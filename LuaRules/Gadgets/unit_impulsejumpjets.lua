@@ -107,6 +107,13 @@ local function StartScript(fn)
 	coroutines[#coroutines + 1] = co
 end
 
+local function Sign(number)
+	if number >0 then
+		return 1
+	else 
+		return -1
+	end
+end
 
 local function FindLaunchSpeedAndAcceleration(flightTime, vector, jumpHeight,groundDistance)
 	--Given value:
@@ -143,17 +150,19 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local fakeUnitID
 	local unitDefID		 = spGetUnitDefID(unitID)
 	local jumpDef			 = jumpDefs[unitDefID]
-	local speed				 = jumpDef.speed --2D speed
+	local speed				 = jumpDef.speed --2D speed (point-A-to-B, ignoring height)
 	local delay				= jumpDef.delay
 	local apexHeight		= jumpDef.height
-	local limitHeight		= jumpDef.limitHeight
+	local impulseTank		= jumpDef.impulseTank or 30 --capacity to launch high, resist Newton and correct drift mid-air
 	local cannotJumpMidair		= jumpDef.cannotJumpMidair
 	local reloadTime		= (jumpDef.reload or 0)*30
 	local teamID				= spGetUnitTeam(unitID)
 	
+	--[[
 	if cannotJumpMidair and abs(spGetGroundHeight(start[1],start[3]) - start[2]) > 1 then
 		return false, true
 	end
+	--]]
 	
 	local rotateMidAir	= jumpDef.rotateMidAir
 	local env
@@ -162,9 +171,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 					goal[2] - start[2],
 					goal[3] - start[3]}
 	
-	if not limitHeight then
-		apexHeight = math.max(apexHeight, vector[2]+apexHeight) --is always higher than the target location
-	end
+	apexHeight = math.max(apexHeight, vector[2]+apexHeight) --is always higher than the target location
 
 	-- vertex of a parabola. This is for flightDist estimate, not need to be too accurate
 	local vertex = {start[1] + vector[1]*0.5,
@@ -213,7 +220,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	if (delay == 0) then
 		Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 		if rotateMidAir then
-			spSetUnitRotation(unitID, 0, -1*startHeading*RADperROT, 0) -- keep current heading. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
+			spSetUnitRotation(unitID, 0, -1*startHeading*RADperROT, 0) -- keep current heading. Note: need to be negative because of bug? wasn't the case for MoveCtrl.SetUnitRotation()
 		end
 	else
 		Spring.UnitScript.CallAsUnit(unitID,env.preJump,turn,lineDist,flightDist,duration)
@@ -230,7 +237,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 
 			if rotateMidAir then
-				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0) -- keep current heading.. Note: need to be negative because of bug? not needed for MoveCtrl.SetUnitRotation() apparently
+				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0) -- keep current heading..
 			end
 
 		end
@@ -244,47 +251,95 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			end
 		end
 		
+		if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
+		
+		--Launch unit upward
 		jumping[unitID]='launch'
-
+		impulseTank = impulseTank - math.abs(xVelocity) - math.abs(zVelocity)
+		local vertThrust = Sign(verticalLaunchVel)*math.min(impulseTank,math.abs(verticalLaunchVel))
+		local rightThrust = xVelocity 
+		local backThrust = zVelocity
+		impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+		impulseQueue[#impulseQueue+1] = {unitID, rightThrust, vertThrust-1, backThrust} --add launch impulse
+		impulseTank = impulseTank - math.abs(vertThrust)
+		
+		--measure initial drift & formulate corection curve
+		local initX,initY,initZ = spGetUnitPosition(unitID)
+		local driftX,driftY,driftZ= spGetUnitVelocity(unitID)
+		local initVertSpeed = driftY + verticalLaunchVel - defFallGravity
+		local initRightSpeed = driftX + xVelocity
+		local initBackSpeed = driftZ + zVelocity
+		local constVertAcc = -(gravity - defFallGravity) - (driftY*2/duration) 
+		local constVertAcc2 = constVertAcc - defFallGravity
+		local constRightAcc = -driftX*2/duration --drift correction curve based on equation: zero-drift = vel*time + (deaccelerate*(time^2))/2n
+		local constBackAcc = -driftZ*2/duration 
+		
+		Sleep()
+		jumping[unitID]= 'airborne'
+		
+		local collisionCountDown = 0
 		local halfJump
-		local jumped
-		local i = 0
-		while i <= duration*1.5 do
+		local i = 1
+		local k = 0
+		while i <= duration*10 do
+			k = k + 1
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
 			if (not jumping[unitID] ) or ( jumping[unitID]=='landed' ) then
 				break --jump aborted (skip to refreshing reload bar)
 			end
 			
-			local x,y,z =spGetUnitPosition(unitID)
-			do
-				if not jumped and y>=0 then --not underwater
-					local grndh =spGetGroundHeight(x,z)
-					if y<=grndh+1 or y<=1 then
-						spSetUnitVelocity(unitID,0,0,0)  --thus its speed don't interfere with jumping (prevent range increase while running). Note; ground unit in flying mode wont be effected
-					end
-					
-					impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
-					impulseQueue[#impulseQueue+1] = {unitID, xVelocity, verticalLaunchVel-1, zVelocity} --add launch impulse
-					jumped = true
-				end
-				local desiredVerticalSpeed = verticalLaunchVel - gravity*(i+1) --maintain original parabola trajectory at all cost. This prevent space-skuttle effect with Newton.
-				local currVertSpeed = verticalLaunchVel - defFallGravity*(i) 
+			if impulseTank > 0 then
+				local j = i-1
+				local  jj = j*j
+				--check vertical drift
+				local expectedVertVel = (initVertSpeed + constVertAcc2*j)  -- from motion formula: velocity = initialVelocity + deacceleration*time
+				local expectedVertPos = (initVertSpeed*j + constVertAcc2*(jj)/2 + initY)
+
+				--check right drift
+				local expectedRightVel = (initRightSpeed + constRightAcc*j)
+				local expectedRightPos = (initRightSpeed*j + constRightAcc*(jj)/2 + initX)
+				
+				--check back drift
+				local expectedBackVel = (initBackSpeed + constBackAcc*j)
+				local expectedBackPos = (initBackSpeed*j + constBackAcc*(jj)/2 + initZ)
+				
+				--create correction thrust
+				local x,y,z =spGetUnitPosition(unitID)
 				local vx,vy,vz= spGetUnitVelocity(unitID)
-				local collide = (jumping[unitID] == 'collide')
-				jumping[unitID]= 'airborne'
-				local vertSpeedDiff =desiredVerticalSpeed - vy --calculate correction
-				local fallOnFeet = halfJump and (currVertSpeed - vy < 0.01) -- negative of expected speed when going down
-				if collide and fallOnFeet then
-					--spSetUnitVelocity(unitID,0,0,0) --stop unit
-					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0}
-					impulseQueue[#impulseQueue+1] = {unitID, -vx*0.5, -vy*0.5-4, -vz*0.5} --slowdown by half
-					break --jump aborted (skip to refreshing reload bar)
-				else --fix vertical velocity difference (fight Newton from pushing unit into space)
-					local sign = math.abs(vertSpeedDiff)/vertSpeedDiff
-					vertSpeedDiff = sign*math.min(math.abs(vertSpeedDiff),verticalLaunchVel) --cap maximum correction to launch impulse (safety against 'physic glitch': violent tug of war between 2 gigantic impulses that cause 1 side to win and send unit into space)
-					impulseQueue[#impulseQueue+1] = {unitID, 0, 4,0} --Impulse capacitor hax; in Spring 91 impulse can't be less than 1, in Spring 93.2.1 impulse can't be less than 4 in y-axis (at least for flying unit)
-					impulseQueue[#impulseQueue+1] = {unitID, 0, vertSpeedDiff-4, 0} --add correction impulse
-					----Spring.Echo("----"); speedProfile[#speedProfile+1]=vy; Spring.Echo(vertSpeedDiff)
+				vertThrust = constVertAcc +  ( expectedVertVel - vy )  --+ ( expectedVertPos - y)
+				rightThrust = constRightAcc + (expectedRightVel-vx)  --+ (x - expectedRightPos) 
+				backThrust = constBackAcc + (expectedBackVel-vz)  --+ (z - expectedBackPos)
+				
+				--limit thrust to avoid glitching out during collision
+				collisionCountDown = (jumping[unitID]=='collide' and collisionCountDown < k and k+4) or collisionCountDown
+				local bigThrust =  (collisionCountDown>k  and 0.1) or 0.4
+				vertThrust = Sign(vertThrust)*math.min(impulseTank,math.abs(vertThrust),bigThrust)
+				impulseTank = impulseTank - math.abs(vertThrust)
+				if impulseTank >0 then
+					rightThrust = Sign(rightThrust)*math.min(impulseTank,math.abs(rightThrust),bigThrust)
+					impulseTank = impulseTank - math.abs(rightThrust)
+					if impulseTank > 0 then
+						backThrust = Sign(backThrust)*math.min(impulseTank,math.abs(backThrust),bigThrust)
+						impulseTank = impulseTank - math.abs(backThrust)
+					else
+						backThrust = 0
+					end
+				else
+					rightThrust = 0
+					backThrust = 0
+				end
+				impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+				impulseQueue[#impulseQueue+1] = {unitID, rightThrust, vertThrust-1, backThrust} --add launch impulse
+				
+				--Pause sequence for large correction
+				local wait
+				if  math.abs(rightThrust) == bigThrust or math.abs(backThrust) == bigThrust or math.abs(vertThrust) ==bigThrust then
+					wait = true
+				end
+				
+				--Give up fighting Newton/collision
+				if impulseTank <= 0 then
+					break
 				end
 			end
 		
@@ -293,24 +348,24 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			else
 				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0)-- keep current heading .
 			end
-			
 			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i/duration * 100)
-			
 			if (not halfJump and i/duration > 0.5) then
 				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
 				halfJump = true
 			end
-			Sleep()
-			if jumped then
+			
+			if not wait then
 				--[[ Slow damage
 				local slowMult = 1-(Spring.GetUnitRulesParam(unitID, "slowState") or 0)
 				i = i + (step*slowMult)
 				]]
 				i = i + 1 --next frame
 			end
+			Sleep()
 		end
-
-		Spring.UnitScript.CallAsUnit(unitID,env.endJump)
+		if impulseTank > 0  or collisionCountDown >= k then --successful landing or end up colliding with stuff
+			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
+		end
 		lastJumpPosition[unitID] = origCmdParams
 		jumping[unitID] = nil
 		SetLeaveTracks(unitID, true)
@@ -381,19 +436,20 @@ end
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam) --Note:Copied from unit_fall_damage.lua by googlefrog
 	-- unit or wreck collision
 	if jumping[unitID] and (weaponDefID == -3) and attackerID == nil then
-		jumping[unitID] = 'collide' --signal to jump loop (is used to terminate trajectory maintenance when colliding real hard (to escape 'physic glitch'))
+		jumping[unitID] = 'collide' --signal to jump loop to handle collision (to avoid 'physic glitch')
 		if GG.SetUnitFallDamageImmunity then
 			local immunityPeriod = spGetGameFrame()+30
-			GG.SetUnitFallDamageImmunity(unitID, immunityPeriod) --this unit immune to unit-to-unit collision damage
-			GG.SetNoDamageToAllyCollidee(unitID, immunityPeriod)
-			GG.SetUnitFallDamageImmunityFeature(unitID, immunityPeriod) --this unit immune to unit-to-feature collision damage
+			--No collision damage except to enemy to simplify gameplay
+			GG.SetUnitFallDamageImmunity(unitID, immunityPeriod) --receive no damage from unit collision
+			GG.SetNoDamageToAllyCollidee(unitID, immunityPeriod) --deal no damage to ally
+			GG.SetUnitFallDamageImmunityFeature(unitID, immunityPeriod) --receive no damage from feature collision
 		end
 		--return math.random() -- no collision damage to collided victim. Using random return to tell "unit_fall_damage.lua" to not use pairs of damage to infer unit-to-unit collision.
 	end
 	-- ground collision
 	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
-		spSetUnitVelocity(unitID,0,Game.gravity*3/30/30,0) --add some bounce upward to escape 'physic glitch'
-		jumping[unitID] = 'landed' --abort jump. Note: we do not assign NIL because jump is not yet completed and we do not want a 2nd mid-air jump just because CommandFallback() sees NIL.
+		spSetUnitVelocity(unitID,0,defFallGravity*3,0) --add some bounce upward to escape 'physic glitch'
+		jumping[unitID] = 'landed' --abort jump. Note: we don't simply wrote NIL because jump isn't completed yet and we don't want a 2nd mid-air jump just because CommandFallback() saw NIL.
 		return 0  -- no collision damage.
 	end
 	return damage
