@@ -103,7 +103,7 @@ function gadget:GameFrame(n)
 	if n%UPDATE_FREQUENCY == 2 then
 		for unitID, frames in pairs(recloakUnit) do
 			if frames <= UPDATE_FREQUENCY then
-				if not ((spGetUnitRulesParam(unitID,"on_fire") == 1) or (spGetUnitRulesParam(unitID,"disarmed") == 1)) then
+				if not ((spGetUnitRulesParam(unitID,"on_fire") > 0) or (spGetUnitRulesParam(unitID,"disarmed") == 1)) then
 					local wantCloakState = spGetUnitRulesParam(unitID, "wantcloak")
 					local areaCloaked = spGetUnitRulesParam(unitID, "areacloaked")
 					spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)

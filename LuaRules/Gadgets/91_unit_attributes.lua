@@ -357,7 +357,7 @@ local function UpdateUnitAttributes(unitID, frame)
 		end
 	end
 	
-	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1)
+	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") > 0) or (disarmed == 1)
 	if cloakBlocked then
 		changedAtt = true
 		if not unitCannotCloak[unitID] then
