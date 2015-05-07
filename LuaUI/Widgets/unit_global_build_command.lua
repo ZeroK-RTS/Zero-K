@@ -101,6 +101,7 @@ options_order = {
 	'autoConvertRes',
 	'autoRepair',
 	'cleanWrecks',
+	'intelliCost',
 	'alwaysShow'
 }
 
@@ -148,6 +149,13 @@ options = {
 		type = 'bool',
 		desc = 'Automatically add reclaim/res for wrecks near your base. This does not target map features and is not a replacement for area reclaim/res.\n (default = false)',
 		value = false,
+	},
+	
+	intelliCost = {
+		name = 'Intelligent Cost Model',
+		type = 'bool',
+		desc = 'Tries to optimize build order for better worker safety and faster overall construction, but makes it \nmore difficult to control what gets built first.\n (default = true)',
+		value = true,
 	},
 	
 	alwaysShow = {
@@ -1267,10 +1275,19 @@ function FindCheapestJob(unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local buildDist = UnitDefs[unitDefID].buildDistance
 		local moveID = UnitDefs[unitDefID].moveDef.id
+		
 		if moveID then -- for ground units, just cache the cost
-			cachedCost = CostOfJob(unitID, key, ux, uz, jx, jz)
+			if options.intelliCost.value then
+				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz)
+			else
+				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz)
+			end
 		else -- for air units, reduce the cost of their current job since they tend to wander around while building
-			cachedCost = CostOfJob(unitID, key, ux, uz, jx, jz) - (buildDist + 20)
+			if options.intelliCost.value then
+				cachedCost = IntelliCost(unitID, key, ux, uz, jx, jz) - (buildDist + 40)
+			else
+				cachedCost = FlatCost(unitID, key, ux, uz, jx, jz) - (buildDist + 40)
+			end
 		end
 	end
    
@@ -1297,7 +1314,12 @@ function FindCheapestJob(unitID)
 			end
 			
 			if isReachableAndBuildable then
-				local tmpCost = CostOfJob(unitID, hash, ux, uz, jx, jz) -- calculate the job cost
+				local tmpCost -- calculate the job cost, depending on the cost model the user has chosen
+				if options.intelliCost.value then
+					tmpCost = IntelliCost(unitID, hash, ux, uz, jx, jz)
+				else
+					tmpCost = FlatCost(unitID, hash, ux, uz, jx, jz)
+				end
 				if not cachedJob or tmpCost < cachedCost then -- then if there is no cached job or if tmpJob is cheaper, replace the cached job with tmpJob and update the cost
 				-- note we ignore jobs that are only trivially cheaper, since it can cause worker 
 					cachedJob = tmpJob
@@ -1309,8 +1331,8 @@ function FindCheapestJob(unitID)
     return cachedJob -- after iterating over the entire queue, the resulting cached job will be the cheapest, return it.
 end       
                     
--- This function implements the cost model by which jobs are assigned.
-function CostOfJob(unitID, hash, ux, uz, jx, jz)
+-- This function implements the 'intelligent' cost model for assigning jobs.
+function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	local job = myQueue[hash]
     local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
     
@@ -1332,20 +1354,26 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 		end
 	end
 	
-	-- The following implements an ordinal cost model, based on the distance to the job and the number of other workers assigned to the same job.
-	-- The general order of priorities for choosing jobs is as follows:
-	-- #1 Start a new cheap build job, or resurrect job
-	-- #2 Assist on an expensive job, or resurrect job
-	-- #3 Start an expensive job, repair, or reclaim
-	-- #4 Assist on repair or reclaim
-	-- #5 Assist on a cheap build job
+	-- The following cost calculation produces a number of different effects:
 	
-	-- The basic goal is to minimize mobbing on jobs where walking time may be a significant cost
-	-- while ensuring that large jobs will have sufficient build power to be completed quickly once started.
-	-- Repair and reclaim are prioritized equally, even though repair is technically twice as energy efficient.
-	-- This is due to high rates of worker (and com) suicide from following combat units if repair is prioritized higher.
-	-- Resurrect is given the highest overall priority due to its exclusive nature. Metal extractors and defences are given a moderately higher
-	-- priority so that they will tend to be the first things started when expanding.
+	-- It prioritizes small defenses highly, and encourages two workers per small defense structure.
+	-- This is to improve worker safety and deter light raiding more effectively.
+	
+	-- Small energy is penalized slightly to encourage workers to cap mexes consistently earlier when expanding.
+	
+	-- Expensive jobs have an initial starting penalty, which disappears once a worker has been assigned
+	-- to that job, and after that there is no penalty for additional mobbing so that the jobs are
+	-- generally guaranteed to finish quickly once started.
+	
+	-- Resurrect always has a high priority and no mobbing penalty, due to its exclusivity.
+	
+	-- Repair and reclaim have the same cost penalty as for starting expensive jobs,
+	-- but the second worker on those jobs is free. This is mainly to prevent workers
+	-- from trampling trees that other workers are trying to reclaim, but also works
+	-- well for repair since mobbing is usually beneficial for that. It also helps
+	-- to keep workers from advancing too far ahead of your combat units when
+	-- reclaiming wreckage, and reclaim also helps to distract workers from following
+	-- combat units into the enemy's base trying to repair them.
 	
 	-- If you want to change the assignment behavior, the stuff below is what you should edit.
 	-- Note that cost represents a distance, which is why cost modifiers use addition,
@@ -1362,28 +1390,97 @@ function CostOfJob(unitID, hash, ux, uz, jx, jz)
 	end
 	
 	if costMod == 1 then -- for starting new jobs
-		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then
-			cost = distance + 400 -- #3
+		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then -- for expensive jobs, repair and reclaim
+			cost = distance + 400
 		elseif unitDef.reloadTime > 0 then -- for small defences
 			cost = distance - 150
-		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then
+		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then -- for small energy
 			cost = distance + 100
-		else
-			cost = distance -- #1
+		else -- for resurrect and all other small build jobs
+			cost = distance
 		end
 	else -- for assisting other workers
-		if (metalCost and metalCost > 300) or job.id == 125 then
-			cost = distance -- #2
-		elseif unitDef.reloadTime > 0 then
+		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive buildings and resurrect
+			cost = distance
+		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
-		elseif job.id == 40 or job.id == 90 then
-			cost = distance + (200 * costMod) -- #4
-		else 
-			cost = distance + (600 * costMod) -- #5
+		elseif job.id == 40 or job.id == 90 then -- for repair and reclaim
+			cost = distance + (200 * costMod)
+		else -- for all other small build jobs
+			cost = distance + (600 * costMod)
 		end
 	end
 	return cost
 end                 
+
+-- This function implements the 'flat' cost model for assigning jobs.
+function FlatCost(unitID, hash, ux, uz, jx, jz)
+	local job = myQueue[hash]
+    local distance = Distance(ux, uz, jx, jz) -- the distance between our worker and job
+    
+    local costMod = 1 -- our cost modifier, the number of other units assigned to the same job + 1.
+    
+    -- note we only count workers that are roughly closer/equal distance to the job,
+    -- so that can achieve both "find the job closest to worker x" and "find the worker closest to their job"
+    -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
+    -- but does not directly determine the behavior.
+	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
+		if ( unitID ~= unit) then -- excluding our current worker.
+			local ix, _, iz = spGetUnitPosition(unit)
+			local idist = Distance(ix, iz, jx, jz)
+			local rdist = max(distance, 200) -- round distance up to 200, to equalize priority at small distances
+			local deltadist = abs(idist - distance) -- calculate the absolute difference in distance, for considering large distances
+			if idist < rdist or (distance > 500 and deltadist < 500) then -- and for each one that is rounded closer/equal-dist to the job vs our worker, we increment our cost weight.
+				costMod = costMod + 1 -- this way we naturally prioritize closer workers so that more distant workers won't kick us off an otherwise efficient job.
+			end
+		end
+	end
+	
+	-- The goal of the flat cost model is to provide consistent behavior that is easily directed
+	-- by the player's actions.
+	
+	-- Repair, reclaim and resurrect are the same as for intellicost.
+	
+	-- All build jobs are cost=distance for starting new jobs.
+	
+	-- Expensive jobs have no mobbing penalty, while small defenses
+	-- allow up to 2 workers per job before the cost increases.
+	
+	-- all other small jobs have a high penalty for assisting.
+	
+	-- If you want to change the assignment behavior, the stuff below is what you should edit.
+	-- Note that cost represents a distance, which is why cost modifiers use addition,
+	-- and the 'magic constants' for that were chosen based on typical map scaling.
+	-- Metal cost for "expensive" jobs is also based on Zero-K scaling, so you may want to adjust that if porting.
+	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
+	
+	local cost
+	local unitDef = UnitDefs[abs(job.id)]
+	local metalCost = false
+	
+	if job.id < 0 then -- for build jobs, get the metal cost
+		metalCost = unitDef.cost
+	end
+	
+	if costMod == 1 then -- for starting new jobs
+		if job.id == 40 or job.id == 90 then -- for repair and reclaim
+			cost = distance + 400
+		else -- for everything else
+			cost = distance
+		end
+	else -- for assisting other workers
+		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive jobs and resurrect, no mobbing penalty
+			cost = distance
+		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+			cost = distance + (800 * (costMod - 2))
+		elseif job.id == 40 or job.id == 90 then -- for repair and reclaim
+			cost = distance + (200 * costMod)
+		else 
+			cost = distance + (600 * costMod) -- for all other jobs, assist is expensive
+		end
+	end
+	return cost
+end
 
 -- This function checks if our group includes a unit that can resurrect
 function CheckForRes()
@@ -1830,13 +1927,13 @@ end
 function IsTargetReachable(unitID, tx,ty,tz)
 	local ox, oy, oz = spGetUnitPosition(unitID)	-- unit location
 	local unitDefID = spGetUnitDefID(unitID)
-	local buildDist = UnitDefs[unitDefID].buildDistance
+	local buildDist = UnitDefs[unitDefID].buildDistance -- build range
     local moveID = UnitDefs[unitDefID].moveDef.id -- unit pathing type
     if moveID then -- air units have no moveID, and we don't need to calculate pathing for them.
 	    local result,lastcoordinate, waypoints
 	    local path = spRequestPath( moveID,ox,oy,oz,tx,ty,tz, 10)
 	    if path then
-		    local waypoint = path:GetPathWayPoints() --get crude waypoint (low chance to hit a 10x10 box). NOTE; if waypoint don't hit the 'dot' is make reachable build queue look like really far away to the GetWorkFor() function.
+		    local waypoint = path:GetPathWayPoints()
 		    local finalCoord = waypoint[#waypoint]
 		    if finalCoord then -- unknown why sometimes NIL
 			    local dx, dz = finalCoord[1]-tx, finalCoord[3]-tz
@@ -1851,8 +1948,7 @@ function IsTargetReachable(unitID, tx,ty,tz)
 		    end
 	    else
 		    return true -- if path is nil for some reason, return true
-		    -- note: we return true for nils because it's generally less bad to make an unreachable job seem reachable than
-		    -- to make a nearby reachable job seem unreachable.
+		    -- note: it usually returns nil for very short distances, which is why returning true is a much better default here
 	    end
     else
 	    return true --for air units; always reachable
