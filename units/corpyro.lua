@@ -23,6 +23,7 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 1,
+    jump_impulse_tank = 29, --resist 1/2 Newton 
 
     description_es = [[Invasor Caminante Jumpjet]],
     description_fr = [[Marcheur Pilleur r Jetpack]],

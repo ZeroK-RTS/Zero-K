@@ -11,6 +11,13 @@ function gadget:GetInfo()
 
 if (not gadgetHandler:IsSyncedCode()) then return end -- no unsynced code
 
+local tankDesignMode = false --Echo out the amount of impulse used during jump, this is used to design unit more/less resistant to gravity weapon. Tank defaulted to 52 if not configured.
+--commrecon1 vs 3 newton = 50
+--commrecon2 vs 3 newton = 56
+--commrecon3 vs 3 newton = 51
+--commrecon4 vs 3 newton = 48
+--commrecon5 vs 3 newton = 52
+
 include("LuaRules/Configs/customcmds.h.lua")
 -- needed for checks
 
@@ -21,8 +28,10 @@ local pairs     = pairs
 local assert    = assert
 
 local RADperROT = math.pi*2/2^16
-local random = math.random
+-- local random = math.random
 local abs    = math.abs
+local min = math.min
+local max = math.max
 
 local CMD_STOP = CMD.STOP
 local CMD_WAIT = CMD.WAIT
@@ -153,11 +162,14 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local speed				 = jumpDef.speed --2D speed (point-A-to-B, ignoring height)
 	local delay				= jumpDef.delay
 	local apexHeight		= jumpDef.height
-	local impulseTank		= jumpDef.impulseTank or 30 --capacity to launch high, resist Newton and correct drift mid-air
+	local impulseTank		= jumpDef.impulseTank or 52 --capacity to launch high, resist Newton and correct drift mid-air
 	local cannotJumpMidair		= jumpDef.cannotJumpMidair
 	local reloadTime		= (jumpDef.reload or 0)*30
 	local teamID				= spGetUnitTeam(unitID)
 	
+	if tankDesignMode then
+		impulseTank = 1000
+	end
 	--[[
 	if cannotJumpMidair and abs(spGetGroundHeight(start[1],start[3]) - start[2]) > 1 then
 		return false, true
@@ -255,21 +267,24 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		
 		--Launch unit upward
 		jumping[unitID]='launch'
-		impulseTank = impulseTank - math.abs(xVelocity) - math.abs(zVelocity)
-		local vertThrust = Sign(verticalLaunchVel)*math.min(impulseTank,math.abs(verticalLaunchVel))
+		impulseTank = impulseTank - abs(xVelocity) - abs(zVelocity)
+		local vertThrust = Sign(verticalLaunchVel)*min(impulseTank,abs(verticalLaunchVel))
 		local rightThrust = xVelocity 
 		local backThrust = zVelocity
 		impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
 		impulseQueue[#impulseQueue+1] = {unitID, rightThrust, vertThrust-1, backThrust} --add launch impulse
-		impulseTank = impulseTank - math.abs(vertThrust)
+		impulseTank = impulseTank - abs(vertThrust)
 		
 		--measure initial drift & formulate corection curve
 		local initX,initY,initZ = spGetUnitPosition(unitID)
 		local driftX,driftY,driftZ= spGetUnitVelocity(unitID)
-		local initVertSpeed = driftY + verticalLaunchVel - defFallGravity
+		local launchVSpd = driftY + verticalLaunchVel
+		local realLaunchVSpd = launchVSpd - defFallGravity
 		local initRightSpeed = driftX + xVelocity
 		local initBackSpeed = driftZ + zVelocity
 		local constVertAcc = -(gravity - defFallGravity) - (driftY*2/duration) 
+		local needVAcc = -(gravity - defFallGravity) - (driftY*2/duration) 
+		local realVAcc = -(gravity) - (driftY*2/duration) 
 		local constVertAcc2 = constVertAcc - defFallGravity
 		local constRightAcc = -driftX*2/duration --drift correction curve based on equation: zero-drift = vel*time + (deaccelerate*(time^2))/2n
 		local constBackAcc = -driftZ*2/duration 
@@ -291,36 +306,37 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			if impulseTank > 0 then
 				local j = i-1
 				local  jj = j*j
+				local ii = i*i
 				--check vertical drift
-				local expectedVertVel = (initVertSpeed + constVertAcc2*j)  -- from motion formula: velocity = initialVelocity + deacceleration*time
-				local expectedVertPos = (initVertSpeed*j + constVertAcc2*(jj)/2 + initY)
+				local expectedVertVel = (realLaunchVSpd + realVAcc*j)  -- from equation of motion #1: currentVelocity = initialVelocity + deacceleration*time
+				local expectedVertPos = (launchVSpd*i + realVAcc*(ii)/2 + initY) -- from equation of motion #2: currentPosition = initialPosition + initialVelocity*time + deacceleration*time*time/2
 
 				--check right drift
 				local expectedRightVel = (initRightSpeed + constRightAcc*j)
-				local expectedRightPos = (initRightSpeed*j + constRightAcc*(jj)/2 + initX)
+				local expectedRightPos = (initRightSpeed*i + constRightAcc*(ii)/2 + initX)
 				
 				--check back drift
 				local expectedBackVel = (initBackSpeed + constBackAcc*j)
-				local expectedBackPos = (initBackSpeed*j + constBackAcc*(jj)/2 + initZ)
+				local expectedBackPos = (initBackSpeed*i + constBackAcc*(ii)/2 + initZ)
 				
-				--create correction thrust
+				--sum all correction thrust
 				local x,y,z =spGetUnitPosition(unitID)
 				local vx,vy,vz= spGetUnitVelocity(unitID)
-				vertThrust = constVertAcc +  ( expectedVertVel - vy )  --+ ( expectedVertPos - y)
-				rightThrust = constRightAcc + (expectedRightVel-vx)  --+ (x - expectedRightPos) 
-				backThrust = constBackAcc + (expectedBackVel-vz)  --+ (z - expectedBackPos)
+				vertThrust = needVAcc +  ( expectedVertVel - vy )  + ( expectedVertPos - y)*0.01
+				rightThrust = constRightAcc + (expectedRightVel-vx)  + ( expectedRightPos - x)*0.01
+				backThrust = constBackAcc + (expectedBackVel-vz)  +  (expectedBackPos - z)*0.01
 				
 				--limit thrust to avoid glitching out during collision
 				collisionCountDown = (jumping[unitID]=='collide' and collisionCountDown < k and k+4) or collisionCountDown
-				local bigThrust =  (collisionCountDown>k  and 0.1) or 0.4
-				vertThrust = Sign(vertThrust)*math.min(impulseTank,math.abs(vertThrust),bigThrust)
-				impulseTank = impulseTank - math.abs(vertThrust)
+				local maxThrust =  (collisionCountDown>k  and 0.1) or 0.4
+				vertThrust = Sign(vertThrust)*min(impulseTank,abs(vertThrust),maxThrust)
+				impulseTank = impulseTank - abs(vertThrust)
 				if impulseTank >0 then
-					rightThrust = Sign(rightThrust)*math.min(impulseTank,math.abs(rightThrust),bigThrust)
-					impulseTank = impulseTank - math.abs(rightThrust)
+					rightThrust = Sign(rightThrust)*min(impulseTank,abs(rightThrust),maxThrust)
+					impulseTank = impulseTank - abs(rightThrust)
 					if impulseTank > 0 then
-						backThrust = Sign(backThrust)*math.min(impulseTank,math.abs(backThrust),bigThrust)
-						impulseTank = impulseTank - math.abs(backThrust)
+						backThrust = Sign(backThrust)*min(impulseTank,abs(backThrust),maxThrust)
+						impulseTank = impulseTank - abs(backThrust)
 					else
 						backThrust = 0
 					end
@@ -333,7 +349,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				
 				--Pause sequence for large correction
 				local wait
-				if  math.abs(rightThrust) == bigThrust or math.abs(backThrust) == bigThrust or math.abs(vertThrust) ==bigThrust then
+				if  abs(rightThrust) == maxThrust or abs(backThrust) == maxThrust or abs(vertThrust) ==maxThrust then
 					wait = true
 				end
 				
@@ -352,6 +368,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			if (not halfJump and i/duration > 0.5) then
 				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
 				halfJump = true
+				if tankDesignMode then
+					Spring.Echo(1000-impulseTank)
+				end
 			end
 			
 			if not wait then
@@ -362,6 +381,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				i = i + 1 --next frame
 			end
 			Sleep()
+		end
+		if tankDesignMode then
+			Spring.Echo(1000-impulseTank)
 		end
 		if impulseTank > 0  or collisionCountDown >= k then --successful landing or end up colliding with stuff
 			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
@@ -461,6 +483,9 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_JUMP)
 	for _, unitID in pairs(Spring.GetAllUnits()) do
 		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
+	end
+	if tankDesignMode then
+		Spring.Echo("Note: jump unit will have large resistance to Newton due to being in tank design mode")
 	end
 end
 
