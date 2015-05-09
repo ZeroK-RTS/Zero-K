@@ -254,7 +254,7 @@ local max	= math.max
 local min	= math.min
 local modf	= math.modf
 
-local nextFrame	= 15
+local nextFrame	= 2
 local myTeamID = spGetMyTeamID()
 local textColor = {0.7, 1.0, 0.7, 1.0}
 local textSize = 12.0
@@ -321,6 +321,11 @@ end
 
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
 function widget:GameFrame(thisFrame)
+	if thisFrame == 1 then -- initialize, using GameFrame since we need to properly account for lag
+		nextFrame = 30 + ping()
+		return
+	end
+	
 	if ( thisFrame < nextFrame ) then 
 		return
 	end
@@ -1392,7 +1397,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	if costMod == 1 then -- for starting new jobs
 		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then -- for expensive jobs, repair and reclaim
 			cost = distance + 400
-		elseif unitDef.reloadTime > 0 then -- for small defences
+		elseif unitDef.reloadTime > 0 or job.id == 125 then -- for small defenses and resurrect
 			cost = distance - 150
 		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then -- for small energy
 			cost = distance + 100
