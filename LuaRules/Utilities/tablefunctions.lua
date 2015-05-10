@@ -31,7 +31,6 @@ function Spring.Utilities.MergeTable(primary, secondary, deep)
     return new
 end
 
-
 function Spring.Utilities.TableToString(data)
 	 local str = ""
 
@@ -68,4 +67,18 @@ function Spring.Utilities.TableToString(data)
     end
 
     return str
+end
+
+-- need this because SYNCED.tables are merely proxies, not real tables
+function Spring.Utilities.MakeRealTable(proxy)
+	local proxyLocal = proxy
+	local ret = {}
+	for i,v in spairs(proxyLocal) do
+		if type(v) == "table" then
+			ret[i] = MakeRealTable(v)
+		else
+			ret[i] = v
+		end
+	end
+	return ret
 end

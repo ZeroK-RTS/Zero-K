@@ -1407,19 +1407,10 @@ function gadget:Initialize()
   gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
 end
 
-local function MakeRealTable(proxy)
-	local proxyLocal = proxy
-	local ret = {}
-	for i,v in spairs(proxyLocal) do
-		if type(v) == "table" then
-			ret[i] = MakeRealTable(v)
-		else
-			ret[i] = v
-		end
-	end
-	return ret
-end
+
 --[[
+local MakeRealTable = Spring.Utilities.MakeRealTable
+
 function gadget:Save(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "ERROR: Chicken Spawner failed to access save/load API")
