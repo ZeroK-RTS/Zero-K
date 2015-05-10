@@ -187,6 +187,7 @@ local spGetUnitHealth		= Spring.GetUnitHealth
 local spGetUnitTeam			= Spring.GetUnitTeam
 local spIsUnitAllied		= Spring.IsUnitAllied
 local spGiveOrderToUnit    	= Spring.GiveOrderToUnit
+local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
 local spGetMyPlayerID       = Spring.GetMyPlayerID
 local spGetMyTeamID			= Spring.GetMyTeamID
 local spGetMyAllyTeamID		= Spring.GetMyAllyTeamID
@@ -211,6 +212,7 @@ local spIsPosInLos			= Spring.IsPosInLos
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spRequestPath			= Spring.RequestPath
 
+local spWorldToScreenCoords = Spring.WorldToScreenCoords
 local spTraceScreenRay		= Spring.TraceScreenRay
 local spSetMouseCursor		= Spring.SetMouseCursor
 local spPlaySoundFile		= Spring.PlaySoundFile
@@ -975,6 +977,17 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 			elseif id == 40 or id == 90 or id == 125 then -- if the command is for repair, reclaim or ressurect
 				if #params > 1 then -- if the order is an area order
 					local x, y, z, r = params[1], params[2], params[3], params[4]
+					
+					if id == 90 then -- check for specific unit reclaim
+						local mx,my,mz = spWorldToScreenCoords(x, y, z) -- convert the center point to screen coords
+						local cType,uid = spTraceScreenRay(mx,my) -- trace a screen ray back to see if it was placed on top of a unit
+						if cType == "unit" and spGetUnitTeam(uid) == myTeamID then -- if it's a unit, and one of ours, then convert to specific unit reclaim
+							local unitDefID = spGetUnitDefID(uid)
+							ReclaimSpecificUnit(unitDefID, x, z, r, options.shift)
+							return true -- capture the command regardless, since this can't easily be given as a direct order
+						end
+					end
+						
 					local myCmd = {}
 					if options.alt then -- ZK-Specific Behavior: alt makes area jobs 'permanent', thus we need to record if it was used so we can maintain that behavior.
 						-- note if you wanted to emulate this same behavior for some other game, it would require only a minor change to IdleCheck().
@@ -1562,6 +1575,25 @@ function SplitAreaCommand(id, x, z, r)
 					myQueue[hash] = myCmd -- note: this is to prevent assignedUnits from being invalidated
 					UpdateOneJobPathing(hash)
 				end
+			end
+		end
+	end
+end
+
+-- This function implements specific-unit reclaim
+function ReclaimSpecificUnit(unitDefID, x, z, r, shift)
+	local targets = spGetUnitsInCylinder(x, z, r)
+	local iselUnits = spGetSelectedUnits()
+	local selUnits = {}
+	
+	for i=1, #targets do -- identify all the intended targets and add them to the queue
+		local target = targets[i]
+		if spGetUnitDefID(target) == unitDefID and spGetUnitTeam(target) == myTeamID then -- if the unit is ours and of the specified type
+		-- note: the "is ours" part can be removed for games that allow reclaiming the enemy
+			local myCmd = {id=90, target=target, assignedUnits={}}
+			local hash = BuildHash(myCmd)
+			if not myQueue[hash] then -- build a new command and add it to the queue if it isn't already
+				myQueue[hash] = myCmd
 			end
 		end
 	end
