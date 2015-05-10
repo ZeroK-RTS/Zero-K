@@ -452,6 +452,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 end
 
+-- All information required for load is stored in unitRulesParams.
 function gadget:Load(zip)
-
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		UpdateUnitAttributes(unitID)
+	end
 end

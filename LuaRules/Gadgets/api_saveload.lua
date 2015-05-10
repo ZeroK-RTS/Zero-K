@@ -170,7 +170,10 @@ end
 -----------------------------------------------------------------------------------
 local function ValidateUnitRule(name, value)
 	if name == "captureRechargeFrame" then
-		value = value - GetSavedGameFrame()
+		return value - GetSavedGameFrame()
+	end
+	if name == "capture_controller" then
+		return GetNewUnitID(value)
 	end
 	return value
 end
@@ -223,14 +226,22 @@ local function LoadUnits()
 			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
 			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 			
-			-- rulesparams
-			for name,value in pairs(data.rulesParams) do
-				Spring.SetUnitRulesParam(newID, name, ValidateUnitRule(name, value))
-			end
+			
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral)
 			
 			Spring.Echo("unitID check", oldID, newID)
+		end
+	end
+	
+	-- Things that rely on unitID remapping
+	for oldID, data in pairs(savedata.unit) do
+		if data.newID then
+			local newID = data.newID
+			-- rulesparams
+			for name,value in pairs(data.rulesParams) do
+				Spring.SetUnitRulesParam(newID, name, ValidateUnitRule(name, value))
+			end
 		end
 	end
 	
