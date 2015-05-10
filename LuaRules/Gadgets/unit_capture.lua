@@ -71,9 +71,6 @@ local capturedUnits = {}
 local controllerByID = {data = {}, count = 0}
 local controllers = {} 
 
-local drawingByID = {data = {}, count = 0}
-local drawing = {} 
-
 local reloading = {}
 
 local function checkThingsDoubleTable(things, thingByID)
