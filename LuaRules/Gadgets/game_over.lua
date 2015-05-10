@@ -44,6 +44,7 @@ local spGetUnitIsStunned= Spring.GetUnitIsStunned
 local spGetUnitHealth   = Spring.GetUnitHealth
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spTransferUnit	= Spring.TransferUnit
+spGetGameRulesParam     = Spring.GetGameRulesParam
 local spKillTeam	= Spring.KillTeam
 local spGameOver	= Spring.GameOver
 local spEcho       = Spring.Echo
@@ -392,6 +393,10 @@ function gadget:UnitCreated(u, ud, team)
 end
 
 function gadget:UnitDestroyed(u, ud, team)
+	if true or spGetGameRulesParam("loadPurge") == 1 then
+		return
+	end
+	
 	if (team ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
 	  and finishedUnits[u]
@@ -447,7 +452,7 @@ function gadget:GameFrame(n)
 			end
 		end
 		toDestroy = {}
-		if not gameover then
+		if not gameover and not spGetGameRulesParam("loadedGame") then
 			ProcessLastAlly()
 		end
 	end

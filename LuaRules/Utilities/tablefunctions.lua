@@ -70,7 +70,7 @@ function Spring.Utilities.TableToString(data)
 end
 
 -- need this because SYNCED.tables are merely proxies, not real tables
-function Spring.Utilities.MakeRealTable(proxy)
+local function MakeRealTable(proxy)
 	local proxyLocal = proxy
 	local ret = {}
 	for i,v in spairs(proxyLocal) do
@@ -82,3 +82,4 @@ function Spring.Utilities.MakeRealTable(proxy)
 	end
 	return ret
 end
+Spring.Utilities.MakeRealTable = MakeRealTable

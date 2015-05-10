@@ -121,6 +121,24 @@ local function GetNewUnitID(oldUnitID)
 end
 GG.SaveLoad.GetNewUnitID = GetNewUnitID
 
+local function GetNewUnitIDKeys(data)
+	local ret = {}
+	for i, v in pairs(data) do
+		ret[GetNewUnitID(i)] = v
+	end
+	return ret
+end
+GG.SaveLoad.GetNewUnitIDKeys = GetNewUnitIDKeys
+
+local function GetNewUnitIDValues(data)
+	local ret = {}
+	for i, v in pairs(data) do
+		ret[i] = GetNewUnitID(v)
+	end
+	return ret
+end
+GG.SaveLoad.GetNewUnitIDValues = GetNewUnitIDValues
+
 local function GetNewFeatureID(oldFeatureID)
 	return savedata.feature[oldFeatureID] and savedata.feature[oldFeatureID].newID
 end
@@ -150,6 +168,13 @@ local function IsCMDTypeIconModeOrNumber(unitID, cmdID)
 end
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
+local function ValidateUnitRule(name, value)
+	if name == "captureRechargeFrame" then
+		value = value - GetSavedGameFrame()
+	end
+	return value
+end
+
 local function LoadUnits()
 	local factoryBuildeesToDelete = {}
 	-- prep units
@@ -164,7 +189,7 @@ local function LoadUnits()
 		-- with that unitID then the new unit will fail to be created. The old unit
 		-- do not immediately de-allocate their ID on Spring.DestroyUnit so some blocking
 		-- can occur with explicitly set IDs.
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, true)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, false)
 		if newID then
 			data.newID = newID
 			-- position and velocity
@@ -181,7 +206,7 @@ local function LoadUnits()
 			-- weapons
 			for i,v in pairs(data.weapons) do
 				if v.reloadState then
-					spSetUnitWeaponState(newID, i, "reloadState", v.reloadState)
+					spSetUnitWeaponState(newID, i, 'reloadState', v.reloadState - GetSavedGameFrame())
 				end
 				if data.shield[i] then
 					spSetUnitShieldState(newID, i, data.shield[i].enabled, data.shield[i].power)
@@ -200,7 +225,7 @@ local function LoadUnits()
 			
 			-- rulesparams
 			for name,value in pairs(data.rulesParams) do
-				Spring.SetUnitRulesParam(newID, name, value)
+				Spring.SetUnitRulesParam(newID, name, ValidateUnitRule(name, value))
 			end
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral)
@@ -382,6 +407,16 @@ local function LoadGeneralInfo()
 		spSetGameRulesParam(name, value)
 	end
 	
+	local currentGameFrame = Spring.GetGameFrame()
+	
+	-- The subtraction of current game frame should support /reloadgame
+	savedata.general.gameFrame = savedata.general.gameFrame - currentGameFrame
+	
+	-- Game frame when the game was last saved.
+	spSetGameRulesParam("lastSaveGameFrame", savedata.general.gameFrame)
+	-- Total game frame if all saves were stitched together
+	spSetGameRulesParam("totalSaveGameFrame", savedata.general.totalGameFrame)
+	
 	-- team data
 	for teamID, teamData in pairs(savedata.general.teams or {}) do
 		-- this bugs with storage units - do it after units are created
@@ -421,6 +456,7 @@ function gadget:Load(zip)
 
 	toCleanupFactory = {}
 	-- get save data
+	Spring.SetGameRulesParam("loadPurge", 1)
 	savedata.unit = ReadFile(zip, "Unit", unitFile) 
 	local units = Spring.GetAllUnits()
 	for i=1,#units do
@@ -442,6 +478,7 @@ function gadget:Load(zip)
 	LoadProjectiles() -- do projectiles after units so they can home onto units.
 	SetStorage()
 	
+	Spring.SetGameRulesParam("loadPurge", 0)
 	Spring.SetGameRulesParam("loadedGame", 1)
 end
 
@@ -670,7 +707,7 @@ local function SaveUnits()
 		unitInfo.shield = {}
 		for i=1,#weapons do
 			unitInfo.weapons[i] = {}
-			unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, reloadState)
+			unitInfo.weapons[i].reloadState = spGetUnitWeaponState(unitID, i, 'reloadState')
 			local enabled, power = Spring.GetUnitShieldState(unitID, i)
 			if power then
 				unitInfo.shield[i] = {enabled = enabled, power = power}
@@ -715,7 +752,7 @@ local function SaveUnits()
 		local params = Spring.GetUnitRulesParams(unitID)
 		for i=1,#params do
 			for name,value in pairs(params[i]) do
-				unitInfo.rulesParams.name = value 
+				unitInfo.rulesParams[name] = value 
 			end
 		end
 	end
@@ -788,6 +825,7 @@ local function SaveGeneralInfo()
 	local data = {}
 	
 	data.gameFrame = Spring.GetGameFrame()
+	data.totalGameFrame = data.gameFrame + (Spring.GetGameRulesParam("lastSaveGameFrame") or 0)
 	
 	-- gameRulesParams
 	data.gameRulesParams = {}
