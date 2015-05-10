@@ -1024,20 +1024,18 @@ function gadget:Load(zip)
 	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
-	boost = data.boost
-	facplops = data.facplops
 	
-	--[[
 	-- these require special handling because they involve unitIDs
+	boost = {}
 	for oldID in pairs(data.boost) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
 		boost[newID] = true
 	end
+	facplops = {}
 	for oldID in pairs(data.facplops) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
 		GG.GiveFacplop(newID)
 	end
-	]]
 end
 
 --------------------------------------------------------------------
