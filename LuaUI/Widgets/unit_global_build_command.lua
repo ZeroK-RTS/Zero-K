@@ -1583,8 +1583,6 @@ end
 -- This function implements specific-unit reclaim
 function ReclaimSpecificUnit(unitDefID, x, z, r, shift)
 	local targets = spGetUnitsInCylinder(x, z, r)
-	local iselUnits = spGetSelectedUnits()
-	local selUnits = {}
 	
 	for i=1, #targets do -- identify all the intended targets and add them to the queue
 		local target = targets[i]
