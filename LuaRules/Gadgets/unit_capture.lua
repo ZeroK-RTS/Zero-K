@@ -68,7 +68,6 @@ local unitDamage = {}
 
 local capturedUnits = {}
 
-local controllerByID = {data = {}, count = 0}
 local controllers = {} 
 
 local reloading = {}
@@ -402,11 +401,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 	
-	controllerByID.count = controllerByID.count + 1
-	controllerByID.data[controllerByID.count] = unitID
-	
 	controllers[unitID] = {
-		index = controllerByID.count,
 		postCaptureReload = captureUnitDefs[unitDefID].postCaptureReload,
 		units = {},
 		unitByID = {count = 0, data = {}},
@@ -433,7 +428,7 @@ function gadget:UnitDestroyed(unitID)
 				i = i + 1
 			end
 		end
-		removeThingFromDoubleTable(unitID, controllers, controllerByID)
+		controllers[unitID] = nil
 	end
 	
 	if capturedUnits[unitID] then
