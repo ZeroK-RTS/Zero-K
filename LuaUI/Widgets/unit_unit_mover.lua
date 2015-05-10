@@ -37,7 +37,7 @@ local CMD_MOVE = CMD.MOVE
 
 --------------------------------------------------------------------------------
 
-
+-- rewritten by aeonios
 local myTeamID = spGetMyTeamID()
 
 function widget:PlayerChanged(playerID)
