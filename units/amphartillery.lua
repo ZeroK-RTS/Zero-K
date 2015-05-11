@@ -157,7 +157,7 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 96,
-      object           = [[wreck2x2b.s3o]],
+      object           = [[behecrash_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 96,
     },
