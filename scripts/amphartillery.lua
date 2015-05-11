@@ -30,10 +30,11 @@ local torpRange = 440
 local shotRange = 680
 local longRange = true
 
+local smokePiece = {pelvis, turret}
+
 function script.Create()
-	Hide(firept1)
-	Hide(firept2)
 	StartThread(WeaponRangeUpdate)
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function WeaponRangeUpdate()
@@ -140,4 +141,35 @@ function script.QueryWeapon(num)
 	return firepoints[gun_1]
 end
 
-
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity <= .25  then
+		Explode(lfoot, sfxNone)
+		Explode(lleg, sfxNone)
+		Explode(pelvis, sfxNone)
+		Explode(rfoot, sfxNone)
+		Explode(rleg, sfxNone)
+		return 1
+	elseif severity <= .50  then
+		Explode(lfoot, sfxFall)
+		Explode(lleg, sfxFall)
+		Explode(rfoot, sfxFall)
+		Explode(rleg, sfxFall)
+		Explode(pelvis, sfxShatter)
+		return 1
+	elseif severity <= .99  then
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(pelvis, sfxShatter)
+		return 2
+	else
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(pelvis, sfxShatter + sfxExplode )
+		return 2
+	end
+end

@@ -18,6 +18,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
+    amph_regen = 10,
+    amph_submerged_at = 40,
       description_pl = [[Lekki bot amfibijny]],
       helptext       = [[The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. ]],
       helptext_pl    = [[Grebe to lekki bot z granatami krotkiego zasiegu, ktore dobrze sprawdzaja sie przeciwko ciezszym celom. Mimo ze jest amfibijny, nie moze atakowac spod wody.]],
