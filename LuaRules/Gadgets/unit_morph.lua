@@ -609,6 +609,9 @@ local function FinishMorph(unitID, morphData)
   local newXp = Spring.GetUnitExperience(unitID)*XpScale 
   --//copy unit speed
   local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
+ 
+
+  Spring.SetUnitRulesParam(newUnit, "jumpReload", Spring.GetUnitRulesParam(unitID, "jumpReload") or 1)
   
   --// FIXME: - re-attach to current transport?
   --// update selection
@@ -719,11 +722,13 @@ end
 local function UpdateMorph(unitID, morphData)
   if Spring.GetUnitTransporter(unitID) then return true end
   
-  local allow = GG.CheckMiscPriorityBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
-  if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
-    morphData.progress = morphData.progress + morphData.increment
+  if (morphData.progress < 1.0) then
+	  local allow = GG.CheckMiscPriorityBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
+	  if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
+		morphData.progress = morphData.progress + morphData.increment
+	  end
   end
-  if (morphData.progress >= 1.0) then
+  if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1) then
     FinishMorph(unitID, morphData)
     return false -- remove from the list, all done
   end
@@ -1463,7 +1468,8 @@ local function DrawCombatMorphUnit(unitID, morphData, localTeamID)
 	--glDepthTest(false)
 end
 
-function gadget:DrawWorld()
+local function DrawWorldFunc()
+
   local morphUnits = SYNCED.morphUnits
 
   if (not snext(morphUnits)) then
@@ -1486,17 +1492,25 @@ function gadget:DrawWorld()
   CallAsTeam({ ['read'] = readTeam }, function()
     for unitID, morphData in spairs(morphUnits) do
       if (unitID and morphData)and(IsUnitVisible(unitID)) then
-		if morphData.combatMorph then
-		  DrawCombatMorphUnit(unitID, morphData,readTeam)	
-		else
+    if morphData.combatMorph then
+      DrawCombatMorphUnit(unitID, morphData,readTeam) 
+    else
           DrawMorphUnit(unitID, morphData,readTeam)
-		end
+    end
       end
     end
   end)
   glDepthTest(false)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   phase = phase + .06
+end
+
+function gadget:DrawWorld()
+  DrawWorldFunc()
+end
+
+function gadget:DrawWorldRefraction()
+  DrawWorldFunc()
 end
 
 local function split(msg,sep)

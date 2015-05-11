@@ -22,6 +22,8 @@ local DEGRADE_FACTOR = 0.04
 
 local DAMAGE_MULT = 3	-- n times faster when target is at 0% health
 
+local SAVE_FILE = "Gadgets/unit_capture.lua"
+
 include("LuaRules/Configs/customcmds.h.lua")
 local CMD_STOP = CMD.STOP
 local CMD_SELFD = CMD.SELFD
@@ -68,13 +70,20 @@ local unitDamage = {}
 
 local capturedUnits = {}
 
-local controllerByID = {data = {}, count = 0}
 local controllers = {} 
 
-local drawingByID = {data = {}, count = 0}
-local drawing = {} 
-
 local reloading = {}
+
+--------------------------------------------------------------------------------
+-- For gadget:Save
+--------------------------------------------------------------------------------
+_G.unitDamage    = unitDamage
+_G.capturedUnits = capturedUnits
+_G.controllers   = controllers
+_G.reloading     = reloading
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 
 local function checkThingsDoubleTable(things, thingByID)
 	
@@ -405,11 +414,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		return
 	end
 	
-	controllerByID.count = controllerByID.count + 1
-	controllerByID.data[controllerByID.count] = unitID
-	
 	controllers[unitID] = {
-		index = controllerByID.count,
 		postCaptureReload = captureUnitDefs[unitDefID].postCaptureReload,
 		units = {},
 		unitByID = {count = 0, data = {}},
@@ -420,7 +425,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	spInsertUnitCmdDesc(unitID, unitKillSubordinatesCmdDesc)
 	KillToggleCommand(unitID, {0}, {})
-
 end
 
 
@@ -436,7 +440,7 @@ function gadget:UnitDestroyed(unitID)
 				i = i + 1
 			end
 		end
-		removeThingFromDoubleTable(unitID, controllers, controllerByID)
+		controllers[unitID] = nil
 	end
 	
 	if capturedUnits[unitID] then
@@ -472,6 +476,64 @@ function gadget:Initialize()
 	
 end
 
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Capture failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Capture", SAVE_FILE) or {}
+
+	local loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	
+	-- Reset data (something may have triggered during unit creation).
+	damageByID = {data = {}, count = 0}
+	unitDamage = {}
+	capturedUnits = {}
+	controllers = {} 
+	reloading = {}
+	
+	-- Load the data
+	for oldUnitID, data in pairs(loadData.unitDamage) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		damageByID.count = damageByID.count + 1
+		damageByID.data[damageByID.count] = unitID
+		unitDamage[unitID] = data
+		unitDamage[unitID].index = damageByID.count
+	end
+	
+	for oldUnitID, data in pairs(loadData.capturedUnits) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		capturedUnits[unitID] = data
+		capturedUnits[unitID].controllerID = GG.SaveLoad.GetNewUnitID(data.controllerID)
+	end
+	
+	for oldUnitID, data in pairs(loadData.controllers) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+
+		controllers[unitID] = {
+			postCaptureReload = data.postCaptureReload,
+			units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
+			unitByID = {
+				count = data.unitByID.count, 
+				data = GG.SaveLoad.GetNewUnitIDValues(data.unitByID.data)
+			},
+			killSubordinates = data.killSubordinates,
+		}
+		
+		KillToggleCommand(unitID, {(data.killSubordinates and 1) or 0}, {})
+	end
+	
+	for frame, data in pairs(loadData.reloading) do
+		local newFrame = frame - loadGameFrame
+		if newFrame >= 0 then
+			reloading[newFrame] = {
+				count = data.count, 
+				data = GG.SaveLoad.GetNewUnitIDValues(data.data)
+			}
+		end
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -568,6 +630,28 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		drawingUnits[unitID] = controllerID
 		unitCount = unitCount + 1
 	end
+end
+
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		gadget:UnitGiven(unitID)
+	end
+end
+
+local MakeRealTable = Spring.Utilities.MakeRealTable
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Capture failed to access save/load API")
+		return
+	end
+	local toSave = {
+		unitDamage = MakeRealTable(SYNCED.unitDamage),
+		capturedUnits = MakeRealTable(SYNCED.capturedUnits),
+		controllers = MakeRealTable(SYNCED.controllers),
+		reloading = MakeRealTable(SYNCED.reloading),
+	}
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, toSave)
 end
 
 --------------------------------------------------------------------------------

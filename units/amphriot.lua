@@ -89,7 +89,11 @@ unitDef = {
       bounceslip              = 1,
       burnblow                = 1,
       canAttackGround         = false, -- also workaround for range hax
+<<<<<<< HEAD
       flighttime              = 1.0,
+=======
+      flightTime              = 1.5,
+>>>>>>> feb4578ec71f529fc5ed66fd7fcb24e500f6245f
       burnblow                = true,
       collideFriendly         = false,
       craterBoost             = 0,

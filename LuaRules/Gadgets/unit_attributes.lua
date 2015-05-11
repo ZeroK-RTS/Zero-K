@@ -81,13 +81,8 @@ local currentAcc = {}
 local unitForcedOff = {}
 local unitSlowed = {}
 local unitShieldDisabled = {}
-local unitCannotCloak = {}
 
 local unitReloadPaused = {}
-
-if not GG.att_reload then
-	GG.att_reload = {}
-end
 
 local function updateBuildSpeed(unitID, ud, speedFactor)	
 
@@ -106,6 +101,8 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 
     local state = origUnitBuildSpeed[unitDefID]
 
+	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, ALLY_ACCESS)
+	
     spSetUnitBuildSpeed(unitID, 
         state.buildSpeed*speedFactor, -- build
         2*state.buildSpeed*speedFactor, -- repair
@@ -115,21 +112,17 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 end
 
 local function updateEconomy(unitID, ud, factor)	
-	local unitDefID = ud.id
+	local cp = ud.customParams
 	
-    if ud.metalMake ~= 0 then
-        local metalMake = ud.metalMake
-		Spring.SetUnitResourcing(unitID, "cmm", -metalMake*(1-factor))
-	elseif ud.customParams.ismex then
+	if cp.income_metal then
+		Spring.SetUnitResourcing(unitID, "cmm", cp.income_metal*factor)
+	end
+	if cp.income_energy then
+		Spring.SetUnitResourcing(unitID, "cme", cp.income_energy*factor)
+	end
+	if cp.ismex then
 		Spring.SetUnitRulesParam(unitID,"mexincomefactor", factor)
     end
-	
-	if energyMake ~= 0 or energyUpkeep ~= 0 then
-		local energyMake = ud.energyMake
-		local energyUpkeep = ud.energyUpkeep
-		Spring.SetUnitResourcing(unitID, "cme", -energyMake*(1-factor))
-		Spring.SetUnitResourcing(unitID, "cue", -energyUpkeep*(1-factor))
-	end
 end
 
 local function updatePausedReload(unitID, unitDefID, gameFrame)
@@ -303,7 +296,6 @@ local function removeUnit(unitID)
 	unitForcedOff[unitID] = nil
 	unitSlowed[unitID] = nil
 	unitShieldDisabled[unitID] = nil
-	unitCannotCloak[unitID] = nil 
 	unitReloadPaused[unitID] = nil
 	
 	currentEcon[unitID] = nil 
@@ -354,7 +346,6 @@ function UpdateUnitAttributes(unitID, frame)
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, ALLY_ACCESS)
 		
-		GG.att_reload[unitID] = reloadMult
 		unitSlowed[unitID] = moveMult < 1
 		if reloadMult ~= currentReload[unitID] then
 			updateReloadSpeed(unitID, ud, reloadMult, frame)
@@ -408,17 +399,10 @@ function UpdateUnitAttributes(unitID, frame)
 			Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { oldVal }, { })
 		end
 	end
-	
+
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1)
 	if cloakBlocked then
-		changedAtt = true
-		if not unitCannotCloak[unitID] then
-			Spring.SetUnitCloak(unitID, false)
-			unitCannotCloak[unitID] = true
-		end
-	elseif unitCannotCloak[unitID] then
-		Spring.SetUnitCloak(unitID, false, false)
-		unitCannotCloak[unitID] = nil
+		GG.PokeDecloakUnit(unitID, 1)
 	end
 
 	-- remove the attributes if nothing is being changed
@@ -429,6 +413,11 @@ end
 
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
+	
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
+	end
 end
 
 function gadget:GameFrame(f)
@@ -441,6 +430,10 @@ end
 
 function gadget:UnitDestroyed(unitID)
 	removeUnit(unitID)
+end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	updateEconomy(unitID, UnitDefs[unitDefID], 1)
 end
 
 function gadget:AllowCommand_GetWantedCommand()
@@ -459,3 +452,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 end
 
+-- All information required for load is stored in unitRulesParams.
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		UpdateUnitAttributes(unitID)
+	end
+end

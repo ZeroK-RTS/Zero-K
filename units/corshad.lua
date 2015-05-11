@@ -33,7 +33,7 @@ unitDef = {
     helptext_fr    = [[Le Raven largue des bombes de haute précision, parfait pour les frappes chirurgicales comme une défense antimissile ou une tourelle genante, mais peu efficace contre une armée massive.]],
 	helptext_de    = [[Der Raven wirft eine einzige Bombe mit hohem Schaden ab. Ideal fungiert er dazu, einzelne, strategisch wichtige Gebäude wie z.B. Anti-Atom zu zerstören, um dann mit seinen Haupteinheiten einzufallen. Kleinere Einheiten werden aber nur schwelich getroffen und sollten von daher auf anderem Wege bekämpft werden.]],
 	helptext_pl    = [[Raven zrzuca pojedyncza bombe o wysokich obrazeniach i malym obszarze wybuchu. Swietnie nadaje sie do niszczenia ciezszych celow, jednak po kazdym zrzucie musi zaladowac nowa bombe na lotnisku lub stacji dozbrajania.]],
-		modelradius    = [[10]],
+		modelradius    = [[15]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -51,7 +51,7 @@ unitDef = {
   maxElevator         = 0.02,
   maxRudder           = 0.009,
   maxFuel             = 1000000,
-  maxPitch            = 0.3,
+  maxPitch            = 0.4,
   maxVelocity         = 7.8,
   minCloakDistance    = 75,
   noAutoFire          = false,
@@ -139,9 +139,9 @@ unitDef = {
 	  cylinderTargeting	  = 1,
 
       damage                  = {
-        default = 805.1,
-        planes  = 805.1,
-        subs    = 805.1,
+        default = 800.1,
+        planes  = 800.1,
+        subs    = 800.1,
       },
 	  
 	  customParams            = {
@@ -198,8 +198,8 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      range                   = 600,
-      reloadtime              = 2,
+      range                   = 460,
+      reloadtime              = 0.7,
       rgbColor                = [[0.5 1 1]],
       size                    = 1E-06,
 	  startVelocity           = 2000,

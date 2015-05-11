@@ -40,7 +40,7 @@ return {
       ground             = true,
       water              = false,
       properties = {
-        airdrag            = 0.8,
+        airdrag            = 0.95,
         colormap           = [[1 0.5 0.3 0.3  0.45 0.37 0.3 1  0.45 0.37 0.3 1	 0 0 0 0.01]],
         directional        = true,
         emitrot            = 0,
@@ -53,7 +53,7 @@ return {
         particlesize       = 2.3,
         particlesizespread = 1,
         particlespeed      = 0,
-        particlespeedspread = 19,
+        particlespeedspread = 6,
         pos                = [[0, -2, 0]],
         sizegrowth         = 3,
         sizemod            = 1.0,

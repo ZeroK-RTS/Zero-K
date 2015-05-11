@@ -332,7 +332,7 @@ function widget:Update()
 end
 
 
-function widget:DrawWorld()
+local function DrawWorldFunc()
     if Spring.IsGUIHidden() then return end
     if not( (type == 'feature') or (type == 'unit') or #visibleSelected > 0 or #visibleAllySelUnits > 0 ) then
         return
@@ -561,6 +561,13 @@ function widget:DrawWorld()
     
 end
               
+function widget:DrawWorld()
+    DrawWorldFunc()
+end
+
+function widget:DrawWorldRefraction()
+    DrawWorldFunc()
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

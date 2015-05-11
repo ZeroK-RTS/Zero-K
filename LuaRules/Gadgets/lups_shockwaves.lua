@@ -8,7 +8,7 @@ function gadget:GetInfo()
     date      = "Jan. 2008",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false
+    enabled   = true
   }
 end
 
@@ -29,17 +29,20 @@ if (gadgetHandler:IsSyncedCode()) then
     if (not customParams.lups_noshockwave) then
       local speed = 1
       local life = 1
+	  local normalShockwave = (wd.damageAreaOfEffect>70 and not wd.paralyzer and not customParams.disarmdamageonly)
       if customParams.lups_explodespeed then
 	    speed = wd.customParams.lups_explodespeed
+		normalShockwave = true
       end
-      if wd.customParams.lups_explodelife then
+      if customParams.lups_explodelife then
 	    life = wd.customParams.lups_explodelife
+		normalShockwave = true
       end
 	  if wd.description == "Implosion Bomb" then
 		hasShockwave[wd.id] = {special = 1}
         Script.SetWatchWeapon(wd.id,true)
 	    wantedList[#wantedList + 1] = wd.id
-      elseif (wd.damageAreaOfEffect>70 and not wd.paralyzer) then
+      elseif normalShockwave then
 	    hasShockwave[wd.id] = {
 			life = 23*life, 
 			speed = speed,

@@ -2102,13 +2102,7 @@ end
 --]]
 
 function gadgetHandler:GotChatMsg(msg, player)
-    --local ki = self.knownGadgets[name]
-    --Spring.Echo("Check")
-    --if not IsSyncedCode() then
-	--  for i, v in pairs(self.knownGadgets) do
-	--	Spring.Echo(i .. "  " .. ((v.active and "active") or ""))
-	--  end
-	--end
+
   if (((player == 0) or (player == 255)) and Spring.IsCheatingEnabled()) then	-- ours
   --if ((player == 0) and Spring.IsCheatingEnabled()) then		-- base
     local sp = '^%s*'    -- start pattern

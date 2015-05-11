@@ -280,7 +280,7 @@ function widget:DrawScreen()
 end
 ]]--
 
-function widget:DrawWorld()
+local function DrawWorldFunc()
 	--don't draw anything once the game has started; after that engine can draw queues itself
 	if gameStarted then
 		return 
@@ -373,6 +373,13 @@ function widget:DrawWorld()
 	-- Reset gl
 	gl.Color(1.0, 1.0, 1.0, 1.0)
 	gl.LineWidth(1.0)
+end
+
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 function widget:ViewResize(vsx, vsy)

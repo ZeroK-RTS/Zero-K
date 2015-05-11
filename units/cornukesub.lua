@@ -15,22 +15,20 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],
-  category               = [[SUB FIREPROOF]],
+  category               = [[SUB SINK]],
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[30 25 110]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     description_fr = [[Sous-Marin Lance Missile Tactique]],
-	description_de = [[Taktisches Atom-/Antiatomraketen U-Boot]],
-	description_pl = [[Lodz podwodna z rakietami taktycznymi i tarcza antyrakietowa]],
-    fireproof      = [[1]],
-    helptext       = [[The Leviathan provides both a hidden defense against enemy nuclear missiles and a standoff precision strike weapon. It has no defense against direct attacks and should avoid contact with the enemy.]],
+	description_de = [[Taktisches Raketen U-Boot]],
+	description_pl = [[Lodz podwodna z rakietami taktycznymi]],
+    helptext       = [[The Leviathan provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
     helptext_fr    = [[Le Leviathan est la terreur des profondeurs. Tapi au fond des océans, il utilise ses missiles amphibies pour lancer ses terribles tete nucléaires tactiques sur de grande distances. Capable de réduire r néant une base en quelques tirs bien ajustés, il scme la terreur car on voit rarement venir la menace. (Il faut lancer la construction de missiles depuis le sousmarin)]],
-	helptext_de    = [[Der Leviathan bietet zum einen eine versteckte Verteidigung gegen Atomraketen und andererseits eine Präzisionswaffe. Er besitzt keinen Schutz gegen direkte Angriffe und sollte aus diesem Grund jeden direkten Kontakt mit feindlichen Einheiten vermeiden.]],
-	helptext_pl    = [[Leviathan oferuje zarowno ukryta obrone przed wrogimi glowicami atomowymi, jak i rakiety taktyczne - precyzyjna bron dalekiego zasiegu; jest jednak bezbronny w bezposrednim starciu.]],
+	helptext_de    = [[Der Leviathan bietet taktische Raketen - eine Präzisionswaffe. Er besitzt keinen Schutz gegen direkte Angriffe und sollte aus diesem Grund jeden direkten Kontakt mit feindlichen Einheiten vermeiden.]],
+	helptext_pl    = [[Leviathan oferuje rakiety taktyczne - precyzyjna bron dalekiego zasiegu; jest jednak bezbronny w bezposrednim starciu.]],
 	modelradius    = [[15]],
 	stockpiletime  = [[90]],
 	stockpilecost  = [[500]],
@@ -54,9 +52,8 @@ unitDef = {
   objectName             = [[CORNUKESUB]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[CORE]],
+  script                 = [[cornukesub.lua]],
   sightDistance          = 660,
-  smoothAnim             = true,
   turninplace            = 0,
   turnRate               = 307,
   upright                = true,
@@ -76,7 +73,6 @@ unitDef = {
 
   },
 
-
   weaponDefs             = {
 
     SUB_AMD_ROCKET = {
@@ -94,7 +90,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flighttime              = 100,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -138,6 +134,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 0,
+      flightTime              = 10,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -163,45 +160,33 @@ unitDef = {
 
   },
 
-
   featureDefs            = {
 
     DEAD  = {
       description      = [[Wreckage - Leviathan]],
       blocking         = false,
-      category         = [[corpses]],
       damage           = 3000,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 1200,
       object           = [[wreck3x3b.s3o]],
       reclaimable      = true,
       reclaimTime      = 1200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Leviathan]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 3000,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
       metal            = 600,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
       reclaimTime      = 600,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

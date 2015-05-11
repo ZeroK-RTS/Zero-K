@@ -30,7 +30,8 @@ local SIG_ACTIVATE = 8
 
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spSetUnitWeaponState = Spring.SetUnitWeaponState
-local spGetGameFrame = Spring.GetGameFrame
+local spGetUnitRulesParam  = Spring.GetUnitRulesParam
+local spGetGameFrame       = Spring.GetGameFrame
 
 local waveWeaponDef = WeaponDefNames["cormak_blast"]
 local WAVE_RELOAD   = math.ceil( waveWeaponDef.reload * Game.gameSpeed ) -- 27
@@ -151,7 +152,7 @@ function AutoAttack_Thread()
 		local reloaded = select(2, spGetUnitWeaponState(unitID,3))
 		if reloaded then
 			local gameFrame   = spGetGameFrame()
-			local reloadMult  = GG.att_reload[unitID] or 1.0
+			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
 			GG.PokeDecloakUnit(unitID,100)

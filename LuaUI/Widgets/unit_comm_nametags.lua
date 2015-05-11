@@ -171,9 +171,8 @@ function spGetUnitPieceMap(unitID,piecename)
   return pieceMap
 end
 
-
-function widget:DrawWorld()
-	if not Spring.IsGUIHidden() then
+local function DrawWorldFunc()
+		if not Spring.IsGUIHidden() then
 		glDepthTest(true)
 		glTexture('LuaUI/Images/hellomynameis.png')
 		glAlphaTest(GL_GREATER, 0)
@@ -231,6 +230,14 @@ function widget:DrawWorld()
 	glTexture(false)
 	glDepthTest(false)
 	end
+end
+
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)

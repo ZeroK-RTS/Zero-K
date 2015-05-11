@@ -119,6 +119,17 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Set lenient fire tolerance
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if not weaponDef.firetolerance then
+		weaponDef.firetolerance = 32768 -- Full 180 degrees on either side.
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- Preserve crater sizes for new engine
 -- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
 
@@ -134,6 +145,20 @@ end
 for _, weaponDef in pairs(WeaponDefs) do
 	if ((weaponDef.weapontype == "LightningCannon") and (not weaponDef.beamttl)) then
 		weaponDef.beamttl = 10
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Workaround impact only beam vs shield bug 
+-- https://github.com/ZeroK-RTS/Zero-K/issues/663
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if ((weaponDef.weapontype == "LightningCannon") or (weaponDef.weapontype == "BeamLaser")) and weaponDef.impactonly then
+		weaponDef.impactonly = false
+		weaponDef.areaofeffect = 2
+		weaponDef.craterareaofeffect = 3
 	end
 end
 
@@ -197,6 +222,12 @@ end
 	end
 	if weaponDef.mygravity then
 		weaponDef.customparams.mygravity = weaponDef.mygravity -- For attack AOE widget
+    end
+	if weaponDef.flighttime then
+		weaponDef.customparams.flighttime = weaponDef.flighttime
+    end
+	if weaponDef.weapontimer then
+		weaponDef.customparams.weapontimer = weaponDef.weapontimer
     end
 	if weaponDef.weaponvelocity then
 		weaponDef.customparams.weaponvelocity = weaponDef.weaponvelocity -- For attack AOE widget

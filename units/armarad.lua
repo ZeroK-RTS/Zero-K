@@ -27,6 +27,7 @@ unitDef = {
     helptext_de    = [[Der erweiterte Radarturm hat eine weitaus größere Radarreichweite als die Standardvariante. Zusätzlich wird das hin und her wackeln von Zielen halbiert. Dieser Effekt ist global und wirkt such auf alle verbündeten Radartürme aus. Ein, zwei solcher Türme können sehr nützlich sein, haben allerdings ihren Preis.]],
     helptext_pl    = [[Ten radar ma zdecydowanie wiekszy zasieg niz podstawowa wersja. Ponadto, kazdy taki budynek zwieksza dokladnosc namiaru wszystkich wlasnych i sprzymierzonych radarow.]],
     modelradius    = [[16]],
+	removewait     = 1,
   },
 
   energyUse                     = 3,

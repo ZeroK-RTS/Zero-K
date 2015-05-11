@@ -1,0 +1,20 @@
+hotspot center
+frame  cursorpickup_0.png 0.1
+frame  cursorpickup_1.png 0.1
+frame  cursorpickup_2.png 0.1
+frame  cursorpickup_3.png 0.1
+frame  cursorpickup_4.png 0.1
+frame  cursorpickup_5.png 0.1
+frame  cursorpickup_6.png 0.1
+frame  cursorpickup_7.png 0.1
+frame  cursorpickup_8.png 0.1
+frame  cursorpickup_9.png 0.1
+frame  cursorpickup_8.png 0.1
+frame  cursorpickup_7.png 0.1
+frame  cursorpickup_6.png 0.1
+frame  cursorpickup_5.png 0.1
+frame  cursorpickup_4.png 0.1
+frame  cursorpickup_3.png 0.1
+frame  cursorpickup_2.png 0.1
+frame  cursorpickup_1.png 0.1
+frame  cursorpickup_0.png 0.1

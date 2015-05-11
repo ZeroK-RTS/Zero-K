@@ -400,7 +400,7 @@ function widget:Shutdown()
 	end
 end
 
-function widget:DrawWorldPreUnit() --is overwritten when not using the shader
+local function DrawWorldFunc() --is overwritten when not using the shader
     if (not island) or options.drawForIslands.value then
         local glTranslate = gl.Translate
         local glUniform = gl.Uniform
@@ -467,6 +467,13 @@ function widget:DrawWorldPreUnit() --is overwritten when not using the shader
         
         gl.Fog(false)
     end
+end
+
+function widget:DrawWorldPreUnit()
+	DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 
 function widget:MousePress(x, y, button)

@@ -71,7 +71,7 @@ options = {
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
-				local find = string.find(opt, "_tactical_ai")
+				local find = string.find(opt, "_tactical_ai_2")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
 				if ud then
@@ -89,7 +89,7 @@ options = {
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
-				local find = string.find(opt, "_tactical_ai")
+				local find = string.find(opt, "_tactical_ai_2")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
 				if ud then
@@ -368,15 +368,15 @@ local function addUnit(defName, path)
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
 
-    if tacticalAIUnits[defName] or (ud.customParams and ud.customParams.usetacai) then
-		options[defName .. "_tactical_ai"] = {
+    if tacticalAIUnits[defName] then
+		options[defName .. "_tactical_ai_2"] = {
 			name = "  Smart AI",
 			desc = "Smart AI: check box to turn it on",
 			type = 'bool',
-			value = (tacticalAIUnits[defName] and tacticalAIUnits[defName].value) or (ud.customParams and ud.customParams.usetacai) or 1,
+			value = tacticalAIUnits[defName].value,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_tactical_ai"
+		options_order[#options_order+1] = defName .. "_tactical_ai_2"
     end
     
 	if dontFireAtRadarUnits[ud.id] then
@@ -599,9 +599,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				end
 			end
 			
-            if options[name .. "_tactical_ai"] and options[name .. "_tactical_ai"].value ~= nil then
-                -- Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"})
-				orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai"].value and 1 or 0}, {"shift"}}
+            if options[name .. "_tactical_ai_2"] and options[name .. "_tactical_ai_2"].value ~= nil then
+                -- Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"})
+				orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"}}
             end
 			
             if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then

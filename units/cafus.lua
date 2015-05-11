@@ -31,6 +31,7 @@ unitDef = {
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 12 0]],
     modelradius    = [[60]],
+	removewait     = 1,
   },
 
   energyMake                    = 225,
@@ -101,7 +102,7 @@ unitDef = {
       name               = "Naked Singularity",
       soundHit           = "explosion/ex_ultra1",
       damage = {
-        default = 8000,
+        default = 9500,
       },
     },
   },

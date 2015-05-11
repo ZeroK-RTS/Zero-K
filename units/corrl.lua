@@ -24,7 +24,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    usetacai       = [[1]],
     description_fr = [[Tourelle Lance-Missile Légcre]],
 	description_de = [[Leichter Raketenturm (Flugabwehr/Skirmish)]],
 	description_pl = [[Lekka wieza rakietowa]],
@@ -104,7 +103,7 @@ unitDef = {
 	  },
 
       damage                  = {
-        default = 103.1,
+        default = 104,
         subs    = 7.5,
       },
 

@@ -33,7 +33,7 @@ local spGetActiveCmdDesc = Spring.GetActiveCmdDesc
 --------------------------------------------------------------------------------
 local hilite = false
 
-function widget:DrawWorld()
+local function DrawWorldFunc()
   if (not hilite) and (spGetMapDrawMode() ~= 'metal') and (not WG.showeco) then
     return
   end
@@ -71,6 +71,13 @@ function widget:DrawWorld()
   gl.PolygonOffset(false)
   gl.DepthTest(false)
   gl.Fog(true)
+end
+
+function widget:DrawWorld()
+  DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+  DrawWorldFunc()
 end
 
 

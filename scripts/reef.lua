@@ -71,6 +71,10 @@ function script.Create()
 	Hide(WakeAftRight)
 	StartThread(SmokeUnit, smokePiece)
 	
+	for bay,_ in pairs(droneBays) do
+		Move(bay, x_axis, 16)
+	end
+	
 	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
 		Sleep(1000)
 	end

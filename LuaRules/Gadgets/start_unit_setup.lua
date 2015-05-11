@@ -546,7 +546,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
 	local x,y,z = startPosition.x, startPosition.y, startPosition.z
 
-	if notAtTheStartOfTheGame and Game.startPosType == 2 then
+	if notAtTheStartOfTheGame and Game.startPosType == 2 and not (shuffleMode and (shuffleMode == "allboxes")) then
 		x, y, z = getMiddleOfStartBox(teamID)
 	end
 	
@@ -769,12 +769,16 @@ function Shuffle()
       for _,a in ipairs(Spring.GetAllyTeamList()) do
         if a ~= gaiaally then
           local xmin, zmin, xmax, zmax = Spring.GetAllyTeamStartBox(a)
-          local xmid = (xmax + xmin) / 2
-          local zmid = (zmax + zmin) / 2
-          local ymid = Spring.GetGroundHeight(xmid, zmid)
-          local i = #boxPosition + 1
-          boxPosition[i] = {xmid, ymid, zmid}
-          --teamList[i] = i - 1 -- team number starts at 0
+          if xmin and zmin and xmax and zmax then
+            local xmid = (xmax + xmin) / 2
+            local zmid = (zmax + zmin) / 2
+            local ymid = Spring.GetGroundHeight(xmid, zmid)
+            local i = #boxPosition + 1
+            boxPosition[i] = {x = xmid, y = ymid, z = zmid}
+            --teamList[i] = i - 1 -- team number starts at 0
+          else
+            Spring.Echo("Shuffle warning: non-gaia allyteam " .. a .. " has no startbox.")
+          end
         end
       end
 
@@ -786,14 +790,7 @@ function Shuffle()
         end
         local shuffledNums = ShuffleSequence(nums)
         for i=1,#teamList do
-          startPosition[teamList[i]] = boxPosition[shuffledNums[nums[i]]]
-        end
-
-        -- shuffle
-        local shuffled = ShuffleSequence(teamList)
-        teamList = GetAllTeamsList()
-        for _, team in ipairs(teamList) do
-          shuffledStartPosition[team] = startPosition[shuffled[team]]
+          shuffledStartPosition[teamList[i]] = boxPosition[shuffledNums[i]]
         end
       else
         Spring.Echo("Not enough boxes. Teams not shuffled.")
@@ -1027,20 +1024,18 @@ function gadget:Load(zip)
 	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
-	boost = data.boost
-	facplops = data.facplops
 	
-	--[[
 	-- these require special handling because they involve unitIDs
+	boost = {}
 	for oldID in pairs(data.boost) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
 		boost[newID] = true
 	end
+	facplops = {}
 	for oldID in pairs(data.facplops) do
 		newID = GG.SaveLoad.GetNewUnitID(oldID)
 		GG.GiveFacplop(newID)
 	end
-	]]
 end
 
 --------------------------------------------------------------------
@@ -1157,19 +1152,7 @@ function gadget:DrawWorld()
 end
 --]]
 
--- need this because SYNCED.tables are merely proxies, not real tables
-local function MakeRealTable(proxy)
-	local proxyLocal = proxy
-	local ret = {}
-	for i,v in spairs(proxyLocal) do
-		if type(v) == "table" then
-			ret[i] = MakeRealTable(v)
-		else
-			ret[i] = v
-		end
-	end
-	return ret
-end
+local MakeRealTable = Spring.Utilities.MakeRealTable
 
 function gadget:Save(zip)
 	if not GG.SaveLoad then

@@ -31,6 +31,8 @@ local spSetUnitCosts = Spring.SetUnitCosts
 local spValidUnitID = Spring.ValidUnitID
 local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
+local ALLY_ACCESS = {allied = true}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- CONFIG
@@ -81,6 +83,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 		}
 		if select(5,spGetUnitHealth(unitID)) == 1 then
 			spSetUnitCosts(unitID, {buildTime = bt*REPAIR_PENALTY})
+			spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
 		end
 	end
 end
@@ -88,6 +91,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if damagedUnits[unitID] then
 		spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
+			spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
 	elseif buildTimeChangeNeeded[unitDefID] then
 		spSetUnitCosts(unitID, {buildTime = buildTimeChangeNeeded[unitDefID]})
 	end
@@ -100,6 +104,7 @@ function gadget:GameFrame(n)
 			if data.frames <= 0 then
 				if spValidUnitID(unitID) then
 					spSetUnitCosts(unitID, {buildTime = data.bt})
+					spSetUnitRulesParam(unitID, "repairRate", 1, ALLY_ACCESS)
 				end
 				damagedUnits[unitID] = nil
 			end

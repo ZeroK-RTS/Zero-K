@@ -251,10 +251,10 @@ end
 function widget:DrawWorld()
 	if drawList ~= 0 then
 		glPushAttrib(GL.LINE_BITS)
-		glLineStipple(true)
+		gl.LineStipple("springdefault")
 		glDepthTest(false)
-		glLineWidth(1.4)
-		glColor(1, 0.75, 0, 1)
+		glLineWidth(2)
+		glColor(1, 0.75, 0, 0.5)
 		glCallList(drawList)
 		glColor(1, 1, 1, 1)
 		glLineStipple(false)

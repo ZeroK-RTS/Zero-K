@@ -35,6 +35,7 @@ unitDef = {
 	aimposoffset       = [[0 -4 0]],
 	midposoffset       = [[0 -10 0]],
 	modelradius        = [[15]],
+	removewait         = 1,
   },
 
   energyUse              = 0,

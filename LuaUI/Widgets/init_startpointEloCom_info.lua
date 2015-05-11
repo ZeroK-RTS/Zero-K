@@ -234,9 +234,8 @@ local function RevertModelDrawing()
 end
 --]]
 
---//Draw commander. Reference: unit_ghostRadar.lua by very_bad_soldier
-function widget:DrawWorldPreUnit()
-	--draw commander at startposition
+local function DrawWorldFunc()
+		--draw commander at startposition
 	--
 	
 	--SetupModelDrawing()
@@ -263,4 +262,12 @@ function widget:DrawWorldPreUnit()
 	end
 	gl.Color(1, 1, 1, 1)
 	--RevertModelDrawing()
+end
+
+--//Draw commander. Reference: unit_ghostRadar.lua by very_bad_soldier
+function widget:DrawWorldPreUnit()
+	DrawWorldFunc()
+end
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
 end

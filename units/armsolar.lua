@@ -27,12 +27,12 @@ unitDef = {
     pylonrange = 100,
 	aimposoffset   = [[0 16 0]],
 	midposoffset   = [[0 0 0]],
-	force_close = 8, -- time in seconds of forced turnoff
+	force_close    = 8, -- time in seconds of forced turnoff
+	removewait     = 1,
   },
 
   damageModifier                = 0.25,
-  energyMake                    = 0,
-  energyUse                     = -2,
+  energyMake                    = 2,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 5,
   footprintZ                    = 5,

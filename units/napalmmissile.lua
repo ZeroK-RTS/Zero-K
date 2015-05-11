@@ -92,6 +92,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:napalm_missile]],
       fireStarter             = 220,
+      flightTime              = 100,
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,

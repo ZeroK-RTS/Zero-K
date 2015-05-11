@@ -99,7 +99,7 @@ unitDef = {
       edgeEffectiveness       = 0.4,
       explosionGenerator      = [[custom:TORPEDOHITHUGE]],
       fixedLauncher           = true,
-      flighttime              = 12,
+      flightTime              = 12,
 	  groundBounce            = true,
 	  heightMod               = 0,
 	  impulseBoost            = 0.4,
@@ -142,6 +142,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:NONE]],
       fireStarter             = 0,
+      flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
       range                   = 100,
