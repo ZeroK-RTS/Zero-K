@@ -42,6 +42,7 @@ local spSetUnitBlocking    = Spring.SetUnitBlocking
 local spSetUnitMoveGoal    = Spring.SetUnitMoveGoal
 local spGetGroundHeight    = Spring.GetGroundHeight
 local spTestMoveOrder      = Spring.TestMoveOrder
+local spTestBuildOrder     = Spring.TestBuildOrder
 local spGetGameSeconds     = Spring.GetGameSeconds
 local spGetUnitHeading     = Spring.GetUnitHeading
 local spSetUnitNoDraw      = Spring.SetUnitNoDraw
@@ -69,7 +70,7 @@ local jumps = {}
 local jumping = {}
 local goalSet = {}
 
-local quiteNew = not Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
+local quiteNew = Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -92,7 +93,7 @@ local function spTestMoveOrderX(unitDefID, x, y, z)
 	if quiteNew then
 		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
 	else
-		return spTestMoveOrder(unitDefID, x, y, z)
+		return spTestBuildOrder(unitDefID, x, y, z, 1)
 	end
 end
 
