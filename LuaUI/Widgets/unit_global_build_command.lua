@@ -25,7 +25,7 @@ function widget:GetInfo()
 "(\255\200\200\200Ctrl+0\255\255\255\255, or \255\200\200\200Alt+0\255\255\255\255 if using \255\90\255\90Auto Group\255\255\255\255 widget), "..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. " ..
 "Hit \255\255\90\90control-x\255\255\255\255 to get an area select for removing jobs.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
-"Configuration is in \nSettings->Interface->Global Build Command",
+"Configuration is in \nGame->Global Build Command",
     author    = "aeonios",
     date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
@@ -92,7 +92,7 @@ end
 -- Declarations ----------------------------------------------------------------
 include("keysym.h.lua")
 
-options_path = 'Settings/Interface/Global Build Command'
+options_path = 'Game/Global Build Command'
 
 options_order = {
 	'myGroupID',
