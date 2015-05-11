@@ -81,26 +81,22 @@ unitDef = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 80,
-      burst                   = 2,
+      areaOfEffect            = 64,
+      burst                   = 4,
       burstRate               = 0.15,
       avoidFriendly           = false,
       bouncerebound           = 1,
       bounceslip              = 1,
       burnblow                = 1,
       canAttackGround         = false, -- also workaround for range hax
-<<<<<<< HEAD
-      flighttime              = 1.0,
-=======
       flightTime              = 1.5,
->>>>>>> feb4578ec71f529fc5ed66fd7fcb24e500f6245f
       burnblow                = true,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 45,
+        default = 55,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -109,21 +105,21 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.6,
       interceptedByShieldType = 1,
-      leadlimit               = 1,
+      leadlimit               = 0,
       myGravity               = 2,
       model                   = [[diskball.s3o]],
       numBounce               = 1,
-      range                   = 290,
-      reloadtime              = 1,
+      range                   = 430,
+      reloadtime              = 6,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
-      soundStart              = [[weapon/torpedofast]],
+      --soundStart              = [[weapon/torpedo]],
       startVelocity           = 90,
       tracks                  = true,
-      turnRate                = 10800,
+      turnRate                = 3600,
       turret                  = true,
       waterWeapon             = true,
-      weaponAcceleration      = 300,
+      weaponAcceleration      = 140,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 400,
     },
