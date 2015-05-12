@@ -207,6 +207,7 @@ local artyRangeSkirmieeArray = {
 	["armpb"] = true,
 	["cordoom"] = true,
 	["armorco"] = true,
+	["amphartillery"] = true,
 }
 
 local slasherSkirmieeArray = {
@@ -660,6 +661,30 @@ local behaviourConfig = {
 			maxSwarmLeeway = 40,
 			skirmLeeway = 30, 
 			minCircleStrafeDistance = 10,
+		},
+	},
+	
+	["amphartillery"] = {
+		waterline = -5,
+		land = {
+			weaponNum = 1,
+			skirms = artyRangeSkirmieeArray, 
+			swarms = {}, 
+			flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+		},
+		sea = {
+			weaponNum = 2,
+			skirms = medRangeSkirmieeArray, 
+			swarms = {}, 
+			flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
 		},
 	},
 		
