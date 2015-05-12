@@ -32,11 +32,6 @@ local longRange = true
 
 local smokePiece = {pelvis, turret}
 
-function script.Create()
-	StartThread(WeaponRangeUpdate)
-	StartThread(SmokeUnit, smokePiece)	
-end
-
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
@@ -51,6 +46,11 @@ local function WeaponRangeUpdate()
 		end
 		Sleep(200)
 	end
+end
+
+function script.Create()
+	StartThread(WeaponRangeUpdate)
+	StartThread(SmokeUnit, smokePiece)	
 end
 
 local function Walk()
@@ -119,11 +119,22 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	Show(firept1)
-	Show(firept2)
+    local toChange = 3 - num
+	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+	if reloadSpeedMult <= 0 then
+		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
+		reloadSpeedMult = 1
+	end
+	local reloadTimeMult = 1/reloadSpeedMult
+	Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime*reloadTimeMult)
+	if num == 2 then
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		if py < -8 then
+		else
+			Spring.PlaySoundFile("sounds/weapon/torp_land.wav", 5, px, py, pz)
+		end
+	end
 	Sleep(150)
-	Hide(firept1)
-	Hide(firept2)
 	Move(gun1, z_axis, 0, 3)
 	Move(gun2, z_axis, 0, 3)
 end
