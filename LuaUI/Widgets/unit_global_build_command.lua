@@ -1278,6 +1278,10 @@ function FindCheapestJob(unitID)
     local cachedCost = 0 -- the cost of the currently cached cheapest job
     local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
     
+    if not spValidUnitID(unitID) then -- nil guard, because for some reason, possibly including lag we may end up with dead units still in our group.
+		return
+	end
+    
     -- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
     if busyUnits[unitID] then
 		local key = busyUnits[unitID]
@@ -1339,7 +1343,6 @@ function FindCheapestJob(unitID)
 					tmpCost = FlatCost(unitID, hash, ux, uz, jx, jz)
 				end
 				if not cachedJob or tmpCost < cachedCost then -- then if there is no cached job or if tmpJob is cheaper, replace the cached job with tmpJob and update the cost
-				-- note we ignore jobs that are only trivially cheaper, since it can cause worker 
 					cachedJob = tmpJob
 					cachedCost = tmpCost
 				end
@@ -1361,7 +1364,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
     -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
     -- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
-		if ( unitID ~= unit) then -- excluding our current worker.
+		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
 			local idist = Distance(ix, iz, jx, jz)
 			local rdist = max(distance, 200) -- round distance up to 200, to equalize priority at small distances
@@ -1443,7 +1446,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
     -- at the same time. You probably should not change this, since it accounts for a lot of edge cases
     -- but does not directly determine the behavior.
 	for unit,_ in pairs(job.assignedUnits) do -- for all units that have been recorded as assigned to this job
-		if ( unitID ~= unit) then -- excluding our current worker.
+		if ( unitID ~= unit) and spValidUnitID(unit) then -- excluding our current worker.
 			local ix, _, iz = spGetUnitPosition(unit)
 			local idist = Distance(ix, iz, jx, jz)
 			local rdist = max(distance, 200) -- round distance up to 200, to equalize priority at small distances
