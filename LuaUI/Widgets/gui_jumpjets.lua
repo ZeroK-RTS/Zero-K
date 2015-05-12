@@ -47,6 +47,7 @@ local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
 local spTestMoveOrder          = Spring.TestMoveOrder
+local spTestBuildOrder         = Spring.TestBuildOrder
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -66,7 +67,7 @@ local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local function spTestMoveOrderX(unitDefID, x, y, z)
 	if reverseCompatibility then
-		return spTestMoveOrder(unitDefID, x, y, z)
+		return spTestBuildOrder(unitDefID, x, y, z, 1)
 	else
 		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)		
 	end
@@ -232,7 +233,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 
 	--local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
 	--local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3])
-	local canJumpThere = spTestMoveOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
+	local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
 	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
