@@ -18,6 +18,9 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local AllyTeamInfoHandler = VFS.Include("LuaRules/Gadgets/CAI/AllyTeamInfoHandler.lua")
+local AiTeamHandler = VFS.Include("LuaRules/Gadgets/CAI/AiTeamHandler.lua")
+
 local aiConfigByName = {
 	CAI2 = true,
 }
@@ -27,6 +30,12 @@ local aiConfigByName = {
 if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- SYNCED
+--------------------------------------------------------------------------------
+
+local allyTeamInfo = {}
+local aiTeam = {}
+
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:Initialize()
@@ -48,6 +57,13 @@ function gadget:Initialize()
 			local _,_,_,_,_,_,CustomTeamOptions = spGetTeamInfo(team)
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
 				local _,_,_,_,_,allyTeam = spGetTeamInfo(team)
+				
+				if not allyTeamInfo[allyTeam] then
+					allyTeamInfo[allyTeam] = AllyTeamInfoHandler.CreateAllyteamInfoHandler(allyTeam, team)
+				end
+				
+				aiTeam[team] = AiTeamHandler.CreateAiTeam(allyteamID, team, allyTeamInfo[allyTeam])
+				
 				initialiseAiTeam(team, allyTeam, aiConfigByName[spGetTeamLuaAI(team)])
 				aiOnTeam[allyTeam] = true
 				usingAI = true
@@ -56,11 +72,7 @@ function gadget:Initialize()
 	end
 	
 	--// Setup AI if they exist or do nothing else.
-	if usingAI then
-		for _,allyTeam in ipairs(spGetAllyTeamList()) do
-			-- Startup the AI for each team
-		end
-	else
+	if not usingAI then
 		Spring.SetGameRulesParam("CAI2_disabled", 1)
 		gadgetHandler:RemoveGadget()
 		return 

@@ -84,10 +84,6 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 		end
 	end
 	
-	function UpdateHeatmaps()
-		heatmaps.mobileAA.UpdateUnitPositions(true)
-		heatmaps.mobileLand.UpdateUnitPositions(true)
-	end
 	
 	function GetUnitList(name)
 		return completeUnitList[name]
@@ -97,16 +93,10 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 		return combatUnitList[name]
 	end
 	
-	function GetHeatmap(name)
-		return unitHeatmaps[name]
-	end
-	
 	local newAssetTracker = {
 		AddUnit = AddUnit,
-		UpdateHeatmaps = UpdateHeatmaps,
 		GetUnitList = GetUnitList, 
 		GetCombatUnitList = GetCombatUnitList,
-		GetHeatmap = GetHeatmap,
 	}
 	
 	return newAssetTracker
