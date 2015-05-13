@@ -187,6 +187,7 @@ local callInLists = {
 	-- LuaRules CallIns (note: the *PreDamaged calls belong here too)
 	"CommandFallback",
 	"AllowCommand",
+	"AllowStartPosition",
 	"AllowUnitCreation",
 	"AllowUnitTransfer",
 	"AllowUnitBuildStep",
