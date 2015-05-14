@@ -567,7 +567,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 			end
 		end
 	else -- teams are allied
-		if shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
+		if (unitDefID ~= terraunitDefID) and shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
 
