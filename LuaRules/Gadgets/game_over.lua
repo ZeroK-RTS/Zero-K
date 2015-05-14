@@ -393,7 +393,7 @@ function gadget:UnitCreated(u, ud, team)
 end
 
 function gadget:UnitDestroyed(u, ud, team)
-	if true or spGetGameRulesParam("loadPurge") == 1 then
+	if spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 	
