@@ -3,13 +3,13 @@
 
 function gadget:GetInfo()
   return {
-    name      = "CAI",
+    name      = "CAI 2",
     desc      = "AI that plays normal ZK",
     author    = "Google Frog",
     date      = "12 May 8 2015",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
