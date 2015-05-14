@@ -461,6 +461,9 @@ function widget:UnitDestroyed(unitID, unitDefID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
+	if mexBuilderDefs[unitDefID] then
+		mexBuilder[unitID] = true
+	end
 	if unitDefID == mexDefID then
 		local done = select(5, spGetUnitHealth(unitID))
 		if done == 1 then
