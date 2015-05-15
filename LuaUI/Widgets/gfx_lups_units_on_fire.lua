@@ -127,7 +127,7 @@ function widget:GameFrame(n)
 		local unitID
 		for i = 1, #units do
 			unitID = units[i]
-			if spGetUnitRulesParam(unitID, "on_fire") == 1 then
+			if spGetUnitRulesParam(unitID, "on_fire") > 0 then
 				burningUnits.count = burningUnits.count + 1
 				burningUnits[burningUnits.count] = unitID
 			end

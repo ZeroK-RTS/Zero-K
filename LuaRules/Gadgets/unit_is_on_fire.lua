@@ -21,7 +21,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Spring.SetGameRulesParam("unitsOnFire",1)
+Spring.SetGameRulesParam("unitsOnFire",15)
 
 --// customparams values
 -- setunitsonfire: 
@@ -123,16 +123,17 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		if (UnitDefs[unitDefID].customParams.fireproof~="1") then
 			if (random() < fwd.burnChance) then
 				local burnLength = fwd.burnTime*(random()*fwd.burnTimeRand + fwd.burnTimeBase)
-				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < (burnLength*fwd.burnDamage) then
+				local burnDamage = burnLength*fwd.burnDamage
+				if (not unitsOnFire[unitID]) or unitsOnFire[unitID].damageLeft < burnDamage then
 					unitsOnFire[unitID] = {
 						endFrame    = gameFrame + burnLength, 
-						damageLeft  = burnLength*fwd.burnDamage,
+						damageLeft  = burnDamage,
 						fireDmg     = fwd.burnDamage,
 						attackerID  = attackerID,
 						--attackerDefID = attackerDefID,
 						weaponID    = weaponID,
 					}
-					SetUnitRulesParam(unitID, "on_fire", 1, LOS_ACCESS)
+					SetUnitRulesParam(unitID, "on_fire", burnDamage, LOS_ACCESS)
 					GG.UpdateUnitAttributes(unitID)
 				end
 			end
@@ -147,6 +148,10 @@ function gadget:UnitDestroyed(unitID)
 	end
 end
 
+function gadget:UnitCreated(unitID)
+	SetUnitRulesParam(unitID, "on_fire", 0, LOS_ACCESS)
+end
+
 function gadget:GameFrame(n)
 	gameFrame = n
 	if (n%CHECK_INTERVAL<1)and(next(unitsOnFire)) then
@@ -155,11 +160,12 @@ function gadget:GameFrame(n)
 		inGameFrame = true
 		for unitID, t in pairs(unitsOnFire) do
 			if (n > t.endFrame) or (inWater[unitID] and CheckImmersion(unitID)) then
-				SetUnitRulesParam(unitID, "on_fire", 0)
+				SetUnitRulesParam(unitID, "on_fire", 0, LOS_ACCESS)
 				GG.UpdateUnitAttributes(unitID)
 				unitsOnFire[unitID] = nil
 			else
 				t.damageLeft = t.damageLeft - t.fireDmg*CHECK_INTERVAL
+				SetUnitRulesParam(unitID, "on_fire", t.damageLeft, LOS_ACCESS)
 				AddUnitDamage(unitID,t.fireDmg*CHECK_INTERVAL,0,t.attackerID, t.weaponID )
 				--Spring.Echo(t.attackerDefID)
 				burningUnits[cnt] = unitID

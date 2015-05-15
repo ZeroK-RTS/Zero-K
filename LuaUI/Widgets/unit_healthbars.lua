@@ -594,7 +594,7 @@ do
     hp  = (health or 0)/maxHealth
     morph = UnitMorphs[unitID]
   
-    if (drawUnitsOnFire)and(GetUnitRulesParam(unitID,"on_fire")==1) then
+    if (drawUnitsOnFire)and(GetUnitRulesParam(unitID,"on_fire") > 0) then
       onFireUnits[#onFireUnits+1]=unitID
     end
   
@@ -663,7 +663,7 @@ do
     
     morph = UnitMorphs[unitID]
 
-    if (drawUnitsOnFire)and(GetUnitRulesParam(unitID,"on_fire")==1) then
+    if (drawUnitsOnFire)and(GetUnitRulesParam(unitID,"on_fire") > 0) then
       onFireUnits[#onFireUnits+1]=unitID
     end
 
