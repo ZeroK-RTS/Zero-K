@@ -194,7 +194,7 @@ local function RevealAllianceUnits(allianceID)
 	end
 end
 
--- purge the alliance!
+-- purge the alliance! for the horde!
 local function DestroyAlliance(allianceID)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
@@ -372,6 +372,10 @@ end
 --------------------------------------------------------------------------------
 -- callins
 --------------------------------------------------------------------------------
+
+function gadget:TeamDied (teamID)
+	ProcessLastAlly()
+end
 
 function gadget:UnitFinished(u, ud, team)
 	if (team ~= gaiaTeamID)
