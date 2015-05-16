@@ -100,7 +100,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num)
-	return true
+	return num ~= 3
 end
 
 local function ShotThread()
@@ -123,7 +123,7 @@ local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil( depthchargeWeaponDef.reload * Game.gameSpeed )
 
 function ShootDepthcharge()
-	EmitSfx(pads, FIRE_W1)
+	EmitSfx(pads, FIRE_W3)
 	StartThread(ShotThread)
 end
 
@@ -138,7 +138,7 @@ local function FakeWeaponShoot()
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
 			
-			EmitSfx(pads, FIRE_W1)
+			EmitSfx(pads, FIRE_W3)
 			StartThread(ShotThread)
 			Move(gun, y_axis, -2)
 			Move(gun, y_axis, 2, 2)
