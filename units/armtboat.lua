@@ -12,7 +12,6 @@ unitDef = {
   buildTime           = 220,
   canAttack           = false,
   canMove             = true,
-  cantBeTransported   = true,
   category            = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 0 -3]],
   collisionVolumeScales  = [[35 20 55]],
