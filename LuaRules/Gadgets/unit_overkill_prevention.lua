@@ -102,14 +102,14 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 	return false
 end
 
-local function Dist2D2(x0,x1,z0,z1)
-	return (x1-x0)^2+(z1-z0)^2
+local function Dist3D2(x0,x1,y0,y1,z0,z1)
+	return (x1-x0)^2+(y1-y0)^2+(z1-z0)^2
 end
 
 local function GetTargetShieldPower(unitID, targetID, timeout)
 	local totalShieldPower=0
 	local xu, _, zu = spGetUnitPosition(unitID)
-	local x0, _, z0 = spGetUnitPosition(targetID)
+	local x0, y0, z0 = spGetUnitPosition(targetID)
 	local ud0=UnitDefs[spGetUnitDefID(targetID)]
 	local speed0=ud0.speed or 0
 	local myAllyID = spGetUnitAllyTeam(unitID)	
@@ -131,13 +131,13 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 						local shieldPower=wDef.shieldPower
 						local shieldPowerRegen=wDef.shieldPowerRegen --HP/sec
 						local shieldRadius=wDef.shieldRadius
-						local x, _, z = spGetUnitPosition(uId)
+						local x, y, z = spGetUnitPosition(uId)
 						local speed=ud.speed or 0
 
 						-- Check range first. Distance between target and shield carrier should be less than shield radius + shield carrier unit and target can travel towards each other while projetile is flying.
 						-- speed is given in elmo/s thus the "timeout/30"
 						-- Since the calculation is coarse there could be slight overkill, but with shields it's better to overkill than to underkill				
-						if Dist2D2(x0, x, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
+						if Dist3D2(x0, x, y0, y, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
 							local enabledShield, curShieldPower=spGetUnitShieldState(uId, wId)
 							curShieldPower=curShieldPower*enabledShield --just in case
 							
@@ -220,6 +220,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		local adjHealth = health/armor + shieldPower
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
 		incomingDamage[targetID].health = adjHealth
+		--Echo("adjHealth="..adjHealth)
 	end
 	
 	return false
