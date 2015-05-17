@@ -74,6 +74,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corcrash"].id] = true,
 	[UnitDefNames["cormist"].id] = true,
 	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
+	[UnitDefNames["shieldarty"].id] = true, --Shields' racketeer
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -152,19 +153,7 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 	return totalShieldPower
 end
 
-function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
-	if not units[unitID] then
-		return false
-	end
-
-	if spValidUnitID(unitID) and spValidUnitID(targetID) then
-		if troubleVsFast then
-			local unitDefID = Spring.GetUnitDefID(targetID)
-			if fastUnitDefs[unitDefID] then
-				damage = 0
-			end
-		end
-		
+local function OKP_CheckBlock_Regular(unitID, targetID, damage, timeout)
 		local incData = incomingDamage[targetID]
 		local addDamage = true
 		
@@ -188,7 +177,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 						local teamID = spGetUnitTeam(unitID)
 						local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
 						if unitDefID then
-							spSetUnitTarget(unitID,0)
+							spSetUnitTarget(unitID, 0)
 							return true
 						end
 					end
@@ -221,6 +210,62 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
 		incomingDamage[targetID].health = adjHealth
 		--Echo("adjHealth="..adjHealth)
+end
+
+local function OKP_CheckBlock_Disarming(unitID, targetID, damage, timeout)
+	--shields take 1/3 damage of disarming missile	
+end
+
+function GG.OverkillPrevention_CheckBlock(unitID, targetID, damageEx, timeout, troubleVsFast)
+	if not units[unitID] then
+		return false
+	end
+
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+	
+		local damage=tonumber(damageEx) -- default-formatted regular damage
+		local damageType=nil
+		if damage then --number
+			damageType="R"  --Regular
+		else  --string
+		
+			--should return:
+			--  * "R" - for Regular
+			--  * "E" - for EMP
+			--  * "D" - for Disarm
+			--  * "S" - for Slow
+			damageType = damageEx:sub(1,1)
+			
+			local ns = damageEx:sub(2)
+			if damageType=="R" then
+				damage=tonumber(ns)			
+			elseif damageType=="E" then
+				damage=tonumber(ns)
+			elseif damageType=="D" then				
+				damage=tonumber(ns)
+				--Spring.Echo("Got Disarm shot!!! ... damage="..damage)
+			elseif damageType=="S" then
+				damage=tonumber(ns)
+			else --nothing else matches and it's very wrong!
+				error("Passed invalid damageEx to GG.OverkillPrevention_CheckBlock")
+				return false --is this needed?
+			end			
+		end
+	
+		if damageType=="R" and troubleVsFast then
+			local unitDefID = Spring.GetUnitDefID(targetID)
+			if fastUnitDefs[unitDefID] then
+				damage = 0
+			end
+		end
+		
+		local result=nil
+		if damageType=="R" then
+			result=OKP_CheckBlock_Regular(unitID, targetID, damage, timeout)			
+		elseif damageType=="D" then
+			result=OKP_CheckBlock_Disarming(unitID, targetID, damage, timeout)			
+		end
+		if result then return result end --if OKP_CheckBlock_* returned true		
 	end
 	
 	return false
