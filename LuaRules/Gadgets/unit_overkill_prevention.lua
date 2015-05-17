@@ -10,7 +10,7 @@ function gadget:GetInfo()
   return {
     name      = "Overkill Prevention",
     desc      = "Prevents some units from firing at units which are going to be killed by incoming missiles.",
-    author    = "Google Frog",
+    author    = "Google Frog, ivand",
     date      = "14 Jan 2015",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -20,6 +20,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local Echo				= Spring.Echo
 local spValidUnitID    = Spring.ValidUnitID
 local spSetUnitTarget = Spring.SetUnitTarget
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -29,6 +30,14 @@ local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitPosition		= Spring.GetUnitPosition
+local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
+local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
+local spGetUnitShieldState	= Spring.GetUnitShieldState
+local spGetUnitIsStunned	= Spring.GetUnitIsStunned
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+
+local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -93,10 +102,58 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 	return false
 end
 
+local function Dist2D2(x0,x1,z0,z1)
+	return (x1-x0)^2+(z1-z0)^2
+end
+
+local function GetTargetShieldPower(unitID, targetID, timeout)
+	local totalShieldPower=0
+	local xu, _, zu = spGetUnitPosition(unitID)
+	local x0, _, z0 = spGetUnitPosition(targetID)
+	local ud0=UnitDefs[spGetUnitDefID(targetID)]
+	local speed0=ud0.speed or 0
+	local myAllyID = spGetUnitAllyTeam(unitID)	
+	
+	local unitsAround=spGetUnitsInCylinder(x0, z0, maxShieldRange)
+	for _, uId in pairs(unitsAround) do
+	
+		--nearby unit is valid, healthy enough. Also non-friendly, not stunned and not disarmed	
+		if spValidUnitID(uId) and spGetUnitHealth(uId)>0.0 and spGetUnitAllyTeam(uId)~=myAllyID and not(spGetUnitIsStunned(uId)) and spGetUnitRulesParam(uId, "disarmed")~=1  then
+			local ud=UnitDefs[spGetUnitDefID(uId)]
+			
+			if ud.weapons then --unit shall have weapons
+				for wId, weapon in pairs(ud.weapons) do --required to iterate through all unit's weaponDefs, since unit can have more than one shield (so ud.shieldWeaponDef is not enough)
+					local wdId=weapon.weaponDef
+					local wDef=WeaponDefs[wdId]
+					if wDef.isShield then
+						local shieldPower=wDef.shieldPower
+						local shieldPowerRegen=wDef.shieldPowerRegen --HP/sec
+						local shieldRadius=wDef.shieldRadius
+						local x, _, z = spGetUnitPosition(uId)
+						local speed=ud.speed or 0
+
+						-- Check range first. Distance between target and shield carrier should be less than shield radius + shield carrier unit and target can travel towards each other while projetile is flying.
+						-- speed is given in elmo/s thus the "timeout/30"
+						-- Since the calculation is coarse there could be slight overkill, but with shields it's better to overkill than to underkill				
+						if Dist2D2(x0, x, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
+							local _,curShieldPower=spGetUnitShieldState(uId, wId)
+							
+							-- shieldPowerRegen is given in HP/s thus the "timeout/30"
+							totalShieldPower=totalShieldPower+math.min(shieldPower, curShieldPower+shieldPowerRegen*timeout/30)
+						end
+					end
+				end
+			end
+		end
+	end
+	return totalShieldPower
+end
+
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
 	if not units[unitID] then
 		return false
-	end	
+	end
+	--Echo("GG_OverkillPrevention_CheckBlock")
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
 			local unitDefID = Spring.GetUnitDefID(targetID)
@@ -156,8 +213,10 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		local health = spGetUnitHealth(targetID)/armor
-		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= health/armor)
-		incomingDamage[targetID].health = health/armor
+		local shieldPower = GetTargetShieldPower(unitID, targetID, timeout)
+		local adjHealth = health/armor + shieldPower
+		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
+		incomingDamage[targetID].health = adjHealth
 	end
 	
 	return false
@@ -172,6 +231,7 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
+	--Echo("PreventOverkillToggleCommand")
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
