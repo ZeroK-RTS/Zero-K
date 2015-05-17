@@ -114,7 +114,9 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 	local speed0=ud0.speed or 0
 	local myAllyID = spGetUnitAllyTeam(unitID)	
 	
+	--so far we go for perfect/cheating units visibility, e.g. shooting unit will know shielded units and their parameters perfectly. Shouldn't be much of issue in practical domain(?)
 	local unitsAround=spGetUnitsInCylinder(x0, z0, maxShieldRange)
+	--Echo("#unitsAround"..#unitsAround)	
 	for _, uId in pairs(unitsAround) do
 	
 		--nearby unit is valid, healthy enough. Also non-friendly, not stunned and not disarmed	
@@ -136,7 +138,8 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 						-- speed is given in elmo/s thus the "timeout/30"
 						-- Since the calculation is coarse there could be slight overkill, but with shields it's better to overkill than to underkill				
 						if Dist2D2(x0, x, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
-							local _,curShieldPower=spGetUnitShieldState(uId, wId)
+							local enabledShield, curShieldPower=spGetUnitShieldState(uId, wId)
+							curShieldPower=curShieldPower*enabledShield --just in case
 							
 							-- shieldPowerRegen is given in HP/s thus the "timeout/30"
 							totalShieldPower=totalShieldPower+math.min(shieldPower, curShieldPower+shieldPowerRegen*timeout/30)
@@ -153,7 +156,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 	if not units[unitID] then
 		return false
 	end
-	--Echo("GG_OverkillPrevention_CheckBlock")
+
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
 			local unitDefID = Spring.GetUnitDefID(targetID)
@@ -231,7 +234,6 @@ end
 --------------------------------------------------------------------------------
 -- Command Handling
 local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
-	--Echo("PreventOverkillToggleCommand")
 	if canHandleUnit[unitID] then
 		local state = cmdParams[1]
 		local cmdDescID = spFindUnitCmdDesc(unitID, CMD_PREVENT_OVERKILL)
