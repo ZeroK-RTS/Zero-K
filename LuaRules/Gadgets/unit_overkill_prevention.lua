@@ -64,6 +64,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["subraider"].id] = true,
 	[UnitDefNames["corcrash"].id] = true,
 	[UnitDefNames["cormist"].id] = true,
+	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -95,7 +96,7 @@ end
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
 	if not units[unitID] then
 		return false
-	end
+	end	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
 			local unitDefID = Spring.GetUnitDefID(targetID)
@@ -201,9 +202,9 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_PREVENT_OVERKILL) then
+	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
 		return true  -- command was not used
-	end
+	end	
 	PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
 	return false  -- command was used
 end
