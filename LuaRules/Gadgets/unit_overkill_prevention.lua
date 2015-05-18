@@ -107,7 +107,8 @@ local function Dist3D2(x0,x1,y0,y1,z0,z1)
 end
 
 local function GetTargetShieldPower(unitID, targetID, timeout)
-	local totalShieldPower=0
+	local totalShieldsPower=0
+	local maxShieldPower=0
 	local xu, _, zu = spGetUnitPosition(unitID)
 	local x0, y0, z0 = spGetUnitPosition(targetID)
 	local ud0=UnitDefs[spGetUnitDefID(targetID)]
@@ -140,16 +141,18 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 						if Dist3D2(x0, x, y0, y, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
 							local enabledShield, curShieldPower=spGetUnitShieldState(uId, wId)
 							curShieldPower=curShieldPower*enabledShield --just in case
+							local expectedShieldPower=curShieldPower+shieldPowerRegen*timeout/30
 							
 							-- shieldPowerRegen is given in HP/s thus the "timeout/30"
-							totalShieldPower=totalShieldPower+math.min(shieldPower, curShieldPower+shieldPowerRegen*timeout/30)
+							totalShieldsPower=totalShieldsPower+math.min(shieldPower, expectedShieldPower)
+							maxShieldPower=math.max(maxShieldPower, expectedShieldPower)
 						end
 					end
 				end
 			end
 		end
 	end
-	return totalShieldPower
+	return totalShieldsPower, maxShieldPower
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
@@ -216,8 +219,12 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		local adjHealth = spGetUnitHealth(targetID)/armor
-		local shieldPower = GetTargetShieldPower(unitID, targetID, timeout)
-		local adjHealth = adjHealth + shieldPower
+		local shieldPower, maxShieldPower = GetTargetShieldPower(unitID, targetID, timeout)
+		
+		if maxShieldPower>=incomingDamage[targetID].damage then --if not true, then shields no longer can prevent this projectile, so no need to add shieldPower to adjHealth
+			adjHealth = adjHealth + shieldPower
+		end			
+			
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
 		incomingDamage[targetID].health = adjHealth
 		--Echo("adjHealth="..adjHealth)
