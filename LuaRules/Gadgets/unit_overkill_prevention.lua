@@ -109,10 +109,11 @@ end
 local function GetTargetShieldPower(unitID, targetID, timeout)
 	local totalShieldsPower=0
 	local maxShieldPower=0
-	local xu, _, zu = spGetUnitPosition(unitID)
+
 	local x0, y0, z0 = spGetUnitPosition(targetID)
 	local ud0=UnitDefs[spGetUnitDefID(targetID)]
 	local speed0=ud0.speed or 0
+	
 	local myAllyID = spGetUnitAllyTeam(unitID)	
 	
 	--so far we go for perfect/cheating units visibility, e.g. shooting unit will know shielded units and their parameters perfectly. Shouldn't be much of issue in practical domain(?)
