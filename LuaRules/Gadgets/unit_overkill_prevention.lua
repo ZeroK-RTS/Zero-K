@@ -215,9 +215,9 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		end
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		local health = spGetUnitHealth(targetID)/armor
+		local adjHealth = spGetUnitHealth(targetID)/armor
 		local shieldPower = GetTargetShieldPower(unitID, targetID, timeout)
-		local adjHealth = health/armor + shieldPower
+		local adjHealth = adjHealth + shieldPower
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
 		incomingDamage[targetID].health = adjHealth
 		--Echo("adjHealth="..adjHealth)
