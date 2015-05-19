@@ -154,6 +154,7 @@ unitDef = {
       startVelocity           = 400,
       tolerance               = 4000,
       turnrate                = 65535,
+      tracks                  = true,
       weaponAcceleration      = 400,
       weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
