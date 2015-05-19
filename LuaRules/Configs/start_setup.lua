@@ -54,5 +54,3 @@ COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
 DEFAULT_UNIT = "comm_trainer_strike"		--FIXME: hardcodey until I cba to identify precise source of problem
 DEFAULT_UNIT_TEAMSIDES = "Strike Trainer"
-
-JOKE_UNIT = "neebcomm"

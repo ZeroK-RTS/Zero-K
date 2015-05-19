@@ -304,12 +304,8 @@ function gadget:Initialize()
   ]]--
 end
 
-local forcejunior = Spring.GetModOption("forcejunior", true, false)
-
 local function GetStartUnit(teamID, playerID, isAI)
 
-  if forcejunior then return "commbasic" end
-  
   local startUnit
 
   if isAI and (not teamSidesAI[teamID]) then -- AI that didn't pick comm type gets default comm
