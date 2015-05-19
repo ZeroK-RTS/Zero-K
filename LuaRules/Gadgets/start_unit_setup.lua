@@ -18,9 +18,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
     return false -- no unsynced code
   end
 
-  local ploppableDefs = {}  
-    
-  GG.SetFaction = function() end
+  local ploppableDefs = {}
   
   function gadget:Initialize()
     for _, teamID in ipairs(Spring.GetTeamList()) do
@@ -94,7 +92,6 @@ local shuffledStartPosition = {}
 local luaSetStartPositions = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams
-local teamSidesAI = {} 
 
 local playerIDsByName = {}
 local customComms = {}
@@ -118,7 +115,6 @@ _G.waitingForComm = waitingForComm
 _G.scheduledSpawn = scheduledSpawn
 _G.playerSides = playerSides
 _G.teamSides = teamSides
-_G.teamSidesAI = teamSidesAI
 _G.commSpawnedTeam = commSpawnedTeam
 _G.commSpawnedPlayer = commSpawnedPlayer
 
@@ -226,14 +222,10 @@ local function GetStartUnit(teamID, playerID, isAI)
 
   local startUnit
 
-  if isAI and (not teamSidesAI[teamID]) then -- AI that didn't pick comm type gets default comm
-    teamSidesAI[teamID] = "armcom1"
+  if isAI then -- AI that didn't pick comm type gets default comm
+    return (Spring.GetTeamRulesParam(teamID, "start_unit") or "armcom1")
   end
-  
-  if teamSidesAI[teamID] then 
-	return startUnitsAI[teamSidesAI[teamID]]
-  end
-  
+
   if (teamID and teamSides[teamID]) then 
 	startUnit = startUnits[teamSides[teamID]]
   end
@@ -696,16 +688,6 @@ function gadget:RecvLuaMsg(msg, playerID)
 	end	
 end
 
--- (no longer) used by CAI
-local function SetFaction(side, playerID, teamID)
-    teamSidesAI[teamID] = side
-	teamSides[teamID] = side
-	if playerID then
-		--playerSides[playerID] = side
-	end
-end
-GG.SetFaction = SetFaction
-
 -- used by CAI. Could be extended to allow widgets to set start location? 
 local function SetStartLocation(teamID, x, z)
     luaSetStartPositions[teamID] = {x = x, y = Spring.GetGroundHeight(x,z), z = z}
@@ -757,7 +739,6 @@ function gadget:Load(zip)
 	scheduledSpawn = data.scheduledSpawn or {}
 	playerSides = data.playerSides or {}
 	teamSides = data.teamSides or {}
-	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
 end
@@ -803,7 +784,6 @@ function gadget:Save(zip)
 		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
 		playerSides = MakeRealTable(SYNCED.playerSides),
 		teamSides = MakeRealTable(SYNCED.teamSides),
-		teamSidesAI = MakeRealTable(SYNCED.teamSidesAI),
 		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
 		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
 	}

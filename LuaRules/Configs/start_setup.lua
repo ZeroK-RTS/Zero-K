@@ -13,16 +13,6 @@ for name, def in pairs(trainerComms) do
 	startUnits[name] = def[1]
 end
 
-startUnitsAI = {
-	armcom1 = 'armcom1',
-	corcom1 = 'corcom1',
-}
-
-local aiComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
-for name in pairs(aiComms) do
-	startUnitsAI[name] = name
-end
-
 --defaultComms = {}
 --for i,v in pairs(startUnits) do defaultComms[v] = true end
 
