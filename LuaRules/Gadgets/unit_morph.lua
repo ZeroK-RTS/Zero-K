@@ -596,7 +596,7 @@ local function FinishMorph(unitID, morphData)
   --// copy lineage
   --local lineage = Spring.GetUnitLineage(unitID) 
   --// copy facplop
-  local facplop = GG.HasFacplop(unitID)  
+  local facplop = Spring.GetUnitRulesParam(unitID, "facplop")  
   --//copy command queue
   local cmds = Spring.GetCommandQueue(unitID, -1)
   --// copy some state
@@ -654,7 +654,9 @@ local function FinishMorph(unitID, morphData)
   end
   
   --// transfer facplop
-  if facplop then GG.GiveFacplop(newUnit) end  
+  if facplop then
+	Spring.SetUnitRulesParam(newUnit, "facplop", 1)
+  end  
   --// transfer health
   -- old health is declared far above
   local _,newMaxHealth         = Spring.GetUnitHealth(newUnit)

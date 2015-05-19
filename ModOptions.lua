@@ -345,34 +345,6 @@ local options = {
     section='silly',
   },
   {
-    key = "startingresourcetype",
-    name = "Starting Resource Type",
-    desc = "Choose the form in which starting resources are given.",
-    type = "list",
-    section= 'startconds',
-    def = "facplop",
-    items = {
-      {
-        key  = "facplop",
-        name = "Factory Plop",
-        desc = "First factory is free and built very fast.",
-      },
-      {
-        key  = "classic",
-        name = "Classic",
-        desc = "Classic mode.",
-      },
-    },
-  },
-  {
-    key = "air_ploppable",
-    name = "Ploppable Air",
-    desc = "Choose whether Air/Gunships are ploppable",
-    type = "bool",
-    section= 'startconds',
-    def = true,
-  },
-  {
     key = "forcejunior",
     name = "Force Junior",
     desc = "Choose whether everyone gets a standard Junior Comm chassis.",

@@ -210,7 +210,7 @@ local function SelectComm(player, team, strat)
 		total = total + strategies[strat].commanders[i].chance
 		if rand < total then
 			commName = strategies[strat].commanders[i].ID
-			GG.SetFaction(commName, player, team)
+			Spring.SetTeamRulesParam(team, "start_unit", commName)
 			Spring.Echo("CAI: team "..team.." has selected strategy: "..strategies[strat].name..", using commander "..commName)
 			break
 		end

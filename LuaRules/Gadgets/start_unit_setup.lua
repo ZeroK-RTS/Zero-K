@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "StartSetup",
-    desc      = "Implements initial setup: start units, resources, boost and plop for construction",
+    desc      = "Implements initial setup: start units, resources, and plop for construction",
     author    = "Licho, CarRepairer, Google Frog, SirMaverick",
     date      = "2008-2010",
     license   = "GNU GPL, v2 or later",
@@ -9,7 +9,6 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
 
 -- partially based on Spring's unit spawn gadget
 include "LuaRules/Configs/start_setup.lua"
@@ -19,10 +18,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
     return false -- no unsynced code
   end
 
-  local facplops = {}
-  local ploppableDefs = {}  
-    
-  GG.SetFaction = function() end
+  local ploppableDefs = {}
   
   function gadget:Initialize()
     for _, teamID in ipairs(Spring.GetTeamList()) do
@@ -38,34 +34,12 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
         end
       end
     end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
-    end
   end
-  
-  function GG.GiveFacplop(unitID)
-    if dotaMode then return end
-    facplops[unitID] = 1
-    Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
-  end
-  
-  function GG.HasFacplop(unitID)
-    return plop and facplops[unitID]
-  end
-  
+
   function GG.SetStartLocation() end
   
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if ploppableDefs[unitDefID] and facplops[builderID] then
-      facplops[builderID] = nil
+    if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
       local maxHealth = select(2,Spring.GetUnitHealth(unitID))
       Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
@@ -85,21 +59,6 @@ local spGetSpectatingState 	= Spring.GetSpectatingState
 local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
-local startMode = Spring.GetModOption("startingresourcetype",false,"facplop")
-
-
-if (startMode == "limitboost") then
-	for udid, ud in pairs(UnitDefs) do
-		if ud.canAttack and not ud.isFactory then
-			EXCLUDED_UNITS[udid] = true
-		end
-	end
-end
-
-local plop = false
-if startMode == "facplop" or startMode == "facplopboost" then
-  plop = true
-end
 
 local shuffleMode = Spring.GetModOption("shuffle", false, "off")
 
@@ -123,12 +82,7 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local boost = {}
-local boostMax = {}
-
-local facplops = {}
 local ploppableDefs = {}
-local facplopsrunning = {}
 
 local gamestart = false
 --local createBeforeGameStart = {}	-- no longer used
@@ -138,7 +92,6 @@ local shuffledStartPosition = {}
 local luaSetStartPositions = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams
-local teamSidesAI = {} 
 
 local playerIDsByName = {}
 local customComms = {}
@@ -158,12 +111,10 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.facplops = facplops
 _G.waitingForComm = waitingForComm
 _G.scheduledSpawn = scheduledSpawn
 _G.playerSides = playerSides
 _G.teamSides = teamSides
-_G.teamSidesAI = teamSidesAI
 _G.commSpawnedTeam = commSpawnedTeam
 _G.commSpawnedPlayer = commSpawnedPlayer
 
@@ -172,62 +123,8 @@ local loadGame = false	-- was this loaded from a savegame?
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function AddBoost(unitID, newBoost, newBoostMax)
-	boost[unitID]  = newBoost or START_STORAGE
-	boostMax[unitID] = newBoostMax or START_STORAGE
-	SendToUnsynced("UpdateBoost", unitID, boost[unitID], boostMax[unitID])   
-end
-
--- TODO: do for boost
-function GG.HasFacplop(unitID)
-	return plop and facplops[unitID]
-end
-
-function GG.GiveFacplop(unitID)
-	if dotaMode then return end
-	facplops[unitID] = 1
-	Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
-end
-
-local function CheckForShutdown()
-	if dotaMode or ctfMode then
-	    return
-	end
-	
-	local cnt = 0
-	--for _,_ in pairs(boost) do
-	--	cnt = cnt+1
-	--end
-	for _,_ in pairs(facplops) do
-		cnt = cnt+1
-	end
-	for team,_ in pairs(waitingForComm) do
-		cnt = cnt+1
-	end
-	if (cnt == 0) and Spring.GetGameSeconds() > 5 then
-		gadgetHandler.RemoveGadget(self)
-	end
-end
-
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	--[[
-	if not gamestart then
-		createBeforeGameStart[#createBeforeGameStart + 1] = unitID
-
-		-- make units blind, so that you don't see shuffled units
-		Spring.SetUnitSensorRadius(unitID,"los",0)
-		Spring.SetUnitSensorRadius(unitID,"airLos",0)
-		Spring.SetUnitCloak(unitID, 4)
-		Spring.SetUnitStealth(unitID, true)
-		Spring.SetUnitNoDraw(unitID, true)
-		Spring.SetUnitNoSelect(unitID, true)
-		Spring.SetUnitNoMinimap(unitID, true)
-		return
-	end
-	]]--
-
-	if plop and ploppableDefs[unitDefID] and facplops[builderID] then
-		facplops[builderID] = nil
+	if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
@@ -237,68 +134,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
-		
-		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
-		--facplopsrunning[unitID] = true
-		CheckForShutdown()
 	end
 end
-
-
-
-function gadget:UnitDestroyed(unitID)
-	if plop then
-		facplops[unitID] = nil
-		--facplopsrunning[unitID] = nil
-	end
-	
-	--if (boost[unitID] == nil) then return end
-
-	--if gamestart then disableBoost(unitID) end
-end
-
-
-function gadget:UnitFinished(unitID, unitDefID)
-	if plop and facplopsrunning[unitID] then
-		facplopsrunning[unitID] = nil
-		-- reset to original costs
-		Spring.SetUnitCosts(unitID, {
-			buildTime = UnitDefs[unitDefID].buildTime,
-			metalCost = UnitDefs[unitDefID].metalCost,
-			energyCost = UnitDefs[unitDefID].energyCost
-		})
-	end
-end
-
-function disableBoost(unitID) 
-	boost[unitID] = nil
-	CheckForShutdown()
-end
-
---[[
-function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
-	if plop and facplopsrunning[unitID] then
-		return true -- dont waste boost on facplops
-	elseif (boost[builderID]) and (not EXCLUDED_UNITS[unitDefID]) and (step>0) then
-		local cost = UnitDefs[unitDefID].metalCost
-		local oldHealth, maxHealth, _, _, oldProgress = Spring.GetUnitHealth(unitID)
-		if (boost[builderID] > BOOST_RATE) then 
-			local progress  = oldProgress + BOOST_RATE / cost
-			if (progress > 1) then progress = 1 end
-			local newHealth = oldHealth + (BOOST_RATE / cost)*maxHealth
-			if (newHealth > maxHealth) then newHealth = maxHealth end
-			boost[builderID] = boost[builderID] - BOOST_RATE
-			Spring.SetUnitHealth(unitID, { health = newHealth,  build  = progress })
-			SendToUnsynced("UpdateBoost", builderID, boost[builderID], boostMax[builderID])   
-			return false
-		else 
-			disableBoost(builderID)
-		end
-	end
-	return true
-end
-]]
-
 
 local function InitUnsafe()
 	-- for name, id in pairs(playerIDsByName) do
@@ -352,10 +189,7 @@ end
 
 function gadget:Initialize()
   -- self linking
-  --GG['boostHandler'] = {}
-  --GG['boostHandler'].AddBoost = AddBoost
 
-  if plop then
     for i, v in pairs(ploppables) do
       local name = UnitDefNames[v]
       if name then
@@ -365,18 +199,6 @@ function gadget:Initialize()
         end
       end
     end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
-    end
-  end
 
   -- needed if you reload luarules
   local frame = Spring.GetGameFrame()
@@ -393,40 +215,21 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 	end
   end
-  
-  -- legacy save/load compat
-  --[[
-  local teams = Spring.GetTeamList()
-  for i=1,#teams do
-	if Spring.GetGameRulesParam("commSpawnedTeam"..teams[i]) == 1 then
-		commSpawnedTeam[teams[i] ] = true
-	end
-  end
-  local players = Spring.GetPlayerList()
-  for i=1,#players do
-	if Spring.GetGameRulesParam("commSpawnedPlayer"..players[i]) == 1 then
-		commSpawnedPlayer[players[i] ] = true
-	end  
-  end
-  ]]--
-end
 
-local forcejunior = Spring.GetModOption("forcejunior", true, false)
+end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
-  if forcejunior then return "commbasic" end
-  
+	if Spring.GetModOption("forcejunior", true, false) then
+		return "commbasic"
+	end
+
   local startUnit
 
-  if isAI and (not teamSidesAI[teamID]) then -- AI that didn't pick comm type gets default comm
-    teamSidesAI[teamID] = "armcom1"
+  if isAI then -- AI that didn't pick comm type gets default comm
+    return (Spring.GetTeamRulesParam(teamID, "start_unit") or "armcom1")
   end
-  
-  if teamSidesAI[teamID] then 
-	return startUnitsAI[teamSidesAI[teamID]]
-  end
-  
+
   if (teamID and teamSides[teamID]) then 
 	startUnit = startUnits[teamSides[teamID]]
   end
@@ -583,14 +386,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
       Spring.SetUnitLineage(unitID, teamID, true)
     end
 
-    -- add boost and facplop
+    -- add facplop
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
     local validTeam = (teamID ~= gaiateam and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI:sub(1,3) == "CAI"))
-    local boost = (startMode == "boost"
-                or startMode == "limitboost"
-                or startMode == "facplopboost")
 
 	local commCost = (udef.metalCost or BASE_COMM_COST) - BASE_COMM_COST			
 				
@@ -599,50 +399,16 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	  local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 	  local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 		
-      if boost then
-        Spring.SetTeamResource(teamID, 'energy', 0)
-        Spring.SetTeamResource(teamID, 'metal', 0)
-		Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore)
-		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore)		
-		local boostAmount = START_BOOST + BASE_COMM_COST - commCost
-		
-        if (udef.name ~= "chickenbroodqueen") then
-          if (startMode == "facplopboost") then
-            AddBoost(unitID, boostAmount, boostAmount)
-          elseif (startMode == "boost") then
-            AddBoost(unitID, boostAmount, boostAmount)
-          else
-            AddBoost(unitID)
-          end
-        end
-
-      else
-		-- the adding of existing resources is necessary for handling /take and spawn
+        -- the adding of existing resources is necessary for handling /take and spawn
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
 		
-        if startMode == "classic" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_CLASSIC + energyStore + bonus)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_CLASSIC + metalStore + bonus)
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE_CLASSIC + energy - commCost + bonus)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE_CLASSIC + metal - commCost + bonus)
-        elseif startMode == "facplop" then
-          Spring.SetTeamResource(teamID, "es", START_STORAGE_FACPLOP + energyStore  + bonus)
-          Spring.SetTeamResource(teamID, "ms", START_STORAGE_FACPLOP + metalStore + bonus)
-          Spring.SetTeamResource(teamID, "energy", START_ENERGY_FACPLOP + energy - commCost + bonus)
-          Spring.SetTeamResource(teamID, "metal", START_METAL_FACPLOP + metal - commCost + bonus)		  
-        else
-		  Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore)
-		  Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore)		
-          Spring.SetTeamResource(teamID, "energy", START_STORAGE + energy - commCost + bonus)
-          Spring.SetTeamResource(teamID, "metal", START_STORAGE + metal - commCost + bonus)
-        end
-
-      end
+        Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore  + bonus)
+        Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore + bonus)
+        Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy - commCost + bonus)
+        Spring.SetTeamResource(teamID, "metal", START_METAL + metal - commCost + bonus)
 
       if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
-        if plop then
-		  GG.GiveFacplop(unitID)
-        end
+        Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
       end
 
     end
@@ -910,13 +676,6 @@ function gadget:GameStart()
       end
     end
   end
-  
-  -- kill units if engine spawned
-  --[[
-  for i,u in ipairs(createBeforeGameStart) do
-    Spring.DestroyUnit(u, false, true) -- selfd = false, reclaim = true
-  end
-  ]]--
 end
 
 function gadget:RecvLuaMsg(msg, playerID)
@@ -930,44 +689,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 		SendToUnsynced("CommSelected",playerID, name) --activate an event called "CommSelected" that can be detected in unsynced part
 		commChoice[playerID] = name
 		StartUnitPicked(playerID, name)
-	--[[
-	elseif (msg:find("<startsetup>playername:",1,true)) then
-		local name = msg:gsub('.*:([^=]*)=.*', '%1')
-		local id = msg:gsub('.*:.*=(.*)', '%1')
-		playerIDsByName[name] = tonumber(id)
-	elseif (msg:find("<startsetup>playernames",1,true)) then
-		InitUnsafe()
-		local allUnits = Spring.GetAllUnits()
-		for _, unitID in pairs(allUnits) do
-			local udid = Spring.GetUnitDefID(unitID)
-			if udid then
-				gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
-			end
-		end]]--
 	end	
 end
-
---[[
-function gadget:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)
-	local teamID = select(4, spGetPlayerInfo(playerID))
-	startPosition[teamID] = {x = cx, y = cy, z = cz}
-	local oldCommID = prespawnedCommIDs[teamID]
-	if oldCommID then
-		Spring.SetUnitPosition(oldCommID, cx, cz)
-	end
-	return true
-end
-]]
-
--- (no longer) used by CAI
-local function SetFaction(side, playerID, teamID)
-    teamSidesAI[teamID] = side
-	teamSides[teamID] = side
-	if playerID then
-		--playerSides[playerID] = side
-	end
-end
-GG.SetFaction = SetFaction
 
 -- used by CAI. Could be extended to allow widgets to set start location? 
 local function SetStartLocation(teamID, x, z)
@@ -1007,7 +730,6 @@ function gadget:Shutdown()
 	--Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
-
 function gadget:Load(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
@@ -1021,21 +743,8 @@ function gadget:Load(zip)
 	scheduledSpawn = data.scheduledSpawn or {}
 	playerSides = data.playerSides or {}
 	teamSides = data.teamSides or {}
-	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
-	
-	-- these require special handling because they involve unitIDs
-	boost = {}
-	for oldID in pairs(data.boost) do
-		newID = GG.SaveLoad.GetNewUnitID(oldID)
-		boost[newID] = true
-	end
-	facplops = {}
-	for oldID in pairs(data.facplops) do
-		newID = GG.SaveLoad.GetNewUnitID(oldID)
-		GG.GiveFacplop(newID)
-	end
 end
 
 --------------------------------------------------------------------
@@ -1050,28 +759,12 @@ local spValidUnitID 	= Spring.ValidUnitID
 local spAreTeamsAllied 	= Spring.AreTeamsAllied
 local spGetUnitTeam 	= Spring.GetUnitTeam
 
-local boost = {}
-local boostMax = {}
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction("UpdateBoost",UpdateBoost)
   gadgetHandler:AddSyncAction('CommSelected',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
---[[
---  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
---  gadgetHandler:AddSyncAction("whisper", whisper)
-  
-	local playerroster = Spring.GetPlayerList()
-	local playercount = #playerroster
-	for i=1,playercount do
-		local name = spGetPlayerInfo(playerroster[i])
-		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
-	end
-	Spring.SendLuaRulesMsg('<startsetup>playernames')
-end
-]]--  
-end
-  
 
+end
+  
 function CommSelection(_,playerID,commSeries)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
@@ -1081,76 +774,7 @@ function CommSelection(_,playerID,commSeries)
 			Script.LuaUI.CommSelection(playerID, commSeries) --send to widgets as event
 		end
 	end
-end  
-  
-function UpdateBoost(_, uid, value, valueMax) 
-	boost[uid] = value
-	boostMax[uid] = valueMax
 end
-  
-  
-local function circleLines(percentage, radius)
-	gl.BeginEnd(GL.LINE_STRIP, function()
-		local radstep = (2.0 * math.pi) / 50
-		for i = 0, 50 * percentage do
-			local a = (i * radstep)
-			gl.Vertex(math.sin(a)*radius, 0, math.cos(a)*radius)
-		end
-	end)
-end  
-
-function gadget:DrawWorldPreUnit()
-	if Spring.IsGUIHidden() then return end
-	teamID = Spring.GetLocalTeamID()
-	local spec, fullview = spGetSpectatingState()
-	spec = spec or fullview
-	for unitID, value in pairs(boost) do
-		local ut = spGetUnitTeam(unitID)
-		if (ut ~= nil and (spec or spAreTeamsAllied(teamID, ut))) then
-			if (value > 0 and boostMax[unitID] ~= nil) then 
-				gl.DepthTest(false)
-				gl.LineWidth(6.5)
-				gl.Color({255,0,0})
-				local radius = 30
-				while value > START_BOOST do 
-					gl.DrawFuncAtUnit(unitID, false, circleLines, 1, radius)
-					radius = radius + 8
-					value = value - START_BOOST
-				end
-				gl.DrawFuncAtUnit(unitID, false, circleLines, value / START_BOOST, radius)
-				gl.DepthTest(true)
-			end
-		end
-	end
-	gl.Color(1,1,1,1)
-end
---[[ moved to widget
-local function DrawUnitFunc(yshift)
-	gl.Translate(0,yshift,0)
-	gl.Billboard()
-	gl.TexRect(-10, -10, 10, 10)
-end
-
-local facplopTexture = 'LuaUI/Images/gift.png'
-
-function gadget:DrawWorld()
-	if Spring.IsGUIHidden() then return end
-	local facplops = SYNCED.facplops
-	local spec, fullview = Spring.GetSpectatingState()
-	local myAllyID = Spring.GetMyAllyTeamID()
-
-	spec = spec or fullview
-	gl.Texture(facplopTexture )	
-	gl.Color(1,1,1,1)
-	for id,_ in spairs(facplops) do
-		local los = spGetUnitLosState(id, myAllyID, false)
-		if spValidUnitID(id) and spGetUnitDefID(id) and ((los and los.los) or spec) then
-			gl.DrawFuncAtUnit(id, false, DrawUnitFunc,  UnitDefs[spGetUnitDefID(id)].height+30)
-		end
-	end
-	gl.Texture("")
-end
---]]
 
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
@@ -1160,13 +784,10 @@ function gadget:Save(zip)
 		return
 	end
 	local toSave = {
-		boost = boost,
-		facplops = MakeRealTable(SYNCED.facplops),
 		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
 		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
 		playerSides = MakeRealTable(SYNCED.playerSides),
 		teamSides = MakeRealTable(SYNCED.teamSides),
-		teamSidesAI = MakeRealTable(SYNCED.teamSidesAI),
 		commSpawnedPlayer = MakeRealTable(SYNCED.commSpawnedPlayer),
 		commSpawnedTeam = MakeRealTable(SYNCED.commSpawnedTeam),
 	}

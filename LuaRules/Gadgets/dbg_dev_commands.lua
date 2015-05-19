@@ -441,7 +441,7 @@ local function restart(cmd,line,words,player)
 			if GG.startUnits[teamID] and GG.CommanderSpawnLocation[teamID] then
 				local spawn = GG.CommanderSpawnLocation[teamID]
 				local unitID = GG.DropUnit(GG.startUnits[teamID], spawn.x, spawn.y, spawn.z, spawn.facing, teamID, nil, 0)
-				GG.GiveFacplop(unitID)
+				Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 			end
 		end
 		
