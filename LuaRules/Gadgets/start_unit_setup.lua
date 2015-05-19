@@ -220,6 +220,10 @@ end
 
 local function GetStartUnit(teamID, playerID, isAI)
 
+	if Spring.GetModOption("forcejunior", true, false) then
+		return "commbasic"
+	end
+
   local startUnit
 
   if isAI then -- AI that didn't pick comm type gets default comm

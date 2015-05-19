@@ -345,6 +345,14 @@ local options = {
     section='silly',
   },
   {
+    key = "forcejunior",
+    name = "Force Junior",
+    desc = "Choose whether everyone gets a standard Junior Comm chassis.",
+    type = "bool",
+    section= 'startconds',
+    def = false,
+  },
+  {
 	key		= "disabledunits",
 	name	= "Disable units",
 	desc	= "Prevents specified units from being built ingame. Specify multiple units by using + ",
