@@ -171,22 +171,6 @@ local function CheckForShutdown()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	--[[
-	if not gamestart then
-		createBeforeGameStart[#createBeforeGameStart + 1] = unitID
-
-		-- make units blind, so that you don't see shuffled units
-		Spring.SetUnitSensorRadius(unitID,"los",0)
-		Spring.SetUnitSensorRadius(unitID,"airLos",0)
-		Spring.SetUnitCloak(unitID, 4)
-		Spring.SetUnitStealth(unitID, true)
-		Spring.SetUnitNoDraw(unitID, true)
-		Spring.SetUnitNoSelect(unitID, true)
-		Spring.SetUnitNoMinimap(unitID, true)
-		return
-	end
-	]]--
-
 	if ploppableDefs[unitDefID] and facplops[builderID] then
 		facplops[builderID] = nil
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
@@ -286,22 +270,7 @@ function gadget:Initialize()
 		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
 	end
   end
-  
-  -- legacy save/load compat
-  --[[
-  local teams = Spring.GetTeamList()
-  for i=1,#teams do
-	if Spring.GetGameRulesParam("commSpawnedTeam"..teams[i]) == 1 then
-		commSpawnedTeam[teams[i] ] = true
-	end
-  end
-  local players = Spring.GetPlayerList()
-  for i=1,#players do
-	if Spring.GetGameRulesParam("commSpawnedPlayer"..players[i]) == 1 then
-		commSpawnedPlayer[players[i] ] = true
-	end  
-  end
-  ]]--
+
 end
 
 local function GetStartUnit(teamID, playerID, isAI)
@@ -762,13 +731,6 @@ function gadget:GameStart()
       end
     end
   end
-  
-  -- kill units if engine spawned
-  --[[
-  for i,u in ipairs(createBeforeGameStart) do
-    Spring.DestroyUnit(u, false, true) -- selfd = false, reclaim = true
-  end
-  ]]--
 end
 
 function gadget:RecvLuaMsg(msg, playerID)
@@ -782,34 +744,8 @@ function gadget:RecvLuaMsg(msg, playerID)
 		SendToUnsynced("CommSelected",playerID, name) --activate an event called "CommSelected" that can be detected in unsynced part
 		commChoice[playerID] = name
 		StartUnitPicked(playerID, name)
-	--[[
-	elseif (msg:find("<startsetup>playername:",1,true)) then
-		local name = msg:gsub('.*:([^=]*)=.*', '%1')
-		local id = msg:gsub('.*:.*=(.*)', '%1')
-		playerIDsByName[name] = tonumber(id)
-	elseif (msg:find("<startsetup>playernames",1,true)) then
-		InitUnsafe()
-		local allUnits = Spring.GetAllUnits()
-		for _, unitID in pairs(allUnits) do
-			local udid = Spring.GetUnitDefID(unitID)
-			if udid then
-				gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
-			end
-		end]]--
 	end	
 end
-
---[[
-function gadget:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)
-	local teamID = select(4, spGetPlayerInfo(playerID))
-	startPosition[teamID] = {x = cx, y = cy, z = cz}
-	local oldCommID = prespawnedCommIDs[teamID]
-	if oldCommID then
-		Spring.SetUnitPosition(oldCommID, cx, cz)
-	end
-	return true
-end
-]]
 
 -- (no longer) used by CAI
 local function SetFaction(side, playerID, teamID)
@@ -859,7 +795,6 @@ function gadget:Shutdown()
 	--Spring.Echo("<Start Unit Setup> Going to sleep...")
 end
 
-
 function gadget:Load(zip)
 	if not GG.SaveLoad then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Start Unit Setup failed to access save/load API")
@@ -900,22 +835,9 @@ local spGetUnitTeam 	= Spring.GetUnitTeam
 
 function gadget:Initialize()
   gadgetHandler:AddSyncAction('CommSelected',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
---[[
---  gadgetHandler:AddSyncAction('PWCreate',WrapToLuaUI)
---  gadgetHandler:AddSyncAction("whisper", whisper)
-  
-	local playerroster = Spring.GetPlayerList()
-	local playercount = #playerroster
-	for i=1,playercount do
-		local name = spGetPlayerInfo(playerroster[i])
-		Spring.SendLuaRulesMsg('<startsetup>playername:'..name..'='..playerroster[i])
-	end
-	Spring.SendLuaRulesMsg('<startsetup>playernames')
-end
-]]--  
-end
-  
 
+end
+  
 function CommSelection(_,playerID,commSeries)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
@@ -926,17 +848,6 @@ function CommSelection(_,playerID,commSeries)
 		end
 	end
 end
-  
-  
-local function circleLines(percentage, radius)
-	gl.BeginEnd(GL.LINE_STRIP, function()
-		local radstep = (2.0 * math.pi) / 50
-		for i = 0, 50 * percentage do
-			local a = (i * radstep)
-			gl.Vertex(math.sin(a)*radius, 0, math.cos(a)*radius)
-		end
-	end)
-end  
 
 local MakeRealTable = Spring.Utilities.MakeRealTable
 
