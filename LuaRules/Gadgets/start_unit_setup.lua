@@ -38,17 +38,6 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
         end
       end
     end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
-    end
   end
   
   function GG.GiveFacplop(unitID)
@@ -364,17 +353,6 @@ function gadget:Initialize()
           ploppableDefs[ud] = true
         end
       end
-    end
-    if(Spring.GetModOption("air_ploppable", true, true)) then
-	    for i, v in pairs(air_ploppables) do
-	      local name = UnitDefNames[v]
-	      if name then
-		    local ud = name.id
-		    if ud then
-		      ploppableDefs[ud] = true
-		    end
-	      end
-	    end
     end
   end
 

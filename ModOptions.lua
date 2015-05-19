@@ -365,14 +365,6 @@ local options = {
     },
   },
   {
-    key = "air_ploppable",
-    name = "Ploppable Air",
-    desc = "Choose whether Air/Gunships are ploppable",
-    type = "bool",
-    section= 'startconds',
-    def = true,
-  },
-  {
     key = "forcejunior",
     name = "Force Junior",
     desc = "Choose whether everyone gets a standard Junior Comm chassis.",
