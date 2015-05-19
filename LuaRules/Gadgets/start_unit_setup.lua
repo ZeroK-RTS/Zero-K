@@ -10,7 +10,6 @@ function gadget:GetInfo()
   }
 end
 
-
 -- partially based on Spring's unit spawn gadget
 include "LuaRules/Configs/start_setup.lua"
 
@@ -19,7 +18,6 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
     return false -- no unsynced code
   end
 
-  local facplops = {}
   local ploppableDefs = {}  
     
   GG.SetFaction = function() end
@@ -39,22 +37,11 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
       end
     end
   end
-  
-  function GG.GiveFacplop(unitID)
-    if dotaMode then return end
-    facplops[unitID] = 1
-    Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
-  end
-  
-  function GG.HasFacplop(unitID)
-    return facplops[unitID]
-  end
-  
+
   function GG.SetStartLocation() end
   
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if ploppableDefs[unitDefID] and facplops[builderID] then
-      facplops[builderID] = nil
+    if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
       local maxHealth = select(2,Spring.GetUnitHealth(unitID))
       Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
@@ -97,7 +84,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local facplops = {}
 local ploppableDefs = {}
 
 local gamestart = false
@@ -128,7 +114,6 @@ local commSpawnedTeam = {}
 local commSpawnedPlayer = {}
 
 -- allow gadget:Save (unsynced) to reach them
-_G.facplops = facplops
 _G.waitingForComm = waitingForComm
 _G.scheduledSpawn = scheduledSpawn
 _G.playerSides = playerSides
@@ -142,37 +127,8 @@ local loadGame = false	-- was this loaded from a savegame?
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function GG.HasFacplop(unitID)
-	return facplops[unitID]
-end
-
-function GG.GiveFacplop(unitID)
-	if dotaMode then return end
-	facplops[unitID] = 1
-	Spring.SetUnitRulesParam(unitID,"facplop",1, {inlos = true})
-end
-
-local function CheckForShutdown()
-	if dotaMode or ctfMode then
-	    return
-	end
-	
-	local cnt = 0
-
-	for _,_ in pairs(facplops) do
-		cnt = cnt+1
-	end
-	for team,_ in pairs(waitingForComm) do
-		cnt = cnt+1
-	end
-	if (cnt == 0) and Spring.GetGameSeconds() > 5 then
-		gadgetHandler.RemoveGadget(self)
-	end
-end
-
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	if ploppableDefs[unitDefID] and facplops[builderID] then
-		facplops[builderID] = nil
+	if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
@@ -182,14 +138,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
-		
-		-- remember to plop, can't do it here else other gadgets etc. see UnitFinished before UnitCreated
-		CheckForShutdown()
 	end
-end
-
-function gadget:UnitDestroyed(unitID)
-	facplops[unitID] = nil
 end
 
 local function InitUnsafe()
@@ -463,7 +412,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
         Spring.SetTeamResource(teamID, "metal", START_METAL + metal - commCost + bonus)
 
       if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
-        GG.GiveFacplop(unitID)
+        Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
       end
 
     end
@@ -811,13 +760,6 @@ function gadget:Load(zip)
 	teamSidesAI = data.teamSidesAI or {}
 	commSpawnedPlayer = data.commSpawnedPlayer or {}
 	commSpawnedTeam = data.commSpawnedTeam or {}
-	
-	-- these require special handling because they involve unitIDs
-	facplops = {}
-	for oldID in pairs(data.facplops) do
-		newID = GG.SaveLoad.GetNewUnitID(oldID)
-		GG.GiveFacplop(newID)
-	end
 end
 
 --------------------------------------------------------------------
@@ -857,7 +799,6 @@ function gadget:Save(zip)
 		return
 	end
 	local toSave = {
-		facplops = MakeRealTable(SYNCED.facplops),
 		waitingForComm = MakeRealTable(SYNCED.waitingForComm),
 		scheduledSpawn = MakeRealTable(SYNCED.scheduledSpawn),
 		playerSides = MakeRealTable(SYNCED.playerSides),
