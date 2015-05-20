@@ -123,6 +123,10 @@ function CreateTheUI(showProgress)
 					if x>progress_speed.x and y>progress_speed.y
 					and x<progress_speed.x2 and  y<progress_speed.y2
 					then
+						progress_speed.color = {0.9,0.15,0.2,0.75}
+						progress_speed:SetValue(progress_speed.max)
+						progress_speed.flash = true
+						
 						label_hoverTime:SetCaption("twice to activate")
 						if spDiffTimers(spGetTimer(),self.lastClick) <0.40 then
 							CreateTheUI(true)
@@ -142,6 +146,10 @@ function CreateTheUI(showProgress)
 						setReplaySpeed (speeds[#speeds], #speeds)
 						fastForwardTo = modf(target*progress_speed.max)
 						label_hoverTime:SetCaption("> >")
+					else
+						snapButton(2)
+						progress_target:SetValue(0)
+						setReplaySpeed (speeds[2],2)
 					end
 				end
 				return 
@@ -153,7 +161,14 @@ function CreateTheUI(showProgress)
 				end
 				
 				if not showProgress then
-					label_hoverTime:SetCaption(" ")
+					if progress_speed.flash then
+						progress_speed.color = {1,1,1,0.0} 
+						progress_speed:SetValue(0)
+						progress_speed.flash = false
+					end
+					if label_hoverTime.caption ~= " " then
+						label_hoverTime:SetCaption(" ")
+					end
 					return
 				end
 
@@ -166,7 +181,9 @@ function CreateTheUI(showProgress)
 					second = 60*second --multiply remainder with 60sec-per-minute to get second back.
 					label_hoverTime:SetCaption(format ("%d:%02d" , minute, second))
 				else
-					label_hoverTime:SetCaption(" ")
+					if label_hoverTime.caption ~= " " then
+						label_hoverTime:SetCaption(" ")
+					end
 				end
 				return 
 			end},
@@ -188,6 +205,9 @@ function CreateTheUI(showProgress)
 			snapButton(i)
 			progress_target:SetValue(0)
 			setReplaySpeed (speeds[i], i)
+			if isPaused then
+				unpause()
+			end
 		end}
 	}
 	end
@@ -248,7 +268,7 @@ function CreateTheUI(showProgress)
 			width   = 280,
 			height	= 20, 
 			max     = 1;
-			color   = {0.75,0.75,0.75,0.25} ;
+			color   = {0.75,0.75,0.75,0.5} ;
 			backgroundColor = {0,0,0,0} ,
 			value = 0,
 		}
@@ -261,9 +281,11 @@ function CreateTheUI(showProgress)
 			width   = 280,
 			height	= 20, 
 			max     = replayLen;
-			caption = window.showProgress and (frame/replayLen .. "%") or " ",
+			caption = window.showProgress and (frame/replayLen*100 .. "%") or " ",
 			color   = window.showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
+			backgroundColor = {0,0,0,0.8} ,
 			value = frame,
+			flash = false,
 		}
 	progress_speed.x2 =  progress_speed.x + progress_speed.width
 	progress_speed.y2 =  progress_speed.y + progress_speed.height
