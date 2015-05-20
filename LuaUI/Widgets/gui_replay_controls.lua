@@ -283,7 +283,7 @@ function CreateTheUI(showProgress)
 			max     = replayLen;
 			caption = window.showProgress and (frame/replayLen*100 .. "%") or " ",
 			color   = window.showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
-			backgroundColor = {0,0,0,0.8} ,
+			backgroundColor = {1,1,1,0.8} ,
 			value = frame,
 			flash = false,
 		}
