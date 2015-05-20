@@ -4,14 +4,21 @@ function widget:GetInfo()
     desc      = "Graphical buttons for controlling replay speed, " .. 
     "pausing and skipping pregame chatter",
     author    = "knorke",
-    date      = "August 2012",
+    date      = "August 2012", --updated on 20 May 2015
     license   = "stackable",
     layer     = 1, 
     enabled   = true  --  loaded by my horse?
   }
 end
 
+-- 5 May 2015 added progress bar, by xponen
+
+--Speedup
 local widgetName = widget:GetInfo().name
+local modf = math.modf
+local format = string.format
+local spDiffTimers = Spring.DiffTimers
+local spGetTimer = Spring.GetTimer
 
 local Chili
 local Button
@@ -29,13 +36,17 @@ local window
 local button_setspeed = {}
 local button_skipPreGame
 local button_startStop
+local progress_speed
+local progress_target
+local label_hoverTime
 
 local speeds = {0.5, 1, 2, 3, 4, 5,10}
 
 local isPaused = false
-local wantedSpeed = nil
+-- local wantedSpeed = nil
 local skipped = false
-local lastSkippedTime = 0
+local fastForwardTo = -1
+local demoStarted = false
 
 function widget:Initialize()
 	if (not Spring.IsReplay()) then
@@ -54,7 +65,11 @@ function widget:Initialize()
 	Progressbar = Chili.Progressbar
 	Control = Chili.Control
 	screen0 = Chili.Screen0
-	
+
+	CreateTheUI(false)
+end
+
+function CreateTheUI(showProgress)
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
@@ -62,7 +77,20 @@ function widget:Initialize()
 	
 	local labelHeight = 24
 	local fontSize = 16
+	
+	local currSpeed = 2 --default button setting
+	if window then
+		currSpeed = window.currSpeed
+		screen0:RemoveChild(window)
+		window:Dispose()
+	end
 
+	local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
+	if replayLen == 0 then --replay info broken
+		replayLen = false
+	end
+	local frame = Spring.GetGameFrame()
+	
 	window = Window:New{
 		--parent = screen0,
 		name   = 'replaycontroller';
@@ -78,48 +106,146 @@ function widget:Initialize()
 		minWidth = MIN_WIDTH, 
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
+		--informational tag:
+		showProgress = showProgress and replayLen,
+		currSpeed = currSpeed, 
+		lastClick = Spring.GetTimer(),
+		--end info tag
 		--itemMargin  = {0, 0, 0, 0},
 		--caption = "replay control"
+		OnMouseDown = {function(self, x, y, mouse) 
+				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
+				if  not replayLen then
+					return
+				end
+				
+				if not showProgress then
+					if x>progress_speed.x and y>progress_speed.y
+					and x<progress_speed.x2 and  y<progress_speed.y2
+					then
+						progress_speed.color = {0.9,0.15,0.2,0.75}
+						progress_speed:SetValue(progress_speed.max)
+						progress_speed.flash = true
+						
+						label_hoverTime:SetCaption("twice to activate")
+						if spDiffTimers(spGetTimer(),self.lastClick) <0.40 then
+							CreateTheUI(true)
+						end
+						self.lastClick = spGetTimer()
+					end
+					return
+				end
+
+				if x>progress_speed.x and y>progress_speed.y
+				and x<progress_speed.x2 and  y<progress_speed.y2
+				then
+					local target = (x-progress_speed.x) / (progress_speed.width)
+					if target > progress_speed.value/progress_speed.max then
+						progress_target:SetValue(target)
+						snapButton(#speeds)
+						setReplaySpeed (speeds[#speeds], #speeds)
+						fastForwardTo = modf(target*progress_speed.max)
+						label_hoverTime:SetCaption("> >")
+					else
+						snapButton(2)
+						progress_target:SetValue(0)
+						setReplaySpeed (speeds[2],2)
+					end
+				end
+				return 
+			end},
+		OnMouseMove = {function(self, x, y, mouse) 
+				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
+				if  not replayLen then
+					return
+				end
+				
+				if not showProgress then
+					if progress_speed.flash then
+						progress_speed.color = {1,1,1,0.0} 
+						progress_speed:SetValue(0)
+						progress_speed.flash = false
+					end
+					if label_hoverTime.caption ~= " " then
+						label_hoverTime:SetCaption(" ")
+					end
+					return
+				end
+
+				if x>progress_speed.x and y>progress_speed.y
+				and x<progress_speed.x2 and  y<progress_speed.y2
+				then
+					local target = (x-progress_speed.x) / (progress_speed.width)
+					local hoverOver = modf(target*progress_speed.max/30)
+					local minute, second = modf(hoverOver/60)--second divide by 60sec-per-minute, then saperate result from its remainder
+					second = 60*second --multiply remainder with 60sec-per-minute to get second back.
+					label_hoverTime:SetCaption(format ("%d:%02d" , minute, second))
+				else
+					if label_hoverTime.caption ~= " " then
+						label_hoverTime:SetCaption(" ")
+					end
+				end
+				return 
+			end},
 	}
 	
 	for i = 1, #speeds do
 		button_setspeed[i] = Button:New {
 		width = 40,
 		height = 20,
-		y = 30,
+		y = 36,
 		x = 10+(i-1)*40,
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 0, 1},		
+		backgroundColor = (i==currSpeed and {0, 0, 1, 1}) or {1, 1, 0, 1}, -- 1x selected by default
 		caption=speeds[i] .."x",
 		tooltip = "play at " .. speeds[i] .. "x speed";
 		OnClick = {function()
+			snapButton(i)
+			progress_target:SetValue(0)
 			setReplaySpeed (speeds[i], i)
-			button_setspeed.backgroundColor = {0, 0, 1, 1}
-			end}
+			if isPaused then
+				unpause()
+			end
+		end}
 	}
 	end
 	
-	button_skipPreGame = Button:New {
-		width = 180,
-		height = 20,
-		y = 55,
-		x = 100,
+	if (frame == 0) then 
+		button_skipPreGame = Button:New {
+			width = 180,
+			height = 20,
+			y = 58,
+			x = 100,
+			parent=window;
+			padding = {0, 0, 0,0},
+			margin = {0, 0, 0, 0},
+			caption="skip pregame chatter",
+			tooltip = "Skip the pregame chat and startposition chosing, directly to the action!";
+			OnClick = {function()
+				skipPreGameChatter ()
+				end}
+		}
+	else 
+		--in case reloading luaui mid demo
+		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveCallIn("Update")
+	end
+	
+	label_hoverTime = Label:New {
+		width = 20,
+		height = 15,
+		y = 58,
+		x = 133,
 		parent=window;
-		padding = {0, 0, 0,0},
-		margin = {0, 0, 0, 0},
-		caption="skip pregame chatter",
-		tooltip = "Skip the pregame chat and startposition chosing, directly to the action!";
-		OnClick = {function()
-			skipPreGameChatter ()
-			end}
+		caption=" ",
 	}
 	
 	button_startStop = Button:New {
 		width = 80,
 		height = 20,
-		y = 55,
+		y = 58,
 		x = 10,
 		parent=window;
 		padding = {0, 0, 0,0},
@@ -135,20 +261,43 @@ function widget:Initialize()
 			end}
 	}
 	
-	progress_speed = Progressbar:New{
+	progress_target = Progressbar:New{
 			parent = window,
-			y = 8,
+			y =  8,
 			x		= 10,
 			width   = 280,
-			height	= 20,
-			max     = #speeds;
-			caption = "replay speed";
-			color   = (i == 1 and {0.2,0.9,0.3,1}) or {0.9,0.15,0.2,1};
-			value = 1 +1,
+			height	= 20, 
+			max     = 1;
+			color   = {0.75,0.75,0.75,0.5} ;
+			backgroundColor = {0,0,0,0} ,
+			value = 0,
 		}
-	
-	screen0:AddChild(window)
 
+	local replayLen = (replayLen and replayLen* 30) or 100-- in frame
+	progress_speed = Progressbar:New{
+			parent = window,
+			y =  8,
+			x		= 10,
+			width   = 280,
+			height	= 20, 
+			max     = replayLen;
+			caption = window.showProgress and (frame/replayLen*100 .. "%") or " ",
+			color   = window.showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
+			backgroundColor = {0,0,0,0.8} ,
+			value = frame,
+			flash = false,
+		}
+	progress_speed.x2 =  progress_speed.x + progress_speed.width
+	progress_speed.y2 =  progress_speed.y + progress_speed.height
+
+	screen0:AddChild(window)
+end
+
+function snapButton(pushButton)
+	button_setspeed[window.currSpeed].backgroundColor = {1, 1, 0, 1}
+	button_setspeed[window.currSpeed]:Invalidate()
+	button_setspeed[pushButton].backgroundColor = {0, 0, 1, 1}
+	button_setspeed[pushButton]:Invalidate()
 end
 
 function pause ()
@@ -157,7 +306,7 @@ function pause ()
 	isPaused = true
 	button_startStop:SetCaption ("play")
 	--window:SetColor ({1,0,0, 1})
-	--window:SetCaption ("trololo")--button stays pressed down and game lags	ANY INVALID CODE MAKES IT LAG, REASON WHY COM MORPH LAGS?	
+	--window:SetCaption ("trololo")--button stays pressed down and game lags	ANY INVALID CODE MAKES IT LAG, REASON WHY COM MORPH LAGS?
 end
 
 function unpause ()
@@ -199,9 +348,10 @@ function setReplaySpeed (speed, i)
 		-- end	
 	end	
 	--Spring.SendCommands ("setmaxpeed " .. speed)
-	progress_speed:SetValue(i)
+	window.currSpeed = i
 end
 
+local lastSkippedTime = 0
 function widget:Update(dt)
 	-- if (wantedSpeed) then
 	-- 	if (Spring.GetGameSpeed() > wantedSpeed) then
@@ -210,7 +360,7 @@ function widget:Update(dt)
 	-- 		wantedSpeed = nil
 	-- 	end
 	-- end
-	if skipped == true then
+	if skipped and demoStarted then --do not do "skip 1" at or before demoStart because,it Hung Spring/broke the command respectively. 
 		if lastSkippedTime > 1.5 then
 			Spring.SendCommands("skip 1")
 			lastSkippedTime = 0
@@ -221,16 +371,42 @@ function widget:Update(dt)
 end
 
 function widget:GameFrame (f)
+	if (fastForwardTo>0) then
+		if f==fastForwardTo then
+			pause ()
+			snapButton(2)
+			progress_target:SetValue(0)
+			setReplaySpeed (speeds[2],2)
+			fastForwardTo = -1
+		elseif f>fastForwardTo then
+			progress_target:SetValue(0)
+			fastForwardTo = -1
+		end
+	end
 	if (f==1) then
 		window:RemoveChild(button_skipPreGame)
 		skipped = nil
 		lastSkippedTime = nil
+		widgetHandler:RemoveCallIn("AddConsoleMessage")
+		widgetHandler:RemoveCallIn("Update")
+	elseif window.showProgress and (f%2 ==0)  then
+		progress_speed:SetValue(f)
+		progress_speed:SetCaption(math.modf(f/progress_speed.max*100) .. "%")
+	end
+end
+
+function widget:AddConsoleMessage(msg)
+	if msg.text == "Beginning demo playback" then
+		demoStarted = true
+		widgetHandler:RemoveCallIn("AddConsoleMessage")
 	end
 end
 
 function skipPreGameChatter ()
 	Spring.Echo("Skipping pregame chatter")
-	Spring.SendCommands("skip 1")
+	if (demoStarted) then 
+		Spring.SendCommands("skip 1")
+	end
 	skipped = true
-	window:RemoveChild(button_skipPreGame)
+	-- window:RemoveChild(button_skipPreGame)
 end
