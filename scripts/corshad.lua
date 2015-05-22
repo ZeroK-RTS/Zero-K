@@ -91,7 +91,7 @@ local function SpeedControl()
 	SetSignalMask(SIG_SPEED_CONTROL)
 	while true do
 		local x,y,z = spGetUnitPosition(unitID)
-		local terrain = math.max(spGetGroundHeight(x,z), 0)
+		local terrain = max(spGetGroundHeight(x,z), 0) -- not amphibious, treat water as ground
 		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain-50)/(fullHeight-60)))
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
 		GG.UpdateUnitAttributes(unitID)
