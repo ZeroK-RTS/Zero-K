@@ -359,6 +359,9 @@ function widget:GameFrame(n)
 	local mPercent = 100 * mCurr / mStor
 	local ePercent = 100 * eCurr / eStor
 
+	mPercent = math.min(math.max(mPercent, 0), 100)
+	ePercent = math.min(math.max(ePercent, 0), 100)
+
 	bar_metal:SetValue( mPercent )
 	bar_energy:SetValue( ePercent )
 	
