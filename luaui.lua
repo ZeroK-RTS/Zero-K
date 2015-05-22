@@ -21,6 +21,7 @@ LUAUI_DIRNAME = 'LuaUI/'
 VFS.DEF_MODE = VFS.RAW_FIRST
 
 local STARTUP_FILENAME = LUAUI_DIRNAME .. 'camain.lua'
+local GAME_LAW_FILENAME = LUAUI_DIRNAME .. 'carules.lua'
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -36,6 +37,26 @@ do
 end
 
 Spring.Echo('Using LUAUI_DIRNAME = ' .. LUAUI_DIRNAME)
+
+-------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------- 
+--
+-- load user interface's censorship/rules/enforcement
+--
+
+do
+  text = VFS.LoadFile(GAME_LAW_FILENAME, VFS.ZIP_ONLY )
+  if (text == nil) then
+    Script.Kill('Failed to load ' .. GAME_LAW_FILENAME)
+  end
+  local chunk, err = loadstring(text)
+  if (chunk == nil) then
+    Script.Kill('Failed to load ' .. GAME_LAW_FILENAME .. ' (' .. err .. ')')
+  else
+    chunk()
+    --return
+  end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
