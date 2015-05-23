@@ -15,6 +15,8 @@
 -- emptrail
 -- disarmtrail
 -- raventrail
+-- concussiontrail
+-- concussionspikes
 -- banishertrail
 -- bdtrail
 -- voidtrail
@@ -1175,6 +1177,125 @@ return {
     },
   },
 
+  ["concussiontrail"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    
+    
+    -- largeflash = {
+      -- air                = true,
+      -- class              = [[CBitmapMuzzleFlame]],
+      -- count              = 1,
+      -- ground             = true,
+      -- underwater         = 1,
+      -- water              = true,
+      -- properties = {
+        -- colormap           = [[1 1 0.25 0.01 0.6 0.4 0.1 0.01 0 0 0 0.01]],
+        -- dir                = [[dir]],
+        -- frontoffset        = 0,
+        -- fronttexture       = [[muzzlefront]],
+        -- length             = -33,
+        -- sidetexture        = [[muzzleside]],
+        -- size               = -6,
+        -- sizegrowth         = 1.5,
+        -- ttl                = 15,
+      -- },
+    -- },
+    
+    
+
+    green_flame_start = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 3,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 1,
+        colormap           = [[1 1 1 0.1  1 1 1 0.75]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = 0,
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 2,
+        particlelifespread = 0,
+        particlesize       = [[9 i2]],
+        particlesizespread = 0,
+        particlespeed      = [[45 i-7.5]],
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = 0,
+        sizemod            = 1,
+        texture            = [[smoke]],
+      },
+    },
+    green_flame_end = {
+      air                = true,
+      class              = [[CSimpleParticleSystem]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        airdrag            = 0.5,
+        colormap           = [[1 1 1 0.1   0.5 1 0.0 0.3   0.25 1 0.0 0.5   0.0 0.0 0.0 0.00]],
+        directional        = false,
+        emitrot            = 0,
+        emitrotspread      = [[0 i3]],
+        emitvector         = [[dir]],
+        gravity            = [[0, 0, 0]],
+        numparticles       = 1,
+        particlelife       = 7,
+        particlelifespread = 1,
+        particlesize       = [[15 i-2.3333]],
+        particlesizespread = 0,
+        particlespeed      = [[30 i-15]],
+        particlespeedspread = 0,
+        pos                = [[0, 0, 0]],
+        sizegrowth         = [[-0.1 i-0.1]],
+        sizemod            = 0.9,
+        texture            = [[smoke]],
+      },
+    },
+    spikes = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 2,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[i1]],
+        damage             = [[i1]],
+        dir                = [[dir]],
+        explosionGenerator = [[custom:CONCUSSION_SPIKES]],
+        pos                = [[0, 0, 0]],
+      },
+    },
+  },
+  
+  ["concussion_spikes"] = {
+    alwaysvisible      = false,
+    usedefaultexplosions = false,
+    spikes = {
+      air                = true,
+      class              = [[CExploSpikeProjectile]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alpha              = 1,
+        alphadecay         = [[0.20 d-0.075]],
+        color              = [[0.5 d-0.5, 1, 0]],
+        pos                = [[0, 0, 0]],
+        dir                = [[dir]],
+        length             = [[40 r2.5]],
+        width              = [[15 d-10]],
+        lengthGrowth       = 0,
+      },
+    },
+  },
+  
   ["banishertrail"] = {
     usedefaultexplosions = false,
     largeflash = {
@@ -1266,8 +1387,7 @@ return {
       },
     },
   },
-
-
+  
   ["bdtrail"] = {
     usedefaultexplosions = false,
     largeflash = {
