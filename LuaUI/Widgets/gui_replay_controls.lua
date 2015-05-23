@@ -17,8 +17,6 @@ end
 local widgetName = widget:GetInfo().name
 local modf = math.modf
 local format = string.format
-local spDiffTimers = Spring.DiffTimers
-local spGetTimer = Spring.GetTimer
 
 local Chili
 local Button
@@ -40,13 +38,50 @@ local progress_speed
 local progress_target
 local label_hoverTime
 
+---------------------------------
+-- Globals 
+---------------------------------
 local speeds = {0.5, 1, 2, 3, 4, 5,10}
-
 local isPaused = false
 -- local wantedSpeed = nil
 local skipped = false
 local fastForwardTo = -1
 local demoStarted = false
+local showProgress = true
+
+---------------------------------
+-- Epic Menu
+---------------------------------
+options_path = 'Settings/HUD Panels/Replay Controls'
+options_order = { 'visibleprogress'}
+options = {
+	visibleprogress = {
+		name = 'Progress Bar',
+		desc = 'Enables a clickable progress bar for the replay.',
+		type = 'bool',
+		value = true,
+		OnChange = function(self) 
+			local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
+			if replayLen == 0 then --replay info broken
+				replayLen = false
+				self.value = false
+			end
+			local frame = Spring.GetGameFrame()
+			
+			if self.value then
+				progress_speed:SetValue(frame)
+				progress_speed:SetCaption(math.modf(frame/progress_speed.max*100) .. "%")
+			else
+				progress_speed:SetValue(0)
+				progress_speed:SetCaption("")
+			end
+			showProgress = self.value
+		end,
+	},
+}
+
+---------------------------------
+---------------------------------
 
 function widget:Initialize()
 	if (not Spring.IsReplay()) then
@@ -66,10 +101,10 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 
-	CreateTheUI(false)
+	CreateTheUI()
 end
 
-function CreateTheUI(showProgress)
+function CreateTheUI()
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
@@ -88,6 +123,7 @@ function CreateTheUI(showProgress)
 	local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
 	if replayLen == 0 then --replay info broken
 		replayLen = false
+		showProgress = false
 	end
 	local frame = Spring.GetGameFrame()
 	
@@ -107,7 +143,6 @@ function CreateTheUI(showProgress)
 		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		--informational tag:
-		showProgress = showProgress and replayLen,
 		currSpeed = currSpeed, 
 		lastClick = Spring.GetTimer(),
 		--end info tag
@@ -115,30 +150,10 @@ function CreateTheUI(showProgress)
 		--caption = "replay control"
 		OnMouseDown = {function(self, x, y, mouse) 
 				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
-				if  not replayLen then
-					return
-				end
-				
 				if not showProgress then
-					if x>progress_speed.x and y>progress_speed.y
-					and x<progress_speed.x2 and  y<progress_speed.y2
-					then
-						progress_speed.color = {0.9,0.15,0.2,0.75}
-						progress_speed:SetValue(progress_speed.max)
-						progress_speed.flash = true
-						
-						label_hoverTime:SetCaption("twice to activate")
-						if spDiffTimers(spGetTimer(),self.lastClick) <0.40 then
-							CreateTheUI(true)
-						end
-						self.lastClick = spGetTimer()
-					end
 					return
 				end
-
-				if x>progress_speed.x and y>progress_speed.y
-				and x<progress_speed.x2 and  y<progress_speed.y2
-				then
+				if x>progress_speed.x and y>progress_speed.y and x<progress_speed.x2 and  y<progress_speed.y2 then
 					local target = (x-progress_speed.x) / (progress_speed.width)
 					if target > progress_speed.value/progress_speed.max then
 						progress_target:SetValue(target)
@@ -156,25 +171,11 @@ function CreateTheUI(showProgress)
 			end},
 		OnMouseMove = {function(self, x, y, mouse) 
 				--clickable bar, reference: "Chili Economy Panel Default"'s Reserve bar
-				if  not replayLen then
-					return
-				end
-				
 				if not showProgress then
-					if progress_speed.flash then
-						progress_speed.color = {1,1,1,0.0} 
-						progress_speed:SetValue(0)
-						progress_speed.flash = false
-					end
-					if label_hoverTime.caption ~= " " then
-						label_hoverTime:SetCaption(" ")
-					end
 					return
 				end
 
-				if x>progress_speed.x and y>progress_speed.y
-				and x<progress_speed.x2 and  y<progress_speed.y2
-				then
+				if x>progress_speed.x and y>progress_speed.y and x<progress_speed.x2 and  y<progress_speed.y2 then
 					local target = (x-progress_speed.x) / (progress_speed.width)
 					local hoverOver = modf(target*progress_speed.max/30)
 					local minute, second = modf(hoverOver/60)--second divide by 60sec-per-minute, then saperate result from its remainder
@@ -281,8 +282,8 @@ function CreateTheUI(showProgress)
 			width   = 280,
 			height	= 20, 
 			max     = replayLen;
-			caption = window.showProgress and (frame/replayLen*100 .. "%") or " ",
-			color   = window.showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
+			caption = showProgress and (frame/replayLen*100 .. "%") or " ",
+			color   = showProgress and {0.9,0.15,0.2,0.75} or  {1,1,1,0.0} ; --red, --{0.2,0.9,0.3,1}; --green
 			backgroundColor = {1,1,1,0.8} ,
 			value = frame,
 			flash = false,
@@ -389,7 +390,7 @@ function widget:GameFrame (f)
 		lastSkippedTime = nil
 		widgetHandler:RemoveCallIn("AddConsoleMessage")
 		widgetHandler:RemoveCallIn("Update")
-	elseif window.showProgress and (f%2 ==0)  then
+	elseif showProgress and (f%2 ==0)  then
 		progress_speed:SetValue(f)
 		progress_speed:SetCaption(math.modf(f/progress_speed.max*100) .. "%")
 	end
