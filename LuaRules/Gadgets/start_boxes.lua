@@ -42,10 +42,11 @@ function gadget:Initialize()
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
+			local boxID = allyTeamList[i] + 1 -- Springie is 1-based
 			if startboxConfig[allyTeamID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
-					Spring.SetTeamRulesParam(teamList[j], "start_box_id", allyTeamID)
+					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)
 				end
 			end
 		end
@@ -54,7 +55,7 @@ function gadget:Initialize()
 
 		local randomizedSequence = {}
 		for i = 1, #actualAllyTeamList do
-			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i], math.random()}
+			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i] + 1, math.random()}
 		end
 		table.sort(randomizedSequence, function(a, b) return (a[2] < b[2]) end)
 
@@ -79,8 +80,8 @@ function gadget:Initialize()
 
 		for i = 1, #actualAllyTeamList do
 			local allyTeamID = actualAllyTeamList[i]
-			local boxID = randomizedSequence[i][1]
-			if startboxConfig[boxID] then
+			local boxID = randomizedSequence[i] and randomizedSequence[i][1]
+			if boxID and startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
 					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)

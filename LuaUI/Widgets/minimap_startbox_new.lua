@@ -67,9 +67,29 @@ function widget:Initialize()
 		allyStartBox = startboxConfig[myBoxID]
 	end
 
-	for id, box in pairs(startboxConfig) do
-		if (id ~= myBoxID) then
-			table.insert(enemyStartBoxes, box)
+	local shuffleMode = Spring.GetModOptions().shuffle or "off"
+	if ((shuffleMode == "off") or (shuffleMode == "shuffle")) then -- only draw occupied boxes
+		local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+		local allyTeamList = Spring.GetAllyTeamList()
+		local actualAllyTeamList = {}
+		for i = 1, #allyTeamList do
+			local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
+			if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
+				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i] + 1
+			end
+		end
+
+		for i = 1, #actualAllyTeamList do
+			local id = actualAllyTeamList[i]
+			if ((id ~= myBoxID) and startboxConfig[id]) then
+				table.insert(enemyStartBoxes, startboxConfig[id])
+			end
+		end
+	else -- occupied boxes unknown; draw all
+		for id, box in pairs(startboxConfig) do
+			if (id ~= myBoxID) then
+				table.insert(enemyStartBoxes, box)
+			end
 		end
 	end
 end
