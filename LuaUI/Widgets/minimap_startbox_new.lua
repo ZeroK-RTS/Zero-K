@@ -67,6 +67,9 @@ function widget:Initialize()
 		allyStartBox = startboxConfig[myBoxID]
 	end
 
+	-- Springie is 1-based but proper Spring ordering is 0-based; handle both
+	local offset = (startboxConfig[0] and 0 or 1)
+
 	local shuffleMode = Spring.GetModOptions().shuffle or "off"
 	if ((shuffleMode == "off") or (shuffleMode == "shuffle")) then -- only draw occupied boxes
 		local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
@@ -75,7 +78,7 @@ function widget:Initialize()
 		for i = 1, #allyTeamList do
 			local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 			if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
-				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i] + 1
+				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i] + offset
 			end
 		end
 

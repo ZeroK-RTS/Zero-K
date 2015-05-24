@@ -32,18 +32,21 @@ function gadget:Initialize()
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
-			actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
+			actualAllyTeamList[#actualAllyTeamList+1] = {allyTeamList[i], math.random()}
 		end
 	end
 
 	local shuffleMode = Spring.GetModOptions().shuffle or "off"
 
+	-- Springie is 1-based but proper Spring ordering is 0-based; handle both
+	local offset = startboxConfig[0] and 0 or 1
+
 	if (shuffleMode == "off") then
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
-			local boxID = allyTeamList[i] + 1 -- Springie is 1-based
-			if startboxConfig[allyTeamID] then
+			local boxID = allyTeamList[i] + offset
+			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
 					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)
@@ -55,12 +58,12 @@ function gadget:Initialize()
 
 		local randomizedSequence = {}
 		for i = 1, #actualAllyTeamList do
-			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i] + 1, math.random()}
+			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i][1] + offset, math.random()}
 		end
 		table.sort(randomizedSequence, function(a, b) return (a[2] < b[2]) end)
 
 		for i = 1, #actualAllyTeamList do
-			local allyTeamID = actualAllyTeamList[i]
+			local allyTeamID = actualAllyTeamList[i][1]
 			local boxID = randomizedSequence[i][1]
 			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
@@ -77,9 +80,10 @@ function gadget:Initialize()
 			randomizedSequence[#randomizedSequence + 1] = {id, math.random()}
 		end
 		table.sort(randomizedSequence, function(a, b) return (a[2] < b[2]) end)
+		table.sort(actualAllyTeamList, function(a, b) return (a[2] < b[2]) end)
 
 		for i = 1, #actualAllyTeamList do
-			local allyTeamID = actualAllyTeamList[i]
+			local allyTeamID = actualAllyTeamList[i][1]
 			local boxID = randomizedSequence[i] and randomizedSequence[i][1]
 			if boxID and startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
@@ -93,7 +97,7 @@ end
 
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	if (playerID == 255) then
-		return false -- custom AI, cannot get its teamID so block it
+		return false -- custom AI, cannot get its teamID so block it (will get the default startpos at the middle of the box)
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
