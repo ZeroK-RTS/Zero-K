@@ -38,6 +38,7 @@ local oldTeam = {} -- team which player was on last frame
 local oldAllyTeam = {} -- allyTeam which player was on last frame
 local factories = {}
 local transferredFactories = {} -- unitDef and health states of the unit that was being produced be the transferred factory
+local shareLevels = {}
 
 GG.Lagmonitor_activeTeams = {}
 
@@ -278,6 +279,12 @@ function gadget:GameFrame(n)
 							end
 						end
 
+						if (shareLevels[team]) then
+							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team][1])
+							Spring.SetTeamShareLevel(team, "energy", shareLevels[team][2])
+							shareLevels[team] = nil
+						end
+
 						afkTeams[team] = nil
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = true
@@ -348,6 +355,13 @@ function gadget:GameFrame(n)
 						local spareMetal = spGetTeamResources(team,"metal") or 0
 						spUseTeamResource(team,"metal",spareMetal)
 						spAddTeamResource(recepientByAllyTeam[allyTeam].team,"metal",spareMetal)
+						local mShareLevel = select(6, Spring.GetTeamResources(team, "metal"))
+						local eShareLevel = select(6, Spring.GetTeamResources(team, "energy"))
+
+						if (mShareLevel > 0 or eShareLevel > 0) then
+							shareLevels[team] = {mShareLevel, eShareLevel}
+						end
+						
 						Spring.SetTeamShareLevel(team, "metal",  0)
 						Spring.SetTeamShareLevel(team, "energy", 0)
 
