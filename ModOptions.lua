@@ -106,30 +106,6 @@ local options = {
 		},
 	},
     {
-        key='hilltime',
-        name='Hill control time',
-        desc='Set how long a team has to control the hill for (in minutes).',
-        type='number',
-        def=10,
-        min=1,
-        max=30,
-        step=1.0,
-        section='silly',
-    },
-
-    {
-        key='gracetime',
-        name='No control grace period',
-        desc='No player can control the hill until period is over.',
-        type='number',
-        def=2,
-        min=0,
-        max=5,
-        step=0.5,
-        section='silly',
-    },
-	
-    {
         key='lavarisecycles',
         name='Number of cycles',
         desc='Set how many cycles before map floods completely.  The more cycles, the slower the map floods. ',
