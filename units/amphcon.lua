@@ -30,7 +30,6 @@ unitDef = {
     helptext_pl    = [[Conch to wytrzymaly konstruktor, ktory moze wykonywac swoje obowiazki zarowno na ladzie, jak i gleboko pod woda.]],
   },
 
-  energyMake          = 0.225,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -41,7 +40,6 @@ unitDef = {
   maxDamage           = 850,
   maxSlope            = 36,
   maxVelocity         = 1.7,
-  metalMake           = 0.225,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],

@@ -37,7 +37,6 @@ unitDef = {
 	modelradius    = [[15]],
   },
 
-  energyMake          = 0.15,
   energyUse           = 0,
   explodeAs           = [[BIG_UNITEX]],
   floater             = true,
@@ -50,7 +49,6 @@ unitDef = {
   maxDamage           = 800,
   maxSlope            = 36,
   maxVelocity         = 2.8,
-  metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],

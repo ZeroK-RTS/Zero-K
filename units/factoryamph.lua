@@ -43,7 +43,6 @@ unitDef = {
     sortName = [[8]],
   },
 
-  energyMake       = 0.3,
   energyUse        = 0,
   explodeAs        = [[LARGE_BUILDINGEX]],
   footprintX       = 7,
@@ -53,7 +52,6 @@ unitDef = {
   idleTime         = 1800,
   maxDamage        = 4000,
   maxSlope         = 15,
-  metalMake        = 0.3,
   minCloakDistance = 150,
   noAutoFire       = false,
   objectName       = [[factory2.s3o]],

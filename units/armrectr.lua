@@ -46,7 +46,6 @@ unitDef = {
 	modelradius    = [[14]],
   },
 
-  energyMake             = 0.15,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
@@ -59,7 +58,6 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 1.9,
   maxWaterDepth          = 22,
-  metalMake              = 0.15,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],

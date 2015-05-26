@@ -35,7 +35,6 @@ unitDef = {
     helptext_pl    = [[Silos Rakietowy buduje i przechowuje do czterech jednorazowych rakiet taktycznych dalekiego zasiegu. Silos oferuje kilka roznych glowic, co daje swietne mozliwosci zarowno defensywne, jak i ofensywne.]],
   },
 
-  energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
@@ -47,7 +46,6 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
   script                        = [[missilesilo.lua]],

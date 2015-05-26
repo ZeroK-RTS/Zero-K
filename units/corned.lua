@@ -43,7 +43,6 @@ unitDef = {
 	modelradius    = [[14]],
   },
 
-  energyMake             = 0.15,
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
@@ -57,7 +56,6 @@ unitDef = {
   maxSlope               = 18,
   maxVelocity            = 2.4,
   maxWaterDepth          = 22,
-  metalMake              = 0.15,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   noAutoFire             = false,
