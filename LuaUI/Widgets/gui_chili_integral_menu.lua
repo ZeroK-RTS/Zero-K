@@ -628,9 +628,19 @@ local function RemoveChildren(container)
 	end
 end 
 
--- compared real chili container with new commands and update accordingly
-local function UpdateContainer(container, nl, columns) 
-	if not columns then columns = MAX_COLUMNS end 
+-- Compare chili container with required commands to see if an update is required.
+
+-- These two functions are split in two for a good reason. The function MakeButton
+-- is able to use cached buttons, it does this by setting the parent of a button
+-- for the desired command. If, for example, the new first row should contain a
+-- button that was on the old second row then the parent will be reassigned to 
+-- the first row before the second row had a chance to check whether it should update.
+-- This would cause subsequent rows to fail to update and thus be left with wide 
+-- or incorrect buttons.
+
+-- The solution is to check whether all the containers require updating before
+-- modifying any of the containers.
+local function SetContainerNeedUpdate(container, nl)
 	local cnt = 0 
 	local needUpdate = false 
 	local dif = {}
@@ -653,9 +663,16 @@ local function UpdateContainer(container, nl, columns)
 			needUpdate = true 
 			break
 		end 
+	end
+	container.needUpdate = needUpdate
+end
+
+local function UpdateContainer(container, nl, columns) 
+	if not columns then 
+		columns = MAX_COLUMNS 
 	end 
-	
-	if needUpdate then 
+
+	if container.needUpdate then 
 		RemoveChildren(container) 
 		for i=1, #nl do 
 			MakeButton(container, nl[i], true, i)
@@ -880,6 +897,9 @@ local function ManageStateIcons()
 		end
 	end
 	for i=1, numStateColumns do
+		SetContainerNeedUpdate(sp_states[i], stateCols[i])
+	end
+	for i=1, numStateColumns do
 		UpdateContainer(sp_states[i], stateCols[i], MAX_STATE_ROWS)
 	end
 end
@@ -909,6 +929,9 @@ local function ManageCommandIcons(useRowSort)
 				end
 			end
 		end	
+	end
+	for i=1, numRows do
+		SetContainerNeedUpdate(sp_commands[i], commandRows[i])
 	end
 	for i=1, numRows do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)

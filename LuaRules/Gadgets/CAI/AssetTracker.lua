@@ -1,5 +1,5 @@
 --[[ Handles force composition and position
- * Should be used both for the enemies of a CAI and its allyteam
+ * Should be used both for the enemies of a CAI and its allyTeam
  * Maintains heatmaps for static/mobile units which are anti land/AA.
 --]]
 local HeatmapUnitDefID, ListUnitDefID, CombatListUnitDefID, EconomyTargetUnitDefID = VFS.Include("LuaRules/Configs/CAI/assetTrackerConfig.lua")
@@ -147,6 +147,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 	
 	local newAssetTracker = {
 		AddUnit = AddUnit,
+		RemoveUnit = RemoveUnit,
 		UpdateHeatmaps = UpdateHeatmaps,
 		GetUnitList = GetUnitList, 
 		GetCombatUnitList = GetCombatUnitList,

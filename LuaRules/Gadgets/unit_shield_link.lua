@@ -522,7 +522,7 @@ local function DrawFunc()
 	end
 end
 
-function gadget:DrawWorld()
+local function DrawWorldFunc()
 	if shieldCount > 1 then
 		local frame = spGetGameFrame()
 		local alpha = 0.5-0.1*abs((frame%10) - 5)
@@ -539,6 +539,13 @@ function gadget:DrawWorld()
     
 		glPopAttrib()
 	end
+end
+
+function gadget:DrawWorld()
+	DrawWorldFunc()
+end
+function gadget:DrawWorldRefraction()
+	DrawWorldFunc()
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

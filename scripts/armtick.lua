@@ -18,6 +18,7 @@ local digger = piece 'digger'
 --linear constant 65536
 
 include "constants.lua"
+include 'reliableStartMoving.lua'
 
 --cob values
 local cloaked = COB.CLOAKED
@@ -212,12 +213,7 @@ local function UnBurrow()
 	StartThread( Walk )
 end
 
-
-function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-end
-
-function script.StartMoving()
+function StartMoving()
 	Signal( SIG_BURROW )
 	if burrowed then
 		StartThread( UnBurrow )
@@ -226,8 +222,13 @@ function script.StartMoving()
 	end
 end
 
-function script.StopMoving()
+function StopMoving()
 	StartThread( Burrow )
+end
+
+function script.Create()
+	StartThread(SmokeUnit, smokePiece)
+	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

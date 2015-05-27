@@ -265,8 +265,7 @@ local function DrawUnitFunc(xshift, yshift)
 	glTexRect(xshift - iconsize*0.5, -9, xshift + iconsize*0.5, iconsize-9)
 end
 
-
-function widget:DrawWorld()
+local function DrawWorldFunc()
 	if Spring.IsGUIHidden() then return end
 	
 	if (next(unitHeights) == nil) then
@@ -324,6 +323,15 @@ function widget:DrawWorld()
 	glDepthTest(false)
 	glDepthMask(false)
 end
+
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
+end
+
 
 -- drawscreen method
 -- the problem with this one is it draws at same size regardless of how far away the unit is

@@ -386,7 +386,7 @@ function SimpleParticles2:Visible()
   local posX,posY,posZ = self.pos[1],self.pos[2],self.pos[3]
   local losState
   if (self.unit and not self.worldspace) then
-    losState = (spGetUnitLosState(self.unit, LocalAllyTeamID) or {}).los or false
+    losState = GetUnitLosState(self.unit)
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
     posX,posY,posZ = posX+ux,posY+uy,posZ+uz
     radius = radius + spGetUnitRadius(self.unit)
@@ -396,13 +396,13 @@ function SimpleParticles2:Visible()
   end
   if (losState==nil) then
     if (self.radar) then
-      losState = IsPosInRadar(posX,posY,posZ, LocalAllyTeamID)
+      losState = IsPosInRadar(posX,posY,posZ)
     end
     if ((not losState) and self.airLos) then
-      losState = IsPosInAirLos(posX,posY,posZ, LocalAllyTeamID)
+      losState = IsPosInAirLos(posX,posY,posZ)
     end
     if ((not losState) and self.los) then
-      losState = IsPosInLos(posX,posY,posZ, LocalAllyTeamID)
+      losState = IsPosInLos(posX,posY,posZ)
     end
   end
   return (losState)and(spIsSphereInView(posX,posY,posZ,radius))

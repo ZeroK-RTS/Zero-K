@@ -26,6 +26,7 @@ local rb_foot = piece "legrrshin"
 
 --constants
 include "constants.lua"
+include 'reliableStartMoving.lua'
 
 local PI = math.pi
 local sa = math.rad(20)
@@ -168,11 +169,7 @@ local function Talk()
 	Spring.Echo("Hello World! ... Directive: Kill all humans")
 end
 
-function script.Create()
-	StartThread(SmokeUnit, smokePiece)
-end
-
-function script.StartMoving()
+function StartMoving()
 	Signal( SIG_BURROW )
 	if burrowed then
 		StartThread( UnBurrow )
@@ -182,8 +179,13 @@ function script.StartMoving()
 	--StartThread( Talk )
 end
 
-function script.StopMoving()
+function StopMoving()
 	StartThread( Burrow )
+end
+
+function script.Create()
+	StartThread(SmokeUnit, smokePiece)
+	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -46,6 +46,7 @@ local spGetSelectedUnits       = Spring.GetSelectedUnits
 local spGetUnitDefID           = Spring.GetUnitDefID
 local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
+local spTestMoveOrder          = Spring.TestMoveOrder
 local spTestBuildOrder         = Spring.TestBuildOrder
 
 --------------------------------------------------------------------------------
@@ -63,6 +64,14 @@ local pink     = {  1, 0.5, 0.5,   1}
 local red      = {  1,   0,   0,   1}
 
 local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
+
+local function spTestMoveOrderX(unitDefID, x, y, z)
+	if reverseCompatibility then
+		return spTestBuildOrder(unitDefID, x, y, z, 1)
+	else
+		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)		
+	end
+end
 
 local function ListToSet(t)
   local new = {}
@@ -222,7 +231,9 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
-	local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
+	--local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
+	--local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3])
+	local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
 	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
@@ -261,7 +272,8 @@ function widget:CommandNotify(id, params, options)
   for i=1,#units do
     unitID = units[i]
     local _, _, _, shift   = spGetModKeyState()
-    if (#spGetCommandQueue(unitID, 1) == 0 or not shift) then
+	local queue = spGetCommandQueue(unitID, 1)
+    if queue and (#queue == 0 or not shift) then
       local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 	  lastJump[unitID] = {
         pos   = {ux,uy,uz},
@@ -306,7 +318,7 @@ function widget:DrawWorld()
   local _, activeCommand = spGetActiveCommand()
   if (activeCommand == CMD_JUMP) then
     local mouseX, mouseY   = spGetMouseState()
-    local category, arg    = spTraceScreenRay(mouseX, mouseY)
+    local category, arg    = spTraceScreenRay(mouseX, mouseY, true)
     local _, _, _, shift   = spGetModKeyState()
     local units = spGetSelectedUnits()
 	local quality = 1

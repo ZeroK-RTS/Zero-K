@@ -496,6 +496,7 @@ upgrades = {
 				for i,v in pairs(weapons) do
 					local id = v.customparams.idstring
 					-- linear rather than exponential increase with stacking
+					v.reloadtime = v.reloadtime or 1
 					local previousCount = v.customparams.burstloaders or 0
 					local baseReload = v.reloadtime / (1 + 0.7*previousCount)
 					if id == "commweapon_beamlaser" or id == "commweapon_disruptor" or id == "commweapon_slowbeam" then
@@ -566,6 +567,7 @@ upgrades = {
 	},
 	module_personal_shield = {
 		name = "Personal Shield",
+		order = 5,
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
@@ -582,6 +584,7 @@ upgrades = {
 	
 	module_areashield = {
 		name = "Area Shield",
+		order = 6,
 		description = "A bubble shield that protects surrounding units within 350 m",
 		func = function(unitDef)
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)

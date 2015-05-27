@@ -44,6 +44,7 @@ local spGetUnitIsStunned= Spring.GetUnitIsStunned
 local spGetUnitHealth   = Spring.GetUnitHealth
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 local spTransferUnit	= Spring.TransferUnit
+spGetGameRulesParam     = Spring.GetGameRulesParam
 local spKillTeam	= Spring.KillTeam
 local spGameOver	= Spring.GameOver
 local spEcho       = Spring.Echo
@@ -193,7 +194,7 @@ local function RevealAllianceUnits(allianceID)
 	end
 end
 
--- purge the alliance!
+-- purge the alliance! for the horde!
 local function DestroyAlliance(allianceID)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
@@ -372,6 +373,10 @@ end
 -- callins
 --------------------------------------------------------------------------------
 
+function gadget:TeamDied (teamID)
+	ProcessLastAlly()
+end
+
 function gadget:UnitFinished(u, ud, team)
 	if (team ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
@@ -392,6 +397,10 @@ function gadget:UnitCreated(u, ud, team)
 end
 
 function gadget:UnitDestroyed(u, ud, team)
+	if spGetGameRulesParam("loadPurge") == 1 then
+		return
+	end
+	
 	if (team ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
 	  and finishedUnits[u]
@@ -406,7 +415,7 @@ end
 function gadget:UnitGiven(u, ud, newTeam, oldTeam)
 	if (newTeam ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
-	  and(not select(3,spGetUnitIsStunned(u)))
+	  and finishedUnits[u]
 	then
 		AddAllianceUnit(u, ud, newTeam)
 	end
@@ -415,7 +424,7 @@ end
 function gadget:UnitTaken(u, ud, oldTeam, newTeam)
 	if (oldTeam ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
-	  and(select(5,spGetUnitHealth(u))>=1)
+	  and finishedUnits[u]
 	then
 		RemoveAllianceUnit(u, ud, oldTeam)	
 	end
@@ -447,7 +456,7 @@ function gadget:GameFrame(n)
 			end
 		end
 		toDestroy = {}
-		if not gameover then
+		if not gameover and not spGetGameRulesParam("loadedGame") then
 			ProcessLastAlly()
 		end
 	end

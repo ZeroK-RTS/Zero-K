@@ -77,6 +77,10 @@ backgrounds = {
 --//chicken queen has air movementtype
   {check={name="chickenq"},                                  texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
 
+--// stuff that needs hardcoding
+  {check={name="reef"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
+
+  
 --[[terraforms
   {check={name="rampup"},                                    texture="LuaRules/Images/IconGenBkgs/rampup.png"},
   {check={name="rampdown"},                                  texture="LuaRules/Images/IconGenBkgs/rampdown.png"},
@@ -230,6 +234,10 @@ unitConfigs = {
   [UnitDefNames.hoverdepthcharge.id] = {
     unfold = true,
   },
+  [UnitDefNames.spherecloaker.id] = {
+    unfold = true,
+    wait   = 100,
+  },
   [UnitDefNames.cormex.id] = {
     clamp  = 0,
     unfold = true,
@@ -317,6 +325,10 @@ unitConfigs = {
     empty  = true,
   },
   [UnitDefNames.wolverine_mine.id] = {
+    unfold  = true,
+    wait = 60,
+  },
+  [UnitDefNames.corch.id] = {
     unfold  = true,
     wait = 60,
   },

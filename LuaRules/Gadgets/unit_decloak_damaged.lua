@@ -103,13 +103,15 @@ function gadget:GameFrame(n)
 	if n%UPDATE_FREQUENCY == 2 then
 		for unitID, frames in pairs(recloakUnit) do
 			if frames <= UPDATE_FREQUENCY then
-				local wantCloakState = spGetUnitRulesParam(unitID, "wantcloak")
-				local areaCloaked = spGetUnitRulesParam(unitID, "areacloaked")
-				spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
-				if wantCloakState == 1 or areaCloaked == 1 then
-					spSetUnitCloak(unitID, 1)
+				if not ((spGetUnitRulesParam(unitID,"on_fire") == 1) or (spGetUnitRulesParam(unitID,"disarmed") == 1)) then
+					local wantCloakState = spGetUnitRulesParam(unitID, "wantcloak")
+					local areaCloaked = spGetUnitRulesParam(unitID, "areacloaked")
+					spSetUnitRulesParam(unitID, "cannotcloak", 0, alliedTrueTable)
+					if wantCloakState == 1 or areaCloaked == 1 then
+						spSetUnitCloak(unitID, 1)
+					end
+					recloakUnit[unitID] = nil
 				end
-				recloakUnit[unitID] = nil
 			else
 				recloakUnit[unitID] = frames - UPDATE_FREQUENCY
 			end

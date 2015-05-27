@@ -260,7 +260,7 @@ function gl.Utilities.DrawVolume(vol_dlist)
 
   if (gl.DepthClamp) then gl.DepthClamp(false) end
   gl.StencilTest(false)
-  gl.DepthTest(true)
+  -- gl.DepthTest(true)
   gl.Culling(false)
 end
 

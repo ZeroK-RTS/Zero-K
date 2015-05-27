@@ -90,6 +90,14 @@ end
 
 local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
 
+local function SetCameraTarget(x, y, z)
+	if WG.COFC_SetCameraTarget then
+		WG.COFC_SetCameraTarget(x, y, z)
+	else
+		Spring.SetCameraTarget(x, y, z)
+	end
+end
+
 local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
 
@@ -329,7 +337,7 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 				SelectUnitArray({unitID}, shift)
 				if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 					local x, y, z = Spring.GetUnitPosition(unitID)
-					Spring.SetCameraTarget(x, y, z)
+					SetCameraTarget(x, y, z)
 				end
 			end},
 		padding = {1,1,1,1},
@@ -717,7 +725,7 @@ local function SelectComm()
 	Spring.SelectUnitArray({unitID}, shift)
 	if not shift then
 		local x, y, z = Spring.GetUnitPosition(unitID)
-		Spring.SetCameraTarget(x, y, z)
+		SetCameraTarget(x, y, z)
 	end
 end
 

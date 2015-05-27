@@ -1,10 +1,11 @@
 include "constants.lua"
+include "pieceControl.lua"
 
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
 
 local basebottom, basemid, basetop, holder, housing, spindle, aim = piece('basebottom', 'basemid', 'basetop', 'holder', 'housing', 'spindle', 'aim')
-local flares = {piece('flare1', 'flare2', 'flare3')}
+local flare = piece('flare1')
 
 local smokePiece = {basebottom, basemid, basetop}
 
@@ -45,33 +46,38 @@ end
 ----------------------------------------------------------------------------------------------
 -- Weapon Animations
 
-function script.QueryWeapon(num) return flares[index] end
+function script.QueryWeapon(num) return flare end
 
 function script.AimFromWeapon(num) return holder end
+
+function Stunned ()
+	StopTurn (basetop, y_axis)
+	StopTurn (housing, x_axis)
+end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	if not firing then
-		Turn(basetop, y_axis, 2  * heading, BASETOP_TURN_SPEED )
-		Turn(basemid, y_axis, -1 * heading, BASEMID_TURN_SPEED )
-		Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED )
-		WaitForTurn(basetop, y_axis)
-		WaitForTurn(basemid, y_axis)
-		WaitForTurn(housing, x_axis)
-		return true
+	while firing or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) do
+		Sleep (100)
 	end
+	
+	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+	Turn(basetop, y_axis, heading, BASETOP_TURN_SPEED*slowMult )
+	Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED*slowMult )
+	WaitForTurn(basetop, y_axis)
+	WaitForTurn(housing, x_axis)
+
+	return true
 end
 
 function script.FireWeapon(num)
 	firing = true
-	EmitSfx(flares[index], UNIT_SFX2)
-	Sleep(1200)
-	rx,ry,rz = GetPieceRotation(spindle)
+	EmitSfx(flare, UNIT_SFX2)
+	Sleep(800)
+	local rz = select(3, GetPieceRotation(spindle))
 	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
 	firing = false
-	index = index - 1
-	if index == 0 then index = 3 end
 end
 
 

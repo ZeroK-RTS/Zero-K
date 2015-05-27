@@ -24,13 +24,13 @@ unitDef = {
 
     description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
     description_pl = [[Wezel Energetyczny]],
-    helptext       = [[Energy Transmission Pylons help one extend one's energy grid and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid.]],
+    helptext       = [[Energy Transmission Pylons help extend energy grids and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid. Note that over short distances or in low-energy situations using energy producers like solar collectors to connect grids can be a more cost efficient alternative.]],
     helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
     helptext_pl    = [[Ten wezel pozwala tanio rozszerzyc siec energetyczna, aby zapewnic kopalniom dodatkowa moc lub zasilic niektore potezniejsze wieze.]],
-
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
+	removewait     = 1,
   },
 
   explodeAs                     = [[ESTOR_BUILDINGEX]],

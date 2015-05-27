@@ -53,6 +53,8 @@ local spTraceScreenRay      = Spring.TraceScreenRay
 local spGetMyPlayerID       = Spring.GetMyPlayerID
 local spGetPlayerInfo       = Spring.GetPlayerInfo
 local spEcho                = Spring.Echo
+local spGetBuildFacing	    = Spring.GetBuildFacing
+local spPos2BuildPos        = Spring.Pos2BuildPos
 
 local glBeginEnd            = gl.BeginEnd
 local glColor               = gl.Color
@@ -200,7 +202,7 @@ function DrawBuildMenuBlastRange()
 	local centerX = coords[1]
 	local centerZ = coords[3]
 		
-	centerX, _, centerZ = Spring.Pos2BuildPos( unitDefID, centerX, 0, centerZ )
+	centerX, _, centerZ = spPos2BuildPos( unitDefID, centerX, 0, centerZ, spGetBuildFacing() )
 	--this replaced the following
 	--subsample to map grid
 --[[

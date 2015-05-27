@@ -31,7 +31,8 @@ local rad_con				= 180 / math_pi
 local GL_KEEP      = 0x1E00
 local GL_REPLACE   = 0x1E01
 
-local spGetUnitDirection     = Spring.GetUnitDirection
+local spGetUnitIsDead        = Spring.GetUnitIsDead
+local spGetUnitHeading       = Spring.GetUnitHeading
 
 local spGetVisibleUnits      = Spring.GetVisibleUnits
 local spGetSelectedUnits     = Spring.GetSelectedUnits
@@ -60,7 +61,7 @@ local innersize = 0.9 -- circle scale compared to unit radius
 local selectinner = 1.5
 local outersize = 1.8 -- outer fade size compared to circle scale (1 = no outer fade)
 local scalefaktor = 2.8
-local rectangleFactor = 3.5
+local rectangleFactor = 2.7
 local CAlpha = 0.2
 
 local colorout = {   1,   1,   1,   0 } -- outer color
@@ -123,20 +124,15 @@ local function GetVisibleUnits()
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
 				visibleSelected[#visibleSelected+1] = unitID
-			--else
-				--visibleUnits[#visibleUnits+1] = unitID
 			elseif options.showally.value and WG.allySelUnits[unitID] then
 				visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 			end
 		end
 		
-		--lastVisibleUnits = visibleUnits
 		lastvisibleAllySelUnits = visibleAllySelUnits
 		lastVisibleSelected = visibleSelected
-		--return visibleUnits, visibleSelected
 		return visibleAllySelUnits, visibleSelected
 	else
-		--return lastVisibleUnits, lastVisibleSelected
 		return lastvisibleAllySelUnits, lastVisibleSelected
 	end
 end
@@ -273,9 +269,9 @@ end
 
 local function CreateTriangleLists()
 	local points = {
-		{0, -1},
-		{1, 1},
-		{-1, 1}
+		{0, -1.3},
+		{1, 0.7},
+		{-1, 0.7}
 	}
 	
 	local callback = CreatePolygonCallback(points, GL.TRIANGLES)
@@ -301,9 +297,17 @@ function widget:Initialize()
 	CreateTriangleLists()
 	
 	for udid, unitDef in pairs(UnitDefs) do
+	
 		local xsize, zsize = unitDef.xsize, unitDef.zsize
 		local scale = scalefaktor*( xsize^2 + zsize^2 )^0.5
 		local shape, xscale, zscale
+		
+		if unitDef.customParams and unitDef.customParams.selection_scale then
+			local factor = (tonumber(unitDef.customParams.selection_scale) or 1)
+			scale = scale*factor
+			xsize = xsize*factor
+			zsize = zsize*factor
+		end
 		
 		
 		if (unitDef.isBuilding or unitDef.isFactory or unitDef.speed==0) then
@@ -318,6 +322,10 @@ function widget:Initialize()
 		end
 
 		unitConf[udid] = {shape=shape, xscale=xscale, zscale=zscale}
+		
+		if unitDef.customParams and unitDef.customParams.selection_velocity_heading then
+			unitConf[udid].velocityHeading = true
+		end
 	end
 
 	clearquad = gl.CreateList(function()
@@ -345,38 +353,35 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local visibleUnits, visibleSelected = {}, {}
+local visibleSelected = {}
 local degrot = {}
-function widget:Update()
-	-- [[
-	local mx, my = spGetMouseState()
-	local ct, id = spTraceScreenRay(mx, my)
-	if (ct == "unit") then
-		hoveredUnit = id
-	else
-		hoveredUnit = nil
-	end
-	--]]
-	--visibleUnits, visibleSelected = GetVisibleUnits()
-	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
-	for i=1, #visibleUnits do
-		local unitID = visibleUnits[i]
-		local dirx, _, dirz = spGetUnitDirection(unitID)
-		if (dirz ~= nil) then
-			degrot[unitID] = 180 - math_acos(dirz) * rad_con
-		end
-	end
-	for i=1, #visibleSelected do
-		local unitID = visibleSelected[i]
-		local dirx, _, dirz = spGetUnitDirection(unitID)
-		if (dirz ~= nil) then
-			if dirx < 0 then
-				degrot[unitID] = 180 - math_acos(dirz) * rad_con
-			else
-				degrot[unitID] = 180 + math_acos(dirz) * rad_con
+
+local HEADING_TO_RAD = 1/32768*math.pi
+local RADIANS_PER_COBANGLE = math.pi / 32768
+
+local function UpdateUnitListRotation(unitList)
+	for i=1, #unitList do
+		local unitID = unitList[i]
+		local udid = spGetUnitDefID(unitID)
+		if udid and unitConf[udid].velocityHeading then
+			local vx,_,vz = Spring.GetUnitVelocity(unitID)
+			local speed = vx*vx + vz*vz
+			if speed > 0 then
+				local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
+				degrot[unitID] = 180 + velHeading * rad_con	
 			end
+		else		
+			local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
+			degrot[unitID] = 180 + heading * rad_con	
 		end
 	end
+end
+
+function widget:Update()
+	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+	
+	UpdateUnitListRotation(visibleSelected)
+	UpdateUnitListRotation(visibleAllySelUnits)
 end
 
 
@@ -386,11 +391,11 @@ function DrawUnitShapes(unitList, color)
 	end
 
 	-- To fix Water
-	--gl_ColorMask(false,false,false,true)
-	--gl_BlendFunc(GL_ONE, GL_ONE)
-	--glColor(r,g,b,1)
+	gl.ColorMask(false,false,false,true)
+	gl.BlendFunc(GL.ONE, GL.ONE)
+	gl.Color(0,0,0,1)
 	-- Does not need to be drawn per Unit .. it covers the whole map
-	--gl_DrawList(clearquad)
+	gl.CallList(clearquad)
 
 	--  Draw selection circles
 	gl.Color(1,1,1,1)
@@ -421,6 +426,7 @@ function DrawUnitShapes(unitList, color)
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			-- gl.Unit(unitID, true)
 		end
 	end
 
@@ -434,10 +440,8 @@ function DrawUnitShapes(unitList, color)
 	gl.CallList(clearquad)
 end
 
-
-
 function widget:DrawWorldPreUnit()
-	--if Spring.IsGUIHidden() then return end
+		--if Spring.IsGUIHidden() then return end
 	if (#visibleAllySelUnits + #visibleSelected == 0) then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)

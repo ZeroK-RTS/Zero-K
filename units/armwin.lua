@@ -30,6 +30,7 @@ unitDef = {
     pylonrange     = 60,
     windgen        = true,
     modelradius    = [[15]],
+	removewait     = 1,
   },
 
   energyUse                     = 0,

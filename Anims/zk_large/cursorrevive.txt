@@ -1,0 +1,14 @@
+hotspot topleft
+frame  cursorrevive_0.png  1
+frame  cursorrevive_1.png  0.1
+frame  cursorrevive_2.png  0.1
+frame  cursorrevive_3.png  0.1
+frame  cursorrevive_4.png  0.1
+frame  cursorrevive_5.png  0.1
+frame  cursorrevive_6.png  0.1
+frame  cursorrevive_7.png  0.1
+frame  cursorrevive_8.png  0.1
+frame  cursorrevive_9.png  0.1
+frame  cursorrevive_10.png  0.1
+frame  cursorrevive_11.png  0.1
+frame  cursorrevive_12.png  0.1

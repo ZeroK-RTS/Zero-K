@@ -304,7 +304,7 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 	
 local pathSelectionShapes = 'Settings/Interface/Selection/Selection Shapes'
 local pathSelectionXrayHalo = 'Settings/Interface/Selection/Selection XRay&Halo'
-local pathSelectionPlatters = 'Settings/Interface/Selection/Blurry Halo Selections'
+local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
 	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	

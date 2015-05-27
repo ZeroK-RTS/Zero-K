@@ -315,6 +315,13 @@ function widget:DrawWorldPreUnit()
 	end	
 end
 
+function widget:DrawWorldRefraction()
+	if DspLst then
+		gl.CallList(DspLst)-- Or maybe you want to keep it cached but not draw it everytime.
+		-- Maybe you want Spring.SetDrawGround(false) somewhere
+	end	
+end
+
 function widget:MousePress(x, y, button)
 	local _, mpos = spTraceScreenRay(x, y, true) --//convert UI coordinate into ground coordinate.
 	if mpos==nil then --//activate epic menu if mouse position is outside the map

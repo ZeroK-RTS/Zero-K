@@ -33,7 +33,7 @@ unitDef = {
     helptext_fr    = [[C'est le plus polyvalent des Navires possibles, le Reef peut tirer des missiles de croisicre longue portée pour des frappes chirurgicales, tirer des antimissiles pour contrer tout missile nucléaire, servir de station de réparation et de rechargement pour les planeurs alliés ou encore utiliser ses nombreux drones.]],
     helptext_pl    = [[Najbardziej wielozadaniowy sposrod okretow. Posiada rakiety dalekiego zasiegu i tarcze antyrakietowa, a jego pokład sluzy jako stacja naprawy i dozbrajania samolotow. Ponadto jest w stanie automatycznie produkowac wlasne drony bojowe.]],
 	midposoffset   = [[0 -10 0]],
-    modelradius    = [[30]],
+    modelradius    = [[50]],
   },
 
   energyUse              = 1.5,
@@ -154,6 +154,7 @@ unitDef = {
       startVelocity           = 400,
       tolerance               = 4000,
       turnrate                = 65535,
+      tracks                  = true,
       weaponAcceleration      = 400,
       weaponTimer             = 1,
       weaponType              = [[StarburstLauncher]],
