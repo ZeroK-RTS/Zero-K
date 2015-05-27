@@ -146,6 +146,7 @@ function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
 end
 
 function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
+	if not Spring.IsUnitAllied(unitID) then return end
 	RemovePossibleCommander(unitID,  unitDefID)
 end
 
