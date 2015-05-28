@@ -730,25 +730,6 @@ upgrades = {
 	}
 }
 
-upgrades_dota = {
-	module_personal_cloak = {
-		name = "Stealth System",
-		description = "Makes the commander invisible to radar",
-		func = function(unitDef)
-				unitDef.stealth = true
-			end,
-	},
-	module_cloak_field = upgrades.module_jammer,
-	
-	module_resurrect = {
-		name = "Lazarus Nanolathe",
-		description = "Adds +7.5 metal/s build speed",
-		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 7.5 end
-			end,
-	},
-}
-
 decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
@@ -902,15 +883,7 @@ for name,data in pairs(upgrades) do
 		data.order = order
 	end
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if Spring and Spring.GetModOptions and Spring.GetModOptions().zkmode == "dota" then
-	for name,data in pairs(upgrades_dota) do
-		upgrades[name] = data
-	end
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
 for i=1,#weaponsList do
 	local name, array = VFS.Include(weaponsList[i])
