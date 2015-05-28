@@ -809,6 +809,14 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
+-- Fix inconsistent idle regeneration for air units
+for name, ud in pairs(UnitDefs) do
+	if ud.canfly then
+		ud.customparams.idle_regen = ud.idleautoheal
+		ud.idleautoheal = 0
+	end
+end
+
 -- Set defaults for area cloak
 local area_cloak_defaults = VFS.Include("gamedata/unitdef_defaults/area_cloak_defs.lua")
 for name, ud in pairs(UnitDefs) do
