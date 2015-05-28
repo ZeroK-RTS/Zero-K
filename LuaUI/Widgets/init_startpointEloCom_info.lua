@@ -17,7 +17,7 @@ local rankTextures = {}
 do
 	local rankTexBase = 'LuaUI/Images/Ranks/' 
 	rankTextures = {
-	  [0] = nil,
+	  [0] = rankTexBase .. 'dude_placement.png',
 	  [1] = rankTexBase .. 'dude_smurf.png', --dude-icon added by Sprung/Gnurps for theme consistency
 	  [2] = rankTexBase .. 'dude_user.png',
 	  [3] = rankTexBase .. 'dude_soldier.png',
@@ -94,8 +94,8 @@ function widget:Initialize()
 		for j=1, #playerList do
 			local playerID = playerList[j]
 			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey
-			local elo = (customKey and tonumber(customKey.elo)) or nil
-			local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200)))) or nil -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar. If less than 1 show 1 (math.max), if greater than 4 show 4 (math.min)
+			local elo = (customKey and tonumber(customKey.elo))
+			local eloLevel = (elo and (elo>0 and math.min(4, math.max(1, math.floor((elo-1000) / 200))) or 0)) -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar. If less than 1 show 1 (math.max), if greater than 4 show 4 (math.min)
 			local validEntry = not (x==y and x==z) and elo and (not spec) -- invalidate same coordinate (since they are not humanly possible), and also invalidate entry with "nil" elo, and invalidate spec
 			playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry, comDefName=nil,comDefId=nil, comDefNamePrvs= {}} 
 		end

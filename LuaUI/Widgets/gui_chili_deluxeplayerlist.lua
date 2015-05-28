@@ -433,6 +433,9 @@ local function FormatMetalStats(stat,k)
 end
 
 local function FormatElo(elo,full)
+	if elo < 0 then
+		return "????", {0.5, 0.5, 0.5, 1}
+	end
 	local mult = full and 1 or 10
 	local elo_out = mult * math.floor((elo/mult) + .5)
 	local eloCol = {}
@@ -1165,7 +1168,7 @@ SetupPlayerNames = function()
 			teams[teamID].roster[index] = entities[entityID]
 			if not (spectator or (not active and Spring.GetGameSeconds() > 0.1 and cpuUsage < 1)) then
 				teams[teamID].isPlaying = true
-				if allyTeamID and elo then
+				if allyTeamID and elo and elo>0 then
 					if allyTeamsElo[allyTeamID] then
 						allyTeamsElo[allyTeamID].total = allyTeamsElo[allyTeamID].total + elo
 						allyTeamsElo[allyTeamID].count = allyTeamsElo[allyTeamID].count + 1
@@ -1260,7 +1263,7 @@ SetupPlayerNames = function()
 					local teamID = allyTeams[allyTeamID][j]
 					if teams[teamID] and teams[teamID].roster then
 						for k=1,#teams[teamID].roster do -- for every player on the player team
-							if teams[teamID].roster[k].elo then allyTeamOrderRank[allyTeamID] = allyTeamOrderRank[allyTeamID] + teams[teamID].roster[k].elo end
+							if teams[teamID].roster[k].elo and teams[teamID].roster[k].elo>0 then allyTeamOrderRank[allyTeamID] = allyTeamOrderRank[allyTeamID] + teams[teamID].roster[k].elo end
 						end
 					end
 				end
