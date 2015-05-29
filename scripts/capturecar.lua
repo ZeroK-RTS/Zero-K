@@ -158,8 +158,11 @@ function script.QueryWeapon(num) return flare end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	script.Activate()
 	Turn( rear , y_axis, 0.01, PIVOT_SPEED )
+	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
+		Sleep (1000)
+	end
+	script.Activate()
 end
 
 function script.Activate()
