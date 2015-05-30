@@ -145,6 +145,10 @@ function script.FireWeapon()
 	currentMissile = 3 - currentMissile
 end
 
+function script.BlockShot(num, targetID)	
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25, false) --leave troubleVsFast to false so far. Needs testing.
+end
+
 function script.Create()
 
 	InitializeRock(ROCK_PIECE, ROCK_SPEED, ROCK_DECAY, ROCK_MIN, ROCK_MAX, SIG_ROCK_X, x_axis)
