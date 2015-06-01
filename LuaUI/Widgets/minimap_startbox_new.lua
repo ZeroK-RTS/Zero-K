@@ -75,7 +75,7 @@ function widget:Initialize()
 		for i = 1, #allyTeamList do
 			local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 			if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
-				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i] + 1 -- Springie is 1-based
+				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
 			end
 		end
 

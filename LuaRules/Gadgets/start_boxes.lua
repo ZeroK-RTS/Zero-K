@@ -42,7 +42,7 @@ function gadget:Initialize()
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
-			local boxID = allyTeamList[i] + 1
+			local boxID = allyTeamList[i]
 			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
@@ -55,7 +55,7 @@ function gadget:Initialize()
 
 		local randomizedSequence = {}
 		for i = 1, #actualAllyTeamList do
-			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i][1] + 1, math.random()}
+			randomizedSequence[#randomizedSequence + 1] = {actualAllyTeamList[i][1], math.random()}
 		end
 		table.sort(randomizedSequence, function(a, b) return (a[2] < b[2]) end)
 
