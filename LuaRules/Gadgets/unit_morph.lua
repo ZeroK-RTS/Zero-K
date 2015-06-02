@@ -654,7 +654,7 @@ local function FinishMorph(unitID, morphData)
   end
   
   --// transfer facplop
-  if facplop then
+  if facplop and (facplop == 1) then
 	Spring.SetUnitRulesParam(newUnit, "facplop", 1)
   end  
   --// transfer health
