@@ -3,7 +3,7 @@ function gadget:GetInfo()
 		name    = "Impulse Jumpjets",
 		desc    = "Gives units the impulse jump ability",
 		author  = "quantum, modified by xponen (impulsejump)",
-		date    = "May 14 2008, January 2 2014", --last update 22 March 2014
+		date    = "May 14 2008, January 2 2014", --last update 2 June 2015
 		license = "GNU GPL, v2 or later",
 		layer   = -1, --start before unit_fall_damage.lua (for UnitPreDamage())
 		enabled = (Spring.GetModOptions().impulsejump  == "1"),
@@ -228,7 +228,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	SetLeaveTracks(unitID, false)
 
 	env = Spring.UnitScript.GetScriptEnv(unitID)
-	
+
 	if (delay == 0) then
 		Spring.UnitScript.CallAsUnit(unitID,env.beginJump,turn,lineDist,flightDist,duration)
 		if rotateMidAir then
@@ -241,17 +241,31 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 
 	local function JumpLoop()
 
+		--escape water before launching
+		local _,initY = spGetUnitPosition(unitID)
+		local i = 0 --time spent on surfacing
+		while i < duration and initY<-1 do
+			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
+			
+			impulseQueue[#impulseQueue+1] = {unitID, 0, 1,0} --Spring 91 hax; impulse can't be less than 1 or it doesn't work, so we remove 1 and then add 1 impulse.
+			impulseQueue[#impulseQueue+1] = {unitID, 0, 0.4-1, 0} 
+			_,initY = spGetUnitPosition(unitID)
+			i=i+1
+			Sleep()
+		end
+
 		if delay > 0 then
+			delay = delay - i --deduct from time surfacing
 			for i=delay, 1, -1 do
 				Sleep()
 			end
-		
+			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
+
 			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 
 			if rotateMidAir then
 				spSetUnitRotation(unitID, 0,  -1*startHeading*RADperROT, 0) -- keep current heading..
 			end
-
 		end
 	
 		--detach from transport
@@ -292,10 +306,10 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		Sleep()
 		jumping[unitID]= 'airborne'
 		
-		local collisionCountDown = 0
+		local collideTime = 0
 		local halfJump
-		local i = 1
-		local k = 0
+		local i = 1 --jump steps
+		local k = 0 --iteration counter
 		while i <= duration*10 do
 			k = k + 1
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
@@ -327,8 +341,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				backThrust = constBackAcc + (expectedBackVel-vz)  +  (expectedBackPos - z)*0.01
 				
 				--limit thrust to avoid glitching out during collision
-				collisionCountDown = (jumping[unitID]=='collide' and collisionCountDown < k and k+4) or collisionCountDown
-				local maxThrust =  (collisionCountDown>k  and 0.1) or 0.4
+				collideTime = (jumping[unitID]=='collide' and collideTime < k and k+4) or collideTime
+				local maxThrust =  (collideTime>k  and 0.1) or 0.4
 				vertThrust = Sign(vertThrust)*min(impulseTank,abs(vertThrust),maxThrust)
 				impulseTank = impulseTank - abs(vertThrust)
 				if impulseTank >0 then
@@ -385,7 +399,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		if tankDesignMode then
 			Spring.Echo(1000-impulseTank)
 		end
-		if impulseTank > 0  or collisionCountDown >= k then --successful landing or end up colliding with stuff
+		if impulseTank > 0  or collideTime >= k then --successful landing? or collision ending?
 			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
 		end
 		lastJumpPosition[unitID] = origCmdParams
@@ -426,7 +440,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	return true, false
 end
 
--- a bit convoluted for this but might be					 
+-- a bit convoluted for this but might be
 -- useful for lua unit scripts
 local function UpdateCoroutines() 
 	local newCoroutines = {} 
@@ -591,7 +605,4 @@ function gadget:GameFrame(currFrame)
 		spAddUnitImpulse(impulseQueue[i][1],impulseQueue[i][2],impulseQueue[i][3],impulseQueue[i][4])
 		impulseQueue[i]=nil
 	end
-	-- if #speedProfile-1>0 and speedProfile[#speedProfile-1] and speedProfile[#speedProfile] then
-		-- Spring.Echo(speedProfile[#speedProfile] - speedProfile[#speedProfile-1])
-	-- end
 end
