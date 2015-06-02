@@ -37,6 +37,7 @@ local spGetFeaturePosition     = Spring.GetFeaturePosition
 local spSetFeaturePosition     = Spring.SetFeaturePosition
 local spSetFeatureVelocity     = Spring.SetFeatureVelocity
 local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
+local spGetUnitRulesParam     = Spring.GetUnitRulesParam
 
 local abs = math.abs
 local min = math.min
@@ -79,7 +80,7 @@ function checkLabs(checkFeatures)
 			local unitDefID = spGetUnitDefID(unitID)
 			local ud = UnitDefs[unitDefID]
 			local movetype = Spring.Utilities.getMovetype(ud)
-			local fly = ud.canFly
+			local fly = ud.canFly or (spGetUnitRulesParam(unitID, 'is_jumping') == 1)
 			local ally = spGetUnitAllyTeam(unitID)
 			local team = spGetUnitTeam(unitID)
 			if not fly and spMoveCtrlGetTag(unitID) == nil then
