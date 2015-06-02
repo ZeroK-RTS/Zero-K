@@ -173,6 +173,7 @@ local callInLists = {
 	-- Feature CallIns
 	"FeatureCreated",
 	"FeatureDestroyed",
+	"FeaturePreDamaged",
 
 	-- Projectile CallIns
 	"ProjectileCreated",
@@ -1713,6 +1714,27 @@ function gadgetHandler:FeatureDestroyed(featureID, allyTeam)
   return
 end
 
+function gadgetHandler:FeaturePreDamaged(fID, fDefID,fTeam, 
+                       damage, weaponDefID, projectileID,
+                       attackerID, attackerDefID, attackerTeam)
+  local rDam = damage
+  local rImp = 1.0
+
+  for _,g in ipairs(self.FeaturePreDamagedList) do
+    dam, imp = g:FeaturePreDamaged(fID, fDefID, fTeam,
+                  rDam, weaponDefID,
+                  projectileID, attackerID, attackerDefID,
+                  attackerTeam)
+    if (dam ~= nil) then
+        rDam = dam
+    end
+    if (imp ~= nil) then
+      rImp = math.min(imp, rImp)
+    end
+  end
+
+  return rDam, rImp
+end
 
 --------------------------------------------------------------------------------
 --
