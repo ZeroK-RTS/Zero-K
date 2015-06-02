@@ -35,6 +35,11 @@ local NoDamageToSelf = {
 
 local spGetUnitAllyTeam  = Spring.GetUnitAllyTeam
 local spAddUnitDamage = Spring.AddUnitDamage
+local spGetUnitVelocity = Spring.GetUnitVelocity
+local spSetUnitVelocity = Spring.SetUnitVelocity
+local spAddUnitImpulse = Spring.AddUnitImpulse
+local spGetUnitPosition = Spring.GetUnitPosition
+local spValidUnitID = Spring.ValidUnitID
 
 local MAP_X = Game.mapX*512
 local MAP_Z = Game.mapY*512
@@ -77,7 +82,7 @@ end
 
 local function outsideMapDamage(unitID, unitDefID)
 	local att = attributes[unitDefID]
-	local x,y,z = Spring.GetUnitPosition(unitID)
+	local x,y,z = spGetUnitPosition(unitID)
 	if x < 0 or z < 0 or x > MAP_X or z > MAP_Z then
 		return math.max(-x,-z,x-MAP_X,z-MAP_Z)*att.outOfMapDamagePerElmo
 	else
@@ -191,7 +196,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 			unitCollide[unitID].collisionCount = collisionCount
 			unitCollide[unitID].givenDamage[collisionCount] = damage
 		else
-			local vx,vy,vz = Spring.GetUnitVelocity(unitID)
+			local vx,vy,vz = spGetUnitVelocity(unitID)
 			local speed = math.sqrt(vx^2 + vy^2 + vz^2)
 			unitCollide[unitID] = {
 				unitDefID = unitDefID,
@@ -208,7 +213,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	
 	-- ground collision
-	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
+	if weaponDefID == -2 and attackerID == nil and spValidUnitID(unitID) and UnitDefs[unitDefID] then
 	
 		if unitImmune[unitID] then
 			if unitImmune[unitID] >= gameframe then
@@ -220,8 +225,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		-- normal is multiplied by elasticity, tangent by friction
 		-- unit takes damage based on velocity at normal to terrain + TANGENT_DAMAGE of velocity of tangent
 		local att = attributes[unitDefID]
-		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
-		local x,y,z = Spring.GetUnitPosition(unitID)
+		local vx,vy,vz = spGetUnitVelocity(unitID)
+		local x,y,z = spGetUnitPosition(unitID)
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
 		local nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
@@ -230,8 +235,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local nf = att.elasticity
 		local tf = att.friction
 		vx, vy, vz = tx*tf + nx*nf, ty*tf + ny*nf, tz*tf + nz*nf
-		Spring.SetUnitVelocity(unitID,0,0,0)
-		Spring.AddUnitImpulse(unitID,vx,vy,vz) --must do impulse because SetUnitVelocity() is not fully functional in Spring 91 (only work with vertical velocity OR when assigned 0)
+		spSetUnitVelocity(unitID,0,0,0)
+		spAddUnitImpulse(unitID,vx,vy,vz) --must do impulse because SetUnitVelocity() is not fully functional in Spring 91 (only work with vertical velocity OR when assigned 0)
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
 	
 		if NeedWaitWait[unitDefID] then
@@ -249,8 +254,30 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
--- function gadget:FeaturePreDamaged() --require Spring 95
--- end
+local featureCollide = {}
+
+function gadget:FeaturePreDamaged(featureID, featureDefID, featureTeam, damage, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam) --require Spring 95
+	-- unit collision
+	if (weaponDefID == -3) and attackerID == nil  then
+		if featureCollide[featureID] then
+			local collisionCount = featureCollide[featureID].collisionCount + 1
+			featureCollide[featureID].collisionCount = collisionCount
+			featureCollide[featureID].givenDamage[collisionCount] = damage
+		else
+			local vx,vy,vz = Spring.GetFeatureVelocity and Spring.GetFeatureVelocity(featureID) or 0,0,0 --documented but not implemented (?)
+			local speed = math.sqrt(vx^2 + vy^2 + vz^2)
+			featureCollide[featureID] = {
+				featureDefID = featureDefID,
+				vx = vx, vy = vy, vz = vz,
+				certainDamage = speed > UNIT_UNIT_SPEED,
+				speed = speed,
+				collisionCount = 1,
+				givenDamage = {damage},
+				mass = FeatureDefs[featureDefID].mass,
+			}
+		end
+	end
+end
 
 function gadget:GameFrame(frame)
 	gameframe = frame
@@ -261,12 +288,13 @@ function gadget:GameFrame(frame)
 				break;
 			end
 			local crx,cry,crz = colliderrData.x, colliderrData.y, colliderrData.z
+			--unit-unit pair
 			for collideeeID, collideeeData in pairs(unitCollide) do
 				if collideeeID~= colliderrID and collideeeData.collisionCount > 0 then --if collideee not yet processed:
 					local vx,vy,vz = collideeeData.vx, collideeeData.vy, collideeeData.vz
 					local relativeSpeed = math.sqrt((vx - colliderrData.vx)^2 + (vy - colliderrData.vy)^2 + (vz - colliderrData.vz)^2)
-					local dmgMatchColliderr,dmgMatchCollideee = IsDamageMatch(collideeeData,colliderrData,relativeSpeed)
-					if dmgMatchColliderr then --unit matched by damage
+					local colliderrIndx,collideeeIndx = IsDamageMatch(collideeeData,colliderrData,relativeSpeed)
+					if colliderrIndx then --unit matched by damage
 						local unitDefID = collideeeData.unitDefID
 						local noSelfDamage = false
 						if NoDamageToSelf[colliderrData.unitDefID] and NoDamageToSelf[unitDefID] then
@@ -316,8 +344,8 @@ function gadget:GameFrame(frame)
 						end
 						colliderrData.collisionCount = colliderrData.collisionCount - 1
 						collideeeData.collisionCount = collideeeData.collisionCount - 1
-						table.remove(colliderrData.givenDamage, dmgMatchColliderr)
-						table.remove(collideeeData.givenDamage, dmgMatchCollideee)
+						table.remove(colliderrData.givenDamage, colliderrIndx)
+						table.remove(collideeeData.givenDamage, collideeeIndx)
 						if colliderrData.collisionCount == 0 then
 							break;
 						end
@@ -325,7 +353,21 @@ function gadget:GameFrame(frame)
 				end
 			end
 			if colliderrData.collisionCount >= 1 then --add damage to the rest of the collisionCount that doesn't have contact with any unit
-			-- there is no unitID when colliding with feature. Will require gadget:FeaturePreDamaged() in Spring 95 if to get the featureID
+				--unit-feature pair
+				for featureID, featureData in pairs(featureCollide) do
+					if  featureData.collisionCount > 0 then --if collideee not yet processed:
+						local vx,vy,vz = featureData.vx, featureData.vy, featureData.vz
+						local relativeSpeed = math.sqrt((vx - featureData.vx)^2 + (vy - featureData.vy)^2 + (vz - featureData.vz)^2)
+						local colliderrIndx,featureIndx = IsDamageMatch(featureData,colliderrData,relativeSpeed)
+						if colliderrIndx then --unit matched by damage
+							local vx,vy,vz = spGetUnitVelocity(colliderrID)
+							spSetUnitVelocity(colliderrID,vx*0.5,vy*0.5,vz*0.5)
+							table.remove(colliderrData.givenDamage, colliderrIndx)
+							table.remove(featureData.givenDamage, featureIndx)
+						end
+					end
+				end
+				--orphan pair
 				if unitImmuneFeature[colliderrID] then
 					if unitImmuneFeature[colliderrID] < frame then
 						unitImmuneFeature[colliderrID] = nil
@@ -343,6 +385,7 @@ function gadget:GameFrame(frame)
 			until (true) --exit repeat
 		end
 		unitCollide = {}
+		if (#featureCollide>0) then featureCollide = {} end
 		clearTable = false
 	end
 end
