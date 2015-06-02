@@ -310,7 +310,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		local halfJump
 		local i = 1 --jump steps
 		local k = 0 --iteration counter
-		while i <= duration*10 do
+		while i <= duration*2 do
 			k = k + 1
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
 			if (not jumping[unitID] ) or ( jumping[unitID]=='landed' ) then
@@ -340,8 +340,14 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				rightThrust = constRightAcc + (expectedRightVel-vx)  + ( expectedRightPos - x)*0.01
 				backThrust = constBackAcc + (expectedBackVel-vz)  +  (expectedBackPos - z)*0.01
 				
+				--timer for thrust limiting & special fx
+				if (jumping[unitID]=='collide' and collideTime < k) then
+					Spring.UnitScript.CallAsUnit(unitID,env.endJump) --sumo smash
+					collideTime = k+4
+				end
+				jumping[unitID]= 'airborne'
+				
 				--limit thrust to avoid glitching out during collision
-				collideTime = (jumping[unitID]=='collide' and collideTime < k and k+4) or collideTime
 				local maxThrust =  (collideTime>k  and 0.1) or 0.4
 				vertThrust = Sign(vertThrust)*min(impulseTank,abs(vertThrust),maxThrust)
 				impulseTank = impulseTank - abs(vertThrust)
@@ -366,11 +372,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				if  abs(rightThrust) == maxThrust or abs(backThrust) == maxThrust or abs(vertThrust) ==maxThrust then
 					wait = true
 				end
-				
-				--Give up fighting Newton/collision
-				if impulseTank <= 0 then
-					break
-				end
+
+				impulseTank = max(0,impulseTank)
 			end
 		
 			if rotateMidAir then -- allow unit to maintain posture in the air
@@ -399,8 +402,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		if tankDesignMode then
 			Spring.Echo(1000-impulseTank)
 		end
-		if impulseTank > 0  or collideTime >= k then --successful landing? or collision ending?
-			Spring.UnitScript.CallAsUnit(unitID,env.endJump)
+		if impulseTank > 0  or collideTime > k then --successful landing? or collision ending?
+			Spring.UnitScript.CallAsUnit(unitID,env.endJump) --sumo smash
 		end
 		lastJumpPosition[unitID] = origCmdParams
 		jumping[unitID] = nil
@@ -484,7 +487,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	end
 	-- ground collision
 	if jumping[unitID] and weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
-		spSetUnitVelocity(unitID,0,defFallGravity*3,0) --add some bounce upward to escape 'physic glitch'
+		spSetUnitVelocity(unitID,0,defFallGravity*3,0) --add some bounce upward to escape glitch
 		jumping[unitID] = 'landed' --abort jump. Note: we don't simply wrote NIL because jump isn't completed yet and we don't want a 2nd mid-air jump just because CommandFallback() saw NIL.
 		return 0  -- no collision damage.
 	end
