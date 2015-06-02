@@ -82,10 +82,16 @@ end
 -- Factory Plop
 
 local function AddFactoryPlop(teamID, plopUnitDefID)
-	plops[#plops + 1] = {
-		teamID = teamID,
-		plopUnitDefID = plopUnitDefID,
-	}
+	if (teamID == Spring.GetGaiaTeamID()) then return end -- zombies or other silliness
+
+	local playerID = select(2, Spring.GetTeamInfo(teamID))
+	if not playerID then return end -- eg. queue plop and quit before it finishes
+	local name = Spring.GetPlayerInfo(playerID)
+	if not name then return end
+
+	local facName = UnitDefs[plopUnitDefID].name
+
+	Spring.SendCommands("wbynum 255 SPRINGIE:facplop," .. name .. " " .. facName)
 end
 GG.mod_stats_AddFactoryPlop = AddFactoryPlop
 --------------------------------------------------------------------------------
