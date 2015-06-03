@@ -22,6 +22,7 @@ unitDef = {
     jump_speed         = 4,
     jump_reload        = 10,
     jump_from_midair   = 1,
+    jump_impulse_tank = 39, --resist 2 Newton
 
     description_bp = [[Robô de assaulto]],
     description_fr = [[Robot d'Assaut]],

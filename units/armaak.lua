@@ -22,6 +22,7 @@ unitDef = {
     jump_speed         = 6,
     jump_reload        = 10,
     jump_from_midair   = 0,
+    jump_impulse_tank = 24, --resist 1/2 Newton
 
     description_bp = [[Robô anti-ar pesado]],
     description_de = [[Flugabwehr Springer]],

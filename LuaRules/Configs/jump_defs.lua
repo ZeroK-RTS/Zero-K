@@ -14,6 +14,9 @@ for id, ud in pairs (UnitDefs) do
 			rotateMidAir = (tonumber(cp.jump_rotate_midair) == 1),
 			cannotJumpMidair = (tonumber(cp.jump_from_midair) == 0),
 			JumpSpreadException = (tonumber(cp.jump_spread_exception) == 1),
+			
+			--exclusive to Impulse jump:
+			impulseTank = tonumber(cp.jump_impulse_tank) ,
 		}
 	end
 end
