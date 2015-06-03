@@ -314,6 +314,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			k = k + 1
 			if not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID) then return end
 			if (not jumping[unitID] ) or ( jumping[unitID]=='landed' ) then
+				if (collideTime <= k) then --haven't smash for a while
+					Spring.UnitScript.CallAsUnit(unitID,env.endJump) --sumo smash
+				end
 				break --jump aborted (skip to refreshing reload bar)
 			end
 			
@@ -401,9 +404,6 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		end
 		if tankDesignMode then
 			Spring.Echo(1000-impulseTank)
-		end
-		if impulseTank > 0  or collideTime > k then --successful landing? or collision ending?
-			Spring.UnitScript.CallAsUnit(unitID,env.endJump) --sumo smash
 		end
 		lastJumpPosition[unitID] = origCmdParams
 		jumping[unitID] = nil
