@@ -62,7 +62,7 @@ unitDef = {
   sightDistance                 = 660,
   smoothAnim                    = true,
   useBuildingGroundDecal        = true,
-  yardmap                       = [[oooo]],
+  yardmap                       = [[ooooooooo]],
 
   weapons                       = {
 
