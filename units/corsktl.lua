@@ -30,7 +30,6 @@ unitDef = {
     jump_speed       = 5.2,
     jump_reload      = 10,
     jump_from_midair = 0,
-    jump_impulse_tank = 32, --resist 1 Newton
 
     description_bp = [[Bomba rastejante avançada e camuflável]],
     description_fr = [[Bombe Rampante Avancée Camouflable]],
