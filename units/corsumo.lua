@@ -30,7 +30,6 @@ unitDef = {
     jump_reload        = 15,
     jump_from_midair   = 0,
     jump_rotate_midair = 0,
-    jump_impulse_tank = 35, --resist 3 Newton
 
     --description_bp = [[Robô dispersador]],
     description_fr = [[Robot Émeutier]],
