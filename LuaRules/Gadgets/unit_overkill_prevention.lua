@@ -20,6 +20,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local Echo				= Spring.Echo
 local spValidUnitID    = Spring.ValidUnitID
 local spSetUnitTarget = Spring.SetUnitTarget
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -29,6 +30,14 @@ local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
+local spGetUnitPosition		= Spring.GetUnitPosition
+local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
+local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
+local spGetUnitShieldState	= Spring.GetUnitShieldState
+local spGetUnitIsStunned	= Spring.GetUnitIsStunned
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+
+local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -91,6 +100,60 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 		end
 	end
 	return false
+end
+
+local function Dist3D2(x0,x1,y0,y1,z0,z1)
+	return (x1-x0)^2+(y1-y0)^2+(z1-z0)^2
+end
+
+local function GetTargetShieldPower(unitID, targetID, timeout)
+	local totalShieldsPower=0
+	local maxShieldPower=0
+
+	local x0, y0, z0 = spGetUnitPosition(targetID)
+	local ud0=UnitDefs[spGetUnitDefID(targetID)]
+	local speed0=ud0.speed or 0
+	
+	local myAllyID = spGetUnitAllyTeam(unitID)	
+	
+	--so far we go for perfect/cheating units visibility, e.g. shooting unit will know shielded units and their parameters perfectly. Shouldn't be much of issue in practical domain(?)
+	local unitsAround=spGetUnitsInCylinder(x0, z0, maxShieldRange)
+	--Echo("#unitsAround"..#unitsAround)	
+	for _, uId in pairs(unitsAround) do
+	
+		--nearby unit is valid, healthy enough. Also non-friendly, not stunned and not disarmed	
+		if spValidUnitID(uId) and spGetUnitHealth(uId)>0.0 and spGetUnitAllyTeam(uId)~=myAllyID and not(spGetUnitIsStunned(uId)) and spGetUnitRulesParam(uId, "disarmed")~=1  then
+			local ud=UnitDefs[spGetUnitDefID(uId)]
+			
+			if ud.weapons then --unit shall have weapons
+				for wId, weapon in pairs(ud.weapons) do --required to iterate through all unit's weaponDefs, since unit can have more than one shield (so ud.shieldWeaponDef is not enough)
+					local wdId=weapon.weaponDef
+					local wDef=WeaponDefs[wdId]
+					if wDef.isShield then
+						local shieldPower=wDef.shieldPower
+						local shieldPowerRegen=wDef.shieldPowerRegen --HP/sec
+						local shieldRadius=wDef.shieldRadius
+						local x, y, z = spGetUnitPosition(uId)
+						local speed=ud.speed or 0
+
+						-- Check range first. Distance between target and shield carrier should be less than shield radius + shield carrier unit and target can travel towards each other while projetile is flying.
+						-- speed is given in elmo/s thus the "timeout/30"
+						-- Since the calculation is coarse there could be slight overkill, but with shields it's better to overkill than to underkill				
+						if Dist3D2(x0, x, y0, y, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
+							local enabledShield, curShieldPower=spGetUnitShieldState(uId, wId)
+							curShieldPower=curShieldPower*enabledShield --just in case
+							local expectedShieldPower=curShieldPower+shieldPowerRegen*timeout/30
+							
+							-- shieldPowerRegen is given in HP/s thus the "timeout/30"
+							totalShieldsPower=totalShieldsPower+math.min(shieldPower, expectedShieldPower)
+							maxShieldPower=math.max(maxShieldPower, expectedShieldPower)
+						end
+					end
+				end
+			end
+		end
+	end
+	return totalShieldsPower, maxShieldPower
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
@@ -157,9 +220,15 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 		local adjHealth = spGetUnitHealth(targetID)/armor
+		local shieldPower, maxShieldPower = GetTargetShieldPower(unitID, targetID, timeout)
+		
+		if maxShieldPower>=incomingDamage[targetID].damage then --if not true, then shields no longer can prevent this projectile, so no need to add shieldPower to adjHealth
+			adjHealth = adjHealth + shieldPower
+		end			
 			
 		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
 		incomingDamage[targetID].health = adjHealth
+		--Echo("adjHealth="..adjHealth)
 	end
 	
 	return false
