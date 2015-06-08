@@ -38,6 +38,7 @@ local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
 local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
+local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -74,6 +75,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corcrash"].id] = true,
 	[UnitDefNames["cormist"].id] = true,
 	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
+	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -156,10 +158,53 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 	return totalShieldsPower, maxShieldPower
 end
 
+function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
+	if not units[unitID] then
+		return false
+	end
+	
+		--Echo("targetID="..targetID)
+	--Echo("Hello from GG_OverkillPrevention_CheckBlockD")
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		local gameFrame = spGetGameFrame()
+		
+		local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
+		if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
+
+		local health = spGetUnitHealth(targetID)
+		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+		local adjHealth = spGetUnitHealth(targetID)/armor
+		
+		local disarmExtra=math.floor(damage/adjHealth*DECAY_FRAMES)
+		
+		--local disarmShotRequired=disarmFrame-DECAY_FRAMES-timeout>gameFrame
+		local disarmShotRequired=disarmFrame-gameFrame-timeout<DECAY_FRAMES
+		
+		--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame.."  disarmExtra="..disarmExtra.."  disarmShotRequired="..tostring(disarmShotRequired))
+
+		if not disarmShotRequired then
+			local teamID = spGetUnitTeam(unitID)
+			local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+			if unitDefID then
+				spSetUnitTarget(unitID,0)
+				return true
+			end
+		end		
+
+		
+		return false
+		--local stayDisarmed
+	end
+	
+	return false
+end
+
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
 	if not units[unitID] then
 		return false
 	end
+	
+	Echo("targetID="..targetID)
 
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then

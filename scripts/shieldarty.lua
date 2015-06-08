@@ -135,6 +135,10 @@ function script.FireWeapon1()
 	EmitSfx(points[missile].exhaust, 1025)
 end
 
+function script.BlockShot(num, targetID)	
+	return GG.OverkillPrevention_CheckBlockD(unitID, targetID, 1500, 90, 240) --3 seconds - timeout, 8 seconds - disarmTimer
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
