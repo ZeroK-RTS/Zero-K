@@ -60,11 +60,10 @@ function widget:DrawScreen()
   if (spGetGameSeconds() > 1) then
     widgetHandler:RemoveWidget()
   end
-  
-  local endmode = (Spring.GetModOptions().commends) == "1"
+
   local lavamode = (Spring.GetModOptions().zkmode) == "lavarise"
   
-  if endmode or lavamode then
+  if lavamode then
     local timer = widgetHandler:GetHourTimer()
     local colorStr
     --if (math.fmod(timer, 0.5) < 0.25) then
@@ -72,28 +71,9 @@ function widget:DrawScreen()
     --else
       colorStr = YellowStr
     --end
-    local mainText
-    local secondText
-    if endmode and lavamode then
-      if (math.fmod(timer, 6) < 3) then
-    	mainText = "Team Commander Ends!"
-    	secondText = "When all commanders in a team are killed, team loses!"
-      else 
-    	mainText = "Lava Rise mode!"
-    	secondText = "Lava will rise from the ground and will gradually consume everything!"
-      end
-    elseif endmode then
-      if (math.fmod(timer, 6) < 3) then
-    	mainText = "Team Commander Ends!"
-    	secondText = "When all commanders in a team are killed, team loses!"
-      end
-    elseif endmode then
-      mainText = "Team Commander Ends!"
-      secondText = "When all commanders in a team are killed, team loses!"
-    elseif lavamode then
-      mainText = "Lava Rise mode!"
-      secondText = "Lava will rise from the ground and will gradually consume everything!"
-    end
+    local mainText = "Lava Rise mode!"
+    local secondText = "Lava will rise from the ground and will gradually consume everything!"
+
     local msg = colorStr .. mainText
     glPushMatrix()
     glTranslate((vsx * 0.5), (vsy * 0.5) + 50, 0)

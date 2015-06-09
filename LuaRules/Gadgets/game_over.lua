@@ -68,8 +68,6 @@ local finishedUnits = {}	-- this stores a list of all units that have ever been 
 local toDestroy = {}
 
 local modOptions = Spring.GetModOptions() or {}
-local destroy_type = modOptions.defeatmode or 'destroy'
-local commends = tobool(modOptions.commends)
 local noElo = tobool(modOptions.noelo)
 
 local revealed = false
@@ -97,12 +95,6 @@ for name, ud in pairs(UnitDefs) do
 	elseif (not ud.canAttack) and (not ud.speed) and (not ud.isFactory) then
 		doesNotCountList[ud.id] = true
 	end
-end
-
-local commsAlive = {}
-local allyTeams = spGetAllyTeamList()
-for i=1,#allyTeams do
-	commsAlive[allyTeams[i]] = {}
 end
 
 --------------------------------------------------------------------------------
@@ -140,13 +132,6 @@ local function CountAllianceValue(allianceID)
 		end
 	end
 	return value
-end
-
-local function HasNoComms(allianceID)
-	for unitID in pairs(commsAlive[allianceID]) do
-		return false
-	end
-	return true
 end
 
 local function EchoUIMessage(message)
@@ -201,12 +186,12 @@ local function DestroyAlliance(allianceID)
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
 		
-		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
+		if Spring.IsCheatingEnabled() then
 			EchoUIMessage("Game Over: DEBUG")
 			EchoUIMessage("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
-		elseif destroy_type == 'destroy' then	-- kaboom
+		else -- kaboom
 			EchoUIMessage("Alliance " .. allianceID .. " has been destroyed!")
 			for i=1,#teamList do
 				local t = teamList[i]
@@ -224,11 +209,6 @@ local function DestroyAlliance(allianceID)
 				end
 				spKillTeam(t)
 			end
-		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
-			EchoUIMessage("Alliance " .. allianceID .. " has been defeated!")
-			for i=1,#teamList do
-				spKillTeam(teamList[i])
-			end
 		end
 	end
 	CheckForVictory()
@@ -240,11 +220,6 @@ local function AddAllianceUnit(u, ud, teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[ud].metalCost
-	
-	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = true
-	end	
 end
 
 local function RemoveAllianceUnit(u, ud, teamID)
@@ -255,12 +230,8 @@ local function RemoveAllianceUnit(u, ud, teamID)
 	if aliveValue[teamID] < 0 then
 		aliveValue[teamID] = 0
 	end
-	
-	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = nil
-	end
-	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
+
+	if (CountAllianceUnits(allianceID) <= 0) and (allianceID ~= chickenAllyTeamID) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID)
 	end
@@ -297,7 +268,7 @@ end
 
 -- check for active players
 local function ProcessLastAlly()	
-	if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
+	if Spring.IsCheatingEnabled() then
 		return
 	end
 	local allylist = spGetAllyTeamList()

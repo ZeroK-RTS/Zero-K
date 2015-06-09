@@ -64,14 +64,6 @@ local options = {
     },
   },
   {
-    key    = 'commends',
-    name   = 'Team Commander Ends',
-    desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
-    type   = 'bool',
-    def    = false,
-    section= 'modifiers',
-  },
-  {
     key = "noelo",
     name = "No Elo",
     desc = "Prevent battle from affecting Elo rankings",
@@ -271,22 +263,6 @@ local options = {
 	type	= "string",
 	def		= nil,
   },
-   {
-	key		= "noair",
-	name	= "Disable air",
-	desc	= "Disables plane and gunship factories",
-	section	= 'startconds',
-	type	= "bool",
-	def		= false,
-  },
-     {
-	key		= "nodef",
-	name	= "Disable defences",
-	desc	= "Disables all defences from Defence tab",
-	section	= 'startconds',
-	type	= "bool",
-	def		= false,
-  },
   {
     key = "overdrivesharingscheme",
     name = "Overdrive Resource Distribution Scheme",
@@ -358,19 +334,6 @@ local options = {
     type   = 'bool',
     section = 'diplomacy',
     def    = false,
-  },
-  {
-    key    = 'sharemode',
-    name   = 'Share Mode',
-    desc   = 'Determines to which teams you may share units.',
-    type   = 'list',
-    section = 'diplomacy',
-    def    = 'teammates',
-    items = {
-      { key='teammates', name="Teammates Only", desc='Share only to teammates.' },
-      { key='ceasefire', name="Teammates and Ceasefired", desc='May also share to temporary ceasefired allies.' },
-      { key='anyone', name="Anyone", desc='Share to anyone, including enemies.' },
-    },
   },
   {
     key='typemapsetting',
@@ -491,59 +454,7 @@ local options = {
     max    = 1000,
     step   = 0.01,
   },
-  {
-    key    = 'defeatmode',
-    name   = 'Defeat Mode',
-    desc   = "Method of handling defeated alliances",
-    type   = 'list',
-    section= 'experimental',
-    def    = 'destroy',
-    items = {
-      { key='debug', name="Debug", desc='Does nothing; game is endless.' },
-      { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they are defeated"' },
-      { key='losecontrol', name="Lose Control", desc='Alliance loses control of their units if they are defeated.' },
-
-    },
-  },
-  --[[
-  {
-    key    = 'easymetal',
-    name   = 'Easy Metal',
-    desc   = 'Metal extractors are restricted to metal spots in the same way geo plants are. Spots are pre-analyzed but certain maps will provide strange results, such as Azure or Speedmetal.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  --]]
-  --[[
-  {
-    key    = 'terratex',
-    name   = 'Terraform Texture',
-    desc   = 'Adds a texture to terraformed ground.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = true,
-  },
-  --]]
---[[
-  {
-    key    = 'specialpower',
-    name   = 'Special Advanced Powerplants',
-    desc   = 'Rather than explode like a nuke, Adv Fusions create a massive implosion.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  --]]
  
-  {
-    key    = 'specialdecloak',
-    name   = 'Special Decloak Behavior (buggy)',
-    desc   = 'Overrides engine\'s decloak. Shows cloaked units only to team that reveals them, also fixes cloak behavior in FFA games with ceasefires.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
   {
     key    = 'xmas',
     name   = 'Enable festive units',
@@ -559,36 +470,6 @@ local options = {
     type   = 'bool',
     section= 'silly',
     def    = false,
-  },
-  {
-    key    = "disablefeatures",
-    name   = "Disable Features",
-    desc   = "Disable features (no wreackages).",
-    type   = "bool",
-    section= "mapsettings",
-    def    = false,
-  },
-  {
-    key    = 'factorycostmult',
-    name   = 'Factory Cost Multiplier',
-    desc   = 'Multiplies the cost of factories.',
-    type   = 'number',
-    section= 'experimental',
-    def    = 1,
-    min    = 0.01,
-    max    = 100,
-    step   = 0.01,
-  },
-  {
-    key    = 'wreckagemult',
-    name   = 'Wreckage Metal Multiplier',
-    desc   = 'Multiplies the metal of wreckages and debris.',
-    type   = 'number',
-    section= 'experimental',
-    def    = 1,
-    min    = 0.01,
-    max    = 100,
-    step   = 0.01,
   },
   {
     key    = "coop",

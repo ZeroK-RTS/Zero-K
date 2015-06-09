@@ -454,16 +454,7 @@ if (modOptions and modOptions.energymult) then
   end
 end
 
--- FIXME: doesn't change wreck cost
-if (modOptions and modOptions.factorycostmult) then
-  for name, def in pairs(UnitDefs) do
-    if def.unitname:find("factory") or def.unitname == "armcsa" or def.unitname == "striderhub" then
-		def.buildcostmetal = def.buildcostmetal * modOptions.factorycostmult
-		def.buildcostenergy = def.buildcostenergy * modOptions.factorycostmult
-		def.buildtime = def.buildtime * modOptions.factorycostmult
-	end
-  end
-end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- OD mex divide by 20
@@ -723,22 +714,7 @@ if (modOptions and tobool(modOptions.xmas)) then
   end --for
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Special Decloak
--- 
-if (modOptions and tobool(modOptions.specialdecloak)) then
-	for name, ud in pairs(UnitDefs) do
-		if not ud.customparams then
-			ud.customparams = {}
-		end
-		ud.customparams.specialdecloakrange = ud.mincloakdistance or 0
-		ud.mincloakdistance = 0
-	end
-end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Remove initCloaked because cloak state is no longer used
 -- 
 

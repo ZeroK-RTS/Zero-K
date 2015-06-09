@@ -1313,8 +1313,7 @@ function gadget:GameOver()
 	local modopts = Spring.GetModOptions()
 	local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 	local energymult = tonumber(Spring.GetModOptions().energymult) or 1
-	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne((modopts.terracostmult or 1) + 0.001))
-	or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne((modopts.factorycostmult or 1) + 0.001)) then
+	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne((modopts.terracostmult or 1) + 0.001)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Chicken> Cheating modoptions, no score sent")
 		return
 	end
