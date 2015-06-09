@@ -40,8 +40,8 @@ unitDef = {
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
   mass                = 240,
-  maxDamage           = 1850,
-  maxVelocity         = 2.4,
+  maxDamage           = 1650,
+  maxVelocity         = 2.3,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
   movementClass       = [[BOAT4]],
@@ -88,8 +88,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 150,
-        subs    = 150,
+        default = 62,
+        subs    = 62,
       },
 
       edgeEffectiveness       = 0.6,
@@ -107,8 +107,8 @@ unitDef = {
       numbounce               = 4,
       noSelfDamage            = true,
       propeller               = [[1]],
-      range                   = 300,
-      reloadtime              = 2.5,
+      range                   = 320,
+      reloadtime              = 2,
       renderType              = 1,
       selfprop                = true,
       soundHit                = [[TorpedoHitVariable]],
