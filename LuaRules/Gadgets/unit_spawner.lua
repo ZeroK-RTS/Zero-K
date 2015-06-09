@@ -993,7 +993,7 @@ local function MorphQueen()
 	local cmdQueue = spGetCommandQueue(tempID, -1)
 	local queenOwner = spGetUnitTeam(tempID)
 	
-	if (paralyzeDamage or 0) >= (oldHealth or 0) then	-- postpone morph
+	if Spring.GetUnitIsStunned(tempID) or (Spring.GetUnitRulesParam(tempID, "disarmed") == 1) then	-- postpone morph
 		morphFrame = morphFrame + 60
 		return
 	end
