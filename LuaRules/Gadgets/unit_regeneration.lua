@@ -55,3 +55,10 @@ end
 function gadget:UnitDestroyed(unitID)
 	units[unitID] = nil
 end
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
+	end
+end
