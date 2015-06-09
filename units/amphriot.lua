@@ -23,7 +23,6 @@ unitDef = {
     description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
-    extradrawrange = 430,
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -52,7 +51,7 @@ unitDef = {
   },
 
   sightDistance          = 430,
-  sonarDistance          = 300,
+  sonarDistance          = 350,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -81,25 +80,24 @@ unitDef = {
 
     TORPEDO = {
       name                    = [[Undersea Charge Launcher]],
-      areaOfEffect            = 80,
+      areaOfEffect            = 100,
       burst                   = 2,
-      burstRate               = 0.15,
+	  burstRate               = 0.2,
       avoidFriendly           = false,
       bouncerebound           = 1,
       bounceslip              = 1,
-      burnblow                = 1,
-      canAttackGround         = false, -- also workaround for range hax
-      flightTime              = 1.0,
       burnblow                = true,
+      canAttackGround         = false, -- also workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 45,
+        default = 180,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
+      flightTime              = 1.0,
       groundbounce            = 1,
       impactOnly              = false,
       impulseBoost            = 0,
@@ -109,8 +107,8 @@ unitDef = {
       myGravity               = 2,
       model                   = [[diskball.s3o]],
       numBounce               = 1,
-      range                   = 290,
-      reloadtime              = 1,
+      range                   = 260,
+      reloadtime              = 1.8,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
       --soundStart              = [[weapon/torpedo]],
