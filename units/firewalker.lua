@@ -71,7 +71,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[NAPALM_MORTAR]],
+      def                = [[NAPALM_SRAYER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -121,6 +121,52 @@ unitDef = {
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
       sprayangle              = 1024,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 320,
+    },
+	
+	NAPALM_SRAYER = {
+      name                    = [[Napalm Mortar]],
+      accuracy                = 400,
+      areaOfEffect            = 128,
+	  avoidFeature            = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+      cegTag                  = [[flamer]],
+
+	  customParams        	  = {
+	    setunitsonfire = "1",
+		burntime = 60,
+
+		area_damage = 1,
+		area_damage_radius = 64,
+		area_damage_dps = 20,
+		area_damage_duration = 16,
+
+		--lups_heat_fx = [[firewalker]],
+	  },
+	  
+      damage                  = {
+        default = 80,
+        planes  = 80,
+        subs    = 4,
+      },
+
+      explosionGenerator      = [[custom:napalm_firewalker_small]],
+      firestarter             = 180,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 0.1,
+      projectiles             = 10,
+      range                   = 900,
+      reloadtime              = 12,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 5,
+      soundHit                = [[weapon/cannon/wolverine_hit]],
+      soundStart              = [[weapon/cannon/wolverine_fire]],
+      sprayangle              = 2500,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 320,
