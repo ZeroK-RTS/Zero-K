@@ -71,7 +71,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[NAPALM_SRAYER]],
+      def                = [[NAPALM_SPRAYER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -126,7 +126,7 @@ unitDef = {
       weaponVelocity          = 320,
     },
 	
-	NAPALM_SRAYER = {
+	NAPALM_SPRAYER = {
       name                    = [[Napalm Mortar]],
       accuracy                = 400,
       areaOfEffect            = 128,
