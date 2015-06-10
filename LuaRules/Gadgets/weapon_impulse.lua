@@ -23,7 +23,8 @@ end
 
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
-local GROUND_PUSH_CONSTANT = 1.1*GRAVITY/30/30
+local GROUND_PUSH_CONSTANT = 1.12*GRAVITY/30/30
+local UNSTICK_CONSTANT = 10
 
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
@@ -42,13 +43,6 @@ local abs = math.abs
 local getMovetype = Spring.Utilities.getMovetype
 
 
-local UNSTICK_CONSTANT = 0
-if (Game.version:find('91.0') == 1) then
-	UNSTICK_CONSTANT = 2.74 -- for Spring 91.0
-elseif (Game.version:find('94') and Game.version:find('94.1.1')== nil) then
-	UNSTICK_CONSTANT = 3.00 -- for Spring 94.1
-end
-
 --local BALLISTIC_GUNSHIP_GRAVITY = -0.2
 --local BALLISTIC_GUNSHIP_HEIGHT = 600000
 
@@ -59,7 +53,7 @@ local GUNSHIP_VERTICAL_MULT = 0.25 -- prevents rediculus gunship climb
 local impulseMult = {
 	[0] = 0.02, -- fixedwing
 	[1] = 0.004, -- gunships
-	[2] = 0.0032, -- other
+	[2] = 0.0036, -- other
 }
 local impulseWeaponID = {}
 for i, wd in pairs(WeaponDefs) do

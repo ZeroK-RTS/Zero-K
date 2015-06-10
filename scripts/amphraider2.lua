@@ -424,9 +424,9 @@ function script.FireWeapon(num)
 		magnitude = magnitude + depth*impulseDepthMult
 	end
 	
-	if depth < -30 then
-		GG.AddGadgetImpulse(unitID, x, y, z, 30*projectiles, true, false, true, false, unitDefID) 
-	end
+	--if depth < -30 then
+	--	GG.AddGadgetImpulse(unitID, x, y, z, 30*projectiles, true, false, true, false, unitDefID) 
+	--end
 	-- Change Tank
 	GG.shotWaterWeapon(unitID)
 end
