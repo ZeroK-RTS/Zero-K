@@ -24,7 +24,7 @@ end
 local GRAVITY = Game.gravity
 local GRAVITY_BASELINE = 120
 local GROUND_PUSH_CONSTANT = 1.12*GRAVITY/30/30
-local UNSTICK_CONSTANT = 10
+local UNSTICK_CONSTANT = 4
 
 local spSetUnitVelocity = Spring.SetUnitVelocity
 local spAddUnitImpulse = Spring.AddUnitImpulse
