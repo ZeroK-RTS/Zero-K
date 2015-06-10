@@ -114,7 +114,6 @@ local riotRangeSkirmieeArray = {
 	["hoverscout"] = true,
 	["shipscout"] = true,
 	["shipraider"] = true,
-	["shiptorp"] = true,
 	["subraider"] = true,
 	["amphriot"] = true,
 	["armcomdgun"] = true,
@@ -654,7 +653,7 @@ local behaviourConfig = {
 		},
 		sea = {
 			weaponNum = 2,
-			skirms = armedLand, 
+			skirms = riotRangeSkirmieeArray, 
 			swarms = {}, 
 			flees = {},
 			circleStrafe = true,
@@ -769,7 +768,10 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30, 
+		skirmLeeway = 30,
+		stoppingDistance = 15,
+		skirmOrderDis = 180,
+		velocityPrediction = 50,
 	},	
 	
 	-- long range skirms
