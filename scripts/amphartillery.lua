@@ -35,7 +35,7 @@ local smokePiece = {pelvis, turret}
 local function WeaponRangeUpdate()
 	while true do
 		local height = select(2, Spring.GetUnitPosition(unitID))
-		if height < -32 then
+		if height < -20 then
 			if longRange then
 				Spring.SetUnitWeaponState(unitID, 1, {range = torpRange})
 				longRange = false
@@ -137,6 +137,18 @@ function script.FireWeapon(num)
 	Sleep(150)
 	Move(gun1, z_axis, 0, 3)
 	Move(gun2, z_axis, 0, 3)
+end
+
+function script.BlockShot(num, targetID)
+	if num == 2 then -- surface missiles
+		local px, py, pz = Spring.GetUnitPosition(unitID)
+		if py > -20 then
+			return true
+			else
+			return false
+		end
+	end
+	return false
 end
 
 function script.Shot(num)
