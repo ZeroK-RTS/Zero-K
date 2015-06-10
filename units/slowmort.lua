@@ -124,6 +124,44 @@ unitDef = {
 	  weaponVelocity          = 500,
 	},
   
+    DISRUPTOR_BOMB = {
+	  name                    = [[Disruptor Bomb]],
+	  accuracy                = 92,
+	  areaOfEffect            = 64,
+	  cegTag                  = [[beamweapon_muzzle_purple]],
+	  craterBoost             = 0,
+	  craterMult              = 0,
+
+	  customParams            = {
+		timeslow_damagefactor = 3,
+	  },
+
+	  damage                  = {
+		default = 350,
+		planes  = 350,
+		subs    = 17.5,
+	  },
+
+	  explosionGenerator      = [[custom:riotball_small]],
+	  explosionSpeed          = 5,
+	  fireStarter             = 100,
+	  impulseBoost            = 0,
+	  impulseFactor           = 0,
+	  interceptedByShieldType = 2,
+	  model                   = [[wep_b_fabby.s3o]],
+	  range                   = 520,
+	  reloadtime              = 6,
+	  smokeTrail              = true,
+	  soundHit                = [[weapon/aoe_aura]],
+	  soundHitVolume          = 3,
+	  soundStart              = [[weapon/cannon/cannon_fire3]],
+	  --startVelocity           = 350,
+	  --trajectoryHeight        = 0.3,
+	  turret                  = true,
+	  weaponType              = [[Cannon]],
+	  weaponVelocity          = 350,
+	},
+  
     SLOWBEAM = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
