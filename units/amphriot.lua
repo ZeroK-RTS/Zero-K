@@ -93,7 +93,7 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 180,
+        default = 90,
       },
 
       explosionGenerator      = [[custom:TORPEDO_HIT]],
@@ -107,7 +107,7 @@ unitDef = {
       myGravity               = 2,
       model                   = [[diskball.s3o]],
       numBounce               = 1,
-      range                   = 240,
+      range                   = 270,
       reloadtime              = 1.8,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.6,
