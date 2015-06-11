@@ -47,11 +47,18 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-	if regenDefs[unitDefID] then
+	if regenDefs[unitDefID] and units[unitID] then
 		units[unitID][1] = currentFrame + regenDefs[unitDefID][1]
 	end
 end
 
 function gadget:UnitDestroyed(unitID)
 	units[unitID] = nil
+end
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
+	end
 end

@@ -4,11 +4,11 @@ unitDef = {
   description            = [[Fire Support Walker (Artillery/Skirmish)]],
   acceleration           = 0.12,
   brakeRate              = 0.24,
-  buildCostEnergy        = 1200,
-  buildCostMetal         = 1200,
+  buildCostEnergy        = 900,
+  buildCostMetal         = 900,
   builder                = false,
   buildPic               = [[firewalker.png]],
-  buildTime              = 1200,
+  buildTime              = 900,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -71,7 +71,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[NAPALM_MORTAR]],
+      def                = [[NAPALM_SPRAYER]],
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -87,7 +87,7 @@ unitDef = {
 	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
-      cegTag                  = [[flamer]],
+      cegTag                  = [[custom:gravityless_flamer]],
 
 	  customParams        	  = {
 	    setunitsonfire = "1",
@@ -125,6 +125,52 @@ unitDef = {
       weaponType              = [[Cannon]],
       weaponVelocity          = 320,
     },
+	
+	NAPALM_SPRAYER = {
+      name                    = [[Napalm Mortar]],
+      accuracy                = 400,
+      areaOfEffect            = 128,
+	  avoidFeature            = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+      cegTag                  = [[flamer]],
+
+	  customParams        	  = {
+	    setunitsonfire = "1",
+		burntime = 60,
+
+		area_damage = 1,
+		area_damage_radius = 64,
+		area_damage_dps = 20,
+		area_damage_duration = 16,
+
+		--lups_heat_fx = [[firewalker]],
+	  },
+	  
+      damage                  = {
+        default = 80,
+        planes  = 80,
+        subs    = 4,
+      },
+
+      explosionGenerator      = [[custom:napalm_firewalker_small]],
+      firestarter             = 180,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 0.1,
+      projectiles             = 10,
+      range                   = 900,
+      reloadtime              = 12,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 5,
+      soundHit                = [[weapon/cannon/wolverine_hit]],
+      soundStart              = [[weapon/cannon/wolverine_fire]],
+      sprayangle              = 2500,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 320,
+    },
 
   },
 
@@ -142,10 +188,10 @@ unitDef = {
       footprintZ       = 3,
       height           = [[40]],
       hitdensity       = [[100]],
-      metal            = 480,
+      metal            = 360,
       object           = [[firewalker_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 480,
+      reclaimTime      = 360,
     },
 
     HEAP  = {
@@ -157,10 +203,10 @@ unitDef = {
       footprintX       = 4,
       footprintZ       = 4,
       hitdensity       = [[100]],
-      metal            = 240,
+      metal            = 180,
       object           = [[debris4x4c.s3o]],
       reclaimable      = true,
-      reclaimTime      = 240,
+      reclaimTime      = 180,
     },
 
   },

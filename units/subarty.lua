@@ -15,7 +15,7 @@ unitDef = {
   canMove                = true,
   canPatrol              = true,
   category               = [[SUB SINK]],
-  collisionVolumeOffsets = [[0 -4 0]],
+  collisionVolumeOffsets = [[0 3 0]],
   collisionVolumeScales  = [[50 12 70]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
@@ -30,6 +30,8 @@ unitDef = {
 	helptext_de    = [[Der Serpent ist wahrlich ein Albtraum. Seine weitreichenden, tödlich genauen und hochtödlichen, schweren Torpedos können fast jedes Schiff mit ein paar Schüssen zum Sinken bringen. Es ist allerdings extrem teuer und nicht sehr wendig.]],
 	helptext_pl    = [[Serpent jest bardzo drogi i ma niska wytrzymalosc, ale jego potezne torpedy dalekiego zasiegu zatapiaja wszystko, co plywa.]],
 	modelradius    = [[15]],
+	aimposoffset   = [[0 -5 0]],
+	midposoffset   = [[0 -5 0]],
 	turnatfullspeed = [[1]],
   },
 
