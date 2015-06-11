@@ -146,7 +146,7 @@ local function HasNoComms(allianceID)
 		return false
 	end
 	return true
--end
+end
 
 local function EchoUIMessage(message)
 	spEcho("game_message: " .. message)
