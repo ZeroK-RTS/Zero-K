@@ -37,8 +37,18 @@ local spGetUnitShieldState	= Spring.GetUnitShieldState
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
+local parray = VFS.Include("LuaRules/Utilities/parray.lua")
+
 local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
+
+-- damage to shields modifiers
+local EMP_DAMAGE_MOD = 1/3
+local SLOW_DAMAGE_MOD = 1/3
+local DISARM_DAMAGE_MOD = 1/3
+local FLAMER_DAMAGE_MOD = 3
+local GAUSS_DAMAGE_MOD = 1.5
+
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -95,6 +105,7 @@ local preventOverkillCmdDesc = {
 local incomingDamage = {}
 
 function GG.OverkillPrevention_IsDoomed(targetID)
+--[[
 	if incomingDamage[targetID] then
 		local frame = spGetGameFrame()
 		if incomingDamage[targetID].fullTimeout > frame then
@@ -102,6 +113,8 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 		end
 	end
 	return false
+]]--
+	return (incomingDamage[targetID] or {}).doomed or false
 end
 
 local function Dist3D2(x0,x1,y0,y1,z0,z1)
@@ -158,13 +171,123 @@ local function GetTargetShieldPower(unitID, targetID, timeout)
 	return totalShieldsPower, maxShieldPower
 end
 
+local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
+	local incData = incomingDamage[targetID]
+	local targetFrame=gameFrame+timeout
+	
+	local sumDamage=0
+	local sumDisarmDamage=0
+	
+	local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+	local adjHealth = spGetUnitHealth(targetID)/armor
+	
+	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
+	if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
+	
+	--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame)
+
+	local block=false
+	
+	--Echo("incData"..tostring(incData))
+	
+	if incData then --seen this target
+		local si, ei = incData.frames:GetIdxs()
+		for i=si, ei do
+			local frame, data=unpack(incData.frames:GetKV(i))
+			--Echo(frame)
+			if frame<gameFrame then
+				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
+			else
+				local dd=data.dd
+				local fd=data.fd
+				
+				local disarmExtra=math.floor(dd/adjHealth*DECAY_FRAMES)				
+				adjHealth=adjHealth-fd
+				disarmFrame=disarmFrame+disarmExtra
+				--Echo("disarmFrame(raw)="..disarmFrame)
+				if disarmFrame>frame+DECAY_FRAMES+DisarmTimeout then disarmFrame=frame+DECAY_FRAMES+DisarmTimeout end			
+				--Echo("disarmFrame(trunc)="..disarmFrame)
+				--adjHealth=adjHealth
+			end
+		end
+		
+		--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame)
+		
+		local doomed=(adjHealth<0) and (FullDamage>0)										--for regular projectile
+		local disarmed=(disarmFrame-gameFrame-timeout>=DECAY_FRAMES) and (DisarmDamage>0)	--for disarming projectile
+		
+		block=doomed or disarmed --assume function is not called with both regular and disarming damage types
+		
+		incomingDamage[targetID].doomed=doomed
+		incomingDamage[targetID].disarmed=disarmed
+		
+		--Echo("doomed="..tostring(doomed).." disarmed="..tostring(disarmed).." block="..tostring(block))
+					
+	else --new target
+		incomingDamage[targetID]={ frames=parray() }
+		incomingDamage[targetID].frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
+		incData = incomingDamage[targetID]
+	end
+	
+	if not block then	
+		local frameData=incData.frames:Get(targetFrame)
+		if frameData then --here we have a rare case when few different projectiles (from different attack units) are arriving to the target at the same frame. Their powers must be accumulated/harmonized
+			frameData.fd=frameData.fd+FullDamage
+			--frameData.sd=math.min(frameData.sd, SingleDamage)
+			frameData.sd=frameData.sd+SingleDamage
+			frameData.dd=frameData.dd+DisarmDamage			
+			incData.frames:Upsert(targetFrame, frameData)
+		else --this case is much more common: such frame does not exist in incData.frames
+			incData.frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
+		end	
+	end
+	--Echo("block="..tostring(block))
+	return block
+end
+
+
 function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
 	if not units[unitID] then
 		return false
 	end
 	
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		local gameFrame = spGetGameFrame()
+		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
+		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 0, 0, damage, disarmTimer, timeout)
+	end
+end
+
+function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
+	if not units[unitID] then
+		return false
+	end	
+
+	if spValidUnitID(unitID) and spValidUnitID(targetID) then
+		local gameFrame = spGetGameFrame()
+		if troubleVsFast then
+			local unitDefID = Spring.GetUnitDefID(targetID)
+			if fastUnitDefs[unitDefID] then
+				damage = 0
+			end
+		end
+		
+		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
+		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)
+
+		
+	end
+end
+
+--[[
+function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
+	Echo("Hello from GG_OverkillPrevention_CheckBlockD")
+	if not units[unitID] then
+		return false
+	end
+	
 		--Echo("targetID="..targetID)
-	--Echo("Hello from GG_OverkillPrevention_CheckBlockD")
+	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		
@@ -177,7 +300,6 @@ function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, di
 		
 		local disarmExtra=math.floor(damage/adjHealth*DECAY_FRAMES)
 		
-		--local disarmShotRequired=disarmFrame-DECAY_FRAMES-timeout>gameFrame
 		local disarmShotRequired=disarmFrame-gameFrame-timeout<DECAY_FRAMES
 		
 		--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame.."  disarmExtra="..disarmExtra.."  disarmShotRequired="..tostring(disarmShotRequired))
@@ -198,13 +320,15 @@ function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, di
 	
 	return false
 end
+]]--
 
+--[[
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
 	if not units[unitID] then
 		return false
 	end
 	
-	Echo("targetID="..targetID)
+	--Echo("targetID="..targetID)
 
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
@@ -278,6 +402,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 	
 	return false
 end
+]]--
 
 function gadget:UnitDestroyed(unitID)
 	if incomingDamage[unitID] then
