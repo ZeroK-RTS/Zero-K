@@ -64,6 +64,14 @@ local options = {
     },
   },
   {
+    key    = 'commends',
+    name   = 'Team Commander Ends',
+    desc   = 'Causes an allyteam to lose if they have no commanders left on their team',
+    type   = 'bool',
+    def    = false,
+    section= 'modifiers',
+  },
+  {
     key = "noelo",
     name = "No Elo",
     desc = "Prevent battle from affecting Elo rankings",
