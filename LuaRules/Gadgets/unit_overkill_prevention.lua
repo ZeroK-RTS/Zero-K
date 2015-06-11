@@ -242,7 +242,17 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 		end	
 	end
 	--Echo("block="..tostring(block))
-	return block
+	
+	if block then
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+		if unitDefID then
+			spSetUnitTarget(unitID, 0)
+			return true
+		end
+	end
+	
+	return false
 end
 
 
@@ -273,9 +283,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		end
 		
 		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
-		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)
-
-		
+		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)		
 	end
 end
 
