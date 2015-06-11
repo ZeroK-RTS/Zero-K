@@ -77,7 +77,7 @@ local function BehaviourChangeThread(behaviour)
 	while not flying do
 		Sleep(600)
 		state = spGetUnitMoveTypeData(unitID).aircraftState
-		notFlying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
+		flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	end
 	
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)

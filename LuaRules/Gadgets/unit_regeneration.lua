@@ -47,7 +47,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-	if regenDefs[unitDefID] then
+	if regenDefs[unitDefID] and units[unitID] then
 		units[unitID][1] = currentFrame + regenDefs[unitDefID][1]
 	end
 end

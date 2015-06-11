@@ -87,7 +87,7 @@ unitDef = {
 	  avoidFeature            = false,
       craterBoost             = 1,
       craterMult              = 2,
-      cegTag                  = [[flamer]],
+      cegTag                  = [[custom:gravityless_flamer]],
 
 	  customParams        	  = {
 	    setunitsonfire = "1",

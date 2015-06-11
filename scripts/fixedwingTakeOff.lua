@@ -2,6 +2,7 @@ local FUDGE_FACTOR = 1.5
 
 local spGetUnitMoveTypeData = Spring.GetUnitMoveTypeData
 local spSetAirMoveTypeData = Spring.MoveCtrl.SetAirMoveTypeData
+local spMoveCtrlGetTag = Spring.MoveCtrl.GetTag
 
 function TakeOffThread(height, signal)
 	Signal(signal)
@@ -11,11 +12,11 @@ function TakeOffThread(height, signal)
 	end
 	for i = 1, 5 do
 		Sleep(100)
-		if spGetUnitMoveTypeData(unitID) then
+		if spMoveCtrlGetTag(unitID) == nil then
 			spSetAirMoveTypeData(unitID, "wantedHeight", 10)
 			Sleep(33)
 		end
-		if spGetUnitMoveTypeData(unitID) then
+		if spMoveCtrlGetTag(unitID) == nil then
 			spSetAirMoveTypeData(unitID, "wantedHeight", height*FUDGE_FACTOR)
 		end
 	end
