@@ -37,7 +37,7 @@ local spGetUnitShieldState	= Spring.GetUnitShieldState
 local spGetUnitIsStunned	= Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
-local parray = VFS.Include("LuaRules/Utilities/parray.lua")
+local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
 local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
@@ -224,7 +224,7 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 		--Echo("doomed="..tostring(doomed).." disarmed="..tostring(disarmed).." block="..tostring(block))
 					
 	else --new target
-		incomingDamage[targetID]={ frames=parray() }
+		incomingDamage[targetID]={ frames=pmap() }
 		incomingDamage[targetID].frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
 		incData = incomingDamage[targetID]
 	end
