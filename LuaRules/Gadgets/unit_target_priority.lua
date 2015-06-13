@@ -32,14 +32,8 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
-local spGetGameFrame = Spring.GetGameFrame
 
 local targetTable, captureWeaponDefs = include("LuaRules/Configs/target_priority_defs.lua")
-
-local paralyzeOnMaxHealth = ((VFS.Include("gamedata/modrules.lua") or {}).paralyze or {}).paralyzeOnMaxHealth or true
-
---local empDeclineRate = (reverseCompat and 32/1200) or (30/1200) --taken from engine side
-local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
@@ -56,7 +50,7 @@ local remUnitDefID = {}
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
-	Spring.Echo("TARGET CHECK")
+	--Spring.Echo("TARGET CHECK")
 	
 	if (not targetID) or (not unitID) or (not attackerWeaponDefID) then
 		return true, 5
@@ -94,9 +88,8 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	
 	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 	
-	local stunnedOrInbuild=false
 	if not remStunnedOrOverkill[targetID] then
-		stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
+		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
 		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
 	end
@@ -130,20 +123,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			end
 		end
 		
-		if stunnedOrInbuild then			
-			local gameFrame = spGetGameFrame()
-			local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
-			if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
-			local disarmAdd=((disarmFrame-gameFrame)/DECAY_FRAMES) --0 to 1 if not disarmed, >=1 if disarmed
-			
-			local empHP = ((not paralyzeOnMaxHealth) and hp) or maxHP
-			local paralyzeAdd=paralyze/empHP
-			
-			local buildAdd=1-build
-			--slightly deprioritize disarmed, paralyzed and units under construction
-			hpAdd=hpAdd+(disarmAdd+paralyzeAdd+buildAdd)/3*0.05 --0 to 0.05 (no guarantee due to disarm and paralyze overflows)
-		end
-		
 		remHealth[targetID] = hpAdd
 	end
 	
@@ -158,10 +137,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	local newPriority = hpAdd + defPrio + miscAdd + distAdd
-	
-	--GG.UnitEcho(targetID, newPriority)
-	
-	--Spring.Echo("targetID="..targetID.."  newPriority="..newPriority)
 	
 	return true, newPriority --bigger value have lower priority
 end

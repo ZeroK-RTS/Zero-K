@@ -39,16 +39,7 @@ local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
-local maxShieldRange=350+50 --radius to search for shielded units, update if necessary. +50 is addition in case target unit moves under shield or shield unit covers the target
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
-
--- damage to shields modifiers
-local EMP_DAMAGE_MOD = 1/3
-local SLOW_DAMAGE_MOD = 1/3
-local DISARM_DAMAGE_MOD = 1/3
-local FLAMER_DAMAGE_MOD = 3
-local GAUSS_DAMAGE_MOD = 1.5
-
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -105,70 +96,11 @@ local preventOverkillCmdDesc = {
 local incomingDamage = {}
 
 function GG.OverkillPrevention_IsDoomed(targetID)
---[[
-	if incomingDamage[targetID] then
-		local frame = spGetGameFrame()
-		if incomingDamage[targetID].fullTimeout > frame then
-			return incomingDamage[targetID].doomed
-		end
-	end
-	return false
-]]--
 	return (incomingDamage[targetID] or {}).doomed or false
 end
 
 local function Dist3D2(x0,x1,y0,y1,z0,z1)
 	return (x1-x0)^2+(y1-y0)^2+(z1-z0)^2
-end
-
-local function GetTargetShieldPower(unitID, targetID, timeout)
-	local totalShieldsPower=0
-	local maxShieldPower=0
-
-	local x0, y0, z0 = spGetUnitPosition(targetID)
-	local ud0=UnitDefs[spGetUnitDefID(targetID)]
-	local speed0=ud0.speed or 0
-	
-	local myAllyID = spGetUnitAllyTeam(unitID)	
-	
-	--so far we go for perfect/cheating units visibility, e.g. shooting unit will know shielded units and their parameters perfectly. Shouldn't be much of issue in practical domain(?)
-	local unitsAround=spGetUnitsInCylinder(x0, z0, maxShieldRange)
-	--Echo("#unitsAround"..#unitsAround)	
-	for _, uId in pairs(unitsAround) do
-	
-		--nearby unit is valid, healthy enough. Also non-friendly, not stunned and not disarmed	
-		if spValidUnitID(uId) and spGetUnitHealth(uId)>0.0 and spGetUnitAllyTeam(uId)~=myAllyID and not(spGetUnitIsStunned(uId)) and spGetUnitRulesParam(uId, "disarmed")~=1  then
-			local ud=UnitDefs[spGetUnitDefID(uId)]
-			
-			if ud.weapons then --unit shall have weapons
-				for wId, weapon in pairs(ud.weapons) do --required to iterate through all unit's weaponDefs, since unit can have more than one shield (so ud.shieldWeaponDef is not enough)
-					local wdId=weapon.weaponDef
-					local wDef=WeaponDefs[wdId]
-					if wDef.isShield then
-						local shieldPower=wDef.shieldPower
-						local shieldPowerRegen=wDef.shieldPowerRegen --HP/sec
-						local shieldRadius=wDef.shieldRadius
-						local x, y, z = spGetUnitPosition(uId)
-						local speed=ud.speed or 0
-
-						-- Check range first. Distance between target and shield carrier should be less than shield radius + shield carrier unit and target can travel towards each other while projetile is flying.
-						-- speed is given in elmo/s thus the "timeout/30"
-						-- Since the calculation is coarse there could be slight overkill, but with shields it's better to overkill than to underkill				
-						if Dist3D2(x0, x, y0, y, z0, z) < (shieldRadius+(speed+speed0)*timeout/30)^2 then
-							local enabledShield, curShieldPower=spGetUnitShieldState(uId, wId)
-							curShieldPower=curShieldPower*enabledShield --just in case
-							local expectedShieldPower=curShieldPower+shieldPowerRegen*timeout/30
-							
-							-- shieldPowerRegen is given in HP/s thus the "timeout/30"
-							totalShieldsPower=totalShieldsPower+math.min(shieldPower, expectedShieldPower)
-							maxShieldPower=math.max(maxShieldPower, expectedShieldPower)
-						end
-					end
-				end
-			end
-		end
-	end
-	return totalShieldsPower, maxShieldPower
 end
 
 local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
@@ -180,12 +112,8 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	
 	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
 	if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
-	
-	--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame)
 
 	local block=false
-	
-	--Echo("incData"..tostring(incData))
 	
 	if incData then --seen this target
 		local si, ei = incData.frames:GetIdxs()
@@ -201,15 +129,10 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 				local disarmExtra=math.floor(dd/adjHealth*DECAY_FRAMES)				
 				adjHealth=adjHealth-fd
 				disarmFrame=disarmFrame+disarmExtra
-				--Echo("disarmFrame(raw)="..disarmFrame)
+
 				if disarmFrame>frame+DECAY_FRAMES+DisarmTimeout then disarmFrame=frame+DECAY_FRAMES+DisarmTimeout end			
-				--Echo("disarmFrame(trunc)="..disarmFrame)
-				--adjHealth=adjHealth
 			end
 		end
-		
-		--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame)
-		
 		local doomed=(adjHealth<0) and (FullDamage>0)										--for regular projectile
 		local disarmed=(disarmFrame-gameFrame-timeout>=DECAY_FRAMES) and (DisarmDamage>0)	--for disarming projectile
 		
@@ -217,9 +140,6 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 		
 		incomingDamage[targetID].doomed=doomed
 		incomingDamage[targetID].disarmed=disarmed
-		
-		--Echo("doomed="..tostring(doomed).." disarmed="..tostring(disarmed).." block="..tostring(block))
-					
 	else --new target
 		incomingDamage[targetID]={ frames=pmap() }
 		incomingDamage[targetID].frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
@@ -238,7 +158,6 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 			incData.frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
 		end	
 	end
-	--Echo("block="..tostring(block))
 	
 	if block then
 		local teamID = spGetUnitTeam(unitID)
@@ -283,131 +202,6 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)		
 	end
 end
-
---[[
-function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
-	Echo("Hello from GG_OverkillPrevention_CheckBlockD")
-	if not units[unitID] then
-		return false
-	end
-	
-		--Echo("targetID="..targetID)
-	
-	if spValidUnitID(unitID) and spValidUnitID(targetID) then
-		local gameFrame = spGetGameFrame()
-		
-		local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
-		if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
-
-		local health = spGetUnitHealth(targetID)
-		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		local adjHealth = spGetUnitHealth(targetID)/armor
-		
-		local disarmExtra=math.floor(damage/adjHealth*DECAY_FRAMES)
-		
-		local disarmShotRequired=disarmFrame-gameFrame-timeout<DECAY_FRAMES
-		
-		--Echo("gameFrame="..gameFrame.."  disarmframe=="..disarmFrame.."  disarmExtra="..disarmExtra.."  disarmShotRequired="..tostring(disarmShotRequired))
-
-		if not disarmShotRequired then
-			local teamID = spGetUnitTeam(unitID)
-			local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-			if unitDefID then
-				spSetUnitTarget(unitID,0)
-				return true
-			end
-		end		
-
-		
-		return false
-		--local stayDisarmed
-	end
-	
-	return false
-end
-]]--
-
---[[
-function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
-	if not units[unitID] then
-		return false
-	end
-	
-	--Echo("targetID="..targetID)
-
-	if spValidUnitID(unitID) and spValidUnitID(targetID) then
-		if troubleVsFast then
-			local unitDefID = Spring.GetUnitDefID(targetID)
-			if fastUnitDefs[unitDefID] then
-				damage = 0
-			end
-		end
-		
-		local incData = incomingDamage[targetID]
-		local addDamage = true
-		
-		local gameFrame = spGetGameFrame()
-		local newTimeoutFrame = gameFrame + timeout
-		if incData then
-			if incData.doomed then
-				if incData.fullTimeout > gameFrame then
-					-- Not yet timed out
-					local incDamage = incData.damage
-					for frame, shotDamage in pairs(incData.damageTimeout) do
-						if frame < gameFrame then
-							incDamage = incDamage - shotDamage
-							incData.damageTimeout[frame] = nil
-						end
-					end
-					incData.damage = incDamage
-					incData.doomed = (incData.damage >= incData.health)
-					
-					if incData.doomed then
-						local teamID = spGetUnitTeam(unitID)
-						local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-						if unitDefID then
-							spSetUnitTarget(unitID,0)
-							return true
-						end
-					end
-				else
-					-- Timout so make a new shooting instance
-					addDamage = false
-					incData.damage = damage
-					incData.damageTimeout = {[newTimeoutFrame] = damage}
-					incData.fullTimeout = newTimeoutFrame
-				end
-			end
-			
-			if addDamage then
-				incData.damage = incData.damage + damage
-				incData.damageTimeout[newTimeoutFrame] = (incData.damageTimeout[newTimeoutFrame] or 0) + damage
-				incData.fullTimeout = math.max(incData.fullTimeout, newTimeoutFrame)
-			end
-		else
-			incomingDamage[targetID] = {
-				damage = damage,
-				damageTimeout = {[newTimeoutFrame] = damage},
-				fullTimeout = newTimeoutFrame,
-			}
-		end
-		
-		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		local adjHealth = spGetUnitHealth(targetID)/armor
-		local shieldPower, maxShieldPower = GetTargetShieldPower(unitID, targetID, timeout)
-		
-		if maxShieldPower>=incomingDamage[targetID].damage then --if not true, then shields no longer can prevent this projectile, so no need to add shieldPower to adjHealth
-			adjHealth = adjHealth + shieldPower
-		end			
-			
-		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
-		incomingDamage[targetID].health = adjHealth
-		--Echo("adjHealth="..adjHealth)
-	end
-	
-	return false
-end
-]]--
 
 function gadget:UnitDestroyed(unitID)
 	if incomingDamage[unitID] then
