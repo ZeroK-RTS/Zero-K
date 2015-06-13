@@ -17,13 +17,14 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local echo = Spring.Echo
-
-local GetUnitDefID         = Spring.GetUnitDefID
-local GetUnitExperience    = Spring.GetUnitExperience
-local GetAllUnits          = Spring.GetAllUnits
-local IsUnitAllied         = Spring.IsUnitAllied
-local GetSpectatingState   = Spring.GetSpectatingState
+local spGetUnitArmored       = Spring.GetUnitStates
+local spGetUnitRulesParam    = Spring.GetUnitStates
+local spGetUnitHealth        = Spring.GetUnitStates
+local spGetUnitStates        = Spring.GetUnitStates
+local spGetUnitDefID         = Spring.GetUnitDefID
+local spGetAllUnits          = Spring.GetAllUnits
+local spIsUnitAllied         = Spring.IsUnitAllied
+local spGetSpectatingState   = Spring.GetSpectatingState
 
 local min   = math.min
 local floor = math.floor
@@ -103,15 +104,15 @@ local lastArmored = {}
 local lastArmored = {}
 
 function SetUnitStateIcons(unitID)
-	if not (IsUnitAllied(unitID)or(GetSpectatingState())) then
+	if not (spIsUnitAllied(unitID)or(spGetSpectatingState())) then
 		return
 	end
 	
-	local states = Spring.GetUnitStates(unitID)
+	local states = spGetUnitStates(unitID)
 	
 	if not states then return end
 	
-	local ud = Spring.GetUnitDefID(unitID)
+	local ud = spGetUnitDefID(unitID)
 	if ud then
 		ud = UnitDefs[ud]
 	end
@@ -136,7 +137,7 @@ function SetUnitStateIcons(unitID)
 	end
 	
 	if options.showarmorstateonshift.value then
-		local armored, amount = Spring.GetUnitArmored(unitID)
+		local armored, amount = spGetUnitArmored(unitID)
 		armored = armored and amount and amount ~= 1
 		if not lastArmored[unitID] and armored then
 			lastArmored[unitID] = true
@@ -148,9 +149,9 @@ function SetUnitStateIcons(unitID)
 	end
 	
 	if options.showpriorityonshift.value then
-		local state = Spring.GetUnitRulesParam(unitID, "buildpriority")
+		local state = spGetUnitRulesParam(unitID, "buildpriority")
 		if (not ud) or not (ud.canAssist and ud.buildSpeed ~= 0) then
-			local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
+			local _,_,_,_,buildProgress = spGetUnitHealth(unitID)
 			if buildProgress == 1 then
 				state = 1
 			end
@@ -169,7 +170,7 @@ function SetUnitStateIcons(unitID)
 	end
 	
 	if options.showmiscpriorityonshift.value then
-		local state = Spring.GetUnitRulesParam(unitID, "miscpriority")
+		local state = spGetUnitRulesParam(unitID, "miscpriority")
 		
 		if not prevMiscPriority[unitID] or prevMiscPriority[unitID] ~= state then
 			if state == 1 then
@@ -186,8 +187,13 @@ function SetUnitStateIcons(unitID)
 end
 
 local function UpdateAllUnits()
-	if hide then return end
-	for _,unitID in pairs( GetAllUnits() ) do
+	if hide then 
+		return 
+	end
+	local unitID
+	local units = spGetAllUnits()
+	for i = 1, #units do
+		unitID = units[i]
 		SetUnitStateIcons(unitID)
 	end
 end
