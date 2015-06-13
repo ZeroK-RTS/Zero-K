@@ -38,7 +38,7 @@ local targetTable, captureWeaponDefs = include("LuaRules/Configs/target_priority
 
 local paralyzeOnMaxHealth = ((VFS.Include("gamedata/modrules.lua") or {}).paralyze or {}).paralyzeOnMaxHealth or true
 
-local empDeclineRate = (32/30/40 and reverseCompat) or (30/30/40) --taken from engine side
+--local empDeclineRate = (reverseCompat and 32/1200) or (30/1200) --taken from engine side
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
 
 -- Low return number = more worthwhile target

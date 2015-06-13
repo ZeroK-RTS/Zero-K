@@ -175,9 +175,6 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	local incData = incomingDamage[targetID]
 	local targetFrame=gameFrame+timeout
 	
-	local sumDamage=0
-	local sumDisarmDamage=0
-	
 	local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
 	local adjHealth = spGetUnitHealth(targetID)/armor
 	
