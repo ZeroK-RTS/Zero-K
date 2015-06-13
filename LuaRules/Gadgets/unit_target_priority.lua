@@ -139,10 +139,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			local empHP = ((not paralyzeOnMaxHealth) and hp) or maxHP
 			local paralyzeAdd=paralyze/empHP
 			
-			local inbuiltAdd=1-build
+			local buildAdd=1-build
 			--slightly deprioritize disarmed, paralyzed and units under construction
-			--Spring.Echo("disarmAdd="..disarmAdd.."  paralyzeAdd=="..paralyzeAdd.."  inbuiltAdd=="..inbuiltAdd)
-			hpAdd=hpAdd+(disarmAdd+paralyzeAdd+inbuiltAdd)/3*0.05 --0 to 0.05 (no guarantee due to disarm and paralyze overflows)			
+			hpAdd=hpAdd+(disarmAdd+paralyzeAdd+buildAdd)/3*0.05 --0 to 0.05 (no guarantee due to disarm and paralyze overflows)
 		end
 		
 		remHealth[targetID] = hpAdd
