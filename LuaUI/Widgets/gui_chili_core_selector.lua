@@ -709,9 +709,15 @@ local function StripNanos()
 end
 ]]--
 
+-- this prevents SelectComm from firing off multiple times per key press.
+local alreadyFired = false
+function widget:KeyPress() alreadyFired = false end
+
 -- comm selection functionality
 local commIndex = 1
 local function SelectComm()
+	if alreadyFired then return end
+	alreadyFired = true
 	if #comms <= 0 then return end	-- no comms, don't bother
 	if commIndex > #comms then commIndex = #comms end
 	local unitID
