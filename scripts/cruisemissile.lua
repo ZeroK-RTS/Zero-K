@@ -4,8 +4,6 @@ local base = piece 'base'
 
 function script.AimWeapon1(heading, pitch) return true end
 
--- keep the missile alive for a bit after launch
--- otherwise the silo may try to build right over it right away, resulting in an "accident"
 local function RemoveMissile()
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
@@ -14,22 +12,17 @@ local function RemoveMissile()
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)	
 	Spring.SetUnitBlocking(unitID,false,false,false)
-	Sleep(1000)
-	Spring.DestroyUnit(unitID, false, true)
-	--[[
-	local x,y,z = Spring.GetUnitPosition(unitID)
-	Spring.MoveCtrl.SetPosition(unitID, x, -150, z)
-	Spring.MoveCtrl.SetNoBlocking(unitID, true)
-	Hide(base)
+	Sleep(1)
+
+	-- keep alive for stats
+	Spring.SetUnitPosition(unitID,-9001, -9001)
 	GG.DestroyMissile(unitID, unitDefID)
-	Sleep(15000)	-- hang around long enough for missile hit to count towards stats
-	Spring.DestroyUnit(unitID, false, true)	--"reclaim the missile"
-	]]--
+	Sleep(15000)
+	Spring.DestroyUnit(unitID, false, true)
 end
 
 function script.Shot()
 	StartThread(RemoveMissile)
-	--Spring.DestroyUnit(unitID, false, true)
 end
 
 function script.AimFromWeapon() 
