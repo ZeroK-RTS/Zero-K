@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphriot]],
   name                   = [[Scallop]],
-  description            = [[Amphibious Riot Bot (Land), Skirmish Bot (Sea)]],
+  description            = [[Amphibious Riot Bot]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
@@ -21,7 +21,7 @@ unitDef = {
     amph_regen = 10,
     amph_submerged_at = 40,
     description_pl = [[Amfibijny bot wsparcia]],
-    helptext       = [[A flexible unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land. It acts as a stealthy underwater skirmisher, capable of killing outnumbered enemies with low attrition.]],
+    helptext       = [[A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land.]],
     helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
   },
 
