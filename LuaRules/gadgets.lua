@@ -153,6 +153,7 @@ local callInLists = {
 	"UnitCmdDone",
 	"UnitPreDamaged",
 	"UnitDamaged",
+	"UnitStunned",
 	"UnitTaken",
 	"UnitGiven",
 	"UnitEnteredRadar",
@@ -1373,6 +1374,12 @@ function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
   return
 end
 
+function gadgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
+  for _,g in ipairs(self.UnitStunnedList) do
+    g:UnitStunned(unitID, unitDefID, unitTeam, stunned)
+  end
+  return
+end
 
 function gadgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
                                        factID, factDefID, userOrders)
