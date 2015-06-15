@@ -12,7 +12,7 @@ local function RemoveMissile()
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)	
 	Spring.SetUnitBlocking(unitID,false,false,false)
-	Sleep(1)
+	Sleep(2000)
 
 	-- keep alive for stats
 	Spring.SetUnitPosition(unitID,-9001, -9001)
