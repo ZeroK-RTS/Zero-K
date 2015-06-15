@@ -103,6 +103,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 			local env = Spring.UnitScript.GetScriptEnv(parent)
 			if env then Spring.UnitScript.CallAsUnit(parent, env.RemoveMissile, unitID)	end		 --ask silo to remove missile from its inventory
 		end
+		missileParents[unitID] = nil
 	end
 end
 
