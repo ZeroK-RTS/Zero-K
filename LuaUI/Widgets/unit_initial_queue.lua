@@ -408,12 +408,12 @@ function widget:RecvLuaMsg(msg, playerID)
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
 		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
-		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then 
-			return --invalid unitDefID and message type
-		end
-		if typeArg == 5 then -- queue cancelled
+		if typeArg == 5 then -- Cancel queue
 			othersBuildQueue[teamID] = {}
 			return
+		end
+		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then 
+			return --invalid unitDefID and message type
 		end
 		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
 		if not (x and y and z and face) then
