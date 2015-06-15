@@ -409,6 +409,7 @@ function widget:RecvLuaMsg(msg, playerID)
 		local msgArray = explode('|',msg)
 		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
 		if typeArg == 5 then -- Cancel queue
+			local teamID = select(4,Spring.GetPlayerInfo(playerID))
 			othersBuildQueue[teamID] = {}
 			return
 		end
