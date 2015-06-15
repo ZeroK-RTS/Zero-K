@@ -16,6 +16,10 @@ local function RemoveMissile()
 
 	-- keep alive for stats
 	Spring.SetUnitPosition(unitID,-9001, -9001)
+	-- Note that missiles intentionally remove their command 2s after firing 
+	-- instead of immediately. This is to give some command feedback (that the 
+	-- command actually was placed) and to show allies where the launch occurred.
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
 	GG.DestroyMissile(unitID, unitDefID)
 	Sleep(15000)
 	Spring.DestroyUnit(unitID, false, true)
