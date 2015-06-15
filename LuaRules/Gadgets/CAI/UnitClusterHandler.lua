@@ -1,3 +1,24 @@
+--[[ Determines the cluster structure of a list of units.
+
+ 
+== CreateUnitList(losCheckAllyTeamID, clusterRadius)
+ losCheckAllyTeamID is for the underlying UnitList.
+ 
+ clusterRadius is how close two units need to be to be within the
+ same cluster. Close units may be in different clusters depending
+ on how the boundaries work out.
+ 
+=== Functions === 
+ All UnitList functions are accessible along with two more.
+
+ 
+ == UpdateUnitPositions()
+ Updates the clusters based on the current unit positions.
+ 
+ == ClusterIterator() -> averageX, averageZ, totalCost, unitCount
+ Iterates over the clusters of units.
+--]]
+
 local UnitListHandler = VFS.Include("LuaRules/Gadgets/CAI/UnitListHandler.lua")
 
 local UnitClusterHandler = {}

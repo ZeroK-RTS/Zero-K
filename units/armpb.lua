@@ -34,8 +34,8 @@ unitDef = {
 
   damageModifier                = 0.25,
   explodeAs                     = [[SMALL_BUILDINGEX]],
-  footprintX                    = 2,
-  footprintZ                    = 2,
+  footprintX                    = 3,
+  footprintZ                    = 3,
   iconType                      = [[defense]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -62,7 +62,6 @@ unitDef = {
   sightDistance                 = 660,
   smoothAnim                    = true,
   useBuildingGroundDecal        = true,
-  yardmap                       = [[oooo]],
 
   weapons                       = {
 

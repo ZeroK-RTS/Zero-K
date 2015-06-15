@@ -906,14 +906,15 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
+	local idle_autoheal = ud.customParams.idle_regen and tonumber(ud.customParams.idle_regen) or (ud.idleAutoHeal * 2)
+	if (ud.idleTime < 1800) or (idle_autoheal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
-		if ud.idleTime < 1800 or ud.idleAutoHeal > 5 then
+		if ud.idleTime < 1800 or (idle_autoheal > 5) then
 			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(ud.idleAutoHeal * 2) .. ' HP/s'
+			cells[#cells+1] = numformat(idle_autoheal) .. ' HP/s'
 			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's' -- .. ((ud.wantedHeight > 0) and ' landed' or '')
+			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
 		end
 		if ud.autoHeal > 0 then
 			cells[#cells+1] = ' - Combat regen: '

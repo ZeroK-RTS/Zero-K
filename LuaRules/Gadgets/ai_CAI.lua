@@ -3849,8 +3849,22 @@ end
 
 local function setAllyteamStartLocations(allyTeam)
 	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
+		
 		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
 		
+		local startboxString = Spring.GetModOptions().startboxes
+		if startboxString then -- new boxes
+			local startboxConfig = loadstring(startboxString)()
+			local teamList = Spring.GetTeamList(allyTeam)
+			if (not teamList) or (#teamList == 0) then return end
+			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+			local box = boxID and startboxConfig[boxID] or {0,0,1,1}
+			x1 = box[1] * Game.mapSizeX
+			z1 = box[2] * Game.mapSizeZ
+			x2 = box[3] * Game.mapSizeX
+			z2 = box[4] * Game.mapSizeZ
+		end
+
 		local at = allyTeamData[allyTeam]
 		local listOfAis = at.listOfAis
 		
@@ -4141,20 +4155,7 @@ else
 --------------------------------------------------------------------------------
 -- UNSYNCED
 --------------------------------------------------------------------------------
--- need this because SYNCED.tables are merely proxies, not real tables
-local function MakeRealTable(proxy)
-	if not proxy then return end
-	local proxyLocal = proxy
-	local ret = {}
-	for i,v in spairs(proxyLocal) do
-		if type(v) == "table" then
-			ret[i] = MakeRealTable(v)
-		else
-			ret[i] = v
-		end
-	end
-	return ret
-end
+local MakeRealTable = Spring.Utilities.MakeRealTable
 
 local heatmapPosition
 

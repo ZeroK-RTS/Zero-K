@@ -77,6 +77,12 @@ unitDef = {
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER]],
     },
 
+    {
+      def                = [[FAKE_DEPTHCHARGE]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
+    },
+
   },
 
   weaponDefs             = {
@@ -125,6 +131,50 @@ unitDef = {
       weaponAcceleration      = 15,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 280,
+    },
+	
+	FAKE_DEPTHCHARGE = {
+      name                    = [[Fake Depth Charge]],
+      areaOfEffect            = 290,
+      avoidFriendly           = false,
+	  bounceSlip              = 0.4,
+	  bounceRebound           = 0.4,
+      canAttackGround		  = false,	-- it cannot really, this will stop people from being confused.
+      collideFriendly         = false,
+      craterBoost             = 1,
+      craterMult              = 2,
+
+      damage                  = {
+        default = 1250.5,
+      },
+
+      edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:TORPEDOHITHUGE]],
+      fixedLauncher           = true,
+      flightTime              = 2,
+	  groundBounce            = true,
+	  heightMod               = 0,
+	  impulseBoost            = 0.4,
+      impulseFactor           = 1,
+      interceptedByShieldType = 1,
+      model                   = [[depthcharge_big.s3o]],
+	  myGravity               = 0.2,
+      noSelfDamage            = false,
+      numbounce               = 4,
+      predictBoost            = 0,
+      range                   = 270,
+      reloadtime              = 8,
+      soundHitDry             = [[explosion/mini_nuke]],
+      soundHitWet             = [[explosion/wet/ex_underwater]],
+      soundStart              = [[weapon/torp_land]],
+      soundStartVolume        = 8,
+      tolerance               = 1000000,
+      tracks                  = false,
+      turnRate                = 0,
+      turret                  = true,
+      waterWeapon             = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 5,
     },
 	
 	FAKEGUN = {

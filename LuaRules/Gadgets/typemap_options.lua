@@ -40,7 +40,7 @@ function gadget:Initialize()
 	end
 	--]]
 	
-	setting = modOptions.typemapsetting
+	setting = modOptions.typemapsetting or "auto"
 	
 	if spGetGameFrame() > 0 then
 		gadgetHandler:RemoveGadget()

@@ -10,7 +10,7 @@ function gadget:GetInfo()
   return {
     name      = "Overkill Prevention",
     desc      = "Prevents some units from firing at units which are going to be killed by incoming missiles.",
-    author    = "Google Frog",
+    author    = "Google Frog, ivand",
     date      = "14 Jan 2015",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
@@ -64,6 +64,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["subraider"].id] = true,
 	[UnitDefNames["corcrash"].id] = true,
 	[UnitDefNames["cormist"].id] = true,
+	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -96,6 +97,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 	if not units[unitID] then
 		return false
 	end
+
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		if troubleVsFast then
 			local unitDefID = Spring.GetUnitDefID(targetID)
@@ -154,9 +156,10 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		end
 		
 		local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-		local health = spGetUnitHealth(targetID)/armor
-		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= health/armor)
-		incomingDamage[targetID].health = health/armor
+		local adjHealth = spGetUnitHealth(targetID)/armor
+			
+		incomingDamage[targetID].doomed = (incomingDamage[targetID].damage >= adjHealth)
+		incomingDamage[targetID].health = adjHealth
 	end
 	
 	return false
@@ -201,9 +204,9 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID ~= CMD_PREVENT_OVERKILL) then
+	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
 		return true  -- command was not used
-	end
+	end	
 	PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
 	return false  -- command was used
 end

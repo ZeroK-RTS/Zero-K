@@ -919,6 +919,7 @@ end
 --  Concept borrowed from Dave Rodger (trepan) MetalMakers widget
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if not Spring.IsUnitAllied(unitID) then return end
 	UnitGoByeBye(unitID,unitDefID)
 end
 

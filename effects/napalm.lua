@@ -240,6 +240,31 @@ local cegs = {
       },
     },
   },
+  ["napalm_firewalker_small"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 64,
+      ttl                = 480,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 8,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i40]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_450]],
+        pos                = [[-20 r40, 30, -20 r40]],
+      },
+    },
+  },
 
   ["napalm_hellfire"] = {
     usedefaultexplosions = false,

@@ -33,11 +33,11 @@ end
 function RestoreAfterDelay ()
 	SetSignalMask (SIG_AIM)
 	Sleep (5000)
-	
+
 	while (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) do
 		Sleep(100)
 	end
-	
+
 	Turn (missile, x_axis, 0, math.rad(30))
 	WaitForTurn (missile, x_axis)
 
@@ -48,15 +48,15 @@ end
 function script.FireWeapon()
 	respawning_rocket = true
 	Signal (SIG_AIM)
-	
+
 	Hide (missile)
 	Turn (missile, x_axis, 0)
-	
+
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
 	Turn (door1, z_axis, 0, math.rad(80)*slowMult)
 	Turn (door2, z_axis, 0, math.rad(80)*slowMult)
 	WaitForTurn (door1, z_axis)
-	
+
 	respawning_rocket = false
 	Show(missile)
 end
@@ -72,7 +72,8 @@ function script.setSFXoccupy(num)
 	end
 end
 
-function script.HitByWeapon (x, z, weaponDefID, damage)  
+function script.HitByWeapon (x, z, weaponDefID, damage)
+	if weaponDefID < 0 then return damage end
 	if not submerged then
 		local damageTable = WeaponDefs[weaponDefID].damages
 		return damage * (damageTable[elseArmorClass] / damageTable[subArmorClass])

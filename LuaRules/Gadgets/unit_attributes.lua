@@ -84,10 +84,6 @@ local unitShieldDisabled = {}
 
 local unitReloadPaused = {}
 
-if not GG.att_reload then
-	GG.att_reload = {}
-end
-
 local function updateBuildSpeed(unitID, ud, speedFactor)	
 
     if ud.buildSpeed == 0 then
@@ -350,7 +346,6 @@ function UpdateUnitAttributes(unitID, frame)
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, ALLY_ACCESS)
 		
-		GG.att_reload[unitID] = reloadMult
 		unitSlowed[unitID] = moveMult < 1
 		if reloadMult ~= currentReload[unitID] then
 			updateReloadSpeed(unitID, ud, reloadMult, frame)
@@ -457,3 +452,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 end
 
+-- All information required for load is stored in unitRulesParams.
+function gadget:Load(zip)
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		UpdateUnitAttributes(unitID)
+	end
+end

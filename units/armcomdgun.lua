@@ -31,7 +31,7 @@ unitDef = {
 	description_de = [[Desintegrator Wanderer (Anti-Strider)]],	
 	description_pl = [[Robot dezintegracyjny]],	
     helptext       = [[The Ultimatum packs only one weapon: a disintegrator gun that can vaporize a heavy tank in one blast. It is best used for sneaking up to enemy heavy striders and inflicting serious damage or destruction with a few shots. Defense against it is achieved by screening your heavyweights with lighter units.]],
-	helptext_de    = [[Ultimatum beinhaltet nur eine Waffe: ein Desintegrator, welche gegnerische Panzer mit einem Schlag vaporisieren kann. Am meisten wird dafür er gebraucht, sich an gegenerische, harte Streicher heranzuschleichen und diese mit einigen Schüssen zu erledigen. Verteidigung gegen sie wird erreicht, indem man seine Schwergewicht mit leichten Einheiten beschützt.]],
+	helptext_de    = [[Ultimatum beinhaltet nur eine Waffe: ein Desintegrator, welche gegnerische Panzer mit einem Schlag vaporisieren kann. Am meisten wird dafÃ¼r er gebraucht, sich an gegenerische, harte Streicher heranzuschleichen und diese mit einigen SchÃ¼ssen zu erledigen. Verteidigung gegen sie wird erreicht, indem man seine Schwergewicht mit leichten Einheiten beschÃ¼tzt.]],
 	helptext_pl    = [[Ultimatum posiada dezintegrator, ktory jest w stanie zniszczyc ciezki czolg jednym strzalem. Maskowanie pozwala mu podejsc pod wrogie roboty i szybko sie ich pozbyc; lekkie jednostki bardzo skutecznie mu w tym przeszkadzaja.]],
 	modelradius    = [[21]],
   },
@@ -83,6 +83,8 @@ unitDef = {
 
     {
       def = [[DISINTEGRATOR]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SUB SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },

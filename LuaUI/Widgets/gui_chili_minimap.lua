@@ -255,7 +255,7 @@ options = {
 		OnChange = function()
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.5
+			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			updateRadarColors()
@@ -283,7 +283,7 @@ options = {
 		OnChange = function()
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.5
+			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
 			updateRadarColors()
@@ -297,7 +297,7 @@ options = {
 		OnChange = function()
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.5
+			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
 			updateRadarColors()

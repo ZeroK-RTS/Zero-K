@@ -19,7 +19,7 @@ talk.wav
 sparks.wav
 
 Xonotic:
-entire ctf & announcer folder contents
+entire announcer folder contents
 
 Kmar:
 entire announcer/kmar folder contents

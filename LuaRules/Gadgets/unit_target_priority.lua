@@ -89,7 +89,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 	
 	if not remStunnedOrOverkill[targetID] then
-		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
 		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
 	end

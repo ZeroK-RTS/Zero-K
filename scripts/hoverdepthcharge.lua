@@ -1,5 +1,7 @@
 include "constants.lua"
 
+local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+
 local base, shield, front, bottom, back = piece('base', 'shield', 'front', 'bottom', 'back')
 local rim1, door1, rim2, door2 = piece('rim1', 'door1', 'rim2', 'door2')
 local turretbase, turret, gun, pads, flare1, flare2 = piece('turretbase', 'turret', 'gun', 'pads', 'flare1', 'flare2')
@@ -98,7 +100,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num)
-	return true
+	return num ~= 3
 end
 
 local function ShotThread()
@@ -121,7 +123,7 @@ local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
 local RELOAD = math.ceil( depthchargeWeaponDef.reload * Game.gameSpeed )
 
 function ShootDepthcharge()
-	EmitSfx(pads, FIRE_W1)
+	EmitSfx(pads, FIRE_W3)
 	StartThread(ShotThread)
 end
 
@@ -132,11 +134,11 @@ local function FakeWeaponShoot()
 		local h = Spring.GetGroundHeight(x,z)
 		if h > -10 then
 			local gameFrame   = spGetGameFrame()
-			local reloadMult  = GG.att_reload[unitID] or 1.0
+			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
 			
-			EmitSfx(pads, FIRE_W1)
+			EmitSfx(pads, FIRE_W3)
 			StartThread(ShotThread)
 			Move(gun, y_axis, -2)
 			Move(gun, y_axis, 2, 2)

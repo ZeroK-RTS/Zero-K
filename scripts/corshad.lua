@@ -77,7 +77,7 @@ local function BehaviourChangeThread(behaviour)
 	while not flying do
 		Sleep(600)
 		state = spGetUnitMoveTypeData(unitID).aircraftState
-		notFlying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
+		flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	end
 	
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
@@ -91,7 +91,7 @@ local function SpeedControl()
 	SetSignalMask(SIG_SPEED_CONTROL)
 	while true do
 		local x,y,z = spGetUnitPosition(unitID)
-		local terrain = spGetGroundHeight(x,z)
+		local terrain = max(spGetGroundHeight(x,z), 0) -- not amphibious, treat water as ground
 		local speedMult = minSpeedMult + (1-minSpeedMult)*max(0, min(1, (y - terrain-50)/(fullHeight-60)))
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", speedMult)
 		GG.UpdateUnitAttributes(unitID)
