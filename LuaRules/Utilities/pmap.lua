@@ -138,6 +138,14 @@ function pmap:GetIdxs()
         return self.kvStart, self.kvEnd
 end
 
+function pmap:First()
+	return self.kv[self.kvStart]
+end
+
+function pmap:Last()
+	return self.kv[self.kvEnd]
+end
+
 --- /Iteration ---
 
 --------------
