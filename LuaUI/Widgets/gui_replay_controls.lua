@@ -61,6 +61,9 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function(self) 
+			if (not Spring.IsReplay()) then
+				return
+			end
 			local replayLen = Spring.GetReplayLength and Spring.GetReplayLength()
 			if replayLen == 0 then --replay info broken
 				replayLen = false

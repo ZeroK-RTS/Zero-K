@@ -5,7 +5,7 @@
 local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
 local ScoutHeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHeatmapHandler.lua")
 
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam(unitID)
+local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
 
 local AllyTeamInfoHandler = {}

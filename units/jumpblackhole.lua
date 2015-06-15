@@ -15,12 +15,17 @@ unitDef = {
   canPatrol             = true,
   canstop               = [[1]],
   category              = [[LAND]],
+  collisionVolumeOffsets = [[0 0 0]],
+  collisionVolumeScales  = [[30 48 30]],
+  collisionVolumeTest    = 1,
+  collisionVolumeType    = [[cylY]],
   corpse                = [[DEAD]],
 
   customParams          = {
     description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
     helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
+    midposoffset   = [[0 10 0]],
   },
 
   explodeAs             = [[BIG_UNITEX]],

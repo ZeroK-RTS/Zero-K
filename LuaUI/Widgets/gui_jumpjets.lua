@@ -48,6 +48,11 @@ local spGetUnitPosition        = Spring.GetUnitPosition
 local spTraceScreenRay         = Spring.TraceScreenRay
 local spTestMoveOrder          = Spring.TestMoveOrder
 local spTestBuildOrder         = Spring.TestBuildOrder
+local spGetGroundHeight        = Spring.GetGroundHeight
+local spGetGroundNormal        = Spring.GetGroundNormal
+local spIsPosInLos             = Spring.IsPosInLos
+
+local allyTeamID = Spring.GetMyAllyTeamID()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -57,11 +62,23 @@ local pairs = pairs
 
 
 local glVertex = glVertex
-local green    = {0.5,   1, 0.5,   1}
-local yellow   = {  1,   1, 0.5,   1}
-local orange   = {	1, 0.5,   0,   1}
-local pink     = {  1, 0.5, 0.5,   1}
-local red      = {  1,   0,   0,   1}
+local green      = {0.5,   1, 0.5,   1}
+local greenred   = {  0.8, 0.5, 0.5,   1}
+local yellow     = {  1,   1, 0.5,   1}
+local orange     = { 0.9, 0.5,   0,   1}
+local red        = {  1,   0,   0,   1}
+
+-- Types of passibility.
+local V_PASS = 0
+local V_STRUCTURE = 1
+local V_FOG = 2
+
+-- First in range, then out of range
+local viabilityColours = {
+	[V_PASS] = {green, greenred},
+	[V_STRUCTURE] = {yellow, orange},
+	[V_FOG] = {greenred, greenred},
+}
 
 local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
@@ -71,6 +88,35 @@ local function spTestMoveOrderX(unitDefID, x, y, z)
 	else
 		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)		
 	end
+end
+
+local function GetJumpViabilityLevel(unitDefID, x, y, z)
+	if spTestMoveOrderX(unitDefID, x, y, z) then
+		return V_PASS
+	else
+		local height = spGetGroundHeight(x, z)
+		if (not UnitDefs[unitDefID]) or height < -UnitDefs[unitDefID].maxWaterDepth then
+			-- Water too deep for the unit to walk on
+			return false
+		end
+		
+		local normal = select(2, spGetGroundNormal(x, z))
+		if normal < 0.6 then
+			 -- Ground is too steep for bots to walk on.
+			return false
+		end
+		
+		-- Ground is fine, must contain a blocking structure or
+		-- be out of LOS. Spring.TestMoveOrder returns false in 
+		-- widgets for all out of LOS locations.
+		
+		if spIsPosInLos(x, y, z, allyTeamID) then
+			return V_STRUCTURE
+		else
+			return V_FOG
+		end
+	end
+
 end
 
 local function ListToSet(t)
@@ -216,6 +262,13 @@ local function DrawQueue(unitID)
 end
 --]]
 
+local function GetArcColor(viability, inRange)
+	if viability then
+		return inRange and viabilityColours[viability][1] or viabilityColours[viability][2]
+	end
+	return red
+end
+
 local function DrawMouseArc(unitID, shift, groundPos, quality)
 	local unitDefID = spGetUnitDefID(unitID)
 	if (not groundPos or not jumpDefs[unitDefID]) then
@@ -231,16 +284,14 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		passIf = (not queueCount or queueCount == 0 or not shift)
 	end
 
-	--local canJumpThere = (spTestBuildOrder(unitDefID, groundPos[1], groundPos[2], groundPos[3], 1) ~= 0)
-	--local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3])
-	local canJumpThere = spTestMoveOrderX(unitDefID, groundPos[1], groundPos[2], groundPos[3], 0, 0, 0, true, true, true)
+	local viability = GetJumpViabilityLevel(unitDefID, groundPos[1], groundPos[2], groundPos[3])
 	
 	local range = jumpDefs[unitDefID].range
 	if passIf then
 		local _,_,_,ux,uy,uz = spGetUnitPosition(unitID,true)
 		local unitPos = {ux,uy,uz}
 		local dist = GetDist2(unitPos, groundPos)
-		local color = canJumpThere and (range > dist and green or pink) or red
+		local color = GetArcColor(viability, range > dist)
 		DrawArc(unitID, unitPos, groundPos, color, nil, range, false, quality)
 	elseif (shift) then
 		local queue = spGetCommandQueue(unitID, -1)
@@ -251,9 +302,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		if (curve[queue[i].id]) or (queue[i].id < 0) or (#queue[i].params == 3) or (#queue[i].params == 4) then
 			local isEstimate = not curve[queue[i].id]
 			local dist  = GetDist2(queue[i].params, groundPos)
-			local cGood = isEstimate and yellow or green
-			local cBad = isEstimate and orange or pink
-			local color = canJumpThere and ((range > dist and cGood) or cBad) or red
+			local color = GetArcColor(viability, range > dist)
 			DrawArc(unitID, queue[i].params, groundPos, color, nil, range, isEstimate, quality)
 		end
 	end

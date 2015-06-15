@@ -138,6 +138,7 @@ options = {
 		name = 'Select Commander',
 		action = 'selectcomm',
 		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
 	},
 	
 	hideWindow = { type = 'button',
