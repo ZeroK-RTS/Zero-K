@@ -63,6 +63,8 @@ local scrW, scrH = Spring.GetViewGeometry()
 
 local mCost, eCost, bCost, buildTime = 0, 0, 0, 0
 
+local CMD_STOP = CMD.STOP
+
 ------------------------------------------------------------
 -- Local functions
 ------------------------------------------------------------
@@ -406,8 +408,12 @@ function widget:RecvLuaMsg(msg, playerID)
 		msg = msg:sub(4)
 		local msgArray = explode('|',msg)
 		local typeArg, unitDefID = tonumber(msgArray[1]), tonumber(msgArray[2])
-		if not UnitDefs[unitDefID] or typeArg>4 or typeArg<1 then 
+		if not UnitDefs[unitDefID] or typeArg > 5 or typeArg < 1 then 
 			return --invalid unitDefID and message type
+		end
+		if typeArg == 5 then -- queue cancelled
+			othersBuildQueue[teamID] = {}
+			return
 		end
 		local x,y,z,face = tonumber(msgArray[3]),tonumber(msgArray[4]),tonumber(msgArray[5]),tonumber(msgArray[6])
 		if not (x and y and z and face) then
@@ -485,6 +491,7 @@ function widget:GameFrame(n)
 		end
 		widgetHandler:RemoveWidget(self)
 	end
+	
 end
 
 ------------------------------------------------------------
@@ -576,6 +583,12 @@ function widget:CommandsChanged()
 			name = unitName,
 		})
 	end
+	table.insert(widgetHandler.customCommands, {
+		id      = CMD_STOP,
+		type    = CMDTYPE.ICON,
+		tooltip = "Stop",
+		params  = {}, 
+	})
 end
 
 local function GetClosestMetalSpot(x, z) --is used by single mex placement, not used by areamex
@@ -595,9 +608,26 @@ local function GetClosestMetalSpot(x, z) --is used by single mex placement, not 
 	return bestSpot
 end
 
+local function CancelQueue()
+	buildQueue = {}
+	Spring.SendLuaUIMsg("IQ|5",'a')
+	Spring.SendLuaUIMsg("IQ|5",'s')
+	mCost, eCost, bCost = GetQueueCosts()
+	buildTime = bCost / sDef.buildSpeed
+end
+
+
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	local areSpec = Spring.GetSpectatingState()
-	if areSpec or cmdID > 0 or not(cmdParams[1] and cmdParams[2] and cmdParams[3]) then --can't handle other command.
+	if areSpec then
+		return false
+	end
+	if cmdID == CMD_STOP then 
+		-- This only handles pressing the stop button in integral menu.
+		CancelQueue()
+		return true
+	end
+	if cmdID >= 0 or not(cmdParams[1] and cmdParams[2] and cmdParams[3]) then --can't handle other command.
 		return false
 	end
 	SetSelDefID(-1*cmdID)
@@ -646,6 +676,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	end
 	return false
 end
+
 ------------------------------------------------------------
 -- Misc
 ------------------------------------------------------------
@@ -675,5 +706,9 @@ function widget:TextCommand(cmd)
 			SetSelDefID(bDefID)
 			return true
 		end
+	end
+	if cmd == "stop" then
+		-- This only handles the stop hotkey
+		CancelQueue()
 	end
 end
