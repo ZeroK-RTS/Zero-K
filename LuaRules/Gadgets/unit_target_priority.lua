@@ -91,7 +91,8 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if not remStunnedOrOverkill[targetID] then
 		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
-		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
+		local disarmExpected = GG.OverkillPrevention_IsDisarmExpected(targetID)
+		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill or disarmExpected) and 1) or 0
 	end
 
 	if remStunnedOrOverkill[targetID] == 1 then

@@ -96,13 +96,31 @@ local preventOverkillCmdDesc = {
 local incomingDamage = {}
 
 function GG.OverkillPrevention_IsDoomed(targetID)
-	return (incomingDamage[targetID] or {}).doomed or false
+	if incomingDamage[targetID] then
+		local gameFrame = spGetGameFrame()
+		local lastFrame=incomingDamage[targetID].lastFrame or 0
+		return (gameFrame<=lastFrame and incomingDamage[targetID].blocked)
+	end
+	return false
 end
 
-local function Dist3D2(x0,x1,y0,y1,z0,z1)
-	return (x1-x0)^2+(y1-y0)^2+(z1-z0)^2
+function GG.OverkillPrevention_IsDisarmExpected(targetID)
+	if incomingDamage[targetID] then
+		local gameFrame = spGetGameFrame()
+		local lastFrame=incomingDamage[targetID].lastFrame or 0
+		return (gameFrame<=lastFrame and incomingDamage[targetID].blocked)
+	end
+	return false
 end
 
+--[[
+	unitID, targetID - unit IDs. Self explainatory
+	FullDamage - regular damage of salvo
+	SingleDamage - regular damage of one projectile from salvo
+	DisarmDamage - disarming damage
+	DisarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
+	timeout -- percieved projectile travel time from unitID to targetID in frames
+]]--
 local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
 	local incData = incomingDamage[targetID]
 	local targetFrame=gameFrame+timeout
@@ -128,25 +146,28 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 				
 				local disarmExtra=math.floor(dd/adjHealth*DECAY_FRAMES)				
 				adjHealth=adjHealth-fd
+				
 				disarmFrame=disarmFrame+disarmExtra
-
-				if disarmFrame>frame+DECAY_FRAMES+DisarmTimeout then disarmFrame=frame+DECAY_FRAMES+DisarmTimeout end			
+				if disarmFrame>frame+DECAY_FRAMES+DisarmTimeout then disarmFrame=frame+DECAY_FRAMES+DisarmTimeout end							
 			end
 		end
-		local doomed=(adjHealth<0) and (FullDamage>0)										--for regular projectile
-		local disarmed=(disarmFrame-gameFrame-timeout>=DECAY_FRAMES) and (DisarmDamage>0)	--for disarming projectile
-		
-		block=doomed or disarmed --assume function is not called with both regular and disarming damage types
-		
-		incomingDamage[targetID].doomed=doomed
-		incomingDamage[targetID].disarmed=disarmed
+
 	else --new target
 		incomingDamage[targetID]={ frames=pmap() }
-		incomingDamage[targetID].frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
 		incData = incomingDamage[targetID]
 	end
 	
-	if not block then	
+	local doomed=(adjHealth<0) and (FullDamage>0)										--for regular projectile
+	local disarmed=(disarmFrame-gameFrame-timeout>=DECAY_FRAMES) and (DisarmDamage>0)	--for disarming projectile
+	
+	incomingDamage[targetID].doomed=doomed
+	incomingDamage[targetID].disarmed=disarmed	
+	
+	block=doomed or disarmed --assume function is not called with both regular and disarming damage types	
+	
+	
+	if not block then
+		--Echo("^^^^SHOT^^^^")
 		local frameData=incData.frames:Get(targetFrame)
 		if frameData then --here we have a rare case when few different projectiles (from different attack units) are arriving to the target at the same frame. Their powers must be accumulated/harmonized
 			frameData.fd=frameData.fd+FullDamage
@@ -156,14 +177,23 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 			incData.frames:Upsert(targetFrame, frameData)
 		else --this case is much more common: such frame does not exist in incData.frames
 			incData.frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
-		end	
-	end
-	
-	if block then
+		end
+		incData.lastFrame=math.max(incData.lastFrame or 0, targetFrame)
+	else
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-		if unitDefID then
-			spSetUnitTarget(unitID, 0)
+		if unitDefID then		
+			local queue=Spring.GetUnitCommands(unitID, 2)
+			if #queue==1 then
+				local cmd=queue[1]
+				if (cmd.id==CMD.ATTACK) and (cmd.options.internal) and (#cmd.params==1 and cmd.params[1]==targetID) then
+					--Echo("Removing auto-attack command")
+					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+				end
+			else
+				spSetUnitTarget(unitID, 0)
+			end
+			
 			return true
 		end
 	end
