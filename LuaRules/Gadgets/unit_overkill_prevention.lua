@@ -99,7 +99,7 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
 		local lastFrame=incomingDamage[targetID].lastFrame or 0
-		return (gameFrame<=lastFrame and incomingDamage[targetID].blocked)
+		return (gameFrame<=lastFrame and incomingDamage[targetID].doomed)
 	end
 	return false
 end
@@ -108,7 +108,7 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
 		local lastFrame=incomingDamage[targetID].lastFrame or 0
-		return (gameFrame<=lastFrame and incomingDamage[targetID].blocked)
+		return (gameFrame<=lastFrame and incomingDamage[targetID].disarmed)
 	end
 	return false
 end
@@ -189,6 +189,7 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 				if (cmd.id==CMD.ATTACK) and (cmd.options.internal) and (#cmd.params==1 and cmd.params[1]==targetID) then
 					--Echo("Removing auto-attack command")
 					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
 			else
 				spSetUnitTarget(unitID, 0)
