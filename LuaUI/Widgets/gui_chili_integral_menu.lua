@@ -500,7 +500,7 @@ local function MakeButton(container, cmd, insertItem, index)
 				autosize=true; -- this (autosize=true) allow text to be truncated/cut off if button size is too small (prevent a wall-of-text on build icon if button is too small)
 				align="left";
 				valign="bottom";
-				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
+				caption = string.format("%d", UnitDefs[-cmd.id].metalCost);
 				fontSize = 11;
 				fontShadow = true;
 			}		

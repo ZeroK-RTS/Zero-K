@@ -1437,7 +1437,7 @@ local function UpdateMorphControl(morph_data)
 	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=cyan , autosize=false, width=45, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/clock.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/cost.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
 	
 	--if morph_prereq then
@@ -1863,7 +1863,7 @@ local function MakeToolTip_UD(tt_table)
 			tt_table.morph_data 
 				and { name= 'bp', directcontrol = 'buildpic_morph' }
 				or { name= 'bp', directcontrol = 'buildpic_ud' },
-			{ name = 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
+			{ name = 'cost', icon = 'LuaUI/images/cost.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
 			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName, fontSize=6 },
