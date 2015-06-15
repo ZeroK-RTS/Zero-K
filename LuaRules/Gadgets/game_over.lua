@@ -374,7 +374,9 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:TeamDied (teamID)
-	ProcessLastAlly()
+	if not gameover then
+		ProcessLastAlly()
+	end
 end
 
 function gadget:UnitFinished(u, ud, team)
