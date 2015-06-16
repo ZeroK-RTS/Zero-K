@@ -449,7 +449,9 @@ function widget:DrawWorldPreUnit()
 		gl.StencilTest(true)
 
 			DrawUnitShapes(visibleSelected, rgba)
-			DrawUnitShapes(visibleAllySelUnits, yellow)
+			if not Spring.IsGUIHidden() then 
+				DrawUnitShapes(visibleAllySelUnits, yellow)
+			end
 
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
