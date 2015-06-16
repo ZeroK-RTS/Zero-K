@@ -161,6 +161,10 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		allyInt[unitID].incomplete = false
 	elseif allyNuke[unitID] then
 		allyNuke[unitID].incomplete = false
+	elseif enemyInt[unitID] then
+		enemyInt[unitID].incomplete = false
+	elseif enemyNuke[unitID] then
+		enemyNuke[unitID].incomplete = false
 	end
 end
 
