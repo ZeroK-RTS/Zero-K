@@ -474,7 +474,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		return true
 	end
 	
-	if cmdID == CMD_JUMP then
+	if cmdID == CMD.INSERT and cmdParams[2] == CMD_JUMP then
+		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
+	end
+	
+	if cmdID == CMD_JUMP and cmdParams[3] then
 		if spTestMoveOrderX(unitDefID, cmdParams[1], cmdParams[2], cmdParams[3]) then
 			return true
 		else

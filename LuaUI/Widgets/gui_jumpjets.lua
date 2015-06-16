@@ -296,7 +296,7 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 	elseif (shift) then
 		local queue = spGetCommandQueue(unitID, -1)
 		local i = #queue
-		while (ignore[queue[i].id] and i > 0) do
+		while queue[i] and (ignore[queue[i].id] and i > 0) do
 			i = i - 1
 		end
 		if (curve[queue[i].id]) or (queue[i].id < 0) or (#queue[i].params == 3) or (#queue[i].params == 4) then
