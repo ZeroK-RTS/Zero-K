@@ -107,7 +107,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	if stockpileUnitDefID[unitDefID] then
+	if unitsByID[unitID] then
 		units.data[unitsByID[unitID].id] = units.data[units.count]
 		unitsByID[units.data[units.count]].id = unitsByID[unitID].id --shift last entry into empty space
 		units.data[units.count]	= nil
