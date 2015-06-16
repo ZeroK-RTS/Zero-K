@@ -70,8 +70,6 @@ local landBoxSize = 60
 local jumps = {}
 local jumping = {}
 local goalSet = {}
-local structureCollision = {}
-local structureValues = {}
 
 local quiteNew = Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
 
@@ -179,9 +177,8 @@ local function GetLandStructureCheckValues(x, z, myRadius)
 	return false
 end
 
-local function CheckStructureCollision(unitID, x, y, z)
-	local val = structureValues[unitID]
-	return (val.x - x)^2 + (val.y - y)^2 + (val.z - z)^2 < val.distSq
+local function CheckStructureCollision(data, x, y, z)
+	return (data.x - x)^2 + (data.y - y)^2 + (data.z - z)^2 < data.distSq
 end
 
 local function GetDist2Sqr(a, b)
@@ -308,7 +305,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			end
 		end
 	
-		local hitStructure
+		local hitStructure, structureCollisionData
 		local halfJump
 		local i = 0
 		while i <= 1 do
@@ -333,14 +330,16 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				halfJump = true
 				
 				-- Do structure collision here to prevent early collision (perhaps a rejump onto the same structure?)
-				if structureCollision[unitID] then
+				-- If the move order test fails it means the command must have been allowed because the ground
+				-- was otherwise high and flat enough for pathing. This means that a structure (or feature) is at the
+				-- land location.
+				if not spTestMoveOrderX(unitDefID, goal[1], goal[2], goal[3]) then
 					local radius = Spring.GetUnitRadius(unitID)
-					structureValues[unitID] = GetLandStructureCheckValues(goal[1], goal[3], radius)
-					structureCollision[unitID] = nil
+					structureCollisionData = GetLandStructureCheckValues(goal[1], goal[3], radius)
 				end
 			end
 			
-			if halfJump and structureValues[unitID] and CheckStructureCollision(unitID, x, y, z) then
+			if structureCollisionData and CheckStructureCollision(structureCollisionData, x, y, z) then
 				hitStructure = {x, y, z}
 				break
 			end
@@ -357,7 +356,6 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		local jumpEndTime = spGetGameSeconds()
 		lastJumpPosition[unitID] = origCmdParams
 		jumping[unitID] = nil
-		structureCollision[unitID] = nil
 		SetLeaveTracks(unitID, true)
 		spSetUnitVelocity(unitID, 0, 0, 0)
 		Spring.SetUnitRulesParam(unitID, "is_jumping", 0)
@@ -455,7 +453,6 @@ end
 function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	if jumping[oldUnitID] then
 		jumping[oldUnitID] = nil --empty old unit's data
-		structureCollision[oldUnitID] = nil
 	end
 end
 
@@ -499,7 +496,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			end
 			
 			-- Ground is fine, must contain a blocking structure.
-			structureCollision[unitID] = true
 			return true
 		end
 	end
