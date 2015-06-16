@@ -33,6 +33,7 @@ unitDef = {
     helptext_fr    = [[Le Protector est un b?timent indispensable dans tout conflit qui dure. Il est toujours malvenu de voir sa base r?duite en cendres ? cause d'un missile nucl?aire. Le Protector est un syst?me de contre mesure capable de faire exploser en vol les missiles nucl?aires ennemis.]],
 	helptext_pl    = [[Protector automatycznie wysy³a przeciwrakiety, aby zniszczyæ przelatuj¹ce nad jego obszarem ochrony g³owice nuklearne przeciwników.]],
 	removewait     = 1,
+    nuke_coverage  = 2500,
   },
 
   explodeAs                     = [[LARGE_BUILDINGEX]],
@@ -76,10 +77,14 @@ unitDef = {
       name                    = [[Anti-Nuke Missile]],
       areaOfEffect            = 420,
       collideFriendly         = false,
-      coverage                = 2500,
+      coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
-
+	  
+	  customParams            = {
+        nuke_coverage = 2500,
+	  },
+	  
       damage                  = {
         default = 1500,
         subs    = 75,
@@ -95,7 +100,7 @@ unitDef = {
       model                   = [[antinukemissile.s3o]],
       noautorange             = [[1]],
       noSelfDamage            = true,
-      range                   = 4500,
+      range                   = 3800,
       reloadtime              = 6,
       selfprop                = true,
       smokedelay              = [[0.1]],
@@ -109,10 +114,10 @@ unitDef = {
       turnrate                = 65535,
       twoPhase                = true,
       vlaunch                 = true,
-      weaponAcceleration      = 400,
-      weaponTimer             = 1,
+      weaponAcceleration      = 800,
+      weaponTimer             = 0.4,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1300,
+      weaponVelocity          = 1600,
     },
 
   },

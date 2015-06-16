@@ -202,6 +202,7 @@ local callInLists = {
 	"TerraformComplete",
 	"AllowWeaponTargetCheck",
 	"AllowWeaponTarget",
+	"AllowWeaponInterceptTarget",
 	-- unsynced
 	"DrawUnit",
 	"DrawFeature",
@@ -1352,6 +1353,16 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 	end
 
 	return allowed, priority
+end
+
+function gadgetHandler:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)
+	for _, g in ipairs(self.AllowWeaponInterceptTargetList) do
+		if (not g:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)) then
+			return false
+		end
+	end
+	
+	return true
 end
 
 --------------------------------------------------------------------------------
