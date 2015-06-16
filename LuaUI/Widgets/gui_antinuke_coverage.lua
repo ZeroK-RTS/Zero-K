@@ -25,6 +25,8 @@ local intDefs = {
 		range = 2500,
 		rangeSq = 2500^2,
 		static = true,
+		oddX = (5 % 2)*8,
+		oddZ = (8 % 2)*8,
 	},
 	[UnitDefNames["reef"].id] ={
 		range = 1200,
@@ -32,9 +34,6 @@ local intDefs = {
 		static = false,
 	},
 }
-
-local myTeamID = Spring.GetMyTeamID()
-local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 --------------------------------------------------------------------------------
 -- Globals
@@ -49,6 +48,8 @@ local allyNuke = {}
 local specUnit = {}
 
 local spectating = Spring.GetSpectatingState()
+local myTeamID = Spring.GetMyTeamID()
+local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 --------------------------------------------------------------------------------
 -- Unit handling
@@ -107,6 +108,31 @@ local function RemoveUnit(unitID)
 	specUnit[unitID] = nil
 end  
 
+
+local function ReaddUnits()
+	enemyInt = {}
+	enemyNuke = {}
+	allyInt = {}
+	allyNuke = {}
+	specUnit = {}
+	local units = Spring.GetAllUnits()
+	for i=1,#units do
+		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		if spectating then
+			AddSpecUnit(unitID, unitDefID)
+		else
+			local allyTeam = Spring.GetUnitAllyTeam(unitID)
+			if allyTeam == myAllyTeamID then
+				AddUnit(unitID, unitDefID, allyInt, allyNuke)
+			else
+				AddUnit(unitID, unitDefID, enemyInt, enemyNuke)
+			end
+		end
+	end
+end
+
+
 function widget:UnitEnteredLos(unitID, unitTeam)
 	if not Spring.AreTeamsAllied(myTeamID, unitTeam) and not spectating then
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -117,6 +143,12 @@ end
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if spectating then
 		AddSpecUnit(unitID, unitDefID)
+		local allyTeam = Spring.GetUnitAllyTeam(unitID)
+		if allyTeam == myAllyTeamID then
+			AddUnit(unitID, unitDefID, allyInt, allyNuke)
+		else
+			AddUnit(unitID, unitDefID, enemyInt, enemyNuke)
+		end
 	else
 		if Spring.AreTeamsAllied(myTeamID, unitTeam) then
 			AddUnit(unitID, unitDefID, allyInt, allyNuke)
@@ -175,12 +207,18 @@ function widget:GameFrame(n)
 		end
 	end
 	
-	spectating = Spring.GetSpectatingState()
+	local newSpec = Spring.GetSpectatingState()
+	if newSpec ~= spectating then
+		spectating = newSpec
+		ReaddUnits()
+	end
 end
 
 -- Sorts the spectator units into their correct ally or enemy lists from the point
 -- of view of a particular ally team.
-local function SortUnitsIntoAllyEnemy(matchAllyTeam)
+local function SortUnitsIntoAllyEnemy(teamID, matchAllyTeam)
+	myAllyTeamID = matchAllyTeam
+	myTeamID = teamID
 	for unitID,_ in pairs(specUnit) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local allyTeam = Spring.GetUnitAllyTeam(unitID)
@@ -198,54 +236,126 @@ end
 
 -- Add All Units
 function widget:Initialize()
-	local units = Spring.GetAllUnits()
-	for i=1,#units do
-		local unitID = units[i]
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		if spectating then
-			AddSpecUnit(unitID, unitDefID)
-		else
-			local allyTeam = Spring.GetUnitAllyTeam(unitID)
-			if allyTeam == myAllyTeam then
-				AddUnit(unitID, unitDefID, allyInt, allyNuke)
-			else
-				AddUnit(unitID, unitDefID, enemyInt, enemyNuke)
-			end
-		end
-	end
+	ReaddUnits()
 end
 
 --------------------------------------------------------------------------------
--- Decide What to Draw
+-- Decide what to draw
 --------------------------------------------------------------------------------
+local spTraceScreenRay		= Spring.TraceScreenRay
+local spGetMouseState       = Spring.GetMouseState
+local spGetActiveCommand 	= Spring.GetActiveCommand
+local spGetGroundHeight		= Spring.GetGroundHeight
 
+local nukeSelected
+local antinukeSelected
+
+local drawAnti
 local drawNuke
-local drawAntinuke
 
+-- Keep track of selected units (draw when nukes or antinukes are selected)
 function widget:SelectionChanged(newSelection)
-	drawNuke = false
-	drawAntinuke = false
+	nukeSelected = false
+	antinukeSelected = false
 	for i = 1, #newSelection do
 		local unitID = newSelection[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		if unitDefID then
 			if nukeDefs[unitDefID] then
 				if spectating then
-					local allyTeam = Spring.GetUnitAllyTeam(unitID)
-					SortUnitsIntoAllyEnemy(allyTeam)
+					SortUnitsIntoAllyEnemy(Spring.GetUnitTeam(unitID), Spring.GetUnitAllyTeam(unitID))
 				end
 				local x,y,z = Spring.GetUnitPosition(unitID)
-				drawNuke = {x,y,z}
+				nukeSelected = {x,y,z}
 				return
 			elseif intDefs[unitDefID] then
 				if spectating then
-					local allyTeam = Spring.GetUnitAllyTeam(unitID)
-					SortUnitsIntoAllyEnemy(allyTeam)
+					SortUnitsIntoAllyEnemy(Spring.GetUnitTeam(unitID), Spring.GetUnitAllyTeam(unitID))
 				end
-				drawAntinuke = true
+				antinukeSelected = true
 				return
 			end
 		end
+	end
+end
+
+local function DrawAntinukeOnMouse(cmdID)
+	if not (cmdID and intDefs[-cmdID] and intDefs[-cmdID].static) then
+		return false
+	end
+	
+	drawAnti = true
+	return not spectating
+	-- Code for doing drawing based on placement position
+	
+	--local def = intDefs[-cmdID]
+	--	
+	--local mx, my = spGetMouseState()
+	--local _, mouse = spTraceScreenRay(mx, my, true, true)
+	--
+	--if mouse then
+	--	local x,z
+	--	local facing = Spring.GetBuildFacing()
+	--	if facing == 1 or facing == 3 then
+	--		x = math.floor((mouse[1] + 8 - def.oddX)/16)*16 + def.oddX
+	--		z = math.floor((mouse[3] + 8 - def.oddZ)/16)*16 + def.oddZ
+	--	else
+	--		x = math.floor((mouse[1] + 8 - def.oddZ)/16)*16 + def.oddZ
+	--		z = math.floor((mouse[3] + 8 - def.oddX)/16)*16 + def.oddX
+	--	end
+	--	
+	--	if drawAnti and drawAnti ~= true then
+	--		drawAnti.x = x
+	--		drawAnti.y = spGetGroundHeight(x, z)
+	--		drawAnti.z = z
+	--		drawAnti.range = def.range
+	--	else
+	--		drawAnti = {
+	--			x = x, 
+	--			y = spGetGroundHeight(x, z), 
+	--			z = z, 
+	--			range = def.range
+	--		}
+	--	end
+	--	return true
+	--end
+	--return false
+end
+
+local function DrawNukeOnMouse(cmdID)
+	if cmdID ~= CMD.ATTACK then
+		return false
+	end
+	
+	local mx, my = spGetMouseState()
+	local _, mouse = spTraceScreenRay(mx, my, true, true)
+	
+	if not mouse then
+		return false
+	end
+	
+	if drawNuke and drawNuke ~= true then
+		drawNuke.pos = nukeSelected
+		drawNuke.mouse = mouse
+	else
+		drawNuke = {
+			pos = nukeSelected,
+			mouse = mouse,
+		}
+	end
+	return true
+end
+
+-- Decide what to draw
+function widget:Update()
+	local _, cmdID = spGetActiveCommand()
+
+	if not DrawAntinukeOnMouse(cmdID) then
+		drawAnti = antinukeSelected
+	end
+
+	if not (nukeSelected and not drawAnti and DrawNukeOnMouse(cmdID)) then
+		drawNuke = false 
 	end
 end
 
@@ -318,18 +428,23 @@ end
 --------------------------------------------------------------------------------
 -- Drawing
 --------------------------------------------------------------------------------
-
-local spTraceScreenRay		= Spring.TraceScreenRay
-local spGetGroundHeight		= Spring.GetGroundHeight
-local spGetMouseState       = Spring.GetMouseState
-local spGetActiveCommand 	= Spring.GetActiveCommand
-
 local glColor               = gl.Color
 local glLineWidth           = gl.LineWidth
 local glDrawGroundCircle    = gl.DrawGroundCircle
 local glBeginEnd            = gl.BeginEnd
 local glVertex              = gl.Vertex
+local glPopMatrix           = gl.PopMatrix
+local glPushMatrix          = gl.PushMatrix
+local glTranslate           = gl.Translate
+local glScale				= gl.Scale
+local glRotate				= gl.Rotate
+local glLoadIdentity		= gl.LoadIdentity
+local glLighting            = gl.Lighting
+
 local GL_LINES              = GL.LINES
+
+local mapX = Game.mapSizeX
+local mapZ = Game.mapSizeZ
 
 local function VertexList(point)
 	for i = 1, #point do
@@ -337,79 +452,129 @@ local function VertexList(point)
 	end
 end
 
+local function DrawEnemyInterceptors()
+	local px, pz = drawNuke.pos[1], drawNuke.pos[3]
+	local mx, mz = drawNuke.mouse[1], drawNuke.mouse[3]
+
+	local intercepted = 0
+	glLineWidth(2)
+	
+	for unitID, def in pairs(enemyInt) do
+
+		local ux, uz
+		if def.static then
+			ux, uz = def.x, def.z
+		else
+			ux,_,uz = Spring.GetUnitPosition(unitID)
+		end
+		
+		if ux then
+			local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mx, mz, def.rangeSq)
+			if thisIntercepted then
+				if def.incomplete then
+					intercepted = math.max(intercepted, 1)
+					glColor(0.9, 0.5, 0, 1)
+				else
+					intercepted = 2	
+					glColor(1, 0, 0, 1)
+				end
+			else
+				if def.incomplete then
+					glColor(0.35, 0.6, 0.4, 1)
+				else
+					glColor(0, 1, 0, 1)
+				end
+			end
+			
+			glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+		end
+	end
+	
+	return intercepted
+end
+
+local function DrawAllyInterceptors()
+	glLineWidth(2)
+	for unitID, def in pairs(allyInt) do
+		
+		if def.incomplete then
+			glColor(0.35, 0.6, 0.4, 1)
+		else
+			glColor(0, 1, 0, 1)
+		end
+		
+		glDrawGroundCircle(def.x, 0, def.z, def.range, 40 )
+	end
+end
+
+
 local function Draw()
 	
 	if drawNuke then
-		
-		local _, cmdID = spGetActiveCommand()
-		
-		if cmdID ~= CMD.ATTACK then
-			return
-		end
-		
-		local mx, my = spGetMouseState()
-		local _, mouse = spTraceScreenRay(mx, my, true, true)
-				
-		if not mouse then
-			return
-		end
-		
-		local px, pz = drawNuke[1], drawNuke[3]
-		local intercepted = false
-		
-		for unitID, def in pairs(enemyInt) do
-			glLineWidth(2)
-			
-			local ux, uz
-			if def.static then
-				ux, uz = def.x, def.z
-			else
-				ux,_,uz = Spring.GetUnitPosition(unitID)
-			end
-			
-			if ux then
-				local thisIntercepted = GetNukeIntercepted(ux, uz, px, pz, mouse[1], mouse[3], def.rangeSq)
-				if thisIntercepted then
-					glColor(1,0,0,1)
-					intercepted = true
-				else
-					glColor(0,1,0,1)
-				end
-				
-				glDrawGroundCircle(ux, 0, uz, def.range, 40 )
-			end
-		end
-	
-		local vertices = {drawNuke, mouse}
+		local intercepted = DrawEnemyInterceptors()
+		local vertices = {drawNuke.pos, drawNuke.mouse}
   
-		if intercepted then
+		if intercepted == 2 then
 			glColor(1,0,0,1)
+		elseif intercepted == 1 then
+			glColor( 0.9, 0.5, 0, 1)
 		else
 			glColor(0,1,0,1)
 		end
+		
 		glLineWidth(2)
 		glBeginEnd(GL_LINES, VertexList, vertices)
 		
 		glLineWidth(1)
 		glColor(1, 1, 1, 1)
 		
-	elseif drawAntinuke then
+	elseif drawAnti then
+		
+		DrawAllyInterceptors()
+		glLineWidth(1)
+		glColor(1, 1, 1, 1)
+	end
+end
+
+
+local function DrawMinimap()
 	
-	
+	if drawNuke then
+		glPushMatrix()
+		glLoadIdentity()
+		glTranslate(0,1,0)
+		glScale(1/mapX , -1/mapZ, 1)
+		glRotate(270,1,0,0)
+		
+		DrawEnemyInterceptors()
+		
+		glLineWidth(1)
+		glColor(1, 1, 1, 1)
+		
+		glPopMatrix()
+		
+	elseif drawAnti then
+		glPushMatrix()
+		glLoadIdentity()
+		glTranslate(0,1,0)
+		glScale(1/mapX , -1/mapZ, 1)
+		glRotate(270,1,0,0)
+		
+		DrawAllyInterceptors()
+		glLineWidth(1)
+		glColor(1, 1, 1, 1)
+		
+		glPopMatrix()
 	end
 	
 
 end
 
 function widget:DrawInMiniMap()
-
-	--DrawInMinimap()
-
+	DrawMinimap()
 end
 
 	
 function widget:DrawWorldPreUnit()
-	
 	Draw()
-	
 end
