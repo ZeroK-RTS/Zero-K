@@ -507,7 +507,16 @@ local function DrawAllyInterceptors()
 			glColor(0, 1, 0, 1)
 		end
 		
-		glDrawGroundCircle(def.x, 0, def.z, def.range, 40 )
+		local ux, uz
+		if def.static then
+			ux, uz = def.x, def.z
+		else
+			ux,_,uz = Spring.GetUnitPosition(unitID)
+		end
+		
+		if ux then
+			glDrawGroundCircle(ux, 0, uz, def.range, 40 )
+		end
 	end
 end
 
