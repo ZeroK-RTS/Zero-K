@@ -17,9 +17,9 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local spGetUnitArmored       = Spring.GetUnitStates
-local spGetUnitRulesParam    = Spring.GetUnitStates
-local spGetUnitHealth        = Spring.GetUnitStates
+local spGetUnitArmored       = Spring.GetUnitArmored
+local spGetUnitRulesParam    = Spring.GetUnitRulesParam
+local spGetUnitHealth        = Spring.GetUnitHealth
 local spGetUnitStates        = Spring.GetUnitStates
 local spGetUnitDefID         = Spring.GetUnitDefID
 local spGetAllUnits          = Spring.GetAllUnits
@@ -110,7 +110,9 @@ function SetUnitStateIcons(unitID)
 	
 	local states = spGetUnitStates(unitID)
 	
-	if not states then return end
+	if not states then 
+		return 
+	end
 	
 	local ud = spGetUnitDefID(unitID)
 	if ud then
