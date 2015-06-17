@@ -183,6 +183,7 @@ end
 
 local longRangeSkirmieeArray = {
 	["armrock"] = true,
+	["slowmort"] = true,
 	["amphfloater"] = true,
 	["nsclash"] = true, -- hover janus
 	["capturecar"] = true,
