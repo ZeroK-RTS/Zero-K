@@ -769,10 +769,10 @@ local behaviourConfig = {
 		flees = {},
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 30,
-		stoppingDistance = 15,
-		skirmOrderDis = 180,
-		velocityPrediction = 50,
+		skirmLeeway = 0,
+		stoppingDistance = -40,
+		skirmOrderDis = 250,
+		velocityPrediction = 40,
 	},	
 	
 	-- long range skirms
