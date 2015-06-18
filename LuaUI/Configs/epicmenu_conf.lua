@@ -168,6 +168,7 @@ local generalPath = 'Settings/Reset Settings'
 						"luaui disablewidget Lups",
 						"luaui disablewidget Display DPS",
 						"luaui disablewidget Map Edge Extension",
+						'mapborder 1',
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
 						"luaui disablewidget UnitShapes",
@@ -365,29 +366,29 @@ local pathMiscScreenshots = 'Settings/Misc/Screenshots'
 			..' You can then use VirtualDub (opensource software) to do futher compression and editing. Note: there is other opensource video capture software like Taksi that you could try.') 
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
-local pathGraphics = 'Settings/Graphics'
-	ShLabel(pathGraphics, 'View Radius')
+local pathGraphicsMap = 'Settings/Graphics/Map Detail'
+	ShLabel(pathGraphicsMap, 'Terrain Detail')
 	
-	ShButton(pathGraphics, 'Increase Radius', "increaseviewradius")
-	ShButton(pathGraphics, 'Decrease Radius', "decreaseviewradius")
+	ShButton(pathGraphicsMap, 'Increase Terrain Detail', "increaseviewradius")
+	ShButton(pathGraphicsMap, 'Decrease Terrain Detail', "decreaseviewradius")
 
 
-	ShLabel(pathGraphics, 'Trees')
-	ShButton(pathGraphics, 'Toggle View', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png')
-	ShButton(pathGraphics, 'See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png')
-	ShButton(pathGraphics, 'See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png')
+	ShLabel(pathGraphicsMap, 'Trees')
+	ShButton(pathGraphicsMap, 'Toggle Trees', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png')
+	ShButton(pathGraphicsMap, 'See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png')
+	ShButton(pathGraphicsMap, 'See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png')
 	--{'Toggle Dynamic Sky', function(self) spSendCommands{'dynamicsky'} end },
 	
-	ShLabel(pathGraphics, 'Water Settings')
-	ShButton(pathGraphics, 'Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphics, 'Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphics, 'Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphics, 'Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphics, 'Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShLabel(pathGraphicsMap, 'Water Settings')
+	ShButton(pathGraphicsMap, 'Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphicsMap, 'Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphicsMap, 'Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphicsMap, 'Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png')
+	ShButton(pathGraphicsMap, 'Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png')
 
-	ShLabel(pathGraphics, 'Shadow Settings')
+	ShLabel(pathGraphicsMap, 'Shadow Settings')
 	
-	AddOption(pathGraphics, 
+	AddOption(pathGraphicsMap, 
 	{
 		name = 'Shadow Detail (Slide left for off)',
 		type = 'number',
@@ -403,7 +404,7 @@ local pathGraphics = 'Settings/Graphics'
 		end, 
 	})
 	
-	ShButton(pathGraphics, 
+	ShButton(pathGraphicsMap, 
 	'Toggle Shadows',
 		function()
 			local curShadow = Spring.GetConfigInt("Shadows") or 0
@@ -417,7 +418,7 @@ local pathGraphics = 'Settings/Graphics'
 		end
 	)
 
-	ShButton(pathGraphics, 'Toggle Terrain Shadows',
+	ShButton(pathGraphicsMap, 'Toggle Terrain Shadows',
 		function()
 			local curShadow=Spring.GetConfigInt("Shadows") or 0
 			if curShadow == 0 then
@@ -432,11 +433,9 @@ local pathGraphics = 'Settings/Graphics'
 			spSendCommands{"Shadows "..curShadow}
 		end
 	)
-	
-	ShLabel(pathGraphics, 'Various')
-	AddOption(pathGraphics, 
+	AddOption(pathGraphicsMap, 
 	{
-		name = 'Brightness',
+		name = 'Map Brightness',
 		type = 'number',
 		min = 0, 
 		max = 1, 
@@ -447,15 +446,18 @@ local pathGraphics = 'Settings/Graphics'
 	} )
 	
 	
-	AddOption(pathGraphics, 
+	AddOption(pathGraphicsMap, 
 	{ 	
 		name = 'Ground Decals',
 		type = 'bool',
 		springsetting = 'GroundDecals',
 		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end, 
 	} )
+	
+	--ShButton(pathGraphicsMap, 'Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
 
-	AddOption(pathGraphics, 
+local pathGraphicsExtras = 'Settings/Graphics/Effects'
+	AddOption(pathGraphicsExtras, 
 	{
 		name = 'Maximum Particles (100 - 20,000)',
 		type = 'number',
@@ -463,23 +465,11 @@ local pathGraphics = 'Settings/Graphics'
 		springsetting = 'MaxParticles',
 		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
 	} )
-	ShButton(pathGraphics, 'Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
-	ShButton(pathGraphics, 'Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
-	
-local pathGraphicsExtras = 'Settings/Graphics/Effects'
+	ShButton(pathGraphicsExtras, 'Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
 	ShButton(pathGraphicsExtras, 'Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen')
 	ShButton(pathGraphicsExtras, 'Smoke Signal Markers', function() spSendCommands{'luaui togglewidget Smoke Signal'} end, 'Creates a smoke signal effect at map points' )
-local pathGraphicsExtrasNight = 'Settings/Graphics/Effects/Night View'
-	ShButton(pathGraphicsExtrasNight, 'Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
-	
+	ShButton(pathGraphicsExtras, 'Toggle Night View', function() spSendCommands{'luaui togglewidget Night'} end, 'Adds a day/night cycle effect' )
 
-
-local pathVR = 'Settings/Graphics/Map/VR Grid'
-	ShButton(pathVR, 'Toggle VR Grid', function() spSendCommands{'luaui togglewidget External VR Grid'} end, 'Draws a grid around the map' )
-local pathMapExtension = 'Settings/Graphics/Map/Map Extension'
-	ShButton(pathMapExtension, 'Toggle Map Extension', function() spSendCommands{'luaui togglewidget Map Edge Extension'} end ,'Alternate map grid')
-local pathEdgeBarrier = 'Settings/Graphics/Map/Edge Barrier'
-	ShButton(pathEdgeBarrier, 'Toggle Edge Barrier', function() spSendCommands{'luaui togglewidget Map Edge Barrier'} end, 'Draws a boundary wall at map edges')
 	
 local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Options')
