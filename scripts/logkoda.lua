@@ -152,15 +152,15 @@ function script.StopMoving()
 end
 
 -- Weapons
-function script.AimFromWeapon1()
+function script.AimFromWeapon()
 	return turret
 end
 
-function script.QueryWeapon1()
+function script.QueryWeapon()
 	return firepoint
 end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	if flaming then
 		return false
 	end
