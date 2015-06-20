@@ -10,7 +10,6 @@ local rflare = piece 'rflare'
 local larm = piece 'larm' 
 local rarm = piece 'rarm' 
 
-
 local lfrontleg = piece 'lfrontleg' 
 local lfrontleg1 = piece 'lfrontleg1' 
 
@@ -44,11 +43,10 @@ local gun = false
 local smokePiece = {base, barrel}
 
 function script.Create()
-
-Turn(lfrontleg, y_axis, math.rad(45)) 
-Turn(rfrontleg, y_axis, math.rad(-45)) 
-Turn(laftleg, y_axis, math.rad(-45)) 
-Turn(raftleg, y_axis, math.rad(45)) 
+	Turn(lfrontleg, y_axis, math.rad(45)) 
+	Turn(rfrontleg, y_axis, math.rad(-45)) 
+	Turn(laftleg, y_axis, math.rad(-45)) 
+	Turn(raftleg, y_axis, math.rad(45)) 
 
 	StartThread(SmokeUnit,smokePiece)
 end
@@ -66,40 +64,40 @@ local function Walk()
 	SetSignalMask(SIG_Walk)
 	while (true) do
 
-		-- Move(base, y_axis,  1.5, 2*up)	
-		Turn(lfrontleg, y_axis, 1.5*ma, forward)   	-- right front forward
-		Turn(lfrontleg, z_axis, -ma/2, up)       	-- right front up
+		-- Move(base, y_axis,  1.5, 2*up)
+		Turn(lfrontleg, y_axis, 1.5*ma, forward)  -- right front forward
+		Turn(lfrontleg, z_axis, -ma/2, up)        -- right front up
 		Turn(lfrontleg1, z_axis, -ma/3, up)
 		
-		Turn(laftleg, y_axis, -1.5*ma, backward) -- right back backward
-		Turn(laftleg, z_axis, 0, 6*up)         	 -- right back down
+		Turn(laftleg, y_axis, -1.5*ma, backward)  -- right back backward
+		Turn(laftleg, z_axis, 0, 6*up)            -- right back down
 		Turn(laftleg1, z_axis, 0, up)
 		
-		Turn(rfrontleg, y_axis, sa, backward) 	-- left front backward
-    	Turn(rfrontleg, z_axis, 0, 6*up)        -- left front down
+		Turn(rfrontleg, y_axis, sa, backward)     -- left front backward
+		Turn(rfrontleg, z_axis, 0, 6*up)          -- left front down
 		Turn(rfrontleg1, z_axis, 0, up)
 		
-		Turn(raftleg, y_axis, -sa, forward) 	-- left back forward
-		Turn(raftleg, z_axis, ma/2, up)       	-- left back up
+		Turn(raftleg, y_axis, -sa, forward)       -- left back forward
+		Turn(raftleg, z_axis, ma/2, up)           -- left back up
 		Turn(raftleg1, z_axis, ma/3, up)
 		
 		Sleep(pause)
 		
-		-- Move(base, y_axis,  0, 4*up)	
-		Turn(lfrontleg, y_axis, -sa, backward) 	-- right front backward
-		Turn(lfrontleg, z_axis, 0, 6*up)        -- right front down
+		-- Move(base, y_axis,  0, 4*up)
+		Turn(lfrontleg, y_axis, -sa, backward)    -- right front backward
+		Turn(lfrontleg, z_axis, 0, 6*up)          -- right front down
 		Turn(lfrontleg1, z_axis, 0, up)
 		
-		Turn(laftleg, y_axis, sa, forward)   	-- right back forward
-		Turn(laftleg, z_axis, -ma/2, up)       	-- right back up
+		Turn(laftleg, y_axis, sa, forward)        -- right back forward
+		Turn(laftleg, z_axis, -ma/2, up)          -- right back up
 		Turn(laftleg1, z_axis, -ma/3, up)
 		
-		Turn(rfrontleg, y_axis, -1.5*ma, forward) 	-- left front forward
-		Turn(rfrontleg, z_axis, ma/2, up)       	-- left front up
+		Turn(rfrontleg, y_axis, -1.5*ma, forward) -- left front forward
+		Turn(rfrontleg, z_axis, ma/2, up)         -- left front up
 		Turn(rfrontleg1, z_axis, ma/3, up)
 		
-		Turn(raftleg, y_axis, 1.5*ma, backward) -- left back backward
-		Turn(raftleg, z_axis, 0, 6*up)         	-- left back down
+		Turn(raftleg, y_axis, 1.5*ma, backward)   -- left back backward
+		Turn(raftleg, z_axis, 0, 6*up)            -- left back down
 		Turn(raftleg1, z_axis, 0, up)
 		
 		Sleep(pause)
@@ -165,17 +163,17 @@ end
 
 local function recoil()
 	if gun then
-	    EmitSfx(lflare, 1024)
-	    EmitSfx(lflare, 1025) 
+		EmitSfx(lflare, 1024)
+		EmitSfx(lflare, 1025) 
 
-        Move(lbarrel, z_axis, -6)
+		Move(lbarrel, z_axis, -6)
 		Move(larm, z_axis, -2)
 
 		Move(lbarrel, z_axis, 0, 3)
 		Move(larm, z_axis, 0, 1)
 	else
-	    EmitSfx(rflare, 1024)
-	    EmitSfx(rflare, 1025) 
+		EmitSfx(rflare, 1024)
+		EmitSfx(rflare, 1025) 
 
 		Move(rbarrel, z_axis, -6)
 		Move(rarm, z_axis, -2)
@@ -203,7 +201,7 @@ function script.Killed(recentDamage, maxHealth)
 	else
 		Explode(base, sfxShatter)
 		Explode(lbarrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-	    Explode(rbarrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rbarrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end
