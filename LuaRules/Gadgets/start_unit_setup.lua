@@ -354,7 +354,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local x,y,z
 	local startPosition = luaSetStartPositions[teamID]
 	if not startPosition then
-		if (startboxString and not Spring.GetTeamRulesParam(teamID, "valid_startpos")) or (notAtTheStartOfTheGame and (Game.startPosType == 2)) then
+		if (startboxString and not Spring.GetTeamRulesParam(teamID, "valid_startpos")) or (not startboxString and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
 			x,y,z = Spring.GetTeamStartPosition(teamID)
