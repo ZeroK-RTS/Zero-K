@@ -5,6 +5,7 @@ local dish1 = piece 'dish1'
 local dish2 = piece 'dish2' 
 local dish3 = piece 'dish3' 
 local dish4 = piece 'dish4' 
+local fakes = {piece 'fakebase', piece 'fakedish1', piece 'fakedish2', piece 'fakedish3', piece 'fakedish4'}
 
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitHealth = Spring.GetUnitHealth
@@ -56,6 +57,8 @@ function script.Deactivate()
 end
 
 function script.Create()
+	for i = 1, #fakes do Hide (fakes[i]) end
+	Move (base, y_axis, 9000)
 	StartThread(SmokeUnit, smokePiece)
 	Turn( base , y_axis, math.rad(45) )	
 end

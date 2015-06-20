@@ -768,7 +768,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								local metalMult = energyToExtraM(mexE)
 								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
 								local thisMexM = orgMetal + orgMetal * metalMult
-								spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+								spSetUnitRulesParam(unitID, "mex_income", thisMexM, alliedTrueTable)
  
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
@@ -802,7 +802,7 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					local metalMult = energyToExtraM(mexE)
 					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
 					local thisMexM = orgMetal + orgMetal * metalMult
-					spCallCOBScript(unitID, "SetSpeed", 0, thisMexM * 500) 
+					spSetUnitRulesParam(unitID, "mex_income", thisMexM, alliedTrueTable)
 					
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
@@ -1082,7 +1082,7 @@ function gadget:GameFrame(n)
 				summedBaseMetal = summedBaseMetal + orgMetal
                 
 				spSetUnitRulesParam(unitID, "overdrive", 1, alliedTrueTable)
-				spCallCOBScript(unitID, "SetSpeed", 0, orgMetal * 500) 
+				spSetUnitRulesParam(unitID, "mex_income", orgMetal, alliedTrueTable)
 				
 				if mexByID[unitID].refundTeamID then
 					local teamID = mexByID[unitID].refundTeamID
@@ -1299,7 +1299,7 @@ local function AddMex(unitID, teamID, metalMake)
 			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal
 		end
 		
-		spCallCOBScript(unitID, "SetSpeed", 0, metalMake * 500) 
+		spSetUnitRulesParam(unitID, "mex_income", metalMake, alliedTrueTable)
 		local mexGridID = 0
 		local pylonData = pylon[allyTeamID][unitID]
 		if pylonData then

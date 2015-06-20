@@ -66,11 +66,11 @@ unitDef = {
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT HOVER GUNSHIP]],
     },
 	
-	{
-      def                = [[BOGUS_FAKE_NAPALM_BOMBLET]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[]],
-    },
+	--{
+    --  def                = [[BOGUS_FAKE_NAPALM_BOMBLET]],
+    --  badTargetCategory  = [[GUNSHIP]],
+    --  onlyTargetCategory = [[]],
+    --},
 
   },
 
