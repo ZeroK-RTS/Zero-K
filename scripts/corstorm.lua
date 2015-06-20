@@ -33,10 +33,12 @@ local gun_1 = math.random() > 0.5
 local smokePiece = {base, head}
 
 -- Signal( definitions
+local SIG_RESTORE = 1
 local SIG_MOVE = 2
 local SIG_AIM = 4
 
-local RESTORE_DELAY = 1000
+local RESTORE_DELAY_TUBE = 1000
+local RESTORE_DELAY_HEAD = 1500
 
 local function walk()
 	Signal( SIG_MOVE)
@@ -167,7 +169,7 @@ function script.Create()
 end
 
 local function RestoreAfterDelayLeft() 
-	Sleep(RESTORE_DELAY)
+	Sleep(RESTORE_DELAY_TUBE)
 	Turn( l_tube , x_axis, math.rad(0 ), math.rad(45) )
 	Move( l_missile , z_axis, 0  )
 	Move( l_missile , y_axis, .4  )
@@ -187,14 +189,10 @@ local function RestoreAfterDelayLeft()
 	Move( l_door , z_axis, 0 , 1 )
 	Move( l_doorslid , z_axis, 0 , 1 )
 	Turn( l_door , z_axis, math.rad(-(0)), math.rad(90) )
-	
-	Sleep(3000)
-	Turn( head , y_axis, math.rad(0 ), math.rad(90) )
-	Turn( r_tube , x_axis, math.rad(0 ), math.rad(45) )
 end
 
 local function RestoreAfterDelayRight() 
-	Sleep(RESTORE_DELAY)
+	Sleep(RESTORE_DELAY_TUBE)
 	Turn( r_tube , x_axis, math.rad(0 ), math.rad(45) )
 	Move( r_missile , z_axis,5* 0  )
 	Move( r_missile , y_axis, .4  )
@@ -214,9 +212,16 @@ local function RestoreAfterDelayRight()
 	Move( r_door , z_axis, 0 , 1 )
 	Move( r_doorslid , z_axis, 0 , 1 )
 	Turn( r_door , z_axis, math.rad(-(0)), math.rad(90) )
+end
+
+
+local function RestoreAfterDelayHead()
+	Signal(SIG_RESTORE)
+	SetSignalMask( SIG_RESTORE)
 	
-	Sleep(2000)
+	Sleep(RESTORE_DELAY_HEAD)
 	Turn( head , y_axis, math.rad(0 ), math.rad(90) )
+	Turn( r_tube , x_axis, math.rad(0 ), math.rad(45) )
 	Turn( l_tube , x_axis, math.rad(0 ), math.rad(45) )
 end
 
@@ -224,6 +229,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
+	StartThread(RestoreAfterDelayHead)
 	Turn( head , y_axis, heading , math.rad(180) )
 	if gun_1 then
 	
