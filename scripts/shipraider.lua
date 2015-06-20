@@ -54,16 +54,16 @@ local RESTORE_DELAY = 3000
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 
-	Turn( gunb , y_axis, math.rad(-180) )
+	Turn(gunb, y_axis, math.rad(-180))
 end
 
 local function MoveThread()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx( wake1,  2 )
-		EmitSfx( wake2,  2 )
-		Sleep( 300)
+		EmitSfx(wake1,  2)
+		EmitSfx(wake2,  2)
+		Sleep(300)
 	end
 end
 
@@ -72,30 +72,30 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_MOVE)
+	Signal(SIG_MOVE)
 end
 
 local function RestoreAfterDelay(num)
 	local turret = turretData[num]
 	
-	Signal( turret.SIG_RESTORE)
-	SetSignalMask( turret.SIG_RESTORE)
-	Sleep( RESTORE_DELAY)
+	Signal(turret.SIG_RESTORE)
+	SetSignalMask(turret.SIG_RESTORE)
+	Sleep(RESTORE_DELAY)
 	
-	Turn( turret.gun , y_axis, turret.gunRestore, math.rad(90) )
-	Turn( turret.barrelRight , x_axis, 0, math.rad(50) )
-	Turn( turret.barrelLeft , x_axis, 0, math.rad(50) )
+	Turn(turret.gun, y_axis, turret.gunRestore, math.rad(90))
+	Turn(turret.barrelRight, x_axis, 0, math.rad(50))
+	Turn(turret.barrelLeft, x_axis, 0, math.rad(50))
 end
 
 function script.AimWeapon(num, heading, pitch)
 	local turret = turretData[num]
 
-	Signal( turret.SIG_AIM)
-	SetSignalMask( turret.SIG_AIM)
+	Signal(turret.SIG_AIM)
+	SetSignalMask(turret.SIG_AIM)
 	
-	Turn( turret.gun , y_axis, heading, math.rad(800) ) -- Was 375
-	Turn( turret.barrelRight , x_axis, -pitch, math.rad(150) )
-	Turn( turret.barrelLeft , x_axis, -pitch, math.rad(150) )
+	Turn(turret.gun, y_axis, heading, math.rad(800)) -- Was 375
+	Turn(turret.barrelRight, x_axis, -pitch, math.rad(150))
+	Turn(turret.barrelLeft, x_axis, -pitch, math.rad(150))
 	WaitForTurn(turret.gun, y_axis)
 	WaitForTurn(turret.barrelRight, x_axis)
 	StartThread(RestoreAfterDelay, num)
@@ -105,8 +105,8 @@ end
 function script.Shot(num)
 	local turret = turretData[num]
 
-	EmitSfx( turret.flares[turret.shot],  1024 )
-	EmitSfx( turret.gun,  1025 )
+	EmitSfx(turret.flares[turret.shot],  1024)
+	EmitSfx(turret.gun,  1025)
 	turret.shot = 3 - turret.shot
 end
 
@@ -123,37 +123,37 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.25) then
-		Explode( hull, sfxNone)
-		Explode( gunf, sfxNone)
-		Explode( base, sfxNone)
-		Explode( gunb, sfxNone)
-		Explode( barrelfr, sfxNone)
+		Explode(hull, sfxNone)
+		Explode(gunf, sfxNone)
+		Explode(base, sfxNone)
+		Explode(gunb, sfxNone)
+		Explode(barrelfr, sfxNone)
 		return 1
 	end
 	if  severity <= 50  then
-		Explode( hull, sfxNone)
-		Explode( gunf, sfxFall)
-		Explode( base, sfxNone)
-		Explode( gunb, sfxFall)
-		Explode( barrelbr, sfxFall)
+		Explode(hull, sfxNone)
+		Explode(gunf, sfxFall)
+		Explode(base, sfxNone)
+		Explode(gunb, sfxFall)
+		Explode(barrelbr, sfxFall)
 		return 1
 	end
 	if  severity <= 99  then
-		Explode( hull, sfxShatter)
-		Explode( gunf, sfxFall)
-		Explode( base, sfxNone)
-		Explode( gunb, sfxFall)
-		Explode( barrelbr, sfxFall)
-		Explode( barrelfr, sfxFall)
-		Explode( barrelfl, sfxFall)
+		Explode(hull, sfxShatter)
+		Explode(gunf, sfxFall)
+		Explode(base, sfxNone)
+		Explode(gunb, sfxFall)
+		Explode(barrelbr, sfxFall)
+		Explode(barrelfr, sfxFall)
+		Explode(barrelfl, sfxFall)
 		return 2
 	end
-	Explode( hull, sfxShatter)
-	Explode( gunf, sfxFall)
-	Explode( base, sfxNone)
-	Explode( gunb, sfxFall)
-	Explode( barrelbr, sfxFall)
-	Explode( barrelfr, sfxFall)
-	Explode( barrelfl, sfxFall)
+	Explode(hull, sfxShatter)
+	Explode(gunf, sfxFall)
+	Explode(base, sfxNone)
+	Explode(gunb, sfxFall)
+	Explode(barrelbr, sfxFall)
+	Explode(barrelfr, sfxFall)
+	Explode(barrelfl, sfxFall)
 	return 2
 end

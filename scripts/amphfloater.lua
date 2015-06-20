@@ -56,25 +56,25 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 	while true do
-		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)) )
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(0,6)), math.rad(math.random(2,6)))
 		Sleep(2000)
-		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)) )
-		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)) )
+		Turn(base, x_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Turn(base, z_axis, math.rad(math.random(-3,3)), math.rad(math.random(1,2)))
+		Move(base, y_axis, math.rad(math.random(-6,0)), math.rad(math.random(2,6)))
 		Sleep(2000)
 	end
 end
 
 local function SinkBubbles()
-    SetSignalMask(SIG_FLOAT)
-    while true do
-        EmitSfx(vent1, SFX.BUBBLE)
-        EmitSfx(vent2, SFX.BUBBLE)
-        EmitSfx(vent3, SFX.BUBBLE)
-        Sleep(66)
-    end
+	SetSignalMask(SIG_FLOAT)
+	while true do
+		EmitSfx(vent1, SFX.BUBBLE)
+		EmitSfx(vent2, SFX.BUBBLE)
+		EmitSfx(vent3, SFX.BUBBLE)
+		Sleep(66)
+	end
 end
 
 local function dustBottom()
@@ -90,32 +90,32 @@ end
 function Float_startFromFloor()
 	dustBottom()
 	Signal(SIG_WALK)
-    Signal(SIG_FLOAT)
+	Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
 	dustBottom()
 	Signal(SIG_BOB)
-    Signal(SIG_FLOAT)
+	Signal(SIG_FLOAT)
 end
 
 function Float_rising()
-     Signal(SIG_FLOAT)
+	 Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
-    Signal(SIG_FLOAT)
-    StartThread(SinkBubbles)
+	Signal(SIG_FLOAT)
+	StartThread(SinkBubbles)
 end
 
 function Float_crossWaterline(speed)
-    --Signal(SIG_FLOAT)
+	--Signal(SIG_FLOAT)
 end
 
 function Float_stationaryOnSurface()
-    Signal(SIG_FLOAT)
-    bUnpacked = true
+	Signal(SIG_FLOAT)
+	bUnpacked = true
 end
 
 function unit_teleported(position)
@@ -161,23 +161,23 @@ function script.StartMoving()
 end
 
 local function Unpack()
-    Signal(SIG_UNPACK)
-    SetSignalMask(SIG_UNPACK)
-    
-    Sleep(UNPACK_TIME)
-    bUnpacked = true
+	Signal(SIG_UNPACK)
+	SetSignalMask(SIG_UNPACK)
+	
+	Sleep(UNPACK_TIME)
+	bUnpacked = true
 end
 
 local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
-	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
+	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
+	Turn(rshin, x_axis, 0, math.rad(120)*PACE)
+	Turn(rfoot, x_axis, 0, math.rad(80)*PACE)
+	Turn(lthigh, x_axis, 0, math.rad(80)*PACE)
+	Turn(lshin, x_axis, 0, math.rad(80)*PACE)
+	Turn(lfoot, x_axis, 0, math.rad(80)*PACE)
 	
 	--Move(lthigh, y_axis, 4, 12)
 	--Move(rthigh, y_axis, 4, 12)
@@ -219,8 +219,8 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(5000)
-	Turn( head, y_axis, 0, math.rad(65) )
-	Turn( barrel, x_axis, 0, math.rad(65) )
+	Turn(head, y_axis, 0, math.rad(65))
+	Turn(barrel, x_axis, 0, math.rad(65))
 end
 
 function script.AimFromWeapon()
@@ -241,8 +241,8 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
-		Turn( head, y_axis, heading, math.rad(360) )
-		Turn( barrel, x_axis, -pitch, math.rad(180) )
+		Turn(head, y_axis, heading, math.rad(360))
+		Turn(barrel, x_axis, -pitch, math.rad(180))
 		WaitForTurn(head, y_axis)
 		WaitForTurn(barrel, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -278,22 +278,22 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(body, sfxShatter)
 		return 1
 	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
 		Explode(body, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(body, sfxShatter + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(body, sfxShatter + sfxExplode)
 		return 2
 	end
 end

@@ -16,15 +16,15 @@ local takeoffHeight = UnitDefNames["corawac"].wantedHeight
 -- functions
 --------------------------------------------------------------------
 local function Decloak()
-    Signal(SIG_CLOAK)
-    SetSignalMask(SIG_CLOAK)
-    Sleep(CLOAK_TIME)
-    Spring.SetUnitCloak(unitID, false)
+	Signal(SIG_CLOAK)
+	SetSignalMask(SIG_CLOAK)
+	Sleep(CLOAK_TIME)
+	Spring.SetUnitCloak(unitID, false)
 end
 
 function Cloak()
-    Spring.SetUnitCloak(unitID, 2)
-    StartThread(Decloak)
+	Spring.SetUnitCloak(unitID, 2)
+	StartThread(Decloak)
 end
 
 function script.StopMoving()
@@ -34,7 +34,7 @@ end
 
 function script.Create()
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-    StartThread(SmokeUnit, smokePiece)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Killed(recentDamage, maxHealth)

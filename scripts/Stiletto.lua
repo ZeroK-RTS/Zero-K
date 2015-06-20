@@ -42,11 +42,11 @@ function script.MoveRate(moveRate)
 		if  not Static_Var_1   then
 		
 			Static_Var_1 = 1
-			Turn( base , z_axis, math.rad(-(240.000000)), 120.000000 )
+			Turn(base, z_axis, math.rad(-(240.000000)), 120.000000)
 			WaitForTurn(base, z_axis)
-			Turn( base , z_axis, math.rad(-(120.000000)), 180.000000 )
+			Turn(base, z_axis, math.rad(-(120.000000)), 180.000000)
 			WaitForTurn(base, z_axis)
-			Turn( base , z_axis, math.rad(-(0.000000)), 120.000000 )
+			Turn(base, z_axis, math.rad(-(0.000000)), 120.000000)
 			Static_Var_1 = 0
 		end
 	end

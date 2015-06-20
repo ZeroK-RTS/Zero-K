@@ -7,7 +7,7 @@ local firepoint = piece "firepoint"
 function script.QueryWeapon(num) return firepoint end
 function script.AimFromWeapon(num) return base end
 
-function script.AimWeapon( num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	return num == 2
 end
 

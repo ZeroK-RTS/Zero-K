@@ -35,31 +35,31 @@ local function TrackControl()
 	while isMoving do 
 		tracks = tracks + 1
 		if tracks == 2 then 
-			Hide( tracks1)
-			Show( tracks2)
+			Hide(tracks1)
+			Show(tracks2)
 		elseif tracks == 3 then 
-			Hide( tracks2)
-			Show( tracks3)
+			Hide(tracks2)
+			Show(tracks3)
 		elseif tracks == 4 then 
-			Hide( tracks3)
-			Show( tracks4)
+			Hide(tracks3)
+			Show(tracks4)
 		else 
 			tracks = 1
-			Hide( tracks4)
-			Show( tracks1)
+			Hide(tracks4)
+			Show(tracks1)
 		end
 		Sleep(TRACK_PERIOD)
 	end
 end
 
 local function Prepare() 
-	Move( bay , x_axis, 0 , BAY_SPEED )
+	Move(bay, x_axis, 0, BAY_SPEED)
 	WaitForMove(bay, x_axis)
 	doStrobe = true
-	Turn( gantry , x_axis, math.rad(-90), GANTRY_SPEED )
+	Turn(gantry, x_axis, math.rad(-90), GANTRY_SPEED)
 	WaitForTurn(gantry, x_axis)
-	Turn( clamp1 , z_axis, math.rad(-(90)), CLAMP_SPEED )
-	Turn( clamp2 , z_axis, math.rad(-(-90)), CLAMP_SPEED )
+	Turn(clamp1, z_axis, math.rad(-(90)), CLAMP_SPEED)
+	Turn(clamp2, z_axis, math.rad(-(-90)), CLAMP_SPEED)
 	WaitForTurn(clamp1, y_axis)
 	WaitForTurn(clamp2, y_axis)
 	isReady = true
@@ -68,18 +68,18 @@ end
 local function Reload() 
 	isReady = false
 	doStrobe = false
-	Turn( clamp1 , z_axis, 0, CLAMP_SPEED )
-	Turn( clamp2 , z_axis, 0, CLAMP_SPEED )
+	Turn(clamp1, z_axis, 0, CLAMP_SPEED)
+	Turn(clamp2, z_axis, 0, CLAMP_SPEED)
 	WaitForTurn(clamp1, z_axis)
 	WaitForTurn(clamp2, z_axis)
-	Turn( gantry , x_axis, 0, GANTRY_SPEED )
+	Turn(gantry, x_axis, 0, GANTRY_SPEED)
 	WaitForTurn(gantry, x_axis)
-	Move( bay , x_axis, -BAY_DISTANCE , BAY_SPEED )
+	Move(bay, x_axis, -BAY_DISTANCE, BAY_SPEED)
 	WaitForMove(bay, x_axis)
 	
 	Sleep(LOAD_DELAY)
 	isLoaded = 1
-	Show( missile)
+	Show(missile)
 end
 
 local function Moving()
@@ -88,7 +88,7 @@ local function Moving()
 	
 	StartThread(TrackControl)
 	for i=1,#wheels do
-		Spin( wheels[i] , x_axis, WHEEL_SPIN_SPEED, WHEEL_SPIN_ACCEL )
+		Spin(wheels[i], x_axis, WHEEL_SPIN_SPEED, WHEEL_SPIN_ACCEL)
 	end
 end
 
@@ -96,7 +96,7 @@ local function Stopping()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	for i=1,#wheels do
-		StopSpin( wheels[i], x_axis, WHEEL_SPIN_DECEL )
+		StopSpin(wheels[i], x_axis, WHEEL_SPIN_DECEL)
 	end
 end
 
@@ -116,8 +116,8 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch) 
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	GG.DontFireRadar_CheckAim(unitID)
 	
 	if isLoaded then 
@@ -142,17 +142,17 @@ function script.QueryWeapon(num)
 end
 
 function script.Shot(num) 
-	Hide( missile)
+	Hide(missile)
 	isLoaded = false
 	doStrobe = false
 	StartThread(Reload)
 end
 
 function script.Create() 
-	Hide( tracks2)
-	Hide( tracks3)
-	Hide( tracks4)
-	Move( bay , x_axis, -BAY_DISTANCE  )
+	Hide(tracks2)
+	Hide(tracks3)
+	Hide(tracks4)
+	Move(bay, x_axis, -BAY_DISTANCE)
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -175,11 +175,11 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(missile, sfxNone)
 		return 1
 	else 
-		Explode(base, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(bay, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(gantry, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(clamp1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(clamp2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(base, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(bay, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(gantry, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(clamp1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(clamp2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
 		Explode(missile, sfxNone)
 		return 2
 	end

@@ -73,7 +73,7 @@ function script.Create()
 end
 
 function script.StartBuilding()
-	Turn(scaffold , y_axis, math.rad((-padnum*90) + 45), math.rad(90) )
+	Turn(scaffold, y_axis, math.rad((-padnum*90) + 45), math.rad(90))
 end
 
 function script.StopBuilding()

@@ -93,24 +93,24 @@ function Suspension()
 			yv = yv*0.99 + ya
 			yp = yp*0.98 + yv
 
-			Move( base , y_axis, yp, 9000 )
-			Turn( base , x_axis, xtilt, math.rad(9000) )
-			Turn( base , z_axis, -ztilt, math.rad(9000) )
+			Move(base, y_axis, yp, 9000)
+			Turn(base, x_axis, xtilt, math.rad(9000))
+			Turn(base, z_axis, -ztilt, math.rad(9000))
 
-			Move( rwheel1, y_axis, s1r, 20)
-			Move( rwheel2, y_axis, s2r, 20)
-			Move( rfender1, y_axis, s1r, 20)
-			Move( rfender2, y_axis, s2r, 20)
-                                        
-			Move( lwheel1, y_axis, s1l, 20)
-			Move( lwheel2, y_axis, s2l, 20)
-			Move( lfender1, y_axis, s1l, 20)
-			Move( lfender2, y_axis, s2l, 20)
+			Move(rwheel1, y_axis, s1r, 20)
+			Move(rwheel2, y_axis, s2r, 20)
+			Move(rfender1, y_axis, s1r, 20)
+			Move(rfender2, y_axis, s2r, 20)
+										
+			Move(lwheel1, y_axis, s1l, 20)
+			Move(lwheel2, y_axis, s2l, 20)
+			Move(lfender1, y_axis, s1l, 20)
+			Move(lfender2, y_axis, s2l, 20)
 
-			Spin( rwheel1, x_axis, wheelTurnSpeed)
-			Spin( rwheel2, x_axis, wheelTurnSpeed)
-			Spin( lwheel1, x_axis, wheelTurnSpeed)
-			Spin( lwheel2, x_axis, wheelTurnSpeed)
+			Spin(rwheel1, x_axis, wheelTurnSpeed)
+			Spin(rwheel2, x_axis, wheelTurnSpeed)
+			Spin(lwheel1, x_axis, wheelTurnSpeed)
+			Spin(lwheel2, x_axis, wheelTurnSpeed)
 		end
 		Sleep(50)
    end 
@@ -118,7 +118,7 @@ end
 
 function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
-	Turn( turret , y_axis, 0, math.rad(90) )
+	Turn(turret, y_axis, 0, math.rad(90))
 end
 
 function script.StopMoving()
@@ -145,10 +145,10 @@ function script.StartMoving()
 	local x,y,z = spGetUnitVelocity(unitID)
 	wheelTurnSpeed =  math.sqrt(x*x+y*y+z*z)*10
 	
-	Spin( rwheel1 , x_axis, wheelTurnSpeed)
-	Spin( rwheel2 , x_axis, wheelTurnSpeed)
-	Spin( lwheel1 , x_axis, wheelTurnSpeed)
-	Spin( lwheel2 , x_axis, wheelTurnSpeed)
+	Spin(rwheel1, x_axis, wheelTurnSpeed)
+	Spin(rwheel2, x_axis, wheelTurnSpeed)
+	Spin(lwheel1, x_axis, wheelTurnSpeed)
+	Spin(lwheel2, x_axis, wheelTurnSpeed)
 end
 
 -- Weapons
@@ -161,11 +161,11 @@ function script.QueryWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
-	Turn( turret , y_axis, heading, math.rad(TURRET_TURN_SPEED) )
-	Turn( sleeve , x_axis, -pitch, math.rad(SLEEVE_TURN_SPEED) )
+	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
+	Turn(sleeve, x_axis, -pitch, math.rad(SLEEVE_TURN_SPEED))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(sleeve, y_axis)
 	StartThread(RestoreAfterDelay)
@@ -174,7 +174,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function FireWeapon(num)
-	EmitSfx( firepoint,  UNIT_SFX1 )
+	EmitSfx(firepoint,  UNIT_SFX1)
 end
 
 
@@ -193,16 +193,16 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxShatter)
 		return 1
 	elseif severity < 1 then
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
 		Explode(body, sfxNone)
 		Explode(turret, sfxShatter)
 		return 2
 	else
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
 		Explode(body, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
 		return 2
 	end
 end

@@ -5,7 +5,7 @@ include "constants.lua"
 function FakeUprightInit(xp, zp, drop) 
 	Move (xp,z_axis,5000)
 	Move (zp,x_axis,5000)
-	Turn( drop , x_axis,  math.rad(90))
+	Turn(drop, x_axis,  math.rad(90))
 end
 
 function FakeUprightTurn(unitID, xp, zp, base, preDrop) 
@@ -22,6 +22,6 @@ function FakeUprightTurn(unitID, xp, zp, base, preDrop)
 	local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
 	local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
 
-	Turn( preDrop , x_axis, angle_x)
-	Turn( preDrop , z_axis, -angle_z)
+	Turn(preDrop, x_axis, angle_x)
+	Turn(preDrop, z_axis, -angle_z)
 end

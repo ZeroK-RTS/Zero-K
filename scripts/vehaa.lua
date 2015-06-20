@@ -99,7 +99,7 @@ local function AnimControl()
 		
 		turnTilt = -turnAngle*0.007
 		lastHeading = currHeading
-		Sleep( ANIM_PERIOD)
+		Sleep(ANIM_PERIOD)
 	end
 end
 
@@ -142,7 +142,7 @@ function Suspension()
 			s1l = GetWheelHeight(gs1l)
 			s2l = GetWheelHeight(gs2l)
 			
-			--xtilta = (s3r + s3l - s1l - s1r)/6000    
+			--xtilta = (s3r + s3l - s1l - s1r)/6000	
 			--xtiltv = xtiltv*0.99 + xtilta
 			--xtilt = xtilt*0.98 + xtiltv
 
@@ -154,13 +154,13 @@ function Suspension()
 			yv = yv*0.99 + ya
 			yp = yp*0.98 + yv
 
-			Move(rockbase , y_axis, yp , 9000 )
-			--Turn(rockbase , x_axis, xtilt, math.rad(9000) )
-			Turn(rockbase , z_axis, -ztilt, math.rad(9000) )
+			Move(rockbase, y_axis, yp, 9000)
+			--Turn(rockbase, x_axis, xtilt, math.rad(9000))
+			Turn(rockbase, z_axis, -ztilt, math.rad(9000))
 
 			Move(rwheel1, y_axis, s1r, 20)
 			Move(rwheel2, y_axis, s2r, 20)
-                                        
+										
 			Move(lwheel1, y_axis, s1l, 20)
 			Move(lwheel2, y_axis, s2l, 20)
 

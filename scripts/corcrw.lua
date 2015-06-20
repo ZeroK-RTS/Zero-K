@@ -187,17 +187,17 @@ end
 
 --[[
 function TiltBody(heading)
-	Signal( signals.tilt )
-	SetSignalMask( signals.tilt )	
-		if( attacking ) then
+	Signal(signals.tilt)
+	SetSignalMask(signals.tilt)	
+		if(attacking) then
 			--calculate tilt amount for z angle and x angle
 			local amountz = -math.sin(heading)
 			local amountx = math.cos(heading)
 					
 			--Turn(Base,x_axis, amountx * tiltAngle,1)							
 			--Turn(Base,z_axis, amountz * tiltAngle,1)
-			WaitForTurn ( Base , x_axis )
-			WaitForTurn ( Base , z_axis )
+			WaitForTurn (Base, x_axis)
+			WaitForTurn (Base, z_axis)
 		end
 		
 end
@@ -207,10 +207,10 @@ local function RestoreAfterDelay()
 	Sleep(restoreDelay)
 	attacking = false
 	--Turn(Base,x_axis, math.rad(0),1) --default tilt
-	--WaitForTurn ( Base , x_axis )
+	--WaitForTurn (Base, x_axis)
 	--Turn(Base,z_axis, math.rad(0),1) --default tilt
-	--WaitForTurn ( Base , z_axis )
-	--Signal( tiltSignal )
+	--WaitForTurn (Base, z_axis)
+	--Signal(tiltSignal)
 end
 
 function script.QueryWeapon(num) 	
@@ -226,7 +226,7 @@ local function ClusterBombThread()
 	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 	local sleepTime = 70/slowState
 	for i = 1, SPECIAL_FIRE_COUNT do
-		EmitSfx( subemit[0],  FIRE_W5 )
+		EmitSfx(subemit[0],  FIRE_W5)
 		Sleep(sleepTime)
 	end
 	Sleep(330)
@@ -245,15 +245,15 @@ function ClusterBomb()
 	--end
 end
 
-function script.AimWeapon( num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	if num >= 5 then
 		return false
 	elseif num == 3 then
 		--EmitSfx(Base, 2048 + 2)
 		return false
 	end
-	Signal( signals[num] )
-	SetSignalMask( signals[num] )
+	Signal(signals[num])
+	SetSignalMask(signals[num])
 	attacking = true	
 
 	--StartThread(TiltBody, heading)	
@@ -261,16 +261,16 @@ function script.AimWeapon( num, heading, pitch )
 	local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, gunpoints[num].normal, gunpoints[num].radial, gunpoints[num].right)
 	
 	Turn(gunpoints[num].rot, y_axis, theta, turretSpeed)
-	Turn(gunpoints[num].pitch, x_axis, phi ,turretSpeed)	
-	WaitForTurn (gunpoints[num].pitch, x_axis ) 
-	WaitForTurn (gunpoints[num].rot , y_axis )
+	Turn(gunpoints[num].pitch, x_axis, phi,turretSpeed)	
+	WaitForTurn (gunpoints[num].pitch, x_axis) 
+	WaitForTurn (gunpoints[num].rot, y_axis)
 	
 	StartThread(RestoreAfterDelay)
 	return true
 end
 
 function script.FireWeapon(num)
-	--Sleep( 1000 )
+	--Sleep(1000)
 	if num ~= 3 then
 		EmitSfx(gunpoints[num].fire, 1024)
 	else
@@ -282,16 +282,16 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode( Base, sfxNone )
-		Explode( RightTurret, sfxNone )
-		Explode( LeftTurret, sfxNone )
-		Explode( RearTurret, sfxNone )
+		Explode(Base, sfxNone)
+		Explode(RightTurret, sfxNone)
+		Explode(LeftTurret, sfxNone)
+		Explode(RearTurret, sfxNone)
 		return 1
 	else
-		Explode( Base, sfxShatter )
-		Explode( RightTurret, sfxExplode )
-		Explode( LeftTurret, sfxExplode )
-		Explode( RearTurret, sfxExplode )
+		Explode(Base, sfxShatter)
+		Explode(RightTurret, sfxExplode)
+		Explode(LeftTurret, sfxExplode)
+		Explode(RearTurret, sfxExplode)
 		return 2
 	end
 end

@@ -29,13 +29,13 @@ local function Activate()
 	SetSignalMask(SIG_OPEN)
 	
 	Sleep(1000)
-	Move( dish , y_axis, 11 , 7 )
+	Move(dish, y_axis, 11, 7)
 	WaitForMove(dish, y_axis)
-	Turn( ant , z_axis, rad(-100), rad(60) )
-	Turn( arm , z_axis, rad(30), rad(40) )
-	Spin( spinner , y_axis, rad(20), rad(20))
+	Turn(ant, z_axis, rad(-100), rad(60))
+	Turn(arm, z_axis, rad(30), rad(40))
+	Spin(spinner, y_axis, rad(20), rad(20))
 	WaitForTurn(ant, z_axis)
-	Spin( dish , y_axis, rad(20), rad(20))
+	Spin(dish, y_axis, rad(20), rad(20))
 end
 
 local function Deactivate()
@@ -44,25 +44,25 @@ local function Deactivate()
 	SetSignalMask(SIG_CLOSE)
 
 	if spGetUnitIsStunned(unitID) then
-		Spring.UnitScript.StopSpin(dish , y_axis, rad(10))
-		Spring.UnitScript.StopSpin(spinner , y_axis, rad(10))
+		Spring.UnitScript.StopSpin(dish, y_axis, rad(10))
+		Spring.UnitScript.StopSpin(spinner, y_axis, rad(10))
 	else
-		Spin( dish , y_axis,  rad(0), rad(20))
-		Turn( ant , z_axis, rad(0), rad(60) )
-		Turn( arm , z_axis, rad(0), rad(40) )
+		Spin(dish, y_axis,  rad(0), rad(20))
+		Turn(ant, z_axis, rad(0), rad(60))
+		Turn(arm, z_axis, rad(0), rad(40))
 		WaitForTurn(ant, z_axis)
-		Move( dish , y_axis, 0, 7)
+		Move(dish, y_axis, 0, 7)
 		WaitForMove(dish, y_axis)
-		Spin( spinner , y_axis, rad(0), rad(3) )
+		Spin(spinner, y_axis, rad(0), rad(3))
 	end
 end
 
 function script.Activate()
-	StartThread( Activate)
+	StartThread(Activate)
 end
 
 function script.Deactivate()
-	StartThread( Deactivate)
+	StartThread(Deactivate)
 end
 
 function script.Killed(recentDamage, maxHealth)
@@ -78,14 +78,14 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(arm, sfxFall)
 		Explode(ant, sfxFall)
 		Explode(base, sfxShatter)
-		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(spinner, sfxShatter)
 		return 1
 	else
-		Explode(arm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
-		Explode(ant, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+		Explode(arm, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(ant, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(base, sfxShatter)
-		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+		Explode(dish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(spinner, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end

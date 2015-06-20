@@ -36,12 +36,12 @@ local function Burrow()
 	
 	burrowed = true
 	
-	--Spring.UnitScript.SetUnitValue( firestate, 0 )
-	Turn( base, side, -RIGHT_ANGLE, 5 )
-	Turn( l_wing, side, RIGHT_ANGLE, 5 )
-	Turn( r_wing, side, RIGHT_ANGLE, 5 )
-	Move( base, up, 8, 8 )
-	--Move( base, forward, -4, 5 )
+	--Spring.UnitScript.SetUnitValue(firestate, 0)
+	Turn(base, side, -RIGHT_ANGLE, 5)
+	Turn(l_wing, side, RIGHT_ANGLE, 5)
+	Turn(r_wing, side, RIGHT_ANGLE, 5)
+	Move(base, up, 8, 8)
+	--Move(base, forward, -4, 5)
 	Spring.SetUnitCloak(unitID, 2)
 	Spring.SetUnitStealth(unitID, true)
 end
@@ -51,12 +51,12 @@ local function UnBurrow()
 	burrowed = false
 	Spring.SetUnitCloak(unitID, 0)
 	Spring.SetUnitStealth(unitID, false)
-	--Spring.UnitScript.SetUnitValue( firestate, 2 )
-	Turn( base, side, 0, 5 )
-	Turn( l_wing, side,0, 5 )
-	Turn( r_wing, side, 0, 5 )
-	Move( base, up, 0, 10 )
-	--Move( base, forward, 0, 5 )
+	--Spring.UnitScript.SetUnitValue(firestate, 2)
+	Turn(base, side, 0, 5)
+	Turn(l_wing, side,0, 5)
+	Turn(r_wing, side, 0, 5)
+	Move(base, up, 0, 10)
+	--Move(base, forward, 0, 5)
 end
 
 function script.Create()
@@ -64,32 +64,32 @@ function script.Create()
 end
 
 function script.Activate()
-	StartThread( UnBurrow )
+	StartThread(UnBurrow)
 end
 
 function script.StopMoving()
-	StartThread( Burrow )
+	StartThread(Burrow)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( base, SFX.EXPLODE + SFX.FIRE + SFX.SMOKE )
-	Explode( l_wing, SFX.EXPLODE )
-	Explode( r_wing, SFX.EXPLODE )
+	Explode(base, SFX.EXPLODE + SFX.FIRE + SFX.SMOKE)
+	Explode(l_wing, SFX.EXPLODE)
+	Explode(r_wing, SFX.EXPLODE)
 	
-	Explode( missile, SFX.SHATTER )
+	Explode(missile, SFX.SHATTER)
 	
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( l_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
-	Explode( r_fan, SFX.EXPLODE )
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(l_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
+	Explode(r_fan, SFX.EXPLODE)
 	
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then

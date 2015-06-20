@@ -12,7 +12,7 @@ local TRANSLATION_STOP = 1
 function StopTurn(piece, axis)
 	if IsInTurn(piece, axis) then
 		local rot = select(axis, GetPieceRotation(piece))
-		Turn( piece , axis, rot, ROTATION_STOP)
+		Turn(piece, axis, rot, ROTATION_STOP)
 		return true
 	end
 	return false
@@ -21,7 +21,7 @@ end
 function StopMove(piece, axis)
 	if IsInMove(piece, axis) then
 		local trans = select(axis, GetPieceRotation(piece))
-		Move( piece , axis, trans, TRANSLATION_STOP)
+		Move(piece, axis, trans, TRANSLATION_STOP)
 		return true
 	end
 	return false

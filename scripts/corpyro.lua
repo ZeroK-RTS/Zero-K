@@ -38,120 +38,120 @@ local function BeginJumpThread()
 	Signal(SIG_MOVE)
 	
 	--crouch and prepare to jump
-	Turn( l_leg , x_axis, 0, ANGULAR_SPEED*6 )
-	Turn( l_foot , x_axis, math.rad(30), ANGULAR_SPEED*4 )
+	Turn(l_leg, x_axis, 0, ANGULAR_SPEED*6)
+	Turn(l_foot, x_axis, math.rad(30), ANGULAR_SPEED*4)
 	
-	Turn( r_leg , x_axis, 0, ANGULAR_SPEED*6 )
-	Turn( r_foot , x_axis, math.rad(30), ANGULAR_SPEED*4 )
+	Turn(r_leg, x_axis, 0, ANGULAR_SPEED*6)
+	Turn(r_foot, x_axis, math.rad(30), ANGULAR_SPEED*4)
 	
-	Move( base , y_axis, -3 , LINEAR_SPEED*4 )
+	Move(base, y_axis, -3, LINEAR_SPEED*4)
 	WaitForTurn(l_leg, x_axis)
 	--spring off with lower legs
-	Move( base , y_axis, 3 , LINEAR_SPEED*4 )
-	Move( l_shin , y_axis, -2 , LINEAR_SPEED*8 )
-	Move( r_shin , y_axis, -2 , LINEAR_SPEED*8 )
+	Move(base, y_axis, 3, LINEAR_SPEED*4)
+	Move(l_shin, y_axis, -2, LINEAR_SPEED*8)
+	Move(r_shin, y_axis, -2, LINEAR_SPEED*8)
 	--begin rocket boost
-	EmitSfx( l_jetpt,  1027 )
-	EmitSfx( r_jetpt,  1027 )
+	EmitSfx(l_jetpt,  1027)
+	EmitSfx(r_jetpt,  1027)
 	--small adjustments in flight
-	Sleep( 600)
+	Sleep(600)
 	
 	--move to neutral
-	Move( base , y_axis, 0 , LINEAR_SPEED )
-	Move( base , z_axis, -4 , LINEAR_SPEED )
-	Move( l_shin , y_axis, 0 , LINEAR_SPEED/2 )
-	Move( r_shin , y_axis, 0 , LINEAR_SPEED/2 )	
+	Move(base, y_axis, 0, LINEAR_SPEED)
+	Move(base, z_axis, -4, LINEAR_SPEED)
+	Move(l_shin, y_axis, 0, LINEAR_SPEED/2)
+	Move(r_shin, y_axis, 0, LINEAR_SPEED/2)	
 	
 	--wiggle legs in glee
-	Turn( l_leg , x_axis, math.rad(-20), ANGULAR_SPEED )
-	Turn( r_leg , x_axis, math.rad(-50), ANGULAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED)
+	Turn(r_leg, x_axis, math.rad(-50), ANGULAR_SPEED)
 	WaitForTurn(r_leg, x_axis)
-	Turn( l_leg , x_axis, math.rad(-60), ANGULAR_SPEED )
-	Turn( r_leg , x_axis, math.rad(-10), ANGULAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-60), ANGULAR_SPEED)
+	Turn(r_leg, x_axis, math.rad(-10), ANGULAR_SPEED)
 	WaitForTurn(l_leg, x_axis)
-	Turn( l_leg , x_axis, math.rad(-10), ANGULAR_SPEED )
-	Turn( r_leg , x_axis, math.rad(-70), ANGULAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-10), ANGULAR_SPEED)
+	Turn(r_leg, x_axis, math.rad(-70), ANGULAR_SPEED)
 	WaitForTurn(l_leg, x_axis)
-	Turn( l_leg , x_axis, math.rad(-50), ANGULAR_SPEED )
-	Turn( r_leg , x_axis, math.rad(-20), ANGULAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-50), ANGULAR_SPEED)
+	Turn(r_leg, x_axis, math.rad(-20), ANGULAR_SPEED)
 	WaitForTurn(r_leg, x_axis)
 	
 	--move legs to landing position
-	Turn( l_leg , x_axis, math.rad(-40), ANGULAR_SPEED/2 )
-	Turn( l_foot , x_axis, math.rad(30), ANGULAR_SPEED )
-	Turn( r_leg , x_axis, math.rad(-40), ANGULAR_SPEED/2 )
-	Turn( r_foot , x_axis, math.rad(30), ANGULAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-40), ANGULAR_SPEED/2)
+	Turn(l_foot, x_axis, math.rad(30), ANGULAR_SPEED)
+	Turn(r_leg, x_axis, math.rad(-40), ANGULAR_SPEED/2)
+	Turn(r_foot, x_axis, math.rad(30), ANGULAR_SPEED)
 	WaitForMove(r_shin, y_axis)
-	Move( l_shin , y_axis, -1 , LINEAR_SPEED/2 )
-	Move( r_shin , y_axis, -1 , LINEAR_SPEED/2 )
+	Move(l_shin, y_axis, -1, LINEAR_SPEED/2)
+	Move(r_shin, y_axis, -1, LINEAR_SPEED/2)
 end
 
 local function PrepareJumpLand()
-	Sleep( 100)
-	Turn( low_head , x_axis, math.rad(50), ANGULAR_SPEED*2.5 )
-	Move( base , y_axis, -2 , LINEAR_SPEED*2 )
-	Turn( base , x_axis, math.rad(10), ANGULAR_SPEED )
+	Sleep(100)
+	Turn(low_head, x_axis, math.rad(50), ANGULAR_SPEED*2.5)
+	Move(base, y_axis, -2, LINEAR_SPEED*2)
+	Turn(base, x_axis, math.rad(10), ANGULAR_SPEED)
 	
-	Move( l_shin , y_axis, 2 , LINEAR_SPEED*2 )
-	Turn( l_leg , x_axis, math.rad(-15), ANGULAR_SPEED )
-	Turn( l_foot , x_axis, math.rad(15), ANGULAR_SPEED )
+	Move(l_shin, y_axis, 2, LINEAR_SPEED*2)
+	Turn(l_leg, x_axis, math.rad(-15), ANGULAR_SPEED)
+	Turn(l_foot, x_axis, math.rad(15), ANGULAR_SPEED)
 	
-	Move( r_shin , y_axis, 2 , LINEAR_SPEED*2 )
-	Turn( r_leg , x_axis, math.rad(-15), ANGULAR_SPEED )
-	Turn( r_foot , x_axis, math.rad(15), ANGULAR_SPEED )
+	Move(r_shin, y_axis, 2, LINEAR_SPEED*2)
+	Turn(r_leg, x_axis, math.rad(-15), ANGULAR_SPEED)
+	Turn(r_foot, x_axis, math.rad(15), ANGULAR_SPEED)
 	
 	WaitForTurn(low_head, x_axis)
-	Turn( low_head , x_axis, 0, ANGULAR_SPEED )
-	Turn( base , x_axis, 0, ANGULAR_SPEED )
+	Turn(low_head, x_axis, 0, ANGULAR_SPEED)
+	Turn(base, x_axis, 0, ANGULAR_SPEED)
 	WaitForMove(r_shin, y_axis)
-	Move( base , y_axis, 0 , LINEAR_SPEED )
-	Move( l_shin , y_axis, 0 , LINEAR_SPEED )
-	Move( r_shin , y_axis, 0 , LINEAR_SPEED )
+	Move(base, y_axis, 0, LINEAR_SPEED)
+	Move(l_shin, y_axis, 0, LINEAR_SPEED)
+	Move(r_shin, y_axis, 0, LINEAR_SPEED)
 end
 
 local function EndJumpThread()
-	EmitSfx( l_foot,  1027 )
-	EmitSfx( r_foot,  1027 )
+	EmitSfx(l_foot,  1027)
+	EmitSfx(r_foot,  1027)
 	
 	--stumble forward
-	Move( base , z_axis, 0 , LINEAR_SPEED*1.8 )
+	Move(base, z_axis, 0, LINEAR_SPEED*1.8)
 	
-	Turn( l_leg , x_axis, 0, ANGULAR_SPEED )--left max back
-	Turn( l_foot , x_axis, 0, ANGULAR_SPEED )
+	Turn(l_leg, x_axis, 0, ANGULAR_SPEED)--left max back
+	Turn(l_foot, x_axis, 0, ANGULAR_SPEED)
 	
-	Turn( r_leg , x_axis, math.rad(-65), ANGULAR_SPEED )--right max forward
-	Turn( r_foot , x_axis, math.rad(65), ANGULAR_SPEED )
-	Move( r_shin , y_axis, -1.3 , LINEAR_SPEED )
+	Turn(r_leg, x_axis, math.rad(-65), ANGULAR_SPEED)--right max forward
+	Turn(r_foot, x_axis, math.rad(65), ANGULAR_SPEED)
+	Move(r_shin, y_axis, -1.3, LINEAR_SPEED)
 	WaitForTurn(r_leg, x_axis)
 	
-	Turn( l_leg , x_axis, math.rad(-20), ANGULAR_SPEED )
-	Turn( l_foot , x_axis, math.rad(20), ANGULAR_SPEED )
-	Move( l_shin , y_axis, 1 , LINEAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED)
+	Turn(l_foot, x_axis, math.rad(20), ANGULAR_SPEED)
+	Move(l_shin, y_axis, 1, LINEAR_SPEED)
 	
-	Turn( r_leg , x_axis, math.rad(-35), ANGULAR_SPEED )
-	Turn( r_foot , x_axis, math.rad(35), ANGULAR_SPEED )
+	Turn(r_leg, x_axis, math.rad(-35), ANGULAR_SPEED)
+	Turn(r_foot, x_axis, math.rad(35), ANGULAR_SPEED)
 	WaitForTurn(r_leg, x_axis)
 	
-	Turn( l_leg , x_axis, math.rad(-65), ANGULAR_SPEED )--left max forward
-	Turn( l_foot , x_axis, math.rad(65), ANGULAR_SPEED )
-	Move( l_shin , y_axis, -1.3 , LINEAR_SPEED )
-	Turn( l_pist1 , x_axis, math.rad(-60), ANGULAR_SPEED*1.2 )
-	--Move( l_pist3 , y_axis, 0.55 , LINEAR_SPEED )
-	Move( l_pist2 , y_axis, 0.55 , LINEAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-65), ANGULAR_SPEED)--left max forward
+	Turn(l_foot, x_axis, math.rad(65), ANGULAR_SPEED)
+	Move(l_shin, y_axis, -1.3, LINEAR_SPEED)
+	Turn(l_pist1, x_axis, math.rad(-60), ANGULAR_SPEED*1.2)
+	--Move(l_pist3, y_axis, 0.55, LINEAR_SPEED)
+	Move(l_pist2, y_axis, 0.55, LINEAR_SPEED)
 	
-	Turn( r_leg , x_axis, 0, ANGULAR_SPEED )--right max back
-	Turn( r_foot , x_axis, 0, ANGULAR_SPEED )
+	Turn(r_leg, x_axis, 0, ANGULAR_SPEED)--right max back
+	Turn(r_foot, x_axis, 0, ANGULAR_SPEED)
 	WaitForTurn(l_leg, x_axis)
-	Turn( r_pist1 , x_axis, math.rad(-50), ANGULAR_SPEED )
-	Move( r_pist1 , y_axis, -0.45 , LINEAR_SPEED )
-	Move( r_pist2 , y_axis, -0.45 , LINEAR_SPEED )
+	Turn(r_pist1, x_axis, math.rad(-50), ANGULAR_SPEED)
+	Move(r_pist1, y_axis, -0.45, LINEAR_SPEED)
+	Move(r_pist2, y_axis, -0.45, LINEAR_SPEED)
 end
 
-function jumping( jumpPercent )
+function jumping(jumpPercent)
 
 	if jumpPercent < 20  then
-		EmitSfx( l_jetpt,  1026 )
-		EmitSfx( r_jetpt,  1026 )
+		EmitSfx(l_jetpt,  1026)
+		EmitSfx(r_jetpt,  1026)
 	end
 	
 	if jumpPercent > 95 and not landing then 
@@ -182,81 +182,81 @@ local function walk()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	
-	Turn( l_leg , x_axis, math.rad(-65), ANGULAR_SPEED )
-	Turn( l_foot , x_axis, math.rad(65), ANGULAR_SPEED )
-	Move( l_shin , y_axis, -2 , LINEAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-65), ANGULAR_SPEED)
+	Turn(l_foot, x_axis, math.rad(65), ANGULAR_SPEED)
+	Move(l_shin, y_axis, -2, LINEAR_SPEED)
 	
-	Turn( r_leg , x_axis, 0, ANGULAR_SPEED )
-	Turn( r_foot , x_axis, 0, ANGULAR_SPEED )
-	Move( r_shin , y_axis, 0 , LINEAR_SPEED )
+	Turn(r_leg, x_axis, 0, ANGULAR_SPEED)
+	Turn(r_foot, x_axis, 0, ANGULAR_SPEED)
+	Move(r_shin, y_axis, 0, LINEAR_SPEED)
 
 	while true do
 	
-		Move( base , y_axis, 1.5 , LINEAR_SPEED )
-		Turn( low_head , z_axis, math.rad(-(-7)), ANGULAR_SPEED/4 )
-		Turn( low_head , x_axis, math.rad(-5), ANGULAR_SPEED/2.4 )
+		Move(base, y_axis, 1.5, LINEAR_SPEED)
+		Turn(low_head, z_axis, math.rad(-(-7)), ANGULAR_SPEED/4)
+		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
-		Turn( l_leg , x_axis, math.rad(-35), ANGULAR_SPEED*1.4 )
-		Turn( l_foot , x_axis, math.rad(35), ANGULAR_SPEED )
-		Move( l_shin , y_axis, -1.5 , LINEAR_SPEED/1.5 )
+		Turn(l_leg, x_axis, math.rad(-35), ANGULAR_SPEED*1.4)
+		Turn(l_foot, x_axis, math.rad(35), ANGULAR_SPEED)
+		Move(l_shin, y_axis, -1.5, LINEAR_SPEED/1.5)
 		
-		Turn( r_leg , x_axis, math.rad(-20), ANGULAR_SPEED*1.4 )
-		Turn( r_foot , x_axis, math.rad(20), ANGULAR_SPEED )
-		Move( r_shin , y_axis, 1 , LINEAR_SPEED )
-		Move( r_pist1 , y_axis, 0.1 , LINEAR_SPEED/2 )
-		Move( r_pist2 , y_axis, 0.5 , LINEAR_SPEED/2 )
+		Turn(r_leg, x_axis, math.rad(-20), ANGULAR_SPEED*1.4)
+		Turn(r_foot, x_axis, math.rad(20), ANGULAR_SPEED)
+		Move(r_shin, y_axis, 1, LINEAR_SPEED)
+		Move(r_pist1, y_axis, 0.1, LINEAR_SPEED/2)
+		Move(r_pist2, y_axis, 0.5, LINEAR_SPEED/2)
 		
 		WaitForTurn(low_head, x_axis)
 	
-		Move( base , y_axis, 0 , LINEAR_SPEED/3 )
-		Turn( low_head , x_axis, math.rad(10), ANGULAR_SPEED/3 )
+		Move(base, y_axis, 0, LINEAR_SPEED/3)
+		Turn(low_head, x_axis, math.rad(10), ANGULAR_SPEED/3)
 		
-		Turn( l_leg , x_axis, 0, ANGULAR_SPEED*1.6 )--left max back
-		Turn( l_foot , x_axis, 0, ANGULAR_SPEED*1.2 )
-		Turn( l_pist1 , x_axis, math.rad(-50), ANGULAR_SPEED*1.2 )
-		Move( l_pist1 , y_axis, -0.45 , LINEAR_SPEED/2 )
-		Move( l_pist2 , y_axis, -0.45 , LINEAR_SPEED/2 )
+		Turn(l_leg, x_axis, 0, ANGULAR_SPEED*1.6)--left max back
+		Turn(l_foot, x_axis, 0, ANGULAR_SPEED*1.2)
+		Turn(l_pist1, x_axis, math.rad(-50), ANGULAR_SPEED*1.2)
+		Move(l_pist1, y_axis, -0.45, LINEAR_SPEED/2)
+		Move(l_pist2, y_axis, -0.45, LINEAR_SPEED/2)
 		
-		Turn( r_leg , x_axis, math.rad(-65), ANGULAR_SPEED*1.4 )--right max forward
-		Turn( r_foot , x_axis, math.rad(65), ANGULAR_SPEED*1.2 )
-		Move( r_shin , y_axis, -1.3 , LINEAR_SPEED/1.5 )
-		Turn( r_pist1 , x_axis, math.rad(-60), ANGULAR_SPEED )
+		Turn(r_leg, x_axis, math.rad(-65), ANGULAR_SPEED*1.4)--right max forward
+		Turn(r_foot, x_axis, math.rad(65), ANGULAR_SPEED*1.2)
+		Move(r_shin, y_axis, -1.3, LINEAR_SPEED/1.5)
+		Turn(r_pist1, x_axis, math.rad(-60), ANGULAR_SPEED)
 		
 		WaitForTurn(r_leg, x_axis)
-		Move( l_shin , y_axis, .5 , LINEAR_SPEED*2 )
+		Move(l_shin, y_axis, .5, LINEAR_SPEED*2)
 	
-		Move( base , y_axis, 1.5 , LINEAR_SPEED )
-		Turn( low_head , z_axis, math.rad(-(7)), ANGULAR_SPEED/4 )
-		Turn( low_head , x_axis, math.rad(-5), ANGULAR_SPEED/2.4 )
+		Move(base, y_axis, 1.5, LINEAR_SPEED)
+		Turn(low_head, z_axis, math.rad(-(7)), ANGULAR_SPEED/4)
+		Turn(low_head, x_axis, math.rad(-5), ANGULAR_SPEED/2.4)
 		
-		Turn( l_leg , x_axis, math.rad(-20), ANGULAR_SPEED*1.4 )
-		Turn( l_foot , x_axis, math.rad(20), ANGULAR_SPEED )
-		Move( l_shin , y_axis, 1 , LINEAR_SPEED )
-		Move( l_pist1 , y_axis, 0.1 , LINEAR_SPEED/2 )
-		Move( l_pist2 , y_axis, 0.5 , LINEAR_SPEED/2 )
+		Turn(l_leg, x_axis, math.rad(-20), ANGULAR_SPEED*1.4)
+		Turn(l_foot, x_axis, math.rad(20), ANGULAR_SPEED)
+		Move(l_shin, y_axis, 1, LINEAR_SPEED)
+		Move(l_pist1, y_axis, 0.1, LINEAR_SPEED/2)
+		Move(l_pist2, y_axis, 0.5, LINEAR_SPEED/2)
 		
-		Turn( r_leg , x_axis, math.rad(-35), ANGULAR_SPEED*1.4 )
-		Turn( r_foot , x_axis, math.rad(35), ANGULAR_SPEED )
-		Move( r_shin , y_axis, -1.5 , LINEAR_SPEED/1.5 )
+		Turn(r_leg, x_axis, math.rad(-35), ANGULAR_SPEED*1.4)
+		Turn(r_foot, x_axis, math.rad(35), ANGULAR_SPEED)
+		Move(r_shin, y_axis, -1.5, LINEAR_SPEED/1.5)
 		
 		WaitForTurn(low_head, x_axis)
 	
-		Move( base , y_axis, 0 , LINEAR_SPEED/3 )
-		Turn( low_head , x_axis, math.rad(10), ANGULAR_SPEED/3 )
+		Move(base, y_axis, 0, LINEAR_SPEED/3)
+		Turn(low_head, x_axis, math.rad(10), ANGULAR_SPEED/3)
 		
-		Turn( l_leg , x_axis, math.rad(-65), ANGULAR_SPEED*1.4 )--left max forward
-		Turn( l_foot , x_axis, math.rad(65), ANGULAR_SPEED*1.2 )
-		Move( l_shin , y_axis, -1.3 , LINEAR_SPEED/1.5 )
-		Turn( l_pist1 , x_axis, math.rad(-60), ANGULAR_SPEED )
+		Turn(l_leg, x_axis, math.rad(-65), ANGULAR_SPEED*1.4)--left max forward
+		Turn(l_foot, x_axis, math.rad(65), ANGULAR_SPEED*1.2)
+		Move(l_shin, y_axis, -1.3, LINEAR_SPEED/1.5)
+		Turn(l_pist1, x_axis, math.rad(-60), ANGULAR_SPEED)
 		
-		Turn( r_leg , x_axis, 0, ANGULAR_SPEED*1.6 )--right max back
-		Turn( r_foot , x_axis, 0, ANGULAR_SPEED*1.4 )
-		Turn( r_pist1 , x_axis, math.rad(-50), ANGULAR_SPEED*1.2 )
-		Move( r_pist1 , y_axis, -0.45 , LINEAR_SPEED/2 )
-		Move( r_pist2 , y_axis, -0.45 , LINEAR_SPEED/2 )
+		Turn(r_leg, x_axis, 0, ANGULAR_SPEED*1.6)--right max back
+		Turn(r_foot, x_axis, 0, ANGULAR_SPEED*1.4)
+		Turn(r_pist1, x_axis, math.rad(-50), ANGULAR_SPEED*1.2)
+		Move(r_pist1, y_axis, -0.45, LINEAR_SPEED/2)
+		Move(r_pist2, y_axis, -0.45, LINEAR_SPEED/2)
 		
 		WaitForTurn(l_leg, x_axis)
-		Move( r_shin , y_axis, .5 , LINEAR_SPEED*2 )
+		Move(r_shin, y_axis, .5, LINEAR_SPEED*2)
 	
 	end
 end
@@ -270,45 +270,45 @@ function script.StopMoving()
 	Signal(SIG_MOVE)
 	--move all the pieces to their original spots
 	
-	Move( base , y_axis, 0 , LINEAR_SPEED )
+	Move(base, y_axis, 0, LINEAR_SPEED)
 	if not firing then
-		Turn( low_head , z_axis, math.rad(-(0)), ANGULAR_SPEED )
-		Turn( low_head , x_axis, 0, ANGULAR_SPEED )
+		Turn(low_head, z_axis, math.rad(-(0)), ANGULAR_SPEED)
+		Turn(low_head, x_axis, 0, ANGULAR_SPEED)
 	end
 	
-	Turn( l_leg , x_axis, math.rad(-30), ANGULAR_SPEED )
-	Turn( l_foot , x_axis, math.rad(30), ANGULAR_SPEED )
-	Move( l_shin , y_axis, 0 , LINEAR_SPEED )
-	Turn( l_pist1 , x_axis, math.rad(-50), ANGULAR_SPEED )
-	Move( l_pist1 , y_axis, 0 , LINEAR_SPEED )
-	Move( l_pist2 , y_axis, 0 , LINEAR_SPEED )
+	Turn(l_leg, x_axis, math.rad(-30), ANGULAR_SPEED)
+	Turn(l_foot, x_axis, math.rad(30), ANGULAR_SPEED)
+	Move(l_shin, y_axis, 0, LINEAR_SPEED)
+	Turn(l_pist1, x_axis, math.rad(-50), ANGULAR_SPEED)
+	Move(l_pist1, y_axis, 0, LINEAR_SPEED)
+	Move(l_pist2, y_axis, 0, LINEAR_SPEED)
 	
-	Turn( r_leg , x_axis, math.rad(-30), ANGULAR_SPEED )
-	Turn( r_foot , x_axis, math.rad(30), ANGULAR_SPEED )
-	Move( r_shin , y_axis, 0 , LINEAR_SPEED )
-	Turn( r_pist1 , x_axis, math.rad(-50), ANGULAR_SPEED )
-	Move( r_pist1 , y_axis, 0 , LINEAR_SPEED )
-	Move( r_pist2 , y_axis, 0 , LINEAR_SPEED )
+	Turn(r_leg, x_axis, math.rad(-30), ANGULAR_SPEED)
+	Turn(r_foot, x_axis, math.rad(30), ANGULAR_SPEED)
+	Move(r_shin, y_axis, 0, LINEAR_SPEED)
+	Turn(r_pist1, x_axis, math.rad(-50), ANGULAR_SPEED)
+	Move(r_pist1, y_axis, 0, LINEAR_SPEED)
+	Move(r_pist2, y_axis, 0, LINEAR_SPEED)
 end
 
 function script.Create()
 
 	StartThread(SmokeUnit, smokePiece)
 	
-	Spin( tank , z_axis, 70 )
+	Spin(tank, z_axis, 70)
 	
 	--initialize pieces
 	
-	Turn( l_leg , x_axis, math.rad(-30) )
-	Turn( l_foot , x_axis, math.rad(30) )
-	Turn( l_pist1 , x_axis, math.rad(-50) )
+	Turn(l_leg, x_axis, math.rad(-30))
+	Turn(l_foot, x_axis, math.rad(30))
+	Turn(l_pist1, x_axis, math.rad(-50))
 	
-	Turn( r_leg , x_axis, math.rad(-30) )
-	Turn( r_foot , x_axis, math.rad(30) )
-	Turn( r_pist1 , x_axis, math.rad(-50) )
+	Turn(r_leg, x_axis, math.rad(-30))
+	Turn(r_foot, x_axis, math.rad(30))
+	Turn(r_pist1, x_axis, math.rad(-50))
 	
-	Turn( l_jetpt , x_axis, math.rad(50) )
-	Turn( r_jetpt , x_axis, math.rad(50) )
+	Turn(l_jetpt, x_axis, math.rad(50))
+	Turn(r_jetpt, x_axis, math.rad(50))
 end
 
 
@@ -321,10 +321,10 @@ function script.QueryWeapon()
 end
 
 local function RestoreAfterDelay()
-	Sleep( 2500)
-	Turn( low_head , y_axis, 0, math.rad(200) )
-	Turn( low_head , x_axis, 0, math.rad(45) )
-	Move( up_head , y_axis, 0 , LINEAR_SPEED/3 )
+	Sleep(2500)
+	Turn(low_head, y_axis, 0, math.rad(200))
+	Turn(low_head, x_axis, 0, math.rad(45))
+	Move(up_head, y_axis, 0, LINEAR_SPEED/3)
 	firing = false
 end
 
@@ -334,9 +334,9 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	firing = true
 	--turn head, open mouth/limbs
-	Turn( low_head , y_axis, heading, math.rad(650) ) -- left-right
-	Turn( low_head , x_axis, -pitch, math.rad(200) ) --up-down
-	Move( up_head , y_axis, 1 , LINEAR_SPEED/2 )
+	Turn(low_head, y_axis, heading, math.rad(650)) -- left-right
+	Turn(low_head, x_axis, -pitch, math.rad(200)) --up-down
+	Move(up_head, y_axis, 1, LINEAR_SPEED/2)
 	WaitForTurn(low_head, y_axis)
 	WaitForTurn(low_head, x_axis)
 	StartThread(RestoreAfterDelay)
@@ -344,7 +344,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx( firept,  1026 )
+	EmitSfx(firept,  1026)
 end
 
 function script.Killed(recentDamage, maxHealth)

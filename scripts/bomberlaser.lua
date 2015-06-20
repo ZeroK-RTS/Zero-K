@@ -14,8 +14,8 @@ local function Lights()
 		Sleep(400)
 	end
 	while true do
-		EmitSfx( wingtipl,  1025 )
-		EmitSfx( wingtipr,  1026 )
+		EmitSfx(wingtipl,  1025)
+		EmitSfx(wingtipr,  1026)
 		Sleep(2000)
 	end
 end

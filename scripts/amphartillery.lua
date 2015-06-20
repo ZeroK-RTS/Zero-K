@@ -100,10 +100,10 @@ local function RestoreAfterDelay()
 	SetSignalMask(SIG_Restore)
 	Sleep(6000)
 	
-	Turn( turret, y_axis, 0, 2  )
-	Turn( turret, x_axis, 0, 2 )
-	Turn( gun1, z_axis, 0, 2  )
-	Turn( gun2, z_axis, 0, 2  )
+	Turn(turret, y_axis, 0, 2)
+	Turn(turret, x_axis, 0, 2)
+	Turn(gun1, z_axis, 0, 2)
+	Turn(gun2, z_axis, 0, 2)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -119,7 +119,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-    local toChange = 3 - num
+	local toChange = 3 - num
 	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 	if reloadSpeedMult <= 0 then
 		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
@@ -169,18 +169,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(pelvis, sfxShatter)
 		return 1
 	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
 		Explode(pelvis, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(pelvis, sfxShatter + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(pelvis, sfxShatter + sfxExplode)
 		return 2
 	end
 end

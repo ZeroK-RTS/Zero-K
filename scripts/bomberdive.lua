@@ -91,19 +91,19 @@ end
 
 
 function script.StartMoving()
-	--Turn( fins , z_axis, math.rad(-(-30)), math.rad(50) )
-	Move( wingr1 , x_axis, 0, 50)
-	Move( wingr2 , x_axis, 0, 50)
-	Move( wingl1 , x_axis, 0, 50)
-	Move( wingl2 , x_axis, 0, 50)
+	--Turn(fins, z_axis, math.rad(-(-30)), math.rad(50))
+	Move(wingr1, x_axis, 0, 50)
+	Move(wingr2, x_axis, 0, 50)
+	Move(wingl1, x_axis, 0, 50)
+	Move(wingl2, x_axis, 0, 50)
 end
 
 function script.StopMoving()
-	--Turn( fins , z_axis, math.rad(-(0)), math.rad(80) )
-	Move( wingr1 , x_axis, 5, 30)
-	Move( wingr2 , x_axis, 5, 30)
-	Move( wingl1 , x_axis, -5, 30)
-	Move( wingl2 , x_axis, -5, 30)
+	--Turn(fins, z_axis, math.rad(-(0)), math.rad(80))
+	Move(wingr1, x_axis, 5, 30)
+	Move(wingr2, x_axis, 5, 30)
+	Move(wingl1, x_axis, -5, 30)
+	Move(wingl2, x_axis, -5, 30)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
@@ -112,8 +112,8 @@ local function Lights()
 		Sleep(400)
 	end
 	while true do
-		EmitSfx( wingtipr, UNIT_SFX1 )
-		EmitSfx( wingtipl, UNIT_SFX2 )
+		EmitSfx(wingtipr, UNIT_SFX1)
+		EmitSfx(wingtipl, UNIT_SFX2)
 		Sleep(2000)
 	end
 end
@@ -184,17 +184,17 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	elseif severity <= 1  then
 		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire )
+		Explode(engines, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire)
 		return 2
 	else
 		Explode(fuselage, sfxNone)
-		Explode(engines, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingl2, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingr1, sfxFall + sfxSmoke  + sfxFire )
-		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire )
+		Explode(engines, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingl1, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingl2, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingr1, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingr2, sfxFall + sfxSmoke  + sfxFire)
 		return 2
 	end
 end

@@ -66,38 +66,38 @@ local function Walk()
 
 		-- Move(base, y_axis,  1.5, 2*up)
 		Turn(lfrontleg, y_axis, 1.5*ma, forward)  -- right front forward
-		Turn(lfrontleg, z_axis, -ma/2, up)        -- right front up
+		Turn(lfrontleg, z_axis, -ma/2, up)		-- right front up
 		Turn(lfrontleg1, z_axis, -ma/3, up)
 		
 		Turn(laftleg, y_axis, -1.5*ma, backward)  -- right back backward
-		Turn(laftleg, z_axis, 0, 6*up)            -- right back down
+		Turn(laftleg, z_axis, 0, 6*up)			-- right back down
 		Turn(laftleg1, z_axis, 0, up)
 		
-		Turn(rfrontleg, y_axis, sa, backward)     -- left front backward
-		Turn(rfrontleg, z_axis, 0, 6*up)          -- left front down
+		Turn(rfrontleg, y_axis, sa, backward)	 -- left front backward
+		Turn(rfrontleg, z_axis, 0, 6*up)		  -- left front down
 		Turn(rfrontleg1, z_axis, 0, up)
 		
-		Turn(raftleg, y_axis, -sa, forward)       -- left back forward
-		Turn(raftleg, z_axis, ma/2, up)           -- left back up
+		Turn(raftleg, y_axis, -sa, forward)	   -- left back forward
+		Turn(raftleg, z_axis, ma/2, up)		   -- left back up
 		Turn(raftleg1, z_axis, ma/3, up)
 		
 		Sleep(pause)
 		
 		-- Move(base, y_axis,  0, 4*up)
-		Turn(lfrontleg, y_axis, -sa, backward)    -- right front backward
-		Turn(lfrontleg, z_axis, 0, 6*up)          -- right front down
+		Turn(lfrontleg, y_axis, -sa, backward)	-- right front backward
+		Turn(lfrontleg, z_axis, 0, 6*up)		  -- right front down
 		Turn(lfrontleg1, z_axis, 0, up)
 		
-		Turn(laftleg, y_axis, sa, forward)        -- right back forward
-		Turn(laftleg, z_axis, -ma/2, up)          -- right back up
+		Turn(laftleg, y_axis, sa, forward)		-- right back forward
+		Turn(laftleg, z_axis, -ma/2, up)		  -- right back up
 		Turn(laftleg1, z_axis, -ma/3, up)
 		
 		Turn(rfrontleg, y_axis, -1.5*ma, forward) -- left front forward
-		Turn(rfrontleg, z_axis, ma/2, up)         -- left front up
+		Turn(rfrontleg, z_axis, ma/2, up)		 -- left front up
 		Turn(rfrontleg1, z_axis, ma/3, up)
 		
 		Turn(raftleg, y_axis, 1.5*ma, backward)   -- left back backward
-		Turn(raftleg, z_axis, 0, 6*up)            -- left back down
+		Turn(raftleg, z_axis, 0, 6*up)			-- left back down
 		Turn(raftleg1, z_axis, 0, up)
 		
 		Sleep(pause)

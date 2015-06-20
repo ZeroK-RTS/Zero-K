@@ -2,7 +2,7 @@ include "constants.lua"
 
 --pieces
 local  base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
-	= piece( "base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
+	= piece("base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
 local smokePiece = {base, rwing, lwing}
 
@@ -112,11 +112,11 @@ end
 function script.FireWeapon(num)
 	if num == 1 then
 		shotCycle = 1 - shotCycle
-		EmitSfx( flare[shotCycle], UNIT_SFX3 )
+		EmitSfx(flare[shotCycle], UNIT_SFX3)
 	elseif num == 2 then
-		EmitSfx( flare2, UNIT_SFX3 )
+		EmitSfx(flare2, UNIT_SFX3)
 	elseif num == 3 then
-		EmitSfx( missile, UNIT_SFX2 )
+		EmitSfx(missile, UNIT_SFX2)
 	end
 end
 

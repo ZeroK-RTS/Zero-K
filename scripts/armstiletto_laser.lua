@@ -13,8 +13,8 @@ local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["armstiletto_laser"].wantedHeight
 
 function script.Create()
-	Hide( preDrop)
-	Hide( drop)
+	Hide(preDrop)
+	Hide(drop)
 	
 	FakeUprightInit(xp, zp, drop)
 	
@@ -61,10 +61,10 @@ function script.FireWeapon1()
 			local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
 			local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
 	
-			Turn( preDrop , x_axis, angle_x)
-			Turn( preDrop , z_axis, -angle_z)
+			Turn(preDrop, x_axis, angle_x)
+			Turn(preDrop, z_axis, -angle_z)
 			
-			EmitSfx( drop,  FIRE_W2 )
+			EmitSfx(drop,  FIRE_W2)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
 				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)

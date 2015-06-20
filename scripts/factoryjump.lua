@@ -74,12 +74,12 @@ function script.QueryNanoPiece()
 	return nano
 end
 
-function script.Activate ( )
-	StartThread( Open ) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
+function script.Activate ()
+	StartThread(Open) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
 end
 
-function script.Deactivate ( )
-	StartThread( Close )
+function script.Deactivate ()
+	StartThread(Close)
 end
 
 function script.QueryBuildInfo()

@@ -21,10 +21,10 @@ local SIG_Defensive = 4
 local function Open()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
-	Turn( dish1 , x_axis, math.rad(-75), math.rad(60) )
-	Turn( dish2 , x_axis, math.rad(75), math.rad(60) )
-	Turn( dish3 , z_axis, math.rad(75), math.rad(60) )
-	Turn( dish4 , z_axis, math.rad(-75), math.rad(60) )
+	Turn(dish1, x_axis, math.rad(-75), math.rad(60))
+	Turn(dish2, x_axis, math.rad(75), math.rad(60))
+	Turn(dish3, z_axis, math.rad(75), math.rad(60))
+	Turn(dish4, z_axis, math.rad(-75), math.rad(60))
 	WaitForTurn(dish1, z_axis)
 	WaitForTurn(dish2, z_axis)
 	WaitForTurn(dish3, x_axis)
@@ -38,10 +38,10 @@ local function Close()
 	SetSignalMask(SIG_Activate)
 	Spring.SetUnitArmored(unitID,true)
 	SetUnitValue(COB.ARMORED,1)
-	Turn( dish1 , x_axis, 0, math.rad(120) )
-	Turn( dish2 , x_axis, 0, math.rad(120) )
-	Turn( dish3 , z_axis, 0, math.rad(120) )
-	Turn( dish4 , z_axis, 0, math.rad(120) )
+	Turn(dish1, x_axis, 0, math.rad(120))
+	Turn(dish2, x_axis, 0, math.rad(120))
+	Turn(dish3, z_axis, 0, math.rad(120))
+	Turn(dish4, z_axis, 0, math.rad(120))
 	WaitForTurn(dish1, z_axis)
 	WaitForTurn(dish2, z_axis)
 	WaitForTurn(dish3, x_axis)
@@ -60,7 +60,7 @@ function script.Create()
 	for i = 1, #fakes do Hide (fakes[i]) end
 	Move (base, y_axis, 9000)
 	StartThread(SmokeUnit, smokePiece)
-	Turn( base , y_axis, math.rad(45) )	
+	Turn(base, y_axis, math.rad(45))	
 end
 
 local force_close_time = tonumber(UnitDef.customParams.force_close) * 1000
@@ -101,25 +101,25 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .50 then
-		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode)
 		Explode(dish2, sfxNone)
 		Explode(dish3, sfxNone)
 		Explode(dish4, sfxNone)
 		Explode(base, sfxNone)
 		return 1
 	elseif severity <= .99  then
-		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode)
 		Explode(dish2, sfxFall)
 		Explode(dish3, sfxFall)
 		Explode(dish4, sfxFall)
 		Explode(base, sfxNone)
 		return 2
 	else
-		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(dish2, sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(dish3, sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(dish4, sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(base, sfxShatter + sfxExplode )
+		Explode(dish1, sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(dish2, sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(dish3, sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(dish4, sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(base, sfxShatter + sfxExplode)
 		return 2
 	end
 end

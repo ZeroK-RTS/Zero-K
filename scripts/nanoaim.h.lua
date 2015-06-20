@@ -5,10 +5,10 @@
 --
 -- How to use:
 --
--- 1. Add to the start of your script:                                  include "nanoaim.h.lua"
+-- 1. Add to the start of your script:								  include "nanoaim.h.lua"
 -- 2. After you define your pieces tell which you want to smoke e.g.:   local nanoPieces = { piece "nano_aim" }
--- 3. In your 'function script:Create()' add:                           StartThread(UpdateNanoDirectionThread, nanoPieces [, updateInterval = 1000 [, turnSpeed = 0.75*math.pi [, turnSpeedVert = turnSpeed ]]])
--- 4. In your 'function script.StartBuilding()' add:                    UpdateNanoDirection(nanoPieces [, turnSpeed = 0.75*math.pi [, turnSpeedVert = turnSpeed ]])
+-- 3. In your 'function script:Create()' add:						   StartThread(UpdateNanoDirectionThread, nanoPieces [, updateInterval = 1000 [, turnSpeed = 0.75*math.pi [, turnSpeedVert = turnSpeed ]]])
+-- 4. In your 'function script.StartBuilding()' add:					UpdateNanoDirection(nanoPieces [, turnSpeed = 0.75*math.pi [, turnSpeedVert = turnSpeed ]])
 -- 5. Don't forget to set COB.INBUILDSTANCE:=1 & COB.INBUILDSTANCE:=0 in StartBuilding/StopBuilding
 --
 -------------------------------------------------------------------------------------
@@ -40,7 +40,7 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 		local p  = math.asin(select(2,Spring.GetUnitDirection(unitID)))
 		local pitch = p - tp
 
-		turnSpeed     = turnSpeed or (0.75*math.pi)
+		turnSpeed	 = turnSpeed or (0.75*math.pi)
 		turnSpeedVert = turnSpeedVert or turnSpeed
 
 		local turned = false

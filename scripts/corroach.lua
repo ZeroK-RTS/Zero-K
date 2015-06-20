@@ -55,39 +55,39 @@ local SIG_BURROW = 1
 local SIG_Walk = 2
 
 local function Burrow()
-	Signal( SIG_BURROW )
-	SetSignalMask( SIG_BURROW )
+	Signal(SIG_BURROW)
+	SetSignalMask(SIG_BURROW)
 	Sleep(400)
 	
-	Signal( SIG_Walk )
+	Signal(SIG_Walk)
 	burrowed = true
-	EmitSfx( digger, dirtfling )
+	EmitSfx(digger, dirtfling)
 	
 	--burrow
-	Turn( body, 1, (-PI/6), 2 ) --butt into dirt
-	Move( body, 2, -4, 5 ) -- body down
-	Sleep( pause )
+	Turn(body, 1, (-PI/6), 2) --butt into dirt
+	Move(body, 2, -4, 5) -- body down
+	Sleep(pause)
 	--pieces to resting positions
-	Turn( body, 3, 0, 1 )
-	Turn( body, 2, 0, 1 )
+	Turn(body, 3, 0, 1)
+	Turn(body, 2, 0, 1)
 	----[[ could use some polishing
-		Turn( lf_leg, 2, ma, forward )   	-- right front forward
-		Turn( lf_foot, 3, ma/2, up )
+		Turn(lf_leg, 2, ma, forward)   	-- right front forward
+		Turn(lf_foot, 3, ma/2, up)
 		
-		Turn( rf_leg, 2, -ma, forward ) 	-- left front forward
-		Turn( rf_foot, 3, -ma/2, up )
+		Turn(rf_leg, 2, -ma, forward) 	-- left front forward
+		Turn(rf_foot, 3, -ma/2, up)
 		
-		Turn( lb_leg, 2, -ma, backward ) 	-- right back backward
-		Turn( lb_leg, 3, 0, up )         	-- right back down
-		Turn( lb_foot, 3, 0, up )
+		Turn(lb_leg, 2, -ma, backward) 	-- right back backward
+		Turn(lb_leg, 3, 0, up)		 	-- right back down
+		Turn(lb_foot, 3, 0, up)
 		
-		Turn( rb_leg, 2, ma, backward ) 	-- left back backward
-		Turn( rb_leg, 3, 0, up )         	-- left back down
-		Turn( rb_foot, 3, 0, up )
+		Turn(rb_leg, 2, ma, backward) 	-- left back backward
+		Turn(rb_leg, 3, 0, up)		 	-- left back down
+		Turn(rb_foot, 3, 0, up)
 	--]]
-	if( burrowed == true ) then
+	if(burrowed == true) then
 		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue( stealth, 1 )
+		Spring.UnitScript.SetUnitValue(stealth, 1)
 		--Spring.UnitScript.SetUnitValue() MAX_SPEED to maxSpeed/4
 		--Spring.UnitScript.SetUnitValue() STANDINGFIREORDERS to 2
 	end
@@ -96,62 +96,62 @@ end
 --]]
 
 local function Walk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 	
 	while true do
 		
-		Turn( body, 2, .1, .5 )         	-- body roll left
-		Turn( body, 3, sa/2, 1.5 )         	-- body turn right
+		Turn(body, 2, .1, .5)		 	-- body roll left
+		Turn(body, 3, sa/2, 1.5)		 	-- body turn right
 		
-		Turn( lf_leg, 2, ma, forward )   	-- right front forward
-		Turn( lf_leg, 3, -ma, up )       	-- right front up
-		Turn( lf_foot, 3, ma/2, up )
+		Turn(lf_leg, 2, ma, forward)   	-- right front forward
+		Turn(lf_leg, 3, -ma, up)	   	-- right front up
+		Turn(lf_foot, 3, ma/2, up)
 				
-		Turn( lb_leg, 2, -ma, backward ) 	-- right back backward
-		Turn( lb_leg, 3, 0, up )         	-- right back down
-		Turn( lb_foot, 3, 0, up )
+		Turn(lb_leg, 2, -ma, backward) 	-- right back backward
+		Turn(lb_leg, 3, 0, up)		 	-- right back down
+		Turn(lb_foot, 3, 0, up)
 		
-		Turn( rf_leg, 2, sa, backward ) 	-- left front backward
-		Turn( rf_leg, 3, 0, up )         	-- left front down
-		Turn( rf_foot, 3, 0, up )
+		Turn(rf_leg, 2, sa, backward) 	-- left front backward
+		Turn(rf_leg, 3, 0, up)		 	-- left front down
+		Turn(rf_foot, 3, 0, up)
 		
-		Turn( rb_leg, 2, -sa, forward ) 	-- left back forward
-		Turn( rb_leg, 3, ma/2, up )       	-- left back up
-		Turn( rb_foot, 3, -ma/3, up )
+		Turn(rb_leg, 2, -sa, forward) 	-- left back forward
+		Turn(rb_leg, 3, ma/2, up)	   	-- left back up
+		Turn(rb_foot, 3, -ma/3, up)
 		
-		Sleep( pause )
+		Sleep(pause)
 		
-		Turn( body, 2, -.1, .5 )        	-- body roll right
-		Turn( body, 3, -sa/2, 1.5 )        	-- body turn left
+		Turn(body, 2, -.1, .5)			-- body roll right
+		Turn(body, 3, -sa/2, 1.5)			-- body turn left
 		
-		Turn( lf_leg, 2, -sa, backward ) 	-- right front backward
-		Turn( lf_leg, 3, 0, up )         	-- right front down
-		Turn( lf_foot, 3, 0, up )
+		Turn(lf_leg, 2, -sa, backward) 	-- right front backward
+		Turn(lf_leg, 3, 0, up)		 	-- right front down
+		Turn(lf_foot, 3, 0, up)
 		
-		Turn( lb_leg, 2, sa, forward )   	-- right back forward
-		Turn( lb_leg, 3, -ma/2, up )       	-- right back up
-		Turn( lb_foot, 3, ma/3, up )
+		Turn(lb_leg, 2, sa, forward)   	-- right back forward
+		Turn(lb_leg, 3, -ma/2, up)	   	-- right back up
+		Turn(lb_foot, 3, ma/3, up)
 		
-		Turn( rf_leg, 2, -ma, forward ) 	-- left front forward
-		Turn( rf_leg, 3, ma, up )       	-- left front up
-		Turn( rf_foot, 3, -ma/2, up )
+		Turn(rf_leg, 2, -ma, forward) 	-- left front forward
+		Turn(rf_leg, 3, ma, up)	   	-- left front up
+		Turn(rf_foot, 3, -ma/2, up)
 		
-		Turn( rb_leg, 2, ma, backward ) 	-- left back backward
-		Turn( rb_leg, 3, 0, up )         	-- left back down
-		Turn( rb_foot, 3, 0, up )
+		Turn(rb_leg, 2, ma, backward) 	-- left back backward
+		Turn(rb_leg, 3, 0, up)		 	-- left back down
+		Turn(rb_foot, 3, 0, up)
 		
-		Sleep( pause )
+		Sleep(pause)
 	end
 end
 
 local function UnBurrow()
-	Signal( SIG_BURROW )
+	Signal(SIG_BURROW)
 	burrowed = false
 	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue( stealth, 0 )
-	Move( body, 2, 0, 3 )
-	Turn( body, 1, 0, 3 )
+	Spring.UnitScript.SetUnitValue(stealth, 0)
+	Move(body, 2, 0, 3)
+	Turn(body, 1, 0, 3)
 
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
 	GG.UpdateUnitAttributes(unitID)
@@ -160,9 +160,9 @@ local function UnBurrow()
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	EmitSfx( digger, dirtfling )
+	EmitSfx(digger, dirtfling)
 	
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 local function Talk()
@@ -170,17 +170,17 @@ local function Talk()
 end
 
 function StartMoving()
-	Signal( SIG_BURROW )
+	Signal(SIG_BURROW)
 	if burrowed then
-		StartThread( UnBurrow )
+		StartThread(UnBurrow)
 	else
-		StartThread( Walk )
+		StartThread(Walk)
 	end
-	--StartThread( Talk )
+	--StartThread(Talk)
 end
 
 function StopMoving()
-	StartThread( Burrow )
+	StartThread(Burrow)
 end
 
 function script.Create()
@@ -190,14 +190,14 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	--Spring.Echo("I am ded")
-	Explode( lf_leg, SFX.EXPLODE )
-	Explode( lb_leg, SFX.EXPLODE )
-	Explode( rf_leg, SFX.EXPLODE )
-	Explode( rb_leg, SFX.EXPLODE )
-	Explode( lf_foot, SFX.EXPLODE )
-	Explode( lb_foot, SFX.EXPLODE )
-	Explode( rf_foot, SFX.EXPLODE )
-	Explode( rb_foot, SFX.EXPLODE )
+	Explode(lf_leg, SFX.EXPLODE)
+	Explode(lb_leg, SFX.EXPLODE)
+	Explode(rf_leg, SFX.EXPLODE)
+	Explode(rb_leg, SFX.EXPLODE)
+	Explode(lf_foot, SFX.EXPLODE)
+	Explode(lb_foot, SFX.EXPLODE)
+	Explode(rf_foot, SFX.EXPLODE)
+	Explode(rb_foot, SFX.EXPLODE)
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then
 		return 1 -- corpsetype

@@ -38,8 +38,8 @@ function script.QueryWeapon()
 end
 
 function script.Create()
-	Turn( base , x_axis, math.rad(-90) )
-	Move( base , y_axis,  40)
+	Turn(base, x_axis, math.rad(-90))
+	Move(base, y_axis,  40)
 end
 
 function script.Killed(recentDamage, maxHealth)

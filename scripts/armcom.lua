@@ -110,8 +110,8 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Turn( nanolath , x_axis, math.rad(-40), ARM_SPEED_PITCH )
-	Turn( biggun , x_axis, math.rad(-62.5), ARM_SPEED_PITCH )
+	Turn(nanolath, x_axis, math.rad(-40), ARM_SPEED_PITCH)
+	Turn(biggun, x_axis, math.rad(-62.5), ARM_SPEED_PITCH)
 	isMoving = true
 	
 	Turn(ground, x_axis, math.rad(10), math.rad(30))
@@ -150,20 +150,20 @@ local function RestorePose()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	Turn(ground, x_axis, 0, math.rad(60))
-	Move(pelvis , y_axis, 0 , 1 )
-	Turn(rthigh , x_axis, 0, math.rad(200) )
-	Turn(rleg , x_axis, 0, math.rad(200) )
-	Turn(lthigh , x_axis, 0, math.rad(200) )
-	Turn(lleg , x_axis, 0, math.rad(200) )
+	Move(pelvis, y_axis, 0, 1)
+	Turn(rthigh, x_axis, 0, math.rad(200))
+	Turn(rleg, x_axis, 0, math.rad(200))
+	Turn(lthigh, x_axis, 0, math.rad(200))
+	Turn(lleg, x_axis, 0, math.rad(200))
 	Turn(luparm, x_axis, 0, math.rad(120))
 	Turn(ruparm, x_axis, 0, math.rad(120))
 end
 
 function script.Create()
-	Hide( ground)
-	Hide( rbigflash)
-	Hide( lfirept)
-	Hide( nanospray)
+	Hide(ground)
+	Hide(rbigflash)
+	Hide(lfirept)
+	Hide(nanospray)
 	Turn(lfirept, x_axis, math.rad(145))
 	Turn(rbigflash, x_axis, math.rad(145))
 	
@@ -199,7 +199,7 @@ local function RestoreLaser()
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
 	isDgunning = false
-	Turn( luparm , x_axis, restorePitch, ARM_SPEED_PITCH )
+	Turn(luparm, x_axis, restorePitch, ARM_SPEED_PITCH)
 	if (not isDgunning) then Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) end
 end
 
@@ -209,20 +209,20 @@ local function RestoreDgun()
 	Sleep(RESTORE_DELAY_DGUN)
 	isLasering = false
 	isDgunning = false
-	Turn( ruparm , x_axis, 0, ARM_SPEED_PITCH )
+	Turn(ruparm, x_axis, 0, ARM_SPEED_PITCH)
 	if (not isLasering) then Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) end
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num >= 5 then
-		Signal( SIG_LASER)
-		SetSignalMask( SIG_LASER)
+		Signal(SIG_LASER)
+		SetSignalMask(SIG_LASER)
 		isLasering = true
 		if not isDgunning then 
-			Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
+			Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
 		end
-		Turn( nanolath , x_axis, math.rad(-40), ARM_SPEED_PITCH )
-		Turn( luparm , x_axis, math.rad(-50) - pitch, ARM_SPEED_PITCH )
+		Turn(nanolath, x_axis, math.rad(-40), ARM_SPEED_PITCH)
+		Turn(luparm, x_axis, math.rad(-50) - pitch, ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
 		StartThread(RestoreLaser)
@@ -231,12 +231,12 @@ function script.AimWeapon(num, heading, pitch)
 		if starBLaunchers[num] then
 			pitch = ARM_PERPENDICULAR
 		end
-		Signal( SIG_DGUN)
-		SetSignalMask( SIG_DGUN)
+		Signal(SIG_DGUN)
+		SetSignalMask(SIG_DGUN)
 		isDgunning = true
-		Turn( biggun , x_axis, math.rad(-62.5), ARM_SPEED_PITCH )
-		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( ruparm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+		Turn(biggun, x_axis, math.rad(-62.5), ARM_SPEED_PITCH)
+		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
+		Turn(ruparm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
@@ -283,7 +283,7 @@ end
 
 function script.StartBuilding(heading, pitch) 
 	if not isLasering then 
-		Turn( luparm , x_axis, math.rad(-60) - pitch, ARM_SPEED_PITCH )
+		Turn(luparm, x_axis, math.rad(-60) - pitch, ARM_SPEED_PITCH)
 		if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	end
 	restoreHeading, restorePitch = heading, pitch

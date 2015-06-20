@@ -340,7 +340,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	EmitSfx(cervena, 1024 )
+	EmitSfx(cervena, 1024)
 	if(lastHeading > heading) then
 		rotateWise = 1
 	else
@@ -353,13 +353,13 @@ function script.AimWeapon(num, heading, pitch)
 		loaded = true
 	end
 	
-	Turn( rotating_bas , y_axis, heading,  math.rad(TURN_SPEED) )
+	Turn(rotating_bas, y_axis, heading,  math.rad(TURN_SPEED))
 	
 	Spin(gear, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
 	Spin(gear001, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)
 	Spin(gear002, y_axis, math.rad(TURN_SPEED) * rotateWise * 5)	
 	
-	Turn( mc_rocket_ho , x_axis, -pitch,  math.rad(TILT_SPEED) )
+	Turn(mc_rocket_ho, x_axis, -pitch,  math.rad(TILT_SPEED))
 	WaitForTurn(rotating_bas, y_axis)
 	WaitForTurn(mc_rocket_ho, x_axis)	
 	

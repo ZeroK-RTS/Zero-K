@@ -30,7 +30,7 @@ function activity_mode(n)
 			soundIndex = 9
 		end
 		
-		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection) )
+		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection))
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, z_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))

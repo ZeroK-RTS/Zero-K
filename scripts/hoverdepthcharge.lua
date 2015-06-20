@@ -11,22 +11,22 @@ local SIG_HIT = 2
 
 local function WobbleUnit()
 	while true do
-		Move( base , y_axis, 0.8 , 1.2)
+		Move(base, y_axis, 0.8, 1.2)
 		Sleep(750)
-		Move( base , y_axis, -0.80 , 1.2)
+		Move(base, y_axis, -0.80, 1.2)
 		Sleep(750)
 	end
 end
 
 function HitByWeaponThread(x, z)
-	Signal( SIG_HIT)
-	SetSignalMask( SIG_HIT)
-	Turn( base , z_axis, math.rad(-z), math.rad(105))
-	Turn( base , x_axis, math.rad(x ), math.rad(105))
+	Signal(SIG_HIT)
+	SetSignalMask(SIG_HIT)
+	Turn(base, z_axis, math.rad(-z), math.rad(105))
+	Turn(base, x_axis, math.rad(x), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, 0, math.rad(30))
-	Turn( base , x_axis, 0, math.rad(30))
+	Turn(base, z_axis, 0, math.rad(30))
+	Turn(base, x_axis, 0, math.rad(30))
 end
 
 local function MoveScript()
@@ -51,8 +51,8 @@ local function MoveScript()
 			EmitSfx(wake8, 3)
 		end
 	
-		EmitSfx( base,  1024+0 )
-		Sleep( 150)
+		EmitSfx(base,  1024+0)
+		Sleep(150)
 	end
 end
 
@@ -120,7 +120,7 @@ local spSetUnitWeaponState = Spring.SetUnitWeaponState
 local spGetGameFrame = Spring.GetGameFrame
 
 local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
-local RELOAD = math.ceil( depthchargeWeaponDef.reload * Game.gameSpeed )
+local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 
 function ShootDepthcharge()
 	EmitSfx(pads, FIRE_W3)
@@ -136,7 +136,7 @@ local function FakeWeaponShoot()
 			local gameFrame   = spGetGameFrame()
 			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
+			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame})
 			
 			EmitSfx(pads, FIRE_W3)
 			StartThread(ShotThread)

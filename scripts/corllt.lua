@@ -21,16 +21,16 @@ function Stunned ()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 
 	while Spring.GetUnitRulesParam(unitID,"disarmed") == 1 do
 		Sleep(100)
 	end
 
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
-	Turn( turret , y_axis, heading, math.rad(300)*slowMult )
-	Turn( barrel , x_axis, -pitch, math.rad(200)*slowMult )
+	Turn(turret, y_axis, heading, math.rad(300)*slowMult)
+	Turn(barrel, x_axis, -pitch, math.rad(200)*slowMult)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel, x_axis)
 	return true

@@ -155,29 +155,29 @@ function script.StopMoving()
 end
 
 local function RestoreAfterDelay()
-	Sleep( 3000)
-	Turn( torso , y_axis, 0, math.rad(70) )
-	Turn( lturret1 , x_axis, 0, math.rad(50) )
-	Turn( rturret1 , x_axis, 0, math.rad(50) )
-	Turn( lturret2 , x_axis, 0, math.rad(50) )
-	Turn( rturret2 , x_axis, 0, math.rad(50) )	
+	Sleep(3000)
+	Turn(torso, y_axis, 0, math.rad(70))
+	Turn(lturret1, x_axis, 0, math.rad(50))
+	Turn(rturret1, x_axis, 0, math.rad(50))
+	Turn(lturret2, x_axis, 0, math.rad(50))
+	Turn(rturret2, x_axis, 0, math.rad(50))	
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		Signal( SIG_AIM1)
-		SetSignalMask( SIG_AIM1)
+		Signal(SIG_AIM1)
+		SetSignalMask(SIG_AIM1)
 		
-		Turn( torso , y_axis, heading, math.rad(360) )	
-		Turn( mainturret, x_axis, -pitch, math.rad(180) )
+		Turn(torso, y_axis, heading, math.rad(360))	
+		Turn(mainturret, x_axis, -pitch, math.rad(180))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(mainturret, x_axis)
 		
 		return true
 	elseif num == 2 then
 	
-		Signal( SIG_AIM2)	
-		SetSignalMask( SIG_AIM2)
+		Signal(SIG_AIM2)	
+		SetSignalMask(SIG_AIM2)
 		
 		if pitch < -math.rad(10) then 
 			pitch = -math.rad(10)
@@ -185,11 +185,11 @@ function script.AimWeapon(num, heading, pitch)
 			pitch = math.rad(10) 
 		end
 		
-		Turn( torso , y_axis, heading, math.rad(360) )
-		Turn( lturret1 , x_axis, -pitch, math.rad(180) )
-		Turn( rturret1 , x_axis, -pitch, math.rad(180) )
-		Turn( lturret2 , x_axis, -pitch, math.rad(180) )
-		Turn( rturret2 , x_axis, -pitch, math.rad(180) )
+		Turn(torso, y_axis, heading, math.rad(360))
+		Turn(lturret1, x_axis, -pitch, math.rad(180))
+		Turn(rturret1, x_axis, -pitch, math.rad(180))
+		Turn(lturret2, x_axis, -pitch, math.rad(180))
+		Turn(rturret2, x_axis, -pitch, math.rad(180))
 		WaitForTurn(lturret1, x_axis)
 		WaitForTurn(torso, y_axis)
 		StartThread(RestoreAfterDelay)	
@@ -247,10 +247,10 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= .25  then
 		Explode(base, sfxNone)
 		return 1
-	elseif (severity <= .50 ) then
+	elseif (severity <= .50) then
 		Explode(pelvis, sfxNone)
 		return 1
-	elseif (severity <= .99 ) then
+	elseif (severity <= .99) then
 		Explode(pelvis, sfxShatter)
 		Explode(torso, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2

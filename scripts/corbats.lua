@@ -64,18 +64,18 @@ end
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	if dead then return false end
-	Turn( turret1 , y_axis, 0, math.rad(35) )
-	Turn( turret2 , y_axis, math.rad(180), math.rad(35) )
-	Turn( turret3 , y_axis, math.rad(180), math.rad(35) )
+	Turn(turret1, y_axis, 0, math.rad(35))
+	Turn(turret2, y_axis, math.rad(180), math.rad(35))
+	Turn(turret3, y_axis, math.rad(180), math.rad(35))
 end
 
 local function Wake()
 	Signal(SIG_Move)
 	SetSignalMask(SIG_Move)
 	while true do
-		EmitSfx( wake1,  2 )
-		EmitSfx( wake2,  2 )
-		Sleep( 200)
+		EmitSfx(wake1,  2)
+		EmitSfx(wake2,  2)
+		Sleep(200)
 	end
 end
 
@@ -92,9 +92,9 @@ function script.AimWeapon(num, heading, pitch)
 	local SIG_Aim = 2^num
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	Turn( turrets[num], y_axis, heading, math.rad(40) )
+	Turn(turrets[num], y_axis, heading, math.rad(40))
 	for i=1,3 do
-		Turn( barrels[num][i] , x_axis, -pitch, math.rad(40) )
+		Turn(barrels[num][i], x_axis, -pitch, math.rad(40))
 	end
 	WaitForTurn(barrels[num][1], x_axis)	
 	WaitForTurn(turrets[num], y_axis)
@@ -111,8 +111,8 @@ function script.Shot(num)
 	local barrel = barrels[num][(gun[num])]
 	local flare = flares[num][(gun[num])]
 	EmitSfx(flare, 1026)
-	Move( barrel, z_axis, RECOIL_DISTANCE  )
-	Move( barrel, z_axis, 0 , RECOIL_RESTORE_SPEED )	
+	Move(barrel, z_axis, RECOIL_DISTANCE)
+	Move(barrel, z_axis, 0, RECOIL_RESTORE_SPEED)	
 	gun[num] = gun[num] + 1
 	if gun[num] > 3 then gun[num] = 1 end
 end
@@ -144,7 +144,7 @@ local function DeathAnim()
 	dead = true
 	--Turn(ground, z_axis, math.random(math.rad(-15), math.rad(15)), math.rad(1))
 	local speed = math.rad(math.random(3, 10)/10)
-	--Turn(ground, x_axis, math.rad(-10), speed )
+	--Turn(ground, x_axis, math.rad(-10), speed)
 	EmitSfx(turret2, 1024)
 	Sleep(120)
 	EmitSfx(turret1, 1024)

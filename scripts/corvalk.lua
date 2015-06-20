@@ -36,20 +36,20 @@ local function openDoors()
 	Turn(lUpperCl1,z_axis, rad(-140),6)
 	Turn(rUpperCl1,z_axis, rad(140), 6)
 	Sleep(100)
-		                             
+									 
 	Turn(lUpperCl2,z_axis, rad(-140),6)	
 	Turn(rUpperCl2,z_axis, rad(140), 6)
-	WaitForTurn( lUpperCl1, z_axis ) 
-	WaitForTurn( rUpperCl1, z_axis ) 
-	WaitForTurn( lUpperCl2, z_axis )
-	WaitForTurn( rUpperCl2, z_axis )
+	WaitForTurn(lUpperCl1, z_axis) 
+	WaitForTurn(rUpperCl1, z_axis) 
+	WaitForTurn(lUpperCl2, z_axis)
+	WaitForTurn(rUpperCl2, z_axis)
 	doorOpen = true
 end
 
 
 function closeDoors()
 	Signal(SIG_CLOSEDOORS)
-    SetSignalMask(SIG_CLOSEDOORS)
+	SetSignalMask(SIG_CLOSEDOORS)
 	Turn(lUpperCl1,z_axis, rad(0),4)
 	Turn(rUpperCl1,z_axis, rad(0),4)
 	Sleep(100)
@@ -57,10 +57,10 @@ function closeDoors()
 	Turn(lUpperCl2,z_axis, rad(0),4)	
 	Turn(rUpperCl2,z_axis, rad(0),4)
 
-	WaitForTurn( lUpperCl1, z_axis )
-	WaitForTurn( rUpperCl1, z_axis )	
-	WaitForTurn( lUpperCl2, z_axis )
-	WaitForTurn( rUpperCl2, z_axis )
+	WaitForTurn(lUpperCl1, z_axis)
+	WaitForTurn(rUpperCl1, z_axis)	
+	WaitForTurn(lUpperCl2, z_axis)
+	WaitForTurn(rUpperCl2, z_axis)
 	doorOpen = false
 end
 
@@ -76,7 +76,7 @@ function script.Deactivate()
 end
 
 
-function script.QueryTransport( passengerID )
+function script.QueryTransport(passengerID)
 	return link
 end
 
@@ -125,14 +125,14 @@ end
 --fetch unit id of passenger (from the load command)
 function getDropPoint() 
 	local cmd=Spring.GetUnitCommands(unitID, 1)
-	local dropx, dropy ,dropz = nil	
+	local dropx, dropy,dropz = nil	
 	
 	if cmd and cmd[1] then					
 		if  cmd[1]['id'] == 81  then -- CMDTYPE.LOAD_UNITS = 75
-			dropx, dropy ,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]				
+			dropx, dropy,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]				
 		end
 	end
-	return {dropx, dropy ,dropz}
+	return {dropx, dropy,dropz}
 end
 
 function isNearPickupPoint(passengerId)
@@ -193,7 +193,7 @@ function script.MoveRate(curRate)
 	end
 end
 
-function script.BeginTransport( passengerID )
+function script.BeginTransport(passengerID)
 	if loaded then 
 		return 
 	end

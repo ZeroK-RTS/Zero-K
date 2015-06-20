@@ -64,9 +64,9 @@ local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	if dead then return false end
 	for i=2,7 do
-		if i == 4 or i == 5 then Turn( turretPieces[i].turret , y_axis, math.pi, math.rad(35) )
-		else Turn( turretPieces[i].turret , y_axis, 0, math.rad(35) ) end
-		Turn( turretPieces[i].pivot , x_axis, 0, math.rad(15) )
+		if i == 4 or i == 5 then Turn(turretPieces[i].turret, y_axis, math.pi, math.rad(35))
+		else Turn(turretPieces[i].turret, y_axis, 0, math.rad(35)) end
+		Turn(turretPieces[i].pivot, x_axis, 0, math.rad(15))
 	end
 end
 
@@ -74,9 +74,9 @@ local function Wake()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx( wake1,  2 )
-		EmitSfx( wake2,  2 )
-		Sleep( 200)
+		EmitSfx(wake1,  2)
+		EmitSfx(wake2,  2)
+		Sleep(200)
 	end
 end
 
@@ -93,8 +93,8 @@ function script.AimWeapon(num, heading, pitch)
 	local SIG_Aim = 2^num
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
-	Turn( turretPieces[num].turret, y_axis, heading, TURRET_YAW_SPEED )
-	Turn( turretPieces[num].pivot , x_axis, -pitch, TURRET_PITCH_SPEED  )
+	Turn(turretPieces[num].turret, y_axis, heading, TURRET_YAW_SPEED)
+	Turn(turretPieces[num].pivot, x_axis, -pitch, TURRET_PITCH_SPEED)
 	WaitForTurn(turretPieces[num].turret, y_axis)
 	WaitForTurn(turretPieces[num].pivot, x_axis)	
 	StartThread(RestoreAfterDelay)
@@ -111,8 +111,8 @@ function script.Shot(num)
 	local toEmit = (num <= 5) and 1024 or 1025 
 	EmitSfx(flare, toEmit)
 	if (num <= 5) then
-		Move( barrel, z_axis, RECOIL_DISTANCE  )
-		Move( barrel, z_axis, 0 , RECOIL_RESTORE_SPEED )
+		Move(barrel, z_axis, RECOIL_DISTANCE)
+		Move(barrel, z_axis, 0, RECOIL_RESTORE_SPEED)
 	end
 	gunStates[num] = 1 - gunStates[num]
 end

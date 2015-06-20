@@ -27,9 +27,9 @@ local function Wake()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx( wake1,  2 )
-		EmitSfx( wake2,  2 )
-		Sleep( 200)
+		EmitSfx(wake1,  2)
+		EmitSfx(wake2,  2)
+		Sleep(200)
 	end
 end
 
@@ -67,7 +67,7 @@ local function RestoreAfterDelay()
 	Turn(sleeves, x_axis, 0, math.rad(60))
 end
 
-function script.AimWeapon( num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)

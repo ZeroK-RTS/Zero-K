@@ -41,12 +41,12 @@ local MIN_DIFF = math.rad(0.01)
 local smokePiece = {base, turret}
 
 local function ImpactTilt(x,z)
-	Turn( base , z_axis, math.rad(-z), math.rad(105) )
-	Turn( base , x_axis, math.rad(x), math.rad(105) )
+	Turn(base, z_axis, math.rad(-z), math.rad(105))
+	Turn(base, x_axis, math.rad(x), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, 0, math.rad(30) )
-	Turn( base , x_axis, 0, math.rad(300) )
+	Turn(base, z_axis, 0, math.rad(30))
+	Turn(base, x_axis, 0, math.rad(300))
 end
 
 --[[
@@ -64,28 +64,28 @@ local function AnimControl()
 	while true do
 		tracks = tracks + 1
 		if tracks == 2 then 
-			Hide( tracks1)
-			Show( tracks2)
+			Hide(tracks1)
+			Show(tracks2)
 		elseif tracks == 3 then 
-			Hide( tracks2)
-			Show( tracks3)
+			Hide(tracks2)
+			Show(tracks3)
 		elseif tracks == 4 then 
-			Hide( tracks3)
-			Show( tracks4)
+			Hide(tracks3)
+			Show(tracks4)
 		else 
 			tracks = 1
-			Hide( tracks4)
-			Show( tracks1)
+			Hide(tracks4)
+			Show(tracks1)
 		end
 
 		for i=1,#wheels_s do
-			Spin( wheels_s[i] , x_axis, WHEEL_SPIN_SPEED_S, WHEEL_SPIN_ACCEL_S )
+			Spin(wheels_s[i], x_axis, WHEEL_SPIN_SPEED_S, WHEEL_SPIN_ACCEL_S)
 		end
 		for i=1,#wheels_m do
-			Spin( wheels_m[i] , x_axis, WHEEL_SPIN_SPEED_M, WHEEL_SPIN_ACCEL_M )
+			Spin(wheels_m[i], x_axis, WHEEL_SPIN_SPEED_M, WHEEL_SPIN_ACCEL_M)
 		end
 
-		Spin( bigwheel , x_axis, WHEEL_SPIN_SPEED_L, WHEEL_SPIN_ACCEL_L )
+		Spin(bigwheel, x_axis, WHEEL_SPIN_SPEED_L, WHEEL_SPIN_ACCEL_L)
 		
 		--pivot
 		currHeading = GetUnitValue(COB.HEADING)*headingToRad
@@ -113,15 +113,15 @@ local function AnimControl()
 		
 		-- Turn slowly for small course corrections
 		if math.abs(diffHeading) < 0.05 then
-			Turn( front , y_axis, pivotAngle, PIVOT_SPEED*0.2 )
-			Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED*0.2)
+			Turn(front, y_axis, pivotAngle, PIVOT_SPEED*0.2)
+			Turn(rear, y_axis, (0 - pivotAngle), PIVOT_SPEED*0.2)
 		else
-			Turn( front , y_axis, pivotAngle, PIVOT_SPEED )
-			Turn( rear , y_axis, (0 - pivotAngle ), PIVOT_SPEED)
+			Turn(front, y_axis, pivotAngle, PIVOT_SPEED)
+			Turn(rear, y_axis, (0 - pivotAngle), PIVOT_SPEED)
 		end
 		
 		lastHeading = currHeading
-		Sleep( ANIM_PERIOD)
+		Sleep(ANIM_PERIOD)
 	end
 end
 
@@ -158,7 +158,7 @@ function script.QueryWeapon(num) return flare end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	Turn( rear , y_axis, 0.01, PIVOT_SPEED )
+	Turn(rear, y_axis, 0.01, PIVOT_SPEED)
 	while (select(5, Spring.GetUnitHealth(unitID)) < 1) do
 		Sleep (1000)
 	end
@@ -166,20 +166,20 @@ function script.Create()
 end
 
 function script.Activate()
-	Signal( SIG_ACTIVATE)
-	SetSignalMask( SIG_ACTIVATE)
-	Turn( arm_1 , x_axis, math.rad(-90), DEPLOY_SPEED )
+	Signal(SIG_ACTIVATE)
+	SetSignalMask(SIG_ACTIVATE)
+	Turn(arm_1, x_axis, math.rad(-90), DEPLOY_SPEED)
 	WaitForTurn(arm_1, x_axis)
 	
-	Turn( arm_2 , x_axis, math.rad(30), DEPLOY_SPEED  )
-	Turn( arm_3 , x_axis, math.rad(-40), DEPLOY_SPEED  )
+	Turn(arm_2, x_axis, math.rad(30), DEPLOY_SPEED)
+	Turn(arm_3, x_axis, math.rad(-40), DEPLOY_SPEED)
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn( panel_a1 , z_axis, math.rad(-(30)), DEPLOY_SPEED  )
-	Turn( panel_a2 , z_axis, math.rad(-(-30)), DEPLOY_SPEED  )
-	Turn( panel_b1 , z_axis, math.rad(-(-30)), DEPLOY_SPEED  )
-	Turn( panel_b2 , z_axis, math.rad(-(30)), DEPLOY_SPEED  )
+	Turn(panel_a1, z_axis, math.rad(-(30)), DEPLOY_SPEED)
+	Turn(panel_a2, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
+	Turn(panel_b1, z_axis, math.rad(-(-30)), DEPLOY_SPEED)
+	Turn(panel_b2, z_axis, math.rad(-(30)), DEPLOY_SPEED)
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
@@ -189,26 +189,26 @@ function script.Activate()
 end
 
 function script.Deactivate()
-	Signal( SIG_ACTIVATE)
-	SetSignalMask( SIG_ACTIVATE)
-	Turn( turret , y_axis, 0, math.rad(TURRET_SPEED) )
+	Signal(SIG_ACTIVATE)
+	SetSignalMask(SIG_ACTIVATE)
+	Turn(turret, y_axis, 0, math.rad(TURRET_SPEED))
 	WaitForTurn(turret, y_axis)
 	
-	Turn( panel_a1 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_a2 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_b1 , z_axis, 0, DEPLOY_SPEED  )
-	Turn( panel_b2 , z_axis, 0, DEPLOY_SPEED  )
+	Turn(panel_a1, z_axis, 0, DEPLOY_SPEED)
+	Turn(panel_a2, z_axis, 0, DEPLOY_SPEED)
+	Turn(panel_b1, z_axis, 0, DEPLOY_SPEED)
+	Turn(panel_b2, z_axis, 0, DEPLOY_SPEED)
 	WaitForTurn(panel_a1, z_axis)
 	WaitForTurn(panel_a2, z_axis)
 	WaitForTurn(panel_b1, z_axis)
 	WaitForTurn(panel_b2, z_axis)
 	
-	Turn( arm_2 , x_axis, 0, DEPLOY_SPEED )
-	Turn( arm_3 , x_axis, 0, DEPLOY_SPEED )
+	Turn(arm_2, x_axis, 0, DEPLOY_SPEED)
+	Turn(arm_3, x_axis, 0, DEPLOY_SPEED)
 	WaitForTurn(arm_2, x_axis)
 	WaitForTurn(arm_3, x_axis)
 	
-	Turn( arm_1 , x_axis, 0, DEPLOY_SPEED )
+	Turn(arm_1, x_axis, 0, DEPLOY_SPEED)
 end
 
 local function Stopping()

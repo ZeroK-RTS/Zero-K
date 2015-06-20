@@ -8,7 +8,7 @@ local smokePiece = {tamper}
 
 local function Open()
 	Turn (door_r, z_axis, math.rad(-120), math.rad(120))
-	Turn (door_l, z_axis, math.rad( 120), math.rad(120))
+	Turn (door_l, z_axis, math.rad(120), math.rad(120))
 	WaitForTurn (door_l, z_axis)
 	Move (tamper, y_axis, 15, 10)
 	WaitForMove (tamper, y_axis)

@@ -103,48 +103,48 @@ function script.Killed(recentDamage, maxHealth)
 	if  severity <= 0.25  then
 	
 		corpsetype = 1
-		Explode( body, sfxNone)
-		Explode( wake1, sfxNone)
-		Explode( wake2, sfxNone)
-		Explode( wake3, sfxNone)
-		Explode( wake4, sfxNone)
-		Explode( wake5, sfxNone)
-		Explode( wake6, sfxNone)
+		Explode(body, sfxNone)
+		Explode(wake1, sfxNone)
+		Explode(wake2, sfxNone)
+		Explode(wake3, sfxNone)
+		Explode(wake4, sfxNone)
+		Explode(wake5, sfxNone)
+		Explode(wake6, sfxNone)
 		return 1
 	end
 	if  severity <= 0.50  then
 	
 		corpsetype = 2
-		Explode( body, sfxNone)
-		Explode( turret, sfxShatter)
-		Explode( wake1, sfxFall)
-		Explode( wake2, sfxFall)
-		Explode( wake3, sfxFall)
-		Explode( wake4, sfxFall)
-		Explode( wake5, sfxFall)
-		Explode( wake6, sfxFall)
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		Explode(wake1, sfxFall)
+		Explode(wake2, sfxFall)
+		Explode(wake3, sfxFall)
+		Explode(wake4, sfxFall)
+		Explode(wake5, sfxFall)
+		Explode(wake6, sfxFall)
 		return 1
 	end
 	if  severity <= 0.99  then
 	
 		corpsetype = 3
-		Explode( body, sfxNone)
-		Explode( turret, sfxShatter)
-		Explode( wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end
-	Explode( body, sfxNone)
-	Explode( turret, sfxShatter)
-	Explode( wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(body, sfxNone)
+	Explode(turret, sfxShatter)
+	Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 end

@@ -54,7 +54,7 @@ function script.AimFromWeapon(n)
 	return aimProxy 
 end
 
-function script.AimWeapon(num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	return false
 end
 

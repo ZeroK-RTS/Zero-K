@@ -3,11 +3,11 @@ include "constants.lua"
 local base = piece "base"
 local wheel = piece "wheel"
 
-function script.Activate ( )
-        Spin(wheel, y_axis, 3, 0.1)
+function script.Activate ()
+		Spin(wheel, y_axis, 3, 0.1)
 end
 
-function script.Deactivate ( )
+function script.Deactivate ()
 	StopSpin(wheel, y_axis, 0.1)
 end
 
