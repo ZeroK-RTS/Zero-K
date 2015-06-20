@@ -408,11 +408,31 @@ function gadget:GameFrame(n)
 				end
 			end
 			
+			if debugMode then
+				Spring.Echo("team " .. i .. " old resource levels:")
+				if scaleEnergy then
+					Spring.Echo("nextMetalLevel: " .. (level or "nil"))
+					Spring.Echo("nextEnergyLevel: " .. (elevel or "nil"))
+				end
+			end
+			
+			-- Reduce usage fluctuation when stalling by effectively only 
+			-- paying attention to income.
+			level = level - 2
+			elevel = elevel - 2
+			if level < 0 then
+				level = 0
+			end
+			if elevel < 0 then
+				elevel = 0
+			end
+			
+			-- How much of each resource there is to spend in the next second.
 			local nextMetalLevel = (income + recieved + level)
 			local nextEnergyLevel = (eincome + erecieved + elevel)
 			
 			if debugMode then
-				Spring.Echo("team " .. i .. " Resources:")
+				Spring.Echo("team " .. i .. " new resource levels:")
 				if scaleEnergy then
 					Spring.Echo("nextMetalLevel: " .. (nextMetalLevel or "nil"))
 					Spring.Echo("nextEnergyLevel: " .. (nextEnergyLevel or "nil"))
