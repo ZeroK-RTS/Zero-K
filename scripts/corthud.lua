@@ -100,36 +100,24 @@ local function RestoreAfterDelay()
 	Turn(r_gun, x_axis, 0, math.rad(100))
 end
 
--- gun functions
-function script.QueryWeapon1()
-	if gun_1 then
-		return firept1
-	else 
-		return firept2
-	end
+function script.AimFromWeapon() 
+	return head
 end
 
-function script.AimWeapon1(heading, pitch)
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	-- turn to face target
+	
 	Turn(head, y_axis, heading, math.rad(100))
-	-- aim down when shooting close, up a little for farther away
-	local guntilt
-	if pitch < 0.25 then
-		guntilt = pitch
-	else
-		guntilt = -pitch/2
-	end
-	Turn(l_gun, x_axis, guntilt, math.rad(100))
-	Turn(r_gun, x_axis, guntilt, math.rad(100))
+	Turn(l_gun, x_axis, -pitch, math.rad(100))
+	Turn(r_gun, x_axis, -pitch, math.rad(100))
 	WaitForTurn(head, y_axis)
 	
 	StartThread(RestoreAfterDelay)
 	return 1 -- allows fire weapon after WaitForTurn
 end
 
-function script.FireWeapon1() 
+function script.FireWeapon() 
 	gun_1 = not gun_1
 	if gun_1 then
 		EmitSfx(firept1, UNIT_SFX1)
@@ -147,12 +135,21 @@ function script.FireWeapon1()
 
 		Move(l_barrel, z_axis, 0, 2.5)
 		Move(l_gun, z_axis, 0, 1.25)
-		end
+	end
 end
 
--- shield
-function script.QueryWeapon2()
-	return base
+function script.QueryWeapon(num)
+	if num == 1 then
+		-- Gun
+		if gun_1 then
+			return firept1
+		else 
+			return firept2
+		end
+	else
+		-- Shield
+		return base
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)
