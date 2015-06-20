@@ -27,8 +27,8 @@ local function Wake()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(200)
 	end
 end

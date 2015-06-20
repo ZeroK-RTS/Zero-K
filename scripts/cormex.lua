@@ -1,5 +1,5 @@
 
-local  base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'drill1', 'drill2', 'drill3', 'posts')
+local base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'drill1', 'drill2', 'drill3', 'posts')
 
 include "pieceControl.lua"
 include "constants.lua"
@@ -19,13 +19,13 @@ local function Open()
 		local income = Spring.GetUnitRulesParam(unitID, "mex_income") or 0
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
-			Spin (drill1,  y_axis, income, math.rad(1))
+			Spin (drill1, y_axis, income, math.rad(1))
 			Move (tamper, y_axis, height, income*10)
 			WaitForMove (tamper, y_axis)
 			height = 60 - height
 		else
 			StopSpin (furnace, y_axis, math.rad(5))
-			StopSpin (drill1,  y_axis, math.rad(5))
+			StopSpin (drill1, y_axis, math.rad(5))
 			Sleep (200)
 		end
 	end

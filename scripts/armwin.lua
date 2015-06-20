@@ -87,12 +87,12 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if isWind then
-		if  severity <= 0.25  then
+		if severity <= 0.25 then
 			Explode(base, sfxShatter)
 			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 			Explode(base, sfxShatter)
 			return 1
-		elseif severity <= 0.5  then
+		elseif severity <= 0.5 then
 			Explode(base, sfxShatter)
 			Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 			Explode(cradle, sfxShatter)
@@ -104,12 +104,12 @@ function script.Killed(recentDamage, maxHealth)
 			return 2
 		end
 	else
-		if  severity <= 0.25  then
+		if severity <= 0.25 then
 			--Explode(fan, sfxSmoke)
 			--Explode(cradle, sfxFire)
 			CreateTidalWreck()
 			return 3
-		elseif severity <= 0.5  then
+		elseif severity <= 0.5 then
 			--Explode(fan, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 			--Explode(cradle, sfxSmoke)
 			CreateTidalWreck()

@@ -47,7 +47,7 @@ local k_speed = 2
 
 --signals
 local walk = 2
-local aim  = 4
+local aim = 4
 local SIG_Flutter = 1
 
 local function Walk()

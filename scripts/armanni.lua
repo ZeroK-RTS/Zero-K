@@ -121,7 +121,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
@@ -134,7 +134,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
@@ -147,18 +147,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door1, sfxFall)
 		Explode(door2, sfxFall)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(gun, sfxShatter)
 		Explode(ledgun, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(fire, sfxNone)
 		Explode(antenna, sfxFall)
-		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 		Explode(base, sfxNone)
@@ -166,12 +166,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxNone)
 		Explode(gun, sfxShatter)
 		Explode(ledgun, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(fire, sfxNone)
 		Explode(antenna, sfxFall)
-		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end

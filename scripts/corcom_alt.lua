@@ -111,7 +111,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -178,17 +178,17 @@ end
 
 function script.FireWeapon(num) 
 	if num == 5 then
-		EmitSfx(lfirept,  1024)
+		EmitSfx(lfirept, 1024)
 	elseif num == 3 then
-		EmitSfx(rbigflash,  1026)
+		EmitSfx(rbigflash, 1026)
 	end
 end
 
 function script.Shot(num) 
 	if num == 5 then
-		EmitSfx(lfirept,  1025)
+		EmitSfx(lfirept, 1025)
 	elseif num == 3 then
-		EmitSfx(rbigflash,  1027)
+		EmitSfx(rbigflash, 1027)
 	end
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)

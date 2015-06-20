@@ -61,8 +61,8 @@ local function MoveThread()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(300)
 	end
 end
@@ -105,8 +105,8 @@ end
 function script.Shot(num)
 	local turret = turretData[num]
 
-	EmitSfx(turret.flares[turret.shot],  1024)
-	EmitSfx(turret.gun,  1025)
+	EmitSfx(turret.flares[turret.shot], 1024)
+	EmitSfx(turret.gun, 1025)
 	turret.shot = 3 - turret.shot
 end
 
@@ -130,7 +130,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(barrelfr, sfxNone)
 		return 1
 	end
-	if  severity <= 50  then
+	if severity <= 50 then
 		Explode(hull, sfxNone)
 		Explode(gunf, sfxFall)
 		Explode(base, sfxNone)
@@ -138,7 +138,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(barrelbr, sfxFall)
 		return 1
 	end
-	if  severity <= 99  then
+	if severity <= 99 then
 		Explode(hull, sfxShatter)
 		Explode(gunf, sfxFall)
 		Explode(base, sfxNone)

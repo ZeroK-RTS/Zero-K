@@ -14,12 +14,12 @@ local SIG_TAKEOFF = 1
 local takeoffHeight = UnitDefNames["corhurc2"].wantedHeight
 
 local function Lights()
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(400)
 	end
 	while true do
-		EmitSfx(wingtipl,  1025)
-		EmitSfx(wingtipr,  1026)
+		EmitSfx(wingtipl, 1025)
+		EmitSfx(wingtipr, 1026)
 		Sleep(2000)
 	end
 end

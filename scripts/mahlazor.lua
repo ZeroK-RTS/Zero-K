@@ -39,15 +39,15 @@ function TargetingLaser()
 		
 		if awake then		
 			if shooting ~= 0 then
-				EmitSfx(mah_lazer,  FIRE_W2)
-				EmitSfx(flashpoint,  FIRE_W3)
+				EmitSfx(mah_lazer, FIRE_W2)
+				EmitSfx(flashpoint, FIRE_W3)
 				shooting = shooting - 1
 			else
-				EmitSfx(mah_lazer,  FIRE_W4)
-				EmitSfx(flashpoint,  FIRE_W5)
+				EmitSfx(mah_lazer, FIRE_W4)
+				EmitSfx(flashpoint, FIRE_W5)
 			end
 		else
-			--EmitSfx(flashpoint,  FIRE_W6)
+			--EmitSfx(flashpoint, FIRE_W6)
 		end
 		
 		Sleep(30)

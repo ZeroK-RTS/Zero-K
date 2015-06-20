@@ -82,11 +82,11 @@ local UNIT_SPEED = UnitDefNames["corcrw"].speed*SLOWDOWN_FACTOR/30
 local sound_index = 0
 
 function script.Activate()
-  isLanded = false
+ isLanded = false
 end
 
 function script.Deactivate()
-  isLanded = true
+ isLanded = true
 end
 
 local function EmitDust()
@@ -226,7 +226,7 @@ local function ClusterBombThread()
 	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 	local sleepTime = 70/slowState
 	for i = 1, SPECIAL_FIRE_COUNT do
-		EmitSfx(subemit[0],  FIRE_W5)
+		EmitSfx(subemit[0], FIRE_W5)
 		Sleep(sleepTime)
 	end
 	Sleep(330)

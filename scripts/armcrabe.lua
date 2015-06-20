@@ -151,7 +151,7 @@ local function Curl()
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
 		
-   	bCurling = false
+ 	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
 
@@ -208,7 +208,7 @@ local function BlinkingLight()
 		Sleep(3000)
 	end
 	while true do
-		EmitSfx(blight,  1024+2)
+		EmitSfx(blight, 1024+2)
 		Sleep(2100)
 	end
 end
@@ -307,8 +307,8 @@ end
 function script.FireWeapon(num)
 	if num == 1 then
 		Move(barrel1, z_axis, -1.2)
-		EmitSfx(flare1,  1024+0)	
-		EmitSfx(gflash,  1024+1)
+		EmitSfx(flare1, 1024+0)	
+		EmitSfx(gflash, 1024+1)
 		Move(barrel2, z_axis, -1.2)
 		Sleep(150)
 		Move(barrel1, z_axis, 0, 3)
@@ -337,7 +337,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		return 1
 	elseif (severity <= .50) then

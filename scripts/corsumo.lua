@@ -88,7 +88,7 @@ local crater = 4101
 
 --signals
 local walk = 2
-local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32  }
+local SIG_Aim = { [2] = 4, [3] = 8, [4] = 16, [5] = 32 }
 
 local function Walk()
 	Signal(walk)
@@ -289,7 +289,7 @@ function beginJump()
 	Turn(b_dome, z_axis, 0, 0.2)
 
 	Turn(lf_thigh, x_axis, math.rad(80), 7)
-	Turn(rf_thigh, x_axis, math.rad(80),  7)
+	Turn(rf_thigh, x_axis, math.rad(80), 7)
 	Turn(lb_thigh, x_axis, math.rad(-80), 7)
 	Turn(rb_thigh, x_axis, math.rad(-80), 7)
 	
@@ -440,7 +440,7 @@ function script.AimWeapon(num, heading, pitch)
 		local theta, phi = getTheActuallyCorrectHeadingAndPitch(heading, pitch, weaponPieces[num].normal, weaponPieces[num].radial, weaponPieces[num].right)
 		
 		Turn(weaponPieces[num].turret, y_axis, theta, 12)
-		Turn(weaponPieces[num].sleeve,  x_axis, phi, 6)
+		Turn(weaponPieces[num].sleeve, x_axis, phi, 6)
 		
 		WaitForTurn(weaponPieces[num].turret, y_axis)
 		WaitForTurn(weaponPieces[num].sleeve, x_axis)

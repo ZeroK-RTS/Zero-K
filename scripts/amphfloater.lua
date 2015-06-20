@@ -143,7 +143,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rshin, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -259,7 +259,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(lfoot, sfxNone)
 		Explode(lshin, sfxNone)
 		Explode(lthigh, sfxNone)
@@ -268,7 +268,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxNone)
 		Explode(body, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(lfoot, sfxFall)
 		Explode(lshin, sfxFall)
 		Explode(lthigh, sfxFall)
@@ -277,22 +277,22 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxFall)
 		Explode(body, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+	elseif severity <= .99 then
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxShatter + sfxExplode)
 		return 2
 	end

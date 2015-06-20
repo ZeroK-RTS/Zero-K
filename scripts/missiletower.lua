@@ -72,7 +72,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
-	EmitSfx(firepoint[shotNum],  UNIT_SFX1)
+	EmitSfx(firepoint[shotNum], UNIT_SFX1)
 	shotNum = 3 - shotNum
 end
 
@@ -96,21 +96,21 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(launcher1, sfxNone)
 		Explode(launcher2, sfxNone)
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	end
-	if  severity <= 0.50  then
+	if severity <= 0.50 then
 		Explode(launcher1, sfxNone)
 		Explode(launcher2, sfxNone)
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	end
-	if  severity <= 0.99  then
+	if severity <= 0.99 then
 		Explode(launcher1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(launcher2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(base, sfxNone)

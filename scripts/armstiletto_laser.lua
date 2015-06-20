@@ -3,7 +3,7 @@ include "fakeUpright.lua"
 include "bombers.lua"
 include "fixedwingTakeOff.lua"
 
-local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
+local base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
 local sound_index = 0
@@ -64,7 +64,7 @@ function script.FireWeapon1()
 			Turn(preDrop, x_axis, angle_x)
 			Turn(preDrop, z_axis, -angle_z)
 			
-			EmitSfx(drop,  FIRE_W2)
+			EmitSfx(drop, FIRE_W2)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
 				Spring.PlaySoundFile("sounds/weapon/LightningBolt.wav", 4, px, py, pz)

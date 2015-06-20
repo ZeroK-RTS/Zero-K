@@ -21,7 +21,7 @@ local is_open = false
 local restore_delay = 2000;
 
 --signals
-local aim  = 2
+local aim = 2
 local open = 8
 local close = 16
 
@@ -156,7 +156,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(aim)
 	SetSignalMask(aim)
 	
-	Turn(belt,  y_axis, heading, math.rad(200));
+	Turn(belt, y_axis, heading, math.rad(200));
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -167,7 +167,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	--Turn(cannon, y_axis, heading, 1.2)
-	Turn(belt,  y_axis, heading, math.rad(200));
+	Turn(belt, y_axis, heading, math.rad(200));
 	Turn(wheel, x_axis, -math.rad(30), math.rad(200));
 	Turn(arm, x_axis, math.rad(30),10);
 	Turn(hand, x_axis, math.rad(30),10);

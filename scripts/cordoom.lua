@@ -25,8 +25,8 @@ local smokePiece = { shell_1, shell_2, cannonbase, heatray }
 local heat = false
 local on = false
 --signals
-local aim  = 2
-local aim2  = 4
+local aim = 2
+local aim2 = 4
 local open = 8
 local close = 16
 
@@ -110,7 +110,7 @@ function script.AimWeapon1(heading, pitch)
 	SetSignalMask(aim)
 
 	Turn(shellbase, y_axis, heading, 1.2)
-	Turn(cannonbase,  x_axis, -pitch, 0.8) 
+	Turn(cannonbase, x_axis, -pitch, 0.8) 
 	WaitForTurn (shellbase, y_axis)
 	WaitForTurn (cannonbase, x_axis)
 
@@ -139,7 +139,7 @@ function script.AimWeapon2(heading, pitch)
 	Signal(aim2)
 	SetSignalMask(aim2)
 	Turn(heatraybase, y_axis, heading, 3)
-	Turn(heatray,  x_axis, -pitch, 2)
+	Turn(heatray, x_axis, -pitch, 2)
 	WaitForTurn (heatraybase, y_axis)
 	WaitForTurn (heatray, x_axis)
 	return true

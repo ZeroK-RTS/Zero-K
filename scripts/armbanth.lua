@@ -50,9 +50,9 @@ local smokePiece = { torso, rarmgun, larm_rgunclaw }
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-local SIG_Aim  = 4
-local SIG_Aim2  = 8
-local SIG_Aim3  = 16
+local SIG_Aim = 4
+local SIG_Aim2 = 8
+local SIG_Aim3 = 16
 local SIG_Idle = 32
 local armgun = false
 local missilegun = 1
@@ -121,8 +121,8 @@ local function IdleAnim()
 			Turn(head, y_axis, math.rad(-30), math.rad(60))
 		end
 		armgun = not armgun
-		Turn(arm,  x_axis, math.rad(-20), math.rad(45))
-		Turn(shoulder,  x_axis, math.rad(-20), math.rad(45))
+		Turn(arm, x_axis, math.rad(-20), math.rad(45))
+		Turn(shoulder, x_axis, math.rad(-20), math.rad(45))
 		Sleep(2000)
 		Turn(lclaw, y_axis, math.rad(30), math.rad(180))
 		Turn(rclaw, y_axis, math.rad(-30), math.rad(180))
@@ -130,8 +130,8 @@ local function IdleAnim()
 		Turn(lclaw, y_axis, 0, math.rad(180))
 		Turn(rclaw, y_axis, 0, math.rad(180))
 		Sleep(2000)
-		Turn(arm,  x_axis, 0, math.rad(60))
-		Turn(shoulder,  x_axis, 0, math.rad(60))
+		Turn(arm, x_axis, 0, math.rad(60))
+		Turn(shoulder, x_axis, 0, math.rad(60))
 		Turn(head, y_axis, 0, math.rad(60))
 		Sleep(6500)
 	end

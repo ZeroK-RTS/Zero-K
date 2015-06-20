@@ -35,7 +35,7 @@ end
 
 local function TiltBody()
 
-	while  true  do
+	while true do
 		if attacking then
 			Turn(body, x_axis, 0, math.rad(45))
 			Turn(rthruster, x_axis, 0, math.rad(45))
@@ -107,8 +107,8 @@ function script.AimFromWeapon(num)
 end
 
 function script.Shot(num)
-	EmitSfx(emits[gun].flare,  1024)
-	EmitSfx(emits[gun].barrel,  1025)
+	EmitSfx(emits[gun].flare, 1024)
+	EmitSfx(emits[gun].barrel, 1025)
 	gun = (gun)%4 + 1
 end
 

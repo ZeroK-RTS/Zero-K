@@ -244,7 +244,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		return 1
 	elseif (severity <= .50) then

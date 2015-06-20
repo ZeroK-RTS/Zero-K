@@ -54,7 +54,7 @@ function FlameTrailThread()
 	WaitForTurn(sleeve, x_axis)
 	
 	for i = 1, 20 do
-		EmitSfx(firepoint,  FIRE_W2)
+		EmitSfx(firepoint, FIRE_W2)
 		Sleep(400)
 	end
 	flaming = false
@@ -212,36 +212,36 @@ end
 function script.Shot(num)		
 	--[[
 	Turn(firepoint, y_axis, math.rad(25))
-	EmitSfx(firepoint,  FIRE_W2)
+	EmitSfx(firepoint, FIRE_W2)
 	Turn(firepoint, y_axis, - math.rad(25))
-	EmitSfx(firepoint,  FIRE_W2)
+	EmitSfx(firepoint, FIRE_W2)
 	Turn(firepoint, y_axis, 0)
 	--]]
 	StartThread(Recoil)
 end
 
 function script.Killed(severity, corpsetype)
-	if  severity <= 25  then
+	if severity <= 25 then
 	
 		corpsetype = 1
 		Explode(body, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	end
-	if  severity <= 50  then
+	if severity <= 50 then
 	
 		corpsetype = 1
 		Explode(body, sfxNone)
 		Explode(turret,sfxNone)
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire)
 		return 1
 	else
 	
 		corpsetype = 2
 		Explode(body, sfxNone)
 		Explode(turret, sfxNone)
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire)
-		Explode(tracks1, sfxShatter + sfxSmoke  + sfxFire)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire)
+		Explode(tracks1, sfxShatter + sfxSmoke + sfxFire)
 		Hide(tracks2)
 		Hide(tracks3)
 		Hide(tracks4)

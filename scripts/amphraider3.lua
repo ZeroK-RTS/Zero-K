@@ -211,7 +211,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(lfoot, sfxNone)
 		Explode(lshin, sfxNone)
 		Explode(lthigh, sfxNone)
@@ -220,7 +220,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxNone)
 		Explode(torso, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(lfoot, sfxFall)
 		Explode(lshin, sfxFall)
 		Explode(lthigh, sfxFall)
@@ -229,22 +229,22 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxFall)
 		Explode(torso, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+	elseif severity <= .99 then
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(torso, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
 		return 2
 	end

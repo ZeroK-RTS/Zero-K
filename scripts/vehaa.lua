@@ -112,7 +112,7 @@ function Suspension()
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
 	
-	while true do   
+	while true do 
 		
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
@@ -170,7 +170,7 @@ function Suspension()
 			Spin(lwheel2, x_axis, wheelTurnSpeed)
 		end
 		Sleep(ANIM_PERIOD)
-   end 
+ end 
 end
 
 function script.Create()

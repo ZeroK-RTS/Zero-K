@@ -1,7 +1,7 @@
 include "constants.lua"
 
 --pieces
-local  rocketR, rocketL = piece("RocketR", "RocketL");
+local rocketR, rocketL = piece("RocketR", "RocketL");
 local droneMain = piece("DroneMain");
 
 local smokePiece = {rocketR, rocketL,droneMain};

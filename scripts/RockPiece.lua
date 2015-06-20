@@ -4,7 +4,7 @@
 --Date: 5 February 2008
 
 --[[How to Use:
-1. Copy the following to  the top of your unit script, below the piecenum declarations. MAKE SURE YOU REPLACE VALUES WHEN APPROPRIATE.
+1. Copy the following to the top of your unit script, below the piecenum declarations. MAKE SURE YOU REPLACE VALUES WHEN APPROPRIATE.
 DECLARE AS GLOBALS, NOT AS LOCALS
 ALL ANGLES ARE IN RADIANS
 

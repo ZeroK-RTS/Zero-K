@@ -55,7 +55,7 @@ function script.Create()
 	Hide(wake2)
 	StartThread(SmokeUnit, smokePiece)
 	
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
 	Spin(radar, y_axis, rad(60))
@@ -64,9 +64,9 @@ end
 local function StartMoving()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	while  true  do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+	while true do
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(150)
 	end
 end

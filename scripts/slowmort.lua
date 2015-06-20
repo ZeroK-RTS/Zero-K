@@ -211,7 +211,7 @@ end
 function script.FireWeapon()
 
 	Move(barrel, z_axis, -5)
-	EmitSfx(flare,  1024)
+	EmitSfx(flare, 1024)
 	Sleep(150)
 	--Turn(torso, x_axis, math.rad(-10.000000), math.rad(500.120879))
 	Sleep(150)
@@ -229,7 +229,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(barrel, sfxNone)
 		Explode(foot1, sfxNone)
 		Explode(foot2, sfxNone)
@@ -240,7 +240,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(thigh2, sfxNone)
 		Explode(torso, sfxNone)
 		return 1
-	elseif  severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(barrel, sfxNone)
 		Explode(foot1, sfxNone)
 		Explode(foot2, sfxNone)

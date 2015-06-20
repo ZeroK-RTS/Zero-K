@@ -39,7 +39,7 @@ include 'RockPiece.lua'
 local ROCK_PIECE = ground		--piece to rock
 local ROCK_Z_SPEED = 1		--number of rock angles per second around z-axis
 local ROCK_Z_DECAY = -0.5	--rocking around z-axis is reduced by this factor each time; should be negative to alternate rocking direction
-local ROCK_Z_MIN  = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
+local ROCK_Z_MIN = math.rad(3)	--if around z-axis rock is not greater than this amount rocking will stop after returning to center
 local ROCK_Z_MAX = math.rad(15)
 local SIG_ROCK_Z = 1024		--signal to prevent multiple rocking
 
@@ -73,8 +73,8 @@ local function Wake()
 	Signal(SIG_Move)
 	SetSignalMask(SIG_Move)
 	while true do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(200)
 	end
 end

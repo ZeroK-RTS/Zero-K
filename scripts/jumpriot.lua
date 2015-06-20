@@ -38,7 +38,7 @@ local walkCycle = 0
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-local SIG_Aim  = 4
+local SIG_Aim = 4
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
@@ -178,20 +178,20 @@ function beginJump()
 end
 
 function jumping()
-	EmitSfx(lfoot,  UNIT_SFX4)
-	EmitSfx(rfoot,  UNIT_SFX4)
-	EmitSfx(lfoot,  UNIT_SFX1)
-	EmitSfx(rfoot,  UNIT_SFX2)
-	EmitSfx(lshoulder,  UNIT_SFX3)
-	EmitSfx(rshoulder,  UNIT_SFX3)
+	EmitSfx(lfoot, UNIT_SFX4)
+	EmitSfx(rfoot, UNIT_SFX4)
+	EmitSfx(lfoot, UNIT_SFX1)
+	EmitSfx(rfoot, UNIT_SFX2)
+	EmitSfx(lshoulder, UNIT_SFX3)
+	EmitSfx(rshoulder, UNIT_SFX3)
 end
 
 function halfJump()
 end
 
 function endJump() 
-	EmitSfx(lfoot,  UNIT_SFX4)
-	EmitSfx(rfoot,  UNIT_SFX4)
+	EmitSfx(lfoot, UNIT_SFX4)
+	EmitSfx(rfoot, UNIT_SFX4)
 end
 
 

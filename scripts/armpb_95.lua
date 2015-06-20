@@ -23,7 +23,7 @@ local restore_delay = 2000;
 local BUNKERED_AUTOHEAL = tonumber (UnitDef.customParams.armored_regen or 20) / 2 -- applied every 0.5s
 
 --signals
-local aim  = 2
+local aim = 2
 local open = 8
 local close = 16
 
@@ -158,7 +158,7 @@ function script.AimWeapon(num, heading, pitch)
 	Signal(aim)
 	SetSignalMask(aim)
 	
-	Turn(belt,  z_axis, heading, math.rad(200));
+	Turn(belt, z_axis, heading, math.rad(200));
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -169,7 +169,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	--Turn(cannon, y_axis, heading, 1.2)
-	Turn(belt,  z_axis, heading, math.rad(200));
+	Turn(belt, z_axis, heading, math.rad(200));
 	Turn(wheel, x_axis, -math.rad(30), math.rad(200));
 	Turn(arm, x_axis, math.rad(30),10);
 	Turn(hand, x_axis, math.rad(30),10);

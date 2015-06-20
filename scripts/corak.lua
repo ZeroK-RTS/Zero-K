@@ -110,7 +110,7 @@ function script.AimFromWeapon()
 end
 
 function script.QueryWeapon(num)
-	if  gun_1  then	
+	if gun_1 then	
 		return r_gun_barr
 	else
 		return l_gun_barr
@@ -132,7 +132,7 @@ end
 
 function script.FireWeapon(num) 
 	gun_1 = not gun_1
-	if  gun_1  then	
+	if gun_1 then	
 		EmitSfx(r_gun_barr, UNIT_SFX1)
 		Spin(r_gun_barr, z_axis, math.rad(1000), math.rad(50))
 	else
@@ -144,7 +144,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= 0.25  then	
+	if severity <= 0.25 then	
 		Explode(head, sfxNone)
 		Explode(l_gun_barr, sfxNone)
 		Explode(l_gun, sfxNone)
@@ -158,7 +158,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.foot, sfxNone)
 		Explode(base, sfxNone)
 		return 1
-	elseif  severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(head, sfxFall)
 		Explode(r_gun, sfxFall)
 		Explode(l_gun, sfxFall)
@@ -183,8 +183,8 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.foot, sfxShatter)
 		Explode(rightLeg.shin, sfxShatter)
 		Explode(rightLeg.thigh, sfxShatter)
-		Explode(base, sfxFall + sfxSmoke + sfxFire  + sfxExplodeOnHit)
-		Explode(head, sfxFall + sfxSmoke  + sfxSmoke  + sfxExplodeOnHit)
+		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(head, sfxFall + sfxSmoke + sfxSmoke + sfxExplodeOnHit)
 		return 3
 	end
 end

@@ -116,21 +116,21 @@ local function RestoreAfterDelay()
 			Turn(ruparm, x_axis, 0, math.rad(250)) 
 			Turn(ruparm, y_axis, 0, math.rad(250)) 
 			Turn(ruparm, z_axis, 0, math.rad(250)) 
-			Turn(rarm, x_axis, math.rad(2), math.rad(250))	  --up 2
-			Turn(rarm, y_axis, 0, math.rad(250))  
+			Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
+			Turn(rarm, y_axis, 0, math.rad(250)) 
 			Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
-			Turn(rloarm, x_axis, math.rad(47), math.rad(250))   --up 47
-			Turn(rloarm, y_axis, math.rad(76), math.rad(250))   --up 76
-			Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250))   --up -47
-			Turn(luparm, x_axis, math.rad(-9), math.rad(250))	   --up -9
-			Turn(luparm, y_axis, 0, math.rad(250))  
-			Turn(luparm, z_axis, 0, math.rad(250))  
-			Turn(larm, x_axis, math.rad(5), math.rad(250))	   --up 5
-			Turn(larm, y_axis, math.rad(-3), math.rad(250))	   --up -3
-			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	   --up 22
+			Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
+			Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
+			Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
+			Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
+			Turn(luparm, y_axis, 0, math.rad(250)) 
+			Turn(luparm, z_axis, 0, math.rad(250)) 
+			Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
+			Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
+			Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 			Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
-			Turn(lloarm, y_axis, 0, math.rad(250))  
-			Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250))  --upspring 94
+			Turn(lloarm, y_axis, 0, math.rad(250)) 
+			Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 			-- done at ease
 			Sleep(100)
 		end
@@ -265,11 +265,11 @@ end
 
 local function MotionControl(moving, aiming, justmoved)
 	justmoved = true
-	while true  do
+	while true do
 		moving = bMoving
 		aiming = bAiming
-		if moving  then
-			if aiming  then
+		if moving then
+			if aiming then
 				armsFree = true
 			else
 				armsFree = false
@@ -278,14 +278,14 @@ local function MotionControl(moving, aiming, justmoved)
 			justmoved = true
 		else
 			armsFree = true
-			if justmoved  then
+			if justmoved then
 				Turn(rupleg, x_axis, 0, math.rad(200.071429))
 				Turn(rloleg, x_axis, 0, math.rad(200.071429))
 				Turn(rfoot, x_axis, 0, math.rad(200.071429))
 				Turn(lupleg, x_axis, 0, math.rad(200.071429))
 				Turn(lloleg, x_axis, 0, math.rad(200.071429))
 				Turn(lfoot, x_axis, 0, math.rad(200.071429))
-				if  not aiming  then
+				if not aiming then
 					Turn(torso, x_axis, 0) --untilt forward
 					Turn(torso, y_axis, 0, math.rad(90.027473))
 					Turn(ruparm, x_axis, 0, math.rad(200.071429))
@@ -304,21 +304,21 @@ function script.Create()
 	Turn(ruparm, x_axis, 0, math.rad(250)) 
 	Turn(ruparm, y_axis, 0, math.rad(250)) 
 	Turn(ruparm, z_axis, 0, math.rad(250)) 
-	Turn(rarm, x_axis, math.rad(2), math.rad(250))	  --up 2
-	Turn(rarm, y_axis, 0, math.rad(250))  
+	Turn(rarm, x_axis, math.rad(2), math.rad(250))	 --up 2
+	Turn(rarm, y_axis, 0, math.rad(250)) 
 	Turn(rarm, z_axis, math.rad(-(-12)), math.rad(250))	--up -12
-	Turn(rloarm, x_axis, math.rad(47), math.rad(250))   --up 47
-	Turn(rloarm, y_axis, math.rad(76), math.rad(250))   --up 76
-	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250))   --up -47
-	Turn(luparm, x_axis, math.rad(-9), math.rad(250))	   --up -9
-	Turn(luparm, y_axis, 0, math.rad(250))  
-	Turn(luparm, z_axis, 0, math.rad(250))  
-	Turn(larm, x_axis, math.rad(5), math.rad(250))	   --up 5
-	Turn(larm, y_axis, math.rad(-3), math.rad(250))	   --up -3
-	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	   --up 22
+	Turn(rloarm, x_axis, math.rad(47), math.rad(250)) --up 47
+	Turn(rloarm, y_axis, math.rad(76), math.rad(250)) --up 76
+	Turn(rloarm, z_axis, math.rad(-(-47)), math.rad(250)) --up -47
+	Turn(luparm, x_axis, math.rad(-9), math.rad(250))	 --up -9
+	Turn(luparm, y_axis, 0, math.rad(250)) 
+	Turn(luparm, z_axis, 0, math.rad(250)) 
+	Turn(larm, x_axis, math.rad(5), math.rad(250))	 --up 5
+	Turn(larm, y_axis, math.rad(-3), math.rad(250))	 --up -3
+	Turn(larm, z_axis, math.rad(-(22)), math.rad(250))	 --up 22
 	Turn(lloarm, x_axis, math.rad(92), math.rad(250))	-- up 82
-	Turn(lloarm, y_axis, 0, math.rad(250))  
-	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250))  --upspring 94
+	Turn(lloarm, y_axis, 0, math.rad(250)) 
+	Turn(lloarm, z_axis, math.rad(-(94)), math.rad(250)) --upspring 94
 
 	Hide(flare)
 	Hide(jx1)
@@ -455,8 +455,8 @@ end
 
 local function JumpExhaust()
 	while inJumpMode do 
-		EmitSfx(jx1,  1028)
-		EmitSfx(jx2,  1028)
+		EmitSfx(jx1, 1028)
+		EmitSfx(jx2, 1028)
 		Sleep(33)
 	end
 end
@@ -472,8 +472,8 @@ function beginJump()
 end
 
 function jumping()
-	EmitSfx(jx1,  1028)
-	EmitSfx(jx2,  1028)
+	EmitSfx(jx1, 1028)
+	EmitSfx(jx2, 1028)
 end
 
 function halfJump()
@@ -481,7 +481,7 @@ end
 
 function endJump() 
 	inJumpMode = false
-	EmitSfx(base,  1029)
+	EmitSfx(base, 1029)
 end
 
 function script.StopBuilding()
@@ -521,42 +521,42 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lfoot, x_axis, math.rad(24), math.rad(250))	
 		Sleep(200) --give time to fall
 		Turn(ruparm, x_axis, math.rad(-48), math.rad(350))	
-		Turn(ruparm, y_axis, math.rad(32), math.rad(350))  --was -32
+		Turn(ruparm, y_axis, math.rad(32), math.rad(350)) --was -32
 		Turn(luparm, x_axis, math.rad(-50), math.rad(350))	
 		Turn(luparm, y_axis, math.rad(47), math.rad(350))	
 		Turn(luparm, z_axis, math.rad(-(50)), math.rad(350))
 		Sleep(600)
-		EmitSfx(turret,  1027) --impact
+		EmitSfx(turret, 1027) --impact
 		--StartThread(burn)
 		--Sleep((1000 * rand (2, 5))) 
 		Sleep(100)
 		return 1
 	elseif severity <= 0.5 then
-		Explode(gun,	sfxFall + sfxSmoke  + sfxExplode)
-		Explode(head,   sfxFire + sfxExplode)
+		Explode(gun,	sfxFall + sfxSmoke + sfxExplode)
+		Explode(head, sfxFire + sfxExplode)
 		Explode(pelvis, sfxFire + sfxExplode)
 		Explode(lloarm, sfxFire + sfxExplode)
 		Explode(luparm, sfxFire + sfxExplode)
 		Explode(lloleg, sfxFire + sfxExplode)
 		Explode(lupleg, sfxFire + sfxExplode)
 		Explode(rloarm, sfxFire + sfxExplode)
-		Explode(rloleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(ruparm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(rupleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
+		Explode(rloleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
 		return 1
 	else
-		Explode(gun, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(head, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(pelvis, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(lloarm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(luparm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(lloleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(lupleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(rloarm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(rloleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(ruparm, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
-		Explode(rupleg, sfxFall + sfxFire  + sfxSmoke  + sfxExplode)
+		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(pelvis, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(lloarm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(luparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(lloleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(lupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(rloarm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(rloleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
 		return 2
 	end

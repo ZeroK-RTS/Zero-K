@@ -133,17 +133,17 @@ local function RestoreAfterDelay()
 		Turn(ruparm, x_axis, 0, math.rad(250)) 
 		Turn(ruparm, y_axis, 0, math.rad(250)) 
 		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250)) 
-		Turn(rarm, x_axis, 0, math.rad(250))	  --up 2
-		Turn(rarm, y_axis, 0, math.rad(250))  
+		Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
+		Turn(rarm, y_axis, 0, math.rad(250)) 
 		Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
 		Turn(flagellum, x_axis, 0, math.rad(90))
 	
-		Turn(luparm, x_axis, 0, math.rad(250))	   --up -9
-		Turn(luparm, y_axis, 0, math.rad(250))  
-		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250))  
-		Turn(larm, x_axis, 0, math.rad(250))	   --up 5
-		Turn(larm, y_axis, 0, math.rad(250))	   --up -3
-		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	   --up 22
+		Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
+		Turn(luparm, y_axis, 0, math.rad(250)) 
+		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250)) 
+		Turn(larm, x_axis, 0, math.rad(250))	 --up 5
+		Turn(larm, y_axis, 0, math.rad(250))	 --up -3
+		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
 		RestorePose()
 	end
 	StartThread(IdleAnim)
@@ -300,7 +300,7 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	if num == 1 then
-		if  dgunning  then return false end
+		if dgunning then return false end
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		armsFree = false
@@ -310,10 +310,10 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(rarm, x_axis, math.rad(20), math.rad(250))
 		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis)  --need to make surenot 
+		WaitForTurn(larm, x_axis) --need to make surenot 
 		return true
 	elseif num == 2 then
-		if dgunning  then return false end
+		if dgunning then return false end
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
 		Turn(torso, y_axis, heading, math.rad(200))
@@ -346,7 +346,7 @@ function script.AimWeapon(num, heading, pitch)
 		dgunning = false
 		return true
 	elseif num == 4 then
-		if dgunning  then return false end
+		if dgunning then return false end
 		Signal(SIG_AIM_4)
 		SetSignalMask(SIG_AIM_4)
 	
@@ -396,7 +396,7 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
 	Turn(torso, y_axis, 0, math.rad(200))
-	if  severity <= .50  then
+	if severity <= .50 then
 		Turn(base, x_axis, math.rad(71), math.rad(70))
 		Turn(torso, x_axis, math.rad(-31), math.rad(50))
 		Turn(ruparm, x_axis, math.rad(-41), math.rad(50))
@@ -416,7 +416,7 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))
 		Turn(lfoot, x_axis, math.rad(23), math.rad(50))
 		Sleep(800)
-		--EmitSfx(torso,  1027) --impact
+		--EmitSfx(torso, 1027) --impact
 		--StartThread(burn)
 		--Sleep((1000 * rand (2, 5)))
 
@@ -431,14 +431,14 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(torso, sfxNone)
 		return 1
 	else
-		Explode(pelvis, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(luparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(lleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(lupleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(rarm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(rleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(ruparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
-		Explode(rupleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT)
+		Explode(pelvis, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(luparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rarm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(ruparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(torso, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 		return 2
 	end

@@ -89,26 +89,26 @@ local function MoveScript()
 		Sleep(2000)
 	end
 	while true do 
-		if math.random() < 0.5  then
-			EmitSfx(wake1,  5)
-			EmitSfx(wake3,  5)
-			EmitSfx(wake5,  5)
-			EmitSfx(wake7,  5)
-			EmitSfx(wake1,  3)
-			EmitSfx(wake3,  3)
-			EmitSfx(wake5,  3)
-			EmitSfx(wake7,  3)
+		if math.random() < 0.5 then
+			EmitSfx(wake1, 5)
+			EmitSfx(wake3, 5)
+			EmitSfx(wake5, 5)
+			EmitSfx(wake7, 5)
+			EmitSfx(wake1, 3)
+			EmitSfx(wake3, 3)
+			EmitSfx(wake5, 3)
+			EmitSfx(wake7, 3)
 		else
-			EmitSfx(wake2,  5)
-			EmitSfx(wake4,  5)
-			EmitSfx(wake6,  5)
-			EmitSfx(wake8,  5)
-			EmitSfx(wake2,  3)
-			EmitSfx(wake4,  3)
-			EmitSfx(wake6,  3)
-			EmitSfx(wake8,  3)
+			EmitSfx(wake2, 5)
+			EmitSfx(wake4, 5)
+			EmitSfx(wake6, 5)
+			EmitSfx(wake8, 5)
+			EmitSfx(wake2, 3)
+			EmitSfx(wake4, 3)
+			EmitSfx(wake6, 3)
+			EmitSfx(wake8, 3)
 		end
-		EmitSfx(ground1,  1024)
+		EmitSfx(ground1, 1024)
 		Sleep(150)
 	end
 end
@@ -179,18 +179,18 @@ end
 function script.FireWeapon(num)
 	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
 	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE, x_axis)
-	EmitSfx(flareMap[shootCycle],  1025)
+	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)

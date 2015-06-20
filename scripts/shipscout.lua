@@ -29,9 +29,9 @@ end
 local function Motion()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	while  true  do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+	while true do
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(150)
 	end
 end
@@ -85,30 +85,30 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(wake1, sfxNone)
 		Explode(wake2, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(turret, sfxShatter)
 		Explode(wake1, sfxFall + sfxExplode)
 		Explode(wake2, sfxFall + sfxExplode)
 		return 1
-	elseif  severity <= .99  then
+	elseif severity <= .99 then
 		corpsetype = 3
 		Explode(base, sfxNone)
 		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(wake2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 		Explode(base, sfxNone)
 		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(wake2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end

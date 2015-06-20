@@ -4,7 +4,7 @@ local base = piece 'base'
 --local imma_chargin = piece 'imma_chargin' 
 local firepoint_test = piece 'firepoint' 
 local firepoint = piece 'firepoint' 
-local button  = piece 'button' 
+local button = piece 'button' 
 
 local on = false
 
@@ -99,7 +99,7 @@ function script.FireWeapon1()
 		push = false
 	end
 	
-	--EmitSfx(firepoint_test,  FIRE_W2)
+	--EmitSfx(firepoint_test, FIRE_W2)
 end
 
 function script.AimFromWeapon1()

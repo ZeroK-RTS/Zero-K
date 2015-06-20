@@ -228,7 +228,7 @@ local function sinkFloat_thread()
 	Turn(base, z_axis, 0, math.rad(math.random(1,2)))
 	Move(base, y_axis, 0, math.rad(math.random(1,2)))
 	
-	while true do   --FIXME: not stopped when sinking ends!
+	while true do --FIXME: not stopped when sinking ends!
 		EmitSfx(torso, SFX.BUBBLE)
 		Sleep(66)
 	end
@@ -286,7 +286,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speed =  1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		local speed = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		--straighten left leg and draw it back, raise body, center right leg
 		Move(pelvis, y_axis, BODY_RISE_HEIGHT, BODY_RISE_SPEED*speed)
 		Turn(pelvis, z_axis, BODY_TILT_ANGLE, BODY_TILT_SPEED*speed)
@@ -457,7 +457,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(lfoot, sfxNone)
 		Explode(lcalf, sfxNone)
 		Explode(lthigh, sfxNone)
@@ -467,7 +467,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxNone)
 		Explode(torso, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(lfoot, sfxFall)
 		Explode(lcalf, sfxFall)
 		Explode(lthigh, sfxFall)
@@ -477,24 +477,24 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxFall)
 		Explode(torso, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lcalf, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rcalf, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+	elseif severity <= .99 then
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lcalf, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rcalf, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(torso, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lcalf, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rcalf, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lcalf, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rcalf, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
 		return 2
 	end

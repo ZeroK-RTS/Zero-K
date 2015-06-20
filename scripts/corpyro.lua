@@ -51,8 +51,8 @@ local function BeginJumpThread()
 	Move(l_shin, y_axis, -2, LINEAR_SPEED*8)
 	Move(r_shin, y_axis, -2, LINEAR_SPEED*8)
 	--begin rocket boost
-	EmitSfx(l_jetpt,  1027)
-	EmitSfx(r_jetpt,  1027)
+	EmitSfx(l_jetpt, 1027)
+	EmitSfx(r_jetpt, 1027)
 	--small adjustments in flight
 	Sleep(600)
 	
@@ -110,8 +110,8 @@ local function PrepareJumpLand()
 end
 
 local function EndJumpThread()
-	EmitSfx(l_foot,  1027)
-	EmitSfx(r_foot,  1027)
+	EmitSfx(l_foot, 1027)
+	EmitSfx(r_foot, 1027)
 	
 	--stumble forward
 	Move(base, z_axis, 0, LINEAR_SPEED*1.8)
@@ -149,9 +149,9 @@ end
 
 function jumping(jumpPercent)
 
-	if jumpPercent < 20  then
-		EmitSfx(l_jetpt,  1026)
-		EmitSfx(r_jetpt,  1026)
+	if jumpPercent < 20 then
+		EmitSfx(l_jetpt, 1026)
+		EmitSfx(r_jetpt, 1026)
 	end
 	
 	if jumpPercent > 95 and not landing then 
@@ -344,7 +344,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx(firept,  1026)
+	EmitSfx(firept, 1026)
 end
 
 function script.Killed(recentDamage, maxHealth)

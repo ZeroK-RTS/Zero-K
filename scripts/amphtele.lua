@@ -175,7 +175,7 @@ local function Walk()
 	while true do
 		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
-		Turn(pelvis, z_axis,  math.rad(0), math.rad(2)*speedmult)
+		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)
 		
 		-- Right leg mid
@@ -190,7 +190,7 @@ local function Walk()
 		
 		Sleep(1000/speedmult)
 		
-		Turn(pelvis, z_axis,  math.rad(2), math.rad(2)*speedmult)
+		Turn(pelvis, z_axis, math.rad(2), math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 3.5, 1.5*speedmult)
 		
 		-- Right leg back
@@ -205,7 +205,7 @@ local function Walk()
 		
 		Sleep(1000/speedmult)
 		
-		Turn(pelvis, z_axis,  math.rad(0), math.rad(2)*speedmult)
+		Turn(pelvis, z_axis, math.rad(0), math.rad(2)*speedmult)
 		Move(pelvis, y_axis, 2, 1.5*speedmult)
 		
 		-- Right leg raise
@@ -295,12 +295,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(sphere, sfxFall)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxShatter + sfxExplode)
 		Explode(sphere, sfxFall)
 		return 2

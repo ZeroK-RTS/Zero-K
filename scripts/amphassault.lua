@@ -2,7 +2,7 @@ include "constants.lua"
 
 local base, body, turret, torpedo = piece('base', 'body', 'turret', 'torpedo')
 local rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, mflare = piece('rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'mflare')
-local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
+local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot = piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
 local vents = {rffoot, lffoot, rbfoot, lbfoot, piece('ventf1', 'ventf2', 'ventr1', 'ventr2', 'ventr3')}
 

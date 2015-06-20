@@ -5,7 +5,7 @@ include "constants.lua"
 function FakeUprightInit(xp, zp, drop) 
 	Move (xp,z_axis,5000)
 	Move (zp,x_axis,5000)
-	Turn(drop, x_axis,  math.rad(90))
+	Turn(drop, x_axis, math.rad(90))
 end
 
 function FakeUprightTurn(unitID, xp, zp, base, preDrop) 

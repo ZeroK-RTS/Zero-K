@@ -135,7 +135,7 @@ function script.AimWeapon(num, heading, pitch)
 
 	local slowMult = (1 - (Spring.GetUnitRulesParam (unitID, "slowState") or 0))
 	Turn (turret, y_axis, heading, math.rad(200)*slowMult)
-	Turn (sleeve, x_axis, -pitch,  math.rad(200)*slowMult)
+	Turn (sleeve, x_axis, -pitch, math.rad(200)*slowMult)
 
 	StartThread (RestoreAfterDelay)
 	WaitForTurn (turret, y_axis)
@@ -202,8 +202,8 @@ function script.Killed (recentDamage, maxHealth)
 		return 2
 	else
 		Explode (base, sfxShatter)
-		Explode (turret, sfxFall + sfxSmoke  + sfxFire)
-		Explode (sleeve, sfxFall + sfxSmoke  + sfxFire)
+		Explode (turret, sfxFall + sfxSmoke + sfxFire)
+		Explode (sleeve, sfxFall + sfxSmoke + sfxFire)
 		Explode (tracks[1], sfxShatter)
 		Explode (missiles[1], sfxFall + sfxSmoke)
 		Explode (missiles[2], sfxFall + sfxSmoke + sfxFire)

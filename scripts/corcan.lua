@@ -54,8 +54,8 @@ local function BeginJumpThread()
 	Move(l_rocket, x_axis, -1.5, 10)
 	Move(r_rocket, x_axis, 1.5, 10)
 
-	EmitSfx(l_foot,  1025)
-	EmitSfx(r_foot,  1025)
+	EmitSfx(l_foot, 1025)
+	EmitSfx(r_foot, 1025)
 	
 	Turn(l_rocket, x_axis, math.rad(30), math.rad(60))
 	Turn(r_rocket, x_axis, math.rad(30), math.rad(60))
@@ -71,8 +71,8 @@ end
 
 local function EndJumpThread()
 
-	EmitSfx(l_foot,  1025)
-	EmitSfx(r_foot,  1025)
+	EmitSfx(l_foot, 1025)
+	EmitSfx(r_foot, 1025)
 	
 	Sleep(500)
 	Move(l_rocket, x_axis, 2, 2)
@@ -85,8 +85,8 @@ function jumping(jumpPercent)
 	Turn(r_leg, x_axis, 0)
 	Turn(l_pt, x_axis, math.rad(90))
 	Turn(r_pt, x_axis, math.rad(90))
-	EmitSfx(l_pt,  1024)
-	EmitSfx(r_pt,  1024)
+	EmitSfx(l_pt, 1024)
+	EmitSfx(r_pt, 1024)
 end
 
 function preJump(turn,distance)

@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local base, wheel, radar  = piece('base', 'wheel', 'radar')
+local base, wheel, radar = piece('base', 'wheel', 'radar')
 
 local spin = math.rad(60)
 

@@ -75,7 +75,7 @@ function script.Create()
 		Move(bay, x_axis, 16)
 	end
 	
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
 	Spin(Radar, y_axis, rad(60))
@@ -84,11 +84,11 @@ end
 local function StartMoving()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	while  true  do
-		EmitSfx(WakeForeLeft,  2)
-		EmitSfx(WakeForeRight,  2)
-		EmitSfx(WakeAftLeft,  2)
-		EmitSfx(WakeAftRight,  2)
+	while true do
+		EmitSfx(WakeForeLeft, 2)
+		EmitSfx(WakeForeRight, 2)
+		EmitSfx(WakeAftLeft, 2)
+		EmitSfx(WakeAftRight, 2)
 		Sleep(150)
 	end
 end

@@ -58,8 +58,8 @@ local function Walk()
 	while (true) do
 
 
-		Turn(lfrontleg, y_axis, 1.5*ma, forward)   	-- right front forward
-		Turn(lfrontleg, z_axis, -ma, up)	   	-- right front up
+		Turn(lfrontleg, y_axis, 1.5*ma, forward) 	-- right front forward
+		Turn(lfrontleg, z_axis, -ma, up)	 	-- right front up
 		Turn(lfrontleg1, z_axis, -ma/3, up)
 				
 		Turn(laftleg, y_axis, -1.5*ma, backward) 	-- right back backward
@@ -71,7 +71,7 @@ local function Walk()
 		Turn(rfrontleg1, z_axis, 0, up)
 		
 		Turn(raftleg, y_axis, -sa, forward) 	-- left back forward
-		Turn(raftleg, z_axis, ma, up)	   	-- left back up
+		Turn(raftleg, z_axis, ma, up)	 	-- left back up
 		Turn(raftleg1, z_axis, ma/3, up)
 		
 		Sleep(pause)
@@ -82,12 +82,12 @@ local function Walk()
 		Turn(lfrontleg, z_axis, 0, 4*up)		 	-- right front down
 		Turn(lfrontleg1, z_axis, 0, up)
 		
-		Turn(laftleg, y_axis, sa, forward)   	-- right back forward
-		Turn(laftleg, z_axis, -ma, up)	   	-- right back up
+		Turn(laftleg, y_axis, sa, forward) 	-- right back forward
+		Turn(laftleg, z_axis, -ma, up)	 	-- right back up
 		Turn(laftleg1, z_axis, -ma/3, up)
 		
 		Turn(rfrontleg, y_axis, -1.5*ma, forward) 	-- left front forward
-		Turn(rfrontleg, z_axis, ma, up)	   	-- left front up
+		Turn(rfrontleg, z_axis, ma, up)	 	-- left front up
 		Turn(rfrontleg1, z_axis, ma/3, up)
 		
 		Turn(raftleg, y_axis, 1.5*ma, backward) 	-- left back backward
@@ -102,8 +102,8 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
-	Move(base, y_axis,  0, 4*up)	
-	Turn(lfrontleg, y_axis, 0)   	-- right front forward
+	Move(base, y_axis, 0, 4*up)	
+	Turn(lfrontleg, y_axis, 0) 	-- right front forward
 	Turn(lfrontleg, z_axis, 0, up)
 	Turn(lfrontleg1, z_axis, 0, up)
 	
@@ -156,10 +156,10 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(barrel, sfxFall + sfxSmoke)
 		return 1

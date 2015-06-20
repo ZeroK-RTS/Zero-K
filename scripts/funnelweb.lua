@@ -89,9 +89,9 @@ end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode (shield, sfxFall)
 		Explode (shieldArm, sfxFall)
 		Explode (eye, sfxFall)
@@ -99,28 +99,28 @@ function script.Killed (recentDamage, maxHealth)
 		Explode (ml, sfxFall)
 		Explode (fr, sfxFall)
 		return 1
-	elseif severity <= .75  then
+	elseif severity <= .75 then
 		Explode (bl, sfxFall)
 		Explode (mr, sfxFall)
 		Explode (fl, sfxFall)
-		Explode (shield, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (shieldArm, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (eye, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode (shield, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (shieldArm, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (eye, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode (gaster, sfxShatter)
 		return 2
 	else
-		Explode (shield, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (shieldArm, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (eye, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode (shield, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (shieldArm, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (eye, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode (gaster, sfxShatter)
 		Explode (notum, sfxShatter)
 		return 2

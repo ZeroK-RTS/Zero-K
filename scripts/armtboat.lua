@@ -24,8 +24,8 @@ local function Wake()
 	Signal(SIG_Move)
 	SetSignalMask(SIG_Move)
 	while true do
-		EmitSfx(wake1,  2)
-		EmitSfx(wake2,  2)
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(200)
 	end
 end
@@ -71,7 +71,7 @@ function script.TransportPickup(passengerID)
 	
 	if (dist3D > 0) then
 		local xzSpeed = LOAD_SPEED_XZ * dist2D / dist3D
-		local  ySpeed = LOAD_SPEED_XZ * math.abs(dy) / dist3D
+		local ySpeed = LOAD_SPEED_XZ * math.abs(dy) / dist3D
 		Move(load_arm, z_axis, 0, xzSpeed) -- has to be called before AttachUnit, because in some cases calling Move doesn't work while the piece has an unit attached to it
 		Move(load_shoulder, y_axis, 0, ySpeed)
 	end
@@ -106,7 +106,7 @@ function script.TransportDrop(passengerID, x, y, z)
 	Turn(load_shoulder, y_axis, heading)
 	if (dist3D > 0) then
 		local xzSpeed = LOAD_SPEED_XZ * dist2D / dist3D
-		local  ySpeed = LOAD_SPEED_XZ * math.abs(dy) / dist3D
+		local ySpeed = LOAD_SPEED_XZ * math.abs(dy) / dist3D
 		Move(load_shoulder, y_axis, dy, ySpeed)
 		Move(load_arm, z_axis, dist2D, xzSpeed)
 		WaitForMove(load_arm, z_axis)

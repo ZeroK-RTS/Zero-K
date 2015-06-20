@@ -18,10 +18,10 @@ local function TargetingLaser()
 		Turn(emit3, x_axis, math.rad(-20))
 		Turn(emit4, x_axis, math.rad(-5))
 		
-		EmitSfx(emit1,  2048)
-		EmitSfx(emit2,  2048)
-		EmitSfx(emit3,  2048)
-		EmitSfx(emit4,  2048)
+		EmitSfx(emit1, 2048)
+		EmitSfx(emit2, 2048)
+		EmitSfx(emit3, 2048)
+		EmitSfx(emit4, 2048)
 		
 		Sleep(20)
 
@@ -30,10 +30,10 @@ local function TargetingLaser()
 		Turn(emit3, x_axis, math.rad(10))
 		Turn(emit4, x_axis, math.rad(30))
 		
-		EmitSfx(emit1,  2048)
-		EmitSfx(emit2,  2048)
-		EmitSfx(emit3,  2048)
-		EmitSfx(emit4,  2048)
+		EmitSfx(emit1, 2048)
+		EmitSfx(emit2, 2048)
+		EmitSfx(emit3, 2048)
+		EmitSfx(emit4, 2048)
 		
 		Sleep(20)
 		
@@ -42,10 +42,10 @@ local function TargetingLaser()
 		Turn(emit3, x_axis, math.rad(40))
 		Turn(emit4, x_axis, math.rad(50))
 		
-		EmitSfx(emit1,  2048)
-		EmitSfx(emit2,  2048)
-		EmitSfx(emit3,  2048)
-		EmitSfx(emit4,  2048)
+		EmitSfx(emit1, 2048)
+		EmitSfx(emit2, 2048)
+		EmitSfx(emit3, 2048)
+		EmitSfx(emit4, 2048)
 		
 		Sleep(20)
 	end
@@ -89,15 +89,15 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(ground, sfxNone)
 		Explode(head, sfxFall + sfxExplode)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(ground, sfxNone)
 		Explode(head, sfxFall + sfxExplode)
 		return 1
-	elseif  severity <= .99  then
+	elseif severity <= .99 then
 		corpsetype = 2
 		Explode(ground, sfxNone)
 		Explode(head, sfxFall + sfxExplode)

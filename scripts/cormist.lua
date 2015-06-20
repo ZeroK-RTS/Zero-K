@@ -183,7 +183,7 @@ function Suspension()
 	local speed = 0
 	local onGround = false
 	
-	while true do   
+	while true do 
 		
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
@@ -247,7 +247,7 @@ function Suspension()
 			Spin(lwheel3, x_axis, wheelTurnSpeed)
 		end
 		Sleep(ANIM_PERIOD)
-   end 
+ end 
 end
 
 function script.Create()
@@ -287,8 +287,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
-	EmitSfx(gunPieces[shot].firepoint,  UNIT_SFX1)
-	EmitSfx(gunPieces[shot].exhaust,  UNIT_SFX2)
+	EmitSfx(gunPieces[shot].firepoint, UNIT_SFX1)
+	EmitSfx(gunPieces[shot].exhaust, UNIT_SFX2)
 	shot = 3 - shot
 end
 
@@ -298,7 +298,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25 then
+	if severity <= 0.25 then
 		Explode(gun, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(body, sfxNone)

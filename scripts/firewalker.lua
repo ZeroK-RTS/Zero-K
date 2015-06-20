@@ -149,7 +149,7 @@ local function Stop()
 	Turn(rupleg, x_axis, 0, math.rad(50))
 	Turn(lloleg, x_axis, 0, math.rad(100))
 	Turn(rloleg, x_axis, 0, math.rad(100))
-	if not bAiming  then
+	if not bAiming then
 		Turn(torso, z_axis, math.rad(-(0.000000)), math.rad(100))
 		Turn(torso, x_axis, 0, math.rad(20.000000))
 	end
@@ -160,17 +160,17 @@ local function Stop()
 	Turn(rfoot, x_axis, 0, math.rad(100))
 	Turn(lfoot, x_axis, 0, math.rad(100))
 	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
+	if not bAiming then
 	
 		Turn(torso, x_axis, math.rad(10.000000), math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
+	if not bAiming then
 	
 		Turn(torso, x_axis, math.rad(-3.000000), math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
+	if not bAiming then
 	
 		Turn(torso, x_axis, 0, math.rad(48.010989))
 	end
@@ -249,7 +249,7 @@ end
 
 local function Recoil()
 	local barrel = barrels[gun_1]
-	EmitSfx(flares[gun_1],  1024)
+	EmitSfx(flares[gun_1], 1024)
 	Move(barrel, z_axis, -8)
 	Sleep(150)
 	Move(barrel, z_axis, 0, 10)
@@ -266,7 +266,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .50  then
+	if severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxNone)
@@ -280,16 +280,16 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(lfoot, sfxNone)
 		return 1
 	end
-	Explode(base, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(pelvis, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(torso, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(lgun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(rgun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(rupleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(rloleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(rfoot, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(lupleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(lloleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
-	Explode(lfoot, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
+	Explode(base, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(pelvis, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(torso, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rupleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rloleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lupleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lloleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

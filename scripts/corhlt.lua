@@ -33,7 +33,7 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(6000)
-	Turn(housing, x_axis, 0, HOUSING_TURN_SPEED)   
+	Turn(housing, x_axis, 0, HOUSING_TURN_SPEED) 
 end
 
 ----------------------------------------------------------------------------------------------

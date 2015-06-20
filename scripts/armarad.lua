@@ -47,7 +47,7 @@ local function Deactivate()
 		Spring.UnitScript.StopSpin(dish, y_axis, rad(10))
 		Spring.UnitScript.StopSpin(spinner, y_axis, rad(10))
 	else
-		Spin(dish, y_axis,  rad(0), rad(20))
+		Spin(dish, y_axis, rad(0), rad(20))
 		Turn(ant, z_axis, rad(0), rad(60))
 		Turn(arm, z_axis, rad(0), rad(40))
 		WaitForTurn(ant, z_axis)
@@ -67,14 +67,14 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(arm, sfxFire)
 		Explode(ant, sfxFire)
 		Explode(base, sfxFire)
 		Explode(dish, sfxExplode)
 		Explode(spinner, sfxExplode)
 		return 1
-	elseif  severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(arm, sfxFall)
 		Explode(ant, sfxFall)
 		Explode(base, sfxShatter)

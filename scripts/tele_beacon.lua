@@ -78,7 +78,7 @@ function script.Create()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(holder, sfxSmoke  + sfxFire  + sfxExplode)
+	Explode(holder, sfxSmoke + sfxFire + sfxExplode)
 	Explode(sphere, sfxFall)
 	return 0
 end

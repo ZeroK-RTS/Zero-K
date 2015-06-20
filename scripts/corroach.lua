@@ -71,7 +71,7 @@ local function Burrow()
 	Turn(body, 3, 0, 1)
 	Turn(body, 2, 0, 1)
 	----[[ could use some polishing
-		Turn(lf_leg, 2, ma, forward)   	-- right front forward
+		Turn(lf_leg, 2, ma, forward) 	-- right front forward
 		Turn(lf_foot, 3, ma/2, up)
 		
 		Turn(rf_leg, 2, -ma, forward) 	-- left front forward
@@ -104,8 +104,8 @@ local function Walk()
 		Turn(body, 2, .1, .5)		 	-- body roll left
 		Turn(body, 3, sa/2, 1.5)		 	-- body turn right
 		
-		Turn(lf_leg, 2, ma, forward)   	-- right front forward
-		Turn(lf_leg, 3, -ma, up)	   	-- right front up
+		Turn(lf_leg, 2, ma, forward) 	-- right front forward
+		Turn(lf_leg, 3, -ma, up)	 	-- right front up
 		Turn(lf_foot, 3, ma/2, up)
 				
 		Turn(lb_leg, 2, -ma, backward) 	-- right back backward
@@ -117,7 +117,7 @@ local function Walk()
 		Turn(rf_foot, 3, 0, up)
 		
 		Turn(rb_leg, 2, -sa, forward) 	-- left back forward
-		Turn(rb_leg, 3, ma/2, up)	   	-- left back up
+		Turn(rb_leg, 3, ma/2, up)	 	-- left back up
 		Turn(rb_foot, 3, -ma/3, up)
 		
 		Sleep(pause)
@@ -129,12 +129,12 @@ local function Walk()
 		Turn(lf_leg, 3, 0, up)		 	-- right front down
 		Turn(lf_foot, 3, 0, up)
 		
-		Turn(lb_leg, 2, sa, forward)   	-- right back forward
-		Turn(lb_leg, 3, -ma/2, up)	   	-- right back up
+		Turn(lb_leg, 2, sa, forward) 	-- right back forward
+		Turn(lb_leg, 3, -ma/2, up)	 	-- right back up
 		Turn(lb_foot, 3, ma/3, up)
 		
 		Turn(rf_leg, 2, -ma, forward) 	-- left front forward
-		Turn(rf_leg, 3, ma, up)	   	-- left front up
+		Turn(rf_leg, 3, ma, up)	 	-- left front up
 		Turn(rf_foot, 3, -ma/2, up)
 		
 		Turn(rb_leg, 2, ma, backward) 	-- left back backward

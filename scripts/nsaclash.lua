@@ -36,7 +36,7 @@ local ROCK_FIRE_FORCE = 0.35
 local ROCK_SPEED = 10	--Number of half-cycles per second around x-axis.
 local ROCK_DECAY = -0.85	--Rocking around axis is reduced by this factor each time = piece 'to rock.
 local ROCK_PIECE = base	-- should be negative to alternate rocking direction.
-local ROCK_MIN = 0.001  --If around axis rock is not greater than this amount, rocking will stop after returning to center.
+local ROCK_MIN = 0.001 --If around axis rock is not greater than this amount, rocking will stop after returning to center.
 local ROCK_MAX = 1.5
 
 local SIG_MOVE = 1
@@ -46,10 +46,10 @@ local RESTORE_DELAY = 3000
 local function WobbleUnit()
 	local wobble = true
 	while true do
-		if wobble == true  then
+		if wobble == true then
 			Move(base, y_axis, 0.9, 1.2)
 		end
-		if  wobble == false  then
+		if wobble == false then
 		
 			Move(base, y_axis, -0.9, 1.2)
 		end
@@ -152,7 +152,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(wake5, sfxNone)
 		Explode(wake6, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(front, sfxNone)
 		Explode(turret, sfxShatter)
 		Explode(wake1, sfxFall)
@@ -162,7 +162,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(wake5, sfxFall)
 		Explode(wake6, sfxFall)
 		return 1
-	elseif severity <= 0.99  then
+	elseif severity <= 0.99 then
 		Explode(front, sfxShatter)
 		Explode(turret, sfxShatter)
 		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)

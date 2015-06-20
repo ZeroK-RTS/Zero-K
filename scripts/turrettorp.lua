@@ -27,7 +27,7 @@ local function Bob(rot)
 end
 
 function script.Create()
-	--while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	--while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 	--	Sleep(400)
 	--end
 	local x,_,z = Spring.GetUnitBasePosition(unitID)
@@ -81,29 +81,29 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 		local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(firepoint, sfxNone)
 		Explode(arm1, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(firepoint, sfxFall)
 		Explode(arm2, sfxShatter)
 		Explode(turret, sfxFall)
 		return 1
-	elseif  severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxNone)
-		Explode(firepoint, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(firepoint, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(arm1, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 			Explode(base, sfxNone)
-			Explode(firepoint, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+			Explode(firepoint, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 			Explode(arm2, sfxShatter + sfxExplode)
-			Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+			Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 			return 2
 		end
 end

@@ -95,11 +95,11 @@ function script.Shot(num)
 	if num == 1 then
 	bFirepoint1 = not bFirepoint1
 	elseif num == 2 then
-	EmitSfx(turret,  1025)
+	EmitSfx(turret, 1025)
 	if bFirepoint2 then
-		EmitSfx(flarel,  1024)
+		EmitSfx(flarel, 1024)
 	else
-		EmitSfx(flarer,  1024)
+		EmitSfx(flarer, 1024)
 	end
 	bFirepoint2 = not bFirepoint2
 	end
@@ -118,7 +118,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .5  then
+	if severity <= .5 then
 	Explode(fuselage, sfxNone)
 	Explode(head, sfxNone)
 	Explode(wingl, sfxNone)

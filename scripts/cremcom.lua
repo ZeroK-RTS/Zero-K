@@ -141,7 +141,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighL, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)

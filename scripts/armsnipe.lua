@@ -83,7 +83,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighl, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(thighl, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(shinl, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(thighr, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(shinr, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -320,7 +320,7 @@ function script.Killed(recentDamage, maxHealth)
 	elseif severity <= .50 then
 		Explode(shoulderl, sfxShatter)
 		Explode(shoulderr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 --		Sleep(200)
 		Explode(torso, sfxShatter)
 		
@@ -329,7 +329,7 @@ function script.Killed(recentDamage, maxHealth)
 --		WaitForTurn(base, x_axis)
 --		Sleep(1000)
 	
-		Explode(hips, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
+		Explode(hips, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .99 then
 		Explode(hips, sfxShatter)
@@ -342,9 +342,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(thighl, sfxShatter)
 		Explode(shinl, sfxShatter)
 		Explode(shinr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
-		Explode(backpack, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
-		Explode(receiver, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
 		Explode(hips, sfxShatter)
@@ -357,9 +357,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(thighl, sfxShatter)
 		Explode(shinl, sfxShatter)
 		Explode(shinr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE + sfxExplode)
-		Explode(backpack, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
-		Explode(receiver, SFX.FALL + SFX.SMOKE  + SFX.FIRE)
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE + sfxExplode)
+		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

@@ -72,38 +72,38 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
-		Explode(turbineLeft, sfxFall + sfxSmoke  + sfxFire)
+	if severity <= .25 then
+		Explode(turbineLeft, sfxFall + sfxSmoke + sfxFire)
 		Explode(turbineLeft, sfxFire)
-		Explode(wingLeftFront, sfxFall + sfxSmoke  + sfxFire)
-		Explode(wingLeftRear, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingLeftFront, sfxFall + sfxSmoke + sfxFire)
+		Explode(wingLeftRear, sfxFall + sfxSmoke + sfxFire)
 		return 1
-	elseif severity <= .50  then
-		Explode(turbineLeft, sfxFall + sfxSmoke  + sfxFire)
+	elseif severity <= .50 then
+		Explode(turbineLeft, sfxFall + sfxSmoke + sfxFire)
 		Explode(turbineLeft, sfxExplode)
-		Explode(wingLeftFront, sfxFall + sfxSmoke  + sfxFire)
-		Explode(wingLeftRear, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingLeftFront, sfxFall + sfxSmoke + sfxFire)
+		Explode(wingLeftRear, sfxFall + sfxSmoke + sfxFire)
 		Explode(hull, sfxShatter)
 		return 1
-	elseif severity <= 0.75  then
-		Explode(turbineLeft, sfxExplode + sfxSmoke  + sfxFire)
+	elseif severity <= 0.75 then
+		Explode(turbineLeft, sfxExplode + sfxSmoke + sfxFire)
 		Explode(turbineLeft, sfxExplode)
-		Explode(wingLeftFront, sfxFall + sfxSmoke  + sfxFire)
-		Explode(wingLeftRear, sfxFall + sfxSmoke  + sfxFire)
+		Explode(wingLeftFront, sfxFall + sfxSmoke + sfxFire)
+		Explode(wingLeftRear, sfxFall + sfxSmoke + sfxFire)
 		Explode(hull, sfxShatter)
 		return 1
 	else
-		Explode(turbineLeft, sfxExplode + sfxSmoke  + sfxFire)
+		Explode(turbineLeft, sfxExplode + sfxSmoke + sfxFire)
 		Explode(turbineLeft, sfxExplode)
-		Explode(wingLeftFront, sfxExplode + sfxSmoke  + sfxFire)
-		Explode(wingLeftRear, sfxExplode + sfxSmoke  + sfxFire)
-		Explode(turbineRight, sfxExplode + sfxSmoke  + sfxFire)
+		Explode(wingLeftFront, sfxExplode + sfxSmoke + sfxFire)
+		Explode(wingLeftRear, sfxExplode + sfxSmoke + sfxFire)
+		Explode(turbineRight, sfxExplode + sfxSmoke + sfxFire)
 		Explode(turbineRight, sfxExplode)
-		Explode(wingRightFront, sfxExplode + sfxSmoke  + sfxFire)
-		Explode(wingRightRear, sfxExplode + sfxSmoke  + sfxFire)
+		Explode(wingRightFront, sfxExplode + sfxSmoke + sfxFire)
+		Explode(wingRightRear, sfxExplode + sfxSmoke + sfxFire)
 		Explode(turbineTop, sfxExplode)
-		Explode(wingTopFront, sfxExplode + sfxSmoke  + sfxFire)
-		Explode(wingTopRear, sfxExplode + sfxSmoke  + sfxFire)
+		Explode(wingTopFront, sfxExplode + sfxSmoke + sfxFire)
+		Explode(wingTopRear, sfxExplode + sfxSmoke + sfxFire)
 		
 		Explode(hull, sfxShatter)
 		return 2

@@ -66,7 +66,7 @@ local smokeblast = 1024
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-local SIG_Aim  = 4
+local SIG_Aim = 4
 
 function script.Create()
 	Turn(ex_1, x_axis, math.rad(170))

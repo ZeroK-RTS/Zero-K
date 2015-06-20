@@ -280,7 +280,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(r_tube, sfxNone)
 		Explode(l_missile, sfxNone)
@@ -296,7 +296,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(l_tube, sfxNone)
 		return 1
 	end
-	if  severity <= 50  then
+	if severity <= 50 then
 	
 		corpsetype = 2
 		Explode(base, sfxFall)
@@ -314,37 +314,37 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(l_tube, sfxFall)
 		return (0)
 	end
-	if  severity <= 99  then
+	if severity <= 99 then
 	
 		corpsetype = 3
-		Explode(base, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(r_tube, sfxShatter)
-		Explode(l_missile, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(l_foot, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(l_leg, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(l_thigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(popup, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(r_missile, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(r_foot, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(r_leg, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(r_thigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(head, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(l_tube, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(l_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(l_foot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(l_leg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(l_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(popup, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(r_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(r_foot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(r_leg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(r_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(l_tube, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return (0)
 	end
 	corpsetype = 3
-	Explode(base, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+	Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(r_tube, sfxShatter + sfxExplodeOnHit)
-	Explode(l_missile, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(l_foot, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(l_leg, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(l_thigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(popup, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(r_missile, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(r_foot, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(r_leg, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(r_thigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(head, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-	Explode(l_tube, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+	Explode(l_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(l_foot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(l_leg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(l_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(popup, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(r_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(r_foot, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(r_leg, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(r_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(l_tube, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 end
 

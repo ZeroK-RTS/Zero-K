@@ -55,7 +55,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 
-	while  true  do
+	while true do
 		Step(leftLeg, rightLeg)
 		Step(rightLeg, leftLeg)
 	end
@@ -157,7 +157,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(head, sfxNone)
 		Explode(l_gun, sfxNone)
 		Explode(r_gun, sfxNone)
@@ -174,7 +174,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.heel, sfxNone)
 		Explode(rightLeg.heeltoe, sfxNone)
 		return 1
-	elseif  severity <= 0.5  then
+	elseif severity <= 0.5 then
 		Explode(head, sfxNone)
 		Explode(l_gun, sfxNone)
 		Explode(r_gun, sfxFall + sfxExplodeOnHit)
@@ -192,20 +192,20 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.heeltoe, sfxNone)
 		return 1
 	else
-		Explode(head, sfxShatter + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
+		Explode(head, sfxShatter + sfxFire + sfxSmoke + sfxExplodeOnHit)
 		Explode(l_gun, sfxNone)
-		Explode(r_gun, sfxFall + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
-		Explode(leftLeg.leg, sfxFall + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
-		Explode(rightLeg.leg, sfxFall + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
-		Explode(leftLeg.foot, sfxShatter + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
+		Explode(r_gun, sfxFall + sfxFire + sfxSmoke + sfxExplodeOnHit)
+		Explode(leftLeg.leg, sfxFall + sfxFire + sfxSmoke + sfxExplodeOnHit)
+		Explode(rightLeg.leg, sfxFall + sfxFire + sfxSmoke + sfxExplodeOnHit)
+		Explode(leftLeg.foot, sfxShatter + sfxFire + sfxSmoke + sfxExplodeOnHit)
 		Explode(rightLeg.foot, sfxNone)
 		Explode(leftLeg.blever, sfxNone)
 		Explode(rightLeg.blever, sfxNone)
-		Explode(leftLeg.flever, sfxFall + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
-		Explode(rightLeg.flever, sfxShatter + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
+		Explode(leftLeg.flever, sfxFall + sfxFire + sfxSmoke + sfxExplodeOnHit)
+		Explode(rightLeg.flever, sfxShatter + sfxFire + sfxSmoke + sfxExplodeOnHit)
 		Explode(leftLeg.heel, sfxNone)
 		Explode(rightLeg.heel, sfxNone)
-		Explode(leftLeg.heeltoe, sfxShatter + sfxFire  + sfxSmoke  + sfxExplodeOnHit)
+		Explode(leftLeg.heeltoe, sfxShatter + sfxFire + sfxSmoke + sfxExplodeOnHit)
 		Explode(rightLeg.heeltoe, sfxNone)
 		return 2
 	end

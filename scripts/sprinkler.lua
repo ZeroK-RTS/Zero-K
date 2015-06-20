@@ -19,7 +19,7 @@ local is_open = false
 local restore_delay = 2000;
 
 --signals
-local aim  = 2
+local aim = 2
 local open = 8
 local close = 16
 

@@ -50,10 +50,10 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx(ground,  UNIT_SFX1)
+	EmitSfx(ground, UNIT_SFX1)
 	Move(barrel, z_axis, -24, 500)
-	EmitSfx(barrel_back,  UNIT_SFX2)
-	EmitSfx(muzzle,  UNIT_SFX3)
+	EmitSfx(barrel_back, UNIT_SFX2)
+	EmitSfx(muzzle, UNIT_SFX3)
 	WaitForMove(barrel, z_axis)
 	Move(barrel, z_axis, 0, 6)
 end
@@ -68,11 +68,11 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if severity <= 0.25  then
+	if severity <= 0.25 then
 		return 1
-	elseif severity <= 0.50  then
-		Explode(sleeve,  sfxShatter)
-		Explode(turret,  sfxShatter)
+	elseif severity <= 0.50 then
+		Explode(sleeve, sfxShatter)
+		Explode(turret, sfxShatter)
 		return 1
 	else
 		Explode(base, sfxShatter + sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)

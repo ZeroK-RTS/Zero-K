@@ -18,7 +18,7 @@ local firestate = Spring.GetUnitStates(unitID).firestate
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local function TiltWings()
-	while  true  do
+	while true do
 		if attacking then
 			Turn(wings, x_axis, 0, math.rad(45))
 			Sleep(250)

@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local base, shield, front, bottom, back = piece('base', 'shield', 'front', 'bottom', 'back')
 local rim1, door1, rim2, door2 = piece('rim1', 'door1', 'rim2', 'door2')
@@ -31,7 +31,7 @@ end
 
 local function MoveScript()
 	while true do 
-		if math.random() < 0.5  then
+		if math.random() < 0.5 then
 			EmitSfx(wake1, 5)
 			EmitSfx(wake3, 5)
 			EmitSfx(wake5, 5)
@@ -51,7 +51,7 @@ local function MoveScript()
 			EmitSfx(wake8, 3)
 		end
 	
-		EmitSfx(base,  1024+0)
+		EmitSfx(base, 1024+0)
 		Sleep(150)
 	end
 end
@@ -133,8 +133,8 @@ local function FakeWeaponShoot()
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local h = Spring.GetGroundHeight(x,z)
 		if h > -10 then
-			local gameFrame   = spGetGameFrame()
-			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
+			local gameFrame = spGetGameFrame()
+			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
 			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame})
 			
@@ -158,13 +158,13 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		Explode(back, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)

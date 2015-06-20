@@ -296,7 +296,7 @@ function getPassengerId()
 	local unitId = nil	
 	
 	if cmd and cmd[1] then					
-		if  cmd[1]['id'] == 75  then -- CMDTYPE.LOAD_UNITS = 75
+		if cmd[1]['id'] == 75 then -- CMDTYPE.LOAD_UNITS = 75
 			unitId = cmd[1]['params'][1]				
 		end
 	end
@@ -320,7 +320,7 @@ function getDropPoint()
 	local dropx, dropy,dropz = nil	
 	
 	if cmd and cmd[1] then					
-		if  cmd[1]['id'] == 81  then -- CMDTYPE.LOAD_UNITS = 75
+		if cmd[1]['id'] == 81 then -- CMDTYPE.LOAD_UNITS = 75
 			dropx, dropy,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]		
 		end
 	end
@@ -340,7 +340,7 @@ function isNearPickupPoint(passengerId)
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
 	
-	if dist  < 1000^2 then
+	if dist < 1000^2 then
 		return true
 	else
 		return false
@@ -357,10 +357,10 @@ function isNearDropPoint(transportUnitId)
 	local px2, py2, pz2 = dropPoint[1], dropPoint[2], dropPoint[3]
 	
 	local dx = px - px2
-	local dz = pz - pz2  
+	local dz = pz - pz2 
 	local dist = (dx^2 + dz^2)
 	
-	if dist  < 1000^2 then
+	if dist < 1000^2 then
 		return true
 	else
 		return false

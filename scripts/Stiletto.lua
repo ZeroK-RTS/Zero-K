@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local  base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
+local base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
 --constants
@@ -39,7 +39,7 @@ end
 function script.MoveRate(moveRate)
 
 	if moveRate == 2 then
-		if  not Static_Var_1   then
+		if not Static_Var_1 then
 		
 			Static_Var_1 = 1
 			Turn(base, z_axis, math.rad(-(240.000000)), 120.000000)

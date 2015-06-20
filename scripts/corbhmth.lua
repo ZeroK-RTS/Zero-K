@@ -60,33 +60,33 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(barrel1, sfxNone)
 		Explode(barrel2, sfxNone)
 		Explode(barrel3, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxShatter)
 		Explode(turret, sfxFall + sfxSmoke)
 		Explode(barrel1, sfxNone)
 		Explode(barrel2, sfxNone)
 		Explode(barrel3, sfxNone)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(barrel1, sfxFall + sfxSmoke)
 		Explode(barrel2, sfxFall + sfxSmoke)
 		Explode(barrel3, sfxFall + sfxSmoke)
 		return 2
 	else
 		Explode(base, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(barrel1, sfxFall + sfxSmoke  + sfxFire)
-		Explode(barrel2, sfxFall + sfxSmoke  + sfxFire)
-		Explode(barrel3, sfxFall + sfxSmoke  + sfxFire)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(barrel1, sfxFall + sfxSmoke + sfxFire)
+		Explode(barrel2, sfxFall + sfxSmoke + sfxFire)
+		Explode(barrel3, sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
 end

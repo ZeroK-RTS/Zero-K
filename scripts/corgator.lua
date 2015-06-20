@@ -59,7 +59,7 @@ function Suspension()
 	local speed = 0
 	local onGround = false
 	
-	while true do   
+	while true do 
 		
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
@@ -81,7 +81,7 @@ function Suspension()
 			s1l = GetWheelHeight(gs1l) 
 			s2l = GetWheelHeight(gs2l) 
 			
-			xtilta = (s2r + s2l - s1l - s1r)/6000   
+			xtilta = (s2r + s2l - s1l - s1r)/6000 
 			xtiltv = xtiltv*0.99 + xtilta
 			xtilt = xtilt*0.98 + xtiltv
 
@@ -113,7 +113,7 @@ function Suspension()
 			Spin(lwheel2, x_axis, wheelTurnSpeed)
 		end
 		Sleep(50)
-   end 
+ end 
 end
 
 function RestoreAfterDelay()
@@ -143,7 +143,7 @@ function script.StartMoving()
 	runSpin = true
 	
 	local x,y,z = spGetUnitVelocity(unitID)
-	wheelTurnSpeed =  math.sqrt(x*x+y*y+z*z)*10
+	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*10
 	
 	Spin(rwheel1, x_axis, wheelTurnSpeed)
 	Spin(rwheel2, x_axis, wheelTurnSpeed)
@@ -174,7 +174,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function FireWeapon(num)
-	EmitSfx(firepoint,  UNIT_SFX1)
+	EmitSfx(firepoint, UNIT_SFX1)
 end
 
 
@@ -193,16 +193,16 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxShatter)
 		return 1
 	elseif severity < 1 then
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(body, sfxNone)
 		Explode(turret, sfxShatter)
 		return 2
 	else
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
-		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(body, sfxShatter)
-		Explode(turret, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end
 end

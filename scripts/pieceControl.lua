@@ -1,8 +1,8 @@
 local IsInTurn = Spring.UnitScript.IsInTurn
-local IsInMove  = Spring.UnitScript.IsInMove 
+local IsInMove = Spring.UnitScript.IsInMove 
 local GetPieceRotation = Spring.UnitScript.GetPieceRotation
-local GetPieceTranslation  = Spring.UnitScript.GetPieceTranslation 
-local SpringGetUnitRulesParam  = Spring.GetUnitRulesParam
+local GetPieceTranslation = Spring.UnitScript.GetPieceTranslation 
+local SpringGetUnitRulesParam = Spring.GetUnitRulesParam
 local SpringGetUnitIsStunned = Spring.GetUnitIsStunned
 
 -- for some reason a 4th argument is required

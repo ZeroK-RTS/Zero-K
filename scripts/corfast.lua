@@ -563,18 +563,18 @@ end
 
 function beginJump()
 	script.StopMoving()
-	EmitSfx(jump,  UNIT_SFX2)
+	EmitSfx(jump, UNIT_SFX2)
 end
 
 function jumping()
-	EmitSfx(thrust,  UNIT_SFX1)
+	EmitSfx(thrust, UNIT_SFX1)
 end
 
 function halfJump()
 end
 
 function endJump()
-	EmitSfx(jump,  UNIT_SFX2)
+	EmitSfx(jump, UNIT_SFX2)
 end
 
 --------------------------
@@ -592,7 +592,7 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	Hide(flare)
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 	
 		Explode(head, sfxNone)
 		Explode(pelvis, sfxNone)
@@ -608,7 +608,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(torso, sfxNone)
 		return 1
 	end
-	if  severity <= 0.5  then
+	if severity <= 0.5 then
 	
 		Explode(head, sfxFall)
 		Explode(pelvis, sfxFall)

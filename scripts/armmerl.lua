@@ -122,7 +122,7 @@ function script.AimWeapon(num, heading, pitch)
 	
 	if isLoaded then 
 		StartThread(Prepare)
-		if  doStrobe then
+		if doStrobe then
 			EmitSfx(strobe, 1024)
 		end
 	end
@@ -158,7 +158,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then 
+	if severity <= .25 then 
 		Explode(base, sfxNone)
 		Explode(bay, sfxNone)
 		Explode(gantry, sfxNone)
@@ -166,7 +166,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(clamp2, sfxNone)
 		Explode(missile, sfxNone)
 		return 1
-	elseif  severity <= .50  then 
+	elseif severity <= .50 then 
 		Explode(base, sfxNone)
 		Explode(bay, sfxNone)
 		Explode(gantry, sfxFall)
@@ -175,11 +175,11 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(missile, sfxNone)
 		return 1
 	else 
-		Explode(base, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(bay, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(gantry, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(clamp1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode(clamp2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(bay, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(gantry, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(clamp1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(clamp2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(missile, sfxNone)
 		return 2
 	end

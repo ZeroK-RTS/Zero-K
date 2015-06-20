@@ -74,7 +74,7 @@ local lastHeading, lastPitch = 0, 0
 
 --[[
 function beginJump()
-	EmitSfx(jump,  2048 + 3)
+	EmitSfx(jump, 2048 + 3)
 	bJumping = 1
 	Turn(luparm, x_axis, math.rad(30), math.rad(400))
 	Turn(ruparm, x_axis, math.rad(30), math.rad(400))
@@ -103,14 +103,14 @@ function EndJump()
 	Turn(rleg, x_axis, 0, math.rad(400))
 	Turn(lleg, x_axis, 0, math.rad(400))
 	Turn(ground, x_axis, 0, math.rad(4000))
-	EmitSfx(jump,  2048 + 4)
+	EmitSfx(jump, 2048 + 4)
 end
 
 JumpSmoke()
 
-	while  true  do
+	while true do
 	
-		if  bJumping  then
+		if bJumping then
 		
 			Sleep(1500)
 		end
@@ -121,7 +121,7 @@ end
 
 Bladestat()
 
-	if  gun_1 == 1  then
+	if gun_1 == 1 then
 	
 	end
 	StartThread(Bladestat)
@@ -150,7 +150,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)

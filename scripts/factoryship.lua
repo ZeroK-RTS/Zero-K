@@ -88,11 +88,11 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(base, sfxNone)
 		Explode(pontoon, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(pontoon, sfxNone)
 		return 2
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxNone)
 		Explode(pontoon, sfxNone)
 		return 2

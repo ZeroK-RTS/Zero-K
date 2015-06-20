@@ -75,7 +75,7 @@ local function Open()
 	WaitForTurn(pow_1, 3)
 	Sleep(300)
 
---	SetUnitValue(COB.YARD_OPEN, 1)  --Tobi said its not necessary
+--	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
