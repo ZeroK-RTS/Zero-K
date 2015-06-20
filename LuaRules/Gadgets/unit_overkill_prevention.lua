@@ -60,6 +60,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["gunshipsupport"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["amphraider3"].id] = true,
+	[UnitDefNames["amphriot"].id] = true,
 	[UnitDefNames["subarty"].id] = true,
 	[UnitDefNames["subraider"].id] = true,
 	[UnitDefNames["corcrash"].id] = true,
