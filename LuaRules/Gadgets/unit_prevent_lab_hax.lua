@@ -66,11 +66,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function checkLabs(checkFeatures)
+function checkLabs(checkFeatures, onlyUnstick)
 	local labData = labList.data
 	local data, units, features
 	for i = 1, labList.count do
 		data = labData[i]
+		
+		if (onlyUnstick and not data.unstickHelp) then
+			break
+		end
+		
 		units = spGetUnitsInRectangle(data.minx-8, data.minz-8, data.maxx+8, data.maxz+8)
 		features = spGetFeaturesInRectangle(data.minx, data.minz, data.maxx, data.maxz)
 
@@ -83,7 +88,7 @@ function checkLabs(checkFeatures)
 			local ally = spGetUnitAllyTeam(unitID)
 			local team = spGetUnitTeam(unitID)
 			if not fly and spMoveCtrlGetTag(unitID) == nil then
-				if (ally ~= data.ally) or (data.unstickHelp and not ud.isImmobile)  then --teleport unit away
+				if (ally ~= data.ally) or (data.unstickHelp and not ud.isImmobile) then --teleport unit away
 					local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
 					local vx, vy, vz = spGetUnitVelocity(unitID)
 					
@@ -94,22 +99,40 @@ function checkLabs(checkFeatures)
 						local r = abs(ux-data.maxx)
 						local t = abs(uz-data.minz)
 						local b = abs(uz-data.maxz)
+						
+						local pushDistance = (data.unstickHelp and 16) or 8
 
 						local side = min(l,r,t,b)
 
 						if not (isAlly and ux > data.minBuildX and uz < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
 							if (side == l) then
-								spSetUnitPosition(unitID, data.minx-8, uz, true)
-								spSetUnitVelocity(unitID, 0, vy, vz)
+								spSetUnitPosition(unitID, data.minx - pushDistance, uz, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, 0, vy, vz)
+								end
 							elseif (side == r) then
-								spSetUnitPosition(unitID, data.maxx+8, uz, true)
-								spSetUnitVelocity(unitID, vx, vy, 0)
+								spSetUnitPosition(unitID, data.maxx + pushDistance, uz, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, 0, vy, vz)
+								end
 							elseif (side == t) then
-								spSetUnitPosition(unitID, ux, data.minz-8, true)
-								spSetUnitVelocity(unitID, 0, vy, vz)
+								spSetUnitPosition(unitID, ux, data.minz - pushDistance, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, vx, vy, 0)
+								end
 							else
-								spSetUnitPosition(unitID, ux, data.maxz+8, true)
-								spSetUnitVelocity(unitID, vx, vy, 0)
+								spSetUnitPosition(unitID, ux, data.maxz + pushDistance, true)
+								if data.unstickHelp then
+									spSetUnitVelocity(unitID, vx, vy, vz/2)
+								else
+									spSetUnitVelocity(unitID, vx, vy, 0)
+								end
 							end
 						end
 					end	
@@ -251,9 +274,7 @@ function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 end
 
 function gadget:GameFrame(n)
-	if n%5 == 0 then
-		checkLabs(n%60 == 0)
-	end
+	checkLabs(n%60 == 0, n%5 == 0)
 end
 
 function gadget:Initialize()
