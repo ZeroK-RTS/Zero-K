@@ -23,7 +23,9 @@ function gadget:GetInfo()
     author    = "Licho",
     date      = "19.4.2009", --24.2.2013
     license   = "GNU GPL, v2 or later",
-    layer     = -2, --must start before unit_morph.lua gadget to register GG.AddMiscPriority() first
+	-- Must start before unit_morph.lua gadget to register GG.AddMiscPriority() first.
+	-- Must be before mex_overdrive
+    layer     = -5,
     enabled   = not (Game.version:find('91.0') == 1)
   }
 end
@@ -293,6 +295,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 end
 
 function gadget:GameFrame(n)
+
 	if n % TEAM_SLOWUPDATE_RATE == 1 then 
 		local prioUnits, miscPrioUnits
 		
@@ -414,17 +417,6 @@ function gadget:GameFrame(n)
 					Spring.Echo("nextMetalLevel: " .. (level or "nil"))
 					Spring.Echo("nextEnergyLevel: " .. (elevel or "nil"))
 				end
-			end
-			
-			-- Reduce usage fluctuation when stalling by effectively only 
-			-- paying attention to income.
-			level = level - 2
-			elevel = elevel - 2
-			if level < 0 then
-				level = 0
-			end
-			if elevel < 0 then
-				elevel = 0
 			end
 			
 			-- How much of each resource there is to spend in the next second.
