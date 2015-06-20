@@ -41,7 +41,7 @@ function script.Deactivate()
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
-function script.FireWeapon1()
+function script.FireWeapon()
 	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
@@ -82,33 +82,35 @@ function script.FireWeapon1()
 end
 
 
-function script.QueryWeapon1()
+function script.QueryWeapon()
 	return drop
 end
 
-function script.AimFromWeapon1() 
+function script.AimFromWeapon() 
 	return drop 
 end
 
-function script.AimWeapon1(heading, pitch)
-	if (GetUnitValue(CRASHING) == 1) then return false end
+function script.AimWeapon(heading, pitch)
+	if (GetUnitValue(CRASHING) == 1) then 
+		return false 
+	end
 	return true
 end
 
-function script.BlockShot1()
+function script.BlockShot()
 	return (GetUnitValue(CRASHING) == 1)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity < .5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
+	if severity < 0.5 or (Spring.GetUnitMoveTypeData(unitID).aircraftState == "crashing") then
 		Explode(base, sfxNone)
 		Explode(jet1, sfxSmoke)
 		Explode(jet2, sfxSmoke)
 		Explode(Lwing, sfxNone)
 		Explode(Rwing, sfxNone)
 		return 1
-	elseif severity < .75 then
+	elseif severity < 0.75 then
 		Explode(base, sfxShatter)
 		Explode(jet1, sfxSmoke + sfxFire + sfxExplode)
 		Explode(jet2, sfxSmoke + sfxFire + sfxExplode)
