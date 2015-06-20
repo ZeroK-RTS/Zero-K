@@ -137,6 +137,7 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 
 local function SetMetalReserved(teamID, value)
@@ -385,6 +386,11 @@ function gadget:GameFrame(n)
 
 			local level, _, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
 			local elevel, _, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
+			
+			-- Take away the constant income which was gained this frame (innate, reclaim)
+			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
+			local mexIncome = (spGetTeamRulesParam(teamID, "OD_myBase") or 0) + (spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0)
+			level = level - (income - mexIncome)/30
 			
 			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent
 			local metalPull = spending[1] + spending[2] + spending[3]
