@@ -95,6 +95,7 @@ unitDef = {
       areaOfEffect            = 96,
       cegTag                  = [[cruisetrail]],
       collideFriendly         = false,
+	  collideGround           = false,
       craterBoost             = 1,
       craterMult              = 2,
 	  

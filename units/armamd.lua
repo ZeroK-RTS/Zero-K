@@ -77,6 +77,7 @@ unitDef = {
       name                    = [[Anti-Nuke Missile]],
       areaOfEffect            = 420,
       collideFriendly         = false,
+      collideGround           = false,
       coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
