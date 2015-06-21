@@ -139,13 +139,16 @@ local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
+local alliedTable = {allied = true}
 
 local function SetMetalReserved(teamID, value)
 	TeamMetalReserved[teamID] = value or 0
+	Spring.SetTeamRulesParam(teamID, "metalReserve", value or 0, alliedTable)
 end
 
 local function SetEnergyReserved(teamID, value)
 	TeamEnergyReserved[teamID] = value or 0
+	Spring.SetTeamRulesParam(teamID, "energyReserve", value or 0, alliedTable)
 end
 
 
@@ -481,7 +484,14 @@ function gadget:GameFrame(n)
 						nextMetalLevel = nextMetalLevel - nextEnergyLevel
 						nextEnergyLevel = 0
 					end
-				
+				elseif energyDrain > 0 and nextEnergyLevel <= energyDrain then
+					local eRatio = max(0,nextEnergyLevel)/energyDrain
+					-- Set scale for build and repair equally and limit by energy.
+					TeamScale[teamID][pri] = eRatio
+					TeamScaleEnergy[teamID][pri] = eRatio
+					
+					nextMetalLevel = nextMetalLevel - nextEnergyLevel
+					nextEnergyLevel = 0
 				else
 					TeamScale[teamID][pri] = 1
 					TeamScaleEnergy[teamID][pri] = 1

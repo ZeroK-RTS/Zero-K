@@ -183,7 +183,7 @@ function UpdateEconomyDataFromRulesParams()
 	local myOverdrive = spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0
 	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 	local teamEnergyIncome = spGetTeamRulesParam(teamID, "OD_teamEnergyIncome") or 0
-
+	
 	WG.energyWasted = lastEnergyWasted
 	lastEnergyWasted = energyWasted
 	WG.energyForOverdrive = lastEnergyForOverdrive
@@ -198,6 +198,30 @@ function UpdateEconomyDataFromRulesParams()
 	lastMyMetalFromOverdrive = myOverdrive
 	WG.teamEnergyIncome = teamEnergyIncome
 	WG.allies = allies
+	
+	-- Spectators read the reserve state of the player they are spectating.
+	-- Players have the resource bar keep track of reserve locally.
+	if Spring.GetSpectatingState() then
+		local _, mStor = GetTeamResources(teamID, "metal")
+		WG.metalStorageReserve = Spring.GetTeamRulesParam(teamID, "metalReserve") or 0
+		if mStor <= 0 and bar_reserve_metal.bars[1].percent ~= 0 then
+			bar_reserve_metal.bars[1].percent = 0
+			bar_reserve_metal:Invalidate()
+		elseif bar_reserve_metal.bars[1].percent*mStor ~= WG.metalStorageReserve then
+			bar_reserve_metal.bars[1].percent = WG.metalStorageReserve/mStor
+			bar_reserve_metal:Invalidate()
+		end
+		
+		local _, eStor = GetTeamResources(teamID, "energy")
+		WG.energyStorageReserve = Spring.GetTeamRulesParam(teamID, "energyReserve") or 0
+		if eStor <= HIDDEN_STORAGE and bar_reserve_energy.bars[1].percent ~= 0 then
+			bar_reserve_energy.bars[1].percent = 0
+			bar_reserve_energy:Invalidate()
+		elseif bar_reserve_energy.bars[1].percent*(eStor - HIDDEN_STORAGE) ~= WG.energyStorageReserve then
+			bar_reserve_energy.bars[1].percent = WG.energyStorageReserve/(eStor - HIDDEN_STORAGE)
+			bar_reserve_energy:Invalidate()
+		end
+	end
 end
 
 local function updateReserveBars(metal, energy, value, overrideOption)
