@@ -44,7 +44,7 @@ local unitIsUnarmed = {}
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
-	if not weapons or #weapons == 0 then
+	if (not weapons or #weapons == 0) and not ud.canKamikaze then
 		unitIsUnarmed[i] = true
 	end
 end
