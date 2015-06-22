@@ -131,6 +131,15 @@ end
 
 commDefs = {}	--holds precedurally generated comm defs
 
+local totalLevelCost = {
+	[0] = 0,
+	[1] = 0,
+	[2] = 200,
+	[3] = 800, -- +600
+	[4] = 1100, -- +300
+	[5] = 1500, -- +400
+}
+
 local function ProcessComm(name, config)
 	if config.chassis and UnitDefs[config.chassis] then
 		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "debug", "\tModularComms: Processing comm: " .. name)
@@ -169,6 +178,7 @@ local function ProcessComm(name, config)
 		
 		RemoveWeapons(commDefs[name])
 		
+		local totalModuleCost = 0
 		-- process modules
 		if config.modules then
 			local modules = CopyTable(config.modules)
@@ -204,6 +214,7 @@ local function ProcessComm(name, config)
 					if upgrades[moduleName].useWeaponSlot then
 						numWeapons = numWeapons + 1
 					end
+					totalModuleCost = totalModuleCost + (upgrades[moduleName].cost or 0)
 				else
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "error", "\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -222,11 +233,11 @@ local function ProcessComm(name, config)
 		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
 		
 		-- set costs
-		config.cost = config.cost or 0
-		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
-		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
-		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
-		cp.cost = config.cost
+		local totalCost = commDefs[name].buildtime + totalModuleCost + totalLevelCost[commDefs[name].customparams.level or 0]
+		commDefs[name].buildcostmetal = totalCost
+		commDefs[name].buildcostenergy = totalCost
+		commDefs[name].buildtime = totalCost
+		cp.cost = totalCost
 		
 		-- morph
 		if config.morphto then
