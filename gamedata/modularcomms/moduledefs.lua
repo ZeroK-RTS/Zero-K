@@ -21,119 +21,148 @@ upgrades = {
 	commweapon_peashooter = {
 		name = "Peashooter",
 		description = "Basic self-defense weapon",
+		cost = 0,
 	},
 
 	commweapon_assaultcannon = {
 		name = "Assault Cannon",
 		description = "Conventional plasma cannon with decent range",
+		cost = 75,
 	},	
 	commweapon_beamlaser = {
 		name = "Beam Laser",
 		description = "An effective short-range cutting tool",
+		cost = 50,
 	},
 	commweapon_flamethrower = {
 		name = "Flamethrower",
 		description = "Perfect for well-done barbecues",
+		cost = 100,
 	},
 	commweapon_gaussrifle = {
 		name = "Gauss Rifle",
 		description = "Precise armor-piercing weapon",
+		cost = 100,
 	},
 	commweapon_heavymachinegun = {
 		name = "Heavy Machine Gun",
 		description = "Close-in automatic weapon with AoE",
+		cost = 100,
 	},
 	commweapon_heatray = {
 		name = "Heat Ray",
 		description = "Rapidly melts anything at short range; loses damage over distance",
+		cost = 100,
 	},
 	commweapon_lightninggun = {
 		name = "Lightning Gun",
 		description = "Paralyzes and damages annoying bugs",
+		cost = 100,
 	},
 	commweapon_lparticlebeam = {
 		name = "Light Particle Beam",
 		description = "Fires rapid medium-range pulses",
+		cost = 50,
 	},
 	commweapon_hparticlebeam = {
 		name = "Heavy Particle Beam",
 		description = "Ranged high-energy pulse weapon",
+		cost = 250,
 	},
 	commweapon_massdriver = {
 		name = "Mass Driver",
 		description = "High-velocity hunting rifle",
+		cost = 100,
 	},
 	commweapon_missilelauncher = {
 		name = "Missile Launcher",
-		description = "Fires light seeker missiles with good range",	
+		description = "Fires light seeker missiles with good range",
+		cost = 75,
 	},
 	commweapon_partillery = {
 		name = "Plasma Artillery",
 		description = "Long-range artillery gun",
+		cost = 325,
 	},
 	commweapon_riotcannon = {
 		name = "Riot Cannon",
 		description = "The weapon of choice for crowd control",
+		cost = 75,
 	},
 	commweapon_rocketlauncher = {
 		name = "Rocket Launcher",
 		description = "Medium-range low-velocity hitter",
+		cost = 100,
 	},
 	commweapon_shotgun = {
 		name = "Shotgun",
 		description = "Can hammer a single large target or shred many small ones",
+		cost = 100,
 	},
 	commweapon_slowbeam = {
 		name = "Slowing Beam",
 		description = "Slows an enemy's movement and firing rate; non-lethal",
+		cost = 50,
 	},
 	commweapon_sonicgun = {
 		name = "Sonic Blaster",
 		description = "Short-range weapon that works when dry or wet",
+		cost = 50,
 	},	
 	commweapon_torpedo = {
 		name = "Torpedo",
 		description = "Fires a torpedo effective against waterborne targets",
+		cost = 50,
 	},
 	
 	-- dguns
 	commweapon_concussion = {
 		name = "Concussion Shot",
 		description = "Extended range weapon with AoE and impulse",
+		cost = 100,
 	},
 	commweapon_clusterbomb = {
 		name = "Cluster Bomb",
 		description = "Hammers multiple units in a wide line",
+		cost = 100,
 	},
 	commweapon_disintegrator = {
 		name = "Disintegrator Gun",
 		description = "Short-range weapon that vaporizes anything in its path",
+		cost = 450,
 	},
 	commweapon_disruptorbomb = {
 		name = "Disruptor Bomb",
 		description = "Damages and slows units in a large area",
+		cost = 100,
 	},
 	commweapon_multistunner = {
 		name = "Multi-Stunner",
 		description = "Briefly disables multiple targets in an area",
+		cost = 150,
 	},
 	commweapon_napalmgrenade = {
 		name = "Hellfire Grenade",
 		description = "Sets a moderate area ablaze",
+		cost = 75,
 	},
 	commweapon_slamrocket = {
 		name = "S.L.A.M.",
 		description = "Long-range weapon with a lethal punch",
+		cost = 200,
 	},
 	commweapon_sunburst = {
 		name = "Sunburst Cannon",
 		description = "Ruins a single target's day with a medium-range high-energy burst",
+		cost = 150,
 	},
 	
 	-- conversion kits
 	conversion_disruptor = {
 		name = "Disruptor Beam",
 		description = "Slow Beam: +33% reload time, +250 real damage",
+		requirements = {"commweapon_slowbeam"},
+		cost = 150,
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_slowbeam", "commweapon_disruptor")
 			end,	
@@ -141,6 +170,8 @@ upgrades = {
 	conversion_shockrifle = {
 		name = "Shock Rifle",
 		description = "Light Particle Beam: Convert to a long-range sniper rifle",
+		requirements = {"commweapon_lparticlebeam"},
+		cost = 450,
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_shockrifle")
 			end,	
@@ -148,6 +179,8 @@ upgrades = {
 	conversion_partillery = {
 		name = "Plasma Artillery",
 		description = "Assault Cannon: Convert to a light artillery gun",
+		requirements = {"commweapon_assaultcannon"},
+		cost = 250,
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_assaultcannon", "commweapon_partillery")
 				--unitDef.hightrajectory = 1
@@ -156,6 +189,8 @@ upgrades = {
 	conversion_hparticlebeam = {
 		name = "Heavy Particle Beam",
 		description = "Light Particle Beam: Convert to an extended range rifle weapon",
+		requirements = {"commweapon_lparticlebeam"},
+		cost = 200,
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_lparticlebeam", "commweapon_hparticlebeam")
 			end,	
@@ -165,6 +200,8 @@ upgrades = {
 	weaponmod_antiair = {
 		name = "Anti-Air Kit",
 		description = "Beam Laser/Riot Cannon/Missile Launcher: Convert to anti-air weapons",
+		requirements = {"commweapon_beamlaser", "commweapon_riotcannon", "commweapon_missilelauncher"},
+		cost = 100,
 		func = function(unitDef)
 				for i,v in pairs(weapons) do
 					local id = v.customparams.idstring
@@ -184,6 +221,8 @@ upgrades = {
 	weaponmod_autoflechette = {
 		name = "Autoflechette",
 		description = "Shotgun: -25% projectiles, -40% reload time",
+		cost = 450,
+		requirements = {"commweapon_shotgun"},
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -199,6 +238,8 @@ upgrades = {
 	weaponmod_disruptor_ammo = {
 		name = "Disruptor Ammo",
 		description = "Shotgun/Heavy Machine Gun/Shock Rifle: +40% slow damage",
+		requirements = {"commweapon_shotgun", "conversion_shockrifle", "commweapon_heavymachinegun"},
+		cost = 350,
 		func = function(unitDef)
 				local permitted = {
 					commweapon_shotgun = true,
@@ -232,6 +273,8 @@ upgrades = {
 	weaponmod_high_frequency_beam = {
 		name = "High Frequency Beam",
 		description = " +15% damage and range to Beam Laser/Slow Beam/Disruptor Beam/Light Particle Beam/Heavy Particle Beam",
+		requirements = {"commweapon_beamlaser", "commweapon_slowbeam", "commweapon_lparticlebeam"},
+		cost = 450,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
@@ -254,6 +297,8 @@ upgrades = {
 	weaponmod_railaccel = {
 		name = "Rail Accelerator",
 		description = "Gauss Rifle: +10% damage, +20% range",
+		requirements = {"commweapon_gaussrifle"},
+		cost = 250,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -270,6 +315,8 @@ upgrades = {
 	weaponmod_high_caliber_barrel = {
 		name = "High Caliber Barrel",
 		description = "Shotgun/Riot Cannon/Assault Cannon/Plasma Artillery: +150% damage, +100% reload time",
+		requirements = {"commweapon_assaultcannon", "commweapon_shotgun", "commweapon_gaussrifle", "commweapon_riotcannon"},
+		cost = 450,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
@@ -302,6 +349,8 @@ upgrades = {
 	weaponmod_standoff_rocket = {
 		name = "Standoff Rocket",
 		description = "Rocket/Missile Launcher: +50% range, +25% damage, +50% reload time",
+		requirements = {"commweapon_missilelauncher", "commweapon_rocketlauncher"},
+		cost = 400,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -334,6 +383,8 @@ upgrades = {
 	weaponmod_stun_booster = {
 		name = "Flux Amplifier",
 		description = "Lightning Gun: +25% paralyze damage, +2s paralyzetime",
+		requirements = {"commweapon_lightninggun"},
+		cost = 225,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -350,6 +401,8 @@ upgrades = {
 	weaponmod_napalm_warhead = {
 		name = "Napalm Warhead",
 		description = "Riot Cannon/Plasma Artillery/Rocket Launcher: Reduced direct damage, sets target on fire",
+		requirements = {"commweapon_riotcannon", "commweapon_rocketlauncher", "conversion_partillery"},
+		cost = 275,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				local permitted = {
@@ -394,6 +447,8 @@ upgrades = {
 	weaponmod_flame_enhancer = {
 		name = "Long-Burn Napalm",
 		description = "Flamethrower/Napalm Warhead: +40% on-fire time",
+		requirements = {"weaponmod_napalm_warhead", "commweapon_flamethrower"},
+		cost = 100,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -411,6 +466,8 @@ upgrades = {
 	weaponmod_plasma_containment = {
 		name = "Plasma Containment Field",
 		description = "Heat Ray/Riot Cannon: +30% range",
+		requirements = {"commweapon_heatray", "commweapon_riotcannon"},
+		cost = 500,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -428,6 +485,7 @@ upgrades = {
 	module_ablative_armor = {
 		name = "Ablative Armor Plates",
 		description = "Adds 600 HP",
+		cost = 175,
 		func = function(unitDef)
 				unitDef.maxdamage = unitDef.maxdamage + 600
 			end,
@@ -435,6 +493,7 @@ upgrades = {
 	module_adv_targeting = {
 		name = "Advanced Targeting System",
 		description = "Extends range of all weapons by 10%",
+		cost = 150,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -445,6 +504,7 @@ upgrades = {
 	module_adv_nano = {
 		name = "CarRepairer's Nanolathe",
 		description = "Adds +5 metal/s build speed",
+		cost = 150,
 		func = function(unitDef)
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 5 end
 				--if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 60 end
@@ -453,6 +513,7 @@ upgrades = {
 	module_autorepair = {
 		name = "Autorepair System",
 		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
+		cost = 250,
 		func = function(unitDef)
 				-- First module replaces the base 5 hp/s because that occurs after a minute
 				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
@@ -465,6 +526,7 @@ upgrades = {
 	module_companion_drone = {
 		name = "Companion Drone",
 		description = "Spawns a pair of attack drones",
+		cost = 275,
 		func = function(unitDef)
 				unitDef.customparams.drones = unitDef.customparams.drones or {}
 				unitDef.customparams.drones[#unitDef.customparams.drones+1] = "module_companion_drone"
@@ -473,6 +535,7 @@ upgrades = {
 	module_battle_drone = {
 		name = "Battle Drone",
 		description = "Spawns an advanced combat drone",
+		cost = 300,
 		func = function(unitDef)
 				unitDef.customparams.drones = unitDef.customparams.drones or {}
 				unitDef.customparams.drones[#unitDef.customparams.drones+1] = "module_battle_drone"
@@ -481,6 +544,7 @@ upgrades = {
 	module_dmg_booster = {
 		name = "Damage Booster",
 		description = "Increases damage of all weapons by 10%",
+		cost = 150,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -491,6 +555,7 @@ upgrades = {
 	module_burst_loader = {
 		name = "Burst Loader",
 		description = "+1 burst, +70% reload time",
+		cost = 150,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -522,6 +587,7 @@ upgrades = {
 	module_energy_cell = {
 		name = "Energy Cell",
 		description = "Compact fuel cells that produce +6 energy",
+		cost = 250,
 		func = function(unitDef)
 				unitDef.energymake = (unitDef.energymake or 0) + 6
 			end,
@@ -529,6 +595,7 @@ upgrades = {
 	module_fieldradar = {
 		name = "Field Radar Module",
 		description = "Basic radar system with 1800 range",
+		cost = 75,
 		func = function(unitDef)
 				unitDef.radardistance = (unitDef.radardistance or 0)
 				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
@@ -537,6 +604,7 @@ upgrades = {
 	module_heavy_armor = {
 		name = "High Density Plating",
 		description = "Adds 1600 HP, slows comm by +10%",
+		cost = 425,
 		func = function(unitDef, attributeMods)
 				unitDef.maxdamage = unitDef.maxdamage + 1600
 				attributeMods.speed = attributeMods.speed - 0.1
@@ -545,6 +613,7 @@ upgrades = {
 	module_high_power_servos = {
 		name = "High Power Servos",
 		description = "More powerful leg actuators increase speed by 10% of base",
+		cost = 150,
 		func = function(unitDef, attributeMods)
 				attributeMods.speed = attributeMods.speed + 0.1
 			end,
@@ -552,6 +621,7 @@ upgrades = {
 	module_personal_cloak = {
 		name = "Personal Cloak",
 		description = "Cloaks the commander",
+		cost = 400,
 		func = function(unitDef) 
 				unitDef.cancloak = true
 				unitDef.cloakcost = unitDef.cloakcost or 5
@@ -569,6 +639,7 @@ upgrades = {
 		name = "Personal Shield",
 		order = 5,
 		description = "Generates a small bubble shield",
+		cost = 300,
 		func = function(unitDef)
 				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
 			end,
@@ -577,6 +648,7 @@ upgrades = {
 	module_resurrect = {
 		name = "Lazarus Device",
 		description = "Enables resurrection of wrecks",
+		cost = 250,
 		func = function(unitDef)
 				unitDef.canresurrect = true
 			end,
@@ -586,6 +658,8 @@ upgrades = {
 		name = "Area Shield",
 		order = 6,
 		description = "A bubble shield that protects surrounding units within 350 m",
+		requirements = {"commweapon_personal_shield"},
+		cost = 150,
 		func = function(unitDef)
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
 				ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
@@ -593,10 +667,12 @@ upgrades = {
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")
 			end,
-	},	
+	},
 	module_cloak_field = {
 		name = "Cloaking Field",
 		description = "Cloaks all friendly units within 350 m",
+		-- requirements = {"module_personal_cloak"},
+		cost = 700,
 		func = function(unitDef)
 				unitDef.mincloakdistance = math.max(150, unitDef.mincloakdistance or 0)
 				unitDef.onoffable = true
@@ -610,6 +686,7 @@ upgrades = {
 	module_jammer = {
 		name = "Radar Jammer",
 		description = "Masks radar signals of all units within 500 m",
+		cost = 175,
 		func = function(unitDef)
 				unitDef.radardistancejam = 500
 				unitDef.activatewhenbuilt = true
@@ -620,6 +697,7 @@ upgrades = {
 	module_jump_booster = {
 		name = "Dragonfly Booster",
 		description = "Increases jump range and height",
+		cost = 150,
 		func = function(unitDef)
 				unitDef.customparams.jumpclass = "commrecon2"
 			end,	
@@ -627,7 +705,8 @@ upgrades = {
 	
 	module_radarnet = {
 		name = "Integrated Radar Network",
-		description = "Reduces radar wobble for all units",
+		description = "Halves radar wobble for all units",
+		cost = 300, -- 200, requirements = {"module_fieldradar"},
 		func = function(unitDef)
 				unitDef.isTargetingUpgrade = true
 				unitDef.activatewhenbuilt = true
@@ -637,6 +716,7 @@ upgrades = {
 	module_ultralight_hull = {
 		name = "Ultralight Hull",
 		description = "-1200 HP, +25% speed",
+		cost = 500,
 		func = function(unitDef, attributeMods)
 				unitDef.maxdamage = unitDef.maxdamage - 1200
 				attributeMods.speed = attributeMods.speed + 0.25
@@ -645,6 +725,7 @@ upgrades = {
 	module_weapon_hicharge = {
 		name = "Weapon Hi-Charger",
 		description = "-1000 HP, +40% damage",
+		cost = 500,
 		func = function(unitDef, attributeMods)
 				unitDef.maxdamage = unitDef.maxdamage - 1000
 				local weapons = unitDef.weapondefs or {}
@@ -657,6 +738,7 @@ upgrades = {
 	module_guardian_armor = {
 		name = "Guardian Defense System",
 		description = "Adds 100% HP (including other modules); self-repairs 20 HP/s",
+		cost = 500,
 		func = function(unitDef, attributeMods)
 				attributeMods.health = attributeMods.health + 1
 				unitDef.autoheal = (unitDef.autoheal or 0) + 20
@@ -667,6 +749,7 @@ upgrades = {
 	module_superspeed = {
 		name = "Marathon Motion Control",
 		description = "Increases speed by 50% of base",
+		cost = 500,
 		func = function(unitDef, attributeMods)
 				attributeMods.speed = attributeMods.speed + 0.5
 		end,
@@ -676,6 +759,7 @@ upgrades = {
 	module_longshot = {
 		name = "Longshot Fire Control",
 		description = "Extends range of all weapons by 40%",
+		cost = 500,
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
@@ -688,6 +772,7 @@ upgrades = {
 	module_super_nano = {
 		name = "Engineer's Revenge",
 		description = "Adds 20 metal/s build speed and 200 build range",
+		cost = 500,
 		func = function(unitDef)
 				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 20 end
 				if unitDef.builddistance then unitDef.builddistance = unitDef.builddistance + 200 end
@@ -699,6 +784,7 @@ upgrades = {
 	module_improved_optics = {
 		name = "Improved Optics",
 		description = "Increases sight distance by 100 m",
+		cost = 150,
 		func = function(unitDef)
 				unitDef.sightdistance = unitDef.sightdistance + 100
 			end,
@@ -706,6 +792,7 @@ upgrades = {
 	module_repair_field = {
 		name = "Repair Field",
 		description = "Passively repairs all friendly units within 450 m",
+		cost = 500,
 		func = function(unitDef)
 				unitDef.customparams.repairaura_preset = "module_repairfield"
 			end,
@@ -715,6 +802,7 @@ upgrades = {
 	module_econ = {
 		name = "Economy Package",
 		description = "Produces +2 energy and metal",
+		cost = 100,
 		func = function(unitDef)
 				unitDef.energymake = (unitDef.energymake or 0) + 2
 				unitDef.metalmake = (unitDef.metalmake or 0) + 2
@@ -724,6 +812,7 @@ upgrades = {
 	conversion_lazor = {
 		name = "Uberlazor",
 		description = "LOLOLOL",
+		cost = 1337,
 		func = function(unitDef)
 				ReplaceWeapon(unitDef, "commweapon_beamlaser", "commweapon_hparticlebeam")
 			end,	
