@@ -229,7 +229,7 @@ for i = 1, #UnitDefs do
 				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
 				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
 			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)]
+				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
 				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
 				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
 			else
@@ -1037,20 +1037,12 @@ local function printAbilities(ud)
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.transportMass < 365) and "Light" or "Heavy")
 	end
-	
-	local anti_coverage = 0
-	for i=1, #ud.weapons do
-		local coverage = WeaponDefs[ud.weapons[i].weaponDef].coverageRange
-		if coverage and tonumber(coverage) > anti_coverage then
-			anti_coverage = tonumber(coverage)
-		end
-	end
 
-	if anti_coverage > 0 then
+	if ud.customParams.nuke_coverage then
 		cells[#cells+1] = 'Can intercept strategic nukes'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Coverage:'
-		cells[#cells+1] = anti_coverage .. " elmo"
+		cells[#cells+1] = ud.customParams.nuke_coverage .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
