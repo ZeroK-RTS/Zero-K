@@ -196,6 +196,7 @@ local function ProcessComm(name, config)
 				end )
 
 			-- process all modules (including weapons)
+			local installed_modules = {}
 			for _,moduleName in ipairs(modules) do
 				if moduleName:find("commweapon_",1,true) then
 					if weapons[moduleName] then
@@ -207,14 +208,29 @@ local function ProcessComm(name, config)
 					end
 				end
 				if upgrades[moduleName] then
-					--Spring.Echo("\tApplying upgrade: "..moduleName)
-					if upgrades[moduleName].func then --apply upgrade function
-						upgrades[moduleName].func(commDefs[name], attributeMods) 
+					local eligible = false
+					if (not upgrades[moduleName].requirements) then
+						eligible = true
+					else
+						for req = 1, #upgrades[moduleName].requirements do
+							if installed_modules[upgrades[moduleName].requirements[req]] then
+								eligible = true
+								break
+							end
+						end
 					end
-					if upgrades[moduleName].useWeaponSlot then
-						numWeapons = numWeapons + 1
+
+					if eligible then
+						installed_modules[moduleName] = true
+						--Spring.Echo("\tApplying upgrade: "..moduleName)
+						if upgrades[moduleName].func then --apply upgrade function
+							upgrades[moduleName].func(commDefs[name], attributeMods) 
+						end
+						if upgrades[moduleName].useWeaponSlot then
+							numWeapons = numWeapons + 1
+						end
+						totalModuleCost = totalModuleCost + (upgrades[moduleName].cost or 0)
 					end
-					totalModuleCost = totalModuleCost + (upgrades[moduleName].cost or 0)
 				else
 					Spring.Log("gamedata/modularcomms/unitdefgen.lua", "error", "\tERROR: Upgrade "..moduleName.." not found")
 				end
@@ -233,7 +249,7 @@ local function ProcessComm(name, config)
 		commDefs[name].maxdamage = commDefs[name].maxdamage*(1+attributeMods.health)
 		
 		-- set costs
-		local totalCost = commDefs[name].buildtime + totalModuleCost + totalLevelCost[commDefs[name].customparams.level or 0]
+		local totalCost = commDefs[name].buildtime + totalModuleCost + totalLevelCost[tonumber(commDefs[name].customparams.level or "0")]
 		commDefs[name].buildcostmetal = totalCost
 		commDefs[name].buildcostenergy = totalCost
 		commDefs[name].buildtime = totalCost
@@ -271,6 +287,21 @@ local function ProcessComm(name, config)
 		end
 	end
 end
+
+-- for local testing (based on values from a real springie com so should work)
+commData["c4665_1_0"] = {
+	modules = {
+		[1] = "commweapon_massdriver", -- +100 module cost
+		-- [1] = "commweapon_shotgun",
+		[2] = "weaponmod_autoflechette", -- no cost; requires shotgun to work
+	},
+	name = "Lord Obediator level 0",
+	chassis = "commrecon2", -- level 2: +200 cost
+	miscDefs = {
+		customparams = { damagebonus = 5, rangebonus = 1, },
+	},
+	-- total cost: 1200 base + 300 above == 1500 -> testing confims.
+}
 
 for name, config in pairs(commData) do
 	ProcessComm(name, config)
