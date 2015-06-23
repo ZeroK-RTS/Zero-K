@@ -61,12 +61,11 @@ local SIG_AIM_3 = 8
 local SIG_AIM_4 = 16
 local SIG_RESTORE = 32
 local SIG_IDLE = 64
-local RELOADTIME = 20000
+local RELOADTIME = wd and WeaponDefs[wd].reload*30 or 20*30
 local SALVO_TIME = 1000
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
-local reloadTime = wd and WeaponDefs[wd].reload*30 or 20*30
 
 local base_speed = 100
 --------------------------------------------------------------------------------
@@ -378,10 +377,16 @@ function script.Shot(num)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	if num ~= 1 then
+		return false
+	end
+	local reloadState = Spring.GetUnitWeaponState(unitID, 3, 'reloadState')
+	return not (reloadState and (reloadState < 0 or reloadState < Spring.GetGameFrame()))
+end
+
 function script.FireWeapon(num)
 	if num == 3 then
-		local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-		Spring.SetUnitWeaponState(unitID, 1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 		dgunning = true
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
 		GG.UpdateUnitAttributes(unitID)
