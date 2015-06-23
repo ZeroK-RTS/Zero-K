@@ -5,7 +5,7 @@ function gadget:GetInfo() return {
 	date    = "15-05-15",
 	license = "PD",
 	layer   = 0,
-	enabled = true
+	enabled = false
 } end
 
 if (gadgetHandler:IsSyncedCode()) then
