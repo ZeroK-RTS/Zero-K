@@ -237,10 +237,10 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 			
 			if unstickHelp then
 				local data = labList.data[labList.count]
-				data.minBuildX = (((face == 3) and minx) or (minx*0.4 + ux*0.6))
-				data.minBuildZ = (((face == 2) and minz) or (minz*0.4 + uz*0.6))
-				data.maxBuildX = (((face == 1) and maxx) or (maxx*0.4 + ux*0.6))
-				data.maxBuildZ = (((face == 0) and maxz) or (maxz*0.4 + uz*0.6))
+				data.minBuildX = (((face == 3) and minx) or (minx*0.5 + ux*0.5))
+				data.minBuildZ = (((face == 2) and minz) or (minz*0.5 + uz*0.5))
+				data.maxBuildX = (((face == 1) and maxx) or (maxx*0.5 + ux*0.5))
+				data.maxBuildZ = (((face == 0) and maxz) or (maxz*0.5 + uz*0.5))
 				
 				--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.maxBuildX,0,data.minBuildZ)
 				--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.minBuildX,0,data.maxBuildZ)
