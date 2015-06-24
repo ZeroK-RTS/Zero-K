@@ -351,7 +351,7 @@ function widget:GameFrame(n)
 		eCurr = eStor -- cap by storage
 	end 
 
-	ePull = ePull - WG.energyWasted/WG.allies
+	ePull = ePull - ((WG.allies > 0 and WG.energyWasted/WG.allies) or 0)
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	local wastingM = mCurr >= mStor * 0.9
