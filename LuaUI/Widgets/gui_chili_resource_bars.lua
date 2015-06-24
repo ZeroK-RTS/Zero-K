@@ -301,7 +301,7 @@ function widget:GameFrame(n)
 		wastingE = (WG.energyWasted > 0)
 	else
 		local waste = ((WG.allies > 0 and WG.energyWasted/WG.allies) or 0)
-		wastingE = (WG.energyWasted/WG.allies > eInco*0.05) and (waste > 15)
+		wastingE = (waste > eInco*0.05) and (waste > 15)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
