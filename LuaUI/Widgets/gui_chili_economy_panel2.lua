@@ -629,7 +629,7 @@ function CreateWindow()
 	local storageX    = "18%"
 	local incomeX     = "44%"
 	local pullX       = "70%"
-	local textY       = "41%"
+	local textY       = "46%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
 	
@@ -678,7 +678,7 @@ function CreateWindow()
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		caption = "0",
 		autosize = false,
@@ -693,7 +693,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
-		valign = "bottom",
+		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -707,7 +707,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = negativeColourStr.."-0.0",
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -819,7 +819,7 @@ function CreateWindow()
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		caption = "0",
 		autosize = false,
@@ -834,7 +834,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
-		valign = "bottom",
+		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -848,7 +848,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = negativeColourStr.."-0.0",
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
