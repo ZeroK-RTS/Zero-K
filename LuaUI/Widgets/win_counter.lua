@@ -117,7 +117,7 @@ function widget:GameOver()
 	for i=1, #allyTeams do
 		local allyTeamAlive = false
 		local playerTeams = Spring.GetTeamList(allyTeams[i])
-		Spring.Echo("AllyTeam " .. allyTeams[i])
+		-- Spring.Echo("AllyTeam " .. allyTeams[i])
 		for j=1, #playerTeams do
 			local teamID = Spring.GetTeamInfo(playerTeams[j])
 			local isDead = (Spring.GetTeamRulesParam(teamID, "isDead") and true) or false
