@@ -26,6 +26,9 @@ local armkam = UnitDefNames["armkam"].id
 local bladew = UnitDefNames["bladew"].id
 local armbrawl = UnitDefNames["armbrawl"].id
 local corpyro = UnitDefNames["corpyro"].id
+local corgator = UnitDefNames["corgator"].id
+
+local future = (Game.version:find('99.') == 1)
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if unitDefID == corbtrans then
@@ -40,5 +43,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		Spring.SetUnitWeaponState(unitID,1,{range = 600})
 	elseif unitDefID == corpyro then
 		Spring.SetUnitWeaponState(unitID,1,{range = 260})
+	elseif unitDefID == corgator and future then
+		Spring.SetUnitMaxRange(unitID, 64)
 	end
 end
