@@ -345,7 +345,10 @@ function widget:Initialize()
 	
 	if not drawingEnabled then
 		return
-	end	
+	end
+	
+	
+	Spring.SendCommands("mapborder " .. ((options and (options.mapBorderStyle.value == 'cutaway')) and "1" or "0"))
 	
 	if island == nil then
 		island = IsIsland()
