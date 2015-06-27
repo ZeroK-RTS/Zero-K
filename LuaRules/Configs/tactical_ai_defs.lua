@@ -92,23 +92,24 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"chicken_tiamat",
 	"chicken_dragon",
 	"hoverdepthcharge",
-})
-
-local shortRangeSkirmieeArray = NameToDefID({
+	
+	"corgator",
 	"armflea",
 	"armpw",
 	"corfav",
-	"corgator",
+})
+
+local shortRangeSkirmieeArray = NameToDefID({
 	"corpyro",
 	"logkoda",
 	"amphraider3",
 	"corsumo",
 	
 	"corsktl",
+	"corak",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
-	"corak",
 	"panther",
 	"corsh",
 	"hoverscout",
@@ -299,7 +300,7 @@ end
 
 --*** skirms(defaults to empty): the table of units that this unit will attempt to keep at max range
 -- skirmEverything (defaults to false): Skirms everything (does not skirm radar with this enabled only)
--- skirmLeeway: (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
+-- skirmLeeway (defaults to 0): (Weapon range - skirmLeeway) = distance that the unit will try to keep from units while skirming
 -- stoppingDistance (defaults to 0): (skirmLeeway - stoppingDistance) = max distance from target unit that move commands can be given while skirming
 -- skirmRadar (defaults to false): Skirms radar dots
 -- skirmOnlyNearEnemyRange (defaults to false): If true, skirms only when the enemy unit is withing enemyRange + skirmOnlyNearEnemyRange
@@ -389,9 +390,9 @@ local behaviourConfig = {
 		circleStrafe = true, 
 		maxSwarmLeeway = 35, 
 		swarmLeeway = 50, 
+		skirmLeeway = 10,
 		jinkTangentLength = 140, 
 		stoppingDistance = 10,
-		velocityPrediction = 20,
 	},
 	
 	["armflea"] = {
@@ -756,7 +757,18 @@ local behaviourConfig = {
 		stoppingDistance = -40,
 		skirmOrderDis = 250,
 		velocityPrediction = 40,
-	},	
+	},
+	["gunshipsupport"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+	},
+	["corcrw"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		skirmLeeway = 30, 
+	},
 	
 	-- long range skirms
 	["jumpblackhole"] = {
