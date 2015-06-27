@@ -190,7 +190,7 @@ local function ResetRetreatData(unitID)
 end
 
 local function StopRetreating(unitID)
-	local cmds = Spring.GetUnitCommands(unitID)
+	local cmds = Spring.GetUnitCommands(unitID, -1)
 	if retreaterHasRearm[unitID] then
 		for _,cmd in ipairs(cmds) do
 			if retreaterHasRearm[unitID] and cmd.id == CMD_REARM then
