@@ -476,8 +476,10 @@ local function CircleToLand(unitID, goal)
 		
 		local px, pz = DistanceToPosition(totalDist)
 		
-		landingUnit[unitID].landed = true
-		SitOnPad(unitID)
+		if landingUnit[unitID] and not landingUnit[unitID].abort then
+			landingUnit[unitID].landed = true
+			SitOnPad(unitID)
+		end
 	end
 	
 	StartScript(LandLoop)
