@@ -22,12 +22,17 @@ local FEATURE = 102
 local GROUND = 103
 local UNIT = 117
 
-local projectiles = {}
+--local projectiles = {}
 
 -- In elmos/frame
 local projectileSpeed = {
 	[WeaponDefNames["armcybr_arm_pidr"].id] = 19, -- empirical
 }
+
+-- Recluse projectile speed at different distances formula is a result of the least squares linear fit
+-- of the following data set of {distance, averageSpeed} data.
+-- {{290.8, 7.458}, {125.0, 6.252}, {451.9,8.369}, {31.436, 5.238}, {207.89, 6.929}, {371.8, 7.911}, {474.12, 8.466}}
+-- speed = 0.00701024*distance + 5.27606
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileSpeed) do 
@@ -42,7 +47,6 @@ end
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if projectileSpeed[weaponID] then
 		local targetType, targetID = Spring.GetProjectileTarget(proID)
-		projectiles[proID] = true
 		if targetType == UNIT and Spring.ValidUnitID(targetID) then
 			local unitDefID = Spring.GetUnitDefID(targetID)
 			-- May as well home perfectly onto immobile targets, they are not going anywhere.
@@ -82,3 +86,14 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 		end
 	end
 end
+
+--function gadget:ProjectileDestroyed(proID)
+--	if projectiles[proID] then
+--		local data = projectiles[proID] 
+--		local px,py,pz = Spring.GetProjectilePosition(proID)
+--		local f = Spring.GetGameFrame()
+--		local dist = Dist3D(data[1] - px, data[2] - py, data[3] - pz)
+--		local hitTime = f - data[4]
+--		Spring.Echo(dist, dist/hitTime)
+--	end
+--end
