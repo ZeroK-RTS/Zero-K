@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Projectile Retarget",
-    desc      = "Retargets newly created projectiles.",
+    desc      = "Retargets newly created projectiles and implements burnblow.",
     author    = "Google Frog",
     date      = "10 June 2014",
     license   = "GNU GPL, v2 or later",
@@ -22,7 +22,8 @@ local FEATURE = 102
 local GROUND = 103
 local UNIT = 117
 
---local projectiles = {}
+local projectiles = {}
+local thereAreProjectiles = false
 
 -- In elmos/frame
 local projectileSpeed = {
@@ -39,9 +40,25 @@ function gadget:Initialize()
 		Script.SetWatchWeapon(id, true)
 	end
 end
+local function Dist3Dsqr(x,y,z)
+	return x*x + y*y + z*z
+end
 
 local function Dist3D(x,y,z)
 	return math.sqrt(x*x + y*y + z*z)
+end
+
+function gadget:GameFrame(n)
+	if thereAreProjectiles then
+		thereAreProjectiles = false
+		for proID, data in pairs(projectiles) do
+			thereAreProjectiles = true
+			local px,py,pz = Spring.GetProjectilePosition(proID)
+			if px and Dist3Dsqr(data[1] - px, data[2] - py, data[3] - pz) < 121 then
+				Spring.SetProjectileCollision(proID)
+			end
+		end
+	end
 end
 
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
@@ -59,6 +76,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 				
 				-- Check whether the target is on the ground
 				local h = Spring.GetGroundHeight(bx, bz)
+				
+				
 				if by < h + 1 then
 					-- Target is on the ground so snap target position to the ground.
 					-- Reduce the effect of hit time because fast jinking units can cause the shot to go wide.
@@ -69,9 +88,11 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 					local y = Spring.GetGroundHeight(x,z)
 					Spring.SetProjectileTarget(proID, x, y, z)
 				else
-					-- Target is in the air so predict perfectly and hope for flightTime to do its job.
+					-- Target is in the air so predict perfectly and implement burnblow
 					local x,y,z = ux + hitTime*vx, uy + hitTime*vy, uz + hitTime*vz
 					Spring.SetProjectileTarget(proID, x, y, z)
+					projectiles[proID] = {x, y, z}
+					thereAreProjectiles = true
 				end
 			end
 		elseif targetType == FEATURE and Spring.ValidFeatureID(targetID) then
@@ -87,13 +108,8 @@ function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	end
 end
 
---function gadget:ProjectileDestroyed(proID)
---	if projectiles[proID] then
---		local data = projectiles[proID] 
---		local px,py,pz = Spring.GetProjectilePosition(proID)
---		local f = Spring.GetGameFrame()
---		local dist = Dist3D(data[1] - px, data[2] - py, data[3] - pz)
---		local hitTime = f - data[4]
---		Spring.Echo(dist, dist/hitTime)
---	end
---end
+function gadget:ProjectileDestroyed(proID)
+	if projectiles and projectiles[proID] then
+		projectiles[proID] = nil
+	end
+end
