@@ -15,27 +15,23 @@ function gadget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 0,
     enabled   = true  --  loaded by default?
-  }
+ }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local Echo				= Spring.Echo
-local spValidUnitID    = Spring.ValidUnitID
-local spSetUnitTarget = Spring.SetUnitTarget
-local spGetUnitHealth = Spring.GetUnitHealth
-local spGetGameFrame  = Spring.GetGameFrame
+local spValidUnitID         = Spring.ValidUnitID
+local spSetUnitTarget       = Spring.SetUnitTarget
+local spGetUnitHealth       = Spring.GetUnitHealth
+local spGetGameFrame        = Spring.GetGameFrame
 local spFindUnitCmdDesc     = Spring.FindUnitCmdDesc
 local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitPosition		= Spring.GetUnitPosition
-local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
-local spGetUnitAllyTeam		= Spring.GetUnitAllyTeam
-local spGetUnitShieldState	= Spring.GetUnitShieldState
-local spGetUnitIsStunned	= Spring.GetUnitIsStunned
-local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitCommands     = Spring.GetUnitCommands
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
@@ -98,8 +94,8 @@ local incomingDamage = {}
 function GG.OverkillPrevention_IsDoomed(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame=incomingDamage[targetID].lastFrame or 0
-		return (gameFrame<=lastFrame and incomingDamage[targetID].doomed)
+		local lastFrame = incomingDamage[targetID].lastFrame or 0
+		return (gameFrame <= lastFrame and incomingDamage[targetID].doomed)
 	end
 	return false
 end
@@ -107,88 +103,95 @@ end
 function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame=incomingDamage[targetID].lastFrame or 0
-		return (gameFrame<=lastFrame and incomingDamage[targetID].disarmed)
+		local lastFrame = incomingDamage[targetID].lastFrame or 0
+		return (gameFrame <= lastFrame and incomingDamage[targetID].disarmed)
 	end
 	return false
 end
 
 --[[
 	unitID, targetID - unit IDs. Self explainatory
-	FullDamage - regular damage of salvo
-	SingleDamage - regular damage of one projectile from salvo
-	DisarmDamage - disarming damage
-	DisarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
+	fullDamage - regular damage of salvo
+	disarmDamage - disarming damage
+	disarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
 	timeout -- percieved projectile travel time from unitID to targetID in frames
 ]]--
-local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
 	local incData = incomingDamage[targetID]
-	local targetFrame=gameFrame+timeout
+	local targetFrame = gameFrame + timeout
 	
 	local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-	local adjHealth = spGetUnitHealth(targetID)/armor
+	local adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
 	
 	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
-	if disarmFrame==-1 then disarmFrame=gameFrame end --no disarm damage on targetID yet(already)
+	if disarmFrame == -1 then
+		--no disarm damage on targetID yet(already)
+		disarmFrame = gameFrame 
+	end 
 
-	local block=false
+	local block = false
 	
 	if incData then --seen this target
-		local si, ei = incData.frames:GetIdxs()
-		for i=si, ei do
-			local frame, data=unpack(incData.frames:GetKV(i))
-			--Echo(frame)
-			if frame<gameFrame then
+		local startIndex, endIndex = incData.frames:GetIdxs()
+		for i = startIndex, endIndex do
+			local keyValue = incData.frames:GetKV(i)
+			local frame, data = keyValue[1], keyValue[2]
+			--Spring.Echo(frame)
+			if frame < gameFrame then
 				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 			else
-				local dd=data.dd
-				local fd=data.fd
+				local disarmDamage = data.disarmDamage
+				local fullDamage = data.fullDamage
 				
-				local disarmExtra=math.floor(dd/adjHealth*DECAY_FRAMES)				
-				adjHealth=adjHealth-fd
+				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+				adjHealth = adjHealth - fullDamage
 				
-				disarmFrame=disarmFrame+disarmExtra
-				if disarmFrame>frame+DECAY_FRAMES+DisarmTimeout then disarmFrame=frame+DECAY_FRAMES+DisarmTimeout end							
+				disarmFrame = disarmFrame + disarmExtra
+				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
+					disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
+				end
 			end
 		end
-
 	else --new target
-		incomingDamage[targetID]={ frames=pmap() }
+		incomingDamage[targetID] = {frames = pmap()}
 		incData = incomingDamage[targetID]
 	end
 	
-	local doomed=(adjHealth<0) and (FullDamage>0)										--for regular projectile
-	local disarmed=(disarmFrame-gameFrame-timeout>=DECAY_FRAMES) and (DisarmDamage>0)	--for disarming projectile
+	local doomed = (adjHealth < 0) and (fullDamage > 0) --for regular projectile
+	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
 	
-	incomingDamage[targetID].doomed=doomed
-	incomingDamage[targetID].disarmed=disarmed	
+	incomingDamage[targetID].doomed = doomed
+	incomingDamage[targetID].disarmed = disarmed
 	
-	block=doomed or disarmed --assume function is not called with both regular and disarming damage types	
+	block = doomed or disarmed --assume function is not called with both regular and disarming damage types	
 	
 	
 	if not block then
-		--Echo("^^^^SHOT^^^^")
-		local frameData=incData.frames:Get(targetFrame)
-		if frameData then --here we have a rare case when few different projectiles (from different attack units) are arriving to the target at the same frame. Their powers must be accumulated/harmonized
-			frameData.fd=frameData.fd+FullDamage
-			--frameData.sd=math.min(frameData.sd, SingleDamage)
-			frameData.sd=frameData.sd+SingleDamage
-			frameData.dd=frameData.dd+DisarmDamage			
+		--Spring.Echo("^^^^SHOT^^^^")
+		local frameData = incData.frames:Get(targetFrame)
+		if frameData then 
+			-- here we have a rare case when few different projectiles (from different attack units) 
+			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
+			frameData.fullDamage = frameData.fullDamage + fullDamage
+			frameData.disarmDamage = frameData.disarmDamage + disarmDamage
 			incData.frames:Upsert(targetFrame, frameData)
 		else --this case is much more common: such frame does not exist in incData.frames
-			incData.frames:Insert(targetFrame, {fd=FullDamage, sd=SingleDamage, dd=DisarmDamage})
+			incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
 		end
-		incData.lastFrame=math.max(incData.lastFrame or 0, targetFrame)
+		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 	else
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-		if unitDefID then		
-			local queue=Spring.GetUnitCommands(unitID, 2)
-			if #queue==1 then
-				local cmd=queue[1]
-				if (cmd.id==CMD.ATTACK) and (cmd.options.internal) and (#cmd.params==1 and cmd.params[1]==targetID) then
-					--Echo("Removing auto-attack command")
-					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
+		-- Overkill prevention is not allowed to be smart for unidentified units.
+		if unitDefID then
+			local queueSize = spGetUnitCommands(unitID, 0)
+			if queueSize == 1 then
+				local queue = spGetUnitCommands(unitID, 1)
+				local cmd = queue[1]
+				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
+					--Spring.Echo("Removing auto-attack command")
+					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
 					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
 			else
@@ -203,15 +206,15 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 end
 
 
-function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
+function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer)
 	if not units[unitID] then
 		return false
 	end
 	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
-		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
-		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 0, 0, damage, disarmTimer, timeout)
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout)
 	end
 end
 
@@ -229,8 +232,8 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 			end
 		end
 		
-		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
-		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)		
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout)		
 	end
 end
 
@@ -249,7 +252,7 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 		
 		if (cmdDescID) then
 			preventOverkillCmdDesc.params[1] = state
-			spEditUnitCmdDesc(unitID, cmdDescID, { params = preventOverkillCmdDesc.params})
+			spEditUnitCmdDesc(unitID, cmdDescID, {params = preventOverkillCmdDesc.params})
 		end
 		if state == 1 then
 			if not units[unitID] then
