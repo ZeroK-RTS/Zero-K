@@ -91,7 +91,8 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if not remStunnedOrOverkill[targetID] then
 		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
-		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
+		local disarmExpected = GG.OverkillPrevention_IsDisarmExpected(targetID)
+		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill or disarmExpected) and 1) or 0
 	end
 
 	if remStunnedOrOverkill[targetID] == 1 then
@@ -102,14 +103,17 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if remHealth[targetID] then
 		hpAdd = remHealth[targetID]
 	else
-		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
-		local hp, maxHP, _, capture = spGetUnitHealth(targetID)
+		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1		
+		local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
 		hp = hp/armor
+		maxHP = maxHP/armor
+		
 		if hp and maxHP then
 			hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
 		else
 			hpAdd = 0
 		end
+		
 		if capture > 0 then
 			if captureWeaponDefs[attackerWeaponDefID] then
 				-- Really prioritize capturing partially captured units.
@@ -119,6 +123,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 				hpAdd = hpAdd + 0.2*capture
 			end
 		end
+		
 		remHealth[targetID] = hpAdd
 	end
 	
@@ -133,8 +138,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	local newPriority = hpAdd + defPrio + miscAdd + distAdd
-	
-	--GG.UnitEcho(targetID, newPriority)
 	
 	return true, newPriority --bigger value have lower priority
 end
