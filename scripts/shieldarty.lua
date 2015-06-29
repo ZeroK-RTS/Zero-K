@@ -136,7 +136,7 @@ function script.FireWeapon1()
 end
 
 function script.BlockShot(num, targetID)	
-	return GG.OverkillPrevention_CheckBlockD(unitID, targetID, 1500, 120, 240) --4 seconds - timeout, 8 seconds - disarmTimer
+	return GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 1500, 120, 240) --4 seconds - timeout, 8 seconds - disarmTimer
 	--return GG.OverkillPrevention_CheckBlockD(unitID, targetID, 1500, 120, 600) --4 seconds - timeout, 20 seconds - disarmTimer
 end
 

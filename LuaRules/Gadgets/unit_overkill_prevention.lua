@@ -114,18 +114,17 @@ end
 
 --[[
 	unitID, targetID - unit IDs. Self explainatory
-	FullDamage - regular damage of salvo
-	SingleDamage - regular damage of one projectile from salvo
-	DisarmDamage - disarming damage
-	DisarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
+	fullDamage - regular damage of salvo
+	disarmDamage - disarming damage
+	disarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
 	timeout -- percieved projectile travel time from unitID to targetID in frames
 ]]--
-local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	
 	local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
-	local adjHealth = spGetUnitHealth(targetID)/armor
+	local adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
 	
 	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
 	if disarmFrame == -1 then
@@ -136,22 +135,23 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	local block = false
 	
 	if incData then --seen this target
-		local si, ei = incData.frames:GetIdxs()
-		for i = si, ei do
-			local frame, data = unpack(incData.frames:GetKV(i))
+		local startIndex, endIndex = incData.frames:GetIdxs()
+		for i = startIndex, endIndex do
+			local keyValue = incData.frames:GetKV(i)
+			local frame, data = keyValue[1], keyValue[2]
 			--Spring.Echo(frame)
 			if frame < gameFrame then
 				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 			else
-				local dd = data.dd
-				local fd = data.fd
+				local disarmDamage = data.disarmDamage
+				local fullDamage = data.fullDamage
 				
-				local disarmExtra = math.floor(dd/adjHealth*DECAY_FRAMES)
-				adjHealth = adjHealth - fd
+				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+				adjHealth = adjHealth - fullDamage
 				
 				disarmFrame = disarmFrame + disarmExtra
-				if disarmFrame > frame + DECAY_FRAMES + DisarmTimeout then 
-					disarmFrame = frame + DECAY_FRAMES + DisarmTimeout 
+				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
+					disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
 				end
 			end
 		end
@@ -160,8 +160,8 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 		incData = incomingDamage[targetID]
 	end
 	
-	local doomed = (adjHealth < 0) and (FullDamage > 0) --for regular projectile
-	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (DisarmDamage > 0) --for disarming projectile
+	local doomed = (adjHealth < 0) and (fullDamage > 0) --for regular projectile
+	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
 	
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
@@ -175,18 +175,18 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 		if frameData then 
 			-- here we have a rare case when few different projectiles (from different attack units) 
 			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
-			frameData.fd = frameData.fd + FullDamage
-			--frameData.sd = math.min(frameData.sd, SingleDamage)
-			frameData.sd = frameData.sd + SingleDamage
-			frameData.dd = frameData.dd + DisarmDamage
+			frameData.fullDamage = frameData.fullDamage + fullDamage
+			frameData.disarmDamage = frameData.disarmDamage + disarmDamage
 			incData.frames:Upsert(targetFrame, frameData)
 		else --this case is much more common: such frame does not exist in incData.frames
-			incData.frames:Insert(targetFrame, {fd = FullDamage, sd = SingleDamage, dd = DisarmDamage})
+			incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
 		end
 		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 	else
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
+		-- Overkill prevention is not allowed to be smart for unidentified units.
 		if unitDefID then
 			local queue = Spring.GetUnitCommands(unitID, 2)
 			if #queue == 1 then
@@ -208,15 +208,15 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 end
 
 
-function GG.OverkillPrevention_CheckBlockD(unitID, targetID, damage, timeout, disarmTimer)
+function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer)
 	if not units[unitID] then
 		return false
 	end
 	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
-		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
-		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 0, 0, damage, disarmTimer, timeout)
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout)
 	end
 end
 
@@ -234,8 +234,8 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 			end
 		end
 		
-		--OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, FullDamage, SingleDamage, DisarmDamage, DisarmTimeout, timeout)
-		return OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, damage, damage, 0, 0, timeout)		
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout)		
 	end
 end
 
