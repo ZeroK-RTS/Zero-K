@@ -128,7 +128,10 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	local adjHealth = spGetUnitHealth(targetID)/armor
 	
 	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
-	if disarmFrame == -1 then disarmFrame = gameFrame end --no disarm damage on targetID yet(already)
+	if disarmFrame == -1 then
+		--no disarm damage on targetID yet(already)
+		disarmFrame = gameFrame 
+	end 
 
 	local block = false
 	
@@ -152,7 +155,6 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 				end
 			end
 		end
-
 	else --new target
 		incomingDamage[targetID] = {frames = pmap()}
 		incData = incomingDamage[targetID]
@@ -162,7 +164,7 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (DisarmDamage > 0) --for disarming projectile
 	
 	incomingDamage[targetID].doomed = doomed
-	incomingDamage[targetID].disarmed = disarmed	
+	incomingDamage[targetID].disarmed = disarmed
 	
 	block = doomed or disarmed --assume function is not called with both regular and disarming damage types	
 	
@@ -170,7 +172,9 @@ local function OverkillPrevention_CheckBlockCommon(unitID, targetID, gameFrame, 
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
 		local frameData = incData.frames:Get(targetFrame)
-		if frameData then --here we have a rare case when few different projectiles (from different attack units) are arriving to the target at the same frame. Their powers must be accumulated/harmonized
+		if frameData then 
+			-- here we have a rare case when few different projectiles (from different attack units) 
+			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
 			frameData.fd = frameData.fd + FullDamage
 			--frameData.sd = math.min(frameData.sd, SingleDamage)
 			frameData.sd = frameData.sd + SingleDamage
