@@ -95,7 +95,6 @@ unitDef = {
       areaOfEffect            = 96,
       cegTag                  = [[cruisetrail]],
       collideFriendly         = false,
-	  collideGround           = false,
       craterBoost             = 1,
       craterMult              = 2,
 	  
@@ -110,7 +109,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
-      flightTime              = 100,
+      flightTime              = 8,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -134,6 +133,7 @@ unitDef = {
       name                    = [[Anti-Nuke Missile]],
       areaOfEffect            = 420,
       collideFriendly         = false,
+	  collideGround           = false,
       coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
@@ -145,7 +145,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flightTime              = 100,
+      flightTime              = 15,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
