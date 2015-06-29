@@ -29,12 +29,9 @@ local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitsInCylinde   = Spring.GetUnitsInCylinder
-local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
-local spGetUnitShieldState  = Spring.GetUnitShieldState
-local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitCommands     = Spring.GetUnitCommands
+local spGiveOrderToUnit     = Spring.GiveOrderToUnit
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
@@ -188,12 +185,13 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
 		-- Overkill prevention is not allowed to be smart for unidentified units.
 		if unitDefID then
-			local queue = Spring.GetUnitCommands(unitID, 2)
-			if #queue == 1 then
+			local queueSize = spGetUnitCommands(unitID, 0)
+			if queueSize == 1 then
+				local queue = spGetUnitCommands(unitID, 1)
 				local cmd = queue[1]
 				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
 					--Spring.Echo("Removing auto-attack command")
-					Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
 					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
 			else
