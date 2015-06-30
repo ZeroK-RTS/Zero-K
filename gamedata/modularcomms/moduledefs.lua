@@ -452,7 +452,7 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
+		description = "Self-repairs 20 HP/s",
 		func = function(unitDef)
 				-- First module replaces the base 5 hp/s because that occurs after a minute
 				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
