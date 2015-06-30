@@ -32,12 +32,12 @@ end
 --Everything else: anti-bug, syntax, methods, ect
 local lineage = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
 local afkTeams = {}
-local tickTockCounter = {} --remember how many second a player is in AFK mode. To add a delay before unit transfer commence.
 local unitAlreadyFinished = {}
 local oldTeam = {} -- team which player was on last frame
 local oldAllyTeam = {} -- allyTeam which player was on last frame
 local factories = {}
 local transferredFactories = {} -- unitDef and health states of the unit that was being produced be the transferred factory
+local shareLevels = {}
 
 GG.Lagmonitor_activeTeams = {}
 
@@ -278,22 +278,19 @@ function gadget:GameFrame(n)
 							end
 						end
 
+						if (shareLevels[team]) then
+							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team][1])
+							Spring.SetTeamShareLevel(team, "energy", shareLevels[team][2])
+							shareLevels[team] = nil
+						end
+
 						afkTeams[team] = nil
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = true
 					end
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
-					--afkPlayers = afkPlayers .. (10000 + playerID*100 + allyTeam) --compose a string of number that contain playerID & allyTeam information
-					tickTockCounter[playerID] = (tickTockCounter[playerID] or 0) + 1 --tick tock counter ++. count-up 1
-					if tickTockCounter[playerID] >= 2 or justResigned then --team is to be tagged as lagg-er/AFK-er after 3 passes (3 times 50frame = 5 second).
-						local units = spGetTeamUnits(team)
-						if units~=nil and #units > 0 then
-							laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, units = units, resigned = justResigned}
-						end
-					end
-				else --if not at all AFK or lagging: then...
-					tickTockCounter[playerID] = nil -- empty tick-tock clock. We want to reset the counter when the player return.
+					laggers[playerID] = {name = name, team = team, allyTeam = allyTeam, resigned = justResigned}
 				end
 			elseif (spec and not isAI) then
 				specList[playerID] = true --record spectator list in non-AI team
@@ -327,8 +324,19 @@ function gadget:GameFrame(n)
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
 						GG.Lagmonitor_activeTeams[allyTeam][team] = false
 					end
-					afkTeams[team] = true --mark team as AFK
-					local units = lagger.units or {}
+					afkTeams[team] = true --mark team as AFK -- orly
+					
+					local mShareLevel = select(6, Spring.GetTeamResources(team, "metal"))
+					local eShareLevel = select(6, Spring.GetTeamResources(team, "energy"))
+
+					if (mShareLevel > 0 or eShareLevel > 0) then
+						shareLevels[team] = {mShareLevel, eShareLevel}
+					end
+
+					Spring.SetTeamShareLevel(team, "metal",  0)
+					Spring.SetTeamShareLevel(team, "energy", 0)
+
+					local units = spGetTeamUnits(team) or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
 						-- Transfer Units
 						GG.allowTransfer = true
@@ -346,11 +354,6 @@ function gadget:GameFrame(n)
 							end
 						end
 						GG.allowTransfer = false
-
-						-- Transfer metal to reviever, engine handles excess going to allies if it occurs.
-						local spareMetal = spGetTeamResources(team,"metal") or 0
-						spUseTeamResource(team,"metal",spareMetal)
-						spAddTeamResource(recepientByAllyTeam[allyTeam].team,"metal",spareMetal)
 
 						-- Send message
 						if lagger.resigned then

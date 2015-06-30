@@ -25,8 +25,8 @@ local smokePiece = { shell_1, shell_2, cannonbase, heatray }
 local heat = false
 local on = false
 --signals
-local aim  = 2
-local aim2  = 4
+local aim = 2
+local aim2 = 4
 local open = 8
 local close = 16
 
@@ -59,8 +59,8 @@ end
 
 --closing animation of the factory
 local function Close()
-	Signal( aim )
-	Signal( aim2 )
+	Signal(aim)
+	Signal(aim2)
 	Signal(open) --kill the opening animation if it is in process
 	SetSignalMask(close) --set the signal to kill the closing animation
 	
@@ -86,13 +86,13 @@ local function Close()
 
 end
 
-function script.Activate ( )
-	StartThread( Open )
+function script.Activate ()
+	StartThread(Open)
 end
 
-function script.Deactivate ( )
+function script.Deactivate ()
 	on = false
-	StartThread( Close )
+	StartThread(Close)
 end
 
 function script.Create()
@@ -104,13 +104,13 @@ function script.QueryWeapon1() return flare1 end
 
 function script.AimFromWeapon1() return cannon end
 
-function script.AimWeapon1( heading, pitch )
+function script.AimWeapon1(heading, pitch)
 	if not on then return false end
-	Signal( aim )
-	SetSignalMask( aim )
+	Signal(aim)
+	SetSignalMask(aim)
 
-	Turn( shellbase, y_axis, heading, 1.2 )
-	Turn( cannonbase,  x_axis, -pitch, 0.8 ) 
+	Turn(shellbase, y_axis, heading, 1.2)
+	Turn(cannonbase, x_axis, -pitch, 0.8) 
 	WaitForTurn (shellbase, y_axis)
 	WaitForTurn (cannonbase, x_axis)
 
@@ -134,12 +134,12 @@ end
 
 function script.AimFromWeapon2() return heatraybase end
 
-function script.AimWeapon2( heading, pitch )
+function script.AimWeapon2(heading, pitch)
 	if not on then return false end
-	Signal( aim2 )
-	SetSignalMask( aim2 )
-	Turn( heatraybase, y_axis, heading, 3 )
-	Turn( heatray,  x_axis, -pitch, 2 )
+	Signal(aim2)
+	SetSignalMask(aim2)
+	Turn(heatraybase, y_axis, heading, 3)
+	Turn(heatray, x_axis, -pitch, 2)
 	WaitForTurn (heatraybase, y_axis)
 	WaitForTurn (heatray, x_axis)
 	return true

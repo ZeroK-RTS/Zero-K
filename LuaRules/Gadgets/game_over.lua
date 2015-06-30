@@ -29,25 +29,25 @@ end
 --end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local spGetTeamInfo     = Spring.GetTeamInfo
-local spGetTeamList     = Spring.GetTeamList
-local spGetTeamUnits    = Spring.GetTeamUnits
-local spDestroyUnit     = Spring.DestroyUnit
-local spGetAllUnits     = Spring.GetAllUnits
-local spGetAllyTeamList = Spring.GetAllyTeamList
-local spGetPlayerInfo	= Spring.GetPlayerInfo
-local spGetPlayerList	= Spring.GetPlayerList
-local spAreTeamsAllied  = Spring.AreTeamsAllied
-local spGetUnitTeam     = Spring.GetUnitTeam
-local spGetUnitDefID    = Spring.GetUnitDefID
-local spGetUnitIsStunned= Spring.GetUnitIsStunned
-local spGetUnitHealth   = Spring.GetUnitHealth
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-local spTransferUnit	= Spring.TransferUnit
-spGetGameRulesParam     = Spring.GetGameRulesParam
-local spKillTeam	= Spring.KillTeam
-local spGameOver	= Spring.GameOver
-local spEcho       = Spring.Echo
+local spGetTeamInfo       = Spring.GetTeamInfo
+local spGetTeamList       = Spring.GetTeamList
+local spGetTeamUnits      = Spring.GetTeamUnits
+local spDestroyUnit       = Spring.DestroyUnit
+local spGetAllUnits       = Spring.GetAllUnits
+local spGetAllyTeamList   = Spring.GetAllyTeamList
+local spGetPlayerInfo	  = Spring.GetPlayerInfo
+local spGetPlayerList	  = Spring.GetPlayerList
+local spAreTeamsAllied    = Spring.AreTeamsAllied
+local spGetUnitTeam       = Spring.GetUnitTeam
+local spGetUnitDefID      = Spring.GetUnitDefID
+local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
+local spTransferUnit	  = Spring.TransferUnit
+local spGetGameRulesParam = Spring.GetGameRulesParam
+local spKillTeam	      = Spring.KillTeam
+local spGameOver	      = Spring.GameOver
+local spEcho              = Spring.Echo
 
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
@@ -222,6 +222,7 @@ local function DestroyAlliance(allianceID)
 						toDestroy[u] = true
 					end
 				end
+				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
 				spKillTeam(t)
 			end
 		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
@@ -374,7 +375,9 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:TeamDied (teamID)
-	ProcessLastAlly()
+	if not gameover then
+		ProcessLastAlly()
+	end
 end
 
 function gadget:UnitFinished(u, ud, team)

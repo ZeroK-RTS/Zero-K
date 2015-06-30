@@ -66,11 +66,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function checkLabs(checkFeatures)
+function checkLabs(checkFeatures, onlyUnstick)
 	local labData = labList.data
 	local data, units, features
 	for i = 1, labList.count do
 		data = labData[i]
+		
+		if (onlyUnstick and not data.unstickHelp) then
+			break
+		end
+		
 		units = spGetUnitsInRectangle(data.minx-8, data.minz-8, data.maxx+8, data.maxz+8)
 		features = spGetFeaturesInRectangle(data.minx, data.minz, data.maxx, data.maxz)
 
@@ -83,32 +88,53 @@ function checkLabs(checkFeatures)
 			local ally = spGetUnitAllyTeam(unitID)
 			local team = spGetUnitTeam(unitID)
 			if not fly and spMoveCtrlGetTag(unitID) == nil then
-				if (ally ~= data.ally) then --teleport unit away
+				if (ally ~= data.ally) or (data.unstickHelp and not ud.isImmobile) then --teleport unit away
 					local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
 					local vx, vy, vz = spGetUnitVelocity(unitID)
-
-					if aimY > -12 and aimY >= data.miny and aimY <= data.maxy then
+					
+					if aimY > -18 and aimY >= data.miny and aimY <= data.maxy then
+						local isAlly = ally == data.ally 
+						
 						local l = abs(ux-data.minx)
 						local r = abs(ux-data.maxx)
 						local t = abs(uz-data.minz)
 						local b = abs(uz-data.maxz)
+						
+						local pushDistance = (data.unstickHelp and 16) or 8
 
 						local side = min(l,r,t,b)
 
-						if (side == l) then
-							spSetUnitPosition(unitID, data.minx-8, uz, true)
-							spSetUnitVelocity(unitID, 0, vy, vz)
-						elseif (side == r) then
-							spSetUnitPosition(unitID, data.maxx+8, uz, true)
-							spSetUnitVelocity(unitID, vx, vy, 0)
-						elseif (side == t) then
-							spSetUnitPosition(unitID, ux, data.minz-8, true)
-							spSetUnitVelocity(unitID, 0, vy, vz)
-						else
-							spSetUnitPosition(unitID, ux, data.maxz+8, true)
-							spSetUnitVelocity(unitID, vx, vy, 0)
+						if not (isAlly and ux > data.minBuildX and uz < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
+							if (side == l) then
+								spSetUnitPosition(unitID, data.minx - pushDistance, uz, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, 0, vy, vz)
+								end
+							elseif (side == r) then
+								spSetUnitPosition(unitID, data.maxx + pushDistance, uz, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, 0, vy, vz)
+								end
+							elseif (side == t) then
+								spSetUnitPosition(unitID, ux, data.minz - pushDistance, true)
+								if data.unstickHelp then
+								
+								else
+									spSetUnitVelocity(unitID, vx, vy, 0)
+								end
+							else
+								spSetUnitPosition(unitID, ux, data.maxz + pushDistance, true)
+								if data.unstickHelp then
+									spSetUnitVelocity(unitID, vx, vy, vz/2)
+								else
+									spSetUnitVelocity(unitID, vx, vy, 0)
+								end
+							end
 						end
-
 					end	
 				end
 			end
@@ -150,6 +176,8 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 			local zsize = (ud.ysize or ud.zsize)*4
 			local ally = spGetUnitAllyTeam(unitID)
 			local minx, minz, maxx, maxz
+			
+			local unstickHelp = ud.customParams.unstick_help
 
 			local _,sizeY,_,_,offsetY = Spring.GetUnitCollisionVolumeData(unitID)
 			local miny = uy + offsetY - sizeY/2 --set the box bottom
@@ -203,8 +231,22 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 				maxx = maxx,
 				maxy = maxy,
 				maxz = maxz,
+				unstickHelp = unstickHelp,
 			}
 			labs[unitID] = labList.count
+			
+			if unstickHelp then
+				local data = labList.data[labList.count]
+				data.minBuildX = (((face == 3) and minx) or (minx*0.5 + ux*0.5))
+				data.minBuildZ = (((face == 2) and minz) or (minz*0.5 + uz*0.5))
+				data.maxBuildX = (((face == 1) and maxx) or (maxx*0.5 + ux*0.5))
+				data.maxBuildZ = (((face == 0) and maxz) or (maxz*0.5 + uz*0.5))
+				
+				--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.maxBuildX,0,data.minBuildZ)
+				--Spring.MarkerAddLine(data.minBuildX,0,data.minBuildZ,data.minBuildX,0,data.maxBuildZ)
+				--Spring.MarkerAddLine(data.maxBuildX,0,data.maxBuildZ,data.maxBuildX,0,data.minBuildZ)
+				--Spring.MarkerAddLine(data.maxBuildX,0,data.maxBuildZ,data.minBuildX,0,data.maxBuildZ)
+			end
 
 			--Spring.Echo(xsize)
 			--Spring.Echo(zsize)
@@ -232,9 +274,7 @@ function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 end
 
 function gadget:GameFrame(n)
-	if n%5 == 0 then
-		checkLabs(n%60 == 0)
-	end
+	checkLabs(n%60 == 0, n%5 == 0)
 end
 
 function gadget:Initialize()

@@ -41,7 +41,7 @@ local function Open()
 	Move(bay, 1, -18, 15)
 
 	Turn(narm1, 1, 1.85, 0.75)
-	Turn(nano1, 1,  -1.309, 0.35)
+	Turn(nano1, 1, -1.309, 0.35)
 	Turn(door1, 2, -0.611, 0.35)
 	Sleep(600)
 	Move(arm1b, 1, -11, 5)
@@ -65,9 +65,9 @@ local function Open()
 		Sleep(500)
 		Turn(arm1, 1, 0.524, 0.2)
 		
-	Sleep( 150 )
+	Sleep(150)
 
---	SetUnitValue(COB.YARD_OPEN, 1)  --Tobi said its not necessary
+--	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
@@ -103,7 +103,7 @@ local function Close()
 	Turn(pow1, 3, 0, 1)
 	Sleep(600)
 	Turn(narm1, 1, 0, 0.75)
-	Turn(nano1, 1,  0, 0.35)
+	Turn(nano1, 1, 0, 0.35)
 	Turn(door1, 2, 0, 0.35)
 	
 	WaitForTurn(door1, 2)
@@ -136,8 +136,8 @@ function script.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	local buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	while buildprogress < 1 do
-	    Sleep(250)
-	    buildprogress = select(5, Spring.GetUnitHealth(unitID))
+		Sleep(250)
+		buildprogress = select(5, Spring.GetUnitHealth(unitID))
 	end
 	StartThread(padchange)
 end
@@ -165,12 +165,12 @@ function script.QueryLandingPads()
 	return { land }
 end
 
-function script.Activate ( )
-	StartThread( Open ) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
+function script.Activate ()
+	StartThread(Open) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
 end
 
-function script.Deactivate ( )
-	StartThread( Close )
+function script.Deactivate ()
+	StartThread(Close)
 end
 
 --death and wrecks

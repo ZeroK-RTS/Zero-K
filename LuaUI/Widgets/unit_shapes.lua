@@ -366,7 +366,7 @@ local function UpdateUnitListRotation(unitList)
 		if udid and unitConf[udid].velocityHeading then
 			local vx,_,vz = Spring.GetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
-			if speed > 0 then
+			if speed > 0.25 then
 				local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
 				degrot[unitID] = 180 + velHeading * rad_con	
 			end
@@ -449,7 +449,9 @@ function widget:DrawWorldPreUnit()
 		gl.StencilTest(true)
 
 			DrawUnitShapes(visibleSelected, rgba)
-			DrawUnitShapes(visibleAllySelUnits, yellow)
+			if not Spring.IsGUIHidden() then 
+				DrawUnitShapes(visibleAllySelUnits, yellow)
+			end
 
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)

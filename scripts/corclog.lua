@@ -20,39 +20,39 @@ local SIG_RESTORE = 4
 
 -- walk animation
 local function Step(front, back)
-	Turn( front.thigh , x_axis, math.rad(70), math.rad(230) )
-	Turn( front.calf , x_axis, math.rad(20), math.rad(270) )
-	Turn( front.foot , x_axis, math.rad(-100), math.rad(420) )
+	Turn(front.thigh, x_axis, math.rad(70), math.rad(230))
+	Turn(front.calf, x_axis, math.rad(20), math.rad(270))
+	Turn(front.foot, x_axis, math.rad(-100), math.rad(420))
 	
-	Turn( back.thigh , x_axis, math.rad(-20), math.rad(420) )
-	Turn( back.calf , x_axis, math.rad(50), math.rad(420) )
-	Turn( back.foot , x_axis, math.rad(30), math.rad(420) )
+	Turn(back.thigh, x_axis, math.rad(-20), math.rad(420))
+	Turn(back.calf, x_axis, math.rad(50), math.rad(420))
+	Turn(back.foot, x_axis, math.rad(30), math.rad(420))
 	
-	Turn( pelvis , z_axis, math.rad(-(5)), math.rad(40) )
-	Turn( front.thigh , z_axis, math.rad(-(-5)), math.rad(40) )
-	Turn( front.thigh , z_axis, math.rad(-(-5)), math.rad(40) )
-	Move( pelvis , y_axis, 0.7 , 8000 )
+	Turn(pelvis, z_axis, math.rad(-(5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	Turn(front.thigh, z_axis, math.rad(-(-5)), math.rad(40))
+	Move(pelvis, y_axis, 0.7, 8000)
 	
 	WaitForTurn(front.thigh, x_axis)
 	
-	Turn( front.thigh , x_axis, math.rad(-10), math.rad(320) )
-	Turn( front.calf , x_axis, math.rad(-60), math.rad(500) )
-	Turn( front.foot , x_axis, math.rad(70), math.rad(270) )
+	Turn(front.thigh, x_axis, math.rad(-10), math.rad(320))
+	Turn(front.calf, x_axis, math.rad(-60), math.rad(500))
+	Turn(front.foot, x_axis, math.rad(70), math.rad(270))
 	
-	Turn( back.thigh , x_axis, math.rad(40), math.rad(270) )
-	Turn( back.calf , x_axis, math.rad(-40), math.rad(270) )
-	Turn( back.foot , x_axis, 0, math.rad(270) )
+	Turn(back.thigh, x_axis, math.rad(40), math.rad(270))
+	Turn(back.calf, x_axis, math.rad(-40), math.rad(270))
+	Turn(back.foot, x_axis, 0, math.rad(270))
 	
-	Move( pelvis , y_axis, 0, 8000 )
-	Turn( box , x_axis, math.rad(10), math.rad(40) )
+	Move(pelvis, y_axis, 0, 8000)
+	Turn(box, x_axis, math.rad(10), math.rad(40))
 	WaitForTurn(front.calf, x_axis)
 	
-	Turn( box , x_axis, math.rad(-10), math.rad(40) )
+	Turn(box, x_axis, math.rad(-10), math.rad(40))
 end
 
 local function Walk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 	
 	while true do
 		Step(leftLeg, rightLeg)
@@ -89,15 +89,15 @@ end
 local doingSomersault = false
 
 local function jumpTuckInLegs(leg)
-	Turn( leg.thigh , x_axis, math.rad(-120), math.rad(100) )
-	Turn( leg.calf , x_axis, math.rad(-10), math.rad(100) )
-	Turn( leg.foot , x_axis, math.rad(-20), math.rad(100) )
+	Turn(leg.thigh, x_axis, math.rad(-120), math.rad(100))
+	Turn(leg.calf, x_axis, math.rad(-10), math.rad(100))
+	Turn(leg.foot, x_axis, math.rad(-20), math.rad(100))
 end
 
 local function jumpUnTuckLegs(leg)
-	Turn( leg.thigh , x_axis, math.rad(0), math.rad(200) )
-	Turn( leg.calf , x_axis, math.rad(0), math.rad(200) )
-	Turn( leg.foot , x_axis, math.rad(0), math.rad(200) )
+	Turn(leg.thigh, x_axis, math.rad(0), math.rad(200))
+	Turn(leg.calf, x_axis, math.rad(0), math.rad(200))
+	Turn(leg.foot, x_axis, math.rad(0), math.rad(200))
 end
 
 local function somersaultThread(jumpDuration)
@@ -119,27 +119,27 @@ local function somersaultThread(jumpDuration)
 end
 
 local function jumpLegLaunch(leg)
-	Signal( SIG_Walk )
-	Turn( leg.thigh , x_axis, math.rad(0))
-	Turn( leg.calf , x_axis, math.rad(0))
-	Turn( leg.foot , x_axis, math.rad(-40))
+	Signal(SIG_Walk)
+	Turn(leg.thigh, x_axis, math.rad(0))
+	Turn(leg.calf, x_axis, math.rad(0))
+	Turn(leg.foot, x_axis, math.rad(-40))
 	
-	Turn( leg.thigh , x_axis, math.rad(-30), math.rad(100) )
-	Turn( leg.calf , x_axis, math.rad(60), math.rad(500) )
-	Turn( leg.foot , x_axis, math.rad(-10), math.rad(600) )
+	Turn(leg.thigh, x_axis, math.rad(-30), math.rad(100))
+	Turn(leg.calf, x_axis, math.rad(60), math.rad(500))
+	Turn(leg.foot, x_axis, math.rad(-10), math.rad(600))
 end
 
 local function jumpLegLand(leg)
-	Turn( leg.thigh , x_axis, math.rad(0), math.rad(100) )
-	Turn( leg.calf , x_axis, math.rad(-30), math.rad(300) )
-	Turn( leg.foot , x_axis, math.rad(10), math.rad(100) )
+	Turn(leg.thigh, x_axis, math.rad(0), math.rad(100))
+	Turn(leg.calf, x_axis, math.rad(-30), math.rad(300))
+	Turn(leg.foot, x_axis, math.rad(10), math.rad(100))
 end
 
 function beginJump(turn,lineDist,flightDist,duration)
-	Turn( box , x_axis, math.rad(20) )
+	Turn(box, x_axis, math.rad(20))
 	jumpLegLaunch(leftLeg)
 	jumpLegLaunch(rightLeg)
-	Turn( box , x_axis, math.rad(0), math.rad(150) )
+	Turn(box, x_axis, math.rad(0), math.rad(150))
 	
 	doingSomersault = math.random() < 0.15
 	
@@ -158,7 +158,7 @@ function halfJump()
 end
 
 function endJump()
-	Spring.UnitScript.StopSpin(pelvis , x_axis)
+	Spring.UnitScript.StopSpin(pelvis, x_axis)
 	Turn(box, x_axis, math.rad(40),math.rad(400))
 	Move(pelvis, y_axis, -8, 80)
 	jumpLegLand(leftLeg)
@@ -169,16 +169,16 @@ end
 -- Walking
 
 local function Stopping()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 	
-	Move( pelvis , y_axis, 0.000000 , 1.000000 )
-	Turn( rightLeg.thigh, x_axis, 0, math.rad(200) )
-	Turn( rightLeg.calf, x_axis, 0, math.rad(200) )
-	Turn( rightLeg.foot, x_axis, 0, math.rad(200) )
-	Turn( leftLeg.thigh, x_axis, 0, math.rad(200) )
-	Turn( leftLeg.calf, x_axis, 0, math.rad(200) )
-	Turn( leftLeg.foot, x_axis, 0, math.rad(200) )
+	Move(pelvis, y_axis, 0.000000, 1.000000)
+	Turn(rightLeg.thigh, x_axis, 0, math.rad(200))
+	Turn(rightLeg.calf, x_axis, 0, math.rad(200))
+	Turn(rightLeg.foot, x_axis, 0, math.rad(200))
+	Turn(leftLeg.thigh, x_axis, 0, math.rad(200))
+	Turn(leftLeg.calf, x_axis, 0, math.rad(200))
+	Turn(leftLeg.foot, x_axis, 0, math.rad(200))
 end
 
 function script.StartMoving()
@@ -201,20 +201,20 @@ function script.QueryWeapon()
 end
 
 local function RestoreAfterDelay()
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
-	Sleep( 1000)
-	Turn( aimyaw , y_axis, 0, math.rad(135) )
-	Turn( aimpitch , x_axis, 0, math.rad(85) )
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(1000)
+	Turn(aimyaw, y_axis, 0, math.rad(135))
+	Turn(aimpitch, x_axis, 0, math.rad(85))
 end
 
 function script.AimWeapon(num, heading, pitch)
 	
 	StartThread(RestoreAfterDelay)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
-	Turn( aimyaw , y_axis, heading, math.rad(360) ) -- left-right
-	Turn( aimpitch , x_axis, -pitch, math.rad(270) ) --up-down
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	Turn(aimyaw, y_axis, heading, math.rad(360)) -- left-right
+	Turn(aimpitch, x_axis, -pitch, math.rad(270)) --up-down
 	WaitForTurn(aimyaw, y_axis)
 	WaitForTurn(aimpitch, x_axis)
 	gunHeading = heading
@@ -222,13 +222,13 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	Turn( pole , x_axis, math.rad(90), math.rad(40000))
-	Turn( box , x_axis, -math.rad(50), math.rad(40000))
-	Move( box , y_axis, 15, 300)
+	Turn(pole, x_axis, math.rad(90), math.rad(40000))
+	Turn(box, x_axis, -math.rad(50), math.rad(40000))
+	Move(box, y_axis, 15, 300)
 	Sleep(30)
-	Turn( pole , x_axis, math.rad(0), math.rad(80))
-	Turn( box , x_axis, math.rad(0), math.rad(40))
-	Move( box , y_axis, 0, 10)
+	Turn(pole, x_axis, math.rad(0), math.rad(80))
+	Turn(box, x_axis, math.rad(0), math.rad(40))
+	Move(box, y_axis, 0, 10)
 end
 
 
@@ -236,8 +236,8 @@ end
 -- Death
 
 function script.Killed(recentDamage, maxHealth)
-    Explode(box, sfxShatter + sfxSmoke)
-    
+	Explode(box, sfxShatter + sfxSmoke)
+	
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) then
 		return 1 -- corpsetype

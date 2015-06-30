@@ -42,18 +42,18 @@ end
 
 function script.Create()
 	Hide (ground1)
-	Turn( boom, z_axis, math.rad(180))
-	Turn( boom, x_axis, math.rad(60))
-	Turn( boom, y_axis, math.pi)
-	Move( boom, y_axis, 12)
-	Turn( neck, x_axis, -math.rad(120))
+	Turn(boom, z_axis, math.rad(180))
+	Turn(boom, x_axis, math.rad(60))
+	Turn(boom, y_axis, math.pi)
+	Move(boom, y_axis, 12)
+	Turn(neck, x_axis, -math.rad(120))
 	StartThread(SmokeUnit, {base})
 	StartThread(HoveringAnimations)
 	Spring.SetUnitNanoPieces(unitID, {beam})
 end
 
 local function BuildAnim (heading)
-	Turn( boom, y_axis, heading+math.pi, math.rad(200))
+	Turn(boom, y_axis, heading+math.pi, math.rad(200))
 	WaitForTurn (boom, y_axis)
 end
 
@@ -67,7 +67,7 @@ function script.StopBuilding()
 	Spring.SetUnitCOBValue(unitID, COB.INBUILDSTANCE, 0)
 	SetSignalMask (SIG_BUILD)
 	Sleep (5000)
-	Turn( boom, y_axis, math.pi, math.rad(50))
+	Turn(boom, y_axis, math.pi, math.rad(50))
 end
 
 function script.SetSFXoccupy(num)

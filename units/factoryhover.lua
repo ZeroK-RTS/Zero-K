@@ -33,7 +33,7 @@ unitDef = {
     description_de = [[Produziert Aerogleiter, Baut mit 10 M/s]],
     description_pl = [[Buduje poduszkowce, moc 10 m/s]],
     helptext       = [[The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Scrubber, Halberd, Scalpel, Mace, Penetrator]],
-	helptext_de    = [[Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Scrubber, Halberd, Scalpel, Mace, Penetrator]],
+	helptext_de    = [[Die Hovercraft Platform ist schnell und tÃ¶dlich und erÃ¶ffnet dir die MÃ¶glichkeit Wasser und Boden gleichzeitig zu Ã¼berqueren und somit deinen Gegner geschickt zu Ã¼berlisten. Wichtigste Einheiten: Scrubber, Halberd, Scalpel, Mace, Penetrator]],
 	helptext_pl    = [[Poduszkowce sa szybkie i smiercionosne; sa w stanie poruszac sie zarowno na morzu, jak i po ladzie, co pozwala im na okrazenie lub ominiecie przeciwnika. Najwazniejsze jednostki: Scrubber, Halberd, Scalpel, Mace, Penetrator]],
     sortName = [[8]],
 	aimposoffset   = [[0 0 0]],
@@ -68,7 +68,7 @@ unitDef = {
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,
-  yardMap          = [[xooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
+  yardMap          = [[xoooooox ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo ooccccoo xoccccox]],
 
   featureDefs      = {
 

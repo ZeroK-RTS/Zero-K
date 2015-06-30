@@ -71,19 +71,19 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		Explode(brace, sfxSmoke)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxShatter)
 		Explode(door2, sfxShatter)
 		Explode(brace, sfxSmoke)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxShatter)
 		Explode(door1, sfxSmoke + sfxFire)
 		Explode(door2, sfxSmoke + sfxFire)

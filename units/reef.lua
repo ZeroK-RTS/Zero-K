@@ -34,6 +34,7 @@ unitDef = {
     helptext_pl    = [[Najbardziej wielozadaniowy sposrod okretow. Posiada rakiety dalekiego zasiegu i tarcze antyrakietowa, a jego pokład sluzy jako stacja naprawy i dozbrajania samolotow. Ponadto jest w stanie automatycznie produkowac wlasne drony bojowe.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[50]],
+    nuke_coverage  = 1200,
   },
 
   energyUse              = 1.5,
@@ -96,7 +97,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-
+	  
+      customParams            = {
+        nuke_coverage = 1200,
+	  },
+	  
       damage                  = {
         default = 902,
         subs    = 45,
@@ -104,7 +109,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:STARFIRE]],
       fireStarter             = 100,
-      flightTime              = 100,
+      flightTime              = 8,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
@@ -128,7 +133,8 @@ unitDef = {
       name                    = [[Anti-Nuke Missile]],
       areaOfEffect            = 420,
       collideFriendly         = false,
-      coverage                = 1200,
+	  collideGround           = false,
+      coverage                = 100000,
       craterBoost             = 1,
       craterMult              = 2,
 
@@ -139,14 +145,14 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flightTime              = 100,
+      flightTime              = 15,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       interceptor             = 1,
       model                   = [[antinukemissile.s3o]],
       noSelfDamage            = true,
-      range                   = 3500,
+      range                   = 2400,
       reloadtime              = 12,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/vlaunch_hit]],
@@ -155,10 +161,10 @@ unitDef = {
       tolerance               = 4000,
       turnrate                = 65535,
       tracks                  = true,
-      weaponAcceleration      = 400,
-      weaponTimer             = 1,
+      weaponAcceleration      = 800,
+      weaponTimer             = 0.4,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1300,
+      weaponVelocity          = 1600,
     },
 
     carriertargeting   = {

@@ -340,6 +340,21 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+function GG.UnitEcho(unitID, st)
+	st = st or unitID
+	if Spring.ValidUnitID(unitID) then
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.MarkerAddPoint(x,y,z, st)
+	else
+		Spring.Echo("Invalid unitID")
+		Spring.Echo(unitID)
+		Spring.Echo(st)
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 if (gadgetHandler:IsSyncedCode()) then
    
 

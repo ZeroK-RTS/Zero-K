@@ -21,7 +21,7 @@ local is_open = false
 local restore_delay = 2000;
 
 --signals
-local aim  = 2
+local aim = 2
 local open = 8
 local close = 16
 
@@ -69,8 +69,8 @@ end
 
 --closing animation of the factory
 local function Close()
-	Signal( aim )
-	Signal( close )
+	Signal(aim)
+	Signal(close)
 	Signal(open) --kill the opening animation if it is in process
 	SetSignalMask(close) --set the signal to kill the closing animation
 	is_open = false;
@@ -126,13 +126,13 @@ end
 
 -- event handlers
 
-function script.Activate ( )
-	StartThread( Open )
+function script.Activate ()
+	StartThread(Open)
 end
 
-function script.Deactivate ( )
+function script.Deactivate ()
 	is_open = false
-	StartThread( Close )
+	StartThread(Close)
 end
 
 function script.Create()
@@ -152,11 +152,11 @@ function script.AimFromWeapon(n)
 	return aimProxy 
 end
 
-function script.AimWeapon(num, heading, pitch )
-	Signal( aim )
-	SetSignalMask( aim )
+function script.AimWeapon(num, heading, pitch)
+	Signal(aim)
+	SetSignalMask(aim)
 	
-	Turn( belt,  y_axis, heading, math.rad(200));
+	Turn(belt, y_axis, heading, math.rad(200));
 	
 	if (not is_open) then
 		StartThread(Open);
@@ -166,12 +166,12 @@ function script.AimWeapon(num, heading, pitch )
 		end
 	end
 
-	--Turn( cannon, y_axis, heading, 1.2 )
-	Turn( belt,  y_axis, heading, math.rad(200));
-	Turn( wheel, x_axis, -math.rad(30), math.rad(200));
-	Turn( arm, x_axis, math.rad(30),10);
-	Turn( hand, x_axis, math.rad(30),10);
-	Turn( cannon, x_axis, -pitch-math.rad(30),10);
+	--Turn(cannon, y_axis, heading, 1.2)
+	Turn(belt, y_axis, heading, math.rad(200));
+	Turn(wheel, x_axis, -math.rad(30), math.rad(200));
+	Turn(arm, x_axis, math.rad(30),10);
+	Turn(hand, x_axis, math.rad(30),10);
+	Turn(cannon, x_axis, -pitch-math.rad(30),10);
 	 
 	WaitForTurn (belt, y_axis)
 	WaitForTurn (wheel, x_axis)

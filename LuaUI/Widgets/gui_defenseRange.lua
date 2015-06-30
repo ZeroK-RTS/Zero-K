@@ -482,7 +482,7 @@ local function UnitDetected( unitID, isAlly )
 					elseif ( type == 2 ) then
 						tag = currentModConfig["armorTags"] ["air"]
 					elseif ( type == 3 ) then -- antinuke
-						range = weaponDef.coverageRange
+						range = tonumber(weaponDef.customParams and weaponDef.customParams.nuke_coverage or 2500)
 						dps = nil
 						tag = nil
 					end

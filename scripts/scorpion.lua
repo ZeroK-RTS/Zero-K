@@ -36,8 +36,8 @@ local smokePiece = {base, tailgun}
 
 local weaponPieces = {
 	[1] = {aimFrom = body, flare = {body}},
-    [2] = {aimFrom = tailgun, flare = {flare1} },
-    [3] = {aimFrom = tailgun, flare = {flare1} },	
+	[2] = {aimFrom = tailgun, flare = {flare1} },
+	[3] = {aimFrom = tailgun, flare = {flare1} },	
 	[4] = {pivot = gunl, pitch = arml1, aimFrom = gunl, flare = {flare1l, flare2l, flare3l} },
 	[5] = {pivot = gunr, pitch = armr1, aimFrom = gunr, flare = {flare1r, flare2r, flare3r} },
 }
@@ -104,8 +104,8 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
---	Turn( armr1 , z_axis, math.rad(30), 100 )
---	Turn( arml1 , z_axis, math.rad(-30), 100 )
+--	Turn(armr1, z_axis, math.rad(30), 100)
+--	Turn(arml1, z_axis, math.rad(-30), 100)
 end
 
 function script.StartMoving()
@@ -123,13 +123,13 @@ local function RestoreAfterDelay()
 	local turnSpeed = tailTurnSpeed/2
 	local pitchSpeed = tailPitchSpeed/2
 	for i=1, #tailPieces do
-		Turn( tailPieces[i], x_axis, 0, pitchSpeed )
-		Turn( tailPieces[i], y_axis, 0, turnSpeed )
+		Turn(tailPieces[i], x_axis, 0, pitchSpeed)
+		Turn(tailPieces[i], y_axis, 0, turnSpeed)
 	end
 	
 	for i=4,5 do
-		Turn( weaponPieces[i].pivot, y_axis, 0, math.rad(60) )
-		Turn( weaponPieces[i].pitch, x_axis, 0, math.rad(45) )
+		Turn(weaponPieces[i].pivot, y_axis, 0, math.rad(60))
+		Turn(weaponPieces[i].pitch, x_axis, 0, math.rad(45))
 	end
 end
 
@@ -140,20 +140,20 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 2 or num == 3 then
 		if heading > math.pi then heading = -(2 * math.pi - heading) end
 		for i=1, #tailPieces do
-			Turn( tailPieces[i], x_axis, -pitch/6, tailPitchSpeed )
-			Turn( tailPieces[i], y_axis, heading/6, tailTurnSpeed )
+			Turn(tailPieces[i], x_axis, -pitch/6, tailPitchSpeed)
+			Turn(tailPieces[i], y_axis, heading/6, tailTurnSpeed)
 		end
 		WaitForTurn(tailgun, y_axis)
 		WaitForTurn(tailgun, x_axis)
 		StartThread(RestoreAfterDelay)
 	elseif num ~= 1 then
-		Turn( weaponPieces[num].pivot, y_axis, heading, math.rad(120) )
-		Turn( weaponPieces[num].pitch , x_axis, -pitch, math.rad(90) )
+		Turn(weaponPieces[num].pivot, y_axis, heading, math.rad(120))
+		Turn(weaponPieces[num].pitch, x_axis, -pitch, math.rad(90))
 		WaitForTurn(weaponPieces[num].pivot, y_axis)
 		WaitForTurn(weaponPieces[num].pitch, x_axis)
 		StartThread(RestoreAfterDelay)
 	end
-    return true	
+	return true	
 end
 
 function script.AimFromWeapon(num)
@@ -161,7 +161,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-    return weaponPieces[num].flare[gun_cycle[num]]
+	return weaponPieces[num].flare[gun_cycle[num]]
 end
 
 function script.BlockShot(num)
@@ -183,7 +183,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(tail2, sfxNone)
 		Explode(body, sfxNone)
 		Explode(tail1, sfxNone)
@@ -195,7 +195,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(leg6, sfxNone)
 		Explode(tailgun, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(tail2, sfxFall)
 		Explode(body, sfxNone)
 		Explode(tail1, sfxFall)
@@ -207,28 +207,28 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(leg6, sfxFall)
 		Explode(tailgun, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(tail2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+	elseif severity <= .99 then
+		Explode(tail2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxNone)
-		Explode(tail1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg3, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg4, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg5, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg6, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(tail1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg3, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg4, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg5, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg6, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(tailgun, sfxShatter)
 		return 2
 	else
-		Explode(tail2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(tail2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(base, sfxNone)
-		Explode(tail1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg3, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg4, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg5, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(leg6, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(tail1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg3, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg4, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg5, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(leg6, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(tailgun, sfxShatter)
 		return 2
 	end

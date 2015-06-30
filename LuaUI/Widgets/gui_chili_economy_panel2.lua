@@ -183,7 +183,7 @@ function UpdateEconomyDataFromRulesParams()
 	local myOverdrive = spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0
 	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 	local teamEnergyIncome = spGetTeamRulesParam(teamID, "OD_teamEnergyIncome") or 0
-
+	
 	WG.energyWasted = lastEnergyWasted
 	lastEnergyWasted = energyWasted
 	WG.energyForOverdrive = lastEnergyForOverdrive
@@ -198,6 +198,30 @@ function UpdateEconomyDataFromRulesParams()
 	lastMyMetalFromOverdrive = myOverdrive
 	WG.teamEnergyIncome = teamEnergyIncome
 	WG.allies = allies
+	
+	-- Spectators read the reserve state of the player they are spectating.
+	-- Players have the resource bar keep track of reserve locally.
+	if Spring.GetSpectatingState() then
+		local _, mStor = GetTeamResources(teamID, "metal")
+		WG.metalStorageReserve = Spring.GetTeamRulesParam(teamID, "metalReserve") or 0
+		if mStor <= 0 and bar_reserve_metal.bars[1].percent ~= 0 then
+			bar_reserve_metal.bars[1].percent = 0
+			bar_reserve_metal:Invalidate()
+		elseif bar_reserve_metal.bars[1].percent*mStor ~= WG.metalStorageReserve then
+			bar_reserve_metal.bars[1].percent = WG.metalStorageReserve/mStor
+			bar_reserve_metal:Invalidate()
+		end
+		
+		local _, eStor = GetTeamResources(teamID, "energy")
+		WG.energyStorageReserve = Spring.GetTeamRulesParam(teamID, "energyReserve") or 0
+		if eStor <= HIDDEN_STORAGE and bar_reserve_energy.bars[1].percent ~= 0 then
+			bar_reserve_energy.bars[1].percent = 0
+			bar_reserve_energy:Invalidate()
+		elseif bar_reserve_energy.bars[1].percent*(eStor - HIDDEN_STORAGE) ~= WG.energyStorageReserve then
+			bar_reserve_energy.bars[1].percent = WG.energyStorageReserve/(eStor - HIDDEN_STORAGE)
+			bar_reserve_energy:Invalidate()
+		end
+	end
 end
 
 local function updateReserveBars(metal, energy, value, overrideOption)
@@ -281,7 +305,7 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%TEAM_SLOWUPDATE_RATE ~= 2) or not window then 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 0) or not window then 
         return 
     end
 	
@@ -327,7 +351,7 @@ function widget:GameFrame(n)
 		eCurr = eStor -- cap by storage
 	end 
 
-	ePull = ePull - WG.energyWasted/WG.allies
+	ePull = ePull - ((WG.allies > 0 and WG.energyWasted/WG.allies) or 0)
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	local wastingM = mCurr >= mStor * 0.9
@@ -605,7 +629,7 @@ function CreateWindow()
 	local storageX    = "18%"
 	local incomeX     = "44%"
 	local pullX       = "70%"
-	local textY       = "41%"
+	local textY       = "46%"
 	local textWidth   = "45%"
 	local textHeight  = "26%"
 	
@@ -654,7 +678,7 @@ function CreateWindow()
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		caption = "0",
 		autosize = false,
@@ -669,7 +693,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
-		valign = "bottom",
+		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -683,7 +707,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = negativeColourStr.."-0.0",
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -795,7 +819,7 @@ function CreateWindow()
 		y      = textY,
 		height = textWidth,
 		width  = textHeight,
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		caption = "0",
 		autosize = false,
@@ -810,7 +834,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = positiveColourStr.."+0.0",
-		valign = "bottom",
+		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
@@ -824,7 +848,7 @@ function CreateWindow()
 		height = textWidth,
 		width  = textHeight,
 		caption = negativeColourStr.."-0.0",
-		valign = "bottom",
+		valign = "center",
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},

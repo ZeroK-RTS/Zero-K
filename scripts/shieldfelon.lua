@@ -58,83 +58,83 @@ local bAiming = false
 -- functions
 --------------------------------------------------------------------------------
 local function Walk()
-	Signal( SIG_WALK )
-	SetSignalMask( SIG_WALK )
-    
-	while ( true ) do
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
+	while (true) do
 		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
 		Move(pelvis, y_axis, 6.2, 4*speedmult)
-        
-		Turn( l_thigh, x_axis, -1.3, 1.4*speedmult )
-		Turn( l_leg, x_axis, 0.4, 1.4*speedmult )
-		Turn( l_foot, x_axis, 0.8, 1*speedmult )
-        
-		Turn( r_thigh, x_axis, -0.15, 0.9*speedmult )
-		Turn( r_leg, x_axis, 0.8, 0.6*speedmult )
-		Turn( r_foot, x_axis, -0.65, 1.5*speedmult )
 		
-		Sleep( 500/speedmult )
-        
+		Turn(l_thigh, x_axis, -1.3, 1.4*speedmult)
+		Turn(l_leg, x_axis, 0.4, 1.4*speedmult)
+		Turn(l_foot, x_axis, 0.8, 1*speedmult)
+		
+		Turn(r_thigh, x_axis, -0.15, 0.9*speedmult)
+		Turn(r_leg, x_axis, 0.8, 0.6*speedmult)
+		Turn(r_foot, x_axis, -0.65, 1.5*speedmult)
+		
+		Sleep(500/speedmult)
+		
 		Move(pelvis, y_axis, 8.2, 4*speedmult)
 		
-		Turn( l_thigh, x_axis, -0.6, 1.4*speedmult )
-		Turn( l_leg, x_axis, 0.5, 1*speedmult)
-		Turn( l_foot, x_axis, 0.1, 1.4*speedmult )
-        
-		Turn( r_thigh, x_axis, -0.6, 0.9*speedmult )
-		Turn( r_leg, x_axis, -0.3, 2.2*speedmult )
-		Turn( r_foot, x_axis, 0.3, 1.9*speedmult )
+		Turn(l_thigh, x_axis, -0.6, 1.4*speedmult)
+		Turn(l_leg, x_axis, 0.5, 1*speedmult)
+		Turn(l_foot, x_axis, 0.1, 1.4*speedmult)
 		
-		Sleep( 500/speedmult )
+		Turn(r_thigh, x_axis, -0.6, 0.9*speedmult)
+		Turn(r_leg, x_axis, -0.3, 2.2*speedmult)
+		Turn(r_foot, x_axis, 0.3, 1.9*speedmult)
+		
+		Sleep(500/speedmult)
 		
 		Move(pelvis, y_axis, 6, 4*speedmult)
 		
-		Turn( l_thigh, x_axis, -0.15, 0.9*speedmult )
-		Turn( l_leg, x_axis, 0.8, 0.6*speedmult )
-		Turn( l_foot, x_axis, -0.65, 1.5*speedmult )
-        
-		Turn( r_thigh, x_axis, -1.3, 1.4*speedmult )
-		Turn( r_leg, x_axis, 0.4, 1.4*speedmult )
-		Turn( r_foot, x_axis, 0.8, 1*speedmult )
+		Turn(l_thigh, x_axis, -0.15, 0.9*speedmult)
+		Turn(l_leg, x_axis, 0.8, 0.6*speedmult)
+		Turn(l_foot, x_axis, -0.65, 1.5*speedmult)
 		
-		Sleep( 500/speedmult )
+		Turn(r_thigh, x_axis, -1.3, 1.4*speedmult)
+		Turn(r_leg, x_axis, 0.4, 1.4*speedmult)
+		Turn(r_foot, x_axis, 0.8, 1*speedmult)
+		
+		Sleep(500/speedmult)
 		
 		Move(pelvis, y_axis, 8.2, 4*speedmult)
-        
-		Turn( l_thigh, x_axis, -0.6, 0.9*speedmult )
-		Turn( l_leg, x_axis, -0.3, 2.2*speedmult )
-		Turn( l_foot, x_axis, 0.3, 1.9*speedmult )
-        
-		Turn( r_thigh, x_axis, -0.6, 1.4*speedmult )
-		Turn( r_leg, x_axis, 0.5, 1*speedmult)
-		Turn( r_foot, x_axis, 0.1, 1.4*speedmult )
 		
-		Sleep(  500/speedmult )
+		Turn(l_thigh, x_axis, -0.6, 0.9*speedmult)
+		Turn(l_leg, x_axis, -0.3, 2.2*speedmult)
+		Turn(l_foot, x_axis, 0.3, 1.9*speedmult)
+		
+		Turn(r_thigh, x_axis, -0.6, 1.4*speedmult)
+		Turn(r_leg, x_axis, 0.5, 1*speedmult)
+		Turn(r_foot, x_axis, 0.1, 1.4*speedmult)
+		
+		Sleep(500/speedmult)
 	end
 end
 
 local function StopWalk()
-	Signal( SIG_WALK )
-	SetSignalMask( SIG_WALK )
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
 	
 	Move(pelvis, y_axis, 0, 8)
 	
-	Turn( l_thigh, x_axis, 0, 2 )
-	Turn( l_leg, x_axis, 0, 2 )
-	Turn( l_foot, x_axis, 0, 2 )
+	Turn(l_thigh, x_axis, 0, 2)
+	Turn(l_leg, x_axis, 0, 2)
+	Turn(l_foot, x_axis, 0, 2)
 	
-	Turn( r_thigh, x_axis, 0, 2 )
-	Turn( r_leg, x_axis, 0, 2 )
-	Turn( r_foot, x_axis, 0, 2 )
+	Turn(r_thigh, x_axis, 0, 2)
+	Turn(r_leg, x_axis, 0, 2)
+	Turn(r_foot, x_axis, 0, 2)
 end
 
 function script.StartMoving()
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 function script.StopMoving()
-	StartThread( StopWalk )
+	StartThread(StopWalk)
 end
 
 local function FireDelayLoop()
@@ -170,7 +170,7 @@ function script.AimFromWeapon(num) return shot1 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then 
-	    return false 
+		return false 
 	end
 	
 	Signal(SIG_AIM)
@@ -193,7 +193,7 @@ end
 
 function script.BlockShot(num)
 	if num == 2 then
-	    return false
+		return false
 	end
 
 	if aimTime <= 0 then

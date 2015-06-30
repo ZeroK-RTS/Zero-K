@@ -83,7 +83,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighl, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(thighl, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(shinl, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(thighr, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(shinr, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -95,23 +95,23 @@ local function Walk()
 end
 
 local function IdleAnim()
-	Signal( SIG_IDLE)
-	SetSignalMask( SIG_IDLE)
+	Signal(SIG_IDLE)
+	SetSignalMask(SIG_IDLE)
 	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
 	Sleep(3000)
 	while true do
-		Turn( camera , y_axis, math.rad(-30), math.rad(80) )
+		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
-		Turn( camera , y_axis, math.rad(30), math.rad(80) )
-		Turn( forearmr , x_axis, math.rad(-30), math.rad(60) )
+		Turn(camera, y_axis, math.rad(30), math.rad(80))
+		Turn(forearmr, x_axis, math.rad(-30), math.rad(60))
 		idleArmState = true
 		Sleep(3500)
-		Turn( camera , y_axis, math.rad(-30), math.rad(80) )
+		Turn(camera, y_axis, math.rad(-30), math.rad(80))
 		Sleep(3500)
-		Turn( camera , y_axis, math.rad(30), math.rad(80) )	
-		Turn( forearmr , x_axis, 0, math.rad(60) )
+		Turn(camera, y_axis, math.rad(30), math.rad(80))	
+		Turn(forearmr, x_axis, 0, math.rad(60))
 		idleArmState = false
 		Sleep(3500)
 	end
@@ -130,7 +130,7 @@ end
 
 function script.StartMoving()
 	StartThread(Walk)
-	Signal( SIG_IDLE)
+	Signal(SIG_IDLE)
 end
 
 function script.StopMoving()
@@ -143,19 +143,19 @@ end
 
 local function UnpackGunInstant()
 
-	Turn( shoulderr , x_axis, math.rad(-90) )
-	Turn( shoulderl , x_axis, math.rad(-90) )
-	--Turn( forearml , x_axis, math.rad(-90) )
-	Turn( forearml , z_axis, math.rad(-80) )
-	Turn( handl , y_axis, math.rad(-90) )
-	Move( barrel , y_axis, -4.2  )
-	Move( stock , y_axis, 9  )
+	Turn(shoulderr, x_axis, math.rad(-90))
+	Turn(shoulderl, x_axis, math.rad(-90))
+	--Turn(forearml, x_axis, math.rad(-90))
+	Turn(forearml, z_axis, math.rad(-80))
+	Turn(handl, y_axis, math.rad(-90))
+	Move(barrel, y_axis, -4.2)
+	Move(stock, y_axis, 9)
 	gun_unpacked = true
 	return(1)
 end
 
 function script.Create()
-	--Turn( forearmr , x_axis, math.rad(-45), math.rad(280) )
+	--Turn(forearmr, x_axis, math.rad(-45), math.rad(280))
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(UnpackGunInstant)
 	StartThread(IdleAnim)
@@ -173,39 +173,39 @@ end
 -----------------------------------------------------------------------	
 
 local function PackGun()
-	Signal( SIG_IDLE)
-	Signal( SIG_PACK)
-	SetSignalMask( SIG_PACK)
+	Signal(SIG_IDLE)
+	Signal(SIG_PACK)
+	SetSignalMask(SIG_PACK)
 	
 	bCanAim = false
-	Move( barrel , y_axis, 0 , 900 )
-	Move( stock , y_axis, 0 , 1400 )
+	Move(barrel, y_axis, 0, 900)
+	Move(stock, y_axis, 0, 1400)
 
 	WaitForMove(barrel, y_axis)
 	WaitForMove(stock, y_axis)
 		
-	Turn( forearmr  , x_axis, 0, math.rad(140) )
-	--Turn( torso 		, y_axis, 0, math.rad(120) )
-	Turn( forearml , z_axis, 0, math.rad(250) )
-	Turn( handl , y_axis, 0, math.rad(250) )
+	Turn(forearmr, x_axis, 0, math.rad(140))
+	--Turn(torso, y_axis, 0, math.rad(120))
+	Turn(forearml, z_axis, 0, math.rad(250))
+	Turn(handl, y_axis, 0, math.rad(250))
 		
 	WaitForTurn(forearml, z_axis)
-	Turn( shoulderl , x_axis, 0, math.rad(250) )
+	Turn(shoulderl, x_axis, 0, math.rad(250))
 	gun_unpacked = false
 	bCanAim = true
 end
 
 local function UnpackGun()
-	Signal( SIG_IDLE)
-	Signal( SIG_PACK)
-	SetSignalMask( SIG_PACK)
+	Signal(SIG_IDLE)
+	Signal(SIG_PACK)
+	SetSignalMask(SIG_PACK)
 	
-	Turn( forearmr , x_axis, 0, math.rad(200) )
-	Turn( forearml , z_axis, math.rad(-80), math.rad(200) )
-	Turn( handl , y_axis, math.rad(90), math.rad(200) )
+	Turn(forearmr, x_axis, 0, math.rad(200))
+	Turn(forearml, z_axis, math.rad(-80), math.rad(200))
+	Turn(handl, y_axis, math.rad(90), math.rad(200))
 	WaitForTurn(forearml, z_axis)
-	Move( barrel , y_axis, -4.2 , 900 )
-	Move( stock , y_axis, 9 , 1400 )
+	Move(barrel, y_axis, -4.2, 900)
+	Move(stock, y_axis, 9, 1400)
 	WaitForMove(barrel, y_axis)
 	gun_unpacked = true
 end
@@ -215,8 +215,8 @@ local function RestoreAfterDelay()
 	--if the gun is unpacked and we\'re not aiming, close it
 	--if gun_unpacked and not bAiming then
 	--
-		Turn( torso 		, y_axis, 0, math.rad(120) )
-		Turn( shoulderr      , x_axis, math.rad(-90), math.rad(140) )
+		Turn(torso, y_axis, 0, math.rad(120))
+		Turn(shoulderr, x_axis, math.rad(-90), math.rad(140))
 	--	StartThread(PackGun)
 	--end
 	StartThread(IdleAnim)
@@ -225,9 +225,9 @@ end
 	
 function script.AimWeapon(num, heading,pitch)
 
-	Signal( SIG_IDLE)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_IDLE)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	GG.DontFireRadar_CheckAim(unitID)
 	
@@ -236,22 +236,22 @@ function script.AimWeapon(num, heading,pitch)
 		Sleep(100)
 	end
 	bAiming = true
-	Turn( hips , x_axis, 0 )
-	Turn( torso , x_axis, 0 )
-	Turn( camera , y_axis, 0, math.rad(100) )
-	Turn( shoulderr , x_axis, math.rad(-90) - pitch, math.rad(100) )
-	Turn( shoulderl , x_axis, math.rad(-90) - pitch, math.rad(100) )
-	Turn( forearmr , x_axis, 0, math.rad(100) )
+	Turn(hips, x_axis, 0)
+	Turn(torso, x_axis, 0)
+	Turn(camera, y_axis, 0, math.rad(100))
+	Turn(shoulderr, x_axis, math.rad(-90) - pitch, math.rad(100))
+	Turn(shoulderl, x_axis, math.rad(-90) - pitch, math.rad(100))
+	Turn(forearmr, x_axis, 0, math.rad(100))
 	WaitForTurn(shoulderl, x_axis)
 	if not gun_unpacked then
 		UnpackGun()
 	end
-	Turn( torso , y_axis, heading, math.rad(210) )
+	Turn(torso, y_axis, heading, math.rad(210))
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(shoulderr, x_axis)
 	WaitForTurn(forearmr, x_axis)
 	StartThread(RestoreAfterDelay)
-	Turn( camera , y_axis, 0, math.rad(100) )
+	Turn(camera, y_axis, 0, math.rad(100))
 	bAiming = false
 	return(true)
 end
@@ -262,51 +262,51 @@ end
 
 function script.FireWeapon(num)
 --	bCanAim = false
-	Turn( forearmr , x_axis, math.rad(-20), math.rad(300) )
---	Turn( torso , y_axis, math.rad(-20), math.rad(400) )
---	Turn( camera , y_axis, math.rad(20), math.rad(400) )
---	Turn( forearmr , y_axis, math.rad(10), math.rad(400) )
-	Move( barrel , y_axis, 0  )
+	Turn(forearmr, x_axis, math.rad(-20), math.rad(300))
+--	Turn(torso, y_axis, math.rad(-20), math.rad(400))
+--	Turn(camera, y_axis, math.rad(20), math.rad(400))
+--	Turn(forearmr, y_axis, math.rad(10), math.rad(400))
+	Move(barrel, y_axis, 0)
 	Sleep(1000)
 	Sleep(1000)
-	Turn( forearmr , x_axis, 0, math.rad(50) )
---	Turn( torso , y_axis, 0, math.rad(100) )
---	Turn( camera , y_axis, 0, math.rad(150) )
---	Turn( forearmr , y_axis, 0, math.rad(200) )
+	Turn(forearmr, x_axis, 0, math.rad(50))
+--	Turn(torso, y_axis, 0, math.rad(100))
+--	Turn(camera, y_axis, 0, math.rad(150))
+--	Turn(forearmr, y_axis, 0, math.rad(200))
 	Sleep(600)
-	Turn( forearml , z_axis, math.rad(-60), math.rad(120) )
-	Turn( forearmr , z_axis, math.rad(20), math.rad(50) )
-	Turn( forearmr , x_axis, math.rad(-20), math.rad(50) )
+	Turn(forearml, z_axis, math.rad(-60), math.rad(120))
+	Turn(forearmr, z_axis, math.rad(20), math.rad(50))
+	Turn(forearmr, x_axis, math.rad(-20), math.rad(50))
 	WaitForTurn(forearml, z_axis)
 	Sleep(100)
-	Turn( forearml , z_axis, math.rad(-80), math.rad(120) )
-	Turn( forearmr , z_axis, 0, math.rad(50) )
-	Turn( forearmr , x_axis, 0, math.rad(50) )
-	Move( barrel , y_axis, -4.2 , 4 )
+	Turn(forearml, z_axis, math.rad(-80), math.rad(120))
+	Turn(forearmr, z_axis, 0, math.rad(50))
+	Turn(forearmr, x_axis, 0, math.rad(50))
+	Move(barrel, y_axis, -4.2, 4)
 --	bCanAim = true
 end
 	
-function script.Killed( recentDamage, maxHealth)
+function script.Killed(recentDamage, maxHealth)
 	Signal(SIG_MOVE)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then
 		--[[
-		Turn( shinr , x_axis, 0 )	
-		Turn( thighr , x_axis, 0 )
-		Turn( thighl , x_axis, 0 )
-		Turn( shinl , x_axis, 0 )
+		Turn(shinr, x_axis, 0)	
+		Turn(thighr, x_axis, 0)
+		Turn(thighl, x_axis, 0)
+		Turn(shinl, x_axis, 0)
 
 		WaitForTurn(thighl, x_axis)
 		WaitForTurn(thighl, x_axis)
 		Sleep(250)
 
-		Turn( base , x_axis, math.rad(90), math.rad(50) )
-		Turn( hips , x_axis, math.rad(-90), math.rad(50) )
-		Turn( thighr , x_axis, math.rad(-45), math.rad(50) )
-		Turn( thighl , x_axis, math.rad(-45), math.rad(50) )
-		Turn( shinr , x_axis, math.rad(135), math.rad(50) )	
-		Turn( shinl , x_axis, math.rad(135), math.rad(50) )
-		Move( hips , y_axis, -3 , 2000 ) 
+		Turn(base, x_axis, math.rad(90), math.rad(50))
+		Turn(hips, x_axis, math.rad(-90), math.rad(50))
+		Turn(thighr, x_axis, math.rad(-45), math.rad(50))
+		Turn(thighl, x_axis, math.rad(-45), math.rad(50))
+		Turn(shinr, x_axis, math.rad(135), math.rad(50))	
+		Turn(shinl, x_axis, math.rad(135), math.rad(50))
+		Move(hips, y_axis, -3, 2000) 
 
 		WaitForMove(hips, y_axis)		
 		Sleep(2000)]]
@@ -320,16 +320,16 @@ function script.Killed( recentDamage, maxHealth)
 	elseif severity <= .50 then
 		Explode(shoulderl, sfxShatter)
 		Explode(shoulderr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 --		Sleep(200)
-		Explode(torso, sfxShatter )
+		Explode(torso, sfxShatter)
 		
---		Turn( base , x_axis, math.rad(-90), math.rad(50) )
---		Turn( hips , x_axis, math.rad(90), math.rad(50) )
+--		Turn(base, x_axis, math.rad(-90), math.rad(50))
+--		Turn(hips, x_axis, math.rad(90), math.rad(50))
 --		WaitForTurn(base, x_axis)
 --		Sleep(1000)
-    
-		Explode(hips, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
+	
+		Explode(hips, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 1
 	elseif severity <= .99 then
 		Explode(hips, sfxShatter)
@@ -342,9 +342,9 @@ function script.Killed( recentDamage, maxHealth)
 		Explode(thighl, sfxShatter)
 		Explode(shinl, sfxShatter)
 		Explode(shinr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
-		Explode(backpack, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
-		Explode(receiver, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	else
 		Explode(hips, sfxShatter)
@@ -357,9 +357,9 @@ function script.Killed( recentDamage, maxHealth)
 		Explode(thighl, sfxShatter)
 		Explode(shinl, sfxShatter)
 		Explode(shinr, sfxShatter)
-		Explode(camera, SFX.FALL + SFX.SMOKE  + SFX.FIRE + sfxExplode)
-		Explode(backpack, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
-		Explode(receiver, SFX.FALL + SFX.SMOKE  + SFX.FIRE )
+		Explode(camera, SFX.FALL + SFX.SMOKE + SFX.FIRE + sfxExplode)
+		Explode(backpack, SFX.FALL + SFX.SMOKE + SFX.FIRE)
+		Explode(receiver, SFX.FALL + SFX.SMOKE + SFX.FIRE)
 		return 2
 	end
 end

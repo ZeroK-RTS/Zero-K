@@ -10,9 +10,9 @@ local function ReloadQueue(queue, cmdTag)
 	if (not queue) then
 		return
 	end
-    local re = Spring.GetUnitStates(unitID)["repeat"]
+	local re = Spring.GetUnitStates(unitID)["repeat"]
 	local storeParams
-  --// remove finished command
+ --// remove finished command
 	local start = 1
 	if (queue[1])and(cmdTag == queue[1].tag) then
 		start = 2 
@@ -30,15 +30,15 @@ local function ReloadQueue(queue, cmdTag)
 		local cmd = queue[i]
 		local cmdOpt = cmd.options
 		local opts = {"shift"} -- appending
-		if (cmdOpt.alt)   then opts[#opts+1] = "alt"   end
-		if (cmdOpt.ctrl)  then opts[#opts+1] = "ctrl"  end
+		if (cmdOpt.alt) then opts[#opts+1] = "alt" end
+		if (cmdOpt.ctrl) then opts[#opts+1] = "ctrl" end
 		if (cmdOpt.right) then opts[#opts+1] = "right" end
 		Spring.GiveOrderToUnit(unitID, cmd.id, cmd.params, opts)
 	end
 	
 	if re and start == 2 then
 		local cmd = queue[1]
-		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"} )
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"})
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	
@@ -60,7 +60,7 @@ local function ReloadQueue(queue, cmd)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, 0)
 	
 	if re then
-		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"} )
+		spGiveOrderToUnit(unitID, cmd.id, cmd.params, {"shift"})
 	end
 	Spring.GiveOrderToUnit(unitID, CMD.FIRE_STATE, {firestate}, 0)
 	

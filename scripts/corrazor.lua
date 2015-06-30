@@ -26,7 +26,7 @@ local function Close ()
 	WaitForMove (turret, y_axis)
 	if disarmed then return	end
 
-	Turn (door1, z_axis,  math.rad(150),math.rad(125))
+	Turn (door1, z_axis, math.rad(150),math.rad(125))
 	Turn (door2, z_axis, -math.rad(150),math.rad(125))
 	WaitForTurn (door1, z_axis)
 	if disarmed then return	end

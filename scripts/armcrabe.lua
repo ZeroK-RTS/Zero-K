@@ -120,63 +120,63 @@ local function Curl()
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
 	--GG.UpdateUnitAttributes(unitID)
 
-	Move( canon , y_axis, 5 , 2.5 )
-	Move( base , y_axis, -5 , 2.5 )
-	Move( base , z_axis, -5 , 2.5 )
+	Move(canon, y_axis, 5, 2.5)
+	Move(base, y_axis, -5, 2.5)
+	Move(base, z_axis, -5, 2.5)
 	
-	Turn( leg1 , y_axis, math.rad(45), math.rad(35) )
-	Turn( leg4 , y_axis, math.rad(-45), math.rad(35) )
-	Turn( leg2 , y_axis, math.rad(-45), math.rad(35) )
-	Turn( leg3 , y_axis, math.rad(45), math.rad(35) )
+	Turn(leg1, y_axis, math.rad(45), math.rad(35))
+	Turn(leg4, y_axis, math.rad(-45), math.rad(35))
+	Turn(leg2, y_axis, math.rad(-45), math.rad(35))
+	Turn(leg3, y_axis, math.rad(45), math.rad(35))
 	
-	Turn( leg1 , z_axis, math.rad(45), math.rad(35) )
-	Turn( leg4 , z_axis, math.rad(-45), math.rad(35) )
-	Turn( leg2 , z_axis, math.rad(40), math.rad(35) )
-	Turn( leg3 , z_axis, math.rad(-40), math.rad(35) )
+	Turn(leg1, z_axis, math.rad(45), math.rad(35))
+	Turn(leg4, z_axis, math.rad(-45), math.rad(35))
+	Turn(leg2, z_axis, math.rad(40), math.rad(35))
+	Turn(leg3, z_axis, math.rad(-40), math.rad(35))
 	
 	-- preturn (makes sure the legs turn in the right direction)
-	Turn(leg2 , x_axis, math.rad(90), math.rad(95))
-	Turn(leg3 , x_axis, math.rad(90), math.rad(95))
-	Turn(leg1 , x_axis, math.rad(-90), math.rad(95))
-	Turn(leg4 , x_axis, math.rad(-90), math.rad(95))
+	Turn(leg2, x_axis, math.rad(90), math.rad(95))
+	Turn(leg3, x_axis, math.rad(90), math.rad(95))
+	Turn(leg1, x_axis, math.rad(-90), math.rad(95))
+	Turn(leg4, x_axis, math.rad(-90), math.rad(95))
 	Sleep(100)
 	
-	Turn(leg2 , x_axis, math.rad(180), math.rad(95))
-	Turn(leg3 , x_axis, math.rad(180), math.rad(95))
-	Turn(leg1 , x_axis, math.rad(180), math.rad(95))
-	Turn(leg4 , x_axis, math.rad(180), math.rad(95))
+	Turn(leg2, x_axis, math.rad(180), math.rad(95))
+	Turn(leg3, x_axis, math.rad(180), math.rad(95))
+	Turn(leg1, x_axis, math.rad(180), math.rad(95))
+	Turn(leg4, x_axis, math.rad(180), math.rad(95))
 
 	WaitForTurn(leg1, x_axis)
 	WaitForTurn(leg2, x_axis)
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
-	    
-   	bCurling = false
+		
+ 	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
 
 local function ResetLegs()
 	--Spring.Echo("Resetting legs", Spring.GetGameFrame())
-	Turn( leg1 , y_axis, 0, math.rad(35) )
-	Turn( leg2 , y_axis, 0, math.rad(35) )
-	Turn( leg3 , y_axis, 0, math.rad(35) )
-	Turn( leg4 , y_axis, 0, math.rad(35) )
+	Turn(leg1, y_axis, 0, math.rad(35))
+	Turn(leg2, y_axis, 0, math.rad(35))
+	Turn(leg3, y_axis, 0, math.rad(35))
+	Turn(leg4, y_axis, 0, math.rad(35))
 	
-	Turn( leg1 , z_axis, 0, math.rad(25) )
-	Turn( leg2 , z_axis, 0, math.rad(25) )
-	Turn( leg3 , z_axis, 0, math.rad(25) )
-	Turn( leg4 , z_axis, 0, math.rad(25) )
+	Turn(leg1, z_axis, 0, math.rad(25))
+	Turn(leg2, z_axis, 0, math.rad(25))
+	Turn(leg3, z_axis, 0, math.rad(25))
+	Turn(leg4, z_axis, 0, math.rad(25))
 	
 	-- preturn (makes sure the legs turn in the right direction)
-	Turn(leg2 , x_axis, math.rad(90), math.rad(95))
-	Turn(leg3 , x_axis, math.rad(90), math.rad(95))
-	Turn(leg1 , x_axis, math.rad(-90), math.rad(95))
-	Turn(leg4 , x_axis, math.rad(-90), math.rad(95))
+	Turn(leg2, x_axis, math.rad(90), math.rad(95))
+	Turn(leg3, x_axis, math.rad(90), math.rad(95))
+	Turn(leg1, x_axis, math.rad(-90), math.rad(95))
+	Turn(leg4, x_axis, math.rad(-90), math.rad(95))
 	Sleep(100)
-	Turn( leg1 , x_axis, 0, math.rad(95) )
-	Turn( leg2 , x_axis, 0, math.rad(95) )
-	Turn( leg3 , x_axis, 0, math.rad(95) )
-	Turn( leg4 , x_axis, 0, math.rad(95) )
+	Turn(leg1, x_axis, 0, math.rad(95))
+	Turn(leg2, x_axis, 0, math.rad(95))
+	Turn(leg3, x_axis, 0, math.rad(95))
+	Turn(leg4, x_axis, 0, math.rad(95))
 end
 
 local function Uncurl()
@@ -184,14 +184,14 @@ local function Uncurl()
 	bCurling = true
 	
 	ResetLegs()
-	Move( canon , y_axis, 0 , 2.5 )
-	Move( base , y_axis, 0 , 2.5 )
-	Move( base , z_axis, 0 , 2.5 )
+	Move(canon, y_axis, 0, 2.5)
+	Move(base, y_axis, 0, 2.5)
+	Move(base, z_axis, 0, 2.5)
 
 	Sleep(400)
 	--Spring.Echo("disabling armor", Spring.GetGameFrame())
 	Spring.SetUnitArmored(unitID,false)
-    
+	
 	WaitForTurn(leg1, x_axis)
 	WaitForTurn(leg2, x_axis)
 	WaitForTurn(leg3, x_axis)
@@ -205,11 +205,11 @@ end
 
 local function BlinkingLight()
 	while GetUnitValue(COB.BUILD_PERCENT_LEFT) do
-		Sleep( 3000)
+		Sleep(3000)
 	end
 	while true do
-		EmitSfx( blight,  1024+2 )
-		Sleep( 2100)
+		EmitSfx(blight, 1024+2)
+		Sleep(2100)
 	end
 end
 
@@ -241,13 +241,13 @@ end
 
 function script.Create()
 	--set ARMORED to false
-	Hide( flare1)
-	Hide( flare2)
-	Hide( flare3)
-	Hide( flare4)
-	Hide( flare5)
-	Hide( flare6)
-	Hide( flare7)
+	Hide(flare1)
+	Hide(flare2)
+	Hide(flare3)
+	Hide(flare4)
+	Hide(flare5)
+	Hide(flare6)
+	Hide(flare7)
 	
 	StartThread(StartStopMovingControl, StartMoving, StopMoving)
 	
@@ -258,12 +258,12 @@ function script.Create()
 end
 
 local function Rock(anglex, anglez)	
-	Turn( base , z_axis, -anglex, math.rad(50) )
-	Turn( base , x_axis, anglez, math.rad(50) )
+	Turn(base, z_axis, -anglex, math.rad(50))
+	Turn(base, x_axis, anglez, math.rad(50))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, 0, math.rad(20) )
-	Turn( base , x_axis, 0, math.rad(20) )
+	Turn(base, z_axis, 0, math.rad(20))
+	Turn(base, x_axis, 0, math.rad(20))
 end
 	
 function script.RockUnit(anglex, anglez)
@@ -271,32 +271,32 @@ function script.RockUnit(anglex, anglez)
 end
 
 local function RestoreAfterDelay1()
-	Sleep( 3000)
-	Turn( turret , y_axis, 0, math.rad(70) )
-	Turn( canon , x_axis, 0, math.rad(50) )
+	Sleep(3000)
+	Turn(turret, y_axis, 0, math.rad(70))
+	Turn(canon, x_axis, 0, math.rad(50))
 end
 
 local function RestoreAfterDelay2()
-	Sleep( 3000)
-	Turn( rocket , y_axis, 0, math.rad(70) )
-	Turn( rocket , x_axis, 0, math.rad(50) )
+	Sleep(3000)
+	Turn(rocket, y_axis, 0, math.rad(70))
+	Turn(rocket, x_axis, 0, math.rad(50))
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		Signal( SIG_AIM1)
-		SetSignalMask( SIG_AIM1)
-		Turn( turret , y_axis, heading, math.rad(70) )
-		Turn( canon , x_axis, -pitch, math.rad(50) )
+		Signal(SIG_AIM1)
+		SetSignalMask(SIG_AIM1)
+		Turn(turret, y_axis, heading, math.rad(70))
+		Turn(canon, x_axis, -pitch, math.rad(50))
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(canon, x_axis)
 		StartThread(RestoreAfterDelay1)
 		return (not bCurling)
 	elseif num == 2 then
-		Signal( SIG_AIM2)
-		SetSignalMask( SIG_AIM2)
-		Turn( rocket , y_axis, math.rad(heading ), math.rad(190) )
-		Turn( rocket , x_axis, 0, math.rad(150) )
+		Signal(SIG_AIM2)
+		SetSignalMask(SIG_AIM2)
+		Turn(rocket, y_axis, math.rad(heading), math.rad(190))
+		Turn(rocket, x_axis, 0, math.rad(150))
 		WaitForTurn(rocket, y_axis)
 		WaitForTurn(rocket, x_axis)
 		StartThread(RestoreAfterDelay2)
@@ -306,13 +306,13 @@ end
 
 function script.FireWeapon(num)
 	if num == 1 then
-		Move( barrel1 , z_axis, -1.2  )
-		EmitSfx( flare1,  1024+0 )	
-		EmitSfx( gflash,  1024+1 )
-		Move( barrel2 , z_axis, -1.2  )
+		Move(barrel1, z_axis, -1.2)
+		EmitSfx(flare1, 1024+0)	
+		EmitSfx(gflash, 1024+1)
+		Move(barrel2, z_axis, -1.2)
 		Sleep(150)
-		Move( barrel1 , z_axis, 0 , 3 )
-		Move( barrel2 , z_axis, 0 , 3 )
+		Move(barrel1, z_axis, 0, 3)
+		Move(barrel2, z_axis, 0, 3)
 	elseif num == 2 then
 		gun_0 = gun_0 + 1
 		if gun_0 == 3 then
@@ -337,17 +337,17 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		return 1
-	elseif (severity <= .50 ) then
+	elseif (severity <= .50) then
 		Explode(base, sfxNone)
 		Explode(leg1, sfxNone)
 		Explode(leg2, sfxNone)
 		Explode(leg3, sfxNone)
 		Explode(leg4, sfxNone)
 		return 1
-	elseif (severity <= .99 ) then
+	elseif (severity <= .99) then
 		Explode(base, sfxShatter)
 		Explode(leg1, sfxShatter)
 		Explode(leg2, sfxShatter)

@@ -126,33 +126,33 @@ local function openDoors()
 	Sleep(200)
 	doorOpen = true
 	--[[
-	WaitForTurn( LUpperClaw1, z_axis ) 
-	WaitForTurn( RUpperClaw1, z_axis ) 
-	WaitForTurn( LMidClaw1,z_axis )
-	WaitForTurn( RMidClaw1,z_axis )
-	WaitForTurn( LLowClaw1,z_axis )
-	WaitForTurn( RLowClaw1,z_axis )
+	WaitForTurn(LUpperClaw1, z_axis) 
+	WaitForTurn(RUpperClaw1, z_axis) 
+	WaitForTurn(LMidClaw1,z_axis)
+	WaitForTurn(RMidClaw1,z_axis)
+	WaitForTurn(LLowClaw1,z_axis)
+	WaitForTurn(RLowClaw1,z_axis)
 	
-	WaitForTurn( LUpperClaw2, z_axis ) 
-	WaitForTurn( RUpperClaw2, z_axis ) 
-	WaitForTurn( LMidClaw2,z_axis )
-	WaitForTurn( RMidClaw2,z_axis )
-	WaitForTurn( LLowClaw2,z_axis )
-	WaitForTurn( RLowClaw2,z_axis )
+	WaitForTurn(LUpperClaw2, z_axis) 
+	WaitForTurn(RUpperClaw2, z_axis) 
+	WaitForTurn(LMidClaw2,z_axis)
+	WaitForTurn(RMidClaw2,z_axis)
+	WaitForTurn(LLowClaw2,z_axis)
+	WaitForTurn(RLowClaw2,z_axis)
 	
-	WaitForTurn( LUpperClaw3, z_axis ) 
-	WaitForTurn( RUpperClaw3, z_axis ) 
-	WaitForTurn( LMidClaw3,z_axis )
-	WaitForTurn( RMidClaw3,z_axis )
-	WaitForTurn( LLowClaw3,z_axis )
-	WaitForTurn( RLowClaw3,z_axis )
+	WaitForTurn(LUpperClaw3, z_axis) 
+	WaitForTurn(RUpperClaw3, z_axis) 
+	WaitForTurn(LMidClaw3,z_axis)
+	WaitForTurn(RMidClaw3,z_axis)
+	WaitForTurn(LLowClaw3,z_axis)
+	WaitForTurn(RLowClaw3,z_axis)
 	
-	WaitForTurn( LUpperClaw4, z_axis ) 
-	WaitForTurn( RUpperClaw4, z_axis ) 
-	WaitForTurn( LMidClaw4,z_axis )
-	WaitForTurn( RMidClaw4,z_axis )
-	WaitForTurn( LLowClaw4,z_axis )
-	WaitForTurn( RLowClaw4,z_axis )
+	WaitForTurn(LUpperClaw4, z_axis) 
+	WaitForTurn(RUpperClaw4, z_axis) 
+	WaitForTurn(LMidClaw4,z_axis)
+	WaitForTurn(RMidClaw4,z_axis)
+	WaitForTurn(LLowClaw4,z_axis)
+	WaitForTurn(RLowClaw4,z_axis)
 	]]
 end
 
@@ -191,34 +191,34 @@ function closeDoors()
 	Sleep(200)
 	doorOpen = false
 	--[[
-	WaitForTurn( LUpperClaw1, z_axis ) 
-	WaitForTurn( RUpperClaw1, z_axis ) 
-	WaitForTurn( LMidClaw1,z_axis )
-	WaitForTurn( RMidClaw1,z_axis )
-	WaitForTurn( LLowClaw1,z_axis )
-	WaitForTurn( RLowClaw1,z_axis )
+	WaitForTurn(LUpperClaw1, z_axis) 
+	WaitForTurn(RUpperClaw1, z_axis) 
+	WaitForTurn(LMidClaw1,z_axis)
+	WaitForTurn(RMidClaw1,z_axis)
+	WaitForTurn(LLowClaw1,z_axis)
+	WaitForTurn(RLowClaw1,z_axis)
 	
 	
-	WaitForTurn( LUpperClaw2, z_axis ) 
-	WaitForTurn( RUpperClaw2, z_axis ) 
-	WaitForTurn( LMidClaw2,z_axis )
-	WaitForTurn( RMidClaw2,z_axis )
-	WaitForTurn( LLowClaw2,z_axis )
-	WaitForTurn( RLowClaw2,z_axis )
+	WaitForTurn(LUpperClaw2, z_axis) 
+	WaitForTurn(RUpperClaw2, z_axis) 
+	WaitForTurn(LMidClaw2,z_axis)
+	WaitForTurn(RMidClaw2,z_axis)
+	WaitForTurn(LLowClaw2,z_axis)
+	WaitForTurn(RLowClaw2,z_axis)
 	
-	WaitForTurn( LUpperClaw3, z_axis ) 
-	WaitForTurn( RUpperClaw3, z_axis ) 
-	WaitForTurn( LMidClaw3,z_axis )
-	WaitForTurn( RMidClaw3,z_axis )
-	WaitForTurn( LLowClaw3,z_axis )
-	WaitForTurn( RLowClaw3,z_axis )
+	WaitForTurn(LUpperClaw3, z_axis) 
+	WaitForTurn(RUpperClaw3, z_axis) 
+	WaitForTurn(LMidClaw3,z_axis)
+	WaitForTurn(RMidClaw3,z_axis)
+	WaitForTurn(LLowClaw3,z_axis)
+	WaitForTurn(RLowClaw3,z_axis)
 	
-	WaitForTurn( LUpperClaw4, z_axis ) 
-	WaitForTurn( RUpperClaw4, z_axis ) 
-	WaitForTurn( LMidClaw4,z_axis )
-	WaitForTurn( RMidClaw4,z_axis )
-	WaitForTurn( LLowClaw4,z_axis )
-	WaitForTurn( RLowClaw4,z_axis )
+	WaitForTurn(LUpperClaw4, z_axis) 
+	WaitForTurn(RUpperClaw4, z_axis) 
+	WaitForTurn(LMidClaw4,z_axis)
+	WaitForTurn(RMidClaw4,z_axis)
+	WaitForTurn(LLowClaw4,z_axis)
+	WaitForTurn(RLowClaw4,z_axis)
 	]]
 end
 
@@ -268,7 +268,7 @@ function script.Deactivate()
 end
 
 
-function script.QueryTransport( passengerID )
+function script.QueryTransport(passengerID)
 	return link
 end
 
@@ -296,7 +296,7 @@ function getPassengerId()
 	local unitId = nil	
 	
 	if cmd and cmd[1] then					
-		if  cmd[1]['id'] == 75  then -- CMDTYPE.LOAD_UNITS = 75
+		if cmd[1]['id'] == 75 then -- CMDTYPE.LOAD_UNITS = 75
 			unitId = cmd[1]['params'][1]				
 		end
 	end
@@ -317,15 +317,15 @@ end
 --fetch unit id of passenger (from the load command)
 function getDropPoint() 
 	local cmd=Spring.GetUnitCommands(unitID, 1)
-	local dropx, dropy ,dropz = nil	
+	local dropx, dropy,dropz = nil	
 	
 	if cmd and cmd[1] then					
-		if  cmd[1]['id'] == 81  then -- CMDTYPE.LOAD_UNITS = 75
-			dropx, dropy ,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]		
+		if cmd[1]['id'] == 81 then -- CMDTYPE.LOAD_UNITS = 75
+			dropx, dropy,dropz = cmd[1]['params'][1], cmd[1]['params'][2], cmd[1]['params'][3]		
 		end
 	end
 	
-	return {dropx, dropy ,dropz}
+	return {dropx, dropy,dropz}
 end
 
 function isNearPickupPoint(passengerId)
@@ -340,7 +340,7 @@ function isNearPickupPoint(passengerId)
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
 	
-	if dist  < 1000^2 then
+	if dist < 1000^2 then
 		return true
 	else
 		return false
@@ -357,10 +357,10 @@ function isNearDropPoint(transportUnitId)
 	local px2, py2, pz2 = dropPoint[1], dropPoint[2], dropPoint[3]
 	
 	local dx = px - px2
-	local dz = pz - pz2  
+	local dz = pz - pz2 
 	local dist = (dx^2 + dz^2)
 	
-	if dist  < 1000^2 then
+	if dist < 1000^2 then
 		return true
 	else
 		return false
@@ -387,7 +387,7 @@ end
 
 
 
-function script.BeginTransport( passengerID )
+function script.BeginTransport(passengerID)
 	if loaded then 
 		return 
 	end
@@ -419,29 +419,29 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-		Signal( SIG_AIM2)
-		SetSignalMask( SIG_AIM2)
+		Signal(SIG_AIM2)
+		SetSignalMask(SIG_AIM2)
 		
-		Turn( LTurretHinge , y_axis, heading - rad(90), 10)
-		Turn( LTurretVHinge , z_axis, pitch, 10)
+		Turn(LTurretHinge, y_axis, heading - rad(90), 10)
+		Turn(LTurretVHinge, z_axis, pitch, 10)
 		WaitForTurn(LTurretHinge, y_axis)
 		WaitForTurn(LTurretVHinge, z_axis)
 		return true
 	elseif num == 2 then
-		Signal( SIG_AIM3)
-		SetSignalMask( SIG_AIM3)
+		Signal(SIG_AIM3)
+		SetSignalMask(SIG_AIM3)
 		
-		Turn( RTurretHinge , y_axis, rad(90) + heading, 10)
-		Turn( RTurretVHinge , z_axis, -pitch, 10)
+		Turn(RTurretHinge, y_axis, rad(90) + heading, 10)
+		Turn(RTurretVHinge, z_axis, -pitch, 10)
 		WaitForTurn(RTurretHinge, y_axis)
 		WaitForTurn(RTurretVHinge, z_axis)
 		return true
 	elseif num == 3 then
-		Signal( SIG_AIM)
-		SetSignalMask( SIG_AIM)
+		Signal(SIG_AIM)
+		SetSignalMask(SIG_AIM)
 		Turn(FrontGun1,x_axis, -pitch,6)
 		Turn(FrontGun2,x_axis, -pitch,6)
-		WaitForTurn( FrontGun1, x_axis )
+		WaitForTurn(FrontGun1, x_axis)
 		return true
 	end
 	
@@ -476,45 +476,45 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(body, sfxNone )
-		Explode(RUpperClaw1 , sfxShatter	)
+		Explode(body, sfxNone)
+		Explode(RUpperClaw1, sfxShatter	)
 		Explode(RMidClaw1 	, sfxShatter	)
 		Explode(RLowClaw1 	, sfxShatter	)
-		Explode(RUpperClaw2 , sfxShatter	)
+		Explode(RUpperClaw2, sfxShatter	)
 		Explode(RMidClaw2 	, sfxShatter	)
 		Explode(RLowClaw2 	, sfxShatter	)
-		Explode(RUpperClaw3 , sfxShatter	)
+		Explode(RUpperClaw3, sfxShatter	)
 		Explode(RMidClaw3 	, sfxShatter	)
 		Explode(RLowClaw3 	, sfxShatter	)
-		Explode(RUpperClaw4 , sfxShatter	)
+		Explode(RUpperClaw4, sfxShatter	)
 		Explode(RMidClaw4 	, sfxShatter	)
 		return 1
 	elseif severity <= 0.50 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(body, sfxShatter )
-		Explode(RUpperClaw1 , sfxShatter	)
+		Explode(body, sfxShatter)
+		Explode(RUpperClaw1, sfxShatter	)
 		Explode(RMidClaw1 	, sfxShatter	)
 		Explode(RLowClaw1 	, sfxShatter	)
-		Explode(RUpperClaw2 , sfxShatter	)
+		Explode(RUpperClaw2, sfxShatter	)
 		Explode(RMidClaw2 	, sfxShatter	)
 		Explode(RLowClaw2 	, sfxShatter	)
-		Explode(RUpperClaw3 , sfxShatter	)
+		Explode(RUpperClaw3, sfxShatter	)
 		Explode(RMidClaw3 	, sfxShatter	)
 		Explode(RLowClaw3 	, sfxShatter	)
-		Explode(RUpperClaw4 , sfxShatter	)
+		Explode(RUpperClaw4, sfxShatter	)
 		Explode(RMidClaw4 	, sfxShatter	)
 		return 1
 	else
-		Explode(body, sfxShatter )
-		Explode(RUpperClaw1 , sfxShatter	)
+		Explode(body, sfxShatter)
+		Explode(RUpperClaw1, sfxShatter	)
 		Explode(RMidClaw1 	, sfxShatter	)
 		Explode(RLowClaw1 	, sfxShatter	)
-		Explode(RUpperClaw2 , sfxShatter	)
+		Explode(RUpperClaw2, sfxShatter	)
 		Explode(RMidClaw2 	, sfxShatter	)
 		Explode(RLowClaw2 	, sfxShatter	)
-		Explode(RUpperClaw3 , sfxShatter	)
+		Explode(RUpperClaw3, sfxShatter	)
 		Explode(RMidClaw3 	, sfxShatter	)
 		Explode(RLowClaw3 	, sfxShatter	)
-		Explode(RUpperClaw4 , sfxShatter	)
+		Explode(RUpperClaw4, sfxShatter	)
 		Explode(RMidClaw4 	, sfxShatter	)
 		return 2
 	end

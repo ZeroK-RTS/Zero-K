@@ -14,8 +14,8 @@ function script.Activate()
 	Spin (float, y_axis, math.rad(30))
 	Spin (head, y_axis, math.rad(-90))
 	Turn (wings[1], x_axis, math.rad(-50), math.rad(20))
-	Turn (wings[2], z_axis, math.rad( 50), math.rad(20))
-	Turn (wings[3], x_axis, math.rad( 50), math.rad(20))
+	Turn (wings[2], z_axis, math.rad(50), math.rad(20))
+	Turn (wings[3], x_axis, math.rad(50), math.rad(20))
 	Turn (wings[4], z_axis, math.rad(-50), math.rad(20))
 end
 

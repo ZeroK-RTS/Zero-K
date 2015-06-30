@@ -40,8 +40,8 @@ local function RestoreAfterDelay()
 	
 	Sleep(RESTORE_DELAY)
 	
-	Turn( turret , y_axis, math.rad(0 ), math.rad(TURRET_TURN_SPEED/2) )
-	Turn( sleeve , x_axis, math.rad(0 ), math.rad(TURRET_TURN_SPEED/2) )
+	Turn(turret, y_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
+	Turn(sleeve, x_axis, math.rad(0), math.rad(TURRET_TURN_SPEED/2))
 end
 
 
@@ -51,34 +51,34 @@ function AnimationControl()
 	local current_tracks = 0
 	
 	while true do
-		EmitSfx( sparkcenter, 1024 )
+		EmitSfx(sparkcenter, 1024)
 		
-		Move(sparkcenter , z_axis, 2, 1)
-		WaitForMove(sparkcenter , z_axis)
-		Move(sparkcenter , z_axis, 0, 1)
-		WaitForMove(sparkcenter , z_axis)
+		Move(sparkcenter, z_axis, 2, 1)
+		WaitForMove(sparkcenter, z_axis)
+		Move(sparkcenter, z_axis, 0, 1)
+		WaitForMove(sparkcenter, z_axis)
 		
 		if moving or once then
 		
 			if current_tracks == 0 then
 			
-				Show( tracks1)
-				Hide( tracks4)
+				Show(tracks1)
+				Hide(tracks4)
 				current_tracks = current_tracks + 1
 			elseif current_tracks == 1 then
 				
-				Show( tracks2)
-				Hide( tracks1)
+				Show(tracks2)
+				Hide(tracks1)
 				current_tracks = current_tracks + 1
 			elseif current_tracks == 2 then
 			
-				Show( tracks3)
-				Hide( tracks2)
+				Show(tracks3)
+				Hide(tracks2)
 				current_tracks = current_tracks + 1
 			elseif current_tracks == 3 then
 			
-				Show( tracks4)
-				Hide( tracks3)
+				Show(tracks4)
+				Hide(tracks3)
 				current_tracks = 0
 			end
 			
@@ -94,13 +94,13 @@ local function Moving()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	
-	Spin( wheels1 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels2 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels3 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels4 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels5 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels6 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
-	Spin( wheels7 , x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels1, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels2, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels3, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels4, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels5, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels6, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
+	Spin(wheels7, x_axis, WHEEL_TURN_SPEED1, WHEEL_TURN_SPEED1_ACCELERATION)
 end
 
 local function Stopping()
@@ -111,13 +111,13 @@ local function Stopping()
 	-- Probably looks goofy when the unit is turtling,, i.e. does not become faster as time increases..
 	once = animCount*ANIM_SPEED/1000
 
-	StopSpin( wheels1, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels2, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels3, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels4, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels5, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels6, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
-	StopSpin( wheels7, x_axis, WHEEL_TURN_SPEED1_DECELERATION  )
+	StopSpin(wheels1, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels2, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels3, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels4, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels5, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels6, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
+	StopSpin(wheels7, x_axis, WHEEL_TURN_SPEED1_DECELERATION)
 end
 
 
@@ -144,14 +144,14 @@ end
 
 function script.AimWeapon1(heading, pitch)
 	
-	Signal( SIG_AIM1)
-	SetSignalMask( SIG_AIM1)
+	Signal(SIG_AIM1)
+	SetSignalMask(SIG_AIM1)
 	
-	Turn( turret , y_axis, heading, math.rad(TURRET_TURN_SPEED))
-	Turn( sleeve , x_axis, -pitch, math.rad(GUN_TURN_SPEED))
+	Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
+	Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
 	
-	WaitForTurn(turret , y_axis)
-	WaitForTurn(sleeve , x_axis)
+	WaitForTurn(turret, y_axis)
+	WaitForTurn(sleeve, x_axis)
 	
 	StartThread(RestoreAfterDelay)
 	
@@ -164,14 +164,14 @@ function script.AimWeapon1(heading, pitch)
 	local headingDiff = math.abs((heading+pieceHeading)%(math.pi*2) - math.pi)
 	
 	if headingDiff > 2.6 then
-		Turn( turret , y_axis, heading)
-		Turn( sleeve , x_axis, -pitch)
+		Turn(turret, y_axis, heading)
+		Turn(sleeve, x_axis, -pitch)
 		StartThread(RestoreAfterDelay)
 		-- EmitSfx works if the turret takes no time to turn and there is no waitForTurn
 		return true
 	else
-		Turn( turret , y_axis, heading, math.rad(TURRET_TURN_SPEED) )
-		Turn( sleeve , x_axis, -pitch, math.rad(GUN_TURN_SPEED) )
+		Turn(turret, y_axis, heading, math.rad(TURRET_TURN_SPEED))
+		Turn(sleeve, x_axis, -pitch, math.rad(GUN_TURN_SPEED))
 		StartThread(RestoreAfterDelay)
 		return false
 	end
@@ -179,49 +179,49 @@ function script.AimWeapon1(heading, pitch)
 end
 
 local function Recoil()
-	Move( barrel1 , z_axis, -3.5  )
-	Move( barrel2 , z_axis, -3.5  )
+	Move(barrel1, z_axis, -3.5)
+	Move(barrel2, z_axis, -3.5)
 	Sleep(150)
-	Move( barrel1 , z_axis, 0 , 10 )
-	Move( barrel2 , z_axis, 0 , 10 )
+	Move(barrel1, z_axis, 0, 10)
+	Move(barrel2, z_axis, 0, 10)
 end
 
 function script.Shot(num)		
 	--[[
-	Turn( firepoint , y_axis, math.rad(25))
-	EmitSfx( firepoint,  FIRE_W2 )
-	Turn( firepoint , y_axis, - math.rad(25))
-	EmitSfx( firepoint,  FIRE_W2 )
-	Turn( firepoint , y_axis, 0)
+	Turn(firepoint, y_axis, math.rad(25))
+	EmitSfx(firepoint, FIRE_W2)
+	Turn(firepoint, y_axis, - math.rad(25))
+	EmitSfx(firepoint, FIRE_W2)
+	Turn(firepoint, y_axis, 0)
 	--]]
 	StartThread(Recoil)
 end
 
 function script.Killed(severity, corpsetype)
-	if  severity <= 25  then
+	if severity <= 25 then
 	
 		corpsetype = 1
 		Explode(main, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	end
-	if  severity <= 50  then
+	if severity <= 50 then
 	
 		corpsetype = 1
 		Explode(main, sfxNone)
 		Explode(turret,sfxNone)
-		Explode(barrel1, sfxFall + sfxSmoke  + sfxFire )
+		Explode(barrel1, sfxFall + sfxSmoke + sfxFire)
 		return 1
 	else
 	
 		corpsetype = 2
 		Explode(main, sfxNone)
 		Explode(turret, sfxNone)
-		Explode(barrel2, sfxFall + sfxSmoke  + sfxFire )
-		Explode(tracks1, sfxShatter + sfxSmoke  + sfxFire )
-		Hide( tracks2)
-		Hide( tracks3)
-		Hide( tracks4)
+		Explode(barrel2, sfxFall + sfxSmoke + sfxFire)
+		Explode(tracks1, sfxShatter + sfxSmoke + sfxFire)
+		Hide(tracks2)
+		Hide(tracks3)
+		Hide(tracks4)
 		return 2
 	end
 
@@ -231,11 +231,11 @@ end
 function script.Create()
 	moving = false
 	
-	Turn( sparkcenter2 , x_axis, math.rad(7))
+	Turn(sparkcenter2, x_axis, math.rad(7))
 	
-	Hide( tracks1)
-	Hide( tracks2)
-	Hide( tracks3)
+	Hide(tracks1)
+	Hide(tracks2)
+	Hide(tracks3)
 
 	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(250)

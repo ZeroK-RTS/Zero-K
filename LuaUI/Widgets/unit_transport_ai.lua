@@ -15,7 +15,6 @@ function widget:GetInfo()
 end
 
 
-local CONST_IGNORE_BUILDERS = false -- should automated factory transport ignore builders?
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
@@ -54,18 +53,19 @@ local GetSelectedUnits = Spring.GetSelectedUnits
 local GetUnitIsTransporting = Spring.GetUnitIsTransporting
 local GetGroundHeight = Spring.GetGroundHeight
 
-local function IgBuilderChanged()
-  CONST_IGNORE_BUILDERS = options.ignoreBuilders.value
-end
-
-options_path = 'Game'
+options_path = 'Game/Transport AI'
 options = {
-	ignoreBuilders = {
-		name = "Transport AI: Ignore Builders",
+	transportFromFactory = {
+		name = "Transport From Factory",
 		type = "bool",
 		value = false,
-		desc = "Do not pick up builders.",
-		OnChange = IgBuilderChanged,
+		desc = "When enabled newly completed units will be transported to the waypoint of their parent factory.",
+	},
+	ignoreBuilders = {
+		name = "Ignore Constructors From Factory",
+		type = "bool",
+		value = false,
+		desc = "Enable to not transport newly completed constructors.",
 	},
 }
 
@@ -314,9 +314,11 @@ end
 
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders) 
-  if unitTeam == myTeamID then 
+  if unitTeam == myTeamID and options.transportFromFactory.value then 
     local ud = UnitDefs[unitDefID]
-    if (CONST_IGNORE_BUILDERS and ud.isBuilder and ud.canAssist) then return end
+    if (options.ignoreBuilders.value and ud.isBuilder and ud.canAssist) then 
+		return 
+	end
     if (IsTransportable(unitDefID, unitID) and not userOrders) then 
 --      Echo ("new unit from factory "..unitID)
 

@@ -15,7 +15,7 @@ end
 
 function script.AimFromWeapon1() return base end
 
-function script.AimWeapon1( heading, pitch )
+function script.AimWeapon1(heading, pitch)
 	return true
 end
 
@@ -49,7 +49,7 @@ function script.HitByWeapon (x, z, weaponDefID, damage)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( base, SFX.SHATTER )
+	Explode(base, SFX.SHATTER)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
 		return 1 -- corpsetype

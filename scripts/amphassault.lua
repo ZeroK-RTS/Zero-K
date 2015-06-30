@@ -2,7 +2,7 @@ include "constants.lua"
 
 local base, body, turret, torpedo = piece('base', 'body', 'turret', 'torpedo')
 local rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, mflare = piece('rbarrel1', 'rbarrel2', 'lbarrel1', 'lbarrel2', 'rflare', 'lflare', 'mflare')
-local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot =  piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
+local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot = piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
 local vents = {rffoot, lffoot, rbfoot, lbfoot, piece('ventf1', 'ventf2', 'ventr1', 'ventr2', 'ventr3')}
 
@@ -20,80 +20,80 @@ local function Bob()
 	Signal(SIG_BOB)
 	SetSignalMask(SIG_BOB)
 
-	Turn( rfleg, x_axis, math.rad(20),math.rad(60))
-	Turn( rffoot, x_axis, math.rad(-20),math.rad(60))
+	Turn(rfleg, x_axis, math.rad(20),math.rad(60))
+	Turn(rffoot, x_axis, math.rad(-20),math.rad(60))
 	
-	Turn( rbleg, x_axis, math.rad(-20),math.rad(60))
-	Turn( rbfoot, x_axis, math.rad(20),math.rad(60))
+	Turn(rbleg, x_axis, math.rad(-20),math.rad(60))
+	Turn(rbfoot, x_axis, math.rad(20),math.rad(60))
 	
-	Move( rfleg, y_axis, 0,1)
-	Move( rbleg, y_axis, 0,1)
+	Move(rfleg, y_axis, 0,1)
+	Move(rbleg, y_axis, 0,1)
 	
-	Turn( lfleg, x_axis, math.rad(20),math.rad(60))
-	Turn( lffoot, x_axis, math.rad(-20),math.rad(60))
+	Turn(lfleg, x_axis, math.rad(20),math.rad(60))
+	Turn(lffoot, x_axis, math.rad(-20),math.rad(60))
 	
-	Turn( lbleg, x_axis, math.rad(-20),math.rad(60))
-	Turn( lbfoot, x_axis, math.rad(20),math.rad(60))
+	Turn(lbleg, x_axis, math.rad(-20),math.rad(60))
+	Turn(lbfoot, x_axis, math.rad(20),math.rad(60))
 	
-	Move( lfleg, y_axis, 0,1)
-	Move( lbleg, y_axis, 0,1)
+	Move(lfleg, y_axis, 0,1)
+	Move(lbleg, y_axis, 0,1)
 	
 	while true do
 		
-		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
-		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
-		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)) )
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(0,3)), math.rad(math.random(1,2)))
 		Sleep(2000)
 		
 		--[[ Doesn't workm don't know why.
-		Turn( rfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
-		Turn( rffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
 		
-		Turn( rbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
-		Turn( rbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(rbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
 		
-		Turn( lfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
-		Turn( lffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lfleg, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lffoot, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
 		
-		Turn( lbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
-		Turn( lbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lbleg, x_axis, math.rad(-20 + math.random(-2,2)),math.rad(math.random(-2,2)))
+		Turn(lbfoot, x_axis, math.rad(20 + math.random(-2,2)),math.rad(math.random(-2,2)))
 		--]]
 		
-		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
-		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()) )
-		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)) )
+		Turn(base, x_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Turn(base, z_axis, math.rad(math.random(-1,1)), math.rad(math.random()))
+		Move(base, y_axis, math.rad(math.random(-3,0)), math.rad(math.random(1,2)))
 		
 		Sleep(2000)
 	end
 end
 
 local function SinkBubbles()
-    SetSignalMask(SIG_FLOAT)
-    
-	Turn( rfleg, x_axis, math.rad(0),math.rad(20))
-	Turn( rffoot, x_axis, math.rad(0),math.rad(20))
+	SetSignalMask(SIG_FLOAT)
 	
-	Turn( rbleg, x_axis, math.rad(0),math.rad(20))
-	Turn( rbfoot, x_axis, math.rad(0),math.rad(20))
+	Turn(rfleg, x_axis, math.rad(0),math.rad(20))
+	Turn(rffoot, x_axis, math.rad(0),math.rad(20))
 	
-	Move( rfleg, y_axis, 0,1)
-	Move( rbleg, y_axis, 0,1)
+	Turn(rbleg, x_axis, math.rad(0),math.rad(20))
+	Turn(rbfoot, x_axis, math.rad(0),math.rad(20))
 	
-	Turn( lfleg, x_axis, math.rad(0),math.rad(20))
-	Turn( lffoot, x_axis, math.rad(0),math.rad(20))
+	Move(rfleg, y_axis, 0,1)
+	Move(rbleg, y_axis, 0,1)
 	
-	Turn( lbleg, x_axis, math.rad(0),math.rad(20))
-	Turn( lbfoot, x_axis, math.rad(0),math.rad(20))
+	Turn(lfleg, x_axis, math.rad(0),math.rad(20))
+	Turn(lffoot, x_axis, math.rad(0),math.rad(20))
 	
-	Move( lfleg, y_axis, 0,1)
-	Move( lbleg, y_axis, 0,1)
+	Turn(lbleg, x_axis, math.rad(0),math.rad(20))
+	Turn(lbfoot, x_axis, math.rad(0),math.rad(20))
+	
+	Move(lfleg, y_axis, 0,1)
+	Move(lbleg, y_axis, 0,1)
 	
 	while true do
-        for i=1,#vents do
-            EmitSfx(vents[i], SFX.BUBBLE)
-        end
-        Sleep(66)
-    end
+		for i=1,#vents do
+			EmitSfx(vents[i], SFX.BUBBLE)
+		end
+		Sleep(66)
+	end
 end
 
 local function dustBottom()
@@ -113,18 +113,18 @@ end
 function Float_startFromFloor()
 	dustBottom()
 	Signal(SIG_WALK)
-    Signal(SIG_FLOAT)
+	Signal(SIG_FLOAT)
 	StartThread(Bob)
 end
 
 function Float_stopOnFloor()
 	dustBottom()
 	Signal(SIG_BOB)
-    Signal(SIG_FLOAT)
+	Signal(SIG_FLOAT)
 end
 
 function Float_rising()
-    Signal(SIG_FLOAT)
+	Signal(SIG_FLOAT)
 end
 
 function Float_sinking()
@@ -149,8 +149,8 @@ end
 --------------------------------------------------------------------------------------
 
 local gunPieces = {
-    [0] = {flare = lflare, recoil = lbarrel2},
-    [1] = {flare = rflare, recoil = rbarrel2},
+	[0] = {flare = lflare, recoil = lbarrel2},
+	[1] = {flare = rflare, recoil = rbarrel2},
 }
 local gun_1 = 0
 local beamCount = 0
@@ -170,84 +170,84 @@ local function Walk()
 		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 
 		-- right
-		Turn( rfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
-		Turn( rffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
+		Turn(rfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
+		Turn(rffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
 		
-		Turn( rbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
-		Turn( rbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
+		Turn(rbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
 		
-		Move( rfleg, y_axis, 0.6,1.2*speedmult)
-		Move( rbleg, y_axis, 0.6,1.2*speedmult)
+		Move(rfleg, y_axis, 0.6,1.2*speedmult)
+		Move(rbleg, y_axis, 0.6,1.2*speedmult)
 		
 		-- left
-		Turn( lfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
-		Turn( lffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
+		Turn(lfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
+		Turn(lffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
 		
-		Turn( lbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
-		Turn( lbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
+		Turn(lbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
 
-		Move( lfleg, y_axis, 1,4.4*speedmult)
-		Move( lbleg, y_axis, 1,2*speedmult)
+		Move(lfleg, y_axis, 1,4.4*speedmult)
+		Move(lbleg, y_axis, 1,2*speedmult)
 		
-		Move( body, y_axis, 1.5,1*speedmult)
+		Move(body, y_axis, 1.5,1*speedmult)
 		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn( rbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
-		Turn( rbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
+		Turn(rbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
 		
-		Move( rfleg, y_axis, 3.2,5.2*speedmult)
-		Move( rbleg, y_axis, 2,2.8*speedmult)
+		Move(rfleg, y_axis, 3.2,5.2*speedmult)
+		Move(rbleg, y_axis, 2,2.8*speedmult)
 		
 		-- left
-		Turn( lfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
-		Turn( lffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
+		Turn(lfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn(lffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
 		
-		Move( lfleg, y_axis, 0,2*speedmult)
-		Move( lbleg, y_axis, 0,2*speedmult)
+		Move(lfleg, y_axis, 0,2*speedmult)
+		Move(lbleg, y_axis, 0,2*speedmult)
 		
-		Move( body, y_axis, 1,1*speedmult)
+		Move(body, y_axis, 1,1*speedmult)
 		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn( rfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
-		Turn( rffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
+		Turn(rfleg, x_axis, math.rad(-20),math.rad(120)*speedmult)
+		Turn(rffoot, x_axis, math.rad(35),math.rad(150)*speedmult)
 		
-		Turn( rbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
-		Turn( rbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
+		Turn(rbleg, x_axis, math.rad(0),math.rad(45)*speedmult)
+		Turn(rbfoot, x_axis, math.rad(0),math.rad(46)*speedmult)
 		
-		Move( rfleg, y_axis, 1,4.4*speedmult)
-		Move( rbleg, y_axis, 1,2*speedmult)
+		Move(rfleg, y_axis, 1,4.4*speedmult)
+		Move(rbleg, y_axis, 1,2*speedmult)
 		
 		
 		-- left
-		Turn( lfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
-		Turn( lffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
+		Turn(lfleg, x_axis, math.rad(40),math.rad(40)*speedmult)
+		Turn(lffoot, x_axis, math.rad(-40),math.rad(40)*speedmult)
 		
-		Turn( lbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
-		Turn( lbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
+		Turn(lbleg, x_axis, math.rad(5),math.rad(10)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(-40),math.rad(80)*speedmult)
 		
-		Move( lfleg, y_axis, 0.6,1.2*speedmult)
-		Move( lbleg, y_axis, 0.6,1.2*speedmult)
+		Move(lfleg, y_axis, 0.6,1.2*speedmult)
+		Move(lbleg, y_axis, 0.6,1.2*speedmult)
 		
-		Move( body, y_axis, 3,2*speedmult)
+		Move(body, y_axis, 3,2*speedmult)
 		Sleep(500/speedmult) -- ****************
 		
 		-- right
-		Turn( rfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
-		Turn( rffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
+		Turn(rfleg, x_axis, math.rad(0),math.rad(40)*speedmult)
+		Turn(rffoot, x_axis, math.rad(0),math.rad(80)*speedmult)
 		
-		Move( rfleg, y_axis, 0,2)
-		Move( rbleg, y_axis, 0,2)
+		Move(rfleg, y_axis, 0,2)
+		Move(rbleg, y_axis, 0,2)
 		
 		-- left
-		Turn( lbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
-		Turn( lbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
+		Turn(lbleg, x_axis, math.rad(-50),math.rad(110)*speedmult)
+		Turn(lbfoot, x_axis, math.rad(50),math.rad(180)*speedmult)
 		
-		Move( lfleg, y_axis, 3.2,5.2*speedmult)
-		Move( lbleg, y_axis, 2,2.8*speedmult)
+		Move(lfleg, y_axis, 3.2,5.2*speedmult)
+		Move(lbleg, y_axis, 2,2.8*speedmult)
 		
-		Move( body, y_axis, 1,1*speedmult)
+		Move(body, y_axis, 1,1*speedmult)
 		Sleep(500/speedmult) -- ****************
 	end
 end
@@ -256,23 +256,23 @@ local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Turn( rfleg, x_axis, math.rad(0),math.rad(60))
-	Turn( rffoot, x_axis, math.rad(0),math.rad(60))
+	Turn(rfleg, x_axis, math.rad(0),math.rad(60))
+	Turn(rffoot, x_axis, math.rad(0),math.rad(60))
 	
-	Turn( rbleg, x_axis, math.rad(0),math.rad(60))
-	Turn( rbfoot, x_axis, math.rad(0),math.rad(60))
+	Turn(rbleg, x_axis, math.rad(0),math.rad(60))
+	Turn(rbfoot, x_axis, math.rad(0),math.rad(60))
 	
-	Move( rfleg, y_axis, 0,1)
-	Move( rbleg, y_axis, 0,1)
+	Move(rfleg, y_axis, 0,1)
+	Move(rbleg, y_axis, 0,1)
 	
-	Turn( lfleg, x_axis, math.rad(0),math.rad(60))
-	Turn( lffoot, x_axis, math.rad(0),math.rad(60))
+	Turn(lfleg, x_axis, math.rad(0),math.rad(60))
+	Turn(lffoot, x_axis, math.rad(0),math.rad(60))
 	
-	Turn( lbleg, x_axis, math.rad(0),math.rad(60))
-	Turn( lbfoot, x_axis, math.rad(0),math.rad(60))
+	Turn(lbleg, x_axis, math.rad(0),math.rad(60))
+	Turn(lbfoot, x_axis, math.rad(0),math.rad(60))
 	
-	Move( lfleg, y_axis, 0,1)
-	Move( lbleg, y_axis, 0,1)
+	Move(lfleg, y_axis, 0,1)
+	Move(lbleg, y_axis, 0,1)
 end
 
 function script.StartMoving()
@@ -285,11 +285,11 @@ function script.StopMoving()
 end
 
 function script.Create()
-	Turn( rfleg, x_axis, math.rad(0))
-	Turn( rffoot, x_axis, math.rad(0))
+	Turn(rfleg, x_axis, math.rad(0))
+	Turn(rffoot, x_axis, math.rad(0))
 	
-	Turn( rbleg, x_axis, math.rad(0))
-	Turn( rbfoot, x_axis, math.rad(0))
+	Turn(rbleg, x_axis, math.rad(0))
+	Turn(rbfoot, x_axis, math.rad(0))
 end
 
 function script.QueryWeapon(num)
@@ -321,12 +321,12 @@ function script.AimFromWeapon(num)
 end
 
 local function RestoreAfterDelay()
-    Signal(SIG_RESTORE)
-    SetSignalMask(SIG_RESTORE)
-    Sleep(6000)
-    Turn(turret, y_axis, 0, math.rad(90))
-    Turn(lbarrel1, x_axis, 0, math.rad(45))
-    Turn(rbarrel1, x_axis, 0, math.rad(45))    
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(6000)
+	Turn(turret, y_axis, 0, math.rad(90))
+	Turn(lbarrel1, x_axis, 0, math.rad(45))
+	Turn(rbarrel1, x_axis, 0, math.rad(45))	
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -342,7 +342,7 @@ function script.AimWeapon(num, heading, pitch)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 2 then
-		local reloadState = Spring.GetUnitWeaponState(unitID, 1 , 'reloadState')
+		local reloadState = Spring.GetUnitWeaponState(unitID, 1, 'reloadState')
 		if reloadState < 0 or reloadState - Spring.GetGameFrame() < 90 then
 			GG.Floating_AimWeapon(unitID)
 		end
@@ -375,22 +375,22 @@ end
 
 -- should also explode the leg pieces but I really cba...
 function script.Killed(recentDamage, maxHealth)
-    local severity = recentDamage/maxHealth
-    if severity <= .50 then
-        Explode(turret, sfxNone)
-        Explode(body, sfxNone)
-        return 1
-    elseif severity <= .99 then
-        Explode(body, sfxShatter)
-        Explode(turret, sfxShatter)
-        Explode(lbarrel1, sfxFall + sfxSmoke)
-        Explode(rbarrel2, sfxFall + sfxSmoke)
-        return 2
-    else
-        Explode(body, sfxShatter)
-        Explode(turret, sfxShatter)
-        Explode(lbarrel1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
-        Explode(rbarrel2, sfxFall + sfxSmoke + sfxFire + sfxExplode)    
-        return 2
-    end
+	local severity = recentDamage/maxHealth
+	if severity <= .50 then
+		Explode(turret, sfxNone)
+		Explode(body, sfxNone)
+		return 1
+	elseif severity <= .99 then
+		Explode(body, sfxShatter)
+		Explode(turret, sfxShatter)
+		Explode(lbarrel1, sfxFall + sfxSmoke)
+		Explode(rbarrel2, sfxFall + sfxSmoke)
+		return 2
+	else
+		Explode(body, sfxShatter)
+		Explode(turret, sfxShatter)
+		Explode(lbarrel1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rbarrel2, sfxFall + sfxSmoke + sfxFire + sfxExplode)	
+		return 2
+	end
 end

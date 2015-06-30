@@ -153,6 +153,7 @@ local callInLists = {
 	"UnitCmdDone",
 	"UnitPreDamaged",
 	"UnitDamaged",
+	"UnitStunned",
 	"UnitTaken",
 	"UnitGiven",
 	"UnitEnteredRadar",
@@ -201,6 +202,7 @@ local callInLists = {
 	"TerraformComplete",
 	"AllowWeaponTargetCheck",
 	"AllowWeaponTarget",
+	"AllowWeaponInterceptTarget",
 	-- unsynced
 	"DrawUnit",
 	"DrawFeature",
@@ -1353,6 +1355,16 @@ function gadgetHandler:AllowWeaponTarget(attackerID, targetID, attackerWeaponNum
 	return allowed, priority
 end
 
+function gadgetHandler:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)
+	for _, g in ipairs(self.AllowWeaponInterceptTargetList) do
+		if (not g:AllowWeaponInterceptTarget(interceptorUnitID, interceptorWeaponNum, targetProjectileID)) then
+			return false
+		end
+	end
+	
+	return true
+end
+
 --------------------------------------------------------------------------------
 --
 --  Unit call-ins
@@ -1373,6 +1385,12 @@ function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
   return
 end
 
+function gadgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
+  for _,g in ipairs(self.UnitStunnedList) do
+    g:UnitStunned(unitID, unitDefID, unitTeam, stunned)
+  end
+  return
+end
 
 function gadgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
                                        factID, factDefID, userOrders)

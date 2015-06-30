@@ -29,7 +29,7 @@ local function Open()
 	WaitForMove(center2, z_axis)
 	--Sleep(500)
 	
---	SetUnitValue(COB.YARD_OPEN, 1)  --Tobi said its not necessary
+--	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
@@ -74,12 +74,12 @@ function script.QueryNanoPiece()
 	return nano
 end
 
-function script.Activate ( )
-	StartThread( Open ) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
+function script.Activate ()
+	StartThread(Open) --animation needs its own thread because Sleep and WaitForTurn will not work otherwise
 end
 
-function script.Deactivate ( )
-	StartThread( Close )
+function script.Deactivate ()
+	StartThread(Close)
 end
 
 function script.QueryBuildInfo()
