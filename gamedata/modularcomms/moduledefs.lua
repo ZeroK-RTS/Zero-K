@@ -459,7 +459,7 @@ upgrades = {
 					unitDef.idleautoheal = 0
 				end
 				unitDef.idleautoheal = unitDef.idleautoheal + 20
-				unitDef.idletime = 0
+				unitDef.idletime = 300
 			end,
 	},
 	module_companion_drone = {
