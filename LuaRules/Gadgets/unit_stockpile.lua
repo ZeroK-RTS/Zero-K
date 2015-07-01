@@ -45,12 +45,13 @@ for i=1,#UnitDefs do
 			stockTime = stockTime,
 			stockCost = stockCost,
 			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
-			resTable = {
-				m = stockCost/stockTime,
-				e = stockCost/stockTime
-			}
+			perFrameCost = stockCost/stockTime,
 		}
 	end
+end
+
+local function GetStockSpeed(unitID)
+	return (1 - (spGetUnitRulesParam(unitID,"slowState") or 0))
 end
 
 function gadget:GameFrame(n)
@@ -62,27 +63,34 @@ function gadget:GameFrame(n)
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		local def = stockpileUnitDefID[data.unitDefID]
 		if (not (stunned_or_inbuild or disarmed)) and queued > stocked  then
-			if not data.active then
+			
+			local newStockSpeed = GetStockSpeed(unitID)
+			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+					if data.stockSpeed ~= 0 then
+						GG.StopMiscPriorityResourcing(unitID,data.teamID)
+					end
+					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
 				end
-				data.active = true
+				data.stockSpeed = newStockSpeed
+				data.resTable.m = def.perFrameCost*newStockSpeed
+				data.resTable.e = data.resTable.m
 			end
 
-			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and spUseUnitResource(unitID, def.resTable)) then
-				data.progress = data.progress - 1
-				if data.progress == 0 then
+			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, data.resTable.m) and spUseUnitResource(unitID, data.resTable)) then
+				data.progress = data.progress - data.stockSpeed
+				if data.progress <= 0 then
 					spSetUnitStockpile(unitID, stocked + 1)
 					data.progress = def.stockTime
 				end
 				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockTime-data.progress)/def.stockTime)
 			end
 		else
-			if data.active then
+			if data.stockSpeed ~= 0 then
 				if def.stockCost > 0 then
 					GG.StopMiscPriorityResourcing(unitID,data.teamID)
 				end
-				data.active = false
+				data.stockSpeed = 0
 			end
 		end
 	end
@@ -98,7 +106,11 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 			progress = def.stockTime, 
 			unitDefID = unitDefID, 
 			teamID = teamID, 
-			active = false
+			stockSpeed = 0, 
+			resTable = {
+				m = def.perFrameCost,
+				e = def.perFrameCost
+			}
 		}
 		if def.stockCost > 0 then
 			GG.AddMiscPriorityUnit(unitID, teamID)
@@ -119,7 +131,7 @@ end
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if unitsByID[unitID] then
 		unitsByID[unitID].teamID = teamID
-		unitsByID[unitID].active = false
+		unitsByID[unitID].stockSpeed = 0
 	end
 end
 
