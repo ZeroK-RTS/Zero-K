@@ -598,6 +598,24 @@ function calcMainMexDrawList()
 
 			local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
 			local metal = spot.metal
+		
+
+			glPushMatrix()	
+			
+			gl.DepthTest(true)
+
+			glColor(0,0,0,0.7)
+			-- glDepthTest(false)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)	
+			
+			--glColor(0,1,1)
+			--glRect(x-width/2, z+18, x+width/2, z+20)
+			--glDepthTest(false)
+			glPopMatrix()	
 			
 			glPushMatrix()
 			
@@ -639,23 +657,6 @@ function calcMainMexDrawList()
 			end	
 	
 			glPopMatrix()	
-
-			glPushMatrix()	
-			
-			gl.DepthTest(true)
-
-			glColor(0,0,0,0.7)
-			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
-			glDrawGroundCircle(x, 1, z, 40, 21)
-			glColor(mexColor)
-			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)	
-			
-			--glColor(0,1,1)
-			--glRect(x-width/2, z+18, x+width/2, z+20)
-			--glDepthTest(false)
-			glPopMatrix()
 		end
 
 		glLineWidth(1.0)
