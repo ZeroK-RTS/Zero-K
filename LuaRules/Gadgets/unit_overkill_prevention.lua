@@ -196,7 +196,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				local disarmDamage = data.disarmDamage
 				local fullDamage = data.fullDamage
 				
-				Spring.Echo("fullDamage="..fullDamage.." salvoSize="..salvoSize)
+				--Spring.Echo("fullDamage="..fullDamage.." salvoSize="..salvoSize)
 				
 				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first				
 				-----
@@ -212,7 +212,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 								
 								if damageToShield <= expectedShieldPower then  --this shield has absorbed damage
 									relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-									Spring.Echo("Disarm Damage was absorbed by shield")
+									--Spring.Echo("Disarm Damage was absorbed by shield")
 									--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
 									disarmDamage = 0									
 									break
@@ -233,10 +233,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 									
 									if damageToShield <= expectedShieldPower then --this shield has absorbed damage
 										relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-										Spring.Echo("Regular Damage was absorbed by shield")
+										--Spring.Echo("Regular Damage was absorbed by shield")
 										--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
 										fullDamage = fullDamage - damageToShield
-										Spring.Echo("fullDamage="..fullDamage)
+										--Spring.Echo("fullDamage="..fullDamage)
 										break
 									end
 								end
@@ -268,7 +268,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 	
 	block = doomed or disarmed --assume function is not called with both regular and disarming damage types
 	
-	Spring.Echo("Blocked="..tostring(block))
+	--Spring.Echo("Blocked="..tostring(block))
 	
 	
 	if not block then
@@ -295,7 +295,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				local queue = spGetUnitCommands(unitID, 1)
 				local cmd = queue[1]
 				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
-					Spring.Echo("Removing auto-attack command")
+					--Spring.Echo("Removing auto-attack command")
 					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
 					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
