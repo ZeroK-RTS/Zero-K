@@ -241,6 +241,12 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 			local h = Spring.GetGroundHeight(x, z)
 			if h and h >= y then
 				Spring.SetUnitVelocity(unitID, 0,0,0)
+				
+				-- Perhaps attributes should do this:
+				--local env = Spring.UnitScript.GetScriptEnv(unitID)
+				--if env and env.script.StopMoving then
+				--	Spring.UnitScript.CallAsUnit(unitID,env.script.StopMoving, hx, hy, hz)
+				--end
 			end
 		end
 	end

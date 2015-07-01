@@ -52,6 +52,7 @@ unitDef = {
   objectName             = [[spherecloaker.s3o]],
   onoffable              = true,
   pushResistant          = 0,
+  script                 = [[spherecloaker.lua]],
   radarDistanceJam       = 440,
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
