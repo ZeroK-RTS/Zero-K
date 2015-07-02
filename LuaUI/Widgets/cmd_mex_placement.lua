@@ -598,6 +598,24 @@ function calcMainMexDrawList()
 
 			local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
 			local metal = spot.metal
+		
+
+			glPushMatrix()	
+			
+			gl.DepthTest(true)
+
+			glColor(0,0,0,0.7)
+			-- glDepthTest(false)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)	
+			
+			--glColor(0,1,1)
+			--glRect(x-width/2, z+18, x+width/2, z+20)
+			--glDepthTest(false)
+			glPopMatrix()	
 			
 			glPushMatrix()
 			
@@ -621,7 +639,7 @@ function calcMainMexDrawList()
 				glColor(1,1,1)
 				glTexture("LuaUI/Images/ibeam.png")
 				local width = metal*size
-				glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
+				glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
 				glTexture(false)
 			else
 				-- Draws a metal bar at the center of the metal spot
@@ -634,28 +652,11 @@ function calcMainMexDrawList()
 				
 				-- Draws the metal spot's base income "south" of the metal spot
 				glRotate(180,1,0,0)
-				glTranslate(x,-z-20-options.size.value, 0)
+				glTranslate(x,-z-40-options.size.value, 0)
 				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 	
 			glPopMatrix()	
-
-			glPushMatrix()	
-			
-			gl.DepthTest(true)
-
-			glColor(0,0,0,0.7)
-			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
-			glDrawGroundCircle(x, 1, z, 40, 21)
-			glColor(mexColor)
-			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)	
-			
-			--glColor(0,1,1)
-			--glRect(x-width/2, z+18, x+width/2, z+20)
-			--glDepthTest(false)
-			glPopMatrix()
 		end
 
 		glLineWidth(1.0)
