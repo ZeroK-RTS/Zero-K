@@ -189,20 +189,20 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		for i = startIndex, endIndex do
 			local keyValue = incData.frames:GetKV(i)
 			local frame, data = keyValue[1], keyValue[2]
-			--Spring.Echo(frame)
+
 			if frame < gameFrame then
+				--remove old frame data
 				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 			else
-				local disarmDamage = data.disarmDamage
-				local fullDamage = data.fullDamage
-				
-				--Spring.Echo("fullDamage="..fullDamage.." salvoSize="..salvoSize)
+				local disarmDamages = data.disarmDamages
+				local regularDamages = data.regularDamages
 				
 				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first				
-				-----
-				if relevantShields then
-					if disarmDamage > 0 then
-						local damageToShield = disarmDamage * DISARM_DAMAGE_MOD
+
+				if disarmDamages then
+					for idx, damage in pairs(disarmDamages) do
+						local damageToShield = damage * DISARM_DAMAGE_MOD	
+						local absorbed = false
 						for shID, shData in pairs (relevantShields) do
 							local shieldSpeed = shields[shID].speed
 							if spGetUnitSeparation(shID, targetID, true) <= (targetSpeed + shieldSpeed) * (frame - gameFrame) then --this shield can potentially cover this target @frame time
@@ -212,47 +212,51 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 								
 								if damageToShield <= expectedShieldPower then  --this shield has absorbed damage
 									relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-									--Spring.Echo("Disarm Damage was absorbed by shield")
 									--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
-									disarmDamage = 0									
+									absorbed = true
 									break
 								end
 							end
 						end
+						
+						if not absorbed then --this projectile comes through all shields (if any)
+							local disarmExtra = math.floor(damage/adjHealth*DECAY_FRAMES)
+							disarmFrame = disarmFrame + disarmExtra
+							if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
+								disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
+							end
+						end
+						
 					end
-					
-					if fullDamage > 0 then
-						local damageToShield = fullDamage / salvoSize --single projectile damage (from salvo)
-						for num = 1, salvoSize do
-							for shID, shData in pairs (relevantShields) do
-								local shieldSpeed = shields[shID].speed
-								if spGetUnitSeparation(shID, targetID, true) <= (targetSpeed + shieldSpeed) * (frame - gameFrame) then --this shield can potentially cover this target @frame time
+				end
+				
+				if regularDamages then
+					for idx, damage in pairs(regularDamages) do
+						local damageToShield = damage
+						local absorbed = false
+						for shID, shData in pairs (relevantShields) do
+							local shieldSpeed = shields[shID].speed
+							if spGetUnitSeparation(shID, targetID, true) <= (targetSpeed + shieldSpeed) * (frame - gameFrame) then --this shield can potentially cover this target @frame time
+							
+								local expectedShieldPower = shData.curShieldPower + shData.shieldPowerRegen * (frame - gameFrame) / 30 --estimate how powerful shield will be @frame time
+								if expectedShieldPower > shData.shieldPowerMax then expectedShieldPower = shData.shieldPowerMax end --cap shieldPower to maximum power of shield 								
 								
-									local expectedShieldPower = shData.curShieldPower + shData.shieldPowerRegen * (frame - gameFrame) / 30 --estimate how powerful shield will be @frame time
-									if expectedShieldPower > shData.shieldPowerMax then expectedShieldPower = shData.shieldPowerMax end --cap shieldPower to maximum power of shield 								
-									
-									if damageToShield <= expectedShieldPower then --this shield has absorbed damage
-										relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-										--Spring.Echo("Regular Damage was absorbed by shield")
-										--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
-										fullDamage = fullDamage - damageToShield
-										--Spring.Echo("fullDamage="..fullDamage)
-										break
-									end
+								if damageToShield <= expectedShieldPower then  --this shield has absorbed damage
+									relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
+									--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
+									absorbed = true
+									break
 								end
 							end
 						end
+
+						if not absorbed then --this projectile comes through all shields (if any)
+							adjHealth = adjHealth - damage
+						end
+						
 					end
 				end
-				-----
 				
-				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
-				disarmFrame = disarmFrame + disarmExtra
-				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
-					disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
-				end
-					
-				adjHealth = adjHealth - fullDamage
 			end
 		end
 	else --new target
@@ -274,15 +278,27 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
 		local frameData = incData.frames:Get(targetFrame)
-		if frameData then 
-			-- here we have a rare case when few different projectiles (from different attacking units) 
-			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
-			frameData.fullDamage = frameData.fullDamage + fullDamage
-			frameData.disarmDamage = frameData.disarmDamage + disarmDamage
-			incData.frames:Upsert(targetFrame, frameData)
-		else --this case is much more common: such frame does not exist in incData.frames
-			incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
+		if not frameData then frameData = {} end
+		
+		-- damages used to be bluntly summed up, however this approach was just wrong when dealing with shields or disarming missiles.
+		-- For such cases numeric sum of projectile powers gives different outcome to individual projectiles simulation
+		-- Example: 2 projectiles 500 damage each will not penetrate two shields 550 shield power each, however single imaginary 1000 (500+500) damage projectile will penetrate both.
+			
+		if fullDamage > 0 then
+			if not frameData.regularDamages then frameData.regularDamages = {} end
+			local singleDamage = fullDamage / salvoSize				
+			for i = 1, salvoSize do
+				table.insert(frameData.regularDamages, singleDamage)			
+			end
 		end
+		
+		if disarmDamage > 0 then
+			if not frameData.disarmDamages then frameData.disarmDamages = {} end
+			table.insert(frameData.disarmDamages, disarmDamage)
+		end
+		
+		incData.frames:Upsert(targetFrame, frameData)
+		
 		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 	else
 		local teamID = spGetUnitTeam(unitID)
@@ -321,6 +337,7 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)
 		return CheckBlockCommon(unitID, targetID, gameFrame, 0, 1, damage, disarmTimer, timeout)
 	end
+	return false
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
@@ -344,6 +361,7 @@ function GG.OverkillPrevention_CheckBlockSalvo(unitID, targetID, damage, salvoSi
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)
 		return CheckBlockCommon(unitID, targetID, gameFrame, damage, salvoSize, 0, 0, timeout)		
 	end
+	return false
 end
 
 --------------------------------------------------------------------------------
@@ -408,11 +426,12 @@ function gadget:GameFrame(f)
 			end
 		end
 		
-		
-		--Spring.Echo("^^^^^^^^^FRAME^^^^^^^^^")
+		--[[
+		Spring.Echo("^^^^^^^^^FRAME^^^^^^^^^")
 		for k,v in pairs(shieldCoveredUnits) do
-			--Spring.Echo("uId="..k.." is covered with "..#v.." shields")
+			Spring.Echo("uId="..k.." is covered with "..#v.." shields")
 		end
+		]]--
 	end
 end
 
