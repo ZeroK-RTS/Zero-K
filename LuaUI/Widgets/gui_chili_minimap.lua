@@ -103,7 +103,7 @@ local radar_path = 'Settings/Interface/Map'
 options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks',  'minimizable',
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
-'radar_radar_color', 'radar_jammer_color', 
+'radar_radar_color', 'radar_jammer_color', 'radar_radar2_color',
 'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
 options = {
 	start_with_showeco = {
@@ -247,6 +247,13 @@ options = {
 		OnChange = function() updateRadarColors() end,
 		path = radar_path,
 	},
+	radar_radar2_color = {
+		name = "Radar Inside Color",
+		type = "colors",
+		value = { 0, 0.8, 0, 1},
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path,
+	},
 	
 	-- NB: The sum of fog color and los color on each channel needs to be 0.5 in order for the area in los to be the same colour as if fog of war was off (i.e. by hitting 'L')
 	radar_preset_blue_line = {
@@ -258,6 +265,7 @@ options = {
 			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
+			options.radar_radar2_color.value = { 0, 0.8, 0, 1}
 			updateRadarColors()
 		end,
 		path = radar_path,
@@ -272,6 +280,7 @@ options = {
 			options.radar_fog_brightness.value = 0.18
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
+			options.radar_radar2_color.value = { 0, 0.8, 0, 1}
 			updateRadarColors()
 		end,
 		path = radar_path,
@@ -285,6 +294,7 @@ options = {
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
 			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
+			options.radar_radar2_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
 			updateRadarColors()
 		end,
@@ -299,6 +309,7 @@ options = {
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
 			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 0, 0}
+			options.radar_radar2_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
 			updateRadarColors()
 		end,
@@ -385,11 +396,16 @@ function updateRadarColors()
 	local los = {los_value, los_value, los_value, 1}
 	local radar = options.radar_radar_color.value
 	local jam = options.radar_jammer_color.value
-	Spring.SetLosViewColors(
-		{ fog[1], los[1], radar[1], jam[1]},
-		{ fog[2], los[2], radar[2], jam[2]}, 
-		{ fog[3], los[3], radar[3], jam[3]} 
-	)
+	local radar2 = options.radar_radar2_color.value
+	if #{Spring.GetLosViewColors()} == 5 then -- newer engine has radar2
+		Spring.SetLosViewColors(fog, los, radar, jam, radar2)
+	else
+		Spring.SetLosViewColors(
+			{ fog[1], los[1], radar[1], jam[1]},
+			{ fog[2], los[2], radar[2], jam[2]}, 
+			{ fog[3], los[3], radar[3], jam[3]} 
+		)
+	end
 end
 
 function setSensorState(newState)
