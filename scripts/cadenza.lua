@@ -12,9 +12,9 @@ local ruparm, rlarm, rfbarrel1, rfbarrel2, rfflare1, rfflare2 = piece("ruparm", 
 
 local gunIndex = {1,1,1}
 local flares = {
-    {lfflare1, lfflare2, rfflare1, rfflare2},
-    {lbflare1, rbflare1, lbflare2, rbflare2},
-    {base}
+	{lfflare1, lfflare2, rfflare1, rfflare2},
+	{lbflare1, rbflare1, lbflare2, rbflare2},
+	{base}
 }
 
 local smokePiece = {torso}
@@ -88,76 +88,76 @@ local function RestorePose()
 	SetSignalMask(SIG_WALK)
 	
 	Turn(base, x_axis, 0, math.rad(60))
-	Move(pelvis , y_axis, 0 , 1 )
-	Turn(rthigh , x_axis, 0, math.rad(200) )
-	Turn(rleg , x_axis, 0, math.rad(200) )
-	Turn(lthigh , x_axis, 0, math.rad(200) )
-	Turn(lleg , x_axis, 0, math.rad(200) )
+	Move(pelvis, y_axis, 0, 1)
+	Turn(rthigh, x_axis, 0, math.rad(200))
+	Turn(rleg, x_axis, 0, math.rad(200))
+	Turn(lthigh, x_axis, 0, math.rad(200))
+	Turn(lleg, x_axis, 0, math.rad(200))
 	Turn(luparm, x_axis, 0, math.rad(120))
 	Turn(ruparm, x_axis, 0, math.rad(120))
-        
-        Turn(llarm, x_axis, 0, math.rad(180))
-        Turn(rlarm, x_axis, 0, math.rad(180))
+		
+		Turn(llarm, x_axis, 0, math.rad(180))
+		Turn(rlarm, x_axis, 0, math.rad(180))
 	Turn(luparm, z_axis, math.rad(45))
 	Turn(ruparm, z_axis, math.rad(-45))
 end
 
 -- jump stuff
 function preJump(turn,distance)
-        Signal(SIG_WALK)
-        Signal(SIG_RESTORE)
-        bJumping = true
+		Signal(SIG_WALK)
+		Signal(SIG_RESTORE)
+		bJumping = true
 	local radians = turn*2*math.pi/2^16
-        if radians > 0 then
-                if radians > math.rad(120) then
-                    jumpDir = 3
-                elseif radians > math.rad(60) then
-                    jumpDir = 2
-                else
-                    jumpDir = 1
-                end
-        else
-                if radians < math.rad(-120) then
-                    jumpDir = 3
-                elseif radians < math.rad(-60) then
-                    jumpDir = 4
-                else
-                    jumpDir = 1
-                end    
-        end
-        
-        -- coil for jump
-        Move(pelvis, y_axis, -5, 10)
-        Turn(torso, y_axis, 0, math.rad(180))
-        
-        Turn(lthigh, y_axis, math.rad(30), math.rad(60))
-        Turn(rthigh, y_axis, math.rad(-30), math.rad(60))
-        Turn(lthigh, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rthigh, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(lleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
-        
-        Turn(luparm, z_axis, UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
-        Turn(ruparm, z_axis, -UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
-        Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)
-        Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)       
+		if radians > 0 then
+				if radians > math.rad(120) then
+					jumpDir = 3
+				elseif radians > math.rad(60) then
+					jumpDir = 2
+				else
+					jumpDir = 1
+				end
+		else
+				if radians < math.rad(-120) then
+					jumpDir = 3
+				elseif radians < math.rad(-60) then
+					jumpDir = 4
+				else
+					jumpDir = 1
+				end	
+		end
+		
+		-- coil for jump
+		Move(pelvis, y_axis, -5, 10)
+		Turn(torso, y_axis, 0, math.rad(180))
+		
+		Turn(lthigh, y_axis, math.rad(30), math.rad(60))
+		Turn(rthigh, y_axis, math.rad(-30), math.rad(60))
+		Turn(lthigh, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+		Turn(rthigh, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+		Turn(lleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+		Turn(rleg, x_axis, LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED)
+		
+		Turn(luparm, z_axis, UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
+		Turn(ruparm, z_axis, -UPARM_JUMP_COIL_ANGLE, UPARM_JUMP_COIL_SPEED)
+		Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)
+		Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_COIL_SPEED)	 
 end
 
 function beginJump()
-        -- release jump
-        Move(pelvis, y_axis, 0, 24)
-        Turn(lthigh, y_axis, 0, math.rad(180))
-        Turn(rthigh, y_axis, 0, math.rad(180))
-        Turn(lthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
-        Turn(rthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
-        Turn(lleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
-        Turn(rleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
-        
-        --Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
-        --Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
-        Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
-        Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
-        bSomersault = true
+		-- release jump
+		Move(pelvis, y_axis, 0, 24)
+		Turn(lthigh, y_axis, 0, math.rad(180))
+		Turn(rthigh, y_axis, 0, math.rad(180))
+		Turn(lthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
+		Turn(rthigh, x_axis, LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
+		Turn(lleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
+		Turn(rleg, x_axis, -2*LEG_JUMP_RELEASE_ANGLE, LEG_JUMP_RELEASE_SPEED)
+		
+		--Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
+		--Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_RELEASE_SPEED)
+		Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
+		Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_RELEASE_SPEED)
+		bSomersault = true
 end
 
 function jumping()
@@ -170,67 +170,67 @@ end
 
 
 function endJump()
-        EmitSfx(base, 4096 + 2)
-        bJumping = false
-        RestorePose()
+		EmitSfx(base, 4096 + 2)
+		bJumping = false
+		RestorePose()
 end
 
 local function Somersault()
-        Sleep(100)
-        if jumpDir == 1 then
-                Turn(pelvis, x_axis, math.rad(22), math.rad(40))
-        elseif jumpDir == 2 then
-        elseif jumpDir == 3 then
-                Turn(pelvis, x_axis, math.rad(-22), math.rad(40))
-        else
-        end
-        
-        -- curl up body
-        Sleep(600)
-        --Turn(luparm, y_axis, -math.rad(45), UPARM_JUMP_RELEASE_SPEED)
-        --Turn(ruparm, y_axis, math.rad(45), UPARM_JUMP_RELEASE_SPEED)
-        Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
-        Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
-        Turn(lthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
-        Turn(rthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
-        Turn(lleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
-        Turn(rleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
-        Sleep(200)
+		Sleep(100)
+		if jumpDir == 1 then
+				Turn(pelvis, x_axis, math.rad(22), math.rad(40))
+		elseif jumpDir == 2 then
+		elseif jumpDir == 3 then
+				Turn(pelvis, x_axis, math.rad(-22), math.rad(40))
+		else
+		end
+		
+		-- curl up body
+		Sleep(600)
+		--Turn(luparm, y_axis, -math.rad(45), UPARM_JUMP_RELEASE_SPEED)
+		--Turn(ruparm, y_axis, math.rad(45), UPARM_JUMP_RELEASE_SPEED)
+		Turn(llarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
+		Turn(rlarm, x_axis, LARM_JUMP_COIL_ANGLE, LARM_JUMP_RELEASE_SPEED)
+		Turn(lthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
+		Turn(rthigh, x_axis, -math.rad(90), LEG_JUMP_RELEASE_SPEED)
+		Turn(lleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
+		Turn(rleg, x_axis, math.rad(30), LEG_JUMP_RELEASE_SPEED)
+		Sleep(200)
 
-        -- spin
-        if jumpDir == 1 then
-                Turn(pelvis, x_axis, math.rad(200), math.rad(240))
-        elseif jumpDir == 2 then
-        elseif jumpDir == 3 then
-                Turn(pelvis, x_axis, math.rad(-200), math.rad(240))
-        else
-        end
-        WaitForTurn(pelvis, x_axis)
-        Turn(pelvis, x_axis, 0, math.rad(240))
-        
-        -- strike a pose
-        Turn(luparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)
-        Turn(ruparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)        
-        Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
-        Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
-        Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
-        Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
-        
-        Turn(lthigh, x_axis, 1.75*LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED*1.5)
-        Turn(rthigh, x_axis, -math.rad(50), LEG_JUMP_COIL_SPEED*1.5)
-        Turn(lleg, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_RELEASE_SPEED)
-        Turn(rleg, x_axis, math.rad(40), LEG_JUMP_RELEASE_SPEED*1.5)
+		-- spin
+		if jumpDir == 1 then
+				Turn(pelvis, x_axis, math.rad(200), math.rad(240))
+		elseif jumpDir == 2 then
+		elseif jumpDir == 3 then
+				Turn(pelvis, x_axis, math.rad(-200), math.rad(240))
+		else
+		end
+		WaitForTurn(pelvis, x_axis)
+		Turn(pelvis, x_axis, 0, math.rad(240))
+		
+		-- strike a pose
+		Turn(luparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)
+		Turn(ruparm, y_axis, 0, UPARM_JUMP_COIL_SPEED*1.5)		
+		Turn(luparm, z_axis, UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
+		Turn(ruparm, z_axis, -UPARM_JUMP_RELEASE_ANGLE, UPARM_JUMP_COIL_SPEED*1.5)
+		Turn(llarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
+		Turn(rlarm, x_axis, LARM_JUMP_RELEASE_ANGLE, LARM_JUMP_COIL_SPEED*1.5)
+		
+		Turn(lthigh, x_axis, 1.75*LEG_JUMP_COIL_ANGLE, LEG_JUMP_COIL_SPEED*1.5)
+		Turn(rthigh, x_axis, -math.rad(50), LEG_JUMP_COIL_SPEED*1.5)
+		Turn(lleg, x_axis, -LEG_JUMP_COIL_ANGLE, LEG_JUMP_RELEASE_SPEED)
+		Turn(rleg, x_axis, math.rad(40), LEG_JUMP_RELEASE_SPEED*1.5)
 end
 
 -- needed because the gadgets throw tantrums if you start a thread in the above functions
 function SomersaultLoop()
-        while true do
-                if bSomersault then
-                        bSomersault = false
-                        Somersault()
-                end
-                Sleep(100)    
-        end
+		while true do
+				if bSomersault then
+						bSomersault = false
+						Somersault()
+				end
+				Sleep(100)	
+		end
 end
 
 -- not jump stuff
@@ -256,7 +256,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -274,17 +274,17 @@ end
 function script.Create()
 	Turn(luparm, z_axis, math.rad(45))
 	Turn(ruparm, z_axis, math.rad(-45))
-        Turn(lbflare1, x_axis, math.rad(-120))
-        Turn(lbflare2, x_axis, math.rad(-120))
-        Turn(rbflare1, x_axis, math.rad(-120))
-        Turn(rbflare2, x_axis, math.rad(-120))
-        Turn(lbflare1, y_axis, math.rad(-45))
-        Turn(lbflare2, y_axis, math.rad(-45))
-        Turn(rbflare1, y_axis, math.rad(45))
-        Turn(rbflare2, y_axis, math.rad(45))       
-        
+		Turn(lbflare1, x_axis, math.rad(-120))
+		Turn(lbflare2, x_axis, math.rad(-120))
+		Turn(rbflare1, x_axis, math.rad(-120))
+		Turn(rbflare2, x_axis, math.rad(-120))
+		Turn(lbflare1, y_axis, math.rad(-45))
+		Turn(lbflare2, y_axis, math.rad(-45))
+		Turn(rbflare1, y_axis, math.rad(45))
+		Turn(rbflare2, y_axis, math.rad(45))	 
+		
 	StartThread(SmokeUnit, smokePiece)
-        StartThread(SomersaultLoop)
+		StartThread(SomersaultLoop)
 end
 
 function script.StartMoving() 
@@ -298,50 +298,50 @@ end
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
-        Sleep(RESTORE_DELAY)
-        armsFree = true
-        Turn(torso, y_axis, 0,  TORSO_SPEED_YAW)
-        Turn(luparm, x_axis, 0, ARM_SPEED_PITCH)
-        Turn(ruparm, x_axis, 0, ARM_SPEED_PITCH)
+		Sleep(RESTORE_DELAY)
+		armsFree = true
+		Turn(torso, y_axis, 0, TORSO_SPEED_YAW)
+		Turn(luparm, x_axis, 0, ARM_SPEED_PITCH)
+		Turn(ruparm, x_axis, 0, ARM_SPEED_PITCH)
 end
 
 
 function script.AimWeapon(num, heading, pitch)
-        if num == 1 then
-                if bJumping then return false end
-                Signal(SIG_AIM)
-                SetSignalMask(SIG_AIM)
-                armsFree = false
-                Turn(torso, y_axis, heading,  TORSO_SPEED_YAW)
-                Turn(luparm, x_axis, -pitch, ARM_SPEED_PITCH)
-                Turn(ruparm, x_axis, -pitch, ARM_SPEED_PITCH)
-                WaitForTurn(torso, y_axis)
-                WaitForTurn(luparm, x_axis)
-                WaitForTurn(ruparm, x_axis)
-        end
-        return true
+		if num == 1 then
+				if bJumping then return false end
+				Signal(SIG_AIM)
+				SetSignalMask(SIG_AIM)
+				armsFree = false
+				Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
+				Turn(luparm, x_axis, -pitch, ARM_SPEED_PITCH)
+				Turn(ruparm, x_axis, -pitch, ARM_SPEED_PITCH)
+				WaitForTurn(torso, y_axis)
+				WaitForTurn(luparm, x_axis)
+				WaitForTurn(ruparm, x_axis)
+		end
+		return true
 end
 
 function script.FireWeapon(num)
 end
 
 function script.Shot(num)
-        gunIndex[num] = gunIndex[num] + 1
-        if gunIndex[num] > 4 then gunIndex[num] = 1 end
-        if num == 1 then
-                EmitSfx(flares[num][gunIndex[num]], 1024)
-                EmitSfx(flares[num][gunIndex[num]], 1026)
-        else
-                EmitSfx(flares[num][gunIndex[num]], 1027)
-        end
+		gunIndex[num] = gunIndex[num] + 1
+		if gunIndex[num] > 4 then gunIndex[num] = 1 end
+		if num == 1 then
+				EmitSfx(flares[num][gunIndex[num]], 1024)
+				EmitSfx(flares[num][gunIndex[num]], 1026)
+		else
+				EmitSfx(flares[num][gunIndex[num]], 1027)
+		end
 end
 
 function script.QueryWeapon(num)
-        return(flares[num][gunIndex[num]])
+		return(flares[num][gunIndex[num]])
 end
 
 function script.AimFromWeapon(num)
-        return torso
+		return torso
 end
 
 function script.Killed(recentDamage, maxHealth)

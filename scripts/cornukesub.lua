@@ -21,7 +21,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
-	Turn (door1, z_axis, math.rad( 90), math.rad(90)*slowMult)
+	Turn (door1, z_axis, math.rad(90), math.rad(90)*slowMult)
 	Turn (door2, z_axis, math.rad(-90), math.rad(90)*slowMult)
 	WaitForTurn (door1, z_axis)
 	Turn (missile, x_axis, math.rad(-90), math.rad(180)*slowMult)

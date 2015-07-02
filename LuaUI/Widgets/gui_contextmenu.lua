@@ -229,7 +229,7 @@ for i = 1, #UnitDefs do
 				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
 				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
 			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)]
+				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
 				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
 				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
 			else
@@ -906,14 +906,15 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
+	local idle_autoheal = ud.customParams.idle_regen and tonumber(ud.customParams.idle_regen) or (ud.idleAutoHeal * 2)
+	if (ud.idleTime < 1800) or (idle_autoheal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
-		if ud.idleTime < 1800 or ud.idleAutoHeal > 5 then
+		if ud.idleTime < 1800 or (idle_autoheal > 5) then
 			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(ud.idleAutoHeal * 2) .. ' HP/s'
+			cells[#cells+1] = numformat(idle_autoheal) .. ' HP/s'
 			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's' -- .. ((ud.wantedHeight > 0) and ' landed' or '')
+			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
 		end
 		if ud.autoHeal > 0 then
 			cells[#cells+1] = ' - Combat regen: '
@@ -1036,20 +1037,12 @@ local function printAbilities(ud)
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.transportMass < 365) and "Light" or "Heavy")
 	end
-	
-	local anti_coverage = 0
-	for i=1, #ud.weapons do
-		local coverage = WeaponDefs[ud.weapons[i].weaponDef].coverageRange
-		if coverage and tonumber(coverage) > anti_coverage then
-			anti_coverage = tonumber(coverage)
-		end
-	end
 
-	if anti_coverage > 0 then
+	if ud.customParams.nuke_coverage then
 		cells[#cells+1] = 'Can intercept strategic nukes'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Coverage:'
-		cells[#cells+1] = anti_coverage .. " elmo"
+		cells[#cells+1] = ud.customParams.nuke_coverage .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end

@@ -23,6 +23,9 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
+
+local startboxString = Spring.GetModOptions().startboxes
+if startboxString then return end -- only use with legacy startboxes
 -- version: 1.02
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

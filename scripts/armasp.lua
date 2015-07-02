@@ -12,10 +12,10 @@ local nanoPieces = {radar}
 local smokePiece = {base,land1,land2,land3,land4}
 
 local function SpinRadar()
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(400)
 	end
-	Spin( radar , y_axis, math.rad(90))
+	Spin(radar, y_axis, math.rad(90))
 end
 
 function script.Create()
@@ -34,30 +34,30 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(land1, sfxNone)
 		Explode(land2, sfxNone)
 		Explode(land3, sfxNone)
 		Explode(land4, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(body, sfxShatter)
 		Explode(land1, sfxNone)
 		Explode(land2, sfxNone)
 		Explode(land3, sfxNone)
 		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 1
-	elseif  severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxNone)
 		Explode(body, sfxShatter)
 		Explode(land1, sfxNone)
 		Explode(land2, sfxNone)
 		Explode(land3, sfxNone)
 		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 		Explode(base, sfxNone)
@@ -66,7 +66,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(land2, sfxNone)
 		Explode(land3, sfxNone)
 		Explode(land4, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end

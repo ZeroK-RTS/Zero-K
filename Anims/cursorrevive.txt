@@ -1,4 +1,4 @@
-hotspot topleft
+hotspot center
 frame  anims/cursorrevive_0.png  1
 frame  anims/cursorrevive_1.png  0.1
 frame  anims/cursorrevive_2.png  0.1

@@ -77,7 +77,7 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(5000)
-	Turn( torso, y_axis, 0, math.rad(65) )
+	Turn(torso, y_axis, 0, math.rad(65))
 	Turn(lnozzle, x_axis, 0, math.rad(180))
 	Turn(rnozzle, x_axis, 0, math.rad(180))
 	Turn(lnozzle, y_axis, math.rad(-1), math.rad(180))
@@ -115,7 +115,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(lfoot, sfxNone)
 		Explode(lleg, sfxNone)
 		Explode(pelvis, sfxNone)
@@ -123,7 +123,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rleg, sfxNone)
 		Explode(torso, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(lfoot, sfxFall)
 		Explode(lleg, sfxFall)
 		Explode(pelvis, sfxFall)
@@ -131,21 +131,21 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rleg, sfxFall)
 		Explode(torso, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+	elseif severity <= .99 then
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(torso, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rleg, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(torso, sfxShatter + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rleg, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(torso, sfxShatter + sfxExplode)
 		return 2
 	end
 end

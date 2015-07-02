@@ -234,6 +234,21 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 	if speedFactor <= 0 then
 		speedFactor = 0
 		decFactor = 100000 -- a unit with 0 decRate will not deccelerate down to it's 0 maxVelocity
+		
+		-- Set the units velocity to zero if it is attached to the ground.
+		local x, y, z = Spring.GetUnitPosition(unitID)
+		if x then
+			local h = Spring.GetGroundHeight(x, z)
+			if h and h >= y then
+				Spring.SetUnitVelocity(unitID, 0,0,0)
+				
+				-- Perhaps attributes should do this:
+				--local env = Spring.UnitScript.GetScriptEnv(unitID)
+				--if env and env.script.StopMoving then
+				--	Spring.UnitScript.CallAsUnit(unitID,env.script.StopMoving, hx, hy, hz)
+				--end
+			end
+		end
 	end
 	if turnAccelFactor <= 0 then
 		turnAccelFactor = 0
@@ -324,7 +339,8 @@ function UpdateUnitAttributes(unitID, frame)
 	-- Increased reload from CAPTURE --
 	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
 	
-	local disarmed = spGetUnitRulesParam(unitID,"disarmed")
+	local disarmed = spGetUnitRulesParam(unitID,"disarmed") or 0
+	local morphDisable = spGetUnitRulesParam(unitID,"morphDisable") or 0
 	
 	-- Unit speed change (like sprint) --
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
@@ -334,12 +350,12 @@ function UpdateUnitAttributes(unitID, frame)
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or disarmed or selfAccelerationChange then
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or disarmed or morphDisable or selfAccelerationChange then
 		local slowMult   = 1-(slowState or 0)
-		local econMult  = (slowMult)*(1 - (disarmed or 0))
-		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)
-		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)
-		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - (disarmed or 0))
+		local econMult  = (slowMult)*(1 - disarmed)*(1 - morphDisable)
+		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)
+		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
+		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
 		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)
 
 		-- Let other gadgets and widgets get the total effect without 
@@ -374,7 +390,7 @@ function UpdateUnitAttributes(unitID, frame)
 	local forcedOff = spGetUnitRulesParam(unitID,"forcedOff")
 	
 	if ud.shieldWeaponDef then
-		if (forcedOff and forcedOff == 1) or (disarmed and disarmed == 1) then
+		if forcedOff == 1 or disarmed == 1 or morphDisable == 1 then
 			Spring.SetUnitShieldState(unitID, -1, false)
 			unitShieldDisabled[unitID] = true
 		elseif unitShieldDisabled[unitID] then
@@ -384,7 +400,7 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 	
 	if ableToForceOff[udid] then
-		if (forcedOff and forcedOff == 1) or (disarmed and disarmed == 1) then
+		if forcedOff == 1 or disarmed == 1 or morphDisable == 1 then
 			changedAtt = true
 			if not unitForcedOff[unitID] then
 				local active = Spring.GetUnitStates(unitID).active
@@ -400,7 +416,7 @@ function UpdateUnitAttributes(unitID, frame)
 		end
 	end
 
-	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1)
+	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (morphDisable == 1)
 	if cloakBlocked then
 		GG.PokeDecloakUnit(unitID, 1)
 	end

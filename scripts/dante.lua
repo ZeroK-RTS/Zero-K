@@ -61,12 +61,11 @@ local SIG_AIM_3 = 8
 local SIG_AIM_4 = 16
 local SIG_RESTORE = 32
 local SIG_IDLE = 64
-local RELOADTIME = 20000
+local RELOADTIME = wd and WeaponDefs[wd].reload*30 or 20*30
 local SALVO_TIME = 1000
 
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
-local reloadTime = wd and WeaponDefs[wd].reload*30 or 20*30
 
 local base_speed = 100
 --------------------------------------------------------------------------------
@@ -80,25 +79,25 @@ local targetHeading = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function RestorePose()
-	Turn( torso , x_axis, 0, math.rad(100) )
+	Turn(torso, x_axis, 0, math.rad(100))
 	
-	Turn( lupleg , x_axis, 0, math.rad(100) )
-	Turn( rupleg , x_axis, 0, math.rad(100) )		
-	Turn( lfoot , x_axis, 0, math.rad(100) )
-	Turn( rfoot , x_axis, 0, math.rad(100) )
-	Turn( lleg , x_axis, 0, math.rad(100) )
-	Turn( rleg , x_axis, 0, math.rad(100) )
-	Turn( ltoef , x_axis, 0, math.rad(100) )
-	Turn( ltoer , x_axis, 0, math.rad(100) )
-	Turn( rtoef , x_axis, 0, math.rad(100) )
-	Turn( rtoer , x_axis, 0, math.rad(100) )
+	Turn(lupleg, x_axis, 0, math.rad(100))
+	Turn(rupleg, x_axis, 0, math.rad(100))		
+	Turn(lfoot, x_axis, 0, math.rad(100))
+	Turn(rfoot, x_axis, 0, math.rad(100))
+	Turn(lleg, x_axis, 0, math.rad(100))
+	Turn(rleg, x_axis, 0, math.rad(100))
+	Turn(ltoef, x_axis, 0, math.rad(100))
+	Turn(ltoer, x_axis, 0, math.rad(100))
+	Turn(rtoef, x_axis, 0, math.rad(100))
+	Turn(rtoer, x_axis, 0, math.rad(100))
 
 	Move(pelvis, y_axis, 0, 5)
 end
 
 local function IdleAnim()
-	Signal( SIG_IDLE )
-	SetSignalMask( SIG_IDLE )
+	Signal(SIG_IDLE)
+	SetSignalMask(SIG_IDLE)
 	Sleep(12000)
 	while true do
 		Turn(torso, y_axis, math.rad(15), math.rad(60))
@@ -123,27 +122,27 @@ local function IdleAnim()
 end
 
 local function RestoreAfterDelay()
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(8000)
 	--torso	
 	if not dead then
-		Turn( torso , y_axis, 0, math.rad(100) )
+		Turn(torso, y_axis, 0, math.rad(100))
 		
-		Turn( ruparm , x_axis, 0, math.rad(250) ) 
-		Turn( ruparm , y_axis, 0, math.rad(250) ) 
-		Turn( ruparm , z_axis, math.rad(-(0)), math.rad(250) ) 
-		Turn( rarm , x_axis, 0, math.rad(250) )      --up 2
-		Turn( rarm , y_axis, 0, math.rad(250) )  
-		Turn( rarm , z_axis, math.rad(-(0)), math.rad(250) )    --up -12
-		Turn( flagellum , x_axis, 0, math.rad(90) )
+		Turn(ruparm, x_axis, 0, math.rad(250)) 
+		Turn(ruparm, y_axis, 0, math.rad(250)) 
+		Turn(ruparm, z_axis, math.rad(-(0)), math.rad(250)) 
+		Turn(rarm, x_axis, 0, math.rad(250))	 --up 2
+		Turn(rarm, y_axis, 0, math.rad(250)) 
+		Turn(rarm, z_axis, math.rad(-(0)), math.rad(250))	--up -12
+		Turn(flagellum, x_axis, 0, math.rad(90))
 	
-		Turn( luparm , x_axis, 0, math.rad(250) )       --up -9
-		Turn( luparm , y_axis, 0, math.rad(250) )  
-		Turn( luparm , z_axis, math.rad(-(0)), math.rad(250) )  
-		Turn( larm , x_axis, 0, math.rad(250) )       --up 5
-		Turn( larm , y_axis, 0, math.rad(250) )       --up -3
-		Turn( larm , z_axis, math.rad(-(0)), math.rad(250) )       --up 22
+		Turn(luparm, x_axis, 0, math.rad(250))	 --up -9
+		Turn(luparm, y_axis, 0, math.rad(250)) 
+		Turn(luparm, z_axis, math.rad(-(0)), math.rad(250)) 
+		Turn(larm, x_axis, 0, math.rad(250))	 --up 5
+		Turn(larm, y_axis, 0, math.rad(250))	 --up -3
+		Turn(larm, z_axis, math.rad(-(0)), math.rad(250))	 --up 22
 		RestorePose()
 	end
 	StartThread(IdleAnim)
@@ -161,95 +160,95 @@ local function Walk()
 		Turn(ruparm, x_axis, 0, math.rad(240))
 	end
 	while true do
-		Turn( lupleg , x_axis, math.rad(20), math.rad(50.010989) )
-		Turn( rupleg , x_axis, math.rad(-20), math.rad(50.010989) )
-		Turn( lfoot , x_axis, math.rad(-15.016484), math.rad(70.016484) )
-		Turn( rfoot , x_axis, math.rad(5), math.rad(50.010989) )
-		Turn( rleg , x_axis, math.rad(-10), math.rad(70.016484) )
+		Turn(lupleg, x_axis, math.rad(20), math.rad(50.010989))
+		Turn(rupleg, x_axis, math.rad(-20), math.rad(50.010989))
+		Turn(lfoot, x_axis, math.rad(-15.016484), math.rad(70.016484))
+		Turn(rfoot, x_axis, math.rad(5), math.rad(50.010989))
+		Turn(rleg, x_axis, math.rad(-10), math.rad(70.016484))
 		if armsFree then
-			Turn( torso , x_axis, math.rad(-1), math.rad(5) )
-			Turn( ruparm , y_axis, math.rad(-2.50), math.rad(25) )
-			Turn( luparm , y_axis, math.rad(-2.50), math.rad(25) )
+			Turn(torso, x_axis, math.rad(-1), math.rad(5))
+			Turn(ruparm, y_axis, math.rad(-2.50), math.rad(25))
+			Turn(luparm, y_axis, math.rad(-2.50), math.rad(25))
 		end
 		Sleep(304)
 		
-		Turn( lfoot , x_axis, math.rad(20), math.rad(100) )
-		Turn( rfoot , x_axis, math.rad(10), math.rad(50.010989) )
-		Turn( rleg , x_axis, math.rad(20), math.rad(100) )
-		Turn( ltoef , x_axis, math.rad(22), math.rad(100) )
-		Turn( ltoer , x_axis, math.rad(-22), math.rad(100) )
-		Turn( rtoef , x_axis, 0, math.rad(100) )
+		Turn(lfoot, x_axis, math.rad(20), math.rad(100))
+		Turn(rfoot, x_axis, math.rad(10), math.rad(50.010989))
+		Turn(rleg, x_axis, math.rad(20), math.rad(100))
+		Turn(ltoef, x_axis, math.rad(22), math.rad(100))
+		Turn(ltoer, x_axis, math.rad(-22), math.rad(100))
+		Turn(rtoef, x_axis, 0, math.rad(100))
 		Sleep(360)
 		
-		Turn( rtoer , x_axis, 0, math.rad(100) )
-		Move( pelvis , y_axis, 0 , 5 )
-		Turn( pelvis , z_axis, math.rad(-(-3.50)), math.rad(3) )
-		Turn( lupleg , x_axis, math.rad(-20), math.rad(50.010989) )
-		Turn( rupleg , x_axis, math.rad(20), math.rad(50.010989) )
-		Turn( rfoot , x_axis, math.rad(-20), math.rad(130.027473) )
-		Turn( lleg , x_axis, math.rad(-20), math.rad(100) )
+		Turn(rtoer, x_axis, 0, math.rad(100))
+		Move(pelvis, y_axis, 0, 5)
+		Turn(pelvis, z_axis, math.rad(-(-3.50)), math.rad(3))
+		Turn(lupleg, x_axis, math.rad(-20), math.rad(50.010989))
+		Turn(rupleg, x_axis, math.rad(20), math.rad(50.010989))
+		Turn(rfoot, x_axis, math.rad(-20), math.rad(130.027473))
+		Turn(lleg, x_axis, math.rad(-20), math.rad(100))
 		Sleep(650)
 	
-		Turn( rfoot , x_axis, math.rad(20), math.rad(100) )
-		Turn( lleg , x_axis, math.rad(20), math.rad(100) )
-		Move( pelvis , y_axis, 0 , 5 )
-		Turn( ltoef , x_axis, 0, math.rad(100) )
-		Turn( rtoef , x_axis, math.rad(22), math.rad(100) )
-		Turn( rtoer , x_axis, math.rad(-22), math.rad(100) )
+		Turn(rfoot, x_axis, math.rad(20), math.rad(100))
+		Turn(lleg, x_axis, math.rad(20), math.rad(100))
+		Move(pelvis, y_axis, 0, 5)
+		Turn(ltoef, x_axis, 0, math.rad(100))
+		Turn(rtoef, x_axis, math.rad(22), math.rad(100))
+		Turn(rtoer, x_axis, math.rad(-22), math.rad(100))
 		Sleep(360)
 
-		Turn( ltoer , x_axis, 0, math.rad(100) )
-		Move( pelvis , y_axis, 10 , 5 )
-		Turn( pelvis , z_axis, math.rad(-(3.5)), math.rad(8) )
-		Turn( lupleg , x_axis, math.rad(20), math.rad(50.010989) )
-		Turn( rupleg , x_axis, math.rad(-20), math.rad(50.010989) )
-		Turn( lfoot , x_axis, math.rad(-20), math.rad(130.027473) )
-		Turn( rleg , x_axis, math.rad(-20), math.rad(100) )
+		Turn(ltoer, x_axis, 0, math.rad(100))
+		Move(pelvis, y_axis, 10, 5)
+		Turn(pelvis, z_axis, math.rad(-(3.5)), math.rad(8))
+		Turn(lupleg, x_axis, math.rad(20), math.rad(50.010989))
+		Turn(rupleg, x_axis, math.rad(-20), math.rad(50.010989))
+		Turn(lfoot, x_axis, math.rad(-20), math.rad(130.027473))
+		Turn(rleg, x_axis, math.rad(-20), math.rad(100))
 		if armsFree then
-			Turn( torso , y_axis, math.rad(2.5), math.rad(12) )
-			Turn( torso , x_axis, math.rad(1), math.rad(6) )
-			Turn( ruparm , y_axis, math.rad(2.5), math.rad(25) )
-			Turn( luparm , y_axis, math.rad(2.5), math.rad(25) )
+			Turn(torso, y_axis, math.rad(2.5), math.rad(12))
+			Turn(torso, x_axis, math.rad(1), math.rad(6))
+			Turn(ruparm, y_axis, math.rad(2.5), math.rad(25))
+			Turn(luparm, y_axis, math.rad(2.5), math.rad(25))
 		end
 		Sleep(650)
 		
-		Turn( lfoot , x_axis, math.rad(20), math.rad(100) )
-		Turn( rfoot , x_axis, math.rad(20), math.rad(70.016484) )
-		Turn( rleg , x_axis, math.rad(20), math.rad(100) )
-		Move( pelvis , y_axis, 0 , 5 )
-		Turn( ltoef , x_axis, math.rad(22), math.rad(100) )
-		Turn( ltoer , x_axis, math.rad(-22), math.rad(100) )
-		Turn( rtoef , x_axis, 0, math.rad(100) )
+		Turn(lfoot, x_axis, math.rad(20), math.rad(100))
+		Turn(rfoot, x_axis, math.rad(20), math.rad(70.016484))
+		Turn(rleg, x_axis, math.rad(20), math.rad(100))
+		Move(pelvis, y_axis, 0, 5)
+		Turn(ltoef, x_axis, math.rad(22), math.rad(100))
+		Turn(ltoer, x_axis, math.rad(-22), math.rad(100))
+		Turn(rtoef, x_axis, 0, math.rad(100))
 		Sleep(360)
 			
-		Turn( rtoer , x_axis, 0, math.rad(100) )
-		Move( pelvis , y_axis, 10 , 5 )
-		Turn( pelvis , z_axis, math.rad(-(-3.50)), math.rad(8) )
-		Turn( lupleg , x_axis, math.rad(-20), math.rad(50.010989) )
-		Turn( rupleg , x_axis, math.rad(20), math.rad(50.010989) )
-		Turn( rfoot , x_axis, math.rad(-20), math.rad(130.027473) )
-		Turn( lleg , x_axis, math.rad(-20), math.rad(100) )
+		Turn(rtoer, x_axis, 0, math.rad(100))
+		Move(pelvis, y_axis, 10, 5)
+		Turn(pelvis, z_axis, math.rad(-(-3.50)), math.rad(8))
+		Turn(lupleg, x_axis, math.rad(-20), math.rad(50.010989))
+		Turn(rupleg, x_axis, math.rad(20), math.rad(50.010989))
+		Turn(rfoot, x_axis, math.rad(-20), math.rad(130.027473))
+		Turn(lleg, x_axis, math.rad(-20), math.rad(100))
 		
 		
 		if armsFree then
-			Turn( torso , y_axis, math.rad(-2.5), math.rad(12) )
-			Turn( torso , x_axis, math.rad(-1), math.rad(6) )
-			Turn( ruparm , y_axis, math.rad(5), math.rad(25) )
-			Turn( luparm , y_axis, math.rad(5), math.rad(25) )
+			Turn(torso, y_axis, math.rad(-2.5), math.rad(12))
+			Turn(torso, x_axis, math.rad(-1), math.rad(6))
+			Turn(ruparm, y_axis, math.rad(5), math.rad(25))
+			Turn(luparm, y_axis, math.rad(5), math.rad(25))
 		end
 		Sleep(650)
 
-		Turn( rfoot , x_axis, math.rad(20), math.rad(100) )
-		Turn( lleg , x_axis, math.rad(20), math.rad(100) )
-		Move( pelvis , y_axis, 0 , 5 )
-		Turn( ltoef , x_axis, 0, math.rad(100) )
-		Turn( rtoef , x_axis, math.rad(22), math.rad(100) )
-		Turn( rtoer , x_axis, math.rad(-22), math.rad(100) )
+		Turn(rfoot, x_axis, math.rad(20), math.rad(100))
+		Turn(lleg, x_axis, math.rad(20), math.rad(100))
+		Move(pelvis, y_axis, 0, 5)
+		Turn(ltoef, x_axis, 0, math.rad(100))
+		Turn(rtoef, x_axis, math.rad(22), math.rad(100))
+		Turn(rtoer, x_axis, math.rad(-22), math.rad(100))
 		Sleep(360)
 
-		Turn( ltoer , x_axis, 0, math.rad(100) )
-		Move( pelvis , y_axis, 10 , 5 )
-		Turn( pelvis , z_axis, math.rad(-(3.5)), math.rad(8) )
+		Turn(ltoer, x_axis, 0, math.rad(100))
+		Move(pelvis, y_axis, 10, 5)
+		Turn(pelvis, z_axis, math.rad(-(3.5)), math.rad(8))
 		Sleep(2)
 	end
 end
@@ -257,16 +256,16 @@ end
 
 function script.Create()
 	base_speed = GetUnitValue(COB.MAX_SPEED)
-	Hide( flame1)
-	Hide( flame2)
-	Hide( rf1)
-	Hide( rf2)
-	Hide( rf3)
-	Hide( lf1)
-	Hide( lf2)
-	Hide( lf3)
-	Hide( jet1)
-	Hide( jet2)
+	Hide(flame1)
+	Hide(flame2)
+	Hide(rf1)
+	Hide(rf2)
+	Hide(rf3)
+	Hide(lf1)
+	Hide(lf2)
+	Hide(lf3)
+	Hide(jet1)
+	Hide(jet2)
 	
 	StartThread(SmokeUnit, smokePiece)
 end
@@ -300,58 +299,58 @@ end
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_IDLE)
 	if num == 1 then
-		if  dgunning  then return false end
-		Signal( SIG_AIM)
-		SetSignalMask( SIG_AIM)
+		if dgunning then return false end
+		Signal(SIG_AIM)
+		SetSignalMask(SIG_AIM)
 		armsFree = false
-		Turn( ruparm , x_axis, -pitch - math.rad(20), math.rad(250) )
-		Turn( luparm , x_axis, -pitch - math.rad(20), math.rad(250) )
-		Turn( torso , y_axis, heading, math.rad(250) )
-		Turn( rarm , x_axis, math.rad(20), math.rad(250) )
-		Turn( larm , x_axis, math.rad(20), math.rad(250) )
+		Turn(ruparm, x_axis, -pitch - math.rad(20), math.rad(250))
+		Turn(luparm, x_axis, -pitch - math.rad(20), math.rad(250))
+		Turn(torso, y_axis, heading, math.rad(250))
+		Turn(rarm, x_axis, math.rad(20), math.rad(250))
+		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
-		WaitForTurn(larm, x_axis)  --need to make surenot 
+		WaitForTurn(larm, x_axis) --need to make surenot 
 		return true
 	elseif num == 2 then
-		if dgunning  then return false end
-		Signal( SIG_AIM_2)
-		SetSignalMask( SIG_AIM_2)
-		Turn( torso , y_axis, heading, math.rad(200) )
+		if dgunning then return false end
+		Signal(SIG_AIM_2)
+		SetSignalMask(SIG_AIM_2)
+		Turn(torso, y_axis, heading, math.rad(200))
 		WaitForTurn(torso, y_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
 		dgunning = true
-		Signal( SIG_AIM)
-		Signal( SIG_AIM_2)
-		Signal( SIG_AIM_3)
-		SetSignalMask( SIG_AIM_3)
+		Signal(SIG_AIM)
+		Signal(SIG_AIM_2)
+		Signal(SIG_AIM_3)
+		SetSignalMask(SIG_AIM_3)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
 		GG.UpdateUnitAttributes(unitID)
 		armsFree = false
 		
-		Turn( ruparm , x_axis, -pitch - math.rad(20), math.rad(250) )
-		Turn( luparm , x_axis, -pitch - math.rad(20), math.rad(250) )
-		Turn( torso , y_axis, heading, math.rad(250) )
-		Turn( rarm , x_axis, math.rad(20), math.rad(250) )
-		Turn( larm , x_axis, math.rad(20), math.rad(250) )
+		Turn(ruparm, x_axis, -pitch - math.rad(20), math.rad(250))
+		Turn(luparm, x_axis, -pitch - math.rad(20), math.rad(250))
+		Turn(torso, y_axis, heading, math.rad(250))
+		Turn(rarm, x_axis, math.rad(20), math.rad(250))
+		Turn(larm, x_axis, math.rad(20), math.rad(250))
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(larm, x_axis)
 		targetHeading = heading + GetUnitValue(COB.HEADING)/32768
 		StartThread(RestoreAfterDelay)
-		Signal( SIG_AIM)
-		Signal( SIG_AIM_2)
+		Signal(SIG_AIM)
+		Signal(SIG_AIM_2)
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 		GG.UpdateUnitAttributes(unitID)
 		dgunning = false
 		return true
 	elseif num == 4 then
-		if dgunning  then return false end
-		Signal( SIG_AIM_4)
-		SetSignalMask( SIG_AIM_4)
+		if dgunning then return false end
+		Signal(SIG_AIM_4)
+		SetSignalMask(SIG_AIM_4)
 	
-		Turn( flagellum , x_axis, -pitch, math.rad(90) )
-		Turn( torso , y_axis, heading, math.rad(250) )
+		Turn(flagellum, x_axis, -pitch, math.rad(90))
+		Turn(torso, y_axis, heading, math.rad(250))
 		WaitForTurn(ruparm, x_axis)
 		WaitForTurn(flagellum, x_axis)
 		WaitForTurn(torso, y_axis)
@@ -378,10 +377,16 @@ function script.Shot(num)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	if num ~= 1 then
+		return false
+	end
+	local reloadState = Spring.GetUnitWeaponState(unitID, 3, 'reloadState')
+	return not (reloadState and (reloadState < 0 or reloadState < Spring.GetGameFrame()))
+end
+
 function script.FireWeapon(num)
 	if num == 3 then
-		local speedmult = 1/(Spring.GetUnitRulesParam(unitID,"slowState") or 1)
-		Spring.SetUnitWeaponState(unitID, 1, "reloadFrame", Spring.GetGameFrame() + reloadTime*speedmult)
 		dgunning = true
 		Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 0)
 		GG.UpdateUnitAttributes(unitID)
@@ -395,30 +400,30 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
-	Turn( torso , y_axis, 0, math.rad(200) )
-	if  severity <= .50  then
-		Turn( base , x_axis, math.rad(71), math.rad(70) )
-		Turn( torso , x_axis, math.rad(-31), math.rad(50) )
-		Turn( ruparm , x_axis, math.rad(-41), math.rad(50) )
-		Turn( ruparm , y_axis, math.rad(-11), math.rad(50) )
-		Turn( rarm , x_axis, math.rad(-6), math.rad(50) ) --was 0
-		Turn( flagellum , x_axis, math.rad(49), math.rad(50) )
-		Turn( flagellum , y_axis, math.rad(14), math.rad(50) )
-		Turn( luparm , y_axis, math.rad(54), math.rad(50) )
-		Turn( rupleg , x_axis, math.rad(-27), math.rad(50) )
-		Turn( rupleg , y_axis, math.rad(-42), math.rad(50) )
-		Turn( rupleg , z_axis, math.rad(-(-5)), math.rad(50) )		
-		Turn( rleg , x_axis, math.rad(13), math.rad(50) )
-		Turn( rleg , y_axis, math.rad(-36), math.rad(50) )
-		Turn( rleg , z_axis, math.rad(-(24)), math.rad(50) )	
-		Turn( lupleg , y_axis, math.rad(18), math.rad(50) )
-		Turn( lleg , x_axis, math.rad(20), math.rad(50) )
-		Turn( lleg , y_axis, math.rad(28), math.rad(50) )
-		Turn( lfoot , x_axis, math.rad(23), math.rad(50) )
+	Turn(torso, y_axis, 0, math.rad(200))
+	if severity <= .50 then
+		Turn(base, x_axis, math.rad(71), math.rad(70))
+		Turn(torso, x_axis, math.rad(-31), math.rad(50))
+		Turn(ruparm, x_axis, math.rad(-41), math.rad(50))
+		Turn(ruparm, y_axis, math.rad(-11), math.rad(50))
+		Turn(rarm, x_axis, math.rad(-6), math.rad(50)) --was 0
+		Turn(flagellum, x_axis, math.rad(49), math.rad(50))
+		Turn(flagellum, y_axis, math.rad(14), math.rad(50))
+		Turn(luparm, y_axis, math.rad(54), math.rad(50))
+		Turn(rupleg, x_axis, math.rad(-27), math.rad(50))
+		Turn(rupleg, y_axis, math.rad(-42), math.rad(50))
+		Turn(rupleg, z_axis, math.rad(-(-5)), math.rad(50))		
+		Turn(rleg, x_axis, math.rad(13), math.rad(50))
+		Turn(rleg, y_axis, math.rad(-36), math.rad(50))
+		Turn(rleg, z_axis, math.rad(-(24)), math.rad(50))	
+		Turn(lupleg, y_axis, math.rad(18), math.rad(50))
+		Turn(lleg, x_axis, math.rad(20), math.rad(50))
+		Turn(lleg, y_axis, math.rad(28), math.rad(50))
+		Turn(lfoot, x_axis, math.rad(23), math.rad(50))
 		Sleep(800)
-		--EmitSfx( torso,  1027 ) --impact
+		--EmitSfx(torso, 1027) --impact
 		--StartThread(burn)
-		--Sleep((1000 * rand (2 , 5)))
+		--Sleep((1000 * rand (2, 5)))
 
 		Explode(pelvis, sfxNone)
 		Explode(luparm, sfxNone)
@@ -431,15 +436,15 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(torso, sfxNone)
 		return 1
 	else
-		Explode(pelvis, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(luparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(lleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(lupleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(rarm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(rleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(ruparm, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(rupleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(torso, SFX.SHATTER + SFX.EXPLODE_ON_HIT )
+		Explode(pelvis, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(luparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(lupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rarm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(ruparm, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(rupleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(torso, SFX.SHATTER + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

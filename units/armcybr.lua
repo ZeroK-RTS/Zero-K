@@ -93,15 +93,15 @@ unitDef = {
       craterMult              = 2,
 
       damage                  = {
-        default = 2001.3,
-        planes  = 2001.3,
+        default = 2000.1,
+        planes  = 2000.1,
         subs    = 100,
       },
 
       edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:NUKE_150]],
       fireStarter             = 100,
-      flightTime              = 4,
+      flightTime              = 3,
       impulseBoost            = 0,
       impulseFactor           = -0.8,
       interceptedByShieldType = 2,
@@ -119,7 +119,7 @@ unitDef = {
       startsmoke              = [[1]],
       startVelocity           = 300,
       tolerance               = 16000,
-      tracks                  = false,
+      tracks                  = true,
       turnRate                = 30000,
 	  weaponAcceleration      = 200,
       weaponTimer             = 6,

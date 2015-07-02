@@ -26,7 +26,7 @@ end
 weapons[5] = {aimFrom = hull, flares = {hull}, gunIndex = 1}
 
 for i=1,6 do
-    docked[i] = piece("docked"..i)
+	docked[i] = piece("docked"..i)
 end
 
 local smokePiece = {hull, engines[2], engines[4], pads[3]};
@@ -39,7 +39,7 @@ local smokePiece = {hull, engines[2], engines[4], pads[3]};
 -- functions
 --------------------------------------------------------------------------------
 local function EngineLoop()
-    while true do
+	while true do
 		local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 		local v2d = (vx^2 + vz^2)^0.5
 		for i=1,4 do
@@ -47,17 +47,17 @@ local function EngineLoop()
 		end
 		--Spring.Echo(GetUnitValue(COB.CURRENT_SPEED)/65536)
 		Sleep(250)
-    end
+	end
 end
 
 function script.Create()
-    StartThread(EngineLoop)
-    StartThread(SmokeUnit, smokePiece)
-    --Turn(piece "turret3", z_axis, math.rad(-90))
-    --Turn(piece "turret4", z_axis, math.rad(90))
-    for i=1,2 do
+	StartThread(EngineLoop)
+	StartThread(SmokeUnit, smokePiece)
+	--Turn(piece "turret3", z_axis, math.rad(-90))
+	--Turn(piece "turret4", z_axis, math.rad(90))
+	for i=1,2 do
 		Turn(pads[i], y_axis, math.pi)
-    end
+	end
 end
 
 function script.QueryWeapon(num) 
@@ -75,13 +75,13 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	if num == 3 or num == 4 then
 		if (heading/math.pi < 1.5 and heading/math.pi > 0.5) then
-		    if num == 4 then
+			if num == 4 then
 			heading = -2*math.pi/2 + heading
 			pitch = -pitch + math.pi 
-		    elseif num == 3 then
+			elseif num == 3 then
 			heading = -2*math.pi/2 + heading
 			pitch = -pitch + math.pi 
-		    end
+			end
 		end
 		Turn(weapons[num].pitch, x_axis, -pitch, math.rad(240))
 		Turn(weapons[num].yaw, y_axis, heading, math.rad(120))
@@ -99,7 +99,7 @@ end
 function script.Shot(num)
 	local index = weapons[num].gunIndex
 	weapons[num].gunIndex = index % #weapons[num].flares + 1
-	EmitSfx( weapons[num].flares[index], UNIT_SFX1 )
+	EmitSfx(weapons[num].flares[index], UNIT_SFX1)
 end
 
 function script.BlockShot(num)
@@ -135,10 +135,10 @@ function script.Killed(recentDamage, maxHealth)
 		EmitSfx(hull, UNIT_SFX3)
 		Explode(hull, sfxShatter)
 		for i=1,4 do
-		    Explode(engines[i], sfxFall + sfxSmoke + sfxFire)
+			Explode(engines[i], sfxFall + sfxSmoke + sfxFire)
 		end
 		for i=1,6 do
-		    Explode(docked[i], sfxFall + sfxSmoke + sfxFire)
+			Explode(docked[i], sfxFall + sfxSmoke + sfxFire)
 		end
 		return 2
 	end

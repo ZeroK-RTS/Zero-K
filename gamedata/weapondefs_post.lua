@@ -343,7 +343,7 @@ do
     local canAttack = false
     if (RawCanAttack(ud)) then
       canAttack = true
-    elseif (ud.tedclass == 'PLANT') then
+    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo")) then
       if (FacCanAttack(ud)) then
         canAttack = true
       end

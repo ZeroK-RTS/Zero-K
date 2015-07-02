@@ -30,94 +30,94 @@ local rb_knee = piece "rb_knee"
 local rb_foot = piece "rb_foot"
 
 --constants
-local l_angle = math.rad( 40 )
+local l_angle = math.rad(40)
 local l_speed = 1
-local k_angle = math.rad( 45 )
+local k_angle = math.rad(45)
 local k_speed = 10
 
 local function hover()
-	while( true ) do
-		Spin( glow, y_axis, 1 )
-		Move( glow, y_axis, math.random(1,5), 2 )
-		WaitForMove( glow, y_axis )
-		Sleep ( 200 )
-		Move( glow, y_axis, math.random(-6,-1), 2 )
+	while(true) do
+		Spin(glow, y_axis, 1)
+		Move(glow, y_axis, math.random(1,5), 2)
+		WaitForMove(glow, y_axis)
+		Sleep (200)
+		Move(glow, y_axis, math.random(-6,-1), 2)
 	end
 end
 
 local function initialize()
-	Move( lf_ball, y_axis, -10, 5 )
-	Move( rf_ball, y_axis, -10, 5 )
-	Move( lb_ball, y_axis, -10, 5 )
-	Move( rb_ball, y_axis, -10, 5 )
+	Move(lf_ball, y_axis, -10, 5)
+	Move(rf_ball, y_axis, -10, 5)
+	Move(lb_ball, y_axis, -10, 5)
+	Move(rb_ball, y_axis, -10, 5)
 	
-	Turn( lf_knee, x_axis, -k_angle, k_speed )
-	Turn( lf_knee, z_axis, k_angle, k_speed )
-	Turn( lb_knee, x_axis, k_angle, k_speed )
-	Turn( lb_knee, z_axis, k_angle, k_speed )
-	Turn( rf_knee, x_axis, -k_angle, k_speed )
-	Turn( rf_knee, z_axis, -k_angle, k_speed )
-	Turn( rb_knee, x_axis, k_angle, k_speed )
-	Turn( rb_knee, z_axis, -k_angle, k_speed )
-	Sleep( 100 )
+	Turn(lf_knee, x_axis, -k_angle, k_speed)
+	Turn(lf_knee, z_axis, k_angle, k_speed)
+	Turn(lb_knee, x_axis, k_angle, k_speed)
+	Turn(lb_knee, z_axis, k_angle, k_speed)
+	Turn(rf_knee, x_axis, -k_angle, k_speed)
+	Turn(rf_knee, z_axis, -k_angle, k_speed)
+	Turn(rb_knee, x_axis, k_angle, k_speed)
+	Turn(rb_knee, z_axis, -k_angle, k_speed)
+	Sleep(100)
 	
-	StartThread( hover )
+	StartThread(hover)
 end
 	
 	
 function script.Create()
-	StartThread( initialize )
+	StartThread(initialize)
 end
 
 function script.Activate()
-	Turn( lf_leaf, x_axis, l_angle, l_speed )
-	Turn( lf_leaf, z_axis, -l_angle, l_speed )
+	Turn(lf_leaf, x_axis, l_angle, l_speed)
+	Turn(lf_leaf, z_axis, -l_angle, l_speed)
 	
-	Turn( rf_leaf, x_axis, l_angle, l_speed )
-	Turn( rf_leaf, z_axis, l_angle, l_speed )
+	Turn(rf_leaf, x_axis, l_angle, l_speed)
+	Turn(rf_leaf, z_axis, l_angle, l_speed)
 	
-	Turn( lb_leaf, x_axis, -l_angle, l_speed )
-	Turn( lb_leaf, z_axis, -l_angle, l_speed )
+	Turn(lb_leaf, x_axis, -l_angle, l_speed)
+	Turn(lb_leaf, z_axis, -l_angle, l_speed)
 	
-	Turn( rb_leaf, x_axis, -l_angle, l_speed )
-	Turn( rb_leaf, z_axis, l_angle, l_speed )
+	Turn(rb_leaf, x_axis, -l_angle, l_speed)
+	Turn(rb_leaf, z_axis, l_angle, l_speed)
 	
 	--spSetUnitShieldState(unitID, 1, true)
 end
 
 function script.Deactivate()
-	Turn( lf_leaf, x_axis, 0, 1 )
-	Turn( lf_leaf, z_axis, 0, 1 )
+	Turn(lf_leaf, x_axis, 0, 1)
+	Turn(lf_leaf, z_axis, 0, 1)
 	
-	Turn( rf_leaf, x_axis, 0, 1 )
-	Turn( rf_leaf, z_axis, 0, 1 )
+	Turn(rf_leaf, x_axis, 0, 1)
+	Turn(rf_leaf, z_axis, 0, 1)
 	
-	Turn( lb_leaf, x_axis, 0, 1 )
-	Turn( lb_leaf, z_axis, 0, 1 )
+	Turn(lb_leaf, x_axis, 0, 1)
+	Turn(lb_leaf, z_axis, 0, 1)
 	
-	Turn( rb_leaf, x_axis, 0, 1 )
-	Turn( rb_leaf, z_axis, 0, 1 )
+	Turn(rb_leaf, x_axis, 0, 1)
+	Turn(rb_leaf, z_axis, 0, 1)
 	
 	--spSetUnitShieldState(unitID, 1, false)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( base, SFX.EXPLODE )
+	Explode(base, SFX.EXPLODE)
 	
-	Explode( lf_leaf, SFX.EXPLODE )
-	Explode( rf_leaf, SFX.EXPLODE )
-	Explode( lb_leaf, SFX.EXPLODE )
-	Explode( rb_leaf, SFX.EXPLODE )
+	Explode(lf_leaf, SFX.EXPLODE)
+	Explode(rf_leaf, SFX.EXPLODE)
+	Explode(lb_leaf, SFX.EXPLODE)
+	Explode(rb_leaf, SFX.EXPLODE)
 	
-	Explode( lf_foot, SFX.EXPLODE )
-	Explode( rf_foot, SFX.EXPLODE )
-	Explode( lb_foot, SFX.EXPLODE )
-	Explode( rb_foot, SFX.EXPLODE )
+	Explode(lf_foot, SFX.EXPLODE)
+	Explode(rf_foot, SFX.EXPLODE)
+	Explode(lb_foot, SFX.EXPLODE)
+	Explode(rb_foot, SFX.EXPLODE)
 	
-	Explode( lf_ball, SFX.EXPLODE )
-	Explode( rf_ball, SFX.EXPLODE )
-	Explode( lb_ball, SFX.EXPLODE )
-	Explode( rb_ball, SFX.EXPLODE )
+	Explode(lf_ball, SFX.EXPLODE)
+	Explode(rf_ball, SFX.EXPLODE)
+	Explode(lb_ball, SFX.EXPLODE)
+	Explode(rb_ball, SFX.EXPLODE)
 
 	local severity = recentDamage / maxHealth
 

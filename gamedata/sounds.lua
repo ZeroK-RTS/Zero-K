@@ -87,6 +87,7 @@ local replyOpts = {
 
 local noVariation = {
 	dopplerscale  = 0,
+	in3d = false,
 }
 
 local ignoredExtensions = {

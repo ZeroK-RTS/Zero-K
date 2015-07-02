@@ -44,6 +44,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
+  script                        = "armdeva.lua",
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
@@ -117,7 +118,7 @@ unitDef = {
       description      = [[Wreckage - Stardust]],
       blocking         = true,
       damage           = 1500,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 88,
@@ -126,20 +127,7 @@ unitDef = {
       reclaimTime      = 88,
     },
 
-    DEAD2 = {
-      description      = [[Debris - Stardust]],
-      blocking         = false,
-      damage           = 1500,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      metal            = 88,
-      object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-    },
-
-    HEAP  = {
+	HEAP  = {
       description      = [[Debris - Stardust]],
       blocking         = false,
       damage           = 1500,

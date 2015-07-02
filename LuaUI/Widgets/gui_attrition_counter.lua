@@ -67,6 +67,8 @@ function widget:Shutdown()
 	if window then window:Dispose() end
 end
 
+local function cap (x) return math.max(math.min(x,1),0) end
+
 function updateCounters()
 	killed_units:SetCaption(killedUnits..' ('..floor(killedMetal)..'m)');
 	lost_units:SetCaption(lostUnits..' ('..floor(lostMetal)..'m)');
@@ -81,94 +83,33 @@ function updateCounters()
 		end
 	else
 		rate = killedMetal/lostMetal;
-		
-		if(rate>=1) then
-			rateCaption = tostring(floor(rate*100))..'%';
-			attrition_counter.font.color={0,1,0,1}
-		else
-			if rate>0.75 then
-				attrition_counter.font.color={1,1,0,1}
-			elseif rate>0.5 then
-				attrition_counter.font.color={1,0.5,0,1}
-			else
-				attrition_counter.font.color={1,0,0,1}
-			end
-			rateCaption = tostring(floor(rate*100))..'%';
-		end
+		rateCaption = tostring(floor(rate*100))..'%';
+		attrition_counter.font.color = {
+			cap(3-rate*2),
+			cap(2*rate-1),
+			0,1}
 		attrition_counter:SetCaption(rateCaption);
 	end
 end
 
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
+	if GetUnitHealth(unitID) > 0 then return end
 
-function widget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDefID, attackerTeamID)
-	local ud = UnitDefs[unitDefID];
-	if not ud.customParams.dontcount then
-		if teamID == myTeam then			
-			if GetUnitRulesParam(unitID, 'wasMorphedTo') then	
-				visible[unitID] = nil;
-			else 
-				local _,_,_,_,built = GetUnitHealth(unitID);
-				lostUnits=lostUnits+1;
-				lostMetal=lostMetal+UnitDefs[unitDefID].metalCost*built;
-				updateCounters()
-			end
-		elseif spectating then
-			if GetUnitRulesParam(unitID, 'wasMorphedTo') then	
-				visible[unitID] = nil;
-			else 
-				local _,_,_,_,built = GetUnitHealth(unitID);
-				killedUnits = killedUnits + 1;
-				killedMetal = killedMetal + UnitDefs[unitDefID].metalCost*built;
-				visible[unitID] = nil
-				updateCounters()
-			end
-		end
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.dontcount then return end
+
+	local buildProgress = select(5, GetUnitHealth(unitID))
+	local worth = ud.metalCost * buildProgress
+
+	if teamID == myTeam then
+		lostUnits = lostUnits + 1
+		lostMetal = lostMetal + worth
+	else
+		killedUnits = killedUnits + 1
+		killedMetal = killedMetal + worth
 	end
-end
 
-function widget:UnitEnteredLos(uID, tID)
-	local udid = Spring.GetUnitDefID(uID);
-	local ud = UnitDefs[udid];
-	
-	if ud.customParams.dontcount ~= 1 and tID ~= myTeam then
-		visible[uID] = {
-			cost=ud.metalCost,
-			team=tID
-		}
-		
-		local _,_,_,_,built = GetUnitHealth(uID);
-		
-		if built < 1  then
-			nanoframes[uID] = built;
-		end
-	end
-end
-
-function widget:UnitLeftLos(uID)
-	visible[uID] = nil;
-	nanoframes[uID] = nil;
-end
-
-function widget:GameFrame(n)
-    for uID, kill in pairs(visible) do
-        if not Spring.GetUnitDefID(uID) then
-			if(kill.team ~= myTeam ) then
-					if nanoframes[uID] then kill.cost = kill.cost * nanoframes[uID] end
-					killedUnits = killedUnits + 1;
-					killedMetal = killedMetal + kill.cost;
-					visible[uID] = nil;
-					nanoframes[uID] = nil;
-					updateCounters()
-			end
-		elseif nanoframes[uID] then
-			local _,_,_,_,built = GetUnitHealth(uID);
-			if built < 1 then
-				nanoframes[uID] = built;
-			else
-				nanoframes[uID] = nil;
-			end
-        end
-    end
+	updateCounters()
 end
 
 function CreateWindow()	

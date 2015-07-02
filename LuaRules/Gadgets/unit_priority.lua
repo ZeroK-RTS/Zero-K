@@ -23,7 +23,9 @@ function gadget:GetInfo()
     author    = "Licho",
     date      = "19.4.2009", --24.2.2013
     license   = "GNU GPL, v2 or later",
-    layer     = -2, --must start before unit_morph.lua gadget to register GG.AddMiscPriority() first
+	-- Must start before unit_morph.lua gadget to register GG.AddMiscPriority() first.
+	-- Must be before mex_overdrive
+    layer     = -5,
     enabled   = not (Game.version:find('91.0') == 1)
   }
 end
@@ -106,6 +108,7 @@ local priorityTypes = {
 local ALLY_ACCESS = {allied = true}
 
 local reportedError = false
+local debugTeam = false
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -134,14 +137,18 @@ local spSetUnitRulesParam = Spring.SetUnitRulesParam
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
+local alliedTable = {allied = true}
 
 local function SetMetalReserved(teamID, value)
 	TeamMetalReserved[teamID] = value or 0
+	Spring.SetTeamRulesParam(teamID, "metalReserve", value or 0, alliedTable)
 end
 
 local function SetEnergyReserved(teamID, value)
 	TeamEnergyReserved[teamID] = value or 0
+	Spring.SetTeamRulesParam(teamID, "energyReserve", value or 0, alliedTable)
 end
 
 
@@ -292,11 +299,16 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 end
 
 function gadget:GameFrame(n)
+
 	if n % TEAM_SLOWUPDATE_RATE == 1 then 
 		local prioUnits, miscPrioUnits
 		
+		local debugMode
 		local teams = spGetTeamList()
 		for i=1,#teams do
+			
+			debugMode = debugTeam and debugTeam[i]
+			
 			local teamID = teams[i]
 			prioUnits = TeamPriorityUnits[teamID] or {}
 			miscPrioUnits = teamMiscPriorityUnits[teamID] or {}
@@ -307,6 +319,16 @@ function gadget:GameFrame(n)
 			local realEnergyOnlyPull = 0
 			local scaleEnergy = TeamScaleEnergy[teamID]
 			
+			if debugMode then
+				Spring.Echo("====== Frame " .. n .. " ======")
+				Spring.Echo("team " .. i .. " Initial energy only scale:")
+				if scaleEnergy then
+					Spring.Echo("High: " .. (scaleEnergy[3] or "nil"))
+					Spring.Echo("Med: " .. (scaleEnergy[2] or "nil"))
+					Spring.Echo("Low: " .. (scaleEnergy[1] or "nil"))
+				end
+			end
+			
 			for unitID, pri in pairs(prioUnits) do  --add construction priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				if unitDefID ~= nil then
@@ -315,10 +337,23 @@ function gadget:GameFrame(n)
 						energySpending[pri] = energySpending[pri] + buildSpeed*UnitOnlyEnergy[unitID]
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
+							
+							if debugMode then
+								GG.UnitEcho(unitID, "Energy Priority: " ..  pri ..
+									", BP: " .. buildSpeed .. 
+									", Pull: " .. buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
+								)
+							end
 						end
 					else
 						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
 						spending[pri] = spending[pri] + buildSpeed
+						
+						if debugMode then
+							GG.UnitEcho(unitID, "Priority: " .. pri ..
+								", BP: " .. buildSpeed
+							)
+						end
 					end
 				end 
 			end
@@ -331,9 +366,21 @@ function gadget:GameFrame(n)
 						energySpending[pri] = energySpending[pri] + drain
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + drain*scaleEnergy[pri]
+							
+							if debugMode then
+								GG.UnitEcho(unitID, "Misc Energy Priority: " ..  pri ..
+									", BP: " .. drain .. 
+									", Pull: " .. realEnergyOnlyPull + drain*scaleEnergy[pri]
+								)
+							end
 						end
 					else
 						spending[pri] = spending[pri] + drain
+						if debugMode then
+							GG.UnitEcho(unitID, "Misc Priority: " .. pri ..
+								", BP: " .. drain
+							)
+						end
 					end
 				end 
 			end 
@@ -343,6 +390,11 @@ function gadget:GameFrame(n)
 			local level, _, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
 			local elevel, _, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
 			
+			-- Take away the constant income which was gained this frame (innate, reclaim)
+			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
+			local mexIncome = (spGetTeamRulesParam(teamID, "OD_myBase") or 0) + (spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0)
+			level = level - (income - mexIncome)/30
+			
 			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent
 			local metalPull = spending[1] + spending[2] + spending[3]
 			local energyPull = fakeEnergyPull + metalPull - fakeMetalPull + energySpending[1] + energySpending[2] + energySpending[3] - realEnergyOnlyPull
@@ -350,15 +402,43 @@ function gadget:GameFrame(n)
 			spSetTeamRulesParam(teamID, "extraMetalPull", metalPull - fakeMetalPull, ALLY_ACCESS)
 			spSetTeamRulesParam(teamID, "extraEnergyPull", energyPull - fakeEnergyPull, ALLY_ACCESS)
 			
-			--if i == 1 then
-			--	Spring.Echo("pull " .. metalPull)
-			--	Spring.Echo("lowPrioSpending " .. spending[1])
-			--	Spring.Echo("normalSpending " .. spending[2])
-			--	Spring.Echo("prioSpending " .. spending[3])
-			--end
+			if debugMode then
+				Spring.Echo("team " .. i .. " Pull:")
+				if scaleEnergy then
+					Spring.Echo("High: " .. (spending[3] or "nil"))
+					Spring.Echo("Med: " .. (spending[2] or "nil"))
+					Spring.Echo("Low: " .. (spending[1] or "nil"))
+				end
+			end
 			
+			if debugMode then
+				Spring.Echo("team " .. i .. " Energy Only Pull:")
+				if scaleEnergy then
+					Spring.Echo("High: " .. (energySpending[3] or "nil"))
+					Spring.Echo("Med: " .. (energySpending[2] or "nil"))
+					Spring.Echo("Low: " .. (energySpending[1] or "nil"))
+				end
+			end
+			
+			if debugMode then
+				Spring.Echo("team " .. i .. " old resource levels:")
+				if scaleEnergy then
+					Spring.Echo("nextMetalLevel: " .. (level or "nil"))
+					Spring.Echo("nextEnergyLevel: " .. (elevel or "nil"))
+				end
+			end
+			
+			-- How much of each resource there is to spend in the next second.
 			local nextMetalLevel = (income + recieved + level)
 			local nextEnergyLevel = (eincome + erecieved + elevel)
+			
+			if debugMode then
+				Spring.Echo("team " .. i .. " new resource levels:")
+				if scaleEnergy then
+					Spring.Echo("nextMetalLevel: " .. (nextMetalLevel or "nil"))
+					Spring.Echo("nextEnergyLevel: " .. (nextEnergyLevel or "nil"))
+				end
+			end
 			
 			TeamScale[teamID] = {}
 			TeamScaleEnergy[teamID] = {}
@@ -404,7 +484,14 @@ function gadget:GameFrame(n)
 						nextMetalLevel = nextMetalLevel - nextEnergyLevel
 						nextEnergyLevel = 0
 					end
-				
+				elseif energyDrain > 0 and nextEnergyLevel <= energyDrain then
+					local eRatio = max(0,nextEnergyLevel)/energyDrain
+					-- Set scale for build and repair equally and limit by energy.
+					TeamScale[teamID][pri] = eRatio
+					TeamScaleEnergy[teamID][pri] = eRatio
+					
+					nextMetalLevel = nextMetalLevel - nextEnergyLevel
+					nextEnergyLevel = 0
 				else
 					TeamScale[teamID][pri] = 1
 					TeamScaleEnergy[teamID][pri] = 1
@@ -418,7 +505,28 @@ function gadget:GameFrame(n)
 					nextEnergyLevel = nextEnergyLevel - (TeamEnergyReserved[teamID] or 0)
 				end
 			end
+			
+			if debugMode then
+				Spring.Echo("team " .. i .. " Scale:")
+				if scaleEnergy then
+					Spring.Echo("High: " .. (TeamScale[teamID][3] or "nil"))
+					Spring.Echo("Med: " .. (TeamScale[teamID][2] or "nil"))
+					Spring.Echo("Low: " .. (TeamScale[teamID][1] or "nil"))
+				end
+			end
+			
+			if debugMode then
+				Spring.Echo("team " .. i .. " Energy Only Scale:")
+				if scaleEnergy then
+					Spring.Echo("High: " .. (TeamScaleEnergy[teamID][3] or "nil"))
+					Spring.Echo("Med: " .. (TeamScaleEnergy[teamID][2] or "nil"))
+					Spring.Echo("Low: " .. (TeamScaleEnergy[teamID][1] or "nil"))
+				end
+			end
+			
 		end
+		
+		
 		teamMiscPriorityUnits = {} --reset priority list
 		TeamPriorityUnits = {} --reset builder priority list (will be checked every n%32==15 th frame) 
 		
@@ -480,6 +588,34 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		StopMiscPriorityResourcing(unitID,oldTeamID)
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Debug
+
+local function toggleDebug(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	local teamID = tonumber(words[1])
+	Spring.Echo("Debug priority for team " .. (teamID or "nil"))
+	if teamID then
+		if not debugTeam then
+			debugTeam = {}
+		end
+		if debugTeam[teamID] then
+			debugTeam[teamID] = nil
+			if #debugTeam == 0 then
+				debugTeam = {}
+			end
+			Spring.Echo("Disabled")
+		else
+			debugTeam[teamID] = true
+			Spring.Echo("Enabled")
+		end
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit Handling
@@ -499,6 +635,7 @@ function gadget:Initialize()
 		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 	end
 
+	gadgetHandler:AddChatAction("debugpri", toggleDebug, "Debugs priority.")
 end
 
 function gadget:RecvLuaMsg(msg, playerID)

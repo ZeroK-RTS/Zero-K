@@ -141,7 +141,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(thighL, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(thighL, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(shinL, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(thighR, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(shinR, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -162,11 +162,11 @@ local function RestorePose()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 
-	Move(pelvis , y_axis, 0 , 1 )
-	Turn(thighR , x_axis, 0, math.rad(200) )
-	Turn(shinR , x_axis, 0, math.rad(200) )
-	Turn(thighL , x_axis, 0, math.rad(200) )
-	Turn(shinL , x_axis, 0, math.rad(200) )
+	Move(pelvis, y_axis, 0, 1)
+	Turn(thighR, x_axis, 0, math.rad(200))
+	Turn(shinR, x_axis, 0, math.rad(200))
+	Turn(thighL, x_axis, 0, math.rad(200))
+	Turn(shinL, x_axis, 0, math.rad(200))
 	Turn(uparmL, x_axis, 0, math.rad(120))
 	Turn(uparmR, x_axis, 0, math.rad(120))
 end
@@ -207,10 +207,10 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY)
-	Turn( uparmL , x_axis, 0, ARM_SPEED_PITCH/2 )
-	Turn( uparmR , x_axis, 0, ARM_SPEED_PITCH/2 )
-	Turn( forearmL , x_axis, 0, FOREARM_SPEED_PITCH/2 )
-	Turn( forearmR , x_axis, 0, FOREARM_SPEED_PITCH/2 )
+	Turn(uparmL, x_axis, 0, ARM_SPEED_PITCH/2)
+	Turn(uparmR, x_axis, 0, ARM_SPEED_PITCH/2)
+	Turn(forearmL, x_axis, 0, FOREARM_SPEED_PITCH/2)
+	Turn(forearmR, x_axis, 0, FOREARM_SPEED_PITCH/2)
 	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW/2)
 	WaitForTurn(torso, y_axis)
 	armsFree = true
@@ -221,23 +221,23 @@ function script.AimWeapon(num, heading, pitch)
 		pitch = ARM_PERPENDICULAR
 	end
 	if num >= 5 then
-		Signal( SIG_AIM)
-		SetSignalMask( SIG_AIM)
+		Signal(SIG_AIM)
+		SetSignalMask(SIG_AIM)
 		armsFree = false
-		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( uparmL , x_axis, -pitch, ARM_SPEED_PITCH )
-		Turn( forearmL , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
+		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
+		Turn(uparmL, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(forearmL, x_axis, -rightAngle, FOREARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(uparmL, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
-		Signal( SIG_DGUN)
-		SetSignalMask( SIG_DGUN)
+		Signal(SIG_DGUN)
+		SetSignalMask(SIG_DGUN)
 		armsFree = false
-		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( uparmR , x_axis, -pitch, ARM_SPEED_PITCH )
-		Turn( forearmR , x_axis, -rightAngle, FOREARM_SPEED_PITCH )
+		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
+		Turn(uparmR, x_axis, -pitch, ARM_SPEED_PITCH)
+		Turn(forearmR, x_axis, -rightAngle, FOREARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(uparmR, x_axis)
 		WaitForTurn(forearmR, x_axis)
@@ -285,7 +285,7 @@ end
 
 function script.StartBuilding(heading, pitch)
 	restoreHeading = heading
-	Turn( torso , y_axis, heading, ARM_SPEED_PITCH )
+	Turn(torso, y_axis, heading, ARM_SPEED_PITCH)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 end
 

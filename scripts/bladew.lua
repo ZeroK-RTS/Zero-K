@@ -23,8 +23,8 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local function TiltWings()
 	while true do
 		if attacking then
-			Turn (base, x_axis, 0, math.rad(100) )
-			Turn (boosters, x_axis, 0, math.rad(140) )
+			Turn (base, x_axis, 0, math.rad(100))
+			Turn (boosters, x_axis, 0, math.rad(140))
 		else
 			local vx,_,vz = spGetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz

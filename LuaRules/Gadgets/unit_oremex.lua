@@ -114,8 +114,6 @@ local TiberiumProofDefs = {
 	[UnitDefNames["cormex"].id] = true,
 	[UnitDefNames['pw_generic'].id] = true,
 	[UnitDefNames['pw_hq'].id] = true,
-	[UnitDefNames['ctf_flag'].id] = true,
-	[UnitDefNames['ctf_center'].id] = true,
 	[UnitDefNames['tele_beacon'].id] = true, -- why not
 	[UnitDefNames['terraunit'].id] = true, -- totally why not
 } -- also any unit that has "chicken" inside its unitname and anything that can reclaim is also tiberium proof

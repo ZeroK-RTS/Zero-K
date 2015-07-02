@@ -24,28 +24,28 @@ function script.Create()
 end
 
 function script.Activate()
-	Turn( arm , x_axis, math.rad(-80), math.rad(200) )
-	Turn( lathe , x_axis, math.rad(-80), math.rad(200) )
+	Turn(arm, x_axis, math.rad(-80), math.rad(200))
+	Turn(lathe, x_axis, math.rad(-80), math.rad(200))
 end
 
 function script.Deactivate()
-	Turn( arm , x_axis, 0, math.rad(200) )
-	Turn( lathe , x_axis, 0, math.rad(200) )
+	Turn(arm, x_axis, 0, math.rad(200))
+	Turn(lathe, x_axis, 0, math.rad(200))
 end
 
 local function StartMoving()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
-	Turn( enginel , x_axis, math.rad(10), math.rad(200) )
-	Turn( enginer , x_axis, math.rad(10), math.rad(200) )
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
+	Turn(enginel, x_axis, math.rad(10), math.rad(200))
+	Turn(enginer, x_axis, math.rad(10), math.rad(200))
 end
 
 local function Stopping()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
 	
-	Turn( enginel , x_axis, 0, math.rad(100) )
-	Turn( enginer , x_axis, 0, math.rad(100) )
+	Turn(enginel, x_axis, 0, math.rad(100))
+	Turn(enginer, x_axis, 0, math.rad(100))
 end
 
 function script.StartMoving()
@@ -58,15 +58,15 @@ end
 
 function script.StartBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 1)
-	Turn( jaw1 , x_axis, math.rad(-30), math.rad(150) )
-	Turn( jaw2 , x_axis, math.rad(30), math.rad(150) )
+	Turn(jaw1, x_axis, math.rad(-30), math.rad(150))
+	Turn(jaw2, x_axis, math.rad(30), math.rad(150))
 	
 end
 
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
-	Turn( jaw1 , x_axis, 0, math.rad(100) )
-	Turn( jaw2 , x_axis, 0, math.rad(100) )
+	Turn(jaw1, x_axis, 0, math.rad(100))
+	Turn(jaw2, x_axis, 0, math.rad(100))
 end
 
 function script.QueryNanoPiece()
@@ -79,17 +79,17 @@ function script.Killed(recentDamage, maxHealth)
 	if severity <= 0.25 then
 		return 1
 	elseif severity <= 0.5 or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then
-		Explode(enginel, sfxFall + sfxFire )
-		Explode(enginer, sfxFall + sfxFire )
+		Explode(enginel, sfxFall + sfxFire)
+		Explode(enginer, sfxFall + sfxFire)
 		return 1
 	else
 		Explode(fuselage, sfxFall)
 		Explode(head, sfxFall)
 		Explode(wingl, sfxFall)
 		Explode(wingr, sfxFall)
-		Explode(enginel, sfxFall + sfxSmoke + sfxFire )
-		Explode(enginer, sfxFall + sfxSmoke + sfxFire )
-		Explode(lathe, sfxFall + sfxSmoke + sfxFire )
+		Explode(enginel, sfxFall + sfxSmoke + sfxFire)
+		Explode(enginer, sfxFall + sfxSmoke + sfxFire)
+		Explode(lathe, sfxFall + sfxSmoke + sfxFire)
 		return 2
 	end
 end

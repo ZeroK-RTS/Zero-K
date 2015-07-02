@@ -43,87 +43,87 @@ local pause = 600
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-local SIG_Aim  = 4
+local SIG_Aim = 4
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
 
 local function Walk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
-	while ( true ) do
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
+	while (true) do
 		Move(base, y_axis, 3.6, 6)
-		Turn( lthigh, x_axis, 0.6, 2 )
-		Turn( lleg, x_axis, 0.6, 1.75 )
-		Turn( rthigh, x_axis, -1, 2.5 )
-		Turn( rleg, x_axis, -0.4, 3 )
-		Turn( lfoot, x_axis, -0.8, 2 )
-		Sleep( 280 )
+		Turn(lthigh, x_axis, 0.6, 2)
+		Turn(lleg, x_axis, 0.6, 1.75)
+		Turn(rthigh, x_axis, -1, 2.5)
+		Turn(rleg, x_axis, -0.4, 3)
+		Turn(lfoot, x_axis, -0.8, 2)
+		Sleep(280)
 		
 		Move(base, y_axis, 0, 5)
-		Turn( rthigh, x_axis, -1, 1 )
-		Turn( rleg, x_axis, 0.4, 3 )
-		Turn( rfoot, x_axis, 0, 1.75 )
-		Sleep( 280 )
+		Turn(rthigh, x_axis, -1, 1)
+		Turn(rleg, x_axis, 0.4, 3)
+		Turn(rfoot, x_axis, 0, 1.75)
+		Sleep(280)
 		
 		Move(base, y_axis, 3.6, 6)
-		Turn( lthigh, x_axis, -1, 2.5 )
-		Turn( lleg, x_axis, -0.4, 3 )
-		Turn( lfoot, x_axis, -0.8, 2 )
-		Turn( rthigh, x_axis, 0.6, 2 )
-		Turn( rleg, x_axis, 0.6, 1.75 )
-		Sleep( 280 )
+		Turn(lthigh, x_axis, -1, 2.5)
+		Turn(lleg, x_axis, -0.4, 3)
+		Turn(lfoot, x_axis, -0.8, 2)
+		Turn(rthigh, x_axis, 0.6, 2)
+		Turn(rleg, x_axis, 0.6, 1.75)
+		Sleep(280)
 		
 		Move(base, y_axis, 0, 5)
-		Turn( lthigh, x_axis, -1, 1 )
-		Turn( lleg, x_axis, 0.4, 3 )
-		Turn( lfoot, x_axis, 0, 1.75 )
-		Sleep(  280 )
+		Turn(lthigh, x_axis, -1, 1)
+		Turn(lleg, x_axis, 0.4, 3)
+		Turn(lfoot, x_axis, 0, 1.75)
+		Sleep(280)
 	end
 end
 
 local function StopWalk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 	Move(base, y_axis, 0, 6)
 	
-	Turn( lthigh, x_axis, 0, 1 )
-	Turn( lleg, x_axis, 0, 1 )
-	Turn( lfoot, x_axis, 0, 1 )
+	Turn(lthigh, x_axis, 0, 1)
+	Turn(lleg, x_axis, 0, 1)
+	Turn(lfoot, x_axis, 0, 1)
 	
-	Turn( rthigh, x_axis, 0, 1 )
-	Turn( rleg, x_axis, 0, 1 )
-	Turn( rfoot, x_axis, 0, 1 )
+	Turn(rthigh, x_axis, 0, 1)
+	Turn(rleg, x_axis, 0, 1)
+	Turn(rfoot, x_axis, 0, 1)
 end
 
 function script.StartMoving()
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 function script.StopMoving()
-	StartThread( StopWalk )
+	StartThread(StopWalk)
 end
 
 local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	Turn( body, y_axis, 0, 2 )
-	Turn( turret, x_axis, 0, math.rad(30) )
+	Turn(body, y_axis, 0, 2)
+	Turn(turret, x_axis, 0, math.rad(30))
 end
 
 function script.QueryWeapon1() return points[missile].missile end
 
 function script.AimFromWeapon1() return pelvis end
 
-function script.AimWeapon1( heading, pitch )
-	Signal( SIG_Aim )
-	SetSignalMask( SIG_Aim )
-	Turn( body, y_axis, heading, 5 )
-	Turn( turret, x_axis, math.rad(-90), math.rad(120) )
-	WaitForTurn( body, y_axis )
-	WaitForTurn( turret, x_axis )
+function script.AimWeapon1(heading, pitch)
+	Signal(SIG_Aim)
+	SetSignalMask(SIG_Aim)
+	Turn(body, y_axis, heading, 5)
+	Turn(turret, x_axis, math.rad(-90), math.rad(120))
+	WaitForTurn(body, y_axis)
+	WaitForTurn(turret, x_axis)
 	StartThread(RestoreAfterDelay)
 	return true
 end
@@ -133,6 +133,11 @@ function script.FireWeapon1()
 	if missile > 2 then missile = 1 end
 	EmitSfx(points[missile].missile, 1024)
 	EmitSfx(points[missile].exhaust, 1025)
+end
+
+function script.BlockShot(num, targetID)	
+	return GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 1500, 120, 240) --4 seconds - timeout, 8 seconds - disarmTimer
+	--return GG.OverkillPrevention_CheckBlockD(unitID, targetID, 1500, 120, 600) --4 seconds - timeout, 20 seconds - disarmTimer
 end
 
 function script.Killed(recentDamage, maxHealth)

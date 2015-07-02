@@ -1,6 +1,6 @@
 include "constants.lua"
 
-local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local base, shield, front, bottom, back = piece('base', 'shield', 'front', 'bottom', 'back')
 local rim1, door1, rim2, door2 = piece('rim1', 'door1', 'rim2', 'door2')
@@ -11,27 +11,27 @@ local SIG_HIT = 2
 
 local function WobbleUnit()
 	while true do
-		Move( base , y_axis, 0.8 , 1.2)
+		Move(base, y_axis, 0.8, 1.2)
 		Sleep(750)
-		Move( base , y_axis, -0.80 , 1.2)
+		Move(base, y_axis, -0.80, 1.2)
 		Sleep(750)
 	end
 end
 
 function HitByWeaponThread(x, z)
-	Signal( SIG_HIT)
-	SetSignalMask( SIG_HIT)
-	Turn( base , z_axis, math.rad(-z), math.rad(105))
-	Turn( base , x_axis, math.rad(x ), math.rad(105))
+	Signal(SIG_HIT)
+	SetSignalMask(SIG_HIT)
+	Turn(base, z_axis, math.rad(-z), math.rad(105))
+	Turn(base, x_axis, math.rad(x), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, 0, math.rad(30))
-	Turn( base , x_axis, 0, math.rad(30))
+	Turn(base, z_axis, 0, math.rad(30))
+	Turn(base, x_axis, 0, math.rad(30))
 end
 
 local function MoveScript()
 	while true do 
-		if math.random() < 0.5  then
+		if math.random() < 0.5 then
 			EmitSfx(wake1, 5)
 			EmitSfx(wake3, 5)
 			EmitSfx(wake5, 5)
@@ -51,8 +51,8 @@ local function MoveScript()
 			EmitSfx(wake8, 3)
 		end
 	
-		EmitSfx( base,  1024+0 )
-		Sleep( 150)
+		EmitSfx(base, 1024+0)
+		Sleep(150)
 	end
 end
 
@@ -120,7 +120,7 @@ local spSetUnitWeaponState = Spring.SetUnitWeaponState
 local spGetGameFrame = Spring.GetGameFrame
 
 local depthchargeWeaponDef = WeaponDefNames["hoverdepthcharge_depthcharge"]
-local RELOAD = math.ceil( depthchargeWeaponDef.reload * Game.gameSpeed )
+local RELOAD = math.ceil(depthchargeWeaponDef.reload * Game.gameSpeed)
 
 function ShootDepthcharge()
 	EmitSfx(pads, FIRE_W3)
@@ -133,10 +133,10 @@ local function FakeWeaponShoot()
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local h = Spring.GetGroundHeight(x,z)
 		if h > -10 then
-			local gameFrame   = spGetGameFrame()
-			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
+			local gameFrame = spGetGameFrame()
+			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame} )
+			spSetUnitWeaponState(unitID, 1, {reloadFrame = reloadFrame})
 			
 			EmitSfx(pads, FIRE_W3)
 			StartThread(ShotThread)
@@ -158,13 +158,13 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		Explode(back, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)

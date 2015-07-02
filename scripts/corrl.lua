@@ -106,7 +106,7 @@ local function FireAndReload(num)
 	
 	Show(bay[num].missile)
 	Show(bay[num].greenLight)
-	Move(bay[num].missile, z_axis, 0 , 1 )
+	Move(bay[num].missile, z_axis, 0, 1)
 	Sleep(500)
 	
 	lights = lights + 1
@@ -133,8 +133,8 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_RESTORE)
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
-		Turn(turret, y_axis, heading, math.rad(450) ) -- left-right
-		Turn(pod, x_axis, -pitch, math.rad(450) ) --up-down
+		Turn(turret, y_axis, heading, math.rad(450)) -- left-right
+		Turn(pod, x_axis, -pitch, math.rad(450)) --up-down
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(pod, x_axis)
 		return true
@@ -158,53 +158,53 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
-		Explode( base, sfxShatter)
-		Explode( lever, sfxNone)
-		--Explode( door, sfxNone)
-		Explode( pod, sfxNone)
-		Explode( bay[1].missile, sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[2].missile, sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[3].missile, sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[1].backDoor, sfxNone)
-		Explode( bay[2].backDoor, sfxNone)
-		Explode( bay[3].backDoor, sfxNone)
-		Explode( turret, sfxNone)
+	if severity <= 0.25 then
+		Explode(base, sfxShatter)
+		Explode(lever, sfxNone)
+		--Explode(door, sfxNone)
+		Explode(pod, sfxNone)
+		Explode(bay[1].missile, sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[2].missile, sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[3].missile, sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[1].backDoor, sfxNone)
+		Explode(bay[2].backDoor, sfxNone)
+		Explode(bay[3].backDoor, sfxNone)
+		Explode(turret, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
-		Explode( base, sfxShatter)
-		Explode( lever, sfxFall)
-		--Explode( door, sfxFall)
-		Explode( pod, sfxShatter)
-		Explode( bay[1].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[2].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[3].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
-		Explode( bay[1].backDoor, sfxNone)
-		Explode( bay[2].backDoor, sfxNone)
-		Explode( bay[3].backDoor, sfxNone)
-		Explode( turret, sfxNone)
+	elseif severity <= 0.50 then
+		Explode(base, sfxShatter)
+		Explode(lever, sfxFall)
+		--Explode(door, sfxFall)
+		Explode(pod, sfxShatter)
+		Explode(bay[1].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[2].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[3].missile, sfxFall + sfxExplodeOnHit + sfxSmoke)
+		Explode(bay[1].backDoor, sfxNone)
+		Explode(bay[2].backDoor, sfxNone)
+		Explode(bay[3].backDoor, sfxNone)
+		Explode(turret, sfxNone)
 		return 1
-	elseif  severity <= 0.99  then
-		Explode( base, sfxShatter)
-		Explode( lever, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		--Explode( door, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( pod, sfxFall)
-		Explode( bay[1].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( bay[2].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( bay[3].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( bay[1].backDoor, sfxNone + sfxExplodeOnHit)
-		Explode( bay[2].backDoor, sfxNone + sfxExplodeOnHit)
-		Explode( bay[3].backDoor, sfxNone + sfxExplodeOnHit)
-		Explode( turret, sfxNone)
+	elseif severity <= 0.99 then
+		Explode(base, sfxShatter)
+		Explode(lever, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		--Explode(door, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(pod, sfxFall)
+		Explode(bay[1].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(bay[2].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(bay[3].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(bay[1].backDoor, sfxNone + sfxExplodeOnHit)
+		Explode(bay[2].backDoor, sfxNone + sfxExplodeOnHit)
+		Explode(bay[3].backDoor, sfxNone + sfxExplodeOnHit)
+		Explode(turret, sfxNone)
 		return 2
 	end
-	Explode( base, sfxShatter)
-	Explode( lever, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	--Explode( door, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( pod, sfxShatter + sfxExplodeOnHit)
-	Explode( bay[1].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( bay[2].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( bay[3].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( turret, sfxNone)
+	Explode(base, sfxShatter)
+	Explode(lever, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	--Explode(door, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(pod, sfxShatter + sfxExplodeOnHit)
+	Explode(bay[1].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(bay[2].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(bay[3].missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(turret, sfxNone)
 	return 2
 end

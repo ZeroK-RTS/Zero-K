@@ -70,10 +70,10 @@ end
 local function WobbleUnit()
 
 	while true do
-		Move( base , y_axis, 1, 1.20000 )
-		Sleep( 750)
-		Move( base , y_axis, -1 , 1.20000 )
-		Sleep( 750)
+		Move(base, y_axis, 1, 1.20000)
+		Sleep(750)
+		Move(base, y_axis, -1, 1.20000)
+		Sleep(750)
 	end
 end
 
@@ -89,32 +89,32 @@ local function MoveScript()
 		Sleep(2000)
 	end
 	while true do 
-		if math.random() < 0.5  then
-			EmitSfx( wake1,  5 )
-			EmitSfx( wake3,  5 )
-			EmitSfx( wake5,  5 )
-			EmitSfx( wake7,  5 )
-			EmitSfx( wake1,  3 )
-			EmitSfx( wake3,  3 )
-			EmitSfx( wake5,  3 )
-			EmitSfx( wake7,  3 )
+		if math.random() < 0.5 then
+			EmitSfx(wake1, 5)
+			EmitSfx(wake3, 5)
+			EmitSfx(wake5, 5)
+			EmitSfx(wake7, 5)
+			EmitSfx(wake1, 3)
+			EmitSfx(wake3, 3)
+			EmitSfx(wake5, 3)
+			EmitSfx(wake7, 3)
 		else
-			EmitSfx( wake2,  5 )
-			EmitSfx( wake4,  5 )
-			EmitSfx( wake6,  5 )
-			EmitSfx( wake8,  5 )
-			EmitSfx( wake2,  3 )
-			EmitSfx( wake4,  3 )
-			EmitSfx( wake6,  3 )
-			EmitSfx( wake8,  3 )
+			EmitSfx(wake2, 5)
+			EmitSfx(wake4, 5)
+			EmitSfx(wake6, 5)
+			EmitSfx(wake8, 5)
+			EmitSfx(wake2, 3)
+			EmitSfx(wake4, 3)
+			EmitSfx(wake6, 3)
+			EmitSfx(wake8, 3)
 		end
-		EmitSfx( ground1,  1024)
-		Sleep( 150)
+		EmitSfx(ground1, 1024)
+		Sleep(150)
 	end
 end
 
 function script.Create()
-	Hide( ground1)
+	Hide(ground1)
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
@@ -128,18 +128,18 @@ end
 
 local function RestoreAfterDelay()
 
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
-	Sleep( RESTORE_DELAY)
-	Move( turretbase , y_axis, 0 , 20 )
-	Turn( turretbase , x_axis, 0, math.rad(150.000000) )
-	Turn( turret , x_axis, 0, math.rad(150.000000) )
-	Turn( door1 , z_axis, math.rad(-(0)), math.rad(150.000000) )
-	Turn( door2 , z_axis, math.rad(-(0)), math.rad(150.000000) )
-	Turn( rim1 , z_axis, math.rad(-(0)), math.rad(150.000000) )
-	Turn( rim2 , z_axis, math.rad(-(0)), math.rad(150.000000) )
-	Turn( gun , y_axis, 0, math.rad(300.000000) )
-	Turn( gun , x_axis, 0, math.rad(60.000000) )
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
+	Sleep(RESTORE_DELAY)
+	Move(turretbase, y_axis, 0, 20)
+	Turn(turretbase, x_axis, 0, math.rad(150.000000))
+	Turn(turret, x_axis, 0, math.rad(150.000000))
+	Turn(door1, z_axis, math.rad(-(0)), math.rad(150.000000))
+	Turn(door2, z_axis, math.rad(-(0)), math.rad(150.000000))
+	Turn(rim1, z_axis, math.rad(-(0)), math.rad(150.000000))
+	Turn(rim2, z_axis, math.rad(-(0)), math.rad(150.000000))
+	Turn(gun, y_axis, 0, math.rad(300.000000))
+	Turn(gun, x_axis, 0, math.rad(60.000000))
 	WaitForMove(turretbase, y_axis)
 	Spring.SetUnitArmored(unitID,true)
 end
@@ -151,20 +151,20 @@ end
 function script.AimWeapon(num, heading, pitch)
 
 	StartThread(RestoreAfterDelay)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	Spring.SetUnitArmored(unitID,false)
 	
-	Move( turretbase , y_axis, 3 , 30 )
-	Turn( turretbase , x_axis, math.rad(30), math.rad(150.000000) )
-	Turn( turret , x_axis, math.rad(-30), math.rad(150.000000) )
-	Turn( door1 , z_axis, math.rad(80), math.rad(150.000000) )
-	Turn( door2 , z_axis, math.rad(-80), math.rad(150.000000) )
-	Turn( rim1 , z_axis, math.rad(-30), math.rad(150.000000) )
-	Turn( rim2 , z_axis, math.rad(30), math.rad(150.000000) )
-	Turn( gun , y_axis, heading, math.rad(300.000000) )
-	Turn( gun , x_axis, -pitch, math.rad(60.000000) )
+	Move(turretbase, y_axis, 3, 30)
+	Turn(turretbase, x_axis, math.rad(30), math.rad(150.000000))
+	Turn(turret, x_axis, math.rad(-30), math.rad(150.000000))
+	Turn(door1, z_axis, math.rad(80), math.rad(150.000000))
+	Turn(door2, z_axis, math.rad(-80), math.rad(150.000000))
+	Turn(rim1, z_axis, math.rad(-30), math.rad(150.000000))
+	Turn(rim2, z_axis, math.rad(30), math.rad(150.000000))
+	Turn(gun, y_axis, heading, math.rad(300.000000))
+	Turn(gun, x_axis, -pitch, math.rad(60.000000))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(turret, x_axis)
 	gunHeading = heading
@@ -179,18 +179,18 @@ end
 function script.FireWeapon(num)
 	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
 	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE, x_axis)
-	EmitSfx( flareMap[shootCycle],  1025 )
+	EmitSfx(flareMap[shootCycle], 1025)
 	shootCycle = (shootCycle + 1) % 2
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(base, sfxNone)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)

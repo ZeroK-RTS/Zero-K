@@ -9,8 +9,12 @@ local missiles = {
 	piece ('dummy2'),
 }
 
+local SIG_Restore = 1
+local SIG_Aim = 2
+local SIG_Move = 4
 local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
+local SIG_Stun = 32
 
 local ROCK_FIRE_FORCE = 0.06
 local ROCK_SPEED = 18		--Number of half-cycles per second around x-axis.
@@ -34,10 +38,7 @@ for i = 2, 7 do
 	wheels.small[i-1] = piece ('wheels' .. i)
 end
 
-local SIG_Restore = 1
-local SIG_Aim = 2
-local SIG_Move = 4
-
+local disarmed = false
 local isMoving = false
 local isAiming = false
 local currentMissile = 1
@@ -71,10 +72,38 @@ function TracksControl()
 	end
 end
 
-function Stunned(isFull) -- future disarm/EMP obedience
+local function RestoreAfterDelay()
 	Signal (SIG_Restore)
+	SetSignalMask (SIG_Restore)
+
+	Sleep (8000)
+
+	Turn (turret, y_axis, 0, math.rad (50))
+	Turn (sleeve, x_axis, 0, math.rad (50))
+
+	WaitForTurn (turret, y_axis)
+	WaitForTurn (sleeve, x_axis)
+	isAiming = false
+end
+
+function StunnedThread()
+	disarmed = true
+	Signal (SIG_Restore)
+	Signal (SIG_Stun)
+	SetSignalMask (SIG_Stun)
 	StopTurn(turret, y_axis)
 	StopTurn(sleeve, x_axis)
+	while IsDisarmed() do
+		Sleep (100)
+	end
+	disarmed = false
+	if isAiming then
+		StartThread(RestoreAfterDelay)
+	end
+end
+
+function Stunned(isFull)
+	StartThread (StunnedThread) -- for Sleep()
 end
 
 function script.StartMoving()
@@ -85,18 +114,6 @@ end
 function script.StopMoving()
 	isMoving = false
 end
-
-local function RestoreAfterDelay()
-	Signal (SIG_Restore)
-	SetSignalMask (SIG_Restore)
-
-	Sleep (8000)
-
-	isAiming = false
-	Turn (turret, y_axis, 0, math.rad (50))
-	Turn (sleeve, x_axis, 0, math.rad (50))
-end
-
 
 function script.AimFromWeapon()
 	return sleeve
@@ -112,21 +129,21 @@ function script.AimWeapon(num, heading, pitch)
 
 	isAiming = true
 
-	while (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) do
-		Sleep (33)
+	while disarmed do
+		Sleep (100)
 	end
 
 	local slowMult = (1 - (Spring.GetUnitRulesParam (unitID, "slowState") or 0))
 	Turn (turret, y_axis, heading, math.rad(200)*slowMult)
-	Turn (sleeve, x_axis, -pitch,  math.rad(200)*slowMult)
+	Turn (sleeve, x_axis, -pitch, math.rad(200)*slowMult)
 
+	StartThread (RestoreAfterDelay)
 	WaitForTurn (turret, y_axis)
 	WaitForTurn (sleeve, x_axis)
 
-	StartThread (RestoreAfterDelay)
 	gunHeading = heading
 
-	return (Spring.GetUnitRulesParam (unitID, "disarmed") ~= 1)
+	return true
 end
 
 
@@ -139,10 +156,14 @@ local function ReloadThread(missile)
 end
 
 function script.FireWeapon()
+	currentMissile = 3 - currentMissile
 	StartThread(ReloadThread, currentMissile)
 	StartThread(Rock, gunHeading, ROCK_FIRE_FORCE, z_axis)
 	StartThread(Rock, gunHeading - hpi, ROCK_FIRE_FORCE, x_axis)
-	currentMissile = 3 - currentMissile
+end
+
+function script.BlockShot(num, targetID)	
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25, false) --leave troubleVsFast to false so far. Needs testing.
 end
 
 function script.Create()
@@ -181,8 +202,8 @@ function script.Killed (recentDamage, maxHealth)
 		return 2
 	else
 		Explode (base, sfxShatter)
-		Explode (turret, sfxFall + sfxSmoke  + sfxFire)
-		Explode (sleeve, sfxFall + sfxSmoke  + sfxFire)
+		Explode (turret, sfxFall + sfxSmoke + sfxFire)
+		Explode (sleeve, sfxFall + sfxSmoke + sfxFire)
 		Explode (tracks[1], sfxShatter)
 		Explode (missiles[1], sfxFall + sfxSmoke)
 		Explode (missiles[2], sfxFall + sfxSmoke + sfxFire)

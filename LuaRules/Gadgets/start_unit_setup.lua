@@ -60,13 +60,12 @@ local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 
-local shuffleMode = Spring.GetModOption("shuffle", false, "off")
-
 local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
-
+local startboxString = Spring.GetModOptions().startboxes
+local startboxConfig = startboxString and (loadstring(startboxString)()) or {}
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
@@ -87,8 +86,6 @@ local ploppableDefs = {}
 local gamestart = false
 --local createBeforeGameStart = {}	-- no longer used
 local scheduledSpawn = {}
-local startPosition = {} -- [teamID] = {x, y, z}
-local shuffledStartPosition = {}
 local luaSetStartPositions = {}
 local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams
@@ -124,7 +121,7 @@ local loadGame = false	-- was this loaded from a savegame?
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+	if ploppableDefs[unitDefID] and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
@@ -204,7 +201,6 @@ function gadget:Initialize()
   local frame = Spring.GetGameFrame()
   if frame and frame > 0 then
     gamestart = true
-	Shuffle()
   end
   
   InitUnsafe()
@@ -297,16 +293,25 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 local function getMiddleOfStartBox(teamID)
-	local allyTeam = select(6, spGetTeamInfo(teamID))
-	local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
-	
-	local x = x1 + (x2 - x1)*0.5
-	local z = z1 + (z2 - z1)*0.5
-	local y = Spring.GetGroundHeight(x,z)
+	if not startboxString then -- legacy boxes
+		local allyTeam = select(6, spGetTeamInfo(teamID))
+		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
 
-	return x, y, z
+		local x = x1 + (x2 - x1)*0.5
+		local z = z1 + (z2 - z1)*0.5
+		local y = Spring.GetGroundHeight(x,z)
+
+		return x, y, z
+	else
+		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+		local box = boxID and startboxConfig[boxID] or {0,0,1,1}
+		local x = (box[1]+box[3])/2 * Game.mapSizeX
+		local z = (box[2]+box[4])/2 * Game.mapSizeZ
+		local y = Spring.GetGroundHeight(x,z)
+
+		return x, y, z
+	end
 end
-
 
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
   local luaAI = Spring.GetTeamLuaAI(teamID)
@@ -346,13 +351,18 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   
   if startUnit then
     -- replace with shuffled position
-	local startPosition = luaSetStartPositions[teamID] or shuffledStartPosition[teamID]
-	local x,y,z = startPosition.x, startPosition.y, startPosition.z
-
-	if notAtTheStartOfTheGame and Game.startPosType == 2 and not (shuffleMode and (shuffleMode == "allboxes")) then
-		x, y, z = getMiddleOfStartBox(teamID)
+	local x,y,z
+	local startPosition = luaSetStartPositions[teamID]
+	if not startPosition then
+		if (startboxString and not Spring.GetTeamRulesParam(teamID, "valid_startpos")) or (not startboxString and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
+			x,y,z = getMiddleOfStartBox(teamID)
+		else
+			x,y,z = Spring.GetTeamStartPosition(teamID)
+		end
+	else
+		x,y,z = startPosition.x, startPosition.y, startPosition.z
 	end
-	
+
     -- get facing direction
     local facing = GetFacingDirection(x, z, teamID)
 
@@ -457,121 +467,6 @@ local function StartUnitPicked(playerID, name)
 	GG.startUnits[teamID] = GetStartUnit(teamID) -- ctf compatibility
 end
 
--- {[1] = 1, [2] = 3, [3] = 4} -> {[3] = 1, [1] = 4, [4] = 3}
-local function ShuffleSequence(nums)
-  local seq, shufseq = {}, {}
-  for i = 1, #nums do
-    seq[i] = {nums[i], math.random()}
-  end
-  table.sort(seq, function(a,b) return a[2] < b[2] end)
-  for i = 1, #nums do
-    shufseq[nums[i]] = seq[i][1]
-  end
-  return shufseq
-end
-
-function GetAllTeamsList()
-  teamList = {}
-  -- create list with all teams
-  for _, alliance in ipairs(Spring.GetAllyTeamList()) do
-    if alliance ~= gaiaally then
-      local teams = Spring.GetTeamList(alliance)
-      for _, team in ipairs(teams) do
-        teamList[#teamList + 1] = team
-      end
-    end
-  end
-  return teamList
-end
-
-function Shuffle()
-  -- setup startpos
-  local teamIDs = Spring.GetTeamList()
-  for i=1,#teamIDs do
-    teamID = teamIDs[i]
-    if teamID ~= gaiateam then
-      local x, y, z = Spring.GetTeamStartPosition(teamID)
-      startPosition[teamID] = {x=x, y=y, z=z}
-      shuffledStartPosition[teamID] = startPosition[teamID]
-    end
-  end
-
-  if (not shuffleMode) or (shuffleMode and shuffleMode == "off") then
-    -- nothing to do
-
-  elseif shuffleMode then
-
-    if shuffleMode == "box" then
- 
-     -- shuffle for each alliance
-      for _, alliance in ipairs(Spring.GetAllyTeamList()) do
-        if alliance ~= gaiaally then
-          local teamList = Spring.GetTeamList(alliance)
-          local shuffled = ShuffleSequence(teamList)
-          for _, team in ipairs(teamList) do
-            shuffledStartPosition[team] = startPosition[shuffled[team]]
-          end
-        end
-
-      end
-
-    elseif shuffleMode == "all" then
-
-      teamList = GetAllTeamsList()
-      -- shuffle
-      local shuffled = ShuffleSequence(teamList)
-      for _, team in ipairs(teamList) do
-        shuffledStartPosition[team] = startPosition[shuffled[team]]
-      end      
-
-    elseif shuffleMode == "allboxes" then
-
-      teamList = GetAllTeamsList()
-      boxPosition = {}
-      --[[ Spring will replace a missing box by adding one covering the whole map.
-           So if two or more boxes are missing, serveral commanders will be placed
-           in the middle of the map. ]]
-      -- get box middle positions
-      for _,a in ipairs(Spring.GetAllyTeamList()) do
-        if a ~= gaiaally then
-          local xmin, zmin, xmax, zmax = Spring.GetAllyTeamStartBox(a)
-          if xmin and zmin and xmax and zmax then
-            local xmid = (xmax + xmin) / 2
-            local zmid = (zmax + zmin) / 2
-            local ymid = Spring.GetGroundHeight(xmid, zmid)
-            local i = #boxPosition + 1
-            boxPosition[i] = {x = xmid, y = ymid, z = zmid}
-            --teamList[i] = i - 1 -- team number starts at 0
-          else
-            Spring.Echo("Shuffle warning: non-gaia allyteam " .. a .. " has no startbox.")
-          end
-        end
-      end
-
-      if #boxPosition >= #teamList then
-        -- shuffle all positions, use first #teamList positions to shuffle teams
-        local nums = {}
-        for i=1,#boxPosition do
-          nums[#nums + 1] = i
-        end
-        local shuffledNums = ShuffleSequence(nums)
-        for i=1,#teamList do
-          shuffledStartPosition[teamList[i]] = boxPosition[shuffledNums[i]]
-        end
-      else
-        Spring.Echo("Not enough boxes. Teams not shuffled.")
-      end
-
-    end
-  end
-end
-
---[[
-   spring puts all specs on team 0, so we have to check if team 0 is
-   a team with players or a ai team with specs
-   if team 0 is ai team with only specs, nil is returned else
-   this functions returns the playerlist unchanged
---]]
 local function workAroundSpecsInTeamZero(playerlist, team)
   if team == 0 then
     local players = #playerlist
@@ -609,9 +504,6 @@ function gadget:GameStart()
 		return
 	end
   gamestart = true
-
-  -- shuffle start unit positions
-  Shuffle()
 
   -- spawn units
   for i,team in ipairs(Spring.GetTeamList()) do

@@ -38,6 +38,7 @@ local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
 local random 				= math.random
 local sqrt 					= math.sqrt
+local min                   = math.min
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 local GetEffectiveWeaponRange = Spring.Utilities.GetEffectiveWeaponRange
@@ -306,33 +307,46 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 	local cx,cy,cz -- command position	
-	
+
 	if not (ex and vx) then
 		return behaviour.skirmKeepOrder
-	end
+	end	
 	
+	-- The e vector is relative to unit position
+	ex, ey, ez = ex - ux, ey - uy, ez - uz
+	
+	-- The d vector is also relative to unit position.
 	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
 	
-	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
-	local skirmRange = GetEffectiveWeaponRange(data.udID,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) - behaviour.skirmLeeway
+	local eDistSq = ex^2 + ey^2 + ez^2
+	local eDist = sqrt(eDistSq)
 	
-	if skirmRange > pointDis then
+	-- Scalar projection of prediction vector onto enemy vector
+	local predProj = (ex*dx + ey*dy + ez*dz)/eDistSq
+
+	-- Calculate predicted enemy distance
+	local predictedDist = eDist
+	if predProj > 0 then 
+		predictedDist = predictedDist*predProj
+	else
+		-- In this case the enemy is predicted to go past me
+		predictedDist = 0
+	end
+	local skirmRange = GetEffectiveWeaponRange(data.udID,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) - behaviour.skirmLeeway
+
+	if skirmRange > predictedDist then
 	
 		if behaviour.skirmOnlyNearEnemyRange then
-			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(uy-ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
-			if enemyRange < pointDis then
+			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
+			if enemyRange < predictedDist then
 				return behaviour.skirmKeepOrder
 			end
 		end
 
-		local dis = behaviour.skirmOrderDis 
-		local f = dis/pointDis
-		if (pointDis+dis > skirmRange-behaviour.stoppingDistance) then
-			f = (skirmRange-behaviour.stoppingDistance-pointDis)/pointDis
-		end
-		local cx = ux+(ux-ex)*f
+		local wantedDis = min(behaviour.skirmOrderDis, skirmRange - behaviour.stoppingDistance - predictedDist)
+		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
-		local cz = uz+(uz-ez)*f
+		local cz = uz - wantedDis*ez/eDist
 		
 		if move then
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )

@@ -30,12 +30,12 @@ local SIG_ACTIVATE = 8
 
 local spGetUnitWeaponState = Spring.GetUnitWeaponState
 local spSetUnitWeaponState = Spring.SetUnitWeaponState
-local spGetUnitRulesParam  = Spring.GetUnitRulesParam
-local spGetGameFrame       = Spring.GetGameFrame
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetGameFrame	 = Spring.GetGameFrame
 
 local waveWeaponDef = WeaponDefNames["cormak_blast"]
-local WAVE_RELOAD   = math.ceil( waveWeaponDef.reload * Game.gameSpeed ) -- 27
-local WAVE_TIMEOUT  = math.ceil( waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed )* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was  (damageAreaOfEffect / explosionSpeed) - 4  frames
+local WAVE_RELOAD = math.ceil(waveWeaponDef.reload * Game.gameSpeed) -- 27
+local WAVE_TIMEOUT = math.ceil(waveWeaponDef.damageAreaOfEffect / waveWeaponDef.explosionSpeed)* (1000 / Game.gameSpeed) + 200 -- empirically maximum delay of damage was (damageAreaOfEffect / explosionSpeed) - 4 frames
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -44,103 +44,103 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		Move( torso , y_axis, 0.000000  )
-		Turn( Rleg , x_axis, 0 )
-		Turn( lowerRleg , x_axis, 0 )
-		Turn( Rfoot , x_axis, 0 )
-		Turn( Lleg , x_axis, 0 )
-		Turn( lowerLleg , x_axis, 0 )
-		Turn( Lfoot , x_axis, 0 )
+		Move(torso, y_axis, 0.000000)
+		Turn(Rleg, x_axis, 0)
+		Turn(lowerRleg, x_axis, 0)
+		Turn(Rfoot, x_axis, 0)
+		Turn(Lleg, x_axis, 0)
+		Turn(lowerLleg, x_axis, 0)
+		Turn(Lfoot, x_axis, 0)
 		Sleep(67)
 	
-		Move( torso , y_axis, 0.300000  )
-		Turn( Rleg , x_axis, math.rad(-10.000000) )
-		Turn( lowerRleg , x_axis, math.rad(-20.000000) )
-		Turn( Rfoot , x_axis, math.rad(20.000000) )
-		Turn( Lleg , x_axis, math.rad(10.000000) )
-		Turn( lowerLleg , x_axis, math.rad(20.000000) )
-		Turn( Lfoot , x_axis, math.rad(-20.000000) )
+		Move(torso, y_axis, 0.300000)
+		Turn(Rleg, x_axis, math.rad(-10.000000))
+		Turn(lowerRleg, x_axis, math.rad(-20.000000))
+		Turn(Rfoot, x_axis, math.rad(20.000000))
+		Turn(Lleg, x_axis, math.rad(10.000000))
+		Turn(lowerLleg, x_axis, math.rad(20.000000))
+		Turn(Lfoot, x_axis, math.rad(-20.000000))
 		Sleep(67)
 	
-		Move( torso , y_axis, 0.700000  )
-		Turn( Rleg , x_axis, math.rad(-20.000000) )
-		Turn( lowerRleg , x_axis, math.rad(-30.005495) )
-		Turn( Rfoot , x_axis, math.rad(30.005495) )
-		Turn( lowerLleg , x_axis, math.rad(20.000000) )
-		Turn( Lfoot , x_axis, math.rad(-20.000000) )
+		Move(torso, y_axis, 0.700000)
+		Turn(Rleg, x_axis, math.rad(-20.000000))
+		Turn(lowerRleg, x_axis, math.rad(-30.005495))
+		Turn(Rfoot, x_axis, math.rad(30.005495))
+		Turn(lowerLleg, x_axis, math.rad(20.000000))
+		Turn(Lfoot, x_axis, math.rad(-20.000000))
 		Sleep(67)
 	
-		Move( torso , y_axis, 0.300000  )
-		Turn( Rleg , x_axis, math.rad(-30.005495) )
-		Turn( lowerRleg , x_axis, math.rad(-20.000000) )
-		Turn( Rfoot , x_axis, math.rad(40.005495) )
-		Turn( lowerLleg , x_axis, math.rad(30.005495) )
-		Turn( Lfoot , x_axis, math.rad(-30.005495) )
+		Move(torso, y_axis, 0.300000)
+		Turn(Rleg, x_axis, math.rad(-30.005495))
+		Turn(lowerRleg, x_axis, math.rad(-20.000000))
+		Turn(Rfoot, x_axis, math.rad(40.005495))
+		Turn(lowerLleg, x_axis, math.rad(30.005495))
+		Turn(Lfoot, x_axis, math.rad(-30.005495))
 		Sleep(67)
 	
-		Move( torso , y_axis, 0.000000  )
-		Turn( Rleg , x_axis, math.rad(-20.000000) )
-		Turn( lowerRleg , x_axis, math.rad(-10.000000) )
-		Turn( Rfoot , x_axis, math.rad(30.005495) )
-		Turn( lowerLleg , x_axis, math.rad(40.005495) )
-		Turn( Lfoot , x_axis, math.rad(-40.005495) )
+		Move(torso, y_axis, 0.000000)
+		Turn(Rleg, x_axis, math.rad(-20.000000))
+		Turn(lowerRleg, x_axis, math.rad(-10.000000))
+		Turn(Rfoot, x_axis, math.rad(30.005495))
+		Turn(lowerLleg, x_axis, math.rad(40.005495))
+		Turn(Lfoot, x_axis, math.rad(-40.005495))
 		Sleep(67)
 	
-		Move( torso , y_axis, -0.100000  )
-		Turn( Rleg , x_axis, 0 )
-		Turn( lowerRleg , x_axis, 0 )
-		Turn( Rfoot , x_axis, 0 )
-		Turn( Lleg , x_axis, 0 )
-		Turn( lowerLleg , x_axis, 0 )
-		Turn( Lfoot , x_axis, 0 )
+		Move(torso, y_axis, -0.100000)
+		Turn(Rleg, x_axis, 0)
+		Turn(lowerRleg, x_axis, 0)
+		Turn(Rfoot, x_axis, 0)
+		Turn(Lleg, x_axis, 0)
+		Turn(lowerLleg, x_axis, 0)
+		Turn(Lfoot, x_axis, 0)
 		Sleep(67)
 	
-		Move( torso , y_axis, -0.200000  )
-		Turn( Rleg , x_axis, math.rad(10.000000) )
-		Turn( lowerRleg , x_axis, math.rad(20.000000) )
-		Turn( Rfoot , x_axis, math.rad(-20.000000) )
-		Turn( Lleg , x_axis, math.rad(-10.000000) )
-		Turn( lowerLleg , x_axis, math.rad(-20.000000) )
-		Turn( Lfoot , x_axis, math.rad(20.000000) )
+		Move(torso, y_axis, -0.200000)
+		Turn(Rleg, x_axis, math.rad(10.000000))
+		Turn(lowerRleg, x_axis, math.rad(20.000000))
+		Turn(Rfoot, x_axis, math.rad(-20.000000))
+		Turn(Lleg, x_axis, math.rad(-10.000000))
+		Turn(lowerLleg, x_axis, math.rad(-20.000000))
+		Turn(Lfoot, x_axis, math.rad(20.000000))
 		Sleep(67)
 
-		Move( torso , y_axis, -0.300000  )
-		Turn( lowerRleg , x_axis, math.rad(20.000000) )
-		Turn( Rfoot , x_axis, math.rad(-20.000000) )
-		Turn( Lleg , x_axis, math.rad(-20.000000) )
-		Turn( lowerLleg , x_axis, math.rad(-30.005495) )
-		Turn( Lfoot , x_axis, math.rad(30.005495) )
+		Move(torso, y_axis, -0.300000)
+		Turn(lowerRleg, x_axis, math.rad(20.000000))
+		Turn(Rfoot, x_axis, math.rad(-20.000000))
+		Turn(Lleg, x_axis, math.rad(-20.000000))
+		Turn(lowerLleg, x_axis, math.rad(-30.005495))
+		Turn(Lfoot, x_axis, math.rad(30.005495))
 		Sleep(67)
 
-		Move( torso , y_axis, -0.400000  )
-		Turn( lowerRleg , x_axis, math.rad(30.005495) )
-		Turn( Rfoot , x_axis, math.rad(-30.005495) )
-		Turn( Lleg , x_axis, math.rad(-30.005495) )
-		Turn( lowerLleg , x_axis, math.rad(-20.000000) )
-		Turn( Lfoot , x_axis, math.rad(40.005495) )
+		Move(torso, y_axis, -0.400000)
+		Turn(lowerRleg, x_axis, math.rad(30.005495))
+		Turn(Rfoot, x_axis, math.rad(-30.005495))
+		Turn(Lleg, x_axis, math.rad(-30.005495))
+		Turn(lowerLleg, x_axis, math.rad(-20.000000))
+		Turn(Lfoot, x_axis, math.rad(40.005495))
 		Sleep(67)
 
-		Move( torso , y_axis, -0.500000  )
-		Turn( lowerRleg , x_axis, math.rad(40.005495) )
-		Turn( Rfoot , x_axis, math.rad(-40.005495) )
-		Turn( Lleg , x_axis, math.rad(-20.000000) )
-		Turn( lowerLleg , x_axis, math.rad(-10.000000) )
-		Turn( Lfoot , x_axis, math.rad(30.005495) )
+		Move(torso, y_axis, -0.500000)
+		Turn(lowerRleg, x_axis, math.rad(40.005495))
+		Turn(Rfoot, x_axis, math.rad(-40.005495))
+		Turn(Lleg, x_axis, math.rad(-20.000000))
+		Turn(lowerLleg, x_axis, math.rad(-10.000000))
+		Turn(Lfoot, x_axis, math.rad(30.005495))
 		Sleep(67)
 
-		Move( torso , y_axis, 0.000000  )
-		Turn( lowerRleg , x_axis, 0, math.rad(200.000000) )
-		Turn( Rleg , x_axis, 0, math.rad(200.000000) )
-		Turn( Rfoot , x_axis, 0, math.rad(200.000000) )
-		Turn( Lleg , x_axis, 0 )
-		Turn( lowerLleg , x_axis, 0 )
-		Turn( Lfoot , x_axis, 0 )
+		Move(torso, y_axis, 0.000000)
+		Turn(lowerRleg, x_axis, 0, math.rad(200.000000))
+		Turn(Rleg, x_axis, 0, math.rad(200.000000))
+		Turn(Rfoot, x_axis, 0, math.rad(200.000000))
+		Turn(Lleg, x_axis, 0)
+		Turn(lowerLleg, x_axis, 0)
+		Turn(Lfoot, x_axis, 0)
 		Sleep(67)
 	end
 end
 
 function script.Create()
-	--Move( emit, y_axis, 20)
+	--Move(emit, y_axis, 20)
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -151,14 +151,14 @@ function AutoAttack_Thread()
 		Sleep(100)
 		local reloaded = select(2, spGetUnitWeaponState(unitID,3))
 		if reloaded then
-			local gameFrame   = spGetGameFrame()
-			local reloadMult  = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
+			local gameFrame = spGetGameFrame()
+			local reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1.0
 			local reloadFrame = gameFrame + WAVE_RELOAD / reloadMult
-			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame} )
+			spSetUnitWeaponState(unitID, 3, {reloadFrame = reloadFrame})
 			GG.PokeDecloakUnit(unitID,100)
 			
-			EmitSfx( emit,  UNIT_SFX1 )
-			EmitSfx( emit,  DETO_W2 )
+			EmitSfx(emit, UNIT_SFX1)
+			EmitSfx(emit, DETO_W2)
 			FireAnim()
 		end
 	end
@@ -169,20 +169,20 @@ function FireAnim()
 	local mspeed = 4
 	Move (l_gun, x_axis, 2, mspeed*3)	
 	Move (r_gun, x_axis, -2, mspeed*3)
-    WaitForMove(l_gun, x_axis)
-    WaitForMove(r_gun, x_axis)
-    Sleep(1)
+	WaitForMove(l_gun, x_axis)
+	WaitForMove(r_gun, x_axis)
+	Sleep(1)
 	Move (l_gun, x_axis, 0, mspeed)	
 	Move (r_gun, x_axis, 0, mspeed)
-    Sleep(1)
+	Sleep(1)
 end
 
 function script.Activate()
-  StartThread(AutoAttack_Thread)
+ StartThread(AutoAttack_Thread)
 end
 
 function script.Deactivate()
-  Signal(SIG_ACTIVATE)
+ Signal(SIG_ACTIVATE)
 end
 
 function script.StartMoving()
@@ -195,8 +195,8 @@ end
 
 function script.FireWeapon(num)
 	if num == 3 then
-		EmitSfx( emit,  UNIT_SFX1 )
-		EmitSfx( emit,  DETO_W2 )
+		EmitSfx(emit, UNIT_SFX1)
+		EmitSfx(emit, DETO_W2)
 		FireAnim()
 	end
 end
@@ -215,7 +215,7 @@ end
 
 local function Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(torso, sfxNone)
 		Explode(Rleg, sfxNone)
@@ -225,7 +225,7 @@ local function Killed(recentDamage, maxHealth)
 		Explode(Rfoot, sfxNone)
 		Explode(Lfoot, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(torso, sfxNone)
 		Explode(Rleg, sfxNone)
@@ -235,26 +235,26 @@ local function Killed(recentDamage, maxHealth)
 		Explode(Rfoot, sfxNone)
 		Explode(Lfoot, sfxNone)
 		return 1
-	elseif  severity <= .99  then
-		Explode(base, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+	elseif severity <= .99 then
+		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(torso, sfxNone)
 
-		Explode(Rleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(Lleg, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(lowerRleg, sfxNone)
 		Explode(lowerLleg, sfxNone)
-		Explode(Rfoot, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(Lfoot, sfxNone)
 		return 2
 	else
-		Explode(base, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+		Explode(base, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(torso, sfxNone)
 	
-		Explode(Rleg, SFX.FALL + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
-		Explode(Lleg, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+		Explode(Rleg, SFX.FALL + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
+		Explode(Lleg, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(lowerRleg, sfxNone)
 		Explode(lowerLleg, sfxNone)
-		Explode(Rfoot, SFX.SHATTER + SFX.FIRE  + SFX.SMOKE  + SFX.EXPLODE_ON_HIT )
+		Explode(Rfoot, SFX.SHATTER + SFX.FIRE + SFX.SMOKE + SFX.EXPLODE_ON_HIT)
 		Explode(Lfoot, sfxNone)
 		return 2
 	end
@@ -280,12 +280,12 @@ function script.Killed(recentDamage, maxHealth)
 	-- spawn wreck
 	local wreckDef = FeatureDefNames[ud.wreckName]
 	while (wreckLevel > 1 and wreckDef) do
-		wreckDef   = FeatureDefs[ wreckDef.deathFeatureID ]
+		wreckDef = FeatureDefs[ wreckDef.deathFeatureID ]
 		wreckLevel = wreckLevel - 1
 	end
 	if (wreckDef) then
-		local heading   = Spring.GetUnitHeading(unitID)
-		local teamID    = Spring.GetUnitTeam(unitID)
+		local heading = Spring.GetUnitHeading(unitID)
+		local teamID	= Spring.GetUnitTeam(unitID)
 		local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
 		Spring.SetFeatureResurrect(featureID, ud.name)
 		-- engine also sets speed and smokeTime for wrecks, but there are no lua functions for these
@@ -298,7 +298,7 @@ end
 
 if (Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil) then
 	script.Killed = function(recentDamage, maxHealth)
-	  -- spawn debris etc.
+	 -- spawn debris etc.
 		local wreckLevel = Killed(recentDamage, maxHealth)
 
 		local ud = UnitDefs[unitDefID]
@@ -317,12 +317,12 @@ if (Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil) the
 		-- spawn wreck
 		local wreckDef = FeatureDefNames[ ud.wreckName ]
 		while (wreckLevel > 1 and wreckDef) do
-			wreckDef   = FeatureDefNames[ wreckDef.deathFeature ]
+			wreckDef = FeatureDefNames[ wreckDef.deathFeature ]
 			wreckLevel = wreckLevel - 1
 		end
 		if (wreckDef) then
-			local heading   = Spring.GetUnitHeading(unitID)
-			local teamID    = Spring.GetUnitTeam(unitID)
+			local heading = Spring.GetUnitHeading(unitID)
+			local teamID	= Spring.GetUnitTeam(unitID)
 			local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
 			Spring.SetFeatureResurrect(featureID, ud.name)
 			-- engine also sets speed and smokeTime for wrecks, but there are no lua functions for these

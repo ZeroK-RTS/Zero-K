@@ -36,15 +36,15 @@ local stealth = COB.STEALTH
 
 local function Walk()
 	while (walking == true) do
-		Turn( body, 2, .1, .5 )         	-- body roll left
-		Turn( body, 3, sa/2, 1.5 )         	-- body turn right
+		Turn(body, 2, .1, .5)		 	-- body roll left
+		Turn(body, 3, sa/2, 1.5)		 	-- body turn right
 		
-		Sleep( pause )
+		Sleep(pause)
 		
-		Turn( body, 2, -.1, .5 )        	-- body roll right
-		Turn( body, 3, -sa/2, 1.5 )        	-- body turn left
+		Turn(body, 2, -.1, .5)			-- body roll right
+		Turn(body, 3, -sa/2, 1.5)			-- body turn left
 		
-		Sleep( pause )
+		Sleep(pause)
 	end
 end
 
@@ -69,31 +69,31 @@ function script.AimWeapon1()
 end
 
 local function Burrow()
-	Signal( SIG_BURROW )
-	SetSignalMask( SIG_BURROW )
+	Signal(SIG_BURROW)
+	SetSignalMask(SIG_BURROW)
 	Sleep(400)
 	
-	Signal( SIG_Walk )
+	Signal(SIG_Walk)
 	burrowed = true
-	EmitSfx( digger, dirtfling )
+	EmitSfx(digger, dirtfling)
 	
 	--burrow
-	Move( body , y_axis, -1.500000 , 1.500000 )
-	Turn( body , x_axis, math.rad(-20.000000), math.rad(20.000000) )
+	Move(body, y_axis, -1.500000, 1.500000)
+	Turn(body, x_axis, math.rad(-20.000000), math.rad(20.000000))
 	
-	if( burrowed == true ) then
+	if(burrowed == true) then
 		GG.SetWantedCloaked(unitID, 1)
-		Spring.UnitScript.SetUnitValue( stealth, 1 )
+		Spring.UnitScript.SetUnitValue(stealth, 1)
 	end
 end
 
 local function UnBurrow()
-	Signal( SIG_BURROW )
+	Signal(SIG_BURROW)
 	burrowed = false
 	GG.SetWantedCloaked(unitID, 0)
-	Spring.UnitScript.SetUnitValue( stealth, 0 )
-	Move( body , y_axis, 0.000000 , 2.000000 )
-	Turn( body , x_axis, 0, math.rad(60.000000) )
+	Spring.UnitScript.SetUnitValue(stealth, 0)
+	Move(body, y_axis, 0.000000, 2.000000)
+	Turn(body, x_axis, 0, math.rad(60.000000))
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
 	GG.UpdateUnitAttributes(unitID)
@@ -102,9 +102,9 @@ local function UnBurrow()
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
-	EmitSfx( digger, dirtfling)
+	EmitSfx(digger, dirtfling)
 	
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 local function Moving()
@@ -114,18 +114,18 @@ local function Moving()
 	Spin(wheell2, x_axis, (12))
 	Spin(wheelr1, x_axis, (12))
 	Spin(wheelr2, x_axis, (12))
-	StartThread( UnBurrow )
+	StartThread(UnBurrow)
 	walking = true
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 
 function script.StartMoving()
-	Signal( SIG_BURROW )
+	Signal(SIG_BURROW)
 	if burrowed then
-		StartThread( UnBurrow )
+		StartThread(UnBurrow)
 	else
-		StartThread( Moving )
+		StartThread(Moving)
 	end
 end
 
@@ -136,7 +136,7 @@ function script.StopMoving()
 	StopSpin(wheelr1, x_axis, (10))
 	StopSpin(wheelr2, x_axis, (10))
 	if select(2,Spring.GetUnitPosition(unitID)) > 0 then
-		StartThread( Burrow ) --cloaked
+		StartThread(Burrow) --cloaked
 	end
 end
 

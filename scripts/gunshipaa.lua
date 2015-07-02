@@ -188,7 +188,7 @@ function script.AimFromWeapon(num)
 	return base 
 end
 
-function script.AimWeapon( num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	return true
 end
 

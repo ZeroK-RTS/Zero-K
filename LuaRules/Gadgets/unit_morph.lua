@@ -459,10 +459,14 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 
   
   Spring.SetUnitRulesParam(unitID, "morphing", 1)
-  if not morphDef.combatMorph then 
-	Spring.SetUnitHealth(unitID, { paralyze = 1.0e9 })    --// turns mexes and mm off (paralyze the unit)
-	Spring.SetUnitResourcing(unitID,"e",0)                --// turns solars off
-	Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { "alt" }) --// turns radars/jammers off
+
+  if not combatMorph then
+    Spring.SetUnitRulesParam(unitID, "morphDisable", 1)
+	GG.UpdateUnitAttributes(unitID)
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if env and env.script.StopMoving then
+		Spring.UnitScript.CallAsUnit(unitID,env.script.StopMoving, hx, hy, hz)
+	end
   end
 
   morphUnits[unitID] = {
@@ -473,22 +477,30 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
     teamID = teamID,
 	combatMorph = morphDef.combatMorph,
   }
-
+  
   local cmdDescID = Spring.FindUnitCmdDesc(unitID, morphDef.cmd)
   if (cmdDescID) then
     Spring.EditUnitCmdDesc(unitID, cmdDescID, {id=morphDef.stopCmd, name=RedStr.."Stop"})
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time*32/30)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
+function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
+	local morphData = morphUnits[unitID]
+	if not morphData then return end
+	GG.StopMiscPriorityResourcing(unitID, morphData.teamID)
+	morphData.teamID = newTeamID
+	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time))
+end
 
 local function StopMorph(unitID, morphData)
   GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
   morphUnits[unitID] = nil
-  if not morphData.combatMorph then 
-    Spring.SetUnitHealth(unitID, { paralyze = -1})
+  if not morphData.combatMorph then
+    Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
+	GG.UpdateUnitAttributes(unitID)
   end
   Spring.SetUnitRulesParam(unitID, "morphing", 0)
   local scale = morphData.progress * stopPenalty
@@ -654,8 +666,8 @@ local function FinishMorph(unitID, morphData)
   end
   
   --// transfer facplop
-  if facplop then
-	Spring.SetUnitRulesParam(newUnit, "facplop", 1)
+  if facplop and (facplop == 1) then
+	Spring.SetUnitRulesParam(newUnit, "facplop", 1, {inlos = true})
   end  
   --// transfer health
   -- old health is declared far above
@@ -666,12 +678,10 @@ local function FinishMorph(unitID, morphData)
   end
   
   local newPara = 0
-  if morphData.combatMorph then
-	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
-	local slowDamage = GG.getSlowDamage(unitID)
-	if slowDamage then
-	  GG.addSlowDamage(newUnit, slowDamage)
-	end
+  newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
+  local slowDamage = GG.getSlowDamage(unitID)
+  if slowDamage then
+    GG.addSlowDamage(newUnit, slowDamage)
   end
   Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
   
@@ -1117,8 +1127,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				morphUnits[unitID] = nil
 				return false
 			end
-		elseif (cmdID == CMD.ONOFF) then
-			return morphData.combatMorph
 		elseif cmdID == CMD.SELFD then
 			StopMorph(unitID, morphData)
 			morphUnits[unitID] = nil

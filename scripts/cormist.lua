@@ -58,24 +58,24 @@ local PIVOT_SPEED = math.rad(60)
 local turnTilt = 0
 
 local function RestoreAfterDelay()
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY)
 	Turn(turret, y_axis, 0, TURRET_TURN_SPEED/2)
 	Turn(gun, x_axis, 0, GUN_TURN_SPEED/2)
 end
 
 local function SetDeploy(wantDeploy)
-	Signal( SIG_DEPLOY)
-	SetSignalMask( SIG_DEPLOY)
+	Signal(SIG_DEPLOY)
+	SetSignalMask(SIG_DEPLOY)
 	if wantDeploy then
-		Move( arms , y_axis, 10 , ARMS_RAISE_SPEED )
+		Move(arms, y_axis, 10, ARMS_RAISE_SPEED)
 		WaitForMove(arms, y_axis)
 		deployed = true
 	else
-		Turn( turret , y_axis, 0, TURRET_TURN_SPEED/2)
-		Turn( gun , x_axis, 0,GUN_TURN_SPEED/2)
-		Move( arms , y_axis, 0 , ARMS_LOWER_SPEED )
+		Turn(turret, y_axis, 0, TURRET_TURN_SPEED/2)
+		Turn(gun, x_axis, 0,GUN_TURN_SPEED/2)
+		Move(arms, y_axis, 0, ARMS_LOWER_SPEED)
 		deployed = false
 	end
 end
@@ -127,15 +127,15 @@ local function AnimControl()
 		turnTilt = -pivotAngle*0.007
 		-- Turn slowly for small course corrections
 		if math.abs(diffHeading) < 0.02 then
-			Turn( cab , y_axis, pivotAngle*2, PIVOT_SPEED*0.5)
-			Turn( rockbase , y_axis, -pivotAngle*0.2, PIVOT_SPEED*0.5)
+			Turn(cab, y_axis, pivotAngle*2, PIVOT_SPEED*0.5)
+			Turn(rockbase, y_axis, -pivotAngle*0.2, PIVOT_SPEED*0.5)
 		else
-			Turn( cab , y_axis, pivotAngle*2, PIVOT_SPEED )
-			Turn( rockbase , y_axis, -pivotAngle*0.2, PIVOT_SPEED)
+			Turn(cab, y_axis, pivotAngle*2, PIVOT_SPEED)
+			Turn(rockbase, y_axis, -pivotAngle*0.2, PIVOT_SPEED)
 		end
 		
 		lastHeading = currHeading
-		Sleep( ANIM_PERIOD)
+		Sleep(ANIM_PERIOD)
 	end
 end
 
@@ -165,12 +165,12 @@ function StartMoving()
 	local x,y,z = spGetUnitVelocity(unitID)
 	wheelTurnSpeed = math.sqrt(x*x+y*y+z*z)*WHEEL_TURN_MULT
 	
-	Spin( rwheel1, x_axis, wheelTurnSpeed)
-	Spin( rwheel2, x_axis, wheelTurnSpeed)
-	Spin( rwheel3, x_axis, wheelTurnSpeed)
-	Spin( lwheel1, x_axis, wheelTurnSpeed)
-	Spin( lwheel2, x_axis, wheelTurnSpeed)
-	Spin( lwheel3, x_axis, wheelTurnSpeed)
+	Spin(rwheel1, x_axis, wheelTurnSpeed)
+	Spin(rwheel2, x_axis, wheelTurnSpeed)
+	Spin(rwheel3, x_axis, wheelTurnSpeed)
+	Spin(lwheel1, x_axis, wheelTurnSpeed)
+	Spin(lwheel2, x_axis, wheelTurnSpeed)
+	Spin(lwheel3, x_axis, wheelTurnSpeed)
 end
 
 function Suspension()
@@ -183,7 +183,7 @@ function Suspension()
 	local speed = 0
 	local onGround = false
 	
-	while true do   
+	while true do 
 		
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
@@ -215,7 +215,7 @@ function Suspension()
 			s2l = GetWheelHeight(gs2l)
 			s3l = GetWheelHeight(gs3l)
 			
-			--xtilta = (s3r + s3l - s1l - s1r)/6000    
+			--xtilta = (s3r + s3l - s1l - s1r)/6000	
 			--xtiltv = xtiltv*0.99 + xtilta
 			--xtilt = xtilt*0.98 + xtiltv
 
@@ -227,27 +227,27 @@ function Suspension()
 			yv = yv*0.99 + ya
 			yp = yp*0.98 + yv
 
-			Move( rockbase , y_axis, yp , 9000 )
-			--Turn( rockbase , x_axis, xtilt, math.rad(9000) )
-			Turn( rockbase , z_axis, -ztilt, math.rad(9000) )
+			Move(rockbase, y_axis, yp, 9000)
+			--Turn(rockbase, x_axis, xtilt, math.rad(9000))
+			Turn(rockbase, z_axis, -ztilt, math.rad(9000))
 
-			Move( rwheel1, y_axis, s1r, 20)
-			Move( rwheel2, y_axis, s2r, 20)
-			Move( rwheel3, y_axis, s3r, 20)
-                                        
-			Move( lwheel1, y_axis, s1l, 20)
-			Move( lwheel2, y_axis, s2l, 20)
-			Move( lwheel3, y_axis, s3l, 20)
+			Move(rwheel1, y_axis, s1r, 20)
+			Move(rwheel2, y_axis, s2r, 20)
+			Move(rwheel3, y_axis, s3r, 20)
+										
+			Move(lwheel1, y_axis, s1l, 20)
+			Move(lwheel2, y_axis, s2l, 20)
+			Move(lwheel3, y_axis, s3l, 20)
 
-			Spin( rwheel1, x_axis, wheelTurnSpeed)
-			Spin( rwheel2, x_axis, wheelTurnSpeed)
-			Spin( rwheel3, x_axis, wheelTurnSpeed)
-			Spin( lwheel1, x_axis, wheelTurnSpeed)
-			Spin( lwheel2, x_axis, wheelTurnSpeed)
-			Spin( lwheel3, x_axis, wheelTurnSpeed)
+			Spin(rwheel1, x_axis, wheelTurnSpeed)
+			Spin(rwheel2, x_axis, wheelTurnSpeed)
+			Spin(rwheel3, x_axis, wheelTurnSpeed)
+			Spin(lwheel1, x_axis, wheelTurnSpeed)
+			Spin(lwheel2, x_axis, wheelTurnSpeed)
+			Spin(lwheel3, x_axis, wheelTurnSpeed)
 		end
 		Sleep(ANIM_PERIOD)
-   end 
+ end 
 end
 
 function script.Create()
@@ -270,14 +270,14 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	if moving then
 		return false
 	else
-		Turn( turret , y_axis, heading, TURRET_TURN_SPEED)
-		Turn( gun , x_axis, -pitch, GUN_TURN_SPEED)
+		Turn(turret, y_axis, heading, TURRET_TURN_SPEED)
+		Turn(gun, x_axis, -pitch, GUN_TURN_SPEED)
 		WaitForTurn(turret, y_axis)
 		WaitForTurn(gun, y_axis)
 		StartThread(RestoreAfterDelay)
@@ -287,36 +287,36 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot()
-	EmitSfx( gunPieces[shot].firepoint,  UNIT_SFX1 )
-	EmitSfx( gunPieces[shot].exhaust,  UNIT_SFX2 )
+	EmitSfx(gunPieces[shot].firepoint, UNIT_SFX1)
+	EmitSfx(gunPieces[shot].exhaust, UNIT_SFX2)
 	shot = 3 - shot
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 40.01, 36, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 36, true)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25 then
-		Explode( gun, sfxNone)
-		Explode( turret, sfxNone)
-		Explode( body, sfxNone)
+	if severity <= 0.25 then
+		Explode(gun, sfxNone)
+		Explode(turret, sfxNone)
+		Explode(body, sfxNone)
 		return 1
 	elseif severity <= 0.50 then
-		Explode( gun, sfxFall)
-		Explode( turret, sfxShatter)
-		Explode( body, sfxNone)
+		Explode(gun, sfxFall)
+		Explode(turret, sfxShatter)
+		Explode(body, sfxNone)
 		return 1
 	elseif severity <= 1 then
-		Explode( gun, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( turret, sfxShatter)
-		Explode( body, sfxNone)
+		Explode(gun, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(turret, sfxShatter)
+		Explode(body, sfxNone)
 		return 2
 	else
-		Explode( gun, sfxShatter)
-		Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( body, sfxShatter)
+		Explode(gun, sfxShatter)
+		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(body, sfxShatter)
 		return 2
 	end
 end

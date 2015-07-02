@@ -30,7 +30,7 @@ function activity_mode(n)
 			soundIndex = 9
 		end
 		
-		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection) )
+		Spin(holder, y_axis, math.rad(spinmodes[n].holder*holderDirection))
 		Spin(sphere, x_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, y_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
 		Spin(sphere, z_axis, math.rad((math.random(spinmodes[n].sphere)+spinmodes[n].sphere)*plusOrMinusOne()))
@@ -78,7 +78,7 @@ function script.Create()
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(holder, sfxSmoke  + sfxFire  + sfxExplode)
+	Explode(holder, sfxSmoke + sfxFire + sfxExplode)
 	Explode(sphere, sfxFall)
 	return 0
 end
