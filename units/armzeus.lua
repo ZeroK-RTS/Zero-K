@@ -121,6 +121,7 @@ unitDef = {
       rgbColor                = [[0.5 0.5 1]],
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
+      sprayAngle              = 1800,
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,

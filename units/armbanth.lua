@@ -233,6 +233,7 @@ unitDef = {
       soundStart              = [[weapon/LightningBolt]],
       soundStartVolume        = 2,
       soundTrigger            = true,
+      sprayAngle              = 1800,
       startsmoke              = [[1]],
       texture1                = [[lightning]],
       thickness               = 10,
