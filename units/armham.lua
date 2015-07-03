@@ -113,7 +113,6 @@ unitDef = {
       reloadtime              = 6,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
-      targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 260,

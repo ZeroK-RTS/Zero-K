@@ -116,7 +116,6 @@ unitDef = {
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
       startsmoke              = [[1]],
-      targetMoveError         = 0.1,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,

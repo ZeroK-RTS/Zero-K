@@ -107,7 +107,6 @@ unitDef = {
       soundStart              = [[weapon/small_lightning]],
       soundTrigger            = false,	  
       targetborder            = 1,
-      targetMoveError         = 0,
       texture1                = [[lightning]],
       thickness               = 1.2,
       tolerance               = 10000,

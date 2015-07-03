@@ -271,7 +271,6 @@ unitDef = {
       soundStart              = [[weapon/laser/heavy_laser3]],
       soundStartVolume        = 2,
       sweepfire               = false,
-      targetMoveError         = 0.2,
       texture1                = [[largelaserdark]],
       texture2                = [[flaredark]],
       texture3                = [[flaredark]],

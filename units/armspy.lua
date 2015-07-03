@@ -101,7 +101,6 @@ unitDef = {
       soundStart              = [[weapon/LightningBolt]],
       soundTrigger            = true,
       targetborder            = 1,
-      targetMoveError         = 0.2,
       texture1                = [[lightning]],
       thickness               = 10,
       tolerance               = 10000,

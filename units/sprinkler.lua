@@ -103,7 +103,6 @@ unitDef = {
       --soundHit                = [[weapon/laser/lasercannon_hit]],
       --0soundStart              = [[weapon/laser/small_laser_fire2]],
       soundTrigger            = true,
-      targetMoveError         = 0.0,
       thickness               = 2.55,
       tolerance               = 10000,
       turret                  = true,

@@ -112,7 +112,6 @@ unitDef = {
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
       startsmoke              = [[1]],
-      targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 330,

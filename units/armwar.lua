@@ -119,7 +119,6 @@ unitDef = {
       soundHit                = [[weapon/cannon/emg_hit]],
       soundStart              = [[weapon/heavy_emg]],
       stages                  = 10,
-      targetMoveError         = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,

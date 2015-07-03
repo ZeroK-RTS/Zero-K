@@ -151,7 +151,6 @@ unitDef = {
       soundStart              = [[weapon/laser/heavylaser_fire2]],
 	  soundStartVolume		  = 0.7,
       soundTrigger            = true,
-      targetMoveError         = 0.2,
       thickness               = 3.25,
       tolerance               = 10000,
       turret                  = true,
