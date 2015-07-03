@@ -250,7 +250,7 @@ options = {
 	radar_radar2_color = {
 		name = "Radar Inside Color",
 		type = "colors",
-		value = { 0, 0.8, 0, 1},
+		value = { 0, 1, 0, 1},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
@@ -265,7 +265,7 @@ options = {
 			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
-			options.radar_radar2_color.value = { 0, 0.8, 0, 1}
+			options.radar_radar2_color.value = { 0, 1, 0, 1}
 			updateRadarColors()
 		end,
 		path = radar_path,
