@@ -10,6 +10,7 @@ unitDef = {
   buildCostMetal         = 4500,
   buildPic               = [[funnelweb.png]],
   buildTime              = 4500,
+  canBeAssisted          = false,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,

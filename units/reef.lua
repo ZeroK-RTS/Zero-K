@@ -11,6 +11,7 @@ unitDef = {
   buildPic               = [[reef.png]],
   buildTime              = 3500,
   canAssist              = false,
+  canBeAssisted          = false,
   canMove                = true,
   canReclaim             = false,
   canRepair              = false,
