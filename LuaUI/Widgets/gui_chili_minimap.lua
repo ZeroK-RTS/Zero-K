@@ -104,7 +104,7 @@ options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight
 'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
 'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
 'radar_radar_color', 'radar_jammer_color', 'radar_radar2_color',
-'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
+'radar_preset_blue_line',  'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
 options = {
 	start_with_showeco = {
 		name = "Initial Showeco state",
@@ -263,21 +263,6 @@ options = {
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
 			options.radar_fog_brightness.value = 0.4
-			options.radar_radar_color.value = { 0, 0, 1, 1}
-			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
-			options.radar_radar2_color.value = { 0, 0.8, 0, 1}
-			updateRadarColors()
-		end,
-		path = radar_path,
-	},
-	
-	radar_preset_blue_line_dark_fog = {
-		name = 'Blue Outline Radar with dark fog',
-		type = 'button',
-		OnChange = function()
-			-- options.radar_fog_color.value = { 0.09, 0.09, 0.09, 1}
-			-- options.radar_los_color.value = { 0.41, 0.41, 0.41, 1}
-			options.radar_fog_brightness.value = 0.18
 			options.radar_radar_color.value = { 0, 0, 1, 1}
 			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
 			options.radar_radar2_color.value = { 0, 0.8, 0, 1}
