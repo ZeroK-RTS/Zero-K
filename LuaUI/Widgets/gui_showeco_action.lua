@@ -25,18 +25,7 @@ local function ToggleShoweco()
   end
 end
 
-options_path = 'Settings/Interface/Map'
-options = {
-	showeco = {
-		name = 'Show Eco Overlay',
-		desc = 'Show metal, geo spots and energy grid',
-		hotkey = {key='f4', mod=''},
-		type ='button',
-		action='showeco',
-		noAutoControlFunc = true,
-		OnChange = ToggleShoweco
-	},
-}
+WG.ToggleShoweco = ToggleShoweco
 
 --------------------------------------------------------------------------------------
 --Grid drawing. Copied and trimmed from unit_mex_overdrive.lua gadget (by licho & googlefrog)
