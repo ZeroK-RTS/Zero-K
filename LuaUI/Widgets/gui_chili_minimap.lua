@@ -260,14 +260,14 @@ options = {
 	radar_radar_color = {
 		name = "Radar Edge Color",
 		type = "colors",
-		value = (usingNewEngine and {0.1, 0, 0.3, 0}) or { 0, 0, 1, 0},
+		value = { 0, 0, 1, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
 	radar_radar2_color = {
 		name = "Radar Interior Color",
 		type = "colors",
-		value = { 0, 1, 0, 0},
+		value = { 0, 0, 1, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
@@ -304,7 +304,7 @@ options = {
 	},
 	
 	radar_preset_double_outline = {
-		name = 'Double Outline (default)',
+		name = 'Double Outline',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness.value = 0.4
@@ -321,7 +321,7 @@ options = {
 		path = radar_path,
 	},
 	radar_preset_blue_line = {
-		name = 'Blue Outline',
+		name = 'Blue Outline (default)',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness.value = 0.4

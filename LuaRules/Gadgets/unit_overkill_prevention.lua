@@ -236,6 +236,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, tro
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
 		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout)		
 	end
+	return false
 end
 
 function gadget:UnitDestroyed(unitID)

@@ -153,6 +153,7 @@ end
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(FireDelayLoop)
+	Move(shot1, y_axis, -80)
 end
 
 local function RestoreAfterDelay()
@@ -162,11 +163,18 @@ local function RestoreAfterDelay()
 end
 
 function script.QueryWeapon(num) 
-	if num == 1 then return shotPieces[num][gun_1 + 1] end
+	if num == 1 then 
+		return shotPieces[num][gun_1 + 1] 
+	end
 	return shotPieces[num] 
 end
 
-function script.AimFromWeapon(num) return shot1 end
+function script.AimFromWeapon(num) 
+	--if num == 1 then
+	--	return shotPieces[num][gun_1 + 1] 
+	--end
+	return shot1
+end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 2 then 
