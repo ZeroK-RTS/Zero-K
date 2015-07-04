@@ -101,8 +101,8 @@ end
 options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
-local radar_path = 'Settings/Interface/Map/Radar'
-local radar_path_edit = 'Settings/Interface/Map/Radar'
+local radar_path = 'Settings/Interface/Map/Radar Color'
+local radar_path_edit = 'Settings/Interface/Map/Radar Color'
 options_order = { 
 	'label_drawing', 
 	'drawinmap',
@@ -238,7 +238,7 @@ options = {
 --------------------------------------------------------------------------	
 	
 	radar_view_colors_label1 = { 
-		type = 'label', name = 'Configure Radar and Line of Sight',
+		type = 'label', name = 'Other Options',
 	},
 	
 	radar_fog_brightness = {
@@ -260,7 +260,7 @@ options = {
 	radar_radar_color = {
 		name = "Radar Edge Color",
 		type = "colors",
-		value = (usingNewEngine and {0.3, 0, 0.3, 0}) or { 0, 0, 1, 0},
+		value = (usingNewEngine and {0.1, 0, 0.3, 0}) or { 0, 0, 1, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
@@ -310,7 +310,7 @@ options = {
 			options.radar_fog_brightness.value = 0.4
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			if usingNewEngine then
-				options.radar_radar_color.value = { 0.3, 0, 0.3, 0}
+				options.radar_radar_color.value = { 0.1, 0, 0.3, 0}
 				options.radar_radar2_color.value = { 0, 1, 0, 0}
 			else
 				options.radar_radar_color.value = { 0, 0, 1, 0}
@@ -358,7 +358,7 @@ options = {
 		OnChange = function()
 			options.radar_fog_brightness.value = 0.4
 			options.radar_radar_color.value = { 0, 0, 0.4, 0}
-			options.radar_radar2_color.value = { 0, 0.06, 1, 0}
+			options.radar_radar2_color.value = { 0, 0.04, 1, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)

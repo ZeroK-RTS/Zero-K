@@ -111,7 +111,7 @@ local TEXT_CORRECT_Y = 1.25
 
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
-options_path = 'Settings/Interface/Metal Spots'
+options_path = 'Settings/Interface/Map/Metal Spots'
 options_order = { 'drawicons', 'size', 'specPlayerColours', 'rounding'}
 options = {
 	
