@@ -460,7 +460,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   
   Spring.SetUnitRulesParam(unitID, "morphing", 1)
 
-  if not combatMorph then
+  if not morphDef.combatMorph then
     Spring.SetUnitRulesParam(unitID, "morphDisable", 1)
 	GG.UpdateUnitAttributes(unitID)
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
