@@ -107,6 +107,7 @@ options_order = {
 	'label_drawing', 
 	'drawinmap',
 	'clearmapmarks', 
+	'lastmsgpos',
 	
 	'lblViews', 
 	'viewstandard', 
@@ -161,6 +162,12 @@ options = {
 		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
+	},	
+	lastmsgpos = {
+		name = 'Zoom To Last Message',
+		desc = 'Moves the camera to the most recently placed map marker or message.',
+		type = 'button',
+		action = 'lastmsgpos',
 	},	
 	
 	lblViews = { type = 'label', name = 'Map Overlays', },

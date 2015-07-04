@@ -213,7 +213,6 @@ local cameraPath = 'Settings/Camera'
 		so the hotkey Ctrl+F2 doesn't show in the menu, and thus cannot be unbound. A proposed solution is to enable both "radioButton" 
 		& old camera button, but put the later in saperate category.
 	--]]
-	ShButton(cameraPath, 'Zoom To Last Message', 'lastmsgpos')
 
 	local cofcDisable = "luaui disablewidget Combo Overhead/Free Camera (experimental)"
 	ShRadio( cameraPath,
