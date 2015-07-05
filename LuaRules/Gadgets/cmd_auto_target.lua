@@ -44,10 +44,12 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, id, params, options, tag, synced)
 
-	if (id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE) and not options.right then
-		unitHasManualTarget[unitID] = true 
-	elseif id == CMD_UNIT_CANCEL_TARGET and not options.right then
-		unitHasManualTarget[unitID] = nil
+	if not options.right then
+		if id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE then 
+			unitHasManualTarget[unitID] = true 				
+		elseif id == CMD_UNIT_CANCEL_TARGET then
+			unitHasManualTarget[unitID] = nil		
+		end
 	end
 	
 	return true	
