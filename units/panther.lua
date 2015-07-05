@@ -123,7 +123,6 @@ unitDef = {
       soundStart              = [[weapon/more_lightning_fast]],
       soundTrigger            = true,
       startsmoke              = [[1]],
-      targetMoveError         = 0.1,
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,

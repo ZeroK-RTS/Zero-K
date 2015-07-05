@@ -166,7 +166,6 @@ unitDef = {
       soundStart              = [[weapon/bomb_drop]],
       startsmoke              = [[1]],
       startVelocity           = 200,
-      targetMoveError         = 0,
       tolerance               = 8000,
       tracks                  = false,
       turnRate                = 2500,

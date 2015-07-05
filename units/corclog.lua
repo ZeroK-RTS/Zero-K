@@ -109,7 +109,6 @@ unitDef = {
       soundStart              = [[explosion/ex_small4_2]],
       soundStartVolume        = 25,
       targetborder            = 1,
-      targetMoveError         = 0,
       thickness               = 0,
       tolerance               = 1000000,
       turret                  = true,

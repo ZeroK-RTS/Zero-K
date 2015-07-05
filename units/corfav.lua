@@ -109,7 +109,6 @@ unitDef = {
       rgbColor                = [[1 1 0]],
       soundStart              = [[weapon/laser/small_laser_fire]],
       soundTrigger            = true,
-      targetMoveError         = 0.2,
       thickness               = 5.3619026473818,
       tolerance               = 10000,
       turret                  = true,

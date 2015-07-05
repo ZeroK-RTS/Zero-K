@@ -20,7 +20,7 @@ local spSendCommands = Spring.SendCommands
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --options for epicmenu:
-options_path = 'Settings/Interface/Auto Toggle Mapviews'
+options_path = 'Settings/Interface/Map/Auto Toggle Overlay'
 options_order = {'enginemetalview','engineheightview','enginepathview'}
 options={
 	enginemetalview ={

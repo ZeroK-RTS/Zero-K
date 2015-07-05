@@ -129,7 +129,6 @@ unitDef = {
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,
       soundTrigger            = true,
-      targetMoveError         = 0,
       texture1                = [[corelaser]],
       thickness               = 2,
       turret                  = true,

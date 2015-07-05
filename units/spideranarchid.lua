@@ -102,7 +102,6 @@ unitDef = {
       soundStart              = [[weapon/laser/laser_burn8]],
       soundTrigger            = true,
       sweepfire               = false,
-      targetMoveError         = 0.1,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],

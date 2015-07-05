@@ -304,6 +304,9 @@ function StaticParticles:Visible()
   if (self.unit and not self.worldspace) then
     losState = GetUnitLosState(self.unit)
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
+	if not ux then
+	  return false
+	end
     posX,posY,posZ = posX+ux,posY+uy,posZ+uz
     radius = radius + spGetUnitRadius(self.unit)
   elseif (self.projectile and not self.worldspace) then
