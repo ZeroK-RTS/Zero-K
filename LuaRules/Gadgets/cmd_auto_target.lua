@@ -100,11 +100,11 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, id, params, options
 	if id == CMD_QUEUE_SET_TARGET_MARKER then		
 		Spring.GiveOrderToUnit(unitID,CMD_UNIT_SET_TARGET,params,OPTIONS_RIGHT) 		
 		unitHasManualTarget[unitID] = nil
-		return {true, true}	
+		return true,true	
 	elseif id == CMD_QUEUE_CANCEL_TARGET_MARKER then
 		Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,OPTIONS_RIGHT) 		
 		unitHasManualTarget[unitID] = nil
-		return {true, true}	
+		return true,true	
 	end
 	return false
 end
