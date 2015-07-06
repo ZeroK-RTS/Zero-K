@@ -164,12 +164,13 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		if shieldCoverData then		
 			local unitAllyID = spGetUnitAllyTeam(unitID)		
 			
-			for _, shID in pairs (shieldCoverData) do
+			local shieldCoverDataCount=#shieldCoverData
+			for i = 1, shieldCoverDataCount do
+				local shID=shieldCoverData[i]			
 				if (spValidUnitID(shID) and spGetUnitHealth(shID) > 0.0) and --shield must be valid and alive
 				((not spGetUnitIsStunned(shID)) and spGetUnitRulesParam(shID, "disarmed") ~= 1) and --TODO check if unit will be disarmed soon?
 				(shields[shID].allyTeamID ~= unitAllyID) then --check if shield belongs to another alliance, thus will block our projectiles
 				
-					--Spring.Echo("shields[shID].shieldWeaponDefID="..shields[shID].shieldWeaponDefID)
 					local shWDef=WeaponDefs[shields[shID].shieldWeaponDefID]
 					local shieldPowerMax=shWDef.shieldPower
 					local shieldPowerRegen=shWDef.shieldPowerRegen --HP/sec
@@ -200,7 +201,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first				
 
 				if disarmDamages then
-					for idx, damage in pairs(disarmDamages) do
+					local disarmDamagesCount = #disarmDamages
+					for i = 1, disarmDamagesCount do
+						local damage = disarmDamages[i]
+
 						local damageToShield = damage * DISARM_DAMAGE_MOD	
 						local absorbed = false
 						for shID, shData in pairs (relevantShields) do
@@ -231,7 +235,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				end
 				
 				if regularDamages then
-					for idx, damage in pairs(regularDamages) do
+					local regularDamagesCount = #regularDamages
+					for i = 1, regularDamagesCount do
+						local damage = regularDamages[i]
+						
 						local damageToShield = damage
 						local absorbed = false
 						for shID, shData in pairs (relevantShields) do
@@ -272,11 +279,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 	
 	block = doomed or disarmed --assume function is not called with both regular and disarming damage types
 	
-	--Spring.Echo("Blocked="..tostring(block))
-	
-	
 	if not block then
-		--Spring.Echo("^^^^SHOT^^^^")
 		local frameData = incData.frames:Get(targetFrame)
 		if not frameData then frameData = {} end
 		
@@ -286,15 +289,19 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 			
 		if fullDamage > 0 then
 			if not frameData.regularDamages then frameData.regularDamages = {} end
-			local singleDamage = fullDamage / salvoSize				
+			local singleDamage = fullDamage / salvoSize
+			local regDmgSize = #frameData.regularDamages
 			for i = 1, salvoSize do
-				table.insert(frameData.regularDamages, singleDamage)			
+				--substitute for table.insert(frameData.regularDamages, singleDamage)			
+				frameData.regularDamages[regDmgSize + i] = singleDamage
 			end
 		end
 		
 		if disarmDamage > 0 then
 			if not frameData.disarmDamages then frameData.disarmDamages = {} end
-			table.insert(frameData.disarmDamages, disarmDamage)
+			
+			--substitute for table.insert(frameData.disarmDamages, disarmDamage)
+			frameData.disarmDamages[#frameData.disarmDamages + 1] = disarmDamage
 		end
 		
 		incData.frames:Upsert(targetFrame, frameData)
@@ -311,7 +318,6 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				local queue = spGetUnitCommands(unitID, 1)
 				local cmd = queue[1]
 				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
-					--Spring.Echo("Removing auto-attack command")
 					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
 					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 				end
@@ -415,23 +421,21 @@ function gadget:GameFrame(f)
 			local unitShieldRadius = WeaponDefs[shieldWeaponDef].shieldRadius --get its radius
 			
 			local unitsAround = spGetUnitsInCylinder(xSh, zSh, unitShieldRadius + addSearchRadius)
+			local unitsAroundCount = #unitsAround
 			
-			for _, uId in pairs(unitsAround) do				
+			for i = 1, unitsAroundCount do
+				local uId = unitsAround[i]
+				
 				if not shieldCoveredUnits[uId] then --this unit has not been marked as covered by any shield yet
 					shieldCoveredUnits[uId] = {}
 				end
 				
-				--add shield unit ID(shID) as a cover for uId
-				table.insert(shieldCoveredUnits[uId], shID)				
+				-- add shield unit ID(shID) as a cover for uId
+				
+				-- substitute for table.insert(shieldCoveredUnits[uId], shID)
+				shieldCoveredUnits[uId][#shieldCoveredUnits[uId]+1] = shID
 			end
 		end
-		
-		--[[
-		Spring.Echo("^^^^^^^^^FRAME^^^^^^^^^")
-		for k,v in pairs(shieldCoveredUnits) do
-			Spring.Echo("uId="..k.." is covered with "..#v.." shields")
-		end
-		]]--
 	end
 end
 
@@ -448,19 +452,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	
 	local ud=UnitDefs[unitDefID]
 	if ud.shieldWeaponDef then --unit has at least one shield. Apparently ZK has got rid of any unit with > 1 shield, so it's safe to assume shielded units carry exactly one shield.
-	--[[ --it's safe to delete. All shielded ZK units have single shield.
-		local shieldWeaponDefIDs = {}		
-		for wId, weapon in pairs(ud.weapons) do
-			local wdId = weapon.weaponDef
-			local wDef = WeaponDefs[wdId]
-			if wDef.isShield then
-				table.insert(shieldWeaponDefIDs, wdId)
-			end
-		end
-
-		shields[unitID] = {teamID = teamID, unitDefID = unitDefID, allyTeamID = spGetUnitAllyTeam(unitID),
-							shieldWeaponDefIDs = shieldWeaponDefIDs, shieldWeaponDefID = UnitDefs[unitDefID].shieldWeaponDef, speed=ud.speed or 0}
-	]]--
 		shields[unitID] = {teamID = teamID, unitDefID = unitDefID, allyTeamID = spGetUnitAllyTeam(unitID),
 							shieldWeaponDefID = UnitDefs[unitDefID].shieldWeaponDef, speed=ud.speed or 0}
 	
