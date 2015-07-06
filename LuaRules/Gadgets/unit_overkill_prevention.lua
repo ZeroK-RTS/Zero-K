@@ -198,7 +198,12 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				local disarmDamages = data.disarmDamages
 				local regularDamages = data.regularDamages
 				
-				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first				
+				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first
+
+				-- Forward note: expectedShieldPower is calculated @frame time, but projectile may hit shield sphere slightly before @frame, so overkill is possible.
+				-- If shield is considered strong enough to block projectile @frame it may not be strong enought to block projectile at whatever frame projectile is going to hit shield
+				-- There is almost nothing could be done here, since both shields and target are considered mobile (if they are not static),
+				-- So overkill will be happening from time to time, if shields are drained.
 
 				if disarmDamages then
 					local disarmDamagesCount = #disarmDamages
