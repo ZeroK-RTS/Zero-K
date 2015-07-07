@@ -542,11 +542,16 @@ local function weapons2Table(cells, ws, ud)
 		}
 		local show_projectile_speed = not cp.stats_hide_projectile_speed and not hitscan[wd.type]
 
-		if ((dps + dpsw + dpss + dpsd + dpsc) < 5) then -- no damage: newtons and such
+		if ((dps + dpsw + dpss + dpsd + dpsc) < 2) then -- no damage: newtons and such
 			show_damage = false
 			show_dps = false
 		end
 		
+		if cp.damage_vs_shield then -- Wolverine
+			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
+			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
+		end
+
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
@@ -559,7 +564,16 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
 		end
-
+		
+		local lowerName = wd.name:lower()
+		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "300%"
+		elseif lowerName:find("gauss") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "150%"
+		end
+		
 		if stun_time > 0 then
 			cells[#cells+1] = ' - Stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'
