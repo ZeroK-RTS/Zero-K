@@ -155,7 +155,9 @@ function gadget:GameFrame(f)
 					);
 					local _, maxMetal, _,_, reclaim = spGetFeatureResources(feature)
 					metal = featureMetal[feature] or maxMetal*reclaim
-					if metal >= quota then
+					-- The 0.0001 is to safeguard against rounding errors possibly introduced by
+					-- the fact that reclaim has a fractional value.
+					if metal - 0.0001 > quota then
 						unit.progress = unit.progress + quota
 						featureMetal[feature] = metal-quota
 						quota = 0
