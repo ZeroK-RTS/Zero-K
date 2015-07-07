@@ -69,8 +69,6 @@ local unit = {count = 0, data = {}} -- data holds all unitID data
 
 local drawPlayerAlways = {}
 
-local deadUnitID = 0 
-
 --------------------------------------------------------------------------------
 -- Commands
 
@@ -130,8 +128,17 @@ local function locationInRange(unitID, x, y, z, range)
 end
 
 local function clearTarget(unitID)
-	spSetUnitTarget(unitID,deadUnitID)
+	spSetUnitTarget(unitID, nil) -- The second argument is needed.
 	spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
+end
+
+if not Spring.Utilities.IsCurrentVersionNewerThan(98, 662) then
+	-- Reverse compatibility for versions earlier than
+	-- https://github.com/spring/spring/commit/b31de4c10ed7e9b9f4ec189a8337f8a8f5c5d499
+	clearTarget = function(unitID)
+		spSetUnitTarget(unitID,0)
+		spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
+	end
 end
 
 local function setTarget(data, sendToWidget)
