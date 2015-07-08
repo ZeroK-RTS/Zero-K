@@ -267,7 +267,7 @@ options = {
 	radar_radar2_color = {
 		name = "Radar Interior Color",
 		type = "colors",
-		value = { 0, 0, 1, 0},
+		value = { 0, 1, 0, 0},
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
@@ -304,34 +304,27 @@ options = {
 	},
 	
 	radar_preset_double_outline = {
-		name = 'Double Outline',
+		name = 'Double Outline (default)',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness.value = 0.4
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
-			if usingNewEngine then
-				options.radar_radar_color.value = { 0.1, 0, 0.3, 0}
-				options.radar_radar2_color.value = { 0, 1, 0, 0}
-			else
-				options.radar_radar_color.value = { 0, 0, 1, 0}
-			end
+			options.radar_radar_color.value = { 0, 0, 1, 0}
+			options.radar_radar2_color.value = { 0, 1, 0, 0}
+
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
 	},
 	radar_preset_blue_line = {
-		name = 'Blue Outline (default)',
+		name = 'Blue Outline',
 		type = 'button',
 		OnChange = function()
 			options.radar_fog_brightness.value = 0.4
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
-			if usingNewEngine then
-				options.radar_radar_color.value = { 0, 0, 1, 0}
-				options.radar_radar2_color.value = { 0, 0, 1, 0}
-			else
-				options.radar_radar_color.value = { 0, 0, 1, 0}
-			end
+			options.radar_radar_color.value = { 0, 0, 1, 0}
+			options.radar_radar2_color.value = { 0, 0, 1, 0}
 			updateRadarColors()
 			WG.crude.OpenPath(radar_path, false)
 		end,
