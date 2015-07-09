@@ -358,6 +358,19 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
 			x,y,z = Spring.GetTeamStartPosition(teamID)
+			
+			-- clamp invalid positions
+			-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
+			local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+			if boxID then
+				local box = startboxConfig[boxID]
+				local bx = x / Game.mapSizeX
+				local bz = z / Game.mapSizeZ
+				local valid = (bx > box[1]) and (bz > box[2]) and (bx < box[3]) and (bz < box[4])
+				if not valid then
+					x,y,z = getMiddleOfStartBox(teamID)
+				end
+			end
 		end
 	else
 		x,y,z = startPosition.x, startPosition.y, startPosition.z
