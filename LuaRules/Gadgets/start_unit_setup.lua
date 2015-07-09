@@ -361,7 +361,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			
 			-- clamp invalid positions
 			-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
-			local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+			local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
 			if boxID then
 				local box = startboxConfig[boxID]
 				local bx = x / Game.mapSizeX
