@@ -1239,8 +1239,8 @@ function widgetHandler:CommandNotify(id, params, options)
   return false
 end
 
-local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
-local MUTE_LOBBY = Spring.GetModOptions().mutelobby
+local MUTE_SPECTATORS = Spring.GetModOptions().mutespec or 'autodetect'
+local MUTE_LOBBY = Spring.GetModOptions().mutelobby or 'autodetect'
 local playerNameToID 
 
 do
