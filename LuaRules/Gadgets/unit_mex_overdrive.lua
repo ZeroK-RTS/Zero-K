@@ -143,9 +143,6 @@ local teamPayback = {} -- teamPayback[teamID] = {count = 0, toRemove = {}, data 
 
 local allyTeamInfo = {} 
 
-local setOreIncome = function(_,_,_) end
-GG.oreIncome = {}
-
 do
   local allyTeamList = Spring.GetAllyTeamList()
   for i=1,#allyTeamList do
