@@ -32,9 +32,6 @@ local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme
 local enableEnergyPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_od"))
 local enableMexPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_base"))
 
--- this is "fun" mod
-local OreMexModOption = tonumber((Spring.GetModOptions()).oremex) or 0 -- Red Annihilation mexes, no harvesters though, use cons/coms to reclaim ore.
-
 include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/mex_overdrive.lua")
 
@@ -793,7 +790,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 									local unitDef = UnitDefs[unitDefID]
 									if unitDef then
 										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
-										setOreIncome(unitID, thisMexM) -- this function does nothing if oremex==0 (line ~142)
 									else
 										if not spammedError then
 											Spring.Echo("unitDefID missing for maxxed metal extractor")
@@ -830,7 +826,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							else
 								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
 							end
-							setOreIncome(unitID, thisMexM) -- this function does nothing if oremex==0 (line ~142)
 						else
 							if not spammedError then
 								Spring.Echo("unitDefID missing for metal extractor")
@@ -1425,21 +1420,7 @@ function gadget:Initialize()
 		}
 		SetTeamEconomyRulesParams(teamList[i], 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 	end
-	
-	
-	-- "oremex" modoption, instead of modyfing overdrive code integrity and decreasing readability, this will do
-	-- check unit_oremex.lua for oremex code.
-	if (OreMexModOption == 1) then
-		spAddTeamResource = function(a,b,c) 
-			if b~="m" then Spring.AddTeamResource(a,b,c) end  --disable metal distribution issued by *this* gadget.
-		end
-		setOreIncome = function(unitID, oreAmount)
-			 GG.oreIncome[unitID] = oreAmount -- this spawn the rocks. It don't need to reset to empty value, because this is set to NIL when unitID is destroyed in unit_oremex.lua anyway
-		end
-		enableEnergyPayback = false -- because metal/rocks is reclaimable by anyone, so payback can't work. Also resource distribution is handled within oremex (currently communism). -- or does oremex need a communism modoption?
-		enableMexPayback = false
-	end
-	
+
 	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
 end
 
