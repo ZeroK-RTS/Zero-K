@@ -279,6 +279,7 @@ local x_cf
 local x_status
 local x_name
 local x_teamsize
+local x_teamsize_dude
 local x_share
 local x_m_mobiles
 local x_m_defense
