@@ -313,7 +313,7 @@ local function CalculateWidths()
 	x_cf			= x_elo + 32
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
-	x_teamsize		= x_icon_clan + 6
+	x_teamsize		= x_icon_clan
 	x_teamsize_dude	= x_icon_rank 
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
