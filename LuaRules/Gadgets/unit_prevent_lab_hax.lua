@@ -104,7 +104,7 @@ function checkLabs(checkFeatures, onlyUnstick)
 
 						local side = min(l,r,t,b)
 
-						if not (isAlly and ux > data.minBuildX and uz < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
+						if not (isAlly and ux > data.minBuildX and ux < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
 							if (side == l) then
 								spSetUnitPosition(unitID, data.minx - pushDistance, uz, true)
 								if data.unstickHelp then

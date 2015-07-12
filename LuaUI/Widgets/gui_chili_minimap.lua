@@ -52,6 +52,8 @@ local final_opacity = 0
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
 
 local tabbedMode = false
+
+local usingNewEngine = (#{Spring.GetLosViewColors()} == 5) -- newer engine has radar2
 --local init = true
 
 local function toggleTeamColors()
@@ -99,16 +101,128 @@ end
 options_path = 'Settings/Interface/Map'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
-local radar_path = 'Settings/Interface/Map'
-options_order = { 'use_map_ratio', 'opacity', 'alwaysResizable', 'buttonsOnRight', 'hidebuttons', 'initialSensorState', 'start_with_showeco','lastmsgpos', 'viewstandard', 'clearmapmarks',  'minimizable',
-'lblViews', 'viewheightmap', 'viewblockmap', 'lblLos', 'viewfow',
-'radar_view_colors_label1', 'radar_view_colors_label2', 'radar_fog_brightness', --'radar_fog_color', 'radar_los_color', 
-'radar_radar_color', 'radar_jammer_color', 
-'radar_preset_blue_line', 'radar_preset_blue_line_dark_fog', 'radar_preset_green', 'radar_preset_only_los', 'leftClickOnMinimap', 'fadeMinimapOnZoomOut'}
+local radar_path = 'Settings/Interface/Map/Radar Color'
+local radar_path_edit = 'Settings/Interface/Map/Radar Color'
+options_order = { 
+	'label_drawing', 
+	'drawinmap',
+	'clearmapmarks', 
+	'lastmsgpos',
+	
+	'lblViews', 
+	'viewstandard', 
+	'viewheightmap', 
+	'viewblockmap', 
+	'viewfow',
+	'showeco',
+	
+	'lable_initialView', 
+	'initialSensorState', 
+	'start_with_showeco',
+	
+	-- Radar view configuration
+	'radar_view_colors_label1',
+	'radar_fog_brightness', 
+	
+	-- Radar view editing
+	'radar_view_colors_label2', 
+	'radar_radar_color', 
+	'radar_radar2_color',
+	'radar_jammer_color', 
+
+	-- Radar view presets
+	'radar_view_presets_label1',
+	'radar_preset_only_los', 
+	'radar_preset_double_outline', 
+	'radar_preset_blue_line',  
+	'radar_preset_green', 
+	'radar_preset_green_in_blue', 
+	
+	-- Minimap options
+	'use_map_ratio',
+	'opacity', 
+	'alwaysResizable', 
+	'buttonsOnRight', 
+	'hidebuttons', 
+	'minimizable',
+	'leftClickOnMinimap', 
+	'fadeMinimapOnZoomOut', 
+}
 options = {
+	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
+	
+	drawinmap = {
+		name = 'Map Drawing Hotkey',
+		desc = 'Hold this hotkey to draw on the map and write messages. Left click to draw, right click to erase, middle click to place a marker. Double left click to type a marker message.',
+		type = 'button',
+		action = 'drawinmap',
+	},
+	clearmapmarks = {
+		name = 'Erase Map Drawing',
+		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
+		type = 'button',
+		action = 'clearmapmarks',
+	},	
+	lastmsgpos = {
+		name = 'Zoom To Last Message',
+		desc = 'Moves the camera to the most recently placed map marker or message.',
+		type = 'button',
+		action = 'lastmsgpos',
+	},	
+	
+	lblViews = { type = 'label', name = 'Map Overlays', },
+
+	viewstandard = {
+		name = 'Clear Overlays',
+		desc = 'Disables Heightmap, Pathing and Line of Sight overlays.',
+		type = 'button',
+		action = 'showstandard',
+	},
+	viewheightmap = {
+		name = 'Toggle Height Map',
+		desc = 'Shows contours of terrain elevation.',
+		type = 'button',
+		action = 'showelevation',
+	},
+	viewblockmap = {
+		name = 'Toggle Pathing Map',
+		desc = 'Select a unit to see where it can go. Select a building blueprint to see where it can be placed.',
+		type = 'button',
+		action = 'showpathtraversability',
+	},
+	
+	viewfow = {
+		name = 'Toggle Line of Sight',
+		desc = 'Shows sight distance and radar coverage.',
+		type = 'button',
+		action = 'togglelos',
+	},
+	
+	showeco = {
+		name = 'Toggle Economy Overlay',
+		desc = 'Show metal, geo spots and energy grid',
+		hotkey = {key='f4', mod=''},
+		type ='button',
+		action='showeco',
+		noAutoControlFunc = true,
+		OnChange = function(self)
+			if (WG.ToggleShoweco) then
+				WG.ToggleShoweco()
+			end
+		end,
+	},
+	
+	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
+	
+	initialSensorState = {
+		name = "Start with LOS enabled",
+		desc = "Game starts with Line of Sight Overlay enabled",
+		type = 'bool',
+		value = true,
+	},
 	start_with_showeco = {
-		name = "Initial Showeco state",
-		desc = "Game starts with Showeco enabled",
+		name = "Start with economy overly",
+		desc = "Game starts with Economy Overlay enabled",
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
@@ -117,6 +231,138 @@ options = {
 			end
 		end,
 	},
+	
+	
+--------------------------------------------------------------------------
+-- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
+--------------------------------------------------------------------------	
+	
+	radar_view_colors_label1 = { 
+		type = 'label', name = 'Other Options',
+	},
+	
+	radar_fog_brightness = {
+		name = "Fog Brightness",
+		type = "number",
+		value = 0.4, min = 0, max = 1, step = 0.01,
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path,
+	},
+	
+--------------------------------------------------------------------------
+-- Radar view color editing 'Settings/Interface/Map/Radar'
+--------------------------------------------------------------------------
+	
+	radar_view_colors_label2 = { 
+		type = 'label', name = '* Note: These colors are additive.', path = radar_path_edit,
+	},
+
+	radar_radar_color = {
+		name = "Radar Edge Color",
+		type = "colors",
+		value = { 0, 0, 1, 0},
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path_edit,
+	},
+	radar_radar2_color = {
+		name = "Radar Interior Color",
+		type = "colors",
+		value = { 0, 1, 0, 0},
+		OnChange =  function() updateRadarColors() end,
+		path = radar_path_edit,
+	},
+	radar_jammer_color = {
+		name = "Jammer Color",
+		type = "colors",
+		value = { 0.1, 0, 0, 0},
+		OnChange = function() updateRadarColors() end,
+		path = radar_path_edit,
+	},
+	
+--------------------------------------------------------------------------
+-- Radar view presets 'Settings/Interface/Map/Radar'
+--------------------------------------------------------------------------
+	
+	radar_view_presets_label1 = { 
+		type = 'label', name = 'Radar Presets', path = radar_path,
+	},
+	
+	radar_preset_only_los = {
+		name = 'Only LOS',
+		type = 'button',
+		OnChange = function()
+			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
+			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
+			options.radar_fog_brightness.value = 0.4
+			options.radar_radar_color.value = { 0, 0, 0, 0}
+			options.radar_radar2_color.value = { 0, 0, 0, 0}
+			options.radar_jammer_color.value = { 0, 0, 0, 0}
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_double_outline = {
+		name = 'Double Outline (default)',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness.value = 0.4
+			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
+			options.radar_radar_color.value = { 0, 0, 1, 0}
+			options.radar_radar2_color.value = { 0, 1, 0, 0}
+
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	radar_preset_blue_line = {
+		name = 'Blue Outline',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness.value = 0.4
+			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
+			options.radar_radar_color.value = { 0, 0, 1, 0}
+			options.radar_radar2_color.value = { 0, 0, 1, 0}
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_green = {
+		name = 'Green Area Fill',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness.value = 0.4
+			options.radar_radar_color.value = { 0, 0.17, 0, 0}
+			options.radar_radar2_color.value = { 0, 0.17, 0, 0}
+			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	
+	radar_preset_green_in_blue = {
+		name = 'Green in Blue Outline',
+		type = 'button',
+		OnChange = function()
+			options.radar_fog_brightness.value = 0.4
+			options.radar_radar_color.value = { 0, 0, 0.4, 0}
+			options.radar_radar2_color.value = { 0, 0.04, 1, 0}
+			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
+			updateRadarColors()
+			WG.crude.OpenPath(radar_path, false)
+		end,
+		path = radar_path,
+	},
+	
+	
+--------------------------------------------------------------------------
+-- Minimap path area 'Settings/HUD Panels/Minimap'
+--------------------------------------------------------------------------
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
@@ -136,186 +382,7 @@ options = {
 			end 
 		end,
 		path = minimap_path,
-	},
-	--[[
-	simpleMinimapColors = {
-		name = 'Simplified Minimap Colors',
-		type = 'bool',
-		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).', 
-		springsetting = 'SimpleMiniMapColors',
-		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
-	},
-	--]]
-	
-	initialSensorState = {
-		name = "Initial LOS state",
-		desc = "Game starts with LOS enabled",
-		type = 'bool',
-		value = true,
-	},
-	
-	lblViews = { type = 'label', name = 'Views', },
-	
-	buttonsOnRight = {
-		name = 'Map buttons on the right',
-		type = 'bool',
-		value = false,
-		OnChange = function(self) MakeMinimapWindow() end,
-		path = minimap_path,
-	},
-	alwaysResizable = {
-		name = 'Resizable',
-		type = 'bool',
-		value = false,
-		OnChange= function(self) MakeMinimapWindow() end,
-		path = minimap_path,
-	},
-	minimizable = {
-		name = 'Minimizable',
-		type = 'bool',
-		value = false,
-		OnChange= function(self) MakeMinimapWindow() end,
-		path = minimap_path,
-	},
-	
-	-- [[ this option was secretly removed
-	viewstandard = {
-		name = 'View standard map',
-		type = 'button',
-		action = 'showstandard',
-	},
-	--]]
-	clearmapmarks = {
-		name = 'Clear map drawings',
-		type = 'button',
-		action = 'clearmapmarks',
-	},
-	viewheightmap = {
-		name = 'Toggle Height Map',
-		type = 'button',
-		action = 'showelevation',
-	},
-	viewblockmap = {
-		name = 'Toggle Pathing Map',
-		desc = 'Select unit then click this to see where it can go.',
-		type = 'button',
-		action = 'showpathtraversability',
-	},
-	
-	lastmsgpos = {
-		name = 'Last Message Position',
-		type = 'button',
-		action = 'lastmsgpos',
-	},
-	
-	lblLos = { type = 'label', name = 'Line of Sight', },
-	
-	viewfow = {
-		name = 'Toggle Fog of War View',
-		type = 'button',
-		action = 'togglelos',
-	},
-	
-	radar_view_colors_label1 = { type = 'label', name = 'Radar View Colors', path = radar_path,},
-	radar_view_colors_label2 = { type = 'label', name = '* Note: These colors are additive.', path = radar_path,},
-	
-	radar_fog_brightness = {
-		name = "Fog Brightness",
-		type = "number",
-		value = 0.4, min = 0, max = 1, step = 0.01,
-		OnChange =  function() updateRadarColors() end,
-		path = radar_path,
-	},
-	-- radar_los_color = {
-	-- 	name = "LOS Color",
-	-- 	type = "colors",
-	-- 	value = 0.25, min = 0, max = 1,
-	-- 	OnChange =  function() updateRadarColors() end,
-	-- 	path = radar_path,
-	-- },
-	radar_radar_color = {
-		name = "Radar Color",
-		type = "colors",
-		value = { 0, 0, 1, 1},
-		OnChange =  function() updateRadarColors() end,
-		path = radar_path,
-	},
-	radar_jammer_color = {
-		name = "Jammer Color",
-		type = "colors",
-		value = { 0.1, 0, 0, 1},
-		OnChange = function() updateRadarColors() end,
-		path = radar_path,
-	},
-	
-	-- NB: The sum of fog color and los color on each channel needs to be 0.5 in order for the area in los to be the same colour as if fog of war was off (i.e. by hitting 'L')
-	radar_preset_blue_line = {
-		name = 'Blue Outline Radar (default)',
-		type = 'button',
-		OnChange = function()
-			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.4
-			options.radar_radar_color.value = { 0, 0, 1, 1}
-			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
-			updateRadarColors()
-		end,
-		path = radar_path,
-	},
-	
-	radar_preset_blue_line_dark_fog = {
-		name = 'Blue Outline Radar with dark fog',
-		type = 'button',
-		OnChange = function()
-			-- options.radar_fog_color.value = { 0.09, 0.09, 0.09, 1}
-			-- options.radar_los_color.value = { 0.41, 0.41, 0.41, 1}
-			options.radar_fog_brightness.value = 0.18
-			options.radar_radar_color.value = { 0, 0, 1, 1}
-			options.radar_jammer_color.value = { 0.1, 0, 0, 1}
-			updateRadarColors()
-		end,
-		path = radar_path,
-	},
-	
-	radar_preset_green = {
-		name = 'Green Area Radar',
-		type = 'button',
-		OnChange = function()
-			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.4
-			options.radar_radar_color.value = { 0, 0.17, 0, 0}
-			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
-			updateRadarColors()
-		end,
-		path = radar_path,
-	},
-	
-	radar_preset_only_los = {
-		name = 'Only LOS',
-		type = 'button',
-		OnChange = function()
-			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
-			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = 0.4
-			options.radar_radar_color.value = { 0, 0, 0, 0}
-			options.radar_jammer_color.value = { 0, 0, 0, 0}
-			updateRadarColors()
-		end,
-		path = radar_path,
-	},
-	
-	hidebuttons = {
-		name = 'Hide Minimap Buttons',
-		type = 'bool',
-		advanced = true,
-		OnChange= function(self) 
-			iconsize = self.value and 0 or 20 
-			MakeMinimapWindow() 
-		end,
-		value = false,
-		path = minimap_path,
-	},
+	},	
 	opacity = {
 		name = "Opacity",
 		type = "number",
@@ -331,6 +398,38 @@ options = {
 			MakeMinimapWindow()
 			window:Invalidate()
 		end,
+		path = minimap_path,
+	},
+	alwaysResizable = {
+		name = 'Resizable',
+		type = 'bool',
+		value = false,
+		OnChange= function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+	},	
+	buttonsOnRight = {
+		name = 'Map buttons on the right',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+	},
+	hidebuttons = {
+		name = 'Hide Minimap Buttons',
+		type = 'bool',
+		advanced = true,
+		OnChange= function(self) 
+			iconsize = self.value and 0 or 20 
+			MakeMinimapWindow() 
+		end,
+		value = false,
+		path = minimap_path,
+	},
+	minimizable = {
+		name = 'Minimizable',
+		type = 'bool',
+		value = false,
+		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 	},
 	leftClickOnMinimap = {
@@ -358,6 +457,16 @@ options = {
 			end,
 		path = minimap_path,
 	},
+	--[[
+	simpleMinimapColors = {
+		name = 'Simplified Minimap Colors',
+		type = 'bool',
+		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).', 
+		springsetting = 'SimpleMiniMapColors',
+		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
+		path = minimap_path,
+	},
+	--]]
 }
 
 function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimizable)
@@ -385,11 +494,16 @@ function updateRadarColors()
 	local los = {los_value, los_value, los_value, 1}
 	local radar = options.radar_radar_color.value
 	local jam = options.radar_jammer_color.value
-	Spring.SetLosViewColors(
-		{ fog[1], los[1], radar[1], jam[1]},
-		{ fog[2], los[2], radar[2], jam[2]}, 
-		{ fog[3], los[3], radar[3], jam[3]} 
-	)
+	local radar2 = options.radar_radar2_color.value
+	if usingNewEngine then
+		Spring.SetLosViewColors(fog, los, radar, jam, radar2)
+	else
+		Spring.SetLosViewColors(
+			{ fog[1], los[1], radar[1], jam[1]},
+			{ fog[2], los[2], radar[2], jam[2]}, 
+			{ fog[3], los[3], radar[3], jam[3]} 
+		)
+	end
 end
 
 function setSensorState(newState)

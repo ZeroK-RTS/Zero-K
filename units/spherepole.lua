@@ -117,7 +117,6 @@ unitDef = {
       rgbColor                = [[1 0.25 0]],
       soundStart              = [[BladeSwing]],
       targetborder            = 1,
-      targetMoveError         = 0.2,
       thickness               = 0,
       tolerance               = 10000,
       turret                  = true,

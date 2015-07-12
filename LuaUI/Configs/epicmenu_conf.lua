@@ -290,10 +290,8 @@ local HUDSkinPath = 'Settings/HUD Panels/HUD Skin'
 
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
-local pathMap = 'Settings/Interface/Map'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
 	ShButton(pathInterface, 'Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage')
-	ShButton(pathMap, 'Map Draw Key', "drawinmap", nil, true)
 	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
 	AddOption(pathMouse,
 	{ 	

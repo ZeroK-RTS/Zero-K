@@ -116,7 +116,6 @@ unitDef = {
       soundStartVolume        = 0.5,
       soundTrigger            = true,
       sweepfire               = false,
-      targetMoveError         = 0,
       texture1                = [[dosray]],
       texture2                = [[flare]],
       texture3                = [[flare]],

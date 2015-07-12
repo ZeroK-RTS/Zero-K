@@ -46,7 +46,6 @@ for i=1,#UnitDefs do
 	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
 		pylonDefs[i] = {
 			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE,
-			extractor = (udef.customParams.ismex and true or false),
 			neededLink = tonumber(udef.customParams.neededlink) or false,
 			keeptooltip = udef.customParams.keeptooltip or false,
 		}
@@ -56,6 +55,8 @@ end
 
 local alliedTrueTable = {allied = true}
 local inlosTrueTable = {inlos = true}
+
+local sentErrorWarning = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -417,7 +418,7 @@ local function RemovePylonsFromGridQueue(unitID)
 	end
 end
 
-local function AddPylon(unitID, unitDefID, isMex, range)
+local function AddPylon(unitID, unitDefID, range)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
@@ -429,7 +430,7 @@ local function AddPylon(unitID, unitDefID, isMex, range)
 	pylon[allyTeamID][unitID] = {
 		gridID = 0,
 		--mexes = 0,
-		mex = isMex,
+		mex = (mexByID[unitID] and true) or false,
 		nearPylon = {},
 		linkRange = range,
 		mexRange = 10,
@@ -745,6 +746,12 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 							gridMetalGain[i] = 0
 							local gridE = maxGridCapacity[i]
 							local gridMetalSquared = allyTeamData.grid[i].mexSquaredSum
+							if gridMetalSquared <= 0 and not sentErrorWarning then
+								Spring.Echo("** Warning: gridMetalSquared <= 0 **")
+								Spring.Echo(gridMetalSquared)
+								sentErrorWarning = true
+							end
+							
 							gridEnergySpent[i] = maxGridCapacity[i]
                             
 							summedMetalProduction = 0
@@ -1284,7 +1291,9 @@ local function TransferMexRefund(unitID, newTeamID)
 end
 
 local function AddMex(unitID, teamID, metalMake)
-	metalMake = metalMake or 0
+	if (metalMake or 0) <= 0 then
+		return
+	end
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	if (allyTeamID) then
 		mexByID[unitID] = {gridID = 0, allyTeamID = allyTeamID}
@@ -1398,7 +1407,7 @@ function gadget:Initialize()
 			AddMex(unitID, false, inc)
 		end
 		if (pylonDefs[unitDefID]) then
-			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
 		end
 		--if (energyDefs[unitDefID]) then
 		--	AddEnergy(unitID, unitDefID, unitTeam)
@@ -1450,7 +1459,7 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
-		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
 	end
 	if paybackDefs[unitDefID] and enableEnergyPayback then
 		AddEnergyToPayback(unitID, unitDefID, unitTeam)
@@ -1470,7 +1479,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		if (pylonDefs[unitDefID] and notDestroyed[unitID]) then
 			local _,_,_,_,build = spGetUnitHealth(unitID)
 			if (build == 1) then
-				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].extractor, pylonDefs[unitDefID].range)
+				AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
 				--Spring.Echo(spGetUnitAllyTeam(unitID) .. "  " .. newAllyTeam)
 			end
 		end

@@ -37,7 +37,11 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   end
 
   function GG.SetStartLocation() end
-  
+
+  function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
+  	Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
+  end
+
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
     if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})

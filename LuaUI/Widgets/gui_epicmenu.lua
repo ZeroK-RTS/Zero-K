@@ -2642,8 +2642,8 @@ function widget:Initialize()
 	init = false
 	
 	--intialize remote menu trigger
-	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
-		MakeSubWindow(path)	-- FIXME should pause the game
+	WG.crude.OpenPath = function(path, pause) --Note: declared here so that it work in local copy
+		MakeSubWindow(path, pause)	-- FIXME should pause the game
 	end
 	
 	--intialize remote menu trigger 2

@@ -119,7 +119,6 @@ unitDef = {
       soundStart              = [[weapon/laser/heavy_laser3]],
       soundStartVolume        = 3,
       sweepfire               = false,
-      targetMoveError         = 0.15,
       texture1                = [[largelaserdark]],
       texture2                = [[flaredark]],
       texture3                = [[flaredark]],
@@ -170,7 +169,7 @@ unitDef = {
       -- soundStart              = [[weapon/more_lightning_fast]],
       -- soundTrigger            = true,
       -- startsmoke              = [[1]],
-      -- targetMoveError         = 0.3,
+      --
       -- texture1                = [[lightning]],
       -- thickness               = 10,
       -- turret                  = true,
