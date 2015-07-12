@@ -1,3 +1,10 @@
+--[[
+remaining issues:
+- some things that should keep or remove target don't: building things, cloaking?, ... setting target when attacking would fix part of this
+- doesn't work with queues, needs synched
+- empty area commands trigger can trigger set/remove, but shouldnt. (because this runs in CommandNotify(), where these arent filtered out yet) 
+--]]
+
 function widget:GetInfo()
   return {
     name      = "Keep Target",
@@ -44,6 +51,19 @@ local function isValidUnit(unitID)
 	return false
 end
 
+local TargetKeepingCommand = {
+	[CMD.MOVE] = true,
+	[CMD_JUMP] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+	[CMD_AREA_MEX] = true,
+	[CMD.LOAD_UNITS] = true,
+	[CMD.UNLOAD_UNITS] = true,
+	[CMD.LOAD_ONTO] = true,
+	[CMD.UNLOAD_UNIT] = true,	
+}
+
 local TargetCancelingCommand = {
 	[CMD.STOP] = true,
 	[CMD.ATTACK] = true,
@@ -54,20 +74,18 @@ local TargetCancelingCommand = {
 }
 
 function widget:CommandNotify(id, params, cmdOptions)
-    if TargetCancelingCommand[id] == nil then
-		if options.keepTarget.value then
-			local units = Spring.GetSelectedUnits()
-			for i = 1, #units do
-				local unitID = units[i]
-				if isValidUnit(unitID) then
-					local cmd = Spring.GetCommandQueue(unitID, 1)
-					if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then
-						Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, cmd[1].params, {internal = true})
-					end
+    if TargetKeepingCommand[id] and options.keepTarget.value then
+		local units = Spring.GetSelectedUnits()
+		for i = 1, #units do
+			local unitID = units[i]
+			if isValidUnit(unitID) then
+				local cmd = Spring.GetCommandQueue(unitID, 1)
+				if cmd and #cmd ~= 0 and cmd[1].id == CMD.ATTACK and #cmd[1].params == 1 and not cmd[1].options.internal then
+					Spring.GiveOrderToUnit(unitID, CMD_UNIT_SET_TARGET, cmd[1].params, {internal = true})
 				end
 			end		
 		end	
-    elseif options.removeTarget.value then
+    elseif TargetCancelingCommand[id] and options.removeTarget.value then
         local units = Spring.GetSelectedUnits()
         for i = 1, #units do
             local unitID = units[i]
