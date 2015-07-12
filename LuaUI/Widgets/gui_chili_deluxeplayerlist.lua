@@ -1,4 +1,4 @@
--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
@@ -313,8 +313,8 @@ local function CalculateWidths()
 	x_cf			= x_elo + 32
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
-	x_teamsize		= x_icon_clan
-	x_teamsize_dude	= x_icon_rank - 6
+	x_teamsize		= x_icon_clan + 6
+	x_teamsize_dude	= x_icon_rank 
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
 	x_m_mobiles_width = options.stats_width.value * options.text_height.value / 2 + 10
@@ -747,7 +747,7 @@ local function UpdatePlayerInfo()
 		local teamID
 		if entities[i].isAI then
 			teamID = entities[i].teamID
-		else			
+		else
 			local playerID = entities[i].playerID
 			local name,active,spectator,localteamID,allyTeamID,pingTime,cpuUsage = Spring.GetPlayerInfo(playerID)
 			teamID = localteamID
@@ -773,7 +773,7 @@ local function UpdatePlayerInfo()
 				else
 					tstatus = 'X'
 					tstatuscolor = {1,0,0,1}
-				end			
+				end
 			end
 
 			local displayname
@@ -1014,7 +1014,7 @@ end
 
 local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	local allyTeamResources
-	local allyTeamWins	
+	local allyTeamWins
 	local allyTeamsNumActivePlayers = {}
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
@@ -1022,8 +1022,8 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 			allyTeamsNumActivePlayers[allyTeamID] = 0			
 			for j=1,#allyTeams[allyTeamID] do
 				local teamID = allyTeams[allyTeamID][j]
-				if teamID then					
-					if 	not teams[teamID].isDead and teams[teamID].isPlaying then --and teams[teamID].isActive
+				if teamID then
+					if not teams[teamID].isDead and teams[teamID].isPlaying then --and teams[teamID].isActive
 						allyTeamsNumActivePlayers[allyTeamID] = allyTeamsNumActivePlayers[allyTeamID] + 1
 					end
 					local s = GetPlayerTeamStats(teamID)
@@ -1051,7 +1051,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 					allyTeamColor = {Spring.GetTeamColor(allyTeams[allyTeamID][1])}
 				end
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = ("Team " .. allyTeamID+1),textColor = allyTeamColor,})
-				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {1,1,1,1}, align = "right"})				
+				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
 				local rstring = "smurf"
 				if elo then 
@@ -1267,13 +1267,13 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end		
+		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
 			if allyTeams[allyTeamID] then
 				if #allyTeams[allyTeamID] > 2 then existsVeryBigTeam = true end
-				if #allyTeams[allyTeamID] > 1 then numBigTeams = numBigTeams + 1 end				
+				if #allyTeams[allyTeamID] > 1 then numBigTeams = numBigTeams + 1 end
 				for j=1,#allyTeams[allyTeamID] do  -- for every player team on the ally team
 					local teamID = allyTeams[allyTeamID][j]
 					if teams[teamID] and teams[teamID].roster then
