@@ -1267,16 +1267,13 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		--if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end
-		myTeamIsVeryBig = true
+		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end		
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
 			if allyTeams[allyTeamID] then
-				--if #allyTeams[allyTeamID] > 2 then existsVeryBigTeam = true end
-				--if #allyTeams[allyTeamID] > 1 then numBigTeams = numBigTeams + 1 end
-				existsVeryBigTeam = true
-				numBigTeams = 2
+				if #allyTeams[allyTeamID] > 2 then existsVeryBigTeam = true end
+				if #allyTeams[allyTeamID] > 1 then numBigTeams = numBigTeams + 1 end				
 				for j=1,#allyTeams[allyTeamID] do  -- for every player team on the ally team
 					local teamID = allyTeams[allyTeamID][j]
 					if teams[teamID] and teams[teamID].roster then
