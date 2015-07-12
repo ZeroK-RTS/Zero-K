@@ -1265,7 +1265,7 @@ end
 ----------------------------------------------------------------
 
 local function SetHealthbar(tt_healthbar,health, maxhealth)
-	if health then
+	if health and maxhealth and (maxhealth > 0) then
 		tt_health_fraction = health/maxhealth
 		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		tt_healthbar:SetValue(tt_health_fraction)
@@ -2446,7 +2446,7 @@ function widget:Update(dt)
 			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
 			
-				if metalUse then
+				if metalUse and stt_ud.buildSpeed and (stt_ud.buildSpeed > 0) then
 					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
 					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')
 				else
@@ -2457,7 +2457,7 @@ function widget:Update(dt)
 
 			local shieldbar_stack = globalitems['shield_selunit']
 			local shieldbar = shieldbar_stack:GetChildByName('bar')
-			if shieldbar then
+			if shieldbar and stt_ud.shieldPower and (stt_ud.shieldPower > 0) then
 				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID)
 				
 				shieldbar:SetValue((shieldCurrentPower or 0) / stt_ud.shieldPower,true)
