@@ -1267,7 +1267,7 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end
+		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end -- this appears to be broken
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
@@ -1335,6 +1335,11 @@ SetupPlayerNames = function()
 		AddAllAllyTeamSummaries(allyTeamsSorted)
 		row = row + 0.5
 	elseif options.showSummaries.value then
+		if existsVeryBigTeam or numBigTeams > 2 then
+			AddAllAllyTeamSummaries(allyTeamsSorted)
+			row = row + 0.5
+		end
+		--[[
 		if amSpec then
 			if existsVeryBigTeam or numBigTeams > 2 then
 				AddAllAllyTeamSummaries(allyTeamsSorted)
@@ -1346,6 +1351,7 @@ SetupPlayerNames = function()
 				row = row + 0.5
 			end
 		end
+		--]]
 	end
 
 	-- add the player entities
