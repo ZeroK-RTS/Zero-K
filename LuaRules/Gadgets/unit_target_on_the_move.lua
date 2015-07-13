@@ -39,7 +39,6 @@ local CMD_WAIT = CMD.WAIT
 local TARGET_NONE = 0
 local TARGET_GROUND = 1
 local TARGET_UNIT= 2
-
 --------------------------------------------------------------------------------
 -- Config
 
@@ -190,9 +189,9 @@ end
 -- Unit adding/removal
 
 local function addUnit(unitID, data)
-	if spValidUnitID(unitID) then 
-        -- clear current target
-		clearTarget(unitID) -- might want to not remove existing target if new target is invalid?
+	if spValidUnitID(unitID) then
+			-- clear current target
+		clearTarget(unitID)
 		if setTarget(data, true) then
             if unitById[unitID] then
                 unit.data[unitById[unitID]] = data
@@ -214,7 +213,7 @@ local function removeUnit(unitID)
 	if unitDefID and validUnits[unitDefID] and unitById[unitID] then
 		if waitWaitUnits[unitDefID] then
 			clearTarget(unitID)
-			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})--what is the reason for this? resetting internal target?
+			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 		end
 		if unitById[unitID] ~= unit.count then
