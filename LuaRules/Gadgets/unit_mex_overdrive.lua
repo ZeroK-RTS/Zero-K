@@ -908,7 +908,7 @@ function gadget:GameFrame(n)
 				local pylonData = pylon[allyTeamID][unitID]
 				if pylonData then
 					if spValidUnitID(unitID) then
-						local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+						local stunned_or_inbuld = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1) or (spGetUnitRulesParam(unitID,"morphDisable") == 1)
 						local states = spGetUnitStates(unitID)
 						local currentlyActive = (not stunned_or_inbuld) and states and states.active
 						if (currentlyActive) and (not pylonData.active) then
@@ -1000,7 +1000,7 @@ function gadget:GameFrame(n)
 				maxGridCapacity[i] = 0
 				if not allyTeamData.nilGrid[i] then
 					for unitID,_ in pairs(allyTeamData.grid[i].pylon) do
-						local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1)
+						local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID,"disarmed") == 1) or (spGetUnitRulesParam(unitID,"morphDisable") == 1)
 						if (not stunned_or_inbuild) then
 							local _,_,em,eu = spGetUnitResources(unitID)
 							maxGridCapacity[i] = maxGridCapacity[i] + (em or 0) - (eu or 0)
