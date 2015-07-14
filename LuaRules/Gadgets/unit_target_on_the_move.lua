@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
 	name 	= "Target on the move",
-	desc	= "Adds a command to set unit target without using the normal command queue",
+	desc	= "Adds a command to set unit target without interrupting the current command queue",
 	author	= "Google Frog",
 	date	= "September 25 2011",
 	license	= "GNU GPL, v2 or later",
@@ -84,7 +84,7 @@ local unitSetTargetCmdDesc = {
 	name    = 'Set Target',
 	action  = 'settarget',
     cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands',
+	tooltip	= 'Sets target for unit without removing existing commands, persists through movement.',
 	hidden = true,
 }
 
@@ -94,7 +94,7 @@ local unitSetTargetCircleCmdDesc = {
 	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
     cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
+	tooltip	= 'Sets target for unit without removing existing commands, persists through movement. Circle version',
 	hidden = false,
 }
 
@@ -103,12 +103,13 @@ local unitCancelTargetCmdDesc = {
 	type    = CMDTYPE.ICON,
 	name    = 'Cancel Target',
 	action  = 'canceltarget',
-	tooltip	= 'Removes target for unit',
+	tooltip	= 'Removes target for unit, does not remove other existing commands',
 	hidden = false,
 }
 
 --------------------------------------------------------------------------------
 -- Gadget Interaction
+-- not used by anything. could be useful to make this information available to widgets tho.
 
 function GG.GetUnitTarget(unitID)
 	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
@@ -424,8 +425,7 @@ function gadget:GameFrame(n)
 	if n%16 == 15 then -- timing synced with slow update to reduce attack jittering
         -- 15 causes attack command to override target command
         -- 0 causes target command to take precedence
-		-- this doesnt seem to work very well and may not longer be necessary
-        
+		
         local toRemove = {count = 0, data = {}}
         for i = 1, unit.count do
             if not setTarget(unit.data[i], false) then

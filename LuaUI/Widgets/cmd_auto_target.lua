@@ -13,24 +13,23 @@ end
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local AttackCommand = {
-	[CMD.ATTACK] = true,	
+	[CMD.ATTACK] = true,
 	[CMD.AREA_ATTACK] =true,
 }	
 
 local AutoTargetCancelingCommand = {
 	[CMD.STOP] = true,
-	[CMD.GUARD] = true,	
+	[CMD.GUARD] = true,
 }
-
+-- makes no sense to preserve target during fight as jitter will occur
 local AlwaysCancelingCommand = {
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,
 }
 
-
 local unitHasManualTarget = {}
 
-local function isValidUnit(unitID, unitDefID)	
+local function isValidUnit(unitID, unitDefID)
 	if Spring.ValidUnitID(unitID) then
 		local ud = UnitDefs[unitDefID]
 		return ud and not (ud.isBomber or ud.isFactory)
@@ -38,33 +37,36 @@ local function isValidUnit(unitID, unitDefID)
 	return false
 end
 
-function widget:UnitCommand(unitID, unitDefID, teamID, id, options, params, tag)		
-	if math.bit_and(options,CMD.OPT_INTERNAL) == CMD.OPT_INTERNAL then return end
-	local opt = math.bit_or(options,CMD.OPT_RIGHT+CMD.OPT_INTERNAL)
+function widget:UnitCommand(unitID, unitDefID, teamID, id, options, params, tag)
+	--if math.bit_and(options,CMD.OPT_INTERNAL) == CMD.OPT_INTERNAL then return end --seems unnecessary
 	
-	if isValidUnit(unitID, unitDefID) then
-		if AttackCommand[id] then -- attack always overrides target		
+	if AttackCommand[id] then
+		if isValidUnit(unitID, unitDefID) then
+			local opt = math.bit_or(options,CMD.OPT_RIGHT+CMD.OPT_INTERNAL)
 			Spring.GiveOrderToUnit(unitID,CMD_UNIT_SET_TARGET,params,opt)
-		-- should check for existing target here to avoid giving unnecessary order but thats in gadget space
-		-- also preserving target through fight makes little sense, as jitter will occur
-		elseif AutoTargetCancelingCommand[id] and unitHasManualTarget[unitID] == nil then 
-			Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,opt)
-		elseif AlwaysCancelingCommand[id] then
-		Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,opt)
-		end			
+		end
+		
+	elseif AlwaysCancelingCommand[id] or (AutoTargetCancelingCommand[id] and not unitHasManualTarget[unitID]) then
+		if isValidUnit(unitID, unitDefID) then
+			local currentTarget = Spring.GetUnitRulesParam(unitID, "target_type")			
+			if currentTarget and currentTarget > 0 then
+				local opt = math.bit_or(options,CMD.OPT_RIGHT+CMD.OPT_INTERNAL)
+				Spring.GiveOrderToUnit(unitID,CMD_UNIT_CANCEL_TARGET,params,opt)
+			end
+		end	
 	end
 end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, id, cmdTag, cmdParams, cmdOpts)
 	
-	if id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE then		
-		if cmdOpts.right then unitHasManualTarget[unitID] = nil			
+	if id == CMD_UNIT_SET_TARGET or id == CMD_UNIT_SET_TARGET_CIRCLE then
+		if cmdOpts.right then unitHasManualTarget[unitID] = nil
 		else unitHasManualTarget[unitID] = true
 		end
-	elseif id == CMD_UNIT_CANCEL_TARGET then unitHasManualTarget[unitID] = nil	
-	end		
+	elseif id == CMD_UNIT_CANCEL_TARGET then unitHasManualTarget[unitID] = nil
+	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-	if unitHasManualTarget[unitID] == true then unitHasManualTarget[unitID] = nil end
+	unitHasManualTarget[unitID] = nil
 end
