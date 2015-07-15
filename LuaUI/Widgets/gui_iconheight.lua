@@ -150,10 +150,16 @@ end
 local UpdateDynamic = function()
 	local cs = Spring.GetCameraState()
 	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
-	if showingicons and cs.py - gy < options.iconheight.value - tolerance then
+	local testHeight = cs.py - gy
+	if cs.name == "ov" then
+		testHeight = options.iconheight.value * 2
+	elseif cs.name == "ta" then
+		testHeight = cs.height - gy
+	end
+	if showingicons and testHeight < options.iconheight.value - tolerance then
 		Spring.SendCommands("disticon " .. 100000)
 		showingicons = false
-	elseif not showingicons and cs.py - gy > options.iconheight.value + tolerance then
+	elseif not showingicons and testHeight > options.iconheight.value + tolerance then
 		Spring.SendCommands("disticon " .. 0)
 		showingicons = true
 	end
