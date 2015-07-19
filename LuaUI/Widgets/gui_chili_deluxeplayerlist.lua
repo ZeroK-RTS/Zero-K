@@ -3,9 +3,9 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 2.02",
+    name      = "Chili Deluxe Player List - Alpha 2.03",
     desc      = "v0.210 Chili Deluxe Player List, Alpha Release",
-    author    = "CarRepairer, KingRaptor, CrazyEddie",
+    author    = "CarRepairer, KingRaptor, CrazyEddie, Klon",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
@@ -278,6 +278,8 @@ local x_elo
 local x_cf
 local x_status
 local x_name
+local x_teamsize
+local x_teamsize_dude
 local x_share
 local x_m_mobiles
 local x_m_defense
@@ -311,6 +313,8 @@ local function CalculateWidths()
 	x_cf			= x_elo + 32
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
+	x_teamsize		= x_icon_clan
+	x_teamsize_dude	= x_icon_rank 
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
 	x_m_mobiles_width = options.stats_width.value * options.text_height.value / 2 + 10
@@ -1011,12 +1015,17 @@ end
 local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	local allyTeamResources
 	local allyTeamWins
+	local allyTeamsNumActivePlayers = {}
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
+			allyTeamsNumActivePlayers[allyTeamID] = 0			
 			for j=1,#allyTeams[allyTeamID] do
 				local teamID = allyTeams[allyTeamID][j]
 				if teamID then
+					if not teams[teamID].isDead and teams[teamID].isPlaying then --and teams[teamID].isActive
+						allyTeamsNumActivePlayers[allyTeamID] = allyTeamsNumActivePlayers[allyTeamID] + 1
+					end
 					local s = GetPlayerTeamStats(teamID)
 					allyTeamResources = allyTeamResources or {}
 					allyTeamResources[allyTeamID] = allyTeamResources[allyTeamID] or { eCurr = 0, eStor = 0, eInco = 0, mCurr = 0, mStor = 0, mInco = 0, mMobs = 0, mDefs = 0 }
@@ -1042,8 +1051,17 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 					allyTeamColor = {Spring.GetTeamColor(allyTeams[allyTeamID][1])}
 				end
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = ("Team " .. allyTeamID+1),textColor = allyTeamColor,})
+				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
-				if elo then MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
+				local rstring = "smurf"
+				if elo then 
+					MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) 
+					if elo > 1800 then rstring = "napoleon"
+					elseif elo > 1600 then rstring = "soldier"
+					elseif elo > 1400 then rstring = "user"
+					end
+				end
+				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/Ranks/dude_"..rstring..".png",})
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 
@@ -1249,7 +1267,7 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end
+		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end -- this appears to be broken
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
@@ -1317,6 +1335,11 @@ SetupPlayerNames = function()
 		AddAllAllyTeamSummaries(allyTeamsSorted)
 		row = row + 0.5
 	elseif options.showSummaries.value then
+		if existsVeryBigTeam or numBigTeams > 2 then
+			AddAllAllyTeamSummaries(allyTeamsSorted)
+			row = row + 0.5
+		end
+		--[[
 		if amSpec then
 			if existsVeryBigTeam or numBigTeams > 2 then
 				AddAllAllyTeamSummaries(allyTeamsSorted)
@@ -1328,6 +1351,7 @@ SetupPlayerNames = function()
 				row = row + 0.5
 			end
 		end
+		--]]
 	end
 
 	-- add the player entities
