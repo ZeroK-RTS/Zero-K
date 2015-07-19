@@ -139,7 +139,6 @@ function gadget:Initialize()
 	
 	if metalSpots then
 		local mult = (modOptions and modOptions.metalmult) or 1
-		local oremex_mult = (modOptions and modOptions.oremex and tonumber(modOptions.oremex) == 1) and 0.75 or 1 -- as a test to make maps produce less metal overall
 		local i = 1
 		while i <= #metalSpots do
 			local spot = metalSpots[i]
@@ -147,7 +146,7 @@ function gadget:Initialize()
 				if metalValueOverride then
 					spot.metal = metalValueOverride
 				end
-				spot.metal = spot.metal*mult*oremex_mult
+				spot.metal = spot.metal*mult
 				i = i + 1
 			else
 				metalSpots[i] = metalSpots[#metalSpots]
