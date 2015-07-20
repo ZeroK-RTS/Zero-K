@@ -379,15 +379,8 @@ function widget:GameFrame(n)
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
 
-	local mPercent = 100 * mCurr / mStor
-	local ePercent = 100 * eCurr / eStor
-	-- NaN protection
-	if (mPercent ~= mPercent) then
-		mPercent = 0
-	end
-	if (ePercent ~= ePercent) then
-		ePercent = 0
-	end
+	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
+	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
 	
 	mPercent = math.min(math.max(mPercent, 0), 100)
 	ePercent = math.min(math.max(ePercent, 0), 100)
