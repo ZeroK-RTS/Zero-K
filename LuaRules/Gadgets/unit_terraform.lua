@@ -1,12 +1,6 @@
 -- $Id: unit_terraform.lua 4610 2009-05-12 13:03:32Z google frog $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 
 function gadget:GetInfo()
   return {
@@ -19,6 +13,12 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if (gadgetHandler:IsSyncedCode()) then
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -71,6 +71,7 @@ local spSetUnitSensorRadius	= Spring.SetUnitSensorRadius
 local spGetAllUnits			= Spring.GetAllUnits
 local spSetUnitTooltip		= Spring.SetUnitTooltip
 local spGetUnitIsDead       = Spring.GetUnitIsDead
+local spSetUnitRulesParam	= Spring.SetUnitRulesParam
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
@@ -395,7 +396,15 @@ local function getPointInsideMap(x,z)
 	return x, z
 end
 
-local function setupTerraunit(unitID, team, x, y, z)
+local function setupTerraTag(unitID, terraTag, i, count)
+	if terraTag then					
+		spSetUnitRulesParam(unitID, "terraTag", terraTag)
+		spSetUnitRulesParam(unitID, "terraTagSegment", i)
+		spSetUnitRulesParam(unitID, "terraTagSegmentsCount", count)
+	end
+end
+
+local function setupTerraunit(unitID, team, x, y, z, terraTag)
 
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
@@ -421,7 +430,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift)
 
 	--** Initial constructor processing **
 	local unitsX = 0
@@ -793,8 +802,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
-			if id then
-				
+			if id then				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
 					rampLevels.count = rampLevels.count + 1
 					rampLevels.data[rampLevels.count] = {along = segment[i].along, count = 0, data = {}}
@@ -802,8 +810,9 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
-				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)				
+				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraTag(id, terraTag, i, n-1)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -844,6 +853,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
 				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SendToUnsynced("TerraformUnitCreatedWrap", id, team)
 			end
 		end
 		
@@ -889,7 +899,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	
 end
 
-local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1287,10 +1297,10 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
-            if id then
-			
+            if id then			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
-				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraTag(id, terraTag, i, n-1)				
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1331,6 +1341,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
 				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SendToUnsynced("TerraformUnitCreatedWrap", id, team)		
 			end
 		end
 		
@@ -1359,7 +1370,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 
 end
 
-local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -1853,7 +1864,8 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				aveZ = aveZ + segment[i].position.z
 				
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
-				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraTag(id, terraTag, i, n-1)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1894,6 +1906,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
 				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SendToUnsynced("TerraformUnitCreatedWrap", id, team)			
 			end
 		end
 		
@@ -2023,10 +2036,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				i = i + 1
 			end
 			
+			local terraTag = cmdParams[i]
+			
 			if cmdParams[3] == 0 then
-				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
+				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 			else
-				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
+				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 			end
 			
 			return false
@@ -2045,7 +2060,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				i = i + 1
 			end
 			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], cmdOptions.shift)
+			local terraTag = cmdParams[i]
+			
+			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 		
 			return false
 			
@@ -3605,4 +3622,29 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+else -- UNSYNCED
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+function gadget:Initialize()
+	gadgetHandler:AddSyncAction('TerraformUnitCreatedWrap', TerraformUnitCreatedWrap)
+end
+
+function gadget:Shutdown()
+	gadgetHandler:RemoveSyncAction('TerraformUnitCreatedWrap')
+end
+
+function TerraformUnitCreatedWrap(_, unitID, unitTeam)
+	if (unitTeam ~= Spring.GetLocalTeamID()) then return end
+	if (Script.LuaUI('TerraformUnitCreated')) then
+		Script.LuaUI.TerraformUnitCreated(unitID, unitTeam)
+	end
+end
+
+--unsynced
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 end
