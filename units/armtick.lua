@@ -69,7 +69,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 160,
+  sightDistance          = 240,
   turnRate               = 3000,
   
   featureDefs            = {
