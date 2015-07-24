@@ -53,9 +53,9 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[CORRAID.s3o]],
-  script		 = [[corraid.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
+  script                 = [[corraid.lua]],
 
   sfxtypes               = {
 

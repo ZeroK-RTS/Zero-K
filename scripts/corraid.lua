@@ -7,15 +7,15 @@ include "pieceControl.lua"
 --------------------------------------------------------------------------------
 
 local base, body, turret, sleeve, barrel, firepoint,
-			rwheel1, rwheel2, rwheel3,
-			lwheel1, lwheel2, lwheel3,
-			gs1r, gs2r, gs3r,
-			gs1l, gs2l, gs3l = piece(
+			rwheel1, rwheel2, rwheel3, rwheel4,
+			lwheel1, lwheel2, lwheel3, lwheel4,
+			gs1r, gs2r, gs3r, gs4r,
+			gs1l, gs2l, gs3l, gs4l = piece(
 		'base', 'body', 'turret', 'sleeve', 'barrel', 'firepoint',
-			'rwheel1', 'rwheel2', 'rwheel3',
-			'lwheel1', 'lwheel2', 'lwheel3',
-			'gs1r', 'gs2r', 'gs3r',
-			'gs1l', 'gs2l', 'gs3l')
+			'rwheel1', 'rwheel2', 'rwheel3', 'rwheel4',
+			'lwheel1', 'lwheel2', 'lwheel3', 'lwheel4',
+			'gs1r', 'gs2r', 'gs3r', 'gs4r',
+			'gs1l', 'gs2l', 'gs3l', 'gs4l')
 			
 -- speedups
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -32,14 +32,14 @@ local isAiming = false
 
 local smokePiece = {turret, body}
 
-local SUSPENSION_BOUND = 6
+local SUSPENSION_BOUND = 5
 local WHEEL_TURN_MULT = 2.0
 
 local ANIM_PERIOD = 50
 local RESTORE_DELAY = 3000
 
-local TURRET_TURN_SPEED = 160
-local GUN_TURN_SPEED = 50
+local TURRET_TURN_SPEED = 90
+local GUN_TURN_SPEED = 45
 
 
 local SIG_Restore = 1
@@ -106,20 +106,22 @@ function WheelsControl()
 			local s1r = GetWheelHeight(gs1r)
 			local s2r = GetWheelHeight(gs2r)
 			local s3r = GetWheelHeight(gs3r)
+			local s4r = GetWheelHeight(gs4r)
 			
 			local s1l = GetWheelHeight(gs1l)
 			local s2l = GetWheelHeight(gs2l)
 			local s3l = GetWheelHeight(gs3l)
+			local s4l = GetWheelHeight(gs4l)
 			
-			xtilta = (s3r + s3l - s1l - s1r)/6000 
+			xtilta = (s4r + s4l - s1l - s1r)/6000 
 			xtiltv = xtiltv*0.99 + xtilta
 			xtilt = xtilt*0.98 + xtiltv
 
-			ztilta = (s1r + s3r - s1l - s3l)/10000
+			ztilta = (s1r + s4r - s1l - s4l)/10000
 			ztiltv = ztiltv*0.99 + ztilta
 			ztilt = ztilt*0.99 + ztiltv
 
-			ya = (s1r + s3r + s1l + s3l)/1000
+			ya = (s1r + s4r + s1l + s4l)/1000
 			yv = yv*0.99 + ya
 			yp = yp*0.98 + yv
 
@@ -130,10 +132,12 @@ function WheelsControl()
 			Move(rwheel1, y_axis, s1r, 20)
 			Move(rwheel2, y_axis, s2r, 20)
 			Move(rwheel3, y_axis, s3r, 20)
+			Move(rwheel4, y_axis, s4r, 20)
 										
 			Move(lwheel1, y_axis, s1l, 20)
 			Move(lwheel2, y_axis, s2l, 20)
 			Move(lwheel3, y_axis, s3l, 20) 
+			Move(lwheel4, y_axis, s4l, 20) 
 		else
 			wheelTurnSpeed = 0
 		end
@@ -141,10 +145,12 @@ function WheelsControl()
 		Spin(rwheel1, x_axis, wheelTurnSpeed)
 		Spin(rwheel2, x_axis, wheelTurnSpeed)
 		Spin(rwheel3, x_axis, wheelTurnSpeed)
+		Spin(rwheel4, x_axis, wheelTurnSpeed)
 		
 		Spin(lwheel1, x_axis, wheelTurnSpeed)
 		Spin(lwheel2, x_axis, wheelTurnSpeed)
 		Spin(lwheel3, x_axis, wheelTurnSpeed)
+		Spin(lwheel4, x_axis, wheelTurnSpeed)
 		
 		Sleep(ANIM_PERIOD)	
 	end
