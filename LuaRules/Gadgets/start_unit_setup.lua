@@ -43,7 +43,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   end
 
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+    if ploppableDefs[unitDefID] and builderID and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
       local maxHealth = select(2,Spring.GetUnitHealth(unitID))
       Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
