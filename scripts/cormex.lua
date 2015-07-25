@@ -21,7 +21,7 @@ local function Open()
 	local height = 40
 
 	while true do
-		local income = Spring.GetUnitRulesParam(unitID, "mex_income") or 0
+		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))

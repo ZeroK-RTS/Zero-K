@@ -112,17 +112,7 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 end
 
 local function updateEconomy(unitID, ud, factor)	
-	local cp = ud.customParams
-	
-	if cp.income_metal then
-		Spring.SetUnitResourcing(unitID, "cmm", cp.income_metal*factor)
-	end
-	if cp.income_energy then
-		Spring.SetUnitResourcing(unitID, "cme", cp.income_energy*factor)
-	end
-	if cp.ismex then
-		Spring.SetUnitRulesParam(unitID,"mexincomefactor", factor)
-    end
+	Spring.SetUnitRulesParam(unitID,"resourceGenerationFactor", factor)
 end
 
 local function updatePausedReload(unitID, unitDefID, gameFrame)
@@ -352,7 +342,7 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or disarmed or morphDisable or selfAccelerationChange then
 		local slowMult   = 1-(slowState or 0)
-		local econMult  = (slowMult)*(1 - disarmed)*(1 - morphDisable)
+		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)
 		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
@@ -429,11 +419,6 @@ end
 
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
-	
-	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		gadget:UnitCreated(unitID, unitDefID)
-	end
 end
 
 function gadget:GameFrame(f)
@@ -446,10 +431,6 @@ end
 
 function gadget:UnitDestroyed(unitID)
 	removeUnit(unitID)
-end
-
-function gadget:UnitCreated(unitID, unitDefID)
-	updateEconomy(unitID, UnitDefs[unitDefID], 1)
 end
 
 function gadget:AllowCommand_GetWantedCommand()

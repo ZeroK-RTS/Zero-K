@@ -392,10 +392,13 @@ function gadget:GameFrame(n)
 			
 			-- Take away the constant income which was gained this frame (innate, reclaim)
 			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
-			local mexIncome = (spGetTeamRulesParam(teamID, "OD_myBase") or 0) + (spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0)
-			level = level - (income - mexIncome)/30
+			local lumpIncome = (spGetTeamRulesParam(teamID, "OD_metalBase") or 0) + 
+				(spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0) + (spGetTeamRulesParam(teamID, "OD_metalMisc") or 0)
+			level = level - (income - lumpIncome)/30
 			
 			-- Make sure the misc resoucing is constantly pulling the same value regardless of whether resources are spent
+			-- If AllowUnitBuildStep returns false the constructor does not add the attempt to pull. This makes pull incorrect.
+			-- The following calculations get the useful type of pull.
 			local metalPull = spending[1] + spending[2] + spending[3]
 			local energyPull = fakeEnergyPull + metalPull - fakeMetalPull + energySpending[1] + energySpending[2] + energySpending[3] - realEnergyOnlyPull
 

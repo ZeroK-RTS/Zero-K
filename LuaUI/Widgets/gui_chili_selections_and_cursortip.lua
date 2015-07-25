@@ -602,8 +602,17 @@ local function UpdateDynamicGroupInfo()
 		if ud then
 			name = ud.name 
 			hp, _, paradam, cap, build = spGetUnitHealth(id)
-			mm,mu,em,eu = spGetUnitResources(id)
+			mm, mu, em, eu = spGetUnitResources(id)
 		
+			if mm then
+				mm = mm + (spGetUnitRulesParam(id, "current_metalIncome") or 0)
+				em = em + (spGetUnitRulesParam(id, "current_energyIncome") or 0)
+			end
+			
+			if eu then
+				eu = eu + (spGetUnitRulesParam(id, "overdrive_energyDrain") or 0)
+			end
+				
 			if name ~= "terraunit" then
 				if mm then--failsafe when switching spectator view.
 					total_cost = total_cost + ud.metalCost*build
@@ -612,34 +621,11 @@ local function UpdateDynamicGroupInfo()
 				
 				stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
-					if name == 'armmex' or name =='cormex' then -- mex case
-						tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
-						
-						baseMetal = 0
-						s = tooltip:match("Makes: ([^ ]+)")
-						if s ~= nil then 
-							baseMetal = tonumber(s) 
-						end 
-										
-						s = tooltip:match("Overdrive: %+([0-9]+)")
-						od = 0
-						if s ~= nil then 
-							od = tonumber(s) 
-						end
-						
-						total_metalincome = total_metalincome + baseMetal + baseMetal * od / 100
-							
-						s = tooltip:match("Energy: ([^ ]+)")
-						if s ~= nil then 
-							total_energydrain = total_energydrain - (tonumber(s) or 0)
-						end 
-					else
-						if mm then --failsafe when switching spectator view.
-							total_metalincome = total_metalincome + mm
-							total_metaldrain = total_metaldrain + mu
-							total_energyincome = total_energyincome + em
-							total_energydrain = total_energydrain + eu
-						end
+					if mm then --failsafe when switching spectator view.
+						total_metalincome = total_metalincome + mm
+						total_metaldrain = total_metaldrain + mu
+						total_energyincome = total_energyincome + em
+						total_energydrain = total_energydrain + eu
 					end
 					
 					if ud.buildSpeed ~= 0 and mm then
@@ -1338,33 +1324,14 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'
-		local metalMake, metalUse, energyMake, energyUse = Spring.GetUnitResources(unitID)
+		local metalMake, metalUse, energyMake, energyUse = spGetUnitResources(unitID)
 		
 		if metalMake then
-			metal = metalMake - metalUse
+			metal = metalMake - metalUse + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
 		end
 		if energyMake then
-			energy = energyMake - energyUse
+			energy = energyMake - energyUse + (spGetUnitRulesParam(unitID, "current_energyIncome") or 0) - (spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0)
 		end
-		
-		-- special cases for mexes
-		if ud.name=='cormex' then 
-			local baseMetal = 0
-			local s = tooltip:match("Makes: ([^ ]+)")
-			if s ~= nil then baseMetal = tonumber(s) end 
-							
-			s = tooltip:match("Overdrive: %+([0-9]+)")
-			local od = 0
-			if s ~= nil then od = tonumber(s) end
-			
-			metal = metal + baseMetal + baseMetal * od / 100
-			
-			s = tooltip:match("Energy: ([^ \n]+)")
-			s = tonumber(s)
-			if s ~= nil and type(s) == 'number' then 
-				energy = energy + tonumber(s)
-			end 
-		end 
 	end
 	
 	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
@@ -1806,8 +1773,8 @@ local function MakeToolTip_UD(tt_table)
 			end
 		end
 		
-		local metalOD = WG.metalFromOverdrive
-		local energyOD = WG.energyForOverdrive
+		local metalOD = WG.team_metalOverdrive
+		local energyOD = WG.team_energyOverdrive
 		
 		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
 			-- Best case payback assumes that extra energy will make

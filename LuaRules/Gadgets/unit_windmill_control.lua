@@ -18,7 +18,7 @@ function gadget:GetInfo()
 end
 
 -- Changelog:
--- 		CarRepairer: Enhanced to allow overriding map's min/max wind values in mod options. Negative values (default) will use map's values.
+--   CarRepairer: Enhanced to allow overriding map's min/max wind values in mod options. Negative values (default) will use map's values.
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -47,16 +47,15 @@ local privateTable = {private = true}
 
 -- Speed-ups
 
-local SetUnitCOBValue      = Spring.SetUnitCOBValue
-local GetWind              = Spring.GetWind
-local GetUnitDefID         = Spring.GetUnitDefID
-local GetHeadingFromVector = Spring.GetHeadingFromVector
-local AddUnitResource      = Spring.AddUnitResource
-local GetUnitBasePosition  = Spring.GetUnitBasePosition
-local GetUnitIsStunned     = Spring.GetUnitIsStunned
-local GetUnitRulesParam    = Spring.GetUnitRulesParam
-local SetTeamRulesParam    = Spring.SetTeamRulesParam
-local SetUnitTooltip       = Spring.SetUnitTooltip
+local spGetWind              = Spring.GetWind
+local spGetUnitDefID         = Spring.GetUnitDefID
+local spGetHeadingFromVector = Spring.GetHeadingFromVector
+local spGetUnitPosition      = Spring.GetUnitPosition
+local spGetUnitIsStunned     = Spring.GetUnitIsStunned
+local spGetUnitRulesParam    = Spring.GetUnitRulesParam
+local spSetUnitRulesParam    = Spring.SetUnitRulesParam
+local spSetTeamRulesParam    = Spring.SetTeamRulesParam
+local spSetUnitTooltip       = Spring.SetUnitTooltip
 
 local sformat = string.format
 local pi_2    = math.pi * 2
@@ -78,9 +77,9 @@ function gadget:GameFrame(n)
 			if step_count > 0 then
 				strength = strength + strength_step
 				step_count = step_count - 1
-			end		
-			local _, _, _, windStrength, x, _, z = GetWind()
-			local windHeading = Spring.GetHeadingFromVector(x,z)/2^15*math.pi+math.pi
+			end
+			local _, _, _, windStrength, x, _, z = spGetWind()
+			local windHeading = spGetHeadingFromVector(x,z)/2^15*math.pi+math.pi
 			
 			Spring.SetGameRulesParam("WindHeading", windHeading)
 			Spring.SetGameRulesParam("WindStrength", (strength-windMin)/windRange)
@@ -89,18 +88,20 @@ function gadget:GameFrame(n)
 				teamEnergy[teamList[i]] = 0
 			end
 			for unitID, entry in pairs(windmills) do
-				local de = (windMax - strength)*entry[1].alt + strength
-				local paralyzed = GetUnitIsStunned(unitID) or (GetUnitRulesParam(unitID, "disarmed") == 1)
+				local windEnergy = (windMax - strength)*entry[1].alt + strength
+				local paralyzed = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry[2]
-					local slowMult = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
-					de = de*slowMult
-					teamEnergy[tid] = teamEnergy[tid] + de -- monitor team energy
-					AddUnitResource(unitID, "e", de)
+					local incomeFactor = spGetUnitRulesParam(unitID,"current_energyIncome") or 1
+					windEnergy = windEnergy*incomeFactor
+					teamEnergy[tid] = teamEnergy[tid] + windEnergy -- monitor team energy
+					spSetUnitRulesParam(unitID, "windEnergyIncome", windEnergy)
+				else
+					spSetUnitRulesParam(unitID, "windEnergyIncome", 0)
 				end
 			end
 			for i = 1, #teamList do
-				SetTeamRulesParam (teamList[i], "WindIncome", teamEnergy[teamList[i]], privateTable)
+				spSetTeamRulesParam (teamList[i], "WindIncome", teamEnergy[teamList[i]], privateTable)
 			end
 		end
 		if (((n+16) % (32*30)) < 0.1) then
@@ -119,14 +120,14 @@ local function SetupUnit(unitID)
 		gadget:Initialize()
 	end
 	
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
 	
-	local unitDefID = Spring.GetUnitDefID(unitID)
+	local unitDefID = spGetUnitDefID(unitID)
 	
 	local scriptIDs = {}
 
-	local x, y, z = GetUnitBasePosition(unitID)
+	local x, y, z = spGetUnitPosition(unitID)
 	
 	if Spring.GetGroundHeight(x,z) <= -10 then
 		Spring.SetUnitResourcing(unitID, "cme", 1.2)
@@ -147,7 +148,7 @@ local function SetupUnit(unitID)
 
 	local unitDef = UnitDefs[unitDefID]
 	Spring.SetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, {inlos = true})
-	SetUnitTooltip(
+	spSetUnitTooltip(
 		unitID, --Spring.GetUnitTooltip(unitID)..
 		unitDef.humanName .. " - " .. unitDef.tooltip ..
 		" (E " .. round(windMin+windRange*scriptIDs.alt,1) .. "-" .. round(windMax,1) .. ")"
@@ -190,7 +191,7 @@ function gadget:Initialize()
 
 	for i = 1, #teamList do
 		teamEnergy[teamList[i]] = 0
-		SetTeamRulesParam(teamList[i], "WindIncome", 0, privateTable)
+		spSetTeamRulesParam(teamList[i], "WindIncome", 0, privateTable)
 	end
 end
 
