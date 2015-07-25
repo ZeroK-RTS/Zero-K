@@ -404,7 +404,7 @@ local function setupTerraTag(unitID, terraTag, i, count)
 	end
 end
 
-local function setupTerraunit(unitID, team, x, y, z, terraTag)
+local function setupTerraunit(unitID, team, x, y, z)
 
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
 
@@ -811,7 +811,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)				
-				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				setupTerraTag(id, terraTag, i, n-1)
 			
 				blocks = blocks + 1
@@ -1299,7 +1299,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			
             if id then			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
-				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				setupTerraTag(id, terraTag, i, n-1)				
 			
 				blocks = blocks + 1
@@ -1864,7 +1864,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				aveZ = aveZ + segment[i].position.z
 				
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
-				setupTerraunit(id, team, terraunitX, false, terraunitZ, terraTag)
+				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 				setupTerraTag(id, terraTag, i, n-1)
 			
 				blocks = blocks + 1
