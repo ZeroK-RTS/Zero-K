@@ -6,15 +6,15 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Windmill Control",
-    desc      = "Controls windmill helix and overrides map wind settings",
-    author    = "quantum",
-    date      = "June 29, 2007",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name     = "Windmill Control",
+		desc     = "Controls windmill helix and overrides map wind settings",
+		author   = "quantum",
+		date     = "June 29, 2007",
+		license  = "GNU GPL, v2 or later",
+		layer    = 0,
+		enabled  = true -- loaded by default?
+	}
 end
 
 -- Changelog:
@@ -25,7 +25,7 @@ end
 include("LuaRules/Configs/constants.lua")
 
 local windDefs = {
-  [ UnitDefNames['armwin'].id ] = true,
+	[ UnitDefNames['armwin'].id ] = true,
 }
 
 local windmills = {}
@@ -57,14 +57,15 @@ local GetUnitIsStunned     = Spring.GetUnitIsStunned
 local GetUnitRulesParam    = Spring.GetUnitRulesParam
 local SetTeamRulesParam    = Spring.SetTeamRulesParam
 local SetUnitTooltip       = Spring.SetUnitTooltip
+
 local sformat = string.format
-local pi_2  = math.pi * 2
-local fmod  = math.fmod
-local atan2 = math.atan2
-local rand = math.random
+local pi_2    = math.pi * 2
+local fmod    = math.fmod
+local atan2   = math.atan2
+local rand    = math.random
 
 local function round(num, idp)
-  return sformat("%." .. (idp or 0) .. "f", num)
+	return sformat("%." .. (idp or 0) .. "f", num)
 end
 
 -------------------------------------------------------------------------------------
@@ -73,17 +74,17 @@ end
 function gadget:GameFrame(n)
 	if (((n+16) % TEAM_SLOWUPDATE_RATE) < 0.1) then
 		if (next(windmills)) then
-      
+			
 			if step_count > 0 then
 				strength = strength + strength_step
 				step_count = step_count - 1
-			end	  
+			end		
 			local _, _, _, windStrength, x, _, z = GetWind()
 			local windHeading = Spring.GetHeadingFromVector(x,z)/2^15*math.pi+math.pi
 			
 			Spring.SetGameRulesParam("WindHeading", windHeading)
 			Spring.SetGameRulesParam("WindStrength", (strength-windMin)/windRange)
-	  
+		
 			for i = 1, #teamList do
 				teamEnergy[teamList[i]] = 0
 			end
@@ -114,46 +115,47 @@ end
 -------------------------------------------------------------------------------------
 
 local function SetupUnit(unitID)
-  if not windMin then
-    gadget:Initialize()
-  end
-  
-  local unitDefID = Spring.GetUnitDefID(unitID)
-  local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
-  
-  local unitDefID = Spring.GetUnitDefID(unitID)
-  
-  local scriptIDs = {}
+	if not windMin then
+		gadget:Initialize()
+	end
+	
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
+	
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	
+	local scriptIDs = {}
 
-  local x, y, z = GetUnitBasePosition(unitID)
-  
-  if Spring.GetGroundHeight(x,z) <= -10 then
-	Spring.SetUnitResourcing(unitID, "cme", 1.2)
-	Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
-	Spring.SetUnitMaxHealth(unitID, 400)
-	Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
-	Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
-	Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
-	Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
-	return false
-  end
-  
-  local altitude = (y - groundMin)/groundExtreme
-  scriptIDs.alt = altitude*slope
-  if (scriptIDs.alt > 1) then
-  	scriptIDs.alt = 1
-  end
+	local x, y, z = GetUnitBasePosition(unitID)
+	
+	if Spring.GetGroundHeight(x,z) <= -10 then
+		Spring.SetUnitResourcing(unitID, "cme", 1.2)
+		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
+		Spring.SetUnitMaxHealth(unitID, 400)
+		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
+		Spring.SetUnitMidAndAimPos(unitID, 0, -5, 0, 0, 2, 0, true)
+		Spring.SetUnitRulesParam(unitID, "midpos_override", -5 - midy)
+		Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
+		return false
+	end
+	
+	local altitude = (y - groundMin)/groundExtreme
+	scriptIDs.alt = altitude*slope
+	if (scriptIDs.alt > 1) then
+		scriptIDs.alt = 1
+	end
 
-  local unitDef = UnitDefs[unitDefID]
-  Spring.SetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, {inlos = true})
-  SetUnitTooltip(unitID, --Spring.GetUnitTooltip(unitID)..
-    unitDef.humanName .. " - " .. unitDef.tooltip ..
-    " (E " .. round(windMin+windRange*scriptIDs.alt,1) .. "-" .. round(windMax,1) .. ")"
-  )
-  windmills[unitID] = {scriptIDs, Spring.GetUnitTeam(unitID)}
-  
-  return true, windMin+windRange*scriptIDs.alt, windRange*(1-scriptIDs.alt)
-  
+	local unitDef = UnitDefs[unitDefID]
+	Spring.SetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, {inlos = true})
+	SetUnitTooltip(
+		unitID, --Spring.GetUnitTooltip(unitID)..
+		unitDef.humanName .. " - " .. unitDef.tooltip ..
+		" (E " .. round(windMin+windRange*scriptIDs.alt,1) .. "-" .. round(windMax,1) .. ")"
+	)
+	windmills[unitID] = {scriptIDs, Spring.GetUnitTeam(unitID)}
+	
+	return true, windMin+windRange*scriptIDs.alt, windRange*(1-scriptIDs.alt)
+	
 end
 
 GG.SetupWindmill = SetupUnit
@@ -164,27 +166,27 @@ function gadget:Initialize()
 	windMax = 2.5
 	windRange = windMax - windMin
 
-  Spring.SetGameRulesParam("WindMin",windMin)
-  Spring.SetGameRulesParam("WindMax",windMax)
-  Spring.SetGameRulesParam("WindHeading", 0)
-  Spring.SetGameRulesParam("WindStrength", 0)
+	Spring.SetGameRulesParam("WindMin",windMin)
+	Spring.SetGameRulesParam("WindMax",windMax)
+	Spring.SetGameRulesParam("WindHeading", 0)
+	Spring.SetGameRulesParam("WindStrength", 0)
 	
-  groundMin, groundMax = Spring.GetGroundExtremes()
-  groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
-  groundExtreme = groundMax - groundMin
-  if groundExtreme < 1 then
-    groundExtreme = 1
-  end
+	groundMin, groundMax = Spring.GetGroundExtremes()
+	groundMin, groundMax = math.max(groundMin,0), math.max(groundMax,1)
+	groundExtreme = groundMax - groundMin
+	if groundExtreme < 1 then
+		groundExtreme = 1
+	end
 
-  --this is a function defined between 0 and 1, so we can adjust the gadget 
-  -- effect between 0% (flat maps) and 100% (mountained maps)
-  slope = 1/(1+math.exp(4 - groundExtreme/105))
-  
-  Spring.SetGameRulesParam("WindGroundMin", groundMin)
-  Spring.SetGameRulesParam("WindGroundExtreme", groundExtreme)
-  Spring.SetGameRulesParam("WindSlope", slope)
+	--this is a function defined between 0 and 1, so we can adjust the gadget 
+	-- effect between 0% (flat maps) and 100% (mountained maps)
+	slope = 1/(1+math.exp(4 - groundExtreme/105))
+	
+	Spring.SetGameRulesParam("WindGroundMin", groundMin)
+	Spring.SetGameRulesParam("WindGroundExtreme", groundExtreme)
+	Spring.SetGameRulesParam("WindSlope", slope)
 
-  strength = (rand() * windRange) + windMin
+	strength = (rand() * windRange) + windMin
 
 	for i = 1, #teamList do
 		teamEnergy[teamList[i]] = 0
@@ -201,7 +203,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-  if (windDefs[unitDefID]) then 
-    windmills[unitID] = nil
-  end
+	if (windDefs[unitDefID]) then 
+		windmills[unitID] = nil
+	end
 end
