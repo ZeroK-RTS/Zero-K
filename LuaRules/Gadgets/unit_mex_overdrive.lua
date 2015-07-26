@@ -115,7 +115,6 @@ local debugMode = false
 -------------------------------------------------------------------------------------
 
 local sqrt  = math.sqrt
-local round = math.round
 local min   = math.min
 local max   = math.max
 
@@ -130,7 +129,6 @@ local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetUnitResources  = Spring.GetUnitResources
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spSetUnitRulesParam = Spring.SetUnitRulesParam
-local spSetUnitTooltip    = Spring.SetUnitTooltip
 local spCallCOBScript     = Spring.CallCOBScript
 local spSetTeamRulesParam = Spring.SetTeamRulesParam
 
@@ -811,16 +809,18 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								if stunned_or_inbuld then
 									orgMetal = 0
 								end
-								local incomeFactor = spGetUnitRulesParam(unitID,"mexincomefactor")
+								local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor")
 								if incomeFactor then
 									orgMetal = orgMetal*incomeFactor
 								end
 								local mexE = gridE*(orgMetal * orgMetal)/ gridMetalSquared 
 								local metalMult = energyToExtraM(mexE)
-								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
-								spSetUnitRulesParam(unitID, "overdrive_energyDrain", mexE, alliedTrueTable)
 								local thisMexM = orgMetal + orgMetal * metalMult
-								spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, alliedTrueTable)
+								
+								spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, inlosTrueTable)
+								spSetUnitRulesParam(unitID, "overdrive_energyDrain", mexE, inlosTrueTable)
+								spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, inlosTrueTable)
+								spSetUnitRulesParam(unitID, "overdrive_proportion", metalMult, inlosTrueTable)
  
 								maxedMetalProduction = maxedMetalProduction + thisMexM
 								maxedBaseMetal = maxedBaseMetal + orgMetal
@@ -832,29 +832,18 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 								if mexByID[unitID].refundTeamID then
 									mexBaseMetal[unitID] = orgMetal
 								end
-								
-								local unitDefID = spGetUnitDefID(unitID)
-								if not pylonDefs[unitDefID].keeptooltip then
-									local unitDef = UnitDefs[unitDefID]
-									if unitDef then
-										spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  \nEnergy: -" .. round(mexE,2))
-									else
-										if not spammedError then
-											Spring.Echo("unitDefID missing for maxxed metal extractor")
-											spammedError = true
-										end
-									end
-								end
 							end
 							break --finish distributing energy to 1 grid, go to next grid
 						end
 					end 
 					
 					local metalMult = energyToExtraM(mexE)
-					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, alliedTrueTable)
-					spSetUnitRulesParam(unitID, "overdrive_energyDrain", mexE, alliedTrueTable)
 					local thisMexM = orgMetal + orgMetal * metalMult
-					spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, alliedTrueTable)
+					
+					spSetUnitRulesParam(unitID, "overdrive", 1+mexE/5, inlosTrueTable)
+					spSetUnitRulesParam(unitID, "overdrive_energyDrain", mexE, inlosTrueTable)
+					spSetUnitRulesParam(unitID, "current_metalIncome", thisMexM, inlosTrueTable)
+					spSetUnitRulesParam(unitID, "overdrive_proportion", metalMult, inlosTrueTable)
 					
 					summedMetalProduction = summedMetalProduction + thisMexM
 					summedBaseMetal = summedBaseMetal + orgMetal
@@ -864,23 +853,6 @@ local function OptimizeOverDrive(allyTeamID,allyTeamData,allyE,maxGridCapacity)
 					
 					if mexByID[unitID].refundTeamID then
 						mexBaseMetal[unitID] = orgMetal
-					end
-					
-					local unitDefID = spGetUnitDefID(unitID)
-					if not pylonDefs[unitDefID].keeptooltip then
-						local unitDef = UnitDefs[unitDefID]
-						if unitDef then
-							if (metalMult < 1.5) then
-								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2))
-							else
-								spSetUnitTooltip(unitID,"Makes: " .. round(orgMetal,2) .. " + Overdrive: +" .. round(metalMult*100,0) .. "%  Energy: -" .. round(mexE,2) .. " \nConnect more energy sources to produce additional metal")
-							end
-						else
-							if not spammedError then
-								Spring.Echo("unitDefID missing for metal extractor")
-								spammedError = true
-							end
-						end
 					end
 				end
 				
@@ -1017,8 +989,8 @@ function gadget:GameFrame(n)
 								sumMetal = sumMetal + metal
 								sumEnergy = sumEnergy + energy
 							end
-							spSetUnitRulesParam(unitID, "current_metalIncome", metal + privateMetal)
-							spSetUnitRulesParam(unitID, "current_energyIncome", energy)
+							spSetUnitRulesParam(unitID, "current_metalIncome", metal + privateMetal, inlosTrueTable)
+							spSetUnitRulesParam(unitID, "current_energyIncome", energy, inlosTrueTable)
 						end
 					end
 				end
@@ -1156,9 +1128,10 @@ function gadget:GameFrame(n)
 				end
 				summedBaseMetal = summedBaseMetal + orgMetal
                 
-				spSetUnitRulesParam(unitID, "overdrive", 1, alliedTrueTable)
-				spSetUnitRulesParam(unitID, "overdrive_energyDrain", 0, alliedTrueTable)
-				spSetUnitRulesParam(unitID, "current_metalIncome", orgMetal, alliedTrueTable)
+				spSetUnitRulesParam(unitID, "overdrive", 1, inlosTrueTable)
+				spSetUnitRulesParam(unitID, "overdrive_energyDrain", 0, inlosTrueTable)
+				spSetUnitRulesParam(unitID, "current_metalIncome", orgMetal, inlosTrueTable)
+				spSetUnitRulesParam(unitID, "overdrive_proportion", 0, inlosTrueTable)
 				
 				if mexByID[unitID].refundTeamID then
 					local teamID = mexByID[unitID].refundTeamID
@@ -1175,19 +1148,6 @@ function gadget:GameFrame(n)
 				end
 
 				summedMetalProduction = summedMetalProduction + orgMetal
-				local unitDefID = spGetUnitDefID(unitID)
-				local pylonDef = pylonDefs[unitDefID]
-				if pylonDef and not pylonDef.keeptooltip then
-					local unitDef = UnitDefs[unitDefID]
-					if unitDef then
-						spSetUnitTooltip(unitID,"Metal Extractor - Makes: " .. round(orgMetal,2) .. " Not connected to Grid")
-					else
-						if not spammedError then
-							Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for ungridded mex")
-							spammedError = true
-						end
-					end
-				end
 			end
 			
 			--// Update pylon tooltips
@@ -1219,9 +1179,11 @@ function gadget:GameFrame(n)
 						else
 							if not pylonDefs[unitDefID].keeptooltip then
 								if grid ~= 0 then
-									spSetUnitTooltip(unitID,"GRID: "  .. round(gridEnergySpent[grid],2) .. "/" .. round(maxGridCapacity[grid],2) .. "E => " .. round(gridMetalGain[grid],2).."M")
+									spSetUnitRulesParam(unitID, "OD_gridCurrent", gridEnergySpent[grid], alliedTrueTable)
+									spSetUnitRulesParam(unitID, "OD_gridMaximum", maxGridCapacity[grid], alliedTrueTable)
+									spSetUnitRulesParam(unitID, "OD_gridMetal", gridMetalGain[grid], alliedTrueTable)
 								else
-									spSetUnitTooltip(unitID,unitDef.humanName .. " - Currently Disabled")
+									spSetUnitRulesParam(unitID, "OD_gridCurrent", -1, alliedTrueTable)
 								end
 							end
 						end
@@ -1403,7 +1365,7 @@ local function AddMex(unitID, teamID, metalMake)
 			teamPayback[teamID].metalDueBase = teamPayback[teamID].metalDueBase + mexByID[unitID].refundTotal
 		end
 		
-		spSetUnitRulesParam(unitID, "current_metalIncome", metalMake, alliedTrueTable)
+		spSetUnitRulesParam(unitID, "current_metalIncome", metalMake, inlosTrueTable)
 		local mexGridID = 0
 		local pylonData = pylon[allyTeamID][unitID]
 		if pylonData then

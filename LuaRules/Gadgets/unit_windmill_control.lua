@@ -40,7 +40,8 @@ local strength, next_strength, strength_step, step_count = 0,0,0,0
 local teamList = Spring.GetTeamList()
 local teamEnergy = {}
 
-local privateTable = {private = true}
+local alliedTrueTable = {allied = true}
+local inlosTrueTable = {inlos = true}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -92,16 +93,16 @@ function gadget:GameFrame(n)
 				local paralyzed = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 				if (not paralyzed) then
 					local tid = entry[2]
-					local incomeFactor = spGetUnitRulesParam(unitID,"current_energyIncome") or 1
+					local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor") or 1
 					windEnergy = windEnergy*incomeFactor
 					teamEnergy[tid] = teamEnergy[tid] + windEnergy -- monitor team energy
-					spSetUnitRulesParam(unitID, "windEnergyIncome", windEnergy)
+					spSetUnitRulesParam(unitID, "current_energyIncome", windEnergy, inlosTrueTable)
 				else
-					spSetUnitRulesParam(unitID, "windEnergyIncome", 0)
+					spSetUnitRulesParam(unitID, "current_energyIncome", 0, inlosTrueTable)
 				end
 			end
 			for i = 1, #teamList do
-				spSetTeamRulesParam (teamList[i], "WindIncome", teamEnergy[teamList[i]], privateTable)
+				spSetTeamRulesParam (teamList[i], "WindIncome", teamEnergy[teamList[i]], alliedTrueTable)
 			end
 		end
 		if (((n+16) % (32*30)) < 0.1) then
@@ -147,7 +148,7 @@ local function SetupUnit(unitID)
 	end
 
 	local unitDef = UnitDefs[unitDefID]
-	Spring.SetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, {inlos = true})
+	spSetUnitRulesParam(unitID,"minWind",windMin+windRange*scriptIDs.alt, inlosTrueTable)
 	spSetUnitTooltip(
 		unitID, --Spring.GetUnitTooltip(unitID)..
 		unitDef.humanName .. " - " .. unitDef.tooltip ..
@@ -191,7 +192,7 @@ function gadget:Initialize()
 
 	for i = 1, #teamList do
 		teamEnergy[teamList[i]] = 0
-		spSetTeamRulesParam(teamList[i], "WindIncome", 0, privateTable)
+		spSetTeamRulesParam(teamList[i], "WindIncome", 0, alliedTrueTable)
 	end
 end
 

@@ -23,7 +23,6 @@ local spGetFeatureTeam			= Spring.GetFeatureTeam
 --local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
 local spGetUnitTeam				= Spring.GetUnitTeam
 local spGetUnitHealth			= Spring.GetUnitHealth
-local spGetUnitResources		= Spring.GetUnitResources
 local spTraceScreenRay			= Spring.TraceScreenRay
 local spGetTeamInfo				= Spring.GetTeamInfo
 local spGetPlayerInfo			= Spring.GetPlayerInfo
@@ -457,6 +456,11 @@ end
 
 --options.fontsize.OnChange = FontChanged
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--helper functions
+
 local function GetHealthColor(fraction, returnType)
 	local midpt = (fraction > .5)
 	local r, g
@@ -473,17 +477,13 @@ local function GetHealthColor(fraction, returnType)
 	return {r, g, 0, 1}
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---helper functions
-
 function round(num, idp)
-  if (not idp) then
-    return math.floor(num+.5)
-  else
-    local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
-  end
+	if (not idp) then
+		return math.floor(num+.5)
+	else
+		local mult = 10^(idp or 0)
+		return math.floor(num * mult + 0.5) / mult
+	end
 end
 
 
@@ -525,6 +525,68 @@ function comma_value(amount, displaySign)
   	return formatted
 end
 --]]
+
+local function GetUnitResources(unitID)		
+	local mm, mu, em, eu = Spring.GetUnitResources(unitID)
+	
+	mm = (mm or 0) + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
+	em = (em or 0) + (spGetUnitRulesParam(unitID, "current_energyIncome") or 0)
+	eu = (eu or 0) + (spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0)
+	
+	if mm ~= 0 or mu ~= 0 or em ~= 0 or eu ~= 0 then
+		return mm, (mu or 0), em, eu
+	else
+		return
+	end
+end
+
+local function GetWindTooltip(unitID)
+	local minWind = spGetUnitRulesParam(unitID, "minWind")
+	if not minWind then
+		return ""
+	end
+	
+	return "\nWind Range " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+end
+
+local function GetGridTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local gridCurrent = spGetUnitRulesParam(unitID, "OD_gridCurrent")
+	if not gridCurrent then
+		return false
+	end
+	
+	if gridCurrent < 0 then
+		return "Disabled - No Grid" .. GetWindTooltip(unitID)
+	end
+	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
+	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
+	
+	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " => " .. math.round(gridMetal,2) .. GetWindTooltip(unitID)
+end
+
+local function GetMexTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local metalMult = spGetUnitRulesParam(unitID, "overdrive_proportion")
+	if not metalMult then
+		return false
+	end
+	
+	local currentIncome = spGetUnitRulesParam(unitID, "current_metalIncome")
+	local mexIncome = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	local baseFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+	
+	if currentIncome == 0 then
+		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
+	end
+
+
+	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -602,17 +664,8 @@ local function UpdateDynamicGroupInfo()
 		if ud then
 			name = ud.name 
 			hp, _, paradam, cap, build = spGetUnitHealth(id)
-			mm, mu, em, eu = spGetUnitResources(id)
-		
-			if mm then
-				mm = mm + (spGetUnitRulesParam(id, "current_metalIncome") or 0)
-				em = em + (spGetUnitRulesParam(id, "current_energyIncome") or 0)
-			end
-			
-			if eu then
-				eu = eu + (spGetUnitRulesParam(id, "overdrive_energyDrain") or 0)
-			end
-				
+			mm, mu, em, eu = GetUnitResources(id)
+
 			if name ~= "terraunit" then
 				if mm then--failsafe when switching spectator view.
 					total_cost = total_cost + ud.metalCost*build
@@ -757,6 +810,13 @@ local function GetUnitDesc(unitID, ud)
 	local lang = (WG.lang and WG.lang()) or 'en'
 	local font = WG.langFont
 	
+	local gridTooltip = GetGridTooltip(unitID)
+	local mexTooltip = GetMexTooltip(unitID)
+	if gridTooltip then
+		return gridTooltip
+	elseif mexTooltip then
+		return mexTooltip
+	end
 	
 	if lang == 'en' then
 		if unitID then
@@ -1324,13 +1384,13 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'
-		local metalMake, metalUse, energyMake, energyUse = spGetUnitResources(unitID)
+		local metalMake, metalUse, energyMake, energyUse = GetUnitResources(unitID)
 		
 		if metalMake then
-			metal = metalMake - metalUse + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
+			metal = metalMake - metalUse
 		end
 		if energyMake then
-			energy = energyMake - energyUse + (spGetUnitRulesParam(unitID, "current_energyIncome") or 0) - (spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0)
+			energy = energyMake - energyUse
 		end
 	end
 	
@@ -2408,11 +2468,19 @@ function widget:Update(dt)
 				ctrle:SetCaption(e)
 			end
 			
+			local gridTooltip = GetGridTooltip(stt_unitID)
+			local mexTooltip = GetMexTooltip(stt_unitID)
+			if gridTooltip then
+				controls['selunit2']['utt']:SetCaption(gridTooltip)
+			elseif mexTooltip then
+				controls['selunit2']['utt']:SetCaption(mexTooltip)
+			end
+			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
 			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
-			
+				
 				if metalUse and stt_ud.buildSpeed and (stt_ud.buildSpeed > 0) then
 					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
 					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')

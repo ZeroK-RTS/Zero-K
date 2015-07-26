@@ -46,6 +46,7 @@ local spSetGunshipMoveTypeData = Spring.MoveCtrl.SetGunshipMoveTypeData
 local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
 
 local ALLY_ACCESS = {allied = true}
+local INLOS_ACCESS = {inlos = true}
 
 local getMovetype = Spring.Utilities.getMovetype
 
@@ -101,7 +102,7 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 
     local state = origUnitBuildSpeed[unitDefID]
 
-	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, ALLY_ACCESS)
+	spSetUnitRulesParam(unitID, "buildSpeed", state.buildSpeed*speedFactor, INLOS_ACCESS)
 	
     spSetUnitBuildSpeed(unitID, 
         state.buildSpeed*speedFactor, -- build
@@ -112,7 +113,7 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
 end
 
 local function updateEconomy(unitID, ud, factor)	
-	Spring.SetUnitRulesParam(unitID,"resourceGenerationFactor", factor)
+	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
 end
 
 local function updatePausedReload(unitID, unitDefID, gameFrame)
@@ -181,7 +182,7 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 		else
 			if unitReloadPaused[unitID] then
 				unitReloadPaused[unitID] = nil
-				spSetUnitRulesParam(unitID, "reloadPaused", -1, ALLY_ACCESS)
+				spSetUnitRulesParam(unitID, "reloadPaused", -1, INLOS_ACCESS)
 			end
 			local newReload = w.reload/speedFactor
 			local nextReload = gameFrame+(reloadState-gameFrame)*newReload/reloadTime
@@ -350,7 +351,7 @@ function UpdateUnitAttributes(unitID, frame)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
-		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, ALLY_ACCESS)
+		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
 		
 		unitSlowed[unitID] = moveMult < 1
 		if reloadMult ~= currentReload[unitID] then
