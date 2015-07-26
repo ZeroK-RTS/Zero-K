@@ -163,7 +163,7 @@ local function SetPriorityState(unitID, state, prioID)
 end 
 
 function PriorityCommand(unitID, cmdID, cmdParams, cmdOptions)
-	local state = cmdParams[1]
+	local state = cmdParams[1] or 1
 	if cmdOptions and (cmdOptions.right) then 
 		state = state - 2
 	end
