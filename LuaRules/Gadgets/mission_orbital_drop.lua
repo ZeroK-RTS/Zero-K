@@ -17,6 +17,7 @@ end
 
 local Spring = Spring
 local emptyTable = {}
+local LOS_ACCESS = {inlos = true}
 
 ----- Settings -----------------------------------------------------------------
 
@@ -121,7 +122,17 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
 	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
+	
+	-- prevent units from shooting while falling
+	if GG.UpdateUnitAttributes then
+		Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 0, LOS_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
+	end
+	-- can't be shot either (in Spring ~100 enemies will shoot at the ground below them)
+	-- problem is enemies won't re-engage even after neutrality is removed
+	--Spring.SetUnitNeutral(unitID, true)
   end
+
   return unitID
 end
 
@@ -162,6 +173,10 @@ function gadget:GameFrame(frame)
 		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)	-- WAIT WAIT to make unit continue with any orders it has
 		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
 		--Spring.Echo(units[unitID][1]) --see if it match desired timeToGround
+		if GG.UpdateUnitAttributes then
+		      Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 1, LOS_ACCESS)
+		      GG.UpdateUnitAttributes(unitID)
+		end
 		units[unitID]= nil --remove from watchlist
       elseif y < brakeAltitude+10  then
         -- unit is braking
@@ -172,6 +187,9 @@ function gadget:GameFrame(frame)
 			Spring.SpawnCEG("banishertrail", x + 10, y - 40, z - 10)
 			Spring.SpawnCEG("banishertrail", x - 10, y - 40, z - 10)
 		end
+		--if Spring.GetUnitNeutral(unitID) then
+		--	Spring.SetUnitNeutral(unitID, true)
+		--end
       else
 	  	-- unit is falling
 		if frame % 2 == 0 then
