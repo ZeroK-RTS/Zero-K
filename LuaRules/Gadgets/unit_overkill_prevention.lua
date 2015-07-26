@@ -150,8 +150,6 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		disarmFrame = gameFrame 
 	end 
 
-	local block = false
-	
 	if incData then --seen this target, makes sense to calculate if this shot needs to be blocked
 	
 		--shields
@@ -276,13 +274,16 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		incData = incomingDamage[targetID]
 	end
 	
-	local doomed = (adjHealth < 0) and (fullDamage > 0) --for regular projectile
-	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
+	local doomed = (adjHealth < 0) --for regular projectile
+	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) --for disarming projectile
 	
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
 	
-	block = doomed or disarmed --assume function is not called with both regular and disarming damage types
+	--works for combined weapon types
+	local block = true
+	if fullDamage > 0 then block = block and doomed end --if there's regular damage, check if regular damage part opts for blocking
+	if disarmDamage > 0 then block = block and disarmed end --if there's disarming damage, check if disarming damage part opts for blocking
 	
 	if not block then
 		local frameData = incData.frames:Get(targetFrame)
