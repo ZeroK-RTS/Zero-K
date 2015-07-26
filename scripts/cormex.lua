@@ -51,7 +51,7 @@ local explodables = {door_l, furnace}
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	Spring.Echo(severity)
+
 	for i = 1, #explodables do
 		if (math.random() < severity*1.5) then
 			Explode (explodables[i], sfxFall + sfxSmoke)
