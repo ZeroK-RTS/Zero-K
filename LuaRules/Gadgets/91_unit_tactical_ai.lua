@@ -611,7 +611,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		swarmLeeway = (behaviourData.swarmLeeway or 50), 
 		skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
 		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
-		searchRange = (behaviourData.searchRange or 800),
+		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
 		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
 	}
 	
