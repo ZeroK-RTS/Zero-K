@@ -347,6 +347,9 @@ function widget:GameFrame(n)
 
 	eInco = WG.energyIncome
 	
+	totalPull = totalPull - WG.team_energyWaste
+	teamEnergyExp = teamEnergyExp - WG.team_energyWaste
+	
 	local extraMetalPull = spGetTeamRulesParam(myTeamID, "extraMetalPull") or 0
 	local extraEnergyPull = spGetTeamRulesParam(myTeamID, "extraEnergyPull") or 0
 	mPull = mPull + extraMetalPull
@@ -422,7 +425,7 @@ function widget:GameFrame(n)
 	local team_energyPull = Format(-totalPull)
 	local team_energyOverdrive = Format(-WG.team_energyOverdrive)
 	local team_energyWaste = Format(-WG.team_energyWaste)
-	local team_energyOther = Format(-teamEnergyExp + teamMSpent)
+	local team_energyOther = Format(-teamEnergyExp + teamMSpent + WG.team_energyOverdrive)
 	
 	image_metal.tooltip = "Local Metal Economy" ..
 	"\n  Base Extraction: " .. metalBase ..

@@ -246,7 +246,9 @@ function widget:GameFrame(n)
 	local teams = Spring.GetTeamList(myAllyTeamID)
 	
 	local totalPull = 0
+	local teamEnergyExp = 0
 	local teamMInco = 0
+	local teamMPull = 0
 	local teamMSpent = 0
 	local teamFreeStorage = 0
 	local teamTotalMetalStored = 0
@@ -261,12 +263,26 @@ function widget:GameFrame(n)
 		teamTotalMetalStored = teamTotalMetalStored + mCurr
 		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor
 		
+		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
+		teamMPull = teamMPull + mPull + extraMetalPull
+		
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
-		totalPull = totalPull + ePull
+		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
+		
+		local energyOverdrive = spGetTeamRulesParam(teams[i], "OD_energyOverdrive") or 0
+		local energyChange    = spGetTeamRulesParam(teams[i], "OD_energyChange") or 0
+		local extraChange     = math.min(0, energyChange) - math.min(0, energyOverdrive)
+		
+		totalPull = totalPull + ePull + extraEnergyPull + extraChange
+		teamEnergyExp = teamEnergyExp + eExpe + extraChange
+		
 		teamTotalEnergyStored = teamTotalEnergyStored + math.min(eCurr, eStor - HIDDEN_STORAGE)
 		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE 
 	end
 
+	totalPull = totalPull - WG.team_energyWaste
+	teamEnergyExp = teamEnergyExp - WG.team_energyWaste
+	
 	local eCurr, eStor, ePull, _, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 
@@ -344,6 +360,7 @@ function widget:GameFrame(n)
 	local metalConstuction = Format(-mExpe)
 	
 	local team_metalTotalIncome = Format(teamMInco)
+	local team_metalPull = Format(-teamMPull)
 	local team_metalBase = Format(WG.team_metalBase)
 	local team_metalOverdrive = Format(WG.team_metalOverdrive)
 	local team_metalReclaim = Format(math.max(0, teamMInco - WG.team_metalOverdrive - WG.team_metalBase - WG.team_metalMisc))
@@ -354,15 +371,15 @@ function widget:GameFrame(n)
 	local energyGenerators = Format(eInco - WG.energyReclaim)
 	local energyReclaim = Format(WG.energyReclaim)
 	local energyOverdrive = Format(WG.energyOverdrive)
-	local energyOther = Format(-eExpe - math.min(0, WG.energyChange) + mExpe)
+	local energyOther = Format(-eExpe + mExpe - math.min(0, WG.energyOverdrive))
 	
 	local team_energyIncome = Format(WG.team_energyIncome)
 	local team_energyGenerators = Format(WG.team_energyIncome - WG.team_energyReclaim)
 	local team_energyReclaim = Format(WG.team_energyReclaim)
-	local team_energyPull = Format(-totalPull - WG.team_energyOverdrive)
+	local team_energyPull = Format(-totalPull)
 	local team_energyOverdrive = Format(-WG.team_energyOverdrive)
 	local team_energyWaste = Format(-WG.team_energyWaste)
-	local team_energyOther = Format(- totalPull + teamMSpent)
+	local team_energyOther = Format(-teamEnergyExp + teamMSpent + WG.team_energyOverdrive)
 	
 	bar_metal.tooltip = "Local Metal Economy" ..
 	"\n  Base Extraction: " .. metalBase ..
@@ -375,7 +392,7 @@ function widget:GameFrame(n)
     "\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " .. 
 	"\nTeam Metal Economy  " .. 
-	"\n   " .. team_metalTotalIncome .. "       " .. team_metalConstuction ..
+	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
 	"\n  Base Extraction: " .. team_metalBase ..
 	"\n  Overdrive: " .. team_metalOverdrive ..
 	"\n  Reclaim : " .. team_metalReclaim ..
@@ -394,7 +411,7 @@ function widget:GameFrame(n)
     "\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " .. 
 	"\nTeam Energy Economy" ..
-	"\n   " .. team_energyIncome .. "       " .. team_energyPull ..
+	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
 	"\n  Generators: " .. team_energyGenerators ..
 	"\n  Reclaim: " .. team_energyReclaim ..
 	"\n  Overdrive: " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " metal" ..
