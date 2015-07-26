@@ -97,10 +97,6 @@ local paybackDefs = { -- cost is how much to pay back
 	[UnitDefNames["amgeo"].id] = {cost = UnitDefNames["amgeo"].metalCost*PAYBACK_FACTOR},
 }
 
--- This value should match the corresponding value in featuredef posts.
--- See featuredef_posts.lua
-local RECLAIM_RESOURCE_MULT = 10000
-
 --local PYLON_ENERGY_RANGESQ = 160000
 --local PYLON_LINK_RANGESQ = 40000
 --local PYLON_MEX_RANGESQ = 10000
@@ -276,6 +272,7 @@ end
 -- Information Sharing to Widget functions
 
 local privateTable = {private = true}
+local previousData = {}
 
 local function SetTeamEconomyRulesParams(
 			teamID, activeCount, -- TeamID of the team as well as number of active allies.
@@ -284,8 +281,7 @@ local function SetTeamEconomyRulesParams(
 			summedOverdrive, -- AllyTeam overdrive income
 			allyTeamMiscMetalIncome, -- AllyTeam constructor income
 			
-			allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
-			allyTeamEnergyReclaim, -- AllyTeam energy income from reclaim
+			allyTeamEnergyIncome, -- AllyTeam total energy generator income
 			overdriveEnergySpending, -- AllyTeam energy spent on overdrive
 			energyWasted, -- AllyTeam energy excess
 			
@@ -293,33 +289,55 @@ local function SetTeamEconomyRulesParams(
 			odShare, -- Team share of overdrive income
 			miscShare, -- Team share of constructor metal income
 			
-			energyIncome, -- Total (everything) energy income for the team
-			energyReclaim, -- Team energy due to reclaim
+			energyIncome, -- Total energy generator income
 			overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 			overdriveEnergyChange) -- real change in energy due to overdrive
 
-	spSetTeamRulesParam(teamID, "OD_allies",               activeCount, privateTable)
+	if previousData[teamID] then
+		local pd = previousData[teamID]		
+		spSetTeamRulesParam(teamID, "OD_allies",               pd.activeCount, privateTable)
+		
+		spSetTeamRulesParam(teamID, "OD_team_metalBase",       pd.summedBaseMetal, privateTable)
+		spSetTeamRulesParam(teamID, "OD_team_metalOverdrive",  pd.summedOverdrive, privateTable)
+		spSetTeamRulesParam(teamID, "OD_team_metalMisc",       pd.allyTeamMiscMetalIncome, privateTable)
+		
+		spSetTeamRulesParam(teamID, "OD_team_energyIncome",    pd.allyTeamEnergyIncome, privateTable)
+		spSetTeamRulesParam(teamID, "OD_team_energyOverdrive", pd.overdriveEnergySpending, privateTable)
+		spSetTeamRulesParam(teamID, "OD_team_energyWaste",     pd.energyWasted, privateTable)
+		
+		spSetTeamRulesParam(teamID, "OD_metalBase",       pd.baseShare, privateTable)
+		spSetTeamRulesParam(teamID, "OD_metalOverdrive",  pd.odShare, privateTable)
+		spSetTeamRulesParam(teamID, "OD_metalMisc",       pd.miscShare, privateTable)
+		
+		spSetTeamRulesParam(teamID, "OD_energyIncome",    pd.energyIncome, privateTable)
+		spSetTeamRulesParam(teamID, "OD_energyOverdrive", pd.overdriveEnergyNet, privateTable)
+		spSetTeamRulesParam(teamID, "OD_energyChange",    pd.overdriveEnergyChange, privateTable)
+		
+		spSetTeamRulesParam(teamID, "OD_RoI_metalDue",    teamPayback[teamID].metalDueOD, privateTable)
+		spSetTeamRulesParam(teamID, "OD_base_metalDue",   teamPayback[teamID].metalDueBase, privateTable)
+	else
+		previousData[teamID] = {}
+	end
 	
-	spSetTeamRulesParam(teamID, "OD_team_metalBase",       summedBaseMetal, privateTable)
-	spSetTeamRulesParam(teamID, "OD_team_metalOverdrive",  summedOverdrive, privateTable)
-	spSetTeamRulesParam(teamID, "OD_team_metalMisc",       allyTeamMiscMetalIncome, privateTable)
+	local pd = previousData[teamID]	 
 	
-	spSetTeamRulesParam(teamID, "OD_team_energyIncome",    allyTeamEnergyIncome, privateTable)
-	spSetTeamRulesParam(teamID, "OD_team_energyReclaim",   allyTeamEnergyReclaim, privateTable)
-	spSetTeamRulesParam(teamID, "OD_team_energyOverdrive", overdriveEnergySpending, privateTable)
-	spSetTeamRulesParam(teamID, "OD_team_energyWaste",     energyWasted, privateTable)
+	pd.activeCount = activeCount
 	
-	spSetTeamRulesParam(teamID, "OD_metalBase",       baseShare, privateTable)
-	spSetTeamRulesParam(teamID, "OD_metalOverdrive",  odShare, privateTable)
-	spSetTeamRulesParam(teamID, "OD_metalMisc",       miscShare, privateTable)
+	pd.summedBaseMetal = summedBaseMetal
+	pd.summedOverdrive = summedOverdrive
+	pd.allyTeamMiscMetalIncome = allyTeamMiscMetalIncome
 	
-	spSetTeamRulesParam(teamID, "OD_energyIncome",    energyIncome, privateTable)
-	spSetTeamRulesParam(teamID, "OD_energyReclaim",   allyTeamEnergyReclaim, privateTable)
-	spSetTeamRulesParam(teamID, "OD_energyOverdrive", overdriveEnergyNet, privateTable)
-	spSetTeamRulesParam(teamID, "OD_energyChange",    overdriveEnergyChange, privateTable)
+	pd.allyTeamEnergyIncome = allyTeamEnergyIncome
+	pd.overdriveEnergySpending = overdriveEnergySpending
+	pd.energyWasted = energyWasted
 	
-	spSetTeamRulesParam(teamID, "OD_RoI_metalDue",    teamPayback[teamID].metalDueOD, privateTable)
-	spSetTeamRulesParam(teamID, "OD_base_metalDue",   teamPayback[teamID].metalDueBase, privateTable)
+	pd.baseShare = baseShare
+	pd.odShare = odShare
+	pd.miscShare = miscShare
+	
+	pd.energyIncome = energyIncome
+	pd.overdriveEnergyNet = overdriveEnergyNet
+	pd.overdriveEnergyChange = overdriveEnergyChange
 end
 
 -------------------------------------------------------------------------------------
@@ -931,10 +949,8 @@ function gadget:GameFrame(n)
 			--// Calculate total energy and other metal income from structures and units
 			-- Does not include reclaim
 			local teamEnergy = {}
-			local teamReclaim = {}
 			
 			local allyTeamEnergyIncome = 0
-			local allyTeamEnergyReclaim = 0
 			local allyTeamExpense = 0
 			local allyTeamEnergySpare = 0
 			local allyTeamPositiveSpare = 0
@@ -964,32 +980,16 @@ function gadget:GameFrame(n)
 							local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 							local states = spGetUnitStates(unitID)
 							local currentlyActive = not stunned_or_inbuld
-							metal, privateMetal, energy = 0, 0, 0
+							metal, energy = 0, 0, 0
 							if currentlyActive then
 								local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor") or 1
 								metal  = data.metalIncome*incomeFactor
 								energy = data.energyIncome*incomeFactor 
 								
-								local mm,_,em = spGetUnitResources(unitID)
-								if em > 0 then
-									teamReclaim[teamID] = teamReclaim[teamID] or {metal = 0, energy = 0}
-									-- The metal is added later as private income. The energy reclaim is handled the same as 
-									-- all other energy, it exists here to be sent to widgets for display.
-									-- Reclaim which does not yield energy is not tracked.
-									local metalReclaim = mm*RECLAIM_RESOURCE_MULT
-									local energyReclaim = em*RECLAIM_RESOURCE_MULT
-									teamReclaim[teamID].metal = teamReclaim[teamID].metal + metalReclaim
-									teamReclaim[teamID].energy = teamReclaim[teamID].energy + energyReclaim
-									allyTeamEnergyReclaim = allyTeamEnergyReclaim + energyReclaim
-									
-									privateMetal = privateMetal + metalReclaim
-									energy = energy + energyReclaim
-								end
-								
 								sumMetal = sumMetal + metal
 								sumEnergy = sumEnergy + energy
 							end
-							spSetUnitRulesParam(unitID, "current_metalIncome", metal + privateMetal, inlosTrueTable)
+							spSetUnitRulesParam(unitID, "current_metalIncome", metal, inlosTrueTable)
 							spSetUnitRulesParam(unitID, "current_energyIncome", energy, inlosTrueTable)
 						end
 					end
@@ -1297,8 +1297,6 @@ function gadget:GameFrame(n)
 						local baseShare = (summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)) or 0
 						local miscShare = allyTeamMiscMetalIncome / activeCount 
 						
-						local energyReclaim = (teamReclaim[teamID] and teamReclaim[teamID].energy) or 0
-						
 						sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
 						
 						spAddTeamResource(teamID, "m", odShare + baseShare + miscShare)
@@ -1311,7 +1309,6 @@ function gadget:GameFrame(n)
 							allyTeamMiscMetalIncome, -- AllyTeam constructor income
 							
 							allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
-							allyTeamEnergyReclaim, -- AllyTeam energy income from reclaim
 							overdriveEnergySpending, -- AllyTeam energy spent on overdrive
 							energyWasted, -- AllyTeam energy excess
 							
@@ -1320,7 +1317,6 @@ function gadget:GameFrame(n)
 							miscShare, -- Team share of constructor metal income
 							
 							te.inc, -- Total (everything) energy income for the team
-							energyReclaim, -- Team energy due to reclaim
 							te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 							te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
 						) 

@@ -626,7 +626,7 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	if builderTeam == gaiaTeamID then
 		return true
 	end
-	reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].customParams.real_metal }
+	reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].metal }
 	reclaimListByFeature[featureID][builderTeam] = (reclaimListByFeature[featureID][builderTeam] or 0) + part
 	return true
 end
