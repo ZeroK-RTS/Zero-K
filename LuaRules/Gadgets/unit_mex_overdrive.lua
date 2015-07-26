@@ -51,12 +51,12 @@ for i = 1, #UnitDefs do
 	end
 	local metalIncome = tonumber(udef.customParams.income_metal) or 0
 	local energyIncome = tonumber(udef.customParams.income_energy) or 0
-	local windGenerator = (udef.customParams.windgen and true) or false
-	if metalIncome > 0 or energyIncome > 0 or windgen then
+	local isWind = (udef.customParams.windgen and true) or false
+	if metalIncome > 0 or energyIncome > 0 or isWind then
 		generatorDefs[i] = {
 			metalIncome = metalIncome,
 			energyIncome = energyIncome,
-			windGenerator = windGenerator,
+			isWind = isWind,
 		}
 	end
 end
