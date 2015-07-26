@@ -891,13 +891,14 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},	
 	["shieldarty"] = {
-		skirms = artyRangeSkirmieeArray, 
-		swarms = {}, 
+		skirms = {}, 
+		skirmEverything = true,
+		swarms = {},
 		flees = {},
 		skirmRadar = true,
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
+		skirmLeeway = 150, 
 	},	
 	["armmanni"] = {
 		skirms = artyRangeSkirmieeArray, 
