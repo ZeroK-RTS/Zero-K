@@ -48,6 +48,8 @@ end
 local RECLAIM_RESOURCE_MULT = 10000
 
 for name, fd in pairs(FeatureDefs) do
+	fd.customparams = fd.customparams or {}
+	fd.customparams.real_metal = (tonumber(fd.metal) and fd.metal) or 0
 	if tonumber(fd.energy) or 0 > 0 then 
 		fd.energy = fd.energy * RECLAIM_RESOURCE_MULT 
 		if tonumber(fd.metal) then 
