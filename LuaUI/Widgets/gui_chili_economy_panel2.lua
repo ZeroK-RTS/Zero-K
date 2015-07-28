@@ -167,6 +167,10 @@ function UpdateCustomParamResourceData()
 	local teamID = Spring.GetLocalTeamID()
 	cp.allies               = spGetTeamRulesParam(teamID, "OD_allies") or 1
 	
+	if cp.allies < 1 then
+		cp.allies = 1
+	end
+	
 	cp.team_metalBase       = spGetTeamRulesParam(teamID, "OD_team_metalBase") or 0
 	cp.team_metalOverdrive  = spGetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
 	cp.team_metalMisc       = spGetTeamRulesParam(teamID, "OD_team_metalMisc") or 0
@@ -363,7 +367,8 @@ function widget:GameFrame(n)
 	
 	local extraChange = math.min(0, cp.energyChange) - math.min(0, cp.energyOverdrive)
 	eExpe = eExpe + extraChange
-	ePull = ePull + extraEnergyPull + extraChange
+	ePull = ePull + extraEnergyPull + extraChange - cp.team_energyWaste/cp.allies
+	-- Waste energy is reported as the equal fault of all players.
 	
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then 
