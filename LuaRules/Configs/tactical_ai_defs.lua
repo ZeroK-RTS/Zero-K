@@ -891,7 +891,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},	
 	["shieldarty"] = {
-		skirms = Union(artyRangeSkirmieeArray, skirmableAir)
+		skirms = Union(artyRangeSkirmieeArray, skirmableAir),
 		swarms = {},
 		flees = {},
 		skirmRadar = true,
