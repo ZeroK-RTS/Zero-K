@@ -9,7 +9,7 @@ end
 function gadget:GetInfo()
   return {
 	name 	= "Target on the move",
-	desc	= "Adds a command to set unit target without using the normal command queue",
+	desc	= "Adds a command to set unit target without interrupting the current command queue",
 	author	= "Google Frog",
 	date	= "September 25 2011",
 	license	= "GNU GPL, v2 or later",
@@ -84,7 +84,7 @@ local unitSetTargetCmdDesc = {
 	name    = 'Set Target',
 	action  = 'settarget',
     cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands',
+	tooltip	= 'Sets target for unit without removing existing commands, persists through movement.',
 	hidden = true,
 }
 
@@ -94,7 +94,7 @@ local unitSetTargetCircleCmdDesc = {
 	name    = 'Set Target Circle',
 	action  = 'settargetcircle',
     cursor  = 'Attack',
-	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
+	tooltip	= 'Sets target for unit without removing existing commands, persists through movement. Circle version',
 	hidden = false,
 }
 
@@ -103,12 +103,13 @@ local unitCancelTargetCmdDesc = {
 	type    = CMDTYPE.ICON,
 	name    = 'Cancel Target',
 	action  = 'canceltarget',
-	tooltip	= 'Removes target for unit',
+	tooltip	= 'Removes target for unit, does not remove other existing commands',
 	hidden = false,
 }
 
 --------------------------------------------------------------------------------
 -- Gadget Interaction
+-- not used by anything. could be useful to make this information available to widgets tho.
 
 function GG.GetUnitTarget(unitID)
 	return unitById[unitID] and unit.data[unitById[unitID]] and unit.data[unitById[unitID]].targetID
@@ -190,9 +191,9 @@ end
 
 local function addUnit(unitID, data)
 	if spValidUnitID(unitID) then
-		-- clear current traget
-        clearTarget(unitID)
-        if setTarget(data, true) then
+			-- clear current target
+		clearTarget(unitID)
+		if setTarget(data, true) then
             if unitById[unitID] then
                 unit.data[unitById[unitID]] = data
             else
@@ -322,85 +323,99 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+    if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
+		if #cmdParams == 6 then
+			local team = Spring.GetUnitTeam(unitID)
+				
+			if not team then
+				return true,true
+			end
+				
+			local top, bot, left, right
+			if cmdParams[1] < cmdParams[4] then
+				left = cmdParams[1]
+				right = cmdParams[4]
+			else
+				left = cmdParams[4]
+				right = cmdParams[1]
+			end
+				
+			if cmdParams[3] < cmdParams[6] then
+				top = cmdParams[3]
+				bot = cmdParams[6]
+			else
+				bot = cmdParams[6]
+				top = cmdParams[3]
+			end
+			
+			local units = CallAsTeam(team,
+				function ()
+				return Spring.GetUnitsInRectangle(left,top,right,bot) end)
+				
+			setTargetClosestFromList(unitID, unitDefID, team, units)
+				
+		elseif #cmdParams == 3 or (#cmdParams == 4 and cmdParams[4] == 0) then
+            addUnit(unitID, {
+                id = unitID, 
+                x = cmdParams[1], 
+                y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
+                z = cmdParams[3], 
+                allyTeam = spGetUnitAllyTeam(unitID), 
+                range = UnitDefs[unitDefID].maxWeaponRange
+            })
+			
+		elseif #cmdParams == 4 then
+			
+			local team = Spring.GetUnitTeam(unitID)
+				
+			if not team then
+				return true,true
+			end
+				
+			local units = CallAsTeam(team,
+				function ()
+				return Spring.GetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4]) end)
+					
+			setTargetClosestFromList(unitID, unitDefID, team, units)
+				
+        elseif #cmdParams == 1 then
+            local targetUnitDef = spGetUnitDefID(cmdParams[1])
+			local tud = targetUnitDef and UnitDefs[targetUnitDef]
+			addUnit(unitID, {
+                id = unitID, 
+                targetID = cmdParams[1], 
+                allyTeam = spGetUnitAllyTeam(unitID), 
+				allyAllowed = allyTargetUnits[unitDefID],
+                range = UnitDefs[unitDefID].maxWeaponRange,
+				alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
+            })
+        end    
+		return true,true  -- command was used
+    elseif cmdID == CMD_UNIT_CANCEL_TARGET then
+		removeUnit(unitID)				
+        return true,true  -- command was used
+    end
+	return false -- command was not used
+end
+
+-- in order for UnitCmdDone() to be eventually called, we need to push non-shifted orders into first queue position instead of executing them here.
+-- shifted orders and those given while no queue is present will automatically behave the way we want them to
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
-    if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
+	if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE or cmdID == CMD_UNIT_CANCEL_TARGET then
 		if validUnits[unitDefID] then
-            if #cmdParams == 6 then
-				local team = Spring.GetUnitTeam(unitID)
-				
-				if not team then
-					return false
+			if not cmdOptions.shift then 
+				local cmd = Spring.GetCommandQueue(unitID)
+				if cmd and #cmd > 0 and (not cmd[1].id == CMD.ATTACK or cmdID == CMD_UNIT_CANCEL_TARGET) then
+					-- set target overrides attack to avoid funky target switching					
+					Spring.GiveOrderToUnit(unitID, CMD.INSERT,{0,cmdID, math.bit_or(cmdOptions.coded,CMD.OPT_SHIFT+CMD.OPT_INTERNAL), unpack(cmdParams)},CMD.OPT_ALT)
+					return false				
 				end
-				
-				local top, bot, left, right
-				if cmdParams[1] < cmdParams[4] then
-					left = cmdParams[1]
-					right = cmdParams[4]
-				else
-					left = cmdParams[4]
-					right = cmdParams[1]
-				end
-				
-				if cmdParams[3] < cmdParams[6] then
-					top = cmdParams[3]
-					bot = cmdParams[6]
-				else
-					bot = cmdParams[6]
-					top = cmdParams[3]
-				end
-				
-				local units = CallAsTeam(team,
-					function ()
-					return Spring.GetUnitsInRectangle(left,top,right,bot) end)
-				
-				setTargetClosestFromList(unitID, unitDefID, team, units)
-				
-			elseif #cmdParams == 3 or (#cmdParams == 4 and cmdParams[4] == 0) then
-                addUnit(unitID, {
-                    id = unitID, 
-                    x = cmdParams[1], 
-                    y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
-                    z = cmdParams[3], 
-                    allyTeam = spGetUnitAllyTeam(unitID), 
-                    range = UnitDefs[unitDefID].maxWeaponRange
-                })
-			
-			elseif #cmdParams == 4 then
-			
-				local team = Spring.GetUnitTeam(unitID)
-				
-				if not team then
-					return false
-				end
-				
-				local units = CallAsTeam(team,
-					function ()
-					return Spring.GetUnitsInCylinder(cmdParams[1],cmdParams[3],cmdParams[4]) end)
-					
-				setTargetClosestFromList(unitID, unitDefID, team, units)
-				
-            elseif #cmdParams == 1 then
-                local targetUnitDef = spGetUnitDefID(cmdParams[1])
-				local tud = targetUnitDef and UnitDefs[targetUnitDef]
-				addUnit(unitID, {
-                    id = unitID, 
-                    targetID = cmdParams[1], 
-                    allyTeam = spGetUnitAllyTeam(unitID), 
-					allyAllowed = allyTargetUnits[unitDefID],
-                    range = UnitDefs[unitDefID].maxWeaponRange,
-					alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
-                })
-            end
-        end
-        return false  -- command was used
-    elseif cmdID == CMD_UNIT_CANCEL_TARGET then
-		if validUnits[unitDefID] then
-			removeUnit(unitID)
-		end
-        return false  -- command was used
-    end
-	return true  -- command was not used
+			end
+		end	
+	end	
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -410,7 +425,7 @@ function gadget:GameFrame(n)
 	if n%16 == 15 then -- timing synced with slow update to reduce attack jittering
         -- 15 causes attack command to override target command
         -- 0 causes target command to take precedence
-        
+		
         local toRemove = {count = 0, data = {}}
         for i = 1, unit.count do
             if not setTarget(unit.data[i], false) then
