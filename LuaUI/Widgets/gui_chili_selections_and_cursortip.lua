@@ -1474,6 +1474,7 @@ local function UpdateMorphControl(morph_data)
 	
 	
 	globalitems.morphs = StackPanel:New {
+		name = "morphs stackpanel",
 		centerItems = false,
 		autoArrangeV = true,
 		orientation='horizontal',
@@ -1607,6 +1608,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 		
 		if not empty then
 			children[#children+1] = StackPanel:New{
+				name = "children stackpanel " .. #children+1,
 				centerItems = false,
 				autoArrangeV = true,
 				orientation='horizontal',
@@ -2692,9 +2694,11 @@ function widget:Initialize()
 	CreateShieldBar('shield_selunit')
 	
 	stack_main = StackPanel:New{
+		name = "stack_main",
 		width=300, -- needed for initial tooltip
 	}
 	stack_leftbar = StackPanel:New{
+		name = "stack_leftbar",
 		width=10, -- needed for initial tooltip
 	}
 	
