@@ -53,7 +53,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -79,6 +79,30 @@ options = {
 		OnChange = function() 
 		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
 		end,
+	},
+	inc_wins_1 = {
+		name = "Increment Team 1 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[1]) 
+		end
+		end,
+		advanced = true
+	},
+	inc_wins_2 = {
+		name = "Increment Team 2 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[2]) 
+		end
+		end,
+		advanced = true
 	},
 	win_show_condition = {
 		name = 'Show Wins',
