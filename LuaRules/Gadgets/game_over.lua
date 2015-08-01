@@ -345,14 +345,11 @@ local function ProcessLastAlly()
 							local name,active,spec = spGetPlayerInfo(playerlist[j])
 							if not spec then
 								if active then
-									Spring.Echo(name .. " is active")
 									hasActiveTeam = true
 								else
 									hasDroppedTeam = true
-									Spring.Echo(name .. " is dropped")
 								end
 							else
-								Spring.Echo(name .. " is spectator")
 							end
 						end
 					end
@@ -367,8 +364,6 @@ local function ProcessLastAlly()
 		end
 		until true
 	end -- for
-
-	Spring.Echo((#activeAllies) .. " active allies")
 	
 	if #activeAllies > 1 and inactiveWinAllyTeam then
 		inactiveWinAllyTeam = false
@@ -392,7 +387,6 @@ local function ProcessLastAlly()
 			end
 		end
 	elseif #activeAllies < 2 then
-		Spring.Echo((#droppedAllies) .. " dropped allies")
 		if #droppedAllies > 0 then
 			inactiveWinAllyTeam = lastActive
 			Spring.SetGameRulesParam("inactivity_win", lastActive)
