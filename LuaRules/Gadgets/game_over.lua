@@ -75,6 +75,8 @@ local noElo = tobool(modOptions.noelo)
 local revealed = false
 local gameover = false
 
+local inactiveWinAllyTeam = false
+
 local nilUnitDef = {id=-1}
 local function GetUnitDefIdByName(defName)
   return (UnitDefNames[defName] or nilUnitDef).id
@@ -195,7 +197,7 @@ local function RevealAllianceUnits(allianceID)
 end
 
 -- purge the alliance! for the horde!
-local function DestroyAlliance(allianceID)
+local function DestroyAlliance(allianceID, skipCheck)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
@@ -235,6 +237,17 @@ local function DestroyAlliance(allianceID)
 	CheckForVictory()
 end
 GG.DestroyAlliance = DestroyAlliance
+
+local function CauseVictory(allyTeamID)
+	local allylist = spGetAllyTeamList()
+	local count = 0
+	for _,a in pairs(allylist) do
+		if a ~= allyTeamID and a ~= gaiaAllyTeamID then
+			DestroyAlliance(a)
+		end
+	end
+	--spGameOver({lastAllyTeam})
+end
 
 local function AddAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
@@ -303,6 +316,7 @@ local function ProcessLastAlly()
 	end
 	local allylist = spGetAllyTeamList()
 	local activeAllies = {}
+	local inactiveAllies = {}
 	local lastActive = nil
 	for i=1,#allylist do
 		repeat
@@ -312,6 +326,7 @@ local function ProcessLastAlly()
 		local teamlist = spGetTeamList(a)
 		if (not teamlist) then break end -- continue
 		local activeTeams = 0
+		local inactiveTeams = 0
 		for i=1,#teamlist do
 			local t = teamlist[i]
 			-- any team without units is dead to us; so only teams who are active AND have units matter
@@ -319,32 +334,43 @@ local function ProcessLastAlly()
 			local numAlive = aliveCount[t]
 			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
 			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
-				local playerlist = spGetPlayerList(t, true) -- active players
-				if playerlist then
-					for j=1,#playerlist do
-						local _,active,spec = spGetPlayerInfo(playerlist[j])
-						if active and not spec then
-							activeTeams = activeTeams + 1
-						end
-					end
-				end
 				-- count AI teams as active
 				local _,_,_,isAiTeam = spGetTeamInfo(t)
 				if isAiTeam then
 					activeTeams = activeTeams + 1
+				else
+					local playerlist = spGetPlayerList(t, true) -- active players
+					if playerlist then
+						for j = 1, #playerlist do
+							local _,active,spec = spGetPlayerInfo(playerlist[j])
+							if not spec then
+								if active then
+									activeTeams = activeTeams + 1
+								else
+									inactiveTeams = inactiveTeams + 1
+								end
+							end
+						end
+					end
 				end
 			end
 		end
 		if activeTeams > 0 then
 			activeAllies[#activeAllies+1] = a
 			lastActive = a
+		elseif inactiveTeams > 0 then
+			inactiveAllies[#inactiveAllies+1] = a
 		end
 		until true
 	end -- for
 
+	if #activeAllies > 1 and inactiveWinAllyTeam then
+		inactiveWinAllyTeam = false
+		Spring.SetGameRulesParam("inactivity_win", -1)
+	end
+	
 	if #activeAllies == 2 then
-		if revealed then return end
-		if activeAllies[1] == chickenAllyTeamID or activeAllies[2] == chickenAllyTeamID then
+		if revealed or activeAllies[1] == chickenAllyTeamID or activeAllies[2] == chickenAllyTeamID then
 			return
 		end
 		-- run value comparison
@@ -360,11 +386,31 @@ local function ProcessLastAlly()
 			end
 		end
 	elseif #activeAllies < 2 then
-		-- remove every unit except for last active alliance
-		for i=1, #allylist do
-			local a = allylist[i]
-			if (a ~= lastActive)and(a ~= gaiaAllyTeamID) then
-				DestroyAlliance(a)
+		if lastActive then
+			inactiveAllies[lastActive] = nil
+		end
+		if #inactiveAllies > 0 then
+			inactiveWinAllyTeam = lastActive
+			Spring.SetGameRulesParam("inactivity_win", lastActive)
+		else
+			-- remove every unit except for last active alliance
+			for i=1, #allylist do
+				local a = allylist[i]
+				if (a ~= lastActive) and (a ~= gaiaAllyTeamID) then
+					DestroyAlliance(a)
+				end
+			end
+		end
+	end
+end
+
+local function CheckInactivityWin(cmd, line, words, player)
+	if inactiveWinAllyTeam and not gameover then
+		if player then 
+			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player)
+			if allyTeamID == inactiveWinAllyTeam and not spec then
+				Spring.Echo((name or "") .. " has forced a win due to dropped opposition.")
+				CauseVictory(inactiveWinAllyTeam)
 			end
 		end
 	end
@@ -443,8 +489,9 @@ function gadget:Initialize()
 			--break
 		end
 	end
-	
 	CheckAllUnits()
+	
+	gadgetHandler:AddChatAction('inactivitywin', CheckInactivityWin, "")
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Game Over initialized")
 end
@@ -458,6 +505,7 @@ function gadget:GameFrame(n)
 				spDestroyUnit(u, true)
 			end
 		end
+		
 		toDestroy = {}
 		if not gameover and not spGetGameRulesParam("loadedGame") then
 			ProcessLastAlly()
