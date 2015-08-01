@@ -667,7 +667,7 @@ local function UpdateDynamicGroupInfo()
 			mm, mu, em, eu = GetUnitResources(id)
 
 			if name ~= "terraunit" then
-				if mm then--failsafe when switching spectator view.
+				if hp then--failsafe when switching spectator view.
 					total_cost = total_cost + ud.metalCost*build
 					total_hp = total_hp + hp
 				end
