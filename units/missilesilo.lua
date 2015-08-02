@@ -35,7 +35,7 @@ unitDef = {
     helptext_pl    = [[Silos Rakietowy buduje i przechowuje do czterech jednorazowych rakiet taktycznych dalekiego zasiegu. Silos oferuje kilka roznych glowic, co daje swietne mozliwosci zarowno defensywne, jak i ofensywne.]],
   },
 
-  energyUse                     = 0,
+  energyMake                    = 0.3,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 6,

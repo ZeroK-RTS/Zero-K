@@ -46,7 +46,7 @@ unitDef = {
 	midposoffset   = [[0 20 0]],
   },
 
-  energyUse                     = 0,
+  energyMake                    = 0.3,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 8,

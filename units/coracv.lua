@@ -41,7 +41,7 @@ unitDef = {
 	modelradius    = [[30]],
   },
 
-  energyUse              = 0,
+  energyMake             = 0.225,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,

@@ -43,6 +43,7 @@ unitDef = {
     modelradius    = [[24]],
   },
 
+  energyMake                    = 0.3,
   explodeAs                     = [[NANOBOOM2]],
   floater                       = true,
   footprintX                    = 3,

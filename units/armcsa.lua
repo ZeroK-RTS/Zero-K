@@ -69,7 +69,7 @@ unitDef = {
     modelradius    = [[15]],
   },
 
-  energyUse           = 0,
+  energyMake          = 0.225,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,

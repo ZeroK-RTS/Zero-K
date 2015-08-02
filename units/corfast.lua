@@ -43,7 +43,7 @@ unitDef = {
 	helptext_pl    = [[Predki i majacy mozliwosc skoku, Freaker to idealny konstruktor do szybkiej rozbudowy. Posiada takze lekki promien spowalniajacy, dzieki ktoremu zapewnia wsparcie w walce.]],
   },
 
-  energyUse           = 0,
+  energyMake          = 0.15,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,

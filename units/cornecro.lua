@@ -35,6 +35,7 @@ unitDef = {
     helptext_pl    = [[Convict to bot konstrukcyjny wyposazony w ochronna tarcze.]],
   },
 
+  energyMake          = 0.15,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,

@@ -41,7 +41,7 @@ unitDef = {
 	modelradius    = [[60]],
   },
 
-  energyUse        = 0,
+  energyMake       = 0.3,
   explodeAs        = [[LARGE_BUILDINGEX]],
   footprintX       = 8,
   footprintZ       = 8,

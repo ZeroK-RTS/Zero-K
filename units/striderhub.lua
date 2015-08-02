@@ -52,6 +52,7 @@ unitDef = {
 	modelradius    = [[35]],
   },
 
+  energyMake                    = 0.3,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,

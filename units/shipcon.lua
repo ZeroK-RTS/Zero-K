@@ -38,7 +38,7 @@ unitDef = {
 	turnatfullspeed = [[1]],
   },
 
-  energyUse              = 0,
+  energyMake             = 0.225,
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
   footprintX             = 3,

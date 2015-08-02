@@ -50,7 +50,7 @@ unitDef = {
 	midposoffset   = [[0 4 0]],
   },
 
-  energyUse           = 0,
+  energyMake          = 0.12,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
   footprintX          = 2,

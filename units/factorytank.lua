@@ -43,7 +43,7 @@ unitDef = {
     sortName = [[6]],
   },
 
-  energyUse                     = 0,
+  energyMake                    = 0.3,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 10,
   footprintZ                    = 8,
