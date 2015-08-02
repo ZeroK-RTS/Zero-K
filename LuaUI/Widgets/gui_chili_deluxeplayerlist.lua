@@ -542,11 +542,12 @@ local function GetPlayerTeamStats(teamID)
 	
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
-	
-	local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
-	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
-	
-	eInco = eInco + energyIncome - math.max(0, energyChange)
+
+	if eInco then	
+		local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+		local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
+		eInco = eInco + energyIncome - math.max(0, energyChange)
+	end
 	
 	if eStor then
 		eStor = eStor - 10000					-- eStor has a "hidden 10k" to account for
