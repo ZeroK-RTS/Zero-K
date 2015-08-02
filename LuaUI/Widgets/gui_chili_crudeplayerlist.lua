@@ -124,7 +124,7 @@ include("keysym.h.lua")
 function SetupPlayerNames() end
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = {'text_height', 'backgroundOpacity', 'reset_wins','alignToTop','showSpecs','allyTeamPerTeam','debugMessages','mousewheel','win_show_condition'}
+options_order = {'text_height', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','alignToTop','showSpecs','allyTeamPerTeam','debugMessages','mousewheel','win_show_condition'}
 options = {
 	text_height = {
 		name = 'Font Size (10-18)',
@@ -149,8 +149,34 @@ options = {
 		desc = "Reset the win counts of all players",
 		type = 'button',
 		OnChange = function() 
-		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
+		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset(); SetupPlayerNames() end 
 		end,
+	},	
+	inc_wins_1 = {
+		name = "Increment Team 1 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[1]) 
+			SetupPlayerNames()
+		end
+		end,
+		advanced = true
+	},
+	inc_wins_2 = {
+		name = "Increment Team 2 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[2]) 
+			SetupPlayerNames()
+		end
+		end,
+		advanced = true
 	},
 	win_show_condition = {
 		name = 'Show Wins',
