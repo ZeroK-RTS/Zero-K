@@ -1,12 +1,6 @@
 -- $Id: unit_terraform.lua 4610 2009-05-12 13:03:32Z google frog $
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 
 function gadget:GetInfo()
   return {
@@ -19,6 +13,12 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+if (not gadgetHandler:IsSyncedCode()) then return end
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -71,6 +71,7 @@ local spSetUnitSensorRadius	= Spring.SetUnitSensorRadius
 local spGetAllUnits			= Spring.GetAllUnits
 local spSetUnitTooltip		= Spring.SetUnitTooltip
 local spGetUnitIsDead       = Spring.GetUnitIsDead
+local spSetUnitRulesParam	= Spring.SetUnitRulesParam
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
@@ -184,6 +185,8 @@ local currentCheckFrame 	= 0
 local terraformUnit 		= {}
 local terraformUnitTable 	= {}
 local terraformUnitCount 	= 0
+
+local terraTagInfo 			= nil
 
 local terraformOrder		= {}
 local terraformOrders 		= 0
@@ -395,6 +398,14 @@ local function getPointInsideMap(x,z)
 	return x, z
 end
 
+local function setupTerraTag(unitID, terraTag, segment, segmentsCount)
+	if terraTag then
+		spSetUnitRulesParam(unitID, "terraTag", terraTag)
+		spSetUnitRulesParam(unitID, "terraTagSegment", segment)
+		spSetUnitRulesParam(unitID, "terraTagSegmentsCount", segmentsCount)
+	end
+end
+
 local function setupTerraunit(unitID, team, x, y, z)
 
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
@@ -421,7 +432,7 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift)
 
 	--** Initial constructor processing **
 	local unitsX = 0
@@ -790,11 +801,17 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			
+			terraTagInfo = {
+				terraTag = terraTag,
+				segment = i,
+				segmentsCount = n - 1
+			}
+
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
-			if id then
-				
+			if id then				
 				if segment[i].along ~= rampLevels.data[rampLevels.count].along then
 					rampLevels.count = rampLevels.count + 1
 					rampLevels.data[rampLevels.count] = {along = segment[i].along, count = 0, data = {}}
@@ -802,7 +819,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				rampLevels.data[rampLevels.count].count = rampLevels.data[rampLevels.count].count + 1
 				rampLevels.data[rampLevels.count].data[rampLevels.data[rampLevels.count].count] = id
 			
-				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
+				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)				
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
 				blocks = blocks + 1
@@ -838,7 +855,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 					fullyInitialised = false,
 					lastProgress = 0,
 					lastHealth = 0,
-				}
+				}				
 				
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
@@ -889,7 +906,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 	
 end
 
-local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1284,11 +1301,17 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			
+			terraTagInfo = {
+				terraTag = terraTag,
+				segment = i,
+				segmentsCount = n - 1
+			}
+			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
-            if id then
-			
+            if id then			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
 			
@@ -1359,7 +1382,7 @@ local function TerraformWall(terraform_type,mPoint,mPoints,terraformHeight,unit,
 
 end
 
-local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,units,team,volumeSelection,shift)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -1842,6 +1865,13 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 			local terraunitX, terraunitZ = segment[i].position.x + scale*vx, segment[i].position.z + scale*vz
 			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
+			
+			terraTagInfo = {
+				terraTag = terraTag,
+				segment = i,
+				segmentsCount = n - 1
+			}			
+			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
@@ -1889,7 +1919,7 @@ local function TerraformArea(terraform_type,mPoint,mPoints,terraformHeight,unit,
 					lastProgress = 0,
 					lastHealth = 0,
 				}
-			
+
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
@@ -2023,10 +2053,12 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				i = i + 1
 			end
 			
+			local terraTag = cmdParams[i]
+			
 			if cmdParams[3] == 0 then
-				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
+				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 			else
-				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], cmdOptions.shift)
+				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 			end
 			
 			return false
@@ -2045,7 +2077,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 				i = i + 1
 			end
 			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], cmdOptions.shift)
+			local terraTag = cmdParams[i]
+			
+			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
 		
 			return false
 			
@@ -3475,6 +3509,13 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	if spGetUnitIsDead(unitID) then
 		return
+	end
+	
+	if unitDefID == terraunitDefID then		
+		if terraTagInfo then
+			setupTerraTag(unitID, terraTagInfo.terraTag, terraTagInfo.segment, terraTagInfo.segmentsCount)
+			terraTagInfo = nil
+		end
 	end
 
 	local ud = UnitDefs[unitDefID]
