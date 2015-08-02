@@ -543,8 +543,8 @@ local function GetPlayerTeamStats(teamID)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
 	
-	local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome")
-	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") 
+	local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 	
 	eInco = eInco + energyIncome - math.max(0, energyChange)
 	
