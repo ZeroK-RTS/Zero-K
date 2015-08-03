@@ -7,7 +7,7 @@ function widget:GetInfo()
     date      = "Dec 2012, Aug 2015",
     license   = "GPL",
     layer     = -10,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -132,8 +132,13 @@ function widget:Initialize()
 		elo = keys.elo
 		i = i + 1
 		if not spectator and teamID ~= gaiaTeam then			
-			if not enemyAllyTeam then
-				if allyTeamID ~= myAllyTeam then enemyAllyTeam = allyTeamID; i = 1	end	-- found enemyAllyTeam team, now need to restart				
+			if not enemyAllyTeam then				
+				if allyTeamID ~= myAllyTeam then enemyAllyTeam = allyTeamID; i = 1	end	-- found enemyAllyTeam team, now need to restart
+				if i == #playerlist then -- most likely chicken game etc
+					Echo("<AttritionCounter>: could not find enemy team")
+					widgetHandler:RemoveWidget()
+					return
+				end
 			else
 				if allyTeamID ~= myAllyTeam and allyTeamID ~= enemyAllyTeam then --ffa
 					widgetHandler:RemoveWidget()
