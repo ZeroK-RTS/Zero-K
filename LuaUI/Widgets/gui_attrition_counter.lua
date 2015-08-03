@@ -1,4 +1,4 @@
-local version = 2.0
+local version = 2.01
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
