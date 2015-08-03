@@ -1,4 +1,4 @@
-local version = 2.01
+local version = 2.02
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
@@ -133,8 +133,9 @@ function widget:Initialize()
 		i = i + 1
 		if not spectator and teamID ~= gaiaTeam then			
 			if not enemyAllyTeam then				
-				if allyTeamID ~= myAllyTeam then enemyAllyTeam = allyTeamID; i = 1	end	-- found enemyAllyTeam team, now need to restart
-				if i == #playerlist then -- most likely chicken game etc
+				if allyTeamID ~= myAllyTeam then 
+					enemyAllyTeam = allyTeamID; i = 1	-- found enemyAllyTeam team, now need to restart
+				elseif i == #playerlist then -- most likely chicken game etc
 					Echo("<AttritionCounter>: could not find enemy team")
 					widgetHandler:RemoveWidget()
 					return
