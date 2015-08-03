@@ -1,4 +1,4 @@
-local version = 2.02
+local version = 2.03
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
@@ -126,9 +126,10 @@ function widget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
 	
 	local name, spectator, teamID, allyTeamID, keys, elo
-	local i = 1; while (i < #playerlist) do		
+	local i = 1; while (i <= #playerlist) do		
 		local playerID = playerlist[i]
 		name,_,spectator,teamID,allyTeamID,_,_,_,_,keys = GetPlayerInfo(playerID)
+		Echo (name)
 		elo = keys.elo
 		i = i + 1
 		if not spectator and teamID ~= gaiaTeam then			
@@ -138,7 +139,7 @@ function widget:Initialize()
 				elseif i == #playerlist then -- most likely chicken game etc
 					Echo("<AttritionCounter>: could not find enemy team")
 					widgetHandler:RemoveWidget()
-					return
+					return					
 				end
 			else
 				if allyTeamID ~= myAllyTeam and allyTeamID ~= enemyAllyTeam then --ffa
@@ -150,7 +151,7 @@ function widget:Initialize()
 				teams[teamID].enemyAllyTeam = (allyTeamID == myAllyTeam and enemyAllyTeam or myAllyTeam)
 				local r,g,b,a = GetTeamColor(teamID)
 				teams[teamID].color = {r,g,b,a, asString = rgbToString(r,g,b)}
-				--Echo (teamID.." - "..name..' ID: '..teamID.." friend: "..teams[teamID].friendlyAllyTeam.." enemyAllyTeam: "..teams[teamID].enemyAllyTeam..' elo: '..elo)				
+				Echo (teamID.." - "..name..' ID: '..teamID.." friend: "..teams[teamID].friendlyAllyTeam.." enemyAllyTeam: "..teams[teamID].enemyAllyTeam..' elo: '..elo)				
 				allyTeams[allyTeamID].teamIDs[teamID] = true				
 				allyTeams[allyTeamID].numPlayers = allyTeams[allyTeamID].numPlayers + 1
 				if allyTeams[allyTeamID].highestElo then
