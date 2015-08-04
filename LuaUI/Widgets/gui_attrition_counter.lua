@@ -67,7 +67,7 @@ local icon_other_bars
 local ICON_KILLS_FILE = 'luaui/images/AttritionCounter/skull.png'
 local ICON_METAL_FILE = 'luaui/images/ibeam.png'
 
-local font -- dummy
+local font -- dummy, need this to call GetTextWidth without looking up an instance
 
 local myTeam
 local myAllyTeam
@@ -93,7 +93,7 @@ local allyTeams = {
 	--		lostMetal = <number>
 	-- 		rate = allyTeams[other].lostMetal / lostMetal : <number>
 	--		teamIDs = { <number>  teamID = true, ... }
-	--		color = {R,G,B,A, asString} <table<number, string>>
+	--		color = teams[highestElo].color {R,G,B,A, asString} <table<number, ..., string>>
 	--		name = allyteam# or playername <string>
 	--		numPlayers = <number>
 	--		highestElo = teamID <number>
@@ -212,9 +212,9 @@ function widget:Initialize()
 		elo = keys.elo
 		i = i + 1
 		if not spectator and teamID ~= gaiaTeam then
-			if not enemyAllyTeam then
+			if not enemyAllyTeam then -- need to first find out enemy allyteams' ID before we can fill tables
 				if allyTeamID ~= myAllyTeam then
-					enemyAllyTeam = allyTeamID; i = 1	-- found enemyAllyTeam team, now need to restart
+					enemyAllyTeam = allyTeamID; i = 1	-- found enemyAllyTeam team, now need to restart loop
 				elseif i == #playerlist then -- most likely chicken game etc
 					Echo("<AttritionCounter>: could not find enemy team, disabling")
 					widgetHandler:RemoveWidget()
@@ -224,6 +224,7 @@ function widget:Initialize()
 				if allyTeamID ~= myAllyTeam and allyTeamID ~= enemyAllyTeam then --ffa
 					Echo("<AttritionCounter>: found more than one enemy team, disabling")
 					widgetHandler:RemoveWidget()
+					return
 				end
 				teams[teamID].name = name
 				teams[teamID].elo = elo
