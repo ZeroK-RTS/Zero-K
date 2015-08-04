@@ -1,4 +1,4 @@
-local version = 2.11
+local version = 2.12
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
@@ -11,7 +11,7 @@ function widget:GetInfo()
   }
 end
 
-options_path = 'Settings/Misc/Attrition Counter'
+options_path = 'Settings/HUD Panels/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
 	updateFrequency = {
