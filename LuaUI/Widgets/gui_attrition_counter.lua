@@ -1,4 +1,4 @@
-local version = 2.1
+local version = 2.11
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
@@ -52,8 +52,7 @@ local label_rate
 
 local label_self
 local label_other
---local label_own_losses
---local label_other_losses
+
 local label_own_kills_units
 local label_own_kills_metal
 local label_other_kills_units
@@ -81,10 +80,10 @@ local teams = {
 	--	[teamID] = {
 	--		lostUnits = <number>
 	--		lostMetal = <number>	
-	-- 		rate = (allyTeams[other].lostMetal / #allyTeams[other].teamIDs) / lostMetal : <number>
-	--		friendAllyTeamID = <number>
-	--		enemyAllyTeamID = <number>
-	--		color = {R,G,B,A, asString} <table<number, string>>
+	-- 		rate = (allyTeams[other].lostMetal / #allyTeams[other].teamIDs) / lostMetal : <number> -- unused
+	--		friendAllyTeamID = teamID <number>
+	--		enemyAllyTeamID = teamID <number>
+	--		color = {R,G,B,A, asString} <table<number, ..., string>>
 	--		name = playername <string>
 }setmetatable(teams, {__index = function (t, k) rawset(t, k, {lostUnits = 0, lostMetal = h, rate = -1}); return t[k] end})
 
@@ -93,12 +92,12 @@ local allyTeams = {
 	--		lostUnits = <number>
 	--		lostMetal = <number>
 	-- 		rate = allyTeams[other].lostMetal / lostMetal : <number>
-	--		teamIDs = { <number> = true, ... }
+	--		teamIDs = { <number>  teamID = true, ... }
 	--		color = {R,G,B,A, asString} <table<number, string>>
-	--		name = team or playername <string>
+	--		name = allyteam# or playername <string>
 	--		numPlayers = <number>
-	--		highestElo = <teamID>
-}setmetatable(allyTeams, {__index = function (t, k) rawset(t, k, {lostUnits = 0, lostMetal = h, rate = -1, numPlayers = 0, teamIDs = {}, enemyTeamIDs = {}}); return t[k] end}) -- 
+	--		highestElo = teamID <number>
+}setmetatable(allyTeams, {__index = function (t, k) rawset(t, k, {lostUnits = 0, lostMetal = h, rate = -1, numPlayers = 0, teamIDs = {}}); return t[k] end}) -- 
 
 local frame = 0 -- options.updateFrequency.value
 local doUpdate = false
@@ -108,7 +107,7 @@ local doUpdate = false
 --------------- local functions
 ------------------------------------------------------------------------------------------------------------------------------------
 
-local function rgbToString(r,g,b) return '\255'..string.char(floor(r*255))..string.char(floor(g*255))..string.char(floor(b*255)) end
+local function rgbToString(r, g, b) return '\255'..string.char(floor(r*255))..string.char(floor(g*255))..string.char(floor(b*255)) end
 local function cap (x) return math.max(math.min(x,1),0) end
 
 local function UpdateCounters()
@@ -118,16 +117,16 @@ local function UpdateCounters()
 	if rate < 0 then caption 'N/A'; label_rate_player.font.color = grey	
 	elseif rate > 9.99 then caption = 'PWN!'; label_rate_player.font.color = blue
 	else
-		caption = tostring(floor(rate*100))..'%'		
+		caption = tostring(floor(rate*100))..'%'
 		label_rate_player.font.color = {
 			cap(3-rate*2),
 			cap(2*rate-1),
 			cap((rate-2) / 2),
 			1}	
-	end		
+	end
 	
 	label_rate_player:SetCaption(caption)	
-	label_rate_player.x = (window_main.width / 2) - (font:GetTextWidth(label_rate_player.caption, 30) / 2)
+	label_rate_player.x = (window_main.width / 2) - (font:GetTextWidth(caption, 30) / 2)
 	
 	label_own_kills_units:SetCaption(allyTeams[enemyAllyTeam].lostUnits)
 	label_own_kills_metal:SetCaption('/ '..floor(allyTeams[enemyAllyTeam].lostMetal))
@@ -168,8 +167,8 @@ end
 
 
 local function UpdateRates()
-	local friendTeam
-	local enemyTeam
+	local friendTeam = allyTeams[myAllyTeam]
+	local enemyTeam = allyTeams[enemyAllyTeam]
 	
 	-- player vs enemy team average. the information is largely misleading as no connection to players' individual kills can be made
 	-- -> players with no activity at all will show good rates, more active players will show bad rates even when possibly making cost
@@ -180,9 +179,6 @@ local function UpdateRates()
 		
 	end
 	--]]
-	
-	friendTeam = allyTeams[myAllyTeam]
-	enemyTeam = allyTeams[enemyAllyTeam]
 	
 	friendTeam.rate = enemyTeam.lostMetal / friendTeam.lostMetal
 	enemyTeam.rate = friendTeam.lostMetal / enemyTeam.lostMetal
@@ -202,31 +198,31 @@ function widget:Initialize()
 	
 	font = Chili.Font:New{} -- need this to call GetTextWidth without looking up an instance
 	
-	-- set up all the teams and allyteams and find out gamemode
-	--local allAllyTeams = Spring.GetAllyTeamList()
+	-- set up all the teams and allyteams and find out gamemode	
 	local playerlist = Spring.GetPlayerList()
-		
+	
 	myAllyTeam = Spring.GetMyAllyTeamID()
 	myTeam = Spring.GetMyTeamID()
 	gaiaTeam = Spring.GetGaiaTeamID()
 	
 	local name, spectator, teamID, allyTeamID, keys, elo
-	local i = 1; while (i <= #playerlist) do		
+	local i = 1; while (i <= #playerlist) do
 		local playerID = playerlist[i]
-		name,_,spectator,teamID,allyTeamID,_,_,_,_,keys = GetPlayerInfo(playerID)		
+		name,_,spectator,teamID,allyTeamID,_,_,_,_,keys = GetPlayerInfo(playerID)
 		elo = keys.elo
 		i = i + 1
-		if not spectator and teamID ~= gaiaTeam then			
-			if not enemyAllyTeam then				
-				if allyTeamID ~= myAllyTeam then 
+		if not spectator and teamID ~= gaiaTeam then
+			if not enemyAllyTeam then
+				if allyTeamID ~= myAllyTeam then
 					enemyAllyTeam = allyTeamID; i = 1	-- found enemyAllyTeam team, now need to restart
 				elseif i == #playerlist then -- most likely chicken game etc
 					Echo("<AttritionCounter>: could not find enemy team, disabling")
 					widgetHandler:RemoveWidget()
-					return					
+					return
 				end
 			else
 				if allyTeamID ~= myAllyTeam and allyTeamID ~= enemyAllyTeam then --ffa
+					Echo("<AttritionCounter>: found more than one enemy team, disabling")
 					widgetHandler:RemoveWidget()
 				end
 				teams[teamID].name = name
@@ -234,13 +230,13 @@ function widget:Initialize()
 				teams[teamID].friendlyAllyTeam = allyTeamID
 				teams[teamID].enemyAllyTeam = (allyTeamID == myAllyTeam and enemyAllyTeam or myAllyTeam)
 				local r,g,b,a = GetTeamColor(teamID)
-				teams[teamID].color = {r,g,b,a, asString = rgbToString(r,g,b)}
+				teams[teamID].color = {r, g, b, a, asString = rgbToString(r,g,b)}
 				--Echo (teamID.." - "..name..' ID: '..teamID.." friend: "..teams[teamID].friendlyAllyTeam.." enemyAllyTeam: "..teams[teamID].enemyAllyTeam..' elo: '..elo)				
-				allyTeams[allyTeamID].teamIDs[teamID] = true				
+				allyTeams[allyTeamID].teamIDs[teamID] = true
 				allyTeams[allyTeamID].numPlayers = allyTeams[allyTeamID].numPlayers + 1
 				if allyTeams[allyTeamID].highestElo then
 					if elo > teams[allyTeams[allyTeamID].highestElo].elo then allyTeams[allyTeamID].highestElo = teamID end
-				else allyTeams[allyTeamID].highestElo = teamID				
+				else allyTeams[allyTeamID].highestElo = teamID
 				end							
 			end
 		end
@@ -296,7 +292,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 		-- not sure about the health check?
 
 	local ud = UnitDefs[unitDefID]
-	if ud.customParams.dontcount then return end
+	if ud.customParams.dontcount or ud.customParams.is_drone then return end
 	
 	local buildProgress = select(5, GetUnitHealth(unitID))
 	local worth = ud.metalCost * buildProgress
@@ -321,7 +317,7 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function CreateWindow()	
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	
 	--// WINDOW
 	window_main = Window:New{
@@ -343,7 +339,7 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-        minimizable = true,
+		minimizable = true,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)		
 	}
 		
