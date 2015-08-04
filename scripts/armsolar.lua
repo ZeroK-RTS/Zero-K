@@ -58,7 +58,7 @@ end
 
 function script.Create()
 	for i = 1, #fakes do Hide (fakes[i]) end
-	Move (base, y_axis, 9000)
+	Move (base, y_axis, -90000)
 	StartThread(SmokeUnit, smokePiece)
 	Turn(base, y_axis, math.rad(45))	
 end
