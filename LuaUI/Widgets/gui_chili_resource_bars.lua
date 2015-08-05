@@ -512,7 +512,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Shutdown()
-	window:Dispose()\
+	window:Dispose()
 end
 
 function widget:Initialize()
