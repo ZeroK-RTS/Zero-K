@@ -114,7 +114,7 @@ local incomingDamage = {}
 function GG.OverkillPrevention_IsDoomed(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame = incomingDamage[targetID].lastFrame or 0
+		local lastFrame = incomingDamage[targetID].lastFrameF or 0
 		return (gameFrame <= lastFrame and incomingDamage[targetID].doomed)
 	end
 	return false
@@ -123,7 +123,7 @@ end
 function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame = incomingDamage[targetID].lastFrame or 0
+		local lastFrame = incomingDamage[targetID].lastFrameD or 0
 		return (gameFrame <= lastFrame and incomingDamage[targetID].disarmed)
 	end
 	return false
@@ -275,7 +275,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 	end
 	
 	local doomed = (adjHealth < 0) --for regular projectile
-	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) --for disarming projectile
+	local disarmed = (disarmFrame - targetFrame >= DECAY_FRAMES + disarmTimeout - timeout) --for disarming projectile
 	
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
@@ -301,6 +301,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 				--substitute for table.insert(frameData.regularDamages, singleDamage)			
 				frameData.regularDamages[regDmgSize + i] = singleDamage
 			end
+			incData.lastFrameF = math.max(incData.lastFrameF or 0, targetFrame)
 		end
 		
 		if disarmDamage > 0 then
@@ -308,11 +309,10 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 			
 			--substitute for table.insert(frameData.disarmDamages, disarmDamage)
 			frameData.disarmDamages[#frameData.disarmDamages + 1] = disarmDamage
+			incData.lastFrameD = math.max(incData.lastFrameD or 0, targetFrame)
 		end
 		
-		incData.frames:Upsert(targetFrame, frameData)
-		
-		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
+		incData.frames:Upsert(targetFrame, frameData)		
 	else
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
