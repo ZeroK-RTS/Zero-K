@@ -131,7 +131,7 @@ local function SetupUnit(unitID)
 	local x, y, z = spGetUnitPosition(unitID)
 	
 	if Spring.GetGroundHeight(x,z) <= -10 then
-		Spring.SetUnitResourcing(unitID, "cme", 1.2)
+		spSetUnitRulesParam(unitID, "wanted_energyIncome", 1.2, inlosTrueTable)
 		Spring.SetUnitRulesParam(unitID, "NotWindmill",1)
 		Spring.SetUnitMaxHealth(unitID, 400)
 		Spring.SetUnitCollisionVolumeData(unitID, 30, 30, 30, 0, 0, 0, 0, 1, 0)
@@ -140,6 +140,8 @@ local function SetupUnit(unitID)
 		Spring.SetUnitRulesParam(unitID, "aimpos_override", 2 - midy)
 		return false
 	end
+	
+	spSetUnitRulesParam(unitID, "isWind", 1, inlosTrueTable)
 	
 	local altitude = (y - groundMin)/groundExtreme
 	scriptIDs.alt = altitude*slope

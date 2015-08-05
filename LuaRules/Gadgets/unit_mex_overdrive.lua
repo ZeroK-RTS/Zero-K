@@ -973,7 +973,7 @@ function gadget:GameFrame(n)
 					local unitID = genList.data[i]
 					local data = gen[unitID]
 					if spValidUnitID(unitID) then
-						if data.isWind then
+						if spGetUnitRulesParam(unitID, "isWind") then
 							local energy = spGetUnitRulesParam(unitID,"current_energyIncome") or 0
 							sumEnergy = sumEnergy + energy
 						else
@@ -1439,14 +1439,14 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	end
 	
 	local defData = generatorDefs[unitDefID]
-	if defData.isWind then
+	if spGetUnitRulesParam(unitID, "isWind") then
 		generator[allyTeamID][teamID][unitID] = {
 			isWind = defData.isWind
 		}
 	else
 		generator[allyTeamID][teamID][unitID] = {
 			metalIncome = defData.metalIncome,
-			energyIncome = defData.energyIncome,
+			energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or defData.energyIncome,
 		}
 	end
 	
