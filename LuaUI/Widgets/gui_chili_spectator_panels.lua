@@ -82,15 +82,13 @@ local function UpdatePlayerWindowFonts()
 	playerWindow.nameRight:Invalidate()
 	playerWindow.winsLeft:Invalidate()
 	playerWindow.winsRight:Invalidate()
-	windowData.mainPanel:Invalidate()
+	playerWindow.mainPanel:Invalidate()
 end
 
 local function option_UpdateFonts()
-	if UpdateResourceWindowFonts[allyTeamData[1].allyTeamID] then
-		UpdateWindowFonts(economyWindowData[allyTeamData[1].allyTeamID])
-	end
-	if economyWindowData[allyTeamData[2].allyTeamID] then
-		UpdateResourceWindowFonts(economyWindowData[allyTeamData[2].allyTeamID])
+	if economyWindowData then
+		UpdateResourceWindowFonts(economyWindowData[1])
+		UpdateResourceWindowFonts(economyWindowData[2])
 	end
 	if playerWindow then
 		UpdatePlayerWindowFonts()
@@ -113,6 +111,8 @@ local function ShowOptions(self)
 	return true
 end
 
+ShowOptions = {ShowOptions}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Options
@@ -121,15 +121,16 @@ options_path = 'Settings/HUD Panels/Extras/Spectating'
 
 options_order = {
 	'enableSpectator',
-	'opacity',
 
 	'lable_playerPanel',
 	'enablePlayerPanel',
+	'playerOpacity',
 	'playerMainFontSize', 
 	'playerFontSize',
 	
 	'lable_economyPanels',
 	'enableEconomyPanels',
+	'resourceOpacity',
 	'resourceMainFontSize', 
 	'resourceFontSize',
 	'colourBlind', 
@@ -143,13 +144,6 @@ options = {
 		OnChange = function(self) option_CheckEnable(self) end, 
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
-	opacity = {
-		name  = "Opacity",
-		type  = "number",
-		value = 0.6, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) window.color = {1,1,1,self.value}; window:Invalidate() end,
-	},
-	
 	
 	lable_playerPanel = {type = 'label', name = 'Player Panel',},
 	enablePlayerPanel = {
@@ -157,11 +151,22 @@ options = {
 		type  = "bool", 
 		value = true, 
 		OnChange = function(self) option_CheckEnablePlayer(self) end,
+	},	
+	playerOpacity = {
+		name  = "Opacity",
+		type  = "number",
+		value = 0.6, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) 
+				if playerWindow then
+					playerWindow.window.color = {1,1,1,self.value}
+					playerWindow.window:Invalidate()
+				end
+			end,
 	},
 	playerMainFontSize = {
 		name  = "Main Font Size",
 		type  = "number",
-		value = 30, min = 8, max = 60, step = 1,
+		value = 25, min = 8, max = 60, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	playerFontSize = {
@@ -177,11 +182,24 @@ options = {
 		type  = "bool", 
 		value = true, 
 		OnChange = function(self) option_CheckEnableResource(self) end,
+	},	
+	resourceOpacity = {
+		name  = "Opacity",
+		type  = "number",
+		value = 0.6, min = 0, max = 1, step = 0.01,
+		OnChange = function(self) 
+				if economyWindowData then
+					economyWindowData[1].window.color = {1,1,1,self.value}
+					economyWindowData[1].window:Invalidate()
+					economyWindowData[2].window.color = {1,1,1,self.value}
+					economyWindowData[2].window:Invalidate()
+				end
+			end,
 	},
 	resourceMainFontSize = {
 		name  = "Main Font Size",
 		type  = "number",
-		value = 30, min = 8, max = 60, step = 1,
+		value = 25, min = 8, max = 60, step = 1,
 		OnChange = option_UpdateFonts,
 	},
 	resourceFontSize = {
@@ -213,8 +231,8 @@ end
 local blink = 0
 local BLINK_PERIOD = 1.4
 
-local function UpdateResourceWindowFlash(allyTeamID, blinkAlpha)
-	local windowData = economyWindowData[allyTeamID]
+local function UpdateResourceWindowFlash(sideID, blinkAlpha)
+	local windowData = economyWindowData[sideID]
 	
 	if windowData.metalPanel.flashing then
 		windowData.metalPanel.bar:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blinkAlpha))
@@ -229,8 +247,8 @@ function UpdateResourceWindowFlashMain(dt)
 	blink = (blink + dt)%BLINK_PERIOD
 	local sawtooth = math.abs(blink/BLINK_PERIOD - 0.5)*2
 	local blinkAlpha = sawtooth*0.92
-	UpdateResourceWindowFlash(allyTeamData[1].allyTeamID, blinkAlpha)
-	UpdateResourceWindowFlash(allyTeamData[2].allyTeamID, blinkAlpha)
+	UpdateResourceWindowFlash(1, blinkAlpha)
+	UpdateResourceWindowFlash(2, blinkAlpha)
 end
 
 local function GetFontMult(input)
@@ -305,7 +323,7 @@ local function UpdateResourcePanel(panel, income, pull, overdrive, reclaim, stor
 		panel.bar:SetValue(0)
 	end 
 	
-	local newFontSize = GetFontMult(income)*options.resourceMainFontSize.value
+	local newFontSize = math.round(GetFontMult(income)*options.resourceMainFontSize.value)
 	panel.label_income.font.size = newFontSize
 	panel.label_income:Invalidate()
 	panel.label_income:SetCaption(Format(income, ""))
@@ -320,9 +338,10 @@ local function UpdateResourcePanel(panel, income, pull, overdrive, reclaim, stor
 	panel.label_reclaim:SetCaption("Re: " .. Format(reclaim))
 end
 
-local function UpdateResourceWindowPanel(allyTeamID)
+local function UpdateResourceWindowPanel(sideID)
+	local allyTeamID = allyTeamData[sideID].allyTeamID
 	local teams = Spring.GetTeamList(allyTeamID)
-	local windowData = economyWindowData[allyTeamID]
+	local windowData = economyWindowData[sideID]
 	
 	if not (teams and teams[1]) or (not windowData) then
 		return
@@ -374,6 +393,8 @@ local function UpdateResourceWindowPanel(allyTeamID)
 		energyStorageMax = energyStorageMax + (eStor or 0) - HIDDEN_STORAGE 
 	end
 	
+	energyReclaim = math.max(0, energyReclaim)
+	
 	local metalReclaim = metalIncome 
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0)
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
@@ -402,8 +423,8 @@ local function UpdateResourceWindowPanel(allyTeamID)
 end
 
 function UpdateResourceWindowMain()
-	UpdateResourceWindowPanel(allyTeamData[1].allyTeamID)
-	UpdateResourceWindowPanel(allyTeamData[2].allyTeamID)
+	UpdateResourceWindowPanel(1)
+	UpdateResourceWindowPanel(2)
 end
 
 --------------------------------------------------------------------------------
@@ -420,16 +441,16 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	local incomeWidth  = "24%"
 	local incomeHeight = "70%"
 	
-	local overdriveX    = "30%"
-	local reclaimX     = "62%"
-	local textY       = "50%"
+	local overdriveX    = "29%"
+	local reclaimX     = "63%"
+	local textY       = "51%"
 	local textWidth   = "60%"
 	local textHeight  = "32%"
 	
 	local barX      = "26%"
-	local barY      = "9%"
+	local barY      = "12%"
 	local barRight  = "4%"
-	local barHeight = "40%"
+	local barHeight = "36%"
 	
 	data.mainPanel = Chili.Panel:New{
 		parent = parentPanel,
@@ -438,7 +459,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		y      = 0,
 		bottom = 0,
 		padding = {0,0,0,0},
-		color = {1,1,1,options.opacity.value},
+		color = {1,1,1,options.resourceOpacity.value},
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -533,19 +554,19 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	return data
 end
 
-local function CreateResourceWindow(allyTeamID)
+local function CreateResourceWindow(allyTeamDataNumber, x, width)
 	local data = {}
-
+	
 	data.window = Chili.Window:New{
 		parent = screen0,
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		dockable = true,
-		name = "SpectatorEconomyPanel" .. allyTeamID,
+		name = "SpectatorEconomyPanel" .. allyTeamDataNumber,
 		padding = {0,0,0,0},
-		x = 0,
+		x = x,
 		y = 0,
-		clientWidth  = 500,
+		clientWidth  = width,
 		clientHeight = 50,
 		draggable = false,
 		resizable = false,
@@ -553,6 +574,7 @@ local function CreateResourceWindow(allyTeamID)
 		tweakResizable = true,
 		minimizable = false,
 		OnMouseDown = ShowOptions,
+		tooltip = "Economy for " .. allyTeamData[allyTeamDataNumber].name,
 	}
 	
 	data.mainPanel = Chili.Panel:New{
@@ -567,7 +589,11 @@ local function CreateResourceWindow(allyTeamID)
 		draggable = false,
 		resizable = false,
 		OnMouseDown = ShowOptions,
+		tooltip = "Economy for " .. allyTeamData[allyTeamDataNumber].name,
 	}
+	
+	function data.window:HitTest(x,y) return self end
+	function data.mainPanel:HitTest(x,y) return self end
 	
 	data.metalPanel = CreateResourceWindowPanel(data, 0, "50%", col_metal, false)
 	data.energyPanel = CreateResourceWindowPanel(data, "50%", "50%", col_energy, true)
@@ -580,13 +606,19 @@ local function AddEconomyWindows()
 		return
 	end
 	if economyWindowData then
-		screen0:AddChild(economyWindowData[allyTeamData[1].allyTeamID].window)
-		screen0:AddChild(economyWindowData[allyTeamData[2].allyTeamID].window)
+		screen0:AddChild(economyWindowData[1].window)
+		screen0:AddChild(economyWindowData[2].window)
 	else
 		Spring.SendCommands("resbar 0")
+		
+		local screenWidth,screenHeight = Spring.GetWindowGeometry()
+		local screenHorizCentre = screenWidth / 2
+		local playerWindowWidth = 500
+		local econWidth = 460
+		
 		economyWindowData = {
-			[allyTeamData[1].allyTeamID] = CreateResourceWindow(allyTeamData[1].allyTeamID),
-			[allyTeamData[2].allyTeamID] = CreateResourceWindow(allyTeamData[2].allyTeamID),
+			[1] = CreateResourceWindow(1, screenHorizCentre - playerWindowWidth/2 - econWidth, econWidth),
+			[2] = CreateResourceWindow(2, screenHorizCentre + playerWindowWidth/2, econWidth),
 		}
 	end
 	enabledEconomy = true
@@ -594,8 +626,8 @@ end
 
 local function RemoveEconomyWindows()
 	if enabledEconomy then
-		screen0:RemoveChild(economyWindowData[allyTeamData[1].allyTeamID].window)
-		screen0:RemoveChild(economyWindowData[allyTeamData[2].allyTeamID].window)
+		screen0:RemoveChild(economyWindowData[1].window)
+		screen0:RemoveChild(economyWindowData[2].window)
 		enabledEconomy = false
 	end
 end
@@ -606,6 +638,10 @@ end
 
 local function CreatePlayerWindow()
 	local data = {}
+	
+	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenHorizCentre = screenWidth / 2
+	local playerWindowWidth = 500
 
 	data.window = Chili.Window:New{
 		parent = screen0,
@@ -614,9 +650,9 @@ local function CreatePlayerWindow()
 		dockable = true,
 		name = "SpectatorPlayerPanel",
 		padding = {0,0,0,0},
-		x = 0,
+		x = screenHorizCentre - playerWindowWidth/2,
 		y = 0,
-		clientWidth  = 600,
+		clientWidth  = playerWindowWidth,
 		clientHeight = 50,
 		draggable = false,
 		resizable = false,
@@ -627,7 +663,7 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
-		color = {1,1,1,options.opacity.value},
+		color = {1,1,1,options.playerOpacity.value},
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -640,23 +676,30 @@ local function CreatePlayerWindow()
 		OnMouseDown = ShowOptions,
 	}
 	
-	local nameOuter = "20%"
-	local nameInner = "50%"
-	local winsOuter = "4%"
-	local winsInner = "84%"
+	function data.window:HitTest(x,y) return self end
+	function data.mainPanel:HitTest(x,y) return self end
+	
+	-- Panel internals
+	local nameOuter = 45
+	local nameInner = "51%"
+	local winsOuter = 16
+	local winsInner = "80%"
+	
+	local texY = "8%"
+	local texBottom = "15%"
 	
 	data.nameLeft = Chili.Label:New{
 		parent = data.mainPanel,
 		x      = nameOuter,
-		y      = "15%",
+		y      = texY,
 		right  = nameInner,
-		bottom = "20%",
+		bottom = texBottom,
 		caption = allyTeamData[1].name,
 		valign = "center",
  		align  = "left",
 		autosize = false,
 		font   = {
-			size = options.playerMainFontSize.value, 
+			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize), 
 			outline = true, 
 			outlineWidth = 2, 
 			outlineWeight = 2,
@@ -667,15 +710,15 @@ local function CreatePlayerWindow()
 	data.nameRight = Chili.Label:New{
 		parent = data.mainPanel,
 		x      = nameInner,
-		y      = "15%",
+		y      = texY,
 		right  = nameOuter,
-		bottom = "20%",
+		bottom = texBottom,
 		caption = allyTeamData[2].name,
 		valign = "center",
  		align  = "right",
 		autosize = false,
 		font   = {
-			size = options.playerMainFontSize.value, 
+			size = math.round(options.playerMainFontSize.value*allyTeamData[2].nameSize), 
 			outline = true, 
 			outlineWidth = 2, 
 			outlineWeight = 2,
@@ -686,12 +729,12 @@ local function CreatePlayerWindow()
 	data.winsLeft  = Chili.Label:New{
 		parent = data.mainPanel,
 		x      = winsOuter,
-		y      = "15%",
+		y      = texY,
 		right  = winsInner,
-		bottom = "20%",
+		bottom = texBottom,
 		caption = allyTeamData[1].winString,
 		valign = "center",
- 		align  = "center",
+ 		align  = "left",
 		autosize = false,
 		font   = {
 			size = options.playerMainFontSize.value, 
@@ -705,12 +748,12 @@ local function CreatePlayerWindow()
 	data.winsRight  = Chili.Label:New{
 		parent = data.mainPanel,
 		x      = winsInner,
-		y      = "15%",
+		y      = texY,
 		right  = winsOuter,
-		bottom = "20%",
+		bottom = texBottom,
 		caption = allyTeamData[2].winString,
 		valign = "center",
- 		align  = "center",
+ 		align  = "right",
 		autosize = false,
 		font   = {
 			size = options.playerMainFontSize.value, 
@@ -766,62 +809,110 @@ local function GetOpposingAllyTeams()
 	for i = 1, #teams do
 		local teamID = teams[i]
 		local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
-		if teamID == gaiaTeamID then
-		elseif isAI then
-			if not activeAllyTeams[allyTeamID] then
+		if teamID ~= gaiaTeamID then
+			if isAI then
+				-- If the team is an AI team then count it as long as it is not chicken.
+				-- The AI names are collected seperately because they are less important.
 				local _,name = Spring.GetAIInfo(teamID)
 				if not name:find("Chicken:") then
-					activeAllyTeams[allyTeamID] = {aiName = name, players = 0, teamID = teamID}
+					if not activeAllyTeams[allyTeamID] then
+						activeAllyTeams[allyTeamID] = {aiNames = {}, players = 0, AIs = 0, teamID = teamID}
+						activeAllyTeamsCount = activeAllyTeamsCount + 1
+					end
+					
+					local data = activeAllyTeams[allyTeamID]
+					data.AIs = data.AIs + 1
+					data.aiNames[data.AIs] = name
+				end
+			else
+				local name,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(leader)
+				customKeys = customKeys or {}
+				local clan = customKeys.clan or ""
+				if not activeAllyTeams[allyTeamID] then
+					activeAllyTeams[allyTeamID] = {players = 0, AIs = 0, teamID = teamID}
 					activeAllyTeamsCount = activeAllyTeamsCount + 1
 				end
-			end
-		else
-			local name,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(leader)
-			local clan = customKeys.clan or ""
-			if not activeAllyTeams[allyTeamID] then
-				activeAllyTeams[allyTeamID] = {players = 0, teamID = teamID}
-				activeAllyTeamsCount = activeAllyTeamsCount + 1
-			end
-			
-			local data = activeAllyTeams[allyTeamID]
-			
-			data.players = data.players + 1
-			
-			if not data.playerName then
-				data.playerName = name
-				data.teamID = teamID
-				data.winString = GetWinString(name)
-			end
-			
-			local customKeys = select(10, Spring.GetPlayerInfo(leader))
-			local clan = customKeys.clan or ""
-			
-			if (not data.noClan) and data.clan ~= clan then
-				if data.clan then
-					data.noClan = true
-				else
-					data.clan = clan
+				
+				local data = activeAllyTeams[allyTeamID]
+				
+				-- The first player provides some representitive information for the team
+				if not data.playerNames then
+					data.playerNames = {}
+					data.teamID = teamID
+					data.winString = GetWinString(name)
+				end
+				
+				data.players = data.players + 1
+				data.playerNames[data.players] = name
+				
+				-- The team is considered a clan until players from distinct clans are found.
+				if (not data.noClan) and data.clan ~= clan then
+					if data.clan then
+						data.noClan = true
+					else
+						data.clan = clan
+					end
 				end
 			end
 		end
 	end
-	Spring.Echo(activeAllyTeamsCount)
+	
+	-- The spectator panel is only supported for games against two teams
 	if activeAllyTeamsCount ~= 2 then
 		return false
 	end
 	
+	-- If all players have the same clan then designation by clan is useless.
+	local clans = {}
+	for allyTeamID, data in pairs(activeAllyTeams) do
+		clans[#clans + 1] = data.clan
+	end
+	
+	if clans[1] == clans[2] then
+		for allyTeamID, data in pairs(activeAllyTeams) do
+			data.noClan = true
+		end
+	end
+	
+	-- Create the final allyTeamData
 	local returnData = {}
 	
 	for allyTeamID, data in pairs(activeAllyTeams) do
+		local name = "noname"
+		local nameSize = 1
+		
+		local teamMembers = data.players + data.AIs
+		
+		if (not data.noClan) and data.clan ~= "" and data.players > 1 then
+			-- All players on a team of at least two have the same clan
+			name = data.clan
+		else
+			if data.players >= 1 then
+				name = data.playerNames[1]
+			else
+				name = data.aiNames[1]
+			end
+			if teamMembers == 2 or data.players == 2 then
+				nameSize = 0.65
+				if data.players >= 2 then
+					name = name .. "\n" .. data.playerNames[2]
+				else
+					name = name .. "\n" .. data.aiNames[2]
+				end
+			elseif teamMembers > 2 then
+				nameSize = 0.65
+				name = name .. "\n and team"
+			end
+		end
+		
 		returnData[#returnData + 1] = {
-			allyTeamID = allyTeamID,
-			name = (((not data.noClan) and data.players > 1) and data.clan) or
-				data.playerName or
-				data.aiName,
-			teamID = data.teamID,
-			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1},
-			playerName = data.playerName,
-			winString = data.winString or "0",
+			allyTeamID = allyTeamID, -- allyTeamID for the team
+			name = name, -- Large display name of the team
+			nameSize = nameSize, -- Display size factor of the team name.
+			teamID = data.teamID, -- representitive teamID
+			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1}, -- color of the teams text (color of first player)
+			playerName = data.playerName, -- representitive player name (for win counter)
+			winString = data.winString or "0", -- Win string from win counter
 		}
 	end
 	
@@ -834,8 +925,7 @@ end
 
 
 function option_CheckEnable(self)
-	Spring.Echo("self.value")
-	Spring.Echo(self.value)
+
 	if not self.value then
 		if enabled then
 			RemovePlayerWindow()
@@ -848,20 +938,16 @@ function option_CheckEnable(self)
 	if enabled then
 		return
 	end
-	Spring.Echo("enabled")
 	
 	local spectating = select(1, Spring.GetSpectatingState())
-	Spring.Echo(spectating)
 	if not spectating then
 		return
 	end
-	Spring.Echo("spectating")
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
 		return
 	end
-	Spring.Echo("allyTeamData")
 	
 	if options.enablePlayerPanel.value then
 		AddPlayerWindow()
