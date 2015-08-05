@@ -39,6 +39,7 @@ local spGetUnitArmored      = Spring.GetUnitArmored
 local spGetUnitSeparation   = Spring.GetUnitSeparation
 local spGetUnitIsStunned    = Spring.GetUnitIsStunned
 local spGetUnitShieldState	= Spring.GetUnitShieldState
+local spGetUnitLosState		= Spring.GetUnitLosState
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
@@ -316,22 +317,37 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 	else
 		local teamID = spGetUnitTeam(unitID)
 		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
+		
 		-- Overkill prevention is not allowed to be smart for unidentified units.
 		if unitDefID then
-			local queueSize = spGetUnitCommands(unitID, 0)
-			if queueSize == 1 then
-				local queue = spGetUnitCommands(unitID, 1)
-				local cmd = queue[1]
-				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
-					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
-					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
-				end
-			else
-				spSetUnitTarget(unitID, 0)
+			local canBlock = true --since we have unitDefID
+			
+			local mobile = UnitDefs[unitDefID].speed > 0
+			if mobile then
+				local inLos = spGetUnitLosState(targetID, teamID).los
+				canBlock = inLos --special case for mobile units
 			end
 			
-			return true
+			-- There used to be a UnitDefID check to perform type identification of the unit (either LOS or identified radar dot)
+			-- It was not good enough for mobile units, cause it worked for both units in LoS and once seen units on radar.
+			-- However there is a radar wobble, which prevents precise targetting, so lots of missiles didn't hit target, therefore there were few false overkill preventions
+			-- Now algorithm checks for LoS for mobile units and performs old unitDefID check for buildings			
+			
+			if canBlock then
+				local queueSize = spGetUnitCommands(unitID, 0)
+				if queueSize == 1 then
+					local queue = spGetUnitCommands(unitID, 1)
+					local cmd = queue[1]
+					if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
+						spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+						--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
+					end
+				else
+					spSetUnitTarget(unitID, 0)
+				end
+				
+				return true
+			end
 		end
 	end
 	
