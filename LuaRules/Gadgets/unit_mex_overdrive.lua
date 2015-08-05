@@ -1196,7 +1196,7 @@ function gadget:GameFrame(n)
 			--// Share Overdrive Metal
 			if GG.Lagmonitor_activeTeams then
 				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
-				local activeCount = (activeTeams.count >= 1 and activeTeams.count) or 1
+				local activeCount = activeTeams.count or 1
 				local summedBaseMetalAfterPrivate = summedBaseMetal
 				
 				-- Extra base share from mex production
@@ -1274,53 +1274,56 @@ function gadget:GameFrame(n)
 				-- Make changes to team resources
 				for i = 1, allyTeamData.teams do 
 					local teamID = allyTeamData.team[i]
-					if activeTeams[teamID] then
-						local te = teamEnergy[teamID]
-						
-						-- Energy
-						if te.overdriveEnergyNet + te.inc > 0 then
-							spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
-							lastTeamOverdriveSpending[teamID] = 0
-						elseif te.overdriveEnergyNet + te.inc < 0 then
-							spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
-							lastTeamOverdriveSpending[teamID] = -(te.overdriveEnergyNet + te.inc)
-						end
-						
-						-- Metal
-						-- old system
-						-- local odShare
-						-- local ratio = summedOverdrive / activeCount
-						--if (teamODEnergySum > 0 and teamODEnergy[teamID]) then 
-						--	odShare = OD_OWNER_SHARE * summedOverdrive * teamODEnergy[teamID] / teamODEnergySum +  (1-OD_OWNER_SHARE) * ratio
-						--end		
-						local odShare = (summedOverdriveMetalAfterPayback / activeCount + (teamPacybackOD[teamID] or 0)) or 0
-						local baseShare = (summedBaseMetalAfterPrivate / activeCount + (privateBaseMetal[teamID] or 0)) or 0
-						local miscShare = allyTeamMiscMetalIncome / activeCount 
-						
-						sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
-						
-						spAddTeamResource(teamID, "m", odShare + baseShare + miscShare)
-						--Spring.Echo(teamID .. " got odShare " .. odShare)
-						SetTeamEconomyRulesParams(
-							teamID, activeCount, -- TeamID of the team as well as number of active allies.
-							
-							summedBaseMetal, -- AllyTeam base metal extrator income
-							summedOverdrive, -- AllyTeam overdrive income
-							allyTeamMiscMetalIncome, -- AllyTeam constructor income
-							
-							allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
-							overdriveEnergySpending, -- AllyTeam energy spent on overdrive
-							energyWasted, -- AllyTeam energy excess
-							
-							baseShare, -- Team share of base metal extractor income
-							odShare, -- Team share of overdrive income
-							miscShare, -- Team share of constructor metal income
-							
-							te.inc, -- Total (everything) energy income for the team
-							te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
-							te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
-						) 
+					local te = teamEnergy[teamID]
+					
+					--// Energy
+					-- Inactive teams still interact normally with energy for a few reasons:
+					-- * Energy shared to them would disappear otherwise.
+					-- * If they have reclaim (somehow) then they could build up storage without sharing.
+					if te.overdriveEnergyNet + te.inc > 0 then
+						spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
+						lastTeamOverdriveSpending[teamID] = 0
+					elseif te.overdriveEnergyNet + te.inc < 0 then
+						spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
+						lastTeamOverdriveSpending[teamID] = -(te.overdriveEnergyNet + te.inc)
 					end
+					
+					-- Metal
+					local odShare = 0
+					local baseShare = 0
+					local miscShare = 0
+					
+					local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
+					
+					if activeTeams[teamID] or activeCount == 0 then
+						odShare = (summedOverdriveMetalAfterPayback / metalSplit + (teamPacybackOD[teamID] or 0)) or 0
+						baseShare = (summedBaseMetalAfterPrivate / metalSplit + (privateBaseMetal[teamID] or 0)) or 0
+						miscShare = allyTeamMiscMetalIncome / metalSplit
+					end
+					
+					sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
+					
+					spAddTeamResource(teamID, "m", odShare + baseShare + miscShare)
+					--Spring.Echo(teamID .. " got odShare " .. odShare)
+					SetTeamEconomyRulesParams(
+						teamID, metalSplit, -- TeamID of the team as well as number of active allies.
+						
+						summedBaseMetal, -- AllyTeam base metal extrator income
+						summedOverdrive, -- AllyTeam overdrive income
+						allyTeamMiscMetalIncome, -- AllyTeam constructor income
+						
+						allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
+						overdriveEnergySpending, -- AllyTeam energy spent on overdrive
+						energyWasted, -- AllyTeam energy excess
+						
+						baseShare, -- Team share of base metal extractor income
+						odShare, -- Team share of overdrive income
+						miscShare, -- Team share of constructor metal income
+						
+						te.inc, -- Non-reclaim energy income for the team
+						te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
+						te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
+					)
 				end 
 			else
 				Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
