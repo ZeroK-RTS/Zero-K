@@ -158,7 +158,9 @@ options = {
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) 
 				if playerWindow then
-					playerWindow.window.color = {1,1,1,self.value}
+					playerWindow.mainPanel.color = {1,1,1,self.value}
+					playerWindow.mainPanel.backgroundColor = {1,1,1,self.value}
+					playerWindow.mainPanel:Invalidate()
 					playerWindow.window:Invalidate()
 				end
 			end,
@@ -189,9 +191,20 @@ options = {
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) 
 				if economyWindowData then
-					economyWindowData[1].window.color = {1,1,1,self.value}
+					economyWindowData[1].metalPanel.mainPanel.color = {1,1,1,self.value}
+					economyWindowData[1].metalPanel.mainPanel.backgroundColor = {1,1,1,self.value}
+					economyWindowData[1].metalPanel.mainPanel:Invalidate()
+					economyWindowData[1].energyPanel.mainPanel.color = {1,1,1,self.value}
+					economyWindowData[1].energyPanel.mainPanel.backgroundColor = {1,1,1,self.value}
+					economyWindowData[1].energyPanel.mainPanel:Invalidate()
 					economyWindowData[1].window:Invalidate()
-					economyWindowData[2].window.color = {1,1,1,self.value}
+					
+					economyWindowData[2].metalPanel.mainPanel.color = {1,1,1,self.value}
+					economyWindowData[2].metalPanel.mainPanel.backgroundColor = {1,1,1,self.value}
+					economyWindowData[2].metalPanel.mainPanel:Invalidate()
+					economyWindowData[2].energyPanel.mainPanel.color = {1,1,1,self.value}
+					economyWindowData[2].energyPanel.mainPanel.backgroundColor = {1,1,1,self.value}
+					economyWindowData[2].energyPanel.mainPanel:Invalidate()
 					economyWindowData[2].window:Invalidate()
 				end
 			end,
@@ -316,7 +329,7 @@ local function GetBarCaption(net)
 	end
 end
 
-local function UpdateResourcePanel(panel, income, pull, overdrive, reclaim, storage, storageMax)
+local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, storage, storageMax)
 	if storageMax > 0 then
 		panel.bar:SetValue(100*storage/storageMax)
 	else
@@ -329,9 +342,9 @@ local function UpdateResourcePanel(panel, income, pull, overdrive, reclaim, stor
 	panel.label_income:SetCaption(Format(income, ""))
 	
 	if panel.barOverlay then
-		panel.barOverlay:SetCaption(GetBarCaption(income - pull))
+		panel.barOverlay:SetCaption(GetBarCaption(net))
 	else
-		panel.bar:SetCaption(GetBarCaption(income - pull))
+		panel.bar:SetCaption(GetBarCaption(net))
 	end
 	
 	panel.label_overdrive:SetCaption("OD: " .. Format(overdrive))
@@ -350,7 +363,6 @@ local function UpdateResourceWindowPanel(sideID)
 	--// Update Economy Values
 	-- These are the values displayed on the UI
 	local metalIncome = 0
-	local metalPull = 0
 	local metalOverdrive = spGetTeamRulesParam(teams[1], "OD_team_metalOverdrive") or 0
 	-- metalReclaim set below
 	local metalStorage = 0
@@ -360,7 +372,6 @@ local function UpdateResourceWindowPanel(sideID)
 	
 	local energyWaste = spGetTeamRulesParam(teams[1], "OD_team_energyWaste") or 0
 	-- energyIncome set below
-	local energyPull = -energyWaste
 	local energyOverdrive = spGetTeamRulesParam(teams[1], "OD_team_energyOverdrive") or 0
 	local energyReclaim = 0
 	local energyStorage = 0
@@ -377,7 +388,6 @@ local function UpdateResourceWindowPanel(sideID)
 		metalSpent = metalSpent + (mExpe or 0)
 		
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
-		metalPull = metalPull + (mPull or 0) + extraMetalPull
 		
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teams[i], "energy")
 		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
@@ -386,7 +396,6 @@ local function UpdateResourceWindowPanel(sideID)
 		local energyChange    = spGetTeamRulesParam(teams[i], "OD_energyChange") or 0
 		local extraChange     = math.min(0, energyChange) - math.min(0, energyOverdrive)
 		
-		energyPull = energyPull + (ePull or 0) + extraEnergyPull + extraChange
 		energyReclaim = energyReclaim + (eInco or 0) - math.max(0, energyChange)
 		
 		energyStorage = energyStorage + math.min((eCurr or 0), (eStor or 0) - HIDDEN_STORAGE)
@@ -400,6 +409,12 @@ local function UpdateResourceWindowPanel(sideID)
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalBase") or 0) 
 			- (spGetTeamRulesParam(teams[1], "OD_team_metalMisc") or 0)
 	local energyIncome = (spGetTeamRulesParam(teams[1], "OD_team_energyIncome") or 0) + energyReclaim
+	
+	local metalNet = metalStorage - (economyWindowData[sideID].lastMetalStorage or 0)
+	economyWindowData[sideID].lastMetalStorage = metalStorage
+	
+	local energyNet = energyStorage - (economyWindowData[sideID].lastEnergyStorage or 0)
+	economyWindowData[sideID].lastEnergyStorage = energyStorage
 	
 	--// Flashing
 	local newMetalFlash = (metalIncome - metalSpent + metalStorage >= metalStorageMax)
@@ -416,9 +431,9 @@ local function UpdateResourceWindowPanel(sideID)
 	windowData.energyPanel.flashing = newEnergyFlash
 
 	--// Update GUI
-	UpdateResourcePanel(windowData.metalPanel, metalIncome, metalPull, 
+	UpdateResourcePanel(windowData.metalPanel, metalIncome, metalNet, 
 		metalOverdrive, metalReclaim, metalStorage, metalStorageMax)
-	UpdateResourcePanel(windowData.energyPanel, energyIncome, energyPull, 
+	UpdateResourcePanel(windowData.energyPanel, energyIncome, energyNet, 
 		-energyOverdrive, energyReclaim, energyStorage, energyStorageMax)
 end
 
@@ -459,6 +474,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 		y      = 0,
 		bottom = 0,
 		padding = {0,0,0,0},
+		backgroundColor = {1,1,1,options.resourceOpacity.value},
 		color = {1,1,1,options.resourceOpacity.value},
 		dockable = false;
 		draggable = false,
@@ -663,7 +679,8 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
-		color = {1,1,1,options.playerOpacity.value},
+		backgroundColor = {1,1,1,options.resourceOpacity.value},
+		color = {1,1,1,options.resourceOpacity.value},
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
