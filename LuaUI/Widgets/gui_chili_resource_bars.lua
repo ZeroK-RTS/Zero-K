@@ -512,8 +512,7 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Shutdown()
-	window:Dispose()
-	Spring.SendCommands("resbar 1")
+	window:Dispose()\
 end
 
 function widget:Initialize()
