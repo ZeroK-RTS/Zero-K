@@ -105,7 +105,7 @@ options_order = {
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
 	'colourBlind','fontSize'}
  
-options = { 
+options = {
 	eExcessFlash = {
 		name  = 'Flash On Energy Excess', 
 		type  = 'bool', 
@@ -280,7 +280,7 @@ local function Format(input, override)
 		return WhiteStr .. "0"
 	elseif input < 100 then
 		return leadingString .. ("%.1f"):format(input) .. WhiteStr
-	elseif input < 10^3 then
+	elseif input < 10^3 - 0.5 then
 		return leadingString .. ("%.0f"):format(input) .. WhiteStr
 	elseif input < 10^4 then
 		return leadingString .. ("%.2f"):format(input/1000) .. "k" .. WhiteStr
@@ -520,31 +520,31 @@ function widget:GameFrame(n)
 	
 	local netEnergy = eInco - realEnergyPull
 	if netEnergy < -27.5 then
-		bar_energy:SetCaption(negativeColourStr.."<<<<<<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<<")
 	elseif netEnergy < -22.5 then
-		bar_energy:SetCaption(negativeColourStr.."<<<<<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<")
 	elseif netEnergy < -17.5 then
-		bar_energy:SetCaption(negativeColourStr.."<<<<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<")
 	elseif netEnergy < -12.5 then
-		bar_energy:SetCaption(negativeColourStr.."<<<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<<")
 	elseif netEnergy < -7.5 then
-		bar_energy:SetCaption(negativeColourStr.."<<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<<")
 	elseif netEnergy < -2.5 then
-		bar_energy:SetCaption(negativeColourStr.."<")
+		bar_overlay_energy:SetCaption(negativeColourStr.."<")
 	elseif netEnergy < 2.5 then
-		bar_energy:SetCaption("")
+		bar_overlay_energy:SetCaption("")
 	elseif netEnergy < 7.5 then
-		bar_energy:SetCaption(positiveColourStr..">")
+		bar_overlay_energy:SetCaption(positiveColourStr..">")
 	elseif netEnergy < 12.5 then
-		bar_energy:SetCaption(positiveColourStr..">>")
+		bar_overlay_energy:SetCaption(positiveColourStr..">>")
 	elseif netEnergy < 17.5 then
-		bar_energy:SetCaption(positiveColourStr..">>>")
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>")
 	elseif netEnergy < 22.5 then
-		bar_energy:SetCaption(positiveColourStr..">>>>")
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>")
 	elseif netEnergy < 27.5 then
-		bar_energy:SetCaption(positiveColourStr..">>>>>")
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>")
 	else
-		bar_energy:SetCaption(positiveColourStr..">>>>>>")
+		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>>")
 	end
 end
 
@@ -923,7 +923,13 @@ function CreateWindow()
 		right  = barRight,
 		height = barHeight,
 		noSkin = true,
-		font   = {color = {.8,.8,.8,.95}, outlineColor = {0,0,0,0.7}, },
+		font   = {
+			size = 20, 
+			color = {.8,.8,.8,.95}, 
+			outline = true,
+			outlineWidth = 2, 
+			outlineWeight = 2
+		},
 	}
     
 	bar_energy = Chili.Progressbar:New{
@@ -937,13 +943,6 @@ function CreateWindow()
 		height = barHeight,
 		fontShadow = false,
 		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximun storage is reached and you start wasting energy.",
-		font   = {
-			size = 20, 
-			color = {.8,.8,.8,.95}, 
-			outline = true,
-			outlineWidth = 2, 
-			outlineWeight = 2
-		},
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
