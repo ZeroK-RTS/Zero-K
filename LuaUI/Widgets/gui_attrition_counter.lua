@@ -1,4 +1,4 @@
-local version = 2.12
+local version = 2.13
 function widget:GetInfo()
   return {
     name      = "Attrition Counter",
@@ -287,14 +287,20 @@ function widget:GameFrame(n)
 end
 
 
+local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twice for the same unit, so we need to prevent it from counting twice
+
 function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)		
-	if teamID == gaiaTeam or GetUnitHealth(unitID) > 0 then return end
+	
+	if deadUnits[unitID] then deadUnits[unitID] = nil; return end	
+	deadUnits[unitID] = true
+	
+	if teamID == gaiaTeam then return end
 		-- might just ignore gaia, it will set up a table for it and track its losses but nothing else will happen?
 		-- not sure about the health check?
 
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
-	
+		
 	local buildProgress = select(5, GetUnitHealth(unitID))
 	local worth = ud.metalCost * buildProgress
 	
