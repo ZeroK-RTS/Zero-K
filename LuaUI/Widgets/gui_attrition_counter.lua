@@ -291,12 +291,12 @@ local deadUnits = {} -- in spec mode UnitDestroyed would sometimes be called twi
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, attTeamID)	
 	
+	-- if its also the same kind of unit, its safe to assume that it is the very same unit
+	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
+	-- small margin of error remains
 	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
 		deadUnits[unitID] = nil
-		return end
-		-- if its also the same kind of unit, its safe to assume that it is the very same unit
-		-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
-		-- small margin of error remains
+		return 		
 	end
 	
 	deadUnits[unitID] = unitDefID
