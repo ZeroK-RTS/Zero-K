@@ -75,9 +75,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
-	  
+
       customParams            = {
       lups_explodelife = 1.5,
+		stats_hide_dps = 1, -- meaningless
+		stats_hide_reload = 1,
 	  },
 	  
       damage                  = {
