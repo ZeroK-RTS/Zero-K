@@ -1835,8 +1835,9 @@ local function MakeToolTip_UD(tt_table)
 			end
 		end
 		
-		local metalOD = WG.team_metalOverdrive
-		local energyOD = WG.team_energyOverdrive
+		local teamID = Spring.GetLocalTeamID()
+		local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+		local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
 		
 		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
 			-- Best case payback assumes that extra energy will make
