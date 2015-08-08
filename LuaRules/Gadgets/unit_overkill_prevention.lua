@@ -137,7 +137,15 @@ end
 	disarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmFrame" unit param)
 	timeout -- percieved projectile travel time from unitID to targetID in frames
 ]]--
-local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)	
+	-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
+	-- Overkill prevention is not allowed to be smart for unidentified units.
+	local teamID = spGetUnitTeam(unitID)
+	local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)	
+	if not unitDefID then
+		return false -- we are not willing to do OKP for unidentified radar dots.
+	end
+
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	
@@ -314,25 +322,19 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		
 		incData.frames:Upsert(targetFrame, frameData)		
 	else
-		local teamID = spGetUnitTeam(unitID)
-		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
-		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
-		-- Overkill prevention is not allowed to be smart for unidentified units.
-		if unitDefID then
-			local queueSize = spGetUnitCommands(unitID, 0)
-			if queueSize == 1 then
-				local queue = spGetUnitCommands(unitID, 1)
-				local cmd = queue[1]
-				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
-					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
-					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
-				end
-			else
-				spSetUnitTarget(unitID, 0)
+		local queueSize = spGetUnitCommands(unitID, 0)
+		if queueSize == 1 then
+			local queue = spGetUnitCommands(unitID, 1)
+			local cmd = queue[1]
+			if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
+				spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+				--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
 			end
-			
-			return true
+		else
+			spSetUnitTarget(unitID, 0)
 		end
+		
+		return true
 	end
 	
 	return false
