@@ -121,7 +121,8 @@ options_path = 'Settings/HUD Panels/Extras/Spectating'
 
 options_order = {
 	'enableSpectator',
-
+	'clanNameLengthCutoff',
+	
 	'lable_playerPanel',
 	'enablePlayerPanel',
 	'playerOpacity',
@@ -143,6 +144,12 @@ options = {
 		value = false, 
 		OnChange = function(self) option_CheckEnable(self) end, 
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
+	},
+	clanNameLengthCutoff = {
+		name  = "Max Clan Name Length",
+		type  = "number",
+		value = 12, min = 0, max = 60, step = 1,
+		desc = "Clans with full names shorter than this are displayed in full. Otherwise the short name is used. Requires reload."
 	},
 	
 	lable_playerPanel = {type = 'label', name = 'Player Panel',},
@@ -867,6 +874,7 @@ local function GetOpposingAllyTeams()
 					if data.clan then
 						data.noClan = true
 					else
+						data.clanfull = customKeys.clanfull
 						data.clan = clan
 					end
 				end
@@ -902,7 +910,11 @@ local function GetOpposingAllyTeams()
 		
 		if (not data.noClan) and data.clan ~= "" and data.players > 1 then
 			-- All players on a team of at least two have the same clan
-			name = data.clan
+			if data.clanfull and string.len(data.clanfull) < options.clanNameLengthCutoff.value then
+				name = data.clanfull
+			else
+				name = data.clan
+			end
 		else
 			if data.players >= 1 then
 				name = data.playerNames[1]
