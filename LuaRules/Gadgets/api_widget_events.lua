@@ -19,7 +19,7 @@ local spGetUnitLosState    = Spring.GetUnitLosState
 function gadget:UnitDestroyed (unitID, unitDefID, unitTeam)
 	if not spAreTeamsAllied(unitTeam, spGetMyTeamID()) then
 		local spec, specFullView = spGetSpectatingState()
-		if ((spec and specFullView) or spGetUnitLosState(unitID, spGetMyAllyTeamID()).los) then
+		if (not (spec and specFullView) and spGetUnitLosState(unitID, spGetMyAllyTeamID()).los) then
 			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
 		end
 	end
