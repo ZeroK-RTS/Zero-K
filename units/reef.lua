@@ -130,7 +130,7 @@ unitDef = {
     },
 
     CARRIER_AMD_ROCKET = {
-      name                    = [[Anti-Nuke Missile]],
+      name                    = [[Anti-Nuke Missile Fake]],
       areaOfEffect            = 420,
       collideFriendly         = false,
 	  collideGround           = false,

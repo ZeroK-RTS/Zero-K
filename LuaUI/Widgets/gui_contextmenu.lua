@@ -565,7 +565,7 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = dps_str
 		end
 		
-		local lowerName = wd.name:lower()
+		local lowerName = name:lower()
 		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
 			cells[#cells+1] = ' - Shield damage:'
 			cells[#cells+1] = "300%"
@@ -573,7 +573,12 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = ' - Shield damage:'
 			cells[#cells+1] = "150%"
 		end
-		
+
+		if (wd.interceptedByShieldType == 0) then
+			cells[#cells+1] = ' - Ignores shields'
+			cells[#cells+1] = ''
+		end
+
 		if stun_time > 0 then
 			cells[#cells+1] = ' - Stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'

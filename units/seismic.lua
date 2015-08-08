@@ -79,6 +79,9 @@ unitDef = {
         smoothradius = [[256]],
         detachmentradius = [[256]],
         smoothmult   = [[1]],
+
+		stats_hide_dps = 1, -- one use
+		stats_hide_reload = 1,
       },
 	  
       damage                  = {
