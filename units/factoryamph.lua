@@ -57,6 +57,7 @@ unitDef = {
   minCloakDistance = 150,
   noAutoFire       = false,
   objectName       = [[factory2.s3o]],
+  script           = "factoryamph.lua",
   seismicSignature = 4,
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
@@ -68,7 +69,7 @@ unitDef = {
 
     DEAD  = {
       description      = [[Wreckage - Amphibious Operations Plant]],
-      blocking         = false,
+      blocking         = true,
       damage           = 4000,
       energy           = 0,
       featureDead      = [[HEAP]],
