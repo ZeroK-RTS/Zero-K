@@ -294,14 +294,16 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	-- if its also the same kind of unit, its safe to assume that it is the very same unit
 	-- else it is most likely not the same unit but an old table entry and a re-used unitID. we just keep the entry
 	-- small margin of error remains
+	
+	if teamID == gaiaTeam or GetUnitHealth(unitID) > 0 then return end
+	
 	if deadUnits[unitID] and deadUnits[unitID] == unitDefID then
 		deadUnits[unitID] = nil
 		return 		
 	end
 	
 	deadUnits[unitID] = unitDefID
-	
-	if teamID == gaiaTeam then return end
+
 		-- might just ignore gaia, it will set up a table for it and track its losses but nothing else will happen?
 		-- not sure about the health check?
 
