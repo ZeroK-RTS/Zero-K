@@ -32,19 +32,10 @@ local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 local spGetUnitCommands     = Spring.GetUnitCommands
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spGetUnitAllyTeam     = Spring.GetUnitAllyTeam
-local spGetUnitsInCylinder  = Spring.GetUnitsInCylinder
-local spGetUnitPosition     = Spring.GetUnitPosition
-local spGetUnitArmored      = Spring.GetUnitArmored
-local spGetUnitSeparation   = Spring.GetUnitSeparation
-local spGetUnitIsStunned    = Spring.GetUnitIsStunned
-local spGetUnitShieldState	= Spring.GetUnitShieldState
 
 local pmap = VFS.Include("LuaRules/Utilities/pmap.lua")
 
 local DECAY_FRAMES = 1200 -- time in frames it takes to decay 100% para to 0 (taken from unit_boolean_disable.lua)
-
-local addSearchRadius = 200 --addition to a shield radius when search of nearby covered units is being performed
 
 local FAST_SPEED = 5.5*30 -- Speed which is considered fast.
 local fastUnitDefs = {}
@@ -54,44 +45,34 @@ for i, ud in pairs(UnitDefs) do
 	end
 end
 
--- damage to shields modifiers (taken from armordefs.lua)
---local EMP_DAMAGE_MOD = 1/3
---local SLOW_DAMAGE_MOD = 1/3
-local DISARM_DAMAGE_MOD = 1/3
---local FLAMER_DAMAGE_MOD = 3
---local GAUSS_DAMAGE_MOD = 1.5
-
-
 local canHandleUnit = {}
 local units = {}
-local shields = {}
-local shieldCoveredUnits = {}
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 local HandledUnitDefIDs = {
-	[UnitDefNames["corrl"].id] = true, --Defender
-	[UnitDefNames["armcir"].id] = true, --Chainsaw
-	[UnitDefNames["nsaclash"].id] = true, --Scalpel
-	[UnitDefNames["missiletower"].id] = true, --Hacksaw
-	[UnitDefNames["screamer"].id] = true, --Screamer
-	[UnitDefNames["amphaa"].id] = true, --Angler
-	[UnitDefNames["puppy"].id] = true, --Puppy
-	[UnitDefNames["fighter"].id] = true, --Swift's rocket weapon
-	[UnitDefNames["hoveraa"].id] = true, --Flail
-	[UnitDefNames["spideraa"].id] = true, --Tarantula
-	[UnitDefNames["vehaa"].id] = true, --Crasher
-	[UnitDefNames["gunshipaa"].id] = true, --Trident
-	[UnitDefNames["gunshipsupport"].id] = true, --Rapier
-	[UnitDefNames["armsnipe"].id] = true, --Sharpshooter
-	[UnitDefNames["amphraider3"].id] = true, --Duck
-	[UnitDefNames["amphriot"].id] = true, --Scallop's sea weapon
-	[UnitDefNames["subarty"].id] = true, --Serpent (Sniper sub)
-	[UnitDefNames["subraider"].id] = true, --Submarine (ordinal sub)
-	[UnitDefNames["corcrash"].id] = true, --Vandal
-	[UnitDefNames["cormist"].id] = true, --Slasher
-	[UnitDefNames["tawf114"].id] = true, --Banisher	
+	[UnitDefNames["corrl"].id] = true,
+	[UnitDefNames["armcir"].id] = true,
+	[UnitDefNames["nsaclash"].id] = true,
+	[UnitDefNames["missiletower"].id] = true,
+	[UnitDefNames["screamer"].id] = true,
+	[UnitDefNames["amphaa"].id] = true,
+	[UnitDefNames["puppy"].id] = true,
+	[UnitDefNames["fighter"].id] = true,
+	[UnitDefNames["hoveraa"].id] = true,
+	[UnitDefNames["spideraa"].id] = true,
+	[UnitDefNames["vehaa"].id] = true,
+	[UnitDefNames["gunshipaa"].id] = true,
+	[UnitDefNames["gunshipsupport"].id] = true,
+	[UnitDefNames["armsnipe"].id] = true,
+	[UnitDefNames["amphraider3"].id] = true,
+	[UnitDefNames["amphriot"].id] = true,
+	[UnitDefNames["subarty"].id] = true,
+	[UnitDefNames["subraider"].id] = true,
+	[UnitDefNames["corcrash"].id] = true,
+	[UnitDefNames["cormist"].id] = true,
+	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
 	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
 }
 
@@ -114,7 +95,7 @@ local incomingDamage = {}
 function GG.OverkillPrevention_IsDoomed(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame = incomingDamage[targetID].lastFrameF or 0
+		local lastFrame = incomingDamage[targetID].lastFrame or 0
 		return (gameFrame <= lastFrame and incomingDamage[targetID].doomed)
 	end
 	return false
@@ -123,7 +104,7 @@ end
 function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
-		local lastFrame = incomingDamage[targetID].lastFrameD or 0
+		local lastFrame = incomingDamage[targetID].lastFrame or 0
 		return (gameFrame <= lastFrame and incomingDamage[targetID].disarmed)
 	end
 	return false
@@ -131,26 +112,17 @@ end
 
 --[[
 	unitID, targetID - unit IDs. Self explainatory
-	fullDamage - regular damage of salvo (one or more projectiles shot simultaneously)
-	salvoSize - size of regular damage salvo
+	fullDamage - regular damage of salvo
 	disarmDamage - disarming damage
-	disarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmFrame" unit param)
+	disarmTimeout - for how long in frames unit projectile may cause unit disarm state (it's a cap for "disarmframe" unit param)
 	timeout -- percieved projectile travel time from unitID to targetID in frames
 ]]--
-local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)	
-	-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
-	-- Overkill prevention is not allowed to be smart for unidentified units.
-	local teamID = spGetUnitTeam(unitID)
-	local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)	
-	if not unitDefID then
-		return false -- we are not willing to do OKP for unidentified radar dots.
-	end
-
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
 	local incData = incomingDamage[targetID]
 	local targetFrame = gameFrame + timeout
 	
-	local armor = select(2, spGetUnitArmored(targetID)) or 1
-	local adjHealth = spGetUnitHealth(targetID)/armor -- health, adjusted by factor of armor
+	local armor = select(2,Spring.GetUnitArmored(targetID)) or 1
+	local adjHealth = spGetUnitHealth(targetID)/armor -- adjusted health after incoming damage is dealt
 	
 	local disarmFrame = spGetUnitRulesParam(targetID, "disarmframe") or -1
 	if disarmFrame == -1 then
@@ -158,123 +130,27 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		disarmFrame = gameFrame 
 	end 
 
-	if incData then --seen this target, makes sense to calculate if this shot needs to be blocked
+	local block = false
 	
-		--shields
-		local shieldCoverData = shieldCoveredUnits[targetID]
-		local relevantShields={} --hash of shield IDs, that can potentially cover particular target
-		
-		local targetUnitDefID = spGetUnitDefID(targetID)	
-		local targetSpeed = UnitDefs[targetUnitDefID].speed or 0 --used for shield-related part of the code
-		
-		if shieldCoverData then		
-			local unitAllyID = spGetUnitAllyTeam(unitID)		
-			
-			local shieldCoverDataCount=#shieldCoverData
-			for i = 1, shieldCoverDataCount do
-				local shID=shieldCoverData[i]			
-				if (spValidUnitID(shID) and spGetUnitHealth(shID) > 0.0) and --shield must be valid and alive
-				((not spGetUnitIsStunned(shID)) and spGetUnitRulesParam(shID, "disarmed") ~= 1) and --TODO check if unit will be disarmed soon?
-				(shields[shID].allyTeamID ~= unitAllyID) then --check if shield belongs to another alliance, thus will block our projectiles
-				
-					local shWDef=WeaponDefs[shields[shID].shieldWeaponDefID]
-					local shieldPowerMax=shWDef.shieldPower
-					local shieldPowerRegen=shWDef.shieldPowerRegen --HP/sec
-					local shieldRadius=shWDef.shieldRadius
-
-					local enabledShield, curShieldPower = spGetUnitShieldState(shID)
-					curShieldPower=curShieldPower*enabledShield --just in case
-					
-					relevantShields[shID] = {curShieldPower = curShieldPower, shieldPowerMax = shieldPowerMax, shieldPowerRegen = shieldPowerRegen, shieldRadius = shieldRadius} --saving relevant shield parameters for future calculation
-				end
-			end			
-				
-		end
-		--/shields
-		
+	if incData then --seen this target
 		local startIndex, endIndex = incData.frames:GetIdxs()
 		for i = startIndex, endIndex do
 			local keyValue = incData.frames:GetKV(i)
 			local frame, data = keyValue[1], keyValue[2]
-
+			--Spring.Echo(frame)
 			if frame < gameFrame then
-				--remove old frame data
 				incData.frames:TrimFront() --frames should come in ascending order, so it's safe to trim front of array one by one
 			else
-				local disarmDamages = data.disarmDamages
-				local regularDamages = data.regularDamages
+				local disarmDamage = data.disarmDamage
+				local fullDamage = data.fullDamage
 				
-				--By convention I've just established hereby, if both regular and non-regular damages happen same frame the non-regular damages are applied first
-
-				-- Forward note: expectedShieldPower is calculated @frame time, but projectile may hit shield sphere slightly before @frame, so overkill is possible.
-				-- If shield is considered strong enough to block projectile @frame it may not be strong enought to block projectile at whatever frame projectile is going to hit shield
-				-- There is almost nothing could be done here, since both shields and target are considered mobile (if they are not static),
-				-- So overkill will be happening from time to time, if shields are drained.
-
-				if disarmDamages then
-					local disarmDamagesCount = #disarmDamages
-					for i = 1, disarmDamagesCount do
-						local damage = disarmDamages[i]
-
-						local damageToShield = damage * DISARM_DAMAGE_MOD	
-						local absorbed = false
-						for shID, shData in pairs (relevantShields) do
-							local shieldSpeed = shields[shID].speed
-							if spGetUnitSeparation(shID, targetID, true) <= (targetSpeed + shieldSpeed) * (frame - gameFrame) then --this shield can potentially cover this target @frame time
-							
-								local expectedShieldPower = shData.curShieldPower + shData.shieldPowerRegen * (frame - gameFrame) / 30 --estimate how powerful shield will be @frame time
-								if expectedShieldPower > shData.shieldPowerMax then expectedShieldPower = shData.shieldPowerMax end --cap shieldPower to maximum power of shield 								
-								
-								if damageToShield <= expectedShieldPower then  --this shield has absorbed damage
-									relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-									--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
-									absorbed = true
-									break
-								end
-							end
-						end
-						
-						if not absorbed then --this projectile comes through all shields (if any)
-							local disarmExtra = math.floor(damage/adjHealth*DECAY_FRAMES)
-							disarmFrame = disarmFrame + disarmExtra
-							if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
-								disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
-							end
-						end
-						
-					end
+				local disarmExtra = math.floor(disarmDamage/adjHealth*DECAY_FRAMES)
+				adjHealth = adjHealth - fullDamage
+				
+				disarmFrame = disarmFrame + disarmExtra
+				if disarmFrame > frame + DECAY_FRAMES + disarmTimeout then 
+					disarmFrame = frame + DECAY_FRAMES + disarmTimeout 
 				end
-				
-				if regularDamages then
-					local regularDamagesCount = #regularDamages
-					for i = 1, regularDamagesCount do
-						local damage = regularDamages[i]
-						
-						local damageToShield = damage
-						local absorbed = false
-						for shID, shData in pairs (relevantShields) do
-							local shieldSpeed = shields[shID].speed
-							if spGetUnitSeparation(shID, targetID, true) <= (targetSpeed + shieldSpeed) * (frame - gameFrame) then --this shield can potentially cover this target @frame time
-							
-								local expectedShieldPower = shData.curShieldPower + shData.shieldPowerRegen * (frame - gameFrame) / 30 --estimate how powerful shield will be @frame time
-								if expectedShieldPower > shData.shieldPowerMax then expectedShieldPower = shData.shieldPowerMax end --cap shieldPower to maximum power of shield 								
-								
-								if damageToShield <= expectedShieldPower then  --this shield has absorbed damage
-									relevantShields[shID].curShieldPower = relevantShields[shID].curShieldPower - damageToShield
-									--this can go below 0, but it's virtual, since calculus is done @frame and it's <0 @gameFrame
-									absorbed = true
-									break
-								end
-							end
-						end
-
-						if not absorbed then --this projectile comes through all shields (if any)
-							adjHealth = adjHealth - damage
-						end
-						
-					end
-				end
-				
 			end
 		end
 	else --new target
@@ -282,59 +158,49 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSi
 		incData = incomingDamage[targetID]
 	end
 	
-	local doomed = (adjHealth < 0) --for regular projectile
-	local disarmed = (disarmFrame - targetFrame >= DECAY_FRAMES + disarmTimeout - timeout) --for disarming projectile
+	local doomed = (adjHealth < 0) and (fullDamage > 0) --for regular projectile
+	local disarmed = (disarmFrame - gameFrame - timeout >= DECAY_FRAMES) and (disarmDamage > 0) --for disarming projectile
 	
 	incomingDamage[targetID].doomed = doomed
 	incomingDamage[targetID].disarmed = disarmed
 	
-	--works for combined weapon types
-	local block = true
-	if fullDamage > 0 then block = block and doomed end --if there's regular damage, check if regular damage part opts for blocking
-	if disarmDamage > 0 then block = block and disarmed end --if there's disarming damage, check if disarming damage part opts for blocking
+	block = doomed or disarmed --assume function is not called with both regular and disarming damage types	
+	
 	
 	if not block then
+		--Spring.Echo("^^^^SHOT^^^^")
 		local frameData = incData.frames:Get(targetFrame)
-		if not frameData then frameData = {} end
-		
-		-- damages used to be bluntly summed up, however this approach was just wrong when dealing with shields or disarming missiles.
-		-- For such cases numeric sum of projectile powers gives different outcome to individual projectiles simulation
-		-- Example: 2 projectiles 500 damage each will not penetrate two shields 550 shield power each, however single imaginary 1000 (500+500) damage projectile will penetrate both.
-			
-		if fullDamage > 0 then
-			if not frameData.regularDamages then frameData.regularDamages = {} end
-			local singleDamage = fullDamage / salvoSize
-			local regDmgSize = #frameData.regularDamages
-			for i = 1, salvoSize do
-				--substitute for table.insert(frameData.regularDamages, singleDamage)			
-				frameData.regularDamages[regDmgSize + i] = singleDamage
-			end
-			incData.lastFrameF = math.max(incData.lastFrameF or 0, targetFrame)
+		if frameData then 
+			-- here we have a rare case when few different projectiles (from different attack units) 
+			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
+			frameData.fullDamage = frameData.fullDamage + fullDamage
+			frameData.disarmDamage = frameData.disarmDamage + disarmDamage
+			incData.frames:Upsert(targetFrame, frameData)
+		else --this case is much more common: such frame does not exist in incData.frames
+			incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
 		end
-		
-		if disarmDamage > 0 then
-			if not frameData.disarmDamages then frameData.disarmDamages = {} end
-			
-			--substitute for table.insert(frameData.disarmDamages, disarmDamage)
-			frameData.disarmDamages[#frameData.disarmDamages + 1] = disarmDamage
-			incData.lastFrameD = math.max(incData.lastFrameD or 0, targetFrame)
-		end
-		
-		incData.frames:Upsert(targetFrame, frameData)		
+		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 	else
-		local queueSize = spGetUnitCommands(unitID, 0)
-		if queueSize == 1 then
-			local queue = spGetUnitCommands(unitID, 1)
-			local cmd = queue[1]
-			if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
-				spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
-				--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
+		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = CallAsTeam(teamID, spGetUnitDefID, targetID)
+		-- UnitDefID check is purely to check for type identification of the unit (either LOS or identified radar dot)
+		-- Overkill prevention is not allowed to be smart for unidentified units.
+		if unitDefID then
+			local queueSize = spGetUnitCommands(unitID, 0)
+			if queueSize == 1 then
+				local queue = spGetUnitCommands(unitID, 1)
+				local cmd = queue[1]
+				if (cmd.id == CMD.ATTACK) and (cmd.options.internal) and (#cmd.params == 1 and cmd.params[1] == targetID) then
+					--Spring.Echo("Removing auto-attack command")
+					spGiveOrderToUnit(unitID, CMD.REMOVE, {cmd.tag}, {} )
+					--Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, {} )
+				end
+			else
+				spSetUnitTarget(unitID, 0)
 			end
-		else
-			spSetUnitTarget(unitID, 0)
+			
+			return true
 		end
-		
-		return true
 	end
 	
 	return false
@@ -348,17 +214,12 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
-		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, 0, 1, damage, disarmTimer, timeout)
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout)
 	end
-	return false
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, troubleVsFast)
-	return GG.OverkillPrevention_CheckBlockSalvo(unitID, targetID, damage, 1, timeout, troubleVsFast)
-end
-
-function GG.OverkillPrevention_CheckBlockSalvo(unitID, targetID, damage, salvoSize, timeout, troubleVsFast)
 	if not units[unitID] then
 		return false
 	end	
@@ -366,16 +227,22 @@ function GG.OverkillPrevention_CheckBlockSalvo(unitID, targetID, damage, salvoSi
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		if troubleVsFast then
-			local unitDefID = spGetUnitDefID(targetID)
+			local unitDefID = Spring.GetUnitDefID(targetID)
 			if fastUnitDefs[unitDefID] then
 				damage = 0
 			end
 		end
 		
-		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, salvoSize, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, damage, salvoSize, 0, 0, timeout)		
+		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout)		
 	end
 	return false
+end
+
+function gadget:UnitDestroyed(unitID)
+	if incomingDamage[unitID] then
+		incomingDamage[unitID] = nil
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -418,36 +285,6 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return false  -- command was used
 end
 
-function gadget:GameFrame(f)
-	if f%16 == 4 then
-		shieldCoveredUnits={} --empty array first
-		
-		for shID, _ in pairs(shields) do --this will iterate through shield unitIDs
-			local xSh, _, zSh = spGetUnitPosition(shID)
-			
-			local shieldWeaponDef = shields[shID].shieldWeaponDefID --get shID's biggest shield		
-			local unitShieldRadius = WeaponDefs[shieldWeaponDef].shieldRadius --get its radius
-			
-			local unitsAround = spGetUnitsInCylinder(xSh, zSh, unitShieldRadius + addSearchRadius)
-			local unitsAroundCount = #unitsAround
-			
-			for i = 1, unitsAroundCount do
-				local uId = unitsAround[i]
-				
-				if not shieldCoveredUnits[uId] then --this unit has not been marked as covered by any shield yet
-					shieldCoveredUnits[uId] = {}
-				end
-				
-				-- add shield unit ID(shID) as a cover for uId
-				
-				-- substitute for table.insert(shieldCoveredUnits[uId], shID)
-				shieldCoveredUnits[uId][#shieldCoveredUnits[uId]+1] = shID
-			end
-		end
-	end
-end
-
-
 --------------------------------------------------------------------------------
 -- Unit Handling
 
@@ -457,13 +294,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		canHandleUnit[unitID] = true
 		PreventOverkillToggleCommand(unitID, {1})
 	end
-	
-	local ud=UnitDefs[unitDefID]
-	if ud.shieldWeaponDef then --unit has at least one shield. Apparently ZK has got rid of any unit with > 1 shield, so it's safe to assume shielded units carry exactly one shield.
-		shields[unitID] = {teamID = teamID, unitDefID = unitDefID, allyTeamID = spGetUnitAllyTeam(unitID),
-							shieldWeaponDefID = UnitDefs[unitDefID].shieldWeaponDef, speed=ud.speed or 0}
-	
-	end	
 end
 
 function gadget:UnitDestroyed(unitID)
@@ -473,23 +303,6 @@ function gadget:UnitDestroyed(unitID)
 		end
 		canHandleUnit[unitID] = nil
 	end
-	
-	if incomingDamage[unitID] then
-		incomingDamage[unitID] = nil
-	end	
-	
-	if shields[unitID] then
-		shields[unitID] = nil
-	end	
-	
-	if shieldCoveredUnits[unitID] then
-		shieldCoveredUnits[unitID] = nil
-	end
-end
-
-function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)	
-	gadget:UnitDestroyed(unitID)
-	gadget:UnitCreated(unitID, unitDefID, newTeam)
 end
 
 function gadget:Initialize()
@@ -498,8 +311,8 @@ function gadget:Initialize()
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
-		local unitDefID = spGetUnitDefID(unitID)
-		local teamID = spGetUnitTeam(unitID)
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
