@@ -642,7 +642,7 @@ local unlocks = {
 		type = "Module",
 		morph = 3,
 		limit = 8,
-		cost = 250,
+		cost = 150,
 	},	
 	[117] = {  
 		code = "weaponmod_stun_booster", 
