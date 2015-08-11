@@ -60,7 +60,7 @@ unitDef = {
   },
 
   side                = [[CORE]],
-  sightDistance       = 450,
+  sightDistance       = 500,
   sonarDistance       = 350,
   smoothAnim          = true,
   turninplace         = 0,
@@ -109,7 +109,7 @@ unitDef = {
       noExplode               = true,
       noSelfDamage            = true,
       numbounce               = 40,
-      range                   = 205,
+      range                   = 210,
       reloadtime              = 3,
       rgbColor                = [[0.5 1 1]],
       separation              = 0.5,
