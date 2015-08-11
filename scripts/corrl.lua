@@ -142,7 +142,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 103, 30, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 103, 30)
 end
 
 function script.FireWeapon()

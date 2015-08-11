@@ -225,7 +225,7 @@ end
 function script.BlockShot(num, targetID)
 	if num == 2 then -- torpedoes
 		-- Lower than real damage (180) to help against Duck regen case.
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 172, 40)
 	end
 	return false
 end

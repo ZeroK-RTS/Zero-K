@@ -190,7 +190,11 @@ end
 ------------------------------------------------------------------------------------------------------------------------------------
 
 function widget:Initialize()
-	Chili = WG.Chili; if (not Chili) then widgetHandler:RemoveWidget() return end
+	Chili = WG.Chili; 
+	if (not Chili) then 
+		widgetHandler:RemoveWidget() 
+		return 
+	end
 
 	Window = Chili.Window
 	Label = Chili.Label	
@@ -206,7 +210,8 @@ function widget:Initialize()
 	gaiaTeam = Spring.GetGaiaTeamID()
 	
 	local name, spectator, teamID, allyTeamID, keys, elo
-	local i = 1; while (i <= #playerlist) do
+	local i = 1; 
+	while (i <= #playerlist) do
 		local playerID = playerlist[i]
 		name,_,spectator,teamID,allyTeamID,_,_,_,_,keys = GetPlayerInfo(playerID)
 		elo = keys.elo
@@ -236,8 +241,11 @@ function widget:Initialize()
 				allyTeams[allyTeamID].teamIDs[teamID] = true
 				allyTeams[allyTeamID].numPlayers = allyTeams[allyTeamID].numPlayers + 1
 				if allyTeams[allyTeamID].highestElo then
-					if elo > teams[allyTeams[allyTeamID].highestElo].elo then allyTeams[allyTeamID].highestElo = teamID end
-				else allyTeams[allyTeamID].highestElo = teamID
+					if elo > teams[allyTeams[allyTeamID].highestElo].elo then 
+						allyTeams[allyTeamID].highestElo = teamID 
+					end
+				else 
+					allyTeams[allyTeamID].highestElo = teamID
 				end							
 			end
 		end
@@ -249,7 +257,6 @@ function widget:Initialize()
 	else																						--teams
 		allyTeams[myAllyTeam].name = spectating and ("Team "..myAllyTeam) or 'Your Team'
 		allyTeams[enemyAllyTeam].name = spectating and ("Team "..enemyAllyTeam) or 'Enemy Team'
-
 	end
 	
 	allyTeams[myAllyTeam].color = teams[allyTeams[myAllyTeam].highestElo].color
