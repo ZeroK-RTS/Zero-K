@@ -279,7 +279,7 @@ function gadget:GameFrame(n)
 						end
 
 						if (shareLevels[team]) then
-							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team][1])
+							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team])
 							shareLevels[team] = nil
 						end
 
@@ -326,10 +326,9 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true --mark team as AFK -- orly
 					
 					local mShareLevel = select(6, Spring.GetTeamResources(team, "metal"))
-					local eShareLevel = select(6, Spring.GetTeamResources(team, "energy"))
 
-					if (mShareLevel > 0 or eShareLevel > 0) then
-						shareLevels[team] = {mShareLevel, eShareLevel}
+					if (mShareLevel > 0) then
+						shareLevels[team] = mShareLevel
 					end
 
 					Spring.SetTeamShareLevel(team, "metal",  0)
