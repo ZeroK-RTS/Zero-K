@@ -640,7 +640,7 @@ local unlocks = {
 		xp = 250,
 		level = 6,
 		type = "Module",
-		morph = 3,
+		morph = 2,
 		limit = 8,
 		cost = 150,
 	},	
