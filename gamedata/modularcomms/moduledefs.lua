@@ -452,7 +452,7 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 1P/s",
+		description = "Self-repairs 10 HP/s",
 		func = function(unitDef)
 				unitDef.autoheal = (unitDef.autoheal or 0) + 10
 			end,
