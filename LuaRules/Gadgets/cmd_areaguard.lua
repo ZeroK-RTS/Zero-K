@@ -90,7 +90,22 @@ end
 --------------------------------------------------------------------------------
 -- Functions
 
-local function DoAreaGuard( unitID, unitTeam, cmdParams, cmdOptions )
+local function RandomPermutation(n)
+	local perm = {}
+	local taken = {}
+	for i = 1, n do
+		local entry = math.random(i, n)
+		if taken[entry] then
+			perm[i] = taken[entry]
+		else
+			perm[i] = entry
+		end
+		taken[entry] = i
+	end
+	return perm
+end
+
+local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	local cmdOptions2 = {}
 	if (cmdOptions.shift) then table.insert(cmdOptions2, "shift")   end
 	if (cmdOptions.alt)   then table.insert(cmdOptions2, "alt")   end
@@ -116,11 +131,17 @@ local function DoAreaGuard( unitID, unitTeam, cmdParams, cmdOptions )
 	end
 	
     local units = Spring.GetUnitsInSphere( unpack(cmdParams) )
-    for _,otherUnitID in ipairs( units ) do
+	local perm = RandomPermutation(#units)
+
+    for i = 1, #units do
+		local otherUnitID = units[perm[i]]
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
-				Spring.GiveOrderToUnit(unitID, CMD.GUARD, {otherUnitID}, cmdOptions2)
+				local cmdParams = {otherUnitID}
+				if GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, cmdParams, cmdOptions2) then
+					Spring.GiveOrderToUnit(unitID, CMD.GUARD, cmdParams, cmdOptions2)
+				end
 			end
 		end
     end
@@ -268,7 +289,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
     if cmdID == CMD_AREA_GUARD then
-        DoAreaGuard(unitID, unitTeam, cmdParams, cmdOptions )
+        DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
         return false
     elseif cmdID == CMD_ORBIT or cmdID == CMD_ORBIT_DRAW then
 		return canGuardUnitDefIDs[unitDefID] and unitID ~= cmdParams[1]

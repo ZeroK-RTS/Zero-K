@@ -261,6 +261,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
 	
 	return false
 end
+
+local function Teleport_AllowCommand(unitID, unitDefID, cmdID, cmdParams, cmdOptions)
+	return gadget:AllowCommand(unitID, unitDefID, false, cmdID, cmdParams, cmdOptions)
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Create the beacon
@@ -593,6 +597,8 @@ function gadget:Initialize()
 	GG.tele_deployTeleport = tele_deployTeleport
 	GG.tele_undeployTeleport = tele_undeployTeleport
 	GG.tele_createBeacon = tele_createBeacon
+	
+	GG.Teleport_AllowCommand = Teleport_AllowCommand
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
