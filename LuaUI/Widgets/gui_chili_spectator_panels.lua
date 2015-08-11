@@ -934,6 +934,8 @@ local function GetOpposingAllyTeams()
 			end
 		end
 		
+		name = name or "noname"
+		
 		returnData[#returnData + 1] = {
 			allyTeamID = allyTeamID, -- allyTeamID for the team
 			name = name, -- Large display name of the team
