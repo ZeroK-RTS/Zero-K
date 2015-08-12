@@ -33,6 +33,7 @@ unitDef = {
 	removewait     = 1,
   },
 
+  energyMake                    = 1.2,
   energyUse                     = 0,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,

@@ -56,7 +56,6 @@ for i = 1, #UnitDefs do
 		generatorDefs[i] = {
 			metalIncome = metalIncome,
 			energyIncome = energyIncome,
-			isWind = isWind,
 		}
 	end
 end
@@ -143,7 +142,7 @@ local lowPowerUnits = {inner = {count = 0, units = {}}}
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
 local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID, ...}, count = number}
 
-local generator = {} -- generator[allyTeamID][teamID][unitID] = {generatorListID, metalIncome, energyIncome, isWind}
+local generator = {} -- generator[allyTeamID][teamID][unitID] = {generatorListID, metalIncome, energyIncome}
 local generatorList = {} -- generator[allyTeamID][teamID] = {data  = {[1] = unitID, [2] = unitID, ...}, count = number}
 
 local pylonGridQueue = false -- pylonGridQueue[unitID] = true
