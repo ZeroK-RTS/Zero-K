@@ -69,7 +69,6 @@ local spGetUnitPosition		= Spring.GetUnitPosition
 local spSetUnitPosition		= Spring.SetUnitPosition	
 local spSetUnitSensorRadius	= Spring.SetUnitSensorRadius
 local spGetAllUnits			= Spring.GetAllUnits
-local spSetUnitTooltip		= Spring.SetUnitTooltip
 local spGetUnitIsDead       = Spring.GetUnitIsDead
 local spSetUnitRulesParam	= Spring.SetUnitRulesParam
 
@@ -151,9 +150,6 @@ local structureCheckLoopFrames = 300 -- frequency of slow update for building de
 local terraUnitLimit = 250 -- limit on terraunits per player
 
 local terraUnitLeash = 100 -- how many elmos a terraunit is allowed to roam
-
-local TOOLTIP_SPENT = "Spent: "
-local TOOLTIP_COST = "Estimated Cost: "
 
 local costMult = 1
 local modOptions = Spring.GetModOptions()
@@ -302,6 +298,15 @@ elseif modOptions.terrarestoreonly == "1" then
 end
 
 --------------------------------------------------------------------------------
+-- New Functions
+--------------------------------------------------------------------------------
+
+local function SetTooltip(unitID, spent, estimatedCost)
+	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, {allied = true})
+	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, {allied = true})
+end
+
+--------------------------------------------------------------------------------
 -- Terraform Calculation Functions
 --------------------------------------------------------------------------------
 
@@ -397,6 +402,7 @@ local function getPointInsideMap(x,z)
 	end
 	return x, z
 end
+
 
 local function setupTerraTag(unitID, terraTag, segment, segmentsCount)
 	if terraTag then
@@ -860,7 +866,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SetTooltip(id, 0, pyramidCostEstimate + totalCost)
 			end
 		end
 		
@@ -1353,7 +1359,7 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SetTooltip(id, 0, pyramidCostEstimate + totalCost)
 			end
 		end
 		
@@ -1923,7 +1929,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				terraformUnitTable[terraformUnitCount] = id
 				terraformOrder[terraformOrders].index[terraformOrder[terraformOrders].indexes] = terraformUnitCount
 				
-				spSetUnitTooltip(id, TOOLTIP_COST .. floor(pyramidCostEstimate + totalCost))
+				SetTooltip(id, 0, pyramidCostEstimate + totalCost)
 			end
 		end
 		
@@ -2958,8 +2964,7 @@ function gadget:GameFrame(n)
 				if n - terraformUnit[id].lastUpdate > updateFrequency then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
-					spSetUnitTooltip(id, TOOLTIP_SPENT .. floor(terraformUnit[id].totalSpent) ..
-							  ", " .. TOOLTIP_COST .. floor(terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost) )
+					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
 					
 					if GG.Awards and GG.Awards.AddAwardPoints then
 						GG.Awards.AddAwardPoints('terra', terraformUnit[id].team, costDiff)

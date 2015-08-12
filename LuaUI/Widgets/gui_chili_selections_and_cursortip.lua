@@ -584,8 +584,52 @@ local function GetMexTooltip(unitID)
 		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
 	end
 
-
 	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
+end
+
+local function GetZenithTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local meteorsControlled = spGetUnitRulesParam(unitID, "meteorsControlled")
+	if not meteorsControlled then
+		return false
+	end
+
+	return "Meteor Controller - Controlling " .. meteorsControlled .. " meteors"
+end
+
+local function GetTerraformTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local spent = spGetUnitRulesParam(unitID, "terraform_spent")
+	if not spent then
+		return false
+	end
+
+	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
+	
+	return "Terraform - Estiamted Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
+end
+
+local function GetRulesParamTooltip(unitID)
+	local gridTooltip = GetGridTooltip(unitID)
+	if gridTooltip then
+		return gridTooltip
+	end
+	local mexTooltip = GetMexTooltip(unitID)
+	if mexTooltip then
+		return mexTooltip
+	end
+	local zenithTooltip = GetZenithTooltip(unitID)
+	if zenithTooltip then
+		return zenithTooltip
+	end
+	local terraformTooltip = GetTerraformTooltip(unitID)
+	if terraformTooltip then
+		return terraformTooltip
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -810,12 +854,9 @@ local function GetUnitDesc(unitID, ud)
 	local lang = (WG.lang and WG.lang()) or 'en'
 	local font = WG.langFont
 	
-	local gridTooltip = GetGridTooltip(unitID)
-	local mexTooltip = GetMexTooltip(unitID)
-	if gridTooltip then
-		return gridTooltip
-	elseif mexTooltip then
-		return mexTooltip
+	local rulesParamTooltip = GetRulesParamTooltip(unitID)
+	if rulesParamTooltip then
+		return rulesParamTooltip
 	end
 	
 	if lang == 'en' then
@@ -2471,12 +2512,9 @@ function widget:Update(dt)
 				ctrle:SetCaption(e)
 			end
 			
-			local gridTooltip = GetGridTooltip(stt_unitID)
-			local mexTooltip = GetMexTooltip(stt_unitID)
-			if gridTooltip then
-				controls['selunit2']['utt']:SetCaption(gridTooltip)
-			elseif mexTooltip then
-				controls['selunit2']['utt']:SetCaption(mexTooltip)
+			local rulesParamTooltip = GetRulesParamTooltip(stt_unitID)
+			if rulesParamTooltip then
+				controls['selunit2']['utt']:SetCaption(rulesParamTooltip)
 			end
 			
 			local nanobar_stack = globalitems['bp_selunit']
