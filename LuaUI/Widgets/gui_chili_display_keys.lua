@@ -34,12 +34,12 @@ options = {
 	keyReleaseTimeout = {
 		name  = "Key Release Timeout",
 		type  = "number",
-		value = 0.4, min = 0, max = 5, step = 0.025,
+		value = 0.6, min = 0, max = 5, step = 0.025,
 	},
 	mouseReleaseTimeout = {
-		name  = "Key Release Timeout",
+		name  = "Mouse Release Timeout",
 		type  = "number",
-		value = 0.2, min = 0, max = 5, step = 0.025,
+		value = 0.3, min = 0, max = 5, step = 0.025,
 	},
 }
 

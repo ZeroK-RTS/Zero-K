@@ -595,6 +595,7 @@ local function GetZenithTooltip(unitID)
 	if not meteorsControlled then
 		return false
 	end
+	meteorsControlled = math.min(meteorsControlled, 450) -- after 5 minutes the meteors leave control.
 
 	return "Meteor Controller - Controlling " .. meteorsControlled .. " meteors"
 end
