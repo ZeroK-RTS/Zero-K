@@ -11,26 +11,26 @@ function gadget:GetInfo() return {
 } end
 
 local spAreTeamsAllied     = Spring.AreTeamsAllied
--- local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
+local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
 local spGetMyTeamID        = Spring.GetMyTeamID
 local spGetSpectatingState = Spring.GetSpectatingState
 local spGetUnitLosState    = Spring.GetUnitLosState
 
-function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)
-	local myTeamID = spGetMyTeamID()	
+function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)	
+	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
-	local isAllyUnit = spAreTeamsAllied(unitTeam, myTeamID)
+	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
 	
 	if spec then
 		Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)		
-		if not specFullView and not isAllyUnit and spGetUnitLosState(unitID, myTeamID).los then
+		if not specFullView and not isAllyUnit and spGetUnitLosState(unitID, myAllyTeamID).los then
 			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
 		end
 	else
-		local attackerInLos = attUnitID and spGetUnitLosState(attUnitID, myTeamID).los
+		local attackerInLos = attUnitID and spGetUnitLosState(attUnitID, myAllyTeamID).los
 		if isAllyUnit then			
 			Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
-		elseif spGetUnitLosState(unitID, myTeamID).los then
+		elseif spGetUnitLosState(unitID, myAllyTeamID).los then
 				Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
 				Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
 		end		
