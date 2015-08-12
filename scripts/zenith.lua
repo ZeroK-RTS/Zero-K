@@ -9,8 +9,10 @@ local firept = piece "firept"
 local SOURCE_RANGE = 4000	-- size of the box which the emit point can be randomly placed in
 local SOURCE_HEIGHT = 9001
 
-local HOVER_RANGE = 1000
+local HOVER_RANGE = 1600
 local HOVER_HEIGHT = 2600
+
+local AIM_RADIUS = 160
 
 local smokePiece = {base}
 
@@ -35,6 +37,14 @@ local launchInProgress = false
 local currentlyStunned
 
 local INLOS_ACCESS = {inlos = true}
+
+local function IsDisabled()
+	local state = Spring.GetUnitStates(unitID)
+	if not (state and state.active) then
+		return true
+	end
+	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+end
 
 local function TransformMeteor(weaponDefID, proID, ttl, x, y, z, gravity)
 	
@@ -85,7 +95,7 @@ local function RegainControlOfMeteors()
 		if Spring.GetProjectileDefID(proID) == uncontrolWeaponDefID then
 			local ttl = Spring.GetProjectileTimeToLive(projectiles[i])
 			if ttl > 0 then
-				local hoverPos = Vector.PolarToCart(HOVER_RANGE*(1-math.random()^2), 2*math.pi*math.random())
+				local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ttl, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2], meteorGravity)
 			end
 		end
@@ -97,25 +107,20 @@ local function SpawnProjectileThread()
 	local uy = Spring.GetGroundHeight(ux, uz)
 	
 	local reloadMult = 1
-	local stunned_or_inbuild = false
 	
-	while true do
-		Sleep(700/((reloadMult > 0 and reloadMult) or 1))
-		EmitSfx(flare, 2049)
-
+	while true do		
 		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-		stunned_or_inbuild = spGetUnitIsStunned(unitID)
 		
-		while stunned_or_inbuild or reloadMult == 0 do			
+		-- reloadMult should be 0 only when disabled.
+		Sleep(700/((reloadMult > 0 and reloadMult) or 1))
+		while IsDisabled() do			
 			if not currentlyStunned then
 				LoseControlOfMeteors()
 				currentlyStunned = true
 			end
-			
 			Sleep(700)
-			reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-			stunned_or_inbuild = spGetUnitIsStunned(unitID)
 		end
+		EmitSfx(flare, 2049)
 		
 		if currentlyStunned then
 			RegainControlOfMeteors()
@@ -123,7 +128,7 @@ local function SpawnProjectileThread()
 		end
 		
 		local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
-		local hoverPos = Vector.PolarToCart(HOVER_RANGE*(1-math.random()^2), 2*math.pi*math.random())
+		local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 		local proID = Spring.SpawnProjectile(floatWeaponDefID, {
 			pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
 			tracking = true, 
@@ -136,6 +141,8 @@ local function SpawnProjectileThread()
 		projectileCount = projectileCount + 1
 		projectiles[projectileCount] = proID
 		Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
+		
+
 	end
 end
 
@@ -177,7 +184,9 @@ local function LaunchAll(x, z)
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then
 			-- Projectile is valid, launch!
-			TransformMeteor(fireWeaponDefID, proID, 900, x, y, z, fireGravity)
+			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
+			
+			TransformMeteor(fireWeaponDefID, proID, 900, x + aimOff[1], y, z + aimOff[2], fireGravity)
 		end
 	end
 	
@@ -185,7 +194,7 @@ local function LaunchAll(x, z)
 end
 
 function script.Create()
-	currentlyStunned = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+	currentlyStunned = IsDisabled()
 	
 	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
@@ -217,8 +226,7 @@ function script.BlockShot(num, target)
 		return true
 	end
 	
-	local stunned_or_inbuild = spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
-	if stunned_or_inbuild then
+	if IsDisabled() then
 		return true
 	end
 	
