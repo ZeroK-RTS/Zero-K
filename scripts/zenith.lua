@@ -247,6 +247,7 @@ function script.BlockShot(num, target)
 end
 
 function script.Killed(recentDamage, maxHealth)
+	LoseControlOfMeteors();
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 then
 		Explode(base, sfxNone)
