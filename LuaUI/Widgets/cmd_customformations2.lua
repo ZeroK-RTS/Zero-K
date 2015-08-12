@@ -81,6 +81,7 @@ local formationCmds = {
 	[CMD.PATROL] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_JUMP] = true, -- jump
+	[CMD_PLACE_BEACON] = true, -- teleport beacon
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
 }

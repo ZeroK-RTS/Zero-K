@@ -25,9 +25,11 @@ include "LuaRules/Configs/customcmds.h.lua"
 
 local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
 local Angle = Spring.Utilities.Vector.Angle
+
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitVelocity = Spring.GetUnitVelocity
-
+local spAreTeamsAllied  = Spring.AreTeamsAllied
+local spGetUnitTeam     = Spring.GetUnitTeam
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Global Variables
@@ -132,23 +134,36 @@ local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	
     local units = Spring.GetUnitsInSphere( unpack(cmdParams) )
 	local perm = RandomPermutation(#units)
-
+	
+	-- Give teleport command if a teleporter is in the area
+	for i = 1, #units do
+		local otherUnitID = units[perm[i]]
+		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
+			local teamID = Spring.GetUnitTeam(otherUnitID)
+			if Spring.AreTeamsAllied( unitTeam, teamID ) then
+				local cmdParams = {otherUnitID}
+				if not GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, cmdParams, cmdOptions2) then
+					return
+				end
+			end
+		end
+	end
+	
+	-- Otherwise, give a guard command to all units in the area
     for i = 1, #units do
 		local otherUnitID = units[perm[i]]
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
 				local cmdParams = {otherUnitID}
-				if GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, cmdParams, cmdOptions2) then
-					Spring.GiveOrderToUnit(unitID, CMD.GUARD, cmdParams, cmdOptions2)
-				end
+				Spring.GiveOrderToUnit(unitID, CMD.GUARD, cmdParams, cmdOptions2)
 			end
 		end
     end
 	
 end
 
-local function DoCircleGuard(unitID, unitDefID, cmdParams, cmdOptions)
+local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	
 	-- targetID is the unitID of the unit to guard.
 	-- radius is the radius to keep from the unit.
@@ -159,10 +174,16 @@ local function DoCircleGuard(unitID, unitDefID, cmdParams, cmdOptions)
 	
 	local ud = unitDefID and UnitDefs[unitDefID]
 	
+	--// Check command validity
 	if not (ud and targetID and Spring.ValidUnitID(targetID)) then
 		return true
 	end
 
+	local targetTeamID = spGetUnitTeam(targetID)
+	if not spAreTeamsAllied(teamID, targetTeamID) then
+		return true -- remove
+	end
+	
 	-- Keep factory queue but don't do anything with it.
 	if ud.isFactory then
 		return false
@@ -301,7 +322,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	if cmdID == CMD_ORBIT then
 		-- return true from DoCircleGuard to remove the command.
 		-- return false from DoCircleGuard to keep the command in the queue.
-		return true, DoCircleGuard(unitID, unitDefID, cmdParams, cmdOptions)	
+		return true, DoCircleGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions)	
 	end
 	return false -- command not used
 end

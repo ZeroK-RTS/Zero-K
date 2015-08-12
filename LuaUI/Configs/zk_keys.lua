@@ -78,6 +78,7 @@ return {
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
 		{	"oneclickwep",	"d",},
+		{	"placebeacon",  "d",},
 		{	"reclaim",	"e",},
 		{	"fight",	"f",},
 		{	"forcestart",	"Alt+f",},

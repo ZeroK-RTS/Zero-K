@@ -29,6 +29,7 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
 local getMovetype = Spring.Utilities.getMovetype
 
 local placeBeaconCmdDesc = {
@@ -435,12 +436,14 @@ function gadget:GameFrame(f)
 								Spring.MoveCtrl.Enable(teleportiee)
 								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
 								Spring.MoveCtrl.Disable(teleportiee)
+	
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
 							Spring.SpawnCEG("teleport_in", ux, uy, uz, 0, 0, 0, size)
 							
-							Spring.SetUnitMoveGoal(teleportiee, dx,0,dz)
+							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
+							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)
 							
 							Spring.GiveOrderToUnit(teleportiee,CMD.REMOVE, {cQueue[1].tag}, {})
 							
