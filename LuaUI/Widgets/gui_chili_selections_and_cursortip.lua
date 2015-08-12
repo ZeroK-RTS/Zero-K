@@ -564,7 +564,7 @@ local function GetGridTooltip(unitID)
 	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
 	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
 	
-	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " => " .. math.round(gridMetal,2) .. GetWindTooltip(unitID)
+	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. GetWindTooltip(unitID)
 end
 
 local function GetMexTooltip(unitID)
@@ -611,7 +611,7 @@ local function GetTerraformTooltip(unitID)
 
 	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
 	
-	return "Terraform - Estiamted Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
+	return "Terraform - Estimated Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
 end
 
 local function GetRulesParamTooltip(unitID)
