@@ -145,7 +145,6 @@ return {
 		{	"moveslow",	"Any+ctrl",},
 		{	"track",	"alt+t",},
 		{	"resurrect",	"t",},
-		{	"controlunit",	"alt+v",},
 		{	"jump",	"j",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
 		{	"select AllMap+_Builder_Not_Building_Not_Transport_Idle+_ClearSelection_SelectAll+",	"ctrl+b",},
