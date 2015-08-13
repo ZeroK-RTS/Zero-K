@@ -604,7 +604,23 @@ local function drawFunc(units, spec)
 	end
 end
 
+-- collect potential morphed slaves to process next frame
+-- cannot be done immediately because newly-recreated slaves dont yet have the data
+local newUnitsCount = 0
+local newUnits = {}
+function gadget:UnitCreated (unitID)
+	newUnitsCount = newUnitsCount + 1
+	newUnits[newUnitsCount] = unitID
+end
+
 function gadget:GameFrame()
+	if newUnitsCount > 0 then
+		for i = 1, newUnitsCount do
+			gadget:UnitGiven(newUnits[i]) end
+			newUnits[i] = nil
+		end
+		newUnitsCount = 0
+	end
 	if unitCount ~= 0 then
 		local spec, fullview = spGetSpectatingState()
 		spec = spec or fullview
