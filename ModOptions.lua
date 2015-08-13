@@ -462,7 +462,20 @@ local options = {
     max    = 1000,
     step   = 0.01,
   },
- 
+  {
+    key    = 'defeatmode',
+    name   = 'Defeat Mode',
+    desc   = "Method of handling defeated alliances",
+    type   = 'list',
+    section= 'experimental',
+    def    = 'destroy',
+    items = {
+      { key='debug', name="Debug", desc='Does nothing; game is endless.' },
+      { key='destroy', name="Destroy Alliance", desc='Destroys the alliance if they are defeated"' },
+      { key='losecontrol', name="Lose Control", desc='Alliance loses control of their units if they are defeated.' },
+
+    },
+  },
   {
     key    = 'xmas',
     name   = 'Enable festive units',
