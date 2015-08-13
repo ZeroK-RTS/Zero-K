@@ -24,7 +24,9 @@ local Vector = Spring.Utilities.Vector
 
 local projectiles = {}
 local projectileCount = 0
-local oldestProjectile = 1
+local oldestProjectile = 1 -- oldestProjectile is for when the projectile table is being cyclicly overridden.
+
+local tooltipProjectileCount = 0 -- a more correct but less useful count.
 
 local gravityWeaponDefID    = WeaponDefNames["zenith_gravity_neg"].id
 local floatWeaponDefID      = WeaponDefNames["zenith_meteor_float"].id
@@ -90,7 +92,7 @@ local function TransformMeteor(weaponDefID, proID, x, y, z)
 	return newProID
 end
 
-local function DropMeteor(index)
+local function DropSingleMeteor(index)
 	local proID = projectiles[index]
 	-- Check that the projectile ID is still valid
 	if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
@@ -99,27 +101,33 @@ local function DropMeteor(index)
 end
 
 local function LoseControlOfMeteors()
+	tooltipProjectileCount = 0
 	for i = 1, projectileCount do
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
+			tooltipProjectileCount = tooltipProjectileCount + 1
 			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID)
 		end
 	end
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 end
 
 local function RegainControlOfMeteors()
+	tooltipProjectileCount = 0
 	for i = 1, projectileCount do
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == uncontrolWeaponDefID then
 			local ttl = Spring.GetProjectileTimeToLive(projectiles[i])
 			if ttl > 0 then
+				tooltipProjectileCount = tooltipProjectileCount + 1
 				local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 			end
 		end
 	end
+	Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 end
 
 local function SpawnProjectileThread()
@@ -168,7 +176,7 @@ local function SpawnProjectileThread()
 		
 		-- Drop meteor if there are too many. It is more fun this way.
 		if projectileCount >= METEOR_CAPACITY then
-			DropMeteor(oldestProjectile)
+			DropSingleMeteor(oldestProjectile)
 			projectiles[oldestProjectile] = proID
 			oldestProjectile = oldestProjectile + 1
 			if oldestProjectile > projectileCount then
@@ -177,7 +185,9 @@ local function SpawnProjectileThread()
 		else
 			projectileCount = projectileCount + 1
 			projectiles[projectileCount] = proID
-			Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
+			
+			tooltipProjectileCount = tooltipProjectileCount + 1
+			Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
 		
 		end
 	end
@@ -224,6 +234,8 @@ local function LaunchAll(x, z)
 	projectiles = {}
 	projectileCount = 0
 	oldestProjectile = 1
+	
+	tooltipProjectileCount = 0
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
 	
 	-- Sleep to give time for the aim projectiles to turn

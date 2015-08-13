@@ -77,6 +77,7 @@ unitDef = {
 
     GRAVITY_NEG = {
       name                    = [[Attractive Gravity (fake)]],
+      alwaysVisible           = 1,
       avoidFriendly           = false,
 	  canAttackGround		  = false,
       coreThickness           = 0.5,
@@ -103,7 +104,7 @@ unitDef = {
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
       soundStart              = [[weapon/gravity_fire]],
-	  soundStartVolume        = 0.25,
+	  soundStartVolume        = 0.15,
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,

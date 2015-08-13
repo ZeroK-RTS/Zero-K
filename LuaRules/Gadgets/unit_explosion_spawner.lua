@@ -49,11 +49,17 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(w, x, y, z, owner)
-	if spawn_defs_id[w] and owner then
-		if not noCreate[owner] then
+	if spawn_defs_id[w] and (owner or spawn_defs_id[w].feature) then
+		if (not owner) or (not noCreate[owner]) then
 			--if not Spring.GetGroundBlocked(x,z) then
-			if UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
-				createList[#createList+1] = {name = spawn_defs_id[w].name, owner = owner, x=x,y=y,z=z, expire=spawn_defs_id[w].expire, feature = spawn_defs_id[w].feature}
+			if (not owner) or UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
+				createList[#createList+1] = {
+					name = spawn_defs_id[w].name,
+					owner = owner, 
+					x = x,y = y,z = z, 
+					expire=spawn_defs_id[w].expire, 
+					feature = spawn_defs_id[w].feature
+				}
 				return false
 			end
 		else
@@ -93,7 +99,9 @@ end
 function gadget:GameFrame(f)
 	for i,c in pairs(createList) do
 		if c.feature then
-            Spring.CreateFeature(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
+            local featureID = Spring.CreateFeature(c.name , c.x, c.y, c.z, 0, c.owner and Spring.GetUnitTeam(c.owner))
+			local dir = Spring.Utilities.Vector.PolarToCart(1, 2*math.pi*math.random())
+			Spring.SetFeatureDirection(featureID, dir[1], 0 , dir[2])
         else
             local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
             if (c.expire > 0) and unitID then 
