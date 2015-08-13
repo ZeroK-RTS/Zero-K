@@ -22,17 +22,17 @@ function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDe
 	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
 	
 	if spec then
-		Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)		
+		--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)		
 		if not specFullView and not isAllyUnit and spGetUnitLosState(unitID, myAllyTeamID).los then
 			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
 		end
 	else
 		local attackerInLos = attUnitID and spGetUnitLosState(attUnitID, myAllyTeamID).los
 		if isAllyUnit then			
-			Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+			--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
 		elseif spGetUnitLosState(unitID, myAllyTeamID).los then
-				Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
-				Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
+			--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
 		end		
 	end
 end
