@@ -23,9 +23,9 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams                  = {
-    helptext       = [[The Zenith summons down meteorites from the sky, which break things they hit and also provide a reclaimable source of metal.]],
+    helptext       = [[The Zenith uses its gravity manipulators to gather meteors from orbit and launch them in devastating storms against its enemies.]],
     description_pl = [[Kontroler Meteorow]],
-    helptext_pl    = [[Zenith przyciaga w dowolne miejsce meteory z orbity, ktore niszcza trafione obiekty i z ktorych mozna odzyskac metal.]],
+    helptext_pl    = [[Zenith przyciaga w dowolne miejsce meteory z orbity, ktore niszcza trafione obiekty.]],
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
