@@ -68,6 +68,7 @@ local finishedUnits = {}	-- this stores a list of all units that have ever been 
 local toDestroy = {}
 
 local modOptions = Spring.GetModOptions() or {}
+local destroy_type = modOptions.defeatmode or 'destroy'
 local commends = tobool(modOptions.commends)
 local noElo = tobool(modOptions.noelo)
 
@@ -200,12 +201,12 @@ local function DestroyAlliance(allianceID)
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil then return end	-- empty allyteam, don't bother
 		
-		if Spring.IsCheatingEnabled() then
+		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 			EchoUIMessage("Game Over: DEBUG")
 			EchoUIMessage("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
-		else -- kaboom
+		elseif destroy_type == 'destroy' then	-- kaboom
 			EchoUIMessage("Alliance " .. allianceID .. " has been destroyed!")
 			for i=1,#teamList do
 				local t = teamList[i]
@@ -222,6 +223,11 @@ local function DestroyAlliance(allianceID)
 					end
 				end
 				spKillTeam(t)
+			end
+		elseif destroy_type == 'losecontrol' then	-- no orders can be issued to team
+			EchoUIMessage("Alliance " .. allianceID .. " has been defeated!")
+			for i=1,#teamList do
+				spKillTeam(teamList[i])
 			end
 		end
 	end
@@ -291,7 +297,7 @@ end
 
 -- check for active players
 local function ProcessLastAlly()	
-	if Spring.IsCheatingEnabled() then
+	if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 		return
 	end
 	local allylist = spGetAllyTeamList()
