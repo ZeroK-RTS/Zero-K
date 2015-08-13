@@ -62,7 +62,7 @@ unitDef = {
     {
       def                = [[METEOR]],
       badTargetCateogory = [[MOBILE]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
     {
@@ -97,11 +97,13 @@ unitDef = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 6000,
+      range                   = 20000,
       reloadtime              = 0.2,
       rgbColor                = [[0 0 1]],
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
+      soundStart              = [[weapon/gravity_fire]],
+	  soundStartVolume        = 0.25,
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,

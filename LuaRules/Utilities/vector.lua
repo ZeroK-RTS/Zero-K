@@ -11,8 +11,16 @@ local function Mult(b, v)
 	return {b*v[1], b*v[2]}
 end
 
-local function AbsVal(v)
-	return sqrt(v[1]*v[1] + v[2]*v[2])
+local function AbsVal(x, y,z)
+	if z then
+		return sqrt(x*x + y*y + z*z)
+	elseif y then
+		return sqrt(x*x + y*y)
+	elseif x[3] then
+		return sqrt(x[1]*x[1] + x[2]*x[2] + x[3]*x[3])
+	else
+		return sqrt(x[1]*x[1] + x[2]*x[2])
+	end
 end
 
 local function Unit(v)

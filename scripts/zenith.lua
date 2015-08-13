@@ -14,21 +14,37 @@ local HOVER_HEIGHT = 2600
 
 local AIM_RADIUS = 160
 
+-- 5 minutes and 50 seconds to reach capacity.
+local SPAWN_PERIOD = 700 -- in milliseconds
+local METEOR_CAPACITY = 500 
+
 local smokePiece = {base}
 
 local Vector = Spring.Utilities.Vector
 
 local projectiles = {}
 local projectileCount = 0
+local oldestProjectile = 1
 
+local gravityWeaponDefID    = WeaponDefNames["zenith_gravity_neg"].id
 local floatWeaponDefID      = WeaponDefNames["zenith_meteor_float"].id
 local aimWeaponDefID        = WeaponDefNames["zenith_meteor_aim"].id
 local fireWeaponDefID       = WeaponDefNames["zenith_meteor"].id
 local uncontrolWeaponDefID  = WeaponDefNames["zenith_meteor_uncontrolled"].id
 
-local uncontrolGravity = -0.05
-local meteorGravity = -0.2
-local fireGravity = 0.2
+local timeToLiveDefs = {
+	[floatWeaponDefID]     = 180000, -- 10 minutes, timeout is handled manually with METEOR_CAPACITY.
+	[aimWeaponDefID]       = 300,    -- Should only exist for 1.5 seconds
+	[fireWeaponDefID]      = 450,    -- 15 seconds, gives time for a high wobbly meteor to hit the ground.
+	[uncontrolWeaponDefID] = 900,    -- 30 seconds, uncontrolled ones are slow
+}
+
+local gravityDefs = {
+	[floatWeaponDefID]     = -0.2,  -- Gravity reduces the time taken to move from capture to the holding cloud.
+	[aimWeaponDefID]       = 0,     -- No gravity, stops aim from being confused.
+	[fireWeaponDefID]      = 0.2,   -- Pushes the meteor up a litte, makes an arcing effect.
+	[uncontrolWeaponDefID] = -0.12, -- Gravity increases speed of fall and reduced size of drop impact zone.
+}
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
@@ -38,6 +54,8 @@ local currentlyStunned
 
 local INLOS_ACCESS = {inlos = true}
 
+local ux, uy, uz
+
 local function IsDisabled()
 	local state = Spring.GetUnitStates(unitID)
 	if not (state and state.active) then
@@ -46,7 +64,7 @@ local function IsDisabled()
 	return spGetUnitIsStunned(unitID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
 end
 
-local function TransformMeteor(weaponDefID, proID, ttl, x, y, z, gravity)
+local function TransformMeteor(weaponDefID, proID, x, y, z)
 	
 	-- Get old projectile attributes
 	local px, py, pz = Spring.GetProjectilePosition(proID)
@@ -62,8 +80,8 @@ local function TransformMeteor(weaponDefID, proID, ttl, x, y, z, gravity)
 		["end"] = {x, y, z},
 		tracking = true, 
 		speed = {vx, vy, vz}, 
-		ttl = ttl,
-		gravity = gravity,
+		ttl = timeToLiveDefs[weaponDefID],
+		gravity = gravityDefs[weaponDefID],
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
@@ -72,23 +90,25 @@ local function TransformMeteor(weaponDefID, proID, ttl, x, y, z, gravity)
 	return newProID
 end
 
+local function DropMeteor(index)
+	local proID = projectiles[index]
+	-- Check that the projectile ID is still valid
+	if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
+		TransformMeteor(uncontrolWeaponDefID, proID)
+	end
+end
+
 local function LoseControlOfMeteors()
 	for i = 1, projectileCount do
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
-			local ttl = Spring.GetProjectileTimeToLive(projectiles[i])
-			if ttl > 0 then
-				projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID, ttl, nil, nil, nil, uncontrolGravity)
-			end
+			projectiles[i] = TransformMeteor(uncontrolWeaponDefID, proID)
 		end
 	end
 end
 
 local function RegainControlOfMeteors()
-	local ux,_, uz = Spring.GetUnitPosition(unitID)
-	local uy = Spring.GetGroundHeight(ux, uz)
-	
 	for i = 1, projectileCount do
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
@@ -96,29 +116,35 @@ local function RegainControlOfMeteors()
 			local ttl = Spring.GetProjectileTimeToLive(projectiles[i])
 			if ttl > 0 then
 				local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
-				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ttl, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2], meteorGravity)
+				projectiles[i] = TransformMeteor(floatWeaponDefID, proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 			end
 		end
 	end
 end
 
 local function SpawnProjectileThread()
-	local ux,_, uz = Spring.GetUnitPosition(unitID)
-	local uy = Spring.GetGroundHeight(ux, uz)
 	
 	local reloadMult = 1
 	
 	while true do		
 		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 		
+		--Spring.SpawnProjectile(gravityWeaponDefID, {
+		--	pos = {1000,1000,1000},
+		--	speed = {10, 0 ,10},
+		--	ttl = 100,
+		--	maxRange = 1000,
+		--})
+		
+		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
-		Sleep(700/((reloadMult > 0 and reloadMult) or 1))
+		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
 		while IsDisabled() do			
 			if not currentlyStunned then
 				LoseControlOfMeteors()
 				currentlyStunned = true
 			end
-			Sleep(700)
+			Sleep(500)
 		end
 		EmitSfx(flare, 2049)
 		
@@ -127,31 +153,43 @@ local function SpawnProjectileThread()
 			currentlyStunned = false
 		end
 		
+		--// Handle Meteors 
+		-- Call a new meteor
 		local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
 		local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 		local proID = Spring.SpawnProjectile(floatWeaponDefID, {
 			pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
 			tracking = true, 
 			speed = {0, -1, 0}, 
-			ttl = 9000, -- 9000 = 5 minutes
+			ttl = 18000, -- 18000 = 10 minutes
 			gravity = meteorGravity,
 		})
 		Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 		
-		projectileCount = projectileCount + 1
-		projectiles[projectileCount] = proID
-		Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
+		-- Drop meteor if there are too many. It is more fun this way.
+		if projectileCount >= METEOR_CAPACITY then
+			DropMeteor(oldestProjectile)
+			projectiles[oldestProjectile] = proID
+			oldestProjectile = oldestProjectile + 1
+			if oldestProjectile > projectileCount then
+				oldestProjectile = 1
+			end
+		else
+			projectileCount = projectileCount + 1
+			projectiles[projectileCount] = proID
+			Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
 		
-
+		end
 	end
 end
 
 local function LaunchAll(x, z)
+	--Spring.MarkerAddPoint(x, 0, z)
 	launchInProgress = true
 	
 	-- Sanitize input
 	x, z = Spring.Utilities.ClampPosition(x, z)
-	local y = Spring.GetGroundHeight(x,z)
+	local y = math.min(0, Spring.GetGroundHeight(x,z))
 	
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
@@ -163,15 +201,29 @@ local function LaunchAll(x, z)
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
+			
+			--// Shoot gravity beams at the new aim projectiles. Did not look great.
+			--local px, py, pz = Spring.GetProjectilePosition(proID)
+			--local dist = math.sqrt((px - ux)^2 + (py - uy)^2 + (pz - uz)^2)
+			--local mult = 1000/dist
+			--Spring.SpawnProjectile(gravityWeaponDefID, {
+			--	pos = {ux, uy + 100, uz},
+			--	speed = {(px - ux)*mult, (py - uy)*mult, (pz - uz)*mult},
+			--	ttl = dist/1000,
+			--	owner = unitID,
+			--	maxRange = dist,
+			--})
+			
 			-- Projectile is valid, launch!
 			aimCount = aimCount + 1
-			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, 300, x, y, z)
+			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, x, y, z)
 		end
 	end
 	
 	-- All projectiles were launched so there are none left.
 	projectiles = {}
 	projectileCount = 0
+	oldestProjectile = 1
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
 	
 	-- Sleep to give time for the aim projectiles to turn
@@ -182,11 +234,11 @@ local function LaunchAll(x, z)
 	for i = 1, aimCount do
 		local proID = aim[i]
 		-- Check that the projectile ID is still valid
-		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then
+		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then			
 			-- Projectile is valid, launch!
 			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
 			
-			TransformMeteor(fireWeaponDefID, proID, 900, x + aimOff[1], y, z + aimOff[2], fireGravity)
+			TransformMeteor(fireWeaponDefID, proID, x + aimOff[1], y, z + aimOff[2])
 		end
 	end
 	
@@ -194,6 +246,9 @@ local function LaunchAll(x, z)
 end
 
 function script.Create()
+	ux,_, uz = Spring.GetUnitPosition(unitID)
+	uy = Spring.GetGroundHeight(ux, uz)
+	
 	currentlyStunned = IsDisabled()
 	
 	Move(firept, y_axis, 9001)
@@ -240,6 +295,18 @@ function script.BlockShot(num, target)
 	elseif #cQueue[1].params == 1 then
 		local x,y,z = Spring.GetUnitPosition(cQueue[1].params[1])
 		if x then
+			local vx,_,vz = Spring.GetUnitVelocity(cQueue[1].params[1])
+			if vx then
+				local dist = Vector.AbsVal(ux - x, uy + HOVER_HEIGHT - y, uz - z)
+				-- Weapon speed is 53 elmos/frame but it has some acceleration.
+				-- Add 22 frames for the aim time. It takes about 40 frames for every meteor
+				-- to face the right way so an average meteor should take 20 frames.
+				-- That was the reasoning, the final equation is just experimentation though.
+				local travelTime = dist/80 + 10 -- in frames
+				x = x + vx*travelTime
+				z = z + vz*travelTime
+			end
+			x, z = x + vx*50, z + vz*50
 			StartThread(LaunchAll, x, z)
 		end
 	end
