@@ -417,14 +417,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
-    local validTeam = (teamID ~= gaiateam and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI:sub(1,3) == "CAI"))
-
 	local commCost = (udef.metalCost or BASE_COMM_COST) - BASE_COMM_COST			
-				
-    if validTeam then
-
-	  local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
-	  local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
+	
+	local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
+	local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 		
         -- the adding of existing resources is necessary for handling /take and spawn
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
@@ -438,7 +434,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
         Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
       end
 
-    end
 
     return true
   end
