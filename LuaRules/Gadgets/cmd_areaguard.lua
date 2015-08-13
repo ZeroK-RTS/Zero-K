@@ -259,10 +259,10 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		
 		-- First guard of this circut updates the angle
 		if not newGuards[targetID][radGroup] then
-			local circuitTime = oldcircuitTime[targetID][radGroup]
+			local circuitTime = oldcircuitTime[targetID] and oldcircuitTime[targetID][radGroup]
 			-- Update circuit positon
 			if circuitTime then
-				guardAngle[targetID][radGroup] = (guardAngle[targetID][radGroup] or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
+				guardAngle[targetID][radGroup] = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
 			end
 		end
 		
@@ -278,12 +278,12 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		end
 		
 		-- Update the number of units in the circle
-		local guards = oldGuards[targetID][radGroup] or 1
+		local guards = (oldGuards[targetID] and oldGuards[targetID][radGroup]) or 1
 		local newG = newGuards[targetID][radGroup] or 0
 		newGuards[targetID][radGroup] = newG + 1
 		
 		-- Calculate my own angle
-		angle = (guardAngle[targetID][radGroup] or 0) + 2*pi*newG/guards
+		angle = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + 2*pi*newG/guards
 		perpSize = circleDirection[targetID]*50
 	end
 	
