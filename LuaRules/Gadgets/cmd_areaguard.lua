@@ -79,6 +79,8 @@ local CIRC_MULT = 15 * 2*math.pi
 
 local UPDATE_GAP_LEEWAY = 30
 
+local RADIUS_BAND_SIZE = 100
+
 local cos = math.cos
 local sin = math.sin
 local pi = math.pi
@@ -198,8 +200,8 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 	
 	ux, uz = ux + vx*PREDICTION, uz + vz*PREDICTION
 	
-	--// First Guarder dpes some bookkeeping
-	if not newGuards[targetID] then
+	--// First Circling Guarder dpes some bookkeeping
+	if not (newGuards[targetID] or facing) then
 		-- Update guard circle direction. This swaps whenever there is a gap in which
 		-- no guarders are assigned.
 		if not circleDirection[targetID] then
@@ -212,14 +214,15 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 			end
 		end
 		lastUpdateTime[targetID] = frame
+
+		-- Make sure some old tables exist, for convinience.
+		guardAngle[targetID] = guardAngle[targetID] or {}
+		oldcircuitTime[targetID] = oldcircuitTime[targetID] or {}
+		oldGuards[targetID] = oldGuards[targetID] or {}
 		
-		-- Update circuit positon
-		local circuitTime = oldcircuitTime[targetID]
-		if circuitTime then
-			guardAngle[targetID] = (guardAngle[targetID] or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
-		end
-		
-		newGuards[targetID] = 0
+		-- Reinitalize new tables
+		newcircuitTime[targetID] = {}
+		newGuards[targetID] = {}
 	end
 	
 	--// Get the desired angle for the unit
@@ -251,22 +254,36 @@ local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
 		
 	else 
 		-- Fixed spacing and matched speed along circle mode
-		local mySpeed  = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*(ud.speed/30)
-		local circumference = 2*pi*radius
+		-- Group with units of nearby radius
+		local radGroup = math.ceil(radius/RADIUS_BAND_SIZE)
 		
-		local adjustedSpeed = mySpeed - speed
-		if adjustedSpeed < 0.01 then
-			newcircuitTime[targetID] = false
-		elseif newcircuitTime[targetID] ~= false then
-			local circuitTime = circumference/adjustedSpeed
-			newcircuitTime[targetID] = math.max(circuitTime, newcircuitTime[targetID] or 0)
+		-- First guard of this circut updates the angle
+		if not newGuards[targetID][radGroup] then
+			local circuitTime = oldcircuitTime[targetID][radGroup]
+			-- Update circuit positon
+			if circuitTime then
+				guardAngle[targetID][radGroup] = (guardAngle[targetID][radGroup] or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
+			end
 		end
 		
-		local guards = oldGuards[targetID] or 1
-		local newG = newGuards[targetID] or 0
-		newGuards[targetID] = newG + 1
+		-- Determine circuit time, distance around the circle
+		local mySpeed  = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*(ud.speed/30)
+		local circumference = 2*pi*radius
+		local adjustedSpeed = mySpeed - speed
+		if adjustedSpeed < 0.01 then
+			newcircuitTime[targetID][radGroup] = false
+		elseif newcircuitTime[targetID][radGroup] ~= false then
+			local circuitTime = circumference/adjustedSpeed
+			newcircuitTime[targetID][radGroup] = math.max(circuitTime, newcircuitTime[targetID][radGroup] or 0)
+		end
 		
-		angle = (guardAngle[targetID] or 0) + 2*pi*newG/guards
+		-- Update the number of units in the circle
+		local guards = oldGuards[targetID][radGroup] or 1
+		local newG = newGuards[targetID][radGroup] or 0
+		newGuards[targetID][radGroup] = newG + 1
+		
+		-- Calculate my own angle
+		angle = (guardAngle[targetID][radGroup] or 0) + 2*pi*newG/guards
 		perpSize = circleDirection[targetID]*50
 	end
 	
