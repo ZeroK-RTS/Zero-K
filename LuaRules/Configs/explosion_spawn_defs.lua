@@ -11,11 +11,6 @@ local spawn_defs = {
 	chicken_blimpy_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
 	corgarp_mine = {name = "wolverine_mine", cost=0, expire=60},
 	hoverminer_mine = {name = "wolverine_mine", cost=0, expire=60},
-	zenith_meteor = {name = "asteroid_dead", cost=0, expire=0, feature = true},
-	zenith_meteor_float = {name = "asteroid_dead", cost=0, expire=0, feature = true},
-	zenith_meteor_aim = {name = "asteroid_dead", cost=0, expire=0, feature = true},
-	zenith_meteor_uncontrolled = {name = "asteroid_dead", cost=0, expire=0, feature = true},
-
 	chickenflyerqueen_dodobomb = {name = "chicken_dodo", cost=0, expire=30},
 	chickenflyerqueen_basiliskbomb = {name = "chickenc", cost=0, expire=0},
 	chickenflyerqueen_tiamatbomb = {name = "chicken_tiamat", cost=0, expire=0},
