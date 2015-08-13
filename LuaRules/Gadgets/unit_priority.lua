@@ -248,8 +248,8 @@ function CheckMiscPriorityBuildStep(unitID, teamID, toSpend)
 end
 
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
-	if (step<0) then
-		--// Reclaiming isn't prioritized
+	if (step<=0) then
+		--// Reclaiming and null buildpower (waited cons) aren't prioritized
 		return true
 	end
 	
