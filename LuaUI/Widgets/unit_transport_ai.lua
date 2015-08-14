@@ -22,8 +22,10 @@ local CONST_TRANSPORT_STOPDISTANCE = 150 -- how close by has transport be to sto
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
+local allTransports = {} -- list of all transports key = id, value = {defid} 
 local waitingUnits = {} -- list of units waiting for traqnsport - key = unitID, {unit state, unitDef, factory}
 local priorityUnits = {} -- lists of priority units waiting for key= unitId, value = state
+local toGuard = {} -- list of transports which need to guard something at the end of their queue. key = id, value = guardieeID
 local toPick = {} -- list of units waiting to be picked - key = transportID, value = {id, stoppedState}
 local toPickRev = {} -- list of units waiting to be picked - key = unitID, value=transportID
 local storedQueue = {} -- unit keyed stored queues
@@ -218,6 +220,7 @@ function widget:Initialize()
 	local units = spGetTeamUnits(teamID)
 	for i=1,#units do	-- init existing transports
 		local unitID = units[i]
+		widget:UnitCreated(unitID, spGetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		if AddTransport(unitID, spGetUnitDefID(unitID)) then
 			AssignTransports(unitID, 0)
 		end
@@ -237,19 +240,17 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	end
 end
 
---[[function widget:UnitCreated(unitID, unitDefID, teamID)
-	if teamID == myTeamID then 
-		if AddTransport(unitID, unitDefID) then
-			 AssignTransports(unitID, 0)
-		end
+function widget:UnitCreated(unitID, unitDefID, teamID)
+	if teamID == myTeamID and IsTransport(unitDefID) then
+		allTransports[unitID] = unitDefID
 	end
-end]]--
+end
 
-function widget:UnitDestroyed(unitID, unitDefID, teamID)
+function RemoveUnit(unitID, unitDefID, teamID)
 	if teamID == myTeamID then 
---		 spEcho("unit destroyed " ..unitID)
-		 idleTransports[unitID] = nil
-		 priorityUnits[unitID] = nil
+		--spEcho("unit destroyed " ..unitID)
+		idleTransports[unitID] = nil
+		priorityUnits[unitID] = nil
 		waitingUnits[unitID] = nil
 		 local tuid = GetToPickUnit(unitID)
 		 if (tuid ~= 0) then -- transport which was about to pick something was destroyed
@@ -266,12 +267,24 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 			DeleteToPickTran(unitID)
 			AssignTransports(0, tuid)
 		else	-- unit which was about to be picked was destroyed
-			pom = GetToPickTransport(unitID)
+			local pom = GetToPickTransport(unitID)
 			if (pom~=0) then 
 				DeleteToPickUnit(unitID)
 				spGiveOrderToUnit(pom, CMD.STOP, {}, {})
+				
+				if toGuard[pom] then
+					spGiveOrderToUnit(pom, CMD.GUARD, {toGuard[pom]}, {})
+				end
 			end	-- delete form toPick list
 		end
+	end
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
+	if teamID == myTeamID then 
+		allTransports[unitID] = nil
+		toGuard[unitID] = nil
+		RemoveUnit(unitID, unitDefID, teamID)
 	end
 end
 
@@ -319,11 +332,8 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 	end
 end
 
-
-
-
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders) 
-	if unitTeam == myTeamID and options.transportFromFactory.value then 
+	if unitTeam == myTeamID then 
 		local ud = UnitDefs[unitDefID]
 		if (options.ignoreBuilders.value and ud.isBuilder and ud.canAssist) then 
 			return 
@@ -340,7 +350,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			end
 
 			waitingUnits[unitID] = {ST_ROUTE, unitDefID, factID}
-			AssignTransports(0, unitID) 
+			AssignTransports(0, unitID, factID, not options.transportFromFactory.value) 
 		end
 	end 
 end
@@ -353,7 +363,7 @@ function widget:CommandNotify(id, params, options)
 		sel = spGetSelectedUnits()
 		for i=1,#sel do
 			local uid = sel[i]
-			widget:UnitDestroyed(uid, spGetUnitDefID(uid), myTeamID)
+			RemoveUnit(uid, spGetUnitDefID(uid), myTeamID)
 		end
 	end
 
@@ -444,9 +454,9 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 	DeleteToPickTran(transportID)
 	hackIdle[transportID] = true
 	local cnt = 0
-	for k=1, #queue do
+	for k = 1, #queue do
 		local v = queue[k]
-	local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
+		local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
 		if not (v.options.internal or internal) then	--not other widget's command
 			if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
 				cnt = cnt +1
@@ -473,7 +483,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			end
 		end
 	end
-
+	
 	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
 	
 	if (vl ~= nil) then 
@@ -487,9 +497,14 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 
 		local x,y,z = spGetUnitPosition(transportID)
 		spGiveOrderToUnit(transportID, CMD.MOVE, {x,y,z}, {"shift"})
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"}) --unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
-	end
+		
+		--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
+		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"})
 
+		if toGuard[transportID] then
+			spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, {"shift"})
+		end
+	end
 end
 
 
@@ -542,10 +557,30 @@ function CanTransport(transportID, unitID)
 	return true
 end
 
+local function GetTransportBenefit(unitID, ud, transporter, transDef, unitspeed, unitmass, priorityState)
+	local transpeed = UnitDefs[transDef].speed
+	local transMass = UnitDefs[transDef].mass
+	local speedMod  = math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
 
-function AssignTransports(transportID, unitID) 
+	local td = spGetUnitSeparation(unitID, transporter, true)
+
+	local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
+	local utime = (ud) / unitspeed
+	local benefit = utime-ttime
+	if priorityState then 
+		benefit = benefit + CONST_PRIORITY_BENEFIT
+	end
+
+	--spEcho ("	 "..transporter.. " " .. unitID .. "	" .. benefit)
+
+	if (benefit > options.minimumTransportBenefit.value) then 
+		return {benefit, transporter, unitID}
+	end
+end
+
+function AssignTransports(transportID, unitID, guardID, ignoreIdle) 
 	local best = {}
---	spEcho ("assigning " .. transportID .. " " ..unitID)
+	--spEcho ("assigning " .. transportID .. " " ..unitID)
 	if (transportID~=0) then
 		 local unitDefID = spGetUnitDefID(transportID)
 		 local transpeed = UnitDefs[unitDefID].speed
@@ -578,28 +613,32 @@ function AssignTransports(transportID, unitID)
 		local unitDefID = spGetUnitDefID(unitID)
 		local unitspeed = UnitDefs[unitDefID].speed
 		local unitmass = UnitDefs[unitDefID].mass
-		local speedMod = 1
-		local state = waitingUnits[unitID][1]
+		local priorityState = (waitingUnits[unitID][1] == ST_PRIORITY)
 		local ud = GetPathLength(unitID)
-		for id, def in pairs(idleTransports) do 
-			if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
-				local transpeed = UnitDefs[def].speed
-				local transMass = UnitDefs[def].mass
-				speedMod =	math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
 
-				local td = spGetUnitSeparation(unitID, id, true)
-
-				local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
-				local utime = (ud) / unitspeed
-				local benefit = utime-ttime
-				if (state==ST_PRIORITY) then 
-					benefit = benefit + CONST_PRIORITY_BENEFIT
+		if not ignoreIdle then
+			for id, def in pairs(idleTransports) do 
+				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
+					local benefit = GetTransportBenefit(unitID, ud, id, def, unitspeed, unitmass, priorityState)
+					if benefit then
+						toGuard[id] = nil
+						TableInsert(best, benefit) 
+					end
 				end
-
-				 --spEcho ("	 "..id.. " " .. unitID .. "	" .. benefit)
-
-				if (benefit > options.minimumTransportBenefit.value) then 
-					TableInsert(best, {benefit, id, unitID}) 
+			end
+		end
+		
+		if guardID then
+			for id, def in pairs(allTransports) do 
+				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
+					local queue = spGetCommandQueue(id, 1)
+					if queue and queue[1] and queue[1].id == CMD.GUARD and queue[1].params[1] == guardID then
+						local benefit = GetTransportBenefit(unitID, ud, id, def, unitspeed, unitmass, priorityState)
+						if benefit then
+							toGuard[id] = guardID
+							TableInsert(best, benefit) 
+						end
+					end
 				end
 			end
 		end
@@ -616,7 +655,7 @@ function AssignTransports(transportID, unitID)
 		if (used[tid]==nil and used[uid]==nil) then --check if already given transport order in same loop
 			used[tid] = 1
 			used[uid] = 1
---			spEcho ("ordering " .. tid .. " " .. uid )
+			--spEcho ("ordering " .. tid .. " " .. uid )
 
 			if (waitingUnits[uid][1] == ST_PRIORITY) then 
 				AddToPick(tid, uid, ST_PRIORITY)
@@ -757,7 +796,7 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 	if (teamID ~= myTeamID) then return end
 	
 	if (not shift) then
-		widget:UnitDestroyed(unitID, spGetUnitDefID(unitID), myTeamID) --remove existing command ASAP
+		RemoveUnit(unitID, spGetUnitDefID(unitID), myTeamID) --remove existing command ASAP
 	end
 	
 	local queue = spGetCommandQueue(unitID, -1)
