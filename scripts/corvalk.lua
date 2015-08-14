@@ -65,6 +65,7 @@ function closeDoors()
 end
 
 function script.Create()
+	Move(link, y_axis, -50)
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -141,7 +142,15 @@ function isNearPickupPoint(passengerId)
 	end
 
 	local px, py, pz = Spring.GetUnitBasePosition(passengerId)
-	local px2, py2, pz2 = Spring.GetUnitBasePosition(unitID)	
+	if not px then
+		return
+	end
+	
+	local px2, py2, pz2 = Spring.GetUnitBasePosition(unitID)
+	if not px2 then
+		return
+	end
+	
 	local dx = px2 - px
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
