@@ -632,6 +632,11 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 	end
 end
 
+function gadget:UnitDestroyed (unitID)
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morphedTo then gadget:UnitGiven(morphedTo) end
+end
+
 function gadget:Load(zip)
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		gadget:UnitGiven(unitID)
