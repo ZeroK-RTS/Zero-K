@@ -18,7 +18,6 @@ end
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
-local CONST_BENEFIT_LIMIT = 5	-- what is the lowest benefit treshold to use transport (in sec difference with transport against without it)
 local CONST_TRANSPORT_STOPDISTANCE = 150 -- how close by has transport be to stop the unit
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
@@ -67,6 +66,12 @@ options = {
 		type = "bool",
 		value = false,
 		desc = "Enable to not transport newly completed constructors.",
+	},
+	minimumTransportBenefit = {
+		name = 'Factory transport benefit threshold (s)',
+		type = 'number',
+		value = 2,
+		min = -10, max = 10, step = 0.1,
 	},
 }
 
@@ -564,7 +569,7 @@ function AssignTransports(transportID, unitID)
 				end
 				--spEcho ("	 "..transportID .. " " .. id .. "	" .. benefit)
 
-				if (benefit > CONST_BENEFIT_LIMIT) then 
+				if (benefit > options.minimumTransportBenefit.value) then 
 					TableInsert(best, {benefit, transportID, id}) 
 				end
 			 end 
@@ -593,7 +598,7 @@ function AssignTransports(transportID, unitID)
 
 				 --spEcho ("	 "..id.. " " .. unitID .. "	" .. benefit)
 
-				if (benefit > CONST_BENEFIT_LIMIT) then 
+				if (benefit > options.minimumTransportBenefit.value) then 
 					TableInsert(best, {benefit, id, unitID}) 
 				end
 			end
