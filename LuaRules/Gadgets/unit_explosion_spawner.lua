@@ -49,7 +49,7 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(w, x, y, z, owner)
-	if spawn_defs_id[w] and (owner or spawn_defs_id[w].feature) then
+	if spawn_defs_id[w] and (owner or (spawn_defs_id[w].feature and Spring.Utilities.IsValidPosition(x, z))) then
 		if (not owner) or (not noCreate[owner]) then
 			--if not Spring.GetGroundBlocked(x,z) then
 			if (not owner) or UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
