@@ -321,7 +321,12 @@ function widget:Initialize()
 			xscale, zscale = scale, scale
 		end
 
-		unitConf[udid] = {shape=shape, xscale=xscale, zscale=zscale}
+		unitConf[udid] = {
+			shape = shape, 
+			xscale = xscale, 
+			zscale = zscale,
+			noRotate = (unitDef.customParams.select_no_rotate and true) or false
+		}
 		
 		if unitDef.customParams and unitDef.customParams.selection_velocity_heading then
 			unitConf[udid].velocityHeading = true
@@ -363,7 +368,9 @@ local function UpdateUnitListRotation(unitList)
 	for i=1, #unitList do
 		local unitID = unitList[i]
 		local udid = spGetUnitDefID(unitID)
-		if udid and unitConf[udid].velocityHeading then
+		if udid and unitConf[udid].noRotate then
+			degrot[unitID] = 0
+		elseif udid and unitConf[udid].velocityHeading then
 			local vx,_,vz = Spring.GetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
 			if speed > 0.25 then

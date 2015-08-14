@@ -11,7 +11,7 @@ local function Mult(b, v)
 	return {b*v[1], b*v[2]}
 end
 
-local function AbsVal(x, y,z)
+local function AbsVal(x, y, z)
 	if z then
 		return sqrt(x*x + y*y + z*z)
 	elseif y then
@@ -41,13 +41,15 @@ local function Norm(b, v)
 	end
 end
 
-local function AngleManual(v) -- in case Angle stops working
-	if v[1] == 0 and v[2] == 0 then
+local function Angle(x,z)
+	if not z then
+		x,z = x[1], x[2]
+	end
+	if x == 0 and z == 0 then
 		return 0
 	end
-	local mult = 1/AbsVal(v)
-	local x, z = v[1]*mult, v[2]*mult
-	Spring.Echo(x, z)
+	local mult = 1/AbsVal(x, z)
+	x, z = x*mult, z*mult
 	if z > 0 then
 		return math.acos(x)
 	elseif z < 0 then
@@ -59,7 +61,8 @@ local function AngleManual(v) -- in case Angle stops working
 	return 0
 end
 
-local function Angle(x, z)
+-- Spring.GetHeadingFromVector is actually broken at angles close to pi/4 and reflections
+local function AngleSpringHeaving(x, z)
 	if z then
 		return -Spring.GetHeadingFromVector(x, z)/2^15*pi + pi/2
 	else
