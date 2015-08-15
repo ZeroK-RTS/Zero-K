@@ -10,29 +10,39 @@ function gadget:GetInfo() return {
 	enabled   = true,
 } end
 
-local spAreTeamsAllied     = Spring.AreTeamsAllied
-local spGetMyAllyTeamID    = Spring.GetMyAllyTeamID
-local spGetMyTeamID        = Spring.GetMyTeamID
-local spGetSpectatingState = Spring.GetSpectatingState
-local spGetUnitLosState    = Spring.GetUnitLosState
+local spAreTeamsAllied     	= Spring.AreTeamsAllied
+local spGetMyAllyTeamID    	= Spring.GetMyAllyTeamID
+local spGetMyTeamID        	= Spring.GetMyTeamID
+local spGetSpectatingState 	= Spring.GetSpectatingState
+local spGetUnitLosState    	= Spring.GetUnitLosState
+
+local scriptUnitDestroyed		= Script.LuaUI.UnitDestroyed
+local scriptUnitDestroyedByTeam	= Script.LuaUI.UnitDestroyedByTeam
 
 function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attUnitID, attUnitDefID, attTeamID)	
 	local myAllyTeamID = spGetMyAllyTeamID()
 	local spec, specFullView = spGetSpectatingState()
-	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())
+	local isAllyUnit = spAreTeamsAllied(unitTeam, spGetMyTeamID())	
 	
-	if spec then
-		--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)		
-		if not specFullView and not isAllyUnit and spGetUnitLosState(unitID, myAllyTeamID).los then
-			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
+	-- we need to check if any widget uses the callin, otherwise it is not bound and will produce error spam
+	if Script.LuaUI('UnitDestroyedByTeam') then
+		if spec then
+			scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attTeamID)
+			if not specFullView and not isAllyUnit and spGetUnitLosState(unitID, myAllyTeamID).los then
+				scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+			end
+		else
+			local attackerInLos = attUnitID and spGetUnitLosState(attUnitID, myAllyTeamID).los
+			if isAllyUnit then
+				scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+			elseif spGetUnitLosState(unitID, myAllyTeamID).los then
+					scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+					scriptUnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
+			end		
 		end
-	else
-		local attackerInLos = attUnitID and spGetUnitLosState(attUnitID, myAllyTeamID).los
-		if isAllyUnit then			
-			--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
-		elseif spGetUnitLosState(unitID, myAllyTeamID).los then
-			Script.LuaUI.UnitDestroyed (unitID, unitDefID, unitTeam)
-			--Script.LuaUI.UnitDestroyedByTeam (unitID, unitDefID, unitTeam, attackerInLos and attTeamID or nil)
-		end		
-	end
+	else		
+		if not isAllyUnit and (not (spec and specFullView) and spGetUnitLosState(unitID, spGetMyAllyTeamID()).los) then
+ 			scriptUnitDestroyed (unitID, unitDefID, unitTeam)
+ 		end
+ 	end	
 end
