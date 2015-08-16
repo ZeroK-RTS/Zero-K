@@ -703,7 +703,7 @@ local function FinishMorph(unitID, morphData)
     { CMD.FIRE_STATE, { states.firestate }, emptyTable },
     { CMD.MOVE_STATE, { states.movestate }, emptyTable },
     { CMD.REPEAT,     { states["repeat"] and 1 or 0 }, emptyTable },
-    { CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable} },
+    { CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable },
     { CMD.ONOFF,      { 1 }, emptyTable},
     { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, emptyTable },
     { CMD_PRIORITY, { states.buildPrio }, emptyTable },
