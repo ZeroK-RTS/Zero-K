@@ -154,7 +154,7 @@ function script.Activate()
 	Turn(rb_leaf, x_axis, -l_angle, 1)
 	Turn(rb_leaf, z_axis, l_angle, 1)
 	StartThread(Flutter)
-	--spSetUnitShieldState(unitID, 1, true)
+	spSetUnitShieldState(unitID, 1, true)
 end
 
 function script.Deactivate()
@@ -171,7 +171,7 @@ function script.Deactivate()
 	Turn(rb_leaf, x_axis, 0, 1)
 	Turn(rb_leaf, z_axis, 0, 1)
 	
-	--spSetUnitShieldState(unitID, 1, false)
+	spSetUnitShieldState(unitID, 1, false)
 end
 
 local function Stopping()
