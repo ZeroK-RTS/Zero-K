@@ -1628,11 +1628,12 @@ function widget:KeyPress(key)
 			return true
 		end
 	end
-
+	
 	if key == KEYSYMS.SPACE and ( 
-		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle)) or 
-		(terraform_type == 4 and (setHeight or drawingRamp)) or 
-		(terraform_type == 5 and drawingLasso)
+		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or 
+		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or 
+		(terraform_type == 4 and (setHeight or drawingRamp or drawingRectangle)) or 
+		(terraform_type == 5 and (drawingLasso or drawingRectangle))
 	) then
 		volumeSelection = volumeSelection+1
 		if volumeSelection > 2 then
@@ -1865,7 +1866,7 @@ function widget:DrawScreen()
 		end
 	end
 	
-	if terraform_type == 1 or terraform_type == 4 or terraform_type == 5 then
+	if terraform_type == 1 or terraform_type == 3 or terraform_type == 4 or terraform_type == 5 then
 		if volumeSelection == 1 then
 			drawMouseText(-30,"Only raise")
 		elseif volumeSelection == 2 then

@@ -357,7 +357,7 @@ local function checkPointCreation(terraform_type, volumeSelection, orHeight, new
 		return (volumeSelection == 1 and ny > 0.595) or ny > 0.894
 	end
 	
-	if volumeSelection == 0 or terraform_type == 2 or terraform_type == 3 then
+	if volumeSelection == 0 or terraform_type == 2 then
 		return true
 	end
 	

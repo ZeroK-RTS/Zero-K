@@ -101,6 +101,9 @@ function script.Create()
 	--Move(beam1, z_axis, 28)
 	--Move(beam1, y_axis, -2)
 
+	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
+	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
+	
 	Turn(mah_lazer, x_axis, math.rad(90))
 	Turn(downbeam, x_axis, math.rad(90))
 	--Turn(shoop_da_woop, z_axis, math.rad(0.04))
