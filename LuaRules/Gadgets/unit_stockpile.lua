@@ -102,6 +102,15 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
+		local def = stockpileUnitDefID[unitDefID]
+		if def.stockCost > 0 then
+			GG.AddMiscPriorityUnit(unitID, teamID)
+		end
+	end
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]
@@ -118,9 +127,6 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 				e = def.perUpdateCost
 			}
 		}
-		if def.stockCost > 0 then
-			GG.AddMiscPriorityUnit(unitID, teamID)
-		end
 	end
 end
 
@@ -146,6 +152,7 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 		gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
