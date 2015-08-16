@@ -59,6 +59,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[armpnix.s3o]],
   radarDistance       = 2400,
+  radarDistanceJam    = 700,
   script              = [[corawac.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
