@@ -354,14 +354,15 @@ function widget:CommandNotify(cmdID, params, options)
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
-				local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
+				local y = Spring.GetGroundHeight(x, z)
+				local buildable, feature = spTestBuildOrder(mexDefID,x,y,z,1)
 				if buildable ~= 0 then
 					local handledExternally = false
 					if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-						handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options , true) --add additional flag "true" for additional logic for zk areamex
+						handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,y,z,0} , options , true) --add additional flag "true" for additional logic for zk areamex
 					end
 					if ( not handledExternally ) then
-						commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,0,z,0} , {"shift"}}
+						commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 						--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
 					end
 				else
