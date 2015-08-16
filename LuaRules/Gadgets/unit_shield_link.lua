@@ -117,10 +117,16 @@ function gadget:UnitCreated(unitID, unitDefID)
 		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
 			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
+			
+			local shieldRegen = shieldWep.shieldPowerRegen
+			if shieldRegen == 0 and shieldWep.customParams and shieldWep.customParams.shield_rate then
+				shieldRegen = tonumber(shieldWep.customParams.shield_rate)
+			end
+			
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
-				shieldRegen  = shieldWep.shieldPowerRegen,
+				shieldRegen  = shieldRegen,
 				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
 				unitDefID    = unitDefID,
 				neighbors    = {},
@@ -196,7 +202,9 @@ function QueueLinkUpdate(allyTeamID,unitID)
 	updateLink[allyTeamID][unitID] = true
 end
 
--- check if working unit so it can be used for shield link
+-- Check if working unit so it can be used for shield link
+-- Note that shields forced off due to low energy still count for shield link!!
+-- This is intended to stop possible workarounds (eg save a shield so that it is 3600 and stops a tacnuke)
 local function IsEnabled(unitID)
 	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild or (spGetUnitRulesParam(unitID, "disarmed") == 1) then

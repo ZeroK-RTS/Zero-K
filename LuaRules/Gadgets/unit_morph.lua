@@ -484,19 +484,19 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	local morphData = morphUnits[unitID]
 	if not morphData then return end
-	GG.StopMiscPriorityResourcing(unitID, morphData.teamID)
+	GG.StopMiscPriorityResourcing(unitID, morphData.teamID, 2)
 	morphData.teamID = newTeamID
-	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time))
+	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time), false, 2)
 end
 
 local function StopMorph(unitID, morphData)
-  GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
+  GG.StopMiscPriorityResourcing(unitID,morphData.teamID, 2) --is using unit_priority.lua gadget to handle morph priority.
   morphUnits[unitID] = nil
   if not morphData.combatMorph then
     Spring.SetUnitRulesParam(unitID, "morphDisable", 0)

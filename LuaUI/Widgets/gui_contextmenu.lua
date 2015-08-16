@@ -396,6 +396,19 @@ local function getDescription(unitDef)
 	
 end	
 
+local function GetShieldRegenDrain(wd)
+	local shieldRegen = wd.shieldPowerRegen
+	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
+		shieldRegen = wd.customParams.shield_rate
+	end
+	
+	local shieldDrain = wd.shieldPowerRegenEnergy
+	if shieldDrain == 0 and wd.customParams and wd.customParams.shield_drain then
+		shieldDrain = wd.customParams.shield_drain
+	end
+	return shieldRegen, shieldDrain
+end
+
 local function weapons2Table(cells, ws, ud)
 	local cells = cells
 	
@@ -423,12 +436,13 @@ local function weapons2Table(cells, ws, ud)
 	cells[#cells+1] = ''
 
 	if wd.isShield then
+		local regen, drain = GetShieldRegenDrain(wd) 
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = wd.shieldPowerRegen .. " HP/s"
+		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
-		cells[#cells+1] = wd.shieldPowerRegenEnergy .. " E/s"
+		cells[#cells+1] = drain .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else

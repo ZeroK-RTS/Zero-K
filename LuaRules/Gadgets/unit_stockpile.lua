@@ -73,9 +73,6 @@ function gadget:GameFrame(n)
 			local newStockSpeed = GetStockSpeed(unitID)
 			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					if data.stockSpeed ~= 0 then
-						GG.StopMiscPriorityResourcing(unitID,data.teamID)
-					end
 					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
 				end
 				data.stockSpeed = newStockSpeed
