@@ -23,7 +23,6 @@ unitDef = {
     helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Posiada tarcze obszarowa oraz produkuje zestaw dronow.]],
   },
 
-  energyUse              = 1.5,
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
