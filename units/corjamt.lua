@@ -35,7 +35,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[m-8.s3o]],
-  onoffable                     = false,
+  onoffable                     = true,
   script                        = [[corjamt.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[BIG_UNITEX]],
@@ -56,7 +56,7 @@ unitDef = {
     morphto = [[core_spectre]],
     morphtime = [[30]],
 	
-	priority_misc = 2, -- High
+	priority_misc = 1, -- Medium
   },  
   
   weapons                       = {

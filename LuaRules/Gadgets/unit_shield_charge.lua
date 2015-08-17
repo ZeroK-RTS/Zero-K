@@ -91,7 +91,7 @@ function gadget:GameFrame(n)
 		local enabled, charge = IsShieldEnabled(unitID)
 		
 		local def = shieldUnitDefID[data.unitDefID]
-		if enabled and charge < def.maxCharge then
+		if enabled and charge < def.maxCharge and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			
 			-- Get changed charge rate based on slow
 			local newChargeRate = GetChargeRate(unitID)

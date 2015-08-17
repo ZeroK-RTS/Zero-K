@@ -33,7 +33,7 @@ unitDef = {
     morphto = [[corjamt]],
     morphtime = 30,
 	
-	priority_misc = 2, -- High
+	priority_misc = 1, -- Medium
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -51,7 +51,7 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   moveState              = 0,
   objectName             = [[m-8.s3o]],
-  onoffable              = false,
+  onoffable              = true,
   pushResistant          = 0,
   script                 = [[core_spectre.lua]],
   seismicSignature       = 4,
