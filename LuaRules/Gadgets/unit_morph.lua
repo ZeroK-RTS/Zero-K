@@ -30,6 +30,7 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local emptyTable = { } -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -541,7 +542,7 @@ local function FinishMorph(unitID, morphData)
 
   --// copy health
   local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(unitID)
-  
+
   local isBeingBuilt = false
   if buildProgress < 1 then
     isBeingBuilt = true
@@ -611,8 +612,12 @@ local function FinishMorph(unitID, morphData)
   local facplop = Spring.GetUnitRulesParam(unitID, "facplop")  
   --//copy command queue
   local cmds = Spring.GetCommandQueue(unitID, -1)
-  --// copy some state
+
   local states = Spring.GetUnitStates(unitID)
+  states.retreat = Spring.GetUnitRulesParam(unitID, "retreatState") or 0
+  states.buildPrio = Spring.GetUnitRulesParam(unitID, "buildpriority") or 1
+  states.miscPrio = Spring.GetUnitRulesParam(unitID, "miscpriority") or 1
+
   --// copy cloak state
   local wantCloakState = Spring.GetUnitRulesParam(unitID, "wantcloak")
   --// copy shield power
@@ -693,13 +698,17 @@ local function FinishMorph(unitID, morphData)
     Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
   end
   --//transfer some state
+  
   Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-    { CMD.FIRE_STATE, { states.firestate },             { } },
-    { CMD.MOVE_STATE, { states.movestate },             { } },
-    { CMD.REPEAT,     { states["repeat"] and 1 or 0 },  { } },
-    { CMD_WANT_CLOAK, { wantCloakState or 0 },  { } },
-    { CMD.ONOFF,      { 1 },                            { } },
-    { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, { } },
+    { CMD.FIRE_STATE, { states.firestate }, emptyTable },
+    { CMD.MOVE_STATE, { states.movestate }, emptyTable },
+    { CMD.REPEAT,     { states["repeat"] and 1 or 0 }, emptyTable },
+    { CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable },
+    { CMD.ONOFF,      { 1 }, emptyTable},
+    { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, emptyTable },
+    { CMD_PRIORITY, { states.buildPrio }, emptyTable },
+    { CMD_RETREAT, { states.retreat }, states.retreat == 0 and {"right"} or emptyTable },
+    { CMD_MISC_PRIORITY, { states.miscPrio }, emptyTable },
   })
   --//reassign assist commands to new unit
   ReAssignAssists(newUnit,unitID)

@@ -652,7 +652,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] and (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") ~= 1) then
         local orderArray = {}
 		if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
 			-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"})
