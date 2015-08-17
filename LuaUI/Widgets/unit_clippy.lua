@@ -10,7 +10,7 @@ function widget:GetInfo()
 		date = "2011.5.6",
 		license = "Public Domain",
 		layer = 0,
-		enabled = true,	-- (rank and rank == 1) or true,
+		enabled = false,	-- (rank and rank == 1) or true,
 	}
 end
 
