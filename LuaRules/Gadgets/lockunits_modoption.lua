@@ -17,19 +17,6 @@ end
 
 local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
 local disabledunits = { }
-local defenceunits = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "armcir", "screamer", "corgrav", "turrettorp", "cordoom", "armanni", "corjamt" }
-
---Different lock modoptions are compatible
-if tobool(Spring.GetModOptions().noair) then
-	disabledunits[1]="factoryplane"
-	disabledunits[2]="factorygunship"
-end
-
-if tobool(Spring.GetModOptions().nodef) then
-	for i in pairs(defenceunits) do
-		table.insert(disabledunits,defenceunits[i])
-	end
-end
 
 if (disabledunitsstring=="" and #disabledunits==0) then --no unit to disable, exit
 	return

@@ -254,11 +254,10 @@ local function AddAllianceUnit(u, ud, teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[ud].metalCost
-	
-	--Spring.Echo("added alliance=" .. teamID, 'count='..aliveCount[allianceID])
+
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = true
-	end	
+	end
 end
 
 local function RemoveAllianceUnit(u, ud, teamID)
@@ -269,12 +268,13 @@ local function RemoveAllianceUnit(u, ud, teamID)
 	if aliveValue[teamID] < 0 then
 		aliveValue[teamID] = 0
 	end
-	
-	--Spring.Echo("removed alliance=" .. teamID, 'count='..aliveCount[allianceID]) 
+
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = nil
 	end
-	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID))) and (allianceID ~= chickenAllyTeamID) then
+
+	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)))
+	and (allianceID ~= chickenAllyTeamID) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID)
 	end
