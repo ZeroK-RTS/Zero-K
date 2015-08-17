@@ -1,20 +1,20 @@
-local THRESHOLD_EXPENSIVE = 800
+local THRESHOLD_EXPENSIVE = 1200
 INCOME_TO_SPLURGE = 25	-- ignore expensive warning if you have this much income
 METAL_PER_NANO = 8		-- suggested nanos per metal ^ -1
 MIN_PULL_FOR_NANOS = -10	-- don't make more nanos if our pull is already this low	--unused
 NANO_DEF_ID = UnitDefNames.armnanotc.id
-ENERGY_TO_METAL_RATIO = 4	-- suggested maximum for energy
+ENERGY_TO_METAL_RATIO = 6	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 200
-DEFENSE_QUOTA = 0.3	-- suggested maximum proportion of total assets that is defense
+DEFENSE_QUOTA = 0.4	-- suggested maximum proportion of total assets that is defense
 
 RANK_LIMIT = 3
 
-DELAY_BETWEEN_FACS = 10*60*30	-- gameframes
+DELAY_BETWEEN_FACS = 5*60*30	-- gameframes
 
 --seconds
 TIMER_EXPENSIVE_UNITS = 60 * 10
-TIMER_ADV_FACTORY = 60 * 15
-TIMER_SUPERWEAPON = 60 * 30
+TIMER_ADV_FACTORY = 60 * 8
+TIMER_SUPERWEAPON = 60 * 20
 
 tips = {
 	nano_excess = {str = {"Don't we have enough\nCaretakers already?"}, life = 7, cooldown = 20},
