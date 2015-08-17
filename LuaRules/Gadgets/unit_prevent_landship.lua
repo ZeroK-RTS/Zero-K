@@ -30,8 +30,14 @@ for unitDefID = 1, #UnitDefs do
 	end
 end
 
+local ALLY_ACCESS = {allied = true}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+local PERIOD = 25
+
+local GRAVITY = Game.gravity
 
 local shipList = {}
 local shipMap = {}
@@ -64,15 +70,27 @@ local function UpdateShip(data)
 	local x, y, z = Spring.GetUnitPosition(unitID)
 	if y and y > data.maxHeight then
 		local groundHeight = Spring.GetGroundHeight(x,z)
-		if groundHeight and groundHeight > y - 0.1 then
-			if data.landTime > 4 then
-				data.landTime = data.landTime + 1
-			else
-				GG.AddGadgetImpulseRaw(unitID, 0, 0.001, 0, true, true)
-				GG.DetatchFromGround(unitID)
+		if groundHeight and groundHeight > data.maxHeight then
+			if groundHeight > y - 0.1 then
+				if data.landTime < 2 then
+					data.landTime = data.landTime + 1
+				else
+					data.moveDisable = true
+					Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0, ALLY_ACCESS)
+					GG.UpdateUnitAttributes(unitID)
+					GG.DetatchFromGround(unitID, 1, 0.25, 0.005*GRAVITY)
+					GG.AddGadgetImpulseRaw(unitID, 0, 0.01, 0, true, true)
+				end
 			end
+			return
 		end
-		return
+	end
+	
+	if data.moveDisable then
+		GG.UnitEcho(unitID)
+		data.moveDisable = false
+		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1, ALLY_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
 	end
 	data.landTime = 0
 end
@@ -81,7 +99,7 @@ end
 -------------------------------------------------------------------------------------
 
 function gadget:GameFrame(frame)
-	if frame%66 == 0 then
+	if frame%PERIOD == 0 then
 		for i = 1, #shipList do
 			local data = shipList[i]
 			if Spring.ValidUnitID(data.unitID) then

@@ -262,7 +262,6 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 	end
 	if speedFactor <= 0 then
 		speedFactor = 0
-		decFactor = 100000 -- a unit with 0 decRate will not deccelerate down to it's 0 maxVelocity
 		
 		-- Set the units velocity to zero if it is attached to the ground.
 		local x, y, z = Spring.GetUnitPosition(unitID)
