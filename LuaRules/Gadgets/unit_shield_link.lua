@@ -203,19 +203,17 @@ function QueueLinkUpdate(allyTeamID,unitID)
 end
 
 -- Check if working unit so it can be used for shield link
--- Note that shields forced off due to low energy still count for shield link!!
--- This is intended to stop possible workarounds (eg save a shield so that it is 3600 and stops a tacnuke)
 local function IsEnabled(unitID)
-	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	if stunned_or_inbuild or (spGetUnitRulesParam(unitID, "disarmed") == 1) then
+	local enabled = spGetUnitShieldState(unitID)
+	if not enabled then
 		return false
 	end
-	local active = spGetUnitIsActive(unitID)
-	if active ~= nil then
-		return active
-	else
-		return true
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	if stunned_or_inbuild then
+		return false
 	end
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	return att_enabled
 end
 
 local function ShieldsAreTouching(shield1, shield2)

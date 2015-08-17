@@ -60,6 +60,19 @@ end
 --------------------------------------------------------------------------------
 -- Unit Updating
 
+local function IsShieldEnabled(unitID)
+	local enabled, charge = spGetUnitShieldState(unitID)
+	if not enabled then
+		return false
+	end
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	if stunned_or_inbuild then
+		return false
+	end
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	return att_enabled, charge
+end
+
 local function GetChargeRate(unitID)
 	return (1 - (spGetUnitRulesParam(unitID,"slowState") or 0))
 end
@@ -74,13 +87,11 @@ function gadget:GameFrame(n)
 	for i = 1, unitCount do
 		local data = unitList[i]
 		local unitID = data.unitID
-		local enabled, charge = spGetUnitShieldState(unitID)
-		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
-		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
-		local morphing = (spGetUnitRulesParam(unitID, "morphDisable") == 1)
+		
+		local enabled, charge = IsShieldEnabled(unitID)
 		
 		local def = shieldUnitDefID[data.unitDefID]
-		if enabled and (not (stunned_or_inbuild or disarmed or morphing)) and charge < def.maxCharge then
+		if enabled and charge < def.maxCharge then
 			
 			-- Get changed charge rate based on slow
 			local newChargeRate = GetChargeRate(unitID)
@@ -107,8 +118,16 @@ function gadget:GameFrame(n)
 			if data.oldChargeRate ~= 0 then
 				GG.StopMiscPriorityResourcing(unitID)
 				data.oldChargeRate = 0
-			end
+			end		
 		end
+		
+		-- Drain shields on paralysis etc..
+		if enabled ~= data.enabled then
+			if not enabled then
+				spSetUnitShieldState(unitID, -1, 0)
+			end
+			data.enabled = enabled
+		end	
 	end
 end
 
