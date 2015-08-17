@@ -350,7 +350,13 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			end
 
 			waitingUnits[unitID] = {ST_ROUTE, unitDefID, factID}
-			AssignTransports(0, unitID, factID, not options.transportFromFactory.value) 
+			local foundTransport = AssignTransports(0, unitID, factID, not options.transportFromFactory.value) 
+			
+			-- Transport was not found so remove the unit. Factory guard transport only works
+			-- on units newly exiting the factory (too chaotic otherwise).
+			if (not options.transportFromFactory.value) and (not foundTransport) then
+				waitingUnits[unitID] = nil
+			end
 		end
 	end 
 end
@@ -615,7 +621,7 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 		local unitmass = UnitDefs[unitDefID].mass
 		local priorityState = (waitingUnits[unitID][1] == ST_PRIORITY)
 		local ud = GetPathLength(unitID)
-
+		
 		if not ignoreIdle then
 			for id, def in pairs(idleTransports) do 
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
@@ -665,8 +671,12 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 			waitingUnits[uid] = nil
 			idleTransports[tid] = nil
 			spGiveOrderToUnit(tid, CMD.LOAD_UNITS, {uid}, {})
+			
+			return true -- Transport was matched with the unit
 		end
 	end 
+	
+	return false -- Unit/Transport is still idle
 end
 
 
