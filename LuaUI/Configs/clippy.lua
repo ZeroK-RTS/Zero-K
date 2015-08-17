@@ -20,14 +20,14 @@ tips = {
 	nano_excess = {str = {"Don't we have enough\nCaretakers already?"}, life = 7, cooldown = 20},
 	expensive_unit = {str = {"Boss, I'm not sure\nwe can afford that at\nthis stage of the game.",
 				"Sir, I don't think that\nunit is in our price\nrange right now."}, life = 9, cooldown = 20, verbosity = 2},
-	superweapon = {str = {"A superweapon,\nnow? Seriously?"}, life = 7, cooldown = 60},
+	superweapon = {str = {"A superweapon now?\nThat will probably\ntake a while."}, life = 7, cooldown = 60},
 	adv_factory = {str = {"Are you sure that's\na good starting\nfac, chief?"}, life = 7, cooldown = 60},
 	
 	retreat_repair = {str = {"Getting shot up!\nRequesting permission\nto pull out, sir!",
 				"Get me out of here!\nI need repairs!",}, life = 7, cooldown = 20},
 				
 	energy_excess  = {str = {"I think we've got\nenough energy for\nnow, boss.",
-				"We're not playing\nEnergy Tycoon, man...",
+				"Energy storage already\nat full capacity.",
 				"Sir, we're swimming\nin energy as it is."}, life = 7, cooldown = 20},
 	energy_deficit  = {str = {"Energy deficit, sir.\nMore E structures?",
 				"Commander, we'll soon\nrun out of energy\nunless we build more E."}, life = 7, cooldown = 45},
@@ -35,11 +35,11 @@ tips = {
 				"Boss, we have too much metal.\nGet more of us making stuff."}, life = 7, cooldown = 30},
 	metal_deficit = {str = {"Running low on metal, chief.\nWe should try reclaiming\nor getting more mexes."}, life = 7, cooldown = 60, verbosity = 3},
 	
-	facplop = {str = {"I've got a free factory here.\nMight want to place it ASAP."}, life = 7, cooldown = 30},
-	factory_duplicate = {str = {"We already have one of\nthat fac. I don't think\nwe need a second, chief."}, life = 9, cooldown = 60},
-	factory_multiple = {str = {"Sir, we don't need another\nfac so soon. Assist with cons\nif you need to build faster."}, life = 10, cooldown = 60, verbosity = 2},
+	facplop = {str = {"Remember placing your\nfirst free factory."}, life = 7, cooldown = 30},
+	factory_duplicate = {str = {"We already have one of\nthat factory. Remember you can\nassist it with constructors."}, life = 9, cooldown = 60},
+	factory_multiple = {str = {"Sir, we don't need another factory\nso soon. You can assist your\nfirst factory with constructors."}, life = 10, cooldown = 60, verbosity = 2},
 	
-	defense_excess = {str = {"Boss, this isn't a\nTower Defense game...",
+	defense_excess = {str = {"Boss, consider building\nmobile units instead.",
 				"Chief, don't you think\nwe have enough\ndefenses already?",
 				"Sir, I don't think\nwe should be building\nany more defense."}, life = 8, cooldown = 20}
 }
