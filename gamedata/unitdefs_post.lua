@@ -274,6 +274,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Lua implementation of energyUse
+--
+
+for name, ud in pairs(UnitDefs) do
+	if (ud.energyuse or 0) > 0 then
+		ud.customparams.upkeep_energy = ud.energyuse
+		ud.energyuse = 0
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Disable smoothmesh; allow use of airpads
 -- 
 

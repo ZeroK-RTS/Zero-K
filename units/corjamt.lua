@@ -55,6 +55,8 @@ unitDef = {
 
     morphto = [[core_spectre]],
     morphtime = [[30]],
+	
+	priority_misc = 2, -- High
   },  
   
   weapons                       = {

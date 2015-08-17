@@ -35,6 +35,7 @@ unitDef = {
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[50]],
     nuke_coverage  = 1200,
+	priority_misc = 2, -- High
   },
 
   energyUse              = 1.5,

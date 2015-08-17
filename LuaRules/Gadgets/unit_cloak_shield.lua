@@ -52,7 +52,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --
 
 local GetUnitDefID       = Spring.GetUnitDefID
-local UseUnitResource    = Spring.UseUnitResource
 local GetUnitSeparation  = Spring.GetUnitSeparation
 local SetUnitCloak       = Spring.SetUnitCloak
 
@@ -432,7 +431,7 @@ function gadget:GameFrame(frameNum)
       ShrinkRadius(data)
     else
 	  local activeState = Spring.GetUnitStates(unitID)
-	  local newState = activeState and activeState["active"] and UseUnitResource(unitID, 'e', data.energy)
+	  local newState = activeState and activeState["active"] and (GetUnitRulesParam(unitID, "forcedOff") ~= 1)
       if (newState) then
         GrowRadius(data)
       else

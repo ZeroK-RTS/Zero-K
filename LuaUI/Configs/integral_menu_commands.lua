@@ -4,7 +4,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --SIDENOTE: using this table is preferable than editing command description directly because this maintain tooltip's compatibility with other build menu too.(eg: color text is not supported by stock gui)
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
-	miscpriority = "Misc Priority: Set priority for morph or stockpile (low, normal, high)",
+	miscpriority = "Misc Priority: Set priority for non-construction spending (low, normal, high)",
 	retreat = "Retreat: Retreat to closest retreat point or airpad at 30/65/99% of health (right-click to disable). Airpad for aircraft only.",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",

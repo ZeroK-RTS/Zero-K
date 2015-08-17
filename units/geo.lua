@@ -37,6 +37,8 @@ unitDef = {
     
     morphto = [[amgeo]],
     morphtime = [[90]],
+	
+	priority_misc = 1, -- Medium
   },
 
   energyMake                    = 25,

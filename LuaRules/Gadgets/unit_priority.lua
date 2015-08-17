@@ -99,6 +99,7 @@ local priorityTypes = {
 local ALLY_ACCESS = {allied = true}
 
 local debugTeam = false
+local debugOnUnits = false
 
 --------------------------------------------------------------------------------
 --  COMMON
@@ -323,7 +324,7 @@ function gadget:GameFrame(n)
 						if scaleEnergy and scaleEnergy[pri] then
 							realEnergyOnlyPull = realEnergyOnlyPull + buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
 							
-							if debugMode then
+							if debugMode and debugOnUnits then
 								GG.UnitEcho(unitID, "Energy Priority: " ..  pri ..
 									", BP: " .. buildSpeed .. 
 									", Pull: " .. buildSpeed*UnitOnlyEnergy[unitID]*scaleEnergy[pri]
@@ -334,7 +335,7 @@ function gadget:GameFrame(n)
 						local buildSpeed = spGetUnitRulesParam(unitID, "buildSpeed") or UnitDefs[unitDefID].buildSpeed
 						spending[pri] = spending[pri] + buildSpeed
 						
-						if debugMode then
+						if debugMode and debugOnUnits then
 							GG.UnitEcho(unitID, "Priority: " .. pri ..
 								", BP: " .. buildSpeed
 							)
@@ -343,17 +344,17 @@ function gadget:GameFrame(n)
 				end 
 			end
 			
-			for unitID, miscDatas in pairs(miscResourceDrain) do --add misc priority spending
+			for unitID, miscData in pairs(miscResourceDrain) do --add misc priority spending
 				local unitDefID = spGetUnitDefID(unitID)
 				local pri = miscPrioUnits[unitID]
 				if unitDefID ~= nil and pri then
-					for index, drain in pairs(miscDatas) do
+					for index, drain in pairs(miscData) do
 						if MiscUnitOnlyEnergy[unitID][index] then
 							energySpending[pri] = energySpending[pri] + drain
 							if scaleEnergy and scaleEnergy[pri] then
 								realEnergyOnlyPull = realEnergyOnlyPull + drain*scaleEnergy[pri]
 								
-								if debugMode then
+								if debugMode and debugOnUnits then
 									GG.UnitEcho(unitID, "Misc Energy Priority " .. index .. ": " ..  pri ..
 										", BP: " .. drain .. 
 										", Pull: " .. realEnergyOnlyPull + drain*scaleEnergy[pri]
@@ -362,7 +363,7 @@ function gadget:GameFrame(n)
 							end
 						else
 							spending[pri] = spending[pri] + drain
-							if debugMode then
+							if debugMode and debugOnUnits then
 								GG.UnitEcho(unitID, "Misc Priority " .. index .. ": " ..  pri ..
 									", BP: " .. drain
 								)

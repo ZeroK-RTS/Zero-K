@@ -32,6 +32,8 @@ unitDef = {
     
     morphto = [[corjamt]],
     morphtime = 30,
+	
+	priority_misc = 2, -- High
   },
 
   explodeAs              = [[BIG_UNITEX]],

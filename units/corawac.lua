@@ -37,6 +37,7 @@ unitDef = {
 	helptext_pl    = [[Vulture jest niedorownany w szybkim zwiadzie; oprocz radaru posiada takze sonar do wykrywania celow podwodnych oraz pasywny zaklocacz radaru.]],
 	modelradius    = [[20]],
 	specialreloadtime = [[600]],
+	priority_misc = 2, -- High
   },
 
   energyUse           = 1.5,

@@ -57,33 +57,54 @@ local CMD_WAIT = CMD.WAIT
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
-local ableToForceOff = {
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Sensor Handling
+
+local hasSensorOrJamm = {
 	[ UnitDefNames['armarad'].id ] = true,
 	[ UnitDefNames['spherecloaker'].id ] = true,
 	[ UnitDefNames['armjamt'].id ] = true,
 	[ UnitDefNames['armsonar'].id ] = true,
 	[ UnitDefNames['corrad'].id ] = true,
 	[ UnitDefNames['corawac'].id ] = true,
+	[ UnitDefNames['reef'].id ] = true,
 }
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+local radarUnitDef = {}
+local sonarUnitDef = {}
+local jammerUnitDef = {}
 
-local origUnitSpeed = {}
-local origUnitReload = {}
+for unitDefID,_ in pairs(hasSensorOrJamm) do
+	local ud = UnitDefs[unitDefID]
+	if ud.radarRadius > 0 then
+		radarUnitDef[unitDefID] = ud.radarRadius
+	end
+	if ud.sonarRadius > 0 then
+		sonarUnitDef[unitDefID] = ud.sonarRadius
+	end
+	if ud.jammerRadius > 0 then
+		jammerUnitDef[unitDefID] = ud.jammerRadius
+	end
+end
+
+local function UpdateSensorAndJamm(unitID, unitDefID, enabled)
+	if radarUnitDef[unitDefID] then 
+		Spring.SetUnitSensorRadius(unitID, "radar", (enabled and radarUnitDef[unitDefID]) or 0)
+	end
+	if sonarUnitDef[unitDefID] then 
+		Spring.SetUnitSensorRadius(unitID, "sonar", (enabled and sonarUnitDef[unitDefID]) or 0)
+	end
+	if jammerUnitDef[unitDefID] then 
+		Spring.SetUnitSensorRadius(unitID, "radarJammer", (enabled and jammerUnitDef[unitDefID]) or 0)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Build Speed Handling
+
 local origUnitBuildSpeed = {}
-
-local currentEcon = {}
-local currentReload = {}
-local currentMovement = {}
-local currentTurn = {}
-local currentAcc = {}
-
-local unitForcedOff = {}
-local unitSlowed = {}
-local unitShieldDisabled = {}
-
-local unitReloadPaused = {}
 
 local function updateBuildSpeed(unitID, ud, speedFactor)	
 
@@ -112,9 +133,20 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
     
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Economy Handling
+
 local function updateEconomy(unitID, ud, factor)	
 	spSetUnitRulesParam(unitID,"resourceGenerationFactor", factor, INLOS_ACCESS)
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Reload Time Handling
+
+local origUnitReload = {}
+local unitReloadPaused = {}
 
 local function updatePausedReload(unitID, unitDefID, gameFrame)
 	local state = origUnitReload[unitDefID]
@@ -195,6 +227,12 @@ local function updateReloadSpeed(unitID, ud, speedFactor, gameFrame)
 	end
 	
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Movement Speed Handling
+
+local origUnitSpeed = {}
 
 local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, maxAccelerationFactor)	
 	local unitDefID = ud.id
@@ -298,10 +336,22 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 	
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- UnitRulesParam Handling
+
+local currentEcon = {}
+local currentReload = {}
+local currentMovement = {}
+local currentTurn = {}
+local currentAcc = {}
+
+local unitSlowed = {}
+local unitAbilityDisabled = {}
+
 local function removeUnit(unitID)
-	unitForcedOff[unitID] = nil
 	unitSlowed[unitID] = nil
-	unitShieldDisabled[unitID] = nil
+	unitAbilityDisabled[unitID] = nil
 	unitReloadPaused[unitID] = nil
 	
 	currentEcon[unitID] = nil 
@@ -378,34 +428,28 @@ function UpdateUnitAttributes(unitID, frame)
 	else
 		unitSlowed[unitID] = nil
 	end
-		
-	local forcedOff = spGetUnitRulesParam(unitID,"forcedOff")
 	
-	if ud.shieldWeaponDef then
-		if forcedOff == 1 or disarmed == 1 or morphDisable == 1 then
+	local forcedOff = spGetUnitRulesParam(unitID,"forcedOff")
+	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or morphDisable == 1)
+	local setNewState
+	
+	if abilityDisabled ~= unitAbilityDisabled[unitID] then
+		spSetUnitRulesParam(unitID, "att_abilityDisabled", abilityDisabled and 1 or 0)
+		unitAbilityDisabled[unitID] = abilityDisabled
+		setNewState = true
+	end
+	
+	if ud.shieldWeaponDef and setNewState then
+		if abilityDisabled then
 			Spring.SetUnitShieldState(unitID, -1, false)
-			unitShieldDisabled[unitID] = true
-		elseif unitShieldDisabled[unitID] then
+		else
 			Spring.SetUnitShieldState(unitID, -1, true)
-			unitShieldDisabled[unitID] = nil
 		end
 	end
 	
-	if ableToForceOff[udid] then
-		if forcedOff == 1 or disarmed == 1 or morphDisable == 1 then
-			changedAtt = true
-			if not unitForcedOff[unitID] then
-				local active = Spring.GetUnitStates(unitID).active
-				if active then	-- only disable "active" unit
-					Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { 0 }, { })
-				end
-				unitForcedOff[unitID] = (active and 1) or 0
-			end
-		elseif unitForcedOff[unitID] then
-			local oldVal = unitForcedOff[unitID]
-			unitForcedOff[unitID] = nil
-			Spring.GiveOrderToUnit(unitID, CMD.ONOFF, { oldVal }, { })
-		end
+	if setNewState then
+		changedAtt = true
+		UpdateSensorAndJamm(unitID, udid, not abilityDisabled)
 	end
 
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (morphDisable == 1)
@@ -444,7 +488,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (cmdID == CMD.ONOFF and unitForcedOff[unitID] ~= nil) or (cmdID == 70 and unitSlowed[unitID]) then
+	if (cmdID == 70 and unitSlowed[unitID]) then
 		return false
 	else 
 		return true

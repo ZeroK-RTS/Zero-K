@@ -32,6 +32,7 @@ unitDef = {
 	modelradius    = [[15]],
 	stockpiletime  = [[90]],
 	stockpilecost  = [[500]],
+	priority_misc  = 1, -- Medium
   },
 
   explodeAs              = [[BIG_UNITEX]],

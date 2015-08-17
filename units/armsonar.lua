@@ -45,6 +45,7 @@ unitDef = {
     helptext_pl    = [[Sonar jest odpowiednikiem radaru dzialajacym pod woda. Jest niezbedny do wykrywania (a zatem i niszczenia) okretow podwodnych i amfibii nieprzyjaciela.]],
     modelradius    = [[16]],
 	removewait     = 1,
+	priority_misc  = 2, -- High
   },
 
   featureDefs       = {
