@@ -215,7 +215,7 @@ local function ProcessCommand(unitID, command)
 		local metalCurrent,metalStorage,_,metalIncome,metalExpense = spGetTeamResources(myTeam, "metal")
 		local energyCurrent,energyStorage,_,energyIncome = spGetTeamResources(myTeam, "energy")
 		energyStorage = energyStorage - OD_BUFFER
-		if (energyIncome/metalIncome > ENERGY_TO_METAL_RATIO) and (energyCurrent/energyStorage > 0.2) then
+		if (energyIncome/metalIncome > ENERGY_TO_METAL_RATIO) and (energyCurrent/energyStorage > 0.9) then
 			MakeTip(unitID, "energy_excess")
 			return
 		end
