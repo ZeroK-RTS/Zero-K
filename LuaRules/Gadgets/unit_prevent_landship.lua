@@ -87,7 +87,6 @@ local function UpdateShip(data)
 	end
 	
 	if data.moveDisable then
-		GG.UnitEcho(unitID)
 		data.moveDisable = false
 		Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1, ALLY_ACCESS)
 		GG.UpdateUnitAttributes(unitID)
