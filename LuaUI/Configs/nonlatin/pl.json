@@ -800,7 +800,7 @@
     "corawac": {
         "description": "Samolot zwiadowczy",
         "name": "Vulture",
-        "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar."
+        "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
     },
     "chicken": {
         "description": "Wojownik",
@@ -870,7 +870,7 @@
     "zenith": {
         "description": "Kontroler meteorytów",
         "name": "Zenith",
-        "helptext": "Zenith przyciąga z orbity w dowolne miejsce meteory, które niszczą trafione obiekty i z których można odzyskać metal."
+        "helptext": "Zenith przyciąga z orbity meteory i gromadzi je (maksymalnie 500). Może je wysłać w dowolne miejsce na mapie; zadają ogromne obrażenia i można odzyskać z nich metal."
     },
     "wolverine_mine": {
         "description": "Mina",
