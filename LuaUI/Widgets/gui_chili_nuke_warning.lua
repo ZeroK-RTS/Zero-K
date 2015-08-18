@@ -82,6 +82,7 @@ local function CreateWindow()
 		y = resourcePanelHeight,
 		clientWidth  = windowWidth,
 		clientHeight = 50,
+		dockable = false,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
