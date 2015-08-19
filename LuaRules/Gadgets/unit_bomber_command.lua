@@ -72,6 +72,7 @@ for i=1,#UnitDefs do
 	local movetype = Spring.Utilities.getMovetype(unitDef)
 	if (movetype == 1 or movetype == 0) and (not Spring.Utilities.tobool(unitDef.customParams.cantuseairpads)) then
 		bomberDefs[i] = {
+			builder   = unitDef.isBuilder,
 			fixedwing = (movetype == 0),
 			padRadius = ((movetype == 0) and fixedwingPadRadius) or gunshipPadRadius
 		}
@@ -677,7 +678,7 @@ function gadget:DefaultCommand(type, targetID)
 		for i = 1, #selUnits do
 			unitID    = selUnits[i]
 			unitDefID = spGetUnitDefID(unitID)
-			if bomberDefs[unitDefID] then
+			if bomberDefs[unitDefID] and not bomberDefs[unitDefID].builder then
 				return CMD_REARM
 			end
 		end
