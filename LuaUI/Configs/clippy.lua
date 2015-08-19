@@ -39,7 +39,7 @@ tips = {
 	factory_duplicate = {str = {"We already have one of\nthat factory. Remember you can\nassist it with constructors."}, life = 9, cooldown = 60},
 	factory_multiple = {str = {"Sir, we might not need another\nfactory so soon. You can assist your\nfirst factory with constructors."}, life = 10, cooldown = 60, verbosity = 2},
 	
-	defense_excess = {str = {"Boss, we have plenty of defence.\nMight want to mobile units instead.",
+	defense_excess = {str = {"Boss, we have plenty of defence.\nMight want some mobile units instead.",
 				"Chief, we should build mobile\nunits instead. We already\nhave plenty of defence."}, life = 9, cooldown = 20}
 }
 
