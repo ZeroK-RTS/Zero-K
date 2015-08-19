@@ -35,6 +35,7 @@ unitDef = {
     helptext_pl    = [[Radar jest tanim systemem wczesnego ostrzegania - wykrywa obecnosc wrogich jednostek na duzym obszarze. Utrzymanie skanowania wiaze sie z minimalnym kosztem w energii - braki powoduja przerwanie dzialania. Radar jest blokowany przez rzezbe terenu, na przyklad gory.]],
     modelradius    = [[16]],
 	removewait     = 1,
+	priority_misc  = 2, -- High
   },    
   
   energyUse                     = 0.8,

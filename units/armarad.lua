@@ -28,7 +28,7 @@ unitDef = {
     helptext_pl    = [[Ten radar ma zdecydowanie wiekszy zasieg niz podstawowa wersja. Ponadto, kazdy taki budynek zwieksza dokladnosc namiaru wszystkich wlasnych i sprzymierzonych radarow.]],
     modelradius    = [[16]],
 	removewait     = 1,
-	priority_misc = 2, -- High
+	priority_misc  = 2, -- High
   },
 
   energyUse                     = 3,
