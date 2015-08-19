@@ -197,7 +197,36 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,
   return true, true  -- command was used, remove it
 end
 
-local function AllowMiscBuildStep(unitID, teamID, onlyEnergy)
+-- Misc Priority tasks can get their reduced build rate directly.
+-- The external gadget is then trusted to obey the proportion which
+-- they are allocated.
+local function GetMiscPrioritySpendScale(unitID, teamID, onlyEnergy)
+
+	if (teamMiscPriorityUnits[teamID] == nil) then 
+		teamMiscPriorityUnits[teamID] = {} 
+	end
+	
+	local scale
+	if onlyEnergy then
+		scale = TeamScaleEnergy[teamID]
+	else
+		scale = TeamScale[teamID]
+	end
+	
+	local priorityLevel = (UnitMiscPriority[unitID] or 1) + 1
+
+	teamMiscPriorityUnits[teamID][unitID] = priorityLevel
+	
+	if scale and scale[priorityLevel] then 
+		return scale[priorityLevel]
+	end
+	
+	return 1 -- Units have full spending if they do not know otherwise.
+end
+
+-- This is the other way that Misc Priority tasks can build at the correct rate.
+-- It is quite like AllowUnitBuildStep.
+local function AllowMiscPriorityBuildStep(unitID, teamID, onlyEnergy)
 
 	local conAmount = UnitMiscPortion[unitID] or math.random()
 
@@ -227,10 +256,6 @@ local function AllowMiscBuildStep(unitID, teamID, onlyEnergy)
 	end 
 	
 	return true
-end
-
-function CheckMiscPriorityBuildStep(unitID, teamID, toSpend)
-	return AllowMiscBuildStep(unitID,teamID)
 end
 
 function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step) 
@@ -617,7 +642,9 @@ end
 -- Unit Handling
 
 function gadget:Initialize()
-	GG.CheckMiscPriorityBuildStep  = CheckMiscPriorityBuildStep
+	GG.AllowMiscPriorityBuildStep  = AllowMiscPriorityBuildStep
+	GG.GetMiscPrioritySpendScale   = GetMiscPrioritySpendScale
+	
 	GG.AddMiscPriorityUnit         = AddMiscPriorityUnit
 	GG.StartMiscPriorityResourcing = StartMiscPriorityResourcing
 	GG.StopMiscPriorityResourcing  = StopMiscPriorityResourcing

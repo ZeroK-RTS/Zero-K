@@ -111,7 +111,7 @@ function gadget:GameFrame(n)
 			end
 
 			-- Check if the change can be carried out
-			if (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, data.resTable.e, true) and spUseUnitResource(unitID, data.resTable)) then
+			if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true) and spUseUnitResource(unitID, data.resTable)) then
 				spSetUnitShieldState(unitID, -1, charge + chargeAdd)
 			end
 		else

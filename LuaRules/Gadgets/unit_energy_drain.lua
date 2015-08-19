@@ -25,7 +25,7 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local PERIOD = 10
+local PERIOD = 30
 
 local INLOS_ACCESS = {inlos = true}
 
@@ -97,7 +97,7 @@ local function GetUnitUpkeep(unitID, def)
 end
 
 function gadget:GameFrame(n)
-	if n%PERIOD ~= 0 then
+	if n%PERIOD ~= 1 then
 		return
 	end
 
@@ -125,7 +125,7 @@ function gadget:GameFrame(n)
 			end
 
 			-- Check drain
-			local enabled = (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, data.resTable.e, true) and spUseUnitResource(unitID, data.resTable))
+			local enabled = (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true) and spUseUnitResource(unitID, data.resTable))
 			
 			if enabled ~= data.oldEnabled then
 				spSetUnitRulesParam(unitID, "forcedOff", (enabled and 0) or 1, INLOS_ACCESS)

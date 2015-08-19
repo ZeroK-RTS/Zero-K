@@ -47,7 +47,7 @@ for i=1,#UnitDefs do
 			stockUpdates = stockTime/PERIOD,
 			stockCost = stockCost,
 			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
-			perUpdateCost = PERIOD*stockCost/stockTime,
+			perUpdateCost = PERIOD * stockCost/stockTime,
 		}
 	end
 end
@@ -76,12 +76,17 @@ function gadget:GameFrame(n)
 					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
 				end
 				data.stockSpeed = newStockSpeed
+			end
+
+			if (def.stockCost > 0) then
+				local scale = GG.GetMiscPrioritySpendScale(unitID, data.teamID)
+				newStockSpeed = newStockSpeed*scale
 				data.resTable.m = def.perUpdateCost*newStockSpeed
 				data.resTable.e = data.resTable.m
 			end
-
-			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, data.resTable.m) and spUseUnitResource(unitID, data.resTable)) then
-				data.progress = data.progress - data.stockSpeed
+			
+			if (def.stockCost == 0) or spUseUnitResource(unitID, data.resTable) then
+				data.progress = data.progress - newStockSpeed
 				if data.progress <= 0 then
 					spSetUnitStockpile(unitID, stocked + 1)
 					data.progress = def.stockUpdates

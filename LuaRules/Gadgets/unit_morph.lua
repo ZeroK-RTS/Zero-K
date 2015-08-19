@@ -744,7 +744,7 @@ local function UpdateMorph(unitID, morphData)
   if Spring.GetUnitTransporter(unitID) then return true end
   
   if (morphData.progress < 1.0) then
-	  local allow = GG.CheckMiscPriorityBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
+	  local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
 	  if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
 		morphData.progress = morphData.progress + morphData.increment
 	  end
