@@ -28,7 +28,7 @@ options_order = {'enable'}
 options = {
 	enable ={	
 		name = "Text-To-Speech (with Zero-K lobby only)", 
-		type = 'bool', value = true, 
+		type = 'bool', value = false, 
 		OnChange = function(self)
 			SetupTTS(self.value)
 			WG.textToSpeechCtrl = {ttsEnable = self.value,}
