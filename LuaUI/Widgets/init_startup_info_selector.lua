@@ -173,7 +173,6 @@ local function CreateWindow()
 			OnClick = {function()
 				local prefix = option.trainer and "faction:" or "customcomm:"
 				Spring.SendLuaRulesMsg(prefix..option.name)
-				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
 				Close(true)
 			end},
 			trainer = option.trainer,
