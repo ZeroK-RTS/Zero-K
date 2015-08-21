@@ -78,8 +78,8 @@ local function UpdateShip(data)
 					data.moveDisable = true
 					Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0, ALLY_ACCESS)
 					GG.UpdateUnitAttributes(unitID)
-					GG.DetatchFromGround(unitID, 1, 0.25, 0.005*GRAVITY)
-					GG.AddGadgetImpulseRaw(unitID, 0, 0.01, 0, true, true)
+					GG.DetatchFromGround(unitID, 1, 0.25, 0.0002*GRAVITY)
+					GG.AddGadgetImpulseRaw(unitID, 0, 0.001, 0, true, true)
 				end
 			end
 			return
