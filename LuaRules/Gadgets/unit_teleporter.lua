@@ -671,7 +671,7 @@ local function DrawWire(spec)
 		local bid = beacons[i]
 		local tid = Spring.GetUnitRulesParam(bid, "connectto")
 
-		if (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
+		if tid and (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
 			local point = {nil, nil, nil, nil}
 			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
 			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
