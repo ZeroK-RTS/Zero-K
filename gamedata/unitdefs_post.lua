@@ -278,8 +278,9 @@ end
 --
 
 for name, ud in pairs(UnitDefs) do
-	if (ud.energyuse or 0) > 0 then
-		ud.customparams.upkeep_energy = ud.energyuse
+	local energyUse = tonumber(ud.energyuse or 0)
+	if energyUse and (energyUse > 0) then
+		ud.customparams.upkeep_energy = energyUse
 		ud.energyuse = 0
 	end
 end
