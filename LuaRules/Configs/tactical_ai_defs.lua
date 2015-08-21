@@ -861,7 +861,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 	},
-	["subraider"] = {
+	["subarty"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
