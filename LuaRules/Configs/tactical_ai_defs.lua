@@ -888,7 +888,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
+		skirmLeeway = 20, 
 	},	
 	["shieldarty"] = {
 		skirms = Union(artyRangeSkirmieeArray, skirmableAir),

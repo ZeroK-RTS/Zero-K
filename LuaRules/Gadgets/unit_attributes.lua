@@ -381,6 +381,7 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	local disarmed = spGetUnitRulesParam(unitID,"disarmed") or 0
 	local morphDisable = spGetUnitRulesParam(unitID,"morphDisable") or 0
+	local crashing = spGetUnitRulesParam(unitID,"crashing") or 0
 	
 	-- Unit speed change (like sprint) --
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
@@ -429,7 +430,7 @@ function UpdateUnitAttributes(unitID, frame)
 	end
 	
 	local forcedOff = spGetUnitRulesParam(unitID,"forcedOff")
-	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or morphDisable == 1)
+	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or morphDisable == 1 or crashing == 1)
 	local setNewState
 	
 	if abilityDisabled ~= unitAbilityDisabled[unitID] then

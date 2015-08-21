@@ -34,6 +34,7 @@ function gadget:Initialize()
 	end
 end
 
+local LOS_ACCESS = {inlos = true}
 local DAMAGE_MEMORY = 60	-- gameframes
 
 
@@ -74,10 +75,11 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		if severity < 0.5 then
 			Spring.SetUnitCrashing(unitID, true)
 			Spring.SetUnitNoSelect(unitID, true)
-			-- note that we let the unit keep its airlos
 			Spring.SetUnitSensorRadius(unitID, "los", 0)
-			Spring.SetUnitSensorRadius(unitID, "radar", 0)
-			Spring.SetUnitSensorRadius(unitID, "sonar", 0)
+			Spring.SetUnitSensorRadius(unitID, "airLos", 0)
+			Spring.SetUnitRulesParam(unitID, "crashing", 1, LOS_ACCESS)
+			GG.UpdateUnitAttributes(unitID)
+			-- note that we let the unit keep its airlos
 			if GG.AircraftCrashingDown then
 				GG.AircraftCrashingDown(unitID) --send event to unit_bomber_command.lua to cancel any airpad reservation hold by this airplane
 			end

@@ -67,7 +67,7 @@ local modrules  = {
     los = {
       losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
-      airMipLevel = 3,  -- defaults to 2
+      airMipLevel = 2,  -- defaults to 2
       airMul      = 1,  -- defaults to 1
     },
   },

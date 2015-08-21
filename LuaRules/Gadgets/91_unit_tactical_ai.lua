@@ -304,13 +304,16 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 	--local pointDis = spGetUnitSeparation (enemy,unitID,true)
 	
 	local vx,vy,vz = spGetUnitVelocity(enemy)
-	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
+	local ex,ey,ez,_,aimY = spGetUnitPosition(enemy, false, true) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
 	local cx,cy,cz -- command position	
 
 	if not (ex and vx) then
 		return behaviour.skirmKeepOrder
 	end	
+
+	-- Use aim position as enemy position
+	ey = aimY or ey
 	
 	-- The e vector is relative to unit position
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
@@ -332,7 +335,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
 	end
-	local skirmRange = GetEffectiveWeaponRange(data.udID,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) - behaviour.skirmLeeway
+	local skirmRange = GetEffectiveWeaponRange(data.udID, -(ey+vy*behaviour.velocityPrediction), behaviour.weaponNum) - behaviour.skirmLeeway
 
 	if skirmRange > predictedDist then
 	
