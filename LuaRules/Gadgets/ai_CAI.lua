@@ -453,7 +453,7 @@ local function nearRadar(team,tx,tz,distance)
 	
 	for unitID,_ in pairs(unitArray) do
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 	end
@@ -468,7 +468,7 @@ local function nearFactory(team,tx,tz,distance)
 	for unitID, data in pairs(unitArray) do
 		--mapEcho(unitID,"factroyChecked")
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 		if disSQ(data.wayX,data.wayZ,tx,tz) < (distance*1.5)^2 then
@@ -484,7 +484,7 @@ local function nearEcon(team,tx,tz,distance)
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.econByID
 	for unitID,_ in pairs(unitArray) do
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 	end
