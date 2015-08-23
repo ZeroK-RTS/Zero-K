@@ -246,6 +246,12 @@ local function ProcessCommand(unitID, command)
 		end
 		MakeTip(unitID, "superweapon")
 		return
+	elseif hyperweapons[-command] and TIMER_HYPERWEAPON > gameframe/30 then
+		if tips.superweapon.lastUsed > gameframe - tips.superweapon.cooldown*30 then
+			return
+		end
+		MakeTip(unitID, "superweapon")
+		return
 	elseif expensive_units[-command] and options.warnExpensiveUnits.value and TIMER_EXPENSIVE_UNITS > gameframe/30 then
 		if tips.expensive_unit.lastUsed > gameframe - tips.expensive_unit.cooldown*30 then
 			return

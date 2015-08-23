@@ -13,8 +13,9 @@ DELAY_BETWEEN_FACS = 5*60*30	-- gameframes
 
 --seconds
 TIMER_EXPENSIVE_UNITS = 60 * 10
-TIMER_ADV_FACTORY = 60 * 8
-TIMER_SUPERWEAPON = 60 * 20
+TIMER_ADV_FACTORY = 60 * 6
+TIMER_SUPERWEAPON = 60 * 10
+TIMER_HYPERWEAPON = 60 * 20
 
 tips = {
 	nano_excess = {str = {"We already have plenty of\nCaretakers. We should get more\nresources before building more."}, life = 9, cooldown = 20},
@@ -50,9 +51,12 @@ end
 local superweaponDefs = {
 	"armbrtha",
 	"corsilo",
+}
+local hyperweaponDefs = {
 	"mahlazer",
 	"zenith",
 	"raveparty",
+	"armorco",
 }
 local canRetreatDefs = {
 	"armbrawl",
@@ -120,6 +124,7 @@ end
 --unitDefID-indexed tables
 expensive_units = {}
 superweapons = {}
+hyperweapons = {}
 commanders = {}
 factories = {}
 adv_factories = {}
@@ -141,6 +146,7 @@ local function CreateArray(source, target)
 end
 
 CreateArray(superweaponDefs, superweapons)
+CreateArray(hyperweaponDefs, hyperweapons)
 CreateArray(canRetreatDefs, canRetreat)
 CreateArray(energyDefs, energy)
 CreateArray(defenseDefs, defenses)
