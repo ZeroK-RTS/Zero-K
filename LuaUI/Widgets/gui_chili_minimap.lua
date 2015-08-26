@@ -435,7 +435,7 @@ options = {
 	leftClickOnMinimap = {
 		name = 'Left Click Behaviour',
 		type = 'radioButton',
-		value = 'camera',
+		value = 'unitselection',
 		items={
 			{key='unitselection', name='Unit Selection'},
 			{key='situational', name='Context Dependant'},

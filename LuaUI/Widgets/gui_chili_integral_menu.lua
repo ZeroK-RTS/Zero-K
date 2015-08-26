@@ -112,7 +112,7 @@ options = {
 	unitshotkeyrequiremeta = {
 		name = 'Units tab hotkeys require Meta',
 		type = 'bool',
-		value = false,
+		value = true,
 	},
 	unitshotkeyaltaswell = {
 		name = 'Units tab can use Alt as Meta',
