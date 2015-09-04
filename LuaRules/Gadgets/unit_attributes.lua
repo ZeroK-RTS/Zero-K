@@ -386,14 +386,15 @@ function UpdateUnitAttributes(unitID, frame)
 	-- Unit speed change (like sprint) --
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
+	local selfIncomeChange = spGetUnitRulesParam(unitID, "selfIncomeChange")
 	local selfMaxAccelerationChange = spGetUnitRulesParam(unitID, "selfMaxAccelerationChange") --only exist in airplane??
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or disarmed or morphDisable or selfAccelerationChange then
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
 		local slowMult   = 1-(slowState or 0)
-		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)
+		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
 		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
