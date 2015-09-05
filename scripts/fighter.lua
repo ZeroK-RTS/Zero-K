@@ -45,7 +45,6 @@ function SprintThread()
 		Sleep(33)
 	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
 	GG.UpdateUnitAttributes(unitID)
 	
@@ -58,8 +57,7 @@ function Sprint()
 	Turn(lwing, y_axis, math.rad(-65), math.rad(300))
 
 	StartThread(SprintThread)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)	
-	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", BOOSTUP_FACTOR)	
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
 	GG.UpdateUnitAttributes(unitID)
 end

@@ -41,7 +41,6 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 		local tudid = Spring.GetUnitDefID(transportID)
 		Spring.SetUnitRulesParam(transportID, "effectiveMass", mass[tudid])
 		Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
-		Spring.SetUnitRulesParam(transportID, "selfMaxAccelerationChange", 1)
 		GG.UpdateUnitAttributes(transportID)
 	end
 end
@@ -54,7 +53,6 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 			local speedFactor = math.min(1, 3 * mass[tudid]/(effectiveMass))
 			Spring.SetUnitRulesParam(transportID, "effectiveMass", effectiveMass)
 			Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", speedFactor)
-			Spring.SetUnitRulesParam(transportID, "selfMaxAccelerationChange", speedFactor)
 			GG.UpdateUnitAttributes(transportID)
 			
 			inTransport[unitID] = transportID
@@ -69,7 +67,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			local tudid = Spring.GetUnitDefID(transportID)
 			Spring.SetUnitRulesParam(transportID, "effectiveMass", mass[tudid])
 			Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
-			Spring.SetUnitRulesParam(transportID, "selfMaxAccelerationChange", 1)
 			GG.UpdateUnitAttributes(transportID)
 		end
 		inTransport[unitID] = nil
