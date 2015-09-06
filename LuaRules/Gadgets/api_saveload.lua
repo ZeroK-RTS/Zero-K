@@ -215,20 +215,20 @@ local function LoadUnits()
 					spSetUnitShieldState(newID, i, data.shield[i].enabled, data.shield[i].power)
 				end
 			end
-			spSetUnitStockpile(newID, data.stockpile.num, data.stockpile.progress)
+			spSetUnitStockpile(newID, data.stockpile.num or 0, data.stockpile.progress or 0)
 			
 			-- states
-			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate}, {})
-			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate}, {})
-			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
-			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
-			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
-			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
-			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
+			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate or 2}, {})
+			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate or 1}, {})
+			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"] or 0)}, {})
+			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak or 0)}, {})
+			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active) or 1}, {})
+			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory) or 0}, {})
+			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel) or 1}, {})
 			
 			
 			-- is neutral
-			spSetUnitNeutral(newID, data.neutral)
+			spSetUnitNeutral(newID, data.neutral or false)
 			
 			Spring.Echo("unitID check", oldID, newID)
 		end
@@ -702,9 +702,8 @@ local function SaveUnits()
 		local unitDefID = spGetUnitDefID(unitID)
 		local unitDef = UnitDefs[unitDefID]
 		unitInfo.unitDefName = unitDef.name
-		local unitTeam = spGetUnitTeam(unitID)
-		unitInfo.unitTeam = unitTeam
-		local neutral = spGetUnitNeutral(unitID)
+		unitInfo.unitTeam = spGetUnitTeam(unitID)
+		unitInfo.neutral = spGetUnitNeutral(unitID)
 		-- save position/velocity
 		unitInfo.pos = {spGetUnitBasePosition(unitID)}
 		unitInfo.dir = {spGetUnitDirection(unitID)}
