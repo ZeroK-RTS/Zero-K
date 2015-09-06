@@ -2372,7 +2372,7 @@ local function MakeQuitButtons()
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
-				spSendCommands{"spectator","quit","quitforce"} 
+				spSendCommands{"quit","quitforce"} 
 			end)
 		end,
 		key='Exit to Desktop',
