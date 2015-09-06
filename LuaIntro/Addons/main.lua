@@ -13,6 +13,7 @@ if addon.InGetInfo then
 end
 
 ------------------------------------------
+local BAR_SCALING = 0.85
 
 local lastLoadMessage = ""
 local lastProgress = {0, 0}
@@ -71,6 +72,11 @@ function addon.DrawLoadScreen()
 	local vbw = 3.5/vsy
 	local hsw = 0.2
 	local vsw = 0.2
+	
+	gl.PushMatrix()
+	gl.Scale(BAR_SCALING,BAR_SCALING,1)
+	gl.Translate(-0.1,0,0)
+	
 	gl.BeginEnd(GL.QUADS, function()
 		--shadow topleft
 		gl.Color(0,0,0,0)
@@ -206,6 +212,8 @@ function addon.DrawLoadScreen()
 	else
 		font:Print("Loading...", vsx * 0.5, vsy * 0.165, barTextSize, "oc")
 	end
+	gl.PopMatrix()
+	
 	gl.PopMatrix()
 end
 
