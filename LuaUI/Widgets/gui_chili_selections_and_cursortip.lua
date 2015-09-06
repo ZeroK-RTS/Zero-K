@@ -597,7 +597,7 @@ local function GetZenithTooltip(unitID)
 	end
 	meteorsControlled = meteorsControlled
 
-	return "Meteor Controller - Controls " .. meteorsControlled .. " meteors"
+	return "Meteor Controller - Controls " .. meteorsControlled .. " meteors" .. ((meteorsControlled == 500) and " (max)" or "")
 end
 
 local function GetTerraformTooltip(unitID)
