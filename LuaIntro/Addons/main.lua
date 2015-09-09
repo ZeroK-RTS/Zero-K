@@ -13,7 +13,9 @@ if addon.InGetInfo then
 end
 
 ------------------------------------------
-local BAR_SCALING = 0.85
+local BAR_SCALING = 0.72
+local X_OFFSET = -0.19
+local Y_OFFSET = -0.04
 
 local lastLoadMessage = ""
 local lastProgress = {0, 0}
@@ -75,7 +77,7 @@ function addon.DrawLoadScreen()
 	
 	gl.PushMatrix()
 	gl.Scale(BAR_SCALING,BAR_SCALING,1)
-	gl.Translate(-0.1,0,0)
+	gl.Translate(X_OFFSET,Y_OFFSET,0)
 	
 	gl.BeginEnd(GL.QUADS, function()
 		--shadow topleft
