@@ -305,6 +305,8 @@ local function ShowConvoBoxNoChili(data)
   end
   if data.sound then
     Spring.PlaySoundFile(data.sound, 1, 'ui')
+  else
+    Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
   end
   convoExpireFrame = Spring.GetGameFrame() + (data.time or 150)
 end
@@ -359,6 +361,8 @@ local function ShowConvoBoxChili(data)
   
   if data.sound then
     Spring.PlaySoundFile(data.sound, 1, 'ui')
+  else
+    Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
   end
   
   convoExpireFrame = Spring.GetGameFrame() + (data.time or 150)
@@ -521,7 +525,7 @@ function widget:Initialize()
   
   -- testing
   --[[
-  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"Â—yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
   local str2 = 'Enemy nuclear silo spotted!'
   
   WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
