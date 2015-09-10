@@ -82,6 +82,7 @@ unitDef = {
       beamTime                = 0.01,
       burst                   = 80,
       burstRate               = 0.3,
+	  cameraShake             = 150,
       canattackground         = false,
       collideFriendly         = false,
       coreThickness           = 0.6,

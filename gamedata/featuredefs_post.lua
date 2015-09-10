@@ -28,11 +28,15 @@ local mapReclaimMult  = 1
 
 -- scale energy/reclaimtime of map's features
 for name, fd in pairs(FeatureDefs) do
-  if (type(fd.customparams)~="table") or not(fd.customparams.mod) then
-    if tonumber(fd.energy) then fd.energy = fd.energy * mapEnergyMult end
-    if tonumber(fd.metal) then fd.metal = fd.metal * mapMetalMult end
-    fd.reclaimtime = math.max(fd.energy or 0, fd.metal or 0)
-  end
+	if (type(fd.customparams)~="table") or not(fd.customparams.mod) then
+		if tonumber(fd.energy) then 
+			fd.energy = fd.energy * mapEnergyMult 
+		end
+		if tonumber(fd.metal) then 
+			fd.metal = fd.metal * mapMetalMult 
+		end
+		fd.reclaimtime = math.max(fd.energy or 0, fd.metal or 0)
+	end
 end
 
 --------------------------------------------------------------------------------

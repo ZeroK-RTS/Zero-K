@@ -163,7 +163,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)	
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25, false) --leave troubleVsFast to false so far. Needs testing.
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 440.5, 25)
 end
 
 function script.Create()

@@ -35,6 +35,7 @@ unitDef = {
     helptext_pl    = [[Najbardziej wielozadaniowy sposrod okretow. Posiada rakiety dalekiego zasiegu i tarcze antyrakietowa, a jego pokład sluzy jako stacja naprawy i dozbrajania samolotow. Ponadto jest w stanie automatycznie produkowac wlasne drony bojowe.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[30]],
+	priority_misc = 2, -- High
   },
 
   energyUse              = 1.5,

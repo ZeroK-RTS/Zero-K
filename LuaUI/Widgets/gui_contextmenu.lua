@@ -396,6 +396,19 @@ local function getDescription(unitDef)
 	
 end	
 
+local function GetShieldRegenDrain(wd)
+	local shieldRegen = wd.shieldPowerRegen
+	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
+		shieldRegen = wd.customParams.shield_rate
+	end
+	
+	local shieldDrain = wd.shieldPowerRegenEnergy
+	if shieldDrain == 0 and wd.customParams and wd.customParams.shield_drain then
+		shieldDrain = wd.customParams.shield_drain
+	end
+	return shieldRegen, shieldDrain
+end
+
 local function weapons2Table(cells, ws, ud)
 	local cells = cells
 	
@@ -423,12 +436,13 @@ local function weapons2Table(cells, ws, ud)
 	cells[#cells+1] = ''
 
 	if wd.isShield then
+		local regen, drain = GetShieldRegenDrain(wd) 
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = wd.shieldPowerRegen .. " HP/s"
+		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
-		cells[#cells+1] = wd.shieldPowerRegenEnergy .. " E/s"
+		cells[#cells+1] = drain .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else
@@ -565,7 +579,7 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = dps_str
 		end
 		
-		local lowerName = wd.name:lower()
+		local lowerName = name:lower()
 		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
 			cells[#cells+1] = ' - Shield damage:'
 			cells[#cells+1] = "300%"
@@ -573,7 +587,12 @@ local function weapons2Table(cells, ws, ud)
 			cells[#cells+1] = ' - Shield damage:'
 			cells[#cells+1] = "150%"
 		end
-		
+
+		if (wd.interceptedByShieldType == 0) then
+			cells[#cells+1] = ' - Ignores shields'
+			cells[#cells+1] = ''
+		end
+
 		if stun_time > 0 then
 			cells[#cells+1] = ' - Stun time:'
 			cells[#cells+1] = color2incolor((damw > 0) and colorCyan or colorDisarm) .. numformat(stun_time,2) .. 's\008'
@@ -1256,7 +1275,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0) + (ud.customParams.income_energy or 0) 
+	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) 
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
@@ -1265,8 +1284,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64) .. " elmo", textColor = color.stats_fg, }
-		-- 64 is to offset the engine multiplier, which is
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*32) .. " elmo", textColor = color.stats_fg, }
+		-- 32 is to offset the engine multiplier, which is
 		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
 	end
 

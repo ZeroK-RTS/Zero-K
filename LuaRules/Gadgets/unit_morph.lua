@@ -30,6 +30,7 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local emptyTable = { } -- for speedups
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -484,19 +485,19 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
   end
 
   SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time)) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+  GG.StartMiscPriorityResourcing(unitID,teamID,(morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	local morphData = morphUnits[unitID]
 	if not morphData then return end
-	GG.StopMiscPriorityResourcing(unitID, morphData.teamID)
+	GG.StopMiscPriorityResourcing(unitID, morphData.teamID, 2)
 	morphData.teamID = newTeamID
-	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time))
+	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time), false, 2)
 end
 
 local function StopMorph(unitID, morphData)
-  GG.StopMiscPriorityResourcing(unitID,morphData.teamID) --is using unit_priority.lua gadget to handle morph priority.
+  GG.StopMiscPriorityResourcing(unitID,morphData.teamID, 2) --is using unit_priority.lua gadget to handle morph priority.
   morphUnits[unitID] = nil
   if not morphData.combatMorph then
     Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
@@ -541,7 +542,7 @@ local function FinishMorph(unitID, morphData)
 
   --// copy health
   local oldHealth,oldMaxHealth,paralyzeDamage,captureProgress,buildProgress = Spring.GetUnitHealth(unitID)
-  
+
   local isBeingBuilt = false
   if buildProgress < 1 then
     isBeingBuilt = true
@@ -611,8 +612,12 @@ local function FinishMorph(unitID, morphData)
   local facplop = Spring.GetUnitRulesParam(unitID, "facplop")  
   --//copy command queue
   local cmds = Spring.GetCommandQueue(unitID, -1)
-  --// copy some state
+
   local states = Spring.GetUnitStates(unitID)
+  states.retreat = Spring.GetUnitRulesParam(unitID, "retreatState") or 0
+  states.buildPrio = Spring.GetUnitRulesParam(unitID, "buildpriority") or 1
+  states.miscPrio = Spring.GetUnitRulesParam(unitID, "miscpriority") or 1
+
   --// copy cloak state
   local wantCloakState = Spring.GetUnitRulesParam(unitID, "wantcloak")
   --// copy shield power
@@ -693,13 +698,17 @@ local function FinishMorph(unitID, morphData)
     Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
   end
   --//transfer some state
+  
   Spring.GiveOrderArrayToUnitArray({ newUnit }, {
-    { CMD.FIRE_STATE, { states.firestate },             { } },
-    { CMD.MOVE_STATE, { states.movestate },             { } },
-    { CMD.REPEAT,     { states["repeat"] and 1 or 0 },  { } },
-    { CMD_WANT_CLOAK, { wantCloakState or 0 },  { } },
-    { CMD.ONOFF,      { 1 },                            { } },
-    { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, { } },
+    { CMD.FIRE_STATE, { states.firestate }, emptyTable },
+    { CMD.MOVE_STATE, { states.movestate }, emptyTable },
+    { CMD.REPEAT,     { states["repeat"] and 1 or 0 }, emptyTable },
+    { CMD_WANT_CLOAK, { wantCloakState or 0 }, emptyTable },
+    { CMD.ONOFF,      { 1 }, emptyTable},
+    { CMD.TRAJECTORY, { states.trajectory and 1 or 0 }, emptyTable },
+    { CMD_PRIORITY, { states.buildPrio }, emptyTable },
+    { CMD_RETREAT, { states.retreat }, states.retreat == 0 and {"right"} or emptyTable },
+    { CMD_MISC_PRIORITY, { states.miscPrio }, emptyTable },
   })
   --//reassign assist commands to new unit
   ReAssignAssists(newUnit,unitID)
@@ -735,7 +744,7 @@ local function UpdateMorph(unitID, morphData)
   if Spring.GetUnitTransporter(unitID) then return true end
   
   if (morphData.progress < 1.0) then
-	  local allow = GG.CheckMiscPriorityBuildStep(unitID, morphData.teamID, morphData.def.resTable.m) --use unit_priority.lua gadget to handle morph priority.
+	  local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
 	  if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
 		morphData.progress = morphData.progress + morphData.increment
 	  end

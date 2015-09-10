@@ -60,7 +60,6 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
-  radarDistanceJam       = 10,
   script                 = [[armsnipe.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],

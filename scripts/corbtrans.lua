@@ -235,20 +235,6 @@ local function DustLoop()
 	end
 end
 
-function script.Create()
-	Turn(dust1, x_axis, math.rad(90))
-	Turn(dust2, x_axis, math.rad(90))
-	StartThread(SmokeUnit, smokePiece)
-	--StartThread(DustLoop)	-- looks stupid
-	
-	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
-	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
-	
-	Move(LTurretDoor, y_axis, 3)
-	Move(LTurretBase, x_axis, 10)
-	Move(RTurretDoor, y_axis, 3, 10)
-	Move(RTurretBase, x_axis, -10, 14) --11
-end
 
 local function TakeOffOrLand()
 	Signal(SIG_TOL)
@@ -256,20 +242,6 @@ local function TakeOffOrLand()
 	takeoffOrLanding = true
 	Sleep(1200)
 	takeoffOrLanding = false
-end
-
-function script.Activate()
-	StartThread(TakeOffOrLand)
-end
-
-function script.Deactivate()
-	StartThread(TakeOffOrLand)
-	StartThread(closeDoors)
-end
-
-
-function script.QueryTransport(passengerID)
-	return link
 end
 
 --Special ability: drop unit midair
@@ -328,30 +300,38 @@ function getDropPoint()
 	return {dropx, dropy,dropz}
 end
 
-function isNearPickupPoint(passengerId)
+function isNearPickupPoint(passengerId, requiredDist)
 	if passengerId == nil then
 		return false
 	end
 
 	local px, py, pz = Spring.GetUnitBasePosition(passengerId)
+	if not px then
+		return
+	end
+	
 	local px2, py2, pz2 = Spring.GetUnitBasePosition(unitID)
+	if not px2 then
+		return
+	end
 	
 	local dx = px2 - px
 	local dz = pz2 - pz
 	local dist = (dx^2 + dz^2)
 	
-	if dist < 1000^2 then
+	if dist < requiredDist^2 then	
 		return true
 	else
 		return false
 	end	
 end
 
-function isNearDropPoint(transportUnitId)
+
+function isNearDropPoint(transportUnitId, requiredDist)
 	if transportUnitId == nil then
 		return false
 	end
-	
+
 	local px, py, pz = Spring.GetUnitBasePosition(transportUnitId)
 	local dropPoint = getDropPoint()
 	local px2, py2, pz2 = dropPoint[1], dropPoint[2], dropPoint[3]
@@ -360,7 +340,7 @@ function isNearDropPoint(transportUnitId)
 	local dz = pz - pz2 
 	local dist = (dx^2 + dz^2)
 	
-	if dist < 1000^2 then
+	if dist < requiredDist^2 then
 		return true
 	else
 		return false
@@ -372,26 +352,48 @@ function isValidCargo(soonPassenger, passenger)
 	(passenger and Spring.ValidUnitID(passenger)))
 end
 
+local function PickupAndDropFixer()
+	while true do
+		local passengerId = getPassengerId()
+		if passengerId and (getCommandId() == 75) and isValidCargo(passengerId) and isNearPickupPoint(passengerId, 120) then
+			Sleep(1500)
+			local passengerId = getPassengerId()
+			if passengerId and (getCommandId() == 75) and isValidCargo(passengerId) and isNearPickupPoint(passengerId, 120) then
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+			end
+		end
+		
+		if unitLoaded and (getCommandId() == 81) and isNearDropPoint(unitLoaded, 80) then
+			Sleep(1500)
+			if unitLoaded and (getCommandId() == 81) and isNearDropPoint(unitLoaded, 80) then
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+				Spring.GiveOrderToUnit(unitID, CMD.WAIT, {}, {})
+			end
+		end
+		
+		Sleep(500)
+	end
+end
+
 function script.MoveRate(curRate)	
 	local passengerId = getPassengerId()
 	
 	if doorOpen and not isValidCargo(passengerId,unitLoaded) then
 		unitLoaded = nil
 		StartThread(script.EndTransport) --formalize unit drop (finish animation, clear tag, ect)
-	elseif getCommandId() == 75 and isNearPickupPoint(passengerId) then
+	elseif getCommandId() == 75 and isNearPickupPoint(passengerId, 1000) then
 		StartThread(openDoors)
-	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded) then	
+	elseif getCommandId() == 81 and isNearDropPoint(unitLoaded, 1000) then	
 		StartThread(openDoors)
 	end
 end
-
-
 
 function script.BeginTransport(passengerID)
 	if loaded then 
 		return 
 	end
-	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15)
+	Move(link, y_axis, -Spring.GetUnitHeight(passengerID) - 15, nil, true)
 	
 	--local px, py, pz = Spring.GetUnitBasePosition(passengerID)
 	SetUnitValue(COB.BUSY, 1)
@@ -445,6 +447,36 @@ function script.AimWeapon(num, heading, pitch)
 		return true
 	end
 	
+end
+
+function script.Create()
+	Turn(dust1, x_axis, math.rad(90))
+	Turn(dust2, x_axis, math.rad(90))
+	StartThread(SmokeUnit, smokePiece)
+	StartThread(PickupAndDropFixer)
+	--StartThread(DustLoop)	-- looks stupid
+	
+	Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"bankingAllowed",false)
+	--Spring.MoveCtrl.SetGunshipMoveTypeData(unitID,"turnRate",0)
+	
+	Move(LTurretDoor, y_axis, 3)
+	Move(LTurretBase, x_axis, 10)
+	Move(RTurretDoor, y_axis, 3, 10)
+	Move(RTurretBase, x_axis, -10, 14) --11
+end
+
+function script.Activate()
+	StartThread(TakeOffOrLand)
+end
+
+function script.Deactivate()
+	StartThread(TakeOffOrLand)
+	StartThread(closeDoors)
+end
+
+
+function script.QueryTransport(passengerID)
+	return link
 end
 
 function script.AimFromWeapon(num)

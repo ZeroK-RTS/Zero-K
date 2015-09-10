@@ -112,6 +112,10 @@ function script.FireWeapon()
 	missileLoaded = false
 	doorsAreOpen = false
 
+	if GG.GameRules_NukeLaunched then
+		GG.GameRules_NukeLaunched()
+	end
+	
 	-- Intentionally non-positional
 	Spring.PlaySoundFile("sounds/weapon/missile/heavymissile_launch.wav", 15)
 end

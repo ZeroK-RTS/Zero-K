@@ -23,9 +23,7 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams                  = {
-    helptext       = [[The Zenith summons down meteorites from the sky, which break things they hit and also provide a reclaimable source of metal.]],
-    description_pl = [[Kontroler Meteorow]],
-    helptext_pl    = [[Zenith przyciaga w dowolne miejsce meteory z orbity, ktore niszcza trafione obiekty i z ktorych mozna odzyskac metal.]],
+    helptext       = [[The Zenith collects meteorites from the sky (up to 500), which it can send anywhere to break things or provide a small reclaimable source of metal.]],
     keeptooltip = [[any string I want]],
     --neededlink  = 150,
     --pylonrange  = 150,
@@ -62,9 +60,8 @@ unitDef = {
     {
       def                = [[METEOR]],
       badTargetCateogory = [[MOBILE]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
-
 
     {
       def                = [[GRAVITY_NEG]],
@@ -78,6 +75,7 @@ unitDef = {
 
     GRAVITY_NEG = {
       name                    = [[Attractive Gravity (fake)]],
+      alwaysVisible           = 1,
       avoidFriendly           = false,
 	  canAttackGround		  = false,
       coreThickness           = 0.5,
@@ -98,11 +96,13 @@ unitDef = {
       intensity               = 0.7,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 6000,
+      range                   = 20000,
       reloadtime              = 0.2,
       rgbColor                = [[0 0 1]],
       rgbColor2               = [[1 0.5 1]],
       size                    = 32,
+      soundStart              = [[weapon/gravity_fire]],
+	  soundStartVolume        = 0.15,
       thickness               = 32,
       tolerance               = 5000,
       turret                  = true,
@@ -111,18 +111,17 @@ unitDef = {
       weaponVelocity          = 6000,
     },
 
-
     METEOR      = {
       name                    = [[Meteor]],
 	  accuracy                = 700,
       alwaysVisible           = 1,
-      areaOfEffect            = 160,
+      areaOfEffect            = 240,
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidGround             = false,
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
-      craterBoost             = 0,
+      craterBoost             = 3,
       craterMult              = 6,
 
       damage                  = {
@@ -132,7 +131,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.8,
-      explosionGenerator      = [[custom:TESS]],
+      explosionGenerator      = [[custom:av_tess]],
       fireStarter             = 70,
       flightTime              = 30,
       impulseBoost            = 250,
@@ -153,16 +152,164 @@ unitDef = {
         [[null]],
       },
 
+      turret                  = true,
+	  turnrate                = 2000,
+      weaponAcceleration      = 2000,
+      weaponTimer             = 10,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 1600,
+      wobble                  = 5500,
+    },
+	
+	METEOR_AIM      = {
+      name                    = [[Meteor]],
+	  accuracy                = 700,
+      alwaysVisible           = 1,
+      areaOfEffect            = 240,
+      avoidFriendly           = false,
+      avoidFeature            = false,
+      avoidGround             = false,
+      cegTag                  = [[meteor_aim]],
+      collideFriendly         = true,
+      craterBoost             = 3,
+      craterMult              = 6,
+
+      damage                  = {
+        default = 1000,
+        planes  = 1000,
+        subs    = 50,
+      },
+
+      edgeEffectiveness       = 0.8,
+      explosionGenerator      = [[custom:av_tess]],
+      fireStarter             = 70,
+      flightTime              = 300,
+      impulseBoost            = 250,
+      impulseFactor           = 0.5,
+      interceptedByShieldType = 2,
+      model                   = [[asteroid.s3o]],
+      range                   = 9000,
+      reloadtime              = 0.7,
+      selfprop                = true,
+      smokedelay              = [[0.1]],
+      smokeTrail              = true,
+      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      startsmoke              = [[1]],
+      startVelocity           = 1500,
+
+      textures                = {
+        [[null]],
+        [[null]],
+        [[null]],
+      },
+
+	  tracks                  = true,
+      turret                  = true,
+      turnRate                = 25000,
+      weaponAcceleration      = 600,
+      weaponTimer             = 10,
+      weaponType              = [[MissileLauncher]],
+      weaponVelocity          = 1200,
+      wobble                  = 0,
+    },
+	
+	METEOR_FLOAT      = {
+      name                    = [[Meteor]],
+	  accuracy                = 700,
+      alwaysVisible           = 1,
+      areaOfEffect            = 240,
+      avoidFriendly           = false,
+      avoidFeature            = false,
+      avoidGround             = false,
+      cegTag                  = [[meteor_hover]],
+      collideFriendly         = true,
+      craterBoost             = 3,
+      craterMult              = 6,
+
+      damage                  = {
+        default = 1000,
+        planes  = 1000,
+        subs    = 50,
+      },
+
+      edgeEffectiveness       = 0.8,
+      explosionGenerator      = [[custom:av_tess]],
+      fireStarter             = 70,
+      flightTime              = 300,
+      impulseBoost            = 250,
+      impulseFactor           = 0.5,
+      interceptedByShieldType = 2,
+      model                   = [[asteroid.s3o]],
+      range                   = 9000,
+      reloadtime              = 0.7,
+      selfprop                = true,
+      smokedelay              = [[0.1]],
+      smokeTrail              = true,
+      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      startsmoke              = [[1]],
+      startVelocity           = 1500,
+
+      textures                = {
+        [[null]],
+        [[null]],
+        [[null]],
+      },
+
+	  tracks                  = true,
       trajectoryHeight        = 0,
       turret                  = true,
-	  turnrate                = 512,
+      turnRate                = 6000,
       weaponAcceleration      = 200,
       weaponTimer             = 10,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 1500,
-      wobble                  = 2048,
+      weaponVelocity          = 200,
+      wobble                  = 30000,
     },
+	
+	METEOR_UNCONTROLLED      = {
+      name                    = [[Meteor]],
+	  accuracy                = 700,
+      alwaysVisible           = 1,
+      areaOfEffect            = 240,
+      avoidFriendly           = false,
+      avoidFeature            = false,
+      avoidGround             = false,
+      cegTag                  = [[meteor_fall]],
+      collideFriendly         = true,
+      craterBoost             = 3,
+      craterMult              = 6,
 
+      damage                  = {
+        default = 1000,
+        planes  = 1000,
+        subs    = 50,
+      },
+
+      edgeEffectiveness       = 0.8,
+      explosionGenerator      = [[custom:av_tess]],
+      fireStarter             = 70,
+      flightTime              = 30,
+      impulseBoost            = 250,
+      impulseFactor           = 0.5,
+      interceptedByShieldType = 2,
+      model                   = [[asteroid.s3o]],
+      range                   = 9000,
+      reloadtime              = 0.7,
+      smokeTrail              = true,
+      soundHit                = [[weapon/cannon/supergun_bass_boost]],
+      startsmoke              = [[1]],
+      startVelocity           = 1500,
+
+      textures                = {
+        [[null]],
+        [[null]],
+        [[null]],
+      },
+
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 1600,
+    },
   },
 
 

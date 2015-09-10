@@ -31,6 +31,7 @@ unitDef = {
 	helptext_pl    = [[Silencer to silos rakiet nuklearnych, ktore sa w stanie zniszczyc za jednym zamachem cale bazy, jednak moga zostac przechwycone przez tarcze antyrakietowa.]],
 	stockpiletime  = [[180]],
 	stockpilecost  = [[3240]],
+	priority_misc  = 1, -- Medium
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -88,7 +89,7 @@ unitDef = {
       edgeEffectiveness       = 0.3,
       explosionGenerator      = [[custom:LONDON]],
       fireStarter             = 0,
-      flightTime              = 50,
+      flightTime              = 180,
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 65,

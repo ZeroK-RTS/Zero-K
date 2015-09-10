@@ -21,17 +21,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---------------------------------------------------------------------------------
--- includes
-
 include "LuaRules/Configs/customcmds.h.lua"
 
-local echo = Spring.Echo
+local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
+local Angle = Spring.Utilities.Vector.Angle
 
-
+local spGetUnitPosition = Spring.GetUnitPosition
+local spGetUnitVelocity = Spring.GetUnitVelocity
+local spAreTeamsAllied  = Spring.AreTeamsAllied
+local spGetUnitTeam     = Spring.GetUnitTeam
 --------------------------------------------------------------------------------
--- vars
+--------------------------------------------------------------------------------
+-- Global Variables
 
+local PREDICTION = 30
 
 local areaGuardCmd = {
     id      = CMD_AREA_GUARD,
@@ -43,11 +46,70 @@ local areaGuardCmd = {
 	--hidden	= true,
 }
 
+local orbitDrawCmd = {
+    id      = CMD_ORBIT_DRAW,
+    name    = "OrbitDraw",
+    action  = "orbitdraw",
+	cursor  = 'Guard',
+    type    = CMDTYPE.ICON_UNIT,
+	tooltip = "Circle around the unit in a protective manner",
+	hidden	= true,
+}
+
+-- ud.canGuard is true for units for which it should not be true. This table
+-- is generated as new unit types are created. It check for guard commands.
+local canGuardUnitDefIDs = {}
+
+local newGuards = {}
+local oldGuards = {}
+
+local oldcircuitTime = {}
+local newcircuitTime = {}
+
+local circleDirection = {}
+local lastUpdateTime = {}
+
+local guardAngle = {}
+
+local frame = 0
+
+-- 2*pi comes from the circumference of the circle.
+-- 15 comes from the gap between move goals being recieved.
+local CIRC_MULT = 15 * 2*math.pi
+
+local UPDATE_GAP_LEEWAY = 30
+
+local RADIUS_BAND_SIZE = 100
+
+local cos = math.cos
+local sin = math.sin
+local pi = math.pi
+
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	canGuardUnitDefIDs[i] = ud.speed > 0 or ud.isFactory 
+end
 
 --------------------------------------------------------------------------------
--- functions
+--------------------------------------------------------------------------------
+-- Functions
 
-local function DoAreaGuard( unitID, unitTeam, unitTeam, cmdParams, cmdOptions )
+local function RandomPermutation(n)
+	local perm = {}
+	local taken = {}
+	for i = 1, n do
+		local entry = math.random(i, n)
+		if taken[entry] then
+			perm[i] = taken[entry]
+		else
+			perm[i] = entry
+		end
+		taken[entry] = i
+	end
+	return perm
+end
+
+local function DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
 	local cmdOptions2 = {}
 	if (cmdOptions.shift) then table.insert(cmdOptions2, "shift")   end
 	if (cmdOptions.alt)   then table.insert(cmdOptions2, "alt")   end
@@ -73,23 +135,171 @@ local function DoAreaGuard( unitID, unitTeam, unitTeam, cmdParams, cmdOptions )
 	end
 	
     local units = Spring.GetUnitsInSphere( unpack(cmdParams) )
-    for _,otherUnitID in ipairs( units ) do
+	local perm = RandomPermutation(#units)
+	
+	-- Give teleport command if a teleporter is in the area
+	for i = 1, #units do
+		local otherUnitID = units[perm[i]]
 		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
 			local teamID = Spring.GetUnitTeam(otherUnitID)
 			if Spring.AreTeamsAllied( unitTeam, teamID ) then
-				Spring.GiveOrderToUnit(unitID, CMD.GUARD, {otherUnitID}, cmdOptions2)
+				local cmdParams = {otherUnitID}
+				if not GG.Teleport_AllowCommand(unitID, unitDefID, CMD.GUARD, cmdParams, cmdOptions2) then
+					return
+				end
+			end
+		end
+	end
+	
+	-- Otherwise, give a guard command to all units in the area
+    for i = 1, #units do
+		local otherUnitID = units[perm[i]]
+		if otherUnitID ~= unitID and not alreadyGuarding[otherUnitID] then
+			local teamID = Spring.GetUnitTeam(otherUnitID)
+			if Spring.AreTeamsAllied( unitTeam, teamID ) then
+				local cmdParams = {otherUnitID}
+				Spring.GiveOrderToUnit(unitID, CMD.GUARD, cmdParams, cmdOptions2)
 			end
 		end
     end
 	
 end
 
+local function DoCircleGuard(unitID, unitDefID, teamID, cmdParams, cmdOptions)
+	
+	-- targetID is the unitID of the unit to guard.
+	-- radius is the radius to keep from the unit.
+	-- facing is an optional parameter which restricts to 120 degrees in that direction(set to 0 to disable).
+	local targetID = cmdParams[1]
+	local radius   = cmdParams[2]
+	local facing   = cmdParams[3] and cmdParams[3] >= 0 and cmdParams[3]
+	
+	local ud = unitDefID and UnitDefs[unitDefID]
+	
+	--// Check command validity
+	if not (ud and targetID and Spring.ValidUnitID(targetID)) then
+		return true
+	end
 
+	local targetTeamID = spGetUnitTeam(targetID)
+	if not spAreTeamsAllied(teamID, targetTeamID) then
+		return true -- remove
+	end
+	
+	-- Keep factory queue but don't do anything with it.
+	if ud.isFactory then
+		return false
+	end
+	
+	-- Options.ctrl removes coordination from the units. They move at their max speed.
+	-- This is similar to how Ctrl with a move order makes units match speed.
+	local ctrl = cmdOptions.ctrl
+	
+	local ux,_,uz = spGetUnitPosition(targetID)
+	local vx,_,vz, speed = spGetUnitVelocity(targetID)
+	
+	ux, uz = ux + vx*PREDICTION, uz + vz*PREDICTION
+	
+	--// First Circling Guarder dpes some bookkeeping
+	if not (newGuards[targetID] or facing) then
+		-- Update guard circle direction. This swaps whenever there is a gap in which
+		-- no guarders are assigned.
+		if not circleDirection[targetID] then
+			circleDirection[targetID] = 2*math.random(0,1) - 1
+		end
+		
+		if lastUpdateTime[targetID] then
+			if lastUpdateTime[targetID] + UPDATE_GAP_LEEWAY < frame then
+				circleDirection[targetID] = -circleDirection[targetID]
+			end
+		end
+		lastUpdateTime[targetID] = frame
+
+		-- Make sure some old tables exist, for convinience.
+		guardAngle[targetID] = guardAngle[targetID] or {}
+		oldcircuitTime[targetID] = oldcircuitTime[targetID] or {}
+		oldGuards[targetID] = oldGuards[targetID] or {}
+		
+		-- Reinitalize new tables
+		newcircuitTime[targetID] = {}
+		newGuards[targetID] = {}
+	end
+	
+	--// Get the desired angle for the unit
+	local angle, perpSize
+	if facing then
+		if ctrl then
+			facing = facing - Spring.GetUnitHeading(targetID)/2^15*math.pi
+			-- Keep relative heading mode
+			angle = facing
+			perpSize = 0
+		else
+			-- Absolute mode
+			angle = facing
+			perpSize = 0
+		end
+	elseif ctrl then
+		-- Free movement mode
+		local mySpeed  = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*(ud.speed/30)
+		local circumference = 2*pi*radius
+		
+		local x,_,z = Spring.GetUnitPosition(unitID)
+		local myAngle = Angle(x - ux, z - uz)
+		local circuitTime = circumference/mySpeed
+		
+		-- Factor of 3 acts as leeway because if a unit gets stuck nothing is 
+		-- going to move it.
+		angle = myAngle + 3*circleDirection[targetID]*CIRC_MULT/circuitTime
+		perpSize = circleDirection[targetID]*50
+		
+	else 
+		-- Fixed spacing and matched speed along circle mode
+		-- Group with units of nearby radius
+		local radGroup = math.ceil(radius/RADIUS_BAND_SIZE)
+		
+		-- First guard of this circut updates the angle
+		if not newGuards[targetID][radGroup] then
+			local circuitTime = oldcircuitTime[targetID] and oldcircuitTime[targetID][radGroup]
+			-- Update circuit positon
+			if circuitTime then
+				guardAngle[targetID][radGroup] = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + circleDirection[targetID]*CIRC_MULT/circuitTime
+			end
+		end
+		
+		-- Determine circuit time, distance around the circle
+		local mySpeed  = (Spring.GetUnitRulesParam(unitID, "totalMoveSpeedChange") or 1)*(ud.speed/30)
+		local circumference = 2*pi*radius
+		local adjustedSpeed = mySpeed - speed
+		if adjustedSpeed < 0.01 then
+			newcircuitTime[targetID][radGroup] = false
+		elseif newcircuitTime[targetID][radGroup] ~= false then
+			local circuitTime = circumference/adjustedSpeed
+			newcircuitTime[targetID][radGroup] = math.max(circuitTime, newcircuitTime[targetID][radGroup] or 0)
+		end
+		
+		-- Update the number of units in the circle
+		local guards = (oldGuards[targetID] and oldGuards[targetID][radGroup]) or 1
+		local newG = newGuards[targetID][radGroup] or 0
+		newGuards[targetID][radGroup] = newG + 1
+		
+		-- Calculate my own angle
+		angle = ((guardAngle[targetID] and guardAngle[targetID][radGroup]) or 0) + 2*pi*newG/guards
+		perpSize = circleDirection[targetID]*50
+	end
+	
+	--// Set new position
+	local perpAngle = angle + pi/2
+	
+	local mx = ux + radius*cos(angle) + perpSize*cos(perpAngle)
+	local mz = uz + radius*sin(angle) + perpSize*sin(perpAngle)
+	
+	GiveClampedMoveGoalToUnit(unitID, mx, mz)
+	return false
+end
 
 --------------------------------------------------------------------------------
--- callins
-
-
+--------------------------------------------------------------------------------
+-- Callins
 
 function gadget:UnitCreated(unitID, unitDefID, team)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, CMD.GUARD)
@@ -97,11 +307,18 @@ function gadget:UnitCreated(unitID, unitDefID, team)
         local cmdArray = {hidden = true}
         Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
 		Spring.InsertUnitCmdDesc(unitID, 500, areaGuardCmd)
+		Spring.InsertUnitCmdDesc(unitID, 501, orbitDrawCmd)
     end
 end
 
+function gadget:UnitDestroyed(unitID, unitDefID, team)
+	if guardAngle[unitID] then
+		guardAngle[unitID] = nil
+	end
+end
+
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_AREA_GUARD] = true}
+	return {[CMD_AREA_GUARD] = true, [CMD_ORBIT] = true, [CMD_ORBIT_DRAW] = true}
 end
 	
 function gadget:AllowCommand_GetWantedUnitDefID()	
@@ -110,14 +327,37 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
     if cmdID == CMD_AREA_GUARD then
-        DoAreaGuard( unitID, unitTeam, unitTeam, cmdParams, cmdOptions )
+        DoAreaGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions )
         return false
-    end
-    
+    elseif cmdID == CMD_ORBIT or cmdID == CMD_ORBIT_DRAW then
+		return canGuardUnitDefIDs[unitDefID] and unitID ~= cmdParams[1]
+	end
 	return true
 end
 
+function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_ORBIT then
+		-- return true from DoCircleGuard to remove the command.
+		-- return false from DoCircleGuard to keep the command in the queue.
+		return true, DoCircleGuard(unitID, unitDefID, unitTeam, cmdParams, cmdOptions)	
+	end
+	return false -- command not used
+end
+
+function gadget:GameFrame(f)
+	frame = f
+	if f%15 == 0 then
+		oldGuards = newGuards
+		newGuards = {}
+		
+		oldcircuitTime = newcircuitTime
+		newcircuitTime = {}
+	end
+end
+
 function gadget:Initialize()
+	gadgetHandler:RegisterCMDID(CMD_ORBIT_DRAW)
+	Spring.SetCustomCommandDrawData(CMD_ORBIT_DRAW, "Guard", {0.3, 0.3, 1.0, 0.7})
     for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		--local team = spGetUnitTeam(unitID)

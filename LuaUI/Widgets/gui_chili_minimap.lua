@@ -632,6 +632,7 @@ MakeMinimapWindow = function()
 		}
 	
 	buttons_panel = Chili.StackPanel:New{
+		name = "Minimap buttons_panel",
 		orientation = 'horizontal',
 		height=buttons_height,
 		width=buttons_width,

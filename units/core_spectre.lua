@@ -5,10 +5,10 @@ unitDef = {
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.25,
-  buildCostEnergy        = 550,
-  buildCostMetal         = 550,
+  buildCostEnergy        = 600,
+  buildCostMetal         = 600,
   buildPic               = [[core_spectre.png]],
-  buildTime              = 550,
+  buildTime              = 600,
   canAttack              = false,
   canGuard               = true,
   canMove                = true,
@@ -32,9 +32,10 @@ unitDef = {
     
     morphto = [[corjamt]],
     morphtime = 30,
+	
+	priority_misc = 1, -- Medium
   },
 
-  energyUse              = 1.5,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 2,
   footprintZ             = 2,
@@ -50,7 +51,7 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   moveState              = 0,
   objectName             = [[m-8.s3o]],
-  onoffable              = false,
+  onoffable              = true,
   pushResistant          = 0,
   script                 = [[core_spectre.lua]],
   seismicSignature       = 4,
@@ -111,10 +112,10 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 220,
+      metal            = 240,
       object           = [[shield_dead.s3o]],
       reclaimable      = true,
-      reclaimTime      = 220,
+      reclaimTime      = 240,
     },
 
     HEAP = {
@@ -124,10 +125,10 @@ unitDef = {
       energy           = 0,
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 110,
+      metal            = 120,
       object           = [[debris1x1a.s3o]],
       reclaimable      = true,
-      reclaimTime      = 110,
+      reclaimTime      = 120,
     },
 
   },

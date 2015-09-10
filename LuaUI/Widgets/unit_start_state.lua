@@ -37,7 +37,7 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_retreat'}
+options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
@@ -142,6 +142,16 @@ options = {
 --]]	
 	commander_constructor_buildpriority = {
 		name = "  Constructor Build Priority",
+		desc = "Values: Low, Normal, High",
+		type = 'number',
+		value = 1,
+		min = 0,
+		max = 2,
+		step = 1,
+		path = "Game/New Unit States/Misc",
+	},
+	commander_misc_priority = {
+		name = "  Miscellaneous Priority",
 		desc = "Values: Low, Normal, High",
 		type = 'number',
 		value = 1,
@@ -351,6 +361,20 @@ local function addUnit(defName, path)
 			path = path,
 		}
 		options_order[#options_order+1] = defName .. "_constructor_buildpriority"
+	end
+	
+	if ud.customParams.priority_misc then
+		options[defName .. "_misc_priority"] = {
+			name = "  Miscellaneous Priority",
+			desc = "Values: Low, Normal, High",
+			type = 'number',
+			value = ud.customParams.priority_misc,
+			min = 0,
+			max = 2,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
 	
 	
@@ -599,6 +623,12 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				end
 			end
 			
+			if options[name .. "_misc_priority"] and options[name .. "_misc_priority"].value then
+				if options[name .. "_misc_priority"].value ~= 1 then -- Medium is the default
+					orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {options[name .. "_misc_priority"].value}, {"shift"}}
+				end
+			end
+			
             if options[name .. "_tactical_ai_2"] and options[name .. "_tactical_ai_2"].value ~= nil then
                 -- Spring.GiveOrderToUnit(unitID, CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"})
 				orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"}}
@@ -652,11 +682,12 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] then
+	if unitTeam == Spring.GetMyTeamID() and unitDefID and UnitDefs[unitDefID] and (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") ~= 1) then
         local orderArray = {}
 		if UnitDefs[unitDefID].customParams.commtype or UnitDefs[unitDefID].customParams.level then
 			-- Spring.GiveOrderToUnit(unitID, CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"})
 			orderArray[1] = {CMD_PRIORITY, {options.commander_constructor_buildpriority.value}, {"shift"}}
+			orderArray[2] = {CMD_MISC_PRIORITY, {options.commander_misc_priority.value}, {"shift"}}
         end
         
         local name = UnitDefs[unitDefID].name

@@ -3,9 +3,9 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 2.03",
+    name      = "Chili Deluxe Player List - Alpha 2.02",
     desc      = "v0.210 Chili Deluxe Player List, Alpha Release",
-    author    = "CarRepairer, KingRaptor, CrazyEddie, Klon",
+    author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
@@ -33,6 +33,7 @@ function ToggleVisibility() end
 
 local echo = Spring.Echo
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local Chili
 local Image
@@ -52,7 +53,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -78,6 +79,30 @@ options = {
 		OnChange = function() 
 		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
 		end,
+	},
+	inc_wins_1 = {
+		name = "Increment Team 1 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[1]) 
+		end
+		end,
+		advanced = true
+	},
+	inc_wins_2 = {
+		name = "Increment Team 2 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[2]) 
+		end
+		end,
+		advanced = true
 	},
 	win_show_condition = {
 		name = 'Show Wins',
@@ -517,6 +542,13 @@ local function GetPlayerTeamStats(teamID)
 	
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
+
+	if eInco then	
+		local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+		local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
+		eInco = eInco + energyIncome - math.max(0, energyChange)
+	end
+	
 	if eStor then
 		eStor = eStor - 10000					-- eStor has a "hidden 10k" to account for
 		if eStor > 50000 then eStor = 1000 end	-- fix for weirdness where sometimes storage is reported as huge, assume it should be 1000

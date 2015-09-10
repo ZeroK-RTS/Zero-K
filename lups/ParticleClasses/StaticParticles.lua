@@ -308,7 +308,7 @@ function StaticParticles:Visible()
 	  return false
 	end
     posX,posY,posZ = posX+ux,posY+uy,posZ+uz
-    radius = radius + spGetUnitRadius(self.unit)
+    radius = radius + (spGetUnitRadius(self.unit) or 0)
   elseif (self.projectile and not self.worldspace) then
     local px,py,pz = spGetProjectilePosition(self.projectile)
     posX,posY,posZ = posX+px,posY+py,posZ+pz

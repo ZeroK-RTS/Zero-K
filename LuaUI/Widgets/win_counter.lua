@@ -14,9 +14,10 @@ function widget:GetInfo()
 	layer	 = -1,
 	enabled   = true,
   }
-  --Declares WG.WinCounter_currentWinTable: Table, {string playerName, {"team" = number team, "wins" = number wins}}
+  --Declares WG.WinCounter_currentWinTable: Table, {string playerName, {"team" = number allyTeam, "wins" = number wins, "wonLastGame" = boolean won previous game}}
+  --		 WG.WinCounter_Increment:  Function, (number allyTeam) -> nil, Increments win counter for selected allyTeam
   --		 WG.WinCounter_Reset:		   Function, () -> nil, Resets the win count table
-  --		 WG.WinCounter_Set:			 Function, (string playerName | number playerID, number winCount, boolean forAllyTeam) -> nil, 
+  --		 WG.WinCounter_Set:			   Function, (string playerName | number playerID, number winCount, boolean forAllyTeam (, boolean wonLastGame)) -> nil, 
   --										Sets win count for given player and optionally all players on their allyTeam
 end
 
@@ -24,12 +25,28 @@ local lastWinTable = {}
 local currentWinTable = {} --NB: This is constructed with info for all non-spec players in the current game at game start
 local loadedFromConfig = false
 
-local function Set(player, winCount, forAllyTeam) --TODO: Test this with a player list
+local function Set(player, winCount, forAllyTeam, wonLastGame)
 	local name = ""
 	if type(player) == "number" then
 		name = Spring.GetPlayerInfo(player)
 	elseif type(player) == "string" then
 		name = player
+	end
+
+	if wonLastGame ~= nil then
+		local allyTeams = Spring.GetAllyTeamList()
+		for i=1, #allyTeams do
+			local playerTeams = Spring.GetTeamList(allyTeams[i])
+			for j=1, #playerTeams do
+				local players = Spring.GetPlayerList(playerTeams[j])
+				for k=1, #players do
+					local playerName = Spring.GetPlayerInfo(players[k])
+					if playerName ~= nil and currentWinTable[playerName] ~= nil then
+						currentWinTable[playerName].wonLastGame = false
+					end
+				end
+			end
+		end
 	end
 
 	if type(winCount) == "number" and winCount >= 0 and name ~= nil and currentWinTable[name] ~= nil and type(currentWinTable[name]) == "table" then
@@ -41,11 +58,17 @@ local function Set(player, winCount, forAllyTeam) --TODO: Test this with a playe
 					local playerName = Spring.GetPlayerInfo(players[j])
 					if currentWinTable[playerName] ~= nil then
 						currentWinTable[playerName].wins = winCount
+						if wonLastGame ~= nil then
+							currentWinTable[playerName].wonLastGame = wonLastGame
+						end
 					end
 				end
 			end
 		else
 			currentWinTable[name].wins = winCount
+			if wonLastGame ~= nil then
+				currentWinTable[name].wonLastGame = wonLastGame
+			end
 		end
 
 		if winCount > 0 then 
@@ -61,6 +84,25 @@ local function Set(player, winCount, forAllyTeam) --TODO: Test this with a playe
 
 		WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 	end
+end
+
+local function IncrementAllyTeamWins(allyTeamNumber) --We need to figure out playerName to get current wins for allyTeam
+	local playerName = nil
+	playerTeams = Spring.GetTeamList(allyTeamNumber)
+	if playerTeams ~= nil and #playerTeams >= 1 then
+		players = Spring.GetPlayerList(playerTeams[1])
+		for i=1, #players do
+			local name,_,isSpec = Spring.GetPlayerInfo(players[i])
+			if not isSpec then
+				playerName = name
+				break
+			end
+		end
+	end
+	if playerName ~= nil and currentWinTable[playerName] ~= nil then
+		local wins = currentWinTable[playerName].wins or 0
+		Set(playerName, wins + 1, true, true) 
+	end 
 end
 
 local function Reset()
@@ -101,6 +143,7 @@ end
 	function widget:Initialize()
 	WG.WinCounter_Set = Set
 	WG.WinCounter_Reset = Reset
+	WG.WinCounter_Increment = IncrementAllyTeamWins
 	if not loadedFromConfig then
 		Reset()
 	end
@@ -109,6 +152,7 @@ end
 function widget:Shutdown()
 	WG.WinCounter_Set = nil
 	WG.WinCounter_Reset = nil
+	WG.WinCounter_Increment = nil
 end
 
 function widget:GameOver()

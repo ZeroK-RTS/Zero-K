@@ -792,7 +792,9 @@ RecreateFacbar = function()
 	if inTweak then return end
 	
 	table.sort(facs, function(t1,t2)
-		return (t1.teamID == t2.teamID) and (t1.unitID < t2.unitID) or (t1.teamID < t2.teamID)
+		if t1.allyTeamID ~= t2.allyTeamID then return t1.allyTeamID < t2.allyTeamID end
+		if t1.teamID ~= t2.teamID then return t1.teamID < t2.teamID end
+		return t1.unitID < t2.unitID
 	end)
 	
 	stack_main:ClearChildren()
@@ -871,7 +873,8 @@ UpdateFactoryList = function()
 			local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
 			if bo and #bo > 0 then
 				local teamID = Spring.GetUnitTeam(unitID)
-				push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=teamID })
+				local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+				push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=teamID, allyTeamID=allyTeamID })
 				--[[
 				local _, _, _, _, buildProgress = GetUnitHealth(unitID)
 				if (buildProgress)and(buildProgress<1) then

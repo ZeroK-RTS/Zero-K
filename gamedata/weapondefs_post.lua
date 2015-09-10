@@ -272,6 +272,23 @@ end
 	end
  end
  
+ --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Take over the handling of shield energy drain from the engine.
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.shieldpowerregenenergy and weaponDef.shieldpowerregenenergy > 0 then
+		weaponDef.customparams = weaponDef.customparams or {}
+		
+		weaponDef.customparams.shield_rate = weaponDef.shieldpowerregen
+		weaponDef.customparams.shield_drain = weaponDef.shieldpowerregenenergy
+		
+		weaponDef.shieldpowerregen = 0
+		weaponDef.shieldpowerregenenergy = 0
+	end
+end
+ 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

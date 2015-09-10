@@ -94,7 +94,7 @@ end
 
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	if (playerID == 255) then
-		return false -- custom AI, cannot get its teamID so block it (will get the default startpos at the middle of the box)
+		return true -- custom AI, can't know which team it is on so allow it to place anywhere
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))

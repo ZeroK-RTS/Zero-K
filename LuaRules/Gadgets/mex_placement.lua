@@ -106,13 +106,16 @@ function gadget:Initialize()
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		gadget:UnitCreated(unitID, unitDefID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 end
 
 --------------------------------------------------------------------------------
 -- Unit Tracker
 --------------------------------------------------------------------------------
+
+local inlosTrueTable = {inlos = true}
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if canMex[unitDefID] then
@@ -126,7 +129,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			if spotID then
 				spotByID[unitID] = spotID
 				spotData[spotID] = {unitID = unitID}
-				Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotID].metal)
+				Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotID].metal, inlosTrueTable)
 				--GG.UnitEcho(unitID,spotID)
 			else
 		        local nearestspot, dist, spotindex = GetClosestMetalSpot(x, z)
@@ -137,12 +140,12 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 				    end
 					spotByID[unitID] = spotindex
 					spotData[spotindex] = {unitID = unitID}
-					Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotindex].metal)
+					Spring.SetUnitRulesParam(unitID, "mexIncome", metalSpots[spotindex].metal, inlosTrueTable)
 				end
 			end
 		else
 			local metal = GG.IntegrateMetal(x, z)
-			Spring.SetUnitRulesParam(unitID, "mexIncome", metal)
+			Spring.SetUnitRulesParam(unitID, "mexIncome", metal, inlosTrueTable)
 		end
 	end
 end

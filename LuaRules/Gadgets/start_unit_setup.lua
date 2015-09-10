@@ -43,7 +43,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
   end
 
   function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if ploppableDefs[unitDefID] and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+    if ploppableDefs[unitDefID] and builderID and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
       Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
       local maxHealth = select(2,Spring.GetUnitHealth(unitID))
       Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
@@ -358,10 +358,23 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local x,y,z
 	local startPosition = luaSetStartPositions[teamID]
 	if not startPosition then
-		if (startboxString and not Spring.GetTeamRulesParam(teamID, "valid_startpos")) or (not startboxString and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
+		if (startboxString and not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI)) or (not startboxString and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
 			x,y,z = Spring.GetTeamStartPosition(teamID)
+			
+			-- clamp invalid positions
+			-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
+			local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
+			if boxID then
+				local box = startboxConfig[boxID]
+				local bx = x / Game.mapSizeX
+				local bz = z / Game.mapSizeZ
+				local valid = (bx > box[1]) and (bz > box[2]) and (bx < box[3]) and (bz < box[4])
+				if not valid then
+					x,y,z = getMiddleOfStartBox(teamID)
+				end
+			end
 		end
 	else
 		x,y,z = startPosition.x, startPosition.y, startPosition.z
@@ -404,14 +417,10 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
     local teamLuaAI = Spring.GetTeamLuaAI(teamID)
     local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
 
-    local validTeam = (teamID ~= gaiateam and ((not teamLuaAI) or teamLuaAI == "" or teamLuaAI:sub(1,3) == "CAI"))
-
 	local commCost = (udef.metalCost or BASE_COMM_COST) - BASE_COMM_COST			
-				
-    if validTeam then
-
-	  local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
-	  local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
+	
+	local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
+	local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 		
         -- the adding of existing resources is necessary for handling /take and spawn
 		local bonus = (keys and tonumber(keys.bonusresources)) or 0
@@ -425,7 +434,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
         Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
       end
 
-    end
 
     return true
   end

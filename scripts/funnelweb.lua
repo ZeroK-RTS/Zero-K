@@ -1,6 +1,8 @@
 include "constants.lua"
 include "spider_walking.lua"
 
+local ALLY_ACCESS = {allied = true}
+
 local notum = piece 'notum'
 local gaster = piece 'gaster' 
 local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
@@ -68,6 +70,14 @@ function script.Create()
 	Move (aimpoint, z_axis, 9)
 	Move (aimpoint, y_axis, 4)
 	StartThread(SmokeUnit, smokePiece)
+end
+
+function script.Activate()
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 0, ALLY_ACCESS)
+end
+
+function script.Deactivate()
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 1, ALLY_ACCESS)
 end
 
 function script.StartMoving ()

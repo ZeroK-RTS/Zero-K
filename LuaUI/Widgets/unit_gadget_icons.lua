@@ -45,6 +45,10 @@ function SetIcons(unitID)
 	for _,unitID in ipairs(Spring.GetAllUnits()) do
 		local lowpower = Spring.GetUnitRulesParam(unitID, "lowpower") 
 		if lowpower then
+			local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
+			if inbuild then
+				lowpower = 0 -- Draw as if not on low power
+			end
 			if (not lastLowPower[unitID]) or lastLowPower[unitID] ~= lowpower then
 				lastLowPower[unitID] = lowpower
 				if lowpower ~= 0 then

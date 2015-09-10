@@ -246,6 +246,7 @@ local function spawnStructures(left, top, right, bottom, team)
 				Spring.SetUnitNeutral(unitID,true)
 				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
 				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
+				Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 			end
 		end
 	end

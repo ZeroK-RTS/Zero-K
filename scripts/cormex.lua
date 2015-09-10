@@ -21,7 +21,7 @@ local function Open()
 	local height = 40
 
 	while true do
-		local income = Spring.GetUnitRulesParam(unitID, "mex_income") or 0
+		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))
@@ -51,7 +51,7 @@ local explodables = {door_l, furnace}
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	Spring.Echo(severity)
+
 	for i = 1, #explodables do
 		if (math.random() < severity*1.5) then
 			Explode (explodables[i], sfxFall + sfxSmoke)

@@ -198,9 +198,9 @@ end
 
 function script.BlockShot(num, targetID)
 	if num == 1 then -- surface missiles
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40, 0.25)
 	elseif num == 2 then -- torpedoes
-		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40, true)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 229, 40)
 	end
 	return false
 end

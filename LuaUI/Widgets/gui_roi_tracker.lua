@@ -13,6 +13,8 @@ local Chili
 local spectating = Spring.GetSpectatingState()
 local allied_teams
 
+local scheme = Spring.GetModOptions().overdrivesharingscheme or "investmentreturn"
+
 local window, fake_window
 local name_labels = {}
 local roi_labels = {}
@@ -21,7 +23,7 @@ local base_income_labels = {}
 local od_income_labels = {}
 
 function widget:Initialize()
-	if (Spring.GetModOptions().overdrivesharingscheme ~= "investmentreturn") then
+	if (scheme ~= "investmentreturn") then
 		Spring.Echo ("RoI Counter: No need to track capital under Communism, comrade!")
 		widgetHandler:RemoveWidget()
 		return
@@ -69,10 +71,10 @@ function widget:Update(s)
 		window.height = fake_window.height - 45
 		window.width = fake_window.width - 15
 		for i = 1, #allied_teams do
-			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue") or "#"))
-			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue") or "#"))
-			base_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_myBase") or "#"))
-			od_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_myOverdrive") or "#"))
+			roi_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_RoI_metalDue") or 0))
+			base_labels[i]:SetCaption (string.format("%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_base_metalDue") or 0))
+			base_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalBase") or 0))
+			od_income_labels[i]:SetCaption (string.format("+%d m", Spring.GetTeamRulesParam(allied_teams[i], "OD_metalOverdrive") or 0))
 		end
 	end
 end

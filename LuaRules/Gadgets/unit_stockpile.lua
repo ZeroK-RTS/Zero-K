@@ -25,6 +25,8 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local PERIOD = 6
+
 local spGetUnitStockpile  = Spring.GetUnitStockpile
 local spSetUnitStockpile  = Spring.SetUnitStockpile
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
@@ -42,10 +44,10 @@ for i=1,#UnitDefs do
 		local stockTime = tonumber(udef.customParams.stockpiletime)*TEAM_SLOWUPDATE_RATE
 		local stockCost = tonumber(udef.customParams.stockpilecost)
 		stockpileUnitDefID[i] = {
-			stockTime = stockTime,
+			stockUpdates = stockTime/PERIOD,
 			stockCost = stockCost,
 			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
-			perFrameCost = stockCost/stockTime,
+			perUpdateCost = PERIOD * stockCost/stockTime,
 		}
 	end
 end
@@ -55,6 +57,10 @@ local function GetStockSpeed(unitID)
 end
 
 function gadget:GameFrame(n)
+	if n%PERIOD ~= 0 then
+		return
+	end
+
 	for i = 1, units.count do
 		local unitID = units.data[i]
 		local data = unitsByID[unitID]
@@ -67,23 +73,25 @@ function gadget:GameFrame(n)
 			local newStockSpeed = GetStockSpeed(unitID)
 			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					if data.stockSpeed ~= 0 then
-						GG.StopMiscPriorityResourcing(unitID,data.teamID)
-					end
 					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
 				end
 				data.stockSpeed = newStockSpeed
-				data.resTable.m = def.perFrameCost*newStockSpeed
-				data.resTable.e = data.resTable.m
 			end
 
-			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, data.resTable.m) and spUseUnitResource(unitID, data.resTable)) then
-				data.progress = data.progress - data.stockSpeed
+			if (def.stockCost > 0) then
+				local scale = GG.GetMiscPrioritySpendScale(unitID, data.teamID)
+				newStockSpeed = newStockSpeed*scale
+				data.resTable.m = def.perUpdateCost*newStockSpeed
+				data.resTable.e = data.resTable.m
+			end
+			
+			if (def.stockCost == 0) or spUseUnitResource(unitID, data.resTable) then
+				data.progress = data.progress - newStockSpeed
 				if data.progress <= 0 then
 					spSetUnitStockpile(unitID, stocked + 1)
-					data.progress = def.stockTime
+					data.progress = def.stockUpdates
 				end
-				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockTime-data.progress)/def.stockTime)
+				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockUpdates-data.progress)/def.stockUpdates)
 			end
 		else
 			if data.stockSpeed ~= 0 then
@@ -96,6 +104,15 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
+		local def = stockpileUnitDefID[unitDefID]
+		if def.stockCost > 0 then
+			GG.AddMiscPriorityUnit(unitID, teamID)
+		end
+	end
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]
@@ -103,18 +120,15 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		units.data[units.count] = unitID
 		unitsByID[unitID] = {
 			id = units.count, --the "id" is the index in units.data table
-			progress = def.stockTime, 
+			progress = def.stockUpdates, 
 			unitDefID = unitDefID, 
 			teamID = teamID, 
 			stockSpeed = 0, 
 			resTable = {
-				m = def.perFrameCost,
-				e = def.perFrameCost
+				m = def.perUpdateCost,
+				e = def.perUpdateCost
 			}
 		}
-		if def.stockCost > 0 then
-			GG.AddMiscPriorityUnit(unitID, teamID)
-		end
 	end
 end
 
@@ -140,6 +154,7 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 		gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end

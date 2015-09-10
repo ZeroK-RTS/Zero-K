@@ -1388,6 +1388,7 @@ function widget:Initialize()
 	}
 
 	menuTabRow = StackPanel:New{
+		name = "Integral menuTabRow",
 		parent = window,
 		resizeItems = true;
 		columns = 6;
@@ -1438,6 +1439,7 @@ function widget:Initialize()
 	}
 	for i=1,numRows do
 		sp_commands[i] = StackPanel:New{
+			name = "sp_commands " .. i,
 			parent = commands_main,
 			resizeItems = true;
 			orientation   = "horizontal";
@@ -1473,6 +1475,7 @@ function widget:Initialize()
 	}
 	for i=1, numStateColumns do
 		sp_states[i] = StackPanel:New {
+			name = "sp_states " .. i,
 			parent = states_main,
 			resizeItems = true;
 			orientation   = "vertical";
