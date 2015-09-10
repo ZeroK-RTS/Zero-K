@@ -932,7 +932,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local bdid = builderID and Spring.GetUnitDefID(builderID)
     if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 		local i = facsByUnitId[builderID]
-		updateQSoon[i] = true
+		if i then
+			updateQSoon[i] = true
+		end
 	end
 end
 
