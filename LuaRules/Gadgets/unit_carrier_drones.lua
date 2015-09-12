@@ -533,10 +533,18 @@ end
 function gadget:UnitGiven(unitID, unitDefID, newTeam)
 	if carrierList[unitID] then
 		carrierList[unitID].teamID = newTeam
-		for i=1,#carrierList[unitID].droneSets do
+		for i = 1, #carrierList[unitID].droneSets do
 			local set = carrierList[unitID].droneSets[i]
 			for droneID, _ in pairs(set.drones) do
-				drones_to_move[droneID] = newTeam
+				-- Only transfer drones which are allied with the carrier. This is to 
+				-- make carriers and capture interact in a robust, simple way. A captured
+				-- drone will take up a slot on the carrier and attack the carriers allies.
+				-- A captured carrier will need to have its drones killed or captured to
+				-- free up slots.
+				local droneTeam = Spring.GetUnitTeam(droneID)
+				if droneTeam and Spring.AreTeamsAllied(droneTeam, newTeam) then
+					drones_to_move[droneID] = newTeam
+				end
 			end
 		end
 	end

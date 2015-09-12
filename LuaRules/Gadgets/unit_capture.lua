@@ -212,9 +212,15 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if not unitDamage[unitID] then
 		damageByID.count = damageByID.count + 1
 		damageByID.data[damageByID.count] = unitID
+		
+		local buildTime = UnitDefs[unitDefID].buildTime
+		if UnitDefs[unitDefID].customParams.real_buildtime then
+			buildTime = tonumber(UnitDefs[unitDefID].customParams.real_buildtime)
+		end
+		
 		unitDamage[unitID] = {
 			index = damageByID.count,
-			captureHealth = UnitDefs[unitDefID].buildTime,
+			captureHealth = buildTime,
 			largestDamage = 0,
 			allyTeamByID = {count = 0, data = {}},
 			allyTeams = {},
@@ -254,7 +260,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- reset degrade timer for against this allyteam and add to damage
 	allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
 	allyTeamData.totalDamage = allyTeamData.totalDamage + newCaptureDamage
-	
+	Spring.Echo("totalDamage", allyTeamData.totalDamage)
+	Spring.Echo("captureHealth", damageData.captureHealth)
 	-- capture the unit if total damage is greater than max hp of unit
 	if allyTeamData.totalDamage >= damageData.captureHealth then
 		-- give the unit
