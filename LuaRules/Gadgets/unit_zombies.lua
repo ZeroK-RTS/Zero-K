@@ -83,7 +83,6 @@ local ZOMBIES_REZ_SPEED = tonumber(modOptions.zombies_rezspeed)
 if (tonumber(ZOMBIES_REZ_SPEED)==nil) then ZOMBIES_REZ_SPEED = 12 end -- 12m/s, big units have a really long time to respawn
 local ZOMBIES_PERMA_SLOW = tonumber(modOptions.zombies_permaslow)
 if (tonumber(ZOMBIES_PERMA_SLOW)==nil) then ZOMBIES_PERMA_SLOW = 1 end -- from 0 to 1, symbolises from 0% to 50% slow which is always on
-local OREMEX = (tonumber(modOptions.oremex) == 1) -- if its oremex, do not slow down ore extractors, no point
 
 local permaSlowDamage = GG.permaSlowDamage
 local addSlowDamage = GG.addSlowDamage
@@ -304,14 +303,12 @@ local function ReInit(reinit)
 				BringingDownTheHeavens(unitID)
 				zombies[unitID] = true
 				if (ZOMBIES_PERMA_SLOW > 0) then
-					if not(OREMEX and MexDefs[unitDefID]) then
-						local maxHealth = select(2, spGetUnitHealth(unitID))
-						if maxHealth then
-							local mult = ZOMBIES_PERMA_SLOW
-							if (mult < 0) then mult = 0 end
-							addSlowDamage(unitID,(maxHealth/2)*mult)
-							permaSlowDamage(unitID, true)
-						end
+					local maxHealth = select(2, spGetUnitHealth(unitID))
+					if maxHealth then
+						local mult = ZOMBIES_PERMA_SLOW
+						if (mult < 0) then mult = 0 end
+						addSlowDamage(unitID,(maxHealth/2)*mult)
+						permaSlowDamage(unitID, true)
 					end
 				end
 			end
