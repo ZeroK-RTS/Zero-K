@@ -1,19 +1,3 @@
--- $Id: gui_build_eta.lua 3171 2008-11-06 09:06:29Z det $
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
---  file:    gui_build_eta.lua
---  brief:   display estimated time of arrival for builds
---  author:  Dave Rodgers
---
---  >> modified by: jK <<
---
---  Copyright (C) 2007,2008.
---  Licensed under the terms of the GNU GPL, v2 or later.
---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 function widget:GetInfo()
 	return {
 		name      = "BuildETA",
@@ -22,23 +6,28 @@ function widget:GetInfo()
 		date      = "Feb, 2008",
 		license   = "GNU GPL, v2 or later",
 		layer     = -1,
-		enabled   = true  --  loaded by default?
+		enabled   = true,
 	}
 end
 
--- CarRepairer's modification: Properly displaying time.
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local gl     = gl  --  use a local copy for faster access
+local gl     = gl
 local Spring = Spring
 local table  = table
 
+local stockpilerDefNames =
+	{ "corsilo"
+	, "cornukesub"
+}
+
+local stockpilerDefs = {}
+for i = 1, #stockpilerDefNames do
+	stockpilerDefs[UnitDefNames[stockpilerDefNames[i]].id] = true
+end
+stockpilerDefNames = nil
+
 local etaTable = {}
+local stockpileEtaTable = {}
 
-
---------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Build ETA'
 options_order = { 'showonlyonshift'}
@@ -48,12 +37,8 @@ options = {
 		name = 'Show only on shift',
 		type = 'bool',
 		value = false,
-		--OnChange = function() Spring.SendCommands{'showhealthbars'} end,
 	},
 }
-
-		
---------------------------------------------------------------------------------
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 
@@ -63,11 +48,9 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 
---------------------------------------------------------------------------------
-
 local function MakeETA(unitID,unitDefID)
 	if (unitDefID == nil) then return nil end
-	local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
+	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
 	if (buildProgress == nil) then 
 		return nil 
 	end
@@ -84,71 +67,51 @@ local function MakeETA(unitID,unitDefID)
 		rate     = nil,
 		lastNewTime = nil,
 		timeLeft = nil,
-		--prev     = {count = 0, times = {}}, --for the super complex unneded stuff
-		yoffset  = ud.height+14,
+		yoffset  = ud.height + 14,
 	}
 end
 
 
---------------------------------------------------------------------------------
-
 function widget:Initialize()
-	local myUnits = Spring.GetTeamUnits(Spring.GetMyTeamID())
-	for _,unitID in ipairs(myUnits) do
-		local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
-		if (buildProgress < 1) then
-			etaTable[unitID] = MakeETA(unitID,Spring.GetUnitDefID(unitID))
+	local spect, spectFull = Spring.GetSpectatingState()
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	local allUnits = Spring.GetAllUnits()
+	for i = 1, #allUnits do
+		local unitID = allUnits[i]
+		if (Spring.GetUnitAllyTeam(unitID) == myAllyTeam) or (spect and spectFull) then
+			local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+			if (buildProgress < 1) then
+				etaTable[unitID] = MakeETA(unitID, Spring.GetUnitDefID(unitID))
+			elseif (stockpilerDefs[Spring.GetUnitDefID(unitID)]) then
+				stockpileEtaTable[unitID] = {
+					firstSet = true,
+					lastTime = Spring.GetGameFrame(),
+					lastProg = Spring.GetUnitRulesParam(unitID, "gadgetStockpile") or 0,
+					rate     = nil,
+					lastNewTime = nil,
+					timeLeft = nil,
+					negative = false,
+					yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+				}
+			end
 		end
 	end
 	WG.etaTable = etaTable
 end
 
-
---------------------------------------------------------------------------------
-
-local function updateTime(bi, dt, newTime)
-
-	if bi.lastNewTime and dt < 2 then
-		bi.timeLeft = (newTime + bi.lastNewTime - dt)/2
+local function updateTime(bi, dt, newTime, negative)
+	if bi.lastNewTime and dt < 2 and (bi.negative == negative) then
+		bi.timeLeft = ((newTime + bi.lastNewTime - dt)/2)
 	else
 		bi.timeLeft = newTime
 	end
-
+	bi.negative = negative
 	bi.lastNewTime = newTime
-
 end
 
---[[ Stuff for multiple averaging over many past times, a bit overcomplex
-local function updateTime(bi, dt, newTime)
-	
-	local i = 1
-	local timeLeft = newTime
-	
-	while i <= bi.prev.count do
-		bi.prev.times[i].age = bi.prev.times[i].age + dt
-		bi.prev.times[i].value = bi.prev.times[i].value - dt
-		if bi.prev.times[i].age > 1 then
-			bi.prev.times[i] = bi.prev.times[bi.prev.count]
-			bi.prev.times[bi.prev.count] = nil
-			bi.prev.count = bi.prev.count - 1
-			
-		else
-			timeLeft = timeLeft + bi.prev.times[i].value
-			i = i + 1
-		end
-	end
+function widget:GameFrame(n)
 
-	bi.prev.count = bi.prev.count + 1
-	bi.prev.times[bi.prev.count] = {value = newTime, age = 0}
-	
-	bi.timeLeft = timeLeft/bi.prev.count
-	
-end
---]]
-
-local lastGameUpdate = Spring.GetGameSeconds()
-
-function widget:Update()
+	if (n % 6 ~= 0) then return end -- 6N because stockpile happens in such increments, else its eta fluctuates
 
 	local _,_,pause = Spring.GetGameSpeed()
 	if (pause) then
@@ -156,62 +119,64 @@ function widget:Update()
 	end
 
 	local gs = Spring.GetGameSeconds()
-	if (gs == lastGameUpdate) then
-		return
-	end
-	lastGameUpdate = gs
-  
-	local killTable = {}
-	for unitID,bi in pairs(etaTable) do
-		local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
-		if ((not buildProgress) or (buildProgress >= 1.0)) then
-			table.insert(killTable, unitID)
-		else
-			local dp = buildProgress - bi.lastProg 
-			local dt = gs - bi.lastTime
-			if (dt > 2) then
-				bi.firstSet = true
+
+	for unitID, bi in pairs(stockpileEtaTable) do
+		local buildProgress = Spring.GetUnitRulesParam(unitID, "gadgetStockpile") or 0
+		local dp = buildProgress - bi.lastProg
+		local dt = n - bi.lastTime
+
+		if (dt >= 30) then
+			if (buildProgress <= bi.lastProg) then
 				bi.rate = nil
 				bi.timeLeft = nil
-			end
-			
-			if dt > 0.5 then
-				local rate = dp / dt
+				bi.firstSet = true
+			else
+				local rate = 30 * dp / dt
 
-				if (rate ~= 0) then
-					if (bi.firstSet) then
-						if (buildProgress > 0.001) then
-							bi.firstSet = false
-						end
-					else
-						--[[ Nothing uses this currently but it could be useful in the future
-						local rf = 0.5
-						if (bi.rate == nil) then
-							bi.rate = rate
-						else
-							bi.rate = ((1 - rf) * bi.rate) + (rf * rate)
-						end
-						-]]
-						if (rate > 0) then
-							updateTime(bi, dt, (1 - buildProgress) / rate)
-						elseif (rate < 0) then
-							updateTime(bi, -dt, buildProgress / rate)
-						end
+				if (bi.firstSet) then
+					if (buildProgress > 0.001) then
+						bi.firstSet = false
 					end
-					bi.lastTime = gs
-					bi.lastProg = buildProgress
+				else
+					updateTime(bi, dt, (1 - buildProgress) / rate, false)
 				end
 			end
-			
+			bi.lastTime = n
+			bi.lastProg = buildProgress
 		end
 	end
-	for _,unitID in pairs(killTable) do
-		etaTable[unitID] = nil
+
+	for unitID,bi in pairs(etaTable) do
+		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+		local dp = buildProgress - bi.lastProg 
+		local dt = gs - bi.lastTime
+		if (dt > 2) then
+			bi.firstSet = true
+			bi.rate = nil
+			bi.timeLeft = nil
+		end
+		
+		if dt > 0.5 then
+			local rate = dp / dt
+
+			if (rate ~= 0) then
+				if (bi.firstSet) then
+					if (buildProgress > 0.001) then
+						bi.firstSet = false
+					end
+				else
+					if (rate > 0) then
+						updateTime(bi, dt, (1 - buildProgress) / rate, false)
+					elseif (rate < 0) then
+						updateTime(bi, dt, -buildProgress / rate, true)
+					end
+				end
+				bi.lastTime = gs
+				bi.lastProg = buildProgress
+			end
+		end
 	end
 end
-
-
---------------------------------------------------------------------------------
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local spect,spectFull = Spring.GetSpectatingState()
@@ -221,14 +186,37 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
 
-
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	etaTable[unitID] = nil
+	stockpileEtaTable[unitID] = nil
 end
 
+function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+	local spec = Spring.GetSpectatingState()
+	if (spec) then return end
 
-function widgetHandler:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
-	etaTable[unitID] = nil
+	if Spring.AreTeamsAllied (Spring.GetMyTeamID(), newTeam) then
+		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+		if (buildProgress < 1) then
+			if not etaTable[unitID] then
+				etaTable[unitID] = MakeETA(unitID,Spring.GetUnitDefID(unitID))
+			end
+		elseif stockpilerDefs[Spring.GetUnitDefID(unitID)] and not stockpileEtaTable[unitID] then
+			stockpileEtaTable[unitID] = {
+				firstSet = true,
+				lastTime = Spring.GetGameFrame(),
+				lastProg = buildProgress,
+				rate     = nil,
+				lastNewTime = nil,
+				timeLeft = nil,
+				negative = false,
+				yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+			}
+		end
+	else
+		etaTable[unitID] = nil
+		stockpileEtaTable[unitID] = nil
+	end
 end
 
 local terraunitDefID = UnitDefNames["terraunit"] and UnitDefNames["terraunit"].id
@@ -237,35 +225,36 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	if unitDefID ~= terraunitDefID then
 		etaTable[unitID] = nil
 	end
+
+	if stockpilerDefs[unitDefID]
+	and not stockpileEtaTable[unitID] -- reclaim into rebuild
+	then
+		stockpileEtaTable[unitID] = {
+			firstSet = true,
+			lastTime = Spring.GetGameFrame(),
+			lastProg = Spring.GetUnitRulesParam(unitID, "gadgetStockpile") or 0,
+			rate     = nil,
+			lastNewTime = nil,
+			timeLeft = nil,
+			negative = false,
+			yoffset  = UnitDefs[unitDefID].height + 14,
+		}
+	end
 end
 
 
---------------------------------------------------------------------------------
-
-local function DrawEtaText(timeLeft,yoffset)
+local function DrawEtaText(timeLeft,yoffset, negative)
 	local etaStr
 	if (timeLeft == nil) then
 		etaStr = '\255\255\255\1ETA\255\255\255\255: \255\1\1\255???'
 	else
-		
-		--[[ old code
-		if (timeLeft > 60) then
-			etaStr = "\255\255\255\1ETA\255\255\255\255:" .. string.format('\255\1\255\1%d', timeLeft / 60) .. "m, " .. string.format('\255\1\255\1%.1f', timeLeft % 60) .. "s"
-		elseif (timeLeft > 0) then
-			etaStr = "\255\255\255\1ETA\255\255\255\255:" .. string.format('\255\1\255\1%.1f', timeLeft) .. "s"
-		else
-			etaStr = "\255\255\255\1ETA\255\255\255\255:" .. string.format('\255\255\1\1%.1f', -timeLeft) .. "s"
-		end
-		--]]
-		
-		local color = timeLeft > 0 and '\255\1\255\1' or '\255\255\1\1'
+		local color = negative and '\255\255\1\1' or '\255\1\255\1'
 		etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
 	end
 
 	gl.Translate(0, yoffset,0)
 	gl.Billboard()
 	gl.Translate(0, 5 ,0)
-	--fontHandler.DrawCentered(etaStr)
 	gl.Text(etaStr, 0, 0, 8, "co")
 end
 
@@ -274,15 +263,17 @@ function widget:DrawWorld()
 	gl.DepthTest(true)
 
 	gl.Color(1, 1, 1)
-	--fontHandler.UseDefaultFont()
 
 	for unitID, bi in pairs(etaTable) do
-		gl.DrawFuncAtUnit(unitID, false, DrawEtaText, bi.timeLeft,bi.yoffset)
+		gl.DrawFuncAtUnit(unitID, false, DrawEtaText, bi.timeLeft,bi.yoffset, bi.negative)
+	end
+
+	for unitID, bi in pairs(stockpileEtaTable) do
+		local stocked, wanted = Spring.GetUnitStockpile(unitID)
+		if (stocked < wanted) then
+			gl.DrawFuncAtUnit(unitID, false, DrawEtaText, bi.timeLeft,bi.yoffset, false)
+		end
 	end
 
 	gl.DepthTest(false)
 end
-  
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
