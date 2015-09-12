@@ -30,7 +30,7 @@ end
 local modOptions = Spring.GetModOptions()
 local maplist = include "LuaRules/Configs/typemap_options_maps.lua"
 
-function gadget:Initialize()
+function gadget:GameFrame(n)
 	
 	--[[
 	for i = 0,256,1 do
