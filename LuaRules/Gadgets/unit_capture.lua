@@ -260,8 +260,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- reset degrade timer for against this allyteam and add to damage
 	allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
 	allyTeamData.totalDamage = allyTeamData.totalDamage + newCaptureDamage
-	Spring.Echo("totalDamage", allyTeamData.totalDamage)
-	Spring.Echo("captureHealth", damageData.captureHealth)
 	-- capture the unit if total damage is greater than max hp of unit
 	if allyTeamData.totalDamage >= damageData.captureHealth then
 		-- give the unit
