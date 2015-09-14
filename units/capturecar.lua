@@ -78,7 +78,6 @@ unitDef = {
     CAPTURERAY = {
       name                    = [[Capture Ray]],
       beamdecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.033,
       beamttl                 = 1,
       coreThickness           = 0,

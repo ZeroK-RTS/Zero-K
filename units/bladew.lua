@@ -80,7 +80,6 @@ unitDef = {
     PARALYZER = {
       name                    = [[Light Electro-Stunner]],
       areaOfEffect            = 8,
-      beamWeapon              = true,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,

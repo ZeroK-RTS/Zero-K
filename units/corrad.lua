@@ -95,7 +95,6 @@ unitDef = {
       name                    = [[Scanning Lidar]],
       avoidFeature            = false,
       avoidNeutral            = false,
-      beamlaser               = 1,
       beamTime                = 0.01,
       canattackground         = false,
       coreThickness           = 0.5,

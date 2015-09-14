@@ -245,7 +245,6 @@ unitDef = {
       soundStart              = [[weapon/cannon/mini_cannon]],
       soundStartVolume        = 2,
       sprayangle              = 14400,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,

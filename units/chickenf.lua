@@ -108,7 +108,6 @@ unitDef = {
       propeller               = [[1]],
       range                   = 400,
       reloadtime              = 1.5,
-      renderType              = 1,
       soundHit                = [[chickens/spike_hit]],
       soundStart              = [[chickens/chickenflyerbig1]],
       startVelocity           = 400,

@@ -110,7 +110,6 @@ unitDef = {
       propeller               = [[1]],
       range                   = 460,
       reloadtime              = 3,
-      selfprop                = true,
       soundHit                = [[chickens/spike_hit]],
       soundStart              = [[chickens/spike_fire]],
       startVelocity           = 320,

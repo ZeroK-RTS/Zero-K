@@ -132,7 +132,6 @@ unitDef = {
       soundHit                = [[explosion/ex_large4]],
       soundStart              = [[explosion/ex_large5]],
       sprayAngle              = 768,
-      startsmoke              = [[1]],
       tolerance               = 4096,
       turret                  = true,
       weaponType              = [[Cannon]],

@@ -75,7 +75,6 @@ unitDef = {
     arm_det_weapon = {
       name                    = [[Electro-Stunner]],
       areaOfEffect            = 160,
-      beamWeapon              = true,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,

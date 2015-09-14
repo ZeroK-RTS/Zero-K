@@ -128,7 +128,6 @@ unitDef = {
       soundHit                = [[explosion/mini_nuke]],
       soundStart              = [[weapon/cannon/big_begrtha_gun_fire]],
 	  stages				  = 30,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1100,

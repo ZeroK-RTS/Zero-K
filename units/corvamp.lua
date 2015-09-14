@@ -91,7 +91,6 @@ unitDef = {
       areaOfEffect            = 12,
       avoidFriendly           = false,
       beamDecay               = 0.736,
-      beamlaser               = 1,
       beamTime                = 0.01,
       beamttl                 = 15,
       canattackground         = false,

@@ -102,7 +102,6 @@ unitDef = {
         subs    = 9,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:blobber_goo]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
@@ -117,7 +116,6 @@ unitDef = {
       soundHit                = [[chickens/acid_hit]],
       soundStart              = [[chickens/acid_fire]],
       sprayAngle              = 1792,
-      startsmoke              = [[0]],
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.2,

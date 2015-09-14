@@ -140,10 +140,8 @@ unitDef = {
       model                   = [[asteroid.s3o]],
       range                   = 9000,
       reloadtime              = 0.7,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
-      startsmoke              = [[1]],
       startVelocity           = 1500,
 
       textures                = {
@@ -190,11 +188,8 @@ unitDef = {
       model                   = [[asteroid.s3o]],
       range                   = 9000,
       reloadtime              = 0.7,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
-      startsmoke              = [[1]],
       startVelocity           = 1500,
 
       textures                = {
@@ -242,11 +237,8 @@ unitDef = {
       model                   = [[asteroid.s3o]],
       range                   = 9000,
       reloadtime              = 0.7,
-      selfprop                = true,
-      smokedelay              = [[0.1]],
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
-      startsmoke              = [[1]],
       startVelocity           = 1500,
 
       textures                = {
@@ -297,7 +289,6 @@ unitDef = {
       reloadtime              = 0.7,
       smokeTrail              = true,
       soundHit                = [[weapon/cannon/supergun_bass_boost]],
-      startsmoke              = [[1]],
       startVelocity           = 1500,
 
       textures                = {

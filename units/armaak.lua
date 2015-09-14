@@ -106,7 +106,6 @@ unitDef = {
         subs    = 0.5,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:ARCHPLOSION]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -123,7 +122,6 @@ unitDef = {
       separation              = 1.5,
       soundStart              = [[weapon/cannon/brawler_emg]],
       stages                  = 10,
-      startsmoke              = [[0]],
       sweepfire               = false,
       tolerance               = 8192,
       turret                  = true,
@@ -137,7 +135,6 @@ unitDef = {
       name                    = [[Anti-Air Laser Battery]],
       areaOfEffect            = 12,
       beamDecay               = 0.736,
-      beamlaser               = 1,
       beamTime                = 0.01,
       beamttl                 = 15,
       canattackground         = false,

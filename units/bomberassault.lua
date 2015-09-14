@@ -102,7 +102,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
-      manualBombSettings      = true,
       model                   = [[zeppelin_bomb.dae]],
       myGravity               = 0.15,
       noSelfDamage            = true,

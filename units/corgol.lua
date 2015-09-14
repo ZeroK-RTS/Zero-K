@@ -123,7 +123,6 @@ unitDef = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.12,
       beamttl                 = 50,
       coreThickness           = 0,
