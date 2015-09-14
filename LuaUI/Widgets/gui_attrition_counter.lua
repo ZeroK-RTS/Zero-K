@@ -156,7 +156,6 @@ local function GetOpposingAllyTeams()
 		local teamID = teams[i]
 		local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
 		if teamID ~= gaiaTeamID then
-		
 			if isAI then
 				-- If the team is an AI team then count it as long as it is not chicken.
 				-- The AI names are collected seperately because they are less important.
@@ -182,14 +181,14 @@ local function GetOpposingAllyTeams()
 				local data = activeAllyTeams[allyTeamID]
 				
 				-- The first player provides some representitive information for the team
-				if not data.playerNames then
-					data.playerNames = {}
+				if not data.playerList then
+					data.playerList = {}
 					data.teamID = teamID
 					data.winString = GetWinString(name)
 				end
 				
 				data.players = data.players + 1
-				data.playerNames[data.players] = name
+				table.insert(data.playerList,{name=name,playerID=leader,keys=customKeys});
 				
 				-- The team is considered a clan until players from distinct clans are found.
 				if (not data.noClan) and data.clan ~= clan then
@@ -239,20 +238,31 @@ local function GetOpposingAllyTeams()
 			end
 		else
 			if data.players >= 1 then
-				name = data.playerNames[1]
+				name = data.playerList[1].name;
 			else
 				name = data.aiNames[1]
 			end
 			if teamMembers == 2 or data.players == 2 then
 				nameSize = 0.65
 				if data.players >= 2 then
-					name = name .. "\n" .. data.playerNames[2]
+					name = name .. "\n" .. data.playerList[2].name
 				else
 					name = name .. "\n" .. data.aiNames[2]
 				end
 			elseif teamMembers > 2 then
 				nameSize = 0.65
-				name = name .. "\n and team"
+				if (data.playerList) then
+					local highest = nil;
+					for i,p in pairs(data.playerList) do
+						if not highest then highest = p end;
+						if p.keys and p.keys.elo and p.keys.elo > highest.keys.elo then
+							highest = p
+						end
+					end
+					name = highest.name .. "\n and "..(teamMembers-1).." allies"
+				else
+					name = "AI team ("..teamMembers..")";
+				end
 			end
 		end
 		
@@ -265,6 +275,7 @@ local function GetOpposingAllyTeams()
 			teamID = data.teamID, -- representitive teamID
 			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1}, -- color of the teams text (color of first player)
 			playerName = data.playerName, -- representitive player name (for win counter)
+			playerList = data.playerList,
 			winString = data.winString or "0", -- Win string from win counter
 		}
 	end
@@ -380,6 +391,7 @@ function widget:Initialize()
 			allyTeams[td.allyTeamID].color = td.color;
 			allyTeams[td.allyTeamID].name = td.name;
 			allyTeams[td.allyTeamID].numPlayers = td.name;
+			
 			if(myAllyTeam ~= td.allyTeamID) then enemyAllyTeam = td.allyTeamID end
 		end
 		
@@ -391,7 +403,6 @@ function widget:Initialize()
 			teams[t].name = GetTeamName(t);
 			teams[t].friendlyAllyTeam = allyTeamID;
 			teams[t].enemyAllyTeam = (allyTeamID == myAllyTeam and enemyAllyTeam or myAllyTeam);
-
 			
 			if(isAI) then
 				elo = 1000;
@@ -418,6 +429,15 @@ function widget:Initialize()
 	
 	CreateWindow()
 	UpdateTooltips()
+	
+	if not allyTeams[myAllyTeam].name:find("\n") then
+		label_self.y = label_self.y+18;
+	end
+	
+	if not allyTeams[myAllyTeam].name:find("\n") then
+		label_other.y = label_other.y+18;
+	end
+	
 end
 
 
@@ -485,6 +505,7 @@ end
 
 function CreateWindow()	
 	-- local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local countsOffset = 43;
 	
 	--// WINDOW
 	window_main = Window:New{
@@ -498,9 +519,9 @@ function CreateWindow()
 		y = "10%",
 		height = 60,
 		clientWidth  = 400,
-		clientHeight = 60,
-		minHeight = 60,
-		maxHeight = 60,
+		clientHeight = 65,
+		minHeight = 65,
+		maxHeight = 65,
 		minWidth = 250,
 		draggable = true,
 		resizable = false,
@@ -523,7 +544,7 @@ function CreateWindow()
 	label_self = Label:New {
 		parent = window_main,
 		x = 20,
-		y = 10,
+		y = 0,
 		fontSize = 16,
 		align = 'left',
 		caption = allyTeams[myAllyTeam].name,
@@ -534,7 +555,7 @@ function CreateWindow()
 	label_own_kills_units = Label:New{
 		parent = window_main,
 		x = 22,
-		y = 33,
+		y = countsOffset+1,
 		fontSize = 12,
 		align = 'left',
 		caption = '0',
@@ -547,14 +568,14 @@ function CreateWindow()
 		width = 16,
 		height = 16,
 		x = font:GetTextWidth(label_own_kills_units.caption) + label_own_kills_units.x + 1,
-		y = 31,
+		y = countsOffset,
 		tooltip = 'Units Destroyed',
 		HitTest = function (self, x, y) return self end,
 	}
 	label_own_kills_metal = Label:New{
 		parent = window_main,
 		x = icon_own_skull.x + 20,
-		y = 33,
+		y = countsOffset+1,
 		fontSize = 12,
 		align = 'left',
 		caption = '/ 0',
@@ -567,7 +588,7 @@ function CreateWindow()
 		width = 16,
 		height = 16,
 		x = font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x,
-		y = 31,
+		y = countsOffset,
 		tooltip = 'Metal Value Destroyed',
 		HitTest = function (self, x, y) return self end,
 	}
@@ -576,7 +597,7 @@ function CreateWindow()
 	label_other = Label:New {
 		parent = window_main,
 		right = 20,		
-		y = 10,
+		y = 0,
 		fontSize = 16,
 		align = 'right',
 		caption = allyTeams[enemyAllyTeam].name,
@@ -590,13 +611,13 @@ function CreateWindow()
 		height = 16,
 		x = window_main.clientWidth - (22 + 17),
 		--right = 22,		
-		y = 31,
+		y = countsOffset,
 		tooltip = 'Metal Value Destroyed',
 		HitTest = function (self, x, y) return self end,
 	}	
 	label_other_kills_metal = Label:New{
 		parent = window_main,		
-		y = 33,
+		y = countsOffset+1,
 		x = icon_other_bars.x - (font:GetTextWidth('/ 0') + 1), --window_main.clientWidth - (22 + 17 + font:GetTextWidth('/ ---')),
 		--right = 22 + 17,
 		fontSize = 12,
@@ -613,7 +634,7 @@ function CreateWindow()
 		height = 16,
 		x = label_other_kills_metal.x - 17, --window_main.clientWidth - (22 + 17 + font:GetTextWidth('/ ---') + 1),
 		--right = 22 + 17 + font:GetTextWidth('/ ---') + 1, --font:GetTextWidth(label_own_kills_metal.caption) + 1 + label_own_kills_metal.x,
-		y = 31,
+		y = countsOffset,
 		tooltip = 'Units Destroyed',
 		HitTest = function (self, x, y) return self end,
 		-- align = 'right',
@@ -622,7 +643,7 @@ function CreateWindow()
 		parent = window_main,
 		x = icon_other_skull.x - (font:GetTextWidth('0') + 1),
 		--right = icon_other_skull.right + 17, --- font:GetTextWidth('---'),
-		y = 33,
+		y = countsOffset+1,
 		fontSize = 12,
 		--align = 'right',
 		caption = '0',
