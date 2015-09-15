@@ -95,7 +95,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      minbarrelangle          = [[-10]],
       myGravity               = 0.1,
       noSelfDamage            = true,
       range                   = 1180,

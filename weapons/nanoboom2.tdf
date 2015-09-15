@@ -1,12 +1,10 @@
 [NANOBOOM2]
 {
-  name=MEX;
+  name=Nano Explosion;
   areaofeffect=128;
   craterboost=1;
   cratermult=3.5;
   edgeeffectiveness=0.75;
-  explosionart=explode2;
-  explosiongaf=fx;
   explosiongenerator=custom:FLASH1;
   impulseboost=0;
   impulsefactor=0.4;

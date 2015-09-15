@@ -132,7 +132,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       lodDistance             = 10000,
-      pitchtolerance          = [[2000]],
       range                   = 700,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],

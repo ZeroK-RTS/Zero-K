@@ -125,7 +125,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      minbarrelangle          = [[-25]],
       projectiles             = 1,
       range                   = 1400,
       reloadtime              = 10,

@@ -177,7 +177,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 100,	-- gadget modifies to 450
       reloadtime              = 0.4,
       rgbColor                = [[0 1 1]],

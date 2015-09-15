@@ -119,7 +119,6 @@ unitDef = {
       myGravity               = 1000,
       range                   = 10,
       reloadtime              = 10,
-      scale                   = [[0]],
       weaponType              = [[AircraftBomb]],
     },
 

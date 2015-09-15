@@ -105,7 +105,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 1,
       lodDistance             = 10000,
-      pitchtolerance          = [[1000]],
       predictBoost            = 1,
       proximityPriority       = 4,
       range                   = 1040,

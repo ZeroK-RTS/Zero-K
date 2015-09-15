@@ -159,7 +159,6 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 0,
       model                   = [[wep_t_longbolt.s3o]],
-      propeller               = true,
       range                   = 210,
       reloadtime              = 4.4,
       startVelocity           = 400,

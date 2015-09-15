@@ -105,7 +105,6 @@ unitDef = {
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
-      propeller               = [[1]],
       range                   = 350,
       reloadtime              = 2.2,
       soundHit                = [[TorpedoHitVariable]],

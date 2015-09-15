@@ -119,8 +119,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 300,
       reloadtime              = 0.5,
-      renderType              = 6,
-      scale                   = [[0]],
       weaponType              = [[AircraftBomb]],
     },
 

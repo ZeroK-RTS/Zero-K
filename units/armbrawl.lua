@@ -113,7 +113,6 @@ unitDef = {
       interceptedByShieldType = 1,
 	  myGravity               = 0.15,
       noSelfDamage            = true,
-      pitchtolerance          = 12000,
       range                   = 650,
       reloadtime              = 0.45,
       rgbColor                = [[1 0.95 0.5]],

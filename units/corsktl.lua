@@ -127,8 +127,6 @@ local weaponDefs = {
     impulseBoost       = 0,
     impulseFactor      = 0.1,
     name               = "Explosion",
-    shakeduration      = 0,
-    shakemagnitude     = 0,
     soundHit           = "explosion/mini_nuke",
 	
 	customParams       = {

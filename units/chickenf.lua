@@ -105,7 +105,6 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       model                   = [[spike.s3o]],
-      propeller               = [[1]],
       range                   = 400,
       reloadtime              = 1.5,
       soundHit                = [[chickens/spike_hit]],

@@ -118,7 +118,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 2.9,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 800,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],

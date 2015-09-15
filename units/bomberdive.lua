@@ -119,7 +119,6 @@ unitDef = {
       myGravity               = 1000,
       range                   = 10,
       reloadtime              = 10,
-      scale                   = [[0]],
       weaponType              = [[AircraftBomb]],
     },
 
@@ -194,7 +193,6 @@ unitDef = {
       range                   = 600,
       reloadtime              = 2,
       rgbColor                = [[0.5 1 1]],
-      scale                   = [[0]],
       size                    = 1E-06,
 	  startVelocity           = 2000,
       turret                  = true,

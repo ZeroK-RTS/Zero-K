@@ -80,7 +80,6 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 6,
       craterMult              = 6,
-      cruise                  = [[1]],
 
       damage                  = {
         default = 11501.1,
@@ -97,8 +96,6 @@ unitDef = {
       noSelfDamage            = false,
       range                   = 72000,
       reloadtime              = 5,
-      shakeduration           = [[3]],
-      shakemagnitude          = [[50]],
       smokeTrail              = false,
       soundHit                = [[explosion/ex_ultra8]],
       startVelocity           = 800,

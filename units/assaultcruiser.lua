@@ -181,7 +181,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 0,
-      minbarrelangle          = [[-15]],
       noExplode               = true,
       numbounce               = 40,
       range                   = 450,

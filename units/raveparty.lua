@@ -269,7 +269,6 @@ unitDef = {
 
 	  edgeEffectiveness       = 0.75,
       explosionGenerator      = [[custom:POWERPLANT_EXPLOSION]],
-      holdtime                = [[1]],
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
@@ -311,7 +310,6 @@ unitDef = {
       edgeeffectiveness       = 0.8,
       explosionGenerator      = [[custom:riotballplus2_purple]],
 	  explosionScar           = false,
-      holdtime                = [[1]],
       impulseBoost            = 0.2,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
