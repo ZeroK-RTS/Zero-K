@@ -15,7 +15,6 @@
   paralyzetime=4;
   range=600;
   reloadtime=0.3;
-  rendertype=4;
   soundhit=explosion/small_emp_explode;
   tolerance=7000;
   turret=1;

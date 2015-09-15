@@ -12,7 +12,6 @@
   interceptedbyshieldtype=1;
   range=1;
   reloadtime=3.6;
-  rendertype=4;
   soundhit=explosion/ex_med17;
   soundhitvolume=18;
   turret=1;
