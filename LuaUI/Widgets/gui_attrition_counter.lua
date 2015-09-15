@@ -434,7 +434,7 @@ function widget:Initialize()
 		label_self.y = label_self.y+18;
 	end
 	
-	if not allyTeams[myAllyTeam].name:find("\n") then
+	if not allyTeams[enemyAllyTeam].name:find("\n") then
 		label_other.y = label_other.y+18;
 	end
 	
