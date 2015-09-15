@@ -25,7 +25,6 @@ return {
     interceptedbyshieldtype = 1,
     range                   = 200,
     reloadtime              = 3.6,
-    rendertype              = 4,
     soundhit                = [[explosion/ex_med3]],
     turret                  = 1,
     weaponvelocity          = 250,
