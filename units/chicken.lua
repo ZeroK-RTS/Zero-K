@@ -97,7 +97,6 @@ unitDef = {
         subs    = 80,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:NONE]],
       impactOnly              = true,
       impulseBoost            = 0,
@@ -108,7 +107,6 @@ unitDef = {
       size                    = 0,
       soundHit                = [[chickens/chickenbig2]],
       soundStart              = [[chickens/chicken]],
-      startsmoke              = [[0]],
       targetborder            = 1,
       tolerance               = 5000,
       turret                  = true,

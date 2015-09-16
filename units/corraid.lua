@@ -112,7 +112,6 @@ unitDef = {
       reloadtime              = 2,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/medplasma_fire]],
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 215,

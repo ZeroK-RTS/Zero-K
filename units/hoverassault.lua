@@ -82,7 +82,6 @@ unitDef = {
     DEW = {
       name                    = [[Direct Energy Weapon]],
       areaOfEffect            = 48,
-      beamWeapon              = true,
       cegTag                  = [[beamweapon_muzzle_blue]],
       coreThickness           = 0.5,
       craterBoost             = 0,

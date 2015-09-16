@@ -117,7 +117,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 730,
       reloadtime              = 4,
-      renderType              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/sabot_hit]],
       soundStart              = [[weapon/missile/missile_fire]],

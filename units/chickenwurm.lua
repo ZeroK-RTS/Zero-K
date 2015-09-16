@@ -105,7 +105,6 @@ unitDef = {
         subs    = 2.5,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:napalm_firewalker]],
       fireStarter             = 120,
       impulseBoost            = 0,
@@ -120,7 +119,6 @@ unitDef = {
       soundHit                = [[chickens/acid_hit]],
       soundStart              = [[chickens/acid_fire]],
       sprayAngle              = 1024,
-      startsmoke              = [[0]],
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.2,

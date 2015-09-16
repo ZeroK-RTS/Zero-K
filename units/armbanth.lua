@@ -234,7 +234,6 @@ unitDef = {
       soundStartVolume        = 2,
       soundTrigger            = true,
       sprayAngle              = 1000,
-      startsmoke              = [[1]],
       texture1                = [[lightning]],
       thickness               = 10,
       turret                  = true,

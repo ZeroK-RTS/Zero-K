@@ -86,7 +86,6 @@ unitDef = {
     LASER = {
       name                    = [[Laser Blaster]],
       areaOfEffect            = 8,
-      beamWeapon              = true,
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

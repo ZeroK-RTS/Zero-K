@@ -118,7 +118,6 @@ unitDef = {
       soundHitVolume          = 2.5,
       soundStart              = [[weapon/missile/banisher_fire]],
       soundStartVolume        = 2.5,
-      startsmoke              = [[1]],
       startVelocity           = 100,
       tolerance               = 9000,
       tracks                  = true,

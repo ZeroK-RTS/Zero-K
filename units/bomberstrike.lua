@@ -99,7 +99,6 @@ unitDef = {
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/rapid_rocket_fire2]],
       soundStartVolume        = 7,
-      startsmoke              = [[1]],
       startVelocity           = 190,
       texture2                = [[lightsmoketrail]],
       tracks                  = true,

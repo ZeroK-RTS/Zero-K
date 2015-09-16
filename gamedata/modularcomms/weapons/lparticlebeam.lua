@@ -24,7 +24,6 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	laserFlareSize          = 4.5,
 	minIntensity            = 1,
-	pitchtolerance          = 8192,
 	range                   = 330,
 	reloadtime              = 10/30,
 	rgbColor                = [[1 0 0]],

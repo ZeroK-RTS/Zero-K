@@ -77,7 +77,6 @@ unitDef = {
       name                    = [[Disable Ray]],
       --avoidFriendly           = false,
       beamdecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 1,
       --collideFriendly         = false,

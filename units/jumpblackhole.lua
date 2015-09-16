@@ -131,7 +131,6 @@ unitDef = {
       soundStart              = [[weapon/blackhole_fire]],
       soundStartVolume        = 6000,
       soundHitVolume          = 6000,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
