@@ -179,10 +179,13 @@ function widget:GameFrame(n)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	local spect,spectFull = Spring.GetSpectatingState()
-	local myTeam = Spring.GetMyTeamID()
-	if Spring.AreTeamsAllied(unitTeam, myTeam) or (spect and spectFull) then
-		etaTable[unitID] = MakeETA(unitID,unitDefID)
+	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+	if(buildProgress < 1) then
+		local spect,spectFull = Spring.GetSpectatingState()
+		local myTeam = Spring.GetMyTeamID()
+		if Spring.AreTeamsAllied(unitTeam, myTeam) or (spect and spectFull) then
+			etaTable[unitID] = MakeETA(unitID,unitDefID)
+		end
 	end
 end
 
