@@ -119,7 +119,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 80,
-      object           = [[wreck2x2c.s3o]],
+      object           = [[armartic_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 80,
     },
