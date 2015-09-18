@@ -90,6 +90,7 @@ local formationCmds = {
 -- What commands require alt to be held (Must also appear in formationCmds)
 local requiresAlt = {
 	[CMD.ATTACK] = true,
+	[CMD.MANUALFIRE] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_UNIT_SET_TARGET] = true, -- settarget
 	[CMD_UNIT_SET_TARGET_CIRCLE] = true, -- settarget
