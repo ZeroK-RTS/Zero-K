@@ -167,9 +167,12 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 1200,
-      object           = [[wreck3x3b.s3o]],
+      object           = [[cornukesub_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 1200,
+	  collisionVolumeOffsets = [[0 -5 0]],
+	  collisionVolumeScales  = [[30 25 110]],
+	  collisionVolumeType    = [[box]],
     },
 
     HEAP  = {
