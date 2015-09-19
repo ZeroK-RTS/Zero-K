@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[firewalker]],
   name                   = [[Firewalker]],
-  description            = [[Fire Support Walker (Artillery/Skirmish)]],
+  description            = [[Fire Support Walker (Artillery/Riot)]],
   acceleration           = 0.12,
   brakeRate              = 0.24,
   buildCostEnergy        = 900,
@@ -18,10 +18,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Roboter mit Feuerunterst?zung (Artillerie/Skrimish)]],
+    description_de = [[Roboter mit Feuerunterst√ºtzung (Artillerie/Riot)]],
     description_pl = [[Robot wsparcia artyleryjskiego]],
     helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
-	helptext_de    = [[Der Firewalker verschieﬂt seine Mˆrser auf mittlerer Distanz und erzeugt in den betroffenen Arealen eine Unbrauchbarkeit des Gel‰ndes f? kurze Zeitr‰ume. Die Einheit selber ist etwas schwerf‰llig und langsam im Manˆvrieren.]],
+	helptext_de    = [[Der Firewalker setzt mit seinem M√∂rser auf mittlerer Distanz Gebiete in Brand und macht sie somit f√ºr kurze Zeit unpassierbar. Die Einheit selber ist etwas schwerf√§llig und langsam im Man√∂vrieren.]],
 	helptext_pl    = [[Firewalker uzywa swoich dzial sredniego zasiegu do podpalania wyznaczonych obszarow, co zadaje obrazenia jednostkom, ktore tam pozostana.]],
   },
 
