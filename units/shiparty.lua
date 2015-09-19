@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shiparty]],
   name                   = [[Crusader]],
-  description            = [[Destroyer (Fire Support/Semi-Antisub)]],
+  description            = [[Artillery/Torpedo Support Ship]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,

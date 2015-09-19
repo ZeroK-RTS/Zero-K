@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armsnipe]],
   name                   = [[Sharpshooter]],
-  description            = [[Sniper Walker (Skirmish/Anti-Heavy)]],
+  description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.3,
   brakeRate              = 0.2,
   buildCostEnergy        = 750,

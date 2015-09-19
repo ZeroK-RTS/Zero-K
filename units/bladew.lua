@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[bladew]],
   name                = [[Gnat]],
-  description         = [[Light Paralyzer Drone]],
+  description         = [[Anti-Heavy EMP Drone]],
   acceleration        = 0.264,
   brakeRate           = 0.264,
   buildCostEnergy     = 90,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[firewalker]],
   name                   = [[Firewalker]],
-  description            = [[Fire Support Walker (Artillery/Skirmish)]],
+  description            = [[Saturation Artillery Walker]],
   acceleration           = 0.12,
   brakeRate              = 0.24,
   buildCostEnergy        = 900,

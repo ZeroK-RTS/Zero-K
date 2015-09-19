@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[gunshipaa]],
   name                   = [[Trident]],
-  description            = [[AA Gunship]],
+  description            = [[Anti-Air Gunship]],
   acceleration           = 0.18,
   airStrafe              = 0,
   amphibious             = true,

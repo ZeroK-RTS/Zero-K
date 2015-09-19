@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[cormist]],
   name                   = [[Slasher]],
-  description            = [[Deployable Missile Truck (must stop to fire)]],
+  description            = [[Deployable Missile Vehicle (must stop to fire)]],
   acceleration           = 0.0354,
   brakeRate              = 0.0358,
   buildCostEnergy        = 140,

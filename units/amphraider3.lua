@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphraider3]],
   name                   = [[Duck]],
-  description            = [[Amphibious Raider Bot (Sea)]],
+  description            = [[Amphibious Raider Bot (Torpedo)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corcrash]],
   name                   = [[Vandal]],
-  description            = [[Anti-air Bot]],
+  description            = [[Anti-Air Bot]],
   acceleration           = 0.45,
   brakeRate              = 0.45,
   buildCostEnergy        = 90,

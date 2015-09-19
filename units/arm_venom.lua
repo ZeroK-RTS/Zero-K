@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[arm_venom]],
   name                   = [[Venom]],
-  description            = [[Riot Lightning Spider]],
+  description            = [[Lightning Riot Spider]],
   acceleration           = 0.26,
   brakeRate              = 0.26,
   buildCostEnergy        = 200,

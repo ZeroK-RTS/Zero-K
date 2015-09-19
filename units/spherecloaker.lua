@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[spherecloaker]],
   name                   = [[Eraser]],
-  description            = [[Cloaker/Jammer Walker]],
+  description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.25,

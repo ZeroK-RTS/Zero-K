@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corsumo]],
   name                = [[Sumo]],
-  description         = [[Heavy Assault Jumper - On to Repulse, Off to Attract]],
+  description         = [[Heavy Riot Jumper - On to Repulse, Off to Attract]],
   acceleration        = 0.1,
   activateWhenBuilt   = true,
   brakeRate           = 0.1,

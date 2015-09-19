@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipraider]],
   name                   = [[Typhoon]],
-  description            = [[Corvette (Assault/Raider)]],
+  description            = [[Assault/Raider Corvette]],
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
   brakeRate              = 0.042,

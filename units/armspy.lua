@@ -1,7 +1,7 @@
 unitDef = {
   unitname              = [[armspy]],
   name                  = [[Infiltrator]],
-  description           = [[Spy, Anti-Heavy]],
+  description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
   brakeRate             = 0.3,

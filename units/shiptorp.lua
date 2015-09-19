@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[shiptorp]],
   name                = [[Hunter]],
-  description         = [[Riot Torpedo Frigate]],
+  description         = [[Torpedo Riot Frigate]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,

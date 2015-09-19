@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corbats]],
   name                   = [[Warlord]],
-  description            = [[Battleship (Bombardment)]],
+  description            = [[Heavy Artillery Ship]],
   acceleration           = 0.039,
   brakeRate              = 0.0475,
   buildAngle             = 16384,

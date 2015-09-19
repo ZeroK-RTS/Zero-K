@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[subraider]],
   name                   = [[Snake]],
-  description            = [[Submarine]],
+  description            = [[Raider Submarine]],
   acceleration           = 0.06,
   activateWhenBuilt      = true,
   brakeRate              = 0.2,

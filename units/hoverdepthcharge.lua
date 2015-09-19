@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[hoverdepthcharge]],
   name                = [[Claymore]],
-  description         = [[Antisub Hovercraft]],
+  description         = [[Anti-Sub Hovercraft]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,

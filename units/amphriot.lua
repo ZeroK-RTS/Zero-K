@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphriot]],
   name                   = [[Scallop]],
-  description            = [[Amphibious Riot Bot]],
+  description            = [[Amphibious Riot Bot (Torpedo)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,

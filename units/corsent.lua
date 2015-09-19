@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corsent]],
   name                   = [[Copperhead]],
-  description            = [[Flak Tank]],
+  description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostEnergy        = 550,

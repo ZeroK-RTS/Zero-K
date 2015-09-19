@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armamd]],
   name                          = [[Protector]],
-  description                   = [[Anti-Nuke System]],
+  description                   = [[Strategic Nuke Interception System]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   antiweapons                   = [[1]],

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[cormex]],
   name                   = [[Metal Extractor]],
-  description            = [[Extracts Metal]],
+  description            = [[Produces Metal]],
   acceleration           = 0,
   activateWhenBuilt      = true,
   bmcode                 = [[0]],

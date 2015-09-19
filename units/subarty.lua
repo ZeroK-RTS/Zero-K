@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[subarty]],
   name                   = [[Serpent]],
-  description            = [[Sniper Submarine]],
+  description            = [[Precise Artillery/Anti-Heavy Submarine]],
   acceleration           = 0.1,
   activateWhenBuilt      = true,
   brakeRate              = 0.3,

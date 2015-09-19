@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[screamer]],
   name                          = [[Screamer]],
-  description                   = [[Very Long-Range AA Missile Tower, 20 second stockpile]],
+  description                   = [[Very Long-Range Anti-Air Missile Tower]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -75,7 +75,7 @@ unitDef = {
   weaponDefs                    = {
 
     ADVSAM = {
-      name                    = [[Advanced AA Missile]],
+      name                    = [[Advanced Anti-Air Missile]],
       areaOfEffect            = 240,
       canAttackGround         = false,
       cegTag                  = [[screamertrail]],

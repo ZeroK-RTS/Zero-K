@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[hoveraa]],
   name                = [[Flail]],
-  description         = [[AA Hover]],
+  description         = [[Anti-Air Hovercraft]],
   acceleration        = 0.048,
   brakeRate           = 0.043,
   buildCostEnergy     = 300,

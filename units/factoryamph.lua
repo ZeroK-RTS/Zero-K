@@ -1,6 +1,6 @@
 unitDef = {
   unitname         = [[factoryamph]],
-  name             = [[Amphibious Operations Plant]],
+  name             = [[Amphibious Bot Plant]],
   description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
   buildCostEnergy  = 600,
   buildCostMetal   = 600,

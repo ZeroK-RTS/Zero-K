@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armmerl]],
   name                = [[Impaler]],
-  description         = [[Kinetic Missile Artillery]],
+  description         = [[Precision Artillery Vehicle]],
   acceleration        = 0.042,
   brakeRate           = 0.08,
   buildCostEnergy     = 700,

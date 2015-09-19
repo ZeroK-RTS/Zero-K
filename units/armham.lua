@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armham]],
   name                   = [[Hammer]],
-  description            = [[Light Artillery/Skirmisher Bot]],
+  description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.25,
   buildCostEnergy        = 130,

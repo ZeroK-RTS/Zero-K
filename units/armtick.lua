@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armtick]],
   name                   = [[Tick]],
-  description            = [[All-Terrain EMP Crawling Bomb]],
+  description            = [[Burrowing EMP Bomb Spider]],
   acceleration           = 0.25,
   brakeRate              = 0.6,
   buildCostEnergy        = 120,

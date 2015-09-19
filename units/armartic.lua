@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armartic]],
   name                          = [[Faraday]],
-  description                   = [[EMP Weapon]],
+  description                   = [[EMP Turret]],
   buildCostEnergy               = 200,
   buildCostMetal                = 200,
   builder                       = false,

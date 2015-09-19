@@ -522,7 +522,7 @@ function widget:Update()
 		metalSpotsNil = false
 	end
 	
-	WG.mouseoverMexIncome = 0
+	WG.mouseoverMexIncome = false
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
@@ -758,6 +758,8 @@ function widget:DrawWorld()
 			
 			local height = spGetGroundHeight(closestSpot.x,closestSpot.z)
 			height = height > 0 and height or 0
+			
+			gl.DepthTest(false)
 			
 			gl.LineWidth(1.49)
 			gl.Color(1, 1, 0, 0.5)

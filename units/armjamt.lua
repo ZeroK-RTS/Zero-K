@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armjamt]],
   name                          = [[Sneaky Pete]],
-  description                   = [[Cloaker/Jammer Tower]],
+  description                   = [[Area Cloaker/Jammer]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 420,
   buildCostMetal                = 420,

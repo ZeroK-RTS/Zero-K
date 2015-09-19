@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corawac]],
   name                = [[Vulture]],
-  description         = [[Intel/Jammer Plane]],
+  description         = [[Area Jammer, Radar/Sconar Plane]],
   altfromsealevel     = [[1]],
   amphibious          = true,
   buildCostEnergy     = 340,

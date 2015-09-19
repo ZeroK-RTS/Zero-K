@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armmanni]],
   name                = [[Penetrator]],
-  description         = [[Mobile Tachyon Projector (Artillery/Anti-Heavy)]],
+  description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
   brakeRate           = 0.148,
   buildCostEnergy     = 1000,

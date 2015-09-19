@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehaa]],
   name                   = [[Crasher]],
-  description            = [[Fast AA Vehicle]],
+  description            = [[Fast Anti-Air Vehicle]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostEnergy        = 220,

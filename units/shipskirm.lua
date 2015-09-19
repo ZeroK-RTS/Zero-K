@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipskirm]],
   name                   = [[Enforcer]],
-  description            = [[Missile Cruiser (Skirmisher/Artillery)]],
+  description            = [[Skirmisher/Artillery Missile Cruiser]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,

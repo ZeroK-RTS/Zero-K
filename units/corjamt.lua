@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corjamt]],
   name                          = [[Aegis]],
-  description                   = [[Area Shield Device]],
+  description                   = [[Area Shield]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

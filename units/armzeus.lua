@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armzeus]],
   name                   = [[Zeus]],
-  description            = [[Assault Bot]],
+  description            = [[Lightning Assault Bot]],
   acceleration           = 0.2,
   brakeRate              = 0.2,
   buildCostEnergy        = 350,

@@ -1846,7 +1846,7 @@ local function MakeToolTip_UD(tt_table)
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
 	local extraText = ""
-	if mexDefID == tt_table.unitDef.id then
+	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost

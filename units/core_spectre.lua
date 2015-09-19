@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[core_spectre]],
   name                   = [[Aspis]],
-  description            = [[Linkable Shield Walker]],
+  description            = [[Area Shield Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.25,
