@@ -61,7 +61,6 @@ unitDef = {
   },
 
   sightDistance          = 500,
-  --stealth                = true,
   turnRate               = 693,
 
   weapons                = {

@@ -11,13 +11,12 @@ local passiveStealth = {
 }
 
 local stealthDefs = {
-
-  corsktl = true,
-  armspy = true,
-  spherepole = true,
-  armsnipe = true,
-  armcomdgun = true,
-  battledrone = true,
+	corsktl = true,
+	armspy = true,
+	spherepole = true,
+	armsnipe = true,
+	armcomdgun = true,
+	battledrone = true,
 }
 
 for name, _ in pairs(stealthDefs) do
