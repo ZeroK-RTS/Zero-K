@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corroach]],
   name                   = [[Roach]],
-  description            = [[Burrowing Bomb Crawler]],
+  description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,

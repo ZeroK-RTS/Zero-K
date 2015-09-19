@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armcomdgun]],
   name                   = [[Ultimatum]],
-  description            = [[Cloaked Anit-Heavy/Anti-Strider Walker]],
+  description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
   acceleration           = 0.18,
   activateWhenBuilt      = false,
   amphibious             = [[1]],

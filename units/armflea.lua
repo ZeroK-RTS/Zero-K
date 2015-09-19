@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[armflea]],
   name                = [[Flea]],
-  description         = [[Ultralight Scout Spider]],
+  description         = [[Ultralight Scout Spider (Burrows)]],
   acceleration        = 0.7,
   brakeRate           = 0.7,
   buildCostEnergy     = 20,

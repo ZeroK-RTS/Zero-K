@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[geo]],
-  name                          = [[Geothermal Powerplant]],
+  name                          = [[Geothermal Generator]],
   description                   = [[Produces Energy (25)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,

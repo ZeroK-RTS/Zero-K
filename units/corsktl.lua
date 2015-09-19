@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corsktl]],
   name                   = [[Skuttle]],
-  description            = [[Cloaked Anti-Heavy Bomb Jumper]],
+  description            = [[Cloaked Jumping Anti-Heavy Bomb]],
   acceleration           = 0.18,
   brakeRate              = 0.18,
   buildCostEnergy        = 550,

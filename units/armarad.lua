@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armarad]],
-  name                          = [[Advanced Radar Tower]],
-  description                   = [[Long-Range Radar, halves radar wobble]],
+  name                          = [[Advanced Radar]],
+  description                   = [[Long-Range Radar, Halves Radar Wobble]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[blastwing]],
   name                   = [[Blastwing]],
-  description            = [[Burrowing Flying Bomb]],
+  description            = [[Flying Bomb (Burrows)]],
   acceleration           = 0.25,
   altfromsealevel        = [[30]],
   amphibious             = true,
