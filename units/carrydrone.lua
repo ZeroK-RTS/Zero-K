@@ -69,7 +69,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 500,
   smoothAnim          = true,
-  stealth             = true,
   turnRate            = 792,
   upright             = true,
 

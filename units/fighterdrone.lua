@@ -82,7 +82,6 @@ unitDef = {
   sightDistance          = 520,
   smoothAnim             = true,
   speedToFront           = 0,
-  stealth                = true,
   turnRate               = 9001,
   turnRadius             = 90,
 

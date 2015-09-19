@@ -17,6 +17,7 @@ local stealthDefs = {
 	armsnipe = true,
 	armcomdgun = true,
 	battledrone = true,
+	armcsa = true,
 }
 
 for name, _ in pairs(stealthDefs) do

@@ -98,7 +98,6 @@ unitDef = {
   sonarDistance       = 600,
   smoothAnim          = true,
   resurrectSpeed      = 6,
-  stealth             = true,
   terraformSpeed      = 300,
   turnRate            = 148,
   workerTime          = 7.5,

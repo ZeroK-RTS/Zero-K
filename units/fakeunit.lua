@@ -39,7 +39,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 0.2,
   smoothAnim                    = true,
-  stealth                       = false,
   TEDClass                      = [[SPECIAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
