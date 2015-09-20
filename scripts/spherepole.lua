@@ -34,12 +34,15 @@ local runspeed = 6
 local steptime = 40
 
 -- variables
-local firing = 0
+local firing = false
+local moving = false
+local idling = false
 
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
 local SIG_Aim = 4
+local SIG_Idle = 6
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
@@ -50,7 +53,74 @@ function script.Create()
 	Turn(halberd, z_axis, 0, 5)
 end
 
+
+local function RestoreFromIdle ()
+	idling = false
+	Turn (rthigh, y_axis, 0, math.rad(60))
+	Turn (lthigh, y_axis, 0, math.rad(100))
+	Turn (rthigh, x_axis, 0, math.rad(100))
+	Turn (lthigh, x_axis, 0, math.rad(60))
+	Turn (rshin, z_axis, 0, math.rad(60))
+	Turn (lshin, z_axis, 0, math.rad(60))
+	Turn (rshin, x_axis, 0, math.rad(60))
+	Turn (lshin, x_axis, 0, math.rad(160))
+	Turn (rfoot, z_axis, 0, math.rad(50))
+	Turn (rfoot, x_axis, 0, math.rad(40))
+	Turn (lfoot, x_axis, 0, math.rad(110))
+	Turn (lfoot, z_axis, 0, math.rad(40))
+	Move (hips, y_axis, 0, 10)
+	Turn (head, y_axis, 0, math.rad(70))
+	Turn (rshoulder, x_axis, 0, math.rad(150))
+	Turn (rforearm, x_axis, 0, math.rad(34.38))
+	Turn (rforearm, y_axis, 0, math.rad(-126))
+	Turn (rforearm, z_axis, 0, math.rad(57.3))
+	Turn (lshoulder, z_axis, 0, math.rad(60))
+	Turn (lshoulder, x_axis, 0, math.rad(60))
+	Turn (lforearm, x_axis, 0, math.rad(60))
+	Turn (lforearm, y_axis, 0, math.rad(120))
+	Move (halberd, z_axis, 0, 30)
+	Turn (chest, y_axis, 0, math.rad(140))
+end
+
+local function Idle ()
+	if moving or firing then return end
+	SetSignalMask (SIG_Idle)
+	Sleep (12000)
+	idling = true
+	Turn (rthigh, y_axis, math.rad(-30), math.rad(60))
+	Turn (lthigh, y_axis, math.rad(50), math.rad(100))
+	Turn (rthigh, x_axis, math.rad(-50), math.rad(100))
+	Turn (lthigh, x_axis, math.rad(-30), math.rad(60))
+	Turn (rshin, z_axis, math.rad(-30), math.rad(60))
+	Turn (lshin, z_axis, math.rad(30), math.rad(60))
+	Turn (rshin, x_axis, math.rad(30), math.rad(60))
+	Turn (lshin, x_axis, math.rad(80), math.rad(160))
+	Turn (rfoot, z_axis, math.rad(25), math.rad(50))
+	Turn (rfoot, x_axis, math.rad(20), math.rad(40))
+	Turn (lfoot, x_axis, math.rad(-55), math.rad(110))
+	Turn (lfoot, z_axis, math.rad(-20), math.rad(40))
+	Move (hips, y_axis, -5, 10)
+	Turn (head, y_axis, math.rad(-35), math.rad(70))
+	Turn (rshoulder, x_axis, math.rad(-75), math.rad(150))
+	Turn (rforearm, x_axis, math.rad(17.2), math.rad(34.38))
+	Turn (rforearm, y_axis, math.rad(-63), math.rad(-126))
+	Turn (rforearm, z_axis, math.rad(28.65), math.rad(57.3))
+	Turn (lshoulder, z_axis, math.rad(30), math.rad(60))
+	Turn (lshoulder, x_axis, math.rad(-30), math.rad(60))
+	Turn (lforearm, x_axis, math.rad(-30), math.rad(60))
+	Turn (lforearm, y_axis, math.rad(-60), math.rad(120))
+	Move (halberd, z_axis, 15, 30)
+
+	while true do
+		Sleep (math.random(1000, 2500))
+		Turn (chest, y_axis, math.rad(math.random(10, 70)), math.rad(25))
+		WaitForTurn (chest, y_axis)
+	end
+end
+
 local function Walk()
+	if idling then RestoreFromIdle() end
+	moving = true
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
 	while (true) do
@@ -90,6 +160,7 @@ end
 local function StopWalk()
 	Signal(SIG_Walk)
 	SetSignalMask(SIG_Walk)
+	moving = false
 	Turn(hips, z_axis, 0, 0.5)
 	Turn(rshoulder, x_axis, 0, 0.5)
 		
@@ -100,6 +171,8 @@ local function StopWalk()
 	Turn(rthigh, x_axis, 0, 2)
 	Turn(rshin, x_axis, 0, 2)
 	Turn(rfoot, x_axis, 0, 2)
+	
+	StartThread (Idle)
 end
 
 function script.StartMoving()
@@ -114,9 +187,11 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(2000)
-	firing = 0
+	firing = false
 	Turn(chest, y_axis, 0, 3)
 	Move(halberd, z_axis, 0, 2)
+
+	StartThread (Idle)
 end
 
 ----[[
@@ -125,7 +200,7 @@ function script.QueryWeapon1() return head end
 function script.AimFromWeapon1() return head end
 
 function script.AimWeapon1(heading, pitch)
-	
+	if idling then RestoreFromIdle() end
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)
 	--[[ Gun Hugger
@@ -140,7 +215,7 @@ function script.AimWeapon1(heading, pitch)
 	Turn(head, x_axis, -pitch, 9)--]]
 	
 	-- Outstreched Arm
-	firing = 1
+	firing = true
 	Turn(chest, y_axis, heading, 12)
 	
 	WaitForTurn(chest, y_axis)
