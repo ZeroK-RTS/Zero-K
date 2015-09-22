@@ -65,6 +65,13 @@ local Sounds = {
 			pitchMod = 0.1,
 			gainMod = 0.05,
 		},
+			Heatraysound = {
+			file = "sounds/weapon/heatray_firenew.wav",
+			pitchMod = 0.2,
+			gain = 1.4,
+			gainmod = 0.2,
+			maxconcurrent = 6,
+		},
 	},
 }
 
