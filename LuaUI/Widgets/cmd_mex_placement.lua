@@ -328,7 +328,7 @@ function widget:CommandNotify(cmdID, params, options)
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
 			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
-				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z), mex = (not spotData[i])}
+				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
 
@@ -365,9 +365,8 @@ function widget:CommandNotify(cmdID, params, options)
 				local x = command.x
 				local z = command.z
 				local y = Spring.GetGroundHeight(x, z)
-				if not options.meta then
-					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
-				end
+
+				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 
 				for i=1, #addons do
 					local addon = addons[i]
