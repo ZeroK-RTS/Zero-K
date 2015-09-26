@@ -180,7 +180,7 @@ local addons = { -- stuff added around each mex when the modifier key is held
 	{ 64,  16, "ctrl", solarDefID},
 	{-16,  64, "ctrl", solarDefID},
 	{-64, -16, "ctrl", solarDefID},
-	{ 41,  73, "alt",  lltDefID}
+	-- { 41,  73, "alt",  lltDefID}
 }
 
 --------------------------------------------------------------------------------
