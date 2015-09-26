@@ -924,7 +924,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if UnitDefs[unitDefID].isFactory then
 		local bo =  UnitDefs[unitDefID] and UnitDefs[unitDefID].buildOptions
 		if bo and #bo > 0 then
-			push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=unitTeam })
+			local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+			push(facs,{ unitID=unitID, unitDefID=unitDefID, buildList=UnitDefs[unitDefID].buildOptions, teamID=unitTeam, allyTeamID=allyTeamID })
 			--UpdateFactoryList()
 			RecreateFacbar()
 		end

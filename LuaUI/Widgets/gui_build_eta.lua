@@ -147,7 +147,7 @@ function widget:GameFrame(n)
 	end
 
 	for unitID,bi in pairs(etaTable) do
-		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
+		local buildProgress = select(5, Spring.GetUnitHealth(unitID)) or 0
 		local dp = buildProgress - bi.lastProg 
 		local dt = gs - bi.lastTime
 		if (dt > 2) then
