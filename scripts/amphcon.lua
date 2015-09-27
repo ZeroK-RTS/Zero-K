@@ -94,6 +94,7 @@ function script.StopBuilding()
 end
 
 function script.StartBuilding(heading, pitch)
+	Signal(SIG_RESTORE)
 	Turn(torso, y_axis, heading, math.rad(180))
 	Turn(ldoor, y_axis, math.rad(90), math.rad(180))	
 	Turn(rdoor, y_axis, math.rad(-90), math.rad(180))
