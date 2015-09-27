@@ -153,6 +153,9 @@ options = {
 -- Mexes and builders
 
 local mexDefID = UnitDefNames["cormex"].id
+local lltDefID = UnitDefNames["corllt"].id
+local solarDefID = UnitDefNames["armsolar"].id
+
 local mexUnitDef = UnitDefNames["cormex"]
 local mexDefInfo = {
 	extraction = 0.001,
@@ -171,6 +174,14 @@ for udid, ud in ipairs(UnitDefs) do
 		end
 	end
 end
+
+local addons = { -- stuff added around each mex when the modifier key is held
+	{ 16, -64, "ctrl", solarDefID},
+	{ 64,  16, "ctrl", solarDefID},
+	{-16,  64, "ctrl", solarDefID},
+	{-64, -16, "ctrl", solarDefID},
+	-- { 41,  73, "alt",  lltDefID}
+}
 
 --------------------------------------------------------------------------------
 -- Variables
@@ -316,7 +327,7 @@ function widget:CommandNotify(cmdID, params, options)
 		for i = 1, #WG.metalSpots do		
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (not spotData[i]) and (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
+			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -349,38 +360,24 @@ function widget:CommandNotify(cmdID, params, options)
 			--prepare command list
 			if not shift then 
 				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
-				--spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
 			end
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
 				local y = Spring.GetGroundHeight(x, z)
-				local buildable, feature = spTestBuildOrder(mexDefID,x,y,z,1)
-				if buildable ~= 0 then
-					local handledExternally = false
-					if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-						handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,y,z,0} , options , true) --add additional flag "true" for additional logic for zk areamex
-					end
-					if ( not handledExternally ) then
-						commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
-						--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
-					end
-				else
-					local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
-					for i = 1, #mexes do --check unit in build location
-						local aid = mexes[i]
-						local udid = spGetUnitDefID(aid)
-						if spGetUnitAllyTeam(aid) == myAllyTeam and mexDefID == udid then
-							if select(5, spGetUnitHealth(aid)) ~= 1 then
-								commandArrayToIssue[#commandArrayToIssue+1] = {CMD.REPAIR, {aid} , {"shift"}}
-								--spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
-								break
-							end
-						end
+
+				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+
+				for i=1, #addons do
+					local addon = addons[i]
+					if (options[addon[3]]) then
+						local xx = x+addon[1]
+						local zz = z+addon[2]
+						local yy = Spring.GetGroundHeight(xx, zz)
+						commandArrayToIssue[#commandArrayToIssue+1] = {-addon[4], {xx,yy,zz,0}, {"shift"}}
 					end
 				end
-			end		
-			--issue all order to all unit at once
+			end
 			Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
 		end
   
