@@ -1180,8 +1180,12 @@ function gadget:GameFrame(n)
         local unitID = chickens[i]
         local cmdQueue = spGetCommandQueue(unitID, 1)
         if (not (cmdQueue and cmdQueue[1])) then
-		  --AttackNearestEnemy(unitID)
-          spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
+          --AttackNearestEnemy(unitID)
+          if (difficulty > 1) and (unitID == queenID) then
+            spGiveOrderToUnit(unitID, CMD.MOVE, targetCache, {"shift"})
+          else
+            spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
+          end
         end
       end
     end
