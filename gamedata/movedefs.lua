@@ -50,6 +50,15 @@ local moveDefs = {
 		crushstrength = 500,
 		depthmodparams = common_depthmodparams,
 	},
+
+	KBOT5 = { -- fake to recalculate path cache
+		footprintx = 5,
+		footprintz = 5,
+		maxwaterdepth = 123,
+		maxslope = 36,
+		crushstrength = 999,
+		depthmodparams = common_depthmodparams,
+	},
 	
 	AKBOT2 = {		--amphib
 		footprintx = 2,
