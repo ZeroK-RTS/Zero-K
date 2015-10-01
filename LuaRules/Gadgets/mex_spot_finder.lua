@@ -247,11 +247,21 @@ local function SanitiseSpots(spots)
 	return spots
 end
 
-local oldKey = 0
-
-local function MakeKey()
-	oldKey = oldKey + 1
-	return oldKey
+local function makeString(group)
+	if group then
+		local ret = ""
+		for i, v in pairs(group.left) do
+			ret = ret .. i .. v
+		end
+		ret = ret .. " "
+		for i, v in pairs(group.right) do
+			ret = ret .. i .. v
+		end
+		ret = ret .. " " .. group.minZ .. " " .. group.maxZ .. " " .. group.worth
+		return ret
+	else
+		return ""
+	end
 end
 
 function GetSpots()
@@ -312,7 +322,7 @@ function GetSpots()
 						end
 						assignedTo.maxZ = z
 						assignedTo.worth = assignedTo.worth + matchGroup.worth
-						uniqueGroups[MakeKey()] = nil
+						uniqueGroups[makeString(matchGroup)] = nil
 					end
 				else
 					assignedTo = matchGroup
@@ -341,7 +351,7 @@ function GetSpots()
 					worth = worth
 				}
 			stripGroup[nStrips] = newGroup
-			uniqueGroups[MakeKey()] = newGroup
+			uniqueGroups[makeString(newGroup)] = newGroup
 		end
 	end
 	
@@ -412,8 +422,6 @@ function GetSpots()
 			spots[#spots + 1] = d
 		end
 	end
-	
-	Spring.Echo("Mex spot finder keys", oldKey or "bad key")
 	
 	--for i = 1, #spots do
 	--	Spring.MarkerAddPoint(spots[i].x,spots[i].y,spots[i].z,"")
