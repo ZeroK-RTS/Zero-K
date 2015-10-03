@@ -20,6 +20,7 @@ unitDef = {
   
   customParams          = {
       dontcount = [[1]],
+      completely_hidden = 1, -- for widget-senpai not to notice me
   },
   
   explodeAs             = [[TINY_BUILDINGEX]],
