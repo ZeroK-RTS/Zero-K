@@ -119,6 +119,10 @@ function SetUnitStateIcons(unitID)
 		ud = UnitDefs[ud]
 	end
 	
+	if ud and ud.customParams.completely_hidden then
+		return
+	end
+	
 	if options.showstateonshift.value then
 		if ud then
 			if ud.canAttack or ud.isFactory then
