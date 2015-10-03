@@ -458,7 +458,7 @@ local function UnitDetected( unitID, isAlly )
 	local weaponDef
 
 	if unitDefID == shieldDefID then
-		if not options.enemyshield.value then return end
+		if isAlly or (not options.enemyshield.value) then return end
 		weaponDef = WeaponDefs[udef.weapons[1].weaponDef]
 		local rangeLines = CalcBallisticCircle(x,y,z, weaponDef.shieldRadius, weaponDef )
 		defences[unitID] = {
