@@ -1351,21 +1351,16 @@ function gadget:Load(zip)
 	queenID = GG.SaveLoad.GetNewUnitID(data.queenID)
 	miniQueenNum = data.miniQueenNum
 	--targetCache = data.targetCache	-- not needed
-	for unitID, targetData in pairs(data.burrows) do
-		burrows[GG.SaveLoad.GetNewUnitID(unitID)] = targetData
+	burrows = GG.SaveLoad.GetNewUnitIDKeys(data.burrows)
+	for burrowID, targetData in pairs(burrows) do
+		targetData.targetID = GG.SaveLoad.GetNewUnitID(targetData.targetID)
 	end
-	for unitID, birthTime in pairs(data.chickenBirths) do
-		chickenBirths[GG.SaveLoad.GetNewUnitID(unitID)] = birthTime - math.floor(gameFrameOffset/30)
-	end
+	chickenBirths = GG.SaveLoad.GetNewUnitIDKeys(data.chickenBirths)
 	timeOfLastSpawn = data.timeOfLastSpawn - math.floor(gameFrameOffset/30)
 	waveSchedule = data.waveSchedule - gameFrameOffset
 	waveNumber = data.waveNumber
-	for featureID, time in pairs(data.eggDecay) do
-		eggDecay[GG.SaveLoad.GetNewFeatureID(featureID)] = time - math.floor(gameFrameOffset/30)
-	end
-	for unitID, targetTeam in pairs(data.targets) do
-		targets[GG.SaveLoad.GetNewUnitID(unitID)] = targetTeam
-	end
+	eggDecay = GG.SaveLoad.GetNewUnitIDKeys(data.eggDecay)
+	targets = GG.SaveLoad.GetNewUnitIDKeys(data.targets)
 	totalTechAccel = data.totalTechAccel
 	defensePool = data.defensePool
 	defenseQuota = data.defenseQuota
