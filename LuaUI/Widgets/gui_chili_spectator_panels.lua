@@ -343,8 +343,9 @@ local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, stora
 		panel.bar:SetValue(0)
 	end 
 	
-	local newFontSize = math.round(GetFontMult(income)*options.resourceMainFontSize.value)
-	panel.label_income.font.size = newFontSize
+	-- local newFontSize = math.round(GetFontMult(income)*options.resourceMainFontSize.value)
+	-- panel.label_income.font.size = newFontSize
+	panel.label_income.font.size =math.round(GetFontMult(income)*options.resourceMainFontSize.value)
 	panel.label_income:Invalidate()
 	panel.label_income:SetCaption(Format(income, ""))
 	
@@ -819,7 +820,7 @@ local function GetWinString(name)
 	if winTable and winTable[name] and winTable[name].wins then
 		return (winTable[name].wonLastGame and "*" or "") .. winTable[name].wins
 	end
-	return false
+	return ""
 end
 
 local function GetOpposingAllyTeams()
@@ -1034,9 +1035,16 @@ function widget:Initialize()
 end
 
 
+local timer = 0
 function widget:Update(dt)
+	timer = timer + dt
 	if economyWindowData then
 		UpdateResourceWindowFlashMain(dt)
+	end
+	if timer >= 1 then
+		playerWindow.winsLeft:SetCaption(GetWinString(allyTeamData[1].name))
+		playerWindow.winsRight:SetCaption(GetWinString(allyTeamData[2].name))
+		timer = 0
 	end
 end
 
