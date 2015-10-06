@@ -17,6 +17,9 @@ unitDef = {
   canPatrol                     = false,
   canstop                       = [[0]],
   category                      = [[SINK]],
+  customparams                  = {
+    completely_hidden = 1,
+  },
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[none]],
