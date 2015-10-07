@@ -200,6 +200,17 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
+-- Set myGravity for Cannons because maps cannot be trusted. Standard is 120, 
+-- gravity of 150 can cause high things (such as HLT) to be unhittable.
+
+ for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "Cannon" and not weaponDef.mygravity then
+		weaponDef.mygravity = 2/15 -- 120/(GAME_SPEED^2)
+	end
+end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
 -- because the way lua access to unitdefs and weapondefs is setup is insane
 --
  for _, weaponDef in pairs(WeaponDefs) do
