@@ -130,7 +130,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(barrelfr, sfxNone)
 		return 1
 	end
-	if severity <= 50 then
+	if severity <= 0.50 then
 		Explode(hull, sfxNone)
 		Explode(gunf, sfxFall)
 		Explode(base, sfxNone)
@@ -138,7 +138,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(barrelbr, sfxFall)
 		return 1
 	end
-	if severity <= 99 then
+	if severity <= 0.99 then
 		Explode(hull, sfxShatter)
 		Explode(gunf, sfxFall)
 		Explode(base, sfxNone)
