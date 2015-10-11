@@ -47,6 +47,7 @@ unitDef = {
   objectName          = [[corleveler_512.s3o]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX_LEVELER]],
+  script              = [[corlevlr.lua]],
 
   sfxtypes            = {
 

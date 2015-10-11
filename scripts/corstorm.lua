@@ -279,8 +279,8 @@ function script.FireWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	local severity = recentDamage/maxHealth
-	if severity <= .25 then
+	local severity = (recentDamage/maxHealth) * 100
+	if severity <= 25 then
 		Explode(base, sfxNone)
 		Explode(r_tube, sfxNone)
 		Explode(l_missile, sfxNone)
@@ -296,9 +296,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(l_tube, sfxNone)
 		return 1
 	end
-	if severity <= 50 then
-	
-		corpsetype = 2
+	if severity <= 50 then	
 		Explode(base, sfxFall)
 		Explode(r_tube, sfxShatter)
 		Explode(l_missile, sfxFall)
@@ -312,11 +310,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(r_thigh, sfxFall)
 		Explode(head, sfxFall)
 		Explode(l_tube, sfxFall)
-		return (0)
+		return 2
 	end
 	if severity <= 99 then
-	
-		corpsetype = 3
 		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(r_tube, sfxShatter)
 		Explode(l_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
@@ -330,9 +326,8 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(r_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(l_tube, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		return (0)
+		return 3
 	end
-	corpsetype = 3
 	Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(r_tube, sfxShatter + sfxExplodeOnHit)
 	Explode(l_missile, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
@@ -346,5 +341,6 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(r_thigh, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(head, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(l_tube, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	return 3
 end
 
