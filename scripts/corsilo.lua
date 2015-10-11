@@ -157,5 +157,5 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(doorr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(tower, sfxNone)
 	Explode(nuke, sfxNone)
-	return 3
+	return 2
 end
