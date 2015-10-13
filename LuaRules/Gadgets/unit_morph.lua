@@ -435,11 +435,14 @@ local function ReAssignAssists(newUnit,oldUnit)
     for i=1,#alliedUnits do
       local unitID = alliedUnits[i]
       local cmds = Spring.GetCommandQueue(unitID, -1)
-      for j=1,#cmds do
+      for j=1, #cmds do
         local cmd = cmds[j]
-        if (cmd.id == CMD.GUARD)and(cmd.params[1] == oldUnit) then
-          Spring.GiveOrderToUnit(unitID,CMD.INSERT,{cmd.tag,CMD.GUARD,0,newUnit},{})
-          Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd.tag},{})
+		local params = cmd.params
+        if (cmd.id == CMD.GUARD or cmd.id == CMD_ORBIT or (cmd.id == CMD.REPAIR and #params == 1 --[[not area repair]] )) and (params[1] == oldUnit) then
+			params[1] = newUnit
+			local opts = (cmd.options.meta and 4 or 0) + (cmd.options.ctrl and 64 or 0) + (cmd.options.alt and 128 or 0)
+			Spring.GiveOrderToUnit(unitID,CMD.INSERT,{cmd.tag, cmd.id, opts, params[1], params[2], params[3]},{})
+			Spring.GiveOrderToUnit(unitID,CMD.REMOVE,{cmd.tag},{})
         end
       end
     end
