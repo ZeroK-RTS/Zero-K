@@ -18,6 +18,7 @@ end
 local spSendCommands			= Spring.SendCommands
 
 local echo = Spring.Echo
+local spec
 
 local Chili
 local Image
@@ -52,35 +53,7 @@ local awardPanelHeight = 50
 local white_table 	= {1,1,1, 1}
 local magenta_table = {0.8, 0, 0, 1}
 
-local awardDescs =
-{
-	pwn     = 'Complete Annihilation Award',
-	navy    = 'Fleet Admiral',
-	air     = 'Airforce General',
-	nux     = 'Apocalyptic Achievement Award',
-	friend  = 'Friendly Fire Award',
-	shell   = 'Turtle Shell Award',
-	fire    = 'Master Grill-Chef',
-	emp     = 'EMP Wizard',
-	slow    = 'Traffic Cop',
-	t3      = 'Experimental Engineer',
-	cap     = 'Capture Award',
-	share   = 'Share Bear',
-	terra   = 'Legendary Landscaper',
-	reclaim = 'Spoils of War',
-	rezz    = 'Necromancy Award',
-	vet     = 'Decorated Veteran',
-	ouch    = 'Big Purple Heart',
-	kam     = 'Kamikaze Award',
-	comm    = 'Master and Commander',
-	mex     = 'Mineral Prospector',
-	mexkill = 'Loot & Pillage',
-	rage    = 'Rage Inducer',
-	head    = 'Head Hunter',
-	dragon  = 'Dragon Slayer',
-	heart   = 'Queen Heart Breaker',
-	sweeper = 'Land Sweeper',
-}
+local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -209,7 +182,9 @@ end
 local function SetupControls()
 	window_endgame = Window:New{  
 		name = "GameOver",
-		caption = "Game Over",
+		caption = "Game aborted",
+		textColor = {0.5,0.5,0.5,1}, 
+		fontSize = 50,
 		x = '20%',
 		y = '20%',
 		width  = '60%',
@@ -225,7 +200,7 @@ local function SetupControls()
 	
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
-		x=10;y=40;
+		x=10;y=55;
 		bottom=10;right=10;
 		autosize = true,
 		scrollbarSize = 6,
@@ -298,7 +273,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
+
+	spec = Spring.GetSpectatingState()
 
 	Chili = WG.Chili
 	Image = Chili.Image
@@ -322,7 +298,22 @@ function widget:Initialize()
 	SetTeamNamesAndColors()
 end
 
-function widget:GameOver()
+function widget:GameOver (winners)
+	if winners and (#winners > 0) then
+		if spec then
+			window_endgame.caption = "Game over!"
+			window_endgame.font.color = {1,1,1,1}
+			window_endgame:Invalidate()
+		elseif (winners[1] == Spring.GetMyAllyTeamID()) then
+			window_endgame.caption = "Victory!"
+			window_endgame.font.color = {0,1,0,1}
+			window_endgame:Invalidate()
+		else
+			window_endgame.caption = "Defeat!"
+			window_endgame.font.color = {1,0,0,1}
+			window_endgame:Invalidate()
+		end
+	end
 	ShowEndGameWindow()
 end
 
