@@ -140,7 +140,7 @@ local function Reset()
 	WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
-	function widget:Initialize()
+function widget:Initialize()
 	WG.WinCounter_Set = Set
 	WG.WinCounter_Reset = Reset
 	WG.WinCounter_Increment = IncrementAllyTeamWins
@@ -155,26 +155,9 @@ function widget:Shutdown()
 	WG.WinCounter_Increment = nil
 end
 
-function widget:GameOver()
-	local allyTeams = Spring.GetAllyTeamList()
-	local winningAllyTeam
-	for i=1, #allyTeams do
-		local allyTeamAlive = false
-		local playerTeams = Spring.GetTeamList(allyTeams[i])
-		-- Spring.Echo("AllyTeam " .. allyTeams[i])
-		for j=1, #playerTeams do
-			local teamID = Spring.GetTeamInfo(playerTeams[j])
-			local isDead = (Spring.GetTeamRulesParam(teamID, "isDead") and true) or false
-			if not isDead then 
-				allyTeamAlive = true 
-				break 
-			end
-		end
-		if allyTeamAlive then 
-			winningAllyTeam = allyTeams[i]
-			break 
-		end
-	end
+function widget:GameOver(winningAllyTeams)
+	-- Don't do anything if the game was exited
+	if #winningAllyTeams == 0 then return end
 
 	-- Reset who won last game
 	local players = Spring.GetPlayerList()
@@ -185,19 +168,22 @@ function widget:GameOver()
 		end
 	end
 
-	local winningPlayerTeams = Spring.GetTeamList(winningAllyTeam)
-	for i=1, #winningPlayerTeams do
-		local players = Spring.GetPlayerList(winningPlayerTeams[i])
-		for j=1, #players do
-			local playerName = Spring.GetPlayerInfo(players[j])
-			if currentWinTable[playerName] ~= nil then
-				currentWinTable[playerName].wins = (currentWinTable[playerName].wins or 0) + 1
-				currentWinTable[playerName].wonLastGame = true
+	for i=1, #winningAllyTeams do
+		local winningAllyTeam = winningAllyTeams[i]
+		local winningPlayerTeams = Spring.GetTeamList(winningAllyTeam)
+		for i=1, #winningPlayerTeams do
+			local players = Spring.GetPlayerList(winningPlayerTeams[i])
+			for j=1, #players do
+				local playerName = Spring.GetPlayerInfo(players[j])
+				if currentWinTable[playerName] ~= nil then
+					currentWinTable[playerName].wins = (currentWinTable[playerName].wins or 0) + 1
+					currentWinTable[playerName].wonLastGame = true
+				end
 			end
 		end
+		currentWinTable.hasWins = true
+		WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 	end
-	currentWinTable.hasWins = true
-	WG.WinCounter_currentWinTable = currentWinTable --Set at end rather than modified throughout to remove contention risks
 end
 
 function widget:GetConfigData()
