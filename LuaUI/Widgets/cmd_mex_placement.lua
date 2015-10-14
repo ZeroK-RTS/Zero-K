@@ -175,12 +175,11 @@ for udid, ud in ipairs(UnitDefs) do
 	end
 end
 
-local addons = { -- stuff added around each mex when the modifier key is held
-	{ 16, -64, "ctrl", solarDefID},
-	{ 64,  16, "ctrl", solarDefID},
-	{-16,  64, "ctrl", solarDefID},
-	{-64, -16, "ctrl", solarDefID},
-	-- { 41,  73, "alt",  lltDefID}
+local addons = { -- coordinates of solars for the Alt modifier key
+	{ 16, -64 },
+	{ 64,  16 },
+	{-16,  64 },
+	{-64, -16 },
 }
 
 --------------------------------------------------------------------------------
@@ -368,13 +367,13 @@ function widget:CommandNotify(cmdID, params, options)
 
 				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 
-				for i=1, #addons do
-					local addon = addons[i]
-					if (options[addon[3]]) then
+				if (options["alt"]) then
+					for i=1, #addons do
+						local addon = addons[i]
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
-						commandArrayToIssue[#commandArrayToIssue+1] = {-addon[4], {xx,yy,zz,0}, {"shift"}}
+						commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
 					end
 				end
 			end
