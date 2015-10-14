@@ -148,21 +148,7 @@ unitDef = {
       reclaimTime      = 20,
     },
 	
-	DEAD2      = {
-      description      = [[Wreckage - Puppy]],
-      blocking         = false,
-      damage           = 80,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      metal            = 20,
-      object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 20,
-    },
-
-    HEAP      = {
+	HEAP      = {
       description      = [[Debris - Puppy]],
       blocking         = false,
       damage           = 80,
