@@ -30,8 +30,6 @@ local function OnOptionsChange()
   ResetWidget()
 end
 
-
-
 options_path = 'Settings/Graphics/Unit Visibility/BlobShadow'
 options = {
   onlyShowOnAir = {
@@ -86,21 +84,21 @@ local unitsList = {}
 local function AddUnit(unitID,unitDefID)
   
   local udef = UnitDefs[unitDefID]
-  if (not onlyShowOnAirOption or (udef and udef.canFly)) then
+  if not onlyShowOnAirOption or (udef and udef.canFly) then
     unitsCount = unitsCount + 1
     unitsList[unitsCount] = (unitID)
   end
 end
 
 function widget:UnitEnteredAir(unitID)
-  if (onlyShowOnAirOption) then
+  if onlyShowOnAirOption then
     unitsCount = unitsCount + 1
     unitsList[unitsCount] = (unitID)
   end
 end
 
 function widget:UnitFinished(unitID, unitDefID)
-  if(not onlyShowOnAirOption) then
+  if not onlyShowOnAirOption then
     AddUnit(unitID,unitDefID)
   end
 end
@@ -110,10 +108,10 @@ function widget:UnitEnteredLos(unitID, unitDefID)
 end
 
 function widget:UnitLeftAir(unitID)
-  if (onlyShowOnAirOption) then
+  if onlyShowOnAirOption then
     uid = (unitID or _unitID)
 	  for i=1,unitsCount do
-      if (unitsList[i] == uid) then
+      if unitsList[i] == uid then
         unitsList[i] = unitsList[unitsCount]
         unitsCount = unitsCount - 1
         return
