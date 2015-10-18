@@ -10,17 +10,34 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
---[[ Usage:
-	* there is a "startboxes" modoption that contains a table (parse it using loadstring, see below)
-	* each team can have a private TeamRulesParam called "start_box_id". This is the index of its box in the startbox table
-	* no ID means there is no box (ie. can place anywhere)
-	* boxes are normalised to 0..1 - multiply by Game.mapSizeX and Z to get the actual co-ordinates
-]]
+if VFS.FileExists("mission.lua") then return end
 
-local startboxString = Spring.GetModOptions().startboxes
-if not startboxString then return end -- missions
+local startboxConfig
+local manualStartposConfig
+local mapsideBoxes = "mapconfig/map_startboxes.lua"
 
-local startboxConfig = loadstring(startboxString)()
+if VFS.FileExists (mapsideBoxes) then
+	startboxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
+else
+	startboxConfig = { }
+	local startboxString = Spring.GetModOptions().startboxes
+	if startboxString then
+		local springieBoxes = loadstring(startboxString)()
+		for id, box in pairs(springieBoxes) do
+			box[1] = box[1]*Game.mapSizeX
+			box[2] = box[2]*Game.mapSizeZ
+			box[3] = box[3]*Game.mapSizeX
+			box[4] = box[4]*Game.mapSizeZ
+			startboxConfig[id] = {
+				{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
+				{box[1], box[2], box[3], box[4], box[3], box[2]}
+			}
+		end
+	end
+end
+
+GG.startboxConfig = startboxConfig
+GG.manualStartposConfig = manualStartposConfig
 
 function gadget:Initialize()
 
@@ -92,26 +109,42 @@ function gadget:Initialize()
 	end
 end
 
+local function cross_product (px, pz, ax, az, bx, bz)
+	return ((px - bx)*(az - bz) - (ax - bx)*(pz - bz))
+end
+
+local function CheckStartbox (boxID, x, z)
+
+	local box = startboxConfig[boxID]
+	local valid = false
+
+	for i = 1, #box do
+		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
+		if (cross_product(x, z, x1, z1, x2, z2) < 0
+		and cross_product(x, z, x2, z2, x3, z3) < 0
+		and cross_product(x, z, x3, z3, x1, z1) < 0
+		) then
+			valid = true
+		end
+	end
+
+	return valid
+end
+
+GG.CheckStartbox = CheckStartbox
+
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	if (playerID == 255) then
-		return true -- custom AI, can't know which team it is on so allow it to place anywhere
+		return true -- custom AI, can't know which team it is on so allow it to place anywhere for now and filter invalid positions later
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
-	if not boxID then
-		Spring.SetTeamRulesParam(teamID, "valid_startpos", 1)
+	if (not boxID) or CheckStartbox(boxID, x, z) then
+		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
 		return true
+	else
+		return false
 	end
-
-	local box = startboxConfig[boxID]
-	x = x / Game.mapSizeX
-	z = z / Game.mapSizeZ
-
-	local valid = (x > box[1]) and (z > box[2]) and (x < box[3]) and (z < box[4])
-	if valid then
-		Spring.SetTeamRulesParam(teamID, "valid_startpos", 1)
-	end
-	return valid
 end

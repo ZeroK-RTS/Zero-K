@@ -297,6 +297,17 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 local function getMiddleOfStartBox(teamID)
+	if GG.manualStartposConfig then
+		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+		local startpos = GG.manualStartposConfig[boxID][1]
+
+		local x = startpos[1]
+		local z = startpos[2]
+		local y = Spring.GetGroundHeight(x,z)
+
+		return x, y, z
+	end
+
 	if not startboxString then -- legacy boxes
 		local allyTeam = select(6, spGetTeamInfo(teamID))
 		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
@@ -358,7 +369,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local x,y,z
 	local startPosition = luaSetStartPositions[teamID]
 	if not startPosition then
-		if (startboxString and not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI)) or (not startboxString and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
+		if (GG.startboxConfig and not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI)) or (not GG.startboxConfig and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
 			x,y,z = Spring.GetTeamStartPosition(teamID)
@@ -366,14 +377,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			-- clamp invalid positions
 			-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
 			local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
-			if boxID then
-				local box = startboxConfig[boxID]
-				local bx = x / Game.mapSizeX
-				local bz = z / Game.mapSizeZ
-				local valid = (bx > box[1]) and (bz > box[2]) and (bx < box[3]) and (bz < box[4])
-				if not valid then
-					x,y,z = getMiddleOfStartBox(teamID)
-				end
+			if boxID and not GG.CheckStartbox(boxID, x, z) then
+				x,y,z = getMiddleOfStartBox(teamID)
 			end
 		end
 	else

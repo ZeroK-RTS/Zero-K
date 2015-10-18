@@ -3849,14 +3849,29 @@ end
 
 local function setAllyteamStartLocations(allyTeam)
 	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
-		
+
+		local teamList = Spring.GetTeamList(allyTeam)
+		if (not teamList) or (#teamList == 0) then return end
+
+		local at = allyTeamData[allyTeam]
+		local listOfAis = at.listOfAis
+
+		if GG.manualStartposConfig then
+			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+			local boxConfig = GG.manualStartposConfig[boxID]
+			for i = 1, listOfAis.count do
+				local team = listOfAis.data[i]
+				local startpos = boxConfig[i] or boxConfig[1]
+				GG.SetStartLocation (team, startpos[1], startpos[2])
+			end
+			return
+		end
+
 		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
-		
+
 		local startboxString = Spring.GetModOptions().startboxes
 		if startboxString then -- new boxes
 			local startboxConfig = loadstring(startboxString)()
-			local teamList = Spring.GetTeamList(allyTeam)
-			if (not teamList) or (#teamList == 0) then return end
 			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 			local box = boxID and startboxConfig[boxID] or {0,0,1,1}
 			x1 = box[1] * Game.mapSizeX
@@ -3865,12 +3880,9 @@ local function setAllyteamStartLocations(allyTeam)
 			z2 = box[4] * Game.mapSizeZ
 		end
 
-		local at = allyTeamData[allyTeam]
-		local listOfAis = at.listOfAis
-		
 		local width = x2 - x1
 		local height = z2 - z1
-		
+
 		if width > height then
 			local mid = (z1+z2)*0.5
 			local mult = width/(listOfAis.count + 1)
