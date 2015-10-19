@@ -2,12 +2,11 @@ inWater = false
 isMoving = false
 
 function script.setSFXoccupy (terrainType)
-	Spring.Echo("SetSFXOccupy: "..terrainType);
 	local nowInWater = (terrainType == 2 or terrainType == 1)
 	
 	if nowInWater then
 		if not inWater and isMoving then
-			StartThread(WADE);
+			StartThread(Wade);
 		end
 	else
 		Signal(SIG_WADE)
@@ -15,7 +14,7 @@ function script.setSFXoccupy (terrainType)
 	inWater = nowInWater
 end
 
-function WADE()
+function Wade()
 	local spGetUnitPosition = Spring.GetUnitPosition
 	local maxWadeDepth = -Spring.GetUnitHeight(unitID)
 	

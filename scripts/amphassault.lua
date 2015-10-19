@@ -282,10 +282,10 @@ local function Stopping()
 end
 
 function script.StartMoving()
-	isMoving = true
 	StartThread(Walk)
+	isMoving = true
 	if inWater then 
-		StartThread(WADE);
+		StartThread(Wade);
 	end
 end
 

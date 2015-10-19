@@ -17,6 +17,11 @@ local SIG_WALK = 1
 local SIG_DEPLOY = 2
 local SIG_BEACON = 2
 
+SIG_WADE = 4
+WADE_SFX = SFXTYPE_WAKE1
+WADE_PIECE = {rfoot, lfoot}
+include "wade.lua"
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
@@ -258,9 +263,15 @@ function script.StartMoving()
 	deployed = false
 	GG.tele_undeployTeleport(unitID)
 	StartThread(Walk)
+	isMoving = true
+	if inWater then 
+		StartThread(Wade);
+	end
 end
 
 function script.StopMoving()
+	Signal(SIG_WADE)
+	isMoving = false
 	Signal(SIG_WALK)
 	StartThread(Stopping)
 end

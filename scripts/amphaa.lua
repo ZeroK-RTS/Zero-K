@@ -37,6 +37,11 @@ local SIG_RESTORE = 8
 local SIG_FLOAT = 16
 local SIG_BOB = 32
 
+SIG_WADE = 64
+WADE_SFX = SFXTYPE_WAKE1
+WADE_PIECE = {rfoot, lfoot}
+include "wade.lua"
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Swim functions
@@ -291,9 +296,15 @@ end
 
 function script.StartMoving()
 	StartThread(Walk)
+	isMoving = true
+	if inWater then 
+		StartThread(Wade);
+	end
 end
 
 function script.StopMoving()
+	Signal(SIG_WADE)
+	isMoving = false
 	Signal(SIG_START_FLOAT)
 	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
