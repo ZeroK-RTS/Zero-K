@@ -22,7 +22,7 @@ function Wade()
 		return 
 	end
 	
-	SetSignalMask(SIG_WAKE);
+	SetSignalMask(SIG_WADE);
 	
 	while true do
 		local x,y,z = spGetUnitPosition(unitID)
