@@ -8,16 +8,9 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-local startboxString = Spring.GetModOptions().startboxes
-if not startboxString then return end -- missions and such
+local startboxConfig = WG.startBoxConfig
 
-local startboxConfig = loadstring(startboxString)()
-for id, box in pairs(startboxConfig) do
-	box[1] = box[1]*Game.mapSizeX
-	box[2] = box[2]*Game.mapSizeZ
-	box[3] = box[3]*Game.mapSizeX
-	box[4] = box[4]*Game.mapSizeZ
-end
+if (not startboxConfig) or (#startboxConfig == 0) then return end
 
 VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
@@ -113,12 +106,19 @@ function widget:DrawWorld()
 
 	if (allyStartBox) then
 		gl.Color (allyStartBoxColor)
-		gl.Utilities.DrawGroundRectangle (allyStartBox)
+		for i = 1, #allyStartBox do
+			local x1, z1, x2, z2, x3, z3 = unpack(allyStartBox[i])
+			gl.Utilities.DrawGroundTriangle(x1, z1, x2, z2, x3, z3)
+		end
 	end
 
 	gl.Color(enemyStartBoxColor)
-	for _,startBox in ipairs(enemyStartBoxes) do
-		gl.Utilities.DrawGroundRectangle(startBox)
+	for j = 1, #enemyStartBoxes do
+		local startBox = enemyStartBoxes[j]
+		for i = 1, #startBox do
+			local x1, z1, x2, z2, x3, z3 = unpack(startBox[i])
+			gl.Utilities.DrawGroundTriangle(x1, z1, x2, z2, x3, z3)
+		end
 	end
 
 	for _, teamID in ipairs(Spring.GetTeamList()) do
@@ -170,23 +170,31 @@ function widget:DrawInMiniMap(sx, sz)
 	gl.PushMatrix()
 	gl.CallList(xformList)
 	gl.LineWidth(1.49)
-
-	for i = 1, #enemyStartBoxes do
-		local x1, z1, x2, z2 = unpack(enemyStartBoxes[i])
-		gl.Color(enemyStartBoxColor)
-		gl.Rect(x1, z1, x2, z2)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-		gl.Rect(x1, z1, x2, z2)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-	end
+	gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 
 	if (allyStartBox) then
-		local x1, z1, x2, z2 = unpack(allyStartBox)
-		gl.Color(allyStartBoxColor)
-		gl.Rect(x1, z1, x2, z2)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
-		gl.Rect(x1, z1, x2, z2)
-		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+		gl.Color (allyStartBoxColor)
+		for i = 1, #allyStartBox do
+			local x1, z1, x2, z2, x3, z3 = unpack(allyStartBox[i])
+			gl.Shape (GL.TRIANGLES, {
+				{ v = {x1, z1, 0} },
+				{ v = {x2, z2, 0} },
+				{ v = {x3, z3, 0} },
+			})
+		end
+	end
+
+	gl.Color(enemyStartBoxColor)
+	for i = 1, #enemyStartBoxes do
+		local box = enemyStartBoxes[i]
+		for j = 1, #box do
+			local x1, z1, x2, z2, x3, z3 = unpack(box[j])
+			gl.Shape (GL.TRIANGLES, {
+				{ v = {x1, z1, 0} },
+				{ v = {x2, z2, 0} },
+				{ v = {x3, z3, 0} },
+			})
+		end
 	end
 
 	gl.LineWidth(3)
@@ -204,6 +212,7 @@ function widget:DrawInMiniMap(sx, sz)
 		end
 	end
 
+	gl.Color(1,1,1,1)
 	gl.LineWidth(1.0)
 	gl.PopMatrix()
 end
