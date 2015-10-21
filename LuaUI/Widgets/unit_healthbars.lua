@@ -61,6 +61,37 @@ local captureReloadTime = 360
 local DISARM_DECAY_FRAMES = 1200
 
 --------------------------------------------------------------------------------
+-- LOCALISATION
+--------------------------------------------------------------------------------
+
+local messages = {
+	shield = "shield",
+	health = "health",
+	building = "buildingbla",
+	morph = "morph",
+	stockpile = "stockpile",
+	paralyze = "paralyze",
+	disarm = "disarm",
+	capture = "capture",
+	capture_reload = "capture reload",
+	water_tank = "water tank",
+	teleport = "teleport",
+	ability = "ability",
+	reload = "reload",
+	slow = "slow",
+	goo = "goo",
+	jump = "jump",
+}
+
+local translation
+
+local function languageChanged ()
+	for key, value in pairs(messages) do
+		messages[key] = translation (key)
+	end
+end
+
+--------------------------------------------------------------------------------
 -- OPTIONS
 --------------------------------------------------------------------------------
 local function OptionsChanged() 
@@ -224,6 +255,9 @@ do
 end --//end do
 
 function widget:Initialize()
+
+	translation = WG.initializeTranslation ("healthbars", languageChanged, GetInfo().name)
+	languageChanged ()
 
   --// catch f9
   Spring.SendCommands({"showhealthbars 0"})
@@ -632,10 +666,10 @@ do
     ci = customInfo[unitDefID]
 
     fullText = true
-    ux, uy, uz = GetUnitViewPosition(unitID)
+    local ux, uy, uz = GetUnitViewPosition(unitID)
 	if not ux then return end
-    dx, dy, dz = ux-cx, uy-cy, uz-cz
-    dist = dx*dx + dy*dy + dz*dz
+    local dx, dy, dz = ux-cx, uy-cy, uz-cz
+    local dist = dx*dx + dy*dy + dz*dz
     if (dist > infoDistance) then
       if (dist > 9000000) then
         if debugMode then
@@ -648,14 +682,14 @@ do
     end
 
     --// GET UNIT INFORMATION
-    health,maxHealth,paralyzeDamage,capture,build = GetUnitHealth(unitID)
+    local health,maxHealth,paralyzeDamage,capture,build = GetUnitHealth(unitID)
    --if (not health)    then health=-1   elseif(health<1)    then health=1    end
     if (not maxHealth)or(maxHealth<1) then maxHealth=1 end
     if (not build)     then build=1   end
 
     local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
-    emp = (paralyzeDamage or 0)/empHP
-    hp  = (health or 0)/maxHealth
+    local emp = (paralyzeDamage or 0)/empHP
+    local hp  = (health or 0)/maxHealth
     
     if hp < 0 then
         hp = 0
@@ -673,7 +707,7 @@ do
         local shieldOn,shieldPower = GetUnitShieldState(unitID)
         if (shieldOn)and(build==1)and(shieldPower<ci.maxShield) then
           shieldPower = shieldPower / ci.maxShield
-          AddBar("shield",shieldPower,"shield",(fullText and floor(shieldPower*100)..'%') or '')
+          AddBar(messages.shield,shieldPower,"shield",(fullText and floor(shieldPower*100)..'%') or '')
         end
       end
 
@@ -682,19 +716,19 @@ do
         hp100 = hp*100; hp100 = hp100 - hp100%1; --//same as floor(hp*100), but 10% faster
         if (hp100<0) then hp100=0 elseif (hp100>100) then hp100=100 end
         if (drawFullHealthBars)or(hp100<100) then
-          AddBar("health",hp,nil,(fullText and hp100..'%') or '',bfcolormap[hp100])
+          AddBar(messages.health,hp,nil,(fullText and hp100..'%') or '',bfcolormap[hp100])
         end
       end
 
       --// BUILD
       if (build<1) then
-        AddBar("building",build,"build",(fullText and floor(build*100)..'%') or '')
+        AddBar(messages.building,build,"build",(fullText and floor(build*100)..'%') or '')
       end
 
       --// MORPHING
       if (morph) then
         local build = morph.progress
-        AddBar("morph",build,"build",(fullText and floor(build*100)..'%') or '')
+        AddBar(messages.morph,build,"build",(fullText and floor(build*100)..'%') or '')
       end
 
       --// STOCKPILE
@@ -707,7 +741,7 @@ do
         if (numStockpiled) then
           stockpileBuild = stockpileBuild or 0
           if (stockpileBuild>0) then
-            AddBar("stockpile",stockpileBuild,"stock",(fullText and floor(stockpileBuild*100)..'%') or '')
+            AddBar(messages.stockpile,stockpileBuild,"stock",(fullText and floor(stockpileBuild*100)..'%') or '')
           end
         end
       else
@@ -734,7 +768,7 @@ do
           end
         end
         local empcolor_index = (stunned and ((blink and "emp_b") or "emp_p")) or ("emp")
-        AddBar("paralyze",emp,empcolor_index,infotext)
+        AddBar(messages.paralyze,emp,empcolor_index,infotext)
       end
 	  
 	   --// DISARM
@@ -743,12 +777,12 @@ do
         local disarmProp = (disarmFrame - gameFrame)/1200
         if disarmProp < 1 then
 			if (not paraTime) and disarmProp > emp + 0.014 then -- 16 gameframes of emp time
-				AddBar("disarm",disarmProp,"disarm",(fullText and floor(disarmProp*100)..'%') or '')
+				AddBar(messages.disarm,disarmProp,"disarm",(fullText and floor(disarmProp*100)..'%') or '')
 			end
 		else
 			local disarmTime = (disarmFrame - gameFrame - 1200)/30
 			if (not paraTime) or disarmTime > paraTime + 0.5 then
-			  AddBar("disarm",1,((blink and "disarm_b") or "disarm_p") or ("disarm"),floor(disarmTime) .. 's')
+			  AddBar(messages.disarm,1,((blink and "disarm_b") or "disarm_p") or ("disarm"),floor(disarmTime) .. 's')
 			  if not stunned then
 			    disarmUnits[#disarmUnits+1]=unitID
 			  end
@@ -758,14 +792,14 @@ do
 
       --// CAPTURE (set by capture gadget)
       if ((capture or -1)>0) then
-        AddBar("capture",capture,"capture",(fullText and floor(capture*100)..'%') or '')
+        AddBar(messages.capture,capture,"capture",(fullText and floor(capture*100)..'%') or '')
       end
 	  
 	  --// CAPTURE RECHARGE
 	  local captureReloadState = GetUnitRulesParam(unitID,"captureRechargeFrame")
       if (captureReloadState and captureReloadState > 0) then
 		local capture = 1-(captureReloadState-gameFrame)/captureReloadTime
-        AddBar("capture reload",capture,"reload",(fullText and floor(capture*100)..'%') or '')
+        AddBar(messages.capture_reload,capture,"reload",(fullText and floor(capture*100)..'%') or '')
       end
 	  
 	  --// WATER TANK
@@ -773,7 +807,7 @@ do
       if (ci.maxWaterTank and waterTank) then
         local prog = waterTank/ci.maxWaterTank
 		if prog < 1 then
-			AddBar("water tank",prog,"tank",(fullText and floor(prog*100)..'%') or '')
+			AddBar(messages.water_tank,prog,"tank",(fullText and floor(prog*100)..'%') or '')
 		end
       end
 	  
@@ -790,7 +824,7 @@ do
 			prog = 1 - TeleportEnd
 		end
 		if prog < 1 then
-			AddBar("teleport",prog,"tele",(fullText and floor(prog*100)..'%') or '')
+			AddBar(messages.teleport,prog,"tele",(fullText and floor(prog*100)..'%') or '')
 		end
       end
 
@@ -799,7 +833,7 @@ do
 	  local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
       if (specialReloadState and specialReloadState > gameFrame) then
 		local special = 1-(specialReloadState-gameFrame)/(ud.customParams.specialreloadtime or 1*30)
-        AddBar("ability",special,"reload2",(fullText and floor(special*100)..'%') or '')
+        AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
       end	  
 	  
 	  
@@ -815,7 +849,7 @@ do
 		  if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
             reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
 		    if (reload >= 0) then
-              AddBar("reload",reload,"reload",(fullText and floor(reload*100)..'%') or '')
+              AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
 		    end
 		  end
         end
@@ -830,20 +864,20 @@ do
 	  --// SLOW
       local slowState = GetUnitRulesParam(unitID,"slowState")
       if (slowState and (slowState>0)) then
-        AddBar("slow",slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
+        AddBar(messages.slow,slowState*2,"slow",(fullText and floor(slowState*100)..'%') or '')
       end
 	  
 	  --// GOO
       local gooState = GetUnitRulesParam(unitID,"gooState")
       if (gooState and (gooState>0)) then
-        AddBar("goo",gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
+        AddBar(messages.goo,gooState,"goo",(fullText and floor(gooState*100)..'%') or '')
       end
 	  
       --// JUMPJET
       if (drawJumpJet)and(ci.canJump) then
         local jumpReload = GetUnitRulesParam(unitID,"jumpReload")
         if (jumpReload and (jumpReload>0) and (jumpReload<1)) then
-          AddBar("jump",jumpReload,"jump",(fullText and floor(jumpReload*100)..'%') or '')
+          AddBar(messages.jump,jumpReload,"jump",(fullText and floor(jumpReload*100)..'%') or '')
         end
       end
 	  

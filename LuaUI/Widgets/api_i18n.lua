@@ -75,8 +75,8 @@ local function lang(l)
 end
 
 
-local function loadLocale(i18n,widget_name,locale)
-	local path="Luaui/Configs/lang/"..widget_name.."."..locale..".json"
+local function loadLocale(i18n,database,locale)
+	local path="Luaui/Configs/lang/"..database.."."..locale..".json"
 	if VFS.FileExists(path, VFS.ZIP) then
 		local lang=Spring.Utilities.json.decode(VFS.LoadFile(path, VFS.ZIP))
 		local t={}
@@ -84,21 +84,21 @@ local function loadLocale(i18n,widget_name,locale)
 		i18n.load(t)
 		return true
 	end
-	Spring.Echo("Cannot load locale \""..locale.."\" for "..widget_name)
+	Spring.Echo("Cannot load locale \""..locale.."\" for "..database)
 	return false
 end
 
-local function initializeTranslation(widget_name,listener)
+local function initializeTranslation(database, listener, widget_name)
 	addListener(widget_name,listener)
 	
 	local i18n = VFS.Include("LuaUI/i18nlib/i18n/init.lua", nil, VFS.DEF_MODE)
-	loadLocale(i18n,widget_name,"en") 
+	loadLocale(i18n,database,"en") 
 	
 	local localsList={en=true}
 	return 	function(key,data)
 				local lang=WG.lang()
 				if not localsList[lang] then
-					loadLocale(i18n,widget_name,lang)
+					loadLocale(i18n,database,lang)
 					localsList[lang]=true
 				end
 				return i18n(key,data,lang)

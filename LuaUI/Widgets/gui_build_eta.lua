@@ -47,7 +47,6 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 	vsy = viewSizeY
 end
 
-
 local function MakeETA(unitID,unitDefID)
 	if (unitDefID == nil) then return nil end
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
@@ -71,8 +70,18 @@ local function MakeETA(unitID,unitDefID)
 	}
 end
 
+local build_eta_translation
+local translation
+
+function languageChanged ()
+	build_eta_translation = translation ("build_eta")
+end
 
 function widget:Initialize()
+
+	translation = WG.initializeTranslation ("common", languageChanged, GetInfo().name)
+	languageChanged ()
+
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local allUnits = Spring.GetAllUnits()
@@ -249,10 +258,10 @@ end
 local function DrawEtaText(timeLeft,yoffset, negative)
 	local etaStr
 	if (timeLeft == nil) then
-		etaStr = '\255\255\255\1ETA\255\255\255\255: \255\1\1\255???'
+		etaStr = '\255\255\255\1' .. build_eta_translation .. ' \255\1\1\255???'
 	else
 		local color = negative and '\255\255\1\1' or '\255\1\255\1'
-		etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
+		etaStr = "\255\255\255\1" .. string.format('%s %s%d:%02d', build_eta_translation, color, timeLeft / 60, timeLeft % 60)
 	end
 
 	gl.Translate(0, yoffset,0)
