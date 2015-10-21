@@ -1307,7 +1307,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (((ud.mass > 365) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 
 	if commModules then
