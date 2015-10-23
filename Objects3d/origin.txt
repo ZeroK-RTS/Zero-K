@@ -86,7 +86,7 @@ MidKnight - Artistic License 2.0
 KingRaptor (L.J. Lim) - Artistic License 2.0
  * Enforcer
  * Gull (carrier drone)
- * Sharpshooter
+ * Spectre
  * Sonar Station
  * Some projectile models - PD
  
