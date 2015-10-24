@@ -3,6 +3,28 @@ function cross_product (px, pz, ax, az, bx, bz)
 end
 
 function SanitizeBoxes (boxes)
+
+	-- chop polies into triangles
+	for id, polies in pairs(boxes) do
+		local triangles = {}
+		local polycount = #polies
+		for i = 1, polycount do
+			local polygon = polies[i]
+			local A = polygon[1]
+			local B = polygon[2]
+			for j = 3, #polygon do
+				local C = polygon[j]
+				triangles[#triangles+1] = {A[1], A[2], B[1], B[2], C[1], C[2]}
+				B = C
+			end
+			polies[i] = nil
+		end
+		for i = 1, #triangles do
+			polies[i] = triangles[i]
+		end
+	end
+
+	-- make sure the triangles are counter-clockwise
 	for id, box in pairs(boxes) do
 		for i = 1, #box do
 			local conf = box[i]
