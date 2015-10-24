@@ -751,9 +751,9 @@
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
     "armsnipe": {
-        "name": "Sharpshooter",
+        "name": "Spectre",
         "description": "Niewidzialny snajper harcownik",
-        "helptext": "Karabin snajperski Sharpshootera zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Sharpshootera jest przeczesanie okolicy tanimi jednostkami."
+        "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
     "corbhmth": {
         "name": "Behemoth",
@@ -1126,7 +1126,7 @@
     "armarad": {
         "name": "Zaawansowany radar",
         "description": "Radar dalekiego zasięgu, zmniejsza niepewność pomiaru",
-        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja. Ponadto zmniejsza niepewność pomiaru wszystkich sojuszniczych radarów, co bardzo pomaga w używaniu jednostek snajperskich takich jak Impaler czy Sharpshooter."
+        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja. Ponadto zmniejsza niepewność pomiaru wszystkich sojuszniczych radarów, co bardzo pomaga w używaniu jednostek snajperskich takich jak Impaler czy Spectre."
     },
     "amphraider2": {
         "name": "Archer",
