@@ -107,8 +107,7 @@ function widget:DrawWorld()
 	if (allyStartBox) then
 		gl.Color (allyStartBoxColor)
 		for i = 1, #allyStartBox do
-			local x1, z1, x2, z2, x3, z3 = unpack(allyStartBox[i])
-			gl.Utilities.DrawGroundTriangle(x1, z1, x2, z2, x3, z3)
+			gl.Utilities.DrawGroundTriangle(allyStartBox[i])
 		end
 	end
 
@@ -116,8 +115,7 @@ function widget:DrawWorld()
 	for j = 1, #enemyStartBoxes do
 		local startBox = enemyStartBoxes[j]
 		for i = 1, #startBox do
-			local x1, z1, x2, z2, x3, z3 = unpack(startBox[i])
-			gl.Utilities.DrawGroundTriangle(x1, z1, x2, z2, x3, z3)
+			gl.Utilities.DrawGroundTriangle(startBox[i])
 		end
 	end
 

@@ -219,10 +219,9 @@ function gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
 end
 
 local triangles = {}
-function gl.Utilities.DrawGroundTriangle(x1,z1,x2,z2,x3,z3)
-	local args = {x1,z1,x2,z2,x3,z3}
+function gl.Utilities.DrawGroundTriangle(args)
 	if not triangles[args] then
-		triangles[args] = gl.CreateList(gl.Utilities.DrawMy3DTriangle, x1, z1, x2, z2, x3, z3, -0.5, 0.5)
+		triangles[args] = gl.CreateList(gl.Utilities.DrawMy3DTriangle, args[1], args[2], args[3], args[4], args[5], args[6], -0.5, 0.5)
 	end
 	gl.PushMatrix()
 	gl.Translate(0, averageGroundHeight, 0)
