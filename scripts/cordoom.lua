@@ -102,7 +102,7 @@ end
 
 function script.QueryWeapon1() return flare1 end
 
-function script.AimFromWeapon1() return cannon end
+function script.AimFromWeapon1() return cannonbase end
 
 function script.AimWeapon1(heading, pitch)
 	if not on then return false end
