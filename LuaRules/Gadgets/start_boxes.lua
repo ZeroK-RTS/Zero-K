@@ -12,38 +12,11 @@ function gadget:GetInfo() return {
 
 if VFS.FileExists("mission.lua") then return end
 
-local startboxConfig
-local manualStartposConfig
-local mapsideBoxes = "mapconfig/map_startboxes.lua"
-local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
-
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-if VFS.FileExists (modsideBoxes) then
-	startboxConfig, manualStartposConfig = VFS.Include (modsideBoxes)
-	SanitizeBoxes (startboxConfig)
-elseif VFS.FileExists (mapsideBoxes) then
-	startboxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
-	SanitizeBoxes (startboxConfig)
-else
-	startboxConfig = { }
-	local startboxString = Spring.GetModOptions().startboxes
-	if startboxString then
-		local springieBoxes = loadstring(startboxString)()
-		for id, box in pairs(springieBoxes) do
-			box[1] = box[1]*Game.mapSizeX
-			box[2] = box[2]*Game.mapSizeZ
-			box[3] = box[3]*Game.mapSizeX
-			box[4] = box[4]*Game.mapSizeZ
-			startboxConfig[id] = {
-				{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
-				{box[1], box[2], box[3], box[4], box[3], box[2]}
-			}
-		end
-	end
-end
+local startboxConfig, manualStartposConfig = ParseBoxes()
 
-GG.startboxConfig = startboxConfig
+GG.startBoxConfig = startboxConfig
 GG.manualStartposConfig = manualStartposConfig
 
 function gadget:Initialize()
