@@ -11,12 +11,17 @@ function widget:GetInfo() return {
 if VFS.FileExists("mission.lua") then return end
 
 local startBoxConfig
+local manualStartposConfig
 local mapsideBoxes = "mapconfig/map_startboxes.lua"
+local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-if VFS.FileExists (mapsideBoxes) then
-	startBoxConfig = VFS.Include (mapsideBoxes)
+if VFS.FileExists (modsideBoxes) then
+	startBoxConfig, manualStartposConfig = VFS.Include (modsideBoxes)
+	SanitizeBoxes (startBoxConfig)
+elseif VFS.FileExists (mapsideBoxes) then
+	startBoxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
 	SanitizeBoxes (startBoxConfig)
 else
 	startBoxConfig = { }

@@ -15,10 +15,14 @@ if VFS.FileExists("mission.lua") then return end
 local startboxConfig
 local manualStartposConfig
 local mapsideBoxes = "mapconfig/map_startboxes.lua"
+local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-if VFS.FileExists (mapsideBoxes) then
+if VFS.FileExists (modsideBoxes) then
+	startboxConfig, manualStartposConfig = VFS.Include (modsideBoxes)
+	SanitizeBoxes (startboxConfig)
+elseif VFS.FileExists (mapsideBoxes) then
 	startboxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
 	SanitizeBoxes (startboxConfig)
 else
