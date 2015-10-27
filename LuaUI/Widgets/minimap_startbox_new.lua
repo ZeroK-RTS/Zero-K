@@ -17,11 +17,14 @@ VFS.Include("LuaRules/Utilities/glVolumes.lua")
 local xformList = 0
 local coneList = 0
 
+local recommendedStartpoints
+local myTeammates = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 local allyStartBox    = nil
 local enemyStartBoxes = {}
 
 local allyStartBoxColor  = { 0, 1, 0, 0.3 }  -- green
 local enemyStartBoxColor = { 1, 0, 0, 0.3 }  -- red
+local recommendedStartposRadius = 256
 
 local startTimer = Spring.GetTimer()
 
@@ -58,6 +61,10 @@ function widget:Initialize()
 	local myBoxID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(), "start_box_id")
 	if myBoxID then
 		allyStartBox = startboxConfig[myBoxID]
+		local startpoints = WG.manualStartposConfig
+		if startpoints then
+			recommendedStartpoints = startpoints[myBoxID]
+		end
 	end
 
 	local shuffleMode = Spring.GetModOptions().shuffle or "off"
@@ -108,6 +115,24 @@ function widget:DrawWorld()
 		gl.Color (allyStartBoxColor)
 		for i = 1, #allyStartBox do
 			gl.Utilities.DrawGroundTriangle(allyStartBox[i])
+		end
+
+		if (recommendedStartpoints) then
+			gl.LineWidth(3)
+			gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINES)
+			for i = 1, #recommendedStartpoints do
+				local x = recommendedStartpoints[i][1]
+				local z = recommendedStartpoints[i][2]
+				local empty = true
+				for j = 1, #myTeammates do
+					local tx, _, tz = Spring.GetTeamStartPosition(myTeammates[j])
+					if ((tx-x)^2 + (tz-z)^2 < recommendedStartposRadius^2) then
+						empty = false
+					end
+				end
+				if empty then gl.DrawGroundCircle(x, 0, z, recommendedStartposRadius, 19) end
+			end
+			gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 		end
 	end
 
