@@ -47,6 +47,8 @@ function ParseBoxes ()
 	local startBoxConfig
 	local manualStartposConfig
 
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
+
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig, manualStartposConfig = VFS.Include (modsideBoxes)
 		SanitizeBoxes (startBoxConfig)

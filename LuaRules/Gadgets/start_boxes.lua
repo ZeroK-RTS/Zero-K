@@ -14,7 +14,13 @@ if VFS.FileExists("mission.lua") then return end
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
+--[[ expose a randomness seed
+this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
+afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
+local private_seed = math.random(2000000000) -- must be an integer
+Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
 local startboxConfig, manualStartposConfig = ParseBoxes()
+math.randomseed(private_seed)
 
 GG.startBoxConfig = startboxConfig
 GG.manualStartposConfig = manualStartposConfig

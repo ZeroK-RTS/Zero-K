@@ -875,7 +875,17 @@ if (teams == 7) then
 	return outer_layout, outer_startpos, supported_teamcounts
 elseif (teams == 3) then
 	return inner_layout, inner_startpos, supported_teamcounts
-else
+elseif (teams == 5) then
 	return middle_layout, middle_startpos, supported_teamcounts
+else
+	-- duel: all layouts work so pick one at random (preferring 5 though)
+	local r = math.random()
+	if (r < 0.6) then
+		return middle_layout, middle_startpos, supported_teamcounts
+	elseif (r < 0.8) then
+		return inner_layout, inner_startpos, supported_teamcounts
+	else
+		return outer_layout, outer_startpos, supported_teamcounts
+	end
 end
 
