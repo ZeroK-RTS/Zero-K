@@ -21,7 +21,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local LOS_MULT = 64 -- multiplier from UnitDefs to reasonable units
+local LOS_MULT = 32 -- multiplier from UnitDefs to reasonable units
 local UPDATE_FREQUENCY = 15
 
 local units = {count = 0, data = {}}
