@@ -47,7 +47,7 @@ local terraformCost  = UnitDefNames["terraunit"].metalCost
 local mexDefID = UnitDefNames["cormex"].id
 local mexCost  = UnitDefNames["cormex"].metalCost
 
-local reclaimListByFeature = {}
+local reclaimListByTeam = {}
 local shareListTemp1 = {}
 local shareListTemp2 = {}
 
@@ -329,25 +329,16 @@ local function AddAwardPoints( awardType, teamID, amount )
 	end
 end
 
-local function AddFeatureReclaim(featureID)
-	local featureData = reclaimListByFeature[featureID]
-	local metal = featureData.metal
-	featureData.metal = nil
-
-	for team, part in pairs(featureData) do
-		if (part < 0) then --more metal was reclaimed from feature than spent on repairing it (during resurrecting)
-			if metal then
-				AddAwardPoints( 'reclaim', team, - metal * part )
-			end
+local function UpdateReclaimList()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local team = teamList[i]
+		if team ~= gaiaTeamID then
+			AddAwardPoints( 'reclaim', team, -reclaimListByTeam[team])
+			reclaimListByTeam[team] = 0
+			Spring.SetTeamRulesParam(team, "total_reclaimed_metal", awardData['reclaim'][team])
 		end
 	end
-end
-
-local function FinalizeReclaimList()
-	for featureID, _ in pairs(reclaimListByFeature) do
-		AddFeatureReclaim(featureID)
-	end
-	reclaimListByFeature = {}
 end
 
 local function ProcessAwardData()
@@ -463,6 +454,7 @@ function gadget:Initialize()
 		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
+			reclaimListByTeam[team] = 0
 			totalTeamList[team] = team
 		end
 	end
@@ -598,16 +590,10 @@ function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, feature
 	if builderTeam == gaiaTeamID then
 		return true
 	end
-	reclaimListByFeature[featureID] = reclaimListByFeature[featureID] or { metal = FeatureDefs[featureDefID].metal }
-	reclaimListByFeature[featureID][builderTeam] = (reclaimListByFeature[featureID][builderTeam] or 0) + part
-	return true
-end
-
-function gadget:FeatureDestroyed (featureID, allyTeam)
-	if (reclaimListByFeature[featureID]) then
-		AddFeatureReclaim(featureID)
-		reclaimListByFeature[featureID] = nil
+	if (part < 0) then
+		reclaimListByTeam[builderTeam] = reclaimListByTeam[builderTeam] + (part * FeatureDefs[featureDefID].metal)
 	end
+	return true
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
@@ -686,6 +672,10 @@ function gadget:GameFrame(n)
 	--	UpdateResourceStats((n-2)/TEAM_SLOWUPDATE_RATE)
 	--end
 
+	if n % TEAM_SLOWUPDATE_RATE == 7 then
+		UpdateReclaimList()
+	end
+
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
 	end
@@ -717,8 +707,6 @@ function gadget:GameFrame(n)
 			local unitDefID = spGetUnitDefID(unitID)
 			gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		end
-
-		FinalizeReclaimList()
 
 		--new
 		ProcessAwardData()
