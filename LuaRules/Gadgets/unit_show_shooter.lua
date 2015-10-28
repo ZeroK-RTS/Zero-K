@@ -24,15 +24,14 @@ end
 --------------------------------------------------------------------------------
 
 local ALLYTEAM_COUNT = #(Spring.GetAllyTeamList()) - 1 -- Because allyTeams start at 0
+local SLOW_UPDATE = 15
 
-local revealedUnits = {}
+local STATIC_SHOW_TIME = 10 -- 5 seconds
+local MOBILE_SHOW_TIME = 4.5 -- 2.5 seconds
 
-for i = 0, ALLYTEAM_COUNT do
-	revealedUnits[i] = {}
-end
-
-local fakeWeapons = {}
-local staticWeapons = {}
+local fakeWeapons = {}   -- WeaponDefs which are for hax.
+local staticWeapons = {} -- WeaponDefs which are on turrets.
+local noDecloakWeapons = {[WeaponDefNames["armsnipe_shockrifle"].id] = true}
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]
@@ -50,44 +49,48 @@ for i = 1, #UnitDefs do
 	end
 end
 
+-- These are the units which have been revealed and are waiting to be re-hidden
+local revealedUnits = {}
+
+for i = 0, ALLYTEAM_COUNT do
+	revealedUnits[i] = {}
+end
+
+-- Units which have already had their reveal state checked since last slow update.
+local firedUnits = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Checks for whether a fired unit should be revealed
 
-local function CheckUnitRevealAllyTeam(unitID, x, z, allyTeamID, staticWeapon)
+local function CheckUnitRevealAllyTeam(unitID, x, z, allyTeamID, weaponID)
+	-- Position check is used because there is no concept of a unit being "in air LOS".
+	-- A unit is either revealed or not revealed.
 	local aLos = Spring.IsPosInAirLos(x, 0, z, allyTeamID)
 	local los = Spring.IsPosInLos(x, 0, z, allyTeamID)
+	
+	-- Don't reveal units which are already in LOS. Waste of time to do so.
 	if aLos and not los then
-		revealedUnits[allyTeamID][unitID] = staticWeapon and 10 or 4 -- 5s for statics, 2s for mobiles
-		Spring.SetUnitLosMask(unitID, allyTeamID, 15)
-		Spring.SetUnitLosState(unitID, allyTeamID, 15)
+		if noDecloakWeapons[weaponID] and Spring.GetUnitIsCloaked(unitID) then
+			return
+		end
+		revealedUnits[allyTeamID][unitID] = staticWeapons[weaponID] and STATIC_SHOW_TIME or MOBILE_SHOW_TIME
+		Spring.SetUnitLosMask(unitID, allyTeamID, 15)  -- Prevents engine slow update from modifying state.
+		Spring.SetUnitLosState(unitID, allyTeamID, 15) -- Sets the unit to be fully visible.
 	end
 end
 
-local function CheckUnitRevealing(unitID, staticWeapon)
+local function CheckUnitRevealing(unitID, weaponID)
 	if not Spring.ValidUnitID(unitID) then
 		return
 	end
 	local unitAllyTeamID = Spring.GetUnitAllyTeam(unitID)
 	local x,_,z = Spring.GetUnitPosition(unitID)
+	
+	-- Check each allyTeam individually for FFA purposes.
 	for allyTeamID = 0, ALLYTEAM_COUNT do
 		if unitAllyTeamID ~= allyTeamID then
-			CheckUnitRevealAllyTeam(unitID, x, z, allyTeamID, staticWeapon)		
-		end
-	end
-end
-
-local function HideUnits(n)
-	if n%15 == 0 then
-		for allyTeamID = 0, ALLYTEAM_COUNT do
-			for unitID, data in pairs(revealedUnits[allyTeamID]) do
-				if data > 1 then
-					revealedUnits[allyTeamID][unitID] = data - 1
-				else
-					Spring.SetUnitLosMask(unitID, allyTeamID, 0)
-					revealedUnits[allyTeamID][unitID] = nil
-				end
-			end
+			CheckUnitRevealAllyTeam(unitID, x, z, allyTeamID, weaponID)		
 		end
 	end
 end
@@ -96,92 +99,41 @@ end
 --------------------------------------------------------------------------------
 -- Projectile creation method of checking unit firing
 
-local firedUnits = {}
-
 function gadget:ProjectileCreated(proID, proOwnerID, weaponID)
 	if proOwnerID and not firedUnits[proOwnerID] and not fakeWeapons[weaponID] then
-		CheckUnitRevealing(proOwnerID, staticWeapons[weaponID])
-		firedUnits[proOwnerID] = true
+		CheckUnitRevealing(proOwnerID, weaponID)
+		firedUnits[proOwnerID] = true -- Do not check the unit again until the next slow update.
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Updates
+
+local function RevealedUnitTimeout(n)
+	if n%SLOW_UPDATE == 0 then
+		for allyTeamID = 0, ALLYTEAM_COUNT do
+			for unitID, data in pairs(revealedUnits[allyTeamID]) do
+				if data > 1 then
+					revealedUnits[allyTeamID][unitID] = data - 1
+				else
+					Spring.SetUnitLosMask(unitID, allyTeamID, 0) -- Releasing mask reverts LOS to engine control.
+					revealedUnits[allyTeamID][unitID] = nil
+				end
+			end
+		end
 	end
 end
 
 local function ClearFiredUnits(n)
-	if n%15 == 1 then
+	if n%SLOW_UPDATE == 1 then
 		firedUnits = {}
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Reload time polling method of checking unit firing (WIP and probably pointless)
---
---local unitList = {}
---local unitCount = 0
---local unitMap = {}
---
---local listPos = 1
---
---local UPDATE_PERIOD = 10
---
---local function CheckUnitFiredRecently(unitID)
---	-- etc
---	--CheckUnitRevealing
---end
---
---local function IsUnitArmed(unitDefID)
---	return true
---end
---
---local function PollReloadTimes()
---	if unitCount == 0 then
---		return
---	end
---
---	for i = 1, math.max(unitCount/UPDATE_PERIOD) do
---		CheckUnitFiredRecently(unitList[listPos])
---		
---		listPos = listPos + 1
---		if listPos > unitCount then
---			listPos = 1
---		end
---	end
---end
---
---function gadget:UnitFinished(unitID, unitDefID)
---	if not IsUnitArmed(unitDefID) then
---		return
---	end
---	unitCount = unitCount + 1
---	unitList[unitCount] = unitID
---	unitMap[unitID] = unitCount
---end
---
---function gadget:UnitDestroyed(unitID)
---	if not unitMap[unitID] then
---		return
---	end
---	unitMap[unitList[unitCount]] = unitMap[unitID]
---	unitList[unitCount] = nil
---	unitMap[unitID] = nil
---	unitCount = unitCount - 1
---end
---
---function gadget:Initialize()
---	local units = Spring.GetAllUnits()
---	for i = 1, #units do
---		local udid = Spring.GetUnitDefID(units[i])
---		gadget:UnitCreated(units[i])
---	end
---end
---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Shared callins
-
 function gadget:GameFrame(n)
-	--PollReloadTimes()
 	ClearFiredUnits(n)
-	HideUnits(n)
+	RevealedUnitTimeout(n)
 end
 
 --------------------------------------------------------------------------------
