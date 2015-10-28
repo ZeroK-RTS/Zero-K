@@ -943,8 +943,7 @@ local function GetOpposingAllyTeams()
 			nameSize = nameSize, -- Display size factor of the team name.
 			teamID = data.teamID, -- representitive teamID
 			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1}, -- color of the teams text (color of first player)
-			playerName = data.playerName, -- representitive player name (for win counter)
-			winsName = data.playerNames[1], -- Name for updating win counter
+			playerName = data.playerNames[1], -- representitive player name (for win counter)
 			winString = data.winString or "0", -- Win string from win counter
 		}
 	end
@@ -1043,8 +1042,8 @@ function widget:Update(dt)
 		UpdateResourceWindowFlashMain(dt)
 	end
 	if timer >= 1 then
-		playerWindow.winsLeft:SetCaption(GetWinString(allyTeamData[1].winsName))
-		playerWindow.winsRight:SetCaption(GetWinString(allyTeamData[2].winsName))
+		playerWindow.winsLeft:SetCaption(GetWinString(allyTeamData[1].playerName))
+		playerWindow.winsRight:SetCaption(GetWinString(allyTeamData[2].playerName))
 		timer = 0
 	end
 end
