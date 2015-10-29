@@ -12,31 +12,17 @@ function gadget:GetInfo() return {
 
 if VFS.FileExists("mission.lua") then return end
 
-local startboxConfig
-local manualStartposConfig
-local mapsideBoxes = "mapconfig/map_startboxes.lua"
+VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-if VFS.FileExists (mapsideBoxes) then
-	startboxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
-else
-	startboxConfig = { }
-	local startboxString = Spring.GetModOptions().startboxes
-	if startboxString then
-		local springieBoxes = loadstring(startboxString)()
-		for id, box in pairs(springieBoxes) do
-			box[1] = box[1]*Game.mapSizeX
-			box[2] = box[2]*Game.mapSizeZ
-			box[3] = box[3]*Game.mapSizeX
-			box[4] = box[4]*Game.mapSizeZ
-			startboxConfig[id] = {
-				{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
-				{box[1], box[2], box[3], box[4], box[3], box[2]}
-			}
-		end
-	end
-end
+--[[ expose a randomness seed
+this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
+afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
+local private_seed = math.random(2000000000) -- must be an integer
+Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
+local startboxConfig, manualStartposConfig = ParseBoxes()
+math.randomseed(private_seed)
 
-GG.startboxConfig = startboxConfig
+GG.startBoxConfig = startboxConfig
 GG.manualStartposConfig = manualStartposConfig
 
 function gadget:Initialize()
@@ -107,10 +93,6 @@ function gadget:Initialize()
 			end
 		end
 	end
-end
-
-local function cross_product (px, pz, ax, az, bx, bz)
-	return ((px - bx)*(az - bz) - (ax - bx)*(pz - bz))
 end
 
 local function CheckStartbox (boxID, x, z)
