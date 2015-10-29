@@ -1041,7 +1041,7 @@ function widget:Update(dt)
 	if economyWindowData then
 		UpdateResourceWindowFlashMain(dt)
 	end
-	if timer >= 1 then
+	if timer >= 1 and playerWindow then
 		playerWindow.winsLeft:SetCaption(GetWinString(allyTeamData[1].playerName))
 		playerWindow.winsRight:SetCaption(GetWinString(allyTeamData[2].playerName))
 		timer = 0
