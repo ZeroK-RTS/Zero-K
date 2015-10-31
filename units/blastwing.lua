@@ -106,4 +106,45 @@ unitDef = {
   },
 }
 
+--------------------------------------------------------------------------------
+
+local weaponDefs = {
+  BLASTWING_EXPLOSION = {
+    name               = "Blastwing Explosion",
+    areaOfEffect       = 256,
+    craterBoost        = 1,
+    craterMult         = 3.5,
+	
+	customParams        	  = {
+      setunitsonfire = "1",
+      burntime = 60,
+      
+      area_damage = 1,
+      area_damage_radius = 128,
+      area_damage_dps = 16,
+      area_damage_duration = 20,
+      
+      --lups_heat_fx = [[firewalker]],
+    },
+	
+    damage = {
+      default = 80,
+      planes  = 80,
+      subs    = 4,
+    },
+	
+    edgeeffectiveness  = 0.7,
+    explosionGenerator = [[custom:napalm_blastwing]],
+    explosionSpeed     = 10000,
+	firestarter        = 180,
+    impulseBoost       = 0,
+    impulseFactor      = 0.4,
+    soundHit           = "explosion/ex_med17",
+	
+  },
+}
+unitDef.weaponDefs = weaponDefs
+
+--------------------------------------------------------------------------------
+
 return lowerkeys({ blastwing = unitDef })
