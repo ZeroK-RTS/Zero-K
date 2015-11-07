@@ -164,12 +164,12 @@ local startpos = {
 
 for j = 1, #layout[0] do
 	for i = 1, #layout[0][j] do
-		layout[1][j][i] = { 7168 - layout[0][j][i][1], 7168 - layout[0][j][i][2] }
+		layout[1][j][i] = { Game.mapSizeX - layout[0][j][i][1], Game.mapSizeZ - layout[0][j][i][2] }
 	end
 end
 
 for i = 1, #startpos[0] do
-	startpos[1][i] = { 7168 - startpos[0][i][1], 7168 -  - startpos[0][i][2]}
+	startpos[1][i] = { Game.mapSizeX - startpos[0][i][1], Game.mapSizeZ - startpos[0][i][2]}
 end
 
 return layout, startpos, { 2 }
