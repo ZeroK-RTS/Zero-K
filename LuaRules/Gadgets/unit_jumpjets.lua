@@ -525,6 +525,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, true
 	end
 
+	if ((Spring.GetUnitRulesParam(unitID, "orbitalDrop") or 0) == 1) then
+		return true, false
+	end
+
 	if (jumping[unitID]) then
 		return true, false -- command was used but don't remove it (unit is still jumping)
 	end
