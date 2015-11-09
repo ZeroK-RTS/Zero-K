@@ -33,6 +33,10 @@ function script.Create()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if (spGetUnitRulesParam(unitID, "lowpower") == 1) then
+		return
+	end
+
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(75))

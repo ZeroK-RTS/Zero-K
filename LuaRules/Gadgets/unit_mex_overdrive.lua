@@ -137,8 +137,6 @@ local spGetTeamInfo       = Spring.GetTeamInfo
 local mexes = {}   -- mexes[teamID][gridID][unitID] == mexMetal
 local mexByID = {} -- mexByID[unitID] = {gridID, allyTeamID, refundTeamID, refundTime, refundTotal, refundSoFar}
 
-local lowPowerUnits = {inner = {count = 0, units = {}}}
-
 local pylon = {} -- pylon[allyTeamID][unitID] = {gridID,mexes,mex[unitID],x,z,overdrive, nearPlant[unitID],nearPylon[unitID], color}
 local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID, ...}, count = number}
 
@@ -918,7 +916,6 @@ local lastTeamOverdriveSpending = {}
 
 function gadget:GameFrame(n)
 	if (n%TEAM_SLOWUPDATE_RATE == 1) then
-		lowPowerUnits.inner = {count = 0, units = {}}
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do 
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			local list = pylonList[allyTeamID]
@@ -931,7 +928,7 @@ function gadget:GameFrame(n)
 							(spGetUnitRulesParam(unitID,"disarmed") == 1) or 
 							(spGetUnitRulesParam(unitID,"morphDisable") == 1)
 						local states = spGetUnitStates(unitID)
-						local currentlyActive = (not stunned_or_inbuld) and states and states.active
+						local currentlyActive = (not stunned_or_inbuld) and ((states and states.active) or pylonData.neededLink)
 						if (currentlyActive) and (not pylonData.active) then
 							ReactivatePylon(unitID)
 						elseif (not currentlyActive) and (pylonData.active) then
@@ -1069,8 +1066,6 @@ function gadget:GameFrame(n)
 					if pylonData.neededLink then
 						if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
 							spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
-							lowPowerUnits.inner.count = lowPowerUnits.inner.count + 1
-							lowPowerUnits.inner.units[lowPowerUnits.inner.count] = unitID
 						else
 							spSetUnitRulesParam(unitID,"lowpower",0, inlosTrueTable)
 						end
@@ -1502,7 +1497,6 @@ end
 function gadget:Initialize()
 	
 	_G.pylon = pylon
-	_G.lowPowerUnits = lowPowerUnits
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
 		if (mexDefs[unitDefID]) then
