@@ -122,7 +122,9 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
 	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
-	
+
+	Spring.SetUnitRulesParam(unitID, "orbitalDrop", 1, LOS_ACCESS)
+
 	-- prevent units from shooting while falling
 	if GG.UpdateUnitAttributes then
 		Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 0, LOS_ACCESS)
@@ -174,8 +176,9 @@ function gadget:GameFrame(frame)
 		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
 		--Spring.Echo(units[unitID][1]) --see if it match desired timeToGround
 		if GG.UpdateUnitAttributes then
-		      Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 1, LOS_ACCESS)
-		      GG.UpdateUnitAttributes(unitID)
+			Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 1, LOS_ACCESS)
+			Spring.SetUnitRulesParam(unitID, "orbitalDrop", 0, LOS_ACCESS)
+			GG.UpdateUnitAttributes(unitID)
 		end
 		units[unitID]= nil --remove from watchlist
       elseif y < brakeAltitude+10  then
