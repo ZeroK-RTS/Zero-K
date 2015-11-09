@@ -156,8 +156,6 @@ local layout = {
 local startpos = {
 	[0] = {
 		{3666, 2000},
-		{4626, 2126},
-		{4315, 2185}
 	},
 	[1] = {} -- autopopulated
 }
