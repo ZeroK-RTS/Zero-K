@@ -7,35 +7,76 @@ local function SanitizeBoxes (boxes)
 	-- chop polies into triangles
 	for id, polies in pairs(boxes) do
 		local triangles = {}
-		local polycount = #polies
-		for i = 1, polycount do
-			local polygon = polies[i]
-			local A = polygon[1]
-			local B = polygon[2]
-			for j = 3, #polygon do
-				local C = polygon[j]
-				triangles[#triangles+1] = {A[1], A[2], B[1], B[2], C[1], C[2]}
-				B = C
-			end
-			polies[i] = nil
-		end
-		for i = 1, #triangles do
-			polies[i] = triangles[i]
-		end
-	end
+		for z = 1, #polies do
+			local polygon = polies[z]
 
-	-- make sure the triangles are counter-clockwise
-	for id, box in pairs(boxes) do
-		for i = 1, #box do
-			local conf = box[i]
-			if cross_product(conf[5], conf[6], conf[1], conf[2], conf[3], conf[4]) > 0 then
-				local temp = conf[5]
-				conf[5] = conf[3]
-				conf[3] = temp
-				temp = conf[6]
-				conf[6] = conf[4]
-				conf[4] = temp
+			-- find out clockwisdom
+			polygon[#polygon+1] = polygon[1]
+			local clockwise = 0
+			for i = 2, #polygon do
+				clockwise = clockwise + (polygon[i-1][1] * polygon[i][2]) - (polygon[i-1][2] * polygon[i][1])
 			end
+			polygon[#polygon] = nil
+			local clockwise = (clockwise < 0)
+
+			-- the van gogh concave polygon triangulation algorithm: cuts off ears
+			-- is pretty shitty at O(V^3) but was easy to code and it's only done once anyway
+			while (#polygon > 2) do
+
+				-- get a candidate ear
+				local triangle
+				local c0, c1, c2 = 0, 0, 0
+				local candidate_ok = false
+				while not candidate_ok do
+
+					c0 = c0 + 1
+					c1, c2 = c0+1, c0+2
+					if c1 > #polygon then c1 = c1 - #polygon end
+					if c2 > #polygon then c2 = c2 - #polygon end
+					triangle = {
+						polygon[c0][1], polygon[c0][2],
+						polygon[c1][1], polygon[c1][2],
+						polygon[c2][1], polygon[c2][2],
+					}
+
+					-- make sure the ear is of proper rotation but then make it counter-clockwise
+					local dir = cross_product(triangle[5], triangle[6], triangle[1], triangle[2], triangle[3], triangle[4])
+					if ((dir < 0) == clockwise) then
+						if dir > 0 then
+							local temp = triangle[5]
+							triangle[5] = triangle[3]
+							triangle[3] = temp
+							temp = triangle[6]
+							triangle[6] = triangle[4]
+							triangle[4] = temp
+						end
+
+						-- check if no point lies inside the triangle
+						candidate_ok = true
+						for i = 1, #polygon do
+							if (i ~= c0 and i ~= c1 and i ~= c2) then
+								local current_pt = polygon[i]
+								if  (cross_product(current_pt[1], current_pt[2], triangle[1], triangle[2], triangle[3], triangle[4]) < 0)
+								and (cross_product(current_pt[1], current_pt[2], triangle[3], triangle[4], triangle[5], triangle[6]) < 0)
+								and (cross_product(current_pt[1], current_pt[2], triangle[5], triangle[6], triangle[1], triangle[2]) < 0)
+								then
+									candidate_ok = false
+								end
+							end
+						end
+					end
+				end
+
+				-- cut off ear
+				triangles[#triangles+1] = triangle
+				table.remove(polygon, c1)
+			end
+
+			polies[z] = nil
+		end
+
+		for z = 1, #triangles do
+			polies[z] = triangles[z]
 		end
 	end
 end
