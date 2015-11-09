@@ -142,7 +142,7 @@ function script.AimWeapon2(heading, pitch)
 	Turn(heatray, x_axis, -pitch, 2)
 	WaitForTurn (heatraybase, y_axis)
 	WaitForTurn (heatray, x_axis)
-	return true
+	return (spGetUnitRulesParam(unitID, "lowpower") == 0)
 end
 
 function script.FireWeapon2()
