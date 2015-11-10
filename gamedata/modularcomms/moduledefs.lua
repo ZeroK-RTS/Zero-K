@@ -526,8 +526,12 @@ upgrades = {
 		description = "Basic radar system with 1800 range",
 		func = function(unitDef)
 				unitDef.radardistance = (unitDef.radardistance or 0)
-				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
-				if unitDef.radaremitheight < 100 then unitDef.radaremitheight = 100 end
+				if unitDef.radardistance < 1800 then 
+					unitDef.radardistance = 1800
+				end
+				if unitDef.radaremitheight and unitDef.radaremitheight < 100 then 
+					unitDef.radaremitheight = 100 
+				end
 			end,
 	},
 	module_heavy_armor = {
