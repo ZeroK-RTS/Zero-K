@@ -51,6 +51,7 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[antinuke.s3o]],
   radarDistance                 = 2500,
+  radarEmitHeight			    = 100,
   script                        = [[armamd.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],

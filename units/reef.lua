@@ -54,6 +54,7 @@ unitDef = {
   objectName             = [[lmcarrier.dae]],
   script                 = [[reef.lua]],
   radarDistance          = 1200,
+  radarEmitHeight        = 100,
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sfxtypes               = {

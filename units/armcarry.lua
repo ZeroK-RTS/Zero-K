@@ -53,6 +53,7 @@ unitDef = {
   objectName             = [[ARMCARRIER]],
   script                 = [[armcarry.lua]],
   radarDistance          = 1200,
+  radarEmitHeight        = 100,
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   showNanoSpray          = false,

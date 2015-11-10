@@ -46,6 +46,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad_big.s3o]],
   radarDistance       = 1200,
+  radarEmitHeight     = 100,
   script              = [[vehdisable.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],

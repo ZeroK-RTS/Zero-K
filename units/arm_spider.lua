@@ -65,6 +65,7 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,
+  radarEmitHeight        = 100,
   script                 = [[arm_spider.lua]],
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],

@@ -51,6 +51,7 @@ unitDef = {
   objectName          = [[corvrad.S3O]],
   onoffable           = true,
   radarDistance       = 1800,
+  radarEmitHeight     = 100,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
