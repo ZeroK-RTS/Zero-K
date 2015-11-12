@@ -14,7 +14,7 @@ local strFormat 				= string.format
 
 function ToSI(num, displaySign)
   if type(num) ~= 'number' then
-	return 'ToSI wacky error #55'
+	num = tonumber(num)
   end
   if (num == 0) then
     return "0"
@@ -38,7 +38,7 @@ end
 
 function ToSIPrec(num) -- more presise
   if type(num) ~= 'number' then
-	return 'ToSI wacky error #56'
+	num = tonumber(num)
   end
  
   if (num == 0) then
