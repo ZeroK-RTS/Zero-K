@@ -244,7 +244,7 @@ end
               
 function widget:DrawWorldRefraction()
   local oldZMin, oldZMax = zMin, zMax
-  zMin, zMax = zMin/3, zMax/3
+  zMin, zMax = zMin/1.2, zMax/1.2
   DrawWorldFunc()
   zMin, zMax = oldZMin, oldZMax 
 end

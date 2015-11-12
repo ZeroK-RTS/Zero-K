@@ -133,6 +133,28 @@ local unbuiltUnits = {}
 function widget:Initialize()
   vsx, vsy = widgetHandler:GetViewSizes()
 
+  self:ViewResize(widgetHandler:GetViewSizes())
+
+  if gl.CreateShader == nil then --For old Intel chips
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: cannot create shaders. forcing shader-less fallback.")
+    forceLowQuality = true
+    options.lowQualityOutlines.value = true
+    return true
+  end
+
+  --For cards that can use shaders
+  enter2d = gl.CreateList(function()
+    glUseShader(0)
+    glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity()
+    glMatrixMode(GL_MODELVIEW);  glPushMatrix(); glLoadIdentity()
+  end)
+  leave2d = gl.CreateList(function()
+    glMatrixMode(GL_PROJECTION); glPopMatrix()
+    glMatrixMode(GL_MODELVIEW);  glPopMatrix()
+    glTexture(false)
+    glUseShader(0)
+  end)
+
   depthShader = gl.CreateShader({
     fragment = [[
       uniform sampler2D tex0;
@@ -214,7 +236,7 @@ function widget:Initialize()
   })
 
   if (depthShader == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: depthcheck shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: depthcheck shader error, forcing shader-less fallback: "..gl.GetShaderLog())
     -- widgetHandler:RemoveWidget()
     -- return false
     forceLowQuality = true
@@ -222,7 +244,7 @@ function widget:Initialize()
     return true
   end
   if (blurShader_h == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: hblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: hblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
     -- widgetHandler:RemoveWidget()
     -- return false
     forceLowQuality = true
@@ -230,7 +252,7 @@ function widget:Initialize()
     return true
   end
   if (blurShader_v == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo widget: vblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Outline widget: vblur shader error, forcing shader-less fallback: "..gl.GetShaderLog())
     -- widgetHandler:RemoveWidget()
     -- return false
     forceLowQuality = true
@@ -241,20 +263,6 @@ function widget:Initialize()
   uniformScreenXY        = gl.GetUniformLocation(depthShader,  'screenXY')
   uniformScreenX         = gl.GetUniformLocation(blurShader_h, 'screenX')
   uniformScreenY         = gl.GetUniformLocation(blurShader_v, 'screenY')
-
-  self:ViewResize(widgetHandler:GetViewSizes())
-
-  enter2d = gl.CreateList(function()
-    glUseShader(0)
-    glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity()
-    glMatrixMode(GL_MODELVIEW);  glPushMatrix(); glLoadIdentity()
-  end)
-  leave2d = gl.CreateList(function()
-    glMatrixMode(GL_PROJECTION); glPopMatrix()
-    glMatrixMode(GL_MODELVIEW);  glPopMatrix()
-    glTexture(false)
-    glUseShader(0)
-  end)
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
@@ -352,25 +360,10 @@ end
 
 local DrawVisibleUnitsLines = function(underwater) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
 
-  -- gl.StencilTest(true)
-
-  -- gl.ColorMask(false,false,false,false)
-  -- gl.DepthMask(false)
-  -- gl.StencilMask(0xFF)
-  -- glClear(GL.STENCIL_BUFFER_BIT, 0x0)
-  -- gl.StencilFunc(GL.NEVER, 0x01, 0xFF)
-  -- gl.StencilOp(GL.REPLACE, GL.KEEP, GL.KEEP)
-  -- gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  -- gl.Culling(false)
-  -- DrawVisibleUnits(true)
-  -- gl.StencilMask(0x00)
-
-  -- gl.StencilFunc(GL.EQUAL, 0x0, 0xFF)
-  -- gl.ColorMask(true,true,true,true)
-
   gl.DepthTest(GL.LESS)
   if underwater then
-    gl.LineWidth(2.0 * thickness)
+    gl.LineWidth(4.0 * thickness)
+    gl.PolygonOffset(8.0, 4.0)
   else
     gl.LineWidth(4.0 * thickness)
   end
@@ -382,20 +375,17 @@ local DrawVisibleUnitsLines = function(underwater) --This is expected to be a sh
   glPushMatrix()
   glResetMatrices()
   DrawVisibleUnits(true)
-  -- gl.DepthTest(GL.EQUAL)
-  -- gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  -- gl.Culling(GL.BACK)
-  -- DrawVisibleUnits(false)
   glPopMatrix()
 
   gl.LineWidth(1.0)
   glColor(1,1,1,1)
   gl.Culling(false)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  gl.DepthTest(GL.LEQUAL)
-  -- gl.StencilTest(false)
-  -- gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
-  -- gl.StencilOp(GL.KEEP, GL.KEEP, GL.KEEP)
+  gl.DepthTest(GL.LESS)
+
+  if underwater then
+    gl.PolygonOffset(0.0, 0.0)
+  end
 end
 
 local blur_h = function()
