@@ -784,10 +784,21 @@ local function LimitZoom(a,b,c,sp,limit)
 	return zox*maxZoom,zoy*maxZoom,zoz*maxZoom
 end
 
-local function ExtendedGetGroundHeight(x,z)
+local function GetProperGroundHeight(x,z,checkFreeMode) --only ScrollCam seems to want to ignore this when FreeMode is on
+	if options.smoothmeshscroll.value then
+		return spGetSmoothMeshHeight(x, z) or 0
+	else
+		if not (checkFreeMode and options.freemode.value) then
+			return spGetGroundHeight(x, z) or 0
+		end
+	end
+end
+
+local function GetMapBoundedGroundHeight(x,z)
 	--out of map. Bound coordinate to within map
 	x,z = GetMapBoundedCoords(x,z)
-	return spGetGroundHeight(x,z)
+	return GetProperGroundHeight(x,z)
+	-- return spGetGroundHeight(x,z)
 end
 
 --------------------------------------------------------------------------------
@@ -819,7 +830,7 @@ local function OverrideTraceScreenRay(x,y,cs,planeToHit,sphereToHit,returnRayDis
 	end
 	local camPos = {px=cs.px,py=cs.py,pz=cs.pz}
 	local camRot = {rx=cs.rx,ry=cs.ry,rz=cs.rz}
-	local gx,gy,gz,rx,ry,rz,rayDist,cancelCache = TraceCursorToGround(viewSizeX,viewSizeY,{x=x,y=y} ,cs.fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance) 
+	local gx,gy,gz,rx,ry,rz,rayDist,cancelCache = TraceCursorToGround(viewSizeX,viewSizeY,{x=x,y=y} ,cs.fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance,options.smoothmeshscroll.value) 
 	--//caching for efficiency
 	if not cancelCache then
 		scrnRay_cache.result[1] = gx
@@ -895,6 +906,13 @@ local function VirtTraceRay(x,y, cs)
 
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
+		if options.smoothmeshscroll.value then --We can't tell Spring to trace to the smooth mesh point, so compensate with vector multiplication
+			local gy_smooth = GetProperGroundHeight(gpos[1],gpos[3])
+			local correction_vector_scale = 1 - (cs.py - gy_smooth)/(cs.py - gy) --cs.py > gy_smooth >= gy. We want real ground to smooth ground proportion
+			local dx, dz = cs.px - gx, cs.pz - gz
+			gy = gy_smooth
+			gx, gz = gx + dx * correction_vector_scale, gz + dz * correction_vector_scale
+		end
 		
 		--gy = spGetSmoothMeshHeight (gx,gz)
 		
@@ -944,7 +962,7 @@ SetCenterBounds = function(cs)
 			if cs.pz < minZ then cs.pz = minZ; ls_z = minZ; outOfBounds = true end
 			if cs.pz > maxZ then cs.pz = maxZ; ls_z = maxZ; outOfBounds = true end
 		end
-		if outOfBounds then ls_y = ExtendedGetGroundHeight(ls_x, ls_z) end
+		if outOfBounds then ls_y = GetMapBoundedGroundHeight(ls_x, ls_z) end
 	else
 		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
 	end
@@ -988,7 +1006,7 @@ local function UpdateCam(cs)
 	cs.pz = ls_z - cos(cs.ry) * opp
 	
 	if not options.freemode.value then
-		local gndheight = spGetGroundHeight(cs.px, cs.pz) + 10
+		local gndheight = GetProperGroundHeight(cs.px, cs.pz) + 10
 		if cs.py < gndheight then --prevent camera from going underground
 			if options.groundrot.value then
 				cs.py = gndheight
@@ -1016,7 +1034,7 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		         |                         x
 		     -90 v -cam angle                       x
 		--]]
-	local groundHeight = groundMin --ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local groundHeight = groundMin --GetMapBoundedGroundHeight(gx, gz) + groundBufferZone
 	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
 	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
 
@@ -1119,7 +1137,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 		else -- otherwise, enforce bounds here to avoid the camera jumping around when moved with MMB or minimap over hilly terrain
 			ls_x = min(max(gx, minX), maxX) --update lockpot to target destination
 			ls_z = min(max(gz, minZ), maxZ)
-			ls_y = ExtendedGetGroundHeight(ls_x, ls_z)
+			ls_y = GetMapBoundedGroundHeight(ls_x, ls_z)
 		end
 		if options.tiltedzoom.value then
 			local cstemp = UpdateCam(cs)
@@ -1178,7 +1196,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		local new_pz = cs.pz + zoz
 		-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 
-		local groundMinimum = ExtendedGetGroundHeight(new_px, new_pz) + 20
+		local groundMinimum = GetMapBoundedGroundHeight(new_px, new_pz) + 20
 		
 		if not options.freemode.value then
 			if new_py < groundMinimum then --zooming underground?
@@ -1301,8 +1319,8 @@ local function Altitude(up, s)
 	local dy = py * (up and 1 or -1) * (s and 0.3 or 0.1)
 	local new_py = py + dy
 	if not options.freemode.value then
-        if new_py < spGetGroundHeight(cs.px, cs.pz)+5  then
-            new_py = spGetGroundHeight(cs.px, cs.pz)+5  
+        if new_py < GetProperGroundHeight(cs.px, cs.pz)+5  then
+            new_py = GetProperGroundHeight(cs.px, cs.pz)+5  
         elseif new_py > maxDistY then
             new_py = maxDistY 
         end
@@ -1457,7 +1475,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 	local _, playerID = Spring.GetTeamInfo(teamID)
 	local pp = WG.alliedCursorsPos[ playerID ]
 	if pp then
-		local groundY = max(0,spGetGroundHeight(pp[1],pp[2]))
+		local groundY = max(0,GetProperGroundHeight(pp[1],pp[2]))
 		local scrn_x,scrn_y = Spring.WorldToScreenCoords(pp[1],groundY,pp[2]) --get cursor's position on screen
 		local scrnsize_X,scrnsize_Y = Spring.GetViewGeometry() --get current screen size
 		if (scrn_x<scrnsize_X*4/6 and scrn_x>scrnsize_X*2/6) and (scrn_y<scrnsize_Y*4/6 and scrn_y>scrnsize_Y*2/6) then --if cursor near center:
@@ -1677,21 +1695,15 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = ls_z + ddz
 	
 	if not options.freemode.value then
-		ls_x = min(ls_x, maxX-3) --limit camera movement to map area
-		ls_x = max(ls_x, minX+3)
+		ls_x = min(ls_x, maxX-3) --limit camera movement, either to map area or (if options.zoomouttocenter.value is true) to a set distance from map center
+		ls_x = max(ls_x, minX+3) --Do not replace with GetMapBoundedCoords or GetMapBoundedGroundHeight, those functions only (and should only) respect map area.
 		
 		ls_z = min(ls_z, maxZ-3)
 		ls_z = max(ls_z, minZ+3)
 	end
 	
-	if options.smoothmeshscroll.value then
-		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
-	else
-		if not options.freemode.value then
-			ls_y = spGetGroundHeight(ls_x, ls_z) or 0 --bind lockspot to groundheight if not free
-		end
-	end
-	
+	ls_y = GetProperGroundHeight(ls_x, ls_z, true)
+
 	local csnew = UpdateCam(cs)
 	if csnew and options.tiltedzoom.value then
 	  csnew.rx = GetZoomTiltAngle(ls_x, ls_z, csnew)
