@@ -111,7 +111,7 @@ local startpos = {
 	[4] = {},
 }
 
-local center = {Game.mapSizeX / 2, Game.mapSizeZ / 2}
+local center = {4614, 4619}
 
 for tri = 1, #layout[0][1] do
 	local dx = (layout[0][1][tri][1] - center[1])
