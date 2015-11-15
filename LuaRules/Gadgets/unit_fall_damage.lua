@@ -223,9 +223,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local vx,vy,vz = Spring.GetUnitVelocity(unitID)
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		local nx, ny, nz = Spring.GetGroundNormal(x,z)
-		
-		nx, ny, nz = -nx, -ny, -nz -- For some reason normal is reversed
-		
+
 		local nMag = math.sqrt(nx^2 + ny^2 + nz^2)
 		local nx, ny, nz = nx/nMag, ny/nMag, nz/nMag -- normal to unit vector
 		nx, ny, nz = vx*nx, vy*ny, vz*nz -- normal is now a component of velocity
