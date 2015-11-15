@@ -244,7 +244,7 @@ options = {
 	radar_fog_brightness = {
 		name = "Fog Brightness",
 		type = "number",
-		value = 0.4, min = 0, max = 1, step = 0.01,
+		value = 0.62, min = 0, max = 1, step = 0.01,
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
