@@ -125,7 +125,7 @@ local loadGame = false	-- was this loaded from a savegame?
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	if ploppableDefs[unitDefID] and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
