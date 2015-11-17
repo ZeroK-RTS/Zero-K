@@ -1745,7 +1745,7 @@ end
 local missedMouseRelease = false
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
-    
+	
 	if hideCursor then
 		spSetMouseCursor('%none%')
 	end
@@ -1838,7 +1838,9 @@ function widget:Update(dt)
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
 	local a,c,m,s = spGetModKeyState()
-	
+
+	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
+    
 	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 	(rot.right or rot.left or rot.up or rot.down))
@@ -1846,7 +1848,7 @@ function widget:Update(dt)
 		
 		cs = GetTargetCameraState()
 
-		local speed = options.rotfactor.value * (s and 500 or 250)
+		local speed = options.rotfactor.value * (s and 500 or 250) * fpsCompensationFactor
 
 		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
@@ -1910,7 +1912,7 @@ function widget:Update(dt)
 			spWarpMouse(cx, cy)		
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
-			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor, 1 )
+			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
 			
 			if move.right or move2.right then
 				mxm = speed
@@ -2248,8 +2250,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 			
 
 		
-			local speed = modifier.shift and 30 or 10 
-			
+			local speed = (modifier.shift and 30 or 10)
+
 			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt)
 			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt)
 			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt)
