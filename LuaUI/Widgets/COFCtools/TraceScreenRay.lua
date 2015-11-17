@@ -5,7 +5,8 @@
 -- planeToHit = (integer) intersect a custom ground level. Note: is CPU cheaper than normal, and return intersect with Sphere of radius 2000 if looking away from the level.
 -- sphereToHit = (integer) intersect a custom sphere. Note: it override result from planeToHit and is CPU cheaper than planeToHit.
 -- returnRayDistance = (boolean) calculate ray-distance.
-TraceCursorToGround = function (viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance) 
+-- smoothMeshTarget = (boolean) true if caller is using Spring.GetSmoothMeshHeight to find ground heights
+TraceCursorToGround = function (viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance,smoothMeshTarget) 
 	--return gx,gy,gz,rx,ry,rz,rayDist,cancelCache
 end
 ----------------------------------------------------------------------------
@@ -21,16 +22,21 @@ local sin	= math.sin
 local cos	= math.cos
 local PI = math.pi
 local HALFPI = math.pi/2
+local spGetSmoothMeshHeight	= Spring.GetSmoothMeshHeight
 local spGetGroundHeight = Spring.GetGroundHeight
 local RADperDEGREE = PI/180
 
-local function _ExtendedGetGroundHeight(x,z)
+local function _ExtendedGetGroundHeight(x,z,smoothMeshTarget)
 	--out of map. Bound coordinate to within map
 	if x < 0 then x = 0; end
 	if x > Game.mapSizeX then x=Game.mapSizeX; end
 	if z < 0 then z = 0; end 
 	if z >  Game.mapSizeZ then z =  Game.mapSizeZ; end 
-	return spGetGroundHeight(x,z)
+	if smoothMeshTarget then
+		return spGetSmoothMeshHeight(x,z)
+	else
+		return spGetGroundHeight(x,z)
+	end
 end
 
 local function _FindGroundWithTrigonometry(outResult,effectiveHeading,camPos,xz_GrndDistRatio,vertGroundDist)
@@ -57,10 +63,10 @@ local function _FindGroundWithTrigonometry(outResult,effectiveHeading,camPos,xz_
 	outResult.gx, outResult.gz = camPos.px+xDist,camPos.pz+zDist --estimated ground position infront of camera
 end
 
-local function _FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndDistRatio)
+local function _FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndDistRatio,smoothMeshTarget)
 	local currentGrndH, vertGroundDist = 0,-camPos.py
 	if abs(xz_GrndDistRatio) == 0 then --is looking directly downward. Easy case, no need to find Ray intersecting with ground
-		currentGrndH = _ExtendedGetGroundHeight(camPos.px,camPos.pz)
+		currentGrndH = _ExtendedGetGroundHeight(camPos.px,camPos.pz,smoothMeshTarget)
 		vertGroundDist =  (currentGrndH - camPos.py) 
 		outResult.px,outResult.py,outResult.pz,outResult.cursorxzDist = camPos.px,currentGrndH,camPos.pz,0
 		outResult.rx,outResult.ry,outResult.rz = 0,vertGroundDist,0
@@ -80,7 +86,7 @@ local function _FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndD
 		cursorxDist = sin(effectiveHeading)*cxzd --break down the ground beneath into x and z component.  Note: using Sin() instead of regular Cos() because coordinate & angle is left handed
 		cursorzDist = cos(effectiveHeading)*cxzd
 		tx, tz = camPos.px+cursorxDist,camPos.pz+cursorzDist --estimated ground position infront of camera
-		currentGrndH = _ExtendedGetGroundHeight(tx,tz)
+		currentGrndH = _ExtendedGetGroundHeight(tx,tz,smoothMeshTarget)
 		ty = (cxzd/xz_GrndDistRatio) + camPos.py
 		if (camPos.py> 0 and currentGrndH >= ty) or (camPos.py< 0 and currentGrndH <= ty) then --condition meet, intersected the ground
 			if searchDirection >0.1 then --but search is too coarse
@@ -107,7 +113,7 @@ local function _FindCoordinateInWorldSphere(outResult,effectiveHeading,camPos,ne
 end
 ----------------------------------------------------------------------------
 -------------------TraceCursorToGround------------------------------
-TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance)
+TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, camRot,planeToHit,sphereToHit,returnRayDistance,smoothMeshTarget)
 	local halfViewSizeY = viewSizeY/2
 	local halfViewSizeX = viewSizeX/2
 	mousePos.y = mousePos.y- halfViewSizeY --convert screen coordinate to 0,0 at middle
@@ -194,7 +200,7 @@ TraceCursorToGround = function(viewSizeX,viewSizeY,mousePos ,cs_fov, camPos, cam
 			_FindGroundWithTrigonometry(outResult,effectiveHeading,camPos,xz_GrndDistRatio,vertGroundDist)
 			outResult.gy = planeToHit
 		else
-				_FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndDistRatio)
+				_FindGroundWithHitScan(outResult,effectiveHeading,camPos,xz_GrndDistRatio,smoothMeshTarget)
 				local vertGroundDist = outResult.gy-camPos.py --distance to ground
 				groundDistSign = abs(vertGroundDist)/vertGroundDist --negative when ground is below, positive when ground is above
 		end
