@@ -703,8 +703,11 @@ SetFOV = function(fov)
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
 	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
-  spSetCameraState(cs,0)
-  -- OverrideSetCameraStateInterpolate(cs,smoothness.value)
+	if cs.name == "free" then
+	  OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
+	else
+	  spSetCameraState(cs,0)
+	end
 end
 
 local function SetSkyBufferProportion(cs)
