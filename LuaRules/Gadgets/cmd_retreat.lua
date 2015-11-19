@@ -392,23 +392,43 @@ end
 function gadget:UnitDestroyed(unitID)
 	ResetRetreatData(unitID)
 	retreatables[unitID] = nil
-end	
-
-function gadget:RecvLuaMsg(msg, playerID)
-	local _,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
-	if spec then return end
-	HandleLuaMessage(msg, teamID);
 end
 
 function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
-	HandleLuaMessage(dataStr, aiTeam);
-end
+	-- perhaps this should be a global relay mode somewhere instead
+	if(string.sub(dataStr,1,string.len('sethaven'))=='sethaven') then
+		CallAsTeam(aiTeam, function()
+			Spring.SendLuaRulesMsg(dataStr.."|"..aiTeam)
+		end)
+	end
+end	
 
-function HandleLuaMessage(msg, teamID)
+function gadget:RecvLuaMsg(msg, playerID)
 	local msg_table = explode('|', msg)
 	if msg_table[1] ~= 'sethaven' then
 		return
 	end
+	
+	local t = msg_table[5];
+	
+	local spec, teamID, allianceID;
+	
+	if(t) then
+		t = tonumber(t);
+		local _,_,_,isAI = Spring.GetTeamInfo(t)
+		if(isAI) then
+			local aiid, ainame, aihost = Spring.GetAIInfo(t);
+			if (aihost == playerID) then
+				teamID,_,_,_,_,allianceID = Spring.GetTeamInfo(t);
+			end
+		end
+	end
+	
+	if not teamID then
+		_,_, spec, teamID, allianceID = Spring.GetPlayerInfo(playerID)
+	end
+	
+	if spec then return end
 	
 	local unitID = msg_table[2]+0
 	local x = msg_table[2]+0
