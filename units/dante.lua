@@ -107,6 +107,7 @@ unitDef = {
     DANTE_FLAMER         = {
       name                    = [[Flamethrower]],
       areaOfEffect            = 96,
+      avoidGround             = false,
       avoidFeature            = false,
       avoidFriendly           = false,
       collideFeature          = false,
