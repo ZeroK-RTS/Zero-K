@@ -81,6 +81,8 @@ local messages = {
 	slow = "slow",
 	goo = "goo",
 	jump = "jump",
+	reclaim = "reclaim",
+	resurrect = "resurrect",
 }
 
 local translation
@@ -959,17 +961,17 @@ do
       --// HEALTH
       if (hp<featureHpThreshold)and(drawFeatureHealth) then
         local hpcolor = {GetColor(fhpcolormap,hp)}
-        AddBar("health",hp,nil,(fullText and floor(hp*100)..'%') or '',hpcolor)
+        AddBar(messages.health,hp,nil,(fullText and floor(hp*100)..'%') or '',hpcolor)
       end
 
       --// RESURRECT
       if (resurrect>0) then
-        AddBar("resurrect",resurrect,"resurrect",(fullText and floor(resurrect*100)..'%') or '')
+        AddBar(messages.resurrect,resurrect,"resurrect",(fullText and floor(resurrect*100)..'%') or '')
       end
 
       --// RECLAIMING
       if (reclaimLeft>0 and reclaimLeft<1) then
-        AddBar("reclaim",reclaimLeft,"reclaim",(fullText and floor(reclaimLeft*100)..'%') or '')
+        AddBar(messages.reclaim,reclaimLeft,"reclaim",(fullText and floor(reclaimLeft*100)..'%') or '')
       end
 
 

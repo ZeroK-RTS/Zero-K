@@ -14,5 +14,7 @@
 	"reload" : "reload",
 	"slow" : "slow",
 	"goo" : "goo",
+	"reclaim" : "reclaim",
+	"resurrect" : "resurrect",
 	"jump" : "jump"
 }
