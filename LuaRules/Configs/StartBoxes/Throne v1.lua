@@ -1,7 +1,7 @@
-local supported_teamcounts = {2,3,5,7}
+local supported_teamcounts = {2,3,4,5,6,7,8,9,10,11,12,13,15,16} -- except 14
 
-local inner_layout = {
-	[0] = {
+local L3 = {
+	{
 		{
 			{4074.140625, 5704.7001953125},
 			{4560, 5724},
@@ -64,7 +64,7 @@ local inner_layout = {
 			{4560, 5724},
 		}
 	},
-	[1] = {
+	{
 		{
 			{6927.3813476563, 3833.1862792969},
 			{6811.560546875, 4392.8764648438},
@@ -119,7 +119,7 @@ local inner_layout = {
 			{6811.560546875, 4392.8764648438},
 		},
 	},
-	[2] = {
+	{
         {
 			{7130.4438476563, 7379.8149414063},
 			{6942.53125, 6916.6157226563},
@@ -211,20 +211,20 @@ local inner_layout = {
     },
 }
 
-local inner_startpos = {
-	[0] = {
+local S3 = {
+	{
 		{4074.140625, 5704.7001953125},
 	},
-	[1] = {
+	{
 		{6927.3813476563, 3833.1862792969},
 	},
-	[2] = {
+	{
 		{7130.4438476563, 7379.8149414063},
 	}
 }
 
-local middle_layout = {
-	[0] = {
+local L5 = {
+	{
 		{
 			{5689.894049688, 2881.294921875},
 			{6440.255859375, 2934.9189453125},
@@ -277,7 +277,7 @@ local middle_layout = {
 			{6440.255859375, 2934.9189453125},
 		},
 	},
-	[1] = {
+	{
 		{
 			{9067.5634765625, 4605.7661132813},
 			{8596.4775390625, 5373.5083007813},
@@ -348,7 +348,7 @@ local middle_layout = {
 			{8596.4775390625, 5373.5083007813},
 		},
 	},
-	[2] = {
+	{
 		{
 			{8661.2109375, 8291.9140625},
 			{8403.6923828125, 7013.078125},
@@ -402,7 +402,7 @@ local middle_layout = {
 			{8403.6923828125, 7013.078125},
 		},
 	},
-	[3] = {
+	{
 		{
 			{4730.3823242188, 8590.599609375},
 			{4097.6333007813, 7940.7421875},
@@ -442,7 +442,7 @@ local middle_layout = {
 			{4097.6333007813, 7940.7421875},
 		},
 	},
-	[4] = {
+	{
 		{
 			{2636.13671875, 5271.4370117188},
 			{3718.1604003906, 4713.138671875},
@@ -482,26 +482,26 @@ local middle_layout = {
 	},
 }
 
-local middle_startpos = {
-	[0] = {
+local S5 = {
+	{
 		{5577.5419921875, 2270.4768066406},
 	},
-	[1] = {
+	{
 		{9312.9765625, 4350.431640625},
 	},
-	[2] = {
+	{
 		{8661.2109375, 8291.9140625},
 	},
-	[3] = {
+	{
 		{4520.9819335938, 9032.86328125},
 	},
-	[4] = {
+	{
 		{2624.064453125, 4932.76953125},
 	}
 }
 
-local outer_layout = {
-	[0] = {
+local L7 = {
+	{
 		{
 			{5240.427734375, 1131.3504638672},
 			{6520.1435546875, 1655.9228515625},
@@ -569,7 +569,7 @@ local outer_layout = {
 			{6520.1435546875, 1655.9228515625},
 		},
 	},
-	[1] = {
+	{
 		{
 			{9640.5849609375, 2440.8698730469},
 			{9857.0009765625, 3340.9916992188},
@@ -615,7 +615,7 @@ local outer_layout = {
 			{9857.0009765625, 3340.9916992188},
 		},
 	},
-	[2] = {
+	{
 		{
 			{10732.750976563, 6642.1904296875},
 			{10310.735351563, 5524.701171875},
@@ -661,7 +661,7 @@ local outer_layout = {
 			{10310.735351563, 5524.701171875},
 		},
 	},
-	[3] = {
+	{
 		{
 			{8500.587890625, 10520.779296875},
 			{7617.7329101563, 9994.984375},
@@ -709,7 +709,7 @@ local outer_layout = {
 			{7617.7329101563, 9994.984375},
 		},
 	},
-	[4] = {
+	{
 		{
 			{4469.8564453125, 11202.521484375},
 			{4182, 9875.70703125},
@@ -755,7 +755,7 @@ local outer_layout = {
 			{4182, 9875.70703125},
 		},
 	},
-	[5] = {
+	{
 		{
 			{1861.2352294922, 7575.40625},
 			{2208.591796875, 6605.8686523438},
@@ -795,7 +795,7 @@ local outer_layout = {
 			{2208.591796875, 6605.8686523438},
 		},
 	},
-	[6] = {
+	{
 		{
 			{1954.9813232422, 3145.8500976563},
 			{2884.1437988281, 2802.3022460938},
@@ -845,47 +845,146 @@ local outer_layout = {
 	}
 }
 
-local outer_startpos = {
-	[0] = {
+local S7 = {
+	{
 		{5341.0649414063, 850.59326171875},
 	},
-	[1] = {
+	{
 		{10087.366210938, 2077.6818847656},
 	},
-	[2] = {
+	{
 		{11347.745117188, 6616.7978515625},
 	},
-	[3] = {
+	{
 		{9032.35546875, 10857.01171875},
 	},
-	[4] = {
+	{
 		{4469.8564453125, 11202.521484375},
 	},
-	[5] = {
+	{
 		{931.41833496094, 7801.5756835938},
 	},
-	[6] = {
+	{
 		{1447.2905273438, 2776.8386230469},
 	}
 }
 
+local S1 = {
+	{
+		{6064, 5555},
+	},
+}
+
+local L1 = {
+	{
+		{
+			{5408, 5664},
+			{5410, 5613},
+			{5427, 5557},
+			{5457, 5500},
+			{5492, 5470},
+			{5681, 5358},
+			{5789, 5273},
+			{5895, 5120},
+			{5984, 5001},
+			{6039, 4954},
+			{6084, 4931},
+			{6118, 4922},
+			{6168, 4922},
+			{6207, 4918},
+			{6245, 4917},
+			{6279, 4924},
+			{6311, 4937},
+			{6334, 4955},
+			{6348, 4979},
+			{6355, 5017},
+			{6354, 5056},
+			{6363, 5103},
+			{6377, 5149},
+			{6427, 5201},
+			{6485, 5246},
+			{6534, 5270},
+			{6555, 5289},
+			{6571, 5324},
+			{6603, 5398},
+			{6626, 5450},
+			{6649, 5537},
+			{6670, 5722},
+			{6666, 5843},
+			{6646, 5956},
+			{6621, 6042},
+			{6581, 6075},
+			{6552, 6087},
+			{6524, 6116},
+			{6487, 6154},
+			{6436, 6168},
+			{6354, 6177},
+			{6259, 6166},
+			{6201, 6171},
+			{6063, 6179},
+			{5875, 6161},
+			{5754, 6101},
+			{5658, 6021},
+			{5594, 5988},
+			{5535, 5976},
+			{5484, 5976},
+			{5442, 5969},
+			{5423, 5953},
+			{5420, 5931},
+			{5429, 5896},
+			{5438, 5852},
+			{5409, 5772},
+			{5404, 5708},
+		}
+	},
+}
+
+local function combineTables(tabs)
+	local ret = {}
+	local id = 0
+	for i = 1, #tabs do
+		for j = 1, #tabs[i] do
+			ret[id] = tabs[i][j]
+			id = id + 1
+		end
+	end
+	return ret
+end
+
 local teams = GetTeamCount()
 
-if (teams == 7) then
-	return outer_layout, outer_startpos, supported_teamcounts
-elseif (teams == 3) then
-	return inner_layout, inner_startpos, supported_teamcounts
-elseif (teams == 5) then
-	return middle_layout, middle_startpos, supported_teamcounts
-else
+if (teams == 1) then return combineTables({L1}), combineTables({S1}), supported_teamcounts
+elseif (teams == 3) then return combineTables({L3}), combineTables({S3}), supported_teamcounts
+elseif (teams == 4) then return combineTables({L3,L1}), combineTables({S3,S1}), supported_teamcounts
+elseif (teams == 5) then return combineTables({L5}), combineTables({S5}), supported_teamcounts
+elseif (teams == 6) then return combineTables({L5,L1}), combineTables({S5,S1}), supported_teamcounts
+elseif (teams == 7) then return combineTables({L7}), combineTables({S7}), supported_teamcounts
+elseif (teams == 9) then return combineTables({L5,L3,L1}), combineTables({S5,S3,S1}), supported_teamcounts
+elseif (teams == 10) then return combineTables({L7,L3}), combineTables({S7,S3}), supported_teamcounts
+elseif (teams == 11) then return combineTables({L7,L3,L1}), combineTables({S7,S3,S1}), supported_teamcounts
+elseif (teams == 12) then return combineTables({L7,L5}), combineTables({S7,S5}), supported_teamcounts
+elseif (teams == 13) then return combineTables({L7,L5,L1}), combineTables({S7,S5,S1}), supported_teamcounts
+elseif (teams == 14 or teams == 15) then
+	-- 14 also gives 15 boxes because impossible to get 14 using 1/3/5/7
+	return combineTables({L7,L5,L3}), combineTables({S7,S5,S3}), supported_teamcounts
+elseif (teams == 8) then
+	-- two possibilities: 5+3 is the more "fair" setup but 7+1 is the more interesting one
+	local r = math.random()
+	if (r < 0.7)
+		then return combineTables({L5,L3}), combineTables({S5,S3}), supported_teamcounts
+		else return combineTables({L7,L1}), combineTables({S7,S1}), supported_teamcounts
+	end
+elseif (teams == 2) then
 	-- duel: all layouts work so pick one at random (preferring 5 though)
 	local r = math.random()
 	if (r < 0.6) then
-		return middle_layout, middle_startpos, supported_teamcounts
+		return combineTables({L5}), combineTables({S5}), supported_teamcounts
 	elseif (r < 0.8) then
-		return inner_layout, inner_startpos, supported_teamcounts
+		return combineTables({L3}), combineTables({S3}), supported_teamcounts
 	else
-		return outer_layout, outer_startpos, supported_teamcounts
+		return combineTables({L7}), combineTables({S7}), supported_teamcounts
 	end
+else
+	return combineTables({L7,L5,L3,L1}), combineTables({S7,S5,S3,S1}), supported_teamcounts
 end
 
