@@ -27,6 +27,19 @@ GG.manualStartposConfig = manualStartposConfig
 
 function gadget:Initialize()
 
+	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
+	Spring.SetGameRulesParam("startbox_custom_shapes", manualStartposConfig and 1 or 0)
+
+	if manualStartposConfig then
+		for box_id, startposes in pairs(manualStartposConfig) do
+			Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
+			for i = 1, #startposes do
+				Spring.SetGameRulesParam("startpos_x_" .. box_id .. "_" .. i, startposes[i][1])
+				Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
+			end
+		end
+	end
+
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 
 	-- filter out fake teams (empty or Gaia)

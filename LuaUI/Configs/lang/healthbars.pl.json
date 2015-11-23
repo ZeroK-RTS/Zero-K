@@ -14,5 +14,7 @@
 	"reload" : "przeładowanie",
 	"slow" : "spowolnienie",
 	"goo" : "rozmnażanie",
+	"reclaim" : "zbieranie",
+	"resurrect" : "wskrzeszanie",
 	"jump" : "skok"
 }
