@@ -50,7 +50,7 @@ local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
 local final_opacity = 0
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
-local default_fog_brightness = 0.5
+local default_fog_brightness = 5.0
 
 local tabbedMode = false
 
@@ -766,7 +766,7 @@ function widget:MousePress(x, y, button)
 			end
 			if coord then
 				if (WG.COFC_SetCameraTarget) then
-					WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0)
+					WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 				else
 			 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
 				end
@@ -786,7 +786,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 		end
 		if coord then
 			if (WG.COFC_SetCameraTarget) then
-				WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0)
+				WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 			else
 		 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
 			end
