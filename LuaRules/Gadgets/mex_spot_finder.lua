@@ -127,10 +127,10 @@ end
 ------------------------------------------------------------
 function gadget:Initialize()
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Mex Spot Finder Initialising")
-	local metalSpots = GetSpots()
+	local metalSpots, fromEngineMetalmap = GetSpots()
 	local metalSpotsByPos = false
 	
-	if #metalSpots < 6 then
+	if fromEngineMetalmap and #metalSpots < 6 then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Indiscrete metal map detected")
 		metalSpots = false
 	end
@@ -273,7 +273,7 @@ function GetSpots()
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
 			spots = SanitiseSpots(gameConfig.spots)
-			return spots
+			return spots, false
 		end
 	end
 	
@@ -281,7 +281,7 @@ function GetSpots()
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		loadConfig = true
 		spots = SanitiseSpots(mapConfig.spots)
-		return spots
+		return spots, false
 	end
 	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Detecting mex config from metalmap")
@@ -427,7 +427,7 @@ function GetSpots()
 	--	Spring.MarkerAddPoint(spots[i].x,spots[i].y,spots[i].z,"")
 	--end
 	
-	return spots
+	return spots, true
 end
 
 function GetValidStrips(spot)
