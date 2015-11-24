@@ -624,7 +624,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 				local unitDef = UnitDefNames[name];
 				if unitDef then -- the requested unit actually exists
 					if(unitDef.customParams.level == "0") then -- the unit is a valid level zero commander
-						Spring.SetTeamRulesParam(teamID, "start_unit", unitDef.id);
+						Spring.SetTeamRulesParam(teamID, "start_unit", name);
 					end
 				end
 			end
