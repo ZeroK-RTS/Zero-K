@@ -322,7 +322,7 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					decRate         = state.origMaxDec      *decFactor
 				}
 				if isNewEngine then
-					attribute.turnAccel = state.origTurnRate*turnAccelFactor
+					attribute.turnAccel = state.origTurnRate*turnAccelFactor*1.2
 				end
 				spSetGroundMoveTypeData (unitID, attribute)
 			else
