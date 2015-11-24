@@ -587,6 +587,17 @@ function gadget:GameStart()
   end
 end
 
+function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
+	-- perhaps this should be a global relay mode somewhere instead
+	local command = "ai_commander:";
+	if dataStr:find(command,1,true) then	
+		local name = dataStr:sub(command:len()+1);
+		CallAsTeam(aiTeam, function()
+			Spring.SendLuaRulesMsg(command..aiTeam..":"..name);
+		end)
+	end
+end	
+
 function gadget:RecvLuaMsg(msg, playerID)
 	if msg:find("faction:",1,true) then
 		local side = msg:sub(9)
@@ -598,6 +609,27 @@ function gadget:RecvLuaMsg(msg, playerID)
 		SendToUnsynced("CommSelected",playerID, name) --activate an event called "CommSelected" that can be detected in unsynced part
 		commChoice[playerID] = name
 		StartUnitPicked(playerID, name)
+	elseif msg:find("ai_commander:",1,true) then
+		local command = "ai_commander:";
+		local offset = msg:find(":",command:len()+1,true);
+		local teamID = msg:sub(command:len()+1,offset-1);
+		local name = msg:sub(offset+1);
+		
+		teamID = tonumber(teamID);
+		
+		local _,_,_,isAI = Spring.GetTeamInfo(teamID)
+		if(isAI) then -- this is actually an AI 
+			local aiid, ainame, aihost = Spring.GetAIInfo(teamID);
+			if (aihost == playerID) then -- it's actually controlled by the local host
+				local unitDef = UnitDefNames[name];
+				if unitDef then -- the requested unit actually exists
+					if(unitDef.customParams.level == "0") then -- the unit is a valid level zero commander
+						Spring.SetTeamRulesParam(teamID, "start_unit", unitDef.id);
+					end
+				end
+			end
+		end
+
 	end	
 end
 
