@@ -227,7 +227,7 @@ local function GetStartUnit(teamID, playerID, isAI)
   local startUnit
 
   if isAI then -- AI that didn't pick comm type gets default comm
-    return (Spring.GetTeamRulesParam(teamID, "start_unit") or "armcom1")
+    return (Spring.GetTeamRulesParam(teamID, "start_unit") or "comm_trainer_strike_0")
   end
 
   if (teamID and teamSides[teamID]) then 
