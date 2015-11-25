@@ -129,6 +129,7 @@ local prioritySos = {
     "factoryjump",
     "factorytank",
     "factoryship",
+	"comm_trainer_strike_0",
 	"armcom1",
 	"corcom1",
 	"commrecon1",
