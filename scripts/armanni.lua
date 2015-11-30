@@ -28,16 +28,31 @@ local function Open()
 	SetSignalMask(SIG_OPEN)
 	Spring.SetUnitArmored(unitID,false)	--broken
 	Spring.SetUnitCOBValue(unitID, COB.ARMORED, 0)
-	Turn( door1 , z_axis, 0, math.rad(80) )
-	Turn( door2 , z_axis, 0, math.rad(80) )
+	Turn(door1, z_axis, 0, math.rad(80))
+	Turn(door2, z_axis, 0, math.rad(80))
 	WaitForTurn(door1, z_axis)
-	Move( arm , y_axis, 0 , 12)
-	Turn( antenna , x_axis, 0, math.rad(50) )
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
+	Move(arm, y_axis, 0, 12)
+	Turn(antenna, x_axis, 0, math.rad(50))
 	Sleep(200)
-	Move( barrel , z_axis, 0 , 7 )
-	Move( ledgun , z_axis, 0 , 7 )
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
+	Move(barrel, z_axis, 0, 7)
+	Move(ledgun, z_axis, 0, 7)
 	WaitForMove(barrel, z_axis)
 	WaitForMove(ledgun, z_axis)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	open = true
 end
 
@@ -45,47 +60,64 @@ local function Close()
 	open = false
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
-	Turn( turret , y_axis, 0, math.rad(50) )
-	Turn( gun , x_axis, 0, math.rad(40) )
-	Move( barrel , z_axis, -24 , 7 )
-	Move( ledgun , z_axis, -15 , 7 )
-	Turn( antenna , x_axis, math.rad(90), math.rad(50) )
+	
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	Turn(turret, y_axis, 0, math.rad(50))
+	Turn(gun, x_axis, 0, math.rad(40))
+	Move(barrel, z_axis, -24, 7)
+	Move(ledgun, z_axis, -15, 7)
+	Turn(antenna, x_axis, math.rad(90), math.rad(50))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
-	Move( arm , y_axis, -50 , 12 )
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
+	Move(arm, y_axis, -50, 12)
 	WaitForMove(arm, y_axis)
-	Turn( door1 , z_axis, math.rad(-(90)), math.rad(80) )
-	Turn( door2 , z_axis, math.rad(-(-90)), math.rad(80) )
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
+	Turn(door1, z_axis, math.rad(-(90)), math.rad(80))
+	Turn(door2, z_axis, math.rad(-(-90)), math.rad(80))
 	WaitForTurn(door1, z_axis)
 	WaitForTurn(door2, z_axis)
-	Spring.SetUnitArmored(unitID,true)	--broken
-	Spring.SetUnitCOBValue(unitID, COB.ARMORED, 1)
+	
+	Spring.SetUnitArmored(unitID,true)
 end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
 function script.Activate()
-	Spin( radar , y_axis, math.rad(100) )
+	Spin(radar, y_axis, math.rad(100))
 	StartThread(Open)
 end
 
 function script.Deactivate()
 	StopSpin(radar, y_axis)
 	Signal(SIG_AIM)
-	Turn(radar , y_axis, 0, math.rad(100) )
+	Turn(radar, y_axis, 0, math.rad(100))
 	StartThread(Close)
 end
 
 function script.AimWeapon(weaponNum, heading, pitch)
-	if not open then return false end
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	if (not open) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then 
+		return false 
+	end
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	GG.DontFireRadar_CheckAim(unitID)
 	
-	Turn( turret , y_axis, heading, math.rad(50) )
-	Turn( gun , x_axis, 0 - pitch, math.rad(40) )
+	Turn(turret, y_axis, heading, math.rad(50))
+	Turn(gun, x_axis, 0 - pitch, math.rad(40))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
@@ -121,7 +153,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
@@ -134,7 +166,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door1, sfxNone)
 		Explode(door2, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
@@ -147,18 +179,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door1, sfxFall)
 		Explode(door2, sfxFall)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxNone)
 		Explode(arm, sfxNone)
 		Explode(turret, sfxNone)
 		Explode(gun, sfxShatter)
 		Explode(ledgun, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(fire, sfxNone)
 		Explode(antenna, sfxFall)
-		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 		Explode(base, sfxNone)
@@ -166,12 +198,12 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(turret, sfxNone)
 		Explode(gun, sfxShatter)
 		Explode(ledgun, sfxNone)
-		Explode(radar, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(radar, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(fire, sfxNone)
 		Explode(antenna, sfxFall)
-		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end

@@ -20,39 +20,39 @@ local SIG_RESTORE = 2
 local smokePiece = { base}
 
 function script.Activate()
-	Spin( rffan , y_axis, rad(360), rad(100) )
-	Spin( lffan , y_axis, rad(360), rad(100) )
-	Spin( rrfan , y_axis, rad(360), rad(100) )
-	Spin( lrfan , y_axis, rad(360), rad(100) )
+	Spin(rffan, y_axis, rad(360), rad(100))
+	Spin(lffan, y_axis, rad(360), rad(100))
+	Spin(rrfan, y_axis, rad(360), rad(100))
+	Spin(lrfan, y_axis, rad(360), rad(100))
 end
 
 function script.StopMoving()
-	Spin( rffan , y_axis, rad(0), rad(100) )
-	Spin( lffan , y_axis, rad(0), rad(100) )
-	Spin( rrfan , y_axis, rad(0), rad(100) )
-	Spin( lrfan , y_axis, rad(0), rad(100) )
+	Spin(rffan, y_axis, rad(0), rad(100))
+	Spin(lffan, y_axis, rad(0), rad(100))
+	Spin(rrfan, y_axis, rad(0), rad(100))
+	Spin(lrfan, y_axis, rad(0), rad(100))
 end
 
 local function TiltBody()
 
-	while  true  do
+	while true do
 		if attacking then
-			Turn( body , x_axis, 0, math.rad(45) )
-			Turn( rthruster , x_axis, 0, math.rad(45) )
-			Turn( lthruster , x_axis, 0, math.rad(45) )
+			Turn(body, x_axis, 0, math.rad(45))
+			Turn(rthruster, x_axis, 0, math.rad(45))
+			Turn(lthruster, x_axis, 0, math.rad(45))
 			Sleep(250)
 		else
 			local vx,_,vz = spGetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
 			if speed > 0.5 then
-				Turn( body , x_axis, math.rad(22.5), math.rad(45) )
-				Turn( rthruster , x_axis, math.rad(22.5), math.rad(45) )
-				Turn( lthruster , x_axis, math.rad(22.5), math.rad(45) )
+				Turn(body, x_axis, math.rad(22.5), math.rad(45))
+				Turn(rthruster, x_axis, math.rad(22.5), math.rad(45))
+				Turn(lthruster, x_axis, math.rad(22.5), math.rad(45))
 				Sleep(250)
 			else
-				Turn( body , x_axis, 0, math.rad(45) )
-				Turn( rthruster , x_axis, 0, math.rad(45) )
-				Turn( lthruster , x_axis, 0, math.rad(45) )
+				Turn(body, x_axis, 0, math.rad(45))
+				Turn(rthruster, x_axis, 0, math.rad(45))
+				Turn(lthruster, x_axis, 0, math.rad(45))
 				Sleep(250)
 			end
 		end
@@ -61,13 +61,13 @@ end
 
 function script.Create()
 	
-	Turn( rfjet , x_axis, math.rad(-90) )
-	Turn( lfjet , x_axis, math.rad(-90) )
-	Turn( rrjet , x_axis, math.rad(-90) )
-	Turn( lrjet , x_axis, math.rad(-90) )
+	Turn(rfjet, x_axis, math.rad(-90))
+	Turn(lfjet, x_axis, math.rad(-90))
+	Turn(rrjet, x_axis, math.rad(-90))
+	Turn(lrjet, x_axis, math.rad(-90))
 
-	Turn( rrfanbase , z_axis, math.rad(-22.5) )
-	Turn( lrfanbase , z_axis, math.rad(22.5) )
+	Turn(rrfanbase, z_axis, math.rad(-22.5))
+	Turn(lrfanbase, z_axis, math.rad(22.5))
 
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltBody)
@@ -75,22 +75,22 @@ end
 
 local function RestoreAfterDelay()
 	
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 
 	Sleep(1000)
-	Turn( rgun , y_axis, 0, math.rad(600))
-	Turn( lgun , y_axis, 0, math.rad(600))
+	Turn(rgun, y_axis, 0, math.rad(600))
+	Turn(lgun, y_axis, 0, math.rad(600))
 	attacking = false
 end
 
 function script.AimWeapon(num, heading, pitch)
 
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
-	Turn( rgun , y_axis, heading, math.rad(600))
-	Turn( lgun , y_axis, heading, math.rad(600))
+	Turn(rgun, y_axis, heading, math.rad(600))
+	Turn(lgun, y_axis, heading, math.rad(600))
 
 	attacking = true
 	
@@ -107,8 +107,8 @@ function script.AimFromWeapon(num)
 end
 
 function script.Shot(num)
-	EmitSfx( emits[gun].flare,  1024 )
-	EmitSfx( emits[gun].barrel,  1025 )
+	EmitSfx(emits[gun].flare, 1024)
+	EmitSfx(emits[gun].barrel, 1025)
 	gun = (gun)%4 + 1
 end
 

@@ -413,7 +413,7 @@ cormexGlow = {
   piece       = "furnace",
 
   partpos = "x,y,z|"..
-	"y = ((i>3) and 59) or 49,"..
+	"y = ((i>3) and 5) or -5,"..
 	"local i = i%4,"..
 	"local d = 5,"..
 	"x = ((i>1) and -d) or d,"..

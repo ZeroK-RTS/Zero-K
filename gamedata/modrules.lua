@@ -17,6 +17,7 @@ local modrules  = {
     allowUnitCollisionDamage = true; -- defaults to false
     allowUnitCollisionOverlap = false,	-- defaults to true	-- this lets units clump close together when moving, after which they are pushed apart
     allowGroundUnitGravity = false,
+	allowDirectionalPathing = true,
   },
   
   construction = {
@@ -64,10 +65,10 @@ local modrules  = {
     requireSonarUnderWater = true,  -- defaults to true
     
     los = {
-      losMipLevel = 3,  -- defaults to 1
+      losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
-      airMipLevel = 4,  -- defaults to 2
-      airMul      = 1,  -- defaults to 1
+      airMipLevel = 2,  -- defaults to 2
+      airLosMul   = 2/3,  -- defaults to 1
     },
   },
 

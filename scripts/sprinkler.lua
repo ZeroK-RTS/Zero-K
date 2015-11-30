@@ -19,7 +19,7 @@ local is_open = false
 local restore_delay = 2000;
 
 --signals
-local aim  = 2
+local aim = 2
 local open = 8
 local close = 16
 
@@ -54,7 +54,7 @@ function script.AimFromWeapon(n)
 	return aimProxy 
 end
 
-function script.AimWeapon(num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	return false
 end
 

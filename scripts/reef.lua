@@ -75,20 +75,20 @@ function script.Create()
 		Move(bay, x_axis, 16)
 	end
 	
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
-	Spin( Radar , y_axis, rad(60) )
+	Spin(Radar, y_axis, rad(60))
 end
 
 local function StartMoving()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
-	while  true  do
-		EmitSfx( WakeForeLeft,  2 )
-		EmitSfx( WakeForeRight,  2 )
-		EmitSfx( WakeAftLeft,  2 )
-		EmitSfx( WakeAftRight,  2 )
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
+	while true do
+		EmitSfx(WakeForeLeft, 2)
+		EmitSfx(WakeForeRight, 2)
+		EmitSfx(WakeAftLeft, 2)
+		EmitSfx(WakeAftRight, 2)
 		Sleep(150)
 	end
 end
@@ -98,12 +98,12 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_MOVE)
+	Signal(SIG_MOVE)
 end
 
 local function RestoreAfterDelay()
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(3000)
 end
 
@@ -143,7 +143,7 @@ local function closeBay(piece)
 		local bay = droneBays[piece];
 		if(bay) then
 			Signal("bay"..piece)
-			SetSignalMask( "bay"..piece)
+			SetSignalMask("bay"..piece)
 			Sleep(1000);
 			Move(bay.slider,x_axis,0,3);
 			Turn(bay.hatch, z_axis, math.rad(0),math.rad(40));

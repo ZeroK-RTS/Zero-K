@@ -1,6 +1,8 @@
 include "constants.lua"
 include "spider_walking.lua"
 
+local ALLY_ACCESS = {allied = true}
+
 local notum = piece 'notum'
 local gaster = piece 'gaster' 
 local gunL, gunR, flareL, flareR, aimpoint = piece('gunl', 'gunr', 'flarel', 'flarer', 'aimpoint')
@@ -70,6 +72,14 @@ function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
 
+function script.Activate()
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 0, ALLY_ACCESS)
+end
+
+function script.Deactivate()
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 1, ALLY_ACCESS)
+end
+
 function script.StartMoving ()
 	StartThread (Walk)
 end
@@ -89,9 +99,9 @@ end
 
 function script.Killed (recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode (shield, sfxFall)
 		Explode (shieldArm, sfxFall)
 		Explode (eye, sfxFall)
@@ -99,28 +109,28 @@ function script.Killed (recentDamage, maxHealth)
 		Explode (ml, sfxFall)
 		Explode (fr, sfxFall)
 		return 1
-	elseif severity <= .75  then
+	elseif severity <= .75 then
 		Explode (bl, sfxFall)
 		Explode (mr, sfxFall)
 		Explode (fl, sfxFall)
-		Explode (shield, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (shieldArm, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (eye, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode (shield, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (shieldArm, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (eye, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode (gaster, sfxShatter)
 		return 2
 	else
-		Explode (shield, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (shieldArm, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (eye, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
-		Explode (fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode)
+		Explode (shield, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (shieldArm, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (eye, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode (fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode (gaster, sfxShatter)
 		Explode (notum, sfxShatter)
 		return 2

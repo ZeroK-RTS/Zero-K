@@ -61,7 +61,6 @@ unitDef = {
   },
 
   sightDistance          = 500,
-  --stealth                = true,
   turnRate               = 693,
 
   weapons                = {
@@ -82,7 +81,6 @@ unitDef = {
       name                    = [[Light Laserbeam]],
       areaOfEffect            = 8,
       avoidFeature            = false,
-      beamlaser               = 1,
       beamTime                = 0.12,
       collideFriendly         = false,
       coreThickness           = 0.3,

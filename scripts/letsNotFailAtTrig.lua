@@ -8,7 +8,7 @@ local acos = math.acos
 local asin = math.asin
 
 function rotateXaxis(v, angle)
-	return {v[1], v[2]*cos(angle) - v[3]*sin(angle),  v[3]*cos(angle) + v[2]*sin(angle)}
+	return {v[1], v[2]*cos(angle) - v[3]*sin(angle), v[3]*cos(angle) + v[2]*sin(angle)}
 end
 
 function rotateYaxis(v, angle)

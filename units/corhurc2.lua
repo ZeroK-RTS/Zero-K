@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[corhurc2]],
   name                = [[Phoenix]],
-  description         = [[Napalm Bomber]],
+  description         = [[Saturation Napalm Bomber]],
   amphibious          = true,
   buildCostEnergy     = 360,
   buildCostMetal      = 360,
@@ -117,7 +117,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.1,
       interceptedByShieldType = 1,
-      manualBombSettings      = true,
       model                   = [[wep_b_fabby.s3o]],
       myGravity               = 0.7,
       noSelfDamage            = true,

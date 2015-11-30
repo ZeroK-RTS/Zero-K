@@ -18,7 +18,7 @@ include("keysym.h.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
---WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(, number dist))} -> {}, Set Camera target, ensures camera state caching works
+--WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures camera state caching works
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
 
 --------------------------------------------------------------------------------
@@ -703,8 +703,11 @@ SetFOV = function(fov)
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
 	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
 
-  spSetCameraState(cs,0)
-  -- OverrideSetCameraStateInterpolate(cs,smoothness.value)
+	if cs.name == "free" then
+	  OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
+	else
+	  spSetCameraState(cs,0)
+	end
 end
 
 local function SetSkyBufferProportion(cs)
@@ -784,10 +787,26 @@ local function LimitZoom(a,b,c,sp,limit)
 	return zox*maxZoom,zoy*maxZoom,zoz*maxZoom
 end
 
-local function ExtendedGetGroundHeight(x,z)
+local function GetSmoothOrGroundHeight(x,z,checkFreeMode) --only ScrollCam seems to want to ignore this when FreeMode is on
+	if options.smoothmeshscroll.value then
+		return spGetSmoothMeshHeight(x, z) or 0
+	else
+		if not (checkFreeMode and options.freemode.value) then
+			return spGetGroundHeight(x, z) or 0
+		end
+	end
+end
+
+local function GetMapBoundedGroundHeight(x,z)
 	--out of map. Bound coordinate to within map
 	x,z = GetMapBoundedCoords(x,z)
 	return spGetGroundHeight(x,z)
+end
+
+local function GetMapBoundedSmoothOrGroundHeight(x,z)
+	--out of map. Bound coordinate to within map
+	x,z = GetMapBoundedCoords(x,z)
+	return GetSmoothOrGroundHeight(x,z)
 end
 
 --------------------------------------------------------------------------------
@@ -888,6 +907,18 @@ local function MoveRotatedCam(cs, mxm, mym)
 end
 --]]
 
+local function CorrectTraceTargetToSmoothMesh(cs,x,y,z) --Returns true if it corrected anything, false if no changes
+	if cs.ry > 0 and options.smoothmeshscroll.value then --We couldn't tell Spring to trace to the smooth mesh point, so compensate with vector multiplication
+		local y_smooth = spGetSmoothMeshHeight(x, z) or 0
+		local correction_vector_scale = 1 - (cs.py - y_smooth)/(cs.py - y) --Since cs.ry > 0, cs.py > y. We want real ground to smooth ground proportion
+		local dx, dz = cs.px - x, cs.pz - z
+		y = y_smooth
+		x, z = x + dx * correction_vector_scale, z + dz * correction_vector_scale
+		return true, x, y, z
+	end
+	return false, x, y, z
+end
+
 --Note: If the x,y is not pointing at an onmap point, this function traces a virtual ray to an
 --          offmap position using the camera direction and disregards the x,y parameters.
 local function VirtTraceRay(x,y, cs)
@@ -895,8 +926,6 @@ local function VirtTraceRay(x,y, cs)
 
 	if gpos then
 		local gx, gy, gz = gpos[1], gpos[2], gpos[3]
-		
-		--gy = spGetSmoothMeshHeight (gx,gz)
 		
 		if gx < 0 or gx > MWIDTH or gz < 0 or gz > MHEIGHT then --out of map
 			return false, gx, gy, gz	
@@ -944,14 +973,29 @@ SetCenterBounds = function(cs)
 			if cs.pz < minZ then cs.pz = minZ; ls_z = minZ; outOfBounds = true end
 			if cs.pz > maxZ then cs.pz = maxZ; ls_z = maxZ; outOfBounds = true end
 		end
-		if outOfBounds then ls_y = ExtendedGetGroundHeight(ls_x, ls_z) end
+		if outOfBounds then ls_y = GetMapBoundedGroundHeight(ls_x, ls_z) end
 	else
 		minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
 	end
 	-- Spring.Echo("Bounds: "..minX..", "..minZ..", "..maxX..", "..maxZ)
 end
 
-local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera rotation 
+local function ComputeLockSpotParams(cs, gx, gy, gz, onmap) --Only compute from what is sent in, otherwise use pre-existing values
+	if gx then
+		ls_x,ls_y,ls_z = gx,gy,gz
+	end
+	if ls_x then
+		local px,py,pz = cs.px,cs.py,cs.pz
+		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+		if onmap then
+			ls_onmap = onmap
+		end
+		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
+		ls_have = true
+	end
+end
+
+local function SetLockSpot2(cs, x, y, useSmoothMeshSetting) --set an anchor on the ground for camera rotation 
 	if ls_have then --if lockspot is locked
 		return
 	end
@@ -962,15 +1006,12 @@ local function SetLockSpot2(cs, x, y) --set an anchor on the ground for camera r
 	end
 
 	local onmap, gx,gy,gz = VirtTraceRay(x, y, cs) --convert screen coordinate to ground coordinate
-	
-	if gx then
-		ls_x,ls_y,ls_z = gx,gy,gz
-		local px,py,pz = cs.px,cs.py,cs.pz
-		local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
-		ls_onmap = onmap
-		ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
-		ls_have = true
+
+
+	if useSmoothMeshSetting then
+		_, gx,gy,gz = CorrectTraceTargetToSmoothMesh(cs, gx,gy,gz)
 	end
+	ComputeLockSpotParams(cs, gx, gy, gz, onmap)
 end
 
 
@@ -1016,7 +1057,7 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 		         |                         x
 		     -90 v -cam angle                       x
 		--]]
-	local groundHeight = groundMin --ExtendedGetGroundHeight(gx, gz) + groundBufferZone
+	local groundHeight = groundMin --GetMapBoundedGroundHeight(gx, gz) + groundBufferZone
 	local skyProportion = math.min(math.max((cs.py - groundHeight)/((maxDistY - topDownBufferZone) - groundHeight), 0.0), 1.0)
 	local targetRx = sqrt(skyProportion) * (minZoomTiltAngle - HALFPI) - minZoomTiltAngle
 
@@ -1102,7 +1143,7 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY)
 	return cs
 end
 
-local function SetCameraTarget(gx,gy,gz,smoothness,dist)
+local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 
 	--Note: this is similar to spSetCameraTarget() except we have control of the rules.
 	--for example: native spSetCameraTarget() only work when camera is facing south at ~45 degree angle and camera height cannot have negative value (not suitable for underground use)
@@ -1119,7 +1160,11 @@ local function SetCameraTarget(gx,gy,gz,smoothness,dist)
 		else -- otherwise, enforce bounds here to avoid the camera jumping around when moved with MMB or minimap over hilly terrain
 			ls_x = min(max(gx, minX), maxX) --update lockpot to target destination
 			ls_z = min(max(gz, minZ), maxZ)
-			ls_y = ExtendedGetGroundHeight(ls_x, ls_z)
+			if useSmoothMeshSetting then
+				ls_y = GetMapBoundedSmoothOrGroundHeight(ls_x, ls_z)
+			else
+				ls_y = GetMapBoundedGroundHeight(ls_x, ls_z)
+			end
 		end
 		if options.tiltedzoom.value then
 			local cstemp = UpdateCam(cs)
@@ -1178,7 +1223,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		local new_pz = cs.pz + zoz
 		-- Spring.Echo("Zoom Speed Vector: ("..zox..", "..zoy..", "..zoz..")")
 
-		local groundMinimum = ExtendedGetGroundHeight(new_px, new_pz) + 20
+		local groundMinimum = GetMapBoundedGroundHeight(new_px, new_pz) + 20
 		
 		if not options.freemode.value then
 			if new_py < groundMinimum then --zooming underground?
@@ -1236,14 +1281,15 @@ local function Zoom(zoomin, shift, forceCenter)
 
 		ls_have = false --unlock lockspot 
 		-- SetLockSpot2(cs) --set lockspot
-		if gx then --set lockspot
-			ls_x,ls_y,ls_z = gx,gy,gz
-			local px,py,pz = cs.px,cs.py,cs.pz
-			local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
-			ls_onmap = onmap
-			ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
-			ls_have = true
-		end
+		-- if gx then --set lockspot
+		-- 	ls_x,ls_y,ls_z = gx,gy,gz
+		-- 	local px,py,pz = cs.px,cs.py,cs.pz
+		-- 	local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
+		-- 	ls_onmap = onmap
+		-- 	ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
+		-- 	ls_have = true
+		-- end
+		ComputeLockSpotParams(cs, gx, gy, gz, onmap)
 
 		if not ls_have then
 			return
@@ -1648,7 +1694,7 @@ end
 
 local function ScrollCam(cs, mxm, mym, smoothlevel)
 	scrnRay_cache.previous.fov = -999 --force reset of offmap traceScreenRay cache. Reason: because offmap traceScreenRay use cursor position for calculation but scrollcam always have cursor at midscreen
-	SetLockSpot2(cs)
+	SetLockSpot2(cs, nil, nil, true)
 	if not cs.dy or not ls_have then
 		--echo "<COFC> scrollcam fcn fail"
 		return
@@ -1667,7 +1713,14 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	local len = sqrt((cr[1] * cr[1]) + (cr[3] * cr[3]))
 	local drx = cr[1] / len
 	local drz = cr[3] / len
-	
+
+	-- The following code should be here and not in SetLockSpot2, 
+	-- but MouseMove springscroll (MMB scrolling, not smoothscroll) 
+	-- starts translating on all axes, rather than just x and z
+
+	-- corrected, ls_x, ls_y, ls_z = CorrectTraceTargetToSmoothMesh(cs, ls_x, ls_y, ls_z)
+	-- if corrected then ComputeLockSpotParams(cs) end
+
 	local vecDist = (- cs.py) / cs.dy
 	
 	local ddx = (mxm * drx) + (mym * dfx)
@@ -1677,21 +1730,15 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	ls_z = ls_z + ddz
 	
 	if not options.freemode.value then
-		ls_x = min(ls_x, maxX-3) --limit camera movement to map area
-		ls_x = max(ls_x, minX+3)
+		ls_x = min(ls_x, maxX-3) --limit camera movement, either to map area or (if options.zoomouttocenter.value is true) to a set distance from map center
+		ls_x = max(ls_x, minX+3) --Do not replace with GetMapBoundedCoords or GetMapBoundedGroundHeight, those functions only (and should only) respect map area.
 		
 		ls_z = min(ls_z, maxZ-3)
 		ls_z = max(ls_z, minZ+3)
 	end
 	
-	if options.smoothmeshscroll.value then
-		ls_y = spGetSmoothMeshHeight(ls_x, ls_z) or 0
-	else
-		if not options.freemode.value then
-			ls_y = spGetGroundHeight(ls_x, ls_z) or 0 --bind lockspot to groundheight if not free
-		end
-	end
-	
+	ls_y = GetSmoothOrGroundHeight(ls_x, ls_z, true)
+
 	local csnew = UpdateCam(cs)
 	if csnew and options.tiltedzoom.value then
 	  csnew.rx = GetZoomTiltAngle(ls_x, ls_z, csnew)
@@ -1733,7 +1780,7 @@ end
 local missedMouseRelease = false
 function widget:Update(dt)
 	local framePassed = math.ceil(dt/0.0333) --estimate how many gameframe would've passes based on difference in time??
-    
+	
 	if hideCursor then
 		spSetMouseCursor('%none%')
 	end
@@ -1826,7 +1873,9 @@ function widget:Update(dt)
 	local use_lockspringscroll = lockspringscroll and not springscroll
 
 	local a,c,m,s = spGetModKeyState()
-	
+
+	local fpsCompensationFactor = (60 * dt) --Normalize to 60fps
+    
 	--//HANDLE ROTATE CAMERA
 	if 	(not thirdperson_trackunit and  --block 3rd Person 
 	(rot.right or rot.left or rot.up or rot.down))
@@ -1834,7 +1883,7 @@ function widget:Update(dt)
 		
 		cs = GetTargetCameraState()
 
-		local speed = options.rotfactor.value * (s and 500 or 250)
+		local speed = options.rotfactor.value * (s and 500 or 250) * fpsCompensationFactor
 
 		if (rot.right or rot.left) and options.leftRightEdge.value == 'orbit' then
 			SetLockSpot2(cs, vsx * 0.5, vsy * 0.5)
@@ -1898,7 +1947,7 @@ function widget:Update(dt)
 			spWarpMouse(cx, cy)		
 		else --edge screen scroll
 			--local speed = options.speedFactor_k.value * (s and 3 or 1) * heightFactor
-			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor, 1 )
+			local speed = math.max( options.speedFactor_k.value * (s and 3 or 1) * heightFactor * fpsCompensationFactor, 1 )
 			
 			if move.right or move2.right then
 				mxm = speed
@@ -2050,7 +2099,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 			lockspringscroll = false
 		end
 		local dir = options.invertscroll.value and -1 or 1
-					
+
 		local cs = GetTargetCameraState()
 		
 		local speed = options.speedFactor.value * cs.py/1000 / 10
@@ -2236,8 +2285,8 @@ function widget:KeyPress(key, modifier, isRepeat)
 			
 
 		
-			local speed = modifier.shift and 30 or 10 
-			
+			local speed = (modifier.shift and 30 or 10)
+
 			if key == key_code.right then 		RotateCamera(vsx * 0.5, vsy * 0.5, speed, 0, true, not modifier.alt)
 			elseif key == key_code.left then 	RotateCamera(vsx * 0.5, vsy * 0.5, -speed, 0, true, not modifier.alt)
 			elseif key == key_code.down then 	onTiltZoomTrack = false; RotateCamera(vsx * 0.5, vsy * 0.5, 0, -speed, true, not modifier.alt)
@@ -2574,13 +2623,13 @@ function GroupRecallFix(key, modifier, isRepeat)
 					meanX = sumX/unitCount --//calculate center of cluster
 					meanY = sumY/unitCount
 					meanZ = sumZ/unitCount
-					SetCameraTarget(meanX, meanY, meanZ,0.5)
+					SetCameraTarget(meanX, meanY, meanZ,0.5,true)
 				else
 					local unitID = lonely[currentIteration-#cluster]
 					local slctUnit = slctUnitUnordered[unitID]
 					if slctUnit ~= nil then --nil check. There seems to be a race condition or something which causes this unit to be nil sometimes
 						local x,y,z= slctUnit[1],slctUnit[2],slctUnit[3] --// get stored unit position
-						SetCameraTarget(x,y,z,0.5)
+						SetCameraTarget(x,y,z,0.5,true)
 					end
 				end
 				cluster=nil
@@ -2598,7 +2647,7 @@ function GroupRecallFix(key, modifier, isRepeat)
 				meanX = sumX/unitCount --//calculate center
 				meanY = sumY/unitCount
 				meanZ = sumZ/unitCount
-				SetCameraTarget(meanX, meanY, meanZ,0.5) --is overriden by Spring.SetCameraTarget() at cache.lua.
+				SetCameraTarget(meanX, meanY, meanZ,0.5,true) --is overriden by Spring.SetCameraTarget() at cache.lua.
 			end
 			previousGroup= group
 			return true

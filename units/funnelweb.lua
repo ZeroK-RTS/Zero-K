@@ -21,9 +21,9 @@ unitDef = {
     description_pl = [[Ciezki pajak wsparcia]],
     helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
     helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Posiada tarcze obszarowa oraz produkuje zestaw dronow.]],
+	priority_misc  = 1, -- Medium
   },
 
-  energyUse              = 1.5,
   explodeAs              = [[ESTOR_BUILDING]],
   footprintX             = 4,
   footprintZ             = 4,
@@ -40,6 +40,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[funnelweb.s3o]],
+  onoffable              = true,
   seismicSignature       = 4,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
@@ -57,7 +58,7 @@ unitDef = {
   trackStrength          = 8,
   trackStretch           = 1,
   trackType              = [[ChickenTrackPointy]],
-  trackWidth             = 64,
+  trackWidth             = 85,
   turnRate               = 240,
   workerTime             = 0,
 

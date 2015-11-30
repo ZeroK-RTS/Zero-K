@@ -452,14 +452,9 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
+		description = "Self-repairs 10 HP/s",
 		func = function(unitDef)
-				-- First module replaces the base 5 hp/s because that occurs after a minute
-				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
-					unitDef.idleautoheal = 0
-				end
-				unitDef.idleautoheal = unitDef.idleautoheal + 20
-				unitDef.idletime = 300
+				unitDef.autoheal = (unitDef.autoheal or 0) + 10
 			end,
 	},
 	module_companion_drone = {
@@ -531,7 +526,12 @@ upgrades = {
 		description = "Basic radar system with 1800 range",
 		func = function(unitDef)
 				unitDef.radardistance = (unitDef.radardistance or 0)
-				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
+				if unitDef.radardistance < 1800 then 
+					unitDef.radardistance = 1800
+				end
+				if (not unitDef.radaremitheight) or unitDef.radaremitheight < 100 then 
+					unitDef.radaremitheight = 100 
+				end
 			end,
 	},
 	module_heavy_armor = {
@@ -730,25 +730,6 @@ upgrades = {
 	}
 }
 
-upgrades_dota = {
-	module_personal_cloak = {
-		name = "Stealth System",
-		description = "Makes the commander invisible to radar",
-		func = function(unitDef)
-				unitDef.stealth = true
-			end,
-	},
-	module_cloak_field = upgrades.module_jammer,
-	
-	module_resurrect = {
-		name = "Lazarus Nanolathe",
-		description = "Adds +7.5 metal/s build speed",
-		func = function(unitDef)
-				if unitDef.workertime then unitDef.workertime = unitDef.workertime + 7.5 end
-			end,
-	},
-}
-
 decorations = {
 	skin_recon_dark = {
 		func = function(unitDef)
@@ -902,15 +883,7 @@ for name,data in pairs(upgrades) do
 		data.order = order
 	end
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-if Spring and Spring.GetModOptions and Spring.GetModOptions().zkmode == "dota" then
-	for name,data in pairs(upgrades_dota) do
-		upgrades[name] = data
-	end
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+
 local weaponsList = VFS.DirList("gamedata/modularcomms/weapons", "*.lua") or {}
 for i=1,#weaponsList do
 	local name, array = VFS.Include(weaponsList[i])

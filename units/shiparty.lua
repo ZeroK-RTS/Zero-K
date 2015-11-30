@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shiparty]],
   name                   = [[Crusader]],
-  description            = [[Destroyer (Fire Support/Semi-Antisub)]],
+  description            = [[Artillery Destroyer, Light Anti-Sub]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
@@ -135,7 +135,6 @@ unitDef = {
       size                    = 3.8,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
-      targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 270,

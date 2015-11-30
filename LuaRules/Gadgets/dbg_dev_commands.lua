@@ -129,7 +129,6 @@ local unsyncedGadgetList = {
 	"Awards",	
 	"Noexplode Stopper",	
 	"Perks",	
-	"Ore mexes!",
 	"Control gunship strafe range",
 	"Area Denial",
 	"Bounties",
@@ -318,7 +317,6 @@ local gadgetList = {
 	"LupsNanoSpray",
 	--"CustomUnitShaders",
 	"Hide Autorepairlevel Command",
-	"Ore mexes!",
 	"CAI",
 	"Lups",
 	"Planet Wars Structures",
@@ -336,6 +334,37 @@ local gadgetList = {
 -------------------------------------------------------------------------------------
 
 local spIsCheatingEnabled = Spring.IsCheatingEnabled
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
+function GG.TableEcho(data, indent)
+	indent = indent or ""
+	for name, v in pairs(data) do
+		local ty =  type(v)
+		if ty == "table" then
+			Spring.Echo(indent .. name .. " = {")
+			GG.TableEcho(v, indent .. "    ")
+			--Spring.Echo("Spring.Echo(indent .. "}"" .. )
+		elseif ty == "boolean" then
+			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+		else
+			Spring.Echo(indent .. name .. " = " .. v)
+		end
+	end
+end
+
+function GG.UnitEcho(unitID, st)
+	st = st or unitID
+	if Spring.ValidUnitID(unitID) then
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.MarkerAddPoint(x,y,z, st)
+	else
+		Spring.Echo("Invalid unitID")
+		Spring.Echo(unitID)
+		Spring.Echo(st)
+	end
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -441,7 +470,7 @@ local function restart(cmd,line,words,player)
 			if GG.startUnits[teamID] and GG.CommanderSpawnLocation[teamID] then
 				local spawn = GG.CommanderSpawnLocation[teamID]
 				local unitID = GG.DropUnit(GG.startUnits[teamID], spawn.x, spawn.y, spawn.z, spawn.facing, teamID, nil, 0)
-				GG.GiveFacplop(unitID)
+				Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 			end
 		end
 		

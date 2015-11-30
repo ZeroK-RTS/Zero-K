@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armham]],
   name                   = [[Hammer]],
-  description            = [[Light Artillery/Skirmisher Bot]],
+  description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.25,
   buildCostEnergy        = 130,
@@ -113,7 +113,6 @@ unitDef = {
       reloadtime              = 6,
       soundHit                = [[explosion/ex_med5]],
       soundStart              = [[weapon/cannon/cannon_fire1]],
-      targetMoveError         = 0.3,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 260,

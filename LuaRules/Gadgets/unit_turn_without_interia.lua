@@ -18,11 +18,12 @@ function gadget:GetInfo()
 end
 
 local spSetGroundMoveTypeData  = Spring.MoveCtrl.SetGroundMoveTypeData
-local getMovetype = Spring.Utilities.getMovetype
+local getMovetype              = Spring.Utilities.getMovetype
+local spMoveCtrlGetTag         = Spring.MoveCtrl.GetTag
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	local ud = UnitDefs[unitDefID]
-	if getMovetype(ud) == 2 then -- Ground/Sea
+	if getMovetype(ud) == 2 and spMoveCtrlGetTag(unitID) == nil  then -- Ground/Sea
 		spSetGroundMoveTypeData(unitID, "turnAccel", ud.turnRate*1.2)
 	end
 end

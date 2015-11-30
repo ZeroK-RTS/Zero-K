@@ -1,0 +1,20 @@
+{
+	"shield" : "shield",
+	"health" : "health",
+	"building" : "building",
+	"morph" : "morph",
+	"stockpile" : "stockpile",
+	"paralyze" : "paralyze",
+	"disarm" : "disarm",
+	"capture" : "capture",
+	"capture_reload" : "capture reload",
+	"water_tank" : "water tank",
+	"teleport" : "teleport",
+	"ability" : "ability",
+	"reload" : "reload",
+	"slow" : "slow",
+	"goo" : "goo",
+	"reclaim" : "reclaim",
+	"resurrect" : "resurrect",
+	"jump" : "jump"
+}

@@ -52,7 +52,7 @@ function widget:Update(dt)
       -- widgetHandler:RemoveWidget()
     elseif DiffTimers(GetTimer(), endTime) > delay then
       Echo("<autoquit> Autoquit sending quit command.")
-      SendCommands("quit","quitforce")
+      SendCommands("quitforce")
     end
   end
 end

@@ -245,7 +245,11 @@ local function CircleToLand(unitID, goal)
 	local start = {spGetUnitBasePosition(unitID)}
 	
 	local unitDefID	= spGetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
+	local ud = unitDefID and UnitDefs[unitDefID]
+	
+	if not (unitDefID and ud and turnRadius[unitDefID]) then
+		return
+	end
 	
 	local turnCircleRadius = turnRadius[unitDefID]
 	local turnCircleRadiusSq = turnCircleRadius^2
@@ -476,8 +480,10 @@ local function CircleToLand(unitID, goal)
 		
 		local px, pz = DistanceToPosition(totalDist)
 		
-		landingUnit[unitID].landed = true
-		SitOnPad(unitID)
+		if landingUnit[unitID] and not landingUnit[unitID].abort then
+			landingUnit[unitID].landed = true
+			SitOnPad(unitID)
+		end
 	end
 	
 	StartScript(LandLoop)

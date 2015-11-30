@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[cormex]],
   name                   = [[Metal Extractor]],
-  description            = [[Extracts Metal]],
+  description            = [[Produces Metal]],
   acceleration           = 0,
   activateWhenBuilt      = true,
   bmcode                 = [[0]],
@@ -56,6 +56,7 @@ unitDef = {
   noAutoFire             = false,
   objectName             = [[AMETALEXTRACTORLVL1.S3O]],
   onoffable              = false,
+  script                 = "cormex.lua",
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_BUILDINGEX]],
   side                   = [[CORE]],

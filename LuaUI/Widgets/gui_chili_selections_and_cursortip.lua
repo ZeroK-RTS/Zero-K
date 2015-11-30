@@ -23,7 +23,6 @@ local spGetFeatureTeam			= Spring.GetFeatureTeam
 --local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
 local spGetUnitTeam				= Spring.GetUnitTeam
 local spGetUnitHealth			= Spring.GetUnitHealth
-local spGetUnitResources		= Spring.GetUnitResources
 local spTraceScreenRay			= Spring.TraceScreenRay
 local spGetTeamInfo				= Spring.GetTeamInfo
 local spGetPlayerInfo			= Spring.GetPlayerInfo
@@ -457,6 +456,11 @@ end
 
 --options.fontsize.OnChange = FontChanged
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--helper functions
+
 local function GetHealthColor(fraction, returnType)
 	local midpt = (fraction > .5)
 	local r, g
@@ -473,17 +477,13 @@ local function GetHealthColor(fraction, returnType)
 	return {r, g, 0, 1}
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---helper functions
-
 function round(num, idp)
-  if (not idp) then
-    return math.floor(num+.5)
-  else
-    local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
-  end
+	if (not idp) then
+		return math.floor(num+.5)
+	else
+		local mult = 10^(idp or 0)
+		return math.floor(num * mult + 0.5) / mult
+	end
 end
 
 
@@ -525,6 +525,113 @@ function comma_value(amount, displaySign)
   	return formatted
 end
 --]]
+
+local function GetUnitResources(unitID)		
+	local mm, mu, em, eu = Spring.GetUnitResources(unitID)
+	
+	mm = (mm or 0) + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
+	em = (em or 0) + (spGetUnitRulesParam(unitID, "current_energyIncome") or 0)
+	eu = (eu or 0) + (spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0)
+	
+	if mm ~= 0 or mu ~= 0 or em ~= 0 or eu ~= 0 then
+		return mm, (mu or 0), em, eu
+	else
+		return
+	end
+end
+
+local function GetWindTooltip(unitID)
+	local minWind = spGetUnitRulesParam(unitID, "minWind")
+	if not minWind then
+		return ""
+	end
+	
+	return "\nWind Range " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+end
+
+local function GetGridTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local gridCurrent = spGetUnitRulesParam(unitID, "OD_gridCurrent")
+	if not gridCurrent then
+		return false
+	end
+	
+	if gridCurrent < 0 then
+		return "Disabled - No Grid" .. GetWindTooltip(unitID)
+	end
+	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
+	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
+	
+	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. GetWindTooltip(unitID)
+end
+
+local function GetMexTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local metalMult = spGetUnitRulesParam(unitID, "overdrive_proportion")
+	if not metalMult then
+		return false
+	end
+	
+	local currentIncome = spGetUnitRulesParam(unitID, "current_metalIncome")
+	local mexIncome = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	local baseFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+	
+	if currentIncome == 0 then
+		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
+	end
+
+	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
+end
+
+local function GetZenithTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local meteorsControlled = spGetUnitRulesParam(unitID, "meteorsControlled")
+	if not meteorsControlled then
+		return false
+	end
+	meteorsControlled = meteorsControlled
+
+	return "Meteor Controller - Controls " .. meteorsControlled .. "/500 meteors"
+end
+
+local function GetTerraformTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local spent = spGetUnitRulesParam(unitID, "terraform_spent")
+	if not spent then
+		return false
+	end
+
+	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
+	
+	return "Terraform - Estimated Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
+end
+
+local function GetRulesParamTooltip(unitID)
+	local gridTooltip = GetGridTooltip(unitID)
+	if gridTooltip then
+		return gridTooltip
+	end
+	local mexTooltip = GetMexTooltip(unitID)
+	if mexTooltip then
+		return mexTooltip
+	end
+	local zenithTooltip = GetZenithTooltip(unitID)
+	if zenithTooltip then
+		return zenithTooltip
+	end
+	local terraformTooltip = GetTerraformTooltip(unitID)
+	if terraformTooltip then
+		return terraformTooltip
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -602,44 +709,21 @@ local function UpdateDynamicGroupInfo()
 		if ud then
 			name = ud.name 
 			hp, _, paradam, cap, build = spGetUnitHealth(id)
-			mm,mu,em,eu = spGetUnitResources(id)
-		
+			mm, mu, em, eu = GetUnitResources(id)
+
 			if name ~= "terraunit" then
-				if mm then--failsafe when switching spectator view.
+				if hp then--failsafe when switching spectator view.
 					total_cost = total_cost + ud.metalCost*build
 					total_hp = total_hp + hp
 				end
 				
 				stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
-					if name == 'armmex' or name =='cormex' then -- mex case
-						tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
-						
-						baseMetal = 0
-						s = tooltip:match("Makes: ([^ ]+)")
-						if s ~= nil then 
-							baseMetal = tonumber(s) 
-						end 
-										
-						s = tooltip:match("Overdrive: %+([0-9]+)")
-						od = 0
-						if s ~= nil then 
-							od = tonumber(s) 
-						end
-						
-						total_metalincome = total_metalincome + baseMetal + baseMetal * od / 100
-							
-						s = tooltip:match("Energy: ([^ ]+)")
-						if s ~= nil then 
-							total_energydrain = total_energydrain - (tonumber(s) or 0)
-						end 
-					else
-						if mm then --failsafe when switching spectator view.
-							total_metalincome = total_metalincome + mm
-							total_metaldrain = total_metaldrain + mu
-							total_energyincome = total_energyincome + em
-							total_energydrain = total_energydrain + eu
-						end
+					if mm then --failsafe when switching spectator view.
+						total_metalincome = total_metalincome + mm
+						total_metaldrain = total_metaldrain + mu
+						total_energyincome = total_energyincome + em
+						total_energydrain = total_energydrain + eu
 					end
 					
 					if ud.buildSpeed ~= 0 and mm then
@@ -771,6 +855,10 @@ local function GetUnitDesc(unitID, ud)
 	local lang = (WG.lang and WG.lang()) or 'en'
 	local font = WG.langFont
 	
+	local rulesParamTooltip = GetRulesParamTooltip(unitID)
+	if rulesParamTooltip then
+		return rulesParamTooltip
+	end
 	
 	if lang == 'en' then
 		if unitID then
@@ -1265,7 +1353,7 @@ end
 ----------------------------------------------------------------
 
 local function SetHealthbar(tt_healthbar,health, maxhealth)
-	if health then
+	if health and maxhealth and (maxhealth > 0) then
 		tt_health_fraction = health/maxhealth
 		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		tt_healthbar:SetValue(tt_health_fraction)
@@ -1338,7 +1426,7 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'
-		local metalMake, metalUse, energyMake, energyUse = Spring.GetUnitResources(unitID)
+		local metalMake, metalUse, energyMake, energyUse = GetUnitResources(unitID)
 		
 		if metalMake then
 			metal = metalMake - metalUse
@@ -1346,25 +1434,6 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 		if energyMake then
 			energy = energyMake - energyUse
 		end
-		
-		-- special cases for mexes
-		if ud.name=='cormex' then 
-			local baseMetal = 0
-			local s = tooltip:match("Makes: ([^ ]+)")
-			if s ~= nil then baseMetal = tonumber(s) end 
-							
-			s = tooltip:match("Overdrive: %+([0-9]+)")
-			local od = 0
-			if s ~= nil then od = tonumber(s) end
-			
-			metal = metal + baseMetal + baseMetal * od / 100
-			
-			s = tooltip:match("Energy: ([^ \n]+)")
-			s = tonumber(s)
-			if s ~= nil and type(s) == 'number' then 
-				energy = energy + tonumber(s)
-			end 
-		end 
 	end
 	
 	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
@@ -1437,7 +1506,7 @@ local function UpdateMorphControl(morph_data)
 	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=cyan , autosize=false, width=45, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/clock.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/ibeam.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/cost.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
 	
 	--if morph_prereq then
@@ -1447,6 +1516,7 @@ local function UpdateMorphControl(morph_data)
 	
 	
 	globalitems.morphs = StackPanel:New {
+		name = "morphs stackpanel",
 		centerItems = false,
 		autoArrangeV = true,
 		orientation='horizontal',
@@ -1580,6 +1650,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 		
 		if not empty then
 			children[#children+1] = StackPanel:New{
+				name = "children stackpanel " .. #children+1,
 				centerItems = false,
 				autoArrangeV = true,
 				orientation='horizontal',
@@ -1775,7 +1846,7 @@ local function MakeToolTip_UD(tt_table)
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
 	local extraText = ""
-	if mexDefID == tt_table.unitDef.id then
+	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost
@@ -1806,8 +1877,9 @@ local function MakeToolTip_UD(tt_table)
 			end
 		end
 		
-		local metalOD = WG.metalFromOverdrive
-		local energyOD = WG.energyForOverdrive
+		local teamID = Spring.GetLocalTeamID()
+		local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+		local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
 		
 		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
 			-- Best case payback assumes that extra energy will make
@@ -1863,7 +1935,7 @@ local function MakeToolTip_UD(tt_table)
 			tt_table.morph_data 
 				and { name= 'bp', directcontrol = 'buildpic_morph' }
 				or { name= 'bp', directcontrol = 'buildpic_ud' },
-			{ name = 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
+			{ name = 'cost', icon = 'LuaUI/images/cost.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
 			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName, fontSize=6 },
@@ -2441,12 +2513,17 @@ function widget:Update(dt)
 				ctrle:SetCaption(e)
 			end
 			
+			local rulesParamTooltip = GetRulesParamTooltip(stt_unitID)
+			if rulesParamTooltip then
+				controls['selunit2']['utt']:SetCaption(rulesParamTooltip)
+			end
+			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
 			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
-			
-				if metalUse then
+				
+				if metalUse and stt_ud.buildSpeed and (stt_ud.buildSpeed > 0) then
 					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
 					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')
 				else
@@ -2457,7 +2534,7 @@ function widget:Update(dt)
 
 			local shieldbar_stack = globalitems['shield_selunit']
 			local shieldbar = shieldbar_stack:GetChildByName('bar')
-			if shieldbar then
+			if shieldbar and stt_ud.shieldPower and (stt_ud.shieldPower > 0) then
 				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID)
 				
 				shieldbar:SetValue((shieldCurrentPower or 0) / stt_ud.shieldPower,true)
@@ -2657,9 +2734,11 @@ function widget:Initialize()
 	CreateShieldBar('shield_selunit')
 	
 	stack_main = StackPanel:New{
+		name = "stack_main",
 		width=300, -- needed for initial tooltip
 	}
 	stack_leftbar = StackPanel:New{
+		name = "stack_leftbar",
 		width=10, -- needed for initial tooltip
 	}
 	

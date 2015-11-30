@@ -69,7 +69,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 500,
   smoothAnim          = true,
-  stealth             = true,
   turnRate            = 792,
   upright             = true,
 
@@ -101,7 +100,6 @@ unitDef = {
         subs    = 0.4,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:EMG_HIT]],
       fireStarter             = 30,
       impactOnly              = true,
@@ -116,7 +114,6 @@ unitDef = {
       soundStart              = [[weapon/emg]],
       soundStartVolume        = 2,
       sprayAngle              = 512,
-      startsmoke              = [[0]],
       turret                  = true,
       weaponTimer             = 0.1,
       weaponType              = [[Cannon]],

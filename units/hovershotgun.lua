@@ -107,7 +107,6 @@ unitDef = {
 	soundStartVolume		= 0.6,
 	soundTrigger            = true,
 	sprayangle				= 2400,
-	targetMoveError         = 0.15,
 	thickness               = 2,
 	tolerance               = 10000,
 	turret                  = true,

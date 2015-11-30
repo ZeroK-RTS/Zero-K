@@ -1,8 +1,8 @@
 include "constants.lua"
 
 --pieces
-local  base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
-	= piece( "base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
+local base, flare1, flare2, nozzle1, nozzle2, missile, rgun, lgun, rwing, lwing, rjet, ljet, body 
+	= piece("base", "flare1", "flare2", "nozzle1", "nozzle2", "missile", "rgun", "lgun", "rwing", "lwing", "rjet", "ljet", "body")
 
 local smokePiece = {base, rwing, lwing}
 
@@ -45,7 +45,6 @@ function SprintThread()
 		Sleep(33)
 	end
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", 1)
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 0.5)
 	GG.UpdateUnitAttributes(unitID)
 	
@@ -58,8 +57,7 @@ function Sprint()
 	Turn(lwing, y_axis, math.rad(-65), math.rad(300))
 
 	StartThread(SprintThread)
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)	
-	Spring.SetUnitRulesParam(unitID, "selfMaxAccelerationChange", BOOSTUP_FACTOR)	
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", SPEEDUP_FACTOR)
 	-- Spring.MoveCtrl.SetAirMoveTypeData(unitID, "maxAcc", 3)
 	GG.UpdateUnitAttributes(unitID)
 end
@@ -112,11 +110,11 @@ end
 function script.FireWeapon(num)
 	if num == 1 then
 		shotCycle = 1 - shotCycle
-		EmitSfx( flare[shotCycle], UNIT_SFX3 )
+		EmitSfx(flare[shotCycle], UNIT_SFX3)
 	elseif num == 2 then
-		EmitSfx( flare2, UNIT_SFX3 )
+		EmitSfx(flare2, UNIT_SFX3)
 	elseif num == 3 then
-		EmitSfx( missile, UNIT_SFX2 )
+		EmitSfx(missile, UNIT_SFX2)
 	end
 end
 

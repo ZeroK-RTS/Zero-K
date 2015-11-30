@@ -142,7 +142,7 @@ local function removeRoute(routeID)
 		transport[route.transporters[i]].routeTransportIndex = false
 		transport[route.transporters[i]].waypoint = 0
 		
-		WG.FerryUnits[unitID] = false
+		WG.FerryUnits[route.transporters[i]] = false
 	end
 	
 	ferryRoutes.route[routeID] = ferryRoutes.route[ferryRoutes.count]

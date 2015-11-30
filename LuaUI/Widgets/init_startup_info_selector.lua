@@ -24,8 +24,6 @@ local spGetGameRulesParam = Spring.GetGameRulesParam
 -- FIXME use tobool instead of this string comparison silliness
 local coop = (Spring.GetModOptions().coop == "1") or false
 local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
-local dotaMode = Spring.GetModOptions().zkmode == "dota"
-local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 
 local Chili
 local Window
@@ -274,7 +272,7 @@ function widget:Initialize()
 	vsx, vsy = widgetHandler:GetViewSizes()
 
 	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
-	if (not noComm) or dotaMode then
+	if (not noComm) then
 		buttonWindow = Window:New{
 			resizable = false,
 			draggable = false,
@@ -340,9 +338,7 @@ function widget:Gameframe(n)
 end
 
 function widget:GameStart()
-	if (not dotaMode) and (not ctfMode) then
-		screen0:RemoveChild(buttonWindow)
-	end
+	screen0:RemoveChild(buttonWindow)
 end
 
 --------------------------------------------------------------------------------

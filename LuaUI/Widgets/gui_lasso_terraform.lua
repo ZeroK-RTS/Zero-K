@@ -238,6 +238,12 @@ local function completelyStopCommand()
 	terraform_type = 0
 end
 
+local terraTag=-1
+function WG.Terraform_GetNextTag()
+	terraTag=terraTag + 1
+	return terraTag
+end
+
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
@@ -259,12 +265,13 @@ local function SendCommand()
 				i = i + 3
 			end
 					
-			i = i + 2
 			for j = 1, #constructor do
 				params[i] = constructor[j]
 				i = i + 1
 			end
 			
+			params[#params + 1] = WG.Terraform_GetNextTag()
+
 			local a,c,m,s = spGetModKeyState()
 			
 			if s then
@@ -293,11 +300,12 @@ local function SendCommand()
 				i = i + 2
 			end
 			
-			i = i + 2
 			for j = 1, #constructor do
 				params[i] = constructor[j]
 				i = i + 1
 			end
+			
+			params[#params + 1] = WG.Terraform_GetNextTag()
 			
 			local a,c,m,s = spGetModKeyState()
 			
@@ -1620,11 +1628,12 @@ function widget:KeyPress(key)
 			return true
 		end
 	end
-
+	
 	if key == KEYSYMS.SPACE and ( 
-		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle)) or 
-		(terraform_type == 4 and (setHeight or drawingRamp)) or 
-		(terraform_type == 5 and drawingLasso)
+		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or 
+		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or 
+		(terraform_type == 4 and (setHeight or drawingRamp or drawingRectangle)) or 
+		(terraform_type == 5 and (drawingLasso or drawingRectangle))
 	) then
 		volumeSelection = volumeSelection+1
 		if volumeSelection > 2 then
@@ -1857,7 +1866,7 @@ function widget:DrawScreen()
 		end
 	end
 	
-	if terraform_type == 1 or terraform_type == 4 or terraform_type == 5 then
+	if terraform_type == 1 or terraform_type == 3 or terraform_type == 4 or terraform_type == 5 then
 		if volumeSelection == 1 then
 			drawMouseText(-30,"Only raise")
 		elseif volumeSelection == 2 then

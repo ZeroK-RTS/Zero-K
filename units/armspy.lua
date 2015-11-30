@@ -1,7 +1,7 @@
 unitDef = {
   unitname              = [[armspy]],
   name                  = [[Infiltrator]],
-  description           = [[Spy, Anti-Heavy]],
+  description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
   brakeRate             = 0.3,
@@ -101,7 +101,6 @@ unitDef = {
       soundStart              = [[weapon/LightningBolt]],
       soundTrigger            = true,
       targetborder            = 1,
-      targetMoveError         = 0.2,
       texture1                = [[lightning]],
       thickness               = 10,
       tolerance               = 10000,

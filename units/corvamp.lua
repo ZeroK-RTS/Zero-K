@@ -41,6 +41,7 @@ unitDef = {
 	refuelturnradius = [[120]],
 
 	combat_slowdown = 0.5,
+	selection_scale = 1.4,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -90,7 +91,6 @@ unitDef = {
       areaOfEffect            = 12,
       avoidFriendly           = false,
       beamDecay               = 0.736,
-      beamlaser               = 1,
       beamTime                = 0.01,
       beamttl                 = 15,
       canattackground         = false,
@@ -118,7 +118,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 2.9,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 800,
       reloadtime              = 0.1,
       rgbColor                = [[0 1 1]],

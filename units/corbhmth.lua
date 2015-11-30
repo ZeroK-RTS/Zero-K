@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corbhmth]],
   name                          = [[Behemoth]],
-  description                   = [[Plasma Battery - Requires 50 Power]],
+  description                   = [[Plasma Artillery Battery - Requires 50 Power]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
@@ -109,7 +109,6 @@ unitDef = {
       soundHit                = [[explosion/ex_large4]],
       soundStart              = [[explosion/ex_large5]],
       sprayangle              = 1024,
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,

@@ -21,10 +21,10 @@ local SIG_AIM = 2
 local function WobbleUnit()
 	local wobble = true
 	while true do
-		if wobble == true  then
+		if wobble == true then
 			Move(base, y_axis, 1.2, 1.6)
 		end
-		if  wobble == false  then
+		if wobble == false then
 		
 			Move(base, y_axis, -1.2, 1.6)
 		end
@@ -100,51 +100,51 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 	
 		corpsetype = 1
-		Explode( body, sfxNone)
-		Explode( wake1, sfxNone)
-		Explode( wake2, sfxNone)
-		Explode( wake3, sfxNone)
-		Explode( wake4, sfxNone)
-		Explode( wake5, sfxNone)
-		Explode( wake6, sfxNone)
+		Explode(body, sfxNone)
+		Explode(wake1, sfxNone)
+		Explode(wake2, sfxNone)
+		Explode(wake3, sfxNone)
+		Explode(wake4, sfxNone)
+		Explode(wake5, sfxNone)
+		Explode(wake6, sfxNone)
 		return 1
 	end
-	if  severity <= 0.50  then
+	if severity <= 0.50 then
 	
 		corpsetype = 2
-		Explode( body, sfxNone)
-		Explode( turret, sfxShatter)
-		Explode( wake1, sfxFall)
-		Explode( wake2, sfxFall)
-		Explode( wake3, sfxFall)
-		Explode( wake4, sfxFall)
-		Explode( wake5, sfxFall)
-		Explode( wake6, sfxFall)
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		Explode(wake1, sfxFall)
+		Explode(wake2, sfxFall)
+		Explode(wake3, sfxFall)
+		Explode(wake4, sfxFall)
+		Explode(wake5, sfxFall)
+		Explode(wake6, sfxFall)
 		return 1
 	end
-	if  severity <= 0.99  then
+	if severity <= 0.99 then
 	
 		corpsetype = 3
-		Explode( body, sfxNone)
-		Explode( turret, sfxShatter)
-		Explode( wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode( wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(body, sfxNone)
+		Explode(turret, sfxShatter)
+		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end
-	Explode( body, sfxNone)
-	Explode( turret, sfxShatter)
-	Explode( wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode( wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(body, sfxNone)
+	Explode(turret, sfxShatter)
+	Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+	Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 end

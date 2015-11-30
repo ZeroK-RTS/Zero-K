@@ -29,6 +29,7 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
 local getMovetype = Spring.Utilities.getMovetype
 
 local placeBeaconCmdDesc = {
@@ -261,6 +262,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
 	
 	return false
 end
+
+local function Teleport_AllowCommand(unitID, unitDefID, cmdID, cmdParams, cmdOptions)
+	return gadget:AllowCommand(unitID, unitDefID, false, cmdID, cmdParams, cmdOptions)
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Create the beacon
@@ -431,12 +436,14 @@ function gadget:GameFrame(f)
 								Spring.MoveCtrl.Enable(teleportiee)
 								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
 								Spring.MoveCtrl.Disable(teleportiee)
+	
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
 							Spring.SpawnCEG("teleport_in", ux, uy, uz, 0, 0, 0, size)
 							
-							Spring.SetUnitMoveGoal(teleportiee, dx,0,dz)
+							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
+							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)
 							
 							Spring.GiveOrderToUnit(teleportiee,CMD.REMOVE, {cQueue[1].tag}, {})
 							
@@ -593,6 +600,8 @@ function gadget:Initialize()
 	GG.tele_deployTeleport = tele_deployTeleport
 	GG.tele_undeployTeleport = tele_undeployTeleport
 	GG.tele_createBeacon = tele_createBeacon
+	
+	GG.Teleport_AllowCommand = Teleport_AllowCommand
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -662,7 +671,7 @@ local function DrawWire(spec)
 		local bid = beacons[i]
 		local tid = Spring.GetUnitRulesParam(bid, "connectto")
 
-		if (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
+		if tid and (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
 			local point = {nil, nil, nil, nil}
 			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
 			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")

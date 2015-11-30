@@ -79,6 +79,9 @@ unitDef = {
         smoothradius = [[256]],
         detachmentradius = [[256]],
         smoothmult   = [[1]],
+
+		stats_hide_dps = 1, -- one use
+		stats_hide_reload = 1,
       },
 	  
       damage                  = {
@@ -91,13 +94,10 @@ unitDef = {
       fireStarter             = 0,
       flightTime              = 100,
       interceptedByShieldType = 1,
-      levelGround             = false,
       model                   = [[wep_seismic.s3o]],
       noSelfDamage            = true,
       range                   = 6000,
       reloadtime              = 10,
-      shakeduration           = [[4]],
-      shakemagnitude          = [[32]],
       smokeTrail              = false,
       soundHit                = [[explosion/ex_large4]],
       soundStart              = [[weapon/missile/tacnuke_launch]],

@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[corsilo]],
   name                          = [[Silencer]],
-  description                   = [[Nuclear ICBM Launcher, Drains 18 m/s, 3 minute stockpile]],
+  description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
   antiweapons                   = [[1]],
   bmcode                        = [[0]],
@@ -31,6 +31,7 @@ unitDef = {
 	helptext_pl    = [[Silencer to silos rakiet nuklearnych, ktore sa w stanie zniszczyc za jednym zamachem cale bazy, jednak moga zostac przechwycone przez tarcze antyrakietowa.]],
 	stockpiletime  = [[180]],
 	stockpilecost  = [[3240]],
+	priority_misc  = 1, -- Medium
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
@@ -79,7 +80,6 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 6,
       craterMult              = 6,
-      cruise                  = [[1]],
 
       damage                  = {
         default = 11501.1,
@@ -88,7 +88,7 @@ unitDef = {
       edgeEffectiveness       = 0.3,
       explosionGenerator      = [[custom:LONDON]],
       fireStarter             = 0,
-      flightTime              = 100,
+      flightTime              = 180,
       impulseBoost            = 0.5,
       impulseFactor           = 0.2,
       interceptedByShieldType = 65,
@@ -96,12 +96,8 @@ unitDef = {
       noSelfDamage            = false,
       range                   = 72000,
       reloadtime              = 5,
-      shakeduration           = [[3]],
-      shakemagnitude          = [[50]],
-      smokedelay              = [[0.1]],
       smokeTrail              = false,
       soundHit                = [[explosion/ex_ultra8]],
-      startsmoke              = [[1]],
       startVelocity           = 800,
       stockpile               = true,
       stockpileTime           = 10^5,

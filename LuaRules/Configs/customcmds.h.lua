@@ -24,6 +24,13 @@ CMD_NEWTON_FIREZONE = 10283
 CMD_STOP_NEWTON_FIREZONE = 10284
 CMD_FACTORY_GUARD = 13921
 CMD_AREA_GUARD = 13922
+CMD_ORBIT = 13923
+
+-- CMD_CIRCLE_GUARD_DRAW is an evil on the order of CMD.SET_WANTED_MAX_SPEED.
+-- It is required because CMD_CIRCLE_GUARD needs two parameters but this
+-- causes it to not draw in the command queue.
+-- See https://springrts.com/mantis/view.php?id=4931
+CMD_ORBIT_DRAW = 13924
 
 CMD_AREA_MEX = 30100
 CMD_STEALTH = 31100
@@ -43,7 +50,6 @@ CMD_UNIT_FLOAT_STATE = 33412
 CMD_PRIORITY = 34220
 CMD_MISC_PRIORITY = 34221
 CMD_RETREAT = 34223
-CMD_SCAN_SWEEP = 34273 -- unit_scan_sweep
 CMD_UNIT_BOMBER_DIVE_STATE = 34281  -- bomber dive
 CMD_AP_FLY_STATE = 34569	-- unit_air_plants
 CMD_AP_AUTOREPAIRLEVEL = 34570	-- unit_air_plants
@@ -55,8 +61,6 @@ CMD_PLACE_BEACON = 35170
 CMD_WAIT_AT_BEACON = 35171
 CMD_ABANDON_PW = 35200
 CMD_ANTINUKEZONE = 35130	-- ceasefire
-CMD_DROP_FLAG = 35300	-- capture_the_flag.lua gui_chili_ctf.lua
-CMD_AUTOECO = 35301	-- gui_oremex.lua
 CMD_UNIT_KILL_SUBORDINATES = 35821	-- unit_capture
 CMD_UNIT_AI = 36214
 CMD_WANT_CLOAK = 37382

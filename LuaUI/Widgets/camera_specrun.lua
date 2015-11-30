@@ -363,21 +363,9 @@ end
 --------------------------------------------------------------------------------
 
 local function cleanUI()
-	Spring.SendCommands({
-		--"resbar 0",
-		--"minimap minimize 0",
-		--"tooltip 0",
-		--"showhealthbars 1",
-	})
 end
 
 local function restoreUI()
-	Spring.SendCommands({
-		--"resbar 1",
-		--"minimap minimize 0",
-		--"tooltip 1",
-		--"showhealthbars 1",
-	})
 end
 
 local theKey_functions = {
@@ -586,9 +574,7 @@ local theKey_functions = {
 					Spring.SendCommands({
 						"viewta", --set camera view to TA mode
 					}) 
-					
-					restoreUI()
-					
+
 					local vsx, vsy = widgetHandler:GetViewSizes()
 					Spring.WarpMouse(vsx * 0.5, vsy * 0.5)
 				end

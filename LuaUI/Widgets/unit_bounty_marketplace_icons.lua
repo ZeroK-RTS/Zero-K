@@ -107,7 +107,8 @@ end
 
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	
+	if not Spring.IsUnitAllied(unitID) then return end
+
 	for _,iconType in ipairs( iconTypes ) do
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			WG.icons.SetUnitIcon( unitID, {name=iconType.. teamID, texture=nil} )

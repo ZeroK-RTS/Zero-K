@@ -2,6 +2,7 @@ unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
+  acceleration                  = 0,
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,
@@ -34,8 +35,8 @@ unitDef = {
 
   damageModifier                = 0.25,
   explodeAs                     = [[SMALL_BUILDINGEX]],
-  footprintX                    = 2,
-  footprintZ                    = 2,
+  footprintX                    = 3,
+  footprintZ                    = 3,
   iconType                      = [[defense]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -62,7 +63,6 @@ unitDef = {
   sightDistance                 = 660,
   smoothAnim                    = true,
   useBuildingGroundDecal        = true,
-  yardmap                       = [[oooo]],
 
   weapons                       = {
 
@@ -89,8 +89,8 @@ unitDef = {
       craterMult              = 0,
 
       damage                  = {
-        default = 200,
-        planes  = 200,
+        default = 200.1,
+        planes  = 200.1,
       },
 
       customParams = {

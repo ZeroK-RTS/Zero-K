@@ -44,7 +44,7 @@ local unitIsUnarmed = {}
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local weapons = ud.weapons
-	if not weapons or #weapons == 0 then
+	if (not weapons or #weapons == 0) and not ud.canKamikaze then
 		unitIsUnarmed[i] = true
 	end
 end
@@ -130,6 +130,16 @@ for i=1, #baseUnitPriority do
 end
 --]]
 
+-- Generate transport unit table
+local transportMult = {}
+
+for uid = 1, #UnitDefs do
+	local ud = UnitDefs[uid]
+	if ud.isTransport then
+		transportMult[uid] = 0.98 -- Priority multiplier for transported unit.
+	end
+end
+
 -- Generate full target table
 local targetTable = {}
 
@@ -152,4 +162,4 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable, captureWeaponDefs
+return targetTable, captureWeaponDefs, transportMult

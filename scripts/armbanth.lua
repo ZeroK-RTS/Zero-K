@@ -50,25 +50,25 @@ local smokePiece = { torso, rarmgun, larm_rgunclaw }
 --signals
 local SIG_Restore = 1
 local SIG_Walk = 2
-local SIG_Aim  = 4
-local SIG_Aim2  = 8
-local SIG_Aim3  = 16
+local SIG_Aim = 4
+local SIG_Aim2 = 8
+local SIG_Aim3 = 16
 local SIG_Idle = 32
 local armgun = false
 local missilegun = 1
 local PACE = 1.4
 
-local LEG_FRONT_ANGLES    = { thigh=math.rad(-35), shin=math.rad(  5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
-local LEG_FRONT_SPEEDS    = { thigh=math.rad( 90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_FRONT_ANGLES	= { thigh=math.rad(-35), shin=math.rad(5), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(25) }
+local LEG_FRONT_SPEEDS	= { thigh=math.rad(90)*PACE, shin=math.rad(150)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_STRAIGHT_ANGLES = { thigh=math.rad( -6), shin=math.rad(6), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
-local LEG_STRAIGHT_SPEEDS = { thigh=math.rad( 90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_STRAIGHT_ANGLES = { thigh=math.rad(-6), shin=math.rad(6), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_STRAIGHT_SPEEDS = { thigh=math.rad(90)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BACK_ANGLES     = { thigh=math.rad( 25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
-local LEG_BACK_SPEEDS     = { thigh=math.rad( 72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
+local LEG_BACK_ANGLES	 = { thigh=math.rad(25), shin=math.rad(5), foot=math.rad(0), toef=math.rad(-25), toeb=math.rad(0) }
+local LEG_BACK_SPEEDS	 = { thigh=math.rad(72)*PACE, shin=math.rad(90)*PACE, foot=math.rad(90)*PACE, toef=math.rad(90)*PACE, toeb=math.rad(90)*PACE }
 
-local LEG_BENT_ANGLES     = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
-local LEG_BENT_SPEEDS     = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
+local LEG_BENT_ANGLES	 = { thigh=math.rad(-30), shin=math.rad(95), foot=math.rad(0), toef=math.rad(0), toeb=math.rad(0) }
+local LEG_BENT_SPEEDS	 = { thigh=math.rad(120)*PACE, shin=math.rad(280)*PACE, foot=math.rad(90)*PACE, toef=math.rad(800)*PACE, toeb=math.rad(60)*PACE }
 
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(15)*PACE
@@ -100,10 +100,10 @@ local reloadTimeShort = wd and WeaponDefs[wd].reload*30 or 30
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function script.Create()
-	Turn( larm, z_axis, -0.1)
-	Turn( rarm, z_axis, 0.1)	
-	Turn( lmissileflare, z_axis, math.rad(-90))
-	Turn( rmissileflare, z_axis, math.rad(-90))	
+	Turn(larm, z_axis, -0.1)
+	Turn(rarm, z_axis, 0.1)	
+	Turn(lmissileflare, z_axis, math.rad(-90))
+	Turn(rmissileflare, z_axis, math.rad(-90))	
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -121,8 +121,8 @@ local function IdleAnim()
 			Turn(head, y_axis, math.rad(-30), math.rad(60))
 		end
 		armgun = not armgun
-		Turn(arm,  x_axis, math.rad(-20), math.rad(45))
-		Turn(shoulder,  x_axis, math.rad(-20), math.rad(45))
+		Turn(arm, x_axis, math.rad(-20), math.rad(45))
+		Turn(shoulder, x_axis, math.rad(-20), math.rad(45))
 		Sleep(2000)
 		Turn(lclaw, y_axis, math.rad(30), math.rad(180))
 		Turn(rclaw, y_axis, math.rad(-30), math.rad(180))
@@ -130,8 +130,8 @@ local function IdleAnim()
 		Turn(lclaw, y_axis, 0, math.rad(180))
 		Turn(rclaw, y_axis, 0, math.rad(180))
 		Sleep(2000)
-		Turn(arm,  x_axis, 0, math.rad(60))
-		Turn(shoulder,  x_axis, 0, math.rad(60))
+		Turn(arm, x_axis, 0, math.rad(60))
+		Turn(shoulder, x_axis, 0, math.rad(60))
 		Turn(head, y_axis, 0, math.rad(60))
 		Sleep(6500)
 	end
@@ -152,16 +152,16 @@ local function Step(frontLeg, backLeg)
 	if not(isFiring) then
 		if (frontLeg == leftLeg) then
 			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
-			Turn(larmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
-			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
-			Turn(rarmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
+			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(larmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(rarmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		else
 			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
-			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
-			Turn(larmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED )
-			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
-			Turn(rarmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED )
+			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(larmgun, x_axis, -ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
+			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+			Turn(rarmgun, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
 	end
 
@@ -193,14 +193,14 @@ end
 
 
 local function Walk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 
 	-- tilt arms out a bit so they don't scrape body
-	Turn(larm, z_axis, ARM_SIDE_ANGLE, ARM_BACK_SPEED )
-	Turn(rarm, z_axis, -ARM_SIDE_ANGLE, ARM_FRONT_SPEED )
+	Turn(larm, z_axis, ARM_SIDE_ANGLE, ARM_BACK_SPEED)
+	Turn(rarm, z_axis, -ARM_SIDE_ANGLE, ARM_FRONT_SPEED)
 
-	while ( true ) do
+	while (true) do
 		-- left leg
 		Step(leftLeg, rightLeg)
 		-- right leg
@@ -210,8 +210,8 @@ local function Walk()
 end
 
 local function StopWalk()
-	Signal( SIG_Walk )
-	SetSignalMask( SIG_Walk )
+	Signal(SIG_Walk)
+	SetSignalMask(SIG_Walk)
 
 	-- straighten legs
 	for i, p in pairs(leftLeg) do
@@ -230,8 +230,8 @@ local function StopWalk()
 		Turn(torso, y_axis, 0, 4)
 		Move(pelvis, y_axis, 0, 4)
 		Turn(pelvis, z_axis, 0, 1)
-		Turn(larm, z_axis, 0, 1 )
-		Turn(rarm, z_axis, 0, 1 )
+		Turn(larm, z_axis, 0, 1)
+		Turn(rarm, z_axis, 0, 1)
 		Turn(rarmgun, x_axis, 0, 1)
 		Turn(larmgun, x_axis, 0, 1)
 		StartThread(IdleAnim)
@@ -240,11 +240,11 @@ end
 
 function script.StartMoving()
 	Signal(SIG_Idle)
-	StartThread( Walk )
+	StartThread(Walk)
 end
 
 function script.StopMoving()
-	StartThread( StopWalk )
+	StartThread(StopWalk)
 end
 
 
@@ -252,21 +252,21 @@ local function RestoreAfterDelay()
 	Signal(SIG_Restore)
 	SetSignalMask(SIG_Restore)
 	Sleep(6000)
-	Turn( head, y_axis, 0, 3 )
-	Turn( torso, y_axis, 0, 3 )
-	Turn( larm, x_axis, 0, 3 )
-	Turn( rarm, x_axis, 0, 3 )
+	Turn(head, y_axis, 0, 3)
+	Turn(torso, y_axis, 0, 3)
+	Turn(larm, x_axis, 0, 3)
+	Turn(rarm, x_axis, 0, 3)
 	isFiring = false
 	StartThread(IdleAnim)
 end
 
 
 local function missilelaunch()
-		Hide ( lmissiles )
-		Hide ( rmissiles )
+		Hide (lmissiles)
+		Hide (rmissiles)
 		Sleep(30000)
-		Show ( lmissiles )
-		Show ( rmissiles )
+		Show (lmissiles)
+		Show (rmissiles)
 end
 
 local function armrecoil()
@@ -318,27 +318,27 @@ function script.AimFromWeapon(num)
 	end
 end
 
-function script.AimWeapon(num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Idle)
 	if num == 1 then
-		Signal( SIG_Aim )
-		SetSignalMask( SIG_Aim )
-		Turn( head, y_axis, heading, 3 )
-		Turn( headflare, x_axis, -pitch, 3 )
-		WaitForTurn( head, y_axis )
-		WaitForTurn( headflare, x_axis )
+		Signal(SIG_Aim)
+		SetSignalMask(SIG_Aim)
+		Turn(head, y_axis, heading, 3)
+		Turn(headflare, x_axis, -pitch, 3)
+		WaitForTurn(head, y_axis)
+		WaitForTurn(headflare, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 2 then
-		Signal( SIG_Aim2 )
-		SetSignalMask( SIG_Aim2 )
+		Signal(SIG_Aim2)
+		SetSignalMask(SIG_Aim2)
 		isFiring = true
 		
-		Turn( torso, y_axis, heading, 3 )
-		Turn( larm, x_axis, -pitch, 3 )
-		Turn( rarm, x_axis, -pitch, 3 )
-		WaitForTurn( torso, y_axis )
-		WaitForTurn( larm, x_axis )
+		Turn(torso, y_axis, heading, 3)
+		Turn(larm, x_axis, -pitch, 3)
+		Turn(rarm, x_axis, -pitch, 3)
+		WaitForTurn(torso, y_axis)
+		WaitForTurn(larm, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true	
 	elseif num == 3 then

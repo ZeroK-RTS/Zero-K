@@ -89,6 +89,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customparams = {
+		stats_hide_dps = 1, -- one use
+		stats_hide_reload = 1,
+	  },
+	  
       damage                  = {
         default = 40,
         planes  = 40,
@@ -106,13 +111,11 @@ unitDef = {
       model                   = [[wep_b_fabby.s3o]],
       range                   = 115,
       reloadtime              = 20,
-      smokedelay              = [[.1]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med5]],
       soundHitVolume          = 8,
       soundStart              = [[weapon/missile/sabot_fire]],
       soundStartVolume        = 7,
-      startsmoke              = [[1]],
       startVelocity           = 50,
       texture2                = [[darksmoketrail]],
       tracks                  = true,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[spherecloaker]],
   name                   = [[Eraser]],
-  description            = [[Cloaker/Jammer Walker]],
+  description            = [[Area Cloaker/Jammer Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.25,
@@ -34,6 +34,8 @@ unitDef = {
     area_cloak_upkeep = 15,
     area_cloak_radius = 440,
     area_cloak_decloak_distance = 75,
+	
+	priority_misc = 2, -- High
   },
 
   energyUse              = 1.5,
@@ -52,6 +54,7 @@ unitDef = {
   objectName             = [[spherecloaker.s3o]],
   onoffable              = true,
   pushResistant          = 0,
+  script                 = [[spherecloaker.lua]],
   radarDistanceJam       = 440,
   seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],

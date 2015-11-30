@@ -86,15 +86,15 @@ end
 
 local function RestoreAfterDelay()
 	Sleep(restore_delay)
-	Turn( turret , y_axis, 0, math.rad(90) )
-	Turn( gun , x_axis, 0, math.rad(90) )
+	Turn(turret, y_axis, 0, math.rad(90))
+	Turn(gun, x_axis, 0, math.rad(90))
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
-	Turn( turret , y_axis, heading, math.rad(450) )
-	Turn( gun , x_axis, -pitch, math.rad(180) )
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	Turn(turret, y_axis, heading, math.rad(450))
+	Turn(gun, x_axis, -pitch, math.rad(180))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	StartThread(RestoreAfterDelay)
@@ -111,7 +111,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(gun, sfxNone)
 		Explode(body, sfxNone)
 		Explode(br, sfxNone)
@@ -122,7 +122,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(fl, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(gun, sfxFall)
 		Explode(body, sfxNone)
 		Explode(br, sfxFall)
@@ -133,27 +133,27 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(fl, sfxFall)
 		Explode(turret, sfxShatter)
 		return 1
-	elseif severity <= .99  then
-		Explode(gun, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+	elseif severity <= .99 then
+		Explode(gun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxNone)
-		Explode(br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(turret, sfxShatter)
 		return 2
 	else
-		Explode(gun, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+		Explode(gun, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxNone)
-		Explode(br, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(mr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(fr, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(bl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(ml, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(fl, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(turret, sfxShatter + sfxExplode )
+		Explode(br, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(mr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(fr, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(bl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(ml, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(fl, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(turret, sfxShatter + sfxExplode)
 		return 2
 	end
 end

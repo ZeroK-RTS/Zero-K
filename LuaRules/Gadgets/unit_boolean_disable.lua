@@ -227,3 +227,27 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		removeUnitID(unitID, paraUnits, paraUnitID)
 	end
 end
+
+--helps removing "disarmed" attribute from unit upon gadget reload
+local function InitReload()
+	local spGetUnitRulesParam = Spring.GetUnitRulesParam
+	local gameFrame = Spring.GetGameFrame()
+	local allUnits = Spring.GetAllUnits()
+	for _, unitID in pairs(allUnits) do
+		local disarmFrame = spGetUnitRulesParam(unitID, "disarmframe")
+		if (disarmFrame and gameFrame == -1) then disarmFrame = gameFrame end
+		
+		if disarmFrame then
+			if disarmFrame > gameFrame + DECAY_FRAMES then --fully disarmed
+				addUnitID(unitID, paraUnits, paraUnitID, disarmFrame - DECAY_FRAMES, DECAY_FRAMES)
+			elseif disarmFrame > gameFrame then --partially disarmed
+				removeEffect(unitID)
+				addUnitID(unitID, partialUnits, partialUnitID, disarmFrame, 0)
+			end
+		end
+	end
+end
+
+function gadget:Initialize()
+	InitReload()
+end

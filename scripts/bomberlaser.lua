@@ -10,12 +10,12 @@ include "constants.lua"
 include "bombers.lua"
 
 local function Lights()
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(400)
 	end
 	while true do
-		EmitSfx( wingtipl,  1025 )
-		EmitSfx( wingtipr,  1026 )
+		EmitSfx(wingtipl, 1025)
+		EmitSfx(wingtipr, 1026)
 		Sleep(2000)
 	end
 end
@@ -38,21 +38,21 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(body, sfxNone)
 		Explode(jet, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(body, sfxNone)
 		Explode(jet, sfxShatter)
 		return 1
-	elseif severity <= 99  then
+	elseif severity <= 99 then
 		Explode(body, sfxShatter)
-		Explode(jet, sfxFall + sfxSmoke  + sfxFire + sfxExplode)
+		Explode(jet, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
 		Explode(body, sfxShatter)
-		Explode(jet, sfxFall + sfxSmoke  + sfxFire + sfxExplode)
+		Explode(jet, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	end
 end

@@ -117,10 +117,16 @@ function gadget:UnitCreated(unitID, unitDefID)
 		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
 			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
+			
+			local shieldRegen = shieldWep.shieldPowerRegen
+			if shieldRegen == 0 and shieldWep.customParams and shieldWep.customParams.shield_rate then
+				shieldRegen = tonumber(shieldWep.customParams.shield_rate)
+			end
+			
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
 				shieldRadius = shieldWep.shieldRadius,
-				shieldRegen  = shieldWep.shieldPowerRegen,
+				shieldRegen  = shieldRegen,
 				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
 				unitDefID    = unitDefID,
 				neighbors    = {},
@@ -196,18 +202,18 @@ function QueueLinkUpdate(allyTeamID,unitID)
 	updateLink[allyTeamID][unitID] = true
 end
 
--- check if working unit so it can be used for shield link
+-- Check if working unit so it can be used for shield link
 local function IsEnabled(unitID)
-	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	if stunned_or_inbuild or (spGetUnitRulesParam(unitID, "disarmed") == 1) then
+	local enabled = spGetUnitShieldState(unitID)
+	if not enabled then
 		return false
 	end
-	local active = spGetUnitIsActive(unitID)
-	if active ~= nil then
-		return active
-	else
-		return true
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	if stunned_or_inbuild then
+		return false
 	end
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	return att_enabled
 end
 
 local function ShieldsAreTouching(shield1, shield2)

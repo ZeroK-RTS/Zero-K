@@ -111,7 +111,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -130,23 +130,23 @@ local function RestoreLegs()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 
-	Move( pelvis , y_axis, 0 , 1 )
-	Turn( rthigh , x_axis, 0, math.rad(200) )
-	Turn( rleg , x_axis, 0, math.rad(200) )
-	Turn( lthigh , x_axis, 0, math.rad(200) )
-	Turn( lleg , x_axis, 0, math.rad(200) )
+	Move(pelvis, y_axis, 0, 1)
+	Turn(rthigh, x_axis, 0, math.rad(200))
+	Turn(rleg, x_axis, 0, math.rad(200))
+	Turn(lthigh, x_axis, 0, math.rad(200))
+	Turn(lleg, x_axis, 0, math.rad(200))
 end
 
 
 function script.Create()
-	Hide( lfirept)
-	Hide( rbigflash)
-	Hide( nanospray)
+	Hide(lfirept)
+	Hide(rbigflash)
+	Hide(nanospray)
 	
-	Turn( luparm , x_axis, math.rad(30) )
-	Turn( ruparm , x_axis, math.rad(-10) )
-	Turn( biggun , x_axis, math.rad(41) )
-	Turn( nanolathe , x_axis, math.rad(36) )
+	Turn(luparm, x_axis, math.rad(30))
+	Turn(ruparm, x_axis, math.rad(-10))
+	Turn(biggun, x_axis, math.rad(41))
+	Turn(nanolathe, x_axis, math.rad(36))
 	
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
@@ -178,17 +178,17 @@ end
 
 function script.FireWeapon(num) 
 	if num == 5 then
-		EmitSfx( lfirept,  1024 )
+		EmitSfx(lfirept, 1024)
 	elseif num == 3 then
-		EmitSfx( rbigflash,  1026 )
+		EmitSfx(rbigflash, 1026)
 	end
 end
 
 function script.Shot(num) 
 	if num == 5 then
-		EmitSfx( lfirept,  1025 )
+		EmitSfx(lfirept, 1025)
 	elseif num == 3 then
-		EmitSfx( rbigflash,  1027 )
+		EmitSfx(rbigflash, 1027)
 	end
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
@@ -196,39 +196,39 @@ function script.Shot(num)
 end
 
 local function RestoreLaser()
-	Signal( SIG_RESTORE_LASER)
-	SetSignalMask( SIG_RESTORE_LASER)
+	Signal(SIG_RESTORE_LASER)
+	SetSignalMask(SIG_RESTORE_LASER)
 	Sleep(RESTORE_DELAY_LASER)
 	isLasering = false
-	Turn( luparm , x_axis, 0, ARM_SPEED_PITCH )
-	Turn( biggun , x_axis, math.rad(41), ARM_SPEED_PITCH  )
+	Turn(luparm, x_axis, 0, ARM_SPEED_PITCH)
+	Turn(biggun, x_axis, math.rad(41), ARM_SPEED_PITCH)
 	if not isDgunning then 
-		Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW) 
+		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) 
 	end
 end
 
 local function RestoreDgun()
-	Signal( SIG_RESTORE_DGUN)
-	SetSignalMask( SIG_RESTORE_DGUN)
+	Signal(SIG_RESTORE_DGUN)
+	SetSignalMask(SIG_RESTORE_DGUN)
 	Sleep(RESTORE_DELAY_DGUN)
 	isDgunning = false
-	Turn( ruparm , x_axis, restorePitch, ARM_SPEED_PITCH )
-	Turn( nanolathe , x_axis, math.rad(36), ARM_SPEED_PITCH )
+	Turn(ruparm, x_axis, restorePitch, ARM_SPEED_PITCH)
+	Turn(nanolathe, x_axis, math.rad(36), ARM_SPEED_PITCH)
 	if not isLasering then 
-		Turn( torso , y_axis, restoreHeading, TORSO_SPEED_YAW) 
+		Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW) 
 	end
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num >= 5 then
-		Signal( SIG_LASER)
-		SetSignalMask( SIG_LASER)
+		Signal(SIG_LASER)
+		SetSignalMask(SIG_LASER)
 		isLasering = true
 		if not isDgunning then 
-			Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
+			Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
 		end
-		Turn( luparm , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
-		Turn( nanolathe , x_axis, math.rad(0) , ARM_SPEED_PITCH )
+		Turn(luparm, x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH)
+		Turn(nanolathe, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(luparm, x_axis)
 		StartThread(RestoreLaser)
@@ -237,12 +237,12 @@ function script.AimWeapon(num, heading, pitch)
 		if starBLaunchers[num] then
 			pitch = ARM_PERPENDICULAR
 		end
-		Signal( SIG_DGUN)
-		SetSignalMask( SIG_DGUN)
+		Signal(SIG_DGUN)
+		SetSignalMask(SIG_DGUN)
 		isDgunning = true
-		Turn( torso , y_axis, heading, TORSO_SPEED_YAW )
-		Turn( ruparm , x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH )
-		Turn( biggun , x_axis, math.rad(0) , ARM_SPEED_PITCH )
+		Turn(torso, y_axis, heading, TORSO_SPEED_YAW)
+		Turn(ruparm, x_axis, math.rad(0) - pitch, ARM_SPEED_PITCH)
+		Turn(biggun, x_axis, math.rad(0), ARM_SPEED_PITCH)
 		WaitForTurn(torso, y_axis)
 		WaitForTurn(ruparm, x_axis)
 		StartThread(RestoreDgun)
@@ -261,7 +261,7 @@ function script.StopBuilding()
 end
 
 function script.StartBuilding(heading, pitch) 
-	Turn( ruparm , x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH )
+	Turn(ruparm, x_axis, math.rad(-30) - pitch, ARM_SPEED_PITCH)
 	if not (isDgunning) then Turn(torso, y_axis, heading, TORSO_SPEED_YAW) end
 	restoreHeading, restorePitch = heading, pitch
 	SetUnitValue(COB.INBUILDSTANCE, 1)

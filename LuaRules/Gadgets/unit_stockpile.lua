@@ -25,6 +25,8 @@ include("LuaRules/Configs/constants.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local PERIOD = 6
+
 local spGetUnitStockpile  = Spring.GetUnitStockpile
 local spSetUnitStockpile  = Spring.SetUnitStockpile
 local spGetUnitIsStunned  = Spring.GetUnitIsStunned
@@ -42,18 +44,23 @@ for i=1,#UnitDefs do
 		local stockTime = tonumber(udef.customParams.stockpiletime)*TEAM_SLOWUPDATE_RATE
 		local stockCost = tonumber(udef.customParams.stockpilecost)
 		stockpileUnitDefID[i] = {
-			stockTime = stockTime,
+			stockUpdates = stockTime/PERIOD,
 			stockCost = stockCost,
 			stockDrain = TEAM_SLOWUPDATE_RATE*stockCost/stockTime,
-			resTable = {
-				m = stockCost/stockTime,
-				e = stockCost/stockTime
-			}
+			perUpdateCost = PERIOD * stockCost/stockTime,
 		}
 	end
 end
 
+local function GetStockSpeed(unitID)
+	return (1 - (spGetUnitRulesParam(unitID,"slowState") or 0))
+end
+
 function gadget:GameFrame(n)
+	if n%PERIOD ~= 0 then
+		return
+	end
+
 	for i = 1, units.count do
 		local unitID = units.data[i]
 		local data = unitsByID[unitID]
@@ -61,29 +68,49 @@ function gadget:GameFrame(n)
 		local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
 		local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
 		local def = stockpileUnitDefID[data.unitDefID]
-		if (not (stunned_or_inbuild or disarmed)) and queued > stocked  then
-			if not data.active then
+		local queue = Spring.GetCommandQueue(unitID, 1)
+		local isWaiting = queue and queue[1] and (queue[1].id == CMD.WAIT)
+		if (not (stunned_or_inbuild or disarmed)) and queued > stocked and not (isWaiting and (def.stockCost > 0)) then
+			
+			local newStockSpeed = GetStockSpeed(unitID)
+			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain)
+					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
 				end
-				data.active = true
+				data.stockSpeed = newStockSpeed
 			end
 
-			if (def.stockCost == 0) or (GG.CheckMiscPriorityBuildStep(unitID, data.teamID, def.resTable.m) and spUseUnitResource(unitID, def.resTable)) then
-				data.progress = data.progress - 1
-				if data.progress == 0 then
+			if (def.stockCost > 0) then
+				local scale = GG.GetMiscPrioritySpendScale(unitID, data.teamID)
+				newStockSpeed = newStockSpeed*scale
+				data.resTable.m = def.perUpdateCost*newStockSpeed
+				data.resTable.e = data.resTable.m
+			end
+			
+			if (def.stockCost == 0) or spUseUnitResource(unitID, data.resTable) then
+				data.progress = data.progress - newStockSpeed
+				if data.progress <= 0 then
 					spSetUnitStockpile(unitID, stocked + 1)
-					data.progress = def.stockTime
+					data.progress = def.stockUpdates
 				end
-				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockTime-data.progress)/def.stockTime)
+				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockUpdates-data.progress)/def.stockUpdates)
 			end
 		else
-			if data.active then
+			if data.stockSpeed ~= 0 then
 				if def.stockCost > 0 then
 					GG.StopMiscPriorityResourcing(unitID,data.teamID)
 				end
-				data.active = false
+				data.stockSpeed = 0
 			end
+		end
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
+		local def = stockpileUnitDefID[unitDefID]
+		if def.stockCost > 0 then
+			GG.AddMiscPriorityUnit(unitID, teamID)
 		end
 	end
 end
@@ -95,19 +122,20 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		units.data[units.count] = unitID
 		unitsByID[unitID] = {
 			id = units.count, --the "id" is the index in units.data table
-			progress = def.stockTime, 
+			progress = def.stockUpdates, 
 			unitDefID = unitDefID, 
 			teamID = teamID, 
-			active = false
+			stockSpeed = 0, 
+			resTable = {
+				m = def.perUpdateCost,
+				e = def.perUpdateCost
+			}
 		}
-		if def.stockCost > 0 then
-			GG.AddMiscPriorityUnit(unitID, teamID)
-		end
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
-	if stockpileUnitDefID[unitDefID] then
+	if unitsByID[unitID] then
 		units.data[unitsByID[unitID].id] = units.data[units.count]
 		unitsByID[units.data[units.count]].id = unitsByID[unitID].id --shift last entry into empty space
 		units.data[units.count]	= nil
@@ -119,7 +147,7 @@ end
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if unitsByID[unitID] then
 		unitsByID[unitID].teamID = teamID
-		unitsByID[unitID].active = false
+		unitsByID[unitID].stockSpeed = 0
 	end
 end
 
@@ -128,6 +156,7 @@ function gadget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
 		gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end

@@ -82,7 +82,6 @@ unitDef = {
   sightDistance          = 520,
   smoothAnim             = true,
   speedToFront           = 0,
-  stealth                = true,
   turnRate               = 9001,
   turnRadius             = 90,
 
@@ -120,7 +119,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 500,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],

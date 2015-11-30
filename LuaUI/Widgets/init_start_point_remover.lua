@@ -36,7 +36,7 @@ function widget:GameFrame(f)
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				Spring.MarkerErasePosition(x, y, z)
 				if WG.COFC_SetCameraTarget then
-					WG.COFC_SetCameraTarget(x, y, z, 1, 1000)
+					WG.COFC_SetCameraTarget(x, y, z, 1, true, 1000)
 				else 
 					Spring.SetCameraTarget(x, y, z)
 				end

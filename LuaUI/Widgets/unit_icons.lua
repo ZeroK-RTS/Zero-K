@@ -324,6 +324,15 @@ local function DrawWorldFunc()
 	glDepthMask(false)
 end
 
+function widget:DrawWorld()
+	DrawWorldFunc()
+end
+
+function widget:DrawWorldRefraction()
+	DrawWorldFunc()
+end
+
+
 -- drawscreen method
 -- the problem with this one is it draws at same size regardless of how far away the unit is
 --[[

@@ -404,7 +404,7 @@ for name, data in pairs(commDefs) do
 
 	-- set morph time
 	if data.customparams.morphto then
-		local morph_time = (commDefs[data.customparams.morphto].buildtime - data.buildtime) / (5 * (data.customparams.level + 1))
+		local morph_time = (commDefs[data.customparams.morphto].buildtime - data.buildtime) / (5 * (data.customparams.level + 2))
 		data.customparams.morphtime = tostring(math.floor(morph_time))
 	end
 end

@@ -21,22 +21,22 @@ local RESTORE_DELAY = 3000
 
 local function WobbleUnit()
 	while true do
-		Move( base , y_axis, 0.8 , 1.2)
+		Move(base, y_axis, 0.8, 1.2)
 		Sleep(750)
-		Move( base , y_axis, -0.80 , 1.2)
+		Move(base, y_axis, -0.80, 1.2)
 		Sleep(750)
 	end
 end
 
 function HitByWeaponThread(x, z)
-	Signal( SIG_HIT)
-	SetSignalMask( SIG_HIT)
-	Turn( base , z_axis, math.rad(-z), math.rad(105))
-	Turn( base , x_axis, math.rad(x ), math.rad(105))
+	Signal(SIG_HIT)
+	SetSignalMask(SIG_HIT)
+	Turn(base, z_axis, math.rad(-z), math.rad(105))
+	Turn(base, x_axis, math.rad(x), math.rad(105))
 	WaitForTurn(base, z_axis)
 	WaitForTurn(base, x_axis)
-	Turn( base , z_axis, 0, math.rad(30))
-	Turn( base , x_axis, 0, math.rad(30))
+	Turn(base, z_axis, 0, math.rad(30))
+	Turn(base, x_axis, 0, math.rad(30))
 end
 
 --[[
@@ -47,7 +47,7 @@ end
 
 local function MoveScript()
 	while true do 
-		if math.random() < 0.5  then
+		if math.random() < 0.5 then
 			EmitSfx(wake1, 5)
 			EmitSfx(wake3, 5)
 			EmitSfx(wake5, 5)
@@ -67,8 +67,8 @@ local function MoveScript()
 			EmitSfx(wake8, 3)
 		end
 	
-		EmitSfx( ground1,  1024+0 )
-		Sleep( 150)
+		EmitSfx(ground1, 1024+0)
+		Sleep(150)
 	end
 end
 
@@ -83,10 +83,10 @@ function script.Create()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
-	Turn( barrel , y_axis, heading, math.rad(300.000000) )
-	Turn( barrel , x_axis, -pitch, math.rad(300.000000) )
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	Turn(barrel, y_axis, heading, math.rad(300.000000))
+	Turn(barrel, x_axis, -pitch, math.rad(300.000000))
 	WaitForTurn(barrel, y_axis)
 	WaitForTurn(barrel, x_axis)
 	return true
@@ -102,7 +102,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(base, sfxNone)
 		Explode(wake1, sfxNone)
 		Explode(wake2, sfxNone)
@@ -111,7 +111,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(wake5, sfxNone)
 		Explode(wake6, sfxNone)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(base, sfxNone)
 		Explode(wake1, sfxFall)
 		Explode(wake2, sfxFall)

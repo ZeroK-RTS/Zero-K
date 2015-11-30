@@ -44,7 +44,7 @@ local function RestoreAfterDelay()
 	StartThread(IdleAnim)
 end
 
-function script.AimWeapon(num, heading, pitch )
+function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_Idle)
 	Signal(SIG_Aim)
 	SetSignalMask(SIG_Aim)

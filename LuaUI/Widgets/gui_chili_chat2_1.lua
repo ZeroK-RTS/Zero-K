@@ -576,7 +576,7 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
-	string.find(msg.argument,'resigned and is now spectating') or
+	string.find(msg.argument,'resigned') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
 	string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
 end
@@ -949,6 +949,7 @@ function widget:Initialize()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	stack_console = WG.Chili.StackPanel:New{
+		name = "stack_console",
 		margin = { 0, 0, 0, 0 },
 		padding = { 0, 0, 0, 0 },
 		x = 0,

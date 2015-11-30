@@ -1,7 +1,7 @@
 include "constants.lua"
 
 --pieces
-local  rocketR, rocketL = piece("RocketR", "RocketL");
+local rocketR, rocketL = piece("RocketR", "RocketL");
 local droneMain = piece("DroneMain");
 
 local smokePiece = {rocketR, rocketL,droneMain};
@@ -36,7 +36,7 @@ end
 
 function script.FireWeapon(num)
 	shotCycle = 1 - shotCycle
-	EmitSfx( flare[shotCycle], UNIT_SFX3 )
+	EmitSfx(flare[shotCycle], UNIT_SFX3)
 end
 
 function script.BlockShot(num)

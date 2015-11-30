@@ -18,7 +18,6 @@ return {
     interceptedbyshieldtype = 1,
     range                   = 200,
     reloadtime              = 3.6,
-    rendertype              = 4,
     soundhit                = [[explosion/mini_nuke]],
     turret                  = 1,
     weaponvelocity          = 250,

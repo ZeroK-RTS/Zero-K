@@ -18,14 +18,14 @@ local firestate = Spring.GetUnitStates(unitID).firestate
 local spGetUnitVelocity = Spring.GetUnitVelocity
 
 local function TiltWings()
-	while  true  do
+	while true do
 		if attacking then
-			Turn( wings , x_axis, 0, math.rad(45) )
+			Turn(wings, x_axis, 0, math.rad(45))
 			Sleep(250)
 		else
 			local vx,_,vz = spGetUnitVelocity(unitID)
 			local speed = vx*vx + vz*vz
-			Turn( wings, x_axis, math.rad(speed*3), math.rad(45) )
+			Turn(wings, x_axis, math.rad(speed*3), math.rad(45))
 			Sleep(250)
 		end
 	end
@@ -34,16 +34,16 @@ end
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltWings)
-	Turn( Lwingengine, x_axis, math.rad(-90), math.rad(500) )
-	Turn( Rwingengine, x_axis, math.rad(-90), math.rad(500) )
+	Turn(Lwingengine, x_axis, math.rad(-90), math.rad(500))
+	Turn(Rwingengine, x_axis, math.rad(-90), math.rad(500))
 end
 
 function script.Activate()
-	Spin( fan , y_axis, math.rad(700) )
+	Spin(fan, y_axis, math.rad(700))
 end
 
 function script.Deactivate()
-	StopSpin( fan , y_axis, math.rad(3) )
+	StopSpin(fan, y_axis, math.rad(3))
 end
 
 function script.QueryWeapon(num)

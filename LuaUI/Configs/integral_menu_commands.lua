@@ -4,7 +4,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --SIDENOTE: using this table is preferable than editing command description directly because this maintain tooltip's compatibility with other build menu too.(eg: color text is not supported by stock gui)
 local tooltips = {
 	priority = "Priority: Set construction priority (low, normal, high)",
-	miscpriority = "Misc Priority: Set priority for morph or stockpile (low, normal, high)",
+	miscpriority = "Misc Priority: Set priority for non-construction spending (low, normal, high)",
 	retreat = "Retreat: Retreat to closest retreat point or airpad at 30/65/99% of health (right-click to disable). Airpad for aircraft only.",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
@@ -267,7 +267,6 @@ local overrides = {
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
-	[CMD_AUTOECO] = { texture = {imageDir .. 'states/autoeco_off.png', imageDir .. 'states/autoeco_misc.png', imageDir .. 'states/autoeco_on.png'}, text=''},
 	}
 
 -- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)

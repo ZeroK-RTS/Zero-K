@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[geo]],
-  name                          = [[Geothermal Powerplant]],
+  name                          = [[Geothermal Generator]],
   description                   = [[Produces Energy (25)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
@@ -37,6 +37,8 @@ unitDef = {
     
     morphto = [[amgeo]],
     morphtime = [[90]],
+	
+	priority_misc = 1, -- Medium
   },
 
   energyMake                    = 25,

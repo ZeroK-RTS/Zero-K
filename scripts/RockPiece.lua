@@ -4,7 +4,7 @@
 --Date: 5 February 2008
 
 --[[How to Use:
-1. Copy the following to  the top of your unit script, below the piecenum declarations. MAKE SURE YOU REPLACE VALUES WHEN APPROPRIATE.
+1. Copy the following to the top of your unit script, below the piecenum declarations. MAKE SURE YOU REPLACE VALUES WHEN APPROPRIATE.
 DECLARE AS GLOBALS, NOT AS LOCALS
 ALL ANGLES ARE IN RADIANS
 
@@ -69,13 +69,13 @@ function Rock(heading, rockAmount, axis)
 	--Spring.Echo(rockAngle[axis])
 	
 	while (rockAngle[axis] > ROCK_MIN[axis]) or (rockAngle[axis] < -ROCK_MIN[axis]) do
-		Turn( ROCK_PIECE[axis] , axis, rockAngle[axis], math.abs(rockAngle[axis]*ROCK_SPEED[axis]) )
+		Turn(ROCK_PIECE[axis], axis, rockAngle[axis], math.abs(rockAngle[axis]*ROCK_SPEED[axis]))
 		--Spring.Echo("Turning to "..rockAngle[axis] .. " speed " .. rockAngle[axis]*ROCK_SPEED)
-		WaitForTurn( ROCK_PIECE[axis], axis)
+		WaitForTurn(ROCK_PIECE[axis], axis)
 		Sleep(33)
 		rockAngle[axis] = rockAngle[axis] * ROCK_DECAY[axis]
 	end
-	Turn( ROCK_PIECE[axis], axis, 0, (ROCK_MIN[axis] * ROCK_SPEED[axis]) )
+	Turn(ROCK_PIECE[axis], axis, 0, (ROCK_MIN[axis] * ROCK_SPEED[axis]))
 end
 
 
@@ -119,12 +119,12 @@ function RockZ(heading, rock_z)
 	if rockAngle[axis] < 0 then rockAngle[axis] = -rockAngle[axis] end
 	while (result > ROCK_MIN) or (result < - ROCK_MIN) do
 		Spring.Echo("result: \t"..result.."\trockAngle[axis]: \t"..rockAngle[axis])
-	    Turn( ROCK_PIECE , z_axis, math.rad(rockAngle[axis]), math.rad(result * ROCK_SPEED) )	
-		WaitForTurn( ROCK_PIECE, z_axis)
+		Turn(ROCK_PIECE, z_axis, math.rad(rockAngle[axis]), math.rad(result * ROCK_SPEED))	
+		WaitForTurn(ROCK_PIECE, z_axis)
 		Sleep(100)
 		rockAngle[axis] = rockAngle[axis] * ROCK_DECAY
 		if rockAngle[axis] < 0 then rockAngle[axis] = -rockAngle[axis] end
 	end
-	Turn( ROCK_PIECE, z_axis, 0, math.rad(ROCK_MIN * ROCK_SPEED) )
+	Turn(ROCK_PIECE, z_axis, 0, math.rad(ROCK_MIN * ROCK_SPEED))
 end
 ]]--

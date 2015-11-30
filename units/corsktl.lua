@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corsktl]],
   name                   = [[Skuttle]],
-  description            = [[Cloakable Anti-Heavy Bomb]],
+  description            = [[Cloaked Jumping Anti-Heavy Bomb]],
   acceleration           = 0.18,
   brakeRate              = 0.18,
   buildCostEnergy        = 550,
@@ -127,8 +127,6 @@ local weaponDefs = {
     impulseBoost       = 0,
     impulseFactor      = 0.1,
     name               = "Explosion",
-    shakeduration      = 0,
-    shakemagnitude     = 0,
     soundHit           = "explosion/mini_nuke",
 	
 	customParams       = {

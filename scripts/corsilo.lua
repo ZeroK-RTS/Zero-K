@@ -25,7 +25,7 @@ local function OpenDoors()
 	if openingDoors or closingDoors then
 		return
 	end 
-    openingDoors = true
+	openingDoors = true
 
 	Move(doorl, x_axis, 0)
 	Move(doorl, x_axis, -22, 14)
@@ -36,8 +36,8 @@ local function OpenDoors()
 	Move(tower, y_axis, 0)
 	
 	Show(tube)
-    Show(tower)
-    Show(nuke)
+	Show(tower)
+	Show(nuke)
 	
 	Sleep(1000)
 
@@ -70,7 +70,7 @@ local function CloseDoors()
 	Sleep(500)
 	
 	WaitForMove(doorr, x_axis)
-    Hide(tube)	
+	Hide(tube)	
 	
 	closingDoors = false
 	missileLoaded = true
@@ -79,8 +79,8 @@ end
 function script.Create()
 	StartThread(SmokeUnit, {base})
 	Hide(tube)
-    Hide(tower)
-    Hide(nuke)
+	Hide(tower)
+	Hide(nuke)
 end
 
 local function RestoreAfterDelay()
@@ -112,6 +112,10 @@ function script.FireWeapon()
 	missileLoaded = false
 	doorsAreOpen = false
 
+	if GG.GameRules_NukeLaunched then
+		GG.GameRules_NukeLaunched()
+	end
+	
 	-- Intentionally non-positional
 	Spring.PlaySoundFile("sounds/weapon/missile/heavymissile_launch.wav", 15)
 end
@@ -153,5 +157,5 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(doorr, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	Explode(tower, sfxNone)
 	Explode(nuke, sfxNone)
-	return 3
+	return 2
 end

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armjeth]],
   name                   = [[Gremlin]],
-  description            = [[Anti-air Bot]],
+  description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.32,
   buildCostEnergy        = 150,
@@ -27,7 +27,7 @@ unitDef = {
     description_de = [[Flugabwehr Roboter]],
     description_es = [[Robot Antiaéreo]],
     description_fi = [[Ilmatorjuntarobotti]],
-    description_fr = [[Robot Anti-air]],
+    description_fr = [[Robot Anti-Air]],
     description_it = [[Robot da contraerea]],
     description_pl = [[Bot przeciwlotniczy z maskowaniem]],
     helptext       = [[Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.]],

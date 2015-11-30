@@ -33,18 +33,30 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs = include("LuaRules/Configs/target_priority_defs.lua")
+local targetTable, captureWeaponDefs, transportMult = include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
 -- Callin occurs every 16 frames
 
--- Values reset every slow update
-local remHealth = {}
+--// Values that reset every slow update
+-- Priority added based on health and capture for non-capture weapons
+local remHealth = {} 
+
+ -- Priority added based on health and capture for capture weapons
+ -- The disinction is because capture weapons need to prioritize partially captured things
+local remCaptureHealth = {}
+
+-- UnitDefID of unit carried in a transport. Used to override transporter unitDefID
+local remTransportiee = {}
+
+-- Priority to add based on disabled state.
 local remStunnedOrOverkill = {}
+
+-- Whether the enemy unit is visible.
 local remVisible = {}
 
--- Fairly unchanging values
+--// Fairly unchanging values
 local remAllyTeam = {}
 local remUnitDefID = {}
 
@@ -86,40 +98,88 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		return true, 5
 	end
 	
-	local defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
-	
+	--// Get Base priority of unit. Transporting unit for transports.
+	local defPrio
+	if transportMult[enemyUnitDef] then
+		if not remTransportiee[targetID] then
+			local carryList = Spring.GetUnitIsTransporting(targetID)
+			local carryID = carryList and carryList[1]
+			if carryID and remUnitDefID[carryID] then
+				remTransportiee[targetID] = remUnitDefID[carryID]
+			else
+				remTransportiee[targetID] = -1
+			end
+		end
+		if remTransportiee[targetID] == -1 then
+			defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
+		else
+			
+			defPrio = (targetTable[remTransportiee[targetID]][attackerWeaponDefID] or 5)*transportMult[enemyUnitDef]
+		end
+	else
+		defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
+	end
+
+	--// Get priority modifier based on disabling.
 	if not remStunnedOrOverkill[targetID] then
-		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(unitID, "disarmed") == 1)
+		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
-		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill) and 1) or 0
+		local disarmExpected = GG.OverkillPrevention_IsDisarmExpected(targetID)
+		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill or disarmExpected) and 1) or 0
 	end
 
 	if remStunnedOrOverkill[targetID] == 1 then
 		defPrio = defPrio + 25
 	end
 	
+	--// Get priority modifier for health and capture progress.
 	local hpAdd
-	if remHealth[targetID] then
-		hpAdd = remHealth[targetID]
-	else
-		local armor = select(2,Spring.GetUnitArmored(unitID)) or 1
-		local hp, maxHP, _, capture = spGetUnitHealth(targetID)
-		hp = hp/armor
-		if hp and maxHP then
-			hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
+	if captureWeaponDefs[attackerWeaponDefID] then
+	
+		if remCaptureHealth[targetID] then
+			hpAdd = remCaptureHealth[targetID]
 		else
-			hpAdd = 0
-		end
-		if capture > 0 then
-			if captureWeaponDefs[attackerWeaponDefID] then
-				-- Really prioritize capturing partially captured units.
-				hpAdd = hpAdd - 5*capture
+			local armor = select(2,Spring.GetUnitArmored(unitID)) or 1		
+			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
+			hp = hp/armor
+			maxHP = maxHP/armor
+			
+			if hp and maxHP then
+				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
 			else
+				hpAdd = 0
+			end
+			
+			if capture > 0 then
+				-- Really prioritize partially captured units
+				hpAdd = hpAdd - 6*capture
+			end
+			
+			remCaptureHealth[targetID] = hpAdd
+		end
+	else
+		
+		if remHealth[targetID] then
+			hpAdd = remHealth[targetID]
+		else
+			local armor = select(2,Spring.GetUnitArmored(unitID)) or 1		
+			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
+			hp = hp/armor
+			maxHP = maxHP/armor
+			
+			if hp and maxHP then
+				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
+			else
+				hpAdd = 0
+			end
+			
+			if capture > 0 then
 				-- Deprioritize partially captured units.
 				hpAdd = hpAdd + 0.2*capture
 			end
+			
+			remHealth[targetID] = hpAdd
 		end
-		remHealth[targetID] = hpAdd
 	end
 	
 	--Note: included toned down engine priority (maybe have desired behaviour?).
@@ -133,15 +193,15 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	local newPriority = hpAdd + defPrio + miscAdd + distAdd
-	
-	--GG.UnitEcho(targetID, newPriority)
-	
+
 	return true, newPriority --bigger value have lower priority
 end
 
 function gadget:GameFrame(f)
 	if f%16 == 8 then -- f%16 == 0 happens just before AllowWeaponTarget
 		remHealth = {}
+		remCaptureHealth = {}
+		remTransportiee = {}
 		remVisible = {}
 		remStunnedOrOverkill = {}
 	end

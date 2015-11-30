@@ -164,6 +164,7 @@ local flexCallIns = {
   'UnitFinished',
   'UnitFromFactory',
   'UnitDestroyed',
+  'UnitDestroyedByTeam',
   'UnitExperience',
   'UnitTaken',
   'UnitGiven',
@@ -171,6 +172,7 @@ local flexCallIns = {
   'UnitCommand',
   'UnitCmdDone',
   'UnitDamaged',
+  'UnitStunned',
   'UnitEnteredRadar',
   'UnitEnteredLos',
   'UnitLeftRadar',
@@ -1238,8 +1240,8 @@ function widgetHandler:CommandNotify(id, params, options)
   return false
 end
 
-local MUTE_SPECTATORS = Spring.GetModOptions().mutespec
-local MUTE_LOBBY = Spring.GetModOptions().mutelobby
+local MUTE_SPECTATORS = Spring.GetModOptions().mutespec or 'autodetect'
+local MUTE_LOBBY = Spring.GetModOptions().mutelobby or 'autodetect'
 local playerNameToID 
 
 do
@@ -1794,9 +1796,9 @@ function widgetHandler:GameStart()
   return
 end
 
-function widgetHandler:GameOver()
+function widgetHandler:GameOver(winners)
   for _,w in ipairs(self.GameOverList) do
-    w:GameOver()
+    w:GameOver(winners)
   end
   return
 end
@@ -1966,6 +1968,14 @@ function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 
+function widgetHandler:UnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamID)
+  for _,w in ipairs(self.UnitDestroyedByTeamList) do
+    w:UnitDestroyedByTeam(unitID, unitDefID, unitTeam, attTeamID)
+  end
+  return
+end
+
+
 function widgetHandler:UnitExperience(unitID,     unitDefID,     unitTeam,
                                       experience, oldExperience)
   for _,w in ipairs(self.UnitExperienceList) do
@@ -2022,6 +2032,13 @@ function widgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer)
   for _,w in ipairs(self.UnitDamagedList) do
     w:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
+  end
+  return
+end
+
+function widgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
+  for _,w in ipairs(self.UnitStunnedList) do
+    w:UnitStunned(unitID, unitDefID, unitTeam, stunned)
   end
   return
 end

@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[armestor]],
-  name                          = [[Energy Transmission Pylon]],
+  name                          = [[Energy Pylon]],
   description                   = [[Extends overdrive grid]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 200,
@@ -45,6 +45,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[armestor.s3o]],
+  script                        = "armestor.lua",
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   sightDistance                 = 273,

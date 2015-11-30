@@ -74,7 +74,6 @@ unitDef = {
     MINE = {
       name                    = [[Light Mine]],
       accuracy                = 1600,
-      avoidEnemy              = false,      
       avoidFriendly           = false,
       avoidNeutral            = false,
       burnblow                = true,

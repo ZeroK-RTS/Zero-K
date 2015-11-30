@@ -25,7 +25,7 @@ local curTerrainType = 4
 local wobble = false
 
 local function Tilt()
-	while  true  do
+	while true do
 		local angle1 = math.random(-15, 15)
 		local angle2 = math.random(-15, 15)
 		Turn(base, x_axis, math.rad(angle1*0.1), math.rad(1))
@@ -37,12 +37,12 @@ end
 
 local function WobbleUnit()
 	StartThread(Tilt)
-	while  true  do
-		if  wobble == true  then
-			Move( base , y_axis, 2 , 3 )
+	while true do
+		if wobble == true then
+			Move(base, y_axis, 2, 3)
 		end
-		if  wobble == false  then
-			Move( base , y_axis, -2 , 3 )
+		if wobble == false then
+			Move(base, y_axis, -2, 3)
 		end
 		wobble = not wobble
 		Sleep(1500)
@@ -70,31 +70,31 @@ function script.StopMoving()
 end
 
 function script.Create()
-	Hide( flare)
+	Hide(flare)
 
 	StartThread(WobbleUnit)
 	
-	Hide( wheels1)
-	Hide( wheels2)
-	Hide( wheels3)
-	Hide( wheels4)
+	Hide(wheels1)
+	Hide(wheels2)
+	Hide(wheels3)
+	Hide(wheels4)
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(HoverFX)
 end
 
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
-	Turn( turret , y_axis, 0, math.rad(30) )
-	Turn( gun , x_axis, 0, math.rad(10) )
+	Turn(turret, y_axis, 0, math.rad(30))
+	Turn(gun, x_axis, 0, math.rad(10))
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	GG.DontFireRadar_CheckAim(unitID)
 	
-	Turn( turret , y_axis, heading, math.rad(70) )
-	Turn( gun , x_axis, -pitch, math.rad(60) )
+	Turn(turret, y_axis, heading, math.rad(70))
+	Turn(gun, x_axis, -pitch, math.rad(60))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
 	StartThread(RestoreAfterDelay)
@@ -116,33 +116,33 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
-		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
+	if severity <= .25 then
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
-	elseif  severity <= .50  then
-		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT)
+	elseif severity <= .50 then
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
 		Explode(turret, SFX.FALL)
 		return 1
-	elseif  severity <= .99  then
-		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+	elseif severity <= .99 then
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
-		Explode(turret, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(flpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(frpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(rlpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(rrpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(rlpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(rrpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	else
-		Explode(gun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(gun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		Explode(base, sfxNone)
-		Explode(turret, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(flpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(frpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(rlpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-		Explode(rrpontoon, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+		Explode(turret, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(flpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(frpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(rlpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+		Explode(rrpontoon, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 		return 2
 	end
 end

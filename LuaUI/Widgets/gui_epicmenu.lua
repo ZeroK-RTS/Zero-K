@@ -1123,6 +1123,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	
 	--Keybindings
 	if (option.type == 'button' and not option.isDirectoryButton) or option.type == 'bool' then
+		if (not option.dontRegisterAction) then
 		local actionName = GetActionName(path, option)
 		
 		--migrate from old logic, make sure this is done before setting orig_key
@@ -1137,7 +1138,7 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		end
 		
 		CreateOptionAction(path, option)
-		
+		end
 	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
 		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
@@ -2641,8 +2642,8 @@ function widget:Initialize()
 	init = false
 	
 	--intialize remote menu trigger
-	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
-		MakeSubWindow(path)	-- FIXME should pause the game
+	WG.crude.OpenPath = function(path, pause) --Note: declared here so that it work in local copy
+		MakeSubWindow(path, pause)	-- FIXME should pause the game
 	end
 	
 	--intialize remote menu trigger 2

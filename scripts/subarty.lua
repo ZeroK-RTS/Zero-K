@@ -15,12 +15,12 @@ end
 
 function script.AimFromWeapon1() return base end
 
-function script.AimWeapon1( heading, pitch )
+function script.AimWeapon1(heading, pitch)
 	return true
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 900.1, 120, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 900.1, 120, 0.5, 0.25)
 end
 
 function script.FireWeapon1()
@@ -39,7 +39,8 @@ function script.setSFXoccupy(num)
 	end
 end
 
-function script.HitByWeapon (x, z, weaponDefID, damage)  
+function script.HitByWeapon (x, z, weaponDefID, damage)
+	if weaponDefID < 0 then return damage end
 	if not submerged then
 		local damages = WeaponDefs[weaponDefID].damages
 		return damage * (damages[elseArmorClass] / damages[subArmorClass])
@@ -48,13 +49,13 @@ function script.HitByWeapon (x, z, weaponDefID, damage)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode( base, SFX.SHATTER )
+	Explode(base, SFX.SHATTER)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
 		return 1
-	else		
+	else
 		return 2
 	end
 end

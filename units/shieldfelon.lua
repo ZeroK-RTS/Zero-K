@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[shieldfelon]],
   name                = [[Felon]],
-  description         = [[Shielded Fire Support Bot]],
+  description         = [[Shielded Riot/Skirmisher Bot]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.22,
@@ -129,7 +129,6 @@ unitDef = {
       soundStart              = [[weapon/constant_electric]],
       soundStartVolume        = 9,
       soundTrigger            = true,
-      targetMoveError         = 0,
       texture1                = [[corelaser]],
       thickness               = 2,
       turret                  = true,

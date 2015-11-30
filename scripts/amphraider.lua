@@ -57,7 +57,7 @@ local function Walk()
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lthigh, x_axis,  THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
+		Turn(lthigh, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
 		Turn(lshin, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
 		Turn(rthigh, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
 		Turn(rshin, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
@@ -70,14 +70,14 @@ local function Stopping()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Turn( rthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( rshin , x_axis, 0, math.rad(120)*PACE  )
-	Turn( rfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lthigh , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lshin , x_axis, 0, math.rad(80)*PACE  )
-	Turn( lfoot , x_axis, 0, math.rad(80)*PACE  )
-	Turn( pelvis , z_axis, 0, math.rad(20)*PACE  )
-	Move( pelvis , y_axis, 0, 12*PACE )
+	Turn(rthigh, x_axis, 0, math.rad(80)*PACE)
+	Turn(rshin, x_axis, 0, math.rad(120)*PACE)
+	Turn(rfoot, x_axis, 0, math.rad(80)*PACE)
+	Turn(lthigh, x_axis, 0, math.rad(80)*PACE)
+	Turn(lshin, x_axis, 0, math.rad(80)*PACE)
+	Turn(lfoot, x_axis, 0, math.rad(80)*PACE)
+	Turn(pelvis, z_axis, 0, math.rad(20)*PACE)
+	Move(pelvis, y_axis, 0, 12*PACE)
 end
 
 function script.StartMoving()
@@ -96,9 +96,9 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(5000)
-	Turn( body, y_axis, 0, math.rad(65) )
-	Turn( pelvis, x_axis, 0, math.rad(47.5) )
-	Turn( countertilt, x_axis, 0, math.rad(47.5) )
+	Turn(body, y_axis, 0, math.rad(65))
+	Turn(pelvis, x_axis, 0, math.rad(47.5))
+	Turn(countertilt, x_axis, 0, math.rad(47.5))
 end
 
 local function ReloadDisks(index)
@@ -113,9 +113,9 @@ function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		Signal(SIG_AIM1)
 		SetSignalMask(SIG_AIM1)
-		Turn( body, y_axis, heading, math.rad(360) )
-		Turn( pelvis, x_axis, -pitch, math.rad(180) )
-		Turn( countertilt, x_axis, pitch, math.rad(180) )	
+		Turn(body, y_axis, heading, math.rad(360))
+		Turn(pelvis, x_axis, -pitch, math.rad(180))
+		Turn(countertilt, x_axis, pitch, math.rad(180))	
 		WaitForTurn(body, y_axis)
 		WaitForTurn(pelvis, x_axis)
 		StartThread(RestoreAfterDelay)
@@ -150,7 +150,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity >= .25  then
+	if severity >= .25 then
 		Explode(lfoot, sfxNone)
 		Explode(lshin, sfxNone)
 		Explode(lthigh, sfxNone)
@@ -160,7 +160,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxNone)
 		Explode(body, sfxNone)
 		return 1
-	elseif severity >= .50  then
+	elseif severity >= .50 then
 		Explode(lfoot, sfxFall)
 		Explode(lshin, sfxFall)
 		Explode(lthigh, sfxFall)
@@ -170,25 +170,25 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rthigh, sfxFall)
 		Explode(body, sfxShatter)
 		return 1
-	elseif severity >= .99  then
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
+	elseif severity >= .99 then
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(body, sfxShatter)
 		return 2
 	else
-		Explode(lfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(lthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(pelvis, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rfoot, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rshin, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(rthigh, sfxFall + sfxSmoke  + sfxFire  + sfxExplode )
-		Explode(body, sfxShatter + sfxExplode )
+		Explode(lfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(lthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(pelvis, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rfoot, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rshin, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(rthigh, sfxFall + sfxSmoke + sfxFire + sfxExplode)
+		Explode(body, sfxShatter + sfxExplode)
 		return 2
 	end
 end

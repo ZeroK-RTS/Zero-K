@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[gunshipaa]],
   name                   = [[Trident]],
-  description            = [[AA Gunship]],
+  description            = [[Anti-Air Gunship]],
   acceleration           = 0.18,
   airStrafe              = 0,
   amphibious             = true,
@@ -39,6 +39,7 @@ unitDef = {
 	helptext_pl    = [[Trident to wolny statek powietrzny, ktory niszczy lotnictwo silnymi rakietami. Jego szybkosc i niski pulap sprawiaja jednak, ze mozna go latwo zniszczyc jednostkami naziemnymi.]],
 	modelradius    = [[18]],
 	midposoffset   = [[0 15 0]],
+	selection_velocity_heading = 1,
   },
 
   explodeAs              = [[GUNSHIPEX]],
@@ -129,8 +130,6 @@ unitDef = {
       tolerance               = 32767,
       tracks                  = true,
       turnRate                = 90000,
-      twoPhase                = true,
-      vlaunch                 = true,
       turret                  = false,
       weaponAcceleration      = 550,
       weaponTimer             = 0.2,

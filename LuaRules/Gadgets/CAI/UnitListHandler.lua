@@ -2,6 +2,59 @@
  * Create as a list of unit with some functions.
  * Can get total unit cost, a random unit, units in area etc..
  * Elements can have custom data.
+ 
+== CreateUnitList(losCheckAllyTeamID)
+ losCheckAllyTeamID is the point of view that the return functions should take
+ regarding LOS. A non-cheating AI would always create a unit list with its
+ allyTeamID to ensure that the UnitList does not cheat.
+ 
+=== Functions === 
+
+ == GetUnitPosition(unitID) -> {x, y, z} or false
+ Returns the position of the unitID obeying LOS and radar.
+ 
+ == GetNearestUnit(x, z, condition) -> unitID
+ Returns the nearest unit in the list which satisfies the condition.
+ The condition is a function of the form
+	condition(unitID, x, z, customData, cost).
+ 
+ == HasUnitMoved(unitID, range) -> boolean
+ Returns true if the unit is range away from where it was when HasUnitMoved
+ was last called.
+ 
+ == IsPositionNearUnit(x, z, radius, condition) -> boolean
+ Returns true if there is a unit from the list satisfying the conditions
+ within the radius around the point. The condition is the same as in 
+ GetNearestUnit.
+ 
+ == OverwriteUnitData(unitID, newData)
+ == GetUnitData(unitID) -> table
+ == SetUnitDataValue(unitID, key, value)
+ Functions which get and set the custom data attachable to units in the list.
+ 
+ 
+ == AddUnit(unitID, static, cost, newData)
+ Adds a unit to the list.
+ - static tells the list whether the unit can move.
+ - cost is just treated as a number.
+ - newData is a table of information to attach to the unit.
+ 
+ == RemoveUnit(unitID) -> boolean
+ Remove a unit from the list
+
+ == GetUnitCost(unitID) -> cost
+ == GetTotalCost() -> cost
+
+ == ValidUnitID(unitID) -> boolean
+ Returns true if the unit is in the list.
+
+ == Iterator() -> unitID, cost, customData
+ Provides a way to iterate over units in the list. It is not safe to remove units
+ while iterating over them. To use do this:
+ 
+ for unitID, cost, customData in unitList.Iterator() do
+	...
+ end
 --]]
 
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -206,7 +259,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		return function ()
 			i = i + 1
 			if i <= unitCount then 
-				return unitList[i].unitID, unitList[i].customData 
+				return unitList[i].unitID, unitList[i].cost, unitList[i].customData 
 			end
 		end
 	end

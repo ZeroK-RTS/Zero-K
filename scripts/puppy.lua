@@ -215,22 +215,22 @@ function script.Shot()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 407, 15, 0.25)
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(lfoot, sfxFall)
 		Explode(rfoot, sfxFall)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(lcalf, sfxFall)
 		Explode(rcalf, sfxFall)
 		Explode(lfoot, sfxFall)
 		Explode(rfoot, sfxFall)
 		return 1
-	elseif severity <= 0.99  then
+	elseif severity <= 0.99 then
 		Explode(pelvis, sfxFall + sfxExplode)
 		Explode(lthigh, sfxFall)
 		Explode(rthigh, sfxFall)

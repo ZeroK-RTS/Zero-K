@@ -500,7 +500,7 @@ local function MakeButton(container, cmd, insertItem, index)
 				autosize=true; -- this (autosize=true) allow text to be truncated/cut off if button size is too small (prevent a wall-of-text on build icon if button is too small)
 				align="left";
 				valign="bottom";
-				caption = string.format("%d m", UnitDefs[-cmd.id].metalCost);
+				caption = string.format("%d", UnitDefs[-cmd.id].metalCost);
 				fontSize = 11;
 				fontShadow = true;
 			}		
@@ -1388,6 +1388,7 @@ function widget:Initialize()
 	}
 
 	menuTabRow = StackPanel:New{
+		name = "Integral menuTabRow",
 		parent = window,
 		resizeItems = true;
 		columns = 6;
@@ -1438,6 +1439,7 @@ function widget:Initialize()
 	}
 	for i=1,numRows do
 		sp_commands[i] = StackPanel:New{
+			name = "sp_commands " .. i,
 			parent = commands_main,
 			resizeItems = true;
 			orientation   = "horizontal";
@@ -1473,6 +1475,7 @@ function widget:Initialize()
 	}
 	for i=1, numStateColumns do
 		sp_states[i] = StackPanel:New {
+			name = "sp_states " .. i,
 			parent = states_main,
 			resizeItems = true;
 			orientation   = "vertical";

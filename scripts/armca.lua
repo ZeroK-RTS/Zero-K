@@ -24,20 +24,20 @@ local smokePiece = {base, engine1, engine2}
 local nanoPieces = {nano, CentreNano, LeftNano}
 
 function script.Create()
-	Move( engShield1, y_axis, 0, 0.5 ) 
-	Move( engShield2, y_axis, 0, 0.5 ) 
+	Move(engShield1, y_axis, 0, 0.5) 
+	Move(engShield2, y_axis, 0, 0.5) 
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()
-	Move( engShield1, y_axis, 0.8, 0.5 ) 
-	Move( engShield2, y_axis, -0.8, 0.5 ) 
+	Move(engShield1, y_axis, 0.8, 0.5) 
+	Move(engShield2, y_axis, -0.8, 0.5) 
 end
 
 function script.Deactivate()
-	Move( engShield1, y_axis, 0, 0.5 ) 
-	Move( engShield2, y_axis, 0, 0.5 ) 	
+	Move(engShield1, y_axis, 0, 0.5) 
+	Move(engShield2, y_axis, 0, 0.5) 	
 end
 
 function script.StartBuilding()
@@ -53,12 +53,12 @@ function script.StartBuilding()
 	Turn(rightClawBit,y_axis, rad(-135),2.5)
 	
 	--[[
-	WaitForTurn( centreClaw, x_axis )
-	WaitForTurn( centreClawBit, x_axis )
-	WaitForTurn( leftClaw, y_axis )
-	WaitForTurn( leftClawBit, y_axis )
-	WaitForTurn( rightClaw, y_axis )
-	WaitForTurn( rightClawBit, y_axis )
+	WaitForTurn(centreClaw, x_axis)
+	WaitForTurn(centreClawBit, x_axis)
+	WaitForTurn(leftClaw, y_axis)
+	WaitForTurn(leftClawBit, y_axis)
+	WaitForTurn(rightClaw, y_axis)
+	WaitForTurn(rightClawBit, y_axis)
 	]]
 end
 
@@ -74,12 +74,12 @@ function script.StopBuilding()
 	Turn(rightClawBit,y_axis, rad(0),2)
 	
 	--[[
-	WaitForTurn( centreClaw, x_axis )
-	WaitForTurn( centreClawBit, x_axis )
-	WaitForTurn( leftClaw, y_axis )
-	WaitForTurn( leftClawBit, y_axis )
-	WaitForTurn( rightClaw, y_axis )
-	WaitForTurn( rightClawBit, y_axis )
+	WaitForTurn(centreClaw, x_axis)
+	WaitForTurn(centreClawBit, x_axis)
+	WaitForTurn(leftClaw, y_axis)
+	WaitForTurn(leftClawBit, y_axis)
+	WaitForTurn(rightClaw, y_axis)
+	WaitForTurn(rightClawBit, y_axis)
 	]]
 end
 
@@ -101,8 +101,8 @@ function script.Killed(recentDamage, maxHealth)
 		return 1
 	else
 		Explode(base, sfxShatter)
-		Explode(engine2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
-		Explode(engine1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit )
+		Explode(engine2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(engine1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end
 end

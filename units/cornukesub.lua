@@ -32,6 +32,7 @@ unitDef = {
 	modelradius    = [[15]],
 	stockpiletime  = [[90]],
 	stockpilecost  = [[500]],
+	priority_misc  = 1, -- Medium
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -90,7 +91,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:ANTINUKE]],
       fireStarter             = 100,
-      flightTime              = 100,
+      flightTime              = 15,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
@@ -102,13 +103,10 @@ unitDef = {
       smokeTrail              = true,
       soundHit                = [[weapon/missile/vlaunch_hit]],
       soundStart              = [[weapon/missile/missile_launch]],
-      startsmoke              = [[1]],
       startVelocity           = 400,
       tolerance               = 4000,
       tracks                  = true,
       turnrate                = 65535,
-      twoPhase                = true,
-      vlaunch                 = true,
       waterWeapon             = true,
       weaponAcceleration      = 400,
       weaponTimer             = 1,
@@ -149,8 +147,6 @@ unitDef = {
       stockpileTime           = 10^5,
       tolerance               = 4000,
       turnrate                = 18000,
-      twoPhase                = true,
-      vlaunch                 = true,
       waterWeapon             = true,
       weaponAcceleration      = 180,
       weaponTimer             = 4,
@@ -171,9 +167,12 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 1200,
-      object           = [[wreck3x3b.s3o]],
+      object           = [[cornukesub_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 1200,
+	  collisionVolumeOffsets = [[0 -5 0]],
+	  collisionVolumeScales  = [[30 25 110]],
+	  collisionVolumeType    = [[box]],
     },
 
     HEAP  = {

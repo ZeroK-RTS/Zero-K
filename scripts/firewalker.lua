@@ -62,80 +62,80 @@ local function Walk()
 	while true do
 		pace = WALK_RATE*(1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
 		
-		Turn( rupleg 	, y_axis, 0, math.rad(pace))
-		Turn( lupleg 	, y_axis, 0, math.rad(pace))
+		Turn(rupleg 	, y_axis, 0, math.rad(pace))
+		Turn(lupleg 	, y_axis, 0, math.rad(pace))
 		
-		Turn( rupleg 	, z_axis, math.rad(-(0)), math.rad(pace) )
-		Turn( lupleg 	, z_axis, math.rad(-(0)), math.rad(pace) )
-		Turn( lfoot 	, z_axis, math.rad(-(0)), math.rad(pace) )
-		Turn( rfoot 	, z_axis, math.rad(-(0)), math.rad(pace) )
+		Turn(rupleg 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(lupleg 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(lfoot 	, z_axis, math.rad(-(0)), math.rad(pace))
+		Turn(rfoot 	, z_axis, math.rad(-(0)), math.rad(pace))
 	
-		Turn( rupleg , x_axis, math.rad(-70.000000), math.rad(pace*4) ) --Forward
-		Turn( rloleg , x_axis, math.rad(70.000000), math.rad(pace*9) )
-		Turn( rfoot , x_axis, 0, math.rad(pace*4) )
+		Turn(rupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Forward
+		Turn(rloleg, x_axis, math.rad(70.000000), math.rad(pace*9))
+		Turn(rfoot, x_axis, 0, math.rad(pace*4))
 		
-		Turn( rftoe , x_axis, 0, math.rad(pace*6) )
-		Turn( rrtoe , x_axis, 0, math.rad(pace*6) )
+		Turn(rftoe, x_axis, 0, math.rad(pace*6))
+		Turn(rrtoe, x_axis, 0, math.rad(pace*6))
 		
-		Turn( lupleg , x_axis, math.rad(10.000000), math.rad(pace*4) ) --Back
-		Turn( lloleg , x_axis, 0, math.rad(pace*2) )
-		Turn( lfoot , x_axis, math.rad(-10.000000), math.rad(pace*2) )
+		Turn(lupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Back
+		Turn(lloleg, x_axis, 0, math.rad(pace*2))
+		Turn(lfoot, x_axis, math.rad(-10.000000), math.rad(pace*2))
 		
-		Turn( lftoe , x_axis, math.rad(-20), math.rad(pace*6) )
+		Turn(lftoe, x_axis, math.rad(-20), math.rad(pace*6))
 		
-		Turn( torso , z_axis, math.rad(-(5)), math.rad(pace*0.4) )
-		Turn( torso , x_axis, math.rad(3), math.rad(pace*1) )
+		Turn(torso, z_axis, math.rad(-(5)), math.rad(pace*0.4))
+		Turn(torso, x_axis, math.rad(3), math.rad(pace*1))
 	
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
 			
-		Turn( rupleg , x_axis, math.rad(10.000000), math.rad(pace*4) ) --Mid
-		Turn( rloleg , x_axis, math.rad(20.000000), math.rad(pace*5) )
-		Turn( rfoot , x_axis, math.rad(10.000000), math.rad(pace*1) )
+		Turn(rupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Mid
+		Turn(rloleg, x_axis, math.rad(20.000000), math.rad(pace*5))
+		Turn(rfoot, x_axis, math.rad(10.000000), math.rad(pace*1))
 		
-		Turn( lupleg , x_axis, math.rad(-70.000000), math.rad(pace*4) ) --Up
-		Turn( lloleg , x_axis, math.rad(-20.000000), math.rad(pace*2) )
-		Turn( lfoot , x_axis, math.rad(40.000000), math.rad(pace*4) )
+		Turn(lupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Up
+		Turn(lloleg, x_axis, math.rad(-20.000000), math.rad(pace*2))
+		Turn(lfoot, x_axis, math.rad(40.000000), math.rad(pace*4))
 		
-		Turn( lftoe , x_axis, math.rad(30), math.rad(pace*3) )
-		Turn( lrtoe , x_axis, math.rad(-30), math.rad(pace*3) )
+		Turn(lftoe, x_axis, math.rad(30), math.rad(pace*3))
+		Turn(lrtoe, x_axis, math.rad(-30), math.rad(pace*3))
 		
-		Turn( torso , x_axis, math.rad(-3), math.rad(pace*1) )
-		
-		WaitForTurn(rloleg, x_axis)
-		Sleep(0)
-		
-		Turn( rupleg , x_axis, math.rad(10.000000), math.rad(pace*4) ) --Back
-		Turn( rloleg , x_axis, 0, math.rad(pace*2) )
-		Turn( rfoot , x_axis, math.rad(-10.000000), math.rad(pace*2) )
-		
-		Turn( rftoe , x_axis, math.rad(-20), math.rad(pace*6) )
-		
-		Turn( lupleg , x_axis, math.rad(-70.000000), math.rad(pace*4) ) --Forward
-		Turn( lloleg , x_axis, math.rad(70.000000), math.rad(pace*9) )
-		Turn( lfoot , x_axis, 0, math.rad(pace*4) )
-		
-		Turn( lftoe , x_axis, 0, math.rad(pace*6) )
-		Turn( lrtoe , x_axis, 0, math.rad(pace*6) )
-		
-		Turn( torso , z_axis, math.rad(-(-5)), math.rad(pace*0.4) )
-		Turn( torso , x_axis, math.rad(3), math.rad(pace*1) )
+		Turn(torso, x_axis, math.rad(-3), math.rad(pace*1))
 		
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
 		
-		Turn( rupleg , x_axis, math.rad(-70.000000), math.rad(pace*4) ) --Up
-		Turn( rloleg , x_axis, math.rad(-20.000000), math.rad(pace*2) )
-		Turn( rfoot , x_axis, math.rad(40.000000), math.rad(pace*4) )
+		Turn(rupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Back
+		Turn(rloleg, x_axis, 0, math.rad(pace*2))
+		Turn(rfoot, x_axis, math.rad(-10.000000), math.rad(pace*2))
 		
-		Turn( rftoe , x_axis, math.rad(30), math.rad(pace*3) )
-		Turn( rrtoe , x_axis, math.rad(-30), math.rad(pace*3) )
+		Turn(rftoe, x_axis, math.rad(-20), math.rad(pace*6))
 		
-		Turn( lupleg , x_axis, math.rad(10.000000), math.rad(pace*4) ) --Mid
-		Turn( lloleg , x_axis, math.rad(20.000000), math.rad(pace*5) )
-		Turn( lfoot , x_axis, math.rad(10.000000), math.rad(pace*1) )
+		Turn(lupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Forward
+		Turn(lloleg, x_axis, math.rad(70.000000), math.rad(pace*9))
+		Turn(lfoot, x_axis, 0, math.rad(pace*4))
 		
-		Turn( torso , x_axis, math.rad(-3), math.rad(pace*1) )
+		Turn(lftoe, x_axis, 0, math.rad(pace*6))
+		Turn(lrtoe, x_axis, 0, math.rad(pace*6))
+		
+		Turn(torso, z_axis, math.rad(-(-5)), math.rad(pace*0.4))
+		Turn(torso, x_axis, math.rad(3), math.rad(pace*1))
+		
+		WaitForTurn(rloleg, x_axis)
+		Sleep(0)
+		
+		Turn(rupleg, x_axis, math.rad(-70.000000), math.rad(pace*4)) --Up
+		Turn(rloleg, x_axis, math.rad(-20.000000), math.rad(pace*2))
+		Turn(rfoot, x_axis, math.rad(40.000000), math.rad(pace*4))
+		
+		Turn(rftoe, x_axis, math.rad(30), math.rad(pace*3))
+		Turn(rrtoe, x_axis, math.rad(-30), math.rad(pace*3))
+		
+		Turn(lupleg, x_axis, math.rad(10.000000), math.rad(pace*4)) --Mid
+		Turn(lloleg, x_axis, math.rad(20.000000), math.rad(pace*5))
+		Turn(lfoot, x_axis, math.rad(10.000000), math.rad(pace*1))
+		
+		Turn(torso, x_axis, math.rad(-3), math.rad(pace*1))
 		
 		WaitForTurn(rloleg, x_axis)
 		Sleep(0)
@@ -145,34 +145,34 @@ end
 local function Stop()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
-	Turn( lupleg , x_axis, 0, math.rad(50) )
-	Turn( rupleg , x_axis, 0, math.rad(50) )
-	Turn( lloleg , x_axis, 0, math.rad(100) )
-	Turn( rloleg , x_axis, 0, math.rad(100) )
-	if not bAiming  then
-		Turn( torso , z_axis, math.rad(-(0.000000)), math.rad(100) )
-		Turn( torso , x_axis, 0, math.rad(20.000000) )
+	Turn(lupleg, x_axis, 0, math.rad(50))
+	Turn(rupleg, x_axis, 0, math.rad(50))
+	Turn(lloleg, x_axis, 0, math.rad(100))
+	Turn(rloleg, x_axis, 0, math.rad(100))
+	if not bAiming then
+		Turn(torso, z_axis, math.rad(-(0.000000)), math.rad(100))
+		Turn(torso, x_axis, 0, math.rad(20.000000))
 	end
-	Turn( rftoe , x_axis, 0, math.rad(100) )
-	Turn( rrtoe , x_axis, 0, math.rad(100) )
-	Turn( lftoe , x_axis, 0, math.rad(100) )
-	Turn( lrtoe , x_axis, 0, math.rad(100) )
-	Turn( rfoot , x_axis, 0, math.rad(100) )
-	Turn( lfoot , x_axis, 0, math.rad(100) )
+	Turn(rftoe, x_axis, 0, math.rad(100))
+	Turn(rrtoe, x_axis, 0, math.rad(100))
+	Turn(lftoe, x_axis, 0, math.rad(100))
+	Turn(lrtoe, x_axis, 0, math.rad(100))
+	Turn(rfoot, x_axis, 0, math.rad(100))
+	Turn(lfoot, x_axis, 0, math.rad(100))
 	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
+	if not bAiming then
 	
-		Turn( torso , x_axis, math.rad(10.000000), math.rad(48.010989) )
-	end
-	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
-	
-		Turn( torso , x_axis, math.rad(-3.000000), math.rad(48.010989) )
+		Turn(torso, x_axis, math.rad(10.000000), math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
-	if  not bAiming  then
+	if not bAiming then
 	
-		Turn( torso , x_axis, 0, math.rad(48.010989) )
+		Turn(torso, x_axis, math.rad(-3.000000), math.rad(48.010989))
+	end
+	WaitForTurn(torso, x_axis)
+	if not bAiming then
+	
+		Turn(torso, x_axis, 0, math.rad(48.010989))
 	end
 	WaitForTurn(torso, x_axis)
 	Sleep(20)
@@ -199,18 +199,18 @@ end
 local function RestoreAfterDelay()
 	Sleep(RESTORE_DELAY)
 	local speed = math.rad(50)
-	Turn( rflap1 , x_axis, 0, speed)
-	Turn( rflap2 , x_axis, 0, speed )
-	Turn( rflap3 , y_axis, 0, speed )
-	Turn( rflap4 , y_axis, 0, speed )
-	Turn( lflap1 , x_axis, 0, speed )
-	Turn( lflap2 , x_axis, 0, speed )
-	Turn( lflap3 , y_axis, 0, speed )
-	Turn( lflap4 , y_axis, 0, speed )
-	Turn( torso , y_axis, 0, speed )
-	Turn( torso , x_axis, 0, speed )
-	Turn( lgun , x_axis, 0, speed )
-	Turn( rgun , x_axis, 0, speed )
+	Turn(rflap1, x_axis, 0, speed)
+	Turn(rflap2, x_axis, 0, speed)
+	Turn(rflap3, y_axis, 0, speed)
+	Turn(rflap4, y_axis, 0, speed)
+	Turn(lflap1, x_axis, 0, speed)
+	Turn(lflap2, x_axis, 0, speed)
+	Turn(lflap3, y_axis, 0, speed)
+	Turn(lflap4, y_axis, 0, speed)
+	Turn(torso, y_axis, 0, speed)
+	Turn(torso, x_axis, 0, speed)
+	Turn(lgun, x_axis, 0, speed)
+	Turn(rgun, x_axis, 0, speed)
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(torso, x_axis)
 	WaitForTurn(lgun, x_axis)
@@ -219,23 +219,23 @@ local function RestoreAfterDelay()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	local aimMult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))
 	
 	bAiming = true
-	Turn( rflap1 , x_axis, 0, math.rad(168)*aimMult )
-	Turn( rflap2 , x_axis, 0, math.rad(168)*aimMult )
-	Turn( rflap3 , y_axis, 0, math.rad(168)*aimMult )
-	Turn( rflap4 , y_axis, 0, math.rad(168)*aimMult )
-	Turn( lflap1 , x_axis, 0, math.rad(168)*aimMult )
-	Turn( lflap2 , x_axis, 0, math.rad(168)*aimMult )
-	Turn( lflap3 , y_axis, 0, math.rad(168)*aimMult )
-	Turn( lflap4 , y_axis, 0, math.rad(168)*aimMult )
-	Turn( rgun , x_axis, - pitch, math.rad(168)*aimMult )
-	Turn( lgun , x_axis, - pitch, math.rad(168)*aimMult )
-	Turn( torso , y_axis, heading, math.rad(65)*aimMult )
+	Turn(rflap1, x_axis, 0, math.rad(168)*aimMult)
+	Turn(rflap2, x_axis, 0, math.rad(168)*aimMult)
+	Turn(rflap3, y_axis, 0, math.rad(168)*aimMult)
+	Turn(rflap4, y_axis, 0, math.rad(168)*aimMult)
+	Turn(lflap1, x_axis, 0, math.rad(168)*aimMult)
+	Turn(lflap2, x_axis, 0, math.rad(168)*aimMult)
+	Turn(lflap3, y_axis, 0, math.rad(168)*aimMult)
+	Turn(lflap4, y_axis, 0, math.rad(168)*aimMult)
+	Turn(rgun, x_axis, - pitch + 0.15, math.rad(168)*aimMult)
+	Turn(lgun, x_axis, - pitch + 0.15, math.rad(168)*aimMult)
+	Turn(torso, y_axis, heading, math.rad(65)*aimMult)
 	WaitForTurn(torso, y_axis)
 	WaitForTurn(lgun, x_axis)
 	StartThread(RestoreAfterDelay)	
@@ -249,10 +249,10 @@ end
 
 local function Recoil()
 	local barrel = barrels[gun_1]
-	EmitSfx( flares[gun_1],  1024)
-	Move( barrel, z_axis, -8 )
+	EmitSfx(flares[gun_1], 1024)
+	Move(barrel, z_axis, -8)
 	Sleep(150)
-	Move( barrel , z_axis, 0, 10 )
+	Move(barrel, z_axis, 0, 10)
 end
 
 function script.Shot(num)
@@ -266,7 +266,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .50  then
+	if severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(pelvis, sfxNone)
 		Explode(torso, sfxNone)
@@ -280,16 +280,16 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(lfoot, sfxNone)
 		return 1
 	end
-	Explode(base, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(pelvis, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(torso, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(lgun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(rgun, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(rupleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(rloleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(rfoot, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(lupleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(lloleg, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
-	Explode(lfoot, SFX.FALL + SFX.SMOKE  + SFX.FIRE  + SFX.EXPLODE_ON_HIT )
+	Explode(base, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(pelvis, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(torso, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rgun, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rupleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rloleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(rfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lupleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lloleg, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
+	Explode(lfoot, SFX.FALL + SFX.SMOKE + SFX.FIRE + SFX.EXPLODE_ON_HIT)
 	return 2
 end

@@ -1,0 +1,20 @@
+{
+	"shield" : "tarcza",
+	"health" : "życie",
+	"building" : "budowa",
+	"morph" : "ulepszenie",
+	"stockpile" : "amunicja",
+	"paralyze" : "paraliż",
+	"disarm" : "rozbrojenie",
+	"capture" : "przejmowanie",
+	"capture_reload" : "przeładowanie",
+	"water_tank" : "cysterna",
+	"teleport" : "teleport",
+	"ability" : "umiejętność",
+	"reload" : "przeładowanie",
+	"slow" : "spowolnienie",
+	"goo" : "rozmnażanie",
+	"reclaim" : "zbieranie",
+	"resurrect" : "wskrzeszanie",
+	"jump" : "skok"
+}

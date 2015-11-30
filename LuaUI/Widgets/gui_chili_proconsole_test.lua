@@ -763,7 +763,7 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'paused the game') or
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
-	string.find(msg.argument,'resigned and is now spectating') or
+	string.find(msg.argument,'resigned') or
 	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
 	string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
 end
@@ -1284,9 +1284,11 @@ end
 local firstUpdate = true
 local timer = 0
 
+local initialSwapTime = 0.2
+local firstSwap = true
+
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
-
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
@@ -1314,6 +1316,18 @@ function widget:Update(s)
 		end
 		firstUpdate = false
 		SetInputFontSize(15)
+	end
+	
+	-- Workaround bugged display on first open of the backlog
+	if initialSwapTime then
+		initialSwapTime = initialSwapTime - s
+		if initialSwapTime < 0.1 and firstSwap then
+			SwapBacklog()
+			firstSwap = nil
+		elseif initialSwapTime < 0 then
+			SwapBacklog()
+			initialSwapTime = nil
+		end
 	end
 end
 

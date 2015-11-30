@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armtick]],
   name                   = [[Tick]],
-  description            = [[All-Terrain EMP Crawling Bomb]],
+  description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.6,
   buildCostEnergy        = 120,
@@ -69,7 +69,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 160,
+  sightDistance          = 240,
   turnRate               = 3000,
   
   featureDefs            = {

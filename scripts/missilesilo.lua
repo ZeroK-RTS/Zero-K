@@ -73,7 +73,7 @@ function script.Create()
 end
 
 function script.StartBuilding()
-	Turn(scaffold , y_axis, math.rad((-padnum*90) + 45), math.rad(90) )
+	Turn(scaffold, y_axis, math.rad((-padnum*90) + 45), math.rad(90))
 end
 
 function script.StopBuilding()
@@ -92,7 +92,7 @@ function script.QueryNanoPiece() return trolleyb end
 function script.QueryBuildInfo()
 	if padnum == 1 then return silo1
 	elseif padnum == 2 then return silo2
-	elseif  padnum == 3 then return silo3
+	elseif padnum == 3 then return silo3
 	else return silo4 end
 end
 
@@ -104,7 +104,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity <= .25  then
+	if severity <= .25 then
 		Explode(body, sfxNone)
 		Explode(scaffold, sfxNone)
 		Explode(clampb1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
@@ -114,7 +114,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(trolleyu, sfxNone)
 		Explode(trolleyb, sfxNone)
 		return 1
-	elseif severity <= .50  then
+	elseif severity <= .50 then
 		Explode(body, sfxNone)
 		Explode(scaffold, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(clampb1, sfxFall + sfxSmoke + sfxFire + sfxExplode)
@@ -124,7 +124,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(trolleyu, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(trolleyb, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(body, sfxShatter)
 		Explode(scaffold, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(clampb1, sfxFall + sfxSmoke + sfxFire + sfxExplode)

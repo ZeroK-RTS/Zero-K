@@ -46,27 +46,27 @@ local SIG_MOVE = 1
 local SIG_RESTORE = 2
 
 function script.Create()
-	Hide( muzzle1)
-	Hide( muzzle2)
-	Hide( muzzle3)
-	Hide( muzzle4)
-	Hide( muzzle5)
-	Hide( wake1)
-	Hide( wake2)
+	Hide(muzzle1)
+	Hide(muzzle2)
+	Hide(muzzle3)
+	Hide(muzzle4)
+	Hide(muzzle5)
+	Hide(wake1)
+	Hide(wake2)
 	StartThread(SmokeUnit, smokePiece)
 	
-	while select(5, Spring.GetUnitHealth(unitID)) < 1  do
+	while select(5, Spring.GetUnitHealth(unitID)) < 1 do
 		Sleep(1000)
 	end
-	Spin( radar , y_axis, rad(60) )
+	Spin(radar, y_axis, rad(60))
 end
 
 local function StartMoving()
-	Signal( SIG_MOVE)
-	SetSignalMask( SIG_MOVE)
-	while  true  do
-		EmitSfx( wake1,  2 )
-		EmitSfx( wake2,  2 )
+	Signal(SIG_MOVE)
+	SetSignalMask(SIG_MOVE)
+	while true do
+		EmitSfx(wake1, 2)
+		EmitSfx(wake2, 2)
 		Sleep(150)
 	end
 end
@@ -76,30 +76,30 @@ function script.StartMoving()
 end
 
 function script.StopMoving()
-	Signal( SIG_MOVE)
+	Signal(SIG_MOVE)
 end
 
 local function RestoreAfterDelay()
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 	Sleep(3000)
-	Turn( hatch1 , x_axis, 0, rad(35) )
-	Turn( hatch2 , x_axis, 0, rad(35) )
-	Turn( hatch3 , x_axis, 0, rad(35) )
-	Turn( hatch4 , x_axis, 0, rad(35) )
-	Turn( hatch5 , x_axis, 0, rad(35) )
+	Turn(hatch1, x_axis, 0, rad(35))
+	Turn(hatch2, x_axis, 0, rad(35))
+	Turn(hatch3, x_axis, 0, rad(35))
+	Turn(hatch4, x_axis, 0, rad(35))
+	Turn(hatch5, x_axis, 0, rad(35))
 end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
 		return true
 	elseif num == 2 then
-		Turn( missileSpots[missileGun].hatch , x_axis, rad(-90), rad(180) )
+		Turn(missileSpots[missileGun].hatch, x_axis, rad(-90), rad(180))
 		WaitForTurn(missileSpots[missileGun].hatch, x_axis)
 		StartThread(RestoreAfterDelay)
 		return true
 	elseif num == 3 then
-		Turn( hatch5 , x_axis, rad(-90), rad(180) )
+		Turn(hatch5, x_axis, rad(-90), rad(180))
 		WaitForTurn(hatch5, x_axis)
 		return true
 	end
@@ -109,14 +109,14 @@ function script.FireWeapon(num)
 	if num == 1 then
 		
 	elseif num == 2 then
-		Turn( hatch1 , x_axis, 0, rad(35) )
-		Turn( hatch2 , x_axis, 0, rad(35) )
-		Turn( hatch3 , x_axis, 0, rad(35) )
-		Turn( hatch4 , x_axis, 0, rad(35) )
+		Turn(hatch1, x_axis, 0, rad(35))
+		Turn(hatch2, x_axis, 0, rad(35))
+		Turn(hatch3, x_axis, 0, rad(35))
+		Turn(hatch4, x_axis, 0, rad(35))
 		missileGun = (missileGun%4) + 1
 	elseif num == 3 then
 		Sleep(1300)
-		Turn( hatch5 , x_axis, 0, rad(35) )
+		Turn(hatch5, x_axis, 0, rad(35))
 		Sleep(3000)
 	end
 end

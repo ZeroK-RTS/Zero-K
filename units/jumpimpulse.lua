@@ -84,7 +84,6 @@ unitDef = {
       name                    = [[Impulse Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.03,
       beamttl                 = 40,
       coreThickness           = 0,

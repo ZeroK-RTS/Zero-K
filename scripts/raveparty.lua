@@ -127,8 +127,8 @@ function script.AimWeapon(num, heading, pitch)
 	spindlePitch = -pitch
 
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
-	Turn( turret , y_axis, heading, headingSpeed*slowMult)
-	Turn( spindle , x_axis, spindlePitch+spindleOffset, pitchSpeed*slowMult)
+	Turn(turret, y_axis, heading, headingSpeed*slowMult)
+	Turn(spindle, x_axis, spindlePitch+spindleOffset, pitchSpeed*slowMult)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(spindle, x_axis)
 	return (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1)
@@ -143,11 +143,11 @@ function script.QueryWeapon(num)
 end
 
 function gunFire(num)
-	Move( guns[num].barrel , z_axis, guns[num].z*1.2 , 8*guns[num].zs )
-	Move( guns[num].barrel , y_axis, guns[num].y*1.2 , 8*guns[num].ys )
+	Move(guns[num].barrel, z_axis, guns[num].z*1.2, 8*guns[num].zs)
+	Move(guns[num].barrel, y_axis, guns[num].y*1.2, 8*guns[num].ys)
 	WaitForMove(guns[num].barrel, y_axis)
-	Move( guns[num].barrel , z_axis, 0 , 0.2*guns[num].zs )
-	Move( guns[num].barrel , y_axis, 0 , 0.2*guns[num].ys )
+	Move(guns[num].barrel, z_axis, 0, 0.2*guns[num].zs)
+	Move(guns[num].barrel, y_axis, 0, 0.2*guns[num].ys)
 end
 
 
@@ -172,17 +172,17 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if  severity <= .25  then
+	if severity <= .25 then
 		Explode(base, sfxNone)
 		Explode(spindle, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
-	elseif  severity <= .50  then
+	elseif severity <= .50 then
 		Explode(base, sfxNone)
 		Explode(spindle, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
-	elseif severity <= .99  then
+	elseif severity <= .99 then
 		Explode(base, sfxShatter)
 		Explode(spindle, sfxShatter)
 		Explode(turret, sfxShatter)

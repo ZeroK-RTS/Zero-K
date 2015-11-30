@@ -229,7 +229,7 @@ for i = 1, #UnitDefs do
 				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
 				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
 			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)]
+				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
 				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
 				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
 			else
@@ -396,6 +396,19 @@ local function getDescription(unitDef)
 	
 end	
 
+local function GetShieldRegenDrain(wd)
+	local shieldRegen = wd.shieldPowerRegen
+	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
+		shieldRegen = wd.customParams.shield_rate
+	end
+	
+	local shieldDrain = wd.shieldPowerRegenEnergy
+	if shieldDrain == 0 and wd.customParams and wd.customParams.shield_drain then
+		shieldDrain = wd.customParams.shield_drain
+	end
+	return shieldRegen, shieldDrain
+end
+
 local function weapons2Table(cells, ws, ud)
 	local cells = cells
 	
@@ -423,12 +436,13 @@ local function weapons2Table(cells, ws, ud)
 	cells[#cells+1] = ''
 
 	if wd.isShield then
+		local regen, drain = GetShieldRegenDrain(wd) 
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = wd.shieldPowerRegen .. " HP/s"
+		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
-		cells[#cells+1] = wd.shieldPowerRegenEnergy .. " E/s"
+		cells[#cells+1] = drain .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else
@@ -542,11 +556,16 @@ local function weapons2Table(cells, ws, ud)
 		}
 		local show_projectile_speed = not cp.stats_hide_projectile_speed and not hitscan[wd.type]
 
-		if ((dps + dpsw + dpss + dpsd + dpsc) < 5) then -- no damage: newtons and such
+		if ((dps + dpsw + dpss + dpsd + dpsc) < 2) then -- no damage: newtons and such
 			show_damage = false
 			show_dps = false
 		end
 		
+		if cp.damage_vs_shield then -- Wolverine
+			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
+			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
+		end
+
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
@@ -558,6 +577,20 @@ local function weapons2Table(cells, ws, ud)
 		if show_dps then
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
+		end
+		
+		local lowerName = name:lower()
+		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "300%"
+		elseif lowerName:find("gauss") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "150%"
+		end
+
+		if (wd.interceptedByShieldType == 0) then
+			cells[#cells+1] = ' - Ignores shields'
+			cells[#cells+1] = ''
 		end
 
 		if stun_time > 0 then
@@ -906,14 +939,15 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if (ud.idleTime < 1800) or (ud.idleAutoHeal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
+	local idle_autoheal = ud.customParams.idle_regen and tonumber(ud.customParams.idle_regen) or (ud.idleAutoHeal * 2)
+	if (ud.idleTime < 1800) or (idle_autoheal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
-		if ud.idleTime < 1800 or ud.idleAutoHeal > 5 then
+		if ud.idleTime < 1800 or (idle_autoheal > 5) then
 			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(ud.idleAutoHeal * 2) .. ' HP/s'
+			cells[#cells+1] = numformat(idle_autoheal) .. ' HP/s'
 			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's' -- .. ((ud.wantedHeight > 0) and ' landed' or '')
+			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
 		end
 		if ud.autoHeal > 0 then
 			cells[#cells+1] = ' - Combat regen: '
@@ -1036,20 +1070,12 @@ local function printAbilities(ud)
 		cells[#cells+1] = 'Transport: '
 		cells[#cells+1] = ((ud.transportMass < 365) and "Light" or "Heavy")
 	end
-	
-	local anti_coverage = 0
-	for i=1, #ud.weapons do
-		local coverage = WeaponDefs[ud.weapons[i].weaponDef].coverageRange
-		if coverage and tonumber(coverage) > anti_coverage then
-			anti_coverage = tonumber(coverage)
-		end
-	end
 
-	if anti_coverage > 0 then
+	if ud.customParams.nuke_coverage then
 		cells[#cells+1] = 'Can intercept strategic nukes'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Coverage:'
-		cells[#cells+1] = anti_coverage .. " elmo"
+		cells[#cells+1] = ud.customParams.nuke_coverage .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
@@ -1249,7 +1275,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0) + (ud.customParams.income_energy or 0) 
+	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) 
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
@@ -1258,8 +1284,8 @@ local function printunitinfo(ud, lang, buttonWidth)
 
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64) .. " elmo", textColor = color.stats_fg, }
-		-- 64 is to offset the engine multiplier, which is
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*32) .. " elmo", textColor = color.stats_fg, }
+		-- 32 is to offset the engine multiplier, which is
 		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
 	end
 
@@ -1281,7 +1307,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (((ud.mass > 365) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 
 	if commModules then

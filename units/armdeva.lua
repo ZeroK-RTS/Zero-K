@@ -44,6 +44,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
+  script                        = "armdeva.lua",
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
@@ -66,6 +67,8 @@ unitDef = {
       def                = [[ARMDEVA_WEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      mainDir            = [[0 1 0]],
+      maxAngleDif        = 240,
     },
 
   },
@@ -103,7 +106,6 @@ unitDef = {
       soundStart              = [[weapon/heavy_emg]],
       soundStartVolume        = 0.5,
       stages                  = 10,
-      targetMoveError         = 0,
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
@@ -117,7 +119,7 @@ unitDef = {
       description      = [[Wreckage - Stardust]],
       blocking         = true,
       damage           = 1500,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 88,
@@ -126,20 +128,7 @@ unitDef = {
       reclaimTime      = 88,
     },
 
-    DEAD2 = {
-      description      = [[Debris - Stardust]],
-      blocking         = false,
-      damage           = 1500,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      metal            = 88,
-      object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-    },
-
-    HEAP  = {
+	HEAP  = {
       description      = [[Debris - Stardust]],
       blocking         = false,
       damage           = 1500,

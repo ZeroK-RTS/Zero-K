@@ -42,18 +42,18 @@ local function popUp()
 	Signal(SIG_CLOSE)
 	SetSignalMask(SIG_OPEN)
 	
-	Turn( door1 , z_axis, math.rad(0), math.rad(210) )
-	Turn( door2 , z_axis, math.rad(0), math.rad(210) )
-	Turn( door3 , z_axis, math.rad(0), math.rad(210) )
-	Turn( door4 , z_axis, math.rad(0), math.rad(210) )
-	Turn( door5 , x_axis, 0, math.rad(210) )
-	Turn( door6 , x_axis, 0, math.rad(210) )
+	Turn(door1, z_axis, math.rad(0), math.rad(210))
+	Turn(door2, z_axis, math.rad(0), math.rad(210))
+	Turn(door3, z_axis, math.rad(0), math.rad(210))
+	Turn(door4, z_axis, math.rad(0), math.rad(210))
+	Turn(door5, x_axis, 0, math.rad(210))
+	Turn(door6, x_axis, 0, math.rad(210))
 	
 	Sleep(100)
-	Move( turret , y_axis, 0 , 150 )
+	Move(turret, y_axis, 0, 150)
 	Sleep(100)
-	Move( b1 , z_axis, 0 , 50 )
-	Move( barrel , z_axis, 0 , 50 )
+	Move(b1, z_axis, 0, 50)
+	Move(barrel, z_axis, 0, 50)
 	--WaitForMove(barrel, z_axis)
 	readyToFire = true
 end
@@ -65,22 +65,22 @@ local function popDown()
 	
 	readyToFire = false
 	
-	Turn( turret , y_axis, tauOn6*position, math.rad(200) )
-	Turn( sleeve , x_axis,0, math.rad(100) )
+	Turn(turret, y_axis, tauOn6*position, math.rad(200))
+	Turn(sleeve, x_axis,0, math.rad(100))
 	
-	Move( b1 , z_axis, -4.4 , 5 )
-	Move( barrel , z_axis, -7.4 , 5 )
+	Move(b1, z_axis, -4.4, 5)
+	Move(barrel, z_axis, -7.4, 5)
 	Sleep(500)
 	
-	Move( turret , y_axis, -34 , 22 )
+	Move(turret, y_axis, -34, 22)
 	Sleep(700)
 	
-	Turn( door1 , z_axis, math.rad(-120), math.rad(110) )
-	Turn( door2 , z_axis, math.rad(-120), math.rad(110) )
-	Turn( door3 , z_axis, math.rad(120), math.rad(110) )
-	Turn( door4 , z_axis, math.rad(120), math.rad(110) )
-	Turn( door5 , x_axis, math.rad(120), math.rad(110) )
-	Turn( door6 , x_axis, math.rad(-120), math.rad(110) )
+	Turn(door1, z_axis, math.rad(-120), math.rad(110))
+	Turn(door2, z_axis, math.rad(-120), math.rad(110))
+	Turn(door3, z_axis, math.rad(120), math.rad(110))
+	Turn(door4, z_axis, math.rad(120), math.rad(110))
+	Turn(door5, x_axis, math.rad(120), math.rad(110))
+	Turn(door6, x_axis, math.rad(-120), math.rad(110))
 	
 	Spring.SetUnitArmored(unitID,true)
 end
@@ -88,8 +88,8 @@ end
 
 local function RestoreAfterDelay()
 
-	Signal( SIG_RESTORE)
-	SetSignalMask( SIG_RESTORE)
+	Signal(SIG_RESTORE)
+	SetSignalMask(SIG_RESTORE)
 
 	Sleep(RESTORE_DELAY)
 	while spGetUnitIsStunned(unitID) do
@@ -101,7 +101,7 @@ end
 
 function script.Create()
 
-	Hide( flare)
+	Hide(flare)
 	
 	position = 0
 	
@@ -119,8 +119,8 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 
-	Signal( SIG_AIM)
-	SetSignalMask( SIG_AIM)
+	Signal(SIG_AIM)
+	SetSignalMask(SIG_AIM)
 	
 	if not readyToFire then
 		StartThread(popUp)
@@ -133,8 +133,8 @@ function script.AimWeapon(num, heading, pitch)
 	--Spring.Echo(position)
 	
 	
-	Turn( turret, y_axis, heading,  math.rad(600))
-	Turn( sleeve, x_axis, -pitch,  math.rad(300))
+	Turn(turret, y_axis, heading, math.rad(600))
+	Turn(sleeve, x_axis, -pitch, math.rad(300))
 	WaitForTurn(sleeve, x_axis)
 	WaitForTurn(turret, y_axis)
 	StartThread(RestoreAfterDelay)
@@ -142,8 +142,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-	EmitSfx( flare,  1024 + 0 )
-	EmitSfx( flare,  1024 + 1 )
+	EmitSfx(flare, 1024 + 0)
+	EmitSfx(flare, 1024 + 1)
 end
 
 function script.AimFromWeapon(num)
@@ -156,7 +156,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if severity <= 0.25  then
+	if severity <= 0.25 then
 		Explode(turret, sfxShatter)
 		Explode(door1, sfxSmoke)
 		Explode(door2, sfxSmoke)
@@ -165,7 +165,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door5, sfxSmoke)
 		Explode(door6, sfxSmoke)
 		return 1
-	elseif severity <= 0.50  then
+	elseif severity <= 0.50 then
 		Explode(body, sfxShatter)
 		Explode(turret, sfxShatter)
 		Explode(door1, sfxFall)
@@ -177,18 +177,18 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(sleeve, sfxExplode + sfxSmoke)
 		return 1
 	else
-		Explode(body, sfxShatter + sfxExplodeOnHit )
+		Explode(body, sfxShatter + sfxExplodeOnHit)
 		Explode(turret, sfxShatter)
-		Explode(door1, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(door2, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(door3, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(door4, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(door5, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(door6, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
+		Explode(door1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(door2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(door3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(door4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(door5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(door6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 
-		Explode(barrel, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(b1, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )
-		Explode(sleeve, sfxFall + sfxSmoke  + sfxFire  + sfxExplodeOnHit )		
+		Explode(barrel, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(b1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
+		Explode(sleeve, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)		
 		return 2
 	end
 end
