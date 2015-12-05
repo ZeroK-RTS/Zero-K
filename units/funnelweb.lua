@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Drone/Shield Support Strider]],
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
-  autoheal               = 20,
   brakeRate              = 0.1375,
   buildCostEnergy        = 4500,
   buildCostMetal         = 4500,
