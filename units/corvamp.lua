@@ -61,7 +61,6 @@ unitDef = {
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
-  power                  = 100,
   script                 = [[corvamp.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],

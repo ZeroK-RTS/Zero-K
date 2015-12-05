@@ -40,7 +40,6 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
-  power							= 100,
   reclaimable					= false,
   script                		= [[nullscript.lua]],
   seismicSignature              = 4,

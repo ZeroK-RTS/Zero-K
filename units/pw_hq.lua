@@ -40,7 +40,6 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],
-  power                         = 100,
   reclaimable                   = false,
   script                        = [[nullscript.lua]],
   seismicSignature              = 4,
