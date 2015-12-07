@@ -74,6 +74,12 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"armsnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
+local scorcherSwarmieeArray = {}
+for unitName, def in pairs(UnitDefNames) do
+	local id = def.id
+	scorcherSwarmieeArray[id] = true
+end
+
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
@@ -435,6 +441,7 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 30,
 	},
+	
 	["amphraider3"] = {
 		waterline = -5,
 		land = {
@@ -464,16 +471,20 @@ local behaviourConfig = {
 		velocityPrediction = 30,
 		},
 	},
+	
 	["corgator"] = {
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		skirms = {}, 
+		swarms = scorcherSwarmieeArray, 
 		flees = {},
-		circleStrafe = true, 
-		strafeOrderLength = 120,
+		localJinkOrder = false,
+		jinkTangentLength = 50,
+		circleStrafe = true,
+		strafeOrderLength = 100,
+		minCircleStrafeDistance = 260,
 		skirmLeeway = 60,
-		maxSwarmLeeway =180, 
-		minSwarmLeeway = 300, 
-		swarmLeeway = 40, 
+		maxSwarmLeeway = 0,
+		minSwarmLeeway = 100, 
+		swarmLeeway = 300, 
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
 	},

@@ -151,6 +151,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQu
 			if enemyUnitDef and los then
 				enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
 			end
+			
 			if pointDis < enemyRange+behaviour.swarmLeeway then -- if I am within enemy range
 				if behaviour.maxSwarmRange < pointDis then -- if I cannot shoot at the enemy
 					
@@ -531,7 +532,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		skirms = behaviourData.skirms, 
 		swarms = behaviourData.swarms, 
 		flees  = behaviourData.flees,
-		weaponNum = (behaviourData.weaponNum or 1), 
+		weaponNum = (behaviourData.weaponNum or 1),
 		circleStrafe = (behaviourData.circleStrafe or false), 
 		skirmRadar = (behaviourData.skirmRadar or false), 
 		skirmEverything = (behaviourData.skirmEverything or false), 
@@ -619,6 +620,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if unitAIBehaviour[unitDefID] then
 		behaviour = unitAIBehaviour[unitDefID]
 		spInsertUnitCmdDesc(unitID, unitAICmdDesc)
+		
 		--Spring.Echo("unit added")
 		if not unit[unitID] then
 			unitList.count = unitList.count + 1
