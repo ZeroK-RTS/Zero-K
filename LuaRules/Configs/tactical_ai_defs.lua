@@ -350,43 +350,15 @@ local behaviourDefaults = {
 
 local behaviourConfig = { 
 	-- swarmers
-	["armtick"] = {
-		skirms = {}, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		jinkTangentLength = 100, 
-		minCircleStrafeDistance = 0,
-		minSwarmLeeway = 100,
-		swarmLeeway = 30,
-		alwaysJinkFight = true,		
-	},
-	
-	["corroach"] = {
-		skirms = {}, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		jinkTangentLength = 100, 
-		minCircleStrafeDistance = 0,
-		minSwarmLeeway = 100,
-		swarmLeeway = 30, 
-		alwaysJinkFight = true,	
-	},
-	
 	["puppy"] = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		jinkTangentLength = 100, 
-		minCircleStrafeDistance = 0,
+		localJinkOrder = false,
+		maxSwarmLeeway = 0, 
+		jinkTangentLength = 200,
 		minSwarmLeeway = 100,
-		swarmLeeway = 30, 
-		alwaysJinkFight = true,	
+		swarmLeeway = 200, 
 	},
   
 	["armpw"] = {
