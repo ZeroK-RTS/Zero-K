@@ -424,9 +424,8 @@ local function ProcessAwardData()
 
 				elseif awardType == 'vet' then
 					local vetName = UnitDefs[expUnitDefID] and UnitDefs[expUnitDefID].humanName
-					local expUnitExpRounded = ''..floor(expUnitExp * 10)
-					expUnitExpRounded = expUnitExpRounded:sub(1,-2) .. '.' .. expUnitExpRounded:sub(-1)
-					message = vetName ..', '.. expUnitExpRounded ..' XP'
+					local expUnitExpRounded = floor(expUnitExp * 100)
+					message = vetName ..', '.. expUnitExpRounded .. "% cost made"
 				else
 					message = 'Damaged value: '.. maxValWrite
 				end
@@ -548,7 +547,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	local experience = spGetUnitExperience(unitID)
-	if experience > expUnitExp then
+	if experience > expUnitExp and (experience*UnitDefs[unitDefID].metalCost > 1000) then
 		expUnitExp = experience
 		expUnitTeam = unitTeam
 		expUnitDefID = unitDefID

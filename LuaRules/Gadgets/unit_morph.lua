@@ -210,8 +210,7 @@ local morphCmdDesc = {
   action = 'morph',
 }
 
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
-local GetUnitRank = function(unitID) return spGetUnitRulesParam(unitID, "rank") end
+local GetUnitRank = function(unitID) return math.floor(Spring.GetUnitExperience(unitID) + 0.01) end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

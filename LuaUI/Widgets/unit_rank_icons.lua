@@ -10,7 +10,6 @@ function widget:GetInfo() return {
 
 local min   = math.min
 local floor = math.floor
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
 
 local clearing_table = {
 	name = 'rank',
@@ -23,17 +22,12 @@ local rankTextures = {
 	[1] = rankTexBase .. 'rank1.png',
 	[2] = rankTexBase .. 'rank2.png',
 	[3] = rankTexBase .. 'rank3.png',
-	[4] = rankTexBase .. 'star.png',
-	-- [5] = rankTexBase .. 'gold_star.png',
+	[4] = rankTexBase .. 'rank4.png',
+	[5] = rankTexBase .. 'star.png',
 }
-
-local function UnitRankUp (unitID)
-	UpdateUnitRank (unitID)
-end
 
 function widget:Initialize ()
 	WG.icons.SetOrder ('rank', 1)
-	widgetHandler:RegisterGlobal ('UnitRankUp', UnitRankUp)
 
 	local allUnits = Spring.GetAllUnits()
 	for _,unitID in pairs (allUnits) do
@@ -42,12 +36,16 @@ function widget:Initialize ()
 end
 
 function UpdateUnitRank (unitID)
-	local rank = spGetUnitRulesParam(unitID, "rank") or 0
+	local rank = math.floor(0.01 + (Spring.GetUnitExperience(unitID) or 0)) -- 0.01 for float errors
 	rank = min(#rankTextures or 0, rank)
 	WG.icons.SetUnitIcon (unitID, {
 		name = 'rank',
 		texture = rankTextures[rank]
 	})
+end
+
+function widget:UnitExperience (unitID)
+	UpdateUnitRank (unitID)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
