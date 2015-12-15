@@ -145,7 +145,7 @@ unitDef = {
 
 	PYRO_DEATH = {
 		name                    = [[Napalm Blast]],
-		areaofeffect            = 192,
+		areaofeffect            = 256,
 		craterboost             = 1,
 		cratermult              = 3.5,
 
