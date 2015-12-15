@@ -31,7 +31,7 @@ unitDef = {
 	helptext_de    = [[Der Pyro ist ein günstiger und schneller Roboter, der mit einem Flammenwerfer ausgestattet ist. Dieser fügt großen Zielen erheblichen Schaden zu und kleineren entsprechend weniger. Außerdem können mehrere Ziele gleichzeitig getroffen werden, welche auch im Feuer aufgehen können. Der Pyro explodiert brutalst, sobald er zerstört wird. Zusätzlich besitzt er noch ein Jetpack, welches ihm zum Beispiel das Springen über Hindernisse ermöglicht.]],
   },
 
-  explodeAs             = [[CORPYRO_NAPALM]],
+  explodeAs             = [[CORPYRO_PYRO_DEATH]],
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetraider]],
@@ -50,7 +50,7 @@ unitDef = {
   objectName            = [[m-5_alt.s3o]],
   script				= [[corpyro.cob]],
   seismicSignature      = 4,
-  selfDestructAs        = [[CORPYRO_NAPALM]],
+  selfDestructAs        = [[CORPYRO_PYRO_DEATH]],
   selfDestructCountdown = 1,
 
   sfxtypes              = {
