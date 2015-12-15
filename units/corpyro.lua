@@ -39,7 +39,7 @@ unitDef = {
 	stats_show_death_explosion = 1,
   },
 
-  explodeAs             = [[CORPYRO_NAPALM]],
+  explodeAs             = [[PYRO_DEATH]],
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetraider]],
@@ -54,11 +54,11 @@ unitDef = {
   minCloakDistance      = 75,
   movementClass         = [[KBOT2]],
   noAutoFire            = false,
-  noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
+  noChaseCategory       = [[FIXEDWING GUNSHIP SUB]],
   objectName            = [[m-5.s3o]],
   script                = [[corpyro.lua]],
   seismicSignature      = 4,
-  selfDestructAs        = [[CORPYRO_NAPALM]],
+  selfDestructAs        = [[PYRO_DEATH]],
   selfDestructCountdown = 5,
 
   sfxtypes              = {
@@ -72,9 +72,7 @@ unitDef = {
 
   },
 
-  side                  = [[CORE]],
   sightDistance         = 420,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -144,8 +142,35 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 800,
     },
-  },
 
+	PYRO_DEATH = {
+		name                    = [[Napalm Blast]],
+		areaofeffect            = 192,
+		craterboost             = 1,
+		cratermult              = 3.5,
+
+		customparams        	  = {
+			setunitsonfire = "1",
+			burnchance     = "1",
+			burntime       = 60,
+
+			area_damage = 1,
+			area_damage_radius = 96,
+			area_damage_dps = 20,
+			area_damage_duration = 13.3,
+		},
+
+		damage                  = {
+			default = 50,
+		},
+
+		edgeeffectiveness       = 0.5,
+		explosionGenerator      = [[custom:napalm_koda]],
+		impulseboost            = 0,
+		impulsefactor           = 0,
+		soundhit                = [[explosion/ex_med3]],
+	},
+  },
 
   featureDefs           = {
 
