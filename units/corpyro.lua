@@ -155,7 +155,7 @@ unitDef = {
 			burntime       = 60,
 
 			area_damage = 1,
-			area_damage_radius = 96,
+			area_damage_radius = 128,
 			area_damage_dps = 20,
 			area_damage_duration = 13.3,
 		},
@@ -165,7 +165,7 @@ unitDef = {
 		},
 
 		edgeeffectiveness       = 0.5,
-		explosionGenerator      = [[custom:napalm_koda]],
+		explosionGenerator      = [[custom:napalm_pyro]],
 		impulseboost            = 0,
 		impulsefactor           = 0,
 		soundhit                = [[explosion/ex_med3]],
