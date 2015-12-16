@@ -53,6 +53,31 @@ local cegs = {
       },
     },
   },
+  ["napalm_pyro"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 128,
+      ttl                = 440,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 9,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i40]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
+        pos                = [[-35 r70, 30, -35 r70]],
+      },
+    },
+  },
   ["napalm_koda_small"] = {
     usedefaultexplosions = false,
     groundflash = {
