@@ -235,6 +235,13 @@ local slasherSkirmieeArray = NameToDefID({
 	"armrock",
 })
 
+local sniperSkirmieeArray = {}
+for name,data in pairs(UnitDefNames) do
+	if data.speed > 0 and not data.canfly then
+		sniperSkirmieeArray[data.id] = true
+	end
+end
+
 shortRangeSkirmieeArray = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 riotRangeSkirmieeArray = Union(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
@@ -290,7 +297,7 @@ local fleeables = NameToDefID({
 
 local armedLand = {}
 for name,data in pairs(UnitDefNames) do
-	if data.canAttack and (not data.canFly) 
+	if data.canAttack and (not data.canfly) 
 	and data.weapons[1] and data.weapons[1].onlyTargets.land then
 		armedLand[data.id] = true 
 	end
@@ -350,6 +357,32 @@ local behaviourDefaults = {
 
 local behaviourConfig = { 
 	-- swarmers
+	["armtick"] = {
+		skirms = {}, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		jinkTangentLength = 100, 
+		minCircleStrafeDistance = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 30,
+		alwaysJinkFight = true,		
+	},
+	
+	["corroach"] = {
+		skirms = {}, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		jinkTangentLength = 100, 
+		minCircleStrafeDistance = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 30, 
+		alwaysJinkFight = true,	
+	},
+	
 	["puppy"] = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
@@ -821,12 +854,10 @@ local behaviourConfig = {
 	},	
 	
 	["armsnipe"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = sniperSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
-		maxSwarmLeeway = 10,
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
+		skirmLeeway = 300, 
 	},
 	
 	["corgarp"] = {
