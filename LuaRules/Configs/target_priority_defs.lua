@@ -247,8 +247,8 @@ for uid = 1, #UnitDefs do
 				targetTable[uid][wid] = unitHealthRatio[uid] + 500
 		elseif unitIsBomber[uid] and weaponIsAA[wid] then
 			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
-		elseif (weaponBadCats[wid].raider and unitIsMex[uid]) then
-			targetTable[uid][wid] = 1 -- mexes get max priority for raiders
+		--elseif (weaponBadCats[wid].raider and unitIsMex[uid]) then -- disabled as bad for default behavior
+			--targetTable[uid][wid] = 1 -- mexes get max priority for raiders
 		else
 			targetTable[uid][wid] = unitHealthRatio[uid]
 		end

@@ -626,6 +626,8 @@ for name, ud in pairs(UnitDefs) do
 	end
 	if not ud.canfly then
 		ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
+	else
+		ud.nochasecategory = (ud.nochasecategory or "") .. " SOLAR"
 	end
 end
 
