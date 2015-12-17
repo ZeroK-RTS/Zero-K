@@ -6,29 +6,50 @@ function gadget:GetInfo()
 	return {
 		name = "LockOptions",
 		desc = "Modoption for locking units. 90% Copypasted from game_perks.lua",
-		author = "Storage",
+		author = "Storage, GoogleFrog",
 		license = "Public Domain",
 		layer = -1,
 		enabled = true,
 	}
 end
 
-
-
 local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
-local disabledunits = {}
+local disatbledCount = 0
+local disabledUnits = {}
 
-if (disabledunitsstring=="" and #disabledunits==0) then --no unit to disable, exit
+local UnitDefBothNames = {} -- Includes humanName and name
+
+local function AddName(name, unitDefId)
+	UnitDefBothNames[name] = UnitDefBothNames[name] or {}
+	UnitDefBothNames[name][#UnitDefBothNames[name] + 1] = unitDefId
+end
+
+for unitDefID = 1, #UnitDefs do
+	AddName(UnitDefs[unitDefID].humanName, unitDefID)
+	AddName(UnitDefs[unitDefID].name, unitDefID)
+end
+
+if (disabledunitsstring == "") then --no unit to disable, exit
 	return
 end
 
-if disabledunitsstring ~= "" then 
-	for i in string.gmatch(disabledunitsstring, '([^+]+)') do
-		--I should check whether the unit name actually exists, but it seems UnitDefNames hasn't been created at this stage yet
-		disabledunits[#disabledunits+1] = i
+if disabledunitsstring ~= "" then
+	local alreadyDisabled = {}
+	GG.TableEcho(UnitDefBothNames)
+	for name in string.gmatch(disabledunitsstring, '([^+]+)') do
+		Spring.Echo(name)
+		if UnitDefBothNames[name] then
+			for i = 1, #UnitDefBothNames[name] do
+				local unitDefID = UnitDefBothNames[name][i]
+				if not alreadyDisabled[unitDefID] then
+					disatbledCount = disatbledCount + 1
+					disabledUnits[disatbledCount] = unitDefID
+					alreadyDisabled[unitDefID] = true
+				end
+			end
+		end
 	end
 end
-
 
 local function UnlockUnit(unitID, lockDefID)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
@@ -57,16 +78,9 @@ local function SetBuildOptions(unitID, unitDefID)
 	local unitDef = UnitDefs[unitDefID]
 	if (unitDef.isBuilder) then
 		for _, buildoptionID in pairs(unitDef.buildOptions) do
-			for _,unit in pairs(disabledunits) do
-				if (UnitDefNames[unit]) then 
-					RemoveUnit(unitID, UnitDefNames[unit].id)
-				end
+			for i = 1, disatbledCount do
+				RemoveUnit(unitID, disabledUnits[i])
 			end
-			--for _,unit in pairs(lockedUnits) do
-			--	if (UnitDefNames[unit]) then 
-			--		LockUnit(unitID, UnitDefNames[unit].id)
-			--	end
-			--end
 		end
 	end
 end
