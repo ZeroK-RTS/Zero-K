@@ -1404,17 +1404,32 @@ function widget:MouseRelease(mx, my, button)
 								xsize = (mouseUnit.ud.zsize or mouseUnit.ud.ysize)*4
 								ysize = mouseUnit.ud.xsize*4
 							end
-								
-							points = 5
-							point[1] = {x = x - xsize - 16, z = z - ysize - 16}
-							point[2] = {x = x + xsize + 16, z = point[1].z}
-							point[3] = {x = point[2].x, z = z + ysize + 16}
-							point[4] = {x = point[1].x, z = point[3].z}
-							point[5] = {x =point[1].x, z = point[1].z}
 							
-							loop = 0
-							calculateLinePoints(point,points)
-							if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
+							
+							if mouseUnit.ud.isImmobile then
+								points = 5
+								point[1] = {x = x - xsize - 32, z = z - ysize - 32}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}
+								loop = 1
+								calculateAreaPoints(point,points)
+							else
+								points = 5
+								point[1] = {x = x - xsize - 16, z = z - ysize - 16}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}
+								loop = 0
+								calculateLinePoints(point,points)
+							end
+							
+							if (groundGridDraw) then 
+								gl.DeleteList(groundGridDraw); 
+								groundGridDraw=nil 
+							end
 							groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 							
 							if terraform_type == 1 then
@@ -1508,12 +1523,24 @@ function widget:MouseRelease(mx, my, button)
 								ysize = mouseUnit.ud.xsize*4
 							end
 							
-							points = 5
-							point[1] = {x = x - xsize - 16, z = z - ysize - 16}
-							point[2] = {x = x + xsize + 16, z = point[1].z}
-							point[3] = {x = point[2].x, z = z + ysize + 16}
-							point[4] = {x = point[1].x, z = point[3].z}
-							point[5] = {x =point[1].x, z = point[1].z}			
+							if mouseUnit.ud.isImmobile then
+								points = 5
+								point[1] = {x = x - xsize - 32, z = z - ysize - 32}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}	
+								loop = 1
+							else
+								points = 5
+								point[1] = {x = x - xsize - 16, z = z - ysize - 16}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}	
+								loop = 0
+							end
+							
 							
 							SendCommand()
 							stopCommand()
@@ -1534,7 +1561,7 @@ function widget:MouseRelease(mx, my, button)
 					x = point[2].x
 					z = point[2].z
 				end
-						
+				
 				points = 5
 				point[2] = {x = point[1].x, z = z}
 				point[3] = {x = x, z = z}

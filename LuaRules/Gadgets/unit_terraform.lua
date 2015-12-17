@@ -1864,7 +1864,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			local baseCost = areaCost*pointExtraAreaCost + perimeterCost*pointExtraPerimeterCost + baseTerraunitCost
 			totalCost = totalCost*volumeCost + baseCost
 			
-			--Spring.Echo(totalCost .. "\t" .. baseCost)
+			--Spring.Echo("Total Cost", totalCost, "Area Cost", areaCost*pointExtraAreaCost, "Perimeter Cost", perimeterCost*pointExtraPerimeterCost)
 			local pos = segment[i].position
 			local vx, vz = unitsX - segment[i].position.x, unitsZ - segment[i].position.z
 			local scale = terraUnitLeash/sqrt(vx^2 + vz^2)
@@ -2290,25 +2290,95 @@ local function updateTerraformEdgePoints(id)
 				point.edges = nil
 			end
 		end
-		
 	end
+end
 
+local function CheckThickness(x, z, area)
+	-- This function returns whether the terraform point has sufficient nearby points 
+	-- for the terraform to not be considered too thin.
+
+	if x%16 == 8 then
+		if z%16 == 8 then
+			local north = area[x] and (area[x][z-16] ~= nil)
+			local south = area[x] and (area[x][z+16] ~= nil)
+			local east  = area[x+16] and (area[x+16][z] ~= nil)
+			local west  = area[x-16] and (area[x-16][z] ~= nil)
+			
+			if north and west and area[x-16] and (area[x-16][z-16] ~= nil) then
+				return true
+			end
+			if south and west and area[x-16] and (area[x-16][z+16] ~= nil) then
+				return true
+			end
+			if north and east and area[x+16] and (area[x+16][z-16] ~= nil) then
+				return true
+			end
+			if south and east and area[x+16] and (area[x+16][z+16] ~= nil) then
+				return true
+			end
+		else
+			return (area[x] and (area[x][z-8] ~= nil)) or (area[x] and (area[x][z+8] ~= nil))
+		end
+	elseif z%16 == 8 then
+		return (area[x-8] and (area[x-8][z] ~= nil)) or (area[x+8] and (area[x+8][z] ~= nil))
+	else
+		if area[x-8] and (area[x-8][z-8] ~= nil) then
+			return true
+		end
+		if area[x-8] and (area[x-8][z+8] ~= nil) then
+			return true
+		end
+		if area[x+8] and (area[x+8][z-8] ~= nil) then
+			return true
+		end
+		if area[x+8] and (area[x+8][z+8] ~= nil) then
+			return true
+		end
+	end
+	return false
 end
 
 local function updateTerraformCost(id)
+	local terra = terraformUnit[id]
 
+	local checkAreaRemoved = true
+	local areaRemoved = false
+	while checkAreaRemoved do
+		checkAreaRemoved = false
+		for i = 1, terra.points do
+			local point = terra.point[i]
+			if not point.structure then
+				local x = point.x
+				local z = point.z
+				
+				if not CheckThickness(x, z, terra.area) then
+					if terra.area[x] and terra.area[x][z] then
+						terra.area[x][z] = nil
+					end
+					point.structure = 1		
+					areaRemoved = true
+					checkAreaRemoved = true
+				end
+			end		
+		end
+	end
+	
+	if areaRemoved then
+		updateTerraformEdgePoints(id)
+	end
+	
 	local volume = 0
-	for i = 1, terraformUnit[id].points do
-		local point = terraformUnit[id].point[i]
+	for i = 1, terra.points do
+		local point = terra.point[i]
 		local x = point.x
 		local z = point.z
-
+		
 		local height = spGetGroundHeight(x,z)
 		point.orHeight = height
 		if point.structure == 1 then
 			point.diffHeight = 0
 		elseif point.structure then
-			point.diffHeight = 0.0001
+			point.diffHeight = 0
 		else
 			point.diffHeight = point.aimHeight - height 
 		end
@@ -2320,19 +2390,19 @@ local function updateTerraformCost(id)
 		build  = 0
 	})
 	
-	if volume == 0 then
-		volume = 0.01
-		-- deregistering here causes crash bug
+	if volume < 0.0001 then
+		-- Destroying the terraform here would enable structure-detecting maphax.
+		volume = 0.0001
+		terra.toRemove = true
 	end
 
-	terraformUnit[id].lastProgress = 0
-	terraformUnit[id].lastHealth = 0
-	terraformUnit[id].progress = 0
-	terraformUnit[id].cost = volume*volumeCost
-	terraformUnit[id].totalCost = terraformUnit[id].cost + terraformUnit[id].baseCost
+	terra.lastProgress = 0
+	terra.lastHealth = 0
+	terra.progress = 0
+	terra.cost = volume*volumeCost
+	terra.totalCost = terra.cost + terra.baseCost
 	
 	return true
-	
 end
 
 
@@ -2438,8 +2508,15 @@ local function addSteepnessMarker(team, x, z)
 end
 
 local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
-	
 	local terra = terraformUnit[id]
+	
+	if terra.toRemove and (costDiff > 0.1 or terra.baseCostSpent > 0.1) then
+		-- Removing terraform too early enables structure-detecting maphax.
+		deregisterTerraformUnit(id,arrayIndex,2)			
+		spDestroyUnit(id, false, true)
+		return 0
+	end
+	
 	if terra.baseCostSpent then
 		if costDiff < terra.baseCost-terra.baseCostSpent then
 			terra.baseCostSpent = terra.baseCostSpent + costDiff
@@ -2580,7 +2657,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
-							terra.area[terra.point[i].x][terra.point[i].z] = nil
+							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
 						terra.point[i].diffHeight = 0.0001
 						terra.point[i].structure = 1
@@ -2626,7 +2703,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[terra.point[i].x] and terra.area[terra.point[i].x][terra.point[i].z] then
-							terra.area[terra.point[i].x][terra.point[i].z] = nil
+							terra.area[terra.point[i].x][terra.point[i].z] = false
 						end
 						terra.point[i].diffHeight = 0.0001
 						terra.point[i].structure = 1
@@ -2639,9 +2716,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 						extraPointArea[x] = {}
 					end
 					extraPointArea[x][z] = index
-
 				end
-				
 			end
 		end
 	end
@@ -2700,7 +2775,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
-							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = nil
+							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false
 						end
 						terra.point[extraPoint[i].supportID].diffHeight = 0.0001
 						terra.point[extraPoint[i].supportID].structure = 1
@@ -2744,7 +2819,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 					
 					if structureAreaMap[x] and structureAreaMap[x][z] then
 						if terra.area[extraPoint[index].supportX] and terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] then
-							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = nil
+							terra.area[extraPoint[index].supportX][extraPoint[index].supportZ] = false -- false for edge-derived problems
 						end
 						terra.point[extraPoint[i].supportID].diffHeight = 0.0001
 						terra.point[extraPoint[i].supportID].structure = 1
@@ -2798,9 +2873,7 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 				else
 					edgeTerraMult = edgeTerraCost/addedCost
 				end
-
 			end
-			
 		end
 	end
 	
@@ -2930,7 +3003,6 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 	end
 	
 	return 1
-	
 end
 
 function gadget:GameFrame(n)
@@ -2987,14 +3059,11 @@ function gadget:GameFrame(n)
 				else
 					i = i + 1
 				end
-
 			end
-			
 		else
 			-- remove if the unit is no longer valid
 			deregisterTerraformUnit(id,i,4)
 		end
-		
 	end
 	
 	--check constrcutors that are repairing terraform blocks
