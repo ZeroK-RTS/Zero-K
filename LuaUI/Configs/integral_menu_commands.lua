@@ -17,81 +17,74 @@ local tooltips = {
 }
 
 local factories = {
-	factorycloak = {order = 1},
-	factoryshield = {order = 2},
-	factoryveh = {order = 3},
-	factoryhover = {order = 4},
-	factorygunship = {order = 5},
-	factoryplane = {order = 6},
-	factoryspider = {order = 7},
-	factoryjump = {order = 8},
-	factorytank = {order = 9},
-	factoryamph = {order = 10},
-	factoryship = {order = 11},
-	striderhub = {order = 12},
+	factorycloak =    {order = 1, row = 1, col = 1},
+	factoryshield =   {order = 2, row = 1, col = 2},
+	factoryveh =      {order = 3, row = 1, col = 3},
+	factoryhover =    {order = 4, row = 1, col = 4},
+	factorygunship =  {order = 5, row = 1, col = 5},
+	factoryplane =    {order = 6, row = 1, col = 6},
+	factoryspider =   {order = 7, row = 2, col = 1},
+	factoryjump =     {order = 8, row = 2, col = 2},
+	factorytank =     {order = 9, row = 2, col = 3},
+	factoryamph =    {order = 10, row = 2, col = 4},
+	factoryship =    {order = 11, row = 2, col = 5},
+	striderhub =     {order = 12, row = 2, col = 6},
 }
 
 --Integral menu is NON-ROBUST
 --all buildings (except facs) need a row or they won't appear!
 --you can put too many things into the same row, but the buttons will be squished
 local econ = {
-	cormex = {order = 1, row = 1},
-	armwin = {order = 2, row = 2},
-	armsolar = {order = 3, row = 2},
-	geo = {order = 4, row = 2},
-	armfus = {order = 5, row = 2},
-	cafus = {order = 6, row = 2},
-	armmstor = {order = 7, row = 3},
-	armestor = {order = 8, row = 3},
-	armnanotc = {order = 9, row = 3},
-	armasp = {order = 10, row = 3},
+	cormex =     {order = 1, row = 1, col = 1},
+	armwin =     {order = 2, row = 2, col = 1},
+	armsolar =   {order = 3, row = 2, col = 2},
+	geo =        {order = 4, row = 2, col = 3},
+	armfus =     {order = 5, row = 2, col = 4},
+	cafus =      {order = 6, row = 2, col = 5},
+	armmstor =   {order = 7, row = 3, col = 1},
+	armestor =   {order = 8, row = 3, col = 2},
+	armnanotc =  {order = 9, row = 3, col = 3},
+	armasp =    {order = 10, row = 3, col = 4},
 }
 
 local defense = {
-	corrl = {order = 0, row = 1},
-	corllt = {order = 1, row = 1},
-	armdeva = {order = 2, row = 1},
-	armartic = {order = 3, row = 1},
---	corgrav = {order = 4, row = 1},
-	armpb = {order = 5, row = 1},
-	corhlt = {order = 6, row = 1},
---	armanni = {order = 7, row = 1},
+	corrl =    {order = 0, row = 1, col = 1},
+	corllt =   {order = 1, row = 1, col = 2},
+	armdeva =  {order = 2, row = 1, col = 3},
+	armartic = {order = 3, row = 1, col = 4},
+	armpb =    {order = 5, row = 1, col = 5},
+	corhlt =   {order = 6, row = 1, col = 6},
 
---	corrl = {order = 8, row = 2},
-	missiletower = {order = 9, row = 2},
-	corrazor = {order = 10, row = 2},
-	corflak = {order = 11, row = 2},
-	armcir = {order = 12, row = 2},
-	screamer = {order = 13, row = 2},
+	missiletower =  {order = 9, row = 2, col = 1},
+	corrazor =     {order = 10, row = 2, col = 2},
+	corflak =      {order = 11, row = 2, col = 3},
+	armcir =       {order = 12, row = 2, col = 4},
+	screamer =     {order = 13, row = 2, col = 5},
 
 --	armartic = {order = 3, row = 3},
-	corgrav = {order = 4, row = 3},
-	turrettorp = {order = 14, row = 3},
-	cordoom = {order = 16, row = 3},
-	armanni = {order = 17, row = 3},
-	corjamt = {order = 18, row = 3},
+	corgrav =    {order = 4, row = 3, col = 1},
+	turrettorp = {order = 14, row = 3, col = 2},
+	cordoom =    {order = 16, row = 3, col = 3},
+	armanni =    {order = 17, row = 3, col = 4},
+	corjamt =    {order = 18, row = 3, col = 5},
 }
 
 local aux = {	--merged into special
-	corrad = {order = 10, row = 1},
-	armsonar = {order = 11, row = 1},
-	armjamt = {order = 12, row = 1},
-	armarad = {order = 14, row = 1},
---	corjamt = {order = 12, row = 1},
-	--armasp = {order = 15, row = 1},
+	corrad =   {order = 10, row = 1, col = 1},
+	armsonar = {order = 11, row = 1, col = 2},
+	armjamt =  {order = 12, row = 1, col = 3},
+	armarad =  {order = 14, row = 1, col = 4},
 }
 
 local super = {	--merged into special
-	missilesilo = {order = 15, row = 1},
-	armamd = {order = 16, row = 1},
-	--missilesilo = {order = 1, row = 2},
-	corbhmth = {order = 2, row = 2},
-	armbrtha = {order = 3, row = 2},
-	corsilo = {order = 4, row = 2},
-	zenith = {order = 5, row = 2},
-	raveparty = {order = 6, row = 2},
-	mahlazer = {order = 7, row = 2},
-	--zenith = {order = 1, row = 3},
+	missilesilo = {order = 15, row = 1, col = 5},
+	armamd =      {order = 16, row = 1, col = 6},
+	corbhmth =     {order = 2, row = 2, col = 1},
+	armbrtha =     {order = 3, row = 2, col = 2},
+	corsilo =      {order = 4, row = 2, col = 3},
+	zenith =       {order = 5, row = 2, col = 4},
+	raveparty =    {order = 6, row = 2, col = 5},
+	mahlazer =     {order = 7, row = 2, col = 6},
 }
 
 --manual entries not needed; menu has autodetection
@@ -102,11 +95,11 @@ local factory_commands = {}
 local econ_commands = {}
 local defense_commands = {}
 local special_commands = {
-	[CMD_RAMP] = {order = 16, row = 3},
-	[CMD_LEVEL] = {order = 17, row = 3},
-	[CMD_RAISE] = {order = 18, row = 3},
-	[CMD_RESTORE] = {order = 19, row = 3},
-	[CMD_SMOOTH] = {order = 20, row = 3},
+	[CMD_RAMP] =    {order = 16, row = 3, col = 1},
+	[CMD_LEVEL] =   {order = 17, row = 3, col = 2},
+	[CMD_RAISE] =   {order = 18, row = 3, col = 3},
+	[CMD_RESTORE] = {order = 19, row = 3, col = 4},
+	[CMD_SMOOTH] =  {order = 20, row = 3, col = 5},
 	--[CMD_BUMPY] = {order = 21, row = 3},
 }
 
