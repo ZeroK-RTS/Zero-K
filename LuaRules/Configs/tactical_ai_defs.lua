@@ -74,6 +74,12 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"armsnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
+local scorcherSwarmieeArray = {}
+for unitName, def in pairs(UnitDefNames) do
+	local id = def.id
+	scorcherSwarmieeArray[id] = true
+end
+
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
@@ -229,6 +235,13 @@ local slasherSkirmieeArray = NameToDefID({
 	"armrock",
 })
 
+local sniperSkirmieeArray = {}
+for name,data in pairs(UnitDefNames) do
+	if data.speed > 0 and not data.canfly then
+		sniperSkirmieeArray[data.id] = true
+	end
+end
+
 shortRangeSkirmieeArray = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 riotRangeSkirmieeArray = Union(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
@@ -284,7 +297,7 @@ local fleeables = NameToDefID({
 
 local armedLand = {}
 for name,data in pairs(UnitDefNames) do
-	if data.canAttack and (not data.canFly) 
+	if data.canAttack and (not data.canfly) 
 	and data.weapons[1] and data.weapons[1].onlyTargets.land then
 		armedLand[data.id] = true 
 	end
@@ -374,13 +387,13 @@ local behaviourConfig = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		jinkTangentLength = 100, 
-		minCircleStrafeDistance = 0,
+		localJinkOrder = false,
+		circleStrafe = true,
+		minCircleStrafeDistance = 170,
+		maxSwarmLeeway = 170, 
+		jinkTangentLength = 100,
 		minSwarmLeeway = 100,
-		swarmLeeway = 30, 
-		alwaysJinkFight = true,	
+		swarmLeeway = 200, 
 	},
   
 	["armpw"] = {
@@ -435,6 +448,7 @@ local behaviourConfig = {
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 30,
 	},
+	
 	["amphraider3"] = {
 		waterline = -5,
 		land = {
@@ -464,16 +478,20 @@ local behaviourConfig = {
 		velocityPrediction = 30,
 		},
 	},
+	
 	["corgator"] = {
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
+		skirms = {}, 
+		swarms = scorcherSwarmieeArray, 
 		flees = {},
-		circleStrafe = true, 
-		strafeOrderLength = 120,
+		localJinkOrder = false,
+		jinkTangentLength = 50,
+		circleStrafe = true,
+		strafeOrderLength = 100,
+		minCircleStrafeDistance = 260,
 		skirmLeeway = 60,
-		maxSwarmLeeway =180, 
-		minSwarmLeeway = 300, 
-		swarmLeeway = 40, 
+		maxSwarmLeeway = 0,
+		minSwarmLeeway = 100, 
+		swarmLeeway = 300, 
 		stoppingDistance = 8,
 		skirmOrderDis = 150,
 	},
@@ -836,12 +854,10 @@ local behaviourConfig = {
 	},	
 	
 	["armsnipe"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = sniperSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
-		maxSwarmLeeway = 10,
-		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
+		skirmLeeway = 300, 
 	},
 	
 	["corgarp"] = {

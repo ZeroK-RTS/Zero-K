@@ -12,7 +12,7 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  category            = [[LAND]],
+  category            = [[LAND TOOFAST]],
   cloakCost           = 0,
   corpse              = [[DEAD]],
 

@@ -1,4 +1,3 @@
-
 function gadget:GetInfo()
   return {
 	name 	= "Tactical Unit AI",
