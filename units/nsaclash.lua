@@ -72,7 +72,7 @@ unitDef = {
   sightDistance       = 495,
   smoothAnim          = true,
   turninplace         = 0,
-  turnRate            = 480,
+  turnRate            = 440,
   workerTime          = 0,
 
   weapons             = {
@@ -90,7 +90,7 @@ unitDef = {
 
     MISSILE = {
       name                    = [[Heavy Missile Battery]],
-      areaOfEffect            = 96,
+      areaOfEffect            = 80,
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 1.4,
@@ -101,7 +101,7 @@ unitDef = {
 
       fireStarter             = 70,
       fixedlauncher           = true,
-      flightTime              = 3.5,
+      flightTime              = 3.1,
       impulseBoost            = 0.75,
       impulseFactor           = 0.3,
       interceptedByShieldType = 2,
@@ -119,12 +119,12 @@ unitDef = {
       texture2                = [[lightsmoketrail]],
       tracks                  = true,
       trajectoryHeight        = 0.4,
-      turnRate                = 24000,
+      turnRate                = 21000,
       turret                  = true,
       weaponAcceleration      = 90,
-      weaponTimer             = 3,
+      weaponTimer             = 3.1,
       weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 200,
+      weaponVelocity          = 180,
     },
 	
   },

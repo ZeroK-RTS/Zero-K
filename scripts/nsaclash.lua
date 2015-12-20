@@ -29,6 +29,8 @@ local flares = {
 
 local gunHeading = 0
 
+local ROCKET_SPREAD = 0.4
+
 local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
 
@@ -89,6 +91,8 @@ end
 
 function script.Create()
 	Turn(exhaust, y_axis, math.rad(-180))
+	Turn(lbarrel, y_axis, ROCKET_SPREAD)
+	Turn(rbarrel, y_axis, -ROCKET_SPREAD)
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
@@ -111,8 +115,8 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(180))
 	Turn(turret, x_axis, -pitch, math.rad(100))
-	Turn(lbarrel, y_axis, 2*pitch, math.rad(300))
-	Turn(rbarrel, y_axis, -2*pitch, math.rad(300))
+	Turn(lbarrel, y_axis, ROCKET_SPREAD + 2*pitch, math.rad(300))
+	Turn(rbarrel, y_axis, -ROCKET_SPREAD - 2*pitch, math.rad(300))
 	Turn(lbarrel, x_axis, -pitch, math.rad(300))
 	Turn(rbarrel, x_axis, -pitch, math.rad(300))
 	gunHeading = heading
