@@ -713,15 +713,33 @@ end
 -- comm selection functionality
 local commIndex = 1
 local function SelectComm()
-	if #comms <= 0 then return end	-- no comms, don't bother
-	if commIndex > #comms then commIndex = #comms end
+	local commCount = #comms
+	if commCount <= 0 then 
+		-- no comms, don't bother
+		return 
+	end
+	
+	-- This check deals with the case of spectators selecting
+	-- teams with different numbers of commanders.
+	if commCount < commIndex then
+		commIndex = commCount
+	end
+	
 	local unitID
-	repeat	-- if this comm is already in selection, try the next one
+	-- Loop long enough to check every commander.
+	-- The most recently Ctrl+C selected commander is checked last.
+	-- Select the first non-selected commander encountered.
+	for i = 1, commCount do
 		unitID = comms[commIndex].commID
-		if #comms == 1 then break end	-- no other comms, just select this one
-		commIndex = commIndex + 1	-- try next comm
-		if commIndex > #comms then commIndex = 1 end	-- loop
-	until not Spring.IsUnitSelected(unitID)
+		commIndex = commIndex + 1
+		if commIndex > commCount then
+			commIndex = 1
+		end
+		if not Spring.IsUnitSelected(unitID) then
+			break
+		end
+	end
+	
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	Spring.SelectUnitArray({unitID}, shift)
 	if not shift then
