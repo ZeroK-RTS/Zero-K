@@ -22,8 +22,7 @@ local rankTextures = {
 	[1] = rankTexBase .. 'rank1.png',
 	[2] = rankTexBase .. 'rank2.png',
 	[3] = rankTexBase .. 'rank3.png',
-	[4] = rankTexBase .. 'rank4.png',
-	[5] = rankTexBase .. 'star.png',
+	[4] = rankTexBase .. 'star.png',
 }
 
 function widget:Initialize ()
