@@ -113,7 +113,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		if remTransportiee[targetID] == -1 then
 			defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 		else
-			
 			defPrio = (targetTable[remTransportiee[targetID]][attackerWeaponDefID] or 5)*transportMult[enemyUnitDef]
 		end
 	else
@@ -139,15 +138,16 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		if remCaptureHealth[targetID] then
 			hpAdd = remCaptureHealth[targetID]
 		else
-			local armor = select(2,Spring.GetUnitArmored(unitID)) or 1		
+			local armored = Spring.GetUnitArmored(targetID)	
 			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
-			hp = hp/armor
-			maxHP = maxHP/armor
-			
 			if hp and maxHP then
 				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
 			else
 				hpAdd = 0
+			end
+			
+			if armored then
+				hpAdd = hpAdd + 2
 			end
 			
 			if capture > 0 then
@@ -162,15 +162,16 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		if remHealth[targetID] then
 			hpAdd = remHealth[targetID]
 		else
-			local armor = select(2,Spring.GetUnitArmored(unitID)) or 1		
+			local armored = Spring.GetUnitArmored(targetID)	
 			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
-			hp = hp/armor
-			maxHP = maxHP/armor
-			
 			if hp and maxHP then
 				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
 			else
 				hpAdd = 0
+			end
+			
+			if armored then
+				hpAdd = hpAdd + 2
 			end
 			
 			if capture > 0 then
@@ -182,18 +183,14 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 	end
 	
-	--Note: included toned down engine priority (maybe have desired behaviour?).
-	local miscAdd = 0
-	miscAdd = defPriority*0.00000005 --toned down to be around 0.0 to 0.1 (no guarantee)
-	
 	local distAdd = 0 --reimplementing proximityPriority weapon tag
 	if WeaponDefs[attackerWeaponDefID].proximityPriority then
 		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
 		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range)*0.1*WeaponDefs[attackerWeaponDefID].proximityPriority --0.0 to 0.1 multiplied by proximityPriority
 	end
 	
-	local newPriority = hpAdd + defPrio + miscAdd + distAdd
-
+	local newPriority = hpAdd + defPrio + distAdd
+	
 	return true, newPriority --bigger value have lower priority
 end
 

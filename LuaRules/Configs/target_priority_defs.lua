@@ -70,10 +70,9 @@ local unitIsTooFastToHit = {
 	[UnitDefNames["armpw"].id] = true,
 	[UnitDefNames["corfav"].id] = true,
 	[UnitDefNames["corgator"].id] = true,
+	[UnitDefNames["corsh"].id] = true,
 	[UnitDefNames["corak"].id] = true,
-	[UnitDefNames["armtick"].id] = true,
 	[UnitDefNames["puppy"].id] = true,
-	[UnitDefNames["corroach"].id] = true,
 }
 
 local unitIsRaider = {
@@ -81,6 +80,7 @@ local unitIsRaider = {
 	[UnitDefNames["armpw"].id] = true,
 	[UnitDefNames["corfav"].id] = true,
 	[UnitDefNames["corgator"].id] = true,
+	[UnitDefNames["corsh"].id] = true,
 	[UnitDefNames["corak"].id] = true,
 	[UnitDefNames["puppy"].id] = true,
 	[UnitDefNames["armkam"].id] = true,
@@ -105,27 +105,12 @@ local unitIsBadAgainstGround = {
 	[UnitDefNames["fighter"].id] = true,
 }
 
--- raider target primier
-local unitIsMex = {
-	[UnitDefNames["cormex"].id] = true,
-}
-
--- universal bad target
-local unitIsSolar = {
-	[UnitDefNames["armsolar"].id] = true,
-}
-
 -- Prioritize bombers
 local unitIsBomber = {
 	[UnitDefNames["corshad"].id] = true,
 	[UnitDefNames["corhurc2"].id] = true,
 	[UnitDefNames["armcybr"].id] = true,
 	[UnitDefNames["armstiletto_laser"].id] = true,
-}
-
--- Hardcode that racketeer does disarm damage
-local unitIsDisarmer = {
-	[UnitDefNames["shieldarty"].id] = true,
 }
 
 -- Hardcode things which do high burst damage with a long cooldown
@@ -143,6 +128,9 @@ local unitIsCheap = {
 -- Hardcode things which should not fire at things too fast to hit
 local unitIsBadAgainstFastStuff = {
 	[UnitDefNames["correap"].id] = true,
+	[UnitDefNames["corraid"].id] = true,
+	[UnitDefNames["spiderassult"].id] = true,
+	[UnitDefNames["hoverassault"].id] = true,
 	[UnitDefNames["armmanni"].id] = true,
 	[UnitDefNames["armanni"].id] = true,
 	[UnitDefNames["corstorm"].id] = true,
@@ -182,13 +170,6 @@ for i=1, #UnitDefs do
 			local realWD = wd.weaponDef
 			weaponBadCats[realWD].ground = true
 		end
-	elseif unitIsDisarmer[i] then
-		local weapons = ud.weapons
-		for j = 1, #weapons do
-			local wd = weapons[j]
-			local realWD = wd.weaponDef
-			weaponBadCats[realWD].unarmed = true
-		end
 	elseif unitIsHeavyHitter[i] then
 		local weapons = ud.weapons
 		for j = 1, #weapons do
@@ -199,8 +180,8 @@ for i=1, #UnitDefs do
 	end
 end
 
---[[
 -- Check to output expected priority values.
+--[[
 local baseUnitPriority = {}
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -233,22 +214,16 @@ for uid = 1, #UnitDefs do
 	targetTable[uid] = {}
 	for wid = 1, #WeaponDefs do
 		if unitIsUnarmed[uid] then
-			if weaponBadCats[wid].unarmed or unitIsSolar[uid] then
-				targetTable[uid][wid] = unitHealthRatio[uid] + 1000
-			else
-				targetTable[uid][wid] = unitHealthRatio[uid] + 35
-			end
+			targetTable[uid][wid] = unitHealthRatio[uid] + 35
 		elseif (unitIsFighterOrDrone[uid])
 			or (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid])
 			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
 			or (weaponBadCats[wid].ground and unitIsGround[uid])
 			or (weaponBadCats[wid].cheap and unitIsCheap[uid])then
-				targetTable[uid][wid] = unitHealthRatio[uid] + 500
+				targetTable[uid][wid] = unitHealthRatio[uid] + 15
 		elseif unitIsBomber[uid] and weaponIsAA[wid] then
 			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
-		--elseif (weaponBadCats[wid].raider and unitIsMex[uid]) then -- disabled as bad for default behavior
-			--targetTable[uid][wid] = 1 -- mexes get max priority for raiders
 		else
 			targetTable[uid][wid] = unitHealthRatio[uid]
 		end
