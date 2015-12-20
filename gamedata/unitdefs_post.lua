@@ -589,6 +589,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Set higher default losEmitHeight. Engine default is 20.
+--
+
+for name, unitDef in pairs(UnitDefs) do
+	if not unitDef.losEmitHeight then
+		unitDef.losEmitHeight = 30
+    end
+end
+
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Lasercannons going through units fix
 -- 
 
