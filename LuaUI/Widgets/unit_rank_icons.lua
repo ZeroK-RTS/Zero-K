@@ -11,6 +11,8 @@ function widget:GetInfo() return {
 local min   = math.min
 local floor = math.floor
 
+local spGetSpectatingState = Spring.GetSpectatingState
+
 local clearing_table = {
 	name = 'rank',
 	texture = nil
@@ -44,22 +46,24 @@ function UpdateUnitRank (unitID)
 	})
 end
 
-function widget:UnitExperience (unitID)
-	UpdateUnitRank (unitID)
+function widget:UnitExperience(unitID)
+	UpdateUnitRank(unitID)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	UpdateUnitRank (unitID)
+	UpdateUnitRank(unitID)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	UpdateUnitRank (unitID)
+	UpdateUnitRank(unitID)
 end
 
 function widget:UnitLeftLos(unitID, unitDefID, unitTeam)
-	WG.icons.SetUnitIcon (unitID, clearing_table)
+	if not spGetSpectatingState() then
+		WG.icons.SetUnitIcon(unitID, clearing_table)
+	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	WG.icons.SetUnitIcon (unitID, clearing_table)
+	WG.icons.SetUnitIcon(unitID, clearing_table)
 end
