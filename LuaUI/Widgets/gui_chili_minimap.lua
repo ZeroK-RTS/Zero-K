@@ -50,7 +50,7 @@ local iconsize = 20
 local bgColor_panel = {nil, nil, nil, 1}
 local final_opacity = 0
 local last_alpha = 1 --Last set alpha value for the actual clickable minimap image
-local default_fog_brightness = 5.0
+local default_fog_brightness = 0.5
 
 local tabbedMode = false
 
@@ -123,7 +123,7 @@ options_order = {
 	
 	-- Radar view configuration
 	'radar_view_colors_label1',
-	'radar_fog_brightness', 
+	'radar_fog_brightness1', 
 	
 	-- Radar view editing
 	'radar_view_colors_label2', 
@@ -242,7 +242,7 @@ options = {
 		type = 'label', name = 'Other Options',
 	},
 	
-	radar_fog_brightness = {
+	radar_fog_brightness1 = {
 		name = "Fog Brightness",
 		type = "number",
 		value = default_fog_brightness, min = 0, max = 1, step = 0.01,
@@ -294,7 +294,7 @@ options = {
 		OnChange = function()
 			-- options.radar_fog_color.value = { 0.25, 0.25, 0.25, 1}
 			-- options.radar_los_color.value = { 0.25, 0.25, 0.25, 1}
-			options.radar_fog_brightness.value = default_fog_brightness
+			options.radar_fog_brightness1.value = default_fog_brightness
 			options.radar_radar_color.value = { 0, 0, 0, 0}
 			options.radar_radar2_color.value = { 0, 0, 0, 0}
 			options.radar_jammer_color.value = { 0, 0, 0, 0}
@@ -308,7 +308,7 @@ options = {
 		name = 'Double Outline (default)',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_brightness.value = default_fog_brightness
+			options.radar_fog_brightness1.value = default_fog_brightness
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			options.radar_radar_color.value = { 0, 0, 1, 0}
 			options.radar_radar2_color.value = { 0, 1, 0, 0}
@@ -322,7 +322,7 @@ options = {
 		name = 'Blue Outline',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_brightness.value = default_fog_brightness
+			options.radar_fog_brightness1.value = default_fog_brightness
 			options.radar_jammer_color.value = { 0.1, 0, 0, 0}
 			options.radar_radar_color.value = { 0, 0, 1, 0}
 			options.radar_radar2_color.value = { 0, 0, 1, 0}
@@ -336,7 +336,7 @@ options = {
 		name = 'Green Area Fill',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_brightness.value = default_fog_brightness
+			options.radar_fog_brightness1.value = default_fog_brightness
 			options.radar_radar_color.value = { 0, 0.17, 0, 0}
 			options.radar_radar2_color.value = { 0, 0.17, 0, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
@@ -350,7 +350,7 @@ options = {
 		name = 'Green in Blue Outline',
 		type = 'button',
 		OnChange = function()
-			options.radar_fog_brightness.value = default_fog_brightness
+			options.radar_fog_brightness1.value = default_fog_brightness
 			options.radar_radar_color.value = { 0, 0, 0.4, 0}
 			options.radar_radar2_color.value = { 0, 0.04, 1, 0}
 			options.radar_jammer_color.value = { 0.18, 0, 0, 0}
@@ -489,7 +489,7 @@ function updateRadarColors()
 
 	-- local fog = options.radar_fog_color.value
 	-- local los = options.radar_los_color.value
-	local fog_value = options.radar_fog_brightness.value * losViewOffBrightness
+	local fog_value = options.radar_fog_brightness1.value * losViewOffBrightness
 	local los_value = (losViewOffBrightness - fog_value)
 	local fog = {fog_value, fog_value, fog_value, 1}
 	local los = {los_value, los_value, los_value, 1}

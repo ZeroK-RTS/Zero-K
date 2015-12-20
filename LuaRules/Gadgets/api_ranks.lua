@@ -10,11 +10,15 @@ function gadget:GetInfo() return {
 	enabled = true,
 } end
 
+local spValidUnitID = Spring.ValidUnitID
+
 local penalties = {}
 local workToDo = false
 
 function gadget:UnitDestroyed (unitID, unitDefID, unitTeam, attackerID, attackerDefID, attackerTeam)
-	if (not attackerID) or Spring.AreTeamsAllied(attackerTeam, unitTeam) then return end
+	if (not attackerID) or Spring.AreTeamsAllied(attackerTeam, unitTeam) then 
+		return 
+	end
 	local penalty = UnitDefs[unitDefID].power / UnitDefs[attackerDefID].power
 	local xp = Spring.GetUnitExperience(attackerID) - penalty
 	if xp < 0 then
@@ -28,8 +32,10 @@ end
 function gadget:GameFrame (n)
 	if workToDo then
 		for unitID, penalty in pairs(penalties) do
-			Spring.SetUnitExperience(unitID, Spring.GetUnitExperience(unitID) - penalty)
-			penalties[unitID] = nil
+			if unitID and penalty and spValidUnitID(unitID) then
+				Spring.SetUnitExperience(unitID, Spring.GetUnitExperience(unitID) - penalty)
+				penalties[unitID] = nil
+			end
 		end
 		workToDo = false
 	end
