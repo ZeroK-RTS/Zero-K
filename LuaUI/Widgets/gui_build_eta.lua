@@ -28,15 +28,31 @@ stockpilerDefNames = nil
 local etaTable = {}
 local stockpileEtaTable = {}
 
+local fontSize = 8
+local displayETA = true
 
 options_path = 'Settings/Interface/Build ETA'
-options_order = { 'showonlyonshift'}
+options_order = { 'showonlyonshift', 'fontsize', 'drawHeight'}
 options = {
-	
 	showonlyonshift = {
 		name = 'Show only on shift',
 		type = 'bool',
 		value = false,
+	},
+	fontsize = {
+		name = 'Size',
+		type = 'number',
+		value = 9,
+		min = 2, max = 40, step = 1,
+		OnChange = function(self) 
+			fontSize = self.value 
+		end,
+	},
+	drawHeight = {
+		name = 'Display Height',
+		type = 'number',
+		value = 1500,
+		min = 0, max = 5000, step = 1,
 	},
 }
 
@@ -254,6 +270,22 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 end
 
+function widget:Update()
+	if options.drawHeight.value < 5000 then
+		local cs = Spring.GetCameraState()
+		local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+		local cameraHeight
+		if cs.name == "ov" then
+			displayETA = true
+			return
+		elseif cs.name == "ta" then
+			cameraHeight = cs.height - gy
+		else
+			cameraHeight = cs.py - gy
+		end
+		displayETA = options.drawHeight.value > cameraHeight
+	end
+end
 
 local function DrawEtaText(timeLeft,yoffset, negative)
 	local etaStr
@@ -267,11 +299,15 @@ local function DrawEtaText(timeLeft,yoffset, negative)
 	gl.Translate(0, yoffset,0)
 	gl.Billboard()
 	gl.Translate(0, 5 ,0)
-	gl.Text(etaStr, 0, 0, 8, "co")
+	gl.Text(etaStr, 0, 0, fontSize, "co")
 end
 
 function widget:DrawWorld()
-	if Spring.IsGUIHidden() or (options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then return end
+	if Spring.IsGUIHidden() or 
+		not displayETA or
+		(options.showonlyonshift.value and not select(4,Spring.GetModKeyState())) then 
+		return 
+	end
 	gl.DepthTest(true)
 
 	gl.Color(1, 1, 1)
