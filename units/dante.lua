@@ -214,7 +214,7 @@ unitDef = {
       },
 
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:napalm_koda]],
+      explosionGenerator      = [[custom:napalm_phoenix]],
       fireStarter             = 250,
       fixedlauncher           = true,
       flightTime              = 1.8,
@@ -266,7 +266,7 @@ unitDef = {
 
       dance                   = 15,
       edgeEffectiveness       = 0.75,
-      explosionGenerator      = [[custom:napalm_koda]],
+      explosionGenerator      = [[custom:napalm_phoenix]],
       fireStarter             = 250,
       fixedlauncher           = true,
       flightTime              = 1.8,
