@@ -27,8 +27,10 @@ local rankTextures = {
 	[4] = rankTexBase .. 'star.png',
 	[5] = rankTexBase .. 'star.png',
 	[6] = rankTexBase .. 'star.png',
-	[7] = rankTexBase .. 'star.png',
+	[7] = rankTexBase .. 'goldstar.png',
 	[8] = rankTexBase .. 'goldstar.png',
+	[9] = rankTexBase .. 'goldstar.png',
+	[10] = rankTexBase .. 'goldeverything.png',
 }
 
 function widget:Initialize ()
