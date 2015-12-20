@@ -2300,20 +2300,35 @@ local function CheckThickness(x, z, area)
 	if x%16 == 8 then
 		if z%16 == 8 then
 			local north = area[x] and (area[x][z-16] ~= nil)
+			local northEast = area[x+16] and (area[x+16][z-16] ~= nil)
+			local east = area[x+16] and (area[x+16][z] ~= nil)
+			if north and northEast and east then
+				return true
+			end
+			local southEast = area[x+16] and (area[x+16][z+16] ~= nil)
+			if northEast and east and southEast then
+				return true
+			end
 			local south = area[x] and (area[x][z+16] ~= nil)
-			local east  = area[x+16] and (area[x+16][z] ~= nil)
-			local west  = area[x-16] and (area[x-16][z] ~= nil)
-			
-			if north and west and area[x-16] and (area[x-16][z-16] ~= nil) then
+			if east and southEast and south then
 				return true
 			end
-			if south and west and area[x-16] and (area[x-16][z+16] ~= nil) then
+			local southWest = area[x-16] and (area[x-16][z+16] ~= nil)
+			if southEast and south and southWest then
 				return true
 			end
-			if north and east and area[x+16] and (area[x+16][z-16] ~= nil) then
+			local west = area[x-16] and (area[x-16][z] ~= nil)
+			if south and southWest and west then
 				return true
 			end
-			if south and east and area[x+16] and (area[x+16][z+16] ~= nil) then
+			local northWest = area[x-16] and (area[x-16][z-16] ~= nil)
+			if southWest and west and northWest then
+				return true
+			end
+			if west and northWest and north then
+				return true
+			end
+			if northWest and north and northEast then
 				return true
 			end
 		else
