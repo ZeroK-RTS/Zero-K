@@ -43,7 +43,7 @@ options = {
 		name = 'Size',
 		type = 'number',
 		value = 9,
-		min = 2, max = 40, step = 1,
+		min = 2, max = 100, step = 1,
 		OnChange = function(self) 
 			fontSize = self.value 
 		end,
