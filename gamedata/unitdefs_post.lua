@@ -551,9 +551,9 @@ for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and (ud.turnrate > 600 or ud.customparams.turnatfullspeed) then
 		ud.turninplace = false
 		ud.turninplacespeedlimit = (ud.maxvelocity or 0)
-	else
+	elseif ud.turninplace ~= true then
 		ud.turninplace = false	-- true
-		ud.turninplacespeedlimit = (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
+		ud.turninplacespeedlimit = ud.turninplacespeedlimit or (ud.maxvelocity and ud.maxvelocity*0.6 or 0)
 		--ud.turninplaceanglelimit = 180
 	end
  
