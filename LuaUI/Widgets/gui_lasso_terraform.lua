@@ -76,13 +76,7 @@ local string_format = string.format
 local team = Spring.GetMyTeamID()
 
 -- command IDs
-local CMD_RAMP = 39734
-local CMD_LEVEL = 39736
-local CMD_RAISE = 39737
-local CMD_SMOOTH = 39738
-local CMD_RESTORE = 39739
-local CMD_BUMPY = 39740
-local CMD_TERRAFORM_INTERNAL = 39801
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local Grid = 16 -- grid size, do not change without other changes.
 
