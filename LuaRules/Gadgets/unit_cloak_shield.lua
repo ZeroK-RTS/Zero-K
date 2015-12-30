@@ -425,7 +425,7 @@ function gadget:GameFrame(frameNum)
         data.delay = nil
       end
       ShrinkRadius(data)
-    elseif (GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)) then
+    elseif (GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or (Spring.GetUnitRulesParam(unitID, "morphDisable") == 1)) then
       ShrinkRadius(data)
     elseif (not data.want) then
       ShrinkRadius(data)

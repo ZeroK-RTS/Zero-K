@@ -267,8 +267,8 @@ local function StopMorph(unitID, morphData)
 	GG.StopMiscPriorityResourcing(unitID,morphData.teamID, 2) --is using unit_priority.lua gadget to handle morph priority.
 	morphUnits[unitID] = nil
 	if not morphData.combatMorph then
-	Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
-	GG.UpdateUnitAttributes(unitID)
+		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
+		GG.UpdateUnitAttributes(unitID)
 	end
 	Spring.SetUnitRulesParam(unitID, "morphing", 0)
 	local scale = morphData.progress * stopPenalty
