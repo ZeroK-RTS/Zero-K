@@ -68,15 +68,45 @@ local moduleDefs = {
 		slotType = "module",
 	},
 	{
-		name = "skull",
-		humanName = "Skull Thingy",
-		description = "Skull Thingy - Limit 3",
+		name = "damageBooster",
+		humanName = "Damage Booster",
+		description = "Damage Booster, increases damage by 10%. Limit 8.",
 		image = "unitpics/module_dmg_booster.png",
-		limit = 3,
+		limit = 8,
 		cost = 40,
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
+	},
+	{
+		name = "speed",
+		humanName = "High Power Servos",
+		description = "High Power Servos, increases speed by 10%. Limit 8",
+		image = "unitpics/module_high_power_servos.png",
+		limit = 8,
+		cost = 40,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
+		end
+	},
+	{
+		name = "econ",
+		humanName = "Vanguard Economy Pack",
+		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
+		image = "unitpics/module_energy_cell.png",
+		limit = 1,
+		cost = 0,
+		requireModules = {},
+		requireChassis = {"recon", "support"},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.metalIncome = (sharedData.metalIncome or 0) + 4
+			sharedData.energyIncome = (sharedData.energyIncome or 0) + 6
+		end
 	},
 }
 
@@ -92,38 +122,38 @@ local chassisDefs = {
 		levelDefs = {
 			{
 				morphBuildPower = 10,
-				morphBaseCost = 200,
+				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commrecon1_damage_boost" .. (modulesByDefID[moduleDefNames[skull]] or 0)].id
+					return UnitDefNames["commrecon1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = 3,
+						defaultModule = moduleDefNames.gun,
 						slotType = "weapon",
 					},
 					{
-						defaultModule = 5,
+						defaultModule = moduleDefNames.bigHealth,
 						slotType = "module",
 					},
 					{
-						defaultModule = 7,
+						defaultModule = moduleDefNames.health,
 						slotType = "module",
 					},
 				},
 			},
 			{
 				morphBuildPower = 20,
-				morphBaseCost = 300,
+				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commrecon2_damage_boost" .. (modulesByDefID[moduleDefNames[skull]] or 0)].id
+					return UnitDefNames["commrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = 5,
+						defaultModule = moduleDefNames.bigHealth,
 						slotType = "module",
 					},
 					{
-						defaultModule = 7,
+						defaultModule = moduleDefNames.health,
 						slotType = "module",
 					},
 				},
@@ -136,21 +166,21 @@ local chassisDefs = {
 		levelDefs = {
 			{
 				morphBuildPower = 10,
-				morphBaseCost = 200,
+				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commsupport1_damage_boost" .. (modulesByDefID[moduleDefNames[skull]] or 0)].id
+					return UnitDefNames["commsupport1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = 3,
+						defaultModule = moduleDefNames.gun,
 						slotType = "weapon",
 					},
 					{
-						defaultModule = 5,
+						defaultModule = moduleDefNames.bigHealth,
 						slotType = "module",
 					},
 					{
-						defaultModule = 7,
+						defaultModule = moduleDefNames.health,
 						slotType = "module",
 					},
 				},

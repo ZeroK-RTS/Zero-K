@@ -38,6 +38,17 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
+local function UpdateUnitWithSharedData(unitID, data)
+	if data.speedMult then
+		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
+		GG.UpdateUnitAttributes(unitID)
+	end
+	
+	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
+		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+	end
+end
+
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
 	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
 	
@@ -50,7 +61,6 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", upgradeDef.chassis, INLOS)
 
 	local moduleList = upgradeDef.moduleList
-	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
 	
 	-- Set module unitRulesParams
 	local counts = {module = 0, weapon = 0}
@@ -61,6 +71,17 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	SetUnitRulesModuleCounts(unitID, counts)
 	
 	-- Set module effects
+	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
+	
+	local sharedData = {}
+	for i = 1, #moduleList do
+		local moduleDef = moduleDefs[moduleList[i]]
+		if moduleDef.applicationFunction then
+			moduleDef.applicationFunction(unitID, moduleByDefID, sharedData)
+		end
+	end
+	
+	UpdateUnitWithSharedData(unitID, sharedData)
 	
 	return unitID
 end

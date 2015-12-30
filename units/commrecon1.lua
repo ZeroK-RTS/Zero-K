@@ -50,6 +50,7 @@ unitDef = {
 	soundbuild = [[builder_start]],
     commtype = [[3]],
     aimposoffset   = [[0 10 0]],
+	att_speedmult  = 0.5,
   },
 
   energyMake          = 6,

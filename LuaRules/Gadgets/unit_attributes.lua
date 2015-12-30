@@ -57,6 +57,14 @@ local CMD_WAIT = CMD.WAIT
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
+local speedFactorUnitDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams and ud.customParams.att_speedmult then
+		speedFactorUnitDefs[i] = tonumber(ud.customParams.att_speedmult)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
@@ -370,11 +378,13 @@ function UpdateUnitAttributes(unitID, frame)
 	if not udid then 
 		return 
 	end
-		
+	
 	frame = frame or spGetGameFrame()
 	
 	local ud = UnitDefs[udid]
 	local changedAtt = false
+	
+	customParamsSpeedFactor = speedFactorUnitDefs[udid] or 1
 	
 	-- Increased reload from CAPTURE --
 	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
@@ -384,6 +394,7 @@ function UpdateUnitAttributes(unitID, frame)
 	local crashing = spGetUnitRulesParam(unitID,"crashing") or 0
 	
 	-- Unit speed change (like sprint) --
+	local upgradesSpeedMult   = spGetUnitRulesParam(unitID, "upgradesSpeedMult")
 	local selfMoveSpeedChange = spGetUnitRulesParam(unitID, "selfMoveSpeedChange")
 	local selfTurnSpeedChange = spGetUnitRulesParam(unitID, "selfTurnSpeedChange")
 	local selfIncomeChange = spGetUnitRulesParam(unitID, "selfIncomeChange")
@@ -395,7 +406,7 @@ function UpdateUnitAttributes(unitID, frame)
 	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
 		local slowMult   = 1-(slowState or 0)
 		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
-		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)
+		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
 		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)
@@ -466,6 +477,12 @@ end
 
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
+end
+
+function gadget:UnitCreated(unitID, unitDefID)
+	if speedFactorUnitDefs[unitDefID] then
+		UpdateUnitAttributes(unitID)
+	end
 end
 
 function gadget:GameFrame(f)

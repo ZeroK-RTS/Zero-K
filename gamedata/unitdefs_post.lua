@@ -728,6 +728,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Counteract Attributes Speed Multiplier
+--
+for name, ud in pairs(UnitDefs) do
+    if ud.customparams and ud.customparams.att_speedmult then
+		ud.maxvelocity = ud.maxvelocity/ud.customparams.att_speedmult
+    end   
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 --  No leveling ground
 
 

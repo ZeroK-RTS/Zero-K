@@ -46,6 +46,7 @@ unitDef = {
 	commtype = [[1]],
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
     aimposoffset   = [[0 5 0]],
+	att_speedmult  = 0.5,
   },
 
   energyMake             = 6,

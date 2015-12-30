@@ -142,6 +142,7 @@ local pylonList = {} -- pylon[allyTeamID] = {data = {[1] = unitID, [2] = unitID,
 
 local generator = {} -- generator[allyTeamID][teamID][unitID] = {generatorListID, metalIncome, energyIncome}
 local generatorList = {} -- generator[allyTeamID][teamID] = {data  = {[1] = unitID, [2] = unitID, ...}, count = number}
+local resourceGenoratingUnit = {}
 
 local pylonGridQueue = false -- pylonGridQueue[unitID] = true
 
@@ -1435,15 +1436,22 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 		--return
 	end
 	
-	local defData = generatorDefs[unitDefID]
-	if spGetUnitRulesParam(unitID, "isWind") then
-		generator[allyTeamID][teamID][unitID] = {
-			isWind = defData.isWind
-		}
+	if unitDefID and generatorDefs[unitDefID] then
+		local defData = generatorDefs[unitDefID]
+		if spGetUnitRulesParam(unitID, "isWind") then
+			generator[allyTeamID][teamID][unitID] = {
+				isWind = defData.isWind
+			}
+		else
+			generator[allyTeamID][teamID][unitID] = {
+				metalIncome = spGetUnitRulesParam(unitID, "wanted_metalIncome") or defData.metalIncome,
+				energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or defData.energyIncome,
+			}
+		end
 	else
 		generator[allyTeamID][teamID][unitID] = {
-			metalIncome = defData.metalIncome,
-			energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or defData.energyIncome,
+			metalIncome = spGetUnitRulesParam(unitID, "wanted_metalIncome") or 0,
+			energyIncome = spGetUnitRulesParam(unitID, "wanted_energyIncome") or 0,
 		}
 	end
 	
@@ -1452,11 +1460,41 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	list.data[list.count] = unitID
 	
 	generator[allyTeamID][teamID][unitID].listID = list.count	
+	resourceGenoratingUnit[unitID] = true
+end
+
+local function Overdrive_AddUnitResourceGeneration(unitID, metal, energy)
+	if not unitID then
+		return
+	end
+	local teamID = Spring.GetUnitTeam(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	
+	if not teamID or not generator[allyTeamID] or not generator[allyTeamID][teamID] then
+		return
+	end
+	
+	if not generator[allyTeamID][teamID][unitID] then
+		AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
+	end
+	
+	local genData = generator[allyTeamID][teamID][unitID]
+	
+	local metalIncome = math.max(0, genData.metalIncome + metal)
+	local energyIncome = math.max(0, genData.energyIncome + energy)
+	
+	genData.metalIncome = metalIncome
+	genData.energyIncome = energyIncome
+	
+	spSetUnitRulesParam(unitID, "wanted_energyIncome", metalIncome, inlosTrueTable)
+	spSetUnitRulesParam(unitID, "wanted_metalIncome", energyIncome, inlosTrueTable)
 end
 
 local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
 	teamID = teamID or spGetUnitTeam(unitID)
+	
+	resourceGenoratingUnit[unitID] = false
 	
 	if not generator[allyTeamID][teamID][unitID] then
 		--return
@@ -1496,6 +1534,8 @@ end
 
 function gadget:Initialize()
 	
+	GG.Overdrive_AddUnitResourceGeneration = Overdrive_AddUnitResourceGeneration
+	
 	_G.pylon = pylon
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = spGetUnitDefID(unitID)
@@ -1506,7 +1546,7 @@ function gadget:Initialize()
 		if (pylonDefs[unitDefID]) then
 			AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
 		end
-		if (generatorDefs[unitDefID]) then
+		if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
 			AddResourceGenerator(unitID, unitDefID)
 		end
 	end
@@ -1536,7 +1576,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if pylonDefs[unitDefID] then
 		AddPylon(unitID, unitDefID, pylonDefs[unitDefID].range)
 	end
-	if (generatorDefs[unitDefID]) then
+	if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
 		AddResourceGenerator(unitID, unitDefID, unitTeam)
 	end
 end
@@ -1567,7 +1607,7 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		end
 	end
 	
-	if (generatorDefs[unitDefID]) then
+	if (generatorDefs[unitDefID]) or spGetUnitRulesParam(unitID, "wanted_energyIncome") then
 		AddResourceGenerator(unitID, unitDefID, teamID, newAllyTeamID)
 	end
 end
@@ -1590,7 +1630,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 		end
 	end
 	
-	if (generatorDefs[unitDefID]) then
+	if generatorDefs[unitDefID] or resourceGenoratingUnit[unitID] then
 		RemoveResourceGenerator(unitID, unitDefID, oldTeamID, oldAllyTeamID)
 	end
 end
@@ -1605,7 +1645,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if paybackDefs[unitDefID] and enableEnergyPayback then
 		RemoveEnergyToPayback(unitID, unitDefID)
 	end
-	if (generatorDefs[unitDefID]) then
+	if generatorDefs[unitDefID] or resourceGenoratingUnit[unitID] then
 		RemoveResourceGenerator(unitID, unitDefID, unitTeam)
 	end
 end
