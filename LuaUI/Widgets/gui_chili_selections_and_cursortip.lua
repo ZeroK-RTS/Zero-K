@@ -752,15 +752,16 @@ local function UpdateStaticGroupInfo()
 	local total_totalbp = 0
 	local total_maxhp = 0
 	
-	local defID, ud
+	local defID, unitID, ud
 	for i = 1, numSelectedUnits do
+		unitID = selectedUnits[i][1]
 		defID = selectedUnits[i][2]
 		ud = UnitDefs[defID]
 		if ud then
 			if ud.name ~= "terraunit" then
 				total_totalbp = total_totalbp + ud.buildSpeed
-				total_maxhp = total_maxhp + ud.health
-				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(selectedUnits[i][1], defID)
+				total_maxhp = total_maxhp + select(2, Spring.GetUnitHealth(unitID))
+				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(unitID, defID)
 			end
 		end
 	end

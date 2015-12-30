@@ -47,6 +47,12 @@ local function UpdateUnitWithSharedData(unitID, data)
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
 		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
+	
+	if data.healthBonus then
+		local health, maxHealth = Spring.GetUnitHealth(unitID)
+		Spring.SetUnitHealth(unitID, health + data.healthBonus)
+		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
+	end
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)

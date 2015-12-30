@@ -46,8 +46,8 @@ local moduleDefs = {
 	},
 	{
 		name = "health",
-		humanName = "Health Thingy",
-		description = "Health Thingy",
+		humanName = "Ablative Armour Plates",
+		description = "Ablative Armour Plates, provides 600 health. Limit 8.",
 		image = "unitpics/module_ablative_armor.png",
 		limit = 3,
 		cost = 60,
@@ -55,17 +55,24 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600
+		end
 	},
 	{
 		name = "bigHealth",
-		humanName = "Health Thingy",
-		description = "Big Health Thingy - Requires Health Thingy",
+		humanName = "High Density Plating",
+		description = "High Density Plating, provides 1600 health but reduces movement by 10%. Limit 7, requires Ablative Armour Plates.",
 		image = "unitpics/module_heavy_armor.png",
 		limit = 3,
 		cost = 50,
 		requireModules = {"health"},
 		requireLevel = 0,
 		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600
+			sharedData.speedMult = (sharedData.speedMult or 1) - 0.1
+		end
 	},
 	{
 		name = "damageBooster",
