@@ -302,11 +302,13 @@ function DrawButton(obj)
   local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
   local bgcolor = obj.backgroundColor
-  if (obj.state.pressed) then
-    bgcolor = mulColor(bgcolor, 0.4)
-  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-    bgcolor = obj.focusColor
-    --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
+  if not obj.supressButtonReaction then
+    if (obj.state.pressed) then
+      bgcolor = mulColor(bgcolor, 0.4)
+    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+      bgcolor = obj.focusColor
+      --bgcolor = mixColors(bgcolor, obj.focusColor, 0.5)
+    end
   end
   gl.Color(bgcolor)
 
@@ -318,10 +320,12 @@ function DrawButton(obj)
   --gl.Texture(0,false)
 
   local fgcolor = obj.borderColor
-  if (obj.state.pressed) then
-    fgcolor = mulColor(fgcolor, 0.4)
-  elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
-    fgcolor = obj.focusColor
+  if not obj.supressButtonReaction then
+    if (obj.state.pressed) then
+      fgcolor = mulColor(fgcolor, 0.4)
+    elseif (obj.state.hovered) --[[ or (obj.state.focused)]] then
+      fgcolor = obj.focusColor
+    end
   end
   gl.Color(fgcolor)
 
