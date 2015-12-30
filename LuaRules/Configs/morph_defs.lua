@@ -211,6 +211,7 @@ end
 --------------------------------------------------------------------------------
 
 local MAX_MORPH = 0
+local UPGRADING_BUILD_SPEED = 250
 
 local function DefCost(paramName, udSrc, udDst)
 	local pSrc = udSrc[paramName]
@@ -240,7 +241,7 @@ local function BuildMorphDef(udSrc, morphData)
 		local unitDef = udDst
 		local newData = {}
 		newData.into = udDst.id
-		newData.time = morphData.time or math.floor(unitDef.buildTime*7/upgradingBuildSpeed)
+		newData.time = morphData.time or math.floor(unitDef.buildTime*7/UPGRADING_BUILD_SPEED)
 		newData.increment = (1 / (30 * newData.time))
 		newData.metal	= morphData.metal or DefCost('metalCost', udSrc, udDst)
 		newData.energy = morphData.energy or DefCost('energyCost', udSrc, udDst)

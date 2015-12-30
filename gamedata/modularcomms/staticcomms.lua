@@ -216,6 +216,33 @@ local comms = {
     modules = { "commweapon_assaultcannon", "module_dmg_booster", "conversion_partillery"},
   },  
 }
+
+-- Damage booster comms
+local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "benzcom"}
+local levelList = {1,2,3,4,5}
+local weaponCountList = {0,1,2,3,4,5,6,7,8}
+
+for i = 1, #chassisList do
+	local chassis = chassisList[i]
+	for j = 1, #levelList do
+		local level = levelList[j]
+		local fullChassis = chassis .. level
+		for k = 1, #weaponCountList do
+			local weaponCount = weaponCountList[k]
+			
+			local modules = {}
+			for m = 1, weaponCount do
+				modules[m] = "module_dmg_booster"
+			end
+			comms[fullChassis .. "_damage_boost" .. weaponCount] = {
+				chassis = fullChassis,
+				name = fullChassis,
+				modules = modules,
+			}
+		end
+	end
+end
+
 --[[
 for name,stats in pairs(comms) do
 	table.insert(stats.modules, "module_econ")
@@ -336,6 +363,8 @@ local morphableCommDefs = {
     },    
   },  
 }
+
+
 
 for templateName, data in pairs(morphableCommDefs) do
   local modules = {}

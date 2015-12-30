@@ -9,7 +9,7 @@ function widget:GetInfo()
     date      = "29 December 2015",
     license   = "GNU GPL, v2 or later",
 	handler   = true,
-    layer     = 0,
+    layer     = -10,
     enabled   = true
   }
 end
@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, emptyModules, chassisDefs = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -274,11 +274,7 @@ local function ResetCurrentModules(newAlreadyOwned)
 	currentModulesBySlot = {}
     currentModulesByDefID = {}
 	alreadyOwnedModules = newAlreadyOwned
-	alreadyOwnedModulesByDefID = {}
-	for i = 1, #newAlreadyOwned do
-		local defID = newAlreadyOwned[i]
-		alreadyOwnedModulesByDefID[defID] = (alreadyOwnedModulesByDefID[defID] or 0) + 1
-	end
+	alreadyOwnedModulesByDefID = upgradeUtilities.ModuleListToByDefID(newAlreadyOwned)
 end
 
 local function GetCurrentModules()
@@ -310,31 +306,7 @@ end
 
 local function ModuleIsValid(level, chassis, slotType, slotIndex)
 	local moduleDefID = currentModulesBySlot[slotIndex]
-	local data = moduleDefs[moduleDefID]
-	if data.slotType ~= slotType or (data.requireLevel or 0) > level or (data.requireChassis and (not data.requireChassis[chassis])) then
-		return false
-	end
-	
-	-- Check that requirements are met
-	if data.requireModules then
-		for j = 1, #data.requireModules do
-			-- Modules should not depend on themselves so this check is simplier than the
-			-- corresponding chcek in the replacement set generator.
-			local req = data.requireModules[j]
-			if not (alreadyOwnedModulesByDefID[req] or currentModulesByDefID[req]) then
-				return false
-			end
-		end
-	end
-	
-	-- Check that the module limit is not reached
-	if data.limit and (currentModulesByDefID[moduleDefID] or alreadyOwnedModulesByDefID[moduleDefID]) then
-		local count = (currentModulesByDefID[moduleDefID] or 0) + (alreadyOwnedModulesByDefID[moduleDefID] or 0) 
-		if count > data.limit then
-			return false
-		end
-	end
-	return true
+	return upgradeUtilities.ModuleIsValid(level, chassis, slotType, moduleDefID, alreadyOwnedModulesByDefID, currentModulesByDefID)
 end
 
 local function GetNewReplacementSet(level, chassis, slotType, ignoreSlot)
@@ -742,17 +714,8 @@ function SendUpgradeCommand(newModules)
 			
 			table.sort(alreadyOwned)
 			
-			if #alreadyOwned == #upgradeSignature.alreadyOwned then
-				local validUnit = true
-				for i = 1, #alreadyOwned do
-					if alreadyOwned[i] ~= upgradeSignature.alreadyOwned[i] then
-						validUnit = false
-						break
-					end
-				end
-				if validUnit then
-					upgradableUnits[#upgradableUnits + 1] = unitID
-				end
+			if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, upgradeSignature.alreadyOwned) then
+				upgradableUnits[#upgradableUnits + 1] = unitID
 			end
 		end
 	end
@@ -774,7 +737,7 @@ function SendUpgradeCommand(newModules)
 			params[index] = newModules[j]
 			index = index + 1
 		end
-		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE, params, {})
+		Spring.GiveOrderToUnitArray(upgradableUnits, CMD_MORPH_UPGRADE_INTERNAL, params, {})
 	end
 	
 	-- Remove main window
@@ -785,7 +748,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	
-	local slotDefs = chassisDefs[chassis].upgradeSlots[level+1]
+	local slotDefs = chassisDefs[chassis].levelDefs[level+1].upgradeSlots
 	
 	-- Find the modules which are already owned
 	local alreadyOwned = {}
@@ -821,9 +784,12 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	for i = 1, #units do
 		local unitID = units[i]
 		local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-		if level and level < 5 then
-			upgradeID = unitID
-			break
+		if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
+			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+			if chassisDefs[chassis].levelDefs[level+1] then
+				upgradeID = unitID
+				break
+			end
 		end
 	end
 	
@@ -841,11 +807,15 @@ function widget:CommandsChanged()
 	for i = 1, #units do
 		local unitID = units[i]
 		local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-		if level and level < 5 then
-			foundRulesParams = true
-			break
+		if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
+			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+			if chassisDefs[chassis].levelDefs[level+1] then
+				foundRulesParams = true
+				break
+			end
 		end
 	end
+	
 	if foundRulesParams then
 		local customCommands = widgetHandler.customCommands
 

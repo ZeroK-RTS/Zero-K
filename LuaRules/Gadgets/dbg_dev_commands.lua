@@ -338,20 +338,21 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function GG.TableEcho(data, indent)
+function GG.TableEcho(data, name, indent)
 	indent = indent or ""
+	name = name or "TableEcho"
+	Spring.Echo(indent .. name .. " = {")
 	for name, v in pairs(data) do
 		local ty =  type(v)
 		if ty == "table" then
-			Spring.Echo(indent .. name .. " = {")
-			GG.TableEcho(v, indent .. "    ")
-			--Spring.Echo("Spring.Echo(indent .. "}"" .. )
+			GG.TableEcho(v, name, indent .. "    ")
 		elseif ty == "boolean" then
 			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
 		else
 			Spring.Echo(indent .. name .. " = " .. v)
 		end
 	end
+	Spring.Echo(indent .. "}")
 end
 
 function GG.UnitEcho(unitID, st)
