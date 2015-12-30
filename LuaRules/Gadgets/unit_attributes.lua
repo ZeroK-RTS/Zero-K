@@ -409,7 +409,7 @@ function UpdateUnitAttributes(unitID, frame)
 		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
-		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)
+		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
