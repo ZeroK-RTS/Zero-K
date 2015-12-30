@@ -506,7 +506,7 @@ local function UpdateComm(unitID, index)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:SetValue(health/maxHealth)
 	
-	comms[index].button.tooltip = "Commander: "..UnitDefs[comms[index].commDefID].humanName ..
+	comms[index].button.tooltip = "Commander: " .. Spring.Utilities.GetHumanName(unitID, UnitDefs[comms[index].commDefID]) ..
 							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
 							"\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
 							"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
