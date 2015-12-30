@@ -1126,10 +1126,20 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	for udid,_ in pairs(morphDefs) do
 		boolDef[udid] = true
 	end
+	for udid = 1, #UnitDefs do
+		local ud = UnitDefs[udid]
+		if ud and ud.customParams and ud.customParams.level then
+			boolDef[udid] = true
+		end
+	end
 	return boolDef
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_MORPH_UPGRADE then
+		GG.TableEcho(cmdParams)
+		return false
+	end
 	local morphData = morphUnits[unitID]
 	if (morphData) then
 		if (cmdID==morphData.def.stopCmd)or(cmdID==CMD.STOP and not morphData.def.combatMorph)or(cmdID==CMD_MORPH_STOP) then
