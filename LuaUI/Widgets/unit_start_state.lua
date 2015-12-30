@@ -658,6 +658,16 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
     end
 end
 
+function widget:UnitDestroyed(unitID)	
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morphedTo then
+		local controlGroup = Spring.GetUnitGroup(unitID)
+		if controlGroup then
+			Spring.SetUnitGroup(morphedTo, controlGroup)
+		end
+	end
+end
+
 --[[
 function widget:SelectionChanged(newSelection)
 	for i=1,#newSelection do
