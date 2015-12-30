@@ -318,7 +318,8 @@ end
 
 local function FinishMorph(unitID, morphData)
 	local udDst = UnitDefs[morphData.def.into]
-	local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local ud = UnitDefs[unitDefID]
 	local defName = udDst.name
 	local unitTeam = morphData.teamID
 	-- copy dominatrix stuff
@@ -387,7 +388,7 @@ local function FinishMorph(unitID, morphData)
 	if (hostName ~= nil) and PWUnits[unitID] then
 		-- send planetwars deployment message
 		PWUnit = PWUnits[unitID]
-		PWUnit.currentDef=udDst
+		PWUnit.currentDef = udDst
 		local data = PWUnit.owner..","..defName..","..math.floor(px)..","..math.floor(pz)..",".."S" -- todo determine and apply smart orientation of the structure
 		Spring.SendCommands("w "..hostName.." pwmorph:"..data)
 		extraUnitMorphDefs[unitID] = nil
@@ -417,6 +418,7 @@ local function FinishMorph(unitID, morphData)
 	local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
 	--//copy experience
 	local newXp = Spring.GetUnitExperience(unitID) 
+	local oldBuildTime = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	--//copy unit speed
 	local velX,velY,velZ = Spring.GetUnitVelocity(unitID) --remember speed
  
@@ -483,7 +485,7 @@ local function FinishMorph(unitID, morphData)
 	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
 	
 	--//transfer experience
-	newXp = newXp * (ud.buildTime / udDst.buildTime)
+	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(unitID, morphData.def.into))
 	Spring.SetUnitExperience(newUnit, newXp)
 	--// transfer shield power
 	if oldShieldState and Spring.GetUnitShieldState(newUnit) then

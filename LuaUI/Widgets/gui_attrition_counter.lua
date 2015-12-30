@@ -482,7 +482,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID, attUnitID, attDefID, at
 	if ud.customParams.dontcount or ud.customParams.is_drone then return end
 		
 	local buildProgress = select(5, GetUnitHealth(unitID))
-	local worth = ud.metalCost * buildProgress
+	local worth = Spring.Utilities.GetUnitCost(unitID, unitDefID) * buildProgress
 	
 	-- if teamID and unitID and unitDefID and teamID ~= gaiaTeam then 	
 	local team = teams[teamID]

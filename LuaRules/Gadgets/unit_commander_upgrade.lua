@@ -57,9 +57,17 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	end
 	
 	-- Start setting required unitRulesParams
+	local totalCost = upgradeDef.totalCost
 	Spring.SetUnitRulesParam(unitID, "comm_level", upgradeDef.level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", upgradeDef.chassis, INLOS)
-
+	Spring.SetUnitRulesParam(unitID, "comm_cost", totalCost, INLOS)
+	
+	Spring.SetUnitCosts(unitID, {
+		buildTime = totalCost,
+		metalCost = totalCost,
+		energyCost = totalCost
+	})
+	
 	local moduleList = upgradeDef.moduleList
 	
 	-- Set module unitRulesParams
@@ -193,6 +201,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local morphDef = {
 		upgradeDef = {
 			name = Spring.GetUnitRulesParam(unitID, "comm_name"),
+			totalCost = cost + Spring.Utilities.GetUnitCost(unitID),
 			level = level + 1,
 			chassis = chassis,
 			moduleList = fullModuleList

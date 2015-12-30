@@ -473,16 +473,22 @@ function SelectNewModule(moduleDefID)
 	
 	-- Check whether module choices are still valid
 	local requireUpdate = true
+	local newCost = 0
 	while requireUpdate do
+		newCost = 0
 		requireUpdate = false
 		for i = 1, #currentModuleData do
 			local data = currentModuleData[i]
-			if not ModuleIsValid(data.level, data.chassis, data.slotType, i) then
+			if ModuleIsValid(data.level, data.chassis, data.slotType, i) then
+				newCost = newCost + moduleDefs[GetSlotModule(i, data.slotType)].cost
+			else
 				requireUpdate = true
 				ModuleReplacmentWithButton(i, emptyModules[data.slotType])
 			end
 		end
 	end
+	
+	UpdateMorphCost(newCost)
 	
 	-- Update each replacement set
 	for i = 1, #currentModuleData do
@@ -498,7 +504,13 @@ end
 -- Main Module Window Handling
 
 local mainWindowShown = false
-local mainWindow
+local mainWindow, timeLabel, costLabel, morphBuildPower
+
+function UpdateMorphCost(newCost)
+	newCost = (newCost or 0) + morphBaseCost
+	costLabel:SetCaption("Cost: " .. math.floor(newCost) .. "m")
+	timeLabel:SetCaption("Time: " .. math.floor(newCost/morphBuildPower) .. "s")
+end
 
 local function HideMainWindow()
 	if mainWindowShown then
@@ -557,7 +569,7 @@ local function CreateMainWindow()
 		centerItems = false,
 	}
 	
-	local timeLabel = Chili.Label:New{
+	timeLabel = Chili.Label:New{
 		x = 20,
 		right  = 0,
 		bottom  = 110,
@@ -569,7 +581,7 @@ local function CreateMainWindow()
 		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
 	}
 	
-	local costLabel = Chili.Label:New{
+	costLabel = Chili.Label:New{
 		x = 20,
 		right  = 0,
 		bottom  = 80,
@@ -645,6 +657,9 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 	if not currentModuleList then
 		CreateMainWindow()
 	end
+	
+	morphBuildPower = chassisDefs[chassis].levelDefs[level+1].morphBuildPower
+	morphBaseCost = chassisDefs[chassis].levelDefs[level+1].morphBaseCost
 
 	if not mainWindowShown then
 		screen0:AddChild(mainWindow)
@@ -668,12 +683,17 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 	end
 	
 	-- Check that the module in each slot is valid
+	newCost = 0
 	for i = 1, #slots do
 		local slotData = slots[i]
-		if not ModuleIsValid(level, chassis, slotData.slotType, i) then
+		if ModuleIsValid(level, chassis, slotData.slotType, i) then
+			newCost = newCost + moduleDefs[GetSlotModule(i, slotData.slotType)].cost
+		else
 			UpdateSlotModule(i, emptyModules[slotData.slotType])
 		end
 	end
+	
+	UpdateMorphCost(newCost)
 	
 	-- Actually add the default modules and slot data
 	for i = 1, #slots do
@@ -747,6 +767,10 @@ end
 local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+	
+	if not (chassisDefs[chassis] and chassisDefs[chassis].levelDefs[level+1]) then
+		return
+	end
 	
 	local slotDefs = chassisDefs[chassis].levelDefs[level+1].upgradeSlots
 	

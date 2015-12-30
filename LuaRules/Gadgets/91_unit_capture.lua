@@ -212,7 +212,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		damageByID.data[damageByID.count] = unitID
 		unitDamage[unitID] = {
 			index = damageByID.count,
-			captureHealth = UnitDefs[unitDefID].buildTime,
+			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
 			largestDamage = 0,
 			allyTeamByID = {count = 0, data = {}},
 			allyTeams = {},

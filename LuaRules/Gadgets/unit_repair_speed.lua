@@ -50,15 +50,11 @@ for i = 1, #WeaponDefs do
 end
 
 local buildTimeChangeNeeded = {}
-local buildTimes = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local realBuildTime = ud.customParams.real_buildtime
 	if realBuildTime then
 		buildTimeChangeNeeded[i] = tonumber(realBuildTime)
-		buildTimes[i] = buildTimeChangeNeeded[i]
-	else
-		buildTimes[i] = ud.buildTime
 	end
 end
 
@@ -76,7 +72,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 	if damagedUnits[unitID] then
 		damagedUnits[unitID].frames = REPAIR_PENALTY_TIME
 	else
-		local bt = buildTimes[unitDefID]
+		local bt = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		damagedUnits[unitID] = {
 			bt = bt,
 			frames = REPAIR_PENALTY_TIME,

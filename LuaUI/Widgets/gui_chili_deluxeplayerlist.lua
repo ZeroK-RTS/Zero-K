@@ -501,7 +501,7 @@ end
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
-		local metal = UnitDefs[unitDefID].metalCost
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		local speed = UnitDefs[unitDefID].speed
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
 		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	

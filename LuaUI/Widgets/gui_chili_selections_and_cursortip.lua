@@ -713,7 +713,7 @@ local function UpdateDynamicGroupInfo()
 
 			if name ~= "terraunit" then
 				if hp then--failsafe when switching spectator view.
-					total_cost = total_cost + ud.metalCost*build
+					total_cost = total_cost + Spring.Utilities.GetUnitCost(id, defID)*build
 					total_hp = total_hp + hp
 				end
 				
@@ -760,7 +760,7 @@ local function UpdateStaticGroupInfo()
 			if ud.name ~= "terraunit" then
 				total_totalbp = total_totalbp + ud.buildSpeed
 				total_maxhp = total_maxhp + ud.health
-				total_finishedcost = total_finishedcost + ud.metalCost
+				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(selectedUnits[i][1], defID)
 			end
 		end
 	end
@@ -1972,7 +1972,8 @@ local function MakeToolTip_Unit(data, tooltip)
 	local team, fullname
 	tt_unitID = unitID
 	team = spGetUnitTeam(tt_unitID) 
-	tt_ud = UnitDefs[ spGetUnitDefID(tt_unitID) or -1]
+	local unitDefID = spGetUnitDefID(tt_unitID)
+	tt_ud = UnitDefs[ unitDefID or -1]
 	
 	fullname = ((tt_ud and Spring.Utilities.GetHumanName(tt_unitID, tt_ud)) or "")	
 		
@@ -2001,7 +2002,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_unit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(tt_unitID, unitDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
@@ -2048,7 +2049,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_selunit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((stt_ud and stt_ud.metalCost) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(stt_unitID, uDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
