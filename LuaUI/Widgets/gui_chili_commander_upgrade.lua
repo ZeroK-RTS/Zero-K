@@ -594,13 +594,14 @@ local function CreateMainWindow()
 	}
 	
 	local acceptButton = Button:New{
-		caption = "tick",
+		caption = "",
 		right = 135,
 		bottom = 15,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
 		backgroundColor = {0.5,0.5,0.5,0.5},
+		tooltip = "Start upgrade",
 		OnClick = {
 			function()
 				if mainWindowShown then
@@ -611,13 +612,14 @@ local function CreateMainWindow()
 	}
 	
 	viewAlreadyOwnedButton = Button:New{
-		caption = "eye",
+		caption = "",
 		right = 75,
 		bottom = 15,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
 		backgroundColor = {0.5,0.5,0.5,0.5},
+		tooltip = "View current modules",
 		OnClick = {
 			function(self)
 				AlreadyOwnedModuleClick(self)
@@ -626,18 +628,49 @@ local function CreateMainWindow()
 	}
 	
 	local cancelButton = Button:New{
-		caption = "cross",
+		caption = "",
 		right = 15,
 		bottom = 15,
 		width = 55,
 		height = 55,
 		padding = {0, 0, 0, 0},	
 		backgroundColor = {0.5,0.5,0.5,0.5},
+		tooltip = "Cancel module selection",
 		OnClick = {
 			function()
 				HideMainWindow()
 			end
 		},
+	}
+	
+	Image:New{
+		x = 2,
+		right = 2,
+		y = 0,
+		bottom = 0,
+		keepAspect = true,
+		file = "LuaUI/Images/dynamic_comm_menu/tick.png",
+		parent = acceptButton,
+	}
+	
+	Image:New{
+		x = 2,
+		right = 2,
+		y = 0,
+		bottom = 0,
+		keepAspect = true,
+		file = "LuaUI/Images/dynamic_comm_menu/eye.png",
+		parent = viewAlreadyOwnedButton,
+	}
+	
+	Image:New{
+		x = 2,
+		right = 2,
+		y = 0,
+		bottom = 0,
+		keepAspect = true,
+		file = "LuaUI/Images/commands/Bold/cancel.png",
+		parent = cancelButton,
 	}
 	
 	local fakeWindow = Panel:New{
