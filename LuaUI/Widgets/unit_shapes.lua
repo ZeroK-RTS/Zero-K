@@ -52,10 +52,10 @@ local shapes = {}
 
 local myTeamID = Spring.GetLocalTeamID()
 --local r,g,b = Spring.GetTeamColor(myTeamID)
-local r,g,b = 0, 1, 0
+local r,g,b = 0.1, 1, 0.2
 local rgba = {r,g,b,1}
-local yellow = {1,1,0,1}
-local hoverColor = {1,1,0,1}
+local yellow = {1,1,0.1,1}
+local hoverColor = {0.1,1,1,1}
 
 
 local circleDivs = 32 -- how precise circle? octagon by default
@@ -75,11 +75,12 @@ local unitConf = {}
 ------------------------------------------------------------------------------------
 
 local visibleAllySelUnits = {}
+local hoverUnits = {}
 
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally'} 
+options_order = {'showally', 'showhover'} 
 options = {
 	showally = {
 		name = 'Show Ally Selections',
@@ -90,6 +91,15 @@ options = {
 			visibleAllySelUnits = {}
 		end,
 	},
+	showhover = {
+		name = 'Highlight Hovered Unit',
+		desc = 'Highlight the unit under your cursor.', 
+		type = 'bool',
+		value = true,
+		OnChange = function(self) 
+			hoverUnits = {}
+		end,
+	}
 }
 
 ------------------------------------------------------------------------------------
@@ -118,10 +128,12 @@ end
 local function GetVisibleUnits()
 		
 	local hoverUnits = {}
-	local mx, my = spGetMouseState()
-  local pointedType, data = spTraceScreenRay(mx, my)
-	if pointedType == 'unit' and Spring.ValidUnitID(data) and not spIsUnitSelected(data) then -- and not spIsUnitIcon(data) then
-		hoverUnits[#hoverUnits+1] = data
+	if options.showhover.value then
+		local mx, my = spGetMouseState()
+	  local pointedType, data = spTraceScreenRay(mx, my)
+		if pointedType == 'unit' and Spring.ValidUnitID(data) and not spIsUnitSelected(data) then -- and not spIsUnitIcon(data) then
+			hoverUnits[#hoverUnits+1] = data
+		end
 	end
 		-- local teamID = spGetUnitTeam(data)
 		-- if teamID == spGetMyTeamID() then
@@ -377,7 +389,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local visibleSelected = {}
-local hoverUnits = {}
 local degrot = {}
 
 local HEADING_TO_RAD = 1/32768*math.pi
