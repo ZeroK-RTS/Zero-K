@@ -55,6 +55,8 @@ local myTeamID = Spring.GetLocalTeamID()
 local r,g,b = 0, 1, 0
 local rgba = {r,g,b,1}
 local yellow = {1,1,0,1}
+local hoverColor = {1,1,0,1}
+
 
 local circleDivs = 32 -- how precise circle? octagon by default
 local innersize = 0.9 -- circle scale compared to unit radius
@@ -114,6 +116,22 @@ local function HasVisibilityChanged()
 end
 
 local function GetVisibleUnits()
+		
+	local hoverUnits = {}
+	local mx, my = spGetMouseState()
+  local pointedType, data = spTraceScreenRay(mx, my)
+	if pointedType == 'unit' and Spring.ValidUnitID(data) and not spIsUnitSelected(data) then -- and not spIsUnitIcon(data) then
+		hoverUnits[#hoverUnits+1] = data
+	end
+		-- local teamID = spGetUnitTeam(data)
+		-- if teamID == spGetMyTeamID() then
+		-- 	glColor(myHoverColor)
+		-- elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
+		-- 	glColor(allyHoverColor)
+		-- else
+		-- 	glColor(enemyHoverColor)
+		-- end
+
 	if (HasVisibilityChanged()) then
 		local units = spGetVisibleUnits(-1, 30, true)
 		--local visibleUnits = {}
@@ -128,12 +146,12 @@ local function GetVisibleUnits()
 				visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
 			end
 		end
-		
+
 		lastvisibleAllySelUnits = visibleAllySelUnits
 		lastVisibleSelected = visibleSelected
-		return visibleAllySelUnits, visibleSelected
+		return visibleAllySelUnits, visibleSelected, hoverUnits
 	else
-		return lastvisibleAllySelUnits, lastVisibleSelected
+		return lastvisibleAllySelUnits, lastVisibleSelected, hoverUnits
 	end
 end
 
@@ -359,6 +377,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local visibleSelected = {}
+local hoverUnits = {}
 local degrot = {}
 
 local HEADING_TO_RAD = 1/32768*math.pi
@@ -385,10 +404,11 @@ local function UpdateUnitListRotation(unitList)
 end
 
 function widget:Update()
-	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+	visibleAllySelUnits, visibleSelected, hoverUnits = GetVisibleUnits()
 	
 	UpdateUnitListRotation(visibleSelected)
 	UpdateUnitListRotation(visibleAllySelUnits)
+	UpdateUnitListRotation(hoverUnits)
 end
 
 
@@ -449,7 +469,7 @@ end
 
 function widget:DrawWorldPreUnit()
 		--if Spring.IsGUIHidden() then return end
-	if (#visibleAllySelUnits + #visibleSelected == 0) then return end
+	if (#visibleAllySelUnits + #visibleSelected + #hoverUnits == 0) then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
@@ -458,6 +478,7 @@ function widget:DrawWorldPreUnit()
 			DrawUnitShapes(visibleSelected, rgba)
 			if not Spring.IsGUIHidden() then 
 				DrawUnitShapes(visibleAllySelUnits, yellow)
+				DrawUnitShapes(hoverUnits, hoverColor)
 			end
 
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
