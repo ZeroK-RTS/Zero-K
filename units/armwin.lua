@@ -87,7 +87,7 @@ unitDef = {
       reclaimTime      = 7,
     },
 
-    DEAD_WATER = {
+    DEADWATER = {
       description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       damage           = 400,
