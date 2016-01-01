@@ -103,9 +103,11 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", 1, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
 end
 
 --------------------------------------------------------------------------------

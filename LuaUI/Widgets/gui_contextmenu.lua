@@ -65,6 +65,8 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local emptyTable = {}
 
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -1196,7 +1198,7 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName] 
 end
 
-local function printunitinfo(ud, lang, buttonWidth)	
+local function printunitinfo(ud, lang, buttonWidth, unitID)	
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1229,15 +1231,49 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	local statschildren = {}
 
-	-- stuff for modular commanders
-	local commModules, commCost
-	if ud.customParams.commtype then
-		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
-		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
-	end
+	local isCommander = (unitID and Spring.GetUnitRulesParam(unitID, "comm_level"))
+
 	local cost = numformat(ud.metalCost)
-	if commCost then
-		cost = cost .. ' (' .. numformat(commCost) .. ')'
+	local health = numformat(ud.health)
+	local speed = numformat(ud.speed)
+
+	-- dynamic comms get special treatment
+	if isCommander then
+		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
+		health = select(2, Spring.GetUnitHealth(unitID))
+		speed = numformat(ud.speed * ud.customParams.att_speedmult * Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult"))
+
+		local name = Spring.GetUnitRulesParam(unitID, "comm_name") or "COMMANDER"
+		statschildren[#statschildren+1] = Label:New{ caption = name, textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].name, textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		local weapons = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
+		if weapons == 0 then
+			statschildren[#statschildren+1] = Label:New{ caption = 'Peashooter', textColor = colorFire, }
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
+		else
+			for i = 1, weapons do
+				statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)].humanName, textColor = colorFire, }
+				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
+			end
+		end
+		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+		if modules > 0 then
+			for i = 1, modules do
+				statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)].humanName, textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+			end
+		end
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 	end
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
@@ -1246,15 +1282,15 @@ local function printunitinfo(ud, lang, buttonWidth)
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = cost .. " M", textColor = color.stats_fg, }
 	
-	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = 'Health: ', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.mass), textColor = color.stats_fg, }
-	
+
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed) .. " elmo/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
 	end
 
 	--[[ Enable through some option perhaps
@@ -1275,13 +1311,13 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) 
+	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) + (unitID and Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0)
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy,2) .. " E/s", textColor = color.stats_fg, }
 	end
-
+	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*32) .. " elmo", textColor = color.stats_fg, }
@@ -1310,17 +1346,6 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 
-	if commModules then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #commModules do
-			statschildren[#statschildren+1] = Label:New{ caption = commModules[i], textColor = color.stats_fg,}
-			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
-		end	
-	end
-	
 	local cells = printAbilities(ud)
 	
 	if cells and #cells > 0 then
@@ -1524,7 +1549,7 @@ local function KillStatsWindow(num)
 	statswindows[num] = nil
 end
 
-MakeStatsWindow = function(ud, x,y)
+MakeStatsWindow = function(ud, x,y, unitID)
 	hideWindow(window_unitcontext)
 	local x = x
 	local y = y
@@ -1547,7 +1572,7 @@ MakeStatsWindow = function(ud, x,y)
 			width='100%',
 			bottom = B_HEIGHT*2,
 			padding = {2,2,2,2},
-			children = printunitinfo(ud, WG.lang or 'en', window_width) ,
+			children = printunitinfo(ud, WG.lang or 'en', window_width, unitID) ,
 		},	
 		Button:New{ 
 			caption = 'Close', 
@@ -1582,7 +1607,7 @@ MakeStatsWindow = function(ud, x,y)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = ud.humanName ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(unitID, ud) ..' - '.. desc,
 		
 		children = children,
 	}
@@ -1811,11 +1836,6 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
-		end
-		
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
@@ -1825,10 +1845,10 @@ function widget:MousePress(x,y,button)
 				return
 			end
 			
-			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			local udid = UnitDefs[Spring.GetUnitDefID(unitID)]
 			
-			if ud then
-				MakeStatsWindow(ud,x,y)
+			if udid then
+				MakeStatsWindow(udid,x,y, unitID)
 			end
 			-- FIXME enable later when does not show useless info
 			return true
@@ -1852,7 +1872,11 @@ function widget:MousePress(x,y,button)
 				end
 			end
 		end
-		
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 	end
 
 	--[[

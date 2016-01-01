@@ -124,7 +124,7 @@ end
 
 local chassisDefs = {
 	{
-		name = "recon",
+		name = "Recon",
 		baseUnitDef = UnitDefNames["commrecon0"].id,
 		levelDefs = {
 			{
@@ -168,7 +168,7 @@ local chassisDefs = {
 		}
 	},
 	{
-		name = "support",
+		name = "Support",
 		baseUnitDef = UnitDefNames["commsupport0"].id,
 		levelDefs = {
 			{
