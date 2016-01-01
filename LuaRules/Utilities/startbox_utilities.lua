@@ -117,6 +117,42 @@ function ParseBoxes ()
 	return startBoxConfig, manualStartposConfig
 end
 
+function GetRawBoxes ()
+	local mapsideBoxes = "mapconfig/map_startboxes.lua"
+	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
+
+	local startBoxConfig
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
+
+	if VFS.FileExists (modsideBoxes) then
+		startBoxConfig = VFS.Include (modsideBoxes)
+	elseif VFS.FileExists (mapsideBoxes) then
+		startBoxConfig = VFS.Include (mapsideBoxes)
+	else
+		startBoxConfig = { }
+		local startboxString = Spring.GetModOptions().startboxes
+		if startboxString then
+			local springieBoxes = loadstring(startboxString)()
+			for id, box in pairs(springieBoxes) do
+				box[1] = box[1]*Game.mapSizeX
+				box[2] = box[2]*Game.mapSizeZ
+				box[3] = box[3]*Game.mapSizeX
+				box[4] = box[4]*Game.mapSizeZ
+				startBoxConfig[id] = {
+					{
+						{box[1], box[2]},
+						{box[1], box[4]},
+						{box[3], box[4]},
+						{box[3], box[2]},
+					},
+				}
+			end
+		end
+	end
+
+	return startBoxConfig
+end
+
 function GetTeamCount()
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 	local allyTeamList = Spring.GetAllyTeamList()

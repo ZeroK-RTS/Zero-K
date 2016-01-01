@@ -45,8 +45,21 @@ GG.manualStartposConfig = manualStartposConfig
 function gadget:Initialize()
 
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
-	Spring.SetGameRulesParam("startbox_custom_shapes", manualStartposConfig and 1 or 0)
+	Spring.SetGameRulesParam("startbox_recommended_startpos", manualStartposConfig and 1 or 0)
 
+	local rawBoxes = GetRawBoxes()
+	for box_id, polygons in pairs(rawBoxes) do
+		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
+		for i = 1, #polygons do
+			local polygon = polygons[i]
+			Spring.SetGameRulesParam("startbox_polygon_" .. box_id .. "_" .. i, #polygons[i])
+			for j = 1, #polygons[i] do
+				Spring.SetGameRulesParam("startbox_polygon_x_" .. box_id .. "_" .. i .. "_" .. j, polygons[i][j][1])
+				Spring.SetGameRulesParam("startbox_polygon_z_" .. box_id .. "_" .. i .. "_" .. j, polygons[i][j][2])
+			end
+		end
+	end
+	
 	if manualStartposConfig then
 		for box_id, startposes in pairs(manualStartposConfig) do
 			Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
