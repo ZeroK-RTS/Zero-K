@@ -411,7 +411,7 @@ local function GetShieldRegenDrain(wd)
 	return shieldRegen, shieldDrain
 end
 
-local function weapons2Table(cells, ws, ud)
+local function weapons2Table(cells, ws)
 	local cells = cells
 	
 	local wd = WeaponDefs[ws.weaponID]
@@ -1130,52 +1130,62 @@ local function printAbilities(ud)
 	return cells
 end
 
-local function printWeapons(unitDef)
+local function printWeapons(unitDef, unitID)
 	local weaponStats = {}
 
 	local wd = WeaponDefs
 	if not wd then return false end	
 	
 	local ucp = unitDef.customParams
-
+	
 	for i=1, #unitDef.weapons do
-		local weapon = unitDef.weapons[i]
-		local weaponID = weapon.weaponDef
-		local weaponDef = WeaponDefs[weaponID]
+		if not unitID or -- filter out commander weapons not in current loadout
+		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_id")) then
+			local weapon = unitDef.weapons[i]
+			local weaponID = weapon.weaponDef
+			local weaponDef = WeaponDefs[weaponID]
 
-		local aa_only = true
-		for cat in pairs(weapon.onlyTargets) do
-			if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
-				aa_only = false
-				break;
+			local aa_only = true
+			for cat in pairs(weapon.onlyTargets) do
+				if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
+					aa_only = false
+					break;
+				end
 			end
-		end
 
-		local weaponName = weaponDef.description or 'Weapon'
-		local isDuplicate = false
+			local weaponName = weaponDef.description or 'Weapon'
+			local isDuplicate = false
 
-		for i=1,#weaponStats do
-			if weaponStats[i].weaponID == weaponID then
-				weaponStats[i].count = weaponStats[i].count + 1
-				isDuplicate = true
-				break
+			for i=1,#weaponStats do
+				if weaponStats[i].weaponID == weaponID then
+					weaponStats[i].count = weaponStats[i].count + 1
+					isDuplicate = true
+					break
+				end
 			end
-		end
-		
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
-			local wsTemp = {
-				weaponID = weaponID,
-				count = 1,
+			
+			if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
+				local wsTemp = {
+					weaponID = weaponID,
+					count = 1,
+					
+					-- stuff that the weapon gets from the owner unit
+					aa_only = aa_only,
+					highTrajectory = unitDef.highTrajectoryType,
+					free_stockpile = ucp.freestockpile,
+					stockpile_time = ucp.stockpiletime,
+					stockpile_cost = ucp.stockpilecost,
+					firing_arc = weapon.maxAngleDif
+				}
 				
-				-- stuff that the weapon gets from the owner unit
-				aa_only = aa_only,
-				highTrajectory = unitDef.highTrajectoryType,
-				free_stockpile = ucp.freestockpile,
-				stockpile_time = ucp.stockpiletime,
-				stockpile_cost = ucp.stockpilecost,
-				firing_arc = weapon.maxAngleDif
-			}
-			weaponStats[#weaponStats+1] = wsTemp
+				-- dual wielding comms
+				if (unitID and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")) then
+					wsTemp.count = 2
+				end
+				weaponStats[#weaponStats+1] = wsTemp
+			end
 		end
 	end
 
@@ -1241,10 +1251,9 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	if isCommander then
 		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
 		health = select(2, Spring.GetUnitHealth(unitID))
-		speed = numformat(ud.speed * ud.customParams.att_speedmult * Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult"))
+		speed = numformat(ud.speed * (ud.customParams.att_speedmult or 1) * Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult"))
 
-		local name = Spring.GetUnitRulesParam(unitID, "comm_name") or "COMMANDER"
-		statschildren[#statschildren+1] = Label:New{ caption = name, textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
@@ -1256,14 +1265,9 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 		local weapons = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-		if weapons == 0 then
-			statschildren[#statschildren+1] = Label:New{ caption = 'Peashooter', textColor = colorFire, }
+		for i = 1, weapons do
+			statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)].humanName, textColor = colorFire, }
 			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
-		else
-			for i = 1, weapons do
-				statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)].humanName, textColor = colorFire, }
-				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
-			end
 		end
 		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 		if modules > 0 then
@@ -1360,7 +1364,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		end
 	end
 
-	cells = printWeapons(ud)
+	cells = printWeapons(ud, unitID)
 	
 	if cells and #cells > 0 then
 		

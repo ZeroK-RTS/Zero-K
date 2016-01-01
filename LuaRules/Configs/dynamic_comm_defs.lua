@@ -22,15 +22,68 @@ local moduleDefs = {
 		slotType = "weapon",
 	},
 	{
-		name = "gun",
-		humanName = "Gun Thingy",
-		description = "Gun Thingy",
-		image = "unitpics/commweapon_beamlaser.png",
+		name = "lpb",
+		humanName = "Light Particle Beam",
+		description = "Auto Pew",
+		image = "unitpics/commweapon_lparticlebeam.png",
 		limit = 2,
 		cost = 100,
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
+		applicationFunction = function (unitID, modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = 2
+			else
+				sharedData.weapon2 = 2
+			end
+		end
+	},
+	{
+		name = "hpb",
+		humanName = "Heavy Particle Beam",
+		description = "Manual Pew",
+		image = "unitpics/conversion_hparticlebeam.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "weapon",
+		applicationFunction = function (unitID, modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = 3
+			else
+				sharedData.weapon2 = 3
+			end
+		end
+	},
+	{
+		name = "personal_shield",
+		humanName = "Personal Shield",
+		description = "A small, protective bubble shield.",
+		image = "unitpics/module_personal_shield.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.shield = 4
+		end
+	},
+	{
+		name = "area_shield",
+		humanName = "Area Shield",
+		description = "The Emperor protects",
+		image = "unitpics/module_areashield.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.shield = 5
+		end
 	},
 	{
 		name = "rocket",
@@ -135,7 +188,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.gun,
+						defaultModule = moduleDefNames.lpb,
 						slotType = "weapon",
 					},
 					{
@@ -155,6 +208,10 @@ local chassisDefs = {
 					return UnitDefNames["commrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.lpb,
+						slotType = "weapon",
+					},
 					{
 						defaultModule = moduleDefNames.bigHealth,
 						slotType = "module",
@@ -179,7 +236,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.gun,
+						defaultModule = moduleDefNames.lpb,
 						slotType = "weapon",
 					},
 					{

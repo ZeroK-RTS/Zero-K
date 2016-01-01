@@ -76,21 +76,6 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 end
 
 function RemoveWeapons(unitDef) 
--- because for some reason comms have a default weapon with no purpose and I don't want to screw with that
-	if unitDef.weapons then
-		for i=3,6 do
-			if unitDef.weapons[i] then
-				unitDef.weapons[i] = nil
-			end
-		end
-	end
-	
-	-- give unarmed comms a peashooter or two
-	ApplyWeapon(unitDef, "commweapon_peashooter", true, 5)
-	if ((tonumber(unitDef.customparams.level) or 0) >= 3) then
-		ApplyWeapon(unitDef, "commweapon_peashooter", true, 3)
-	end
-	--unitDef.customparams.alreadyhasweapon = nil
 end
 
 function ReplaceWeapon(unitDef, oldWeapon, newWeapon)

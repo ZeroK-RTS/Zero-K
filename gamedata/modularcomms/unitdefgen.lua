@@ -167,8 +167,6 @@ local function ProcessComm(name, config)
 			reload = 0,
 		}
 		
-		RemoveWeapons(commDefs[name])
-		
 		-- process modules
 		if config.modules then
 			local modules = CopyTable(config.modules)

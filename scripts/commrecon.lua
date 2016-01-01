@@ -298,7 +298,14 @@ local function MotionControl(moving, aiming, justmoved)
 	end
 end
 
+local dgunTable
+
 function script.Create()
+
+	-- copy the dgun command table because we sometimes need to reinsert it
+	local cmdID = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
+	dgunTable = Spring.GetUnitCmdDescs(unitID, cmdID)[1]
+
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
 	Turn(ruparm, x_axis, 0, math.rad(250)) 
@@ -398,23 +405,65 @@ local function AimRifle(heading, pitch, isDgun)
 	return true
 end
 
+local weapon1
+local weapon2
+local shield
+
+local dguns = {
+	false, -- pea
+	false, -- lpb
+	true, -- hpb dgun
+	false, -- personal shield
+	false, -- area shield
+}
+
+function UpdateWeapons(w1, w2, sh)
+	weapon1 = w1 or 1 -- guarantee peashooter
+	weapon2 = w2 or (Spring.GetUnitRulesParam(unitID, "comm_level") == 2 and 1) -- second peashooter at level 2
+	shield = sh
+
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", weapon1 or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", weapon2 or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield or 0, INLOS)
+
+	if weapon2 == weapon1 then -- dual wielding the same weapon
+		weapon2 = nil
+
+		Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 2, {inlos = true})
+		GG.UpdateUnitAttributes(unitID)
+	end
+
+	local hasDgun = ((weapon1 and dguns[weapon1]) or (weapon2 and dguns[weapon2]))
+	local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
+	if not hasDgun and cmdDesc then
+		Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
+	elseif hasDgun and not cmdDesc then
+		cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)+1 -- insert after attack so that it appears in the correct spot in the menu
+		Spring.InsertUnitCmdDesc(unitID, cmdDesc, dgunTable)
+	end
+
+	-- shields
+	Spring.SetUnitShieldState(unitID, 4, false)
+	Spring.SetUnitShieldState(unitID, 5, false)
+	if (sh) then
+		Spring.SetUnitShieldState(unitID, sh, true)
+	end
+end
+
 function script.AimWeapon(num, heading, pitch)
-	if num >= 5 then
+	if num == shield then return true end
+
+	if num == weapon1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
-		bAiming = true
-		return AimRifle(heading, pitch)
-	elseif num == 3 then
-		Signal(SIG_AIM)
+	elseif num == weapon2 then
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
-		bAiming = true
-		return AimRifle(heading, pitch, canDgun)		
-	elseif num == 2 or num == 4 then
-		Sleep(100)
-		return (shieldOn)
+	else
+		return false
 	end
-	return false
+
+	return AimRifle(heading, pitch, dguns[num])	
 end
 
 function script.Activate()
@@ -426,28 +475,18 @@ function script.Deactivate()
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then 
-		return grenade 
-	elseif num == 2 or num == 4 then
+	if num == shield then
 		return torso
 	end
 	return flare
 end
 
 function script.FireWeapon(num)
-	if num == 3 then
-		EmitSfx(grenade, 1026)
-	elseif num == 5 then
-		EmitSfx(flare, 1024)
-	end
+	EmitSfx(flare, 1024)
 end
 
 function script.Shot(num)
-	if num == 3 then
-		EmitSfx(grenade, 1027)
-	elseif num == 5 then
-		EmitSfx(flare, 1025)
-	end
+	EmitSfx(flare, 1025)
 	if flamers[num] then
 		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
 	end	
