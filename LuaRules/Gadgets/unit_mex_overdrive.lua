@@ -1486,8 +1486,8 @@ local function Overdrive_AddUnitResourceGeneration(unitID, metal, energy)
 	genData.metalIncome = metalIncome
 	genData.energyIncome = energyIncome
 	
-	spSetUnitRulesParam(unitID, "wanted_energyIncome", metalIncome, inlosTrueTable)
-	spSetUnitRulesParam(unitID, "wanted_metalIncome", energyIncome, inlosTrueTable)
+	spSetUnitRulesParam(unitID, "wanted_metalIncome", metalIncome, inlosTrueTable)
+	spSetUnitRulesParam(unitID, "wanted_energyIncome", energyIncome, inlosTrueTable)
 end
 
 local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)

@@ -45,7 +45,6 @@ unitDef = {
 	commtype = [[6]],
   },
 
-  energyMake             = 6,
   energyStorage          = 0,
   energyUse              = 0,
   explodeAs              = [[ESTOR_BUILDINGEX]],
@@ -62,7 +61,6 @@ unitDef = {
   maxSlope               = 36,
   maxVelocity            = 1.35,
   maxWaterDepth          = 5000,
-  metalMake              = 4,
   metalStorage           = 0,
   minCloakDistance       = 75,
   modelCenterOffset		 = [[0 1 0]],

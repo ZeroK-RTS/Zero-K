@@ -5,7 +5,7 @@ function gadget:GetInfo()
     author    = "Google Frog",
     date      = "30 December 2015",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = 1,
     enabled   = true  --  loaded by default?
   }
 end
@@ -53,6 +53,9 @@ local function UpdateUnitWithSharedData(unitID, data)
 		Spring.SetUnitHealth(unitID, health + data.healthBonus)
 		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
+
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, data.weapon1, data.weapon2, data.shield)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
@@ -103,9 +106,16 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", 1, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
+
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	if env.UpdateWeapons then
+		Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons)
+	end
 end
 
 --------------------------------------------------------------------------------

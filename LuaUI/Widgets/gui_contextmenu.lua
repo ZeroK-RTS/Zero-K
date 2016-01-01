@@ -65,6 +65,8 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local emptyTable = {}
 
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -409,7 +411,7 @@ local function GetShieldRegenDrain(wd)
 	return shieldRegen, shieldDrain
 end
 
-local function weapons2Table(cells, ws, ud)
+local function weapons2Table(cells, ws)
 	local cells = cells
 	
 	local wd = WeaponDefs[ws.weaponID]
@@ -1128,52 +1130,62 @@ local function printAbilities(ud)
 	return cells
 end
 
-local function printWeapons(unitDef)
+local function printWeapons(unitDef, unitID)
 	local weaponStats = {}
 
 	local wd = WeaponDefs
 	if not wd then return false end	
 	
 	local ucp = unitDef.customParams
-
+	
 	for i=1, #unitDef.weapons do
-		local weapon = unitDef.weapons[i]
-		local weaponID = weapon.weaponDef
-		local weaponDef = WeaponDefs[weaponID]
+		if not unitID or -- filter out commander weapons not in current loadout
+		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_id")) then
+			local weapon = unitDef.weapons[i]
+			local weaponID = weapon.weaponDef
+			local weaponDef = WeaponDefs[weaponID]
 
-		local aa_only = true
-		for cat in pairs(weapon.onlyTargets) do
-			if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
-				aa_only = false
-				break;
+			local aa_only = true
+			for cat in pairs(weapon.onlyTargets) do
+				if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
+					aa_only = false
+					break;
+				end
 			end
-		end
 
-		local weaponName = weaponDef.description or 'Weapon'
-		local isDuplicate = false
+			local weaponName = weaponDef.description or 'Weapon'
+			local isDuplicate = false
 
-		for i=1,#weaponStats do
-			if weaponStats[i].weaponID == weaponID then
-				weaponStats[i].count = weaponStats[i].count + 1
-				isDuplicate = true
-				break
+			for i=1,#weaponStats do
+				if weaponStats[i].weaponID == weaponID then
+					weaponStats[i].count = weaponStats[i].count + 1
+					isDuplicate = true
+					break
+				end
 			end
-		end
-		
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
-			local wsTemp = {
-				weaponID = weaponID,
-				count = 1,
+			
+			if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
+				local wsTemp = {
+					weaponID = weaponID,
+					count = 1,
+					
+					-- stuff that the weapon gets from the owner unit
+					aa_only = aa_only,
+					highTrajectory = unitDef.highTrajectoryType,
+					free_stockpile = ucp.freestockpile,
+					stockpile_time = ucp.stockpiletime,
+					stockpile_cost = ucp.stockpilecost,
+					firing_arc = weapon.maxAngleDif
+				}
 				
-				-- stuff that the weapon gets from the owner unit
-				aa_only = aa_only,
-				highTrajectory = unitDef.highTrajectoryType,
-				free_stockpile = ucp.freestockpile,
-				stockpile_time = ucp.stockpiletime,
-				stockpile_cost = ucp.stockpilecost,
-				firing_arc = weapon.maxAngleDif
-			}
-			weaponStats[#weaponStats+1] = wsTemp
+				-- dual wielding comms
+				if (unitID and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")) then
+					wsTemp.count = 2
+				end
+				weaponStats[#weaponStats+1] = wsTemp
+			end
 		end
 	end
 
@@ -1196,7 +1208,7 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName] 
 end
 
-local function printunitinfo(ud, lang, buttonWidth)	
+local function printunitinfo(ud, lang, buttonWidth, unitID)	
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1229,15 +1241,43 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	local statschildren = {}
 
-	-- stuff for modular commanders
-	local commModules, commCost
-	if ud.customParams.commtype then
-		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
-		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
-	end
+	local isCommander = (unitID and Spring.GetUnitRulesParam(unitID, "comm_level"))
+
 	local cost = numformat(ud.metalCost)
-	if commCost then
-		cost = cost .. ' (' .. numformat(commCost) .. ')'
+	local health = numformat(ud.health)
+	local speed = numformat(ud.speed)
+
+	-- dynamic comms get special treatment
+	if isCommander then
+		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
+		health = select(2, Spring.GetUnitHealth(unitID))
+		speed = numformat(ud.speed * (ud.customParams.att_speedmult or 1) * Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult"))
+
+		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].name, textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		
+		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		local weapons = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
+		for i = 1, weapons do
+			statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)].humanName, textColor = colorFire, }
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
+		end
+		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+		if modules > 0 then
+			for i = 1, modules do
+				statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)].humanName, textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+			end
+		end
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 	end
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
@@ -1246,15 +1286,15 @@ local function printunitinfo(ud, lang, buttonWidth)
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = cost .. " M", textColor = color.stats_fg, }
 	
-	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = 'Health: ', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.mass), textColor = color.stats_fg, }
-	
+
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed) .. " elmo/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
 	end
 
 	--[[ Enable through some option perhaps
@@ -1275,13 +1315,13 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) 
+	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) + (unitID and Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0)
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy,2) .. " E/s", textColor = color.stats_fg, }
 	end
-
+	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*32) .. " elmo", textColor = color.stats_fg, }
@@ -1310,17 +1350,6 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 
-	if commModules then
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
-		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #commModules do
-			statschildren[#statschildren+1] = Label:New{ caption = commModules[i], textColor = color.stats_fg,}
-			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
-		end	
-	end
-	
 	local cells = printAbilities(ud)
 	
 	if cells and #cells > 0 then
@@ -1335,7 +1364,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		end
 	end
 
-	cells = printWeapons(ud)
+	cells = printWeapons(ud, unitID)
 	
 	if cells and #cells > 0 then
 		
@@ -1524,7 +1553,7 @@ local function KillStatsWindow(num)
 	statswindows[num] = nil
 end
 
-MakeStatsWindow = function(ud, x,y)
+MakeStatsWindow = function(ud, x,y, unitID)
 	hideWindow(window_unitcontext)
 	local x = x
 	local y = y
@@ -1547,7 +1576,7 @@ MakeStatsWindow = function(ud, x,y)
 			width='100%',
 			bottom = B_HEIGHT*2,
 			padding = {2,2,2,2},
-			children = printunitinfo(ud, WG.lang or 'en', window_width) ,
+			children = printunitinfo(ud, WG.lang or 'en', window_width, unitID) ,
 		},	
 		Button:New{ 
 			caption = 'Close', 
@@ -1582,7 +1611,7 @@ MakeStatsWindow = function(ud, x,y)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = ud.humanName ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(unitID, ud) ..' - '.. desc,
 		
 		children = children,
 	}
@@ -1811,11 +1840,6 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
-		end
-		
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
@@ -1825,10 +1849,10 @@ function widget:MousePress(x,y,button)
 				return
 			end
 			
-			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			local udid = UnitDefs[Spring.GetUnitDefID(unitID)]
 			
-			if ud then
-				MakeStatsWindow(ud,x,y)
+			if udid then
+				MakeStatsWindow(udid,x,y, unitID)
 			end
 			-- FIXME enable later when does not show useless info
 			return true
@@ -1852,7 +1876,11 @@ function widget:MousePress(x,y,button)
 				end
 			end
 		end
-		
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 	end
 
 	--[[
