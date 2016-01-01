@@ -1,5 +1,3 @@
-if (not gadgetHandler:IsSyncedCode()) then return end
-
 function gadget:GetInfo() return {
 	name     = "Startbox handler",
 	desc     = "Handles startboxes",
@@ -13,13 +11,32 @@ function gadget:GetInfo() return {
 if VFS.FileExists("mission.lua") then return end
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+local startboxConfig, manualStartposConfig
+
+local function CheckStartbox (boxID, x, z)
+	local box = startboxConfig[boxID]
+
+	for i = 1, #box do
+		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
+		if (cross_product(x, z, x1, z1, x2, z2) <= 0
+		and cross_product(x, z, x2, z2, x3, z3) <= 0
+		and cross_product(x, z, x3, z3, x1, z1) <= 0
+		) then
+			return true
+		end
+	end
+
+	return false
+end
+
+if gadgetHandler:IsSyncedCode() then -- Synced -------------------------------------------------------------------------------
 
 --[[ expose a randomness seed
 this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
 afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
 local private_seed = math.random(2000000000) -- must be an integer
 Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
-local startboxConfig, manualStartposConfig = ParseBoxes()
+startboxConfig, manualStartposConfig = ParseBoxes()
 math.randomseed(private_seed)
 
 GG.startBoxConfig = startboxConfig
@@ -108,24 +125,6 @@ function gadget:Initialize()
 	end
 end
 
-local function CheckStartbox (boxID, x, z)
-
-	local box = startboxConfig[boxID]
-	local valid = false
-
-	for i = 1, #box do
-		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
-		if (cross_product(x, z, x1, z1, x2, z2) < 0
-		and cross_product(x, z, x2, z2, x3, z3) < 0
-		and cross_product(x, z, x3, z3, x1, z1) < 0
-		) then
-			valid = true
-		end
-	end
-
-	return valid
-end
-
 GG.CheckStartbox = CheckStartbox
 
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
@@ -142,4 +141,30 @@ function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	else
 		return false
 	end
+end
+
+else -- Unsynced ------------------------------------------------------------------------------------------------
+
+startboxConfig, manualStartposConfig = ParseBoxes()
+
+function gadget:RecvSkirmishAIMessage(teamID, dataStr)
+	local command = "ai_is_valid_startpos:"
+	if not dataStr:find(command,1,true) then return end
+
+	local xz = dataStr:sub(command:len()+1)
+	local slash = xz:find("/",1,true)
+	if not slash then return end
+
+	local x = tonumber(xz:sub(1, slash-1))
+	local z = tonumber(xz:sub(slash+1))
+	if not x or not z then return end
+
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if (not boxID) or CheckStartbox(boxID, x, z) then
+		return "1"
+	else
+		return "0"
+	end
+end
+
 end
