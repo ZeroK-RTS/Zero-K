@@ -23,8 +23,10 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
-local standardCommDefs = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")
+local morphableStaticCommDefs = VFS.Include("gamedata/modularcomms/staticcomms_morphable.lua")
 local success, err
+
+local NUM_COMM_LEVELS = 5
 
 -- global comm data (from the modoption)
 -- abolished - exceeeds memory usage during loading
@@ -56,36 +58,68 @@ WG.commDataGlobal = commDataGlobal
 
 -- player comm data (from customkeys)
 local myID = Spring.GetMyPlayerID()
-local commData	-- [name] = {[1] = unitDefName, [2] = unitDefName, ...}
-local customKeys = select(10, Spring.GetPlayerInfo(myID))
-local commDataRaw = customKeys and customKeys.commanders
-if not (commDataRaw and type(commDataRaw) == 'string') then
-	err = "Your comm data entry is empty or in invalid format"
-	commData = {}
-else
-	commDataRaw = string.gsub(commDataRaw, '_', '=')
-	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	--Spring.Echo(commDataRaw)
-	local commDataFunc, err = loadstring("return "..commDataRaw)
-	if commDataFunc then 
-		success, commData = pcall(commDataFunc)
-		if not success then
-			err = commData
-			commData = {}
+local commData = {}
+local commDataByID = {}
+local commDataForPlayers = {}
+
+local players = Spring.GetPlayerList()
+
+for i=1,#players do
+	local playerID = players[i]
+	local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
+	
+	local commDataForPlayer	-- [playerID] = {[commID1] = {}, [commID2] = {}, ...}
+	local commDataForPlayerRaw = customKeys and customKeys.commanders
+	if not (commDataForPlayerRaw and type(commDataForPlayerRaw) == 'string') then
+		err = "Comm data entry for player " .. playerName .. " is empty or in invalid format"
+		commDataForPlayer = {}
+	else
+		commDataForPlayerRaw = string.gsub(commDataForPlayerRaw, '_', '=')
+		commDataForPlayerRaw = Spring.Utilities.Base64Decode(commDataForPlayerRaw)
+		local commDataForPlayerFunc, err = loadstring("return "..commDataForPlayerRaw)
+		if commDataForPlayerFunc then
+			success, commDataForPlayer = pcall(commDataForPlayerFunc)
+			if not success then
+				err = commDataForPlayer
+				commDataForPlayer = {}
+			end
 		end
+	end
+	if err then 
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Modular Comm API error: " .. err)
+	end
+	commDataForPlayers[playerID] = commDataForPlayer
+end
+
+-- morphable static comms (e.g. trainers)
+local morphableStaticComms = {}
+for commID, commDef in pairs(morphableStaticCommDefs) do
+	--Spring.Echo("Modular comm API adding static comm " .. commID)
+	local entry = Spring.Utilities.CopyTable(commDef, true)
+	entry.modules = entry.levels
+	entry.levels = nil
+	for level=1,#entry.modules do
+		entry.modules[level].cost = nil
+	end
+	morphableStaticComms[commID] = entry
+	commDataByID[commID] = entry
+end
+commData.players = commDataForPlayers
+commData.static = morphableStaticComms
+
+-- add player comms to by-name comm list
+for playerID, playerComms in pairs(commData.players) do
+	for commID, data in pairs(playerComms) do
+		commDataByID[commID] = data
 	end
 end
 
-if err then 
-	--Spring.Echo('Modular Comm Info error: ' .. err)	-- ditto, except it's start_unit_setup that complained before
-end
-
-commData = Spring.Utilities.MergeTable(commData, standardCommDefs)
-WG.commData = commData
+--WG.commData = commData
+--WG.commDataByID = commDataByID
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
-local commModulesByComms = {}
+local commModulesByStaticComm = {}
 for i=1,#UnitDefs do
 	if UnitDefs[i].customParams.modules then
 		local modulesRaw = {}
@@ -97,116 +131,60 @@ for i=1,#UnitDefs do
 			modulesRaw[i] = modulename
 			modulesHuman[i] = upgrades[modulename].name
 		end
-		commModulesByComms[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
+		commModulesByStaticComm[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
 	end
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function RemoveDuplicates(base, delete)
-	local count = {}
-	for i=1,#delete do
-		local v = delete[i]
-		count[v] = (count[v] or 0) + 1
-	end	
-	for i=1, #base do
-		local v = base[i]
-		if count[v] and count[v] > 0 then
-			base[i] = nil
-			count[v] = count[v] - 1
-		end
-	end
+-- TODO
+local function GetModulesCost(modulesList)
+	return 0
 end
 
--- recursive magic (likely broken)
-local function MergeModuleTables(moduleTable, previous)
-	local data = UnitDefNames[previous].customParams
-	if data then
-		if data.prev then
-			MergeModuleTables(moduleTable, data.prev)
-		end
-		local modules = data.modules or {}
-		for i=1,#modules do
-			moduleTable[#moduleTable+1] = modules[i]
-		end
-	end
-	
-	return moduleTable
+local function GetCommSeriesInfo(commID)
+	return commDataByID[commID]
 end
 
--- gets modules and costs
-local function GetCommSeriesInfo(seriesName, purgeDuplicates)
-	local data = {}
-	local commList = commData[seriesName]
-	for i=1,#commList do
-		data[i] = {name = commList[i]}
+local function GetPlayerComms(playerID, includeTrainers)
+	local comms = {}
+	if commData.players[playerID] then
+		comms = CopyTable(commData.players[playerID], true)
 	end
-	for i=1,#data do
-		local name = data[i].name
-		local unitDef = UnitDefNames[name]
-		if name and unitDef then
-			data[i].modules = CopyTable(commModulesByComms[name].human, true)
-			data[i].modulesRaw = CopyTable(commModulesByComms[name].raw, true)
-			data[i].cost = unitDef.metalCost
-			data[i].prev = unitDef.customParams.prev
-		end
-	end
-	-- remove reference to modules already in previous levels
-	if purgeDuplicates then
-		for i = #data, 2, -1 do
-			if not data[i].prev then	-- having a previous comm specified indicates we are using per-level module tables instead of lifetime; no need to purge duplicates
-				RemoveDuplicates(data[i].modules, data[i-1].modules)
-				RemoveDuplicates(data[i].modulesRaw, data[i-1].modulesRaw)
+	if includeTrainers then
+		for commID, commDef in pairs(commData.static) do
+			if (string.find(commID, "trainer")) ~= nil then
+				comms[commID] = CopyTable(commDef, true)
 			end
-			data[i].cost = data[i].cost - data[i-1].cost
 		end
 	end
-	return data
+	return comms
 end
-WG.GetCommSeriesInfo = GetCommSeriesInfo
-
---[[
-local function GetCommUnitInfo(unitDef)
-	if type(unitDef) == "number" then unitDef = UnitDefs[unitDef].name end
-	if commDataGlobal[unitDef] then
-		return commDataGlobal[unitDef]
-	end
-end
-WG.GetCommUnitInfo = GetCommUnitInfo
-]]
 
 -- returns the moduledef table
 local function GetCommUpgradeList()
 	return upgrades
 end
-WG.GetCommUpgradeList = GetCommUpgradeList
 
 local function GetCommModules(unitDef, raw)
 	if type(unitDef) == "number" then
 		unitDef = UnitDefs[unitDef].name
 	end
-	if commModulesByComms[unitDef] then
-		return commModulesByComms[unitDef][raw and "raw" or "human"]
+	if commModulesByStaticComm[unitDef] then
+		return commModulesByStaticComm[unitDef][raw and "raw" or "human"]
 	end
-	--[[
-	if commDataGlobal[unitDef] then
-		local modules = {}
-		local modulesInternal = commDataGlobal[unitDef] and commDataGlobal[unitDef].modules or {}
-		if commDataGlobal[unitDef].prev then
-			local copy = CopyTable(modulesInternal)
-			modulesInternal = MergeModuleTables(copy, commDataGlobal[unitDef].prev)
-		end
-		table.sort(modulesInternal,
-				function(a,b)
-					return (a:find("commweapon_") and not b:find("commweapon_"))
-					or (a:find("conversion_") and not (b:find("commweapon_") or b:find("conversion_")) )
-					or (a:find("weaponmod_") and b:find("module_")) 
-				end )
-		for i=1, #modulesInternal do
-			local modulename = modulesInternal[i]
-			modules[i] = upgrades[modulename].name
-		end
-		return modules
-	end
-	]]
 end
-WG.GetCommModules = GetCommModules
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function widget:Initialize()
+	WG.ModularCommAPI = {
+		GetPlayerComms = GetPlayerComms,
+		GetCommUpgradeList = GetCommUpgradeList,
+		GetCommModules = GetCommModules,
+		GetCommSeriesInfo = GetCommSeriesInfo
+	}
+end
+
+function widget:Shutdown()
+	WG.ModularCommAPI = nil
+end
