@@ -354,6 +354,11 @@ for i = 1, #chassisDefs do
 	chassisDefByBaseDef[chassisDefs[i].baseUnitDef] = i
 end
 
+local chassisDefNames = {}
+for i = 1, #chassisDefs do
+	chassisDefNames[chassisDefs[i].name] = i
+end
+
 ------------------------------------------------------------------------
 -- Processing
 ------------------------------------------------------------------------
@@ -500,4 +505,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames
+return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames

@@ -23,7 +23,7 @@ local interallyCreatedUnit = false
 
 local unitCreatedShield, unitCreatedShieldNum
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 -- FIXME: make this not needed
@@ -170,7 +170,7 @@ end
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
-	local chassisDefID = 1 -- SomehowGetChassisFromID(dyncommID)
+	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
