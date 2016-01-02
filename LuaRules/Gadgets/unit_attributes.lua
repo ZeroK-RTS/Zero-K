@@ -414,6 +414,7 @@ function UpdateUnitAttributes(unitID, frame)
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 		
 		unitSlowed[unitID] = moveMult < 1
