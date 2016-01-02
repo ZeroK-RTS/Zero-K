@@ -423,7 +423,7 @@ options = {
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
-		name="Show Unit's DGun Status",
+		name="Show Unit's Special Weapon Status",
 		type='bool',
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
@@ -792,9 +792,9 @@ local function WriteGroupInfo()
 				else
 					remainingTime = remainingTime .. "s"
 				end
-				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. ")"  --red and white
+				dgunStatus = "\nSpecial\255\255\90\90 Reload\255\255\255\255 (" .. remainingTime .. ")"  --red and white
 			else
-				dgunStatus = "\nDGun\255\90\255\90 Ready\255\255\255\255"
+				dgunStatus = "\nSpecial\255\90\255\90 Ready\255\255\255\255"
 			end
 		end
 	end
