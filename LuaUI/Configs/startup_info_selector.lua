@@ -20,13 +20,13 @@ local optionData = {}
 
 local commDataOrdered = {}
 local numComms = 0
-for id, data in pairs( WG.ModularCommAPI.GetPlayerComms(Spring.GetMyPlayerID(), true)) do
+for profileID, data in pairs( WG.ModularCommAPI.GetPlayerComms(Spring.GetMyPlayerID(), true)) do
 	numComms = numComms + 1
 	commDataOrdered[numComms] = data
-	commDataOrdered[numComms].id = id
+	commDataOrdered[numComms].profileID = profileID
 end
 --Spring.Echo("wololo", "Player " .. Spring.GetMyPlayerID() .. " has " .. numComms .. " comms")
-table.sort(commDataOrdered, function(a,b) return a.id < b.id end)
+table.sort(commDataOrdered, function(a,b) return a.profileID < b.profileID end)
 
 local chassisImages = {
 	armcom1 = "LuaUI/Images/startup_info_selector/chassis_armcom.png",
@@ -42,8 +42,8 @@ local colorConversion = "\255\255\96\0"
 local colorWeaponMod = "\255\255\0\255"
 local colorModule = "\255\128\128\255"
 
-local function WriteTooltip(id)
-	local commData = WG.ModularCommAPI.GetCommSeriesInfo(id)
+local function WriteTooltip(profileID)
+	local commData = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 	local str = ''
 	local upgrades = WG.ModularCommAPI.GetCommUpgradeList()
 	for i=1,#commData.modules do
@@ -69,16 +69,16 @@ local function WriteTooltip(id)
 end
 
 local function GetCommSelectTemplate(num, data)
-	local commID = data.id
-	local comm1Name = data.id .. "_1"
+	local commProfileID = data.profileID
+	local comm1Name = commProfileID .. "_1"
 	--if not UnitDefNames[comm1Name] then return end
 	
 	local option = {
 		name = data.name,
-		tooltip = "Select "..data.name..WriteTooltip(data.id),
-		--cmd = "customcomm:"..seriesName,
+		tooltip = "Select "..data.name..WriteTooltip(commProfileID),
+		--cmd = "customcomm:"..profileName,
 		unitname = comm1Name,
-		trainer = string.find(data.id, "trainer") ~= nil,	-- FIXME should probably be in the def table
+		trainer = string.find(commProfileID, "trainer") ~= nil,	-- FIXME should probably be in the def table
 	}
 	if (data.chassis) then
 		Spring.Echo(data.chassis)

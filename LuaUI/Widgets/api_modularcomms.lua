@@ -59,7 +59,7 @@ WG.commDataGlobal = commDataGlobal
 -- player comm data (from customkeys)
 local myID = Spring.GetMyPlayerID()
 local commData = {}
-local commDataByID = {}
+local commDataByProfileID = {}
 local commDataForPlayers = {}
 
 local players = Spring.GetPlayerList()
@@ -68,7 +68,7 @@ for i=1,#players do
 	local playerID = players[i]
 	local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
 	
-	local commDataForPlayer	-- [playerID] = {[commID1] = {}, [commID2] = {}, ...}
+	local commDataForPlayer	-- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
 	local commDataForPlayerRaw = customKeys and customKeys.commanders
 	if not (commDataForPlayerRaw and type(commDataForPlayerRaw) == 'string') then
 		err = "Comm data entry for player " .. playerName .. " is empty or in invalid format"
@@ -93,29 +93,29 @@ end
 
 -- morphable static comms (e.g. trainers)
 local morphableStaticComms = {}
-for commID, commDef in pairs(morphableStaticCommDefs) do
-	--Spring.Echo("Modular comm API adding static comm " .. commID)
+for commProfileID, commDef in pairs(morphableStaticCommDefs) do
+	--Spring.Echo("Modular comm API adding static comm " .. commProfileID)
 	local entry = Spring.Utilities.CopyTable(commDef, true)
 	entry.modules = entry.levels
 	entry.levels = nil
 	for level=1,#entry.modules do
 		entry.modules[level].cost = nil
 	end
-	morphableStaticComms[commID] = entry
-	commDataByID[commID] = entry
+	morphableStaticComms[commProfileID] = entry
+	commDataByProfileID[commProfileID] = entry
 end
 commData.players = commDataForPlayers
 commData.static = morphableStaticComms
 
 -- add player comms to by-name comm list
 for playerID, playerComms in pairs(commData.players) do
-	for commID, data in pairs(playerComms) do
-		commDataByID[commID] = data
+	for commProfileID, data in pairs(playerComms) do
+		commDataByProfileID[commProfileID] = data
 	end
 end
 
 --WG.commData = commData
---WG.commDataByID = commDataByID
+--WG.commDataByProfileID = commDataByProfileID
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
@@ -141,8 +141,8 @@ local function GetModulesCost(modulesList)
 	return 0
 end
 
-local function GetCommSeriesInfo(commID)
-	return commDataByID[commID]
+local function GetCommProfileInfo(commProfileID)
+	return commDataByProfileID[commProfileID]
 end
 
 local function GetPlayerComms(playerID, includeTrainers)
@@ -151,9 +151,9 @@ local function GetPlayerComms(playerID, includeTrainers)
 		comms = CopyTable(commData.players[playerID], true)
 	end
 	if includeTrainers then
-		for commID, commDef in pairs(commData.static) do
-			if (string.find(commID, "trainer")) ~= nil then
-				comms[commID] = CopyTable(commDef, true)
+		for commProfileID, commDef in pairs(commData.static) do
+			if (string.find(commProfileID, "trainer")) ~= nil then
+				comms[commProfileID] = CopyTable(commDef, true)
 			end
 		end
 	end
@@ -181,7 +181,7 @@ function widget:Initialize()
 		GetPlayerComms = GetPlayerComms,
 		GetCommUpgradeList = GetCommUpgradeList,
 		GetCommModules = GetCommModules,
-		GetCommSeriesInfo = GetCommSeriesInfo
+		GetCommProfileInfo = GetCommProfileInfo
 	}
 end
 
