@@ -27,7 +27,7 @@ local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseD
 include("LuaRules/Configs/customcmds.h.lua")
 
 -- FIXME: make this not needed
-local legacyToDyncommChasisMap = {
+local legacyToDyncommChassisMap = {
 	armcom = "assault",
 	corcom = "assault",
 	commrecon = "recon",
@@ -170,7 +170,7 @@ end
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
-	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
+	local chassisDefID = chassisDefNames[legacyToDyncommChassisMap[commProfileInfo.chassis] or "recon"]
 	if not chassisDefID then
 		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis)
 		return false
