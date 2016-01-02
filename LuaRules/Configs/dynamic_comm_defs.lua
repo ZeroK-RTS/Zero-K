@@ -164,8 +164,8 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.metalIncome = (sharedData.metalIncome or 0) + 4
-			sharedData.energyIncome = (sharedData.energyIncome or 0) + 6
+			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
+			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
 		end
 	},
 }

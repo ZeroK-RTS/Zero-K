@@ -716,13 +716,19 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 	end
 	
 	-- Check that the module in each slot is valid
-	newCost = 0
-	for i = 1, #slots do
-		local slotData = slots[i]
-		if ModuleIsValid(level, chassis, slotData.slotType, i) then
-			newCost = newCost + moduleDefs[GetSlotModule(i, slotData.slotType)].cost
-		else
-			UpdateSlotModule(i, emptyModules[slotData.slotType])
+	local requireUpdate = true
+	local newCost = 0
+	while requireUpdate do
+		requireUpdate = false
+		newCost = 0
+		for i = 1, #slots do
+			local slotData = slots[i]
+			if ModuleIsValid(level, chassis, slotData.slotType, i) then
+				newCost = newCost + moduleDefs[GetSlotModule(i, slotData.slotType)].cost
+			else
+				requireUpdate = true
+				UpdateSlotModule(i, emptyModules[slotData.slotType])
+			end
 		end
 	end
 	
