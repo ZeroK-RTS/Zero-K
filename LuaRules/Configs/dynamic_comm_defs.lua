@@ -242,6 +242,8 @@ end
 -- Chassis Definitions
 ------------------------------------------------------------------------
 
+-- it'd help if there was a name -> chassisDef map you know
+
 local chassisDefs = {
 	{
 		name = "recon",

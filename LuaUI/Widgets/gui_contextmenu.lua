@@ -1251,7 +1251,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	if isCommander then
 		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
 		health = select(2, Spring.GetUnitHealth(unitID))
-		speed = numformat(ud.speed * (ud.customParams.att_speedmult or 1) * Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult"))
+		speed = numformat(ud.speed * (ud.customParams.att_speedmult or 1) * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
 
 		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }

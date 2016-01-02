@@ -95,13 +95,12 @@ local playerSides = {} -- sides selected ingame from widget  - per players
 local teamSides = {} -- sides selected ingame from widgets - per teams
 
 local playerIDsByName = {}
-local customComms = {}
 local commChoice = {}
 local customKeys = {}	-- [playerID] = {}
 
 --local prespawnedCommIDs = {}	-- [teamID] = unitID
 
-GG.startUnits = {}
+GG.startUnits = {}	-- WARNING: this is liable to break with new dyncomms (entries will likely not be an actual unitDefID)
 GG.CommanderSpawnLocation = {}
 
 local waitingForComm = {}
@@ -139,52 +138,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
 end
 
 local function InitUnsafe()
-	-- for name, id in pairs(playerIDsByName) do
-	for index, id in pairs(Spring.GetPlayerList()) do	
-		-- copied from PlanetWars
-		local commData, success
-		customKeys[id] = select(10, spGetPlayerInfo(id))
-		local commDataRaw = customKeys[id] and customKeys[id].commanders
-		if not (commDataRaw and type(commDataRaw) == 'string') then
-			if commDataRaw then
-				err = "Comm data entry for player "..id.." is in invalid format"
-			end
-			commData = {}
-		else
-			commDataRaw = string.gsub(commDataRaw, '_', '=')
-			commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-			--Spring.Echo(commDataRaw)
-			local commDataFunc, err = loadstring("return "..commDataRaw)
-			if commDataFunc then 
-				success, commData = pcall(commDataFunc)
-				if not success then
-					err = commData
-					commData = {}
-				end
-			end
-		end
-		if err then 
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Start Unit Setup warning: ' .. err)
-		end
-
-		-- record the player's first-level comm def for each chassis
-		for commSeries, subdata in pairs(commData) do
-			customComms[id] = customComms[id] or {}
-			customComms[id][commSeries] = subdata[1]
-			--Spring.Echo(id,"comm"..chassis, subdata[1])
-		end
-		
-		-- this method makes no sense, it's not like any given generated def will be used for more than one replacement/player!
-		-- would be more logical to use replacee as key and replacement as value in player customkeys
-		--[[
-		customComms[id] = customComms[id] or {}
-		for replacementComm, replacees in pairs(commData) do
-			for _,name in pairs(replacees) do
-				customComms[id][name] = replacementComm
-			end
-		end
-		]]--
-	end
+	
 end
 
 
@@ -225,6 +179,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 	end
 
   local startUnit
+  local commProfileID = nil
 
   if isAI then -- AI that didn't pick comm type gets default comm
     return (Spring.GetTeamRulesParam(teamID, "start_unit") or "comm_trainer_strike_0")
@@ -238,12 +193,16 @@ local function GetStartUnit(teamID, playerID, isAI)
 	startUnit = startUnits[playerSides[playerID]]
   end
   
-  -- if a replacement def is available, use it  
+  -- if a player-selected comm is available, use it
   playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
   if (playerID and commChoice[playerID]) then
 	--Spring.Echo("Attempting to load alternate comm")
-	local altComm = customComms[playerID][(commChoice[playerID])]
-	startUnit = (altComm and UnitDefNames[altComm] and altComm) or startUnit
+	local playerComms = GG.ModularCommAPI.GetPlayerComms(playerID, true)
+	local altComm = playerComms[commChoice[playerID]]
+	if altComm then
+		startUnit = "unused_variable"	-- FIXME: this should probably be the dyncomm's base unitDef
+		commProfileID = commChoice[playerID]
+	end
   end
   
   -- hack workaround for chicken
@@ -251,7 +210,7 @@ local function GetStartUnit(teamID, playerID, isAI)
   --if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
   
   --if didn't pick a comm, wait for user to pick
-  return startUnit or nil	-- startUnit or DEFAULT_UNIT
+  return (startUnit or nil), commProfileID	-- startUnit or DEFAULT_UNIT
 end
 
 
@@ -348,7 +307,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   end
   
   -- get start unit
-  local startUnit = GetStartUnit(teamID, playerID, isAI)
+  local startUnit, commProfileID = GetStartUnit(teamID, playerID, isAI)
   
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
@@ -392,12 +351,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 	
     -- CREATE UNIT
-	local unitID
-    --if Spring.GetGameFrame() <= 1 then
-	--	unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
-	--else
-		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID) -- Add dyncommID here
-	--end
+	local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, commProfileID)
 	if Spring.GetGameFrame() <= 1 then
 		Spring.SpawnCEG("gate", x, y, z)
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
@@ -451,7 +405,11 @@ local function StartUnitPicked(playerID, name)
 	teamSides[teamID] = name
 	local startUnit = GetStartUnit(teamID, playerID)
 	if startUnit then
-		Spring.SetTeamRulesParam(teamID, "commChoice", UnitDefNames[startUnit].id)
+		if UnitDefNames[startUnit] then
+			Spring.SetTeamRulesParam(teamID, "commChoice", UnitDefNames[startUnit].id)
+		else
+			Spring.SetTeamRulesParam(teamID, "commChoice", startUnit)
+		end
 	end
 	if gamestart then
 		-- picked commander after game start, prep for orbital drop

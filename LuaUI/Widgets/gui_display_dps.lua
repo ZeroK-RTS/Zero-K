@@ -200,57 +200,49 @@ local function drawDeathDPS(damage,ux,uy,uz,textSize,red,alpha)
 end
 
 local function DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
-  -- if Spring.IsGUIHidden() or (not spIsUnitInView(unitID))  then
-    -- return
-  -- end
   glTranslate(xshift, yshift, 0)
   glBillboard()
   gl.MultiTexCoord(1, 0.25 + (0.5 * alpha))
   if paralyze then
     glColor(0.5, 0.5, 1)
-	  gl.PushMatrix()
-		fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16")
-		local fontDefaultSize = fontHandler.GetFontSize()
-		gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
-		fontHandler.DrawCentered(tostring(damage), 0,0)
-	  gl.PopMatrix()
-	--glColor(0, 0, 1)
-    --glText(damage, 0, 0, textSize, 'cnO')
   else
     glColor(1, 1, 1)
-	  gl.PushMatrix()
-		fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16")
-		local fontDefaultSize = fontHandler.GetFontSize()
-		gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
-		fontHandler.DrawCentered(tostring(damage), 0,0)
-	  gl.PopMatrix()	
-    --glText(damage, 0, 0, textSize, 'cno')
+  end
+  gl.PushMatrix()
+  fontHandler.UseFont(":o:LuaUI/Fonts/KOMTXT___16")
+  local fontDefaultSize = fontHandler.GetFontSize()
+  gl.Scale(textSize/fontDefaultSize, textSize/fontDefaultSize, textSize/fontDefaultSize)
+  fontHandler.DrawCentered(tostring(damage), 0,0)
+  gl.PopMatrix()	
+  --glText(damage, 0, 0, textSize, 'cno')
+  if paralyze then	-- reset
+    glColor(1,1,1)
   end
 end
 
 local function DrawUnitFunc2(unitID, yshift, xshift, damage, textSize, alpha, paralyze)
-	if (not spIsUnitInView(unitID)) then
+	if Spring.IsGUIHidden() or (not spIsUnitInView(unitID)) then
 		return
 	end
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	glPushMatrix()
-		glTranslate(x,y,z)
-		DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
+	glTranslate(x,y,z)
+	DrawUnitFunc(yshift, xshift, damage, textSize, alpha, paralyze)
 	glPopMatrix()
 end
 
 local function DrawWorldFunc()
-		local theTime = GetGameSeconds()
+  local theTime = GetGameSeconds()
 
-		if (theTime ~= lastTime) then
-		if next(unitDamage) then calcDPS(unitDamage, false, theTime) end
-		if next(unitParalyze) then calcDPS(unitParalyze, true, theTime) end
+  if (theTime ~= lastTime) then
+    if next(unitDamage) then calcDPS(unitDamage, false, theTime) end
+    if next(unitParalyze) then calcDPS(unitParalyze, true, theTime) end
 
-		if changed then
-			table.sort(damageTable, function(m1,m2) return m1.damage < m2.damage; end)
-			changed = false
-		end
-	end
+    if changed then
+      table.sort(damageTable, function(m1,m2) return m1.damage < m2.damage; end)
+      changed = false
+    end
+  end
 
   lastTime = theTime
  
