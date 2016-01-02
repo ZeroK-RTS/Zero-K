@@ -61,7 +61,7 @@ for i=1,#players do
 		end
 	end
 	if err then 
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Modular Comm API error: " .. err)
+		Spring.Log(GetInfo().name, LOG.ERROR, "Modular Comm API error: " .. err)
 	end
 	commDataForPlayers[playerID] = commDataForPlayer
 end
