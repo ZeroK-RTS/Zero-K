@@ -380,6 +380,7 @@ local function MakeButton(container, cmd, insertItem, index)
 				backgroundColor = {0,0,0,0},
 				isStructure = true;
 				cmdid = "fake",
+				fake = true,
 				HitTest = function (self, x, y) return false end,	
 			}
 		end
@@ -1196,7 +1197,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local pos = gridKeyMap[key]
 		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
-			if cmdid then
+			if cmdid and not cmdid.fake then
 				cmdid = cmdid.cmdid
 				if cmdid then 
 					local index = Spring.GetCmdDescIndex(cmdid)
@@ -1214,7 +1215,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local pos = gridKeyMap[key]
 		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
-			if cmdid then
+			if cmdid and not cmdid.fake then
 				cmdid = cmdid.cmdid
 				if cmdid then 
 					local index = Spring.GetCmdDescIndex(cmdid)
