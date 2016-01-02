@@ -495,4 +495,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef
+return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames

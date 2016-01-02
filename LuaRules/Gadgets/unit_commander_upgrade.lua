@@ -21,7 +21,7 @@ end
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef = include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
@@ -95,6 +95,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	local totalCost = upgradeDef.totalCost
 	Spring.SetUnitRulesParam(unitID, "comm_level", upgradeDef.level, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", upgradeDef.chassis, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_name", upgradeDef.name, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_cost", totalCost, INLOS)
 	
 	Spring.SetUnitCosts(unitID, {
@@ -125,6 +126,21 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	end
 	
 	UpdateUnitWithSharedData(unitID, sharedData)
+	
+	return unitID
+end
+
+local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+	local chassisDefID = 1 -- SomehowGetChassisFromID(dyncommID)
+	local upgradeDef = {
+		level = 0,
+		chassis = chassisDefID, 
+		totalCost = 1200,
+		name = "Bob", -- SomehowGetNameFromID(dyncommID)
+		moduleList = {moduleDefNames.econ}
+	}
+	
+	Upgrades_CreateUpgradedUnit(chassisDefs[chassisDefID].baseUnitDef, x, y, z, face, unitTeam, false, upgradeDef)
 	
 	return unitID
 end

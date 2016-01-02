@@ -396,7 +396,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
     --if Spring.GetGameFrame() <= 1 then
 	--	unitID = Spring.CreateUnit(startUnit, x, y, z, facing, teamID)
 	--else
-		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID)
+		unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID) -- Add dyncommID here
 	--end
 	if Spring.GetGameFrame() <= 1 then
 		Spring.SpawnCEG("gate", x, y, z)
