@@ -171,6 +171,11 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
+	if not chassisDefID then
+		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis)
+		return false
+	end
+	
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
