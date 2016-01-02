@@ -405,47 +405,58 @@ local function AimRifle(heading, pitch, isDgun)
 	return true
 end
 
+local isManual = {}
+
 local weapon1
 local weapon2
 local shield
 
-local dguns = {
-	false, -- pea
-	false, -- lpb
-	true, -- hpb dgun
-	false, -- personal shield
-	false, -- area shield
-}
-
 function UpdateWeapons(w1, w2, sh)
-	weapon1 = w1
-	weapon2 = w2
-	shield = sh
-
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", weapon1 or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", weapon2 or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield or 0, INLOS)
-
-	local hasDgun = ((weapon1 and dguns[weapon1]) or (weapon2 and dguns[weapon2]))
+	weapon1 = w1 and w1.num
+	weapon2 = w2 and w2.num
+	shield  = sh and sh.num
+	
+	local hasManualFire = (w1 and w1.manualFire) or (w2 and w2.manualFire)
 	local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
-	if not hasDgun and cmdDesc then
+	if not hasManualFire and cmdDesc then
 		Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
-	elseif hasDgun and not cmdDesc then
+	elseif hasManualFire and not cmdDesc then
 		cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK) + 1 -- insert after attack so that it appears in the correct spot in the menu
 		Spring.InsertUnitCmdDesc(unitID, cmdDesc, dgunTable)
 	end
 
+	local maxRange = 0
+	if w1 then
+		isManual[weapon1] = w1.manualFire
+		local range = tonumber(WeaponDefs[w1.weaponDefID].customParams.range)
+		maxRange = ((not w1.manualFire) and range > maxRange and range) or maxRange
+		Spring.SetUnitWeaponState(unitID, w1.num, "range", range)
+	end
+	if w2 then
+		isManual[weapon2] = w2.manualFire
+		local range = tonumber(WeaponDefs[w2.weaponDefID].customParams.range)
+		maxRange = ((not w2.manualFire) and range > maxRange and range) or maxRange
+		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
+	end
+	
+	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
+	Spring.SetUnitMaxRange(unitID, maxRange - 20)
+	
 	-- shields
-	Spring.SetUnitShieldState(unitID, 4, false)
-	Spring.SetUnitShieldState(unitID, 5, false)
+	Spring.SetUnitShieldState(unitID, 2, false)
+	Spring.SetUnitShieldState(unitID, 3, false)
 	if (sh) then
 		Spring.SetUnitShieldState(unitID, sh, true)
 	end
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if num == shield then return true end
-
+	if num == shield then 
+		return true 
+	end
+	
+	local curWep
+	
 	if num == weapon1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
@@ -456,7 +467,7 @@ function script.AimWeapon(num, heading, pitch)
 		return false
 	end
 
-	return AimRifle(heading, pitch, dguns[num])	
+	return AimRifle(heading, pitch, isManual[num])	
 end
 
 function script.Activate()

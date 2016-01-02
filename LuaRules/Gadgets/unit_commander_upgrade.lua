@@ -41,7 +41,7 @@ end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield)
 	local chassisDefID = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames
+	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames 
 	
 	weapon1 = chassisWeaponDefNames[weapon1 or "peashooter"]
 	
@@ -52,6 +52,10 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield)
 	end
 	
 	shield = shield and chassisWeaponDefNames[shield]
+	
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weapon1 and weapon1.num) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weapon2 and weapon2.num) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_shield_id", (shield and shield.num) or 0, INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield)

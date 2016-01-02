@@ -112,6 +112,17 @@ unitDef = {
 
   weapons             = {
     {
+      def                = [[fakeweapon]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},
+    {
+      def                = [[personal_shield]],
+	},
+	{
+      def                = [[area_shield]],
+	},
+    {
       def                = [[peashooter]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
@@ -122,30 +133,29 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
     {
-      def                = [[hpb]],
+      def                = [[missile]],
+      badTargetCategory  = [[]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	},
+    {
+      def                = [[machinegun]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
     {
-      def                = [[personal_shield]],
-	},
-	{
-      def                = [[area_shield]],
+      def                = [[hpb]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
   },
 
   weaponDefs          = {
-
-	peashooter = {
-		name                    = [[Laser Blaster]],
+	fakeweapon = {
+		name                    = [[Fake Bogus Weapon (for range setting)]],
 		areaOfEffect            = 8,
 		coreThickness           = 0.5,
 		craterBoost             = 0,
 		craterMult              = 0,
-
-		customParams			= {
-			muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
-		},
 
 		damage                  = {
 			default = 10,
@@ -160,7 +170,7 @@ unitDef = {
 		impulseFactor           = 0.4,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
-		range                   = 600,
+		range                   = 100,
 		reloadtime              = 0.1,
 		rgbColor                = [[1 0 0]],
 		soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -172,71 +182,6 @@ unitDef = {
 		weaponType              = [[LaserCannon]],
 		weaponVelocity          = 880,
 	},
-	
-	lpb = {
-		name                    = [[Light Particle Beam]],
-		beamDecay               = 0.85,
-		beamTime                = 0.01,
-		beamttl                 = 45,
-		coreThickness           = 0.5,
-		craterBoost             = 0,
-		craterMult              = 0,
-
-		damage                  = {
-			default = 40.01,
-		},
-
-		explosionGenerator      = [[custom:flash1red]],
-		fireStarter             = 100,
-		impactOnly              = true,
-		impulseFactor           = 0,
-		interceptedByShieldType = 1,
-		laserFlareSize          = 4.5,
-		minIntensity            = 1,
-		range                   = 330,
-		reloadtime              = 10/30,
-		rgbColor                = [[1 0 0]],
-		soundStart              = [[weapon/laser/mini_laser]],
-		soundStartVolume        = 5,
-		thickness               = 4,
-		tolerance               = 8192,
-		turret                  = true,
-		weaponType              = [[BeamLaser]],
-	},
-
-	hpb = {
-		name                    = [[Heavy Particle Beam]],
-		beamDecay               = 0.9,
-		beamTime                = 0.01,
-		beamttl                 = 75,
-		commandfire             = true,
-		coreThickness           = 0.5,
-		craterBoost             = 0,
-		craterMult              = 0,
-
-		damage                  = {
-			default = 2000.1,
-		},
-
-		explosionGenerator      = [[custom:blue_explosion]],
-		fireStarter             = 100,
-		impactOnly              = true,
-		impulseFactor           = 0,
-		interceptedByShieldType = 1,
-		laserFlareSize          = 10,
-		minIntensity            = 1,
-		pitchtolerance          = 8192,
-		range                   = 350,
-		reloadtime              = 15,
-		rgbColor                = [[0.1 0.2 1]],
-		soundStart              = [[weapon/laser/small_laser_fire4]],
-		soundStartVolume        = 5,
-		thickness               = 8,
-		tolerance               = 8192,
-		turret                  = true,
-		weaponType              = [[BeamLaser]],
-	},
-	
     personal_shield = {
 		name                    = [[Personal Shield]],
 		exteriorShield          = true,
@@ -258,7 +203,6 @@ unitDef = {
 		weaponType              = [[Shield]],
 		damage = {},
     },
-
 	area_shield = {
 		name                    = [[Area Shield]],
 		exteriorShield          = true,
@@ -279,7 +223,197 @@ unitDef = {
 		weaponType              = [[Shield]],
 		damage                  = {},
 	},
-	
+	peashooter = {
+		name                    = [[Laser Blaster]],
+		areaOfEffect            = 8,
+		coreThickness           = 0.5,
+		craterBoost             = 0,
+		craterMult              = 0,
+
+		customParams			= {
+			muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
+			range = 600,
+		},
+
+		damage                  = {
+			default = 10,
+		},
+
+		duration                = 0.02,
+		explosionGenerator      = [[custom:BEAMWEAPON_HIT_RED]],
+		fireStarter             = 50,
+		heightMod               = 1,
+		impactOnly              = true,
+		impulseBoost            = 0,
+		impulseFactor           = 0.4,
+		interceptedByShieldType = 1,
+		noSelfDamage            = true,
+		range                   = 0,
+		reloadtime              = 0.1,
+		rgbColor                = [[1 0 0]],
+		soundHit                = [[weapon/laser/lasercannon_hit]],
+		soundStart              = [[weapon/laser/small_laser_fire2]],
+		soundTrigger            = true,
+		thickness               = 2.55,
+		tolerance               = 10000,
+		turret                  = true,
+		weaponType              = [[LaserCannon]],
+		weaponVelocity          = 880,
+	},
+	lpb = {
+		name                    = [[Light Particle Beam]],
+		beamDecay               = 0.85,
+		beamTime                = 0.01,
+		beamttl                 = 45,
+		coreThickness           = 0.5,
+		craterBoost             = 0,
+		craterMult              = 0,
+
+		customParams			= {
+			range = 600,
+		},
+		
+		damage                  = {
+			default = 40.01,
+		},
+
+		explosionGenerator      = [[custom:flash1red]],
+		fireStarter             = 100,
+		impactOnly              = true,
+		impulseFactor           = 0,
+		interceptedByShieldType = 1,
+		laserFlareSize          = 4.5,
+		minIntensity            = 1,
+		range                   = 600,
+		reloadtime              = 10/30,
+		rgbColor                = [[1 0 0]],
+		soundStart              = [[weapon/laser/mini_laser]],
+		soundStartVolume        = 5,
+		thickness               = 4,
+		tolerance               = 8192,
+		turret                  = true,
+		weaponType              = [[BeamLaser]],
+	},
+	missile = {
+	  name                    = [[Missile Launcher]],
+	  areaOfEffect            = 48,
+	  avoidFeature            = true,
+	  cegTag                  = [[missiletrailyellow]],
+	  craterBoost             = 1,
+	  craterMult              = 2,
+      
+	  customParams            = {
+	  	muzzleEffectFire = [[custom:SLASHMUZZLE]],
+        range = 600,
+	  },
+      
+	  damage                  = {
+	  	default = 80,
+	  	planes  = 80,
+	  	subs    = 4,
+	  },
+      
+	  explosionGenerator      = [[custom:FLASH2]],
+	  fireStarter             = 70,
+	  flightTime              = 3,
+	  impulseBoost            = 0,
+	  impulseFactor           = 0.4,
+	  interceptedByShieldType = 2,
+	  model                   = [[wep_m_frostshard.s3o]],
+	  noSelfDamage            = true,
+	  range                   = 600,
+	  reloadtime              = 1,
+	  smokeTrail              = true,
+	  soundHit                = [[explosion/ex_med17]],
+	  soundStart              = [[weapon/missile/missile_fire11]],
+	  startVelocity           = 450,
+	  texture2                = [[lightsmoketrail]],
+	  tolerance               = 8000,
+	  tracks                  = true,
+	  turnRate                = 33000,
+	  turret                  = true,
+	  weaponAcceleration      = 109,
+	  weaponType              = [[MissileLauncher]],
+	  weaponVelocity          = 545,
+	},
+	machinegun = {
+	  name                    = [[Heavy Machine Gun]],
+	  accuracy                = 1024,
+	  alphaDecay              = 0.7,
+	  areaOfEffect            = 96,
+	  burnblow                = true,
+	  craterBoost             = 0.15,
+	  craterMult              = 0.3,
+      
+	  customParams            = {
+	    muzzleEffectShot = [[custom:WARMUZZLE]],
+	    miscEffectShot   = [[custom:DEVA_SHELLS]],
+        range = 600,
+	  },
+      
+	  damage                  = {
+	  	default = 33,
+	  	planes  = 33,
+	  	subs    = 1.75,
+	  },
+      
+	  edgeEffectiveness       = 0.5,
+	  explosionGenerator      = [[custom:EMG_HIT_HE]],
+	  firestarter             = 70,
+	  impulseBoost            = 0,
+	  impulseFactor           = 0.2,
+	  intensity               = 0.7,
+	  interceptedByShieldType = 1,
+	  noSelfDamage            = true,
+	  range                   = 600,
+	  reloadtime              = 0.167,
+	  rgbColor                = [[1 0.95 0.4]],
+	  separation              = 1.5,
+	  soundHit                = [[weapon/cannon/emg_hit]],
+	  soundStart              = [[weapon/sd_emgv7]],
+	  soundStartVolume        = 7,
+	  stages                  = 10,
+	  turret                  = true,
+	  weaponType              = [[Cannon]],
+	  weaponVelocity          = 550,
+	},
+	hpb = {
+		name                    = [[Heavy Particle Beam]],
+		beamDecay               = 0.9,
+		beamTime                = 0.01,
+		beamttl                 = 75,
+		commandfire             = true,
+		coreThickness           = 0.5,
+		craterBoost             = 0,
+		craterMult              = 0,
+
+		customParams			= {
+			manualfire = [[1]],
+			range = 350,
+		},
+		
+		damage                  = {
+			default = 2000.1,
+		},
+
+		explosionGenerator      = [[custom:blue_explosion]],
+		fireStarter             = 100,
+		impactOnly              = true,
+		impulseFactor           = 0,
+		interceptedByShieldType = 1,
+		laserFlareSize          = 10,
+		minIntensity            = 1,
+		pitchtolerance          = 8192,
+		range                   = 0,
+		reloadtime              = 15,
+		rgbColor                = [[0.1 0.2 1]],
+		soundStart              = [[weapon/laser/small_laser_fire4]],
+		soundStartVolume        = 5,
+		thickness               = 8,
+		tolerance               = 8192,
+		turret                  = true,
+		weaponType              = [[BeamLaser]],
+	},
   },
 
   

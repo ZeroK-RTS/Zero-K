@@ -65,6 +65,24 @@ local moduleDefs = {
 		end
 	},
 	{
+		name = "machinegun",
+		humanName = "Machine Gun",
+		description = "Machine Gun",
+		image = "unitpics/commweapon_heavymachinegun.png",
+		limit = 1,
+		cost = 50,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "weapon",
+		applicationFunction = function (unitID, modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "machinegun"
+			else
+				sharedData.weapon2 = "machinegun"
+			end
+		end
+	},
+	{
 		name = "rocket",
 		humanName = "Rocket Thingy",
 		description = "Rocket Thingy",
@@ -383,11 +401,15 @@ for i = 1, #chassisDefs do
 	local data = chassisDefs[i]
 	local weapons = UnitDefs[data.baseUnitDef].weapons
 	local chassisDefWeaponNames = {}
-	for localWeapon = 1, #weapons do
-		local wd = WeaponDefs[weapons[localWeapon].weaponDef]
+	for num = 1, #weapons do
+		local wd = WeaponDefs[weapons[num].weaponDef]
 		local nameSplit = Split(wd.name, "_") 
 		if #nameSplit > 1 then
-			chassisDefWeaponNames[nameSplit[2]] = localWeapon
+			chassisDefWeaponNames[nameSplit[2]] = {
+				num = num,
+				weaponDefID = weapons[num].weaponDef,
+				manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
+			}
 		end
 	end
 	data.weaponDefNames = chassisDefWeaponNames
