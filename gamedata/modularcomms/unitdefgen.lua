@@ -44,6 +44,8 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 local err, success
 
+-- old site-generated comm system; obsolete
+--[[
 local commDataRaw = modOptions.commandertypes
 local commDataFunc, commData
 
@@ -68,7 +70,7 @@ if err then
 end
 
 if not commData then commData = {} end
-
+]]
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- generate the baseline comm
@@ -257,10 +259,6 @@ local function ProcessComm(name, config)
 			commDefs[name] = MergeTable(commDefs[name], config.miscDefs, true)
 		end
 	end
-end
-
-for name, config in pairs(commData) do
-	ProcessComm(name, config)
 end
 
 --stress test: try every possible module to make sure it doesn't crash

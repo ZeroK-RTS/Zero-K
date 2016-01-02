@@ -20,12 +20,13 @@ local optionData = {}
 
 local commDataOrdered = {}
 local numComms = 0
-for seriesName, comms in pairs(WG.commData) do
+for id, data in pairs( WG.ModularCommAPI.GetPlayerComms(Spring.GetMyPlayerID(), true)) do
 	numComms = numComms + 1
-	commDataOrdered[numComms] = comms
-	commDataOrdered[numComms].seriesName = seriesName
+	commDataOrdered[numComms] = data
+	commDataOrdered[numComms].id = id
 end
-table.sort(commDataOrdered, function(a,b) return a[1] < b[1] end)
+--Spring.Echo("wololo", "Player " .. Spring.GetMyPlayerID() .. " has " .. numComms .. " comms")
+table.sort(commDataOrdered, function(a,b) return a.id < b.id end)
 
 local chassisImages = {
 	armcom1 = "LuaUI/Images/startup_info_selector/chassis_armcom.png",
@@ -41,13 +42,13 @@ local colorConversion = "\255\255\96\0"
 local colorWeaponMod = "\255\255\0\255"
 local colorModule = "\255\128\128\255"
 
-local function WriteTooltip(seriesName)
-	local data = WG.GetCommSeriesInfo(seriesName, true)
+local function WriteTooltip(id)
+	local commData = WG.ModularCommAPI.GetCommSeriesInfo(id)
 	local str = ''
-	local upgrades = WG.GetCommUpgradeList()
-	for i=2,#data do	-- exclude level 0 comm
-		str = str .. "\nLEVEL "..(i-1).. " ("..data[i].cost.." metal)\n\tModules:"
-		for j, modulename in pairs(data[i].modulesRaw) do
+	local upgrades = WG.ModularCommAPI.GetCommUpgradeList()
+	for i=1,#commData.modules do
+		str = str .. "\nLEVEL "..(i).. " (".."??".." metal)\n\tModules:"	-- TODO calculate metal cost
+		for j, modulename in pairs(commData.modules[i]) do
 			if upgrades[modulename] then
 				local substr = upgrades[modulename].name
 				-- assign color
@@ -67,19 +68,25 @@ local function WriteTooltip(seriesName)
 	return str
 end
 
-local function CommSelectTemplate(num, data)
-	local seriesName = data.seriesName
-	local comm1Name = data[1]
-	if not UnitDefNames[comm1Name] then return end
+local function GetCommSelectTemplate(num, data)
+	local commID = data.id
+	local comm1Name = data.id .. "_1"
+	--if not UnitDefNames[comm1Name] then return end
 	
 	local option = {
-		name = seriesName,
-		image = chassisImages[UnitDefNames[comm1Name].customParams.statsname],
-		tooltip = "Select "..seriesName..WriteTooltip(seriesName),
+		name = data.name,
+		tooltip = "Select "..data.name..WriteTooltip(data.id),
 		--cmd = "customcomm:"..seriesName,
 		unitname = comm1Name,
-		trainer = data.trainer,
+		trainer = string.find(data.id, "trainer") ~= nil,	-- FIXME should probably be in the def table
 	}
+	if (data.chassis) then
+		Spring.Echo(data.chassis)
+		option.image = chassisImages[data.chassis .. 1]
+	else
+		option.image = chassisImages[UnitDefNames[comm1Name].customParams.statsname]
+	end
+	--Spring.Echo(option.image)
 	
 	return option
 end	
@@ -89,7 +96,7 @@ end
 
 local i = 0
 for i = 1, numComms do
-	local option = CommSelectTemplate(i, commDataOrdered[i])
+	local option = GetCommSelectTemplate(i, commDataOrdered[i])
 	optionData[#optionData+1] = option
 end
 
