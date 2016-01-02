@@ -29,12 +29,12 @@ end
 table.sort(commDataOrdered, function(a,b) return a.profileID < b.profileID end)
 
 local chassisImages = {
-	armcom1 = "LuaUI/Images/startup_info_selector/chassis_armcom.png",
-	corcom1 = "LuaUI/Images/startup_info_selector/chassis_corcom.png",
-	commrecon1 = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
-	commsupport1 = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
-	benzcom1 = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
-	cremcom1 = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
+	armcom = "LuaUI/Images/startup_info_selector/chassis_armcom.png",
+	corcom = "LuaUI/Images/startup_info_selector/chassis_corcom.png",
+	commrecon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
+	commsupport = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
+	benzcom = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
+	cremcom = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
 }
 
 local colorWeapon = "\255\255\32\32"
@@ -70,22 +70,16 @@ end
 
 local function GetCommSelectTemplate(num, data)
 	local commProfileID = data.profileID
-	local comm1Name = commProfileID .. "_1"
-	--if not UnitDefNames[comm1Name] then return end
 	
 	local option = {
 		name = data.name,
 		tooltip = "Select "..data.name..WriteTooltip(commProfileID),
+		image = chassisImages[data.chassis],
 		--cmd = "customcomm:"..profileName,
 		unitname = comm1Name,
+		commProfile = commProfileID,
 		trainer = string.find(commProfileID, "trainer") ~= nil,	-- FIXME should probably be in the def table
 	}
-	if (data.chassis) then
-		option.image = chassisImages[data.chassis .. 1]
-	else
-		option.image = chassisImages[UnitDefNames[comm1Name].customParams.statsname]
-	end
-	--Spring.Echo(option.image)
 	
 	return option
 end	

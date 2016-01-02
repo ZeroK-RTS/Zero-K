@@ -171,8 +171,7 @@ local function CreateWindow()
 			height = BUTTON_HEIGHT,
 			padding = {5,5,5,5},
 			OnClick = {function()
-				local prefix = option.trainer and "faction:" or "customcomm:"
-				Spring.SendLuaRulesMsg(prefix..option.name)
+				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
 				Close(true)
 			end},

@@ -33,7 +33,6 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 
 local NUM_COMM_LEVELS = 5
 
-local myID = Spring.GetMyPlayerID()
 local commData = {}
 local commDataByProfileID = {}
 local commDataForPlayers = {}

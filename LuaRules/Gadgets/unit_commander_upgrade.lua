@@ -24,6 +24,16 @@ local interallyCreatedUnit = false
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
+-- FIXME: make this not needed
+local legacyToDyncommChasisMap = {
+	armcom = "assault",
+	corcom = "assault",
+	commrecon = "recon",
+	commsupport = "support",
+	benzcom = "assault",
+	cremcom = "support",
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -131,16 +141,18 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
+	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = 1 -- SomehowGetChassisFromID(dyncommID)
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
 		totalCost = 1200,
-		name = "Bob", -- SomehowGetNameFromID(dyncommID)
+		name = commProfileInfo.name,
 		moduleList = {moduleDefNames.econ}
 	}
 	
-	Upgrades_CreateUpgradedUnit(chassisDefs[chassisDefID].baseUnitDef, x, y, z, face, unitTeam, false, upgradeDef)
+	local unitID = Upgrades_CreateUpgradedUnit(chassisDefs[chassisDefID].baseUnitDef, x, y, z, facing, teamID, false, upgradeDef)
 	
 	return unitID
 end
