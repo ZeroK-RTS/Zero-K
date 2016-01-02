@@ -418,27 +418,20 @@ local dguns = {
 }
 
 function UpdateWeapons(w1, w2, sh)
-	weapon1 = w1 or 1 -- guarantee peashooter
-	weapon2 = w2 or (Spring.GetUnitRulesParam(unitID, "comm_level") == 2 and 1) -- second peashooter at level 2
+	weapon1 = w1
+	weapon2 = w2
 	shield = sh
 
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", weapon1 or 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", weapon2 or 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield or 0, INLOS)
 
-	if weapon2 == weapon1 then -- dual wielding the same weapon
-		weapon2 = nil
-
-		Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 2, {inlos = true})
-		GG.UpdateUnitAttributes(unitID)
-	end
-
 	local hasDgun = ((weapon1 and dguns[weapon1]) or (weapon2 and dguns[weapon2]))
 	local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
 	if not hasDgun and cmdDesc then
 		Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
 	elseif hasDgun and not cmdDesc then
-		cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK)+1 -- insert after attack so that it appears in the correct spot in the menu
+		cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK) + 1 -- insert after attack so that it appears in the correct spot in the menu
 		Spring.InsertUnitCmdDesc(unitID, cmdDesc, dgunTable)
 	end
 

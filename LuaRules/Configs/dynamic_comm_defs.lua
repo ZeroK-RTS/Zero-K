@@ -1,4 +1,9 @@
+------------------------------------------------------------------------
+-- Module Definitions
+------------------------------------------------------------------------
+
 local moduleDefs = {
+	-- Empty Module Slots
 	{
 		name = "nullmodule",
 		humanName = "No Module",
@@ -21,29 +26,13 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "weapon",
 	},
+	
+	-- Ordinary Weapons
 	{
 		name = "lpb",
 		humanName = "Light Particle Beam",
 		description = "Auto Pew",
 		image = "unitpics/commweapon_lparticlebeam.png",
-		limit = 2,
-		cost = 100,
-		requireModules = {},
-		requireLevel = 0,
-		slotType = "weapon",
-		applicationFunction = function (unitID, modules, sharedData)
-			if not sharedData.weapon1 then
-				sharedData.weapon1 = 2
-			else
-				sharedData.weapon2 = 2
-			end
-		end
-	},
-	{
-		name = "hpb",
-		humanName = "Heavy Particle Beam",
-		description = "Manual Pew",
-		image = "unitpics/conversion_hparticlebeam.png",
 		limit = 1,
 		cost = 100,
 		requireModules = {},
@@ -51,38 +40,28 @@ local moduleDefs = {
 		slotType = "weapon",
 		applicationFunction = function (unitID, modules, sharedData)
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = 3
+				sharedData.weapon1 = "lpb"
 			else
-				sharedData.weapon2 = 3
+				sharedData.weapon2 = "lpb"
 			end
 		end
 	},
 	{
-		name = "personal_shield",
-		humanName = "Personal Shield",
-		description = "A small, protective bubble shield.",
-		image = "unitpics/module_personal_shield.png",
+		name = "missile",
+		humanName = "Missile Launcher",
+		description = "Missile Launcher",
+		image = "unitpics/commweapon_missilelauncher.png",
 		limit = 1,
-		cost = 100,
+		cost = 50,
 		requireModules = {},
 		requireLevel = 0,
-		slotType = "module",
+		slotType = "weapon",
 		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.shield = 4
-		end
-	},
-	{
-		name = "area_shield",
-		humanName = "Area Shield",
-		description = "The Emperor protects",
-		image = "unitpics/module_areashield.png",
-		limit = 1,
-		cost = 100,
-		requireModules = {},
-		requireLevel = 0,
-		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.shield = 5
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "missile"
+			else
+				sharedData.weapon2 = "missile"
+			end
 		end
 	},
 	{
@@ -97,6 +76,74 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "weapon",
 	},
+	
+	-- Manual Fire Weapons
+	{
+		name = "hpb",
+		humanName = "Heavy Particle Beam",
+		description = "Manual Pew",
+		image = "unitpics/conversion_hparticlebeam.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "weapon",
+		applicationFunction = function (unitID, modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "hpb"
+			else
+				sharedData.weapon2 = "hpb"
+			end
+		end
+	},
+	
+	-- Unique Modules
+	{
+		name = "personal_shield",
+		humanName = "Personal Shield",
+		description = "A small, protective bubble shield.",
+		image = "unitpics/module_personal_shield.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.shield = "personal_shield"
+		end
+	},
+	{
+		name = "area_shield",
+		humanName = "Area Shield",
+		description = "The Emperor protects",
+		image = "unitpics/module_areashield.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.shield = "area_shield"
+		end
+	},
+	{
+		name = "econ",
+		humanName = "Vanguard Economy Pack",
+		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
+		image = "unitpics/module_energy_cell.png",
+		limit = 1,
+		cost = 0,
+		requireModules = {},
+		requireChassis = {"recon", "support"},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
+			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
+		end
+	},
+	
+	-- Repeat Modules
 	{
 		name = "health",
 		humanName = "Ablative Armour Plates",
@@ -152,22 +199,6 @@ local moduleDefs = {
 			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
 		end
 	},
-	{
-		name = "econ",
-		humanName = "Vanguard Economy Pack",
-		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
-		image = "unitpics/module_energy_cell.png",
-		limit = 1,
-		cost = 0,
-		requireModules = {},
-		requireChassis = {"recon", "support"},
-		requireLevel = 0,
-		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
-			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
-		end
-	},
 }
 
 local moduleDefNames = {}
@@ -175,9 +206,13 @@ for i = 1, #moduleDefs do
 	moduleDefNames[moduleDefs[i].name] = i
 end
 
+------------------------------------------------------------------------
+-- Chassis Definitions
+------------------------------------------------------------------------
+
 local chassisDefs = {
 	{
-		name = "Recon",
+		name = "recon",
 		baseUnitDef = UnitDefNames["dynrecon0"].id,
 		levelDefs = {
 			{
@@ -225,7 +260,7 @@ local chassisDefs = {
 		}
 	},
 	{
-		name = "Support",
+		name = "support",
 		baseUnitDef = UnitDefNames["dynsupport0"].id,
 		levelDefs = {
 			{
@@ -252,7 +287,7 @@ local chassisDefs = {
 		}
 	},
 	{
-		name = "Assault",
+		name = "assault",
 		baseUnitDef = UnitDefNames["dynassault0"].id,
 		levelDefs = {
 			{
@@ -280,6 +315,10 @@ local chassisDefs = {
 	}
 }
 
+local chassisDefByBaseDef = {}
+for i = 1, #chassisDefs do
+	chassisDefByBaseDef[chassisDefs[i].baseUnitDef] = i
+end
 
 ------------------------------------------------------------------------
 -- Processing
@@ -329,6 +368,29 @@ for i = 1, #moduleDefs do
 		end
 		data.requireChassis = newRequire
 	end
+end
+
+local function Split(s, separator)
+	local results = {}
+		for part in s:gmatch("[^"..separator.."]+") do
+			results[#results + 1] = part
+		end
+	return results
+end
+
+-- Create WeaponDefNames for each chassis
+for i = 1, #chassisDefs do
+	local data = chassisDefs[i]
+	local weapons = UnitDefs[data.baseUnitDef].weapons
+	local chassisDefWeaponNames = {}
+	for localWeapon = 1, #weapons do
+		local wd = WeaponDefs[weapons[localWeapon].weaponDef]
+		local nameSplit = Split(wd.name, "_") 
+		if #nameSplit > 1 then
+			chassisDefWeaponNames[nameSplit[2]] = localWeapon
+		end
+	end
+	data.weaponDefNames = chassisDefWeaponNames
 end
 
 ------------------------------------------------------------------------
@@ -397,4 +459,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, emptyModules, chassisDefs, utilities
+return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef

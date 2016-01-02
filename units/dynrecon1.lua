@@ -111,36 +111,32 @@ unitDef = {
   workerTime          = 10,
 
   weapons             = {
-  
-	[1] = {
-      def                = [[PEASHOOTER]],
+    {
+      def                = [[peashooter]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
-
-	[2] = {
-      def                = [[LPB]],
+    {
+      def                = [[lpb]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
-
-	[3] = {
-      def                = [[HPB]],
+    {
+      def                = [[hpb]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
-
-	[4] = {
-      def                = [[PERSONAL_SHIELD]],
+    {
+      def                = [[personal_shield]],
 	},
-	[5] = {
-      def                = [[AREA_SHIELD]],
+	{
+      def                = [[area_shield]],
 	},
   },
 
   weaponDefs          = {
 
-	PEASHOOTER = {
+	peashooter = {
 		name                    = [[Laser Blaster]],
 		areaOfEffect            = 8,
 		coreThickness           = 0.5,
@@ -177,7 +173,7 @@ unitDef = {
 		weaponVelocity          = 880,
 	},
 	
-	LPB = {
+	lpb = {
 		name                    = [[Light Particle Beam]],
 		beamDecay               = 0.85,
 		beamTime                = 0.01,
@@ -208,7 +204,7 @@ unitDef = {
 		weaponType              = [[BeamLaser]],
 	},
 
-	HPB = {
+	hpb = {
 		name                    = [[Heavy Particle Beam]],
 		beamDecay               = 0.9,
 		beamTime                = 0.01,
@@ -241,7 +237,7 @@ unitDef = {
 		weaponType              = [[BeamLaser]],
 	},
 	
-    PERSONAL_SHIELD = {
+    personal_shield = {
 		name                    = [[Personal Shield]],
 		exteriorShield          = true,
 		shieldAlpha             = 0.2,
@@ -263,7 +259,7 @@ unitDef = {
 		damage = {},
     },
 
-	AREA_SHIELD = {
+	area_shield = {
 		name                    = [[Area Shield]],
 		exteriorShield          = true,
 		shieldAlpha             = 0.2,

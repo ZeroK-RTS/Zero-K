@@ -19,8 +19,9 @@ if (not gadgetHandler:IsSyncedCode()) then
 end
 
 local INLOS = {inlos = true}
+local interallyCreatedUnit = false
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
@@ -36,6 +37,24 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	for name, value in pairs(counts) do
 		Spring.SetUnitRulesParam(unitID, "comm_" .. name .. "_count", value, INLOS)
 	end
+end
+
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield)
+	local chassisDefID = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames
+	
+	weapon1 = chassisWeaponDefNames[weapon1 or "peashooter"]
+	
+	if weapon2 then
+		weapon2 = chassisWeaponDefNames[weapon2]
+	elseif Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
+		weapon2 = chassisWeaponDefNames["peashooter"]
+	end
+	
+	shield = shield and chassisWeaponDefNames[shield]
+	
+	local env = Spring.UnitScript.GetScriptEnv(unitID)
+	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield)
 end
 
 local function UpdateUnitWithSharedData(unitID, data)
@@ -54,12 +73,13 @@ local function UpdateUnitWithSharedData(unitID, data)
 		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
 
-	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, data.weapon1, data.weapon2, data.shield)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
+	interallyCreatedUnit = true
 	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
+	interallyCreatedUnit = false
 	
 	if not unitID then
 		return false
@@ -104,17 +124,16 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_chassis", 1, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
-
-	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	if env.UpdateWeapons then
-		Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons)
+	if chassisDefByBaseDef[unitDefID] and not interallyCreatedUnit then
+		Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_chassis", chassisDefByBaseDef[unitDefID], INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
+		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
+		
+		ApplyWeaponData(unitID, "peashooter")
 	end
 end
 
