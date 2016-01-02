@@ -1,52 +1,53 @@
 unitDef = {
-  unitname            = [[benzcom1]],
-  name                = [[Siege Commander]],
-  description         = [[Standoff Combat Commander, Builds at 10 m/s]],
-  acceleration        = 0.18,
+  unitname            = [[dynsupport1]],
+  name                = [[Support Commander]],
+  description         = [[Econ/Support Commander, Builds at 12 m/s]],
+  acceleration        = 0.25,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
   autoHeal            = 5,
-  brakeRate           = 0.375,
+  brakeRate           = 0.45,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 250,
   builder             = true,
 
   buildoptions        = {
   },
 
-  buildPic            = [[benzcom.png]],
+  buildPic            = [[commsupport.png]],
   buildTime           = 1200,
   canAttack           = true,
-  canCloak            = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
+  canreclamate        = [[1]],
   category            = [[LAND]],
   commander           = true,
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[45 54 45]],
+  collisionVolumeScales  = [[45 50 45]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],  
   corpse              = [[DEAD]],
 
   customParams        = {
-	--description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
-	description_pl = [[Dowodca dalekiego zasiegu, moc 10 m/s]],
-	helptext       = [[The Siege Commander is optimized for pummeling the enemy from a distance. Its low speed and armor leave it vulnerable in a knife fight.]],
-	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
-    helptext_pl    = [[Siege to Dowodca przystosowany do walki na dystans; nie powinien brac udzialu w bezposrednich walkach ze wzgledu jego niska predkosc i wytrzymalosc.]],
-	level = [[1]],
-	statsname = [[benzcom1]],
-	soundok = [[heavy_bot_move]],
-	soundselect = [[bot_select]],
-	soundbuild = [[builder_start]],
-	commtype = [[5]],
+    cloakstealth = [[1]],
+    description_de = [[Ökonomie/Untersützung Kommandant, Baut mit 12 M/s]],
+    description_pl = [[Dowodca ekonomiczny/wsparcia, moc 12 m/s]],
+    helptext       = [[The esoteric Support Commander uses a more unorthodox weapon set. Though lacking armor or speed, this chassis is still favored due to its intrinsic buildpower bonus.]],
+    helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Baubonus beliebt.]],
+    helptext_pl    = [[Support to Dowodca, ktory moze uzywac bardziej niekonwencjonalnych broni do wspierania swoich jednostek; ma takze wieksza moc budowy, niz pozostali Dowodcy. Mimo to jest dosyc wolny i ma niska wytrzymalosc.]],
+    level = [[1]],
+    statsname = [[dynsupport1]],
+    soundok = [[heavy_bot_move]],
+    soundselect = [[bot_select]],
+    soundbuild = [[builder_start]],
+    commtype = [[4]],
+    aimposoffset   = [[0 15 0]],
 	att_speedmult  = 0.5,
   },
 
   energyMake          = 6,
-  energyStorage       = 0,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -57,66 +58,67 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 40,
-  mass                = 423,
-  maxDamage           = 2250,
+  mass                = 402,
+  maxDamage           = 2000,
   maxSlope            = 36,
-  maxVelocity         = 1.25,
+  maxVelocity         = 1.2,
   maxWaterDepth       = 5000,
   metalMake           = 4,
-  metalStorage        = 0,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
-  noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   norestrict          = [[1]],
-  objectName          = [[benzcom1.s3o]],
-  script              = [[benzcom.lua]],
+  objectName          = [[commsupport.s3o]],
+  script              = [[dynsupport.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
 
     explosiongenerators = {
-      [[custom:RAIDMUZZLE]],
-      [[custom:LEVLRMUZZLE]],
-      [[custom:RAIDMUZZLE]],
+      [[custom:flashmuzzle1]],
+	  [[custom:NONE]],
     },
 
   },
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[CORE]],
+  side                = [[ARM]],
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
+  TEDClass            = [[COMMANDER]],
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
   terraformSpeed      = 600,
-  turnRate            = 1148,
+  turnRate            = 1350,
   upright             = true,
-  workerTime          = 10,
+  workerTime          = 12,
 
   weapons             = {
-    [1] = {
+
+	[1] = {
       def                = [[FAKELASER]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
+	}, 
+  
+    [5] = {
+      def                = [[GAUSS]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
-    [5] = {
-      def                = [[ASSAULT_CANNON]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },	
   },
 
 
   weaponDefs          = {
 
-    FAKELASER    = {
+    FAKELASER     = {
       name                    = [[Fake Laser]],
       areaOfEffect            = 12,
       beamTime                = 0.1,
@@ -126,23 +128,20 @@ unitDef = {
 
       damage                  = {
         default = 0,
-        subs    = 0,
       },
 
-      edgeEffectiveness       = 0.99,
+      duration                = 0.11,
       explosionGenerator      = [[custom:flash1green]],
-      fireStarter             = 70,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       laserFlareSize          = 5.53,
       minIntensity            = 1,
-      range                   = 360,
+      range                   = 450,
       reloadtime              = 0.11,
       rgbColor                = [[0 1 0]],
-      soundStart              = [[weapon/laser/pulse_laser3]],
-      soundTrigger            = true,
+      sweepfire               = false,
       texture1                = [[largelaser]],
       texture2                = [[flare]],
       texture3                = [[flare]],
@@ -151,33 +150,54 @@ unitDef = {
       tolerance               = 10000,
       turret                  = true,
       weaponType              = [[BeamLaser]],
+      weaponVelocity          = 900,
     },
-
-
-    ASSAULT_CANNON = {
-      name                    = [[Assault Cannon]],
-      areaOfEffect            = 32,
-      craterBoost             = 1,
-      craterMult              = 3,
 	
+    GAUSS = {
+      name                    = [[Gauss Rifle]],
+      alphaDecay              = 0.12,
+      areaOfEffect            = 16,
+      avoidfeature            = false,
+      bouncerebound           = 0.15,
+      bounceslip              = 1,
+      cegTag                  = [[gauss_tag_l]],
+      craterBoost             = 0,
+      craterMult              = 0,
+
       damage                  = {
-		default = 360,
-		planes  = 360,
-		subs    = 18,
+        default = 140,
+        planes  = 140,
+        subs    = 8,
       },
       
-      explosionGenerator      = [[custom:INGEBORG]],
+      customParams = {
+        single_hit = true,
+      },
+
+      explosionGenerator      = [[custom:gauss_hit_l]],
+      groundbounce            = 1,
+      impactOnly              = true,
       impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      myGravity		      = 0.25,
-      range                   = 360,
-      reloadtime              = 2,
-      soundHit                = [[weapon/cannon/cannon_hit2]],
-      soundStart              = [[weapon/cannon/medplasma_fire]],
+      impulseFactor           = 0,
+      interceptedByShieldType = 0,
+      noExplode               = true,
+      noSelfDamage            = true,
+      numbounce               = 40,
+      range                   = 420,
+      reloadtime              = 2.5,
+      rgbColor                = [[0.5 1 1]],
+      separation              = 0.5,
+      size                    = 0.8,
+      sizeDecay               = -0.1,
+      soundHit                = [[weapon/gauss_hit]],
+      soundHitVolume          = 3,
+      soundStart              = [[weapon/gauss_fire]],
+      soundStartVolume        = 2.5,
+      stages                  = 32,
       turret                  = true,
+      waterbounce             = 1,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 300,
+      weaponVelocity          = 2200,
     },
 
   },
@@ -186,10 +206,10 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Siege Commander]],
+      description      = [[Wreckage - Support Commander]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 2250,
+      damage           = 2000,
       energy           = 0,
       featureDead      = [[HEAP]],
       featurereclamate = [[SMUDGE01]],
@@ -198,19 +218,18 @@ unitDef = {
       height           = [[20]],
       hitdensity       = [[100]],
       metal            = 480,
-      object           = [[benzcom1_wreck.s3o]],
+      object           = [[commsupport_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 480,
       seqnamereclamate = [[TREE1RECLAMATE]],
       world            = [[All Worlds]],
     },
 
-
     HEAP      = {
-      description      = [[Debris - Siege Commander]],
+      description      = [[Debris - Support Commander]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 2250,
+      damage           = 2000,
       energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
@@ -228,5 +247,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ benzcom1 = unitDef })
-
+return lowerkeys({ dynsupport1 = unitDef })

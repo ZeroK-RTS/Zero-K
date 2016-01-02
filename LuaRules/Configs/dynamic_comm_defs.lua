@@ -178,13 +178,13 @@ end
 local chassisDefs = {
 	{
 		name = "Recon",
-		baseUnitDef = UnitDefNames["commrecon0"].id,
+		baseUnitDef = UnitDefNames["dynrecon0"].id,
 		levelDefs = {
 			{
 				morphBuildPower = 10,
 				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commrecon1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
@@ -205,7 +205,7 @@ local chassisDefs = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
@@ -226,13 +226,40 @@ local chassisDefs = {
 	},
 	{
 		name = "Support",
-		baseUnitDef = UnitDefNames["commsupport0"].id,
+		baseUnitDef = UnitDefNames["dynsupport0"].id,
 		levelDefs = {
 			{
 				morphBuildPower = 10,
 				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["commsupport1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynsupport1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.lpb,
+						slotType = "weapon",
+					},
+					{
+						defaultModule = moduleDefNames.bigHealth,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.health,
+						slotType = "module",
+					},
+				},
+			},
+		}
+	},
+	{
+		name = "Assault",
+		baseUnitDef = UnitDefNames["dynassault0"].id,
+		levelDefs = {
+			{
+				morphBuildPower = 10,
+				morphBaseCost = 20,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{

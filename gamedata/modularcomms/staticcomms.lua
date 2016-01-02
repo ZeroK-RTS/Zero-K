@@ -218,18 +218,22 @@ local comms = {
 }
 
 -- Damage booster comms
-local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "benzcom"}
-local levelList = {1,2,3,4,5}
-local weaponCountList = {0,1,2,3,4,5,6,7,8}
+local chassisList = {"dynrecon", "dynsupport", "dynassault"}
+-- levelLimitList is pairs {level, maxWeaponCount}
+local levelLimitList = {{1, 1}, {2, 3}, {3, 5}, {4, 8}, {5, 8}}
+local weaponCountList = {0, 1 , 2, 3, 4, 5, 6, 7, 8}
 
 for i = 1, #chassisList do
 	local chassis = chassisList[i]
-	for j = 1, #levelList do
-		local level = levelList[j]
+	for j = 1, #levelLimitList do
+		local level = levelLimitList[j][1]
+		local weaponLimit = levelLimitList[j][2]
 		local fullChassis = chassis .. level
 		for k = 1, #weaponCountList do
 			local weaponCount = weaponCountList[k]
-			
+			if weaponCount > weaponLimit then
+				break
+			end
 			local modules = {}
 			for m = 1, weaponCount do
 				modules[m] = "module_dmg_booster"

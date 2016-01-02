@@ -1,7 +1,7 @@
 unitDef = {
-  unitname            = [[benzcom1]],
-  name                = [[Siege Commander]],
-  description         = [[Standoff Combat Commander, Builds at 10 m/s]],
+  unitname            = [[dynassault1]],
+  name                = [[Assault Commander]],
+  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
@@ -32,12 +32,12 @@ unitDef = {
 
   customParams        = {
 	--description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
-	description_pl = [[Dowodca dalekiego zasiegu, moc 10 m/s]],
-	helptext       = [[The Siege Commander is optimized for pummeling the enemy from a distance. Its low speed and armor leave it vulnerable in a knife fight.]],
+	description_pl = [[Bla, moc 10 m/s]],
+	helptext       = [[Bla, builds at 10 m/s.]],
 	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
-    helptext_pl    = [[Siege to Dowodca przystosowany do walki na dystans; nie powinien brac udzialu w bezposrednich walkach ze wzgledu jego niska predkosc i wytrzymalosc.]],
+    helptext_pl    = [[Bla.]],
 	level = [[1]],
-	statsname = [[benzcom1]],
+	statsname = [[dynassault1]],
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
@@ -58,9 +58,9 @@ unitDef = {
   leaveTracks         = true,
   losEmitHeight       = 40,
   mass                = 423,
-  maxDamage           = 2250,
+  maxDamage           = 2500,
   maxSlope            = 36,
-  maxVelocity         = 1.25,
+  maxVelocity         = 1.35,
   maxWaterDepth       = 5000,
   metalMake           = 4,
   metalStorage        = 0,
@@ -69,7 +69,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   norestrict          = [[1]],
   objectName          = [[benzcom1.s3o]],
-  script              = [[benzcom.lua]],
+  script              = [[dynassault.lua]],
   seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
@@ -228,5 +228,5 @@ unitDef = {
 
 }
 
-return lowerkeys({ benzcom1 = unitDef })
+return lowerkeys({ dynassault1 = unitDef })
 

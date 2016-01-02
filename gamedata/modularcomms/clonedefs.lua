@@ -213,12 +213,101 @@ local copy = {
 			wreckmodel = "benzcom5_wreck.s3o",
 		},
 	},
+	dynrecon1 = {
+		dynrecon0 = {
+			level = 0,
+		},
+		dynrecon2 = {
+			level = 2,
+			mainstats = {maxdamage = 2100, objectname = "commrecon2.s3o", aimposoffset = [[0 12 0]]},
+			customparams = {},
+			wreckmodel = "commrecon2_dead.s3o",
+		},
+		dynrecon3 = {
+			level = 3,
+			mainstats = {maxdamage = 2600, objectname = "commrecon3.s3o", aimposoffset = [[0 14 0]]},
+			customparams = {},
+			wreckmodel = "commrecon3_dead.s3o",
+		},
+		dynrecon4 = {
+			level = 4,
+			mainstats = {maxdamage = 3100, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
+			customparams = {},
+			wreckmodel = "commrecon4_dead.s3o",
+		},
+		dynrecon5 = {
+			level = 5,
+			mainstats = {maxdamage = 3600, objectname = "commrecon5.s3o", aimposoffset = [[0 18 0]]},
+			customparams = {},
+			wreckmodel = "commrecon5_dead.s3o",
+		},		
+	},
+	dynsupport1 = {
+		dynsupport0 = {
+			level = 0,
+		},
+		dynsupport2 = {
+			level = 2,
+			mainstats = {maxdamage = 2500, workertime = 14, description = "Econ/Support Commander, Builds at 14 m/s", objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]]},
+			customparams = {},
+			wreckmodel = "commsupport2_dead.s3o",
+		},
+		dynsupport3 = {
+			level = 3,
+			mainstats = {maxdamage = 3000, workertime = 16, description = "Econ/Support Commander, Builds at 16 m/s", objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]],},
+			customparams = {},
+			wreckmodel = "commsupport3_dead.s3o",
+		},
+		dynsupport4 = {
+			level = 4,
+			mainstats = {maxdamage = 3700, workertime = 18, description = "Econ/Support Commander, Builds at 18 m/s", objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]],},
+			customparams = {},
+			wreckmodel = "commsupport4_dead.s3o",
+		},
+		dynsupport5 = {
+			level = 5,
+			mainstats = {maxdamage = 4500, workertime = 20, description = "Econ/Support Commander, Builds at 20 m/s", objectname = "commsupport5.s3o", aimposoffset = [[0 25 0]],},
+			customparams = {},
+			wreckmodel = "commsupport5_dead.s3o",
+		},			
+	},
+	dynassault1 = {
+		dynassault0 = {
+			level = 0,
+		},
+		dynassault2 = {
+			level = 2,
+			mainstats = {maxdamage = 3000, objectname = "benzcom2.s3o"},
+			customparams = {},
+			wreckmodel = "benzcom2_wreck.s3o",
+		},
+		dynassault3 = {
+			level = 3,
+			mainstats = {maxdamage = 4000, objectname = "benzcom3.s3o",},
+			customparams = {},
+			wreckmodel = "benzcom3_wreck.s3o",
+		},
+		dynassault4 = {
+			level = 4,
+			mainstats = {maxdamage = 5000, objectname = "benzcom4.s3o",},
+			customparams = {},
+			wreckmodel = "benzcom4_wreck.s3o",
+		},
+		dynassault5 = {
+			level = 5,
+			mainstats = {maxdamage = 6000,objectname = "benzcom5.s3o",},
+			customparams = {},
+			wreckmodel = "benzcom5_wreck.s3o",
+		},
+	},
 }
 
 for sourceName, copyTable in pairs(copy) do
 	for cloneName, stats in pairs(copyTable) do
 		-- some further modification
+		Spring.Echo("COPY")
 		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
+		Spring.Echo("COPY DONE")
 		UnitDefs[cloneName].unitname = cloneName
 		
 		if stats.level > 0 then
