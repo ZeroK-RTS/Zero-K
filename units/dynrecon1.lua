@@ -160,7 +160,6 @@ unitDef = {
 
 		customParams			= {
 			muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
-			range = 350,
 		},
 
 		damage                  = {
@@ -176,7 +175,7 @@ unitDef = {
 		impulseFactor           = 0.4,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
-		range                   = 350,
+		range                   = 100,
 		reloadtime              = 0.1,
 		rgbColor                = [[1 0 0]],
 		soundHit                = [[weapon/laser/lasercannon_hit]],

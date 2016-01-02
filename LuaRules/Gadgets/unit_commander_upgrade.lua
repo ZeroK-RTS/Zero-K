@@ -39,7 +39,7 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	local chassisDefID = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames 
 	
@@ -53,12 +53,14 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield)
 	
 	shield = shield and chassisWeaponDefNames[shield]
 	
+	rangeMult = rangeMult or 1
+	
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weapon1 and weapon1.num) or 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weapon2 and weapon2.num) or 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_shield_id", (shield and shield.num) or 0, INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield)
+	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
 end
 
 local function UpdateUnitWithSharedData(unitID, data)
@@ -77,7 +79,7 @@ local function UpdateUnitWithSharedData(unitID, data)
 		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
 
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)

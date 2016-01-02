@@ -413,7 +413,7 @@ local weapon1
 local weapon2
 local shield
 
-function UpdateWeapons(w1, w2, sh)
+function UpdateWeapons(w1, w2, sh, rangeMult)
 	weapon1 = w1 and w1.num
 	weapon2 = w2 and w2.num
 	shield  = sh and sh.num
@@ -431,7 +431,7 @@ function UpdateWeapons(w1, w2, sh)
 	local otherRange = false
 	if w1 then
 		isManual[weapon1] = w1.manualFire
-		local range = tonumber(WeaponDefs[w1.weaponDefID].range)
+		local range = tonumber(WeaponDefs[w1.weaponDefID].range)*rangeMult
 		if w1.manualFire then
 			otherRange = range
 		else
@@ -441,7 +441,7 @@ function UpdateWeapons(w1, w2, sh)
 	end
 	if w2 then
 		isManual[weapon2] = w2.manualFire
-		local range = tonumber(WeaponDefs[w2.weaponDefID].range)
+		local range = tonumber(WeaponDefs[w2.weaponDefID].range)*rangeMult
 		if maxRange then
 			if w2.manualFire then
 				otherRange = range
@@ -459,7 +459,7 @@ function UpdateWeapons(w1, w2, sh)
 	
 	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
 	Spring.SetUnitMaxRange(unitID, maxRange)
-	Spring.Echo(otherRange)
+	
 	if otherRange then
 		Spring.SetUnitRulesParam(unitID, "secondary_range", otherRange, INLOS)
 	end

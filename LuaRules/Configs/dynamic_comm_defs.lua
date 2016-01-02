@@ -217,6 +217,20 @@ local moduleDefs = {
 			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
 		end
 	},
+	{
+		name = "range",
+		humanName = "Advanced Targeting System",
+		description = "Advanced Targeting System, increases range by 10%. Limit 8",
+		image = "unitpics/module_adv_targeting.png",
+		limit = 8,
+		cost = 40,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (unitID, modules, sharedData)
+			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.1
+		end
+	},
 }
 
 local moduleDefNames = {}
