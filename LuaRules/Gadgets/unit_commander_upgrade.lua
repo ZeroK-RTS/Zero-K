@@ -285,6 +285,7 @@ end
 
 function gadget:Initialize()
 	GG.Upgrades_CreateUpgradedUnit         = Upgrades_CreateUpgradedUnit
+	GG.Upgrades_CreateStarterDyncomm       = Upgrades_CreateStarterDyncomm
 	GG.Upgrades_GetValidAndMorphAttributes = Upgrades_GetValidAndMorphAttributes
 	
 	-- load active units
