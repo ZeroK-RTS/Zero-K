@@ -305,9 +305,7 @@ local copy = {
 for sourceName, copyTable in pairs(copy) do
 	for cloneName, stats in pairs(copyTable) do
 		-- some further modification
-		Spring.Echo("COPY")
 		UnitDefs[cloneName] = CopyTable(UnitDefs[sourceName], true)
-		Spring.Echo("COPY DONE")
 		UnitDefs[cloneName].unitname = cloneName
 		
 		if stats.level > 0 then
