@@ -81,7 +81,6 @@ local function GetCommSelectTemplate(num, data)
 		trainer = string.find(commProfileID, "trainer") ~= nil,	-- FIXME should probably be in the def table
 	}
 	if (data.chassis) then
-		Spring.Echo(data.chassis)
 		option.image = chassisImages[data.chassis .. 1]
 	else
 		option.image = chassisImages[UnitDefNames[comm1Name].customParams.statsname]
