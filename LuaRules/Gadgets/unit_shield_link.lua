@@ -108,10 +108,21 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if stunned_or_inbuild ~= nil and inbuild then
 		return
 	end
-
+	
 	local ud = UnitDefs[unitDefID]
-	if ud.shieldWeaponDef then
-		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
+	
+	local shieldWeaponDefID
+	local shieldNum = -1
+	if ud.customParams.dynamic_comm then
+		if GG.Upgrades_UnitShieldDef then
+			shieldWeaponDefID, shieldNum = GG.Upgrades_UnitShieldDef(unitID)
+		end
+	else
+		shieldWeaponDefID = ud.shieldWeaponDef
+	end
+	
+	if shieldWeaponDefID then
+		local shieldWep = WeaponDefs[shieldWeaponDefID]
 		--local x,y,z = spGetUnitPosition(unitID)
 		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
@@ -125,6 +136,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
+				shieldNum    = shieldNum,
 				shieldRadius = shieldWep.shieldRadius,
 				shieldRegen  = shieldRegen,
 				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
@@ -153,7 +165,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	
 	local ud = UnitDefs[unitDefID]
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if ud.shieldWeaponDef and allyTeamShields[allyTeamID] then
+	if allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID] then
 		local unitData = allyTeamShields[allyTeamID][unitID]
 		if unitData then
 			RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
@@ -165,9 +177,9 @@ end
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
-	if ud.shieldWeaponDef then
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 		local unitData
-		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 			unitData = allyTeamShields[oldAllyTeam][unitID]
 			
@@ -297,8 +309,8 @@ local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, hig
 	if chargeFlow > 0 then -- Disallow negative flow
 		local slowMult = 1 - (spGetUnitRulesParam(highID, "slowState") or 0)
 		chargeFlow = chargeFlow * slowMult
-		spSetUnitShieldState(highID, -1, highCharge - chargeFlow)
-		spSetUnitShieldState(lowID, -1, lowCharge + chargeFlow)
+		spSetUnitShieldState(highID, highData.shieldNum, highCharge - chargeFlow)
+		spSetUnitShieldState(lowID, lowData.shieldNum, lowCharge + chargeFlow)
 		return chargeFlow
 	end
 	return 0
@@ -358,7 +370,7 @@ function gadget:GameFrame(n)
 			for i = 1, unitList.count do
 				unitID = unitList[i]
 				unitData = shieldUnits[unitID]
-				on, unitCharge = spGetUnitShieldState(unitID, -1)
+				on, unitCharge = spGetUnitShieldState(unitID, unitData.shieldNum)
 				chargeFlow = 0
 				attempt = 1
 				while attempt and attempt < 3 do
@@ -374,7 +386,7 @@ function gadget:GameFrame(n)
 						if otherID then
 							otherData = allyTeamShields[allyTeamID][otherID]
 							if otherData then
-								on, otherCharge = spGetUnitShieldState(otherID, -1)
+								on, otherCharge = spGetUnitShieldState(otherID, otherData.shieldNum)
 								if on and otherCharge and otherData.enabled and ShieldsAreTouching(unitData, otherData) then
 									if (unitCharge > otherCharge) then
 										chargeFlow = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)

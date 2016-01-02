@@ -705,12 +705,23 @@ do
 
     --// BARS //-----------------------------------------------------------------------------
       --// Shield
-      if (ci.maxShield>0) then
-        local shieldOn,shieldPower = GetUnitShieldState(unitID)
-        if (shieldOn)and(build==1)and(shieldPower<ci.maxShield) then
-          shieldPower = shieldPower / ci.maxShield
-          AddBar(messages.shield,shieldPower,"shield",(fullText and floor(shieldPower*100)..'%') or '')
-        end
+      if (ci.maxShield>0) then 
+	    local commShield = GetUnitRulesParam(unitID, "comm_shield_max")
+		if commShield then
+		  if commShield ~= 0 then
+		    local shieldOn, shieldPower = GetUnitShieldState(unitID, GetUnitRulesParam(unitID, "comm_shield_num"))
+			if (shieldOn)and(build==1)and(shieldPower < commShield) then
+              shieldPower = shieldPower / commShield
+              AddBar(messages.shield,shieldPower,"shield",(fullText and floor(shieldPower*100)..'%') or '')
+            end
+		  end
+		else
+          local shieldOn,shieldPower = GetUnitShieldState(unitID)
+          if (shieldOn)and(build==1)and(shieldPower<ci.maxShield) then
+            shieldPower = shieldPower / ci.maxShield
+            AddBar(messages.shield,shieldPower,"shield",(fullText and floor(shieldPower*100)..'%') or '')
+          end
+		end
       end
 
       --// HEALTH

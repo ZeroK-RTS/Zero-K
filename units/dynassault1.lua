@@ -108,7 +108,7 @@ unitDef = {
     },
 
     [5] = {
-      def                = [[ASSAULT_CANNON]],
+      def                = [[ASSAULTCANNON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },	
@@ -155,7 +155,7 @@ unitDef = {
     },
 
 
-    ASSAULT_CANNON = {
+    ASSAULTCANNON = {
       name                    = [[Assault Cannon]],
       areaOfEffect            = 32,
       craterBoost             = 1,

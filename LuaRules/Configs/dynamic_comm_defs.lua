@@ -38,7 +38,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "lpb"
 			else
@@ -56,7 +56,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "missile"
 			else
@@ -74,7 +74,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "machinegun"
 			else
@@ -106,7 +106,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "hpb"
 			else
@@ -117,7 +117,7 @@ local moduleDefs = {
 	
 	-- Unique Modules
 	{
-		name = "personal_shield",
+		name = "personalshield",
 		humanName = "Personal Shield",
 		description = "A small, protective bubble shield.",
 		image = "unitpics/module_personal_shield.png",
@@ -126,22 +126,22 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.shield = "personal_shield"
+		applicationFunction = function (modules, sharedData)
+			sharedData.shield = "personalshield"
 		end
 	},
 	{
-		name = "area_shield",
+		name = "areashield",
 		humanName = "Area Shield",
 		description = "The Emperor protects",
 		image = "unitpics/module_areashield.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
+		requireModules = {"personalshield"},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
-			sharedData.shield = "area_shield"
+		applicationFunction = function (modules, sharedData)
+			sharedData.shield = "areashield"
 		end
 	},
 	{
@@ -155,7 +155,7 @@ local moduleDefs = {
 		requireChassis = {"recon", "support"},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
 			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
 		end
@@ -173,7 +173,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600
 		end
 	},
@@ -187,7 +187,7 @@ local moduleDefs = {
 		requireModules = {"health"},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600
 			sharedData.speedMult = (sharedData.speedMult or 1) - 0.1
 		end
@@ -213,7 +213,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
 		end
 	},
@@ -227,7 +227,7 @@ local moduleDefs = {
 		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (unitID, modules, sharedData)
+		applicationFunction = function (modules, sharedData)
 			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.1
 		end
 	},
@@ -424,6 +424,9 @@ for i = 1, #chassisDefs do
 				weaponDefID = weapons[num].weaponDef,
 				manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
 			}
+			if #nameSplit > 2 then
+				Spring.Echo("Don't put underscores in weapon module names!", wd.name)
+			end
 		end
 	end
 	data.weaponDefNames = chassisDefWeaponNames

@@ -21,11 +21,14 @@ end
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
+local unitCreatedShield, unitCreatedShieldNum
+
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 
 local function SetUnitRulesModule(unitID, counts, moduleDefID)
 	local slotType = moduleDefs[moduleDefID].slotType
@@ -54,16 +57,30 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	shield = shield and chassisWeaponDefNames[shield]
 	
 	rangeMult = rangeMult or 1
+	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
 	
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weapon1 and weapon1.num) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weapon2 and weapon2.num) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_shield_id", (shield and shield.num) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weapon1 and weapon1.weaponDefID) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weapon2 and weapon2.weaponDefID) or 0, INLOS)
+	
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_1", (weapon1 and weapon1.num) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_2", (weapon2 and weapon2.num) or 0, INLOS)
+	
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_1", (weapon1 and weapon1.manualFire) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_2", (weapon2 and weapon2.manualFire) or 0, INLOS)
+
+	if shield then
+		Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield.weaponDefID, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_shield_num", shield.num, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_shield_max", WeaponDefs[shield.weaponDefID].shieldPower, INLOS)
+	else
+		Spring.SetUnitRulesParam(unitID, "comm_shield_max", 0, INLOS)
+	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
 end
 
-local function UpdateUnitWithSharedData(unitID, data)
+local function ApplyModuleEffects(unitID, data)
 	if data.speedMult then
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
 		GG.UpdateUnitAttributes(unitID)
@@ -83,9 +100,33 @@ local function UpdateUnitWithSharedData(unitID, data)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
+	-- Calculate Module effects
+	local chassisWeaponDefNames = chassisDefs[upgradeDef.chassis].weaponDefNames 
+	local moduleList = upgradeDef.moduleList
+	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
+	
+	local moduleEffectData = {}
+	for i = 1, #moduleList do
+		local moduleDef = moduleDefs[moduleList[i]]
+		if moduleDef.applicationFunction then
+			moduleDef.applicationFunction(moduleByDefID, moduleEffectData)
+		end
+	end
+	
+	-- Create Unit
+	if moduleEffectData.shield then
+		unitCreatedShield = chassisWeaponDefNames[moduleEffectData.shield].weaponDefID
+		unitCreatedShieldNum = chassisWeaponDefNames[moduleEffectData.shield].num
+	end
+	
 	interallyCreatedUnit = true
 	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
 	interallyCreatedUnit = false
+	
+	if moduleEffectData.shield then
+		unitCreatedShield = nil
+		unitCreatedShieldNum = nil
+	end
 	
 	if not unitID then
 		return false
@@ -104,8 +145,6 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		energyCost = totalCost
 	})
 	
-	local moduleList = upgradeDef.moduleList
-	
 	-- Set module unitRulesParams
 	local counts = {module = 0, weapon = 0}
 	for i = 1, #moduleList do
@@ -114,19 +153,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	end
 	SetUnitRulesModuleCounts(unitID, counts)
 	
-	-- Set module effects
-	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
-	
-	local sharedData = {}
-	for i = 1, #moduleList do
-		local moduleDef = moduleDefs[moduleList[i]]
-		if moduleDef.applicationFunction then
-			moduleDef.applicationFunction(unitID, moduleByDefID, sharedData)
-		end
-	end
-	
-	UpdateUnitWithSharedData(unitID, sharedData)
-	
+	ApplyModuleEffects(unitID, moduleEffectData)
 	return unitID
 end
 
@@ -282,6 +309,10 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+function GG.Upgrades_UnitShieldDef(unitID)
+	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num")
+end
 
 function gadget:Initialize()
 	GG.Upgrades_CreateUpgradedUnit         = Upgrades_CreateUpgradedUnit

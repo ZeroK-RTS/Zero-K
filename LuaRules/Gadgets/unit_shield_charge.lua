@@ -43,7 +43,7 @@ local shieldUnitDefID = {}
 
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
-	if ud.shieldWeaponDef then
+	if ud.shieldWeaponDef and not ud.customParams.dynamic_comm then
 		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
 		if shieldWep.customParams and shieldWep.customParams.shield_drain and tonumber(shieldWep.customParams.shield_drain) > 0 then
 			shieldUnitDefID[unitDefID] = {
@@ -55,6 +55,15 @@ for unitDefID = 1, #UnitDefs do
 		end
 	end
 end
+
+local commAreaShield = WeaponDefNames["dynrecon1_areashield"]
+
+local commAreaShieldDefID = {
+	maxCharge = commAreaShield.shieldPower,
+	perUpdateCost = PERIOD*tonumber(commAreaShield.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
+	chargePerUpdate = PERIOD*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
+	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -90,7 +99,7 @@ function gadget:GameFrame(n)
 		
 		local enabled, charge = IsShieldEnabled(unitID)
 		
-		local def = shieldUnitDefID[data.unitDefID]
+		local def = data.def
 		if enabled and charge < def.maxCharge and spGetUnitRulesParam(unitID, "shieldChargeDisabled") ~= 1 then
 			
 			-- Get changed charge rate based on slow
@@ -112,7 +121,7 @@ function gadget:GameFrame(n)
 
 			-- Check if the change can be carried out
 			if (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true) and spUseUnitResource(unitID, data.resTable)) then
-				spSetUnitShieldState(unitID, -1, charge + chargeAdd)
+				spSetUnitShieldState(unitID, data.shieldNum, charge + chargeAdd)
 			end
 		else
 			if data.oldChargeRate ~= 0 then
@@ -136,14 +145,22 @@ end
 -- Unit Tracking
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-	if shieldUnitDefID[unitDefID] and not unitMap[unitID] then
+	if (shieldUnitDefID[unitDefID] or GG.CreatedUnitShield) and not unitMap[unitID] then
 		GG.AddMiscPriorityUnit(unitID, teamID)
 	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	if shieldUnitDefID[unitDefID] and not unitMap[unitID] then
+	local commShieldID = GG.Upgrades_UnitShieldDef and select(1, GG.Upgrades_UnitShieldDef(unitID))
+	if (shieldUnitDefID[unitDefID] or commShieldID) and not unitMap[unitID] then
 		local def = shieldUnitDefID[unitDefID]
+		if commShieldID then
+			if WeaponDefs[commShieldID].customParams.commshieldid then
+				def = commAreaShieldDefID
+			else
+				return
+			end
+		end
 		unitCount = unitCount + 1
 		
 		local data = {
@@ -154,7 +171,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 			resTable = {
 				m = 0,
 				e = def.perUpdateCost
-			}
+			},
+			shieldNum = (GG.Upgrades_UnitShieldDef and select(2, GG.Upgrades_UnitShieldDef(unitID))) or -1,
+			def = def
 		}
 		
 		unitList[unitCount] = data

@@ -118,10 +118,10 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],	
 	},
     {
-      def                = [[personal_shield]],
+      def                = [[personalshield]],
 	},
 	{
-      def                = [[area_shield]],
+      def                = [[areashield]],
 	},
     {
       def                = [[peashooter]],
@@ -187,7 +187,7 @@ unitDef = {
 		weaponType              = [[LaserCannon]],
 		weaponVelocity          = 880,
 	},
-    personal_shield = {
+    personalshield = {
 		name                    = [[Personal Shield]],
 		exteriorShield          = true,
 		shieldAlpha             = 0.2,
@@ -199,7 +199,7 @@ unitDef = {
 		shieldPowerRegenEnergy  = 0,
 		shieldRadius            = 80,
 		shieldRepulser          = false,
-		shieldStartingPower     = 600,
+		shieldStartingPower     = 850,
 		smartShield             = true,
 		texture1                = [[shield3mist]],
 		visibleShield           = true,
@@ -208,8 +208,13 @@ unitDef = {
 		weaponType              = [[Shield]],
 		damage = {},
     },
-	area_shield = {
+	areashield = {
 		name                    = [[Area Shield]],
+		
+		customParams			= {
+			commshieldid = 2,
+		},
+		
 		exteriorShield          = true,
 		shieldAlpha             = 0.2,
 		shieldBadColor          = [[1 0.1 0.1]],

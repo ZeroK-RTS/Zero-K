@@ -338,6 +338,26 @@ function script.Create()
 	StartThread(RestoreAfterDelay)
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	
+	if Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") then
+		UpdateWeapons(
+			{
+				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1"),
+				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1"),
+				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_1"),
+			},
+			{
+				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2"),
+				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2"),
+				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_2"),
+			},
+			{
+				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_shield_id"),
+				num = Spring.GetUnitRulesParam(unitID, "comm_shield_num"),
+			},
+			Spring.GetUnitRulesParam(unitID, "comm_range_mult")
+		)
+	end
 end
 
 function script.StartMoving()
@@ -467,8 +487,8 @@ function UpdateWeapons(w1, w2, sh, rangeMult)
 	-- shields
 	Spring.SetUnitShieldState(unitID, 2, false)
 	Spring.SetUnitShieldState(unitID, 3, false)
-	if (sh) then
-		Spring.SetUnitShieldState(unitID, sh, true)
+	if (shield) then
+		Spring.SetUnitShieldState(unitID, shield, true)
 	end
 end
 
@@ -501,8 +521,8 @@ function script.Deactivate()
 end
 
 function script.QueryWeapon(num)
-	if num == shield then
-		return torso
+	if num == shield or not weapon1 then
+		return pelvis
 	end
 	return flare
 end
