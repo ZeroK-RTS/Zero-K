@@ -45,6 +45,7 @@ unitDef = {
     commtype = [[4]],
     aimposoffset   = [[0 15 0]],
 	att_speedmult  = 0.5,
+	dynamic_comm   = 1,
   },
 
   energyMake          = 0.3,

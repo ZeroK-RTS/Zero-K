@@ -51,6 +51,7 @@ unitDef = {
     commtype = [[3]],
     aimposoffset   = [[0 10 0]],
 	att_speedmult  = 0.5,
+	dynamic_comm   = 1,
   },
 
   energyMake          = 0.3,
@@ -151,11 +152,16 @@ unitDef = {
 
   weaponDefs          = {
 	fakeweapon = {
-		name                    = [[Fake Bogus Weapon (for range setting)]],
+		name                    = [[Laser Blaster]],
 		areaOfEffect            = 8,
 		coreThickness           = 0.5,
 		craterBoost             = 0,
 		craterMult              = 0,
+
+		customParams			= {
+			muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
+			range = 350,
+		},
 
 		damage                  = {
 			default = 10,
@@ -170,7 +176,7 @@ unitDef = {
 		impulseFactor           = 0.4,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
-		range                   = 100,
+		range                   = 350,
 		reloadtime              = 0.1,
 		rgbColor                = [[1 0 0]],
 		soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -232,7 +238,7 @@ unitDef = {
 
 		customParams			= {
 			muzzleEffectShot = [[custom:BEAMWEAPON_MUZZLE_RED]],
-			range = 600,
+			range = 350,
 		},
 
 		damage                  = {
@@ -248,7 +254,7 @@ unitDef = {
 		impulseFactor           = 0.4,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
-		range                   = 0,
+		range                   = 350,
 		reloadtime              = 0.1,
 		rgbColor                = [[1 0 0]],
 		soundHit                = [[weapon/laser/lasercannon_hit]],
@@ -270,7 +276,7 @@ unitDef = {
 		craterMult              = 0,
 
 		customParams			= {
-			range = 600,
+			range = 350,
 		},
 		
 		damage                  = {
@@ -284,7 +290,7 @@ unitDef = {
 		interceptedByShieldType = 1,
 		laserFlareSize          = 4.5,
 		minIntensity            = 1,
-		range                   = 600,
+		range                   = 350,
 		reloadtime              = 10/30,
 		rgbColor                = [[1 0 0]],
 		soundStart              = [[weapon/laser/mini_laser]],
@@ -304,7 +310,7 @@ unitDef = {
       
 	  customParams            = {
 	  	muzzleEffectFire = [[custom:SLASHMUZZLE]],
-        range = 600,
+        range = 350,
 	  },
       
 	  damage                  = {
@@ -321,7 +327,7 @@ unitDef = {
 	  interceptedByShieldType = 2,
 	  model                   = [[wep_m_frostshard.s3o]],
 	  noSelfDamage            = true,
-	  range                   = 600,
+	  range                   = 350,
 	  reloadtime              = 1,
 	  smokeTrail              = true,
 	  soundHit                = [[explosion/ex_med17]],
@@ -348,7 +354,7 @@ unitDef = {
 	  customParams            = {
 	    muzzleEffectShot = [[custom:WARMUZZLE]],
 	    miscEffectShot   = [[custom:DEVA_SHELLS]],
-        range = 600,
+        range = 350,
 	  },
       
 	  damage                  = {
@@ -365,7 +371,7 @@ unitDef = {
 	  intensity               = 0.7,
 	  interceptedByShieldType = 1,
 	  noSelfDamage            = true,
-	  range                   = 600,
+	  range                   = 350,
 	  reloadtime              = 0.167,
 	  rgbColor                = [[1 0.95 0.4]],
 	  separation              = 1.5,
@@ -404,7 +410,7 @@ unitDef = {
 		laserFlareSize          = 10,
 		minIntensity            = 1,
 		pitchtolerance          = 8192,
-		range                   = 0,
+		range                   = 350,
 		reloadtime              = 15,
 		rgbColor                = [[0.1 0.2 1]],
 		soundStart              = [[weapon/laser/small_laser_fire4]],

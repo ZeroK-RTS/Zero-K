@@ -274,40 +274,47 @@ end
 --updates
 --------------------------------------------------------------------------------
 local function GetRepUnitID(unitIDs)
-  return unitIDs[1]
+	return unitIDs[1]
 end
 
 local function UpdateSelection()
-  local sel = GetSelectedUnitsSorted()
-  
-  local maxCost = 0
-  dgunUnitDefID = nil
-  aoeUnitDefID = nil
-  dgunUnitID = nil
-  aoeUnitID = nil
-  
-  for unitDefID, unitIDs in pairs(sel) do
-	if unitDefID == "n" then
-	  break
+	local sel = GetSelectedUnitsSorted()
+
+	local maxCost = 0
+	dgunUnitDefID = nil
+	aoeUnitDefID = nil
+	dgunUnitID = nil
+	aoeUnitID = nil
+
+	for unitDefID, unitIDs in pairs(sel) do
+		if unitDefID == "n" then
+			break
+		end
+		if (dgunInfo[unitDefID]) then 
+			dgunUnitDefID = unitDefID
+			dgunUnitID = unitIDs[1]
+		end
+
+		if (aoeDefInfo[unitDefID]) then
+			local currCost = UnitDefs[unitDefID].cost * #unitIDs
+			if (currCost > maxCost) then
+				maxCost = currCost
+				aoeUnitDefID = unitDefID
+				aoeUnitID = GetRepUnitID(unitIDs)
+			end
+		end
+
+		local extraDrawParam = Spring.GetUnitRulesParam(unitIDs[1], "secondary_range")
+		if extraDrawParam then
+			extraDrawRange = extraDrawParam
+		else
+			extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
+		end
+		
+		if extraDrawRange then
+			selUnitID = GetRepUnitID(unitIDs)
+		end
 	end
-    if (dgunInfo[unitDefID]) then 
-      dgunUnitDefID = unitDefID
-      dgunUnitID = unitIDs[1]
-    end
-  
-    if (aoeDefInfo[unitDefID]) then
-      local currCost = UnitDefs[unitDefID].cost * #unitIDs
-      if (currCost > maxCost) then
-        maxCost = currCost
-        aoeUnitDefID = unitDefID
-        aoeUnitID = GetRepUnitID(unitIDs)
-      end
-    end
-	extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
-	if extraDrawRange then
-		selUnitID = GetRepUnitID(unitIDs)
-	end
- end
 end
 
 --------------------------------------------------------------------------------
@@ -630,6 +637,10 @@ function widget:DrawWorld()
 	unitID = aoeUnitID
   elseif (cmd == CMD_MANUALFIRE and dgunUnitDefID) then
     info = dgunInfo[dgunUnitDefID]
+	local extraDrawParam = Spring.GetUnitRulesParam(dgunUnitID, "secondary_range")
+	if extraDrawParam then
+	  info.range = extraDrawParam
+	end
 	unitID = dgunUnitID
   else
     return

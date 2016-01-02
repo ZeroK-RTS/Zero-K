@@ -245,11 +245,11 @@ local chassisDefs = {
 						slotType = "weapon",
 					},
 					{
-						defaultModule = moduleDefNames.bigHealth,
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 					{
-						defaultModule = moduleDefNames.health,
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 				},
@@ -266,11 +266,11 @@ local chassisDefs = {
 						slotType = "weapon",
 					},
 					{
-						defaultModule = moduleDefNames.bigHealth,
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 					{
-						defaultModule = moduleDefNames.health,
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 				},

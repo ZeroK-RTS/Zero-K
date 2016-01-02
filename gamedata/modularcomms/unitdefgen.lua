@@ -331,7 +331,7 @@ for name, data in pairs(commDefs) do
 	end	
 	
 	-- set weapon1 range	- may need exception list in future depending on what weapons we add
-	if data.weapondefs then
+	if data.weapondefs and not data.customparams.dynamic_comm then
 		local maxRange = 0
 		local weaponRanges = {}
 		local weaponNames = {}

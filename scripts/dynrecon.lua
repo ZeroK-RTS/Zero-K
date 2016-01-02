@@ -39,6 +39,8 @@ local grenade = piece 'grenade'
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
 
+local INLOS = {inlos = true}
+
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
@@ -426,21 +428,41 @@ function UpdateWeapons(w1, w2, sh)
 	end
 
 	local maxRange = 0
+	local otherRange = false
 	if w1 then
 		isManual[weapon1] = w1.manualFire
-		local range = tonumber(WeaponDefs[w1.weaponDefID].customParams.range)
-		maxRange = ((not w1.manualFire) and range > maxRange and range) or maxRange
+		local range = tonumber(WeaponDefs[w1.weaponDefID].range)
+		if w1.manualFire then
+			otherRange = range
+		else
+			maxRange = range
+		end
 		Spring.SetUnitWeaponState(unitID, w1.num, "range", range)
 	end
 	if w2 then
 		isManual[weapon2] = w2.manualFire
-		local range = tonumber(WeaponDefs[w2.weaponDefID].customParams.range)
-		maxRange = ((not w2.manualFire) and range > maxRange and range) or maxRange
+		local range = tonumber(WeaponDefs[w2.weaponDefID].range)
+		if maxRange then
+			if w2.manualFire then
+				otherRange = range
+			elseif range > maxRange then
+				otherRange = maxRange
+				maxRange = range
+			elseif range < maxRange then
+				otherRange = range
+			end
+		else
+			maxRange = range
+		end
 		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
 	end
 	
 	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
-	Spring.SetUnitMaxRange(unitID, maxRange - 20)
+	Spring.SetUnitMaxRange(unitID, maxRange)
+	Spring.Echo(otherRange)
+	if otherRange then
+		Spring.SetUnitRulesParam(unitID, "secondary_range", otherRange, INLOS)
+	end
 	
 	-- shields
 	Spring.SetUnitShieldState(unitID, 2, false)
