@@ -4,6 +4,7 @@
 include 'constants.lua'
 
 local base = piece 'base' 
+local shield = piece 'shield' 
 local head = piece 'head' 
 local l_gun = piece 'l_gun' 
 local r_gun = piece 'r_gun' 
@@ -64,6 +65,7 @@ end
 function script.Create()
 	gun_1 = true
 	StartThread(SmokeUnit, smokePiece)
+	Move(base, x_axis, -2)
 end
 
 local function Stopping()
@@ -148,7 +150,7 @@ function script.QueryWeapon(num)
 		end
 	else
 		-- Shield
-		return base
+		return shield
 	end
 end
 
