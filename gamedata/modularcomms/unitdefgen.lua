@@ -67,6 +67,11 @@ if err then
 	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
 end
 
+do
+	local commDataPredefined = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua")
+	commData = MergeTable(commData, commDataPredefined)
+end
+
 for commProfileID, commProfile in pairs(commData) do
 	-- MAKE SURE THIS MATCHES api_modularcomms
 	commProfile.baseUnitName = commProfileID .. "_base"

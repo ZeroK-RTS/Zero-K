@@ -26,7 +26,7 @@ local CopyTable = Spring.Utilities.CopyTable
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
-local morphableStaticCommDefs = VFS.Include("gamedata/modularcomms/staticcomms_morphable.lua", nil, VFSMODE)
+local predefinedDynamicComms = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua", nil, VFSMODE)
 local success, err
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
@@ -62,13 +62,6 @@ local function LoadCommData()
 	end
 	if err then 
 		Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
-	else
-		for profileID, profile in pairs(commProfilesByProfileID) do
-			-- MAKE SURE THIS MATCHES WHAT UNITDEFGEN SETS
-			profile.baseUnitDefID = UnitDefNames[profileID .. "_base"].id
-			profile.baseWreckID = FeatureDefNames[profileID .. "_base_dead"].id
-			profile.baseHeapID = FeatureDefNames[profileID .. "_base_heap"].id
-		end
 	end
 	
 	-- comm player entries
@@ -112,7 +105,7 @@ local function LoadCommData()
 	
 	-- morphable static comms (e.g. trainers)
 	local morphableStaticComms = {}
-	for commProfileID, commDef in pairs(morphableStaticCommDefs) do
+	for commProfileID, commDef in pairs(predefinedDynamicComms) do
 		--Spring.Echo("Modular comm API adding static comm " .. commProfileID)
 		local entry = Spring.Utilities.CopyTable(commDef, true)
 		entry.modules = entry.levels
@@ -125,6 +118,13 @@ local function LoadCommData()
 	end
 	commData.players = commProfilesForPlayers
 	commData.static = morphableStaticComms
+	
+	for profileID, profile in pairs(commProfilesByProfileID) do
+		-- MAKE SURE THIS MATCHES WHAT UNITDEFGEN SETS
+		profile.baseUnitDefID = UnitDefNames[profileID .. "_base"].id
+		profile.baseWreckID = FeatureDefNames[profileID .. "_base_dead"].id
+		profile.baseHeapID = FeatureDefNames[profileID .. "_base_heap"].id
+	end
 	
 	--XG.commData = commData
 	--XG.commProfilesByProfileID = commProfilesByProfileID

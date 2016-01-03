@@ -35,7 +35,13 @@ local chassisImages = {
 	commsupport = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
 	benzcom = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 	cremcom = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
+	
+	dynrecon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
+	dynsupport = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
+	dynassault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 }
+
+local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 local colorWeapon = "\255\255\32\32"
 local colorConversion = "\255\255\96\0"
@@ -45,19 +51,20 @@ local colorModule = "\255\128\128\255"
 local function WriteTooltip(profileID)
 	local commData = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 	local str = ''
-	local upgrades = WG.ModularCommAPI.GetLegacyModuleDefs()
 	for i=1,#commData.modules do
 		str = str .. "\nLEVEL "..(i).. " (".."??".." metal)\n\tModules:"	-- TODO calculate metal cost
 		for j, modulename in pairs(commData.modules[i]) do
-			if upgrades[modulename] then
-				local substr = upgrades[modulename].name
+			if moduleDefNames[modulename] then
+				local moduleDef = moduleDefs[moduleDefNames[modulename]]
+				local substr = moduleDef.humanName
 				-- assign color
-				if (modulename):find("commweapon_") then
+				
+				if moduleDef.slotType == "weapon" then
 					substr = colorWeapon..substr
-				elseif (modulename):find("conversion_") then
-					substr = colorConversion..substr
-				elseif (modulename):find("weaponmod_") then
-					substr = colorWeaponMod..substr
+				--elseif moduleDef.slotType == "conversion" then
+				--	substr = colorConversion..substr
+				--elseif (moduleDef.slotType == "weaponmod" then
+				--	substr = colorWeaponMod..substr
 				else
 					substr = colorModule..substr
 				end
@@ -75,7 +82,7 @@ local function GetCommSelectTemplate(num, data)
 		name = data.name,
 		tooltip = "Select "..data.name..WriteTooltip(commProfileID),
 		image = chassisImages[data.chassis],
-		--cmd = "customcomm:"..profileName,
+		cmd = "customcomm:"..commProfileID,
 		unitname = comm1Name,
 		commProfile = commProfileID,
 		trainer = string.find(commProfileID, "trainer") ~= nil,	-- FIXME should probably be in the def table
