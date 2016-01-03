@@ -124,6 +124,7 @@ local moduleDefs = {
 		limit = 1,
 		cost = 100,
 		requireModules = {},
+		prohibitingModules = {"personalcloak"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -138,6 +139,7 @@ local moduleDefs = {
 		limit = 1,
 		cost = 100,
 		requireModules = {"personalshield"},
+		prohibitingModules = {"personalcloak"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -198,9 +200,11 @@ local moduleDefs = {
 		limit = 1,
 		cost = 100,
 		requireModules = {},
+		prohibitingModules = {"personalshield", "areashield"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
+			sharedData.decloakDistance = 150
 			sharedData.personalCloak = true
 		end
 	},
@@ -215,7 +219,7 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.cloakFieldRange = 350
+			sharedData.areaCloak = true
 			sharedData.radarJammingRange = 350
 		end
 	},

@@ -594,7 +594,7 @@ end
 local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
 local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
 
-local function SpawnModuleWreck(moduleDefID, wreckLevel, magnitude, teamID, x, y, z, vx, vy, vz)
+local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
 	local featureDefID = FeatureDefNames[moduleWreckNamePrefix[wreckLevel] .. moduleDefID]
 	if not featureDefID then
 		Spring.Echo("Cannot find module wreck", moduleWreckNamePrefix[wreckLevel] .. moduleDefID)
@@ -605,9 +605,8 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, magnitude, teamID, x, y
 	local dir = math.random(2*math.pi)
 	local pitch = (math.random(2)^2 - 1)*math.pi/2
 	local heading = math.random(65536)
-	local mag = 10 + math.random(10)*magnitude
+	local mag = 10 + math.random(10)*totalCount
 	local horScale = mag*math.cos(pitch)
-	
 	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
 	
 	local featureID = Spring.CreateFeature(featureDefID, x + vx, y, z + vz, heading, teamID)

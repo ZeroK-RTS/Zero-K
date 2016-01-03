@@ -244,7 +244,7 @@ function gadget:Initialize()
   -- add the CloakShield command to existing units
   for _,unitID in ipairs(Spring.GetAllUnits()) do
     local unitDefID = GetUnitDefID(unitID)
-    local cloakShieldDef = cloakShieldDefs[unitDefID]
+    local cloakShieldDef = cloakShieldDefs[unitDefID] or GG.Upgrades_UnitCloakShieldDef(unitID)
     if (cloakShieldDef) then
       AddCloakShieldUnit(unitID, cloakShieldDef)
     end
@@ -267,7 +267,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-  local cloakShieldDef = cloakShieldDefs[unitDefID]
+  local cloakShieldDef = cloakShieldDefs[unitDefID] or GG.Upgrades_UnitCloakShieldDef(unitID)
   if (not cloakShieldDef) then
     return
   end
@@ -322,7 +322,7 @@ local function UpdateCloakees(data)
   local allyTeam = GetUnitAllyTeam(unitID)
   for _,cloakee in ipairs(closeUnits) do
     local udid = GetUnitDefID(cloakee)
-    if ((not uncloakableDefs[udid]) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
+    if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
       if (cloakee ~= unitID) then
         --other units
         SetUnitCloakAndParam(cloakee, level, (not radiusException[udid]) and decloakDistance)

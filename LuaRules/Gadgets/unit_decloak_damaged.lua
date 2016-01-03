@@ -187,8 +187,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 			end
 			return
 		end
-	end
-	if ud.customParams.dynamic_comm then
+	elseif ud.customParams.dynamic_comm then
 		local cloakDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK)
 		if cloakDescID then
 			Spring.RemoveUnitCmdDesc(unitID, cloakDescID)

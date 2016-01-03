@@ -21,7 +21,7 @@ end
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
-local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak
+local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
@@ -36,6 +36,25 @@ local legacyToDyncommChassisMap = {
 	cremcom = "support",
 }
 
+local commanderCloakShieldDef = {
+	energy = 15,
+	maxrad = 350,
+	
+	growRate =	512,
+	shrinkRate = 2048,
+	decloakDistance = 75,
+	
+	init = true,
+	draw = true,
+	selfCloak = true,
+	radiusException = {}
+}
+	
+for _, eud in pairs (UnitDefs) do
+	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
+		commanderCloakShieldDef.radiusException[eud.id] = true
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -101,12 +120,24 @@ local function ApplyModuleEffects(unitID, data)
 	
 	if data.radarJammingRange then
 		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
+	else
+		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
+		if onOffCmd then
+			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
+		end
 	end
 	
-	if data.personalCloak then
+	if data.decloakDistance then
 		Spring.SetUnitCloak(unitID, false, data.decloakDistance)
 		Spring.SetUnitRulesParam(unitID, "comm_decloak_distance", data.decloakDistance, INLOS)
+	end
+		
+	if data.personalCloak then
 		Spring.SetUnitRulesParam(unitID, "comm_personal_cloak", 1, INLOS)
+	end
+	
+	if data.areaCloak then
+		Spring.SetUnitRulesParam(unitID, "comm_area_cloak", 1, INLOS)
 	end
 	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
@@ -144,7 +175,9 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		end
 	end
 	
-	-- Create Unit
+	-- Create Unit, set appropriate global data first
+	-- These variables are set such that other gadgets can notice the effect
+	-- within UnitCreated.
 	if moduleEffectData.shield then
 		unitCreatedShield = chassisWeaponDefNames[moduleEffectData.shield].weaponDefID
 		unitCreatedShieldNum = chassisWeaponDefNames[moduleEffectData.shield].num
@@ -152,6 +185,10 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	
 	if moduleEffectData.personalCloak then
 		unitCreatedCloak = true
+	end
+	
+	if moduleEffectData.areaCloak then
+		unitCreatedCloakShield = true
 	end
 	
 	interallyCreatedUnit = true
@@ -163,6 +200,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedShield = nil
 	unitCreatedShieldNum = nil
 	unitCreatedCloak = nil
+	unitCreatedCloakShield = nil
 	
 	if not unitID then
 		return false
@@ -256,6 +294,11 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
+		
+		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
+		if onOffCmd then
+			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
+		end
 		
 		ApplyWeaponData(unitID, "peashooter")
 	end
@@ -394,6 +437,10 @@ end
 
 function GG.Upgrades_UnitCanCloak(unitID)
 	return unitCreatedCloak or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")
+end
+
+function GG.Upgrades_UnitCloakShieldDef(unitID)
+	return (unitCreatedCloakShield or Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) and commanderCloakShieldDef
 end
 
 function gadget:Initialize()

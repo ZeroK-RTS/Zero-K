@@ -151,7 +151,7 @@ local stopUpgradeCmdDesc = {
 	name    = "",
 	action  = 'upgradecommstop',
 	cursor  = 'Morph', 
-	tooltip	= 'Stops commander upgrade.',
+	tooltip	= 'Stop commander upgrade.',
 }
 
 --------------------------------------------------------------------------------
@@ -604,6 +604,8 @@ function gadget:Initialize()
 					end
 				end
 			end
+		elseif UnitDefs[unitDefID].customParams.dynamic_comm then
+			GG.AddMiscPriorityUnit(unitID,teamID)
 		end
 	end
 end
@@ -638,6 +640,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 				AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef)
 			end
 		end
+	elseif UnitDefs[unitDefID].customParams.dynamic_comm then
+		GG.AddMiscPriorityUnit(unitID,teamID)
 	end
 end
 

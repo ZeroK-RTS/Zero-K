@@ -283,21 +283,23 @@ end
 --
 --Spring.Echo("Shield Weapon Def")
 for name, ud in pairs(UnitDefs) do
-	local hasShield = false
-	if ud.weapondefs then
-		for _, wd in pairs(ud.weapondefs) do      
-			if wd.weapontype == "Shield" then
-				hasShield = true
-				break
+	if not ud.customparams.dynamic_comm then
+		local hasShield = false
+		if ud.weapondefs then
+			for _, wd in pairs(ud.weapondefs) do      
+				if wd.weapontype == "Shield" then
+					hasShield = true
+					break
+				end
 			end
 		end
-	end
-	if (hasShield or (((not ud.maxvelocity) or ud.maxvelocity == 0) and not ud.cloakcost)) then
-		ud.customparams.cannotcloak = 1
-		ud.mincloakdistance = 0
-		ud.cloakcost = nil
-		ud.cloakcostmoving = nil
-		ud.cancloak = false
+		if (hasShield or (((not ud.maxvelocity) or ud.maxvelocity == 0) and not ud.cloakcost)) then
+			ud.customparams.cannotcloak = 1
+			ud.mincloakdistance = 0
+			ud.cloakcost = nil
+			ud.cloakcostmoving = nil
+			ud.cancloak = false
+		end
 	end
 end
 
