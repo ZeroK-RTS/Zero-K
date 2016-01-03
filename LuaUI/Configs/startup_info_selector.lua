@@ -20,7 +20,7 @@ local optionData = {}
 
 local commDataOrdered = {}
 local numComms = 0
-for profileID, data in pairs( WG.ModularCommAPI.GetPlayerComms(Spring.GetMyPlayerID(), true)) do
+for profileID, data in pairs( WG.ModularCommAPI.GetPlayerCommProfiles(Spring.GetMyPlayerID(), true)) do
 	numComms = numComms + 1
 	commDataOrdered[numComms] = data
 	commDataOrdered[numComms].profileID = profileID

@@ -4,7 +4,7 @@
 local function GetInfo()
 	return {
 		name      = "Modular Comm Info",
-		desc      = "Helper widget that provides info on modular comms.",
+		desc      = "Helper widget/gadget that provides info on modular comms.",
 		author    = "KingRaptor",
 		date      = "2011",
 		license   = "GNU GPL, v2 or later",
@@ -33,78 +33,114 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 
 local NUM_COMM_LEVELS = 5
 
-local commData = {}
-local commDataByProfileID = {}
-local commDataForPlayers = {}
+local commData = {}	-- {players = {[playerID1] = {}, [playerID2] = {}}, static = {}}
+local commProfilesByProfileID = {}
+local commProfileIDsByPlayerID = {}
 
-local players = Spring.GetPlayerList()
-
-for i=1,#players do
-	local playerID = players[i]
-	local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
-	
-	local commDataForPlayer	-- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
-	local commDataForPlayerRaw = customKeys and customKeys.commanders
-	if not (commDataForPlayerRaw and type(commDataForPlayerRaw) == 'string') then
-		err = "Comm data entry for player " .. playerName .. " is empty or in invalid format"
-		commDataForPlayer = {}
+local function LoadCommData()
+	-- comm profile definitions
+	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
+	local commDataRaw = modOptions.commanders
+	local commDataFunc
+	if not (commDataRaw and type(commDataRaw) == 'string') then
+		err = "Comm data entry in modoption is empty or in invalid format"
+		commData = {}
 	else
-		commDataForPlayerRaw = string.gsub(commDataForPlayerRaw, '_', '=')
-		commDataForPlayerRaw = Spring.Utilities.Base64Decode(commDataForPlayerRaw)
-		local commDataForPlayerFunc, err = loadstring("return "..commDataForPlayerRaw)
-		if commDataForPlayerFunc then
-			success, commDataForPlayer = pcall(commDataForPlayerFunc)
-			if not success then
-				err = commDataForPlayer
-				commDataForPlayer = {}
+		commDataRaw = string.gsub(commDataRaw, '_', '=')
+		commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
+		--Spring.Echo(commDataRaw)
+		commDataFunc, err = loadstring("return "..commDataRaw)
+		if commDataFunc then
+			success, commProfilesByProfileID = pcall(commDataFunc)
+			if not success then	-- execute Borat
+				err = commProfilesByProfileID
+				commProfilesByProfileID = {}
 			end
 		end
 	end
 	if err then 
-		Spring.Log(GetInfo().name, LOG.ERROR, "Modular Comm API error: " .. err)
-	end
-	commDataForPlayers[playerID] = commDataForPlayer
-end
-
--- morphable static comms (e.g. trainers)
-local morphableStaticComms = {}
-for commProfileID, commDef in pairs(morphableStaticCommDefs) do
-	--Spring.Echo("Modular comm API adding static comm " .. commProfileID)
-	local entry = Spring.Utilities.CopyTable(commDef, true)
-	entry.modules = entry.levels
-	entry.levels = nil
-	for level=1,#entry.modules do
-		entry.modules[level].cost = nil
-	end
-	morphableStaticComms[commProfileID] = entry
-	commDataByProfileID[commProfileID] = entry
-end
-commData.players = commDataForPlayers
-commData.static = morphableStaticComms
-
--- add player comms to by-name comm list
-for playerID, playerComms in pairs(commData.players) do
-	for commProfileID, data in pairs(playerComms) do
-		commDataByProfileID[commProfileID] = data
-	end
-end
-
---XG.commData = commData
---XG.commDataByProfileID = commDataByProfileID
-
-local commModulesByStaticComm = {}
-for i=1,#UnitDefs do
-	if UnitDefs[i].customParams.modules then
-		local modulesRaw = {}
-		local modulesHuman = {}
-		local modulesInternalFunc = loadstring("return ".. UnitDefs[i].customParams.modules)
-		local modulesInternal = modulesInternalFunc()
-		for i=1, #modulesInternal do
-			local modulename = modulesInternal[i]
-			modulesRaw[i] = modulename
-			modulesHuman[i] = upgrades[modulename].name
+		Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
+	else
+		for profileID, profile in pairs(commProfilesByProfileID) do
+			-- MAKE SURE THIS MATCHES WHAT UNITDEFGEN SETS
+			profile.baseUnitDefID = UnitDefNames[profileID .. "_base"].id
+			profile.baseWreckID = FeatureDefNames[profileID .. "_base_dead"].id
+			profile.baseHeapID = FeatureDefNames[profileID .. "_base_heap"].id
 		end
-		commModulesByStaticComm[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
+	end
+	
+	-- comm player entries
+	local commProfilesForPlayers = {}	-- {[playerID1] = {}, [playerID2] = {}}
+	local players = Spring.GetPlayerList()
+	for i=1,#players do
+		local playerID = players[i]
+		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
+		
+		if (not spectator) then
+			local playerCommProfileIDs	-- [playerID] = {[commProfileID1] = {}, [commProfileID2] = {}, ...}
+			local playerCommProfileIDsRaw = customKeys and customKeys.commanders
+			if not (playerCommProfileIDsRaw and type(playerCommProfileIDsRaw) == 'string') then
+				err = "Comm data entry for player " .. playerName .. " is empty or in invalid format"
+				playerCommProfileIDs = {}
+			else
+				playerCommProfileIDsRaw = string.gsub(playerCommProfileIDsRaw, '_', '=')
+				playerCommProfileIDsRaw = Spring.Utilities.Base64Decode(playerCommProfileIDsRaw)
+				local playerCommProfileIDsFunc, err = loadstring("return "..playerCommProfileIDsRaw)
+				if playerCommProfileIDsFunc then
+					success, playerCommProfileIDs = pcall(playerCommProfileIDsFunc)
+					if not success then
+						err = playerCommProfileIDs
+						playerCommProfileIDs = {}
+					end
+				end
+			end
+			if err then 
+				Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
+			end
+			
+			commProfileIDsByPlayerID[playerID] = playerCommProfileIDs
+			local playerCommProfiles = {} 
+			for i=1,#playerCommProfileIDs do
+				local profileID = playerCommProfileIDs[i]
+				playerCommProfiles[profileID] = commProfilesByProfileID[profileID]
+			end
+			commProfilesForPlayers[playerID] = playerCommProfiles
+		end
+	end
+	
+	-- morphable static comms (e.g. trainers)
+	local morphableStaticComms = {}
+	for commProfileID, commDef in pairs(morphableStaticCommDefs) do
+		--Spring.Echo("Modular comm API adding static comm " .. commProfileID)
+		local entry = Spring.Utilities.CopyTable(commDef, true)
+		entry.modules = entry.levels
+		entry.levels = nil
+		for level=1,#entry.modules do
+			entry.modules[level].cost = nil
+		end
+		morphableStaticComms[commProfileID] = entry
+		commProfilesByProfileID[commProfileID] = entry
+	end
+	commData.players = commProfilesForPlayers
+	commData.static = morphableStaticComms
+	
+	--XG.commData = commData
+	--XG.commProfilesByProfileID = commProfilesByProfileID
+	
+	local commModulesByStaticComm = {}
+	for i=1,#UnitDefs do
+		if UnitDefs[i].customParams.modules then
+			local modulesRaw = {}
+			local modulesHuman = {}
+			local modulesInternalFunc = loadstring("return ".. UnitDefs[i].customParams.modules)
+			local modulesInternal = modulesInternalFunc()
+			for i=1, #modulesInternal do
+				local modulename = modulesInternal[i]
+				modulesRaw[i] = modulename
+				modulesHuman[i] = upgrades[modulename].name
+			end
+			commModulesByStaticComm[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
+		end
 	end
 end
 --------------------------------------------------------------------------------
@@ -115,10 +151,10 @@ local function GetModulesCost(modulesList)
 end
 
 local function GetCommProfileInfo(commProfileID)
-	return commDataByProfileID[commProfileID]
+	return commProfilesByProfileID[commProfileID]
 end
 
-local function GetPlayerComms(playerID, includeTrainers)
+local function GetPlayerCommProfiles(playerID, includeTrainers)
 	local comms = {}
 	if commData.players[playerID] then
 		comms = CopyTable(commData.players[playerID], true)
@@ -153,8 +189,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function Initialize()
+	LoadCommData()
 	XG.ModularCommAPI = {
-		GetPlayerComms = GetPlayerComms,
+		GetPlayerCommProfiles = GetPlayerCommProfiles,
 		GetCommUpgradeList = GetCommUpgradeList,
 		--GetCommModules = GetCommModules,
 		GetCommProfileInfo = GetCommProfileInfo

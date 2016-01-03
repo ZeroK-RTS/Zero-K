@@ -197,8 +197,8 @@ local function GetStartUnit(teamID, playerID, isAI)
   playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
   if (playerID and commChoice[playerID]) then
 	--Spring.Echo("Attempting to load alternate comm")
-	local playerComms = GG.ModularCommAPI.GetPlayerComms(playerID, true)
-	local altComm = playerComms[commChoice[playerID]]
+	local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
+	local altComm = playerCommProfiles[commChoice[playerID]]
 	if altComm then
 		startUnit = "unused_variable"	-- FIXME: this should probably be the dyncomm's base unitDef
 		commProfileID = commChoice[playerID]

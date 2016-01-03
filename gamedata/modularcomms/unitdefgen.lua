@@ -44,9 +44,7 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 local err, success
 
--- old site-generated comm system; obsolete
---[[
-local commDataRaw = modOptions.commandertypes
+local commDataRaw = modOptions.commanders
 local commDataFunc, commData
 
 if not (commDataRaw and type(commDataRaw) == 'string') then
@@ -69,8 +67,52 @@ if err then
 	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
 end
 
-if not commData then commData = {} end
-]]
+for commProfileID, commProfile in pairs(commData) do
+	-- MAKE SURE THIS MATCHES api_modularcomms
+	commProfile.baseUnitName = commProfileID .. "_base"
+end
+
+local legacyToDyncommChassisMap = {
+	commrecon = "dynrecon",
+	commsupport = "dynsupport",
+	armcom = "dynassault",
+	corcom = "dynassault",
+	benzcom = "dynassault",
+	cremcom = "dynsupport",
+}
+
+local function GenerateLevel0DyncommsAndWrecks()
+	for commProfileID, commProfile in pairs(commData) do
+		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "debug", "\tModularComms: Generating base dyncomm for " .. commProfile.name)
+		local unitName = commProfile.baseUnitName
+		
+		local chassis = commProfile.chassis
+		local mappedChassis = legacyToDyncommChassisMap[chassis]
+		if mappedChassis then
+			chassis = mappedChassis
+		end
+		
+		UnitDefs[unitName] = CopyTable(UnitDefs[chassis.."1"], true)
+		local ud = UnitDefs[unitName]
+		ud.name = commProfile.name .. " level 0"
+		
+		local features = ud.featuredefs or {}
+		for featureName,array in pairs(features) do
+			local mult = 0.4
+			local typeName = "Wreckage"
+			if featureName == "heap" then
+				typeName = "Debris"
+				mult = 0.2 
+			end
+			array.description = typeName .. " - " .. commProfile.name
+			array.customparams = array.customparams or {}
+			array.customparams.unit = unitName
+		end
+		ud.featuredefs = features
+	end
+end
+
+GenerateLevel0DyncommsAndWrecks()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- generate the baseline comm
