@@ -207,18 +207,18 @@ return ret
 --------------------------------------------------------------------------------
 -- example of modoption data
 --[[
-Y29tbWFuZGVycyA9IHsNCiAgYzU4MDZfMjQzID0gew0KICAgIG5hbWUgPSAiUHJpbmNlc3MgTHVuYSINCiAgICBjaGFzc2lzID0gImFybWNvbSIsDQogICAgbW9kdWxlcyA9IHsNCiAgICAgIHsiY29tbXdlYXBvbl9saWdodG5pbmdndW4iLCJtb2R1bGVfZmllbGRyYWRhciJ9LA0KICAgICAgeyJtb2R1bGVfYWJsYXRpdmVfYXJtb3IiLCJtb2R1bGVfcGVyc29uYWxfY2xvYWsifSwNCiAgICAgIHsibW9kdWxlX2FibGF0aXZlX2FybW9yIiwid2VhcG9ubW9kX3N0dW5fYm9vc3RlciJ9LA0KICAgICAgeyJtb2R1bGVfaGlnaF9wb3dlcl9zZXJ2b3MiLCJtb2R1bGVfaGVhdnlfYXJtb3IifSwNCiAgICAgIHt9DQogICAgfSwNCiAgICBkZWNvcmF0aW9ucyA9IHsic2hpZWxkX2JsdWUifSwNCiAgfSwNCn0=
+ew0KICBjNTgwNl8yNDMgPSB7DQogICAgbmFtZSA9ICJQcmluY2VzcyBMdW5hIiwNCiAgICBjaGFzc2lzID0gImNyZW1jb20iLA0KICAgIG1vZHVsZXMgPSB7DQogICAgICB7ImxwYiJ9LA0KICAgICAgeyJoZWFsdGgifSwNCiAgICAgIHsicGVyc29uYWxjbG9hayJ9LA0KICAgICAgeyJzcGVlZCJ9LA0KICAgICAgeyJzcGVlZCJ9LA0KICAgIH0sDQogICAgZGVjb3JhdGlvbnMgPSB7InNoaWVsZF9ibHVlIn0sDQogIH0sDQp9
 
 {
   c5806_243 = {
     name = "Princess Luna",
     chassis = "cremcom",
     modules = {
-      {"commweapon_lightninggun","module_fieldradar"},
-      {"module_ablative_armor","module_personal_cloak"},
-      {"commweapon_disintegrator", "module_ablative_armor", "weaponmod_stun_booster"},
-      {"module_high_power_servos","module_heavy_armor"},
-      {}
+      {"lpb"},
+      {"health"},
+      {"personalcloak"},
+      {"speed"},
+      {"speed"},
     },
     decorations = {"shield_blue"},
   },
