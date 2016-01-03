@@ -318,7 +318,7 @@ local function ProcessLastAlly()
 	local activeAllies = {}
 	local droppedAllies = {}
 	local lastActive = nil
-	for i=1,#allylist do
+	for i = 1, #allylist do
 		repeat
 		local a = allylist[i]
 		if (a == gaiaAllyTeamID) then break end -- continue
@@ -388,8 +388,12 @@ local function ProcessLastAlly()
 		end
 	elseif #activeAllies < 2 then
 		if #droppedAllies > 0 then
-			inactiveWinAllyTeam = lastActive
-			Spring.SetGameRulesParam("inactivity_win", lastActive)
+			if lastActive then
+				inactiveWinAllyTeam = lastActive
+				Spring.SetGameRulesParam("inactivity_win", lastActive)
+			else
+				inactiveWinAllyTeam = false
+			end
 		else
 			-- remove every unit except for last active alliance
 			for i=1, #allylist do
