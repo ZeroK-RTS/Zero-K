@@ -13,14 +13,26 @@ return {
 		{	"edit_backspace",	"Any+backspace",},
 		{	"toggleoverview",	"Any+tab",},
 		{	"edit_complete",	"Any+tab",},
-		{	"chatally",	"Alt+enter",},
-		{	"chatswitchally",	"Alt+enter",},
-		{	"chatall",	"Ctrl+enter",},
-		{	"chatswitchall",	"Ctrl+enter",},
+		{
+			"chatally", 			{"Alt+enter", "Alt+numpad_enter"}, 
+		}, 
+		{
+			"chatswitchally", 			{"Alt+enter", "Alt+numpad_enter"}, 
+		}, 
+		{
+			"chatall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
+		}, 
+		{
+			"chatswitchall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
+		}, 
 		{	"chatspec",	"None"},
 		{	"chatswitchspec",	"None"},
-		{	"chat",	"Any+enter",},
-		{	"edit_return",	"Any+enter",},
+		{
+			"chat", 			{"Any+enter", "Any+numpad_enter"}, 
+		}, 
+		{
+			"edit_return", 			{"Any+enter", "Any+numpad_enter"}, 
+		}, 
 		{	"pause",	"pause",},
 		{	"crudemenu",	"esc",},
 		{	"exitwindow",	"shift+esc",},
