@@ -442,7 +442,7 @@ function UpdateUnitAttributes(unitID, frame)
 		unitSlowed[unitID] = nil
 	end
 	
-	local forcedOff = spGetUnitRulesParam(unitID,"forcedOff")
+	local forcedOff = spGetUnitRulesParam(unitID, "forcedOff")
 	local abilityDisabled = (forcedOff == 1 or disarmed == 1 or morphDisable == 1 or crashing == 1)
 	local setNewState
 	

@@ -21,7 +21,7 @@ end
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
-local unitCreatedShield, unitCreatedShieldNum
+local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
@@ -103,6 +103,10 @@ local function ApplyModuleEffects(unitID, data)
 		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
 	end
 	
+	if data.personalCloak then
+		Spring.SetUnitRulesParam(unitID, "comm_personal_cloak", 1, INLOS)
+	end
+	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
 		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
@@ -139,14 +143,19 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedShieldNum = chassisWeaponDefNames[moduleEffectData.shield].num
 	end
 	
-	interallyCreatedUnit = true
-	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
-	interallyCreatedUnit = false
-	
-	if moduleEffectData.shield then
-		unitCreatedShield = nil
-		unitCreatedShieldNum = nil
+	if moduleEffectData.personalCloak then
+		unitCreatedCloak = true
 	end
+	
+	interallyCreatedUnit = true
+	
+	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
+	
+	-- Unset the variables which need to be present at unit creation
+	interallyCreatedUnit = false
+	unitCreatedShield = nil
+	unitCreatedShieldNum = nil
+	unitCreatedCloak = nil
 	
 	if not unitID then
 		return false
@@ -158,6 +167,9 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	Spring.SetUnitRulesParam(unitID, "comm_chassis", upgradeDef.chassis, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_name", upgradeDef.name, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_cost", totalCost, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", upgradeDef.baseUnitDefID, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID", upgradeDef.baseWreckID, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID", upgradeDef.baseHeapID, INLOS)
 	
 	Spring.SetUnitCosts(unitID, {
 		buildTime = totalCost,
@@ -186,25 +198,35 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 		return false
 	end
 	
+	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisDefs[chassisDefID].baseUnitDef
+	
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
 		totalCost = 1200,
 		name = commProfileInfo.name,
-		moduleList = {moduleDefNames.econ}
+		moduleList = {moduleDefNames.econ},
+		baseUnitDefID = baseUnitDefID,
+		baseWreckID = commProfileInfo.baseWreckID,
+		baseHeapID = commProfileInfo.baseHeapID,
 	}
 	
-	local unitID = Upgrades_CreateUpgradedUnit(chassisDefs[chassisDefID].baseUnitDef, x, y, z, facing, teamID, false, upgradeDef)
+	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)
 	
 	return unitID
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if chassisDefByBaseDef[unitDefID] and not interallyCreatedUnit then
+		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
+		
 		Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_chassis", chassisDefByBaseDef[unitDefID], INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", unitDefID, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_baseWreckID", chassisData.baseWreckID, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_baseHeapID", chassisData.baseHeapID, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
@@ -315,7 +337,10 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 			totalCost = cost + Spring.Utilities.GetUnitCost(unitID),
 			level = level + 1,
 			chassis = chassis,
-			moduleList = fullModuleList
+			moduleList = fullModuleList,
+			baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID"),
+			baseWreckID = Spring.GetUnitRulesParam(unitID, "comm_baseWreckID"),
+			baseHeapID = Spring.GetUnitRulesParam(unitID, "comm_baseHeapID"),
 		},
 		combatMorph = true,
 		metal = cost,
@@ -339,6 +364,10 @@ end
 
 function GG.Upgrades_UnitShieldDef(unitID)
 	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num")
+end
+
+function GG.Upgrades_UnitCanCloak(unitID)
+	return unitCreatedCloak or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")
 end
 
 function gadget:Initialize()

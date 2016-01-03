@@ -591,11 +591,65 @@ function script.QueryNanoPiece()
 	return nanospray
 end
 
+local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
+local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
+
+local function SpawnModuleWreck(moduleDefID, wreckLevel, teamID, x, y, z, vx, vy, vz)
+	local featureDefID = FeatureDefNames[moduleWreckNamePrefix[wreckLevel] .. moduleDefID].id
+	
+	local dir = math.random(2*math.pi)
+	local pitch = (math.random(2)^2 - 1)*math.pi/2
+	local heading = math.random(65536)
+	local mag = 30
+	local horScale = mag*math.cos(pitch)
+	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
+	
+	local featureID = Spring.CreateFeature(featureDefID, x, y, z, heading, teamID)
+	Spring.SetFeatureVelocity(featureID, vx, vy, vz)
+end
+
+local function SpawnWreck(wreckLevel)
+	local makeRezzable = (wreckLevel == 1)
+	local wreckDef = FeatureDefs[Spring.GetUnitRulesParam(unitID, commWreckUnitRulesParam[wreckLevel])]
+	
+	local x, y, z = Spring.GetUnitPosition(unitID)
+	
+	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	
+	if (wreckDef) then
+		local heading   = Spring.GetUnitHeading(unitID)
+		local teamID	= Spring.GetUnitTeam(unitID)
+		local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
+		Spring.SetFeatureVelocity(featureID, vx, vy, vz)
+		if makeRezzable then
+			local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
+			Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
+		end
+	end
+end
+
+local function SpawnModuleWrecks(wreckLevel)
+	local _, _, _, mx, my, mz = Spring.GetUnitPosition(unitID, true)
+	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	local teamID	= Spring.GetUnitTeam(unitID)
+	
+	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
+	for i = 1, weaponCount do
+		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i), wreckLevel, teamID, mx, my, mz, vx, vy, vz)
+	end
+	
+	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+	for i = 1, moduleCount do
+		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, teamID, mx, my, mz, vx, vy, vz)
+	end
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
 --	Turn(turret, y_axis, 0, math.rad(500))
 	if severity <= 0.5 and not inJumpMode then
+		SpawnModuleWrecks(1)
 		Turn(base, x_axis, math.rad(80), math.rad(80))
 		Turn(turret, x_axis, math.rad(-16), math.rad(50))
 		Turn(turret, y_axis, 0, math.rad(90))
@@ -616,8 +670,9 @@ function script.Killed(recentDamage, maxHealth)
 		--StartThread(burn)
 		--Sleep((1000 * rand (2, 5))) 
 		Sleep(100)
-		return 1
+		SpawnWreck(1)
 	elseif severity <= 0.5 then
+		SpawnModuleWrecks(1)
 		Explode(gun,	sfxFall + sfxSmoke + sfxExplode)
 		Explode(head, sfxFire + sfxExplode)
 		Explode(pelvis, sfxFire + sfxExplode)
@@ -630,8 +685,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
-		return 1
+		SpawnWreck(1)
 	else
+		SpawnModuleWrecks(2)
 		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(pelvis, sfxFall + sfxFire + sfxSmoke + sfxExplode)
@@ -644,7 +700,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
-		return 2
+		SpawnWreck(2)
 	end
 end
 

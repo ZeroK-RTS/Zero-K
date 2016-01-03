@@ -21,6 +21,70 @@ local function isstring(x) return (type(x) == 'string')  end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local baseModuleWreck = {
+	description		= [[Module Shards]],
+	blocking		= false,
+	category		 = [[heaps]],
+	damage			= 100,
+	energy			= 0,
+	footprintX		= 2,
+	footprintZ		= 2,
+	height			= [[4]],
+	hitdensity		= [[100]],
+	metal			= 40,
+	object			= [[debris2x2c.s3o]],
+	reclaimable		= true,
+	reclaimTime		= 40,
+}
+
+local baseModuleHeap = {
+	description		= [[Module Fragments]],
+	blocking		= false,
+	category		= [[heaps]],
+	damage			= 50,
+	energy			= 0,
+	footprintX		= 1,
+	footprintZ		= 1,
+	height			= [[4]],
+	hitdensity		= [[100]],
+	metal			= 20,
+	object			= [[debris1x1b.s3o]],
+	reclaimable		= true,
+	reclaimTime		= 20,
+}
+
+local function GenerateModuleWrecks()
+	local moduleDefs = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+	for i=1,#moduleDefs do
+		local moduleDef = moduleDefs[i]
+		if (moduleDef.cost > 0) then
+			local wreck = CopyTable(baseModuleWreck, true)
+			local heap = CopyTable(baseModuleHeap, true)
+			wreck.description = moduleDef.humanName .. " Shards"
+			wreck.metal = moduleDef.cost * 0.4
+			wreck.reclaimtime = moduleDef.cost * 0.4
+			wreck.damage = moduleDef.cost * 2
+			wreck.name = "module_heap_" .. i
+			wreck.featuredead = "module_heap_" .. i
+			
+			FeatureDefs["module_heap_" .. i] = wreck
+			
+			heap.description = moduleDef.humanName .. " Fragments"
+			heap.metal = moduleDef.cost * 0.2
+			heap.reclaimtime = moduleDef.cost * 0.2
+			heap.damage = moduleDef.cost * 2
+			heap.name = "module_heap_" .. i
+			
+			FeatureDefs["module_heap_" .. i] = heap
+		end
+	end
+end
+
+GenerateModuleWrecks()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local mapEnergyMult   = .1  --Used to normalize map features to a mod-specific scale
 local mapMetalMult    = 1
 local mapReclaimMult  = 1

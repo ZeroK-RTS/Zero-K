@@ -322,7 +322,7 @@ end
 local chassisDefs = {
 	{
 		name = "recon",
-		baseUnitDef = UnitDefNames["dynrecon0"].id,
+		baseUnitDef = UnitDefNames and UnitDefNames["dynrecon0"].id,
 		levelDefs = {
 			{
 				morphBuildPower = 10,
@@ -370,7 +370,7 @@ local chassisDefs = {
 	},
 	{
 		name = "support",
-		baseUnitDef = UnitDefNames["dynsupport0"].id,
+		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
 		levelDefs = {
 			{
 				morphBuildPower = 10,
@@ -397,7 +397,7 @@ local chassisDefs = {
 	},
 	{
 		name = "assault",
-		baseUnitDef = UnitDefNames["dynassault0"].id,
+		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
 		levelDefs = {
 			{
 				morphBuildPower = 10,
@@ -425,8 +425,10 @@ local chassisDefs = {
 }
 
 local chassisDefByBaseDef = {}
-for i = 1, #chassisDefs do
-	chassisDefByBaseDef[chassisDefs[i].baseUnitDef] = i
+if UnitDefNames then
+	for i = 1, #chassisDefs do
+		chassisDefByBaseDef[chassisDefs[i].baseUnitDef] = i
+	end
 end
 
 local chassisDefNames = {}
@@ -484,36 +486,46 @@ for i = 1, #moduleDefs do
 	end
 end
 
-local function Split(s, separator)
-	local results = {}
-		for part in s:gmatch("[^"..separator.."]+") do
-			results[#results + 1] = part
-		end
-	return results
-end
+if UnitDefNames then
+	local function Split(s, separator)
+		local results = {}
+			for part in s:gmatch("[^"..separator.."]+") do
+				results[#results + 1] = part
+			end
+		return results
+	end
 
--- Create WeaponDefNames for each chassis
-for i = 1, #chassisDefs do
-	local data = chassisDefs[i]
-	local weapons = UnitDefs[data.baseUnitDef].weapons
-	local chassisDefWeaponNames = {}
-	for num = 1, #weapons do
-		local wd = WeaponDefs[weapons[num].weaponDef]
-		local nameSplit = Split(wd.name, "_") 
-		if #nameSplit > 1 then
-			chassisDefWeaponNames[nameSplit[2]] = {
-				num = num,
-				weaponDefID = weapons[num].weaponDef,
-				manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
-			}
-			if #nameSplit > 2 then
-				Spring.Echo("Don't put underscores in weapon module names!", wd.name)
+	-- Create WeaponDefNames for each chassis
+	for i = 1, #chassisDefs do
+		local data = chassisDefs[i]
+		local weapons = UnitDefs[data.baseUnitDef].weapons
+		local chassisDefWeaponNames = {}
+		for num = 1, #weapons do
+			local wd = WeaponDefs[weapons[num].weaponDef]
+			local nameSplit = Split(wd.name, "_") 
+			if #nameSplit > 1 then
+				chassisDefWeaponNames[nameSplit[2]] = {
+					num = num,
+					weaponDefID = weapons[num].weaponDef,
+					manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
+				}
+				if #nameSplit > 2 then
+					Spring.Echo("Don't put underscores in weapon module names!", wd.name)
+				end
 			end
 		end
+		data.weaponDefNames = chassisDefWeaponNames
 	end
-	data.weaponDefNames = chassisDefWeaponNames
-end
 
+	-- Add baseWreckID and baseHeapID
+	for i = 1, #chassisDefs do
+		local data = chassisDefs[i]
+		local wreckData = FeatureDefNames[UnitDefs[data.baseUnitDef].wreckName]
+
+		data.baseWreckID = wreckData.id
+		data.baseHeapID = wreckData.deathFeatureID
+	end
+end
 ------------------------------------------------------------------------
 -- Utility Functions
 ------------------------------------------------------------------------
