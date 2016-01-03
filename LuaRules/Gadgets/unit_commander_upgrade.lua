@@ -198,7 +198,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 		return false
 	end
 	
-	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisDefs[chassisDefID].baseUnitDef
+	local chassisData = chassisDefs[chassisDefID]
+	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local upgradeDef = {
 		level = 0,
@@ -207,8 +208,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 		name = commProfileInfo.name,
 		moduleList = {moduleDefNames.econ},
 		baseUnitDefID = baseUnitDefID,
-		baseWreckID = commProfileInfo.baseWreckID,
-		baseHeapID = commProfileInfo.baseHeapID,
+		baseWreckID = commProfileInfo.baseWreckID or chassisData.baseWreckID,
+		baseHeapID = commProfileInfo.baseHeapID or chassisData.baseHeapID,
 	}
 	
 	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)

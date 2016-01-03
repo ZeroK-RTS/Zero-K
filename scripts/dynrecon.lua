@@ -594,18 +594,40 @@ end
 local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
 local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
 
-local function SpawnModuleWreck(moduleDefID, wreckLevel, teamID, x, y, z, vx, vy, vz)
-	local featureDefID = FeatureDefNames[moduleWreckNamePrefix[wreckLevel] .. moduleDefID].id
+local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
+	local featureDefID = FeatureDefNames[moduleWreckNamePrefix[wreckLevel] .. moduleDefID]
+	if not featureDefID then
+		Spring.Echo("Cannot find module wreck", moduleWreckNamePrefix[wreckLevel] .. moduleDefID)
+		return
+	end
+	featureDefID = featureDefID.id
 	
 	local dir = math.random(2*math.pi)
 	local pitch = (math.random(2)^2 - 1)*math.pi/2
 	local heading = math.random(65536)
-	local mag = 30
+	local mag = 10 + math.random(10)*totalCount
 	local horScale = mag*math.cos(pitch)
 	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
 	
-	local featureID = Spring.CreateFeature(featureDefID, x, y, z, heading, teamID)
-	Spring.SetFeatureVelocity(featureID, vx, vy, vz)
+	local featureID = Spring.CreateFeature(featureDefID, x + vx, y, z + vz, heading, teamID)
+end
+
+local function SpawnModuleWrecks(wreckLevel)
+	local x, y, z, mx, my, mz = Spring.GetUnitPosition(unitID, true)
+	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
+	local teamID	= Spring.GetUnitTeam(unitID)
+	
+	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
+	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+	local totalCount = weaponCount + moduleCount
+	
+	for i = 1, weaponCount do
+		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i), wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
+	end
+	
+	for i = 1, moduleCount do
+		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
+	end
 end
 
 local function SpawnWreck(wreckLevel)
@@ -625,22 +647,6 @@ local function SpawnWreck(wreckLevel)
 			local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
 			Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
 		end
-	end
-end
-
-local function SpawnModuleWrecks(wreckLevel)
-	local _, _, _, mx, my, mz = Spring.GetUnitPosition(unitID, true)
-	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-	local teamID	= Spring.GetUnitTeam(unitID)
-	
-	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-	for i = 1, weaponCount do
-		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i), wreckLevel, teamID, mx, my, mz, vx, vy, vz)
-	end
-	
-	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
-	for i = 1, moduleCount do
-		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, teamID, mx, my, mz, vx, vy, vz)
 	end
 end
 

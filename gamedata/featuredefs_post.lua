@@ -22,7 +22,7 @@ local function isstring(x) return (type(x) == 'string')  end
 --------------------------------------------------------------------------------
 
 local baseModuleWreck = {
-	description		= [[Module Shards]],
+	description		= [[Module Wreck]],
 	blocking		= false,
 	category		 = [[heaps]],
 	damage			= 100,
@@ -32,13 +32,13 @@ local baseModuleWreck = {
 	height			= [[4]],
 	hitdensity		= [[100]],
 	metal			= 40,
-	object			= [[debris2x2c.s3o]],
+	object			= [[wreck2x2c.s3o]],
 	reclaimable		= true,
 	reclaimTime		= 40,
 }
 
 local baseModuleHeap = {
-	description		= [[Module Fragments]],
+	description		= [[Module Debris]],
 	blocking		= false,
 	category		= [[heaps]],
 	damage			= 50,
@@ -55,28 +55,26 @@ local baseModuleHeap = {
 
 local function GenerateModuleWrecks()
 	local moduleDefs = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
-	for i=1,#moduleDefs do
+	for i = 1, #moduleDefs do
 		local moduleDef = moduleDefs[i]
-		if (moduleDef.cost > 0) then
-			local wreck = CopyTable(baseModuleWreck, true)
-			local heap = CopyTable(baseModuleHeap, true)
-			wreck.description = moduleDef.humanName .. " Shards"
-			wreck.metal = moduleDef.cost * 0.4
-			wreck.reclaimtime = moduleDef.cost * 0.4
-			wreck.damage = moduleDef.cost * 2
-			wreck.name = "module_heap_" .. i
-			wreck.featuredead = "module_heap_" .. i
-			
-			FeatureDefs["module_heap_" .. i] = wreck
-			
-			heap.description = moduleDef.humanName .. " Fragments"
-			heap.metal = moduleDef.cost * 0.2
-			heap.reclaimtime = moduleDef.cost * 0.2
-			heap.damage = moduleDef.cost * 2
-			heap.name = "module_heap_" .. i
-			
-			FeatureDefs["module_heap_" .. i] = heap
-		end
+		local wreck = CopyTable(baseModuleWreck, true)
+		local heap = CopyTable(baseModuleHeap, true)
+		wreck.description = moduleDef.humanName .. " Shards"
+		wreck.metal = moduleDef.cost * 0.4
+		wreck.reclaimtime = moduleDef.cost * 0.4
+		wreck.damage = moduleDef.cost * 2
+		wreck.name = "module_wreck_" .. i
+		wreck.featuredead = "module_wreck_" .. i
+		
+		FeatureDefs["module_wreck_" .. i] = wreck
+		
+		heap.description = moduleDef.humanName .. " Fragments"
+		heap.metal = moduleDef.cost * 0.2
+		heap.reclaimtime = moduleDef.cost * 0.2
+		heap.damage = moduleDef.cost * 2
+		heap.name = "module_heap_" .. i
+		
+		FeatureDefs["module_heap_" .. i] = heap
 	end
 end
 
