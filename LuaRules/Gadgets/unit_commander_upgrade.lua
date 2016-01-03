@@ -299,7 +299,7 @@ local function Upgrades_CreateBrokenStarterDyncomm(dyncommID, x, y, z, facing, t
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if interallyCreatedUnit then
+	if interallyCreatedUnit or Spring.GetUnitRulesParam(unitID, "comm_level") then
 		return
 	end
 	if chassisDefByBaseDef[unitDefID] then
