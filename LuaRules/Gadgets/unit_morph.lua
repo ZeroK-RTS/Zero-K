@@ -415,7 +415,8 @@ local function FinishMorph(unitID, morphData)
 	--// copy cloak state
 	local wantCloakState = Spring.GetUnitRulesParam(unitID, "wantcloak")
 	--// copy shield power
-	local enabled,oldShieldState = Spring.GetUnitShieldState(unitID)
+	local shieldNum = Spring.GetUnitRulesParam(unitID, "comm_shield_num") or -1
+	local enabled, oldShieldCharge = Spring.GetUnitShieldState(unitID, shieldNum)
 	--//copy experience
 	local newXp = Spring.GetUnitExperience(unitID) 
 	local oldBuildTime = Spring.Utilities.GetUnitCost(unitID, unitDefID)
@@ -488,8 +489,8 @@ local function FinishMorph(unitID, morphData)
 	newXp = newXp * (oldBuildTime / Spring.Utilities.GetUnitCost(unitID, morphData.def.into))
 	Spring.SetUnitExperience(newUnit, newXp)
 	--// transfer shield power
-	if oldShieldState and Spring.GetUnitShieldState(newUnit) then
-		Spring.SetUnitShieldState(newUnit, enabled,oldShieldState)
+	if oldShieldState then
+		Spring.SetUnitShieldState(newUnit, shieldNum, oldShieldCharge)
 	end
 	
 	--//transfer some state

@@ -160,6 +160,65 @@ local moduleDefs = {
 			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
 		end
 	},
+	{
+		name = "radarjammer",
+		humanName = "Radar Jammer",
+		description = "Makes the Commander and nearby units invisible to radar.",
+		image = "unitpics/module_jammer.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.cloakFieldRange then
+				sharedData.radarJammingRange = 500
+			end
+		end
+	},
+	{
+		name = "radar",
+		humanName = "Field Radar",
+		description = "Attaches a basic radar system to the Commander.",
+		image = "unitpics/module_fieldradar.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.radarRange = 1800
+		end
+	},
+	{
+		name = "personalcloak",
+		humanName = "Personal Cloak",
+		description = "A personal cloaking device for the Commander.",
+		image = "unitpics/module_personal_cloak.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.personalCloak = true
+		end
+	},
+	{
+		name = "areacloak",
+		humanName = "Cloaking Field",
+		description = "Cloaks all nearby units.",
+		image = "unitpics/module_cloak_field.png",
+		limit = 1,
+		cost = 100,
+		requireModules = {"radarjammer"},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.cloakFieldRange = 350
+			sharedData.radarJammingRange = 350
+		end
+	},
 	
 	-- Repeat Modules
 	{
@@ -229,6 +288,22 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.1
+		end
+	},
+	{
+		name = "buildpower",
+		humanName = "CarRepairer's Nanolathe",
+		description = "CarRepairer's Nanolathe, increases build power by 5. Limit 8",
+		image = "unitpics/module_adv_nano.png",
+		limit = 8,
+		cost = 40,
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.rangeMult = (sharedData.bonusBuildPower or 0) + 5
+			sharedData.metalIncome = (sharedData.metalIncome or 0) + 0.15
+			sharedData.energyIncome = (sharedData.energyIncome or 0) + 0.15
 		end
 	},
 }

@@ -96,15 +96,15 @@ for unitDefID,_ in pairs(hasSensorOrJamm) do
 	end
 end
 
-local function UpdateSensorAndJamm(unitID, unitDefID, enabled)
-	if radarUnitDef[unitDefID] then 
-		Spring.SetUnitSensorRadius(unitID, "radar", (enabled and radarUnitDef[unitDefID]) or 0)
+local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, sonarOverride, jammerOverride)
+	if radarUnitDef[unitDefID] or radarOverride then 
+		Spring.SetUnitSensorRadius(unitID, "radar", (enabled and (radarOverride or radarUnitDef[unitDefID])) or 0)
 	end
-	if sonarUnitDef[unitDefID] then 
-		Spring.SetUnitSensorRadius(unitID, "sonar", (enabled and sonarUnitDef[unitDefID]) or 0)
+	if sonarUnitDef[unitDefID] or sonarOverride then 
+		Spring.SetUnitSensorRadius(unitID, "sonar", (enabled and (sonarOverride or sonarUnitDef[unitDefID])) or 0)
 	end
-	if jammerUnitDef[unitDefID] then 
-		Spring.SetUnitSensorRadius(unitID, "radarJammer", (enabled and jammerUnitDef[unitDefID]) or 0)
+	if jammerUnitDef[unitDefID] or jammerOverride then 
+		Spring.SetUnitSensorRadius(unitID, "radarJammer", (enabled and (jammerOverride or jammerUnitDef[unitDefID])) or 0)
 	end
 end
 
@@ -452,17 +452,21 @@ function UpdateUnitAttributes(unitID, frame)
 		setNewState = true
 	end
 	
-	if ud.shieldWeaponDef and setNewState then
+	if ud.shieldWeaponDef and spGetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and setNewState then
 		if abilityDisabled then
-			Spring.SetUnitShieldState(unitID, -1, false)
+			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, false)
 		else
-			Spring.SetUnitShieldState(unitID, -1, true)
+			Spring.SetUnitShieldState(unitID, spGetUnitRulesParam(unitID, "comm_shield_num") or -1, true)
 		end
 	end
 	
-	if setNewState then
+	local radarOverride = spGetUnitRulesParam(unitID, "radarRangeOverride")
+	local sonarOverride = spGetUnitRulesParam(unitID, "sonarRangeOverride")
+	local jammerOverride = spGetUnitRulesParam(unitID, "jammingRangeOverride")
+	
+	if setNewState or radarOverride or sonarOverride or jammerOverride then
 		changedAtt = true
-		UpdateSensorAndJamm(unitID, udid, not abilityDisabled)
+		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride)
 	end
 
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (morphDisable == 1)

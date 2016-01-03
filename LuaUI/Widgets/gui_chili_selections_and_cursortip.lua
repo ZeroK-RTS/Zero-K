@@ -2047,6 +2047,8 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	
 	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
 	
+	local hasShield = Spring.GetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and stt_ud.shieldWeaponDef
+
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_selunit' },
@@ -2058,7 +2060,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
 			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
-			stt_ud.shieldWeaponDef and { name='shield', directcontrol = 'shield_selunit', } or {},
+			hasShield and { name='shield', directcontrol = 'shield_selunit', } or {},
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			
@@ -2533,15 +2535,16 @@ function widget:Update(dt)
 					nanobar:SetCaption('??? / ' .. numformat(stt_ud.buildSpeed))
 				end
 			end
-
+			
 			local shieldbar_stack = globalitems['shield_selunit']
 			local shieldbar = shieldbar_stack:GetChildByName('bar')
-			if shieldbar and stt_ud.shieldPower and (stt_ud.shieldPower > 0) then
-				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID)
+			local shieldPower = Spring.GetUnitRulesParam(stt_unitID, "comm_shield_max") or stt_ud.shieldPower
+			if shieldbar and shieldPower and (shieldPower > 0) then
+				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID, Spring.GetUnitRulesParam(stt_unitID, "comm_shield_num") or -1)
 				
-				shieldbar:SetValue((shieldCurrentPower or 0) / stt_ud.shieldPower,true)
+				shieldbar:SetValue((shieldCurrentPower or 0) / shieldPower,true)
 				if shieldEnabled then
-					shieldbar:SetCaption(round(shieldCurrentPower) .. ' / ' .. stt_ud.shieldPower)
+					shieldbar:SetCaption(math.floor(shieldCurrentPower) .. ' / ' .. shieldPower)
 				else
 					shieldbar:SetCaption('Shield offline')
 				end

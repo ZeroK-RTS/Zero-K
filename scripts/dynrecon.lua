@@ -487,6 +487,7 @@ function UpdateWeapons(w1, w2, sh, rangeMult)
 	-- shields
 	Spring.SetUnitShieldState(unitID, 2, false)
 	Spring.SetUnitShieldState(unitID, 3, false)
+	
 	if (shield) then
 		Spring.SetUnitShieldState(unitID, shield, true)
 	end

@@ -93,7 +93,14 @@ end
 local function ApplyModuleEffects(unitID, data)
 	if data.speedMult then
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
-		GG.UpdateUnitAttributes(unitID)
+	end
+	
+	if data.radarRange then
+		Spring.SetUnitRulesParam(unitID, "radarRangeOverride", data.radarRange, INLOS)
+	end
+	
+	if data.radarJammingRange then
+		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
 	end
 	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
@@ -105,8 +112,11 @@ local function ApplyModuleEffects(unitID, data)
 		Spring.SetUnitHealth(unitID, health + data.healthBonus)
 		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
-
+	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
+	
+	-- Do this all the time as it will be needed almost always.
+	GG.UpdateUnitAttributes(unitID)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
