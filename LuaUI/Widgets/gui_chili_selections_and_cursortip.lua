@@ -759,7 +759,7 @@ local function UpdateStaticGroupInfo()
 		ud = UnitDefs[defID]
 		if ud then
 			if ud.name ~= "terraunit" then
-				total_totalbp = total_totalbp + ud.buildSpeed
+				total_totalbp = total_totalbp + ud.buildSpeed * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 				total_maxhp = total_maxhp + select(2, Spring.GetUnitHealth(unitID))
 				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(unitID, defID)
 			end
@@ -2527,12 +2527,13 @@ function widget:Update(dt)
 			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
 				
-				if metalUse and stt_ud.buildSpeed and (stt_ud.buildSpeed > 0) then
-					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
-					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')
+				local buildSpeed = stt_ud.buildSpeed*(Spring.GetUnitRulesParam(stt_unitID, "buildpower_mult") or 1)
+				if metalUse and buildSpeed and (buildSpeed > 0) then
+					nanobar:SetValue(metalUse/buildSpeed,true)
+					nanobar:SetCaption(round(100*metalUse/buildSpeed)..'%')
 				else
 					nanobar:SetValue(1)
-					nanobar:SetCaption('??? / ' .. numformat(stt_ud.buildSpeed))
+					nanobar:SetCaption('??? / ' .. numformat(buildSpeed))
 				end
 			end
 			
