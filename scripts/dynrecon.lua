@@ -480,6 +480,8 @@ function UpdateWeapons(w1, w2, sh, rangeMult)
 	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
 	Spring.SetUnitMaxRange(unitID, maxRange)
 	
+	Spring.SetUnitRulesParam(unitID, "sightRangeOverride", math.max(500, math.min(600, maxRange*1.1)), INLOS)
+	
 	if otherRange then
 		Spring.SetUnitRulesParam(unitID, "secondary_range", otherRange, INLOS)
 	end

@@ -96,7 +96,7 @@ for unitDefID,_ in pairs(hasSensorOrJamm) do
 	end
 end
 
-local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, sonarOverride, jammerOverride)
+local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	if radarUnitDef[unitDefID] or radarOverride then 
 		Spring.SetUnitSensorRadius(unitID, "radar", (enabled and (radarOverride or radarUnitDef[unitDefID])) or 0)
 	end
@@ -105,6 +105,10 @@ local function UpdateSensorAndJamm(unitID, unitDefID, enabled, radarOverride, so
 	end
 	if jammerUnitDef[unitDefID] or jammerOverride then 
 		Spring.SetUnitSensorRadius(unitID, "radarJammer", (enabled and (jammerOverride or jammerUnitDef[unitDefID])) or 0)
+	end
+	if sightOverride then
+		Spring.SetUnitSensorRadius(unitID, "los", sightOverride)
+		Spring.SetUnitSensorRadius(unitID, "airLos", sightOverride)
 	end
 end
 
@@ -473,10 +477,11 @@ function UpdateUnitAttributes(unitID, frame)
 	local radarOverride = spGetUnitRulesParam(unitID, "radarRangeOverride")
 	local sonarOverride = spGetUnitRulesParam(unitID, "sonarRangeOverride")
 	local jammerOverride = spGetUnitRulesParam(unitID, "jammingRangeOverride")
+	local sightOverride = spGetUnitRulesParam(unitID, "sightRangeOverride")
 	
-	if setNewState or radarOverride or sonarOverride or jammerOverride then
+	if setNewState or radarOverride or sonarOverride or jammerOverride or sightOverride then
 		changedAtt = true
-		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride)
+		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 
 	local cloakBlocked = (spGetUnitRulesParam(unitID,"on_fire") == 1) or (disarmed == 1) or (morphDisable == 1)

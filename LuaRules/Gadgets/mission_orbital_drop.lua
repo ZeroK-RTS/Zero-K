@@ -90,8 +90,7 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, t
   if y < gy then 
     y = gy 
   end
-  --local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)) or Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
-  local unitID = GG.Upgrades_CreateBrokenStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+  local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)) or Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
  if not Spring.ValidUnitID(unitID) then
     Spring.Echo("Orbital Drop error: unitID from" .. unitDefName .." is invalid. No orbital drop for this unit.")
 	return
