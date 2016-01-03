@@ -301,7 +301,8 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.rangeMult = (sharedData.bonusBuildPower or 0) + 5
+			-- All comms have 10 BP in their unitDef (even support)
+			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 5
 			sharedData.metalIncome = (sharedData.metalIncome or 0) + 0.15
 			sharedData.energyIncome = (sharedData.energyIncome or 0) + 0.15
 		end

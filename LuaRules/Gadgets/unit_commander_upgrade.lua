@@ -104,11 +104,18 @@ local function ApplyModuleEffects(unitID, data)
 	end
 	
 	if data.personalCloak then
+		Spring.SetUnitCloak(unitID, false, data.decloakDistance)
+		Spring.SetUnitRulesParam(unitID, "comm_decloak_distance", data.decloakDistance, INLOS)
 		Spring.SetUnitRulesParam(unitID, "comm_personal_cloak", 1, INLOS)
 	end
 	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
 		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+	end
+	
+	if data.bonusBuildPower then
+		-- All comms have 10 BP in their unitDef (even support)
+		Spring.SetUnitRulesParam(unitID, "buildpower_mult", data.bonusBuildPower/10 + 1, INLOS)
 	end
 	
 	if data.healthBonus then
@@ -213,6 +220,24 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	}
 	
 	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)
+	
+	return unitID
+end
+
+local function Upgrades_CreateBrokenStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+	local chassisData = chassisDefs[1]
+	local upgradeDef = {
+		level = 0,
+		chassis = 1, 
+		totalCost = 1200,
+		name = "Bob",
+		moduleList = {moduleDefNames.econ},
+		baseUnitDefID = chassisData.baseUnitDef,
+		baseWreckID = chassisData.baseWreckID,
+		baseHeapID = chassisData.baseHeapID,
+	}
+	
+	local unitID = Upgrades_CreateUpgradedUnit(chassisData.baseUnitDef, x, y, z, facing, teamID, false, upgradeDef)
 	
 	return unitID
 end
@@ -373,7 +398,7 @@ end
 
 function gadget:Initialize()
 	GG.Upgrades_CreateUpgradedUnit         = Upgrades_CreateUpgradedUnit
-	GG.Upgrades_CreateStarterDyncomm       = Upgrades_CreateStarterDyncomm
+	GG.Upgrades_CreateBrokenStarterDyncomm       = Upgrades_CreateBrokenStarterDyncomm
 	GG.Upgrades_GetValidAndMorphAttributes = Upgrades_GetValidAndMorphAttributes
 	
 	-- load active units

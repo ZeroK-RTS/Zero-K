@@ -216,10 +216,10 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance)
 		if wantCloak == 1 then
 			local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
 			if cannotCloak ~= 1 then
-				SetUnitCloak(unitID, 1, false)
+				SetUnitCloak(unitID, 1, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
 			end
 		else
-			SetUnitCloak(unitID, 0, false)
+			SetUnitCloak(unitID, 0, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
 		end
 	end
 	SetUnitRulesParam(unitID, "areacloaked", (level and 1) or 0, alliedTrueTable)

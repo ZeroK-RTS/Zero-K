@@ -348,6 +348,7 @@ end
 -- UnitRulesParam Handling
 
 local currentEcon = {}
+local currentBuildpower = {}
 local currentReload = {}
 local currentMovement = {}
 local currentTurn = {}
@@ -361,7 +362,8 @@ local function removeUnit(unitID)
 	unitAbilityDisabled[unitID] = nil
 	unitReloadPaused[unitID] = nil
 	
-	currentEcon[unitID] = nil 
+	currentEcon[unitID] = nil
+	currentBuildpower[unitID] = nil
 	currentReload[unitID] = nil 
 	currentMovement[unitID] = nil 
 	currentTurn[unitID] = nil 
@@ -402,10 +404,13 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	-- SLOW --
 	local slowState = spGetUnitRulesParam(unitID,"slowState")
+	local buildpowerMult = spGetUnitRulesParam(unitID, "buildpower_mult")
 	
-	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
+	if selfReloadSpeedChange or selfMoveSpeedChange or slowState or buildpowerMult or
+			selfTurnSpeedChange or selfIncomeChange or disarmed or morphDisable or selfAccelerationChange then
 		local slowMult   = 1-(slowState or 0)
 		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
+		local buildMult  = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
 		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
@@ -415,6 +420,7 @@ function UpdateUnitAttributes(unitID, frame)
 		-- duplicating the pevious calculations.
 		spSetUnitRulesParam(unitID, "totalReloadSpeedChange", reloadMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalEconomyChange", econMult, INLOS_ACCESS)
+		spSetUnitRulesParam(unitID, "totalBuildPowerChange", buildMult, INLOS_ACCESS)
 		spSetUnitRulesParam(unitID, "totalMoveSpeedChange", moveMult, INLOS_ACCESS)
 		
 		unitSlowed[unitID] = moveMult < 1
@@ -430,8 +436,12 @@ function UpdateUnitAttributes(unitID, frame)
 			currentAcc[unitID] = maxAccMult
 		end
 		
+		if buildMult ~= currentBuildpower[unitID] then
+			updateBuildSpeed(unitID, ud, buildMult)
+			currentBuildpower[unitID] = buildMult
+		end
+		
 		if econMult ~= currentEcon[unitID] then
-			updateBuildSpeed(unitID, ud, econMult)
 			updateEconomy(unitID, ud, econMult)
 			currentEcon[unitID] = econMult
 		end
