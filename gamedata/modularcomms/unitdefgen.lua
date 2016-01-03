@@ -78,12 +78,15 @@ for commProfileID, commProfile in pairs(commData) do
 end
 
 local legacyToDyncommChassisMap = {
-	commrecon = "dynrecon",
-	commsupport = "dynsupport",
-	armcom = "dynassault",
-	corcom = "dynassault",
-	benzcom = "dynassault",
-	cremcom = "dynsupport",
+	commrecon = "recon",
+	commsupport = "support",
+	armcom = "assault",
+	corcom = "assault",
+	benzcom = "assault",
+	cremcom = "support",
+	recon = "recon",
+	support = "support",
+	assault = "assault",
 }
 
 local function GenerateLevel0DyncommsAndWrecks()
@@ -92,14 +95,14 @@ local function GenerateLevel0DyncommsAndWrecks()
 		local unitName = commProfile.baseUnitName
 		
 		local chassis = commProfile.chassis
-		local mappedChassis = legacyToDyncommChassisMap[chassis]
+		local mappedChassis = legacyToDyncommChassisMap[chassis] or "recon"
 		if mappedChassis then
 			chassis = mappedChassis
 		end
 		
-		UnitDefs[unitName] = CopyTable(UnitDefs[chassis.."1"], true)
+		UnitDefs[unitName] = CopyTable(UnitDefs["dyn" .. chassis .. "1"], true)
 		local ud = UnitDefs[unitName]
-		ud.name = commProfile.name .. " level 0"
+		ud.name = commProfile.name
 		
 		local features = ud.featuredefs or {}
 		for featureName,array in pairs(features) do

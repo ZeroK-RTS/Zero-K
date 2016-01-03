@@ -23,6 +23,18 @@ VFS.Include("LuaRules/Utilities/base64.lua", nil, VFSMODE)
 VFS.Include("LuaRules/Utilities/tablefunctions.lua", nil, VFSMODE)
 local CopyTable = Spring.Utilities.CopyTable
 
+local legacyToDyncommChassisMap = {
+	armcom = "assault",
+	corcom = "assault",
+	commrecon = "recon",
+	commsupport = "support",
+	benzcom = "assault",
+	cremcom = "support",
+	support = "support",
+	recon = "recon",
+	assault = "assault",
+}
+
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
@@ -36,6 +48,7 @@ local NUM_COMM_LEVELS = 5
 local commData = {}	-- { players = {[playerID1] = {profiles...}, [playerID2] = {profiles...}}, static = {[staticProfileID1] = {}} }
 local commProfilesByProfileID = {}
 local commProfileIDsByPlayerID = {}
+local profileIDByBaseDefID = {}
 
 local legacyModulesByUnitDefName = {}
 
@@ -44,19 +57,23 @@ local function LoadCommData()
 	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 	local commDataRaw = modOptions.commanders
 	local commDataFunc
+	local newCommData = {}
+	local newCommProfilesByProfileID = {}
+	local newCommProfileIDsByPlayerID = {}
+	local newProfileIDByBaseDefID = {}
 	if not (commDataRaw and type(commDataRaw) == 'string') then
 		err = "Comm data entry in modoption is empty or in invalid format"
-		commData = {}
+		newCommData = {}
 	else
 		commDataRaw = string.gsub(commDataRaw, '_', '=')
 		commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
 		--Spring.Echo(commDataRaw)
 		commDataFunc, err = loadstring("return "..commDataRaw)
 		if commDataFunc then
-			success, commProfilesByProfileID = pcall(commDataFunc)
+			success, newCommProfilesByProfileID = pcall(commDataFunc)
 			if not success then	-- execute Borat
-				err = commProfilesByProfileID
-				commProfilesByProfileID = {}
+				err = newCommProfilesByProfileID
+				newCommProfilesByProfileID = {}
 			end
 		end
 	end
@@ -67,7 +84,7 @@ local function LoadCommData()
 	-- comm player entries
 	local commProfilesForPlayers = {}	-- {[playerID1] = {}, [playerID2] = {}}
 	local players = Spring.GetPlayerList()
-	for i=1,#players do
+	for i = 1, #players do
 		local playerID = players[i]
 		local playerName, active, spectator, teamID, allyTeamID, _, _, country, rank, customKeys = Spring.GetPlayerInfo(playerID)
 		
@@ -93,11 +110,11 @@ local function LoadCommData()
 				Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
 			end
 			
-			commProfileIDsByPlayerID[playerID] = playerCommProfileIDs
+			newCommProfileIDsByPlayerID[playerID] = playerCommProfileIDs
 			local playerCommProfiles = {} 
 			for i=1,#playerCommProfileIDs do
 				local profileID = playerCommProfileIDs[i]
-				playerCommProfiles[profileID] = commProfilesByProfileID[profileID]
+				playerCommProfiles[profileID] = newCommProfilesByProfileID[profileID]
 			end
 			commProfilesForPlayers[playerID] = playerCommProfiles
 		end
@@ -110,26 +127,29 @@ local function LoadCommData()
 		local entry = Spring.Utilities.CopyTable(commDef, true)
 		entry.modules = entry.levels
 		entry.levels = nil
-		for level=1,#entry.modules do
+		for level = 1, #entry.modules do
 			entry.modules[level].cost = nil
 		end
 		morphableStaticComms[commProfileID] = entry
-		commProfilesByProfileID[commProfileID] = entry
+		newCommProfilesByProfileID[commProfileID] = entry
 	end
-	commData.players = commProfilesForPlayers
-	commData.static = morphableStaticComms
+	newCommData.players = commProfilesForPlayers
+	newCommData.static = morphableStaticComms
 	
-	for profileID, profile in pairs(commProfilesByProfileID) do
+	for profileID, profile in pairs(newCommProfilesByProfileID) do
 		-- MAKE SURE THIS MATCHES WHAT UNITDEFGEN SETS
 		profile.baseUnitDefID = UnitDefNames[profileID .. "_base"].id
 		profile.baseWreckID = FeatureDefNames[profileID .. "_base_dead"].id
 		profile.baseHeapID = FeatureDefNames[profileID .. "_base_heap"].id
+		newProfileIDByBaseDefID[profile.baseUnitDefID] = profileID
 	end
 	
-	--XG.commData = commData
-	--XG.commProfilesByProfileID = commProfilesByProfileID
+	-- Convert chassis to correct names.
+	for profileID, profile in pairs(newCommProfilesByProfileID) do
+		profile.chassis = legacyToDyncommChassisMap[profile.chassis]
+	end
 	
-	for i=1,#UnitDefs do
+	for i = 1, #UnitDefs do
 		if UnitDefs[i].customParams.modules then
 			local modulesRaw = {}
 			local modulesHuman = {}
@@ -143,6 +163,8 @@ local function LoadCommData()
 			legacyModulesByUnitDefName[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
 		end
 	end
+	
+	return newCommData, newCommProfilesByProfileID, newCommProfileIDsByPlayerID, newProfileIDByBaseDefID
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -153,6 +175,10 @@ end
 
 local function GetCommProfileInfo(commProfileID)
 	return commProfilesByProfileID[commProfileID]
+end
+
+local function GetProfileIDByBaseDefID(unitDefID)
+	return profileIDByBaseDefID[unitDefID]
 end
 
 local function GetPlayerCommProfiles(playerID, includeTrainers)
@@ -188,9 +214,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function Initialize()
-	LoadCommData()
+	commData, commProfilesByProfileID, commProfileIDsByPlayerID, profileIDByBaseDefID = LoadCommData()
 	XG.ModularCommAPI = {
 		GetPlayerCommProfiles = GetPlayerCommProfiles,
+		GetProfileIDByBaseDefID = GetProfileIDByBaseDefID,
 		GetLegacyModuleDefs = GetLegacyModuleDefs,
 		GetLegacyModulesForComm = GetLegacyModulesForComm,
 		GetCommProfileInfo = GetCommProfileInfo

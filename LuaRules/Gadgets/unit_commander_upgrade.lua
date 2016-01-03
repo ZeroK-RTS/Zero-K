@@ -27,14 +27,6 @@ local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseD
 include("LuaRules/Configs/customcmds.h.lua")
 
 -- FIXME: make this not needed
-local legacyToDyncommChassisMap = {
-	armcom = "assault",
-	corcom = "assault",
-	commrecon = "recon",
-	commsupport = "support",
-	benzcom = "assault",
-	cremcom = "support",
-}
 
 local commanderCloakShieldDef = {
 	energy = 15,
@@ -161,10 +153,7 @@ local function ApplyModuleEffects(unitID, data)
 	GG.UpdateUnitAttributes(unitID)
 end
 
-local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
-	-- Calculate Module effects
-	local chassisWeaponDefNames = chassisDefs[upgradeDef.chassis].weaponDefNames 
-	local moduleList = upgradeDef.moduleList
+local function GetModuleEffectsData(moduleList)
 	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
 	
 	local moduleEffectData = {}
@@ -174,6 +163,47 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 			moduleDef.applicationFunction(moduleByDefID, moduleEffectData)
 		end
 	end
+	return moduleEffectData
+end
+
+local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData)
+	-- This function sets the UnitRulesParams and updates the unit attributes after
+	-- a commander has been created. This can either happen internally due to a request
+	-- to spawn a commander or with rezz/construction/spawning.
+	if not moduleEffectData then
+		moduleEffectData = GetModuleEffectsData(moduleList)
+	end
+	
+	-- Start setting required unitRulesParams
+	Spring.SetUnitRulesParam(unitID, "comm_level",         level, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_chassis",       chassis, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_name",          name, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_cost",          totalCost, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
+	
+	Spring.SetUnitCosts(unitID, {
+		buildTime = totalCost,
+		metalCost = totalCost,
+		energyCost = totalCost
+	})
+	
+	-- Set module unitRulesParams
+	local counts = {module = 0, weapon = 0}
+	for i = 1, #moduleList do
+		local moduleDefID = moduleList[i]
+		SetUnitRulesModule(unitID, counts, moduleDefID)
+	end
+	SetUnitRulesModuleCounts(unitID, counts)
+	
+	ApplyModuleEffects(unitID, moduleEffectData)
+end
+
+local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
+	-- Calculate Module effects
+	local chassisWeaponDefNames = chassisDefs[upgradeDef.chassis].weaponDefNames 
+	local moduleEffectData = GetModuleEffectsData(upgradeDef.moduleList)
 	
 	-- Create Unit, set appropriate global data first
 	-- These variables are set such that other gadgets can notice the effect
@@ -206,38 +236,26 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		return false
 	end
 	
-	-- Start setting required unitRulesParams
-	local totalCost = upgradeDef.totalCost
-	Spring.SetUnitRulesParam(unitID, "comm_level", upgradeDef.level, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_chassis", upgradeDef.chassis, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_name", upgradeDef.name, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_cost", totalCost, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", upgradeDef.baseUnitDefID, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID", upgradeDef.baseWreckID, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID", upgradeDef.baseHeapID, INLOS)
+	InitializeDynamicCommander(
+		unitID,
+		upgradeDef.level, 
+		upgradeDef.chassis, 
+		upgradeDef.totalCost, 
+		upgradeDef.name, 
+		upgradeDef.baseUnitDefID, 
+		upgradeDef.baseWreckID, 
+		upgradeDef.baseHeapID, 
+		upgradeDef.moduleList, 
+		moduleEffectData
+	)
 	
-	Spring.SetUnitCosts(unitID, {
-		buildTime = totalCost,
-		metalCost = totalCost,
-		energyCost = totalCost
-	})
-	
-	-- Set module unitRulesParams
-	local counts = {module = 0, weapon = 0}
-	for i = 1, #moduleList do
-		local moduleDefID = moduleList[i]
-		SetUnitRulesModule(unitID, counts, moduleDefID)
-	end
-	SetUnitRulesModuleCounts(unitID, counts)
-	
-	ApplyModuleEffects(unitID, moduleEffectData)
 	return unitID
 end
 
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
-	local chassisDefID = chassisDefNames[legacyToDyncommChassisMap[commProfileInfo.chassis] or "recon"]
+	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	if not chassisDefID then
 		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis)
 		return false
@@ -281,26 +299,38 @@ local function Upgrades_CreateBrokenStarterDyncomm(dyncommID, x, y, z, facing, t
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-	if chassisDefByBaseDef[unitDefID] and not interallyCreatedUnit then
+	if interallyCreatedUnit then
+		return
+	end
+	if chassisDefByBaseDef[unitDefID] then
 		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
 		
-		Spring.SetUnitRulesParam(unitID, "comm_level", 0, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_chassis", chassisDefByBaseDef[unitDefID], INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_cost", 1200, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_name", "Guinea Pig", INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", unitDefID, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_baseWreckID", chassisData.baseWreckID, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_baseHeapID", chassisData.baseHeapID, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_module_count", 0, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_weapon_count", 0, INLOS)
-		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", 1)
-		
-		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
-		if onOffCmd then
-			Spring.RemoveUnitCmdDesc(unitID, onOffCmd)
-		end
-		
-		ApplyWeaponData(unitID, "peashooter")
+		InitializeDynamicCommander(
+			unitID,
+			0, 
+			chassisDefByBaseDef[unitDefID], 
+			1200, 
+			"Guinea Pig", 
+			unitDefID, 
+			chassisData.baseWreckID, 
+			chassisData.baseHeapID, 
+			{}
+		)
+	end
+	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
+	if profileID then
+		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
+		InitializeDynamicCommander(
+			unitID,
+			0, 
+			chassisDefNames[commProfileInfo.chassis], 
+			1200, 
+			commProfileInfo.name, 
+			unitDefID, 
+			commProfileInfo.baseWreckID, 
+			commProfileInfo.baseHeapID, 
+			{}
+		)
 	end
 end
 

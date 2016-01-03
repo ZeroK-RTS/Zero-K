@@ -331,6 +331,21 @@ local function GetNewReplacementSet(level, chassis, slotType, ignoreSlot)
 				end
 			end
 			
+			-- Check whether prohibited modules are present, not counting ignored slot
+			if accepted and data.prohibitingModules then
+				for j = 1, #data.prohibitingModules do
+					local prohibit = data.prohibitingModules[j]
+					if (alreadyOwnedModulesByDefID[prohibit] or 
+						(currentModulesByDefID[prohibit] and 
+							(currentModulesBySlot[ignoreSlot] ~= prohibit or 
+							currentModulesByDefID[prohibit] > 1))) then
+						
+						accepted = false
+						break
+					end
+				end
+			end
+			
 			-- Check against module limit, not counting ignored slot
 			if accepted and data.limit and (currentModulesByDefID[i] or alreadyOwnedModulesByDefID[i]) then
 				local count = (currentModulesByDefID[i] or 0) + (alreadyOwnedModulesByDefID[i] or 0) 

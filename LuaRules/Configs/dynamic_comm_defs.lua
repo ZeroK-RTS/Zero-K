@@ -466,15 +466,26 @@ for i = 1, #moduleDefs do
 	if data.requireModules then
 		local newRequire = {}
 		for j = 1, #data.requireModules do
-			for k = 1, #moduleDefs do
-				if moduleDefs[k].name == data.requireModules[j] then
-					newRequire[#newRequire + 1] = k
-					break
-				end
+			local reqModuleID = moduleDefNames[data.requireModules[j]]
+			if reqModuleID then
+				newRequire[#newRequire + 1] = reqModuleID
 			end
 		end
 		data.requireModules = newRequire
 	end
+	
+	-- Prohibiting modules are a list of moduleDefIDs too
+	if data.prohibitingModules then
+		local newProhibit = {}
+		for j = 1, #data.prohibitingModules do
+			local reqModuleID = moduleDefNames[data.prohibitingModules[j]]
+			if reqModuleID then
+				newProhibit[#newProhibit + 1] = reqModuleID
+			end
+		end
+		data.prohibitingModules = newProhibit
+	end
+	
 	
 	-- Required chassis is a map indexed by chassisDefID
 	if data.requireChassis then
@@ -551,6 +562,18 @@ local function ModuleIsValid(level, chassis, slotType, moduleDefID, alreadyOwned
 				return false
 			end
 		end
+	end
+	
+	-- Check that nothing prohibits this module
+	if data.prohibitingModules then
+		for j = 1, #data.prohibitingModules do
+			-- Modules cannot prohibit themselves otherwise this check makes no sense.
+			local probihitDefID = data.prohibitingModules[j]
+			if (alreadyOwned[probihitDefID] or (alreadyOwned2 and alreadyOwned2[probihitDefID])) then
+				return false
+			end
+		end
+	
 	end
 	
 	-- Check that the module limit is not reached
