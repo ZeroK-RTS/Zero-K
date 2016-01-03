@@ -33,9 +33,11 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 
 local NUM_COMM_LEVELS = 5
 
-local commData = {}	-- {players = {[playerID1] = {}, [playerID2] = {}}, static = {}}
+local commData = {}	-- { players = {[playerID1] = {profiles...}, [playerID2] = {profiles...}}, static = {[staticProfileID1] = {}} }
 local commProfilesByProfileID = {}
 local commProfileIDsByPlayerID = {}
+
+local legacyModulesByUnitDefName = {}
 
 local function LoadCommData()
 	-- comm profile definitions
@@ -127,7 +129,6 @@ local function LoadCommData()
 	--XG.commData = commData
 	--XG.commProfilesByProfileID = commProfilesByProfileID
 	
-	local commModulesByStaticComm = {}
 	for i=1,#UnitDefs do
 		if UnitDefs[i].customParams.modules then
 			local modulesRaw = {}
@@ -139,7 +140,7 @@ local function LoadCommData()
 				modulesRaw[i] = modulename
 				modulesHuman[i] = upgrades[modulename].name
 			end
-			commModulesByStaticComm[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
+			legacyModulesByUnitDefName[UnitDefs[i].name] = {raw = modulesRaw, human = modulesHuman}
 		end
 	end
 end
@@ -171,20 +172,18 @@ end
 
 -- TODO: use dynamic comm def data instead of the old stuff in gamedata
 -- returns the moduledef table
-local function GetCommUpgradeList()
+local function GetLegacyModuleDefs()
 	return upgrades
 end
 
---[[
-local function GetCommModules(unitDef, raw)
+local function GetLegacyModulesForComm(unitDef, raw)
 	if type(unitDef) == "number" then
 		unitDef = UnitDefs[unitDef].name
 	end
-	if commModulesByStaticComm[unitDef] then
-		return commModulesByStaticComm[unitDef][raw and "raw" or "human"]
+	if legacyModulesByUnitDefName[unitDef] then
+		return legacyModulesByUnitDefName[unitDef][raw and "raw" or "human"]
 	end
 end
-]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -192,8 +191,8 @@ local function Initialize()
 	LoadCommData()
 	XG.ModularCommAPI = {
 		GetPlayerCommProfiles = GetPlayerCommProfiles,
-		GetCommUpgradeList = GetCommUpgradeList,
-		--GetCommModules = GetCommModules,
+		GetLegacyModuleDefs = GetLegacyModuleDefs,
+		GetLegacyModulesForComm = GetLegacyModulesForComm,
 		GetCommProfileInfo = GetCommProfileInfo
 	}
 end

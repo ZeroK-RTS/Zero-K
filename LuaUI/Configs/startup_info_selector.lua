@@ -45,7 +45,7 @@ local colorModule = "\255\128\128\255"
 local function WriteTooltip(profileID)
 	local commData = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 	local str = ''
-	local upgrades = WG.ModularCommAPI.GetCommUpgradeList()
+	local upgrades = WG.ModularCommAPI.GetLegacyModuleDefs()
 	for i=1,#commData.modules do
 		str = str .. "\nLEVEL "..(i).. " (".."??".." metal)\n\tModules:"	-- TODO calculate metal cost
 		for j, modulename in pairs(commData.modules[i]) do

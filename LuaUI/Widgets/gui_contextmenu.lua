@@ -1141,7 +1141,7 @@ local function printWeapons(unitDef, unitID)
 	for i=1, #unitDef.weapons do
 		if not unitID or -- filter out commander weapons not in current loadout
 		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")
 		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_id")) then
 			local weapon = unitDef.weapons[i]
 			local weaponID = weapon.weaponDef
@@ -1246,6 +1246,13 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	local cost = numformat(ud.metalCost)
 	local health = numformat(ud.health)
 	local speed = numformat(ud.speed)
+	
+	-- stuff for modular commanders
+	local legacyModules, legacyCommCost
+	if ud.customParams.commtype and not isCommander then	-- old style pregenerated commander (still used in missions etc.)
+		legacyModules = WG.ModularCommAPI and WG.ModularCommAPI.GetLegacyModulesForComm(ud.id)
+		legacyCommCost = ud.customParams.cost -- or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
+	end
 
 	-- dynamic comms get special treatment
 	if isCommander then
@@ -1280,11 +1287,16 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 	end
 	
+	local costStr = cost .. " M"
+	if (legacyCommCost) then
+		costStr = costStr .. "(" .. legacyCommCost .. " M)"
+	end
+	
 	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = cost .. " M", textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = costStr, textColor = color.stats_fg, }
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'Health: ', textColor = color.stats_fg, }
 	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
@@ -1349,6 +1361,17 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
+	
+	if legacyModules then
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		for i=1, #legacyModules do
+			statschildren[#statschildren+1] = Label:New{ caption = legacyModules[i], textColor = color.stats_fg,}
+			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
+		end	
+	end
 
 	local cells = printAbilities(ud)
 	
@@ -1364,7 +1387,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		end
 	end
 
-	cells = printWeapons(ud, unitID)
+	cells = printWeapons(ud, isCommander and unitID)
 	
 	if cells and #cells > 0 then
 		
