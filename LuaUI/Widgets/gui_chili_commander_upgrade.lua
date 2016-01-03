@@ -523,8 +523,8 @@ local mainWindow, timeLabel, costLabel, morphBuildPower
 
 function UpdateMorphCost(newCost)
 	newCost = (newCost or 0) + morphBaseCost
-	costLabel:SetCaption("Cost: " .. math.floor(newCost) .. "m")
-	timeLabel:SetCaption("Time: " .. math.floor(newCost/morphBuildPower) .. "s")
+	costLabel:SetCaption(math.floor(newCost))
+	timeLabel:SetCaption(math.floor(newCost/morphBuildPower))
 end
 
 local function HideMainWindow()
@@ -584,28 +584,46 @@ local function CreateMainWindow()
 		centerItems = false,
 	}
 	
+	local cyan = {0,1,1,1}
+	
+	local timeImage = Image:New{
+		x = 15,
+		bottom  = 80,
+		file ='LuaUI/images/clock.png',
+		height = 24,
+		width = 24, 
+		keepAspect = true,
+	}
+	
 	timeLabel = Chili.Label:New{
-		x = 20,
+		x = 45,
 		right  = 0,
-		bottom  = 110,
-		height = 35,
-		valign = "center",
+		bottom  = 83,
+		valign = "top",
 		align  = "left",
-		caption = "Time:",
+		caption = 0,
 		autosize = false,
-		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		font    = {size = 24, outline = true, color = cyan, outlineWidth = 2, outlineWeight = 2},
+	}
+	
+	local costImage = Image:New{
+		x = 100,
+		bottom  = 80,
+		file ='LuaUI/images/cost.png',
+		height = 24,
+		width = 24, 
+		keepAspect = true,
 	}
 	
 	costLabel = Chili.Label:New{
-		x = 20,
+		x = 130,
 		right  = 0,
-		bottom  = 80,
-		height = 35,
-		valign = "center",
+		bottom  = 83,
+		valign = "top",
 		align  = "left",
-		caption = "Cost:",
+		caption = 0,
 		autosize = false,
-		font   = {size = 20, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
+		font     = {size = 24, outline = true, color = cyan, outlineWidth = 2, outlineWeight = 2},
 	}
 	
 	local acceptButton = Button:New{
@@ -697,7 +715,7 @@ local function CreateMainWindow()
 		bottom = 0,
 		padding = {0, 0, 0, 0},	
 		backgroundColor = {1, 1, 1, 0.8},
-		children = {topLabel, currentModuleList, timeLabel, costLabel, acceptButton, viewAlreadyOwnedButton, cancelButton}
+		children = {topLabel, currentModuleList, timeImage, timeLabel, costImage, costLabel, acceptButton, viewAlreadyOwnedButton, cancelButton}
 	}
 end
 

@@ -500,8 +500,6 @@ function script.AimWeapon(num, heading, pitch)
 		return true 
 	end
 	
-	local curWep
-	
 	if num == weapon1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
@@ -607,7 +605,7 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	local dir = math.random(2*math.pi)
 	local pitch = (math.random(2)^2 - 1)*math.pi/2
 	local heading = math.random(65536)
-	local mag = 10 + math.random(10)*totalCount
+	local mag = 20 + math.random(20)*totalCount
 	local horScale = mag*math.cos(pitch)
 	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
 	
