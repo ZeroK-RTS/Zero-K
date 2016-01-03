@@ -303,10 +303,22 @@ local cegs = {
         [3]  = 0.1,
       },
     },
+    bigredploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:napalmfireball_600_main]],
+        pos                = [[0 0 0]],
+      },
+    },
     redploom = {
       air                = true,
       class              = [[CExpGenSpawner]],
-      count              = 12,
+      count              = 4,
       ground             = true,
       water              = true,
       properties = {
@@ -481,11 +493,21 @@ local altforms = {
       },
     },
   },
+  napalmfireball_600_main = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.002   .5 .5 .5 0.010     .5 .5 .5 0.08    .4 .4 .4 0.06   0 0 0 0.003]],
+	    properties = {particlelife = 400, particlelifespread = 200, particlesize = 110, particlesizespread = 25,},
+      },
+    },
+  },
   napalmfireball_600_big = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {particlelife = 200, particlelifespread = 400, particlesize = 80, particlesizespread = 25,},
+		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
+	    properties = {particlelife = 200, particlelifespread = 400, particlesize = 60, particlesizespread = 25,},
       },
     },
   },
@@ -509,14 +531,14 @@ local altforms = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {
-	  airdrag            = 0.98,
-	  colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
-	  particlelife       = 500,	--minimum particle lifetime in frames
-	  particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
-	  particlespeed      = 0.6,
-	  particlespeedspread = 1.2,
-	},
+		properties = {
+		  airdrag            = 0.98,
+		  colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
+		  particlelife       = 500,	--minimum particle lifetime in frames
+		  particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
+		  particlespeed      = 0.6,
+		  particlespeedspread = 1.2,
+		},
       }
     }
   },
