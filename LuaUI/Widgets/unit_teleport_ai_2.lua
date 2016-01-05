@@ -331,7 +331,7 @@ function widget:GameFrame(n)
 								local transportSpeedMod = 1
 								local isTransport = listOfMobile[unitDefID][7]
 								if isTransport then
-									local newMass = spGetUnitRulesParam(unitID,"effectiveMass")
+									local newMass = spGetUnitRulesParam(unitID,"massOverride")
 									transportChargetime[unitID] = (newMass and math.floor(newMass*0.25)) or nil --Note: see cost calculation in unit_teleporter.lua (by googlefrog). Charge time is in frame (number of frame)
 									transportSpeedMod = spGetUnitRulesParam(unitID,"selfMoveSpeedChange") or 1 --see unit_transport_speed.lua
 								end

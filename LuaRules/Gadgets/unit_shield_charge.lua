@@ -56,15 +56,6 @@ for unitDefID = 1, #UnitDefs do
 	end
 end
 
-local commAreaShield = WeaponDefNames["dynrecon1_areashield"]
-
-local commAreaShieldDefID = {
-	maxCharge = commAreaShield.shieldPower,
-	perUpdateCost = PERIOD*tonumber(commAreaShield.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
-	chargePerUpdate = PERIOD*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
-	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
-}
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit Updating
@@ -156,7 +147,7 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		local def = shieldUnitDefID[unitDefID]
 		if commShieldID then
 			if WeaponDefs[commShieldID].customParams.commshieldid then
-				def = commAreaShieldDefID
+				def = select(3, GG.Upgrades_UnitShieldDef(unitID))
 			else
 				return
 			end

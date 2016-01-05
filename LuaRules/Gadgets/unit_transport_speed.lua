@@ -39,7 +39,7 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 	end
 	if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(transportID) then
 		local tudid = Spring.GetUnitDefID(transportID)
-		Spring.SetUnitRulesParam(transportID, "effectiveMass", mass[tudid])
+		Spring.SetUnitRulesParam(transportID, "massOverride", mass[tudid])
 		Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
 		GG.UpdateUnitAttributes(transportID)
 	end
@@ -49,9 +49,9 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 	if Spring.ValidUnitID(unitID) and Spring.ValidUnitID(transportID) then
 		local tudid = Spring.GetUnitDefID(transportID)
 		if tudid and unitDefID then
-			local effectiveMass = mass[tudid] + mass[unitDefID]
+			local effectiveMass = mass[tudid] + (Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID])
 			local speedFactor = math.min(1, 3 * mass[tudid]/(effectiveMass))
-			Spring.SetUnitRulesParam(transportID, "effectiveMass", effectiveMass)
+			Spring.SetUnitRulesParam(transportID, "massOverride", effectiveMass)
 			Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", speedFactor)
 			GG.UpdateUnitAttributes(transportID)
 			
@@ -65,7 +65,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		local transportID = inTransport[unitID]
 		if not Spring.GetUnitIsDead(transportID) then
 			local tudid = Spring.GetUnitDefID(transportID)
-			Spring.SetUnitRulesParam(transportID, "effectiveMass", mass[tudid])
+			Spring.SetUnitRulesParam(transportID, "massOverride", mass[tudid])
 			Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
 			GG.UpdateUnitAttributes(transportID)
 		end

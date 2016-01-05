@@ -24,6 +24,8 @@ if (not gadgetHandler:IsSyncedCode()) then
    return
 end
 
+include("LuaRules/Configs/constants.lua")
+
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
@@ -47,6 +49,16 @@ local commanderCloakShieldDef = {
 	selfCloak = true,
 	radiusException = {}
 }
+	
+local commAreaShield = WeaponDefNames["dynassault1_commweapon_areashield"]
+
+local commAreaShieldDefID = {
+	maxCharge = commAreaShield.shieldPower,
+	perUpdateCost = 2*tonumber(commAreaShield.customParams.shield_drain)/TEAM_SLOWUPDATE_RATE,
+	chargePerUpdate = 2*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
+	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
+}
+
 	
 for _, eud in pairs (UnitDefs) do
 	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
@@ -107,7 +119,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
 end
 
-local function ApplyModuleEffects(unitID, data)
+local function ApplyModuleEffects(unitID, data, totalCost)
 	if data.speedMult then
 		Spring.SetUnitRulesParam(unitID, "upgradesSpeedMult", data.speedMult, INLOS)
 	end
@@ -156,6 +168,10 @@ local function ApplyModuleEffects(unitID, data)
 	if data.skinOverride then
 		Spring.SetUnitRulesParam(unitID, "comm_texture", data.skinOverride, INLOS)
 	end
+	
+	local _, maxHealth = Spring.GetUnitHealth(unitID)
+	local effectiveMass = (((totalCost/2) + (maxHealth/8))^0.6)*6.5
+	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
 	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
 	
@@ -207,7 +223,7 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	end
 	SetUnitRulesModuleCounts(unitID, counts)
 	
-	ApplyModuleEffects(unitID, moduleEffectData)
+	ApplyModuleEffects(unitID, moduleEffectData, totalCost)
 end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
@@ -510,7 +526,10 @@ end
 --------------------------------------------------------------------------------
 
 function GG.Upgrades_UnitShieldDef(unitID)
-	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num")
+	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), 
+		unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num"), 
+		(unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) and commAreaShieldDefID
+		
 end
 
 function GG.Upgrades_UnitCanCloak(unitID)

@@ -496,7 +496,7 @@ function gadget:GameFrame(f)
 						local flying = isUnitFlying(tid)
 						if ud and not flying then
 
-							local mass = Spring.GetUnitRulesParam(teleportiee, "effectiveMass") or ud.mass
+							local mass = Spring.GetUnitRulesParam(teleportiee, "massOverride") or ud.mass
 
 							local cost = math.floor(mass*COST_FACTOR + math.random())
 							--Spring.Echo(cost/30)
