@@ -530,10 +530,9 @@ function widget:DrawWorldPreUnit()
 						  DrawUnitShapes(visibleAllySelUnits[teams[i]+1], {r,g,b,1})
 						end
 					end
-				else
+				elseif visibleAllySelUnits[1] then
 					DrawUnitShapes(visibleAllySelUnits[1], yellow)
 				end
-				-- DrawUnitShapes(visibleAllySelUnits, yellow)
 				DrawUnitShapes(hoverUnits, hoverColor)
 			end
 
