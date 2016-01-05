@@ -13,6 +13,7 @@ local weaponDef = {
 		--timeslow_preset       = [[module_disruptorbomb]],
 		timeslow_damagefactor = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		manualfire = 1,
 	},
 
 	damage                  = {

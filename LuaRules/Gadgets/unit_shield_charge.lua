@@ -143,14 +143,10 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	local commShieldID = GG.Upgrades_UnitShieldDef and select(1, GG.Upgrades_UnitShieldDef(unitID))
-	if (shieldUnitDefID[unitDefID] or commShieldID) and not unitMap[unitID] then
+	if ((shieldUnitDefID[unitDefID] and not UnitDefs[unitDefID].customParams.dynamic_comm) or commShieldID) and not unitMap[unitID] then
 		local def = shieldUnitDefID[unitDefID]
 		if commShieldID then
-			if WeaponDefs[commShieldID].customParams.commshieldid then
-				def = select(3, GG.Upgrades_UnitShieldDef(unitID))
-			else
-				return
-			end
+			def = select(3, GG.Upgrades_UnitShieldDef(unitID)) 
 		end
 		unitCount = unitCount + 1
 		

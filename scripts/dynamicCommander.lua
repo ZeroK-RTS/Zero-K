@@ -101,6 +101,7 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 		end
 		Spring.SetUnitWeaponState(unitID, w1.num, "range", range)
 	end
+	
 	if weapon2 and weapon2 ~= 0 then
 		isManual[weapon2] = w2.manualFire
 		local range = tonumber(WeaponDefs[w2.weaponDefID].range)*rangeMult

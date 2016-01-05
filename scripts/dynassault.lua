@@ -14,7 +14,7 @@ local HAS_BONUS_CANNON = pieceMap.bonuscannonflare and true or false
 local torso = piece 'torso' 
 
 local rcannon_flare= HAS_GATTLING and piece('rgattlingflare') or piece('rcannon_flare') 
-local barrels= HAS_GATTLING and piece 'barrels' or nil
+local barrels = HAS_GATTLING and piece 'barrels' or nil
 local lcannon_flare = HAS_BONUS_CANNON and piece('bonuscannonflare') or piece('lnanoflare')
 local lnanoflare = piece 'lnanoflare' 
 local lnanohand = piece 'lnanohand' 
@@ -281,14 +281,6 @@ end
 function script.QueryNanoPiece()
 	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),lnanoflare)
 	return lnanoflare
-end
-
-function script.Activate()
-	--spSetUnitShieldState(unitID, 2, true)
-end
-
-function script.Deactivate()
-	--spSetUnitShieldState(unitID, 2, false)
 end
 
 function script.Killed(recentDamage, maxHealth)

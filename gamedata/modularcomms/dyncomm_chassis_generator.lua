@@ -65,12 +65,10 @@ local chassisDefs = {
 }
 
 local statOverrides = {
-	-- For personal cloak
-	cloakcost           = 5,
-	cloakcostmoving     = 10, 
-	-- For jammer and cloaker toggling
-	onoffable           = true,
-	maxdamage           = 1235,
+	cloakcost       = 5, -- For personal cloak
+	cloakcostmoving = 10, 
+	onoffable       = true, -- For jammer and cloaker toggling
+	canManualFire   = true, -- For manualfire weapons.
 }
 
 for i = 1, #chassisDefs do

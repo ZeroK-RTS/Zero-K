@@ -104,8 +104,8 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_1", (weapon1 and weapon1.num) or 0, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_2", (weapon2 and weapon2.num) or 0, INLOS)
 	
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_1", (weapon1 and weapon1.manualFire) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_2", (weapon2 and weapon2.manualFire) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_1", (weapon1 and weapon1.manualFire and 1) or 0, INLOS)
+	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_2", (weapon2 and weapon2.manualFire and 1) or 0, INLOS)
 
 	if shield then
 		Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield.weaponDefID, INLOS)
@@ -534,10 +534,6 @@ end
 
 function GG.Upgrades_UnitCanCloak(unitID)
 	return unitCreatedCloak or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")
-end
-
-function GG.Upgrades_UnitCloakShieldDef(unitID)
-	return (unitCreatedCloakShield or Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) and commanderCloakShieldDef
 end
 
 function GG.Upgrades_UnitCloakShieldDef(unitID)

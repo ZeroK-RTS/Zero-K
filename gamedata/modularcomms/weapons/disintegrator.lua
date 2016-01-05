@@ -12,6 +12,7 @@ local weaponDef = {
 	customParams            = {
 		muzzleEffectShot = [[custom:ataalaser]],
 		slot = [[3]],
+		manualfire = 1,
 	},
 
 	damage                  = {

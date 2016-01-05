@@ -13,6 +13,7 @@ local weaponDef = {
 		setunitsonfire = "1",
 		burntime = [[90]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		manualfire = 1,
 
 		area_damage = 1,
 		area_damage_radius = 128,

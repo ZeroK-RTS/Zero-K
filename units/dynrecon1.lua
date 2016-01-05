@@ -21,7 +21,6 @@ unitDef = {
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
-  canManualFire       = true,
   category            = [[LAND]],
   commander           = true,
   collisionVolumeOffsets = [[0 0 0]],

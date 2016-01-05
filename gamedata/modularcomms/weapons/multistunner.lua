@@ -10,6 +10,7 @@ local weaponDef = {
 	customParams            = {
 		muzzleEffectFire = [[custom:YELLOW_LIGHTNING_MUZZLE]],
 		slot = [[3]],
+		manualfire = 1,
 	},
 
 	craterBoost             = 0,

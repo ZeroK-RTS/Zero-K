@@ -662,6 +662,19 @@ local chassisDefs = {
 						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
+				},
+			},
+			{
+				morphBuildPower = 15,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
@@ -672,12 +685,54 @@ local chassisDefs = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
 						slotType = "weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynrecon4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynrecon5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
@@ -695,6 +750,7 @@ local chassisDefs = {
 		name = "support",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
 		levelDefs = {
+			
 			{
 				morphBuildPower = 10,
 				morphBaseCost = 20,
@@ -707,11 +763,87 @@ local chassisDefs = {
 						slotType = "weapon",
 					},
 					{
-						defaultModule = moduleDefNames.bigHealth,
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 15,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynsupport2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 					{
-						defaultModule = moduleDefNames.health,
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynsupport3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotType = "weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynsupport4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynsupport5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 				},
@@ -734,11 +866,87 @@ local chassisDefs = {
 						slotType = "weapon",
 					},
 					{
-						defaultModule = moduleDefNames.bigHealth,
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 15,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 					{
-						defaultModule = moduleDefNames.health,
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotType = "weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+				},
+			},
+			{
+				morphBuildPower = 20,
+				morphBaseCost = 30,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotType = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
 						slotType = "module",
 					},
 				},

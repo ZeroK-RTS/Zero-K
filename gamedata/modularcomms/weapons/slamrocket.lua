@@ -17,6 +17,7 @@ local weaponDef = {
 	customParams            = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:SLAM_MUZZLE]],
+		manualfire = 1,
 	},
 	cylinderTargeting       = 1.0,
 
