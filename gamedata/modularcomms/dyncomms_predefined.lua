@@ -9,6 +9,7 @@ return {
 			{"speed"},
 			{"speed"},
 		},
+		decorations = {"skin_recon_dark"},
 	},
 	dyntrainer_support = {
 		name = "Support Trainer",
@@ -19,6 +20,7 @@ return {
 			{"personalcloak"},
 			{"health"},
 			{"buildpower"},
-		},       
+		},
+		decorations = {"skin_support_hotrod"},
 	},
 }

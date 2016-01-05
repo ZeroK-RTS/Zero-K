@@ -15,7 +15,13 @@ end
 
 --SYNCED
 if (not gadgetHandler:IsSyncedCode()) then
-   return false
+
+   function GG.Upgrades_GetUnitCustomShader(unitID)
+		local skinOverride = Spring.GetGameRulesParam("unitCreatedTexture")
+		return (skinOverride ~= 0 and skinOverride) or Spring.GetUnitRulesParam(unitID, "comm_texture")
+	end
+   
+   return
 end
 
 local INLOS = {inlos = true}
@@ -147,6 +153,10 @@ local function ApplyModuleEffects(unitID, data)
 		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
 	
+	if data.skinOverride then
+		Spring.SetUnitRulesParam(unitID, "comm_texture", data.skinOverride, INLOS)
+	end
+	
 	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
 	
 	-- Do this all the time as it will be needed almost always.
@@ -190,7 +200,7 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	})
 	
 	-- Set module unitRulesParams
-	local counts = {module = 0, weapon = 0}
+	local counts = {module = 0, weapon = 0, decoration = 0}
 	for i = 1, #moduleList do
 		local moduleDefID = moduleList[i]
 		SetUnitRulesModule(unitID, counts, moduleDefID)
@@ -221,6 +231,10 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedCloakShield = true
 	end
 	
+	if moduleEffectData.skinOverride then
+		Spring.SetGameRulesParam("unitCreatedTexture", moduleEffectData.skinOverride)
+	end
+	
 	interallyCreatedUnit = true
 	
 	local unitID = Spring.CreateUnit(defName, x, y, z, face, unitTeam, isBeingBuilt)
@@ -231,6 +245,10 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedShieldNum = nil
 	unitCreatedCloak = nil
 	unitCreatedCloakShield = nil
+	
+	if moduleEffectData.skinOverride then
+		Spring.SetGameRulesParam("unitCreatedTexture", 0)
+	end
 	
 	if not unitID then
 		return false
@@ -264,36 +282,29 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	local chassisData = chassisDefs[chassisDefID]
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
+	local moduleList = {moduleDefNames.econ}
+	
+	if commProfileInfo.decorations then
+		for i = 1, #commProfileInfo.decorations do
+			local decName = commProfileInfo.decorations[i]
+			if moduleDefNames[decName] then
+				moduleList[#moduleList + 1] = moduleDefNames[decName]
+			end
+		end
+	end
+	
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
 		totalCost = 1200,
 		name = commProfileInfo.name,
-		moduleList = {moduleDefNames.econ},
+		moduleList = moduleList,
 		baseUnitDefID = baseUnitDefID,
 		baseWreckID = commProfileInfo.baseWreckID or chassisData.baseWreckID,
 		baseHeapID = commProfileInfo.baseHeapID or chassisData.baseHeapID,
 	}
 	
 	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)
-	
-	return unitID
-end
-
-local function Upgrades_CreateBrokenStarterDyncomm(dyncommID, x, y, z, facing, teamID)
-	local chassisData = chassisDefs[1]
-	local upgradeDef = {
-		level = 0,
-		chassis = 1, 
-		totalCost = 1200,
-		name = "Bob",
-		moduleList = {moduleDefNames.econ},
-		baseUnitDefID = chassisData.baseUnitDef,
-		baseWreckID = chassisData.baseWreckID,
-		baseHeapID = chassisData.baseHeapID,
-	}
-	
-	local unitID = Upgrades_CreateUpgradedUnit(chassisData.baseUnitDef, x, y, z, facing, teamID, false, upgradeDef)
 	
 	return unitID
 end
@@ -320,6 +331,18 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if profileID then
 		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
+		
+		-- Add decorations
+		local moduleList = {}
+		if commProfileInfo.decorations then
+			for i = 1, #commProfileInfo.decorations do
+				local decName = commProfileInfo.decorations[i]
+				if moduleDefNames[decName] then
+					moduleList[#moduleList + 1] = moduleDefNames[decName]
+				end
+			end
+		end
+		
 		InitializeDynamicCommander(
 			unitID,
 			0, 
@@ -329,7 +352,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			unitDefID, 
 			commProfileInfo.baseWreckID, 
 			commProfileInfo.baseHeapID, 
-			{}
+			moduleList
 		)
 	end
 end
@@ -388,6 +411,9 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	table.sort(alreadyOwned)
 	table.sort(pAlreadyOwned)
 	
+	-- alreadyOwned does not contain decoration modules so pAlreadyOwned
+	-- should not contain decoration modules. The check fails if pAlreadyOwned
+	-- contains decorations.
 	if not upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, pAlreadyOwned) then
 		return false
 	end
@@ -421,6 +447,14 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		else
 			return false
 		end
+	end
+	
+	-- Add Decorations, they are modules but not part of the previous checks.
+	-- Assumed to be valid here because they cannot be added by this function.
+	local decCount = Spring.GetUnitRulesParam(unitID, "comm_decoration_count")
+	for i = 1, decCount do
+		local decoration = Spring.GetUnitRulesParam(unitID, "comm_decoration_" .. i)
+		fullModuleList[#fullModuleList + 1] = decoration
 	end
 	
 	-- The command is now known to be valid. Construct the morphDef.
@@ -472,6 +506,8 @@ end
 function GG.Upgrades_UnitCloakShieldDef(unitID)
 	return (unitCreatedCloakShield or Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) and commanderCloakShieldDef
 end
+
+-- GG.Upgrades_GetUnitCustomShader is up in unsynced
 
 function gadget:Initialize()
 	GG.Upgrades_CreateUpgradedUnit         = Upgrades_CreateUpgradedUnit

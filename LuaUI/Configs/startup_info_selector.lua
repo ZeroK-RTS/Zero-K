@@ -36,9 +36,9 @@ local chassisImages = {
 	benzcom = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 	cremcom = "LuaUI/Images/startup_info_selector/chassis_cremcom.png",
 	
-	dynrecon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
-	dynsupport = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
-	dynassault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
+	recon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
+	support = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
+	assault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
 }
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")

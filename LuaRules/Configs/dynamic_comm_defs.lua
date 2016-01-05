@@ -1,3 +1,6 @@
+
+local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
+
 ------------------------------------------------------------------------
 -- Module Definitions
 ------------------------------------------------------------------------
@@ -311,7 +314,42 @@ local moduleDefs = {
 			sharedData.energyIncome = (sharedData.energyIncome or 0) + 0.15
 		end
 	},
+	
+	-- Decorative Modules
+	{
+		name = "clan_banner",
+		humanName = "Clan Banner",
+		description = "Clan Banner",
+		image = "unitpics/module_ablative_armor.png",
+		limit = 1,
+		cost = 0,
+		requireChassis = {},
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "decoration",
+		applicationFunction = function (modules, sharedData)
+			sharedData.skinOverride = "bla"
+		end
+	}
 }
+
+for name, data in pairs(skinDefs) do
+	moduleDefs[#moduleDefs + 1] = {
+		name = "skin_" .. name,
+		humanName = data.humanName,
+		description = data.humanName,
+		image = "unitpics/module_ablative_armor.png",
+		limit = 1,
+		cost = 0,
+		requireChassis = {data.chassis},
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "decoration",
+		applicationFunction = function (modules, sharedData)
+			sharedData.skinOverride = name
+		end
+	}
+end
 
 local moduleDefNames = {}
 for i = 1, #moduleDefs do
