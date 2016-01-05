@@ -104,7 +104,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
 end
 
 local function ApplyModuleEffects(unitID, data)

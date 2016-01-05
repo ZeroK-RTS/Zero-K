@@ -1,7 +1,7 @@
 include "constants.lua"
 include "JumpRetreat.lua"
 
-local spSetUnitShieldState = Spring.SetUnitShieldState
+dyncomm = include('dynamicCommander.lua')
 
 --------------------------------------------------------------------------------
 -- pieces
@@ -38,8 +38,6 @@ local grenade = piece 'grenade'
 
 local smokePiece = {torso}
 local nanoPieces = {nanospray}
-
-local INLOS = {inlos = true}
 
 --------------------------------------------------------------------------------
 -- constants
@@ -300,14 +298,8 @@ local function MotionControl(moving, aiming, justmoved)
 	end
 end
 
-local dgunTable
-
 function script.Create()
-
-	-- copy the dgun command table because we sometimes need to reinsert it
-	local cmdID = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
-	dgunTable = Spring.GetUnitCmdDescs(unitID, cmdID)[1]
-
+	dyncomm.Create()
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring at -45
 	Turn(ruparm, x_axis, 0, math.rad(250)) 
@@ -338,26 +330,6 @@ function script.Create()
 	StartThread(RestoreAfterDelay)
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	
-	if Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") then
-		UpdateWeapons(
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1"),
-				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_1"),
-			},
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2"),
-				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_2"),
-			},
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_shield_id"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_shield_num"),
-			},
-			Spring.GetUnitRulesParam(unitID, "comm_range_mult")
-		)
-	end
 end
 
 function script.StartMoving()
@@ -423,94 +395,31 @@ local function AimRifle(heading, pitch, isDgun)
 	WaitForTurn(armhold, x_axis)
 	WaitForTurn(lloarm, z_axis)
 	StartThread(RestoreAfterDelay)
-	if isDgun then dgunning = false end	
+	
+	if isDgun then 
+		dgunning = false 
+	end	
 	return true
 end
 
-local isManual = {}
-
-local weapon1
-local weapon2
-local shield
-
-function UpdateWeapons(w1, w2, sh, rangeMult)
-	weapon1 = w1 and w1.num
-	weapon2 = w2 and w2.num
-	shield  = sh and sh.num
-	
-	local hasManualFire = (w1 and w1.manualFire) or (w2 and w2.manualFire)
-	local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
-	if not hasManualFire and cmdDesc then
-		Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
-	elseif hasManualFire and not cmdDesc then
-		cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.ATTACK) + 1 -- insert after attack so that it appears in the correct spot in the menu
-		Spring.InsertUnitCmdDesc(unitID, cmdDesc, dgunTable)
-	end
-
-	local maxRange = 0
-	local otherRange = false
-	if w1 then
-		isManual[weapon1] = w1.manualFire
-		local range = tonumber(WeaponDefs[w1.weaponDefID].range)*rangeMult
-		if w1.manualFire then
-			otherRange = range
-		else
-			maxRange = range
-		end
-		Spring.SetUnitWeaponState(unitID, w1.num, "range", range)
-	end
-	if w2 then
-		isManual[weapon2] = w2.manualFire
-		local range = tonumber(WeaponDefs[w2.weaponDefID].range)*rangeMult
-		if maxRange then
-			if w2.manualFire then
-				otherRange = range
-			elseif range > maxRange then
-				otherRange = maxRange
-				maxRange = range
-			elseif range < maxRange then
-				otherRange = range
-			end
-		else
-			maxRange = range
-		end
-		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
-	end
-	
-	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
-	Spring.SetUnitMaxRange(unitID, maxRange)
-	
-	Spring.SetUnitRulesParam(unitID, "sightRangeOverride", math.max(500, math.min(600, maxRange*1.1)), INLOS)
-	
-	if otherRange then
-		Spring.SetUnitRulesParam(unitID, "secondary_range", otherRange, INLOS)
-	end
-	
-	-- shields
-	Spring.SetUnitShieldState(unitID, 2, false)
-	Spring.SetUnitShieldState(unitID, 3, false)
-	
-	if (shield) then
-		Spring.SetUnitShieldState(unitID, shield, true)
-	end
-end
-
 function script.AimWeapon(num, heading, pitch)
-	if num == shield then 
+	local weaponNum = dyncomm.GetWeapon(num)
+	
+	if weaponNum == 3 then -- shield
 		return true 
 	end
 	
-	if num == weapon1 then
+	if weaponNum == 1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
-	elseif num == weapon2 then
+	elseif weaponNum == 2 then
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
 	else
 		return false
 	end
 
-	return AimRifle(heading, pitch, isManual[num])	
+	return AimRifle(heading, pitch, dyncomm.IsManualFire(num))	
 end
 
 function script.Activate()
@@ -521,11 +430,14 @@ function script.Deactivate()
 	--spSetUnitShieldState(unitID, false)
 end
 
+local weaponFlares = {
+	[1] = flare,
+	[2] = flare,
+	[3] = pelvis,
+}
+
 function script.QueryWeapon(num)
-	if num == shield or not weapon1 then
-		return pelvis
-	end
-	return flare
+	return weaponFlares[dyncomm.GetWeapon(num) or flare]
 end
 
 function script.FireWeapon(num)
@@ -591,71 +503,12 @@ function script.QueryNanoPiece()
 	return nanospray
 end
 
-local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
-local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
-
-local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
-	local featureDefID = FeatureDefNames[moduleWreckNamePrefix[wreckLevel] .. moduleDefID]
-	if not featureDefID then
-		Spring.Echo("Cannot find module wreck", moduleWreckNamePrefix[wreckLevel] .. moduleDefID)
-		return
-	end
-	featureDefID = featureDefID.id
-	
-	local dir = math.random(2*math.pi)
-	local pitch = (math.random(2)^2 - 1)*math.pi/2
-	local heading = math.random(65536)
-	local mag = 20 + math.random(20)*totalCount
-	local horScale = mag*math.cos(pitch)
-	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
-	
-	local featureID = Spring.CreateFeature(featureDefID, x + vx, y, z + vz, heading, teamID)
-end
-
-local function SpawnModuleWrecks(wreckLevel)
-	local x, y, z, mx, my, mz = Spring.GetUnitPosition(unitID, true)
-	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-	local teamID	= Spring.GetUnitTeam(unitID)
-	
-	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
-	local totalCount = weaponCount + moduleCount
-	
-	for i = 1, weaponCount do
-		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i), wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
-	end
-	
-	for i = 1, moduleCount do
-		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, totalCount, teamID, x, y, z, vx, vy, vz)
-	end
-end
-
-local function SpawnWreck(wreckLevel)
-	local makeRezzable = (wreckLevel == 1)
-	local wreckDef = FeatureDefs[Spring.GetUnitRulesParam(unitID, commWreckUnitRulesParam[wreckLevel])]
-	
-	local x, y, z = Spring.GetUnitPosition(unitID)
-	
-	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
-	
-	if (wreckDef) then
-		local heading   = Spring.GetUnitHeading(unitID)
-		local teamID	= Spring.GetUnitTeam(unitID)
-		local featureID = Spring.CreateFeature(wreckDef.id, x, y, z, heading, teamID)
-		Spring.SetFeatureVelocity(featureID, vx, vy, vz)
-		if makeRezzable then
-			local baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID") or unitDefID
-			Spring.SetFeatureResurrect(featureID, UnitDefs[baseUnitDefID].name)
-		end
-	end
-end
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
 --	Turn(turret, y_axis, 0, math.rad(500))
 	if severity <= 0.5 and not inJumpMode then
-		SpawnModuleWrecks(1)
+		dyncomm.SpawnModuleWrecks(1)
 		Turn(base, x_axis, math.rad(80), math.rad(80))
 		Turn(turret, x_axis, math.rad(-16), math.rad(50))
 		Turn(turret, y_axis, 0, math.rad(90))
@@ -676,9 +529,9 @@ function script.Killed(recentDamage, maxHealth)
 		--StartThread(burn)
 		--Sleep((1000 * rand (2, 5))) 
 		Sleep(100)
-		SpawnWreck(1)
+		dyncomm.SpawnWreck(1)
 	elseif severity <= 0.5 then
-		SpawnModuleWrecks(1)
+		dyncomm.SpawnModuleWrecks(1)
 		Explode(gun,	sfxFall + sfxSmoke + sfxExplode)
 		Explode(head, sfxFire + sfxExplode)
 		Explode(pelvis, sfxFire + sfxExplode)
@@ -691,9 +544,9 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
-		SpawnWreck(1)
+		dyncomm.SpawnWreck(1)
 	else
-		SpawnModuleWrecks(2)
+		dyncomm.SpawnModuleWrecks(2)
 		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(pelvis, sfxFall + sfxFire + sfxSmoke + sfxExplode)
@@ -706,7 +559,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
-		SpawnWreck(2)
+		dyncomm.SpawnWreck(2)
 	end
 end
 
