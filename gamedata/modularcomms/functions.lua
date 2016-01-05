@@ -19,6 +19,38 @@ mapWeaponToCEG = {
 	[5] = {1,2},
 }
 
+
+function DynamicApplyWeapon(unitDef, weapon, replace, slot)
+	weapons[weapon].customparams = weapons[weapon].customparams or {}
+	local wcp = weapons[weapon].customparams
+	
+	Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
+	
+	unitDef.weapons = unitDef.weapons or {}
+	unitDef.weapondefs = unitDef.weapondefs or {}
+	
+	unitDef.weapons[slot] = {
+		def = weapon,
+		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
+		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
+	}
+	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
+
+	-- upgrade by level -- no longer used
+	local wd = unitDef.weapondefs[weapon]
+
+	-- add CEGs
+	unitDef.sfxtypes = unitDef.sfxtypes or {}
+	unitDef.sfxtypes.explosiongenerators = unitDef.sfxtypes.explosiongenerators or {}
+	
+	unitDef.sfxtypes.explosiongenerators[6 + slot*2] = wcp.muzzleeffectfire or [[custom:NONE]]
+	unitDef.sfxtypes.explosiongenerators[6 + slot*2] = wcp.muzzleeffectshot or [[custom:NONE]]
+	
+	if (not isDgun) and not (dualwield or replace) then
+		unitDef.customparams.alreadyhasweapon = true
+	end
+end
+
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
@@ -35,6 +67,9 @@ function ApplyWeapon(unitDef, weapon, replace, forceslot)
 	slot = forceslot or slot
 	
 	--Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
+	
+	unitDef.weapons = unitDef.weapons or {}
+	unitDef.weapondefs = unitDef.weapondefs or {}
 	
 	unitDef.weapons[slot] = {
 		def = weapon,

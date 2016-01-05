@@ -1,5 +1,7 @@
 include "constants.lua"
 
+dyncomm = include('dynamicCommander.lua')
+
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
 --------------------------------------------------------------------------------
@@ -76,18 +78,15 @@ local RESTORE_DELAY_DGUN = 2500
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local isMoving, isLasering, isDgunning, gunLockOut, shieldOn = false, false, false, false, true
+local isMoving, isLasering, isDgunning, gunLockOut = false, false, false, false
 local restoreHeading, restorePitch = 0, 0
 
-local flamers = {}
 local starBLaunchers = {}
 local wepTable = UnitDefs[unitDefID].weapons
 wepTable.n = nil
 for index, weapon in pairs(wepTable) do
 	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" then
-		flamers[index] = true
-	elseif weaponDef.type == "StarburstLauncher" then
+	if weaponDef.type == "StarburstLauncher" then
 		starBLaunchers[index] = true
 		--Spring.Echo("sbl found")
 	end
@@ -147,6 +146,7 @@ end
 
 
 function script.Create()
+	dyncomm.Create()
 	Hide(rcannon_flare)
 	Hide(lnanoflare)
 	
@@ -200,9 +200,9 @@ local function RestoreDGun()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	local weaponNum = dyncomm.GetWeapon(num)
 
-
-	if num >= 5 then
+	if weaponNum == 1 then
 		Signal(SIG_LASER)
 		SetSignalMask(SIG_LASER)
 		isLasering = true
@@ -213,7 +213,7 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreLaser)
 		return true
-	elseif num == 3 then
+	elseif weaponNum == 2 then
 		if starBLaunchers[num] then
 			pitch = ARM_PERPENDICULAR
 		end
@@ -227,31 +227,27 @@ function script.AimWeapon(num, heading, pitch)
 		WaitForTurn(rarm, x_axis)
 		StartThread(RestoreDGun)
 		return true
-	elseif num == 2 or num == 4 then
-		Sleep(100)
-		return (shieldOn)
+	elseif weaponNum == 3 then
+		return true
 	end
 	return false
 end
 
 function script.FireWeapon(num)
-
-	if num == 5 then
-		EmitSfx(rcannon_flare, 1024)
-	elseif num == 3 then
-		EmitSfx(lcannon_flare, 1026)
+	local weaponNum = dyncomm.GetWeapon(num)
+	if weaponNum == 1 then
+		dyncomm.EmitWeaponFireSfx(rcannon_flare, num)
+	elseif weaponNum == 2 then
+		dyncomm.EmitWeaponFireSfx(lcannon_flare, num)
 	end
-
 end
 
 function script.Shot(num)
-	if num == 5 then
-		EmitSfx(rcannon_flare, 1025)
-	elseif num == 3 then
-		EmitSfx(lcannon_flare, 1027)
-	end
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
+	local weaponNum = dyncomm.GetWeapon(num)
+	if weaponNum == 1 then
+		dyncomm.EmitWeaponShotSfx(rcannon_flare, num)
+	elseif weaponNum == 2 then
+		dyncomm.EmitWeaponShotSfx(lcannon_flare, num)
 	end
 end
 
@@ -260,12 +256,12 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 3 then 
+	if dyncomm.GetWeapon(num) == 1 then 
+		return rcannon_flare
+	elseif dyncomm.GetWeapon(num) == 2 then 
 		return lcannon_flare
-	elseif num == 2 or num == 4 then
-		return torso
 	end
-	return rcannon_flare
+	return torso
 end
 
 function script.StopBuilding()
@@ -308,7 +304,8 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rhand, sfxNone)
 		Explode(lleg, sfxNone)
 		Explode(rleg, sfxNone)
-		return 1
+		dyncomm.SpawnModuleWrecks(1)
+		dyncomm.SpawnWreck(1)
 	else
 		Explode(torso, sfxShatter)
 		Explode(larm, sfxSmoke + sfxFire + sfxExplode)
@@ -320,6 +317,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rhand, sfxSmoke + sfxFire + sfxExplode)
 		Explode(lleg, sfxShatter)
 		Explode(rleg, sfxShatter)
-		return 2
+		dyncomm.SpawnModuleWrecks(2)
+		dyncomm.SpawnWreck(2)
 	end
 end

@@ -724,8 +724,8 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 		CreateMainWindow()
 	end
 	
-	morphBuildPower = chassisDefs[chassis].levelDefs[level+1].morphBuildPower
-	morphBaseCost = chassisDefs[chassis].levelDefs[level+1].morphBaseCost
+	morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
+	morphBaseCost = chassisDefs[chassis].levelDefs[level].morphBaseCost
 
 	if not mainWindowShown then
 		screen0:AddChild(mainWindow)
@@ -867,7 +867,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 	
 	-- Create the window
 	windowOpen = true
-	ShowModuleListWindow(slotDefs, slotDefaults, level, chassis, alreadyOwned)
+	ShowModuleListWindow(slotDefs, slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)

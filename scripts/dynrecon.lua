@@ -50,16 +50,6 @@ local SIG_AIM_2 = 4
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local flamers = {}
-local wepTable = UnitDefs[unitDefID].weapons
-wepTable.n = nil
-for index, weapon in pairs(wepTable) do
-	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	end
-end
-
 local restoreHeading, restorePitch = 0, 0
 
 wepTable = nil
@@ -264,6 +254,18 @@ local function Walk()
 end
 
 local function MotionControl(moving, aiming, justmoved)
+	--for i = 1024, 1050 do
+	--	Spring.Echo("Weapon", i)
+	--	for j = 1, 20 do
+	--		EmitSfx(flare, i)
+	--		Sleep (100)
+	--	end
+	--end
+	--for i = 1, 20 do
+	--	local reloadTime = Spring.GetUnitWeaponState(unitID, i, "reloadTime")
+	--	Spring.Echo("Weapon reload time", i, reloadTime)
+	--end
+	
 	justmoved = true
 	while true do
 		moving = bMoving
@@ -441,14 +443,11 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
-	EmitSfx(flare, 1024)
+	dyncomm.EmitWeaponFireSfx(flare, num)
 end
 
 function script.Shot(num)
-	EmitSfx(flare, 1025)
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
-	end	
+	dyncomm.EmitWeaponShotSfx(flare, num)
 end
 
 local function JumpExhaust()

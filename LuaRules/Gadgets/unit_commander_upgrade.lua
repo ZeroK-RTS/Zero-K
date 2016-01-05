@@ -73,12 +73,12 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	local chassisDefID = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames 
 	
-	weapon1 = chassisWeaponDefNames[weapon1 or "peashooter"]
+	weapon1 = chassisWeaponDefNames[weapon1 or "commweapon_peashooter"]
 	
 	if weapon2 then
 		weapon2 = chassisWeaponDefNames[weapon2]
 	elseif Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
-		weapon2 = chassisWeaponDefNames["peashooter"]
+		weapon2 = chassisWeaponDefNames["commweapon_peashooter"]
 	end
 	
 	shield = shield and chassisWeaponDefNames[shield]
@@ -394,6 +394,8 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		return false
 	end
 	
+	local newLevel = level + 1
+	
 	-- Determine what the command thinks the unit already owns
 	local index = 5
 	local pAlreadyOwned = {}
@@ -448,13 +450,13 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local modulesByDefID = upgradeUtilities.ModuleListToByDefID(fullModuleList)
 	
 	-- Determine Cost and check that the new modules are valid.
-	local levelDefs = chassisDefs[chassis].levelDefs[level+1]
+	local levelDefs = chassisDefs[chassis].levelDefs[newLevel]
 	local slotDefs = levelDefs.upgradeSlots
 	local cost = 0
 	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
-		if upgradeUtilities.ModuleIsValid(level, chassis, slotDefs[i].slotType, moduleDefID, modulesByDefID) then
+		if upgradeUtilities.ModuleIsValid(newLevel, chassis, slotDefs[i].slotType, moduleDefID, modulesByDefID) then
 			cost = cost + moduleDefs[moduleDefID].cost
 		else
 			return false
@@ -480,7 +482,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 		upgradeDef = {
 			name = Spring.GetUnitRulesParam(unitID, "comm_name"),
 			totalCost = cost + Spring.Utilities.GetUnitCost(unitID),
-			level = level + 1,
+			level = newLevel,
 			chassis = chassis,
 			moduleList = fullModuleList,
 			baseUnitDefID = Spring.GetUnitRulesParam(unitID, "comm_baseUnitDefID"),

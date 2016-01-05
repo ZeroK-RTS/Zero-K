@@ -30,12 +30,14 @@ Spring.Log = Spring.Log or function() end
 --	Weapon 6: unused
 --------------------------------------------------------------------------------
 
+VFS.Include("gamedata/modularcomms/moduledefs.lua")
+
+VFS.Include("gamedata/modularcomms/dyncomm_chassis_generator.lua")
 VFS.Include("gamedata/modularcomms/clonedefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-VFS.Include("gamedata/modularcomms/moduledefs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

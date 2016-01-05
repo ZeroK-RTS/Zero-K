@@ -14,7 +14,6 @@ local moduleDefs = {
 		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
 		limit = false,
 		cost = 0,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 	},
@@ -25,128 +24,411 @@ local moduleDefs = {
 		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
 		limit = false,
 		cost = 0,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "weapon",
 	},
 	
-	-- Ordinary Weapons
+	-- Weapons
 	{
-		name = "lpb",
-		humanName = "Light Particle Beam",
-		description = "Auto Pew",
-		image = "unitpics/commweapon_lparticlebeam.png",
+		name = "commweapon_beamlaser",
+		humanName = "Beam Laser",
+		description = "Beam Laser",
+		image = "unitpics/commweapon_beamlaser.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
-		requireLevel = 0,
+		requireChassis = {"recon", "support"},
+		requireLevel = 1,
 		slotType = "weapon",
 		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "lpb"
+				sharedData.weapon1 = "commweapon_beamlaser"
 			else
-				sharedData.weapon2 = "lpb"
+				sharedData.weapon2 = "commweapon_beamlaser"
 			end
 		end
 	},
 	{
-		name = "missile",
-		humanName = "Missile Launcher",
-		description = "Missile Launcher",
-		image = "unitpics/commweapon_missilelauncher.png",
+		name = "commweapon_clusterbomb",
+		humanName = "Cluster Bomb",
+		description = "Cluster Bomb",
+		image = "unitpics/commweapon_clusterbomb.png",
 		limit = 1,
-		cost = 50,
-		requireModules = {},
-		requireLevel = 0,
+		cost = 100,
+		requireChassis = {"recon", "assault"},
+		requireLevel = 3,
 		slotType = "weapon",
 		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "missile"
+				sharedData.weapon1 = "commweapon_clusterbomb"
 			else
-				sharedData.weapon2 = "missile"
+				sharedData.weapon2 = "commweapon_clusterbomb"
 			end
 		end
 	},
 	{
-		name = "machinegun",
+		name = "commweapon_concussion",
+		humanName = "Concussion Shell",
+		description = "Concussion Shell",
+		image = "unitpics/commweapon_concussion.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"support"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_concussion"
+			else
+				sharedData.weapon2 = "commweapon_concussion"
+			end
+		end
+	},
+	{
+		name = "commweapon_disintegrator",
+		humanName = "Disintegrator",
+		description = "Disintegrator",
+		image = "unitpics/commweapon_disintegrator.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"assault"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_disintegrator"
+			else
+				sharedData.weapon2 = "commweapon_disintegrator"
+			end
+		end
+	},
+	{
+		name = "commweapon_disruptorbomb",
+		humanName = "Disruptor Bomb",
+		description = "Disruptor Bomb",
+		image = "unitpics/commweapon_disruptorbomb.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"recon", "support"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_disruptorbomb"
+			else
+				sharedData.weapon2 = "commweapon_disruptorbomb"
+			end
+		end
+	},
+	{
+		name = "commweapon_flamethrower",
+		humanName = "Flamethrower",
+		description = "Flamethrower",
+		image = "unitpics/commweapon_flamethrower.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"recon", "assault"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_flamethrower"
+			else
+				sharedData.weapon2 = "commweapon_flamethrower"
+			end
+		end
+	},
+	{
+		name = "commweapon_heatray",
+		humanName = "Heatray",
+		description = "Heatray",
+		image = "unitpics/commweapon_heatray.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"recon", "assault"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_heatray"
+			else
+				sharedData.weapon2 = "commweapon_heatray"
+			end
+		end
+	},
+	{
+		name = "commweapon_heavymachinegun",
 		humanName = "Machine Gun",
 		description = "Machine Gun",
 		image = "unitpics/commweapon_heavymachinegun.png",
 		limit = 1,
 		cost = 50,
-		requireModules = {},
-		requireLevel = 0,
+		requireChassis = {"recon", "assault"},
+		requireLevel = 1,
 		slotType = "weapon",
 		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "machinegun"
+				sharedData.weapon1 = "commweapon_heavymachinegun"
 			else
-				sharedData.weapon2 = "machinegun"
+				sharedData.weapon2 = "commweapon_heavymachinegun"
 			end
 		end
 	},
 	{
-		name = "rocket",
-		humanName = "Rocket Thingy",
-		description = "Rocket Thingy",
-		image = "unitpics/commweapon_rocketlauncher.png",
-		limit = 2,
-		cost = 75,
-		requireChassis = {"support"},
-		requireModules = {},
-		requireLevel = 0,
-		slotType = "weapon",
-	},
-	
-	-- Manual Fire Weapons
-	{
-		name = "hpb",
+		name = "commweapon_hparticlebeam",
 		humanName = "Heavy Particle Beam",
-		description = "Manual Pew",
+		description = "Heavy Particle Beam",
 		image = "unitpics/conversion_hparticlebeam.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
-		requireLevel = 0,
+		requireChassis = {"support"},
+		requireLevel = 1,
 		slotType = "weapon",
 		applicationFunction = function (modules, sharedData)
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "hpb"
+				sharedData.weapon1 = "commweapon_hparticlebeam"
 			else
-				sharedData.weapon2 = "hpb"
+				sharedData.weapon2 = "commweapon_hparticlebeam"
+			end
+		end
+	},
+	{
+		name = "commweapon_hpartillery",
+		humanName = "Plasma Artillery",
+		description = "Plasma Artillery",
+		image = "unitpics/commweapon_assaultcannon.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"assault", "support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_hpartillery"
+			else
+				sharedData.weapon2 = "commweapon_hpartillery"
+			end
+			--if not sharedData.weapon1 then
+			--	sharedData.weapon1 = "commweapon_hpartillery_napalm"
+			--else
+			--	sharedData.weapon2 = "commweapon_hpartillery_napalm"
+			--end
+		end
+	},
+	{
+		name = "commweapon_lightninggun",
+		humanName = "Lightning Rifle",
+		description = "Lightning Rifle",
+		image = "unitpics/commweapon_lightninggun.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"recon", "support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_lightninggun"
+			else
+				sharedData.weapon2 = "commweapon_lightninggun"
+			end
+		end
+	},
+	{
+		name = "commweapon_lparticlebeam",
+		humanName = "Light Particle Beam",
+		description = "Light Particle Beam",
+		image = "unitpics/commweapon_lparticlebeam.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"assault", "support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_lparticlebeam"
+			else
+				sharedData.weapon2 = "commweapon_lparticlebeam"
+			end
+			--if not sharedData.weapon1 then
+			--	sharedData.weapon1 = "commweapon_disruptor"
+			--else
+			--	sharedData.weapon2 = "commweapon_disruptor"
+			--end
+		end
+	},
+	{
+		name = "commweapon_missilelauncher",
+		humanName = "Missile Launcher",
+		description = "Missile Launcher",
+		image = "unitpics/commweapon_missilelauncher.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_missilelauncher"
+			else
+				sharedData.weapon2 = "commweapon_missilelauncher"
+			end
+		end
+	},
+	{
+		name = "commweapon_multistunner",
+		humanName = "Multistunner",
+		description = "Multistunner",
+		image = "unitpics/commweapon_multistunner.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"support", "recon"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_multistunner"
+			else
+				sharedData.weapon2 = "commweapon_multistunner"
+			end
+		end
+	},
+	{
+		name = "commweapon_napalmgrenade",
+		humanName = "Napalm Grenade",
+		description = "Napalm Grenade",
+		image = "unitpics/commweapon_napalmgrenade.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"assault", "recon"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_napalmgrenade"
+			else
+				sharedData.weapon2 = "commweapon_napalmgrenade"
+			end
+		end
+	},
+	{
+		name = "commweapon_riotcannon",
+		humanName = "Riot Cannon",
+		description = "Riot Cannon",
+		image = "unitpics/commweapon_riotcannon.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"assault", "recon"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_riotcannon"
+			else
+				sharedData.weapon2 = "commweapon_riotcannon"
+			end
+		end
+	},
+	{
+		name = "commweapon_rocketlauncher",
+		humanName = "Rocket Launcher",
+		description = "Rocket Launcher",
+		image = "unitpics/commweapon_rocketlauncher.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"assault", "support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_rocketlauncher"
+			else
+				sharedData.weapon2 = "commweapon_rocketlauncher"
+			end
+		end
+	},
+	{
+		name = "commweapon_shockrifle",
+		humanName = "Shock Rifle",
+		description = "Shock Rifle",
+		image = "unitpics/conversion_shockrifle.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"support"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_shockrifle"
+			else
+				sharedData.weapon2 = "commweapon_shockrifle"
+			end
+		end
+	},
+	{
+		name = "commweapon_shotgun",
+		humanName = "Shotgun",
+		description = "Shotgun",
+		image = "unitpics/commweapon_shotgun.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"assault", "recon"},
+		requireLevel = 1,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_shotgun"
+			else
+				sharedData.weapon2 = "commweapon_shotgun"
+			end
+		end
+	},
+	{
+		name = "commweapon_slamrocket",
+		humanName = "S.L.A.M. Rocket",
+		description = "S.L.A.M. Rocket",
+		image = "unitpics/commweapon_slamrocket.png",
+		limit = 1,
+		cost = 50,
+		requireChassis = {"assault"},
+		requireLevel = 3,
+		slotType = "weapon",
+		applicationFunction = function (modules, sharedData)
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = "commweapon_slamrocket"
+			else
+				sharedData.weapon2 = "commweapon_slamrocket"
 			end
 		end
 	},
 	
 	-- Unique Modules
 	{
-		name = "personalshield",
+		name = "commweapon_personal_shield",
 		humanName = "Personal Shield",
 		description = "A small, protective bubble shield.",
 		image = "unitpics/module_personal_shield.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
 		prohibitingModules = {"personalcloak"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.shield = "personalshield"
+			sharedData.shield = "commweapon_personal_shield"
 		end
 	},
 	{
-		name = "areashield",
+		name = "commweapon_areashield",
 		humanName = "Area Shield",
 		description = "The Emperor protects",
 		image = "unitpics/module_areashield.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {"personalshield"},
+		requireChassis = {"assault", "support"},
+		requireModules = {"commweapon_personal_shield"},
 		prohibitingModules = {"personalcloak"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.shield = "areashield"
+			sharedData.shield = "commweapon_areashield"
 		end
 	},
 	{
@@ -154,10 +436,8 @@ local moduleDefs = {
 		humanName = "Vanguard Economy Pack",
 		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
 		image = "unitpics/module_energy_cell.png",
-		limit = 1,
+		limit = 0, -- Nothing is allowed to equip this module
 		cost = 0,
-		requireModules = {},
-		requireChassis = {"recon", "support"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -203,7 +483,7 @@ local moduleDefs = {
 		limit = 1,
 		cost = 100,
 		requireModules = {},
-		prohibitingModules = {"personalshield", "areashield"},
+		prohibitingModules = {"commweapon_personal_shield", "commweapon_area)shield"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -375,7 +655,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.lpb,
+						defaultModule = moduleDefNames.commweapon_beamlaser,
 						slotType = "weapon",
 					},
 					{
@@ -396,7 +676,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.lpb,
+						defaultModule = moduleDefNames.commweapon_beamlaser,
 						slotType = "weapon",
 					},
 					{
@@ -423,7 +703,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.lpb,
+						defaultModule = moduleDefNames.commweapon_beamlaser,
 						slotType = "weapon",
 					},
 					{
@@ -450,7 +730,7 @@ local chassisDefs = {
 				end,
 				upgradeSlots = {
 					{
-						defaultModule = moduleDefNames.lpb,
+						defaultModule = moduleDefNames.commweapon_beamlaser,
 						slotType = "weapon",
 					},
 					{

@@ -1,5 +1,7 @@
 include "constants.lua"
 
+dyncomm = include('dynamicCommander.lua')
+
 local spSetUnitShieldState = Spring.SetUnitShieldState
 
 -- pieces
@@ -45,21 +47,10 @@ local SIG_WALK = 1
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
-local flamers = {}
-local wepTable = UnitDefs[unitDefID].weapons
-wepTable.n = nil
-for index, weapon in pairs(wepTable) do
-	local weaponDef = WeaponDefs[weapon.weaponDef]
-	if weaponDef.type == "Flame" or (weaponDef.customParams and weaponDef.customParams.flamethrower) then
-		flamers[index] = true
-	end
-end
-
 local restoreHeading, restorePitch = 0, 0
 
 local canDgun = UnitDefs[unitDefID].canDgun
 
-local shieldOn = false
 local dead = false
 local bMoving = false
 local bAiming = false
@@ -298,6 +289,7 @@ local function MotionControl(moving, aiming, justmoved)
 end
 
 function script.Create()
+	dyncomm.Create()
 	--alert to dirt
 	Turn(armhold, x_axis, math.rad(-45), math.rad(250)) --upspring
 	Turn(ruparm, x_axis, 0, math.rad(250)) 
@@ -343,10 +335,10 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	if num == 2 or num == 4 then
-		return torso
+	if dyncomm.GetWeapon(num) == 1 or dyncomm.GetWeapon(num) == 2 then 
+		return flare
 	end
-	return flare
+	return torso
 end
 
 local function AimRifle(heading, pitch, isDgun)
@@ -405,21 +397,21 @@ local function AimRifle(heading, pitch, isDgun)
 end
 
 function script.AimWeapon(num, heading, pitch)
+	local weaponNum = dyncomm.GetWeapon(num)
 	inBuildAnim = false
-	if num >= 5 then
+	if weaponNum == 1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		bAiming = true
 		return AimRifle(heading, pitch)
-	elseif num == 3 then
+	elseif weaponNum == 2 then
 		Signal(SIG_AIM)
 		Signal(SIG_AIM_2)
 		SetSignalMask(SIG_AIM_2)
 		bAiming = true
 		return AimRifle(heading, pitch, canDgun)
-	elseif num == 2 or num == 4 then
-		Sleep(100)
-		return (shieldOn)
+	elseif weaponNum == 3 then
+		return true
 	end
 	return false
 end
@@ -433,35 +425,11 @@ function script.Deactivate()
 end
 
 function script.FireWeapon(num)
-	if num == 5 then
-		EmitSfx(flare, 1024)
-	elseif num == 3 then
-		EmitSfx(flare, 1026)
-	end
-	--recoil
-	--[[
-	if num ~= 4 then
-		Sleep(50)
-		Turn(gun, x_axis, math.rad(-2), math.rad(1250))
-		Sleep(250)
-		Turn(gun, x_axis, 0, math.rad(250))
-		Sleep(800)
-		if (math.random() < 0.33) then
-			Turn(armhold, x_axis, math.rad(15), math.rad(75)) --check the sexy shot
-		end
-	end
-	]]--
+	dyncomm.EmitWeaponFireSfx(flare, num)
 end
 
 function script.Shot(num)
-	if num == 5 then
-		EmitSfx(flare, 1025)
-	elseif num == 3 then
-		EmitSfx(flare, 1027)
-	end
-	if flamers[num] then
-		--GG.LUPS.FlameShot(unitID, unitDefID, _, num)
-	end	
+	dyncomm.EmitWeaponShotSfx(flare, num)
 end
 
 function script.QueryNanoPiece()
@@ -488,6 +456,7 @@ function script.Killed(recentDamage, maxHealth)
 	dead = 1
 	--Turn(turret, y_axis, 0, math.rad(500))
 	if severity <= .5 then
+		dyncomm.SpawnModuleWrecks(1)
 	
 		Turn(base, x_axis, math.rad(79), math.rad(80))
 		Turn(rloleg, x_axis, math.rad(25), math.rad(250))	
@@ -515,7 +484,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rupleg)
 		Explode(torso)
 ]]--
-		return 1
+		dyncomm.SpawnModuleWrecks(1)
 	else
 		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
@@ -529,6 +498,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(ruparm, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
-		return 2
+		dyncomm.SpawnModuleWrecks(2)
+		dyncomm.SpawnModuleWrecks(2)
 	end
 end
