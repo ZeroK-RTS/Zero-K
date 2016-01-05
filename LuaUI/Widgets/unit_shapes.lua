@@ -55,7 +55,8 @@ local myTeamID = Spring.GetLocalTeamID()
 local r,g,b = 0.1, 1, 0.2
 local rgba = {r,g,b,1}
 local yellow = {1,1,0.1,1}
-local hoverColor = {0.1,1,1,1}
+local teal = {0.1,1,1,1}
+local hoverColor = teal
 
 
 local circleDivs = 32 -- how precise circle? octagon by default
@@ -74,13 +75,15 @@ local unitConf = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
-local visibleAllySelUnits = {}
+local visibleAllySelUnits = {} --actually a table of tables for colour purposes
+local hasVisibleAllySelections = false
 local hoverUnits = {}
 
+local forceUpdate = false
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally', 'showhover'} 
+options_order = {'showally', 'showallyplayercolours', 'showhover'} 
 options = {
 	showally = {
 		name = 'Show Ally Selections',
@@ -88,7 +91,22 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function(self) 
+			forceUpdate = true
 			visibleAllySelUnits = {}
+		end,
+	},
+	showallyplayercolours = {
+		name = 'Use Player Colors when Spectating',
+		desc = 'Highlight allies\' selected units with their color.', 
+		type = 'bool',
+		value = false,
+		OnChange = function(self) 
+			forceUpdate = true
+			if self.value then
+				hoverColor = yellow
+			else
+				hoverColor = teal
+			end
 		end,
 	},
 	showhover = {
@@ -109,12 +127,11 @@ local lastCamX, lastCamY, lastCamZ
 local lastGameFrame = 0
 
 local lastVisibleUnits, lastVisibleSelected, lastvisibleAllySelUnits
-local forceUpdate = false
 
 local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
 	local gameFrame = spGetGameFrame()
-	if (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
+	if forceUpdate or (camX ~= lastCamX) or (camY ~= lastCamY) or (camZ ~= lastCamZ) or
 		((gameFrame - lastGameFrame) >= 15) or (#lastVisibleSelected > 0) or
 		(#spGetSelectedUnits() > 0) then
 		
@@ -146,7 +163,7 @@ local function GetVisibleUnits()
 
 	if (HasVisibilityChanged()) then
 		local units = spGetVisibleUnits(-1, 30, true)
-		--local visibleUnits = {}
+		hasVisibleAllySelections = false
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
 		
@@ -155,7 +172,15 @@ local function GetVisibleUnits()
 			if (spIsUnitSelected(unitID)) then
 				visibleSelected[#visibleSelected+1] = unitID
 			elseif options.showally.value and WG.allySelUnits[unitID] then
-				visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
+				local teamIDIndex = Spring.GetUnitTeam(unitID)+1
+				if Spring.GetSpectatingState() and not options.showallyplayercolours.value then
+					teamIDIndex = 1
+				end
+				if not visibleAllySelUnits[teamIDIndex] then
+					visibleAllySelUnits[teamIDIndex] = {}
+				end
+				visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = unitID
+				hasVisibleAllySelections = true
 			end
 		end
 
@@ -418,7 +443,16 @@ function widget:Update()
 	visibleAllySelUnits, visibleSelected, hoverUnits = GetVisibleUnits()
 	
 	UpdateUnitListRotation(visibleSelected)
-	UpdateUnitListRotation(visibleAllySelUnits)
+	local teams = Spring.GetTeamList()
+	if Spring.GetSpectatingState() and options.showallyplayercolours.value then
+		for i=1, #teams do
+			if visibleAllySelUnits[teams[i]+1] then
+				UpdateUnitListRotation(visibleAllySelUnits[teams[i]+1])
+			end
+		end
+	elseif hasVisibleAllySelections then
+		UpdateUnitListRotation(visibleAllySelUnits[1])
+	end
 	UpdateUnitListRotation(hoverUnits)
 end
 
@@ -480,15 +514,26 @@ end
 
 function widget:DrawWorldPreUnit()
 		--if Spring.IsGUIHidden() then return end
-	if (#visibleAllySelUnits + #visibleSelected + #hoverUnits == 0) then return end
-	
+	if (#visibleSelected + #hoverUnits == 0) and not hasVisibleAllySelections then return end
+
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
 		gl.StencilTest(true)
 
 			DrawUnitShapes(visibleSelected, rgba)
 			if not Spring.IsGUIHidden() then 
-				DrawUnitShapes(visibleAllySelUnits, yellow)
+				if Spring.GetSpectatingState() and options.showallyplayercolours.value then
+					local teams = Spring.GetTeamList()
+					for i=1, #teams do
+						if visibleAllySelUnits[teams[i]+1] then
+							local r,g,b = Spring.GetTeamColor(teams[i])
+						  DrawUnitShapes(visibleAllySelUnits[teams[i]+1], {r,g,b,1})
+						end
+					end
+				else
+					DrawUnitShapes(visibleAllySelUnits[1], yellow)
+				end
+				-- DrawUnitShapes(visibleAllySelUnits, yellow)
 				DrawUnitShapes(hoverUnits, hoverColor)
 			end
 
