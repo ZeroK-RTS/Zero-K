@@ -313,7 +313,8 @@ local function GetNewReplacementSet(level, chassis, slotType, ignoreSlot)
 	local replacementSet = {}
 	for i = 1, #moduleDefs do
 		local data = moduleDefs[i]
-		if data.slotType == slotType and (data.requireLevel or 0) <= level and ((not data.requireChassis) or data.requireChassis[chassis]) then
+		if data.slotType == slotType and (data.requireLevel or 0) <= level and 
+				((not data.requireChassis) or data.requireChassis[chassis]) and not data.unequipable then
 			local accepted = true
 			
 			-- Check whether required modules are present, not counting ignored slot

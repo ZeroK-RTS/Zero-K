@@ -436,7 +436,8 @@ local moduleDefs = {
 		humanName = "Vanguard Economy Pack",
 		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
 		image = "unitpics/module_energy_cell.png",
-		limit = 0, -- Nothing is allowed to equip this module
+		limit = 1,
+		unequipable = true,
 		cost = 0,
 		requireLevel = 0,
 		slotType = "module",
@@ -1063,7 +1064,8 @@ end
 
 local function ModuleIsValid(level, chassis, slotType, moduleDefID, alreadyOwned, alreadyOwned2)
 	local data = moduleDefs[moduleDefID]
-	if data.slotType ~= slotType or (data.requireLevel or 0) > level or (data.requireChassis and (not data.requireChassis[chassis])) then
+	if data.slotType ~= slotType or (data.requireLevel or 0) > level or 
+			(data.requireChassis and (not data.requireChassis[chassis])) or data.unequipable then
 		return false
 	end
 	
