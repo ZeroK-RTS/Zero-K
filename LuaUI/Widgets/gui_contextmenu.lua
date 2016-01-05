@@ -804,16 +804,18 @@ local function weapons2Table(cells, ws)
 	return cells
 end
 
-local function printAbilities(ud)
+local function printAbilities(ud, unitID)
 	local cells = {}
 
 	local cp = ud.customParams
-		
+
+	
 	if ud.buildSpeed > 0 then
+		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
-		cells[#cells+1] = numformat(ud.buildSpeed)
+		cells[#cells+1] = numformat(buildSpeed)
 		if ud.canResurrect then
 			cells[#cells+1] = ' - Can resurrect wreckage'
 			cells[#cells+1] = ''
@@ -839,18 +841,21 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if cp.area_cloak then
+	if cp.area_cloak or (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) then
+		local areaCloakUpkeep = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_upkeep") or cp.area_cloak_upkeep)
+		local areaCloakRadius = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius") or cp.area_cloak_radius)
 		cells[#cells+1] = 'Area cloak'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Upkeep:'
-		cells[#cells+1] = cp.area_cloak_upkeep .. " E/s"
+		cells[#cells+1] = areaCloakUpkeep .. " E/s"
 		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = cp.area_cloak_radius .. " elmo"
+		cells[#cells+1] = areaCloakRadius .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
 
-	if ud.cloakCost > 0 then
+	if ud.cloakCost > 0 and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
+		local decloakDistance = unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance") or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
 		if ud.speed > 0 then
@@ -862,7 +867,7 @@ local function printAbilities(ud)
 		end
 		cells[#cells+1] = numformat(ud.cloakCost) .. " E/s"
 		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(ud.decloakDistance) .. " elmo"
+		cells[#cells+1] = numformat(decloakDistance) .. " elmo"
 		if not ud.decloakOnFire then
 			cells[#cells+1] = ' - No decloak while shooting'
 			cells[#cells+1] = ''
@@ -884,16 +889,19 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if (ud.radarRadius > 0) or (ud.jammerRadius > 0) or ud.targfac then
+	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarRadius
+	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.jammerRadius
+	
+	if (radarRadius > 0) or (jammerRadius > 0) or ud.targfac then
 		cells[#cells+1] = 'Provides intel'
 		cells[#cells+1] = ''
-		if (ud.radarRadius > 0) then
+		if (radarRadius > 0) then
 			cells[#cells+1] = ' - Radar:'
-			cells[#cells+1] = numformat(ud.radarRadius) .. " elmo"
+			cells[#cells+1] = numformat(radarRadius) .. " elmo"
 		end
-		if (ud.jammerRadius > 0) then
+		if (jammerRadius > 0) then
 			cells[#cells+1] = ' - Radar jamming:'
-			cells[#cells+1] = numformat(ud.jammerRadius) .. " elmo"
+			cells[#cells+1] = numformat(jammerRadius) .. " elmo"
 		end
 		if ud.targfac then
 			cells[#cells+1] = ' - Improves radar accuracy'
@@ -1140,9 +1148,9 @@ local function printWeapons(unitDef, unitID)
 	
 	for i=1, #unitDef.weapons do
 		if not unitID or -- filter out commander weapons not in current loadout
-		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")
-		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_id")) then
+		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
 			local weapon = unitDef.weapons[i]
 			local weaponID = weapon.weaponDef
 			local weaponDef = WeaponDefs[weaponID]
@@ -1246,6 +1254,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	local cost = numformat(ud.metalCost)
 	local health = numformat(ud.health)
 	local speed = numformat(ud.speed)
+	local mass = numformat(ud.mass)
 	
 	-- stuff for modular commanders
 	local legacyModules, legacyCommCost
@@ -1258,17 +1267,18 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	if isCommander then
 		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
 		health = select(2, Spring.GetUnitHealth(unitID))
-		speed = numformat(ud.speed * (ud.customParams.att_speedmult or 1) * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
+		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
+		mass = numformat(Spring.GetUnitRulesParam(unitID, "massOverride") or ud.mass)
 
 		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].name, textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].humanName, textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		
+
 		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 		local weapons = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
@@ -1277,16 +1287,24 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
 		end
 		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+
 		if modules > 0 then
+		local module_instances = {}
 			for i = 1, modules do
-				statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)].humanName, textColor = color.stats_fg, }
+				local moduleID = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
+				module_instances[moduleID] = (module_instances[moduleID] or 0) + 1
+			end
+			for moduleID, moduleCount in pairs(module_instances) do
+				local moduleStr = moduleDefs[moduleID].humanName
+				if moduleCount > 1 then moduleStr = moduleStr .. "  x" .. moduleCount end
+				statschildren[#statschildren+1] = Label:New{ caption = moduleStr, textColor = color.stats_fg, }
 				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
 			end
 		end
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 	end
-	
+
 	local costStr = cost .. " M"
 	if (legacyCommCost) then
 		costStr = costStr .. "(" .. legacyCommCost .. " M)"
@@ -1302,7 +1320,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.mass), textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = mass, textColor = color.stats_fg, }
 
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
@@ -1327,7 +1345,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0) + (unitID and Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0)
+	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
@@ -1373,7 +1391,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		end	
 	end
 
-	local cells = printAbilities(ud)
+	local cells = printAbilities(ud, isCommander and unitID)
 	
 	if cells and #cells > 0 then
 

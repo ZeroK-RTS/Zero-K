@@ -148,6 +148,8 @@ local function ApplyModuleEffects(unitID, data, totalCost)
 	
 	if data.areaCloak then
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak", 1, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_upkeep", data.cloakFieldUpkeep, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 	end
 	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
