@@ -541,14 +541,6 @@ for i = 1, #moduleDefs do
 end
 
 if UnitDefNames then
-	local function Split(s, separator)
-		local results = {}
-			for part in s:gmatch("[^"..separator.."]+") do
-				results[#results + 1] = part
-			end
-		return results
-	end
-
 	-- Create WeaponDefNames for each chassis
 	for i = 1, #chassisDefs do
 		local data = chassisDefs[i]
@@ -556,16 +548,13 @@ if UnitDefNames then
 		local chassisDefWeaponNames = {}
 		for num = 1, #weapons do
 			local wd = WeaponDefs[weapons[num].weaponDef]
-			local nameSplit = Split(wd.name, "_") 
-			if #nameSplit > 1 then
-				chassisDefWeaponNames[nameSplit[2]] = {
+			local weaponName = string.sub(wd.name, (string.find(wd.name,"_") or 0) + 1, 100)
+			if weaponName then
+				chassisDefWeaponNames[weaponName] = {
 					num = num,
 					weaponDefID = weapons[num].weaponDef,
 					manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
 				}
-				if #nameSplit > 2 then
-					Spring.Echo("Don't put underscores in weapon module names!", wd.name)
-				end
 			end
 		end
 		data.weaponDefNames = chassisDefWeaponNames

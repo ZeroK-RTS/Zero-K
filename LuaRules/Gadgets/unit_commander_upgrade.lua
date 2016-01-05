@@ -231,6 +231,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedCloakShield = true
 	end
 	
+	unitCreatedWeaponNums = {}
 	if moduleEffectData.weapon1 then
 		unitCreatedWeaponNums[moduleEffectData.weapon1] = 1
 	end
