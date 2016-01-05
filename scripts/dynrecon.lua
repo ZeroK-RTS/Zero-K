@@ -437,10 +437,7 @@ local weaponFlares = {
 }
 
 function script.QueryWeapon(num)
-	if dyncomm.GetWeapon(num) == 3 then
-		return pelvis
-	end
-	return flare
+	return weaponFlares[dyncomm.GetWeapon(num) or 1]
 end
 
 function script.FireWeapon(num)

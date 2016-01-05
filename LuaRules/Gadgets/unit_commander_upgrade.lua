@@ -27,7 +27,7 @@ end
 local INLOS = {inlos = true}
 local interallyCreatedUnit = false
 
-local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield
+local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield, unitCreatedWeaponNums
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
@@ -231,6 +231,16 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedCloakShield = true
 	end
 	
+	if moduleEffectData.weapon1 then
+		unitCreatedWeaponNums[moduleEffectData.weapon1] = 1
+	end
+	if moduleEffectData.weapon2 then
+		unitCreatedWeaponNums[moduleEffectData.weapon2] = 2
+	end
+	if moduleEffectData.shield then
+		unitCreatedWeaponNums[moduleEffectData.shield] = 3
+	end
+	
 	if moduleEffectData.skinOverride then
 		Spring.SetGameRulesParam("unitCreatedTexture", moduleEffectData.skinOverride)
 	end
@@ -245,6 +255,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedShieldNum = nil
 	unitCreatedCloak = nil
 	unitCreatedCloakShield = nil
+	unitCreatedWeaponNums = nil
 	
 	if moduleEffectData.skinOverride then
 		Spring.SetGameRulesParam("unitCreatedTexture", 0)
@@ -505,6 +516,17 @@ end
 
 function GG.Upgrades_UnitCloakShieldDef(unitID)
 	return (unitCreatedCloakShield or Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) and commanderCloakShieldDef
+end
+
+function GG.Upgrades_UnitCloakShieldDef(unitID)
+	return (unitCreatedCloakShield or Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) and commanderCloakShieldDef
+end
+
+function GG.Upgrades_WeaponNumMap(num)
+	if unitCreatedWeaponNums then
+		return unitCreatedWeaponNums[num]
+	end
+	return false
 end
 
 -- GG.Upgrades_GetUnitCustomShader is up in unsynced
