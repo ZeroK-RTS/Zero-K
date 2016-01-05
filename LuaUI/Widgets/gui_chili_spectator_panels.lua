@@ -336,6 +336,22 @@ local function GetBarCaption(net)
 	end
 end
 
+local function GetTimeString()
+  local secs = math.floor(Spring.GetGameSeconds())
+  if (timeSecs ~= secs) then
+    timeSecs = secs
+    local h = math.floor(secs / 3600)
+    local m = math.floor((secs % 3600) / 60)
+    local s = math.floor(secs % 60)
+    if (h > 0) then
+      timeString = string.format('%02i:%02i:%02i', h, m, s)
+    else
+      timeString = string.format('%02i:%02i', m, s)
+    end
+  end
+  return timeString
+end
+
 local function UpdateResourcePanel(panel, income, net, overdrive, reclaim, storage, storageMax)
 	if storageMax > 0 then
 		panel.bar:SetValue(100*storage/storageMax)
@@ -712,6 +728,25 @@ local function CreatePlayerWindow()
 	
 	local texY = "8%"
 	local texBottom = "15%"
+
+	data.time = Chili.Label:New{
+		parent = data.mainPanel,
+		x      = 0,
+		y      = texY,
+		right  = 0,
+		bottom = texBottom,
+		caption = GetTimeString(),
+		valign = "center",
+ 		align  = "center",
+		autosize = false,
+		font   = {
+			size = math.round(options.playerMainFontSize.value*allyTeamData[1].nameSize), 
+			outline = true, 
+			outlineWidth = 2, 
+			outlineWeight = 2,
+			color = {0.95, 1.0, 1.0, 1}, 
+		},
+	}
 	
 	data.nameLeft = Chili.Label:New{
 		parent = data.mainPanel,
@@ -1034,7 +1069,6 @@ function widget:Initialize()
 	option_ColourBlindUpdate()
 end
 
-
 local timer = 0
 function widget:Update(dt)
 	timer = timer + dt
@@ -1042,6 +1076,7 @@ function widget:Update(dt)
 		UpdateResourceWindowFlashMain(dt)
 	end
 	if timer >= 1 and playerWindow then
+		playerWindow.time:SetCaption(GetTimeString())
 		playerWindow.winsLeft:SetCaption(GetWinString(allyTeamData[1].playerName))
 		playerWindow.winsRight:SetCaption(GetWinString(allyTeamData[2].playerName))
 		timer = 0
