@@ -102,11 +102,6 @@ options = {
 		value = false,
 		OnChange = function(self) 
 			forceUpdate = true
-			if self.value then
-				hoverColor = yellow
-			else
-				hoverColor = teal
-			end
 		end,
 	},
 	showhover = {
@@ -520,9 +515,13 @@ function widget:DrawWorldPreUnit()
 		gl.DepthTest(false)
 		gl.StencilTest(true)
 
+			hoverColor = teal
+
 			DrawUnitShapes(visibleSelected, rgba)
 			if not Spring.IsGUIHidden() then 
 				if Spring.GetSpectatingState() and options.showallyplayercolours.value then
+					hoverColor = yellow
+					
 					local teams = Spring.GetTeamList()
 					for i=1, #teams do
 						if visibleAllySelUnits[teams[i]+1] then
