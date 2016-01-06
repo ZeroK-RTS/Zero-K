@@ -512,6 +512,36 @@ local moduleDefs = {
 	
 	-- Repeat Modules
 	{
+		name = "drone",
+		humanName = "Companion Drone",
+		description = "Companion Drone",
+		image = "unitpics/module_companion_drone.png",
+		limit = 3,
+		cost = 60,
+		requireChassis = {"recon", "support"},
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.drones = (sharedData.drones or 0) + 1
+		end
+	},
+	{
+		name = "battleDrone",
+		humanName = "Battle Drone",
+		description = "Battle Drone",
+		image = "unitpics/module_battle_drone.png",
+		limit = 3,
+		cost = 60,
+		requireChassis = {"recon", "support"},
+		requireModules = {"drone"},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.battleDrones = (sharedData.battleDrones or 0) + 1
+		end
+	},
+	{
 		name = "health",
 		humanName = "Ablative Armour Plates",
 		description = "Ablative Armour Plates, provides 600 health. Limit 8.",

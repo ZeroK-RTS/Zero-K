@@ -56,9 +56,8 @@ local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function InitCarrier(unitID, unitDefID, teamID)
-	local carrierData = carrierDefs[unitDefID]
-	local toReturn  = {unitDefID = unitDefID, teamID = teamID, droneSets = {}, occupiedPieces={}, droneInQueue= {}}
+local function InitCarrier(unitID, carrierData, teamID)
+	local toReturn  = {teamID = teamID, droneSets = {}, occupiedPieces={}, droneInQueue= {}}
 	local unitPieces = GetUnitPieceMap(unitID)
 	local usedPieces = carrierData.spawnPieces
 	if usedPieces then
@@ -89,7 +88,7 @@ local function callScript(unitID, funcName, args)
 	end
 end
 
-local function NewDrone(unitID, unitDefID, droneName, setNum, droneBuiltExternally)
+local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	local carrierEntry = carrierList[unitID]
 	local _, _, _, x, y, z = GetUnitPosition(unitID, true)
 	local xS, yS, zS = x, y, z
@@ -148,9 +147,8 @@ function AddUnitToEmptyPad(carrierID, droneType)
 	local unitIDAdded
 	local CheckCreateStart = function(pieceNum)
 		if not carrierData.occupiedPieces[pieceNum] then -- Note: We could do a strict checking of empty space here (Spring.GetUnitInBox()) before spawning drone, but that require a loop to check if & when its empty.
-			local carrierDefID = carrierData.unitDefID
 			local droneDefID = carrierData.droneSets[droneType].config.drone
-			unitIDAdded = NewDrone(carrierID, carrierDefID, droneDefID, droneType, true)
+			unitIDAdded = NewDrone(carrierID, droneDefID, droneType, true)
 			if unitIDAdded then
 				local offsets = carrierData.droneSets[droneType].config.offsets
 				SitOnPad(unitIDAdded, carrierID, pieceNum, offsets)
@@ -527,7 +525,7 @@ end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if (carrierDefs[unitDefID]) and not carrierList[unitID] then
-		carrierList[unitID] = InitCarrier(unitID, unitDefID, unitTeam)
+		carrierList[unitID] = InitCarrier(unitID, carrierDefs[unitDefID], unitTeam)
 	end
 end
 
@@ -598,18 +596,28 @@ function gadget:GameFrame(n)
 	UpdateCoroutines() --maintain nanoframe position relative to carrier
 end
 
+local function ProcessCarrierDef(carrierData)
+	for i = 1, #carrierData do
+		-- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
+		local buildUpProgress = 1/(carrierData[i].buildTime)*(BUILD_UPDATE_INTERVAL/30)
+		carrierData[i].buildStep = buildUpProgress
+		carrierData[i].buildStepHealth = buildUpProgress*UnitDefs[carrierData[i].drone].health
+		carrierData[i].colvolTweaked = carrierData[i].offsets.colvolMidX~=0 or carrierData[i].offsets.colvolMidY~=0
+										or carrierData[i].offsets.colvolMidZ~=0 or carrierData[i].offsets.aimX~=0
+										or carrierData[i].offsets.aimY~=0 or carrierData[i].offsets.aimZ~=0
+	end
+	return carrierData
+end
+
+function GG.Drones_InitializeCarrier(unitID, carrierData)
+	carrierList[unitID] = InitCarrier(unitID, ProcessCarrierDef(carrierData), Spring.GetUnitTeam(unitID))
+end
+
 function gadget:Initialize()
 	--pre-calculate some buildtime related variable (this will be copied to carrierList[] table when carrier is initialized)
 	local buildUpProgress
 	for name, carrierData in pairs(carrierDefs) do
-		for i = 1, #carrierData do
-			buildUpProgress = 1/(carrierData[i].buildTime)*(BUILD_UPDATE_INTERVAL/30) -- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
-			carrierDefs[name][i].buildStep = buildUpProgress
-			carrierDefs[name][i].buildStepHealth = buildUpProgress*UnitDefs[carrierData[i].drone].health
-			carrierDefs[name][i].colvolTweaked = carrierData[i].offsets.colvolMidX~=0 or carrierData[i].offsets.colvolMidY~=0
-											or carrierData[i].offsets.colvolMidZ~=0 or carrierData[i].offsets.aimX~=0
-											or carrierData[i].offsets.aimY~=0 or carrierData[i].offsets.aimZ~=0 
-		end
+		carrierData = ProcessCarrierDef(carrierData)
 	end
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

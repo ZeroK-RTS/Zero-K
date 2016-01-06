@@ -66,6 +66,5 @@ local thingsWhichAreDrones = {
 	[UnitDefNames.battledrone.id] = true,
 	[UnitDefNames.fighterdrone.id] = true
 }
-	
 
 return carrierDefs, thingsWhichAreDrones

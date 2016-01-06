@@ -30,7 +30,9 @@ local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloa
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
--- FIXME: make this not needed
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Various module configs
 
 local commanderCloakShieldDef = {
 	energy = 15,
@@ -55,11 +57,19 @@ local commAreaShieldDefID = {
 	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
 }
 
+
+local droneDef = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 1, spawnSize = 1, range = 450, buildTime = 3, maxBuild = 1,
+					offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0,aimX = 0, aimY = 0, aimZ = 0}}
+local battleDroneDef = {drone = UnitDefNames.battledrone.id, reloadTime = 20, maxDrones = 1, spawnSize = 1, range = 600, buildTime = 3, maxBuild = 1,
+					offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0,aimX = 0, aimY = 0, aimZ = 0}}
+					
+					
 for _, eud in pairs (UnitDefs) do
 	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
 		commanderCloakShieldDef.radiusException[eud.id] = true
 	end
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -170,6 +180,21 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.bannerOverhead then
 		Spring.SetUnitRulesParam(unitID, "comm_banner_overhead", images.overhead or "fakeunit", INLOS)
+	end
+	
+	if (data.drones or data.battleDrones) and GG.Drones_InitializeCarrier then
+		local carrierDef = {}
+		if data.drones then
+			local droneTable = Spring.Utilities.CopyTable(droneDef)
+			droneTable.maxDrones = data.drones
+			carrierDef[#carrierDef + 1] = droneTable
+		end
+		if data.battleDrones then
+			local droneTable = Spring.Utilities.CopyTable(battleDroneDef)
+			droneTable.maxDrones = data.battleDrones
+			carrierDef[#carrierDef + 1] = droneTable
+		end
+		GG.Drones_InitializeCarrier(unitID, carrierDef)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)
@@ -284,6 +309,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedCloak = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
+	unitCreatedCarrierDef = nil
 	
 	if not unitID then
 		return false
