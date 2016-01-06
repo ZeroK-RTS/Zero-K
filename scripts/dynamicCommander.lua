@@ -120,7 +120,15 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
 	end
 	
-	Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
+	-- Set other ranges to 0 for leashing
+	if 1 ~= weapon1 and 1 ~= weapon2 then
+		Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
+	end
+	for i = 2, 16 do
+		if i ~= weapon1 and i ~= weapon2 then
+			Spring.SetUnitWeaponState(unitID, i, "range", 0)
+		end
+	end
 	Spring.SetUnitMaxRange(unitID, maxRange)
 	
 	Spring.SetUnitRulesParam(unitID, "sightRangeOverride", math.max(500, math.min(600, maxRange*1.1)), INLOS)

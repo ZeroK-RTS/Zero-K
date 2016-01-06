@@ -147,13 +147,15 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 	end
 	
-	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
-		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
-	end
-	
 	if data.bonusBuildPower then
 		-- All comms have 10 BP in their unitDef (even support)
+		data.metalIncome = (data.metalIncome or 0) + data.bonusBuildPower*0.03
+		data.energyIncome = (data.energyIncome or 0) + data.bonusBuildPower*0.03
 		Spring.SetUnitRulesParam(unitID, "buildpower_mult", data.bonusBuildPower/10 + 1, INLOS)
+	end
+	
+	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
+		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
 	
 	if data.healthBonus then
@@ -180,7 +182,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	GG.UpdateUnitAttributes(unitID)
 end
 
-local function GetModuleEffectsData(moduleList)
+local function GetModuleEffectsData(moduleList, level, chassis)
 	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
 	
 	local moduleEffectData = {}
@@ -190,6 +192,12 @@ local function GetModuleEffectsData(moduleList)
 			moduleDef.applicationFunction(moduleByDefID, moduleEffectData)
 		end
 	end
+	
+	local levelFunction = chassisDefs[chassis or 1].levelDefs[level or 1].chassisApplicationFunction
+	if levelFunction then
+		levelFunction(moduleByDefID, moduleEffectData)
+	end
+	
 	return moduleEffectData
 end
 
@@ -198,7 +206,7 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	-- a commander has been created. This can either happen internally due to a request
 	-- to spawn a commander or with rezz/construction/spawning.
 	if not moduleEffectData then
-		moduleEffectData = GetModuleEffectsData(moduleList)
+		moduleEffectData = GetModuleEffectsData(moduleList, level, chassis)
 	end
 	
 	-- Start setting required unitRulesParams
@@ -230,7 +238,7 @@ end
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
 	-- Calculate Module effects
 	local chassisWeaponDefNames = chassisDefs[upgradeDef.chassis].weaponDefNames 
-	local moduleEffectData = GetModuleEffectsData(upgradeDef.moduleList)
+	local moduleEffectData = GetModuleEffectsData(upgradeDef.moduleList, upgradeDef.level, upgradeDef.chassis)
 	
 	-- Create Unit, set appropriate global data first
 	-- These variables are set such that other gadgets can notice the effect

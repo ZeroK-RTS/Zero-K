@@ -593,8 +593,6 @@ local moduleDefs = {
 		applicationFunction = function (modules, sharedData)
 			-- All comms have 10 BP in their unitDef (even support)
 			sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 5
-			sharedData.metalIncome = (sharedData.metalIncome or 0) + 0.15
-			sharedData.energyIncome = (sharedData.energyIncome or 0) + 0.15
 		end
 	},
 	
@@ -651,7 +649,15 @@ local chassisDefs = {
 		humanName = "Recon",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynrecon0"].id,
 		levelDefs = {
-			{
+			[0] = {
+				morphBuildPower = 10,
+				morphBaseCost = 20,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynrecon0"].id
+				end,
+				upgradeSlots = {},
+			},
+			[1] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -668,7 +674,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[2] = {
 				morphBuildPower = 15,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -685,7 +691,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[3] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -706,7 +712,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[4] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -727,7 +733,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[5] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -755,10 +761,25 @@ local chassisDefs = {
 		humanName = "Engineer",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
 		levelDefs = {
-			
-			{
+			[0] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynsupport0"].id
+				end,
+				upgradeSlots = {},
+			},
+			[1] = {
+				morphBuildPower = 10,
+				morphBaseCost = 20,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -773,9 +794,13 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[2] = {
 				morphBuildPower = 15,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -790,9 +815,13 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[3] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -811,9 +840,13 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[4] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 8
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -832,9 +865,13 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[5] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					-- All comms have 10 BP in their unitDef (even support)
+					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 10
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -860,7 +897,15 @@ local chassisDefs = {
 		humanName = "Guardian",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
 		levelDefs = {
-			{
+			[0] = {
+				morphBuildPower = 10,
+				morphBaseCost = 20,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynassault0"].id
+				end,
+				upgradeSlots = {},
+			},
+			[1] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -877,7 +922,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[2] = {
 				morphBuildPower = 15,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -894,7 +939,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[3] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -915,7 +960,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[4] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
@@ -936,7 +981,7 @@ local chassisDefs = {
 					},
 				},
 			},
-			{
+			[5] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
 				morphUnitDefFunction = function(modulesByDefID)
