@@ -256,7 +256,7 @@ end
 local function MotionControl(moving, aiming, justmoved)
 	--for i = 1024, 1050 do
 	--	Spring.Echo("Weapon", i)
-	--	for j = 1, 20 do
+	--	for j = 1, 12 do
 	--		EmitSfx(flare, i)
 	--		Sleep (100)
 	--	end

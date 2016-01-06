@@ -43,8 +43,11 @@ function DynamicApplyWeapon(unitDef, weapon, replace, slot)
 	unitDef.sfxtypes = unitDef.sfxtypes or {}
 	unitDef.sfxtypes.explosiongenerators = unitDef.sfxtypes.explosiongenerators or {}
 	
-	unitDef.sfxtypes.explosiongenerators[6 + slot*2] = wcp.muzzleeffectfire or [[custom:NONE]]
-	unitDef.sfxtypes.explosiongenerators[6 + slot*2] = wcp.muzzleeffectshot or [[custom:NONE]]
+	unitDef.sfxtypes.explosiongenerators[6 + slot*2] = wcp.muzzleeffectfire or ("custom:NONE" .. (6 + slot*2))
+	unitDef.sfxtypes.explosiongenerators[7 + slot*2] = wcp.muzzleeffectshot or ("custom:NONE" .. (7 + slot*2))
+	
+	--unitDef.sfxtypes.explosiongenerators[6 + slot*2] = ("custom:NONE" .. (6 + slot*2))
+	--unitDef.sfxtypes.explosiongenerators[7 + slot*2] = ("custom:NONE" .. (7 + slot*2))
 	
 	if (not isDgun) and not (dualwield or replace) then
 		unitDef.customparams.alreadyhasweapon = true

@@ -8,7 +8,6 @@ local chassisDefs = {
 			"commweapon_lparticlebeam",
 			"commweapon_shotgun",
 			--slow "commweapon_shotgun",
-			--slow "commweapon_shotgun",
 			"commweapon_lightninggun",
 			"commweapon_flamethrower",
 			"commweapon_heatray",
@@ -77,6 +76,10 @@ for i = 1, #chassisDefs do
 	
 	for key, data in pairs(statOverrides) do
 		unitDef[key] = data
+	end
+	
+	for i = 1, 7 do
+		unitDef.sfxtypes.explosiongenerators[i] = unitDef.sfxtypes.explosiongenerators[i] or [[custom:NONE]]
 	end
 	
 	for num = 1, #chassisDefs[i].weapons do
