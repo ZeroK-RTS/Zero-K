@@ -504,6 +504,8 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.areaCloak = true
+			sharedData.cloakFieldRange = 350
+			sharedData.cloakFieldUpkeep = 15
 			sharedData.radarJammingRange = 350
 		end
 	},
@@ -646,6 +648,7 @@ end
 local chassisDefs = {
 	{
 		name = "recon",
+		humanName = "Recon",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynrecon0"].id,
 		levelDefs = {
 			{
@@ -749,6 +752,7 @@ local chassisDefs = {
 	},
 	{
 		name = "support",
+		humanName = "Engineer",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
 		levelDefs = {
 			
@@ -853,6 +857,7 @@ local chassisDefs = {
 	},
 	{
 		name = "assault",
+		humanName = "Guardian",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
 		levelDefs = {
 			{
