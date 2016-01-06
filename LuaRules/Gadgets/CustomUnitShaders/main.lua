@@ -310,7 +310,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitFinished(unitID,unitDefID,teamID)
-  local matDef = GG.Upgrades_GetUnitCustomShader(unitID) or unitDefID
+  local matDef = Spring.GetUnitRulesParam(unitID, "comm_texture") or unitDefID
   local unitMat = unitMaterialInfos[matDef]
   if (unitMat) then
     local mat = materialDefs[unitMat[1]]

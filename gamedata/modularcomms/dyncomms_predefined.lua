@@ -9,7 +9,8 @@ return {
 			{"speed"},
 			{"speed"},
 		},
-		decorations = {"skin_recon_dark"},
+		decorations = {"skin_recon_dark", "banner_overhead"},
+		images = {overhead = "184"}
 	},
 	dyntrainer_support = {
 		name = "Engineer Trainer",
@@ -33,5 +34,7 @@ return {
 			{"health"},
 			{"buildpower"},
 		},
+		decorations = {"banner_overhead"},
+		images = {overhead = "166"}
 	},
 }

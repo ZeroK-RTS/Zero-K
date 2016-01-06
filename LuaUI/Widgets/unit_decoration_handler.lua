@@ -92,22 +92,32 @@ local function RemoveUnit(unitID, attributes, tex)
 	end
 end
 
-local function SetupPossibleCommander(unitID,  unitDefID)
+local function SetupPossibleCommander(unitID,  unitDefID, teamID)
 	if unitDefID and not unitAlreadyAdded[unitID] then
 		unitAlreadyAdded[unitID] = true
 		local ud = UnitDefs[unitDefID]
-		if ud.customParams and ud.customParams.commtype and ud.customParams.level then
-			local commtype = ud.customParams.commtype
-			local level = ud.customParams.level
+		if (ud.customParams and ud.customParams.commtype and ud.customParams.level) or Spring.GetUnitRulesParam(unitID, "comm_level") then
+			local commtype = Spring.GetUnitRulesParam(unitID, "comm_chassis") or ud.customParams.commtype
+			local level = Spring.GetUnitRulesParam(unitID, "comm_level") or ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
-				local decIconFunc, err = loadstring("return" .. (ud.customParams.decorationicons or ""))
-				local decIcons = decIconFunc() or {}
-				for pointName, data in pairs(points) do
-					local imageName = decIcons[pointName]
-					if imageName then
-						local image = GetImageDir(imageName)
-						AddUnitTexture(unitID, data,  image)
+				if Spring.GetUnitRulesParam(unitID, "comm_level") then
+					for pointName, data in pairs(points) do
+						local imageName = Spring.GetUnitRulesParam(unitID, "comm_banner_" .. pointName)
+						if imageName then
+							local image = GetImageDir(imageName)
+							AddUnitTexture(unitID, data,  image)
+						end
+					end
+				else
+					local decIconFunc, err = loadstring("return" .. (ud.customParams.decorationicons or ""))
+					local decIcons = decIconFunc() or {}
+					for pointName, data in pairs(points) do
+						local imageName = decIcons[pointName]
+						if imageName then
+							local image = GetImageDir(imageName)
+							AddUnitTexture(unitID, data,  image)
+						end
 					end
 				end
 			end
@@ -119,16 +129,26 @@ local function RemovePossibleCommander(unitID,  unitDefID)
 	if unitDefID then
 		unitAlreadyAdded[unitID] = nil
 		local ud = UnitDefs[unitDefID]
-		if ud.customParams and ud.customParams.commtype and ud.customParams.level then
-			local commtype = ud.customParams.commtype
-			local level = ud.customParams.level
+		if (ud.customParams and ud.customParams.commtype and ud.customParams.level) or Spring.GetUnitRulesParam(unitID, "comm_level") then
+			local commtype = Spring.GetUnitRulesParam(unitID, "comm_chassis") or ud.customParams.commtype
+			local level = Spring.GetUnitRulesParam(unitID, "comm_level") or ud.customParams.level
 			if commtypeTable[commtype] and commtypeTable[commtype][level] then
 				local points = commtypeTable[commtype][level]
-				for pointName, data in pairs(points) do
-					local imageName = (ud.customParams.decorationicons or {}).pointName
-					if imageName then
-						local image = GetImageDir(imageName)
-						AddUnitTexture(unitID, data,  image)
+				if Spring.GetUnitRulesParam(unitID, "comm_level") then
+					for pointName, data in pairs(points) do
+						local imageName = Spring.GetUnitRulesParam(unitID, "comm_banner_" .. pointName)
+						if imageName then
+							local image = GetImageDir(imageName)
+							AddUnitTexture(unitID, data,  image)
+						end
+					end
+				else
+					for pointName, data in pairs(points) do
+						local imageName = (ud.customParams.decorationicons or {}).pointName
+						if imageName then
+							local image = GetImageDir(imageName)
+							AddUnitTexture(unitID, data,  image)
+						end
 					end
 				end
 			end
@@ -138,15 +158,17 @@ end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
 	local unitDefID = spGetUnitDefID(unitID)
-	SetupPossibleCommander(unitID,  unitDefID)
+	SetupPossibleCommander(unitID,  unitDefID, unitTeam)
 end
 
 function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
-	SetupPossibleCommander(unitID,  unitDefID)
+	SetupPossibleCommander(unitID,  unitDefID, unitTeam)
 end
 
 function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
-	if not Spring.IsUnitAllied(unitID) then return end
+	if not Spring.IsUnitAllied(unitID) then 
+		return 
+	end
 	RemovePossibleCommander(unitID,  unitDefID)
 end
 

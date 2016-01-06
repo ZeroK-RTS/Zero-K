@@ -600,9 +600,9 @@ local moduleDefs = {
 	
 	-- Decorative Modules
 	{
-		name = "clan_banner",
-		humanName = "Clan Banner",
-		description = "Clan Banner",
+		name = "banner_overhead",
+		humanName = "Banner",
+		description = "Banner",
 		image = "unitpics/module_ablative_armor.png",
 		limit = 1,
 		cost = 0,
@@ -611,7 +611,7 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "decoration",
 		applicationFunction = function (modules, sharedData)
-			sharedData.skinOverride = "bla"
+			sharedData.bannerOverhead = true
 		end
 	}
 }

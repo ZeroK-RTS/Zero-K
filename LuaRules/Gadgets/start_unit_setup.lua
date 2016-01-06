@@ -200,7 +200,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 	local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
 	local altComm = playerCommProfiles[commChoice[playerID]]
 	if altComm then
-		startUnit = "unused_variable"	-- FIXME: this should probably be the dyncomm's base unitDef
+		startUnit = playerCommProfiles[commChoice[playerID]].baseUnitDefID
 		commProfileID = commChoice[playerID]
 	end
   end
