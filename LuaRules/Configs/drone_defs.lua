@@ -1,5 +1,6 @@
 -- reloadTime is in seconds
 -- offsets = {x,y,z} , where x is left(-)/right(+), y is up(+)/down(-), z is forward(+)/backward(-)
+local BUILD_UPDATE_INTERVAL = 15
 
 local carrierDefs = {}
 
@@ -38,6 +39,14 @@ local presets = {
 							offsets = {0,35,0,colvolMidX=0, colvolMidY=0,colvolMidZ=0,aimX=0,aimY=0,aimZ=0}},
 }
 
+local unitRulesCarrierDefs = {
+	drone = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 1, spawnSize = 1, range = 450, buildTime = 3, maxBuild = 1,
+					offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}},
+	battleDrone = {drone = UnitDefNames.battledrone.id, reloadTime = 20, maxDrones = 1, spawnSize = 1, range = 600, buildTime = 3, maxBuild = 1,
+					offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}}
+}
+					
+
 --[[
 for name, ud in pairs(UnitDefNames) do
 	if ud.customParams.sheath_preset then
@@ -67,4 +76,25 @@ local thingsWhichAreDrones = {
 	[UnitDefNames.fighterdrone.id] = true
 }
 
-return carrierDefs, thingsWhichAreDrones
+local function ProcessCarrierDef(carrierData)
+	-- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
+	local buildUpProgress = 1/(carrierData.buildTime)*(BUILD_UPDATE_INTERVAL/30)
+	carrierData.buildStep = buildUpProgress
+	carrierData.buildStepHealth = buildUpProgress*UnitDefs[carrierData.drone].health
+	carrierData.colvolTweaked = carrierData.offsets.colvolMidX~=0 or carrierData.offsets.colvolMidY~=0
+									or carrierData.offsets.colvolMidZ~=0 or carrierData.offsets.aimX~=0
+										or carrierData.offsets.aimY~=0 or carrierData.offsets.aimZ~=0
+	return carrierData
+end
+
+for name, carrierData in pairs(carrierDefs) do
+	for i = 1, #carrierData do
+		carrierData[i] = ProcessCarrierDef(carrierData[i])
+	end
+end
+
+for name, carrierData in pairs(unitRulesCarrierDefs) do
+	carrierData = ProcessCarrierDef(carrierData)
+end
+
+return carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL

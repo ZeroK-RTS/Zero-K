@@ -56,14 +56,7 @@ local commAreaShieldDefID = {
 	chargePerUpdate = 2*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
 	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
 }
-
-
-local droneDef = {drone = UnitDefNames.attackdrone.id, reloadTime = 10, maxDrones = 1, spawnSize = 1, range = 450, buildTime = 3, maxBuild = 1,
-					offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0,aimX = 0, aimY = 0, aimZ = 0}}
-local battleDroneDef = {drone = UnitDefNames.battledrone.id, reloadTime = 20, maxDrones = 1, spawnSize = 1, range = 600, buildTime = 3, maxBuild = 1,
-					offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0,aimX = 0, aimY = 0, aimZ = 0}}
-					
-					
+		
 for _, eud in pairs (UnitDefs) do
 	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
 		commanderCloakShieldDef.radiusException[eud.id] = true
@@ -182,19 +175,14 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_banner_overhead", images.overhead or "fakeunit", INLOS)
 	end
 	
-	if (data.drones or data.battleDrones) and GG.Drones_InitializeCarrier then
-		local carrierDef = {}
+	if (data.drones or data.battleDrones) and GG.Drones_InitializeDynamicCarrier then
 		if data.drones then
-			local droneTable = Spring.Utilities.CopyTable(droneDef)
-			droneTable.maxDrones = data.drones
-			carrierDef[#carrierDef + 1] = droneTable
+			Spring.SetUnitRulesParam(unitID, "carrier_count_drone", data.drones, INLOS)
 		end
 		if data.battleDrones then
-			local droneTable = Spring.Utilities.CopyTable(battleDroneDef)
-			droneTable.maxDrones = data.battleDrones
-			carrierDef[#carrierDef + 1] = droneTable
+			Spring.SetUnitRulesParam(unitID, "carrier_count_battleDrone", data.battleDrones, INLOS)
 		end
-		GG.Drones_InitializeCarrier(unitID, carrierDef)
+		GG.Drones_InitializeDynamicCarrier(unitID)
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)

@@ -40,12 +40,9 @@ local CMD_ATTACK		= CMD.ATTACK
 local emptyTable = {}
 
 -- thingsWhichAreDrones is an optimisation for AllowCommand
-local carrierDefs, thingsWhichAreDrones = include "LuaRules/Configs/drone_defs.lua"
+local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL = include "LuaRules/Configs/drone_defs.lua"
 
 local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
-local DEFAULT_MAX_DRONE_RANGE = 1500
-
-local BUILD_UPDATE_INTERVAL = 15 --gameframe
 
 local carrierList = {}
 local droneList = {}
@@ -56,7 +53,7 @@ local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function InitCarrier(unitID, carrierData, teamID)
+local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 	local toReturn  = {teamID = teamID, droneSets = {}, occupiedPieces={}, droneInQueue= {}}
 	local unitPieces = GetUnitPieceMap(unitID)
 	local usedPieces = carrierData.spawnPieces
@@ -70,13 +67,32 @@ local function InitCarrier(unitID, carrierData, teamID)
 	for i = 1, #carrierData do
 		-- toReturn.droneSets[i] = Spring.Utilities.CopyTable(carrierData[i])
 		toReturn.droneSets[i] = {nil}
-		toReturn.droneSets[i].config = carrierData[i] --same as above, but we assign reference to "carrierDefs[i]" table in memory to avoid duplicates, DO NOT CHANGE ITS CONTENT (its constant & config value only).
+		--same as above, but we assign reference to "carrierDefs[i]" table in memory to avoid duplicates, DO NOT CHANGE ITS CONTENT (its constant & config value only).
+		toReturn.droneSets[i].config = carrierData[i]
+		toReturn.droneSets[i].maxDrones = (maxDronesOverride and maxDronesOverride[i]) or carrierData[i].maxDrones
 		toReturn.droneSets[i].reload = carrierData[i].reloadTime
 		toReturn.droneSets[i].droneCount = 0
 		toReturn.droneSets[i].drones = {}
 		toReturn.droneSets[i].buildCount = 0
 	end
 	return toReturn
+end
+
+local function Drones_InitializeDynamicCarrier(unitID)
+	if carrierList[unitID] then
+		return
+	end
+	
+	local carrierData = {}
+	local maxDronesOverride = {}
+	for name, data in pairs(unitRulesCarrierDefs) do
+		local drones = Spring.GetUnitRulesParam(unitID, "carrier_count_" .. name)
+		if drones then
+			carrierData[#carrierData + 1] = data
+			maxDronesOverride[#maxDronesOverride + 1] = drones
+		end
+	end
+	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
 end
 
 -- communicates to unitscript, copied from unit_float_toggle; should be extracted to utility 
@@ -524,6 +540,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+	if Spring.GetUnitRulesParam(unitID, "comm_level") then
+		Drones_InitializeDynamicCarrier(unitID)
+	end
 	if (carrierDefs[unitDefID]) and not carrierList[unitID] then
 		carrierList[unitID] = InitCarrier(unitID, carrierDefs[unitDefID], unitTeam)
 	end
@@ -559,9 +578,9 @@ function gadget:GameFrame(n)
 						local reloadMult = spGetUnitRulesParam(carrierID, "totalReloadSpeedChange") or 1
 						set.reload = (set.reload - reloadMult)
 						
-					elseif (set.droneCount < set.config.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
+					elseif (set.droneCount < set.maxDrones) and set.buildCount < set.config.maxBuild then --not reach max count and finished previous queue
 						for n = 1, set.config.spawnSize do
-							if (set.droneCount >= set.config.maxDrones) then
+							if (set.droneCount >= set.maxDrones) then
 								break
 							end
 							-- Method1: Spawn instantly,
@@ -596,30 +615,8 @@ function gadget:GameFrame(n)
 	UpdateCoroutines() --maintain nanoframe position relative to carrier
 end
 
-local function ProcessCarrierDef(carrierData)
-	for i = 1, #carrierData do
-		-- derived from: time_to_complete = (1.0/build_step_fraction)*build_interval
-		local buildUpProgress = 1/(carrierData[i].buildTime)*(BUILD_UPDATE_INTERVAL/30)
-		carrierData[i].buildStep = buildUpProgress
-		carrierData[i].buildStepHealth = buildUpProgress*UnitDefs[carrierData[i].drone].health
-		carrierData[i].colvolTweaked = carrierData[i].offsets.colvolMidX~=0 or carrierData[i].offsets.colvolMidY~=0
-										or carrierData[i].offsets.colvolMidZ~=0 or carrierData[i].offsets.aimX~=0
-										or carrierData[i].offsets.aimY~=0 or carrierData[i].offsets.aimZ~=0
-	end
-	return carrierData
-end
-
-function GG.Drones_InitializeCarrier(unitID, carrierData)
-	carrierList[unitID] = InitCarrier(unitID, ProcessCarrierDef(carrierData), Spring.GetUnitTeam(unitID))
-end
-
 function gadget:Initialize()
-	--pre-calculate some buildtime related variable (this will be copied to carrierList[] table when carrier is initialized)
-	local buildUpProgress
-	for name, carrierData in pairs(carrierDefs) do
-		carrierData = ProcessCarrierDef(carrierData)
-	end
-
+	GG.Drones_InitializeDynamicCarrier = Drones_InitializeDynamicCarrier
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local build  = select(5, Spring.GetUnitHealth(unitID))
 		if build == 1 then
