@@ -1,3 +1,5 @@
+if not gadgetHandler:IsSyncedCode() or VFS.FileExists("mission.lua") then return end
+
 function gadget:GetInfo() return {
 	name     = "Startbox handler",
 	desc     = "Handles startboxes",
@@ -8,10 +10,18 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
-if VFS.FileExists("mission.lua") then return end
-
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
-local startboxConfig, manualStartposConfig
+
+--[[ expose a randomness seed
+this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
+afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
+local private_seed = math.random(2000000000) -- must be an integer
+Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
+local startboxConfig, manualStartposConfig = ParseBoxes()
+math.randomseed(private_seed)
+
+GG.startBoxConfig = startboxConfig
+GG.manualStartposConfig = manualStartposConfig
 
 local function CheckStartbox (boxID, x, z)
 	local box = startboxConfig[boxID]
@@ -28,19 +38,6 @@ local function CheckStartbox (boxID, x, z)
 
 	return false
 end
-
-if gadgetHandler:IsSyncedCode() then -- Synced -------------------------------------------------------------------------------
-
---[[ expose a randomness seed
-this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
-afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
-local private_seed = math.random(2000000000) -- must be an integer
-Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
-startboxConfig, manualStartposConfig = ParseBoxes()
-math.randomseed(private_seed)
-
-GG.startBoxConfig = startboxConfig
-GG.manualStartposConfig = manualStartposConfig
 
 function gadget:Initialize()
 
@@ -156,10 +153,6 @@ function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	end
 end
 
-else -- Unsynced ------------------------------------------------------------------------------------------------
-
-startboxConfig, manualStartposConfig = ParseBoxes()
-
 function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	local command = "ai_is_valid_startpos:"
 	if not dataStr:find(command,1,true) then return end
@@ -178,6 +171,4 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	else
 		return "0"
 	end
-end
-
 end
