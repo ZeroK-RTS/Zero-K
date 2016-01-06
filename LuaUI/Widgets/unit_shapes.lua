@@ -2,7 +2,7 @@ function widget:GetInfo()
    return {
       name      = "UnitShapes",
       desc      = "0.5.8.zk.02 Draws blended shapes around units and buildings",
-      author    = "Lelousius and aegis, modded Licho, CarRepairer, jK",
+      author    = "Lelousius and aegis, modded Licho, CarRepairer, jK, Shadowfury333",
       date      = "30.07.2010",
       license   = "GNU GPL, v2 or later",
       layer     = 2,
@@ -44,6 +44,11 @@ local spGetGameFrame		 = Spring.GetGameFrame
 local spTraceScreenRay		 = Spring.TraceScreenRay
 local spGetMouseState		 = Spring.GetMouseState
 
+local SafeWGCall = function(fnName) if fnName then return fnName() else return nil end end
+local GetUnitUnderCursor = function() return SafeWGCall(WG.PreSelection_GetUnitUnderCursor) end
+local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
+local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -56,6 +61,7 @@ local r,g,b = 0.1, 1, 0.2
 local rgba = {r,g,b,1}
 local yellow = {1,1,0.1,1}
 local teal = {0.1,1,1,1}
+local red = {1,0.2,0.1,1}
 local hoverColor = teal
 
 
@@ -67,6 +73,20 @@ local scalefaktor = 2.8
 local rectangleFactor = 2.7
 local CAlpha = 0.2
 
+
+local hoverScaleDuration = 0.05
+local hoverScaleStart = 0.95
+local hoverScaleEnd = 1.0
+
+local hoverRestedTime = 0.05 --Time in ms below which the player is assumed to be rapidly hovering over different units
+local hoverBufferDisplayTime = 0.05 --Time in ms to keep showing hover when starting box selection
+local hoverBufferScaleSuppressTime = 0.1 --Time in ms to stop box select from doing scale effect on a hovered unit
+
+local boxedScaleDuration = 0.05
+local boxedScaleStart = 0.9
+local boxedScaleEnd = 1.0
+
+
 local colorout = {   1,   1,   1,   0 } -- outer color
 local colorin  = {   r,   g,   b,   1 } -- inner color
 
@@ -75,15 +95,21 @@ local unitConf = {}
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 
-local visibleAllySelUnits = {} --actually a table of tables for colour purposes
-local hasVisibleAllySelections = false
-local hoverUnits = {}
+local lastBoxedUnits = {}
+local lastBoxedUnitsIDs = {}
 
+local selectedUnits = {}
+
+local visibleBoxed = {}
+local visibleAllySelUnits = {}
+local hoveredUnit = {}
+
+local hasVisibleAllySelections = false
 local forceUpdate = false
 ------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------
 options_path = 'Settings/Interface/Selection/Selection Shapes'
-options_order = {'showally', 'showallyplayercolours', 'showhover'} 
+options_order = {'showally', 'showallyplayercolours', 'showhover', 'showinselectionbox', 'animatehover', 'animateselectionbox'} 
 options = {
 	showally = {
 		name = 'Show Ally Selections',
@@ -110,8 +136,28 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = function(self) 
-			hoverUnits = {}
+			hoveredUnit = {}
 		end,
+	},
+	showinselectionbox = {
+		name = 'Highlight Units in Selection Box',
+		desc = 'Highlight the units in the selection box.', 
+		type = 'bool',
+		value = true,
+	},
+	animatehover = {
+		name = 'Animate Hover Shape',
+		desc = '',
+		type = 'bool',
+		value = true,
+		advanced = true,
+	},
+	animateselectionbox = {
+		name = 'Animate Shapes in Selection Box',
+		desc = '',
+		type = 'bool',
+		value = true,
+		advanced = true,
 	}
 }
 
@@ -122,6 +168,36 @@ local lastCamX, lastCamY, lastCamZ
 local lastGameFrame = 0
 
 local lastVisibleUnits, lastVisibleSelected, lastvisibleAllySelUnits
+-- local lastDrawtoolSetting = WG.drawtoolKeyPressed
+
+local hoverBuffer = 0
+local hoverTime = 0 --how long we've been hovering
+local cursorIsOn = "self"
+
+local function GetBoxedUnits() --Mostly a helper function for the animation system
+	local allBoxedUnits = GetUnitsInSelectionBox()
+	local boxedUnits = {}
+	local boxedUnitsIDs = {}
+	if allBoxedUnits then
+		for i=1, #allBoxedUnits do
+			if #hoveredUnit > 0 and hoveredUnit[1].unitID == allBoxedUnits[i] then --Transfer hovered unit here to avoid flickering
+				boxedUnits[#boxedUnits+1] = hoveredUnit[1]
+				hoveredUnit = {}
+				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits
+			elseif hoverBuffer > 0 or spIsUnitSelected(allBoxedUnits[i]) or not options.animateselectionbox.value then --don't scale if it just stopped being hovered over, reduces flicker effect
+				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits+1
+				boxedUnits[#boxedUnits+1] = {unitID = allBoxedUnits[i], scale = boxedScaleEnd}
+			elseif not lastBoxedUnitsIDs[allBoxedUnits[i]] then
+				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits+1
+				boxedUnits[#boxedUnits+1] = {unitID = allBoxedUnits[i], startTime = Spring.GetTimer(), duration = boxedScaleDuration, startScale = boxedScaleStart, endScale = boxedScaleEnd}
+			else
+				boxedUnits[#boxedUnits+1] = lastBoxedUnits[lastBoxedUnitsIDs[allBoxedUnits[i]]]
+				boxedUnitsIDs[allBoxedUnits[i]] = #boxedUnits
+			end
+		end
+	end
+	return boxedUnits, boxedUnitsIDs
+end
 
 local function HasVisibilityChanged()
 	local camX, camY, camZ = spGetCameraPosition()
@@ -134,61 +210,110 @@ local function HasVisibilityChanged()
 		lastCamX, lastCamY, lastCamZ = camX, camY, camZ
 		return true
 	end
+
+	-- if WG.drawtoolKeyPressed ~= lastDrawtoolSetting then
+	-- 	lastDrawtoolSetting = WG.drawtoolKeyPressed
+	-- 	return true
+	-- end
 	return false
 end
 
 local function GetVisibleUnits()
-		
-	local hoverUnits = {}
-	if options.showhover.value then
-		local mx, my = spGetMouseState()
-	  local pointedType, data = spTraceScreenRay(mx, my)
-		if pointedType == 'unit' and Spring.ValidUnitID(data) and not spIsUnitSelected(data) then -- and not spIsUnitIcon(data) then
-			hoverUnits[#hoverUnits+1] = data
-		end
+	local visibleBoxed = {}
+	if options.showinselectionbox.value then
+		local boxedUnits, boxedUnitsIDs = GetBoxedUnits()
+
+		if IsSelectionBoxActive() then --It's not worth rebuilding visible selected lists for selection box, but selection box needs to be updated per-frame
+			local units = spGetVisibleUnits(-1, 30, true)
+			for i=1, #units do
+				local unitID = units[i]
+				if boxedUnitsIDs[units[i]] and not WG.drawtoolKeyPressed then
+					visibleBoxed[#visibleBoxed+1] = boxedUnits[boxedUnitsIDs[unitID]]
+	      end
+	    end
+	  end
+
+		lastBoxedUnits = boxedUnits
+		lastBoxedUnitsIDs = boxedUnitsIDs
 	end
-		-- local teamID = spGetUnitTeam(data)
-		-- if teamID == spGetMyTeamID() then
-		-- 	glColor(myHoverColor)
-		-- elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
-		-- 	glColor(allyHoverColor)
-		-- else
-		-- 	glColor(enemyHoverColor)
-		-- end
 
 	if (HasVisibilityChanged()) then
 		local units = spGetVisibleUnits(-1, 30, true)
-		hasVisibleAllySelections = false
+		--local visibleUnits = {}
 		local visibleAllySelUnits = {}
 		local visibleSelected = {}
 		
 		for i=1, #units do
 			local unitID = units[i]
 			if (spIsUnitSelected(unitID)) then
-				visibleSelected[#visibleSelected+1] = unitID
-			elseif options.showally.value and WG.allySelUnits[unitID] then
-				local teamIDIndex = Spring.GetUnitTeam(unitID)+1
-				if Spring.GetSpectatingState() and not options.showallyplayercolours.value then
-					teamIDIndex = 1
+				visibleSelected[#visibleSelected+1] = {unitID = unitID}
+			end
+			if options.showally.value and WG.allySelUnits[unitID] then
+				local teamIDIndex = Spring.GetUnitTeam(unitID)
+				if teamIDIndex then --Possible nil check failure if unit is destroyed while selected
+					teamIDIndex = teamIDIndex+1
+					if Spring.GetSpectatingState() and not options.showallyplayercolours.value then
+						teamIDIndex = 1
+					end
+					if not visibleAllySelUnits[teamIDIndex] then
+						visibleAllySelUnits[teamIDIndex] = {}
+					end
+					visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = {unitID = unitID, scale = 0.92}
+					hasVisibleAllySelections = true
 				end
-				if not visibleAllySelUnits[teamIDIndex] then
-					visibleAllySelUnits[teamIDIndex] = {}
-				end
-				visibleAllySelUnits[teamIDIndex][#visibleAllySelUnits[teamIDIndex]+1] = unitID
-				hasVisibleAllySelections = true
 			end
 		end
 
 		lastvisibleAllySelUnits = visibleAllySelUnits
 		lastVisibleSelected = visibleSelected
-		return visibleAllySelUnits, visibleSelected, hoverUnits
+		return visibleAllySelUnits, visibleSelected, visibleBoxed
 	else
-		return lastvisibleAllySelUnits, lastVisibleSelected, hoverUnits
+		return lastvisibleAllySelUnits, lastVisibleSelected, visibleBoxed
 	end
 end
 
+local function GetHoveredUnit(dt) --Mostly a convenience function for the animation system
+	local unitID = GetUnitUnderCursor()
+	local hoveredUnit = hoveredUnit
+	local cursorIsOn = cursorIsOn
+	if unitID then
+		if #hoveredUnit == 0 or unitID ~= hoveredUnit[#hoveredUnit].unitID then
+			if hoverTime < hoverRestedTime or not options.animatehover.value then --Only animate hover effect if player is not rapidly changing hovered unit
+				hoveredUnit[1] = {unitID = unitID, scale = hoverScaleEnd}
+			else
+				hoveredUnit[1] = {unitID = unitID, startTime = Spring.GetTimer(), duration = hoverScaleDuration, startScale = hoverScaleStart, endScale = hoverScaleEnd}
+			end
 
+			local teamID = Spring.GetUnitTeam(unitID)
+			local myTeamID = Spring.GetMyTeamID()
+			if teamID then
+				if teamID == myTeamID then
+					cursorIsOn = "self"
+				elseif teamID and Spring.AreTeamsAllied(teamID, myTeamID) then
+					cursorIsOn = "ally"
+				else
+					cursorIsOn = "enemy"
+				end
+			end
+			hoverTime = 0
+		else
+			hoverTime = math.min(hoverTime + dt, hoverRestedTime)
+		end
 
+		hoverBuffer = hoverBufferDisplayTime + hoverBufferScaleSuppressTime
+	elseif hoverBuffer > 0 then
+		hoverBuffer = math.max(hoverBuffer - dt, 0)
+
+		if hoverBuffer <= hoverBufferScaleSuppressTime then --stop showing hover shape here, but if box selected within a short time don't do scale effect
+			hoveredUnit = {}
+		end
+
+		if hoverBuffer < hoverBufferScaleSuppressTime then
+			cursorIsOn = "self" --Don't change colour at the last second when over enemy
+		end
+	end
+	return hoveredUnit, cursorIsOn
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -414,9 +539,25 @@ local degrot = {}
 local HEADING_TO_RAD = 1/32768*math.pi
 local RADIANS_PER_COBANGLE = math.pi / 32768
 
-local function UpdateUnitListRotation(unitList)
-	for i=1, #unitList do
-		local unitID = unitList[i]
+local function UpdateunitlistUnderCursorScale(unitlistUnderCursor)
+	local now = Spring.GetTimer()
+	for i=1, #unitlistUnderCursor do
+		local startScale = unitlistUnderCursor[i].startScale
+		local endScale = unitlistUnderCursor[i].endScale
+		local scaleDuration = unitlistUnderCursor[i].duration
+		if scaleDuration and scaleDuration > 0 then
+			unitlistUnderCursor[i].scale = startScale + math.min(Spring.DiffTimers(now, unitlistUnderCursor[i].startTime) / scaleDuration, 1.0) * (endScale - startScale)
+		elseif startScale then
+			unitlistUnderCursor[i].scale = startScale
+		elseif not unitlistUnderCursor[i].scale then --implicitly allows explicit scale to be set on unitlistUnderCursor entry creation
+			unitlistUnderCursor[i].scale = 1.0
+		end	
+	end
+end
+
+local function UpdateunitlistUnderCursorRotation(unitlistUnderCursor)
+	for i=1, #unitlistUnderCursor do
+		local unitID = unitlistUnderCursor[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		if udid and unitConf[udid].noRotate then
 			degrot[unitID] = 0
@@ -427,33 +568,48 @@ local function UpdateUnitListRotation(unitList)
 				local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
 				degrot[unitID] = 180 + velHeading * rad_con	
 			end
-		else		
+		else
 			local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
 			degrot[unitID] = 180 + heading * rad_con	
 		end
 	end
 end
 
-function widget:Update()
-	visibleAllySelUnits, visibleSelected, hoverUnits = GetVisibleUnits()
+function widget:Update(dt)
+	if options.showhover.value then
+		hoveredUnit, cursorIsOn = GetHoveredUnit(dt)
+	end
+
+	visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
+
+	if #visibleBoxed > 0 then
+		cursorIsOn = "self"
+	end
 	
-	UpdateUnitListRotation(visibleSelected)
+	UpdateunitlistUnderCursorRotation(visibleSelected)
 	local teams = Spring.GetTeamList()
 	if Spring.GetSpectatingState() and options.showallyplayercolours.value then
 		for i=1, #teams do
 			if visibleAllySelUnits[teams[i]+1] then
-				UpdateUnitListRotation(visibleAllySelUnits[teams[i]+1])
+				UpdateunitlistUnderCursorRotation(visibleAllySelUnits[teams[i]+1])
+				UpdateunitlistUnderCursorScale(visibleAllySelUnits[teams[i]+1])
 			end
 		end
 	elseif hasVisibleAllySelections then
-		UpdateUnitListRotation(visibleAllySelUnits[1])
+		UpdateunitlistUnderCursorRotation(visibleAllySelUnits[1])
+		UpdateunitlistUnderCursorScale(visibleAllySelUnits[1])
 	end
-	UpdateUnitListRotation(hoverUnits)
+	UpdateunitlistUnderCursorRotation(hoveredUnit)
+	UpdateunitlistUnderCursorRotation(visibleBoxed)
+	
+	UpdateunitlistUnderCursorScale(visibleSelected)
+	UpdateunitlistUnderCursorScale(hoveredUnit)
+	UpdateunitlistUnderCursorScale(visibleBoxed)
 end
 
 
-function DrawUnitShapes(unitList, color)
-	if not unitList[1] then
+function DrawUnitShapes(unitlistUnderCursor, color)
+	if not unitlistUnderCursor[1] then
 		return
 	end
 
@@ -471,13 +627,14 @@ function DrawUnitShapes(unitList, color)
 	gl.ColorMask(false,false,false,true)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	for i=1, #unitList do
-		local unitID = unitList[i]
+	for i=1, #unitlistUnderCursor do
+		local unitID = unitlistUnderCursor[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
+		local scale = unitlistUnderCursor[i].scale
 
 		if (unit) then
-			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
 		end
 	end
 
@@ -486,13 +643,14 @@ function DrawUnitShapes(unitList, color)
 	gl.ColorMask(false,false,false,false)
 	gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	for i=1, #unitList do
-		local unitID = unitList[i]
+	for i=1, #unitlistUnderCursor do
+		local unitID = unitlistUnderCursor[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
+		local scale = unitlistUnderCursor[i].scale
 
 		if (unit) then
-			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale, 1.0, unit.zscale, degrot[unitID], 0, degrot[unitID], 0)
+			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
 			-- gl.Unit(unitID, true)
 		end
 	end
@@ -509,18 +667,19 @@ end
 
 function widget:DrawWorldPreUnit()
 		--if Spring.IsGUIHidden() then return end
-	if (#visibleSelected + #hoverUnits == 0) and not hasVisibleAllySelections then return end
-
+	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
+	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
 		gl.StencilTest(true)
 
-			hoverColor = teal
+			hoverColor = cursorIsOn == "enemy" and red or (cursorIsOn == "ally" and yellow or teal)
 
 			DrawUnitShapes(visibleSelected, rgba)
 			if not Spring.IsGUIHidden() then 
-				if Spring.GetSpectatingState() and options.showallyplayercolours.value then
-					hoverColor = yellow
+				local spec, _, fullselect = Spring.GetSpectatingState()
+				if spec and options.showallyplayercolours.value then
+					if fullselect then hoverColor = yellow end
 					
 					local teams = Spring.GetTeamList()
 					for i=1, #teams do
@@ -532,7 +691,8 @@ function widget:DrawWorldPreUnit()
 				elseif visibleAllySelUnits[1] then
 					DrawUnitShapes(visibleAllySelUnits[1], yellow)
 				end
-				DrawUnitShapes(hoverUnits, hoverColor)
+				DrawUnitShapes(hoveredUnit, hoverColor)
+				DrawUnitShapes(visibleBoxed, hoverColor)
 			end
 
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
