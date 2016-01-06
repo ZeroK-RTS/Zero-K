@@ -33,9 +33,14 @@ local pointSizeMult        = 2048
 --------------------------------------------------------------------------------
 local aoeDefInfo = {}
 local dgunInfo = {}
+
+local unitAoeDefs = {} 
+local unitDgunDefs = {}
+local unitHasBeenSetup = {} 
+
 local hasSelectionCallin = false
-local aoeUnitDefID
-local dgunUnitDefID
+local aoeUnitInfo
+local dgunUnitInfo
 local aoeUnitID
 local dgunUnitID
 local selUnitID
@@ -242,6 +247,22 @@ local function SetupUnit(unitDef, unitID)
 		return 
 	end
 
+	local weapon1, weapon2, manualfireWeapon, rangeMult
+	if unitID then
+		weapon1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+		weapon2 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+		
+		local manual1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_1") == 1
+		local manual2 = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_2") == 1
+		if manual1 then
+			manualfireWeapon = weapon1
+		elseif manual2 then
+			manualfireWeapon = weapon2
+		end
+		
+		rangeMult = Spring.GetUnitRulesParam(unitID, "comm_range_mult")
+	end
+	
 	local retDgunInfo
 	local retAoeInfo
 
@@ -249,12 +270,15 @@ local function SetupUnit(unitDef, unitID)
 	local maxWeaponDef
 
 	for num, weapon in ipairs(unitDef.weapons) do
-		if (weapon.weaponDef) then
+		if (weapon.weaponDef) and ((not unitID) or num == weapon1 or num == weapon2) then
 			local weaponDef = WeaponDefs[weapon.weaponDef]
 			if (weaponDef) then
 				local aoe = weaponDef.damageAreaOfEffect
-				if (num == 3 and unitDef.canManualFire) then
+				if (num == 3  and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
+					if retDgunInfo.range and rangeMult then
+						retDgunInfo.range = retDgunInfo.range * rangeMult
+					end
 				elseif (not weaponDef.isShield 
 						and not ToBool(weaponDef.interceptor) and not ToBool(weaponDef.customParams.hidden)
 						and (aoe > maxSpread or weaponDef.range * (weaponDef.accuracy + weaponDef.sprayAngle) > maxSpread )) then
@@ -266,7 +290,10 @@ local function SetupUnit(unitDef, unitID)
 	end
 
 	if (maxWeaponDef) then 
-		 retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
+		retAoeInfo = getWeaponInfo(maxWeaponDef, unitDef)
+		if retAoeInfo.range and rangeMult then
+			retAoeInfo.range = retAoeInfo.range * rangeMult
+		end
 	end
 	
 	return retAoeInfo, retDgunInfo
@@ -283,16 +310,12 @@ end
 --------------------------------------------------------------------------------
 --updates
 --------------------------------------------------------------------------------
-local function GetRepUnitID(unitIDs)
-	return unitIDs[1]
-end
-
 local function UpdateSelection()
 	local sel = GetSelectedUnitsSorted()
 
 	local maxCost = 0
-	dgunUnitDefID = nil
-	aoeUnitDefID = nil
+	dgunUnitInfo = nil
+	aoeUnitInfo = nil
 	dgunUnitID = nil
 	aoeUnitID = nil
 
@@ -300,21 +323,30 @@ local function UpdateSelection()
 		if unitDefID == "n" then
 			break
 		end
+		
+		local unitID = unitIDs[1]
+		local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
+		
+		if dynamicComm and not unitHasBeenSetup[unitID] then
+			unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
+			unitHasBeenSetup[unitID] = true
+		end
+		
 		if (dgunInfo[unitDefID]) then 
-			dgunUnitDefID = unitDefID
-			dgunUnitID = unitIDs[1]
+			dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+			dgunUnitID = unitID
 		end
 
 		if (aoeDefInfo[unitDefID]) then
 			local currCost = UnitDefs[unitDefID].cost * #unitIDs
 			if (currCost > maxCost) then
 				maxCost = currCost
-				aoeUnitDefID = unitDefID
-				aoeUnitID = GetRepUnitID(unitIDs)
+				aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+				aoeUnitID = unitID
 			end
 		end
 
-		local extraDrawParam = Spring.GetUnitRulesParam(unitIDs[1], "secondary_range")
+		local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
 		if extraDrawParam then
 			extraDrawRange = extraDrawParam
 		else
@@ -322,7 +354,7 @@ local function UpdateSelection()
 		end
 		
 		if extraDrawRange then
-			selUnitID = GetRepUnitID(unitIDs)
+			selUnitID = unitID
 		end
 	end
 end
@@ -663,14 +695,14 @@ function widget:DrawWorld()
 		end
 	end
 
-	if (cmd == CMD_ATTACK and aoeUnitDefID) then 
-		info = aoeDefInfo[aoeUnitDefID]
+	if (cmd == CMD_ATTACK and aoeUnitInfo) then 
+		info = aoeUnitInfo
 		unitID = aoeUnitID
-	elseif (cmd == CMD_MANUALFIRE and dgunUnitDefID) then
-		info = dgunInfo[dgunUnitDefID]
+	elseif (cmd == CMD_MANUALFIRE and dgunUnitInfo) then
+		info = dgunUnitInfo
 		local extraDrawParam = Spring.GetUnitRulesParam(dgunUnitID, "secondary_range")
 		if extraDrawParam then
-		info.range = extraDrawParam
+			info.range = extraDrawParam
 		end
 		unitID = dgunUnitID
 	else
@@ -730,6 +762,12 @@ function widget:DrawWorld()
 		glColor(1,1,1,1)
 	end
 
+end
+
+function widget:UnitDestroyed(unitID)
+	unitAoeDefs[unitID] = nil
+	unitDgunDefs[unitID] = nil
+	unitHasBeenSetup[unitID] = nil
 end
 
 function widget:SelectionChanged(sel)
