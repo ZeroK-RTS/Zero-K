@@ -679,7 +679,7 @@ function widget:DrawWorldPreUnit()
 			if not Spring.IsGUIHidden() then 
 				local spec, _, fullselect = Spring.GetSpectatingState()
 				if spec and options.showallyplayercolours.value then
-					if fullselect then hoverColor = yellow end
+					if fullselect then hoverColor = teal end
 					
 					local teams = Spring.GetTeamList()
 					for i=1, #teams do
