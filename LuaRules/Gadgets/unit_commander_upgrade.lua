@@ -27,7 +27,7 @@ local internalCreationModuleEffectData
 
 local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield, unitCreatedWeaponNums
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
@@ -65,10 +65,15 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
+local moduleSlotTypeMap = {
+	decoration = "decoration",
+	module = "module",
+	basic_weapon = "module",
+	adv_weapon = "module",
+}
 
 local function SetUnitRulesModule(unitID, counts, moduleDefID)
-	local slotType = moduleDefs[moduleDefID].slotType
+	local slotType = moduleSlotTypeMap[moduleDefs[moduleDefID].slotType]
 	counts[slotType] = counts[slotType] + 1
 	Spring.SetUnitRulesParam(unitID, "comm_" .. slotType .. "_" .. counts[slotType], moduleDefID, INLOS)
 end
@@ -87,7 +92,7 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	
 	if weapon2 then
 		weapon2 = chassisWeaponDefNames[weapon2]
-	elseif Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
+	elseif Spring.GetUnitRulesParam(unitID, "comm_level") > 2 and Spring.GetUnitRulesParam(unitID, "comm_chassis") == 3 then 
 		weapon2 = chassisWeaponDefNames["commweapon_peashooter"]
 	end
 	
@@ -246,7 +251,9 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	})
 	
 	-- Set module unitRulesParams
-	local counts = {module = 0, weapon = 0, decoration = 0}
+	-- Decorations are kept seperate from other module types.
+	-- basic_weapon, adv_weapon and module all count as modules.
+	local counts = {module = 0, decoration = 0}
 	for i = 1, #moduleList do
 		local moduleDefID = moduleList[i]
 		SetUnitRulesModule(unitID, counts, moduleDefID)
@@ -461,12 +468,6 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Find the modules which are already owned
 	local alreadyOwned = {}
 	local fullModuleList = {}
-	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-	for i = 1, weaponCount do
-		local weapon = Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)
-		alreadyOwned[#alreadyOwned + 1] = weapon
-		fullModuleList[#fullModuleList + 1] = weapon
-	end
 	
 	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 	for i = 1, moduleCount do
@@ -496,7 +497,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	-- Finish the full modules list
 	-- Empty module slots do not make it into this list
 	for i = 1, #pNewModules  do
-		if not emptyModules[pNewModules[i]] then
+		if not moduleDefs[pNewModules[i]].emptyModule then
 			fullModuleList[#fullModuleList + 1] = pNewModules[i] 
 		end
 	end
@@ -510,7 +511,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
-		if upgradeUtilities.ModuleIsValid(newLevel, chassis, slotDefs[i].slotType, moduleDefID, modulesByDefID) then
+		if upgradeUtilities.ModuleIsValid(newLevel, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
 			cost = cost + moduleDefs[moduleDefID].cost
 		else
 			return false

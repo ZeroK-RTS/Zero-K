@@ -13,11 +13,11 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 500,
-		subs    = 18,
+		default = 800,
+		subs    = 40,
 	},
 
-	explosionGenerator      = [[custom:greencannonimpact]],
+	explosionGenerator      = [[custom:flash2green_large]],
 	fireStarter             = 100,
 	impactOnly              = true,
 	impulseFactor           = 0,

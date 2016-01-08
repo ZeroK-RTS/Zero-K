@@ -65,7 +65,7 @@ local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local emptyTable = {}
 
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

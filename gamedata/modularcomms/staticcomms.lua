@@ -244,11 +244,12 @@ for i = 1, #chassisList do
 				modules = modules,
 			}
 			if chassis == "dynsupport" then
-				modules[#modules + 1] = "module_resurrect"
+				local resModule = Spring.Utilities.CopyTable(modules)
+				resModule[#resModule + 1] = "module_resurrect"
 				comms[fullChassis .. "_damage_boost" .. weaponCount .. "resurrect"] = {
 					chassis = fullChassis,
 					name = fullChassis,
-					modules = modules,
+					modules = resModule,
 				}
 			end
 		end

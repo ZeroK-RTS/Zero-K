@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, emptyModules, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -285,8 +285,8 @@ local function GetAlreadyOwned()
 	return alreadyOwnedModules
 end
 
-local function GetSlotModule(slot, slotType)
-	return currentModulesBySlot[slot] or emptyModules[slotType]
+local function GetSlotModule(slot, emptyModule)
+	return currentModulesBySlot[slot] or emptyModule
 end
 
 local function UpdateSlotModule(slot, moduleDefID)
@@ -304,31 +304,36 @@ local function UpdateSlotModule(slot, moduleDefID)
 	currentModulesByDefID[moduleDefID] = (currentModulesByDefID[moduleDefID] or 0) + 1
 end
 
-local function ModuleIsValid(level, chassis, slotType, slotIndex)
+local function ModuleIsValid(level, chassis, slotAllows, slotIndex)
 	local moduleDefID = currentModulesBySlot[slotIndex]
-	return upgradeUtilities.ModuleIsValid(level, chassis, slotType, moduleDefID, alreadyOwnedModulesByDefID, currentModulesByDefID)
+	return upgradeUtilities.ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwnedModulesByDefID, currentModulesByDefID)
 end
 
-local function GetNewReplacementSet(level, chassis, slotType, ignoreSlot)
+local function GetNewReplacementSet(level, chassis, slotAllows, ignoreSlot)
 	local replacementSet = {}
+	local haveEmpty = false
 	for i = 1, #moduleDefs do
 		local data = moduleDefs[i]
-		if data.slotType == slotType and (data.requireLevel or 0) <= level and 
+		if slotAllows[data.slotType] and (data.requireLevel or 0) <= level and 
 				((not data.requireChassis) or data.requireChassis[chassis]) and not data.unequipable then
 			local accepted = true
 			
 			-- Check whether required modules are present, not counting ignored slot
-			if data.requireModules then
-				for j = 1, #data.requireModules do
-					local req = data.requireModules[j]
-					if not (alreadyOwnedModulesByDefID[req] or 
+			if data.requireOneOf then
+				local foundRequirement = false
+				for j = 1, #data.requireOneOf do
+					local req = data.requireOneOf[j]
+					if (alreadyOwnedModulesByDefID[req] or 
 						(currentModulesByDefID[req] and 
 							(currentModulesBySlot[ignoreSlot] ~= req or 
 							currentModulesByDefID[req] > 1))) then
 						
-						accepted = false
+						foundRequirement = true
 						break
 					end
+				end
+				if not foundRequirement then
+					accepted = false
 				end
 			end
 			
@@ -358,6 +363,16 @@ local function GetNewReplacementSet(level, chassis, slotType, ignoreSlot)
 				end
 			end
 			
+			-- Only put one empty module in the accepted set (for the case of slots which allow two or more types)
+			if accepted and data.emptyModule then
+				if haveEmpty then
+					accepted = false
+				else
+					haveEmpty = true
+				end
+			end
+			
+			-- Add the module once accepted
 			if accepted then
 				replacementSet[#replacementSet + 1] = i
 			end
@@ -462,7 +477,7 @@ local function ModuleReplacmentWithButton(slotIndex, moduleDefID)
 	UpdateSlotModule(slotIndex, moduleDefID)
 end
 
-local function GetCurrentModuleButton(moduleDefID, slotIndex, level, chassis, slotType)
+local function GetCurrentModuleButton(moduleDefID, slotIndex, level, chassis, slotAllows, empty)
 	if not currentModuleButton[slotIndex] then
 		AddCurrentModuleButton(slotIndex, moduleDefID)
 	end
@@ -472,8 +487,9 @@ local function GetCurrentModuleButton(moduleDefID, slotIndex, level, chassis, sl
 	
 	current.level = level
 	current.chassis = chassis
-	current.slotType = slotType
-	current.replacementSet = GetNewReplacementSet(level, chassis, slotType, slotIndex)
+	current.slotAllows = slotAllows
+	current.empty = empty
+	current.replacementSet = GetNewReplacementSet(level, chassis, slotAllows, slotIndex)
 
 	ModuleReplacmentWithButton(slotIndex, moduleDefID)
 	
@@ -490,17 +506,20 @@ function SelectNewModule(moduleDefID)
 	-- Check whether module choices are still valid
 	local requireUpdate = true
 	local newCost = 0
-	while requireUpdate do
+	for repeatBreak = 1, 2 * #currentModuleData do
 		newCost = 0
 		requireUpdate = false
 		for i = 1, #currentModuleData do
 			local data = currentModuleData[i]
-			if ModuleIsValid(data.level, data.chassis, data.slotType, i) then
-				newCost = newCost + moduleDefs[GetSlotModule(i, data.slotType)].cost
+			if ModuleIsValid(data.level, data.chassis, data.slotAllows, i) then
+				newCost = newCost + moduleDefs[GetSlotModule(i, data.empty)].cost
 			else
 				requireUpdate = true
-				ModuleReplacmentWithButton(i, emptyModules[data.slotType])
+				ModuleReplacmentWithButton(i, data.empty)
 			end
+		end
+		if not requireUpdate then
+			break
 		end
 	end
 	
@@ -509,7 +528,7 @@ function SelectNewModule(moduleDefID)
 	-- Update each replacement set
 	for i = 1, #currentModuleData do
 		local data = currentModuleData[i]
-		data.replacementSet = GetNewReplacementSet(data.level, data.chassis, data.slotType, i)
+		data.replacementSet = GetNewReplacementSet(data.level, data.chassis, data.slotAllows, i)
 	end
 	
 	ShowModuleSelection(currentModuleData[activeSlotIndex].replacementSet)
@@ -752,17 +771,20 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 	-- Check that the module in each slot is valid
 	local requireUpdate = true
 	local newCost = 0
-	while requireUpdate do
+	for repeatBreak = 1, 2 * #slots do
 		requireUpdate = false
 		newCost = 0
 		for i = 1, #slots do
 			local slotData = slots[i]
-			if ModuleIsValid(level, chassis, slotData.slotType, i) then
-				newCost = newCost + moduleDefs[GetSlotModule(i, slotData.slotType)].cost
+			if ModuleIsValid(level, chassis, slotData.slotAllows, i) then
+				newCost = newCost + moduleDefs[GetSlotModule(i, slotData.empty)].cost
 			else
 				requireUpdate = true
-				UpdateSlotModule(i, emptyModules[slotData.slotType])
+				UpdateSlotModule(i, slotData.empty)
 			end
+		end
+		if not requireUpdate then
+			break
 		end
 	end
 	
@@ -771,7 +793,7 @@ local function ShowModuleListWindow(slots, slotDefaults, level, chassis, already
 	-- Actually add the default modules and slot data
 	for i = 1, #slots do
 		local slotData = slots[i]
-		currentModuleList:AddChild(GetCurrentModuleButton(GetSlotModule(i, slotData.slotType), i, level, chassis, slotData.slotType))
+		currentModuleList:AddChild(GetCurrentModuleButton(GetSlotModule(i, slotData.empty), i, level, chassis, slotData.slotAllows, slotData.empty))
 	end
 end
 
@@ -793,12 +815,6 @@ function SendUpgradeCommand(newModules)
 		local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 		if level == upgradeSignature.level and chassis == upgradeSignature.chassis then
 			local alreadyOwned = {}
-			local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-			for i = 1, weaponCount do
-				local weapon = Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)
-				alreadyOwned[#alreadyOwned + 1] = weapon
-			end
-			
 			local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 			for i = 1, moduleCount do
 				local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
@@ -849,12 +865,6 @@ local function CreateModuleListWindowFromUnit(unitID)
 	
 	-- Find the modules which are already owned
 	local alreadyOwned = {}
-	local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-	for i = 1, weaponCount do
-		local weapon = Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)
-		alreadyOwned[#alreadyOwned + 1] = weapon
-	end
-	
 	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 	for i = 1, moduleCount do
 		local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
@@ -907,12 +917,6 @@ function widget:CommandsChanged()
 			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 			if level == upgradeSignature.level and chassis == upgradeSignature.chassis then
 				local alreadyOwned = {}
-				local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-				for i = 1, weaponCount do
-					local weapon = Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)
-					alreadyOwned[#alreadyOwned + 1] = weapon
-				end
-				
 				local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 				for i = 1, moduleCount do
 					local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)

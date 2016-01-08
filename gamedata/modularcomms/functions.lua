@@ -21,10 +21,11 @@ mapWeaponToCEG = {
 
 
 function DynamicApplyWeapon(unitDef, weapon, replace, slot)
+	if not weapons[weapon] then
+		Spring.Echo("Cannont find weapon", weapon)
+	end
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
-	
-	Spring.Echo(weapons[weapon].name .. " into slot " .. slot)
 	
 	unitDef.weapons = unitDef.weapons or {}
 	unitDef.weapondefs = unitDef.weapondefs or {}

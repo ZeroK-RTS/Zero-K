@@ -5,6 +5,8 @@ local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
 -- Module Definitions
 ------------------------------------------------------------------------
 
+local moduleDefNames = {}
+
 local moduleDefs = {
 	-- Empty Module Slots
 	{
@@ -13,19 +15,32 @@ local moduleDefs = {
 		description = "No Module",
 		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
 		limit = false,
+		emptyModule = true,
 		cost = 0,
 		requireLevel = 0,
 		slotType = "module",
 	},
 	{
-		name = "nullweapon",
+		name = "nullbasicweapon",
 		humanName = "No Weapon",
 		description = "No Weapon",
 		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
 		limit = false,
+		emptyModule = true,
 		cost = 0,
 		requireLevel = 0,
-		slotType = "weapon",
+		slotType = "basic_weapon",
+	},
+	{
+		name = "nulladvweapon",
+		humanName = "No Weapon",
+		description = "No Weapon",
+		image = "LuaUI/Images/dynamic_comm_menu/cross.png",
+		limit = false,
+		emptyModule = true,
+		cost = 0,
+		requireLevel = 0,
+		slotType = "adv_weapon",
 	},
 	
 	-- Weapons
@@ -38,8 +53,11 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"recon", "support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_beamlaser"
 			else
@@ -56,8 +74,11 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"recon", "assault"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_clusterbomb"
 			else
@@ -72,10 +93,13 @@ local moduleDefs = {
 		image = "unitpics/commweapon_concussion.png",
 		limit = 1,
 		cost = 100,
-		requireChassis = {"support"},
+		requireChassis = {"support", "recon"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_concussion"
 			else
@@ -92,8 +116,11 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"assault"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_disintegrator"
 			else
@@ -110,8 +137,11 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"recon", "support"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_disruptorbomb"
 			else
@@ -128,8 +158,11 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"recon", "assault"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_flamethrower"
 			else
@@ -144,10 +177,13 @@ local moduleDefs = {
 		image = "unitpics/commweapon_heatray.png",
 		limit = 1,
 		cost = 100,
-		requireChassis = {"recon", "assault"},
+		requireChassis = {"assault"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_heatray"
 			else
@@ -164,31 +200,37 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"recon", "assault"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_heavymachinegun_disrupt") or "commweapon_heavymachinegun"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_heavymachinegun"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_heavymachinegun"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
 	{
 		name = "commweapon_hparticlebeam",
 		humanName = "Heavy Particle Beam",
-		description = "Heavy Particle Beam",
+		description = "Heavy Particle Beam, replaces level 1 weapon.",
 		image = "unitpics/conversion_hparticlebeam.png",
 		limit = 1,
 		cost = 100,
 		requireChassis = {"support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
-			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_hparticlebeam"
-			else
-				sharedData.weapon2 = "commweapon_hparticlebeam"
+			if sharedData.noMoreWeapons then
+				return
 			end
+			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_heavy_disruptor") or "commweapon_hparticlebeam"
+			sharedData.weapon1 = weaponName
+			sharedData.weapon2 = nil
+			sharedData.noMoreWeapons = true
 		end
 	},
 	{
@@ -198,20 +240,19 @@ local moduleDefs = {
 		image = "unitpics/commweapon_assaultcannon.png",
 		limit = 1,
 		cost = 100,
-		requireChassis = {"assault", "support"},
+		requireChassis = {"assault"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
-			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_hpartillery"
-			else
-				sharedData.weapon2 = "commweapon_hpartillery"
+			if sharedData.noMoreWeapons then
+				return
 			end
-			--if not sharedData.weapon1 then
-			--	sharedData.weapon1 = "commweapon_hpartillery_napalm"
-			--else
-			--	sharedData.weapon2 = "commweapon_hpartillery_napalm"
-			--end
+			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_hpartillery_napalm") or "commweapon_hpartillery"
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = weaponName
+			else
+				sharedData.weapon2 = weaponName
+			end
 		end
 	},
 	{
@@ -223,12 +264,16 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"recon", "support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.flux_amplifier] and "commweapon_lightninggun_improved") or "commweapon_lightninggun"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_lightninggun"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_lightninggun"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
@@ -241,18 +286,17 @@ local moduleDefs = {
 		cost = 100,
 		requireChassis = {"support", "recon"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
-			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_lparticlebeam"
-			else
-				sharedData.weapon2 = "commweapon_lparticlebeam"
+			if sharedData.noMoreWeapons then
+				return
 			end
-			--if not sharedData.weapon1 then
-			--	sharedData.weapon1 = "commweapon_disruptor"
-			--else
-			--	sharedData.weapon2 = "commweapon_disruptor"
-			--end
+			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_disruptor") or "commweapon_lparticlebeam"
+			if not sharedData.weapon1 then
+				sharedData.weapon1 = weaponName
+			else
+				sharedData.weapon2 = weaponName
+			end
 		end
 	},
 	{
@@ -264,8 +308,11 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_missilelauncher"
 			else
@@ -282,12 +329,16 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"support", "recon"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.flux_amplifier] and "commweapon_multistunner_improved") or "commweapon_multistunner"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_multistunner"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_multistunner"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
@@ -300,8 +351,11 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"assault", "recon"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_napalmgrenade"
 			else
@@ -318,12 +372,16 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"assault"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_riotcannon_napalm") or "commweapon_riotcannon"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_riotcannon"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_riotcannon"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
@@ -336,31 +394,36 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"assault", "support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_rocketlauncher_napalm") or "commweapon_rocketlauncher"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_rocketlauncher"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_rocketlauncher"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
 	{
 		name = "commweapon_shockrifle",
 		humanName = "Shock Rifle",
-		description = "Shock Rifle",
+		description = "Shock Rifle, replaces level 1 weapon.",
 		image = "unitpics/conversion_shockrifle.png",
 		limit = 1,
 		cost = 50,
 		requireChassis = {"support"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
-			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_shockrifle"
-			else
-				sharedData.weapon2 = "commweapon_shockrifle"
+			if sharedData.noMoreWeapons then
+				return
 			end
+			sharedData.weapon1 = "commweapon_shockrifle"
+			sharedData.weapon2 = nil
+			sharedData.noMoreWeapons = true
 		end
 	},
 	{
@@ -372,12 +435,16 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"assault", "recon"},
 		requireLevel = 1,
-		slotType = "weapon",
+		slotType = "basic_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
+			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_shotgun_disrupt") or "commweapon_shotgun"
 			if not sharedData.weapon1 then
-				sharedData.weapon1 = "commweapon_shotgun"
+				sharedData.weapon1 = weaponName
 			else
-				sharedData.weapon2 = "commweapon_shotgun"
+				sharedData.weapon2 = weaponName
 			end
 		end
 	},
@@ -390,8 +457,11 @@ local moduleDefs = {
 		cost = 50,
 		requireChassis = {"assault"},
 		requireLevel = 3,
-		slotType = "weapon",
+		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
+			if sharedData.noMoreWeapons then
+				return
+			end
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = "commweapon_slamrocket"
 			else
@@ -401,6 +471,21 @@ local moduleDefs = {
 	},
 	
 	-- Unique Modules
+	{
+		name = "econ",
+		humanName = "Vanguard Economy Pack",
+		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
+		image = "unitpics/module_energy_cell.png",
+		limit = 1,
+		unequipable = true,
+		cost = 0,
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
+			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
+		end
+	},
 	{
 		name = "commweapon_personal_shield",
 		humanName = "Personal Shield",
@@ -423,7 +508,7 @@ local moduleDefs = {
 		limit = 1,
 		cost = 100,
 		requireChassis = {"assault", "support"},
-		requireModules = {"commweapon_personal_shield"},
+		requireOneOf = {"commweapon_personal_shield"},
 		prohibitingModules = {"personalcloak"},
 		requireLevel = 0,
 		slotType = "module",
@@ -432,19 +517,40 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "econ",
-		humanName = "Vanguard Economy Pack",
-		description = "Vanguard Economy Pack, produces 4 Metal and 6 Energy.",
-		image = "unitpics/module_energy_cell.png",
+		name = "napalm_warhead",
+		humanName = "Napalm Warhead",
+		description = "Riot Cannon, Rocket Launcher and Plasma Artillery set targets on fire. Reduced direct damage.",
+		image = "unitpics/weaponmod_napalm_warhead.png",
 		limit = 1,
-		unequipable = true,
-		cost = 0,
+		cost = 100,
+		requireChassis = {"assault"},
+		requireOneOf = {"commweapon_rocketlauncher", "commweapon_hpartillery", "commweapon_riotcannon"},
 		requireLevel = 0,
 		slotType = "module",
-		applicationFunction = function (modules, sharedData)
-			sharedData.metalIncome = (sharedData.metalIncome or 0) + 3.7
-			sharedData.energyIncome = (sharedData.energyIncome or 0) + 5.7
-		end
+	},
+	{
+		name = "disruptor_ammo",
+		humanName = "Disruptor Ammo",
+		description = "Heavy Machine Gun, Shotgun and Particle Beams deal slow damage. Reduced direct damage.",
+		image = "unitpics/weaponmod_disruptor_ammo.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"support", "recon", "assult"},
+		requireOneOf = {"commweapon_heavymachinegun", "commweapon_shotgun", "commweapon_hparticlebeam", "commweapon_lparticlebeam"},
+		requireLevel = 0,
+		slotType = "module",
+	},
+	{
+		name = "flux_amplifier",
+		humanName = "Flux Amplifier",
+		description = "Improves EMP duration and strength of Lightning Rifle and Multistunner.",
+		image = "unitpics/weaponmod_stun_booster.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"support"},
+		requireOneOf = {"commweapon_lightninggun", "commweapon_multistunner"},
+		requireLevel = 0,
+		slotType = "module",
 	},
 	{
 		name = "radarjammer",
@@ -453,7 +559,6 @@ local moduleDefs = {
 		image = "unitpics/module_jammer.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -469,7 +574,6 @@ local moduleDefs = {
 		image = "unitpics/module_fieldradar.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -483,7 +587,6 @@ local moduleDefs = {
 		image = "unitpics/module_personal_cloak.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {},
 		prohibitingModules = {"commweapon_personal_shield", "commweapon_area)shield"},
 		requireLevel = 0,
 		slotType = "module",
@@ -499,7 +602,7 @@ local moduleDefs = {
 		image = "unitpics/module_cloak_field.png",
 		limit = 1,
 		cost = 100,
-		requireModules = {"radarjammer"},
+		requireOneOf = {"radarjammer"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -520,7 +623,7 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.canRessurect = true
+			sharedData.canResurrect = true
 			sharedData.buildPowerMult = 0.5
 		end
 	},
@@ -534,7 +637,6 @@ local moduleDefs = {
 		limit = 3,
 		cost = 60,
 		requireChassis = {"recon", "support"},
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -549,7 +651,7 @@ local moduleDefs = {
 		limit = 3,
 		cost = 60,
 		requireChassis = {"recon", "support"},
-		requireModules = {"drone"},
+		requireOneOf = {"drone"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -564,7 +666,6 @@ local moduleDefs = {
 		limit = 3,
 		cost = 60,
 		requireChassis = {"recon", "support", "assault"},
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -579,7 +680,6 @@ local moduleDefs = {
 		limit = 3,
 		cost = 60,
 		requireChassis = {"recon", "support"},
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -593,7 +693,7 @@ local moduleDefs = {
 		image = "unitpics/module_heavy_armor.png",
 		limit = 3,
 		cost = 50,
-		requireModules = {"health"},
+		requireOneOf = {"health"},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -608,7 +708,6 @@ local moduleDefs = {
 		image = "unitpics/module_dmg_booster.png",
 		limit = 8,
 		cost = 40,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 	},
@@ -619,7 +718,6 @@ local moduleDefs = {
 		image = "unitpics/module_high_power_servos.png",
 		limit = 8,
 		cost = 40,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -633,7 +731,6 @@ local moduleDefs = {
 		image = "unitpics/module_adv_targeting.png",
 		limit = 8,
 		cost = 40,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -647,7 +744,6 @@ local moduleDefs = {
 		image = "unitpics/module_adv_nano.png",
 		limit = 8,
 		cost = 40,
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -665,7 +761,6 @@ local moduleDefs = {
 		limit = 1,
 		cost = 0,
 		requireChassis = {},
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "decoration",
 		applicationFunction = function (modules, sharedData)
@@ -683,7 +778,6 @@ for name, data in pairs(skinDefs) do
 		limit = 1,
 		cost = 0,
 		requireChassis = {data.chassis},
-		requireModules = {},
 		requireLevel = 0,
 		slotType = "decoration",
 		applicationFunction = function (modules, sharedData)
@@ -692,7 +786,6 @@ for name, data in pairs(skinDefs) do
 	}
 end
 
-local moduleDefNames = {}
 for i = 1, #moduleDefs do
 	moduleDefNames[moduleDefs[i].name] = i
 end
@@ -732,11 +825,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = "basic_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -752,11 +845,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -772,15 +865,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = "adv_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -796,15 +889,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -820,15 +913,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -867,11 +960,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = "basic_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -891,11 +984,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -915,15 +1008,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = "adv_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -943,15 +1036,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -971,15 +1064,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1010,11 +1103,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = "basic_weapon",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1030,11 +1123,11 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1050,15 +1143,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotType = "weapon",
+						slotAllows = {"adv_weapon", "basic_weapon"},
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1074,15 +1167,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1098,15 +1191,15 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,
-						slotType = "module",
+						slotAllows = "module",
 					},
 				},
 			},
@@ -1130,33 +1223,20 @@ end
 -- Processing
 ------------------------------------------------------------------------
 
--- Find the empty modules
--- This table is both by slotType and by moduleDefID
-local emptyModules = {}
-for i = 1, #moduleDefs do
-	if moduleDefs[i].name == "nullmodule" then
-		emptyModules.module = i
-		emptyModules[i] = true
-	elseif moduleDefs[i].name == "nullweapon" then
-		emptyModules.weapon = i
-		emptyModules[i] = true
-	end
-end
-
 -- Transform from human readable format into number indexed format
 for i = 1, #moduleDefs do
 	local data = moduleDefs[i]
 	
 	-- Required modules are a list of moduleDefIDs
-	if data.requireModules then
+	if data.requireOneOf then
 		local newRequire = {}
-		for j = 1, #data.requireModules do
-			local reqModuleID = moduleDefNames[data.requireModules[j]]
+		for j = 1, #data.requireOneOf do
+			local reqModuleID = moduleDefNames[data.requireOneOf[j]]
 			if reqModuleID then
 				newRequire[#newRequire + 1] = reqModuleID
 			end
 		end
-		data.requireModules = newRequire
+		data.requireOneOf = newRequire
 	end
 	
 	-- Prohibiting modules are a list of moduleDefIDs too
@@ -1187,8 +1267,37 @@ for i = 1, #moduleDefs do
 	end
 end
 
+-- Find empty modules so slots can find their appropriate empty module
+local emptyModules = {}
+for i = 1, #moduleDefs do
+	if moduleDefs[i].emptyModule then
+		emptyModules[moduleDefs[i].slotType] = i
+	end
+end
+
+-- Process slotAllows into a table of keys
+for i = 1, #chassisDefs do
+	for j = 0, #chassisDefs[i].levelDefs do
+		local levelData = chassisDefs[i].levelDefs[j]
+		for k = 1, #levelData.upgradeSlots do
+			local slotData = levelData.upgradeSlots[k]
+			if type(slotData.slotAllows) == "string" then
+				slotData.empty = emptyModules[slotData.slotAllows]
+				slotData.slotAllows = {[slotData.slotAllows] = true}
+			else
+				local newSlotAllows = {}
+				slotData.empty = emptyModules[slotData.slotAllows[1]]
+				for m = 1, #slotData.slotAllows do
+					newSlotAllows[slotData.slotAllows[m]] = true
+				end
+				slotData.slotAllows = newSlotAllows
+			end
+		end
+	end
+end
+
+-- Create WeaponDefNames for each chassis
 if UnitDefNames then
-	-- Create WeaponDefNames for each chassis
 	for i = 1, #chassisDefs do
 		local data = chassisDefs[i]
 		local weapons = UnitDefs[data.baseUnitDef].weapons
@@ -1220,22 +1329,27 @@ end
 -- Utility Functions
 ------------------------------------------------------------------------
 
-local function ModuleIsValid(level, chassis, slotType, moduleDefID, alreadyOwned, alreadyOwned2)
+local function ModuleIsValid(level, chassis, slotAllows, moduleDefID, alreadyOwned, alreadyOwned2)
 	local data = moduleDefs[moduleDefID]
-	if data.slotType ~= slotType or (data.requireLevel or 0) > level or 
+	if (not slotAllows[data.slotType]) or (data.requireLevel or 0) > level or 
 			(data.requireChassis and (not data.requireChassis[chassis])) or data.unequipable then
 		return false
 	end
 	
 	-- Check that requirements are met
-	if data.requireModules then
-		for j = 1, #data.requireModules do
+	if data.requireOneOf then
+		local foundRequirement = false
+		for j = 1, #data.requireOneOf do
 			-- Modules should not depend on themselves so this check is simplier than the
 			-- corresponding chcek in the replacement set generator.
-			local reqDefID = data.requireModules[j]
-			if not (alreadyOwned[reqDefID] or (alreadyOwned2 and alreadyOwned2[reqDefID])) then
-				return false
+			local reqDefID = data.requireOneOf[j]
+			if (alreadyOwned[reqDefID] or (alreadyOwned2 and alreadyOwned2[reqDefID])) then
+				foundRequirement = true
+				break
 			end
+		end
+		if not foundRequirement then
+			return false
 		end
 	end
 	
@@ -1295,4 +1409,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, emptyModules, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames
+return moduleDefs, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames

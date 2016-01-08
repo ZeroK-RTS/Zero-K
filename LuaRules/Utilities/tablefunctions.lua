@@ -82,4 +82,22 @@ local function MakeRealTable(proxy)
 	end
 	return ret
 end
-Spring.Utilities.MakeRealTable = MakeRealTable
+
+local function TableEcho(data, name, indent)
+	name = name or "TableEcho"
+	Spring.Echo((indent or "") .. name .. " = {")
+	indent = indent or "    "
+	for name, v in pairs(data) do
+		local ty =  type(v)
+		if ty == "table" then
+			TableEcho(v, name, indent .. "    ")
+		elseif ty == "boolean" then
+			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+		else
+			Spring.Echo(indent .. name .. " = " .. v)
+		end
+	end
+	Spring.Echo(indent .. "}")
+end
+
+Spring.Utilities.TableEcho = TableEcho
