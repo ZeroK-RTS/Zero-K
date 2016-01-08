@@ -38,21 +38,21 @@ local carrierDefNames = {
 		spawnPieces = {"emitl", "emitr"},
 		{
 			drone = UnitDefNames.attackdrone.id, 
-			reloadTime = 20, 
+			reloadTime = 15, 
 			maxDrones = 6, 
 			spawnSize = 2, 
 			range = 800, 
-			buildTime = 15, 
+			buildTime = 10, 
 			maxBuild = 1,
 			offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
 		{
 			drone = UnitDefNames.battledrone.id,
-			reloadTime = 30, 
+			reloadTime = 25, 
 			maxDrones = 2, 
 			spawnSize = 1, 
 			range = 800, 
-			buildTime = 20, 
+			buildTime = 15, 
 			maxBuild = 1,
 			offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
@@ -75,21 +75,21 @@ local carrierDefNames = {
 local presets = {
 	module_companion_drone = {
 		drone = UnitDefNames.attackdrone.id, 
-		reloadTime = 20, 
+		reloadTime = 15, 
 		maxDrones = 2,
 		spawnSize = 1, 
 		range = 450, 
-		buildTime = 15, 
+		buildTime = 10, 
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	},
 	module_battle_drone = {
 		drone = UnitDefNames.battledrone.id, 
-		reloadTime = 30,
+		reloadTime = 25,
 		maxDrones = 1, 
 		spawnSize = 1, 
 		range = 600, 
-		buildTime = 20,
+		buildTime = 15,
 		maxBuild = 1,
 		offsets = {0, 35, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	},
@@ -98,26 +98,25 @@ local presets = {
 local unitRulesCarrierDefs = {
 	drone = {
 		drone = UnitDefNames.attackdrone.id, 
-		reloadTime = 20, 
+		reloadTime = 15, 
 		maxDrones = 2,
 		spawnSize = 1, 
 		range = 450, 
-		buildTime = 15, 
+		buildTime = 10, 
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	},
 	battleDrone = {
 		drone = UnitDefNames.battledrone.id, 
-		reloadTime = 30,
+		reloadTime = 25,
 		maxDrones = 1, 
 		spawnSize = 1, 
 		range = 600, 
-		buildTime = 20,
+		buildTime = 15,
 		maxBuild = 1,
 		offsets = {0, 50, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 	}
 }
-					
 
 --[[
 for name, ud in pairs(UnitDefNames) do
@@ -138,7 +137,9 @@ for id, ud in pairs(UnitDefs) do
 end
 
 for name, data in pairs(carrierDefNames) do
-	if UnitDefNames[name] then carrierDefs[UnitDefNames[name].id] = data	end
+	if UnitDefNames[name] then 
+		carrierDefs[UnitDefNames[name].id] = data	
+	end
 end
 
 local thingsWhichAreDrones = {
