@@ -37,4 +37,37 @@ return {
 		decorations = {"banner_overhead"},
 		images = {overhead = "166"}
 	},
+	dynhub_recon = {
+		name = "Recon Support",
+		chassis = "recon",
+		levels = {
+			{"commweapon_beamlaser"},
+			{"health"},
+			{"personalcloak"},
+			{"speed"},
+			{"speed"},
+		},
+	},
+	dynhub_support = {
+		name = "Engineer Support",
+		chassis = "support",
+		levels = {
+			{"commweapon_hpartillery"},
+			{"radar"},
+			{"personalcloak"},
+			{"health"},
+			{"buildpower"},
+		},
+	},
+	dynhub_assault = {
+		name = "Guardian Support",
+		chassis = "assault",
+		levels = {
+			{"commweapon_hpartillery"},
+			{"radar"},
+			{"personalcloak"},
+			{"health"},
+			{"buildpower"},
+		},
+	},
 }
