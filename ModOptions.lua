@@ -407,6 +407,14 @@ local options = {
     def    = false,
   },
   {
+    key    = 'commtest',
+    name   = 'Test Commanders',
+    desc   = "Commanders cost 10% of normal and can be built by anything. For testing purposes.",
+    type   = 'bool',
+    section= 'silly',
+    def    = false,
+  },
+  {
     key    = "coop",
     name   = "Cooperation Mode",
     desc   = "Cooperation Mode",

@@ -496,7 +496,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rupleg)
 		Explode(torso)
 ]]--
-		dyncomm.SpawnModuleWrecks(1)
+		dyncomm.SpawnWreck(1)
 	else
 		Explode(gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(head, sfxFall + sfxFire + sfxSmoke + sfxExplode)
@@ -511,6 +511,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rupleg, sfxFall + sfxFire + sfxSmoke + sfxExplode)
 		Explode(torso, sfxShatter + sfxExplode)
 		dyncomm.SpawnModuleWrecks(2)
-		dyncomm.SpawnModuleWrecks(2)
+		dyncomm.SpawnWreck(2)
 	end
 end

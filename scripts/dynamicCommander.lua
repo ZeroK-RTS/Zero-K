@@ -217,10 +217,10 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	end
 	featureDefID = featureDefID.id
 	
-	local dir = math.random(2*math.pi)
-	local pitch = (math.random(2)^2 - 1)*math.pi/2
+	local dir = math.random()*2*math.pi
+	local pitch = ((math.random()*2)^2 - 1)*math.pi/2
 	local heading = math.random(65536)
-	local mag = math.min(20 + math.random(20)*totalCount, 80)
+	local mag = 30 + math.random()*(30 + 5*math.min(totalCount, 15))
 	local horScale = mag*math.cos(pitch)
 	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
 	
@@ -234,7 +234,7 @@ local function SpawnModuleWrecks(wreckLevel)
 	
 	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 	for i = 1, moduleCount do
-		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, moduleCount, teamID, x, y, z, vx, vy, vz)
+		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_1"), wreckLevel, moduleCount, teamID, x, y, z, vx, vy, vz)
 	end
 end
 

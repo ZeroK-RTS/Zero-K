@@ -64,7 +64,13 @@ local chassisDefs = {
 	},
 }
 
-local commanderCost = 120
+local commanderCost = 1200
+if (Spring.GetModOptions) then
+	local modOptions = Spring.GetModOptions()
+	if (modOptions and modOptions.commtest and modOptions.commtest ~= 0) then
+		commanderCost = 120
+	end
+end
 
 local statOverrides = {
 	cloakcost       = 5, -- For personal cloak
