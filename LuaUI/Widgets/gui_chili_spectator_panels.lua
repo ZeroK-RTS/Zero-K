@@ -882,6 +882,7 @@ local function GetOpposingAllyTeams()
 					
 					local data = activeAllyTeams[allyTeamID]
 					data.AIs = data.AIs + 1
+					data.aiNames = data.aiNames or {}
 					data.aiNames[data.AIs] = name
 				end
 			else
@@ -955,14 +956,14 @@ local function GetOpposingAllyTeams()
 			if data.players >= 1 then
 				name = data.playerNames[1]
 			else
-				name = data.aiNames[1]
+				name = data.aiNames[1] or "AI"
 			end
 			if teamMembers == 2 or data.players == 2 then
 				nameSize = 0.65
 				if data.players >= 2 then
 					name = name .. "\n" .. data.playerNames[2]
 				else
-					name = name .. "\n" .. data.aiNames[2]
+					name = name .. "\n" .. (data.aiNames[2] or "AI")
 				end
 			elseif teamMembers > 2 then
 				nameSize = 0.65
