@@ -262,7 +262,7 @@ function script.QueryWeapon(num)
 	elseif dyncomm.GetWeapon(num) == 2 then 
 		return lcannon_flare
 	end
-	return torso
+	return pelvis
 end
 
 function script.StopBuilding()

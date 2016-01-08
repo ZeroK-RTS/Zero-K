@@ -344,7 +344,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 2 or num == 4 then
-		return torso
+		return pelvis
 	end
 	return flare
 end

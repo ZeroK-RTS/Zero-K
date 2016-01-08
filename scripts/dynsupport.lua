@@ -348,7 +348,7 @@ function script.QueryWeapon(num)
 	if dyncomm.GetWeapon(num) == 1 or dyncomm.GetWeapon(num) == 2 then 
 		return flare
 	end
-	return torso
+	return pelvis
 end
 
 local function AimRifle(heading, pitch, isDgun)

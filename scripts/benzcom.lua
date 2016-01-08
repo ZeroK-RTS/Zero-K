@@ -264,7 +264,7 @@ function script.QueryWeapon(num)
 	if num == 3 then 
 		return lcannon_flare
 	elseif num == 2 or num == 4 then
-		return torso
+		return pelvis
 	end
 	return rcannon_flare
 end

@@ -439,7 +439,7 @@ local weaponFlares = {
 }
 
 function script.QueryWeapon(num)
-	return weaponFlares[dyncomm.GetWeapon(num) or 1]
+	return weaponFlares[dyncomm.GetWeapon(num) or 3]
 end
 
 function script.FireWeapon(num)
