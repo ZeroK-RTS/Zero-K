@@ -50,6 +50,9 @@ local buildOpts = {
 	[[raveparty]],
 	[[zenith]],
 	[[armcsa]],
+	[[dynhub_support_base]],
+	[[dynhub_recon_base]],
+	[[dynhub_assault_base]],
  }
 
 return buildOpts

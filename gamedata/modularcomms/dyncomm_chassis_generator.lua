@@ -64,16 +64,26 @@ local chassisDefs = {
 	},
 }
 
+local commanderCost = 60
+
 local statOverrides = {
 	cloakcost       = 5, -- For personal cloak
 	cloakcostmoving = 10, 
 	onoffable       = true, -- For jammer and cloaker toggling
-	canManualFire   = true, -- For manualfire weapons.
+	canmanualfire   = true, -- For manualfire weapons.
+	buildcostmetal  = commanderCost,
+	buildcostenergy = commanderCost,
+	buildtime       = commanderCost,
 }
 
 for i = 1, #chassisDefs do
 	local name = chassisDefs[i].name
 	local unitDef = UnitDefs[name]
+	
+	for _, wreckDef in pairs(unitDef.featuredefs) do
+		wreckDef.metal = wreckDef.metal*commanderCost/1200
+		wreckDef.reclaimtime = wreckDef.reclaimtime*commanderCost/1200
+	end
 	
 	for key, data in pairs(statOverrides) do
 		unitDef[key] = data

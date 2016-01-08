@@ -355,7 +355,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
-		totalCost = 1200,
+		totalCost = UnitDefs[baseUnitDefID].metalCost,
 		name = commProfileInfo.name,
 		moduleList = moduleList,
 		baseUnitDefID = baseUnitDefID,
