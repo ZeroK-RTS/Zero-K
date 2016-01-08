@@ -178,39 +178,39 @@ local function GetStartUnit(teamID, playerID, isAI)
 		return "commbasic"
 	end
 
-  local startUnit
-  local commProfileID = nil
+	local startUnit
+	local commProfileID = nil
 
-  if isAI then -- AI that didn't pick comm type gets default comm
-    return (Spring.GetTeamRulesParam(teamID, "start_unit") or "comm_trainer_strike_0")
-  end
-
-  if (teamID and teamSides[teamID]) then 
-	startUnit = startUnits[teamSides[teamID]]
-  end
-
-  if (playerID and playerSides[playerID]) then 
-	startUnit = startUnits[playerSides[playerID]]
-  end
-  
-  -- if a player-selected comm is available, use it
-  playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
-  if (playerID and commChoice[playerID]) then
-	--Spring.Echo("Attempting to load alternate comm")
-	local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
-	local altComm = playerCommProfiles[commChoice[playerID]]
-	if altComm then
-		startUnit = playerCommProfiles[commChoice[playerID]].baseUnitDefID
-		commProfileID = commChoice[playerID]
+	if isAI then -- AI that didn't pick comm type gets default comm
+		return (Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault_base")
 	end
-  end
-  
-  -- hack workaround for chicken
-  --local luaAI = Spring.GetTeamLuaAI(teamID)
-  --if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
-  
-  --if didn't pick a comm, wait for user to pick
-  return (startUnit or nil), commProfileID	-- startUnit or DEFAULT_UNIT
+
+	if (teamID and teamSides[teamID]) then 
+		startUnit = startUnits[teamSides[teamID]]
+	end
+
+	if (playerID and playerSides[playerID]) then 
+		startUnit = startUnits[playerSides[playerID]]
+	end
+
+	-- if a player-selected comm is available, use it
+	playerID = playerID or (teamID and select(2, spGetTeamInfo(teamID)) )
+	if (playerID and commChoice[playerID]) then
+		--Spring.Echo("Attempting to load alternate comm")
+		local playerCommProfiles = GG.ModularCommAPI.GetPlayerCommProfiles(playerID, true)
+		local altComm = playerCommProfiles[commChoice[playerID]]
+		if altComm then
+			startUnit = playerCommProfiles[commChoice[playerID]].baseUnitDefID
+			commProfileID = commChoice[playerID]
+		end
+	end
+
+	-- hack workaround for chicken
+	--local luaAI = Spring.GetTeamLuaAI(teamID)
+	--if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
+
+	--if didn't pick a comm, wait for user to pick
+	return (startUnit or nil), commProfileID	-- startUnit or DEFAULT_UNIT
 end
 
 
@@ -581,7 +581,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
 				local unitDef = UnitDefNames[name];
 				if unitDef then -- the requested unit actually exists
-					if(unitDef.customParams.level == "0") then -- the unit is a valid level zero commander
+					if aiCommanders[unitDef] then
 						Spring.SetTeamRulesParam(teamID, "start_unit", name);
 					end
 				end

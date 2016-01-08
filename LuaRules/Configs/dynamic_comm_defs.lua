@@ -509,7 +509,7 @@ local moduleDefs = {
 			sharedData.radarJammingRange = 350
 		end
 	},
-	
+
 	-- Repeat Modules
 	{
 		name = "drone",

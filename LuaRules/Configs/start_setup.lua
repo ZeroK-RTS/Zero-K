@@ -8,6 +8,12 @@ startUnits = {
 	commbasic = 'commbasic',
 }
 
+aiCommanders = {
+	[UnitDefNames["dyntrainer_recon_base"].id] = true,
+	[UnitDefNames["dyntrainer_support_base"].id] = true,
+	[UnitDefNames["dyntrainer_assault_base"].id] = true,
+}
+
 local trainerComms = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")
 for name, def in pairs(trainerComms) do
 	startUnits[name] = def[1]
