@@ -175,14 +175,23 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_banner_overhead", images.overhead or "fakeunit", INLOS)
 	end
 	
-	if (data.drones or data.battleDrones) and GG.Drones_InitializeDynamicCarrier then
+	if data.drones or data.battleDrones then
 		if data.drones then
 			Spring.SetUnitRulesParam(unitID, "carrier_count_drone", data.drones, INLOS)
 		end
 		if data.battleDrones then
 			Spring.SetUnitRulesParam(unitID, "carrier_count_battleDrone", data.battleDrones, INLOS)
 		end
-		GG.Drones_InitializeDynamicCarrier(unitID)
+		if GG.Drones_InitializeDynamicCarrier then
+			GG.Drones_InitializeDynamicCarrier(unitID)
+		end
+	end
+	
+	if data.autorepairRate then
+		Spring.SetUnitRulesParam(unitID, "comm_autorepair_rate", data.autorepairRate, INLOS)
+		if GG.SetUnitIdleRegen then
+			GG.SetUnitIdleRegen(unitID, 0, data.autorepairRate / 2)
+		end
 	end
 	
 	local _, maxHealth = Spring.GetUnitHealth(unitID)

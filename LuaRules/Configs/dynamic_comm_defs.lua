@@ -542,6 +542,21 @@ local moduleDefs = {
 		end
 	},
 	{
+		name = "autorepair",
+		humanName = "Autorepair",
+		description = "Autorepair, regenerates the commander at 10 hp/s. Limit 8.",
+		image = "unitpics/module_autorepair.png",
+		limit = 3,
+		cost = 60,
+		requireChassis = {"recon", "support", "assault"},
+		requireModules = {},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
+		end
+	},
+	{
 		name = "health",
 		humanName = "Ablative Armour Plates",
 		description = "Ablative Armour Plates, provides 600 health. Limit 8.",
@@ -682,6 +697,9 @@ local chassisDefs = {
 			[0] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon0"].id
 				end,
@@ -690,6 +708,9 @@ local chassisDefs = {
 			[1] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -707,6 +728,9 @@ local chassisDefs = {
 			[2] = {
 				morphBuildPower = 15,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -724,6 +748,9 @@ local chassisDefs = {
 			[3] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -745,6 +772,9 @@ local chassisDefs = {
 			[4] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -766,6 +796,9 @@ local chassisDefs = {
 			[5] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynrecon5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -797,6 +830,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5 
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport0"].id
@@ -830,6 +864,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
@@ -851,6 +886,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
@@ -876,6 +912,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 8
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
@@ -901,6 +938,7 @@ local chassisDefs = {
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 10
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynsupport5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
@@ -930,6 +968,9 @@ local chassisDefs = {
 			[0] = {
 				morphBuildPower = 10,
 				morphBaseCost = 20,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault0"].id
 				end,
@@ -955,6 +996,9 @@ local chassisDefs = {
 			[2] = {
 				morphBuildPower = 15,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -972,6 +1016,9 @@ local chassisDefs = {
 			[3] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -993,6 +1040,9 @@ local chassisDefs = {
 			[4] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,
@@ -1014,6 +1064,9 @@ local chassisDefs = {
 			[5] = {
 				morphBuildPower = 20,
 				morphBaseCost = 30,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
 				morphUnitDefFunction = function(modulesByDefID)
 					return UnitDefNames["dynassault5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
 				end,

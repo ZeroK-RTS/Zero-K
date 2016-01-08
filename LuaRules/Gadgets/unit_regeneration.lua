@@ -19,7 +19,7 @@ local regenDefs = {}
 
 for id, def in pairs(UnitDefs) do
 	if def.customParams.idle_regen then
-		regenDefs[id] = { def.idleTime, def.customParams.idle_regen / 2 }
+		regenDefs[id] = {idleTime = def.idleTime, rate = def.customParams.idle_regen / 2 }
 	end
 end
 
@@ -32,23 +32,31 @@ function gadget:GameFrame (frame)
 	currentFrame = frame
 	if ((frame % 15) == 7) then
 		for unitID, data in pairs(units) do
-			if (data[1] < frame) and (not spGetUnitIsStunned(unitID)) then
-				local health = spGetUnitHealth(unitID) + data[2]
+			if (data.idleFrame < frame) and (not spGetUnitIsStunned(unitID)) then
+				local health = spGetUnitHealth(unitID) + data.rate
 				spSetUnitHealth(unitID, health)
 			end
 		end
 	end
 end
 
+local function SetUnitIdleRegen(unitID, idleTime, idleRate)
+	units[unitID] = {idleFrame = 0, idleTime = idleTime, rate = idleRate}
+end
+
 function gadget:UnitCreated(unitID, unitDefID)
 	if regenDefs[unitDefID] then
-		units[unitID] = {0, regenDefs[unitDefID][2]}
+		SetUnitIdleRegen(unitID, regenDefs[unitDefID].idleTime, regenDefs[unitDefID].rate)
+	end
+	local regen = Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate")
+	if regen then
+		SetUnitIdleRegen(unitID, 0, regen / 2)
 	end
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 	if regenDefs[unitDefID] and units[unitID] then
-		units[unitID][1] = currentFrame + regenDefs[unitDefID][1]
+		units[unitID].idleFrame = currentFrame + units[unitID].idleTime
 	end
 end
 
@@ -57,6 +65,8 @@ function gadget:UnitDestroyed(unitID)
 end
 
 function gadget:Initialize()
+	GG.SetUnitIdleRegen = SetUnitIdleRegen
+
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)

@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
-  autoHeal            = 5,
   brakeRate           = 0.45,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
