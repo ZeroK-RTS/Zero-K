@@ -243,6 +243,14 @@ for i = 1, #chassisList do
 				name = fullChassis,
 				modules = modules,
 			}
+			if chassis == "dynsupport" then
+				modules[#modules + 1] = "module_resurrect"
+				comms[fullChassis .. "_damage_boost" .. weaponCount .. "resurrect"] = {
+					chassis = fullChassis,
+					name = fullChassis,
+					modules = modules,
+				}
+			end
 		end
 	end
 end

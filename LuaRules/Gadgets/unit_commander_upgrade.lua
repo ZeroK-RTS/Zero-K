@@ -150,12 +150,11 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 		Spring.SetUnitRulesParam(unitID, "comm_area_cloak_radius", data.cloakFieldRange, INLOS)
 	end
 	
-	if data.bonusBuildPower then
-		-- All comms have 10 BP in their unitDef (even support)
-		data.metalIncome = (data.metalIncome or 0) + data.bonusBuildPower*0.03
-		data.energyIncome = (data.energyIncome or 0) + data.bonusBuildPower*0.03
-		Spring.SetUnitRulesParam(unitID, "buildpower_mult", data.bonusBuildPower/10 + 1, INLOS)
-	end
+	-- All comms have 10 BP in their unitDef (even support)
+	local buildPower = (10 + (data.bonusBuildPower or 0)) * (data.buildPowerMult or 1)
+	data.metalIncome = (data.metalIncome or 0) + buildPower*0.03
+	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
+	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
 	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
 		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)

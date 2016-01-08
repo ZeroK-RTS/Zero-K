@@ -509,7 +509,22 @@ local moduleDefs = {
 			sharedData.radarJammingRange = 350
 		end
 	},
-
+	{
+		name = "resurrect",
+		humanName = "Lazarus Device",
+		description = "Lazarus Device, enables the commander to resurrect wreckages. Halves build power.",
+		image = "unitpics/module_resurrect.png",
+		limit = 1,
+		cost = 100,
+		requireChassis = {"support"},
+		requireLevel = 0,
+		slotType = "module",
+		applicationFunction = function (modules, sharedData)
+			sharedData.canRessurect = true
+			sharedData.buildPowerMult = 0.5
+		end
+	},
+	
 	-- Repeat Modules
 	{
 		name = "drone",
@@ -845,7 +860,9 @@ local chassisDefs = {
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynsupport1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
+					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
+					return UnitDefNames["dynsupport1_damage_boost" .. damageBooster .. resurrect].id
 				end,
 				upgradeSlots = {
 					{
@@ -867,7 +884,9 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynsupport2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
+					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
+					return UnitDefNames["dynsupport2_damage_boost" .. damageBooster .. resurrect].id
 				end,
 				upgradeSlots = {
 					{
@@ -889,7 +908,9 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynsupport3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
+					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
+					return UnitDefNames["dynsupport3_damage_boost" .. damageBooster .. resurrect].id
 				end,
 				upgradeSlots = {
 					{
@@ -915,7 +936,9 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynsupport4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
+					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
+					return UnitDefNames["dynsupport4_damage_boost" .. damageBooster .. resurrect].id
 				end,
 				upgradeSlots = {
 					{
@@ -941,7 +964,9 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynsupport5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
+					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
+					return UnitDefNames["dynsupport5_damage_boost" .. damageBooster .. resurrect].id
 				end,
 				upgradeSlots = {
 					{
