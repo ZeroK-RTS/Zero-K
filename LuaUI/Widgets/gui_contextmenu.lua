@@ -1281,15 +1281,11 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 
 		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
-		local weapons = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
-		for i = 1, weapons do
-			statschildren[#statschildren+1] = Label:New{ caption = moduleDefs[Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)].humanName, textColor = colorFire, }
-			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = colorFire, }
-		end
+
 		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 
 		if modules > 0 then
-		local module_instances = {}
+			local module_instances = {}
 			for i = 1, modules do
 				local moduleID = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
 				module_instances[moduleID] = (module_instances[moduleID] or 0) + 1
