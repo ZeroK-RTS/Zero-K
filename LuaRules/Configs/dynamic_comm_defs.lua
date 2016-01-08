@@ -1,7 +1,7 @@
 local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
 
 local UNBOUNDED_LEVEL = true
-local COST_MULT = 0.05
+local COST_MULT = 0.1
 
 ------------------------------------------------------------------------
 -- Module Definitions
