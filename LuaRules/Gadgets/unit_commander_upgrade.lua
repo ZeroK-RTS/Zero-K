@@ -232,7 +232,7 @@ local function GetModuleEffectsData(moduleList, level, chassis)
 	return moduleEffectData
 end
 
-local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images)
+local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images, profileID)
 	-- This function sets the UnitRulesParams and updates the unit attributes after
 	-- a commander has been created. This can either happen internally due to a request
 	-- to spawn a commander or with rezz/construction/spawning.
@@ -248,6 +248,9 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
+	if profileID then
+		Spring.SetUnitRulesParam(unitID, "comm_profileID",     profileID, INLOS)
+	end
 	
 	Spring.SetUnitCosts(unitID, {
 		buildTime = totalCost,
@@ -327,7 +330,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
-	Spring.Echo("Creating starter dyncomm " .. dyncommID) 
+	Spring.Echo("Creating starter dyncomm " .. dyncommID)
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	if not chassisDefID then
@@ -358,7 +361,8 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 		baseUnitDefID = baseUnitDefID,
 		baseWreckID = commProfileInfo.baseWreckID or chassisData.baseWreckID,
 		baseHeapID = commProfileInfo.baseHeapID or chassisData.baseHeapID,
-		images = commProfileInfo.images
+		images = commProfileInfo.images,
+		profileID = dyncommID
 	}
 	
 	local unitID = Upgrades_CreateUpgradedUnit(baseUnitDefID, x, y, z, facing, teamID, false, upgradeDef)
@@ -383,7 +387,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			internalCreationUpgradeDef.baseHeapID, 
 			internalCreationUpgradeDef.moduleList, 
 			internalCreationModuleEffectData,
-			internalCreationUpgradeDef.images
+			internalCreationUpgradeDef.images,
+			internalCreationUpgradeDef.profileID
 		)
 		return
 	end
@@ -430,7 +435,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			commProfileInfo.baseHeapID, 
 			moduleList,
 			false,
-			commProfileInfo.images
+			commProfileInfo.images,
+			profileID
 		)
 	end
 end
@@ -566,6 +572,7 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 			baseWreckID = Spring.GetUnitRulesParam(unitID, "comm_baseWreckID"),
 			baseHeapID = Spring.GetUnitRulesParam(unitID, "comm_baseHeapID"),
 			images = images,
+			profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID"),
 		},
 		combatMorph = true,
 		metal = cost,

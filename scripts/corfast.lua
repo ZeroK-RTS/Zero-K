@@ -567,6 +567,7 @@ function beginJump()
 end
 
 function jumping()
+	GG.PokeDecloakUnit(unitID, 50)
 	EmitSfx(thrust, UNIT_SFX1)
 end
 

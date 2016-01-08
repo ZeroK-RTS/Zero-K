@@ -326,7 +326,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
 
-			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i * 100)
+			Spring.UnitScript.CallAsUnit(unitID, env.jumping, i * 100)
 		
 			if (not halfJump and i > 0.5) then
 				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)

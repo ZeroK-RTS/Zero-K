@@ -3,7 +3,7 @@ return {
 		name = "Recon Trainer",
 		chassis = "recon",
 		levels = {
-			{"commweapon_beamlaser"},
+			{"commweapon_beamlaser", "health"},
 			{"health"},
 			{"personalcloak"},
 			{"speed"},

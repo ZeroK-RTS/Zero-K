@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, _, moduleDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -864,6 +864,7 @@ end
 local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
 	
 	if not (chassisDefs[chassis] and chassisDefs[chassis].levelDefs[math.min(chassisDefs[chassis].maxNormalLevel, level+1)]) then
 		return
@@ -881,6 +882,18 @@ local function CreateModuleListWindowFromUnit(unitID)
 	upgradeSignature.level = level
 	upgradeSignature.chassis = chassis
 	upgradeSignature.alreadyOwned = alreadyOwned
+	
+	-- Load default loadout
+	local slotDefaults = {}
+	if profileID then
+		local commProfileInfo = WG.ModularCommAPI.GetCommProfileInfo(profileID)
+		if commProfileInfo and commProfileInfo.modules and commProfileInfo.modules[level + 1] then
+			local defData = commProfileInfo.modules[level + 1]
+			for i = 1, #defData do
+				slotDefaults[i] = moduleDefNames[defData[i]]
+			end
+		end
+	end
 	
 	-- Create the window
 	ShowModuleListWindow(slotDefaults, level + 1, chassis, alreadyOwned)
