@@ -1,5 +1,6 @@
-
 local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
+
+local UNBOUNDED_LEVEL = true
 
 ------------------------------------------------------------------------
 -- Module Definitions
@@ -590,7 +591,7 @@ local moduleDefs = {
 		requireLevel = 0,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.decloakDistance = 150
+			sharedData.decloakDistance = math.max(sharedData.decloakDistance or 0, 150)
 			sharedData.personalCloak = true
 		end
 	},
@@ -606,6 +607,7 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.areaCloak = true
+			sharedData.decloakDistance = 180
 			sharedData.cloakFieldRange = 350
 			sharedData.cloakFieldUpkeep = 15
 			sharedData.radarJammingRange = 350
@@ -798,6 +800,10 @@ local chassisDefs = {
 		name = "recon",
 		humanName = "Recon",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynrecon0"].id,
+		extraLevelCostFunction = function (level)
+			return level*10
+		end,
+		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 10,
@@ -928,6 +934,10 @@ local chassisDefs = {
 		name = "support",
 		humanName = "Engineer",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
+		extraLevelCostFunction = function (level)
+			return level*10
+		end,
+		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 10,
@@ -1079,6 +1089,10 @@ local chassisDefs = {
 		name = "assault",
 		humanName = "Guardian",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
+		extraLevelCostFunction = function (level)
+			return level*10
+		end,
+		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 10,
@@ -1406,4 +1420,4 @@ local utilities = {
 -- Return Values
 ------------------------------------------------------------------------
 
-return moduleDefs, chassisDefs, utilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames
+return moduleDefs, chassisDefs, utilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames

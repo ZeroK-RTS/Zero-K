@@ -27,7 +27,8 @@ local internalCreationModuleEffectData
 
 local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield, unitCreatedWeaponNums
 
-local moduleDefs, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
+	
 include("LuaRules/Configs/customcmds.h.lua")
 
 --------------------------------------------------------------------------------
@@ -35,19 +36,29 @@ include("LuaRules/Configs/customcmds.h.lua")
 -- Various module configs
 
 local commanderCloakShieldDef = {
+	draw = true,
+	init = true,
+	level = 2,
+	delay = 30,
 	energy = 15,
+	minrad = 64,
 	maxrad = 350,
 	
 	growRate =	512,
 	shrinkRate = 2048,
-	decloakDistance = 75,
-	
-	init = true,
-	draw = true,
 	selfCloak = true,
-	radiusException = {}
+	decloakDistance = 75,
+	isTransport = false,
+	
+	radiusException = {}	
 }
 	
+for _, eud in pairs (UnitDefs) do
+	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
+		commanderCloakShieldDef.radiusException[eud.id] = true
+	end
+end
+
 local commAreaShield = WeaponDefNames["dynassault1_commweapon_areashield"]
 
 local commAreaShieldDefID = {
@@ -56,12 +67,6 @@ local commAreaShieldDefID = {
 	chargePerUpdate = 2*tonumber(commAreaShield.customParams.shield_rate)/TEAM_SLOWUPDATE_RATE,
 	perSecondCost = tonumber(commAreaShield.customParams.shield_drain)
 }
-		
-for _, eud in pairs (UnitDefs) do
-	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
-		commanderCloakShieldDef.radiusException[eud.id] = true
-	end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -219,7 +224,7 @@ local function GetModuleEffectsData(moduleList, level, chassis)
 		end
 	end
 	
-	local levelFunction = chassisDefs[chassis or 1].levelDefs[level or 1].chassisApplicationFunction
+	local levelFunction = chassisDefs[chassis or 1].levelDefs[math.min(chassisDefs[chassis or 1].maxNormalLevel, level or 1)].chassisApplicationFunction
 	if levelFunction then
 		levelFunction(moduleByDefID, moduleEffectData)
 	end
@@ -456,6 +461,12 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	end
 	
 	local newLevel = level + 1
+	local newLevelBounded = math.min(chassisDefs[chassis].maxNormalLevel, level + 1)
+	
+	-- If unbounded level is disallowed then the comm is invalid
+	if newLevel ~= newLevelBounded and not UNBOUNDED_LEVEL then
+		return false
+	end
 	
 	-- Determine what the command thinks the unit already owns
 	local index = 5
@@ -505,13 +516,13 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local modulesByDefID = upgradeUtilities.ModuleListToByDefID(fullModuleList)
 	
 	-- Determine Cost and check that the new modules are valid.
-	local levelDefs = chassisDefs[chassis].levelDefs[newLevel]
+	local levelDefs = chassisDefs[chassis].levelDefs[newLevelBounded]
 	local slotDefs = levelDefs.upgradeSlots
 	local cost = 0
 	
 	for i = 1, #pNewModules do
 		local moduleDefID = pNewModules[i]
-		if upgradeUtilities.ModuleIsValid(newLevel, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
+		if upgradeUtilities.ModuleIsValid(newLevelBounded, chassis, slotDefs[i].slotAllows, moduleDefID, modulesByDefID) then
 			cost = cost + moduleDefs[moduleDefID].cost
 		else
 			return false
@@ -533,7 +544,12 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	end
 	
 	-- The command is now known to be valid. Construct the morphDef.
-	local cost = cost + levelDefs.morphBaseCost
+	
+	if newLevel ~= newLevelBounded then
+		cost = cost + chassisDefs[chassis].extraLevelCostFunction(newLevel)
+	else
+		cost = cost + levelDefs.morphBaseCost
+	end
 	local targetUnitDefID = levelDefs.morphUnitDefFunction(modulesByDefID)
 	
 	local morphTime = cost/levelDefs.morphBuildPower

@@ -209,7 +209,7 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance)
 			if cloakers[unitID] and cloakers[unitID].radius > 0 then
 				changeRadius = false
 			end
-			SetUnitCloak(unitID, level, ((changeRadius and decloakDistance) or false))
+			SetUnitCloak(unitID, level, ((changeRadius and decloakDistance) or GetUnitRulesParam(unitID, "comm_decloak_distance") or false))
 		end
 	else
 		local wantCloak = GetUnitRulesParam(unitID, "wantcloak")

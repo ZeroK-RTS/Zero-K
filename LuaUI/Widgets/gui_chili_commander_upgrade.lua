@@ -50,7 +50,7 @@ local screen0
 -- * Callins. This block handles widget callins. Does barely anything.
 
 -- Module config
-local moduleDefs, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
+local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -121,7 +121,7 @@ local function UpdateNewSelectionButton(buttonIndex, moduleDefID)
 end
 
 local function GetNewSelectionButton(buttonIndex, moduleDefID)
-	if newButtons[moduleDefID] then
+	if newButtons[buttonIndex] then
 		UpdateNewSelectionButton(buttonIndex, moduleDefID)
 	else
 		AddNewSelectonButton(buttonIndex, moduleDefID)
@@ -739,13 +739,21 @@ local function CreateMainWindow()
 	}
 end
 
-local function ShowModuleListWindow(slots, slotDefaults, level, chassis, alreadyOwnedModules)
+local function ShowModuleListWindow(slotDefaults, level, chassis, alreadyOwnedModules)
 	if not currentModuleList then
 		CreateMainWindow()
 	end
 	
-	morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
-	morphBaseCost = chassisDefs[chassis].levelDefs[level].morphBaseCost
+	if level > chassisDefs[chassis].maxNormalLevel then
+		morphBaseCost = chassisDefs[chassis].extraLevelCostFunction(level)
+		level = chassisDefs[chassis].maxNormalLevel
+		morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
+	else
+		morphBaseCost = chassisDefs[chassis].levelDefs[level].morphBaseCost
+		morphBuildPower = chassisDefs[chassis].levelDefs[level].morphBuildPower
+	end
+	
+	local slots = chassisDefs[chassis].levelDefs[level].upgradeSlots
 
 	if not mainWindowShown then
 		screen0:AddChild(mainWindow)
@@ -857,11 +865,9 @@ local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	
-	if not (chassisDefs[chassis] and chassisDefs[chassis].levelDefs[level+1]) then
+	if not (chassisDefs[chassis] and chassisDefs[chassis].levelDefs[math.min(chassisDefs[chassis].maxNormalLevel, level+1)]) then
 		return
 	end
-	
-	local slotDefs = chassisDefs[chassis].levelDefs[level+1].upgradeSlots
 	
 	-- Find the modules which are already owned
 	local alreadyOwned = {}
@@ -877,7 +883,7 @@ local function CreateModuleListWindowFromUnit(unitID)
 	upgradeSignature.alreadyOwned = alreadyOwned
 	
 	-- Create the window
-	ShowModuleListWindow(slotDefs, slotDefaults, level + 1, chassis, alreadyOwned)
+	ShowModuleListWindow(slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
@@ -892,7 +898,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 		if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
 			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-			if chassisDefs[chassis].levelDefs[level+1] then
+			if UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] then
 				upgradeID = unitID
 				break
 			end
@@ -956,7 +962,7 @@ function widget:CommandsChanged()
 			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 			if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
 				local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-				if chassisDefs[chassis].levelDefs[level+1] then
+				if UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] then
 					foundRulesParams = true
 					break
 				end

@@ -17,7 +17,6 @@ unitDef = {
   buildPic            = [[benzcom.png]],
   buildTime           = 1200,
   canAttack           = true,
-  canCloak            = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
