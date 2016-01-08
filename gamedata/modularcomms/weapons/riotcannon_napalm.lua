@@ -14,6 +14,7 @@ local weaponDef = {
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
 		burntime         = 420,
 		burnchance       = 1,
+		setunitsonfire   = [[1]],
 	},
 
 	damage                  = {

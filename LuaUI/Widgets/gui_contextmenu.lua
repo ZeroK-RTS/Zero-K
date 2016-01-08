@@ -411,7 +411,7 @@ local function GetShieldRegenDrain(wd)
 	return shieldRegen, shieldDrain
 end
 
-local function weapons2Table(cells, ws)
+local function weapons2Table(cells, ws, unitID)
 	local cells = cells
 	
 	local wd = WeaponDefs[ws.weaponID]
@@ -608,7 +608,7 @@ local function weapons2Table(cells, ws)
 
 		if show_range then
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range,2) .. " elmo"
+			cells[#cells+1] = numformat(wd.range * (Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1),2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -1205,7 +1205,7 @@ local function printWeapons(unitDef, unitID)
 			cells[#cells+1] = ''
 			cells[#cells+1] = ''
 		end
-		cells = weapons2Table(cells, ws)
+		cells = weapons2Table(cells, ws, unitID)
 		--end
 	end
 	

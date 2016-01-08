@@ -11,6 +11,7 @@ local weaponDef = {
 		muzzleEffectFire = [[custom:STORMMUZZLE]],
 		burntime         = 450,
 		burnchance       = 1,
+		setunitsonfire   = [[1]],
 	},
 
 	damage                  = {
