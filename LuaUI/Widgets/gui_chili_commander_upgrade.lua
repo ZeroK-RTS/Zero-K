@@ -867,7 +867,6 @@ local function CreateModuleListWindowFromUnit(unitID)
 	upgradeSignature.alreadyOwned = alreadyOwned
 	
 	-- Create the window
-	windowOpen = true
 	ShowModuleListWindow(slotDefs, slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
@@ -900,33 +899,79 @@ end
 
 function widget:CommandsChanged()
 	local units = Spring.GetSelectedUnits()
-	local foundRulesParams = false
-	for i = 1, #units do
-		local unitID = units[i]
-		local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-		if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
+	if mainWindowShown then
+		local foundMatchingComm = false
+		for i = 1, #units do
+			local unitID = units[i]
+			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-			if chassisDefs[chassis].levelDefs[level+1] then
-				foundRulesParams = true
-				break
+			if level == upgradeSignature.level and chassis == upgradeSignature.chassis then
+				local alreadyOwned = {}
+				local weaponCount = Spring.GetUnitRulesParam(unitID, "comm_weapon_count")
+				for i = 1, weaponCount do
+					local weapon = Spring.GetUnitRulesParam(unitID, "comm_weapon_" .. i)
+					alreadyOwned[#alreadyOwned + 1] = weapon
+				end
+				
+				local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+				for i = 1, moduleCount do
+					local module = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
+					alreadyOwned[#alreadyOwned + 1] = module
+				end
+				
+				table.sort(alreadyOwned)
+				
+				if upgradeUtilities.ModuleSetsAreIdentical(alreadyOwned, upgradeSignature.alreadyOwned) then
+					foundMatchingComm = true
+					break
+				end
 			end
+		end
+		
+		if foundMatchingComm then
+			local customCommands = widgetHandler.customCommands
+
+			customCommands[#customCommands+1] = {			
+				id      = CMD_UPGRADE_UNIT,
+				type    = CMDTYPE.ICON,
+				tooltip = 'Upgrade Commander',
+				cursor  = 'Repair',
+				action  = 'upgradecomm',
+				params  = {}, 
+				texture = 'LuaUI/Images/commands/Bold/build.png',
+			}
+		else
+			HideMainWindow() -- Hide window if no commander matching the window is selected
 		end
 	end
 	
-	if foundRulesParams then
-		local customCommands = widgetHandler.customCommands
+	if not mainWindowShown then
+		local foundRulesParams = false
+		for i = 1, #units do
+			local unitID = units[i]
+			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
+			if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
+				local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+				if chassisDefs[chassis].levelDefs[level+1] then
+					foundRulesParams = true
+					break
+				end
+			end
+		end
+		
+		if foundRulesParams then
+			local customCommands = widgetHandler.customCommands
 
-		customCommands[#customCommands+1] = {			
-			id      = CMD_UPGRADE_UNIT,
-			type    = CMDTYPE.ICON,
-			tooltip = 'Upgrade Commander',
-			cursor  = 'Repair',
-			action  = 'upgradecomm',
-			params  = {}, 
-			texture = 'LuaUI/Images/commands/Bold/build.png',
-		}
-	else
-		HideMainWindow() -- Hide window if upgradables are deselected
+			customCommands[#customCommands+1] = {			
+				id      = CMD_UPGRADE_UNIT,
+				type    = CMDTYPE.ICON,
+				tooltip = 'Upgrade Commander',
+				cursor  = 'Repair',
+				action  = 'upgradecomm',
+				params  = {}, 
+				texture = 'LuaUI/Images/commands/Bold/build.png',
+			}
+		end
 	end
 end
 
