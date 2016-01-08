@@ -572,10 +572,14 @@ end
 --------------------------------------------------------------------------------
 
 function GG.Upgrades_UnitShieldDef(unitID)
+	local shieldDef = false
+	if (unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) == 3 then
+		shieldDef = commAreaShieldDefID
+	end
+
 	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), 
-		unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num"), 
-		(unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) and commAreaShieldDefID
-		
+		unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num"),
+		shieldDef		
 end
 
 function GG.Upgrades_UnitCanCloak(unitID)

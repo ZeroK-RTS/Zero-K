@@ -147,6 +147,9 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 		local def = shieldUnitDefID[unitDefID]
 		if commShieldID then
 			def = select(3, GG.Upgrades_UnitShieldDef(unitID)) 
+			if not def then
+				return
+			end
 		end
 		unitCount = unitCount + 1
 		
