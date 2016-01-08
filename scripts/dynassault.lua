@@ -100,7 +100,7 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
-		local speedMult = Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1
+		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()
 		--left leg up, right leg back
 		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
 		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)

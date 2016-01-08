@@ -661,6 +661,7 @@ do
 		gadgetStock   = ud.customParams.stockpiletime,
         reloadTime    = ud.reloadTime,
         primaryWeapon = ud.primaryWeapon,
+        dyanmicComm   = ud.customParams.dynamic_comm,
 		maxWaterTank  = ud.customParams.maxwatertank,
 		freeStockpile = (ud.customParams.freestockpile and true) or nil,
       }
@@ -851,20 +852,22 @@ do
 	  
 	  
       --// RELOAD
-      if (ci.reloadTime>=options.minReloadTime.value) then
-        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,ci.primaryWeapon - reverseCompat)
+      if ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value) then
+        local primaryWeapon = GetUnitRulesParam(unitID, "primary_weapon_override") or ci.primaryWeapon
+        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon - reverseCompat)
         if (reloaded==false) then
-		  local slowState = 1-(GetUnitRulesParam(unitID,"slowState") or 0)
-		  local reloadTime = Spring.GetUnitWeaponState(unitID, ci.primaryWeapon - reverseCompat , 'reloadTime')
-		  ci.reloadTime = reloadTime
-		  -- When weapon is disabled the reload time is constantly set to be almost complete. 
-		  -- It results in a bunch of units walking around with 99% reload bars.
-		  if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
-            reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
-		    if (reload >= 0) then
-              AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		  local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon - reverseCompat , 'reloadTime')
+		  if (not ci.dyanmicComm) or (reloadTime >= options.minReloadTime.value) then 
+		    ci.reloadTime = reloadTime
+		    -- When weapon is disabled the reload time is constantly set to be almost complete. 
+		    -- It results in a bunch of units walking around with 99% reload bars.
+		    if reloadFrame > gameFrame + 6 then -- UPDATE_PERIOD in unit_attributes.lua.
+              reload = 1 - ((reloadFrame-gameFrame)/30) / ci.reloadTime;
+		      if (reload >= 0) then
+                AddBar(messages.reload,reload,"reload",(fullText and floor(reload*100)..'%') or '')
+		      end
 		    end
-		  end
+          end
         end
       end
 

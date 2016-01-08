@@ -7,6 +7,7 @@ local weapon2
 local shield
 local weaponNumMap = {}
 local weaponsInitialized = false
+local paceMult
 
 local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
 local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
@@ -24,6 +25,24 @@ end
 
 local function IsManualFire(num)
 	return isManual[num]
+end
+
+local function CalculatePaceMult()
+	local levelToPace = {
+		[0] = 1,
+		[1] = 1,
+		[2] = 0.93,
+		[3] = 0.86,
+		[4] = 0.8,
+		[5] = 0.75,
+	}
+	
+	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	return paceMult
+end
+
+local function GetPace()
+	return paceMult or CalculatePaceMult()
 end
 
 local function GetWeapon(num)
@@ -118,6 +137,20 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 			maxRange = range
 		end
 		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
+	end
+	
+	if weapon1 and weapon1 ~= 0 then
+		if weapon2 and weapon2 ~= 0 then
+			local reload1 = Spring.GetUnitWeaponState(unitID, weapon1, 'reloadTime')
+			local reload2 = Spring.GetUnitWeaponState(unitID, weapon2, 'reloadTime')
+			if reload1 > reload2 then
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon1, INLOS)
+			else
+				Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon2, INLOS)
+			end
+		else
+			Spring.SetUnitRulesParam(unitID, "primary_weapon_override",  weapon1, INLOS)
+		end
 	end
 	
 	-- Set other ranges to 0 for leashing
@@ -226,6 +259,7 @@ local function SpawnWreck(wreckLevel)
 end
 
 return {
+	GetPace           = GetPace,
 	GetWeapon         = GetWeapon,
 	EmitWeaponFireSfx = EmitWeaponFireSfx,
 	EmitWeaponShotSfx = EmitWeaponShotSfx,
