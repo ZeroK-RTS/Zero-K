@@ -150,6 +150,8 @@ local drawHotkeyBytes = {}
 local drawHotkeyBytesCount = 0
 local drawtoolKeyPressed
 
+WG.drawtoolKeyPressed = nil
+
 local windTooltips = {
 	["armwin"] = true,
 }
@@ -2564,6 +2566,7 @@ function widget:Update(dt)
 			end
 		end
 	end
+	WG.drawtoolKeyPressed = drawtoolKeyPressed
 	
 	
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
@@ -2822,6 +2825,8 @@ function widget:Initialize()
 		local shieldDefID = ud.shieldWeaponDef
 		ud.shieldPower = ((shieldDefID)and(WeaponDefs[shieldDefID].shieldPower))or(-1)
 	end
+
+	WG.drawtoolKeyPressed = false
 	
 	option_Deselect()
 end
@@ -2832,6 +2837,7 @@ function widget:Shutdown()
 		window_tooltip2:Dispose()
 	end
 	Spring.SetDrawSelectionInfo(true)
+	WG.drawtoolKeyPressed = nil
 end
 
 --lags like a brick due to being spammed constantly for unknown reason, moved all its behavior to SelectionChanged
