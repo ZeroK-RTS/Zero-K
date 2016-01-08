@@ -17,6 +17,7 @@ local nanoPieces = {nanopoint}
 
 -- Signal definitions
 local SIG_MOVE = 1
+local SIG_BUILD = 2
 
 local function BuildDecloakThread()
 	Signal(SIG_BUILD)

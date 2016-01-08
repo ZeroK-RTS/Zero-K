@@ -38,6 +38,7 @@ local nanoPieces = {nanospray}
 --------------------------------------------------------------------------------
 -- constants
 --------------------------------------------------------------------------------
+local SIG_BUILD = 32
 local SIG_RESTORE = 16
 local SIG_AIM = 2
 local SIG_AIM_2 = 4
@@ -60,6 +61,15 @@ local dgunning = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function BuildDecloakThread()
+	Signal(SIG_BUILD)
+	SetSignalMask(SIG_BUILD)
+	while true do
+		GG.PokeDecloakUnit(unitID, 50)
+		Sleep(1000)
+	end
+end
+
 local function BuildPose(heading, pitch)
 	inBuildAnim = true
 	Turn(luparm, x_axis, math.rad(-60), math.rad(250))
@@ -438,6 +448,7 @@ function script.QueryNanoPiece()
 end
 
 function script.StopBuilding()
+	Signal(SIG_BUILD)
 	inBuildAnim = false
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	if not bAiming then
@@ -446,6 +457,7 @@ function script.StopBuilding()
 end
 
 function script.StartBuilding(heading, pitch) 
+	StartThread(BuildDecloakThread)
 	restoreHeading, restorePitch = heading, pitch
 	BuildPose(heading, pitch)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
