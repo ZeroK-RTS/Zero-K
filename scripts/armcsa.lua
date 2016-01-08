@@ -18,19 +18,24 @@ local nanoPieces = {nanopoint}
 -- Signal definitions
 local SIG_MOVE = 1
 
+local function BuildDecloakThread()
+	Signal(SIG_BUILD)
+	SetSignalMask(SIG_BUILD)
+	while true do
+		GG.PokeDecloakUnit(unitID, 50)
+		Sleep(1000)
+	end
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 end
 
 function script.Activate()
-	Turn(arm, x_axis, math.rad(-80), math.rad(200))
-	Turn(lathe, x_axis, math.rad(-80), math.rad(200))
 end
 
 function script.Deactivate()
-	Turn(arm, x_axis, 0, math.rad(200))
-	Turn(lathe, x_axis, 0, math.rad(200))
 end
 
 local function StartMoving()
@@ -57,6 +62,9 @@ function script.StopMoving()
 end
 
 function script.StartBuilding()
+	StartThread(BuildDecloakThread)
+	Turn(arm, x_axis, math.rad(-80), math.rad(200))
+	Turn(lathe, x_axis, math.rad(-80), math.rad(200))
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	Turn(jaw1, x_axis, math.rad(-30), math.rad(150))
 	Turn(jaw2, x_axis, math.rad(30), math.rad(150))
@@ -64,6 +72,9 @@ function script.StartBuilding()
 end
 
 function script.StopBuilding()
+	Signal(SIG_BUILD)
+	Turn(arm, x_axis, 0, math.rad(200))
+	Turn(lathe, x_axis, 0, math.rad(200))
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	Turn(jaw1, x_axis, 0, math.rad(100))
 	Turn(jaw2, x_axis, 0, math.rad(100))
