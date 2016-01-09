@@ -48,7 +48,7 @@ unitDef = {
   script                        = "armestor.lua",
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
-  sightDistance                 = 273,
+  sightDistance                 = 512,
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 
