@@ -220,7 +220,7 @@ local function SpawnModuleWreck(moduleDefID, wreckLevel, totalCount, teamID, x, 
 	local dir = math.random()*2*math.pi
 	local pitch = ((math.random()*2)^2 - 1)*math.pi/2
 	local heading = math.random(65536)
-	local mag = 30 + math.random()*(30 + 5*math.min(totalCount, 15))
+	local mag = 60 + math.random()*(30 + 5*math.min(totalCount, 15))
 	local horScale = mag*math.cos(pitch)
 	vx, vy, vz = vx + math.cos(dir)*horScale, vy + math.sin(pitch)*mag, vz + math.sin(dir)*horScale
 	

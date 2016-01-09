@@ -288,7 +288,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_lparticlebeam",
 		humanName = "Light Particle Beam",
-		description = "Light Particle Beam\nCost:75",
+		description = "Light Particle Beam",
 		image = "unitpics/commweapon_lparticlebeam.png",
 		limit = 1,
 		cost = 75 * COST_MULT,
@@ -310,7 +310,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_missilelauncher",
 		humanName = "Missile Launcher",
-		description = "Missile Launcher\nCost:100",
+		description = "Missile Launcher",
 		image = "unitpics/commweapon_missilelauncher.png",
 		limit = 1,
 		cost = 100 * COST_MULT,
@@ -353,7 +353,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_napalmgrenade",
 		humanName = "Helfire Grenade",
-		description = "Helfire Grenade\nCost:125",
+		description = "Helfire Grenade",
 		image = "unitpics/commweapon_napalmgrenade.png",
 		limit = 1,
 		cost = 125 * COST_MULT,
@@ -396,7 +396,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_rocketlauncher",
 		humanName = "Rocket Launcher",
-		description = "Rocket Launcher\nCost:100",
+		description = "Rocket Launcher",
 		image = "unitpics/commweapon_rocketlauncher.png",
 		limit = 1,
 		cost = 100 * COST_MULT,
@@ -511,7 +511,7 @@ local moduleDefs = {
 	{
 		name = "commweapon_areashield",
 		humanName = "Area Shield",
-		description = "Area Shield - Projects a large shield. Replaces Personal Shield.\nCost:250",
+		description = "Area Shield - Projects a large shield. Replaces Personal Shield.",
 		image = "unitpics/module_areashield.png",
 		limit = 1,
 		cost = 250 * COST_MULT,
@@ -539,7 +539,7 @@ local moduleDefs = {
 	{
 		name = "disruptor_ammo",
 		humanName = "Disruptor Ammo",
-		description = "Disruptor Ammo - Heavy Machine Gun, Shotgun and Particle Beams deal slow damage. Reduced direct damage.\nCost:450",
+		description = "Disruptor Ammo - Heavy Machine Gun, Shotgun and Particle Beams deal slow damage. Reduced direct damage.",
 		image = "unitpics/weaponmod_disruptor_ammo.png",
 		limit = 1,
 		cost = 450 * COST_MULT,
@@ -577,7 +577,7 @@ local moduleDefs = {
 	{
 		name = "radar",
 		humanName = "Field Radar",
-		description = "Field Radar - Attaches a basic radar system to the Commander.\nCost:75",
+		description = "Field Radar - Attaches a basic radar system to the Commander.",
 		image = "unitpics/module_fieldradar.png",
 		limit = 1,
 		cost = 75 * COST_MULT,
@@ -590,7 +590,7 @@ local moduleDefs = {
 	{
 		name = "personalcloak",
 		humanName = "Personal Cloak",
-		description = "Personal Cloak - A personal cloaking device for the Commander.\Cost: 400",
+		description = "Personal Cloak - A personal cloaking device for the Commander.",
 		image = "unitpics/module_personal_cloak.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
