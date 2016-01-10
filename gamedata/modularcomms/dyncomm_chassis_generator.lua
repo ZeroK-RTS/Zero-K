@@ -25,6 +25,7 @@ local chassisDefs = {
 		weapons = {
 			"commweapon_peashooter",
 			"commweapon_beamlaser",
+			"commweapon_shotgun",
 			"commweapon_lparticlebeam",
 			"commweapon_disruptor",
 			"commweapon_hparticlebeam",

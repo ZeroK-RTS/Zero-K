@@ -48,5 +48,5 @@ BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
 
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
-DEFAULT_UNIT = "comm_trainer_strike"		--FIXME: hardcodey until I cba to identify precise source of problem
-DEFAULT_UNIT_TEAMSIDES = "Strike Trainer"
+DEFAULT_UNIT = "dyntrainer_assault_base"    --FIXME: hardcodey until I cba to identify precise source of problem
+DEFAULT_UNIT_TEAMSIDES = "Guardian Trainer"

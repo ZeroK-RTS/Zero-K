@@ -90,10 +90,20 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
+	if (not weapon2) and weapon1 then
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local weaponName = UnitDefs[unitDefID].name .. "_" .. weapon1
+		local wd = WeaponDefNames[weaponName]
+		if wd and wd.customParams and wd.customParams.manualfire then
+			weapon2 = weapon1
+			weapon1 = "commweapon_peashooter"
+		end
+	end
+	
 	weapon1 = weapon1 or "commweapon_peashooter"
 	
 	if (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 and Spring.GetUnitRulesParam(unitID, "comm_chassis") == 3 then 
-		weapon2 = chassisWeaponDefNames["commweapon_peashooter"]
+		weapon2 = "commweapon_peashooter"
 	end
 	
 	rangeMult = rangeMult or 1
