@@ -631,7 +631,6 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.canResurrect = true
-			sharedData.buildPowerMult = 0.5
 		end
 	},
 	
@@ -754,7 +753,7 @@ local moduleDefs = {
 		description = "CarRepairer's Nanolathe - Increases build power by 5. Limit: 8",
 		image = "unitpics/module_adv_nano.png",
 		limit = 8,
-		cost = 175 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
