@@ -343,7 +343,7 @@ function script.StopMoving()
 end
 
 function script.AimFromWeapon(num)
-	return armhold
+	return pelvis
 end
 
 local function AimRifle(heading, pitch, isDgun)

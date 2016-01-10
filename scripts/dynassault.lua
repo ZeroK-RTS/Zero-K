@@ -39,6 +39,7 @@ local SIG_LASER = 2
 local SIG_DGUN = 4
 local SIG_RESTORE_LASER = 8
 local SIG_RESTORE_DGUN = 16
+local SIG_RESTORE_TORSO = 32
 
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
@@ -72,8 +73,7 @@ local FOREARM_BACK_SPEED = math.rad(40) * PACE
 local TORSO_ANGLE_MOTION = math.rad(8)
 local TORSO_SPEED_MOTION = math.rad(7)*PACE
 
-local RESTORE_DELAY_LASER = 4000
-local RESTORE_DELAY_DGUN = 2500
+local RESTORE_DELAY = 2500
 
 --------------------------------------------------------------------------------
 -- vars
@@ -170,16 +170,21 @@ function script.StopMoving()
 	StartThread(RestoreLegs)
 end
 
+local function RestoreTorsoAim()
+	Signal(SIG_RESTORE_TORSO)
+	SetSignalMask(SIG_RESTORE_TORSO)
+	Sleep(RESTORE_DELAY)
+	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
+end
+
 local function RestoreLaser()
+	StartThread(RestoreTorsoAim)
 	Signal(SIG_RESTORE_LASER)
 	SetSignalMask(SIG_RESTORE_LASER)
-	Sleep(RESTORE_DELAY_LASER)
+	Sleep(RESTORE_DELAY)
 	isLasering = false
-	Turn(larm, x_axis, 0, ARM_SPEED_PITCH)
-	Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
 	Turn(rarm, x_axis, restorePitch, ARM_SPEED_PITCH)
 	Turn(rhand, x_axis, 0, ARM_SPEED_PITCH)
-	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
 	
 	if HAS_GATTLING then
 		Spin(barrels, z_axis, 100)
@@ -189,15 +194,13 @@ local function RestoreLaser()
 end
 
 local function RestoreDGun()
+	StartThread(RestoreTorsoAim)
 	Signal(SIG_RESTORE_DGUN)
 	SetSignalMask(SIG_RESTORE_DGUN)
-	Sleep(RESTORE_DELAY_DGUN)
+	Sleep(RESTORE_DELAY)
 	isDgunning = false
 	Turn(larm, x_axis, 0, ARM_SPEED_PITCH)
 	Turn(lnanohand, x_axis, 0, ARM_SPEED_PITCH)
-	Turn(rarm, x_axis, restorePitch, ARM_SPEED_PITCH)
-	Turn(rhand, x_axis, 0, ARM_SPEED_PITCH)
-	Turn(torso, y_axis, restoreHeading, TORSO_SPEED_YAW)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -253,7 +256,7 @@ function script.Shot(num)
 end
 
 function script.AimFromWeapon(num)
-	return torso
+	return pelvis
 end
 
 function script.QueryWeapon(num)

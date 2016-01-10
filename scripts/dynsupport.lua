@@ -341,7 +341,7 @@ function script.StopMoving()
 end
 
 function script.AimFromWeapon(num)
-	return armhold
+	return head
 end
 
 function script.QueryWeapon(num)
