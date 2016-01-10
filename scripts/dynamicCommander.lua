@@ -208,7 +208,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 	
 	-- shields
 	for i = 1, #shields do
-		Spring.SetUnitShieldState(unitID, shields[i], false)
+		--Spring.SetUnitShieldState(unitID, shields[i], false)
 	end
 	
 	if (shield) then

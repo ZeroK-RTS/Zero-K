@@ -479,7 +479,7 @@ upgrades = {
 		func = function(unitDef)
 				local weapons = unitDef.weapondefs or {}
 				for i,v in pairs(weapons) do
-					v.customparams.damagemod = v.customparams.damagemod + 0.1
+					v.customparams.damagemod = (v.customparams.damagemod or 0) + 0.1
 				end
 			end,	
 	},

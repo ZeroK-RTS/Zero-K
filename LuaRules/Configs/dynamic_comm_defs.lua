@@ -808,6 +808,34 @@ end
 
 -- it'd help if there was a name -> chassisDef map you know
 
+--------------------------------------------------------------------------------------
+-- Must match staticomms.lua around line 250 (MakeCommanderChassisClones)
+--------------------------------------------------------------------------------------
+-- A note on personal shield and area shield:
+-- The personal shield weapon is replaced by the area shield weapon in moduledefs.lua.
+-- Therefore the clonedef with an area shield and no personal shield does not actually
+-- have an area shield. This means that the below functions return the correct values,
+-- if a commander has a an area shield and a personal shield it should return the
+-- clone which was given those modules.
+
+local function GetReconCloneModulesString(modulesByDefID)
+	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0)
+end
+
+local function GetSupportCloneModulesString(modulesByDefID)
+	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
+		(modulesByDefID[moduleDefNames.resurrect] or 0)
+end
+
+local function GetAssaultCloneModulesString(modulesByDefID)
+	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
+end
+
 local chassisDefs = {
 	{
 		name = "recon",
@@ -836,7 +864,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon1_" .. GetReconCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -856,7 +884,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon2_" .. GetReconCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -876,7 +904,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon3_" .. GetReconCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -900,7 +928,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon4_" .. GetReconCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -924,7 +952,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynrecon5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynrecon5_" .. GetReconCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -973,9 +1001,7 @@ local chassisDefs = {
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
-					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
-					return UnitDefNames["dynsupport1_damage_boost" .. damageBooster .. resurrect].id
+					return UnitDefNames["dynsupport1_" .. GetSupportCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -997,9 +1023,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
-					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
-					return UnitDefNames["dynsupport2_damage_boost" .. damageBooster .. resurrect].id
+					return UnitDefNames["dynsupport2_" .. GetSupportCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1021,9 +1045,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
-					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
-					return UnitDefNames["dynsupport3_damage_boost" .. damageBooster .. resurrect].id
+					return UnitDefNames["dynsupport3_" .. GetSupportCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1049,9 +1071,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
-					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
-					return UnitDefNames["dynsupport4_damage_boost" .. damageBooster .. resurrect].id
+					return UnitDefNames["dynsupport4_" .. GetSupportCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1077,9 +1097,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					local damageBooster = (modulesByDefID[moduleDefNames.damageBooster] or 0)
-					local resurrect = ((modulesByDefID[moduleDefNames.resurrect] and "resurrect") or "")
-					return UnitDefNames["dynsupport5_damage_boost" .. damageBooster .. resurrect].id
+					return UnitDefNames["dynsupport5_" .. GetSupportCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1122,7 +1140,7 @@ local chassisDefs = {
 				morphBuildPower = 10,
 				morphBaseCost = 0,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynassault1_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynassault1_" .. GetAssaultCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1142,7 +1160,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynassault2_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynassault2_" .. GetAssaultCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1162,7 +1180,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynassault3_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynassault3_" .. GetAssaultCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1186,7 +1204,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynassault4_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynassault4_" .. GetAssaultCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1210,7 +1228,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynassault5_damage_boost" .. (modulesByDefID[moduleDefNames.damageBooster] or 0)].id
+					return UnitDefNames["dynassault5_" .. GetAssaultCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{

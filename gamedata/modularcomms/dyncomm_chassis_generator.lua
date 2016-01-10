@@ -3,7 +3,6 @@ local chassisDefs = {
 		name = "dynrecon1",
 		weapons = {
 			"commweapon_peashooter",
-			"commweapon_personal_shield",
 			"commweapon_beamlaser",
 			"commweapon_lparticlebeam",
 			"commweapon_disruptor",
@@ -18,14 +17,13 @@ local chassisDefs = {
 			"commweapon_clusterbomb",
 			"commweapon_disruptorbomb",
 			"commweapon_concussion",
+			-- Space for shield
 		}
 	},
 	{
 		name = "dynsupport1",
 		weapons = {
 			"commweapon_peashooter",
-			"commweapon_personal_shield",
-			"commweapon_areashield",
 			"commweapon_beamlaser",
 			"commweapon_lparticlebeam",
 			"commweapon_disruptor",
@@ -39,14 +37,13 @@ local chassisDefs = {
 			"commweapon_multistunner",
 			"commweapon_multistunner_improved",
 			"commweapon_disruptorbomb",
+			-- Space for shield
 		}
 	},
 	{
 		name = "dynassault1",
 		weapons = {
 			"commweapon_peashooter",
-			"commweapon_personal_shield",
-			"commweapon_areashield",
 			"commweapon_heatray",
 			"commweapon_heavymachinegun",
 			"commweapon_heavymachinegun_disrupt",
@@ -60,6 +57,7 @@ local chassisDefs = {
 			"commweapon_disintegrator",
 			"commweapon_slamrocket",
 			"commweapon_clusterbomb",
+			-- Space for shield
 		}
 	},
 }
@@ -101,7 +99,7 @@ for i = 1, #chassisDefs do
 	
 	for num = 1, #chassisDefs[i].weapons do
 		weaponName = chassisDefs[i].weapons[num]
-		DynamicApplyWeapon(unitDef, weaponName, true, num)
+		DynamicApplyWeapon(unitDef, weaponName, num)
 	end
 	
 	if #chassisDefs[i].weapons > 16 then

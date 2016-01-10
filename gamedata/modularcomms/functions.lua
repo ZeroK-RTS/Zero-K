@@ -20,10 +20,13 @@ mapWeaponToCEG = {
 }
 
 
-function DynamicApplyWeapon(unitDef, weapon, replace, slot)
+function DynamicApplyWeapon(unitDef, weapon, slot)
 	if not weapons[weapon] then
 		Spring.Echo("Cannont find weapon", weapon)
 	end
+	
+	slot = slot or (#unitDef.weapons + 1)
+	
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
 	
@@ -49,13 +52,14 @@ function DynamicApplyWeapon(unitDef, weapon, replace, slot)
 	
 	--unitDef.sfxtypes.explosiongenerators[6 + slot*2] = ("custom:NONE" .. (6 + slot*2))
 	--unitDef.sfxtypes.explosiongenerators[7 + slot*2] = ("custom:NONE" .. (7 + slot*2))
-	
-	if (not isDgun) and not (dualwield or replace) then
-		unitDef.customparams.alreadyhasweapon = true
-	end
 end
 
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
+	if unitDef.customparams.dynamic_comm then
+		DynamicApplyWeapon(unitDef, weapon, replace and forceslot)
+		return
+	end
+	
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
 	local slot = tonumber(wcp.slot) or 5

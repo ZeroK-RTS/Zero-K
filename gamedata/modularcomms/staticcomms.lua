@@ -223,38 +223,49 @@ local chassisList = {"dynrecon", "dynsupport", "dynassault"}
 local levelLimitList = {{1, 1}, {2, 3}, {3, 5}, {4, 8}, {5, 8}}
 local weaponCountList = {0, 1 , 2, 3, 4, 5, 6, 7, 8}
 
-for i = 1, #chassisList do
-	local chassis = chassisList[i]
-	for j = 1, #levelLimitList do
-		local level = levelLimitList[j][1]
-		local weaponLimit = levelLimitList[j][2]
-		local fullChassis = chassis .. level
-		for k = 1, #weaponCountList do
-			local weaponCount = weaponCountList[k]
-			if weaponCount > weaponLimit then
-				break
-			end
-			local modules = {}
-			for m = 1, weaponCount do
-				modules[m] = "module_dmg_booster"
-			end
-			comms[fullChassis .. "_damage_boost" .. weaponCount] = {
-				chassis = fullChassis,
-				name = fullChassis,
-				modules = modules,
-			}
-			if chassis == "dynsupport" then
-				local resModule = Spring.Utilities.CopyTable(modules)
-				resModule[#resModule + 1] = "module_resurrect"
-				comms[fullChassis .. "_damage_boost" .. weaponCount .. "resurrect"] = {
-					chassis = fullChassis,
-					name = fullChassis,
-					modules = resModule,
-				}
-			end
+local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, modules, moduleType)
+	if moduleType > #levelLimits then
+		comms[unitName] = {
+			chassis = fullChassisName,
+			name = fullChassisName,
+			modules = modules,
+		}
+		return
+	end
+	
+	for copies = 0, levelLimits[moduleType] do
+		for m = 1, copies do
+			modules[#modules + 1] = moduleNames[moduleType]
 		end
+		MakeClones(levelLimits, moduleNames, fullChassisName, unitName .. copies, Spring.Utilities.CopyTable(modules), moduleType + 1)
 	end
 end
+
+local function MakeCommanderChassisClones(chassis, levelLimits, moduleNames)
+	for level = 1, #levelLimits do
+		local fullChassisName = chassis .. level
+		local modules = {}
+		MakeClones(levelLimits[level], moduleNames, fullChassisName, fullChassisName .. "_", modules, 1)
+	end
+end
+
+--------------------------------------------------------------------------------------
+-- Must match dynamic_comm_defs.lua around line 800 (top of the chassis defs)
+--------------------------------------------------------------------------------------
+MakeCommanderChassisClones("dynrecon", 
+	{{1, 0}, {3, 1}, {5, 1}, {8, 1}, {8, 1}}, 
+	{"module_dmg_booster", "module_areashield"}
+)
+
+MakeCommanderChassisClones("dynsupport",
+	{{1, 0, 0, 0}, {3, 1, 0, 1}, {5, 1, 1, 1}, {8, 1, 1, 1}, {8, 1, 1, 1}},
+	{"module_dmg_booster", "module_personal_shield", "module_areashield", "module_resurrect"}
+)
+
+MakeCommanderChassisClones("dynassault", 
+	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
+	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+)
 
 --[[
 for name,stats in pairs(comms) do

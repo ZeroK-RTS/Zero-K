@@ -305,7 +305,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 end
 
 local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
-	Spring.Echo("Creating starter dyncomm " .. dyncommID)
+	--Spring.Echo("Creating starter dyncomm " .. dyncommID)
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
 	if not chassisDefID then
