@@ -1328,27 +1328,8 @@ for i = 1, #chassisDefs do
 	end
 end
 
--- Create WeaponDefNames for each chassis
+-- Add baseWreckID and baseHeapID
 if UnitDefNames then
-	for i = 1, #chassisDefs do
-		local data = chassisDefs[i]
-		local weapons = UnitDefs[data.baseUnitDef].weapons
-		local chassisDefWeaponNames = {}
-		for num = 1, #weapons do
-			local wd = WeaponDefs[weapons[num].weaponDef]
-			local weaponName = string.sub(wd.name, (string.find(wd.name,"_") or 0) + 1, 100)
-			if weaponName then
-				chassisDefWeaponNames[weaponName] = {
-					num = num,
-					weaponDefID = weapons[num].weaponDef,
-					manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
-				}
-			end
-		end
-		data.weaponDefNames = chassisDefWeaponNames
-	end
-
-	-- Add baseWreckID and baseHeapID
 	for i = 1, #chassisDefs do
 		local data = chassisDefs[i]
 		local wreckData = FeatureDefNames[UnitDefs[data.baseUnitDef].wreckName]
@@ -1432,10 +1413,25 @@ local function ModuleListToByDefID(moduleList)
 	return byDefID
 end
 
+local function GetUnitDefShield(unitDefNameOrID, shieldName)
+	local unitDefID = (type(unitDefNameOrID) == "string" and UnitDefNames[unitDefNameOrID].id) or unitDefNameOrID
+	local wepTable = UnitDefs[unitDefID].weapons
+	for num = 1, #wepTable do
+		local wd = WeaponDefs[wepTable[num].weaponDef]
+		if wd.type == "Shield" then
+			local weaponName = string.sub(wd.name, (string.find(wd.name,"commweapon") or 0), 100)
+			if weaponName == shieldName then
+				return wd.id, num
+			end
+		end
+	end
+end
+
 local utilities = {
-	ModuleIsValid = ModuleIsValid,
+	ModuleIsValid          = ModuleIsValid,
 	ModuleSetsAreIdentical = ModuleSetsAreIdentical,
-	ModuleListToByDefID = ModuleListToByDefID,
+	ModuleListToByDefID    = ModuleListToByDefID,
+	GetUnitDefShield       = GetUnitDefShield
 }
 
 ------------------------------------------------------------------------

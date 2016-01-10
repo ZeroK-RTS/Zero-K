@@ -59,7 +59,7 @@ for _, eud in pairs (UnitDefs) do
 	end
 end
 
-local commAreaShield = WeaponDefNames["dynassault1_commweapon_areashield"]
+local commAreaShield = WeaponDefNames["core_spectre_cor_shield_small"]
 
 local commAreaShieldDefID = {
 	maxCharge = commAreaShield.shieldPower,
@@ -90,38 +90,14 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 end
 
 local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
-	local chassisDefID = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-	local chassisWeaponDefNames = chassisDefs[chassisDefID].weaponDefNames 
+	weapon1 = weapon1 or "commweapon_peashooter"
 	
-	weapon1 = chassisWeaponDefNames[weapon1 or "commweapon_peashooter"]
-	
-	if weapon2 then
-		weapon2 = chassisWeaponDefNames[weapon2]
-	elseif Spring.GetUnitRulesParam(unitID, "comm_level") > 2 and Spring.GetUnitRulesParam(unitID, "comm_chassis") == 3 then 
+	if (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 and Spring.GetUnitRulesParam(unitID, "comm_chassis") == 3 then 
 		weapon2 = chassisWeaponDefNames["commweapon_peashooter"]
 	end
 	
-	shield = shield and chassisWeaponDefNames[shield]
-	
 	rangeMult = rangeMult or 1
 	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
-	
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weapon1 and weapon1.weaponDefID) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weapon2 and weapon2.weaponDefID) or 0, INLOS)
-	
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_1", (weapon1 and weapon1.num) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_num_2", (weapon2 and weapon2.num) or 0, INLOS)
-	
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_1", (weapon1 and weapon1.manualFire and 1) or 0, INLOS)
-	Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_2", (weapon2 and weapon2.manualFire and 1) or 0, INLOS)
-
-	if shield then
-		Spring.SetUnitRulesParam(unitID, "comm_shield_id", shield.weaponDefID, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_shield_num", shield.num, INLOS)
-		Spring.SetUnitRulesParam(unitID, "comm_shield_max", WeaponDefs[shield.weaponDefID].shieldPower, INLOS)
-	else
-		Spring.SetUnitRulesParam(unitID, "comm_shield_max", 0, INLOS)
-	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
@@ -273,15 +249,13 @@ end
 
 local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isBeingBuilt, upgradeDef)
 	-- Calculate Module effects
-	local chassisWeaponDefNames = chassisDefs[upgradeDef.chassis].weaponDefNames 
 	local moduleEffectData = GetModuleEffectsData(upgradeDef.moduleList, upgradeDef.level, upgradeDef.chassis)
 	
 	-- Create Unit, set appropriate global data first
 	-- These variables are set such that other gadgets can notice the effect
 	-- within UnitCreated.
 	if moduleEffectData.shield then
-		unitCreatedShield = chassisWeaponDefNames[moduleEffectData.shield].weaponDefID
-		unitCreatedShieldNum = chassisWeaponDefNames[moduleEffectData.shield].num
+		unitCreatedShield, unitCreatedShieldNum = upgradeUtilities.GetUnitDefShield(defName, moduleEffectData.shield)
 	end
 	
 	if moduleEffectData.personalCloak then
@@ -317,6 +291,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	
 	unitCreatedShield = nil
 	unitCreatedShieldNum = nil
+	unitCreatedShield = nil
 	unitCreatedCloak = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
@@ -595,14 +570,14 @@ end
 --------------------------------------------------------------------------------
 
 function GG.Upgrades_UnitShieldDef(unitID)
+	local shieldDefID = (unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) or false
+	local shieldNum = (unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num")) or false
 	local shieldDef = false
-	if (unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_id")) == 3 then
+	if shieldDefID and WeaponDefs[shieldDefID].shieldRadius > 200 then
 		shieldDef = commAreaShieldDefID
 	end
 
-	return unitCreatedShield or Spring.GetUnitRulesParam(unitID, "comm_shield_id"), 
-		unitCreatedShieldNum or Spring.GetUnitRulesParam(unitID, "comm_shield_num"),
-		shieldDef		
+	return shieldDefID, shieldNum, shieldDef
 end
 
 function GG.Upgrades_UnitCanCloak(unitID)

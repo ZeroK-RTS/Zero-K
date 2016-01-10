@@ -15,11 +15,20 @@ local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
 local isManual = {}
 
 local shields = {}
+local unitWeaponNames = {} -- Unit weapons by name
 local wepTable = UnitDefs[unitDefID].weapons
-for i = 1, #wepTable do
-	local weaponDef = WeaponDefs[wepTable[i].weaponDef]
-	if weaponDef.type == "Shield" then
-		shields[#shields + 1] = i
+for num = 1, #wepTable do
+	local wd = WeaponDefs[wepTable[num].weaponDef]
+	if wd.type == "Shield" then
+		shields[#shields + 1] = num
+	end
+	local weaponName = string.sub(wd.name, (string.find(wd.name,"commweapon") or 0), 100)
+	if weaponName then
+		unitWeaponNames[weaponName] = {
+			num = num,
+			weaponDefID = wd.id,
+			manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
+		}
 	end
 end
 
@@ -83,10 +92,37 @@ local function EmitWeaponShotSfx(pieceNum, num)
 	end
 end
 
-local function UpdateWeapons(w1, w2, sh, rangeMult)
-	weapon1 = w1 and w1.num
-	weapon2 = w2 and w2.num
-	shield  = sh and sh.num
+local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
+	local weaponDef1 = weaponName1 and unitWeaponNames[weaponName1]
+	local weaponDef2 = weaponName2 and unitWeaponNames[weaponName2]
+	local shieldDef = shieldName and unitWeaponNames[shieldName]
+	
+	weapon1 = weaponDef1 and weaponDef1.num
+	weapon2 = weaponDef2 and weaponDef2.num
+	shield  = shieldDef and shieldDef.num
+	
+	if weapon1 then
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_name_1", weaponName1, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_id_1", (weaponDef1 and weaponDef1.weaponDefID) or 0, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_num_1", weapon1, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_1", (weaponDef1 and weaponDef1.manualFire and 1) or 0, INLOS)
+	end
+	
+	if weapon2 then
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_name_2", weaponName2, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_id_2", (weaponDef2 and weaponDef2.weaponDefID) or 0, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_num_2", weapon2, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_weapon_manual_2", (weaponDef2 and weaponDef2.manualFire and 1) or 0, INLOS)
+	end
+
+	if shield then
+		Spring.SetUnitRulesParam(unitID, "comm_shield_name", shieldName, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_shield_id", shieldDef.weaponDefID, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_shield_num", shield, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_shield_max", WeaponDefs[shieldDef.weaponDefID].shieldPower, INLOS)
+	else
+		Spring.SetUnitRulesParam(unitID, "comm_shield_max", 0, INLOS)
+	end
 	
 	weaponNumMap = {}
 	if weapon1 then
@@ -99,7 +135,7 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 		weaponNumMap[shield] = 3
 	end
 	
-	local hasManualFire = (w1 and w1.manualFire) or (w2 and w2.manualFire)
+	local hasManualFire = (weaponDef1 and weaponDef1.manualFire) or (weaponDef2 and weaponDef2.manualFire)
 	local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD.MANUALFIRE)
 	if not hasManualFire and cmdDesc then
 		Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
@@ -110,22 +146,22 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 
 	local maxRange = 0
 	local otherRange = false
-	if weapon1 and weapon1 ~= 0 then
-		isManual[weapon1] = w1.manualFire
-		local range = tonumber(WeaponDefs[w1.weaponDefID].range)*rangeMult
-		if w1.manualFire then
+	if weapon1 then
+		isManual[weapon1] = weaponDef1.manualFire
+		local range = tonumber(WeaponDefs[weaponDef1.weaponDefID].range)*rangeMult
+		if weaponDef1.manualFire then
 			otherRange = range
 		else
 			maxRange = range
 		end
-		Spring.SetUnitWeaponState(unitID, w1.num, "range", range)
+		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)
 	end
 	
-	if weapon2 and weapon2 ~= 0 then
-		isManual[weapon2] = w2.manualFire
-		local range = tonumber(WeaponDefs[w2.weaponDefID].range)*rangeMult
+	if weapon2 then
+		isManual[weapon2] = weaponDef2.manualFire
+		local range = tonumber(WeaponDefs[weaponDef2.weaponDefID].range)*rangeMult
 		if maxRange then
-			if w2.manualFire then
+			if weaponDef2.manualFire then
 				otherRange = range
 			elseif range > maxRange then
 				otherRange = maxRange
@@ -136,11 +172,11 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 		else
 			maxRange = range
 		end
-		Spring.SetUnitWeaponState(unitID, w2.num, "range", range)
+		Spring.SetUnitWeaponState(unitID, weapon2, "range", range)
 	end
 	
-	if weapon1 and weapon1 ~= 0 then
-		if weapon2 and weapon2 ~= 0 then
+	if weapon1 then
+		if weapon2 then
 			local reload1 = Spring.GetUnitWeaponState(unitID, weapon1, 'reloadTime')
 			local reload2 = Spring.GetUnitWeaponState(unitID, weapon2, 'reloadTime')
 			if reload1 > reload2 then
@@ -154,7 +190,7 @@ local function UpdateWeapons(w1, w2, sh, rangeMult)
 	end
 	
 	-- Set other ranges to 0 for leashing
-	if 1 ~= weapon1 and 1 ~= weapon2 then
+	if weapon1 ~= 1 and weapon2 ~= 1 then
 		Spring.SetUnitWeaponState(unitID, 1, "range", maxRange)
 	end
 	for i = 2, 16 do
@@ -189,20 +225,9 @@ local function Create()
 	
 	if Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") then
 		UpdateWeapons(
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1"),
-				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_1") == 1,
-			},
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2"),
-				manualFire = Spring.GetUnitRulesParam(unitID, "comm_weapon_manual_2") == 1,
-			},
-			{
-				weaponDefID = Spring.GetUnitRulesParam(unitID, "comm_shield_id"),
-				num = Spring.GetUnitRulesParam(unitID, "comm_shield_num"),
-			},
+			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
+			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
+			Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
 			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
 		)
 	end
