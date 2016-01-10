@@ -317,6 +317,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local moduleList = {moduleDefNames.econ}
+	local moduleCost = moduleDefs[moduleDefNames.econ].cost
 	
 	if commProfileInfo.decorations then
 		for i = 1, #commProfileInfo.decorations do
@@ -330,7 +331,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	local upgradeDef = {
 		level = 0,
 		chassis = chassisDefID, 
-		totalCost = UnitDefs[baseUnitDefID].metalCost,
+		totalCost = UnitDefs[baseUnitDefID].metalCost + moduleCost,
 		name = commProfileInfo.name,
 		moduleList = moduleList,
 		baseUnitDefID = baseUnitDefID,

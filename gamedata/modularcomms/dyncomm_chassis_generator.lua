@@ -44,6 +44,7 @@ local chassisDefs = {
 		name = "dynassault1",
 		weapons = {
 			"commweapon_peashooter",
+			"commweapon_beamlaser",
 			"commweapon_heatray",
 			"commweapon_heavymachinegun",
 			"commweapon_heavymachinegun_disrupt",
@@ -62,11 +63,11 @@ local chassisDefs = {
 	},
 }
 
-local commanderCost = 1200
+local commanderCost = 1000
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
 	if (modOptions and modOptions.commtest and modOptions.commtest ~= 0) then
-		commanderCost = 120
+		commanderCost = 100
 	end
 end
 
