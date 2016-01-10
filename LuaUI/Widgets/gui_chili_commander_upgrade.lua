@@ -72,6 +72,7 @@ local currentModuleList
 
 -- Button for viewing owned modules
 local viewAlreadyOwnedButton
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- New Module Selection Button Handling
@@ -549,6 +550,7 @@ end
 
 local function HideMainWindow()
 	if mainWindowShown then
+		SaveModuleLoadout()
 		screen0:RemoveChild(mainWindow)
 		mainWindowShown = false
 	end
@@ -810,6 +812,7 @@ end
 -- Command Handling
 
 local upgradeSignature = {}
+local savedSlotLoadout = {}
 
 function SendUpgradeCommand(newModules)
 	table.sort(upgradeSignature.alreadyOwned)
@@ -861,6 +864,17 @@ function SendUpgradeCommand(newModules)
 	HideMainWindow()
 end
 
+function SaveModuleLoadout()
+	local currentModules = GetCurrentModules()
+	if not (upgradeSignature and currentModules) then
+		return
+	end
+	local profileID = upgradeSignature.profileID
+	local level = upgradeSignature.level
+	savedSlotLoadout[profileID] = savedSlotLoadout[profileID] or {}
+	savedSlotLoadout[profileID][level] = GetCurrentModules()
+end
+
 local function CreateModuleListWindowFromUnit(unitID)
 	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
@@ -881,16 +895,21 @@ local function CreateModuleListWindowFromUnit(unitID)
 	-- Record the signature of the morphing unit for later application.
 	upgradeSignature.level = level
 	upgradeSignature.chassis = chassis
+	upgradeSignature.profileID = profileID
 	upgradeSignature.alreadyOwned = alreadyOwned
 	
 	-- Load default loadout
 	local slotDefaults = {}
-	if profileID then
-		local commProfileInfo = WG.ModularCommAPI.GetCommProfileInfo(profileID)
-		if commProfileInfo and commProfileInfo.modules and commProfileInfo.modules[level + 1] then
-			local defData = commProfileInfo.modules[level + 1]
-			for i = 1, #defData do
-				slotDefaults[i] = moduleDefNames[defData[i]]
+	if profileID and level then
+		if savedSlotLoadout[profileID] and savedSlotLoadout[profileID][level] then
+			slotDefaults = savedSlotLoadout[profileID][level]
+		else
+			local commProfileInfo = WG.ModularCommAPI.GetCommProfileInfo(profileID)
+			if commProfileInfo and commProfileInfo.modules and commProfileInfo.modules[level + 1] then
+				local defData = commProfileInfo.modules[level + 1]
+				for i = 1, #defData do
+					slotDefaults[i] = moduleDefNames[defData[i]]
+				end
 			end
 		end
 	end
