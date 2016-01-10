@@ -127,7 +127,7 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 				local teamID = 0
 				for i=1, #units do
 					teamID = Spring.GetUnitTeam(units[i])
-					if teamID == myTeamID then -- or (teamID and Spring.AreTeamsAllied(teamID, myTeamID) ) then
+					if teamID == myTeamID and not Spring.GetUnitNoSelect(units[i]) then
 						myUnits[#myUnits+1] = units[i]
 					end
 				end
@@ -145,13 +145,6 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 				units = Spring.GetAllUnits()
 			else
 				units = Spring.GetTeamUnits(myTeamID)
-				-- local allies = Spring.GetTeamList(Spring.GetMyAllyTeamID())
-				-- for j=1, #allies do
-				-- 	local teamUnits = Spring.GetTeamUnits(allies[j])
-				-- 	for i=1, #teamUnits do
-				-- 		units[#units+1] = teamUnits[i]
-				-- 	end
-				-- end
 			end
 
 			for i=1, #units do
