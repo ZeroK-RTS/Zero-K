@@ -256,6 +256,13 @@ function script.Shot(num)
 end
 
 function script.AimFromWeapon(num)
+	if dyncomm.IsManualFire(num) then
+		if dyncomm.GetWeapon(num) == 1 then 
+			return rcannon_flare
+		elseif dyncomm.GetWeapon(num) == 2 then 
+			return lcannon_flare
+		end
+	end
 	return pelvis
 end
 

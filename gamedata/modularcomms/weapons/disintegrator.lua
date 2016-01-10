@@ -31,7 +31,6 @@ local weaponDef = {
 	soundHit                = [[explosion/ex_med6]],
 	soundStart              = [[weapon/laser/heavy_laser4]],
 	soundTrigger            = true,
-	tolerance               = 10000,
 	turret                  = true,
 	weaponType              = [[DGun]],
 	weaponVelocity          = 300,
