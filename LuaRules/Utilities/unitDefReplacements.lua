@@ -7,7 +7,7 @@ function Spring.Utilities.GetHumanName(unitID, ud)
 		if name then
 			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 			if level then
-				return name .. " Lv" .. level
+				return name .. " Lvl "  .. (level + 1)
 			else
 				return name
 			end

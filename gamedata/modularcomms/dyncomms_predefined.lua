@@ -39,6 +39,7 @@ return {
 	},
 	dynhub_recon = {
 		name = "Recon Support",
+		notStarter = true,
 		chassis = "recon",
 		levels = {
 			{"commweapon_shotgun", "radar"},
@@ -50,6 +51,7 @@ return {
 	},
 	dynhub_support = {
 		name = "Engineer Support",
+		notStarter = true,
 		chassis = "support",
 		levels = {
 			{"commweapon_lightninggun", "range"},
@@ -61,6 +63,7 @@ return {
 	},
 	dynhub_assault = {
 		name = "Guardian Support",
+		notStarter = true,
 		chassis = "assault",
 		levels = {
 			{"commweapon_riotcannon", "range"},

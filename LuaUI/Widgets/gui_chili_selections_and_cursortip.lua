@@ -870,6 +870,18 @@ local function GetUnitDesc(unitID, ud)
 				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", windMax )
 			end
 			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
+			if Spring.GetUnitRulesParam(unitID, "comm_profileID") and WG.ModularCommAPI.IsStarterComm then
+				if not WG.ModularCommAPI.IsStarterComm(unitID) then
+					local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
+					if buildPower then
+						buildPower = buildPower*10
+						tooltip = string.sub(ud.tooltip, 0, (string.find(ud.tooltip, "Builds at") or 100) - 1)
+						return tooltip .. "Builds at " .. buildPower .. " m/s"
+					else
+						return ud.tooltip
+					end
+				end
+			end
 			return tooltip
 		end
 		return ud.tooltip

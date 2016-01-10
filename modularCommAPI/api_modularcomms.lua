@@ -211,6 +211,11 @@ local function GetLegacyModulesForComm(unitDef, raw)
 	end
 end
 
+local function IsStarterComm(unitID)
+	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
+	return profileID and (not commProfilesByProfileID[profileID].notStarter)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function Initialize()
@@ -220,7 +225,8 @@ local function Initialize()
 		GetProfileIDByBaseDefID = GetProfileIDByBaseDefID,
 		GetLegacyModuleDefs = GetLegacyModuleDefs,
 		GetLegacyModulesForComm = GetLegacyModulesForComm,
-		GetCommProfileInfo = GetCommProfileInfo
+		GetCommProfileInfo = GetCommProfileInfo,
+		IsStarterComm = IsStarterComm,
 	}
 end
 

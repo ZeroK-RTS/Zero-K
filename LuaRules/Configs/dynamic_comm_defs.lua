@@ -671,7 +671,7 @@ local moduleDefs = {
 		humanName = "Autorepair",
 		description = "Autorepair - Commander self-repairs at +10 hp/s. Reduces Health by 100. Limit: 8",
 		image = "unitpics/module_autorepair.png",
-		limit = 3,
+		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
@@ -738,7 +738,7 @@ local moduleDefs = {
 	{
 		name = "range",
 		humanName = "Advanced Targeting System",
-		description = "Advanced Targeting System - Increases range by 5%, increased weapon weight reduces reduces speed by 2.5%. Limit: 8",
+		description = "Advanced Targeting System - Increases range by 5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
 		image = "unitpics/module_adv_targeting.png",
 		limit = 8,
 		cost = 100 * COST_MULT,
