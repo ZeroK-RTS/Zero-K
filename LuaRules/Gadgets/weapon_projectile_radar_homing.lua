@@ -46,10 +46,10 @@ function gadget:GameFrame(n)
 			local px, py, pz = Spring.GetProjectilePosition(proID)
 			local _, _, _, ux, uy, uz = Spring.GetUnitPosition(data.unitID, true)
 			if px and ux then
-				if Dist3Dsqr(ux - px, uy - py, uz - pz) < data.homeDistance then
+				if (not Spring.GetUnitIsCloaked(data.unitID)) and Dist3Dsqr(ux - px, uy - py, uz - pz) < data.homeDistance then
 					Spring.SetProjectileTarget(proID, ux, uy, uz)
 				else
-					Spring.SetProjectileTarget(proID, unitID)
+					Spring.SetProjectileTarget(proID, data.unitID)
 				end
 			end
 		end
