@@ -28,6 +28,10 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 	--return nil | {[1] = unitID, etc.}
 end
 
+WG.PreSelection_IsUnitInSelectionBox = function (unitID)
+	--return boolean
+end
+
 ----------------------------------------------------------------------------
 ----------------------Implementation-------------------------------------
 
@@ -49,6 +53,8 @@ local start
 local cannotSelect = false
 local holdingForSelection = false
 local thruMinimap = false
+
+local boxedUnitIDs
 
 local function SafeTraceScreenRay(x, y, onlyCoords, useMinimap, includeSky, ignoreWater)
 	local type, pt = Spring.TraceScreenRay(x, y, onlyCoords, useMinimap, includeSky, ignoreWater)
@@ -170,10 +176,28 @@ WG.PreSelection_GetUnitsInSelectionBox = function ()
 	end
 end
 
+WG.PreSelection_IsUnitInSelectionBox = function (unitID)
+	if not boxedUnitIDs then
+		boxedUnitIDs = {}
+		local boxedUnits = WG.PreSelection_GetUnitsInSelectionBox()
+		if boxedUnits then
+			for i=1, #boxedUnits do
+				boxedUnitIDs[boxedUnits[i]] = true
+			end
+		end
+	end
+	return boxedUnitIDs[unitID] or false
+end
+
 function widget:ShutDown()
 	WG.PreSelection_GetUnitUnderCursor = nil
 	WG.PreSelection_IsSelectionBoxActive = nil
 	WG.PreSelection_GetUnitsInSelectionBox = nil
+	WG.PreSelection_IsUnitInSelectionBox = nil
+end
+
+function widget:Update()
+	boxedUnitIDs = nil
 end
 
 function widget:MousePress(x, y, button)
