@@ -15,7 +15,7 @@ function widget:GetInfo()
 end
 
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
-local GetUnitUnderCursor = function() return SafeWGCall(WG.PreSelection_GetUnitUnderCursor) end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
 local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
@@ -335,7 +335,7 @@ end
 function widget:Update()
     local mx, my = GetMouseState()
     type, data = TraceScreenRay(mx, my, false, true)
-    if type == "unit" then data = GetUnitUnderCursor() end
+    if type == "unit" then data = GetUnitUnderCursor(false) end
     if not data then type = "ground" end
 
     --visibleUnits, visibleSelected = GetVisibleUnits()
@@ -413,7 +413,7 @@ local function DrawWorldFunc()
     glBlending(GL_SRC_ALPHA, GL_ONE)
     glPolygonOffset(-2, -2)
     
-    if (type == 'unit') and ValidUnitID(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then 
+    if (type == 'unit') and ValidUnitID(data) and not spIsUnitSelected(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then 
         SetTeamColor(GetUnitTeam(data))
         glUnit(data, true)
     elseif (type == 'feature') and ValidFeatureID(data) then
