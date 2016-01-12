@@ -16,7 +16,7 @@ end
 ----------------------------------------------------------------------------
 -------------------------Interface---------------------------------------
 
-WG.PreSelection_GetUnitUnderCursor = function ()
+WG.PreSelection_GetUnitUnderCursor = function (onlySelectable)
 	--return nil | unitID
 end
 
@@ -76,7 +76,7 @@ local function SafeTraceScreenRay(x, y, onlyCoords, useMinimap, includeSky, igno
 	return type, pt
 end
 
-WG.PreSelection_GetUnitUnderCursor = function ()
+WG.PreSelection_GetUnitUnderCursor = function (onlySelectable)
 	local x, y, lmb, mmb, rmb = spGetMouseState()
 	if mmb or rmb then cannotSelect = true
 	elseif cannotSelect and not lmb then cannotSelect = false
@@ -85,10 +85,10 @@ WG.PreSelection_GetUnitUnderCursor = function ()
 	local aboveMiniMap = spIsAboveMiniMap(x, y)
 	local onAndUsingMinimap = (not WG.MinimapDraggingCamera and aboveMiniMap) or not aboveMiniMap
 
-	if not WG.PreSelection_IsSelectionBoxActive() and onAndUsingMinimap and not cannotSelect then
+	if not WG.PreSelection_IsSelectionBoxActive() and onAndUsingMinimap and (not onlySelectable or (onlySelectable and not cannotSelect)) then
 		--holding time when starting box selection, that way it avoids flickering if the hovered unit is selected quickly in the box selection
 	  local pointedType, data = spTraceScreenRay(x, y, false, true)
-		if pointedType == 'unit' and Spring.ValidUnitID(data) and not spIsUnitSelected(data) and not WG.drawtoolKeyPressed then -- and not spIsUnitIcon(data) then
+		if pointedType == 'unit' and Spring.ValidUnitID(data) and not WG.drawtoolKeyPressed then -- and not spIsUnitIcon(data) then
 			return data
 		else
 			return nil
