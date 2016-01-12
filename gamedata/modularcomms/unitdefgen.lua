@@ -35,6 +35,7 @@ VFS.Include("gamedata/modularcomms/moduledefs.lua")
 VFS.Include("gamedata/modularcomms/dyncomm_chassis_generator.lua")
 VFS.Include("gamedata/modularcomms/clonedefs.lua")
 
+local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTranslate.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ VFS.Include("gamedata/modularcomms/clonedefs.lua")
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
 local err, success
 
-local commDataRaw = modOptions.commanders
+local commDataRaw = modOptions.commandertypes
 local commDataFunc, commData
 
 if not (commDataRaw and type(commDataRaw) == 'string') then
@@ -62,6 +63,8 @@ else
 		if not success then	-- execute Borat
 			err = commData
 			commData = {}
+		else
+			commData = legacyTranslators.TranslateModoption(commData)
 		end
 	end
 end

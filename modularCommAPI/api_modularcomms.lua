@@ -39,6 +39,7 @@ local legacyToDyncommChassisMap = {
 -- load data
 --------------------------------------------------------------------------------
 local predefinedDynamicComms = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua", nil, VFSMODE)
+local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTranslate.lua", nil, VFSMODE)
 local success, err
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
@@ -55,12 +56,13 @@ local legacyModulesByUnitDefName = {}
 local function LoadCommData()
 	-- comm profile definitions
 	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-	local commDataRaw = modOptions.commanders
+	local commDataRaw = modOptions.commandertypes
 	local commDataFunc
 	local newCommData = {}
 	local newCommProfilesByProfileID = {}
 	local newCommProfileIDsByPlayerID = {}
 	local newProfileIDByBaseDefID = {}
+	
 	if not (commDataRaw and type(commDataRaw) == 'string') then
 		err = "Comm data entry in modoption is empty or in invalid format"
 		newCommData = {}
@@ -80,6 +82,8 @@ local function LoadCommData()
 	if err then 
 		Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
 	end
+	
+	newCommProfilesByProfileID = legacyTranslators.TranslateModoption(newCommProfilesByProfileID)
 	
 	-- comm player entries
 	local commProfilesForPlayers = {}	-- {[playerID1] = {}, [playerID2] = {}}
@@ -103,6 +107,8 @@ local function LoadCommData()
 					if not success then
 						err = playerCommProfileIDs
 						playerCommProfileIDs = {}
+					else
+						playerCommProfileIDs = legacyTranslators.TranslatePlayerCustomkeys(playerCommProfileIDs)
 					end
 				end
 			end
@@ -112,7 +118,7 @@ local function LoadCommData()
 			
 			newCommProfileIDsByPlayerID[playerID] = playerCommProfileIDs
 			local playerCommProfiles = {} 
-			for i=1,#playerCommProfileIDs do
+			for i = 1, #playerCommProfileIDs do
 				local profileID = playerCommProfileIDs[i]
 				playerCommProfiles[profileID] = newCommProfilesByProfileID[profileID]
 			end
@@ -125,8 +131,6 @@ local function LoadCommData()
 	for commProfileID, commDef in pairs(predefinedDynamicComms) do
 		--Spring.Echo("Modular comm API adding static comm " .. commProfileID)
 		local entry = Spring.Utilities.CopyTable(commDef, true)
-		entry.modules = entry.levels
-		entry.levels = nil
 		for level = 1, #entry.modules do
 			entry.modules[level].cost = nil
 		end

@@ -356,7 +356,7 @@ local moduleDefs = {
 		image = "unitpics/commweapon_concussion.png",
 		limit = 1,
 		cost = 150 * COST_MULT,
-		requireChassis = {"support", "recon"},
+		requireChassis = {"recon"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
 		applicationFunction = function (modules, sharedData)
@@ -524,7 +524,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "napalm_warhead",
+		name = "weaponmod_napalm_warhead",
 		humanName = "Napalm Warhead",
 		description = "Napalm Warhead - Riot Cannon, Rocket Launcher and Plasma Artillery set targets on fire. Reduced direct damage.",
 		image = "unitpics/weaponmod_napalm_warhead.png",
@@ -536,7 +536,7 @@ local moduleDefs = {
 		slotType = "module",
 	},
 	{
-		name = "disruptor_ammo",
+		name = "conversion_disruptor",
 		humanName = "Disruptor Ammo",
 		description = "Disruptor Ammo - Heavy Machine Gun, Shotgun and Particle Beams deal slow damage. Reduced direct damage.",
 		image = "unitpics/weaponmod_disruptor_ammo.png",
@@ -547,7 +547,7 @@ local moduleDefs = {
 		slotType = "module",
 	},
 	{
-		name = "flux_amplifier",
+		name = "weaponmod_stun_booster",
 		humanName = "Flux Amplifier",
 		description = "Flux Amplifier - Improves EMP duration and strength of Lightning Rifle and Multistunner.",
 		image = "unitpics/weaponmod_stun_booster.png",
@@ -559,7 +559,7 @@ local moduleDefs = {
 		slotType = "module",
 	},
 	{
-		name = "radarjammer",
+		name = "module_jammer",
 		humanName = "Radar Jammer",
 		description = "Radar Jammer - Hide the radar signals of nearby units.",
 		image = "unitpics/module_jammer.png",
@@ -574,7 +574,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "radar",
+		name = "module_radarnet",
 		humanName = "Field Radar",
 		description = "Field Radar - Attaches a basic radar system to the Commander.",
 		image = "unitpics/module_fieldradar.png",
@@ -587,7 +587,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "personalcloak",
+		name = "module_personal_cloak",
 		humanName = "Personal Cloak",
 		description = "Personal Cloak - A personal cloaking device for the Commander.",
 		image = "unitpics/module_personal_cloak.png",
@@ -602,7 +602,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "areacloak",
+		name = "module_cloak_field",
 		humanName = "Cloaking Field",
 		description = "Cloaking Field - Cloaks all nearby units.",
 		image = "unitpics/module_cloak_field.png",
@@ -620,7 +620,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "resurrect",
+		name = "module_resurrect",
 		humanName = "Lazarus Device",
 		description = "Lazarus Device - Upgrade nanolathe to allow resurrection. Halves build power.",
 		image = "unitpics/module_resurrect.png",
@@ -636,7 +636,7 @@ local moduleDefs = {
 	
 	-- Repeat Modules
 	{
-		name = "drone",
+		name = "module_companion_drone",
 		humanName = "Companion Drone",
 		description = "Companion Drone - Commander spawns protective drones. Limit: 8",
 		image = "unitpics/module_companion_drone.png",
@@ -650,7 +650,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "battleDrone",
+		name = "module_battle_drone",
 		humanName = "Battle Drone",
 		description = "Battle Drone - Commander spawns heavy drones. Limit: 8, Requires Companion Drone",
 		image = "unitpics/module_battle_drone.png",
@@ -665,7 +665,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "autorepair",
+		name = "module_autorepair",
 		humanName = "Autorepair",
 		description = "Autorepair - Commander self-repairs at +10 hp/s. Reduces Health by 100. Limit: 8",
 		image = "unitpics/module_autorepair.png",
@@ -679,7 +679,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "health",
+		name = "module_ablative_armor",
 		humanName = "Ablative Armour Plates",
 		description = "Ablative Armour Plates - Provides 600 health. Limit: 8",
 		image = "unitpics/module_ablative_armor.png",
@@ -692,7 +692,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "bigHealth",
+		name = "module_heavy_armor",
 		humanName = "High Density Plating",
 		description = "High Density Plating - Provides 1600 health but reduces movement by 10%. Limit: 8, Requires Ablative Armour Plates",
 		image = "unitpics/module_heavy_armor.png",
@@ -707,7 +707,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "damageBooster",
+		name = "module_dmg_booster",
 		humanName = "Damage Booster",
 		description = "Damage Booster - Increases damage by 10%, increased weapon weight reduces speed by 2.5%.  Limit: 8",
 		image = "unitpics/module_dmg_booster.png",
@@ -721,7 +721,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "speed",
+		name = "module_high_power_servos",
 		humanName = "High Power Servos",
 		description = "High Power Servos - Increases speed by 10%. Limit: 8",
 		image = "unitpics/module_high_power_servos.png",
@@ -734,7 +734,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "range",
+		name = "module_adv_targeting",
 		humanName = "Advanced Targeting System",
 		description = "Advanced Targeting System - Increases range by 5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
 		image = "unitpics/module_adv_targeting.png",
@@ -748,7 +748,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "buildpower",
+		name = "module_adv_nano",
 		humanName = "CarRepairer's Nanolathe",
 		description = "CarRepairer's Nanolathe - Increases build power by 5. Limit: 8",
 		image = "unitpics/module_adv_nano.png",

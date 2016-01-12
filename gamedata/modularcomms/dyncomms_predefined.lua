@@ -2,7 +2,7 @@ return {
 	dyntrainer_recon = {
 		name = "Recon Trainer",
 		chassis = "recon",
-		levels = {
+		modules = {
 			{"commweapon_beamlaser", "health"},
 			{"speed", "commweapon_personal_shield"},
 			{"commweapon_clusterbomb", "damageBooster", "health"},
@@ -15,7 +15,7 @@ return {
 	dyntrainer_support = {
 		name = "Engineer Trainer",
 		chassis = "support",
-		levels = {
+		modules = {
 			{"commweapon_lparticlebeam", "radar"},
 			{"health", "speed"},
 			{"commweapon_hparticlebeam", "personalcloak", "buildpower"},
@@ -27,7 +27,7 @@ return {
 	dyntrainer_assault = {
 		name = "Guardian Trainer",
 		chassis = "assault",
-		levels = {
+		modules = {
 			{"commweapon_heavymachinegun", "range"},
 			{"speed", "health"},
 			{"commweapon_riotcannon", "commweapon_personal_shield", "bigHealth"},
@@ -41,7 +41,7 @@ return {
 		name = "Recon Support",
 		notStarter = true,
 		chassis = "recon",
-		levels = {
+		modules = {
 			{"commweapon_shotgun", "radar"},
 			{"health", "personalcloak"},
 			{"commweapon_disruptorbomb", "disruptor_ammo", "speed"},
@@ -53,7 +53,7 @@ return {
 		name = "Engineer Support",
 		notStarter = true,
 		chassis = "support",
-		levels = {
+		modules = {
 			{"commweapon_lightninggun", "range"},
 			{"resurrect", "personalcloak"},
 			{"commweapon_multistunner", "buildpower", "flux_amplifier"},
@@ -65,7 +65,7 @@ return {
 		name = "Guardian Support",
 		notStarter = true,
 		chassis = "assault",
-		levels = {
+		modules = {
 			{"commweapon_riotcannon", "range"},
 			{"range", "napalm_warhead"},
 			{"commweapon_hpartillery", "range", "damageBooster"},
