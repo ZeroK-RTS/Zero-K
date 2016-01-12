@@ -16,7 +16,7 @@ end
 
 
 local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
-local GetUnitUnderCursor = function() return SafeWGCall(WG.PreSelection_GetUnitUnderCursor) end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
 local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
@@ -300,23 +300,26 @@ local function DrawHaloFunc()
   end
 
 	local mx, my = spGetMouseState()
-    local pointedType, data = spTraceScreenRay(mx, my)
+  local pointedType, data = spTraceScreenRay(mx, my, false, true)
+  if pointedType == 'unit' then 
+    data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
+  end
+
 	if pointedType == 'unit' and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
-		local teamID = spGetUnitTeam(data)
-		if teamID == spGetMyTeamID() then
-			glColor(myHoverColor)
-		elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
-			glColor(allyHoverColor)
-		else
-			glColor(enemyHoverColor)
-		end
+  	local teamID = spGetUnitTeam(data)
+  	if teamID == spGetMyTeamID() then
+  		glColor(myHoverColor)
+  	elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
+  		glColor(allyHoverColor)
+  	else
+  		glColor(enemyHoverColor)
+  	end
 
-		glUnit(data, true,-1)
-    elseif (pointedType == 'feature') and ValidFeatureID(data) then
-		glColor(featureHoverColor)
-		glFeature(data, true)
-    end
-
+  	glUnit(data, true,-1)
+  elseif (pointedType == 'feature') and ValidFeatureID(data) then
+  	glColor(featureHoverColor)
+  	glFeature(data, true)
+  end
 end
 
 local DrawVisibleUnits

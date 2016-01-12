@@ -45,7 +45,7 @@ local spTraceScreenRay		 = Spring.TraceScreenRay
 local spGetMouseState		 = Spring.GetMouseState
 
 local SafeWGCall = function(fnName) if fnName then return fnName() else return nil end end
-local GetUnitUnderCursor = function() return SafeWGCall(WG.PreSelection_GetUnitUnderCursor) end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
 local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
 local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
 
@@ -273,10 +273,10 @@ local function GetVisibleUnits()
 end
 
 local function GetHoveredUnit(dt) --Mostly a convenience function for the animation system
-	local unitID = GetUnitUnderCursor()
+	local unitID = GetUnitUnderCursor(false)
 	local hoveredUnit = hoveredUnit
 	local cursorIsOn = cursorIsOn
-	if unitID then
+	if unitID and not spIsUnitSelected(unitID) then
 		if #hoveredUnit == 0 or unitID ~= hoveredUnit[#hoveredUnit].unitID then
 			if hoverTime < hoverRestedTime or not options.animatehover.value then --Only animate hover effect if player is not rapidly changing hovered unit
 				hoveredUnit[1] = {unitID = unitID, scale = hoverScaleEnd}
