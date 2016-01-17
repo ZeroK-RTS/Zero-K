@@ -494,7 +494,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "commweapon_personal_shield",
+		name = "module_personal_shield",
 		humanName = "Personal Shield",
 		description = "Personal Shield - A small, protective bubble shield.",
 		image = "unitpics/module_personal_shield.png",
@@ -508,7 +508,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "commweapon_areashield",
+		name = "module_areashield",
 		humanName = "Area Shield",
 		description = "Area Shield - Projects a large shield. Replaces Personal Shield.",
 		image = "unitpics/module_areashield.png",
@@ -536,7 +536,7 @@ local moduleDefs = {
 		slotType = "module",
 	},
 	{
-		name = "conversion_disruptor",
+		name = "weaponmod_disruptor_ammo",
 		humanName = "Disruptor Ammo",
 		description = "Disruptor Ammo - Heavy Machine Gun, Shotgun and Particle Beams deal slow damage. Reduced direct damage.",
 		image = "unitpics/weaponmod_disruptor_ammo.png",
@@ -574,7 +574,7 @@ local moduleDefs = {
 		end
 	},
 	{
-		name = "module_radarnet",
+		name = "module_fieldradar",
 		humanName = "Field Radar",
 		description = "Field Radar - Attaches a basic radar system to the Commander.",
 		image = "unitpics/module_fieldradar.png",
