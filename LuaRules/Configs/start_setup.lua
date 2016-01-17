@@ -49,5 +49,6 @@ BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
 
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
-DEFAULT_UNIT = "dyntrainer_assault_base"    --FIXME: hardcodey until I cba to identify precise source of problem
-DEFAULT_UNIT_TEAMSIDES = "Guardian Trainer"
+DEFAULT_UNIT = "dyntrainer_assault_base"
+DEFAULT_UNIT_NAME = "Guardian Trainer"
+

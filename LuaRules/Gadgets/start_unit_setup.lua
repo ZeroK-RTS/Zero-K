@@ -182,15 +182,15 @@ local function GetStartUnit(teamID, playerID, isAI)
 	local commProfileID = nil
 
 	if isAI then -- AI that didn't pick comm type gets default comm
-		return (Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault_base")
+		return Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault"
 	end
 
 	if (teamID and teamSides[teamID]) then 
-		startUnit = startUnits[teamSides[teamID]]
+		startUnit = DEFAULT_UNIT
 	end
 
 	if (playerID and playerSides[playerID]) then 
-		startUnit = startUnits[playerSides[playerID]]
+		startUnit = DEFAULT_UNIT
 	end
 
 	-- if a player-selected comm is available, use it
@@ -210,7 +210,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 	--if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
 
 	--if didn't pick a comm, wait for user to pick
-	return (startUnit or nil), commProfileID	-- startUnit or DEFAULT_UNIT
+	return (startUnit or nil)
 end
 
 
@@ -307,22 +307,13 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
   end
   
   -- get start unit
-  local startUnit, commProfileID = GetStartUnit(teamID, playerID, isAI)
+  local startUnit = GetStartUnit(teamID, playerID, isAI)
   
   if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID]))
   and not bonusSpawn then
     return false
   end
 
-  if bonusSpawn then
-  	--startUnit = DEFAULT_UNIT
-  end
-  
-  local keys = customKeys[playerID] or customKeys[select(2, spGetTeamInfo(teamID))]
-  if keys and keys.jokecomm then
-	startUnit = DEFAULT_UNIT
-  end    
-  
   if startUnit then
     -- replace with shuffled position
 	local x,y,z
@@ -351,7 +342,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 	
     -- CREATE UNIT
-	local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, commProfileID)
+	local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit))
 	if Spring.GetGameFrame() <= 1 then
 		Spring.SpawnCEG("gate", x, y, z)
 		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
@@ -601,7 +592,7 @@ function gadget:GameFrame(n)
   if n == (COMM_SELECT_TIMEOUT) then
 	for team in pairs(waitingForComm) do
 		local _,playerID = spGetTeamInfo(team)
-		teamSides[team] = DEFAULT_UNIT_TEAMSIDES
+		teamSides[team] = DEFAULT_UNIT_NAME
 		--playerSides[playerID] = "basiccomm"
 		scheduledSpawn[n] = scheduledSpawn[n] or {}
 		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode
