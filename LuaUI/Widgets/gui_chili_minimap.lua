@@ -525,8 +525,10 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		return
 	end
 	if not updateRunOnceRan then
-		setSensorState(options.initialSensorState.value)
-		updateRadarColors()
+		if Spring.GetGameFrame() > 0 then
+			setSensorState(options.initialSensorState.value)
+			updateRadarColors()
+		end
 		options.use_map_ratio.OnChange(options.use_map_ratio) -- Wait for docking to provide saved window size
 		updateRunOnceRan = true
 	end
@@ -543,6 +545,11 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
 	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
+end
+
+function widget:GameStart()
+	setSensorState(options.initialSensorState.value)
+	updateRadarColors()
 end
 
 local function MakeMinimapButton(file, params)
