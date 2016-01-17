@@ -110,8 +110,10 @@ local function Walk()
 		Move(lb_shin, y_axis, -2, 7) -- down
 		Move(rb_shin, y_axis, 0, 2) -- neut
 		
-		EmitSfx(rf_foot, dirtfling)
-		EmitSfx(lb_foot, dirtfling)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			EmitSfx(rf_foot, dirtfling)
+			EmitSfx(lb_foot, dirtfling)
+		end
 		
 		Turn(lf_ball, y_axis, lf_angle, sp1) -- left front leg forward
 		Turn(rf_ball, y_axis, -rb_angle, sp2) -- right front leg backward
@@ -167,8 +169,10 @@ local function Walk()
 		Move(lb_shin, y_axis, 0, 2) -- neut
 		Move(rb_shin, y_axis, -2, 7) -- down
 		
-		EmitSfx(lf_foot, dirtfling)
-		EmitSfx(rb_foot, dirtfling)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			EmitSfx(lf_foot, dirtfling)
+			EmitSfx(rb_foot, dirtfling)
+		end
 		
 		Turn(lf_ball, y_axis, -lb_angle, sp2) -- left front leg backward
 		Turn(rf_ball, y_axis, rf_angle, sp1) -- right front leg forward
