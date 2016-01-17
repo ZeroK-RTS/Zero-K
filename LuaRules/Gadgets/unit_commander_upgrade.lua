@@ -323,7 +323,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 		Spring.Echo("Incorrect dynamic comm chassis", commProfileInfo.chassis)
 		return false
 	end
-	Spring.Echo("dyncommID", dyncommID)
+	
 	local chassisData = chassisDefs[chassisDefID]
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
