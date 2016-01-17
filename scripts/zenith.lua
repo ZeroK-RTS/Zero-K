@@ -18,6 +18,8 @@ local AIM_RADIUS = 160
 local SPAWN_PERIOD = 700 -- in milliseconds
 local METEOR_CAPACITY = 500 
 
+local fireRange = WeaponDefNames["zenith_meteor"].range
+
 local smokePiece = {base}
 
 local Vector = Spring.Utilities.Vector
@@ -194,12 +196,15 @@ local function SpawnProjectileThread()
 end
 
 local function LaunchAll(x, z)
-	--Spring.MarkerAddPoint(x, 0, z)
-	launchInProgress = true
-	
 	-- Sanitize input
 	x, z = Spring.Utilities.ClampPosition(x, z)
 	local y = math.min(0, Spring.GetGroundHeight(x,z))
+	
+	if Vector.AbsVal(ux - x, uz - z) > fireRange then
+		return
+	end
+	
+	launchInProgress = true
 	
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
