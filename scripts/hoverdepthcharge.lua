@@ -31,27 +31,29 @@ end
 
 local function MoveScript()
 	while true do 
-		if math.random() < 0.5 then
-			EmitSfx(wake1, 5)
-			EmitSfx(wake3, 5)
-			EmitSfx(wake5, 5)
-			EmitSfx(wake7, 5)
-			EmitSfx(wake1, 3)
-			EmitSfx(wake3, 3)
-			EmitSfx(wake5, 3)
-			EmitSfx(wake7, 3)
-		else
-			EmitSfx(wake2, 5)
-			EmitSfx(wake4, 5)
-			EmitSfx(wake6, 5)
-			EmitSfx(wake8, 5)
-			EmitSfx(wake2, 3)
-			EmitSfx(wake4, 3)
-			EmitSfx(wake6, 3)
-			EmitSfx(wake8, 3)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			if math.random() < 0.5 then
+				EmitSfx(wake1, 5)
+				EmitSfx(wake3, 5)
+				EmitSfx(wake5, 5)
+				EmitSfx(wake7, 5)
+				EmitSfx(wake1, 3)
+				EmitSfx(wake3, 3)
+				EmitSfx(wake5, 3)
+				EmitSfx(wake7, 3)
+			else
+				EmitSfx(wake2, 5)
+				EmitSfx(wake4, 5)
+				EmitSfx(wake6, 5)
+				EmitSfx(wake8, 5)
+				EmitSfx(wake2, 3)
+				EmitSfx(wake4, 3)
+				EmitSfx(wake6, 3)
+				EmitSfx(wake8, 3)
+			end
+		
+			EmitSfx(base, 1024+0)
 		end
-	
-		EmitSfx(base, 1024+0)
 		Sleep(150)
 	end
 end
