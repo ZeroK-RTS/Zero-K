@@ -375,6 +375,7 @@ return {
     blackhole = {
       class              = [[CExpGenSpawner]],
       count              = 1,
+      air                = true,
       ground             = true,
       water              = true,
       underwater         = true,
