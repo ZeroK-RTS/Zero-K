@@ -218,11 +218,6 @@ local comms = {
 }
 
 -- Damage booster comms
-local chassisList = {"dynrecon", "dynsupport", "dynassault"}
--- levelLimitList is pairs {level, maxWeaponCount}
-local levelLimitList = {{1, 1}, {2, 3}, {3, 5}, {4, 8}, {5, 8}}
-local weaponCountList = {0, 1 , 2, 3, 4, 5, 6, 7, 8}
-
 local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, modules, moduleType)
 	if moduleType > #levelLimits then
 		comms[unitName] = {
@@ -263,6 +258,11 @@ MakeCommanderChassisClones("dynsupport",
 )
 
 MakeCommanderChassisClones("dynassault", 
+	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
+	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+)
+
+MakeCommanderChassisClones("dynstrike", 
 	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
 	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
 )

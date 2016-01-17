@@ -23,24 +23,14 @@ VFS.Include("LuaRules/Utilities/base64.lua", nil, VFSMODE)
 VFS.Include("LuaRules/Utilities/tablefunctions.lua", nil, VFSMODE)
 local CopyTable = Spring.Utilities.CopyTable
 
-local legacyToDyncommChassisMap = {
-	armcom = "assault",
-	corcom = "assault",
-	commrecon = "recon",
-	commsupport = "support",
-	benzcom = "assault",
-	cremcom = "support",
-	support = "support",
-	recon = "recon",
-	assault = "assault",
-}
-
 --------------------------------------------------------------------------------
 -- load data
 --------------------------------------------------------------------------------
 local predefinedDynamicComms = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua", nil, VFSMODE)
 local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTranslate.lua", nil, VFSMODE)
 local success, err
+
+local legacyToDyncommChassisMap = legacyTranslators.legacyToDyncommChassisMap
 
 VFS.Include("gamedata/modularcomms/moduledefs.lua", nil, VFSMODE)
 

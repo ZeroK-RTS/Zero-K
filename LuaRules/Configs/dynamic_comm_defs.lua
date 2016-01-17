@@ -834,7 +834,149 @@ local function GetAssaultCloneModulesString(modulesByDefID)
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 
+local function GetStrikeCloneModulesString(modulesByDefID)
+	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
+end
+
+
 local chassisDefs = {
+	{
+		name = "strike",
+		humanName = "Strike",
+		baseUnitDef = UnitDefNames and UnitDefNames["dynstrike0"].id,
+		extraLevelCostFunction = function (level)
+			return (level - 1) * 100 * COST_MULT
+		end,
+		maxNormalLevel = 5,
+		secondPeashooter = true,
+		levelDefs = {
+			[0] = {
+				morphBuildPower = 10,
+				morphBaseCost = 0,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike0"].id
+				end,
+				upgradeSlots = {},
+			},
+			[1] = {
+				morphBuildPower = 10,
+				morphBaseCost = 25,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike1_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotAllows = "basic_weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[2] = {
+				morphBuildPower = 15,
+				morphBaseCost = 150 * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike2_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[3] = {
+				morphBuildPower = 20,
+				morphBaseCost = 500 * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotAllows = "adv_weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[4] = {
+				morphBuildPower = 25,
+				morphBaseCost = 300 * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike4_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[5] = {
+				morphBuildPower = 30,
+				morphBaseCost = 400 * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynstrike5_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+		}
+	},
 	{
 		name = "recon",
 		humanName = "Recon",
@@ -1122,6 +1264,7 @@ local chassisDefs = {
 			return (level - 1) * 100 * COST_MULT
 		end,
 		maxNormalLevel = 5,
+		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
 				morphBuildPower = 10,

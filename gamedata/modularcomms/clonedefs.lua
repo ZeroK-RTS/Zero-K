@@ -213,6 +213,35 @@ local copy = {
 			wreckmodel = "benzcom5_wreck.s3o",
 		},
 	},
+	dynstrike1 = {
+		dynstrike0 = {
+			level = 0,
+		},
+		dynstrike2 = {
+			level = 2,
+			mainstats = {maxdamage = 2100, objectname = "strikecom.dae", aimposoffset = [[0 12 0]]},
+			customparams = {},
+			wreckmodel = "benzcom2_wreck.s3o",
+		},
+		dynstrike3 = {
+			level = 3,
+			mainstats = {maxdamage = 2600, objectname = "strikecom.dae", aimposoffset = [[0 14 0]]},
+			customparams = {},
+			wreckmodel = "benzcom3_wreck.s3o",
+		},
+		dynstrike4 = {
+			level = 4,
+			mainstats = {maxdamage = 3100, objectname = "strikecom.dae", aimposoffset = [[0 16 0]]},
+			customparams = {},
+			wreckmodel = "benzcom4_wreck.s3o",
+		},
+		dynstrike5 = {
+			level = 5,
+			mainstats = {maxdamage = 3600, objectname = "strikecom.dae", aimposoffset = [[0 18 0]]},
+			customparams = {},
+			wreckmodel = "benzcom5_wreck.s3o",
+		},		
+	},
 	dynrecon1 = {
 		dynrecon0 = {
 			level = 0,

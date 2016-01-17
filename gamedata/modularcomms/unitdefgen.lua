@@ -82,17 +82,7 @@ for commProfileID, commProfile in pairs(commData) do
 	commProfile.baseUnitName = commProfileID .. "_base"
 end
 
-local legacyToDyncommChassisMap = {
-	commrecon = "recon",
-	commsupport = "support",
-	armcom = "assault",
-	corcom = "assault",
-	benzcom = "assault",
-	cremcom = "support",
-	recon = "recon",
-	support = "support",
-	assault = "assault",
-}
+local legacyToDyncommChassisMap = legacyTranslators.legacyToDyncommChassisMap
 
 local function GenerateLevel0DyncommsAndWrecks()
 	for commProfileID, commProfile in pairs(commData) do

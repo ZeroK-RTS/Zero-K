@@ -1,5 +1,5 @@
 local legacyToDyncommChassisMap = {
-	armcom = "assault",
+	armcom = "strike",
 	corcom = "assault",
 	commrecon = "recon",
 	commsupport = "support",
@@ -8,6 +8,7 @@ local legacyToDyncommChassisMap = {
 	support = "support",
 	recon = "recon",
 	assault = "assault",
+	strike = "strike",
 }
 
 local function TranslateModoption(legacy)
@@ -105,5 +106,6 @@ end
 
 return {
 	TranslateModoption = TranslateModoption,
-	TranslatePlayerCustomkeys = TranslatePlayerCustomkeys
+	TranslatePlayerCustomkeys = TranslatePlayerCustomkeys,
+	legacyToDyncommChassisMap = legacyToDyncommChassisMap
 }

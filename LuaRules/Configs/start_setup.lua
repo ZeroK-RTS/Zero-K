@@ -12,6 +12,7 @@ aiCommanders = {
 	[UnitDefNames["dyntrainer_recon_base"].id] = true,
 	[UnitDefNames["dyntrainer_support_base"].id] = true,
 	[UnitDefNames["dyntrainer_assault_base"].id] = true,
+	[UnitDefNames["dyntrainer_strike_base"].id] = true,
 }
 
 local trainerComms = VFS.Include("LuaRules/Configs/comm_trainer_defs.lua")

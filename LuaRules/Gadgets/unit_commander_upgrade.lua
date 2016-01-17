@@ -101,8 +101,9 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	end
 	
 	weapon1 = weapon1 or "commweapon_peashooter"
+	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
 	
-	if (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 and Spring.GetUnitRulesParam(unitID, "comm_chassis") == 3 then 
+	if chassis and chassisDefs[chassis] and chassisDefs[chassis].secondPeashooter and (not weapon2) and Spring.GetUnitRulesParam(unitID, "comm_level") > 2 then 
 		weapon2 = "commweapon_peashooter"
 	end
 	
