@@ -55,8 +55,8 @@ function startTeleOutLoop_Thread(teleportiee, teleporter)
 		GG.PokeDecloakUnit(unitID)
 		soundIndex = soundIndex + 1
 		if soundIndex > 8 then
-			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2.5, x, y, z)
-			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2.5, lx, ly, lz)
+			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, x, y, z)
+			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 2.5, lx, ly, lz)
 			soundIndex = 0
 		end
 		Sleep(200)

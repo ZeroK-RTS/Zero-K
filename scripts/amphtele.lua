@@ -33,7 +33,7 @@ local function Create_Beacon_Thread(x,z)
 	
 	activity_mode(3)
 	
-	Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
+	GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 	for i = 1, 90 do
 		local speedMult = (1 - (spGetUnitRulesParam(unitID,"slowState") or 0)) * BEACON_SPAWN_SPEED
 		Turn(body, y_axis, math.rad(i*4), math.rad(40*speedMult))
@@ -47,7 +47,7 @@ local function Create_Beacon_Thread(x,z)
 		end
 		Spring.SpawnCEG("teleport_progress", x, y, z, 0, 0, 0, 0)
 		if i == 30 or i == 60 then
-			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 3, x, y, z)
+			GG.PlayFogHiddenSound("sounds/misc/teleport_loop.wav", 3, x, y, z)
 		end
 	end
 
