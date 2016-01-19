@@ -41,8 +41,9 @@ local nanoPieces = {Nano}
 local nanoing = false
 local aiming = false
 
-local FINGER_ANGLE = math.rad(-50)
-local FINGER_SPEED = math.rad(100)
+local FINGER_ANGLE_IN = math.rad(10)
+local FINGER_ANGLE_OUT = math.rad(-25)
+local FINGER_SPEED = math.rad(60)
 
 local SIG_RIGHT = 1
 local SIG_RESTORE_RIGHT = 2
@@ -294,17 +295,17 @@ local function NanoAnimation()
 	Signal(SIG_NANO)
 	SetSignalMask(SIG_NANO)
 	while true do
-		Turn(FingerA, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Turn(FingerA, x_axis, FINGER_ANGLE_OUT, FINGER_SPEED)
 		Sleep(200)
-		Turn(FingerB, x_axis, 0, FINGER_SPEED)
+		Turn(FingerB, x_axis, FINGER_ANGLE_IN, FINGER_SPEED)
 		Sleep(200)
-		Turn(FingerC, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Turn(FingerC, x_axis, FINGER_ANGLE_OUT, FINGER_SPEED)
 		Sleep(200)
-		Turn(FingerA, x_axis, 0, FINGER_SPEED)
+		Turn(FingerA, x_axis, FINGER_ANGLE_IN, FINGER_SPEED)
 		Sleep(200)
-		Turn(FingerB, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Turn(FingerB, x_axis, FINGER_ANGLE_OUT, FINGER_SPEED)
 		Sleep(200)
-		Turn(FingerC, x_axis, 0, FINGER_SPEED)
+		Turn(FingerC, x_axis, FINGER_ANGLE_IN, FINGER_SPEED)
 		Sleep(200)
 	end
 end
@@ -344,7 +345,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity < 0.5 then
+	if severity < 0.5 or true then
 		
 		dyncomm.SpawnModuleWrecks(1)
 		dyncomm.SpawnWreck(1)

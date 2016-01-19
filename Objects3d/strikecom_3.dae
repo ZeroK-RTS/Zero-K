@@ -8177,7 +8177,7 @@
                   <rotate sid="rotationZ">0 0 1 -7.47052e-7</rotate>
                   <rotate sid="rotationY">0 1 0 1.66753e-7</rotate>
                   <rotate sid="rotationX">1 0 0 1.27769e-13</rotate>
-                  <scale sid="scale">1 1 0.9999999</scale>
+                  <scale sid="scale">0.6 0.6 1</scale>
                   <instance_geometry url="#Cylinder_019-mesh" name="UnderGun">
                     <bind_material>
                       <technique_common>
