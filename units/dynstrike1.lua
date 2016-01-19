@@ -44,7 +44,7 @@ unitDef = {
 	soundbuild = [[builder_start]],
 	commtype = [[1]],
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
-    aimposoffset   = [[0 5 0]],
+    aimposoffset   = [[0 15 0]],
 	att_speedmult  = 0.5,
 	dynamic_comm   = 1,
   },
