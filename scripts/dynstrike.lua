@@ -21,127 +21,116 @@ local Head = piece('Head')
 local HipLeft = piece('HipLeft')
 local HipRight = piece('HipRight')
 local Muzzle = piece('Muzzle')
-local Nano = piece('Nano')
+local Palm = piece('Palm')
 local Stomach = piece('Stomach')
+local Base = piece('Base')
+local Nano = piece('Nano')
 local UnderGun = piece('UnderGun')
 local UnderMuzzle = piece('UnderMuzzle')
+local Eye = piece('Eye')
+local Shield = piece('Shield')
+local FingerTipA = piece('FingerTipA')
+local FingerTipB = piece('FingerTipB')
+local FingerTipC = piece('FingerTipC')
 
-local scriptEnv = {	
-	AntennaTip = AntennaTip,
-	ArmLeft = ArmLeft,
-	ArmRight = ArmRight,
-	AssLeft = AssLeft,
-	AssRight = AssRight,
-	Breast = Breast,
-	CalfLeft = CalfLeft,
-	CalfRight = CalfRight,
-	FingerA = FingerA,
-	FingerB = FingerB,
-	FingerC = FingerC,
-	FootLeft = FootLeft,
-	FootRight = FootRight,
-	Gun = Gun,
-	HandRight = HandRight,
-	Head = Head,
-	HipLeft = HipLeft,
-	HipRight = HipRight,
-	Muzzle = Muzzle,
-	Nano = Nano,
-	Stomach = Stomach,
-	UnderGun = UnderGun,
-	UnderMuzzle = UnderMuzzle,
-	x_axis = x_axis,
-	y_axis = y_axis,
-	z_axis = z_axis,
-}
+local TORSO_SPEED_YAW = math.rad(300)
+local ARM_SPEED_PITCH = math.rad(180)
 
-local Animations = {}
---Animations["pose"] = VFS.Include("scripts/strikecom_pose.lua", scriptEnv)
-
-function constructSkeleton(unit, piece, offset)
-	if (offset == nil) then
-		offset = {0,0,0}
-	end
-
-	local bones = {}
-	local info = Spring.GetUnitPieceInfo(unit,piece)
-
-	for i = 1, 3 do
-		info.offset[i] = offset[i]+info.offset[i]
-	end 
-
-	bones[piece] = info.offset
-	local map = Spring.GetUnitPieceMap(unit)
-	local children = info.children
-
-	if (children) then
-		for i, childName in pairs(children) do
-			local childId = map[childName]
-			local childBones = constructSkeleton(unit, childId, info.offset)
-			for cid, cinfo in pairs(childBones) do
-				bones[cid] = cinfo
-			end
-		end
-	end		
-	return bones
-end
+local nanoPieces = {Muzzle}
 
 function script.Create()
-	local map = Spring.GetUnitPieceMap(unitID)
-	local offsets = constructSkeleton(unitID,map.Scene, {0,0,0})
+	dyncomm.Create()
+	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	
-	for a,anim in pairs(Animations) do
-		for i, keyframe in pairs(anim) do
-			local commands = keyframe.commands
-			for k,command in pairs(commands) do
-				-- commands are described in (c)ommand,(p)iece,(a)xis,(t)arget,(s)peed format
-				-- the t attribute needs to be adjusted for move commands from blender's absolute values
-				if (command.c == "move") then
-					local adjusted =  command.t - (offsets[command.p][command.a])
-					Animations[a][i]['commands'][k].t = command.t - (offsets[command.p][command.a])
-				end
-			end
-		end
-	end
-	--PlayAnimation('pose')
+	--Move(UnderGun, x_axis, 0)
+	--Move(UnderGun, y_axis, -1)
+	--Move(UnderGun, z_axis, 1)
 end
 
-local animCmd = {turn = Turn, move = Move}
-function PlayAnimation(animname)
-	local anim = Animations[animname]
-	for i = 1, #anim do
-		local commands = anim[i].commands
-		for j = 1, #commands do
-			local cmd = commands[j]
-			animCmd[cmd.c](cmd.p,cmd.a,cmd.t,cmd.s)
-		end
-		if (i < #anim) then
-			local t = anim[i+1]['time'] - anim[i]['time']
-			Sleep(t*33) -- sleep works on milliseconds
-		end
-	end
-end
+local SIG_RIGHT = 1
+local SIG_RESTORE_TORSO = 2
+local SIG_RESTORE_RIGHT = 4
+local RESTORE_DELAY = 2500
 
 ---------------------------
 
 function script.AimFromWeapon(num)
-	return Head
+	if dyncomm.IsManualFire(num) then
+		if dyncomm.GetWeapon(num) == 1 then 
+			return Palm
+		elseif dyncomm.GetWeapon(num) == 2 then 
+			return UnderMuzzle
+		end
+	end
+	return Shield
 end
 
 function script.QueryWeapon(num)
-	local weaponNum = dyncomm.GetWeapon(num)
-	if weaponNum == 1 or weaponNum == 2 then 
-		return Muzzle
+	if dyncomm.GetWeapon(num) == 1 then 
+		return Palm
+	elseif dyncomm.GetWeapon(num) == 2 then 
+		return UnderMuzzle
 	end
-	return Stomach
+	return Shield
+end
+
+local function RestoreTorsoAim()
+	Signal(SIG_RESTORE_TORSO)
+	SetSignalMask(SIG_RESTORE_TORSO)
+	Sleep(RESTORE_DELAY)
+end
+
+local function RestoreRightAim()
+	StartThread(RestoreTorsoAim)
+	Signal(SIG_RESTORE_RIGHT)
+	SetSignalMask(SIG_RESTORE_RIGHT)
+	Sleep(RESTORE_DELAY)
 end
 
 function script.AimWeapon(num, heading, pitch)
 	local weaponNum = dyncomm.GetWeapon(num)
+	
+	if weaponNum == 1 then
+		Signal(SIG_RIGHT)
+		SetSignalMask(SIG_RIGHT)
+		Turn(ArmRight, x_axis, -pitch/2 - 0.7, ARM_SPEED_PITCH)
+		Turn(Stomach, z_axis, heading, TORSO_SPEED_YAW)
+		Turn(HandRight, x_axis, -pitch/2 - 0.8, ARM_SPEED_PITCH)
+		WaitForTurn(Stomach, y_axis)
+		WaitForTurn(ArmRight, x_axis)
+		StartThread(RestoreRightAim)
+		return true
+	end
 	return (weaponNum and true) or false
 end
 
+function script.FireWeapon(num)
+	local weaponNum = dyncomm.GetWeapon(num)
+	if weaponNum == 1 then
+		dyncomm.EmitWeaponFireSfx(UnderMuzzle, num)
+	elseif weaponNum == 2 then
+		dyncomm.EmitWeaponFireSfx(UnderMuzzle, num)
+	end
+end
+
+function script.Shot(num)
+	local weaponNum = dyncomm.GetWeapon(num)
+	if weaponNum == 1 then
+		dyncomm.EmitWeaponShotSfx(UnderMuzzle, num)
+	elseif weaponNum == 2 then
+		dyncomm.EmitWeaponShotSfx(UnderMuzzle, num)
+	end
+end
+
+function script.StopBuilding()
+	SetUnitValue(COB.INBUILDSTANCE, 0)
+end
+
+function script.StartBuilding(heading, pitch)
+	SetUnitValue(COB.INBUILDSTANCE, 1)
+end
+
 function script.QueryNanoPiece()
-	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),Nano)
-	return Nano
+	GG.LUPS.QueryNanoPiece(unitID,unitDefID,Spring.GetUnitTeam(unitID),Palm)
+	return Palm
 end
