@@ -8262,7 +8262,7 @@
                       <scale sid="scale">1 1 1</scale>
                     </node>
                   </node>
-		  		<node id="Nano" name="Nano" type="NODE">
+		  		  <node id="Nano" name="Nano" type="NODE">
                     <translate sid="location">0.02898979 -0.1089336 -9.707235</translate>
                     <rotate sid="rotationZ">0 0 1 -2.90542e-7</rotate>
                     <rotate sid="rotationY">0 1 0 -1.0463e-5</rotate>

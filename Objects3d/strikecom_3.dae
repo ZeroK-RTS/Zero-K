@@ -8048,216 +8048,226 @@
   <library_controllers/>
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
-      <node id="Stomach" name="Stomach" type="NODE">
+      <node id="Base" name="Base" type="NODE">
         <translate sid="location">0.419569 -0.02246954 43.5574</translate>
-        <rotate sid="rotationZ">0 0 1 0</rotate>
-        <rotate sid="rotationY">0 1 0 0</rotate>
-        <rotate sid="rotationX">1 0 0 0</rotate>
-        <scale sid="scale">1 1 1</scale>
-        <instance_geometry url="#Cylinder_004-mesh" name="Stomach">
-          <bind_material>
-            <technique_common>
-              <instance_material symbol="Armor-material" target="#Armor-material"/>
-            </technique_common>
-          </bind_material>
-        </instance_geometry>
-        <node id="Breast" name="Breast" type="NODE">
-          <translate sid="location">0.05191669 -2.145898 11.83024</translate>
+        <node id="Stomach" name="Stomach" type="NODE">
+          <translate sid="location">0 0 0</translate>
           <rotate sid="rotationZ">0 0 1 0</rotate>
           <rotate sid="rotationY">0 1 0 0</rotate>
           <rotate sid="rotationX">1 0 0 0</rotate>
           <scale sid="scale">1 1 1</scale>
-          <instance_geometry url="#Cylinder_010-mesh" name="Breast">
+          <instance_geometry url="#Cylinder_004-mesh" name="Stomach">
             <bind_material>
               <technique_common>
                 <instance_material symbol="Armor-material" target="#Armor-material"/>
               </technique_common>
             </bind_material>
           </instance_geometry>
-          <node id="ArmLeft" name="ArmLeft" type="NODE">
-            <translate sid="location">15.82179 -0.04427028 -0.244297</translate>
-            <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
-            <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
+          <node id="Breast" name="Breast" type="NODE">
+            <translate sid="location">0.05191669 -2.145898 11.83024</translate>
+            <rotate sid="rotationZ">0 0 1 0</rotate>
+            <rotate sid="rotationY">0 1 0 0</rotate>
             <rotate sid="rotationX">1 0 0 0</rotate>
-            <scale sid="scale">1 0.9999999 1</scale>
-            <instance_geometry url="#Cylinder_005-mesh" name="ArmLeft">
+            <scale sid="scale">1 1 1</scale>
+            <instance_geometry url="#Cylinder_010-mesh" name="Breast">
               <bind_material>
                 <technique_common>
                   <instance_material symbol="Armor-material" target="#Armor-material"/>
                 </technique_common>
               </bind_material>
             </instance_geometry>
-            <node id="Gun" name="Gun" type="NODE">
-              <translate sid="location">0.4447708 0.5829304 -15.19025</translate>
-              <rotate sid="rotationZ">0 0 1 4.26887e-7</rotate>
-              <rotate sid="rotationY">0 1 0 6.0031e-8</rotate>
-              <rotate sid="rotationX">1 0 0 3.47873e-16</rotate>
-              <scale sid="scale">1 1 1</scale>
-              <instance_geometry url="#Cylinder_006-mesh" name="Gun">
+            <node id="ArmLeft" name="ArmLeft" type="NODE">
+              <translate sid="location">15.82179 -0.04427028 -0.244297</translate>
+              <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
+              <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
+              <rotate sid="rotationX">1 0 0 0</rotate>
+              <scale sid="scale">1 0.9999999 1</scale>
+              <instance_geometry url="#Cylinder_005-mesh" name="ArmLeft">
                 <bind_material>
                   <technique_common>
                     <instance_material symbol="Armor-material" target="#Armor-material"/>
                   </technique_common>
                 </bind_material>
               </instance_geometry>
-              <node id="UnderGun" name="UnderGun" type="NODE">
-                <translate sid="location">-0.2639313 0.1014212 -2.67029e-5</translate>
-                <rotate sid="rotationZ">0 0 1 -7.47052e-7</rotate>
-                <rotate sid="rotationY">0 1 0 1.66753e-7</rotate>
-                <rotate sid="rotationX">1 0 0 1.27769e-13</rotate>
-                <scale sid="scale">1 1 0.9999999</scale>
-                <instance_geometry url="#Cylinder_019-mesh" name="UnderGun">
+              <node id="Gun" name="Gun" type="NODE">
+                <translate sid="location">0.4447708 0.5829304 -15.19025</translate>
+                <rotate sid="rotationZ">0 0 1 4.26887e-7</rotate>
+                <rotate sid="rotationY">0 1 0 6.0031e-8</rotate>
+                <rotate sid="rotationX">1 0 0 3.47873e-16</rotate>
+                <scale sid="scale">1 1 1</scale>
+                <instance_geometry url="#Cylinder_006-mesh" name="Gun">
                   <bind_material>
                     <technique_common>
                       <instance_material symbol="Armor-material" target="#Armor-material"/>
                     </technique_common>
                   </bind_material>
                 </instance_geometry>
-                <node id="UnderMuzzle" name="UnderMuzzle" type="NODE">
-                  <translate sid="location">-0.08271599 0.8179368 -21.816</translate>
-                  <rotate sid="rotationZ">0 0 1 6.4033e-7</rotate>
-                  <rotate sid="rotationY">0 1 0 2.73474e-7</rotate>
-                  <rotate sid="rotationX">1 0 0 6.42633e-14</rotate>
-                  <scale sid="scale">1 1 1</scale>
+                <node id="Muzzle" name="Muzzle" type="NODE">
+                  <translate sid="location">-0.1981564 -3.329452 -21.69823</translate>
+                  <rotate sid="rotationZ">0 0 1 -7.47052e-7</rotate>
+                  <rotate sid="rotationY">0 1 0 1.06722e-7</rotate>
+                  <rotate sid="rotationX">1 0 0 1.27713e-13</rotate>
+                  <scale sid="scale">1 1 0.9999999</scale>
                 </node>
               </node>
-              <node id="Muzzle" name="Muzzle" type="NODE">
-                <translate sid="location">-0.1981564 -3.329452 -21.69823</translate>
-                <rotate sid="rotationZ">0 0 1 -7.47052e-7</rotate>
-                <rotate sid="rotationY">0 1 0 1.06722e-7</rotate>
-                <rotate sid="rotationX">1 0 0 1.27713e-13</rotate>
-                <scale sid="scale">1 1 0.9999999</scale>
-              </node>
             </node>
-          </node>
-          <node id="Head" name="Head" type="NODE">
-            <translate sid="location">-0.190857 0.563646 1.830124</translate>
-            <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
-            <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
-            <rotate sid="rotationX">1 0 0 0</rotate>
-            <scale sid="scale">1 0.9999999 1</scale>
-            <instance_geometry url="#Cylinder_018-mesh" name="Head">
-              <bind_material>
-                <technique_common>
-                  <instance_material symbol="Armor-material" target="#Armor-material"/>
-                </technique_common>
-              </bind_material>
-            </instance_geometry>
-            <node id="AntennaTip" name="AntennaTip" type="NODE">
-              <translate sid="location">1.126227 11.76467 10.32204</translate>
-              <rotate sid="rotationZ">0 0 1 4.26887e-7</rotate>
-              <rotate sid="rotationY">0 1 0 -6.67011e-9</rotate>
-              <rotate sid="rotationX">1 0 0 5.33608e-8</rotate>
-              <scale sid="scale">1 1 1</scale>
-            </node>
-            <node id="Eye" name="Eye" type="NODE">
-              <translate sid="location">0.2656812 -0.1069189 6.303646</translate>
-              <rotate sid="rotationZ">0 0 1 2.13443e-7</rotate>
-              <rotate sid="rotationY">0 1 0 -7.07673e-13</rotate>
-              <rotate sid="rotationX">1 0 0 1.06722e-7</rotate>
-              <scale sid="scale">1 1 1</scale>
-            </node>
-          </node>
-          <node id="ArmRight" name="ArmRight" type="NODE">
-            <translate sid="location">-14.2406 0.5124432 0.1135826</translate>
-            <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
-            <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
-            <rotate sid="rotationX">1 0 0 0</rotate>
-            <scale sid="scale">1 0.9999999 1</scale>
-            <instance_geometry url="#Cylinder_008-mesh" name="ArmRight">
-              <bind_material>
-                <technique_common>
-                  <instance_material symbol="Armor-material" target="#Armor-material"/>
-                </technique_common>
-              </bind_material>
-            </instance_geometry>
-            <node id="HandRight" name="HandRight" type="NODE">
-              <translate sid="location">0.190177 0.05373204 -16.22414</translate>
-              <rotate sid="rotationZ">0 0 1 1.36345e-7</rotate>
-              <rotate sid="rotationY">0 1 0 -1.04497e-5</rotate>
-              <rotate sid="rotationX">1 0 0 1.71793e-13</rotate>
-              <scale sid="scale">1 1 1</scale>
-              <instance_geometry url="#Cylinder_009-mesh" name="HandRight">
+            <node id="Head" name="Head" type="NODE">
+              <translate sid="location">-0.190857 0.563646 1.830124</translate>
+              <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
+              <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
+              <rotate sid="rotationX">1 0 0 0</rotate>
+              <scale sid="scale">1 0.9999999 1</scale>
+              <instance_geometry url="#Cylinder_018-mesh" name="Head">
                 <bind_material>
                   <technique_common>
                     <instance_material symbol="Armor-material" target="#Armor-material"/>
                   </technique_common>
                 </bind_material>
               </instance_geometry>
-              <node id="RightMuzzle" name="RightMuzzle" type="NODE">
-                <translate sid="location">0.03623962 -0.1361676 -12.13403</translate>
-                <rotate sid="rotationZ">0 0 1 9.92235e-7</rotate>
-                <rotate sid="rotationY">0 1 0 2.44504e-5</rotate>
-                <rotate sid="rotationX">1 0 0 5.89811e-14</rotate>
-                <scale sid="scale">1 1 0.9999999</scale>
+              <node id="AntennaTip" name="AntennaTip" type="NODE">
+                <translate sid="location">1.126227 11.76467 10.32204</translate>
+                <rotate sid="rotationZ">0 0 1 4.26887e-7</rotate>
+                <rotate sid="rotationY">0 1 0 -6.67011e-9</rotate>
+                <rotate sid="rotationX">1 0 0 5.33608e-8</rotate>
+                <scale sid="scale">1 1 1</scale>
               </node>
-              <node id="Palm" name="Palm" type="NODE">
-                <translate sid="location">0.07191753 -0.1835955 -6.199898</translate>
-                <rotate sid="rotationZ">0 0 1 8.46965e-7</rotate>
-                <rotate sid="rotationY">0 1 0 1.911e-5</rotate>
-                <rotate sid="rotationX">1 0 0 9.21964e-14</rotate>
-                <scale sid="scale">1 1 0.9999999</scale>
-                <node id="FingerC" name="FingerC" type="NODE">
-                  <translate sid="location">-0.0719099 -2.080734 -0.6969376</translate>
-                  <rotate sid="rotationZ">0 0 1 -3.91224e-7</rotate>
-                  <rotate sid="rotationY">0 1 0 5.59469e-6</rotate>
-                  <rotate sid="rotationX">1 0 0 -1.33402e-7</rotate>
-                  <scale sid="scale">1 1 1</scale>
-                  <instance_geometry url="#Cylinder_015-mesh" name="FingerC">
+              <node id="Eye" name="Eye" type="NODE">
+                <translate sid="location">0.2656812 -0.1069189 6.303646</translate>
+                <rotate sid="rotationZ">0 0 1 2.13443e-7</rotate>
+                <rotate sid="rotationY">0 1 0 -7.07673e-13</rotate>
+                <rotate sid="rotationX">1 0 0 1.06722e-7</rotate>
+                <scale sid="scale">1 1 1</scale>
+              </node>
+            </node>
+            <node id="ArmRight" name="ArmRight" type="NODE">
+              <translate sid="location">-14.2406 0.5124432 0.1135826</translate>
+              <rotate sid="rotationZ">0 0 1 3.81667e-14</rotate>
+              <rotate sid="rotationY">0 1 0 1.33402e-8</rotate>
+              <rotate sid="rotationX">1 0 0 0</rotate>
+              <scale sid="scale">1 0.9999999 1</scale>
+              <instance_geometry url="#Cylinder_008-mesh" name="ArmRight">
+                <bind_material>
+                  <technique_common>
+                    <instance_material symbol="Armor-material" target="#Armor-material"/>
+                  </technique_common>
+                </bind_material>
+              </instance_geometry>
+              <node id="HandRight" name="HandRight" type="NODE">
+                <translate sid="location">0.190177 0.05373204 -16.22414</translate>
+                <rotate sid="rotationZ">0 0 1 1.36345e-7</rotate>
+                <rotate sid="rotationY">0 1 0 -1.04497e-5</rotate>
+                <rotate sid="rotationX">1 0 0 1.71793e-13</rotate>
+                <scale sid="scale">1 1 1</scale>
+                <instance_geometry url="#Cylinder_009-mesh" name="HandRight">
+                  <bind_material>
+                    <technique_common>
+                      <instance_material symbol="Armor-material" target="#Armor-material"/>
+                    </technique_common>
+                  </bind_material>
+                </instance_geometry>
+                <node id="RightMuzzle" name="RightMuzzle" type="NODE">
+                  <translate sid="location">0.03623962 -0.1361676 -12.13403</translate>
+                  <rotate sid="rotationZ">0 0 1 9.92235e-7</rotate>
+                  <rotate sid="rotationY">0 1 0 2.44504e-5</rotate>
+                  <rotate sid="rotationX">1 0 0 5.89811e-14</rotate>
+                  <scale sid="scale">1 1 0.9999999</scale>
+                </node>
+                <node id="UnderGun" name="UnderGun" type="NODE">
+                  <translate sid="location">-0.3339313 -1.37886306 1.25</translate>
+                  <rotate sid="rotationZ">0 0 1 -7.47052e-7</rotate>
+                  <rotate sid="rotationY">0 1 0 1.66753e-7</rotate>
+                  <rotate sid="rotationX">1 0 0 1.27769e-13</rotate>
+                  <scale sid="scale">1 1 0.9999999</scale>
+                  <instance_geometry url="#Cylinder_019-mesh" name="UnderGun">
                     <bind_material>
                       <technique_common>
                         <instance_material symbol="Armor-material" target="#Armor-material"/>
                       </technique_common>
                     </bind_material>
                   </instance_geometry>
-                  <node id="FingerTipC" name="FingerTipC" type="NODE">
-                    <translate sid="location">0.06287861 0.07073736 -8.168182</translate>
-                    <rotate sid="rotationZ">0 0 1 1.491627</rotate>
-                    <rotate sid="rotationY">0 1 0 -0.00733345</rotate>
-                    <rotate sid="rotationX">1 0 0 -44.30983</rotate>
+                  <node id="UnderMuzzle" name="UnderMuzzle" type="NODE">
+                    <translate sid="location">-0.08271599 0.8179368 -21.816</translate>
+                    <rotate sid="rotationZ">0 0 1 6.4033e-7</rotate>
+                    <rotate sid="rotationY">0 1 0 2.73474e-7</rotate>
+                    <rotate sid="rotationX">1 0 0 6.42633e-14</rotate>
                     <scale sid="scale">1 1 1</scale>
                   </node>
                 </node>
-                <node id="FingerA" name="FingerA" type="NODE">
-                  <translate sid="location">-1.766013 1.102644 -0.6969376</translate>
-                  <rotate sid="rotationZ">0 0 1 -120</rotate>
-                  <rotate sid="rotationY">0 1 0 5.29529e-6</rotate>
-                  <rotate sid="rotationX">1 0 0 -3.47799e-6</rotate>
-                  <scale sid="scale">1 1 1</scale>
-                  <instance_geometry url="#Cylinder_011-mesh" name="FingerA">
-                    <bind_material>
-                      <technique_common>
-                        <instance_material symbol="Armor-material" target="#Armor-material"/>
-                      </technique_common>
-                    </bind_material>
-                  </instance_geometry>
-                  <node id="FingerTipA" name="FingerTipA" type="NODE">
-                    <translate sid="location">0.0628767 0.07073402 -8.168175</translate>
-                    <rotate sid="rotationZ">0 0 1 1.491638</rotate>
-                    <rotate sid="rotationY">0 1 0 -0.007360852</rotate>
-                    <rotate sid="rotationX">1 0 0 -44.30983</rotate>
+                <node id="Palm" name="Palm" type="NODE">
+                  <translate sid="location">0.07191753 -0.1835955 -6.199898</translate>
+                  <rotate sid="rotationZ">0 0 1 8.46965e-7</rotate>
+                  <rotate sid="rotationY">0 1 0 1.911e-5</rotate>
+                  <rotate sid="rotationX">1 0 0 9.21964e-14</rotate>
+                  <scale sid="scale">1 1 0.9999999</scale>
+                  <node id="FingerC" name="FingerC" type="NODE">
+                    <translate sid="location">-0.0719099 -2.080734 -0.6969376</translate>
+                    <rotate sid="rotationZ">0 0 1 -3.91224e-7</rotate>
+                    <rotate sid="rotationY">0 1 0 5.59469e-6</rotate>
+                    <rotate sid="rotationX">1 0 0 -1.33402e-7</rotate>
                     <scale sid="scale">1 1 1</scale>
+                    <instance_geometry url="#Cylinder_015-mesh" name="FingerC">
+                      <bind_material>
+                        <technique_common>
+                          <instance_material symbol="Armor-material" target="#Armor-material"/>
+                        </technique_common>
+                      </bind_material>
+                    </instance_geometry>
+                    <node id="FingerTipC" name="FingerTipC" type="NODE">
+                      <translate sid="location">0.06287861 0.07073736 -8.168182</translate>
+                      <rotate sid="rotationZ">0 0 1 1.491627</rotate>
+                      <rotate sid="rotationY">0 1 0 -0.00733345</rotate>
+                      <rotate sid="rotationX">1 0 0 -44.30983</rotate>
+                      <scale sid="scale">1 1 1</scale>
+                    </node>
                   </node>
-                </node>
-                <node id="FingerB" name="FingerB" type="NODE">
-                  <translate sid="location">1.837924 0.9780909 -0.6969376</translate>
-                  <rotate sid="rotationZ">0 0 1 120</rotate>
-                  <rotate sid="rotationY">0 1 0 6.03468e-6</rotate>
-                  <rotate sid="rotationX">1 0 0 3.21119e-6</rotate>
-                  <scale sid="scale">1 1 1</scale>
-                  <instance_geometry url="#Cylinder_016-mesh" name="FingerB">
-                    <bind_material>
-                      <technique_common>
-                        <instance_material symbol="Armor-material" target="#Armor-material"/>
-                      </technique_common>
-                    </bind_material>
-                  </instance_geometry>
-                  <node id="FingerTipB" name="FingerTipB" type="NODE">
-                    <translate sid="location">0.06287766 0.07073689 -8.168194</translate>
-                    <rotate sid="rotationZ">0 0 1 1.491597</rotate>
-                    <rotate sid="rotationY">0 1 0 -0.007344393</rotate>
-                    <rotate sid="rotationX">1 0 0 -44.30984</rotate>
-                    <scale sid="scale">1 1 0.9999999</scale>
+                  <node id="FingerA" name="FingerA" type="NODE">
+                    <translate sid="location">-1.766013 1.102644 -0.6969376</translate>
+                    <rotate sid="rotationZ">0 0 1 -120</rotate>
+                    <rotate sid="rotationY">0 1 0 5.29529e-6</rotate>
+                    <rotate sid="rotationX">1 0 0 -3.47799e-6</rotate>
+                    <scale sid="scale">1 1 1</scale>
+                    <instance_geometry url="#Cylinder_011-mesh" name="FingerA">
+                      <bind_material>
+                        <technique_common>
+                          <instance_material symbol="Armor-material" target="#Armor-material"/>
+                        </technique_common>
+                      </bind_material>
+                    </instance_geometry>
+                    <node id="FingerTipA" name="FingerTipA" type="NODE">
+                      <translate sid="location">0.0628767 0.07073402 -8.168175</translate>
+                      <rotate sid="rotationZ">0 0 1 1.491638</rotate>
+                      <rotate sid="rotationY">0 1 0 -0.007360852</rotate>
+                      <rotate sid="rotationX">1 0 0 -44.30983</rotate>
+                      <scale sid="scale">1 1 1</scale>
+                    </node>
+                  </node>
+                  <node id="FingerB" name="FingerB" type="NODE">
+                    <translate sid="location">1.837924 0.9780909 -0.6969376</translate>
+                    <rotate sid="rotationZ">0 0 1 120</rotate>
+                    <rotate sid="rotationY">0 1 0 6.03468e-6</rotate>
+                    <rotate sid="rotationX">1 0 0 3.21119e-6</rotate>
+                    <scale sid="scale">1 1 1</scale>
+                    <instance_geometry url="#Cylinder_016-mesh" name="FingerB">
+                      <bind_material>
+                        <technique_common>
+                          <instance_material symbol="Armor-material" target="#Armor-material"/>
+                        </technique_common>
+                      </bind_material>
+                    </instance_geometry>
+                    <node id="FingerTipB" name="FingerTipB" type="NODE">
+                      <translate sid="location">0.06287766 0.07073689 -8.168194</translate>
+                      <rotate sid="rotationZ">0 0 1 1.491597</rotate>
+                      <rotate sid="rotationY">0 1 0 -0.007344393</rotate>
+                      <rotate sid="rotationX">1 0 0 -44.30984</rotate>
+                      <scale sid="scale">1 1 0.9999999</scale>
+                    </node>
+                  </node>
+		  		  <node id="Nano" name="Nano" type="NODE">
+                    <translate sid="location">0.03498979 -0.135336 -12.107235</translate>
+                    <rotate sid="rotationZ">0 0 1 -2.90542e-7</rotate>
+                    <rotate sid="rotationY">0 1 0 -1.0463e-5</rotate>
+                    <rotate sid="rotationX">1 0 0 -8.13709e-14</rotate>
+                    <scale sid="scale">0.9999999 1 1</scale>
                   </node>
                 </node>
               </node>

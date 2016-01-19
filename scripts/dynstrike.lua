@@ -41,12 +41,16 @@ local nanoPieces = {Nano}
 local nanoing = false
 local aiming = false
 
+local FINGER_ANGLE = math.rad(-50)
+local FINGER_SPEED = math.rad(100)
+
 local SIG_RIGHT = 1
 local SIG_RESTORE_RIGHT = 2
 local SIG_LEFT = 4
 local SIG_RESTORE_LEFT = 8
 local SIG_RESTORE_TORSO = 16
 local SIG_WALK = 32
+local SIG_NANO = 64
 
 local RESTORE_DELAY = 2500
 
@@ -286,15 +290,45 @@ function script.Shot(num)
 	end
 end
 
+local function NanoAnimation()
+	Signal(SIG_NANO)
+	SetSignalMask(SIG_NANO)
+	while true do
+		Turn(FingerA, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Sleep(200)
+		Turn(FingerB, x_axis, 0, FINGER_SPEED)
+		Sleep(200)
+		Turn(FingerC, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Sleep(200)
+		Turn(FingerA, x_axis, 0, FINGER_SPEED)
+		Sleep(200)
+		Turn(FingerB, x_axis, FINGER_ANGLE, FINGER_SPEED)
+		Sleep(200)
+		Turn(FingerC, x_axis, 0, FINGER_SPEED)
+		Sleep(200)
+	end
+end
+
+local function NanoRestore()
+	Signal(SIG_NANO)
+	SetSignalMask(SIG_NANO)
+	Sleep(500)
+	Turn(FingerA, x_axis, 0, FINGER_SPEED)
+	Turn(FingerB, x_axis, 0, FINGER_SPEED)
+	Turn(FingerC, x_axis, 0, FINGER_SPEED)
+end
+	
 function script.StopBuilding()
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	StartThread(RestoreRightAim, 200)
+	StartThread(NanoRestore)
 	nanoing = false
 end
 
 function script.StartBuilding(heading, pitch)
 	AimArm(heading, pitch, ArmRight, HandRight, false)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+	StartThread(NanoAnimation)
 	nanoing = true
 end
 
