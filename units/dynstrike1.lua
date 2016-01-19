@@ -14,7 +14,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[armcom.png]],
+  buildPic               = [[commstrike.png]],
   buildTime              = 1200,
   canAttack              = true,
   canGuard               = true,

@@ -39,6 +39,7 @@ local chassisImages = {
 	recon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
 	support = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
 	assault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
+	strike = "LuaUI/Images/startup_info_selector/chassis_commstrike.png"
 }
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
@@ -57,14 +58,14 @@ local function WriteTooltip(profileID)
 			if moduleDefNames[modulename] then
 				local moduleDef = moduleDefs[moduleDefNames[modulename]]
 				local substr = moduleDef.humanName
-				-- assign color
 				
-				if moduleDef.slotType == "weapon" then
+				-- assign color
+				if (modulename):find("commweapon_") then
 					substr = colorWeapon..substr
-				--elseif moduleDef.slotType == "conversion" then
-				--	substr = colorConversion..substr
-				--elseif (moduleDef.slotType == "weaponmod" then
-				--	substr = colorWeaponMod..substr
+				elseif (modulename):find("conversion_") then
+					substr = colorConversion..substr
+				elseif (modulename):find("weaponmod_") then
+					substr = colorWeaponMod..substr
 				else
 					substr = colorModule..substr
 				end
