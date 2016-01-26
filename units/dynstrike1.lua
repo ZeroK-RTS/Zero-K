@@ -107,7 +107,7 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 480,
-      object           = [[benzcom1_wreck.s3o]],
+      object           = [[strikecom_dead.dae]],
       reclaimable      = true,
       reclaimTime      = 480,
     },

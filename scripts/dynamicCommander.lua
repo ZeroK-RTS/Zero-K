@@ -257,7 +257,7 @@ local function SpawnModuleWrecks(wreckLevel)
 	local vx, vy, vz = Spring.GetUnitVelocity(unitID)
 	local teamID	= Spring.GetUnitTeam(unitID)
 	
-	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+	local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count") or 0;
 	for i = 1, moduleCount do
 		SpawnModuleWreck(Spring.GetUnitRulesParam(unitID, "comm_module_" .. i), wreckLevel, moduleCount, teamID, x, y, z, vx, vy, vz)
 	end

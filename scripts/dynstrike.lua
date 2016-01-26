@@ -56,6 +56,234 @@ local SIG_NANO = 64
 local RESTORE_DELAY = 2500
 
 ---------------------------------------------------------------------
+---  blender-exported animation: data (move to include file?)     ---
+---------------------------------------------------------------------
+local Animations = {};
+Animations['die'] = {
+	{
+		['time'] = 0,
+		['commands'] = {
+		}
+	},
+	{
+		['time'] = 5,
+		['commands'] = {
+			{['c']='turn',['p']=Base, ['a']=x_axis, ['t']=0.232016, ['s']=0.696048},
+			{['c']='turn',['p']=Base, ['a']=y_axis, ['t']=0.004894, ['s']=0.014683},
+			{['c']='turn',['p']=Base, ['a']=z_axis, ['t']=0.250887, ['s']=0.032047},
+			{['c']='move',['p']=Base, ['a']=y_axis, ['t']=-10.286314, ['s']=16.366669},
+			{['c']='move',['p']=Base, ['a']=z_axis, ['t']=25.215321, ['s']=28.891800},
+			{['c']='turn',['p']=CalfRight, ['a']=x_axis, ['t']=1.605359, ['s']=4.816078},
+			{['c']='turn',['p']=CalfRight, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Stomach, ['a']=x_axis, ['t']=-0.541880, ['s']=0.587425},
+			{['c']='turn',['p']=Stomach, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Stomach, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=x_axis, ['t']=1.114193, ['s']=2.644143},
+			{['c']='turn',['p']=CalfLeft, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=x_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=z_axis, ['t']=0.161811, ['s']=0.485432},
+			{['c']='turn',['p']=HipRight, ['a']=x_axis, ['t']=-0.286401, ['s']=0.859202},
+			{['c']='turn',['p']=HipRight, ['a']=y_axis, ['t']=-0.000001, ['s']=0.000000},
+			{['c']='turn',['p']=HipRight, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Head, ['a']=x_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Head, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Head, ['a']=z_axis, ['t']=0.432971, ['s']=1.298912},
+			{['c']='turn',['p']=ArmLeft, ['a']=x_axis, ['t']=-0.192287, ['s']=1.014448},
+			{['c']='turn',['p']=ArmLeft, ['a']=z_axis, ['t']=0.015827, ['s']=0.000000},
+			{['c']='turn',['p']=HipLeft, ['a']=x_axis, ['t']=-0.094390, ['s']=0.283170},
+			{['c']='turn',['p']=HipLeft, ['a']=y_axis, ['t']=-0.245644, ['s']=0.736933},
+			{['c']='turn',['p']=HipLeft, ['a']=z_axis, ['t']=0.163177, ['s']=0.489530},
+			{['c']='turn',['p']=ArmRight, ['a']=x_axis, ['t']=-0.083255, ['s']=1.066882},
+			{['c']='turn',['p']=ArmRight, ['a']=y_axis, ['t']=0.413306, ['s']=0.676712},
+			{['c']='turn',['p']=ArmRight, ['a']=z_axis, ['t']=0.238749, ['s']=0.331098},
+		}
+	},
+	{
+		['time'] = 15,
+		['commands'] = {
+			{['c']='move',['p']=Base, ['a']=y_axis, ['t']=-6.303279, ['s']=8.535074},
+			{['c']='move',['p']=Base, ['a']=z_axis, ['t']=23.746590, ['s']=3.147281},
+			{['c']='turn',['p']=CalfRight, ['a']=x_axis, ['t']=2.268937, ['s']=1.421952},
+			{['c']='turn',['p']=CalfRight, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Stomach, ['a']=x_axis, ['t']=-0.411610, ['s']=0.279149},
+			{['c']='turn',['p']=Stomach, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Stomach, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=HandRight, ['a']=x_axis, ['t']=-0.298665, ['s']=0.639996},
+			{['c']='turn',['p']=HandRight, ['a']=y_axis, ['t']=0.057640, ['s']=0.123514},
+			{['c']='turn',['p']=HandRight, ['a']=z_axis, ['t']=-0.052757, ['s']=0.113051},
+			{['c']='turn',['p']=CalfLeft, ['a']=x_axis, ['t']=1.883354, ['s']=1.648202},
+			{['c']='turn',['p']=CalfLeft, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=HipRight, ['a']=x_axis, ['t']=-0.791779, ['s']=1.082954},
+			{['c']='turn',['p']=HipRight, ['a']=y_axis, ['t']=-0.000001, ['s']=0.000000},
+			{['c']='turn',['p']=HipRight, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=x_axis, ['t']=-0.419692, ['s']=0.487297},
+			{['c']='turn',['p']=ArmLeft, ['a']=y_axis, ['t']=-0.208858, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=z_axis, ['t']=0.015827, ['s']=0.000000},
+			{['c']='turn',['p']=HipLeft, ['a']=x_axis, ['t']=-0.641872, ['s']=1.173175},
+			{['c']='turn',['p']=HipLeft, ['a']=y_axis, ['t']=-0.245644, ['s']=0.000000},
+			{['c']='turn',['p']=HipLeft, ['a']=z_axis, ['t']=0.163177, ['s']=0.000000},
+			{['c']='turn',['p']=Gun, ['a']=x_axis, ['t']=-0.221850, ['s']=0.475394},
+			{['c']='turn',['p']=Gun, ['a']=y_axis, ['t']=-0.304574, ['s']=0.652659},
+			{['c']='turn',['p']=Gun, ['a']=z_axis, ['t']=-0.036910, ['s']=0.079093},
+		}
+	},
+	{
+		['time'] = 29,
+		['commands'] = {
+			{['c']='move',['p']=Base, ['a']=y_axis, ['t']=-11.554915, ['s']=26.258180},
+			{['c']='turn',['p']=CalfRight, ['a']=x_axis, ['t']=1.680374, ['s']=2.942814},
+			{['c']='turn',['p']=CalfRight, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=HandRight, ['a']=x_axis, ['t']=-0.603072, ['s']=1.522036},
+			{['c']='turn',['p']=HandRight, ['a']=y_axis, ['t']=0.111299, ['s']=0.268299},
+			{['c']='turn',['p']=HandRight, ['a']=z_axis, ['t']=-0.147644, ['s']=0.474433},
+			{['c']='turn',['p']=AssLeft, ['a']=x_axis, ['t']=0.575311, ['s']=1.871441},
+			{['c']='turn',['p']=AssLeft, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=AssLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=x_axis, ['t']=1.425336, ['s']=2.290088},
+			{['c']='turn',['p']=CalfLeft, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=x_axis, ['t']=0.186159, ['s']=0.930793},
+			{['c']='turn',['p']=Breast, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=z_axis, ['t']=0.161811, ['s']=0.000000},
+			{['c']='turn',['p']=HipRight, ['a']=x_axis, ['t']=-0.144300, ['s']=3.237398},
+			{['c']='turn',['p']=HipRight, ['a']=y_axis, ['t']=-0.000001, ['s']=0.000000},
+			{['c']='turn',['p']=HipRight, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=x_axis, ['t']=-0.921177, ['s']=2.507425},
+			{['c']='turn',['p']=ArmLeft, ['a']=y_axis, ['t']=-0.108622, ['s']=0.501180},
+			{['c']='turn',['p']=ArmLeft, ['a']=z_axis, ['t']=-0.047991, ['s']=0.319091},
+			{['c']='turn',['p']=HipLeft, ['a']=x_axis, ['t']=-0.523475, ['s']=0.591982},
+			{['c']='turn',['p']=HipLeft, ['a']=z_axis, ['t']=0.163177, ['s']=0.000000},
+			{['c']='turn',['p']=ArmRight, ['a']=x_axis, ['t']=-0.697045, ['s']=3.068952},
+			{['c']='turn',['p']=ArmRight, ['a']=y_axis, ['t']=0.503615, ['s']=0.451545},
+			{['c']='turn',['p']=ArmRight, ['a']=z_axis, ['t']=0.051914, ['s']=0.934174},
+			{['c']='turn',['p']=Gun, ['a']=x_axis, ['t']=-0.563546, ['s']=1.708478},
+			{['c']='turn',['p']=Gun, ['a']=y_axis, ['t']=-0.222652, ['s']=0.409613},
+			{['c']='turn',['p']=Gun, ['a']=z_axis, ['t']=0.061517, ['s']=0.492138},
+		}
+	},
+	{
+		['time'] = 35,
+		['commands'] = {
+			{['c']='turn',['p']=Base, ['a']=x_axis, ['t']=1.191343, ['s']=4.796636},
+			{['c']='turn',['p']=Base, ['a']=y_axis, ['t']=0.004894, ['s']=0.000000},
+			{['c']='turn',['p']=Base, ['a']=z_axis, ['t']=0.250887, ['s']=0.000000},
+			{['c']='move',['p']=Base, ['a']=x_axis, ['t']=4.315906, ['s']=13.935559},
+			{['c']='move',['p']=Base, ['a']=y_axis, ['t']=-21.297955, ['s']=48.715196},
+			{['c']='move',['p']=Base, ['a']=z_axis, ['t']=15.503991, ['s']=41.212993},
+			{['c']='turn',['p']=CalfRight, ['a']=x_axis, ['t']=0.670799, ['s']=5.047876},
+			{['c']='turn',['p']=CalfRight, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=HandRight, ['a']=x_axis, ['t']=-1.360638, ['s']=3.787832},
+			{['c']='turn',['p']=HandRight, ['a']=y_axis, ['t']=0.111299, ['s']=0.000001},
+			{['c']='turn',['p']=HandRight, ['a']=z_axis, ['t']=-0.147644, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=x_axis, ['t']=0.396744, ['s']=5.142960},
+			{['c']='turn',['p']=CalfLeft, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=x_axis, ['t']=0.517826, ['s']=1.658337},
+			{['c']='turn',['p']=Breast, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=Breast, ['a']=z_axis, ['t']=0.161811, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=x_axis, ['t']=-1.242896, ['s']=1.608593},
+			{['c']='turn',['p']=ArmLeft, ['a']=y_axis, ['t']=-0.108622, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=z_axis, ['t']=-0.047991, ['s']=0.000000},
+			{['c']='turn',['p']=FootRight, ['a']=x_axis, ['t']=0.448296, ['s']=2.241478},
+			{['c']='turn',['p']=FootRight, ['a']=y_axis, ['t']=0.000001, ['s']=0.000000},
+			{['c']='turn',['p']=FootRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=ArmRight, ['a']=x_axis, ['t']=-1.191173, ['s']=2.470638},
+			{['c']='turn',['p']=ArmRight, ['a']=y_axis, ['t']=0.503615, ['s']=0.000000},
+			{['c']='turn',['p']=ArmRight, ['a']=z_axis, ['t']=0.051914, ['s']=0.000000},
+			{['c']='turn',['p']=Gun, ['a']=x_axis, ['t']=-1.308940, ['s']=3.726971},
+			{['c']='turn',['p']=Gun, ['a']=y_axis, ['t']=-0.222652, ['s']=0.000000},
+			{['c']='turn',['p']=Gun, ['a']=z_axis, ['t']=0.061517, ['s']=0.000000},
+		}
+	},
+	{
+		['time'] = 41,
+		['commands'] = {
+			{['c']='turn',['p']=Base, ['a']=x_axis, ['t']=1.511230, ['s']=2.399147},
+			{['c']='turn',['p']=Base, ['a']=y_axis, ['t']=0.004894, ['s']=0.000000},
+			{['c']='turn',['p']=Base, ['a']=z_axis, ['t']=0.250887, ['s']=0.000000},
+			{['c']='move',['p']=Base, ['a']=y_axis, ['t']=-25.564775, ['s']=32.001157},
+			{['c']='move',['p']=Base, ['a']=z_axis, ['t']=7.163431, ['s']=62.554203},
+			{['c']='turn',['p']=CalfRight, ['a']=x_axis, ['t']=0.215270, ['s']=3.416467},
+			{['c']='turn',['p']=CalfRight, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfRight, ['a']=z_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=FootLeft, ['a']=x_axis, ['t']=0.205250, ['s']=2.591299},
+			{['c']='turn',['p']=FootLeft, ['a']=y_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=FootLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=x_axis, ['t']=0.168139, ['s']=1.714537},
+			{['c']='turn',['p']=CalfLeft, ['a']=y_axis, ['t']=0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=CalfLeft, ['a']=z_axis, ['t']=-0.000000, ['s']=0.000000},
+			{['c']='turn',['p']=ArmLeft, ['a']=x_axis, ['t']=-1.695927, ['s']=3.397732},
+			{['c']='turn',['p']=ArmLeft, ['a']=y_axis, ['t']=-0.003014, ['s']=0.792059},
+			{['c']='turn',['p']=ArmLeft, ['a']=z_axis, ['t']=0.707491, ['s']=5.666117},
+			{['c']='turn',['p']=HipLeft, ['a']=x_axis, ['t']=-0.615074, ['s']=0.686993},
+			{['c']='turn',['p']=HipLeft, ['a']=z_axis, ['t']=0.163177, ['s']=0.000000},
+			{['c']='turn',['p']=ArmRight, ['a']=x_axis, ['t']=-1.601538, ['s']=3.077738},
+			{['c']='turn',['p']=ArmRight, ['a']=y_axis, ['t']=0.078940, ['s']=3.185058},
+			{['c']='turn',['p']=ArmRight, ['a']=z_axis, ['t']=-1.185024, ['s']=9.277040},
+		}
+	},
+	{
+		['time'] = 45,
+		['commands'] = {
+		}
+	},
+}
+
+---------------------------------------------------------------------
+---  blender-exported animation: framework code             ---------
+---------------------------------------------------------------------
+
+local animCmd = {['turn']=Turn,['move']=Move};
+function PlayAnimation(animname)
+    local anim = Animations[animname];
+    for i = 1, #anim do
+        local commands = anim[i].commands;
+        for j = 1,#commands do
+            local cmd = commands[j];
+            animCmd[cmd.c](cmd.p,cmd.a,cmd.t,cmd.s);
+        end
+        if(i < #anim) then
+            local t = anim[i+1]['time'] - anim[i]['time'];
+            Sleep(t*33); -- sleep works on milliseconds
+        end
+    end
+end
+
+function constructSkeleton(unit, piece, offset)
+    if (offset == nil) then
+        offset = {0,0,0};
+    end
+
+    local bones = {};
+    local info = Spring.GetUnitPieceInfo(unit,piece);
+
+    for i=1,3 do
+        info.offset[i] = offset[i]+info.offset[i];
+    end 
+
+    bones[piece] = info.offset;
+    local map = Spring.GetUnitPieceMap(unit);
+    local children = info.children;
+
+    if (children) then
+        for i, childName in pairs(children) do
+            local childId = map[childName];
+            local childBones = constructSkeleton(unit, childId, info.offset);
+            for cid, cinfo in pairs(childBones) do
+                bones[cid] = cinfo;
+            end
+        end
+    end        
+    return bones;
+end
+
 ---------------------------------------------------------------------
 -- Walking
 
@@ -99,6 +327,50 @@ local walkAngle = {
 		
 	},
 }
+
+function constructSkeleton(unit, piece, offset)
+    if (offset == nil) then
+        offset = {0,0,0};
+    end
+
+    local bones = {};
+    local info = Spring.GetUnitPieceInfo(unit,piece);
+
+    for i=1,3 do
+        info.offset[i] = offset[i]+info.offset[i];
+    end 
+
+    bones[piece] = info.offset;
+    local map = Spring.GetUnitPieceMap(unit);
+    local children = info.children;
+
+    if (children) then
+        for i, childName in pairs(children) do
+            local childId = map[childName];
+            local childBones = constructSkeleton(unit, childId, info.offset);
+            for cid, cinfo in pairs(childBones) do
+                bones[cid] = cinfo;
+            end
+        end
+    end        
+    return bones;
+end
+
+local animCmd = {['turn']=Turn,['move']=Move};
+function PlayAnimation(animname)
+    local anim = Animations[animname];
+    for i = 1, #anim do
+        local commands = anim[i].commands;
+        for j = 1,#commands do
+            local cmd = commands[j];
+            animCmd[cmd.c](cmd.p,cmd.a,cmd.t,cmd.s);
+        end
+        if(i < #anim) then
+            local t = anim[i+1]['time'] - anim[i]['time'];
+            Sleep(t*33); -- sleep works on milliseconds
+        end
+    end
+end
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -338,6 +610,23 @@ end
 -- Creation and Death
 
 function script.Create()
+    local map = Spring.GetUnitPieceMap(unitID);
+    local offsets = constructSkeleton(unitID,map.Scene, {0,0,0});
+    
+    for a,anim in pairs(Animations) do
+        for i,keyframe in pairs(anim) do
+            local commands = keyframe.commands;
+            for k,command in pairs(commands) do
+                -- commands are described in (c)ommand,(p)iece,(a)xis,(t)arget,(s)peed format
+                -- the t attribute needs to be adjusted for move commands from blender's absolute values
+                if (command.c == "move") then
+                    local adjusted =  command.t - (offsets[command.p][command.a]);
+                    Animations[a][i]['commands'][k].t = command.t - (offsets[command.p][command.a]);
+                end
+            end
+        end
+    end
+    
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(SmokeUnit, smokePiece)
@@ -346,11 +635,12 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 or true then
-		
+		PlayAnimation('die')
+		Explode(Head,SFX.NONE);
+		Hide(Head);
 		dyncomm.SpawnModuleWrecks(1)
 		dyncomm.SpawnWreck(1)
 	else
-		
 		dyncomm.SpawnModuleWrecks(2)
 		dyncomm.SpawnWreck(2)
 	end
