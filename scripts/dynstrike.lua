@@ -328,50 +328,6 @@ local walkAngle = {
 	},
 }
 
-function constructSkeleton(unit, piece, offset)
-    if (offset == nil) then
-        offset = {0,0,0};
-    end
-
-    local bones = {};
-    local info = Spring.GetUnitPieceInfo(unit,piece);
-
-    for i=1,3 do
-        info.offset[i] = offset[i]+info.offset[i];
-    end 
-
-    bones[piece] = info.offset;
-    local map = Spring.GetUnitPieceMap(unit);
-    local children = info.children;
-
-    if (children) then
-        for i, childName in pairs(children) do
-            local childId = map[childName];
-            local childBones = constructSkeleton(unit, childId, info.offset);
-            for cid, cinfo in pairs(childBones) do
-                bones[cid] = cinfo;
-            end
-        end
-    end        
-    return bones;
-end
-
-local animCmd = {['turn']=Turn,['move']=Move};
-function PlayAnimation(animname)
-    local anim = Animations[animname];
-    for i = 1, #anim do
-        local commands = anim[i].commands;
-        for j = 1,#commands do
-            local cmd = commands[j];
-            animCmd[cmd.c](cmd.p,cmd.a,cmd.t,cmd.s);
-        end
-        if(i < #anim) then
-            local t = anim[i+1]['time'] - anim[i]['time'];
-            Sleep(t*33); -- sleep works on milliseconds
-        end
-    end
-end
-
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
