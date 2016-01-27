@@ -1,22 +1,22 @@
 include "constants.lua"
 include "bombers.lua"
 
-local fuselage = piece 'fuselage' 
-local wingl = piece 'wingl' 
-local wingr = piece 'wingr' 
-local enginel = piece 'enginel' 
-local enginer = piece 'enginer' 
-local head = piece 'head' 
-local turretbase = piece 'turretbase' 
-local turret = piece 'turret' 
-local sleevel = piece 'sleevel' 
-local sleever = piece 'sleever' 
-local barrell = piece 'barrell' 
-local barrelr = piece 'barrelr' 
-local flarel = piece 'flarel' 
-local flarer = piece 'flarer' 
-local bombl = piece 'bombl' 
-local bombr = piece 'bombr' 
+local fuselage = piece 'fuselage'
+local wingl = piece 'wingl'
+local wingr = piece 'wingr'
+local enginel = piece 'enginel'
+local enginer = piece 'enginer'
+local head = piece 'head'
+local turretbase = piece 'turretbase'
+local turret = piece 'turret'
+local sleevel = piece 'sleevel'
+local sleever = piece 'sleever'
+local barrell = piece 'barrell'
+local barrelr = piece 'barrelr'
+local flarel = piece 'flarel'
+local flarer = piece 'flarer'
+local bombl = piece 'bombl'
+local bombr = piece 'bombr'
 
 local bFirepoint1 = false
 local bFirepoint2 = false
@@ -75,7 +75,7 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return Spring.GetUnitRulesParam(unitID, "noammo") ~= 1
 	elseif num == 2 then
 		Signal(SIG_AIM_2)
 	SetSignalMask(SIG_AIM_2)
@@ -129,7 +129,7 @@ function script.Killed(recentDamage, maxHealth)
 	Explode(sleevel, sfxNone)
 	Explode(sleever, sfxNone)
 	return 1
-	else	
+	else
 	Explode(fuselage, sfxFall + sfxSmoke)
 	Explode(head, sfxFall + sfxSmoke + sfxFire)
 	Explode(wingl, sfxFall + sfxSmoke)

@@ -16,7 +16,7 @@ local AIM_RADIUS = 160
 
 -- 5 minutes and 50 seconds to reach capacity.
 local SPAWN_PERIOD = 700 -- in milliseconds
-local METEOR_CAPACITY = 500 
+local METEOR_CAPACITY = 500
 
 local fireRange = WeaponDefNames["zenith_meteor"].range
 
@@ -69,28 +69,27 @@ local function IsDisabled()
 end
 
 local function TransformMeteor(weaponDefID, proID, x, y, z)
-	
+
 	-- Get old projectile attributes
 	local px, py, pz = Spring.GetProjectilePosition(proID)
 	local vx, vy, vz = Spring.GetProjectileVelocity(proID)
-	
+
 	-- Destroy old projectile
-	Spring.SetProjectilePosition(proID, -1000000, 10000, -1000000)
-	Spring.SetProjectileCollision(proID)
-	
+	Spring.DeleteProjectile(proID)
+
 	-- Send new one in the right direction
 	local newProID = Spring.SpawnProjectile(weaponDefID, {
 		pos = {px, py, pz},
 		["end"] = {x, y, z},
-		tracking = true, 
-		speed = {vx, vy, vz}, 
+		tracking = true,
+		speed = {vx, vy, vz},
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
 	end
-	
+
 	return newProID
 end
 
@@ -133,23 +132,23 @@ local function RegainControlOfMeteors()
 end
 
 local function SpawnProjectileThread()
-	
+
 	local reloadMult = 1
-	
-	while true do		
+
+	while true do
 		reloadMult = spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-		
+
 		--Spring.SpawnProjectile(gravityWeaponDefID, {
 		--	pos = {1000,1000,1000},
 		--	speed = {10, 0 ,10},
 		--	ttl = 100,
 		--	maxRange = 1000,
 		--})
-		
+
 		--// Handle stun and slow
 		-- reloadMult should be 0 only when disabled.
 		Sleep(SPAWN_PERIOD/((reloadMult > 0 and reloadMult) or 1))
-		while IsDisabled() do			
+		while IsDisabled() do
 			if not currentlyStunned then
 				LoseControlOfMeteors()
 				currentlyStunned = true
@@ -157,25 +156,25 @@ local function SpawnProjectileThread()
 			Sleep(500)
 		end
 		EmitSfx(flare, 2049)
-		
+
 		if currentlyStunned then
 			RegainControlOfMeteors()
 			currentlyStunned = false
 		end
-		
-		--// Handle Meteors 
+
+		--// Handle Meteors
 		-- Call a new meteor
 		local sourcePos = Vector.PolarToCart(SOURCE_RANGE*(1 - math.random()^2), 2*math.pi*math.random())
 		local hoverPos = Vector.PolarToCart(HOVER_RANGE*math.random()^2, 2*math.pi*math.random())
 		local proID = Spring.SpawnProjectile(floatWeaponDefID, {
-			pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]}, 
-			tracking = true, 
-			speed = {0, -1, 0}, 
+			pos = {ux + sourcePos[1], uy + SOURCE_HEIGHT, uz + sourcePos[2]},
+			tracking = true,
+			speed = {0, -1, 0},
 			ttl = 18000, -- 18000 = 10 minutes
 			gravity = meteorGravity,
 		})
 		Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
-		
+
 		-- Drop meteor if there are too many. It is more fun this way.
 		if projectileCount >= METEOR_CAPACITY then
 			DropSingleMeteor(oldestProjectile)
@@ -187,10 +186,10 @@ local function SpawnProjectileThread()
 		else
 			projectileCount = projectileCount + 1
 			projectiles[projectileCount] = proID
-			
+
 			tooltipProjectileCount = tooltipProjectileCount + 1
 			Spring.SetUnitRulesParam(unitID, "meteorsControlled", tooltipProjectileCount, INLOS_ACCESS)
-		
+
 		end
 	end
 end
@@ -199,24 +198,24 @@ local function LaunchAll(x, z)
 	-- Sanitize input
 	x, z = Spring.Utilities.ClampPosition(x, z)
 	local y = math.min(0, Spring.GetGroundHeight(x,z))
-	
+
 	if Vector.AbsVal(ux - x, uz - z) > fireRange then
 		return
 	end
-	
+
 	launchInProgress = true
-	
+
 	-- Make the aiming projectiles. These projectiles have high turnRate
 	-- so are able to rotate the wobbly float projectiles in the right
 	-- direction.
 	local aim = {}
 	local aimCount = 0
-	
+
 	for i = 1, projectileCount do
 		local proID = projectiles[i]
 		-- Check that the projectile ID is still valid
 		if Spring.GetProjectileDefID(proID) == floatWeaponDefID then
-			
+
 			--// Shoot gravity beams at the new aim projectiles. Did not look great.
 			--local px, py, pz = Spring.GetProjectilePosition(proID)
 			--local dist = math.sqrt((px - ux)^2 + (py - uy)^2 + (pz - uz)^2)
@@ -228,52 +227,52 @@ local function LaunchAll(x, z)
 			--	owner = unitID,
 			--	maxRange = dist,
 			--})
-			
+
 			-- Projectile is valid, launch!
 			aimCount = aimCount + 1
 			aim[aimCount] = TransformMeteor(aimWeaponDefID, proID, x, y, z)
 		end
 	end
-	
+
 	-- All projectiles were launched so there are none left.
 	projectiles = {}
 	projectileCount = 0
 	oldestProjectile = 1
-	
+
 	tooltipProjectileCount = 0
 	Spring.SetUnitRulesParam(unitID, "meteorsControlled", projectileCount, INLOS_ACCESS)
-	
+
 	-- Sleep to give time for the aim projectiles to turn
 	Sleep(1500)
-	
+
 	-- Destroy the aim projectiles and create the speedy, low turnRate
 	-- projectiles.
 	for i = 1, aimCount do
 		local proID = aim[i]
 		-- Check that the projectile ID is still valid
-		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then			
+		if Spring.GetProjectileDefID(proID) == aimWeaponDefID then
 			-- Projectile is valid, launch!
 			local aimOff = Vector.PolarToCart(AIM_RADIUS*math.random()^2, 2*math.pi*math.random())
-			
+
 			TransformMeteor(fireWeaponDefID, proID, x + aimOff[1], y, z + aimOff[2])
 		end
 	end
-	
+
 	launchInProgress = false
 end
 
 function script.Create()
 	ux,_, uz = Spring.GetUnitPosition(unitID)
 	uy = Spring.GetGroundHeight(ux, uz)
-	
+
 	currentlyStunned = IsDisabled()
-	
+
 	Move(firept, y_axis, 9001)
 	Move(flare, y_axis, -110)
 	Turn(flare, x_axis, math.rad(-90))
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(SpawnProjectileThread)
-	
+
 	-- Helpful for devving
 	--local proj = Spring.GetProjectilesInRectangle(0,0, 10000, 10000)
 	--for i = 1, #proj do
@@ -281,7 +280,7 @@ function script.Create()
 	--end
 end
 
-function script.QueryWeapon(num) 
+function script.QueryWeapon(num)
 	return firept
 end
 
@@ -297,16 +296,16 @@ function script.BlockShot(num, target)
 	if launchInProgress then
 		return true
 	end
-	
+
 	if IsDisabled() then
 		return true
 	end
-	
+
 	local cQueue = Spring.GetCommandQueue(unitID, 1)
 	if not (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
 		return true
 	end
-	
+
 	if cQueue[1].params[3] then
 		StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
 	elseif #cQueue[1].params == 1 then

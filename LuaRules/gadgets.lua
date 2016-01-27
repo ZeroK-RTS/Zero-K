@@ -45,7 +45,7 @@ local function mynext(...)
 	return i,v
 end
 
-pairs = function(...) 
+pairs = function(...)
 	if SendToUnsynced then
 		local n,s,i = origPairs(...)
 		return mynext,s,i
@@ -119,7 +119,7 @@ gadgetHandler = {
   yViewSizeOld = 1,
 
   mouseOwner = nil,
-  
+
   actionHandler = actionHandler,	-- FIXME: not in base
 }
 
@@ -1361,7 +1361,7 @@ function gadgetHandler:AllowWeaponInterceptTarget(interceptorUnitID, interceptor
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -1403,7 +1403,8 @@ end
 
 
 function gadgetHandler:UnitDestroyed(unitID,     unitDefID,     unitTeam,
-                                     attackerID, attackerDefID, attackerTeam)
+                                     attackerID, attackerDefID, attackerTeam, pre)
+  if not pre then return end
   for _,g in ipairs(self.UnitDestroyedList) do
     g:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                     attackerID, attackerDefID, attackerTeam)
@@ -1449,11 +1450,11 @@ end
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
 								   a, b, c, d)
-	
+
 	local projectileID,attackerID
 	local attackerDefID,attackerTeam
-	if unitDamagedOrderChange then 
-		attackerID = a 
+	if unitDamagedOrderChange then
+		attackerID = a
 		attackerDefID = b
 		attackerTeam = c
 	else
@@ -1462,7 +1463,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		attackerDefID = c
 		attackerTeam = d
 	end
-	
+
 	if UnitPreDamaged_first then
 		for _,g in ipairs(self.UnitPreDamagedList) do
 			local weaponDefs = (g.UnitPreDamaged_GetWantedWeaponDef and g:UnitPreDamaged_GetWantedWeaponDef()) or allWeaponDefs
@@ -1480,7 +1481,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 		end
 		UnitPreDamaged_first = false
 	end
-	
+
 	local rDam = damage
 	local rImp = 1.0
 
@@ -1512,8 +1513,8 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
 								   a, b, c, d)
   local projectileID,attackerID
   local attackerDefID,attackerTeam
-  if unitDamagedOrderChange then 
-	attackerID = a 
+  if unitDamagedOrderChange then
+	attackerID = a
     attackerDefID = b
     attackerTeam = c
   else
@@ -1522,7 +1523,7 @@ function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
     attackerDefID = c
     attackerTeam = d
   end
-  
+
   local rDam = damage
   local rImp = 1.0
 
@@ -1548,7 +1549,7 @@ local UnitDamaged_count = 0
 local UnitDamaged_gadgets = {}
 
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
 	if unitDamagedOrderChange then
 		attackerTeam = attackerDefID
@@ -1576,15 +1577,15 @@ end
 
 --[[ Old
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
-                                   damage, paralyzer, weaponID, projectileID, 
+                                   damage, paralyzer, weaponID, projectileID,
                                    attackerID, attackerDefID, attackerTeam)
-		
+
   if unitDamagedOrderChange then
     attackerTeam = attackerDefID
     attackerDefID = attackerID
     attackerID = projectileID
   end
-  
+
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,
                   damage, paralyzer, weaponID,
@@ -1805,7 +1806,7 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
 		end
 		Explosion_first = false
 	end
-	
+
 	local noGfx = false
 	local single = Explosion_GadgetSingle[weaponID]
 	local map = Explosion_GadgetMap[weaponID]
@@ -2203,7 +2204,7 @@ end
 
 function gadgetHandler:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) -- opts is a bitmask
   for _,g in ipairs(self.UnitCommandList) do
-    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams) 
+    g:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
   end
   return
 end

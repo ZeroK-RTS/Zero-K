@@ -87,55 +87,55 @@ end
 local function UpdateUnitGrow(unitID, growScale)
 	local unit = growUnit[unitID]
 	growScale = 1 - growScale
-	
+
 	spSetUnitCollisionVolumeData(unitID,
-		unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
-		unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3], 
+		unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3],
+		unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3],
 		unit.volumeType, unit.testType, unit.primaryAxis)
 
-	spSetUnitMidAndAimPos(unitID, 
+	spSetUnitMidAndAimPos(unitID,
 		unit.mid[1], unit.mid[2], unit.mid[3],
 		unit.aim[1], unit.aim[2] - growScale*unit.aimOff, unit.aim[3], true)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local ud = UnitDefs[unitDefID]
-	
+
 	local mid, aim
-	
+
 	if offsets[unitDefID] and ud then
 		mid = offsets[unitDefID].mid
 		aim = offsets[unitDefID].aim
 		mid[2] = Spring.GetUnitRulesParam(unitID, "midpos_override") or mid[2]
 		aim[2] = Spring.GetUnitRulesParam(unitID, "aimpos_override") or aim[2]
-		
-		spSetUnitMidAndAimPos(unitID, 
-			mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz, 
-			aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz, true)
+
+		spSetUnitMidAndAimPos(unitID,
+			mid[1] + ud.model.midx, mid[2] + ud.model.midy, mid[3] + ud.model.midz,
+			aim[1] + ud.model.midx, aim[2] + ud.model.midy, aim[3] + ud.model.midz, true)
 	else
 		mid = {0, Spring.GetUnitRulesParam(unitID, "midpos_override") or 0, 0}
 		aim = {0, Spring.GetUnitRulesParam(unitID, "aimpos_override") or 0, 0}
 	end
-	
+
 	if modelRadii[unitDefID] then
 		spSetUnitRadiusAndHeight(unitID, modelRadii[unitDefID].radius, modelRadii[unitDefID].height)
 	end
-	
+
 	local buildProgress = select(5, spGetUnitHealth(unitID))
-	
+
 	if buildProgress > FULL_GROW then
 		return
 	end
-	
+
 	-- Sertup growth scale
-	
+
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
-	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, 
+	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ,
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
-	
-	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)	
+
+	local volumeBelow = -((midY - baseY) + offsetY - scaleY/2)
 	local aimAbove = (midY - baseY) + aim[2] - mid[2]
-	
+
 	if volumeBelow < 0 then
 		aimAbove = aimAbove + volumeBelow
 		volumeBelow = 0
@@ -143,12 +143,12 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 
 	local aimOff = aimAbove - 1
 	local scaleOff = scaleY - volumeBelow - 2
-	
+
 	local growScale = min(1, buildProgress/FULL_GROW)
 
 	growUnit[unitID] = {
-		mid = {mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz},
-		aim = {aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz},
+		mid = {mid[1] + ud.model.midx, mid[2] + ud.model.midy, mid[3] + ud.model.midz},
+		aim = {aim[1] + ud.model.midx, aim[2] + ud.model.midy, aim[3] + ud.model.midz},
 		aimOff = aimOff,
 		scaleOff = scaleOff,
 		scale = {scaleX, scaleY, scaleZ},
@@ -158,7 +158,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		primaryAxis = primaryAxis,
 		prevGrowth = growScale,
 	}
-	
+
 	UpdateUnitGrow(unitID, growScale)
 end
 

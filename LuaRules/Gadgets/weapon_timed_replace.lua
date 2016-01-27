@@ -12,7 +12,7 @@ end
 
 -------------------------------------------------------------
 -------------------------------------------------------------
-if not (gadgetHandler:IsSyncedCode()) then 
+if not (gadgetHandler:IsSyncedCode()) then
 	return false
 end
 -------------------------------------------------------------
@@ -43,8 +43,8 @@ function gadget:GameFrame(n)
 					local y = Spring.GetGroundHeight(x,z)
 					Spring.SetProjectileTarget(proID, x, y, z)
 				else
-					-- If the unit is not visible we have been homing onto a radar 
-					-- dot. The radar dot position is unknown to lua so target 
+					-- If the unit is not visible we have been homing onto a radar
+					-- dot. The radar dot position is unknown to lua so target
 					-- ground beneath the projectile.
 					local x,_,z = Spring.GetProjectilePosition(proID)
 					local y = Spring.GetGroundHeight(x,z)
@@ -57,12 +57,12 @@ function gadget:GameFrame(n)
 			end
 			projectiles[proID] = nil
 			projectileAllyTeam[proID] = nil
-			
+
 			--local x, _, z = Spring.GetProjectilePosition(proID)
-			
+
 			--[[local x, y, z = Spring.GetProjectilePosition(proID)
 			local vx, vy, vz = Spring.GetProjectileVelocity(proID)
-			
+
 			-- Create new projectile
 			Spring.SpawnProjectile(data.replacement, {
 				pos = {x, y, z},
@@ -70,13 +70,12 @@ function gadget:GameFrame(n)
 				ttl = 180,
 				tracking = false
 			})
-			
+
 			-- Destroy old projectile
-			Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-			Spring.SetProjectileCollision(proID)
+			Spring.DeleteProjectile(proID)
 			--]]
 		end
-		
+
 	end
 end
 

@@ -21,7 +21,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local LOS_MULT = 32 -- multiplier from UnitDefs to reasonable units
+local LOS_MULT = 1 -- multiplier from UnitDefs to reasonable units
 local UPDATE_FREQUENCY = 15
 
 local units = {count = 0, data = {}}
@@ -52,14 +52,14 @@ local function checkUnit(unitID, los, airLos)
 	if not Spring.ValidUnitID(unitID) then
 		return false
 	end
-	
+
 	local x,y,z = Spring.GetUnitPosition(unitID)
 	local ground =  Spring.GetGroundHeight(x,z)
 
 	if ground and y then
 		local diff = y - ground
 		--GG.UnitEcho(unitID, diff)
-		
+
 		if diff < 10 then
 			Spring.SetUnitSensorRadius(unitID, "los", los)
 			Spring.SetUnitSensorRadius(unitID, "airLos", airLos)

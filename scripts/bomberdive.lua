@@ -1,19 +1,19 @@
 local base = piece 'base'
-local fuselage = piece 'fuselage' 
-local wingl1 = piece 'wingl1' 
-local wingr1 = piece 'wingr1' 
-local wingl2 = piece 'wingl2' 
-local wingr2 = piece 'wingr2' 
-local engines = piece 'engines' 
-local fins = piece 'fins' 
-local rflap = piece 'rflap' 
-local lflap = piece 'lflap' 
-local predrop = piece 'predrop' 
-local drop = piece 'drop' 
-local thrustl = piece 'thrustl' 
-local thrustr = piece 'thrustr' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local fuselage = piece 'fuselage'
+local wingl1 = piece 'wingl1'
+local wingr1 = piece 'wingr1'
+local wingl2 = piece 'wingl2'
+local wingr2 = piece 'wingr2'
+local engines = piece 'engines'
+local fins = piece 'fins'
+local rflap = piece 'rflap'
+local lflap = piece 'lflap'
+local predrop = piece 'predrop'
+local drop = piece 'drop'
+local thrustl = piece 'thrustl'
+local thrustr = piece 'thrustr'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 local xp,zp = piece("x","z")
 
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -58,21 +58,21 @@ local takeoffHeight = UnitDefNames["bomberdive"].wantedHeight
 local function BehaviourChangeThread(behaviour)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
 	SetSignalMask(SIG_CHANGE_FLY_HEIGHT)
-	
+
 	takeoffHeight = behaviour.wantedHeight/1.5
-	
+
 	local state = spGetUnitMoveTypeData(unitID).aircraftState
 	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	if not flying then
 		StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	end
-	
+
 	while not flying do
 		Sleep(600)
 		state = spGetUnitMoveTypeData(unitID).aircraftState
 		notFlying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	end
-	
+
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	--GG.UpdateUnitAttributes(unitID)
@@ -133,14 +133,14 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return Spring.GetUnitRulesParam(unitID, "noammo") ~= 1
 end
 
 function script.BlockShot(num, targetID)
 	if num ~= 2 then
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 	return not ableToFire
 end
 

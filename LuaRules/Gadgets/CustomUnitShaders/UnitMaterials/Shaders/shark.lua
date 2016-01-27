@@ -16,7 +16,6 @@ return {
 
     varying vec3 normal;
     varying vec3 cameraDir;
-    varying vec3 teamColor;
     varying vec3 light;
 
 
@@ -25,8 +24,8 @@ return {
       gl_TexCoord[0].st = gl_MultiTexCoord0.st;
 
       vec4 v = gl_Vertex;
-      v += (1.0 + speed.z) * smoothstep(0.0,-20.0,gl_Vertex.z) * vec4(sin(radians(frame2*10.0+gl_Vertex.z*5.0)),0.0,0.0,0.0); 
-      v += (1.0 + speed.z) * smoothstep(0.0,15.0,abs(gl_Vertex.x)) * smoothstep(0.0,10.0,abs(gl_Vertex.z)) * vec4(0.0,sin(radians(frame2*15.0+gl_Vertex.z*19.0))*1.2,0.0,0.0); 
+      v += (1.0 + speed.z) * smoothstep(0.0,-20.0,gl_Vertex.z) * vec4(sin(radians(frame2*10.0+gl_Vertex.z*5.0)),0.0,0.0,0.0);
+      v += (1.0 + speed.z) * smoothstep(0.0,15.0,abs(gl_Vertex.x)) * smoothstep(0.0,10.0,abs(gl_Vertex.z)) * vec4(0.0,sin(radians(frame2*15.0+gl_Vertex.z*19.0))*1.2,0.0,0.0);
 
       v += vec4(-speed.x*150.0,0.0,0.0,0.0) * pow((1.0-clamp((gl_Vertex.z+80.0)/100.0,0.0,1.0)),2.5);
 
@@ -34,8 +33,6 @@ return {
 
       normal    = normalize(gl_NormalMatrix * gl_Normal);
       cameraDir = worldPos.xyz - cameraPos;
-
-      teamColor = gl_TextureEnvColor[0].rgb;
 
       float a = max( dot(normal, sunPos), 0.0);
       light   = a * sunDiffuse + sunAmbient;
@@ -60,9 +57,10 @@ return {
     uniform vec3 sunAmbient;
   #endif
 
+    uniform vec4 teamColor;
+
     varying vec3 normal;
     varying vec3 cameraDir;
-    varying vec3 teamColor;
     varying vec3 light;
 
     void main(void)
