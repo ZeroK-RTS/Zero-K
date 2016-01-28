@@ -16,6 +16,7 @@ VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
 local xformList = 0
 local coneList = 0
+local areasList = 0
 
 local recommendedStartpoints
 local myTeammates = Spring.GetTeamList(Spring.GetMyAllyTeamID())
@@ -27,6 +28,25 @@ local enemyStartBoxColor = { 1, 0, 0, 0.3 }  -- red
 local recommendedStartposRadius = 256
 
 local startTimer = Spring.GetTimer()
+
+local function drawBoxes()
+	
+	if (allyStartBox) then
+		gl.Color (allyStartBoxColor)
+		for i = 1, #allyStartBox do
+			gl.Utilities.DrawGroundTriangle(allyStartBox[i])
+		end
+	end
+
+	gl.Color(enemyStartBoxColor)
+	for j = 1, #enemyStartBoxes do
+		local startBox = enemyStartBoxes[j]
+		for i = 1, #startBox do
+			gl.Utilities.DrawGroundTriangle(startBox[i])
+		end
+	end
+
+end
 
 function widget:Initialize()
 	-- only show at the beginning
@@ -107,43 +127,39 @@ local function ValidStartpos (x, y, z)
 	return x and (x ~= 0) and (y ~= 0) and (z ~= 0)
 end
 
+local boxes_loaded = true
+
 function widget:DrawWorld()
 
 	gl.Fog(false)
 
-	if (allyStartBox) then
+	if boxes_loaded then
+		gl.CallList(areasList)
+	else
+		drawBoxes()
+		areasList = gl.CreateList(drawBoxes)
+		first = false
+	end
+
+	if (allyStartBox and recommendedStartpoints) then
 		gl.Color (allyStartBoxColor)
-		for i = 1, #allyStartBox do
-			gl.Utilities.DrawGroundTriangle(allyStartBox[i])
-		end
-
-		if (recommendedStartpoints) then
-			gl.LineWidth(3)
-			gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINES)
-			for i = 1, #recommendedStartpoints do
-				local x = recommendedStartpoints[i][1]
-				local z = recommendedStartpoints[i][2]
-				local empty = true
-				for j = 1, #myTeammates do
-					local tx, _, tz = Spring.GetTeamStartPosition(myTeammates[j])
-					if ((tx-x)^2 + (tz-z)^2 < recommendedStartposRadius^2) then
-						empty = false
-					end
+		gl.LineWidth(3)
+		gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINES)
+		for i = 1, #recommendedStartpoints do
+			local x = recommendedStartpoints[i][1]
+			local z = recommendedStartpoints[i][2]
+			local empty = true
+			for j = 1, #myTeammates do
+				local tx, _, tz = Spring.GetTeamStartPosition(myTeammates[j])
+				if ((tx-x)^2 + (tz-z)^2 < recommendedStartposRadius^2) then
+					empty = false
 				end
-				if empty then gl.DrawGroundCircle(x, 0, z, recommendedStartposRadius, 19) end
 			end
-			gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+			if empty then gl.DrawGroundCircle(x, 0, z, recommendedStartposRadius, 19) end
 		end
+		gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
 	end
-
-	gl.Color(enemyStartBoxColor)
-	for j = 1, #enemyStartBoxes do
-		local startBox = enemyStartBoxes[j]
-		for i = 1, #startBox do
-			gl.Utilities.DrawGroundTriangle(startBox[i])
-		end
-	end
-
+	
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local x, y, z = Spring.GetTeamStartPosition(teamID)
 		if ValidStartpos(x,y,z) then
