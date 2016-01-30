@@ -669,7 +669,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 
 	--  Here The inner of the selected circles are removed
 	gl.Blending(false)
-	gl.ColorMask(false,false,false,true)
+	gl.ColorMask(false,false,false,false)
 	gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
 	for i=1, #unitList do
@@ -701,7 +701,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	gl.Blending(true)
 	gl.BlendFuncSeparate(GL.ONE_MINUS_DST_ALPHA, GL.DST_ALPHA, GL.ONE, GL.ONE)
 	gl.StencilFunc(GL.EQUAL, 0x01, 0xFF)
-	gl.StencilOp(GL_KEEP, GL_KEEP, GL.ZERO)
+	gl.StencilOp(GL_KEEP, GL.ZERO, GL.ZERO)
 	gl.CallList(clearquad)
 		gl.PolygonOffset(0.0,0.0)
 	-- gl.StencilMask(0xFF)
