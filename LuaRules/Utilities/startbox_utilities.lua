@@ -98,6 +98,7 @@ function ParseBoxes ()
 		SanitizeBoxes (startBoxConfig)
 	else
 		startBoxConfig = { }
+		manualStartposConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
@@ -109,6 +110,9 @@ function ParseBoxes ()
 				startBoxConfig[id] = {
 					{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
 					{box[1], box[2], box[3], box[4], box[3], box[2]}
+				}
+				manualStartposConfig[id] = {
+					{(box[1]+box[3]) / 2, (box[2]+box[4]) / 2}
 				}
 			end
 		end
