@@ -31,7 +31,7 @@ local function TranslateModoption(legacy)
 					decorations = decorations or {}
 					decorations[#decorations +1] = decData
 				elseif decName == "icon_overhead" then
-					images = {decData.image}
+					images = {overhead = decData.image}
 					decorations = decorations or {}
 					decorations[#decorations +1] = "banner_overhead"
 				end

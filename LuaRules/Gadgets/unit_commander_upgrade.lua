@@ -380,22 +380,6 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 		return
 	end
 	
-	if chassisDefByBaseDef[unitDefID] then
-		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
-		
-		InitializeDynamicCommander(
-			unitID,
-			0, 
-			chassisDefByBaseDef[unitDefID], 
-			UnitDefs[unitDefID].metalCost, 
-			"Guinea Pig", 
-			unitDefID, 
-			chassisData.baseWreckID, 
-			chassisData.baseHeapID, 
-			{},
-			{}
-		)
-	end
 	local profileID = GG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if profileID then
 		local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(profileID)
@@ -425,6 +409,25 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			commProfileInfo.images,
 			profileID
 		)
+		return
+	end
+	
+	if chassisDefByBaseDef[unitDefID] then
+		local chassisData = chassisDefs[chassisDefByBaseDef[unitDefID]]
+		
+		InitializeDynamicCommander(
+			unitID,
+			0, 
+			chassisDefByBaseDef[unitDefID], 
+			UnitDefs[unitDefID].metalCost, 
+			"Guinea Pig", 
+			unitDefID, 
+			chassisData.baseWreckID, 
+			chassisData.baseHeapID, 
+			{},
+			{}
+		)
+		return
 	end
 end
 
