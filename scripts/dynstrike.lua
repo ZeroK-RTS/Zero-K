@@ -590,7 +590,7 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
-	if severity < 0.5 or true then
+	if severity < 0.5 then
 		-- Pointless because deathclone contains head.
 		--Explode(Head, sfxFall)
 		--Hide(Head)
@@ -607,7 +607,16 @@ function script.Killed(recentDamage, maxHealth)
 		dyncomm.SpawnWreck(1)
 	else
 		Explode(Head, sfxFall + sfxFire)
-		Hide(Head)
+		Explode(Stomach, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(ArmLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(ArmRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(HandRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(Gun, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(CalfLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(CalfRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(HipLeft, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(HipRight, sfxFall + sfxFire + sfxSmoke + sfxExplode)
+		Explode(Breast, sfxShatter + sfxExplode)
 		dyncomm.SpawnModuleWrecks(2)
 		dyncomm.SpawnWreck(2)
 	end
