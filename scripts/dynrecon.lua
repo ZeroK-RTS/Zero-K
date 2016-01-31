@@ -519,6 +519,8 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lupleg, x_axis, math.rad(7), math.rad(250))	
 		Turn(lloleg, y_axis, math.rad(21), math.rad(250))	
 		Turn(lfoot, x_axis, math.rad(24), math.rad(250))	
+		
+		InitializeDeathAnimation()
 		Sleep(200) --give time to fall
 		Turn(ruparm, x_axis, math.rad(-48), math.rad(350))	
 		Turn(ruparm, y_axis, math.rad(32), math.rad(350)) --was -32

@@ -624,6 +624,7 @@ do
     end
     --// GET UNIT INFORMATION
     health,maxHealth,paralyzeDamage = GetUnitHealth(unitID)
+	paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage
 	
     local empHP = ((not paralyzeOnMaxHealth) and health) or maxHealth
     emp = (paralyzeDamage or 0)/empHP
@@ -636,7 +637,7 @@ do
   
     --// PARALYZE
 	local stunned, _, inbuild = GetUnitIsStunned(unitID)
-	if (emp>0)and(hp>0)and((not morph) or morph.combatMorph) and (emp<1e8) and (paralyzeDamage >= empHP) then
+	if (emp>0) and ((not morph) or morph.combatMorph) and (emp<1e8) and (paralyzeDamage >= empHP) then
       if (stunned) then
         paraUnits[#paraUnits+1]=unitID
       end
@@ -686,6 +687,7 @@ do
 
     --// GET UNIT INFORMATION
     local health,maxHealth,paralyzeDamage,capture,build = GetUnitHealth(unitID)
+	paralyzeDamage = GetUnitRulesParam(unitID, "real_para") or paralyzeDamage
    --if (not health)    then health=-1   elseif(health<1)    then health=1    end
     if (not maxHealth)or(maxHealth<1) then maxHealth=1 end
     if (not build)     then build=1   end
@@ -693,6 +695,10 @@ do
     local empHP = (not paralyzeOnMaxHealth) and health or maxHealth
     local emp = (paralyzeDamage or 0)/empHP
     local hp  = (health or 0)/maxHealth
+	
+	if Spring.GetUnitIsDead(unitID) then
+		health = false
+	end
     
     if hp < 0 then
         hp = 0
@@ -765,7 +771,7 @@ do
       --// PARALYZE
 	  local paraTime = false
 	  local stunned = GetUnitIsStunned(unitID)
-	  if (emp>0)and(hp>0)and((not morph) or morph.combatMorph)and(emp<1e8) then
+	  if (emp>0) and ((not morph) or morph.combatMorph)and(emp<1e8) then
         local infotext = ""
         stunned = stunned and paralyzeDamage >= empHP
 		if (stunned) then

@@ -401,7 +401,7 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = true
 	Turn(torso, y_axis, 0, math.rad(200))
-	if severity <= .50 then
+	if severity <= 0.5 then
 		Turn(base, x_axis, math.rad(71), math.rad(70))
 		Turn(torso, x_axis, math.rad(-31), math.rad(50))
 		Turn(ruparm, x_axis, math.rad(-41), math.rad(50))
@@ -420,6 +420,8 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(lleg, x_axis, math.rad(20), math.rad(50))
 		Turn(lleg, y_axis, math.rad(28), math.rad(50))
 		Turn(lfoot, x_axis, math.rad(23), math.rad(50))
+		
+		InitializeDeathAnimation()
 		Sleep(800)
 		--EmitSfx(torso, 1027) --impact
 		--StartThread(burn)

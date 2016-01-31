@@ -467,14 +467,16 @@ function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	dead = 1
 	--Turn(turret, y_axis, 0, math.rad(500))
-	if severity <= .5 then
+	if severity <= 0.5 then
 		dyncomm.SpawnModuleWrecks(1)
-	
+		
 		Turn(base, x_axis, math.rad(79), math.rad(80))
 		Turn(rloleg, x_axis, math.rad(25), math.rad(250))	
 		Turn(lupleg, x_axis, math.rad(7), math.rad(250))	
 		Turn(lupleg, y_axis, math.rad(34), math.rad(250))	
 		Turn(lupleg, z_axis, math.rad(-(-9)), math.rad(250))	
+		
+		InitializeDeathAnimation()
 		Sleep(200) --give time to fall
 		Turn(luparm, y_axis, math.rad(18), math.rad(350))	
 		Turn(luparm, z_axis, math.rad(-(-45)), math.rad(350))

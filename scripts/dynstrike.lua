@@ -591,9 +591,10 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity < 0.5 or true then
+		InitializeDeathAnimation()
 		PlayAnimation('die')
-		Explode(Head,SFX.NONE);
-		Hide(Head);
+		Explode(Head,SFX.NONE)
+		Hide(Head)
 		dyncomm.SpawnModuleWrecks(1)
 		dyncomm.SpawnWreck(1)
 	else
