@@ -3,6 +3,7 @@ local legacyToDyncommChassisMap = {
 	corcom = "assault",
 	commrecon = "recon",
 	commsupport = "support",
+	commstrike = "strike",
 	benzcom = "assault",
 	cremcom = "support",
 	support = "support",
