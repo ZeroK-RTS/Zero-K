@@ -141,7 +141,7 @@ local function updateBuildSpeed(unitID, ud, speedFactor)
         state.buildSpeed*speedFactor, -- build
         2*state.buildSpeed*speedFactor, -- repair
         state.buildSpeed*speedFactor, -- reclaim
-        0.4*state.buildSpeed*speedFactor) -- rezz
+        0.5*state.buildSpeed*speedFactor) -- rezz
     
 end
 

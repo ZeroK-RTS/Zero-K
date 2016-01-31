@@ -47,7 +47,7 @@ local modrules  = {
 
 
   resurrect = {
-    energyCostFactor = 2.5,  -- defaults to 0.5
+    energyCostFactor = 2,  -- defaults to 0.5
   },
 
 
