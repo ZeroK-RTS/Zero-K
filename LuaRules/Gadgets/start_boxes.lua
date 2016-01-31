@@ -149,6 +149,11 @@ end
 GG.CheckStartbox = CheckStartbox
 
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
+	if (x == 0 and z == 0) then
+		-- engine default startpos
+		return false
+	end
+
 	if (playerID == 255) then
 		return true -- custom AI, can't know which team it is on so allow it to place anywhere for now and filter invalid positions later
 	end
