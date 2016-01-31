@@ -736,14 +736,14 @@ local moduleDefs = {
 	{
 		name = "module_adv_targeting",
 		humanName = "Advanced Targeting System",
-		description = "Advanced Targeting System - Increases range by 5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
+		description = "Advanced Targeting System - Increases range by 7.5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
 		image = "unitpics/module_adv_targeting.png",
 		limit = 8,
-		cost = 100 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.05
+			sharedData.rangeMult = (sharedData.rangeMult or 1) + 0.075
 			sharedData.speedMult = (sharedData.speedMult or 1) - 0.025
 		end
 	},

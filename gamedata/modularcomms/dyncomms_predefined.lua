@@ -43,9 +43,9 @@ return {
 		modules = {
 			{"commweapon_heavymachinegun", "module_adv_targeting"},
 			{"module_high_power_servos", "module_ablative_armor"},
-			{"commweapon_riotcannon", "commweapon_personal_shield", "bigmodule_ablative_armor"},
-			{"module_dmg_booster", "module_dmg_booster", "bigmodule_ablative_armor"},
-			{"conversion_disruptor","module_dmg_booster", "bigmodule_ablative_armor"},
+			{"commweapon_riotcannon", "commweapon_personal_shield", "module_heavy_armor"},
+			{"module_dmg_booster", "module_dmg_booster", "module_heavy_armor"},
+			{"conversion_disruptor","module_dmg_booster", "module_heavy_armor"},
 		},
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "166"}
