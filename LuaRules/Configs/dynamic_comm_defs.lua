@@ -737,7 +737,7 @@ local moduleDefs = {
 	},
 	{
 		name = "module_adv_targeting",
-		humanName = "Advanced Targeting System",
+		humanName = "Adv. Targeting System",
 		description = "Advanced Targeting System - Increases range by 7.5%, increased weapon weight reduces speed by 2.5%. Limit: 8",
 		image = "unitpics/module_adv_targeting.png",
 		limit = 8,
@@ -917,7 +917,7 @@ local chassisDefs = {
 				upgradeSlots = {
 					{
 						defaultModule = moduleDefNames.commweapon_beamlaser,
-						slotAllows = "adv_weapon",
+						slotAllows = {"adv_weapon", "basic_weapon"},
 					},
 					{
 						defaultModule = moduleDefNames.nullmodule,

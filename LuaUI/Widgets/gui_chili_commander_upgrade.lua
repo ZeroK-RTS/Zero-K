@@ -73,6 +73,8 @@ local currentModuleList
 -- Button for viewing owned modules
 local viewAlreadyOwnedButton
 
+local moduleTextColor = {.8,.8,.8,.9}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- New Module Selection Button Handling
@@ -463,6 +465,17 @@ local function AddCurrentModuleButton(slotIndex, moduleDefID)
 		parent = newButton,
 	}
 	
+	local textBox = Chili.TextBox:New{
+		x      = 64,
+		y      = 10,
+		right  = 8,
+		bottom = 8,
+		valign = "left",
+		text   = moduleData.humanName,
+		font   = {size = 16, outline = true, color = moduleTextColor, outlineWidth = 2, outlineWeight = 2},
+		parent = newButton,
+	}
+	
 	currentModuleButton[slotIndex] = newButton
 end
 
@@ -475,6 +488,7 @@ local function ModuleReplacmentWithButton(slotIndex, moduleDefID)
 	button.tooltip = moduleData.description
 	button.children[1].file = moduleData.image
 	button.children[1]:Invalidate()
+	button.children[2]:SetText(moduleData.humanName)
 	UpdateSlotModule(slotIndex, moduleDefID)
 end
 
@@ -562,6 +576,7 @@ local function CreateMainWindow()
 	local minimapHeight = screenWidth/6 + 45
 	
 	mainWindow = Window:New{
+		name = "ModulesWindow",
 		fontsize = 20,
 		x = 0,  
 		y = minimapHeight, 
