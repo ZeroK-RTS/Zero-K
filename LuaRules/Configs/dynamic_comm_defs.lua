@@ -437,8 +437,8 @@ local moduleDefs = {
 	},
 	{
 		name = "commweapon_napalmgrenade",
-		humanName = "Helfire Grenade",
-		description = "Helfire Grenade",
+		humanName = "Hellfire Grenade",
+		description = "Hellfire Grenade",
 		image = "unitpics/commweapon_napalmgrenade.png",
 		limit = 1,
 		cost = 100 * COST_MULT,
