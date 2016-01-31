@@ -137,24 +137,29 @@ function widget:Update(dt)
 	end
 end
 
-function CommSelection(playerID, commSeries) --receive from start_unit_setup.lua gadget.
+function CommSelection(playerID, unitDefID) --receive from start_unit_setup.lua gadget.
 	--find commander unitDefID, remember commander name
 	--
 	
-	local sixthDefName = commSeries .. " level ".. maxComLevel --used concenatted 'commSeries'
-	local comDefId
-	for id,unitDef in pairs(UnitDefs) do
-		if unitDef.humanName == sixthDefName then
-			comDefId = id
-		end
+	local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
+	if not commProfileDef then
+		return
 	end
-	for i=1, #playerInfo do
+	
+	local commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+	
+	for i = 1, #playerInfo do
 		if playerID == playerInfo[i].playerID then
 			local previousCom = playerInfo[i].comDefName
 			local tableIndex = #playerInfo[i].comDefNamePrvs
 			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
-			playerInfo[i].comDefName = sixthDefName
-			playerInfo[i].comDefId = comDefId
+			playerInfo[i].comDefName = commProfile.name or ""
+			local unitDef = UnitDefNames["dyn" .. (commProfile.chassis or "strike").. "5"]
+			if unitDef and unitDef.id then
+				playerInfo[i].comDefId = unitDef.id
+			else
+				playerInfo[i].comDefId = UnitDefNames["dynstrike5"]
+			end
 		end
 	end
 end

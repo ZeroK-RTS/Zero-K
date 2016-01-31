@@ -392,12 +392,16 @@ end
 
 local function StartUnitPicked(playerID, name)
 	local _,_,spec,teamID = spGetPlayerInfo(playerID)
-	if spec then return end
+	if spec then 
+		return 
+	end
 	teamSides[teamID] = name
 	local startUnit = GetStartUnit(teamID, playerID)
 	if startUnit then
 		if UnitDefNames[startUnit] then
-			Spring.SetTeamRulesParam(teamID, "commChoice", UnitDefNames[startUnit].id)
+			local startUnitDefID = UnitDefNames[startUnit].id
+			Spring.SetTeamRulesParam(teamID, "commChoice", startUnitDefID)
+			SendToUnsynced("CommSelected",playerID, startUnitDefID) --activate an event called "CommSelected" that can be detected in unsynced part
 		else
 			Spring.SetTeamRulesParam(teamID, "commChoice", startUnit)
 		end
@@ -555,7 +559,6 @@ function gadget:RecvLuaMsg(msg, playerID)
 		StartUnitPicked(playerID, side)
 	elseif msg:find("customcomm:",1,true) then
 		local name = msg:sub(12)
-		SendToUnsynced("CommSelected",playerID, name) --activate an event called "CommSelected" that can be detected in unsynced part
 		commChoice[playerID] = name
 		StartUnitPicked(playerID, name)
 	elseif msg:find("ai_commander:",1,true) then
@@ -655,13 +658,13 @@ function gadget:Initialize()
 
 end
   
-function CommSelection(_,playerID,commSeries)
+function CommSelection(_,playerID,unitDefID)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
 		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
 		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
 		if isSpec or myAllyID == eventAllyID then
-			Script.LuaUI.CommSelection(playerID, commSeries) --send to widgets as event
+			Script.LuaUI.CommSelection(playerID, unitDefID) --send to widgets as event
 		end
 	end
 end
