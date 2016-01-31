@@ -68,8 +68,6 @@ local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
 local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
-local startboxString = Spring.GetModOptions().startboxes
-local startboxConfig = startboxString and (loadstring(startboxString)()) or {}
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
