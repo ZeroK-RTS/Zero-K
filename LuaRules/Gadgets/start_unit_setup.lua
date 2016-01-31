@@ -324,6 +324,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
 			Spring.Echo("team " .. teamID .. " valid")
+			if isAI then Spring.Echo("because of isAI") end
+			if Spring.GetTeamRulesParam(teamID, "valid_startpos") then Spring.Echo("because of valid") end
 			x,y,z = Spring.GetTeamStartPosition(teamID)
 			
 			-- clamp invalid positions
