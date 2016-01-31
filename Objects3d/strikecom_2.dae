@@ -8173,7 +8173,7 @@
                   <scale sid="scale">1 1 0.9999999</scale>
                 </node>
                 <node id="UnderGun" name="UnderGun" type="NODE">
-                  <translate sid="location">-0.253376 -1.09188606 1.2</translate>
+                  <translate sid="location">0 -1.09188606 1.2</translate>
                   <rotate sid="rotationZ">0 0 1 1.06722e-7</rotate>
                   <rotate sid="rotationY">0 1 0 1.66753e-7</rotate>
                   <rotate sid="rotationX">1 0 0 1.22487e-13</rotate>

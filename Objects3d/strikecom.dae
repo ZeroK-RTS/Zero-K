@@ -8166,7 +8166,7 @@
                   </bind_material>
                 </instance_geometry>
                 <node id="UnderGun" name="UnderGun" type="NODE">
-                  <translate sid="location">-0.2111464 -0.91886306 1</translate>
+                  <translate sid="location">0 -0.91886306 1</translate>
                   <rotate sid="rotationZ">0 0 1 1.01778e-13</rotate>
                   <rotate sid="rotationY">0 1 0 1.06722e-7</rotate>
                   <rotate sid="rotationX">1 0 0 3.23029e-16</rotate>
