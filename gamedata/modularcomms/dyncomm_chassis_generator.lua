@@ -101,6 +101,7 @@ local statOverrides = {
 	buildcostmetal  = commanderCost,
 	buildcostenergy = commanderCost,
 	buildtime       = commanderCost,
+	power           = 1200,
 }
 
 for i = 1, #chassisDefs do
