@@ -3,10 +3,10 @@ local chassisDefs = {
 		name = "dynstrike1",
 		weapons = {
 			"commweapon_peashooter",
+			"commweapon_beamlaser",
 			"commweapon_lparticlebeam",
 			"commweapon_shotgun",
 			"commweapon_shotgun_disrupt",
-			"commweapon_lparticlebeam",
 			"commweapon_disruptor",
 			"commweapon_heavymachinegun",
 			"commweapon_heavymachinegun_disrupt",
