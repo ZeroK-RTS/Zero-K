@@ -25,6 +25,10 @@ GG.manualStartposConfig = manualStartposConfig
 
 local function CheckStartbox (boxID, x, z)
 	local box = startboxConfig[boxID]
+	if not box then
+		Spring.Echo("validator: global box")
+		return true
+	end
 
 	for i = 1, #box do
 		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
@@ -32,15 +36,20 @@ local function CheckStartbox (boxID, x, z)
 		and cross_product(x, z, x2, z2, x3, z3) <= 0
 		and cross_product(x, z, x3, z3, x1, z1) <= 0
 		) then
+			Spring.Echo("validator: found " .. x .. "/" .. z .. " in triangle:")
+			Spring.Echo(x1 .. "/" .. z1)
+			Spring.Echo(x2 .. "/" .. z2)
+			Spring.Echo(x3 .. "/" .. z3)
 			return true
 		end
 	end
 
+	Spring.Echo("validator: did not find")
 	return false
 end
 
 function gadget:Initialize()
-
+	
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", manualStartposConfig and 1 or 0)
 
@@ -133,6 +142,8 @@ function gadget:Initialize()
 			end
 		end
 	end
+
+	Spring.Echo("validator: configs loaded")
 end
 
 GG.CheckStartbox = CheckStartbox
@@ -145,10 +156,15 @@ function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
+	Spring.Echo("team " .. teamID .. " is asking about " .. x .. "/" .. z)
+	Spring.Echo("inside box " .. boxID)
+	Spring.Echo("middle is " .. Game.mapSizeX/2 .. "/" .. Game.mapSizeZ/2)
 	if (not boxID) or CheckStartbox(boxID, x, z) then
+		Spring.Echo("pos found valid")
 		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
 		return true
 	else
+		Spring.Echo("pos found INvalid")
 		return false
 	end
 end
