@@ -256,35 +256,30 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 local function getMiddleOfStartBox(teamID)
+	local x, z
 	if GG.manualStartposConfig then
 		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-		local startpos = GG.manualStartposConfig[boxID][1]
-
-		local x = startpos[1]
-		local z = startpos[2]
-		local y = Spring.GetGroundHeight(x,z)
-
-		return x, y, z
-	end
-
-	if not startboxString then -- legacy boxes
-		local allyTeam = select(6, spGetTeamInfo(teamID))
-		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
-
-		local x = x1 + (x2 - x1)*0.5
-		local z = z1 + (z2 - z1)*0.5
-		local y = Spring.GetGroundHeight(x,z)
-
-		return x, y, z
+		if not boxID then
+			x = Game.mapSizeX / 2
+			z = Game.mapSizeZ / 2
+		else
+			local startposList = GG.manualStartposConfig[boxID]
+			if not startposList then
+				x = Game.mapSizeX / 2
+				z = Game.mapSizeZ / 2
+			else
+				local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
+				x = startpos[1]
+				z = startpos[2]
+			end
+		end
 	else
-		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-		local box = boxID and GG.startBoxConfig[boxID] or {0,0,1,1}
-		local x = (box[1]+box[3])/2 * Game.mapSizeX
-		local z = (box[2]+box[4])/2 * Game.mapSizeZ
-		local y = Spring.GetGroundHeight(x,z)
-
-		return x, y, z
+		-- shouldnt ever arrive there
+		x = Game.mapSizeX / 2
+		z = Game.mapSizeZ / 2
 	end
+
+	return x, Spring.GetGroundHeight(x,z), z
 end
 
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
