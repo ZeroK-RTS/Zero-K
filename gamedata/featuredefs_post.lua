@@ -32,7 +32,7 @@ local baseModuleWreck = {
 	height			= [[4]],
 	hitdensity		= [[100]],
 	metal			= 40,
-	object			= [[wreck2x2c.s3o]],
+	object			= [[wreck1x1.s3o]],
 	reclaimable		= true,
 	reclaimTime		= 40,
 }

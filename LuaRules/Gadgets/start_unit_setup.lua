@@ -398,10 +398,9 @@ local function StartUnitPicked(playerID, name)
 	teamSides[teamID] = name
 	local startUnit = GetStartUnit(teamID, playerID)
 	if startUnit then
+		SendToUnsynced("CommSelection",playerID, startUnit) --activate an event called "CommSelection" that can be detected in unsynced part
 		if UnitDefNames[startUnit] then
-			local startUnitDefID = UnitDefNames[startUnit].id
-			Spring.SetTeamRulesParam(teamID, "commChoice", startUnitDefID)
-			SendToUnsynced("CommSelected",playerID, startUnitDefID) --activate an event called "CommSelected" that can be detected in unsynced part
+			Spring.SetTeamRulesParam(teamID, "commChoice", UnitDefNames[startUnit].id)
 		else
 			Spring.SetTeamRulesParam(teamID, "commChoice", startUnit)
 		end
@@ -654,17 +653,17 @@ local spGetUnitTeam 	= Spring.GetUnitTeam
 
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction('CommSelected',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
+  gadgetHandler:AddSyncAction('CommSelection',CommSelection) --Associate "CommSelected" event to "WrapToLuaUI". Reference: http://springrts.com/phpbb/viewtopic.php?f=23&t=24781 "Gadget and Widget Cross Communication"
 
 end
   
-function CommSelection(_,playerID,unitDefID)
+function CommSelection(_,playerID, startUnit)
 	if (Script.LuaUI('CommSelection')) then --if there is widgets subscribing to "CommSelection" function then:
 		local isSpec = Spring.GetSpectatingState() --receiver player is spectator?
 		local myAllyID = Spring.GetMyAllyTeamID() --receiver player's alliance?
 		local _,_,_,_, eventAllyID,_,_,_,_ = Spring.GetPlayerInfo(playerID) --source alliance?
 		if isSpec or myAllyID == eventAllyID then
-			Script.LuaUI.CommSelection(playerID, unitDefID) --send to widgets as event
+			Script.LuaUI.CommSelection(playerID, startUnit) --send to widgets as event
 		end
 	end
 end

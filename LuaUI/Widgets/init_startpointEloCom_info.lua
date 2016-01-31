@@ -138,17 +138,29 @@ function widget:Update(dt)
 	end
 end
 
-function CommSelection(playerID, unitDefID) --receive from start_unit_setup.lua gadget.
+function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua gadget.
 	--find commander unitDefID, remember commander name
 	--
-	Spring.Echo("Get CommSelection", playerID, unitDefID, UnitDefs[unitDefID or 1].name, UnitDefs[unitDefID or 1].humanName)
-	local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
-	if not commProfileDef then
+	Spring.Echo("Get CommSelection", playerID, startUnit, UnitDefs[unitDefID or 1].name, UnitDefs[unitDefID or 1].humanName)
+	
+	if not startUnit then
 		return
 	end
 	
-	local commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+	local commProfile
+	if UnitDefNames[startUnit] then
+		local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(UnitDefNames[startUnit].id)
+		if commProfileDef then
+			commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+		end
+	else
+		commProfile = WG.ModularCommAPI.GetCommProfileInfo(startUnit)
+	end
 	
+	if not commProfile then
+		return
+	end
+
 	Spring.Echo("Get CommSelection Profile", commProfile)
 	
 	for i = 1, #playerInfo do
