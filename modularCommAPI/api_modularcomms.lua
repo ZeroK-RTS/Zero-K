@@ -58,6 +58,9 @@ local function LoadCommData()
 		newCommData = {}
 	else
 		commDataRaw = string.gsub(commDataRaw, '_', '=')
+		if collectgarbage then
+			collectgarbage("collect")
+		end
 		commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
 		--Spring.Echo(commDataRaw)
 		commDataFunc, err = loadstring("return "..commDataRaw)
