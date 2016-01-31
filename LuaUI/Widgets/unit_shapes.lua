@@ -539,34 +539,36 @@ local degrot = {}
 local HEADING_TO_RAD = 1/32768*math.pi
 local RADIANS_PER_COBANGLE = math.pi / 32768
 
-local function UpdateunitlistUnderCursorScale(unitlistUnderCursor)
+local function UpdateUnitListScale(unitList)
 	local now = Spring.GetTimer()
-	for i=1, #unitlistUnderCursor do
-		local startScale = unitlistUnderCursor[i].startScale
-		local endScale = unitlistUnderCursor[i].endScale
-		local scaleDuration = unitlistUnderCursor[i].duration
+	for i=1, #unitList do
+		local startScale = unitList[i].startScale
+		local endScale = unitList[i].endScale
+		local scaleDuration = unitList[i].duration
 		if scaleDuration and scaleDuration > 0 then
-			unitlistUnderCursor[i].scale = startScale + math.min(Spring.DiffTimers(now, unitlistUnderCursor[i].startTime) / scaleDuration, 1.0) * (endScale - startScale)
+			unitList[i].scale = startScale + math.min(Spring.DiffTimers(now, unitList[i].startTime) / scaleDuration, 1.0) * (endScale - startScale)
 		elseif startScale then
-			unitlistUnderCursor[i].scale = startScale
-		elseif not unitlistUnderCursor[i].scale then --implicitly allows explicit scale to be set on unitlistUnderCursor entry creation
-			unitlistUnderCursor[i].scale = 1.0
+			unitList[i].scale = startScale
+		elseif not unitList[i].scale then --implicitly allows explicit scale to be set on unitList entry creation
+			unitList[i].scale = 1.0
 		end	
 	end
 end
 
-local function UpdateunitlistUnderCursorRotation(unitlistUnderCursor)
-	for i=1, #unitlistUnderCursor do
-		local unitID = unitlistUnderCursor[i].unitID
+local function UpdateUnitListRotation(unitList)
+	for i=1, #unitList do
+		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		if udid and unitConf[udid].noRotate then
 			degrot[unitID] = 0
 		elseif udid and unitConf[udid].velocityHeading then
 			local vx,_,vz = Spring.GetUnitVelocity(unitID)
-			local speed = vx*vx + vz*vz
-			if speed > 0.25 then
-				local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
-				degrot[unitID] = 180 + velHeading * rad_con	
+			if vx then
+				local speed = vx*vx + vz*vz
+				if speed > 0.25 then
+					local velHeading = Spring.GetHeadingFromVector(vx, vz)*HEADING_TO_RAD
+					degrot[unitID] = 180 + velHeading * rad_con	
+				end
 			end
 		else
 			local heading = (not (spGetUnitIsDead(unitID)) and spGetUnitHeading(unitID) or 0) * RADIANS_PER_COBANGLE
@@ -586,74 +588,112 @@ function widget:Update(dt)
 		cursorIsOn = "self"
 	end
 	
-	UpdateunitlistUnderCursorRotation(visibleSelected)
+	UpdateUnitListRotation(visibleSelected)
 	local teams = Spring.GetTeamList()
 	if Spring.GetSpectatingState() and options.showallyplayercolours.value then
 		for i=1, #teams do
 			if visibleAllySelUnits[teams[i]+1] then
-				UpdateunitlistUnderCursorRotation(visibleAllySelUnits[teams[i]+1])
-				UpdateunitlistUnderCursorScale(visibleAllySelUnits[teams[i]+1])
+				UpdateUnitListRotation(visibleAllySelUnits[teams[i]+1])
+				UpdateUnitListScale(visibleAllySelUnits[teams[i]+1])
 			end
 		end
 	elseif hasVisibleAllySelections then
-		UpdateunitlistUnderCursorRotation(visibleAllySelUnits[1])
-		UpdateunitlistUnderCursorScale(visibleAllySelUnits[1])
+		UpdateUnitListRotation(visibleAllySelUnits[1])
+		UpdateUnitListScale(visibleAllySelUnits[1])
 	end
-	UpdateunitlistUnderCursorRotation(hoveredUnit)
-	UpdateunitlistUnderCursorRotation(visibleBoxed)
+	UpdateUnitListRotation(hoveredUnit)
+	UpdateUnitListRotation(visibleBoxed)
 	
-	UpdateunitlistUnderCursorScale(visibleSelected)
-	UpdateunitlistUnderCursorScale(hoveredUnit)
-	UpdateunitlistUnderCursorScale(visibleBoxed)
+	UpdateUnitListScale(visibleSelected)
+	UpdateUnitListScale(hoveredUnit)
+	UpdateUnitListScale(visibleBoxed)
 end
 
-
-function DrawUnitShapes(unitlistUnderCursor, color)
-	if not unitlistUnderCursor[1] then
-		return
-	end
-
+function SetupUnitShapes()
 	-- To fix Water
 	gl.ColorMask(false,false,false,true)
 	gl.BlendFunc(GL.ONE, GL.ONE)
 	gl.Color(0,0,0,1)
+
+	gl.DepthMask(false)
+	--To fix other stencil effects leaving stencil data in
+	gl.ColorMask(false,false,false,true)
+	gl.StencilFunc(GL.ALWAYS, 0x00, 0xFF)
+	gl.StencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE)
 	-- Does not need to be drawn per Unit .. it covers the whole map
 	gl.CallList(clearquad)
+end
+
+function DrawUnitShapes(unitList, color, underWorld)
+	if not unitList[1] then
+		return
+	end
+
+	-- Setup unit mask for later depth test against only units (don't test against map)
+	-- gl.ColorMask(false,false,false,false)
+	-- gl.DepthTest(GL.LEQUAL)
+	-- gl.PolygonOffset(-1.0,-1.0)
+	-- gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
+	-- gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+	-- local visibleUnits = spGetVisibleUnits(-1, 30, true)
+	-- for i=1, #visibleUnits do
+	-- 	gl.Unit(visibleUnits[i], true)
+	-- end
+	-- gl.DepthTest(false)
 
 	--  Draw selection circles
 	gl.Color(1,1,1,1)
 	gl.Blending(true)
 	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.SRC_ALPHA)
 	gl.ColorMask(false,false,false,true)
+	if underWorld then
+		gl.DepthTest(GL.GREATER)
+	else
+		gl.DepthTest(GL.LEQUAL)
+	end
+	gl.PolygonOffset(-1.0,-1.0)
+	-- gl.StencilMask(0x01)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	for i=1, #unitlistUnderCursor do
-		local unitID = unitlistUnderCursor[i].unitID
+	for i=1, #unitList do
+		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitlistUnderCursor[i].scale
+		local scale = unitList[i].scale
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.select, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
 		end
 	end
+	gl.DepthTest(false)
 
 	--  Here The inner of the selected circles are removed
 	gl.Blending(false)
 	gl.ColorMask(false,false,false,false)
 	gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 	gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
-	for i=1, #unitlistUnderCursor do
-		local unitID = unitlistUnderCursor[i].unitID
+	for i=1, #unitList do
+		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		local unit = unitConf[udid]
-		local scale = unitlistUnderCursor[i].scale
+		local scale = unitList[i].scale
 
 		if (unit) then
 			gl.DrawListAtUnit(unitID, unit.shape.large, false, unit.xscale * scale, 1.0, unit.zscale * scale, degrot[unitID], 0, degrot[unitID], 0)
-			-- gl.Unit(unitID, true)
 		end
 	end
+	-- gl.DepthTest(GL.LEQUAL)
+	-- gl.PolygonOffset(-1.0,-1.0)
+	-- for i=1, #unitList do
+	-- 	local unitID = unitList[i].unitID
+	-- 	gl.Unit(unitID, true)
+	-- end
+	-- gl.PolygonOffset(0.0,0.0)
+	-- gl.DepthTest(GL.LESS)
+	-- for i=1, #visibleUnits do
+	-- 	gl.Unit(visibleUnits[i], true)
+	-- end
+	-- gl.DepthTest(false)
 
 	--  Really draw the Circles now
 	gl.Color(color)
@@ -661,21 +701,24 @@ function DrawUnitShapes(unitlistUnderCursor, color)
 	gl.Blending(true)
 	gl.BlendFuncSeparate(GL.ONE_MINUS_DST_ALPHA, GL.DST_ALPHA, GL.ONE, GL.ONE)
 	gl.StencilFunc(GL.EQUAL, 0x01, 0xFF)
-	gl.StencilOp(GL_KEEP, GL_KEEP, GL.ZERO)
+	gl.StencilOp(GL_KEEP, GL.ZERO, GL.ZERO)
 	gl.CallList(clearquad)
+		gl.PolygonOffset(0.0,0.0)
+	-- gl.StencilMask(0xFF)
 end
 
-function widget:DrawWorldPreUnit()
+local function DrawCircles(underWorld)
 		--if Spring.IsGUIHidden() then return end
 	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
 	
 	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
 		gl.StencilTest(true)
-
 			hoverColor = cursorIsOn == "enemy" and red or (cursorIsOn == "ally" and yellow or teal)
 
-			DrawUnitShapes(visibleSelected, rgba)
+			SetupUnitShapes()
+
+			DrawUnitShapes(visibleSelected, rgba, underWorld)
 			if not Spring.IsGUIHidden() then 
 				local spec, _, fullselect = Spring.GetSpectatingState()
 				if spec and options.showallyplayercolours.value then
@@ -685,21 +728,30 @@ function widget:DrawWorldPreUnit()
 					for i=1, #teams do
 						if visibleAllySelUnits[teams[i]+1] then
 							local r,g,b = Spring.GetTeamColor(teams[i])
-						  DrawUnitShapes(visibleAllySelUnits[teams[i]+1], {r,g,b,1})
+						  DrawUnitShapes(visibleAllySelUnits[teams[i]+1], {r,g,b,1}, underWorld)
 						end
 					end
 				elseif visibleAllySelUnits[1] then
-					DrawUnitShapes(visibleAllySelUnits[1], yellow)
+					DrawUnitShapes(visibleAllySelUnits[1], yellow, underWorld)
 				end
-				DrawUnitShapes(hoveredUnit, hoverColor)
-				DrawUnitShapes(visibleBoxed, hoverColor)
+				DrawUnitShapes(hoveredUnit, hoverColor, underWorld)
+				DrawUnitShapes(visibleBoxed, hoverColor, underWorld)
 			end
 
 		gl.StencilFunc(GL.ALWAYS, 0x0, 0xFF)
 		gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+		gl.StencilTest(false)
 		gl.Blending("reset")
 		gl.Color(1,1,1,1)
 	gl.PopAttrib()
+end
+
+function widget:DrawWorldPreUnit()
+	DrawCircles(true)
+end
+
+function widget:DrawWorld()
+	DrawCircles(false)
 end
 
 
