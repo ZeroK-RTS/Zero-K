@@ -128,7 +128,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_heavymachinegun_disrupt") or "commweapon_heavymachinegun"
+			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_heavymachinegun_disrupt") or "commweapon_heavymachinegun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -150,7 +150,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_hpartillery_napalm") or "commweapon_hpartillery"
+			local weaponName = (modules[moduleDefNames.weaponmod_napalm_warhead] and "commweapon_hpartillery_napalm") or "commweapon_hpartillery"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -172,7 +172,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.flux_amplifier] and "commweapon_lightninggun_improved") or "commweapon_lightninggun"
+			local weaponName = (modules[moduleDefNames.weaponmod_stun_booster] and "commweapon_lightninggun_improved") or "commweapon_lightninggun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -194,7 +194,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_disruptor") or "commweapon_lparticlebeam"
+			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_disruptor") or "commweapon_lparticlebeam"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -237,7 +237,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_riotcannon_napalm") or "commweapon_riotcannon"
+			local weaponName = (modules[moduleDefNames.weaponmod_napalm_warhead] and "commweapon_riotcannon_napalm") or "commweapon_riotcannon"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -259,7 +259,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.napalm_warhead] and "commweapon_rocketlauncher_napalm") or "commweapon_rocketlauncher"
+			local weaponName = (modules[moduleDefNames.weaponmod_napalm_warhead] and "commweapon_rocketlauncher_napalm") or "commweapon_rocketlauncher"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -281,7 +281,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_shotgun_disrupt") or "commweapon_shotgun"
+			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_shotgun_disrupt") or "commweapon_shotgun"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -303,7 +303,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.disruptor_ammo] and "commweapon_heavy_disruptor") or "commweapon_hparticlebeam"
+			local weaponName = (modules[moduleDefNames.conversion_disruptor] and "commweapon_heavy_disruptor") or "commweapon_hparticlebeam"
 			sharedData.weapon1 = weaponName
 			sharedData.weapon2 = nil
 			sharedData.noMoreWeapons = true
@@ -426,7 +426,7 @@ local moduleDefs = {
 			if sharedData.noMoreWeapons then
 				return
 			end
-			local weaponName = (modules[moduleDefNames.flux_amplifier] and "commweapon_multistunner_improved") or "commweapon_multistunner"
+			local weaponName = (modules[moduleDefNames.weaponmod_stun_booster] and "commweapon_multistunner_improved") or "commweapon_multistunner"
 			if not sharedData.weapon1 then
 				sharedData.weapon1 = weaponName
 			else
@@ -500,7 +500,7 @@ local moduleDefs = {
 		image = "unitpics/module_personal_shield.png",
 		limit = 1,
 		cost = 300 * COST_MULT,
-		prohibitingModules = {"personalcloak"},
+		prohibitingModules = {"module_personal_cloak"},
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -516,7 +516,7 @@ local moduleDefs = {
 		cost = 250 * COST_MULT,
 		requireChassis = {"assault", "support"},
 		requireOneOf = {"commweapon_personal_shield"},
-		prohibitingModules = {"personalcloak"},
+		prohibitingModules = {"module_personal_cloak"},
 		requireLevel = 3,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -593,7 +593,7 @@ local moduleDefs = {
 		image = "unitpics/module_personal_cloak.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
-		prohibitingModules = {"commweapon_personal_shield", "commweapon_area)shield"},
+		prohibitingModules = {"commweapon_personal_shield", "commweapon_areashield"},
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -608,7 +608,7 @@ local moduleDefs = {
 		image = "unitpics/module_cloak_field.png",
 		limit = 1,
 		cost = 600 * COST_MULT,
-		requireOneOf = {"radarjammer"},
+		requireOneOf = {"module_jammer"},
 		requireLevel = 3,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -657,7 +657,7 @@ local moduleDefs = {
 		limit = 8,
 		cost = 600 * COST_MULT,
 		requireChassis = {"support"},
-		requireOneOf = {"drone"},
+		requireOneOf = {"module_companion_drone"},
 		requireLevel = 3,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -698,7 +698,7 @@ local moduleDefs = {
 		image = "unitpics/module_heavy_armor.png",
 		limit = 8,
 		cost = 400 * COST_MULT,
-		requireOneOf = {"health"},
+		requireOneOf = {"module_ablative_armor"},
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
