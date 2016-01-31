@@ -343,6 +343,63 @@ local commtypeTable = {
 				},
 			},
 		}
+	}, -- new Strike Comm
+	["7"] = { -- cremcom
+		["0"] = {	-- level
+			back = {
+				{
+					piece = "Breast",
+					height = 10,
+					width = 10,
+					rotation = 180,
+					rotVector = {0,1,0},
+					offset = {0, 14, -23},
+					alpha = 0.6,
+				},
+			},
+			chest = {
+				{
+					piece = "Breast",
+					height = 10,
+					width = 10,
+					rotation = 0,
+					rotVector = {0,0,0},
+					offset = {0, 0, 2},
+					alpha = 0.6,
+				},
+			},
+			overhead = {
+				{
+					piece = "Breast",
+					height = 10,
+					width = 10,
+					rotation = 90,
+					rotVector = {1,0,0},
+					offset = {0, 0, 22},
+					alpha = 0.8,
+				},
+			},			
+			shoulders = {
+				{	
+					piece = "Breast",
+					height = 5,
+					width = 5,
+					rotation = 90,
+					rotVector = {1,0,0},
+					offset = {13, 16, -7},
+					alpha = 0.8,
+				},
+				{	
+					piece = "Breast",
+					height = 5,
+					width = 5,
+					rotation = 90,
+					rotVector = {1,0,0},
+					offset = {-13, 16, -7},
+					alpha = 0.8,
+				},
+			},
+		}
 	},
 }
 
@@ -390,8 +447,9 @@ for commtype = 3, 5, 2 do
 end
 
 -- Make dynamic comm tables.
-commtypeTable[1] = CopyTableToNumber(commtypeTable["3"])
-commtypeTable[2] = CopyTableToNumber(commtypeTable["4"])
-commtypeTable[3] = CopyTableToNumber(commtypeTable["5"])
+commtypeTable[1] = CopyTableToNumber(commtypeTable["7"])
+commtypeTable[2] = CopyTableToNumber(commtypeTable["3"])
+commtypeTable[3] = CopyTableToNumber(commtypeTable["4"])
+commtypeTable[4] = CopyTableToNumber(commtypeTable["5"])
 
 return commtypeTable

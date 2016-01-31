@@ -9,7 +9,7 @@ return {
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 		},
-		--decorations = {"skin_recon_dark", "banner_overhead"},
+		--decorations = {"banner_overhead"},
 		--images = {overhead = "184"}
 	},
 	dyntrainer_recon = {

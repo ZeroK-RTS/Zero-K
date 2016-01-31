@@ -221,22 +221,21 @@ for i = 1, #UnitDefs do
 			addUnit(i,"Misc/Chickens", false)
 		elseif ud.customParams.is_drone then
 			addUnit(i,"Units/Misc", false)
-		elseif (ud.customParams.commtype or ud.customParams.level) then
-			local unitName = ud.name
-			if unitName:sub(6, 8) == "cai" then
-				-- addUnit(i,"Misc/Commanders/CAI", false)
-			elseif unitName:sub(6, 13) == "campaign" then
-				addUnit(i,"Misc/Commanders/Campaign", false)
-			elseif unitName:sub(6, 12) == "trainer" then
-				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
-				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
-			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
-				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
-				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
-			else
-				-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
-			end
+		--elseif (ud.customParams.commtype or ud.customParams.level) then
+		--	local unitName = ud.name
+		--	if unitName:sub(6, 8) == "cai" then
+		--		-- addUnit(i,"Misc/Commanders/CAI", false)
+		--	elseif unitName:sub(6, 13) == "campaign" then
+		--		addUnit(i,"Misc/Commanders/Campaign", false)
+		--	elseif unitName:sub(6, 12) == "trainer" then
+		--		local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
+		--		addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
+		--	elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
+		--		local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
+		--		addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. ud.humanName, false)
+		--	else
+		--		-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
+		--	end
 		end
 	end
 end
