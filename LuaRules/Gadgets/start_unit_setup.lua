@@ -69,7 +69,6 @@ local dotaMode = Spring.GetModOptions().zkmode == "dota"
 local ctfMode = Spring.GetModOptions().zkmode == "ctf"
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
 local startboxString = Spring.GetModOptions().startboxes
-local startboxConfig = startboxString and (loadstring(startboxString)()) or {}
 --Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
@@ -278,7 +277,7 @@ local function getMiddleOfStartBox(teamID)
 		return x, y, z
 	else
 		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-		local box = boxID and startboxConfig[boxID] or {0,0,1,1}
+		local box = (boxID and GG.startBoxConfig[boxID]) or {0,0,1,1}
 		local x = (box[1]+box[3])/2 * Game.mapSizeX
 		local z = (box[2]+box[4])/2 * Game.mapSizeZ
 		local y = Spring.GetGroundHeight(x,z)
