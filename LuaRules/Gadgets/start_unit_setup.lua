@@ -256,23 +256,30 @@ end
 local function getMiddleOfStartBox(teamID)
 	local x, z
 	if GG.manualStartposConfig then
+		Spring.Echo("manual override exists")
 		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 		if not boxID then
+			Spring.Echo("team has no box defined")
 			x = Game.mapSizeX / 2
 			z = Game.mapSizeZ / 2
 		else
+			Spring.Echo("team has a box")
 			local startposList = GG.manualStartposConfig[boxID]
 			if not startposList then
+				Spring.Echo("box itself does not exist")
 				x = Game.mapSizeX / 2
 				z = Game.mapSizeZ / 2
 			else
+				Spring.Echo("box exists, everything should be fine")
 				local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
 				x = startpos[1]
 				z = startpos[2]
+				Spring.Echo("x/z = " .. x .. "/" .. z)
 			end
 		end
 	else
 		-- shouldnt ever arrive there
+		Spring.Echo("impossible")
 		x = Game.mapSizeX / 2
 		z = Game.mapSizeZ / 2
 	end
@@ -312,9 +319,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	local x,y,z
 	local startPosition = luaSetStartPositions[teamID]
 	if not startPosition then
-		if (GG.startBoxConfig and not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI)) or (not GG.startBoxConfig and notAtTheStartOfTheGame and (Game.startPosType == 2)) then
+		if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
+			Spring.Echo("team " .. teamID .. " not valid")
 			x,y,z = getMiddleOfStartBox(teamID)
 		else
+			Spring.Echo("team " .. teamID .. " valid")
 			x,y,z = Spring.GetTeamStartPosition(teamID)
 			
 			-- clamp invalid positions
