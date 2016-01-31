@@ -33,6 +33,8 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
 local ALLY_ACCESS = {allied = true}
 
+local unitCostOverride = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- CONFIG
@@ -87,7 +89,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	if damagedUnits[unitID] then
 		spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
-			spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
+		spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
 	elseif buildTimeChangeNeeded[unitDefID] then
 		spSetUnitCosts(unitID, {buildTime = buildTimeChangeNeeded[unitDefID]})
 	end

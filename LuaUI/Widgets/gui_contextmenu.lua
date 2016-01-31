@@ -607,7 +607,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		if show_range then
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range * (Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1),2) .. " elmo"
+			cells[#cells+1] = numformat(wd.range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -842,7 +842,7 @@ local function printAbilities(ud, unitID)
 
 	if cp.area_cloak or (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) then
 		local areaCloakUpkeep = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_upkeep") or cp.area_cloak_upkeep)
-		local areaCloakRadius = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius") or cp.area_cloak_radius)
+		local areaCloakRadius = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius")) or cp.area_cloak_radius)
 		cells[#cells+1] = 'Area cloak'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Upkeep:'
@@ -854,7 +854,7 @@ local function printAbilities(ud, unitID)
 	end
 
 	if ud.cloakCost > 0 and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
-		local decloakDistance = unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance") or ud.decloakDistance
+		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
 		if ud.speed > 0 then
@@ -1264,7 +1264,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 
 	-- dynamic comms get special treatment
 	if isCommander then
-		cost = Spring.GetUnitRulesParam(unitID, "comm_cost")
+		cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or 1200
 		health = select(2, Spring.GetUnitHealth(unitID))
 		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
 		mass = numformat(Spring.GetUnitRulesParam(unitID, "massOverride") or ud.mass)
