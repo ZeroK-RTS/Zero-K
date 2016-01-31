@@ -49,6 +49,6 @@ BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
 
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
-DEFAULT_UNIT = "dyntrainer_assault_base"
+DEFAULT_UNIT = UnitDefNames["dyntrainer_assault_base"].id
 DEFAULT_UNIT_NAME = "Guardian Trainer"
 

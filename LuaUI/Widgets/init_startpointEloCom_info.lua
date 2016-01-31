@@ -141,8 +141,7 @@ end
 function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua gadget.
 	--find commander unitDefID, remember commander name
 	--
-	Spring.Echo("Get CommSelection", playerID, startUnit, UnitDefs[unitDefID or 1].name, UnitDefs[unitDefID or 1].humanName)
-	
+
 	if not startUnit then
 		return
 	end
@@ -153,15 +152,16 @@ function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua 
 		if commProfileDef then
 			commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
 		end
-	else
-		commProfile = WG.ModularCommAPI.GetCommProfileInfo(startUnit)
+	elseif UnitDefs[startUnit] then
+		local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(UnitDefs[startUnit].id)
+		if commProfileDef then
+			commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+		end
 	end
 	
 	if not commProfile then
 		return
 	end
-
-	Spring.Echo("Get CommSelection Profile", commProfile)
 	
 	for i = 1, #playerInfo do
 		if playerID == playerInfo[i].playerID then
@@ -170,7 +170,7 @@ function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua 
 			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
 			playerInfo[i].comDefName = commProfile.name or ""
 			local unitDef = UnitDefNames["dyn" .. (commProfile.chassis or "strike").. "5"]
-			Spring.Echo("Get CommSelection Chassis", commProfile.chassis )
+			
 			if unitDef and unitDef.id then
 				playerInfo[i].comDefId = unitDef.id
 			else
