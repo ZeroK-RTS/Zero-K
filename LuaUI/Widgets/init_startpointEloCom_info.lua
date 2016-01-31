@@ -73,6 +73,7 @@ function widget:Initialize()
 	--check for gamestart, initialize CommSelection event, get player list, get player info, initialize WG.customTooltip.
 	--
 	
+	Spring.Echo("Local Comm Selection")
 	if Spring.GetGameFrame()>0 then
 		widgetHandler:RemoveWidget()
 		Spring.Echo("\"Comm-n-Elo Startpos. Info\" widget removed after game start.")
@@ -140,13 +141,15 @@ end
 function CommSelection(playerID, unitDefID) --receive from start_unit_setup.lua gadget.
 	--find commander unitDefID, remember commander name
 	--
-	
+	Spring.Echo("Get CommSelection", playerID, unitDefID, UnitDefs[unitDefID or 1].name, UnitDefs[unitDefID or 1].humanName)
 	local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(unitDefID)
 	if not commProfileDef then
 		return
 	end
 	
 	local commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+	
+	Spring.Echo("Get CommSelection Profile", commProfile)
 	
 	for i = 1, #playerInfo do
 		if playerID == playerInfo[i].playerID then
@@ -155,6 +158,7 @@ function CommSelection(playerID, unitDefID) --receive from start_unit_setup.lua 
 			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
 			playerInfo[i].comDefName = commProfile.name or ""
 			local unitDef = UnitDefNames["dyn" .. (commProfile.chassis or "strike").. "5"]
+			Spring.Echo("Get CommSelection Chassis", commProfile.chassis )
 			if unitDef and unitDef.id then
 				playerInfo[i].comDefId = unitDef.id
 			else
