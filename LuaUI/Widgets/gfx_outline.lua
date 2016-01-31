@@ -326,7 +326,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function DrawVisibleUnits(overrideEngineDraw)
+local function DrawVisibleUnits(overrideEngineDraw, perUnitStencil)
   if (Spring.GetGameFrame() % 15 == 0) then
         checknow = true
   end
@@ -343,7 +343,25 @@ local function DrawVisibleUnits(overrideEngineDraw)
     end
  
     if not unbuiltUnits[visibleUnits[i]] then
+      if perUnitStencil then
+        gl.Clear(GL.STENCIL_BUFFER_BIT)
+        gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
+        gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
+        gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
+        glUnit(visibleUnits[i],true)
+        gl.StencilFunc(GL.NOTEQUAL, 0x01, 0xFF)
+        gl.StencilOp(GL.KEEP, GL.KEEP, GL.KEEP)
+        gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
+        gl.DepthMask(true)
+      end
       glUnit(visibleUnits[i],overrideEngineDraw)
+      if perUnitStencil then
+        gl.DepthMask(false)
+        gl.StencilFunc(GL.ALWAYS, 0, 0xFF); 
+        gl.StencilOp(GL.REPLACE, GL.REPLACE, GL.REPLACE)
+        gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+        gl.Unit(visibleUnits[i],true)
+      end
     end
   end
 end
@@ -358,30 +376,38 @@ local MyDrawVisibleUnits = function()
   glPopMatrix()
 end
 
-local DrawVisibleUnitsLines = function(underwater) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
+local DrawVisibleUnitsLines = function(underwater, frontLines) --This is expected to be a shader-less fallback for low-end machines, though it also works for refraction pass
 
   gl.DepthTest(GL.LESS)
   if underwater then
-    gl.LineWidth(4.0 * thickness)
+    gl.LineWidth(3.0 * thickness)
     gl.PolygonOffset(8.0, 4.0)
   else
-    gl.LineWidth(4.0 * thickness)
+    if options.lowQualityOutlines.value then
+      gl.LineWidth(4.0 * thickness)
+    end
+    if frontLines then
+      gl.LineWidth(3.0 * thickness)
+      gl.PolygonOffset(10.0, 5.0)
+    end
   end
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.LINE)
   gl.Culling(GL.FRONT)
-  gl.DepthMask(false)
+  -- gl.DepthMask(false)
   glColor(0,0,0,1)
 
   glPushMatrix()
   glResetMatrices()
-  DrawVisibleUnits(true)
+  -- gl.StencilTest(true)
+  DrawVisibleUnits(true)--, true)
+  -- gl.StencilTest(false)
   glPopMatrix()
 
   gl.LineWidth(1.0)
   glColor(1,1,1,1)
   gl.Culling(false)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
-  gl.DepthTest(GL.LESS)
+  gl.DepthTest(false)
 
   if underwater then
     gl.PolygonOffset(0.0, 0.0)
@@ -403,6 +429,9 @@ end
 function widget:DrawWorldPreUnit()
   if (options.lowQualityOutlines.value or forceLowQuality) then
     DrawVisibleUnitsLines(false)
+    gl.DepthMask(true)
+    DrawVisibleUnitsLines(false, true)
+    gl.DepthMask(false)
   else
     glCopyToTexture(depthtex, 0, 0, 0, 0, vsx, vsy)
     glTexture(depthtex)
@@ -430,6 +459,10 @@ function widget:DrawWorldPreUnit()
     glTexture(offscreentex)
     glTexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
     glCallList(leave2d)
+
+    gl.DepthMask(true)
+    DrawVisibleUnitsLines(false, true)
+    gl.DepthMask(false)
   end
 end
 
