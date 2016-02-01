@@ -3858,11 +3858,20 @@ local function setAllyteamStartLocations(allyTeam)
 
 		if GG.manualStartposConfig then
 			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-			local boxConfig = GG.manualStartposConfig[boxID]
+			if boxID then
+				local boxConfig = GG.manualStartposConfig[boxID]
+				if boxConfig and boxConfig[1] then
+					for i = 1, listOfAis.count do
+						local team = listOfAis.data[i]
+						local startpos = boxConfig[i] or boxConfig[1]
+						GG.SetStartLocation (team, startpos[1], startpos[2])
+					end
+					return
+				end
+			end
 			for i = 1, listOfAis.count do
 				local team = listOfAis.data[i]
-				local startpos = boxConfig[i] or boxConfig[1]
-				GG.SetStartLocation (team, startpos[1], startpos[2])
+				GG.SetStartLocation (team, math.random(1, Game.mapSizeX-1), math.random(1, Game.mapSizeZ-1))
 			end
 			return
 		end
