@@ -64,7 +64,7 @@ else
 			err = commData
 			commData = {}
 		else
-			commData = legacyTranslators.TranslateModoption(commData)
+			--commData = legacyTranslators.TranslateModoption(commData)
 		end
 	end
 end
