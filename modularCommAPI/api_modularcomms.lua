@@ -11,7 +11,7 @@ local function GetInfo()
 		layer     = 0,
 		api       = true,
 		enabled   = true,
-		--alwaysStart = true,
+		alwaysStart = true,
 	}
 end
 
