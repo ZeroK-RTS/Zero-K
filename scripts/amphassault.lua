@@ -155,7 +155,7 @@ local gunPieces = {
 local gun_1 = 0
 local beamCount = 0
 
-local SPEED = 1.9
+local SPEED = 2
 
 local function Walk()
 	Signal(SIG_WALK)

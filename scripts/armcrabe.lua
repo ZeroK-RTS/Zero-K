@@ -37,7 +37,7 @@ local SIG_MOVE = 2
 local SIG_AIM1 = 4
 local SIG_AIM2 = 8
 
-local PACE = 1.2
+local PACE = 2.4
 
 local legRaiseSpeed = math.rad(45)*PACE
 local legRaiseAngle = math.rad(20)
@@ -46,7 +46,7 @@ local legLowerSpeed = math.rad(50)*PACE
 local legForwardSpeed = math.rad(40)*PACE
 local legForwardAngle = -math.rad(20)
 local legBackwardSpeed = math.rad(35)*PACE
-local legBackwardAngle = math.rad(25)
+local legBackwardAngle = math.rad(45)
 local legBackwardAngleMinor = math.rad(10)
 
 --------------------------------------------------------------------------------
@@ -117,12 +117,12 @@ local function Curl()
 	Sleep(100)
 	bCurling = true
 	--Spring.Echo("slowing down", Spring.GetGameFrame())
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
-	--GG.UpdateUnitAttributes(unitID)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.05)
+	GG.UpdateUnitAttributes(unitID)
 
-	Move(canon, y_axis, 5, 2.5)
+	Move(canon, y_axis, 5, 1.5)
 	Move(base, y_axis, -5, 2.5)
-	Move(base, z_axis, -5, 2.5)
+	Move(base, z_axis, -1, 2.5)
 	
 	Turn(leg1, y_axis, math.rad(45), math.rad(35))
 	Turn(leg4, y_axis, math.rad(-45), math.rad(35))
@@ -150,7 +150,7 @@ local function Curl()
 	WaitForTurn(leg2, x_axis)
 	WaitForTurn(leg3, x_axis)
 	WaitForTurn(leg4, x_axis)
-		
+	
  	bCurling = false
 	Spring.SetUnitArmored(unitID,true)
 end
@@ -198,8 +198,8 @@ local function Uncurl()
 	WaitForTurn(leg4, x_axis)
 	
 	--Spring.Echo("speeding up", Spring.GetGameFrame())
-	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	--GG.UpdateUnitAttributes(unitID)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	GG.UpdateUnitAttributes(unitID)
 	bCurling = false
 end
 

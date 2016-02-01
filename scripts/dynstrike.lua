@@ -287,7 +287,7 @@ end
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 3.6
+local PACE = 3.8
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 local PACE = PACE * VELOCITY/BASE_VELOCITY
