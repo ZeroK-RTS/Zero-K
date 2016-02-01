@@ -625,7 +625,7 @@ local moduleDefs = {
 	{
 		name = "module_resurrect",
 		humanName = "Lazarus Device",
-		description = "Lazarus Device - Upgrade nanolathe to allow resurrection. Halves build power.",
+		description = "Lazarus Device - Upgrade nanolathe to allow resurrection.",
 		image = "unitpics/module_resurrect.png",
 		limit = 1,
 		cost = 400 * COST_MULT,
