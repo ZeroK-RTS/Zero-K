@@ -173,14 +173,14 @@ end
 local function GetStartUnit(teamID, playerID, isAI)
 
 	if Spring.GetModOption("forcejunior", true, false) then
-		return "commbasic"
+		return UnitDefNames["commbasic"].id
 	end
 
 	local startUnit
 	local commProfileID = nil
 
 	if isAI then -- AI that didn't pick comm type gets default comm
-		return Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault_base"
+		return UnitDefNames[Spring.GetTeamRulesParam(teamID, "start_unit") or "dyntrainer_assault_base"].id
 	end
 
 	if (teamID and teamSides[teamID]) then 
