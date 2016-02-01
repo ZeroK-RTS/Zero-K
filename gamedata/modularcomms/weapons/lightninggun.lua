@@ -2,6 +2,7 @@ local name = "commweapon_lightninggun"
 local weaponDef = {
 	name                    = [[Lightning Gun]],
 	areaOfEffect            = 8,
+	beamTTL                 = 12,
 	craterBoost             = 0,
 	craterMult              = 0,
 

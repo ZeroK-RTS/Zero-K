@@ -31,17 +31,14 @@ function DynamicApplyWeapon(unitDef, weapon, slot)
 	local wcp = weapons[weapon].customparams
 	
 	unitDef.weapons = unitDef.weapons or {}
-	unitDef.weapondefs = unitDef.weapondefs or {}
+	--unitDef.weapondefs = unitDef.weapondefs or {}
 	
 	unitDef.weapons[slot] = {
 		def = weapon,
 		badtargetcategory = wcp.badtargetcategory or [[FIXEDWING]],
 		onlytargetcategory = wcp.onlytargetcategory or [[FIXEDWING LAND SINK SHIP SWIM FLOAT GUNSHIP HOVER]],
 	}
-	unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
-
-	-- upgrade by level -- no longer used
-	local wd = unitDef.weapondefs[weapon]
+	--unitDef.weapondefs[weapon] = CopyTable(weapons[weapon], true)
 
 	-- add CEGs
 	unitDef.sfxtypes = unitDef.sfxtypes or {}
@@ -145,14 +142,24 @@ function ModifyWeaponRange(unitDef, factor, includeCustomParams)
 end
 
 function ModifyWeaponDamage(unitDef, factor, includeCustomParams)
-	local weapons = unitDef.weapondefs or {}
-	for i,v in pairs(weapons) do
-		local mod = factor
-		if includeCustomParams and v.customparams then
-			mod = mod + (v.customparams.damagemod or 0)
+	if unitDef.customparams.dynamic_comm then
+		-- Change the name of the used weapon.
+		local damageMod = (unitDef.customparams.damagemod or 0)
+		for i,v in pairs(unitDef.weapons) do
+			v.name = damageMod .. "_" .. v.def
+			v.def = nil
 		end
-		for armorname, dmg in pairs(v.damage) do
-			v.damage[armorname] = dmg + dmg * mod
+	else
+		-- Modify weapons which are included in unitdef
+		local weapons = unitDef.weapondefs or {}
+		for i,v in pairs(weapons) do
+			local mod = factor
+			if includeCustomParams and v.customparams then
+				mod = mod + (v.customparams.damagemod or 0)
+			end
+			for armorname, dmg in pairs(v.damage) do
+				v.damage[armorname] = dmg + dmg * mod
+			end
 		end
 	end
 end

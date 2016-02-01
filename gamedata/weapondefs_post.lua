@@ -14,6 +14,16 @@
 
 local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
+Spring.Echo("Loading WeaponDefs_posts")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+--  Dynamic Comms
+--
+
+VFS.Include('gamedata/modularcomms/weapondefgen.lua')
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -329,6 +339,10 @@ do
       for i, weapon in pairs(ud.weapons) do
 		--Spring.Echo(ud.name)
         local wd = WeaponDefs[weapon.name:lower()]
+		if not wd then
+			Spring.Echo("Weapon Def Missing", weapon.name)
+			return true
+		end
         if ((not (wd.weapontype == "Shield")) and 
             (not wd.interceptor)) then
           return true

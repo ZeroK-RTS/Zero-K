@@ -477,9 +477,15 @@ upgrades = {
 		name = "Damage Booster",
 		description = "Increases damage of all weapons by 10%",
 		func = function(unitDef)
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					v.customparams.damagemod = (v.customparams.damagemod or 0) + 0.1
+				if unitDef.customparams.dynamic_comm then
+					-- Weapondefs are static
+					unitDef.customparams.damagemod = (unitDef.customparams.damagemod or 0) + 1
+				else
+					-- Weapondefs stored in unitdef
+					local weapons = unitDef.weapondefs or {}
+					for i,v in pairs(weapons) do
+						v.customparams.damagemod = (v.customparams.damagemod or 0) + 0.1
+					end
 				end
 			end,	
 	},

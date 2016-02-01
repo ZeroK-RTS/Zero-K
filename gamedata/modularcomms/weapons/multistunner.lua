@@ -3,6 +3,7 @@ local weaponDef = {
 	name                    = [[Multi-Stunner]],
 	areaOfEffect            = 144,
 	avoidFeature            = false,
+	beamTTL                 = 12,
 	burst                   = 16,
 	burstRate               = 0.1875,
 	commandFire             = true,

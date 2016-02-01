@@ -13,6 +13,8 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+Spring.Echo("Loacing FeatureDefs_posts")
+
 local function isbool(x)   return (type(x) == 'boolean') end
 local function istable(x)  return (type(x) == 'table')   end
 local function isnumber(x) return (type(x) == 'number')  end

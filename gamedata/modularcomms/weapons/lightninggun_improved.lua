@@ -2,6 +2,7 @@ local name = "commweapon_lightninggun_improved"
 local weaponDef = {
 	name                    = [[Heavy Lightning Gun]],
 	areaOfEffect            = 8,
+	beamTTL                 = 12,
 	craterBoost             = 0,
 	craterMult              = 0,
 

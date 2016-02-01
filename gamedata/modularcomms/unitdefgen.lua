@@ -358,6 +358,7 @@ for name, data in pairs(commDefs) do
 	-- apply intrinsic bonuses
 	local damBonus = data.customparams.damagebonus or 0
 	ModifyWeaponDamage(data, damBonus, true)
+	
 	local rangeBonus =  data.customparams.rangebonus or 0
 	ModifyWeaponRange(data, rangeBonus, true)
 

@@ -235,10 +235,11 @@ local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, p
 	end
 	
 	for copies = 0, levelLimits[moduleType] do
+		local newModules = Spring.Utilities.CopyTable(modules)
 		for m = 1, copies do
-			modules[#modules + 1] = moduleNames[moduleType]
+			newModules[#newModules + 1] = moduleNames[moduleType]
 		end
-		MakeClones(levelLimits, moduleNames, fullChassisName, unitName .. copies, power, Spring.Utilities.CopyTable(modules), moduleType + 1)
+		MakeClones(levelLimits, moduleNames, fullChassisName, unitName .. copies, power, newModules, moduleType + 1)
 	end
 end
 

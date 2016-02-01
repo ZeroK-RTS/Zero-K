@@ -38,6 +38,7 @@ end
 
 local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
+Spring.Echo("Loading UnitDefs_posts")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
