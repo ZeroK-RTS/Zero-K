@@ -394,11 +394,11 @@ local function RestoreLegs()
 	Turn(FootRight, x_axis, 0, 2.5)
 	
 	if not aiming then
-		Turn(ArmLeft, x_axis, 0, 2)
-		Turn(Gun, x_axis, 0, 2)
+		Turn(ArmLeft, x_axis, math.rad(-5), 2)
+		Turn(Gun, x_axis, math.rad(-5), 2)
 		
-		Turn(ArmRight, x_axis, 0, 2)
-		Turn(HandRight, x_axis, 0, 2)
+		Turn(ArmRight, x_axis, math.rad(-5), 2)
+		Turn(HandRight, x_axis, math.rad(-5), 2)
 	
 		Turn(Stomach, z_axis, 0, 1)
 	end
@@ -453,8 +453,8 @@ local function RestoreRightAim(sleepTime)
 	SetSignalMask(SIG_RESTORE_RIGHT)
 	Sleep(sleepTime or RESTORE_DELAY)
 	if not nanoing then
-		Turn(ArmRight, x_axis, 0, ARM_SPEED_PITCH)
-		Turn(HandRight, x_axis, 0, ARM_SPEED_PITCH)
+		Turn(ArmRight, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+		Turn(HandRight, x_axis, math.rad(-5), ARM_SPEED_PITCH)
 	end
 end
 
@@ -463,8 +463,8 @@ local function RestoreLeftAim(sleepTime)
 	Signal(SIG_RESTORE_LEFT)
 	SetSignalMask(SIG_RESTORE_LEFT)
 	Sleep(sleepTime or RESTORE_DELAY)
-	Turn(ArmLeft, x_axis, 0, ARM_SPEED_PITCH)
-	Turn(Gun, x_axis, 0, ARM_SPEED_PITCH)
+	Turn(ArmLeft, x_axis, math.rad(-5), ARM_SPEED_PITCH)
+	Turn(Gun, x_axis, math.rad(-5), ARM_SPEED_PITCH)
 end
 
 local function AimArm(heading, pitch, arm, hand, wait)
@@ -473,7 +473,7 @@ local function AimArm(heading, pitch, arm, hand, wait)
 	Turn(Stomach, z_axis, heading, TORSO_SPEED_YAW)
 	Turn(hand, x_axis, -pitch/2 - 0.85, ARM_SPEED_PITCH)
 	if wait then
-		WaitForTurn(Stomach, y_axis)
+		WaitForTurn(Stomach, z_axis)
 		WaitForTurn(arm, x_axis)
 	end
 end
@@ -497,8 +497,10 @@ function script.AimWeapon(num, heading, pitch)
 		AimArm(heading, pitch, ArmRight, HandRight, true)
 		StartThread(RestoreRightAim)
 		return true
+	elseif weaponNum == 3 then
+		return true
 	end
-	return (weaponNum and true) or false
+	return false
 end
 
 function script.FireWeapon(num)

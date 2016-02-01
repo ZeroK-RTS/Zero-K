@@ -35,6 +35,7 @@ local weaponDef = {
 	interceptedByShieldType = 2,
 	leadLimit               = 0.0,
 	model                   = [[wep_m_phoenix.s3o]],
+    noSelfDamage            = false,
 	predictBoost            = 0.0,
 	range                   = 700,
 	reloadtime              = 30,

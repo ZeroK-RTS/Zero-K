@@ -40,10 +40,10 @@ local function CalculatePaceMult()
 	local levelToPace = {
 		[0] = 1,
 		[1] = 1,
-		[2] = 0.93,
-		[3] = 0.86,
-		[4] = 0.8,
-		[5] = 0.75,
+		[2] = 0.94,
+		[3] = 0.88,
+		[4] = 0.85,
+		[5] = 0.8,
 	}
 	
 	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
