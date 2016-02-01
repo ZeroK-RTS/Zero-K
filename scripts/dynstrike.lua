@@ -585,6 +585,9 @@ function script.Create()
         end
     end
     
+    Turn(Muzzle, z_axis, math.rad(180))
+    Turn(UnderMuzzle,z_axis, math.rad(180))
+	
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(SmokeUnit, smokePiece)
