@@ -567,7 +567,7 @@ function gadget:RecvLuaMsg(msg, playerID)
 			if (aihost == playerID) then -- it's actually controlled by the local host
 				local unitDef = UnitDefNames[name];
 				if unitDef then -- the requested unit actually exists
-					if aiCommanders[unitDef] then
+					if aiCommanders[unitDef.id] then
 						Spring.SetTeamRulesParam(teamID, "start_unit", name);
 					end
 				end
