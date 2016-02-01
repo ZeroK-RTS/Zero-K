@@ -585,8 +585,8 @@ function script.Create()
         end
     end
     
-    Turn(Muzzle, z_axis, math.rad(180))
-    Turn(UnderMuzzle,z_axis, math.rad(180))
+    Turn(Muzzle, x_axis, math.rad(180))
+    Turn(UnderMuzzle,x_axis, math.rad(180))
 	
 	dyncomm.Create()
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
