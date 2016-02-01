@@ -53,7 +53,7 @@ local function WriteTooltip(profileID)
 	local commData = WG.ModularCommAPI.GetCommProfileInfo(profileID)
 	local str = ''
 	for i=1,#commData.modules do
-		str = str .. "\nLEVEL "..(i).. " (".."??".." metal)\n\tModules:"	-- TODO calculate metal cost
+		str = str .. "\nLEVEL "..(i + 1) .. "\n\tModules:"	-- TODO calculate metal cost
 		for j, modulename in pairs(commData.modules[i]) do
 			if moduleDefNames[modulename] then
 				local moduleDef = moduleDefs[moduleDefNames[modulename]]
