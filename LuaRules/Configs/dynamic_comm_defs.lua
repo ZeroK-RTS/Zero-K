@@ -827,7 +827,7 @@ local function GetSupportCloneModulesString(modulesByDefID)
 	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
 		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
-		(modulesByDefID[moduleDefNames.resurrect] or 0)
+		(modulesByDefID[moduleDefNames.module_resurrect] or 0)
 end
 
 local function GetAssaultCloneModulesString(modulesByDefID)

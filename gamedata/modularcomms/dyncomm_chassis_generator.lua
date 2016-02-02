@@ -69,7 +69,6 @@ local chassisDefs = {
 			"commweapon_beamlaser",
 			"commweapon_heatray",
 			"commweapon_heavymachinegun",
-			"commweapon_heavymachinegun_disrupt",
 			"commweapon_flamethrower",
 			"commweapon_rocketlauncher",
 			"commweapon_rocketlauncher_napalm",
@@ -78,6 +77,7 @@ local chassisDefs = {
 			"commweapon_riotcannon",
 			"commweapon_riotcannon_napalm",
 			"commweapon_disintegrator",
+			"commweapon_napalmgrenade",
 			"commweapon_slamrocket",
 			"commweapon_clusterbomb",
 			-- Space for shield

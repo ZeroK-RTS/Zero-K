@@ -318,6 +318,7 @@ local custom_cmd_actions = {
 	buildprev=1,
 	areaguard=1,
 	dropflag=3,
+	upgradecomm=3,
 	
 	-- terraform
 	rampground=1,
