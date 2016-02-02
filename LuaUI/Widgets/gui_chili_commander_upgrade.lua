@@ -181,6 +181,7 @@ local function CreateModuleSelectionWindow()
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
+		dockable = true,
 		tweakDraggable = true,
 		tweakResizable = true,
 		color = {0,0,0,0},
@@ -255,6 +256,7 @@ local function ShowModuleSelection(moduleSet, supressButton)
 	panel.columns = columns
 	window:Resize(columns*BUTTON_SIZE + 10, rows*BUTTON_SIZE + 10)
 	fakeWindow:Resize(columns*BUTTON_SIZE + 10, rows*BUTTON_SIZE + 10)
+	window.dockable = false -- Stop docking from preventing size change.
 	
 	-- Display window if not already shown
 	if not selectionWindow.windowShown then
@@ -572,8 +574,10 @@ local function HideMainWindow()
 end
 
 local function CreateMainWindow()
-	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local minimapHeight = screenWidth/6 + 45
+	
+	local mainHeight = math.min(420, math.max(325, screenHeight - 450))
 	
 	mainWindow = Window:New{
 		name = "ModulesWindow",
@@ -581,12 +585,13 @@ local function CreateMainWindow()
 		x = 0,  
 		y = minimapHeight, 
 		clientWidth = 200,
-		clientHeight = 400,
-		minWidth = 100,
-		minHeight = 350,	
+		clientHeight = 325,
+		minWidth = 200,
+		minHeight = 325,	
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
+		dockable = true,
 		tweakDraggable = true,
 		tweakResizable = true,
 		parent = screen0,
