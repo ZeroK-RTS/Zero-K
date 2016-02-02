@@ -95,7 +95,6 @@ local teamSides = {} -- sides selected ingame from widgets - per teams
 
 local playerIDsByName = {}
 local commChoice = {}
-local customKeys = {}	-- [playerID] = {}
 
 --local prespawnedCommIDs = {}	-- [teamID] = unitID
 
@@ -519,8 +518,10 @@ function gadget:GameStart()
 			playerlist = workAroundSpecsInTeamZero(playerlist, team)
 			if playerlist then
 				for i = 1, #playerlist do
-					if customKeys[playerlist[i]] and customKeys[playerlist[i]].extracomm then
-						for j = 1, tonumber(customKeys[playerlist[i]].extracomm) do
+					local customKeys = select(10, Spring.GetPlayerInfo(playerlist[i]))
+					if customKeys and customKeys.extracomm then
+						for j = 1, tonumber(customKeys.extracomm) do
+						Spring.Echo("Spawing a commander")
 							SpawnStartUnit(team, playerlist[i], false, true)
 						end
 					end
@@ -598,8 +599,9 @@ function gadget:GameFrame(n)
 
 			if (canSpawn) then
 				-- extra comms
-				if playerID and customKeys[playerID] and customKeys[playerID].extracomm then
-					for j=1, tonumber(customKeys[playerID].extracomm) do
+				local customKeys = select(10, playerID)
+				if playerID and customKeys and customKeys.extracomm then
+					for j=1, tonumber(customKeys.extracomm) do
 						SpawnStartUnit(teamID, playerID, false, true, true)
 					end
 				end

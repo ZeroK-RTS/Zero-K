@@ -94,6 +94,22 @@ local function TranslateModoption(legacy)
 	return sorted
 end
 
+local function FixOverheadIcon(legacy)
+	if not legacy then
+		return
+	end
+	
+	for name, data in pairs(legacy) do
+		if data.decorations and data.decorations.icon_overhead then
+			data.images = data.images or {}
+			data.images.overhead = data.decorations.icon_overhead.image
+			data.decorations.icon_overhead = nil
+			data.decorations[#data.decorations + 1] = "banner_overhead"
+		end
+	end
+	return legacy
+end
+
 local function TranslatePlayerCustomkeys(legacy)
 	if not legacy then
 		return
@@ -109,6 +125,7 @@ end
 
 return {
 	TranslateModoption = TranslateModoption,
+	FixOverheadIcon = FixOverheadIcon,
 	TranslatePlayerCustomkeys = TranslatePlayerCustomkeys,
 	legacyToDyncommChassisMap = legacyToDyncommChassisMap
 }

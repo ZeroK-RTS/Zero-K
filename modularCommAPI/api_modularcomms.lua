@@ -76,7 +76,7 @@ local function LoadCommData()
 		Spring.Log(GetInfo().name, "warning", 'Modular Comms API warning: ' .. err)
 	end
 	
-	--newCommProfilesByProfileID = legacyTranslators.TranslateModoption(newCommProfilesByProfileID)
+	newCommProfilesByProfileID = legacyTranslators.FixOverheadIcon(newCommProfilesByProfileID)
 	
 	-- comm player entries
 	local commProfilesForPlayers = {}	-- {[playerID1] = {}, [playerID2] = {}}
