@@ -14,45 +14,46 @@ end
 include "LuaRules/Configs/start_setup.lua"
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
-  if not gadgetHandler:IsSyncedCode() then
-    return false -- no unsynced code
-  end
+	if not gadgetHandler:IsSyncedCode() then
+		return false -- no unsynced code
+	end
 
-  local ploppableDefs = {}
-  
-  function gadget:Initialize()
-    for _, teamID in ipairs(Spring.GetTeamList()) do
-      Spring.SetTeamResource(teamID, "es", START_STORAGE + OVERDRIVE_BUFFER)
-      Spring.SetTeamResource(teamID, "ms", START_STORAGE)
-    end
-    for i, v in pairs(ploppables) do
-      local name = UnitDefNames[v]
-      if name then
-        local ud = name.id
-        if ud then
-          ploppableDefs[ud] = true
-        end
-      end
-    end
-  end
+	local ploppableDefs = {}
 
-  function GG.SetStartLocation() end
+	function gadget:Initialize()
+		for _, teamID in ipairs(Spring.GetTeamList()) do
+			Spring.SetTeamResource(teamID, "es", START_STORAGE + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(teamID, "ms", START_STORAGE)
+		end
+		for i, v in pairs(ploppables) do
+			local name = UnitDefNames[v]
+			if name then
+				local ud = name.id
+				if ud then
+					ploppableDefs[ud] = true
+				end
+			end
+		end
+	end
 
-  function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
-  	Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
-  end
+	function GG.SetStartLocation() 
+	end
 
-  function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-    if ploppableDefs[unitDefID] and builderID and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
-      Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
-      local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-      Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
-      local x,y,z = Spring.GetUnitPosition(unitID)
-      Spring.SpawnCEG("gate", x, y, z)
-    end
-  end
-  
-  return
+	function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
+		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
+	end
+
+	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+		if ploppableDefs[unitDefID] and builderID and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+			Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+			local maxHealth = select(2,Spring.GetUnitHealth(unitID))
+			Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
+			local x,y,z = Spring.GetUnitPosition(unitID)
+			Spring.SpawnCEG("gate", x, y, z)
+		end
+	end
+
+	return
 end
 
 --------------------------------------------------------------------------------
@@ -141,33 +142,31 @@ end
 
 
 function gadget:Initialize()
-  -- self linking
-
-    for i, v in pairs(ploppables) do
-      local name = UnitDefNames[v]
-      if name then
-        local ud = name.id
-        if ud then
-          ploppableDefs[ud] = true
-        end
-      end
-    end
-
-  -- needed if you reload luarules
-  local frame = Spring.GetGameFrame()
-  if frame and frame > 0 then
-    gamestart = true
-  end
-  
-  InitUnsafe()
-  local allUnits = Spring.GetAllUnits()
-  for _, unitID in pairs(allUnits) do
-	local udid = Spring.GetUnitDefID(unitID)
-	if udid then
-		gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+-- self linking
+	for i, v in pairs(ploppables) do
+		local name = UnitDefNames[v]
+		if name then
+			local ud = name.id
+			if ud then
+				ploppableDefs[ud] = true
+			end
+		end
 	end
-  end
 
+	-- needed if you reload luarules
+	local frame = Spring.GetGameFrame()
+	if frame and frame > 0 then
+		gamestart = true
+	end
+
+	InitUnsafe()
+	local allUnits = Spring.GetAllUnits()
+	for _, unitID in pairs(allUnits) do
+		local udid = Spring.GetUnitDefID(unitID)
+		if udid then
+			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+		end
+	end
 end
 
 local function GetStartUnit(teamID, playerID, isAI)
@@ -430,19 +429,21 @@ local function StartUnitPicked(playerID, name)
 end
 
 local function workAroundSpecsInTeamZero(playerlist, team)
-  if team == 0 then
-    local players = #playerlist
-    local specs = 0
-    -- count specs
-    for i=1,#playerlist do
-      local _,_,spec = spGetPlayerInfo(playerlist[i])
-      if spec then specs = specs + 1 end
-    end
-    if players == specs then
-      return nil
-    end
-  end
-  return playerlist
+	if team == 0 then
+		local players = #playerlist
+		local specs = 0
+		-- count specs
+		for i=1,#playerlist do
+			local _,_,spec = spGetPlayerInfo(playerlist[i])
+			if spec then 
+				specs = specs + 1 
+			end
+			end
+		if players == specs then
+			return nil
+		end
+	end
+	return playerlist
 end
 
 --[[
@@ -465,71 +466,71 @@ function gadget:GameStart()
 	if Spring.Utilities.tobool(Spring.GetGameRulesParam("loadedGame")) then
 		return
 	end
-  gamestart = true
+	gamestart = true
 
-  -- spawn units
-  for i,team in ipairs(Spring.GetTeamList()) do
+	-- spawn units
+	for i,team in ipairs(Spring.GetTeamList()) do
+		
+		-- clear resources
+		-- actual resources are set depending on spawned unit and setup
+		if not loadGame then
+			Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(team, "ms", 0)
+			Spring.SetTeamResource(team, "energy", 0)
+			Spring.SetTeamResource(team, "metal", 0)
+		end
 
-    -- clear resources
-    -- actual resources are set depending on spawned unit and setup
-	if not loadGame then
-		Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
-		Spring.SetTeamResource(team, "ms", 0)
-		Spring.SetTeamResource(team, "energy", 0)
-		Spring.SetTeamResource(team, "metal", 0)
-	end
-	
-	--check if player resigned before game started
-	local _,playerID,_,isAI = spGetTeamInfo(team)
-	local deadPlayer = (not isAI) and IsTeamResigned(team)
-	
-	if team ~= gaiateam and not deadPlayer then
-	  local luaAI = Spring.GetTeamLuaAI(team)
-	  if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
-		waitingForComm[team] = true
-	  end
-      if coop then
-        -- 1 start unit per player
-        local playerlist = Spring.GetPlayerList(team, true)
-        playerlist = workAroundSpecsInTeamZero(playerlist, team)
-        if playerlist and (#playerlist > 0) then
-          for i=1,#playerlist do
-            local _,_,spec = spGetPlayerInfo(playerlist[i])
-            if (not spec) then
-              SpawnStartUnit(team, playerlist[i])
-            end
-          end
-        else
-          -- AI etc.
-          SpawnStartUnit(team, nil, true)
-        end
-      else -- no coop
-        if (playerID) then
-          local _,_,spec,teamID = spGetPlayerInfo(playerID)
-          if (teamID == team and not spec) then
-            isAI = false
-          else
-            playerID = nil
-          end
-        end
-        
-        SpawnStartUnit(team, playerID, isAI)
-      end
-	  
-	  -- extra comms
-	  local playerlist = Spring.GetPlayerList(team, true)
-      playerlist = workAroundSpecsInTeamZero(playerlist, team)
-      if playerlist then
-        for i=1,#playerlist do
-			if customKeys[playerlist[i]] and customKeys[playerlist[i]].extracomm then
-				for j=1, tonumber(customKeys[playerlist[i]].extracomm) do
-					SpawnStartUnit(team, playerlist[i], false, true)
+		--check if player resigned before game started
+		local _,playerID,_,isAI = spGetTeamInfo(team)
+		local deadPlayer = (not isAI) and IsTeamResigned(team)
+
+		if team ~= gaiateam and not deadPlayer then
+			local luaAI = Spring.GetTeamLuaAI(team)
+			if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
+				waitingForComm[team] = true
+			end
+			if coop then
+				-- 1 start unit per player
+				local playerlist = Spring.GetPlayerList(team, true)
+				playerlist = workAroundSpecsInTeamZero(playerlist, team)
+				if playerlist and (#playerlist > 0) then
+					for i=1,#playerlist do
+						local _,_,spec = spGetPlayerInfo(playerlist[i])
+						if (not spec) then
+							SpawnStartUnit(team, playerlist[i])
+						end
+					end
+				else
+					-- AI etc.
+					SpawnStartUnit(team, nil, true)
+				end
+			else -- no coop
+				if (playerID) then
+					local _,_,spec,teamID = spGetPlayerInfo(playerID)
+					if (teamID == team and not spec) then
+						isAI = false
+					else
+						playerID = nil
+					end
+				end
+
+				SpawnStartUnit(team, playerID, isAI)
+			end
+
+			-- extra comms
+			local playerlist = Spring.GetPlayerList(team, true)
+			playerlist = workAroundSpecsInTeamZero(playerlist, team)
+			if playerlist then
+				for i = 1, #playerlist do
+					if customKeys[playerlist[i]] and customKeys[playerlist[i]].extracomm then
+						for j = 1, tonumber(customKeys[playerlist[i]].extracomm) do
+							SpawnStartUnit(team, playerlist[i], false, true)
+						end
+					end
 				end
 			end
-        end
-      end
-    end
-  end
+		end
+	end
 end
 
 function gadget:RecvSkirmishAIMessage(aiTeam, dataStr)
@@ -584,31 +585,31 @@ end
 GG.SetStartLocation = SetStartLocation
 
 function gadget:GameFrame(n)
-  if n == (COMM_SELECT_TIMEOUT) then
-	for team in pairs(waitingForComm) do
-		local _,playerID = spGetTeamInfo(team)
-		teamSides[team] = DEFAULT_UNIT_NAME
-		--playerSides[playerID] = "basiccomm"
-		scheduledSpawn[n] = scheduledSpawn[n] or {}
-		scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode
+	if n == (COMM_SELECT_TIMEOUT) then
+		for team in pairs(waitingForComm) do
+			local _,playerID = spGetTeamInfo(team)
+			teamSides[team] = DEFAULT_UNIT_NAME
+			--playerSides[playerID] = "basiccomm"
+			scheduledSpawn[n] = scheduledSpawn[n] or {}
+			scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode
+		end
 	end
-  end
-  if scheduledSpawn[n] then
-	for _, spawnData in pairs(scheduledSpawn[n]) do
-    local teamID, playerID = spawnData[1], spawnData[2]
-    local canSpawn = SpawnStartUnit(teamID, playerID, false, false, true)
-    
-    if (canSpawn) then
-      -- extra comms
-      if playerID and customKeys[playerID] and customKeys[playerID].extracomm then
-        for j=1, tonumber(customKeys[playerID].extracomm) do
-          SpawnStartUnit(teamID, playerID, false, true, true)
-        end
-      end
-    end
+	if scheduledSpawn[n] then
+		for _, spawnData in pairs(scheduledSpawn[n]) do
+			local teamID, playerID = spawnData[1], spawnData[2]
+			local canSpawn = SpawnStartUnit(teamID, playerID, false, false, true)
+
+			if (canSpawn) then
+				-- extra comms
+				if playerID and customKeys[playerID] and customKeys[playerID].extracomm then
+					for j=1, tonumber(customKeys[playerID].extracomm) do
+						SpawnStartUnit(teamID, playerID, false, true, true)
+					end
+				end
+			end
+		end
+		scheduledSpawn[n] = nil
 	end
-	scheduledSpawn[n] = nil
-  end
 end
 
 function gadget:Shutdown()
