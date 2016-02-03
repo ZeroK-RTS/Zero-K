@@ -713,6 +713,7 @@ local function CreateMainWindow()
 		tooltip = "Cancel module selection",
 		OnClick = {
 			function()
+				Spring.Echo("Upgrade UI Debug - Cancel Clicked")
 				HideMainWindow()
 			end
 		},
@@ -881,6 +882,7 @@ function SendUpgradeCommand(newModules)
 	end
 	
 	-- Remove main window
+	Spring.Echo("Upgrade UI Debug - Upgrade Command Sent")
 	HideMainWindow()
 end
 
@@ -1003,6 +1005,7 @@ function widget:CommandsChanged()
 				texture = 'LuaUI/Images/commands/Bold/upgrade.png',
 			}
 		else
+			Spring.Echo("Upgrade UI Debug - Commander Deselected")
 			HideMainWindow() -- Hide window if no commander matching the window is selected
 		end
 	end
