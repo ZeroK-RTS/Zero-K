@@ -1000,7 +1000,7 @@ function widget:CommandsChanged()
 				cursor  = 'Repair',
 				action  = 'upgradecomm',
 				params  = {}, 
-				texture = 'LuaUI/Images/commands/Bold/build.png',
+				texture = 'LuaUI/Images/commands/Bold/upgrade.png',
 			}
 		else
 			HideMainWindow() -- Hide window if no commander matching the window is selected
@@ -1031,7 +1031,7 @@ function widget:CommandsChanged()
 				cursor  = 'Repair',
 				action  = 'upgradecomm',
 				params  = {}, 
-				texture = 'LuaUI/Images/commands/Bold/build.png',
+				texture = 'LuaUI/Images/commands/Bold/upgrade.png',
 			}
 		end
 	end
