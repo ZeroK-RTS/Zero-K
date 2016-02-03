@@ -708,6 +708,11 @@ local function processMorph(unitID, unitDefID, teamID, cmdID, cmdParams)
 end
 
 local function processUpgrade(unitID, unitDefID, teamID, cmdID, cmdParams)
+	if morphUnits[unitID] then
+		-- Unit is already upgrading.
+		return false
+	end
+	
 	if not GG.Upgrades_GetValidAndMorphAttributes then
 		return false
 	end
