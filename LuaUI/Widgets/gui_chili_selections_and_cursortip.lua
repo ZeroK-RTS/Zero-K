@@ -1285,19 +1285,26 @@ end
 --tooltip functions
 
 local UnitDefByHumanName_cache = {}
+local UnitDefByHumanNameCommander_cache = {}
 local function GetUnitDefByHumanName(humanName, findCommander)
-	local cached_udef = UnitDefByHumanName_cache[humanName]
+	local cache
+	if findCommander then
+		cache = UnitDefByHumanNameCommander_cache
+	else
+		cache = UnitDefByHumanName_cache
+	end
+	local cached_udef = cache[humanName]
 	if (cached_udef ~= nil) then
 		return cached_udef
 	end
-
+Spring.Echo("findCommander", findCommander)
 	for _,ud in pairs(UnitDefs) do
-		if ud.humanName == humanName and ((ud.customParams and ud.customParams.dynamic_comm) == findCommander) then
-			UnitDefByHumanName_cache[humanName] = ud
+		if ud.humanName == humanName and (((ud.customParams and ud.customParams.dynamic_comm and (not ud.customParams.not_starter) and true) or false) == findCommander) then
+			cache[humanName] = ud
 			return ud
 		end
 	end
-	UnitDefByHumanName_cache[humanName] = false
+	cache[humanName] = false
 	return false
 end
 

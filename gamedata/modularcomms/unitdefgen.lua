@@ -90,7 +90,7 @@ local function GenerateLevel0DyncommsAndWrecks()
 		local unitName = commProfile.baseUnitName
 		
 		local chassis = commProfile.chassis
-		local mappedChassis = legacyToDyncommChassisMap[chassis] or "recon"
+		local mappedChassis = legacyToDyncommChassisMap[chassis] or "assault"
 		if mappedChassis then
 			chassis = mappedChassis
 		end
@@ -98,6 +98,10 @@ local function GenerateLevel0DyncommsAndWrecks()
 		UnitDefs[unitName] = CopyTable(UnitDefs["dyn" .. chassis .. "1"], true)
 		local ud = UnitDefs[unitName]
 		ud.name = commProfile.name
+		if commProfile.notStarter then
+			ud.customparams = ud.customparams or {}
+			ud.customparams.not_starter = 1
+		end
 		
 		local features = ud.featuredefs or {}
 		for featureName,array in pairs(features) do

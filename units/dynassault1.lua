@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[dynassault1]],
   name                = [[Guardian Commander]],
-  description         = [[Heavy Combat Commander, Builds at ]],
+  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
