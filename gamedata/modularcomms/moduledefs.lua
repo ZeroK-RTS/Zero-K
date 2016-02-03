@@ -576,7 +576,11 @@ upgrades = {
 		order = 5,
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
+				if unitDef.customparams.dynamic_comm then
+					DynamicApplyWeapon(unitDef, "commweapon_personal_shield", 16)
+				else
+					ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
+				end
 			end,
 	},
 	
@@ -594,7 +598,12 @@ upgrades = {
 		description = "A bubble shield that protects surrounding units within 350 m",
 		func = function(unitDef)
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
-				ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
+				
+				if unitDef.customparams.dynamic_comm then
+					DynamicApplyWeapon(unitDef, "commweapon_areashield", 16)
+				else
+					ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
+				end
 
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")

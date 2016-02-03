@@ -505,7 +505,8 @@ local moduleDefs = {
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.shield = "commweapon_personal_shield"
+			-- Do not override area shield
+			sharedData.shield = sharedData.shield or "commweapon_personal_shield"
 		end
 	},
 	{

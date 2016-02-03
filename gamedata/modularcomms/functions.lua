@@ -52,11 +52,6 @@ function DynamicApplyWeapon(unitDef, weapon, slot)
 end
 
 function ApplyWeapon(unitDef, weapon, replace, forceslot)
-	if unitDef.customparams.dynamic_comm then
-		DynamicApplyWeapon(unitDef, weapon, replace and forceslot)
-		return
-	end
-	
 	weapons[weapon].customparams = weapons[weapon].customparams or {}
 	local wcp = weapons[weapon].customparams
 	local slot = tonumber(wcp.slot) or 5

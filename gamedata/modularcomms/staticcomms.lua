@@ -256,7 +256,7 @@ end
 --------------------------------------------------------------------------------------
 MakeCommanderChassisClones("dynrecon", 
 	{{1, 0}, {3, 1}, {5, 1}, {8, 1}, {8, 1}}, 
-	{"module_dmg_booster", "module_areashield"}
+	{"module_dmg_booster", "module_personal_shield"}
 )
 
 MakeCommanderChassisClones("dynsupport",
