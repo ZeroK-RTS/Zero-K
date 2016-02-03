@@ -181,7 +181,8 @@ local function CreateModuleSelectionWindow()
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
-		dockable = true,
+		dockableSavePositionOnly = true,
+		dockableNoResize = true,
 		tweakDraggable = true,
 		tweakResizable = true,
 		color = {0,0,0,0},
@@ -256,7 +257,6 @@ local function ShowModuleSelection(moduleSet, supressButton)
 	panel.columns = columns
 	window:Resize(columns*BUTTON_SIZE + 10, rows*BUTTON_SIZE + 10)
 	fakeWindow:Resize(columns*BUTTON_SIZE + 10, rows*BUTTON_SIZE + 10)
-	window.dockable = false -- Stop docking from preventing size change.
 	
 	-- Display window if not already shown
 	if not selectionWindow.windowShown then
@@ -591,7 +591,7 @@ local function CreateMainWindow()
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
-		dockable = true,
+		dockableSavePositionOnly = true,
 		tweakDraggable = true,
 		tweakResizable = true,
 		parent = screen0,
