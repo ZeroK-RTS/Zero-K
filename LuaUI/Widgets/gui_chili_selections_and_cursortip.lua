@@ -1339,7 +1339,7 @@ local function tooltipBreakdown(tooltip)
 				buildType = 'build'
 				unitHumanName = tooltip:sub(8,start-1)
 			end
-			unitDef = GetUnitDefByHumanName(unitHumanName, tooltip:find('BuildComm', 1, true) == 1)
+			unitDef = GetUnitDefByHumanName(unitHumanName, tooltip:find('BuildCo', 1, true) == 1)
 			
 			tooltip = tooltip:sub(fin+1)
 		end

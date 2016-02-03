@@ -123,7 +123,7 @@ function widget:Update(dt)
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
 			if comDefName then
-				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildComm  ".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
+				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildCo".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
 			end
 			--Spring.Echo(teamID .. " " .. #prvsComDefName)
 			for i=#prvsComDefName,1,-1 do --start at end of table, iterate downward while emptying table content
