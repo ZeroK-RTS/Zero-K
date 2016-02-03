@@ -1297,7 +1297,7 @@ local function GetUnitDefByHumanName(humanName, findCommander)
 	if (cached_udef ~= nil) then
 		return cached_udef
 	end
-Spring.Echo("findCommander", findCommander)
+	
 	for _,ud in pairs(UnitDefs) do
 		if ud.humanName == humanName and (((ud.customParams and ud.customParams.dynamic_comm and (not ud.customParams.not_starter) and true) or false) == findCommander) then
 			cache[humanName] = ud
