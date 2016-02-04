@@ -970,6 +970,7 @@ end
 function widget:CommandsChanged()
 	local units = Spring.GetSelectedUnits()
 	if mainWindowShown then
+		Spring.Echo("Upgrade UI Debug - Number of units selected", #units)
 		local foundMatchingComm = false
 		for i = 1, #units do
 			local unitID = units[i]

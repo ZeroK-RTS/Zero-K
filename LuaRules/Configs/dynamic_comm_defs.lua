@@ -820,25 +820,25 @@ end
 -- clone which was given those modules.
 
 local function GetReconCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
 		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0)
 end
 
 local function GetSupportCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
 		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
 		(modulesByDefID[moduleDefNames.module_resurrect] or 0)
 end
 
 local function GetAssaultCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
 		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 
 local function GetStrikeCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.damageBooster] or 0) .. 
+	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
 		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
