@@ -42,7 +42,7 @@ function script.Deactivate()
 end
 
 function script.FireWeapon()
-	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
 	
