@@ -11,7 +11,6 @@ function widget:GetInfo() return {
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 local startboxConfig, manualStartposConfig = ParseBoxes()
-if (not startboxConfig) or (#startboxConfig == 0) then return end
 
 local rawBoxes = GetRawBoxes()
 for boxID, box in pairs(rawBoxes) do
