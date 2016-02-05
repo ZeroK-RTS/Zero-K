@@ -18,8 +18,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --  «SYNCED»  ------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local reverseCompat = ((Game.version:find('91.0') == 1))
-
 --Speed-ups
 local spGetUnitDefID    = Spring.GetUnitDefID;
 local spValidUnitID		= Spring.ValidUnitID
@@ -123,12 +121,7 @@ end
 local function GetCommandLenght(unitID)
 	local cmds
 	local lenght = 0
-	if reverseCompat then
-		cmds = spGetCommandQueue(unitID, -1)
-		lenght = (cmds and #cmds) or 0
-	else
-		lenght = spGetCommandQueue(unitID,0) or 0
-	end
+	lenght = spGetCommandQueue(unitID,0) or 0
 	return lenght, cmds
 end
 
