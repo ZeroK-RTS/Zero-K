@@ -38,6 +38,7 @@ stats_hide_projectile_speed
 
 include("keysym.h.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
+VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
 local spSendLuaRulesMsg			= Spring.SendLuaRulesMsg
 local spGetCurrentTooltip		= Spring.GetCurrentTooltip
@@ -54,6 +55,8 @@ local abs						= math.abs
 local strFormat 				= string.format
 
 local echo = Spring.Echo
+
+local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
 
 local VFSMODE      = VFS.RAW_FIRST
 local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
@@ -107,8 +110,9 @@ local colorCapture = {0.6, 1, 0.6, 1}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function MakeStatsWindow() 
+end
 
-local function MakeStatsWindow() end
 options_order = {'shortNotation'}
 options_path = 'Help/Guide/Unit List'
 options = {
@@ -1349,7 +1353,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*32) .. " elmo", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*LOS_MULT) .. " elmo", textColor = color.stats_fg, }
 		-- 32 is to offset the engine multiplier, which is
 		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
 	end
