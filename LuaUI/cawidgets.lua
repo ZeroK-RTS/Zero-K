@@ -1960,7 +1960,8 @@ function widgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
 end
 
 
-function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam)
+function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, pre)
+  if pre == false then return end
   for _,w in ipairs(self.UnitDestroyedList) do
     w:UnitDestroyed(unitID, unitDefID, unitTeam)
   end

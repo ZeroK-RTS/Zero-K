@@ -1402,7 +1402,8 @@ end
 
 
 function gadgetHandler:UnitDestroyed(unitID,     unitDefID,     unitTeam,
-                                     attackerID, attackerDefID, attackerTeam)
+                                     attackerID, attackerDefID, attackerTeam, pre)
+  if pre == false then return end
   for _,g in ipairs(self.UnitDestroyedList) do
     g:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                     attackerID, attackerDefID, attackerTeam)
