@@ -45,8 +45,6 @@ START_STORAGE = 500
 
 OVERDRIVE_BUFFER = 10000
 
-BASE_COMM_COST = UnitDefNames.armcom1.metalCost or 1200
-
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
 DEFAULT_UNIT = UnitDefNames["dyntrainer_assault_base"].id

@@ -312,9 +312,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		-- add facplop
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]
-
-		local commCost = (udef.metalCost or BASE_COMM_COST) - BASE_COMM_COST			
+		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]		
 
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
@@ -324,8 +322,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 
 		Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore  + bonus)
 		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore + bonus)
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy - commCost + bonus)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal - commCost + bonus)
+		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy + bonus)
+		Spring.SetTeamResource(teamID, "metal", START_METAL + metal + bonus)
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
