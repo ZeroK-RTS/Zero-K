@@ -3848,65 +3848,34 @@ local function RemoveUnit(unitID, unitDefID, unitTeam)
 end
 
 local function setAllyteamStartLocations(allyTeam)
-	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
+	if Game.startPosType ~= 2 then -- 'choose ingame'
+		return
+	end
 
-		local teamList = Spring.GetTeamList(allyTeam)
-		if (not teamList) or (#teamList == 0) then return end
+	local teamList = Spring.GetTeamList(allyTeam)
+	if (not teamList) or (#teamList == 0) then return end
 
-		local at = allyTeamData[allyTeam]
-		local listOfAis = at.listOfAis
+	local at = allyTeamData[allyTeam]
+	local listOfAis = at.listOfAis
 
-		if GG.manualStartposConfig then
-			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-			if boxID then
-				local boxConfig = GG.manualStartposConfig[boxID]
-				if boxConfig and boxConfig[1] then
-					for i = 1, listOfAis.count do
-						local team = listOfAis.data[i]
-						local startpos = boxConfig[i] or boxConfig[1]
-						GG.SetStartLocation (team, startpos[1], startpos[2])
-					end
-					return
+	if GG.manualStartposConfig then
+		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+		if boxID then
+			local boxConfig = GG.manualStartposConfig[boxID]
+			if boxConfig and boxConfig[1] then
+				for i = 1, listOfAis.count do
+					local team = listOfAis.data[i]
+					local startpos = boxConfig[i] or boxConfig[1]
+					GG.SetStartLocation (team, startpos[1], startpos[2])
 				end
-			end
-			for i = 1, listOfAis.count do
-				local team = listOfAis.data[i]
-				GG.SetStartLocation (team, math.random(1, Game.mapSizeX-1), math.random(1, Game.mapSizeZ-1))
-			end
-			return
-		end
-
-		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
-
-		local startboxString = Spring.GetModOptions().startboxes
-		if startboxString then -- new boxes
-			local startboxConfig = loadstring(startboxString)()
-			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-			local box = boxID and startboxConfig[boxID] or {0,0,1,1}
-			x1 = box[1] * Game.mapSizeX
-			z1 = box[2] * Game.mapSizeZ
-			x2 = box[3] * Game.mapSizeX
-			z2 = box[4] * Game.mapSizeZ
-		end
-
-		local width = x2 - x1
-		local height = z2 - z1
-
-		if width > height then
-			local mid = (z1+z2)*0.5
-			local mult = width/(listOfAis.count + 1)
-			for i = 1, listOfAis.count do
-				local team = listOfAis.data[i]
-				GG.SetStartLocation(team,x1 + i*mult,mid)
-			end
-		else
-			local mid = (x1+x2)*0.5
-			local mult = height/(listOfAis.count + 1)
-			for i = 1, listOfAis.count do
-				local team = listOfAis.data[i]
-				GG.SetStartLocation(team,mid,z1 + i*mult)
+				return
 			end
 		end
+	end
+
+	for i = 1, listOfAis.count do
+		local team = listOfAis.data[i]
+		GG.SetStartLocation (team, math.random(1, Game.mapSizeX-1), math.random(1, Game.mapSizeZ-1))
 	end
 end
 
