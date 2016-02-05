@@ -211,44 +211,9 @@ end
 
 
 local function GetFacingDirection(x, z, teamID)
-	local facing = "south"
-
-	local allyCount = #Spring.GetAllyTeamList()
-	if (allyCount ~= 2+1) then -- +1 cause of gaia
-		-- face to map center
-		facing = (math.abs(Game.mapSizeX/2 - x) > math.abs(Game.mapSizeZ/2 - z))
+	return (math.abs(Game.mapSizeX/2 - x) > math.abs(Game.mapSizeZ/2 - z))
 			and ((x>Game.mapSizeX/2) and "west" or "east")
 			or ((z>Game.mapSizeZ/2) and "north" or "south")
-	else
-		local allyID = select(6, spGetTeamInfo(teamID))
-		local enemyAllyID = gaiaally
-
-		-- detect enemy allyid
-		local allyList = Spring.GetAllyTeamList()
-		for i=1,#allyList do
-			if (allyList[i] ~= allyID)and(allyList[i] ~= gaiaally) then
-				enemyAllyID = allyList[i]
-				break
-			end
-		end
-		assert(enemyAllyID ~= gaiaally, "couldn't detect enemy ally id!")
-
-		-- face to enemy
-		local enemyStartbox = {Spring.GetAllyTeamStartBox(enemyAllyID)}
-		local midPosX = (enemyStartbox[1] + enemyStartbox[3]) * 0.5
-		local midPosZ = (enemyStartbox[2] + enemyStartbox[4]) * 0.5
-
-		local dirX = midPosX - x
-		local dirZ = midPosZ - z
-
-		if (math.abs(dirX) > math.abs(dirZ)) then --distance in X direction is greater than distance in Z direction?
-			facing = (dirX < 0)and("west")or("east") --is distance (X) in negative direction? (left?)
-		else --if distance in Z direction is greater, then:
-			facing = (dirZ > 0)and("south")or("north") --is distance (Z) in positive direction? (down?)
-		end
-	end
-
-	return facing
 end
 
 local function getMiddleOfStartBox(teamID)
