@@ -156,7 +156,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 end
 
 local predictMult = 3
@@ -165,7 +165,7 @@ function script.BlockShot(num, targetID)
 	if num ~= 2 then
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 	if not (targetID and ableToFire) then
 		return not ableToFire
 	end

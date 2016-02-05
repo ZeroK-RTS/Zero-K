@@ -75,18 +75,18 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if num == 1 then
-	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+		return (Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
 	elseif num == 2 then
 		Signal(SIG_AIM_2)
-	SetSignalMask(SIG_AIM_2)
-	Turn(turret, y_axis, math.rad(heading), math.rad(390))
-	Turn(sleevel, x_axis, 0, math.rad(350))
-	Turn(sleever, x_axis, 0, math.rad(350))
-	WaitForTurn(turret, y_axis)
-	WaitForTurn(sleevel, x_axis)
-	WaitForTurn(sleever, x_axis)
-	StartThread(RestoreAfterDelay)
-	return true
+		SetSignalMask(SIG_AIM_2)
+		Turn(turret, y_axis, math.rad(heading), math.rad(390))
+		Turn(sleevel, x_axis, 0, math.rad(350))
+		Turn(sleever, x_axis, 0, math.rad(350))
+		WaitForTurn(turret, y_axis)
+		WaitForTurn(sleevel, x_axis)
+		WaitForTurn(sleever, x_axis)
+		StartThread(RestoreAfterDelay)
+		return true
 	end
 end
 

@@ -39,7 +39,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return not (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return (Spring.GetUnitRulesParam(unitID, "noammo") == 1)
 end
 
 function script.FireWeapon(num)

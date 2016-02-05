@@ -21,7 +21,7 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local LOS_MULT = 32 -- multiplier from UnitDefs to reasonable units
+local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32 -- multiplier from UnitDefs to reasonable units
 local UPDATE_FREQUENCY = 15
 
 local units = {count = 0, data = {}}
