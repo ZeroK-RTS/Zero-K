@@ -79,7 +79,6 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
 local reverseCompat = (Game.version:find('91.0') == 1)
-local unitDamagedOrderChange = not Spring.Utilities.IsCurrentVersionNewerThan(94, 698)
 --------------------------------------------------------------------------------
 
 function pgl() -- (print gadget list)  FIXME: move this into a gadget
@@ -1448,20 +1447,7 @@ end
 
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
-								   a, b, c, d)
-	
-	local projectileID,attackerID
-	local attackerDefID,attackerTeam
-	if unitDamagedOrderChange then 
-		attackerID = a 
-		attackerDefID = b
-		attackerTeam = c
-	else
-		projectileID = a
-		attackerID = b
-		attackerDefID = c
-		attackerTeam = d
-	end
+								   projectileID, attackerID, attackerDefID, attackerTeam)
 	
 	if UnitPreDamaged_first then
 		for _,g in ipairs(self.UnitPreDamagedList) do
@@ -1509,19 +1495,7 @@ end
 --[[ Old
 function gadgetHandler:UnitPreDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponDefID,
-								   a, b, c, d)
-  local projectileID,attackerID
-  local attackerDefID,attackerTeam
-  if unitDamagedOrderChange then 
-	attackerID = a 
-    attackerDefID = b
-    attackerTeam = c
-  else
-    projectileID = a
-    attackerID = b
-    attackerDefID = c
-    attackerTeam = d
-  end
+								   projectileID, attackerID, attackerDefID, attackerTeam)
   
   local rDam = damage
   local rImp = 1.0
@@ -1550,12 +1524,7 @@ local UnitDamaged_gadgets = {}
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
-	if unitDamagedOrderChange then
-		attackerTeam = attackerDefID
-		attackerDefID = attackerID
-		attackerID = projectileID
-	end
-
+								   
 	if UnitDamaged_first then
 		for _,g in ipairs(self.UnitDamagedList) do
 			UnitDamaged_count = UnitDamaged_count + 1
@@ -1578,12 +1547,6 @@ end
 function gadgetHandler:UnitDamaged(unitID, unitDefID, unitTeam,
                                    damage, paralyzer, weaponID, projectileID, 
                                    attackerID, attackerDefID, attackerTeam)
-		
-  if unitDamagedOrderChange then
-    attackerTeam = attackerDefID
-    attackerDefID = attackerID
-    attackerID = projectileID
-  end
   
   for _,g in ipairs(self.UnitDamagedList) do
     g:UnitDamaged(unitID, unitDefID, unitTeam,

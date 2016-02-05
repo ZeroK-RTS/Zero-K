@@ -98,4 +98,17 @@ return {
 			{"module_adv_targeting", "module_adv_targeting", "module_dmg_booster"},
 		},
 	},
+	dynfancy_recon = {
+		name = "Recon Trainer",
+		chassis = "recon",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+			{"module_high_power_servos", "commweapon_personal_shield"},
+			{"commweapon_clusterbomb", "module_dmg_booster", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		decorations = {"skin_recon_dark", "banner_overhead"},
+		images = {overhead = "184"}
+	},
 }

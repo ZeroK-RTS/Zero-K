@@ -20,8 +20,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local isNewEngine = Spring.Utilities.IsCurrentVersionNewerThan(96, 300)
-
 local UPDATE_PERIOD = 3
 
 --------------------------------------------------------------------------------
@@ -332,10 +330,8 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					turnRate        = state.origTurnRate    *turnFactor,
 					accRate         = accRate,
 					decRate         = state.origMaxDec      *decFactor
+					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2
 				}
-				if isNewEngine then
-					attribute.turnAccel = state.origTurnRate*turnAccelFactor*1.2
-				end
 				spSetGroundMoveTypeData (unitID, attribute)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)
