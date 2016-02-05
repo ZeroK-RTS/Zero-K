@@ -132,15 +132,6 @@ local function clearTarget(unitID)
 	spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
 end
 
-if not Spring.Utilities.IsCurrentVersionNewerThan(98, 662) then
-	-- Reverse compatibility for versions earlier than
-	-- https://github.com/spring/spring/commit/b31de4c10ed7e9b9f4ec189a8337f8a8f5c5d499
-	clearTarget = function(unitID)
-		spSetUnitTarget(unitID,0)
-		spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
-	end
-end
-
 local function setTarget(data, sendToWidget)
     if spValidUnitID(data.id) then
         if not data.targetID then

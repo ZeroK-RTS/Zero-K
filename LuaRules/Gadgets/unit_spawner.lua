@@ -21,8 +21,6 @@ local SAVE_FILE = "Gadgets/unit_spawner.lua"
 if (gadgetHandler:IsSyncedCode()) then
 -- BEGIN SYNCED
 
-local reverseCompat = ((Game.version:find('91.0') == 1))
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1168,10 +1166,8 @@ function gadget:GameFrame(n)
   if ((n+29) % 90) < 0.1 then
     KillOldChicken()
     DecayEggs()
-    
-    if reverseCompat then	
-	  DetectCpuLag()
-	end
+	--DetectCpuLag() -- Was only done in 91.0 for some reason
+	
     targetCache = ChooseTarget()
 
     if (targetCache) then

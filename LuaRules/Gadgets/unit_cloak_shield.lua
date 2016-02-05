@@ -20,7 +20,7 @@ function gadget:GetInfo()
     date      = "May 02, 2007", --updated on 23 January 2014
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 

@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date    = "2008-10-15", --2013-09-05
 		license = "GNU GPL, v2 or later",
 		layer   = 1000000, -- Must be after all other build steps and before unit_spawner.lua for queen kill award.
-		enabled = not (Game.version:find('91.0') == 1),
+		enabled = true,
 	}
 end
 

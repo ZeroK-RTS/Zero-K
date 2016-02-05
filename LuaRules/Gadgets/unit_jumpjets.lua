@@ -71,8 +71,6 @@ local jumps = {}
 local jumping = {}
 local goalSet = {}
 
-local quiteNew = Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -91,12 +89,8 @@ local jumpCmdDesc = {
 --------------------------------------------------------------------------------
 
 local function spTestMoveOrderX(unitDefID, x, y, z)
-	if quiteNew then
-		-- Note that spTestMoveOrder returns true for jumping underwater.
-		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
-	else
-		return spTestBuildOrder(unitDefID, x, y, z, 1)
-	end
+	-- Note that spTestMoveOrder returns true for jumping underwater.
+	return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
 end
 
 

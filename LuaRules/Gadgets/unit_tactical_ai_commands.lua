@@ -1,13 +1,13 @@
 
 function gadget:GetInfo()
   return {
-	name 	= "Tactical Unit AI_91",
-	desc	= "Implements tactial AI for some units",
+	name 	= "Tactical Unit AI Commands",
+	desc	= "Implements tactial AI for some units. Uses commands.",
 	author	= "Google Frog",
 	date	= "April 20 2010",
 	license	= "GNU GPL, v2 or later",
 	layer	= 0,
-	enabled = true, (Game.version:find('91.0') == 1) ,
+	enabled = true,
   }
 end
 

@@ -27,7 +27,7 @@ function gadget:GetInfo()
     date      = "25 September 2011",
     license   = "GNU LGPL, v2 or later",
     layer     = -math.huge,	-- we want this to go first
-    enabled   = Spring.Utilities.IsCurrentVersionNewerThan(98, 450)
+    enabled   = true
   }
 end
 

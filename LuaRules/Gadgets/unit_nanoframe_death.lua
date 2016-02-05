@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date     = "Mar 29, 2009",
 		license	 = "GNU GPL, v2 or later",
 		layer    = -10,
-		enabled  = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+		enabled  = true
 	}
 end
 

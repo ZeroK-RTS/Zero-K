@@ -13,14 +13,12 @@ function gadget:GetInfo()
       date      = "2009-11-27", --last update 2014-2-19
       license   = "GNU GPL, v2 or later",
       layer     = -1,
-      enabled   = not (Game.version:find('91.0') == 1), 
+      enabled   = true, 
    }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local isNewEngine = Spring.Utilities.IsCurrentVersionNewerThan(96, 300)
 
 local UPDATE_PERIOD = 3
 
@@ -331,11 +329,9 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
 					turnRate        = state.origTurnRate    *turnFactor,
 					accRate         = accRate,
-					decRate         = state.origMaxDec      *decFactor
+					decRate         = state.origMaxDec      *decFactor,
+					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
 				}
-				if isNewEngine then
-					attribute.turnAccel = state.origTurnRate*turnAccelFactor*1.2
-				end
 				spSetGroundMoveTypeData (unitID, attribute)
 			else
 				--Spring.Echo(state.origSpeed*speedFactor*WACKY_CONVERSION_FACTOR_1)

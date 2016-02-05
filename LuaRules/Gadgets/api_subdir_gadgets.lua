@@ -9,8 +9,6 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local reverseCompat = (Game.version:find('91.0') == 1)
-
 local SCRIPT_DIR = Script.GetName() .. '/'
 local GADGETS_DIR = SCRIPT_DIR .. 'Gadgets/'
 
@@ -30,7 +28,7 @@ end
 local subdirs = VFS.SubDirs(GADGETS_DIR)
 for i=1,#subdirs do
     curdir = subdirs[i]
-    local gf = curdir .. (reverseCompat and "91_main.lua" or "main.lua")
+    local gf = curdir .. "main.lua"
     if (VFS.FileExists(gf)) then
 	local g = gh:LoadGadget(gf)
 	if g then
