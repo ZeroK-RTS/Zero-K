@@ -17,6 +17,8 @@ function gadget:GetInfo()
 	}
 end
 
+local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+
 local passedProjectile = {}
 
 function gadget:ProjectileDestroyed(proID)
@@ -60,8 +62,12 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 			local on, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
 			if charge and wd.damages[0] < charge then
 				--Spring.MarkerAddPoint(x,y,z,"")
-				Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-				Spring.SetProjectileCollision(proID)
+				if devCompatibility then
+					Spring.DeleteProjectile(proID)
+				else
+					Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
+					Spring.SetProjectileCollision(proID)
+				end
 			else
 				passedProjectile[proID] = true
 			end
