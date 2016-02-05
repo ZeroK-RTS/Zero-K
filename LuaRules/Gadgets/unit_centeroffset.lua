@@ -29,6 +29,8 @@ local spGetUnitCollisionVolumeData = Spring.GetUnitCollisionVolumeData
 
 local min = math.min
 
+local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -101,6 +103,11 @@ end
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local ud = UnitDefs[unitDefID]
 	
+	local midTable = ud
+	if devCompatibility then
+		midTable = ud.model
+	end
+	
 	local mid, aim
 	
 	if offsets[unitDefID] and ud then
@@ -110,8 +117,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		aim[2] = Spring.GetUnitRulesParam(unitID, "aimpos_override") or aim[2]
 		
 		spSetUnitMidAndAimPos(unitID, 
-			mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz, 
-			aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz, true)
+			mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz, 
+			aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz, true)
 	else
 		mid = {0, Spring.GetUnitRulesParam(unitID, "midpos_override") or 0, 0}
 		aim = {0, Spring.GetUnitRulesParam(unitID, "aimpos_override") or 0, 0}
@@ -147,8 +154,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	local growScale = min(1, buildProgress/FULL_GROW)
 
 	growUnit[unitID] = {
-		mid = {mid[1] + ud.midx, mid[2] + ud.midy, mid[3] + ud.midz},
-		aim = {aim[1] + ud.midx, aim[2] + ud.midy, aim[3] + ud.midz},
+		mid = {mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz},
+		aim = {aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz},
 		aimOff = aimOff,
 		scaleOff = scaleOff,
 		scale = {scaleX, scaleY, scaleZ},
