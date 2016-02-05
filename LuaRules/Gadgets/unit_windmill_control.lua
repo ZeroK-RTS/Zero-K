@@ -22,6 +22,8 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+
 include("LuaRules/Configs/constants.lua")
 
 local windDefs = {
@@ -122,7 +124,12 @@ local function SetupUnit(unitID)
 	end
 	
 	local unitDefID = spGetUnitDefID(unitID)
-	local midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
+	local midy
+	if devCompatibility then
+		midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].model.midy) or 18
+	else
+		midy = (unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].midy) or 18
+	end
 	
 	local unitDefID = spGetUnitDefID(unitID)
 	
