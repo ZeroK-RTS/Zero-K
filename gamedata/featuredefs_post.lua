@@ -66,7 +66,7 @@ local function GenerateModuleWrecks()
 		wreck.reclaimtime = moduleDef.cost * 0.4
 		wreck.damage = moduleDef.cost * 2
 		wreck.name = "module_wreck_" .. i
-		wreck.featuredead = "module_wreck_" .. i
+		wreck.featuredead = "module_heap_" .. i
 		
 		FeatureDefs["module_wreck_" .. i] = wreck
 		
