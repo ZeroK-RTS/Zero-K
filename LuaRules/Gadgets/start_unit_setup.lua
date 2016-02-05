@@ -217,27 +217,19 @@ local function GetFacingDirection(x, z, teamID)
 end
 
 local function getMiddleOfStartBox(teamID)
-	local x, z
+	local x = Game.mapSizeX / 2
+	local z = Game.mapSizeZ / 2
+
 	if GG.manualStartposConfig then
 		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-		if not boxID then
-			x = Game.mapSizeX / 2
-			z = Game.mapSizeZ / 2
-		else
+		if boxID then
 			local startposList = GG.manualStartposConfig[boxID]
-			if not startposList then
-				x = Game.mapSizeX / 2
-				z = Game.mapSizeZ / 2
-			else
+			if startposList then
 				local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
 				x = startpos[1]
 				z = startpos[2]
 			end
 		end
-	else
-		-- shouldnt ever arrive there
-		x = Game.mapSizeX / 2
-		z = Game.mapSizeZ / 2
 	end
 
 	return x, Spring.GetGroundHeight(x,z), z
