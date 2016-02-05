@@ -45,7 +45,6 @@ unitDef = {
 	commtype = [[1]],
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
     aimposoffset   = [[0 15 0]],
-	att_speedmult  = 0.5,
 	dynamic_comm   = 1,
   },
 

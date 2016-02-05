@@ -729,17 +729,6 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Counteract Attributes Speed Multiplier
---
-for name, ud in pairs(UnitDefs) do
-    if ud.customparams and ud.customparams.att_speedmult then
-		ud.maxvelocity = ud.maxvelocity/ud.customparams.att_speedmult
-		ud.acceleration = ud.acceleration/ud.customparams.att_speedmult
-		ud.brakerate = ud.brakerate/ud.customparams.att_speedmult
-    end   
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

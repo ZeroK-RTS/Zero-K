@@ -42,7 +42,6 @@ unitDef = {
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
 	commtype = [[5]],
-	att_speedmult  = 0.5,
   },
 
   energyMake          = 6,

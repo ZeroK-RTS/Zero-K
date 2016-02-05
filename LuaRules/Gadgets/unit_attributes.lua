@@ -55,14 +55,6 @@ local CMD_WAIT = CMD.WAIT
 
 local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.GetModOptions().pathfinder == "classic") and true) or false)
 
-local speedFactorUnitDefs = {}
-for i = 1, #UnitDefs do
-	local ud = UnitDefs[i]
-	if ud.customParams and ud.customParams.att_speedmult then
-		speedFactorUnitDefs[i] = tonumber(ud.customParams.att_speedmult)
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Sensor Handling
@@ -386,8 +378,6 @@ function UpdateUnitAttributes(unitID, frame)
 	local ud = UnitDefs[udid]
 	local changedAtt = false
 	
-	customParamsSpeedFactor = speedFactorUnitDefs[udid] or 1
-	
 	-- Increased reload from CAPTURE --
 	local selfReloadSpeedChange = spGetUnitRulesParam(unitID,"selfReloadSpeedChange")
 	
@@ -411,10 +401,10 @@ function UpdateUnitAttributes(unitID, frame)
 		local slowMult   = 1-(slowState or 0)
 		local econMult   = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)
 		local buildMult  = (slowMult)*(1 - disarmed)*(1 - morphDisable)*(selfIncomeChange or 1)*(buildpowerMult or 1)
-		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
+		local moveMult   = (slowMult)*(selfMoveSpeedChange or 1)*(1 - morphDisable)*(upgradesSpeedMult or 1)
 		local turnMult   = (slowMult)*(selfMoveSpeedChange or 1)*(selfTurnSpeedChange or 1)*(1 - morphDisable)
 		local reloadMult = (slowMult)*(selfReloadSpeedChange or 1)*(1 - disarmed)*(1 - morphDisable)
-		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)*customParamsSpeedFactor*(upgradesSpeedMult or 1)
+		local maxAccMult = (slowMult)*(selfMaxAccelerationChange or 1)*(upgradesSpeedMult or 1)
 
 		-- Let other gadgets and widgets get the total effect without 
 		-- duplicating the pevious calculations.
@@ -493,12 +483,6 @@ end
 
 function gadget:Initialize()
 	GG.UpdateUnitAttributes = UpdateUnitAttributes
-end
-
-function gadget:UnitCreated(unitID, unitDefID)
-	if speedFactorUnitDefs[unitDefID] then
-		UpdateUnitAttributes(unitID)
-	end
 end
 
 function gadget:GameFrame(f)
