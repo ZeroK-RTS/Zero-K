@@ -329,8 +329,8 @@ local function updateMovementSpeed(unitID, ud, speedFactor, turnAccelFactor, max
 					maxReverseSpeed = (isSlowed and 0) or state.origReverseSpeed, --disallow reverse while slowed
 					turnRate        = state.origTurnRate    *turnFactor,
 					accRate         = accRate,
-					decRate         = state.origMaxDec      *decFactor
-					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2
+					decRate         = state.origMaxDec      *decFactor,
+					turnAccel       = state.origTurnRate    *turnAccelFactor*1.2,
 				}
 				spSetGroundMoveTypeData (unitID, attribute)
 			else
