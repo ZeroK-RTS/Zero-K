@@ -26,33 +26,33 @@ local function isstring(x) return (type(x) == 'string')  end
 local baseModuleWreck = {
 	description		= [[Module Wreck]],
 	blocking		= false,
-	category		 = [[heaps]],
 	damage			= 100,
 	energy			= 0,
 	footprintX		= 2,
 	footprintZ		= 2,
-	height			= [[4]],
-	hitdensity		= [[100]],
 	metal			= 40,
 	object			= [[wreck1x1.s3o]],
 	reclaimable		= true,
 	reclaimTime		= 40,
+	customparams    = {
+		fromunit = 1,
+	},
 }
 
 local baseModuleHeap = {
 	description		= [[Module Debris]],
 	blocking		= false,
-	category		= [[heaps]],
 	damage			= 50,
 	energy			= 0,
 	footprintX		= 1,
 	footprintZ		= 1,
-	height			= [[4]],
-	hitdensity		= [[100]],
 	metal			= 20,
 	object			= [[debris1x1b.s3o]],
 	reclaimable		= true,
 	reclaimTime		= 20,
+	customparams    = {
+		fromunit = 1,
+	},
 }
 
 local function GenerateModuleWrecks()
