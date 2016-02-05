@@ -90,10 +90,17 @@ local function UpdateUnitGrow(unitID, growScale)
 	local unit = growUnit[unitID]
 	growScale = 1 - growScale
 	
-	spSetUnitCollisionVolumeData(unitID,
-		unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
-		unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3], 
-		unit.volumeType, unit.testType, unit.primaryAxis)
+	if unit.isSphere then
+		spSetUnitCollisionVolumeData(unitID,
+			unit.scale[1], unit.scale[2], unit.scale[3], 
+			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
+			unit.volumeType, unit.testType, unit.primaryAxis)
+	else
+		spSetUnitCollisionVolumeData(unitID,
+			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
+			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff/2, unit.offset[3], 
+			unit.volumeType, unit.testType, unit.primaryAxis)
+	end
 
 	spSetUnitMidAndAimPos(unitID, 
 		unit.mid[1], unit.mid[2], unit.mid[3],
@@ -147,12 +154,16 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		aimAbove = aimAbove + volumeBelow
 		volumeBelow = 0
 	end
-
+	
+	local isSphere = (volumeType == 3) -- Spheres are 3, seems to be no way for engine to tell me this.
 	local aimOff = aimAbove - 1
-	local scaleOff = scaleY - volumeBelow - 2
+	
+	-- Spheres poke more above the ground to give them more vulnerabilty.
+	-- Otherwise only the tip would show. Other volumes show the entire surface area because they are prisms.
+	local scaleOff = scaleY - volumeBelow - ((isSphere and 8) or 2)
 	
 	local growScale = min(1, buildProgress/FULL_GROW)
-
+	
 	growUnit[unitID] = {
 		mid = {mid[1] + midTable.midx, mid[2] + midTable.midy, mid[3] + midTable.midz},
 		aim = {aim[1] + midTable.midx, aim[2] + midTable.midy, aim[3] + midTable.midz},
@@ -161,6 +172,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 		scale = {scaleX, scaleY, scaleZ},
 		offset = {offsetX, offsetY, offsetZ},
 		volumeType = volumeType,
+		isSphere = isSphere,
 		testType = testType,
 		primaryAxis = primaryAxis,
 		prevGrowth = growScale,
