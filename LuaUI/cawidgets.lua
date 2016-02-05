@@ -132,14 +132,14 @@ widgetHandler = {
   autoModWidgets = false,
 
   actionHandler = include("actions.lua"),
-  
+
   WG = {}, -- shared table for widgets
 
   globals = {}, -- global vars/funcs
 
   mouseOwner = nil,
   ownedButton = 0,
-  
+
   tweakMode = false,
 }
 
@@ -226,7 +226,7 @@ local callInLists = {
   'JoyAxis',
   'JoyHat',
   'JoyButtonDown',
-  'JoyButtonUp',  
+  'JoyButtonUp',
   'IsAbove',
   'GetTooltip',
   'GroupChanged',
@@ -302,15 +302,15 @@ function widgetHandler:LoadOrderList()
     if (not self.orderList) then
       self.orderList = {} -- safety
     end
-	if (self.orderList.version or 0) < ORDER_VERSION then 
+	if (self.orderList.version or 0) < ORDER_VERSION then
 		self.orderList = {}
 		self.orderList.version = ORDER_VERSION
-	end 
+	end
 	local detailLevel = Spring.GetConfigInt("widgetDetailLevel", 2)
 	if (self.orderList.lastWidgetDetailLevel ~= detailLevel) then
 		resetWidgetDetailLevel = true
 		self.orderList.lastWidgetDetailLevel = detailLevel
-	end 
+	end
   end
 end
 
@@ -338,10 +338,10 @@ function widgetHandler:LoadConfigData()
     if (not self.configData) then
       self.configData = {} -- safety
     end
-	if (self.configData.version or 0) < DATA_VERSION then 
+	if (self.configData.version or 0) < DATA_VERSION then
 		self.configData = {}
 		self.configData.version = DATA_VERSION
-	end 
+	end
 
   end
 end
@@ -352,10 +352,10 @@ function widgetHandler:SaveConfigData()
   self:LoadConfigData()
   for _,w in ipairs(self.widgets) do
     if (w.GetConfigData) then
-      local ok, err = pcall(function() 
+      local ok, err = pcall(function()
 		self.configData[w.whInfo.name] = w:GetConfigData()
 	  end)
-	  if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData from: " .. w.whInfo.name.." ("..err..")") end 
+	  if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData from: " .. w.whInfo.name.." ("..err..")") end
     end
   end
   table.save(self.configData, CONFIG_FILENAME, '-- Widget Custom Data')
@@ -399,8 +399,8 @@ function widgetHandler:Initialize()
       table.insert(unsortedWidgets, widget)
     end
   end
-  
-  -- sort the widgets  
+
+  -- sort the widgets
   table.sort(unsortedWidgets, function(w1, w2)
     local l1 = w1.whInfo.layer
     local l2 = w2.whInfo.layer
@@ -418,7 +418,7 @@ function widgetHandler:Initialize()
     end
   end)
 
-  -- first add the api widgets 
+  -- first add the api widgets
   for _,w in ipairs(unsortedWidgets) do
     if (w.whInfo.api) then
       widgetHandler:InsertWidget(w)
@@ -429,7 +429,7 @@ function widgetHandler:Initialize()
     end
   end
 
-  -- add the widgets  
+  -- add the widgets
   for _,w in ipairs(unsortedWidgets) do
     if (not w.whInfo.api) then
       widgetHandler:InsertWidget(w)
@@ -460,7 +460,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     Spring.Log(HANDLER_BASENAME, LOG.ERROR, 'Failed to load: ' .. basename .. '  (' .. err .. ')')
     return nil
   end
-  
+
   local widget = widgetHandler:NewWidget()
   setfenv(chunk, widget)
   local success, err = pcall(chunk)
@@ -524,7 +524,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 
   local info  = widget:GetInfo()
   local order = self.orderList[name]
-  
+
   local enabled = ((order ~= nil) and (order > 0)) or
       ((order == nil) and  -- unknown widget
        (info.enabled and ((not knownInfo.fromZip) or self.autoModWidgets))) or info.alwaysStart
@@ -543,7 +543,7 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
 		enabled = detailLevel >= tonumber(info.detailsDefault)
 	end
   end
-			 
+
   if (enabled) then
 	-- this will be an active widget
     if (order == nil) then
@@ -557,12 +557,12 @@ function widgetHandler:LoadWidget(filename, _VFSMODE)
     return nil
   end
 
-  -- load the config data  
+  -- load the config data
   local config = self.configData[name]
   if (widget.SetConfigData and config) then
     widget:SetConfigData(config)
   end
-    
+
   return widget
 end
 
@@ -645,7 +645,7 @@ function widgetHandler:NewWidget()
     return MessageProcessor:ProcessConsoleBuffer(num) --chat_preprocess.lua
   end
   ----
-  
+
   return widget
 end
 
@@ -847,10 +847,10 @@ function widgetHandler:RemoveWidget(widget)
 
   local name = widget.whInfo.name
   if (widget.GetConfigData) then
-    local ok, err = pcall(function() 
+    local ok, err = pcall(function()
 	  self.configData[name] = widget:GetConfigData()
 	end)
-	if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData: " .. name.." ("..err..")") end 
+	if not ok then Spring.Log(HANDLER_BASENAME, LOG.ERROR, "Failed to GetConfigData: " .. name.." ("..err..")") end
   end
   self.knownWidgets[name].active = false
   if (widget.Shutdown) then
@@ -1179,7 +1179,7 @@ function widgetHandler:Shutdown()
 end
 
 function widgetHandler:Update()
-  local deltaTime = Spring.GetLastUpdateSeconds()  
+  local deltaTime = Spring.GetLastUpdateSeconds()
   -- update the hour timer
   hourTimer = (hourTimer + deltaTime)%3600
   for _,w in ipairs(self.UpdateList) do
@@ -1242,7 +1242,7 @@ end
 
 local MUTE_SPECTATORS = Spring.GetModOptions().mutespec or 'autodetect'
 local MUTE_LOBBY = Spring.GetModOptions().mutelobby or 'autodetect'
-local playerNameToID 
+local playerNameToID
 
 do
 	local teams = Spring.GetTeamList();
@@ -1253,13 +1253,13 @@ do
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
 			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
-			if (not ai) and (not humanAlly[ally]) then 
+			if (not ai) and (not humanAlly[ally]) then
 				humanAlly[ally] = true
 				humanAllyCount = humanAllyCount + 1
-			end	
+			end
 		end
 	end
-	
+
 	if MUTE_SPECTATORS == 'autodetect' then
 		if humanAllyCount > 2 then
 			MUTE_SPECTATORS = true
@@ -1269,9 +1269,9 @@ do
 	else
 		MUTE_SPECTATORS = (MUTE_SPECTATORS == 'mute')
 	end
-	
+
 	if MUTE_LOBBY == 'autodetect' then
-		if humanAllyCount > 2 then 
+		if humanAllyCount > 2 then
 			MUTE_LOBBY = true
 		else
 			MUTE_LOBBY = false
@@ -1303,7 +1303,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
   elseif StringStarts(msg, transmitMagic) then -- receiving from the lobby
     if StringStarts(msg, voiceMagic) then
       local tableString = string.sub(msg, string.len(voiceMagic) + 1) -- strip the magic string
-      local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form      
+      local voiceCommandParams = Deserialize("return "..tableString) -- deserialize voice command parameters in table form
       for _,w in ipairs(self.VoiceCommandList) do
         w:VoiceCommand(voiceCommandParams.commandName, voiceCommandParams)
       end
@@ -1318,7 +1318,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 	local newMsg = { text = msg, priority = priority }
 	MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
-	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'game_message' then 
+	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'game_message' then
 		if MUTE_SPECTATORS and newMsg.msgtype == 'spec_to_everyone' then
 			local spectating = select(1, Spring.GetSpectatingState())
 			if not spectating then
@@ -1331,15 +1331,15 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		if customkeys and customkeys.muted then
 			local myPlayerID = Spring.GetLocalPlayerID()
 			if myPlayerID == playerID_msg then --if I am the muted, then:
-				newMsg.argument = "<your message was blocked by mute>"	--remind myself that I am muted.		
-				msg = "<your message was blocked by mute>" 
+				newMsg.argument = "<your message was blocked by mute>"	--remind myself that I am muted.
+				msg = "<your message was blocked by mute>"
 			else --if I am NOT the muted, then: delete this message
 				return
 			end
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
 	end
-	
+
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
@@ -1363,16 +1363,16 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 		end
 	end
-  
+
 	--send message to widget:AddConsoleLine
 	for _,w in ipairs(self.AddConsoleLineList) do
-		w:AddConsoleLine(msg, priority) 
+		w:AddConsoleLine(msg, priority)
 	end
-	
+
 	--send message to widget:AddConsoleMessage
 	if newMsg.msgtype == 'point' or newMsg.msgtype == 'label' then
 		return -- ignore all console messages about points... those come in through the MapDrawCmd callin
-	end    
+	end
 	for _,w in ipairs(self.AddConsoleMessageList) do
 		w:AddConsoleMessage(newMsg)
 	end
@@ -1409,7 +1409,7 @@ end
 function widgetHandler:ViewResize(viewGeometry)
   local vsx = viewGeometry.viewSizeX
   local vsy = viewGeometry.viewSizeY
-    
+
   for _,w in ipairs(self.ViewResizeList) do
     w:ViewResize(vsx, vsy, viewGeometry)
   end
@@ -1586,7 +1586,7 @@ do
     lastDrawFrame = drawframe
     lastx = x
     lasty = y
- 
+
     if (not self.tweakMode) then
       for _,w in ipairs(self.IsAboveList) do
         if (w:IsAbove(x, y)) then
@@ -1784,12 +1784,12 @@ function widgetHandler:GameStart()
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		if ((teamLuaAI == nil or teamLuaAI == "") and teamID ~= gaiaTeam) then
 			local _,_,_,ai,side,ally = Spring.GetTeamInfo(teamID)
-			if (not ai) then 
+			if (not ai) then
 				for _, pid in ipairs(Spring.GetPlayerList(teamID)) do
 					local name, active, spec = Spring.GetPlayerInfo(pid)
 					if active and not spec then plist = plist .. "," .. name end
 				end
-			end	
+			end
 		end
 	end
 	Spring.SendCommands("wbynum 255 SPRINGIE:stats,plist".. plist)
@@ -1895,7 +1895,7 @@ function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
   if customkeys and customkeys.muted then
     return true
   end
-  
+
   local retval = false
   for _,w in ipairs(self.MapDrawCmdList) do
     local takeEvent = w:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
@@ -1960,7 +1960,8 @@ function widgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
 end
 
 
-function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam)
+function widgetHandler:UnitDestroyed(unitID, unitDefID, unitTeam, pre)
+  if not pre then return end
   for _,w in ipairs(self.UnitDestroyedList) do
     w:UnitDestroyed(unitID, unitDefID, unitTeam)
   end
@@ -2191,7 +2192,7 @@ function widgetHandler:UpdateSelection()
       if (newSelection[i] ~= oldSelection[i]) then -- it seems the order stays
         changed = true
         break
-      end                                          
+      end
     end
   else
     changed = true

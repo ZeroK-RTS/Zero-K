@@ -15,18 +15,18 @@ local takeoffHeight = UnitDefNames["armstiletto_laser"].wantedHeight
 function script.Create()
 	Hide(preDrop)
 	Hide(drop)
-	
+
 	FakeUprightInit(xp, zp, drop)
-	
+
 	Turn(Lwing, z_axis, math.rad(90))
-	Turn(Rwing, z_axis, math.rad(-90))	
+	Turn(Rwing, z_axis, math.rad(-90))
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
 function script.Activate()
-	
+
 	Turn(Lwing, z_axis, math.rad(90), 2)
 	Turn(Rwing, z_axis, math.rad(-90), 2)
 	Turn(LwingTip, z_axis, math.rad(-165), 2) --160
@@ -42,10 +42,10 @@ function script.Deactivate()
 end
 
 function script.FireWeapon()
-	if Spring.GetUnitFuel(unitID) < 1 or Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
+	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
-	
+
 	for i = 1, 80 do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
@@ -60,10 +60,10 @@ function script.FireWeapon()
 			local zdz = zz - bz
 			local angle_x = math.atan2(xdy, math.sqrt(xdx^2 + xdz^2))
 			local angle_z = math.atan2(zdy, math.sqrt(zdx^2 + zdz^2))
-	
+
 			Turn(preDrop, x_axis, angle_x)
 			Turn(preDrop, z_axis, -angle_z)
-			
+
 			EmitSfx(drop, FIRE_W2)
 			if sound_index == 0 then
 				local px, py, pz = Spring.GetUnitPosition(unitID)
@@ -77,7 +77,7 @@ function script.FireWeapon()
 		local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		Sleep(35/slowMult) -- fire density
 	end
-	
+
 	Reload()
 end
 
@@ -86,13 +86,13 @@ function script.QueryWeapon()
 	return drop
 end
 
-function script.AimFromWeapon() 
-	return drop 
+function script.AimFromWeapon()
+	return drop
 end
 
 function script.AimWeapon(heading, pitch)
-	if (GetUnitValue(CRASHING) == 1) then 
-		return false 
+	if (GetUnitValue(CRASHING) == 1) then
+		return false
 	end
 	return true
 end

@@ -1,8 +1,8 @@
-local base = piece 'base' 
-local body = piece 'body' 
-local jet = piece 'jet' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local base = piece 'base'
+local body = piece 'body'
+local jet = piece 'jet'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 
 local smokePiece = {body, jet}
 
@@ -39,7 +39,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num)
-	return not (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return Spring.GetUnitRulesParam(unitID, "noammo") ~= 1
 end
 
 function script.FireWeapon(num)

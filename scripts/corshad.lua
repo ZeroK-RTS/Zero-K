@@ -1,19 +1,19 @@
 local base = piece 'base'
-local fuselage = piece 'fuselage' 
-local wingl1 = piece 'wingl1' 
-local wingr1 = piece 'wingr1' 
-local wingl2 = piece 'wingl2' 
-local wingr2 = piece 'wingr2' 
-local engines = piece 'engines' 
-local fins = piece 'fins' 
-local rflap = piece 'rflap' 
-local lflap = piece 'lflap' 
-local predrop = piece 'predrop' 
-local drop = piece 'drop' 
-local thrustl = piece 'thrustl' 
-local thrustr = piece 'thrustr' 
-local wingtipl = piece 'wingtipl' 
-local wingtipr = piece 'wingtipr' 
+local fuselage = piece 'fuselage'
+local wingl1 = piece 'wingl1'
+local wingr1 = piece 'wingr1'
+local wingl2 = piece 'wingl2'
+local wingr2 = piece 'wingr2'
+local engines = piece 'engines'
+local fins = piece 'fins'
+local rflap = piece 'rflap'
+local lflap = piece 'lflap'
+local predrop = piece 'predrop'
+local drop = piece 'drop'
+local thrustl = piece 'thrustl'
+local thrustr = piece 'thrustr'
+local wingtipl = piece 'wingtipl'
+local wingtipr = piece 'wingtipr'
 local xp,zp = piece("x","z")
 
 local spGetUnitPosition = Spring.GetUnitPosition
@@ -65,21 +65,21 @@ local minSpeedMult = 0.5
 local function BehaviourChangeThread(behaviour)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
 	SetSignalMask(SIG_CHANGE_FLY_HEIGHT)
-	
+
 	takeoffHeight = behaviour.wantedHeight/1.5
-	
+
 	local state = spGetUnitMoveTypeData(unitID).aircraftState
 	local flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	if not flying then
 		StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 	end
-	
+
 	while not flying do
 		Sleep(600)
 		state = spGetUnitMoveTypeData(unitID).aircraftState
 		flying = spMoveCtrlGetTag(unitID) == nil and (state == "flying" or state == "takeoff")
 	end
-	
+
 	Spring.MoveCtrl.SetAirMoveTypeData(unitID, behaviour)
 	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
 	--GG.UpdateUnitAttributes(unitID)
@@ -143,7 +143,7 @@ end
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
-	FakeUprightInit(xp, zp, drop) 
+	FakeUprightInit(xp, zp, drop)
 	--StartThread(Lights)
 end
 
@@ -156,7 +156,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.AimWeapon(num, heading, pitch)
-	return (Spring.GetUnitFuel(unitID) >= 1 and Spring.GetUnitRulesParam(unitID, "noammo") ~= 1)
+	return Spring.GetUnitRulesParam(unitID, "noammo") ~= 1
 end
 
 local predictMult = 3
@@ -165,7 +165,7 @@ function script.BlockShot(num, targetID)
 	if num ~= 2 then
 		return false
 	end
-	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitFuel(unitID) < 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
+	local ableToFire = not ((GetUnitValue(COB.CRASHING) == 1) or (Spring.GetUnitRulesParam(unitID, "noammo") == 1))
 	if not (targetID and ableToFire) then
 		return not ableToFire
 	end
@@ -178,13 +178,13 @@ function script.BlockShot(num, targetID)
 	local cosHeading = cos(heading)
 	local sinHeading = sin(heading)
 	dx, dz = cosHeading*dx - sinHeading*dz, cosHeading*dz + sinHeading*dx
-	
+
 	--Spring.Echo(vx .. ", " .. vy .. ", " .. vz)
 	--Spring.Echo(dx .. ", " .. dy .. ", " .. dz)
 	--Spring.Echo(heading)
-	
+
 	if dz < 30 and dz > -30 and dx < 100 and dx > -100 and dy < 0 then
-		FakeUprightTurn(unitID, xp, zp, base, predrop) 
+		FakeUprightTurn(unitID, xp, zp, base, predrop)
 		Move(drop, x_axis, dx)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)
