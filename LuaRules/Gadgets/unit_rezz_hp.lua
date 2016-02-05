@@ -12,7 +12,7 @@ function gadget:GetInfo() return {
 	date      = "Nov 30, 2008",
 	license   = "GNU GPL, v2 or later",
 	layer     = 0,
-	enabled   = not (Game.version:find('91.0') == 1),
+	enabled   = true,
 } end
 
 	local spGetUnitHealth   = Spring.GetUnitHealth
