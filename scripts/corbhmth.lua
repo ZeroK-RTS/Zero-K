@@ -30,7 +30,6 @@ local smokePiece = {base, turret}
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	StartThread(GunToggle)
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -59,6 +58,7 @@ function script.Shot(num)
 end
 
 function script.QueryWeapon(num)
+	-- Seet mantis 5056 for further improvement.
 	return gunPieces[gun_1].flare
 end
 
