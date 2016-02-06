@@ -126,7 +126,8 @@ for i = 1, #chassisDefs do
 		DynamicApplyWeapon(unitDef, weaponName, num)
 	end
 	
-	if #chassisDefs[i].weapons > 16 then
-		Spring.Echo("Too many commander weapons on:", name, "Limit is 16, found weapons:", #chassisDefs[i].weapons)
+	if #chassisDefs[i].weapons > 31 then
+		-- Limit of 31 for shield space.
+		Spring.Echo("Too many commander weapons on:", name, "Limit is 31, found weapons:", #chassisDefs[i].weapons)
 	end
 end
