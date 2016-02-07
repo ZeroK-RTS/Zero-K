@@ -42,8 +42,8 @@ unitDef = {
   footprintX             = 3,
   footprintZ             = 3,
   iconType               = [[kbotriot]],
-  idleAutoHeal           = 5,
-  idleTime               = 1800,
+  idleAutoHeal           = 40,
+  idleTime               = 150,
   leaveTracks            = true,
   maxDamage              = 880,
   maxSlope               = 36,
@@ -66,7 +66,7 @@ unitDef = {
 
   },
 
-  sightDistance          = 330,
+  sightDistance          = 345,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

@@ -45,7 +45,7 @@ local SIG_AIM = 4
 
 local RESTORE_DELAY = 3000
 
-local PACE = 1.5
+local PACE = 1.4
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -399,9 +399,9 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	aiming = true
 
-	Turn(chest, y_axis, heading, math.rad(400))
-	Turn(rforearm, x_axis, -pitch, math.rad(400))
-	Turn(lforearm, x_axis, -pitch, math.rad(400))
+	Turn(chest, y_axis, heading, math.rad(800))
+	Turn(rforearm, x_axis, -pitch, math.rad(600))
+	Turn(lforearm, x_axis, -pitch, math.rad(600))
 	WaitForTurn(chest, y_axis)
 	WaitForTurn(lforearm, x_axis)
 	WaitForTurn(rforearm, x_axis)
