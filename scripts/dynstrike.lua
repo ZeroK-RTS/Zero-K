@@ -287,7 +287,7 @@ end
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 3.8
+local PACE = 2.3
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 local PACE = PACE * VELOCITY/BASE_VELOCITY
@@ -372,7 +372,7 @@ local function Walk()
 		Turn(FootRight, x_axis,  right[2].foot[1], right[2].foot[2] * speedMult)
 		
 		if not aiming then
-			Turn(Stomach, z_axis, -0.3*(walkCycle - 1.5), speedMult)
+			Turn(Stomach, z_axis, -0.3*(walkCycle - 1.5), 0.4 * speedMult)
 		end
 		
 		Move(Base, z_axis, 0, 2 * speedMult)
