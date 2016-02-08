@@ -684,10 +684,13 @@ function DrawUnitShapes(unitList, color, underWorld)
 	end
 	-- gl.DepthTest(GL.LEQUAL)
 	-- gl.PolygonOffset(-1.0,-1.0)
-	-- for i=1, #unitList do
-	-- 	local unitID = unitList[i].unitID
-	-- 	gl.Unit(unitID, true)
-	-- end
+	for i=1, #unitList do --Correct underwater
+		local unitID = unitList[i].unitID
+		local _, y, _ = Spring.GetUnitViewPosition(unitID)
+		if (y < 0 ) then
+			gl.Unit(unitID, true)
+		end
+	end
 	-- gl.PolygonOffset(0.0,0.0)
 	-- gl.DepthTest(GL.LESS)
 	-- for i=1, #visibleUnits do
