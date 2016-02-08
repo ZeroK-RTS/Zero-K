@@ -306,24 +306,28 @@ local copy = {
 		},
 		dynassault2 = {
 			level = 2,
+			collisionvolumescales  = [[50 60 50]],
 			mainstats = {maxdamage = 3800, objectname = "benzcom2.s3o"},
 			customparams = {},
 			wreckmodel = "benzcom2_wreck.s3o",
 		},
 		dynassault3 = {
 			level = 3,
+			collisionvolumescales  = [[55 65 55]],
 			mainstats = {maxdamage = 4900, objectname = "benzcom3.s3o",},
 			customparams = {},
 			wreckmodel = "benzcom3_wreck.s3o",
 		},
 		dynassault4 = {
 			level = 4,
+			collisionvolumescales  = [[58 68 58]],
 			mainstats = {maxdamage = 6000, objectname = "benzcom4.s3o",},
 			customparams = {},
 			wreckmodel = "benzcom4_wreck.s3o",
 		},
 		dynassault5 = {
 			level = 5,
+			collisionvolumescales  = [[61 71 61]],
 			mainstats = {maxdamage = 7200, objectname = "benzcom5.s3o",},
 			customparams = {},
 			wreckmodel = "benzcom5_wreck.s3o",
