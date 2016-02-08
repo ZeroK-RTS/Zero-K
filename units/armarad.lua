@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armarad]],
-  name                          = [[Advanced Radar Tower]],
-  description                   = [[Long-Range Radar, halves radar wobble]],
+  name                          = [[Advanced Radar]],
+  description                   = [[Long-Range Radar, Halves Radar Wobble]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
@@ -28,6 +28,7 @@ unitDef = {
     helptext_pl    = [[Ten radar ma zdecydowanie wiekszy zasieg niz podstawowa wersja. Ponadto, kazdy taki budynek zwieksza dokladnosc namiaru wszystkich wlasnych i sprzymierzonych radarow.]],
     modelradius    = [[16]],
 	removewait     = 1,
+	priority_misc  = 2, -- High
   },
 
   energyUse                     = 3,

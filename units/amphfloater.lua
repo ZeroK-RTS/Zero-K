@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[amphfloater]],
   name                   = [[Buoy]],
-  description            = [[Inflatable Amphibious Bot]],
+  description            = [[Heavy Amphibious Skirmisher Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,

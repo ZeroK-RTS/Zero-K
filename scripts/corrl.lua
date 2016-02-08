@@ -96,7 +96,16 @@ local function FireAndReload(num)
 	Turn(lever, x_axis, 0, math.rad(50))
 	Turn(pod, x_axis, 0, math.rad(50))
 	Turn(bay[num].backDoor, x_axis, 0, math.rad(100))
-	Sleep(7500)
+	
+	Sleep(500)
+	local adjustedDuration = 0
+	while adjustedDuration < 7 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
+	
 	Move(bay[num].missile, z_axis, -2.2)
 	
 	Move(l_poddoor, x_axis, 0, 5)
@@ -105,7 +114,6 @@ local function FireAndReload(num)
 	Sleep(500)
 	
 	Show(bay[num].missile)
-	Show(bay[num].greenLight)
 	Move(bay[num].missile, z_axis, 0, 1)
 	Sleep(500)
 	
@@ -115,7 +123,15 @@ local function FireAndReload(num)
 		Move(r_poddoor, x_axis, -4, 5)
 		StartThread(RestoreAfterDelay)
 	end
-	Sleep(2500)
+	
+	Sleep(500)
+	while adjustedDuration < 9 do
+		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
+		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
+		adjustedDuration = adjustedDuration + reloadMult
+		Sleep(1000)
+	end
+	Show(bay[num].greenLight)
 	
 	ammo = ammo + 1
 end
@@ -142,7 +158,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 103, 30, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 103, 30)
 end
 
 function script.FireWeapon()

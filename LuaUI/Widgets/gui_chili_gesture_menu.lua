@@ -339,13 +339,17 @@ function SetupMenu(keyboard, mouseless)
     local found = false
     for _, unitID in ipairs(units) do 
       local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
-      if ud.isBuilder and menu_use[ud.name] then 
-		found = ud
-	  elseif ud.canMove and not keyboard then
-		menu = nil
-        menu_selected=  nil
-        return false
-      end
+      if ud then
+	    if ud.isBuilder and menu_use[ud.name] then 
+		  found = ud
+	    elseif ud.canMove and not keyboard then
+		  menu = nil
+          menu_selected=  nil
+          return false
+        end
+	  else
+		return false
+	  end
     end 
 
     -- setup menu depending on selected unit

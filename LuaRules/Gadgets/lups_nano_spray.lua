@@ -10,7 +10,7 @@ function gadget:GetInfo()
     date      = "2008-2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+    enabled   = true
   }
 end
 
@@ -279,7 +279,7 @@ function gadget:GameFrame(frame)
 	for i=1,#builders do
 		local unitID = builders[i]
 		if ((unitID + frame) % 30 < 1) then --// only update once per second
-			local strength = Spring.GetUnitCurrentBuildPower(unitID) or 0	-- * 16
+			local strength = (Spring.GetUnitCurrentBuildPower(unitID) or 0)*(Spring.GetUnitRulesParam(unitID, "totalEconomyChange") or 1)	-- * 16
 			if (strength > 0) then
 				local type, target, isFeature = Spring.Utilities.GetUnitNanoTarget(unitID)
 

@@ -4,6 +4,8 @@ local door2 = piece "door2"
 local missile = piece "missile"
 local aimpoint = piece "aimpoint"
 
+include "constants.lua"
+
 local SIG_AIM = 1
 
 function script.QueryWeapon() return missile end

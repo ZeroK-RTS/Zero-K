@@ -26,7 +26,7 @@ unitDef = {
 	helptext_pl    = [[Wurm zagrzebuje sie pod ziemia i moze w ten sposob poruszac sie. Wychodzac z niej, ciska kule ognia, ktore podpalaja okolice. Moze tez wspinac sie na strome wzniesienia. Jego slabym punktem jest niska wytrzymalosc.]],
   },
 
-  explodeAs           = [[CORPYRO_NAPALM]],
+  explodeAs           = [[CORPYRO_PYRO_DEATH]],
   footprintX          = 4,
   footprintZ          = 4,
   iconType            = [[spidergeneric]],
@@ -46,7 +46,7 @@ unitDef = {
   power               = 350,
   script              = [[chickenwurm.lua]],
   seismicSignature    = 4,
-  selfDestructAs      = [[CORPYRO_NAPALM]],
+  selfDestructAs      = [[CORPYRO_PYRO_DEATH]],
 
   sfxtypes            = {
 
@@ -105,7 +105,6 @@ unitDef = {
         subs    = 2.5,
       },
 
-      endsmoke                = [[0]],
       explosionGenerator      = [[custom:napalm_firewalker]],
       fireStarter             = 120,
       impulseBoost            = 0,
@@ -120,7 +119,6 @@ unitDef = {
       soundHit                = [[chickens/acid_hit]],
       soundStart              = [[chickens/acid_fire]],
       sprayAngle              = 1024,
-      startsmoke              = [[0]],
       tolerance               = 5000,
       turret                  = true,
       weaponTimer             = 0.2,

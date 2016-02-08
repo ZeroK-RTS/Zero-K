@@ -30,6 +30,8 @@ local function Open()
 	WaitForTurn(dish3, x_axis)
 	WaitForTurn(dish4, x_axis)
 	Spring.SetUnitArmored(unitID,false)
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
+	GG.UpdateUnitAttributes(unitID)
 	--SetUnitValue(COB.ARMORED,1)	
 end
 
@@ -37,6 +39,8 @@ local function Close()
 	Signal(SIG_Activate)
 	SetSignalMask(SIG_Activate)
 	Spring.SetUnitArmored(unitID,true)
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 0)
+	GG.UpdateUnitAttributes(unitID)
 	SetUnitValue(COB.ARMORED,1)
 	Turn(dish1, x_axis, 0, math.rad(120))
 	Turn(dish2, x_axis, 0, math.rad(120))
@@ -57,10 +61,11 @@ function script.Deactivate()
 end
 
 function script.Create()
+	Spring.SetUnitRulesParam(unitID, "selfIncomeChange", 1)
 	for i = 1, #fakes do Hide (fakes[i]) end
-	Move (base, y_axis, 9000)
+	Move (base, y_axis, -90000)
 	StartThread(SmokeUnit, smokePiece)
-	Turn(base, y_axis, math.rad(45))	
+	Turn(base, y_axis, math.rad(45))
 end
 
 local force_close_time = tonumber(UnitDef.customParams.force_close) * 1000

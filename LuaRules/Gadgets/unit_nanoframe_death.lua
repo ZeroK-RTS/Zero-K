@@ -10,7 +10,7 @@ function gadget:GetInfo()
 		date     = "Mar 29, 2009",
 		license	 = "GNU GPL, v2 or later",
 		layer    = -10,
-		enabled  = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+		enabled  = true
 	}
 end
 
@@ -116,7 +116,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		end
 	end
 	
-	if (progress > 0.05 and not Spring.GetUnitRulesParams(unitID, "noWreck")) then
+	if (progress > 0.05 and not Spring.GetUnitRulesParam(unitID, "noWreck")) then
 		ScrapUnit(unitID, unitDefID, unitTeam, progress, face)
 	end
 	

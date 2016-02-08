@@ -75,9 +75,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 4,
       craterMult              = 3.5,
-	  
+
       customParams            = {
       lups_explodelife = 1.5,
+		stats_hide_dps = 1, -- meaningless
+		stats_hide_reload = 1,
 	  },
 	  
       damage                  = {
@@ -92,12 +94,9 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      levelGround             = false,
       model                   = [[wep_tacnuke.s3o]],
       range                   = 3500,
       reloadtime              = 10,
-      shakeduration           = [[1.5]],
-      shakemagnitude          = [[32]],
       smokeTrail              = false,
       soundHit                = [[explosion/mini_nuke]],
       soundStart              = [[weapon/missile/tacnuke_launch]],

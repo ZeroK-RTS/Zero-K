@@ -95,12 +95,14 @@ local function UnBurrow()
 	Move(body, y_axis, 0.000000, 2.000000)
 	Turn(body, x_axis, 0, math.rad(60.000000))
 	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0)
+	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 5)
 	GG.UpdateUnitAttributes(unitID)
 	
 	Sleep(600)
 	
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 	GG.UpdateUnitAttributes(unitID)
 	EmitSfx(digger, dirtfling)
 	

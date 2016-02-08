@@ -3,13 +3,15 @@ local weaponDef = {
 	name                    = [[Multi-Stunner]],
 	areaOfEffect            = 144,
 	avoidFeature            = false,
+	beamTTL                 = 12,
 	burst                   = 16,
 	burstRate               = 0.1875,
 	commandFire             = true,
 
 	customParams            = {
-		muzzleEffectFire = [[custom:YELLOW_LIGHTNING_MUZZLE]],
+		muzzleEffectShot = [[custom:YELLOW_LIGHTNING_MUZZLE]],
 		slot = [[3]],
+		manualfire = 1,
 	},
 
 	craterBoost             = 0,

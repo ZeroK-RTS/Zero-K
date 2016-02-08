@@ -2,6 +2,7 @@ local name = "commweapon_lightninggun"
 local weaponDef = {
 	name                    = [[Lightning Gun]],
 	areaOfEffect            = 8,
+	beamTTL                 = 12,
 	craterBoost             = 0,
 	craterMult              = 0,
 
@@ -31,7 +32,7 @@ local weaponDef = {
 	rgbColor                = [[0.5 0.5 1]],
 	soundStart              = [[weapon/more_lightning_fast]],
 	soundTrigger            = true,
-	targetMoveError         = 0.3,
+	sprayAngle              = 500,
 	texture1                = [[lightning]],
 	thickness               = 10,
 	turret                  = true,

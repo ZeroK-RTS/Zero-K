@@ -72,7 +72,7 @@ unitDef = {
       footprintX       = 2,
       footprintZ       = 2,
       metal            = 72,
-      object           = [[conbot_dead.s3o]],
+      object           = [[amphcon_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 72,
     },

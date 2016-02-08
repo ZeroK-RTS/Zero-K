@@ -172,6 +172,7 @@ function script.Killed(recentDamage, maxHealth)
 		EmitSfx(DroneFore, 1024)
 		Turn(BayForeHatch, z_axis, math.rad(-100),math.rad(200));
 
+		InitializeDeathAnimation()
 		Sleep(120)
 		
 		EmitSfx(DroneAft, 1024)

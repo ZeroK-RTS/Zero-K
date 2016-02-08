@@ -111,7 +111,7 @@ local TEXT_CORRECT_Y = 1.25
 
 local MINIMAP_DRAW_SIZE = math.max(mapX,mapZ) * 0.0145
 
-options_path = 'Settings/Interface/Metal Spots'
+options_path = 'Settings/Interface/Map/Metal Spots'
 options_order = { 'drawicons', 'size', 'specPlayerColours', 'rounding'}
 options = {
 	
@@ -153,6 +153,9 @@ options = {
 -- Mexes and builders
 
 local mexDefID = UnitDefNames["cormex"].id
+local lltDefID = UnitDefNames["corllt"].id
+local solarDefID = UnitDefNames["armsolar"].id
+
 local mexUnitDef = UnitDefNames["cormex"]
 local mexDefInfo = {
 	extraction = 0.001,
@@ -171,6 +174,13 @@ for udid, ud in ipairs(UnitDefs) do
 		end
 	end
 end
+
+local addons = { -- coordinates of solars for the Alt modifier key
+	{ 16, -64 },
+	{ 64,  16 },
+	{-16,  64 },
+	{-64, -16 },
+}
 
 --------------------------------------------------------------------------------
 -- Variables
@@ -316,7 +326,7 @@ function widget:CommandNotify(cmdID, params, options)
 		for i = 1, #WG.metalSpots do		
 			local mex = WG.metalSpots[i]
 			--if (mex.x > xmin) and (mex.x < xmax) and (mex.z > zmin) and (mex.z < zmax) then -- square area, should be faster
-			if (not spotData[i]) and (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
+			if (Distance(cx,cz,mex.x,mex.z) < cr*cr) then -- circle area, slower
 				commands[#commands+1] = {x = mex.x, z = mex.z, d = Distance(aveX,aveZ,mex.x,mex.z)}
 			end
 		end
@@ -349,37 +359,24 @@ function widget:CommandNotify(cmdID, params, options)
 			--prepare command list
 			if not shift then 
 				commandArrayToIssue[1] = {CMD.STOP, {} , {}}
-				--spGiveOrderToUnit(unitID, CMD.STOP, {} , 0 )
 			end
 			for i, command in ipairs(orderedCommands) do
 				local x = command.x
 				local z = command.z
-				local buildable, feature = spTestBuildOrder(mexDefID,x,0,z,1)
-				if buildable ~= 0 then
-					local handledExternally = false
-					if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-						handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x,0,z,0} , options , true) --add additional flag "true" for additional logic for zk areamex
-					end
-					if ( not handledExternally ) then
-						commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,0,z,0} , {"shift"}}
-						--spGiveOrderToUnit(unitID, -mexDefID, {x,0,z,0} , {"shift"})
-					end
-				else
-					local mexes = spGetUnitsInRectangle(x-1,z-1,x+1,z+1)
-					for i = 1, #mexes do --check unit in build location
-						local aid = mexes[i]
-						local udid = spGetUnitDefID(aid)
-						if spGetUnitAllyTeam(aid) == myAllyTeam and mexDefID == udid then
-							if select(5, spGetUnitHealth(aid)) ~= 1 then
-								commandArrayToIssue[#commandArrayToIssue+1] = {CMD.REPAIR, {aid} , {"shift"}}
-								--spGiveOrderToUnit(unitID, CMD.REPAIR, {aid} , {"shift"})
-								break
-							end
-						end
+				local y = Spring.GetGroundHeight(x, z)
+
+				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+
+				if (options["alt"]) then
+					for i=1, #addons do
+						local addon = addons[i]
+						local xx = x+addon[1]
+						local zz = z+addon[2]
+						local yy = Spring.GetGroundHeight(xx, zz)
+						commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
 					end
 				end
-			end		
-			--issue all order to all unit at once
+			end
 			Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
 		end
   
@@ -521,7 +518,7 @@ function widget:Update()
 		metalSpotsNil = false
 	end
 	
-	WG.mouseoverMexIncome = 0
+	WG.mouseoverMexIncome = false
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
@@ -598,6 +595,24 @@ function calcMainMexDrawList()
 
 			local mexColor = getSpotColor(x,y+45,z,i,specatate,1)
 			local metal = spot.metal
+		
+
+			glPushMatrix()	
+			
+			gl.DepthTest(true)
+
+			glColor(0,0,0,0.7)
+			-- glDepthTest(false)
+			glLineWidth(spot.metal*2.4)
+			glDrawGroundCircle(x, 1, z, 40, 21)
+			glColor(mexColor)
+			glLineWidth(spot.metal*1.5)
+			glDrawGroundCircle(x, 1, z, 40, 21)	
+			
+			--glColor(0,1,1)
+			--glRect(x-width/2, z+18, x+width/2, z+20)
+			--glDepthTest(false)
+			glPopMatrix()	
 			
 			glPushMatrix()
 			
@@ -621,7 +636,7 @@ function calcMainMexDrawList()
 				glColor(1,1,1)
 				glTexture("LuaUI/Images/ibeam.png")
 				local width = metal*size
-				glTexRect(x-width/2, z+20, x+width/2, z+20+size,0,0,metal,1)
+				glTexRect(x-width/2, z+40, x+width/2, z+40+size,0,0,metal,1)
 				glTexture(false)
 			else
 				-- Draws a metal bar at the center of the metal spot
@@ -634,28 +649,11 @@ function calcMainMexDrawList()
 				
 				-- Draws the metal spot's base income "south" of the metal spot
 				glRotate(180,1,0,0)
-				glTranslate(x,-z-20-options.size.value, 0)
+				glTranslate(x,-z-40-options.size.value, 0)
 				glText("+" .. ("%."..options.rounding.value.."f"):format(metal), 0.0, 0.0, options.size.value , "cno")
 			end	
 	
 			glPopMatrix()	
-
-			glPushMatrix()	
-			
-			gl.DepthTest(true)
-
-			glColor(0,0,0,0.7)
-			-- glDepthTest(false)
-			glLineWidth(spot.metal*2.4)
-			glDrawGroundCircle(x, 1, z, 40, 21)
-			glColor(mexColor)
-			glLineWidth(spot.metal*1.5)
-			glDrawGroundCircle(x, 1, z, 40, 21)	
-			
-			--glColor(0,1,1)
-			--glRect(x-width/2, z+18, x+width/2, z+20)
-			--glDepthTest(false)
-			glPopMatrix()
 		end
 
 		glLineWidth(1.0)
@@ -756,6 +754,8 @@ function widget:DrawWorld()
 			
 			local height = spGetGroundHeight(closestSpot.x,closestSpot.z)
 			height = height > 0 and height or 0
+			
+			gl.DepthTest(false)
 			
 			gl.LineWidth(1.49)
 			gl.Color(1, 1, 0, 0.5)

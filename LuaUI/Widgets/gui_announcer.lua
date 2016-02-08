@@ -467,7 +467,7 @@ local function UnitDead(unitID, unitDefID, teamID, attackerID, attackerDefID, at
 	if (markerID ~= nil) then
 	  DeathMarkers[markerID].kills = DeathMarkers[markerID].kills + 1
 	  -- TODO nanoframes metalcost should be scaled by their health
-	  DeathMarkers[markerID].wasted = DeathMarkers[markerID].wasted + ud.metalCost
+	  DeathMarkers[markerID].wasted = DeathMarkers[markerID].wasted + Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	  DeathMarkers[markerID].x = (DeathMarkers[markerID].x+x)/2
 	  DeathMarkers[markerID].z = (DeathMarkers[markerID].z+z)/2
 	  DeathMarkers[markerID].y = spGetGroundHeight2(DeathMarkers[markerID].x,DeathMarkers[markerID].z)

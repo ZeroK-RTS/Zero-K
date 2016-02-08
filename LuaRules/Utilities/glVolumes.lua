@@ -71,6 +71,29 @@ function gl.Utilities.DrawMyBox(minX,minY,minZ, maxX,maxY,maxZ)
   end)
 end
 
+function gl.Utilities.DrawMy3DTriangle(x1,z1, x2, z2, x3,z3, minY, maxY)
+  gl.BeginEnd(GL.TRIANGLES, function()
+    --// top
+    glVertex(x1, maxY, z1)
+    glVertex(x2, maxY, z2)
+    glVertex(x3, maxY, z3)
+    --// bottom
+    glVertex(x1, minY, z1)
+    glVertex(x3, minY, z3)
+    glVertex(x2, minY, z2)
+  end)
+  gl.BeginEnd(GL.QUAD_STRIP, function()
+    --// sides
+    glVertex(x1, maxY, z1)
+    glVertex(x1, minY, z1)
+    glVertex(x2, maxY, z2)
+    glVertex(x2, minY, z2)
+    glVertex(x3, maxY, z3)
+    glVertex(x3, minY, z3)
+    glVertex(x1, maxY, z1)
+    glVertex(x1, minY, z1)
+  end)
+end
 
 local function CreateSinCosTable(divs)
   local sinTable = {}
@@ -193,6 +216,18 @@ function gl.Utilities.DrawGroundRectangle(x1,z1,x2,z2)
   gl.Scale(x2-x1, shapeHeight, z2-z1)
   gl.Utilities.DrawVolume(box)
   gl.PopMatrix()
+end
+
+local triangles = {}
+function gl.Utilities.DrawGroundTriangle(args)
+	if not triangles[args] then
+		triangles[args] = gl.CreateList(gl.Utilities.DrawMy3DTriangle, args[1], args[2], args[3], args[4], args[5], args[6], -0.5, 0.5)
+	end
+	gl.PushMatrix()
+	gl.Translate(0, averageGroundHeight, 0)
+	gl.Scale(1, shapeHeight, 1)
+	gl.Utilities.DrawVolume(triangles[args])
+	gl.PopMatrix()
 end
 
 local cylinder = gl.CreateList(gl.Utilities.DrawMyCylinder,0,0,0,1,1,35)

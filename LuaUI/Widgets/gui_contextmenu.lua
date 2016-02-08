@@ -38,6 +38,7 @@ stats_hide_projectile_speed
 
 include("keysym.h.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
+VFS.Include("LuaRules/Utilities/versionCompare.lua")
 
 local spSendLuaRulesMsg			= Spring.SendLuaRulesMsg
 local spGetCurrentTooltip		= Spring.GetCurrentTooltip
@@ -55,6 +56,8 @@ local strFormat 				= string.format
 
 local echo = Spring.Echo
 
+local LOS_MULT = (Spring.Utilities.IsCurrentVersionNewerThan(100, 0) and 1) or 32
+
 local VFSMODE      = VFS.RAW_FIRST
 local ignoreweapon, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFSMODE)
 local confdata = VFS.Include(LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua", nil, VFSMODE)
@@ -64,6 +67,8 @@ local iconTypesPath = LUAUI_DIRNAME.."Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 
 local emptyTable = {}
+
+local moduleDefs, chassisDefs, upgradeUtilities = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -105,8 +110,9 @@ local colorCapture = {0.6, 1, 0.6, 1}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function MakeStatsWindow() 
+end
 
-local function MakeStatsWindow() end
 options_order = {'shortNotation'}
 options_path = 'Help/Guide/Unit List'
 options = {
@@ -219,22 +225,21 @@ for i = 1, #UnitDefs do
 			addUnit(i,"Misc/Chickens", false)
 		elseif ud.customParams.is_drone then
 			addUnit(i,"Units/Misc", false)
-		elseif (ud.customParams.commtype or ud.customParams.level) then
-			local unitName = ud.name
-			if unitName:sub(6, 8) == "cai" then
-				-- addUnit(i,"Misc/Commanders/CAI", false)
-			elseif unitName:sub(6, 13) == "campaign" then
-				addUnit(i,"Misc/Commanders/Campaign", false)
-			elseif unitName:sub(6, 12) == "trainer" then
-				local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
-				addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
-			elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-				local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
-				local designation = ud.humanName:sub(1, ud.humanName:find(" level ")-1)
-				addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. designation, false)
-			else
-				-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
-			end
+		--elseif (ud.customParams.commtype or ud.customParams.level) then
+		--	local unitName = ud.name
+		--	if unitName:sub(6, 8) == "cai" then
+		--		-- addUnit(i,"Misc/Commanders/CAI", false)
+		--	elseif unitName:sub(6, 13) == "campaign" then
+		--		addUnit(i,"Misc/Commanders/Campaign", false)
+		--	elseif unitName:sub(6, 12) == "trainer" then
+		--		local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
+		--		addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
+		--	elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
+		--		local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
+		--		addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. ud.humanName, false)
+		--	else
+		--		-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
+		--	end
 		end
 	end
 end
@@ -396,7 +401,20 @@ local function getDescription(unitDef)
 	
 end	
 
-local function weapons2Table(cells, ws, ud)
+local function GetShieldRegenDrain(wd)
+	local shieldRegen = wd.shieldPowerRegen
+	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
+		shieldRegen = wd.customParams.shield_rate
+	end
+	
+	local shieldDrain = wd.shieldPowerRegenEnergy
+	if shieldDrain == 0 and wd.customParams and wd.customParams.shield_drain then
+		shieldDrain = wd.customParams.shield_drain
+	end
+	return shieldRegen, shieldDrain
+end
+
+local function weapons2Table(cells, ws, unitID)
 	local cells = cells
 	
 	local wd = WeaponDefs[ws.weaponID]
@@ -423,12 +441,13 @@ local function weapons2Table(cells, ws, ud)
 	cells[#cells+1] = ''
 
 	if wd.isShield then
+		local regen, drain = GetShieldRegenDrain(wd) 
 		cells[#cells+1] = ' - Strength:'
 		cells[#cells+1] = wd.shieldPower .. " HP"
 		cells[#cells+1] = ' - Regen:'
-		cells[#cells+1] = wd.shieldPowerRegen .. " HP/s"
+		cells[#cells+1] = regen .. " HP/s"
 		cells[#cells+1] = ' - Regen cost:'
-		cells[#cells+1] = wd.shieldPowerRegenEnergy .. " E/s"
+		cells[#cells+1] = drain .. " E/s"
 		cells[#cells+1] = ' - Radius:'
 		cells[#cells+1] = wd.shieldRadius .. " elmo"
 	else
@@ -542,11 +561,16 @@ local function weapons2Table(cells, ws, ud)
 		}
 		local show_projectile_speed = not cp.stats_hide_projectile_speed and not hitscan[wd.type]
 
-		if ((dps + dpsw + dpss + dpsd + dpsc) < 5) then -- no damage: newtons and such
+		if ((dps + dpsw + dpss + dpsd + dpsc) < 2) then -- no damage: newtons and such
 			show_damage = false
 			show_dps = false
 		end
 		
+		if cp.damage_vs_shield then -- Wolverine
+			dam_str = tostring(cp.damage_vs_shield) .. " (" .. dam .. " + " .. (tonumber(cp.damage_vs_shield)-dam) .. " mine)"
+			dps_str = numformat(math.floor(tonumber(cp.damage_vs_shield)/reloadtime))
+		end
+
 		if show_damage then
 			cells[#cells+1] = ' - Damage:'
 			cells[#cells+1] = dam_str
@@ -558,6 +582,20 @@ local function weapons2Table(cells, ws, ud)
 		if show_dps then
 			cells[#cells+1] = ' - DPS:'
 			cells[#cells+1] = dps_str
+		end
+		
+		local lowerName = name:lower()
+		if lowerName:find("flamethrower") or lowerName:find("flame thrower") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "300%"
+		elseif lowerName:find("gauss") then
+			cells[#cells+1] = ' - Shield damage:'
+			cells[#cells+1] = "150%"
+		end
+
+		if (wd.interceptedByShieldType == 0) then
+			cells[#cells+1] = ' - Ignores shields'
+			cells[#cells+1] = ''
 		end
 
 		if stun_time > 0 then
@@ -573,7 +611,7 @@ local function weapons2Table(cells, ws, ud)
 
 		if show_range then
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range,2) .. " elmo"
+			cells[#cells+1] = numformat(wd.range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -769,16 +807,18 @@ local function weapons2Table(cells, ws, ud)
 	return cells
 end
 
-local function printAbilities(ud)
+local function printAbilities(ud, unitID)
 	local cells = {}
 
 	local cp = ud.customParams
-		
+
+	
 	if ud.buildSpeed > 0 then
+		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Buildpower: '
-		cells[#cells+1] = numformat(ud.buildSpeed)
+		cells[#cells+1] = numformat(buildSpeed)
 		if ud.canResurrect then
 			cells[#cells+1] = ' - Can resurrect wreckage'
 			cells[#cells+1] = ''
@@ -804,18 +844,21 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if cp.area_cloak then
+	if cp.area_cloak or (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak")) then
+		local areaCloakUpkeep = (unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_upkeep") or cp.area_cloak_upkeep)
+		local areaCloakRadius = ((unitID and Spring.GetUnitRulesParam(unitID, "comm_area_cloak_radius")) or cp.area_cloak_radius)
 		cells[#cells+1] = 'Area cloak'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Upkeep:'
-		cells[#cells+1] = cp.area_cloak_upkeep .. " E/s"
+		cells[#cells+1] = areaCloakUpkeep .. " E/s"
 		cells[#cells+1] = ' - Radius:'
-		cells[#cells+1] = cp.area_cloak_radius .. " elmo"
+		cells[#cells+1] = areaCloakRadius .. " elmo"
 		cells[#cells+1] = ''
 		cells[#cells+1] = ''
 	end
 
-	if ud.cloakCost > 0 then
+	if ud.cloakCost > 0 and (not unitID or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")) then
+		local decloakDistance = (unitID and Spring.GetUnitRulesParam(unitID, "comm_decloak_distance")) or ud.decloakDistance
 		cells[#cells+1] = 'Personal cloak'
 		cells[#cells+1] = ''
 		if ud.speed > 0 then
@@ -827,7 +870,7 @@ local function printAbilities(ud)
 		end
 		cells[#cells+1] = numformat(ud.cloakCost) .. " E/s"
 		cells[#cells+1] = ' - Decloak radius: '
-		cells[#cells+1] = numformat(ud.decloakDistance) .. " elmo"
+		cells[#cells+1] = numformat(decloakDistance) .. " elmo"
 		if not ud.decloakOnFire then
 			cells[#cells+1] = ' - No decloak while shooting'
 			cells[#cells+1] = ''
@@ -849,16 +892,19 @@ local function printAbilities(ud)
 		cells[#cells+1] = ''
 	end
 
-	if (ud.radarRadius > 0) or (ud.jammerRadius > 0) or ud.targfac then
+	local radarRadius = unitID and Spring.GetUnitRulesParam(unitID, "radarRangeOverride") or ud.radarRadius
+	local jammerRadius = unitID and Spring.GetUnitRulesParam(unitID, "jammingRangeOverride") or ud.jammerRadius
+	
+	if (radarRadius > 0) or (jammerRadius > 0) or ud.targfac then
 		cells[#cells+1] = 'Provides intel'
 		cells[#cells+1] = ''
-		if (ud.radarRadius > 0) then
+		if (radarRadius > 0) then
 			cells[#cells+1] = ' - Radar:'
-			cells[#cells+1] = numformat(ud.radarRadius) .. " elmo"
+			cells[#cells+1] = numformat(radarRadius) .. " elmo"
 		end
-		if (ud.jammerRadius > 0) then
+		if (jammerRadius > 0) then
 			cells[#cells+1] = ' - Radar jamming:'
-			cells[#cells+1] = numformat(ud.jammerRadius) .. " elmo"
+			cells[#cells+1] = numformat(jammerRadius) .. " elmo"
 		end
 		if ud.targfac then
 			cells[#cells+1] = ' - Improves radar accuracy'
@@ -1095,52 +1141,62 @@ local function printAbilities(ud)
 	return cells
 end
 
-local function printWeapons(unitDef)
+local function printWeapons(unitDef, unitID)
 	local weaponStats = {}
 
 	local wd = WeaponDefs
 	if not wd then return false end	
 	
 	local ucp = unitDef.customParams
-
+	
 	for i=1, #unitDef.weapons do
-		local weapon = unitDef.weapons[i]
-		local weaponID = weapon.weaponDef
-		local weaponDef = WeaponDefs[weaponID]
+		if not unitID or -- filter out commander weapons not in current loadout
+		(  i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+		or i == Spring.GetUnitRulesParam(unitID, "comm_shield_num")) then
+			local weapon = unitDef.weapons[i]
+			local weaponID = weapon.weaponDef
+			local weaponDef = WeaponDefs[weaponID]
 
-		local aa_only = true
-		for cat in pairs(weapon.onlyTargets) do
-			if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
-				aa_only = false
-				break;
+			local aa_only = true
+			for cat in pairs(weapon.onlyTargets) do
+				if ((cat ~= "fixedwing") and (cat ~= "gunship")) then
+					aa_only = false
+					break;
+				end
 			end
-		end
 
-		local weaponName = weaponDef.description or 'Weapon'
-		local isDuplicate = false
+			local weaponName = weaponDef.description or 'Weapon'
+			local isDuplicate = false
 
-		for i=1,#weaponStats do
-			if weaponStats[i].weaponID == weaponID then
-				weaponStats[i].count = weaponStats[i].count + 1
-				isDuplicate = true
-				break
+			for i=1,#weaponStats do
+				if weaponStats[i].weaponID == weaponID then
+					weaponStats[i].count = weaponStats[i].count + 1
+					isDuplicate = true
+					break
+				end
 			end
-		end
-		
-		if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
-			local wsTemp = {
-				weaponID = weaponID,
-				count = 1,
+			
+			if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
+				local wsTemp = {
+					weaponID = weaponID,
+					count = 1,
+					
+					-- stuff that the weapon gets from the owner unit
+					aa_only = aa_only,
+					highTrajectory = unitDef.highTrajectoryType,
+					free_stockpile = ucp.freestockpile,
+					stockpile_time = ucp.stockpiletime,
+					stockpile_cost = ucp.stockpilecost,
+					firing_arc = weapon.maxAngleDif
+				}
 				
-				-- stuff that the weapon gets from the owner unit
-				aa_only = aa_only,
-				highTrajectory = unitDef.highTrajectoryType,
-				free_stockpile = ucp.freestockpile,
-				stockpile_time = ucp.stockpiletime,
-				stockpile_cost = ucp.stockpilecost,
-				firing_arc = weapon.maxAngleDif
-			}
-			weaponStats[#weaponStats+1] = wsTemp
+				-- dual wielding comms
+				if (unitID and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_1") and i == Spring.GetUnitRulesParam(unitID, "comm_weapon_id_2")) then
+					wsTemp.count = 2
+				end
+				weaponStats[#weaponStats+1] = wsTemp
+			end
 		end
 	end
 
@@ -1152,7 +1208,7 @@ local function printWeapons(unitDef)
 			cells[#cells+1] = ''
 			cells[#cells+1] = ''
 		end
-		cells = weapons2Table(cells, ws)
+		cells = weapons2Table(cells, ws, unitID)
 		--end
 	end
 	
@@ -1163,7 +1219,7 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName] 
 end
 
-local function printunitinfo(ud, lang, buttonWidth)	
+local function printunitinfo(ud, lang, buttonWidth, unitID)	
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1196,32 +1252,78 @@ local function printunitinfo(ud, lang, buttonWidth)
 	
 	local statschildren = {}
 
-	-- stuff for modular commanders
-	local commModules, commCost
-	if ud.customParams.commtype then
-		commModules = WG.GetCommModules and WG.GetCommModules(ud.id)
-		commCost = ud.customParams.cost or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
-	end
+	local isCommander = (unitID and Spring.GetUnitRulesParam(unitID, "comm_level"))
+
 	local cost = numformat(ud.metalCost)
-	if commCost then
-		cost = cost .. ' (' .. numformat(commCost) .. ')'
+	local health = numformat(ud.health)
+	local speed = numformat(ud.speed)
+	local mass = numformat(ud.mass)
+	
+	-- stuff for modular commanders
+	local legacyModules, legacyCommCost
+	if ud.customParams.commtype and not isCommander then	-- old style pregenerated commander (still used in missions etc.)
+		legacyModules = WG.ModularCommAPI and WG.ModularCommAPI.GetLegacyModulesForComm(ud.id)
+		legacyCommCost = ud.customParams.cost -- or (WG.GetCommUnitInfo and WG.GetCommUnitInfo(ud.id) and WG.GetCommUnitInfo(ud.id).cost)
+	end
+
+	-- dynamic comms get special treatment
+	if isCommander then
+		cost = Spring.GetUnitRulesParam(unitID, "comm_cost") or 1200
+		health = select(2, Spring.GetUnitHealth(unitID))
+		speed = numformat(ud.speed * (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1))
+		mass = numformat(Spring.GetUnitRulesParam(unitID, "massOverride") or ud.mass)
+
+		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].humanName, textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+
+		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
+
+		local modules = Spring.GetUnitRulesParam(unitID, "comm_module_count")
+
+		if modules > 0 then
+			local module_instances = {}
+			for i = 1, modules do
+				local moduleID = Spring.GetUnitRulesParam(unitID, "comm_module_" .. i)
+				module_instances[moduleID] = (module_instances[moduleID] or 0) + 1
+			end
+			for moduleID, moduleCount in pairs(module_instances) do
+				local moduleStr = moduleDefs[moduleID].humanName
+				if moduleCount > 1 then moduleStr = moduleStr .. "  x" .. moduleCount end
+				statschildren[#statschildren+1] = Label:New{ caption = moduleStr, textColor = color.stats_fg, }
+				statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg, }
+			end
+		end
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
+	end
+
+	local costStr = cost .. " M"
+	if (legacyCommCost) then
+		costStr = costStr .. "(" .. legacyCommCost .. " M)"
 	end
 	
 	statschildren[#statschildren+1] = Label:New{ caption = 'STATS', textColor = color.stats_header, }
 	statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Cost: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = cost .. " M", textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = costStr, textColor = color.stats_fg, }
 	
-	statschildren[#statschildren+1] = Label:New{ caption = 'Max HP: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.health), textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = 'Health: ', textColor = color.stats_fg, }
+	statschildren[#statschildren+1] = Label:New{ caption = health, textColor = color.stats_fg, }
 
 	statschildren[#statschildren+1] = Label:New{ caption = 'Mass: ', textColor = color.stats_fg, }
-	statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.mass), textColor = color.stats_fg, }
-	
+	statschildren[#statschildren+1] = Label:New{ caption = mass, textColor = color.stats_fg, }
+
 	if ud.speed > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Speed: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.speed) .. " elmo/s", textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = speed .. " elmo/s", textColor = color.stats_fg, }
 	end
 
 	--[[ Enable through some option perhaps
@@ -1242,17 +1344,17 @@ local function printunitinfo(ud, lang, buttonWidth)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
-	local energy = (ud.energyMake or 0) - (ud.energyUpkeep or 0) + (ud.customParams.income_energy or 0) 
+	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Energy: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = (energy > 0 and '+' or '') .. numformat(energy,2) .. " E/s", textColor = color.stats_fg, }
 	end
-
+	
 	if ud.losRadius > 0 then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Sight: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*64) .. " elmo", textColor = color.stats_fg, }
-		-- 64 is to offset the engine multiplier, which is
+		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.losRadius*LOS_MULT) .. " elmo", textColor = color.stats_fg, }
+		-- 32 is to offset the engine multiplier, which is
 		-- (modInfo.losMul / (SQUARE_SIZE * (1 << modInfo.losMipLevel)))
 	end
 
@@ -1274,21 +1376,21 @@ local function printunitinfo(ud, lang, buttonWidth)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = (((ud.mass > 365) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
-
-	if commModules then
+	
+	if legacyModules then
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = 'MODULES', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
-		for i=1, #commModules do
-			statschildren[#statschildren+1] = Label:New{ caption = commModules[i], textColor = color.stats_fg,}
+		for i=1, #legacyModules do
+			statschildren[#statschildren+1] = Label:New{ caption = legacyModules[i], textColor = color.stats_fg,}
 			statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_fg,}
 		end	
 	end
-	
-	local cells = printAbilities(ud)
+
+	local cells = printAbilities(ud, isCommander and unitID)
 	
 	if cells and #cells > 0 then
 
@@ -1302,7 +1404,7 @@ local function printunitinfo(ud, lang, buttonWidth)
 		end
 	end
 
-	cells = printWeapons(ud)
+	cells = printWeapons(ud, isCommander and unitID)
 	
 	if cells and #cells > 0 then
 		
@@ -1491,7 +1593,7 @@ local function KillStatsWindow(num)
 	statswindows[num] = nil
 end
 
-MakeStatsWindow = function(ud, x,y)
+MakeStatsWindow = function(ud, x,y, unitID)
 	hideWindow(window_unitcontext)
 	local x = x
 	local y = y
@@ -1514,7 +1616,7 @@ MakeStatsWindow = function(ud, x,y)
 			width='100%',
 			bottom = B_HEIGHT*2,
 			padding = {2,2,2,2},
-			children = printunitinfo(ud, WG.lang or 'en', window_width) ,
+			children = printunitinfo(ud, WG.lang or 'en', window_width, unitID) ,
 		},	
 		Button:New{ 
 			caption = 'Close', 
@@ -1549,7 +1651,7 @@ MakeStatsWindow = function(ud, x,y)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = ud.humanName ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(unitID, ud) ..' - '.. desc,
 		
 		children = children,
 	}
@@ -1778,11 +1880,6 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		if ud then
-			MakeStatsWindow(ud,x,y)
-			return true
-		end
-		
 		local type, data = spTraceScreenRay(x, y)
 		if (type == 'unit') then
 			local unitID = data
@@ -1792,10 +1889,10 @@ function widget:MousePress(x,y,button)
 				return
 			end
 			
-			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			local udid = UnitDefs[Spring.GetUnitDefID(unitID)]
 			
-			if ud then
-				MakeStatsWindow(ud,x,y)
+			if udid then
+				MakeStatsWindow(udid,x,y, unitID)
 			end
 			-- FIXME enable later when does not show useless info
 			return true
@@ -1819,7 +1916,11 @@ function widget:MousePress(x,y,button)
 				end
 			end
 		end
-		
+
+		if ud then
+			MakeStatsWindow(ud,x,y)
+			return true
+		end
 	end
 
 	--[[

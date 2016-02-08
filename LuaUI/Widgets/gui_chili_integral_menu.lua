@@ -63,6 +63,7 @@ local fakewindow	--visible Panel
 local menuTabRow	--parent row of tabs
 local menuTabs = {}		--buttons
 local commands_main	--parent column of command buttons
+local fakeButtons = {}
 local sp_commands = {}	--buttons
 local states_main	--parent row of state buttons
 local sp_states = {}	--buttons
@@ -70,7 +71,6 @@ local buildRow	--row of build queue buttons
 local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
 local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
 local buildRow_dragDrop = {nil,nil,nil} --current buildqueue that is being dragged by user.
-
 local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
 local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
@@ -82,7 +82,8 @@ local gridLocation = {}
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown'}
+options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 
+					'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'}
 options = {
 	background_opacity = {
 		name = "Opacity",
@@ -146,6 +147,11 @@ options = {
 		advanced = true,
 		value = true,
 	},
+	hide_when_spectating = {
+		name = 'Hide when Spectating',
+		type = 'bool',
+		value = false,
+	},
 }
 
 
@@ -159,6 +165,7 @@ local spGetSelectedUnits = Spring.GetSelectedUnits
 local spGetUnitWeaponState 	= Spring.GetUnitWeaponState
 local spGetGameFrame 		= Spring.GetGameFrame
 local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetSpectatingState = Spring.GetSpectatingState
 
 local push        = table.insert
 
@@ -248,6 +255,7 @@ local alreadyRemovedTag = {}
 
 local hotkeyMode = false
 local recentlyInitialized = false
+local wasPlaying = false
 
 local gridKeyMap = {
 	[KEYSYMS.Q] = {1,1}, 
@@ -363,6 +371,30 @@ end
 --  Generates or updates chili button - either image or text or both based - container is parent of button, cmd is command desc structure
 ------------------------
 local function MakeButton(container, cmd, insertItem, index)
+	if cmd.fake then
+		---- Fake button for padding purposes.
+		if fakeButtons[cmd.row] and fakeButtons[cmd.row][cmd.col] then
+			if insertItem then
+				container:AddChild(fakeButtons[cmd.row][cmd.col])
+			end
+		else
+			fakeButtons[cmd.row] = fakeButtons[cmd.row] or {}
+			fakeButtons[cmd.row][cmd.col] = Button:New{
+				parent=container;
+				padding = {1,1,1,1},
+				margin = {0, 0, 0, 0},
+				caption="";
+				isDisabled = true;
+				backgroundColor = {0,0,0,0},
+				isStructure = true;
+				cmdid = "fake",
+				fake = true,
+				HitTest = function (self, x, y) return false end,	
+			}
+		end
+		return
+	end
+	
 	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
 	local isBuild = (cmd.id < 0)
 	local isStructure = (cmd.id < 0) and menuChoice ~= 1 and menuChoice ~= 6 
@@ -655,7 +687,7 @@ local function SetContainerNeedUpdate(container, nl)
 	if cnt ~= #nl then  -- different counts, we update fully
 		needUpdate = true 
 	else  -- check if some items are different 
-		for i=1, #nl do  
+		for i=1, #nl do
 			dif[nl[i].id] = nil
 		end 
 	
@@ -925,6 +957,16 @@ local function ManageCommandIcons(useRowSort)
 			commandRows[i] = {}
 			for v=1,#sourceArray do
 				if configArray[sourceArray[v].id].row == i then
+					local extra = 0
+					while #commandRows[i] + 1 < configArray[sourceArray[v].id].col do
+						commandRows[i][#commandRows[i]+1] = {
+							fake = true, 
+							row = configArray[sourceArray[v].id].row, 
+							col = configArray[sourceArray[v].id].col + extra,
+							id = false
+						}
+						extra = extra + 1
+					end
 					commandRows[i][#commandRows[i]+1] = sourceArray[v]
 				end
 			end
@@ -954,7 +996,7 @@ local function Update(buttonpush)
 	local commands = widgetHandler.commands
 	local customCommands = widgetHandler.customCommands
 	--most commands don't use row sorting; econ, defense and special do
-	local useRowSort = (menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
+	local useRowSort = (menuChoice == 2 or menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
 	
 	if menuChoice == 1 then
 		hotkeyMode = false
@@ -1163,7 +1205,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local pos = gridKeyMap[key]
 		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
-			if cmdid then
+			if cmdid and not cmdid.fake then
 				cmdid = cmdid.cmdid
 				if cmdid then 
 					local index = Spring.GetCmdDescIndex(cmdid)
@@ -1181,7 +1223,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local pos = gridKeyMap[key]
 		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
 			local cmdid = sp_commands[pos[1]].children[pos[2]]
-			if cmdid then
+			if cmdid and not cmdid.fake then
 				cmdid = cmdid.cmdid
 				if cmdid then 
 					local index = Spring.GetCmdDescIndex(cmdid)
@@ -1293,6 +1335,7 @@ function widget:Initialize()
 	Spring.ForceLayoutUpdate()
 	
 	recentlyInitialized = true
+	wasPlaying = not spGetSpectatingState()
 	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")	
@@ -1388,6 +1431,7 @@ function widget:Initialize()
 	}
 
 	menuTabRow = StackPanel:New{
+		name = "Integral menuTabRow",
 		parent = window,
 		resizeItems = true;
 		columns = 6;
@@ -1438,6 +1482,7 @@ function widget:Initialize()
 	}
 	for i=1,numRows do
 		sp_commands[i] = StackPanel:New{
+			name = "sp_commands " .. i,
 			parent = commands_main,
 			resizeItems = true;
 			orientation   = "horizontal";
@@ -1473,6 +1518,7 @@ function widget:Initialize()
 	}
 	for i=1, numStateColumns do
 		sp_states[i] = StackPanel:New {
+			name = "sp_states " .. i,
 			parent = states_main,
 			resizeItems = true;
 			orientation   = "vertical";
@@ -1587,10 +1633,15 @@ function widget:Update()
 		recentlyInitialized = false
 		ColorTabs(1)
 	end
+	if wasPlaying == spGetSpectatingState() then
+		wasPlaying = not wasPlaying
+		options.hide_when_spectating.OnChange()
+	end
 end
 
 --This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
+	if options.hide_when_spectating.value and spGetSpectatingState() then return end
 	--set progress bar
 	if n%6 == 0 then
 		if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
@@ -1735,4 +1786,15 @@ options.hidetabs.OnChange = function(self)
 	end
 	menuChoice = 1
 	ColorTabs(1)
+end
+
+options.hide_when_spectating.OnChange = function(self) 	
+	if self.value and spGetSpectatingState() then 
+		window:RemoveChild(fakewindow)
+		window:RemoveChild(menuTabRow)
+	else
+		window:AddChild(fakewindow)
+		window:AddChild(menuTabRow)
+	end
+	ColorTabs()
 end

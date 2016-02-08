@@ -23,7 +23,7 @@ unitDef = {
     helptext       = [[The Infernal is a fire-based riot jumper.]],
 	},
 
-  explodeAs             = [[CORPYRO_NAPALM]],
+  explodeAs             = [[CORPYRO_PYRO_DEATH]],
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetriot]],

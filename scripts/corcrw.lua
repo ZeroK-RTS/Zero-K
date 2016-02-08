@@ -91,7 +91,7 @@ end
 
 local function EmitDust()
 	while true do
-		if not (isLanded or Spring.GetUnitIsStunned(unitID)) then
+		if not (isLanded or Spring.GetUnitIsStunned(unitID) or Spring.GetUnitIsCloaked(unitID)) then
 			local x, _, z = GetUnitPosition(unitID)
 			local y = GetGroundHeight(x, z) + 30
 			SpawnCEG("krowdust", x, y, z, 0, 0, 0, 1, 1)
@@ -175,8 +175,6 @@ function script.Create()
 	Turn(jetleft, x_axis, math.rad(90))
 	Turn(jetright, x_axis, math.rad(90))
 	Turn(jetrear, x_axis, math.rad(90))
-	
-	Spin(emit, y_axis, math.rad(180))
 	
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)

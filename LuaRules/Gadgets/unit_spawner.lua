@@ -21,8 +21,6 @@ local SAVE_FILE = "Gadgets/unit_spawner.lua"
 if (gadgetHandler:IsSyncedCode()) then
 -- BEGIN SYNCED
 
-local reverseCompat = ((Game.version:find('91.0') == 1))
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1168,10 +1166,8 @@ function gadget:GameFrame(n)
   if ((n+29) % 90) < 0.1 then
     KillOldChicken()
     DecayEggs()
-    
-    if reverseCompat then	
-	  DetectCpuLag()
-	end
+	--DetectCpuLag() -- Was only done in 91.0 for some reason
+	
     targetCache = ChooseTarget()
 
     if (targetCache) then
@@ -1180,8 +1176,12 @@ function gadget:GameFrame(n)
         local unitID = chickens[i]
         local cmdQueue = spGetCommandQueue(unitID, 1)
         if (not (cmdQueue and cmdQueue[1])) then
-		  --AttackNearestEnemy(unitID)
-          spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
+          --AttackNearestEnemy(unitID)
+          if (difficulty > 1) and (unitID == queenID) then
+            spGiveOrderToUnit(unitID, CMD.MOVE, targetCache, {"shift"})
+          else
+            spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
+          end
         end
       end
     end
@@ -1313,8 +1313,7 @@ function gadget:GameOver()
 	local modopts = Spring.GetModOptions()
 	local metalmult = tonumber(Spring.GetModOptions().metalmult) or 1
 	local energymult = tonumber(Spring.GetModOptions().energymult) or 1
-	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne((modopts.terracostmult or 1) + 0.001))
-	or ExceedsOne(modopts.wreckagemult) or (not ExceedsOne((modopts.factorycostmult or 1) + 0.001)) then
+	if ExceedsOne(modopts.metalmult) or ExceedsOne(modopts.metalmult) or (not ExceedsOne((modopts.terracostmult or 1) + 0.001)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Chicken> Cheating modoptions, no score sent")
 		return
 	end
@@ -1348,21 +1347,16 @@ function gadget:Load(zip)
 	queenID = GG.SaveLoad.GetNewUnitID(data.queenID)
 	miniQueenNum = data.miniQueenNum
 	--targetCache = data.targetCache	-- not needed
-	for unitID, targetData in pairs(data.burrows) do
-		burrows[GG.SaveLoad.GetNewUnitID(unitID)] = targetData
+	burrows = GG.SaveLoad.GetNewUnitIDKeys(data.burrows)
+	for burrowID, targetData in pairs(burrows) do
+		targetData.targetID = GG.SaveLoad.GetNewUnitID(targetData.targetID)
 	end
-	for unitID, birthTime in pairs(data.chickenBirths) do
-		chickenBirths[GG.SaveLoad.GetNewUnitID(unitID)] = birthTime - math.floor(gameFrameOffset/30)
-	end
+	chickenBirths = GG.SaveLoad.GetNewUnitIDKeys(data.chickenBirths)
 	timeOfLastSpawn = data.timeOfLastSpawn - math.floor(gameFrameOffset/30)
 	waveSchedule = data.waveSchedule - gameFrameOffset
 	waveNumber = data.waveNumber
-	for featureID, time in pairs(data.eggDecay) do
-		eggDecay[GG.SaveLoad.GetNewFeatureID(featureID)] = time - math.floor(gameFrameOffset/30)
-	end
-	for unitID, targetTeam in pairs(data.targets) do
-		targets[GG.SaveLoad.GetNewUnitID(unitID)] = targetTeam
-	end
+	eggDecay = GG.SaveLoad.GetNewUnitIDKeys(data.eggDecay)
+	targets = GG.SaveLoad.GetNewUnitIDKeys(data.targets)
 	totalTechAccel = data.totalTechAccel
 	defensePool = data.defensePool
 	defenseQuota = data.defenseQuota

@@ -155,7 +155,7 @@ local gunPieces = {
 local gun_1 = 0
 local beamCount = 0
 
-local SPEED = 1.9
+local SPEED = 2
 
 local function Walk()
 	Signal(SIG_WALK)
@@ -285,6 +285,7 @@ function script.StopMoving()
 end
 
 function script.Create()
+	
 	Turn(rfleg, x_axis, math.rad(0))
 	Turn(rffoot, x_axis, math.rad(0))
 	
@@ -298,7 +299,7 @@ function script.QueryWeapon(num)
 			if beamCount == 1 then
 				Spring.SetUnitWeaponState(unitID, 1, "range", 1)
 			elseif beamCount == 2 then
-				Spring.SetUnitWeaponState(unitID, 1, "range", 550)
+				Spring.SetUnitWeaponState(unitID, 1, "range", 600)
 			end
 			return mflare
 		else

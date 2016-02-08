@@ -78,6 +78,9 @@ unitDef = {
         setunitsonfire = "1",
         burntime = 90,
 
+		stats_hide_dps = 1, -- one use
+		stats_hide_reload = 1,
+
 		area_damage = 1,
 		area_damage_radius = 256,
 		area_damage_dps = 20,
@@ -96,13 +99,10 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0,
       interceptedByShieldType = 1,
-      levelGround             = false,
       model                   = [[wep_napalm.s3o]],
       noSelfDamage            = true,
       range                   = 3500,
       reloadtime              = 10,
-      shakeduration           = [[1.5]],
-      shakemagnitude          = [[32]],
       smokeTrail              = false,
       soundHit                = [[weapon/missile/nalpalm_missile_hit]],
       soundStart              = [[weapon/missile/tacnuke_launch]],

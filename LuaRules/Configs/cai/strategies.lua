@@ -137,9 +137,7 @@ strategies = {
 		name = "Standard",
 		chance	= 0.2,
 		commanders = {
-			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "armcom1", chance = 0.5},
+			{ID = "dyntrainer_strike_base", chance = 1},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -148,9 +146,8 @@ strategies = {
 		name = "Blitz",
 		chance	= 0.2,
 		commanders = {
-			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "armcom1", chance = 0.5},
+			{ID = "dyntrainer_strike_base", chance = 0.5},
+			{ID = "dyntrainer_recon_base", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Blitz,
 		conAndEconHandlerMods = {},
@@ -159,9 +156,8 @@ strategies = {
 		name = "Push",
 		chance	= 0.2,
 		commanders = {
-			count = 2,
-			[1] = {ID = "armcom1", chance = 0.5},
-			[2] = {ID = "armcom1", chance = 0.5},
+			{ID = "dyntrainer_strike_base", chance = 0.5},
+			{ID = "dyntrainer_assault_base", chance = 0.5},
 		},
 		buildTasksMods = BuildTasksMod_Pusher,
 		conAndEconHandlerMods = {},
@@ -170,9 +166,8 @@ strategies = {
 		name = "Defensive",
 		chance	= 0.2,
 		commanders = {
-			count = 2,
-			[1] = {ID = "armcom1", chance = 0.4},
-			[2] = {ID = "armcom1", chance = 0.6},
+			{ID = "dyntrainer_strike_base", chance = 0.5},
+			{ID = "dyntrainer_assault_base", chance = 0.5},
 		},
 		buildTasksMods =  BuildTasksMod_Defensive,
 		conAndEconHandlerMods = {},
@@ -181,9 +176,8 @@ strategies = {
 		name = "Econ",
 		chance	= 0.2,
 		commanders = {
-			count = 2,
-			[1] = {ID = "armcom1", chance = 0.7},
-			[2] = {ID = "armcom1", chance = 0.3},
+			{ID = "dyntrainer_strike_base", chance = 0.5},
+			{ID = "dyntrainer_support_base", chance = 0.5},
 		},
 		buildTasksMods = noFunc,
 		conAndEconHandlerMods = {},
@@ -192,8 +186,7 @@ strategies = {
 		name = "lolz",
 		chance = 0,
 		commanders = {
-			count = 1,
-			[1] = {ID = "armcom1", chance = 1},
+			{ID = "dyntrainer_strike_base", chance = 1},
 		},
 		buildTasksMods = BuildTasksMod_Lolz,
 		conAndEconHandlerMods = {},
@@ -201,12 +194,11 @@ strategies = {
 }
 
 local function SelectComm(player, team, strat)
-	local count = strategies[strat].commanders.count
 	local rand = math.random()
-	
+
 	local commName
 	local total = 0
-	for i = 1, count do
+	for i = 1, #strategies[strat].commanders do
 		total = total + strategies[strat].commanders[i].chance
 		if rand < total then
 			commName = strategies[strat].commanders[i].ID

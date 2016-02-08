@@ -82,10 +82,17 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function GetUnitHeight(unitID)
+local function GetWantedBomberHeight(unitID)
 	local _,_,_, x,y,z = Spring.GetUnitPosition(unitID, true)
+	local height = Spring.GetUnitHeight(unitID)
+	
 	if x then
 		local ground = Spring.GetGroundHeight(x,z)
+		
+		if height and height > 120 then
+			-- Basically, don't clip through Detriment
+			y = y + 45
+		end
 		if ground and y then
 			if ground < 0 then
 				ground = 0
@@ -115,7 +122,7 @@ function Bomber_Dive_fake_fired(unitID)
 				((not Spring.GetUnitRulesParam(unitID, "noammo")) or Spring.GetUnitRulesParam(unitID, "noammo") ~= 1) then
 			local mobileID = isAttackingMobile(unitID)
 			if mobileID then
-				local height = GetUnitHeight(mobileID)
+				local height = GetWantedBomberHeight(mobileID)
 				temporaryDive(unitID, 20, height)
 			end
 		end
@@ -136,7 +143,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 						and ((not Spring.GetUnitRulesParam(proOwnerID, "noammo")) or Spring.GetUnitRulesParam(proOwnerID, "noammo") ~= 1) then
 					local mobileID = isAttackingMobile(proOwnerID)
 					if mobileID then
-						local height = GetUnitHeight(mobileID)
+						local height = GetWantedBomberHeight(mobileID)
 						temporaryDive(proOwnerID, 150, height)
 					else
 						temporaryDive(proOwnerID, 150, 30)

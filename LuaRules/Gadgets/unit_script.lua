@@ -40,8 +40,6 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return false
 end
 
-local reverseCompat = (not Spring.Utilities.IsCurrentVersionNewerThan(94, 0)) and 1 or 0
-
 -- This lists all callins which may be wrapped in a coroutine (thread).
 -- The ones which should not be thread-wrapped are commented out.
 -- Create, Killed, AimWeapon and AimShield callins are always wrapped.
@@ -127,7 +125,7 @@ local sp_WaitForTurn = Spring.UnitScript.WaitForTurn
 local sp_SetPieceVisibility = Spring.UnitScript.SetPieceVisibility
 local sp_SetDeathScriptFinished = Spring.UnitScript.SetDeathScriptFinished
 
-local LUA_WEAPON_MIN_INDEX = 1 - reverseCompat
+local LUA_WEAPON_MIN_INDEX = 1
 local LUA_WEAPON_MAX_INDEX = LUA_WEAPON_MIN_INDEX + 31
 
 local UNITSCRIPT_DIR = (UNITSCRIPT_DIR or "scripts/"):lower()

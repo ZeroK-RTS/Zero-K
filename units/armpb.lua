@@ -2,6 +2,7 @@ unitDef = {
   unitname                      = [[armpb]],
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
+  acceleration                  = 0,
   buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,

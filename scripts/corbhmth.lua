@@ -15,8 +15,8 @@ local flare3 = piece 'flare3'
 local gun_1 = 1
 
 local gunPieces = {
-	{ barrel = barrel1, flare = flare1 },
 	{ barrel = barrel2, flare = flare2 },
+	{ barrel = barrel1, flare = flare1 },
 	{ barrel = barrel3, flare = flare3 }
 }
 
@@ -33,6 +33,10 @@ function script.Create()
 end
 
 function script.AimWeapon(num, heading, pitch)
+	if (spGetUnitRulesParam(unitID, "lowpower") == 1) then
+		return
+	end
+
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(75))
@@ -43,14 +47,18 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num) 
+	gun_1 = gun_1 + 1
+	if gun_1 > 3 then 
+		gun_1 = 1 
+	end
+	
 	EmitSfx(gunPieces[gun_1].flare, 1024)
 	Move(gunPieces[gun_1].barrel, z_axis, RECOIL_DISTANCE)
 	Move(gunPieces[gun_1].barrel, z_axis, 0, RECOIL_RESTORE_SPEED)
-	gun_1 = gun_1 + 1
-	if gun_1 > 3 then gun_1 = 1 end
 end
 
 function script.QueryWeapon(num)
+	-- Seet mantis 5056 for further improvement.
 	return gunPieces[gun_1].flare
 end
 

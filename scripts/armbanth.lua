@@ -378,6 +378,8 @@ function script.Killed(recentDamage, maxHealth)
 		Turn(torso, y_axis, 0, 50)
 		Turn(rarmgun, y_axis, 30, 20)	
 		Turn(larmgun, y_axis, 30, 20)
+		
+		InitializeDeathAnimation()
 		Sleep(800)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then

@@ -171,7 +171,7 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.shin, sfxFall)
 		Explode(rightLeg.foot, sfxFall)
 		Explode(base, sfxShatter)
-		return 2
+		return 1
 	else 
 		Explode(r_gun, sfxShatter)
 		Explode(l_gun, sfxShatter)
@@ -185,6 +185,6 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(rightLeg.thigh, sfxShatter)
 		Explode(base, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		Explode(head, sfxFall + sfxSmoke + sfxSmoke + sfxExplodeOnHit)
-		return 3
+		return 2
 	end
 end

@@ -229,7 +229,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		local tx, ty, tz = vx-nx, vy-ny, vz-nz -- tangent is the other component of velocity
 		local nf = att.elasticity
 		local tf = att.friction
-		vx, vy, vz = tx*tf + nx*nf, ty*tf + ny*nf, tz*tf + nz*nf
+		vx, vy, vz = tx*tf - nx*nf, ty*tf - ny*nf, tz*tf - nz*nf
 		Spring.SetUnitVelocity(unitID,0,0,0)
 		Spring.AddUnitImpulse(unitID,vx,vy,vz) --must do impulse because SetUnitVelocity() is not fully functional in Spring 91 (only work with vertical velocity OR when assigned 0)
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)

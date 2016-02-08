@@ -6,7 +6,7 @@ function gadget:GetInfo()
     date      = "10 June 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = not (Game.version:find('91.0') == 1),
+    enabled   = true,
   }
 end
 
@@ -17,6 +17,8 @@ if not (gadgetHandler:IsSyncedCode()) then
 end
 -------------------------------------------------------------
 -------------------------------------------------------------
+
+local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 local FEATURE = 102
 local UNIT = 117
@@ -72,8 +74,12 @@ function gadget:GameFrame(n)
 			})
 			
 			-- Destroy old projectile
-			Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
-			Spring.SetProjectileCollision(proID)
+			if devCompatibility then
+				Spring.DeleteProjectile(proID)
+			else
+				Spring.SetProjectilePosition(proID,-100000,-100000,-100000)
+				Spring.SetProjectileCollision(proID)
+			end
 			--]]
 		end
 		

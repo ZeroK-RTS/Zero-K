@@ -9,7 +9,7 @@ function gadget:GetInfo()
       date      = "30/9/2010",
       license   = "GNU GPL, v2 or later",
       layer     = 0,
-      enabled   = not (Game.version:find('91.0') == 1)   
+      enabled   = true   
    }
 end
 
@@ -212,9 +212,10 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	if not unitDamage[unitID] then
 		damageByID.count = damageByID.count + 1
 		damageByID.data[damageByID.count] = unitID
+		
 		unitDamage[unitID] = {
 			index = damageByID.count,
-			captureHealth = UnitDefs[unitDefID].buildTime,
+			captureHealth = Spring.Utilities.GetUnitCost(unitID, unitDefID),
 			largestDamage = 0,
 			allyTeamByID = {count = 0, data = {}},
 			allyTeams = {},
@@ -254,7 +255,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- reset degrade timer for against this allyteam and add to damage
 	allyTeamData.degradeTimer = GENERAL_DEGRADE_TIMER
 	allyTeamData.totalDamage = allyTeamData.totalDamage + newCaptureDamage
-	
 	-- capture the unit if total damage is greater than max hp of unit
 	if allyTeamData.totalDamage >= damageData.captureHealth then
 		-- give the unit
@@ -630,6 +630,11 @@ function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
 		drawingUnits[unitID] = controllerID
 		unitCount = unitCount + 1
 	end
+end
+
+function gadget:UnitDestroyed (unitID)
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if morphedTo then gadget:UnitGiven(morphedTo) end
 end
 
 function gadget:Load(zip)

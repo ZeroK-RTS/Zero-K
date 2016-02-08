@@ -50,6 +50,15 @@ local buildOpts = {
 	[[raveparty]],
 	[[zenith]],
 	[[armcsa]],
- }
+}
+
+if (Spring.GetModOptions) then
+	local modOptions = Spring.GetModOptions()
+	if (modOptions and modOptions.commtest and modOptions.commtest ~= 0) then
+		buildOpts[#buildOpts + 1] = [[dynhub_support_base]]
+		buildOpts[#buildOpts + 1] = [[dynhub_recon_base]]
+		buildOpts[#buildOpts + 1] = [[dynhub_assault_base]]
+	end
+end
 
 return buildOpts

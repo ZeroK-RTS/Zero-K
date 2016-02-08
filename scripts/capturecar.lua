@@ -249,6 +249,6 @@ function script.Killed(recentDamage, maxHealth)
 	else
 		Explode(front, sfxShatter)
 		Explode(rear, sfxSmoke + sfxFire + sfxExplode)
-		return 3
+		return 2
 	end
 end

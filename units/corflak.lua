@@ -90,7 +90,6 @@ unitDef = {
       burnblow                = true,
       canattackground         = false,
       cegTag                  = [[flak_trail]],
-      color                   = 1,
       craterBoost             = 0,
       craterMult              = 0,
       cylinderTargeting       = 1,

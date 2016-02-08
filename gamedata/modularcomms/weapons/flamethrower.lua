@@ -2,6 +2,7 @@ local name = "commweapon_flamethrower"
 local weaponDef = {
 	name                    = [[Flame Thrower]],
 	areaOfEffect            = 64,
+	avoidGround             = false,
 	avoidFeature            = false,
 	cegTag                  = [[flamer]],
 	collideFeature          = false,

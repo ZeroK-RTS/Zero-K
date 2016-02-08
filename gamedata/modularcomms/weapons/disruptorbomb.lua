@@ -13,6 +13,7 @@ local weaponDef = {
 		--timeslow_preset       = [[module_disruptorbomb]],
 		timeslow_damagefactor = [[5]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		manualfire = 1,
 	},
 
 	damage                  = {
@@ -28,6 +29,7 @@ local weaponDef = {
 	impulseFactor           = 0,
 	interceptedByShieldType = 2,
 	model                   = [[wep_b_fabby.s3o]],
+    noSelfDamage            = false,
 	range                   = 450,
 	reloadtime              = 12,
 	smokeTrail              = true,

@@ -53,6 +53,31 @@ local cegs = {
       },
     },
   },
+  ["napalm_pyro"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 128,
+      ttl                = 440,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 9,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = [[0 i40]],
+        explosiongenerator = [[custom:NAPALMFIREBALL_200]],
+        pos                = [[-35 r70, 30, -35 r70]],
+      },
+    },
+  },
   ["napalm_koda_small"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -265,6 +290,44 @@ local cegs = {
       },
     },
   },
+  
+  ["napalm_blastwing"] = {
+    usedefaultexplosions = false,
+    groundflash = {
+      flashalpha         = 1,
+      flashsize          = 120,
+      ttl                = 480,
+      color = {
+        [1]  = 0.7,
+        [2]  = 0.3,
+        [3]  = 0.1,
+      },
+    },
+    bigredploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:napalmfireball_600_main]],
+        pos                = [[0 0 0]],
+      },
+    },
+    redploom = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 4,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:napalmfireball_600_big]],
+        pos                = [[r3 y10 -1 x10x10x10 y10 81 a10 y10     r6.2831 y11 -3.1415 a11 y11    r1 y12    -1 x12 y0 1 a0 p0.5 y0 0 a12 p0.5 y1 2 x0 x1 y13       -0.5x11x11 y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10 x13,              2 x12 y12 -1 a12 x10,              -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10 x13]],
+      },
+    },
+  },
 
   ["napalm_hellfire"] = {
     usedefaultexplosions = false,
@@ -430,6 +493,24 @@ local altforms = {
       },
     },
   },
+  napalmfireball_600_main = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.002   .5 .5 .5 0.010     .5 .5 .5 0.08    .4 .4 .4 0.06   0 0 0 0.003]],
+	    properties = {particlelife = 400, particlelifespread = 200, particlesize = 110, particlesizespread = 25,},
+      },
+    },
+  },
+  napalmfireball_600_big = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+		colormap   = [[0 0 0 0.001   .3 .3 .3 0.04     .3 .3 .3 0.03    .2 .2 .2 0.02   0 0 0 0.001]],
+	    properties = {particlelife = 200, particlelifespread = 400, particlesize = 60, particlesizespread = 25,},
+      },
+    },
+  },
   napalmfireball_750 = {
     source = "napalmfireball_200",
     modifications = {
@@ -450,14 +531,14 @@ local altforms = {
     source = "napalmfireball_200",
     modifications = {
       rocks = {
-	properties = {
-	  airdrag            = 0.98,
-	  colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
-	  particlelife       = 500,	--minimum particle lifetime in frames
-	  particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
-	  particlespeed      = 0.6,
-	  particlespeedspread = 1.2,
-	},
+		properties = {
+		  airdrag            = 0.98,
+		  colormap           = [[0 0 0 0.007   .6 .6 .6 0.018     .6 .6 .6 0.015    .6 .6 .6 0.012   0 0 0 0.007]],
+		  particlelife       = 500,	--minimum particle lifetime in frames
+		  particlelifespread = 900,	--max value of random lifetime added to each particle's lifetime
+		  particlespeed      = 0.6,
+		  particlespeedspread = 1.2,
+		},
       }
     }
   },

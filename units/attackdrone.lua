@@ -61,7 +61,6 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 500,
-  stealth             = true,
   turnRate            = 792,
   upright             = true,
 
@@ -102,7 +101,6 @@ unitDef = {
       interceptedByShieldType = 1,
       laserFlareSize          = 3.25,
       minIntensity            = 1,
-      pitchtolerance          = 8192,
       range                   = 250,
       reloadtime              = 0.8,
       rgbColor                = [[0 1 0]],

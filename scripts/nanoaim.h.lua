@@ -35,7 +35,8 @@ function UpdateNanoDirection(nanopieces,turnSpeed,turnSpeedVert)
 		local h = Spring.GetUnitHeading(unitID)
 		local heading = (th - h) * math.pi / 32768
 
-		local norm_dy = dy / math.sqrt(dx*dx + dy*dy + dz*dz)
+		local length = math.sqrt(dx*dx + dy*dy + dz*dz)
+		local norm_dy = (length > 0 and dy / length) or 0
 		local tp = math.asin(norm_dy)
 		local p = math.asin(select(2,Spring.GetUnitDirection(unitID)))
 		local pitch = p - tp

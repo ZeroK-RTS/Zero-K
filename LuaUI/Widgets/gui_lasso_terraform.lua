@@ -76,13 +76,7 @@ local string_format = string.format
 local team = Spring.GetMyTeamID()
 
 -- command IDs
-local CMD_RAMP = 39734
-local CMD_LEVEL = 39736
-local CMD_RAISE = 39737
-local CMD_SMOOTH = 39738
-local CMD_RESTORE = 39739
-local CMD_BUMPY = 39740
-local CMD_TERRAFORM_INTERNAL = 39801
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local Grid = 16 -- grid size, do not change without other changes.
 
@@ -238,6 +232,12 @@ local function completelyStopCommand()
 	terraform_type = 0
 end
 
+local terraTag=-1
+function WG.Terraform_GetNextTag()
+	terraTag=terraTag + 1
+	return terraTag
+end
+
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
@@ -259,12 +259,13 @@ local function SendCommand()
 				i = i + 3
 			end
 					
-			i = i + 2
 			for j = 1, #constructor do
 				params[i] = constructor[j]
 				i = i + 1
 			end
 			
+			params[#params + 1] = WG.Terraform_GetNextTag()
+
 			local a,c,m,s = spGetModKeyState()
 			
 			if s then
@@ -293,11 +294,12 @@ local function SendCommand()
 				i = i + 2
 			end
 			
-			i = i + 2
 			for j = 1, #constructor do
 				params[i] = constructor[j]
 				i = i + 1
 			end
+			
+			params[#params + 1] = WG.Terraform_GetNextTag()
 			
 			local a,c,m,s = spGetModKeyState()
 			
@@ -1396,17 +1398,32 @@ function widget:MouseRelease(mx, my, button)
 								xsize = (mouseUnit.ud.zsize or mouseUnit.ud.ysize)*4
 								ysize = mouseUnit.ud.xsize*4
 							end
-								
-							points = 5
-							point[1] = {x = x - xsize - 16, z = z - ysize - 16}
-							point[2] = {x = x + xsize + 16, z = point[1].z}
-							point[3] = {x = point[2].x, z = z + ysize + 16}
-							point[4] = {x = point[1].x, z = point[3].z}
-							point[5] = {x =point[1].x, z = point[1].z}
 							
-							loop = 0
-							calculateLinePoints(point,points)
-							if (groundGridDraw) then gl.DeleteList(groundGridDraw); groundGridDraw=nil end
+							
+							if mouseUnit.ud.isImmobile then
+								points = 5
+								point[1] = {x = x - xsize - 32, z = z - ysize - 32}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}
+								loop = 1
+								calculateAreaPoints(point,points)
+							else
+								points = 5
+								point[1] = {x = x - xsize - 16, z = z - ysize - 16}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}
+								loop = 0
+								calculateLinePoints(point,points)
+							end
+							
+							if (groundGridDraw) then 
+								gl.DeleteList(groundGridDraw); 
+								groundGridDraw=nil 
+							end
 							groundGridDraw = glCreateList(glBeginEnd, GL_LINES, groundGrid)
 							
 							if terraform_type == 1 then
@@ -1500,12 +1517,24 @@ function widget:MouseRelease(mx, my, button)
 								ysize = mouseUnit.ud.xsize*4
 							end
 							
-							points = 5
-							point[1] = {x = x - xsize - 16, z = z - ysize - 16}
-							point[2] = {x = x + xsize + 16, z = point[1].z}
-							point[3] = {x = point[2].x, z = z + ysize + 16}
-							point[4] = {x = point[1].x, z = point[3].z}
-							point[5] = {x =point[1].x, z = point[1].z}			
+							if mouseUnit.ud.isImmobile then
+								points = 5
+								point[1] = {x = x - xsize - 32, z = z - ysize - 32}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}	
+								loop = 1
+							else
+								points = 5
+								point[1] = {x = x - xsize - 16, z = z - ysize - 16}
+								point[2] = {x = x + xsize + 16, z = point[1].z}
+								point[3] = {x = point[2].x, z = z + ysize + 16}
+								point[4] = {x = point[1].x, z = point[3].z}
+								point[5] = {x =point[1].x, z = point[1].z}	
+								loop = 0
+							end
+							
 							
 							SendCommand()
 							stopCommand()
@@ -1526,7 +1555,7 @@ function widget:MouseRelease(mx, my, button)
 					x = point[2].x
 					z = point[2].z
 				end
-						
+				
 				points = 5
 				point[2] = {x = point[1].x, z = z}
 				point[3] = {x = x, z = z}
@@ -1620,11 +1649,12 @@ function widget:KeyPress(key)
 			return true
 		end
 	end
-
+	
 	if key == KEYSYMS.SPACE and ( 
-		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle)) or 
-		(terraform_type == 4 and (setHeight or drawingRamp)) or 
-		(terraform_type == 5 and drawingLasso)
+		(terraform_type == 1 and (setHeight or drawingLasso or placingRectangle or drawingRectangle)) or 
+		(terraform_type == 3 and (drawingLasso or drawingRectangle)) or 
+		(terraform_type == 4 and (setHeight or drawingRamp or drawingRectangle)) or 
+		(terraform_type == 5 and (drawingLasso or drawingRectangle))
 	) then
 		volumeSelection = volumeSelection+1
 		if volumeSelection > 2 then
@@ -1857,7 +1887,7 @@ function widget:DrawScreen()
 		end
 	end
 	
-	if terraform_type == 1 or terraform_type == 4 or terraform_type == 5 then
+	if terraform_type == 1 or terraform_type == 3 or terraform_type == 4 or terraform_type == 5 then
 		if volumeSelection == 1 then
 			drawMouseText(-30,"Only raise")
 		elseif volumeSelection == 2 then

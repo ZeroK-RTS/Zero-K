@@ -27,6 +27,7 @@ unitDef = {
     helptext_fr    = [[Le Informant est un peu comme tous les radars mobiles, aussi indispensable que faible.]],
 	helptext_de    = [[Der Informant bietet Radarerfassung eines bestimmten Bereiches auf dem Schlachtfeld.]],
 	helptext_pl    = [[Informant to szybki pojazd, ktory zapewnia armii mobilny radar.]],
+	priority_misc = 2, -- High
   },
 
   energyUse           = 1.5,
@@ -50,6 +51,7 @@ unitDef = {
   objectName          = [[corvrad.S3O]],
   onoffable           = true,
   radarDistance       = 1800,
+  radarEmitHeight     = 100,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],

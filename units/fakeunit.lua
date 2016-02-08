@@ -17,6 +17,9 @@ unitDef = {
   canPatrol                     = false,
   canstop                       = [[0]],
   category                      = [[SINK]],
+  customparams                  = {
+    completely_hidden = 1,
+  },
   footprintX                    = 1,
   footprintZ                    = 1,
   iconType                      = [[none]],
@@ -39,7 +42,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 0.2,
   smoothAnim                    = true,
-  stealth                       = false,
   TEDClass                      = [[SPECIAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

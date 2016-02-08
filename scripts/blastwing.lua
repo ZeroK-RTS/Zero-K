@@ -78,18 +78,8 @@ function script.Killed(recentDamage, maxHealth)
 	
 	Explode(missile, SFX.SHATTER)
 	
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(l_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
-	Explode(r_fan, SFX.EXPLODE)
+	--Explode(l_fan, SFX.EXPLODE)
+	--Explode(r_fan, SFX.EXPLODE)
 	
 	local severity = recentDamage / maxHealth
 	if (severity <= 0.5) or ((Spring.GetUnitMoveTypeData(unitID).aircraftState or "") == "crashing") then

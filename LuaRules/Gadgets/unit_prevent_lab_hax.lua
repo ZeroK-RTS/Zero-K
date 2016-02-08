@@ -14,7 +14,7 @@ function gadget:GetInfo()
 		date      = "Jul 24, 2007", --May 11, 2013
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+		enabled   = true  --  loaded by default?
 	}
 end
 
@@ -104,7 +104,7 @@ function checkLabs(checkFeatures, onlyUnstick)
 
 						local side = min(l,r,t,b)
 
-						if not (isAlly and ux > data.minBuildX and uz < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
+						if not (isAlly and ux > data.minBuildX and ux < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
 							if (side == l) then
 								spSetUnitPosition(unitID, data.minx - pushDistance, uz, true)
 								if data.unstickHelp then

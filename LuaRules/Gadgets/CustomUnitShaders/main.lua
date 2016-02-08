@@ -18,7 +18,7 @@ function gadget:GetInfo()
     date      = "2008,2009,2010",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -163,13 +163,14 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function GetUnitMaterial(unitDefID)
-  local mat = bufMaterials[unitDefID]
+function GetUnitMaterial(unitID, unitDefID, matDefOverride)
+  local materialDef = matDefOverride or unitDefID
+  local mat = bufMaterials[materialDef]
   if (mat) then
     return mat
   end
 
-  local matInfo = unitMaterialInfos[unitDefID]
+  local matInfo = unitMaterialInfos[materialDef]
   local mat = materialDefs[matInfo[1]]
 
   matInfo.UNITDEFID = unitDefID
@@ -217,7 +218,7 @@ function GetUnitMaterial(unitDefID)
                    postlist        = mat.postdl,
                  })
 
-  bufMaterials[unitDefID] = luaMat
+  bufMaterials[materialDef] = luaMat
 
   return luaMat
 end
@@ -309,12 +310,13 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitFinished(unitID,unitDefID,teamID)
-  local unitMat = unitMaterialInfos[unitDefID]
+  local matDef = Spring.GetUnitRulesParam(unitID, "comm_texture") or unitDefID
+  local unitMat = unitMaterialInfos[matDef]
   if (unitMat) then
     local mat = materialDefs[unitMat[1]]
     if (normalmapping or mat.force) then
       Spring.UnitRendering.ActivateMaterial(unitID,3)
-      Spring.UnitRendering.SetMaterial(unitID,3,"opaque",GetUnitMaterial(unitDefID))
+      Spring.UnitRendering.SetMaterial(unitID,3,"opaque",GetUnitMaterial(unitID, unitDefID, matDef))
       for pieceID in ipairs(Spring.GetUnitPieceList(unitID) or {}) do
         Spring.UnitRendering.SetPieceList(unitID,3,pieceID)
       end
@@ -420,12 +422,16 @@ function gadget:Initialize()
     end
 
     CompileMaterialShaders()
-
+	
     for unitName,materialInfo in pairs(unitMaterialDefs) do
       if (type(materialInfo) ~= "table") then
         materialInfo = {materialInfo}
       end
-      unitMaterialInfos[(UnitDefNames[unitName] or {id=-1}).id] = materialInfo
+	  if UnitDefNames[unitName] then
+        unitMaterialInfos[(UnitDefNames[unitName] or {id=-1}).id] = materialInfo
+	  else
+	    unitMaterialInfos[unitName] = materialInfo
+	  end
     end
   end
 

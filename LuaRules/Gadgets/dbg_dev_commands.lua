@@ -129,7 +129,6 @@ local unsyncedGadgetList = {
 	"Awards",	
 	"Noexplode Stopper",	
 	"Perks",	
-	"Ore mexes!",
 	"Control gunship strafe range",
 	"Area Denial",
 	"Bounties",
@@ -318,7 +317,6 @@ local gadgetList = {
 	"LupsNanoSpray",
 	--"CustomUnitShaders",
 	"Hide Autorepairlevel Command",
-	"Ore mexes!",
 	"CAI",
 	"Lups",
 	"Planet Wars Structures",
@@ -339,6 +337,23 @@ local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+
+function GG.TableEcho(data, name, indent)
+	indent = indent or ""
+	name = name or "TableEcho"
+	Spring.Echo(indent .. name .. " = {")
+	for name, v in pairs(data) do
+		local ty =  type(v)
+		if ty == "table" then
+			GG.TableEcho(v, name, indent .. "    ")
+		elseif ty == "boolean" then
+			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+		else
+			Spring.Echo(indent .. name .. " = " .. v)
+		end
+	end
+	Spring.Echo(indent .. "}")
+end
 
 function GG.UnitEcho(unitID, st)
 	st = st or unitID

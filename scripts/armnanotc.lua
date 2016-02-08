@@ -11,7 +11,7 @@ local smokePiece = { piece "aim", piece "body" }
 local nanoPieces = { piece "aim" }
 
 local nanoTurnSpeedHori = 0.5 * math.pi
-local nanoTurnSpeedVert = 0.1 * math.pi
+local nanoTurnSpeedVert = 0.3 * math.pi
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)

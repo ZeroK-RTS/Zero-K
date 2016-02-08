@@ -453,7 +453,7 @@ local function nearRadar(team,tx,tz,distance)
 	
 	for unitID,_ in pairs(unitArray) do
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 	end
@@ -468,7 +468,7 @@ local function nearFactory(team,tx,tz,distance)
 	for unitID, data in pairs(unitArray) do
 		--mapEcho(unitID,"factroyChecked")
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 		if disSQ(data.wayX,data.wayZ,tx,tz) < (distance*1.5)^2 then
@@ -484,7 +484,7 @@ local function nearEcon(team,tx,tz,distance)
 	local unitArray = allyTeamData[aiTeamData[team].allyTeam].units.econByID
 	for unitID,_ in pairs(unitArray) do
 		local x,_,z = spGetUnitPosition(unitID)
-		if disSQ(x,z,tx,tz) < distance^2 then
+		if x and disSQ(x,z,tx,tz) < distance^2 then
 			return true
 		end
 	end
@@ -2588,7 +2588,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					addValueToHeatmapInArea(enemyDefence,enemyDefenceHeatmap, ud.metalCost, x, z)
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
 			addValueToHeatmap(enemyEconomy, enemyEconomyHeatmap, ud.metalCost, aX, aZ)
 		end
 		
@@ -2635,7 +2635,7 @@ local function spotEnemyUnit(allyTeam, unitID, unitDefID,readd)
 					at.enemyForceComposition.unit.airDefence = at.enemyForceComposition.unit.airDefence + ud.metalCost
 				end
 			end
-		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
+		elseif ud.buildSpeed > 0 or ud.isFactory or (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
 			
 		end
 	end
@@ -3062,7 +3062,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					controlledUnit.turret.cost = controlledUnit.turret.cost - ud.metalCost
 					controlledUnit.turret.count = controlledUnit.turret.count - 1
 					controlledUnit.turretByID[unitID] = nil
-				elseif (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
+				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econ.cost = controlledUnit.econ.cost - ud.metalCost
 					if controlledUnit.econByID[unitID].onDefenceHeatmap then
 						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,-1,0)
@@ -3171,7 +3171,7 @@ local function ProcessUnitDestroyed(unitID, unitDefID, unitTeam, changeAlly)
 					end
 				end
 				
-				-- if ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or ud.energyUpkeep < 0) or ud.customParams.ismex then -- econ
+				-- if ud.buildSpeed > 0 or ud.isFactory or (ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) or ud.customParams.ismex then -- econ
 					-- at.enemyForceComposition.unit.econ = at.enemyForceComposition.unit.econ - ud.metalCost
 				-- end --handled by "at.enemyEconomy.totalCost"
 				
@@ -3334,7 +3334,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 					controlledUnit.turret.cost = controlledUnit.turret.cost + ud.metalCost
 					controlledUnit.turret.count = controlledUnit.turret.count + 1
 					controlledUnit.turretByID[unitID] = {index = controlledUnit.turret.count, ud = ud,x = x, y = y, z = z, cost = ud.metalCost, finished = false, air = not ud.weapons[1].onlyTargets.land }
-				elseif (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
+				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then
 					local x,y,z = spGetUnitPosition(unitID)
 					if econByDefId and econByDefId[unitDefID] and (not built) then
 						editDefenceHeatmap(unitTeam,unitID,buildDefs.econByDefId[unitDefID].defenceQuota,buildDefs.econByDefId[unitDefID].airDefenceQuota,buildDefs.econByDefId[unitDefID].defenceRange,1,0)
@@ -3374,7 +3374,7 @@ local function ProcessUnitCreated(unitID, unitDefID, unitTeam, builderID, change
 		elseif ud.isBuilding or ud.speed == 0 then -- building
 			if ud.maxWeaponRange > 0 then 
 				units.turretByID[unitID] = true
-			elseif (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0) then
+			elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0) then
 				units.econByID[unitID] = true
 			elseif ud.radarRadius > 0 then -- radar 
 				units.radarByID[unitID] = true
@@ -3465,7 +3465,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 			elseif ud.isBuilding or ud.speed == 0 then -- building
 				if ud.maxWeaponRange > 0 then -- turret
 					controlledUnit.turretByID[unitID].finished = true
-				elseif (ud.customParams.income_energy or ud.energyMake > 0 or ud.energyUpkeep < 0 or (ud.customParams and ud.customParams.windgen)) then
+				elseif (ud.customParams.income_energy or ud.energyMake > 0 or tonumber(ud.customParams.upkeep_energy or 0) < 0 or (ud.customParams and ud.customParams.windgen)) then
 					controlledUnit.econByID[unitID].finished = true
 				elseif ud.radarRadius > 0 then -- radar
 					controlledUnit.radarByID[unitID].finished = true
@@ -3848,44 +3848,34 @@ local function RemoveUnit(unitID, unitDefID, unitTeam)
 end
 
 local function setAllyteamStartLocations(allyTeam)
-	if Game.startPosType == 2 then -- Apparently this is 'choose ingame'
-		
-		local x1, z1, x2, z2 = Spring.GetAllyTeamStartBox(allyTeam)
-		
-		local startboxString = Spring.GetModOptions().startboxes
-		if startboxString then -- new boxes
-			local startboxConfig = loadstring(startboxString)()
-			local teamList = Spring.GetTeamList(allyTeam)
-			if (not teamList) or (#teamList == 0) then return end
-			local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-			local box = boxID and startboxConfig[boxID] or {0,0,1,1}
-			x1 = box[1] * Game.mapSizeX
-			z1 = box[2] * Game.mapSizeZ
-			x2 = box[3] * Game.mapSizeX
-			z2 = box[4] * Game.mapSizeZ
-		end
+	if Game.startPosType ~= 2 then -- 'choose ingame'
+		return
+	end
 
-		local at = allyTeamData[allyTeam]
-		local listOfAis = at.listOfAis
-		
-		local width = x2 - x1
-		local height = z2 - z1
-		
-		if width > height then
-			local mid = (z1+z2)*0.5
-			local mult = width/(listOfAis.count + 1)
-			for i = 1, listOfAis.count do
-				local team = listOfAis.data[i]
-				GG.SetStartLocation(team,x1 + i*mult,mid)
-			end
-		else
-			local mid = (x1+x2)*0.5
-			local mult = height/(listOfAis.count + 1)
-			for i = 1, listOfAis.count do
-				local team = listOfAis.data[i]
-				GG.SetStartLocation(team,mid,z1 + i*mult)
+	local teamList = Spring.GetTeamList(allyTeam)
+	if (not teamList) or (#teamList == 0) then return end
+
+	local at = allyTeamData[allyTeam]
+	local listOfAis = at.listOfAis
+
+	if GG.manualStartposConfig then
+		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+		if boxID then
+			local boxConfig = GG.manualStartposConfig[boxID]
+			if boxConfig and boxConfig[1] then
+				for i = 1, listOfAis.count do
+					local team = listOfAis.data[i]
+					local startpos = boxConfig[i] or boxConfig[1]
+					GG.SetStartLocation (team, startpos[1], startpos[2])
+				end
+				return
 			end
 		end
+	end
+
+	for i = 1, listOfAis.count do
+		local team = listOfAis.data[i]
+		GG.SetStartLocation (team, math.random(1, Game.mapSizeX-1), math.random(1, Game.mapSizeZ-1))
 	end
 end
 

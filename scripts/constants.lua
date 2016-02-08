@@ -111,4 +111,9 @@ end
 local function noFunc()
 end
 
+function InitializeDeathAnimation()
+	local paralyzeDamage = select(3, Spring.GetUnitHealth(unitID))
+	Spring.SetUnitRulesParam(unitID, "real_para", paralyzeDamage or 0)
+end
+
 Spring.SetUnitNanoPieces = Spring.SetUnitNanoPieces or noFunc

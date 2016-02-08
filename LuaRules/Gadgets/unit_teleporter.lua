@@ -7,7 +7,7 @@ function gadget:GetInfo()
     date      = "29 Feb 2012",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -29,6 +29,7 @@ if (gadgetHandler:IsSyncedCode()) then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local GiveClampedMoveGoalToUnit = Spring.Utilities.GiveClampedMoveGoalToUnit
 local getMovetype = Spring.Utilities.getMovetype
 
 local placeBeaconCmdDesc = {
@@ -169,7 +170,7 @@ function tele_createBeacon(unitID,x,z)
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
 			Spring.DestroyUnit(tele[unitID].link, true)
 		end
-		Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
+		GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, x, Spring.GetGroundHeight(x,z) or 0, z)
 		local beaconID = Spring.CreateUnit(beaconDef, x, y, z, 1, Spring.GetUnitTeam(unitID))
 		if beaconID then
 			Spring.SetUnitPosition(beaconID, x, y, z)
@@ -260,6 +261,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
 	end
 	
 	return false
+end
+
+local function Teleport_AllowCommand(unitID, unitDefID, cmdID, cmdParams, cmdOptions)
+	return gadget:AllowCommand(unitID, unitDefID, false, cmdID, cmdParams, cmdOptions)
 end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -416,8 +421,8 @@ function gadget:GameFrame(f)
 								dy = uy - Spring.GetGroundHeight(ux,uz) + Spring.GetGroundHeight(dx,dz)
 							end
 							
-							Spring.PlaySoundFile("sounds/misc/teleport.wav", 10, ux, uy, uz)
-							Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, dx, dy, dz)
+							GG.PlayFogHiddenSound("sounds/misc/teleport.wav", 10, ux, uy, uz)
+							GG.PlayFogHiddenSound("sounds/misc/teleport2.wav", 10, dx, dy, dz)
 							
 							Spring.SpawnCEG("teleport_out", ux, uy, uz, 0, 0, 0, size)
 							
@@ -431,12 +436,14 @@ function gadget:GameFrame(f)
 								Spring.MoveCtrl.Enable(teleportiee)
 								Spring.MoveCtrl.SetPosition(teleportiee, dx, dy, dz)
 								Spring.MoveCtrl.Disable(teleportiee)
+	
 							end
 							
 							local ux, uy, uz = Spring.GetUnitPosition(teleportiee)
 							Spring.SpawnCEG("teleport_in", ux, uy, uz, 0, 0, 0, size)
 							
-							Spring.SetUnitMoveGoal(teleportiee, dx,0,dz)
+							local mx, mz = tx + offset[tele[tid].offsetIndex].x*(size*4 + 120), tz + offset[tele[tid].offsetIndex].z*(size*4 + 120)
+							GiveClampedMoveGoalToUnit(teleportiee, mx, mz)
 							
 							Spring.GiveOrderToUnit(teleportiee,CMD.REMOVE, {cQueue[1].tag}, {})
 							
@@ -492,7 +499,7 @@ function gadget:GameFrame(f)
 						local flying = isUnitFlying(tid)
 						if ud and not flying then
 
-							local mass = Spring.GetUnitRulesParam(teleportiee, "effectiveMass") or ud.mass
+							local mass = Spring.GetUnitRulesParam(teleportiee, "massOverride") or ud.mass
 
 							local cost = math.floor(mass*tele[tid].throughput)
 							--Spring.Echo(cost/30)
@@ -593,6 +600,8 @@ function gadget:Initialize()
 	GG.tele_deployTeleport = tele_deployTeleport
 	GG.tele_undeployTeleport = tele_undeployTeleport
 	GG.tele_createBeacon = tele_createBeacon
+	
+	GG.Teleport_AllowCommand = Teleport_AllowCommand
 
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
@@ -662,7 +671,7 @@ local function DrawWire(spec)
 		local bid = beacons[i]
 		local tid = Spring.GetUnitRulesParam(bid, "connectto")
 
-		if (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
+		if tid and (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
 			local point = {nil, nil, nil, nil}
 			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
 			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
@@ -721,10 +730,9 @@ end
 
 local function DrawWorldFunc()
 	if beaconCount > 0 then
-		local spec, fullview = Spring.GetSpectatingState()
-		spec = spec or fullview
+		local _, fullview = Spring.GetSpectatingState()
 
-		DrawWire(spec)
+		DrawWire(fullview)
 		
 		local shift = select (4, spGetModKeyState())
 		local drawnSomethingYet = false
@@ -732,7 +740,7 @@ local function DrawWorldFunc()
 			local bid = beacons[i]
 			local tid = Spring.GetUnitRulesParam(bid, "connectto")
 			local team = Spring.GetUnitTeam(tid)
-			if spValidUnitID(tid) and spValidUnitID(bid) and (spec or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
+			if spValidUnitID(tid) and spValidUnitID(bid) and (fullview or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
 				
 				if not drawnSomethingYet then
 					gl.PushAttrib(GL.LINE_BITS)

@@ -76,6 +76,7 @@ local spGetUnitViewPosition  = Spring.GetUnitViewPosition
 local spGetUnitDirection     = Spring.GetUnitDirection
 local spGetHeadingFromVector = Spring.GetHeadingFromVector
 local spGetUnitIsActive      = Spring.GetUnitIsActive
+local spGetUnitRulesParam    = Spring.GetUnitRulesParam
 local spGetGameFrame         = Spring.GetGameFrame
 local spGetFrameTimeOffset   = Spring.GetFrameTimeOffset
 local spGetUnitPieceList     = Spring.GetUnitPieceList
@@ -678,9 +679,9 @@ end
 
 local function IsUnitFXVisible(fx)
 	local unitActive = true
-        local unitID = fx.unit
+    local unitID = fx.unit
 	if fx.onActive then
-		unitActive = spGetUnitIsActive(unitID)
+		unitActive = spGetUnitIsActive(unitID) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
 		if (unitActive == nil) then
 			unitActive = true
 		end

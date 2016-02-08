@@ -17,6 +17,7 @@ end
 
 local Spring = Spring
 local emptyTable = {}
+local LOS_ACCESS = {inlos = true}
 
 ----- Settings -----------------------------------------------------------------
 
@@ -84,13 +85,13 @@ local function StartsWith(s, startString)
 end
 
 
-function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,timeToGround, fallGravity,absSpawnHeight,absBrakeHeight)
+function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, timeToGround, fallGravity, absSpawnHeight, absBrakeHeight, dyncommID)
   local gy = Spring.GetGroundHeight(x, z)
   if y < gy then 
     y = gy 
   end
-  local unitID = Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
-  if not Spring.ValidUnitID(unitID) then
+  local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)) or Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
+ if not Spring.ValidUnitID(unitID) then
     Spring.Echo("Orbital Drop error: unitID from" .. unitDefName .." is invalid. No orbital drop for this unit.")
 	return
   end
@@ -102,6 +103,9 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
     return unitID
   end
   local unitDef = UnitDefNames[unitDefName]
+  if (unitDef == nil) then -- dynamic comm
+    unitDef = UnitDefs[Spring.GetUnitDefID(unitID)]
+  end
   if not unitDef.isBuilding and unitDef.speed > 0 and Spring.GetGameFrame() > 1 and ((not timeToGround) or timeToGround > 0) then
 	timeToGround,fallGravity,absSpawnHeight,absBrakeHeight = timeToGround or defTimeToGround,fallGravity or defFallGravity,absSpawnHeight or defSpawnHeight,absBrakeHeight or defBrakeHeight --check input for NIL
     y = gy + absSpawnHeight+10 --spawn height
@@ -121,7 +125,19 @@ function GG.DropUnit(unitDefName, x, y, z, facing, teamID,useSetUnitVelocity,tim
 		Spring.MoveCtrl.SetGravity(unitID,0)
 	end
 	units[unitID] = {2,absBrakeHeight+gy,heading,useSetUnitVelocity,speedProfile} --store speed profile index, store braking height , store heading , store speed profile
+
+	Spring.SetUnitRulesParam(unitID, "orbitalDrop", 1, LOS_ACCESS)
+
+	-- prevent units from shooting while falling
+	if GG.UpdateUnitAttributes then
+		Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 0, LOS_ACCESS)
+		GG.UpdateUnitAttributes(unitID)
+	end
+	-- can't be shot either (in Spring ~100 enemies will shoot at the ground below them)
+	-- problem is enemies won't re-engage even after neutrality is removed
+	--Spring.SetUnitNeutral(unitID, true)
   end
+
   return unitID
 end
 
@@ -162,6 +178,11 @@ function gadget:GameFrame(frame)
 		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)	-- WAIT WAIT to make unit continue with any orders it has
 		Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
 		--Spring.Echo(units[unitID][1]) --see if it match desired timeToGround
+		if GG.UpdateUnitAttributes then
+			Spring.SetUnitRulesParam(unitID, "selfReloadSpeedChange", 1, LOS_ACCESS)
+			Spring.SetUnitRulesParam(unitID, "orbitalDrop", 0, LOS_ACCESS)
+			GG.UpdateUnitAttributes(unitID)
+		end
 		units[unitID]= nil --remove from watchlist
       elseif y < brakeAltitude+10  then
         -- unit is braking
@@ -172,6 +193,9 @@ function gadget:GameFrame(frame)
 			Spring.SpawnCEG("banishertrail", x + 10, y - 40, z - 10)
 			Spring.SpawnCEG("banishertrail", x - 10, y - 40, z - 10)
 		end
+		--if Spring.GetUnitNeutral(unitID) then
+		--	Spring.SetUnitNeutral(unitID, true)
+		--end
       else
 	  	-- unit is falling
 		if frame % 2 == 0 then

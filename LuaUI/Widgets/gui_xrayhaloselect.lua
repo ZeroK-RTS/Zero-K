@@ -14,6 +14,11 @@ function widget:GetInfo()
   }
 end
 
+local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
+local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
+local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
+local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -159,6 +164,7 @@ local circleOffset = 0
 
 local visibleAllySelUnits = {}
 local visibleSelected = {}
+local visibleBoxed = {}
 
 local uCycle = 1
 
@@ -167,21 +173,27 @@ local uCycle = 1
 
 
 local function GetVisibleUnits()
-    local units = spGetVisibleUnits(-1, 30, true)
-    --local visibleUnits = {}
-    local visibleAllySelUnits = {}
-    local visibleSelected = {}
-    
-    for i=1, #units do
-	    local unitID = units[i]
-	    if (spIsUnitSelected(unitID)) then
-		    visibleSelected[#visibleSelected+1] = unitID
-	    elseif showAlly and WG.allySelUnits[unitID] then
-		    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
-	    end
+  local units = spGetVisibleUnits(-1, 30, true)
+  --local visibleUnits = {}
+  local boxedUnits = GetUnitsInSelectionBox();
+
+  local visibleAllySelUnits = {}
+  local visibleSelected = {}
+  local visibleBoxed = {}
+
+  for i=1, #units do
+    local unitID = units[i]
+    if (spIsUnitSelected(unitID)) then
+        visibleSelected[#visibleSelected+1] = unitID
+    elseif showAlly and WG.allySelUnits and WG.allySelUnits[unitID] then
+        visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
     end
-    
-    return visibleAllySelUnits, visibleSelected
+    if IsUnitInSelectionBox(unitID) then
+      visibleBoxed[#visibleBoxed+1] = unitID
+    end
+  end
+
+  return visibleAllySelUnits, visibleSelected, visibleBoxed
 
 end
 
@@ -322,19 +334,21 @@ end
 
 function widget:Update()
     local mx, my = GetMouseState()
-    type, data = TraceScreenRay(mx, my)
+    type, data = TraceScreenRay(mx, my, false, true)
+    if type == "unit" then data = GetUnitUnderCursor(false) end
+    if not data then type = "ground" end
 
     --visibleUnits, visibleSelected = GetVisibleUnits()
     uCycle = (uCycle + 1) % 4
     if uCycle == 1 then
-        visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+        visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
     end
 end
 
 
 local function DrawWorldFunc()
     if Spring.IsGUIHidden() then return end
-    if not( (type == 'feature') or (type == 'unit') or #visibleSelected > 0 or #visibleAllySelUnits > 0 ) then
+    if not( (type == 'feature') or (type == 'unit') or #visibleSelected > 0 or #visibleAllySelUnits > 0 or #visibleBoxed > 0 ) then
         return
     end
 	
@@ -373,7 +387,20 @@ local function DrawWorldFunc()
     end
     na = na - 1
     nac = nac - 1
-	
+
+    local visBoxedUnit,visBoxedCloakUnit,nb,nbc = {},{},1, 1
+    for i=1, #visibleBoxed do
+        local unitID = visibleBoxed[i]
+        if Spring.GetUnitIsCloaked(unitID) then
+            visBoxedCloakUnit[nbc] = unitID
+            nbc = nbc+1
+        else
+            visBoxedUnit[nb] = unitID
+            nb = nb+1
+    	end
+    end
+    nb = nb - 1
+    nbc = nbc - 1
     -- xray
 	
     if (smoothPolys) then
@@ -386,7 +413,7 @@ local function DrawWorldFunc()
     glBlending(GL_SRC_ALPHA, GL_ONE)
     glPolygonOffset(-2, -2)
     
-    if (type == 'unit') and ValidUnitID(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then 
+    if (type == 'unit') and ValidUnitID(data) and not spIsUnitSelected(data) and (data ~= GetPlayerControlledUnit(myPlayerID)) then 
         SetTeamColor(GetUnitTeam(data))
         glUnit(data, true)
     elseif (type == 'feature') and ValidFeatureID(data) then
@@ -408,6 +435,13 @@ local function DrawWorldFunc()
             --if unitID and unitID ~= data then
 			if options.useteamcolors.value then glColor(Spring.GetTeamColor(GetUnitTeam(visAllyUnit[i]))) end
             glUnit(visAllyUnit[i], true)
+        end
+    end
+    
+    if (nb>0) then
+        for i=1,nb do
+            SetTeamColor(GetUnitTeam(visBoxedUnit[i]))
+            glUnit(visBoxedUnit[i], true)
         end
     end
     
@@ -500,6 +534,37 @@ local function DrawWorldFunc()
         gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
         for i=1,nac do
             glUnit(visAllyCloakUnit[i],true,-1)
+        end
+    end 
+
+    if (nbc>0) then
+        gl.ColorMask(false)
+        gl.StencilFunc(GL.ALWAYS, 1, 1)
+        gl.StencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)
+        gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+        for i=1,nbc do
+            glUnit(visBoxedCloakUnit[i],true,-1)
+        end
+        
+        gl.ColorMask(true)
+        gl.StencilFunc(GL.NOTEQUAL, 1, 1)
+        gl.StencilOp(GL_KEEP, GL_KEEP, GL_KEEP)
+        gl.PolygonMode(GL.FRONT_AND_BACK,GL.LINE)
+        for i=1,nbc do
+            SetTeamColor(GetUnitTeam(visBoxedCloakUnit[i]))
+            glUnit(visBoxedCloakUnit[i],true,-1)
+        end
+        gl.PolygonMode(GL.FRONT_AND_BACK,GL.POINT)
+        for i=1,nbc do
+            glUnit(visBoxedCloakUnit[i],true,-1)
+        end
+        
+        gl.ColorMask(false)
+        gl.StencilFunc(GL.ALWAYS, 0, 1)
+        gl.StencilOp(GL_ZERO, GL_ZERO, GL_ZERO)
+        gl.PolygonMode(GL.FRONT_AND_BACK,GL.FILL)
+        for i=1,nbc do
+            glUnit(visBoxedCloakUnit[i],true,-1)
         end
     end 
 

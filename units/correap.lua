@@ -112,7 +112,6 @@ unitDef = {
       reloadtime              = 4,
       soundHit                = [[weapon/cannon/reaper_hit]],
       soundStart              = [[weapon/cannon/cannon_fire5]],
-      startsmoke              = [[1]],
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 255,

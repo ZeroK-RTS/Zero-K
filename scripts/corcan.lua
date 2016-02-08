@@ -80,6 +80,7 @@ local function EndJumpThread()
 end
 
 function jumping(jumpPercent)
+	GG.PokeDecloakUnit(unitID, 50)
 
 	Turn(l_leg, x_axis, 0)
 	Turn(r_leg, x_axis, 0)

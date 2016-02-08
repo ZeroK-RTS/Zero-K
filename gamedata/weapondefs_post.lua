@@ -14,6 +14,16 @@
 
 local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
+Spring.Echo("Loading WeaponDefs_posts")
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+--  Dynamic Comms
+--
+
+VFS.Include('gamedata/modularcomms/weapondefgen.lua')
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -151,20 +161,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Workaround impact only beam vs shield bug 
--- https://github.com/ZeroK-RTS/Zero-K/issues/663
-
-for _, weaponDef in pairs(WeaponDefs) do
-	if ((weaponDef.weapontype == "LightningCannon") or (weaponDef.weapontype == "BeamLaser")) and weaponDef.impactonly then
-		weaponDef.impactonly = false
-		weaponDef.areaofeffect = 2
-		weaponDef.craterareaofeffect = 3
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
 -- Disable sweepfire until we know how to use it
 
 for _, weaponDef in pairs(WeaponDefs) do
@@ -211,6 +207,17 @@ if (modOptions and modOptions.cratermult and modOptions.cratermult ~= 1) then
   end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Set myGravity for Cannons because maps cannot be trusted. Standard is 120, 
+-- gravity of 150 can cause high things (such as HLT) to be unhittable.
+
+ for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "Cannon" and not weaponDef.mygravity then
+		weaponDef.mygravity = 2/15 -- 120/(GAME_SPEED^2)
+	end
+end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -286,6 +293,23 @@ end
 	end
  end
  
+ --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Take over the handling of shield energy drain from the engine.
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.shieldpowerregenenergy and weaponDef.shieldpowerregenenergy > 0 then
+		weaponDef.customparams = weaponDef.customparams or {}
+		
+		weaponDef.customparams.shield_rate = weaponDef.shieldpowerregen
+		weaponDef.customparams.shield_drain = weaponDef.shieldpowerregenenergy
+		
+		weaponDef.shieldpowerregen = 0
+		weaponDef.shieldpowerregenenergy = 0
+	end
+end
+ 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -315,6 +339,10 @@ do
       for i, weapon in pairs(ud.weapons) do
 		--Spring.Echo(ud.name)
         local wd = WeaponDefs[weapon.name:lower()]
+		if not wd then
+			Spring.Echo("Weapon Def Missing", weapon.name)
+			return true
+		end
         if ((not (wd.weapontype == "Shield")) and 
             (not wd.interceptor)) then
           return true

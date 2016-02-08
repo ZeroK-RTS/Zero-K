@@ -2,86 +2,79 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local devolution = false
+include("LuaRules/Configs/customcmds.h.lua")
 
 local morphDefs = {
-  --// Evil4Zerggin: Revised time requirements. All rank requirements set to 3.
-  --// Time requirements:
-  --// To t1 unit: 10
-  --// To t2 unit: 20
-  --// To t1 structure: 30
-  --// To t2 structure: 60
-  
-  --// KR: No longer consistently following tech time requirements, instead it's more correlated to cost difference (since there are no tech levels).
-  --// Hidden Chicken Faction
+	--// Evil4Zerggin: Revised time requirements. All rank requirements set to 3.
+	--// Time requirements:
+	--// To t1 unit: 10
+	--// To t2 unit: 20
+	--// To t1 structure: 30
+	--// To t2 structure: 60
 
-  chicken_drone = {
-    [1] = {
-      into = 'chickend',
-	  energy = 15,
-      time = 20,
-      rank = 0,
-    },
-   [2] = {
-      into = 'nest',
-	  energy = 30,
-      time = 20,
-      rank = 0,
-    },
-   [3] = {
-      into = 'chickenspire',
-	  energy = 600,
-      time = 90,
-      rank = 0,
-    },
-   [4] = {
-      into = 'thicket',
-      time = 4,
-      rank = 0,
-    },
-  }, 
+	--// KR: No longer consistently following tech time requirements, instead it's more correlated to cost difference (since there are no tech levels).
+	--// Hidden Chicken Faction
 
-  nest = {
-    into = 'roostfac',
-    time = 60,
-    rank = 0,
-  },
-  
-  chicken_drone_starter = {
-	{
-      into = 'nest',
-      time = 1,
-      rank = 0,
-    },
-  }, 
+	chicken_drone = {
+		[1] = {
+			into = 'chickend',
+			energy = 15,
+			time = 20,
+		},
+		[2] = {
+			into = 'nest',
+			energy = 30,
+			time = 20,
+		},
+		[3] = {
+			into = 'chickenspire',
+			energy = 600,
+			time = 90,
+		},
+		[4] = {
+			into = 'thicket',
+			time = 4,
+		},
+	}, 
+
+	nest = {
+		into = 'roostfac',
+		time = 60,
+	},
+
+	chicken_drone_starter = {
+		{
+			into = 'nest',
+			time = 1,
+		},
+	}, 
 }
 
 local baseComMorph = {
-	[0] = {	time = 10, cost = 0},
-	[1] = {	time = 25, cost = 250},
-	[2] = {	time = 30, cost = 300},
-	[3] = {	time = 40, cost = 400},
-	[4] = {	time = 50, cost = 500},
+	[0] = {time = 10, cost = 0},
+	[1] = {time = 25, cost = 250},
+	[2] = {time = 30, cost = 300},
+	[3] = {time = 40, cost = 400},
+	[4] = {time = 50, cost = 500},
 }
 
 --------------------------------------------------------------------------------
 -- customparams
 --------------------------------------------------------------------------------
 for i=1,#UnitDefs do
-  local ud = UnitDefs[i]
-  local cp = ud.customParams
-  local name = ud.name
-  local morphTo = cp.morphto
-  if morphTo then
-    local targetDef = UnitDefNames[morphTo]
-    morphDefs[name] = morphDefs[name] or {}
-    morphDefs[name][#morphDefs[name] + 1] = {
-      into = morphTo,
-      time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
-      combatMorph = cp.combatmorph == "1",
-	  rank = cp.morphrank and tonumber(cp.morphrank) or 0,
-    }
-  end
+	local ud = UnitDefs[i]
+	local cp = ud.customParams
+	local name = ud.name
+	local morphTo = cp.morphto
+	if morphTo then
+		local targetDef = UnitDefNames[morphTo]
+		morphDefs[name] = morphDefs[name] or {}
+		morphDefs[name][#morphDefs[name] + 1] = {
+			into = morphTo,
+			time = cp.morphtime or (cp.level and math.floor((targetDef.metalCost - ud.metalCost) / (6 * (cp.level+1)))),	-- or 30,
+			combatMorph = cp.combatmorph == "1",
+		}
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -89,18 +82,18 @@ end
 --------------------------------------------------------------------------------
 local comms = {"armcom", "corcom", "commrecon", "commsupport", "benzcom", "cremcom"}
 
-for i=1,#comms do
-  for j = 0,4 do
-    local source = comms[i] .. j
-    local destination = comms[i] .. (j+1)
-    morphDefs[source] = {
-      into = destination,
-      time = baseComMorph[j].time,
-      metal = baseComMorph[j].cost,
-      energy = baseComMorph[j].cost,
-      combatMorph = true,
-    }
-  end
+for i = 1, #comms do
+	for j = 0,4 do
+		local source = comms[i] .. j
+		local destination = comms[i] .. (j+1)
+		morphDefs[source] = {
+			into = destination,
+			time = baseComMorph[j].time,
+			metal = baseComMorph[j].cost,
+			energy = baseComMorph[j].cost,
+			combatMorph = true,
+		}
+	end
 end
 
 
@@ -108,11 +101,11 @@ end
 -- modular commander handling
 --------------------------------------------------------------------------------
 local comMorph = {	-- not needed
-	[1] = {	time = 20,},
-	[2] = {	time = 25,},
-	[3] = {	time = 30,},
-	[4] = {	time = 35,},
-	[5] = {	time = 40,},
+	[1] = {time = 20,},
+	[2] = {time = 25,},
+	[3] = {time = 30,},
+	[4] = {time = 35,},
+	[5] = {time = 40,},
 }
 
 local customComms = {}
@@ -157,13 +150,16 @@ end
 
 local function CheckForExistingMorph(morphee, target)
 	local array = morphDefs[morphee]
-	if not array then return false end
+	if not array then 
+		return false
+	end
 	if array.into then
-		if array.into == target then return true
-		else return false end
+		return (array.into == target)
 	end
 	for index,morphOpts in pairs(array) do
-		if morphOpts.into and morphOpts.into == target then return true end
+		if morphOpts.into and morphOpts.into == target then 
+			return true 
+		end
 	end
 	return false
 end
@@ -181,24 +177,20 @@ for id, playerData in pairs(customComms) do
 				local sourceName, targetName = originDef.name, targetDef.name
 				local morphCost
 				local morphOption = comMorph[i] and Spring.Utilities.CopyTable(comMorph[i], true) or {}
-				--if morphOption then
-					morphOption.into = array[i+1]
-					-- set time
-					morphOption.time = math.floor( (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) ) or morphOption.time
-					--morphOption.time = math.floor((targetDef.metalCost - originDef.metalCost)/10) or morphOption.time
-					--morphOption.time = math.floor(15 + i*5) or morphOption.time
-					morphOption.combatMorph = true
-					-- copy, checking that this morph isn't already defined
-					morphDefs[sourceName] = morphDefs[sourceName]  or {}
-					if not CheckForExistingMorph(sourceName, targetName) then
-						morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
-					else
-						Spring.Echo("Duplicate morph, exiting")
-					end
-				--else
-					--Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Comm Morph error: no setting for level "..i.."->"..i+1 .. " transition")
-					--break
-				--end
+				
+				morphOption.into = array[i+1]
+				-- set time
+				morphOption.time = math.floor( (targetDef.metalCost - originDef.metalCost) / (5 * (i+1)) ) or morphOption.time
+				--morphOption.time = math.floor((targetDef.metalCost - originDef.metalCost)/10) or morphOption.time
+				--morphOption.time = math.floor(15 + i*5) or morphOption.time
+				morphOption.combatMorph = true
+				-- copy, checking that this morph isn't already defined
+				morphDefs[sourceName] = morphDefs[sourceName]  or {}
+				if not CheckForExistingMorph(sourceName, targetName) then
+					morphDefs[sourceName][#(morphDefs[sourceName]) + 1] = morphOption
+				else
+					Spring.Echo("Duplicate morph, exiting")
+				end
 			end
 		end
 	end
@@ -214,26 +206,98 @@ for i,v in pairs(morphDefs) do
 	end
 end
 ]]--
---
--- Here's an example of why active configuration
--- scripts are better then static TDF files...
---
 
---
--- devolution, babe  (useful for testing)
---
-if (devolution) then
-  local devoDefs = {}
-  for src,data in pairs(morphDefs) do
-    devoDefs[data.into] = { into = src, time = 10, metal = 1, energy = 1 }
-  end
-  for src,data in pairs(devoDefs) do
-    morphDefs[src] = data
-  end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local MAX_MORPH = 0
+local UPGRADING_BUILD_SPEED = 250
+
+local function DefCost(paramName, udSrc, udDst)
+	local pSrc = udSrc[paramName]
+	local pDst = udDst[paramName]
+	if (not pSrc) or (not pDst) then
+		return 0
+	end
+	local cost = (pDst - pSrc)
+	if (cost < 0) then
+		cost = 0
+	end
+	return math.floor(cost)
 end
 
+local function BuildMorphDef(udSrc, morphData)
+	local udDst = UnitDefNames[morphData.into]
+	if (not udDst) then
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph gadget: Bad morph dst type: ' .. morphData.into)
+		return
+	else
+		if (CMD_MORPH + MAX_MORPH >= CMD_MORPH_STOP ) then --reached next custom command ID in the list (see: customcmds.h.lua)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph CMD_ID is overflowing/overlapping with other command.')
+		end
+		if (CMD_MORPH_STOP + MAX_MORPH >= 2*CMD_MORPH_STOP-CMD_MORPH ) then --reached next custom command ID in the list (see: customcmds.h.lua)
+			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Morph Stop CMD_ID is overflowing/overlapping with other command.')
+		end
+		local unitDef = udDst
+		local newData = {}
+		newData.into = udDst.id
+		newData.time = morphData.time or math.floor(unitDef.buildTime*7/UPGRADING_BUILD_SPEED)
+		newData.increment = (1 / (30 * newData.time))
+		newData.metal	= morphData.metal or DefCost('metalCost', udSrc, udDst)
+		newData.energy = morphData.energy or DefCost('energyCost', udSrc, udDst)
+		newData.combatMorph = morphData.combatMorph or false
+		newData.resTable = {
+			m = (newData.increment * newData.metal),
+			e = (newData.increment * newData.energy)
+		}
+		newData.facing = morphData.facing
 
-return morphDefs
+			MAX_MORPH = MAX_MORPH + 1 -- CMD_MORPH is the "generic" morph command. "Specific" morph command start at CMD_MORPH+1
+		newData.cmd	 = CMD_MORPH		+ MAX_MORPH
+		newData.stopCmd = CMD_MORPH_STOP + MAX_MORPH
+
+		if (type(GG.MorphInfo)~="table") then
+			GG.MorphInfo = {["CMD_MORPH_BASE_ID"]=CMD_MORPH,["CMD_MORPH_STOP_BASE_ID"]=CMD_MORPH_STOP}
+		end
+		if (type(GG.MorphInfo[udSrc.id])~="table") then
+			GG.MorphInfo[udSrc.id]={}
+		end
+		GG.MorphInfo[udSrc.id][udDst.id]=newData.cmd
+		GG.MorphInfo["MAX_MORPH"] = MAX_MORPH
+
+		newData.texture = morphData.texture
+		newData.text = morphData.text
+		return newData
+	end
+end
+
+local function ValidateMorphDefs(mds)
+	local newDefs = {}
+	for src, morphData in pairs(mds) do
+		local udSrc = UnitDefNames[src]
+		if (not udSrc) then
+			Spring.Log("Morph", LOG.WARNING, 'Morph gadget: Bad morph src type: ' .. src)
+		else
+			newDefs[udSrc.id] = {}
+			if (morphData.into) then
+				local morphDef = BuildMorphDef(udSrc, morphData)
+				if (morphDef) then 
+					newDefs[udSrc.id][morphDef.cmd] = morphDef 
+				end
+			else
+				for _, morphData in pairs(morphData) do
+					local morphDef = BuildMorphDef(udSrc, morphData)
+					if (morphDef) then 
+						newDefs[udSrc.id][morphDef.cmd] = morphDef 
+					end
+				end
+			end
+		end
+	end
+	return newDefs
+end
+
+return ValidateMorphDefs(morphDefs), MAX_MORPH
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

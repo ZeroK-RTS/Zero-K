@@ -452,14 +452,9 @@ upgrades = {
 	},
 	module_autorepair = {
 		name = "Autorepair System",
-		description = "Self-repairs 20 HP/s when out of combat for 10 seconds",
+		description = "Self-repairs 10 HP/s",
 		func = function(unitDef)
-				-- First module replaces the base 5 hp/s because that occurs after a minute
-				if (not unitDef.idleautoheal) or unitDef.idleautoheal == 5 then
-					unitDef.idleautoheal = 0
-				end
-				unitDef.idleautoheal = unitDef.idleautoheal + 20
-				unitDef.idletime = 300
+				unitDef.autoheal = (unitDef.autoheal or 0) + 10
 			end,
 	},
 	module_companion_drone = {
@@ -482,9 +477,15 @@ upgrades = {
 		name = "Damage Booster",
 		description = "Increases damage of all weapons by 10%",
 		func = function(unitDef)
-				local weapons = unitDef.weapondefs or {}
-				for i,v in pairs(weapons) do
-					v.customparams.damagemod = v.customparams.damagemod + 0.1
+				if unitDef.customparams.dynamic_comm then
+					-- Weapondefs are static
+					unitDef.customparams.damagemod = (unitDef.customparams.damagemod or 0) + 1
+				else
+					-- Weapondefs stored in unitdef
+					local weapons = unitDef.weapondefs or {}
+					for i,v in pairs(weapons) do
+						v.customparams.damagemod = (v.customparams.damagemod or 0) + 0.1
+					end
 				end
 			end,	
 	},
@@ -531,7 +532,12 @@ upgrades = {
 		description = "Basic radar system with 1800 range",
 		func = function(unitDef)
 				unitDef.radardistance = (unitDef.radardistance or 0)
-				if unitDef.radardistance < 1800 then unitDef.radardistance = 1800 end
+				if unitDef.radardistance < 1800 then 
+					unitDef.radardistance = 1800
+				end
+				if (not unitDef.radaremitheight) or unitDef.radaremitheight < 100 then 
+					unitDef.radaremitheight = 100 
+				end
 			end,
 	},
 	module_heavy_armor = {
@@ -570,7 +576,11 @@ upgrades = {
 		order = 5,
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
-				ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
+				if unitDef.customparams.dynamic_comm then
+					DynamicApplyWeapon(unitDef, "commweapon_personal_shield", 16)
+				else
+					ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
+				end
 			end,
 	},
 	
@@ -588,7 +598,12 @@ upgrades = {
 		description = "A bubble shield that protects surrounding units within 350 m",
 		func = function(unitDef)
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
-				ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
+				
+				if unitDef.customparams.dynamic_comm then
+					DynamicApplyWeapon(unitDef, "commweapon_areashield", 16)
+				else
+					ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
+				end
 
 				unitDef.customparams.lups_unit_fxs = unitDef.customparams.lups_unit_fxs or {}
 				table.insert(unitDef.customparams.lups_unit_fxs, "commAreaShield")

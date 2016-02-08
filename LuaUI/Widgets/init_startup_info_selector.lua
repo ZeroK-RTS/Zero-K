@@ -3,13 +3,13 @@ local versionNumber = "1.22"
 --------------------------------------------------------------------------------
 function widget:GetInfo()
 	return {
-	name	= "Startup Info and Selector",
-	desc	= "[v" .. string.format("%s", versionNumber ) .. "] Shows important information and options on startup.",
-	author	= "SirMaverick",
-	date	= "2009,2010",
-	license	= "GNU GPL, v2 or later",
-	layer	= 0,
-	enabled	= true
+		name	= "Startup Info and Selector",
+		desc	= "[v" .. string.format("%s", versionNumber ) .. "] Shows important information and options on startup.",
+		author	= "SirMaverick",
+		date	= "2009,2010",
+		license	= "GNU GPL, v2 or later",
+		layer	= 0,
+		enabled	= true
 	}
 end
 --------------------------------------------------------------------------------
@@ -45,7 +45,7 @@ local buttons = {}
 local buttonLabels = {}
 local trainerLabels = {}
 local actionShow = "showstartupinfoselector"
-local optionData = include("Configs/startup_info_selector.lua")
+local optionData
 
 local noComm = false
 local gameframe = Spring.GetGameFrame()
@@ -171,8 +171,7 @@ local function CreateWindow()
 			height = BUTTON_HEIGHT,
 			padding = {5,5,5,5},
 			OnClick = {function()
-				local prefix = option.trainer and "faction:" or "customcomm:"
-				Spring.SendLuaRulesMsg(prefix..option.name)
+				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
 				Close(true)
 			end},
@@ -239,6 +238,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Initialize()
+	optionData = include("Configs/startup_info_selector.lua")
+
 	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
 	end

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[vehaa]],
   name                   = [[Crasher]],
-  description            = [[Fast AA Vehicle]],
+  description            = [[Fast Anti-Air Vehicle]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostEnergy        = 220,
@@ -117,7 +117,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 730,
       reloadtime              = 4,
-      renderType              = 1,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/sabot_hit]],
       soundStart              = [[weapon/missile/missile_fire]],

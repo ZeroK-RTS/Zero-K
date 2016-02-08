@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[corroach]],
   name                   = [[Roach]],
-  description            = [[Crawling Bomb]],
+  description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
@@ -13,7 +13,7 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  category               = [[LAND]],
+  category               = [[LAND TOOFAST]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[16 16 16]],

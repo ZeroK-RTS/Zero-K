@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[armestor]],
-  name                          = [[Energy Transmission Pylon]],
+  name                          = [[Energy Pylon]],
   description                   = [[Extends overdrive grid]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 200,

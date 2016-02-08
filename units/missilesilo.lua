@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[missilesilo]],
   name                          = [[Missile Silo]],
-  description                   = [[Produces Missiles, Builds at 10 m/s]],
+  description                   = [[Produces Tactical Missiles, Builds at 10 m/s]],
   buildCostEnergy               = 1200,
   buildCostMetal                = 1200,
   builder                       = true,

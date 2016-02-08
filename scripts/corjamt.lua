@@ -1,5 +1,5 @@
 --by Chris Mackey
-local spSetUnitShieldState = Spring.SetUnitShieldState
+local ALLY_ACCESS = {allied = true}
 
 --pieces
 local base = piece "base"
@@ -66,10 +66,6 @@ end
 	
 	
 function script.Create()
-	StartThread(initialize)
-end
-
-function script.Activate()
 	Turn(lf_leaf, x_axis, l_angle, l_speed)
 	Turn(lf_leaf, z_axis, -l_angle, l_speed)
 	
@@ -82,22 +78,40 @@ function script.Activate()
 	Turn(rb_leaf, x_axis, -l_angle, l_speed)
 	Turn(rb_leaf, z_axis, l_angle, l_speed)
 	
+	StartThread(initialize)
+end
+
+function script.Activate()
+	--Turn(lf_leaf, x_axis, l_angle, l_speed)
+	--Turn(lf_leaf, z_axis, -l_angle, l_speed)
+	--
+	--Turn(rf_leaf, x_axis, l_angle, l_speed)
+	--Turn(rf_leaf, z_axis, l_angle, l_speed)
+	--
+	--Turn(lb_leaf, x_axis, -l_angle, l_speed)
+	--Turn(lb_leaf, z_axis, -l_angle, l_speed)
+	--
+	--Turn(rb_leaf, x_axis, -l_angle, l_speed)
+	--Turn(rb_leaf, z_axis, l_angle, l_speed)
+	
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 0, ALLY_ACCESS)
 	--spSetUnitShieldState(unitID, 1, true)
 end
 
 function script.Deactivate()
-	Turn(lf_leaf, x_axis, 0, 1)
-	Turn(lf_leaf, z_axis, 0, 1)
+	--Turn(lf_leaf, x_axis, 0, 1)
+	--Turn(lf_leaf, z_axis, 0, 1)
+	--
+	--Turn(rf_leaf, x_axis, 0, 1)
+	--Turn(rf_leaf, z_axis, 0, 1)
+	--
+	--Turn(lb_leaf, x_axis, 0, 1)
+	--Turn(lb_leaf, z_axis, 0, 1)
+	--
+	--Turn(rb_leaf, x_axis, 0, 1)
+	--Turn(rb_leaf, z_axis, 0, 1)
 	
-	Turn(rf_leaf, x_axis, 0, 1)
-	Turn(rf_leaf, z_axis, 0, 1)
-	
-	Turn(lb_leaf, x_axis, 0, 1)
-	Turn(lb_leaf, z_axis, 0, 1)
-	
-	Turn(rb_leaf, x_axis, 0, 1)
-	Turn(rb_leaf, z_axis, 0, 1)
-	
+	Spring.SetUnitRulesParam(unitID, "shieldChargeDisabled", 1, ALLY_ACCESS)
 	--spSetUnitShieldState(unitID, 1, false)
 end
 

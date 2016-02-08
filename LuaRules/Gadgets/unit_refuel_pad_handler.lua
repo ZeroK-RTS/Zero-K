@@ -150,9 +150,9 @@ local function SitOnPad(unitID)
 					spSetUnitVelocity(unitID, 0, 0, 0)
 					Spring.SetUnitResourcing(unitID, "uue" ,0)
 					mcDisable(unitID)
+					unitMovectrled[unitID] = nil
 					GG.UpdateUnitAttributes(unitID)
 				end
-				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
 				return
 			end
@@ -245,7 +245,11 @@ local function CircleToLand(unitID, goal)
 	local start = {spGetUnitBasePosition(unitID)}
 	
 	local unitDefID	= spGetUnitDefID(unitID)
-	local ud = UnitDefs[unitDefID]
+	local ud = unitDefID and UnitDefs[unitDefID]
+	
+	if not (unitDefID and ud and turnRadius[unitDefID]) then
+		return
+	end
 	
 	local turnCircleRadius = turnRadius[unitDefID]
 	local turnCircleRadiusSq = turnCircleRadius^2
@@ -429,9 +433,9 @@ local function CircleToLand(unitID, goal)
 				if not spGetUnitIsDead(unitID) then
 					spSetUnitLeaveTracks(unitID, true)
 					mcDisable(unitID)
+					unitMovectrled[unitID] = nil
 					GG.UpdateUnitAttributes(unitID)
 				end
-				unitMovectrled[unitID] = nil
 				landingUnit[unitID] = nil
 				return
 			end

@@ -31,13 +31,28 @@ local function Open()
 	Turn(door1, z_axis, 0, math.rad(80))
 	Turn(door2, z_axis, 0, math.rad(80))
 	WaitForTurn(door1, z_axis)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	Move(arm, y_axis, 0, 12)
 	Turn(antenna, x_axis, 0, math.rad(50))
 	Sleep(200)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	Move(barrel, z_axis, 0, 7)
 	Move(ledgun, z_axis, 0, 7)
 	WaitForMove(barrel, z_axis)
 	WaitForMove(ledgun, z_axis)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	open = true
 end
 
@@ -45,6 +60,11 @@ local function Close()
 	open = false
 	Signal(SIG_OPEN)
 	SetSignalMask(SIG_OPEN)
+	
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
 	Turn(turret, y_axis, 0, math.rad(50))
 	Turn(gun, x_axis, 0, math.rad(40))
 	Move(barrel, z_axis, -24, 7)
@@ -52,14 +72,24 @@ local function Close()
 	Turn(antenna, x_axis, math.rad(90), math.rad(50))
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(gun, x_axis)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	Move(arm, y_axis, -50, 12)
 	WaitForMove(arm, y_axis)
+	while spGetUnitRulesParam(unitID, "lowpower") == 1 do
+		Sleep(500)
+	end
+	
+	
 	Turn(door1, z_axis, math.rad(-(90)), math.rad(80))
 	Turn(door2, z_axis, math.rad(-(-90)), math.rad(80))
 	WaitForTurn(door1, z_axis)
 	WaitForTurn(door2, z_axis)
-	Spring.SetUnitArmored(unitID,true)	--broken
-	Spring.SetUnitCOBValue(unitID, COB.ARMORED, 1)
+	
+	Spring.SetUnitArmored(unitID,true)
 end
 
 function script.Create()
@@ -78,7 +108,9 @@ function script.Deactivate()
 end
 
 function script.AimWeapon(weaponNum, heading, pitch)
-	if not open then return false end
+	if (not open) or (spGetUnitRulesParam(unitID, "lowpower") == 1) then 
+		return false 
+	end
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	

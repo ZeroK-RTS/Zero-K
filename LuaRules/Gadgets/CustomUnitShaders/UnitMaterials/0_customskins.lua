@@ -37,6 +37,19 @@ end --for
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local skinDefs = include("LuaRules/Configs/dynamic_comm_skins.lua")
+
+for name, data in pairs(skinDefs) do
+	local altskin2 = data.altskin2
+	if not altskin2 then
+		altskin2 = "%%" .. UnitDefNames["dyn" .. data.chassis .. "0"].id .. ":1"
+	end
+	unitMaterials[name] = {"altSkinS3o", ALTSKIN = data.altskin, ALTSKIN2 = altskin2}
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 return materials, unitMaterials
 
 --------------------------------------------------------------------------------

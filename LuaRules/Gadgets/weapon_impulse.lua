@@ -87,7 +87,6 @@ local thereIsStuffToDo = false
 local unitByID = {count = 0, data = {}}
 local unit = {}
 
-local transportMass = {}
 local inTransport = {}
 
 --local risingByID = {count = 0, data = {}}
@@ -113,16 +112,22 @@ end
 -------------------------------------------------------------------------------------
 -- General Functionss
 
-local function DetatchFromGround(unitID)
+local function DetatchFromGround(unitID, threshold, height, doImpulse)
+	threshold = threshold or 0.01
+	height = height or 0.1
 	local x,y,z = spGetUnitPosition(unitID)
 	local h = spGetGroundHeight(x,z)
 	--GG.UnitEcho(unitID,h-y)
-	if h >= y - 0.01 or y >= h - 0.01 then
-		--spAddUnitImpulse(unitID, 0,1000,0)
+	if h >= y - threshold or y >= h - threshold then
+		if doImpulse then
+			spAddUnitImpulse(unitID, 0, doImpulse, 0)
+		end
 		Spring.MoveCtrl.Enable(unitID)
-		Spring.MoveCtrl.SetPosition(unitID, x, y+0.1, z)
+		Spring.MoveCtrl.SetPosition(unitID, x,  y + height, z)
 		Spring.MoveCtrl.Disable(unitID)
-		--spAddUnitImpulse(unitID, 0,-1000,0)
+		if doImpulse then
+			spAddUnitImpulse(unitID, 0, -doImpulse, 0)
+		end
 	end
 end
 
@@ -176,7 +181,7 @@ local function AddGadgetImpulse(unitID, x, y, z, magnitude, affectTransporter, p
 	
 	myImpulseMult = myImpulseMult or {1,1,1}
 	
-	local myMass = transportMass[unitID] or mass[unitDefID]
+	local myMass = Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID]
 	local mag = magnitude*GRAVITY_BASELINE/dis*impulseMult[moveTypeByID[unitDefID]]*myImpulseMult[moveTypeByID[unitDefID]+1]/myMass
 	
 	if moveTypeByID[unitDefID] == 0 then
@@ -202,7 +207,7 @@ local function DoAirDrag(unitID, factor, unitDefID)
 	unitDefID = unitDefID or spGetUnitDefID(unitID)
 	local vx,vy,vz = spGetUnitVelocity(unitID)
 	if unitDefID and vx then
-		local myMass = transportMass[unitID] or mass[unitDefID]
+		local myMass = Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID]
 		factor = factor/(factor+myMass^1.5)
 		--Spring.Echo(factor)
 		spSetUnitVelocity(unitID, vx*(1-factor), vy*(1-factor), vz*(1-factor))
@@ -272,34 +277,15 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 		spSetUnitVelocity(unitID, 0, 0, 0) -- prevent the impulse capacitor
 	end
 	
-	if transportMass[transportID] then
-		transportMass[transportID] = transportMass[transportID] - mass[unitDefID]
-		--Spring.Echo(transportMass[transportID])
-	end
 	inTransport[unitID] = nil
 end
 
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
-	if transportMass[transportID] then
-		transportMass[transportID] = transportMass[transportID] + mass[unitDefID]
-	else
-		local tudid = spGetUnitDefID(transportID)
-		transportMass[transportID] = mass[tudid] + mass[unitDefID]
-	end
 	inTransport[unitID] = {id = transportID, def = spGetUnitDefID(transportID)}
-	--Spring.Echo(transportMass[transportID])
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if inTransport[unitID] then
-		local transportID = inTransport[unitID].id
-		if transportMass[transportID] then
-			transportMass[transportID] = transportMass[transportID] - mass[unitDefID]
-			--Spring.Echo(transportMass[transportID])
-		end
-		inTransport[unitID] = nil
-		--Spring.Echo(transportMass[transportID])
-	end
+	inTransport[unitID] = nil
 end
 
 function gadget:Initialize()

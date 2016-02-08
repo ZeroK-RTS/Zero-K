@@ -279,8 +279,7 @@ function gadget:GameFrame(n)
 						end
 
 						if (shareLevels[team]) then
-							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team][1])
-							Spring.SetTeamShareLevel(team, "energy", shareLevels[team][2])
+							Spring.SetTeamShareLevel(team, "metal",  shareLevels[team])
 							shareLevels[team] = nil
 						end
 
@@ -327,14 +326,15 @@ function gadget:GameFrame(n)
 					afkTeams[team] = true --mark team as AFK -- orly
 					
 					local mShareLevel = select(6, Spring.GetTeamResources(team, "metal"))
-					local eShareLevel = select(6, Spring.GetTeamResources(team, "energy"))
 
-					if (mShareLevel > 0 or eShareLevel > 0) then
-						shareLevels[team] = {mShareLevel, eShareLevel}
+					if (mShareLevel > 0) then
+						shareLevels[team] = mShareLevel
 					end
 
 					Spring.SetTeamShareLevel(team, "metal",  0)
-					Spring.SetTeamShareLevel(team, "energy", 0)
+					-- Energy share is not set because the storage needs to be full for full overdrive.
+					-- Also energy income is mostly private and a large energy influx to the rest of the 
+					-- team is likely to be wasted or overdriven inefficently.
 
 					local units = spGetTeamUnits(team) or {}
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0

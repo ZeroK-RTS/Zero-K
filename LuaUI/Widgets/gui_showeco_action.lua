@@ -25,18 +25,7 @@ local function ToggleShoweco()
   end
 end
 
-options_path = 'Settings/Interface/Map'
-options = {
-	showeco = {
-		name = 'Show Eco Overlay',
-		desc = 'Show metal, geo spots and energy grid',
-		hotkey = {key='f4', mod=''},
-		type ='button',
-		action='showeco',
-		noAutoControlFunc = true,
-		OnChange = ToggleShoweco
-	},
-}
+WG.ToggleShoweco = ToggleShoweco
 
 --------------------------------------------------------------------------------------
 --Grid drawing. Copied and trimmed from unit_mex_overdrive.lua gadget (by licho & googlefrog)
@@ -182,6 +171,8 @@ end
 -- Unit Handling
 
 function InitializeUnits()
+	pylons = {count = 0, data = {}}
+	pylonByID = {}
 	local allUnits = Spring.GetAllUnits()
 	for i=1, #allUnits do
 		local unitID = allUnits[i]
@@ -238,9 +229,8 @@ function widget:Update(dt)
 	if doTest > 30 then
 		local teamID = Spring.GetMyTeamID()
 		local _, fullView = Spring.GetSpectatingState()
-		if (fullView and not prevFullView) or (teamID ~= prevTeamID) then
+		if (fullView ~= prevFullView) or (teamID ~= prevTeamID) then
 			InitializeUnits()
-			prevFullView = true
 		end
 		prevFullView = fullView
 		prevTeamID = teamID

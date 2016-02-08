@@ -33,6 +33,7 @@ unitDef = {
 	removewait     = 1,
   },
 
+  energyMake                    = 1.2,
   energyUse                     = 0,
   explodeAs                     = [[SMALL_BUILDINGEX]],
   floater                       = true,
@@ -44,7 +45,7 @@ unitDef = {
   levelGround                   = false,
   losEmitHeight                 = 30,
   maxDamage                     = 130,
-  maxSlope                      = 50,
+  maxSlope                      = 255,
   minCloakDistance              = 150,
   objectName                    = [[arm_wind_generator.s3o]],
   script                        = [[armwin.lua]],
@@ -86,7 +87,7 @@ unitDef = {
       reclaimTime      = 7,
     },
 
-    DEAD_WATER = {
+    DEADWATER = {
       description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       damage           = 400,

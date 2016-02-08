@@ -15,7 +15,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 225,
+		default = 150,
 	},
 
 	explosionGenerator      = [[custom:flash2purple]],
@@ -28,7 +28,7 @@ local weaponDef = {
 	laserFlareSize          = 4.33,
 	minIntensity            = 1,
 	noSelfDamage            = true,
-	range                   = 350,
+	range                   = 330,
 	reloadtime              = 2,
 	rgbColor                = [[0.3 0 0.4]],
 	soundStart              = [[weapon/laser/heavy_laser5]],
@@ -38,7 +38,7 @@ local weaponDef = {
 	texture2                = [[flare]],
 	texture3                = [[flare]],
 	texture4                = [[smallflare]],
-	thickness               = 12,
+	thickness               = 8,
 	tolerance               = 18000,
 	turret                  = true,
 	weaponType              = [[BeamLaser]],

@@ -5,7 +5,7 @@ function widget:GetInfo()
   return {
     name      = "Selection BlurryHalo",
     desc      = "Shows a halo for selected, hovered ally-selected units. (Doesn't work on ati cards!)",
-    author    = "CarRepairer, from jK's gfx_halo",
+    author    = "CarRepairer, from jK's gfx_halo, modified by Shadowfury333",
     date      = "Jan, 2008",
     version   = "0.004",
     license   = "GNU GPL, v2 or later",
@@ -14,6 +14,12 @@ function widget:GetInfo()
   }
 end
 
+
+local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
+local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
+local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
+local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -240,26 +246,31 @@ end
 
 local function GetVisibleUnits()
   local units = spGetVisibleUnits(-1, 30, false)
+  local boxedUnits = GetUnitsInSelectionBox();
 
 	local visibleAllySelUnits = {}
-    local visibleSelected = {}
+  local visibleSelected = {}
+  local visibleBoxed = {}
 
-    for i=1, #units do
-	    local unitID = units[i]
-	    if (spIsUnitSelected(unitID)) then
-		    visibleSelected[#visibleSelected+1] = unitID
-	    elseif showAlly and WG.allySelUnits and WG.allySelUnits[unitID] then
-		    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
-	    end
+  for i=1, #units do
+    local unitID = units[i]
+    if (spIsUnitSelected(unitID)) then
+	    visibleSelected[#visibleSelected+1] = unitID
+    elseif showAlly and WG.allySelUnits and WG.allySelUnits[unitID] then
+	    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
     end
+    if IsUnitInSelectionBox(unitID) then
+      visibleBoxed[#visibleBoxed+1] = unitID
+    end
+  end
 
-    return visibleAllySelUnits, visibleSelected
+  return visibleAllySelUnits, visibleSelected, visibleBoxed
 
 end
 
 
 local function DrawHaloFunc()
-	visibleAllySelUnits, visibleSelected = GetVisibleUnits()
+	visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
 
 	glColor(selectColor)
 	for i=1,#visibleSelected do
@@ -282,24 +293,33 @@ local function DrawHaloFunc()
 		glUnit(unitID,true,-1)
 	end
 
+  glColor(myHoverColor)
+  for i=1, #visibleBoxed do
+    local unitID = visibleBoxed[i]
+    glUnit(unitID,true,-1)
+  end
+
 	local mx, my = spGetMouseState()
-    local pointedType, data = spTraceScreenRay(mx, my)
+  local pointedType, data = spTraceScreenRay(mx, my, false, true)
+  if pointedType == 'unit' then 
+    data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
+  end
+
 	if pointedType == 'unit' and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
-		local teamID = spGetUnitTeam(data)
-		if teamID == spGetMyTeamID() then
-			glColor(myHoverColor)
-		elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
-			glColor(allyHoverColor)
-		else
-			glColor(enemyHoverColor)
-		end
+  	local teamID = spGetUnitTeam(data)
+  	if teamID == spGetMyTeamID() then
+  		glColor(myHoverColor)
+  	elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
+  		glColor(allyHoverColor)
+  	else
+  		glColor(enemyHoverColor)
+  	end
 
-		glUnit(data, true,-1)
-    elseif (pointedType == 'feature') and ValidFeatureID(data) then
-		glColor(featureHoverColor)
-		glFeature(data, true)
-    end
-
+  	glUnit(data, true,-1)
+  elseif (pointedType == 'feature') and ValidFeatureID(data) then
+  	glColor(featureHoverColor)
+  	glFeature(data, true)
+  end
 end
 
 local DrawVisibleUnits

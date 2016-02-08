@@ -29,6 +29,8 @@ local flares = {
 
 local gunHeading = 0
 
+local ROCKET_SPREAD = 0.4
+
 local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
 
@@ -63,32 +65,36 @@ local function MoveScript()
 		Sleep(2000)
 	end
 	while true do
-		if random() < 0.5 then
-			EmitSfx(wake1, 5)
-			EmitSfx(wake3, 5)
-			EmitSfx(wake5, 5)
-			EmitSfx(wake7, 5)
-			EmitSfx(wake1, 3)
-			EmitSfx(wake3, 3)
-			EmitSfx(wake5, 3)
-			EmitSfx(wake7, 3)
-		else
-			EmitSfx(wake2, 5)
-			EmitSfx(wake4, 5)
-			EmitSfx(wake6, 5)
-			EmitSfx(wake8, 5)
-			EmitSfx(wake2, 3)
-			EmitSfx(wake4, 3)
-			EmitSfx(wake6, 3)
-			EmitSfx(wake8, 3)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			if random() < 0.5 then
+				EmitSfx(wake1, 5)
+				EmitSfx(wake3, 5)
+				EmitSfx(wake5, 5)
+				EmitSfx(wake7, 5)
+				EmitSfx(wake1, 3)
+				EmitSfx(wake3, 3)
+				EmitSfx(wake5, 3)
+				EmitSfx(wake7, 3)
+			else
+				EmitSfx(wake2, 5)
+				EmitSfx(wake4, 5)
+				EmitSfx(wake6, 5)
+				EmitSfx(wake8, 5)
+				EmitSfx(wake2, 3)
+				EmitSfx(wake4, 3)
+				EmitSfx(wake6, 3)
+				EmitSfx(wake8, 3)
+			end
+			EmitSfx(ground1, UNIT_SFX1)
 		end
-		EmitSfx(ground1, UNIT_SFX1)
 		Sleep(150)
 	end
 end
 
 function script.Create()
 	Turn(exhaust, y_axis, math.rad(-180))
+	Turn(lbarrel, y_axis, ROCKET_SPREAD)
+	Turn(rbarrel, y_axis, -ROCKET_SPREAD)
 	StartThread(SmokeUnit, {base})
 	StartThread(WobbleUnit)
 	StartThread(MoveScript)
@@ -111,8 +117,8 @@ function script.AimWeapon(num, heading, pitch)
 	SetSignalMask(SIG_AIM)
 	Turn(turret, y_axis, heading, math.rad(180))
 	Turn(turret, x_axis, -pitch, math.rad(100))
-	Turn(lbarrel, y_axis, 2*pitch, math.rad(300))
-	Turn(rbarrel, y_axis, -2*pitch, math.rad(300))
+	Turn(lbarrel, y_axis, ROCKET_SPREAD + 2*pitch, math.rad(300))
+	Turn(rbarrel, y_axis, -ROCKET_SPREAD - 2*pitch, math.rad(300))
 	Turn(lbarrel, x_axis, -pitch, math.rad(300))
 	Turn(rbarrel, x_axis, -pitch, math.rad(300))
 	gunHeading = heading
@@ -132,7 +138,7 @@ function script.FireWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 620.1, 70, true)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 620.1, 70, 0.3)
 end
 
 function script.Shot() 

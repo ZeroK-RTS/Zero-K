@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[slowmort]],
   name                = [[Moderator]],
-  description         = [[Disruptor Beam Walker]],
+  description         = [[Distruptor Skirmisher Walker]],
   acceleration        = 0.2,
   activateWhenBuilt   = true,
   brakeRate           = 0.2,
@@ -166,7 +166,6 @@ unitDef = {
       name                    = [[Slowing Beam]],
       areaOfEffect            = 8,
       beamDecay               = 0.9,
-      beamlaser               = 1,
       beamTime                = 0.1,
       beamttl                 = 40,
       coreThickness           = 0.1,

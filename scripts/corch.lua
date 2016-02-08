@@ -28,14 +28,15 @@ local function HoveringAnimations () -- wobbling, waves and dust clouds
 			i = 1
 		end
 
-		if (curTerrainType <= 2) then
-			for j = 1, 8 do
-				EmitSfx (wakes[j], 3)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			if (curTerrainType <= 2) then
+				for j = 1, 8 do
+					EmitSfx (wakes[j], 3)
+				end
+			else
+				EmitSfx (ground1, 1025)
 			end
-		else
-			EmitSfx (ground1, 1025)
 		end
-
 		Sleep (200)
 	end
 end

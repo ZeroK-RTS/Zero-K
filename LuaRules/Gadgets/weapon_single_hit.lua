@@ -19,8 +19,6 @@ end
 
 local spGetGameFrame = Spring.GetGameFrame
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
-
 local wantedWeaponList = {}
 
 local singleHitWeapon = {}
@@ -37,7 +35,7 @@ function gadget:Initialize()
 				singleHitWeapon[wd.id] = true;
 				wantedWeaponList[#wantedWeaponList + 1] = wdid
 			end
-			if isNewEngine and wd.customParams.single_hit_multi then
+			if wd.customParams.single_hit_multi then
 				Script.SetWatchWeapon(wd.id, true)
 				singleHitMultiWeapon[wd.id] = true;
 				wantedWeaponList[#wantedWeaponList + 1] = wdid

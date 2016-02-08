@@ -69,8 +69,6 @@ local unit = {count = 0, data = {}} -- data holds all unitID data
 
 local drawPlayerAlways = {}
 
-local deadUnitID = 0 
-
 --------------------------------------------------------------------------------
 -- Commands
 
@@ -130,7 +128,7 @@ local function locationInRange(unitID, x, y, z, range)
 end
 
 local function clearTarget(unitID)
-	spSetUnitTarget(unitID,deadUnitID)
+	spSetUnitTarget(unitID, nil) -- The second argument is needed.
 	spSetUnitRulesParam(unitID,"target_type",TARGET_NONE)
 end
 

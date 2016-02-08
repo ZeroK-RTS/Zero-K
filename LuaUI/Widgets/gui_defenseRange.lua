@@ -70,7 +70,10 @@ modConfig["ZK"]["unitList"] =
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
 	corgrav = { weapons = { 1 } },		--newton
+	corjamt = { },
 }
+
+local shieldDefID = UnitDefNames["corjamt"].id
 
 local unitDefIDRemap = {
 	[UnitDefNames["missilesilo"].id] = UnitDefNames["tacnuke"].id,
@@ -109,6 +112,7 @@ colorConfig["enemy"]["air"]["min"] = { 0.0, 1.0, 0.0 }
 colorConfig["enemy"]["air"]["max"] = { 0.0, 0.0, 1.0 }
 colorConfig["enemy"]["nuke"]["complete"] =  { 1.0, 1.0, 1.0 }
 colorConfig["enemy"]["nuke"]["nanoframe"] =  { 0.0, 0.6, 0.8 }
+local shieldColor = {1, 0, 1}
 
 colorConfig["ally"] = colorConfig["enemy"]
 --end of DEFAULT COLOR CONFIG
@@ -278,6 +282,12 @@ options = {
 		value = true,
 		OnChange = function() RedoUnitList() end,
 	},
+	enemyshield = {
+		name = 'Show Enemy Shields', 
+		type = 'bool',
+		value = true,
+		OnChange = function() RedoUnitList() end,
+	},
 	specground = {
 		name = 'Show Ground Defence as Spectator', 
 		type = 'bool', 
@@ -306,6 +316,7 @@ options_order = {
 	'enemyground',
 	'enemyair',
 	'enemynuke',
+	'enemyshield',
 	'specground',
 	'specair',
 	'specnuke',
@@ -406,6 +417,14 @@ end
 
 local function UnitDetected( unitID, isAlly )
 	local unitDefID = spGetUnitDefID(unitID)
+
+	if unitDefID and unitDefIDRemap[unitDefID] then
+		unitDefID = unitDefIDRemap[unitDefID]
+		if unitDefID == -1 then
+			return
+		end
+	end
+
 	local udef = unitDefID and UnitDefs[unitDefID]
 	if not udef then
 		return
@@ -428,14 +447,6 @@ local function UnitDetected( unitID, isAlly )
 	
 	isAlly = isAlly or spectating
 	
-	if unitDefIDRemap[unitDefID] then
-		unitDefID = unitDefIDRemap[unitDefID]
-		if unitDefID == -1 then
-			return
-		end
-	end
-
-	
 	if (not udef) or (#udef.weapons == 0) then
 		--not interesting, has no weapons, lame
 		--printDebug("Unit ignored: weaponCount is 0")
@@ -445,6 +456,27 @@ local function UnitDetected( unitID, isAlly )
 	local x, y, z = spGetUnitPosition(unitID)
 	local longestRange = 0
 	local weaponDef
+
+	if unitDefID == shieldDefID then
+		if isAlly or (not options.enemyshield.value) then return end
+		weaponDef = WeaponDefs[udef.weapons[1].weaponDef]
+		local rangeLines = CalcBallisticCircle(x,y,z, weaponDef.shieldRadius, weaponDef )
+		defences[unitID] = {
+			drawList = glCreateList(CreateDrawList, isAlly, {{
+					type = type,
+					rangeLines = rangeLines,
+					rangeLinesEx = rangeLines,
+					color1 = shieldColor,
+					color2 = shieldColor,
+				}}),
+			pos = {x, y, z},
+			drawRange = weaponDef.shieldRadius,
+			inBuild = inBuild,
+			checkCompleteness = false,
+		}
+		needRedraw = needRedraw or REDRAW_TIME
+		return
+	end
 
 	printDebug( udef.name )
 	local foundWeapons = {}

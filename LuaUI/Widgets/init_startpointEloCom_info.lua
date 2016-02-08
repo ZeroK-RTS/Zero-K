@@ -73,6 +73,7 @@ function widget:Initialize()
 	--check for gamestart, initialize CommSelection event, get player list, get player info, initialize WG.customTooltip.
 	--
 	
+	Spring.Echo("Local Comm Selection")
 	if Spring.GetGameFrame()>0 then
 		widgetHandler:RemoveWidget()
 		Spring.Echo("\"Comm-n-Elo Startpos. Info\" widget removed after game start.")
@@ -122,7 +123,7 @@ function widget:Update(dt)
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
 			if comDefName then
-				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="Build  ".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
+				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildCo".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
 			end
 			--Spring.Echo(teamID .. " " .. #prvsComDefName)
 			for i=#prvsComDefName,1,-1 do --start at end of table, iterate downward while emptying table content
@@ -137,24 +138,44 @@ function widget:Update(dt)
 	end
 end
 
-function CommSelection(playerID, commSeries) --receive from start_unit_setup.lua gadget.
+function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua gadget.
 	--find commander unitDefID, remember commander name
 	--
+
+	if not startUnit then
+		return
+	end
 	
-	local sixthDefName = commSeries .. " level ".. maxComLevel --used concenatted 'commSeries'
-	local comDefId
-	for id,unitDef in pairs(UnitDefs) do
-		if unitDef.humanName == sixthDefName then
-			comDefId = id
+	local commProfile
+	if UnitDefNames[startUnit] then
+		local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(UnitDefNames[startUnit].id)
+		if commProfileDef then
+			commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
+		end
+	elseif UnitDefs[startUnit] then
+		local commProfileDef = WG.ModularCommAPI.GetProfileIDByBaseDefID(UnitDefs[startUnit].id)
+		if commProfileDef then
+			commProfile = WG.ModularCommAPI.GetCommProfileInfo(commProfileDef)
 		end
 	end
-	for i=1, #playerInfo do
+	
+	if not commProfile then
+		return
+	end
+	
+	for i = 1, #playerInfo do
 		if playerID == playerInfo[i].playerID then
 			local previousCom = playerInfo[i].comDefName
 			local tableIndex = #playerInfo[i].comDefNamePrvs
 			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
-			playerInfo[i].comDefName = sixthDefName
-			playerInfo[i].comDefId = comDefId
+			playerInfo[i].comDefName = commProfile.name or ""
+			local unitDef = UnitDefNames["dyn" .. (commProfile.chassis or "strike").. "5"]
+			
+			if unitDef and unitDef.id then
+				playerInfo[i].comDefId = unitDef.id
+			else
+				playerInfo[i].comDefId = UnitDefNames["dynstrike5"]
+			end
 		end
 	end
 end

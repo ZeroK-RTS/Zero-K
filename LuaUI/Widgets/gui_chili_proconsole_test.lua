@@ -1284,9 +1284,11 @@ end
 local firstUpdate = true
 local timer = 0
 
+local initialSwapTime = 0.2
+local firstSwap = true
+
 -- FIXME wtf is this obsessive function?
 function widget:Update(s)
-
 	timer = timer + s
 	if timer > 2 then
 		timer = 0
@@ -1314,6 +1316,18 @@ function widget:Update(s)
 		end
 		firstUpdate = false
 		SetInputFontSize(15)
+	end
+	
+	-- Workaround bugged display on first open of the backlog
+	if initialSwapTime then
+		initialSwapTime = initialSwapTime - s
+		if initialSwapTime < 0.1 and firstSwap then
+			SwapBacklog()
+			firstSwap = nil
+		elseif initialSwapTime < 0 then
+			SwapBacklog()
+			initialSwapTime = nil
+		end
 	end
 end
 

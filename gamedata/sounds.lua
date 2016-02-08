@@ -99,10 +99,12 @@ local function AutoAdd(subDir, generalOpts)
 	local opts
 	local dirList = RecursiveFileSearch("sounds/" .. subDir)
 	--local dirList = RecursiveFileSearch("sounds/")
+	--Spring.Echo("Adding sounds for " .. subDir)
 	for _, fullPath in ipairs(dirList) do
-    	local path, key, ext = fullPath:match("sounds/(.*/(.*)%.(.*))")
+		local path, key, ext = fullPath:match("sounds/(.*/(.*)%.(.*))")
 		local pathPart = fullPath:match("(.*)[.]")
 		pathPart = pathPart:sub(8, -1)	-- truncates extension fullstop and "sounds/" part of path
+		--Spring.Echo(pathPart)
 		if path ~= nil and (not ignoredExtensions[ext]) then
 			if optionOverrides[pathPart] then
 				opts = optionOverrides[pathPart]

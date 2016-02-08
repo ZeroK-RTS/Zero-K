@@ -21,8 +21,14 @@ local options = VFS.Include("ModOptions.lua")
 local window2
 	
 function widget:Initialize()
+	if VFS.FileExists("mission.lua") then
+		widgetHandler:RemoveWidget()
+		return
+	end
+
 	if Spring.GetGameFrame() > 1800 then
 		widgetHandler:RemoveWidget() --auto-close in case user do /luaui reload
+		return
 	end
 
 	local customizedModOptions = {}

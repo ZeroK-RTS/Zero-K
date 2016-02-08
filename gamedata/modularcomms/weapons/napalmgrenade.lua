@@ -13,6 +13,7 @@ local weaponDef = {
 		setunitsonfire = "1",
 		burntime = [[90]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		manualfire = 1,
 
 		area_damage = 1,
 		area_damage_radius = 128,
@@ -32,6 +33,7 @@ local weaponDef = {
 	impulseFactor           = 0,
 	interceptedByShieldType = 2,
 	model                   = [[wep_b_fabby.s3o]],
+    noSelfDamage            = false,
 	range                   = 450,
 	reloadtime              = 12,
 	smokeTrail              = true,

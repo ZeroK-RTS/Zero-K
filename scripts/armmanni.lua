@@ -51,7 +51,7 @@ end
 
 local function HoverFX()
 	while true do
-		if curTerrainType == 4 then
+		if curTerrainType == 4 and not Spring.GetUnitIsCloaked(unitID) then
 			EmitSfx(wheels1, 1024)
 			EmitSfx(wheels2, 1024)
 			EmitSfx(wheels3, 1024)

@@ -1,22 +1,27 @@
 
-local base, bottom, tamper, furnace, door_l, door_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'drill1', 'drill2', 'drill3', 'posts')
+local base, bottom, tamper, furnace, door_l, door_r, hinge_l, hinge_r, drill1, drill2, drill3, posts = piece ('base', 'bottom', 'tamper', 'furnace', 'door_l', 'door_r', 'hinge_l', 'hinge_r', 'drill1', 'drill2', 'drill3', 'posts')
 
 include "pieceControl.lua"
 include "constants.lua"
 
+local SIG_OPEN = 1
+
 local smokePiece = {tamper}
 
 local function Open()
-	Turn (door_r, z_axis, math.rad(-120), math.rad(120))
-	Turn (door_l, z_axis, math.rad(120), math.rad(120))
-	WaitForTurn (door_l, z_axis)
+	Signal(SIG_OPEN)
+	SetSignalMask(SIG_OPEN)
+	
+	Turn (hinge_r, z_axis, math.rad(-120), math.rad(120))
+	Turn (hinge_l, z_axis, math.rad(120), math.rad(120))
+	WaitForTurn (hinge_l, z_axis)
 	Move (tamper, y_axis, 15, 10)
 	WaitForMove (tamper, y_axis)
 
 	local height = 40
 
 	while true do
-		local income = Spring.GetUnitRulesParam(unitID, "mex_income") or 0
+		local income = Spring.GetUnitRulesParam(unitID, "current_metalIncome") or 0
 		if income > 0 then
 			Spin (furnace, y_axis, income, math.rad(1))
 			Spin (drill1, y_axis, income, math.rad(1))
@@ -37,20 +42,25 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
+	if not Spring.GetUnitIsStunned(unitID) then
+		StartThread(Open)
+	end
 end
 
-local explodables = {door_l, door_r, furnace}
+local explodables = {door_l, furnace}
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
+
 	for i = 1, #explodables do
-		if (math.random() < severity) then
+		if (math.random() < severity*1.5) then
 			Explode (explodables[i], sfxFall + sfxSmoke)
 		end
 	end
-	if severity < .5 then
+	if severity < 0.5 then
 		return 1
 	else
+		Explode (door_r, sfxFall + sfxSmoke)
 		Explode (bottom, sfxShatter)
 		return 2
 	end

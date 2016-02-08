@@ -2227,16 +2227,24 @@ local function MakeMenuBar()
 								value = settings.music_volume or 0.5,
 								prevValue = settings.music_volume or 0.5,
 								OnChange = { 
-									function(self)	
-										if (WG.music_start_volume or 0 > 0) then 
+									function(self)
+										if ((WG.music_start_volume or 0) > 0) then 
 											Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
 										else 
 											Spring.SetSoundStreamVolume(self.value) 
 										end 
 										settings.music_volume = self.value
 										WG.music_volume = self.value
-										if (self.prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
-										if (self.prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+										if (self.prevValue > 0 and self.value <=0) then 
+											widgetHandler:DisableWidget("Music Player") 
+										end 
+										if (self.prevValue <=0 and self.value > 0) then
+											-- Disable first in case widget is already enabled.
+											-- This is required for it to notice the volume
+											-- change from 0 in some cases.
+											widgetHandler:DisableWidget("Music Player")
+											widgetHandler:EnableWidget("Music Player") 
+										end 
 										self.prevValue = self.value
 									end	
 								},
@@ -2642,8 +2650,8 @@ function widget:Initialize()
 	init = false
 	
 	--intialize remote menu trigger
-	WG.crude.OpenPath = function(path) --Note: declared here so that it work in local copy
-		MakeSubWindow(path)	-- FIXME should pause the game
+	WG.crude.OpenPath = function(path, pause) --Note: declared here so that it work in local copy
+		MakeSubWindow(path, pause)	-- FIXME should pause the game
 	end
 	
 	--intialize remote menu trigger 2

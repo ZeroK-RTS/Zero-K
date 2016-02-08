@@ -146,6 +146,8 @@ local function DeathAnim()
 	local speed = math.rad(math.random(3, 10)/10)
 	--Turn(ground, x_axis, math.rad(-10), speed)
 	EmitSfx(turret2, 1024)
+	
+	InitializeDeathAnimation()
 	Sleep(120)
 	EmitSfx(turret1, 1024)
 	Explode(radar, sfxSmoke)

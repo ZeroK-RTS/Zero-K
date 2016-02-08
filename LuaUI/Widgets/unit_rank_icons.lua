@@ -10,7 +10,8 @@ function widget:GetInfo() return {
 
 local min   = math.min
 local floor = math.floor
-local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
+local spGetSpectatingState = Spring.GetSpectatingState
 
 local clearing_table = {
 	name = 'rank',
@@ -24,16 +25,16 @@ local rankTextures = {
 	[2] = rankTexBase .. 'rank2.png',
 	[3] = rankTexBase .. 'rank3.png',
 	[4] = rankTexBase .. 'star.png',
-	-- [5] = rankTexBase .. 'gold_star.png',
+	[5] = rankTexBase .. 'star.png',
+	[6] = rankTexBase .. 'star.png',
+	[7] = rankTexBase .. 'goldstar.png',
+	[8] = rankTexBase .. 'goldstar.png',
+	[9] = rankTexBase .. 'goldstar.png',
+	[10] = rankTexBase .. 'goldeverything.png',
 }
-
-local function UnitRankUp (unitID)
-	UpdateUnitRank (unitID)
-end
 
 function widget:Initialize ()
 	WG.icons.SetOrder ('rank', 1)
-	widgetHandler:RegisterGlobal ('UnitRankUp', UnitRankUp)
 
 	local allUnits = Spring.GetAllUnits()
 	for _,unitID in pairs (allUnits) do
@@ -42,7 +43,7 @@ function widget:Initialize ()
 end
 
 function UpdateUnitRank (unitID)
-	local rank = spGetUnitRulesParam(unitID, "rank") or 0
+	local rank = math.floor(0.01 + (Spring.GetUnitExperience(unitID) or 0)) -- 0.01 for float errors
 	rank = min(#rankTextures or 0, rank)
 	WG.icons.SetUnitIcon (unitID, {
 		name = 'rank',
@@ -50,18 +51,24 @@ function UpdateUnitRank (unitID)
 	})
 end
 
+function widget:UnitExperience(unitID)
+	UpdateUnitRank(unitID)
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
-	UpdateUnitRank (unitID)
+	UpdateUnitRank(unitID)
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	UpdateUnitRank (unitID)
+	UpdateUnitRank(unitID)
 end
 
 function widget:UnitLeftLos(unitID, unitDefID, unitTeam)
-	WG.icons.SetUnitIcon (unitID, clearing_table)
+	if not spGetSpectatingState() then
+		WG.icons.SetUnitIcon(unitID, clearing_table)
+	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	WG.icons.SetUnitIcon (unitID, clearing_table)
+	WG.icons.SetUnitIcon(unitID, clearing_table)
 end

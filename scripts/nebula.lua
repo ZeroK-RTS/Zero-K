@@ -97,8 +97,8 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.Shot(num)
-	local index = weapons[num].gunIndex
-	weapons[num].gunIndex = index % #weapons[num].flares + 1
+	local index = weapons[num].gunIndex % #weapons[num].flares + 1
+	weapons[num].gunIndex = index
 	EmitSfx(weapons[num].flares[index], UNIT_SFX1)
 end
 

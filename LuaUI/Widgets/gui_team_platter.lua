@@ -28,6 +28,12 @@ end
 
 local widgetName = widget:GetInfo().name
 
+
+local SafeWGCall = function(fnName, param1) if fnName then return fnName(param1) else return nil end end
+local GetUnitUnderCursor = function(onlySelectable) return SafeWGCall(WG.PreSelection_GetUnitUnderCursor, onlySelectable) end
+local IsSelectionBoxActive = function() return SafeWGCall(WG.PreSelection_IsSelectionBoxActive) end
+local GetUnitsInSelectionBox = function() return SafeWGCall(WG.PreSelection_GetUnitsInSelectionBox) end
+local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_IsUnitInSelectionBox, unitID) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -328,8 +334,17 @@ if not spIsGUIHidden() then
   local alpha = 1.8 * abs(0.5 - (diffTime * 3.0 % 1.0))
   glColor(1, 1, 1, alpha)
 
-  for _,unitID in ipairs(spGetSelectedUnits()) do
-    if (spIsUnitVisible(unitID) and not spGetUnitNoDraw(unitID)) then
+  -- for _,unitID in ipairs(spGetSelectedUnits()) do
+  local units = spGetVisibleUnits(-1, 30, true)
+  for i=1, #units do
+    local unitID = units[i]
+    if IsUnitInSelectionBox(unitID) or (GetUnitUnderCursor() == unitID and not spIsUnitSelected(unitID)) then 
+      glColor(1, 1, 1, 0.5) 
+    else 
+      glColor(1, 1, 1, alpha)
+    end
+    
+    if (spIsUnitSelected(unitID) or IsUnitInSelectionBox(unitID) or GetUnitUnderCursor(false) == unitID) and not spGetUnitNoDraw(unitID) then
       local udid = spGetUnitDefID(unitID)
       local radius = GetUnitDefRealRadius(udid)
       if (radius) then

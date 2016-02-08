@@ -33,6 +33,7 @@ function ToggleVisibility() end
 
 local echo = Spring.Echo
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
+local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
 local Chili
 local Image
@@ -52,7 +53,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -78,6 +79,30 @@ options = {
 		OnChange = function() 
 		if WG.WinCounter_Reset ~= nil then WG.WinCounter_Reset() end 
 		end,
+	},
+	inc_wins_1 = {
+		name = "Increment Team 1 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[1]) 
+		end
+		end,
+		advanced = true
+	},
+	inc_wins_2 = {
+		name = "Increment Team 2 Wins",
+		desc = "",
+		type = 'button',
+		OnChange = function()
+		if WG.WinCounter_Increment ~= nil then 
+			local allyTeams = Spring.GetAllyTeamList()
+			WG.WinCounter_Increment(allyTeams[2]) 
+		end
+		end,
+		advanced = true
 	},
 	win_show_condition = {
 		name = 'Show Wins',
@@ -278,6 +303,8 @@ local x_elo
 local x_cf
 local x_status
 local x_name
+local x_teamsize
+local x_teamsize_dude
 local x_share
 local x_m_mobiles
 local x_m_defense
@@ -311,6 +338,8 @@ local function CalculateWidths()
 	x_cf			= x_elo + 32
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
+	x_teamsize		= x_icon_clan
+	x_teamsize_dude	= x_icon_rank 
 	x_share			= x_name + name_width
 	x_m_mobiles		= not amSpec and x_share + 12 or x_share
 	x_m_mobiles_width = options.stats_width.value * options.text_height.value / 2 + 10
@@ -472,7 +501,7 @@ end
 local function ProcessUnit(unitID, unitDefID, unitTeam, remove)
 	local stats = playerTeamStatsCache[unitTeam]
 	if UnitDefs[unitDefID] and stats then -- shouldn't need to guard against nil here, but I've had it happen
-		local metal = UnitDefs[unitDefID].metalCost
+		local metal = Spring.Utilities.GetUnitCost(unitID, unitDefID)
 		local speed = UnitDefs[unitDefID].speed
 		local unarmed = UnitDefs[unitDefID].springCategories.unarmed
 		local isbuilt = not select(3, spGetUnitIsStunned(unitID))	
@@ -513,6 +542,13 @@ local function GetPlayerTeamStats(teamID)
 	
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = Spring.GetTeamResources(teamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
+
+	if eInco then	
+		local energyIncome = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+		local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
+		eInco = eInco + energyIncome - math.max(0, energyChange)
+	end
+	
 	if eStor then
 		eStor = eStor - 10000					-- eStor has a "hidden 10k" to account for
 		if eStor > 50000 then eStor = 1000 end	-- fix for weirdness where sometimes storage is reported as huge, assume it should be 1000
@@ -1011,12 +1047,17 @@ end
 local function AddAllAllyTeamSummaries(allyTeamsSorted)
 	local allyTeamResources
 	local allyTeamWins
+	local allyTeamsNumActivePlayers = {}
 	for i=1,#allyTeamsSorted do
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
+			allyTeamsNumActivePlayers[allyTeamID] = 0			
 			for j=1,#allyTeams[allyTeamID] do
 				local teamID = allyTeams[allyTeamID][j]
 				if teamID then
+					if not teams[teamID].isDead and teams[teamID].isPlaying then --and teams[teamID].isActive
+						allyTeamsNumActivePlayers[allyTeamID] = allyTeamsNumActivePlayers[allyTeamID] + 1
+					end
 					local s = GetPlayerTeamStats(teamID)
 					allyTeamResources = allyTeamResources or {}
 					allyTeamResources[allyTeamID] = allyTeamResources[allyTeamID] or { eCurr = 0, eStor = 0, eInco = 0, mCurr = 0, mStor = 0, mInco = 0, mMobs = 0, mDefs = 0 }
@@ -1042,8 +1083,17 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 					allyTeamColor = {Spring.GetTeamColor(allyTeams[allyTeamID][1])}
 				end
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = ("Team " .. allyTeamID+1),textColor = allyTeamColor,})
+				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
-				if elo then MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
+				local rstring = "smurf"
+				if elo then 
+					MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) 
+					if elo > 1800 then rstring = "napoleon"
+					elseif elo > 1600 then rstring = "soldier"
+					elseif elo > 1400 then rstring = "user"
+					end
+				end
+				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/Ranks/dude_"..rstring..".png",})
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 
@@ -1249,7 +1299,7 @@ SetupPlayerNames = function()
 	-- while we're at it, determine whether or not to show the ally team summary lines
 	--
 	if #allyTeamOrderRank == 0 then
-		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end
+		if #allyTeams[localAlliance] > 2 then myTeamIsVeryBig = true end -- this appears to be broken
 		for i=1,#allyTeamsSorted do  -- for every ally team
 			local allyTeamID = allyTeamsSorted[i]
 			allyTeamOrderRank[allyTeamID] = 0
@@ -1317,6 +1367,11 @@ SetupPlayerNames = function()
 		AddAllAllyTeamSummaries(allyTeamsSorted)
 		row = row + 0.5
 	elseif options.showSummaries.value then
+		if existsVeryBigTeam or numBigTeams > 2 then
+			AddAllAllyTeamSummaries(allyTeamsSorted)
+			row = row + 0.5
+		end
+		--[[
 		if amSpec then
 			if existsVeryBigTeam or numBigTeams > 2 then
 				AddAllAllyTeamSummaries(allyTeamsSorted)
@@ -1328,6 +1383,7 @@ SetupPlayerNames = function()
 				row = row + 0.5
 			end
 		end
+		--]]
 	end
 
 	-- add the player entities

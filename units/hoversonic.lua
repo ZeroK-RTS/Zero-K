@@ -101,7 +101,6 @@ unitDef = {
 		impulseBoost            = 60,
 		impulseFactor           = 0.5,
 		interceptedByShieldType = 1,
-		lineOfSight             = true,
 		noSelfDamage            = true,
 		range                   = 320,
 		reloadtime              = 1.1,

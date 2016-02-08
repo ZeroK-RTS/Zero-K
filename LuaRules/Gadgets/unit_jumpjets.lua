@@ -71,8 +71,6 @@ local jumps = {}
 local jumping = {}
 local goalSet = {}
 
-local quiteNew = Spring.Utilities.IsCurrentVersionNewerThan(95, 0)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -91,11 +89,8 @@ local jumpCmdDesc = {
 --------------------------------------------------------------------------------
 
 local function spTestMoveOrderX(unitDefID, x, y, z)
-	if quiteNew then
-		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
-	else
-		return spTestBuildOrder(unitDefID, x, y, z, 1)
-	end
+	-- Note that spTestMoveOrder returns true for jumping underwater.
+	return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
 end
 
 
@@ -205,6 +200,8 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	goal[2]                = spGetGroundHeight(goal[1],goal[3])
 	local start            = {spGetUnitPosition(unitID)}
 
+	local startHeight      = spGetGroundHeight(start[1],start[3])
+	
 	local fakeUnitID
 	local unitDefID	       = spGetUnitDefID(unitID)
 	local jumpDef          = jumpDefs[unitDefID]
@@ -215,7 +212,7 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local reloadTime       = (jumpDef.reload or 0)*30
 	local teamID           = spGetUnitTeam(unitID)
 	
-	if cannotJumpMidair and abs(spGetGroundHeight(start[1],start[3]) - start[2]) > 1 then
+	if (cannotJumpMidair and abs(startHeight - start[2]) > 1) or (startHeight < -UnitDefs[unitDefID].maxWaterDepth) then
 		return false, true
 	end
 	
@@ -320,10 +317,10 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			mcSetPosition(unitID, x, y, z)
 			if x0 then
 				jumping[unitID] = {x - x0, y - y0, z - z0}
-				spSetUnitVelocity(unitID, x - x0, y - y0, z - z0) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
+				spSetUnitVelocity(unitID, (x - x0)/30, (y - y0)/30, (z - z0)/30) -- for the benefit of unit AI and possibly target prediction (probably not the latter)
 			end
 
-			Spring.UnitScript.CallAsUnit(unitID,env.jumping, 1, i * 100)
+			Spring.UnitScript.CallAsUnit(unitID, env.jumping, i * 100)
 		
 			if (not halfJump and i > 0.5) then
 				Spring.UnitScript.CallAsUnit(unitID,env.halfJump)
@@ -484,11 +481,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		else
 			-- Check whether the terrain is the source of the blockage. If it is not then
 			-- conclude that the blockage is a structure.
-			local height = spGetGroundHeight(cmdParams[1],cmdParams[3])
-			if (not UnitDefs[unitDefID]) or height < -UnitDefs[unitDefID].maxWaterDepth then
-				-- Water too deep for the unit to walk on
-				return false
-			end
+			-- Jumping into water is allowed.
 			
 			local normal = select(2, spGetGroundNormal(cmdParams[1],cmdParams[3]))
 			-- Most of the time the normal will be close to 1 because structures are built on
@@ -524,6 +517,10 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 
 	if not Spring.ValidUnitID(unitID) then
 		return true, true
+	end
+
+	if ((Spring.GetUnitRulesParam(unitID, "orbitalDrop") or 0) == 1) then
+		return true, false
 	end
 
 	if (jumping[unitID]) then

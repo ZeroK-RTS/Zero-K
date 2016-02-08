@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[amgeo]],
-  name                          = [[Moho Geothermal Powerplant]],
+  name                          = [[Advanced Geothermal]],
   description                   = [[Produces Energy (100) - HAZARDOUS]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 1500,

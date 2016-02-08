@@ -23,7 +23,6 @@ local spGetFeatureTeam			= Spring.GetFeatureTeam
 --local spGetUnitAllyTeam			= Spring.GetUnitAllyTeam
 local spGetUnitTeam				= Spring.GetUnitTeam
 local spGetUnitHealth			= Spring.GetUnitHealth
-local spGetUnitResources		= Spring.GetUnitResources
 local spTraceScreenRay			= Spring.TraceScreenRay
 local spGetTeamInfo				= Spring.GetTeamInfo
 local spGetPlayerInfo			= Spring.GetPlayerInfo
@@ -150,6 +149,8 @@ local drawing, erasing, addingPoint
 local drawHotkeyBytes = {}
 local drawHotkeyBytesCount = 0
 local drawtoolKeyPressed
+
+WG.drawtoolKeyPressed = nil
 
 local windTooltips = {
 	["armwin"] = true,
@@ -424,7 +425,7 @@ options = {
 		path = selPath,
 	},
 	manualWeaponReloadBar = {
-		name="Show Unit's DGun Status",
+		name="Show Unit's Special Weapon Status",
 		type='bool',
 		value= true,
 		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
@@ -457,6 +458,11 @@ end
 
 --options.fontsize.OnChange = FontChanged
 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--helper functions
+
 local function GetHealthColor(fraction, returnType)
 	local midpt = (fraction > .5)
 	local r, g
@@ -473,17 +479,13 @@ local function GetHealthColor(fraction, returnType)
 	return {r, g, 0, 1}
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---helper functions
-
 function round(num, idp)
-  if (not idp) then
-    return math.floor(num+.5)
-  else
-    local mult = 10^(idp or 0)
-    return math.floor(num * mult + 0.5) / mult
-  end
+	if (not idp) then
+		return math.floor(num+.5)
+	else
+		local mult = 10^(idp or 0)
+		return math.floor(num * mult + 0.5) / mult
+	end
 end
 
 
@@ -525,6 +527,113 @@ function comma_value(amount, displaySign)
   	return formatted
 end
 --]]
+
+local function GetUnitResources(unitID)		
+	local mm, mu, em, eu = Spring.GetUnitResources(unitID)
+	
+	mm = (mm or 0) + (spGetUnitRulesParam(unitID, "current_metalIncome") or 0)
+	em = (em or 0) + (spGetUnitRulesParam(unitID, "current_energyIncome") or 0)
+	eu = (eu or 0) + (spGetUnitRulesParam(unitID, "overdrive_energyDrain") or 0)
+	
+	if mm ~= 0 or mu ~= 0 or em ~= 0 or eu ~= 0 then
+		return mm, (mu or 0), em, eu
+	else
+		return
+	end
+end
+
+local function GetWindTooltip(unitID)
+	local minWind = spGetUnitRulesParam(unitID, "minWind")
+	if not minWind then
+		return ""
+	end
+	
+	return "\nWind Range " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+end
+
+local function GetGridTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local gridCurrent = spGetUnitRulesParam(unitID, "OD_gridCurrent")
+	if not gridCurrent then
+		return false
+	end
+	
+	if gridCurrent < 0 then
+		return "Disabled - No Grid" .. GetWindTooltip(unitID)
+	end
+	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
+	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
+	
+	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. GetWindTooltip(unitID)
+end
+
+local function GetMexTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local metalMult = spGetUnitRulesParam(unitID, "overdrive_proportion")
+	if not metalMult then
+		return false
+	end
+	
+	local currentIncome = spGetUnitRulesParam(unitID, "current_metalIncome")
+	local mexIncome = spGetUnitRulesParam(unitID, "mexIncome") or 0
+	local baseFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+	
+	if currentIncome == 0 then
+		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
+	end
+
+	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
+end
+
+local function GetZenithTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local meteorsControlled = spGetUnitRulesParam(unitID, "meteorsControlled")
+	if not meteorsControlled then
+		return false
+	end
+	meteorsControlled = meteorsControlled
+
+	return "Meteor Controller - Controls " .. meteorsControlled .. "/500 meteors"
+end
+
+local function GetTerraformTooltip(unitID)
+	if not (unitID and Spring.ValidUnitID(unitID)) then
+		return
+	end
+	local spent = spGetUnitRulesParam(unitID, "terraform_spent")
+	if not spent then
+		return false
+	end
+
+	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
+	
+	return "Terraform - Estimated Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
+end
+
+local function GetRulesParamTooltip(unitID)
+	local gridTooltip = GetGridTooltip(unitID)
+	if gridTooltip then
+		return gridTooltip
+	end
+	local mexTooltip = GetMexTooltip(unitID)
+	if mexTooltip then
+		return mexTooltip
+	end
+	local zenithTooltip = GetZenithTooltip(unitID)
+	if zenithTooltip then
+		return zenithTooltip
+	end
+	local terraformTooltip = GetTerraformTooltip(unitID)
+	if terraformTooltip then
+		return terraformTooltip
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -602,44 +711,21 @@ local function UpdateDynamicGroupInfo()
 		if ud then
 			name = ud.name 
 			hp, _, paradam, cap, build = spGetUnitHealth(id)
-			mm,mu,em,eu = spGetUnitResources(id)
-		
+			mm, mu, em, eu = GetUnitResources(id)
+
 			if name ~= "terraunit" then
-				if mm then--failsafe when switching spectator view.
-					total_cost = total_cost + ud.metalCost*build
+				if hp then--failsafe when switching spectator view.
+					total_cost = total_cost + Spring.Utilities.GetUnitCost(id, defID)*build
 					total_hp = total_hp + hp
 				end
 				
 				stunned_or_inbuld = spGetUnitIsStunned(id)
 				if not stunned_or_inbuld then 
-					if name == 'armmex' or name =='cormex' then -- mex case
-						tooltip = spGetUnitTooltip(id) or '' --Note:spGetUnitTooltip(id) become NIL if spectator select enemy team's unit while Spectating allied team with limited LOS.
-						
-						baseMetal = 0
-						s = tooltip:match("Makes: ([^ ]+)")
-						if s ~= nil then 
-							baseMetal = tonumber(s) 
-						end 
-										
-						s = tooltip:match("Overdrive: %+([0-9]+)")
-						od = 0
-						if s ~= nil then 
-							od = tonumber(s) 
-						end
-						
-						total_metalincome = total_metalincome + baseMetal + baseMetal * od / 100
-							
-						s = tooltip:match("Energy: ([^ ]+)")
-						if s ~= nil then 
-							total_energydrain = total_energydrain - (tonumber(s) or 0)
-						end 
-					else
-						if mm then --failsafe when switching spectator view.
-							total_metalincome = total_metalincome + mm
-							total_metaldrain = total_metaldrain + mu
-							total_energyincome = total_energyincome + em
-							total_energydrain = total_energydrain + eu
-						end
+					if mm then --failsafe when switching spectator view.
+						total_metalincome = total_metalincome + mm
+						total_metaldrain = total_metaldrain + mu
+						total_energyincome = total_energyincome + em
+						total_energydrain = total_energydrain + eu
 					end
 					
 					if ud.buildSpeed ~= 0 and mm then
@@ -668,15 +754,16 @@ local function UpdateStaticGroupInfo()
 	local total_totalbp = 0
 	local total_maxhp = 0
 	
-	local defID, ud
+	local defID, unitID, ud
 	for i = 1, numSelectedUnits do
+		unitID = selectedUnits[i][1]
 		defID = selectedUnits[i][2]
 		ud = UnitDefs[defID]
 		if ud then
 			if ud.name ~= "terraunit" then
-				total_totalbp = total_totalbp + ud.buildSpeed
-				total_maxhp = total_maxhp + ud.health
-				total_finishedcost = total_finishedcost + ud.metalCost
+				total_totalbp = total_totalbp + ud.buildSpeed * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+				total_maxhp = total_maxhp + select(2, Spring.GetUnitHealth(unitID))
+				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(unitID, defID)
 			end
 		end
 	end
@@ -707,9 +794,9 @@ local function WriteGroupInfo()
 				else
 					remainingTime = remainingTime .. "s"
 				end
-				dgunStatus = "\nDGun\255\255\90\90 Reloading\255\255\255\255(" .. remainingTime .. ")"  --red and white
+				dgunStatus = "\nSpecial\255\255\90\90 Reload\255\255\255\255 (" .. remainingTime .. ")"  --red and white
 			else
-				dgunStatus = "\nDGun\255\90\255\90 Ready\255\255\255\255"
+				dgunStatus = "\nSpecial\255\90\255\90 Ready\255\255\255\255"
 			end
 		end
 	end
@@ -771,6 +858,10 @@ local function GetUnitDesc(unitID, ud)
 	local lang = (WG.lang and WG.lang()) or 'en'
 	local font = WG.langFont
 	
+	local rulesParamTooltip = GetRulesParamTooltip(unitID)
+	if rulesParamTooltip then
+		return rulesParamTooltip
+	end
 	
 	if lang == 'en' then
 		if unitID then
@@ -779,6 +870,18 @@ local function GetUnitDesc(unitID, ud)
 				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", windMax )
 			end
 			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
+			if Spring.GetUnitRulesParam(unitID, "comm_profileID") and WG.ModularCommAPI.IsStarterComm then
+				if not WG.ModularCommAPI.IsStarterComm(unitID) then
+					local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
+					if buildPower then
+						buildPower = buildPower*10
+						tooltip = string.sub(ud.tooltip, 0, (string.find(ud.tooltip, "Builds at") or 100) - 1)
+						return tooltip .. "Builds at " .. buildPower .. " m/s"
+					else
+						return ud.tooltip
+					end
+				end
+			end
 			return tooltip
 		end
 		return ud.tooltip
@@ -816,7 +919,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = Spring.Utilities.GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -890,7 +993,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = ud.humanName .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = Spring.Utilities.GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -1182,19 +1285,26 @@ end
 --tooltip functions
 
 local UnitDefByHumanName_cache = {}
-local function GetUnitDefByHumanName(humanName)
-	local cached_udef = UnitDefByHumanName_cache[humanName]
+local UnitDefByHumanNameCommander_cache = {}
+local function GetUnitDefByHumanName(humanName, findCommander)
+	local cache
+	if findCommander then
+		cache = UnitDefByHumanNameCommander_cache
+	else
+		cache = UnitDefByHumanName_cache
+	end
+	local cached_udef = cache[humanName]
 	if (cached_udef ~= nil) then
 		return cached_udef
 	end
-
+	
 	for _,ud in pairs(UnitDefs) do
-		if ud.humanName == humanName then
-			UnitDefByHumanName_cache[humanName] = ud
+		if ud.humanName == humanName and (((ud.customParams and ud.customParams.dynamic_comm and (not ud.customParams.not_starter) and true) or false) == findCommander) then
+			cache[humanName] = ud
 			return ud
 		end
 	end
-	UnitDefByHumanName_cache[humanName] = false
+	cache[humanName] = false
 	return false
 end
 
@@ -1229,7 +1339,7 @@ local function tooltipBreakdown(tooltip)
 				buildType = 'build'
 				unitHumanName = tooltip:sub(8,start-1)
 			end
-			unitDef = GetUnitDefByHumanName(unitHumanName)
+			unitDef = GetUnitDefByHumanName(unitHumanName, tooltip:find('BuildCo', 1, true) == 1)
 			
 			tooltip = tooltip:sub(fin+1)
 		end
@@ -1237,7 +1347,7 @@ local function tooltipBreakdown(tooltip)
 	elseif tooltip:find('Morph', 1, true) == 1 then
 		
 		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
-		unitDef = GetUnitDefByHumanName(unitHumanName)
+		unitDef = GetUnitDefByHumanName(unitHumanName, false)
 		
 		local needunit
 		if tooltip:find('needs unit', 1, true) then
@@ -1264,15 +1374,43 @@ end
 --tooltip functions
 ----------------------------------------------------------------
 
-local function SetHealthbar(tt_healthbar,health, maxhealth)
-	if health then
+local function SetHealthbar(tt_healthbar,health, maxhealth, unitID)
+	if health and maxhealth and (maxhealth > 0) then
 		tt_health_fraction = health/maxhealth
 		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		tt_healthbar:SetValue(tt_health_fraction)
+
+		local regenStr = ""
+		if unitID and health < maxhealth then
+			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
+			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
+				regenStr = "  (" .. math.ceil(regen_timer / 30) .. "s)"
+			else
+				local regen = 0
+				if (regen_timer <= 0) then
+					regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
+				end
+				if ud.customParams.amph_regen then
+					local x,y,z = Spring.GetUnitPosition(unitID)
+					local h = Spring.GetGroundHeight(x,z) or y
+					if (h < 0) then
+						regen = regen + math.min(ud.customParams.amph_regen, ud.customParams.amph_regen*(-h / ud.customParams.amph_submerged_at))
+					end
+				end
+				if ud.customParams.armored_regen and Spring.GetUnitArmored(unitID) then
+					regen = regen + ud.customParams.armored_regen
+				end
+				if (regen > 0) then
+					regenStr = "  (+" .. math.ceil(regen) .. ")"
+				end
+			end
+		end
+
 		if options.hpshort.value then
-			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth))
+			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth) .. regenStr)
 		else
-			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
+			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth) .. regenStr)
 		end
 		
 	else
@@ -1299,7 +1437,7 @@ local function SetHealthbars()
 	if tt_unitID then
 		health, maxhealth = spGetUnitHealth(tt_unitID)
 		tt_healthbar = globalitems.hp_unit:GetChildByName('bar')
-		SetHealthbar(tt_healthbar,health, maxhealth)
+		SetHealthbar(tt_healthbar,health, maxhealth, tt_unitID)
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
 		tt_healthbar_stack = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
@@ -1310,7 +1448,7 @@ local function SetHealthbars()
 	if stt_unitID then
 		health, maxhealth = spGetUnitHealth(stt_unitID)
 		tt_healthbar = globalitems.hp_selunit:GetChildByName('bar')
-		SetHealthbar(tt_healthbar,health, maxhealth)
+		SetHealthbar(tt_healthbar,health, maxhealth, stt_unitID)
 	end
 end
 
@@ -1338,7 +1476,7 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'
-		local metalMake, metalUse, energyMake, energyUse = Spring.GetUnitResources(unitID)
+		local metalMake, metalUse, energyMake, energyUse = GetUnitResources(unitID)
 		
 		if metalMake then
 			metal = metalMake - metalUse
@@ -1346,25 +1484,6 @@ local function GetResources(tooltip_type, unitID, ud, tooltip)
 		if energyMake then
 			energy = energyMake - energyUse
 		end
-		
-		-- special cases for mexes
-		if ud.name=='cormex' then 
-			local baseMetal = 0
-			local s = tooltip:match("Makes: ([^ ]+)")
-			if s ~= nil then baseMetal = tonumber(s) end 
-							
-			s = tooltip:match("Overdrive: %+([0-9]+)")
-			local od = 0
-			if s ~= nil then od = tonumber(s) end
-			
-			metal = metal + baseMetal + baseMetal * od / 100
-			
-			s = tooltip:match("Energy: ([^ \n]+)")
-			s = tonumber(s)
-			if s ~= nil and type(s) == 'number' then 
-				energy = energy + tonumber(s)
-			end 
-		end 
 	end
 	
 	--Skip metal/energy rendering for unit selection bar when unit has no metal and energy
@@ -1447,6 +1566,7 @@ local function UpdateMorphControl(morph_data)
 	
 	
 	globalitems.morphs = StackPanel:New {
+		name = "morphs stackpanel",
 		centerItems = false,
 		autoArrangeV = true,
 		orientation='horizontal',
@@ -1580,6 +1700,7 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 		
 		if not empty then
 			children[#children+1] = StackPanel:New{
+				name = "children stackpanel " .. #children+1,
 				centerItems = false,
 				autoArrangeV = true,
 				orientation='horizontal',
@@ -1775,7 +1896,7 @@ local function MakeToolTip_UD(tt_table)
 	local iconPath = GetUnitIcon(tt_table.unitDef)
 	
 	local extraText = ""
-	if mexDefID == tt_table.unitDef.id then
+	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
 		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost
@@ -1806,8 +1927,9 @@ local function MakeToolTip_UD(tt_table)
 			end
 		end
 		
-		local metalOD = WG.metalFromOverdrive
-		local energyOD = WG.energyForOverdrive
+		local teamID = Spring.GetLocalTeamID()
+		local metalOD = Spring.GetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+		local energyOD = Spring.GetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
 		
 		if metalOD and metalOD > 0 and energyOD and energyOD > 0 then 
 			-- Best case payback assumes that extra energy will make
@@ -1900,9 +2022,10 @@ local function MakeToolTip_Unit(data, tooltip)
 	local team, fullname
 	tt_unitID = unitID
 	team = spGetUnitTeam(tt_unitID) 
-	tt_ud = UnitDefs[ spGetUnitDefID(tt_unitID) or -1]
+	local unitDefID = spGetUnitDefID(tt_unitID)
+	tt_ud = UnitDefs[ unitDefID or -1]
 	
-	fullname = ((tt_ud and tt_ud.humanName) or "")	
+	fullname = ((tt_ud and Spring.Utilities.GetHumanName(tt_unitID, tt_ud)) or "")	
 		
 	if not (tt_ud) then
 		--fixme
@@ -1929,7 +2052,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_unit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((tt_ud and tt_ud.metalCost) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(tt_unitID, unitDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
@@ -1965,7 +2088,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		return false
 	end
 
-	local fullname = (stt_ud.humanName or "")	
+	local fullname = Spring.Utilities.GetHumanName(stt_unitID, stt_ud)	
 	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	
@@ -1973,10 +2096,12 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	
 	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
 	
+	local hasShield = Spring.GetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and stt_ud.shieldWeaponDef
+
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_selunit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((stt_ud and stt_ud.metalCost) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(stt_unitID, uDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
@@ -1984,7 +2109,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		main = {
 			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
 			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
-			stt_ud.shieldWeaponDef and { name='shield', directcontrol = 'shield_selunit', } or {},
+			hasShield and { name='shield', directcontrol = 'shield_selunit', } or {},
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
 			
@@ -2021,7 +2146,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		desc = ' (wreckage)'
 	end
 	tt_ud = UnitDefNames[live_name]
-	fullname = ((tt_ud and tt_ud.humanName .. desc) or tt_fd.tooltip or "")
+	fullname = ((tt_ud and Spring.Utilities.GetHumanName(tt_unitID, tt_ud) .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
 		--fixme
@@ -2441,28 +2566,41 @@ function widget:Update(dt)
 				ctrle:SetCaption(e)
 			end
 			
+			local rulesParamTooltip = GetRulesParamTooltip(stt_unitID)
+			if rulesParamTooltip then
+				controls['selunit2']['utt']:SetCaption(rulesParamTooltip)
+			end
+			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
 			if nanobar then
 				local metalMake, metalUse, energyMake,energyUse = Spring.GetUnitResources(stt_unitID)
-			
-				if metalUse then
-					nanobar:SetValue(metalUse/stt_ud.buildSpeed,true)
-					nanobar:SetCaption(round(100*metalUse/stt_ud.buildSpeed)..'%')
+				
+				local buildSpeed = stt_ud.buildSpeed*(Spring.GetUnitRulesParam(stt_unitID, "buildpower_mult") or 1)
+				if metalUse and buildSpeed and (buildSpeed > 0) then
+					nanobar:SetValue(metalUse/buildSpeed,true)
+					nanobar:SetCaption(round(100*metalUse/buildSpeed)..'%')
 				else
 					nanobar:SetValue(1)
-					nanobar:SetCaption('??? / ' .. numformat(stt_ud.buildSpeed))
+					nanobar:SetCaption('??? / ' .. numformat(buildSpeed))
 				end
 			end
-
+			
 			local shieldbar_stack = globalitems['shield_selunit']
 			local shieldbar = shieldbar_stack:GetChildByName('bar')
-			if shieldbar then
-				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID)
-				
-				shieldbar:SetValue((shieldCurrentPower or 0) / stt_ud.shieldPower,true)
+			local shieldPower = Spring.GetUnitRulesParam(stt_unitID, "comm_shield_max") or stt_ud.shieldPower
+			if shieldbar and shieldPower and (shieldPower > 0) then
+				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID, Spring.GetUnitRulesParam(stt_unitID, "comm_shield_num") or -1)
+
+				local wd = WeaponDefs[UnitDefs[Spring.GetUnitDefID(stt_unitID)].shieldWeaponDef]
+				local regen = ""
+				if shieldCurrentPower < shieldPower then
+					regen = " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+				end
+
+				shieldbar:SetValue(shieldCurrentPower / shieldPower,true)
 				if shieldEnabled then
-					shieldbar:SetCaption(round(shieldCurrentPower) .. ' / ' .. stt_ud.shieldPower)
+					shieldbar:SetCaption(math.floor(shieldCurrentPower) .. ' / ' .. shieldPower .. regen)
 				else
 					shieldbar:SetCaption('Shield offline')
 				end
@@ -2481,6 +2619,7 @@ function widget:Update(dt)
 			end
 		end
 	end
+	WG.drawtoolKeyPressed = drawtoolKeyPressed
 	
 	
 	--UNIT.STATUS start (by msafwan), function: add/show units task whenever individual pic is shown.
@@ -2657,9 +2796,11 @@ function widget:Initialize()
 	CreateShieldBar('shield_selunit')
 	
 	stack_main = StackPanel:New{
+		name = "stack_main",
 		width=300, -- needed for initial tooltip
 	}
 	stack_leftbar = StackPanel:New{
+		name = "stack_leftbar",
 		width=10, -- needed for initial tooltip
 	}
 	
@@ -2737,6 +2878,8 @@ function widget:Initialize()
 		local shieldDefID = ud.shieldWeaponDef
 		ud.shieldPower = ((shieldDefID)and(WeaponDefs[shieldDefID].shieldPower))or(-1)
 	end
+
+	WG.drawtoolKeyPressed = false
 	
 	option_Deselect()
 end
@@ -2747,6 +2890,7 @@ function widget:Shutdown()
 		window_tooltip2:Dispose()
 	end
 	Spring.SetDrawSelectionInfo(true)
+	WG.drawtoolKeyPressed = nil
 end
 
 --lags like a brick due to being spammed constantly for unknown reason, moved all its behavior to SelectionChanged

@@ -13,18 +13,17 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 500,
-		subs    = 18,
+		default = 800,
+		subs    = 40,
 	},
 
-	explosionGenerator      = [[custom:greencannonimpact]],
+	explosionGenerator      = [[custom:flash2green_large]],
 	fireStarter             = 100,
 	impactOnly              = true,
 	impulseFactor           = 0,
 	interceptedByShieldType = 1,
 	laserFlareSize          = 10,
 	minIntensity            = 1,
-	pitchtolerance          = 8192,
 	range                   = 350,
 	reloadtime              = 4,
 	rgbColor                = [[0 1 0]],

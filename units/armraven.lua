@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[armraven]],
   name                   = [[Catapult]],
-  description            = [[Heavy Rocket Artillery Strider]],
+  description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.1092,
   brakeRate              = 0.1942,
   buildCostEnergy        = 3500,

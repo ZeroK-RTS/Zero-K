@@ -13,14 +13,26 @@ return {
 		{	"edit_backspace",	"Any+backspace",},
 		{	"toggleoverview",	"Any+tab",},
 		{	"edit_complete",	"Any+tab",},
-		{	"chatally",	"Alt+enter",},
-		{	"chatswitchally",	"Alt+enter",},
-		{	"chatall",	"Ctrl+enter",},
-		{	"chatswitchall",	"Ctrl+enter",},
+		{
+			"chatally", 			{"Alt+enter", "Alt+numpad_enter"}, 
+		}, 
+		{
+			"chatswitchally", 			{"Alt+enter", "Alt+numpad_enter"}, 
+		}, 
+		{
+			"chatall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
+		}, 
+		{
+			"chatswitchall", 			{"Ctrl+enter", "Ctrl+numpad_enter"}, 
+		}, 
 		{	"chatspec",	"None"},
 		{	"chatswitchspec",	"None"},
-		{	"chat",	"Any+enter",},
-		{	"edit_return",	"Any+enter",},
+		{
+			"chat", 			{"Any+enter", "Any+numpad_enter"}, 
+		}, 
+		{
+			"edit_return", 			{"Any+enter", "Any+numpad_enter"}, 
+		}, 
 		{	"pause",	"pause",},
 		{	"crudemenu",	"esc",},
 		{	"exitwindow",	"shift+esc",},
@@ -78,6 +90,7 @@ return {
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
 		{	"oneclickwep",	"d",},
+		{	"placebeacon",  "d",},
 		{	"reclaim",	"e",},
 		{	"fight",	"f",},
 		{	"forcestart",	"Alt+f",},
@@ -144,7 +157,6 @@ return {
 		{	"moveslow",	"Any+ctrl",},
 		{	"track",	"alt+t",},
 		{	"resurrect",	"t",},
-		{	"controlunit",	"alt+v",},
 		{	"jump",	"j",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
 		{	"select AllMap+_Builder_Not_Building_Not_Transport_Idle+_ClearSelection_SelectAll+",	"ctrl+b",},

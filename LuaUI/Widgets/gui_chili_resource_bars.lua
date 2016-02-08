@@ -20,15 +20,6 @@ end
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
 
-WG.energyWasted = 0
-WG.energyForOverdrive = 0
-WG.allies = 1
---[[
-WG.windEnergy = 0 
-WG.highPriorityBP = 0
-WG.lowPriorityBP = 0
---]]
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -132,37 +123,33 @@ local lastEnergyWasted = 0
 local lastMetalFromOverdrive = 0
 local lastMyMetalFromOverdrive = 0
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local cp = {}
+
 -- note works only in communism mode
-function UpdateEconomyDataFromRulesParams()
+function UpdateCustomParamResourceData()
+
 	local teamID = Spring.GetLocalTeamID()
-  
-  	local allies = spGetTeamRulesParam(teamID, "OD_allies") or 1
-	local energyWasted = spGetTeamRulesParam(teamID, "OD_energyWasted") or 0
-	local energyForOverdrive = spGetTeamRulesParam(teamID, "OD_energyForOverdrive") or 0
-	--local totalMetalIncome = spGetTeamRulesParam(teamID, "OD_totalMetalIncome") or 0
-	local baseMetal = spGetTeamRulesParam(teamID, "OD_baseMetal") or 0
-	local overdriveMetal = spGetTeamRulesParam(teamID, "OD_overdriveMetal") or 0
-	local myBase = spGetTeamRulesParam(teamID, "OD_myBase") or 0
-	local myOverdrive = spGetTeamRulesParam(teamID, "OD_myOverdrive") or 0
-	local energyChange = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
-	local teamEnergyIncome = spGetTeamRulesParam(teamID, "OD_teamEnergyIncome") or 0
-
-	WG.energyWasted = lastEnergyWasted
-	lastEnergyWasted = energyWasted
-	WG.energyForOverdrive = lastEnergyForOverdrive
-	lastEnergyForOverdrive = energyForOverdrive
-	WG.change = lastChange
-	lastChange = energyChange
-	WG.mexIncome = baseMetal
-	WG.metalFromOverdrive = lastMetalFromOverdrive
-	lastMetalFromOverdrive = overdriveMetal
-	WG.myMexIncome = myBase
-	WG.myMetalFromOverdrive = lastMyMetalFromOverdrive
-	lastMyMetalFromOverdrive = myOverdrive
-	WG.teamEnergyIncome = teamEnergyIncome
-	WG.allies = allies
+	cp.allies               = spGetTeamRulesParam(teamID, "OD_allies") or 1
+	
+	cp.team_metalBase       = spGetTeamRulesParam(teamID, "OD_team_metalBase") or 0
+	cp.team_metalOverdrive  = spGetTeamRulesParam(teamID, "OD_team_metalOverdrive") or 0
+	cp.team_metalMisc       = spGetTeamRulesParam(teamID, "OD_team_metalMisc") or 0
+	
+	cp.team_energyIncome    = spGetTeamRulesParam(teamID, "OD_team_energyIncome") or 0
+	cp.team_energyOverdrive = spGetTeamRulesParam(teamID, "OD_team_energyOverdrive") or 0
+	cp.team_energyWaste     = spGetTeamRulesParam(teamID, "OD_team_energyWaste") or 0
+	
+	cp.metalBase       = spGetTeamRulesParam(teamID, "OD_metalBase") or 0
+	cp.metalOverdrive  = spGetTeamRulesParam(teamID, "OD_metalOverdrive") or 0
+	cp.metalMisc       = spGetTeamRulesParam(teamID, "OD_metalMisc") or 0
+    
+	cp.energyIncome    = spGetTeamRulesParam(teamID, "OD_energyIncome") or 0
+	cp.energyOverdrive = spGetTeamRulesParam(teamID, "OD_energyOverdrive") or 0
+	cp.energyChange    = spGetTeamRulesParam(teamID, "OD_energyChange") or 0
 end
-
 
 local function updateReserveBars(metal, energy, value, overrideOption)
 	if options.enableReserveBar.value or overrideOption then
@@ -247,44 +234,78 @@ function widget:GameFrame(n)
 		initialReserveSet = true
 	end
 	
-	UpdateEconomyDataFromRulesParams()
+	UpdateCustomParamResourceData()
 
 	local myTeamID = GetMyTeamID()
 	local myAllyTeamID = Spring.GetMyAllyTeamID()
 	local teams = Spring.GetTeamList(myAllyTeamID)
 	
-	local totalConstruction = 0
-	local totalExpense = 0
+	local totalPull = 0
+	local teamEnergyExp = 0
+	
 	local teamMInco = 0
 	local teamMSpent = 0
+	local teamMPull = 0
 	local teamFreeStorage = 0
+	
+	local teamEnergyReclaim = 0
+	
 	local teamTotalMetalStored = 0
+	local teamTotalMetalCapacity = 0
+	local teamTotalEnergyStored = 0
+	local teamTotalEnergyCapacity = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
-		totalConstruction = totalConstruction + mExpe
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		teamTotalMetalStored = teamTotalMetalStored + mCurr
+		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor
+		
+		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
+		teamMPull = teamMPull + mPull + extraMetalPull
+		
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
-		totalExpense = totalExpense + eExpe
+		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
+		
+		local energyOverdrive = spGetTeamRulesParam(teams[i], "OD_energyOverdrive") or 0
+		local energyChange    = spGetTeamRulesParam(teams[i], "OD_energyChange") or 0
+		local extraChange     = math.min(0, energyChange) - math.min(0, energyOverdrive)
+		
+		totalPull = totalPull + ePull + extraEnergyPull + extraChange
+		teamEnergyExp = teamEnergyExp + eExpe + extraChange
+		teamEnergyReclaim = teamEnergyReclaim + eInco - math.max(0, energyChange)
+		
+		teamTotalEnergyStored = teamTotalEnergyStored + math.min(eCurr, eStor - HIDDEN_STORAGE)
+		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE 
 	end
 
+	local teamEnergyIncome = teamEnergyReclaim + cp.team_energyIncome
+	
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
+	
+	local eReclaim = eInco
+	eInco = eInco + cp.energyIncome - math.max(0, cp.energyChange)
+	
+	totalPull = totalPull - cp.team_energyWaste
+	teamEnergyExp = teamEnergyExp - cp.team_energyWaste
 	
 	local extraMetalPull = spGetTeamRulesParam(myTeamID, "extraMetalPull") or 0
 	local extraEnergyPull = spGetTeamRulesParam(myTeamID, "extraEnergyPull") or 0
 	mPull = mPull + extraMetalPull
-	ePull = ePull + extraEnergyPull
+	
+	ePull = ePull + extraEnergyPull - math.min(0, cp.energyOverdrive)
 	
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
-	if eCurr > eStor then eCurr = eStor end -- cap by storage
+	if eCurr > eStor then 
+		eCurr = eStor -- cap by storage
+	end 
 
 	if options.onlyShowExpense.value then
-		eExpe = eExpe - WG.energyWasted/WG.allies -- if there is energy wastage, dont show it as used pull energy
+		eExpe = eExpe - cp.team_energyWaste/cp.allies -- if there is energy wastage, dont show it as used pull energy
 	else
-		ePull = ePull - WG.energyWasted/WG.allies
+		ePull = ePull - cp.team_energyWaste/cp.allies
 	end
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
@@ -298,9 +319,9 @@ function widget:GameFrame(n)
 
 	local wastingE = false
 	if options.eexcessflashalways.value then
-		wastingE = (WG.energyWasted > 0)
+		wastingE = (cp.team_energyWaste > 0)
 	else
-		local waste = ((WG.allies > 0 and WG.energyWasted/WG.allies) or 0)
+		local waste = ((cp.allies > 0 and cp.team_energyWaste/cp.allies) or 0)
 		wastingE = (waste > eInco*0.05) and (waste > 15)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
@@ -335,61 +356,73 @@ function widget:GameFrame(n)
 		bar_energy_reserve_overlay:SetCaption( ("%i/%i"):format(eCurr, eStor) )
 	end
 	
-	local mexInc = Format(WG.myMexIncome or 0)
-	local odInc = Format((WG.myMetalFromOverdrive or 0))
-	local otherM = Format(mInco - (WG.myMetalFromOverdrive or 0) - (WG.myMexIncome or 0) - mReci)
-	local shareM = Format(mReci - mSent)
-	local constuction = Format(-mExpe)
+	local metalBase = Format(cp.metalBase)
+	local metalOverdrive = Format(cp.metalOverdrive)
+	local metalReclaim = Format(math.max(0, mInco - cp.metalOverdrive - cp.metalBase - cp.metalMisc - mReci))
+	local metalConstructor = Format(cp.metalMisc)
+	local metalShare = Format(mReci - mSent)
+	local metalConstuction = Format(-mExpe)
 	
-	local teamMexInc = Format(WG.mexIncome or 0)
-	local teamODInc = Format(WG.metalFromOverdrive or 0)
-	local teamOtherM = Format(teamMInco - (WG.metalFromOverdrive or 0) - (WG.mexIncome or 0))
-	local teamWasteM = Format(math.min(teamFreeStorage - teamMInco - teamMSpent,0))
-	local totalMetalIncome = Format(teamMInco)
-	local totalMetalStored = Format((teamTotalMetalStored or 0), "")
+	local team_metalTotalIncome = Format(teamMInco)
+	local team_metalPull = Format(-teamMPull)
+	local team_metalBase = Format(cp.team_metalBase)
+	local team_metalOverdrive = Format(cp.team_metalOverdrive)
+	local team_metalReclaim = Format(math.max(0, teamMInco - cp.team_metalOverdrive - cp.team_metalBase - cp.team_metalMisc))
+	local team_metalConstructor = Format(cp.team_metalMisc)
+	local team_metalConstuction = Format(-teamMSpent)
+	local team_metalWaste = Format(math.min(teamFreeStorage + teamMSpent - teamMInco,0))
 	
-	local energyInc = Format(eInco - math.max(0, (WG.change or 0)))
-	local energyShare =  Format(WG.change or 0)
-	local otherE = Format(-eExpe - math.min(0, (WG.change or 0)) + mExpe)
+	local energyGenerators = Format(cp.energyIncome)
+	local energyReclaim = Format(eReclaim)
+	local energyOverdrive = Format(cp.energyOverdrive)
+	local energyOther = Format(-eExpe + mExpe - math.min(0, cp.energyOverdrive))
 	
-	local teamEnergyIncome = Format(WG.teamEnergyIncome or 0)
-	local totalODE = Format(-(WG.energyForOverdrive or 0))
-	local totalODM = Format(WG.metalFromOverdrive or 0)
-	local totalWaste = Format(-(WG.energyWasted or 0))
-	local totalOtherE = Format(-totalExpense + (WG.energyForOverdrive or 0) + totalConstruction + (WG.energyWasted or 0))
-	local totalConstruction = Format(-totalConstruction)
+	local team_energyIncome = Format(teamEnergyIncome)
+	local team_energyGenerators = Format(cp.team_energyIncome)
+	local team_energyReclaim = Format(teamEnergyReclaim)
+	local team_energyPull = Format(-totalPull)
+	local team_energyOverdrive = Format(-cp.team_energyOverdrive)
+	local team_energyWaste = Format(-cp.team_energyWaste)
+	local team_energyOther = Format(-teamEnergyExp + teamMSpent + cp.team_energyOverdrive)
 	
 	bar_metal.tooltip = "Local Metal Economy" ..
-	"\nBase Extraction: " .. mexInc ..
-	"\nOverdrive: " .. odInc ..
-	"\nReclaim and Cons: " .. otherM ..
-	"\nSharing: " .. shareM .. 
-	"\nConstruction: " .. constuction ..
-    "\nReserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
-	"\n" .. 
-	"\nTeam Metal Economy" ..
-	"\nTotal Income: " .. totalMetalIncome ..
-	"\nBase Extraction: " .. teamMexInc ..
-	"\nOverdrive: " .. teamODInc ..
-	"\nReclaim and Cons: " .. teamOtherM ..
-	"\nConstruction: " .. totalConstruction ..
-	"\nWaste: " .. teamWasteM ..
-	"\n" .. 
-	"\nTotal Stored: " .. totalMetalStored
+	"\n  Base Extraction: " .. metalBase ..
+	"\n  Overdrive: " .. metalOverdrive ..
+	"\n  Reclaim: " .. metalReclaim ..
+	"\n  Cons: " .. metalConstructor ..
+	"\n  Sharing: " .. metalShare .. 
+	"\n  Construction: " .. metalConstuction ..
+    "\n  Reserve: " .. math.ceil(WG.metalStorageReserve or 0) ..
+    "\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
+	"\n " .. 
+	"\nTeam Metal Economy  " .. 
+	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
+	"\n  Base Extraction: " .. team_metalBase ..
+	"\n  Overdrive: " .. team_metalOverdrive ..
+	"\n  Reclaim : " .. team_metalReclaim ..
+	"\n  Cons: " .. team_metalConstructor ..
+	"\n  Construction: " .. team_metalConstuction ..
+	"\n  Waste: " .. team_metalWaste ..
+    "\n  Stored: " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
 	
 	bar_energy.tooltip = "Local Energy Economy" ..
-	"\nIncome: " .. energyInc ..
-	"\nSharing & Overdrive: " .. energyShare .. 
-	"\nConstruction: " .. constuction .. 
-	"\nOther: " .. otherE ..
-    "\nReserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
-	"\n" .. 
+	"\n  Generators: " .. energyGenerators ..
+	"\n  Reclaim: " .. energyReclaim ..
+	"\n  Sharing & Overdrive: " .. energyOverdrive .. 
+	"\n  Construction: " .. metalConstuction .. 
+	"\n  Other: " .. energyOther ..
+    "\n  Reserve: " .. math.ceil(WG.energyStorageReserve or 0) ..
+    "\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
+	"\n " .. 
 	"\nTeam Energy Economy" ..
-	"\nIncome: " .. teamEnergyIncome .. 
-	"\nOverdrive: " .. totalODE .. " -> " .. totalODM .. " metal" ..
-	"\nConstruction: " .. totalConstruction ..
-	"\nOther: " .. totalOtherE ..
-	"\nWaste: " .. totalWaste
+	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
+	"\n  Generators: " .. team_energyGenerators ..
+	"\n  Reclaim: " .. team_energyReclaim ..
+	"\n  Overdrive: " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " metal" ..
+	"\n  Construction: " .. team_metalConstuction ..
+	"\n  Other: " .. team_energyOther ..
+	"\n  Waste: " .. team_energyWaste ..
+    "\n  Stored: " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 
 	local mTotal
 	if options.onlyShowExpense.value then
@@ -480,7 +513,6 @@ end
 
 function widget:Shutdown()
 	window:Dispose()
-	Spring.SendCommands("resbar 1")
 end
 
 function widget:Initialize()
@@ -749,38 +781,6 @@ function DestroyWindow()
 	window:Dispose()
 	window = nil
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
---[[
-local lastMstor = 0
-local lastEstor = 0
-
-function ReserveState(teamID, metalStorageReserve, energyStorageReserve)
-    if (Spring.GetLocalTeamID() == teamID) then 
-        local _, mStor = GetTeamResources(teamID, "metal")
-        local _, eStor = GetTeamResources(teamID, "energy")
-
-        if ((not WG.metalStorageReserve) or WG.metalStorageReserve ~= metalStorageReserve) or (lastMstor ~= mStor) and mStor > 0 then
-            lastMstor = mStor
-            bar_metal_reserve_overlay:SetValue(metalStorageReserve/mStor)
-        end
-        WG.metalStorageReserve = metalStorageReserve
-       
-        if ((not WG.energyStorageReserve) or WG.energyStorageReserve ~= energyStorageReserve) or (lastEstor ~= eStor) and (eStor - HIDDEN_STORAGE) > 0 then
-            lastEstor = eStor
-            bar_energy_reserve_overlay:SetValue(energyStorageReserve/(eStor - HIDDEN_STORAGE))
-        end
-        WG.energyStorageReserve = energyStorageReserve
-    end
-end
---]]
---[[
-function SendWindProduction(teamID, value)
-	WG.windEnergy = value
-end
---]]
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

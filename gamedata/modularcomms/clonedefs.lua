@@ -47,25 +47,25 @@ local copy = {
 			level = 2,
 			mainstats = {maxdamage = 3000, autoheal = 12.5, objectname = "armcom2.3do", collisionvolumescales  = [[50 55 50]], aimposoffset = [[0 6 0]],},
 			--customparams = {speedbonus = "0.025"},
-			wreckmodel = "armcom2_dead",
+			wreckmodel = "armcom2_dead.s3o",
 		},
 		armcom3 = {
 			level = 3,
 			mainstats = {maxdamage = 4000, autoheal = 20, objectname = "armcom3.3do", collisionvolumescales  = [[55 60 55]], aimposoffset = [[0 7 0]],},
 			--customparams = {speedbonus = "0.05"},
-			wreckmodel = "armcom3_dead",
+			wreckmodel = "armcom3_dead.s3o",
 		},
 		armcom4 = {
 			level = 4,
 			mainstats = {maxdamage = 5000, autoheal = 27.5, objectname = "armcom4.3do", collisionvolumescales  = [[60 65 60]], aimposoffset = [[0 8 0]],},
 			--customparams = {speedbonus = "0.075"},
-			wreckmodel = "armcom4_dead",
+			wreckmodel = "armcom4_dead.s3o",
 		},
 		armcom5 = {
 			level = 5,
 			mainstats = {maxdamage = 6000, autoheal = 35, objectname = "armcom5.3do", collisionvolumescales  = [[65 70 65]], aimposoffset = [[0 9 0]],},
 			--customparams = {speedbonus = "0.1"},
-			wreckmodel = "armcom5_dead",
+			wreckmodel = "armcom5_dead.s3o",
 		},		
 	},
 	corcom1 = {
@@ -210,6 +210,122 @@ local copy = {
 			level = 5,
 			mainstats = {maxdamage = 4700,objectname = "benzcom5.s3o",},
 			customparams = {rangebonus = "0.3"},
+			wreckmodel = "benzcom5_wreck.s3o",
+		},
+	},
+	dynstrike1 = {
+		dynstrike0 = {
+			level = 0,
+		},
+		dynstrike2 = {
+			level = 2,
+			mainstats = {maxdamage = 3000, objectname = "strikecom_1.dae", collisionvolumescales  = [[50 55 50]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_1.dae",
+		},
+		dynstrike3 = {
+			level = 3,
+			mainstats = {maxdamage = 4000, objectname = "strikecom_2.dae", collisionvolumescales  = [[55 60 55]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_2.dae",
+		},
+		dynstrike4 = {
+			level = 4,
+			mainstats = {maxdamage = 5000, objectname = "strikecom_3.dae", collisionvolumescales  = [[60 65 60]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_3.dae",
+		},
+		dynstrike5 = {
+			level = 5,
+			mainstats = {maxdamage = 6000, objectname = "strikecom_4.dae", collisionvolumescales  = [[65 70 65]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_4.dae",
+		},		
+	},
+	dynrecon1 = {
+		dynrecon0 = {
+			level = 0,
+		},
+		dynrecon2 = {
+			level = 2,
+			mainstats = {maxdamage = 2100, objectname = "commrecon2.s3o", aimposoffset = [[0 12 0]]},
+			customparams = {},
+			wreckmodel = "commrecon2_dead.s3o",
+		},
+		dynrecon3 = {
+			level = 3,
+			mainstats = {maxdamage = 2600, objectname = "commrecon3.s3o", aimposoffset = [[0 14 0]]},
+			customparams = {},
+			wreckmodel = "commrecon3_dead.s3o",
+		},
+		dynrecon4 = {
+			level = 4,
+			mainstats = {maxdamage = 3100, objectname = "commrecon4.s3o", aimposoffset = [[0 16 0]]},
+			customparams = {},
+			wreckmodel = "commrecon4_dead.s3o",
+		},
+		dynrecon5 = {
+			level = 5,
+			mainstats = {maxdamage = 3600, objectname = "commrecon5.s3o", aimposoffset = [[0 18 0]]},
+			customparams = {},
+			wreckmodel = "commrecon5_dead.s3o",
+		},		
+	},
+	dynsupport1 = {
+		dynsupport0 = {
+			level = 0,
+		},
+		dynsupport2 = {
+			level = 2,
+			mainstats = {maxdamage = 2500, description = "Econ/Support Commander, Builds at 14 m/s", objectname = "commsupport2.s3o", aimposoffset = [[0 17 0]]},
+			customparams = {},
+			wreckmodel = "commsupport2_dead.s3o",
+		},
+		dynsupport3 = {
+			level = 3,
+			mainstats = {maxdamage = 3000, description = "Econ/Support Commander, Builds at 16 m/s", objectname = "commsupport3.s3o", aimposoffset = [[0 19 0]],},
+			customparams = {},
+			wreckmodel = "commsupport3_dead.s3o",
+		},
+		dynsupport4 = {
+			level = 4,
+			mainstats = {maxdamage = 3700, description = "Econ/Support Commander, Builds at 18 m/s", objectname = "commsupport4.s3o", aimposoffset = [[0 22 0]],},
+			customparams = {},
+			wreckmodel = "commsupport4_dead.s3o",
+		},
+		dynsupport5 = {
+			level = 5,
+			mainstats = {maxdamage = 4500, description = "Econ/Support Commander, Builds at 20 m/s", objectname = "commsupport5.s3o", aimposoffset = [[0 25 0]],},
+			customparams = {},
+			wreckmodel = "commsupport5_dead.s3o",
+		},			
+	},
+	dynassault1 = {
+		dynassault0 = {
+			level = 0,
+		},
+		dynassault2 = {
+			level = 2,
+			mainstats = {maxdamage = 3800, objectname = "benzcom2.s3o"},
+			customparams = {},
+			wreckmodel = "benzcom2_wreck.s3o",
+		},
+		dynassault3 = {
+			level = 3,
+			mainstats = {maxdamage = 4900, objectname = "benzcom3.s3o",},
+			customparams = {},
+			wreckmodel = "benzcom3_wreck.s3o",
+		},
+		dynassault4 = {
+			level = 4,
+			mainstats = {maxdamage = 6000, objectname = "benzcom4.s3o",},
+			customparams = {},
+			wreckmodel = "benzcom4_wreck.s3o",
+		},
+		dynassault5 = {
+			level = 5,
+			mainstats = {maxdamage = 7200, objectname = "benzcom5.s3o",},
+			customparams = {},
 			wreckmodel = "benzcom5_wreck.s3o",
 		},
 	},

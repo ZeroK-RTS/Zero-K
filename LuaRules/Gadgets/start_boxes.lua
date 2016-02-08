@@ -1,4 +1,4 @@
-if (not gadgetHandler:IsSyncedCode()) then return end
+if not gadgetHandler:IsSyncedCode() or VFS.FileExists("mission.lua") then return end
 
 function gadget:GetInfo() return {
 	name     = "Startbox handler",
@@ -10,19 +10,69 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
---[[ Usage:
-	* there is a "startboxes" modoption that contains a table (parse it using loadstring, see below)
-	* each team can have a private TeamRulesParam called "start_box_id". This is the index of its box in the startbox table
-	* no ID means there is no box (ie. can place anywhere)
-	* boxes are normalised to 0..1 - multiply by Game.mapSizeX and Z to get the actual co-ordinates
-]]
+VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-local startboxString = Spring.GetModOptions().startboxes
-if not startboxString then return end -- missions
+--[[ expose a randomness seed
+this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
+afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
+local private_seed = math.random(2000000000) -- must be an integer
+Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
+local startboxConfig, manualStartposConfig = ParseBoxes()
+math.randomseed(private_seed)
 
-local startboxConfig = loadstring(startboxString)()
+GG.startBoxConfig = startboxConfig
+GG.manualStartposConfig = manualStartposConfig
+
+local function CheckStartbox (boxID, x, z)
+	if not boxID then
+		return true
+	end
+
+	local box = startboxConfig[boxID]
+	if not box then
+		return true
+	end
+
+	for i = 1, #box do
+		local x1, z1, x2, z2, x3, z3 = unpack(box[i])
+		if (cross_product(x, z, x1, z1, x2, z2) <= 0
+		and cross_product(x, z, x2, z2, x3, z3) <= 0
+		and cross_product(x, z, x3, z3, x1, z1) <= 0
+		) then
+			return true
+		end
+	end
+
+	return false
+end
 
 function gadget:Initialize()
+	
+	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
+	Spring.SetGameRulesParam("startbox_recommended_startpos", manualStartposConfig and 1 or 0)
+
+	local rawBoxes = GetRawBoxes()
+	for box_id, polygons in pairs(rawBoxes) do
+		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
+		for i = 1, #polygons do
+			local polygon = polygons[i]
+			Spring.SetGameRulesParam("startbox_polygon_" .. box_id .. "_" .. i, #polygons[i])
+			for j = 1, #polygons[i] do
+				Spring.SetGameRulesParam("startbox_polygon_x_" .. box_id .. "_" .. i .. "_" .. j, polygons[i][j][1])
+				Spring.SetGameRulesParam("startbox_polygon_z_" .. box_id .. "_" .. i .. "_" .. j, polygons[i][j][2])
+			end
+		end
+	end
+	
+	if manualStartposConfig then
+		for box_id, startposes in pairs(manualStartposConfig) do
+			Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
+			for i = 1, #startposes do
+				Spring.SetGameRulesParam("startpos_x_" .. box_id .. "_" .. i, startposes[i][1])
+				Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
+			end
+		end
+	end
 
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 
@@ -92,26 +142,45 @@ function gadget:Initialize()
 	end
 end
 
+GG.CheckStartbox = CheckStartbox
+
 function gadget:AllowStartPosition(x, y, z, playerID, readyState)
+	if (x == 0 and z == 0) then
+		-- engine default startpos
+		return false
+	end
+
 	if (playerID == 255) then
-		return false -- custom AI, cannot get its teamID so block it (will get the default startpos at the middle of the box)
+		return true -- custom AI, can't know which team it is on so allow it to place anywhere for now and filter invalid positions later
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
-	if not boxID then
-		Spring.SetTeamRulesParam(teamID, "valid_startpos", 1)
+	if (not boxID) or CheckStartbox(boxID, x, z) then
+		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
 		return true
+	else
+		return false
 	end
+end
 
-	local box = startboxConfig[boxID]
-	x = x / Game.mapSizeX
-	z = z / Game.mapSizeZ
+function gadget:RecvSkirmishAIMessage(teamID, dataStr)
+	local command = "ai_is_valid_startpos:"
+	if not dataStr:find(command,1,true) then return end
 
-	local valid = (x > box[1]) and (z > box[2]) and (x < box[3]) and (z < box[4])
-	if valid then
-		Spring.SetTeamRulesParam(teamID, "valid_startpos", 1)
+	local xz = dataStr:sub(command:len()+1)
+	local slash = xz:find("/",1,true)
+	if not slash then return end
+
+	local x = tonumber(xz:sub(1, slash-1))
+	local z = tonumber(xz:sub(slash+1))
+	if not x or not z then return end
+
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if (not boxID) or CheckStartbox(boxID, x, z) then
+		return "1"
+	else
+		return "0"
 	end
-	return valid
 end

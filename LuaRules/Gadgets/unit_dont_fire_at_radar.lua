@@ -51,7 +51,7 @@ local dontFireAtRadarCmdDesc = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = "Don't fire at radar",
 	action  = 'dontfireatradar',
-	tooltip	= 'Enable firing at radar dots.',
+	tooltip	= 'Fire at radar dots: Disable to prevent firing at radar dots.',
 	params 	= {0, 'Fire at radar',"Don't fire at radar"}
 }
 

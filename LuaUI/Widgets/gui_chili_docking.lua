@@ -261,7 +261,7 @@ function widget:Update()
 	local present = {}
 	local names = {}
 	for _, win in ipairs(screen0.children) do  -- NEEDED FOR MINIMIZE BUTTONS: table.shallowcopy( 
-		if (win.dockable) then 
+		if win.dockable or win.dockableSavePositionOnly then 
 			names[win.name] = win
 			present[win.name] = true
 			local lastWinPos = lastPos[win.name]
@@ -284,12 +284,13 @@ function widget:Update()
 						end 
 					end
 
-					if win.resizable or win.tweakResizable then
+					if (win.resizable or win.tweakResizable) and not win.dockableNoResize then
 						win:Resize(w, h, false, false)
 					end
+					
 					win:SetPos(settingsPos[1], settingsPos[2])
-					if not options.dockEnabled.value then 
-						lastPos[win.name] = { win.x, win.y, win.x + win.width, win.y + win.height }
+					if (not options.dockEnabled.value) or win.dockableSavePositionOnly then 
+						lastPos[win.name] = { win.x, win.y, win.x + win.width, win.y + win.height, keepPresent = win.dockableSavePositionOnly }
 					end 
 				end 
 			elseif lastWinPos[1] ~= win.x or lastWinPos[2] ~= win.y or lastWinPos[3] ~= win.x+win.width or lastWinPos[4] ~= win.y + win.height then  -- window changed position
@@ -299,8 +300,8 @@ function widget:Update()
 		end 
 	end 
 	
-	for winName, _ in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
-		if not present[winName] then
+	for winName, data in pairs(lastPos) do  -- delete those not present atm (Redo/refresh docking when window un-minimized)
+		if not (data.keepPresent or present[winName]) then
 			lastPos[winName] = nil 
 		end
 	end 

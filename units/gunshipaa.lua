@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[gunshipaa]],
   name                   = [[Trident]],
-  description            = [[AA Gunship]],
+  description            = [[Anti-Air Gunship]],
   acceleration           = 0.18,
   airStrafe              = 0,
   amphibious             = true,
@@ -130,8 +130,6 @@ unitDef = {
       tolerance               = 32767,
       tracks                  = true,
       turnRate                = 90000,
-      twoPhase                = true,
-      vlaunch                 = true,
       turret                  = false,
       weaponAcceleration      = 550,
       weaponTimer             = 0.2,

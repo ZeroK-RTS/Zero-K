@@ -41,18 +41,18 @@ local SIG_RESTORE_DGUN = 16
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local PACE = 1.6
+local PACE = 3.4
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
-local THIGH_FRONT_ANGLE = -math.rad(40)
+local THIGH_FRONT_ANGLE = -math.rad(60)
 local THIGH_FRONT_SPEED = math.rad(40) * PACE
-local THIGH_BACK_ANGLE = math.rad(20)
+local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(40) * PACE
-local SHIN_FRONT_ANGLE = math.rad(35)
+local SHIN_FRONT_ANGLE = math.rad(40)
 local SHIN_FRONT_SPEED = math.rad(60) * PACE
-local SHIN_BACK_ANGLE = math.rad(5)
+local SHIN_BACK_ANGLE = math.rad(15)
 local SHIN_BACK_SPEED = math.rad(60) * PACE
 
 local ARM_FRONT_ANGLE = -math.rad(15)
@@ -101,32 +101,33 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do
+		local speedMult = Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1
 		--left leg up, right leg back
-		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
-		Turn(rupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(rleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
+		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
+		Turn(rupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(rleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
 		if not(isLasering or isDgunning) then
 			--left arm back, right arm front
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
+			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
 --			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 --			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 		end
-		WaitForTurn(lupleg, x_axis)
+		WaitForTurn(rupleg, x_axis)
 		Sleep(0)
 		
 		--right leg up, left leg back
-		Turn(lupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED)
-		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED)
-		Turn(rupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED)
-		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED)
+		Turn(lupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
+		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
+		Turn(rupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
+		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
 		if not(isLasering or isDgunning) then
 			--left arm front, right arm back
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION)
+			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
 --			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
 --			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
 		end
-		WaitForTurn(rupleg, x_axis)		
+		WaitForTurn(lupleg, x_axis)		
 		Sleep(0)
 	end
 end
@@ -263,7 +264,7 @@ function script.QueryWeapon(num)
 	if num == 3 then 
 		return lcannon_flare
 	elseif num == 2 or num == 4 then
-		return torso
+		return pelvis
 	end
 	return rcannon_flare
 end

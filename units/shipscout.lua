@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipscout]],
   name                   = [[Skeeter]],
-  description            = [[Patrol Boat (Scout/Raider)]],
+  description            = [[Disarming Scout Boat]],
   acceleration           = 0.0984,
   activateWhenBuilt      = true,
   brakeRate              = 0.0475,

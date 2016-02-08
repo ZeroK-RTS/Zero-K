@@ -266,7 +266,7 @@ local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'
 	
 	
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
-local HUDPath = 'Settings/HUD Panels'
+local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
 
 local HUDSkinPath = 'Settings/HUD Panels/HUD Skin'
@@ -290,10 +290,8 @@ local HUDSkinPath = 'Settings/HUD Panels/HUD Skin'
 
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
-local pathMap = 'Settings/Interface/Map'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
 	ShButton(pathInterface, 'Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage')
-	ShButton(pathMap, 'Map Draw Key', "drawinmap", nil, true)
 	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
 	AddOption(pathMouse,
 	{ 	

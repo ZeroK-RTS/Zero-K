@@ -1,4 +1,4 @@
-  
+   
 -- $Id: ModOptions.lua 4642 2009-05-22 05:32:36Z carrepairer $
 
 
@@ -38,7 +38,7 @@ local options = {
     type   = 'section',
   },
   {
-    key    = 'silly', -- lava, oremex, fun, zombies
+    key    = 'silly', -- lava, fun, zombies
     name   = 'Silly',
     desc   = 'Silly options for trolling.',
     type   = 'section',
@@ -170,92 +170,6 @@ local options = {
     step=0.01,
   },
   {
-    key    = 'oremex',
-    name   = 'Enable CNC style mexes',
-    desc   = "You have to reclaim ore with this option being enabled.",
-    type   = 'bool',
-    section= 'silly',
-    def    = false,
-  },
-  {
-    key    = 'oremex_prespawn',
-    name   = 'Ore mex prespawn',
-    desc   = "With this you get prespawned ore extractors.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key='oremex_metal',
-    name='Prespawned ore amount',
-    desc='Set how much metal should be prespawned.',
-    type='number',
-    def=35,
-    min=0,
-    max=10000,
-    step=1,
-    section='silly',
-  },
-  {
-    key    = 'oremex_invul',
-    name   = 'Ore mex invulnerability',
-    desc   = "With this you can't damage ore extractors.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key    = 'oremex_overdrive',
-    name   = 'Ore mex overdrive',
-    desc   = "Overdrive ore extractors to produce more ore.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key    = 'oremex_inf',
-    name   = 'Ore mex infinite growth',
-    desc   = "With this you can have crystal apocalypse should it hurt units...",
-    type   = 'bool',
-    section= 'silly',
-    def    = false,
-  },
-  {
-    key    = 'oremex_uphill',
-    name   = 'Ore mex slower uphill growth',
-    desc   = "With this you can try to use terraform to slow growth.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key    = 'oremex_crystal',
-    name   = 'Ore mex crystal models',
-    desc   = "If true, ore will look like crystal, otherwise will look like metal chunks.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key    = 'oremex_communism',
-    name   = 'Ore mex communism',
-    desc   = "If true, ore income will be fully equally shared between active&alive players.",
-    type   = 'bool',
-    section= 'silly',
-    def    = true,
-  },
-  {
-    key='oremex_harm',
-    name='Ore damage',
-    desc='Set how much damage should ore inflict on contact, it stacks. Some units are ore proof.',
-    type='number',
-    def=0,
-    min=0,
-    max=10000,
-    step=0.01,
-    section='silly',
-  },
-  {
     key = "forcejunior",
     name = "Force Junior",
     desc = "Choose whether everyone gets a standard Junior Comm chassis.",
@@ -270,22 +184,6 @@ local options = {
 	section	= 'startconds',
 	type	= "string",
 	def		= nil,
-  },
-   {
-	key		= "noair",
-	name	= "Disable air",
-	desc	= "Disables plane and gunship factories",
-	section	= 'startconds',
-	type	= "bool",
-	def		= false,
-  },
-     {
-	key		= "nodef",
-	name	= "Disable defences",
-	desc	= "Disables all defences from Defence tab",
-	section	= 'startconds',
-	type	= "bool",
-	def		= false,
   },
   {
     key = "overdrivesharingscheme",
@@ -360,19 +258,6 @@ local options = {
     def    = false,
   },
   {
-    key    = 'sharemode',
-    name   = 'Share Mode',
-    desc   = 'Determines to which teams you may share units.',
-    type   = 'list',
-    section = 'diplomacy',
-    def    = 'teammates',
-    items = {
-      { key='teammates', name="Teammates Only", desc='Share only to teammates.' },
-      { key='ceasefire', name="Teammates and Ceasefired", desc='May also share to temporary ceasefired allies.' },
-      { key='anyone', name="Anyone", desc='Share to anyone, including enemies.' },
-    },
-  },
-  {
     key='typemapsetting',
     name='Terrain Speed Boost',
     desc='Choose which map Speed Boost to use',
@@ -388,17 +273,17 @@ local options = {
       { key='alloff', name="All Off", desc='Disable all speed boost' },
     },
   },
-    {
-    key    = 'waterlevel',
-    name   = 'Water Level',
-    desc   = 'Adjusts the water level of the map',
-    type   = 'number',
-    section= 'mapsettings',
-    def    = 0,
-    min    = -2000,
-    max    = 2000,
-    step   = 1,
-  },
+  --{ Causes desync bug. Re-enable in 101.0
+  --  key    = 'waterlevel',
+  --  name   = 'Water Level',
+  --  desc   = 'Adjusts the water level of the map',
+  --  type   = 'number',
+  --  section= 'mapsettings',
+  --  def    = 0,
+  --  min    = -2000,
+  --  max    = 2000,
+  --  step   = 1,
+  --},
   {
     key    = 'metalmult',
     name   = 'Metal Extraction Multiplier',
@@ -505,45 +390,6 @@ local options = {
 
     },
   },
-  --[[
-  {
-    key    = 'easymetal',
-    name   = 'Easy Metal',
-    desc   = 'Metal extractors are restricted to metal spots in the same way geo plants are. Spots are pre-analyzed but certain maps will provide strange results, such as Azure or Speedmetal.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  --]]
-  --[[
-  {
-    key    = 'terratex',
-    name   = 'Terraform Texture',
-    desc   = 'Adds a texture to terraformed ground.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = true,
-  },
-  --]]
---[[
-  {
-    key    = 'specialpower',
-    name   = 'Special Advanced Powerplants',
-    desc   = 'Rather than explode like a nuke, Adv Fusions create a massive implosion.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
-  --]]
- 
-  {
-    key    = 'specialdecloak',
-    name   = 'Special Decloak Behavior (buggy)',
-    desc   = 'Overrides engine\'s decloak. Shows cloaked units only to team that reveals them, also fixes cloak behavior in FFA games with ceasefires.',
-    type   = 'bool',
-    section= 'experimental',
-    def    = false,
-  },
   {
     key    = 'xmas',
     name   = 'Enable festive units',
@@ -561,34 +407,12 @@ local options = {
     def    = false,
   },
   {
-    key    = "disablefeatures",
-    name   = "Disable Features",
-    desc   = "Disable features (no wreackages).",
-    type   = "bool",
-    section= "mapsettings",
+    key    = 'commtest',
+    name   = 'Test Commanders',
+    desc   = "Commanders cost 10% of normal and can be built by anything. For testing purposes.",
+    type   = 'bool',
+    section= 'silly',
     def    = false,
-  },
-  {
-    key    = 'factorycostmult',
-    name   = 'Factory Cost Multiplier',
-    desc   = 'Multiplies the cost of factories.',
-    type   = 'number',
-    section= 'experimental',
-    def    = 1,
-    min    = 0.01,
-    max    = 100,
-    step   = 0.01,
-  },
-  {
-    key    = 'wreckagemult',
-    name   = 'Wreckage Metal Multiplier',
-    desc   = 'Multiplies the metal of wreckages and debris.',
-    type   = 'number',
-    section= 'experimental',
-    def    = 1,
-    min    = 0.01,
-    max    = 100,
-    step   = 0.01,
   },
   {
     key    = "coop",

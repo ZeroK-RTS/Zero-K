@@ -106,7 +106,6 @@ unitDef = {
       smokeTrail              = false,
       soundHit                = [[weapon/bomb_hit]],
       soundStart              = [[weapon/missile/banisher_fire]],
-      startsmoke              = [[1]],
       startVelocity           = 400,
       tolerance               = 9000,
       tracks                  = true,

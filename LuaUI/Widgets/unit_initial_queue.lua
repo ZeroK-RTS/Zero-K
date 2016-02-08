@@ -212,8 +212,7 @@ end
 -- Initialize/shutdown
 ------------------------------------------------------------
 function widget:Initialize()
-	if (Game.startPosType == 1) or			-- Don't run if start positions are random
-	   (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
+	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
 		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
 		widgetHandler:RemoveWidget(self)
 		return

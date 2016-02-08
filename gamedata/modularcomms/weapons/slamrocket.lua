@@ -17,6 +17,7 @@ local weaponDef = {
 	customParams            = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:SLAM_MUZZLE]],
+		manualfire = 1,
 	},
 	cylinderTargeting       = 1.0,
 
@@ -34,6 +35,7 @@ local weaponDef = {
 	interceptedByShieldType = 2,
 	leadLimit               = 0.0,
 	model                   = [[wep_m_phoenix.s3o]],
+    noSelfDamage            = false,
 	predictBoost            = 0.0,
 	range                   = 700,
 	reloadtime              = 30,

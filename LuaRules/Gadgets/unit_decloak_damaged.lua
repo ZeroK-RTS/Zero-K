@@ -64,7 +64,7 @@ local UPDATE_FREQUENCY = 10
 local cloakUnitDefID = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if ud.canCloak then
+	if ud.canCloak and not ud.customParams.dynamic_comm then
 		cloakUnitDefID[i] = true
 	end
 end
@@ -161,7 +161,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_WANT_CLOAK then
-		if cloakUnitDefID[unitDefID] then
+		if cloakUnitDefID[unitDefID] or GG.Upgrades_UnitCanCloak(unitID) then
 			SetWantedCloaked(unitID,cmdParams[1])
 		end
 		return false
@@ -176,15 +176,21 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
-	if ud.canCloak then
+	if cloakUnitDefID[unitDefID] or GG.Upgrades_UnitCanCloak(unitID) then
 		local cloakDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK)
 		if cloakDescID then
 			Spring.InsertUnitCmdDesc(unitID, unitWantCloakCommandDesc)
 			Spring.RemoveUnitCmdDesc(unitID, cloakDescID)
 			spSetUnitRulesParam(unitID, "wantcloak", 0, alliedTrueTable)
 			if ud.customParams.initcloaked then
-				SetWantedCloaked(unitID,1)
+				SetWantedCloaked(unitID, 1)
 			end
+			return
+		end
+	elseif ud.customParams.dynamic_comm then
+		local cloakDescID = Spring.FindUnitCmdDesc(unitID, CMD_CLOAK)
+		if cloakDescID then
+			Spring.RemoveUnitCmdDesc(unitID, cloakDescID)
 		end
 	end
 end

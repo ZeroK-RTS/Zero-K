@@ -16,8 +16,6 @@ local version = 1.232
 --	2009-5-30: CarRepairer: Lups graphic lines, fix for 0.79.1 compatibility.
 --	2009-9-15: Licho: added simple fast graph lines
 
-local reverseCompat = (Game.version:find('91.0') == 1)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -99,28 +97,42 @@ function gadget:Initialize()
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-	if reverseCompat then
-		SendToUnsynced("shield_link_unit_created", unitID, unitDefID)
-	end
-
 	-- only count finished buildings
 	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID)
 	if stunned_or_inbuild ~= nil and inbuild then
 		return
 	end
-
+	
 	local ud = UnitDefs[unitDefID]
-	if ud.shieldWeaponDef then
-		local shieldWep = WeaponDefs[ud.shieldWeaponDef]
+	
+	local shieldWeaponDefID
+	local shieldNum = -1
+	if ud.customParams.dynamic_comm then
+		if GG.Upgrades_UnitShieldDef then
+			shieldWeaponDefID, shieldNum = GG.Upgrades_UnitShieldDef(unitID)
+		end
+	else
+		shieldWeaponDefID = ud.shieldWeaponDef
+	end
+	
+	if shieldWeaponDefID then
+		local shieldWep = WeaponDefs[shieldWeaponDefID]
 		--local x,y,z = spGetUnitPosition(unitID)
 		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if not (allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID]) then -- not need to redo table if already have table (UnitFinished() will call this function 2nd time)
 			allyTeamShields[allyTeamID] = allyTeamShields[allyTeamID] or {}
 			allyTeamShieldList[allyTeamID] = allyTeamShieldList[allyTeamID] or {count = 0}
+			
+			local shieldRegen = shieldWep.shieldPowerRegen
+			if shieldRegen == 0 and shieldWep.customParams and shieldWep.customParams.shield_rate then
+				shieldRegen = tonumber(shieldWep.customParams.shield_rate)
+			end
+			
 			local shieldUnit = {
 				shieldMaxCharge  = shieldWep.shieldPower,
+				shieldNum    = shieldNum,
 				shieldRadius = shieldWep.shieldRadius,
-				shieldRegen  = shieldWep.shieldPowerRegen,
+				shieldRegen  = shieldRegen,
 				shieldRank   = ((shieldWep.shieldRadius > 200) and 2) or 1,
 				unitDefID    = unitDefID,
 				neighbors    = {},
@@ -141,13 +153,9 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
-	if reverseCompat then
-		SendToUnsynced("shield_link_unit_destroyed", unitID, unitDefID)
-	end
-	
 	local ud = UnitDefs[unitDefID]
 	local allyTeamID = spGetUnitAllyTeam(unitID)
-	if ud.shieldWeaponDef and allyTeamShields[allyTeamID] then
+	if allyTeamShields[allyTeamID] and allyTeamShields[allyTeamID][unitID] then
 		local unitData = allyTeamShields[allyTeamID][unitID]
 		if unitData then
 			RemoveUnitFromNeighbors(allyTeamID, unitID, unitData.neighborList)
@@ -159,9 +167,9 @@ end
 function gadget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
 	local ud = UnitDefs[unitDefID]
 	local _,_,_,_,_,oldAllyTeam = spGetTeamInfo(oldTeam)
-	if ud.shieldWeaponDef then
+	local allyTeamID = spGetUnitAllyTeam(unitID)
+	if allyTeamID and allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 		local unitData
-		local allyTeamID = spGetUnitAllyTeam(unitID)
 		if allyTeamShields[oldAllyTeam] and allyTeamShields[oldAllyTeam][unitID] then
 			unitData = allyTeamShields[oldAllyTeam][unitID]
 			
@@ -196,18 +204,18 @@ function QueueLinkUpdate(allyTeamID,unitID)
 	updateLink[allyTeamID][unitID] = true
 end
 
--- check if working unit so it can be used for shield link
+-- Check if working unit so it can be used for shield link
 local function IsEnabled(unitID)
-	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-	if stunned_or_inbuild or (spGetUnitRulesParam(unitID, "disarmed") == 1) then
+	local enabled = spGetUnitShieldState(unitID)
+	if not enabled then
 		return false
 	end
-	local active = spGetUnitIsActive(unitID)
-	if active ~= nil then
-		return active
-	else
-		return true
+	local stunned_or_inbuild, stunned, inbuild = spGetUnitIsStunned(unitID) 
+	if stunned_or_inbuild then
+		return false
 	end
+	local att_enabled = (spGetUnitRulesParam(unitID, "att_abilityDisabled") ~= 1)
+	return att_enabled
 end
 
 local function ShieldsAreTouching(shield1, shield2)
@@ -291,8 +299,8 @@ local function DoChargeTransfer(lowID, lowData, lowCharge, highID, highData, hig
 	if chargeFlow > 0 then -- Disallow negative flow
 		local slowMult = 1 - (spGetUnitRulesParam(highID, "slowState") or 0)
 		chargeFlow = chargeFlow * slowMult
-		spSetUnitShieldState(highID, -1, highCharge - chargeFlow)
-		spSetUnitShieldState(lowID, -1, lowCharge + chargeFlow)
+		spSetUnitShieldState(highID, highData.shieldNum, highCharge - chargeFlow)
+		spSetUnitShieldState(lowID, lowData.shieldNum, lowCharge + chargeFlow)
 		return chargeFlow
 	end
 	return 0
@@ -352,7 +360,7 @@ function gadget:GameFrame(n)
 			for i = 1, unitList.count do
 				unitID = unitList[i]
 				unitData = shieldUnits[unitID]
-				on, unitCharge = spGetUnitShieldState(unitID, -1)
+				on, unitCharge = spGetUnitShieldState(unitID, unitData.shieldNum)
 				chargeFlow = 0
 				attempt = 1
 				while attempt and attempt < 3 do
@@ -368,7 +376,7 @@ function gadget:GameFrame(n)
 						if otherID then
 							otherData = allyTeamShields[allyTeamID][otherID]
 							if otherData then
-								on, otherCharge = spGetUnitShieldState(otherID, -1)
+								on, otherCharge = spGetUnitShieldState(otherID, otherData.shieldNum)
 								if on and otherCharge and otherData.enabled and ShieldsAreTouching(unitData, otherData) then
 									if (unitCharge > otherCharge) then
 										chargeFlow = DoChargeTransfer(otherID, otherData, otherCharge, unitID, unitData, unitCharge)
@@ -440,61 +448,30 @@ local spGetGameFrame       = Spring.GetGameFrame
 local shieldUnits = {}
 local shieldCount = 0
 
-if reverseCompat then
-	function UnitCreated(_,unitID, unitDefID)
-		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
-			shieldCount = shieldCount + 1
-			shieldUnits[shieldCount] = unitID
-		end
+function gadget:UnitCreated(unitID, unitDefID)
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		shieldCount = shieldCount + 1
+		shieldUnits[shieldCount] = unitID
 	end
+end
 
-	function UnitDestroyed(_,unitID, unitDefID)
-		if unitDefID and UnitDefs[unitDefID].shieldWeaponDef then
-			for i=1, #shieldUnits do
-				if shieldUnits[i] == unitID then
-					table.remove(shieldUnits,i)
-					shieldCount = shieldCount - 1
-					break;
-				end
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if UnitDefs[unitDefID].shieldWeaponDef then
+		for i=1, #shieldUnits do
+			if shieldUnits[i] == unitID then
+				table.remove(shieldUnits,i)
+				shieldCount = shieldCount - 1
+				break;
 			end
 		end
 	end
-	
-	function gadget:Initialize()
-		local spGetUnitDefID = Spring.GetUnitDefID
-		for _,unitID in ipairs(Spring.GetAllUnits()) do
-			local unitDefID = spGetUnitDefID(unitID)
-			UnitCreated(unitID, unitDefID)
-		end
-		gadgetHandler:AddSyncAction("shield_link_unit_created", UnitCreated)
-		gadgetHandler:AddSyncAction("shield_link_unit_destroyed", UnitDestroyed)
-	end
-else
-	function gadget:UnitCreated(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
-			shieldCount = shieldCount + 1
-			shieldUnits[shieldCount] = unitID
-		end
-	end
+end
 
-	function gadget:UnitDestroyed(unitID, unitDefID)
-		if UnitDefs[unitDefID].shieldWeaponDef then
-			for i=1, #shieldUnits do
-				if shieldUnits[i] == unitID then
-					table.remove(shieldUnits,i)
-					shieldCount = shieldCount - 1
-					break;
-				end
-			end
-		end
-	end
-	
-	function gadget:Initialize()
-		local spGetUnitDefID = Spring.GetUnitDefID
-		for _,unitID in ipairs(Spring.GetAllUnits()) do
-			local unitDefID = spGetUnitDefID(unitID)
-			gadget:UnitCreated(unitID, unitDefID)
-		end
+function gadget:Initialize()
+	local spGetUnitDefID = Spring.GetUnitDefID
+	for _,unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = spGetUnitDefID(unitID)
+		gadget:UnitCreated(unitID, unitDefID)
 	end
 end
 

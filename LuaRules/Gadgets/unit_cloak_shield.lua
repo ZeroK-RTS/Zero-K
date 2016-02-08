@@ -20,7 +20,7 @@ function gadget:GetInfo()
     date      = "May 02, 2007", --updated on 23 January 2014
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = not (Game.version:find('91.0') == 1)  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -52,7 +52,6 @@ if (gadgetHandler:IsSyncedCode()) then
 --
 
 local GetUnitDefID       = Spring.GetUnitDefID
-local UseUnitResource    = Spring.UseUnitResource
 local GetUnitSeparation  = Spring.GetUnitSeparation
 local SetUnitCloak       = Spring.SetUnitCloak
 
@@ -210,17 +209,17 @@ local function SetUnitCloakAndParam(unitID, level, decloakDistance)
 			if cloakers[unitID] and cloakers[unitID].radius > 0 then
 				changeRadius = false
 			end
-			SetUnitCloak(unitID, level, ((changeRadius and decloakDistance) or false))
+			SetUnitCloak(unitID, level, ((changeRadius and decloakDistance) or GetUnitRulesParam(unitID, "comm_decloak_distance") or false))
 		end
 	else
 		local wantCloak = GetUnitRulesParam(unitID, "wantcloak")
 		if wantCloak == 1 then
 			local cannotCloak = GetUnitRulesParam(unitID, "cannotcloak")
 			if cannotCloak ~= 1 then
-				SetUnitCloak(unitID, 1, false)
+				SetUnitCloak(unitID, 1, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
 			end
 		else
-			SetUnitCloak(unitID, 0, false)
+			SetUnitCloak(unitID, 0, GetUnitRulesParam(unitID, "comm_decloak_distance") or false)
 		end
 	end
 	SetUnitRulesParam(unitID, "areacloaked", (level and 1) or 0, alliedTrueTable)
@@ -245,7 +244,7 @@ function gadget:Initialize()
   -- add the CloakShield command to existing units
   for _,unitID in ipairs(Spring.GetAllUnits()) do
     local unitDefID = GetUnitDefID(unitID)
-    local cloakShieldDef = cloakShieldDefs[unitDefID]
+    local cloakShieldDef = cloakShieldDefs[unitDefID] or GG.Upgrades_UnitCloakShieldDef(unitID)
     if (cloakShieldDef) then
       AddCloakShieldUnit(unitID, cloakShieldDef)
     end
@@ -268,7 +267,7 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-  local cloakShieldDef = cloakShieldDefs[unitDefID]
+  local cloakShieldDef = cloakShieldDefs[unitDefID] or GG.Upgrades_UnitCloakShieldDef(unitID)
   if (not cloakShieldDef) then
     return
   end
@@ -323,7 +322,7 @@ local function UpdateCloakees(data)
   local allyTeam = GetUnitAllyTeam(unitID)
   for _,cloakee in ipairs(closeUnits) do
     local udid = GetUnitDefID(cloakee)
-    if ((not uncloakableDefs[udid]) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
+    if ((not uncloakableDefs[udid]) and (not GetUnitRulesParam(cloakee, "comm_shield_id")) and (GetUnitAllyTeam(cloakee) == allyTeam)) then
       if (cloakee ~= unitID) then
         --other units
         SetUnitCloakAndParam(cloakee, level, (not radiusException[udid]) and decloakDistance)
@@ -426,13 +425,13 @@ function gadget:GameFrame(frameNum)
         data.delay = nil
       end
       ShrinkRadius(data)
-    elseif (GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1)) then
+    elseif (GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or (Spring.GetUnitRulesParam(unitID, "morphDisable") == 1)) then
       ShrinkRadius(data)
     elseif (not data.want) then
       ShrinkRadius(data)
     else
 	  local activeState = Spring.GetUnitStates(unitID)
-	  local newState = activeState and activeState["active"] and UseUnitResource(unitID, 'e', data.energy)
+	  local newState = activeState and activeState["active"] and (GetUnitRulesParam(unitID, "forcedOff") ~= 1)
       if (newState) then
         GrowRadius(data)
       else
