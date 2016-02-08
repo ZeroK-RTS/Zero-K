@@ -842,26 +842,19 @@ for name, ud in pairs(UnitDefs) do
     end   
 end
 
--- Set default out of combat autorepair
+-- Replace regeneration with Lua
 local autoheal_defaults = VFS.Include("gamedata/unitdef_defaults/autoheal_defs.lua")
 for name, ud in pairs(UnitDefs) do
-	if not ud.autoheal then
-		ud.autoheal = autoheal_defaults.autoheal
+	if (ud.autoheal and (ud.autoheal > 0)) then
+		ud.customparams.idle_regen = ud.autoheal
+		ud.idletime = 0
+	else
+		ud.customparams.idle_regen = ud.idleautoheal or autoheal_defaults.idleautoheal
+		ud.idletime = ud.idletime or autoheal_defaults.idletime
 	end
-	if not ud.idletime then
-		ud.idletime = autoheal_defaults.idletime
-	end
-	if not ud.idleautoheal then
-		ud.idleautoheal = autoheal_defaults.idleautoheal
-	end
-end
 
--- Fix inconsistent idle regeneration for air units
-for name, ud in pairs(UnitDefs) do
-	if ud.canfly then
-		ud.customparams.idle_regen = ud.idleautoheal
-		ud.idleautoheal = 0
-	end
+	ud.idleautoheal = 0
+	ud.autoheal = 0
 end
 
 -- Set defaults for area cloak
