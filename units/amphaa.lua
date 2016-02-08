@@ -5,14 +5,14 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 190,
-  buildCostMetal         = 190,
+  buildCostEnergy        = 180,
+  buildCostMetal         = 180,
 
   buildoptions           = {
   },
 
   buildPic               = [[amphaa.png]],
-  buildTime              = 190,
+  buildTime              = 180,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
