@@ -176,9 +176,6 @@ function script.Create()
 	Turn(jetright, x_axis, math.rad(90))
 	Turn(jetrear, x_axis, math.rad(90))
 	
-	Spin(emit, y_axis, math.rad(180))
-	Move(emit, y_axis, -12)
-	
 	--Move(LeftTurretSeat,x_axis,-2)
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
