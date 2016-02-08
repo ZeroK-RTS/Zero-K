@@ -1374,15 +1374,43 @@ end
 --tooltip functions
 ----------------------------------------------------------------
 
-local function SetHealthbar(tt_healthbar,health, maxhealth)
+local function SetHealthbar(tt_healthbar,health, maxhealth, unitID)
 	if health and maxhealth and (maxhealth > 0) then
 		tt_health_fraction = health/maxhealth
 		tt_healthbar.color = GetHealthColor(tt_health_fraction)
 		tt_healthbar:SetValue(tt_health_fraction)
+
+		local regenStr = ""
+		if unitID and health < maxhealth then
+			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
+			local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
+			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
+				regenStr = "  (" .. math.ceil(regen_timer / 30) .. "s)"
+			else
+				local regen = 0
+				if (regen_timer <= 0) then
+					regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
+				end
+				if ud.customParams.amph_regen then
+					local x,y,z = Spring.GetUnitPosition(unitID)
+					local h = Spring.GetGroundHeight(x,z) or y
+					if (h < 0) then
+						regen = regen + math.min(ud.customParams.amph_regen, ud.customParams.amph_regen*(-h / ud.customParams.amph_submerged_at))
+					end
+				end
+				if ud.customParams.armored_regen and Spring.GetUnitArmored(unitID) then
+					regen = regen + ud.customParams.armored_regen
+				end
+				if (regen > 0) then
+					regenStr = "  (+" .. math.ceil(regen) .. ")"
+				end
+			end
+		end
+
 		if options.hpshort.value then
-			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth))
+			tt_healthbar:SetCaption(numformat(health) .. ' / ' .. numformat(maxhealth) .. regenStr)
 		else
-			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth))
+			tt_healthbar:SetCaption(math.ceil(health) .. ' / ' .. math.ceil(maxhealth) .. regenStr)
 		end
 		
 	else
@@ -1409,7 +1437,7 @@ local function SetHealthbars()
 	if tt_unitID then
 		health, maxhealth = spGetUnitHealth(tt_unitID)
 		tt_healthbar = globalitems.hp_unit:GetChildByName('bar')
-		SetHealthbar(tt_healthbar,health, maxhealth)
+		SetHealthbar(tt_healthbar,health, maxhealth, tt_unitID)
 	elseif tt_fid then
 		health, maxhealth = Spring.GetFeatureHealth(tt_fid)
 		tt_healthbar_stack = tt_ud and globalitems.hp_corpse or globalitems.hp_feature
@@ -1420,7 +1448,7 @@ local function SetHealthbars()
 	if stt_unitID then
 		health, maxhealth = spGetUnitHealth(stt_unitID)
 		tt_healthbar = globalitems.hp_selunit:GetChildByName('bar')
-		SetHealthbar(tt_healthbar,health, maxhealth)
+		SetHealthbar(tt_healthbar,health, maxhealth, stt_unitID)
 	end
 end
 
@@ -2563,10 +2591,16 @@ function widget:Update(dt)
 			local shieldPower = Spring.GetUnitRulesParam(stt_unitID, "comm_shield_max") or stt_ud.shieldPower
 			if shieldbar and shieldPower and (shieldPower > 0) then
 				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID, Spring.GetUnitRulesParam(stt_unitID, "comm_shield_num") or -1)
-				
-				shieldbar:SetValue((shieldCurrentPower or 0) / shieldPower,true)
+
+				local wd = WeaponDefs[UnitDefs[Spring.GetUnitDefID(stt_unitID)].shieldWeaponDef]
+				local regen = ""
+				if shieldCurrentPower < shieldPower then
+					regen = " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+				end
+
+				shieldbar:SetValue(shieldCurrentPower / shieldPower,true)
 				if shieldEnabled then
-					shieldbar:SetCaption(math.floor(shieldCurrentPower) .. ' / ' .. shieldPower)
+					shieldbar:SetCaption(math.floor(shieldCurrentPower) .. ' / ' .. shieldPower .. regen)
 				else
 					shieldbar:SetCaption('Shield offline')
 				end
