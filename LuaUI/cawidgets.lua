@@ -31,6 +31,7 @@ end
 
 include("keysym.h.lua")
 include("utils.lua")
+include("compat_utils.lua")
 includeZIPFirst("system.lua")
 includeZIPFirst("cache.lua") --contain cached override for Spring.GetVisibleUnit (performance optimization). All overrides that are placed here have global reach
 include("callins.lua")
