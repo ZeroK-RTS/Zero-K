@@ -305,7 +305,7 @@ local function DrawHaloFunc()
     data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
   end
 
-	if pointedType == 'unit' and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
+	if pointedType == 'unit' and data and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
   	local teamID = spGetUnitTeam(data)
   	if teamID == spGetMyTeamID() then
   		glColor(myHoverColor)
