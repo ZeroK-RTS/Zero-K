@@ -43,7 +43,6 @@ local weaponDef = {
 	soundHit                = [[weapon/bomb_hit]],
 	soundStart              = [[weapon/missile/missile_fire2]],
 	startVelocity           = 0,
- 	texture1                = [[flare]],
 	targetBorder            = 1,
 	tolerance               = 4000,
 	turret                  = true,
