@@ -104,6 +104,7 @@ function gadget:GameFrame(f)
 			Spring.SetFeatureDirection(featureID, dir[1], 0 , dir[2])
         else
             local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
+			Spring.SetUnitRulesParam(unitID, "parent_unit_id", c.owner)
             if (c.expire > 0) and unitID then 
                 expireList[unitID] = f + c.expire * 32
             end
