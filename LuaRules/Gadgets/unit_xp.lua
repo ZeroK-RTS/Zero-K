@@ -17,7 +17,7 @@ local spGetUnitExperience = Spring.GetUnitExperience
 local getCost = Spring.Utilities.GetUnitCost
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if (attackerID and spValidUnitID(attackerID) and (unitTeam ~= attackerTeam)) then
+	if (attackerID and spValidUnitID(attackerID) and (not Spring.AreTeamsAllied(unitTeam, attackerTeam))) then
 
 		if paralyzer then return end -- for now, no XP for status effects. Figure out a sensible formula later.
 
