@@ -687,7 +687,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	for i=1, #unitList do --Correct underwater
 		local unitID = unitList[i].unitID
 		local _, y, _ = Spring.GetUnitViewPosition(unitID)
-		if (y < 0 ) then
+		if y and (y < 0) then
 			gl.Unit(unitID, true)
 		end
 	end
