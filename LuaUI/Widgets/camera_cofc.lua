@@ -934,9 +934,9 @@ local function VirtTraceRay(x,y, cs)
 		end
 	end
 	
-	if not cs or not cs.dy or cs.dy == 0 then
-		return false, false
-	end
+	-- if not cs or not cs.dy or cs.dy == 0 then
+		-- return false, false
+	-- end
 	--[[ 
 	local vecDist = (- cs.py) / cs.dy
 	local gx, gy, gz = cs.px + vecDist*cs.dx, 	cs.py + vecDist*cs.dy, 	cs.pz + vecDist*cs.dz  --note me: what does cs.dx mean?
@@ -963,10 +963,13 @@ SetCenterBounds = function(cs)
 		local outOfBounds = false;
 		if cs.rx > -HALFPI + 0.002 then --If we are not facing stright down, do a full raycast
 			local _,gx,gy,gz = VirtTraceRay(cx, cy, cs)
-			if gx < minX then cs.px = cs.px + (minX - gx); ls_x = ls_x + (minX - gx); outOfBounds = true end
-			if gx > maxX then cs.px = cs.px + (maxX - gx); ls_x = ls_x + (maxX - gx); outOfBounds = true end
-			if gz < minZ then cs.pz = cs.pz + (minZ - gz); ls_z = ls_z + (minZ - gz); outOfBounds = true end
-			if gz > maxZ then cs.pz = cs.pz + (maxZ - gz); ls_z = ls_z + (maxZ - gz); outOfBounds = true end
+			if gx then
+				if gx < minX then cs.px = cs.px + (minX - gx); ls_x = ls_x + (minX - gx); outOfBounds = true end
+				if gx > maxX then cs.px = cs.px + (maxX - gx); ls_x = ls_x + (maxX - gx); outOfBounds = true end
+				if gz < minZ then cs.pz = cs.pz + (minZ - gz); ls_z = ls_z + (minZ - gz); outOfBounds = true end
+				if gz > maxZ then cs.pz = cs.pz + (maxZ - gz); ls_z = ls_z + (maxZ - gz); outOfBounds = true end
+			else outOfBounds = true
+			end
 		else --We can use camera x & z location in place of a raycast to find center when camera is pointed towards ground, as this is faster and more numerically stable
 			if cs.px < minX then cs.px = minX; ls_x = minX; outOfBounds = true end
 			if cs.px > maxX then cs.px = maxX; ls_x = maxX; outOfBounds = true end
@@ -1308,6 +1311,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		local ls_dist_new = ls_dist + max(min(ls_dist*sp,2000),-2000) -- a zoom in that get faster the further away from target (limited to -+2000)
 		ls_dist_new = max(ls_dist_new, 20)
 		
+		if not gy then gy = 0 end
 		if not options.freemode.value and ls_dist_new > maxDistY - gy then --limit camera distance to maximum distance
 			-- return
 			ls_dist_new = maxDistY - gy
@@ -2342,7 +2346,7 @@ local function DrawPoint(x, y, c, s)
   glBeginEnd(GL_POINTS, glVertex, x, y)
 end
 
-function widget:DrawScreenEffects(vsx, vsy)
+function widget:DrawWorld()--ScreenEffects(vsx, vsy)
 	--placed here so that its always called even when GUI is hidden
 	Interpolate()
 end
