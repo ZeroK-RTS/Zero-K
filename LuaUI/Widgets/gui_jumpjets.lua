@@ -52,8 +52,6 @@ local spGetGroundHeight        = Spring.GetGroundHeight
 local spGetGroundNormal        = Spring.GetGroundNormal
 local spIsPosInLos             = Spring.IsPosInLos
 
-local allyTeamID = Spring.GetMyAllyTeamID()
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
@@ -110,7 +108,7 @@ local function GetJumpViabilityLevel(unitDefID, x, y, z)
 		-- be out of LOS. Spring.TestMoveOrder returns false in 
 		-- widgets for all out of LOS locations.
 		
-		if spIsPosInLos(x, y, z, allyTeamID) then
+		if spIsPosInLos(x, y, z) then
 			return V_STRUCTURE
 		else
 			return V_FOG
