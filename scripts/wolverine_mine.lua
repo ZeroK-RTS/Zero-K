@@ -24,6 +24,28 @@ end
 
 local currentBomblet = 1
 
+local function Remove ()
+	for i = 3, 3 do
+		for j = 1, 4 do
+			Explode(petals[i][j], sfxShatter)
+		end
+	end
+
+	-- keep alive for a while (xp, stats etc)
+	Spring.SetUnitNoSelect(unitID, true)
+	Spring.SetUnitNoDraw(unitID, true)
+	Spring.SetUnitNoMinimap(unitID, true)
+	Spring.SetUnitHealth(unitID, {paralyze=99999999})
+	Spring.SetUnitCloak(unitID, 4)
+	Spring.SetUnitStealth(unitID, true)	
+	Spring.SetUnitBlocking(unitID,false,false,false)
+	Spring.GiveOrderToUnit(unitID, CMD.STOP, {}, 0)
+	Spring.SetUnitPosition(unitID,-9001, -9001)
+
+	Sleep(5000)
+	Spring.DestroyUnit(unitID, false, true)
+end
+
 function script.Create()
 	Turn (base, y_axis, math.random()*pi);
 	Spin (stalk[4], y_axis, math.rad(30))
@@ -68,16 +90,8 @@ function script.Shot (num)
 	else
 		currentBomblet = currentBomblet + 1
 		if (currentBomblet == 5) then
-			Spring.DestroyUnit(unitID, true, false)
+			StartThread(Remove)
 		end
 	end
 	Hide (bomblets[currentBomblet].bomb)
 end
-
---function script.Killed(recentDamage, maxHealth)
---	for i = 3, 3 do
---		for j = 1, 4 do
---			Explode(petals[i][j], sfxFall)
---		end
---	end
---end

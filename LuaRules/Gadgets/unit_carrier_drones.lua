@@ -132,6 +132,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 	--Note: create unit argument: (unitDefID|unitDefName, x, y, z, facing, teamID, build, flattenGround, targetID, builderID)
 	local droneID = CreateUnit(droneName, xS, yS, zS, 1, carrierList[unitID].teamID, droneBuiltExternally and true, false, nil, unitID)
 	if droneID then
+		Spring.SetUnitRulesParam(droneID, "parent_unit_id", unitID)
 		local droneSet = carrierEntry.droneSets[setNum]
 		droneSet.droneCount = droneSet.droneCount + 1
 		droneSet.drones[droneID] = true
