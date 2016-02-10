@@ -25,7 +25,7 @@ for id, def in pairs(UnitDefs) do
 end
 
 local currentFrame
-function gadget:Initialize ()
+function gadget:Initialize()
 	currentFrame = Spring.GetGameFrame()
 end
 
@@ -58,8 +58,10 @@ function gadget:UnitCreated(unitID, unitDefID)
 end
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
-	units[unitID].idleFrame = currentFrame + units[unitID].idleTime
-	spSetUnitRulesParam(unitID, "idleRegenTimer", units[unitID].idleTime, losTable)
+	if units[unitID] then
+		units[unitID].idleFrame = currentFrame + units[unitID].idleTime
+		spSetUnitRulesParam(unitID, "idleRegenTimer", units[unitID].idleTime, losTable)
+	end
 end
 
 function gadget:UnitDestroyed(unitID)
