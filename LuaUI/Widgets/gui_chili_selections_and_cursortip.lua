@@ -1384,25 +1384,27 @@ local function SetHealthbar(tt_healthbar,health, maxhealth, unitID)
 		if unitID and health < maxhealth then
 			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 			local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
-			if ((ud.idleTime <= 300) and (regen_timer > 0)) then
-				regenStr = "  (" .. math.ceil(regen_timer / 30) .. "s)"
-			else
-				local regen = 0
-				if (regen_timer <= 0) then
-					regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
-				end
-				if ud.customParams.amph_regen then
-					local x,y,z = Spring.GetUnitPosition(unitID)
-					local h = Spring.GetGroundHeight(x,z) or y
-					if (h < 0) then
-						regen = regen + math.min(ud.customParams.amph_regen, ud.customParams.amph_regen*(-h / ud.customParams.amph_submerged_at))
+			if regen_timer then
+				if ((ud.idleTime <= 300) and (regen_timer > 0)) then
+					regenStr = "  (" .. math.ceil(regen_timer / 30) .. "s)"
+				else
+					local regen = 0
+					if (regen_timer <= 0) then
+						regen = regen + (spGetUnitRulesParam(unitID, "comm_autorepair_rate") or ud.customParams.idle_regen)
 					end
-				end
-				if ud.customParams.armored_regen and Spring.GetUnitArmored(unitID) then
-					regen = regen + ud.customParams.armored_regen
-				end
-				if (regen > 0) then
-					regenStr = "  (+" .. math.ceil(regen) .. ")"
+					if ud.customParams.amph_regen then
+						local x,y,z = Spring.GetUnitPosition(unitID)
+						local h = Spring.GetGroundHeight(x,z) or y
+						if (h < 0) then
+							regen = regen + math.min(ud.customParams.amph_regen, ud.customParams.amph_regen*(-h / ud.customParams.amph_submerged_at))
+						end
+					end
+					if ud.customParams.armored_regen and Spring.GetUnitArmored(unitID) then
+						regen = regen + ud.customParams.armored_regen
+					end
+					if (regen > 0) then
+						regenStr = "  (+" .. math.ceil(regen) .. ")"
+					end
 				end
 			end
 		end
