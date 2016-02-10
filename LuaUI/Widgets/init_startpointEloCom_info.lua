@@ -275,7 +275,7 @@ local function DrawWorldFunc()
 					gl.PushMatrix()
 					gl.Translate( x, y + 5 , z)
 					gl.Scale(1.4,1.4,1.4)
-					gl.UnitShape( comDefId, teamID )
+					gl.UnitShape( comDefId, teamID, false, true, false)
 					gl.PopMatrix()
 				end
 			end

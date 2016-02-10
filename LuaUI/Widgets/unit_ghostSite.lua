@@ -115,7 +115,7 @@ function DrawGhostFeatures()
 			gl.PushMatrix()
 			gl.Translate( x, y, z)
 
-			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID] )
+			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false )
 
 			gl.PopMatrix()
 		else
@@ -145,7 +145,7 @@ function DrawGhostSites()
 			gl.PushMatrix()
 			gl.Translate( x, y - 17, z)
 
-			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID] )
+			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false )
 
 			gl.PopMatrix()
 		else
