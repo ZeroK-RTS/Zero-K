@@ -234,12 +234,7 @@ end
 
 
 function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult)
-	if not units[unitID] then
-		return false
-	end
-	
-	if type(unitID) ~= "number" then
-		Spring.Echo("OverkillPrevention_CheckBlockDisarm: UnitID is not a number", unitID, type(unitID))
+	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
 	
@@ -251,12 +246,7 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult)
-	if not units[unitID] then
-		return false
-	end	
-	
-	if type(unitID) ~= "number" then
-		Spring.Echo("OverkillPrevention_CheckBlock: UnitID is not a number", unitID, type(unitID))
+	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
 	
