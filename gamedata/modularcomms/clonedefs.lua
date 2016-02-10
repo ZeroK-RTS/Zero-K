@@ -231,13 +231,13 @@ local copy = {
 		},
 		dynstrike4 = {
 			level = 4,
-			mainstats = {maxdamage = 5000, objectname = "strikecom_3.dae", collisionvolumescales  = [[60 65 60]]},
+			mainstats = {maxdamage = 5000, objectname = "strikecom_3.dae", collisionvolumescales  = [[58 66 58]]},
 			customparams = {},
 			wreckmodel = "strikecom_dead_3.dae",
 		},
 		dynstrike5 = {
 			level = 5,
-			mainstats = {maxdamage = 6000, objectname = "strikecom_4.dae", collisionvolumescales  = [[65 70 65]]},
+			mainstats = {maxdamage = 6000, objectname = "strikecom_4.dae", collisionvolumescales  = [[60 72 60]]},
 			customparams = {},
 			wreckmodel = "strikecom_dead_4.dae",
 		},		
@@ -327,7 +327,7 @@ local copy = {
 		},
 		dynassault5 = {
 			level = 5,
-			collisionvolumescales  = [[61 71 61]],
+			collisionvolumescales  = [[60 71 60]],
 			mainstats = {maxdamage = 7200, objectname = "benzcom5.s3o",},
 			customparams = {},
 			wreckmodel = "benzcom5_wreck.s3o",

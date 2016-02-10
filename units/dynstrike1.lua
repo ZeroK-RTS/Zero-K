@@ -106,7 +106,7 @@ unitDef = {
       footprintX       = 3,
       footprintZ       = 3,
       metal            = 480,
-      object           = [[strikecom_dead.dae]],
+      object           = [[strikecom_dead_1.dae]],
       reclaimable      = true,
       reclaimTime      = 480,
     },
