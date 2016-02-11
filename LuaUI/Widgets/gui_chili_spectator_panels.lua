@@ -870,42 +870,27 @@ local function GetOpposingAllyTeams()
 		local teamID = teams[i]
 		local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
 		if teamID ~= gaiaTeamID then
+			if not activeAllyTeams[allyTeamID] then
+				activeAllyTeams[allyTeamID] = {playerNames = {}, aiNames = {}, players = 0, AIs = 0, teamID = teamID}
+				activeAllyTeamsCount = activeAllyTeamsCount + 1
+			end
 			if isAI then
-				-- If the team is an AI team then count it as long as it is not chicken.
-				-- The AI names are collected seperately because they are less important.
-				local _,name = Spring.GetAIInfo(teamID)
-				if not name:find("Chicken:") then
-					if not activeAllyTeams[allyTeamID] then
-						activeAllyTeams[allyTeamID] = {aiNames = {}, players = 0, AIs = 0, teamID = teamID}
-						activeAllyTeamsCount = activeAllyTeamsCount + 1
-					end
-					
-					local data = activeAllyTeams[allyTeamID]
-					data.AIs = data.AIs + 1
-					data.aiNames = data.aiNames or {}
-					data.aiNames[data.AIs] = name
-				end
+				local name = select(2, Spring.GetAIInfo(teamID))
+				local data = activeAllyTeams[allyTeamID]
+				data.AIs = data.AIs + 1
+				data.aiNames[data.AIs] = name
 			else
 				local name,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(leader)
 				customKeys = customKeys or {}
 				local clan = customKeys.clan or ""
-				if not activeAllyTeams[allyTeamID] then
-					activeAllyTeams[allyTeamID] = {players = 0, AIs = 0, teamID = teamID}
-					activeAllyTeamsCount = activeAllyTeamsCount + 1
-				end
-				
+
 				local data = activeAllyTeams[allyTeamID]
-				
-				-- The first player provides some representitive information for the team
-				if not data.playerNames then
-					data.playerNames = {}
-					data.teamID = teamID
-					data.winString = GetWinString(name)
-				end
-				
+
+				data.winString = GetWinString(name)
+
 				data.players = data.players + 1
 				data.playerNames[data.players] = name
-				
+
 				-- The team is considered a clan until players from distinct clans are found.
 				if (not data.noClan) and data.clan ~= clan then
 					if data.clan then
@@ -963,7 +948,7 @@ local function GetOpposingAllyTeams()
 				if data.players >= 2 then
 					name = name .. "\n" .. data.playerNames[2]
 				else
-					name = name .. "\n" .. (data.aiNames[2] or "AI")
+					name = name .. "\n" .. (data.aiNames[2] or data.aiNames[1] or "AI")
 				end
 			elseif teamMembers > 2 then
 				nameSize = 0.65
@@ -979,7 +964,7 @@ local function GetOpposingAllyTeams()
 			nameSize = nameSize, -- Display size factor of the team name.
 			teamID = data.teamID, -- representitive teamID
 			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1}, -- color of the teams text (color of first player)
-			playerName = data.playerNames[1], -- representitive player name (for win counter)
+			playerName = data.playerNames[1] or data.aiNames[1] or "AI", -- representitive player name (for win counter)
 			winString = data.winString or "0", -- Win string from win counter
 		}
 	end
