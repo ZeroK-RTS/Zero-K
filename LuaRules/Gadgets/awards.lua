@@ -329,18 +329,6 @@ local function AddAwardPoints( awardType, teamID, amount )
 	end
 end
 
-local function UpdateReclaimList()
-	local teamList = Spring.GetTeamList()
-	for i = 1, #teamList do
-		local team = teamList[i]
-		if team ~= gaiaTeamID then
-			AddAwardPoints( 'reclaim', team, -reclaimListByTeam[team])
-			reclaimListByTeam[team] = 0
-			Spring.SetTeamRulesParam(team, "total_reclaimed_metal", awardData['reclaim'][team])
-		end
-	end
-end
-
 local function ProcessAwardData()
 
 	for awardType, data in pairs(awardData) do
@@ -507,6 +495,10 @@ function gadget:Initialize()
 		if(UnitDefs[i].customParams.level) then comms[i] = true
 	end
 
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		Spring.SetTeamRulesParam(teamList[i], "total_reclaimed_metal_0", 0)
+	end
  end
 
 end --Initialize
@@ -665,14 +657,26 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
+local stats_index = 1
+
 function gadget:GameFrame(n)
 
 	--if n%TEAM_SLOWUPDATE_RATE == 2 then
 	--	UpdateResourceStats((n-2)/TEAM_SLOWUPDATE_RATE)
 	--end
 
-	if n % TEAM_SLOWUPDATE_RATE == 7 then
-		UpdateReclaimList()
+	if ((n % 450) == 30) then -- Spring stats history frames
+		local teamList = Spring.GetTeamList()
+		local str = "total_reclaimed_metal_" .. stats_index
+		for i = 1, #teamList do
+			local team = teamList[i]
+			if team ~= gaiaTeamID then
+				AddAwardPoints( 'reclaim', team, -reclaimListByTeam[team])
+				reclaimListByTeam[team] = 0
+				Spring.SetTeamRulesParam(team, str, awardData['reclaim'][team])
+			end
+		end
+		stats_index = stats_index + 1
 	end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
