@@ -497,7 +497,7 @@ function gadget:Initialize()
 
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
-		Spring.SetTeamRulesParam(teamList[i], "total_reclaimed_metal_0", 0)
+		Spring.SetTeamRulesParam(teamList[i], "stats_history_reclaim_0", 0)
 	end
  end
 
@@ -667,7 +667,7 @@ function gadget:GameFrame(n)
 
 	if ((n % 450) == 30) then -- Spring stats history frames
 		local teamList = Spring.GetTeamList()
-		local str = "total_reclaimed_metal_" .. stats_index
+		local str = "stats_history_reclaim_" .. stats_index
 		for i = 1, #teamList do
 			local team = teamList[i]
 			if team ~= gaiaTeamID then
