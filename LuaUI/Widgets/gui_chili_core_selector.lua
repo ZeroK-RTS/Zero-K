@@ -114,6 +114,10 @@ local function CheckHide()
 	end
 end
 
+function widget:PlayerChanged()
+	CheckHide()
+end
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
 options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm'}
 options = {

@@ -92,6 +92,12 @@ local function option_recreateWindow()
 	end
 end
 
+function widget:PlayerChanged(pID)
+	if pID == Spring.GetMyPlayerID() then
+		option_recreateWindow()
+	end
+end
+
 local function option_colourBlindUpdate()
 	positiveColourStr = (options.colourBlind.value and YellowStr) or GreenStr
 	negativeColourStr = (options.colourBlind.value and BlueStr) or RedStr
