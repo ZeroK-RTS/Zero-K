@@ -101,9 +101,33 @@ end
 local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
 
+local hidden = false
+local function CheckHide()
+	local shouldShow = (options.showCoreSelector.value == 'always') or (options.showCoreSelector.value == 'spec' and (not Spring.GetSpectatingState()))
+
+	if shouldShow and hidden then
+		hidden = false
+		screen0:AddChild(window_selector)
+	elseif not shouldShow and not hidden then
+		hidden = true
+		screen0:RemoveChild(window_selector)
+	end
+end
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm'}
 options = {
+	showCoreSelector = {
+		name = 'Selection Bar Visibility',
+		type = 'radioButton',
+		value = 'spec',
+		items = {
+			{key ='always', name='Always enabled'},
+			{key ='spec',   name='Hide when spectating'},
+			{key ='never',  name='Always disabled'},
+		},
+		OnChange = CheckHide,
+	},
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
 		type = 'number',
@@ -139,21 +163,6 @@ options = {
 		action = 'selectcomm',
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
-	},
-	
-	hideWindow = { type = 'button',
-		name = 'Hide Window',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		OnChange = function(self)
-			if not self.value then
-				screen0:AddChild(window_selector)
-			else
-				screen0:RemoveChild(window_selector)
-			end
-			
-		end
 	},
 }
 
@@ -1056,6 +1065,9 @@ function widget:Initialize()
 	self:ViewResize(viewSizeX, viewSizeY)
 	
 	InitializeUnits()
+	
+	hidden = false
+	CheckHide()
 end
 
 function widget:Shutdown()
