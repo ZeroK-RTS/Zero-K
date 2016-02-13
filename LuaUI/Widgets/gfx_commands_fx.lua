@@ -49,7 +49,7 @@ options = {
 		name = "Indicate for custom formations", 
 		desc = "Draw the command indication for commands given with custom formations.",
 		type = 'bool', 
-		value = false
+		value = true
 	},
 	onClick = {
 		name = "Indicate for clicks", 
