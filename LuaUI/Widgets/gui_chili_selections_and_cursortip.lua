@@ -1381,7 +1381,7 @@ local function SetHealthbar(tt_healthbar,health, maxhealth, unitID)
 		tt_healthbar:SetValue(tt_health_fraction)
 
 		local regenStr = ""
-		if unitID and (health < maxhealth) and (not select(3, Spring.IsUnitStunned())) then
+		if unitID and (health < maxhealth) and (not select(3, spGetUnitIsStunned(unitID))) then
 			local ud = UnitDefs[Spring.GetUnitDefID(unitID)]
 			local regen_timer = Spring.GetUnitRulesParam(unitID, "idleRegenTimer")
 			if regen_timer then
