@@ -10,7 +10,6 @@ function gadget:GetInfo()
 	}
 end
 
---local TESTMODE = true
 include("LuaRules/Configs/constants.lua")
 
 local spGetAllyTeamList = Spring.GetAllyTeamList
@@ -47,7 +46,6 @@ local terraformCost  = UnitDefNames["terraunit"].metalCost
 local mexDefID = UnitDefNames["cormex"].id
 local mexCost  = UnitDefNames["cormex"].metalCost
 
-local reclaimListByTeam = {}
 local shareListTemp1 = {}
 local shareListTemp2 = {}
 
@@ -206,14 +204,6 @@ local function awardAward(team, awardType, record)
 		return
 	end
 	awardList[team][awardType] = record
-
-	if TESTMODE then
-		for _,curTeam in pairs(totalTeamList) do
-			if curTeam ~= team then
-				awardList[curTeam][awardType] = nil
-			end
-		end
-	end
 end
 
 local function CopyTable(original) -- Warning: circular table references lead to
@@ -441,7 +431,6 @@ function gadget:Initialize()
 		local team = tempTeamList[i]
 		--Spring.Echo('team', team)
 		if team ~= gaiaTeamID then
-			reclaimListByTeam[team] = 0
 			totalTeamList[team] = team
 		end
 	end
@@ -577,16 +566,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	end
 end
 
-function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
-	if builderTeam == gaiaTeamID then
-		return true
-	end
-	if (part < 0) then
-		reclaimListByTeam[builderTeam] = reclaimListByTeam[builderTeam] + (part * FeatureDefs[featureDefID].metal)
-	end
-	return true
-end
-
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
 	if (not attackerTeam)
@@ -657,50 +636,13 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 	end
 end
 
-local stats_index = 1
-
 function gadget:GameFrame(n)
-
-	--if n%TEAM_SLOWUPDATE_RATE == 2 then
-	--	UpdateResourceStats((n-2)/TEAM_SLOWUPDATE_RATE)
-	--end
-
-	if ((n % 450) == 30) then -- Spring stats history frames
-		local teamList = Spring.GetTeamList()
-		local str = "stats_history_reclaim_" .. stats_index
-		for i = 1, #teamList do
-			local team = teamList[i]
-			if team ~= gaiaTeamID then
-				AddAwardPoints( 'reclaim', team, -reclaimListByTeam[team])
-				reclaimListByTeam[team] = 0
-				Spring.SetTeamRulesParam(team, str, awardData['reclaim'][team])
-			end
-		end
-		stats_index = stats_index + 1
-	end
 
 	if n % shareList_update == 1 and not spIsGameOver() then
 		UpdateShareList()
 	end
 
-	if TESTMODE then
-		local frame32 = (n) % 32
-		if (frame32 < 0.1) then
-			sentAwards = false
-		end
-		awardAward(0, 'rezz', '12 super rezz go')
-		awardAward(0, 'pwn', '100000 damage!')
-		awardAward(0, 'ouch', '3400000 damage ouch!')
-		awardAward(0, 'navy', '3400000 damage ouch!')
-		awardAward(0, 'air', '3400000 damage ouch!')
-		awardAward(0, 'nux', '3400000 damage ouch!')
-		awardAward(0, 'kam', '3400000 damage ouch!')
-		
-		awardAward(1, 'mex', '20 mexes built super')
-
-	else
-		if not spIsGameOver() then return end
-	end
+	if not spIsGameOver() then return end
 
 	if not sentAwards then
 		local units = spGetAllUnits()
@@ -711,15 +653,18 @@ function gadget:GameFrame(n)
 			gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		end
 
-		--new
-		ProcessAwardData()
-
-		--test values
-		if TESTMODE then
-			local testteam = 0
-
-		--]]
+		-- read externally tracked values
+		local last_history_frame = math.floor((n+420)/450)
+		local teams = Spring.GetTeamList()
+		for i = 1, #teams do
+			local team = teams[i]
+			if team ~= gaiaTeamID then
+				local totalReclaim = Spring.GetTeamRulesParam(team, "stats_history_reclaim_" .. last_history_frame)
+				AddAwardPoints('reclaim', team, totalReclaim)
+			end
 		end
+
+		ProcessAwardData()
 
 		_G.awardList = awardList
 		sentAwards = true
@@ -760,10 +705,6 @@ function gadget:Initialize()
 			name = Spring.GetPlayerInfo(leaderPlayerID)
 		end
 		teamNames[team] = name
-	end
-	--spSendCommands({'endgraph 0'})
-	if TESTMODE then
-		gadget:GameOver()
 	end
 end
 
