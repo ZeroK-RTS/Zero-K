@@ -86,9 +86,9 @@ local excessE = false
 options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
-	DestroyWindow()
+	local x,y,w,h = DestroyWindow()
 	if (not options.ecoPanelHideSpec.value) or (not Spring.GetSpectatingState()) then
-		CreateWindow()
+		CreateWindow(x,y,w,h)
 	end
 end
 
@@ -590,7 +590,7 @@ function widget:Initialize()
 	option_recreateWindow()
 end
 
-function CreateWindow()
+function CreateWindow(oldX, oldY, oldW, oldH)
 	local function SetReserveByMouse(self, x, y, mouse, metal)
 		local a,c,m,s = spGetModKeyState()
 		if not c then
@@ -625,10 +625,10 @@ function CreateWindow()
 		name="EconomyPanelDefault",
 		padding = {0,0,0,0},
 		-- right = "50%",
-		x = screenHorizCentre - economyPanelWidth/2,
-		y = 0,
-		clientWidth  = economyPanelWidth,
-		clientHeight = 50,
+		x = oldX or (screenHorizCentre - economyPanelWidth/2),
+		y = oldY or 0,
+		clientWidth  = oldW or economyPanelWidth,
+		clientHeight = oldH or 50,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -993,8 +993,10 @@ end
 
 function DestroyWindow()
 	if window then
+		local x,y,w,h = window.x, window.y, window.width, window.height
 		window:Dispose()
 		window = nil
+		return x,y,w,h 
 	end
 end
 
