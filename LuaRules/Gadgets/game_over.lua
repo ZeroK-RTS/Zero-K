@@ -201,7 +201,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
-		if teamList == nil then return end	-- empty allyteam, don't bother
+		if teamList == nil or (#teamList == 0) then return end	-- empty allyteam, don't bother
 		
 		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 			EchoUIMessage("Game Over: DEBUG")
