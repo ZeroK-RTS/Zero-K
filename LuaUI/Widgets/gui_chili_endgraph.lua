@@ -23,21 +23,27 @@ function widget:GetInfo() return {
 
 local buttons = {
 	{"metalProduced"   , "Metal Produced"},
-	{"reclaim"         , "Metal Reclaimed"},
+	{"metal_income"    , "Metal Income"},
+	{"metal_reclaim"   , "Metal Reclaimed"},
 	{"metalExcess"     , "Metal Excess"},
 
 	{"energyProduced"  , "Energy Produced"},
+	{"energy_income"   , "Energy Income"},
 
 	{"damageDealt"     , "Damage Dealt"},
 	{"damageReceived"  , "Damage Received"},
 
 	{"unitsProduced"   , "Units Built"},
+	{"unit_value"      , "Unit Value"},
 	{"unitsKilled"     , "Units Killed"},
 	{"unitsDied"       , "Units Lost"},
 }
 
 local rulesParamStats = {
-	reclaim = true,
+	metal_reclaim = true,
+	unit_value = true,
+	metal_income = true,
+	energy_income = true,
 }
 
 local graphLength = 0
