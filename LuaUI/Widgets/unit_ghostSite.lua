@@ -1,5 +1,6 @@
 -- $Id$
 local versionNumber = "1.03"
+local devCompat = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 function widget:GetInfo()
 	return {
@@ -41,6 +42,26 @@ local ResetGl
 local CheckSpecState
 local printDebug
 
+local teamID = 0
+local unitDefName = "tawf114"
+local unitDefID = UnitDefNames[unitDefName].id
+
+local shaderObj
+function InitShader()
+		shaderTemplate = include("Widgets/Shaders/default_tint.lua")
+
+    local shader = gl.CreateShader(shaderTemplate)
+    local errors = gl.GetShaderLog(shader)
+    if errors ~= "" then
+        Spring.Echo(errors)
+        return
+    end
+    shaderObj = {
+        shader = shader,
+        teamColorID = gl.GetUniformLocation(shader, "teamColor"),
+        tint = gl.GetUniformLocation(shader, "tint")
+    }
+end
 
 function widget:Update(dt)
 	updateTimer = updateTimer + dt
@@ -59,6 +80,9 @@ function widget:Update(dt)
 end
 
 function widget:DrawWorld()
+	if devCompat and not shaderObj then
+		InitShader()
+	end
 	DrawGhostSites()
 	DrawGhostFeatures()
 	ResetGl()
@@ -142,10 +166,22 @@ function DrawGhostSites()
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
 
+			local ghostTeamColor = {Spring.GetTeamColor(ghost[PARAM_TEAMID])}
 			gl.PushMatrix()
-			gl.Translate( x, y - 17, z)
+			gl.Translate( x, y - 17, z) 
+			if devCompat then
+				gl.UseShader(shaderObj.shader)
+	      gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
+	      gl.Uniform(shaderObj.tint, 0.1, 0.8, 0.2)
 
-			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false )
+	      gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
+	      gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
+	      gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
+	    else
+	    	gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
+	    end
+
+      gl.UseShader(0)
 
 			gl.PopMatrix()
 		else
