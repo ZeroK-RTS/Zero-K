@@ -808,7 +808,7 @@
     "armwar": {
         "name": "Warrior",
         "description": "Bot wsparcia",
-        "helptext": "Warrior ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości."
+        "helptext": "Warrior ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Warrior samoczynnie naprawia się."
     },
     "chickenspire": {
         "name": "Szpila kurczaków",
