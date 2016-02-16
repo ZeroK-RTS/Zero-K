@@ -15,8 +15,13 @@ VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 --[[ expose a randomness seed
 this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
 afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
-local private_seed = math.random(2000000000) -- must be an integer
-Spring.SetGameRulesParam("public_random_seed", math.random(2000000000))
+
+-- turns out synced RNG is seeded only *after* the game starts so we have to hack ourselves another source of randomness
+-- this makes the shuffle result discoverable through a widget with some extra work - hopefully the engine gets fixed sometime
+local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "some string")
+local private_seed = math.random(13,37) * public_seed
+
+Spring.SetGameRulesParam("public_random_seed", public_seed)
 local startboxConfig, manualStartposConfig = ParseBoxes()
 math.randomseed(private_seed)
 
@@ -74,6 +79,7 @@ function gadget:Initialize()
 		end
 	end
 
+	math.randomseed(private_seed)
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 
 	-- filter out fake teams (empty or Gaia)
