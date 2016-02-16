@@ -103,6 +103,7 @@ local staticO_small = {
 	tacnuke = 1,
 	empmissile = 1,
 	napalmmissile = 1,
+	wolverine_mine = 1,
 }
 
 local staticO_big = {
@@ -481,12 +482,7 @@ function gadget:Initialize()
 	end
 
 	for i=1,#UnitDefs do
-		if(UnitDefs[i].customParams.level) then comms[i] = true
-	end
-
-	local teamList = Spring.GetTeamList()
-	for i = 1, #teamList do
-		Spring.SetTeamRulesParam(teamList[i], "stats_history_reclaim_0", 0)
+		if(UnitDefs[i].customParams.dynamic_comm) then comms[i] = true
 	end
  end
 
@@ -502,7 +498,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 			local ud = UnitDefs[unitDefID]
 			local mCost = ud and ud.metalCost or 0
 			AddAwardPoints( 'cap', newTeam, mCost )
-			if (ud.customParams.commtype) then
+			if (ud.customParams.dynamic_comm) then
 				if (not cappedComs[unitID]) then
 					cappedComs[unitID] = select(6, spGetTeamInfo(oldTeam))
 				elseif (cappedComs[unitID] == select(6, spGetTeamInfo(newTeam))) then
@@ -550,7 +546,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 		end
 	else
 		local ud = UnitDefs[unitDefID]
-		if (ud.customParams.commtype and (not spAreTeamsAllied(killerTeam, unitTeam))) then
+		if (ud.customParams.dynamic_comm and (not spAreTeamsAllied(killerTeam, unitTeam))) then
 			AddAwardPoints( 'head', killerTeam, 1 )
 		elseif ud.name == "chicken_dragon" then
 			AddAwardPoints( 'dragon', killerTeam, 1 )
@@ -659,7 +655,7 @@ function gadget:GameFrame(n)
 		for i = 1, #teams do
 			local team = teams[i]
 			if team ~= gaiaTeamID then
-				local totalReclaim = Spring.GetTeamRulesParam(team, "stats_history_reclaim_" .. last_history_frame)
+				local totalReclaim = Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_" .. last_history_frame)
 				AddAwardPoints('reclaim', team, totalReclaim)
 			end
 		end
