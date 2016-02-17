@@ -324,7 +324,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
 	--spAddUnitImpulse(unitID,0,3,0)
-	if impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
+	if weaponDefID and attackerID and impulseWeaponID[weaponDefID] and Spring.ValidUnitID(attackerID) then
 		local defData = impulseWeaponID[weaponDefID]
 		local _,_,_,ux, uy, uz = spGetUnitPosition(unitID, true)
 		local_,_,_,ax, ay, az = spGetUnitPosition(attackerID, true)
