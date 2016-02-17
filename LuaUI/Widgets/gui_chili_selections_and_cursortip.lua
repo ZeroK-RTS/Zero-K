@@ -762,7 +762,7 @@ local function UpdateStaticGroupInfo()
 		if ud then
 			if ud.name ~= "terraunit" then
 				total_totalbp = total_totalbp + ud.buildSpeed * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-				total_maxhp = total_maxhp + select(2, Spring.GetUnitHealth(unitID))
+				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
 				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(unitID, defID)
 			end
 		end

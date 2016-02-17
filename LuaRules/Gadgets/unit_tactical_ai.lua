@@ -119,10 +119,6 @@ local function getUnitOrderState(unitID,data,cQueue)
 	elseif cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or fightTwo) then -- if I attack 
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
-			local los = spGetUnitLosState(target,data.allyTeam,false)
-			if los then
-				los = los.los
-			end
 			if not (cQueue[1].id == CMD_FIGHT or fightTwo) then -- only skirm single target when given the order manually
 				return target,false
 			else
@@ -137,17 +133,17 @@ local function getUnitOrderState(unitID,data,cQueue)
 end
 
 
-local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue,n)
+local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue,n)
 
 	local data = unit[unitID]
 
-	if enemy and los then
+	if enemy and typeKnown then
 	
 		local pointDis = spGetUnitSeparation(enemy,unitID,true)
 		
 		if pointDis then
 			local enemyRange = behaviour.swarmEnemyDefaultRange
-			if enemyUnitDef and los then
+			if enemyUnitDef and typeKnown then
 				enemyRange = UnitDefs[enemyUnitDef].maxWeaponRange
 			end
 			if pointDis < enemyRange+behaviour.swarmLeeway then -- if I am within enemy range
@@ -322,20 +318,20 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move,n)
 	return behaviour.skirmKeepOrder
 end
 
-local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue,n)
+local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue,n)
 
 	local data = unit[unitID]
 
 	if (not enemy) or (#cQueue > 0 and cQueue[1].id == CMD_ATTACK and not cQueue[1].options.internal) or -- if I have been given attack order manually do not flee
-	not ( (los and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and not UnitDefs[enemyUnitDef].modCategories["unarmed"]))) 
+	not ((typeKnown and (behaviour.flees[enemyUnitDef] or (behaviour.fleeCombat and not UnitDefs[enemyUnitDef].modCategories["unarmed"]))) 
 	-- if I have los and the unit is a fleeable or a unit is unarmed and I flee combat - flee
-	or (not los and behaviour.fleeRadar)) then -- if I do not have los and flee radar dot, flee
+	or (not typeKnown and behaviour.fleeRadar)) then -- if I do not have los and flee radar dot, flee
 		return false
 	end
 
 	local enemyRange = behaviour.minFleeRange
 	
-	if enemyUnitDef and los then
+	if enemyUnitDef and typeKnown then
 		local range = UnitDefs[enemyUnitDef].maxWeaponRange 
 		if range > enemyRange then
 			enemyRange = range
@@ -420,7 +416,7 @@ local function updateUnits(frame, start, increment)
 				
 				local alwaysJink = (((#cQueue > 0 and cQueue[1].id == CMD_FIGHT) or move) and behaviour.alwaysJinkFight)
 				local enemyUnitDef = false
-				local los = false
+				local typeKnown = false
 					
 				if not alwaysJink then
 					if enemy == -1 then -- if I am fighting/patroling ground get nearest enemy
@@ -433,9 +429,9 @@ local function updateUnits(frame, start, increment)
 					-- use AI on target
 
 					if enemy and not select(2,spGetUnitIsStunned(enemy)) then
-						los = spGetUnitLosState(enemy,data.allyTeam,false)
-						if los then
-							los = los.los
+						local states = spGetUnitLosState(enemy,data.allyTeam,false)
+						if states then
+							typeKnown = states.typed
 						end
 						enemyUnitDef = spGetUnitDefID(enemy)
 					end
@@ -443,23 +439,23 @@ local function updateUnits(frame, start, increment)
 				
 				local checkSkirm = true
 
-				if alwaysJink or (enemy and los and behaviour.swarms[enemyUnitDef]) then
+				if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
 					--Spring.Echo("unit checking swarm")
-					if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, los, move, cQueue, frame) then
+					if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
 						checkSkirm = false
 					else
 						ClearMoveGoal(unitID, data)
 					end
 				end
 				if checkSkirm then
-					if enemy and ((los and behaviour.skirms[enemyUnitDef]) or ((not los) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+					if enemy and ((typeKnown and behaviour.skirms[enemyUnitDef]) or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 						--Spring.Echo("unit checking skirm")
 						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, frame) then
 							ClearMoveGoal(unitID, data)
 						end
 					else
 						--Spring.Echo("unit checking flee")
-						if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, los,move, cQueue, frame) then
+						if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
 							ClearMoveGoal(unitID, data)
 						end
 					end
