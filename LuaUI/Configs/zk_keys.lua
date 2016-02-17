@@ -97,7 +97,7 @@ return {
 		--{	"guard",	"g",},
 		{	"areaguard",	"g",},
 		{	"sharedialog",	"h",},
-		{	"gameinfo",	"None",},
+		{	"gameinfo",	"Ctrl+i",},
 		{	"cloak",	"k",},
 		{	"togglelos",	"l",},
 		{	"loadunits",	"l",},
