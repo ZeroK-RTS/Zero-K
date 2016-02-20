@@ -204,6 +204,8 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local keyShift = 304
 
+local filledCircleOutFading = {} --Table of display lists keyed by cmdID
+
 --------------------------------------------------------------------------------
 -- Helper Functions
 --------------------------------------------------------------------------------
@@ -728,29 +730,39 @@ local function tVertsMinimap(verts)
 	end
 end
 
-local function DrawFilledCircle(pos, size, cornerCount)
-	glPushMatrix()
-	glTranslate(pos[1], pos[2], pos[3])
-	glBeginEnd(GL.TRIANGLE_FAN, function()
-		glVertex(0,0,0)
-		for t = 0, pi2, pi2 / cornerCount do
-			glVertex(sin(t) * size, 0, cos(t) * size)
-		end
-	end)
-	glPopMatrix()
+local function filledCircleVerts(cmd, cornerCount)
+	SetColor(cmd, 1)
+	glVertex(0,0,0)
+	SetColor(cmd, 0)
+	for t = 0, pi2, pi2 / cornerCount do
+		glVertex(sin(t), 0, cos(t))
+	end
+	gl.ColorMask(true)
 end
+
+-- local function DrawFilledCircle(pos, size, cornerCount)
+-- 	glPushMatrix()
+-- 	glTranslate(pos[1], pos[2], pos[3])
+-- 	glScale(size, 1, size)
+-- 	gl.CallList(filledCircleVerts)
+-- 	glPopMatrix()
+-- end
 
 local function DrawFilledCircleOutFading(pos, size, cornerCount)
 	glPushMatrix()
 	glTranslate(pos[1], pos[2], pos[3])
-	glBeginEnd(GL.TRIANGLE_FAN, function()
-		SetColor(usingCmd, 1)
-		glVertex(0,0,0)
-		SetColor(usingCmd, 0)
-		for t = 0, pi2, pi2 / cornerCount do
-			glVertex(sin(t) * size, 0, cos(t) * size)
-		end
-	end)
+	glScale(size, 1, size)
+	local cmd = usingCmd
+	if filledCircleOutFading[usingCmd] == nil then
+		cmd = 0
+	end
+	gl.CallList(filledCircleOutFading[cmd])
+	-- glBeginEnd(GL.TRIANGLE_FAN, function()
+		-- glVertex(0,0,0)
+		-- for t = 0, pi2, pi2 / cornerCount do
+		-- 	glVertex(sin(t), 0, cos(t))
+		-- end
+	-- end)
 	-- draw extra glow as base
 	-- has hardly any effect but doubles gpuTime, so disabled for now
 	-- glBeginEnd(GL.TRIANGLE_FAN, function()
@@ -861,6 +873,21 @@ function widget:DrawInMiniMap()
 		
 		DrawFormationLines(tVertsMinimap, 1)
 	glPopMatrix()
+end
+
+function InitFilledCircle(cmdID)
+	filledCircleOutFading[cmdID] = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, cmdID, 8) 
+end
+
+function widget:Initialize()
+	-- filledCircle = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, 8)
+	InitFilledCircle(CMD_MOVE)
+	InitFilledCircle(CMD_ATTACK)
+	InitFilledCircle(CMD.MANUALFIRE)
+	InitFilledCircle(CMD_UNLOADUNIT)
+	InitFilledCircle(CMD_UNIT_SET_TARGET)
+	InitFilledCircle(CMD_UNIT_SET_TARGET_CIRCLE)
+	InitFilledCircle(0)
 end
 
 function widget:Update(deltaTime)
