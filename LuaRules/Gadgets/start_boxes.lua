@@ -10,6 +10,9 @@ function gadget:GetInfo() return {
 	enabled  = true,
 } end
 
+local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+local shuffleMode = Spring.GetModOptions().shuffle or "off"
+
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
 --[[ expose a randomness seed
@@ -51,8 +54,94 @@ local function CheckStartbox (boxID, x, z)
 	return false
 end
 
+-- name, elo, clanShort, clanLong, isAI
+local function GetPlayerInfo (teamID)
+	local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+
+	if isAI then
+		return select(2, Spring.GetAIInfo(teamID)), -1000, "", "", true
+	end
+
+	local name = Spring.GetPlayerInfo(playerID) or "?"
+	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
+	local clanShort = customKeys.clan     or ""
+	local clanLong  = customKeys.clanfull or ""
+	local elo       = customKeys.elo      or "0"
+	return name, tonumber(elo), clanShort, clanLong, false
+end
+
+-- returns full name and short name (mostly for clans, eg. "Mean Machines" vs "MM")
+local function GetTeamNames (allyTeamID)
+	if allyTeamID == gaiaAllyTeamID then
+		return "Neutral", "Neutral" -- more descriptive than "Gaia"
+	end
+
+	local teamList = Spring.GetTeamList(allyTeamID) or {}
+	if #teamList == 0 then
+		return "Empty", "Empty"
+	end
+
+	local clanShortName, clanLongName
+	local clanFirst = true
+	local leaderName = ""
+	local leaderElo = -2000
+	local bots = 0
+	local humans = 0
+	for i = 1, #teamList do
+		local name, elo, clanShort, clanLong, isAI = GetPlayerInfo(teamList[i])
+		if clanFirst then
+			clanShortName = clanShort
+			clanLongName  = clanLong
+			clanFirst = false
+		else
+			if not isAI and clanShort ~= clanShortName then
+				clanShortName = ""
+				clanLongName = ""
+			end
+		end
+
+		if elo > leaderElo then
+			leaderName = name
+			leaderElo = elo
+		end
+
+		if isAI then
+			bots = bots + 1
+		else
+			humans = humans + 1
+		end
+	end
+
+	if humans == 1 then
+		return leaderName, leaderName
+	end
+
+	if humans == 0 then
+		return "AI", "AI"
+	end
+
+	if clanShortName ~= "" then
+		return clanLongName, clanShortName
+	end
+
+	--[[
+		North
+	]]
+
+	return ("Team " .. leaderName), leaderName
+end
+
 function gadget:Initialize()
-	
+
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local longName, shortName = GetTeamNames(allyTeamID)
+		Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, shortName)
+		Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, longName)
+		Spring.Echo("game_message: allyTeamID " .. allyTeamID .. " = " .. longName .. " (" .. shortName .. ")")
+	end
+
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", manualStartposConfig and 1 or 0)
 
@@ -80,10 +169,8 @@ function gadget:Initialize()
 	end
 
 	math.randomseed(private_seed)
-	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 
 	-- filter out fake teams (empty or Gaia)
-	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
@@ -91,8 +178,6 @@ function gadget:Initialize()
 			actualAllyTeamList[#actualAllyTeamList+1] = {allyTeamList[i], math.random()}
 		end
 	end
-
-	local shuffleMode = Spring.GetModOptions().shuffle or "off"
 
 	if (shuffleMode == "off") then
 
