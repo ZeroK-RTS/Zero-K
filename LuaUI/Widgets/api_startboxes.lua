@@ -12,7 +12,6 @@ if VFS.FileExists("mission.lua") then return end
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-local startBoxConfig, manualStartposConfig = ParseBoxes()
+local startBoxConfig = ParseBoxes()
 
 WG.startBoxConfig = startBoxConfig
-WG.manualStartposConfig = manualStartposConfig

@@ -10,10 +10,11 @@ function widget:GetInfo() return {
 
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
-local startboxConfig, manualStartposConfig = ParseBoxes()
+local startboxConfig = ParseBoxes()
 
 local rawBoxes = GetRawBoxes()
-for boxID, box in pairs(rawBoxes) do
+for boxID, boxx in pairs(rawBoxes) do
+	local box = boxx.boxes
 	for i = 1, #box do
 		local polygon = box[i]
 		local orientation = 0
@@ -234,12 +235,10 @@ function widget:Initialize()
 	end)
 
 	local myBoxID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(), "start_box_id")
-	if myBoxID then
-		allyStartBox = startboxConfig[myBoxID]
-		allyStartBoxRaw = rawBoxes[myBoxID]
-		if manualStartposConfig then
-			recommendedStartpoints = manualStartposConfig[myBoxID]
-		end
+	if myBoxID and startboxConfig[myBoxID] then
+		allyStartBox = startboxConfig[myBoxID].boxes
+		allyStartBoxRaw = rawBoxes[myBoxID].boxes
+		recommendedStartpoints = startboxConfig[myBoxID].startpoints
 	end
 
 	local shuffleMode = Spring.GetModOptions().shuffle or "off"
@@ -256,16 +255,16 @@ function widget:Initialize()
 
 		for i = 1, #actualAllyTeamList do
 			local id = actualAllyTeamList[i]
-			if ((id ~= myBoxID) and startboxConfig[id]) then
-				table.insert(enemyStartBoxes, startboxConfig[id])
-				table.insert(enemyStartBoxesRaw, rawBoxes[id])
+			if ((id ~= myBoxID) and startboxConfig[id] and startboxConfig[id].boxes) then
+				table.insert(enemyStartBoxes, startboxConfig[id].boxes)
+				table.insert(enemyStartBoxesRaw, rawBoxes[id].boxes)
 			end
 		end
 	else -- occupied boxes unknown; draw all
 		for id, box in pairs(startboxConfig) do
-			if (id ~= myBoxID) then
-				table.insert(enemyStartBoxes, box)
-				table.insert(enemyStartBoxesRaw, rawBoxes[id])
+			if (id ~= myBoxID and box.boxes) then
+				table.insert(enemyStartBoxes, box.boxes)
+				table.insert(enemyStartBoxesRaw, rawBoxes[id].boxes)
 			end
 		end
 	end

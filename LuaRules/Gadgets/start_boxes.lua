@@ -25,18 +25,17 @@ local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "s
 local private_seed = math.random(13,37) * public_seed
 
 Spring.SetGameRulesParam("public_random_seed", public_seed)
-local startboxConfig, manualStartposConfig = ParseBoxes()
+local startboxConfig = ParseBoxes()
 math.randomseed(private_seed)
 
 GG.startBoxConfig = startboxConfig
-GG.manualStartposConfig = manualStartposConfig
 
 local function CheckStartbox (boxID, x, z)
 	if not boxID then
 		return true
 	end
 
-	local box = startboxConfig[boxID]
+	local box = startboxConfig[boxID] and startboxConfig[boxID].boxes
 	if not box then
 		return true
 	end
@@ -124,26 +123,24 @@ local function GetTeamNames (allyTeamID)
 		return clanLongName, clanShortName
 	end
 
-	--[[
-		North
-	]]
+	if ((shuffleMode == "off")
+		or (GetTeamCount() == 2 and shuffleMode == "shuffle")
+		or (#startboxConfig == 1 and shuffleMode == "allshuffle")) -- actually means # == 2 since it counts from 0
+	then
+		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+		if boxID then
+			local box = startboxConfig[boxID]
+			return box.nameLong, box.nameShort
+		end
+	end
 
 	return ("Team " .. leaderName), leaderName
 end
 
 function gadget:Initialize()
 
-	local allyTeamList = Spring.GetAllyTeamList()
-	for i = 1, #allyTeamList do
-		local allyTeamID = allyTeamList[i]
-		local longName, shortName = GetTeamNames(allyTeamID)
-		Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, shortName)
-		Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, longName)
-		Spring.Echo("game_message: allyTeamID " .. allyTeamID .. " = " .. longName .. " (" .. shortName .. ")")
-	end
-
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
-	Spring.SetGameRulesParam("startbox_recommended_startpos", manualStartposConfig and 1 or 0)
+	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
 	local rawBoxes = GetRawBoxes()
 	for box_id, polygons in pairs(rawBoxes) do
@@ -158,19 +155,19 @@ function gadget:Initialize()
 		end
 	end
 	
-	if manualStartposConfig then
-		for box_id, startposes in pairs(manualStartposConfig) do
-			Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
-			for i = 1, #startposes do
-				Spring.SetGameRulesParam("startpos_x_" .. box_id .. "_" .. i, startposes[i][1])
-				Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
-			end
+	for box_id, box in pairs(startboxConfig) do
+		local startposes = box.startpoints
+		Spring.SetGameRulesParam("startpos_n_" .. box_id, #startposes)
+		for i = 1, #startposes do
+			Spring.SetGameRulesParam("startpos_x_" .. box_id .. "_" .. i, startposes[i][1])
+			Spring.SetGameRulesParam("startpos_z_" .. box_id .. "_" .. i, startposes[i][2])
 		end
 	end
 
 	math.randomseed(private_seed)
 
 	-- filter out fake teams (empty or Gaia)
+	local allyTeamList = Spring.GetAllyTeamList()
 	local actualAllyTeamList = {}
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
@@ -230,6 +227,14 @@ function gadget:Initialize()
 				end
 			end
 		end
+	end
+
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local longName, shortName = GetTeamNames(allyTeamID)
+		Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, shortName)
+		Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, longName)
+		Spring.Echo("game_message: allyTeamID " .. allyTeamID .. " = " .. longName .. " (" .. shortName .. ")")
 	end
 end
 
