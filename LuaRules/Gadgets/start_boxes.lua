@@ -130,7 +130,9 @@ local function GetTeamNames (allyTeamID)
 		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		if boxID then
 			local box = startboxConfig[boxID]
-			return box.nameLong, box.nameShort
+			if box.nameLong and box.nameShort then
+				return box.nameLong, box.nameShort
+			end
 		end
 	end
 
@@ -234,7 +236,6 @@ function gadget:Initialize()
 		local longName, shortName = GetTeamNames(allyTeamID)
 		Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, shortName)
 		Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, longName)
-		Spring.Echo("game_message: allyTeamID " .. allyTeamID .. " = " .. longName .. " (" .. shortName .. ")")
 	end
 end
 
