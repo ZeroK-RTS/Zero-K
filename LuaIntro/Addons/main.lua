@@ -21,29 +21,10 @@ local lastLoadMessage = ""
 local lastProgress = {0, 0}
 
 local progressByLastLine = {
-	["Parsing Map Information"] = {0, 5},
-	["Loading SMF"] = {5, 10},
-	["Loading Radar Icons"] = {10, 15},
-	["Loading GameData Definitions"] = {15, 20},
-	["Loading Sound Definitions"] = {20, 22},
-	["Creating Smooth Height Mesh"] = {22, 25},
-	["Creating QuadField & CEGs"] = {25, 30},
-	["Creating Unit Textures"] = {30, 35},
-	["Creating Sky"] = {35, 40},
-	["Loading Weapon Definitions"] = {40, 45},
-	["Loading Unit Definitions"] = {45, 50},
-	["Loading Feature Definitions"] = {50, 58},
-	--["PathCosts: writing"] = {55, 60},
-	["Initializing Map Features"] = {58, 65},
-	["Creating ShadowHandler & DecalHandler"] = {65, 68},
-	["Loading Map Tiles"] = {68, 70},
-	["Loading Square Textures"] = {70, 72},
-	["Creating TreeDrawer"] = {72, 75},
-	["Creating ProjectileDrawer & UnitDrawer"] = {75, 78},
-	["Creating Projectile Textures"] = {78, 80},
-	["Loading LuaRules"] = {80, 90},
-	["Loading LuaUI"] = {90, 95},
-	["Initializing PathCache"] = {95, 100},
+	["Parsing Map Information"] = {0, 20},
+	["Loading Weapon Definitions"] = {10, 50},
+	["Loading LuaRules"] = {40, 80},
+	["Loading LuaUI"] = {70, 100},
 	["Finalizing"] = {100, 100}
 }
 for name,val in pairs(progressByLastLine) do
@@ -52,6 +33,9 @@ end
 
 function addon.LoadProgress(message, replaceLastLine)
 	lastLoadMessage = message
+	if message:find("Path") then -- pathing has no rigid messages so cant use the table
+		lastProgress = {0.8, 1.0}
+	end
 	lastProgress = progressByLastLine[message] or lastProgress
 end
 
