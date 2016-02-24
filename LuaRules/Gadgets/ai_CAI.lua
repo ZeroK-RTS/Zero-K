@@ -27,6 +27,7 @@ local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetTeamResources 	= Spring.GetTeamResources
+local spGetTeamRulesParam	= Spring.GetTeamRulesParam
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetUnitHealth		= Spring.GetUnitHealth
@@ -281,7 +282,14 @@ local function updateTeamResourcing(team)
 	for i = econAverageMemory, 2, -1 do
 		averagedEcon.prevEcon[i] = averagedEcon.prevEcon[i-1]
 	end
-	averagedEcon.prevEcon[1] = {eInc = eInc, mInc = mInc, activeBp = mPull}
+	-- @see gui_chili_economy_panel2.lua for eco-params reference
+	local oddEnergyIncome = spGetTeamRulesParam(team, "OD_energyIncome") or 0
+	local oddEnergyChange = spGetTeamRulesParam(team, "OD_energyChange") or 0
+	averagedEcon.prevEcon[1] = {
+		eInc     = eInc + oddEnergyIncome - math.max(0, oddEnergyChange),
+		mInc     = mInc + mRec,
+		activeBp = mPull
+	}
 	-- calculate average
 	averagedEcon.aveEInc = 0
 	averagedEcon.aveMInc = 0
