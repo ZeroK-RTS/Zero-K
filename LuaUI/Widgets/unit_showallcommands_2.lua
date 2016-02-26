@@ -79,15 +79,17 @@ options = {
 			{name = 'All units with SHIFT',key='showallonshift', desc="Commands always hidden, but pressing SHIFT will draw it for all units.", hotkey=nil},
 			{name = 'Selected units on SHIFT',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
 		},
-		value = 'showminimal',  --default at start of widget is to be disabled!
+		value = 'onlyselection',  --default at start of widget
 		OnChange = function(self)
 			local key = self.value
 			if key == 'showallcommand' then
 				commandLevel = 5
 			elseif key == 'onlyselection' then
+				Spring.Echo("OnlySelection")
 				commandLevel = 4
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'onlyselectionlow' then
+				Spring.Echo("OnlySelectionLow")
 				commandLevel = 3
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showallonshift' then
@@ -116,6 +118,8 @@ options = {
 		end,
 	},
 }
+
+do options.showallcommandselection.OnChange(options.showallcommandselection) end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
