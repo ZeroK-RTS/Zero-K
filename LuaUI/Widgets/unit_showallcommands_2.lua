@@ -85,11 +85,9 @@ options = {
 			if key == 'showallcommand' then
 				commandLevel = 5
 			elseif key == 'onlyselection' then
-				Spring.Echo("OnlySelection")
 				commandLevel = 4
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'onlyselectionlow' then
-				Spring.Echo("OnlySelectionLow")
 				commandLevel = 3
 				UpdateSelection(spGetSelectedUnits())
 			elseif key == 'showallonshift' then
