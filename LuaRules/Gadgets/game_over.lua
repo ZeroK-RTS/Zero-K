@@ -178,8 +178,13 @@ local function CheckForVictory()
 		end
 	end
 	if count < 2 then
-		EchoUIMessage(( (lastAllyTeam and ("Alliance " .. lastAllyTeam)) or "Nobody") .. " wins!")
-		spGameOver({lastAllyTeam})
+		if ((not lastAllyTeam) or (count == 0)) then
+			Draw()
+		else
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
+			EchoUIMessage(name .. " wins!")
+			spGameOver({lastAllyTeam})
+		end
 	end
 end
 

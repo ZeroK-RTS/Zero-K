@@ -1082,7 +1082,11 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				else
 					allyTeamColor = {Spring.GetTeamColor(allyTeams[allyTeamID][1])}
 				end
-				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = ("Team " .. allyTeamID+1),textColor = allyTeamColor,})
+				local teamName = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
+				if string.len(teamName) > 10 then
+					teamName = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID)
+				end
+				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = teamName,textColor = allyTeamColor,})
 				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
 				local rstring = "smurf"
