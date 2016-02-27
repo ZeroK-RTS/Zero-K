@@ -372,12 +372,15 @@ local S1 = {
 	{6171, 6304},
 }
 
-local function combineTables(tabs)
+local function combineTables(boxesArray, startpointsArray)
 	local ret = {}
 	local id = 0
-	for i = 1, #tabs do
-		for j = 1, #tabs[i] do
-			ret[id] = { tabs[i][j] }
+	for i = 1, #boxesArray do
+		for j = 1, #boxesArray[i] do
+			ret[id] = {
+				boxes = { boxesArray[i][j] },
+				startpoints = { startpointsArray[i][j] },
+			}
 			id = id + 1
 		end
 	end
@@ -386,10 +389,10 @@ end
 
 local teams = GetTeamCount()
 
-if (teams < 6) then return combineTables({L5}), combineTables({S5}), supported_teamcounts
-elseif (teams == 6) then return combineTables({L5,L1}), combineTables({S5,S1}), supported_teamcounts
-elseif (teams < 11) then return combineTables({L10}), combineTables({S10}), supported_teamcounts
-elseif (teams == 11) then return combineTables({L10,L1}), combineTables({S10,S1}), supported_teamcounts
-elseif (teams < 16) then return combineTables({L10,L5}), combineTables({S10,S5}), supported_teamcounts
-else return combineTables({L10,L5,L1}), combineTables({S10,S5,S1}), supported_teamcounts
+if (teams < 6) then return combineTables({L5}, {S5}), supported_teamcounts
+elseif (teams == 6) then return combineTables({L5,L1}, {S5,S1}), supported_teamcounts
+elseif (teams < 11) then return combineTables({L10}, {S10}), supported_teamcounts
+elseif (teams == 11) then return combineTables({L10,L1}, {S10,S1}), supported_teamcounts
+elseif (teams < 16) then return combineTables({L10,L5}, {S10,S5}), supported_teamcounts
+else return combineTables({L10,L5,L1}, {S10,S5,S1}), supported_teamcounts
 end

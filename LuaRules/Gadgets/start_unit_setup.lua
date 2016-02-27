@@ -220,15 +220,13 @@ local function getMiddleOfStartBox(teamID)
 	local x = Game.mapSizeX / 2
 	local z = Game.mapSizeZ / 2
 
-	if GG.manualStartposConfig then
-		local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-		if boxID then
-			local startposList = GG.manualStartposConfig[boxID]
-			if startposList then
-				local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
-				x = startpos[1]
-				z = startpos[2]
-			end
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	if boxID then
+		local startposList = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
+		if startposList then
+			local startpos = startposList[1] -- todo: distribute afkers over them all instead of always using the 1st
+			x = startpos[1]
+			z = startpos[2]
 		end
 	end
 
