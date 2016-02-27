@@ -74,12 +74,6 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"armsnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
-local scorcherSwarmieeArray = {}
-for unitName, def in pairs(UnitDefNames) do
-	local id = def.id
-	scorcherSwarmieeArray[id] = true
-end
-
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
 lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
@@ -118,6 +112,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 local riotRangeSkirmieeArray = NameToDefID({
 	"panther",
 	"corsh",
+	"armwar",
 	"hoverscout",
 	"shipscout",
 	"shipraider",
@@ -152,7 +147,6 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	"armcom",
 	"armadvcom",
 
-	"armwar",
 	"hoverassault",
 	"arm_venom",
 	
@@ -481,7 +475,7 @@ local behaviourConfig = {
 	
 	["corgator"] = {
 		skirms = {}, 
-		swarms = scorcherSwarmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		localJinkOrder = false,
 		jinkTangentLength = 50,
@@ -710,6 +704,14 @@ local behaviourConfig = {
 	["spiderassault"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 50, 
+		minSwarmLeeway = 120, 
+		skirmLeeway = 40, 
+	},
+	["corraid"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
