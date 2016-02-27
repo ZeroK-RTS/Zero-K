@@ -99,7 +99,7 @@ return {
 		{	"sharedialog",	"h",},
 		{	"gameinfo",	"Ctrl+i",},
 		{	"cloak",	"k",},
-		{	"togglelos",	"l",},
+		{	"togglelos",	"Ctrl+l",},
 		{	"loadunits",	"l",},
 		{	"move",	"m",},
 		{	"singlestep",	"Alt+o",},
