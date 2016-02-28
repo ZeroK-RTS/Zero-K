@@ -18,8 +18,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 180,
-		planes  = 180,
+		default = 165,
+		planes  = 165,
 		subs    = 9,
 	},
 
@@ -31,7 +31,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	range                   = 270,
-	reloadtime              = 2.2,
+	reloadtime              = 2,
 	rgbcolor                = [[1 0.3 0.1]],
 	soundhit                = [[weapon/burn_mixed]],
 	soundStart              = [[weapon/cannon/outlaw_gun]],

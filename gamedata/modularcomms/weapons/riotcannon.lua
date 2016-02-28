@@ -15,8 +15,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 240,
-		planes  = 240,
+		default = 220.2,
+		planes  = 220.2,
 		subs    = 12,
 	},
 
@@ -28,7 +28,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	range                   = 270,
-	reloadtime              = 2.2,
+	reloadtime              = 2,
 	soundHit                = [[weapon/cannon/generic_cannon]],
 	soundStart              = [[weapon/cannon/outlaw_gun]],
 	soundStartVolume        = 3,
