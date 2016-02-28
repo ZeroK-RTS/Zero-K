@@ -90,7 +90,7 @@ unitDef = {
 
     HAMMER_WEAPON = {
       name                    = [[Light Plasma Cannon]],
-      accuracy                = 350,
+      accuracy                = 220,
       areaOfEffect            = 16,
       craterBoost             = 0,
       craterMult              = 0,
