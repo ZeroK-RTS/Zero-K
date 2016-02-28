@@ -102,15 +102,16 @@ function ParseBoxes ()
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				local midX = (box[1]+box[3]) / 2
+				local midZ = (box[2]+box[4]) / 2
+
 				box[1] = box[1]*Game.mapSizeX
 				box[2] = box[2]*Game.mapSizeZ
 				box[3] = box[3]*Game.mapSizeX
 				box[4] = box[4]*Game.mapSizeZ
 
-				local longName = "Team Center"
+				local longName = "Center"
 				local shortName = "Center"
-				local midX = (box[1]+box[3]) / 2
-				local midZ = (box[2]+box[4]) / 2
 
 				if (midX < 0.33) then
 					if (midZ < 0.33) then
