@@ -682,14 +682,6 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
--- Ugly hack for un-Valk-transportable commanders
--- Remove once Spring.SetUnitMass exists
-for name, ud in pairs(UnitDefs) do
-	if ud.customparams.dynamic_comm and ud.mass < 351 then
-		ud.mass = 351 -- valk + 1
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Set incomes
