@@ -3868,7 +3868,7 @@ local function setAllyteamStartLocations(allyTeam)
 
 	local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 	if boxID then
-		local boxConfig = GG.startboxConfig[boxID] and GG.startboxConfig[boxID].startpoints
+		local boxConfig = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
 		if boxConfig and boxConfig[1] then
 			for i = 1, listOfAis.count do
 				local team = listOfAis.data[i]
