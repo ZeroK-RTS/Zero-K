@@ -58,6 +58,10 @@ local strFormat 				= string.format
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
+VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
+local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
+local GetHumanName = Spring.Utilities.GetHumanName
+local GetUnitCost = Spring.Utilities.GetUnitCost
 
 local transkey = include("Configs/transkey.lua")
 
@@ -715,7 +719,7 @@ local function UpdateDynamicGroupInfo()
 
 			if name ~= "terraunit" then
 				if hp then--failsafe when switching spectator view.
-					total_cost = total_cost + Spring.Utilities.GetUnitCost(id, defID)*build
+					total_cost = total_cost + GetUnitCost(id, defID)*build
 					total_hp = total_hp + hp
 				end
 				
@@ -761,9 +765,9 @@ local function UpdateStaticGroupInfo()
 		ud = UnitDefs[defID]
 		if ud then
 			if ud.name ~= "terraunit" then
-				total_totalbp = total_totalbp + ud.buildSpeed * (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+				total_totalbp = total_totalbp + GetUnitBuildSpeed(unitID, defID)
 				total_maxhp = total_maxhp + (select(2, Spring.GetUnitHealth(unitID)) or 0)
-				total_finishedcost = total_finishedcost + Spring.Utilities.GetUnitCost(unitID, defID)
+				total_finishedcost = total_finishedcost + GetUnitCost(unitID, defID)
 			end
 		end
 	end
@@ -919,7 +923,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = Spring.Utilities.GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -993,7 +997,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = Spring.Utilities.GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -2027,7 +2031,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local unitDefID = spGetUnitDefID(tt_unitID)
 	tt_ud = UnitDefs[ unitDefID or -1]
 	
-	fullname = ((tt_ud and Spring.Utilities.GetHumanName(tt_unitID, tt_ud)) or "")	
+	fullname = ((tt_ud and GetHumanName(tt_unitID, tt_ud)) or "")	
 		
 	if not (tt_ud) then
 		--fixme
@@ -2054,7 +2058,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_unit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(tt_unitID, unitDefID)) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((GetUnitCost(tt_unitID, unitDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
@@ -2090,7 +2094,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		return false
 	end
 
-	local fullname = Spring.Utilities.GetHumanName(stt_unitID, stt_ud)	
+	local fullname = GetHumanName(stt_unitID, stt_ud)	
 	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	
@@ -2103,7 +2107,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	local tt_structure = {
 		leftbar = {
 			{ name= 'bp', directcontrol = 'buildpic_selunit' },
-			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((Spring.Utilities.GetUnitCost(stt_unitID, uDefID)) or '0') },
+			{ name= 'cost', icon = 'LuaUI/images/ibeam.png', text = cyan .. numformat((GetUnitCost(stt_unitID, uDefID)) or '0') },
 			
 			{ name='res_m', icon = 'LuaUI/images/metalplus.png', text = m },
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
@@ -2148,7 +2152,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		desc = ' (wreckage)'
 	end
 	tt_ud = UnitDefNames[live_name]
-	fullname = ((tt_ud and Spring.Utilities.GetHumanName(tt_unitID, tt_ud) .. desc) or tt_fd.tooltip or "")
+	fullname = ((tt_ud and GetHumanName(tt_unitID, tt_ud) .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
 		--fixme

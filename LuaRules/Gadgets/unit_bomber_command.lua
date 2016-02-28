@@ -550,10 +550,33 @@ function GG.RefuelComplete(bomberID)
 end
 
 function GG.LandComplete(bomberID)
+	local bomberData = bomberLanding[bomberID]
+	local padID = bomberData and bomberData.padID
+
 	CancelAirpadReservation(bomberID) -- cancel reservation and mark bomber as free to fire
 	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
 	spGiveOrderToUnit(bomberID,CMD.WAIT, emptyTable, 0)
+	
+	-- Check queue inheritence
+	local queueLength = spGetCommandQueue(bomberID, 0)
 	local queue = spGetCommandQueue(bomberID, 1)
+	if (queueLength == 0 or (queueLength == 1 and queue and queue[1] and (queue[1].id == CMD_REARM or queue[1].id == 0))) and 
+			(padID and airpadsData[padID] and not airpadsData[padID].mobile) then
+		local padQueueLength = spGetCommandQueue(padID, 0)
+		if padQueueLength > 0 then
+			local padQueue = spGetCommandQueue(padID, -1)
+			for i = 1, #padQueue do
+				padQueue[i][1] = padQueue[i].id
+				padQueue[i][2] = padQueue[i].params
+				padQueue[i][3] = padQueue[i].options
+			end
+			spGiveOrderToUnit(bomberID,CMD.STOP, emptyTable, 0)
+			Spring.GiveOrderArrayToUnitArray({bomberID}, padQueue)
+			return
+		end
+	end
+	
+	-- Remove rearm if the queue was not inherited.
 	if queue and queue[1] and queue[1].id == CMD_REARM then
 		rearmRemove[bomberID] = true --remove current RE-ARM command
 	end

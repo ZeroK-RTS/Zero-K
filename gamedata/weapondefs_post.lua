@@ -371,8 +371,8 @@ do
     local canAttack = false
     if (RawCanAttack(ud)) then
       canAttack = true
-    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo")) then
-      if (FacCanAttack(ud)) then
+    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname == "armasp") then
+      if (FacCanAttack(ud) or ud.unitname == "armasp") then
         canAttack = true
       end
     end

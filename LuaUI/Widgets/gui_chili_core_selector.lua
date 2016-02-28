@@ -17,6 +17,10 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
+local GetUnitCanBuild = Spring.Utilities.GetUnitCanBuild
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local GetUnitDefID      = Spring.GetUnitDefID
@@ -788,7 +792,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	if ud.buildSpeed > 0 then  --- can build
+	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
 		local bQueue = GetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = GetUnitHealth(unitID)

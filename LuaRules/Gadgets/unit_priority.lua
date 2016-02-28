@@ -693,7 +693,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, teamID) 
 	local ud = UnitDefs[unitDefID]
 	
-	if ((ud.isFactory or ud.isBuilder) and ud.buildSpeed > 0) then 
+	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then 
 		SetPriorityState(unitID, DefaultState, CMD_PRIORITY)
 	else  -- not a builder priority makes no sense now
 		UnitPriority[unitID] = nil

@@ -46,3 +46,29 @@ function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	end
 	return 50
 end
+
+function Spring.Utilities.GetUnitCanBuild(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return 0
+	end
+	local ud = UnitDefs[unitDefID]
+	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
+	return buildPower > 0
+end
+
+function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return 0
+	end
+	local ud = UnitDefs[unitDefID]
+	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
+	if unitID then
+		local mult = (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
+		if realCost then
+			return mult * buildPower
+		end
+	end
+	return buildPower
+end
