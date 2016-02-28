@@ -38,11 +38,11 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 15.5,
+		default = 15,
 		subs    = 0.8,
 	},
 
-	duration                = 0.11,
+	duration                = 0.1,
 	edgeEffectiveness       = 0.99,
 	explosionGenerator      = [[custom:flash1blue]],
 	fireStarter             = 70,
@@ -54,8 +54,8 @@ local weaponDef = {
 	laserFlareSize          = 3,
 	minIntensity            = 1,
 	noSelfDamage            = true,
-	range                   = 300,
-	reloadtime              = 0.11,
+	range                   = 330,
+	reloadtime              = 3/30,
 	rgbColor                = [[0 1 1]],
 	soundStart              = [[weapon/laser/pulse_laser3]],
 	soundTrigger            = true,

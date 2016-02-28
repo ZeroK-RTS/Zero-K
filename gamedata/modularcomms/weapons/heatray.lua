@@ -13,8 +13,8 @@ local weaponDef = {
 	},		  
 
 	damage                  = {
-		default = 41,
-		planes  = 41,
+		default = 50,
+		planes  = 50,
 		subs    = 2.05,
 	},
 
@@ -31,7 +31,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	lodDistance             = 10000,
 	proximityPriority       = 4,
-	range                   = 320,
+	range                   = 300,
 	reloadtime              = 0.1,
 	rgbColor                = [[1 0.1 0]],
 	rgbColor2               = [[1 1 0.25]],

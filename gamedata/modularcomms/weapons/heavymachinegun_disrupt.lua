@@ -16,8 +16,8 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 16.5,
-		planes  = 16.5,
+		default = 15,
+		planes  = 15,
 		subs    = 0.825,
 	},
 
@@ -30,7 +30,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	range                   = 290,
-	reloadtime              = 0.167,
+	reloadtime              = 5/30,
 	rgbColor                = [[0.9 0.1 0.9]],
 	separation              = 1.5,
 	soundHit                = [[weapon/cannon/emg_hit]],

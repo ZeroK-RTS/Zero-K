@@ -15,7 +15,7 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 150,
+		default = 165,
 	},
 
 	explosionGenerator      = [[custom:flash2purple]],
@@ -28,7 +28,7 @@ local weaponDef = {
 	laserFlareSize          = 4.33,
 	minIntensity            = 1,
 	noSelfDamage            = true,
-	range                   = 330,
+	range                   = 300,
 	reloadtime              = 2,
 	rgbColor                = [[0.3 0 0.4]],
 	soundStart              = [[weapon/laser/heavy_laser5]],
