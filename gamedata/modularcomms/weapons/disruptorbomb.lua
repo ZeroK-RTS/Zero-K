@@ -11,7 +11,7 @@ local weaponDef = {
 	customParams            = {
 		slot = [[3]],
 		--timeslow_preset       = [[module_disruptorbomb]],
-		timeslow_damagefactor = [[5]],
+		timeslow_damagefactor = [[6]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		manualfire = 1,
 	},
@@ -31,7 +31,7 @@ local weaponDef = {
 	model                   = [[wep_b_fabby.s3o]],
     noSelfDamage            = false,
 	range                   = 450,
-	reloadtime              = 12,
+	reloadtime              = 25,
 	smokeTrail              = true,
 	soundHit                = [[weapon/aoe_aura]],
 	soundHitVolume          = 8,
