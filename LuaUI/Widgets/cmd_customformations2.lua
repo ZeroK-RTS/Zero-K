@@ -29,7 +29,7 @@ options = {
 		-- desc = 'Change the formation display. Formations are drawn by moving the mouse while the mouse button is pressed. Supported commands are Move, Fight, Patrol, Manual attacks, Jump and with the ALT key held down Attack, Set target and Unload.'
 		-- (new) players might not even know about custom formations, so ultimately this should probably be displayed above these options
 		type = 'radioButton',
-		value = 'both',
+		value = 'lines',
 		items={
 			{key='lines', name='Lines only', desc='Draw stippled lines along the drawn formation'},
 			{key='dots', name='Dots only', desc='Draw dots at command locations'},
