@@ -8049,7 +8049,7 @@
   <library_visual_scenes>
     <visual_scene id="Scene" name="Scene">
       <node id="Base" name="Base" type="NODE">
-        <translate sid="location">0.4727128 -0.0253156 49.0745</translate>
+        <translate sid="location">0.4727128 -0.0253156 45</translate>
         <rotate sid="rotationZ">0 0 1 0</rotate>
         <rotate sid="rotationY">0 1 0 0</rotate>
         <rotate sid="rotationX">1 0 0 0</rotate>
