@@ -21,15 +21,15 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Command Visibility/Formations'
-options_order = { 'drawmode', 'linewidth', 'dotsize' }
+options_order = { 'drawmode_v2', 'linewidth', 'dotsize' }
 options = {
-	drawmode = {
+	drawmode_v2 = {
 		name = 'Draw mode',
 		-- desc is not supported here :(
 		-- desc = 'Change the formation display. Formations are drawn by moving the mouse while the mouse button is pressed. Supported commands are Move, Fight, Patrol, Manual attacks, Jump and with the ALT key held down Attack, Set target and Unload.'
 		-- (new) players might not even know about custom formations, so ultimately this should probably be displayed above these options
 		type = 'radioButton',
-		value = 'lines',
+		value = 'both',
 		items={
 			{key='lines', name='Lines only', desc='Draw stippled lines along the drawn formation'},
 			{key='dots', name='Dots only', desc='Draw dots at command locations'},
@@ -838,12 +838,12 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:DrawWorld()
-	-- Draw lines when a path is drawn instead of a formation, OR when drawmode for formations is not "dots" only
-	if pathCandidate or options.drawmode.value ~= "dots" then
+	-- Draw lines when a path is drawn instead of a formation, OR when drawmode_v2 for formations is not "dots" only
+	if pathCandidate or options.drawmode_v2.value ~= "dots" then
 		DrawFormationLines(tVerts, 2)
 	end
-	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode for formations is not "lines" only
-	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode.value ~= "lines" then
+	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode_v2 for formations is not "lines" only
+	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode_v2.value ~= "lines" then
 		local camX, camY, camZ = spGetCameraPosition()
 		local at, p = spTraceScreenRay(Xs,Ys,true,false,false)
 		if at == "ground" then 

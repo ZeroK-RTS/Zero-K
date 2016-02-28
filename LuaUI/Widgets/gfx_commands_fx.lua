@@ -43,13 +43,13 @@ local spGetTeamColor			= Spring.GetTeamColor
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Command Visibility/Formations'
-options_order = { 'indicate_cf', 'onClick'}
+options_order = { 'indicate_cf_v2', 'onClick'}
 options = {
-	indicate_cf = {
+	indicate_cf_v2 = {
 		name = "Indicate for custom formations", 
 		desc = "Draw the command indication for commands given with custom formations.",
 		type = 'bool', 
-		value = false
+		value = true
 	},
 	onClick = {
 		name = "Indicate for clicks", 
@@ -327,7 +327,7 @@ function widget:CommandNotify(cmdID, cmdParams, options)
 end
 
 function widget:UnitCommandNotify(unitID, cmdID, cmdParams, cmdOptions)
-	if options.indicate_cf.value then
+	if options.indicate_cf_v2.value then
 		if type(cmdParams) == 'table' and #cmdParams >= 3 and OPTIONS.types[cmdID] then
 			AddCommandSpotter(cmdID, cmdParams[1], cmdParams[2], cmdParams[3], os.clock(), unitID)
 		end
