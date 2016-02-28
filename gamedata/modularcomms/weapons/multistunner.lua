@@ -19,7 +19,7 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 542.534722222222,
+		default = 550,
 	},
 
 	duration                = 8,
@@ -32,9 +32,9 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	paralyzer               = true,
-	paralyzeTime            = 6,
+	paralyzeTime            = 8,
 	range                   = 360,
-	reloadtime              = 12,
+	reloadtime              = 25,
 	rgbColor                = [[1 1 0.25]],
 	soundStart              = [[weapon/lightning_fire]],
 	soundTrigger            = false,
