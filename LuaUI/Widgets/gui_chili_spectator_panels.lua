@@ -871,7 +871,7 @@ local function GetOpposingAllyTeams()
 			local winString
 			local playerName
 			for j = 1, #teamList do
-				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[i])
+				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j])
 				if not isAI then
 					playerName = Spring.GetPlayerInfo(playerID)
 					winString = GetWinString(playerName)
@@ -890,8 +890,8 @@ local function GetOpposingAllyTeams()
 				nameSize = 1, -- Display size factor of the team name.
 				teamID = teamList[1], -- representitive teamID
 				color = {Spring.GetTeamColor(teamList[1])} or {1,1,1,1}, -- color of the teams text (color of first player)
-				playerName = playerName, -- representitive player name (for win counter)
-				winString = winString, -- Win string from win counter
+				playerName = playerName or "AI", -- representitive player name (for win counter)
+				winString = winString or "0", -- Win string from win counter
 			}
 		end
 	end
