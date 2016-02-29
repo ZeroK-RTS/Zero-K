@@ -64,7 +64,9 @@ function gadget:Initialize()
 
 	for i = 1, #teamList do
 		local teamID = teamList[i]
-		reclaimListByTeam[teamID] = 0
+
+		reclaimListByTeam[teamID] = -(Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. (stats_index - 1)) or 0)
+
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_0", 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_0", 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_0", 0)
