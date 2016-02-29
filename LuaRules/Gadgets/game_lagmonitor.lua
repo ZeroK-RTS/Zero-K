@@ -362,7 +362,11 @@ function gadget:GameFrame(n)
 					elseif #units > 0 then
 						spEcho("game_message: Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
 					end
-				end	-- if
+				else
+					if lagger.resigned then
+						spEcho("game_message: " .. lagger.name .. " resigned")
+					end
+				end
 			end	-- if
 		end	-- for
 	end	-- if
