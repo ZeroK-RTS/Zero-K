@@ -69,7 +69,7 @@ local function GetPlayerInfo (teamID)
 	return name, tonumber(elo), clanShort, clanLong, false
 end
 
--- returns full name and short name (mostly for clans, eg. "Mean Machines" vs "MM")
+-- returns full name, short name, clan full name, clan short name
 local function GetTeamNames (allyTeamID)
 	if allyTeamID == gaiaAllyTeamID then
 		return "Neutral", "Neutral" -- more descriptive than "Gaia"
@@ -88,14 +88,16 @@ local function GetTeamNames (allyTeamID)
 	local humans = 0
 	for i = 1, #teamList do
 		local name, elo, clanShort, clanLong, isAI = GetPlayerInfo(teamList[i])
-		if clanFirst then
-			clanShortName = clanShort
-			clanLongName  = clanLong
-			clanFirst = false
-		else
-			if not isAI and clanShort ~= clanShortName then
-				clanShortName = ""
-				clanLongName = ""
+		if not isAI then 
+			if clanFirst then
+				clanShortName = clanShort
+				clanLongName  = clanLong
+				clanFirst = false
+			else
+				if clanShort ~= clanShortName then
+					clanShortName = ""
+					clanLongName = ""
+				end
 			end
 		end
 
@@ -119,10 +121,6 @@ local function GetTeamNames (allyTeamID)
 		return "AI", "AI"
 	end
 
-	if clanShortName ~= "" then
-		return clanLongName, clanShortName
-	end
-
 	if ((shuffleMode == "off")
 		or (GetTeamCount() == 2 and shuffleMode == "shuffle")
 		or (#startboxConfig == 1 and shuffleMode == "allshuffle")) -- actually means # == 2 since it counts from 0
@@ -131,12 +129,12 @@ local function GetTeamNames (allyTeamID)
 		if boxID then
 			local box = startboxConfig[boxID]
 			if box.nameLong and box.nameShort then
-				return box.nameLong, box.nameShort
+				return box.nameLong, box.nameShort, clanLongName, clanShortName
 			end
 		end
 	end
 
-	return ("Team " .. leaderName), leaderName
+	return ("Team " .. leaderName), leaderName, clanLongName, clanShortName
 end
 
 function gadget:Initialize()
@@ -231,11 +229,23 @@ function gadget:Initialize()
 		end
 	end
 
+	local clans = {}
 	for i = 1, #allyTeamList do
 		local allyTeamID = allyTeamList[i]
-		local longName, shortName = GetTeamNames(allyTeamID)
+		local longName, shortName, clanLong, clanShort = GetTeamNames(allyTeamID)
 		Spring.SetGameRulesParam("allyteam_short_name_" .. allyTeamID, shortName)
 		Spring.SetGameRulesParam("allyteam_long_name_"  .. allyTeamID, longName)
+		if clanLong and clanLong ~= "" then
+			clans[clanLong] = clans[clanLong] or {0, clanShort, allyTeamID}
+			clans[clanLong][1] = clans[clanLong][1] + 1
+		end
+	end
+
+	for clanName, clan in pairs(clans) do
+		if (clan[1] == 1) and (clanName ~= "") then
+			Spring.SetGameRulesParam("allyteam_short_name_" .. clan[3], clan[2])
+			Spring.SetGameRulesParam("allyteam_long_name_"  .. clan[3], clanName)
+		end
 	end
 end
 
