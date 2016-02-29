@@ -56,11 +56,6 @@ local options = {
         name = 'Normal',
         desc = 'Normal game mode',
       },
-      {
-	key  = 'lavarise',
-	name = 'Lava Rising',
-	desc = 'Endlessly rising lava!  Fiery fun for the whole family!',
-      },
     },
   },
   {
@@ -105,29 +100,6 @@ local options = {
 			{ key='nomute', name = "No Mute", desc = 'Does not mute the lobby.' },
 		},
 	},
-    {
-        key='lavarisecycles',
-        name='Number of cycles',
-        desc='Set how many cycles before map floods completely.  The more cycles, the slower the map floods. ',
-        type='number',
-        def=7,
-        min=1,
-        max=2000,
-        step=1.0,
-        section='silly',
-    },
-
-    {
-        key='lavariseperiod',
-        name='Length of lava cycle',
-        desc='How long each rise will wait for the next in seconds. ',
-        type='number',
-        def=120,
-        min=1,
-        max=6000,
-        step=1,
-        section='silly',
-    },
   {
     key    = 'zombies',
     name   = 'Enable zombies',
