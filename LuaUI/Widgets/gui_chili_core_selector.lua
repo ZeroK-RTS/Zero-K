@@ -54,6 +54,7 @@ local stateCommands = {	-- FIXME: is there a better way of doing this?
   [CMD.ONOFF] = true,
   [CMD.REPEAT] = true,
   [CMD.IDLEMODE] = true,
+  [CMD.WAIT] = true,
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -798,7 +799,9 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			local _, _, _, _, buildProg = GetUnitHealth(unitID)
 			if not ud.isFactory then
 				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
 				if not cQueue[1] then
+					--Spring.Echo("\tCon "..unitID.." must be idle")
 					widget:UnitIdle(unitID, unitDefID, myTeamID)
 				end
 			end
@@ -838,6 +841,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
 	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.level)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
+		--Spring.Echo("Con "..unitID.." is idle")
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
@@ -851,6 +855,14 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 		return
 	end
 	if idleCons[unitID] then
+		--[[Spring.Echo("Con "..unitID.." got an order")
+		local cmdText="CMD ID "..tostring(cmdID)
+		cmdText=cmdText.." Opts: "..tostring(cmdOpts)
+		cmdText=cmdText.." Par:"
+		for _,p in ipairs(cmdParams) do
+			cmdText=cmdText.." "..tostring(p)
+		end
+		Spring.Echo("\t"..cmdText)]]
 		idleCons[unitID] = nil
 		wantUpdateCons = true
 	end
