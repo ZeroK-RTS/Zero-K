@@ -97,6 +97,8 @@ unitDef = {
         statsdamage = 10.4,
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
+		
+        light_height_limit = 0,
       },
 
       damage                  = {

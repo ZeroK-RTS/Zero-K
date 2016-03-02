@@ -93,9 +93,11 @@ unitDef = {
       craterMult              = 0.5,
 
       customParams            = {
-	gatherradius = [[90]],
-	smoothradius = [[60]],
-	smoothmult   = [[0.08]],
+        gatherradius = [[90]],
+        smoothradius = [[60]],
+        smoothmult   = [[0.08]],
+
+		light_camera_height = 1500,
       },
 	  
       damage                  = {

@@ -120,6 +120,7 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 220,
       reloadtime              = 5.5,
+      rgbcolor                = [[0.9 0.1 0.9]],
       soundHit                = [[explosion/wet/ex_underwater_pulse]],
       soundHitVolume          = 6,
       soundStart              = [[weapon/torpedo]],

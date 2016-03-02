@@ -104,6 +104,7 @@ unitDef = {
       model                   = [[wep_m_maverick.s3o]],
       range                   = 360,
       reloadtime              = 5,
+      rgbcolor                = [[0.9 0.1 0.9]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/rocket_fire]],

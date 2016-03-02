@@ -83,6 +83,8 @@ unitDef = {
 		disarmDamageOnly = 1,
 		disarmTimer      = 8, -- seconds
 	  
+		light_camera_height = 1500,
+		light_color = [[1 1 1]],
 	  },
 	  
       damage                  = {

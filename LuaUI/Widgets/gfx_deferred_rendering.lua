@@ -126,6 +126,14 @@ local function VerboseEcho(...)
 	end
 end
 
+local function Split(s, separator)
+	local results = {}
+	for part in s:gmatch("[^"..separator.."]+") do
+		results[#results + 1] = part
+	end
+	return results
+end
+
 --------------------------------------------------------------------------------
 
 local function GetLightsFromUnitDefs()
@@ -139,22 +147,20 @@ local function GetLightsFromUnitDefs()
 			--Dgun
 			--MissileLauncher
 			--StarburstLauncher
-			--LightningCannon --projectile is centered on emit point
-			--BeamLaser --Beamlasers shouldnt, because they are buggy (GetProjectilePosition returns center of beam, no other info avalable)
+			--LaserCannon
+			--LightningCannon
+			--BeamLaser
 		--Shouldnt:
 			--AircraftBomb
-			--LaserCannon --only sniper uses it, no need to make shot more visible
-			--Melee
 			--Shield
 			--TorpedoLauncher
-			--EmgCannon (only gorg uses it, and lights dont look so good too close to ground)
-			--Flame --a bit iffy cause of long projectile life... too bad though because it looks great.
 		
 		local weaponDef = WeaponDefs[weaponDefID]
+		local customParams = weaponDef.customParams or {}
 		
-		local r = weaponDef.visuals.colorR
-		local g = weaponDef.visuals.colorG
-		local b = weaponDef.visuals.colorB
+		local r = weaponDef.visuals.colorR + 0.2
+		local g = weaponDef.visuals.colorG + 0.2
+		local b = weaponDef.visuals.colorB + 0.2
 		
 		local weaponData = {r = r, g = g, b = b, radius = 100}
 		
@@ -166,13 +172,13 @@ local function GetLightsFromUnitDefs()
 			weaponData.radius = 150 * weaponDef.size
 		elseif (weaponDef.type == 'DGun') then
 			VerboseEcho('DGun', weaponDef.name, 'size', weaponDef.size)
-			weaponData.radius = 600
+			weaponData.radius = 800
 		elseif (weaponDef.type == 'MissileLauncher') then
 			VerboseEcho('MissileLauncher', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = 150 * weaponDef.size
 		elseif (weaponDef.type == 'StarburstLauncher') then
 			VerboseEcho('StarburstLauncher', weaponDef.name, 'size', weaponDef.size)
-			weaponData.radius = 200
+			weaponData.radius = 350
 		elseif (weaponDef.type == 'LightningCannon') then
 			VerboseEcho('LightningCannon', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = math.min(weaponDef.range, 250)
@@ -186,7 +192,34 @@ local function GetLightsFromUnitDefs()
 			end
 		end
 		
-		plighttable[weaponDefID] = weaponData
+		if customParams.light_radius then
+			weaponData.radius = tonumber(customParams.light_radius)
+		end
+		
+		if customParams.light_ground_height then
+			weaponData.groundHeightLimit = tonumber(customParams.light_ground_height)
+		end
+		
+		if customParams.light_camera_height then
+			weaponData.cameraHeightLimit = tonumber(customParams.light_camera_height)
+		end
+		
+		if customParams.light_color then
+			local colorList = Split(customParams.light_color, " ")
+			Spring.Utilities.TableEcho(colorList)
+			weaponData.r = colorList[1]
+			weaponData.g = colorList[2]
+			weaponData.b = colorList[3]
+		end
+	
+		--weaponData.r = 2
+		--weaponData.g = 2
+		--weaponData.b = 2
+		--weaponData.radius = 500
+		
+		if weaponData.radius > 0 and not customParams.fake_weapon then
+			plighttable[weaponDefID] = weaponData
+		end
 	end
 	return plighttable
 end
@@ -388,12 +421,22 @@ local function GetCameraHeight()
 end
 
 local function ProjectileLevelOfDetailCheck(param, proID, fps, height)
-	if param.beam then
-		return true
+	if param.cameraHeightLimit and param.cameraHeightLimit < height then
+		Spring.Echo("height", height)
+		if param.cameraHeightLimit*3 > height then
+			local fraction = param.cameraHeightLimit/height
+			if fps < 60 then
+				fraction = fraction*fps/60
+			end
+			local ratio = 1/fraction
+			return (proID%ratio < 1)
+		else
+			return false
+		end
 	end
 	
-	if height > 30 then
-		return false
+	if param.beam then
+		return true
 	end
 	
 	if fps < 60 then
@@ -417,7 +460,7 @@ function widget:DrawWorld()
 	end
 	
 	local fps = Spring.GetFPS()
-	local cameraHeight = math.floor(GetCameraHeight()/100)
+	local cameraHeight = math.floor(GetCameraHeight()*0.01)*100
 	--Spring.Echo("cameraHeight", cameraHeight, "fps", fps)
 	
 	local beamlightprojectiles = {}
@@ -453,7 +496,7 @@ function widget:DrawWorld()
 							beamlightprojectiles[beamLightCount].colMult = 1
 						end
 					else -- point type
-						if not (lightParams.heightCheck and lightParams.heightCheck < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
+						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
 							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, dx = 0, dy = 0, dz = 0, param = lightParams}
 						end

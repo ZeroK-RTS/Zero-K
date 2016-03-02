@@ -96,6 +96,10 @@ unitDef = {
       craterBoost             = 0.15,
       craterMult              = 0.3,
 
+      customParams        = {
+		light_camera_height = 1600,
+      },
+
       damage                  = {
         default = 42.6,
         planes  = 42.6,
