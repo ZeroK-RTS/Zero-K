@@ -161,7 +161,7 @@ end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponDefID, attackerID, attackerDefID, attackerTeam,projectileID)
-  if weaponDefID == puppyWeaponID and spValidUnitID(attackerID) then
+  if weaponDefID == puppyWeaponID and attackerID and spValidUnitID(attackerID) then
     if attackerTeam and unitTeam then
       -- attacker and attacked units are known (both units are alive)
       if spAreTeamsAllied(unitTeam, attackerTeam) then
