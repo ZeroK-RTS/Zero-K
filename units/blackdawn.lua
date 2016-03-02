@@ -88,6 +88,11 @@ unitDef = {
       craterBoost             = 0.123,
       craterMult              = 0.246,
 
+      customparams = {
+		light_camera_height = 2500,
+		light_color = [[0.7 0.35 0.1]],
+      },
+
       damage                  = {
         default = 220.5,
         subs    = 11,

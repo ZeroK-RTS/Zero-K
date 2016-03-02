@@ -165,8 +165,17 @@ local function GetLightsFromUnitDefs()
 		local weaponData = {r = r, g = g, b = b, radius = 100}
 		
 		if (weaponDef.type == 'Cannon') then
-			VerboseEcho('Cannon', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
-			weaponData.radius = 10 + 90 * weaponDef.size
+			if customParams.single_hit then
+				VerboseEcho('Gauss', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
+				weaponData.beamOffset = 1
+				weaponData.beam = true
+				r = 1
+				g = 2
+				b = 2
+			else
+				VerboseEcho('Cannon', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
+				weaponData.radius = 10 + 90 * weaponDef.size
+			end
 		elseif (weaponDef.type == 'LaserCannon') then
 			VerboseEcho('LaserCannon', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
 			weaponData.radius = 150 * weaponDef.size
@@ -212,10 +221,10 @@ local function GetLightsFromUnitDefs()
 			weaponData.b = colorList[3]
 		end
 	
-		--weaponData.r = 2
-		--weaponData.g = 2
-		--weaponData.b = 2
-		--weaponData.radius = 500
+		--weaponData.r = 1
+		--weaponData.g = 1
+		--weaponData.b = 6
+		--weaponData.radius = 300
 		
 		if weaponData.radius > 0 and not customParams.fake_weapon then
 			plighttable[weaponDefID] = weaponData
@@ -487,6 +496,10 @@ function widget:DrawWorld()
 				if lightParams and ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight) then
 					if lightParams.beam then --BEAM type
 						local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
+						if lightParams.beamOffset then
+							local m = lightParams.beamOffset
+							x, y, z = x - deltax*m, y - deltay*m, z - deltaz*m
+						end
 						beamLightCount = beamLightCount + 1
 						beamlightprojectiles[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = lightParams}
 						if lightParams.fadeTime then
@@ -498,6 +511,7 @@ function widget:DrawWorld()
 					else -- point type
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
+							Spring.Echo("lightParams", lightParams.r, lightParams.g, lightParams.b)
 							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, dx = 0, dy = 0, dz = 0, param = lightParams}
 						end
 					end

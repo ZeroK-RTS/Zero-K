@@ -87,6 +87,10 @@ unitDef = {
 
       customparams = {
         timeslow_damagefactor = 3,
+		
+		light_camera_height = 2500,
+		light_color = [[2.5 1 3]],
+		light_radius = 250,
       },
 
       damage                  = {
@@ -104,7 +108,6 @@ unitDef = {
       model                   = [[wep_m_maverick.s3o]],
       range                   = 360,
       reloadtime              = 5,
-      rgbcolor                = [[0.9 0.1 0.9]],
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med11]],
       soundStart              = [[weapon/missile/rocket_fire]],

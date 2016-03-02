@@ -106,14 +106,14 @@ unitDef = {
       cegTag                  = [[gauss_tag_h]],
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams = {
+        single_hit_multi = true,
+      },
 
       damage                  = {
         default = 160,
         planes  = 160,
-      },
-      
-      customParams = {
-        single_hit_multi = true,
       },
 
       explosionGenerator      = [[custom:gauss_hit_h]],

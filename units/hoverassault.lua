@@ -88,6 +88,8 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
+		light_camera_height = 1600,
+		light_color = [[1 1 6]],
 		light_radius = 300,
 	  },
 	  

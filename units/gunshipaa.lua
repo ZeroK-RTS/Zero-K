@@ -102,6 +102,9 @@ unitDef = {
 		isaa = [[1]],
 		script_reload = [[10]],
 		script_burst = [[3]],
+		
+		light_camera_height = 2500,
+		light_radius = 200,
 	  },
 
       damage                  = {

@@ -92,6 +92,9 @@ unitDef = {
         disarmDamageMult = 1,
         disarmDamageOnly = 1,
         disarmTimer      = 16, -- seconds
+	  
+		light_radius = 450,
+		light_color = [[1 1 1]],
       },
  
       damage                  = {

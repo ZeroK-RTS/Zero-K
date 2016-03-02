@@ -101,7 +101,7 @@ unitDef = {
       craterMult              = 0.3,
 
       customparams = {
-		light_camera_height = 1500,
+		light_camera_height = 2000,
         light_ground_height = 120,
       },
 	  
