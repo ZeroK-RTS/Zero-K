@@ -77,6 +77,8 @@ local spGetProjectileVelocity     = Spring.GetProjectileVelocity
 --------------------------------------------------------------------------------
 -- Config
 
+local gibParams = {r = 0.5, g = 0.5, b = 0.25, radius = 100}
+
 local GLSLRenderer = true
 
 --------------------------------------------------------------------------------
@@ -497,7 +499,7 @@ function widget:DrawWorld()
 				if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
 					--Spring.Echo('explosionflag = ', explosionflags)
 					pointLightCount = pointLightCount + 1
-					pointlightprojectiles[pointLightCount] = {r = 0.5, g = 0.5, b = 0.25, radius = 100, px = x, py = y, pz = z, dx = 0, dy = 0, dz = 0}
+					pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = gibParams}
 				end
 			else
 				lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
@@ -524,7 +526,7 @@ function widget:DrawWorld()
 					else -- point type
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
-							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, dx = 0, dy = 0, dz = 0, param = lightParams}
+							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = lightParams}
 						end
 					end
 				end
