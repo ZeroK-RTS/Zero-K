@@ -98,7 +98,9 @@ unitDef = {
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
 		
-        light_height_limit = 0,
+		light_camera_height = 1500,
+		light_color = [[0 0.01 0.03]],
+		light_radius = 100,
       },
 
       damage                  = {

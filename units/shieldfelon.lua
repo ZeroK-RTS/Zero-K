@@ -112,7 +112,8 @@ unitDef = {
         shield_drain = 75,
 		
 		light_camera_height = 2500,
-		light_color = [[0.8 0.2 1]],
+		light_color = [[0.7 0.18 0.95]],
+		light_radius = 120,
       },
 
       damage                  = {

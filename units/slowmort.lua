@@ -92,7 +92,7 @@ unitDef = {
 	  customparams = {
 	    timeslow_damagefactor = 3,
 		
-		light_color = [[5 2.5 7]],
+		light_color = [[3 1 4]],
 		light_radius = 500,
 	  },
 

@@ -102,6 +102,7 @@ unitDef = {
 
       customparams = {
 		light_camera_height = 2000,
+		light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
       },
 	  

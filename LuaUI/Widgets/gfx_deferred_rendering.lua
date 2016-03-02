@@ -213,18 +213,27 @@ local function GetLightsFromUnitDefs()
 			weaponData.cameraHeightLimit = tonumber(customParams.light_camera_height)
 		end
 		
+		if customParams.light_beam_start then
+			weaponData.beamStartOffset = tonumber(customParams.light_beam_start)
+		end
+		
+		if customParams.light_beam_offset then
+			weaponData.beamOffset = tonumber(customParams.light_beam_offset)
+		end
+		
 		if customParams.light_color then
 			local colorList = Split(customParams.light_color, " ")
-			Spring.Utilities.TableEcho(colorList)
 			weaponData.r = colorList[1]
 			weaponData.g = colorList[2]
 			weaponData.b = colorList[3]
 		end
-	
-		--weaponData.r = 1
-		--weaponData.g = 1
-		--weaponData.b = 6
-		--weaponData.radius = 300
+		
+		--weaponData.r = 3
+		--weaponData.g = 0.2
+		--weaponData.b = 4
+		--weaponData.radius = 120
+		--weaponData.beamStartOffset = 0.8
+		--weaponData.beamOffset = 0.8
 		
 		if weaponData.radius > 0 and not customParams.fake_weapon then
 			plighttable[weaponDefID] = weaponData
@@ -431,7 +440,6 @@ end
 
 local function ProjectileLevelOfDetailCheck(param, proID, fps, height)
 	if param.cameraHeightLimit and param.cameraHeightLimit < height then
-		Spring.Echo("height", height)
 		if param.cameraHeightLimit*3 > height then
 			local fraction = param.cameraHeightLimit/height
 			if fps < 60 then
@@ -500,6 +508,11 @@ function widget:DrawWorld()
 							local m = lightParams.beamOffset
 							x, y, z = x - deltax*m, y - deltay*m, z - deltaz*m
 						end
+						if lightParams.beamStartOffset then
+							local m = lightParams.beamStartOffset
+							x, y, z = x + deltax*m, y + deltay*m, z + deltaz*m
+							deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
+						end
 						beamLightCount = beamLightCount + 1
 						beamlightprojectiles[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = lightParams}
 						if lightParams.fadeTime then
@@ -511,7 +524,6 @@ function widget:DrawWorld()
 					else -- point type
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
-							Spring.Echo("lightParams", lightParams.r, lightParams.g, lightParams.b)
 							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, dx = 0, dy = 0, dz = 0, param = lightParams}
 						end
 					end

@@ -112,6 +112,9 @@ unitDef = {
 		flamethrower = [[1]],
 	    setunitsonfire = "1",
 		burntime = [[450]],
+		
+		light_camera_height = 1200,
+		light_color = [[0.7 0.35 0.14]],
 	  },
 	  
       damage                  = {

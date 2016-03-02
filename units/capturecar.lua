@@ -90,6 +90,8 @@ unitDef = {
 
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
+		
+		light_color = [[0 0.6 0.15]],
       },
 
       damage                  = {

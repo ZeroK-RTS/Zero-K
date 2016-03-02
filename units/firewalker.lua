@@ -145,6 +145,8 @@ unitDef = {
 		area_damage_duration = 16,
 
 		--lups_heat_fx = [[firewalker]],
+		light_camera_height = 2500,
+		light_color = [[0.7 0.35 0.14]],
 	  },
 	  
       damage                  = {

@@ -121,6 +121,9 @@ unitDef = {
 		flamethrower = [[1]],
 	    setunitsonfire = "1",
 		burntime = [[450]],
+
+		light_camera_height = 1200,
+		light_radius = 280,
 	  },
 	  
       damage                  = {
@@ -162,6 +165,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+		light_camera_height = 1200,
+		light_radius = 290,
+	  },
+	  
       damage                  = {
         default = 49,
         planes  = 49,
@@ -257,6 +265,9 @@ unitDef = {
 	  customParams        	  = {
 	    setunitsonfire = "1",
 	    burnchance = "1",
+		
+		light_color = [[0.8 0.4 0.1]],
+		light_radius = 320,
 	  },
 	  
       damage                  = {
