@@ -214,7 +214,7 @@ function gadget:Explosion_GetWantedWeaponDef()
 end
 
 function gadget:Explosion(weaponID, px, py, pz, ownerID)
-  if weaponID == puppyWeaponID and spValidUnitID(ownerID) then
+  if weaponID == puppyWeaponID and ownerID and spValidUnitID(ownerID) then
     -- the puppy landed
     RestorePuppy(ownerID, px, py, pz)
   end
