@@ -33,7 +33,6 @@ local commandList = {}
 
 local spGetUnitPosition			= Spring.GetUnitPosition
 local spGetCameraPosition		= Spring.GetCameraPosition
-local spGetUnitCommands			= Spring.GetUnitCommands
 local spGetPlayerInfo			= Spring.GetPlayerInfo
 local spTraceScreenRay			= Spring.TraceScreenRay
 local spLoadCmdColorsConfig		= Spring.LoadCmdColorsConfig
