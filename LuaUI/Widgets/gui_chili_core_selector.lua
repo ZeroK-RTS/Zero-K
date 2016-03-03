@@ -848,8 +848,11 @@ end
 -- Check current cmdID and the queue 
 local function isDoubleWait(unitID, cmdID)
 	if cmdID==CMD.WAIT then
-		local cmds=Spring.GetUnitCommands(unitID)
-		return #cmds==1 and cmds[1].id==CMD.WAIT
+		local cmdsLen=Spring.GetCommandQueue(unitID,0)
+		if cmdsLen==1 then
+			local cmds=Spring.GetCommandQueue(unitID,1)
+			return cmds[1].id==CMD.WAIT
+		end
 	end
 	return false
 end
