@@ -847,7 +847,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
@@ -857,7 +857,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	if idleCons[unitID] then
 		--[[Spring.Echo("Con "..unitID.." got an order")
 		local cmdText="CMD ID "..tostring(cmdID)
-		cmdText=cmdText.." Opts: "..tostring(cmdOpts)
+		cmdText=cmdText.." Opts: "..tostring(cmdOptions)
 		cmdText=cmdText.." Par:"
 		for _,p in ipairs(cmdParams) do
 			cmdText=cmdText.." "..tostring(p)

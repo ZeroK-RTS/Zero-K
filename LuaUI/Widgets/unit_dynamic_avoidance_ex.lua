@@ -370,7 +370,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeam,oldTeam)
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if myTeamID_gbl==unitTeam and issuedOrderTo_G[unitID] then
 		if (CMD.INSERT == cmdID and cmdParams[2] == CMD_MOVE) and
 		cmdParams[4] == issuedOrderTo_G[unitID][1] and 

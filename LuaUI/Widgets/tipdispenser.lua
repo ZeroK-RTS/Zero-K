@@ -375,7 +375,7 @@ function widget:Update(dt)
 end
 
 --tells people not to build the expensive stuff early
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if unitTeam ~= myTeam then return end
 	local t = Spring.GetGameSeconds()
 	local str

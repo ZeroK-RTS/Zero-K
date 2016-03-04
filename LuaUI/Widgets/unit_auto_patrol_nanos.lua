@@ -42,6 +42,8 @@ local spGiveOrderToUnit = Spring.GiveOrderToUnit
 
 local abs = math.abs
 
+local reverseCompat = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -122,8 +124,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
   end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams) 
-	if cmdID == CMD_PATROL and IsImmobileBuilder(UnitDefs[unitDefID]) and (math.bit_and(cmdOptions,CMD.OPT_SHIFT) <= 0) then
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions) 
+	if cmdID == CMD_PATROL and IsImmobileBuilder(UnitDefs[unitDefID]) and ((reverseCompat and (math.bit_and(cmdOptions,CMD.OPT_SHIFT) <= 0)) or not cmdOptions.shift) then
 		local x, y, z = spGetUnitPosition(unitID)
 		if math.abs(x - cmdParams[1]) > 30 or math.abs(z - cmdParams[3]) > 30 then
 			SetupUnit(unitID)
