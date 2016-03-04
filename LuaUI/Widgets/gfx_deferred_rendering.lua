@@ -80,6 +80,93 @@ local spGetProjectileVelocity     = Spring.GetProjectileVelocity
 local gibParams = {r = 0.5, g = 0.5, b = 0.25, radius = 100}
 
 local GLSLRenderer = true
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local colorOverride = {1, 1, 1}
+local colorBrightness = 1
+local radiusOverride = 200
+local overrideParam = {r = 1, g = 1, b = 1, radius = 200}
+
+local wantLoadParams = false
+
+local function Format(value)
+	return string.format("%.2f", value)
+end
+
+local function ApplySetting()
+	overrideParam.r = colorOverride[1] * colorBrightness
+	overrideParam.g = colorOverride[2] * colorBrightness
+	overrideParam.b = colorOverride[3] * colorBrightness
+	overrideParam.radius = radiusOverride
+	Spring.Echo("light_color = [[" .. Format(overrideParam.r) .. " " .. Format(overrideParam.g) .. " " .. Format(overrideParam.b) .. "]]")
+	Spring.Echo("light_radius = " .. Format(radiusOverride) .. ",")
+end
+
+local function LoadParams(param)
+	options.light_radius.value = param.radius
+	options.light_brightness.value = math.max(param.r, param.g, param.b)
+	options.light_color.value = {
+		param.r / options.light_brightness.value,
+		param.g / options.light_brightness.value,
+		param.b / options.light_brightness.value,
+	}
+	
+	radiusOverride = options.light_radius.value
+	colorBrightness = options.light_brightness.value
+	colorOverride = options.light_color.value
+	
+	Spring.Echo("Loading Settings")
+	ApplySetting()
+	wantLoadParams = false
+	WG.RemakeEpicMenu()
+end
+
+options_path = 'Settings/Graphics/Lighting'
+options_order = {'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options = {
+	light_radius = {
+		name = 'Light Radius',
+		type = 'number',
+		value = 3,
+		min = 20, max = 1000, step = 10,
+		OnChange = function (self)
+			radiusOverride = self.value
+			ApplySetting()
+		end,
+		advanced = true
+	},
+	light_brightness = {
+		name = 'Light Brightness',
+		type = 'number',
+		value = 3,
+		min = 0.05, max = 5, step = 0.05,
+		OnChange = function (self) 
+			colorBrightness = self.value
+			ApplySetting()
+		end,
+		advanced = true
+	},
+	light_color = {
+		name = 'Light Color',
+		type = 'colors',
+		value = { 0.8, 0.8, 0.8, 1},
+		OnChange = function (self)
+			colorOverride = self.value
+			ApplySetting()
+		end,
+		advanced = true
+	},
+	light_reload = {
+		name = 'Reload',
+		type = 'button',
+		desc = "Reload settings from the next projectile fired.",
+		OnChange = function (self)
+			wantLoadParams = true
+		end,
+		advanced = true
+	},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -499,10 +586,13 @@ function widget:DrawWorld()
 				if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
 					--Spring.Echo('explosionflag = ', explosionflags)
 					pointLightCount = pointLightCount + 1
-					pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = gibParams}
+					pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = overrideParam or gibParams}
 				end
 			else
 				lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
+				if wantLoadParams then
+					LoadParams(lightParams)
+				end
 				if lightParams and ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight) then
 					if lightParams.beam then --BEAM type
 						local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
@@ -516,7 +606,7 @@ function widget:DrawWorld()
 							deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
 						end
 						beamLightCount = beamLightCount + 1
-						beamlightprojectiles[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = lightParams}
+						beamlightprojectiles[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = overrideParam or lightParams}
 						if lightParams.fadeTime then
 							local timeToLive = Spring.GetProjectileTimeToLive(pID)
 							beamlightprojectiles[beamLightCount].colMult = timeToLive/lightParams.fadeTime
@@ -526,7 +616,7 @@ function widget:DrawWorld()
 					else -- point type
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
-							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = lightParams}
+							pointlightprojectiles[pointLightCount] = {px = x, py = y, pz = z, param = overrideParam or lightParams}
 						end
 					end
 				end

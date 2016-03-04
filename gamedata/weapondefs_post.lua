@@ -315,7 +315,18 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.shieldpowerregenenergy = 0
 	end
 end
- 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Set hardStop for defered lighting and to reduce projectile count
+
+ for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "LaserCannon" then
+		weaponDef.hardstop = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
