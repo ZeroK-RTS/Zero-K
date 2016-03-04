@@ -167,7 +167,6 @@ local spGiveOrder = Spring.GiveOrder
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
-local spTraceScreenRay = Spring.TraceScreenRay
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
@@ -209,6 +208,15 @@ local filledCircleOutFading = {} --Table of display lists keyed by cmdID
 --------------------------------------------------------------------------------
 -- Helper Functions
 --------------------------------------------------------------------------------
+local function CulledTraceScreenRay(mx, my, coords, minimap)
+	local targetType, params = spTraceScreenRay(mx, my, coords, minimap)
+	if targetType == "ground" then
+		params[4], params[5], params[6] = nil, nil, nil
+		return targetType, params
+	end
+	return targetType, params
+end
+
 local function GetModKeys()
 	
 	local alt, ctrl, meta, shift = spGetModKeyState()
@@ -420,13 +428,11 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
-	Spring.GiveOrderToUnitArray(Spring.GetSelectedUnits(), cmdID, cmdParams, cmdOpts.coded)
-	--spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
 
 local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
-	Spring.GiveOrderToUnitArray(Spring.GetSelectedUnits(), cmdID, cmdParams, cmdOpts.coded)
-	--spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
 
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
@@ -471,7 +477,7 @@ function widget:MousePress(mx, my, mButton)
 		local overrideCmdID = overrideCmds[defaultCmdID]
 		if overrideCmdID then
 			
-			local targType, targID = spTraceScreenRay(mx, my, false, inMinimap)
+			local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 			if targType == 'unit' then
 				overriddenCmd = defaultCmdID
 				overriddenTarget = targID
@@ -506,7 +512,7 @@ function widget:MousePress(mx, my, mButton)
 	end
 	
 	-- Get clicked position
-	local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+	local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 	if not pos then return false end
 	
 	-- Setup formation node array
@@ -534,7 +540,7 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 	end
 	
 	-- Get clicked position
-	local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+	local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 	if not pos then return false end
 	
 	-- Add the new formation node
@@ -598,7 +604,7 @@ function widget:MouseRelease(mx, my, mButton)
 	if overriddenCmd then
 		
 		local targetID
-		local targType, targID = spTraceScreenRay(mx, my, false, inMinimap)
+		local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 		if targType == 'unit' then
 			targetID = targID
 		elseif targType == 'feature' then
@@ -626,7 +632,7 @@ function widget:MouseRelease(mx, my, mButton)
 		
 		-- Add final position (Sometimes we don't get the last MouseMove before this MouseRelease)
 		if (not inMinimap) or spIsAboveMiniMap(mx, my) then
-			local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+			local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 			if pos then
 				AddFNode(pos)
 			end
@@ -847,7 +853,7 @@ function widget:DrawWorld()
 	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode_v2 for formations is not "lines" only
 	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode_v2.value ~= "lines" then
 		local camX, camY, camZ = spGetCameraPosition()
-		local at, p = spTraceScreenRay(Xs,Ys,true,false,false)
+		local at, p = CulledTraceScreenRay(Xs,Ys,true,false,false)
 		if at == "ground" then 
 			local dx, dy, dz = camX-p[1], camY-p[2], camZ-p[3]
 			--zoomY = ((dx*dx + dy*dy + dz*dz)*0.01)^0.25	--tests show that sqrt(sqrt(x)) is faster than x^0.25
