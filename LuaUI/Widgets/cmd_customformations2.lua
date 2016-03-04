@@ -420,11 +420,13 @@ local function GiveNotifyingOrder(cmdID, cmdParams, cmdOpts)
 	if widgetHandler:CommandNotify(cmdID, cmdParams, cmdOpts) then
 		return
 	end
-	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	Spring.GiveOrderToUnitArray(Spring.GetSelectedUnits(), cmdID, cmdParams, cmdOpts.coded)
+	--spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
 
 local function GiveNonNotifyingOrder(cmdID, cmdParams, cmdOpts)
-	spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
+	Spring.GiveOrderToUnitArray(Spring.GetSelectedUnits(), cmdID, cmdParams, cmdOpts.coded)
+	--spGiveOrder(cmdID, cmdParams, cmdOpts.coded)
 end
 
 local function GiveNotifyingOrderToUnit(uID, cmdID, cmdParams, cmdOpts)
