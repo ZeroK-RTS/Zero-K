@@ -910,14 +910,6 @@ local function DrawRanges()
 	end
 end
 
-local function GetWeaponRanges(unitID,unitDefID)
-	if Spring.GetUnitRulesParam(unitID, "comm_level") then
-		
-	else
-		return
-	end
-end
-
 local function DrawRangeCircle(ux,uy,uz,range,r)
 	glLineWidth(lineConfig["lineWidth"])
 	glColor(1-(r/5), 0, 0, lineConfig["alphaValue"])
@@ -925,7 +917,6 @@ local function DrawRangeCircle(ux,uy,uz,range,r)
 end
 
 local function DrawComRanges(unitDefID,unitIDs)
-
 	for i=1,#unitIDs do
 		local unitID=unitIDs[i]
 		local ux, uy, uz = spGetUnitViewPosition(unitID)
