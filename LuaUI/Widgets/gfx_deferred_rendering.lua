@@ -321,6 +321,10 @@ function widget:DrawWorld()
 		return
 	end
 	
+	-- parameters for each light:
+	-- {x, y, z, params = {r, g, b, radius, ifBeam, [beamStartOffset, beamOffset]}}
+	-- Also dx, dy, dz for beams
+	
 	local beamLights = {}
 	local beamLightCount = 0
 	local pointLights = {}

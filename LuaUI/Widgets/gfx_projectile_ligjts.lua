@@ -2,16 +2,16 @@
 --------------------------------------------------------------------------------
 
 function widget:GetInfo()
-  return {
-	name      = "Projectile Lights",
-	version   = 3,
-	desc      = "Collects projectiles and sends them to the deferred renderer.",
-	author    = "beherith",
-	date      = "2015 Sept.",
-	license   = "GPL V2",
-	layer     = 0,
-	enabled   = true
-  }
+	return {
+		name      = "Projectile Lights",
+		version   = 3,
+		desc      = "Collects projectiles and sends them to the deferred renderer.",
+		author    = "GoogleFrog (beherith orgional)",
+		date      = "5 March 2016",
+		license   = "GPL V2",
+		layer     = 0,
+		enabled   = true
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -125,11 +125,6 @@ local projectileLightTypes = {}
 	--[4] radius
 	--[5] BEAMTYPE, true if BEAM
 
--- parameters for each light:
--- RGBA: strength in each color channel, radius in elmos.
--- pos: xyz positions
--- params: ABC: where A is constant, B is quadratic, C is linear (only for point lights)
-
 local function Split(s, separator)
 	local results = {}
 	for part in s:gmatch("[^"..separator.."]+") do
@@ -138,20 +133,11 @@ local function Split(s, separator)
 	return results
 end
 
-local verbose = false
-local function VerboseEcho(...)
-	if verbose then
-		Spring.Echo(...) 
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Light Defs
 
 local function GetLightsFromUnitDefs()
-	--The GetProjectileName function returns 'unitname_weaponnname'. EG: armcom_armcomlaser
-	--This is fine with BA, because unitnames dont use '_' characters
 	--Spring.Echo('GetLightsFromUnitDefs init')
 	local plighttable = {}
 	for weaponDefID = 1, #WeaponDefs do
@@ -179,34 +165,26 @@ local function GetLightsFromUnitDefs()
 		
 		if (weaponDef.type == 'Cannon') then
 			if customParams.single_hit then
-				VerboseEcho('Gauss', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
 				weaponData.beamOffset = 1
 				weaponData.beam = true
 				r = 1
 				g = 2
 				b = 2
 			else
-				VerboseEcho('Cannon', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
 				weaponData.radius = 10 + 90 * weaponDef.size
 			end
 		elseif (weaponDef.type == 'LaserCannon') then
-			VerboseEcho('LaserCannon', weaponDef.name, 'size', weaponDef.size, weaponDef.visuals.colorR, weaponDef.visuals.colorG, weaponDef.visuals.colorB)
 			weaponData.radius = 150 * weaponDef.size
 		elseif (weaponDef.type == 'DGun') then
-			VerboseEcho('DGun', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = 800
 		elseif (weaponDef.type == 'MissileLauncher') then
-			VerboseEcho('MissileLauncher', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = 150 * weaponDef.size
 		elseif (weaponDef.type == 'StarburstLauncher') then
-			VerboseEcho('StarburstLauncher', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = 350
 		elseif (weaponDef.type == 'LightningCannon') then
-			VerboseEcho('LightningCannon', weaponDef.name, 'size', weaponDef.size)
 			weaponData.radius = math.min(weaponDef.range, 250)
 			weaponData.beam = true
 		elseif (weaponDef.type == 'BeamLaser') then
-			VerboseEcho('BeamLaser', weaponDef.name, 'rgbcolor', weaponDef.visuals.colorR)
 			weaponData.radius = math.min(weaponDef.range, 150)
 			weaponData.beam = true
 			if weaponDef.beamTTL > 2 then
@@ -240,13 +218,6 @@ local function GetLightsFromUnitDefs()
 			weaponData.g = colorList[2]
 			weaponData.b = colorList[3]
 		end
-		
-		--weaponData.r = 3
-		--weaponData.g = 0.2
-		--weaponData.b = 4
-		--weaponData.radius = 120
-		--weaponData.beamStartOffset = 0.8
-		--weaponData.beamOffset = 0.8
 		
 		if weaponData.radius > 0 and not customParams.fake_weapon then
 			plighttable[weaponDefID] = weaponData
