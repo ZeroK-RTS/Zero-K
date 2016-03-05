@@ -118,6 +118,10 @@ unitDef = {
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
+		
+		light_camera_height = 1800,
+		light_color = [[1 0.3 1.2]],
+		light_radius = 200,
       },
 
       damage                  = {

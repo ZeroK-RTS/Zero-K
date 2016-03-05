@@ -95,6 +95,13 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams        = {
+		light_camera_height = 500,
+		light_color = [[1 1 0.7]],
+		light_radius = 120,
+		light_beam_start = 0.25,
+      },
+	  
       damage                  = {
         default = 200.1,
         planes  = 200,
@@ -103,6 +110,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
       fireStarter             = 90,
+	  hardStop                = false,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,

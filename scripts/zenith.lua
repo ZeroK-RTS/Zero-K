@@ -54,6 +54,7 @@ local gravityDefs = {
 
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local gaiaTeam = Spring.GetGaiaTeamID()
 
 local launchInProgress = false
 local currentlyStunned
@@ -92,6 +93,7 @@ local function TransformMeteor(weaponDefID, proID, x, y, z)
 		speed = {vx, vy, vz}, 
 		ttl = timeToLiveDefs[weaponDefID],
 		gravity = gravityDefs[weaponDefID],
+		team = gaiaTeam,
 	})
 	if x then
 		Spring.SetProjectileTarget(newProID, x, y, z)
@@ -179,6 +181,7 @@ local function SpawnProjectileThread()
 			speed = {0, -1, 0}, 
 			ttl = 18000, -- 18000 = 10 minutes
 			gravity = meteorGravity,
+			team = gaiaTeam,
 		})
 		Spring.SetProjectileTarget(proID, ux + hoverPos[1], uy + HOVER_HEIGHT, uz + hoverPos[2])
 		

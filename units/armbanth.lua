@@ -115,6 +115,9 @@ unitDef = {
       customParams            = {
         statsprojectiles = 1,
         statsdamage = 3000,
+		
+		light_color = [[0.2 0.02 0.7]],
+		light_radius = 300,
       },
 
       damage                  = {
@@ -209,6 +212,9 @@ unitDef = {
 
       customParams            = {
         extra_damage = [[320]],
+		
+		light_camera_height = 1600,
+		light_color = [[0.7 0.7 1]],
       },
 
       damage                  = {

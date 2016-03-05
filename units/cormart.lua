@@ -84,6 +84,10 @@ unitDef = {
       craterBoost             = 1,
       craterMult              = 2,
 
+      customParams            = {
+		light_color = [[1.4 0.8 0.3]],
+      },
+
       damage                  = {
         default = 600.5,
         planes  = 600.5,

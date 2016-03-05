@@ -87,7 +87,13 @@ unitDef = {
       cegTag                  = [[RAVENTRAIL]],
       craterBoost             = 1,
       craterMult              = 2,
-
+	  
+	  customParams        	  = {
+		light_camera_height = 2500,
+		light_color = [[0.8 0.4 0.1]],
+		light_radius = 420,
+	  },
+	  
       damage                  = {
         default = 220.5,
         planes  = 220.5,

@@ -247,6 +247,12 @@ end
 	end
  end
 
+ for _, weaponDef in pairs(WeaponDefs) do
+	local name = weaponDef.name
+	if name:find('fake') or name:find('Fake') or name:find('Bogus') or name:find('NoWeapon') then
+		weaponDef.customparams.fake_weapon = 1
+	end
+ end
 -- Set defaults for napalm (area damage)
 local area_damage_defaults = VFS.Include("gamedata/unitdef_defaults/area_damage_defs.lua")
 for name, wd in pairs (WeaponDefs) do
@@ -309,7 +315,18 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.shieldpowerregenenergy = 0
 	end
 end
- 
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Set hardStop for defered lighting and to reduce projectile count
+
+ for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.weapontype == "LaserCannon" and weaponDef.hardstop == nil then
+		weaponDef.hardstop = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --

@@ -515,7 +515,7 @@ function widget:UnitFinished(unitID,unitDefID,unitTeam)
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if myTeamID==unitTeam and jumperDefs[unitDefID] then
 		if (cmdID ~= CMD.INSERT) then
 			if not jumpersUnitID[unitID] then

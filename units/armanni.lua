@@ -89,6 +89,9 @@ unitDef = {
       customParams            = {
         statsprojectiles = 1,
         statsdamage = 4000,
+		
+		light_color = [[0.2 0.02 0.7]],
+		light_radius = 320,
       },
 
       damage                  = {

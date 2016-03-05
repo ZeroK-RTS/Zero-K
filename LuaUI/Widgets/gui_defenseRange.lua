@@ -910,6 +910,47 @@ local function DrawRanges()
 	end
 end
 
+local function DrawRangeCircle(ux,uy,uz,range,r)
+	glLineWidth(lineConfig["lineWidth"])
+	glColor(1-(r/5), 0, 0, lineConfig["alphaValue"])
+	glDrawGroundCircle(ux, uy, uz, range, lineConfig["circleDivs"])
+end
+
+local function DrawComRanges(unitDefID,unitIDs)
+	for i=1,#unitIDs do
+		local unitID=unitIDs[i]
+		local ux, uy, uz = spGetUnitViewPosition(unitID)
+		local weap1 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_1")
+		if weap1 then
+			local weapRange=Spring.GetUnitWeaponState(unitID,weap1,"range")
+			if weapRange then
+				DrawRangeCircle(ux,uy,uz,weapRange,1)
+			end
+		end
+		
+		local weap2 = Spring.GetUnitRulesParam(unitID, "comm_weapon_num_2")
+		if weap2 then
+			local weapRange=Spring.GetUnitWeaponState(unitID,weap2,"range")
+			if weapRange then
+				DrawRangeCircle(ux,uy,uz,weapRange,2)
+			end
+		end
+		
+	end
+end
+
+local function DrawUnitsRanges(uDefID,uIDs)
+	local uWepRanges = wepRanges[uDefID]
+	if uWepRanges then
+		for i = 1, #uIDs do
+			local ux, uy, uz = spGetUnitViewPosition(uIDs[i])
+			for r = 1, #uWepRanges do
+				DrawRangeCircle(ux,uy,uz,uWepRanges[r],r)
+			end
+		end
+	end
+end
+
 function DrawSelectedRanges()
 	if ( options.showselectedunitrange.value == true ) then
 		-- range OpenGL stuff
@@ -920,16 +961,11 @@ function DrawSelectedRanges()
 		-- Set the color
 		-- Do the loop
 		for uDefID, uIDs in pairs(selUnits) do
-			local uWepRanges = wepRanges[uDefID]
-			if uWepRanges then
-				for i = 1, #uIDs do
-					local ux, uy, uz = spGetUnitViewPosition(uIDs[i])
-					for r = 1, #uWepRanges do
-						glLineWidth(lineConfig["lineWidth"])
-						glColor(1-(r/5), 0, 0, lineConfig["alphaValue"])
-						glDrawGroundCircle(ux, uy, uz, uWepRanges[r], lineConfig["circleDivs"])
-					end
-				end
+			-- Dynamic comm have different ranges and different weapons activated
+			if UnitDefs[uDefID].customParams.dynamic_comm then
+				DrawComRanges(uDefID,uIDs)
+			else
+				DrawUnitsRanges(uDefID,uIDs)
 			end
 		end
 	end

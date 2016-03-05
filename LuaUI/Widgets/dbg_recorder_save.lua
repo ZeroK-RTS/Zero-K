@@ -36,7 +36,7 @@ local unitIDtoKey = {}
 
 local white = "\255\255\255\255"
 
-function widget:UnitCommand(uID, uDID, tID, cmdID, options, params)
+function widget:UnitCommand(uID, uDID, tID, cmdID, params, options)
     if recording then        
         local frame = Spring.GetGameFrame()
         local cmdName = CMD[cmdID]

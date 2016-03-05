@@ -97,6 +97,9 @@ unitDef = {
 
       customParams            = {
         extra_damage = [[190]],
+		
+		light_camera_height = 1600,
+		light_color = [[0.7 0.7 1]],
       },
 
       cylinderTargeting      = 0,

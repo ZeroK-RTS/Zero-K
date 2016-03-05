@@ -303,7 +303,7 @@ function widget:GameFrame(f)
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	-- this won't handle priority for some reason, so that should be intercepted right in the widgets giving the order
 	if (not hide) and ((cmdID == CMD.MOVE_STATE) or (cmdID == CMD.FIRE_STATE)) then
 		SetUnitStateIcons(unitID)

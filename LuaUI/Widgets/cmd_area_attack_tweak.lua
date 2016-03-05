@@ -108,7 +108,7 @@ function GetAndRemoveHandledHistory(unitID)
 end
 
 function RevertAllButOneAttackQueue(unitID,attackList)
-	local queue = Spring.GetUnitCommands(unitID, -1)
+	local queue = Spring.GetCommandQueue(unitID, -1)
 	if queue then
 		local toRemoveCount = 0
 		local queueToRemove = {}

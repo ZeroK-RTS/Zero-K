@@ -639,7 +639,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	IgnoreUnit[unitID]=nil
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	IgnoreUnit[unitID]=nil
 	if issuedOrderTo[unitID] and (CMD.INSERT == cmdID and cmdParams[2] == CMD_WAIT_AT_BEACON) then 
 		local group = issuedOrderTo[unitID]

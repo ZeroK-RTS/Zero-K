@@ -167,6 +167,9 @@ end
 
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
+	if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
+		return
+	end
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam

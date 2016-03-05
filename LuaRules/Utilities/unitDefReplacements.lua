@@ -65,8 +65,8 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	local buildPower = (ud and ((ud.customParams.nobuildpower and 0) or ud.buildSpeed)) or 0
 	if unitID then
-		local mult = (Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
-		if realCost then
+		local mult = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
+		if mult then
 			return mult * buildPower
 		end
 	end

@@ -96,6 +96,8 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
+		
+		light_radius = 0,
 	  },
 
       damage                  = {

@@ -1166,7 +1166,6 @@ local function printWeapons(unitDef, unitID)
 				end
 			end
 
-			local weaponName = weaponDef.description or 'Weapon'
 			local isDuplicate = false
 
 			for i=1,#weaponStats do
@@ -1177,7 +1176,7 @@ local function printWeapons(unitDef, unitID)
 				end
 			end
 			
-			if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
+			if (not isDuplicate) and not weaponDef.customParams.fake_weapon then 
 				local wsTemp = {
 					weaponID = weaponID,
 					count = 1,
