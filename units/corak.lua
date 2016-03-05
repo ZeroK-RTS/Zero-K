@@ -92,6 +92,7 @@ unitDef = {
 
       customParams        = {
 		light_camera_height = 1200,
+		light_radius = 120,
       },
 	  
       damage                  = {

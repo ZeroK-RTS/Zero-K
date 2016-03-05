@@ -265,7 +265,7 @@ local function DrawLightType(lights, lightsCount, lighttype) -- point = 0 beam =
 			local dist_sq = (light.px-cx)^2 + (light.py-cy)^2 + (light.pz-cz)^2
 			local ratio = lightradius / math.sqrt(dist_sq) * 1.5
 			glUniform(lightposlocPoint, light.px, light.py, light.pz, param.radius) --in world space
-			glUniform(lightcolorlocPoint, param.r, param.g, param.b, 1) 
+			glUniform(lightcolorlocPoint, param.r * light.colMult, param.g * light.colMult, param.b * light.colMult, 1) 
 			glTexRect(
 				math.max(-1 , (sx-0.5)*2-ratio*screenratio), 
 				math.max(-1 , (sy-0.5)*2-ratio), 

@@ -322,7 +322,7 @@ end
 -- Set hardStop for defered lighting and to reduce projectile count
 
  for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.weapontype == "LaserCannon" then
+	if weaponDef.weapontype == "LaserCannon" and weaponDef.hardstop == nil then
 		weaponDef.hardstop = true
 	end
 end

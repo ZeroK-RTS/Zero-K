@@ -168,6 +168,8 @@ unitDef = {
 	  customParams        	  = {
 		light_camera_height = 1200,
 		light_radius = 290,
+		light_fade_time = 35,
+		light_fade_offset = 10,
 	  },
 	  
       damage                  = {

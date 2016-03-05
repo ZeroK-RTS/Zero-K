@@ -32,6 +32,7 @@ local colorOverride = {1, 1, 1}
 local colorBrightness = 1
 local radiusOverride = 200
 local overrideParam = {r = 1, g = 1, b = 1, radius = 200}
+local doOverride = false
 
 local wantLoadParams = false
 
@@ -68,8 +69,18 @@ local function LoadParams(param)
 end
 
 options_path = 'Settings/Graphics/Lighting'
-options_order = {'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options_order = {'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
+	light_override = {
+		name = "Override Parameters",
+		desc = "Override lights with the following parameters.",
+		type = 'bool',
+		value = false,
+		OnChange = function (self) 
+			doOverride = self.value
+		end,
+		advanced = true
+	},
 	light_radius = {
 		name = 'Light Radius',
 		type = 'number',
@@ -192,6 +203,11 @@ local function GetLightsFromUnitDefs()
 			end
 		end
 		
+		if customParams.light_fade_time and customParams.light_fade_offset then
+			weaponData.fadeTime = tonumber(customParams.light_fade_time)
+			weaponData.fadeOffset = tonumber(customParams.light_fade_offset)
+		end
+		
 		if customParams.light_radius then
 			weaponData.radius = tonumber(customParams.light_radius)
 		end
@@ -286,7 +302,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 				if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
 					--Spring.Echo('explosionflag = ', explosionflags)
 					pointLightCount = pointLightCount + 1
-					pointLights[pointLightCount] = {px = x, py = y, pz = z, param = overrideParam or gibParams}
+					pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or gibParams, colMult = 1}
 				end
 			else
 				lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
@@ -306,7 +322,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 							deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
 						end
 						beamLightCount = beamLightCount + 1
-						beamLights[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = overrideParam or lightParams}
+						beamLights[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = (doOverride and overrideParam) or lightParams}
 						if lightParams.fadeTime then
 							local timeToLive = Spring.GetProjectileTimeToLive(pID)
 							beamLights[beamLightCount].colMult = timeToLive/lightParams.fadeTime
@@ -316,7 +332,13 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 					else -- point type
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
-							pointLights[pointLightCount] = {px = x, py = y, pz = z, param = overrideParam or lightParams}
+							pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or lightParams}
+							if lightParams.fadeTime and lightParams.fadeOffset then
+								local timeToLive = Spring.GetProjectileTimeToLive(pID)
+								pointLights[pointLightCount].colMult = math.max(0, (timeToLive + lightParams.fadeOffset)/lightParams.fadeTime)
+							else
+								pointLights[pointLightCount].colMult = 1
+							end
 						end
 					end
 				end

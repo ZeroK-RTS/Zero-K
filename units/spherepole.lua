@@ -110,6 +110,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:BEAMWEAPON_HIT_ORANGE]],
       fireStarter             = 90,
+	  hardStop                = false,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
