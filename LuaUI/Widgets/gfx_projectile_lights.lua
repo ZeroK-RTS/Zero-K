@@ -28,6 +28,8 @@ local spGetProjectileVelocity     = Spring.GetProjectileVelocity
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local lightsEnabled = true
+
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
 local radiusOverride = 200
@@ -45,6 +47,7 @@ local function ApplySetting()
 	overrideParam.g = colorOverride[2] * colorBrightness
 	overrideParam.b = colorOverride[3] * colorBrightness
 	overrideParam.radius = radiusOverride
+	Spring.Utilities.TableEcho(overrideParam)
 	Spring.Echo("light_color = [[" .. Format(overrideParam.r) .. " " .. Format(overrideParam.g) .. " " .. Format(overrideParam.b) .. "]]")
 	Spring.Echo("light_radius = " .. Format(radiusOverride) .. ",")
 end
@@ -69,8 +72,16 @@ local function LoadParams(param)
 end
 
 options_path = 'Settings/Graphics/Lighting'
-options_order = {'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options_order = {'light_projectile_enable', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
+	light_projectile_enable = {
+		name = "Enable Projectile Lights",
+		type = 'bool',
+		value = true,
+		OnChange = function (self) 
+			lightsEnabled = self.value
+		end,
+	},
 	light_override = {
 		name = "Override Parameters",
 		desc = "Override lights with the following parameters.",
@@ -279,6 +290,10 @@ end
 
 local function GetProjectileLights(beamLights, beamLightCount, pointLights, pointLightCount)
 
+	if not lightsEnabled then
+		return beamLights, beamLightCount, pointLights, pointLightCount
+	end
+
 	local projectiles = spGetVisibleProjectiles()
 	if #projectiles == 0 then
 		return beamLights, beamLightCount, pointLights, pointLightCount
@@ -306,7 +321,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 				end
 			else
 				lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
-				if wantLoadParams then
+				if wantLoadParams and lightParams then
 					LoadParams(lightParams)
 				end
 				if lightParams and ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight) then
@@ -333,6 +348,9 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
 							pointLightCount = pointLightCount + 1
 							pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or lightParams}
+							-- Use the following to check heatray fadeout parameters.
+							--local timeToLive = Spring.GetProjectileTimeToLive(pID)
+							--Spring.MarkerAddPoint(x,y,z,timeToLive)
 							if lightParams.fadeTime and lightParams.fadeOffset then
 								local timeToLive = Spring.GetProjectileTimeToLive(pID)
 								pointLights[pointLightCount].colMult = math.max(0, (timeToLive + lightParams.fadeOffset)/lightParams.fadeTime)
