@@ -117,6 +117,7 @@ unitDef = {
       reloadtime              = 4,
       soundHit                = [[weapon/cannon/cannon_hit3]],
       soundStart              = [[weapon/cannon/heavy_cannon2]],
+      -- size = 5, -- maybe find a good size that is bigger than default
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 290,
