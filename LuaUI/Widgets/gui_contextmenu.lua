@@ -383,7 +383,7 @@ local function getHelpText(unitDef)
 end	
 
 
-local function getDescription(unitDef)
+local function getDescription(unitDef, unitID)
 	local data = WG.langData
 	local lang = (WG.lang and WG.lang()) or "en"
 	local desc
@@ -396,9 +396,17 @@ local function getDescription(unitDef)
 		desc = unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
 		font = nil
 	end
-		
-	return desc, font
 	
+	if unitID then
+		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
+		if buildPower then
+			buildPower = buildPower*10
+			desc = string.sub(desc, 0, (string.find(desc, "Builds at") or 100) - 1)
+			desc = desc .. "Builds at " .. buildPower .. " m/s"
+		end
+	end
+	
+	return desc, font
 end	
 
 local function GetShieldRegenDrain(wd)
@@ -1635,7 +1643,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		window_unitstats:Dispose()
 	end
 
-	local desc, font = getDescription(ud)
+	local desc, font = getDescription(ud, unitID)
 	
 	statswindows[num] = Window:New{  
 		x = x,
