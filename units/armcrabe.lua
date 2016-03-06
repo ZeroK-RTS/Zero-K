@@ -115,7 +115,6 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 600,
       reloadtime              = 4,
-	  size                    = 55,
       soundHit                = [[weapon/cannon/cannon_hit3]],
       soundStart              = [[weapon/cannon/heavy_cannon2]],
       turret                  = true,
