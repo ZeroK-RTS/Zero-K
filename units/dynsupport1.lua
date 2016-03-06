@@ -53,7 +53,7 @@ unitDef = {
   hideDamage          = false,
   iconType            = [[commander1]],
   idleAutoHeal        = 5,
-  idleTime            = 1800,
+  idleTime            = 0,
   leaveTracks         = true,
   losEmitHeight       = 40,
   mass                = 402,
@@ -103,7 +103,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Support Commander]],
+      description      = [[Wreckage - Engineer Commander]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2000,
@@ -123,7 +123,7 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Support Commander]],
+      description      = [[Debris - Engineer Commander]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2000,

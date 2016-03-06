@@ -30,7 +30,7 @@ unitDef = {
 
   customParams        = {
 	--description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
-	helptext       = [[The Guardian Chassis features two main weapon slots and an array of heavy artillery options, builds at 10 m/s.]],
+	helptext       = [[The Guardian Chassis features two main weapon slots and an array of heavy artillery options.]],
 	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],
 	statsname = [[dynassault1]],
@@ -49,7 +49,7 @@ unitDef = {
   hideDamage          = false,
   iconType            = [[commander1]],
   idleAutoHeal        = 5,
-  idleTime            = 1800,
+  idleTime            = 0,
   leaveTracks         = true,
   losEmitHeight       = 40,
   mass                = 423,
@@ -99,7 +99,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Siege Commander]],
+      description      = [[Wreckage - Guardian Commander]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2250,
@@ -120,7 +120,7 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Siege Commander]],
+      description      = [[Debris - Guardian Commander]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2250,

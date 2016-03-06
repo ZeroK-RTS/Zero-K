@@ -960,19 +960,20 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	local idle_autoheal = ud.customParams.idle_regen and tonumber(ud.customParams.idle_regen) or (ud.idleAutoHeal * 2)
-	if (ud.idleTime < 1800) or (idle_autoheal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
+	if (ud.idleTime < 1800) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
-		if ud.idleTime < 1800 or (idle_autoheal > 5) then
-			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(idle_autoheal) .. ' HP/s'
-			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
-		end
-		if ud.autoHeal > 0 then
-			cells[#cells+1] = ' - Combat regen: '
-			cells[#cells+1] = numformat(ud.autoHeal * 2) .. ' HP/s'
+		if ud.idleTime < 1800 then
+			if ud.idleTime > 0 then
+				cells[#cells+1] = ' - Idle regen: '
+				cells[#cells+1] = numformat(cp.idle_regen) .. ' HP/s'
+				cells[#cells+1] = ' - Time to enable: '
+				cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
+			else
+				cells[#cells+1] = ' - Combat regen: '
+				local dynamic_regen = unitID and Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate") or cp.idle_regen
+				cells[#cells+1] = numformat(dynamic_regen) .. ' HP/s'
+			end
 		end
 		if cp.amph_regen then
 			cells[#cells+1] = ' - Water regen: '
