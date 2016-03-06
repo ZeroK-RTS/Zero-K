@@ -17,7 +17,10 @@ local weaponDef = {
 				explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
 				rgbColor = [[0.2 1 0]],
 			},
-		}
+		},
+		
+		light_color = [[1.1 1.05 0.55]],
+		light_radius = 180,
 	},
 
 	damage                  = {

@@ -10,6 +10,12 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		
+		light_camera_height = 1800,
+		light_color = [[0.9 0.4 0.12]],
+		light_radius = 180,
+		light_fade_time = 40,
+		light_fade_offset = 10,
 	},		  
 
 	damage                  = {

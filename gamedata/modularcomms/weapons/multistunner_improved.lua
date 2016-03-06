@@ -12,6 +12,9 @@ local weaponDef = {
 		muzzleEffectShot = [[custom:YELLOW_LIGHTNING_MUZZLE]],
 		slot = [[3]],
 		manualfire = 1,
+				
+		light_color = [[0.75 0.75 0.22]],
+		light_radius = 350,
 	},
 
 	craterBoost             = 0,

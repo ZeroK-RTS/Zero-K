@@ -15,6 +15,10 @@ local weaponDef = {
 		timeslow_damagefactor = [[2]],
 		timeslow_onlyslow = [[1]],
 		timeslow_smartretarget = [[0.5]],
+		
+		light_camera_height = 1800,
+		light_color = [[0.6 0.22 0.8]],
+		light_radius = 200,
 	},
 
 	damage                  = {

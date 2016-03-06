@@ -12,6 +12,8 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
+
+		light_camera_height = 1500,
 	},
 
 	damage                  = {

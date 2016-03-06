@@ -8,6 +8,8 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		
+		light_radius = 0,
 	},
 
 	damage                  = {

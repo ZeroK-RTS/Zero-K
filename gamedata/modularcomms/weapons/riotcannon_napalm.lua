@@ -15,6 +15,8 @@ local weaponDef = {
 		burntime         = 420,
 		burnchance       = 1,
 		setunitsonfire   = [[1]],
+
+		light_camera_height = 1500,
 	},
 
 	damage                  = {
