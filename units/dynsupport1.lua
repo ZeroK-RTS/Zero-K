@@ -103,7 +103,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Support Commander]],
+      description      = [[Wreckage - Engineer Commander]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 2000,
@@ -123,7 +123,7 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Support Commander]],
+      description      = [[Debris - Engineer Commander]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 2000,
