@@ -122,8 +122,9 @@ unitDef = {
 	    setunitsonfire = "1",
 		burntime = [[450]],
 
-		light_camera_height = 1200,
-		light_radius = 280,
+		light_camera_height = 1800,
+		light_color = [[0.9 0.6 0.25]],
+		light_radius = 260,
 	  },
 	  
       damage                  = {
@@ -166,8 +167,9 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams        	  = {
-		light_camera_height = 1200,
-		light_radius = 290,
+		light_camera_height = 2000,
+		light_color = [[0.9 0.4 0.12]],
+		light_radius = 180,
 		light_fade_time = 35,
 		light_fade_offset = 10,
 	  },

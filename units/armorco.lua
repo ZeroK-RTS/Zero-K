@@ -294,6 +294,9 @@ unitDef = {
 	    gatherradius = [[180]],
 	    smoothradius = [[120]],
 	    smoothmult   = [[0.25]],
+		
+		light_color = [[1 1.4 0.35]],
+		light_radius = 400,
 	  },
 
       damage                  = {

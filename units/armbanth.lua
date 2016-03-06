@@ -116,8 +116,8 @@ unitDef = {
         statsprojectiles = 1,
         statsdamage = 3000,
 		
-		light_color = [[0.2 0.02 0.7]],
-		light_radius = 300,
+		light_color = [[0.25 0.16 0.35]],
+		light_radius = 320,
       },
 
       damage                  = {
@@ -164,6 +164,11 @@ unitDef = {
       commandFire             = true,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+		light_color = [[0.65 0.65 0.18]],
+		light_radius = 380,
+      },
 
       damage                  = {
         default        = 1500,
@@ -213,8 +218,9 @@ unitDef = {
       customParams            = {
         extra_damage = [[320]],
 		
-		light_camera_height = 1600,
-		light_color = [[0.7 0.7 1]],
+		light_camera_height = 2200,
+		light_color = [[0.85 0.85 1.2]],
+		light_radius = 200,
       },
 
       damage                  = {

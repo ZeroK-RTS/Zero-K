@@ -159,7 +159,9 @@ unitDef = {
       customParams            = {
         extra_damage = [[360]],
 		
-		light_color = [[0.7 0.7 1]],
+		light_camera_height = 1600,
+		light_color = [[0.85 0.85 1.2]],
+		light_radius = 200,
       },
 
       cylinderTargeting      = 0,
@@ -205,7 +207,7 @@ unitDef = {
       cylinderTargeting      = 0,
 
       customParams            = {
-		light_color = [[0.8 0.8 0.2]],
+		light_color = [[0.7 0.7 0.2]],
 		light_radius = 320,
       },
 
@@ -250,7 +252,8 @@ unitDef = {
       craterMult              = 0,
 	  
       customParams            = {
-		light_radius = 300,
+		light_color = [[0.9 0.22 0.22]],
+		light_radius = 80,
       },
 	  
       damage                  = {

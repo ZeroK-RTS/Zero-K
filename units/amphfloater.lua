@@ -85,8 +85,8 @@ unitDef = {
         timeslow_damagefactor = 1.667,
 		
 		light_camera_height = 2500,
-		light_color = [[2.1 0.7 2.5]],
-		light_radius = 250,
+		light_color = [[1.36 0.68 1.5]],
+		light_radius = 180,
       },
 
       damage                  = {

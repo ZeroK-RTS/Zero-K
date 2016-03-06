@@ -96,7 +96,7 @@ unitDef = {
         single_hit = true,
 		
 		light_camera_height = 1200,
-		light_radius = 350,
+		light_radius = 180,
       },
 	  
       damage                  = {

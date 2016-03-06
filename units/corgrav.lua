@@ -91,6 +91,9 @@ unitDef = {
 
 	  customParams            = {
 	    impulse = [[-125]],
+		
+		light_color = [[0.33 0.33 1.28]],
+		light_radius = 140,
 	  },
 	  
       damage                  = {
@@ -135,6 +138,9 @@ unitDef = {
 
 	  customParams            = {
 	    impulse = [[125]],
+		
+		light_color = [[0.85 0.2 0.2]],
+		light_radius = 140,
 	  },
 	  
       damage                  = {

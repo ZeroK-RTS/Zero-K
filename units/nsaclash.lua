@@ -94,7 +94,13 @@ unitDef = {
       cegTag                  = [[missiletrailyellow]],
       craterBoost             = 1,
       craterMult              = 1.4,
-
+	  
+      customParams        = {
+		light_camera_height = 3000,
+		light_color = [[1 0.58 0.17]],
+		light_radius = 200,
+      },
+	  
       damage                  = {
         default = 311,
       },

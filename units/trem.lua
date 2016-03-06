@@ -105,6 +105,8 @@ unitDef = {
 	    smoothradius     = [[96]],
 		smoothmult       = [[0.25]],
 		lups_noshockwave = [[1]],
+		
+        light_ground_height = 200,
 	  },
 	  
       damage                  = {

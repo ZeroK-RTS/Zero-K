@@ -98,8 +98,8 @@ unitDef = {
       craterMult              = 0.5,
 
       customParams            = {
-		light_color = [[2 1.5 0.8]],
-		light_radius = 500,
+		light_color = [[1.5 1.13 0.6]],
+		light_radius = 450,
       },
 
       damage                  = {
@@ -115,6 +115,7 @@ unitDef = {
       noSelfDamage            = true,
       range                   = 600,
       reloadtime              = 4,
+	  size                    = 55,
       soundHit                = [[weapon/cannon/cannon_hit3]],
       soundStart              = [[weapon/cannon/heavy_cannon2]],
       turret                  = true,

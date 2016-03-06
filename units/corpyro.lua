@@ -113,8 +113,9 @@ unitDef = {
 	    setunitsonfire = "1",
 		burntime = [[450]],
 		
-		light_camera_height = 1200,
-		light_color = [[0.7 0.35 0.14]],
+		light_camera_height = 2800,
+		light_color = [[1.2 0.78 0.36]],
+		light_radius = 260,
 	  },
 	  
       damage                  = {

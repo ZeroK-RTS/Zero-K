@@ -99,8 +99,8 @@ unitDef = {
 	    smoothradius = [[70]],
 	    smoothmult   = [[0.4]],
 		
-		light_color = [[1.8 1.4 0.9]],
-		light_radius = 420,
+		light_color = [[3 2.33 1.5]],
+		light_radius = 150,
 	  },
       
       damage                  = {
@@ -138,7 +138,7 @@ unitDef = {
         timeslow_smartretarget = 0.33,
 		
 		light_camera_height = 1800,
-		light_color = [[1 0.3 1.2]],
+		light_color = [[0.6 0.22 0.8]],
 		light_radius = 200,
       },
 

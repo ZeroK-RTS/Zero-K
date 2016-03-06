@@ -97,7 +97,8 @@ unitDef = {
         statsprojectiles = 1,
         statsdamage = 850,
 		
-		light_color = [[0.25 0.25 1]],
+		light_color = [[0.25 0.25 0.75]],
+		light_radius = 180,
       },
 
       damage                  = {

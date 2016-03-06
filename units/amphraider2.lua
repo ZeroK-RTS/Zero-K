@@ -99,7 +99,7 @@ unitDef = {
 		stats_hide_reload = 1,
 		
 		light_camera_height = 1500,
-		light_color = [[0 0.01 0.03]],
+		light_color = [[0 0.03 0.07]],
 		light_radius = 100,
       },
 

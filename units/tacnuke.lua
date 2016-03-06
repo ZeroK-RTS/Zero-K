@@ -80,6 +80,9 @@ unitDef = {
       lups_explodelife = 1.5,
 		stats_hide_dps = 1, -- meaningless
 		stats_hide_reload = 1,
+		
+		light_color = [[1.35 0.8 0.36]],
+		light_radius = 400,
 	  },
 	  
       damage                  = {

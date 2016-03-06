@@ -133,7 +133,12 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
-	  cylinderTargeting	  = 1,
+	  cylinderTargeting	      = 1,
+
+	  customParams        	  = {
+		light_color = [[1.1 0.9 0.45]],
+		light_radius = 220,
+	  },
 
       damage                  = {
         default = 800.1,
