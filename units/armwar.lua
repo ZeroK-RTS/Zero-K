@@ -98,7 +98,7 @@ unitDef = {
 
       customParams        = {
 		light_camera_height = 1600,
-		light_color = [[1.2 1.2 0.55]],
+		light_color = [[0.8 0.76 0.38]],
 		light_radius = 150,
       },
 
