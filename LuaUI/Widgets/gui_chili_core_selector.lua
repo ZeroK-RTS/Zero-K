@@ -54,7 +54,6 @@ local stateCommands = {	-- FIXME: is there a better way of doing this?
   [CMD.ONOFF] = true,
   [CMD.REPEAT] = true,
   [CMD.IDLEMODE] = true,
-  [CMD.WAIT] = true,
 }
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -841,28 +840,39 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
 	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.level)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
-		--Spring.Echo("Con "..unitID.." is idle")
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+-- Check current cmdID and the queue 
+local function isDoubleWait(unitID, cmdID)
+	if cmdID==CMD.WAIT then
+		local cmdsLen=Spring.GetCommandQueue(unitID,0)
+		if cmdsLen==1 then
+			local cmds=Spring.GetCommandQueue(unitID,1)
+			return cmds[1].id==CMD.WAIT
+		end
+	end
+	return false
+end
+
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
 	if cmdID and stateCommands[cmdID] then
 		return
 	end
+	
+	-- Double wait means the same as an empty queue
+	-- It is just an engine hack
+	if isDoubleWait(unitID,cmdID) then
+		widget:UnitIdle(unitID,unitDefID,unitTeam)
+		return
+	end
+	
 	if idleCons[unitID] then
-		--[[Spring.Echo("Con "..unitID.." got an order")
-		local cmdText="CMD ID "..tostring(cmdID)
-		cmdText=cmdText.." Opts: "..tostring(cmdOptions)
-		cmdText=cmdText.." Par:"
-		for _,p in ipairs(cmdParams) do
-			cmdText=cmdText.." "..tostring(p)
-		end
-		Spring.Echo("\t"..cmdText)]]
 		idleCons[unitID] = nil
 		wantUpdateCons = true
 	end
