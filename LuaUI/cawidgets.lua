@@ -32,6 +32,7 @@ Spring.Utilities = {}
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 local reverseCompat = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
+VFS.Include("LuaRules/Utilities/function_override.lua")
 
 include("keysym.h.lua")
 include("utils.lua")
