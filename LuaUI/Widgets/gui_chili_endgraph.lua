@@ -22,6 +22,7 @@ function widget:GetInfo() return {
 } end
 
 local buttons = {
+	{"metalProduced"   , "Metal Produced"},
 	{"metalUsed"       , "Metal Used"},
 	{"metal_income"    , "Metal Income"},
 	{"metal_reclaim"   , "Metal Reclaimed"},
