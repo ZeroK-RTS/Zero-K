@@ -44,27 +44,44 @@ local function GetMetalIncome (teamID)
 end
 
 local stats_index
+local sum_count
+local mIncome = {}
+local eIncome = {}
+
 function gadget:GameFrame(n)
-	if ((n % 450) == 30) then -- Spring stats history frames
+	if ((n % 30) == 0) then
 		for i = 1, #teamList do
 			local teamID = teamList[i]
-			if teamID ~= Spring.GetGaiaTeamID() then
+			mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
+			eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
+		end
+		sum_count = sum_count + 1
+
+		if ((n % 450) == 30) then -- Spring stats history frames
+			for i = 1, #teamList do
+				local teamID = teamList[i]
 				Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. stats_index, -reclaimListByTeam[teamID])
 				Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, GetTotalUnitValue(teamID))
-				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_" .. stats_index, GetMetalIncome (teamID))
-				Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, GetEnergyIncome (teamID))
+				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_"  .. stats_index, mIncome[teamID] / sum_count)
+				Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count)
+				mIncome[teamID] = 0
+				eIncome[teamID] = 0
 			end
+			sum_count = 0
+			stats_index = stats_index + 1
 		end
-		stats_index = stats_index + 1
 	end
 end
 
 function gadget:Initialize()
 	stats_index = math.floor((Spring.GetGameFrame() + 870) / 450)
+	sum_count = 0
 
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 
+		mIncome[teamID] = 0
+		eIncome[teamID] = 0
 		reclaimListByTeam[teamID] = -(Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. (stats_index - 1)) or 0)
 
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_0", 0)
