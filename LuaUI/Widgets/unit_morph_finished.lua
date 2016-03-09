@@ -16,6 +16,10 @@ function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
+function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+end
+
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if (unitTeam ~= Spring.GetMyTeamID()) then return end
 	

@@ -378,6 +378,8 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+
   --// catch f9
   widgetHandler:RemoveAction("showhealthbars", showhealthbars)
   Spring.SendCommands({"unbind f9 luaui"})

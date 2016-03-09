@@ -91,6 +91,10 @@ function languageChanged ()
 	build_eta_translation = WG.Translate ("common", "build_eta")
 end
 
+function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+end
+
 function widget:Initialize()
 
 	WG.InitializeTranslation (languageChanged, GetInfo().name)

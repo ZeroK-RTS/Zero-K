@@ -47,6 +47,10 @@ function widget:Initialize()
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
+function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+end
+
 --changing teams, rejoin, becoming spec etc
 function widget:PlayerChanged (playerID)
 	if spGetSpectatingState() then
