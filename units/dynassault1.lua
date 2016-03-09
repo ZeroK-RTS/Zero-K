@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[dynassault1]],
   name                = [[Guardian Commander]],
-  description         = [[Heavy Combat Commander, Builds at 10 m/s]],
+  description         = [[Heavy Combat Commander]],
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   amphibious          = [[1]],
@@ -29,7 +29,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-	--description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
+	--description_de = [[Schwerer Kampfkommandant]],
 	helptext       = [[The Guardian Chassis features two main weapon slots and an array of heavy artillery options.]],
 	--helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstützungsausrüstung. Seine Standardwaffe ist eine randalierende Kanone, während seine Spezialwaffen Streubomben in einer Linie abfeuern.]],
 	level = [[1]],

@@ -401,8 +401,7 @@ local function getDescription(unitDef, unitID)
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
 		if buildPower then
 			buildPower = buildPower*10
-			desc = string.sub(desc, 0, (string.find(desc, "Builds at") or 100) - 1)
-			desc = desc .. "Builds at " .. buildPower .. " m/s"
+			desc = desc .. ", Builds at " .. buildPower .. " m/s"
 		end
 	end
 	
