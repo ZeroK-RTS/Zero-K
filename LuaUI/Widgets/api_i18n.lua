@@ -50,7 +50,7 @@ local langListeners={}
 local translations = {
 	common = true,
 	healthbars = true,
-	-- units = true,
+	units = true,
 }
 
 local function addListener(l, widgetName)
