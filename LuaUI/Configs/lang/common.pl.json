@@ -1,5 +1,7 @@
 {
 	"morph_complete" : "Ulepszenie zakończone",
 	"build_eta" : "Gotowe za",
+	"lvl" : "poz.",
+	"builds_at" : "moc",
 	"unit_under_attack" : "jest pod ostrzałem"
 }

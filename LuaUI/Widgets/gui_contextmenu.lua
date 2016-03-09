@@ -401,7 +401,7 @@ local function getDescription(unitDef, unitID)
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
 		if buildPower then
 			buildPower = buildPower*10
-			desc = desc .. ", Builds at " .. buildPower .. " m/s"
+			desc = desc .. ", " .. WG.Translate("common", "builds_at") .. " " .. buildPower .. " m/s"
 		end
 	end
 	

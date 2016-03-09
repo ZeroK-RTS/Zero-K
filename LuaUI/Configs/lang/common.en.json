@@ -1,5 +1,7 @@
 {
 	"morph_complete" : "Morph complete",
 	"build_eta" : "ETA:",
+	"lvl" : "lvl",
+	"builds_at" : "builds at",
 	"unit_under_attack" : "is under attack"
 }
