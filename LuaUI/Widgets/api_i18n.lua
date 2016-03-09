@@ -118,8 +118,8 @@ local function shutdownTranslation(widget_name)
 	langListeners[widget_name]=nil
 end
 
-local function Translate (db, text)
-	return translations[db](text)
+local function Translate (db, text, data)
+	return translations[db](text, data)
 end
 
 if WG.lang then
