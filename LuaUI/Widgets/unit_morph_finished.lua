@@ -8,15 +8,12 @@ function widget:GetInfo() return {
 } end
 
 local morphCompleteMsg
-local translation
-
 local function languageChanged ()
-	morphCompleteMsg = translation ("morph_complete")
+	morphCompleteMsg = WG.Translate ("common", "morph_complete")
 end
 
 function widget:Initialize()
-	translation = WG.initializeTranslation ("common", languageChanged, GetInfo().name)
-	languageChanged ()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)

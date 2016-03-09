@@ -87,16 +87,13 @@ local function MakeETA(unitID,unitDefID)
 end
 
 local build_eta_translation
-local translation
-
 function languageChanged ()
-	build_eta_translation = translation ("build_eta")
+	build_eta_translation = WG.Translate ("common", "build_eta")
 end
 
 function widget:Initialize()
 
-	translation = WG.initializeTranslation ("common", languageChanged, GetInfo().name)
-	languageChanged ()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()

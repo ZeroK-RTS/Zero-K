@@ -17,10 +17,8 @@ local lastWarning = 0			--in frames
 local localTeamID = Spring.GetLocalTeamID ()
 
 local under_attack_translation
-local translation
-
 function languageChanged ()
-	under_attack_translation = translation ("unit_under_attack")
+	under_attack_translation = WG.Translate ("common", "unit_under_attack")
 end
 
 function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
@@ -46,8 +44,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 	end
 
-	translation = WG.initializeTranslation ("common", languageChanged, GetInfo().name)
-	languageChanged ()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 --changing teams, rejoin, becoming spec etc
