@@ -131,8 +131,6 @@ WG.InitializeTranslation = addListener
 WG.ShutdownTranslation = shutdownTranslation
 WG.Translate = Translate
 
-function widget:Initialize()
-	for db in pairs(translations) do
-		translations[db] = initializeTranslation (db)
-	end
+for db in pairs(translations) do
+	translations[db] = initializeTranslation (db)
 end

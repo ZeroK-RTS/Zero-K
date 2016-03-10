@@ -28,17 +28,6 @@ include("utility_two.lua") --contain file backup function
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not WG.lang then
-	local lang
-	WG.lang=function(l)
-				if not l then
-					return lang
-				else
-					lang=l
-				end
-			end
-end
-
 
 local spGetConfigInt    		= Spring.GetConfigInt
 local spSendCommands			= Spring.SendCommands
@@ -2454,19 +2443,7 @@ function widget:Initialize()
 	if not settings.config then
 		settings.config = {}
 	end
-	
-	if not settings.country or settings.country == 'wut' then
-		myCountry = select(8, Spring.GetPlayerInfo( Spring.GetLocalPlayerID() ) ) 
-		if not myCountry or myCountry == '' then
-			myCountry = 'wut'
-		end
-		settings.country = myCountry
-	end
-	
-	WG.country = settings.country	
-	WG.lang(settings.lang)
-	SetLangFontConf()
-	
+
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 
@@ -2718,6 +2695,21 @@ function widget:SetConfigData(data)
 			settings = data
 		end
 	end
+
+	-- set language. Needs to be done ASAP, before other widgets are even loaded!
+	-- This is because option paths are done right on load and they can use translations.
+	if not settings.country or settings.country == 'wut' then
+		myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
+		if not myCountry or myCountry == '' then
+			myCountry = 'wut'
+		end
+		settings.country = myCountry
+	end
+
+	WG.country = settings.country
+	WG.lang(settings.lang)
+	SetLangFontConf()
+
 	WG.music_volume = settings.music_volume or 0.5
 	LoadKeybinds()
 end
