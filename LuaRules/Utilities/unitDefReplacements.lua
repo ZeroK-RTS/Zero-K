@@ -14,7 +14,7 @@ function Spring.Utilities.GetHumanName(unitID, ud)
 		end
 	end
 	if ud then
-		return ud.humanName
+		return WG.Translate ("units", ud.name .. ".name") or ud.humanName
 	end
 	return ""
 end
