@@ -330,13 +330,14 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
 	local pos = {Spring.GetUnitPosition(unitID)}
 	
-	if (ud.canFly) then AddEvent(ud.humanName .. " shot down", unitDefID, colorRed, "aircraftShotDown", pos)
-	elseif (ud.isFactory) then AddEvent(ud.humanName .. ": factory destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
-	elseif (ud.customParams.commtype) then AddEvent(ud.humanName .. ": commander lost", unitDefID, colorRed, "commanderLost", pos)
-	elseif (ud.isBuilding) then AddEvent(ud.humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
-	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(ud.humanName .. " sunk", unitDefID, colorRed, "unitLost", pos)
-	elseif (ud.isBuilder) then AddEvent(ud.humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
-	else AddEvent(ud.humanName .. ": unit lost", unitDefID, colorRed, "unitLost", pos)
+	local humanName = Spring.Utilities.GetHumanName(ud)
+	if (ud.canFly) then AddEvent(humanName .. " shot down", unitDefID, colorRed, "aircraftShotDown", pos)
+	elseif (ud.isFactory) then AddEvent(humanName .. ": factory destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
+	elseif (ud.customParams.commtype) then AddEvent(humanName .. ": commander lost", unitDefID, colorRed, "commanderLost", pos)
+	elseif (ud.isBuilding) then AddEvent(humanName .. ": building destroyed", unitDefID, colorRed, "buildingDestroyed", pos)
+	elseif (ud.modCategories.ship) or (ud.modCategories.sub) then AddEvent(humanName .. " sunk", unitDefID, colorRed, "unitLost", pos)
+	elseif (ud.isBuilder) then AddEvent(humanName .. ": constructor lost", unitDefID, colorRed, "unitLost", pos)
+	else AddEvent(humanName .. ": unit lost", unitDefID, colorRed, "unitLost", pos)
 	end
 end
 
@@ -350,10 +351,12 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	-- cheap units aren't newsworthy unless they're builders
 	if ((not ud.isBuilder) and (UnitDefs[unitDefID].metalCost < (mIncome * options.minCostMult.value) and useCompleteMinCost)) or noMonitor[unitDefID] then return end
 	local pos = {Spring.GetUnitPosition(unitID)}
+	
+	local humanName = Spring.Utilities.GetHumanName(ud)
 	if (not ud.canMove) or (ud.isFactory) then
-		AddEvent(ud.humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete", pos)
+		AddEvent(humanName .. ": construction completed", unitDefID, colorGreen, "structureComplete", pos)
 	else
-		AddEvent(ud.humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete", pos)
+		AddEvent(humanName .. ": unit operational", unitDefID, colorGreen, "unitComplete", pos)
 	end
 end
 
@@ -361,7 +364,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	local ud = UnitDefs[unitDefID]
 	if ud.isFactory and (spGetTeam(unitID) == myTeam) then
 		local pos = {Spring.GetUnitPosition(unitID)}
-		AddEvent(ud.humanName .. ": factory idle", unitDefID, colorYellow, "factoryIdle", pos)
+		AddEvent(Spring.Utilities.GetHumanName(ud) .. ": factory idle", unitDefID, colorYellow, "factoryIdle", pos)
 	end
 end
 

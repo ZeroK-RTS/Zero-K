@@ -55,7 +55,7 @@ local chickenColorSet 	= configs.colorSet
 
 local chickenNamesPlural = {}
 for chickenName, color in pairs(chickenColorSet) do
-	chickenNamesPlural[chickenName] = color..UnitDefNames[chickenName].humanName.."s\008"
+	chickenNamesPlural[chickenName] = color .. Spring.Utilities.GetHumanName(UnitDefNames[chickenName]) .. "\008"
 end
 
 local eggs = (Spring.GetModOptions().eggs == '1')
@@ -296,9 +296,9 @@ local function MakeLine(chicken, n)
   if (n <= 0) then
     return
   end
-  local humanName = UnitDefNames[chicken].humanName
+  local humanName = Spring.Utilities.GetHumanName(UnitDefNames[chicken])
   local color = chickenColorSet[chicken] or ""
-  return color..n.." "..humanName.."s"
+  return color..humanName.." x"..n
 end
 
 function ChickenEvent(chickenEventArgs)

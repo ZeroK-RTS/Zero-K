@@ -923,7 +923,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -997,7 +997,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = GetHumanName(unitid, ud) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -1994,7 +1994,7 @@ local function MakeToolTip_UD(tt_table)
 			{ name = 'cost', icon = 'LuaUI/images/cost.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
-			{ name = 'udname', icon = iconPath, text = tt_table.unitDef.humanName, fontSize=6 },
+			{ name = 'udname', icon = iconPath, text = Spring.Utilities.GetHumanName(tt_table.unitDef), fontSize=6 },
 			{ name = 'tt', text = tt_table.unitDef.tooltip .. extraText, wrap=true },
 			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health),  fontSize=4, },
 			--[[
@@ -2031,7 +2031,7 @@ local function MakeToolTip_Unit(data, tooltip)
 	local unitDefID = spGetUnitDefID(tt_unitID)
 	tt_ud = UnitDefs[ unitDefID or -1]
 	
-	fullname = ((tt_ud and GetHumanName(tt_unitID, tt_ud)) or "")	
+	fullname = (tt_ud and GetHumanName(tt_ud, tt_unitID))
 		
 	if not (tt_ud) then
 		--fixme
@@ -2094,7 +2094,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		return false
 	end
 
-	local fullname = GetHumanName(stt_unitID, stt_ud)	
+	local fullname = GetHumanName(stt_ud, stt_unitID)
 	
 	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
 	
@@ -2152,7 +2152,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		desc = ' (wreckage)'
 	end
 	tt_ud = UnitDefNames[live_name]
-	fullname = ((tt_ud and GetHumanName(tt_unitID, tt_ud) .. desc) or tt_fd.tooltip or "")
+	fullname = ((tt_ud and GetHumanName(tt_ud, tt_unitID) .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
 		--fixme

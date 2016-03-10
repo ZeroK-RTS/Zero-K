@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-function Spring.Utilities.GetHumanName(unitID, ud)
+function Spring.Utilities.GetHumanName(ud, unitID)
 	if unitID then
 		local name = Spring.GetUnitRulesParam(unitID, "comm_name")
 		if name then

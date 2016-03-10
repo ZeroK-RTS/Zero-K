@@ -212,7 +212,7 @@ local function addUnit(defName, path)
     options[defName .. "_label"] = {
         name = "label", 
         type = 'label', 
-        value = ud.humanName,
+        value = Spring.Utilities.GetHumanName(ud),
         path = path,
     }
     options_order[#options_order+1] = defName .. "_label"

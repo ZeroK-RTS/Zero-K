@@ -304,14 +304,13 @@ local function UpdateFac(unitID, index)
 		end
 	end
 
-	local tooltip = "Factory: "..UnitDefs[facs[index].facDefID].humanName
+	local tooltip = "Factory: ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID])
 	tooltip = tooltip .. "\n" .. count .. " item(s) in queue"
 	if rep then
 		tooltip = tooltip .. "\255\0\255\255 (repeating)\008"
 	end
 	if buildeeDefID then
-		local buildeeDef = UnitDefs[buildeeDefID]
-		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
+		tooltip = tooltip .. "\nCurrent project: " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." ("..math.floor(progress*100).."% done)"
 	end
 	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
 										"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
@@ -523,7 +522,7 @@ local function UpdateComm(unitID, index)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:SetValue(health/maxHealth)
 	
-	comms[index].button.tooltip = "Commander: " .. Spring.Utilities.GetHumanName(unitID, UnitDefs[comms[index].commDefID]) ..
+	comms[index].button.tooltip = "Commander: " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
 							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
 							"\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
 							"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..

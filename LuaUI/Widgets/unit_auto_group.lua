@@ -275,9 +275,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 				for udid,_ in pairs(selUnitDefIDs) do
 					if options.verbose.value then
 						if gr then
-							Echo('game_message: Added '..  UnitDefs[udid].humanName ..' to autogroup #'.. gr ..'.')
+							Echo('game_message: Added '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' to autogroup #'.. gr ..'.')
 						else
-							Echo('game_message: Removed '..  UnitDefs[udid].humanName ..' from autogroups.')
+							Echo('game_message: Removed '..  Spring.Utilities.GetHumanName(UnitDefs[udid]) ..' from autogroups.')
 						end
 					end
 				end

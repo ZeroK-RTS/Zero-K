@@ -78,7 +78,7 @@ for unitDefID,_ in pairs(unitList) do
 	local ud = (not unitDefID) or UnitDefs[unitDefID]
 	if ud then
 		options[ud.name .. "_mark"] = {
-			name = "  " .. ud.humanName or "",
+			name = "  " .. Spring.Utilities.GetHumanName(ud) or "",
 			type = 'bool',
 			value = false,
 			OnChange = function (self)
@@ -119,7 +119,7 @@ function widget:UnitEnteredLos (unitID, unitTeam)
 
 	if unitList[unitDefID] and unitList[unitDefID].active and ((not knownUnits[unitID]) or (knownUnits[unitID] ~= unitDefID)) then
 		local x, y, z = Spring.GetUnitPosition(unitID)
-		local markerText = unitList[unitDefID].markerText or UnitDefs[unitDefID].humanName
+		local markerText = unitList[unitDefID].markerText or Spring.Utilities.GetHumanName(UnitDefs[unitDefID])
 		if not unitList[unitDefID].mark_each_appearance then
 			knownUnits[unitID] = unitDefID
 		end

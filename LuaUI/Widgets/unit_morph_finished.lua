@@ -26,6 +26,5 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	local newUnit = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 	if not newUnit then return end
 
-	local newUnitDefID = Spring.GetUnitDefID(newUnit)
-	Spring.Echo("game_message: " .. morphCompleteMsg .. ": " .. (Spring.GetUnitRulesParam(unitID, "comm_name") or UnitDefs[newUnitDefID].humanName))
+	Spring.Echo("game_message: " .. morphCompleteMsg .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[Spring.GetUnitDefID(newUnit)], unitID))
 end

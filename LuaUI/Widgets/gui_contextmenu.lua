@@ -225,21 +225,6 @@ for i = 1, #UnitDefs do
 			addUnit(i,"Misc/Chickens", false)
 		elseif ud.customParams.is_drone then
 			addUnit(i,"Units/Misc", false)
-		--elseif (ud.customParams.commtype or ud.customParams.level) then
-		--	local unitName = ud.name
-		--	if unitName:sub(6, 8) == "cai" then
-		--		-- addUnit(i,"Misc/Commanders/CAI", false)
-		--	elseif unitName:sub(6, 13) == "campaign" then
-		--		addUnit(i,"Misc/Commanders/Campaign", false)
-		--	elseif unitName:sub(6, 12) == "trainer" then
-		--		local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
-		--		addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
-		--	elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-		--		local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
-		--		addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. ud.humanName, false)
-		--	else
-		--		-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
-		--	end
 		end
 	end
 end
@@ -692,7 +677,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		if cp.spawns_name then
 			cells[#cells+1] = ' - Spawns: '
-			cells[#cells+1] = UnitDefNames[cp.spawns_name].humanName
+			cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.spawns_name])
 			if cp.spawns_expire then
 				cells[#cells+1] = ' - Spawn life: '
 				cells[#cells+1] = cp.spawns_expire .. "s"
@@ -940,7 +925,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = 'Morphing'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - To: '
-		cells[#cells+1] = UnitDefNames[cp.morphto].humanName
+		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.morphto])
 		cells[#cells+1] = ' - Cost: '
 		cells[#cells+1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime)) .. " M"
 		if cp.morphrank and (tonumber(cp.morphrank) > 0) then
@@ -1063,7 +1048,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ' - Eats nearby wreckage to spawn units'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Spawns:'
-		cells[#cells+1] = UnitDefNames[cp.grey_goo_spawn].humanName
+		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.grey_goo_spawn])
 		cells[#cells+1] = ' - BP:'
 		cells[#cells+1] = cp.grey_goo_drain
 		cells[#cells+1] = ' - Cost:'
@@ -1435,7 +1420,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'BUILDS', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		for i=1, #this_buildlist do
-			statschildren[#statschildren+1] = Label:New{ caption = UnitDefs[this_buildlist[i]].humanName, textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = Spring.Utilities.GetHumanName(UnitDefs[this_buildlist[i]]), textColor = color.stats_fg, }
 			-- desc. would be nice, but there is horizontal cutoff
 			-- and long names can overlap (eg. Adv Radar)
 			-- statschildren[#statschildren+1] = Label:New{ caption = UnitDefs[this_buildlist[i]].tooltip, textColor = colorDisarm,}
@@ -1658,7 +1643,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = Spring.Utilities.GetHumanName(unitID, ud) ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(ud, unitID) ..' - '.. desc,
 		
 		children = children,
 	}
@@ -1773,7 +1758,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 	
 	local desc, font = getDescription(ud)
 	local children = {
-		Label:New{ caption =  ud.humanName ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
+		Label:New{ caption = Spring.Utilities.GetHumanName(ud) ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		

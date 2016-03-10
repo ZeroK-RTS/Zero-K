@@ -29,8 +29,7 @@ function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, wea
 	end
 	if (localTeamID==unitTeam and not Spring.IsUnitInView (unitID)) then
 		lastWarning = currentFrame
-		local attackedUnit = (unitDefID and UnitDefs[unitDefID].humanName) or "Unit"
-		Spring.Echo ("game_message: " .. attackedUnit  .. " " .. under_attack_translation)
+		Spring.Echo ("game_message: " .. Spring.Utilities.GetHumanName(UnitDefs[unitDefID])  .. " " .. under_attack_translation)
 		--Spring.PlaySoundFile (blabla attack.wav, ... "userinterface")
 		local x,y,z = Spring.GetUnitPosition (unitID)
 		if (x and y and z) then
