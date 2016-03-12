@@ -24,7 +24,7 @@ local progressByLastLine = {
 	["Parsing Map Information"] = {0, 20},
 	["Loading Weapon Definitions"] = {10, 50},
 	["Loading LuaRules"] = {40, 80},
-	["Loading LuaUI"] = {70, 100},
+	["Loading LuaUI"] = {70, 95},
 	["Finalizing"] = {100, 100}
 }
 for name,val in pairs(progressByLastLine) do
