@@ -481,7 +481,9 @@ local function weapons2Table(cells, ws, unitID)
 
 		if wd.paralyzer then
 			damw = val
-			stun_time = wd.damages.paralyzeDamageTime
+			if stun_time == 0 then
+				stun_time = wd.damages.paralyzeDamageTime
+			end
 		else
 			dam = val
 		end
