@@ -42,7 +42,7 @@ function gadget:UnitUnloaded(unitID, unitDefID, unitTeam, transportID, transport
 		Spring.SetUnitRulesParam(transportID, "massOverride", mass[tudid])
 		Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", 1)
 		GG.UpdateUnitAttributes(transportID)
-	end
+	end 
 end
 
 function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
@@ -50,7 +50,7 @@ function gadget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTe
 		local tudid = Spring.GetUnitDefID(transportID)
 		if tudid and unitDefID then
 			local effectiveMass = mass[tudid] + (Spring.GetUnitRulesParam(unitID, "massOverride") or mass[unitDefID])
-			local speedFactor = math.min(1, 3 * mass[tudid]/(effectiveMass))
+			local speedFactor = math.min(1, 2 * mass[tudid]/(effectiveMass))
 			Spring.SetUnitRulesParam(transportID, "massOverride", effectiveMass)
 			Spring.SetUnitRulesParam(transportID, "selfMoveSpeedChange", speedFactor)
 			GG.UpdateUnitAttributes(transportID)
