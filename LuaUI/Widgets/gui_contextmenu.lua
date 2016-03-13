@@ -1206,12 +1206,9 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 				width=40,
 			}
 	end
-	
-	local text,font = getHelpText(ud)
-	
+
 	local helptextbox = TextBox:New{
-		font = {font=font},
-		text = text, 
+		text = Spring.Utilities.GetHelptext(ud), 
 		textColor = color.stats_fg, 
 		width = '100%',
 		height = '100%',

@@ -17,5 +17,6 @@
 	"base_payback" : "Zwrot inwestycji",
 	"never" : "nigdy",
 	"unknown" : "nie wiadomo",
+	"no_helptext" : "Do tej jednostki nie ma samouczka.",
 	"unit_under_attack" : "jest pod ostrzałem"
 }

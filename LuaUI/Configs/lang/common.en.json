@@ -17,5 +17,6 @@
 	"base_payback" : "Base payback",
 	"never" : "never",
 	"unknown" : "unknown",
+	"no_helptext" : "No guide material available for this unit.",
 	"unit_under_attack" : "is under attack"
 }
