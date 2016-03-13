@@ -62,6 +62,7 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
+local GetDescription = Spring.Utilities.GetDescription
 
 local transkey = include("Configs/transkey.lua")
 
@@ -923,7 +924,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -997,7 +998,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -1468,7 +1469,7 @@ local function KillTooltip(force)
 end
 
 
-local function GetResources(tooltip_type, unitID, ud, tooltip)
+local function GetResources(tooltip_type, unitID, ud)
 	local metal, energy = 0,0
 	local color_m = white
 	local color_e = white
@@ -1994,8 +1995,8 @@ local function MakeToolTip_UD(tt_table)
 			{ name = 'cost', icon = 'LuaUI/images/cost.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
-			{ name = 'udname', icon = iconPath, text = Spring.Utilities.GetHumanName(tt_table.unitDef), fontSize=6 },
-			{ name = 'tt', text = tt_table.unitDef.tooltip .. extraText, wrap=true },
+			{ name = 'udname', icon = iconPath, text = GetHumanName(tt_table.unitDef), fontSize=6 },
+			{ name = 'tt', text = GetDescription(tt_table.unitDef) .. extraText, wrap=true },
 			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health),  fontSize=4, },
 			--[[
 			{ name = 'requires', text = tt_table.requires and ('REQUIRES' .. tt_table.requires) or '', },
@@ -2021,7 +2022,7 @@ local function MakeToolTip_UD(tt_table)
 end
 
 
-local function MakeToolTip_Unit(data, tooltip)
+local function MakeToolTip_Unit(data)
 	
 	
 	local unitID = data
@@ -2031,8 +2032,6 @@ local function MakeToolTip_Unit(data, tooltip)
 	local unitDefID = spGetUnitDefID(tt_unitID)
 	tt_ud = UnitDefs[ unitDefID or -1]
 	
-	fullname = (tt_ud and GetHumanName(tt_ud, tt_unitID))
-		
 	if not (tt_ud) then
 		--fixme
 		return false
@@ -2050,10 +2049,9 @@ local function MakeToolTip_Unit(data, tooltip)
 	end
 
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	local m, e = GetResources( 'unit', unitID, tt_ud, tooltip )
+	local m, e = GetResources( 'unit', unitID, tt_ud)
 	
 	local tt_structure = {
 		leftbar = {
@@ -2064,8 +2062,8 @@ local function MakeToolTip_Unit(data, tooltip)
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
-			{ name='utt', text = unittooltip .. '\n', wrap=true },
+			{ name='uname', icon = iconPath, text = GetHumanName(tt_ud, tt_unitID), fontSize=4, },
+			{ name='utt', text = GetDescription(tt_ud, tt_unitID) .. '\n', wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
 			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
 			{ name='help', text = green .. 'Space+click: Show unit stats', },
@@ -2077,7 +2075,7 @@ local function MakeToolTip_Unit(data, tooltip)
 end
 
 
-local function MakeToolTip_SelUnit(data, tooltip)
+local function MakeToolTip_SelUnit(data)
 	local unitID = data
 	local uDefID = spGetUnitDefID(unitID)
 	
@@ -2094,13 +2092,9 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		return false
 	end
 
-	local fullname = GetHumanName(stt_ud, stt_unitID)
-	
-	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
-	
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
+	local m, e = GetResources( 'selunit', unitID, stt_ud)
 	
 	local hasShield = Spring.GetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and stt_ud.shieldWeaponDef
 
@@ -2113,8 +2107,8 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
-			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
+			{ name='uname', icon = iconPath, text = GetHumanName(stt_ud, stt_unitID), fontSize=4, }, --name in window
+			{ name='utt', text = GetDescription(stt_ud, stt_unitID) .. '\n', wrap=false, description = true },
 			hasShield and { name='shield', directcontrol = 'shield_selunit', } or {},
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
@@ -2126,7 +2120,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	return BuildTooltip2('selunit2', tt_structure, true)
 end
 
-local function MakeToolTip_Feature(data, tooltip)
+local function MakeToolTip_Feature(data)
 	local featureID = data
 	local tt_fd
 	local team, fullname
@@ -2152,7 +2146,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		desc = ' (wreckage)'
 	end
 	tt_ud = UnitDefNames[live_name]
-	fullname = ((tt_ud and GetHumanName(tt_ud, tt_unitID) .. desc) or tt_fd.tooltip or "")
+	fullname = ((tt_ud and GetHumanName(tt_ud) .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
 		--fixme
@@ -2167,10 +2161,10 @@ local function MakeToolTip_Feature(data, tooltip)
 	local _, player		= spGetTeamInfo(team)
 	local playerName	= player and spGetPlayerInfo(player) or 'noname'
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
+	local unittooltip	= tt_ud and GetDescription(tt_ud) or ""
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	local m,e = GetResources( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip )
+	local m,e = GetResources( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd )
 	
 	local leftbar = tt_ud and {
 		{ name= 'bp', directcontrol = 'buildpic_feature' },
@@ -2416,7 +2410,7 @@ local function MakeTooltip(dt)
 			if options.show_for_units.value and 
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
 					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
-				MakeToolTip_Unit(data, tooltip)
+				MakeToolTip_Unit(data)
 			else
 				KillTooltip()
 			end
@@ -2425,7 +2419,7 @@ local function MakeTooltip(dt)
 			if options.show_for_wreckage.value and
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
 					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
-				if MakeToolTip_Feature(data, tooltip) then
+				if MakeToolTip_Feature(data) then
 					return
 				end
 			else
@@ -2567,15 +2561,13 @@ function widget:Update(dt)
 			local ctrlm = controls['selunit2']['res_m']
 			if ctrlm then
 				local ctrle = controls['selunit2']['res_e']
-				local m, e = GetResources( 'selunit', stt_unitID, stt_ud, tooltip)
+				local m, e = GetResources( 'selunit', stt_unitID, stt_ud)
 				ctrlm:SetCaption(m)
 				ctrle:SetCaption(e)
 			end
 			
-			local rulesParamTooltip = GetRulesParamTooltip(stt_unitID)
-			if rulesParamTooltip then
-				controls['selunit2']['utt']:SetCaption(rulesParamTooltip)
-			end
+			local ud = UnitDefs[Spring.GetUnitDefID(stt_unitID)]
+			controls['selunit2']['utt']:SetCaption(GetDescription(ud, stt_unitID))
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
@@ -2949,7 +2941,7 @@ function widget:SelectionChanged(newSelection)
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
-			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1], tooltip) --healthbar/resource consumption/ect chili element
+			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1]) --healthbar/resource consumption/ect chili element
 			if cur1 then
 				DisposeSelectionDisplay()
 				window_corner:AddChild(cur1)

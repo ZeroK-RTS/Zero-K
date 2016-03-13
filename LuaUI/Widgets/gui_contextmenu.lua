@@ -367,32 +367,6 @@ local function getHelpText(unitDef)
 	return helpText, font
 end	
 
-
-local function getDescription(unitDef, unitID)
-	local data = WG.langData
-	local lang = (WG.lang and WG.lang()) or "en"
-	local desc
-	if data then
-		local unitConf = data[unitDef.name] 
-		desc = unitConf and unitConf.description
-	end
-	if not desc then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		desc = unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
-		font = nil
-	end
-	
-	if unitID then
-		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-		if buildPower then
-			buildPower = buildPower*10
-			desc = desc .. ", " .. WG.Translate("common", "builds_at") .. " " .. buildPower .. " m/s"
-		end
-	end
-	
-	return desc, font
-end	
-
 local function GetShieldRegenDrain(wd)
 	local shieldRegen = wd.shieldPowerRegen
 	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
@@ -1630,12 +1604,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		window_unitstats:Dispose()
 	end
 
-	local desc, font = getDescription(ud, unitID)
-	
 	statswindows[num] = Window:New{  
 		x = x,
 		y = y,
-		font = {font=font},
 		width  = window_width,
 		height = window_height,
 		resizable = true,
@@ -1645,7 +1616,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = Spring.Utilities.GetHumanName(ud, unitID) ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(ud, unitID) ..' - '.. Spring.Utilities.GetDescription(ud, unitID),
 		
 		children = children,
 	}
@@ -1757,10 +1728,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 		
 	local window_width = 200
 	--local buttonWidth = window_width - 0
-	
-	local desc, font = getDescription(ud)
+
 	local children = {
-		Label:New{ caption = Spring.Utilities.GetHumanName(ud) ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
+		Label:New{ caption = Spring.Utilities.GetHumanName(ud) ..' - '.. Spring.Utilities.GetDescription(ud), width=window_width, textColor = color.context_header,},
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		

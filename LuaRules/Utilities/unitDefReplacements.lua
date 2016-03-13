@@ -19,6 +19,18 @@ function Spring.Utilities.GetHumanName(ud, unitID)
 	return ""
 end
 
+function Spring.Utilities.GetDescription(ud, unitID)
+	local desc = WG.Translate ("units", ud.name .. ".description") or ud.tooltip
+	if unitID then
+		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
+		if buildPower then
+			buildPower = buildPower*10
+			desc = desc .. ", " .. WG.Translate("common", "builds_at") .. " " .. buildPower .. " m/s"
+		end
+	end
+	return desc
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
