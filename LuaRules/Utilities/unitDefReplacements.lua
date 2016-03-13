@@ -13,14 +13,14 @@ function Spring.Utilities.GetHumanName(ud, unitID)
 			end
 		end
 	end
-	if ud then
-		return WG.Translate ("units", ud.name .. ".name") or ud.humanName
-	end
-	return ""
+
+	local name_override = ud.customParams.statsname or ud.name
+	return WG.Translate ("units", name_override .. ".name") or ud.humanName
 end
 
 function Spring.Utilities.GetDescription(ud, unitID)
-	local desc = WG.Translate ("units", ud.name .. ".description") or ud.tooltip
+	local name_override = ud.customParams.statsname or ud.name
+	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	if unitID then
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
 		if buildPower then
