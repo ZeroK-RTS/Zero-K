@@ -547,99 +547,6 @@ local function GetUnitResources(unitID)
 	end
 end
 
-local function GetWindTooltip(unitID)
-	local minWind = spGetUnitRulesParam(unitID, "minWind")
-	if not minWind then
-		return ""
-	end
-	
-	return "\nWind Range " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
-end
-
-local function GetGridTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local gridCurrent = spGetUnitRulesParam(unitID, "OD_gridCurrent")
-	if not gridCurrent then
-		return false
-	end
-	
-	if gridCurrent < 0 then
-		return "Disabled - No Grid" .. GetWindTooltip(unitID)
-	end
-	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
-	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
-	
-	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. GetWindTooltip(unitID)
-end
-
-local function GetMexTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local metalMult = spGetUnitRulesParam(unitID, "overdrive_proportion")
-	if not metalMult then
-		return false
-	end
-	
-	local currentIncome = spGetUnitRulesParam(unitID, "current_metalIncome")
-	local mexIncome = spGetUnitRulesParam(unitID, "mexIncome") or 0
-	local baseFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
-	
-	if currentIncome == 0 then
-		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
-	end
-
-	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
-end
-
-local function GetZenithTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local meteorsControlled = spGetUnitRulesParam(unitID, "meteorsControlled")
-	if not meteorsControlled then
-		return false
-	end
-	meteorsControlled = meteorsControlled
-
-	return "Meteor Controller - Controls " .. meteorsControlled .. "/500 meteors"
-end
-
-local function GetTerraformTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local spent = spGetUnitRulesParam(unitID, "terraform_spent")
-	if not spent then
-		return false
-	end
-
-	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
-	
-	return "Terraform - Estimated Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
-end
-
-local function GetRulesParamTooltip(unitID)
-	local gridTooltip = GetGridTooltip(unitID)
-	if gridTooltip then
-		return gridTooltip
-	end
-	local mexTooltip = GetMexTooltip(unitID)
-	if mexTooltip then
-		return mexTooltip
-	end
-	local zenithTooltip = GetZenithTooltip(unitID)
-	if zenithTooltip then
-		return zenithTooltip
-	end
-	local terraformTooltip = GetTerraformTooltip(unitID)
-	if terraformTooltip then
-		return terraformTooltip
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --functions
@@ -855,63 +762,6 @@ local function DisposeSelectionDisplay()
 		end
 		globalitems["window_corner_direct_child"]=nil
 	end
-end
-
-local function GetUnitDesc(unitID, ud)
-	if not (unitID or ud) then return '' end
-	
-	local lang = (WG.lang and WG.lang()) or 'en'
-	local font = WG.langFont
-	
-	local rulesParamTooltip = GetRulesParamTooltip(unitID)
-	if rulesParamTooltip then
-		return rulesParamTooltip
-	end
-	
-	if lang == 'en' then
-		if unitID then
-			local tooltip = spGetUnitTooltip(unitID)
-			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
-				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", windMax )
-			end
-			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
-			if Spring.GetUnitRulesParam(unitID, "comm_profileID") and WG.ModularCommAPI.IsStarterComm then
-				if not WG.ModularCommAPI.IsStarterComm(unitID) then
-					local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-					if buildPower then
-						buildPower = buildPower*10
-						tooltip = string.sub(ud.tooltip, 0, (string.find(ud.tooltip, "Builds at") or 100) - 1)
-						return tooltip .. "Builds at " .. buildPower .. " m/s"
-					else
-						return ud.tooltip
-					end
-				end
-			end
-			return tooltip
-		end
-		return ud.tooltip
-	end
-	
-	local desc
-	if font then
-		local unitConf = WG.langFontConf.units[ud.name] 
-		desc = unitConf and unitConf.description
-	end
-	if not desc then
-		local suffix = ('_' .. lang)
-		desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
-		--font = nil
-	end
-	
-	if unitID then
-		local endesc = ud.tooltip
-		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc):gsub( '^' .. ud.humanName .. ' %- ', '' ) -- permutation description-> description_FR for example
-		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
-			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. spGetGameRulesParam("WindMax")
-		end
-		return tooltip
-	end
-	return desc
 end
 
 local function AddSelectionIcon(index,unitid,defid,unitids,counts)
@@ -1904,12 +1754,12 @@ local function MakeToolTip_UD(tt_table)
 	
 	local extraText = ""
 	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
-		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+		extraText = ", ".. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost
-			extraText = extraText .. "\nBase Payback: " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
+			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
 		else
-			extraText = extraText .. "\nBase Payback: Never"
+			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. WG.Translate("common", "never")
 		end
 	end
 	if energyStructureDefs[tt_table.unitDef.id] then
@@ -1923,11 +1773,11 @@ local function MakeToolTip_UD(tt_table)
 
 				if y then
 					if y <= windTidalThreashold then
-						extraText = ", Tidal Income +1.2"
+						extraText = ", " .. WG.Translate("common", "tidal_income") .. " +1.2"
 						income = 1.2
 					else
 						local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
-						extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+						extraText = ", " .. WG.Translate("common", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
 						income = (minWindIncome+2.5)/2
 					end
 				end
@@ -1981,9 +1831,9 @@ local function MakeToolTip_UD(tt_table)
 			--.. "\n extraMetal: " .. extraMetalza
 			--.. "\n unitformCasePayback: " .. unitformCasePayback 
 			--.. "\n worstCasePayback: " .. worstCasePayback 
-			extraText = extraText .. "\nOverdrive Payback: " .. SecondsToMinutesSeconds(worstCasePayback)
+			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback)
 		else
-			extraText = extraText .. "\nOverdrive Payback: Unknown"
+			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " ..  WG.Translate("common", "unknown")
 		end
 	end
 		

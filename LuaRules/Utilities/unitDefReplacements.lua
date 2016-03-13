@@ -1,5 +1,56 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+local function GetGridTooltip (unitID)
+	local gridCurrent = Spring.GetUnitRulesParam(unitID, "OD_gridCurrent")
+	if not gridCurrent then return end
+
+	local windStr = ""
+	local minWind = Spring.GetUnitRulesParam(unitID, "minWind")
+	if minWind then
+		windStr = "\n" ..  WG.Translate("common", "wind_range") .. " " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+	end
+
+	if gridCurrent < 0 then
+		return WG.Translate("common", "disabled_no_grid") .. windStr
+	end
+	local gridMaximum = Spring.GetUnitRulesParam(unitID, "OD_gridMaximum") or 0
+	local gridMetal = Spring.GetUnitRulesParam(unitID, "OD_gridMetal") or 0
+
+	return WG.Translate("common", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
+end
+
+local function GetMexTooltip (unitID)
+	local metalMult = Spring.GetUnitRulesParam(unitID, "overdrive_proportion")
+	if not metalMult then return end
+
+	local currentIncome = Spring.GetUnitRulesParam(unitID, "current_metalIncome")
+	local mexIncome = Spring.GetUnitRulesParam(unitID, "mexIncome") or 0
+	local baseFactor = Spring.GetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
+
+	if currentIncome == 0 then
+		return WG.Translate("common", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
+	end
+
+	return WG.Translate("common", "income") .. ": " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("common", "overdrive")
+end
+
+local function GetTerraformTooltip(unitID)
+	local spent = Spring.GetUnitRulesParam(unitID, "terraform_spent")
+	if not spent then return end
+
+	return WG.Translate("common", "terraform") .. " - " .. WG.Translate("common", "estimated_cost") .. ": " .. math.floor(spent) .. " / " .. math.floor(Spring.GetUnitRulesParam(unitID, "terraform_estimate") or 0)
+end
+
+local function GetZenithTooltip (unitID)
+	local meteorsControlled = Spring.GetUnitRulesParam(unitID, "meteorsControlled")
+	if not meteorsControlled then return end
+
+	return WG.Translate("units", "zenith.description") .. " - " .. WG.Translate("common", "meteors_controlled") .. " " .. meteorsControlled .. "/500"
+end
+
+local function GetCustomTooltip (unitID)
+	return GetGridTooltip(unitID) or GetMexTooltip(unitID) or GetTerraformTooltip(unitID) or GetZenithTooltip(unitID)
+end
 
 function Spring.Utilities.GetHumanName(ud, unitID)
 	if unitID then
@@ -21,7 +72,12 @@ end
 function Spring.Utilities.GetDescription(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
-	if unitID then
+	if Spring.ValidUnitID(unitID) then
+		local customTooltip = GetCustomTooltip(unitID)
+		if customTooltip then
+			return customTooltip
+		end
+
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
 		if buildPower then
 			buildPower = buildPower*10
