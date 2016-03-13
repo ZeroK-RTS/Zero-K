@@ -127,7 +127,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm', 'selectprecbomber'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'selectprecbomber', 'lblSelection', 'selectcomm'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -169,16 +169,16 @@ options = {
 		type = 'bool',
 		value = false,		
 	},
+	selectprecbomber = { type = 'button',
+		name = 'Individual precision bombers',
+		action = 'selectprecbomber',
+		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
+	},
 	lblSelection = { type='label', name='Commander', path='Game/Selection Hotkeys', },
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
 		action = 'selectcomm',
-		path = 'Game/Selection Hotkeys',
-		dontRegisterAction = true,
-	},
-	selectprecbomber = { type = 'button',
-		name = 'Select Precision Bomber',
-		action = 'selectprecbomber',
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
