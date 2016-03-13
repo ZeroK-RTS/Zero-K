@@ -31,10 +31,13 @@ local GetSelectedUnits  = Spring.GetSelectedUnits
 local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
 local GetGameSeconds	= Spring.GetGameSeconds
-local GetGameFrame 		= Spring.GetGameFrame
+local GetGameFrame 	= Spring.GetGameFrame
 local GetModKeyState	= Spring.GetModKeyState
 local SelectUnitArray	= Spring.SelectUnitArray
 local GetUnitRulesParam	= Spring.GetUnitRulesParam
+local GetMouseState	= Spring.GetMouseState
+local TraceScreenRay	= Spring.TraceScreenRay
+local GetUnitPosition	= Spring.GetUnitPosition
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -177,7 +180,7 @@ options = {
 		name = 'Select Precision Bomber',
 		action = 'selectprecbomber',
 		path = 'Game/Selection Hotkeys',
-		dontRegisterAction = true,
+		-- dontRegisterAction = true,
 	},
 }
 
@@ -778,13 +781,15 @@ local function SelectPrecBomber()
 	-- Check each one for distance from the mouse cursor.
 	-- Select the one that's the closest.
 
+	Spring.SelectUnitArray({nil,})
+	
 	local mx,my = GetMouseState()
 	local _,pos = TraceScreenRay(mx,my,true)     
 	local mindist = math.huge
 	local muid = nil
 	if (pos == nil) then return end
 	
-	for _, uid in ipairs(readyUntaskedBombers) do  
+	for uid, v in pairs(readyUntaskedBombers) do  
 		local x,_,z = GetUnitPosition(uid)
 		dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
 		if (dist < mindist) then
@@ -812,10 +817,10 @@ end
 -- Check the queue for an attack command
 local function isAttackQueued(unitID)
 	local cmdsLen=Spring.GetCommandQueue(unitID,0)
-	if cmdsLen > 0 then
-		local cmds=Spring.GetCommandQueue(unitID,1)
+	if cmdsLen and (cmdsLen > 0) then
+		local cmds=Spring.GetCommandQueue(unitID,-1)
 		for i=1,cmdsLen do
-			if cmds[i].id==CMD.ATTACK then
+			if cmds and cmds[i] and (cmds[i].id==CMD.ATTACK) then
 				return true
 			end
 		end
@@ -854,9 +859,12 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			end
 		end
 	end
-	if (ud.unitname == "corshad") then
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
 		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if (not noAmmo or noAmmo == 0) and isAttackQueued(unitID) then
+		if (noAmmo and noAmmo ~= 0) or isAttackQueued(unitID) then
+			readyUntaskedBombers[unitID] = nil
+		else
 			readyUntaskedBombers[unitID] = true
 		end
 	end
@@ -900,9 +908,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
-	if (ud.unitname == "corshad") then
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
 		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if not noAmmo or noAmmo == 0 then
+		if (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) then
+			readyUntaskedBombers[unitID] = nil
+		else
 			readyUntaskedBombers[unitID] = true
 		end
 	end
@@ -939,13 +950,14 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 		idleCons[unitID] = nil
 		wantUpdateCons = true
 	end
-	local ud = UnitDefs[unitDefID]
-	if (ud.unitname == "corshad") then
+
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
 		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if (not noAmmo or noAmmo == 0) and isAttackQueued(unitID) then
-			readyUntaskedBombers[unitID] = true
-		else
+		if cmdID==CMD.ATTACK or (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) or isAttackQueued(unitID) then
 			readyUntaskedBombers[unitID] = nil
+		else
+			readyUntaskedBombers[unitID] = true
 		end
 	end
 end
