@@ -170,12 +170,14 @@ local keybind_date = 0
 local settings = {
 	versionmin = 50,
 	lang = 'en',
+	country = 'wut',
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
 	showAdvanced = false,
 }
 
+local confLoaded = false
 
 
 ----------------------------------------------------------------
@@ -2444,6 +2446,20 @@ function widget:Initialize()
 		settings.config = {}
 	end
 
+	if not confLoaded then
+		if not settings.country or settings.country == 'wut' then
+			myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
+			if not myCountry or myCountry == '' then
+				myCountry = 'wut'
+			end
+			settings.country = myCountry
+		end
+
+		WG.country = settings.country
+		WG.lang(settings.lang)
+		SetLangFontConf()
+	end
+
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 
@@ -2690,6 +2706,7 @@ function widget:GetConfigData()
 end
 
 function widget:SetConfigData(data)
+	confLoaded = true
 	if (data and type(data) == 'table') then
 		if data.versionmin and data.versionmin >= 50 then
 			settings = data
