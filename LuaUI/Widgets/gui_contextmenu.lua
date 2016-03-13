@@ -347,26 +347,6 @@ local function GetUnitDefByHumanName(humanName)
 	return false
 end
 
-
-local function getHelpText(unitDef)
-	local data = WG.langData
-	local lang = (WG.lang and WG.lang()) or "en"
-	local helpText
-	if data then
-		local unitConf = data[unitDef.name] 
-		helpText = unitConf and unitConf.helptext
-	end
-	if not helpText then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		helpText = unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
-			or unitDef.customParams.helptext
-			or "No help text available for this unit."
-		font = nil
-	end
-		
-	return helpText, font
-end	
-
 local function GetShieldRegenDrain(wd)
 	local shieldRegen = wd.shieldPowerRegen
 	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
@@ -1187,7 +1167,7 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName] 
 end
 
-local function printunitinfo(ud, lang, buttonWidth, unitID)	
+local function printunitinfo(ud, buttonWidth, unitID)	
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1581,7 +1561,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			width='100%',
 			bottom = B_HEIGHT*2,
 			padding = {2,2,2,2},
-			children = printunitinfo(ud, WG.lang or 'en', window_width, unitID) ,
+			children = printunitinfo(ud, window_width, unitID) ,
 		},	
 		Button:New{ 
 			caption = 'Close', 

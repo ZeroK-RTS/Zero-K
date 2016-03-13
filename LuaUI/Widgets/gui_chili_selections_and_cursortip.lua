@@ -1503,27 +1503,25 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			end
 			
 			if item.wrap then
-				local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
 				controls[ttname][item.name] = TextBox:New{
 					name=item.name, 				
 					autosize=false,
 					text = itemtext , 
 					width='100%',
 					valign="ascender", 
-					font= font,
+					font= { size=curFontSize },
 					--fontShadow=true,
 				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			else
 				if item.description then
-					local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
 					controls[ttname][item.name] = Label:New{
 						name=item.name, 				
 						autosize=false,
 						caption = itemtext , 
 						width='100%',
 						valign="ascender", 
-						font= font,
+						font= { size=curFontSize },
 						--fontShadow=true,
 					}
 				else

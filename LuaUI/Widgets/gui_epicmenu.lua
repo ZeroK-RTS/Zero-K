@@ -560,27 +560,6 @@ end
 
 VFS.Include("LuaUI/Utilities/json.lua");
 
-local function UTF8SupportCheck()
-	local version=Game.version
-	local first_dot=string.find(version,"%.")
-	local major_version = (first_dot and string.sub(version,0,first_dot-1)) or version
-	local major_version_number = tonumber(major_version)
-	return major_version_number>=98
-end
-local UTF8SUPPORT = UTF8SupportCheck()
-
-local function SetLangFontConf()
-	if UTF8SUPPORT and VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP) then
-		WG.langData = Spring.Utilities.json.decode(VFS.LoadFile("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP))
-		WG.langFont = nil
-		WG.langFontConf = nil
-	else
-		WG.langData = nil
-		WG.langFont = nil
-		WG.langFontConf = nil
-	end
-end
-
 local function SetCountry(self) 
 	echo('Setting country: "' .. self.country .. '" ') 
 	
@@ -590,7 +569,6 @@ local function SetCountry(self)
 	if WG.lang then
 		WG.lang(self.countryLang)
 	end
-	SetLangFontConf()
 	
 	settings.lang = self.countryLang
 	
@@ -2457,7 +2435,6 @@ function widget:Initialize()
 
 		WG.country = settings.country
 		WG.lang(settings.lang)
-		SetLangFontConf()
 	end
 
 		-- add custom widget settings to crudemenu
@@ -2725,7 +2702,6 @@ function widget:SetConfigData(data)
 
 	WG.country = settings.country
 	WG.lang(settings.lang)
-	SetLangFontConf()
 
 	WG.music_volume = settings.music_volume or 0.5
 	LoadKeybinds()
