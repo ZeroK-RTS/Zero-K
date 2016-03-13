@@ -828,6 +828,18 @@ function widget:GameStart()
 end
 ]]--
 
+-- Check current cmdID and the queue for a double-wait
+local function isDoubleWait(unitID, cmdID)
+	if cmdID==CMD.WAIT then
+		local cmdsLen=Spring.GetCommandQueue(unitID,0)
+		if cmdsLen==1 then
+			local cmds=Spring.GetCommandQueue(unitID,1)
+			return cmds[1].id==CMD.WAIT
+		end
+	end
+	return false
+end
+
 -- Check the queue for an attack command
 local function isAttackQueued(unitID)
 	local cmdsLen=Spring.GetCommandQueue(unitID,0)
@@ -840,6 +852,16 @@ local function isAttackQueued(unitID)
 		end
 	end
 	return false
+end
+
+-- Check to see if the bomber is ready and untasked
+local function setBomberReadyStatus(unitID)
+	local noAmmo = GetUnitRulesParam(unitID, "noammo")
+	if (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) or isAttackQueued(unitID) then
+		readyUntaskedBombers[unitID] = nil
+	else
+		readyUntaskedBombers[unitID] = true
+	end
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
@@ -875,12 +897,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 	end
 	local unitName = UnitDefs[unitDefID].name
 	if (unitName  == "corshad") then
-		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if (noAmmo and noAmmo ~= 0) or isAttackQueued(unitID) then
-			readyUntaskedBombers[unitID] = nil
-		else
-			readyUntaskedBombers[unitID] = true
-		end
+		setBomberReadyStatus(unitID)
 	end
 end
 
@@ -924,25 +941,8 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 	local unitName = UnitDefs[unitDefID].name
 	if (unitName  == "corshad") then
-		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) then
-			readyUntaskedBombers[unitID] = nil
-		else
-			readyUntaskedBombers[unitID] = true
-		end
+		setBomberReadyStatus(unitID)
 	end
-end
-
--- Check current cmdID and the queue 
-local function isDoubleWait(unitID, cmdID)
-	if cmdID==CMD.WAIT then
-		local cmdsLen=Spring.GetCommandQueue(unitID,0)
-		if cmdsLen==1 then
-			local cmds=Spring.GetCommandQueue(unitID,1)
-			return cmds[1].id==CMD.WAIT
-		end
-	end
-	return false
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
@@ -967,12 +967,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 
 	local unitName = UnitDefs[unitDefID].name
 	if (unitName  == "corshad") then
-		local noAmmo = GetUnitRulesParam(unitID, "noammo")
-		if cmdID==CMD.ATTACK or (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) or isAttackQueued(unitID) then
-			readyUntaskedBombers[unitID] = nil
-		else
-			readyUntaskedBombers[unitID] = true
-		end
+		setBomberReadyStatus(unitID)
 	end
 end
 
