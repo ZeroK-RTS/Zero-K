@@ -34,6 +34,7 @@ local GetGameSeconds	= Spring.GetGameSeconds
 local GetGameFrame 		= Spring.GetGameFrame
 local GetModKeyState	= Spring.GetModKeyState
 local SelectUnitArray	= Spring.SelectUnitArray
+local GetUnitRulesParam	= Spring.GetUnitRulesParam
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -123,7 +124,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm', 'selectprecbomber'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -172,6 +173,12 @@ options = {
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
+	selectprecbomber = { type = 'button',
+		name = 'Select Precision Bomber',
+		action = 'selectprecbomber',
+		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
+	},
 }
 
 function WG.CoreSelector_SetOptions(maxbuttons)
@@ -189,6 +196,7 @@ local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
 local wantUpdateCons = false
+local readyUntaskedBombers = {}	-- [unitID] = true
 
 --local gamestart = GetGameFrame() > 1
 local myTeamID = false
@@ -764,6 +772,33 @@ local function SelectComm()
 	end
 end
 
+local function SelectPrecBomber()
+	
+	-- Loop through all the bombers.
+	-- Check each one for distance from the mouse cursor.
+	-- Select the one that's the closest.
+
+	local mx,my = GetMouseState()
+	local _,pos = TraceScreenRay(mx,my,true)     
+	local mindist = math.huge
+	local muid = nil
+	if (pos == nil) then return end
+	
+	for _, uid in ipairs(readyUntaskedBombers) do  
+		local x,_,z = GetUnitPosition(uid)
+		dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+		if (dist < mindist) then
+			mindist = dist
+			muid = uid
+		end
+	end
+	
+	if (muid ~= nil) then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		Spring.SelectUnitArray({muid}, shift)
+	end
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- engine callins
@@ -773,6 +808,20 @@ function widget:GameStart()
 	gamestart = true
 end
 ]]--
+
+-- Check the queue for an attack command
+local function isAttackQueued(unitID)
+	local cmdsLen=Spring.GetCommandQueue(unitID,0)
+	if cmdsLen > 0 then
+		local cmds=Spring.GetCommandQueue(unitID,1)
+		for i=1,cmdsLen do
+			if cmds[i].id==CMD.ATTACK then
+				return true
+			end
+		end
+	end
+	return false
+end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
@@ -804,7 +853,13 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 				end
 			end
 		end
-	end  
+	end
+	if (ud.unitname == "corshad") then
+		local noAmmo = GetUnitRulesParam(unitID, "noammo")
+		if (not noAmmo or noAmmo == 0) and isAttackQueued(unitID) then
+			readyUntaskedBombers[unitID] = true
+		end
+	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
@@ -819,6 +874,9 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
+	end	
+	if readyUntaskedBombers[unitID] then
+		readyUntaskedBombers[unitID] = nil
 	end	
 	if facsByID[unitID] then
 		RemoveFac(unitID)
@@ -841,6 +899,12 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
+	end
+	if (ud.unitname == "corshad") then
+		local noAmmo = GetUnitRulesParam(unitID, "noammo")
+		if not noAmmo or noAmmo == 0 then
+			readyUntaskedBombers[unitID] = true
+		end
 	end
 end
 
@@ -874,6 +938,15 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
+	end
+	local ud = UnitDefs[unitDefID]
+	if (ud.unitname == "corshad") then
+		local noAmmo = GetUnitRulesParam(unitID, "noammo")
+		if (not noAmmo or noAmmo == 0) and isAttackQueued(unitID) then
+			readyUntaskedBombers[unitID] = true
+		else
+			readyUntaskedBombers[unitID] = nil
+		end
 	end
 end
 
@@ -937,6 +1010,7 @@ function widget:Initialize()
 	end
 	
 	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'tp')
+	widgetHandler:AddAction("selectprecbomber", SelectPrecBomber, nil, 'tp')
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -1101,4 +1175,5 @@ end
 
 function widget:Shutdown()
 	widgetHandler:RemoveAction("selectcomm")
+	widgetHandler:RemoveAction("selectprecbomber")
 end
