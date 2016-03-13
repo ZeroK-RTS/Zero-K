@@ -48,8 +48,30 @@ local function GetZenithTooltip (unitID)
 	return WG.Translate("units", "zenith.description") .. " - " .. WG.Translate("common", "meteors_controlled") .. " " .. meteorsControlled .. "/500"
 end
 
+local function GetAvatarTooltip(unitID)
+	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
+	if not profileID then return end
+
+	local teamID = Spring.GetUnitTeam(unitID)
+	local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
+
+	local name
+	if isAI then
+		name = select(2, Spring.GetAIInfo(teamID))
+	else
+		name = Spring.GetPlayerInfo(playerID)
+	end
+
+	return name or ""
+	-- todo: for extra My Com Feel, use the original owner's name
+end
+
 local function GetCustomTooltip (unitID)
-	return GetGridTooltip(unitID) or GetMexTooltip(unitID) or GetTerraformTooltip(unitID) or GetZenithTooltip(unitID)
+	return GetGridTooltip(unitID)
+	or GetMexTooltip(unitID)
+	or GetTerraformTooltip(unitID)
+	or GetZenithTooltip(unitID)
+	or GetAvatarTooltip(unitID)
 end
 
 function Spring.Utilities.GetHumanName(ud, unitID)
