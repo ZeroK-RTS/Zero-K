@@ -846,7 +846,7 @@ local function isAttackQueued(unitID)
 	if cmdsLen and (cmdsLen > 0) then
 		local cmds=Spring.GetCommandQueue(unitID,-1)
 		for i=1,cmdsLen do
-			if cmds and cmds[i] and (cmds[i].id==CMD.ATTACK) then
+			if cmds and cmds[i] and ((cmds[i].id==CMD.ATTACK) or (cmds[i].id==CMD.AREA_ATTACK)) then
 				return true
 			end
 		end
