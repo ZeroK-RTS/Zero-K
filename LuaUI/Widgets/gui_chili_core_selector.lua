@@ -180,7 +180,7 @@ options = {
 		name = 'Select Precision Bomber',
 		action = 'selectprecbomber',
 		path = 'Game/Selection Hotkeys',
-		-- dontRegisterAction = true,
+		dontRegisterAction = true,
 	},
 }
 
@@ -776,12 +776,23 @@ local function SelectComm()
 end
 
 local function SelectPrecBomber()
-	
-	-- Loop through all the bombers.
-	-- Check each one for distance from the mouse cursor.
-	-- Select the one that's the closest.
 
-	Spring.SelectUnitArray({nil,})
+	-- Check to see if anything other than a ready bomber is selected
+	--	If not, then we'll increment the number of ready bombers selected
+	--	If so, then we'll either:
+	--		Select one ready bomber if none are selected
+	--		Select only the already selected ready bombers if at least one is selected	
+	
+	local toBeSelected = {}
+	
+	local currentSelection = Spring.GetSelectedUnits()
+	local isAnythingElseSelected = nil
+	for i,uid in ipairs(currentSelection) do
+		if not readyUntaskedBombers[uid] then
+			isAnythingElseSelected = true
+			break
+		end
+	end
 	
 	local mx,my = GetMouseState()
 	local _,pos = TraceScreenRay(mx,my,true)     
@@ -789,19 +800,22 @@ local function SelectPrecBomber()
 	local muid = nil
 	if (pos == nil) then return end
 	
-	for uid, v in pairs(readyUntaskedBombers) do  
-		local x,_,z = GetUnitPosition(uid)
-		dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
-		if (dist < mindist) then
-			mindist = dist
-			muid = uid
+	for uid, v in pairs(readyUntaskedBombers) do
+		if (Spring.IsUnitSelected(uid)) then
+			table.insert(toBeSelected,uid)
+		else
+			local x,_,z = GetUnitPosition(uid)
+			dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+			if (dist < mindist) then
+				mindist = dist
+				muid = uid
+			end
 		end
 	end
-	
-	if (muid ~= nil) then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		Spring.SelectUnitArray({muid}, shift)
+	if (muid ~= nil) and (not isAnythingElseSelected or #toBeSelected == 0) then
+		table.insert(toBeSelected,muid)
 	end
+	Spring.SelectUnitArray(toBeSelected)
 end
 
 -------------------------------------------------------------------------------
