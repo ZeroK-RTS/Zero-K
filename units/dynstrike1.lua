@@ -38,7 +38,7 @@ unitDef = {
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung.]],
 	helptext_pl    = [[Strike to wszechstronny Dowodca, ktory moze uzywac wiekszosci modulow i ma dobra predkosc, wytrzymalosc i samonaprawe.]],
 	level = [[1]],
-	statsname = [[armcom1]],
+	statsname = [[dynstrike1]],
 	soundok = [[heavy_bot_move]],
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
@@ -81,8 +81,6 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  showPlayerName         = true,
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 300,
   trackOffset            = 0,

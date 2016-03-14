@@ -405,7 +405,7 @@ function widget:GetTooltip(x, y)
   if (not ud) then
     return ''
   end
-  return Spring.Utilities.GetHumanName(ud) .. ' - ' .. ud.tooltip
+  return Spring.Utilities.GetHumanName(ud) .. ' - ' .. Spring.Utilities.GetDescription(ud)
 end
 
 

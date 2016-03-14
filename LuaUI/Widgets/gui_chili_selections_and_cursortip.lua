@@ -62,6 +62,7 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 local GetUnitBuildSpeed = Spring.Utilities.GetUnitBuildSpeed
 local GetHumanName = Spring.Utilities.GetHumanName
 local GetUnitCost = Spring.Utilities.GetUnitCost
+local GetDescription = Spring.Utilities.GetDescription
 
 local transkey = include("Configs/transkey.lua")
 
@@ -546,99 +547,6 @@ local function GetUnitResources(unitID)
 	end
 end
 
-local function GetWindTooltip(unitID)
-	local minWind = spGetUnitRulesParam(unitID, "minWind")
-	if not minWind then
-		return ""
-	end
-	
-	return "\nWind Range " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
-end
-
-local function GetGridTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local gridCurrent = spGetUnitRulesParam(unitID, "OD_gridCurrent")
-	if not gridCurrent then
-		return false
-	end
-	
-	if gridCurrent < 0 then
-		return "Disabled - No Grid" .. GetWindTooltip(unitID)
-	end
-	local gridMaximum = spGetUnitRulesParam(unitID, "OD_gridMaximum") or 0
-	local gridMetal = spGetUnitRulesParam(unitID, "OD_gridMetal") or 0
-	
-	return "Grid: " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. GetWindTooltip(unitID)
-end
-
-local function GetMexTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local metalMult = spGetUnitRulesParam(unitID, "overdrive_proportion")
-	if not metalMult then
-		return false
-	end
-	
-	local currentIncome = spGetUnitRulesParam(unitID, "current_metalIncome")
-	local mexIncome = spGetUnitRulesParam(unitID, "mexIncome") or 0
-	local baseFactor = spGetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
-	
-	if currentIncome == 0 then
-		return "Disabled - Base Metal: " .. math.round(mexIncome,2)
-	end
-
-	return "Income: " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% Overdrive"
-end
-
-local function GetZenithTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local meteorsControlled = spGetUnitRulesParam(unitID, "meteorsControlled")
-	if not meteorsControlled then
-		return false
-	end
-	meteorsControlled = meteorsControlled
-
-	return "Meteor Controller - Controls " .. meteorsControlled .. "/500 meteors"
-end
-
-local function GetTerraformTooltip(unitID)
-	if not (unitID and Spring.ValidUnitID(unitID)) then
-		return
-	end
-	local spent = spGetUnitRulesParam(unitID, "terraform_spent")
-	if not spent then
-		return false
-	end
-
-	local estimate = spGetUnitRulesParam(unitID, "terraform_estimate") or 0
-	
-	return "Terraform - Estimated Cost: " .. math.floor(estimate) .. ", Spent: " .. math.floor(spent)
-end
-
-local function GetRulesParamTooltip(unitID)
-	local gridTooltip = GetGridTooltip(unitID)
-	if gridTooltip then
-		return gridTooltip
-	end
-	local mexTooltip = GetMexTooltip(unitID)
-	if mexTooltip then
-		return mexTooltip
-	end
-	local zenithTooltip = GetZenithTooltip(unitID)
-	if zenithTooltip then
-		return zenithTooltip
-	end
-	local terraformTooltip = GetTerraformTooltip(unitID)
-	if terraformTooltip then
-		return terraformTooltip
-	end
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --functions
@@ -856,63 +764,6 @@ local function DisposeSelectionDisplay()
 	end
 end
 
-local function GetUnitDesc(unitID, ud)
-	if not (unitID or ud) then return '' end
-	
-	local lang = (WG.lang and WG.lang()) or 'en'
-	local font = WG.langFont
-	
-	local rulesParamTooltip = GetRulesParamTooltip(unitID)
-	if rulesParamTooltip then
-		return rulesParamTooltip
-	end
-	
-	if lang == 'en' then
-		if unitID then
-			local tooltip = spGetUnitTooltip(unitID)
-			if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
-				tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. string.format("%.1f", windMax )
-			end
-			tooltip = tooltip:gsub( '^' .. ud.humanName .. ' %- ', '' ) -- remove name from desc
-			if Spring.GetUnitRulesParam(unitID, "comm_profileID") and WG.ModularCommAPI.IsStarterComm then
-				if not WG.ModularCommAPI.IsStarterComm(unitID) then
-					local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
-					if buildPower then
-						buildPower = buildPower*10
-						tooltip = string.sub(ud.tooltip, 0, (string.find(ud.tooltip, "Builds at") or 100) - 1)
-						return tooltip .. "Builds at " .. buildPower .. " m/s"
-					else
-						return ud.tooltip
-					end
-				end
-			end
-			return tooltip
-		end
-		return ud.tooltip
-	end
-	
-	local desc
-	if font then
-		local unitConf = WG.langFontConf.units[ud.name] 
-		desc = unitConf and unitConf.description
-	end
-	if not desc then
-		local suffix = ('_' .. lang)
-		desc = ud.customParams and ud.customParams['description' .. suffix] or ud.tooltip or 'Description error'
-		--font = nil
-	end
-	
-	if unitID then
-		local endesc = ud.tooltip
-		local tooltip = spGetUnitTooltip(unitID):gsub(endesc, desc):gsub( '^' .. ud.humanName .. ' %- ', '' ) -- permutation description-> description_FR for example
-		if windTooltips[ud.name] and not spGetUnitRulesParam(unitID,"NotWindmill") and spGetUnitRulesParam(unitID,"minWind") then
-			tooltip = tooltip .. "\nWind Range " .. string.format("%.1f", spGetUnitRulesParam(unitID,"minWind")) .. " - " .. spGetGameRulesParam("WindMax")
-		end
-		return tooltip
-	end
-	return desc
-end
-
 local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 	counts = counts or 1
 	local ud = UnitDefs[defid]
@@ -923,7 +774,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -997,7 +848,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = GetHumanName(ud, unitid) .. " - " .. ud.tooltip.. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -1468,7 +1319,7 @@ local function KillTooltip(force)
 end
 
 
-local function GetResources(tooltip_type, unitID, ud, tooltip)
+local function GetResources(tooltip_type, unitID, ud)
 	local metal, energy = 0,0
 	local color_m = white
 	local color_e = white
@@ -1652,27 +1503,25 @@ local function MakeStack(ttname, ttstackdata, leftbar)
 			end
 			
 			if item.wrap then
-				local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
 				controls[ttname][item.name] = TextBox:New{
 					name=item.name, 				
 					autosize=false,
 					text = itemtext , 
 					width='100%',
 					valign="ascender", 
-					font= font,
+					font= { size=curFontSize },
 					--fontShadow=true,
 				}
 				stack_children[#stack_children+1] = controls[ttname][item.name]
 			else
 				if item.description then
-					local font = WG.langFont and { font= WG.langFont } or { size=curFontSize } --setting size breaks with cyrillic font
 					controls[ttname][item.name] = Label:New{
 						name=item.name, 				
 						autosize=false,
 						caption = itemtext , 
 						width='100%',
 						valign="ascender", 
-						font= font,
+						font= { size=curFontSize },
 						--fontShadow=true,
 					}
 				else
@@ -1903,12 +1752,12 @@ local function MakeToolTip_UD(tt_table)
 	
 	local extraText = ""
 	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
-		extraText = ", Income +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+		extraText = ", ".. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost
-			extraText = extraText .. "\nBase Payback: " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
+			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
 		else
-			extraText = extraText .. "\nBase Payback: Never"
+			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. WG.Translate("common", "never")
 		end
 	end
 	if energyStructureDefs[tt_table.unitDef.id] then
@@ -1922,11 +1771,11 @@ local function MakeToolTip_UD(tt_table)
 
 				if y then
 					if y <= windTidalThreashold then
-						extraText = ", Tidal Income +1.2"
+						extraText = ", " .. WG.Translate("common", "tidal_income") .. " +1.2"
 						income = 1.2
 					else
 						local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
-						extraText = ", Wind Range " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+						extraText = ", " .. WG.Translate("common", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
 						income = (minWindIncome+2.5)/2
 					end
 				end
@@ -1980,9 +1829,9 @@ local function MakeToolTip_UD(tt_table)
 			--.. "\n extraMetal: " .. extraMetalza
 			--.. "\n unitformCasePayback: " .. unitformCasePayback 
 			--.. "\n worstCasePayback: " .. worstCasePayback 
-			extraText = extraText .. "\nOverdrive Payback: " .. SecondsToMinutesSeconds(worstCasePayback)
+			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback)
 		else
-			extraText = extraText .. "\nOverdrive Payback: Unknown"
+			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " ..  WG.Translate("common", "unknown")
 		end
 	end
 		
@@ -1994,8 +1843,8 @@ local function MakeToolTip_UD(tt_table)
 			{ name = 'cost', icon = 'LuaUI/images/cost.png', text = cyan .. numformat(tt_table.unitDef.metalCost), },
 		},
 		main = {
-			{ name = 'udname', icon = iconPath, text = Spring.Utilities.GetHumanName(tt_table.unitDef), fontSize=6 },
-			{ name = 'tt', text = tt_table.unitDef.tooltip .. extraText, wrap=true },
+			{ name = 'udname', icon = iconPath, text = GetHumanName(tt_table.unitDef), fontSize=6 },
+			{ name = 'tt', text = GetDescription(tt_table.unitDef) .. extraText, wrap=true },
 			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health),  fontSize=4, },
 			--[[
 			{ name = 'requires', text = tt_table.requires and ('REQUIRES' .. tt_table.requires) or '', },
@@ -2021,7 +1870,7 @@ local function MakeToolTip_UD(tt_table)
 end
 
 
-local function MakeToolTip_Unit(data, tooltip)
+local function MakeToolTip_Unit(data)
 	
 	
 	local unitID = data
@@ -2031,8 +1880,6 @@ local function MakeToolTip_Unit(data, tooltip)
 	local unitDefID = spGetUnitDefID(tt_unitID)
 	tt_ud = UnitDefs[ unitDefID or -1]
 	
-	fullname = (tt_ud and GetHumanName(tt_ud, tt_unitID))
-		
 	if not (tt_ud) then
 		--fixme
 		return false
@@ -2050,10 +1897,9 @@ local function MakeToolTip_Unit(data, tooltip)
 	end
 
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	local m, e = GetResources( 'unit', unitID, tt_ud, tooltip )
+	local m, e = GetResources( 'unit', unitID, tt_ud)
 	
 	local tt_structure = {
 		leftbar = {
@@ -2064,8 +1910,8 @@ local function MakeToolTip_Unit(data, tooltip)
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=4, },
-			{ name='utt', text = unittooltip .. '\n', wrap=true },
+			{ name='uname', icon = iconPath, text = GetHumanName(tt_ud, tt_unitID), fontSize=4, },
+			{ name='utt', text = GetDescription(tt_ud, tt_unitID) .. '\n', wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
 			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
 			{ name='help', text = green .. 'Space+click: Show unit stats', },
@@ -2077,7 +1923,7 @@ local function MakeToolTip_Unit(data, tooltip)
 end
 
 
-local function MakeToolTip_SelUnit(data, tooltip)
+local function MakeToolTip_SelUnit(data)
 	local unitID = data
 	local uDefID = spGetUnitDefID(unitID)
 	
@@ -2094,13 +1940,9 @@ local function MakeToolTip_SelUnit(data, tooltip)
 		return false
 	end
 
-	local fullname = GetHumanName(stt_ud, stt_unitID)
-	
-	local unittooltip	= GetUnitDesc(stt_unitID, stt_ud)
-	
 	local iconPath		= GetUnitIcon(stt_ud)
 	
-	local m, e = GetResources( 'selunit', unitID, stt_ud, tooltip)
+	local m, e = GetResources( 'selunit', unitID, stt_ud)
 	
 	local hasShield = Spring.GetUnitRulesParam(unitID, "comm_shield_max") ~= 0 and stt_ud.shieldWeaponDef
 
@@ -2113,8 +1955,8 @@ local function MakeToolTip_SelUnit(data, tooltip)
 			{ name='res_e', icon = 'LuaUI/images/energy.png', text = e },
 		},
 		main = {
-			{ name='uname', icon = iconPath, text = fullname, fontSize=4, }, --name in window
-			{ name='utt', text = unittooltip .. '\n', wrap=false, description = true },
+			{ name='uname', icon = iconPath, text = GetHumanName(stt_ud, stt_unitID), fontSize=4, }, --name in window
+			{ name='utt', text = GetDescription(stt_ud, stt_unitID) .. '\n', wrap=false, description = true },
 			hasShield and { name='shield', directcontrol = 'shield_selunit', } or {},
 			{ name='hp', directcontrol = 'hp_selunit', },
 			stt_ud.isBuilder and { name='bp', directcontrol = 'bp_selunit', } or {},
@@ -2126,7 +1968,7 @@ local function MakeToolTip_SelUnit(data, tooltip)
 	return BuildTooltip2('selunit2', tt_structure, true)
 end
 
-local function MakeToolTip_Feature(data, tooltip)
+local function MakeToolTip_Feature(data)
 	local featureID = data
 	local tt_fd
 	local team, fullname
@@ -2152,7 +1994,7 @@ local function MakeToolTip_Feature(data, tooltip)
 		desc = ' (wreckage)'
 	end
 	tt_ud = UnitDefNames[live_name]
-	fullname = ((tt_ud and GetHumanName(tt_ud, tt_unitID) .. desc) or tt_fd.tooltip or "")
+	fullname = ((tt_ud and GetHumanName(tt_ud) .. desc) or tt_fd.tooltip or "")
 	
 	if not (tt_fd) then
 		--fixme
@@ -2167,10 +2009,10 @@ local function MakeToolTip_Feature(data, tooltip)
 	local _, player		= spGetTeamInfo(team)
 	local playerName	= player and spGetPlayerInfo(player) or 'noname'
 	local teamColor		= Chili.color2incolor(spGetTeamColor(team))
-	local unittooltip	= GetUnitDesc(tt_unitID, tt_ud)
+	local unittooltip	= tt_ud and GetDescription(tt_ud) or ""
 	local iconPath		= GetUnitIcon(tt_ud)
 	
-	local m,e = GetResources( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd, tooltip )
+	local m,e = GetResources( tt_ud and 'corpse' or 'feature', featureID, tt_ud or tt_fd )
 	
 	local leftbar = tt_ud and {
 		{ name= 'bp', directcontrol = 'buildpic_feature' },
@@ -2416,7 +2258,7 @@ local function MakeTooltip(dt)
 			if options.show_for_units.value and 
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
 					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
-				MakeToolTip_Unit(data, tooltip)
+				MakeToolTip_Unit(data)
 			else
 				KillTooltip()
 			end
@@ -2425,7 +2267,7 @@ local function MakeTooltip(dt)
 			if options.show_for_wreckage.value and
 					(meta or options.independant_world_tooltip_delay.value == 0 or 
 					sameObjectIDTime > options.independant_world_tooltip_delay.value) then
-				if MakeToolTip_Feature(data, tooltip) then
+				if MakeToolTip_Feature(data) then
 					return
 				end
 			else
@@ -2567,15 +2409,13 @@ function widget:Update(dt)
 			local ctrlm = controls['selunit2']['res_m']
 			if ctrlm then
 				local ctrle = controls['selunit2']['res_e']
-				local m, e = GetResources( 'selunit', stt_unitID, stt_ud, tooltip)
+				local m, e = GetResources( 'selunit', stt_unitID, stt_ud)
 				ctrlm:SetCaption(m)
 				ctrle:SetCaption(e)
 			end
 			
-			local rulesParamTooltip = GetRulesParamTooltip(stt_unitID)
-			if rulesParamTooltip then
-				controls['selunit2']['utt']:SetCaption(rulesParamTooltip)
-			end
+			local ud = UnitDefs[Spring.GetUnitDefID(stt_unitID)]
+			controls['selunit2']['utt']:SetCaption(GetDescription(ud, stt_unitID))
 			
 			local nanobar_stack = globalitems['bp_selunit']
 			local nanobar = nanobar_stack:GetChildByName('bar')
@@ -2949,7 +2789,7 @@ function widget:SelectionChanged(newSelection)
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
 			local tooltip, unitDef  = tt_table.tooltip, tt_table.unitDef
 			
-			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1], tooltip) --healthbar/resource consumption/ect chili element
+			local cur1, cur2 = MakeToolTip_SelUnit(selectedUnits[1][1]) --healthbar/resource consumption/ect chili element
 			if cur1 then
 				DisposeSelectionDisplay()
 				window_corner:AddChild(cur1)

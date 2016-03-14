@@ -321,9 +321,9 @@ function widget:GameOver (winners)
 			end
 		end
 	elseif #winners == 1 then
-		local winnerTeamName = Spring.GetGameRulesParam("allyteam_long_name_"  .. winners[1])
+		local winnerTeamName = Spring.GetGameRulesParam("allyteam_long_name_"  .. winners[1]) or "Team " .. winners[1]
 		if string.len(winnerTeamName) > 10 then
-			winnerTeamName = Spring.GetGameRulesParam("allyteam_short_name_" .. winners[1])
+			winnerTeamName = Spring.GetGameRulesParam("allyteam_short_name_" .. winners[1]) or "Team " .. winners[1]
 		end
 		if spec then
 			if (winners[1] == gaiaAllyTeamID) then

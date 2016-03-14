@@ -81,7 +81,6 @@ unitDef = {
   },
 
   showNanoSpray       = false,
-  showPlayerName      = true,
   side                = [[CORE]],
   sightDistance       = 500,
   smoothAnim          = true,
