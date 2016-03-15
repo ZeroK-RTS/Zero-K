@@ -48,8 +48,18 @@ function gadget:UnitCreated(unitID, unitDefID)
         if not unit[unitID] then
             units.count = units.count + 1
             units.data[units.count] = unitID
-            unit[unitID] = uddim.height
+            unit[unitID] = {id=units.count,h=uddim.height}
         end
+    end
+end
+
+function gadget:UnitDestroyed(unitID)
+    if unit[unitID] then
+        units.data[unit[unitID].id] = units.data[units.count]
+        unit[units.data[units.count]].id = unit[unitID].id --shift last entry into empty space
+        units.data[units.count] = nil
+        units.count = units.count - 1
+        unit[unitID] = nil
     end
 end
 
@@ -60,25 +70,18 @@ function gadget:GameFrame(n)
              current_fold = 1
         end
         for i=current_fold, units.count, n_folds do
-              local u = listData[i]
-              
-            if not Spring.ValidUnitID(u) then
-                listData[i] = listData[units.count]
-                listData[units.count] = nil
-                units.count = units.count - 1
-                unit[u] = nil
-            else
-                local x,y,z = Spring.GetUnitPosition(u)
-                local h = unit[u]
-                if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
-                    local radius = Spring.GetUnitRadius(u);
-                    local effect = SFXTYPE_WAKE1
-                    if radius>50 then sfx = SFXTYPE_WAKE2 end
-                    Spring.UnitScript.CallAsUnit(u, function()
-                        Spring.UnitScript.EmitSfx(1,effect);
-                    end);
-                end
+            local u = listData[i]             
+            local x,y,z = Spring.GetUnitPosition(u)
+            local h = unit[u].h
+            if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
+                local radius = Spring.GetUnitRadius(u);
+                local effect = SFXTYPE_WAKE1
+                if radius>50 then sfx = SFXTYPE_WAKE2 end
+                Spring.UnitScript.CallAsUnit(u, function()
+                    Spring.UnitScript.EmitSfx(1,effect);
+                end);
             end
+
         end
         current_fold = current_fold+1
     end
