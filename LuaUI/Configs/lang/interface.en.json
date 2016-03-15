@@ -1,0 +1,4 @@
+{
+	"idle_cons_different_types" : "You have %{cons} idle cons of %{types} different types",
+	"x_units_in_queue" : "%{x} units in queue"
+}

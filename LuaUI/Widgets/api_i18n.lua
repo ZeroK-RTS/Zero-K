@@ -51,6 +51,7 @@ local translations = {
 	common = true,
 	healthbars = true,
 	units = true,
+	interface = true,
 }
 
 local function addListener(l, widgetName)

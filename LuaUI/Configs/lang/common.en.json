@@ -18,5 +18,18 @@
 	"never" : "never",
 	"unknown" : "unknown",
 	"no_helptext" : "No guide material available for this unit.",
+	"factory" : "Factory",
+	"commander" : "Commander",
+	"repeating" : "repeating",
+	"current_project" : "Current project",
+	"lmb" : "Left-click",
+	"rmb" : "Right-click",
+	"shift" : "Shift",
+	"health" : "Health",
+	"select" : "Select",
+	"select_all" : "Select all",
+	"select_and_go_to" : "Select and go to",
+	"x%_done" : "%{x}%% done",
+	"append_to_current_selection" : "Append to current selection",
 	"unit_under_attack" : "is under attack"
 }

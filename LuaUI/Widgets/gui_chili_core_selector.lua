@@ -315,17 +315,17 @@ local function UpdateFac(unitID, index)
 		end
 	end
 
-	local tooltip = "Factory: ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID])
-	tooltip = tooltip .. "\n" .. count .. " item(s) in queue"
+	local tooltip = WG.Translate("common", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {x = count})
 	if rep then
-		tooltip = tooltip .. "\255\0\255\255 (repeating)\008"
+		tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("common", "repeating") .. ")\008"
 	end
 	if buildeeDefID then
-		tooltip = tooltip .. "\nCurrent project: " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." ("..math.floor(progress*100).."% done)"
+		tooltip = tooltip .. "\n" .. WG.Translate("common", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." (".. WG.Translate("common", "x%_done", {x = math.floor(progress*100)}) .. ")"
 	end
-	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
-										"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
-										"\nShift: Append to current selection\008"
+	tooltip = tooltip .. "\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+										"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+										"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
+
 	local tooltipOld = facs[index].button.tooltip
 	if tooltipOld ~= tooltip then
 		facs[index].button.tooltip = tooltip
@@ -533,12 +533,11 @@ local function UpdateComm(unitID, index)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:SetValue(health/maxHealth)
 	
-	comms[index].button.tooltip = "Commander: " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
-							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-							"\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
-							"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
-							"\nShift: Append to current selection\008"
-	
+	comms[index].button.tooltip = WG.Translate("common", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
+							"\n\255\0\255\255" .. WG.Translate("common", "health") .. ":\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+							"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+							"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+							"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
 end
 
 --[[
@@ -658,9 +657,9 @@ local function UpdateConsButton()
 		conButton.button:Invalidate()
 		--idleBuilderDefID = maxDefID
 	end
-	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..
-								"\n\255\0\255\0Left-click: Select"..
-								"\nRight-click: Select all\008"
+	conButton.button.tooltip = WG.Translate("interface", "idle_cons_different_types", {cons = total, types = numTypes}) ..
+								"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") ..
+								"\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "select_all") .. "\008"
 	idleCons.count = total
 	total = (total > 0 and tostring(total)) or ''
 	if conButton.countLabel then

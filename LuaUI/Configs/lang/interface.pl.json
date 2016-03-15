@@ -1,0 +1,4 @@
+{
+	"idle_cons_different_types" : "Masz %{cons} wolnych konstruktorów %{types} różnych rodzajów.",
+	"x_units_in_queue" : "%{x} jednostek w kolejce"
+}
