@@ -19,13 +19,12 @@ function gadget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
-
-local units = {}
-local n_units = 0
+local unit = {}
+local units = {count = 0, data = {}}
 
 local fold_frames = 7 -- every seventh frame
 local n_folds = 4 -- check every fourth unit
-local current_fold = 0
+local current_fold = 1
 
 function canWade(unitDefID)
     local moveDef = UnitDefs[unitDefID].moveDef
@@ -47,26 +46,31 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
     if(canWade(unitDefID)) then
         local uddim = Spring.GetUnitDefDimensions(unitDefID)
-        units[unitID] = uddim.height
+		if not unit[unitID] then
+			units.count = units.count + 1
+			units.data[units.count] = unitID
+            unit[unitID] = uddim.height
+		end
     end
-end
-
-function gadget:UnitDestroyed(unitID)
-    units[unitID] = nil
 end
 
 function gadget:GameFrame(n)
     if n%fold_frames == 0 then
+        local listData = units.data
         if current_fold > n_folds then
-            current_fold = 0
+             current_fold = 1
         end
-        
-        local i = 0
-        for u,h in pairs(units) do
-            i = i+1
-            if i % n_folds == current_fold then
-                local udn = UnitDefs[Spring.GetUnitDefID(u)].name
+	    for i=current_fold, units.count, n_folds do
+      		local u = listData[i]
+              
+            if not Spring.ValidUnitID(u) then
+                listData[i] = listData[units.count]
+                listData[units.count] = nil
+                units.count = units.count - 1
+                unit[u] = nil
+            else
                 local x,y,z = Spring.GetUnitPosition(u)
+                local h = unit[u]
                 if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
                     local radius = Spring.GetUnitRadius(u);
                     local effect = SFXTYPE_WAKE1
@@ -77,7 +81,6 @@ function gadget:GameFrame(n)
                 end
             end
         end
-        n_units = i -- this is now usable for dynamic folding 
         current_fold = current_fold+1
     end
 end
