@@ -572,16 +572,18 @@ function widget:CommandsChanged()
 	end
 	for i=1, #buildOptions do
 		local unitName = buildOptions[i]
-		table.insert(widgetHandler.customCommands, {
-			id      = -1*UnitDefNames[unitName].id,
-			type    = 20,
-			tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
-			cursor  = unitName,
-			action  = "buildunit_" .. unitName,
-			params  = {}, 
-			texture = "", --"#"..id,
-			name = unitName,
-		})
+		if not Spring.GetGameRulesParam("disabled_unit_" .. unitName) then
+			table.insert(widgetHandler.customCommands, {
+				id      = -1*UnitDefNames[unitName].id,
+				type    = 20,
+				tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
+				cursor  = unitName,
+				action  = "buildunit_" .. unitName,
+				params  = {}, 
+				texture = "", --"#"..id,
+				name = unitName,
+			})
+		end
 	end
 	table.insert(widgetHandler.customCommands, {
 		id      = CMD_STOP,
