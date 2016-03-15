@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 if not gadgetHandler:IsSyncedCode() then
-	return
+    return
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -46,11 +46,11 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
     if(canWade(unitDefID)) then
         local uddim = Spring.GetUnitDefDimensions(unitDefID)
-		if not unit[unitID] then
-			units.count = units.count + 1
-			units.data[units.count] = unitID
+        if not unit[unitID] then
+            units.count = units.count + 1
+            units.data[units.count] = unitID
             unit[unitID] = uddim.height
-		end
+        end
     end
 end
 
@@ -60,8 +60,8 @@ function gadget:GameFrame(n)
         if current_fold > n_folds then
              current_fold = 1
         end
-	    for i=current_fold, units.count, n_folds do
-      		local u = listData[i]
+        for i=current_fold, units.count, n_folds do
+              local u = listData[i]
               
             if not Spring.ValidUnitID(u) then
                 listData[i] = listData[units.count]
