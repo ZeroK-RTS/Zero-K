@@ -33,9 +33,8 @@ function canWade(unitDefID)
         if mdFamily == "kbot" or mdFamily == "tank" then
             return true
         end
-    else
-        return false
     end
+    return false
 end
 
 function isMoving(unitID)
