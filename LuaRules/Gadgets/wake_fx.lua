@@ -67,7 +67,7 @@ function gadget:GameFrame(n)
             if i % n_folds == current_fold then
                 local udn = UnitDefs[Spring.GetUnitDefID(u)].name
                 local x,y,z = Spring.GetUnitPosition(u)
-                if y > -h and y <= 0 and isMoving(u) then -- emit wakes only when moving and not completely submerged
+                if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
                     local radius = Spring.GetUnitRadius(u);
                     local effect = SFXTYPE_WAKE1
                     if radius>50 then sfx = SFXTYPE_WAKE2 end
