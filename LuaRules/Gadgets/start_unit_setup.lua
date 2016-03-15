@@ -303,11 +303,6 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			waitingForComm[teamID] = nil
 		end
 
-		-- set the *team's* lineage root
-		if Spring.SetUnitLineage then
-			Spring.SetUnitLineage(unitID, teamID, true)
-		end
-
 		-- add facplop
 		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
 		local udef = UnitDefs[Spring.GetUnitDefID(unitID)]		
@@ -326,6 +321,14 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
+		
+		local name
+		if isAI then
+			name = select(2, Spring.GetAIInfo(teamID))
+		else
+			name = Spring.GetPlayerInfo(playerID)
+		end
+		Spring.SetUnitRulesParam(unitID, "commander_owner", name, {inlos = true})
 		return true
 	end
 	return false

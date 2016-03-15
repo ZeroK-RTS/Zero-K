@@ -49,21 +49,9 @@ local function GetZenithTooltip (unitID)
 end
 
 local function GetAvatarTooltip(unitID)
-	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
-	if not profileID then return end
-
-	local teamID = Spring.GetUnitTeam(unitID)
-	local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
-
-	local name
-	if isAI then
-		name = select(2, Spring.GetAIInfo(teamID))
-	else
-		name = Spring.GetPlayerInfo(playerID)
-	end
-
-	return name or ""
-	-- todo: for extra My Com Feel, use the original owner's name
+	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
+	if not commOwner then return end
+	return commOwner or ""
 end
 
 local function GetCustomTooltip (unitID)
