@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[armtick]],
-  name                   = [[Tick]],
+  name                   = [[Wisp]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.6,
@@ -26,14 +26,14 @@ unitDef = {
     description_fr = [[Bombe rampante EMP tout terrain]],
     description_it = [[Bomba PEM mobile All-terrain]],
     description_pl = [[Terenowa bomba EMP]],
-    helptext       = [[The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle.]],
-    helptext_bp    = [[Tick ? um rob? de PEM escalador suicida. Usado com habilidade pode valer v?rias vezes seu pre?o. Use-o para paralizar defesas, unidades inimigas pesadas e grupos de unidades inimigas pr?ximas umas das outras armadas com armas lentas. Outras unidades podem entao eliminar as unidades paralizadas correndo pouco risco. defenda-se com defenders ou caminhoes de miss?is, ou uma ?nica unidade barata para provocar uma explosao prematura.]],
-    helptext_de    = [[Geschickt eingesetzt kann Tick sich mehrfach rentieren. Nutze Tick, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt.]],
-    helptext_es    = [[Usado bien, el Tick puede valer docenas de veces su costo. Usalo para paralizar defensas, unidades pesadas, y masas de unidades con armas lentas. Otras unidades pueden eliminar a los enemigos indefensos sin riesgos. Contrastalos con torres de misil o síngolas unidades baratas para causar detonaciones inmaduras.]],
-    helptext_fi    = [[Taitavasti k?ytettyn? Tick voi maksaa itsens? takaisin lukuisia kertoja. K?yt? sit? niit? vihollisia vastaan, joiden l?helle p??set - esimerkkin? suuret, hitaasti ampuvat yksik?t ja tiiviit ryhmittym?t. Muu armeijasi voi t?m?n j?lkeen vaaratta eliminoida lamaantuneet vastustajat. Ohjukset ja laserit r?j?ytt?v?t Tickin helposti ennen kuin se ylt?? kohteeseensa.]],
-    helptext_fr    = [[Le Tick, invisible lorqu'il est statique, est rapide et petit ce qui lui permet d'éviter les tirs des armes imprécises. Il peut paralyser des unités lourdes ou des groupes d'unités de raid qui ne peuvent le tuer avant d'être dans l'aire d'effet EMP. Des Warriors ou des Glaives peuvent ensuite éliminer les enemis figés sans risque. Contrez-le avec des défenses ou des unités bon marché pour provoquer une détonation prématurée.]],
-    helptext_it    = [[Usato bene, il Tick puo valere dozzine di volte il suo costo. Usalo per paralizzare difese, unitá pesanti, e masse di unitá con armi lente. Altre tue unitá posson eliminare i nemici indifesi senza rischi. Contrastali con torri lancia-razzo o singole unitá economiche per provocare una detonazione prematura.]],
-    helptext_pl    = [[Tick jest szybki i maly, co pozwala mu unikac wolniejszych pociskow i dotrzec do celu, aby sie zdetonowac, zadajac wysokie obrazenia EMP i paralizujac grupy przeciwnikow. Gdy stoi nieruchomo w miejscu, wlacza maskowanie.]],
+    helptext       = [[The Wisp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Ghouls or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle.]],
+    helptext_bp    = [[Wisp ? um rob? de PEM escalador suicida. Usado com habilidade pode valer v?rias vezes seu pre?o. Use-o para paralizar defesas, unidades inimigas pesadas e grupos de unidades inimigas pr?ximas umas das outras armadas com armas lentas. Outras unidades podem entao eliminar as unidades paralizadas correndo pouco risco. defenda-se com defenders ou caminhoes de miss?is, ou uma ?nica unidade barata para provocar uma explosao prematura.]],
+    helptext_de    = [[Geschickt eingesetzt kann Wisp sich mehrfach rentieren. Nutze Wisp, um gegnerische Verteidigung, schwere Einheiten und gut geschützte Einheiten mit langsamen Waffen zu paralysieren. Andere deiner Einheiten haben so die Möglichkeit die feindlichen Truppen einfach, ohne Risiko zu eleminieren. Konter diese Einheit mit Raketentürmen oder einzelnen, billigen Einheiten. Diese Einheit tarnt sich sobald sie sich nicht mehr bewegt.]],
+    helptext_es    = [[Usado bien, el Wisp puede valer docenas de veces su costo. Usalo para paralizar defensas, unidades pesadas, y masas de unidades con armas lentas. Otras unidades pueden eliminar a los enemigos indefensos sin riesgos. Contrastalos con torres de misil o síngolas unidades baratas para causar detonaciones inmaduras.]],
+    helptext_fi    = [[Taitavasti k?ytettyn? Wisp voi maksaa itsens? takaisin lukuisia kertoja. K?yt? sit? niit? vihollisia vastaan, joiden l?helle p??set - esimerkkin? suuret, hitaasti ampuvat yksik?t ja tiiviit ryhmittym?t. Muu armeijasi voi t?m?n j?lkeen vaaratta eliminoida lamaantuneet vastustajat. Ohjukset ja laserit r?j?ytt?v?t Tickin helposti ennen kuin se ylt?? kohteeseensa.]],
+    helptext_fr    = [[Le Wisp, invisible lorqu'il est statique, est rapide et petit ce qui lui permet d'éviter les tirs des armes imprécises. Il peut paralyser des unités lourdes ou des groupes d'unités de raid qui ne peuvent le tuer avant d'être dans l'aire d'effet EMP. Des Ghouls ou des Glaives peuvent ensuite éliminer les enemis figés sans risque. Contrez-le avec des défenses ou des unités bon marché pour provoquer une détonation prématurée.]],
+    helptext_it    = [[Usato bene, il Wisp puo valere dozzine di volte il suo costo. Usalo per paralizzare difese, unitá pesanti, e masse di unitá con armi lente. Altre tue unitá posson eliminare i nemici indifesi senza rischi. Contrastali con torri lancia-razzo o singole unitá economiche per provocare una detonazione prematura.]],
+    helptext_pl    = [[Wisp jest szybki i maly, co pozwala mu unikac wolniejszych pociskow i dotrzec do celu, aby sie zdetonowac, zadajac wysokie obrazenia EMP i paralizujac grupy przeciwnikow. Gdy stoi nieruchomo w miejscu, wlacza maskowanie.]],
 
     modelradius    = [[7]],
     instantselfd   = [[1]],
@@ -75,7 +75,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Tick]],
+      description      = [[Wreckage - Wisp]],
       blocking         = false,
       damage           = 50,
       featureDead      = [[HEAP]],
@@ -88,7 +88,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Tick]],
+      description      = [[Debris - Wisp]],
       blocking         = false,
       damage           = 50,
       footprintX       = 1,

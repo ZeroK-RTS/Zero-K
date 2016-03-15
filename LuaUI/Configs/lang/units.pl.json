@@ -70,9 +70,9 @@
         "helptext": "Główną bronią Daimyo jest mocne działo; jest także wyposażony w rakiety, które mogą zanurzyć się i uderzać w cele podwodne. Walcząc przeciwko Daimyo, najlepiej atakować z bezpiecznej odległości."
     },
     "armtick": {
-        "name": "Tick",
+        "name": "Wisp",
         "description": "Pajęcza bomba EMP (zakopuje się)",
-        "helptext": "Tick zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Tick słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
+        "helptext": "Wisp zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Wisp słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
     },
     "cormak": {
         "name": "Outlaw",
@@ -806,9 +806,9 @@
         "helptext": "Funnelweb to ciężki mech-pająk z tarczą obszarową i kontyngentem dronów bojowych."
     },
     "armwar": {
-        "name": "Warrior",
+        "name": "Ghoul",
         "description": "Bot wsparcia",
-        "helptext": "Warrior ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Warrior samoczynnie naprawia się."
+        "helptext": "Ghoul ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Ghoul samoczynnie regeneruje się."
     },
     "chickenspire": {
         "name": "Szpila kurczaków",
