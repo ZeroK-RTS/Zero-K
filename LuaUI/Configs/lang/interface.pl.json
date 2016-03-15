@@ -1,4 +1,6 @@
 {
 	"idle_cons_different_types" : "Masz %{cons} wolnych konstruktorów %{types} różnych rodzajów.",
+	"quick_rallypoint_mode" : "Tryb szybkiej kolejki",
+	"clear_factory_queue" : "Wyczyść kolejkę",
 	"x_units_in_queue" : "%{x} jednostek w kolejce"
 }
