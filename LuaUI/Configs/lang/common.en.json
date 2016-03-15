@@ -9,6 +9,7 @@
 	"disabled_base_metal" : "Disabled - Base metal",
 	"income" : "Income",
 	"overdrive" : "Overdrive",
+	"mexspot" : "Metal spot",
 	"terraform" : "Terraform",
 	"estimated_cost" : "Estimated cost",
 	"meteors_controlled" : "Meteors controlled",

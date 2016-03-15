@@ -2284,7 +2284,7 @@ local function MakeTooltip(dt)
 		end
 		
 		if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
-			MakeToolTip_Text(" Metal spot, Income +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+			MakeToolTip_Text(WG.Translate("common", "mexspot") .. ", " .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
 			return
 		end
 		
@@ -2303,7 +2303,7 @@ local function MakeTooltip(dt)
 	end
 	
 	if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
-		MakeToolTip_Text(" Metal spot, Income +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+		MakeToolTip_Text(WG.Translate("common", "mexspot") .. ", " .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
 		return
 	end
 	
