@@ -1137,8 +1137,11 @@ local function CheckPlacingRectangle(self)
 	end
 end
 
-function widget:Update(n)
+function widget:Update(dt)
 
+	if buildingPress then
+		buildingPress.frame = buildingPress.frame - dt
+	end
 	CheckPlacingRectangle(self)
 	
 	if currentlyActiveCommand then
@@ -1267,20 +1270,20 @@ function widget:Update(n)
 					if s then
 						buildingPress.frame = false
 					else
-						buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*30
+						buildingPress.frame = options.staticMouseTime.value
 						buildingPress.pos[1] = pos[1]
 						buildingPress.pos[3] = pos[3]
 					end
 				end
 			else
-				buildingPress = {pos = pos, frame = spGetGameFrame() + options.staticMouseTime.value*30, unitDefID = -activeid}
+				buildingPress = {pos = pos, frame = options.staticMouseTime.value, unitDefID = -activeid}
 			end
 		end
 	else
 		buildingPress = false
 	end
 	
-	if buildingPress and buildingPress.frame and buildingPress.frame < spGetGameFrame() then
+	if buildingPress and buildingPress.frame and buildingPress.frame < 0 then
 		if buildingPress.unitDefID == -activeid then
 			WG.Terraform_SetPlacingRectangle(buildingPress.unitDefID)
 			CheckPlacingRectangle(self)
