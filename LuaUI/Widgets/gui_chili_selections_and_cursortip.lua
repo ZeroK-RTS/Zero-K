@@ -1760,6 +1760,8 @@ local function MakeToolTip_UD(tt_table)
 			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. WG.Translate("common", "never")
 		end
 	end
+
+	local health = tt_table.unitDef.health
 	if energyStructureDefs[tt_table.unitDef.id] then
 		local income = energyStructureDefs[tt_table.unitDef.id].income
 		local cost = energyStructureDefs[tt_table.unitDef.id].cost
@@ -1773,6 +1775,7 @@ local function MakeToolTip_UD(tt_table)
 					if y <= windTidalThreashold then
 						extraText = ", " .. WG.Translate("common", "tidal_income") .. " +1.2"
 						income = 1.2
+						health = 400
 					else
 						local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
 						extraText = ", " .. WG.Translate("common", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
@@ -1834,7 +1837,7 @@ local function MakeToolTip_UD(tt_table)
 			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " ..  WG.Translate("common", "unknown")
 		end
 	end
-		
+
 	local tt_structure = {
 		leftbar = {
 			tt_table.morph_data 
@@ -1845,7 +1848,7 @@ local function MakeToolTip_UD(tt_table)
 		main = {
 			{ name = 'udname', icon = iconPath, text = GetHumanName(tt_table.unitDef), fontSize=6 },
 			{ name = 'tt', text = GetDescription(tt_table.unitDef) .. extraText, wrap=true },
-			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(tt_table.unitDef.health),  fontSize=4, },
+			{ name='health', icon = 'LuaUI/images/commands/Bold/health.png',  text = numformat(health),  fontSize=4, },
 			--[[
 			{ name = 'requires', text = tt_table.requires and ('REQUIRES' .. tt_table.requires) or '', },
 			{ name = 'provides', text = tt_table.provides and ('PROVIDES' .. tt_table.provides) or '', },
