@@ -702,23 +702,23 @@ local function WriteGroupInfo()
 			if reloadFraction < 0.99 then
 				remainingTime = math.floor(remainingTime)
 				if remainingTime > 1000 then
-					remainingTime = "Never"
+					remainingTime = WG.Translate("common", "never")
 				else
 					remainingTime = remainingTime .. "s"
 				end
-				dgunStatus = "\nSpecial\255\255\90\90 Reload\255\255\255\255 (" .. remainingTime .. ")"  --red and white
+				dgunStatus = "\n" .. WG.Translate("common", "special") .. "\255\255\90\90 " .. WG.Translate("common", "reloading") .. "\255\255\255\255 (" .. remainingTime .. ")"  --red and white
 			else
-				dgunStatus = "\nSpecial\255\90\255\90 Ready\255\255\255\255"
+				dgunStatus = "\n" .. WG.Translate("common", "special") .. "\255\90\255\90 " .. WG.Translate("common", "ready") .. "\255\255\255\255"
 			end
 		end
 	end
-	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\nMetal \255\0\255\0" .. numformat(unitInfoSum.metalincome, true) .. "\255\255\255\255 / \255\255\0\0" ..  numformat(-unitInfoSum.metaldrain, true)  .. "\255\255\255\255") or '' --have metal or ''
-	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\nEnergy \255\0\255\0" .. numformat(unitInfoSum.energyincome, true) .. "\255\255\255\255 / \255\255\0\0" .. numformat(-unitInfoSum.energydrain, true) .. "\255\255\255\255") or '' --have energy or ''
-	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\nBuild Power " .. numformat(unitInfoSum.usedbp) .. " / " ..  numformat(unitInfoSum.totalbp)) or ''  --have buildpower or ''
+	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\n" .. WG.Translate("common", "metal") .. " \255\0\255\0" .. numformat(unitInfoSum.metalincome, true) .. "\255\255\255\255 / \255\255\0\0" ..  numformat(-unitInfoSum.metaldrain, true)  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\n" .. WG.Translate("common", "energy") .. " \255\0\255\0" .. numformat(unitInfoSum.energyincome, true) .. "\255\255\255\255 / \255\255\0\0" .. numformat(-unitInfoSum.energydrain, true) .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\n" .. WG.Translate("common", "buildpower") .. " " .. numformat(unitInfoSum.usedbp) .. " / " ..  numformat(unitInfoSum.totalbp)) or ''  --have buildpower or ''
 	local unitInfoString = 
-		"Selected Units " .. numformat(unitInfoSum.count) ..
-		"\nHealth " .. numformat(unitInfoSum.hp) .. " / " ..  numformat(unitInfoSum.maxhp) ..
-		"\nCost " .. numformat(unitInfoSum.cost) .. " / " ..  numformat(unitInfoSum.finishedcost) ..
+		WG.Translate("common", "selected_units") .. ": " .. numformat(unitInfoSum.count) ..
+		"\n" .. WG.Translate("common", "health") .. ": " .. numformat(unitInfoSum.hp) .. " / " ..  numformat(unitInfoSum.maxhp) ..
+		"\n" .. WG.Translate("common", "value") .. ": " .. numformat(unitInfoSum.cost) .. " / " ..  numformat(unitInfoSum.finishedcost) ..
 		metal .. energy ..	buildpower .. dgunStatus
 	
 	label_unitInfo = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
@@ -764,6 +764,10 @@ local function DisposeSelectionDisplay()
 	end
 end
 
+local function SelectionTooltips()
+	return "\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") .. "\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "deselect") .. "\n" .. WG.Translate("common", "shift") .. "+" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select_type") .. "\n" .. WG.Translate("common", "shift") .. "+" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "deselect_type") .. "\n" .. WG.Translate("common", "mmb") .. ": " .. WG.Translate("common", "go_to")
+end
+
 local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 	counts = counts or 1
 	local ud = UnitDefs[defid]
@@ -774,7 +778,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.unitid = unitid
 		squareData.unitids = unitids
 		
-		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto"
+		squareData.image.tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. SelectionTooltips()
 		squareData.image.file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]))
 		squareData.image.file = "#" .. defid
 		
@@ -848,7 +852,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 		squareData.image = Image:New{
 			name = "selImage";
 			parent  = squareData.panel;
-			tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. "\n\255\0\255\0Left Click: Select \nRight Click: Deselect \nShift+Left Click: Select Type\nShift+Right Click: Deselect Type \nMiddle-click: Goto";
+			tooltip = GetHumanName(ud, unitid) .. " - " .. GetDescription(ud, unitid) .. SelectionTooltips();
 			file2   = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(UnitDefs[defid]));
 			file    = "#" .. defid;
 			keepAspect = false;
@@ -1446,24 +1450,21 @@ local function GetHelpText(tooltip_type)
 
 	local sc_caption = ''
 	if tooltip_type == 'build' then
-		sc_caption = 'Space+click: Show unit stats'
+		sc_caption = WG.Translate("interface", "space_click_show_stats")
 	elseif tooltip_type == 'buildunit' then
 			if showExtendedTip then
 			
 				sc_caption = 
-					'Shift+click: x5 multiplier.\n'..
-					'Ctrl+click: x20 multiplier.\n'..
-					'Alt+click: Add units to front of queue. \n'..
-					'Rightclick: remove units from queue.\n'..
-					'Space+click: Show unit stats'
+					WG.Translate("interface", "fac_modifier_keys_instruction") ..
+					WG.Translate("interface", "space_click_show_stats")
 			else
-				sc_caption = '(Hold Spacebar for help)'
+				sc_caption = WG.Translate("interface", "hold_space_for_help")
 			end
 	
 	elseif tooltip_type == 'morph' then
-		sc_caption = 'Space+click: Show unit stats'
+		sc_caption = WG.Translate("interface", "space_click_show_stats")
 	else
-		sc_caption = 'Space+click: Show unit stats'
+		sc_caption = WG.Translate("interface", "space_click_show_stats")
 	end
 	
 	return sc_caption
@@ -1710,7 +1711,7 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 		globalitems[globalitem_name] = Image:New{
 			file = "#" .. ud.id,
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
-			tooltip = 'Middle-click: Goto',
+			tooltip = WG.Translate("common", "mmb") .. ": " .. WG.Translate("common", "go_to"),
 			keepAspect = false,
 			height  = 55*(4/5),
 			width   = 55,
@@ -1916,8 +1917,8 @@ local function MakeToolTip_Unit(data)
 			{ name='uname', icon = iconPath, text = GetHumanName(tt_ud, tt_unitID), fontSize=4, },
 			{ name='utt', text = GetDescription(tt_ud, tt_unitID) .. '\n', wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
-			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
-			{ name='help', text = green .. 'Space+click: Show unit stats', },
+			{ name='ttplayer', text = WG.Translate("common", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
+			{ name='help', text = green .. WG.Translate("interface", "space_click_show_stats"), },
 		},
 	}
 	
@@ -1992,9 +1993,9 @@ local function MakeToolTip_Feature(data)
 	
 	local desc = ''
 	if feature_name:find('dead2') or feature_name:find('heap') then
-		desc = ' (debris)'
+		desc = ' (' .. WG.Translate("common", "debris") .. ')'
 	elseif feature_name:find('dead') then
-		desc = ' (wreckage)'
+		desc = ' (' .. WG.Translate("common", "wreckage") .. ')'
 	end
 	tt_ud = UnitDefNames[live_name]
 	fullname = ((tt_ud and GetHumanName(tt_ud) .. desc) or tt_fd.tooltip or "")
@@ -2040,8 +2041,8 @@ local function MakeToolTip_Feature(data)
 					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
 			
-			{ name='ttplayer', text = 'Player: ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false, },
-			{ name='help', text = tt_ud and (green .. 'Space+click: Show unit stats') or '', },
+			{ name='ttplayer', text = WG.Translate("common", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false, },
+			{ name='help', text = tt_ud and (green .. WG.Translate("interface", "space_click_show_stats")) or '', },
 		},
 	}
 	

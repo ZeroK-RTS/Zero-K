@@ -2,5 +2,8 @@
 	"idle_cons_different_types" : "You have %{cons} idle cons of %{types} different types",
 	"quick_rallypoint_mode" : "Quick rallypoint mode",
 	"clear_factory_queue" : "Clear factory queue",
+	"space_click_show_stats" : "Space+click: Show unit stats",
+	"hold_space_for_help" : "Hold Spacebar for help",
+	"fac_modifier_keys_instruction" : "Shift+click: x5 multiplier.\nCtrl+click: x20 multiplier.\nAlt+click: Add units to front of queue.\nRightclick: remove units from queue.\n",
 	"x_units_in_queue" : "%{x} units in queue"
 }

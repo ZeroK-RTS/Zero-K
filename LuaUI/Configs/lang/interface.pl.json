@@ -2,5 +2,8 @@
 	"idle_cons_different_types" : "Masz %{cons} wolnych konstruktorów %{types} różnych rodzajów.",
 	"quick_rallypoint_mode" : "Tryb szybkiej kolejki",
 	"clear_factory_queue" : "Wyczyść kolejkę",
+	"space_click_show_stats" : "Spacja+klik: Pokaż statystyki jednostki",
+	"hold_space_for_help" : "Przytrzymaj spację: instrukcja",
+	"fac_modifier_keys_instruction" : "Shift: razy 5\nCtrl: razy 20\nAlt: wstaw na początek\nPrawy-klik: usuń z kolejki\n",
 	"x_units_in_queue" : "%{x} jednostek w kolejce"
 }
