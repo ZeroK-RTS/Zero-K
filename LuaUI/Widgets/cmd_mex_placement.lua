@@ -797,7 +797,7 @@ end
 
 function widget:DefaultCommand()
 	if mexSpotToDraw and selectionEntirelyCons then
-		return -UnitDefNames.cormex.id
+		return -mexDefID
 	end
 end
 
