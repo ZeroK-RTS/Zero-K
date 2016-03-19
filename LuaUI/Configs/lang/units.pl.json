@@ -10,7 +10,7 @@
         "helptext": "Do podlewania kaktusa."
     },
     "factorycloak": {
-        "name": "Fabryka niewidzialnych botów (Cloaky Bot Factory)",
+        "name": "Fabryka cichociemnych",
         "description": "Buduje cichociemne boty, moc 10 m/s",
         "helptext": "Jednostki z tej fabryki cechują się zwinnością i nieuchwytnością bardziej niż siłą ognia i wytrzymałością. Wiele z nich posiada maskowanie lub broń EMP, co promuje sprytne podejście do walki."
     },
@@ -160,7 +160,7 @@
         "helptext": "Limpet jest w stanie uniknąć wolniejszych pocisków dzięki szybkości i małym rozmiarom. To pozwala mu zbliżyć się do wroga i wybuchnąć, co zadaje obrażenia i spowalnia trafione jednostki."
     },
     "factoryveh": {
-        "name": "Fabryka pojazdów (Vehicle Plant)",
+        "name": "Fabryka pojazdów",
         "description": "Buduje pojazdy, moc 10 m/s",
         "helptext": "Fabryka pojazdów to ucieleśnienie wojny błyskawicznej - oddaje do dyspozycji szybkie, agresywne jednostki skuteczne w bezpośredniej walce."
     },
@@ -263,7 +263,7 @@
         "helptext": "Działo Levelera skutecznie niszczy grupy lżejszych jednostek, jednak musi mieć czystą linię strzału, zatem w miarę możliwości Levelery należy zawsze ustawiać w linii. Słabościami Levelera są niska szybkość i zasięg. Pociski Levelera wyrównują teren, co może ułatwić pojazdom przejazd po grząskim terenie."
     },
     "corjamt": {
-        "name": "Aegi",
+        "name": "Aegis",
         "description": "Tarcza obszarowa",
         "helptext": "Aegis posiada tarczę obszarową, która detonuje nadlatujące pociski. Wiąże się to jednak z wysokim kosztem energetycznym, a potężne ataki i tak mogą przebić się przez osłabioną tarczę."
     },
@@ -401,7 +401,7 @@
         "helptext": "Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie jednostki i niszczenia ich mocnym działkiem EMP. Nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, lecz jednostki o mniejszym od niego zasięgu niszczy skutecznie."
     },
     "armsolar": {
-        "name": "Solar Collector (Panel słoneczny)",
+        "name": "Panel słoneczny",
         "description": "Wytwarza energię (2)",
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
     },
@@ -411,7 +411,7 @@
         "helptext": "Brawler to statek powietrzny, którego wysokość lotu sprawia nie lada problem przy próbach zestrzelenia go. Jest wytrzymały i posiada podwójne karabiny o dużym zasięgu."
     },
     "factoryshield": {
-        "name": "Fabryka ekranowanych botów (Shield Bot Factory)",
+        "name": "Fabryka tarczowników",
         "description": "Buduje harde boty, moc 10 m/s",
         "helptext": "Boty tu produkowane z reguły wyposażone są w tarcze, co daje im wysoką wytrzymałość. Łączenie tarcz powoduje, że dobrze działają w grupach. Dobra fabryka dla nowicjuszy."
     },
@@ -491,7 +491,7 @@
         "helptext": "Informant zapewnia radar na polu bitwy."
     },
     "armwin": {
-        "name": "Turbina wiatrowa/wodna",
+        "name": "Turbina",
         "description": "Wytwarza energię",
         "helptext": "Turbiny produkują różną ilość energii zależnie od tego, gdzie się je zbuduje. Na lądzie produkują zmienną ilość energii, która zwiększa się wraz z wysokością nad poziomem morza. Wiatraki są bardzo delikatne, zatem należy stawiać je rozważnie. W wodzie turbiny produkują stałą ilość energii i są nieco wytrzymalsze niż wiatraki."
     },
@@ -521,7 +521,7 @@
         "helptext": "Ultimatum posiada dezintegrator, który jest w stanie zniszczyć nawet ciężkie jednostki jednym strzałem. Niewidzialność pozwala mu podejść pod wrogie mechy i szybko się ich pozbyć; lekkie jednostki bardzo skutecznie mu w tym przeszkadzają."
     },
     "cormex": {
-        "name": "Kopalnia (Metal Extractor)",
+        "name": "Kopalnia",
         "description": "Wydobywa metal",
         "helptext": "Kopalnia to główne źródło metalu i najważniejszy nabytek na polu bitwy. Nadmiar energii automatycznie trafia do kopalni, by zwiększyć wydobycie."
     },
@@ -581,7 +581,7 @@
         "helptext": "Karny kurczak za złe zachowanie."
     },
     "factoryplane": {
-        "name": "Lotnisko (Airplane Plant)",
+        "name": "Lotnisko",
         "description": "Buduje samoloty, moc 10 m/s",
         "helptext": "Lotnisko produkuje samoloty; oferuje przede wszystkim myśliwce i bombowce, aczkolwiek nie tylko. Na lotnisku znajduje się jedno lądowisko do naprawy samolotów i przeładowywania bombowców."
     },
@@ -611,7 +611,7 @@
         "helptext": "Tutaj budowane są boty amfibijne, które są w stanie walczyć na lądzie i w wodzie. Zanurzone amfibie regenerują się."
     },
     "factoryship": {
-        "name": "Stocznia (Shipyard)",
+        "name": "Stocznia",
         "description": "Buduje statki, moc 10 m/s",
         "helptext": "Stocznia buduje statki i łodzie podwodne. Pozostałe jednostki wodne, tj. poduszkowce i amfibie, mają osobne fabryki."
     },
@@ -826,7 +826,7 @@
         "helptext": "Jedna salwa z pancernika jest w stanie poradzić sobie z większością celów na powierzchni wody, a daleki zasięg pozwala również na ostrzał celów lądowych. Pancernik wymaga jednak ochrony przed jednostkami podwodnymi i powietrznymi."
     },
     "factoryspider": {
-        "name": "Fabryka pająków (Spider Factory)",
+        "name": "Fabryka pająków",
         "description": "Buduje pająki, moc 10 m/s",
         "helptext": "Stworzone do walki na trudnym terenie, pająki polegają na zasięgu i ruchliwości bardziej niż na sile ognia."
     },
@@ -1014,7 +1014,7 @@
         "helptext": "Doomsday Machine to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny.  Jest w stanie schować działo, by zmniejszyć otrzymywane obrażenia czterokrotnie."
     },
     "factorygunship": {
-        "name": "Fabryka statków powietrznych (Gunship Plant)",
+        "name": "Fabryka statków powietrznych",
         "description": "Buduje statki powietrzne, moc 10 m/s",
         "helptext": "W tej fabryce produkuje się statki powietrzne, zarówno bojowe, jak i transportowe."
     },
@@ -1079,7 +1079,7 @@
         "helptext": "Dominatrix przejmuje jednostki wroga pod swoją kontrolę. Wiele Dominatrix może współpracować przy przejmowaniu danej jednostki, ale tylko jednej z nich zostanie przypisana. Po przejęciu jednostki, Dominatrix nie może przejmować przez kolejne 12 sekund. Zniszczenie powoduje zwrot wszystkich przypisanych jednostek do pierwotnego właściciela."
     },
     "factorytank": {
-        "name": "Fabryka czołgów (Heavy Tank Factory)",
+        "name": "Fabryka czołgów",
         "description": "Buduje czołgi, moc 10 m/s",
         "helptext": "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
     },
@@ -1149,7 +1149,7 @@
         "helptext": "Newton to eksperymentalne działko grawitacyjne, które choć nie zadaje obrażeń, to jest w stanie przyciągać lub odpychać inne jednostki, w tym także sojusznicze."
     },
     "factoryhover": {
-        "name": "Fabryka poduszkowców (Hovercraft Platform)",
+        "name": "Fabryka poduszkowców",
         "description": "Buduje poduszkowce, moc 10 m/s",
         "helptext": "Poduszkowce są śmiercionośne i szybko poruszają się zarówno po powierzchni wody, jak i po płaskim terenie."
     },
