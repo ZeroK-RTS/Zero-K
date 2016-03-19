@@ -1,6 +1,11 @@
 {
 	"idle_cons_different_types" : "You have %{cons} idle cons of %{types} different types",
 	"quick_rallypoint_mode" : "Quick rallypoint mode",
+	"tacnuke_and_emp" : "Tacnuke and EMP",
+	"seismic" : "Seismic",
+	"emp_aoe" : "EMP AOE",
+	"emp_vertical" : "EMP vertical",
+	"tacnuke_vertical" : "Seismic and Tacnuke vertical",
 	"clear_factory_queue" : "Clear factory queue",
 	"space_click_show_stats" : "Space+click: Show unit stats",
 	"hold_space_for_help" : "Hold Spacebar for help",

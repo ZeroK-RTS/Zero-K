@@ -83,7 +83,7 @@ local Grid = 16 -- grid size, do not change without other changes.
 ---------------------------------
 -- Epic Menu
 ---------------------------------
-options_path = 'Settings/Interface/Terraform'
+options_path = 'Settings/Interface/Building Placement'
 options_order = { 'staticMouseTime'}
 options = {
 	staticMouseTime = {
