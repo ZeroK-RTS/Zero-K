@@ -780,6 +780,27 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1, 1)
 end
 
+local selectionEntirelyCons = false
+function widget:SelectionChanged(units)
+	if not units then
+		selectionEntirelyCons = false
+		return
+	end
+	selectionEntirelyCons = true
+	for i = 1, #units do
+		if not mexBuilder[units[i]] then
+			selectionEntirelyCons = false
+			return
+		end
+	end
+end
+
+function widget:DefaultCommand()
+	if mexSpotToDraw and selectionEntirelyCons then
+		return -UnitDefNames.cormex.id
+	end
+end
+
 function widget:DrawInMiniMap()
 
 	if drawMexSpots then
