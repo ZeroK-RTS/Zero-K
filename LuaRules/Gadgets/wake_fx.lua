@@ -76,7 +76,7 @@ function gadget:GameFrame(n)
             if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
                 local radius = Spring.GetUnitRadius(u);
                 local effect = SFXTYPE_WAKE1
-                if radius>50 then sfx = SFXTYPE_WAKE2 end
+                if radius>50 then effect = SFXTYPE_WAKE2 end
                 Spring.UnitScript.CallAsUnit(u, function()
                     Spring.UnitScript.EmitSfx(1,effect);
                 end);
