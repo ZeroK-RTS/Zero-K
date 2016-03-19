@@ -1139,7 +1139,7 @@ end
 
 function widget:Update(dt)
 
-	if buildingPress then
+	if buildingPress and buildingPress.frame then
 		buildingPress.frame = buildingPress.frame - dt
 	end
 	CheckPlacingRectangle(self)
