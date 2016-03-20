@@ -177,9 +177,9 @@ factionBuildConfig = {
 				
 				[2] = { -- scout
 					importanceMult = 1.2,
-					count = 2,
-					[1] = {ID = UnitDefNames['armflea'].id, chance = 0.95},
-					[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
+					count = 1,
+					[1] = {ID = UnitDefNames['armflea'].id, chance = 1},
+					--[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
 				},
 				
 				[3] = { -- raider
