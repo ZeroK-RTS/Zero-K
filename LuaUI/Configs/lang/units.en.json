@@ -12,7 +12,7 @@
 	"factorycloak" : {
 		"name" : "Cloaky Bot Factory",
 		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
-		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Ghoul, Zeus, Hammer"
+		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer"
 	},
 	"amphartillery" : {
 		"name" : "Kraken",
@@ -70,9 +70,9 @@
 		"helptext" : "The Daimyo class destroyer packs a wallop with its main gun, a powerful riot cannon. It also features missiles that can hit submarines and surface targets alike. The Daimyo is best attacked from afar, using surface ships or hovercraft with long-range weapons."
 	},
 	"armtick" : {
-		"name" : "Wisp",
+		"name" : "Tick",
 		"description" : "All Terrain EMP Bomb (Burrows)",
-		"helptext" : "The Wisp relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Ghouls or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
+		"helptext" : "The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
 	},
 	"cormak" : {
 		"name" : "Outlaw",
@@ -810,9 +810,9 @@
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
 	},
 	"armwar" : {
-		"name" : "Ghoul",
+		"name" : "Warrior",
 		"description" : "Riot Bot",
-		"helptext" : "The Ghoul's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat."
+		"helptext" : "The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat."
 	},
 	"chickenspire" : {
 		"name" : "Chicken Spire",
