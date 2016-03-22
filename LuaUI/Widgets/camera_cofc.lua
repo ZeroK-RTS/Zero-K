@@ -625,11 +625,23 @@ local initialBoundsSet = false
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local cx,cy = vsx * 0.5,vsy * 0.5
+local centerDriftFactor = 20/1080 * vsy
+local horizAspectCorrectionFactor, vertAspectCorrectionFactor = 1, 1
+if vsx > vsy then horizAspectCorrectionFactor = vsx/vsy
+else vertAspectCorrectionFactor = vsy/vsx end
+
 function widget:ViewResize(viewSizeX, viewSizeY)
 	vsx = viewSizeX
 	vsy = viewSizeY
 	cx = vsx * 0.5
 	cy = vsy * 0.5
+	centerDriftFactor = 20/1080 * vsy
+	horizAspectCorrectionFactor, vertAspectCorrectionFactor = 1, 1
+	if vsx > vsy then 
+		horizAspectCorrectionFactor = vsx/vsy
+	else 
+		vertAspectCorrectionFactor = vsy/vsx 
+	end
 	SetFOV(Spring.GetCameraFOV())
 end
 
@@ -692,7 +704,6 @@ local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
 -- local targetCenteringHeight = 1200
 local mapEdgeProportion = 1.0/5.9
-local centerDriftFactor = 20/1080 * vsy
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
@@ -1170,10 +1181,16 @@ if storeTarget and options.zoomouttocenter.value and not zoomin then
 		cstemp.px = cstemp.px + dx
 		cstemp.pz = cstemp.pz + dz
 		local csnew = SetCenterBounds(cstemp, true)
-		dx, dz = csnew.px - cstemp.px, csnew.pz - cstemp.pz
-		--Since the delta is computed for the final camera position, we can treat the camera movement as linearly corresponding to the necessary lockpoint movement
-		--which makes this work both for zoom out from cursor and zoom out from screen center
-		lockPoint.worldEnd = {x = lockPoint.worldBegin.x + dx, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z + dz}
+		if options.zoomout.value == 'fromCursor' then
+			dx, dz = csnew.px - cstemp.px, csnew.pz - cstemp.pz
+			--Since the delta is computed for the final camera position, we can treat the camera movement as linearly corresponding to the necessary lockpoint movement
+			--which makes this work both for zoom out from cursor and zoom out from screen center
+			lockPoint.worldEnd = {x = lockPoint.worldBegin.x + dx, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z + dz}
+		else
+			lockPoint.screen = {x = cx, y = cy}
+			lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
+			lockPoint.worldEnd.x, lockPoint.worldEnd.z = GetPyramidBoundedCoords(lockPoint.worldBegin.x, lockPoint.worldBegin.z)
+		end
 	end
 	--
 
@@ -1182,8 +1199,8 @@ end
 
 local function DriftToCenter(cs, gx, gy, gz, mx, my)
 	if options.drifttocenter.value then
-		mx = mx + (mx - vsx/2)/(vsx/2) * (vsx/vsy) * centerDriftFactor --Not sure the correct value and function to compute it
-	 	my = my + (my - vsy/2)/(vsy/2) * centerDriftFactor
+		mx = mx + (mx - vsx/2)/(vsx/2) * horizAspectCorrectionFactor * centerDriftFactor --Seems to produce the same apparent size on centered object independent of FOV
+	 	my = my + (my - vsy/2)/(vsy/2) * vertAspectCorrectionFactor * centerDriftFactor
 		local dirx, diry, dirz = Spring.GetPixelDir(mx, vsy - my)
 		local distanceFactor = 0
 		if diry ~= 0 then
@@ -1326,32 +1343,20 @@ local function Zoom(zoomin, shift, forceCenter)
 	else
 
 		--//ZOOMOUT FROM CENTER-SCREEN, ZOOMIN TO CENTER-SCREEN//--
-		local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs)
+		local onmap, gx,gy,gz = VirtTraceRay(cx, cy, cs) --This doesn't seem to provide the exact center, thus later bounding
 		
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
 			gx,gz = GetMapBoundedCoords(gx,gz)   
+			if not zoomin then gx, gz = GetPyramidBoundedCoords(gx, gz) end
 		end
 
-		ls_have = false --unlock lockspot 
-		-- SetLockSpot2(cs) --set lockspot
-		-- if gx then --set lockspot
-		-- 	ls_x,ls_y,ls_z = gx,gy,gz
-		-- 	local px,py,pz = cs.px,cs.py,cs.pz
-		-- 	local dx,dy,dz = ls_x-px, ls_y-py, ls_z-pz
-		-- 	ls_onmap = onmap
-		-- 	ls_dist = sqrt(dx*dx + dy*dy + dz*dz) --distance to ground coordinate
-		-- 	ls_have = true
-		-- end
+		ls_have = false --unlock lockspot
 		ComputeLockSpotParams(cs, gx, gy, gz, onmap)
 
 		if not ls_have then
 			return
 		end
-	    
-		-- if zoomin and not ls_onmap then --prevent zooming into null area (outside map)
-			-- return
-		-- end
 
 		-- if not options.freemode.value and ls_dist >= maxDistY then 
 			-- return 
