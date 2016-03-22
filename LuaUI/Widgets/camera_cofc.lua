@@ -111,7 +111,7 @@ local OverviewAction = function() end
 local OverviewSetAction = function() end
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
-local SetCenterBounds = function(cs) end
+local ApplyCenterBounds = function(cs) end
 
 options = {
 	
@@ -296,7 +296,7 @@ options = {
 		OnChange = function(self) 
 			local cs = Spring.GetCameraState()
 			if cs.rx then
-				cs = SetCenterBounds(cs)
+				cs = ApplyCenterBounds(cs)
 				-- Spring.SetCameraState(cs, options.smoothness.value)
 				OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
 			end
@@ -681,17 +681,17 @@ local camcycle = 1
 local trackcycle = 1
 local hideCursor = false
 
-
-local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
+-- Mirrored in Interpolate.lua
+-- local MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
 local minX, minZ, maxX, maxZ = 0, 0, MWIDTH, MHEIGHT
-local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
-local mcy 		= spGetGroundHeight(mcx, mcz)
-local maxDistY = max(MHEIGHT, MWIDTH) * 2
-local mapEdgeBuffer = 1000
+-- local mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
+-- local mcy 		= spGetGroundHeight(mcx, mcz)
+-- local maxDistY = max(MHEIGHT, MWIDTH) * 2
+-- local mapEdgeBuffer = 1000
 
 --Tilt Zoom constants
 local onTiltZoomTrack = true
-local lockPoint = {worldBegin = nil, worldEnd = nil, screen = nil, mode = nil}
+local lockPoint = {worldBegin = nil, worldEnd = nil, worldCenter = nil, world = nil, screen = nil, mode = nil}
 local lastMouseX, lastMouseY
 -- local zoomTime = 0
 -- local zoomTimer
@@ -978,7 +978,7 @@ local function VirtTraceRay(x,y, cs)
 	return false, gx, gy, gz
 end
 
-SetCenterBounds = function(cs, ignoreLockSpot)
+ApplyCenterBounds = function(cs, ignoreLockSpot)
 	local csnew = spGetCameraState()
 	CopyState(csnew, cs)
 	-- if options.zoomouttocenter then Spring.Echo("zoomouttocenter.value: "..options.zoomouttocenter.value) end
@@ -1174,22 +1174,24 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTa
 	end
 
 if storeTarget and options.zoomouttocenter.value and not zoomin then
-		csold = spGetCameraState()  --the lockpoint correction function uses Spring.GetPixelDir, which only works on the currently set camera state.
-		spSetCameraState(cstemp, 0) --Since OverrideTraceScreenRay doesn't work underwater we're kinda limited here
-		local dx, _, dz = GetLockpointCorrectionDelta(cstemp, lockPoint)
-		spSetCameraState(csold, 0)
-		cstemp.px = cstemp.px + dx
-		cstemp.pz = cstemp.pz + dz
-		local csnew = SetCenterBounds(cstemp, true)
 		if options.zoomout.value == 'fromCursor' then
+			csold = spGetCameraState()  --the lockpoint correction function uses Spring.GetPixelDir, which only works on the currently set camera state.
+			spSetCameraState(cstemp, 0) --Since OverrideTraceScreenRay doesn't work underwater we're kinda limited here
+			local dx, _, dz = GetLockpointCorrectionDelta(cstemp, lockPoint)
+			spSetCameraState(csold, 0)
+			cstemp.px = cstemp.px + dx
+			cstemp.pz = cstemp.pz + dz
+			local csnew = ApplyCenterBounds(cstemp, true)
 			dx, dz = csnew.px - cstemp.px, csnew.pz - cstemp.pz
 			--Since the delta is computed for the final camera position, we can treat the camera movement as linearly corresponding to the necessary lockpoint movement
 			--which makes this work both for zoom out from cursor and zoom out from screen center
 			lockPoint.worldEnd = {x = lockPoint.worldBegin.x + dx, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z + dz}
 		else
+			lockPoint.worldCenter = {x = gx, z = gz}
+			-- lockPoint.screenBegin = {x = lockPoint.screen.x, y = lockPoint.screen.y}
 			lockPoint.screen = {x = cx, y = cy}
-			lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
-			lockPoint.worldEnd.x, lockPoint.worldEnd.z = GetPyramidBoundedCoords(lockPoint.worldBegin.x, lockPoint.worldBegin.z)
+			-- lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
+			-- lockPoint.worldEnd.x, lockPoint.worldEnd.z = GetPyramidBoundedCoords(lockPoint.worldBegin.x, lockPoint.worldBegin.z)
 		end
 	end
 	--
@@ -1252,7 +1254,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 
 		if not options.freemode.value then cs.py = min(cs.py, maxDistY) end --Ensure camera never goes higher than maxY
 
-		cs = SetCenterBounds(cs) 
+		cs = ApplyCenterBounds(cs) 
 
 		-- spSetCameraState(cs, smoothness) --move
 		OverrideSetCameraStateInterpolate(cs,smoothness)
@@ -1348,7 +1350,7 @@ local function Zoom(zoomin, shift, forceCenter)
 		if gx and not options.freemode.value then
 			--out of map. Bound zooming to within map
 			gx,gz = GetMapBoundedCoords(gx,gz)   
-			if not zoomin then gx, gz = GetPyramidBoundedCoords(gx, gz) end
+			-- if not zoomin then gx, gz = GetPyramidBoundedCoords(gx, gz) end
 		end
 
 		ls_have = false --unlock lockspot
@@ -1385,7 +1387,9 @@ local function Zoom(zoomin, shift, forceCenter)
 		if cstemp then cs = cstemp; end
 	end
 
-	cs = SetCenterBounds(cs, not zoomin)
+	if not zoomin then
+		cs = ApplyCenterBounds(cs, not zoomin)
+	end
 
 	OverrideSetCameraStateInterpolate(cs,options.smoothness.value, lockPoint)
 
@@ -1415,7 +1419,7 @@ local function Altitude(up, s)
 	end
     cs.py = new_py
 
-	cs = SetCenterBounds(cs)
+	cs = ApplyCenterBounds(cs)
 
 	lastMouseX = nil
 
@@ -1433,7 +1437,7 @@ local function ResetCam()
 	cs.pz = Game.mapSizeZ/2
 	cs.rx = -HALFPI
 	cs.ry = PI
-	cs = SetCenterBounds(cs)
+	cs = ApplyCenterBounds(cs)
 	-- spSetCameraState(cs, 0)
 	OverrideSetCameraStateInterpolate(cs,0)
 	ov_cs = nil
@@ -1477,7 +1481,7 @@ OverviewAction = function()
 			cs.pz = Game.mapSizeZ/2
 			cs.rx = -HALFPI
 		end
-		cs = SetCenterBounds(cs)
+		cs = ApplyCenterBounds(cs)
 
 		local onmap, gx, gy, gz = VirtTraceRay(cx,cy,cs)
 		lockPoint = {}
@@ -1503,7 +1507,7 @@ OverviewAction = function()
 			ls_have = true
 			local cstemp = UpdateCam(cs) --set camera position & orientation based on lockstop point
 			if cstemp then cs = cstemp; end
-			cs = SetCenterBounds(cs)
+			cs = ApplyCenterBounds(cs)
 
 			lockPoint = {}
 			lockPoint.worldBegin = {x = Game.mapSizeX/2, y = GetMapBoundedGroundHeight(Game.mapSizeX/2, Game.mapSizeZ/2), z = Game.mapSizeZ/2}
@@ -1828,7 +1832,7 @@ local function ScrollCam(cs, mxm, mym, smoothlevel)
 	end
 	if csnew then
 		if not options.freemode.value then csnew.py = min(csnew.py, maxDistY) end --Ensure camera never goes higher than maxY
-		csnew = SetCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
+		csnew = ApplyCenterBounds(csnew) --Should be done since cs.py changes, but stops camera movement southwards. TODO: Investigate this.
     -- spSetCameraState(csnew, smoothlevel)
 	OverrideSetCameraStateInterpolate(csnew,smoothlevel)
   end

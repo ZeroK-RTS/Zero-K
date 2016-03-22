@@ -17,6 +17,13 @@ local deltaEnd = {px=nil,py=0,pz=0,rx=0,ry=0,rz=0,fov=0,time=0}
 local targetCam = {px=0,py=0,pz=0,rx=0,ry=0,rz=0,dx=0,dy=0,dz=0,fov=0,name="",active=false}
 local lockTarget = nil
 
+MWIDTH, MHEIGHT = Game.mapSizeX, Game.mapSizeZ
+mcx, mcz 	= MWIDTH / 2, MHEIGHT / 2
+mcy 		= Spring.GetGroundHeight(mcx, mcz)
+maxDistY = math.max(MHEIGHT, MWIDTH) * 2
+mapEdgeBuffer = 1000
+
+
 function GetTargetCameraState()
 	--//Double-check no outside SetCameraTarget happened//--
 	if not targetCam.active then
@@ -92,6 +99,7 @@ function OverrideSetCameraStateInterpolate(cs,smoothness, lockPoint)
 	if lockPoint then
 		lockTarget = {}
 		lockTarget.world = lockPoint.world
+		lockTarget.worldCenter = lockPoint.worldCenter
 		lockTarget.worldBegin = lockPoint.worldBegin
 		lockTarget.worldEnd = lockPoint.worldEnd
 		lockTarget.screen = lockPoint.screen
@@ -135,6 +143,14 @@ local function DisableEngineTilt(cs)
 	cs.scrollSpeed = 0
 end
 
+function GetCenterBounds(cs)
+	-- local currentFOVhalf_rad = (csnew.fov/2) * RADperDEGREE
+	local maxDc = math.max((maxDistY - cs.py), 0)/(maxDistY - mapEdgeBuffer)-- * math.tan(currentFOVhalf_rad) * 1.5)
+	-- Spring.Echo("MaxDC: "..maxDc)
+	local minX, minZ, maxX, maxZ = math.max(mcx - MWIDTH/2 * maxDc, 0), math.max(mcz - MHEIGHT/2 * maxDc, 0), math.min(mcx + MWIDTH/2 * maxDc, MWIDTH), math.min(mcz + MHEIGHT/2 * maxDc, MHEIGHT)
+	return minX, minZ, maxX, maxZ 
+end
+
 function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
 	local dx, dy, dz
 	if lockPoint then
@@ -159,6 +175,35 @@ function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
 			lockPoint.world.z = lockPoint.worldBegin.z + lockPoint.worldDelta.z * tweenFact
 		end
 
+		if lockPoint.worldCenter then 
+			local vsx, vsy = widgetHandler:GetViewSizes()
+			local cx,cy = vsx * 0.5,vsy * 0.5
+			local dirx, diry, dirz = Spring.GetPixelDir(cx, cy)
+			local distanceFactor = 0
+			if diry ~= 0 then
+				distanceFactor = (lockPoint.world.y - cs.py) / diry
+			end
+			dirx = dirx * distanceFactor
+			diry = diry * distanceFactor
+			dirz = dirz * distanceFactor
+			lockPoint.worldCenter = {x = cs.px + dirx, y = cs.py + diry, z = cs.pz + dirz}
+			-- lockPoint.worldCenter = {x = cg[1], y = cg[2], z = cg[3]}
+
+			local minX, minZ, maxX, maxZ = GetCenterBounds(cs)
+			local cdx, cdz = 0, 0
+			local corrected = false
+			if lockPoint.worldCenter.x < minX then corrected = true ; lockPoint.worldCenter.x = minX end
+			if lockPoint.worldCenter.x > maxX then corrected = true ; lockPoint.worldCenter.x = maxX end
+			if lockPoint.worldCenter.z < minZ then corrected = true ; lockPoint.worldCenter.z = minZ end
+			if lockPoint.worldCenter.z > maxZ then corrected = true ; lockPoint.worldCenter.z = maxZ end
+			-- if corrected then
+				lockPoint.world.x = lockPoint.worldCenter.x
+				lockPoint.world.z = lockPoint.worldCenter.z
+			-- end
+			-- Spring.Echo("lockPoint.world: {"..lockPoint.world.x..", "..lockPoint.world.z.."}")
+			-- Spring.Echo("Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", lockPoint.worldCenter: {"..lockPoint.worldCenter.x..", "..lockPoint.worldCenter.z.."}")
+		end
+
 		if lockPoint.mode == lockMode.xy then
 			local dirx, diry, dirz = Spring.GetPixelDir(lockPoint.screen.x, lockPoint.screen.y)
 			local distanceFactor = 0
@@ -169,8 +214,11 @@ function GetLockpointCorrectionDelta(cs, lockPoint, tweenFact)
 			diry = diry * distanceFactor
 			dirz = dirz * distanceFactor
 			local screenTargetInWorld = {x = cs.px + dirx, y = cs.py + diry, z = cs.pz + dirz}
+			-- Spring.Echo("lockPoint.world: {"..lockPoint.world.x..", "..lockPoint.world.z.."}, screenTargetInWorld: {"..screenTargetInWorld.x..", "..screenTargetInWorld.z.."}")
 
 			dx, dz = lockPoint.world.x - screenTargetInWorld.x, lockPoint.world.z - screenTargetInWorld.z
+			-- Spring.Echo("lockPoint.screen: {"..lockPoint.screen.x..", "..lockPoint.screen.y.."}")
+			-- Spring.Echo("d: {"..dx..", "..dz.."}")
 		end
 		if lockPoint.mode == lockMode.free then
 			--When someone needs this, this is where to put in the correction mode that works on xyz
