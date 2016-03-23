@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Newton]],
   description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   buildCostEnergy               = 200,
   buildCostMetal                = 200,
   builder                       = false,

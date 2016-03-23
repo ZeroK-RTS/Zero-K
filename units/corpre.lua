@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[corpre]],
   name                          = [[Scorcher]],
   description                   = [[Anti-Swarm Heat Ray (weaker at range)]],
-  bmcode                        = [[0]],
   buildCostEnergy               = 220,
   buildCostMetal                = 220,
   builder                       = false,

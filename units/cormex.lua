@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Produces Metal]],
   acceleration           = 0,
   activateWhenBuilt      = true,
-  bmcode                 = [[0]],
   brakeRate              = 0,
   buildAngle             = 2048,
   buildCostEnergy        = 75,
