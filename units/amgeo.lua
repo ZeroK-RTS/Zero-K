@@ -53,7 +53,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Moho Geothermal Powerplant]],
+      description      = [[Wreckage - Advanced Geothermal]],
       blocking         = true,
       damage           = 3250,
       energy           = 0,
@@ -67,7 +67,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Moho Geothermal Powerplant]],
+      description      = [[Debris - Advanced Geothermal]],
       blocking         = false,
       damage           = 3250,
       energy           = 0,
