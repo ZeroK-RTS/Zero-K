@@ -522,6 +522,7 @@ function widget:Update()
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
+		WG.mouseoverMex = mexSpotToDraw
 	else
 		local _, cmd_id = spGetActiveCommand()
 		if -mexDefID ~= cmd_id then
