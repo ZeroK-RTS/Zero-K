@@ -790,11 +790,6 @@
         "description": "Assault/Riot Bot",
         "name": "Hoarder"
     },
-    "corpre": {
-        "helptext": "The Scorcher is armed with the Heat Ray. It is incredibly powerful close up, but unfortunately the beam gradually dissipates as it travels and loses most of its lethality at long range.",
-        "description": "Anti-Swarm Heat Ray (weaker at range)",
-        "name": "Лихач"
-    },
     "corpyro2": {
         "helptext": "Пиро (Pyro) - это дешёвый, быстрый шагоход с огнемётом. Огнемёт наносит увлеченный урон большим юнитам и способен сжигать несколько целей одновременно. После уничтожения, Пиро (Pyro) поджигает ближайших юнитов. Дополнительно, данный робот имеет прыжковые двигатели, позволяющие ему перепрыгивать препятствия или внезапно прыгать на противника.",
         "description": "Прыгающий рейдер/подавитель",

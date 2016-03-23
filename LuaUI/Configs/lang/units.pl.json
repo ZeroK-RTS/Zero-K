@@ -790,11 +790,6 @@
         "description": "Szturmowy bot wsparcia",
         "helptext": "Hoarder to jednostka wsparcia, która zasysa okoliczne jednostki, co ułatwia ich zniszczenie."
     },
-    "corpre": {
-        "name": "Scorcher",
-        "description": "Wieżyczka wsparcia",
-        "helptext": "Scorcher to wieżyczka wsparcia uzbrojona w promień cieplny."
-    },
     "corpyro2": {
         "name": "Pyro",
         "description": "Lekki skoczek wsparcia",

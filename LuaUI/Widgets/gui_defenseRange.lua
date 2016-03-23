@@ -58,7 +58,6 @@ modConfig["ZK"]["unitList"] =
 	corrl = { weapons = { 4 } },		--defender
 	corllt = { weapons = { 1 } },		--LLT
 	corhlt = { weapons = { 1 } },		--HLT
-	corpre = { weapons = { 1 } },		--scorcher (unused)
 	corvipe = { weapons = { 1 } },		--viper (unused)
 	cordoom = { weapons = { 1 } },		--doomsday
 	cordl = { weapons = { 1 } },		--jellyfish (unused)
