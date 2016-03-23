@@ -217,11 +217,6 @@
         "description": "Zwiadowcza łódź podwodna kamikaze",
         "helptext": "Lancelet to właściwie duża torpeda z możliwościami zwiadowczymi. Po wykonaniu rekonesansu może zdetonować się, zadając ciężkie obrażenia."
     },
-    "vehdisable": {
-        "name": "Dominatrix",
-        "description": "Pojazd walki elektronicznej",
-        "helptext": "Dominatrix dominuje uległe jednostki."
-    },
     "armmstor": {
         "name": "Magazyn",
         "description": "Magazynuje metal i energię (po 500)",

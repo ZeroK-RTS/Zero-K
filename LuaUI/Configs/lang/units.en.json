@@ -216,11 +216,6 @@
 		"description" : "Scout/Suicide Minisub",
 		"helptext" : "The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships."
 	},
-	"vehdisable" : {
-		"name" : "Dominatrix",
-		"description" : "Electronic Warfare Vehicle",
-		"helptext" : "The Dominatrix progressively disables enemies with its electronic warfare attack, starting by slowing their movement and attack, then disarming them and finally paralyzing them outright."
-	},
 	"armmstor" : {
 		"name" : "Storage",
 		"description" : "Stores Metal and Energy (500)",
