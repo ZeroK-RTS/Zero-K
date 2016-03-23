@@ -201,7 +201,7 @@ local options = {
     desc   = "Shuffles start boxes.",
     type   = "list",
     section= 'startconds',
-    def    = "off",
+    def    = "shuffle",
     items  = {
       {
         key  = "off",
