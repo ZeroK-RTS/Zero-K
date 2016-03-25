@@ -1173,25 +1173,11 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTa
 		lastMouseY = nil
 	end
 
-if storeTarget and options.zoomouttocenter.value and not zoomin then
-		if options.zoomout.value == 'fromCursor' then
-			csold = spGetCameraState()  --the lockpoint correction function uses Spring.GetPixelDir, which only works on the currently set camera state.
-			spSetCameraState(cstemp, 0) --Since OverrideTraceScreenRay doesn't work underwater we're kinda limited here
-			local dx, _, dz = GetLockpointCorrectionDelta(cstemp, lockPoint)
-			spSetCameraState(csold, 0)
-			cstemp.px = cstemp.px + dx
-			cstemp.pz = cstemp.pz + dz
-			local csnew = ApplyCenterBounds(cstemp, true)
-			dx, dz = csnew.px - cstemp.px, csnew.pz - cstemp.pz
-			--Since the delta is computed for the final camera position, we can treat the camera movement as linearly corresponding to the necessary lockpoint movement
-			--which makes this work both for zoom out from cursor and zoom out from screen center
-			lockPoint.worldEnd = {x = lockPoint.worldBegin.x + dx, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z + dz}
-		else
-			lockPoint.worldCenter = {x = gx, z = gz}
-			-- lockPoint.screenBegin = {x = lockPoint.screen.x, y = lockPoint.screen.y}
+	if storeTarget and options.zoomouttocenter.value and not zoomin then
+		lockPoint.worldCenter = {x = gx, z = gz}
+		if options.zoomout.value == 'fromCenter' then --Special case. For some reason it gets bouncy when done the same way as fromCursor
+			lockPoint.mode = lockMode.xycenter
 			lockPoint.screen = {x = cx, y = cy}
-			-- lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
-			-- lockPoint.worldEnd.x, lockPoint.worldEnd.z = GetPyramidBoundedCoords(lockPoint.worldBegin.x, lockPoint.worldBegin.z)
 		end
 	end
 	--
@@ -1387,8 +1373,9 @@ local function Zoom(zoomin, shift, forceCenter)
 		if cstemp then cs = cstemp; end
 	end
 
+	local csbounded = ApplyCenterBounds(cs, not zoomin)
 	if not zoomin then
-		cs = ApplyCenterBounds(cs, not zoomin)
+		cs = csbounded
 	end
 
 	OverrideSetCameraStateInterpolate(cs,options.smoothness.value, lockPoint)
