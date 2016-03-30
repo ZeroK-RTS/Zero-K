@@ -1,43 +1,29 @@
 -- $Id$
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local materials = {
-	normalMappedS3O = {
-		shaderDefinitions = {
-			"#define use_normalmapping",
-			"#define deferred_mode 0",
-			"#define use_vertex_ao",
-			"#define flashlights",
-			"#define SPECULARMULT 8.0",
-		},
-		deferredDefinitions = {
-			"#define use_normalmapping",
-			"#define deferred_mode 1",
-			"#define flashlights",
-			"#define use_vertex_ao",
-			"#define SPECULARMULT 8.0",
-		},
-
-		shader    = include("ModelMaterials/Shaders/default.lua"),
-		deferred  = include("ModelMaterials/Shaders/default.lua"),
-		usecamera = false,
-		culling   = GL.BACK,
-		predl  = nil,
-		postdl = nil,
-		texunits  = {
-			[0] = '%%UNITDEFID:0',
-			[1] = '%%UNITDEFID:1',
-			[2] = '$shadow',
-			[3] = '$specular',
-			[4] = '$reflection',
-			[5] = '%NORMALTEX',
-		},
-		-- uniforms = {
-		-- }
-		--DrawUnit = DrawUnit,
-	},
+   normalMappedS3o = {
+       shaderDefinitions = {
+         "#define use_perspective_correct_shadows",
+         "#define use_normalmapping",
+         --"#define flip_normalmap",
+       },
+       shader    = include("ModelMaterials/Shaders/default.lua"),
+       usecamera = false,
+       culling   = GL.BACK,
+       predl  = nil,
+       postdl = nil,
+       texunits  = {
+         [0] = '%%UNITDEFID:0',
+         [1] = '%%UNITDEFID:1',
+         [2] = '$shadow',
+         [3] = '$specular',
+         [4] = '$reflection',
+         [5] = '%NORMALTEX',
+       },
+   },
 }
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -86,7 +72,7 @@ for i=1,#UnitDefs do
   local udef = UnitDefs[i]
 
   if (udef.customParams.normaltex and VFS.FileExists(udef.customParams.normaltex)) then
-    unitMaterials[i] = {"normalMappedS3O", NORMALTEX = udef.customParams.normaltex}
+    unitMaterials[i] = {"normalMappedS3o", NORMALTEX = udef.customParams.normaltex}
 
   elseif (udef.model.type == "s3o") then
     local modelpath = udef.model.path
@@ -110,7 +96,7 @@ for i=1,#UnitDefs do
 
       local normaltex = FindNormalmap(tex1,tex2)
       if (normaltex and not unitMaterials[i]) then
-        unitMaterials[i] = {"normalMappedS3O", NORMALTEX = normaltex}
+        unitMaterials[i] = {"normalMappedS3o", NORMALTEX = normaltex}
       end
     end --if model
 
@@ -132,7 +118,7 @@ for i=1,#UnitDefs do
 
           local normaltex = FindNormalmap(tex1,tex2)
           if (normaltex and not unitMaterials[i]) then
-            unitMaterials[i] = {"normalMappedS3O", NORMALTEX = normaltex}
+            unitMaterials[i] = {"normalMappedS3o", NORMALTEX = normaltex}
           end
         end
       end

@@ -179,6 +179,7 @@ local function _CompileMaterialShaders(rendering)
           shadowmatrixloc = gl.GetUniformLocation(GLSLshader, "shadowMatrix"),
           shadowparamsloc = gl.GetUniformLocation(GLSLshader, "shadowParams"),
           sunposloc       = gl.GetUniformLocation(GLSLshader, "sunPos"),
+          simframeloc     = gl.GetUniformLocation(GLSLshader, "simFrame"),
         }
         end
     end
@@ -198,6 +199,7 @@ local function _CompileMaterialShaders(rendering)
           shadowmatrixloc = gl.GetUniformLocation(GLSLshader, "shadowMatrix"),
           shadowparamsloc = gl.GetUniformLocation(GLSLshader, "shadowParams"),
           sunposloc       = gl.GetUniformLocation(GLSLshader, "sunPos"),
+          simframeloc     = gl.GetUniformLocation(GLSLshader, "simFrame"),
         }
       end
     end
@@ -570,7 +572,7 @@ end
 local function _ProcessMaterials(rendering, materialDefs)
   local engineShaderTypes = {"3do", "s3o", "obj", "ass"}
   for _, mat_src in pairs(rendering.materialDefs) do
-    mat_src = {shader = include("ModelMaterials/Shaders/default.lua") or "s3o"}
+    --mat_src = {shader = include("ModelMaterials/Shaders/default.lua") or "s3o"}
     if mat_src.shader ~= nil and engineShaderTypes[mat_src.shader] == nil then
       mat_src.shaderSource = mat_src.shader
       mat_src.shader = nil

@@ -51,13 +51,13 @@ local function ActivateMaterial(rendering, objectID, lod)
     activeMats = {current = math.huge}
     rendering.activeMats[objectID] = activeMats
   end
-
+  
   local lod_count = GetLODCount(rendering, objectID)
   if lod_count < lod then
     SetLODCount(rendering, objectID, lod)
   end
 
-  rendering.activeMats[lod] = true
+  activeMats[lod] = true
 
   if lod > rendering.curHighestLOD then
     rendering.curHighestLOD = lod
