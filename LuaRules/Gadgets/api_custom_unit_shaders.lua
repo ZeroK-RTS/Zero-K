@@ -22,6 +22,10 @@ function gadget:GetInfo()
   }
 end
 
+if not Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
+	return
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Synced
