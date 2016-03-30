@@ -101,13 +101,21 @@ local materials = {
 -- affected unitdefs
 
 local featureMaterials = {}
-local featureNameStubs = {"ad0_", "btree", "art", "tree"} -- all of the 0ad, beherith and artturi features start with these.
+local featureNameStubs = {
+	-- all of the 0ad, beherith and artturi features start with these.
+	{str = "ad0_", prefix = true}, 
+	{str = "btree", prefix = true}, 
+	{str = "art", prefix = true}, 
+	-- Other trees will probably contain "tree" as a substring.
+	{str = "tree", prefix = false}, 
+} 
 local tex1_to_normaltex = {}
 -- All feature defs that contain the string "aleppo" will be affected by it
 for id, featureDef in pairs(FeatureDefs) do
 	Spring.PreloadFeatureDefModel(id)
-	for _,stub in ipairs (featureNameStubs) do
-		if featureDef.model.textures and featureDef.model.textures.tex1 and featureDef.name:find(stub) then --also starts with
+	for _,stubData in ipairs (featureNameStubs) do
+		if featureDef.model.textures and featureDef.model.textures.tex1 and featureDef.name:find(stubData.str) and 
+			((not stubData.prefix) or featureDef.name:find(stubData.str) == 1) then
 			--if featureDef.customParam.normaltex then
 				Spring.Echo('Feature',featureDef.name,'seems like a nice tree, assigning the default normal texture to it.')
 				if featureDef.name:find('btree') == 1 then --beherith's old trees suffer if they get shitty normals
