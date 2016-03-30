@@ -39,7 +39,7 @@ static-var	moving, once;
 #define REAR_Z							[-1.2]
 #define NANO_Z							[2]
 
-lua_QueryNanoPiece() 
+lua_QueryNanoPiece()
 {
   return 0;
 }
@@ -50,23 +50,23 @@ DamageControl()
 	while (TRUE)
 	{
 		health = get HEALTH;
-		
+
 		// Restore damaged parts
 /*		if (health > 25)
 		{
 			if (health > 50)
 			{
-				
+
 			}
 
 		}*/
-		
+
 		// Damage parts, smoke emits etc.
 		if (health < 50)
 		{
 			emit-sfx SFXTYPE_WHITESMOKE from body;
 			if (health < 25)
-			{	
+			{
 				emit-sfx SFXTYPE_BLACKSMOKE from turret;
 			}
 		}
@@ -77,10 +77,10 @@ DamageControl()
 StartMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
+	set-signal-mask SIG_MOVE;
 
 	moving = TRUE;
-	
+
 	spin fwheel around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
 	spin rwheel1 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
 	spin rwheel2 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
@@ -95,10 +95,10 @@ StartMoving()
 StopMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
+	set-signal-mask SIG_MOVE;
 
 	moving = FALSE;
-	
+
 	// I don't like insta braking. It's not perfect but works for most cases.
 	// Probably looks goofy when the unit is turtling around, i.e. does not become faster as time increases..
 
@@ -117,15 +117,15 @@ StartBuilding(heading, pitch)
 {
 	signal SIG_BUILD;
 	set-signal-mask SIG_BUILD;
-	
+
 	turn door1 to z-axis 0-DOOR_ANGLE_Z speed TURN_SPEED2;
 	turn door2 to z-axis DOOR_ANGLE_Z speed TURN_SPEED2;
 	sleep SLEEP_TIME2;
-	
+
 	move lift to y-axis LIFT_Y speed MOVE_SPEED2;
 	move turret to y-axis TURRET_Y speed MOVE_SPEED2;
 	wait-for-move lift along y-axis;
-	
+
 	move nano to z-axis NANO_Z speed MOVE_SPEED2;
 	move rear to z-axis REAR_Z speed MOVE_SPEED2;
 	turn panel_t to x-axis 0-PANEL_ANGLE_MIN speed TURN_SPEED2;
@@ -138,7 +138,7 @@ StartBuilding(heading, pitch)
 	wait-for-turn cradle around x-axis;
 
 	set INBUILDSTANCE to 1;
-	
+
 	var rand_turret_y, rand_panel_angle;
 #ifdef WOBBLE
 	while (TRUE) {
@@ -147,7 +147,7 @@ StartBuilding(heading, pitch)
 			rand_panel_angle = rand(0, 1);
 			if (rand_panel_angle) rand_panel_angle = PANEL_ANGLE_MAX;
 			else rand_panel_angle = PANEL_ANGLE_MIN;
-			
+
 			move turret to y-axis (TURRET_Y - rand_turret_y) speed MOVE_SPEED2;
 
 			turn panel_t to x-axis 0-rand_panel_angle speed TURN_SPEED1;
@@ -178,7 +178,7 @@ StopBuilding()
 	turn cradle to x-axis 0 speed TURN_SPEED1;
 	wait-for-turn turret around y-axis;
 	wait-for-turn cradle around x-axis;
-	
+
 	move lift to y-axis 0 speed MOVE_SPEED1;
 	move turret to y-axis 0 speed MOVE_SPEED1;
 	sleep SLEEP_TIME2;
@@ -238,6 +238,7 @@ Killed(severity, corpsetype)
 		explode body type SHATTER | BITMAP;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	}
+	return corpsetype;
 }
 Create()
 {
@@ -245,6 +246,6 @@ Create()
 
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
-	
+
 	start-script DamageControl();
 }

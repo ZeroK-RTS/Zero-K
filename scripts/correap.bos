@@ -1,8 +1,8 @@
 /*
 	Linear constant is 65536 * 2.5, angular 182.044449!
-	
+
 	Needs two explosion generators, one for the muzzle flame and one for
-	smoke from the sides of the muzzle brakes, in the unit definition!   
+	smoke from the sides of the muzzle brakes, in the unit definition!
 */
 
 #define TAK
@@ -10,7 +10,7 @@
 
 piece		base, body, turret, sleeve1, sleeve2, barrel1, barrel2, firepoint1, firepoint2, smoke1, smoke2,
 			tracks1, tracks2, tracks3, tracks4, wheels1, wheels2, wheels3, wheels4, wheels5, wheels6, wheels7;
-			
+
 static-var	moving, once, animCount, gun1, gun_1_yaw;
 
 #define SIG_AIM1						1
@@ -29,7 +29,7 @@ static-var	moving, once, animCount, gun1, gun_1_yaw;
 #define WHEEL_TURN_SPEED1_DECELERATION	<60>
 
 #define WHEEL_TURN_SPEED2				<480>
-#define WHEEL_TURN_SPEED2_ACCELERATION	<15>	
+#define WHEEL_TURN_SPEED2_ACCELERATION	<15>
 #define WHEEL_TURN_SPEED2_DECELERATION	<30>
 
 //rocking
@@ -64,23 +64,23 @@ DamageControl()
 	while (TRUE)
 	{
 		health = get HEALTH;
-		
+
 		// Restore damaged parts
 /*		if (health > 25)
 		{
 			if (health > 50)
 			{
-				
+
 			}
 
 		}*/
-		
+
 		// Damage parts, smoke emits etc.
 		if (health < 50)
 		{
 			emit-sfx SFXTYPE_WHITESMOKE from body;
 			if (health < 25)
-			{	
+			{
 				emit-sfx SFXTYPE_BLACKSMOKE from turret;
 			}
 		}
@@ -91,7 +91,7 @@ AnimationControl()
 {
 	var current_tracks;
 	current_tracks = 0;
-	
+
 	while (TRUE)
 	{
 		if (moving OR once)
@@ -134,7 +134,7 @@ StartMoving()
 
 	moving = TRUE;
 	animCount = 0;
-	
+
 	spin wheels2 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
 	spin wheels4 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
 	spin wheels6 around x-axis speed WHEEL_TURN_SPEED1 accelerate WHEEL_TURN_SPEED1_ACCELERATION;
@@ -151,7 +151,7 @@ StopMoving()
 	set-signal-mask SIG_MOVE;
 
 	moving = FALSE;
-	
+
 	// I don't like insta braking. It's not perfect but works for most cases.
 	// Probably looks goofy when the unit is turtling around, i.e. does not become faster as time increases..
 	once = animCount*ANIM_SPEED/1000;
@@ -187,7 +187,7 @@ AimWeapon1 (heading, pitch)
 {
 	signal SIG_AIM1;
 	set-signal-mask SIG_AIM1;
-	
+
 
 	turn turret to y-axis (heading) speed TURRET_TURN_SPEED;
 	turn sleeve1 to x-axis (0-pitch) speed GUN_TURN_SPEED;
@@ -263,13 +263,14 @@ Killed(severity, corpsetype)
 		explode body type SHATTER | BITMAP;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	}
+	return corpsetype;
 }
 
 Create()
 {
 	moving = FALSE;
 	gun1 = 0;
-	
+
 	hide tracks1;
 	hide tracks2;
 	hide tracks3;
@@ -278,7 +279,7 @@ Create()
 
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
-	
+
 	start-script AnimationControl();
 	start-script DamageControl();
 	call-script RockXInit();
