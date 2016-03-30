@@ -1658,7 +1658,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 		end
 
 		if data.tempTarget then
-			if spValidUnitID(data.tempTarget) and isUnitVisible(data.tempTarget,at.aTeamOnThisTeam) then
+			if spValidUnitID(data.tempTarget) and isUnitVisible(data.tempTarget,a.allyTeam) then
 				local x, y, z = spGetUnitPosition(data.tempTarget)
 				for unitID,_ in pairs(data.unit) do
 					if not data.aa[unitID] then
