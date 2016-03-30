@@ -217,11 +217,6 @@
         "description": "Scout/Suicide Minisub",
         "name": "subscout"
     },
-    "vehdisable": {
-        "helptext": "Властитель (Dominatrix) захватывает юнитов противника, поворачивая их против бывших союзников. Несколько Властителей захватывают цель быстрее, но только один из них будет контролировать захваченного. После того как юнит захвачен, Властитель не может стрелять в течении 8 секунд если он стал контроллером. Если Властитель уничтожен, все зависимые от него юниты возвращаются владельцу.",
-        "description": "Машиная РЭБ",
-        "name": "Властитель"
-    },
     "armmstor": {
         "helptext": "Хранилище (Storage) можно использовать как буфер при временном увеличение количества получаемого метала. К примеру при переработке обломков. Однако, при увеличение дохода на длительное время лучшим выбором будет увеличить строительную силу.",
         "description": "Хранит 500 метала и энергии",
@@ -789,11 +784,6 @@
         "helptext": "The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.",
         "description": "Assault/Riot Bot",
         "name": "Hoarder"
-    },
-    "corpre": {
-        "helptext": "The Scorcher is armed with the Heat Ray. It is incredibly powerful close up, but unfortunately the beam gradually dissipates as it travels and loses most of its lethality at long range.",
-        "description": "Anti-Swarm Heat Ray (weaker at range)",
-        "name": "Лихач"
     },
     "corpyro2": {
         "helptext": "Пиро (Pyro) - это дешёвый, быстрый шагоход с огнемётом. Огнемёт наносит увлеченный урон большим юнитам и способен сжигать несколько целей одновременно. После уничтожения, Пиро (Pyro) поджигает ближайших юнитов. Дополнительно, данный робот имеет прыжковые двигатели, позволяющие ему перепрыгивать препятствия или внезапно прыгать на противника.",

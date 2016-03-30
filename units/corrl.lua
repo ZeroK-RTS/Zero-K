@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Defender]],
   description                   = [[Light Missile Tower]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 80,
   buildCostMetal                = 80,

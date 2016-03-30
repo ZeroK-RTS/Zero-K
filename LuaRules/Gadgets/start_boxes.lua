@@ -11,7 +11,7 @@ function gadget:GetInfo() return {
 } end
 
 local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
-local shuffleMode = Spring.GetModOptions().shuffle or "off"
+local shuffleMode = Spring.GetModOptions().shuffle or "shuffle"
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 

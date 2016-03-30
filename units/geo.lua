@@ -68,7 +68,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Geothermal Powerplant]],
+      description      = [[Wreckage - Geothermal Generator]],
       blocking         = true,
       damage           = 1750,
       energy           = 0,
@@ -83,11 +83,10 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Geothermal Powerplant]],
+      description      = [[Debris - Geothermal Generator]],
       blocking         = false,
       damage           = 1750,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       metal            = 100,

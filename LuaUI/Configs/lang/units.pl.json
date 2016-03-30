@@ -217,11 +217,6 @@
         "description": "Zwiadowcza łódź podwodna kamikaze",
         "helptext": "Lancelet to właściwie duża torpeda z możliwościami zwiadowczymi. Po wykonaniu rekonesansu może zdetonować się, zadając ciężkie obrażenia."
     },
-    "vehdisable": {
-        "name": "Dominatrix",
-        "description": "Pojazd walki elektronicznej",
-        "helptext": "Dominatrix dominuje uległe jednostki."
-    },
     "armmstor": {
         "name": "Magazyn",
         "description": "Magazynuje metal i energię (po 500)",
@@ -789,11 +784,6 @@
         "name": "Hoarder",
         "description": "Szturmowy bot wsparcia",
         "helptext": "Hoarder to jednostka wsparcia, która zasysa okoliczne jednostki, co ułatwia ich zniszczenie."
-    },
-    "corpre": {
-        "name": "Scorcher",
-        "description": "Wieżyczka wsparcia",
-        "helptext": "Scorcher to wieżyczka wsparcia uzbrojona w promień cieplny."
     },
     "corpyro2": {
         "name": "Pyro",

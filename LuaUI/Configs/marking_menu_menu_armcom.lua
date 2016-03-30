@@ -102,10 +102,6 @@ local menu_armcom = {
         angle = 45,
         unit = "corrl"
       },
---      {
---        angle = 90,
---        unit = "corpre"
---      },
       {
         angle = 90,
         unit = "corhlt"

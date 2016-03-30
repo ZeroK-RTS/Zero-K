@@ -58,7 +58,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Advanced Radar Tower]],
+      description      = [[Wreckage - Advanced Radar]],
       blocking         = true,
       damage           = 330,
       energy           = 0,
@@ -72,7 +72,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Advanced Radar Tower]],
+      description      = [[Debris - Advanced Radar]],
       blocking         = false,
       damage           = 330,
       energy           = 0,

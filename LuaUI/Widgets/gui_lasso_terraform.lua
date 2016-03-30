@@ -182,6 +182,8 @@ local mouseUnit = {id = false}
 
 local mouseX, mouseY
 
+local mexDefID = UnitDefNames.cormex.id
+
 --------------------------------------------------------------------------------
 -- Command handling and issuing.
 --------------------------------------------------------------------------------
@@ -1144,8 +1146,8 @@ function widget:Update(dt)
 	end
 	CheckPlacingRectangle(self)
 	
+	local activeCmdIndex, activeid = spGetActiveCommand()
 	if currentlyActiveCommand then
-		local activeCmdIndex, activeid = spGetActiveCommand()
 		if activeid ~= currentlyActiveCommand then
 			stopCommand()
 		end
@@ -1242,8 +1244,13 @@ function widget:Update(dt)
 			end
 		end
 	elseif placingRectangle then
-		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local pos
+		if (activeid == -mexDefID) and WG.mouseoverMex then
+			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+		else
+			local mx,my = spGetMouseState()
+			pos = select(2, spTraceScreenRay(mx, my, true))
+		end
 		
 		local facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
@@ -1258,11 +1265,15 @@ function widget:Update(dt)
 		return true
 	end
 	
-	local activeCmdIndex, activeid = spGetActiveCommand()
 	local mx, my, lmb, mmb, rmb = spGetMouseState()
 	
 	if lmb and activeid and activeid < 0 then
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local pos
+		if (activeid == -mexDefID) and WG.mouseoverMex then
+			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+		else
+			pos = select(2, spTraceScreenRay(mx, my, true))
+		end
 		if pos and legalPos(pos) then
 			if buildingPress then
 				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
@@ -1736,8 +1747,13 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	point[2] = {x = 0, y = 0, z = 0}
 	point[3] = {x = 0, y = 0, z = 0}
 	
-	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	local pos
+	if (unitDefID == mexDefID) and WG.mouseoverMex then
+		pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+	else
+		local mx,my = spGetMouseState()
+		pos = select(2, spTraceScreenRay(mx, my, true))
+	end
 	
 	SetFixedRectanglePoints(pos)
 	

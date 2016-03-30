@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Created by scrambling devices.]],
   acceleration                  = 0,
   activateWhenBuilt             = false,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 0.45,
   buildCostMetal                = 0.45,

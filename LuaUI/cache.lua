@@ -11,6 +11,7 @@ local visibleUnits = {}
 local GetTeamColor = Spring.GetTeamColor
 local SetTeamColor = Spring.SetTeamColor
 local GetVisibleUnits = Spring.GetVisibleUnits
+local MarkerAddPoint = Spring.MarkerAddPoint
 
 function Spring.GetTeamColor(teamid)
   if teamColor[teamid] then
@@ -18,6 +19,10 @@ function Spring.GetTeamColor(teamid)
     teamColor[teamid] = { GetTeamColor(teamid) }
   end
   return unpack(teamColor[teamid])
+end
+
+function Spring.MarkerAddPoint(x, y, z, t, b)
+	MarkerAddPoint(x,y,z,t,true)
 end
 
 function Spring.SetTeamColor(teamid, r, g, b)
