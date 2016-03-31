@@ -63,6 +63,10 @@ local function GetCustomTooltip (unitID)
 end
 
 function Spring.Utilities.GetHumanName(ud, unitID)
+	if not ud then
+		return ""
+	end
+
 	if unitID then
 		local name = Spring.GetUnitRulesParam(unitID, "comm_name")
 		if name then
@@ -80,6 +84,10 @@ function Spring.Utilities.GetHumanName(ud, unitID)
 end
 
 function Spring.Utilities.GetDescription(ud, unitID)
+	if not ud then
+		return ""
+	end
+
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	if Spring.ValidUnitID(unitID) then
