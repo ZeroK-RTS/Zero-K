@@ -353,7 +353,7 @@ function gadget:DrawUnit(unitID)
   end
 end
 
-gadget.UnitReverseBuild = gadget.UnitDestroyed
+gadget.UnitReverseBuilt = gadget.UnitDestroyed
 gadget.UnitCloaked   = gadget.UnitDestroyed
 gadget.UnitDecloaked = gadget.UnitFinished
 
@@ -435,7 +435,7 @@ function gadget:Initialize()
     end
   end
 
-  gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuild)
+  gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
   gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
 end
 

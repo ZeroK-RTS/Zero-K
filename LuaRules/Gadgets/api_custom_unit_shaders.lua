@@ -490,7 +490,7 @@ end
 function gadget:DrawFeature(featureID, drawMode)
   return DrawObject(featureRendering, featureID, drawMode)
 end
-gadget.UnitReverseBuild = gadget.RenderUnitDestroyed
+gadget.UnitReverseBuilt = gadget.RenderUnitDestroyed
 gadget.UnitCloaked   = gadget.RenderUnitDestroyed
 gadget.UnitDecloaked = gadget.UnitFinished
 
@@ -612,6 +612,6 @@ function gadget:Initialize()
 
   --// insert synced actions
 
-  gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuild)
+  gadgetHandler:AddSyncAction("unitshaders_reverse", UnitReverseBuilt)
   gadgetHandler:AddChatAction("normalmapping", ToggleNormalmapping)
 end
