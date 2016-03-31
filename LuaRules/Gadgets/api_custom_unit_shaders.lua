@@ -490,15 +490,15 @@ end
 function gadget:DrawFeature(featureID, drawMode)
   return DrawObject(featureRendering, featureID, drawMode)
 end
-gadget.UnitReverseBuild = gadget.UnitDestroyed
-gadget.UnitCloaked   = gadget.UnitDestroyed
+gadget.UnitReverseBuild = gadget.RenderUnitDestroyed
+gadget.UnitCloaked   = gadget.RenderUnitDestroyed
 gadget.UnitDecloaked = gadget.UnitFinished
 
 
 -- NOTE: No feature equivalent (features can't change team)
 function gadget:UnitGiven(unitID,...)
   if not select(3, Spring.GetUnitIsStunned(unitID)) then
-    gadget:UnitDestroyed(unitID, ...)
+    gadget:RenderUnitDestroyed(unitID, ...)
     gadget:UnitFinished(unitID, ...)
   end
 end
