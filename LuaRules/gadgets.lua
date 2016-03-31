@@ -145,6 +145,7 @@ local callInLists = {
 	-- Unit CallIns
 	"UnitCreated",
 	"UnitFinished",
+	"UnitReverseBuilt",
 	"UnitFromFactory",
 	"UnitDestroyed",
 	"RenderUnitDestroyed",
@@ -1380,6 +1381,13 @@ end
 function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
   for _,g in ipairs(self.UnitFinishedList) do
     g:UnitFinished(unitID, unitDefID, unitTeam)
+  end
+  return
+end
+
+function gadgetHandler:UnitReverseBuilt(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitReverseBuiltList) do
+    g:UnitReverseBuilt(unitID, unitDefID, unitTeam)
   end
   return
 end
