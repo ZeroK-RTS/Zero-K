@@ -167,6 +167,7 @@ local flexCallIns = {
   'DefaultCommand',
   'UnitCreated',
   'UnitFinished',
+  'UnitReverseBuilt',
   'UnitFromFactory',
   'UnitDestroyed',
   'UnitDestroyedByTeam',
@@ -1954,6 +1955,12 @@ function widgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
   return
 end
 
+function widgetHandler:UnitReverseBuilt(unitID, unitDefID, unitTeam)
+  for _,w in ipairs(self.UnitReverseBuiltList) do
+    w:UnitReverseBuilt(unitID, unitDefID, unitTeam)
+  end
+  return
+end
 
 function widgetHandler:UnitFromFactory(unitID, unitDefID, unitTeam,
                                        factID, factDefID, userOrders)
