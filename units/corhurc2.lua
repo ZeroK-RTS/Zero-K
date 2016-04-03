@@ -54,7 +54,7 @@ unitDef = {
   maxVelocity         = 8,
   minCloakDistance    = 75,
   noAutoFire          = false,
-  noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
+  noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],
   script			  = [[corhurc2.lua]],
   seismicSignature    = 0,
@@ -79,8 +79,8 @@ unitDef = {
 
     {
       def                = [[NAPALM]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      badTargetCategory  = [[SWIM LAND SHIP HOVER GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER GUNSHIP]],
     },
 
   },
