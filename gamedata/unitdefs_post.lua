@@ -812,7 +812,7 @@ modOptions.hpmult = 0.01
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
     for unitDefID, unitDef in pairs(UnitDefs) do
-        if unitDef.maxdamage then unitDef.maxdamage = unitDef.maxdamage*hpMulti end
+        if unitDef.maxdamage then unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) end
     end
 end
 
