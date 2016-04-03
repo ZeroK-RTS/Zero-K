@@ -18,11 +18,6 @@ if (not gadgetHandler:IsSyncedCode()) then
    return
 end
 
-local modOptions = {}
-if (Spring.GetModOptions) then
-  modOptions = Spring.GetModOptions()
-end
-
 include("LuaRules/Configs/constants.lua")
 
 local INLOS = {inlos = true}
@@ -164,12 +159,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		local healthBonus = data.healthBonus
-		if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
-		    healthBonus = healthBonus * modOptions.hpmult
-		end
-		Spring.SetUnitHealth(unitID, health + healthBonus)
-		Spring.SetUnitMaxHealth(unitID, maxHealth + healthBonus)
+		Spring.SetUnitHealth(unitID, health + data.healthBonus)
+		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
 	end
 	
 	if data.skinOverride then

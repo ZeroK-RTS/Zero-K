@@ -2,13 +2,20 @@ local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
 
 local UNBOUNDED_LEVEL = true
 local COST_MULT = 1
+local HP_MULT = 0.01
 
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
-	if (modOptions and modOptions.commtest and modOptions.commtest ~= 0) then
-		COST_MULT = 0.1
-	end
+    if modOptions then
+        if (modOptions.commtest and modOptions.commtest ~= 0) then
+            COST_MULT = 0.1
+        end
+        if modOptions.hpmult and modOptions.hpmult ~= 1 then
+            HP_MULT = modOptions.hpmult
+        end
+    end
 end
+
 ------------------------------------------------------------------------
 -- Module Definitions
 ------------------------------------------------------------------------
@@ -670,7 +677,7 @@ local moduleDefs = {
 	{
 		name = "module_autorepair",
 		humanName = "Autorepair",
-		description = "Autorepair - Commander self-repairs at +10 hp/s. Reduces Health by 100. Limit: 8",
+		description = "Autorepair - Commander self-repairs at +10 hp/s. Reduces Health by " .. 100*HP_MULT .. ". Limit: 8",
 		image = "unitpics/module_autorepair.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
@@ -678,26 +685,27 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 10
-			sharedData.healthBonus = (sharedData.healthBonus or 0) - 100
+			sharedData.healthBonus = (sharedData.healthBonus or 0) - 100*HP_MULT
 		end
 	},
 	{
 		name = "module_ablative_armor",
 		humanName = "Ablative Armour Plates",
-		description = "Ablative Armour Plates - Provides 600 health. Limit: 8",
+		description = "Ablative Armour Plates - Provides " .. 600*HP_MULT .. " health. Limit: 8",
 		image = "unitpics/module_ablative_armor.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 600*HP_MULT
 		end
 	},
 	{
 		name = "module_heavy_armor",
 		humanName = "High Density Plating",
-		description = "High Density Plating - Provides 1600 health but reduces movement by 10%. Limit: 8, Requires Ablative Armour Plates",
+		description = "High Density Plating - Provides " .. 1600*HP_MULT .. " health but reduces movement by 10%. " .. 
+		"Limit: 8, Requires Ablative Armour Plates",
 		image = "unitpics/module_heavy_armor.png",
 		limit = 8,
 		cost = 400 * COST_MULT,
@@ -705,7 +713,7 @@ local moduleDefs = {
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
-			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600
+			sharedData.healthBonus = (sharedData.healthBonus or 0) + 1600*HP_MULT
 			sharedData.speedMult = (sharedData.speedMult or 1) - 0.1
 		end
 	},
