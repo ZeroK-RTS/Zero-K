@@ -12,6 +12,9 @@ local weaponDef = {
 		muzzleEffectShot = [[custom:YELLOW_LIGHTNING_MUZZLE]],
 		slot = [[3]],
 		manualfire = 1,
+				
+		light_color = [[0.75 0.75 0.22]],
+		light_radius = 350,
 	},
 
 	craterBoost             = 0,
@@ -19,7 +22,7 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 750,
+		default = 800,
 	},
 
 	duration                = 8,
@@ -32,9 +35,9 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
 	paralyzer               = true,
-	paralyzeTime            = 9,
+	paralyzeTime            = 12,
 	range                   = 360,
-	reloadtime              = 12,
+	reloadtime              = 25,
 	rgbColor                = [[1 1 0.1]],
 	soundStart              = [[weapon/lightning_fire]],
 	soundTrigger            = false,

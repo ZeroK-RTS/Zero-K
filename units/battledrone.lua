@@ -90,6 +90,10 @@ unitDef = {
   
       customParams			= {
 	    timeslow_damagefactor = [[2]],
+		
+		light_camera_height = 2000,
+		light_color = [[0.85 0.33 1]],
+		light_radius = 150,
       },
 	  
       damage                  = {

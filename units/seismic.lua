@@ -82,6 +82,9 @@ unitDef = {
 
 		stats_hide_dps = 1, -- one use
 		stats_hide_reload = 1,
+		
+		light_color = [[1.2 1.6 0.55]],
+		light_radius = 550,
       },
 	  
       damage                  = {

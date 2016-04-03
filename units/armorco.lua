@@ -106,14 +106,14 @@ unitDef = {
       cegTag                  = [[gauss_tag_h]],
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams = {
+        single_hit_multi = true,
+      },
 
       damage                  = {
         default = 160,
         planes  = 160,
-      },
-      
-      customParams = {
-        single_hit_multi = true,
       },
 
       explosionGenerator      = [[custom:gauss_hit_h]],
@@ -242,6 +242,8 @@ unitDef = {
       customParams            = {
         statsprojectiles = 3,
         statsdamage = 600,
+		
+		light_color = [[0.1 0.4 0.1]],
       },
       
       damage                  = {
@@ -292,6 +294,9 @@ unitDef = {
 	    gatherradius = [[180]],
 	    smoothradius = [[120]],
 	    smoothmult   = [[0.25]],
+		
+		light_color = [[1 1.4 0.35]],
+		light_radius = 400,
 	  },
 
       damage                  = {

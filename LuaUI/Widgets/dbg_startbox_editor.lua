@@ -72,7 +72,7 @@ include("keysym.h.lua")
 
 function widget:KeyPress(key)
 	if (key == KEYSYMS.S) then
-		str = "\n\t[TEAM] = {\n" -- not as separate echoes because timestamp keeps getting in the way
+		str = "\n\tboxes = {\n" -- not as separate echoes because timestamp keeps getting in the way
 		for j = 1, #final_polygons do
 			str = str .. "\t\t{\n"
 			local polygon = final_polygons[j]

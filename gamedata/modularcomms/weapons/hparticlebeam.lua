@@ -10,6 +10,9 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		
+		light_color = [[0.3 1 3]],
+		light_radius = 120,
 	},
 
 	damage                  = {
@@ -24,8 +27,8 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	laserFlareSize          = 10,
 	minIntensity            = 1,
-	range                   = 350,
-	reloadtime              = 4,
+	range                   = 390,
+	reloadtime              = 3.1,
 	rgbColor                = [[0 1 0]],
 	soundStart              = [[weapon/laser/small_laser_fire4]],
 	soundStartVolume        = 5,

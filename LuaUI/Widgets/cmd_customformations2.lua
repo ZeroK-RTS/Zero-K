@@ -21,15 +21,15 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Interface/Command Visibility/Formations'
-options_order = { 'drawmode', 'linewidth', 'dotsize' }
+options_order = { 'drawmode_v2', 'linewidth', 'dotsize' }
 options = {
-	drawmode = {
+	drawmode_v2 = {
 		name = 'Draw mode',
 		-- desc is not supported here :(
 		-- desc = 'Change the formation display. Formations are drawn by moving the mouse while the mouse button is pressed. Supported commands are Move, Fight, Patrol, Manual attacks, Jump and with the ALT key held down Attack, Set target and Unload.'
 		-- (new) players might not even know about custom formations, so ultimately this should probably be displayed above these options
 		type = 'radioButton',
-		value = 'lines',
+		value = 'both',
 		items={
 			{key='lines', name='Lines only', desc='Draw stippled lines along the drawn formation'},
 			{key='dots', name='Dots only', desc='Draw dots at command locations'},
@@ -167,7 +167,6 @@ local spGiveOrder = Spring.GiveOrder
 local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetCommandQueue = Spring.GetCommandQueue
 local spGetUnitPosition = Spring.GetUnitPosition
-local spTraceScreenRay = Spring.TraceScreenRay
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetFeaturePosition = Spring.GetFeaturePosition
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
@@ -204,9 +203,20 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 
 local keyShift = 304
 
+local filledCircleOutFading = {} --Table of display lists keyed by cmdID
+
 --------------------------------------------------------------------------------
 -- Helper Functions
 --------------------------------------------------------------------------------
+local function CulledTraceScreenRay(mx, my, coords, minimap)
+	local targetType, params = spTraceScreenRay(mx, my, coords, minimap)
+	if targetType == "ground" then
+		params[4], params[5], params[6] = nil, nil, nil
+		return targetType, params
+	end
+	return targetType, params
+end
+
 local function GetModKeys()
 	
 	local alt, ctrl, meta, shift = spGetModKeyState()
@@ -467,7 +477,7 @@ function widget:MousePress(mx, my, mButton)
 		local overrideCmdID = overrideCmds[defaultCmdID]
 		if overrideCmdID then
 			
-			local targType, targID = spTraceScreenRay(mx, my, false, inMinimap)
+			local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 			if targType == 'unit' then
 				overriddenCmd = defaultCmdID
 				overriddenTarget = targID
@@ -502,7 +512,7 @@ function widget:MousePress(mx, my, mButton)
 	end
 	
 	-- Get clicked position
-	local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+	local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 	if not pos then return false end
 	
 	-- Setup formation node array
@@ -530,7 +540,7 @@ function widget:MouseMove(mx, my, dx, dy, mButton)
 	end
 	
 	-- Get clicked position
-	local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+	local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 	if not pos then return false end
 	
 	-- Add the new formation node
@@ -594,7 +604,7 @@ function widget:MouseRelease(mx, my, mButton)
 	if overriddenCmd then
 		
 		local targetID
-		local targType, targID = spTraceScreenRay(mx, my, false, inMinimap)
+		local targType, targID = CulledTraceScreenRay(mx, my, false, inMinimap)
 		if targType == 'unit' then
 			targetID = targID
 		elseif targType == 'feature' then
@@ -622,7 +632,7 @@ function widget:MouseRelease(mx, my, mButton)
 		
 		-- Add final position (Sometimes we don't get the last MouseMove before this MouseRelease)
 		if (not inMinimap) or spIsAboveMiniMap(mx, my) then
-			local _, pos = spTraceScreenRay(mx, my, true, inMinimap)
+			local _, pos = CulledTraceScreenRay(mx, my, true, inMinimap)
 			if pos then
 				AddFNode(pos)
 			end
@@ -728,29 +738,38 @@ local function tVertsMinimap(verts)
 	end
 end
 
-local function DrawFilledCircle(pos, size, cornerCount)
-	glPushMatrix()
-	glTranslate(pos[1], pos[2], pos[3])
-	glBeginEnd(GL.TRIANGLE_FAN, function()
-		glVertex(0,0,0)
-		for t = 0, pi2, pi2 / cornerCount do
-			glVertex(sin(t) * size, 0, cos(t) * size)
-		end
-	end)
-	glPopMatrix()
+local function filledCircleVerts(cmd, cornerCount)
+	SetColor(cmd, 1)
+	glVertex(0,0,0)
+	SetColor(cmd, 0)
+	for t = 0, pi2, pi2 / cornerCount do
+		glVertex(sin(t), 0, cos(t))
+	end
 end
+
+-- local function DrawFilledCircle(pos, size, cornerCount)
+-- 	glPushMatrix()
+-- 	glTranslate(pos[1], pos[2], pos[3])
+-- 	glScale(size, 1, size)
+-- 	gl.CallList(filledCircleVerts)
+-- 	glPopMatrix()
+-- end
 
 local function DrawFilledCircleOutFading(pos, size, cornerCount)
 	glPushMatrix()
 	glTranslate(pos[1], pos[2], pos[3])
-	glBeginEnd(GL.TRIANGLE_FAN, function()
-		SetColor(usingCmd, 1)
-		glVertex(0,0,0)
-		SetColor(usingCmd, 0)
-		for t = 0, pi2, pi2 / cornerCount do
-			glVertex(sin(t) * size, 0, cos(t) * size)
-		end
-	end)
+	glScale(size, 1, size)
+	local cmd = usingCmd
+	if filledCircleOutFading[usingCmd] == nil then
+		cmd = 0
+	end
+	gl.CallList(filledCircleOutFading[cmd])
+	-- glBeginEnd(GL.TRIANGLE_FAN, function()
+		-- glVertex(0,0,0)
+		-- for t = 0, pi2, pi2 / cornerCount do
+		-- 	glVertex(sin(t), 0, cos(t))
+		-- end
+	-- end)
 	-- draw extra glow as base
 	-- has hardly any effect but doubles gpuTime, so disabled for now
 	-- glBeginEnd(GL.TRIANGLE_FAN, function()
@@ -827,14 +846,14 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:DrawWorld()
-	-- Draw lines when a path is drawn instead of a formation, OR when drawmode for formations is not "dots" only
-	if pathCandidate or options.drawmode.value ~= "dots" then
+	-- Draw lines when a path is drawn instead of a formation, OR when drawmode_v2 for formations is not "dots" only
+	if pathCandidate or options.drawmode_v2.value ~= "dots" then
 		DrawFormationLines(tVerts, 2)
 	end
-	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode for formations is not "lines" only
-	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode.value ~= "lines" then
+	-- Draw dots when no path is drawn AND nodenumber is high enough AND drawmode_v2 for formations is not "lines" only
+	if not pathCandidate and (#fNodes > 1 or #dimmNodes > 1) and options.drawmode_v2.value ~= "lines" then
 		local camX, camY, camZ = spGetCameraPosition()
-		local at, p = spTraceScreenRay(Xs,Ys,true,false,false)
+		local at, p = CulledTraceScreenRay(Xs,Ys,true,false,false)
 		if at == "ground" then 
 			local dx, dy, dz = camX-p[1], camY-p[2], camZ-p[3]
 			--zoomY = ((dx*dx + dy*dy + dz*dz)*0.01)^0.25	--tests show that sqrt(sqrt(x)) is faster than x^0.25
@@ -861,6 +880,21 @@ function widget:DrawInMiniMap()
 		
 		DrawFormationLines(tVertsMinimap, 1)
 	glPopMatrix()
+end
+
+function InitFilledCircle(cmdID)
+	filledCircleOutFading[cmdID] = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, cmdID, 8) 
+end
+
+function widget:Initialize()
+	-- filledCircle = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, 8)
+	InitFilledCircle(CMD_MOVE)
+	InitFilledCircle(CMD_ATTACK)
+	InitFilledCircle(CMD.MANUALFIRE)
+	InitFilledCircle(CMD_UNLOADUNIT)
+	InitFilledCircle(CMD_UNIT_SET_TARGET)
+	InitFilledCircle(CMD_UNIT_SET_TARGET_CIRCLE)
+	InitFilledCircle(0)
 end
 
 function widget:Update(deltaTime)

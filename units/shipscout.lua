@@ -127,15 +127,17 @@ unitDef = {
       craterMult              = 0,
       cylinderTargeting       = 1,
 
-      damage                  = {
-        default = 45.1,
-        subs    = 5,
-      },
-
       customParams        = {
         disarmDamageMult = 4,
         disarmDamageOnly = 0,
         disarmTimer      = 3, -- seconds
+		
+		light_color = [[1 1 1]],
+      },
+	  
+      damage                  = {
+        default = 45.1,
+        subs    = 5,
       },
 
       explosionGenerator      = [[custom:mixed_white_lightning_bomb_small]],

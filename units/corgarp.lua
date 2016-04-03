@@ -96,6 +96,8 @@ unitDef = {
         damage_vs_shield = [[220]],
 		spawns_name = "wolverine_mine",
 		spawns_expire = 60,
+		
+		light_radius = 0,
       },
 	  
       damage                  = {

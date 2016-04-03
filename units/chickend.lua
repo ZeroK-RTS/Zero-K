@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Defense and energy source]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,

@@ -41,17 +41,44 @@ options = {
 		type = 'bool',
 		value = false,
 	},
-	showarmorstateonshift = {
-		name = "Show armor state on shift",
-		desc = "When holding shift, an icon appears over armored units.",
-		type = 'bool',
-		value = true,
+	showarmorstate = {
+		name = 'Armor state visibility',
+		desc = "When to show an icon for armored units.",
+		type = 'radioButton',
+		value = 'shift',
+		items = {
+			{key ='always', name='Always'},
+			{key ='shift',  name='When holding Shift'},
+			{key ='never',  name='Never'},
+			-- an option to show armor on enemies would be good. Gadget assumes units are own so would need some rewriting.
+		},
+		OnChange = function (this)
+			if this.value == 'always' then
+				WG.icons.SetDisplay('armored', true)
+			else
+				WG.icons.SetDisplay('armored', false)
+			end
+		end,
 	},
-	showpriorityonshift = {
-		name = "Show priority on shift",
-		desc = "When holding shift, an icon appears over unit with low or high priority.",
+
+	showpriority = {
+		name = "Priority state visibility",
+		desc = "When to show an icon for prioritized units.",
 		type = 'bool',
-		value = true,
+		type = 'radioButton',
+		value = 'shift',
+		items = {
+			{key ='always', name='Always'},
+			{key ='shift',  name='When holding Shift'},
+			{key ='never',  name='Never'},
+		},
+		OnChange = function (this)
+			if this.value == 'always' then
+				WG.icons.SetDisplay('priority', true)
+			else
+				WG.icons.SetDisplay('priority', false)
+			end
+		end,
 	},
 	showmiscpriorityonshift = {
 		name = "Show misc priorty on shift",
@@ -61,11 +88,7 @@ options = {
 	},
 }
 
-
 include("keysym.h.lua")
-
-local myAllyTeamID = 666
-
 
 local imageDir = 'LuaUI/Images/commands/'
 local fireStateIcons = {
@@ -100,7 +123,6 @@ local prevFirestate = {}
 local prevMovestate = {}
 local prevPriority = {}
 local prevMiscPriority = {}
-local lastArmored = {}
 local lastArmored = {}
 
 function SetUnitStateIcons(unitID)
@@ -141,8 +163,8 @@ function SetUnitStateIcons(unitID)
 			end
 		end
 	end
-	
-	if options.showarmorstateonshift.value then
+
+	if options.showarmorstate.value ~= "never" then
 		local armored, amount = spGetUnitArmored(unitID)
 		armored = armored and amount and amount ~= 1
 		if not lastArmored[unitID] and armored then
@@ -153,8 +175,8 @@ function SetUnitStateIcons(unitID)
 			WG.icons.SetUnitIcon( unitID, {name='armored', texture=nil} )
 		end
 	end
-	
-	if options.showpriorityonshift.value then
+
+	if options.showpriority.value ~= "never" then
 		local state = spGetUnitRulesParam(unitID, "buildpriority")
 		if (not ud) or not (ud.canAssist and ud.buildSpeed ~= 0) then
 			local _,_,_,_,buildProgress = spGetUnitHealth(unitID)
@@ -193,7 +215,7 @@ function SetUnitStateIcons(unitID)
 end
 
 local function UpdateAllUnits()
-	if hide then 
+	if hide and not ((options.showpriority.value == "always") or (options.showarmorstate.value == "always")) then 
 		return 
 	end
 	local unitID
@@ -223,7 +245,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if isRepeat or not (options.showstateonshift.value or options.showarmorstateonshift.value) then
+	if isRepeat then
 		return
 	end
 
@@ -237,10 +259,10 @@ function widget:KeyPress(key, modifier, isRepeat)
 			WG.icons.SetDisplay('firestate', true)
 			WG.icons.SetDisplay('movestate', true)
 		end
-		if options.showarmorstateonshift.value then
+		if options.showarmorstate.value == "shift" then
 			WG.icons.SetDisplay('armored', true)
 		end
-		if options.showpriorityonshift.value then
+		if options.showpriority.value == "shift" then
 			WG.icons.SetDisplay('priority', true)
 		end
 		if options.showmiscpriorityonshift.value then
@@ -260,14 +282,20 @@ function widget:KeyRelease(key, modifier )
 		
 		WG.icons.SetDisplay('firestate', false)
 		WG.icons.SetDisplay('movestate', false)
-		WG.icons.SetDisplay('armored', false)
-		WG.icons.SetDisplay('priority', false)
+
+		if options.showarmorstate.value == "shift" then
+			WG.icons.SetDisplay('armored', false)
+		end
+		if options.showpriority.value == "shift" then
+			WG.icons.SetDisplay('priority', false)
+		end
+
 		WG.icons.SetDisplay('miscpriority', false)
 	end
 end
 
 
---needed if icon widget gets disabled/enabled after this one. find a better way?
+-- todo: intercept state change and (un-)armoring events, and get rid of polling altogether
 function widget:GameFrame(f)
 
 	if f%(30) == 0 then --1 second
@@ -275,11 +303,9 @@ function widget:GameFrame(f)
 	end
 end
 
-
---this needs work
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOptions, cmdParams)
-	if hide then return end
-	if (cmdID == CMD.MOVE_STATE) or (cmdID == CMD.FIRE_STATE)  then
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+	-- this won't handle priority for some reason, so that should be intercepted right in the widgets giving the order
+	if (not hide) and ((cmdID == CMD.MOVE_STATE) or (cmdID == CMD.FIRE_STATE)) then
 		SetUnitStateIcons(unitID)
 	end
 end

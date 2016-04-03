@@ -57,8 +57,8 @@ local moduleDefs = {
 		humanName = "Beam Laser",
 		description = "Beam Laser",
 		image = "unitpics/commweapon_beamlaser.png",
-		limit = 1,
-		cost = 25 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"recon", "assault", "support", "strike"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -78,8 +78,8 @@ local moduleDefs = {
 		humanName = "Flamethrower",
 		description = "Flamethrower",
 		image = "unitpics/commweapon_flamethrower.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"recon", "assault"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -99,8 +99,8 @@ local moduleDefs = {
 		humanName = "Heatray",
 		description = "Heatray",
 		image = "unitpics/commweapon_heatray.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"assault"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -120,8 +120,8 @@ local moduleDefs = {
 		humanName = "Machine Gun",
 		description = "Machine Gun",
 		image = "unitpics/commweapon_heavymachinegun.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"recon", "assault", "strike"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -142,7 +142,7 @@ local moduleDefs = {
 		humanName = "Plasma Artillery",
 		description = "Plasma Artillery",
 		image = "unitpics/commweapon_assaultcannon.png",
-		limit = 1,
+		limit = 2,
 		cost = 300 * COST_MULT,
 		requireChassis = {"assault"},
 		requireLevel = 3,
@@ -164,8 +164,8 @@ local moduleDefs = {
 		humanName = "Lightning Rifle",
 		description = "Lightning Rifle",
 		image = "unitpics/commweapon_lightninggun.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"recon", "support", "strike"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -186,7 +186,7 @@ local moduleDefs = {
 		humanName = "Light Particle Beam",
 		description = "Light Particle Beam",
 		image = "unitpics/commweapon_lparticlebeam.png",
-		limit = 1,
+		limit = 2,
 		cost = 50 * COST_MULT,
 		requireChassis = {"support", "recon", "strike"},
 		requireLevel = 1,
@@ -208,8 +208,8 @@ local moduleDefs = {
 		humanName = "Missile Launcher",
 		description = "Missile Launcher",
 		image = "unitpics/commweapon_missilelauncher.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"support", "strike"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -229,7 +229,7 @@ local moduleDefs = {
 		humanName = "Riot Cannon",
 		description = "Riot Cannon",
 		image = "unitpics/commweapon_riotcannon.png",
-		limit = 1,
+		limit = 2,
 		cost = 50 * COST_MULT,
 		requireChassis = {"assault"},
 		requireLevel = 1,
@@ -251,8 +251,8 @@ local moduleDefs = {
 		humanName = "Rocket Launcher",
 		description = "Rocket Launcher",
 		image = "unitpics/commweapon_rocketlauncher.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"assault"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -273,8 +273,8 @@ local moduleDefs = {
 		humanName = "Shotgun",
 		description = "Shotgun",
 		image = "unitpics/commweapon_shotgun.png",
-		limit = 1,
-		cost = 75 * COST_MULT,
+		limit = 2,
+		cost = 50 * COST_MULT,
 		requireChassis = {"recon", "support", "strike"},
 		requireLevel = 1,
 		slotType = "basic_weapon",
@@ -296,7 +296,7 @@ local moduleDefs = {
 		description = "Heavy Particle Beam - Replaces other weapons.",
 		image = "unitpics/conversion_hparticlebeam.png",
 		limit = 1,
-		cost = 200 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"support"},
 		requireLevel = 1,
 		slotType = "adv_weapon",
@@ -316,7 +316,7 @@ local moduleDefs = {
 		description = "Shock Rifle - Replaces other weapons.",
 		image = "unitpics/conversion_shockrifle.png",
 		limit = 1,
-		cost = 200 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"support"},
 		requireLevel = 1,
 		slotType = "adv_weapon",
@@ -377,7 +377,7 @@ local moduleDefs = {
 		description = "Disintegrator",
 		image = "unitpics/commweapon_disintegrator.png",
 		limit = 1,
-		cost = 400 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"assault", "strike"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -398,7 +398,7 @@ local moduleDefs = {
 		description = "Disruptor Bomb",
 		image = "unitpics/commweapon_disruptorbomb.png",
 		limit = 1,
-		cost = 125 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"recon", "support", "strike"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -419,7 +419,7 @@ local moduleDefs = {
 		description = "Multistunner",
 		image = "unitpics/commweapon_multistunner.png",
 		limit = 1,
-		cost = 125 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"support", "recon", "strike"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -441,7 +441,7 @@ local moduleDefs = {
 		description = "Hellfire Grenade",
 		image = "unitpics/commweapon_napalmgrenade.png",
 		limit = 1,
-		cost = 100 * COST_MULT,
+		cost = 150 * COST_MULT,
 		requireChassis = {"assault", "recon"},
 		requireLevel = 3,
 		slotType = "adv_weapon",
@@ -556,7 +556,7 @@ local moduleDefs = {
 		image = "unitpics/weaponmod_stun_booster.png",
 		limit = 1,
 		cost = 300 * COST_MULT,
-		requireChassis = {"support", "strike"},
+		requireChassis = {"support", "strike", "recon"},
 		requireOneOf = {"commweapon_lightninggun", "commweapon_multistunner"},
 		requireLevel = 2,
 		slotType = "module",
@@ -645,7 +645,7 @@ local moduleDefs = {
 		description = "Companion Drone - Commander spawns protective drones. Limit: 8",
 		image = "unitpics/module_companion_drone.png",
 		limit = 8,
-		cost = 400 * COST_MULT,
+		cost = 300 * COST_MULT,
 		requireLevel = 2,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
@@ -658,7 +658,7 @@ local moduleDefs = {
 		description = "Battle Drone - Commander spawns heavy drones. Limit: 8, Requires Companion Drone",
 		image = "unitpics/module_battle_drone.png",
 		limit = 8,
-		cost = 600 * COST_MULT,
+		cost = 500 * COST_MULT,
 		requireChassis = {"support"},
 		requireOneOf = {"module_companion_drone"},
 		requireLevel = 3,
@@ -843,15 +843,24 @@ local function GetStrikeCloneModulesString(modulesByDefID)
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 
+local morphCosts = {
+	25,
+	100,
+	400,
+	200,
+	300,
+}
+
+local function extraLevelCostFunction(level)
+	return (level - 2) * 100 * COST_MULT 
+end
 
 local chassisDefs = {
 	{
 		name = "strike",
 		humanName = "Strike",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynstrike0"].id,
-		extraLevelCostFunction = function (level)
-			return (level - 1) * 100 * COST_MULT
-		end,
+		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
 		secondPeashooter = true,
 		levelDefs = {
@@ -868,7 +877,7 @@ local chassisDefs = {
 			},
 			[1] = {
 				morphBuildPower = 10,
-				morphBaseCost = 25,
+				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -888,7 +897,7 @@ local chassisDefs = {
 			},
 			[2] = {
 				morphBuildPower = 15,
-				morphBaseCost = 150 * COST_MULT,
+				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12.5
 				end,
@@ -908,7 +917,7 @@ local chassisDefs = {
 			},
 			[3] = {
 				morphBuildPower = 20,
-				morphBaseCost = 500 * COST_MULT,
+				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
 				end,
@@ -932,7 +941,7 @@ local chassisDefs = {
 			},
 			[4] = {
 				morphBuildPower = 25,
-				morphBaseCost = 300 * COST_MULT,
+				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 27.5
 				end,
@@ -956,7 +965,7 @@ local chassisDefs = {
 			},
 			[5] = {
 				morphBuildPower = 30,
-				morphBaseCost = 400 * COST_MULT,
+				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 35
 				end,
@@ -984,9 +993,7 @@ local chassisDefs = {
 		name = "recon",
 		humanName = "Recon",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynrecon0"].id,
-		extraLevelCostFunction = function (level)
-			return (level - 1) * 100 * COST_MULT
-		end,
+		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
@@ -1002,7 +1009,7 @@ local chassisDefs = {
 			},
 			[1] = {
 				morphBuildPower = 10,
-				morphBaseCost = 25,
+				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1022,7 +1029,7 @@ local chassisDefs = {
 			},
 			[2] = {
 				morphBuildPower = 15,
-				morphBaseCost = 150 * COST_MULT,
+				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1042,7 +1049,7 @@ local chassisDefs = {
 			},
 			[3] = {
 				morphBuildPower = 20,
-				morphBaseCost = 500 * COST_MULT,
+				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1066,7 +1073,7 @@ local chassisDefs = {
 			},
 			[4] = {
 				morphBuildPower = 25,
-				morphBaseCost = 300 * COST_MULT,
+				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1090,7 +1097,7 @@ local chassisDefs = {
 			},
 			[5] = {
 				morphBuildPower = 30,
-				morphBaseCost = 400 * COST_MULT,
+				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1118,9 +1125,7 @@ local chassisDefs = {
 		name = "support",
 		humanName = "Engineer",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynsupport0"].id,
-		extraLevelCostFunction = function (level)
-			return (level - 1) * 100 * COST_MULT
-		end,
+		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
 		levelDefs = {
 			[0] = {
@@ -1138,7 +1143,7 @@ local chassisDefs = {
 			},
 			[1] = {
 				morphBuildPower = 10,
-				morphBaseCost = 25,
+				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 2
@@ -1160,7 +1165,7 @@ local chassisDefs = {
 			},
 			[2] = {
 				morphBuildPower = 15,
-				morphBaseCost = 150 * COST_MULT,
+				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 4
@@ -1182,7 +1187,7 @@ local chassisDefs = {
 			},
 			[3] = {
 				morphBuildPower = 20,
-				morphBaseCost = 500 * COST_MULT,
+				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 6
@@ -1208,7 +1213,7 @@ local chassisDefs = {
 			},
 			[4] = {
 				morphBuildPower = 25,
-				morphBaseCost = 300,
+				morphBaseCost = morphCosts[4],
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 8
@@ -1234,7 +1239,7 @@ local chassisDefs = {
 			},
 			[5] = {
 				morphBuildPower = 30,
-				morphBaseCost = 400,
+				morphBaseCost = morphCosts[5],
 				chassisApplicationFunction = function (modules, sharedData)
 					-- All comms have 10 BP in their unitDef (even support)
 					sharedData.bonusBuildPower = (sharedData.bonusBuildPower or 0) + 10
@@ -1264,9 +1269,7 @@ local chassisDefs = {
 		name = "assault",
 		humanName = "Guardian",
 		baseUnitDef = UnitDefNames and UnitDefNames["dynassault0"].id,
-		extraLevelCostFunction = function (level)
-			return (level - 1) * 100 * COST_MULT
-		end,
+		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
 		secondPeashooter = true,
 		levelDefs = {
@@ -1283,7 +1286,7 @@ local chassisDefs = {
 			},
 			[1] = {
 				morphBuildPower = 10,
-				morphBaseCost = 25,
+				morphBaseCost = morphCosts[1],
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1303,7 +1306,7 @@ local chassisDefs = {
 			},
 			[2] = {
 				morphBuildPower = 15,
-				morphBaseCost = 150 * COST_MULT,
+				morphBaseCost = morphCosts[2] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1323,7 +1326,7 @@ local chassisDefs = {
 			},
 			[3] = {
 				morphBuildPower = 20,
-				morphBaseCost = 500 * COST_MULT,
+				morphBaseCost = morphCosts[3] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1347,7 +1350,7 @@ local chassisDefs = {
 			},
 			[4] = {
 				morphBuildPower = 25,
-				morphBaseCost = 300 * COST_MULT,
+				morphBaseCost = morphCosts[4] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
@@ -1371,7 +1374,7 @@ local chassisDefs = {
 			},
 			[5] = {
 				morphBuildPower = 30,
-				morphBaseCost = 400 * COST_MULT,
+				morphBaseCost = morphCosts[5] * COST_MULT,
 				chassisApplicationFunction = function (modules, sharedData)
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,

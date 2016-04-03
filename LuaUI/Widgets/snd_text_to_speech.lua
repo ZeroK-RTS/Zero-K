@@ -27,7 +27,7 @@ options_path = 'Settings/Audio'
 options_order = {'enable'}
 options = {
 	enable ={	
-		name = "Text-To-Speech (with Zero-K lobby only)", 
+		name = "Text-To-Speech (ZKL only)", 
 		type = 'bool', value = true, 
 		OnChange = function(self)
 			SetupTTS(self.value)

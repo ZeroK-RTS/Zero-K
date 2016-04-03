@@ -17,8 +17,12 @@ local weaponDef = {
 
 		area_damage = 1,
 		area_damage_radius = 128,
-		area_damage_dps = 20,
+		area_damage_dps = 40,
 		area_damage_duration = 45,
+		
+		light_camera_height = 3500,
+		light_color = [[0.75 0.4 0.15]],
+		light_radios = 520,
 	},
 
 	damage                  = {
@@ -35,7 +39,7 @@ local weaponDef = {
 	model                   = [[wep_b_fabby.s3o]],
     noSelfDamage            = false,
 	range                   = 450,
-	reloadtime              = 12,
+	reloadtime              = 25,
 	smokeTrail              = true,
 	soundHit                = [[weapon/cannon/wolverine_hit]],
 	soundHitVolume          = 8,

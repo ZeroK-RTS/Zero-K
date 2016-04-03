@@ -859,129 +859,45 @@ local function GetWinString(name)
 end
 
 local function GetOpposingAllyTeams()
-	local teams = Spring.GetTeamList()
-	local gaiaTeamID = Spring.GetGaiaTeamID()
-	
-	-- Finds the teams that contain players or skirmish AIs
-	local activeAllyTeams = {}
-	local activeAllyTeamsCount = 0
-	
-	for i = 1, #teams do
-		local teamID = teams[i]
-		local _,leader,_,isAI,_,allyTeamID = Spring.GetTeamInfo(teamID)
-		if teamID ~= gaiaTeamID then
-			if isAI then
-				-- If the team is an AI team then count it as long as it is not chicken.
-				-- The AI names are collected seperately because they are less important.
-				local _,name = Spring.GetAIInfo(teamID)
-				if not name:find("Chicken:") then
-					if not activeAllyTeams[allyTeamID] then
-						activeAllyTeams[allyTeamID] = {aiNames = {}, players = 0, AIs = 0, teamID = teamID}
-						activeAllyTeamsCount = activeAllyTeamsCount + 1
-					end
-					
-					local data = activeAllyTeams[allyTeamID]
-					data.AIs = data.AIs + 1
-					data.aiNames = data.aiNames or {}
-					data.aiNames[data.AIs] = name
-				end
-			else
-				local name,_,_,_,_,_,_,_,_,customKeys = Spring.GetPlayerInfo(leader)
-				customKeys = customKeys or {}
-				local clan = customKeys.clan or ""
-				if not activeAllyTeams[allyTeamID] then
-					activeAllyTeams[allyTeamID] = {players = 0, AIs = 0, teamID = teamID}
-					activeAllyTeamsCount = activeAllyTeamsCount + 1
-				end
-				
-				local data = activeAllyTeams[allyTeamID]
-				
-				-- The first player provides some representitive information for the team
-				if not data.playerNames then
-					data.playerNames = {}
-					data.teamID = teamID
-					data.winString = GetWinString(name)
-				end
-				
-				data.players = data.players + 1
-				data.playerNames[data.players] = name
-				
-				-- The team is considered a clan until players from distinct clans are found.
-				if (not data.noClan) and data.clan ~= clan then
-					if data.clan then
-						data.noClan = true
-					else
-						data.clanfull = customKeys.clanfull
-						data.clan = clan
-					end
-				end
-			end
-		end
-	end
-	
-	-- The spectator panel is only supported for games against two teams
-	if activeAllyTeamsCount ~= 2 then
-		return false
-	end
-	
-	-- If all players have the same clan then designation by clan is useless.
-	local clans = {}
-	for allyTeamID, data in pairs(activeAllyTeams) do
-		clans[#clans + 1] = data.clan
-	end
-	
-	if clans[1] == clans[2] then
-		for allyTeamID, data in pairs(activeAllyTeams) do
-			data.noClan = true
-		end
-	end
-	
-	-- Create the final allyTeamData
+	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 	local returnData = {}
-	
-	for allyTeamID, data in pairs(activeAllyTeams) do
-		local name = "noname"
-		local nameSize = 1
-		
-		local teamMembers = data.players + data.AIs
-		
-		if (not data.noClan) and data.clan ~= "" and data.players > 1 then
-			-- All players on a team of at least two have the same clan
-			if data.clanfull and string.len(data.clanfull) < options.clanNameLengthCutoff.value then
-				name = data.clanfull
-			else
-				name = data.clan
-			end
-		else
-			if data.players >= 1 then
-				name = data.playerNames[1]
-			else
-				name = data.aiNames[1] or "AI"
-			end
-			if teamMembers == 2 or data.players == 2 then
-				nameSize = 0.65
-				if data.players >= 2 then
-					name = name .. "\n" .. data.playerNames[2]
-				else
-					name = name .. "\n" .. (data.aiNames[2] or "AI")
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+
+		local teamList = Spring.GetTeamList(allyTeamID)
+		if allyTeamID ~= gaiaAllyTeamID and #teamList > 0 then
+
+			local winString
+			local playerName
+			for j = 1, #teamList do
+				local _, playerID, _, isAI = Spring.GetTeamInfo (teamList[j])
+				if not isAI then
+					playerName = Spring.GetPlayerInfo(playerID)
+					winString = GetWinString(playerName)
+					break
 				end
-			elseif teamMembers > 2 then
-				nameSize = 0.65
-				name = name .. "\n and team"
 			end
+
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
+			if string.len(name) > options.clanNameLengthCutoff.value then
+				name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID)
+			end
+
+			returnData[#returnData + 1] = {
+				allyTeamID = allyTeamID, -- allyTeamID for the team
+				name = name, -- Large display name of the team
+				nameSize = 1, -- Display size factor of the team name.
+				teamID = teamList[1], -- representitive teamID
+				color = {Spring.GetTeamColor(teamList[1])} or {1,1,1,1}, -- color of the teams text (color of first player)
+				playerName = playerName or "AI", -- representitive player name (for win counter)
+				winString = winString or "0", -- Win string from win counter
+			}
 		end
-		
-		name = name or "noname"
-		
-		returnData[#returnData + 1] = {
-			allyTeamID = allyTeamID, -- allyTeamID for the team
-			name = name, -- Large display name of the team
-			nameSize = nameSize, -- Display size factor of the team name.
-			teamID = data.teamID, -- representitive teamID
-			color = {Spring.GetTeamColor(data.teamID)} or {1,1,1,1}, -- color of the teams text (color of first player)
-			playerName = data.playerNames[1], -- representitive player name (for win counter)
-			winString = data.winString or "0", -- Win string from win counter
-		}
+	end
+
+	if #returnData ~= 2 then
+		return
 	end
 	
 	if returnData[1].allyTeamID > returnData[2].allyTeamID then

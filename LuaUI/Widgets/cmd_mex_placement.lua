@@ -522,6 +522,7 @@ function widget:Update()
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
+		WG.mouseoverMex = mexSpotToDraw
 	else
 		local _, cmd_id = spGetActiveCommand()
 		if -mexDefID ~= cmd_id then
@@ -769,7 +770,7 @@ function widget:DrawWorld()
 			gl.PushMatrix()
 			gl.Translate(closestSpot.x, height, closestSpot.z)
 			gl.Rotate(90 * bface, 0, 1, 0)
-			gl.UnitShape(mexDefID, Spring.GetMyTeamID())
+			gl.UnitShape(mexDefID, Spring.GetMyTeamID(), false, true, false)
 			gl.PopMatrix()
 			
 			gl.DepthTest(false)
@@ -778,6 +779,27 @@ function widget:DrawWorld()
 	end
 	
 	gl.Color(1, 1, 1, 1)
+end
+
+local selectionEntirelyCons = false
+function widget:SelectionChanged(units)
+	if not units then
+		selectionEntirelyCons = false
+		return
+	end
+	selectionEntirelyCons = true
+	for i = 1, #units do
+		if not mexBuilder[units[i]] then
+			selectionEntirelyCons = false
+			return
+		end
+	end
+end
+
+function widget:DefaultCommand(type, id)
+	if mexSpotToDraw and selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
+		return -mexDefID
+	end
 end
 
 function widget:DrawInMiniMap()

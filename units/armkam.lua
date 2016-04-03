@@ -91,6 +91,10 @@ unitDef = {
 	  customparams = {
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
+
+		
+		light_color = [[1 0.25 0.25]],
+		light_radius = 175,
 	  },
 
       damage                  = {

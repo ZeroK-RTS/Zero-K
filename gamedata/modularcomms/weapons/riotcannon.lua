@@ -12,11 +12,13 @@ local weaponDef = {
 		slot = [[5]],
 		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 		miscEffectFire   = [[custom:RIOT_SHELL_L]],
+
+		light_camera_height = 1500,
 	},
 
 	damage                  = {
-		default = 240,
-		planes  = 240,
+		default = 220.2,
+		planes  = 220.2,
 		subs    = 12,
 	},
 
@@ -27,8 +29,8 @@ local weaponDef = {
 	impulseFactor           = 0.5,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 270,
-	reloadtime              = 2.2,
+	range                   = 275,
+	reloadtime              = 2,
 	soundHit                = [[weapon/cannon/generic_cannon]],
 	soundStart              = [[weapon/cannon/outlaw_gun]],
 	soundStartVolume        = 3,

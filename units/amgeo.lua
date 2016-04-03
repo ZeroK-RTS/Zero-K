@@ -42,7 +42,7 @@ unitDef = {
   maxDamage                     = 3250,
   maxSlope                      = 255,
   minCloakDistance              = 150,
-  objectName                    = [[amgeo.obj]],
+  objectName                    = [[amgeo.dae]],
   script                        = [[amgeo.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[NUCLEAR_MISSILE]],
@@ -53,7 +53,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Moho Geothermal Powerplant]],
+      description      = [[Wreckage - Advanced Geothermal]],
       blocking         = true,
       damage           = 3250,
       energy           = 0,
@@ -61,13 +61,13 @@ unitDef = {
       footprintX       = 5,
       footprintZ       = 5,
       metal            = 600,
-      object           = [[amgeo_dead.obj]],
+      object           = [[amgeo_dead.dae]],
       reclaimable      = true,
       reclaimTime      = 600,
     },
 
     HEAP  = {
-      description      = [[Debris - Moho Geothermal Powerplant]],
+      description      = [[Debris - Advanced Geothermal]],
       blocking         = false,
       damage           = 3250,
       energy           = 0,

@@ -3,8 +3,6 @@ unitDef = {
   name                          = [[Silencer]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
-  antiweapons                   = [[1]],
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildAngle                    = 8192,
   buildCostEnergy               = 8000,
@@ -80,6 +78,11 @@ unitDef = {
       commandfire             = true,
       craterBoost             = 6,
       craterMult              = 6,
+
+	  customParams        	  = {
+		light_color = [[2.92 2.64 1.76]],
+		light_radius = 3000,
+	  },
 
       damage                  = {
         default = 11501.1,

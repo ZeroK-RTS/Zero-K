@@ -84,7 +84,7 @@ end
 
 --fetch unit id of passenger (from the load command)
 function getPassengerId() 
-	local cmd = Spring.GetUnitCommands(unitID, 1)
+	local cmd = Spring.GetCommandQueue(unitID, 1)
 	local unitId = nil	
 	
 	if cmd and cmd[1] then					
@@ -99,7 +99,7 @@ end
 
 --fetch id of command
 function getCommandId() 
-	local cmd=Spring.GetUnitCommands(unitID, 1)
+	local cmd=Spring.GetCommandQueue(unitID, 1)
 	if cmd and cmd[1] then		
 		return cmd[1]['id']		
 	end
@@ -108,7 +108,7 @@ end
 
 --fetch unit id of passenger (from the load command)
 function getDropPoint() 
-	local cmd=Spring.GetUnitCommands(unitID, 1)
+	local cmd=Spring.GetCommandQueue(unitID, 1)
 	local dropx, dropy,dropz = nil	
 	
 	if cmd and cmd[1] then					

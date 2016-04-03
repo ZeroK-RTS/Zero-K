@@ -96,7 +96,10 @@ unitDef = {
 		area_damage_radius = 96,
 		area_damage_dps = 20,
 		area_damage_duration = 13.3,
-      },
+		
+		light_color = [[1.6 0.8 0.32]],
+		light_radius = 320,
+	  },
 	  
       damage                  = {
         default = 120,

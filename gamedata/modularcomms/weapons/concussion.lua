@@ -12,6 +12,9 @@ local weaponDef = {
 		slot = [[3]],
 		muzzleEffectFire = [[custom:RAIDMUZZLE]],
 		manualfire = 1,
+		
+		light_color = [[1.5 1.13 0.6]],
+		light_radius = 450,
 	},
 
 	damage                  = {
@@ -26,7 +29,7 @@ local weaponDef = {
 	impulseFactor           = 0.5,
 	interceptedByShieldType = 1,
 	range                   = 450,
-	reloadtime              = 15,
+	reloadtime              = 25,
 	rgbColor                = [[1 0.6 0]],
 	separation              = 0.5,
 	size                    = 0.8,

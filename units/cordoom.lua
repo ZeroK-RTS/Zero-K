@@ -108,6 +108,14 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+		light_camera_height = 2000,
+		light_color = [[0.9 0.4 0.12]],
+		light_radius = 180,
+		light_fade_time = 35,
+		light_fade_offset = 10,
+	  },
+
       damage                  = {
         default = 51.1,
         planes  = 51.1,
@@ -148,6 +156,11 @@ unitDef = {
       burnBlow                = true,
       craterBoost             = 0.7,
       craterMult              = 1.2,
+
+      customParams            = {
+		light_color = [[2.2 1.6 0.9]],
+		light_radius = 550,
+      },
 
       damage                  = {
         default = 1201,

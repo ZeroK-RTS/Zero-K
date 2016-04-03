@@ -24,11 +24,15 @@ for num = 1, #wepTable do
 	end
 	local weaponName = string.sub(wd.name, (string.find(wd.name,"commweapon") or 0), 100)
 	if weaponName then
-		unitWeaponNames[weaponName] = {
-			num = num,
-			weaponDefID = wd.id,
-			manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
-		}
+		if unitWeaponNames[weaponName] then
+			unitWeaponNames[weaponName].num2 = num
+		else
+			unitWeaponNames[weaponName] = {
+				num = num,
+				weaponDefID = wd.id,
+				manualFire = (wd.customParams and wd.customParams.manualfire and true) or false
+			}
+		end
 	end
 end
 
@@ -98,7 +102,7 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 	local shieldDef = shieldName and unitWeaponNames[shieldName]
 	
 	weapon1 = weaponDef1 and weaponDef1.num
-	weapon2 = weaponDef2 and weaponDef2.num
+	weapon2 = weaponDef2 and (weaponDef2.num2 or weaponDef2.num)
 	shield  = shieldDef and shieldDef.num
 	
 	if weapon1 then

@@ -77,12 +77,16 @@ unitDef = {
 
     CORE_ARTILLERY = {
       name                    = [[Plasma Artillery]],
-      accuracy                = 300,
+      accuracy                = 180,
       areaOfEffect            = 96,
 	  avoidFeature            = false,
 	  avoidGround             = false,
       craterBoost             = 1,
       craterMult              = 2,
+
+      customParams            = {
+		light_color = [[1.4 0.8 0.3]],
+      },
 
       damage                  = {
         default = 600.5,

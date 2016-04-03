@@ -408,7 +408,7 @@ function widget:GameFrame(n)
 	gameframe = n
 end
 
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if unitTeam == myTeam and cmdID < 0 then
 		ProcessCommand(unitID, cmdID)
 	end

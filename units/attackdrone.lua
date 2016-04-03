@@ -87,7 +87,13 @@ unitDef = {
       coreThickness           = 0.25,
       craterBoost             = 0,
       craterMult              = 0,
-      cylinderTargeting      = 1,
+      cylinderTargeting       = 1,
+  
+      customParams			= {
+		light_camera_height = 1800,
+		light_color = [[0.25 1 0.25]],
+		light_radius = 130,
+      },
 
       damage                  = {
         default = 32,

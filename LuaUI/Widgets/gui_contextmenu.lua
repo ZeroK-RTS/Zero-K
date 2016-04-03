@@ -225,21 +225,6 @@ for i = 1, #UnitDefs do
 			addUnit(i,"Misc/Chickens", false)
 		elseif ud.customParams.is_drone then
 			addUnit(i,"Units/Misc", false)
-		--elseif (ud.customParams.commtype or ud.customParams.level) then
-		--	local unitName = ud.name
-		--	if unitName:sub(6, 8) == "cai" then
-		--		-- addUnit(i,"Misc/Commanders/CAI", false)
-		--	elseif unitName:sub(6, 13) == "campaign" then
-		--		addUnit(i,"Misc/Commanders/Campaign", false)
-		--	elseif unitName:sub(6, 12) == "trainer" then
-		--		local chassisType = ud.humanName:sub(1, ud.humanName:find(" Trainer")-1)
-		--		addUnit(i,"Misc/Commanders/Trainer/".. chassisType, false)
-		--	elseif ((ud.name:byte(1) == string.byte('c')) and (ud.name:byte(2) >= string.byte('0')) and (ud.name:byte(2) <= string.byte('9'))) then
-		--		local owner_name = lobbyIDs[ud.name:sub(2, ud.name:find('_')-1)] or "<unknown>"
-		--		addUnit(i,"Misc/Commanders/Player Commanders/".. owner_name .. "/" .. ud.humanName, false)
-		--	else
-		--		-- addUnit(i,"Misc/Commanders/Other", false) -- mostly chassis templates and testing stuff
-		--	end
 		end
 	end
 end
@@ -362,45 +347,6 @@ local function GetUnitDefByHumanName(humanName)
 	return false
 end
 
-
-local function getHelpText(unitDef)
-	local data = WG.langData
-	local lang = (WG.lang and WG.lang()) or "en"
-	local helpText
-	if data then
-		local unitConf = data[unitDef.name] 
-		helpText = unitConf and unitConf.helptext
-	end
-	if not helpText then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		helpText = unitDef.customParams and unitDef.customParams['helptext' .. suffix] 
-			or unitDef.customParams.helptext
-			or "No help text available for this unit."
-		font = nil
-	end
-		
-	return helpText, font
-end	
-
-
-local function getDescription(unitDef)
-	local data = WG.langData
-	local lang = (WG.lang and WG.lang()) or "en"
-	local desc
-	if data then
-		local unitConf = data[unitDef.name] 
-		desc = unitConf and unitConf.description
-	end
-	if not desc then
-		local suffix = (lang == 'en') and '' or ('_' .. lang)
-		desc = unitDef.customParams and unitDef.customParams['description' .. suffix] or unitDef.tooltip or 'Description error'
-		font = nil
-	end
-		
-	return desc, font
-	
-end	
-
 local function GetShieldRegenDrain(wd)
 	local shieldRegen = wd.shieldPowerRegen
 	if shieldRegen == 0 and wd.customParams and wd.customParams.shield_rate then
@@ -489,7 +435,9 @@ local function weapons2Table(cells, ws, unitID)
 
 		if wd.paralyzer then
 			damw = val
-			stun_time = wd.damages.paralyzeDamageTime
+			if stun_time == 0 then
+				stun_time = wd.damages.paralyzeDamageTime
+			end
 		else
 			dam = val
 		end
@@ -685,7 +633,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		if cp.spawns_name then
 			cells[#cells+1] = ' - Spawns: '
-			cells[#cells+1] = UnitDefNames[cp.spawns_name].humanName
+			cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.spawns_name])
 			if cp.spawns_expire then
 				cells[#cells+1] = ' - Spawn life: '
 				cells[#cells+1] = cp.spawns_expire .. "s"
@@ -813,7 +761,7 @@ local function printAbilities(ud, unitID)
 	local cp = ud.customParams
 
 	
-	if ud.buildSpeed > 0 then
+	if ud.buildSpeed > 0 and not cp.nobuildpower then
 		local buildSpeed = ud.buildSpeed * (unitID and Spring.GetUnitRulesParam(unitID, "buildpower_mult") or 1)
 		cells[#cells+1] = 'Construction'
 		cells[#cells+1] = ''
@@ -933,7 +881,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = 'Morphing'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - To: '
-		cells[#cells+1] = UnitDefNames[cp.morphto].humanName
+		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.morphto])
 		cells[#cells+1] = ' - Cost: '
 		cells[#cells+1] = math.max(0, (UnitDefNames[cp.morphto].buildTime - ud.buildTime)) .. " M"
 		if cp.morphrank and (tonumber(cp.morphrank) > 0) then
@@ -952,19 +900,20 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ''
 	end
 
-	local idle_autoheal = ud.customParams.idle_regen and tonumber(ud.customParams.idle_regen) or (ud.idleAutoHeal * 2)
-	if (ud.idleTime < 1800) or (idle_autoheal > 5) or (ud.autoHeal > 0) or (cp.amph_regen) or (cp.armored_regen) then
+	if (ud.idleTime < 1800) or (cp.amph_regen) or (cp.armored_regen) then
 		cells[#cells+1] = 'Improved regeneration'
 		cells[#cells+1] = ''
-		if ud.idleTime < 1800 or (idle_autoheal > 5) then
-			cells[#cells+1] = ' - Idle regen: '
-			cells[#cells+1] = numformat(idle_autoheal) .. ' HP/s'
-			cells[#cells+1] = ' - Time to enable: '
-			cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
-		end
-		if ud.autoHeal > 0 then
-			cells[#cells+1] = ' - Combat regen: '
-			cells[#cells+1] = numformat(ud.autoHeal * 2) .. ' HP/s'
+		if ud.idleTime < 1800 then
+			if ud.idleTime > 0 then
+				cells[#cells+1] = ' - Idle regen: '
+				cells[#cells+1] = numformat(cp.idle_regen) .. ' HP/s'
+				cells[#cells+1] = ' - Time to enable: '
+				cells[#cells+1] = numformat(ud.idleTime / 30) .. 's'
+			else
+				cells[#cells+1] = ' - Combat regen: '
+				local dynamic_regen = unitID and Spring.GetUnitRulesParam(unitID, "comm_autorepair_rate") or cp.idle_regen
+				cells[#cells+1] = numformat(dynamic_regen) .. ' HP/s'
+			end
 		end
 		if cp.amph_regen then
 			cells[#cells+1] = ' - Water regen: '
@@ -1055,7 +1004,7 @@ local function printAbilities(ud, unitID)
 		cells[#cells+1] = ' - Eats nearby wreckage to spawn units'
 		cells[#cells+1] = ''
 		cells[#cells+1] = ' - Spawns:'
-		cells[#cells+1] = UnitDefNames[cp.grey_goo_spawn].humanName
+		cells[#cells+1] = Spring.Utilities.GetHumanName(UnitDefNames[cp.grey_goo_spawn])
 		cells[#cells+1] = ' - BP:'
 		cells[#cells+1] = cp.grey_goo_drain
 		cells[#cells+1] = ' - Cost:'
@@ -1166,7 +1115,6 @@ local function printWeapons(unitDef, unitID)
 				end
 			end
 
-			local weaponName = weaponDef.description or 'Weapon'
 			local isDuplicate = false
 
 			for i=1,#weaponStats do
@@ -1177,7 +1125,7 @@ local function printWeapons(unitDef, unitID)
 				end
 			end
 			
-			if (not isDuplicate) and not(weaponName:find('fake') or weaponName:find('Fake') or weaponName:find('Bogus') or weaponName:find('NoWeapon')) then 
+			if (not isDuplicate) and not weaponDef.customParams.fake_weapon then 
 				local wsTemp = {
 					weaponID = weaponID,
 					count = 1,
@@ -1219,7 +1167,7 @@ local function GetWeapon(weaponName)
 	return WeaponDefNames[weaponName] 
 end
 
-local function printunitinfo(ud, lang, buttonWidth, unitID)	
+local function printunitinfo(ud, buttonWidth, unitID)	
 	local icons = {
 		Image:New{
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
@@ -1238,12 +1186,9 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 				width=40,
 			}
 	end
-	
-	local text,font = getHelpText(ud)
-	
+
 	local helptextbox = TextBox:New{
-		font = {font=font},
-		text = text, 
+		text = Spring.Utilities.GetHelptext(ud), 
 		textColor = color.stats_fg, 
 		width = '100%',
 		height = '100%',
@@ -1276,7 +1221,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = "COMMANDER", textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header, }
 		statschildren[#statschildren+1] = Label:New{ caption = 'Level: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = Spring.GetUnitRulesParam(unitID, "comm_level")+1, textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = 'Chassis: ', textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = chassisDefs[Spring.GetUnitRulesParam(unitID, "comm_chassis")].humanName, textColor = color.stats_fg, }
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
@@ -1428,7 +1373,7 @@ local function printunitinfo(ud, lang, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = 'BUILDS', textColor = color.stats_header,}
 		statschildren[#statschildren+1] = Label:New{ caption = '', textColor = color.stats_header,}
 		for i=1, #this_buildlist do
-			statschildren[#statschildren+1] = Label:New{ caption = UnitDefs[this_buildlist[i]].humanName, textColor = color.stats_fg, }
+			statschildren[#statschildren+1] = Label:New{ caption = Spring.Utilities.GetHumanName(UnitDefs[this_buildlist[i]]), textColor = color.stats_fg, }
 			-- desc. would be nice, but there is horizontal cutoff
 			-- and long names can overlap (eg. Adv Radar)
 			-- statschildren[#statschildren+1] = Label:New{ caption = UnitDefs[this_buildlist[i]].tooltip, textColor = colorDisarm,}
@@ -1616,7 +1561,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			width='100%',
 			bottom = B_HEIGHT*2,
 			padding = {2,2,2,2},
-			children = printunitinfo(ud, WG.lang or 'en', window_width, unitID) ,
+			children = printunitinfo(ud, window_width, unitID) ,
 		},	
 		Button:New{ 
 			caption = 'Close', 
@@ -1636,12 +1581,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		window_unitstats:Dispose()
 	end
 
-	local desc, font = getDescription(ud)
-	
 	statswindows[num] = Window:New{  
 		x = x,
 		y = y,
-		font = {font=font},
 		width  = window_width,
 		height = window_height,
 		resizable = true,
@@ -1651,7 +1593,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		minWidth = 250,
 		minHeight = 300,
 		
-		caption = Spring.Utilities.GetHumanName(unitID, ud) ..' - '.. desc,
+		caption = Spring.Utilities.GetHumanName(ud, unitID) ..' - '.. Spring.Utilities.GetDescription(ud, unitID),
 		
 		children = children,
 	}
@@ -1763,10 +1705,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 		
 	local window_width = 200
 	--local buttonWidth = window_width - 0
-	
-	local desc, font = getDescription(ud)
+
 	local children = {
-		Label:New{ caption =  ud.humanName ..' - '.. desc, font={font=font}, width=window_width, textColor = color.context_header,},
+		Label:New{ caption = Spring.Utilities.GetHumanName(ud) ..' - '.. Spring.Utilities.GetDescription(ud), width=window_width, textColor = color.context_header,},
 		Label:New{ caption = 'Player: ' .. playerName, width=window_width, textColor=teamColor },
 		Label:New{ caption = 'Alliance - ' .. alliance .. '    Team - ' .. team, width=window_width ,textColor = color.context_fg,},
 		

@@ -90,6 +90,8 @@ unitDef = {
         gatherradius = [[128]],
         smoothradius = [[96]],
         smoothmult   = [[0.4]],
+		
+		light_color = [[2.4 1.5 0.6]],
       },
 	  
       damage                  = {

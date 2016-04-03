@@ -11,54 +11,39 @@
 		Metal spent - damage recieved = total metal in units?
 
 ]]
-function widget:GetInfo()
-	return {
-		name		    = "EndGame Stats",
-		desc		    = "v0.913 Chili replacement for default end game statistics",
-		author		  = "Funkencool",
-		date		    = "2013",
-		license     = "public domain",
-		layer		    = -1,
-		enabled   	= true
-	}
-end
+function widget:GetInfo() return {
+	name    = "EndGame Stats",
+	desc    = "v0.913 Chili replacement for default end game statistics",
+	author  = "Funkencool",
+	date    = "2013",
+	license = "public domain",
+	layer   = -1,
+	enabled = true
+} end
 
---[[
-	changelog:
-		0.91 - CarRepairer
-			- Added fixes to prevent widget crash when running spring.exe.
-			- Integrated with awards gadget.
-		0.911 - CarRepairer
-			- Integrated with new widget gui_chili_endgamewindow
-	
---]]
-
-local testing = false
--- INCLUDES
-
---comment out any stats you don't want included, order also directly effects button layout.. [1] = engineName, [2] = Custom Widget Name (can change)
-local engineStats = {
-	--{"time"            , "time"},
-	-- {"frame"           , ""},
-	{"metalUsed"       , "Metal Used"},
+local buttons = {
 	{"metalProduced"   , "Metal Produced"},
+	{"metalUsed"       , "Metal Used"},
+	{"metal_income"    , "Metal Income"},
+	{"metal_reclaim"   , "Metal Reclaimed"},
 	{"metalExcess"     , "Metal Excess"},
-	{"metalReceived"   , "Metal Received"},
-	{"metalSent"       , "Metal Sent"},
-	{"energyUsed"      , "Energy Used"},
-	{"energyProduced"  , "Energy Produced"},
-	{"energyExcess"    , "Energy Excess"},
-	{"energyReceived"  , "Energy Received"},
-	{"energySent"      , "Energy Sent"},
+
+	{"energy_income"   , "Energy Income"},
+
 	{"damageDealt"     , "Damage Dealt"},
 	{"damageReceived"  , "Damage Received"},
+
 	{"unitsProduced"   , "Units Built"},
+	{"unit_value"      , "Unit Value"},
 	{"unitsKilled"     , "Units Killed"},
 	{"unitsDied"       , "Units Lost"},
-	{"unitsReceived"   , "Units Received"},
-	{"unitsSent"       , "Units Sent"},
-	{"unitsCaptured"   , "Units Captured"},
-	-- {"unitsOutCaptured", ""},
+}
+
+local rulesParamStats = {
+	metal_reclaim = true,
+	unit_value = true,
+	metal_income = true,
+	energy_income = true,
 }
 
 local graphLength = 0
@@ -203,7 +188,16 @@ local function getEngineArrays(statistic, labelCaption)
 	local graphMax = 0
 	for a=0, teams do
 		local temp = {}
-		local stats = Spring.GetTeamStatsHistory(a, 0, graphLength)
+		local stats
+		if rulesParamStats[statistic] then
+			stats = {}
+			for i = 0, graphLength do
+				stats[i] = {}
+				stats[i][statistic] = Spring.GetTeamRulesParam(a, "stats_history_" .. statistic .. "_" .. i) or 0
+			end
+		else
+			stats = Spring.GetTeamStatsHistory(a, 0, graphLength)
+		end
 		for b=1, graphLength - 1 do
 			temp[b] = stats[b][statistic]
 			if isDelta then temp[b] = stats[b+1][statistic] - stats[b][statistic] end
@@ -235,8 +229,8 @@ function loadpanel()
 	graphLabel  = Chili.Label:New{autosize = true, parent = window0, bottom = 5,caption = "", align = "center", width = "70%", x = "20%", height = 30, font = {size = 30,},}
 	graphTime		= Chili.Label:New{parent = window0, bottom = 25,caption = "", width = 50, right = 50, height = 10}
 
-	for a=1, #engineStats do
-		local engineButton =	Chili.Button:New{name = engineStats[a][1], caption = engineStats[a][2], parent = graphSelect, OnClick = {
+	for a=1, #buttons do
+		local engineButton =	Chili.Button:New{name = buttons[a][1], caption = buttons[a][2], parent = graphSelect, OnClick = {
 			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
 	end
 	

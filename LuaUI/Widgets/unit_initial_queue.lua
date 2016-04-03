@@ -115,7 +115,7 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 		gl.Translate(bx, by, bz)
 		gl.Rotate(90 * facing, 0, 1, 0)
 		gl.Texture("%"..bDefID..":0") --.s3o texture atlas for .s3o model
-		gl.UnitShape(bDefID, teamID)
+		gl.UnitShape(bDefID, teamID, false, true, false)
 		gl.Texture(false)
 	gl.PopMatrix()
 
@@ -132,7 +132,7 @@ local function DrawUnitDef(uDefID, uTeam, ux, uy, uz)
 
 	gl.PushMatrix()
 		gl.Translate(ux, uy, uz)
-		gl.UnitShape(uDefID, uTeam)
+		gl.UnitShape(uDefID, uTeam, false, true, true)
 	gl.PopMatrix()
 
 	gl.Lighting(false)
@@ -572,16 +572,18 @@ function widget:CommandsChanged()
 	end
 	for i=1, #buildOptions do
 		local unitName = buildOptions[i]
-		table.insert(widgetHandler.customCommands, {
-			id      = -1*UnitDefNames[unitName].id,
-			type    = 20,
-			tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
-			cursor  = unitName,
-			action  = "buildunit_" .. unitName,
-			params  = {}, 
-			texture = "", --"#"..id,
-			name = unitName,
-		})
+		if not Spring.GetGameRulesParam("disabled_unit_" .. unitName) then
+			table.insert(widgetHandler.customCommands, {
+				id      = -1*UnitDefNames[unitName].id,
+				type    = 20,
+				tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
+				cursor  = unitName,
+				action  = "buildunit_" .. unitName,
+				params  = {}, 
+				texture = "", --"#"..id,
+				name = unitName,
+			})
+		end
 	end
 	table.insert(widgetHandler.customCommands, {
 		id      = CMD_STOP,

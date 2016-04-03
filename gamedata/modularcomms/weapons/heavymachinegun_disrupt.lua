@@ -13,11 +13,14 @@ local weaponDef = {
 		muzzleEffectShot = [[custom:WARMUZZLE]],
 		miscEffectShot = [[custom:DEVA_SHELLS]],
 		timeslow_damagefactor = 0.5,
+		
+		light_color = [[1.3 0.5 1.6]],
+		light_radius = 180,
 	},
 
 	damage                  = {
-		default = 16.5,
-		planes  = 16.5,
+		default = 15,
+		planes  = 15,
 		subs    = 0.825,
 	},
 
@@ -29,8 +32,8 @@ local weaponDef = {
 	intensity               = 0.7,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 290,
-	reloadtime              = 0.167,
+	range                   = 285,
+	reloadtime              = 5/30,
 	rgbColor                = [[0.9 0.1 0.9]],
 	separation              = 1.5,
 	soundHit                = [[weapon/cannon/emg_hit]],

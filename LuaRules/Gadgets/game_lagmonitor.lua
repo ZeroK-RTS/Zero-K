@@ -354,15 +354,19 @@ function gadget:GameFrame(n)
 							end
 						end
 						GG.allowTransfer = false
-
-						-- Send message
-						if lagger.resigned then
-							spEcho("game_message: " .. lagger.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name .. " (ally #".. allyTeam ..")")
-						else
-							spEcho("game_message: Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK (ally #".. allyTeam ..")")
-						end
 					end
-				end	-- if
+
+					-- Send message
+					if lagger.resigned then
+						spEcho("game_message: " .. lagger.name .. " resigned, giving all units to ".. recepientByAllyTeam[allyTeam].name)
+					elseif #units > 0 then
+						spEcho("game_message: Giving all units of "..lagger.name .. " to " .. recepientByAllyTeam[allyTeam].name .. " due to lag/AFK")
+					end
+				else
+					if lagger.resigned then
+						spEcho("game_message: " .. lagger.name .. " resigned")
+					end
+				end
 			end	-- if
 		end	-- for
 	end	-- if

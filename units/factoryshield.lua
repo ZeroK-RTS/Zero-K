@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Shield Bot Factory]],
   description                   = [[Produces Tough Robots, Builds at 10 m/s]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 600,
   buildCostMetal                = 600,

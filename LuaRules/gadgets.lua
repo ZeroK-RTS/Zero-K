@@ -145,8 +145,10 @@ local callInLists = {
 	-- Unit CallIns
 	"UnitCreated",
 	"UnitFinished",
+	"UnitReverseBuilt",
 	"UnitFromFactory",
 	"UnitDestroyed",
+	"RenderUnitDestroyed",
 	"UnitExperience",
 	"UnitIdle",
 	"UnitCmdDone",
@@ -288,7 +290,6 @@ end
 local function ripairs(t)
   return rev_iter, t, (1 + #t)
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1384,6 +1385,13 @@ function gadgetHandler:UnitFinished(unitID, unitDefID, unitTeam)
   return
 end
 
+function gadgetHandler:UnitReverseBuilt(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.UnitReverseBuiltList) do
+    g:UnitReverseBuilt(unitID, unitDefID, unitTeam)
+  end
+  return
+end
+
 function gadgetHandler:UnitStunned(unitID, unitDefID, unitTeam, stunned)
   for _,g in ipairs(self.UnitStunnedList) do
     g:UnitStunned(unitID, unitDefID, unitTeam, stunned)
@@ -1407,6 +1415,14 @@ function gadgetHandler:UnitDestroyed(unitID,     unitDefID,     unitTeam,
   for _,g in ipairs(self.UnitDestroyedList) do
     g:UnitDestroyed(unitID,     unitDefID,     unitTeam,
                     attackerID, attackerDefID, attackerTeam)
+  end
+  return
+end
+
+
+function gadgetHandler:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
+  for _,g in ipairs(self.RenderUnitDestroyedList) do
+    g:RenderUnitDestroyed(unitID, unitDefID, unitTeam)
   end
   return
 end

@@ -74,7 +74,7 @@ options = {
 }
 
 for id,value in pairs(factoryDefs) do
-	options[UnitDefs[id].name] = {name = UnitDefs[id].humanName, type = 'bool', value = (value ~= 0) }
+	options[UnitDefs[id].name] = {name = Spring.Utilities.GetHumanName(UnitDefs[id]), type = 'bool', value = (value ~= 0) }
 	options_order[#options_order+1] = UnitDefs[id].name
 end
 

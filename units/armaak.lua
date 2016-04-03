@@ -98,6 +98,10 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
+		
+		light_camera_height = 1600,
+		light_color = [[0.9 0.86 0.45]],
+		light_radius = 140,
 	  },
 
       damage                  = {
@@ -143,6 +147,8 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
+		light_color = [[0.2 1.2 1.2]],
+		light_radius = 120,
 	  },
 
       damage                  = {

@@ -102,7 +102,7 @@ unitDef = {
   weaponDefs                    = {
 
     TARGETER = {
-      name                    = [[Aimer (fake)]],
+      name                    = [[Aimer (Fake)]],
       alwaysVisible           = 18,
       areaOfEffect            = 56,
       avoidFeature            = false,
@@ -111,6 +111,10 @@ unitDef = {
       avoidGround             = false,
       beamTime                = 0.001,
       coreThickness           = 0.5,
+
+	  customParams        	  = {
+		light_radius = 0,
+	  },
 
       damage                  = {
         default = -0.00001,
@@ -153,6 +157,10 @@ unitDef = {
 
 	  customParams        	  = {
 		stats_damage = 3000,
+
+		light_color = [[5 0.3 6]],
+		light_radius = 2000,
+		light_beam_start = 0.8,
 	  },
 
       damage                  = {
@@ -197,6 +205,10 @@ unitDef = {
       craterBoost             = 2,
       craterMult              = 4,
 
+	  customParams        	  = {
+		light_radius = 0,
+	  },
+
       damage                  = {
         default = 180,
       },
@@ -237,6 +249,12 @@ unitDef = {
       craterBoost             = 4,
       craterMult              = 8,
 
+	  customParams        	  = {
+		light_color = [[3 0.2 4]],
+		light_radius = 1200,
+		light_beam_start = 0.8,
+	  },
+	  
       damage                  = {
         default = 180,
       },
@@ -278,6 +296,10 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 2,
       craterMult              = 4,
+
+	  customParams        	  = {
+		light_radius = 0,
+	  },
 
       damage                  = {
         default = 180,

@@ -54,7 +54,7 @@ unitDef = {
   maxVelocity                   = 0,
   minCloakDistance              = 150,
   noAutoFire                    = false,
-  objectName                    = [[geo.obj]],
+  objectName                    = [[geo.dae]],
   script                        = [[geo.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
@@ -68,7 +68,7 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Geothermal Powerplant]],
+      description      = [[Wreckage - Geothermal Generator]],
       blocking         = true,
       damage           = 1750,
       energy           = 0,
@@ -76,18 +76,17 @@ unitDef = {
       footprintX       = 4,
       footprintZ       = 4,
       metal            = 200,
-      object           = [[geo_dead.obj]],
+      object           = [[geo_dead.dae]],
       reclaimable      = true,
       reclaimTime      = 200,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Geothermal Powerplant]],
+      description      = [[Debris - Geothermal Generator]],
       blocking         = false,
       damage           = 1750,
       energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
       metal            = 100,

@@ -1,184 +1,181 @@
-local versionName = "v1.1"
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-function widget:GetInfo()
-  return {
-    name      = "Vertical Line on Radar Dots",
-    desc      = versionName .. " help you identify enemy units by adding vertical line on radar dots",
-    author    = "msafwan",
-    date      = "Nov 11, 2012",
-    license   = "GNU GPL, v2 or later",
-    layer     = 20,
-    enabled   = false  --  loaded by default?
-  }
+
+function widget:GetInfo() return {
+	name    = "Vertical Line on Radar Dots v2",
+	desc    = "Helps you identify enemy air units by adding vertical line on radar dots",
+	author  = "msafwan",
+	date    = "Nov 11, 2012",
+	license = "GNU GPL, v2 or later",
+	layer   = 20,
+	enabled = true,
+} end
+
+
+local last_frame = 0
+local disabled = false
+local enemyDots = {}
+local allyDots = {}
+local needsUpdate = false
+local myAllyTeamID
+
+local function forceUpdate ()
+	needsUpdate = true
 end
 
-local osClock = os.clock
---local mathCeil = math.ceil
-local mathMax = math.max
-local spGetUnitPosition = Spring.GetUnitPosition
-local spGetGroundHeight = Spring.GetGroundHeight
---local spGetMyAllyTeamID = Spring.GetMyAllyTeamID 
+options_path = 'Settings/Graphics/Unit Visibility/Vertical Lines'
+options_order = { 'enable_vertical_lines_air', 'enable_vertical_lines_water', 'enable_vertical_lines_ally' }
+options = {
+	enable_vertical_lines_air = {
+		name = 'Show for enemy aircraft',
+		desc = 'Draw a line perpendicular to the ground for enemy airborne units',
+		type = 'radioButton',
+		value = 'radar',
+		items = {
+			{key ='always', name='Always'},
+			{key ='radar',  name='In radar, not in sight'},
+			{key ='never',  name='Never'},
+		},
+		OnChange = forceUpdate,
+	},
+	enable_vertical_lines_water = {
+		name = 'Show for enemy underwater',
+		desc = 'Draw a line perpendicular to the surface for enemy submerged units',
+		type = 'radioButton',
+		value = 'never',
+		items = {
+			{key ='always', name='Always'},
+			{key ='radar',  name='In radar, not in sight'},
+			{key ='never',  name='Never'},
+		},
+	},
+	enable_vertical_lines_ally = {
+		name = 'Show for allied units',
+		desc = 'Draw the lines for allied units',
+		type = 'radioButton',
+		value = 'never',
+		items = {
+			{key ='always', name='Aircraft and Underwater'},
+			{key ='air',    name='Aircraft'},
+			{key ='water',  name='Underwater'},
+			{key ='never',  name='None'},
+		},
+	},
+}
 
-local glVertex          = gl.Vertex 
-local glPushAttrib  = gl.PushAttrib 
-local glLineStipple = gl.LineStipple 
-local glDepthTest   = gl.DepthTest 
-local glLineWidth   = gl.LineWidth 
-local glColor       = gl.Color 
-local glBeginEnd    = gl.BeginEnd 
-local glPopAttrib   = gl.PopAttrib 
-local glCreateList  = gl.CreateList 
---local glCallList    = gl.CallList 
---local glDeleteList  = gl.DeleteList 
-local GL_LINES      = GL.LINES 
-
-local dots_gbl = {} --//variable: store enemy position.
-local dotsEnterLos_gbl = {} --//variable: remember if enemy is in LOS.
-local framePoll_gbl = {frame = 0, lastUpdate = 0} --// variable: 1st number represent number of frame soo far, 2nd number represent the time of last update
-local updateAtFrame_gbl = 0 --//variable: tell at which frame to update enemy position.
-local desiredDisplayInterval_gbl = 0.03 --// constant: the rest period (in second) between each update of enemy position.
---local myAllyTeamID = -1
------------------------------------------
-function widget:Initialize()
-	framePoll_gbl.frame = 0
-	framePoll_gbl.lastUpdate = osClock()
-	--myAllyTeamID = spGetMyAllyTeamID()
-	local myPlayerID=Spring.GetMyPlayerID() --//get spec status. Will be used to determine how to draw lines.
-	local _, _, spec = Spring.GetPlayerInfo(myPlayerID)
-	if spec then 
-		widgetHandler:RemoveWidget()
-	end
-end
-
-function widget:PlayerChanged(playerID)
+local function UpdateSpec ()
 	if Spring.GetSpectatingState() then 
-		widgetHandler:RemoveWidget()
+		disabled = true
 	end
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 end
------------------------------------------
-function widget:UnitEnteredRadar(unitID, allyTeam)
-	--if myAllyTeamID ~= allyTeam then
-		--if ( dots_gbl[unitID] == nil ) then --//a check to prevent crash in case 1: where enemy suddenly appear in LOS + Radar but LOS registered it first
-			--dots_gbl[unitID] = {position={0,0,0}, surface=0, isBelow = false, frame= 0, wasInLOS = false , inLOS=false}
-		--end
-	--end
-	dots_gbl[unitID] = {position={0,0,0}, surface=0, isBelow = false, frame= 0, wasInLOS = false}
-	if (dotsEnterLos_gbl[unitID] == 1) then
-		dots_gbl[unitID].wasInLOS = true
+
+function widget:Initialize()
+	UpdateSpec()
+end
+
+function widget:PlayerChanged (playerID)
+	UpdateSpec()
+end
+
+function widget:UnitEnteredRadar (unitID, unitTeam)
+	if (Spring.GetUnitAllyTeam(unitID) ~= myAllyTeamID) then
+		local x, y, z = Spring.GetUnitPosition (unitID)
+		local losState = Spring.GetUnitLosState(unitID, myAllyTeamID)
+		local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+		enemyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), losState.los, r, g, b} -- x, y, z, ground, inlos, r, g, b
 	end
 end
 
-function widget:UnitLeftRadar(unitID, allyTeam)
-	dots_gbl[unitID] = nil
+function widget:UnitLeftRadar (unitID, unitTeam)
+	enemyDots[unitID] = nil
 end
 
-function widget:UnitEnteredLos(unitID, allyTeam )
-	--if myAllyTeamID ~= allyTeam then
-		-- if ( dots_gbl[unitID] ~= nil ) then --//a check to prevent crash in case 2: where enemy appear in LOS but ally has no radar
-			-- dots_gbl[unitID].inLOS= true
-			-- dots_gbl[unitID].wasInLOS = true
-		-- else  --//a check to prevent crash in case 1: where enemy suddenly appear in LOS + Radar but LOS registered it first
-			-- dots_gbl[unitID] = {position={0,0,0}, surface=0, isBelow = false, frame= 0, inLOS=true , wasInLOS = true}
-		-- end
-	--end	
-	dotsEnterLos_gbl[unitID] = 1
-	if ( dots_gbl[unitID] ~= nil ) then
-		dots_gbl[unitID].wasInLOS = true
-	end
+function widget:UnitDestroyed (unitID, unitTeam)
+	enemyDots[unitID] = nil
+	allyDots[unitID] = nil
 end
 
-function widget:UnitLeftLos(unitID, allyTeam)
-	--if myAllyTeamID ~= allyTeam then 
-		-- if ( dots_gbl[unitID] ~= nil ) then --//a check to prevent crash in case 3: where enemy died in LOS + Radar but Radar registered the death first.
-			-- dots_gbl[unitID].inLOS= false	
-		-- end
-	--end
-	dotsEnterLos_gbl[unitID] = nil
-end
-------------------------------------------------------
-local function UpdateDotsContent (unitID, content) --//retrieve unit position.
-	local x, y, z = spGetUnitPosition(unitID)
-	if x == nil then 
-		return nil --position didn't exist, delete content
+function widget:UnitCreated (unitID)
+	if (Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
+		local x, y, z = Spring.GetUnitPosition (unitID)
+		local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+		allyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), true, r, g, b} -- x, y, z, ground, inlos, r, g, b
 	end
-	local groundY = spGetGroundHeight(x,z)
-	local surfaceY = mathMax (groundY, 0) --//select water, or select terrain height depending on which is higher. 
-	if surfaceY > y then  --//mark unit as submerged if it below surface
-		content.isBelow = true
-	else 
-		content.isBelow = false
-	end
-	content.surface = surfaceY
-	content.position = {x,y,z}
-	
-	return content
-end
-
-local function GetAppropriateUpdateInterval (framePoll, updateAtFrame) --//poll 60 frame to check how long (in second) 1 frame took
-	local desiredDisplayInterval = desiredDisplayInterval_gbl
-	---- localized global variable
-	
-	local currentTime = osClock()
-	local secondPerFrame = (currentTime - framePoll.lastUpdate)/framePoll.frame
-	framePoll.lastUpdate = currentTime
-	updateAtFrame = desiredDisplayInterval/secondPerFrame
-	--updateAtFrame = mathCeil(numberOfFrameForDesiredDisplayInterval) --//either use the number of frame needed to satisfy the desired interval, or update every 1 frame (in case the frame number is a fraction, eg: <1). Prevent high FPS from updating dot position too much
-	
-	return framePoll, updateAtFrame
 end
 
 function widget:DrawWorld()
-	local framePoll = framePoll_gbl
-	local updateAtFrame = updateAtFrame_gbl
-	local dots = dots_gbl
-	local dotsEnterLos = dotsEnterLos_gbl
-	----localized global variable
-	
-	framePoll.frame = framePoll.frame +1
-	if framePoll.frame >= 60 then --//calculate the appropriate update interval by polling the time required to draw 60 frame
-		framePoll, updateAtFrame = GetAppropriateUpdateInterval (framePoll, updateAtFrame)
-		framePoll.frame = 0
+
+	if disabled then return end
+
+	local needs_update = needsUpdate
+	needsUpdate = false
+	local f = Spring.GetGameFrame()
+	if f > last_frame then
+		last_frame = f
+		needs_update = true
 	end
 
-	glPushAttrib(GL.LINE_BITS)	--//reference: "unit_target_on_the_move.lua" (by Google Frog), ZK gadget
-	glDepthTest(false)
-	glLineWidth(1.4)
-	glColor(1, 0.75, 0, 1)
-	for unitID, content in pairs(dots) do --//iterate over all dots and draw them
-		if content ~= nil then
-			--if (content.inLos == false) then
-			if (dotsEnterLos[unitID] == nil) then
-				content.frame = content.frame +1
-				if content.frame >= updateAtFrame then --//retrieve dots position after a specific interval. The interval prevent updating more than necessary
-					content.frame = 0
-					content = UpdateDotsContent (unitID, content)
-				end
-				if content ~= nil then
-					if content.isBelow then --//use stipple when unit is below surface. Indicate moving away from map's plane/away from user
-						glLineStipple(true) --1, 2047)
-					elseif content.wasInLOS then --//add occlusion to the vertical line (when enemy was identified) for asthetic purposes 
-					 	glDepthTest(true)
-					end
-					local x,y,z = content.position[1],content.position[2],content.position[3]
-					local surfaceY = content.surface
-					glBeginEnd(GL_LINES, function() glVertex(x,surfaceY,z) glVertex(x,y,z) end)
-					--glCallList(drawList)
-					glLineStipple(false)
-					glDepthTest(false)
-				end
-				dots[unitID] = content --//commit any changes to dots.
+	gl.PushAttrib (GL.LINE_BITS)
+	gl.DepthTest (true)
+	gl.LineWidth (1.4)
+
+	local removals = {}
+	for unitID, data in pairs (enemyDots) do
+		if needs_update then
+			if not Spring.ValidUnitID(unitID) then
+				removals[unitID] = true
+			else
+				local x, y, z = Spring.GetUnitPosition (unitID)
+				local losState = Spring.GetUnitLosState(unitID)
+				local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+				data[1] = x
+				data[2] = y
+				data[3] = z
+				data[4] = math.max(Spring.GetGroundHeight(x,z), 0)
+				data[5] = losState.los
+				data[6] = r
+				data[7] = g
+				data[8] = b
+			end
+		end
+		if (((data[2] > 0) and ((options.enable_vertical_lines_air.value == "always") or ((options.enable_vertical_lines_air.value == "radar") and (not data[5])))) or ((data[2] < 0) and ((options.enable_vertical_lines_water.value == "always") or ((options.enable_vertical_lines_water.value == "radar") and (not data[5]))))) then
+			gl.Color (data[6], data[7], data[8], 1)
+			gl.BeginEnd(GL.LINES, function()
+				gl.Vertex(data[1],data[4],data[3])
+				gl.Vertex(data[1],data[2],data[3])
+			end)
+		end
+	end
+	for unitID in pairs (removals) do
+		enemyDots[unitID] = nil
+	end
+
+	if options.enable_vertical_lines_ally.value ~= "never" then
+		local show_air   = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "air"))
+		local show_water = ((options.enable_vertical_lines_ally.value == "always") or (options.enable_vertical_lines_ally.value == "water"))
+		for unitID, data in pairs (allyDots) do
+			if needs_update then
+				local x, y, z = Spring.GetUnitPosition (unitID)
+				local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
+				data[1] = x
+				data[2] = y
+				data[3] = z
+				data[4] = math.max(Spring.GetGroundHeight(x,z), 0)
+				data[5] = true
+				data[6] = r
+				data[7] = g
+				data[8] = b
+			end
+			if ((data[2] > 0) and show_air) or ((data[2] < 0) and show_water) then
+				gl.Color (data[6], data[7], data[8], 1)
+				gl.BeginEnd(GL.LINES, function()
+					gl.Vertex(data[1],data[4],data[3])
+					gl.Vertex(data[1],data[2],data[3])
+				end)
 			end
 		end
 	end
-	glColor(1,1,1,1)	
-	glPopAttrib() 	
-	
-	---- update global variable
-	framePoll_gbl = framePoll
-	updateAtFrame_gbl = updateAtFrame
-	dots_gbl = dots
+
+	gl.DepthTest (false)
+	gl.Color (1,1,1,1)	
+	gl.PopAttrib ()
 end
-----------------------
---//reference1: "unit_ghostRadar.lua" (by very_bad_soldier), http://widgets.springrts.de/
---//reference2: "unit_target_on_the_move.lua" (by Google Frog), ZK gadget

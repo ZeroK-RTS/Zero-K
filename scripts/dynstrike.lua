@@ -287,10 +287,12 @@ end
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 2.3
+local PACE = 2.05
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 local PACE = PACE * VELOCITY/BASE_VELOCITY
+
+local SLEEP_TIME = 1000*10/30 -- Empirically determined
 
 local walkCycle = 1 -- Alternate between 1 and 2
 
@@ -336,7 +338,7 @@ local function Walk()
 	
 	while true do
 		walkCycle = 3 - walkCycle
-		speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()
+		speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace())
 		
 		local left = walkAngle[walkCycle] 
 		local right = walkAngle[3 - walkCycle] 
@@ -360,7 +362,9 @@ local function Walk()
 		
 		Move(Base, z_axis, 1, 2 * speedMult)
 		
-		WaitForTurn(left.wait, x_axis)
+		--WaitForTurn(left.wait, x_axis)
+		--Spring.Echo(Spring.GetGameFrame())
+		Sleep(SLEEP_TIME / speedMult)
 		-----------------------------------------------------------------------------------
 		
 		Turn(HipLeft, x_axis,  left[2].hip[1],  left[2].hip[2] * speedMult)
@@ -377,7 +381,9 @@ local function Walk()
 		
 		Move(Base, z_axis, 0, 2 * speedMult)
 		
-		WaitForTurn(left.wait, x_axis)
+		--WaitForTurn(left.wait, x_axis)
+		--Spring.Echo(Spring.GetGameFrame())
+		Sleep(SLEEP_TIME / speedMult)
 	end
 end
 

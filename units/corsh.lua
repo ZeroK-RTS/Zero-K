@@ -92,14 +92,17 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams = {
+        single_hit = true,
+		
+		light_camera_height = 1200,
+		light_radius = 180,
+      },
+	  
       damage                  = {
         default = 110.1,
       },
       
-      customParams = {
-        single_hit = true,
-      },
-
       explosionGenerator      = [[custom:gauss_hit_l]],
       groundbounce            = 1,
       impactOnly              = true,

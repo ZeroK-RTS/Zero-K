@@ -79,7 +79,9 @@ local function ScrapUnit(unitID, unitDefID, team, progress, face)
 			if (progress == 0) then
 				progress = 0.001
 			end
-			local featureID = spCreateFeature(wreck, x, y, z) --	_, team
+			local allyTeam = select(6, Spring.GetTeamInfo(team))
+			local featureID = spCreateFeature(wreck, x, y, z, face, allyTeam)
+			Spring.TransferFeature(featureID, team)
 			local maxHealth = FeatureDefs[wreck].maxHealth
 			spSetFeatureReclaim(featureID, progress)
 			--spSetFeatureResurrect(featureID, UnitDefs[unitDefID].name, face)

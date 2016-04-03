@@ -91,7 +91,7 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-
+	  
       damage                  = {
         default = 90.1,
       },
@@ -130,6 +130,12 @@ unitDef = {
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
+
+      customParams            = {
+		light_camera_height = 2000,
+		light_color = [[0.3 0.3 0.05]],
+		light_radius = 120,
+      },
 
       damage                  = {
         default = 26,

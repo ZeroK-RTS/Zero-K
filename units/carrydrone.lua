@@ -94,6 +94,12 @@ unitDef = {
       burstrate               = 0.1,
       craterBoost             = 0,
       craterMult              = 0,
+  
+      customParams			= {
+		light_camera_height = 2000,
+		light_color = [[0.95 0.91 0.48]],
+		light_radius = 150,
+      },
 
       damage                  = {
         default = 8,

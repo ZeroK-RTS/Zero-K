@@ -29,7 +29,7 @@ local mexDefID = UnitDefNames["cormex"].id
 local cmdMex = {
 	id      = CMD_AREA_MEX,
 	type    = CMDTYPE.ICON_AREA,
-	tooltip = 'Define an area to make mexes in',
+	tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
 	name    = 'Mex',
 	cursor  = 'Repair',
 	action  = 'areamex',
@@ -75,8 +75,8 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
-		local x = cmdParams[1]
-		local z = cmdParams[3]
+		local x = math.ceil(cmdParams[1])
+		local z = math.ceil(cmdParams[3])
 		if x and z then
 			if metalSpotsByPos[x] and metalSpotsByPos[x][z] then
 				return true

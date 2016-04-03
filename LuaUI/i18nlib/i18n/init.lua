@@ -161,7 +161,7 @@ function i18n.translate(key, data, newLocale)
     Spring.Log("i18n", "error", "No translation found for \"" .. key .. "\"")
     missingTranslation["_all"] = true
   end
-  return data.default or key
+  return data.default
 end
 
 function i18n.setLocale(newLocale, newPluralizeFunction)

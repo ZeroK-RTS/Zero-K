@@ -17,6 +17,10 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+Spring.Utilities = Spring.Utilities or {}
+VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
+local GetUnitCanBuild = Spring.Utilities.GetUnitCanBuild
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local GetUnitDefID      = Spring.GetUnitDefID
@@ -27,9 +31,13 @@ local GetSelectedUnits  = Spring.GetSelectedUnits
 local GetFullBuildQueue = Spring.GetFullBuildQueue
 local GetUnitIsBuilding = Spring.GetUnitIsBuilding
 local GetGameSeconds	= Spring.GetGameSeconds
-local GetGameFrame 		= Spring.GetGameFrame
+local GetGameFrame 	= Spring.GetGameFrame
 local GetModKeyState	= Spring.GetModKeyState
 local SelectUnitArray	= Spring.SelectUnitArray
+local GetUnitRulesParam	= Spring.GetUnitRulesParam
+local GetMouseState	= Spring.GetMouseState
+local TraceScreenRay	= Spring.TraceScreenRay
+local GetUnitPosition	= Spring.GetUnitPosition
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -101,9 +109,37 @@ end
 local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
 
+local hidden = false
+local function CheckHide()
+	local shouldShow = (options.showCoreSelector.value == 'always') or (options.showCoreSelector.value == 'spec' and (not Spring.GetSpectatingState()))
+
+	if shouldShow and hidden then
+		hidden = false
+		screen0:AddChild(window_selector)
+	elseif not shouldShow and not hidden then
+		hidden = true
+		screen0:RemoveChild(window_selector)
+	end
+end
+
+function widget:PlayerChanged()
+	CheckHide()
+end
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'lblSelection', 'selectcomm', 'hideWindow'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'selectprecbomber', 'lblSelection', 'selectcomm'}
 options = {
+	showCoreSelector = {
+		name = 'Selection Bar Visibility',
+		type = 'radioButton',
+		value = 'spec',
+		items = {
+			{key ='always', name='Always enabled'},
+			{key ='spec',   name='Hide when spectating'},
+			{key ='never',  name='Always disabled'},
+		},
+		OnChange = CheckHide,
+	},
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
 		type = 'number',
@@ -133,27 +169,18 @@ options = {
 		type = 'bool',
 		value = false,		
 	},
+	selectprecbomber = { type = 'button',
+		name = 'Individual precision bombers',
+		action = 'selectprecbomber',
+		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
+	},
 	lblSelection = { type='label', name='Commander', path='Game/Selection Hotkeys', },
 	selectcomm = { type = 'button',
 		name = 'Select Commander',
 		action = 'selectcomm',
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
-	},
-	
-	hideWindow = { type = 'button',
-		name = 'Hide Window',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		OnChange = function(self)
-			if not self.value then
-				screen0:AddChild(window_selector)
-			else
-				screen0:RemoveChild(window_selector)
-			end
-			
-		end
 	},
 }
 
@@ -172,6 +199,7 @@ local commDefID = UnitDefNames.armcom1.id
 local idleCons = {}	-- [unitID] = true
 local idleBuilderDefID = UnitDefNames.armrectr.id
 local wantUpdateCons = false
+local readyUntaskedBombers = {}	-- [unitID] = true
 
 --local gamestart = GetGameFrame() > 1
 local myTeamID = false
@@ -287,18 +315,17 @@ local function UpdateFac(unitID, index)
 		end
 	end
 
-	local tooltip = "Factory: "..UnitDefs[facs[index].facDefID].humanName
-	tooltip = tooltip .. "\n" .. count .. " item(s) in queue"
+	local tooltip = WG.Translate("common", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {x = count})
 	if rep then
-		tooltip = tooltip .. "\255\0\255\255 (repeating)\008"
+		tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("common", "repeating") .. ")\008"
 	end
 	if buildeeDefID then
-		local buildeeDef = UnitDefs[buildeeDefID]
-		tooltip = tooltip .. "\nCurrent project: "..buildeeDef.humanName.." ("..math.floor(progress*100).."% done)"
+		tooltip = tooltip .. "\n" .. WG.Translate("common", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." (".. WG.Translate("common", "x%_done", {x = math.floor(progress*100)}) .. ")"
 	end
-	tooltip = tooltip .. "\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
-										"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
-										"\nShift: Append to current selection\008"
+	tooltip = tooltip .. "\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+										"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+										"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
+
 	local tooltipOld = facs[index].button.tooltip
 	if tooltipOld ~= tooltip then
 		facs[index].button.tooltip = tooltip
@@ -506,12 +533,11 @@ local function UpdateComm(unitID, index)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:SetValue(health/maxHealth)
 	
-	comms[index].button.tooltip = "Commander: " .. Spring.Utilities.GetHumanName(unitID, UnitDefs[comms[index].commDefID]) ..
-							"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-							"\n\255\0\255\0Left-click: Select" .. (options.leftMouseCenter.value and " and go to" or "") ..
-							"\nRight-click: Select" .. ((not options.leftMouseCenter.value) and " and go to" or "") ..
-							"\nShift: Append to current selection\008"
-	
+	comms[index].button.tooltip = WG.Translate("common", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
+							"\n\255\0\255\255" .. WG.Translate("common", "health") .. ":\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+							"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+							"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
+							"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
 end
 
 --[[
@@ -631,9 +657,9 @@ local function UpdateConsButton()
 		conButton.button:Invalidate()
 		--idleBuilderDefID = maxDefID
 	end
-	conButton.button.tooltip = "You have ".. total .. " idle con(s), of "..numTypes.." different type(s)."..
-								"\n\255\0\255\0Left-click: Select"..
-								"\nRight-click: Select all\008"
+	conButton.button.tooltip = WG.Translate("interface", "idle_cons_different_types", {cons = total, types = numTypes}) ..
+								"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") ..
+								"\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "select_all") .. "\008"
 	idleCons.count = total
 	total = (total > 0 and tostring(total)) or ''
 	if conButton.countLabel then
@@ -748,6 +774,49 @@ local function SelectComm()
 	end
 end
 
+local function SelectPrecBomber()
+
+	-- Check to see if anything other than a ready bomber is selected
+	--	If not, then we'll increment the number of ready bombers selected
+	--	If so, then we'll either:
+	--		Select one ready bomber if none are selected
+	--		Select only the already selected ready bombers if at least one is selected	
+	
+	local toBeSelected = {}
+	
+	local currentSelection = Spring.GetSelectedUnits()
+	local isAnythingElseSelected = nil
+	for i,uid in ipairs(currentSelection) do
+		if not readyUntaskedBombers[uid] then
+			isAnythingElseSelected = true
+			break
+		end
+	end
+	
+	local mx,my = GetMouseState()
+	local _,pos = TraceScreenRay(mx,my,true)     
+	local mindist = math.huge
+	local muid = nil
+	if (pos == nil) then return end
+	
+	for uid, v in pairs(readyUntaskedBombers) do
+		if (Spring.IsUnitSelected(uid)) then
+			table.insert(toBeSelected,uid)
+		else
+			local x,_,z = GetUnitPosition(uid)
+			dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+			if (dist < mindist) then
+				mindist = dist
+				muid = uid
+			end
+		end
+	end
+	if (muid ~= nil) and (not isAnythingElseSelected or #toBeSelected == 0) then
+		table.insert(toBeSelected,muid)
+	end
+	Spring.SelectUnitArray(toBeSelected)
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- engine callins
@@ -757,6 +826,42 @@ function widget:GameStart()
 	gamestart = true
 end
 ]]--
+
+-- Check current cmdID and the queue for a double-wait
+local function isDoubleWait(unitID, cmdID)
+	if cmdID==CMD.WAIT then
+		local cmdsLen=Spring.GetCommandQueue(unitID,0)
+		if cmdsLen==1 then
+			local cmds=Spring.GetCommandQueue(unitID,1)
+			return cmds[1].id==CMD.WAIT
+		end
+	end
+	return false
+end
+
+-- Check the queue for an attack command
+local function isAttackQueued(unitID)
+	local cmdsLen=Spring.GetCommandQueue(unitID,0)
+	if cmdsLen and (cmdsLen > 0) then
+		local cmds=Spring.GetCommandQueue(unitID,-1)
+		for i=1,cmdsLen do
+			if cmds and cmds[i] and ((cmds[i].id==CMD.ATTACK) or (cmds[i].id==CMD.AREA_ATTACK)) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+-- Check to see if the bomber is ready and untasked
+local function setBomberReadyStatus(unitID)
+	local noAmmo = GetUnitRulesParam(unitID, "noammo")
+	if (noAmmo and noAmmo ~= 0) or select(3, Spring.GetUnitIsStunned(unitID)) or isAttackQueued(unitID) then
+		readyUntaskedBombers[unitID] = nil
+	else
+		readyUntaskedBombers[unitID] = true
+	end
+end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
@@ -775,18 +880,24 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		return
 	end
 	local ud = UnitDefs[unitDefID]
-	if ud.buildSpeed > 0 then  --- can build
+	if GetUnitCanBuild(unitID, unitDefID) then  --- can build
 		local bQueue = GetFullBuildQueue(unitID)
 		if not bQueue[1] then  --- has no build queue
 			local _, _, _, _, buildProg = GetUnitHealth(unitID)
 			if not ud.isFactory then
 				local cQueue = Spring.GetCommandQueue(unitID, 1)
+				--Spring.Echo("Con "..unitID.." queue "..tostring(cQueue[1]))
 				if not cQueue[1] then
+					--Spring.Echo("\tCon "..unitID.." must be idle")
 					widget:UnitIdle(unitID, unitDefID, myTeamID)
 				end
 			end
 		end
-	end  
+	end
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
+		setBomberReadyStatus(unitID)
+	end
 end
 
 function widget:UnitGiven(unitID, unitDefID, unitTeam, oldTeam)
@@ -801,6 +912,9 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
+	end	
+	if readyUntaskedBombers[unitID] then
+		readyUntaskedBombers[unitID] = nil
 	end	
 	if facsByID[unitID] then
 		RemoveFac(unitID)
@@ -824,6 +938,10 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		idleCons[unitID] = true
 		wantUpdateCons = true
 	end
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
+		setBomberReadyStatus(unitID)
+	end
 end
 
 function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
@@ -833,9 +951,22 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	if cmdID and stateCommands[cmdID] then
 		return
 	end
+	
+	-- Double wait means the same as an empty queue
+	-- It is just an engine hack
+	if isDoubleWait(unitID,cmdID) then
+		widget:UnitIdle(unitID,unitDefID,unitTeam)
+		return
+	end
+	
 	if idleCons[unitID] then
 		idleCons[unitID] = nil
 		wantUpdateCons = true
+	end
+
+	local unitName = UnitDefs[unitDefID].name
+	if (unitName  == "corshad") then
+		setBomberReadyStatus(unitID)
 	end
 end
 
@@ -899,6 +1030,7 @@ function widget:Initialize()
 	end
 	
 	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'tp')
+	widgetHandler:AddAction("selectprecbomber", SelectPrecBomber, nil, 'tp')
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -1056,8 +1188,12 @@ function widget:Initialize()
 	self:ViewResize(viewSizeX, viewSizeY)
 	
 	InitializeUnits()
+	
+	hidden = false
+	CheckHide()
 end
 
 function widget:Shutdown()
 	widgetHandler:RemoveAction("selectcomm")
+	widgetHandler:RemoveAction("selectprecbomber")
 end

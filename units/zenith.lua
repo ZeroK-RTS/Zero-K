@@ -82,6 +82,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+	  customParams        	  = {
+		light_radius = 0,
+	  },
+
       damage                  = {
         default = 0.001,
         planes  = 0.001,
@@ -122,8 +126,13 @@ unitDef = {
       cegTag                  = [[METEOR_TAG]],
       collideFriendly         = true,
       craterBoost             = 3,
-      craterMult              = 6,
+      craterMult              = 6, 
 
+	  customParams        	  = {
+		light_color = [[2.4 1.5 0.6]],
+		light_radius = 600,
+      },
+	  
       damage                  = {
         default = 1000,
         planes  = 1000,
@@ -171,6 +180,10 @@ unitDef = {
       collideFriendly         = true,
       craterBoost             = 3,
       craterMult              = 6,
+
+	  customParams        	  = {
+		light_radius = 0,
+	  },
 
       damage                  = {
         default = 1000,
@@ -221,6 +234,10 @@ unitDef = {
       craterBoost             = 3,
       craterMult              = 6,
 
+	  customParams        	  = {
+		light_radius = 0,
+	  },
+
       damage                  = {
         default = 1000,
         planes  = 1000,
@@ -270,6 +287,11 @@ unitDef = {
       collideFriendly         = true,
       craterBoost             = 3,
       craterMult              = 6,
+
+	  customParams        	  = {
+		light_color = [[2.4 1.5 0.6]],
+		light_radius = 600,
+      },
 
       damage                  = {
         default = 1000,

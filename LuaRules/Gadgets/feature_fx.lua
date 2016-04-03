@@ -14,7 +14,7 @@ function gadget:GetInfo()
     date      = "January 2015",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = false  --  loaded by default?
+    enabled   = true  --  loaded by default?
   }
 end
 
@@ -32,7 +32,7 @@ function gadget:FeatureDestroyed(id, allyTeam)
 	spSpawnCEG( CEG_SPAWN,
 		x,y,z,
 		0,0,0,
-		1+r, 1+r
+		2+(r/3), 2+(r/3)
 	);
 
 	--This could be used to later play sounds without betraying events or positions of destroyed features

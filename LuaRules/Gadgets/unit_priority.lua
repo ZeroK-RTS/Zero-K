@@ -317,10 +317,9 @@ function gadget:GameFrame(n)
 		local debugMode
 		local teams = spGetTeamList()
 		for i=1,#teams do
-			
-			debugMode = debugTeam and debugTeam[i]
-			
 			local teamID = teams[i]
+			debugMode = debugTeam and debugTeam[teamID]
+			
 			prioUnits = TeamPriorityUnits[teamID] or {}
 			miscPrioUnits = teamMiscPriorityUnits[teamID] or {}
 			
@@ -658,6 +657,7 @@ function gadget:Initialize()
 		spInsertUnitCmdDesc(unitID, CommandOrder, CommandDesc)
 	end
 
+	--toggleDebug(nil, nil, {"0"}, nil)
 	gadgetHandler:AddChatAction("debugpri", toggleDebug, "Debugs priority.")
 end
 
@@ -693,7 +693,7 @@ end
 function gadget:UnitFinished(unitID, unitDefID, teamID) 
 	local ud = UnitDefs[unitDefID]
 	
-	if ((ud.isFactory or ud.isBuilder) and ud.buildSpeed > 0) then 
+	if ((ud.isFactory or ud.isBuilder) and (ud.buildSpeed > 0 and not ud.customParams.nobuildpower)) then 
 		SetPriorityState(unitID, DefaultState, CMD_PRIORITY)
 	else  -- not a builder priority makes no sense now
 		UnitPriority[unitID] = nil

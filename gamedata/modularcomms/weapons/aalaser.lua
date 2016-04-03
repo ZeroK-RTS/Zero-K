@@ -13,6 +13,9 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		
+		light_color = [[0.2 1.2 1.2]],
+		light_radius = 120,
 	},
 
 	damage                  = {
@@ -29,7 +32,6 @@ local weaponDef = {
 	laserFlareSize          = 3.25,
 	minIntensity            = 1,
 	noSelfDamage            = true,
-	pitchtolerance          = 8192,
 	range                   = 800,
 	reloadtime              = 0.1,
 	rgbColor                = [[0 1 1]],

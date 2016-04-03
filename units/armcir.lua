@@ -97,6 +97,8 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
+		light_color = [[0.6 0.7 0.7]],
+		light_radius = 420,
 	  },
 
       damage                  = {

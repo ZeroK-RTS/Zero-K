@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Spider Factory]],
   description                   = [[Produces Spiders, Builds at 10 m/s]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 600,
   buildCostMetal                = 600,

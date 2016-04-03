@@ -160,8 +160,16 @@ local function UnitWithinBounds(unitID)
 	return (x > -500) and (x < Game.mapSizeX + 500) and (y > -1000) and (z > -500) and (z < Game.mapSizeZ + 500)
 end
 
+local function Draw() -- declares a draw
+	EchoUIMessage("The game ended in a draw!")
+	spGameOver({gaiaAllyTeamID}) -- exit uses {} so use Gaia for draw to differentiate
+end
+
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
+	if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
+		return
+	end
 	local allylist = spGetAllyTeamList()
 	local count = 0
 	local lastAllyTeam
@@ -173,8 +181,13 @@ local function CheckForVictory()
 		end
 	end
 	if count < 2 then
-		EchoUIMessage(( (lastAllyTeam and ("Alliance " .. lastAllyTeam)) or "Nobody") .. " wins!")
-		spGameOver({lastAllyTeam})
+		if ((not lastAllyTeam) or (count == 0)) then
+			Draw()
+		else
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
+			EchoUIMessage(name .. " wins!")
+			spGameOver({lastAllyTeam})
+		end
 	end
 end
 
@@ -201,7 +214,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
-		if teamList == nil then return end	-- empty allyteam, don't bother
+		if teamList == nil or (#teamList == 0) then return end	-- empty allyteam, don't bother
 		
 		if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
 			EchoUIMessage("Game Over: DEBUG")
@@ -392,15 +405,19 @@ local function ProcessLastAlly()
 				inactiveWinAllyTeam = lastActive
 				Spring.SetGameRulesParam("inactivity_win", lastActive)
 			else
-				inactiveWinAllyTeam = false
+				Draw()
 			end
 		else
-			-- remove every unit except for last active alliance
-			for i=1, #allylist do
-				local a = allylist[i]
-				if (a ~= lastActive) and (a ~= gaiaAllyTeamID) then
-					DestroyAlliance(a)
+			if #activeAllies == 1 then
+				-- remove every unit except for last active alliance
+				for i=1, #allylist do
+					local a = allylist[i]
+					if (a ~= lastActive) and (a ~= gaiaAllyTeamID) then
+						DestroyAlliance(a)
+					end
 				end
+			else -- no active team. For example two roaches were left and blew up each other
+				Draw()
 			end
 		end
 	end

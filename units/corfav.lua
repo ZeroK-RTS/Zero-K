@@ -86,6 +86,10 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams        = {
+		light_camera_height = 1000,
+      },
+
       damage                  = {
         default = 55,
         planes  = 55,
@@ -95,6 +99,7 @@ unitDef = {
       duration                = 0.02,
       explosionGenerator      = [[custom:beamweapon_hit_yellow_small]],
       fireStarter             = 50,
+	  hardStop                = false,
       heightMod               = 1,
       impactOnly              = true,
       impulseBoost            = 0,

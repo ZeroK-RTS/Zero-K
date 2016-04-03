@@ -16,6 +16,10 @@ local weaponDef = {
 		flamethrower = [[1]],
 		setunitsonfire = "1",
 		burntime = [[450]],
+		
+		light_camera_height = 2800,
+		light_color = [[1.2 0.78 0.36]],
+		light_radius = 260,
 	},
 
 	damage                  = {
@@ -32,8 +36,8 @@ local weaponDef = {
 	noExplode               = true,
 	noSelfDamage            = true,
 	--predictBoost            = 1,
-	range                   = 280,
-	reloadtime              = 0.2 - 1/30, -- 0.1(6)
+	range                   = 270,
+	reloadtime              = 5/30,
 	rgbColor                = [[1 1 1]],
 	soundStart              = [[weapon/flamethrower]],
 	soundTrigger            = true,

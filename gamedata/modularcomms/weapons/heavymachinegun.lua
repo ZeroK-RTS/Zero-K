@@ -17,13 +17,16 @@ local weaponDef = {
 				explosionGenerator = [[custom:BEAMWEAPON_HIT_GREEN]],
 				rgbColor = [[0.2 1 0]],
 			},
-		}
+		},
+		
+		light_color = [[0.8 0.76 0.38]],
+		light_radius = 180,
 	},
 
 	damage                  = {
-		default = 33,
-		planes  = 33,
-		subs    = 1.75,
+		default = 30,
+		planes  = 30,
+		subs    = 1.5,
 	},
 
 	edgeEffectiveness       = 0.5,
@@ -34,8 +37,8 @@ local weaponDef = {
 	intensity               = 0.7,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	range                   = 290,
-	reloadtime              = 0.167,
+	range                   = 285,
+	reloadtime              = 5/30,
 	rgbColor                = [[1 0.95 0.4]],
 	separation              = 1.5,
 	soundHit                = [[weapon/cannon/emg_hit]],

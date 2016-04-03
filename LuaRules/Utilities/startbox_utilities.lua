@@ -5,7 +5,8 @@ end
 local function SanitizeBoxes (boxes)
 
 	-- chop polies into triangles
-	for id, polies in pairs(boxes) do
+	for id, box in pairs(boxes) do
+		local polies = box.boxes
 		local triangles = {}
 		for z = 1, #polies do
 			local polygon = polies[z]
@@ -86,39 +87,83 @@ function ParseBoxes ()
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
 
 	local startBoxConfig
-	local manualStartposConfig
 
 	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
 
 	if VFS.FileExists (modsideBoxes) then
-		startBoxConfig, manualStartposConfig = VFS.Include (modsideBoxes)
+		startBoxConfig = VFS.Include (modsideBoxes)
 		SanitizeBoxes (startBoxConfig)
 	elseif VFS.FileExists (mapsideBoxes) then
-		startBoxConfig, manualStartposConfig = VFS.Include (mapsideBoxes)
+		startBoxConfig = VFS.Include (mapsideBoxes)
 		SanitizeBoxes (startBoxConfig)
 	else
 		startBoxConfig = { }
-		manualStartposConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				local midX = (box[1]+box[3]) / 2
+				local midZ = (box[2]+box[4]) / 2
+
 				box[1] = box[1]*Game.mapSizeX
 				box[2] = box[2]*Game.mapSizeZ
 				box[3] = box[3]*Game.mapSizeX
 				box[4] = box[4]*Game.mapSizeZ
+
+				local longName = "Center"
+				local shortName = "Center"
+
+				if (midX < 0.33) then
+					if (midZ < 0.33) then
+						longName = "North-West"
+						shortName = "NW"
+					elseif (midZ > 0.66) then
+						longName = "South-West"
+						shortName = "SW"
+					else
+						longName = "West"
+						shortName = "W"
+					end
+				elseif (midX > 0.66) then
+					if (midZ < 0.33) then
+						longName = "North-East"
+						shortName = "NE"
+					elseif (midZ > 0.66) then
+						longName = "South-East"
+						shortName = "SE"
+					else
+						longName = "East"
+						shortName = "E"
+					end
+				else
+					if (midZ < 0.33) then
+						longName = "North"
+						shortName = "N"
+					elseif (midZ > 0.66) then
+						longName = "South"
+						shortName = "S"
+					else
+						longName = "Center"
+						shortName = "Center"
+					end
+				end
+
 				startBoxConfig[id] = {
-					{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
-					{box[1], box[2], box[3], box[4], box[3], box[2]}
-				}
-				manualStartposConfig[id] = {
-					{(box[1]+box[3]) / 2, (box[2]+box[4]) / 2}
+					boxes = {
+						{box[1], box[2], box[1], box[4], box[3], box[4]}, -- must be counterclockwise
+						{box[1], box[2], box[3], box[4], box[3], box[2]}
+					},
+					startpoints = {
+						{(box[1]+box[3]) / 2, (box[2]+box[4]) / 2}
+					},
+					nameLong = longName,
+					nameShort = shortName
 				}
 			end
 		end
 	end
 
-	return startBoxConfig, manualStartposConfig
+	return startBoxConfig
 end
 
 function GetRawBoxes ()
@@ -143,12 +188,14 @@ function GetRawBoxes ()
 				box[3] = box[3]*Game.mapSizeX
 				box[4] = box[4]*Game.mapSizeZ
 				startBoxConfig[id] = {
-					{
-						{box[1], box[2]},
-						{box[1], box[4]},
-						{box[3], box[4]},
-						{box[3], box[2]},
-					},
+					boxes = {
+						{
+							{box[1], box[2]},
+							{box[1], box[4]},
+							{box[3], box[4]},
+							{box[3], box[2]},
+						},
+					}
 				}
 			end
 		end

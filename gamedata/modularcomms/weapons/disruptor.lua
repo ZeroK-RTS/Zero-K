@@ -12,10 +12,13 @@ local weaponDef = {
 	customParams            = {
 		--timeslow_preset       = [[module_disruptorbeam]],
 		timeslow_damagefactor = [[2]],
+		
+		light_color = [[1.88 0.63 2.5]],
+		light_radius = 320,
 	},
 
 	damage                  = {
-		default = 150,
+		default = 165,
 	},
 
 	explosionGenerator      = [[custom:flash2purple]],
@@ -28,7 +31,7 @@ local weaponDef = {
 	laserFlareSize          = 4.33,
 	minIntensity            = 1,
 	noSelfDamage            = true,
-	range                   = 330,
+	range                   = 310,
 	reloadtime              = 2,
 	rgbColor                = [[0.3 0 0.4]],
 	soundStart              = [[weapon/laser/heavy_laser5]],

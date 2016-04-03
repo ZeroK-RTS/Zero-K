@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Heavy Tank Factory]],
   description                   = [[Produces Heavy and Specialized Vehicles, Builds at 10 m/s]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 600,
   buildCostMetal                = 600,

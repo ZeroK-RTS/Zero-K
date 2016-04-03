@@ -73,6 +73,9 @@ unitDef = {
 	  customparams = {
 		stats_hide_dps = 1, -- one use
 		stats_hide_reload = 1,
+		
+		light_color = [[1.35 1.35 0.36]],
+		light_radius = 450,
 	  },
 
       damage                  = {

@@ -80,6 +80,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
+      customParams            = {
+		light_color = [[1.85 1.85 0.45]],
+		light_radius = 300,
+      },
+
       damage                  = {
         default        = 8000.1,
       },

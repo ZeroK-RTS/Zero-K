@@ -235,7 +235,7 @@ if not Spring.IsGUIHidden() then
 			glPushMatrix()
 			glTranslate( x, y, z )
 			glRotate( degrees, 0, 1.0, 0 )
-			glUnitShape( cmd, spGetMyTeamID() )
+			glUnitShape( cmd, spGetMyTeamID(), false, true, false )
 			glRotate( degrees, 0, -1.0, 0 )
 			glBillboard()					-- also show some debug stuff
 			glColor(textColor)

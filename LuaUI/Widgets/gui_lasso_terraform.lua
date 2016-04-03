@@ -83,7 +83,7 @@ local Grid = 16 -- grid size, do not change without other changes.
 ---------------------------------
 -- Epic Menu
 ---------------------------------
-options_path = 'Settings/Interface/Terraform'
+options_path = 'Settings/Interface/Building Placement'
 options_order = { 'staticMouseTime'}
 options = {
 	staticMouseTime = {
@@ -181,6 +181,8 @@ local mouseGridDraw
 local mouseUnit = {id = false}
 
 local mouseX, mouseY
+
+local mexDefID = UnitDefNames.cormex.id
 
 --------------------------------------------------------------------------------
 -- Command handling and issuing.
@@ -1137,12 +1139,15 @@ local function CheckPlacingRectangle(self)
 	end
 end
 
-function widget:Update(n)
+function widget:Update(dt)
 
+	if buildingPress and buildingPress.frame then
+		buildingPress.frame = buildingPress.frame - dt
+	end
 	CheckPlacingRectangle(self)
 	
+	local activeCmdIndex, activeid = spGetActiveCommand()
 	if currentlyActiveCommand then
-		local activeCmdIndex, activeid = spGetActiveCommand()
 		if activeid ~= currentlyActiveCommand then
 			stopCommand()
 		end
@@ -1239,8 +1244,13 @@ function widget:Update(n)
 			end
 		end
 	elseif placingRectangle then
-		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local pos
+		if (activeid == -mexDefID) and WG.mouseoverMex then
+			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+		else
+			local mx,my = spGetMouseState()
+			pos = select(2, spTraceScreenRay(mx, my, true))
+		end
 		
 		local facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
@@ -1255,11 +1265,15 @@ function widget:Update(n)
 		return true
 	end
 	
-	local activeCmdIndex, activeid = spGetActiveCommand()
 	local mx, my, lmb, mmb, rmb = spGetMouseState()
 	
 	if lmb and activeid and activeid < 0 then
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local pos
+		if (activeid == -mexDefID) and WG.mouseoverMex then
+			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+		else
+			pos = select(2, spTraceScreenRay(mx, my, true))
+		end
 		if pos and legalPos(pos) then
 			if buildingPress then
 				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
@@ -1267,20 +1281,20 @@ function widget:Update(n)
 					if s then
 						buildingPress.frame = false
 					else
-						buildingPress.frame = spGetGameFrame() + options.staticMouseTime.value*30
+						buildingPress.frame = options.staticMouseTime.value
 						buildingPress.pos[1] = pos[1]
 						buildingPress.pos[3] = pos[3]
 					end
 				end
 			else
-				buildingPress = {pos = pos, frame = spGetGameFrame() + options.staticMouseTime.value*30, unitDefID = -activeid}
+				buildingPress = {pos = pos, frame = options.staticMouseTime.value, unitDefID = -activeid}
 			end
 		end
 	else
 		buildingPress = false
 	end
 	
-	if buildingPress and buildingPress.frame and buildingPress.frame < spGetGameFrame() then
+	if buildingPress and buildingPress.frame and buildingPress.frame < 0 then
 		if buildingPress.unitDefID == -activeid then
 			WG.Terraform_SetPlacingRectangle(buildingPress.unitDefID)
 			CheckPlacingRectangle(self)
@@ -1733,8 +1747,13 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	point[2] = {x = 0, y = 0, z = 0}
 	point[3] = {x = 0, y = 0, z = 0}
 	
-	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	local pos
+	if (unitDefID == mexDefID) and WG.mouseoverMex then
+		pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
+	else
+		local mx,my = spGetMouseState()
+		pos = select(2, spTraceScreenRay(mx, my, true))
+	end
 	
 	SetFixedRectanglePoints(pos)
 	

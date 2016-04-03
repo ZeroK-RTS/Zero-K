@@ -62,7 +62,7 @@ AnimControl() {
 	var lastHeading, currHeading, diffHeading, pivotAngle;
 	lastHeading = GET HEADING;
 	while (1) {
-	
+
 		//pivot
 		currHeading = GET HEADING;
 		diffHeading = currHeading - lastHeading;
@@ -72,7 +72,7 @@ AnimControl() {
 		if (pivotAngle > MAX_PIVOT) pivotAngle = MAX_PIVOT;
 		if (pivotAngle < MIN_PIVOT) pivotAngle = MIN_PIVOT;
 		turn steering to y-axis 0 - pivotAngle speed PIVOT_SPEED;
-		
+
 		lastHeading = currHeading;
 		sleep ANIM_PERIOD;
 	}
@@ -84,12 +84,12 @@ DamageControl()
 	while (TRUE)
 	{
 		health = get HEALTH;
-		
+
 		if (health < 50)
 		{
 			emit-sfx SFXTYPE_WHITESMOKE from base;
 			if (health < 25)
-			{	
+			{
 				emit-sfx SFXTYPE_BLACKSMOKE from turret;
 			}
 		}
@@ -100,8 +100,8 @@ DamageControl()
 StartMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
+	set-signal-mask SIG_MOVE;
+
 	isMoving = 1;
 	spin wheel1r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
 	spin wheel2r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
@@ -113,8 +113,8 @@ StartMoving()
 StopMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
+	set-signal-mask SIG_MOVE;
+
 	isMoving = 0;
 
 	stop-spin wheel1r around x-axis decelerate WHEEL_SPIN_DECEL;
@@ -159,9 +159,9 @@ Shot1()
 	move barrel to z-axis RECOIL_BARREL now;
 	move breech to z-axis RECOIL_BREECH now;
 	turn swivel to y-axis RECOIL_SWIVEL now;
-	
+
 	emit-sfx 1024 from muzzle;
-	
+
 	move barrel to z-axis 0 speed RECOIL_RESTORE_BARREL;
 	move breech to z-axis 0 speed RECOIL_RESTORE_BREECH;
 	turn swivel to y-axis 0 speed RECOIL_RESTORE_SWIVEL;
@@ -207,18 +207,19 @@ Killed(severity, corpsetype)
 		explode base type SHATTER | BITMAP;
 		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 	}
+	return corpsetype;
 }
 
 Create()
 {
 	isMoving = 0;
-	
+
 	call-script RockXInit();
 	start-script AnimControl();
 
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
-	
-	
+
+
 	start-script DamageControl();
 }

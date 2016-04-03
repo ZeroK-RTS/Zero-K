@@ -125,8 +125,9 @@ local function MakePlural(str)
 end
 
 local function WriteString(str, unitDef, plural)
-	local name = (type(unitDef) == "number") and UnitDefs[unitDef].humanName or UnitDefNames[unitDef].humanName 
-	if plural then name = MakePlural(name) end
+	local def = (type(unitDef) == "number") and UnitDefs[unitDef] or UnitDefNames[unitDef]
+	local name = Spring.Utilities.GetHumanName(def)
+	if plural then name = MakePlural(name) end -- todo: use i18n for plurals
 	return string.gsub(str, "<name>", name, 1)
 end
 
@@ -375,7 +376,7 @@ function widget:Update(dt)
 end
 
 --tells people not to build the expensive stuff early
-function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdParams)
+function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if unitTeam ~= myTeam then return end
 	local t = Spring.GetGameSeconds()
 	local str

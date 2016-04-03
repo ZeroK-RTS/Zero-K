@@ -27,6 +27,7 @@ local spGetUnitAllyTeam 	= Spring.GetUnitAllyTeam
 local spGiveOrderToUnit 	= Spring.GiveOrderToUnit
 local spGetUnitPosition 	= Spring.GetUnitPosition
 local spGetTeamResources 	= Spring.GetTeamResources
+local spGetTeamRulesParam	= Spring.GetTeamRulesParam
 local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local spGetCommandQueue 	= Spring.GetCommandQueue
 local spGetUnitHealth		= Spring.GetUnitHealth
@@ -281,7 +282,14 @@ local function updateTeamResourcing(team)
 	for i = econAverageMemory, 2, -1 do
 		averagedEcon.prevEcon[i] = averagedEcon.prevEcon[i-1]
 	end
-	averagedEcon.prevEcon[1] = {eInc = eInc, mInc = mInc, activeBp = mPull}
+	-- @see gui_chili_economy_panel2.lua for eco-params reference
+	local oddEnergyIncome = spGetTeamRulesParam(team, "OD_energyIncome") or 0
+	local oddEnergyChange = spGetTeamRulesParam(team, "OD_energyChange") or 0
+	averagedEcon.prevEcon[1] = {
+		eInc     = eInc + oddEnergyIncome - math.max(0, oddEnergyChange),
+		mInc     = mInc + mRec,
+		activeBp = mPull
+	}
 	-- calculate average
 	averagedEcon.aveEInc = 0
 	averagedEcon.aveMInc = 0
@@ -1650,7 +1658,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 		end
 
 		if data.tempTarget then
-			if spValidUnitID(data.tempTarget) and isUnitVisible(data.tempTarget,at.aTeamOnThisTeam) then
+			if spValidUnitID(data.tempTarget) and isUnitVisible(data.tempTarget,a.allyTeam) then
 				local x, y, z = spGetUnitPosition(data.tempTarget)
 				for unitID,_ in pairs(data.unit) do
 					if not data.aa[unitID] then
@@ -3858,18 +3866,16 @@ local function setAllyteamStartLocations(allyTeam)
 	local at = allyTeamData[allyTeam]
 	local listOfAis = at.listOfAis
 
-	if GG.manualStartposConfig then
-		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		if boxID then
-			local boxConfig = GG.manualStartposConfig[boxID]
-			if boxConfig and boxConfig[1] then
-				for i = 1, listOfAis.count do
-					local team = listOfAis.data[i]
-					local startpos = boxConfig[i] or boxConfig[1]
-					GG.SetStartLocation (team, startpos[1], startpos[2])
-				end
-				return
+	local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+	if boxID then
+		local boxConfig = GG.startBoxConfig[boxID] and GG.startBoxConfig[boxID].startpoints
+		if boxConfig and boxConfig[1] then
+			for i = 1, listOfAis.count do
+				local team = listOfAis.data[i]
+				local startpos = boxConfig[i] or boxConfig[1]
+				GG.SetStartLocation (team, startpos[1], startpos[2])
 			end
+			return
 		end
 	end
 

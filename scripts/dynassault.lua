@@ -44,13 +44,13 @@ local SIG_RESTORE_TORSO = 32
 local TORSO_SPEED_YAW = math.rad(300)
 local ARM_SPEED_PITCH = math.rad(180)
 
-local PACE = 3.4
+local PACE = 1.8
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 PACE = PACE * VELOCITY/BASE_VELOCITY
 
-local THIGH_FRONT_ANGLE = -math.rad(60)
-local THIGH_FRONT_SPEED = math.rad(40) * PACE
+local THIGH_FRONT_ANGLE = -math.rad(45)
+local THIGH_FRONT_SPEED = math.rad(42) * PACE
 local THIGH_BACK_ANGLE = math.rad(30)
 local THIGH_BACK_SPEED = math.rad(40) * PACE
 local SHIN_FRONT_ANGLE = math.rad(40)

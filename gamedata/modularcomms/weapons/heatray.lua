@@ -10,11 +10,17 @@ local weaponDef = {
 
 	customParams            = {
 		slot = [[5]],
+		
+		light_camera_height = 1800,
+		light_color = [[0.9 0.4 0.12]],
+		light_radius = 180,
+		light_fade_time = 40,
+		light_fade_offset = 10,
 	},		  
 
 	damage                  = {
-		default = 41,
-		planes  = 41,
+		default = 45,
+		planes  = 45,
 		subs    = 2.05,
 	},
 
@@ -31,7 +37,7 @@ local weaponDef = {
 	interceptedByShieldType = 1,
 	lodDistance             = 10000,
 	proximityPriority       = 4,
-	range                   = 320,
+	range                   = 300,
 	reloadtime              = 0.1,
 	rgbColor                = [[1 0.1 0]],
 	rgbColor2               = [[1 1 0.25]],

@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0,
   activateWhenBuilt   = true,
   brakeRate           = 0,
-  buildAngle          = 0,
   buildCostEnergy     = 350,
   buildCostMetal      = 350,
   buildDistance       = 6,
@@ -16,6 +15,11 @@ unitDef = {
 
   buildPic            = [[ARMASP.png]],
   buildTime           = 350,
+  canMove             = true,
+  canAttack           = true,
+  canPatrol           = true,
+  canFight            = true,
+  canstop             = [[1]],
   category            = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[144 40 144]],
@@ -30,7 +34,7 @@ unitDef = {
     helptext       = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
     helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
     helptext_pl    = [[Ta Stacja moze naprawiac samoloty i odnawiac amunicje bombowcom. Posiada 4 stanowiska.]],
-	removewait     = 1,
+	nobuildpower   = 1,
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],
@@ -53,6 +57,7 @@ unitDef = {
   sightDistance       = 273,
   turnRate            = 0,
   waterline           = 8,
+  workerTime          = 10,
   yardMap             = [[ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   featureDefs         = {

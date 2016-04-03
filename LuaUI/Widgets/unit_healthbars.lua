@@ -85,11 +85,9 @@ local messages = {
 	resurrect = "resurrect",
 }
 
-local translation
-
 local function languageChanged ()
 	for key, value in pairs(messages) do
-		messages[key] = translation (key)
+		messages[key] = WG.Translate ("healthbars", key)
 	end
 end
 
@@ -258,8 +256,7 @@ end --//end do
 
 function widget:Initialize()
 
-	translation = WG.initializeTranslation ("healthbars", languageChanged, GetInfo().name)
-	languageChanged ()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
   --// catch f9
   Spring.SendCommands({"showhealthbars 0"})
@@ -381,6 +378,8 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
+
   --// catch f9
   widgetHandler:RemoveAction("showhealthbars", showhealthbars)
   Spring.SendCommands({"unbind f9 luaui"})

@@ -939,12 +939,15 @@ local L1 = {
 	},
 }
 
-local function combineTables(tabs)
+local function combineTables(boxesArray, startpointsArray)
 	local ret = {}
 	local id = 0
-	for i = 1, #tabs do
-		for j = 1, #tabs[i] do
-			ret[id] = tabs[i][j]
+	for i = 1, #boxesArray do
+		for j = 1, #boxesArray[i] do
+			ret[id] = {
+				boxes = boxesArray[i][j],
+				startpoints = startpointsArray[i][j],
+			}
 			id = id + 1
 		end
 	end
@@ -953,38 +956,38 @@ end
 
 local teams = GetTeamCount()
 
-if (teams == 1) then return combineTables({L1}), combineTables({S1}), supported_teamcounts
-elseif (teams == 3) then return combineTables({L3}), combineTables({S3}), supported_teamcounts
-elseif (teams == 4) then return combineTables({L3,L1}), combineTables({S3,S1}), supported_teamcounts
-elseif (teams == 5) then return combineTables({L5}), combineTables({S5}), supported_teamcounts
-elseif (teams == 6) then return combineTables({L5,L1}), combineTables({S5,S1}), supported_teamcounts
-elseif (teams == 7) then return combineTables({L7}), combineTables({S7}), supported_teamcounts
-elseif (teams == 9) then return combineTables({L5,L3,L1}), combineTables({S5,S3,S1}), supported_teamcounts
-elseif (teams == 10) then return combineTables({L7,L3}), combineTables({S7,S3}), supported_teamcounts
-elseif (teams == 11) then return combineTables({L7,L3,L1}), combineTables({S7,S3,S1}), supported_teamcounts
-elseif (teams == 12) then return combineTables({L7,L5}), combineTables({S7,S5}), supported_teamcounts
-elseif (teams == 13) then return combineTables({L7,L5,L1}), combineTables({S7,S5,S1}), supported_teamcounts
+if (teams == 1) then return combineTables({L1}, {S1}), supported_teamcounts
+elseif (teams == 3) then return combineTables({L3}, {S3}), supported_teamcounts
+elseif (teams == 4) then return combineTables({L3,L1}, {S3,S1}), supported_teamcounts
+elseif (teams == 5) then return combineTables({L5}, {S5}), supported_teamcounts
+elseif (teams == 6) then return combineTables({L5,L1}, {S5,S1}), supported_teamcounts
+elseif (teams == 7) then return combineTables({L7}, {S7}), supported_teamcounts
+elseif (teams == 9) then return combineTables({L5,L3,L1}, {S5,S3,S1}), supported_teamcounts
+elseif (teams == 10) then return combineTables({L7,L3}, {S7,S3}), supported_teamcounts
+elseif (teams == 11) then return combineTables({L7,L3,L1}, {S7,S3,S1}), supported_teamcounts
+elseif (teams == 12) then return combineTables({L7,L5}, {S7,S5}), supported_teamcounts
+elseif (teams == 13) then return combineTables({L7,L5,L1}, {S7,S5,S1}), supported_teamcounts
 elseif (teams == 14 or teams == 15) then
 	-- 14 also gives 15 boxes because impossible to get 14 using 1/3/5/7
-	return combineTables({L7,L5,L3}), combineTables({S7,S5,S3}), supported_teamcounts
+	return combineTables({L7,L5,L3}, {S7,S5,S3}), supported_teamcounts
 elseif (teams == 8) then
 	-- two possibilities: 5+3 is the more "fair" setup but 7+1 is the more interesting one
 	local r = math.random()
 	if (r < 0.7)
-		then return combineTables({L5,L3}), combineTables({S5,S3}), supported_teamcounts
-		else return combineTables({L7,L1}), combineTables({S7,S1}), supported_teamcounts
+		then return combineTables({L5,L3}, {S5,S3}), supported_teamcounts
+		else return combineTables({L7,L1}, {S7,S1}), supported_teamcounts
 	end
 elseif (teams == 2) then
 	-- duel: all layouts work so pick one at random (preferring 5 though)
 	local r = math.random()
 	if (r < 0.6) then
-		return combineTables({L5}), combineTables({S5}), supported_teamcounts
+		return combineTables({L5}, {S5}), supported_teamcounts
 	elseif (r < 0.8) then
-		return combineTables({L3}), combineTables({S3}), supported_teamcounts
+		return combineTables({L3}, {S3}), supported_teamcounts
 	else
-		return combineTables({L7}), combineTables({S7}), supported_teamcounts
+		return combineTables({L7}, {S7}), supported_teamcounts
 	end
 else
-	return combineTables({L7,L5,L3,L1}), combineTables({S7,S5,S3,S1}), supported_teamcounts
+	return combineTables({L7,L5,L3,L1}, {S7,S5,S3,S1}), supported_teamcounts
 end
 

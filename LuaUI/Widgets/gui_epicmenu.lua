@@ -28,17 +28,6 @@ include("utility_two.lua") --contain file backup function
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not WG.lang then
-	local lang
-	WG.lang=function(l)
-				if not l then
-					return lang
-				else
-					lang=l
-				end
-			end
-end
-
 
 local spGetConfigInt    		= Spring.GetConfigInt
 local spSendCommands			= Spring.SendCommands
@@ -181,12 +170,14 @@ local keybind_date = 0
 local settings = {
 	versionmin = 50,
 	lang = 'en',
+	country = 'wut',
 	widgets = {},
 	show_crudemenu = true,
 	music_volume = 0.5,
 	showAdvanced = false,
 }
 
+local confLoaded = false
 
 
 ----------------------------------------------------------------
@@ -569,27 +560,6 @@ end
 
 VFS.Include("LuaUI/Utilities/json.lua");
 
-local function UTF8SupportCheck()
-	local version=Game.version
-	local first_dot=string.find(version,"%.")
-	local major_version = (first_dot and string.sub(version,0,first_dot-1)) or version
-	local major_version_number = tonumber(major_version)
-	return major_version_number>=98
-end
-local UTF8SUPPORT = UTF8SupportCheck()
-
-local function SetLangFontConf()
-	if UTF8SUPPORT and VFS.FileExists("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP) then
-		WG.langData = Spring.Utilities.json.decode(VFS.LoadFile("Luaui/Configs/nonlatin/"..WG.lang()..".json", VFS.ZIP))
-		WG.langFont = nil
-		WG.langFontConf = nil
-	else
-		WG.langData = nil
-		WG.langFont = nil
-		WG.langFontConf = nil
-	end
-end
-
 local function SetCountry(self) 
 	echo('Setting country: "' .. self.country .. '" ') 
 	
@@ -599,7 +569,6 @@ local function SetCountry(self)
 	if WG.lang then
 		WG.lang(self.countryLang)
 	end
-	SetLangFontConf()
 	
 	settings.lang = self.countryLang
 	
@@ -2398,6 +2367,8 @@ RemakeEpicMenu = function()
 	end
 end
 
+WG.RemakeEpicMenu = RemakeEpicMenu
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -2452,19 +2423,20 @@ function widget:Initialize()
 	if not settings.config then
 		settings.config = {}
 	end
-	
-	if not settings.country or settings.country == 'wut' then
-		myCountry = select(8, Spring.GetPlayerInfo( Spring.GetLocalPlayerID() ) ) 
-		if not myCountry or myCountry == '' then
-			myCountry = 'wut'
+
+	if not confLoaded then
+		if not settings.country or settings.country == 'wut' then
+			myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
+			if not myCountry or myCountry == '' then
+				myCountry = 'wut'
+			end
+			settings.country = myCountry
 		end
-		settings.country = myCountry
+
+		WG.country = settings.country
+		WG.lang(settings.lang)
 	end
-	
-	WG.country = settings.country	
-	WG.lang(settings.lang)
-	SetLangFontConf()
-	
+
 		-- add custom widget settings to crudemenu
 	AddAllCustSettings()
 
@@ -2711,11 +2683,26 @@ function widget:GetConfigData()
 end
 
 function widget:SetConfigData(data)
+	confLoaded = true
 	if (data and type(data) == 'table') then
 		if data.versionmin and data.versionmin >= 50 then
 			settings = data
 		end
 	end
+
+	-- set language. Needs to be done ASAP, before other widgets are even loaded!
+	-- This is because option paths are done right on load and they can use translations.
+	if not settings.country or settings.country == 'wut' then
+		myCountry = select(8, Spring.GetPlayerInfo(Spring.GetLocalPlayerID()))
+		if not myCountry or myCountry == '' then
+			myCountry = 'wut'
+		end
+		settings.country = myCountry
+	end
+
+	WG.country = settings.country
+	WG.lang(settings.lang)
+
 	WG.music_volume = settings.music_volume or 0.5
 	LoadKeybinds()
 end

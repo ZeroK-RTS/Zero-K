@@ -234,7 +234,7 @@ end
 
 
 function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult)
-	if not units[unitID] then
+	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
 	
@@ -246,10 +246,10 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 end
 
 function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult)
-	if not units[unitID] then
+	if not (unitID and targetID and units[unitID]) then
 		return false
-	end	
-
+	end
+	
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)

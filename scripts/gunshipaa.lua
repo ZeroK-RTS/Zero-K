@@ -104,6 +104,7 @@ local function TiltBody()
 			end
 			Sleep(10)
 		else
+			restoreWings()
 			Sleep(10)
 		end
 	end

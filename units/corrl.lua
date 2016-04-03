@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Defender]],
   description                   = [[Light Missile Tower]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
   buildCostEnergy               = 80,
   buildCostMetal                = 80,
@@ -100,6 +99,9 @@ unitDef = {
 		isaa = [[1]],
 		script_reload = [[11]],
 		script_burst = [[3]],
+		
+		light_camera_height = 2000,
+		light_radius = 200,
 	  },
 
       damage                  = {

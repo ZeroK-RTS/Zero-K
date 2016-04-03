@@ -405,7 +405,11 @@ function script.AimFromWeapon()
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/1800
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 225.01, 70 * distMult)
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -419,7 +419,7 @@ function widget:DrawWorld()
 			glPushMatrix()
 			glTranslate(nx, ny, nz)
 			glRotate(wpData[4] * 90.0, 0.0, 1.0, 0.0)
-			glUnitShape(-cmd.id, sprGetMyTeamID())
+			glUnitShape(-cmd.id, sprGetMyTeamID(), false, true, false)
 			glPopMatrix()
 		end
 

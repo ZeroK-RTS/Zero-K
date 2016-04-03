@@ -78,8 +78,8 @@ unitDef = {
     CAPTURERAY = {
       name                    = [[Capture Ray]],
       beamdecay               = 0.9,
-      beamTime                = 0.033,
-      beamttl                 = 1,
+      beamTime                = 1/30,
+      beamttl                 = 3,
       coreThickness           = 0,
       craterBoost             = 0,
       craterMult              = 0,
@@ -90,6 +90,9 @@ unitDef = {
 
 		stats_hide_damage = 1, -- continuous laser
 		stats_hide_reload = 1,
+		
+		light_radius = 120,
+		light_color = [[0 0.6 0.15]],
       },
 
       damage                  = {
@@ -106,7 +109,7 @@ unitDef = {
       laserFlareSize          = 0,
       minIntensity            = 1,
       range                   = 450,
-      reloadtime              = 0.033,
+      reloadtime              = 1/30,
       rgbColor                = [[0 0.8 0.2]],
       scrollSpeed             = 2,
       soundStart              = [[weapon/laser/pulse_laser2]],

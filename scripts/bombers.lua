@@ -68,7 +68,7 @@ local function ReloadQueue(queue, cmd)
 end
 
 function Reload()
-	local queue = Spring.GetUnitCommands(unitID, 1)
+	local queue = Spring.GetCommandQueue(unitID, 1)
 	local cmdID, areaAttack
 	local re = false
 	if queue and queue[1] then

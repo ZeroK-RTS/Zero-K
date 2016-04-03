@@ -97,6 +97,11 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0.5,
 
+      customParams            = {
+		light_color = [[1.5 1.13 0.6]],
+		light_radius = 450,
+      },
+
       damage                  = {
         default = 600.5,
         subs    = 30,
@@ -112,6 +117,7 @@ unitDef = {
       reloadtime              = 4,
       soundHit                = [[weapon/cannon/cannon_hit3]],
       soundStart              = [[weapon/cannon/heavy_cannon2]],
+      -- size = 5, -- maybe find a good size that is bigger than default
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 290,

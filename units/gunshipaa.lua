@@ -102,6 +102,10 @@ unitDef = {
 		isaa = [[1]],
 		script_reload = [[10]],
 		script_burst = [[3]],
+		
+		light_camera_height = 2500,
+		light_radius = 200,
+		light_color = [[0.5 0.6 0.6]],
 	  },
 
       damage                  = {
