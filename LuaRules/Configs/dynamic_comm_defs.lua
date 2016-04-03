@@ -2,7 +2,7 @@ local skinDefs = VFS.Include("LuaRules/Configs/dynamic_comm_skins.lua")
 
 local UNBOUNDED_LEVEL = true
 local COST_MULT = 1
-local HP_MULT = 0.01
+local HP_MULT = 1
 
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
