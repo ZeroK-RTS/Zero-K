@@ -797,7 +797,7 @@ function widget:SelectionChanged(units)
 end
 
 function widget:DefaultCommand(type, id)
-	if mexSpotToDraw and selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, Spring.GetGroundHeight(mexSpotToDraw.x, mexSpotToDraw.z), mexSpotToDraw.z, 0) > 0) then
+	if mexSpotToDraw and selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
 		return -mexDefID
 	end
 end
