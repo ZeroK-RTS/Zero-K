@@ -108,9 +108,6 @@ local alreadyRemovedTag = {}
 local myTeamID = 0
 local inTweak  = false
 local leftTweak, enteredTweak = false, false
-local cycle_half_s = 1
-local cycle_2_s = 1
-local updateQSoon={}
 local lmx,lmy=-1,-1
 local showAllPlayers
 
@@ -523,7 +520,6 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 				buildRow_dragDrop[1] = nil
 				
 				--UpdateFac(facIndex, facs[facIndex])
-				updateQSoon[facIndex] = true
 			end},
 			OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
 				
@@ -579,7 +575,6 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 						BuildRowButtonFunc(prevIndex, facs[i].qStack.children[prevIndex].cmdid, false, true,countTransfer, nil,facID) --then, remove queue on the left
 					end
 					buildRow_dragDrop[1] = nil
-					updateQSoon[facIndex] = true
 				end
 			end},
 			
@@ -671,33 +666,35 @@ local function UpdateFacQ(i, facInfo)
 end
 
 local function UpdateFacProg(i, facInfo)
-	local progress = 0
-	local unitBuildDefID
+	local etaLabel = facInfo.facButton:GetChildByName('facIcon'):GetChildByName('etaLabel')
+
 	local unitBuildID = GetUnitIsBuilding(facInfo.unitID)
-	if unitBuildID then
-		unitBuildDefID = GetUnitDefID(unitBuildID)
-		_, _, _, _, progress = GetUnitHealth(unitBuildID)
-		
-		if options.showETA.value then
-			local etaLabel = facInfo.facButton:GetChildByName('facIcon'):GetChildByName('etaLabel')
-			local timeLeft = WG.etaTable and WG.etaTable[unitBuildID] and WG.etaTable[unitBuildID].timeLeft
-			local etaStr = ''
-			if timeLeft then
-				local color = timeLeft > 0 and '\255\1\255\1' or '\255\255\1\1'
-				--etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
-				etaStr = string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
-			end
-			etaLabel:SetCaption(etaStr)
-		end
+	if not unitBuildID then
+		etaLabel:SetCaption("")
+		return
 	end
-	
+
+	if options.showETA.value then
+		local timeLeft = WG.etaTable and WG.etaTable[unitBuildID] and WG.etaTable[unitBuildID].timeLeft
+		local etaStr = ''
+		if timeLeft then
+			local color = WG.etaTable[unitBuildID].negative and '\255\255\1\1' or '\255\1\255\1'
+			etaLabel:SetCaption(string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60))
+		else
+			etaLabel:SetCaption("\255\255\255\0?:??")
+		end
+	else
+		etaLabel:SetCaption("")
+	end
+
 	local firstButton = facs[i].qStack and facs[i].qStack.children[1]
 	if not firstButton then return end
-	if not unitBuildDefID then return end
+
 	local qBar = firstButton.childrenByName['bp'].childrenByName['prog']
-	local boButton = facs[i].boStack:GetChildByName(unitBuildDefID)
+	local boButton = facs[i].boStack:GetChildByName(GetUnitDefID(unitBuildID))
 	local boBar = boButton:GetChildByName('bp'):GetChildByName('prog')
-	
+
+	local progress = select(5, GetUnitHealth(unitBuildID))
 	qBar:SetValue(progress)
 	boBar:SetValue(progress)
 end
@@ -756,7 +753,6 @@ local function MakeClearButton(unitID, i)
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
 				end
 				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
-				updateQSoon[i] = true
 			end
 		},
 		children = {
@@ -841,8 +837,6 @@ RecreateFacbar = function()
 			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb, i) )
 		end
 		boStack:AddChild( MakeClearButton( facInfo.unitID, i ) )
-		
-		updateQSoon[i] = true
 
 	end
 	
@@ -936,9 +930,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local bdid = builderID and Spring.GetUnitDefID(builderID)
     if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 		local i = facsByUnitId[builderID]
-		if i then
-			updateQSoon[i] = true
-		end
 	end
 end
 
@@ -971,7 +962,9 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
   widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
-function widget:Update()
+local updateT = -1
+function widget:Update(dt)
+	updateT = updateT - dt
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		UpdateFactoryList()
@@ -979,32 +972,18 @@ function widget:Update()
 	end
 	inTweak = widgetHandler:InTweakMode()
   
-	cycle_half_s = (cycle_half_s % 16) + 1
-	cycle_2_s = (cycle_2_s % (32*2)) + 1
-	
-	if cycle_half_s == 1 then 
-		for i,facInfo in ipairs(facs) do
-			if Spring.ValidUnitID( facInfo.unitID ) then
-				if cycle_2_s == 1 then
-					UpdateFac(i, facInfo)
-				end
-				if updateQSoon[i] then
-					UpdateFacQ(i, facInfo)
-				end
-			end
+	if updateT < 0 then
+		updateT = 0.25
+		for i = 1, #facs do
+			UpdateFac(i, facs[i])
+			UpdateFacQ(i, facs[i])
 		end
-		--[[
-		if updateQSoon then
-			updateQSoon = false
-		end
-		--]]
-		updateQSoon={}
 	end
-	
+
 	for i,facInfo in ipairs(facs) do
 		UpdateFacProg(i, facInfo)
 	end
-	
+
 	if inTweak and not enteredTweak then
 		enteredTweak = true
 		stack_main:ClearChildren()
@@ -1036,22 +1015,6 @@ function widget:Update()
 	end
 end
 
-
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam ~= myTeamID and not showAllPlayers then
-		return
-	end
-	local i = facsByUnitId[factID]
-	if i then
-		updateQSoon[i] = true
-	end
-end
-
 function widget:SelectionChanged(selectedUnits)
 	CheckRemoveFacStack()
 	
@@ -1072,9 +1035,6 @@ function widget:SelectionChanged(selectedUnits)
 				alreadyRemovedTag = {}
 			end
 		end
-	end
-	if pressedFac ~= -1 then
-		updateQSoon[pressedFac] = true
 	end
 end
 
