@@ -377,6 +377,17 @@ local options = {
     step   = 0.01,
   },
   {
+    key    = 'hpmult',
+    name   = 'Unit Health Multiplier',
+    desc   = 'Multiplies all unit HPs.',
+    type   = 'number',
+    section= 'experimental',
+    def    = 1,
+    min    = 0.000001,
+    max    = 10000,
+    step   = 0.05,
+  },
+  {
     key    = 'defeatmode',
     name   = 'Defeat Mode',
     desc   = "Method of handling defeated alliances",

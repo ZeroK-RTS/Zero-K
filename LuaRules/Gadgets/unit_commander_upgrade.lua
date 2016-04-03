@@ -1,6 +1,6 @@
 function gadget:GetInfo()
   return {
-    name      = "Comander Upgrade",
+    name      = "Commander Upgrade",
     desc      = "",
     author    = "Google Frog",
     date      = "30 December 2015",
@@ -16,6 +16,11 @@ end
 --SYNCED
 if (not gadgetHandler:IsSyncedCode()) then
    return
+end
+
+local modOptions = {}
+if (Spring.GetModOptions) then
+  modOptions = Spring.GetModOptions()
 end
 
 include("LuaRules/Configs/constants.lua")
@@ -159,8 +164,12 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		Spring.SetUnitHealth(unitID, health + data.healthBonus)
-		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
+		local healthBonus = data.healthBonus
+		if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
+		    healthBonus = healthBonus * modOptions.hpmult
+		end
+		Spring.SetUnitHealth(unitID, health + healthBonus)
+		Spring.SetUnitMaxHealth(unitID, maxHealth + healthBonus)
 	end
 	
 	if data.skinOverride then

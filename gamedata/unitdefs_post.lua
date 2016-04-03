@@ -798,6 +798,26 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Altered unit health mod option
+-- 
+
+--[[
+if not modOptions then
+    modOptions = {}
+end
+
+modOptions.hpmult = 0.05
+]]
+
+if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
+    local hpMulti = modOptions.hpmult
+    for unitDefID, unitDef in pairs(UnitDefs) do
+        if unitDef.maxdamage then unitDef.maxdamage = unitDef.maxdamage*hpMulti end
+    end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Remove Restore
 -- 
 
