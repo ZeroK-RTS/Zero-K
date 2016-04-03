@@ -796,8 +796,8 @@ function widget:SelectionChanged(units)
 	end
 end
 
-function widget:DefaultCommand()
-	if mexSpotToDraw and selectionEntirelyCons and (#spGetUnitsInRectangle(mexSpotToDraw.x-1, mexSpotToDraw.z-1, mexSpotToDraw.x+1, mexSpotToDraw.z+1) == 0) then
+function widget:DefaultCommand(type, id)
+	if mexSpotToDraw and selectionEntirelyCons and not type then
 		return -mexDefID
 	end
 end
