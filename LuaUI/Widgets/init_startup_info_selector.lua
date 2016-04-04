@@ -282,8 +282,6 @@ function widget:Initialize()
 	then
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
-	PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
-
 
 	vsx, vsy = widgetHandler:GetViewSizes()
 
@@ -359,6 +357,17 @@ end
 
 function widget:GameStart()
 	screen0:RemoveChild(buttonWindow)
+end
+
+-- this a pretty retarded place to put this but:
+-- Update can fire before the game is actually loaded
+-- GameStart is the actual game starting (not loading finished)
+-- there is probably some better way
+function widget:DrawWorld()
+	if (Spring.GetGameFrame() < 1) then
+		PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
+	end
+	widgetHandler:RemoveCallIn('DrawWorld')
 end
 
 --------------------------------------------------------------------------------
