@@ -1740,6 +1740,7 @@ MakeSubWindow = function(path, pause)
 				textColor = color.sub_fg, 
 				tooltip   = option.desc,
 			}
+			option.epic_reference = chbox
 			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option)
 			
 		elseif option.type == 'number' then	

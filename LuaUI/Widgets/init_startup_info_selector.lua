@@ -49,7 +49,7 @@ local optionData
 
 local noComm = false
 local gameframe = Spring.GetGameFrame()
-
+local COMM_DROP_FRAME = 450
 local WINDOW_WIDTH = 720
 local WINDOW_HEIGHT = 480
 local BUTTON_WIDTH = 128
@@ -87,9 +87,11 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function(self)
-			--if trainerCheckbox then
-			--	trainerCheckbox:Toggle()
-			--end
+			if trainerCheckbox then
+				trainerCheckbox.checked = self.value
+				trainerCheckbox.state.checked = self.value
+				trainerCheckbox:Invalidate()
+			end
 			ToggleTrainerButtons(not self.value)
 		end
 	},
@@ -114,20 +116,30 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 
-function Close(commPicked)
-	if not commPicked then
-		--Spring.Echo("Requesting baseline comm")
-		--Spring.SendLuaRulesMsg("faction:comm_trainer_strike")
+function Close (permanently)
+
+	if mainWindow then
+		mainWindow:Dispose()
 	end
-	--Spring_SendCommands("say: a:I chose " .. option.button})
-	if mainWindow then mainWindow:Dispose() end
+
+	if permanently then
+		if not noComm then
+			widgetHandler:RemoveAction(actionShow)
+			noComm = true
+		end
+
+		if (Spring.GetGameFrame() <= COMM_DROP_FRAME) then
+			widgetHandler:RemoveCallIn('GameFrame')
+			widgetHandler:RemoveCallIn('GameProgress')
+		end
+	end
 end
 
 local function CreateWindow()
 	if mainWindow then
 		mainWindow:Dispose()
 	end
-	
+
 	local numColumns = math.floor(WINDOW_WIDTH/BUTTON_WIDTH)
 	local numRows = math.ceil(#optionData/numColumns)
 
@@ -173,7 +185,7 @@ local function CreateWindow()
 			OnClick = {function()
 				Spring.SendLuaRulesMsg("customcomm:"..option.commProfile)
 				Spring.SendCommands({'say a:I choose: '..option.name..'!'})
-				Close(true)
+				Close()
 			end},
 			trainer = option.trainer,
 		}
@@ -209,17 +221,16 @@ local function CreateWindow()
 			trainerLabels[i] = trainerLabel
 		end
 	end
-	local cbWidth = WINDOW_WIDTH*0.75
+	local cbWidth = WINDOW_WIDTH*0.4
 	local closeButton = Button:New{
 		parent = mainWindow,
 		caption = "CLOSE",
 		width = cbWidth,
-		x = (WINDOW_WIDTH - cbWidth)/2,
+		x = WINDOW_WIDTH*0.5 + (WINDOW_WIDTH*0.5 - cbWidth)/2,
 		height = 30,
 		bottom = 2,
-		OnClick = {function() Close(false) end}
+		OnClick = {function() Close() end}
 	}
-	--[[	-- FIXME: EPIC doesn't remember the setting if you change it with this checkbox
 	trainerCheckbox = Chili.Checkbox:New{
 		parent = mainWindow,
 		x = 4,
@@ -228,11 +239,16 @@ local function CreateWindow()
 		caption = "Hide Trainer Comms",
 		checked = options.hideTrainers.value,
 		OnChange = { function(self)
-			options.hideTrainers.value = self.checked
+			-- this is called *before* the 'checked' value is swapped, hence negation everywhere
+			if options.hideTrainers.epic_reference then
+				options.hideTrainers.epic_reference.checked = not self.checked
+				options.hideTrainers.epic_reference.state.checked = not self.checked
+				options.hideTrainers.epic_reference:Invalidate()
+			end
+			options.hideTrainers.value = not self.checked
 			ToggleTrainerButtons(self.checked)
 		end },
 	}
-	]]
 	grid:Invalidate()
 end
 --------------------------------------------------------------------------------
@@ -243,11 +259,7 @@ function widget:Initialize()
 	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
 	end
-	 if (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior) and (not Spring.IsCheatingEnabled()) then
-		Spring.Echo("<Startup Info and Selector> Spectator mode, Junior forced, or replay. Widget removed.")
-		widgetHandler:RemoveWidget()
-		return
-	end
+
 	-- chili setup
 	Chili = WG.Chili
 	Window = Chili.Window
@@ -263,8 +275,11 @@ function widget:Initialize()
 	-- nothing serious, just annoying
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
-	if (coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
-	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)	then 
+	if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
+	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)
+	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
+	and (not Spring.IsCheatingEnabled())
+	then
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
 	PlaySound("LuaUI/Sounds/Voices/initialized_core_1", 1, 'ui')
@@ -272,8 +287,8 @@ function widget:Initialize()
 
 	vsx, vsy = widgetHandler:GetViewSizes()
 
-	widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
 	if (not noComm) then
+		widgetHandler:AddAction(actionShow, CreateWindow, nil, "t")
 		buttonWindow = Window:New{
 			resizable = false,
 			draggable = false,
@@ -317,25 +332,29 @@ end
 -- hide window if game was loaded
 local timer = 0
 function widget:Update(dt)
-	if gameframe < 1 then
-		timer = timer + dt
-		if timer >= 0.1 then
-			if (spGetGameRulesParam("loadedGame") == 1) and mainWindow then
-				mainWindow:Dispose()
-			end
+	timer = timer + dt
+	if timer >= 0.1 then
+		if (spGetGameRulesParam("loadedGame") == 1) then
+			Close(true)
 		end
+		widgetHandler:RemoveCallIn('Update')
 	end
 end
 
 function widget:Shutdown()
-  --if mainWindow then
-	--mainWindow:Dispose()
-  --end
-  widgetHandler:RemoveAction(actionShow)
+	Close(true)
 end
 
-function widget:Gameframe(n)
-	gameframe = n
+function widget:GameFrame(n)
+	if n == COMM_DROP_FRAME then
+		Close(true)
+	end
+end
+
+function widget:GameProgress(n)
+	if n == COMM_DROP_FRAME then
+		Close(true)
+	end
 end
 
 function widget:GameStart()
