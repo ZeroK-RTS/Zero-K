@@ -127,7 +127,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms', 'leftMouseCenter', 'monitoridlenano', 'selectprecbomber', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -163,6 +163,12 @@ options = {
 		value = true,
 		OnChange = function() RefreshConsList() end,		
 	},
+	monitorInbuiltCons = {
+		name = 'Track constructors being built',
+		type = 'bool',
+		value = false,
+		OnChange = function() RefreshConsList() end,		
+	},
 	leftMouseCenter = {
 		name = 'Swap Camera Center Button',
 		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
@@ -170,8 +176,22 @@ options = {
 		value = false,		
 	},
 	selectprecbomber = { type = 'button',
-		name = 'Individual precision bombers',
+		name = 'Select precision bomber',
+		desc = 'Selects an idle, armed precision bomber. Use multiple times to select more. Deselects any units which are not idle, armed precision bombers.',
 		action = 'selectprecbomber',
+		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
+	},
+	selectidlecon = { type = 'button',
+		name = 'Select idle constructor',
+		desc = 'Selects an idle constructor. Use multiple times to select more. Deselects any units which are not idle constructors.',
+		action = 'selectidlecon',
+		path = 'Game/Selection Hotkeys',
+		dontRegisterAction = true,
+	},
+	selectidlecon_all = { type = 'button',
+		name = 'Select all idle constructors',
+		action = 'selectidlecon_all',
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
@@ -797,8 +817,10 @@ local function SelectPrecBomber()
 	local _,pos = TraceScreenRay(mx,my,true)     
 	local mindist = math.huge
 	local muid = nil
-	if (pos == nil) then return end
-	
+	if (pos == nil) then
+		pos = {Game.mapSizeX / 2, 0, Game.mapSizeZ / 2}
+	end
+
 	for uid, v in pairs(readyUntaskedBombers) do
 		if (Spring.IsUnitSelected(uid)) then
 			table.insert(toBeSelected,uid)
@@ -808,6 +830,51 @@ local function SelectPrecBomber()
 			if (dist < mindist) then
 				mindist = dist
 				muid = uid
+			end
+		end
+	end
+	if (muid ~= nil) and (not isAnythingElseSelected or #toBeSelected == 0) then
+		table.insert(toBeSelected,muid)
+	end
+	Spring.SelectUnitArray(toBeSelected)
+end
+
+local function SelectIdleCon_all()
+	Spring.SelectUnitMap(idleCons, false)
+end
+
+local function SelectIdleCon()
+
+	local toBeSelected = {}
+	
+	local currentSelection = Spring.GetSelectedUnits()
+	local isAnythingElseSelected = nil
+	for i,uid in ipairs(currentSelection) do
+		if not idleCons[uid] then
+			isAnythingElseSelected = true
+			break
+		end
+	end
+	
+	local mx,my = GetMouseState()
+	local _,pos = TraceScreenRay(mx,my,true)     
+	local mindist = math.huge
+	local muid = nil
+	if (pos == nil) then
+		pos = {Game.mapSizeX / 2, 0, Game.mapSizeZ / 2}
+	end
+	
+	for uid, v in pairs(idleCons) do
+		if uid ~= "count" then
+			if (Spring.IsUnitSelected(uid)) then
+				table.insert(toBeSelected,uid)
+			else
+				local x,_,z = GetUnitPosition(uid)
+				dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+				if (dist < mindist) then
+					mindist = dist
+					muid = uid
+				end
 			end
 		end
 	end
@@ -867,11 +934,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (not myTeamID or unitTeam ~= myTeamID) then
 		return
 	end
-
-	if UnitDefs[unitDefID].isFactory and (not exceptionArray[unitDefID]) then
+	local ud = UnitDefs[unitDefID]
+	
+	if ud.isFactory and (not exceptionArray[unitDefID]) then
 		AddFac(unitID, unitDefID)
-	elseif UnitDefs[unitDefID].customParams.level then
+	elseif ud.customParams.level then
 		AddComm(unitID, unitDefID)
+	elseif options.monitorInbuiltCons.value and ((ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not ud.isFactory)
+	and (options.monitoridlecomms.value or not ud.customParams.dynamic_comm)
+	and (options.monitoridlenano.value or ud.canMove)) then
+		idleCons[unitID] = true
+		wantUpdateCons = true
 	end
 end
 
@@ -933,7 +1006,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	end
 	local ud = UnitDefs[unitDefID]
 	if (ud.buildSpeed > 0) and (not exceptionArray[unitDefID]) and (not UnitDefs[unitDefID].isFactory)
-	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.level)
+	and (options.monitoridlecomms.value or not UnitDefs[unitDefID].customParams.dynamic_comm)
 	and (options.monitoridlenano.value or UnitDefs[unitDefID].canMove) then
 		idleCons[unitID] = true
 		wantUpdateCons = true
@@ -1031,6 +1104,8 @@ function widget:Initialize()
 	
 	widgetHandler:AddAction("selectcomm", SelectComm, nil, 'tp')
 	widgetHandler:AddAction("selectprecbomber", SelectPrecBomber, nil, 'tp')
+	widgetHandler:AddAction("selectidlecon", SelectIdleCon, nil, 'tp')
+	widgetHandler:AddAction("selectidlecon_all", SelectIdleCon_all, nil, 'tp')
 
 	-- setup Chili
 	Chili = WG.Chili
@@ -1126,6 +1201,12 @@ function widget:Initialize()
 	}	
 	UpdateCommButton()
 	]]--
+
+	if WG.crude.GetHotkey("selectidlecon"):upper() and WG.crude.GetHotkey("selectidlecon_all"):upper() then
+		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon"):upper() .. "\n" .. WG.crude.GetHotkey("selectidlecon_all"):upper()
+	else
+		hotkeyCaption = "\255\0\255\0" .. (WG.crude.GetHotkey("selectidlecon"):upper() or WG.crude.GetHotkey("selectidlecon_all"):upper() or '')
+	end
 	
 	conButton.button = Button:New{
 		parent = stack_main;
@@ -1136,18 +1217,9 @@ function widget:Initialize()
 		height = "100%",
 		OnClick = {	function (self, x, y, mouse) 
 				if mouse == 1 then
-					-- FIXME: commanders will still be selected even if not monitored! (category detection donut work)
-					if options.monitoridlecomms.value and options.monitoridlenano.value then
-						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"})
-					elseif options.monitoridlenano.value then
-						Spring.SendCommands({"select AllMap+_Builder_Not_Category_Commander_Not_Building_Idle+_ClearSelection_SelectOne+"})
-					elseif options.monitoridlecomms.value then
-						Spring.SendCommands({"select AllMap+_Builder_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
-					else
-						Spring.SendCommands({"select AllMap+_Builder_Not_Category_Commander_Not_Building_Not_NameContain_" .. nano_name .. "_Idle+_ClearSelection_SelectOne+"})
-					end
+					SelectIdleCon()
 				elseif mouse == 3 and idleCons.count > 0 then
-					Spring.SelectUnitMap(idleCons, false)
+					SelectIdleCon_all()
 				end
 			end},
 		padding = {1,1,1,1},
@@ -1160,7 +1232,7 @@ function widget:Initialize()
 				y=3,
 				align="left";
 				valign="top";
-				caption = '\255\0\255\0'..WG.crude.GetHotkey("select AllMap+_Builder_Not_Building_Idle+_ClearSelection_SelectOne+"):upper() or '',
+				caption = hotkeyCaption,
 				fontSize = 11;
 				fontShadow = true;
 				parent = button;
