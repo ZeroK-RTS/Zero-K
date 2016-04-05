@@ -30,7 +30,6 @@ WG.ToggleShoweco = ToggleShoweco
 --------------------------------------------------------------------------------------
 --Grid drawing. Copied and trimmed from unit_mex_overdrive.lua gadget (by licho & googlefrog)
 VFS.Include("LuaRules/Configs/constants.lua", nil, VFS.ZIP_FIRST)
-VFS.Include("LuaRules/Configs/mex_overdrive.lua", nil, VFS.ZIP_FIRST)
 VFS.Include("LuaRules/Utilities/glVolumes.lua") --have to import this incase it fail to load before this widget
 
 local spGetSelectedUnits   = Spring.GetSelectedUnits
@@ -65,7 +64,7 @@ for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
 	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
 		pylonDefs[i] = {
-			range = tonumber(udef.customParams.pylonrange) or DEFAULT_PYLON_RANGE
+			range = tonumber(udef.customParams.pylonrange)
 		}
 	end
 end
@@ -80,7 +79,7 @@ local circlePolys = 0 -- list for circles
 local disabledColor = { 0.6,0.7,0.5,0.2}
 
 local function HSLtoRGB(ch,cs,cl)
- 
+
 if cs == 0 then
   cr = cl
   cg = cl
@@ -89,52 +88,52 @@ else
   if cl < 0.5 then temp2 = cl * (cl + cs)
   else temp2 = (cl + cs) - (cl * cs)
   end
- 
+
   temp1 = 2 * cl - temp2
   tempr = ch + 1 / 3
- 
+
   if tempr > 1 then tempr = tempr - 1 end
   tempg = ch
   tempb = ch - 1 / 3
   if tempb < 0 then tempb = tempb + 1 end
- 
+
   if tempr < 1 / 6 then cr = temp1 + (temp2 - temp1) * 6 * tempr
   elseif tempr < 0.5 then cr = temp2
   elseif tempr < 2 / 3 then cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
   else cr = temp1
   end
- 
+
   if tempg < 1 / 6 then cg = temp1 + (temp2 - temp1) * 6 * tempg
   elseif tempg < 0.5 then cg = temp2
   elseif tempg < 2 / 3 then cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
   else cg = temp1
   end
- 
+
   if tempb < 1 / 6 then cb = temp1 + (temp2 - temp1) * 6 * tempb
   elseif tempb < 0.5 then cb = temp2
   elseif tempb < 2 / 3 then cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
   else cb = temp1
   end
- 
+
 end
 return {cr,cg,cb, 0.2}
 end --HSLtoRGB
 
 
-local function GetGridColor(efficiency) 
- 	local n = efficiency      
+local function GetGridColor(efficiency)
+ 	local n = efficiency
 	-- mex has no esource/esource has no mex
 	if n==0 then
 		return {1, .25, 1, 0.2}
 	else
-		if n < 3.5 then 
-			h = 5760/(3.5+2)^2 
+		if n < 3.5 then
+			h = 5760/(3.5+2)^2
 		else
 			h=5760/(n+2)^2
 		end
 		return HSLtoRGB(h/255,1,0.5)
 	end
-        
+
 --[[
 --	average/good - will be green
 	local good = 3
@@ -146,7 +145,7 @@ local function GetGridColor(efficiency)
 	else
                 -- red, green, blue
                 r, g, b = 0, 0, 0
-                
+
                 if n <= good then
                         b = (1 - n/good)^.5
                         g = (n/good)^.5
@@ -156,7 +155,7 @@ local function GetGridColor(efficiency)
                         -- n - good, since we are inside "good-bad" now
                         -- n must not be bigger than z
                         nRemain = min(n-good, z)
-                        
+
                         g = 1 - nRemain/z
                         r = (nRemain/z)^.3
                 else
@@ -164,7 +163,7 @@ local function GetGridColor(efficiency)
                 end
         end
 	return {r, g, b, 0.2}]]--
-end 
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -252,7 +251,7 @@ function widget:Initialize()
 			end
 		end)
 	end)
-	
+
 	InitializeUnits()
 end
 
@@ -292,7 +291,7 @@ local function makePylonListVolume()
 			pylons.data[pylons.count] = nil
 			pylons.count = pylons.count - 1
 		end
-	end  
+	end
 end
 
 local function HighlightPylons()
@@ -315,7 +314,7 @@ local function HighlightPylons()
 				local color = GetGridColor(efficiency)
 				glColor(color)
 			end
-			
+
 			gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
 			i = i + 1
 		else
@@ -324,48 +323,48 @@ local function HighlightPylons()
 			pylons.data[pylons.count] = nil
 			pylons.count = pylons.count - 1
 		end
-	end  
+	end
 	--]]
-end 
+end
 
 local function HighlightPlacement(unitDefID)
 	local mx, my = spGetMouseState()
 	local _, coords = spTraceScreenRay(mx, my, true, true, false, true)
-	if coords then 
+	if coords then
 		local radius = pylonDefs[unitDefID].range
 		if (radius ~= 0) then
 			local x, _, z = spPos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
 			glColor(disabledColor)
 			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end
-	end 
+	end
 end
 
 function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
-	
+
 	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
-	if (cmd_id) then 
-		if pylonDefs[-cmd_id] then 
+	if (cmd_id) then
+		if pylonDefs[-cmd_id] then
 			HighlightPylons()
 			HighlightPlacement(-cmd_id)
 			glColor(1,1,1,1)
 			return
-		end 
-	end
-	
-	local selUnits = spGetSelectedUnits()  -- or show it if its selected 	
-	if selUnits then 
-		for i=1,#selUnits do 
-			local ud = spGetUnitDefID(selUnits[i])
-			if (pylonDefs[ud]) then 
-				HighlightPylons()
-				glColor(1,1,1,1)
-				return 
-			end 
 		end
 	end
-	
+
+	local selUnits = spGetSelectedUnits()  -- or show it if its selected
+	if selUnits then
+		for i=1,#selUnits do
+			local ud = spGetUnitDefID(selUnits[i])
+			if (pylonDefs[ud]) then
+				HighlightPylons()
+				glColor(1,1,1,1)
+				return
+			end
+		end
+	end
+
 	local showecoMode = WG.showeco
 	if showecoMode then
 		HighlightPylons()
