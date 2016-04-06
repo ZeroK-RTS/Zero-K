@@ -794,6 +794,7 @@ local function SelectComm()
 	end
 end
 
+local mapMiddle = {Game.mapSizeX / 2, 0, Game.mapSizeZ / 2}
 local function SelectPrecBomber()
 
 	-- Check to see if anything other than a ready bomber is selected
@@ -814,12 +815,9 @@ local function SelectPrecBomber()
 	end
 	
 	local mx,my = GetMouseState()
-	local _,pos = TraceScreenRay(mx,my,true)     
+	local pos = select(2, TraceScreenRay(mx,my,true)) or mapMiddle
 	local mindist = math.huge
 	local muid = nil
-	if (pos == nil) then
-		pos = {Game.mapSizeX / 2, 0, Game.mapSizeZ / 2}
-	end
 
 	for uid, v in pairs(readyUntaskedBombers) do
 		if (Spring.IsUnitSelected(uid)) then
@@ -840,35 +838,19 @@ local function SelectPrecBomber()
 end
 
 local function SelectIdleCon_all()
-	Spring.SelectUnitMap(idleCons, false)
+	Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
 end
 
 local function SelectIdleCon()
-
-	local toBeSelected = {}
-	
-	local currentSelection = Spring.GetSelectedUnits()
-	local isAnythingElseSelected = nil
-	for i,uid in ipairs(currentSelection) do
-		if not idleCons[uid] then
-			isAnythingElseSelected = true
-			break
-		end
-	end
-	
+	local shift = select(4, Spring.GetModKeyState())
 	local mx,my = GetMouseState()
-	local _,pos = TraceScreenRay(mx,my,true)     
+	local pos = select(2, TraceScreenRay(mx,my,true)) or mapMiddle
 	local mindist = math.huge
 	local muid = nil
-	if (pos == nil) then
-		pos = {Game.mapSizeX / 2, 0, Game.mapSizeZ / 2}
-	end
-	
+
 	for uid, v in pairs(idleCons) do
 		if uid ~= "count" then
-			if (Spring.IsUnitSelected(uid)) then
-				table.insert(toBeSelected,uid)
-			else
+			if (not shift or not Spring.IsUnitSelected(uid)) then
 				local x,_,z = GetUnitPosition(uid)
 				dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
 				if (dist < mindist) then
@@ -878,10 +860,8 @@ local function SelectIdleCon()
 			end
 		end
 	end
-	if (muid ~= nil) and (not isAnythingElseSelected or #toBeSelected == 0) then
-		table.insert(toBeSelected,muid)
-	end
-	Spring.SelectUnitArray(toBeSelected)
+
+	Spring.SelectUnitArray({muid}, shift)
 end
 
 -------------------------------------------------------------------------------
