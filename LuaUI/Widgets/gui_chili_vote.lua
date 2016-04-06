@@ -134,8 +134,14 @@ function widget:AddConsoleMessage(msg)
 				Spring.Log(widget:GetInfo().name, LOG.ERROR, "malformed poll notification text")
 				return
 			end
+
 			local title = line:sub(indexStart, indexEnd - 1)
-			votingForceStart = ((title:find("force game"))~=nil)
+			if title:find("Resign team ") then
+				local allyTeamID = string.match(title, '%d+')
+				title = "Resign " .. Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) .. "?"
+			else
+				votingForceStart = ((title:find("force game"))~=nil)
+			end
 			label_title:SetCaption("Poll: "..title)
 	--elseif line:find(string_vote1) or line:find(string_vote2) then	--apply a vote
 			GetVotes(line)
