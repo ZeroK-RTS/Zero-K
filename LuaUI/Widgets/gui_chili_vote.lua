@@ -45,6 +45,7 @@ local string_titleStart = "Poll: "
 local string_endvote = " poll cancelled"
 local string_titleEnd = "?"
 local string_noVote = "There is no poll going on, start some first"
+local string_votemove = "Do you want to join"
 
 local springieName = Spring.GetModOptions().springiename or ''
 
@@ -112,7 +113,7 @@ function widget:AddConsoleMessage(msg)
 	if msg.msgtype ~= "autohost" then	-- no spoofing messages
 		return false
 	end
-	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) or line:find(string_noVote) then	--terminate existing vote
+	if line:find(string_success) or line:find(string_fail) or line:find(string_endvote) or line:find(string_noVote) or line:find(string_votemove) then	--terminate existing vote
 		RemoveWindow()
 		votingForceStart = false
 	elseif line:find(string_titleStart) and line:find(string_vote[1]) and line:find(string_vote[2]) then	--start new vote
