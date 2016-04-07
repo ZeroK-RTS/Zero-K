@@ -841,27 +841,47 @@ local function SelectIdleCon_all()
 	Spring.SelectUnitMap(idleCons, select(4, Spring.GetModKeyState()))
 end
 
+local conIndex = 1
 local function SelectIdleCon()
 	local shift = select(4, Spring.GetModKeyState())
-	local mx,my = GetMouseState()
-	local pos = select(2, TraceScreenRay(mx,my,true)) or mapMiddle
-	local mindist = math.huge
-	local muid = nil
+	if shift then
+		local mx,my = GetMouseState()
+		local pos = select(2, TraceScreenRay(mx,my,true)) or mapMiddle
+		local mindist = math.huge
+		local muid = nil
 
-	for uid, v in pairs(idleCons) do
-		if uid ~= "count" then
-			if (not shift or not Spring.IsUnitSelected(uid)) then
-				local x,_,z = GetUnitPosition(uid)
-				dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
-				if (dist < mindist) then
-					mindist = dist
-					muid = uid
+		for uid, v in pairs(idleCons) do
+			if uid ~= "count" then
+				if (not Spring.IsUnitSelected(uid)) then
+					local x,_,z = GetUnitPosition(uid)
+					dist = (pos[1]-x)*(pos[1]-x) + (pos[3]-z)*(pos[3]-z)
+					if (dist < mindist) then
+						mindist = dist
+						muid = uid
+					end
+				end
+			end
+		end
+
+		Spring.SelectUnitArray({muid}, true)
+	else
+		if idleCons.count == 0 then
+			Spring.SelectUnitArray({})
+		else
+			conIndex = (conIndex % idleCons.count) + 1
+			local i = 1
+			for uid, v in pairs(idleCons) do
+				if uid ~= "count" then
+					if i == conIndex then
+						Spring.SelectUnitArray({uid})
+						return
+					else
+						i = i + 1
+					end
 				end
 			end
 		end
 	end
-
-	Spring.SelectUnitArray({muid}, shift)
 end
 
 -------------------------------------------------------------------------------
