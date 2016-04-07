@@ -874,7 +874,7 @@ local function SelectIdleCon()
 				if uid ~= "count" then
 					if i == conIndex then
 						Spring.SelectUnitArray({uid})
-						Spring.SetCameraTarget(Spring.GetUnitPosition(uid))
+						SetCameraTarget(Spring.GetUnitPosition(uid))
 						return
 					else
 						i = i + 1
