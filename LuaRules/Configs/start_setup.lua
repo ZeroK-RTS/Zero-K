@@ -47,6 +47,6 @@ OVERDRIVE_BUFFER = 10000
 
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
-DEFAULT_UNIT = UnitDefNames["dyntrainer_assault_base"].id
-DEFAULT_UNIT_NAME = "Guardian Trainer"
+DEFAULT_UNIT = UnitDefNames["dyntrainer_strike_base"].id
+DEFAULT_UNIT_NAME = "Strike Trainer"
 
