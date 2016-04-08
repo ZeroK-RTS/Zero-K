@@ -137,7 +137,7 @@ function widget:AddConsoleMessage(msg)
 
 			local title = line:sub(indexStart, indexEnd - 1)
 			if title:find("Resign team ") then
-				local allyTeamID = string.match(title, '%d+')
+				local allyTeamID = string.match(title, '%d+') - 1
 				title = "Resign " .. Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) .. "?"
 			else
 				votingForceStart = ((title:find("force game"))~=nil)
