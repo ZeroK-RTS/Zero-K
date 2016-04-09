@@ -11,25 +11,21 @@ function widget:GetInfo()
   }
 end
 
----------------------------------------------------------------------------------------------
-local maxComLevel = 5 --commander level to be displayed at game start. Possible value: 0,1,2.. n-th
+VFS.Include("LuaRules/Configs/start_setup.lua")
+
 local rankTextures = {}
 do
 	local rankTexBase = 'LuaUI/Images/Ranks/' 
 	rankTextures = {
 	  [0] = nil,
-	  [1] = rankTexBase .. 'dude_smurf.png', --dude-icon added by Sprung/Gnurps for theme consistency
+	  [1] = rankTexBase .. 'dude_smurf.png',
 	  [2] = rankTexBase .. 'dude_user.png',
 	  [3] = rankTexBase .. 'dude_soldier.png',
 	  [4] = rankTexBase .. 'dude_napoleon.png',
-	  -- [1] = rankTexBase .. 'rank1.png', --this use unit-rank as user's rank (by xponen/msafwan)
-	  -- [2] = rankTexBase .. 'rank2.png',
-	  -- [3] = rankTexBase .. 'rank3.png',
-	  -- [4] = rankTexBase .. 'star.png',	  
-	} --reference: unit_rank_icons.lua
+	}
 end
 --[[
-options_path = 'Settings/Interface/Comm-n-Elo Startpos. Info'
+options_path = 'Settings/Interface/Pregame Setup'
 options_order = { 'showeloicon',}
 options = {
 	showeloicon = {
@@ -52,7 +48,7 @@ end
 function widget:Shutdown()
 	for i=1, #playerInfo do
 		for name, _ in pairs(WG.customToolTip) do
-			if name == playerInfo[i].comDefName then
+			if name == ("startpos_" .. playerInfo[i].playerID) then
 				WG.customToolTip[name] = nil
 			end
 		end
@@ -60,13 +56,9 @@ function widget:Shutdown()
 end
 
 function widget:Initialize()
-	--check for gamestart, initialize CommSelection event, get player list, get player info, initialize WG.customTooltip.
-	--
-	
-	Spring.Echo("Local Comm Selection")
+
 	if Spring.GetGameFrame()>0 then
 		widgetHandler:RemoveWidget()
-		Spring.Echo("\"Comm-n-Elo Startpos. Info\" widget removed after game start.")
 		return
 	end
 
@@ -85,10 +77,13 @@ function widget:Initialize()
 		for j=1, #playerList do
 			local playerID = playerList[j]
 			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey
-			local elo = (customKey and tonumber(customKey.elo)) or nil
-			local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200)))) or nil -- for example: elo= 1500. elo 1500 minus 1000 = 500. 500 divide by 200 = 2.5. Floor 2.5 = 2. Thus show 2 bar. If less than 1 show 1 (math.max), if greater than 4 show 4 (math.min)
-			local validEntry = not (x==y and x==z) and elo and (not spec) -- invalidate same coordinate (since they are not humanly possible), and also invalidate entry with "nil" elo, and invalidate spec
-			playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry, comDefName=nil,comDefId=nil, comDefNamePrvs= {}} 
+			local elo = (customKey and tonumber(customKey.elo))
+			local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200))))
+			local validEntry = not (x==y and x==z) and elo and (not spec)
+			playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry,
+				comDefName=DEFAULT_UNIT_NAME,
+				comDefId=DEFAULT_UNIT
+			}
 		end
 	end
 end
@@ -96,13 +91,12 @@ end
 function widget:Update(dt)
 
 	elapsedSecond = elapsedSecond + dt
-	if elapsedSecond>=0.66 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
+	if elapsedSecond>=0.1 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
 		for i=1, #playerInfo do
 			local teamID = playerInfo[i].teamID
 			local elo = playerInfo[i].eloLevel
 			local playerID = playerInfo[i].playerID
 			local comDefName = playerInfo[i].comDefName
-			local prvsComDefName = playerInfo[i].comDefNamePrvs --reference to this table (this is not a value)
 			local _,active,spec = Spring.GetPlayerInfo(playerID)
 			local x,y,z = Spring.GetTeamStartPosition(teamID) --update player's start position (if available).
 			x,y,z = x or 0 ,y or 0, z or 0 --safety for spectating using restricted LOS
@@ -110,15 +104,7 @@ function widget:Update(dt)
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
 			if comDefName then
-				WG.customToolTip[comDefName] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildCo".. comDefName .. " - "} --update tooltip box position. We also added code in "gui_chili_selections_and_cursortip.lua" and "gui_contextmenu.lua" to find detect information.
-			end
-			--Spring.Echo(teamID .. " " .. #prvsComDefName)
-			for i=#prvsComDefName,1,-1 do --start at end of table, iterate downward while emptying table content
-				local previousCom = prvsComDefName[i]
-				prvsComDefName[i]=nil
-				if previousCom ~= comDefName then
-					WG.customToolTip[previousCom] = nil --empty this tooltip entry
-				end
+				WG.customToolTip["startpos_" .. playerID] = {box={x1 = x-25, x2 = x+25, z1= z-25, z2= z+25},tooltip="BuildCo".. comDefName .. " - "}
 			end
 		end
 		elapsedSecond = 0
@@ -152,16 +138,13 @@ function CommSelection(playerID, startUnit) --receive from start_unit_setup.lua 
 	
 	for i = 1, #playerInfo do
 		if playerID == playerInfo[i].playerID then
-			local previousCom = playerInfo[i].comDefName
-			local tableIndex = #playerInfo[i].comDefNamePrvs
-			playerInfo[i].comDefNamePrvs[tableIndex + 1] = previousCom --store list of previous selection. ie {com1, com2, com1,...}
 			playerInfo[i].comDefName = commProfile.name or ""
 			local unitDef = UnitDefNames["dyn" .. (commProfile.chassis or "strike").. "5"]
 			
 			if unitDef and unitDef.id then
 				playerInfo[i].comDefId = unitDef.id
 			else
-				playerInfo[i].comDefId = UnitDefNames["dynstrike5"]
+				playerInfo[i].comDefId = UnitDefNames["dynstrike5"].id
 			end
 		end
 	end

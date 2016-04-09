@@ -123,7 +123,7 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 end
-local function DrawUnitDef(uDefID, uTeam, ux, uy, uz)
+local function DrawUnitDef(uDefID, uTeam, ux, uy, uz, rot)
 
 	gl.Color(1.0, 1.0, 1.0, 1.0)
 	gl.DepthTest(GL.LEQUAL)
@@ -132,6 +132,7 @@ local function DrawUnitDef(uDefID, uTeam, ux, uy, uz)
 
 	gl.PushMatrix()
 		gl.Translate(ux, uy, uz)
+		gl.Rotate(rot, 0, 1, 0)
 		gl.UnitShape(uDefID, uTeam, false, true, true)
 	gl.PopMatrix()
 
@@ -312,7 +313,10 @@ local function DrawWorldFunc()
 		sy = Spring.GetGroundHeight(sx, sz)
 
 		-- Draw the starting unit at start position
-		DrawUnitDef(sDefID, myTeamID, sx, sy, sz)
+		local rot = ((sx/Game.mapSizeX) > (sz/Game.mapSizeZ))
+			and (((1-(sx/Game.mapSizeX)) < (sz/Game.mapSizeZ)) and 270 or 0)
+			or (((1-(sx/Game.mapSizeX)) < (sz/Game.mapSizeZ)) and 180 or 90)
+		DrawUnitDef(sDefID, myTeamID, sx, sy, sz, rot)
 
 		-- Draw start units build radius
 		gl.Color(buildDistanceColor)
