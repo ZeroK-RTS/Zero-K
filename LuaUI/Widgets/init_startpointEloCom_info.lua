@@ -49,23 +49,13 @@ function widget:GameStart()
 	widgetHandler:RemoveWidget()
 end
 
-function widget:Shutdown() 
-	--clean up WG.customToolTip as much as possible
-	--
-	
-	local tableLenght = 0 --measure WG.customToolTip to find out if its empty
+function widget:Shutdown()
 	for i=1, #playerInfo do
-		tableLenght = 0
-		for name, _ in pairs(WG.customToolTip) do --clean WG.customToolTip after use. Find any index with same comm name as ours and delete it.
-			tableLenght = tableLenght + 1
+		for name, _ in pairs(WG.customToolTip) do
 			if name == playerInfo[i].comDefName then
-				WG.customToolTip[name] = nil --empty this entry
-				tableLenght = tableLenght - 1
+				WG.customToolTip[name] = nil
 			end
 		end
-	end
-	if tableLenght == 0 then --delete table completely if empty
-		WG.customToolTip = nil
 	end
 end
 
@@ -101,13 +91,10 @@ function widget:Initialize()
 			playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry, comDefName=nil,comDefId=nil, comDefNamePrvs= {}} 
 		end
 	end
-	WG.customToolTip = WG.customToolTip or {} --initialize table to communicate to other widget of our custom Tooltips points
 end
 
 function widget:Update(dt)
-	--update startposition, update WG.customTooltip
-	--
-	
+
 	elapsedSecond = elapsedSecond + dt
 	if elapsedSecond>=0.66 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
 		for i=1, #playerInfo do
