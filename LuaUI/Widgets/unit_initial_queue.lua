@@ -43,7 +43,7 @@ local fontSize = 14
 local myTeamID = Spring.GetMyTeamID()
 local myPlayerID = Spring.GetMyPlayerID()
 
-local sDefID = Spring.GetTeamRulesParam(myTeamID, "commChoice") or UnitDefNames.commbasic.id-- Starting unit def ID
+local sDefID = Spring.GetTeamRulesParam(myTeamID, "commChoice") or UnitDefNames.dyntrainer_strike_base.id-- Starting unit def ID
 local sDef = UnitDefs[sDefID]
 local buildDistance = sDef.buildDistance
 
