@@ -1,5 +1,10 @@
 {
-	"idle_cons_different_types" : "Masz %{cons} wolnych konstruktorów %{types} różnych rodzajów.",
+	"idle_cons" : {
+		"one" : "%{count} wolny konstruktor",
+		"few" : "%{count} wolnych konstruktorów",
+		"many" : "%{count} wolnych konstruktorów",
+		"other" : "%{count} wolnego konstruktora"
+	},
 	"quick_rallypoint_mode" : "Tryb szybkiej kolejki",
 	"tacnuke_and_emp" : "Rakiety bojowe",
 	"seismic" : "Rakiety sejsmiczne",
@@ -10,5 +15,10 @@
 	"space_click_show_stats" : "Spacja+klik: Pokaż statystyki jednostki",
 	"hold_space_for_help" : "Przytrzymaj spację: instrukcja",
 	"fac_modifier_keys_instruction" : "Shift: razy 5\nCtrl: razy 20\nAlt: wstaw na początek\nPrawy-klik: usuń z kolejki\n",
-	"x_units_in_queue" : "%{x} jednostek w kolejce"
+	"x_units_in_queue" : {
+		"one" : "%{count} jednostka w kolejce",
+		"few" : "%{count} jednostki w kolejce",
+		"many" : "%{count} jednostek w kolejce",
+		"other" : "%{count} jednostek w kolejce"
+	}
 }

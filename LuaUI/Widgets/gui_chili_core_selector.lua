@@ -253,20 +253,6 @@ end
 -------------------------------------------------------------------------------
 -- helper funcs
 
-local function SetCount(set, numOnly)
-	local count = 0
-	if numOnly then
-		for i=1,#set do
-			count = count + 1
-		end
-	else
-		for k in pairs(set) do
-			count = count + 1
-		end	
-	end
-	return count
-end
-
 local function CountButtons(set)
 	local count = 0
 	for _,data in pairs(set) do
@@ -335,7 +321,7 @@ local function UpdateFac(unitID, index)
 		end
 	end
 
-	local tooltip = WG.Translate("common", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {x = count})
+	local tooltip = WG.Translate("common", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = count})
 	if rep then
 		tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("common", "repeating") .. ")\008"
 	end
@@ -609,93 +595,31 @@ local function RemoveComm(unitID)
 	ShiftFacRow()
 end
 
---[[
-local function CycleComm()
-	if SetCount(commsByID) == 0 then
-		return
-	end
-	local newComm
-	local savedPos = 1
-	local commsOrdered = {}
-	
-	-- ipairs breaks for some inane reason
-	-- thankfully pairs preserves a constant order as long as the table remains constant, so we can use it
-	for unitID in pairs(commsByID) do	
-		local i = #commsOrdered+1
-		commsOrdered[i] = unitID
-		if unitID == currentComm then
-			savedPos = i
-		end
-	end
-	if #commsOrdered == savedPos then
-		newComm = commsOrdered[1]
-	else
-		newComm = commsOrdered[savedPos+1]
-	end
-	--clear warning if needed
-	if newComm ~= currentComm then
-		commWarningTimeLeft = -1
-	end
-	
-	currentComm = newComm
-end
-]]--
-
 local function UpdateConsButton()
-	-- get con type with highest number of idlers (as well as number of types total)
+
 	local prevTotal = idleCons.count or 0
 	idleCons.count = nil
-	--local maxDefID = idleBuilderDefID
-	local maxCount, total = 0, 0
-	local types = {}
+	local total = 0
 	for unitID in pairs(idleCons) do
-		local def = GetUnitDefID(unitID)
-		if def then	-- because GetUnitDefID can never be trusted to work
-			types[def] = (types[def] or 0) + 1
-		end
 		total = total + 1
 	end
-	local numTypes = SetCount(types)
-	
-	-- this deprecated stuff is for making the button image change to reflect which con unit type has the most idlers
-	--[[
-	for defID, num in pairs(types) do
-		if num > maxCount then
-			maxDefID = defID
-			maxCount = num
-		end
-	end
-	]]--
-	
-	--if (idleBuilderDefID ~= maxDefID or total == 0 or prevTotal == 0) then
-	if (total == 0 or prevTotal == 0) then
-		--conButton.image.file = '#'..maxDefID
+
+	conButton.button.tooltip = WG.Translate("interface", "idle_cons", {count = total}) ..
+								"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") ..
+								"\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "select_all") .. "\008"
+
+	if ((total > 0 and prevTotal == 0) or (total == 0 and prevTotal > 0)) then
 		conButton.image.file = (total > 0 and buildIcon) or buildIcon_bw
 		conButton.image.color = (total == 0 and imageColorDisabled) or nil
 		conButton.image:Invalidate()
 		conButton.button.backgroundColor = (total == 0 and buttonColorDisabled) or buttonColor
 		conButton.button:Invalidate()
-		--idleBuilderDefID = maxDefID
 	end
-	conButton.button.tooltip = WG.Translate("interface", "idle_cons_different_types", {cons = total, types = numTypes}) ..
-								"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") ..
-								"\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "select_all") .. "\008"
-	idleCons.count = total
-	total = (total > 0 and tostring(total)) or ''
+
 	if conButton.countLabel then
-		conButton.countLabel:Dispose()
+		conButton.countLabel:SetCaption(tostring(total))
 	end
-	conButton.countLabel = Label:New {
-		parent = conButton.image,
-		autosize=false;
-		width="100%";
-		height="100%";
-		align="right";
-		valign="bottom";
-		caption = total;
-		fontSize = 16;
-		fontShadow = true;
-	}
+	idleCons.count = total
 end
 
 RefreshConsList = function()
@@ -1055,16 +979,19 @@ function widget:Update(dt)
 		ClearData(false)
 		InitializeUnits()
 	end
+	
 	if wantUpdateCons then
 		UpdateConsButton()
 		wantUpdateCons = false
 	end
-	
+
 	timer = timer + dt
 	if timer < UPDATE_FREQUENCY then
 		return
 	end
-	
+
+	wantUpdateCons = true
+
 	for i=1,#facs do
 		UpdateFac(facs[i].facID, i)
 	end
@@ -1251,6 +1178,17 @@ function widget:Initialize()
 		--file2 = "bitmaps/icons/frame_cons.png",
 		keepAspect = false,
 		color = (total == 0 and imageColorDisabled) or nil,
+	}
+	conButton.countLabel = Label:New {
+		parent = conButton.image,
+		autosize=false;
+		width="100%";
+		height="100%";
+		align="right";
+		valign="bottom";
+		caption = "0";
+		fontSize = 16;
+		fontShadow = true;
 	}
 	buttonColor = conButton.button.color
 	UpdateConsButton()
