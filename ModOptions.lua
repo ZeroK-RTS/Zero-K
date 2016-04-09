@@ -201,7 +201,7 @@ local options = {
     desc   = "Shuffles start boxes.",
     type   = "list",
     section= 'startconds',
-    def    = "shuffle",
+    def    = "auto",
     items  = {
       {
         key  = "off",
@@ -217,6 +217,11 @@ local options = {
         key  = "allshuffle",
         name = "All Shuffle",
         desc = "Shuffle all present boxes.",
+      },
+      {
+        key  = "auto",
+        name = "Auto",
+        desc = "Shuffle if FFA.",
       },
     },
   },

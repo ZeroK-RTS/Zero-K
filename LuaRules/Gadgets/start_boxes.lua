@@ -11,9 +11,18 @@ function gadget:GetInfo() return {
 } end
 
 local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
-local shuffleMode = Spring.GetModOptions().shuffle or "shuffle"
+local shuffleMode = Spring.GetModOptions().shuffle or "auto"
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
+
+if shuffleMode == "auto" then
+	if GetTeamCount() > 2 then
+		shuffleMode = "shuffle"
+	else
+		shuffleMode = "off"
+	end
+end
+Spring.SetGameRulesParam("shuffleMode", shuffleMode)
 
 --[[ expose a randomness seed
 this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
