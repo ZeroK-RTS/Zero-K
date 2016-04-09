@@ -96,7 +96,7 @@ local function CreateWindow()
 		y      = 0,
 		right  = 0,
 		bottom = 0,
-		caption = "Warning: Nuke Launched",
+		caption = WG.Translate ("common", "nuclear_launch_detected"),
 		valign = "center",
  		align  = "center",
 		autosize = false,
@@ -142,10 +142,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function languageChanged ()
+	if not mainWindow then return end
+	mainWindow.label:SetCaption(WG.Translate ("common", "nuclear_launch_detected"))
+end
+
 function widget:Shutdown()
 	if mainWindow and mainWindow.window then
 		mainWindow.window:Dispose()
 	end
+	WG.ShutdownTranslation(GetInfo().name)
 end
 
 function widget:Initialize()
@@ -155,6 +161,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 function widget:Update(dt)

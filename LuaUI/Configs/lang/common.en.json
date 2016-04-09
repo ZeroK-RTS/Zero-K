@@ -1,5 +1,6 @@
 {
 	"morph_complete" : "Morph complete",
+	"nuclear_launch_detected" : "Warning: Nuke Launched",
 	"build_eta" : "ETA:",
 	"lvl" : "lvl",
 	"builds_at" : "builds at",
