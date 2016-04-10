@@ -436,8 +436,8 @@
 	},
 	"armcarry" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment) & Anti-Nuke",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment. Its anti-missile system safeguards the fleet from the threat of nuclear missiles, and it also serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Aircraft Carrier (Bombardment)",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"slowmort" : {
 		"name" : "Moderator",
@@ -1100,8 +1100,8 @@
 	},
 	"reef" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment) & Anti-Nuke",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment. Its anti-missile system safeguards the fleet from the threat of nuclear missiles, and it also serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Aircraft Carrier (Bombardment)",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"corflak" : {
 		"name" : "Cobra",

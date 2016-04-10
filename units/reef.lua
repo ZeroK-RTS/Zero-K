@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[reef]],
   name                   = [[Reef]],
-  description            = [[Aircraft Carrier (Bombardment) & Anti-Nuke]],
+  description            = [[Aircraft Carrier (Bombardment)]],
   acceleration           = 0.0354,
   activateWhenBuilt      = true,
   brakeRate              = 0.0466,
@@ -25,20 +25,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Flugzeugträger (Bomber) & Anti-Nuke]],
-    description_fr = [[Porte-Avion Bombardier & Anti-Nuke]],
-    description_pl = [[Lotniskowiec z tarcza antyrakietowa]],
-    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment. Its anti-missile system safeguards the fleet from the threat of nuclear missiles, and it also serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
-    helptext_de    = [[Das vielseitigste Schiff auf hoher See, der Träger bietet verschiedenste Funktionen. Er ist mit Marschflugkörpern für weitreichendes Bombardement ausgerüstet. Sein antinukleares System schützt die Flotte vor Atomraketen. Außerdem dient es auch als mobile Reperaturbasis für befreundete Flugzeuge. Vielleicht am nennenswertesten: der Träger besitzt sein eigenes Geschwader an Kampfdrohnen.]],
-    helptext_fr    = [[C'est le plus polyvalent des Navires possibles, le Reef peut tirer des missiles de croisicre longue portée pour des frappes chirurgicales, tirer des antimissiles pour contrer tout missile nucléaire, servir de station de réparation et de rechargement pour les planeurs alliés ou encore utiliser ses nombreux drones.]],
-    helptext_pl    = [[Najbardziej wielozadaniowy sposrod okretow. Posiada rakiety dalekiego zasiegu i tarcze antyrakietowa, a jego pokład sluzy jako stacja naprawy i dozbrajania samolotow. Ponadto jest w stanie automatycznie produkowac wlasne drony bojowe.]],
+    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[50]],
-    nuke_coverage  = 1200,
 	priority_misc = 2, -- High
   },
 
-  energyUse              = 1.5,
   explodeAs              = [[ATOMIC_BLASTSML]],
   floater                = true,
   footprintX             = 6,
@@ -84,10 +76,6 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
-    {
-      def = [[CARRIER_AMD_ROCKET]],
-    },
-
   },
 
   weaponDefs             = {
@@ -129,44 +117,6 @@ unitDef = {
       weaponTimer             = 2,
       weaponType              = [[StarburstLauncher]],
       weaponVelocity          = 10000,
-    },
-
-    CARRIER_AMD_ROCKET = {
-      name                    = [[Anti-Nuke Missile Fake]],
-      areaOfEffect            = 420,
-      collideFriendly         = false,
-	  collideGround           = false,
-      coverage                = 100000,
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 1500,
-        subs    = 75,
-      },
-
-      explosionGenerator      = [[custom:ANTINUKE]],
-      fireStarter             = 100,
-      flightTime              = 15,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      interceptor             = 1,
-      model                   = [[antinukemissile.s3o]],
-      noSelfDamage            = true,
-      range                   = 2400,
-      reloadtime              = 12,
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
-      startVelocity           = 400,
-      tolerance               = 4000,
-      turnrate                = 65535,
-      tracks                  = true,
-      weaponAcceleration      = 800,
-      weaponTimer             = 0.4,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1600,
     },
 
     carriertargeting   = {
