@@ -813,6 +813,42 @@ local icontypes = {
     bitmap='icons/supergunship.dds',
     size=2.8,
   },
+  gunshipscout = {
+    bitmap='icons/gunshipscout.png',
+    size=1.8,
+  },
+  gunshipspecial = {
+    bitmap='icons/gunshipspecial.png',
+    size=1.8,
+  },
+  gunshipraider = {
+    bitmap='icons/gunshipraider.png',
+    size=2,
+  },
+  gunshipskirm = {
+    bitmap='icons/gunshipskirm.png',
+    size=2,
+  },
+  gunshipriot = {
+    bitmap='icons/gunshipriot.png',
+    size=4,
+  },
+  gunshipassault = {
+    bitmap='icons/gunshipassault.png',
+    size=2.4,
+  },
+  gunshiparty = {
+    bitmap='icons/gunshiparty.png',
+    size=2.4,
+  },
+  gunshiptransport = {
+    bitmap='icons/gunshiptransport.png',
+    size=2,
+  },
+  gunshiptransport_large = {
+    bitmap='icons/gunshiptransport.png',
+    size=3.2,
+  },
   nebula = {
     bitmap='icons/nebula.dds',
     size=4,

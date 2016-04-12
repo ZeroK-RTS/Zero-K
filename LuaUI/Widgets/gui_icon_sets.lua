@@ -7,8 +7,8 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-options_path = 'Settings/Graphics/Unit Visibility/Radar Icon Sets'
-options_order = { 'coniconchassis' }
+options_path = 'Settings/Graphics/Unit Visibility/Radar Icons'
+options_order = { 'coniconchassis', 'gunship_pictograms' }
 options = {
 	coniconchassis = {
 		name = 'Show constructor chassis',
@@ -37,6 +37,38 @@ options = {
 				Spring.SetUnitDefIcon(UnitDefNames["corch"].id, "hoverbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "shipbuilder")
 			end
+		end,
+	},
+	gunship_pictograms = {
+		name = 'Use pictograms for gunships',
+		desc = 'Do gunships use pictograms instead of the usual role icons?',
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if not self.value then
+				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "gunshipscout")
+				Spring.SetUnitDefIcon(UnitDefNames["bladew"].id, "gunshipspecial")
+				Spring.SetUnitDefIcon(UnitDefNames["armkam"].id, "gunshipraider")
+				Spring.SetUnitDefIcon(UnitDefNames["gunshipsupport"].id, "gunshipskirm")
+				Spring.SetUnitDefIcon(UnitDefNames["armbrawl"].id, "gunshiparty")
+				Spring.SetUnitDefIcon(UnitDefNames["blackdawn"].id, "gunshipassault")
+				Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "gunshipriot")
+				Spring.SetUnitDefIcon(UnitDefNames["corvalk"].id, "gunshiptransport")
+				Spring.SetUnitDefIcon(UnitDefNames["corbtrans"].id, "gunshiptransport_large")
+			else
+				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "airbomb")
+				Spring.SetUnitDefIcon(UnitDefNames["bladew"].id, "smallgunship")
+				Spring.SetUnitDefIcon(UnitDefNames["armkam"].id, "gunship")
+				Spring.SetUnitDefIcon(UnitDefNames["gunshipsupport"].id, "gunshipears")
+				Spring.SetUnitDefIcon(UnitDefNames["armbrawl"].id, "heavygunship")
+				Spring.SetUnitDefIcon(UnitDefNames["blackdawn"].id, "heavygunshipears")
+				Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "supergunship")
+				Spring.SetUnitDefIcon(UnitDefNames["corvalk"].id, "airtransport")
+				Spring.SetUnitDefIcon(UnitDefNames["corbtrans"].id, "airtransportbig")
+			end
+
+			-- same in both, listed for completeness
+			Spring.SetUnitDefIcon(UnitDefNames["gunshipaa"].id, "gunshipaa")
 		end,
 	},
 }
