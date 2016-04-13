@@ -1741,7 +1741,7 @@ MakeSubWindow = function(path, pause)
 				tooltip   = option.desc,
 			}
 			option.epic_reference = chbox
-			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option)
+			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option, icon, option.noHotkey)
 			
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
@@ -1816,7 +1816,7 @@ MakeSubWindow = function(path, pause)
 					tooltip = item.desc, --tooltip
 				}
 				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey)
 					
 			end
 			tree_children[#tree_children+1] = Label:New{ caption = '', }
