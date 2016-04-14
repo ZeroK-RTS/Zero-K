@@ -64,6 +64,7 @@ options = {
 		desc = 'Preserve auto groupings for next game. Unchecking this clears the groups!',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
 				unit2group = {}
@@ -76,22 +77,26 @@ options = {
 		desc = 'Existing units will be added to group# when setting autogroup#.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	verbose = {
 		name = 'Verbose Mode',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	immediate = {
 		name = 'Immediate Mode',
 		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	groupnumbers = {
 		name = 'Display Group Numbers',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	
 	help = {

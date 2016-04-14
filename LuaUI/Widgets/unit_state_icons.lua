@@ -40,6 +40,7 @@ options = {
 		desc = "When holding shift, icons appear over units indicating move state and fire state.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	showarmorstate = {
 		name = 'Armor state visibility',
@@ -59,6 +60,7 @@ options = {
 				WG.icons.SetDisplay('armored', false)
 			end
 		end,
+		noHotkey = true,
 	},
 
 	showpriority = {
@@ -79,12 +81,14 @@ options = {
 				WG.icons.SetDisplay('priority', false)
 			end
 		end,
+		noHotkey = true,
 	},
 	showmiscpriorityonshift = {
 		name = "Show misc priorty on shift",
 		desc = "When holding shift, an icon appears over unit with low or high misc priority (morph or stockpile).",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 }
 
