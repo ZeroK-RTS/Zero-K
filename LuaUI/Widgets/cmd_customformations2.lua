@@ -20,7 +20,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Command Visibility/Formations'
+options_path = 'Settings/Interface/Command Visibility'--/Formations'
 options_order = { 'drawmode_v2', 'linewidth', 'dotsize' }
 options = {
 	drawmode_v2 = {
@@ -35,6 +35,7 @@ options = {
 			{key='dots', name='Dots only', desc='Draw dots at command locations'},
 			{key='both', name='Draw both', desc='Draw lines and dots'},
 		},
+		noHotkey = true,
 	},
 	
 	linewidth = {
