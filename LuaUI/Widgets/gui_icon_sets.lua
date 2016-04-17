@@ -46,15 +46,15 @@ options = {
 		value = true,
 		OnChange = function(self)
 			if not self.value then
-				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "gunshipscout")
-				Spring.SetUnitDefIcon(UnitDefNames["bladew"].id, "gunshipspecial")
+				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "gunshipspecial")
+				Spring.SetUnitDefIcon(UnitDefNames["bladew"].id, "gunshipscout")
 				Spring.SetUnitDefIcon(UnitDefNames["armkam"].id, "gunshipraider")
 				Spring.SetUnitDefIcon(UnitDefNames["gunshipsupport"].id, "gunshipskirm")
-				Spring.SetUnitDefIcon(UnitDefNames["armbrawl"].id, "gunshiparty")
-				Spring.SetUnitDefIcon(UnitDefNames["blackdawn"].id, "gunshipassault")
-				Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "gunshipriot")
+				Spring.SetUnitDefIcon(UnitDefNames["armbrawl"].id, "heavygunshipskirm")
+				Spring.SetUnitDefIcon(UnitDefNames["blackdawn"].id, "heavygunshipassault")
+				-- Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "gunshipriot")
 				Spring.SetUnitDefIcon(UnitDefNames["corvalk"].id, "gunshiptransport")
-				Spring.SetUnitDefIcon(UnitDefNames["corbtrans"].id, "gunshiptransport_large")
+				Spring.SetUnitDefIcon(UnitDefNames["corbtrans"].id, "heavygunshiptransport")
 			else
 				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "airbomb")
 				Spring.SetUnitDefIcon(UnitDefNames["bladew"].id, "smallgunship")
@@ -62,7 +62,7 @@ options = {
 				Spring.SetUnitDefIcon(UnitDefNames["gunshipsupport"].id, "gunshipears")
 				Spring.SetUnitDefIcon(UnitDefNames["armbrawl"].id, "heavygunship")
 				Spring.SetUnitDefIcon(UnitDefNames["blackdawn"].id, "heavygunshipears")
-				Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "supergunship")
+				-- Spring.SetUnitDefIcon(UnitDefNames["corcrw"].id, "supergunship")
 				Spring.SetUnitDefIcon(UnitDefNames["corvalk"].id, "airtransport")
 				Spring.SetUnitDefIcon(UnitDefNames["corbtrans"].id, "airtransportbig")
 			end
