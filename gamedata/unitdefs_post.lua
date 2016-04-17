@@ -499,6 +499,11 @@ if (modOptions and modOptions.energymult) then
   end
 end
 
+if (modOptions and modOptions.metalmult) then
+	for name in pairs(UnitDefs) do
+		UnitDefs[name].metalmake = (UnitDefs[name].metalmake or 0) * modOptions.metalmult
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

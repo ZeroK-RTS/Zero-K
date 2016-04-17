@@ -1508,8 +1508,8 @@ local function Overdrive_AddUnitResourceGeneration(unitID, metal, energy)
 
 	local genData = generator[allyTeamID][teamID][unitID]
 
-	local metalIncome = math.max(0, genData.metalIncome + metal)
-	local energyIncome = math.max(0, genData.energyIncome + energy)
+	local metalIncome = math.max(0, genData.metalIncome + (metal * (Spring.GetModOptions().metalmult or 1)))
+	local energyIncome = math.max(0, genData.energyIncome + (energy * (Spring.GetModOptions().energymult or 1)))
 
 	genData.metalIncome = metalIncome
 	genData.energyIncome = energyIncome
