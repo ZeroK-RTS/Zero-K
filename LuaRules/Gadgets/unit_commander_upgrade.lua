@@ -1,6 +1,6 @@
 function gadget:GetInfo()
   return {
-    name      = "Comander Upgrade",
+    name      = "Commander Upgrade",
     desc      = "",
     author    = "Google Frog",
     date      = "30 December 2015",
@@ -159,8 +159,10 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		Spring.SetUnitHealth(unitID, health + data.healthBonus)
-		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
+		local newHealth = math.max(health + data.healthBonus, 1)
+		local newMaxHealth = math.max(maxHealth + data.healthBonus, 1)
+		Spring.SetUnitHealth(unitID, newHealth)
+		Spring.SetUnitMaxHealth(unitID, newMaxHealth)
 	end
 	
 	if data.skinOverride then
