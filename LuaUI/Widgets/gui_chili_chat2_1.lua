@@ -211,7 +211,7 @@ end
 
 options = {
 	
-	lblError = {name='Error Filter', type='label'},
+	lblError = {name='Error Filter', type='label', advanced = true},
 	lblFilter = {name='Filtering', type='label', advanced = false},
 	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
@@ -225,6 +225,7 @@ options = {
 		value = true,
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
+		advanced = true,
 	},
 	
 	text_height = {
@@ -245,6 +246,7 @@ options = {
 		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -261,6 +263,7 @@ options = {
 		name = "Dedupe messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -268,6 +271,7 @@ options = {
 		name = "Dedupe points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -275,30 +279,35 @@ options = {
 		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_allies = {
 		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_enemies = {
 		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_specs = {
 		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_other = {
 		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 	},
 --[[
@@ -320,6 +329,7 @@ options = {
 		name = "Surround highlighted messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -327,6 +337,7 @@ options = {
 		name = "Sound for highlighted messages",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -426,6 +437,7 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self) scrollpanel1.ignoreMouseWheel = not self.value; end,
 	},
 	defaultAllyChat = {
@@ -433,12 +445,14 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},	
 	autohide = {
 		name = "Autohide chat",
 		desc = "Hides the chat when not in use",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 	},
 	autohide_time = {

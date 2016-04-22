@@ -212,12 +212,14 @@ options = {
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
+		advanced = true,
 	},
 	
 	enableConsole = {
 		name = "Enable the debug console",
 		type = 'bool',
 		value = false,
+		advanced = true,
 		OnChange = function(self)
 			if window_console then
 				if self.value then
@@ -266,6 +268,7 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		noHotkey = true,
 		path = dedupe_path,
 	},
 	dedupe_points = {
@@ -274,6 +277,7 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		noHotkey = true,
 		path = dedupe_path,
 	},
 	highlight_all_private = {
@@ -281,6 +285,7 @@ options = {
 		type = 'bool',
 		value = true,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 	highlight_filter_allies = {
@@ -288,6 +293,7 @@ options = {
 		type = 'bool',
 		value = true,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 	highlight_filter_enemies = {
@@ -295,6 +301,7 @@ options = {
 		type = 'bool',
 		value = true,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 	highlight_filter_specs = {
@@ -302,6 +309,7 @@ options = {
 		type = 'bool',
 		value = true,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 	highlight_filter_other = {
@@ -309,6 +317,7 @@ options = {
 		type = 'bool',
 		value = false,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 --[[
@@ -342,6 +351,7 @@ options = {
 		value = false,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		noHotkey = true,
 		path = hilite_path,
 	},
 	hideSpec = {
@@ -476,12 +486,14 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	defaultBacklogEnabled = {
 		name = "Enable backlog at start",
 		desc = "Starts with the backlog chat enabled.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	toggleBacklog = {
 		name = "Toggle backlog",
@@ -493,6 +505,7 @@ options = {
 		desc = "Scroll the backlog chat with the mousewheel.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			scrollpanel_backchat.ignoreMouseWheel = not options.mousewheelBacklog.value
 			scrollpanel_backchat:Invalidate()
@@ -503,6 +516,7 @@ options = {
 		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if self.value then
 				window_chat:AddChild(backlogButton)
@@ -547,6 +561,7 @@ options = {
 		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 	},
 	enableChatBackground = {
@@ -554,6 +569,7 @@ options = {
 		desc = "Enables a background for the text-entering box.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 		OnChange = function(self)
 			if self.value then

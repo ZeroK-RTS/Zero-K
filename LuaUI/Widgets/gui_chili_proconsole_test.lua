@@ -209,12 +209,14 @@ options = {
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
+		advanced = true,
 	},
 	
 	enableConsole = {
 		name = "Enable the debug console",
 		type = 'bool',
 		value = false,
+		advanced = true,
 		OnChange = function(self)
 			if window_console then
 				if self.value then
@@ -252,6 +254,7 @@ options = {
 		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -271,12 +274,14 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		noHotkey = true,
 		path = dedupe_path,
 	},
 	dedupe_points = {
 		name = "Dedupe points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = dedupe_path,
@@ -285,6 +290,7 @@ options = {
 		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -292,6 +298,7 @@ options = {
 		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -299,6 +306,7 @@ options = {
 		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -306,6 +314,7 @@ options = {
 		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -313,6 +322,7 @@ options = {
 		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -335,6 +345,7 @@ options = {
 		name = "Surround highlighted messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = hilite_path,
@@ -343,6 +354,7 @@ options = {
 		name = "Sound for highlighted messages",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = hilite_path,
@@ -477,12 +489,14 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	defaultBacklogEnabled = {
 		name = "Enable backlog at start",
 		desc = "Starts with the backlog chat enabled.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	toggleBacklog = {
 		name = "Toggle backlog",
@@ -494,6 +508,7 @@ options = {
 		desc = "Scroll the backlog chat with the mousewheel.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			scrollpanel_backchat.ignoreMouseWheel = not options.mousewheelBacklog.value
 			scrollpanel_backchat:Invalidate()
@@ -504,6 +519,7 @@ options = {
 		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if self.value then
 				window_chat:AddChild(backlogButton)
@@ -549,12 +565,14 @@ options = {
 		type = 'bool',
 		value = false,
 		advanced = true,
+		noHotkey = true,
 	},
 	enableChatBackground = {
 		name = "Enable chat background.",
 		desc = "Enables a background for the text-entering box.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 		OnChange = function(self)
 			if self.value then
