@@ -586,7 +586,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			if ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
-			AddAwardPoints( 'pwn', attackerTeam, costdamage )
+			--AddAwardPoints( 'pwn', attackerTeam, costdamage )
 			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
 
@@ -650,13 +650,12 @@ function gadget:GameFrame(n)
 		end
 
 		-- read externally tracked values
-		local last_history_frame = math.floor((n+420)/450)
 		local teams = Spring.GetTeamList()
 		for i = 1, #teams do
 			local team = teams[i]
 			if team ~= gaiaTeamID then
-				local totalReclaim = Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_" .. last_history_frame)
-				AddAwardPoints('reclaim', team, totalReclaim)
+				AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
+				AddAwardPoints('pwn', team, Spring.GetTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 			end
 		end
 

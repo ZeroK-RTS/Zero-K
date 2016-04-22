@@ -30,8 +30,8 @@ local buttons = {
 
 	{"energy_income"   , "Energy Income"},
 
-	{"damageDealt"     , "Damage Dealt"},
-	{"damageReceived"  , "Damage Received"},
+	{"damage_dealt"     , "Damage Dealt"},
+	{"damage_received"  , "Damage Received"},
 
 	{"unitsProduced"   , "Units Built"},
 	{"unit_value"      , "Unit Value"},
@@ -44,6 +44,8 @@ local rulesParamStats = {
 	unit_value = true,
 	metal_income = true,
 	energy_income = true,
+	damage_dealt = true,
+	damage_received = true,
 }
 
 local graphLength = 0
