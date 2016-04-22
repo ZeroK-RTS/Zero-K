@@ -27,6 +27,7 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = "When enabled, the key must be pressed twice in quick sucession to zoom to a control group.",
+		noHotkey = true,
 	},
 	timeoutlength = {
 		name = "Double Press Speed", 
