@@ -23,15 +23,27 @@ local function SetupTTS(enable)
 	end 
 end 
 
-options_path = 'Settings/Audio'
-options_order = {'enable'}
+options_path = 'Settings/Audio/Text to Speech'
+options_order = {'enable', 'volume'}
 options = {
 	enable ={	
-		name = "Text-To-Speech (ZKL only)", 
+		name = "Enable TTS (ZKL only)",
+		desc = "Ally chat will be read aloud.",
 		type = 'bool', value = true, 
 		OnChange = function(self)
 			SetupTTS(self.value)
 			WG.textToSpeechCtrl = {ttsEnable = self.value,}
+		end,
+	},
+	volume ={	
+		name = "Volume",
+		type = 'number',
+		min = 1,
+		max = 100, 
+		step = 1,
+		value = 50,
+		OnChange = function(self)
+			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. self.value)
 		end,
 	},
 }
