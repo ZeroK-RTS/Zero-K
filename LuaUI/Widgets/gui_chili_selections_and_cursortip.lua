@@ -311,12 +311,14 @@ options = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
 	},
 	featurehp = {
 		name = "Show HP on Features",
 		type = 'bool',
 		advanced = true,
+		noHotkey = true,
 		value = false,
 		desc = 'Shows healthbar for features.',
 		OnChange = function() 
@@ -338,12 +340,14 @@ options = {
 		name = "Show Tooltip for Units",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Show the tooltip for units.',
 	},
 	show_for_wreckage = {
 		name = "Show Tooltip for Wreckage",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Show the tooltip for wreckage and map features.',
 	},
 	show_for_unreclaimable = {
@@ -351,6 +355,7 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = false,
+		noHotkey = true,
 		desc = 'Show the tooltip for unreclaimable features.',
 	},
 	show_position = {
@@ -358,6 +363,7 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
+		noHotkey = true,
 		desc = 'Show the position tooltip, even when showing extended tooltips.',
 	},
 	show_unit_text = {
@@ -365,12 +371,14 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
+		noHotkey = true,
 		desc = 'Show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
 	},
 	showdrawtooltip = {
 		name = "Show Map-drawing Tooltip",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
 	},
 
@@ -378,6 +386,7 @@ options = {
 		name = "Show Terraform Tooltip",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Show terraform tooltip when performing terraform commands.',
 	},
 	
@@ -385,6 +394,7 @@ options = {
 		name = "Show Drawing Tools When Drawing",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		path = 'Settings/Interface/Mouse Cursor',
 		desc = 'Show pencil or eraser when drawing or erasing.',
 		OnChange = function(self)
@@ -415,6 +425,7 @@ options = {
 		name="Show Unit's Command",
 		type='bool',
 		value= false,
+		noHotkey = true,
 		desc = "Display current command on unit's icon (only for ungrouped unit selection)",
 		path = selPath,
 	},
@@ -434,6 +445,7 @@ options = {
 		name="Show Unit's Special Weapon Status",
 		type='bool',
 		value= true,
+		noHotkey = true,
 		desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
 		path = selPath,
 		OnChange = option_Deselect,
@@ -442,6 +454,7 @@ options = {
 		name="Always Show Selection Window",
 		type='bool',
 		value= false,
+		noHotkey = true,
 		desc = "Always show the selection window even if nothing is selected.",
 		path = selPath,
 		OnChange = function(self)
