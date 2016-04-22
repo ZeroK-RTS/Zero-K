@@ -564,6 +564,7 @@ options = {
 		value = true, 
 		desc = "Resets the HUD to the default next time this widget is initialized.",
 		advanced = true,
+		noHotkey = true,
 	},
 	presetlabel = {
 		name = "presetlabel",
