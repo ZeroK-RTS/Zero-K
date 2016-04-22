@@ -81,6 +81,7 @@ options = {
 		OnChange = function (self) 
 			lightsEnabled = self.value
 		end,
+		noHotkey = true,
 	},
 	light_override = {
 		name = "Override Parameters",
@@ -90,6 +91,7 @@ options = {
 		OnChange = function (self) 
 			doOverride = self.value
 		end,
+		noHotkey = true,
 		advanced = true
 	},
 	light_radius = {
