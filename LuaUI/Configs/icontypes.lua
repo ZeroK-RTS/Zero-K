@@ -815,11 +815,11 @@ local icontypes = {
   },
   gunshipscout = {
     bitmap='icons/gunshipscout.png',
-    size=1.8,
+    size=1.5,
   },
   gunshipspecial = {
     bitmap='icons/gunshipspecial.png',
-    size=1.8,
+    size=1.5,
   },
   gunshipraider = {
     bitmap='icons/gunshipraider.png',
@@ -848,6 +848,18 @@ local icontypes = {
   gunshiptransport_large = {
     bitmap='icons/gunshiptransport.png',
     size=3.2,
+  },
+  heavygunshipskirm = {
+    bitmap='icons/heavygunshipskirm.png',
+    size=2.4,
+  },
+  heavygunshiptransport = {
+    bitmap='icons/heavygunshiptransport.png',
+    size=2.4,
+  },
+  heavygunshipassault = {
+    bitmap='icons/heavygunshipassault.png',
+    size=2.4,
   },
   nebula = {
     bitmap='icons/nebula.dds',

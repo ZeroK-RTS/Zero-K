@@ -499,6 +499,11 @@ if (modOptions and modOptions.energymult) then
   end
 end
 
+if (modOptions and modOptions.metalmult) then
+	for name in pairs(UnitDefs) do
+		UnitDefs[name].metalmake = (UnitDefs[name].metalmake or 0) * modOptions.metalmult
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -794,6 +799,18 @@ for name, ud in pairs(UnitDefs) do
 		ud.initcloaked = false
 		ud.customparams.initcloaked = "1"
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Altered unit health mod option
+-- 
+
+if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
+    local hpMulti = modOptions.hpmult
+    for unitDefID, unitDef in pairs(UnitDefs) do
+        if unitDef.maxdamage then unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) end
+    end
 end
 
 --------------------------------------------------------------------------------

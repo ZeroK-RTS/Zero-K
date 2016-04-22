@@ -167,7 +167,7 @@ end
 
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
-	if Spring.IsCheatingEnabled() or destroy_type == 'debug' then
+	if Spring.IsCheatingEnabled() or destroy_type == 'debug' or gameover then
 		return
 	end
 	local allylist = spGetAllyTeamList()
@@ -222,7 +222,8 @@ local function DestroyAlliance(allianceID, skipCheck)
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
 		elseif destroy_type == 'destroy' then	-- kaboom
-			EchoUIMessage("Alliance " .. allianceID .. " has been destroyed!")
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
+			EchoUIMessage(name .. " has been destroyed!")
 			for i=1,#teamList do
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 

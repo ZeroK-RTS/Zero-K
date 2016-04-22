@@ -313,9 +313,9 @@ local function DrawWorldFunc()
 		sy = Spring.GetGroundHeight(sx, sz)
 
 		-- Draw the starting unit at start position
-		local rot = ((sx/Game.mapSizeX) > (sz/Game.mapSizeZ))
-			and (((1-(sx/Game.mapSizeX)) < (sz/Game.mapSizeZ)) and 270 or 0)
-			or (((1-(sx/Game.mapSizeX)) < (sz/Game.mapSizeZ)) and 180 or 90)
+		local rot = (math.abs(Game.mapSizeX/2 - sx) > math.abs(Game.mapSizeZ/2 - sz))
+			and ((sx>Game.mapSizeX/2) and 270 or 90)
+			or ((sz>Game.mapSizeZ/2) and 180 or 0)
 		DrawUnitDef(sDefID, myTeamID, sx, sy, sz, rot)
 
 		-- Draw start units build radius
