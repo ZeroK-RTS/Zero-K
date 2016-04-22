@@ -97,12 +97,14 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Bright units even at night',
+		noHotkey = true,
 	},
 	cycle = {
 		name = "Day/night cycle",
 		type = 'bool',
 		value = true,
 		desc = 'Enable day/night cycle',
+		noHotkey = true,
 	},
 	time = {
 		name = "Time of day",
@@ -135,6 +137,7 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Display searchlight beams',
+		noHotkey = true,
 	},
 	bases = {
 		name = "Searchlight Bases",
@@ -145,6 +148,7 @@ options = {
 			{ key = 'full', name = 'Full', },
 		},
 		value = 'full',
+		noHotkey = true,
 	},
 }
 
