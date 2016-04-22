@@ -49,6 +49,7 @@ options = {
 		advanced = false,
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Dock windows to screen edges and each other to prevent overlaps',
 	},
 	minimizeEnabled = {
@@ -56,6 +57,7 @@ options = {
 		advanced = false,
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'When enabled certain windows will have minimization tabs.',
 	},
 }

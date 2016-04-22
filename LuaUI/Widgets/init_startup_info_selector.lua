@@ -86,6 +86,7 @@ options = {
 		--desc = '',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self)
 			if trainerCheckbox then
 				trainerCheckbox.checked = self.value

@@ -60,6 +60,7 @@ options = {
 		desc = 'Enables a clickable progress bar for the replay.',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self) 
 			if (not Spring.IsReplay()) then
 				return
