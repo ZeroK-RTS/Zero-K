@@ -33,12 +33,14 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Use the tracks included with Zero-K',
+		noHotkey = true,
 	},
 	pausemusic = {
 		name='Pause Music',
 		type='bool',
 		value=false,
 		desc = "Music pauses with game",
+		noHotkey = true,
 	},
 }
 
