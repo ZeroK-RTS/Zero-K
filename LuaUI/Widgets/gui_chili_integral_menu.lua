@@ -98,27 +98,32 @@ options = {
 		name = 'Disable Smart Tab Select',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	hidetabs = {
 		name = 'Hide Tab Row',
 		type = 'bool',
 		advanced = true,
 		value = false,
+		noHotkey = true,
 	},
 	unitstabhotkey = {
-		name = 'Hotkey for Units tab',
+		name = 'Units tab hotkeys enabled',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	unitshotkeyrequiremeta = {
 		name = 'Units tab hotkeys require Meta',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	unitshotkeyaltaswell = {
 		name = 'Units tab can use Alt as Meta',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -146,11 +151,13 @@ options = {
 		type = 'bool',
 		advanced = true,
 		value = true,
+		noHotkey = true,
 	},
 	hide_when_spectating = {
 		name = 'Hide when Spectating',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 }
 
