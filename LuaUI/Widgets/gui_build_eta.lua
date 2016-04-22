@@ -38,6 +38,7 @@ options = {
 		name = 'Show only on shift',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	fontsize = {
 		name = 'Size',
