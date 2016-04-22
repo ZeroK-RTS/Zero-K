@@ -15,6 +15,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 
 local AreTeamsAllied = Spring.AreTeamsAllied
 local GetUnitHealth = Spring.GetUnitHealth
+local GetUnitCost = Spring.Utilities.GetUnitCost
 
 local reclaimListByTeam = {}
 local damageDealtByTeam = {}
@@ -35,7 +36,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		damage = damage + hp
 	end
 
-	local costdamage = (damage / maxHP) * Spring.Utilities.GetUnitCost(unitID, unitDefID)
+	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
 	if attackerTeam and not AreTeamsAllied(attackerTeam, unitTeam) then
 		damageDealtByTeam[attackerTeam] = damageDealtByTeam[attackerTeam] + costdamage
