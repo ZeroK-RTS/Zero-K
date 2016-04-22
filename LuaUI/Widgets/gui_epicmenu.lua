@@ -2182,7 +2182,10 @@ local function MakeMenuBar()
 								width=70,
 								trackColor = color.main_fg,
 								value = spGetConfigInt("snd_volmaster", 50),
-								OnChange = { function(self)	spSendCommands{"set snd_volmaster " .. self.value} end	},
+								OnChange = { function(self)
+									spSendCommands{"set snd_volmaster " .. self.value}
+									Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. self.value)
+								end	},
 							},
 							
 							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },

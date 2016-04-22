@@ -24,7 +24,7 @@ local function SetupTTS(enable)
 end 
 
 options_path = 'Settings/Audio/Text to Speech'
-options_order = {'enable', 'volume'}
+options_order = {'enable'}
 options = {
 	enable ={	
 		name = "Enable TTS (ZKL only)",
@@ -33,17 +33,6 @@ options = {
 		OnChange = function(self)
 			SetupTTS(self.value)
 			WG.textToSpeechCtrl = {ttsEnable = self.value,}
-		end,
-	},
-	volume ={	
-		name = "Volume",
-		type = 'number',
-		min = 1,
-		max = 100, 
-		step = 1,
-		value = 50,
-		OnChange = function(self)
-			Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. self.value)
 		end,
 	},
 }
