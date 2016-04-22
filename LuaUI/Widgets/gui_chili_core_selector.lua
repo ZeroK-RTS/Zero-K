@@ -366,8 +366,14 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
 		caption = '',
-		OnClick = {	function (self, x, y, mouse) 
-				local shift = select(4, GetModKeyState())
+		OnClick = {	function (self, x, y, mouse)
+				local _, _, meta, shift = Spring.GetModKeyState()
+				if meta then
+					WG.crude.OpenPath(options_path)
+					WG.crude.ShowMenu()
+					return true
+				end
+
 				SelectUnitArray({unitID}, shift)
 				if mouse == ((options.leftMouseCenter.value and 1) or 3) then
 					local x, y, z = Spring.GetUnitPosition(unitID)
@@ -1143,7 +1149,13 @@ function widget:Initialize()
 		y = 0,
 		width = (100/options.maxbuttons.value).."%",
 		height = "100%",
-		OnClick = {	function (self, x, y, mouse) 
+		OnClick = {	function (self, x, y, mouse)
+				local meta = select(3, Spring.GetModKeyState())
+				if meta then
+					WG.crude.OpenPath(options_path)
+					WG.crude.ShowMenu()
+					return true
+				end
 				if mouse == 1 then
 					SelectIdleCon()
 				elseif mouse == 3 and idleCons.count > 0 then
