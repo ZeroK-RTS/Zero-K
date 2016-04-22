@@ -47,6 +47,7 @@ options = {
 			{ key = 'k_haos_girl', name = 'K_haos_girl', 	icon='anims/k_haos_girl/cursornormal_0.png' },
 		},
 		value = 'zk',
+		noHotkey = true,
 	}
 }
 

@@ -65,6 +65,7 @@ options = {
 		type = 'bool',
 		desc = 'Highlight your allies\' selections with their team colors instead of the preset colors.',
 		value = false,
+    noHotkey = true,
 	},
 
 	thickness = {
