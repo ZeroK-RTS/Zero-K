@@ -299,6 +299,7 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
+		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	})	
 	
