@@ -35,6 +35,7 @@ options = {
 		desc = 'Show a hard circle rround enemy units',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			UpdateDrawList()
 		end

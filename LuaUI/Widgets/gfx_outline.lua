@@ -54,6 +54,7 @@ options = {
     type = 'bool',
     value = false,
     advanced = true,
+    noHotkey = true,
     OnChange = QualityChangeCheckFunc,
   },
 }

@@ -34,6 +34,7 @@ options = {
 			{key ='radar',  name='In radar, not in sight'},
 			{key ='never',  name='Never'},
 		},
+		noHotkey = true,
 		OnChange = forceUpdate,
 	},
 	enable_vertical_lines_water = {
@@ -46,6 +47,7 @@ options = {
 			{key ='radar',  name='In radar, not in sight'},
 			{key ='never',  name='Never'},
 		},
+		noHotkey = true,
 	},
 	enable_vertical_lines_ally = {
 		name = 'Show for allied units',
@@ -58,6 +60,7 @@ options = {
 			{key ='water',  name='Underwater'},
 			{key ='never',  name='None'},
 		},
+		noHotkey = true,
 	},
 }
 
