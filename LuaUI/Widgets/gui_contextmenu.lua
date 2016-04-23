@@ -121,6 +121,7 @@ options = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},

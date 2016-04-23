@@ -15,6 +15,7 @@ options = {
 		desc = 'Do constructor icons show chassis? Conveys more information but reduces visibility somewhat.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
 				Spring.SetUnitDefIcon(UnitDefNames["armrectr"].id, "builder")
@@ -44,6 +45,7 @@ options = {
 		desc = 'Do gunships use pictograms instead of the usual role icons?',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
 				Spring.SetUnitDefIcon(UnitDefNames["blastwing"].id, "gunshipspecial")

@@ -299,6 +299,7 @@ local pathMouse = 'Settings/Interface/Mouse Cursor'
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
+		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	})	
 	
@@ -325,6 +326,7 @@ local pathMisc = 'Settings/Misc'
 		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	})
 	AddOption(pathMisc,
 	{
@@ -332,6 +334,7 @@ local pathMisc = 'Settings/Misc'
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
 		type = 'bool',
 		advanced = true,
+		noHotkey = true,
 		value = false,
 	})
 	AddOption(pathMisc,
@@ -342,6 +345,7 @@ local pathMisc = 'Settings/Misc'
 				'\n(type "/luaui reload" to apply settings)',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function (self)
 			local value = (self.value and 1) or 0 --true = 1, false = 0
 			if self.value then

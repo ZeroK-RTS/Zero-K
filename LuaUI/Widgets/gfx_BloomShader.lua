@@ -17,7 +17,7 @@ end
 options_path = 'Settings/Graphics/Effects/Bloom'
 options = {
 
-	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,		},
+	dbgDraw 		= { type='bool', 	name='Draw Only Bloom Mask', 	value=false,	noHotkey = true,advanced = true,	},
 	
 	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.47,		min=0.001, max=3,step=0.001, 	},
 	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.7, 		min=0, max=1,step=0.001, 	},

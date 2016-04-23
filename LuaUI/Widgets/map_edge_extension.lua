@@ -75,12 +75,14 @@ options = {
 			drawingEnabled = (self.value == "texture") or (self.value == "grid") 
 			ResetWidget()
 		end,
+		noHotkey = true,
 	},
 	drawForIslands = {
 		name = "Draw for islands",
 		type = 'bool',
 		value = true,
 		desc = "Draws mirror map when map is an island",		
+		noHotkey = true,
 	},
 	useShader = {
 		name = "Use shader",
@@ -89,6 +91,7 @@ options = {
 		advanced = true,
 		desc = 'Use a shader when mirroring the map',
 		OnChange = ResetWidget,
+		noHotkey = true,
 	},
 	gridSize = {
 		name = "Heightmap tile size",
@@ -117,6 +120,7 @@ options = {
 		value = false,
 		desc = 'Blurs the edges of the map slightly to distinguish it from the extension.',
 		OnChange = ResetWidget,
+		noHotkey = true,
 	},
 	curvature = {
 		name = "Curvature Effect",
@@ -124,6 +128,7 @@ options = {
 		value = false,
 		desc = 'Add a curvature to the extension.',
 		OnChange = ResetWidget,
+		noHotkey = true,
 	},
 	
 }

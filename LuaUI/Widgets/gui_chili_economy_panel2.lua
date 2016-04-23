@@ -117,6 +117,7 @@ options = {
 		type  = 'bool', 
 		value = false,
 		advanced = true,
+		noHotkey = true,
 		desc = "Should the panel hide when spectating?",
 		OnChange = option_recreateWindow
 	},
@@ -125,12 +126,14 @@ options = {
 		type  = 'bool', 
 		value = false,
 		advanced = true,
+		noHotkey = true,
 		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
 	enableReserveBar = {
 		name  = 'Enable Reserve', 
 		type  = 'bool', 
 		value = true, 
+		noHotkey = true,
 		desc = "Ctrl+Click on the resource bars will set reserve when enabled. Low and Normal priority constructors cannot use resources in reserve storage."
 	},
 	defaultEnergyReserve = {
@@ -159,6 +162,7 @@ options = {
 		name  = "Colourblind mode",
 		type  = "bool", 
 		value = false, 
+		noHotkey = true,
 		OnChange = option_colourBlindUpdate, 
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},

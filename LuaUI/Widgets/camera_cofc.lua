@@ -32,6 +32,10 @@ local thirdperson_trackunit = false
 --------------------------------------------------------------------------------
 
 options_path = 'Settings/Camera/Camera Controls'
+local zoomPath = 'Settings/Camera/Camera Controls/Zoom Behaviour'
+local rotatePath = 'Settings/Camera/Camera Controls/Rotation Behaviour'
+local scrollPath = 'Settings/Camera/Camera Controls/Scroll Behaviour'
+local miscPath = 'Settings/Camera/Camera Controls/Misc'
 local cameraFollowPath = 'Settings/Camera/Camera Following'
 local minimap_path = 'Settings/HUD Panels/Minimap'
 options_order = { 
@@ -42,6 +46,8 @@ options_order = {
 	'leftRightEdge',
 
 	'middleMouseButton',
+	
+	'smoothness',
 	
 	'lblZoom',
 	-- 'zoomintocursor', 
@@ -72,7 +78,6 @@ options_order = {
 	'smoothmeshscroll', 
 	
 	'lblMisc',
-	'smoothness',
 	'fov',
 	'overviewmode', 
 	'overviewset',
@@ -116,10 +121,10 @@ local ApplyCenterBounds = function(cs) end
 options = {
 	
 	lblblank1 = {name='', type='label'},
-	lblRotate = {name='Rotation Behaviour', type='label'},
-	lblScroll = {name='Scroll Behaviour', type='label'},
-	lblZoom = {name='Zoom Behaviour', type='label'},
-	lblMisc = {name='Misc.', type='label'},
+	lblRotate = {name='Rotation Behaviour', type='label', path=rotatePath},
+	lblScroll = {name='Scroll Behaviour', type='label', path=scrollPath},
+	lblZoom = {name='Zoom Behaviour', type='label', path=zoomPath},
+	lblMisc = {name='Misc.', type='label', path=miscPath},
 	
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
@@ -136,6 +141,7 @@ options = {
 			{key = 'rotate', 		name='Rotate Camera'},
 			{key = 'off', 			name='Off'},
 		},
+		noHotkey = true,
 	},
 
 	leftRightEdge = {
@@ -148,6 +154,7 @@ options = {
 			{key = 'rotate', 		name='Rotate Camera'},
 			{key = 'off', 			name='Off'},
 		},
+		noHotkey = true,
 	},
 
 	middleMouseButton = {
@@ -160,7 +167,15 @@ options = {
 			{key = 'rotate', 		name='Rotate Camera'},
 			{key = 'off', 			name='Off'},
 		},
+		noHotkey = true,
 		advanced = true,
+	},
+	smoothness = {
+		name = 'Smoothness',
+		desc = "Controls how smooth the camera moves.",
+		type = 'number',
+		min = 0.0, max = 0.8, step = 0.1,
+		value = 0.2,
 	},
 	
 	
@@ -183,91 +198,37 @@ options = {
 			Reset Camera..... <Ctrl> + <Alt> + <Middleclick>
 		]],
 	},
-	smoothscroll = {
-		name = 'Smooth scrolling',
-		desc = 'Use smoothscroll method when mouse scrolling.',
-		type = 'bool',
-		value = false,
-	},
-	smoothmeshscroll = {
-		name = 'Smooth Mesh Scrolling',
-		desc = 'A smoother way to scroll. Applies to all types of mouse/keyboard scrolling.',
-		type = 'bool',
-		value = true,
-	},
-	
-	targetmouse = {
-		name = 'Rotate world origin at cursor',
-		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
-		type = 'bool',
-		value = true,
-	},
-	-- edgemove = {
-	-- 	name = 'Scroll camera at edge',
-	-- 	desc = 'Scroll camera when the cursor is at the edge of the screen.',
-	-- 	springsetting = 'WindowedEdgeMove',
-	-- 	type = 'bool',
-	-- 	value = true,
-		
-	-- },
-	speedFactor = {
-		name = 'Mouse scroll speed',
-		desc = 'This speed applies to scrolling with the middle button.',
-		type = 'number',
-		min = 10, max = 40,
-		value = 25,
-	},
-	speedFactor_k = {
-		name = 'Keyboard/edge scroll speed',
-		desc = 'This speed applies to edge scrolling and keyboard keys.',
-		type = 'number',
-		min = 1, max = 50,
-		value = 40,
-	},
+
 	zoominfactor = { --should be lower than zoom-out-speed to help user aim tiny units
 		name = 'Zoom-in speed',
 		type = 'number',
 		min = 0.1, max = 1, step = 0.05,
 		value = 0.5,
+		path = zoomPath,
 	},
 	zoomoutfactor = { --should be higher than zoom-in-speed to help user escape to bigger picture
 		name = 'Zoom-out speed',
 		type = 'number',
 		min = 0.1, max = 1, step = 0.05,
 		value = 0.8,
+		path = zoomPath,
 	},
 	invertzoom = {
 		name = 'Invert zoom',
 		desc = 'Invert the scroll wheel direction for zooming.',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+		path = zoomPath,
 	},
 	invertalt = {
 		name = 'Invert altitude',
 		desc = 'Invert the scroll wheel direction for altitude.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
+		path = zoomPath,
 	},
-  inverttilt = {
-		name = 'Invert tilt',
-		desc = 'Invert the tilt direction when using ctrl+mousewheel.',
-		type = 'bool',
-		value = false,
-	},
-    
-	-- zoomoutfromcursor = {
-	-- 	name = 'Zoom out from cursor',
-	-- 	desc = 'Zoom out from the cursor rather than center of the screen.',
-	-- 	type = 'bool',
-	-- 	value = false,
-	-- },
-	-- zoomintocursor = {
-	-- 	name = 'Zoom in to cursor',
-	-- 	desc = 'Zoom in to the cursor rather than the center of the screen.',
-	-- 	type = 'bool',
-	-- 	value = true,
-	-- },
-
 	zoomin = {
 		name = 'Zoom In',
 		type = 'radioButton',
@@ -276,8 +237,9 @@ options = {
 			{key = 'toCursor', 		name='To Cursor'},
 			{key = 'toCenter', 		name='To Screen Center'},
 		},
+		noHotkey = true,
+		path = zoomPath,
 	},
-
 	zoomout = {
 		name = 'Zoom Out',
 		type = 'radioButton',
@@ -286,8 +248,9 @@ options = {
 			{key = 'fromCursor', 		name='From Cursor'},
 			{key = 'fromCenter', 		name='From Screen Center'},
 		},
+		noHotkey = true,
+		path = zoomPath,
 	},
-
 	zoomouttocenter = {
 		name = 'Zoom out to center',
 		desc = 'Center the map as you zoom out.',
@@ -301,18 +264,24 @@ options = {
 				OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
 			end
 		end,
+		noHotkey = true,
+		path = zoomPath,
 	},
 	drifttocenter = {
 		name = 'Drift zoom target to center',
 		desc = 'Moves object under cursor to screen center. Only works when zooming to cursor.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
+		path = zoomPath,
 	},
 	tiltedzoom = {
 		name = 'Tilt camera while zooming',
 		desc = 'Have the camera tilt while zooming. Camera faces ground when zoomed out, and looks out nearly parallel to ground when fully zoomed in',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+		path = zoomPath,
 	},
 
 	rotfactor = {
@@ -320,6 +289,7 @@ options = {
 		type = 'number',
 		min = 0.001, max = 0.020, step = 0.001,
 		value = 0.005,
+		path = rotatePath,
 	},	
 	-- rotateonedge = {
 	-- 	name = "Rotate camera at edge",
@@ -327,14 +297,91 @@ options = {
 	-- 	type = 'bool',
 	-- 	value = false,
 	-- },
-    
-	smoothness = {
-		name = 'Smoothness',
-		desc = "Controls how smooth the camera moves.",
-		type = 'number',
-		min = 0.0, max = 0.8, step = 0.1,
-		value = 0.2,
+	-- restrictangle = {
+	-- 	name = "Restrict Camera Angle",
+	-- 	desc = "If disabled you can point the camera upward, but end up with strange camera positioning.",
+	-- 	type = 'bool',
+	-- 	advanced = true,
+	-- 	value = true,
+	-- 	OnChange = function(self) init = true; end,
+	-- 	noHotkey = true,
+	-- },
+	targetmouse = {
+		name = 'Rotate world origin at cursor',
+		desc = 'Rotate world using origin at the cursor rather than the center of screen.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		path = rotatePath,
 	},
+  inverttilt = {
+		name = 'Invert tilt',
+		desc = 'Invert the tilt direction when using ctrl+mousewheel.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = rotatePath,
+	},
+	groundrot = {
+		name = "Rotate When Camera Hits Ground",
+		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
+		type = 'bool',
+		value = true,
+		advanced = true,
+		noHotkey = true,
+		path = rotatePath,
+	},
+
+	speedFactor = {
+		name = 'Mouse scroll speed',
+		desc = 'This speed applies to scrolling with the middle button.',
+		type = 'number',
+		min = 10, max = 40,
+		value = 25,
+		path = scrollPath,
+	},
+	speedFactor_k = {
+		name = 'Keyboard/edge scroll speed',
+		desc = 'This speed applies to edge scrolling and keyboard keys.',
+		type = 'number',
+		min = 1, max = 50,
+		value = 40,
+		path = scrollPath,
+	},
+	invertscroll = {
+		name = "Invert scrolling direction",
+		desc = "Invert scrolling direction (doesn't apply to smoothscroll).",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		path = scrollPath,
+	},
+	smoothscroll = {
+		name = 'Smooth scrolling',
+		desc = 'Use smoothscroll method when mouse scrolling.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		path = scrollPath,
+	},
+	smoothmeshscroll = {
+		name = 'Smooth Mesh Scrolling',
+		desc = 'A smoother way to scroll. Applies to all types of mouse/keyboard scrolling.',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		path = scrollPath,
+	},
+    
+	-- mingrounddist = {
+	-- 	name = 'Minimum Ground Distance',
+	-- 	desc = 'Getting too close to the ground allows strange camera positioning.',
+	-- 	type = 'number',
+	-- 	advanced = true,
+	-- 	min = 0, max = 100, step = 1,
+	-- 	value = 1,
+	-- 	OnChange = function(self) init = true; end,
+	-- },
 	fov = {
 		name = 'Field of View (Degrees)',
 		--desc = "FOV (25 deg - 100 deg).",
@@ -342,21 +389,38 @@ options = {
 		min = 10, max = 100, step = 5,
 		value = Spring.GetCameraFOV(),
 		springsetting = 'CamFreeFOV', --save stuff in springsetting. reference: epicmenu_conf.lua
-		OnChange = function(self) SetFOV(self.value) end
+		OnChange = function(self) SetFOV(self.value) end,
+		path=miscPath,
 	},
-	invertscroll = {
-		name = "Invert scrolling direction",
-		desc = "Invert scrolling direction (doesn't apply to smoothscroll).",
+	overviewmode = {
+		name = "COFC Overview",
+		desc = "Go to overview mode, then restore view to cursor position.",
+		type = 'button',
+		hotkey = {key='tab', mod=''},
+		OnChange = function(self) OverviewAction() end,
+		path=miscPath,
+	},
+	overviewset = {
+		name = "Set Overview Viewpoint",
+		desc = "Save the current view as the new overview mode viewpoint. Use 'Reset Camera' to remove it.",
+		type = 'button',
+		OnChange = function(self) OverviewSetAction() end,
+		path=miscPath,
+	},
+	rotatebackfromov = {
+		name = "Rotate Back From Overview",
+		desc = "When returning from overview mode, rotate the camera to its original position (only applies when you have set an overview viewpoint).",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+		path=miscPath,
 	},
-	restrictangle = {
-		name = "Restrict Camera Angle",
-		desc = "If disabled you can point the camera upward, but end up with strange camera positioning.",
-		type = 'bool',
-		advanced = true,
-		value = true,
-		OnChange = function(self) init = true; end
+	resetcam = {
+		name = "Reset Camera",
+		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Middleclick>",
+		type = 'button',
+        -- OnChange defined later
+		path=miscPath,
 	},
 	freemode = {
 		name = "FreeMode (risky)",
@@ -365,50 +429,9 @@ options = {
 		advanced = true,
 		value = false,
 		OnChange = function(self) init = true; end,
+		noHotkey = true,
+		path=miscPath,
 	},
-	mingrounddist = {
-		name = 'Minimum Ground Distance',
-		desc = 'Getting too close to the ground allows strange camera positioning.',
-		type = 'number',
-		advanced = true,
-		min = 0, max = 100, step = 1,
-		value = 1,
-		OnChange = function(self) init = true; end,
-	},
-	
-	overviewmode = {
-		name = "COFC Overview",
-		desc = "Go to overview mode, then restore view to cursor position.",
-		type = 'button',
-		hotkey = {key='tab', mod=''},
-		OnChange = function(self) OverviewAction() end,
-	},
-	overviewset = {
-		name = "Set Overview Viewpoint",
-		desc = "Save the current view as the new overview mode viewpoint. Use 'Reset Camera' to remove it.",
-		type = 'button',
-		OnChange = function(self) OverviewSetAction() end,
-	},
-	rotatebackfromov = {
-		name = "Rotate Back From Overview",
-		desc = "When returning from overview mode, rotate the camera to its original position (only applies when you have set an overview viewpoint).",
-		type = 'bool',
-		value = true,
-	},
-	resetcam = {
-		name = "Reset Camera",
-		desc = "Reset the camera position and orientation. Map a hotkey or use <Ctrl> + <Alt> + <Middleclick>",
-		type = 'button',
-        -- OnChange defined later
-	},
-	groundrot = {
-		name = "Rotate When Camera Hits Ground",
-		desc = "If world-rotation motion causes the camera to hit the ground, camera-rotation motion takes over. Doesn't apply in Free Mode.",
-		type = 'bool',
-		value = true,
-		advanced = true,
-	},
-	
 	
 	
 	-- follow cursor

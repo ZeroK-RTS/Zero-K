@@ -30,6 +30,7 @@ options = {
 		name = "Enable TTS (ZKL only)",
 		desc = "Ally chat will be read aloud.",
 		type = 'bool', value = true, 
+		noHotkey = true,
 		OnChange = function(self)
 			SetupTTS(self.value)
 			WG.textToSpeechCtrl = {ttsEnable = self.value,}

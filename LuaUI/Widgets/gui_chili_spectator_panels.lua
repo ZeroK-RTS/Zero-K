@@ -143,6 +143,7 @@ options = {
 		type  = "bool", 
 		value = false, 
 		OnChange = function(self) option_CheckEnable(self) end, 
+		noHotkey = true,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
 	clanNameLengthCutoff = {
@@ -232,6 +233,7 @@ options = {
 		name  = "Colourblind mode",
 		type  = "bool", 
 		value = false, 
+		noHotkey = true,
 		OnChange = option_ColourBlindUpdate, 
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},

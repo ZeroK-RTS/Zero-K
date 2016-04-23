@@ -19,6 +19,7 @@ options = {
 		name = "Simple Colors",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'All allies are green, all enemies are red.',
 		OnChange = function() widget:Initialize() end
 	},

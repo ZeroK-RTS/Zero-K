@@ -148,6 +148,8 @@ options_order = {
 	'buttonsOnRight', 
 	'hidebuttons', 
 	'minimizable',
+	'lblblank1',
+
 	'leftClickOnMinimap', 
 	'fadeMinimapOnZoomOut', 
 }
@@ -222,12 +224,14 @@ options = {
 		desc = "Game starts with Line of Sight Overlay enabled",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	start_with_showeco = {
 		name = "Start with economy overly",
 		desc = "Game starts with Economy Overlay enabled",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self)
 			if (self.value) then
 				WG.showeco = self.value
@@ -385,6 +389,7 @@ options = {
 			end 
 		end,
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	opacity = {
 		name = "Opacity",
@@ -409,6 +414,7 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
@@ -416,6 +422,7 @@ options = {
 		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},
 	hidebuttons = {
 		name = 'Hide Minimap Buttons',
@@ -427,6 +434,7 @@ options = {
 		end,
 		value = false,
 		path = minimap_path,
+		noHotkey = true,
 	},
 	minimizable = {
 		name = 'Minimizable',
@@ -434,7 +442,9 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},
+	lblblank1 = {name=' ', type='label'},
 	leftClickOnMinimap = {
 		name = 'Left Click Behaviour',
 		type = 'radioButton',
@@ -445,6 +455,7 @@ options = {
 			{key='camera', name='Camera Movement'},
 		},
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	fadeMinimapOnZoomOut = {
 		name = "Minimap fading when zoomed out",
@@ -459,6 +470,7 @@ options = {
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed, for the background opacity
 			end,
 		path = minimap_path,
+		noHotkey = true,
 	},
 	--[[
 	simpleMinimapColors = {

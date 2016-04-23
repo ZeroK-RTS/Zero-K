@@ -139,6 +139,7 @@ options = {
 			{key ='never',  name='Always disabled'},
 		},
 		OnChange = CheckHide,
+		noHotkey = true,
 	},
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
@@ -155,18 +156,21 @@ options = {
 		name = 'Track idle comms',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function() RefreshConsList() end,		
 	},
 	monitoridlenano = {
 		name = 'Track idle nanotowers',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function() RefreshConsList() end,		
 	},
 	monitorInbuiltCons = {
 		name = 'Track constructors being built',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function() RefreshConsList() end,		
 	},
 	leftMouseCenter = {
@@ -174,6 +178,7 @@ options = {
 		desc = 'When enabled left click a commander or factory to center the camera on it. When disabled right click centers.',
 		type = 'bool',
 		value = false,		
+		noHotkey = true,
 	},
 	selectprecbomber = { type = 'button',
 		name = 'Select precision bomber',

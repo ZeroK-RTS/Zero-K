@@ -33,18 +33,21 @@ options = {
 		name = "Rank Limit",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Units make comments only to newbies.',
 	},
 	warnExpensiveUnits = {
 		name = "Warning for Expensive Units",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Units complain about expensive units made early game.',
 	},
 	cartoonBubbles = {
 		name = "Cartoon Bubbles",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Use cartoon bubbles + font instead of a standard panel.',
 	}
 }
