@@ -45,7 +45,7 @@ local spGetUnitHealth	= Spring.GetUnitHealth
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Audio/Unit Replies'
+options_path = 'Settings/Audio'
 options_order = { 
 'selectnoisevolume','ordernoisevolume','attacknoisevolume', 
 }

@@ -26,7 +26,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Audio/Music'
+options_path = 'Settings/Audio'
 options = {
 	useIncludedTracks = {
 		name = "Use Included Tracks",

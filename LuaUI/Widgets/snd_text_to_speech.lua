@@ -15,35 +15,46 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function SetupTTS(enable)
-	if (enable and not Spring.GetSpectatingState()) then 
-		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
-	else 
+local function SetupTTS (value)
+	value = math.floor(value * Spring.GetConfigInt("snd_volmaster", 50) / 100)
+	if (value == 0) then
 		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
-	end 
-end 
+		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME 0")
+		WG.textToSpeechCtrl = {ttsEnable = false,}
+	else
+		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " ENABLE TTS")
+		Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. value)
+		WG.textToSpeechCtrl = {ttsEnable = true,}
+	end
+end
 
-options_path = 'Settings/Audio/Text to Speech'
-options_order = {'enable'}
+options_path = 'Settings/Audio'
+options_order = {'tts_vol'}
 options = {
-	enable ={	
-		name = "Enable TTS (ZKL only)",
-		desc = "Ally chat will be read aloud.",
-		type = 'bool', value = true, 
+	tts_vol = {
+		name = "Text-to-speech volume",
+		desc = "TTS reads the ally chat.",
+		type = 'number',
+		min = 0, max = 100, 
+		value = 50, step = 1,
 		noHotkey = true,
 		OnChange = function(self)
 			SetupTTS(self.value)
-			WG.textToSpeechCtrl = {ttsEnable = self.value,}
 		end,
 	},
 }
 
 function widget:Initialize()
-	SetupTTS(options.enable.value)
-	WG.textToSpeechCtrl = {ttsEnable = options.enable.value,} --allow other widget to get value from this widget. ie: gui_chili_rejoin_progress.lua. We didn't declare it at outside because we doesn't want "WG.textToSpeechCtrl" to be initialize first without widget being enabled first.
-end 
+	SetupTTS (options.tts_vol.value)
+end
+
+local function ttsNotify()
+	SetupTTS (options.tts_vol.value)
+end
+
+WG.ttsNotify = ttsNotify
 
 function widget:Shutdown()
-	Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
+	Spring.Echo (Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " DISABLE TTS")
 	WG.textToSpeechCtrl = nil
 end

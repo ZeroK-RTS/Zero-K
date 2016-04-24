@@ -2184,7 +2184,7 @@ local function MakeMenuBar()
 								value = spGetConfigInt("snd_volmaster", 50),
 								OnChange = { function(self)
 									spSendCommands{"set snd_volmaster " .. self.value}
-									Spring.Echo(Spring.GetPlayerInfo(Spring.GetMyPlayerID()) .. " TTS VOLUME " .. self.value)
+									if WG.ttsNotify then WG.ttsNotify() end
 								end	},
 							},
 							
