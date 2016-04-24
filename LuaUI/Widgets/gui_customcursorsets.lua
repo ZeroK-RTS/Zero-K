@@ -25,28 +25,18 @@ function SetCursor(cursorSet) end
 
 options_path = 'Settings/Interface/Mouse Cursor'
 options = {
-	cursorsets = {
-		name = 'Cursor Sets',
-		type = 'radioButton',
+	cursor_animated = {
+		name = 'Extended cursor animation',
+		desc = 'Some cursors get more varied animations. WARNING: won\'t render cursors at all on some older graphics cards!',
+		type = 'bool',
+		value = false,
 		OnChange = function (self) 
-			if self.value == 'zk' then
+			if not self.value then
 				RestoreCursor()
 			else
-				SetCursor( self.value ); 
+				SetCursor('zk_large'); 
 			end
 		end,
-		items = {
-			{ key = 'zk', name = 'Animated', 		icon='anims/cursornormal_0.png' },
-			{ key = 'zk_static', name = 'Static', 	icon='anims/cursornormal_0.png' },
-			{ key = 'zk_large', name = 'Large Animated', icon='anims/cursornormal_0.png' },
-			{ key = 'ca', name = 'CA Classic', 		icon='anims/ca/cursornormal_0.png' },
-			{ key = 'ca_static', name = 'CA Static', 		icon='anims/ca/cursornormal_0.png' },
-			{ key = 'erom', name = 'Erom', 			icon='anims/erom/cursornormal_0.png' },
-			{ key = 'masse', name = 'Masse', 		icon='anims/masse/cursornormal_0.png' },
-			{ key = 'Lathan', name = 'Lathan', 		icon='anims/lathan/cursornormal_0.png' },
-			{ key = 'k_haos_girl', name = 'K_haos_girl', 	icon='anims/k_haos_girl/cursornormal_0.png' },
-		},
-		value = 'zk',
 		noHotkey = true,
 	}
 }
@@ -107,10 +97,10 @@ end
 	if ( key == KEYSYMS.F5) then
 		if Spring.IsGUIHidden() then
 			
-			if options.cursorsets.value == 'zk' then
+			if not options.cursor_animated.value then
 				RestoreCursor()
 			else
-				SetCursor( options.cursorsets.value )
+				SetCursor( 'zk_large' )
 			end
 			
 		else
