@@ -60,7 +60,7 @@ local SIG_SPEED_CONTROL = 4
 local takeoffHeight = UnitDefNames["corshad"].wantedHeight
 local fullHeight = UnitDefNames["corshad"].wantedHeight/1.5
 
-local minSpeedMult = 0.5
+local minSpeedMult = 0.75
 
 local function BehaviourChangeThread(behaviour)
 	Signal(SIG_CHANGE_FLY_HEIGHT)
