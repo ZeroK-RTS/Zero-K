@@ -107,7 +107,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Tarantula]],
+      description      = [[Wreckage - Redback]],
       blocking         = true,
       damage           = 900,
       energy           = 0,
@@ -121,7 +121,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Tarantula]],
+      description      = [[Debris - Redback]],
       blocking         = false,
       damage           = 900,
       energy           = 0,
