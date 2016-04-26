@@ -38,6 +38,8 @@ unitDef = {
 	boost_accel_mult = 6,
 	boost_duration = 30, -- frames
 
+	fighter_pullup_dist = 400,
+
 	midposoffset   = [[0 3 0]],
 	modelradius    = [[5]],
 	refuelturnradius = [[80]],
