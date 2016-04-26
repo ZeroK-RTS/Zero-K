@@ -726,6 +726,7 @@ function widget:GameFrame(n)
 		if units then
 			for i = 1, #units do
 				widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), team, nil)
+				widget:UnitFinished(units[i], Spring.GetUnitDefID(units[i]), team)
 			end
 		end
 		widgetHandler:RemoveCallIn("GameFrame")
