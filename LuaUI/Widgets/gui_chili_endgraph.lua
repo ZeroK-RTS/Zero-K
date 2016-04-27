@@ -4,12 +4,6 @@
 		Implement camera control to pan in the background while viewing graph,
 		Add minimize option
 		Come up with better way of handling specs, active players and players who died (currently doesn't show players who have died
-
-	Graph Ideas:
-		Total metal in units and/or buildings
-		Total metal in units/# of units, (Average cost of units)
-		Metal spent - damage recieved = total metal in units?
-
 ]]
 function widget:GetInfo() return {
 	name    = "EndGame Stats",
@@ -49,11 +43,8 @@ local rulesParamStats = {
 }
 
 local graphLength = 0
---local gameOver = false
-local isDelta = false
+local usingAllyteams = false
 local curGraph = {}
-
-local echo = Spring.Echo
 
 -- CHILI CONTROLS
 local Chili, window0, graphPanel, graphSelect, graphLabel, graphTime
@@ -110,20 +101,27 @@ local function drawGraph(graphArray, graph_m, teamID)
 	if #graphArray == 0 then
 		return
 	end
-	--get's all the needed info about players and teams
-	local _,teamLeader,isDead,isAI = Spring.GetTeamInfo(teamID)
-	local playerName, isActive, isSpec = Spring.GetPlayerInfo(teamLeader)
-	local r,g,b,a = Spring.GetTeamColor(teamID)
+
+	local r,g,b,a = Spring.GetTeamColor( usingAllyteams
+		and ((teamID == Spring.GetMyAllyTeamID())
+			and Spring.GetMyTeamID()
+			or Spring.GetTeamList(teamID)[1])
+		or teamID
+	)
 	local teamColor = {r,g,b,a}
 	local lineLabel = numFormat(graphArray[#graphArray])
-	local shortName
-	if not playerName then --become NIL if player resigned (when player resigned their teamID change to 0 into spectator team)
-		playerName = playerNames[teamID]
-	end
-	--Sets AI name to reflect AI used and player hosting it
-	if isAI then
-		local _,botID,_,shortName = Spring.GetAIInfo(teamID)
-		playerName = shortName .."-" .. botID .. ""
+
+	local name = ""
+	if usingAllyteams then
+		name = Spring.GetGameRulesParam("allyteam_long_name_" .. teamID)
+	else
+		local _,playerID,_,isAI = Spring.GetTeamInfo(teamID)
+		if isAI then
+			local _,botID,_,shortName = Spring.GetAIInfo(teamID)
+			name = (shortName or "Bot") .." - " .. (botID or "")
+		else
+			name = Spring.GetPlayerInfo(playerID) or playerNames[teamID] or "???"
+		end
 	end
 
 	for i=1, #graphArray do
@@ -142,7 +140,7 @@ local function drawGraph(graphArray, graph_m, teamID)
 	local label1 = Chili.Label:New{parent = lineLabels, y = (1 - graphArray[#graphArray]/graph_m) * 88 - 1 .. "%", width = "100%", caption = lineLabel, font = {color = teamColor}}
 
 	--adds player to Legend
-	local label2 = Chili.Label:New{parent = graphPanel, x = 55, y = (teamID)*20 + 5, width = "100%", height  = 20, caption = playerName, font = {color = teamColor}}
+	local label2 = Chili.Label:New{parent = graphPanel, x = 55, y = (teamID)*20 + 5, width = "100%", height  = 20, caption = name, font = {color = teamColor}}
 
 	--creates graph element
 	local graph = Chili.Control:New{
@@ -174,10 +172,9 @@ end
 local function getEngineArrays(statistic, labelCaption)
 	local teamScores = {}
 	local teams	= Spring.GetTeamList()
-	local teams = (#teams - 1)
 	local graphLength = Spring.GetTeamStatsHistory(0)-1
-	local time = Spring.GetTeamStatsHistory(0, 0, graphLength)
-	local time = time[graphLength]["time"]
+	local generalHistory = Spring.GetTeamStatsHistory(0, 0, graphLength)
+	local time = generalHistory[graphLength]["time"]
 	--Applies label of the selected graph at bottom of window
 	graphLabel:SetCaption(labelCaption)
 	
@@ -188,81 +185,144 @@ local function getEngineArrays(statistic, labelCaption)
 	--finds highest stat out all the player stats, i.e. the highest point of the graph
 	local teamScores = {}
 	local graphMax = 0
-	for a=0, teams do
-		local temp = {}
+	local gaia = usingAllyteams
+		and select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
+		or Spring.GetGaiaTeamID()
+
+	for i=1, #teams do
+		local teamID = teams[i]
+		local effectiveTeam = usingAllyteams
+			and select(6, Spring.GetTeamInfo(teamID))
+			or teamID
+
+		teamScores[effectiveTeam] = teamScores[effectiveTeam] or {}
 		local stats
 		if rulesParamStats[statistic] then
 			stats = {}
 			for i = 0, graphLength do
 				stats[i] = {}
-				stats[i][statistic] = Spring.GetTeamRulesParam(a, "stats_history_" .. statistic .. "_" .. i) or 0
+				stats[i][statistic] = Spring.GetTeamRulesParam(teamID, "stats_history_" .. statistic .. "_" .. i) or 0
 			end
 		else
-			stats = Spring.GetTeamStatsHistory(a, 0, graphLength)
+			stats = Spring.GetTeamStatsHistory(teamID, 0, graphLength)
 		end
-		for b=1, graphLength - 1 do
-			temp[b] = stats[b][statistic]
-			if isDelta then temp[b] = stats[b+1][statistic] - stats[b][statistic] end
-			if (graphMax < temp[b]) then graphMax = temp[b] end --TODO: check for to see if team has any stats, if not don't show
+		for b = 1, graphLength do
+			teamScores[effectiveTeam][b] = (teamScores[effectiveTeam][b] or 0) + stats[b][statistic]
+			if graphMax < teamScores[effectiveTeam][b] then
+				graphMax = teamScores[effectiveTeam][b]
+			end
 		end
-		teamScores[a] = temp
 	end
+
 	if graphMax > 5 then drawIntervals(graphMax) end
-	for a=0, teams-1 do -- teams-1 because gaia is the last team.
-		drawGraph(teamScores[a], graphMax, a)	--Applies per player elements
+
+	for k, v in pairs(teamScores) do
+		if k ~= gaia then
+			drawGraph(v, graphMax, k)
+		end
 	end
 	fixLabelAlignment()
 end
------------------------------------------------------------------------
--- Starting point: Draws all the main elements which are later tailored
+
+function widget:GameFrame(n)
+	-- remember people's names in case they leave
+	if n > 0 then
+		local teams	= Spring.GetTeamList()
+		for i = 1, #teams do
+			local teamID = teams[i]
+			playerNames[teamID] = Spring.GetPlayerInfo(select(2, Spring.GetTeamInfo(teamID)))
+		end
+		widgetHandler:RemoveCallIn("GameFrame")
+	end
+end
+
 function loadpanel()
 	Chili = WG.Chili
 	local screen0 = Chili.Screen0
-	local selW  = 150
-	--window0 		= Chili.Window:New{parent = screen0, x = "20%", y = "20%", width = "60%", height = "60%", padding = {5,5,5,5}}
-	window0 		= Chili.Panel:New{x = "0", y = "0", width = "100%", height = "100%", padding = {5,5,5,5}}
+	local selW = 150
 
-	lineLabels 	= Chili.Control:New{parent = window0, right = 0, y = 0, width = 37, height = "100%", padding = {0,0,0,0},}
-	graphSelect	= Chili.StackPanel:New{
-		minHeight = 70, parent = window0, x =  0, y = 0, width = selW, height = "100%", padding = {0,0,0,0},
-		itemMargin = {0, 0, 0, 0},
-		resizeItems=true,}
-	graphPanel 	= Chili.Panel:New{parent = window0, x = selW, right = 30, y = 0, bottom = 40, padding = {10,10,10,10}}
-	graphLabel  = Chili.Label:New{autosize = true, parent = window0, bottom = 5,caption = "", align = "center", width = "70%", x = "20%", height = 30, font = {size = 30,},}
-	graphTime		= Chili.Label:New{parent = window0, bottom = 25,caption = "", width = 50, right = 50, height = 10}
+	window0 = Chili.Panel:New {
+		x = "0", y = "0",
+		width = "100%", height = "100%",
+		padding = {5,5,5,5}
+	}
+	lineLabels 	= Chili.Control:New {
+		parent = window0,
+		right = 0, y = 0,
+		width = 37, height = "100%",
+		padding = {0,0,0,0},
+	}
+	graphSelect	= Chili.StackPanel:New {
+		parent = window0,
+		minHeight = 70,
+		x = 0, y = 0,
+		width = selW, height = "100%",
+		padding = {0,0,0,0},
+		itemMargin = {0,0,0,0},
+		resizeItems = true,
+	}
+	graphPanel = Chili.Panel:New {
+		parent = window0,
+		x = selW, right = 30,
+		y = 0, bottom = 40,
+		padding = {10,10,10,10}
+	}
+	graphLabel = Chili.Label:New {
+		parent = window0,
+		caption = "",
+		x = "20%", bottom = 5,
+		width = "70%", height = 30, 
+		align = "center",
+		autosize = true,
+		font = {size = 30,},
+	}
+	graphTime = Chili.Label:New {
+		parent = window0,
+		bottom = 25, right = 50,
+		width = 50, height = 10,
+		caption = "",
+	}
 
-	for a=1, #buttons do
-		local engineButton =	Chili.Button:New{name = buttons[a][1], caption = buttons[a][2], parent = graphSelect, OnClick = {
-			function(obj) graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(obj.name,obj.caption);end}}
+	for i = 1, #buttons do
+		local engineButton = Chili.Button:New {
+			name = buttons[i][1],
+			caption = buttons[i][2],
+			parent = graphSelect,
+			OnClick = { function(obj)
+				graphPanel:ClearChildren()
+				lineLabels:ClearChildren()
+				getEngineArrays(obj.name,obj.caption)
+			end }
+		}
 	end
-	
-	--[[
-	local exitButton = Chili.Button:New{name = "exit", caption = "Exit", bottom = 0, right = 0, height = 30, width = 40 , parent = window0, OnClick = {
-		function() Spring.SendCommands("quit");end}}
-	local exitButton = Chili.Button:New{caption = "Delta", bottom = 0, right = 45, height = 30, width = 50 , parent = window0, OnClick = {
-		function()  isDelta = not isDelta; if curGraph.name then graphPanel:ClearChildren();lineLabels:ClearChildren();getEngineArrays(curGraph.name,curGraph.caption)end;end}}
---]]
+
+	local allyToggle = Chili.Checkbox:New {
+		parent = window0,
+		caption = " ",
+		right = 32, bottom = 2,
+		checked = false,
+		OnClick = { function()
+			usingAllyteams = not usingAllyteams
+			if curGraph.name then
+				graphPanel:ClearChildren()
+				lineLabels:ClearChildren()
+				getEngineArrays(curGraph.name,curGraph.caption)
+			end
+		end}
+	}
+
+	local allyToggleLabel = Chili.Label:New {
+		parent = window0,
+		caption = "Teams",
+		bottom = 5, right = 50,
+		width = 50, height = 10,
+		align = "right",
+	}
+
 	WG.statsPanel = window0
 end
 
---to do: possible to run from start when playing as spec
-function widget:GameFrame(n)
-	if n>0 then
-		--remember playerName (specifically: leader's name) for each teamID as soon as possible. At end-game some player might become spectator and loose their original teamID
-		local teams	= Spring.GetTeamList()
-		local teams = (#teams - 1)
-		for teamID=0, teams do
-			local _,teamLeader,_ = Spring.GetTeamInfo(teamID)
-			playerNames[teamID],_ = Spring.GetPlayerInfo(teamLeader)
-			--Spring.Echo(playerNames[teamID])
-		end
-		widgetHandler:RemoveCallIn("GameFrame") -- remove GameFrame call-in since it only need to run once.
-	end
-end
-
 function widget:GameOver()
-	--gameOver = true
-	Spring.SendCommands("endgraph 0")
+	Spring.SendCommands ("endgraph 0")
 	loadpanel()
 end
-
