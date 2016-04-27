@@ -24,7 +24,7 @@ uniform mat4 viewProjectionInv;
 float attentuate(float dist, float radius)
 	{
 		//float att = clamp ( constant-linear * dist / radius - squared * dist * dist / (radius*radius),0.0,.5);
-		float att = clamp(0.7 - 0.3 * dist / radius - 1 * dist * dist / (radius * radius), 0.0, 1.0);
+		float att = clamp(0.7 - 0.3 * dist / radius - 1.0 * dist * dist / (radius * radius), 0.0, 1.0);
 		att *= att;
 		return att;
 	}
@@ -43,7 +43,7 @@ void main(void)
 		map_normals4 = model_normals4;
 		mappos4 = modelpos4;
 		model_lighting_multiplier=1.5;
-		specularHighlight= specularHighlight + 2*model_extra4.g;
+		specularHighlight= specularHighlight + 2.0*model_extra4.g;
 		}
 	}
 	mappos4 = viewProjectionInv * mappos4;
@@ -88,7 +88,7 @@ void main(void)
 		float dist_light_here = length(v - w);
 		light_direction = normalize(w.xyz - mappos4.xyz);
 		float cosphi = max(0.0 , dot (normalize(map_normals4.xyz), light_direction));
-		//float attentuation = max(0, (1 * LIGHT_CONSTANT - LIGHT_SQUARED * (dist_light_here * dist_light_here) / (LIGHTRADIUS * LIGHTRADIUS) - LIGHT_LINEAR * (dist_light_here) / (LIGHTRADIUS)));
+		//float attentuation = max(0.0, (1.0 * LIGHT_CONSTANT - LIGHT_SQUARED * (dist_light_here * dist_light_here) / (LIGHTRADIUS * LIGHTRADIUS) - LIGHT_LINEAR * (dist_light_here) / (LIGHTRADIUS)));
 		float attentuation = attentuate(dist_light_here, LIGHTRADIUS);
 	#endif
 	
@@ -98,7 +98,7 @@ void main(void)
 	if (dot(map_normals4.xyz, light_direction) > 0.02) // light source on the wrong side?
 	{
 		vec3 reflection = reflect(-1.0 * light_direction, map_normals4.xyz);
-		float highlight = pow(max(0.0, dot( reflection, viewDirection)), 8);
+		float highlight = pow(max(0.0, dot( reflection, viewDirection)), 8.0);
 		specularHighlight = specularHighlight * (0.5* highlight);
 	}else{
 		specularHighlight = 0.0;
@@ -109,8 +109,8 @@ void main(void)
 	lightalpha = clamp(lightalpha, 0.0, lightalpha * ((mappos4.y + 50.0)* (0.02)));
 	gl_FragColor = vec4(lightcolor.rgb * lightalpha * model_lighting_multiplier, 1.0);
 	#ifdef DEBUG
-		gl_FragColor = vec4(map_normals4.xyz, 1); //world normals debugging
-		gl_FragColor = vec4(fract(modelpos4.z * 0.01),sign(mappos4.z - modelpos4.z), 0, 1); //world pos debugging, very useful
+		gl_FragColor = vec4(map_normals4.xyz, 1.0); //world normals debugging
+		gl_FragColor = vec4(fract(modelpos4.z * 0.01),sign(mappos4.z - modelpos4.z), 0.0, 1.0); //world pos debugging, very useful
 		if (length(lightcolor.rgb * lightalpha * model_lighting_multiplier) < (1.0 / 256.0)){ //shows light boudaries
 			gl_FragColor=vec4(vec3(0.5, 0.0, 0.5), 0.0);
 		}
