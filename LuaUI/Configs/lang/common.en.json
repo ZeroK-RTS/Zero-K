@@ -1,6 +1,7 @@
 {
 	"morph_complete" : "Morph complete",
 	"nuclear_launch_detected" : "Warning: Nuke Launched",
+	"geospot" : "Geothermal vent\nCan place a Geothermal Generator here",
 	"build_eta" : "ETA:",
 	"lvl" : "lvl",
 	"builds_at" : "builds at",

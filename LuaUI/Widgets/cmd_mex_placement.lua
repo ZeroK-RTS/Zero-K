@@ -781,23 +781,8 @@ function widget:DrawWorld()
 	gl.Color(1, 1, 1, 1)
 end
 
-local selectionEntirelyCons = false
-function widget:SelectionChanged(units)
-	if not units then
-		selectionEntirelyCons = false
-		return
-	end
-	selectionEntirelyCons = true
-	for i = 1, #units do
-		if not mexBuilder[units[i]] then
-			selectionEntirelyCons = false
-			return
-		end
-	end
-end
-
 function widget:DefaultCommand(type, id)
-	if mexSpotToDraw and selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
+	if mexSpotToDraw and WG.selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
 		return -mexDefID
 	end
 end

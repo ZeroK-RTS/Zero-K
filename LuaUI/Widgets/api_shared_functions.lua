@@ -238,3 +238,26 @@ end
 function widget:Initialize()
   WG.GetBuildIconFrame = GetBuildIconFrame
 end
+
+local builderDefs = {}
+for udid, ud in ipairs(UnitDefs) do 
+	for i, option in ipairs(ud.buildOptions) do 
+		if UnitDefNames.cormex.id == option then
+			builderDefs[udid] = true
+		end
+	end
+end
+
+function widget:SelectionChanged(units)
+	if not units then
+		WG.selectionEntirelyCons = false
+		return
+	end
+	for i = 1, #units do
+		if not builderDefs[Spring.GetUnitDefID(units[i])] then
+			WG.selectionEntirelyCons = false
+			return
+		end
+	end
+	WG.selectionEntirelyCons = true
+end

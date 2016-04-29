@@ -2185,6 +2185,18 @@ local function MakeToolTip_Terra(cmdName)
 	BuildTooltip2('terra', tt_structure)
 end
 
+local function miscObjectTooltip()
+	if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
+		MakeToolTip_Text(WG.Translate("common", "mexspot") .. "\n" .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+		return true
+	end
+
+	if WG.mouseAboveGeo then
+		MakeToolTip_Text(WG.Translate("common", "geospot"))
+		return true
+	end
+end
+
 local function MakeTooltip(dt)
 	if options.showdrawtooltip.value and drawtoolKeyPressed and not (drawing or erasing) then
 		MakeToolTip_Draw()
@@ -2302,12 +2314,8 @@ local function MakeTooltip(dt)
 		else
 			KillTooltip()
 		end
-		
-		if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
-			MakeToolTip_Text(WG.Translate("common", "mexspot") .. ", " .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
-			return
-		end
-		
+
+		miscObjectTooltip()
 		return
 	else
 		oldObjectID = 0
@@ -2321,12 +2329,11 @@ local function MakeTooltip(dt)
 		MakeToolTip_Text(tooltip)
 		return
 	end
-	
-	if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
-		MakeToolTip_Text(WG.Translate("common", "mexspot") .. ", " .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+
+	if miscObjectTooltip() then
 		return
 	end
-	
+
 	KillTooltip()
 	return
 	
