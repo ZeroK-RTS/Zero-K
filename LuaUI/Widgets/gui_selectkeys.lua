@@ -15,6 +15,16 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+--[[
+
+Note:
+
+The selection actions in this file must match those in luaui/configs/zk_keys.lua
+
+Please keep them up to date.
+
+--]]
+--------------------------------------------------------------------------------
 
 options_path = 'Game/Selection Hotkeys'
 options_order = {
@@ -119,12 +129,12 @@ options = {
 	uikey1 = { type = 'button',
 		name = 'Non-transport non-Hawk armed air',
 		desc = '',
-		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Weapons_Not_NameContain_Hawk_Not_Radar+_ClearSelection_SelectAll+',
+		action = 'select AllMap+_Not_Builder_Not_Building_Not_Transport_Aircraft_Weapons_Not_NameContain_Vamp_Not_Radar+_ClearSelection_SelectAll+',
 	},
 	uikey2 = { type = 'button',
 		name = 'Hawks',
 		desc = '',
-		action = 'select AllMap+_NameContain_Hawk+_ClearSelection_SelectAll+',
+		action = 'select AllMap+_NameContain_Vamp+_ClearSelection_SelectAll+',
 	},
 	uikey3 = { type = 'button',
 		name = 'Mobile non-builders',

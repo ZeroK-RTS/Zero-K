@@ -111,6 +111,14 @@ local selections = {
 	'select_landw',
 	'selectairw',
 	'lowhealth',
+	
+	'uikey1',
+	'uikey2',
+	'uikey3',
+	'uikey4',
+	'uikey5',
+	'uikey6',
+	
 }
 
 --predeclared functions
