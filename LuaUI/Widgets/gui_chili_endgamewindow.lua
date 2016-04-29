@@ -206,6 +206,7 @@ local function SetupControls()
 		scrollbarSize = 6,
 		horizontalScrollbar = false,
 		hitTestAllowEmpty = true;
+		tooltip = "",
 	}
 	statsPanel = StackPanel:New{
 		x=10;y=40;
@@ -222,6 +223,7 @@ local function SetupControls()
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
 		itemMargin = {1, 1, 1, 1},
+		tooltip = "",
 		autosize = true,
 		
 		resizeItems = false,
@@ -344,6 +346,7 @@ function widget:GameOver (winners)
 			window_endgame.font.color = {1,0,0,1}
 		end
 	end
+	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
 	ShowEndGameWindow()
 end
