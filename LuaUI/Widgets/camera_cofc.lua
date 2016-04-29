@@ -100,7 +100,7 @@ options_order = {
 	'followzoommindist',
 	'followzoommaxdist',
 	
-	'lblMisc2',
+	'label_controlgroups',
 	'enableCycleView',
 	'groupSelectionTapTimeout',
 
@@ -123,8 +123,7 @@ options = {
 	lblFollowCursor = {name='Cursor Following', type='label', path=cameraFollowPath},
 	lblFollowCursorZoom = {name='Auto-Zooming', type='label', path=cameraFollowPath},
 	lblFollowUnit = {name='Unit Following', type='label', path=cameraFollowPath},
-	lblMisc2 = {name='Misc.', type='label', path = cameraFollowPath},
-
+	
 	topBottomEdge = {
 		name = 'Top/Bottom Edge Behaviour',
 		type = 'radioButton',
@@ -531,20 +530,22 @@ options = {
         end,
 	},
 	
+	
+	label_controlgroups = {name='Pan To Cluster', type='label', path = 'Settings/Interface/Control Groups'},
 	enableCycleView = {
-		name = "Group recall cycle within group",
+		name = "Pan to cluster",
 		type = 'bool',
 		value = false,
-		path = cameraFollowPath,
-		desc = "If you tap the group numbers (1,2,3 etc.) it will move the camera position to different clusters of units within the group rather than to the average position of the entire group.",
+		path = 'Settings/Interface/Control Groups',
+		desc = "If you double-tap the group numbers (1,2,3 etc.) it will move the camera position to different clusters of units within the group rather than to the average position of the entire group.",
 	},
 	groupSelectionTapTimeout = {
-		name = 'Group selection tap timeout',
-		desc = "How quickly do you have to tap group numbers to move the camera? Smaller timeout means faster tapping.",
+		name = 'Pan to cluster tap timeout',
+		desc = "How quickly do you have to double-tap group numbers to move the camera? Smaller timeout means faster tapping.",
 		type = 'number',
 		min = 0.0, max = 5.0, step = 0.1,
 		value = 2.0,
-		path = cameraFollowPath,
+		path = 'Settings/Interface/Control Groups',
 	},
 	-- end follow unit
 
