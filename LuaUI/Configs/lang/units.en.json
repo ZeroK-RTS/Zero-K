@@ -1319,49 +1319,41 @@
 		"description" : "Mobile Assault Commander, Builds at 10 m/s",
 		"helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
 	},
-
 	"comm_campaign_ada" : {
 		"name" : "Ada's Commander",
 		"description" : "Relic Commander, Builds at 10 m/s",
 		"helptext" : "A special piloted commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort."
 	},
-	
 	"comm_campaign_promethean" : {
 		"name" : "The Promethean",
 		"description" : "High Mobility Commander, Builds at 10 m/s",
 		"helptext" : "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit."
 	},
-	
 	"comm_campaign_freemachine" : {
 		"name" : "Libertas Machina",
 		"description" : "Mobile Assault Commander, Builds at 10 m/s",
 		"helptext" : "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly."
 	},
-	
 	"comm_campaign_odin" : {
 		"name" : "Odin",
 		"description" : "High Mobility Commander, Builds at 10 m/s",
 		"helptext" : "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe."
 	},
-
 	"comm_campaign_biovizier" : {
 		"name" : "The Biovizier",
 		"description" : "Econ/Support Commander, Builds at 12 m/s",
 		"helptext" : "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating."
 	},
-	
 	"comm_campaign_isonade" : {
 		"name" : "Lord Isonade",
 		"description" : "Mobile Assault Commander, Builds at 10 m/s",
 		"helptext" : "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast."
 	},
-
 	"comm_campaign_legion" : {
 		"name" : "Legate Fidus",
 		"description" : "Mobile Assault Commander, Builds at 10 m/s",
 		"helptext" : "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will. A loyal, steadfast soldier."
 	},	
-		
 	"comm_campaign_praetorian" : {
 		"name" : "Scipio Astra",
 		"description" : "Standoff Combat Commander, Builds at 10 m/s",

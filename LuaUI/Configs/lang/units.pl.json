@@ -1305,43 +1305,36 @@
         "description" : "Dowódca relikwia, moc 10 m/s",
         "helptext" : "Specjalna zalogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest Kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
     },
-    
     "comm_campaign_promethean" : {
         "name" : "The Promethean",
         "description" : "Mobilny Dowódca, moc 10 m/s",
         "helptext" : "Zalozyciel Wolnych Maszyn i tworca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walczaca za wolnosc robotow. Plonie zadza walki."
     },
-    
     "comm_campaign_freemachine" : {
         "name" : "Libertas Machina",
         "description" : "Dowódca szturmowy, moc 10 m/s",
         "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zeby i dobrze opancerzony - nie mozna go lekcewazyc."
     },
-    
     "comm_campaign_odin" : {
         "name" : "Odin",
         "description" : "Mobilny Dowódca, moc 10 m/s",
         "helptext" : "Lider Valhallan, wojownik z krwi i kosci, ktory zyje dla chwaly bitwy. Nie ma skrupulow."
     },
-
     "comm_campaign_biovizier" : {
         "name" : "The Biovizier",
         "description" : "Dowódca wsparcia, moc 12 m/s",
         "helptext" : "Sztuczna inteligencja sprawujaca piecze nad kryptami przechowujacymi dane genetyczne Dynastii. Zimna i przebiegla."
     },
-    
     "comm_campaign_isonade" : {
         "name" : "Lord Isonade",
         "description" : "Dowódca szturmowy, moc 10 m/s",
         "helptext" : "Jeden z lordow-nadludzi Dynastii - ambitny wojownik, ktory ma zamiar przejac wladze nad galaktyka. Bestia zmutowana nie do poznania."
     },
-
     "comm_campaign_legion" : {
         "name" : "Legate Fidus",
         "description" : "Dowódca szturmowy, moc 10 m/s",
         "helptext" : "Dowodca Imperialnego Legionu Strazniczego, ktory wykonuje wole Imperatora. Wierny i niezlomny zolnierz."
-    },	
-            
+    },	 
     "comm_campaign_praetorian" : {
         "name" : "Scipio Astra",
         "description" : "Dowódca dalekiego zasięgu, moc 10 m/s",
