@@ -1297,7 +1297,7 @@
     "comm_mission_tutorial1" : {
         "name" : "Strike Commander",
         "description" : "Dowódca szturmowy, moc 10 m/s",
-        "helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
+        "helptext" : "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
     },
 
     "comm_campaign_ada" : {
