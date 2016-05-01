@@ -1366,5 +1366,10 @@
 		"name" : "Scipio Astra",
 		"description" : "Standoff Combat Commander, Builds at 10 m/s",
 		"helptext" : "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower."
+	},
+	"comm_campaign_athenion" : {
+		"name" : "Athenion",
+		"description" : "Rebel Commander, Builds at 12 m/s",
+		"helptext" : "An Imperial rebel leader."
 	}
 }

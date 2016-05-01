@@ -1347,4 +1347,9 @@
         "description" : "Dowódca dalekiego zasięgu, moc 10 m/s",
         "helptext" : "Prefekt Strazy Pretorianskiej, paladynow Imperium. Fanatyczna wyznawczyni kultu Imperatora, ktora oczyszcza heretykow ogromna sila ognia."
     },
+    "comm_campaign_athenion" : {
+        "name" : "Athenion",
+        "description" : "Dowódca rebeliant, Builds at 12 m/s",
+        "helptext" : "Dowodca grupy rebeliantow walczacych przeciwko Imperium."
+    }
 }
