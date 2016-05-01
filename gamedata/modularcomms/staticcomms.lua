@@ -3,59 +3,59 @@ local commsCampaign = {
   comm_mission_tutorial1 = {
     chassis = "armcom3",
     name = "Tutorial Commander",
-    modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
+    --modules = {},	-- comm module list should be empty/nil to avoid funny stuff when merging with misson's module table
   },  
 
   comm_campaign_ada = {
     chassis = "cremcom2",
     name = "Ada's Commander",
-    modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
+    --modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
   },
   
   comm_campaign_promethean = {
     chassis = "commrecon2",
     name = "The Promethean",
-    modules = { "commweapon_heatray", "module_ablative_armor", "module_ablative_armor", "weaponmod_plasma_containment", "module_autorepair" },
+    --modules = { "commweapon_heatray", "module_ablative_armor", "module_ablative_armor", "weaponmod_plasma_containment", "module_autorepair" },
     decorations = {"skin_recon_red"},
   },
   
   comm_campaign_freemachine = {
     chassis = "corcom2",
     name = "Libertas Machina",
-    modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
+    --modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
   },
   
   comm_campaign_odin = {
     chassis = "commrecon2",
     name = "Odin",
-    modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos", "module_autorepair", "module_companion_drone"},
+    --modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos", "module_autorepair", "module_companion_drone"},
   },
 
   comm_campaign_biovizier = {
     chassis = "commsupport2",
     name = "The Biovizier",
-    modules = { "commweapon_gaussrifle", "module_ablative_armor", "weaponmod_railaccel", "module_autorepair", "module_autorepair" },
+    --modules = { "commweapon_gaussrifle", "module_ablative_armor", "weaponmod_railaccel", "module_autorepair", "module_autorepair" },
     decorations = { "skin_support_green" },
   },
   
   comm_campaign_isonade = {
     chassis = "benzcom2",	-- TODO get a properly organic model
     name = "Lord Isonade",
-    modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
+    --modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
     decorations = { "skin_bombard_steel" },
   },
 
   comm_campaign_legion = {
     chassis = "corcom2",
     name = "Legate Fidus",
-    modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
+    --modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" },
   },  
     
   comm_campaign_praetorian = {
     chassis = "benzcom2",
     name = "Scipio Astra",
-    modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
+    --modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
   },
 }
   

@@ -343,7 +343,9 @@ end
 
 -- for use by AI, in missions, etc.
 local staticComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
-for name,data in pairs(staticComms) do
+local staticComms2 = VFS.Include("gamedata/modularcomms/staticcomms_mission.lua")
+local staticCommsMerged = MergeTable(staticComms2, staticComms, true)
+for name,data in pairs(staticCommsMerged) do
 	ProcessComm(name, data)
 end
 
