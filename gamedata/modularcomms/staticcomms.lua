@@ -3,12 +3,13 @@ local commsCampaign = {
   comm_mission_tutorial1 = {
     chassis = "armcom3",
     name = "Tutorial Commander",
-    --modules = {},	-- comm module list should be empty/nil to avoid funny stuff when merging with misson's module table
+    modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
   },  
 
   comm_campaign_ada = {
     chassis = "cremcom2",
     name = "Ada's Commander",
+    -- comm module list should be empty/nil to avoid funny stuff when merging with misson's module table
     --modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
   },
   
