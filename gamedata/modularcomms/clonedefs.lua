@@ -213,6 +213,35 @@ local copy = {
 			wreckmodel = "benzcom5_wreck.s3o",
 		},
 	},
+	commstrike1 = {
+		commstrike0 = {
+			level = 0,
+		},
+		commstrike2 = {
+			level = 2,
+			mainstats = {maxdamage = 3000, objectname = "strikecom_1.dae", collisionvolumescales  = [[50 55 50]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_1.dae",
+		},
+		commstrike3 = {
+			level = 3,
+			mainstats = {maxdamage = 4000, objectname = "strikecom_2.dae", collisionvolumescales  = [[55 60 55]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_2.dae",
+		},
+		commstrike4 = {
+			level = 4,
+			mainstats = {maxdamage = 5000, objectname = "strikecom_3.dae", collisionvolumescales  = [[58 66 58]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_3.dae",
+		},
+		commstrike5 = {
+			level = 5,
+			mainstats = {maxdamage = 6000, objectname = "strikecom_4.dae", collisionvolumescales  = [[60 72 60]]},
+			customparams = {},
+			wreckmodel = "strikecom_dead_4.dae",
+		},		
+	},
 	dynstrike1 = {
 		dynstrike0 = {
 			level = 0,

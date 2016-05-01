@@ -21,7 +21,7 @@ local commsCampaign = {
   },
   
   comm_campaign_freemachine = {
-    chassis = "corcom2",
+    chassis = "commstrike2",
     name = "Libertas Machina",
     --modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
   },
@@ -47,7 +47,7 @@ local commsCampaign = {
   },
 
   comm_campaign_legion = {
-    chassis = "corcom2",
+    chassis = "commstrike2",
     name = "Legate Fidus",
     --modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" },
