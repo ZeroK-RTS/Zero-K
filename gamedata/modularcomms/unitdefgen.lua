@@ -137,7 +137,8 @@ local function GenerateBasicComm()
 
 	--RemoveWeapons(def)
 	--ApplyWeapon(def, "commweapon_sonicgun")
-
+	
+	-- FIXME: not used any more
 	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
 			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
 
@@ -309,7 +310,7 @@ local function ProcessComm(name, config)
 		
 		-- apply misc. defs
 		if config.miscDefs then
-			commDefs[name] = MergeTable(commDefs[name], config.miscDefs, true)
+			commDefs[name] = MergeTable(config.miscDefs, commDefs[name], true)
 		end
 	end
 end
