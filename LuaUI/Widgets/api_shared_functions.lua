@@ -161,9 +161,10 @@ end
 
 WG.WriteTable = WriteTable
 
-function WG.SaveTable(tab, fileName, tabName, params)
+function WG.SaveTable(tab, dir, fileName, tabName, params)
+	Spring.CreateDir(dir)
 	params = params or {}
-	local file,err = io.open(fileName, "w")
+	local file,err = io.open(dir .. fileName, "w")
 	if (err) then
 		Spring.Log(widget:GetInfo().name, LOG.WARNING, err)
 		return
@@ -221,9 +222,10 @@ end
 
 WG.WritePythonDict = WritePythonDict
 
-function WG.SavePythonDict(fileName, dict, dictName, params)
+function WG.SavePythonDict(dir, fileName, dict, dictName, params)
+	Spring.CreateDir(dir)
 	params = params or {}
-	local file,err = io.open (fileName, "w")
+	local file,err = io.open (dir .. fileName, "w")
 	if (err) then
 		Spring.Log(widget:GetInfo().name, LOG.WARNING, err)
 		return

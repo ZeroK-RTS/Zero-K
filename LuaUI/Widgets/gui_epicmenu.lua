@@ -40,22 +40,23 @@ local echo = Spring.Echo
 local isMission = Game.modDesc:find("Mission Mutator")
 
 -- Config file data
-local keybind_file, defaultkeybinds, defaultkeybind_date, confdata
+local keybind_dir, keybind_file, defaultkeybinds, defaultkeybind_date, confdata
 do
 	--load config file:
 	local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
 	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
 	--assign keybind file:
-	keybind_file = LUAUI_DIRNAME .. 'Configs/' .. Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
+	keybind_dir = LUAUI_DIRNAME .. 'Configs/'
+	keybind_file = Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
 	if isMission then
 		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
-		keybind_file = (confdata.mission_keybinds_file and LUAUI_DIRNAME .. 'Configs/' .. confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
+		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
 	end
 	--check for validity, backup or delete
-	CheckLUAFileAndBackup(keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
+	CheckLUAFileAndBackup(keybind_dir .. keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
 	--load default keybinds:
 	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
-	local default_keybind_file = LUAUI_DIRNAME .. 'Configs/' .. confdata.default_source_file
+	local default_keybind_file = keybind_dir .. confdata.default_source_file
 	local file_return = VFS.FileExists(default_keybind_file, VFS.ZIP) and VFS.Include(default_keybind_file, nil, VFS.ZIP) or {keybinds={},date=0}
 	defaultkeybinds = file_return.keybinds
 	defaultkeybind_date = file_return.date
@@ -393,13 +394,13 @@ end
 local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
-	WG.SaveTable(keybindfile_table, keybind_file, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	WG.SaveTable(keybindfile_table, keybind_dir, keybind_file, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
 
 local function LoadKeybinds()
 	local loaded = false
-	if VFS.FileExists(keybind_file, VFS.RAW) then
-		local file_return = VFS.Include(keybind_file, nil, VFS.RAW)
+	if VFS.FileExists(keybind_dir .. keybind_file, VFS.RAW) then
+		local file_return = VFS.Include(keybind_dir .. keybind_file, nil, VFS.RAW)
 		if file_return then
 			keybounditems, keybind_date = file_return.keybinds, file_return.date
 			if keybounditems and keybind_date then
