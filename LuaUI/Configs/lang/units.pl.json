@@ -1302,47 +1302,47 @@
 
     "comm_campaign_ada" : {
         "name" : "Ada - Jednostka Dowodzenia",
-        "description" : "Dowódca relikwia, moc 10 m/s",
+        "description" : "Zabytkowa jednostka dowodzenia",
         "helptext" : "Specjalna załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
     },
     "comm_campaign_promethean" : {
         "name" : "Promethean",
-        "description" : "Mobilny Dowódca, moc 10 m/s",
+        "description" : "Założyciel Wolnych Maszyn",
         "helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
     },
     "comm_campaign_freemachine" : {
         "name" : "Libertas Machina",
-        "description" : "Dowódca szturmowy, moc 10 m/s",
+        "description" : "Porucznik Prometheana",
         "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
     },
     "comm_campaign_odin" : {
         "name" : "Odin",
-        "description" : "Mobilny Dowódca, moc 10 m/s",
+        "description" : "Lider Valhalli",
         "helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
     },
     "comm_campaign_biovizier" : {
         "name" : "Biowezyr",
-        "description" : "Dowódca wsparcia, moc 12 m/s",
+        "description" : "Strażnik krypt Dynastii",
         "helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
     },
     "comm_campaign_isonade" : {
         "name" : "Lord Isonade",
-        "description" : "Dowódca szturmowy, moc 10 m/s",
+        "description" : "Lord Obediator",
         "helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąc władzę nad galaktyką. Bestia zmutowana nie do poznania."
     },
     "comm_campaign_legion" : {
         "name" : "Legat Fides",
-        "description" : "Dowódca szturmowy, moc 10 m/s",
+        "description" : "Dowódca Straży Imperialnej",
         "helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
     },	 
     "comm_campaign_praetorian" : {
         "name" : "Scipio Astra",
-        "description" : "Dowódca dalekiego zasięgu, moc 10 m/s",
+        "description" : "Prefekt Straży Pretoriańskiej",
         "helptext" : "Prefekt Straży Pretoriańskiej, paladynów Imperium. Fanatyczna wyznawczyni kultu Imperatora, która oczyszcza heretyków ogromną siłą ognia."
     },
     "comm_campaign_athenion" : {
         "name" : "Athenion",
-        "description" : "Dowódca rebeliant, Builds at 12 m/s",
+        "description" : "Dowódca rebeliant",
         "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
     }
 }

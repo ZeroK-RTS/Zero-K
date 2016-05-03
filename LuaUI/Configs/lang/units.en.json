@@ -1321,47 +1321,47 @@
 	},
 	"comm_campaign_ada" : {
 		"name" : "Ada's Commander",
-		"description" : "Relic Commander, Builds at 10 m/s",
+		"description" : "Relic Commander",
 		"helptext" : "A special piloted commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort."
 	},
 	"comm_campaign_promethean" : {
 		"name" : "The Promethean",
-		"description" : "High Mobility Commander, Builds at 10 m/s",
+		"description" : "Free Machines Founder",
 		"helptext" : "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit."
 	},
 	"comm_campaign_freemachine" : {
 		"name" : "Libertas Machina",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
+		"description" : "Promethean's Lieutenant",
 		"helptext" : "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly."
 	},
 	"comm_campaign_odin" : {
 		"name" : "Odin",
-		"description" : "High Mobility Commander, Builds at 10 m/s",
+		"description" : "Leader of the Valhalla",
 		"helptext" : "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe."
 	},
 	"comm_campaign_biovizier" : {
 		"name" : "The Biovizier",
-		"description" : "Econ/Support Commander, Builds at 12 m/s",
+		"description" : "Dynasty Gene Vault Keeper",
 		"helptext" : "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating."
 	},
 	"comm_campaign_isonade" : {
 		"name" : "Lord Isonade",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
+		"description" : "Lord Obediator",
 		"helptext" : "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast."
 	},
 	"comm_campaign_legion" : {
 		"name" : "Legate Fides",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
+		"description" : "Imperial Vanguard Commander",
 		"helptext" : "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will. A loyal, steadfast soldier."
 	},	
 	"comm_campaign_praetorian" : {
 		"name" : "Scipio Astra",
-		"description" : "Standoff Combat Commander, Builds at 10 m/s",
+		"description" : "Praetorian Guard Prefect",
 		"helptext" : "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower."
 	},
 	"comm_campaign_athenion" : {
 		"name" : "Athenion",
-		"description" : "Rebel Commander, Builds at 12 m/s",
+		"description" : "Rebel Commander",
 		"helptext" : "An Imperial rebel leader."
 	}
 }
