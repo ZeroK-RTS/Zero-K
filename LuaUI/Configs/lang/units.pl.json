@@ -1303,46 +1303,46 @@
     "comm_campaign_ada" : {
         "name" : "Ada's Commander",
         "description" : "Dowódca relikwia, moc 10 m/s",
-        "helptext" : "Specjalna zalogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest Kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
+        "helptext" : "Specjalna załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
     },
     "comm_campaign_promethean" : {
         "name" : "The Promethean",
         "description" : "Mobilny Dowódca, moc 10 m/s",
-        "helptext" : "Zalozyciel Wolnych Maszyn i tworca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walczaca za wolnosc robotow. Plonie zadza walki."
+        "helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
     },
     "comm_campaign_freemachine" : {
         "name" : "Libertas Machina",
         "description" : "Dowódca szturmowy, moc 10 m/s",
-        "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zeby i dobrze opancerzony - nie mozna go lekcewazyc."
+        "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
     },
     "comm_campaign_odin" : {
         "name" : "Odin",
         "description" : "Mobilny Dowódca, moc 10 m/s",
-        "helptext" : "Lider Valhallan, wojownik z krwi i kosci, ktory zyje dla chwaly bitwy. Nie ma skrupulow."
+        "helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
     },
     "comm_campaign_biovizier" : {
         "name" : "The Biovizier",
         "description" : "Dowódca wsparcia, moc 12 m/s",
-        "helptext" : "Sztuczna inteligencja sprawujaca piecze nad kryptami przechowujacymi dane genetyczne Dynastii. Zimna i przebiegla."
+        "helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
     },
     "comm_campaign_isonade" : {
         "name" : "Lord Isonade",
         "description" : "Dowódca szturmowy, moc 10 m/s",
-        "helptext" : "Jeden z lordow-nadludzi Dynastii - ambitny wojownik, ktory ma zamiar przejac wladze nad galaktyka. Bestia zmutowana nie do poznania."
+        "helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąc władzę nad galaktyką. Bestia zmutowana nie do poznania."
     },
     "comm_campaign_legion" : {
         "name" : "Legate Fides",
         "description" : "Dowódca szturmowy, moc 10 m/s",
-        "helptext" : "Dowodca Imperialnego Legionu Strazniczego, ktory wykonuje wole Imperatora. Wierny i niezlomny zolnierz."
+        "helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
     },	 
     "comm_campaign_praetorian" : {
         "name" : "Scipio Astra",
         "description" : "Dowódca dalekiego zasięgu, moc 10 m/s",
-        "helptext" : "Prefekt Strazy Pretorianskiej, paladynow Imperium. Fanatyczna wyznawczyni kultu Imperatora, ktora oczyszcza heretykow ogromna sila ognia."
+        "helptext" : "Prefekt Straży Pretoriańskiej, paladynów Imperium. Fanatyczna wyznawczyni kultu Imperatora, która oczyszcza heretyków ogromną siłą ognia."
     },
     "comm_campaign_athenion" : {
         "name" : "Athenion",
         "description" : "Dowódca rebeliant, Builds at 12 m/s",
-        "helptext" : "Dowodca grupy rebeliantow walczacych przeciwko Imperium."
+        "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
     }
 }
