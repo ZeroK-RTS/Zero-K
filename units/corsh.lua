@@ -47,6 +47,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[CORSH.s3o]],
+  script              = "corsh.lua",
   seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
@@ -133,65 +134,33 @@ unitDef = {
 
   },
 
-
   featureDefs         = {
 
     DEAD  = {
       description      = [[Wreckage - Dagger]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 300,
-      energy           = 0,
-      featureDead      = [[DEAD2]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 34,
-      object           = [[corsh_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 34,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-    },
-
-
-    DEAD2 = {
-      description      = [[Debris - Dagger]],
-      blocking         = false,
-      category         = [[heaps]],
       damage           = 300,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 32,
-      object           = [[debris3x3c.s3o]],
+      object           = [[corsh_dead.s3o]],
       reclaimable      = true,
       reclaimTime      = 32,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
-
 
     HEAP  = {
       description      = [[Debris - Dagger]],
       blocking         = false,
-      category         = [[heaps]],
       damage           = 300,
       energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       metal            = 16,
       object           = [[debris3x3c.s3o]],
       reclaimable      = true,
       reclaimTime      = 16,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
