@@ -1301,12 +1301,12 @@
     },
 
     "comm_campaign_ada" : {
-        "name" : "Ada's Commander",
+        "name" : "Ada - Jednostka Dowodzenia",
         "description" : "Dowódca relikwia, moc 10 m/s",
         "helptext" : "Specjalna załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
     },
     "comm_campaign_promethean" : {
-        "name" : "The Promethean",
+        "name" : "Promethean",
         "description" : "Mobilny Dowódca, moc 10 m/s",
         "helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
     },
@@ -1321,7 +1321,7 @@
         "helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
     },
     "comm_campaign_biovizier" : {
-        "name" : "The Biovizier",
+        "name" : "Biowezyr",
         "description" : "Dowódca wsparcia, moc 12 m/s",
         "helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
     },
@@ -1331,7 +1331,7 @@
         "helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąc władzę nad galaktyką. Bestia zmutowana nie do poznania."
     },
     "comm_campaign_legion" : {
-        "name" : "Legate Fides",
+        "name" : "Legat Fides",
         "description" : "Dowódca szturmowy, moc 10 m/s",
         "helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
     },	 
