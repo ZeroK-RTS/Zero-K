@@ -442,7 +442,7 @@
 	"slowmort" : {
 		"name" : "Moderator",
 		"description" : "Distruptor Skirmisher Walker",
-		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50% in addition to dealing damage, making it effective against almost all targets."
+		"helptext" : "The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50%% in addition to dealing damage, making it effective against almost all targets."
 	},
 	"chicken" : {
 		"name" : "Chicken",
@@ -837,7 +837,7 @@
 	"pw_hq" : {
 		"name" : "Command Center",
 		"description" : "PlanetWars Field HQ (changes influence gain)",
-		"helptext" : "This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20% of the influence gain."
+		"helptext" : "This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20%% of the influence gain."
 	},
 	"dante" : {
 		"name" : "Dante",

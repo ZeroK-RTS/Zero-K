@@ -443,7 +443,7 @@
     "slowmort": {
         "name": "Moderator",
         "description": "Bot harcownik spowalniacz",
-        "helptext": "Moderator oprócz zadawania obrażeń spowalnia cel maksymalnie o 50%, dzięki czemu jest efektywny przeciw większości celów. Jego niska szybkostrzelność sprawia, że lekkie jednostki nie powinny mieć z nim większych problemów."
+        "helptext": "Moderator oprócz zadawania obrażeń spowalnia cel maksymalnie o 50%%, dzięki czemu jest efektywny przeciw większości celów. Jego niska szybkostrzelność sprawia, że lekkie jednostki nie powinny mieć z nim większych problemów."
     },
     "chicken": {
         "name": "Kurczak",
@@ -833,7 +833,7 @@
     "pw_hq": {
         "name": "Command Center",
         "description": "Kwatera główna Wojen Planet (zmienia uzyskiwane wpływy)",
-        "helptext": "Kwatera główna jest kluczowa w utrzymaniu kontroli nad planetą; jeżeli zwycięzca bitwy ją utraci, to czekają go konsekwencje. W wypadku agresora, otrzymuje on dwukrotnie mniejsze wpływy. Utracony przez obrońców powoduje, że agresor otrzymuje 20% wpływów."
+        "helptext": "Kwatera główna jest kluczowa w utrzymaniu kontroli nad planetą; jeżeli zwycięzca bitwy ją utraci, to czekają go konsekwencje. W wypadku agresora, otrzymuje on dwukrotnie mniejsze wpływy. Utracony przez obrońców powoduje, że agresor otrzymuje 20%% wpływów."
     },
     "dante": {
         "name": "Dante",
