@@ -1344,5 +1344,27 @@
         "name" : "Athenion",
         "description" : "Dowódca rebeliant",
         "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
-    }
+    },
+    
+    "pw_campaign_bunker" : {
+        "name" : "Storage Bunker",
+        "description" : "Magazyn broni",
+        "helptext" : "Bunkry takie jak ten przetrzymywaly uzbrojenie podczas Wojen Planet. Niektore z nich dalej moga zawierac uzyteczne wyposazenie."
+    },
+    "pw_campaign_techlab" : {
+        "name" : "Tech Lab",
+        "description" : "Stacja badawcza",
+        "helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartosciowa ze wzgledu na zawarte tu technologie."
+    },
+    "pw_campaign_imperialtomb" : {
+        "name" : "Imperial Tomb",
+        "description" : "Tu spoczywa Imperator",
+        "helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkosci."
+    },
+    
+    "nebula_campaign_daneel" : {
+        "name" : "Daneel Olivaw",
+        "description" : "Statek-matka",
+        "helptext" : "Daneel Olivaw jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony."
+    },
 }

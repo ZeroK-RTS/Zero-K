@@ -1363,5 +1363,27 @@
 		"name" : "Athenion",
 		"description" : "Rebel Commander",
 		"helptext" : "An Imperial rebel leader."
-	}
+	},
+	
+	"pw_campaign_bunker" : {
+		"name" : "Storage Bunker",
+		"description" : "Stores Weapons",
+		"helptext" : "Bunkers such as this were used to store munitions during the Planetwars. Some of these may still have usable equipment hidden inside."
+	},
+	"pw_campaign_techlab" : {
+		"name" : "Tech Lab",
+		"description" : "Research and Development Facility",
+		"helptext" : "One of the R&D facilities built during the Last War, widely sought after for the technology contained within."
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "Imperial Tomb",
+		"description" : "Here Lies the Emperor",
+		"helptext" : "This is the resting place of the God-Emperor of Man."
+	},
+	
+	"nebula_campaign_daneel" : {
+		"name" : "Daneel Olivaw",
+		"description" : "Advanced Atmospheric Mothership",
+		"helptext" : "An advanced version of the Nebula-class aerial carrier. As maneuverable as a brick and only modestly armed itself, the Daneel Olivaw is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement."
+	},
 }
