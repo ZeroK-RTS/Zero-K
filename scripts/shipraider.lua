@@ -61,8 +61,10 @@ local function MoveThread()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx(wake1, 2)
-		EmitSfx(wake2, 2)
+		if(not Spring.GetUnitIsCloaked(unitID)) then
+			EmitSfx(wake1, 2)
+			EmitSfx(wake2, 2)
+		end
 		Sleep(300)
 	end
 end
