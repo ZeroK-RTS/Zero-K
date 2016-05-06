@@ -129,6 +129,7 @@ local exitWindowVisible = false
 
 local br = '\n'
 local showTidal = false
+if not confdata.description then confdata.description = '' end
 local gameInfoText = ''
 	..Game.modName ..br..br
 	..'Spring Engine version: '..Game.version..br..br	
@@ -139,6 +140,8 @@ local gameInfoText = ''
 	.. (showTidal and ('    Tidal Power: '..Game.tidal..br) or '')
 	..'    Water Damage: '..Game.waterDamage..br
 	..'    '.. Game.mapDescription..br
+	..br..br
+	..confdata.description 
 	
 
 --------------------------------------------------------------------------------

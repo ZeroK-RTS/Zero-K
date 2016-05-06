@@ -5,6 +5,7 @@ confdata.default_source_file = 'zk_keys.lua' --the file in ZIP archive where def
 confdata.mission_keybinds_file = 'zk_keys.lua' --the filename to be used for Mission mod. set this to NIL if want to use mission's name as filename.
 -- confdata.regular_keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua' --for Multiplayer this is automatically set according to modName in epicmenu.lua
 --FIXME: find modname instead of using hardcoded mission_keybinds_file name
+confdata.description = 'Zero-K is a free real time strategy (RTS), that aims to be the best open source multi-platform strategy game available :-) \n\n www.zero-k.info'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},
