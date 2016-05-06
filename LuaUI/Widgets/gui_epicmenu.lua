@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.438 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.439 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -126,6 +126,21 @@ local pathoptions = {}
 local actionToOption = {}
 
 local exitWindowVisible = false
+
+local br = '\n'
+local showTidal = false
+local gameInfoText = ''
+	..Game.modName ..br..br
+	..'Spring Engine version: '..Game.version..br..br	
+	..'Map: ' ..Game.mapName ..br
+		
+	..'    Size: '..Game.mapX..' x '..Game.mapY..br        
+	..'    Gravity: '..math.round(Game.gravity)..br
+	.. (showTidal and ('    Tidal Power: '..Game.tidal..br) or '')
+	..'    Water Damage: '..Game.waterDamage..br
+	..'    '.. Game.mapDescription..br
+	
+
 --------------------------------------------------------------------------------
 -- Key bindings
 -- KEY BINDINGS AND YOU:
@@ -2326,7 +2341,7 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Resign',
+		name='Resign...',
 		desc = "Abandon team and become spectator",
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
@@ -2346,7 +2361,7 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Exit to Desktop',
+		name='Exit to Desktop...',
 		desc = "Exit game completely",
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
@@ -2465,6 +2480,15 @@ function widget:Initialize()
 	end
 	
 	MakeQuitButtons()
+	
+	AddOption('',{ type='label',name='',value = '',key='',})
+	AddOption('',{
+		type='text',
+		name='About The Game...',
+		value=gameInfoText,
+		--desc = "about game",
+		key='About',
+	})
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
