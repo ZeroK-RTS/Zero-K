@@ -29,6 +29,7 @@ function includeZIPFirst(filename, envTable)
 end
 
 Spring.Utilities = {}
+VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
 local reverseCompat = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
@@ -147,7 +148,6 @@ widgetHandler = {
   
   tweakMode = false,
 }
-
 
 -- these call-ins are set to 'nil' if not used
 -- they are setup in UpdateCallIns()
