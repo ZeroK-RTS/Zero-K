@@ -86,7 +86,7 @@ end
 local function TableEcho(data, name, indent, tableChecked)
 	name = name or "TableEcho"
 	indent = indent or ""
-	if (not tableChecked) and type(v) ~= "table" then
+	if (not tableChecked) and type(data) ~= "table" then
 		Spring.Echo(indent .. name, data)
 		return
 	end
