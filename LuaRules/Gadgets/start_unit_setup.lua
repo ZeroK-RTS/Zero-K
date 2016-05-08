@@ -322,7 +322,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
 		
-		local name
+		local name = "noname" -- Backup for when player does not choose a commander and then resigns.
 		if isAI then
 			name = select(2, Spring.GetAIInfo(teamID))
 		else

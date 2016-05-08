@@ -561,7 +561,10 @@ local function UpdateUnitListScale(unitList)
 end
 
 local function UpdateUnitListRotation(unitList)
-	for i=1, #unitList do
+	if not unitList then
+		return
+	end
+	for i = 1, #unitList do
 		local unitID = unitList[i].unitID
 		local udid = spGetUnitDefID(unitID)
 		if udid and unitConf[udid].noRotate then
