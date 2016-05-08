@@ -3323,7 +3323,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 						end
 						posCount = posCount + 1
 						posX[posCount] = i
-						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ)
+						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^2
 						posZ[posCount] = j
 					end
 				end
@@ -3344,10 +3344,11 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		end
 		
 		if detachmentradius then
+			local GRAVITY = Game.gravity
 			local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
 			for i = 1, #units do
 				local hitUnitID = units[i]
-				GG.DetatchFromGround(hitUnitID)
+				GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
 			end
 		end
 	end
