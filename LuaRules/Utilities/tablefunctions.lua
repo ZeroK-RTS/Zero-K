@@ -85,19 +85,22 @@ end
 
 local function TableEcho(data, name, indent)
 	name = name or "TableEcho"
-	Spring.Echo((indent or "") .. name .. " = {")
-	indent = indent or "    "
+	indent = indent or ""
+	Spring.Echo(indent .. name .. " = {")
+	local newIndent = indent .. "    "
 	for name, v in pairs(data) do
 		local ty =  type(v)
 		if ty == "table" then
-			TableEcho(v, name, indent .. "    ")
+			TableEcho(v, name, newIndent)
 		elseif ty == "boolean" then
-			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+			Spring.Echo(newIndent .. name .. " = " .. (v and "true" or "false"))
+		elseif ty == "function" then
+			Spring.Echo(newIndent .. name .. " = ", v)
 		else
-			Spring.Echo(indent .. name .. " = " .. v)
+			Spring.Echo(newIndent .. name .. " = " .. v)
 		end
 	end
-	Spring.Echo(indent .. "}")
+	Spring.Echo(indent .. "},")
 end
 
 Spring.Utilities.TableEcho = TableEcho
