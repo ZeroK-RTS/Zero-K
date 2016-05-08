@@ -38,7 +38,7 @@ local function DoSelectionLoad()
 				if ud.isTransport then
 					local transportUnits = Spring.GetUnitIsTransporting(unitID)
 					if transportUnits and #transportUnits == 0 then
-						if ud.transportMass >= 365 then
+						if ud.transportMass > 330 then
 							heavyTrans[#heavyTrans + 1] = unitID
 						else
 							lightTrans[#lightTrans + 1] = unitID
@@ -46,7 +46,7 @@ local function DoSelectionLoad()
 					end
 				end
 			else
-				if (ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4) then
+				if (ud.mass > 330) or (ud.xsize > 8) or (ud.zsize > 8) then
 					heavy[#heavy + 1] = unitID
 				else
 					light[#light + 1] = unitID
