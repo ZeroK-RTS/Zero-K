@@ -2485,9 +2485,9 @@ function widget:Initialize()
 	MakeQuitButtons()
 	
 	AddOption('',{ type='label',name='',value = '',key='',})
-	AddOption('',{
+	AddOption('Game',{
 		type='text',
-		name='About The Game...',
+		name='About...',
 		value=gameInfoText,
 		--desc = "about game",
 		key='About',

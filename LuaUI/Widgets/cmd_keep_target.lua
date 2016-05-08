@@ -23,7 +23,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Target AI'
+options_path = 'Game/Unit Behaviour'
 options = {
 	keepTarget = {
 		name = "Keep overridden attack target",

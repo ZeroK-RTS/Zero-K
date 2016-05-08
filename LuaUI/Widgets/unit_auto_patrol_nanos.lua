@@ -59,7 +59,7 @@ local mapCenterZ
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Misc Unit States'
+options_path = 'Game/Unit Behaviour'
 options = 
 {
 	idleSeconds = {
