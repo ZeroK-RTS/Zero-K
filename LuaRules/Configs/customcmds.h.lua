@@ -41,6 +41,7 @@ CMD_DISEMBARK = 31201 --unit_transport_ai_button.lua
 CMD_TRANSPORTTO = 31202 --unit_transport_ai_button.lua
 CMD_EXTENDED_LOAD = 31203 --unit_transport_pickup_floating_amphib.lua
 CMD_EXTENDED_UNLOAD = 31204 --unit_transport_pickup_floating_amphib.lua
+CMD_LOADUNITS_SELECTED = 31205
 CMD_RAW_MOVE = 31205 --cmd_raw_move.lua
 CMD_MORPH_UPGRADE_INTERNAL = 31207
 CMD_UPGRADE_STOP = 31208

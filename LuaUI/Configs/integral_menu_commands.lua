@@ -306,6 +306,7 @@ local custom_cmd_actions = {
 	find_pad=3,
 	embark=3,
 	disembark=3,
+	loadselected=3,
 	oneclickwep=3,
 	settarget=1,
 	settargetcircle=1,

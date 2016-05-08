@@ -101,6 +101,7 @@ return {
 		{	"cloak",	"k",},
 		{	"togglelos",	"Ctrl+l",},
 		{	"loadunits",	"l",},
+		{	"loadselected",	"l",},
 		{	"move",	"m",},
 		{	"singlestep",	"Alt+o",},
 		{	"patrol",	"p",},
