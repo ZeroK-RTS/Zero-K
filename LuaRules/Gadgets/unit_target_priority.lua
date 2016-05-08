@@ -96,6 +96,11 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		return true, 5
 	end
 	
+	--// For heatrays, ignore other priority and just attack the closest target.
+	if WeaponDefs[attackerWeaponDefID].customParams.dyndamageexp then
+		return true, (spGetUnitSeparation(unitID,targetID,true)/WeaponDefs[attackerWeaponDefID].range)
+	end
+
 	--// Get Base priority of unit. Transporting unit for transports.
 	local defPrio
 	if transportMult[enemyUnitDef] then
@@ -180,15 +185,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			remHealth[targetID] = hpAdd
 		end
 	end
-	
-	local distAdd = 0 --reimplementing proximityPriority weapon tag
-	if WeaponDefs[attackerWeaponDefID].proximityPriority then
-		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
-		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range)*0.1*WeaponDefs[attackerWeaponDefID].proximityPriority --0.0 to 0.1 multiplied by proximityPriority
-	end
-	
-	local newPriority = hpAdd + defPrio + distAdd
-	
+
+	local newPriority = hpAdd + defPrio
+
 	return true, newPriority --bigger value have lower priority
 end
 
