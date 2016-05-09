@@ -189,6 +189,10 @@ local function NormalizeRotation(cs)
 	--Note: Spring angle is between -mathPi to +mathPi
 	-- so its not from 0 to 2*mathPi
 
+	--failure?
+	Spring.Echo('Failure - NormalizeRotation')
+	if not cs.rx then Spring.Echo('Failure - OverrideSetCameraStateInterpolate'); return end
+
 	local fullCircle = 2*mathPi
 	if cs.rx > mathPi then
 		cs.rx = cs.rx - fullCircle
@@ -219,6 +223,9 @@ function OverrideSetCameraStateInterpolate(cs,smoothness, lockPoint)
 	
 	local now = Spring.GetCameraState()
 	CopyState(beginCam, now)
+	
+	--failure?
+	if not cs.rx or not now.rx then Spring.Echo('Failure - OverrideSetCameraStateInterpolate'); return end
 
 	CopyState(targetCam, cs)
 	NormalizeRotation(targetCam)
