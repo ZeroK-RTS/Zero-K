@@ -95,7 +95,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	if not enemyUnitDef then
 		return true, 5
 	end
-
+	
 	--// Get Base priority of unit. Transporting unit for transports.
 	local defPrio
 	if transportMult[enemyUnitDef] then
@@ -180,12 +180,13 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			remHealth[targetID] = hpAdd
 		end
 	end
-
+	
 	local distAdd = 0 -- heatrays et al prioritize closer targets
 	if WeaponDefs[attackerWeaponDefID].customParams.dyndamageexp then
-		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
-		distAdd = (unitSeparation/WeaponDefs[attackerWeaponDefID].range) * 10
+		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
+		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 10
 	end
+	
 	local newPriority = hpAdd + defPrio + distAdd
 
 	return true, newPriority --bigger value have lower priority
