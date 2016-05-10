@@ -89,12 +89,12 @@ function constructionAndEconomyHandler(a, at, frame)
 	facJob[2].importance = 3 + 6 * (at.unScoutedPoint.count/heatSquares) -- scouts are built depending on unscouted ground
 	
 	facJob[4].importance = 0
-	if at.enemyDefence.totalCost > 1000 then
-		facJob[4].importance = 3
+	if at.enemyDefence.totalCost > 4000 then
+		facJob[4].importance = 8
 	elseif at.enemyDefence.totalCost > 2000 then
 		facJob[4].importance = 6
-	elseif at.enemyDefence.totalCost > 4000 then
-		facJob[4].importance = 8
+	elseif at.enemyDefence.totalCost > 1000 then
+		facJob[4].importance = 3
 	end
 
 	if averagedEcon.aveMInc > 20 or at.enemyOffense.totalCost > 1000 then
