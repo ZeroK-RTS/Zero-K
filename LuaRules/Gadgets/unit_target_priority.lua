@@ -181,14 +181,14 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 	end
 	
-	local distAdd = 0 --reimplementing proximityPriority weapon tag
-	if WeaponDefs[attackerWeaponDefID].proximityPriority then
+	local distAdd = 0 -- heatrays et al prioritize closer targets
+	if WeaponDefs[attackerWeaponDefID].customParams.dyndamageexp then
 		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
-		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range)*0.1*WeaponDefs[attackerWeaponDefID].proximityPriority --0.0 to 0.1 multiplied by proximityPriority
+		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 10
 	end
 	
 	local newPriority = hpAdd + defPrio + distAdd
-	
+
 	return true, newPriority --bigger value have lower priority
 end
 
