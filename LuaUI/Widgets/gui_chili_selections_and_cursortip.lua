@@ -3,7 +3,7 @@
 function widget:GetInfo()
   return {
     name      = "Chili Selections & CursorTip",
-    desc      = "v0.097 Chili Selection Window and Cursor Tooltip.",
+    desc      = "v0.098 Chili Selection Window and Cursor Tooltip.",
     author    = "CarRepairer, jK",
     date      = "2009-06-02", --22 December 2013
     license   = "GNU GPL, v2 or later",
@@ -113,6 +113,10 @@ local stack_main, stack_leftbar
 local globalitems = {} --remember reference to various chili element that need to be accessed/updated globally.
 
 local ttFontSize = 10
+local leftbar_width = 96
+local mainsection_width = 230
+local buildpic_size = 55
+local morph_text_width = 25
 
 local green = '\255\1\255\1'
 local red = '\255\255\1\1'
@@ -257,7 +261,9 @@ local label_unitInfo
 options_path = 'Settings/HUD Panels/Tooltip'
 options_order = {
 	--tooltip
-	'tooltip_delay', 'independant_world_tooltip_delay', 'hpshort', 'featurehp', 
+	
+	'tooltip_delay', 'independant_world_tooltip_delay',
+	'large','hpshort', 'featurehp', 
 	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
 	
 	--mouse
@@ -281,8 +287,81 @@ end
 
 local function Show(param) end
 
+local function clearControls()
+	--[[
+	for k,controls_cur in pairs(controls) do
+		for _,controls in pairs(controls_cur) do
+			controls:Dispose();
+		end
+	end
+	--]]
+	
+	for _,tt in ipairs({ 'unit2', 'feature2', 'corpse2', 'drawing2', 'terra', 'morph2', 'ud2',
+		'selunit2'
+		}) do
+		if controls[tt] then
+			for _,controls in pairs(controls[tt]) do
+				controls:Dispose();
+			end
+		end
+		controls[tt]=nil
+	end
+	
+	for _,gi in ipairs({ 'buildpic_unit', 'buildpic_feature', 'buildpic_selunit', 'buildpic_morph', 'buildpic_ud', 'morphs' }) do
+		
+		if globalitems[gi] then
+			globalitems[gi]:Dispose()
+		end
+		globalitems[gi] = nil
+	end
+end
+
+local function CreateHpBar() end
+local function CreateBpBar() end
+local function CreateShieldBar() end
+
+
 local selPath = 'Settings/HUD Panels/Selected Units Panel'
 options = {
+	large = {
+		name = 'Large Tooltip',
+		desc = 'For high-resolution screens',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			option_Deselect()
+			if self.value then
+				ttFontSize 			= 16 
+				leftbar_width 		= 130
+				mainsection_width 	= 300
+				buildpic_size 		= 90
+				morph_text_width	= 40
+				icon_size			= 30
+				unitIcon_size		= 70
+			else
+				ttFontSize 			= 10
+				leftbar_width 		= 96
+				mainsection_width 	= 230
+				buildpic_size 		= 55
+				morph_text_width 	= 25
+				icon_size			= 20
+				unitIcon_size		= 50
+			end
+			clearControls()
+			
+			CreateHpBar('hp_unit')
+			CreateHpBar('hp_selunit')
+			CreateHpBar('hp_feature')
+			CreateHpBar('hp_corpse')
+			
+			CreateBpBar('bp_selunit')
+		
+			CreateShieldBar('shield_unit')
+			CreateShieldBar('shield_selunit')
+	--]]
+		end,
+	},
 	tooltip_delay = {
 		name = 'Tooltip display delay (0 - 4s)',
 		desc = 'Determines how long you can leave the mouse idle until the tooltip is displayed.',
@@ -739,12 +818,12 @@ local function WriteGroupInfo()
 		parent = window_corner;
 		y=5,
 		right=5,
-		x=window_corner.width-150,
+		x=window_corner.width-150-(options.large.value and 30 or 0),
 		height  = '100%';
-		width = 120,
+		width = options.large.value and 150 or 120,
 		caption = unitInfoString;
 		valign  = 'top';
-		fontSize = 12;
+		fontSize = ttFontSize+2;
 		fontShadow = true;
 	}
 	
@@ -1428,11 +1507,11 @@ local function UpdateMorphControl(morph_data)
 	
 	local cyan = {0,1,1,1}
 	
-	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=cyan , autosize=false, width=45, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Label:New{ caption = 'Morph: ', height= icon_size, valign='center', textColor=cyan , autosize=false, width=morph_text_width+20, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/clock.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Label:New{ name='time', caption = morph_time, valign='center', textColor=cyan , autosize=false, width=morph_text_width, fontSize=ttFontSize,}
 	morph_controls[#morph_controls + 1] = Image:New{file='LuaUI/images/cost.png',height= icon_size,width= icon_size, fontSize=ttFontSize,}
-	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=cyan , autosize=false, width=25, fontSize=ttFontSize,}
+	morph_controls[#morph_controls + 1] = Label:New{ name='cost', caption = morph_cost, valign='center', textColor=cyan , autosize=false, width=morph_text_width, fontSize=ttFontSize,}
 	
 	--if morph_prereq then
 		--morph_controls[#morph_controls + 1] = Label:New{ 'prereq' caption = 'Need Unit: '..morph_prereq, valign='center', textColor=cyan , autosize=false, width=180, fontSize=ttFontSize,}
@@ -1659,7 +1738,7 @@ local function BuildTooltip2(ttname, ttdata, sel)
 					itemMargin = {0,0,0,0},
 					resizeItems=false,
 					autosize=true,
-					width = 96,
+					width = leftbar_width,
 					children = children_leftbar,
 				}
 			leftside = true
@@ -1670,11 +1749,12 @@ local function BuildTooltip2(ttname, ttdata, sel)
 		stack_main_temp = StackPanel:New{
 			name = 'main',
 			autosize=true,
-			x = leftside and 60 or 0,
+			--x = leftside and 60 or 0,
+			x = leftside and (leftbar_width-36) or 0,
 			y = 0,
 			orientation='vertical',
 			centerItems = false,
-			width = 230,
+			width = mainsection_width,
 			padding = {0,0,0,0},
 			itemPadding = {0,0,0,0},
 			itemMargin = {0,0,0,0},
@@ -1727,8 +1807,8 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
 			tooltip = WG.Translate("common", "mmb") .. ": " .. WG.Translate("common", "go_to"),
 			keepAspect = false,
-			height  = 55*(4/5),
-			width   = 55,
+			height  = buildpic_size*(4/5),
+			width   = buildpic_size,
 			unitID = unitID,
 			
 		}
@@ -2069,12 +2149,12 @@ local function MakeToolTip_Feature(data)
 	return true
 end
 
-local function CreateHpBar(name)
+CreateHpBar = function(name)
 	globalitems[name] = Panel:New {
 		orientation='horizontal',
 		name = name,
 		width = '100%',
-		height = icon_size+2,
+		height = icon_size*1.1,
 		itemMargin    = {0,0,0,0},
 		itemPadding   = {0,0,0,0},	
 		padding = {0,0,0,0},
@@ -2087,25 +2167,27 @@ local function CreateHpBar(name)
 				x=icon_size,
 				right=0,
 				--width = '100%',
-				height = icon_size+2,
+				height = icon_size*1.1,
 				itemMargin    = {0,0,0,0},
 				itemPadding   = {0,0,0,0},	
 				padding = {0,0,0,0},
 				color = {0,1,0,1},
 				max=1,
 				caption = '',
+				font= { size=ttFontSize },
 			},
 		},
+		
 	}
 	
 end
 
-local function CreateBpBar(name)
+CreateBpBar = function(name)
 	globalitems[name] = Panel:New {
 		orientation='horizontal',
 		name = name,
 		width = '100%',
-		height = icon_size+2,
+		height = icon_size*1.1,
 		itemMargin    = {0,0,0,0},
 		itemPadding   = {0,0,0,0},	
 		padding = {0,0,0,0},
@@ -2118,24 +2200,25 @@ local function CreateBpBar(name)
 				x=icon_size,
 				right=0,
 				--width = '100%',
-				height = icon_size+2,
+				height = icon_size*1.1,
 				itemMargin    = {0,0,0,0},
 				itemPadding   = {0,0,0,0},	
 				padding = {0,0,0,0},
 				color = {0.8,0.8,0.2,1};
 				max=1,
 				caption = '',
+				font= { size=ttFontSize },
 			},
 		},
 	}
 end
 
-local function CreateShieldBar(name)
+CreateShieldBar = function(name)
 	globalitems[name] = Panel:New {
 		orientation='horizontal',
 		name = name,
 		width = '100%',
-		height = icon_size+2,
+		height = icon_size*1.1,
 		itemMargin    = {0,0,0,0},
 		itemPadding   = {0,0,0,0},	
 		padding = {0,0,0,0},
@@ -2148,13 +2231,14 @@ local function CreateShieldBar(name)
 				x=icon_size,
 				right=0,
 				--width = '100%',
-				height = icon_size+2,
+				height = icon_size*1.1,
 				itemMargin    = {0,0,0,0},
 				itemPadding   = {0,0,0,0},	
 				padding = {0,0,0,0},
 				color = {0.3,0,0.9,1};
 				max=1,
 				caption = '',
+				font= { size=ttFontSize },
 			},
 		},
 	}
