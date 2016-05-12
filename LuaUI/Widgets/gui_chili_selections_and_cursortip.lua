@@ -2473,7 +2473,7 @@ function widget:Update(dt)
 
 				shieldbar:SetValue(shieldCurrentPower / shieldPower,true)
 				if shieldEnabled then
-					shieldbar:SetCaption(math.floor(shieldCurrentPower) .. ' / ' .. shieldPower .. regen)
+					shieldbar:SetCaption( numformat(math.floor(shieldCurrentPower)) .. ' / ' .. numformat(shieldPower) .. regen)
 				else
 					shieldbar:SetCaption('Shield offline')
 				end
