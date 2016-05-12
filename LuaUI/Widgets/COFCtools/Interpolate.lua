@@ -190,7 +190,7 @@ local function NormalizeRotation(cs)
 	-- so its not from 0 to 2*mathPi
 
 	--failure?
-	Spring.Echo('Failure - NormalizeRotation')
+	-- Spring.Echo('Failure - NormalizeRotation')
 	if not cs.rx then Spring.Echo('Failure - OverrideSetCameraStateInterpolate'); return end
 
 	local fullCircle = 2*mathPi
