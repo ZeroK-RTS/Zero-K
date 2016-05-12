@@ -297,7 +297,7 @@ local function clearControls()
 	--]]
 	
 	for _,tt in ipairs({ 'unit2', 'feature2', 'corpse2', 'drawing2', 'terra', 'morph2', 'ud2',
-		'selunit2'
+		'selunit2', 'tt_text2'	,
 		}) do
 		if controls[tt] then
 			for _,controls in pairs(controls[tt]) do
