@@ -187,9 +187,7 @@ local function GetLightsFromUnitDefs()
 		
 		local weaponData = {r = r, g = g, b = b, radius = 100}
 		
-		if string.find(weaponDef.name, "chicken") ~= nil then
-			weaponData.radius = 0	-- chicken weapons do not have lights by default
-		elseif (weaponDef.type == 'Cannon') then
+		if (weaponDef.type == 'Cannon') then
 			if customParams.single_hit then
 				weaponData.beamOffset = 1
 				weaponData.beam = true

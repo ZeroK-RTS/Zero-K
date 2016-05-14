@@ -21,7 +21,7 @@ unitDef = {
 	description_de = [[Skirmisher]],
     helptext       = [[The Spiker's razor sharp projectiles can pierce even the thickest armor. While it doesn't have much health, it remains a potent threat to both air and ground units. Counter with anything that can reliably outrange it.]],
     helptext_fr    = [[Le Spiker envoie des projectiles affut?s comme des rasoirs qui peuvent traverser m?me les armures les plus solides. Bien que poss?dant peu de vie il reste une menace tr?s r?elle tant pour les unit?s terrestres que volantes. Pour le contrer il faut utiliser tout ce qui tire plus loin.]],
-	helptext_de    = [[Spikers messerscharfe Projektile können auch die dickste Penzerung durchdringen. Zwar besitzen Spiker wenig Lebensenergie, dennoch stellen sie durchauch eine große Gefahr, für sowohl Boden- als auch Lufteinheiten, dar. Wirke den Spikern mit Einheiten entgegen, die eine größere Reichweite als sie besitzen.]],
+	helptext_de    = [[Spikers messerscharfe Projektile können auch die dickste Penzerung durchdringen. Zwar besitzen Spiker wenig Lebensenergie, dennoch stellen sie durchauch eine große Gefahr, fE sowohl Boden- als auch Lufteinheiten, dar. Wirke den Spikern mit Einheiten entgegen, die eine größere Reichweite als sie besitzen.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -94,7 +94,11 @@ unitDef = {
       collideFriendly         = true,
       craterBoost             = 0,
       craterMult              = 0,
-
+      
+      customParams            = {
+        light_radius = 0,
+      },
+      
       damage                  = {
         default = 180,
         planes  = 180,
