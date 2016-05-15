@@ -2174,7 +2174,7 @@ CreateHpBar = function(name)
 				color = {0,1,0,1},
 				max=1,
 				caption = '',
-				font= { size=ttFontSize },
+				font= { size=ttFontSize + 3},
 			},
 		},
 		
@@ -2207,7 +2207,7 @@ CreateBpBar = function(name)
 				color = {0.8,0.8,0.2,1};
 				max=1,
 				caption = '',
-				font= { size=ttFontSize },
+				font= { size=ttFontSize + 3},
 			},
 		},
 	}
@@ -2238,7 +2238,7 @@ CreateShieldBar = function(name)
 				color = {0.3,0,0.9,1};
 				max=1,
 				caption = '',
-				font= { size=ttFontSize },
+				font= { size=ttFontSize + 3},
 			},
 		},
 	}
