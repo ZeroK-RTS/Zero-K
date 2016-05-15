@@ -95,7 +95,7 @@ local function GameFrameUnitsCheck()
 	  fx.size = fx.baseSize*mult
 	end
 	if fx.length then
-	  fx.length = fx.baseLength*mult
+	  fx.length = fx.baseLength + fx.linearLength*mult
 	end
 	fx:Destroy()	-- clean up any display lists
 	fx:CreateParticle()
@@ -118,8 +118,8 @@ local function GetUnitSpeed(unitID)
     end
   end
 
-  local vx, vy, vz = spGetUnitVelocity(unitID)
-  return (vx^2 + vy^2 + vz^2)^0.5
+  local _, _, _, speed = spGetUnitVelocity(unitID)
+  return speed
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)

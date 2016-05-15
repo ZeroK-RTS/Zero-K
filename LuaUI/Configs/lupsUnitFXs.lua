@@ -246,6 +246,10 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}}},
   },
   armca = {
+    {class='Ribbon', options={width=1, size=10, piece="leftwing"}},
+    {class='Ribbon', options={width=1, size=10, piece="rightwing"}},
+  },
+  gunshipcon = {
     {class='Ribbon', options={width=1, size=10, piece="engine1"}},
     {class='Ribbon', options={width=1, size=10, piece="engine2"}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}}},
@@ -288,10 +292,6 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip1"}},
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
-  gunshipsupport = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust2", onActive=true}},
-  },
   corhurc2 = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
@@ -307,7 +307,6 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=8, piece="wingtip2"}},
   },
   corbtrans = {
-    {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, piece="engineEmit", onActive=true}},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav1", onActive=true})},
     {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav1", onActive=true})},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav2", onActive=true})},
