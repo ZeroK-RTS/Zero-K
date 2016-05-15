@@ -563,7 +563,7 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['armca'].id, chance = 1},
+					[1] = {ID = UnitDefNames['gunshipcon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout

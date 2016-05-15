@@ -170,6 +170,7 @@ local completeUnitListNames = {
 		"corch",
 		"amphcon",
 		"armca",
+		"gunshipcon",
 		"shipcon",
 	},
 }
@@ -338,6 +339,7 @@ local economyTargetNames =  {
 	["corch"] = {mult = 1},
 	["amphcon"] = {mult = 1},
 	["armca"] = {mult = 1},
+	["gunshipcon"] = {mult = 1},
 	["shipcon"] = {mult = 1},
 }
 
