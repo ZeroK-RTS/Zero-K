@@ -1364,6 +1364,31 @@
 		"description" : "Rebel Commander",
 		"helptext" : "An Imperial rebel leader."
 	},
+	"comm_campaign_hun" : {
+		"name" : "Hun Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "Ostrogoth Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_lombard" : {
+		"name" : "Lombard Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "Bulgar Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_suevi" : {
+		"name" : "Suevi Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
 	
 	"pw_campaign_bunker" : {
 		"name" : "Storage Bunker",

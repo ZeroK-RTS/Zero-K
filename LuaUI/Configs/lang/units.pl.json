@@ -1345,6 +1345,31 @@
         "description" : "Dowódca rebeliant",
         "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
     },
+    "comm_campaign_hun" : {
+        "name" : "Hun Dowódca",
+        "description" : "Barbarzynski Dowódca",
+        "helptext" : "Barbarzynski dowódca."
+    },
+    "comm_campaign_ostrogoth" : {
+        "name" : "Ostrogoth Dowódca",
+        "description" : "Barbarzynski dowódca",
+        "helptext" : "Barbarzynski dowódca."
+    },
+    "comm_campaign_lombard" : {
+        "name" : "Lombard Dowódca",
+        "description" : "Barbarzynski dowódca",
+        "helptext" : "Barbarzynski dowódca."
+    },
+    "comm_campaign_bulgar" : {
+        "name" : "Bulgar Dowódca",
+        "description" : "Barbarzynski dowódca",
+        "helptext" : "Barbarzynski dowódca."
+    },
+    "comm_campaign_suevi" : {
+        "name" : "Suevi Dowódca",
+        "description" : "Barbarzynski dowódca",
+        "helptext" : "Barbarzynski dowódca."
+    },
     
     "pw_campaign_bunker" : {
         "name" : "Storage Bunker",
