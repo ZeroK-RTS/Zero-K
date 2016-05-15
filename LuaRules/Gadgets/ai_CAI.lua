@@ -3843,7 +3843,7 @@ local function SetFactoryDefImportance(team, factoryDefID, importance)
 	
 	importance = importance or 1
 	a.buildDefs.factoryByDefId[factoryDefID].importance = importance
-	Spring.Echo(a.buildDefs.factoryByDefId[factoryDefID])
+	--Spring.Echo(a.buildDefs.factoryByDefId[factoryDefID])
 end
 
 local function RemoveUnit(unitID, unitDefID, unitTeam)
