@@ -1315,9 +1315,9 @@
 	
 	/* campaign stuff */
 	"comm_mission_tutorial1" : {
-		"name" : "Strike Commander",
-		"description" : "Mobile Assault Commander, Builds at 10 m/s",
-		"helptext" : "The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
+		"name" : "Tutorial Commander",
+		"description" : "Mobile Assault Commander",
+		"helptext" : "A rugged command unit configured to be user-friendly, with decent speed, armor, and regeneration."
 	},
 	"comm_campaign_ada" : {
 		"name" : "Ada's Commander",

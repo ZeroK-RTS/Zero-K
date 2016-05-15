@@ -23,7 +23,7 @@ unitDef = {
     fireproof      = 1,
     helptext       = [[The ultimate assault chicken, the Tiamat is a fire-breathing, iron-jawed, spore-spewing monstrosity that knows no fear, no mercy. It even has a mucous shield to protect itself and surrounding chickens from damage.]],
     helptext_fr    = [[L'ultime unit? d'assault pouler, le Tiamat est une monstruosit? crachant des flammes, d?chirant de ses machoires d'acier et lan?ant des spores sur ses victimes. Elle poss?de m?me un bouclier ?nerg?tique r?sultant de sa fureur, lui procurant ? elle et aux unit?s alli?es ? proximit? une protection efficace durant leur progession vers l'adversaire.]],
-	helptext_de    = [[Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosit‰t, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verb¸ndete Einheiten sch¸tzt.]],
+	helptext_de    = [[Das ultimative Sturmchicken: Tiamat ist eine feuer-, eisenspuckende und Sporenspeiende Monstrosit‰t, die keine Angst oder Furcht kennt, aber auch keine Gnade. Sie besitzt sogar ein schleimiges Schild, welches sie selbst und nahe, verbÅEdete Einheiten schÅEzt.]],
 	helptext_pl    = [[Tiamat to wytrzymale, ziejace ogniem i wypuszczajace zarodniki monstrum z mocnymi szczekami i sluzowa tarcza, ktora chroni zarowno Tiamat, jak i okoliczne kurczaki.]],
   },
 
@@ -226,7 +226,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-
+      
+      customParams            = {
+        light_radius = 0,
+      },
+      
       damage                  = {
         default = 100,
         planes  = 100,
