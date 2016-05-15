@@ -12,7 +12,12 @@ local GetTeamColor = Spring.GetTeamColor
 local SetTeamColor = Spring.SetTeamColor
 local GetVisibleUnits = Spring.GetVisibleUnits
 local MarkerAddPoint = Spring.MarkerAddPoint
-local MarkerAddLine = Spring.MarkerAddLine
+
+-- Block line drawing widgets
+--local MarkerAddLine = Spring.MarkerAddLine
+--function Spring.MarkerAddLine(a,b,c,d,e,f,g)
+--	MarkerAddLine(a,b,c,d,e,f,true)
+--end
 
 function Spring.GetTeamColor(teamid)
   if teamColor[teamid] then
@@ -24,9 +29,6 @@ end
 
 function Spring.MarkerAddPoint(x, y, z, t, b)
 	MarkerAddPoint(x,y,z,t,true)
-end
-function Spring.MarkerAddLine(a,b,c,d,e,f,g)
-	MarkerAddLine(a,b,c,d,e,f,true)
 end
 
 function Spring.SetTeamColor(teamid, r, g, b)
