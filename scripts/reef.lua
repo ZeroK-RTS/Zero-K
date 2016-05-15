@@ -85,10 +85,12 @@ local function StartMoving()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx(WakeForeLeft, 2)
-		EmitSfx(WakeForeRight, 2)
-		EmitSfx(WakeAftLeft, 2)
-		EmitSfx(WakeAftRight, 2)
+		if(not Spring.GetUnitIsCloaked(unitID)) then
+			EmitSfx(WakeForeLeft, 2)
+			EmitSfx(WakeForeRight, 2)
+			EmitSfx(WakeAftLeft, 2)
+			EmitSfx(WakeAftRight, 2)
+		end
 		Sleep(150)
 	end
 end
