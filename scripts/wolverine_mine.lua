@@ -31,6 +31,8 @@ local function Remove ()
 		end
 	end
 
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	
 	-- keep alive for a while (xp, stats etc)
 	Spring.SetUnitNoSelect(unitID, true)
 	Spring.SetUnitNoDraw(unitID, true)
