@@ -187,7 +187,24 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 10
 	end
 	
-	local newPriority = hpAdd + defPrio + distAdd
+	
+	local grav=0 
+	if WeaponDefs[attackerWeaponDefID].customParams.impulse and 
+		WeaponDefs[attackerWeaponDefID].damages[1]<=0.002 then
+		Spring.Echo("Newton weapon")
+		local _, _, _, _, build = spGetUnitHealth(targetID)
+		if build<1 then -- Grav guns should never target nanoframes
+			Spring.Echo("Target is a nanoframe: "..tostring(build))
+			return false
+		else -- Newton gun will try to attack light targets first
+			local targetDefID=spGetUnitDefID(targetID)
+			Spring.Echo("Grav: "..tostring(UnitDefs[targetDefID].mass))
+			grav=UnitDefs[targetDefID].mass
+		end
+	end
+	
+	local newPriority = hpAdd + defPrio + distAdd + grav
+
 
 	return true, newPriority --bigger value have lower priority
 end
