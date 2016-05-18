@@ -31,7 +31,8 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, gravityWeaponDefs, transportMult = include("LuaRules/Configs/target_priority_defs.lua")
+local targetTable, radarWobblePenalty, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult = 
+	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
@@ -60,42 +61,52 @@ local remScaledMass = {}
 --// Fairly unchanging values
 local remAllyTeam = {}
 local remUnitDefID = {}
+local remStatic = {}
 
 function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerWeaponDefID, defPriority)
 
 	--Spring.Echo("TARGET CHECK")
 	
 	if (not targetID) or (not unitID) or (not attackerWeaponDefID) then
-		return true, 5
+		return true, 7
 	end
 	
 	local allyTeam = remAllyTeam[unitID]
 	
 	if (not allyTeam) then
-		return true, 5
+		return true, 7
 	end
 	
-	local los
-	if remVisible[allyTeam] and remVisible[allyTeam][targetID] then
-		los = remVisible[allyTeam][targetID] == 1
-	else
-		los = spGetUnitLosState(targetID,allyTeam,false)
-		if los then
-			los = los.los
-		end
+	--// Get whether the unit type is identified. 
+	-- If it is unidentified then the target priority should not occur.
+	if not (remVisible[allyTeam] and remVisible[allyTeam][targetID]) then
 		if not remVisible[allyTeam] then
 			remVisible[allyTeam] = {}
 		end
-		remVisible[allyTeam][targetID] = (los and 1) or 0
+		local visibilityTable = spGetUnitLosState(targetID,allyTeam,false)
+		if visibilityTable then
+			if visibilityTable.los then
+				remVisible[allyTeam][targetID] = 2 -- In LoS
+			elseif visibilityTable.typed then
+				remVisible[allyTeam][targetID] = 1 -- Known type
+			else
+				remVisible[allyTeam][targetID] = 0
+			end
+		else
+			remVisible[allyTeam][targetID] = 0
+		end
 	end
-	if not los then
-		return true, 5
+	
+	--// Unit type visiblity check
+	local visiblity = remVisible[allyTeam][targetID]
+	if visiblity == 0 then
+		-- Cannot see enemy unit type so there is nothing more to base priority on.
+		return true, 7 + (radarWobblePenalty[attackerWeaponDefID] or 0)
 	end
 	
 	local enemyUnitDef = remUnitDefID[targetID]
-	
 	if not enemyUnitDef then
-		return true, 5
+		return true, 7 + (radarWobblePenalty[attackerWeaponDefID] or 0)
 	end
 	
 	--// Get Base priority of unit. Transporting unit for transports.
@@ -118,6 +129,13 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	else
 		defPrio = targetTable[enemyUnitDef][attackerWeaponDefID] or 5
 	end
+	
+	--// Check whether the unit is in LoS
+	if visiblity ~= 2 then
+		-- A unit which is identified but not visible cannot have priority based on health or other status effects.
+		-- 0.2 is added to make this target less good looking than a visible healthy unit.
+		return true, defPrio + 0.2 + ((remStatic[enemyUnitDef] and radarWobblePenalty[attackerWeaponDefID]) or 0)
+	end
 
 	--// Get priority modifier based on disabling.
 	if not remStunnedOrOverkill[targetID] then
@@ -134,7 +152,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	--// Get priority modifier for health and capture progress.
 	local hpAdd
 	if captureWeaponDefs[attackerWeaponDefID] then
-	
 		if remCaptureHealth[targetID] then
 			hpAdd = remCaptureHealth[targetID]
 		else
@@ -158,7 +175,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			remCaptureHealth[targetID] = hpAdd
 		end
 	else
-		
 		if remHealth[targetID] then
 			hpAdd = remHealth[targetID]
 		else
@@ -178,12 +194,12 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 				-- Deprioritize partially captured units.
 				hpAdd = hpAdd + 0.2*capture
 			end
-			
 			remHealth[targetID] = hpAdd
 		end
 	end
 	
-	--// Gravity weapon target priority
+	--// Gravity weapon special handling.
+	-- Prioritize low mass units, do not target nanoframes.
 	if gravityWeaponDefs[attackerWeaponDefID] then
 		if not remScaledMass[targetID] then
 			local _,_,inbuild = spGetUnitIsStunned(targetID)
@@ -201,15 +217,16 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 	end
 	
-	local distAdd = 0 -- heatrays et al prioritize closer targets
-	if WeaponDefs[attackerWeaponDefID].customParams.dyndamageexp then
+	--// Proximity weapon special handling (heatrays).
+	-- Prioritize nearby units.
+	if proximityWeaponDefs[attackerWeaponDefID] then
 		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
-		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 10
+		local distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 5
+		return true, (hpAdd + defPrio)*0.5 + distAdd
 	end
 	
-	local newPriority = hpAdd + defPrio + distAdd
-
-	return true, newPriority --bigger value have lower priority
+	--// All weapons without special handling.
+	return true, hpAdd + defPrio -- bigger value have lower priority
 end
 
 function gadget:GameFrame(f)
@@ -226,11 +243,13 @@ end
 function gadget:UnitCreated(unitID, unitDefID)
 	remUnitDefID[unitID] = unitDefID
 	remAllyTeam[unitID] = spGetUnitAllyTeam(unitID)
+	remStatic[unitID] = (unitDefID and not Spring.Utilities.getMovetype(UnitDefs[unitDefID]))
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	remUnitDefID[unitID] = nil
 	remAllyTeam[unitID] = nil
+	remStatic[unitID] = nil
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
