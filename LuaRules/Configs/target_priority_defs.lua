@@ -147,6 +147,13 @@ local captureWeaponDefs = {
 	[WeaponDefNames["capturecar_captureray"].id] = true
 }
 
+local gravityWeaponDefs = {
+	[WeaponDefNames["corgrav_gravity_neg"].id] = true,
+	[WeaponDefNames["corgrav_gravity_pos"].id] = true,
+	[WeaponDefNames["corsumo_gravity_neg"].id] = true,
+	[WeaponDefNames["corsumo_gravity_pos"].id] = true,
+}
+
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if unitIsBadAgainstFastStuff[i] then
@@ -230,4 +237,4 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable, captureWeaponDefs, transportMult
+return targetTable, captureWeaponDefs, gravityWeaponDefs, transportMult

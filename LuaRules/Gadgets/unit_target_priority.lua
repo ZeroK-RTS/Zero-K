@@ -31,7 +31,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, transportMult = include("LuaRules/Configs/target_priority_defs.lua")
+local targetTable, captureWeaponDefs, gravityWeaponDefs, transportMult = include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
 -- This seems to override everything, will need to reimplement emp things, badtargetcats etc...
@@ -53,6 +53,9 @@ local remStunnedOrOverkill = {}
 
 -- Whether the enemy unit is visible.
 local remVisible = {}
+
+-- Remebered mass of the target, negative if it is immune to impulse (nanoframes)
+local remScaledMass = {}
 
 --// Fairly unchanging values
 local remAllyTeam = {}
@@ -85,7 +88,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 		remVisible[allyTeam][targetID] = (los and 1) or 0
 	end
-	
 	if not los then
 		return true, 5
 	end
@@ -181,30 +183,31 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 	end
 	
+	--// Gravity weapon target priority
+	if gravityWeaponDefs[attackerWeaponDefID] then
+		if not remScaledMass[targetID] then
+			local _,_,inbuild = spGetUnitIsStunned(targetID)
+			if inbuild then
+				remScaledMass[targetID] = -1
+			else
+				-- Glaive = 1.46, Zeus = 5.24, Reaper = 9.48
+				remScaledMass[targetID] = 0.02 * UnitDefs[remUnitDefID[targetID]].mass
+			end
+		end
+		if remScaledMass[targetID] > 0 then
+			return true, remScaledMass[targetID] + defPrio * 0.3
+		else
+			return false
+		end
+	end
+	
 	local distAdd = 0 -- heatrays et al prioritize closer targets
 	if WeaponDefs[attackerWeaponDefID].customParams.dyndamageexp then
 		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
 		distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 10
 	end
 	
-	
-	local grav=0 
-	if WeaponDefs[attackerWeaponDefID].customParams.impulse and 
-		WeaponDefs[attackerWeaponDefID].damages[1]<=0.002 then
-		--Spring.Echo("Newton weapon")
-		local _, _, _, _, build = spGetUnitHealth(targetID)
-		if build<1 then -- Grav guns should never target nanoframes
-			--Spring.Echo("Target is a nanoframe: "..tostring(build))
-			return false
-		else -- Newton gun will try to attack light targets first
-			local targetDefID=spGetUnitDefID(targetID)
-			--Spring.Echo("Grav: "..tostring(UnitDefs[targetDefID].mass))
-			grav=UnitDefs[targetDefID].mass
-		end
-	end
-	
-	local newPriority = hpAdd + defPrio + distAdd + grav
-
+	local newPriority = hpAdd + defPrio + distAdd
 
 	return true, newPriority --bigger value have lower priority
 end
@@ -215,6 +218,7 @@ function gadget:GameFrame(f)
 		remCaptureHealth = {}
 		remTransportiee = {}
 		remVisible = {}
+		remScaledMass = {}
 		remStunnedOrOverkill = {}
 	end
 end
