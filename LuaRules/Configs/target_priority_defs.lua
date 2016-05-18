@@ -251,7 +251,7 @@ for uid = 1, #UnitDefs do
 		
 		-- Autogenerate some wobble penalties.
 		if not radarWobblePenalty[wid] then
-			local wd = weaponDefs[WeaponDefs]
+			local wd = WeaponDefs[wid]
 			local weaponType = wd.type
 			if weaponType == "BeamLaser" or weaponType == "LaserCannon" or weaponType == "LightningCannon" then
 				radarWobblePenalty[wid] = 2
