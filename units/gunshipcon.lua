@@ -37,7 +37,7 @@ unitDef = {
 	midposoffset   = [[0 4 0]],
   },
 
-  energyMake          = 0.12,
+  energyMake          = 0.225,
   energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
@@ -50,7 +50,7 @@ unitDef = {
   mass                = 130,
   maxDamage           = 800,
   maxVelocity         = 3.1,
-  metalMake           = 0.12,
+  metalMake           = 0.225,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
