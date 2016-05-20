@@ -152,7 +152,13 @@ confdata.subMenuIcons = {
 	['Settings/Interface/Map'] = imgPath..'epicmenu/map.png',
 	['Settings/Interface/Healthbars'] = imgPath..'commands/Bold/health.png',
 	['Settings/Interface/Retreat Zones'] = imgPath..'commands/Bold/retreat.png',
-	['Settings/Interface/Spectating'] = imgPath..'epicmenu/find.png',
+	['Settings/Interface/Spectating'] = imgPath..'epicmenu/popcorn.png',
+	
+	['Settings/Interface/Building Placement'] = imgPath..'factory.png',
+	['Settings/Interface/Local Team Colors'] = imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Common Team Colors'] = imgPath..'map/minimap_colors_simple.png',
+	
+	['Settings/Interface/Build ETA'] = imgPath..'epicmenu/stop_watch_icon.png',
 }
 
 -- SETUP MENU HERE
@@ -359,8 +365,8 @@ local pathMisc = 'Settings/Misc'
 
 
 local pathMiscScreenshots = 'Settings/Misc/Screenshots'	
-	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
-	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot', 'Find your screenshots under Spring/screenshots')
+	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots') 
+	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
 	ShButton(pathMiscScreenshots, 
 			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
 			..'Creates a smooth video framerate without ingame stutter. '

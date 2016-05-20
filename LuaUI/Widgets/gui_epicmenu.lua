@@ -558,6 +558,9 @@ local function KillSubWindow(makingNew)
 	if window_sub_cur then
 		settings.sub_pos_x = window_sub_cur.x
 		settings.sub_pos_y = window_sub_cur.y
+		
+		settings.subwindow_height = window_sub_cur.height
+		
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
@@ -1977,7 +1980,8 @@ MakeSubWindow = function(path, pause)
 		x = settings.sub_pos_x,  
 		y = settings.sub_pos_y, 
 		clientWidth = window_width,
-		clientHeight = window_height+B_HEIGHT*4,
+		--clientHeight = window_height+B_HEIGHT*4,
+		height = settings.subwindow_height,
 		minWidth = 250,
 		minHeight = 350,		
 		--resizable = false,
@@ -2332,10 +2336,14 @@ local function MakeQuitButtons()
 		value = 'Quit game',
 		key='Quit game',
 	})
+	
+	local imgPath = LUAUI_DIRNAME  .. 'images/'
+
 	AddOption('',{
 		type='button',
 		name='Vote Resign',
 		desc = "Ask teammates to resign",
+		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
 				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
 					spSendCommands("say !voteresign")
@@ -2351,6 +2359,7 @@ local function MakeQuitButtons()
 		type='button',
 		name='Resign...',
 		desc = "Abandon team and become spectator",
+		icon = imgPath..'epicmenu/whiteflag.png',
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
@@ -2371,6 +2380,7 @@ local function MakeQuitButtons()
 		type='button',
 		name='Exit to Desktop...',
 		desc = "Exit game completely",
+		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
 				local paused = select(3, Spring.GetGameSpeed())
