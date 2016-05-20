@@ -1712,11 +1712,13 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
+				local button_height = root and 36 or 30
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
-					minHeight = root and 36 or 30,
-					caption = option.name, 
+					minHeight = button_height,
+					--caption = option.name, 
+					caption = '', 
 					OnClick = escapeSearch and {function() filterUserInsertedTerm = ''; end,option.OnChange} or {option.OnChange},
 					backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
 					textColor = disabled and color.disabled_fg or color.sub_button_fg, 
@@ -1729,6 +1731,9 @@ MakeSubWindow = function(path, pause)
 					local width = root and 24 or 16
 					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
 				end
+				
+				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
+				
 				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton )
 			end
 			
