@@ -21,6 +21,7 @@ local PARAM_DEFID   = 4
 local PARAM_TEAMID  = 5
 local PARAM_TEXTURE = 6
 local PARAM_RADIUS  = 7
+local PARAM_FACING  = 8
 
 local updateTimer = 0
 local ghostSites = {}
@@ -88,6 +89,7 @@ local function DrawGhostSites()
 
 			gl.PushMatrix()
 			gl.Translate(x, y - 17, z)
+			gl.Rotate(ghost[PARAM_FACING], 0, 1, 0)
 
 			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false)
 
@@ -212,7 +214,8 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 
 	if (udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1 then
 		local x, _, z = Spring.GetUnitPosition(unitID)
+		local facing = Spring.GetUnitBuildFacing(unitID)
 		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
-		ghostSites[unitID] = {x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100}
+		ghostSites[unitID] = {x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100, facing * 90}
 	end
 end
