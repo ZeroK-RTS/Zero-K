@@ -1,5 +1,6 @@
 -- $Id$
 local versionNumber = "1.03"
+local devCompat = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 function widget:GetInfo()
 	return {
@@ -31,6 +32,23 @@ local scanForRemovalFeatures = {}
 local dontCheckFeatures = {}
 
 local gaiaTeamID = ((Game.version:find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
+
+local shaderObj
+function InitShader()
+	local shaderTemplate = include("Widgets/Shaders/default_tint.lua")
+
+    local shader = gl.CreateShader(shaderTemplate)
+    local errors = gl.GetShaderLog(shader)
+    if errors ~= "" then
+        Spring.Echo(errors)
+        return
+    end
+    shaderObj = {
+        shader = shader,
+        teamColorID = gl.GetUniformLocation(shader, "teamColor"),
+        tint = gl.GetUniformLocation(shader, "tint")
+    }
+end
 
 local function DrawGhostFeatures()
 	gl.Color(1.0, 1.0, 1.0, 0.35)
@@ -87,11 +105,23 @@ local function DrawGhostSites()
 			--glow effect?
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
 
+			local ghostTeamColor = {Spring.GetTeamColor(ghost[PARAM_TEAMID])}
 			gl.PushMatrix()
-			gl.Translate(x, y - 17, z)
+			gl.Translate(x, y, z) 
 			gl.Rotate(ghost[PARAM_FACING], 0, 1, 0)
+			
+			if devCompat then
+				gl.UseShader(shaderObj.shader)
+				gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
+				gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
 
-			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false)
+				gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
+				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
+				gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
+			else
+				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
+			end
+			gl.UseShader(0)
 
 			gl.PopMatrix()
 		else
@@ -192,6 +222,10 @@ function widget:Update(dt)
 end
 
 function widget:DrawWorld()
+	if devCompat and not shaderObj then
+		InitShader()
+	end
+	
 	DrawGhostSites()
 	DrawGhostFeatures()
 	ResetGl()
@@ -215,7 +249,7 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 	if (udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1 then
 		local x, _, z = Spring.GetUnitPosition(unitID)
 		local facing = Spring.GetUnitBuildFacing(unitID)
-		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
+		local y = Spring.GetGroundHeight(x,z) -- every single model is offset by 16, pretty retarded if you ask me.
 		ghostSites[unitID] = {x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100, facing * 90}
 	end
 end
