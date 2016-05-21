@@ -182,7 +182,7 @@ local function SetupShaderTable()
 		#endif
   
 		float ff = 20000.0;
-		if((mirrorZ && mirrorX))
+		if((mirrorZ > 0 && mirrorX > 0))
 		  ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
 		else if(mirrorX)
 		  ff=ff/(pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
@@ -340,7 +340,7 @@ local function DrawOMap(useMirrorShader)
 	----draw map compass text
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
 	gl.Texture(false)
-	gl.DepthMask(false)
+	-- gl.DepthMask(false)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.PopAttrib()
@@ -374,6 +374,7 @@ function widget:Initialize()
 				gl.DepthMask(true)
 				--gl.Texture(tex)
 				gl.CallList(dList)
+				gl.DepthMask(false)
 				gl.Texture(false)
 			end
 		end
