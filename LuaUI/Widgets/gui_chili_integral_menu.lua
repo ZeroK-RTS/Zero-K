@@ -803,10 +803,12 @@ end
 local function UpdateFactoryBuildQueue() 
 	buildQueue = spGetFullBuildQueue(selectedFac)
 	buildQueueUnsorted = {}
-	for i=1, #buildQueue do
-		for udid, count in pairs(buildQueue[i]) do
-			buildQueueUnsorted[udid] = (buildQueueUnsorted[udid] or 0) + count
-			--Spring.Echo(udid .. "\t" .. buildQueueUnsorted[udid])
+	if buildQueue then
+		for i=1, #buildQueue do
+			for udid, count in pairs(buildQueue[i]) do
+				buildQueueUnsorted[udid] = (buildQueueUnsorted[udid] or 0) + count
+				--Spring.Echo(udid .. "\t" .. buildQueueUnsorted[udid])
+			end
 		end
 	end
 end
