@@ -5,7 +5,7 @@ function widget:GetInfo()
     author    = "gajop",
     date      = "in the future",
     license   = "GPL-v2",
-    layer     = 0,
+    layer     = 2000,
     enabled   = true,
   }
 end
