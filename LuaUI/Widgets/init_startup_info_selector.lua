@@ -279,7 +279,7 @@ function widget:Initialize()
 	if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
 	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)
 	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
-	and (not Spring.IsCheatingEnabled())
+	--and (not Spring.IsCheatingEnabled())
 	then
 		noComm = true	-- will prevent window from auto-appearing; can still be brought up from the button
 	end
