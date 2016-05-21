@@ -28,10 +28,7 @@ Object = {
   OnMouseOver     = {},
   OnMouseOut      = {},
   OnKeyPress      = {},
-  OnTextInput     = {},
   OnFocusUpdate   = {},
-  OnHide          = {},
-  OnShow          = {},
 
   disableChildrenHitTest = false, --// if set childrens are not clickable/draggable etc - their mouse events are not processed
 }
@@ -427,25 +424,17 @@ function Object:SetVisibility(visible)
   self.hidden  = not visible
 end
 
---- Hides the objects
+
 function Object:Hide()
-  local wasHidden = self.hidden
   self:SetVisibility(false)
-  if not wasHidden then
-    self:CallListeners(self.OnHide, self)
-  end
 end
 
---- Makes the object visible
+
 function Object:Show()
-  local wasVisible = self.hidden
   self:SetVisibility(true)
-  if not wasVisible then
-    self:CallListeners(self.OnShow, self)
-  end
 end
 
---- Toggles object visibility
+
 function Object:ToggleVisibility()
   self:SetVisibility(not self.visible)
 end
@@ -901,15 +890,6 @@ end
 
 function Object:KeyPress(...)
   if (self:CallListeners(self.OnKeyPress, ...)) then
-    return self
-  end
-
-  return false
-end
-
-
-function Object:TextInput(...)
-  if (self:CallListeners(self.OnTextInput, ...)) then
     return self
   end
 

@@ -9,7 +9,7 @@ function widget:GetInfo()
 		date      = "WIP",
 		license   = "GPLv2",
 		version   = "2.1",
-		layer     = -1000,
+		layer     = 1000,
 		enabled   = true,  --  loaded by default?
 		handler   = true,
 		api       = true,
@@ -167,12 +167,6 @@ function widget:KeyRelease()
   local _keyPressed = keyPressed
   keyPressed = false
   return _keyPressed -- block engine actions when we processed it
-end
-
-function widget:TextInput(utf8, ...)
-	if Spring.IsGUIHidden() then return false end
-
-	return screen0:TextInput(utf8, ...)
 end
 
 

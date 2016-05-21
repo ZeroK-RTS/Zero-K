@@ -261,13 +261,6 @@ local function _DrawCursor(x, y, w, h)
 	gl.Vertex(x + w, y + h)
 end
 
-local function _DrawSelection(x, y, w, h)
-	gl.Vertex(x, y)
-	gl.Vertex(x, y + h)
-	gl.Vertex(x + w, y)
-	gl.Vertex(x + w, y + h)
-end
-
 
 --//=============================================================================
 --//
@@ -365,8 +358,7 @@ function DrawComboBox(self)
 	gl.Texture(0,false)
 end
 
--- TODO: this still uses the old way of drawing by using obj.x and obj.y components
--- to update to FTL chili uncomment the appropriate lines and delete those immediately below
+
 function DrawEditBox(obj)
 	local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
@@ -374,7 +366,6 @@ function DrawEditBox(obj)
 	TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 	local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
 	local tw,th = texInfo.xsize, texInfo.ysize
-    --gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x, obj.y, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	--gl.Texture(0,false)
 
@@ -386,25 +377,10 @@ function DrawEditBox(obj)
 	TextureHandler.LoadTexture(0,obj.TileImageFG,obj)
 	local texInfo = gl.TextureInfo(obj.TileImageFG) or {xsize=1, ysize=1}
 	local tw,th = texInfo.xsize, texInfo.ysize
-	--gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, 0, 0, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
-    gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x, obj.y, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
+	gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawTiledTexture, obj.x, obj.y, obj.width, obj.height,  skLeft,skTop,skRight,skBottom, tw,th)
 	gl.Texture(0,false)
 
-	local text = obj.text	
-	local font = obj.font
-	local displayHint = false
-	
-	if text == "" and not obj.state.focused then
-		text = obj.hint		
-		displayHint = true
-		font = obj.hintFont
-	end
-	
-	if (text) then        
-        if obj.passwordInput and not displayHint then 
-            text = string.rep("*", #text)
-        end
-            
+	if (obj.text) then
 		if (obj.offset > obj.cursor) then
 			obj.offset = obj.cursor
 		end
@@ -413,8 +389,8 @@ function DrawEditBox(obj)
 
 		--// make cursor pos always visible (when text is longer than editbox!)
 		repeat
-			local txt = text:sub(obj.offset, obj.cursor)
-			local wt = font:GetTextWidth(txt)
+			local txt = obj.text:sub(obj.offset, obj.cursor)
+			local wt = obj.font:GetTextWidth(txt)
 			if (wt <= clientWidth) then
 				break
 			end
@@ -424,12 +400,12 @@ function DrawEditBox(obj)
 			obj.offset = obj.offset + 1
 		until (false)
 
-		local txt = text:sub(obj.offset)
+		local txt = obj.text:sub(obj.offset)
 
 		--// strip part at the end that exceeds the editbox
-		local lsize = math.max(0, font:WrapText(txt, clientWidth, clientHeight):len() - 3) -- find a good start (3 dots at end if stripped)
+		local lsize = math.max(0, obj.font:WrapText(txt, clientWidth, clientHeight):len() - 3) -- find a good start (3 dots at end if stripped)
 		while (lsize <= txt:len()) do
-			local wt = font:GetTextWidth(txt:sub(1, lsize))
+			local wt = obj.font:GetTextWidth(txt:sub(1, lsize))
 			if (wt > clientWidth) then
 				break
 			end
@@ -438,12 +414,11 @@ function DrawEditBox(obj)
 		txt = txt:sub(1, lsize - 1)
 
 		gl.Color(1,1,1,1)
-        --font:DrawInBox(txt, clientX, clientY, clientWidth, clientHeight, obj.align, obj.valign)
-		font:DrawInBox(txt, obj.x + clientX, obj.y + clientY, clientWidth, clientHeight, obj.align, obj.valign)
+		obj.font:DrawInBox(txt, obj.x + clientX, obj.y + clientY, clientWidth, clientHeight, obj.align, obj.valign)
 
 		if obj.state.focused then
-			local cursorTxt = text:sub(obj.offset, obj.cursor - 1)
-			local cursorX = font:GetTextWidth(cursorTxt)
+			local cursorTxt = obj.text:sub(obj.offset, obj.cursor - 1)
+			local cursorX = obj.font:GetTextWidth(cursorTxt)
 
 			local dt = Spring.DiffTimers(Spring.GetTimer(), obj._interactedTime)
 			local as = math.sin(dt * 8);
@@ -456,31 +431,8 @@ function DrawEditBox(obj)
 
 			local cc = obj.cursorColor
 			gl.Color(cc[1], cc[2], cc[3], cc[4] * alpha)
-			--gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, cursorX + clientX - 1, clientY, 3, clientHeight)
-            gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, obj.x + cursorX + clientX - 1, obj.y + clientY, 3, clientHeight)
+			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawCursor, obj.x + cursorX + clientX - 1, obj.y + clientY, 3, clientHeight)
 		end
-        if obj.selStart and obj.state.focused then
-			local cursorTxt = text:sub(obj.offset, obj.cursor - 1)
-			local cursorX = font:GetTextWidth(cursorTxt)
-			local cc = obj.selectionColor
-			gl.Color(cc[1], cc[2], cc[3], cc[4])
-            
-            local left, right = obj.selStart, obj.selEnd
-            if left > right then
-                left, right = right, left
-            end
-			
-            local leftTxt = text:sub(obj.offset, left - 1)
-			local leftX = font:GetTextWidth(leftTxt)
-            local rightTxt = text:sub(obj.offset, right - 1)
-			local rightX = font:GetTextWidth(rightTxt)
-
-            local w = rightX - leftX
-            -- limit the selection to the editbox width
-            w = math.min(w, obj.width - leftX - 3)
-            --gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, leftX + clientX - 1, clientY, w, clientHeight)
-			gl.BeginEnd(GL.TRIANGLE_STRIP, _DrawSelection, obj.x + leftX + clientX - 1, obj.y + clientY, w, clientHeight)
-        end
 	end
 end
 
