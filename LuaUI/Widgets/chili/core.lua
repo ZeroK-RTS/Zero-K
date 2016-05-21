@@ -3,7 +3,8 @@ local includes = {
   "headers/util.lua",
   "headers/links.lua",
   "headers/backwardcompability.lua",
-  
+  "headers/unicode.lua",
+
   "handlers/debughandler.lua",
   "handlers/taskhandler.lua",
   "handlers/skinhandler.lua",
