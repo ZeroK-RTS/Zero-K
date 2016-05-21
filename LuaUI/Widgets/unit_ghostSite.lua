@@ -4,7 +4,7 @@ local versionNumber = "1.03"
 function widget:GetInfo()
 	return {
 		name      = "Ghost Site",
-		desc      = "[v" .. string.format("%s", versionNumber ) .. "] Displays ghosted buildings in progress and features",
+		desc      = "[v" .. string.format("%s", versionNumber) .. "] Displays ghosted buildings in progress and features",
 		author    = "very_bad_soldier",
 		date      = "April 7, 2009",
 		license   = "GNU GPL v2",
@@ -32,19 +32,19 @@ local dontCheckFeatures = {}
 local gaiaTeamID = ((Game.version:find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
 
 local function DrawGhostFeatures()
-	gl.Color(1.0, 1.0, 1.0, 0.35 )
+	gl.Color(1.0, 1.0, 1.0, 0.35)
   
 	--gl.Texture(0,"$units1") --.3do texture atlas for .3do model
 	--gl.Texture(1,"$units1")
 
-	gl.TexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160 ) --34160 = GL_COMBINE_RGB_ARB
+	gl.TexEnv(GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 34160) --34160 = GL_COMBINE_RGB_ARB
 	--use the alpha given by glColor for the outgoing alpha, else it would interpret the teamcolor channel as alpha one and make model transparent.
-	gl.TexEnv( GL.TEXTURE_ENV, 34162, GL.REPLACE ) --34162 = GL_COMBINE_ALPHA
-	gl.TexEnv( GL.TEXTURE_ENV, 34184, 34167 ) --34184 = GL_SOURCE0_ALPHA_ARB, 34167 = GL_PRIMARY_COLOR_ARB
+	gl.TexEnv(GL.TEXTURE_ENV, 34162, GL.REPLACE) --34162 = GL_COMBINE_ALPHA
+	gl.TexEnv(GL.TEXTURE_ENV, 34184, 34167) --34184 = GL_SOURCE0_ALPHA_ARB, 34167 = GL_PRIMARY_COLOR_ARB
 	
 	--------------------------Draw-------------------------------------------------------------
 	local lastTexture = ""
-	for featureID, ghost in pairs( ghostFeatures ) do
+	for featureID, ghost in pairs(ghostFeatures) do
 		local x, y, z = ghost[1], ghost[2], ghost[3]
 		local _, losState = Spring.GetPositionLosState(x, y, z)
 
@@ -57,9 +57,9 @@ local function DrawGhostFeatures()
 			end
 
 			gl.PushMatrix()
-			gl.Translate( x, y, z)
+			gl.Translate(x, y, z)
 
-			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false )
+			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false)
 
 			gl.PopMatrix()
 		else
@@ -68,17 +68,17 @@ local function DrawGhostFeatures()
 	end
 
 	--------------------------Clean up-------------------------------------------------------------
-	gl.TexEnv( GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448 ) --8448 = GL_MODULATE
+	gl.TexEnv(GL.TEXTURE_ENV, GL.TEXTURE_ENV_MODE, 8448) --8448 = GL_MODULATE
 	--use the alpha given by glColor for the outgoing alpha.
-	gl.TexEnv( GL.TEXTURE_ENV, 34162, 8448 ) --34162 = GL_COMBINE_ALPHA, 8448 = GL_MODULATE
-	--gl.TexEnv( GL.TEXTURE_ENV, 34184, 5890 ) --34184 = GL_SOURCE0_ALPHA_ARB, 5890 = GL_TEXTURE
+	gl.TexEnv(GL.TEXTURE_ENV, 34162, 8448) --34162 = GL_COMBINE_ALPHA, 8448 = GL_MODULATE
+	--gl.TexEnv(GL.TEXTURE_ENV, 34184, 5890) --34184 = GL_SOURCE0_ALPHA_ARB, 5890 = GL_TEXTURE
 end
 
 local function DrawGhostSites()
 	gl.Color(0.3, 1.0, 0.3, 0.25)
 	gl.DepthTest(true)
 
-	for unitID, ghost in pairs( ghostSites ) do
+	for unitID, ghost in pairs(ghostSites) do
 		local x, y, z = ghost[1], ghost[2], ghost[3]
 		local _, losState = Spring.GetPositionLosState(x, y, z)
 
@@ -87,9 +87,9 @@ local function DrawGhostSites()
 			--gl.Blending(GL.SRC_ALPHA, GL.ONE)
 
 			gl.PushMatrix()
-			gl.Translate( x, y - 17, z)
+			gl.Translate(x, y - 17, z)
 
-			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false )
+			gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false)
 
 			gl.PopMatrix()
 		else
@@ -104,7 +104,7 @@ local function ScanFeatures()
 			local fAllyID = Spring.GetFeatureAllyTeam(fID)
 			local fTeamID = Spring.GetFeatureTeam(fID)
 
-			if ( fTeamID ~= gaiaTeamID and fAllyID and fAllyID >= 0 ) then
+			if (fTeamID ~= gaiaTeamID and fAllyID and fAllyID >= 0) then
 				local fDefId  = Spring.GetFeatureDefID(fID)
 				local x, y, z = Spring.GetFeaturePosition(fID)
 				ghostFeatures[fID] = { x, y, z, fDefId, fTeamID, "%-"..fDefId..":0", FeatureDefs[fDefId].radius + 100 }
@@ -144,7 +144,7 @@ local function DeleteGhostSites()
 		local x, y, z = ghost[1], ghost[2], ghost[3]
 		local _, losState = Spring.GetPositionLosState(x, y, z)
 		local udefID = Spring.GetUnitDefID(unitID)
-		local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
+		local _,_,_,_, buildProgress = Spring.GetUnitHealth(unitID)
 	
 		if losState and ((not udefID) or (buildProgress == 1)) then
 			ghostSites[unitID] = nil
@@ -202,17 +202,17 @@ function widget:DrawWorldRefraction()
 end
 
 function widget:UnitEnteredLos(unitID, unitTeam)
-	if Spring.IsUnitAllied( unitID ) then
+	if Spring.IsUnitAllied(unitID) then
 		return
 	end
 
-	local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
+	local _,_,_,_,buildProgress = Spring.GetUnitHealth(unitID)
 	local udid = Spring.GetUnitDefID(unitID)
 	local udef = UnitDefs[udid]
 
-	if ( udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1  then
+	if (udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1 then
 		local x, _, z = Spring.GetUnitPosition(unitID)
 		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
-		ghostSites[unitID] = { x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100 }
+		ghostSites[unitID] = {x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100}
 	end
 end
