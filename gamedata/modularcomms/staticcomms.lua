@@ -175,6 +175,8 @@ for name, data in pairs(commsCampaign) do
   data.miscDefs = data.miscDefs or {}
   data.miscDefs.customparams = data.miscDefs.customparams or {}
   data.miscDefs.customparams.statsname = name;
+  data.miscDefs.reclaimable = false
+  data.miscDefs.canSelfDestruct = false
   comms[name] = data
 end
 
