@@ -14,7 +14,6 @@ function widget:GetInfo()
 end
 
 -- CONFIGURATION
-local debug = false    --generates debug message
 local updateInt = 1    --seconds for the ::update loop
 -- END OF CONFIG
 
@@ -32,62 +31,7 @@ local dontCheckFeatures = {}
 
 local gaiaTeamID = ((Game.version:find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
 
-local DrawGhostFeatures
-local DrawGhostSites
-local ScanFeatures
-local DeleteGhostFeatures
-local DeleteGhostSites
-local ResetGl
-local CheckSpecState
-local printDebug
-
-
-function widget:Update(dt)
-	updateTimer = updateTimer + dt
-	if (updateTimer < updateInt) then
-		return
-	end
-	updateTimer = 0
-
-	if not CheckSpecState() then
-		return false
-	end
-
-	ScanFeatures()
-	DeleteGhostSites()
-	DeleteGhostFeatures()
-end
-
-function widget:DrawWorld()
-	DrawGhostSites()
-	DrawGhostFeatures()
-	ResetGl()
-end
-
-function widget:DrawWorldRefraction()
-	DrawGhostSites()
-	DrawGhostFeatures()
-	ResetGl()
-end
-
-function widget:UnitEnteredLos(unitID, unitTeam)
-	if Spring.IsUnitAllied( unitID ) then
-		return
-	end
-
-	local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
-	local udid = Spring.GetUnitDefID(unitID)
-	local udef = UnitDefs[udid]
-
-	if ( udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1  then
-		printDebug( "Ghost added")
-		local x, _, z = Spring.GetUnitPosition(unitID)
-		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
-		ghostSites[unitID] = { x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100 }
-	end
-end
-
-function DrawGhostFeatures()
+local function DrawGhostFeatures()
 	gl.Color(1.0, 1.0, 1.0, 0.35 )
   
 	--gl.Texture(0,"$units1") --.3do texture atlas for .3do model
@@ -130,7 +74,7 @@ function DrawGhostFeatures()
 	--gl.TexEnv( GL.TEXTURE_ENV, 34184, 5890 ) --34184 = GL_SOURCE0_ALPHA_ARB, 5890 = GL_TEXTURE
 end
 
-function DrawGhostSites()
+local function DrawGhostSites()
 	gl.Color(0.3, 1.0, 0.3, 0.25)
 	gl.DepthTest(true)
 
@@ -154,7 +98,7 @@ function DrawGhostSites()
 	end
 end
 
-function ScanFeatures()
+local function ScanFeatures()
 	for _, fID in ipairs(Spring.GetAllFeatures()) do
 		if not (dontCheckFeatures[fID] or ghostFeatures[fID]) then
 			local fAllyID = Spring.GetFeatureAllyTeam(fID)
@@ -171,7 +115,7 @@ function ScanFeatures()
 	end
 end
 
-function DeleteGhostFeatures()
+local function DeleteGhostFeatures()
 	if not next(scanForRemovalFeatures) then
 		return
 	end
@@ -184,14 +128,13 @@ function DeleteGhostFeatures()
 		local featDefID = Spring.GetFeatureDefID(featureID)
 
 		if (not featDefID and losState) then
-			printDebug("Ghost Feature deleted: " .. featureID )
 			ghostFeatures[featureID] = nil
 		end
 	end
 	scanForRemovalFeatures = {}
 end
 
-function DeleteGhostSites()
+local function DeleteGhostSites()
 	if not next(scanForRemovalUnits) then
 		return
 	end
@@ -204,7 +147,6 @@ function DeleteGhostSites()
 		local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
 	
 		if losState and ((not udefID) or (buildProgress == 1)) then
-			printDebug("Ghost deleted: " .. unitID )
 			ghostSites[unitID] = nil
 		end
 	end
@@ -212,12 +154,12 @@ function DeleteGhostSites()
 end
 
 --Commons
-function ResetGl()
+local function ResetGl()
 	gl.Color(1.0, 1.0, 1.0, 1.0)
 	gl.Texture(false)
 end
 
-function CheckSpecState()
+local function CheckSpecState()
 	local playerID = Spring.GetMyPlayerID()
 	local _, _, spec = Spring.GetPlayerInfo(playerID)
 
@@ -230,18 +172,47 @@ function CheckSpecState()
 	return true
 end
 
-function printDebug( value )
-	if ( debug ) then
-		if ( type( value ) == "boolean" ) then
-			if ( value == true ) then Spring.Echo( "true" )
-				else Spring.Echo("false") end
-		elseif ( type(value ) == "table" ) then
-			Spring.Echo("Dumping table:")
-			for key,val in pairs(value) do 
-				Spring.Echo(key,val) 
-			end
-		else
-			Spring.Echo( value )
-		end
+
+function widget:Update(dt)
+	updateTimer = updateTimer + dt
+	if (updateTimer < updateInt) then
+		return
+	end
+	updateTimer = 0
+
+	if not CheckSpecState() then
+		return false
+	end
+
+	ScanFeatures()
+	DeleteGhostSites()
+	DeleteGhostFeatures()
+end
+
+function widget:DrawWorld()
+	DrawGhostSites()
+	DrawGhostFeatures()
+	ResetGl()
+end
+
+function widget:DrawWorldRefraction()
+	DrawGhostSites()
+	DrawGhostFeatures()
+	ResetGl()
+end
+
+function widget:UnitEnteredLos(unitID, unitTeam)
+	if Spring.IsUnitAllied( unitID ) then
+		return
+	end
+
+	local _,_,_,_,buildProgress = Spring.GetUnitHealth( unitID )
+	local udid = Spring.GetUnitDefID(unitID)
+	local udef = UnitDefs[udid]
+
+	if ( udef.isBuilding == true or udef.isFactory == true or udef.speed == 0) and buildProgress ~= 1  then
+		local x, _, z = Spring.GetUnitPosition(unitID)
+		local y = Spring.GetGroundHeight(x,z) + 16 -- every single model is offset by 16, pretty retarded if you ask me.
+		ghostSites[unitID] = { x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100 }
 	end
 end
