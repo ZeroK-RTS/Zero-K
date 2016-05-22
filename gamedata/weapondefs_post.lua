@@ -335,6 +335,18 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.edgeeffectiveness = 1
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Combatrange/truerange handling (see unit_control_gunship_strafe_range.lua)
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.customparams.combatrange then
+		weaponDef.customparams.truerange = weaponDef.range
+		weaponDef.range = weaponDef.customparams.combatrange
+	end
+end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

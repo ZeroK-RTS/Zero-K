@@ -84,11 +84,12 @@ unitDef = {
       craterBoost             = 0,
       craterMult              = 0,
 
-	  customParams        = {
-		light_camera_height = 1000,
-		light_color = [[1 1 0.4]],
-		light_radius = 150,
-	  },
+      customParams        = {
+        combatrange = 80,
+        light_camera_height = 1000,
+        light_color = [[1 1 0.4]],
+        light_radius = 150,
+      },
 
       damage                  = {
         default        = 600,
@@ -105,12 +106,12 @@ unitDef = {
       noSelfDamage            = true,
       paralyzer               = true,
       paralyzeTime            = 2, -- was 2.5 but can only be int
-      range                   = 80,
+      range                   = 180,
       reloadtime              = 1.2,
       rgbColor                = [[1 1 0.25]],
       sprayAngle              = 6500,
       soundStart              = [[weapon/small_lightning]],
-      soundTrigger            = false,	  
+      soundTrigger            = false,
       targetborder            = 1,
       texture1                = [[lightning]],
       thickness               = 1.2,
