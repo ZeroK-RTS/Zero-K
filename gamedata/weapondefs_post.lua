@@ -118,12 +118,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- Remove special stuff for empirical DPS purposes
+-- customParams is never nil
 
 for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.impactonly then
-		weaponDef.edgeeffectiveness = 1
-	end
+	weaponDef.customparams = weaponDef.customparams or {}
 end
 
 --------------------------------------------------------------------------------
