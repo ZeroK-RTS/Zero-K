@@ -5,7 +5,7 @@ function widget:GetInfo()
     author    = "gajop",
     date      = "in the future",
     license   = "GPL-v2",
-    layer     = 0,
+    layer     = 2000,
     enabled   = true,
   }
 end
@@ -301,13 +301,15 @@ function widget:Shutdown()
 	Spring.SendCommands("bindkeyset enter chat") --because because.
 end
 
-function widget:KeyPress(key, ...)
+function widget:KeyPress(key, mods, ...)
 	if key == Spring.GetKeyCode("enter") or key == Spring.GetKeyCode("numpad_enter") then
 		if not ebConsole.visible then
 			ebConsole:Show()
 		end
 		screen0:FocusControl(ebConsole)
-		if currentContext == nil or not currentContext.persist then
+		if mods.alt then
+			currentContext = { display = i18n("allies_context", {default="Allies:"}), name = "allies", persist = true }
+		elseif mods.ctrl or (currentContext == nil or not currentContext.persist) then
 			currentContext = { display = i18n("say_context", {default="Say:"}), name = "say", persist = true }
 		end
 		ShowContext()
@@ -354,8 +356,20 @@ end
 function ParseKey(ebConsole, key, mods, ...)
 	if key == Spring.GetKeyCode("enter") or 
 		key == Spring.GetKeyCode("numpad_enter") then
-		ProcessText(ebConsole.text)
-		HideConsole()
+		if mods.alt then
+			if currentContext.name == "allies" then
+				currentContext = { display = i18n("say_context", {default="Say:"}), name = "say", persist = true }
+			else
+				currentContext = { display = i18n("allies_context", {default="Allies:"}), name = "allies", persist = true }
+			end
+			ShowContext()
+		elseif mods.ctrl then
+			currentContext = { display = i18n("say_context", {default="Say:"}), name = "say", persist = true }
+			ShowContext()
+		else
+			ProcessText(ebConsole.text)
+			HideConsole()
+		end
 	elseif key == Spring.GetKeyCode("esc") then
 		HideConsole()
 	elseif key == Spring.GetKeyCode("up") then
