@@ -166,7 +166,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       model                   = [[chickenc.s3o]],
-      range                   = 100,
+      range                   = 500,
       reloadtime              = 10,
       smokeTrail              = false,
       startVelocity           = 200,
@@ -210,7 +210,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 0,
       model                   = [[chicken_dodobomb.s3o]],
-      range                   = 100,
+      range                   = 500,
       reloadtime              = 10,
       smokeTrail              = false,
       startVelocity           = 200,
@@ -253,7 +253,7 @@ unitDef = {
       interceptedByShieldType = 0,
       model                   = [[chickenbroodqueen.s3o]],
       noSelfDamage            = true,
-      range                   = 100,
+      range                   = 500,
       reloadtime              = 10,
       smokeTrail              = false,
       startVelocity           = 200,
@@ -266,8 +266,8 @@ unitDef = {
       weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
-    },
-    
+    },	
+	
     FIREGOO    = {
       name                    = [[Napalm Goo]],
       areaOfEffect            = 256,
@@ -276,8 +276,7 @@ unitDef = {
       cegTag                  = [[queen_trail_fire]],
       
       customParams            = {
-        combatrange = 200,
-        light_radius = 500,
+	light_radius = 500,
       },
       
       craterBoost             = 0,
@@ -351,7 +350,7 @@ unitDef = {
       craterMult              = 0.002,
 
       customParams           = {
-        lups_noshockwave = "1",
+	lups_noshockwave = "1",
       },
       
       
@@ -369,7 +368,7 @@ unitDef = {
       intensity               = 1,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 100,
+      range                   = 512,
       reloadtime              = 1,
       rgbColor                = [[1 1 1]],
       thickness               = 1,
@@ -391,7 +390,6 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-        combatrange = 200,
         light_radius = 0,
       },
 

@@ -175,10 +175,6 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-      
-      customParams            = {
-        combatrange = 240,
-      },
 
       damage                  = {
         default = 1E-06,
@@ -191,7 +187,7 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 300,
+      range                   = 240,
       reloadtime              = 0.95,
       size                    = 1E-06,
       smokeTrail              = false,
