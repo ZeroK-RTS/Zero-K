@@ -133,6 +133,10 @@ unitDef = {
       cegTag                  = [[queen_trail]],
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        combatrange = 160,
+      },
 
       damage                  = {
         default = 500,
@@ -211,7 +215,7 @@ unitDef = {
       impulseFactor           = 1,
       intensity               = 1,
       interceptedByShieldType = 1,
-      range                   = 384,
+      range                   = 100,
       reloadtime              = 1,
       rgbColor                = [[1 1 1]],
       thickness               = 1,
@@ -233,6 +237,7 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+        combatrange = 160,
         light_radius = 0,
       },
 

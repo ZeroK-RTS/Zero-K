@@ -175,6 +175,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        combatrange = 240,
+      },
 
       damage                  = {
         default = 1E-06,

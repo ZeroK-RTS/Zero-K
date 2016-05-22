@@ -120,12 +120,13 @@ unitDef = {
       craterMult              = 0,
       cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[450]],
-	  },
-	  
+      customParams                  = {
+        combatrange = 160,
+        flamethrower = [[1]],
+        setunitsonfire = "1",
+        burntime = [[450]],
+      },
+      
       damage                  = {
         default = 12,
         subs    = 0.01,
@@ -228,6 +229,7 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
+        combatrange = 160,
         light_radius = 0,
       },
       
