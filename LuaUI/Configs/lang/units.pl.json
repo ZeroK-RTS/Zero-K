@@ -1346,50 +1346,50 @@
         "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
     },
     "comm_campaign_hun" : {
-        "name" : "Hun Dowódca",
-        "description" : "Barbarzynski Dowódca",
-        "helptext" : "Barbarzynski dowódca."
+        "name" : "Dowódca Hunów",
+        "description" : "Barbarzyński dowódca",
+        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
     },
     "comm_campaign_ostrogoth" : {
-        "name" : "Ostrogoth Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
+        "name" : "Dowódca Ostrogotów",
+        "description" : "Barbarzyński dowódca",
+        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
     },
     "comm_campaign_lombard" : {
-        "name" : "Lombard Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
+        "name" : "Dowódca Lombardów",
+        "description" : "Barbarzyński dowódca",
+        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
     },
     "comm_campaign_bulgar" : {
-        "name" : "Bulgar Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
+        "name" : "Dowódca Bułgarów",
+        "description" : "Barbarzyński dowódca",
+        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
     },
     "comm_campaign_suevi" : {
-        "name" : "Suevi Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
+        "name" : "Dowódca Swebów",
+        "description" : "Barbarzyński dowódca",
+        "helptext" : "Dowódca jednej z grup barbarzyńców plądrujących Imperium."
     },
     
     "pw_campaign_bunker" : {
-        "name" : "Storage Bunker",
-        "description" : "Magazyn broni",
-        "helptext" : "Bunkry takie jak ten przetrzymywaly uzbrojenie podczas Wojen Planet. Niektore z nich dalej moga zawierac uzyteczne wyposazenie."
+        "name" : "Przedwojenny bunkier",
+        "description" : "Magazyn wyposażenia",
+        "helptext" : "Bunkry takie jak ten przetrzymywały wyposażenie podczas Wojen Planet. Niektóre z nich dalej mogą zawierać użyteczne rzeczy."
     },
     "pw_campaign_techlab" : {
-        "name" : "Tech Lab",
-        "description" : "Stacja badawcza",
-        "helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartosciowa ze wzgledu na zawarte tu technologie."
+        "name" : "Stacja badawcza",
+        "description" : "Przedwojenne centrum badawcze",
+        "helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartościowa ze względu na zawarte tu technologie."
     },
     "pw_campaign_imperialtomb" : {
-        "name" : "Imperial Tomb",
+        "name" : "Krypta Imperatora",
         "description" : "Tu spoczywa Imperator",
-        "helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkosci."
+        "helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkości."
     },
     
     "nebula_campaign_daneel" : {
         "name" : "Daneel Olivaw",
         "description" : "Statek-matka",
-        "helptext" : "Daneel Olivaw jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony."
+        "helptext" : "Zaawansowana wersja lotniskowca klasy Nebula. Daneel Olivaw jest wytrzymały i ma problemy ze zwrotnością niczym latająca cegła, jednak jest uzbrojony w oddział dronów bojowych oraz tarczę obszarową do ich ochrony."
     }
 }
