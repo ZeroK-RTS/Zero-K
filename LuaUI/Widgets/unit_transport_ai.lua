@@ -62,18 +62,21 @@ options = {
 		type = "bool",
 		value = false,
 		desc = "When enabled newly completed units will be transported to the waypoint of their parent factory.",
+		noHotkey = true,
 	},
 	ignoreBuilders = {
 		name = "Ignore Constructors From Factory",
 		type = "bool",
 		value = false,
 		desc = "Enable to not transport newly completed constructors.",
+		noHotkey = true,
 	},
 	minimumTransportBenefit = {
 		name = 'Factory transport benefit threshold (s)',
 		type = 'number',
 		value = 2,
 		min = -10, max = 10, step = 0.1,
+		noHotkey = true,
 	},
 }
 

@@ -30,12 +30,14 @@ options = {
 		type = "bool",
 		value = true,
 		desc = "Units with an attack command will proritize their target until a canceling command is given.",
+		noHotkey = true,
 	},
 	removeTarget = {
 		name = "Stop clears target",
 		type = "bool",
 		value = true,
 		desc = "Issuing the commands Stop, Fight, Guard, Patrol and Attack cancel priority target orders.",
+		noHotkey = true,
 	},
 }
 

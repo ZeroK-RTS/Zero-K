@@ -69,12 +69,12 @@ local factories = {}
 options_path = 'Game/New Unit States/Auto Assist'
 options_order = { 'inheritcontrol', 'label'}
 options = {
-	inheritcontrol = {name = "Inherit Factory Control Group", type = 'bool', value = false},
+	inheritcontrol = {name = "Inherit Factory Control Group", type = 'bool', value = false, noHotkey = true,},
 	label = {name = "label", type = 'label', value = "Set the default Auto Assist for each type\n of factory"}
 }
 
 for id,value in pairs(factoryDefs) do
-	options[UnitDefs[id].name] = {name = Spring.Utilities.GetHumanName(UnitDefs[id]), type = 'bool', value = (value ~= 0) }
+	options[UnitDefs[id].name] = {name = Spring.Utilities.GetHumanName(UnitDefs[id]), type = 'bool', value = (value ~= 0), noHotkey = true, }
 	options_order[#options_order+1] = UnitDefs[id].name
 end
 
