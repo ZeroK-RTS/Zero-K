@@ -1232,14 +1232,6 @@ local sounds = {
 			[1] = "factory_select",
 		},
 	},
-	corvrad = { NEEDED
-		ok = {
-			[1] = "bot_move",
-		},
-		select = {
-			[1] = "factory_select",
-		},
-	},
 	armarad = { NEEDED
 		select = {
 			[1] = "factory_select",
