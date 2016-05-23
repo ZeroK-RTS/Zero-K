@@ -19,6 +19,12 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --	MarkerAddLine(a,b,c,d,e,f,true)
 --end
 
+-- Cutscenes apply F5
+local IsGUIHidden = Spring.IsGUIHidden
+function Spring.IsGUIHidden()
+	return IsGUIHidden() or (WG.Cutscene and WG.Cutscene.IsInCutscene())
+end
+
 function Spring.GetTeamColor(teamid)
   if teamColor[teamid] then
   else

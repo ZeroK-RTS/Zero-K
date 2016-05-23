@@ -28,6 +28,7 @@ function includeZIPFirst(filename, envTable)
   return VFS.Include(LUAUI_DIRNAME .. filename, envTable, VFS.ZIP_FIRST)
 end
 
+WG = {}
 Spring.Utilities = {}
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 VFS.Include("LuaRules/Utilities/versionCompare.lua")
@@ -139,7 +140,7 @@ widgetHandler = {
 
   actionHandler = include("actions.lua"),
   
-  WG = {}, -- shared table for widgets
+  WG = WG, -- shared table for widgets
 
   globals = {}, -- global vars/funcs
 
