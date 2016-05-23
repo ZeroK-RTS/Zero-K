@@ -138,27 +138,51 @@ confdata.subMenuIcons = {
 	['Settings'] = imgPath..'epicmenu/settings.png',
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
-	['Game/Game Speed'] = imgPath..'epicmenu/speed-test-icon.png',
-	['Game/New Unit States'] = imgPath..'epicmenu/robot2.png',
-	['Settings/Reset Settings'] = imgPath..'epicmenu/undo.png',
-	['Settings/Audio'] = imgPath..'epicmenu/vol.png',
-	['Settings/Camera'] = imgPath..'epicmenu/video_camera.png',
-	['Settings/Graphics'] = imgPath..'epicmenu/graphics.png',
-	['Settings/HUD Panels'] = imgPath..'epicmenu/control_panel.png',
-	['Settings/Interface'] = imgPath..'epicmenu/robotarm.png',
-	['Settings/Misc'] = imgPath..'epicmenu/misc.png',
+	['Game/Game Speed'] 			= imgPath..'epicmenu/speed-test-icon.png',
+	['Game/New Unit States'] 		= imgPath..'epicmenu/robot2.png',
+	['Game/Unit Behaviour'] 		= imgPath..'epicmenu/robot2.png',
+	['Game/Transport AI'] 			= imgPath..'epicmenu/robot2.png',
+	['Game/Unit Marker'] 			= imgPath..'epicmenu/marker.png',
+	['Game/Construction Hotkeys'] 	= imgPath..'epicmenu/keyboard.png',
+	['Game/Selection Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
+	['Game/Command Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
 	
-	['Settings/Interface/Mouse Cursor'] = imgPath..'epicmenu/input_mouse.png',
-	['Settings/Interface/Map'] = imgPath..'epicmenu/map.png',
-	['Settings/Interface/Healthbars'] = imgPath..'commands/Bold/health.png',
-	['Settings/Interface/Retreat Zones'] = imgPath..'commands/Bold/retreat.png',
-	['Settings/Interface/Spectating'] = imgPath..'epicmenu/popcorn.png',
+	['Settings/Reset Settings'] 	= imgPath..'epicmenu/undo.png',
+	['Settings/Audio'] 				= imgPath..'epicmenu/vol.png',
+	['Settings/Camera'] 			= imgPath..'epicmenu/video_camera.png',
+	['Settings/Graphics'] 			= imgPath..'epicmenu/graphics.png',
+	['Settings/HUD Panels'] 		= imgPath..'epicmenu/control_panel.png',
+	['Settings/Interface'] 			= imgPath..'epicmenu/robotarm.png',
+	['Settings/Misc'] 				= imgPath..'epicmenu/misc.png',
 	
-	['Settings/Interface/Building Placement'] = imgPath..'factory.png',
-	['Settings/Interface/Local Team Colors'] = imgPath..'map/minimap_colors_simple.png',
-	['Settings/Interface/Common Team Colors'] = imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Mouse Cursor'] 		= imgPath..'epicmenu/input_mouse.png',
+	['Settings/Interface/Map'] 					= imgPath..'epicmenu/map.png',
+	['Settings/Interface/Healthbars'] 			= imgPath..'commands/Bold/health.png',
+	['Settings/Interface/Retreat Zones'] 		= imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Spectating'] 			= imgPath..'epicmenu/popcorn.png',
+	['Settings/Interface/Building Placement'] 	= imgPath..'factory.png',
+	['Settings/Interface/Local Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Common Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Build ETA'] 			= imgPath..'epicmenu/stop_watch_icon.png',
+	['Settings/Interface/Defense Ranges'] 		= imgPath..'epicmenu/target.png',
+	['Settings/Interface/Command Visibility'] 	= imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Hovering Icons'] 		= imgPath..'epicmenu/halo.png',
+	['Settings/Interface/Selection'] 			= imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Control Groups'] 		= imgPath..'epicmenu/addusergroup.png',
 	
-	['Settings/Interface/Build ETA'] = imgPath..'epicmenu/stop_watch_icon.png',
+	
+	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
+	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'cost.png',
+	['Settings/HUD Panels/Commander Selector'] 		= imgPath..'epicmenu/corcommander.png',
+	['Settings/HUD Panels/Tooltip'] 				= imgPath..'epicmenu/lightbulb.png',
+	['Settings/HUD Panels/Chat'] 					= imgPath..'advplayerslist/chat.png',
+	['Settings/HUD Panels/FactoryPanel'] 			= imgPath..'factory.png',
+	['Settings/HUD Panels/Pause Screen'] 			= imgPath..'epicmenu/media_playback_pause.png',
+	['Settings/HUD Panels/Replay Controls'] 		= imgPath..'epicmenu/key_play_pause.png',
+	['Settings/HUD Panels/Unit Stats Help Window'] 	= imgPath..'advplayerslist/random.png',
+	['Settings/HUD Panels/Player List'] 			= imgPath..'epicmenu/people.png',
+	['Settings/HUD Panels/Docking'] 				= imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Selected Units Panel'] 	= imgPath..'epicmenu/grid.png',
 }
 
 -- SETUP MENU HERE
@@ -210,7 +234,7 @@ local gameSpeedPath = 'Game/Game Speed'
 		ShButton(gameSpeedPath, 'Decrease Speed', 'slowdown')
 		
 	ShLabel(gamePath, '')
-	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end)) 
+	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
 --	ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
 
@@ -379,11 +403,11 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 	
 	ShRadio( pathGraphicsMap,
 		'Water rendering', {
-			{name = 'Basic',key='0', desc='A simple plane.'},
-			{name = 'Reflective',key='1', desc='Reflects the world.'},
-			{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.'},
-			{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.'},
-			{name = 'Bumpmapped',key='4', desc='Fast and good-looking.'},
+			{name = 'Basic',key='0', desc='A simple plane.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Reflective',key='1', desc='Reflects the world.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Bumpmapped',key='4', desc='Fast and good-looking.', icon=imgPath..'epicmenu/water.png'},
 		},'4',
 		function(self)
 			spSendCommands{"water " .. self.value}
