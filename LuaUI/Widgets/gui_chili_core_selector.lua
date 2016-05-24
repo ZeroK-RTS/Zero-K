@@ -326,16 +326,16 @@ local function UpdateFac(unitID, index)
 		end
 	end
 
-	local tooltip = WG.Translate("common", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = count})
+	local tooltip = WG.Translate("interface", "factory") .. ": ".. Spring.Utilities.GetHumanName(UnitDefs[facs[index].facDefID]) .. "\n" .. WG.Translate("interface", "x_units_in_queue", {count = count})
 	if rep then
-		tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("common", "repeating") .. ")\008"
+		tooltip = tooltip .. "\255\0\255\255 (" .. WG.Translate("interface", "repeating") .. ")\008"
 	end
 	if buildeeDefID then
-		tooltip = tooltip .. "\n" .. WG.Translate("common", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." (".. WG.Translate("common", "x%_done", {x = math.floor(progress*100)}) .. ")"
+		tooltip = tooltip .. "\n" .. WG.Translate("interface", "current_project") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[buildeeDefID]) .." (".. WG.Translate("interface", "x%_done", {x = math.floor(progress*100)}) .. ")"
 	end
-	tooltip = tooltip .. "\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
-										"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
-										"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
+	tooltip = tooltip .. "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
+										"\n" .. WG.Translate("interface", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
+										"\n" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 
 	local tooltipOld = facs[index].button.tooltip
 	if tooltipOld ~= tooltip then
@@ -550,11 +550,11 @@ local function UpdateComm(unitID, index)
 	comms[index].healthbar.color = GetHealthColor(health/maxHealth)
 	comms[index].healthbar:SetValue(health/maxHealth)
 	
-	comms[index].button.tooltip = WG.Translate("common", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
-							"\n\255\0\255\255" .. WG.Translate("common", "health") .. ":\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-							"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
-							"\n" .. WG.Translate("common", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("common", "select_and_go_to") or WG.Translate("common", "select")) ..
-							"\n" .. WG.Translate("common", "shift") .. ": " .. WG.Translate("common", "append_to_current_selection") .. "\008"
+	comms[index].button.tooltip = WG.Translate("interface", "commander") .. ": " .. Spring.Utilities.GetHumanName(UnitDefs[comms[index].commDefID], unitID) ..
+							"\n\255\0\255\255" .. WG.Translate("interface", "health") .. ":\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
+							"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. (options.leftMouseCenter.value and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
+							"\n" .. WG.Translate("interface", "rmb") .. ": " .. ((not options.leftMouseCenter.value) and WG.Translate("interface", "select_and_go_to") or WG.Translate("interface", "select")) ..
+							"\n" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 end
 
 --[[
@@ -616,8 +616,8 @@ local function UpdateConsButton()
 	end
 
 	conButton.button.tooltip = WG.Translate("interface", "idle_cons", {count = total}) ..
-								"\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") ..
-								"\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "select_all") .. "\008"
+								"\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") ..
+								"\n" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "select_all") .. "\008"
 
 	if ((total > 0 and prevTotal == 0) or (total == 0 and prevTotal > 0)) then
 		conButton.image.file = (total > 0 and buildIcon) or buildIcon_bw

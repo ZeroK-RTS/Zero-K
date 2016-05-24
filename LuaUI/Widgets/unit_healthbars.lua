@@ -87,7 +87,7 @@ local messages = {
 
 local function languageChanged ()
 	for key, value in pairs(messages) do
-		messages[key] = WG.Translate ("healthbars", key)
+		messages[key] = WG.Translate ("interface", key)
 	end
 end
 

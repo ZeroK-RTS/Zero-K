@@ -89,7 +89,7 @@ end
 
 local build_eta_translation
 function languageChanged ()
-	build_eta_translation = WG.Translate ("common", "build_eta")
+	build_eta_translation = WG.Translate ("interface", "build_eta")
 end
 
 function widget:Shutdown()

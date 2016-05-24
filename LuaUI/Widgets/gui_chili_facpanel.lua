@@ -71,7 +71,7 @@ options = {
 		value = 1, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			window_facbar.color = {1,1,1,self.value}
-			window_facbar.caption = self.value == 0 and '' or WG.Translate("common", "factories")
+			window_facbar.caption = self.value == 0 and '' or WG.Translate("interface", "factories")
 			window_facbar:Invalidate()
 		end,
 	},
@@ -280,9 +280,9 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	local facButton = Button:New{
 		width = options.buttonsize.value*1.2,
 		height = options.buttonsize.value*1.0,
-		tooltip = 			WG.Translate("common", "lmb") .. ' - ' .. GreenStr .. WG.Translate("common", "select") .. '\n' 					
-			.. WhiteStr .. 	WG.Translate("common", "mmb") .. ' - ' .. GreenStr .. WG.Translate("common", "go_to") .. '\n'
-			.. WhiteStr .. 	WG.Translate("common", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
+		tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+			.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
+			.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 			,
 		--backgroundColor = buttonColor,
 		backgroundColor = {1,1,1,1},
@@ -305,7 +305,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 				end
 				or nil
 		},
-		caption= unitID == 0 and WG.Translate("common", "button") or '',
+		caption= unitID == 0 and WG.Translate("interface", "button") or '',
 		padding={3, 3, 3, 3},
 		--margin={0, 0, 0, 0},
 		children = {
@@ -756,7 +756,7 @@ local function MakeClearButton(unitID, i)
 			end
 		},
 		children = {
-			Label:New{ caption = WG.Translate("common", "clear"), fontSize = 11, x=2, bottom=2, fontShadow = true, },
+			Label:New{ caption = WG.Translate("interface", "clear"), fontSize = 11, x=2, bottom=2, fontShadow = true, },
 			Image:New{
 				file='LuaUI/images/drawingcursors/eraser.png',
 				width="80%";
@@ -1172,7 +1172,7 @@ function widget:Initialize()
 		minWidth = 56,
 		minHeight = 56,
 --		color = {0,0,0,1},
-		caption= WG.Translate("common", "factories"),
+		caption= WG.Translate("interface", "factories"),
 		children = {
 			stack_build,
 			scrollpanel

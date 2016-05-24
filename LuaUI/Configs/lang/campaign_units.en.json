@@ -1,0 +1,97 @@
+{
+	"comm_mission_tutorial1" : {
+		"name" : "Tutorial Commander",
+		"description" : "Mobile Assault Commander",
+		"helptext" : "A rugged command unit configured to be user-friendly, with decent speed, armor, and regeneration."
+	},
+	"comm_campaign_ada" : {
+		"name" : "Ada's Commander",
+		"description" : "Relic Commander",
+		"helptext" : "A special piloted commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort."
+	},
+	"comm_campaign_promethean" : {
+		"name" : "The Promethean",
+		"description" : "Free Machines Founder",
+		"helptext" : "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit."
+	},
+	"comm_campaign_freemachine" : {
+		"name" : "Libertas Machina",
+		"description" : "Promethean's Lieutenant",
+		"helptext" : "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly."
+	},
+	"comm_campaign_odin" : {
+		"name" : "Odin",
+		"description" : "Leader of the Valhalla",
+		"helptext" : "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe."
+	},
+	"comm_campaign_biovizier" : {
+		"name" : "The Biovizier",
+		"description" : "Dynasty Gene Vault Keeper",
+		"helptext" : "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating."
+	},
+	"comm_campaign_isonade" : {
+		"name" : "Lord Isonade",
+		"description" : "Lord Obediator",
+		"helptext" : "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast."
+	},
+	"comm_campaign_legion" : {
+		"name" : "Legate Fides",
+		"description" : "Imperial Vanguard Commander",
+		"helptext" : "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will. A loyal, steadfast soldier."
+	},	
+	"comm_campaign_praetorian" : {
+		"name" : "Scipio Astra",
+		"description" : "Praetorian Guard Prefect",
+		"helptext" : "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower."
+	},
+	"comm_campaign_athenion" : {
+		"name" : "Athenion",
+		"description" : "Rebel Commander",
+		"helptext" : "An Imperial rebel leader."
+	},
+	"comm_campaign_hun" : {
+		"name" : "Hun Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_ostrogoth" : {
+		"name" : "Ostrogoth Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_lombard" : {
+		"name" : "Lombard Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_bulgar" : {
+		"name" : "Bulgar Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"comm_campaign_suevi" : {
+		"name" : "Suevi Commander",
+		"description" : "Barbarian Commander",
+		"helptext" : "A barbarian commander."
+	},
+	"pw_campaign_bunker" : {
+		"name" : "Storage Bunker",
+		"description" : "Stores Weapons",
+		"helptext" : "Bunkers such as this were used to store munitions during the Planetwars. Some of these may still have usable equipment hidden inside."
+	},
+	"pw_campaign_techlab" : {
+		"name" : "Tech Lab",
+		"description" : "Research and Development Facility",
+		"helptext" : "One of the R&D facilities built during the Last War, widely sought after for the technology contained within."
+	},
+	"pw_campaign_imperialtomb" : {
+		"name" : "Imperial Tomb",
+		"description" : "Here Lies the Emperor",
+		"helptext" : "This is the resting place of the God-Emperor of Man."
+	},
+	"nebula_campaign_daneel" : {
+		"name" : "Daneel Olivaw",
+		"description" : "Advanced Atmospheric Mothership",
+		"helptext" : "An advanced version of the Nebula-class aerial carrier. As maneuverable as a brick and only modestly armed itself, the Daneel Olivaw is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement."
+	}
+}
