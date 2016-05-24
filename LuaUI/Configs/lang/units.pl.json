@@ -1,4 +1,9 @@
 {
+	"gunshipcon" : {
+		"name" : "Bumblebee",
+		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",
+		"helptext" : "Bumblebee łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
+	},
     "gunshipsupport": {
         "name": "Rapier",
         "description": "Wielozadaniowy statek powietrzny",

@@ -1,4 +1,9 @@
 {
+	"gunshipcon" : {
+		"name" : "Bumblebee",
+		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
+		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
+	},
 	"gunshipsupport" : {
 		"name" : "Rapier",
 		"description" : "Multi-Role Support Gunship",
