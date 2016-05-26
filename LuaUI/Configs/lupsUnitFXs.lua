@@ -292,6 +292,12 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip1"}},
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
+  bumblebee = { 
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardRight", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardLeft", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearLeft", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearRight", onActive=true, emitVector = {0, 0, -1}}},
+   },
   corhurc2 = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
