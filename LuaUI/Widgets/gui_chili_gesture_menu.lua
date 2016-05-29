@@ -12,7 +12,7 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 100000,
     enabled   = true,
-    handler = true,
+    handler   = true,
   }
 end 
 
@@ -82,7 +82,7 @@ local function OptionsChanged()
 	end
 end 
 
-options_path = 'Settings/HUD Panels/Gestures'
+options_path = 'Settings/Interface/Gesture Menu'
 options_order = { 'markingmenu', 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
 options = {
 	
