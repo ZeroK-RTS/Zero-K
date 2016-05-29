@@ -556,7 +556,7 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
+options_order = {'setToDefault', 'maintainDefaultUI', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
 options = {
 	setToDefault = {
 		name  = "Set To Default Once",
@@ -564,6 +564,13 @@ options = {
 		value = true, 
 		desc = "Resets the HUD to the default next time this widget is initialized.",
 		advanced = true,
+		noHotkey = true,
+	},
+	maintainDefaultUI = {
+		name  = "Reset on screen resolution change",
+		type  = "bool", 
+		value = false, 
+		desc = "Resets the UI to default when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
 	presetlabel = {
@@ -598,11 +605,15 @@ options = {
 }
 
 ----------------------------------------------------
--- First Run Handling
+-- Callins
 ----------------------------------------------------
 local firstUpdate = true
+local timeSinceUpdate = 0
+local UPDATE_FREQUENCY = 5
+local oldWidth = 0
+local oldHeight = 0
 
-function widget:Update()
+function widget:Update(dt)
 	if firstUpdate then
 		if options.setToDefault.value then
 			-- This is where the defaults are set.
@@ -610,5 +621,30 @@ function widget:Update()
 			options.setToDefault.value = false
 		end
 		firstUpdate = false
+	end
+	
+	if options.maintainDefaultUI.value then
+		timeSinceUpdate = timeSinceUpdate + dt 
+		if timeSinceUpdate > UPDATE_FREQUENCY then
+			local screenWidth, screenHeight = Spring.GetWindowGeometry()
+			if oldWidth ~= screenWidth or oldHeight ~= screenHeight then
+				oldWidth = screenWidth
+				oldHeight = screenHeight
+				SetupDefaultPreset()
+			end
+			timeSinceUpdate = 0
+		end
+	end
+end
+
+function widget:GetConfigData()
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	return {oldScreenWidth = screenWidth, oldScreenHeight = screenHeight}
+end
+
+function widget:SetConfigData(data)
+	if data then
+		oldWidth = data.oldScreenWidth or 0
+		oldHeight = data.oldScreenHeight or 0
 	end
 end
