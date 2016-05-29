@@ -246,10 +246,6 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}}},
   },
   armca = {
-    {class='Ribbon', options={width=1, size=10, piece="leftwing"}},
-    {class='Ribbon', options={width=1, size=10, piece="rightwing"}},
-  },
-  gunshipcon = {
     {class='Ribbon', options={width=1, size=10, piece="engine1"}},
     {class='Ribbon', options={width=1, size=10, piece="engine2"}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}}},
@@ -292,7 +288,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip1"}},
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
-  bumblebee = { 
+  gunshipcon = { 
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardRight", onActive=true, emitVector = {0, 0, -1}}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardLeft", onActive=true, emitVector = {0, 0, -1}}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearLeft", onActive=true, emitVector = {0, 0, -1}}},

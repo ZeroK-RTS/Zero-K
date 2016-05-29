@@ -6,11 +6,6 @@ local tbl = {
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust1", onActive=true}},
     {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust2", onActive=true}},
   },
-  armca = {
-	{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=30, baseLength = 6, piece="thrustb", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-	{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=25, baseLength = 5, piece="thrusta1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-	{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=25, baseLength = 5, piece="thrusta2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
-  },
   fighter = {
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
