@@ -79,7 +79,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 120,
-      object           = [[wreck3x3b.s3o]],
+      object           = [[bumblebee_d.dae]],
       reclaimable      = true,
       reclaimTime      = 120,
     },
