@@ -56,6 +56,7 @@ local translationExtras = { -- lists databases to be merged into the main one
 local translations = {
 	units = true,
 	interface = true,
+	missions = true,
 }
 
 local function addListener(l, widgetName)
