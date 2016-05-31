@@ -80,7 +80,7 @@ local function displayDamage(unitID, unitDefID, damage, paralyze)
   table.insert(damageTable,1,{})
   damageTable[1].unitID = unitID
   damageTable[1].damage = math.ceil(damage - 0.5)
-  damageTable[1].height = UnitDefs[unitDefID].height*0.9
+  damageTable[1].height = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID])*0.9
   damageTable[1].offset = (6 - math.random(0,12))
   damageTable[1].textSize = getTextSize(damage, paralyze)
   damageTable[1].heightOffset = 0
@@ -96,7 +96,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
     table.insert(deadList,1,{})
     local damage = math.ceil(unitDamage[unitID].damage - 0.5)
     deadList[1].x = ux
-    deadList[1].y = (uy + UnitDefs[unitDefID].height*0.9)
+    deadList[1].y = (uy + Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID])*0.9)
     deadList[1].z = uz
     deadList[1].lifeSpan = 1
     deadList[1].fadeTime = math.max((0.03 - (damage / 333333)), 0.015) * 0.66

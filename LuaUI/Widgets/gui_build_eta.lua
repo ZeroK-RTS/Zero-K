@@ -83,7 +83,7 @@ local function MakeETA(unitID,unitDefID)
 		rate     = nil,
 		lastNewTime = nil,
 		timeLeft = nil,
-		yoffset  = ud.height + 14,
+		yoffset  = Spring.Utilities.GetUnitHeight(ud) + 14,
 	}
 end
 
@@ -118,7 +118,7 @@ function widget:Initialize()
 					lastNewTime = nil,
 					timeLeft = nil,
 					negative = false,
-					yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+					yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[Spring.GetUnitDefID(unitID)]) + 14,
 				}
 			end
 		end
@@ -240,7 +240,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 				lastNewTime = nil,
 				timeLeft = nil,
 				negative = false,
-				yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+				yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[Spring.GetUnitDefID(unitID)]) + 14,
 			}
 		end
 	else
@@ -267,7 +267,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			lastNewTime = nil,
 			timeLeft = nil,
 			negative = false,
-			yoffset  = UnitDefs[unitDefID].height + 14,
+			yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + 14,
 		}
 	end
 end
