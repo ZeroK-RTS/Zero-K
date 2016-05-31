@@ -1,4 +1,5 @@
 include "constants.lua"
+include "gunshipConstructionTurnHax.lua"
 
 local Scene = piece('Scene')
 local Base = piece('Base')
@@ -172,6 +173,8 @@ function script.Deactivate()
 end
 
 function script.StartBuilding()
+	ConstructionTurnHax()
+	
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	StartThread(Build)
 	Signal(SIG_STOP_BUILDING)
