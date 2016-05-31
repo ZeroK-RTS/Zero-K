@@ -1,6 +1,7 @@
 include "constants.lua"
 
 local Scene = piece('Scene')
+local Base = piece('Base')
 local ExhaustForwardLeft = piece('ExhaustForwardLeft')
 local ExhaustForwardRight = piece('ExhaustForwardRight')
 local ExhaustRearLeft = piece('ExhaustRearLeft')
@@ -30,11 +31,20 @@ local subspine = {Head, Spine2, Spine3, Spine4, Spine5, Spine6}
 local smokePiece = {Spine1, ForejetLeft, ForejetRight, HindJetLeft, HindJetRight}
 local nanoPieces = {Nano}
 
+local MAGIC_OFFSET = 8
+
 local SIG_TILT = 1
 local SIG_BUILD = 2
+local SIG_LAND = 4
+local SIG_STOP_BUILDING = 8
 
-local function RestoreTilt()
-	Turn(Scene, x_axis, math.rad(0), math.rad(45))
+local constructing = false
+
+local function RestoreTilt(signal)
+	if signal then
+		Signal(SIG_TILT)
+	end
+	Turn(Base, x_axis, math.rad(0), math.rad(45))
 	Move(Spine1, y_axis, 0, 1) 
 	Move(Spine2, y_axis, 0, 1) 
 	
@@ -42,7 +52,6 @@ local function RestoreTilt()
 	Turn(ForejetRight, z_axis, 0, math.rad(60))
 	Turn(HindJetLeft, z_axis, 0, math.rad(60))
 	Turn(HindJetRight, z_axis, 0, math.rad(60))
-	Sleep(100)
 end
 
 local function TiltBody()
@@ -54,7 +63,7 @@ local function TiltBody()
 			if speed > 3.1 then
 				speed = 3.1
 			end
-			Turn(Scene, x_axis, math.rad(7) * speed, math.rad(45))
+			Turn(Base, x_axis, math.rad(7) * speed, math.rad(45))
 			Move(Spine1, y_axis, 0.3*speed, 1) 
 			Move(Spine2, y_axis, -0.3*speed, 1) 
 			
@@ -71,8 +80,13 @@ local function TiltBody()
 end
 
 local function Build()
+	if constructing then
+		return false
+	end
+	
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
+	constructing = true
 	while true do
 		local mag = math.rad(math.random()*8 - 4)
 		for i = 1, 5 do
@@ -83,31 +97,88 @@ local function Build()
 end
 
 local function StopBuild()
+	SetSignalMask(SIG_STOP_BUILDING)
+	Sleep(450)
+	constructing = false
 	Signal(SIG_BUILD)
 	for i = 1, 5 do
 		Turn(subspine[i], z_axis, 0, math.rad(5))
 	end
 end
 
+local function StartLanded()
+	Signal(SIG_LAND)
+	SetSignalMask(SIG_LAND)
+	Sleep(500) -- Repair and reclaim have jittery Deactivate
+	
+	RestoreTilt(true)
+	
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
+	
+	Signal(SIG_TILT)
+	
+	Move(Scene, y_axis, MAGIC_OFFSET, 5)
+	Turn(Head, z_axis, -math.rad(15), math.rad(7.5))
+	Turn(Spine1, z_axis, -math.rad(15), math.rad(7.5))
+	Turn(subspine[2], z_axis, math.rad(5), math.rad(2.5))
+	Turn(subspine[3], z_axis, math.rad(5), math.rad(2.5))
+	Turn(subspine[4], z_axis, math.rad(5), math.rad(2.5))
+	Turn(subspine[5], z_axis, math.rad(-50), math.rad(25))
+	Turn(subspine[6], z_axis, math.rad(105), math.rad(52.5))
+end
+
+local function StopLanded()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)
+
+	Signal(SIG_LAND)
+	Move(Scene, y_axis, 9 + MAGIC_OFFSET, 5)
+	
+	Turn(Head, z_axis, 0, math.rad(7.5))
+	Turn(Spine1, z_axis, 0, math.rad(7.5))
+	Turn(subspine[2], z_axis, 0,  math.rad(2.5))
+	Turn(subspine[3], z_axis, 0, math.rad(2.5))
+	Turn(subspine[4], z_axis, 0, math.rad(2.5))
+	Turn(subspine[5], z_axis, 0, math.rad(25))
+	Turn(subspine[6], z_axis, 0, math.rad(52.5))
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
-	StartThread(TiltBody)
-	Move(Scene, y_axis, 20)
-	Move(Spine1, z_axis, -5)
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
+	-- Permanent changes
+	--Move(Spine1, z_axis, -5)
 	Hide(Sting)
+	
+	-- Set to landed pose
+	Move(Scene, y_axis, MAGIC_OFFSET)
+	Turn(Head, z_axis, -math.rad(15))
+	Turn(Spine1, z_axis, -math.rad(15))
+	Turn(subspine[2], z_axis, math.rad(5))
+	Turn(subspine[3], z_axis, math.rad(5))
+	Turn(subspine[4], z_axis, math.rad(5))
+	Turn(subspine[5], z_axis, math.rad(-50))
+	Turn(subspine[6], z_axis, math.rad(105))
+end
+
+function script.Activate()
+	StartThread(TiltBody)
+	StopLanded()
+end
+
+function script.Deactivate()
+	StartThread(StopBuild)
+	StartThread(StartLanded)
 end
 
 function script.StartBuilding()
-	Signal(SIG_TILT)
-	RestoreTilt()
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	StartThread(Build)
+	Signal(SIG_STOP_BUILDING)
 end
 
 function script.StopBuilding()
-	Signal(SIG_TILT)
-	StopBuild()
+	StartThread(StopBuild)
 	StartThread(TiltBody)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 end

@@ -24,7 +24,7 @@ unitDef = {
   canSubmerge         = false,
   category            = [[GUNSHIP UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[16 55 55]],
+  collisionVolumeScales         = [[25 55 55]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[cylX]],
   collide             = true,
@@ -33,7 +33,10 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	modelradius    = [[30]],
+	modelradius    = [[25]],
+    aimposoffset   = [[0 35 0]],
+    midposoffset   = [[0 35 0]],
+	custom_height  = [[55]],
   },
 
   energyMake          = 0.225,

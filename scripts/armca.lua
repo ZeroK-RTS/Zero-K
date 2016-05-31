@@ -24,6 +24,7 @@ local smokePiece = {base, engine1, engine2}
 local nanoPieces = {nano, CentreNano, LeftNano}
 
 local SIG_TILT = 1
+local SIG_LAND = 2
 
 local function TiltBody()
 	Signal(SIG_TILT)
@@ -62,6 +63,26 @@ function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
 	StartThread(TiltBody)
+end
+
+local function StartLanded()
+	Signal(SIG_LAND)
+	SetSignalMask(SIG_LAND)
+	Sleep(500) -- Repair and reclaim have jittery Deactivate
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
+end
+
+local function StopLanded()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)
+	Signal(SIG_LAND)
+end
+
+function script.Activate()
+	StopLanded()
+end
+
+function script.Deactivate()
+	StartThread(StartLanded)
 end
 
 function script.StartBuilding()
