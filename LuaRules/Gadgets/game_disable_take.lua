@@ -29,7 +29,7 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 		return true 
 	end
 	local _,leaderID,isDead,isAI = spGetTeamInfo(oldTeam)
-	if isAI or isDead then --DISALLOW /take of AI or dead player
+	if isDead then --DISALLOW /take of AI or dead player
 		return false
 	end
 	local _, active, spectator = spGetPlayerInfo(leaderID)
