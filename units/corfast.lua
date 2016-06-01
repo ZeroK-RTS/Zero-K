@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[corfast]],
-  name                = [[Freaker]],
+  name                = [[Constable]],
   description         = [[Jumpjet Constructor, Builds at 5 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.26,
@@ -34,13 +34,13 @@ unitDef = {
     description_it = [[Costruttore jumpjet, costruisce a 5 m/s]],
 	description_de = [[Konstruktionsjumpjet, Baut mit 5 M/s]],
 	description_pl = [[Skaczacy konstruktor, moc 5 m/s]],
-    helptext       = [[Fast and capable of jumping over short distances or heights, the Freaker is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support.]],
-    helptext_bp    = [[Rápido e capaz de saltar por sobre distâncias curtas ou pequenos obstáculos, Freaker é ideal para expans?o rápida.]],
-    helptext_es    = [[Rápido y capaz de brincar sobre cortas distancias o alturas, el Freaker es el constructor ideal para la expansión rápida]],
-    helptext_fr    = [[R la fois rapide et capable de sauter sur de courtes distances grâce r son jetpack, le Freaker est un superbe outil pour favoriser son expansion.]],
-    helptext_it    = [[Veloce e capace di saltare per corte distanze o altezze, il Freaker é il costruttore ideale per l'espanzione rapida]],
-	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Freaker als ideale Konstruktionseinheit für rasche Expansion.]],
-	helptext_pl    = [[Predki i majacy mozliwosc skoku, Freaker to idealny konstruktor do szybkiej rozbudowy. Posiada takze lekki promien spowalniajacy, dzieki ktoremu zapewnia wsparcie w walce.]],
+    helptext       = [[Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support.]],
+    helptext_bp    = [[Rápido e capaz de saltar por sobre distâncias curtas ou pequenos obstáculos, Constable é ideal para expans?o rápida.]],
+    helptext_es    = [[Rápido y capaz de brincar sobre cortas distancias o alturas, el Constable es el constructor ideal para la expansión rápida]],
+    helptext_fr    = [[R la fois rapide et capable de sauter sur de courtes distances grâce r son jetpack, le Constable est un superbe outil pour favoriser son expansion.]],
+    helptext_it    = [[Veloce e capace di saltare per corte distanze o altezze, il Constable é il costruttore ideale per l'espanzione rapida]],
+	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion.]],
+	helptext_pl    = [[Predki i majacy mozliwosc skoku, Constable to idealny konstruktor do szybkiej rozbudowy. Posiada takze lekki promien spowalniajacy, dzieki ktoremu zapewnia wsparcie w walce.]],
   },
 
   energyMake          = 0.15,
@@ -160,7 +160,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Freaker]],
+      description      = [[Wreckage - Constable]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 550,
@@ -180,7 +180,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Freaker]],
+      description      = [[Debris - Constable]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 550,

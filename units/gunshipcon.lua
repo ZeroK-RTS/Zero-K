@@ -1,6 +1,6 @@
 unitDef = {
   unitname            = [[gunshipcon]],
-  name                = [[Bumblebee]],
+  name                = [[Wasp]],
   description         = [[Heavy Construction Aircraft, Builds at 7.5 m/s]],
   acceleration        = 0.1,
   airStrafe           = 0,
@@ -33,7 +33,7 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[0]],
-	modelradius    = [[25]],
+	modelradius    = [[15]],
     aimposoffset   = [[0 35 0]],
     midposoffset   = [[0 35 0]],
 	custom_height  = [[55]],
@@ -71,7 +71,7 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Bumblebee]],
+      description      = [[Wreckage - Wasp]],
       blocking         = true,
       category         = [[corpses]],
       damage           = 600,
@@ -89,7 +89,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Bumblebee]],
+      description      = [[Debris - Wasp]],
       blocking         = false,
       category         = [[heaps]],
       damage           = 600,

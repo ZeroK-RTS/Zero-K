@@ -1,6 +1,6 @@
 {
 	"gunshipcon" : {
-		"name" : "Bumblebee",
+		"name" : "Wasp",
 		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
 		"helptext" : "A heavy constructor which combines the convenience of flying with high buildpower."
 	},
@@ -685,9 +685,9 @@
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
 	},
 	"corfast" : {
-		"name" : "Freaker",
+		"name" : "Constable",
 		"description" : "Jumpjet Constructor, Builds at 5 m/s",
-		"helptext" : "Fast and capable of jumping over short distances or heights, the Freaker is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
+		"helptext" : "Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support."
 	},
 	"chicken_blimpy" : {
 		"name" : "Blimpy",

@@ -1,8 +1,8 @@
 {
 	"gunshipcon" : {
-		"name" : "Bumblebee",
+		"name" : "Wasp",
 		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",
-		"helptext" : "Bumblebee łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
+		"helptext" : "Wasp łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
 	},
     "gunshipsupport": {
         "name": "Rapier",
@@ -681,9 +681,9 @@
         "helptext": "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."
     },
     "corfast": {
-        "name": "Freaker",
+        "name": "Constable",
         "description": "Skoczek konstruktor, moc 5 m/s",
-        "helptext": "Szybki konstruktor z możliwością skoku, Freaker świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
+        "helptext": "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
     },
     "chicken_blimpy": {
         "name": "Blimpy",
