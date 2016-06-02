@@ -1,0 +1,274 @@
+include "constants.lua"
+
+local ActuatorBase = piece('ActuatorBase');
+local ActuatorBase_1 = piece('ActuatorBase_1');
+local ActuatorBase_2 = piece('ActuatorBase_2');
+local ActuatorBase_3 = piece('ActuatorBase_3');
+local ActuatorBase_4 = piece('ActuatorBase_4');
+local ActuatorBase_5 = piece('ActuatorBase_5');
+local ActuatorBase_6 = piece('ActuatorBase_6');
+local ActuatorBase_7 = piece('ActuatorBase_7');
+local ActuatorMiddle = piece('ActuatorMiddle');
+local ActuatorMiddle_1 = piece('ActuatorMiddle_1');
+local ActuatorMiddle_2 = piece('ActuatorMiddle_2');
+local ActuatorMiddle_3 = piece('ActuatorMiddle_3');
+local ActuatorMiddle_4 = piece('ActuatorMiddle_4');
+local ActuatorMiddle_5 = piece('ActuatorMiddle_5');
+local ActuatorMiddle_6 = piece('ActuatorMiddle_6');
+local ActuatorMiddle_7 = piece('ActuatorMiddle_7');
+local ActuatorTip = piece('ActuatorTip');
+local ActuatorTip_1 = piece('ActuatorTip_1');
+local ActuatorTip_2 = piece('ActuatorTip_2');
+local ActuatorTip_3 = piece('ActuatorTip_3');
+local ActuatorTip_4 = piece('ActuatorTip_4');
+local ActuatorTip_5 = piece('ActuatorTip_5');
+local ActuatorTip_6 = piece('ActuatorTip_6');
+local ActuatorTip_7 = piece('ActuatorTip_7');
+
+local Basis = piece('Basis');
+local Dock = piece('Dock');
+local Dock_1 = piece('Dock_1');
+local Dock_2 = piece('Dock_2');
+local Dock_3 = piece('Dock_3');
+local Dock_4 = piece('Dock_4');
+local Dock_5 = piece('Dock_5');
+local Dock_6 = piece('Dock_6');
+local Dock_7 = piece('Dock_7');
+local Emitter = piece('Emitter');
+local EmitterMuzzle = piece('EmitterMuzzle');
+local LimbA1 = piece('LimbA1');
+local LimbA2 = piece('LimbA2');
+local LimbB1 = piece('LimbB1');
+local LimbB2 = piece('LimbB2');
+local LimbC1 = piece('LimbC1');
+local LimbC2 = piece('LimbC2');
+local LimbD1 = piece('LimbD1');
+local LimbD2 = piece('LimbD2');
+local LongSpikes = piece('LongSpikes');
+local LowerCoil = piece('LowerCoil');
+local Satellite = piece('Satellite');
+local SatelliteMuzzle = piece('SatelliteMuzzle');
+local ShortSpikes = piece('ShortSpikes');
+local UpperCoil = piece('UpperCoil');
+
+local InnerLimbs = {LimbA1,LimbB1,LimbC1,LimbD1};
+local OuterLimbs = {LimbA2,LimbB2,LimbC2,LimbD2};
+local DocksClockwise = {Dock,Dock_1,Dock_2,Dock_3};
+local DocksCounterClockwise = {Dock_4,Dock_5,Dock_6,Dock_7};
+local ActuatorBaseClockwise = {ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3}
+local ActuatorBaseCCW = {ActuatorBase_4,ActuatorBase_5,ActuatorBase_6,ActuatorBase_7}
+local ActuatorMidCW =  {ActuatorMiddle,ActuatorMiddle_1,ActuatorMiddle_2,ActuatorMiddle_3}
+local ActuatorMidCCW = {ActuatorMiddle_4,ActuatorMiddle_5,ActuatorMiddle_6,ActuatorMiddle_7}
+local ActuatorTipCW =  {ActuatorTip,ActuatorTip_1,ActuatorTip_2,ActuatorTip_3}
+local ActuatorTipCCW = {ActuatorTip_4,ActuatorTip_5,ActuatorTip_6,ActuatorTip_7}
+
+local smokePiece = {Basis,ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3,ActuatorBase_4,ActuatorBase_5,ActuatorBase_6,ActuatorBase_7}
+
+local on = false;
+local awake = false;
+local oldHeight = 0
+local shooting = 0
+local wantedDirection = 0
+local ROTATION_SPEED = math.rad(3.5)/30
+local TARGET_ALT = 143565270/2^16
+local lazerDefID = WeaponDefNames["starlight_lazer"].id
+local Vector = Spring.Utilities.Vector 
+local max = math.max
+local soundTime = 0
+local spGetUnitIsStunned = Spring.GetUnitIsStunned
+
+-- Signal definitions
+local SIG_AIM = 2
+
+function script.Create()
+
+end
+
+function Undock()
+    for i=1,4 do
+        Turn(DocksClockwise[i]       ,z_axis,math.rad(-42.5),1);
+        Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1);
+        
+        Turn(ActuatorBaseClockwise[i],z_axis,math.rad(-86),2);
+        Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad( 86),2);
+        
+        Turn(ActuatorMidCW [i],z_axis,math.rad( 53),1.5);
+        Turn(ActuatorMidCCW[i],z_axis,math.rad( 53),1.5);
+        
+        Turn(ActuatorTipCW [i],z_axis,math.rad( 90),2.2);
+        Turn(ActuatorTipCCW[i],z_axis,math.rad( 90),2.2);
+
+        -- 53 for mid
+        -- 90 for tip
+    end
+
+    Sleep(1000);
+
+    for i=1,4 do
+        Turn(InnerLimbs[i],y_axis,math.rad(-85),1);
+        Turn(OuterLimbs[i],y_axis,math.rad(-85),1);
+    end
+    
+    on = true
+	StartThread(TargetingLaser)
+
+    Sleep(1500);
+    
+	Move(Satellite, z_axis, TARGET_ALT, 30*4)
+end
+
+function Dock()
+	Move(Satellite, z_axis, 0, 30*4)
+    
+    WaitForMove(Satellite,z_axis);
+
+    for i=1,4 do
+        Turn(InnerLimbs[i],y_axis,math.rad(0),1);
+        Turn(OuterLimbs[i],y_axis,math.rad(0),1);
+    end
+    
+    Sleep(1000)
+    
+    for i=1,4 do
+        Turn(DocksClockwise[i]       ,z_axis,math.rad(0),1);
+        Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1);
+        
+        Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2);
+        Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad(0),2);
+        
+        Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5);
+        Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5);
+        
+        Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2);
+        Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2);
+
+        -- 53 for mid
+        -- 90 for tip
+    end
+end
+
+function TargetingLaser()
+	while on do
+		awake = (not spGetUnitIsStunned(unitID)) and (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1);
+		
+		if awake then
+			--// Aiming
+			local dx, _, dz = Spring.GetUnitDirection(unitID)
+			local currentHeading = Vector.Angle(dx, dz)
+			
+			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+			
+			if aimOff < 0 then
+				aimOff = math.max(-ROTATION_SPEED, aimOff)
+			else
+				aimOff = math.min(ROTATION_SPEED, aimOff)
+			end
+			
+			Spring.SetUnitRotation(unitID, 0, currentHeading - aimOff - math.pi/2, 0)
+			
+			--// Relay range
+			local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
+			local _, SatelliteMuzzleY = Spring.GetUnitPiecePosition(unitID, SatelliteMuzzle)
+			newHeight = max(SatelliteMuzzleY-flashY, 1)
+			if newHeight ~= oldHeight then
+				Spring.SetUnitWeaponState(unitID, 3, "range", newHeight)
+				Spring.SetUnitWeaponState(unitID, 5, "range", newHeight)
+				oldHeight = newHeight
+			end
+			
+			--// Sound effects
+			if soundTime < 0 then
+				local px, py, pz = Spring.GetUnitPosition(unitID)
+				Spring.PlaySoundFile("sounds/weapon/laser/laser_burn6.wav", 10, px, (py + flashY)/2, pz)
+				soundTime = 46
+			else
+				soundTime = soundTime - 1
+			end
+			
+			--// Shooting
+			if shooting ~= 0 then
+				EmitSfx(SatelliteMuzzle, FIRE_W2)
+				EmitSfx(EmitterMuzzle, FIRE_W3)
+				shooting = shooting - 1
+			else
+				EmitSfx(SatelliteMuzzle, FIRE_W4)
+				EmitSfx(EmitterMuzzle, FIRE_W5)
+			end
+		end
+		
+		Sleep(30)
+	end
+end
+
+function script.Create()
+	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
+	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
+	StartThread(SmokeUnit, smokePiece)
+end
+
+function script.Activate()
+    Spin(UpperCoil, z_axis, 10,0.5);
+    Spin(LowerCoil, z_axis, 10,0.5);
+    
+    StartThread(Undock);
+end
+
+function script.Deactivate()
+    StartThread(Dock);
+	on = false
+	Signal(SIG_AIM)
+end
+
+
+function script.AimWeapon(num, heading, pitch)
+	if on and awake and num == 1 then
+		Signal(SIG_AIM)
+		SetSignalMask(SIG_AIM)
+		
+		local dx, _, dz = Spring.GetUnitDirection(unitID)
+		local currentHeading = Vector.Angle(dx, dz)
+		
+		wantedDirection = currentHeading - heading
+		
+		--Spring.Echo("Spring heading pitch",  heading*180/math.pi, pitch*180/math.pi)
+		
+		--local newHeading, newPitch = DoAimFromBetterHeading()
+		--if newHeading then
+		--	heading = newHeading
+		--	pitch = newPitch
+		--end
+		
+		Turn(SatelliteMuzzle, y_axis, 0)
+		Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
+		WaitForTurn(SatelliteMuzzle, x_axis)
+		return true
+	end
+	return false
+end
+
+function script.QueryWeapon(num)
+	return SatelliteMuzzle
+end
+
+function script.FireWeapon(num)
+	shooting = 30
+end
+
+function script.AimFromWeapon(num)
+	return SatelliteMuzzle
+end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage / maxHealth
+	if (severity <= .25) then
+		Explode(Basis, SFX.NONE)
+		return 1 -- corpsetype
+	elseif (severity <= .5) then
+		Explode(Basis, SFX.NONE)
+		return 1 -- corpsetype
+	else
+		Explode(Basis, SFX.SHATTER)
+		return 2 -- corpsetype
+	end
+end
+     
