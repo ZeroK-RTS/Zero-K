@@ -11,6 +11,7 @@ local jaw2 = piece 'jaw2'
 local nanopoint = piece 'nanopoint' 
 
 include "constants.lua"
+include "gunshipConstructionTurnHax.lua"
 
 local smokePiece = {fuselage}
 local nanoPieces = {nanopoint}
@@ -63,7 +64,8 @@ function script.StopMoving()
 end
 
 function script.StartBuilding()
-	StartThread(BuildDecloakThread)
+	ConstructionTurnHax()
+	StartThread(BuildDecloakThread) -- For rez.
 	Turn(arm, x_axis, math.rad(-80), math.rad(200))
 	Turn(lathe, x_axis, math.rad(-80), math.rad(200))
 	SetUnitValue(COB.INBUILDSTANCE, 1)
