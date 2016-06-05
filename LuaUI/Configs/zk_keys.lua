@@ -79,6 +79,7 @@ return {
 				"Any+\\",
 				"Any+`",
 				"Any+0xa7",
+				"Any+^",
 			},
 		},
 		{	"buildfacing dec",	{"Any+delete", "]","Shift+]",}, },
