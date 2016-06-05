@@ -82,7 +82,7 @@ local gridLocation = {}
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 
+options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell',  'hotkeysWithTabClick',
 					'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'}
 options = {
 	background_opacity = {
@@ -122,6 +122,13 @@ options = {
 	unitshotkeyaltaswell = {
 		name = 'Units tab can use Alt as Meta',
 		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	hotkeysWithTabClick = {
+		name = 'Enable hotkeys on tab click',
+		type = 'bool',
+		desc = "Clicking on a tab button enables hotkeys for that tab.",
 		value = false,
 		noHotkey = true,
 	},
@@ -1074,8 +1081,11 @@ local function MakeMenuTab(i, alpha)
 		caption = hotkeyMode and menuChoices[i].name or menuChoices[i].hotkeyName,
 		OnClick = {
 			function()
+				hotkeyMode = options.hotkeysWithTabClick.value
 				menuChoice = i
-				if i >= 2 and i <= 5 then lastBuildChoice = i end
+				if i >= 2 and i <= 5 then 
+					lastBuildChoice = i 
+				end
 				Update(true)
 				ColorTabs(i)
 			end
