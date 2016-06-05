@@ -154,7 +154,7 @@ return {
 		{	"createvideo",	"Ctrl+Shift+f10",},
 		{	"epic_chili_widget_selector_widgetlist",	"f11",},
 		{	"luaui tweakgui",	"C+f11",},
-		{	"screenshot",	"f12",},
+		{	"screenshot png",	"f12",},
 		{	"movefast",	"Any+shift",},
 		{	"moveslow",	"Any+ctrl",},
 		{	"track",	"alt+t",},

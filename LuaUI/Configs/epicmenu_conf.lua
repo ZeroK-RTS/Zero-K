@@ -389,7 +389,7 @@ local pathMisc = 'Settings/Misc'
 
 
 local pathMiscScreenshots = 'Settings/Misc/Screenshots'	
-	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots') 
+	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
 	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
 	ShButton(pathMiscScreenshots, 
 			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
