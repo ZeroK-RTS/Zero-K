@@ -214,9 +214,9 @@ local function WritePythonOrJSONDict(dict, dictName, params)
 	end
 	
 	-- get rid of trailing commma
-	local strEnd  = string.sub(str,-3,-1)
-	if strEnd == endLine then
-		str = string.sub(str, 1, -4) .. "\n"	-- don't ask me why it needs to be -4 to get the comma, it just does
+	local strEnd  = string.sub(str,-3)
+	if strEnd == endLine then -- , \n
+		str = string.sub(str, 1, -4) .. "\n"
 	end
 	
 	if not params.raw then
