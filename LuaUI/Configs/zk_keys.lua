@@ -98,7 +98,7 @@ return {
 		{	"areaguard",	"g",},
 		{	"sharedialog",	"h",},
 		{	"gameinfo",	"Ctrl+i",},
-		{	"cloak",	"k",},
+		{	"wantcloak",	"k",},
 		{	"togglelos",	"Ctrl+l",},
 		{	"loadunits",	"l",},
 		{	"loadselected",	"l",},
