@@ -30,6 +30,7 @@ local stockpileEtaTable = {}
 
 local fontSize = 8
 local displayETA = true
+local previousFullview = false
 
 options_path = 'Settings/Interface/Build ETA'
 options_order = { 'showonlyonshift', 'fontsize', 'drawHeight'}
@@ -98,9 +99,9 @@ function widget:Shutdown()
 	WG.ShutdownTranslation(GetInfo().name)
 end
 
-function widget:Initialize()
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
-
+local function InitializeUnits()
+	etaTable = {}
+	stockpileEtaTable = {}
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local allUnits = Spring.GetAllUnits()
@@ -124,6 +125,12 @@ function widget:Initialize()
 			end
 		end
 	end
+end
+
+function widget:Initialize()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	InitializeUnits()
+	previousFullview = select(2, Spring.GetSpectatingState())
 	WG.etaTable = etaTable
 end
 
@@ -178,30 +185,34 @@ function widget:GameFrame(n)
 
 	for unitID,bi in pairs(etaTable) do
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID)) or 0
-		local dp = buildProgress - bi.lastProg 
-		local dt = gs - bi.lastTime
-		if (dt > 2) then
-			bi.firstSet = true
-			bi.rate = nil
-			bi.timeLeft = nil
-		end
-		
-		if dt > 0.5 then
-			local rate = dp / dt
-			if (rate ~= 0) then
-				if (bi.firstSet) then
-					if (buildProgress > 0.001) then
-						bi.firstSet = false
+		if buildProgress == 1 then
+			etaTable[unitID] = nil
+		else
+			local dp = buildProgress - bi.lastProg 
+			local dt = gs - bi.lastTime
+			if (dt > 2) then
+				bi.firstSet = true
+				bi.rate = nil
+				bi.timeLeft = nil
+			end
+			
+			if dt > 0.5 then
+				local rate = dp / dt
+				if (rate ~= 0) then
+					if (bi.firstSet) then
+						if (buildProgress > 0.001) then
+							bi.firstSet = false
+						end
+					else
+						if (rate > 0) then
+							updateTime(bi, dt, (1 - buildProgress) / rate, false)
+						elseif (rate < 0) then
+							updateTime(bi, dt, -buildProgress / rate, true)
+						end
 					end
-				else
-					if (rate > 0) then
-						updateTime(bi, dt, (1 - buildProgress) / rate, false)
-					elseif (rate < 0) then
-						updateTime(bi, dt, -buildProgress / rate, true)
-					end
+					bi.lastTime = gs
+					bi.lastProg = buildProgress
 				end
-				bi.lastTime = gs
-				bi.lastProg = buildProgress
 			end
 		end
 	end
@@ -288,6 +299,11 @@ function widget:Update()
 			cameraHeight = cs.py - gy
 		end
 		displayETA = options.drawHeight.value > cameraHeight
+	end
+	local newFullview = select(2, Spring.GetSpectatingState())
+	if newFullview ~= previousFullview then
+		InitializeUnits()
+		previousFullview = newFullview
 	end
 end
 
