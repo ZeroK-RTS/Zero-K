@@ -14,9 +14,9 @@ local gl     = gl
 local Spring = Spring
 local table  = table
 
-local stockpilerDefNames =
-	{ "corsilo"
-	, "cornukesub"
+local stockpilerDefNames = { 
+	"corsilo", 
+	"cornukesub"
 }
 
 local stockpilerDefs = {}
@@ -65,7 +65,9 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 local function MakeETA(unitID,unitDefID)
-	if (unitDefID == nil) then return nil end
+	if (unitDefID == nil) then 
+		return nil 
+	end
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
 	if (buildProgress == nil) then 
 		return nil 
@@ -97,7 +99,6 @@ function widget:Shutdown()
 end
 
 function widget:Initialize()
-
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 
 	local spect, spectFull = Spring.GetSpectatingState()
@@ -137,8 +138,10 @@ local function updateTime(bi, dt, newTime, negative)
 end
 
 function widget:GameFrame(n)
-
-	if (n % 6 ~= 0) then return end -- 6N because stockpile happens in such increments, else its eta fluctuates
+	-- 6N because stockpile happens in such increments, else its eta fluctuates
+	if (n % 6 ~= 0) then 
+		return 
+	end
 
 	local _,_,pause = Spring.GetGameSpeed()
 	if (pause) then
@@ -185,7 +188,6 @@ function widget:GameFrame(n)
 		
 		if dt > 0.5 then
 			local rate = dp / dt
-
 			if (rate ~= 0) then
 				if (bi.firstSet) then
 					if (buildProgress > 0.001) then
@@ -207,7 +209,7 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-	if(buildProgress < 1) then
+	if (buildProgress < 1) then
 		local spect,spectFull = Spring.GetSpectatingState()
 		local myTeam = Spring.GetMyTeamID()
 		if Spring.AreTeamsAllied(unitTeam, myTeam) or (spect and spectFull) then
@@ -223,7 +225,9 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	local spec = Spring.GetSpectatingState()
-	if (spec) then return end
+	if (spec) then 
+		return 
+	end
 
 	if Spring.AreTeamsAllied (Spring.GetMyTeamID(), newTeam) then
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
@@ -256,9 +260,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		etaTable[unitID] = nil
 	end
 
-	if stockpilerDefs[unitDefID]
-	and not stockpileEtaTable[unitID] -- reclaim into rebuild
-	then
+	if stockpilerDefs[unitDefID] and not stockpileEtaTable[unitID] then -- reclaim into rebuild
 		stockpileEtaTable[unitID] = {
 			firstSet = true,
 			lastTime = Spring.GetGameFrame(),
