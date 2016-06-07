@@ -132,6 +132,10 @@ for _, weaponDef in pairs(WeaponDefs) do
 	end
 end
 
+-- New engine seems to have covertly increased the effect of cratermult
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.cratermult = (weaponDef.cratermult or 1) * 0.3
+end
 
 -- https://github.com/spring/spring/commit/dd7d1f79c3a9b579f874c210eb4c2a8ae7b72a16
 for _, weaponDef in pairs(WeaponDefs) do
