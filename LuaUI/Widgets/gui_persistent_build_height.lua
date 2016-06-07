@@ -41,10 +41,10 @@ options_path = 'Settings/Interface/Building Placement'
 options_order = { 'setHeightWithAlt'}
 options = {
 	setHeightWithAlt = {
-		name = "Require Alt to set height",
+		name = "Require B to set height",
 		type = "bool",
 		value = true,
-		desc = "Press Alt while placing a structure to set the height of the structure. Keys C and V increase or decrease height."
+		desc = "Press B while placing a structure to set the height of the structure. Keys C and V increase or decrease height."
 	},
 }
 
@@ -58,6 +58,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local INCREMENT_SIZE = 20
 local heightIncrease = KEYSYMS.C
 local heightDecrease = KEYSYMS.V
+local toggleHeight   = KEYSYMS.B
 
 -- Colours used during height choosing for level and raise
 local negVolume   = {1, 0, 0, 0.1} -- negative volume
@@ -172,9 +173,9 @@ function widget:KeyPress(key, mods)
 		return false
 	end
 	
-	if mods.alt then
+	if key == toggleHeight and options.setHeightWithAlt.value then
 		toggleEnabled = not toggleEnabled
-		return false
+		return true
 	end
 	
 	if ((key ~= heightIncrease) and (key ~= heightDecrease)) then
