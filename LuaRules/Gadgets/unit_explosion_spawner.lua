@@ -48,7 +48,7 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
-function gadget:ProjectileDestroyed(proID)
+function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
 	local weapDefID=Spring.GetProjectileDefID(proID)
 	local teamID=Spring.GetProjectileTeamID(proID)
 	if spawn_defs_id[weapDefID] then
