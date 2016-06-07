@@ -32,6 +32,7 @@ unitDef = {
   
   energyUse                     = 0,
   explodeAs                     = [[ATOMIC_BLAST]],
+  fireState                     = 0,
   footprintX                    = 8,
   footprintZ                    = 8,
   iconType                      = [[mahlazer]],
@@ -43,7 +44,7 @@ unitDef = {
   maxVelocity                   = 0,
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
-  noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
+  noChaseCategory               = [[FIXEDWING GUNSHIP SUB STUPIDTARGET]],
   objectName                    = [[zenith.s3o]],
   onoffable                     = true,
   script                        = [[zenith.lua]],
@@ -114,7 +115,6 @@ unitDef = {
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 6000,
     },
-
     METEOR      = {
       name                    = [[Meteor]],
 	  accuracy                = 700,
