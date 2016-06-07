@@ -130,7 +130,7 @@ end
 
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
 	if unitID then
-		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost")
+		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 		if realCost then
 			return realCost
 		end
