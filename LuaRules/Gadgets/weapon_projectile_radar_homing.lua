@@ -30,7 +30,8 @@ local projectileHomingDistance = {
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
-	if (not projectileHomingDistance[wdid]) and wd.tracks and (wd.type == "MissileLauncher" or wd.type == "StarburstLauncher") then
+	if (not projectileHomingDistance[wdid]) and wd.tracks and 
+			(wd.type == "TorpedoLauncher" or wd.type == "MissileLauncher" or wd.type == "StarburstLauncher") then
 		projectileHomingDistance[wdid] = (10 * wd.projectilespeed)^2
 	end
 end
@@ -52,9 +53,8 @@ function gadget:GameFrame(n)
 			local _, _, _, ux, uy, uz = Spring.GetUnitPosition(data.unitID, true)
 			if px and ux then
 				if (not Spring.GetUnitIsCloaked(data.unitID)) and Dist3Dsqr(ux - px, uy - py, uz - pz) < data.homeDistance then
-					Spring.SetProjectileTarget(proID, ux, uy, uz)
-				else
-					Spring.SetProjectileTarget(proID, data.unitID)
+					Spring.SetProjectileIgnoreTrackingError(proID, true)
+					projectiles[proID] = nil
 				end
 			end
 		end
