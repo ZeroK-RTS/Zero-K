@@ -536,7 +536,7 @@ upgrades = {
 					unitDef.radardistance = 1800
 				end
 				if (not unitDef.radaremitheight) or unitDef.radaremitheight < 100 then 
-					unitDef.radaremitheight = 100 
+					unitDef.radaremitheight = 24
 				end
 			end,
 	},
