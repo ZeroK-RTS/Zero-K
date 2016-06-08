@@ -64,8 +64,7 @@ local function GetEnergyIncome (teamID)
 end
 
 local function GetMetalIncome (teamID)
-	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = Spring.GetTeamResources(teamID, "metal")
-	return (mInco or 0) + (mReci or 0)
+	return (select(4, Spring.GetTeamResources(teamID, "metal")) or 0)
 end
 
 local stats_index
