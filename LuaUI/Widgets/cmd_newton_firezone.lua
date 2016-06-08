@@ -340,11 +340,15 @@ local function IsSpectatorAndExit()
 	end
 end
 
-function widget:PlayerChanged()
+local function RemoveIfSpectator()
 	if Spring.GetSpectatingState() and (not Spring.IsCheatingEnabled()) then 
 		Spring.Echo("Newton Firezone disabled for spectator.")
 		widgetHandler:RemoveWidget(widget) --input self (widget) because we are using handler=true,
 	end
+end
+
+function widget:PlayerChanged()
+	--RemoveIfSpectator()
 end
 -------------------------------------------------------------------
 -------------------------------------------------------------------
@@ -368,7 +372,18 @@ function widget:UnitDestroyed(unitID)
 	end
 end
 
-function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
+local function AddTrajectoryEstimate(unitID)
+	if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
+		queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
+	end
+	queueTrajectoryEstimate["unitList"][unitID] = true
+end
+
+--function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+--	AddTrajectoryEstimate(unitID)
+--end
+
+function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	if victim[unitID] then --is current victim of any Newton group?
 		victim[unitID] = currentFrame + 90 --delete 3 second later (if nobody attack it afterward)
 		
@@ -379,12 +394,11 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam,damage, paralyzer)
 			end
 		end
 		--ech("still being attacked")
-		
+	end
+	
+	if damage == 0 then -- Unit shot by a newton (or other 0 damage weapon but I don't mind)	
 		--estimate trajectory of any unit hit by weapon
-		if currentFrame >= queueTrajectoryEstimate["targetFrame"] then
-			queueTrajectoryEstimate["targetFrame"] = (currentFrame-(currentFrame % 15)) + 15 --"(frame-(frame % 15))" group continous integer into steps of 15. eg [1 ... 30] into [1,15,30]
-		end
-		queueTrajectoryEstimate["unitList"][unitID] = true
+		AddTrajectoryEstimate(unitID)
 	end
 end
 
@@ -587,7 +601,7 @@ function EstimateCrashLocation(victimID)
 end
 
 function widget:Initialize()
-	IsSpectatorAndExit()
+	--IsSpectatorAndExit()
 	
 	local circleVertex = function() 
 			local circleDivs, PI = 64 , math.pi
@@ -760,14 +774,14 @@ function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity
 		currPosition.x = xt.hrzn*hrznAngleSin + x --break down xt.hrzn (distance) into components. Note: math.sin for X and math.cos for Z due to orientation of x & z axis in Spring.
 		currPosition.z = xt.hrzn*hrznAngleCos + z
 		currPosition.y = xt.vert + y
-		local groundHeight =spGetGroundHeight(currPosition.x,currPosition.z)
+		local groundHeight = spGetGroundHeight(currPosition.x,currPosition.z)
 		if currPosition.y < groundHeight then --if the unit hits the ground, stop calculating...
 			break;
 		end
 		-- Spring.Echo(t.. " " .. xold.hrzn .. " " .. vold.hrzn .. " " .. xold.vert .. " " .. vold.vert);
 	end
 	if xold.hrzn then
-		return currPosition.x,currPosition.y ,currPosition.z
+		return currPosition.x, spGetGroundHeight(currPosition.x,currPosition.z), currPosition.z
 	end
 	return
 end
