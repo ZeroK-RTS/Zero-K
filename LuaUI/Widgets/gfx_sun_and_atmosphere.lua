@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "June 8, 2016",
 		license   = "GNU GPL, v2 or later",
-		layer     = 0,
+		layer     = -100000000,
 		enabled   = true --  loaded by default?
 	}
 end
@@ -16,9 +16,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local OVERRIDE_DIR = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
-local OVERRIDE_FILE = OVERRIDE_DIR .. (Game.mapName or "") .. ".lua"
+local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
+local MAP_FILE        = (Game.mapName or "") .. ".lua"
+local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
 local OVERRIDE_CONFIG = VFS.FileExists(OVERRIDE_FILE) and VFS.Include(OVERRIDE_FILE) or false
+
+local initialized = false
 
 local skip = {
 	["enable_fog"] = true,
@@ -43,28 +46,42 @@ end
 local function SaveSettings()
 	local writeTable = {
 		sun = GetOptionsTable('Settings/Graphics/Sun and Fog/Sun'),
-		fog = GetOptionsTable('Settings/Graphics/Sun and Fog/Sun')
+		fog = GetOptionsTable('Settings/Graphics/Sun and Fog/Fog')
 	}
-
-	WG.SaveTable(writeTable, OVERRIDE_DIR, OVERRIDE_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	
+	WG.SaveTable(writeTable, OVERRIDE_DIR, MAP_FILE, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
 
-local function LoadSettings()
+local function LoadSunAndFogSettings()
 	if not OVERRIDE_CONFIG then
 		return
 	end
 	local sun = OVERRIDE_CONFIG.sun
+	if sun then
+		Spring.SetSunLighting(sun)
+		
+		for name, value in pairs(sun) do
+			options[name].value = value
+		end
+	end
+	
 	local fog = OVERRIDE_CONFIG.fog
-	
-	Spring.SetSunLighting(sun)
-	Spring.SetAtmosphere(fog)
-	
-	for name, value in pairs(sun) do
-		options[name].value = value
+	if fog then
+		Spring.SetAtmosphere(fog)
+		
+		for name, value in pairs(fog) do
+			options[name].value = value
+		end
 	end
-	for name, value in pairs(fog) do
-		options[name].value = value
+end
+
+local function LoadMinimapSettings()
+	if (not OVERRIDE_CONFIG) or not OVERRIDE_CONFIG.minimap then
+		return
 	end
+	local minimap = OVERRIDE_CONFIG.minimap
+	
+	Spring.SetSunLighting(minimap)
 end
 
 --------------------------------------------------------------------------------
@@ -90,8 +107,10 @@ local function GetOptions()
 			type = 'colors',
 			value = { 0.8, 0.8, 0.8, 1},
 			OnChange = function (self)
-				Spring.Echo("ColorFunction", name, self.value)
-				ColorFunction({[name] = self.value})
+				if initialized then
+					Spring.Echo("ColorFunction", name, self.value)
+					ColorFunction({[name] = self.value})
+				end
 			end,
 			advanced = true,
 			path = path
@@ -105,9 +124,11 @@ local function GetOptions()
 			type = 'number',
 			value = 0,
 			min = -5, max = 5, step = 0.01,
-			OnChange = function (self) 
-				Spring.Echo("NumberFunction", name, self.value)
-				NumberFunction({[name] = self.value})
+			OnChange = function (self)
+				if initialized then
+					Spring.Echo("NumberFunction", name, self.value)
+					NumberFunction({[name] = self.value})
+				end
 			end,
 			advanced = true,
 			path = path
@@ -132,13 +153,6 @@ local function GetOptions()
 	AddNumberOption("fogStart", "Fog Start", fogPath, Spring.SetAtmosphere)
 	AddNumberOption("fogEnd", "Fog End", fogPath, Spring.SetAtmosphere)	
 	
-	
-	AddOption("enable_fog", {
-		name = "Enable fog",
-		type = 'bool',
-		value = true,
-		noHotkey = true,
-	})
 	AddOption("save_map_settings", {
 		name = 'Save Settings',
 		type = 'button',
@@ -150,7 +164,7 @@ local function GetOptions()
 		name = 'Load Settings',
 		type = 'button',
 		desc = "Load the settings, if the map has a config.",
-		OnChange = LoadSettings,
+		OnChange = LoadSunAndFogSettings,
 		advanced = true
 	})
 	
@@ -160,6 +174,15 @@ end
 options_path = 'Settings/Graphics/Sun and Fog'
 options, options_order = GetOptions()
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:Initialize()
-	LoadSettings()
+	initialized = true
+	LoadMinimapSettings()
+end
+
+function widget:Update()
+	LoadSunAndFogSettings()
+	widgetHandler:RemoveCallIn("Update")
 end
