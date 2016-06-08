@@ -10,6 +10,7 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 --// gl const
 
@@ -215,7 +216,7 @@ options = {
 				WG.ToggleShoweco()
 			end
 		end,
-	},
+	},	
 	
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
 	
@@ -566,7 +567,7 @@ end
 
 local function MakeMinimapButton(file, params)
 	local option = params.option
-	local name, desc, action, hotkey
+	local name, desc, action, hotkey, command
 	if option then
 		name = options[option].name
 		desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
@@ -576,6 +577,7 @@ local function MakeMinimapButton(file, params)
 	desc = desc or params.desc or ""
 	action = action or params.action
 	hotkey = WG.crude.GetHotkey(action)
+	command = params.command
 	
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
@@ -594,7 +596,15 @@ local function MakeMinimapButton(file, params)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
-			Spring.SendCommands( action )
+			Spring.Echo(command)
+			if command then
+				local left, right = true, false
+				local alt, ctrl, meta, shift = Spring.GetModKeyState()
+				local index = Spring.GetCmdDescIndex(command)
+				Spring.SetActiveCommand(index, 1, left, right, alt, ctrl, meta, shift)
+			else
+				Spring.SendCommands(action)
+			end
 		end },
 		children={
 		  file and
@@ -636,11 +646,11 @@ MakeMinimapWindow = function()
 	local map_panel_right = 0
 	
 	local buttons_height = iconsize+3
-	local buttons_width = iconsize*10
+	local buttons_width = iconsize*13
 	if options.buttonsOnRight.value then
 		map_panel_bottom = 0
 		map_panel_right = iconsize*1.3
-		buttons_height = iconsize*10
+		buttons_height = iconsize*13
 		buttons_width = iconsize+3
 	end
 	
@@ -703,8 +713,16 @@ MakeMinimapWindow = function()
 			
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
 			
+			MakeMinimapButton( 'LuaUI/images/commands/Bold/retreat.png', {name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}),
+			MakeMinimapButton( 'LuaUI/images/commands/Bold/ferry.png', {name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
 			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
 		},
 	}
 	

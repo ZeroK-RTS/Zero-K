@@ -263,6 +263,13 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
 	}
 
+-- Commands that only exist in LuaUI cannot have a hidden param. Therefore those that should be hidden are placed in this table.
+local widgetSpaceHidden = {
+	[60] = true, -- CMD.PAGES
+	[CMD_SETHAVEN] = true,
+	[CMD_SET_FERRY] = true,
+}
+	
 -- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)
 -- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
 -- This table is used in Keyboardmenu, Integral menu, and Epicmenu for hotkey management.
@@ -353,4 +360,4 @@ local custom_cmd_actions = {
 }
 
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden

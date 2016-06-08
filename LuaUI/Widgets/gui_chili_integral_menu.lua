@@ -183,9 +183,7 @@ local spGetSpectatingState = Spring.GetSpectatingState
 
 local push        = table.insert
 
-local CMD_PAGES = 60
-
-local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden = include("Configs/integral_menu_commands.lua")
 
 local function CapCase(str)
 	local str = str:lower()
@@ -646,7 +644,7 @@ end
 
 --sorts commands into categories
 local function ProcessCommand(cmd) 
-	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
+	if not cmd.hidden and not widgetSpaceHidden[cmd.id] then 
 		-- state icons 
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			n_states[#n_states+1] = cmd 
