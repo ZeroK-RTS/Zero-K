@@ -8,7 +8,7 @@ function widget:GetInfo()
 		author    = "GoogleFrog",
 		date      = "June 8, 2016",
 		license   = "GNU GPL, v2 or later",
-		layer     = -100000000,
+		layer     = 100000000,
 		enabled   = true --  loaded by default?
 	}
 end
@@ -76,11 +76,11 @@ local function LoadSunAndFogSettings()
 end
 
 local function LoadMinimapSettings()
-	if (not OVERRIDE_CONFIG) or not OVERRIDE_CONFIG.minimap then
+	if (not OVERRIDE_CONFIG) or (not OVERRIDE_CONFIG.minimap) then
 		return
 	end
 	local minimap = OVERRIDE_CONFIG.minimap
-	
+	Spring.Echo("Setting minimap brightness")
 	Spring.SetSunLighting(minimap)
 end
 
@@ -98,8 +98,6 @@ local function GetOptions()
 		options[name] = option
 		options_order[#options_order + 1] = name
 	end
-	
-	local options_order = {'enable_fog', 'save_map_settings', 'load_map_settings'}
 	
 	local function AddColorOption(name, humanName, path, ColorFunction)
 		options[name] = {
@@ -178,11 +176,17 @@ options, options_order = GetOptions()
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
-	initialized = true
-	LoadMinimapSettings()
+	if Spring.GetGameFrame() < 1 then
+		LoadMinimapSettings()
+	end
 end
 
+local updates = 0
 function widget:Update()
-	LoadSunAndFogSettings()
-	widgetHandler:RemoveCallIn("Update")
+	initialized = true
+	updates = updates + 1
+	if updates > 4 then
+		LoadSunAndFogSettings()
+		widgetHandler:RemoveCallIn("Update")
+	end
 end
