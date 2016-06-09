@@ -71,17 +71,17 @@ end
 -- veh, bot, spider, ship, hover, amph, air
 
 local paths = {
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["correap"].id, "tank4", true),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["subarty"].id, "uboat3", true),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
-	PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
-	PathfinderGenerator.CreatePathfinder(),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["correap"].id, "tank4", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["subarty"].id, "uboat3", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
+	--PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+	--PathfinderGenerator.CreatePathfinder(),
 }
 
-_G.pathMap = paths[1].pathMap
+--_G.pathMap = paths[1].pathMap
 --_G.botPathMap = botPath.pathMap
 --_G.amphPathMap = amphPath.pathMap
 --_G.hoverPathMap = hoverPath.pathMap

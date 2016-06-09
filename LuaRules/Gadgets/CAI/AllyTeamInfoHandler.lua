@@ -4,20 +4,20 @@
 --]]
 local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
 local ScoutHeatmapHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHeatmapHandler.lua")
+local ScoutHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHandler.lua")
 
 local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
 
-
 local AllyTeamInfoHandler = {}
 
-
-function AllyTeamInfoHandler.CreateAllyTeamInfoHandler(allyTeamID, teamID)
+function AllyTeamInfoHandler.CreateAllyTeamInfoHandler(allyTeamID, teamID, pathfinder)
 	
-	local allyInfo = assetTracker.CreateAssetTracker(allyTeamID, teamID)
-	local enemyInfo = assetTracker.CreateAssetTracker(allyTeamID, teamID)
+	local allyInfo = AssetTracker.CreateAssetTracker(allyTeamID, teamID)
+	local enemyInfo = AssetTracker.CreateAssetTracker(allyTeamID, teamID)
 	local scoutHeatmap = ScoutHeatmapHandler.CreateScoutHeatmap(allyTeamID)
+	local scoutHandler = ScoutHandler.CreateScoutHandler(scoutHeatmap)
 
-	function AddUnit(unitID, unitDefID)
+	local function AddUnit(unitID, unitDefID)
 		if spGetUnitAllyTeam(unitID) == allyTeamID then
 			allyInfo.AddUnit(unitID, unitDefID)
 		else
@@ -25,7 +25,7 @@ function AllyTeamInfoHandler.CreateAllyTeamInfoHandler(allyTeamID, teamID)
 		end
 	end
 	
-	function RemoveUnit(unitID, unitDefID)
+	local function RemoveUnit(unitID, unitDefID)
 		if spGetUnitAllyTeam(unitID) == allyTeamID then
 			allyInfo.RemoveUnit(unitID, unitDefID)
 		else
@@ -33,21 +33,50 @@ function AllyTeamInfoHandler.CreateAllyTeamInfoHandler(allyTeamID, teamID)
 		end
 	end
 	
-	function UnitUpdate()
+	local function UnitUpdate()
 		allyInfo.UpdateHeatmaps()
 		enemyInfo.UpdateHeatmaps()
 	end
 	
-	function ScoutUpdate(gameFrame)
-		scoutHeatmap.UpdateHeatmap(gameFrame)
+	local function AddScout(unitID)
+		scoutHandler.AddUnit(unitID)
+	end
+	
+	local function RemoveScout(unitID)
+		scoutHandler.RemoveUnit(unitID)
+	end
+	
+	local function UnitCreatedUpdate(unitID, unitDefID, unitTeam)
+		AddUnit(unitID, unitDefID)
+	end
+	
+	local function UnitDestroyedUpdate(unitID, unitDefID, unitTeam)
+		RemoveUnit(unitID, unitDefID)
+	end
+	
+	local function GameFrameUpdate(n)
+		if n%60 == 14 then
+			scoutHeatmap.UpdateHeatmap(n)
+			scoutHandler.RunJobHandler()
+		end
+		if n%30 == 3 then
+			enemyInfo.UpdateHeatmaps()
+		end
 	end
 	
 	local newAllyTeamInfoHandler = {
 		AddUnit = AddUnit,
 		RemoveUnit = RemoveUnit,
 		UnitUpdate = UnitUpdate,
-		ScoutUpdate = ScoutUpdate,
 		
+		AddScout = AddScout,
+		RemoveScout = RemoveScout,
+		
+		GameFrameUpdate = GameFrameUpdate,
+		UnitCreatedUpdate = UnitCreatedUpdate,
+		UnitDestroyedUpdate = UnitDestroyedUpdate,
+		
+		pathfinder = pathfinder,
 		scoutHeatmap = scoutHeatmap,
 	}
 	

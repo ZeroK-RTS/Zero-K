@@ -59,7 +59,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 	
 	local economyTargets = UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, 800)
 	
-	function AddUnit(unitID, unitDefID)
+	local function AddUnit(unitID, unitDefID)
 		local str = ""
 		-- Heatmap
 		if HeatmapUnitDefID[unitDefID] then
@@ -97,7 +97,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		GG.UnitEcho(unitID, str)
 	end
 	
-	function RemoveUnit(unitID, unitDefID)
+	local function RemoveUnit(unitID, unitDefID)
 		-- Heatmap
 		if HeatmapUnitDefID[unitDefID] then
 			local data = HeatmapUnitDefID[unitDefID]
@@ -128,20 +128,20 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		end
 	end
 	
-	function UpdateHeatmaps()
-		heatmaps.mobileAA.UpdateUnitPositions(true)
-		heatmaps.mobileLand.UpdateUnitPositions(true)
+	local function UpdateHeatmaps()
+		unitHeatmaps.mobileAntiAir.UpdateUnitPositions(true)
+		unitHeatmaps.mobileLand.UpdateUnitPositions(true)
 	end
 	
-	function GetUnitList(name)
+	local function GetUnitList(name)
 		return completeUnitList[name]
 	end
 	
-	function GetCombatUnitList(name)
+	local function GetCombatUnitList(name)
 		return combatUnitList[name]
 	end
 	
-	function GetHeatmap(name)
+	local function GetHeatmap(name)
 		return unitHeatmaps[name]
 	end
 	

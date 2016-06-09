@@ -8,8 +8,8 @@
  same cluster. Close units may be in different clusters depending
  on how the boundaries work out.
  
-=== Functions === 
- All UnitList functions are accessible along with two more.
+=== local functions === 
+ All UnitList local functions are accessible along with two more.
 
  
  == UpdateUnitPositions()
@@ -136,8 +136,8 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 		end
 	end
 	
-	-- Extra Cluster External Functions
-	function ClusterIterator() -- x, z, cost, count
+	-- Extra Cluster External local functions
+	local function ClusterIterator() -- x, z, cost, count
 		local i = 0
 		return function ()
 			i = i + 1
@@ -148,7 +148,7 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 		end
 	end
 	
-	function UpdateUnitPositions(range)
+	local function UpdateUnitPositions(range)
 		for unitID,_ in unitList.Iterator() do
 			if unitList.HasUnitMoved(unitID,range) then
 				HandleUnitRemoval(unitID)
@@ -157,21 +157,21 @@ function UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, clusterRadius)
 		end
 	end
 	
-	-- UnitListHandler External Functions
-	function AddUnit(unitID, cost, static, newData)
+	-- UnitListHandler External local functions
+	local function AddUnit(unitID, cost, static, newData)
 		if unitList.AddUnit(unitID, cost, static, newData) then
 			HandleUnitAddition(unitID)
 		end
 	end
 	
-	function RemoveUnit(unitID)
+	local function RemoveUnit(unitID)
 		if unitList.ValidUnitID(unitID) then
 			HandleUnitRemoval(unitID)
 		end
 		unitList.RemoveUnit(unitID)
 	end
 	
-	function SetUnitDataValue(unitID, key, value)
+	local function SetUnitDataValue(unitID, key, value)
 		if key ~= "clusterX" and key ~= "clusterZ" then
 			unitList.SetUnitDataValue(unitID, key, value)
 		end
