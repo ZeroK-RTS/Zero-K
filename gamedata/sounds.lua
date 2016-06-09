@@ -2,7 +2,7 @@
 local Sounds = {
 	SoundItems = {
 		--default = {
-		--pitchMod = 0.04,
+		--pitchmod = 0.04,
 		--}
 		IncomingChat = {
 			--file = "sounds/talk.wav",
@@ -32,16 +32,16 @@ local Sounds = {
 		--]]	  
 		BladeSwing = {
 			file = "sounds/weapon/blade/blade_swing.wav",
-			pitchMod = 0.1,
-			gainMod = 0.1,
+			pitchmod = 0.1,
+			gainmod = 0.1,
 			pitch = 0.8,
 			gain = 0.9,
 			priority = 1,
 		},
 		BladeHit = {
 			file = "sounds/weapon/blade/blade_hit.wav",
-			pitchMod = 0.5,
-			gainMod = 0.2,
+			pitchmod = 0.5,
+			gainmod = 0.2,
 		},
 		DefaultsForSounds = { -- this are default settings
 			file = "ThisEntryMustBePresent.wav",
@@ -62,8 +62,8 @@ local Sounds = {
 		},
 		TorpedoHitVariable = {
 			file = "sounds/explosion/wet/ex_underwater.wav",
-			pitchMod = 0.1,
-			gainMod = 0.05,
+			pitchmod = 0.1,
+			gainmod = 0.05,
 		},
 	},
 }
@@ -77,17 +77,19 @@ local optionOverrides = {
 }
 
 local defaultOpts = {
-	pitchMod = 0, --0.02,
-	gainMod = 0,
+	pitchmod = 0, --0.02,
+	gainmod = 0,
 }
 local replyOpts = {
-	pitchMod = 0, --0.02,
-	gainMod = 0,
+	pitchmod = 0, --0.02,
+	gainmod = 0,
 }
 
 local noVariation = {
-	dopplerscale  = 0,
+	dopplerscale = 0,
 	in3d = false,
+	pitchmod = 0,
+	gainmod = 0,
 }
 
 local ignoredExtensions = {
@@ -116,14 +118,14 @@ local function AutoAdd(subDir, generalOpts)
 			Sounds.SoundItems[pathPart] = {
 				file = tostring('sounds/'..path), 
 				rolloff = opts.rollOff, 
-				dopplerscale = opts.dopplerScale, 
-				maxdist = opts.maxDist, 
-				maxconcurrent = opts.maxConcurrent, 
+				dopplerscale = opts.dopplerscale, 
+				maxdist = opts.maxdist, 
+				maxconcurrent = opts.maxconcurrent, 
 				priority = opts.priority, 
 				gain = opts.gain, 
-				gainmod = opts.gainMod, 
+				gainmod = opts.gainmod, 
 				pitch = opts.pitch, 
-				pitchmod = opts.pitchMod
+				pitchmod = opts.pitchmod
 			}
 			--Spring.Echo(Sounds.SoundItems[key].file)
 		end
