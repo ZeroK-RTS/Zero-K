@@ -71,6 +71,98 @@ local cmdStopFirezone = {
 	texture = 'LuaUI/Images/commands/Bold/stop.png',
 	pos     = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},  
 }
+
+local bombUnitDefIDs = {
+	[UnitDefNames["puppy"].id] = true,
+}
+for udid = 1, #UnitDefs do
+	local ud = UnitDefs[udid]
+	if ud.canKamikaze then
+		bombUnitDefIDs[udid] = true
+	end
+end
+
+--------------
+---OPTIONS----
+--------------
+
+local launchPredictLevel = 2
+local alwaysDrawFireZones = false
+local transportPredictLevel = 1
+local transportPredictionSpeedSq = 5^2
+
+options_path = 'Settings/Interface/Falling Units'--/Formations'
+options_order = { 'lbl_newton', 'predictNewton', 'alwaysDrawZones', 'lbl_transports', 'predictDrop', 'transportSpeed'}
+options = {
+	lbl_newton = { name = 'Newton Launchers', type = 'label'},
+	predictNewton = {
+		type='radioButton', 
+		name='Predict impact location for',
+		items = {
+			{name = 'All units', key = 'all', desc = "All units will have their impact predicted whenever they take damge.", hotkey=nil},
+			{name = 'Launched units', key = 'newton', desc = "Units hit by a gravity gun will have their impact predited.", hotkey=nil},
+			{name = 'Firezone units', key = 'firezone', desc = "Only units launched with a firezone will have their impact predicted.", hotkey=nil},
+			{name = 'No units', key = 'none', desc = "No impact prediction.", hotkey=nil},
+		},
+		value = 'newton',  --default at start of widget
+		noHotkey = true,
+		OnChange = function(self)
+			local key = self.value
+			if key == 'all' then
+				launchPredictLevel = 3
+			elseif key == 'newton' then
+				launchPredictLevel = 2
+			elseif key == 'firezone' then
+				launchPredictLevel = 1
+			elseif key == 'none' then
+				launchPredictLevel = 0
+			end
+		end,
+	},
+	alwaysDrawZones = {
+		name = "Always draw firezones", 
+		desc = "Enable to always draw Newton firezones. Otherwise they are only drawn on selection.",
+		type = 'bool', 
+		noHotkey = true,
+		value = false,
+		OnChange = function(self)
+			alwaysDrawFireZones = self.value
+		end,
+	},
+	lbl_transports = { name = 'Transports', type = 'label'},
+	predictDrop = {
+		type='radioButton', 
+		name='Predict transport drop location for',
+		items = {
+			{name = 'All units', key = 'all', desc = "All units will have their drop location predicted.", hotkey=nil},
+			{name = 'Bombs only', key = 'bomb', desc = "Crawling bombs will have their drop loction predicted.", hotkey=nil},
+			{name = 'No units', key = 'none', desc = "No units will have their impact position predicted.", hotkey=nil},
+		},
+		value = 'bomb',  --default at start of widget
+		noHotkey = true,
+		OnChange = function(self)
+			local key = self.value
+			if key == 'all' then
+				transportPredictLevel = 2
+			elseif key == 'bomb' then
+				transportPredictLevel = 1
+			elseif key == 'none' then
+				transportPredictLevel = 0
+			end
+		end,
+	},
+	transportSpeed = {
+		name = "Drop prediction speed threshold",
+		desc = "Draw prediction for transports above this speed.",
+		type = 'number',
+		min = 0, max = 8, step = 0.2,
+		value = 5,
+		OnChange = function(self)
+			transportPredictionSpeedSq = self.value^2
+		end,
+	},
+}
+
 --------------
 --VARIABLE----
 --------------
@@ -94,6 +186,7 @@ local victimStillBeingAttacked = {}
 local victimLandingLocation = {}
 
 local queueTrajectoryEstimate = {targetFrame=-1,unitList={}} --for use in scheduling the time to calculate unit trajectory
+local transportedUnits = {}
 
 --local cmdRate = 0
 --local cmdRateS = 0
@@ -379,9 +472,26 @@ local function AddTrajectoryEstimate(unitID)
 	queueTrajectoryEstimate["unitList"][unitID] = true
 end
 
---function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
---	AddTrajectoryEstimate(unitID)
---end
+local function UpdateTransportedUnits()
+	for unitID,_ in pairs(transportedUnits) do
+		if Spring.ValidUnitID(unitID) then
+			local transport = Spring.GetUnitTransporter(unitID)
+			if transport and Spring.ValidUnitID(transport) then
+				EstimateCrashLocation(unitID, transport)
+			else
+				transportedUnits[unitID] = nil
+			end
+		else
+			transportedUnits[unitID] = nil
+		end
+	end
+end
+
+function widget:UnitLoaded(unitID, unitDefID, unitTeam, transportID, transportTeam)
+	if (transportPredictLevel == 2) or ((transportPredictLevel == 1) and bombUnitDefIDs[unitDefID]) then
+		transportedUnits[unitID] = true
+	end
+end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 	if victim[unitID] then --is current victim of any Newton group?
@@ -396,7 +506,7 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
 		--ech("still being attacked")
 	end
 	
-	if damage == 0 then -- Unit shot by a newton (or other 0 damage weapon but I don't mind)	
+	if ((launchPredictLevel == 2) and damage == 0) or (launchPredictLevel == 3) or ((launchPredictLevel == 1) and victim[unitID]) then
 		--estimate trajectory of any unit hit by weapon
 		AddTrajectoryEstimate(unitID)
 	end
@@ -409,7 +519,11 @@ function widget:GameFrame(n)
 	--	cmdRate = 0
 	--	cmdRateS= 0
 	--end
-
+	
+	if n%2 == 0 then
+		UpdateTransportedUnits()
+	end
+	
 	-- estimate for recently launched units
 	if queueTrajectoryEstimate["targetFrame"] == n then
 		for unitID,_ in pairs(queueTrajectoryEstimate["unitList"]) do
@@ -531,7 +645,7 @@ function widget:DrawWorld()
 	end
 	glLineWidth(2.0)
 	glColor(1, 1, 0)
-	if selectedNewtons then
+	if selectedNewtons or alwaysDrawFireZones then
 		for g = 1, groups.count do
 			local data = groups.data[g]
 			local points = data.points
@@ -568,7 +682,7 @@ function widget:DrawWorld()
 end
 
 ------Crash location estimator---
-function EstimateCrashLocation(victimID)
+function EstimateCrashLocation(victimID, transportID)
 	if not Spring.ValidUnitID(victimID) then
 		return
 	end
@@ -576,12 +690,20 @@ function EstimateCrashLocation(victimID)
 	if not UnitDefs[defID] or UnitDefs[defID].canFly then --if speccing with limited LOS or the unit can fly, then skip predicting trajectory.
 		return
 	end
-	local xVel,yVel,zVel, compositeVelocity= spGetUnitVelocity(victimID)
+	
+	local xVel,yVel,zVel, compositeVelocity= spGetUnitVelocity(transportID or victimID)
 	local currentVelocitySQ = (compositeVelocity and compositeVelocity^2 or (xVel^2+yVel^2+zVel^2)) --elmo per second square
 	local gravity = mapGravity
-	if currentVelocitySQ < goneBallisticThresholdSQ then --speed insignificant compared to unit speed
-		victimLandingLocation[victimID]=nil
-		return
+	if transportID then
+		if transportPredictionSpeedSq and (currentVelocitySQ < transportPredictionSpeedSq) then
+			victimLandingLocation[victimID]=nil
+			return
+		end
+	else
+		if (currentVelocitySQ < goneBallisticThresholdSQ) then --speed insignificant compared to unit speed
+			victimLandingLocation[victimID]=nil
+			return
+		end
 	end
 	local x,y,z = spGetUnitPosition(victimID)
 	local future_locationX, future_locationZ, future_height
@@ -751,8 +873,9 @@ function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity
 
 	local xold={hrzn=0,vert=0}; --position
 	local vold={hrzn=0,vert=0}; --velocity
-	local currPosition = {x=0,y=0,z=0}
-
+	local currPosition = {x = x, y = 0, z = z}
+	local prevPosition = {x = 0, y = 0, z = 0}
+	
 	vold.hrzn = horizontalVelocity --initial horizontal component of velocity
 	vold.vert = velY --initial vertical component of velocity
 
@@ -771,11 +894,15 @@ function SimulateWithDrag(velX,velY,velZ, x,y,z, gravity,mass,radius, airDensity
 		local vt = Vec2sum(vold,VecFRK4xv(1,t,xold,vold,dt,mass,area,gravity,airDensity));
 		xold = xt;
 		vold = vt;
+		prevPosition.x, prevPosition.y, prevPosition.z = currPosition.x, currPosition.y, currPosition.z
 		currPosition.x = xt.hrzn*hrznAngleSin + x --break down xt.hrzn (distance) into components. Note: math.sin for X and math.cos for Z due to orientation of x & z axis in Spring.
 		currPosition.z = xt.hrzn*hrznAngleCos + z
 		currPosition.y = xt.vert + y
 		local groundHeight = spGetGroundHeight(currPosition.x,currPosition.z)
 		if currPosition.y < groundHeight then --if the unit hits the ground, stop calculating...
+			local interpolation = (prevPosition.y - groundHeight) / (prevPosition.y - currPosition.y)
+			currPosition.x = prevPosition.x + interpolation * (currPosition.x - prevPosition.x)
+			currPosition.z = prevPosition.z + interpolation * (currPosition.z - prevPosition.z)
 			break;
 		end
 		-- Spring.Echo(t.. " " .. xold.hrzn .. " " .. vold.hrzn .. " " .. xold.vert .. " " .. vold.vert);
