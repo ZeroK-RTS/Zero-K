@@ -9,7 +9,7 @@ function gadget:GetInfo()
 		date      = "12 May 8 2015",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true  --  loaded by default?
+		enabled   = false  --  loaded by default?
 	}
 end
 
@@ -133,6 +133,14 @@ function gadget:Initialize()
 		Spring.SetGameRulesParam("CAI2_disabled", 1)
 		gadgetHandler:RemoveGadget()
 		return 
+	end
+	
+	local allUnits = Spring.GetAllUnits()
+	for _, unitID in pairs(allUnits) do
+		local udid = Spring.GetUnitDefID(unitID)
+		if udid then
+			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+		end
 	end
 end
 

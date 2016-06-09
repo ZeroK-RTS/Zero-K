@@ -55,6 +55,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		gunship = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		transport = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		fighter = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		commander = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 	}
 	
 	local economyTargets = UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, 800)

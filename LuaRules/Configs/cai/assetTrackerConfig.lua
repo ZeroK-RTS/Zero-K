@@ -359,7 +359,7 @@ FlattenTableInto(fighter, "fighter", completeUnitListNames)
 
 local getMovetype = Spring.Utilities.getMovetype
 
-local function AddListNames(list, source)
+local function AddListNames(list, source, addMisc, addCommander)
 	for category, namesList in pairs(source) do
 		for i = 1, #namesList do
 			local defName = namesList[i]
@@ -373,19 +373,33 @@ local function AddListNames(list, source)
 		end
 	end
 	
-	for defID = 1, #UnitDefs do
-		if not list[defID] then
+	if addMisc then
+		for defID = 1, #UnitDefs do
+			if not list[defID] then
+				local ud = UnitDefs[defID]
+				
+				local moveType = getMovetype(ud) 
+				if moveType then
+					list[ud.id] = {
+						name = "miscUnit",
+						cost = ud.metalCost,
+					}
+				else
+					list[ud.id] = {
+						name = "miscStructure",
+						cost = ud.metalCost,
+					}
+				end
+			end
+		end
+	end
+	
+	if addCommander then
+		for defID = 1, #UnitDefs do
 			local ud = UnitDefs[defID]
-			
-			local moveType = getMovetype(ud) 
-			if moveType then
+			if ud.customParams.dynamic_comm or ud.customParams.commtype then
 				list[ud.id] = {
-					name = "miscUnit",
-					cost = ud.metalCost,
-				}
-			else
-				list[ud.id] = {
-					name = "miscStructure",
+					name = "commander",
 					cost = ud.metalCost,
 				}
 			end
@@ -444,10 +458,10 @@ end
 local heatmapUnitDefID = CreateHeatmapData(heatmapNames)
 
 local completeListUnitDefID = {}
-AddListNames(completeListUnitDefID, completeUnitListNames)
+AddListNames(completeListUnitDefID, completeUnitListNames, true)
 
 local combatListUnitDefID = {}
-AddListNames(combatListUnitDefID, ground)
+AddListNames(combatListUnitDefID, ground, false, true)
 AddListNames(combatListUnitDefID, antiAir)
 AddListNames(combatListUnitDefID, air)
 AddListNames(combatListUnitDefID, fighter)

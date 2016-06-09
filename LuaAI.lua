@@ -15,10 +15,10 @@ return {
     name = 'CAI',
     desc = 'AI that plays regular Zero-K'
   },
-  {
-    name = 'CAI2',
-    desc = 'Another AI that plays regular Zero-K'
-  },
+  --{
+  --  name = 'CAI2',
+  --  desc = 'Another AI that plays regular Zero-K'
+  --},
   {
     name = 'Chicken: Very Easy',
     desc = 'For PvE in PvP games'

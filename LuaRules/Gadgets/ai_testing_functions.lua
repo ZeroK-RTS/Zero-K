@@ -26,7 +26,7 @@ local PATH_Z = ceil(MAP_HEIGHT/PATH_SQUARE)
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then
+if (gadgetHandler:IsSyncedCode()) and false then
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -232,13 +232,13 @@ local function DrawPathMaps()
 	end
 end
 
-function gadget:DrawWorldPreUnit()
-	--DrawPathMaps()
-end
-
-function gadget:Initialize()
-	gadgetHandler:AddSyncAction('SetHeatmapDrawData',SetHeatmapDrawData)
-end
+--function gadget:DrawWorldPreUnit()
+--	--DrawPathMaps()
+--end
+--
+--function gadget:Initialize()
+--	gadgetHandler:AddSyncAction('SetHeatmapDrawData',SetHeatmapDrawData)
+--end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
