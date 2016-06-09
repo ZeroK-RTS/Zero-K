@@ -35,6 +35,7 @@ function assetTracker.CreateAssetTracker(losCheckAllyTeamID, teamID)
 		economy = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		miscStructure = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		constructor = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
+		commander = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		ground = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		antiAir = UnitListHandler.CreateUnitList(losCheckAllyTeamID),
 		air = UnitListHandler.CreateUnitList(losCheckAllyTeamID),

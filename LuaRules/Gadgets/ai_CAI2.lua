@@ -4,7 +4,7 @@
 function gadget:GetInfo()
 	return {
 		name      = "CAI 2",
-		desc      = "AI that plays normal ZK",
+		desc      = "Another AI that plays normal ZK",
 		author    = "Google Frog",
 		date      = "12 May 8 2015",
 		license   = "GNU GPL, v2 or later",
@@ -49,13 +49,13 @@ local function InitializePathfinder()
 	-- veh, bot, spider, ship, hover, amph, air
 	return {
 		PathfinderGenerator.CreatePathfinder(UnitDefNames["correap"].id, "tank4", true),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["subarty"].id, "uboat3", true),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
-		--PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
-		--PathfinderGenerator.CreatePathfinder(),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["subarty"].id, "uboat3", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(),
 	}
 end
 
