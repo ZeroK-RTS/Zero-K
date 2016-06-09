@@ -289,7 +289,7 @@ function gadget:GameFrame(f)
 					data.onSurface = false
 					-- Horizontal jitter if terrain below is invalid
 					if f%30 == 0 then
-						local validMove = Spring.TestMoveOrder(data.unitDefID, data.x*0.5, 0, data.z*0.5)
+						local validMove = Spring.TestMoveOrder(data.unitDefID, data.x, 0, data.z)
 						if not validMove then
 							local nx, ny, nz = Spring.GetGroundNormal(data.x, data.z)
 							Spring.AddUnitImpulse(unitID, nx, 0, ny)
