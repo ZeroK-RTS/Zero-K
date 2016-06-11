@@ -16,6 +16,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Utilities/versionCompare.lua")
+local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+
 local OVERRIDE_DIR    = LUAUI_DIRNAME .. 'Configs/MapSettingsOverride/'
 local MAP_FILE        = (Game.mapName or "") .. ".lua"
 local OVERRIDE_FILE   = OVERRIDE_DIR .. MAP_FILE
@@ -176,6 +179,11 @@ options, options_order = GetOptions()
 --------------------------------------------------------------------------------
 
 function widget:Initialize()
+	if not devCompatibility then
+		widgetHandler:RemoveWidget()
+		return
+	end
+
 	if Spring.GetGameFrame() < 1 then
 		LoadMinimapSettings()
 	end
