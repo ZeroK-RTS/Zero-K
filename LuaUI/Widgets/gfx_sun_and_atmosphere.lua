@@ -178,10 +178,14 @@ options, options_order = GetOptions()
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function widget:Initialize()	
 	if not devCompatibility then
 		widgetHandler:RemoveWidget()
 		return
+	end
+	if Spring.SetSunLighting then
+		Spring.Echo("SetSunLighting")
+		Spring.SetSunLighting({groundSpecularColor = {0,0,0,0}})
 	end
 
 	if Spring.GetGameFrame() < 1 then
