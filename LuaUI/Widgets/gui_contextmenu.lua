@@ -559,8 +559,9 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if show_range then
+			local range = cp.truerange or wd.range
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
+			cells[#cells+1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect

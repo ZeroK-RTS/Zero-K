@@ -108,7 +108,6 @@ local function RemoveUnit(unitID)
 	specUnit[unitID] = nil
 end  
 
-
 local function ReaddUnits()
 	enemyInt = {}
 	enemyNuke = {}
@@ -131,7 +130,6 @@ local function ReaddUnits()
 		end
 	end
 end
-
 
 function widget:UnitEnteredLos(unitID, unitTeam)
 	if not Spring.AreTeamsAllied(myTeamID, unitTeam) and not spectating then
@@ -333,6 +331,7 @@ local function DrawNukeOnMouse(cmdID)
 	
 	local mx, my = spGetMouseState()
 	local _, mouse = spTraceScreenRay(mx, my, true, true)
+	mouse = {mouse[1], mouse[2], mouse[3]}
 	
 	if not mouse then
 		return false

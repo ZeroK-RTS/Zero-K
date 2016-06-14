@@ -9,7 +9,7 @@ function widget:GetInfo() return {
 
 local morphCompleteMsg
 local function languageChanged ()
-	morphCompleteMsg = WG.Translate ("common", "morph_complete")
+	morphCompleteMsg = WG.Translate ("interface", "morph_complete")
 end
 
 function widget:Initialize()

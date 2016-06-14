@@ -644,10 +644,12 @@ for name, ud in pairs(UnitDefs) do
 			end
 		end
 	end
-	if not ud.canfly then
-		ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
-	else
-		ud.nochasecategory = (ud.nochasecategory or "") .. " SOLAR"
+	if not ud.customparams.chase_everything then
+		if not ud.canfly then
+			ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
+		else
+			ud.nochasecategory = (ud.nochasecategory or "") .. " SOLAR"
+		end
 	end
 end
 
@@ -809,7 +811,9 @@ end
 if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
     local hpMulti = modOptions.hpmult
     for unitDefID, unitDef in pairs(UnitDefs) do
-        if unitDef.maxdamage then unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) end
+        if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
+            unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) 
+        end
     end
 end
 

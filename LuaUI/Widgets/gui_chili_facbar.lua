@@ -253,9 +253,9 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		Button:New{
 			width = options.buttonsize.value*1.2,
 			height = options.buttonsize.value*1.0,
-			tooltip = 			WG.Translate("common", "lmb") .. ' - ' .. GreenStr .. WG.Translate("common", "select") .. '\n' 					
-				.. WhiteStr .. 	WG.Translate("common", "mmb") .. ' - ' .. GreenStr .. WG.Translate("common", "go_to") .. '\n'
-				.. WhiteStr .. 	WG.Translate("common", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
+			tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+				.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
+				.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 				,
 			backgroundColor = buttonColor,
 			
@@ -726,7 +726,7 @@ function widget:Initialize()
 		minHeight = 56,
 		color = {0,0,0,0},
 		children = {
-			Label:New{ caption = WG.Translate("common", "factories"), fontShadow = true, },
+			Label:New{ caption = WG.Translate("interface", "factories"), fontShadow = true, },
 			stack_main,
 		},
 		OnMouseDown={ function(self)

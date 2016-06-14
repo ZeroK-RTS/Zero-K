@@ -48,11 +48,15 @@ VFS.Include("LuaUI/Utilities/json.lua");
 local langValue="en"
 local langListeners={}
 
+local translationExtras = { -- lists databases to be merged into the main one
+	units = {"campaign_units"},
+	interface = {"common", "healthbars"},
+}
+
 local translations = {
-	common = true,
-	healthbars = true,
 	units = true,
 	interface = true,
+	missions = true,
 }
 
 local function addListener(l, widgetName)
@@ -83,6 +87,12 @@ local function fireLangChange()
 
 	for db, trans in pairs(translations) do
 		if not trans.locales[langValue] then
+			local extras = translationExtras[db]
+			if extras then
+				for i = 1, #extras do
+					loadLocale(trans.i18n, extras[i], langValue)
+				end
+			end
 			loadLocale(trans.i18n, db, langValue)
 			trans.locales[langValue] = true
 		end
@@ -112,7 +122,14 @@ local function initializeTranslation(database)
 		i18n = VFS.Include("LuaUI/i18nlib/i18n/init.lua", nil, VFS.DEF_MODE),
 		locales = {en = true},
 	}
-	loadLocale(trans.i18n,database,"en") 
+	loadLocale(trans.i18n,database,"en")
+
+	local extras = translationExtras[database]
+	if extras then
+		for i = 1, #extras do
+			loadLocale(trans.i18n, extras[i], "en")
+		end
+	end
 
 	return trans
 end

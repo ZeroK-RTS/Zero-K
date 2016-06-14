@@ -302,7 +302,7 @@ function script.AimWeapon(num, heading, pitch)
 	return (num ~= 2) --and (spGetUnitRulesParam(unitID, "lowpower") == 0)
 end
 
-function script.BlockShot(num, target)
+function script.BlockShot(num, targetID)
 	if launchInProgress then
 		return true
 	end
@@ -312,16 +312,19 @@ function script.BlockShot(num, target)
 	end
 	
 	local cQueue = Spring.GetCommandQueue(unitID, 1)
-	if not (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
-		return true
+	if (cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK) then
+		if cQueue[1].params[3] then
+			StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
+			return true
+		elseif (#cQueue[1].params == 1) then
+			targetID = cQueue[1].params[1]
+		end
 	end
 	
-	if cQueue[1].params[3] then
-		StartThread(LaunchAll, cQueue[1].params[1], cQueue[1].params[3])
-	elseif #cQueue[1].params == 1 then
-		local x,y,z = Spring.GetUnitPosition(cQueue[1].params[1])
+	if targetID then
+		local x,y,z = Spring.GetUnitPosition(targetID)
 		if x then
-			local vx,_,vz = Spring.GetUnitVelocity(cQueue[1].params[1])
+			local vx,_,vz = Spring.GetUnitVelocity(targetID)
 			if vx then
 				local dist = Vector.AbsVal(ux - x, uy + HOVER_HEIGHT - y, uz - z)
 				-- Weapon speed is 53 elmos/frame but it has some acceleration.

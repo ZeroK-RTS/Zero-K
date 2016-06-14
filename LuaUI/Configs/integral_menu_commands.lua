@@ -231,9 +231,9 @@ local overrides = {
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
 	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, text='', tooltip = tooltips["repeat"]},
 	[CMD_WANT_CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+		text ='', tooltip =  'Desired cloak state'},
 	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+		text ='', tooltip =  'Desired cloak state'},
 	[CMD_CLOAK_SHIELD] = { texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'}, 
 		text ='',	tooltip = 'Area Cloaker State'},
 	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, text ='', },
@@ -263,6 +263,13 @@ local overrides = {
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
 	}
 
+-- Commands that only exist in LuaUI cannot have a hidden param. Therefore those that should be hidden are placed in this table.
+local widgetSpaceHidden = {
+	[60] = true, -- CMD.PAGES
+	[CMD_SETHAVEN] = true,
+	[CMD_SET_FERRY] = true,
+}
+	
 -- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)
 -- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
 -- This table is used in Keyboardmenu, Integral menu, and Epicmenu for hotkey management.
@@ -353,4 +360,4 @@ local custom_cmd_actions = {
 }
 
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden

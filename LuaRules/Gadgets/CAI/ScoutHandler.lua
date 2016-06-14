@@ -17,7 +17,7 @@ function scoutHandler.CreateScoutHandler(scoutHeatmap)
 
 	local scoutList = UnitListHandler.CreateUnitList()
 
-	function RunJobHandler()
+	local function RunJobHandler()
 		if scoutHeatmap.IsScoutingRequired() then
 			for unitID,_ in scoutList.Iterator() do
 				local cQueue = spGetCommandQueue(unitID, 1)
@@ -36,6 +36,7 @@ function scoutHandler.CreateScoutHandler(scoutHeatmap)
 		AddUnit = scoutList.AddUnit,
 		RemoveUnit = scoutList.RemoveUnit,
 		GetTotalCost = scoutList.GetTotalCost,
+		RunJobHandler = RunJobHandler,
 	}
 	
 	return newScoutHandler

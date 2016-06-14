@@ -78,12 +78,33 @@ local buildQueueUnsorted = {}	--puts all units of same type into single index; t
 local gridLocation = {}
 
 ------------------------
+--  GRID KEY CONFIG
+------------------------
+------------------------
+
+local gridMap = include("Configs/keyboard_layout.lua")["qwerty"]
+
+local function GenerateGridKeyMap(grid)
+	local ret = {}
+	for i = 1, 3 do
+		for j = 1, 6 do
+			ret[KEYSYMS[grid[i][j]]] = {i, j}
+		end
+	end
+	return ret
+end
+
+gridKeyMap = GenerateGridKeyMap(gridMap)
+------------------------
 --  CONFIG
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell', 
-					'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'}
+options_order = { 
+	'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 
+	'unitshotkeyaltaswell',  'hotkeysWithTabClick', 'keyboardType',
+	'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'
+}
 options = {
 	background_opacity = {
 		name = "Opacity",
@@ -124,6 +145,32 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+	},
+	hotkeysWithTabClick = {
+		name = 'Enable hotkeys on tab click',
+		type = 'bool',
+		desc = "Clicking on a tab button enables hotkeys for that tab.",
+		value = false,
+		noHotkey = true,
+	},
+	keyboardType = {
+		type='radioButton', 
+		name='Keyboard Layout',
+		items = {
+			{name = 'QWERTY (standard)',key = 'qwerty', hotkey=nil},
+			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey=nil},
+			{name = 'AZERTY (France)', key = 'azerty', hotkey=nil},
+		},
+		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+		OnChange = function(self)
+			local layout = self.value
+			local layoutConfig = include("Configs/keyboard_layout.lua")
+			if layoutConfig[layout] then
+				gridMap = layoutConfig[layout]
+				gridKeyMap = GenerateGridKeyMap(gridMap)
+			end
+		end,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -176,9 +223,7 @@ local spGetSpectatingState = Spring.GetSpectatingState
 
 local push        = table.insert
 
-local CMD_PAGES = 60
-
-local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden = include("Configs/integral_menu_commands.lua")
 
 local function CapCase(str)
 	local str = str:lower()
@@ -263,54 +308,6 @@ local alreadyRemovedTag = {}
 local hotkeyMode = false
 local recentlyInitialized = false
 local wasPlaying = false
-
-local gridKeyMap = {
-	[KEYSYMS.Q] = {1,1}, 
-	[KEYSYMS.W] = {1,2},
-	[KEYSYMS.E] = {1,3},
-	[KEYSYMS.R] = {1,4},
-	[KEYSYMS.T] = {1,5},
-	[KEYSYMS.Y] = {1,6},
-	[KEYSYMS.A] = {2,1}, 
-	[KEYSYMS.S] = {2,2},
-	[KEYSYMS.D] = {2,3},
-	[KEYSYMS.F] = {2,4},
-	[KEYSYMS.G] = {2,5},
-	[KEYSYMS.H] = {2,6},
-	[KEYSYMS.Z] = {3,1}, 
-	[KEYSYMS.X] = {3,2},
-	[KEYSYMS.C] = {3,3},
-	[KEYSYMS.V] = {3,4},
-	[KEYSYMS.B] = {3,5},
-	[KEYSYMS.N] = {3,6},
-}
-
-local gridMap = {
-	[1] = {
-		[1] = "Q",
-		[2] = "W",
-		[3] = "E",
-		[4] = "R",
-		[5] = "T",
-		[6] = "Y",
-	},
-	[2] = {
-		[1] = "A",
-		[2] = "S",
-		[3] = "D",
-		[4] = "F",
-		[5] = "G",
-		[6] = "H",
-	},
-	[3] = {
-		[1] = "Z",
-		[2] = "X",
-		[3] = "C",
-		[4] = "V",
-		[5] = "B",
-		[6] = "N",
-	},
-}
 
 -- DGun button progressbar, for listening to special-weapon reload progress
 --VFS.Include("LuaRules/Configs/customcmds.h.lua") --already included in "include("Configs/integral_menu_commands.lua")"
@@ -639,7 +636,7 @@ end
 
 --sorts commands into categories
 local function ProcessCommand(cmd) 
-	if not cmd.hidden and cmd.id ~= CMD_PAGES then 
+	if not cmd.hidden and not widgetSpaceHidden[cmd.id] then 
 		-- state icons 
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			n_states[#n_states+1] = cmd 
@@ -1074,8 +1071,11 @@ local function MakeMenuTab(i, alpha)
 		caption = hotkeyMode and menuChoices[i].name or menuChoices[i].hotkeyName,
 		OnClick = {
 			function()
+				hotkeyMode = options.hotkeysWithTabClick.value
 				menuChoice = i
-				if i >= 2 and i <= 5 then lastBuildChoice = i end
+				if i >= 2 and i <= 5 then 
+					lastBuildChoice = i 
+				end
 				Update(true)
 				ColorTabs(i)
 			end

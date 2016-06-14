@@ -58,13 +58,13 @@ local function GetTotalUnitValue (teamID)
 end
 
 local function GetEnergyIncome (teamID)
-	return (Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0)
+	return (select(4, Spring.GetTeamResources(teamID, "energy")) or 0) + 
+		(Spring.GetTeamRulesParam(teamID, "OD_energyIncome") or 0) - 
+		math.max(0, (Spring.GetTeamRulesParam(teamID, "OD_energyChange") or 0))
 end
 
 local function GetMetalIncome (teamID)
-	return (Spring.GetTeamRulesParam(teamID, "OD_metalBase") or 0)
-		+ (Spring.GetTeamRulesParam(teamID, "OD_metalOverdrive") or 0)
-		+ (Spring.GetTeamRulesParam(teamID, "OD_metalMisc") or 0)
+	return (select(4, Spring.GetTeamResources(teamID, "metal")) or 0)
 end
 
 local stats_index
@@ -78,7 +78,6 @@ function gadget:GameFrame(n)
 			local teamID = teamList[i]
 			mIncome[teamID] = mIncome[teamID] + GetMetalIncome  (teamID)
 			eIncome[teamID] = eIncome[teamID] + GetEnergyIncome (teamID)
-			
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID])

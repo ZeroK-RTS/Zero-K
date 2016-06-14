@@ -108,16 +108,18 @@ unitDef = {
       craterMult              = 0,
       cegTag                  = [[flamer]],
 
-	  customParams        	  = {
-		flamethrower = [[1]],
-	    setunitsonfire = "1",
-		burntime = [[450]],
-		
-		light_camera_height = 2800,
-		light_color = [[1.2 0.78 0.36]],
-		light_radius = 260,
-	  },
-	  
+      customParams            = {
+        flamethrower = [[1]],
+        setunitsonfire = "1",
+        burntime = [[450]],
+          
+        light_camera_height = 2800,
+        light_color = [[1.2 0.78 0.36]],
+        light_radius = 260,
+      
+        combatrange = 280,
+      },
+    
       damage                  = {
         default = 8.5,
         subs    = 0.01,
@@ -133,8 +135,8 @@ unitDef = {
       interceptedByShieldType = 1,
       noExplode               = true,
       noSelfDamage            = true,
-      --predictBoost			  = 1,
-      range                   = 280,
+      --predictBoost          = 1,
+      range                   = 260,
       reloadtime              = 0.16,
       rgbColor                = [[1 1 1]],
       soundStart              = [[weapon/flamethrower]],

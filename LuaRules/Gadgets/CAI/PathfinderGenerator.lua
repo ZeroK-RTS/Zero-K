@@ -31,8 +31,11 @@ local PathfinderGenerator = {
 	PATH_Z = PATH_Z,
 }
 
+local DRAW_PATHMAP = false
+local DRAW_FOUND_PATH = false
+
 ---------------------------------------------------------------
--- Helper functions 
+-- Helper local functions 
 ---------------------------------------------------------------
 local CoordToIDarray = {}
 local IdToCoordarray = {}
@@ -114,7 +117,7 @@ local checkPoints = {
 	{x = 100, z = -100},
 }
 
--- Functions for modifying and checking links.
+-- local functions for modifying and checking links.
 local function AddLink(point, relation, cost)
 	point.linkCount = point.linkCount + 1
 	point.linkList[point.linkCount] = {x = point.x + relation[1], z = point.z + relation[2], cost = cost}
@@ -140,20 +143,25 @@ local function UpdatePathLink(start, finish, relation, moveDef)
 			local fz = finish.pz
 			local myPath = Spring.RequestPath(moveDef, sx, 0, sz, fx, 0, fz, 16)
 			if myPath then
-				local waypoints, estimate = myPath:GetPathWayPoints()
-				local endX = waypoints[#waypoints][1]
-				local endZ = waypoints[#waypoints][3]
-				if #waypoints <= 25 and DisSQ(endX, endZ, fx, fz) < 256 then
-					AddLink(start, relation, #waypoints)
-					AddLink(finish, {-relation[1], -relation[2]}, #waypoints)
+				local waypoints = myPath:GetPathWayPoints()
+				if waypoints and #waypoints > 0 then
+					local endX = waypoints[#waypoints][1]
+					local endZ = waypoints[#waypoints][3]
+					if #waypoints <= 20 and DisSQ(endX, endZ, fx, fz) < 256 then
+						AddLink(start, relation, #waypoints)
+						AddLink(finish, {-relation[1], -relation[2]}, #waypoints)
+						if DRAW_PATH then
+							Spring.MarkerAddLine(sx, 0, sz, fx, 0, fz)
+						end
+					end
+					--if DisSQ(endX, endZ, fx, fz) > 256 then
+					--	Spring.MarkerAddPoint(fx, 0, fz, sqrt(DisSQ(endX, endZ, fx, fz)))
+					--	for i = 1, #waypoints do
+					--		local w = waypoints[i]
+					--		Spring.MarkerAddPoint(w[1], w[2], w[3], i)
+					--	end
+					--end
 				end
-				--if DisSQ(endX, endZ, fx, fz) > 256 then
-				--	Spring.MarkerAddPoint(fx, 0, fz, sqrt(DisSQ(endX, endZ, fx, fz)))
-				--	for i = 1, #waypoints do
-				--		local w = waypoints[i]
-				--		Spring.MarkerAddPoint(w[1], w[2], w[3], i)
-				--	end
-				--end
 			end
 		end
 	else
@@ -185,7 +193,7 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 			}
 			
 			local function IsValidUnitLocation(x, z)
-				return Spring.TestMoveOrder(pathUnitDefID, x/2, 0, z/2) and not (avoidWater and Spring.GetGroundHeight(x,z) < 0)
+				return Spring.TestMoveOrder(pathUnitDefID, x, 0, z) and not (avoidWater and Spring.GetGroundHeight(x,z) < 0)
 			end
 			
 			local point = 1
@@ -210,6 +218,8 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 	end
 	
 	-- Check links between points, this only checks orthagonal but could easily change.
+	--for i = 5, 5 do
+	--	for j = 5, 5 do
 	for i = 1, PATH_X do
 		for j = 1, PATH_Z do
 			if i < PATH_X then
@@ -221,8 +231,8 @@ local function CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 		end
 	end
 	
-	--for i = 0, PATH_X do
-	--	for j = 0, PATH_Z do
+	--for i = 1, PATH_X do
+	--	for j = 1, PATH_Z do
 	--		if pathMap[i][j].passable then
 	--			local str = ""
 	--			local linkList = pathMap[i][j].linkList
@@ -250,12 +260,13 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 	
 	local defenseHeatmaps = {}
 	local defenseHeatmapCount = 0
+	
 	local pathMap = CreatePathMap(pathUnitDefID, pathMoveDefName, avoidWaterDamage)
 	
 	local fearSumCache = {}
 	
-	-- Heatmap functions
-	function SetDefenseHeatmaps(newDefenseHeatmaps)
+	-- Heatmap local functions
+	local function SetDefenseHeatmaps(newDefenseHeatmaps)
 		defenseHeatmaps = newDefenseHeatmaps
 		defenseHeatmapCount = #newDefenseHeatmaps
 	end
@@ -319,7 +330,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 		end
 	end
 	
-	function GetPath(startX, startZ, finishX, finishZ, newHeatmapFear, newHeatFearFactor, minWaypointDistance)
+	local function GetPath(startX, startZ, finishX, finishZ, newHeatmapFear, newHeatFearFactor, minWaypointDistance)
 		fearSumCache = {}
 	
 		heatmapFear = newHeatmapFear
@@ -341,11 +352,11 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 		
 		--for i = 1, #path do
 		--	local x, z = IdToCoords(path[i])
-		--	local wx,_, wz = ArrayToWorld(x, z)
+		--	local wx, wz = ArrayToWorld(x, z)
 		--	Spring.MarkerAddPoint(wx, 0, wz, "")
 		--end
 		
-		-- Functions for culling the path of useless nodes
+		-- local functions for culling the path of useless nodes
 		local function CheckLink(x1, z1, x2, z2, maxFear)
 			local dx, dz = x2 - x1, z2 - z1
 			local linkRelationMap = pathMap[x1][z1].linkRelationMap
@@ -393,8 +404,8 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 				if newRx ~= rx then
 					steps = steps + 1
 					if (not CheckLink(rx, rz, newRx, rz, maxFear)) or IsPositionHeatmapFeared(newRx, rz) then
-						--local w1,_, w2 = ArrayToWorld(rx,rz)
-						--local w3,_, w4 = ArrayToWorld(newRx,rz)
+						--local w1, w2 = ArrayToWorld(rx,rz)
+						--local w3, w4 = ArrayToWorld(newRx,rz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
 						--Spring.MarkerAddPoint(w3, 0, w4, "bla")
 						directPath = false
@@ -408,8 +419,8 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 				if newRz ~= rz then
 					steps = steps + 1
 					if (not CheckLink(rx, rz, rx, newRz, maxFear)) or IsPositionHeatmapFeared(rx, newRz) then
-						--local w1,_, w2 = ArrayToWorld(rx,rz)
-						--local w3,_, w4 = ArrayToWorld(rx,newRz)
+						--local w1, w2 = ArrayToWorld(rx,rz)
+						--local w3, w4 = ArrayToWorld(rx,newRz)
 						--Spring.MarkerAddLine(w1, 0, w2, w3, 0, w4)
 						--Spring.MarkerAddPoint(w3, 0, w4, "bla")
 						directPath = false
@@ -464,7 +475,7 @@ function PathfinderGenerator.CreatePathfinder(pathUnitDefID, pathMoveDefName, av
 				local toX, toZ = IdToCoords(path[from])
 				AddWaypoint(toX, toZ)
 				to = to + minWaypointDistance
-				--local wrx,_, wrz = ArrayToWorld(rx, rz)
+				--local wrx, wrz = ArrayToWorld(rx, rz)
 				--Spring.MarkerAddPoint(wx, 0, wz, "Path: " .. from)
 				--Spring.MarkerAddPoint(wrx, 0, wrz, "Blocked: " .. from)
 			end

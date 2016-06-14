@@ -223,7 +223,7 @@ local overrides = {
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, caption=''},
 	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, caption='', tooltip = tooltips["repeat"]},
 	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		caption ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+		caption ='', tooltip =  'Desired cloak state'},
 	[CMD_CLOAK_SHIELD] = { texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'},
 		caption ='',	tooltip = 'Area Cloaker State'},
 	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, caption ='' },

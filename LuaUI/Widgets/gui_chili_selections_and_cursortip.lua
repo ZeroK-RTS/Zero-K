@@ -795,23 +795,23 @@ local function WriteGroupInfo()
 			if reloadFraction < 0.99 then
 				remainingTime = math.floor(remainingTime)
 				if remainingTime > 1000 then
-					remainingTime = WG.Translate("common", "never")
+					remainingTime = WG.Translate("interface", "never")
 				else
 					remainingTime = remainingTime .. "s"
 				end
-				dgunStatus = "\n" .. WG.Translate("common", "special") .. "\255\255\90\90 " .. WG.Translate("common", "reloading") .. "\255\255\255\255 (" .. remainingTime .. ")"  --red and white
+				dgunStatus = "\n" .. WG.Translate("interface", "special") .. "\255\255\90\90 " .. WG.Translate("interface", "reloading") .. "\255\255\255\255 (" .. remainingTime .. ")"  --red and white
 			else
-				dgunStatus = "\n" .. WG.Translate("common", "special") .. "\255\90\255\90 " .. WG.Translate("common", "ready") .. "\255\255\255\255"
+				dgunStatus = "\n" .. WG.Translate("interface", "special") .. "\255\90\255\90 " .. WG.Translate("interface", "ready") .. "\255\255\255\255"
 			end
 		end
 	end
-	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\n" .. WG.Translate("common", "metal") .. " \255\0\255\0" .. numformat(unitInfoSum.metalincome, true) .. "\255\255\255\255 / \255\255\0\0" ..  numformat(-unitInfoSum.metaldrain, true)  .. "\255\255\255\255") or '' --have metal or ''
-	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\n" .. WG.Translate("common", "energy") .. " \255\0\255\0" .. numformat(unitInfoSum.energyincome, true) .. "\255\255\255\255 / \255\255\0\0" .. numformat(-unitInfoSum.energydrain, true) .. "\255\255\255\255") or '' --have energy or ''
-	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\n" .. WG.Translate("common", "buildpower") .. " " .. numformat(unitInfoSum.usedbp) .. " / " ..  numformat(unitInfoSum.totalbp)) or ''  --have buildpower or ''
+	local metal = (tonumber(unitInfoSum.metalincome)>0 or tonumber(unitInfoSum.metaldrain)>0) and ("\n" .. WG.Translate("interface", "metal") .. " \255\0\255\0" .. numformat(unitInfoSum.metalincome, true) .. "\255\255\255\255 / \255\255\0\0" ..  numformat(-unitInfoSum.metaldrain, true)  .. "\255\255\255\255") or '' --have metal or ''
+	local energy = (tonumber(unitInfoSum.energyincome)>0 or tonumber(unitInfoSum.energydrain)>0) and ("\n" .. WG.Translate("interface", "energy") .. " \255\0\255\0" .. numformat(unitInfoSum.energyincome, true) .. "\255\255\255\255 / \255\255\0\0" .. numformat(-unitInfoSum.energydrain, true) .. "\255\255\255\255") or '' --have energy or ''
+	local buildpower = (tonumber(unitInfoSum.totalbp)>0) and ("\n" .. WG.Translate("interface", "buildpower") .. " " .. numformat(unitInfoSum.usedbp) .. " / " ..  numformat(unitInfoSum.totalbp)) or ''  --have buildpower or ''
 	local unitInfoString = 
-		WG.Translate("common", "selected_units") .. ": " .. numformat(unitInfoSum.count) ..
-		"\n" .. WG.Translate("common", "health") .. ": " .. numformat(unitInfoSum.hp) .. " / " ..  numformat(unitInfoSum.maxhp) ..
-		"\n" .. WG.Translate("common", "value") .. ": " .. numformat(unitInfoSum.cost) .. " / " ..  numformat(unitInfoSum.finishedcost) ..
+		WG.Translate("interface", "selected_units") .. ": " .. numformat(unitInfoSum.count) ..
+		"\n" .. WG.Translate("interface", "health") .. ": " .. numformat(unitInfoSum.hp) .. " / " ..  numformat(unitInfoSum.maxhp) ..
+		"\n" .. WG.Translate("interface", "value") .. ": " .. numformat(unitInfoSum.cost) .. " / " ..  numformat(unitInfoSum.finishedcost) ..
 		metal .. energy ..	buildpower .. dgunStatus
 	
 	label_unitInfo = Label:New{ --recreate chili element (rather than just updating caption) to avoid color bug
@@ -858,7 +858,7 @@ local function DisposeSelectionDisplay()
 end
 
 local function SelectionTooltips()
-	return "\n\255\0\255\0" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select") .. "\n" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "deselect") .. "\n" .. WG.Translate("common", "shift") .. "+" .. WG.Translate("common", "lmb") .. ": " .. WG.Translate("common", "select_type") .. "\n" .. WG.Translate("common", "shift") .. "+" .. WG.Translate("common", "rmb") .. ": " .. WG.Translate("common", "deselect_type") .. "\n" .. WG.Translate("common", "mmb") .. ": " .. WG.Translate("common", "go_to")
+	return "\n\255\0\255\0" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select") .. "\n" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "lmb") .. ": " .. WG.Translate("interface", "select_type") .. "\n" .. WG.Translate("interface", "shift") .. "+" .. WG.Translate("interface", "rmb") .. ": " .. WG.Translate("interface", "deselect_type") .. "\n" .. WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to")
 end
 
 local function AddSelectionIcon(index,unitid,defid,unitids,counts)
@@ -1805,7 +1805,7 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 		globalitems[globalitem_name] = Image:New{
 			file = "#" .. ud.id,
 			file2 = (WG.GetBuildIconFrame)and(WG.GetBuildIconFrame(ud)),
-			tooltip = WG.Translate("common", "mmb") .. ": " .. WG.Translate("common", "go_to"),
+			tooltip = WG.Translate("interface", "mmb") .. ": " .. WG.Translate("interface", "go_to"),
 			keepAspect = false,
 			height  = buildpic_size*(4/5),
 			width   = buildpic_size,
@@ -1847,12 +1847,12 @@ local function MakeToolTip_UD(tt_table)
 	
 	local extraText = ""
 	if mexDefID == tt_table.unitDef.id and WG.mouseoverMexIncome then
-		extraText = ", ".. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome)
+		extraText = ", ".. WG.Translate("interface", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome)
 		if WG.mouseoverMexIncome > 0 then
 			local cost = metalStructureDefs[tt_table.unitDef.id].cost
-			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
+			extraText = extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. SecondsToMinutesSeconds(cost/WG.mouseoverMexIncome)
 		else
-			extraText = extraText .. "\n" .. WG.Translate("common", "base_payback") .. ": " .. WG.Translate("common", "never")
+			extraText = extraText .. "\n" .. WG.Translate("interface", "base_payback") .. ": " .. WG.Translate("interface", "never")
 		end
 	end
 
@@ -1868,12 +1868,12 @@ local function MakeToolTip_UD(tt_table)
 
 				if y then
 					if y <= windTidalThreashold then
-						extraText = ", " .. WG.Translate("common", "tidal_income") .. " +1.2"
+						extraText = ", " .. WG.Translate("interface", "tidal_income") .. " +1.2"
 						income = 1.2
 						health = 400
 					else
 						local minWindIncome = windMin+(windMax-windMin)*windGroundSlope*(y - windGroundMin)/windGroundExtreme
-						extraText = ", " .. WG.Translate("common", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
+						extraText = ", " .. WG.Translate("interface", "wind_range") .. " " .. string.format("%.1f", minWindIncome ) .. " - " .. string.format("%.1f", windMax )
 						income = (minWindIncome+2.5)/2
 					end
 				end
@@ -1927,9 +1927,9 @@ local function MakeToolTip_UD(tt_table)
 			--.. "\n extraMetal: " .. extraMetalza
 			--.. "\n unitformCasePayback: " .. unitformCasePayback 
 			--.. "\n worstCasePayback: " .. worstCasePayback 
-			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback)
+			extraText = extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " .. SecondsToMinutesSeconds(worstCasePayback)
 		else
-			extraText = extraText .. "\n" .. WG.Translate("common", "od_payback") .. ": " ..  WG.Translate("common", "unknown")
+			extraText = extraText .. "\n" .. WG.Translate("interface", "od_payback") .. ": " ..  WG.Translate("interface", "unknown")
 		end
 	end
 
@@ -2011,7 +2011,7 @@ local function MakeToolTip_Unit(data)
 			{ name='uname', icon = iconPath, text = GetHumanName(tt_ud, tt_unitID), fontSize=4, },
 			{ name='utt', text = GetDescription(tt_ud, tt_unitID) .. '\n', wrap=true },
 			{ name='hp', directcontrol = 'hp_unit', },
-			{ name='ttplayer', text = WG.Translate("common", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
+			{ name='ttplayer', text = WG.Translate("interface", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false },
 			{ name='help', text = green .. WG.Translate("interface", "space_click_show_stats"), },
 		},
 	}
@@ -2087,9 +2087,9 @@ local function MakeToolTip_Feature(data)
 	
 	local desc = ''
 	if feature_name:find('dead2') or feature_name:find('heap') then
-		desc = ' (' .. WG.Translate("common", "debris") .. ')'
+		desc = ' (' .. WG.Translate("interface", "debris") .. ')'
 	elseif feature_name:find('dead') then
-		desc = ' (' .. WG.Translate("common", "wreckage") .. ')'
+		desc = ' (' .. WG.Translate("interface", "wreckage") .. ')'
 	end
 	tt_ud = UnitDefNames[live_name]
 	fullname = ((tt_ud and GetHumanName(tt_ud) .. desc) or tt_fd.tooltip or "")
@@ -2135,7 +2135,7 @@ local function MakeToolTip_Feature(data)
 					and { name='hp', directcontrol = (tt_ud and 'hp_corpse' or 'hp_feature'), } 
 					or {}),
 			
-			{ name='ttplayer', text = WG.Translate("common", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false, },
+			{ name='ttplayer', text = WG.Translate("interface", "player") .. ': ' .. teamColor .. playerName .. white ..'', fontSize=2, center=false, },
 			{ name='help', text = tt_ud and (green .. WG.Translate("interface", "space_click_show_stats")) or '', },
 		},
 	}
@@ -2271,12 +2271,12 @@ end
 
 local function miscObjectTooltip()
 	if WG.mouseoverMexIncome and WG.mouseoverMexIncome ~= 0 then
-		MakeToolTip_Text(WG.Translate("common", "mexspot") .. "\n" .. WG.Translate("common", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
+		MakeToolTip_Text(WG.Translate("interface", "mexspot") .. "\n" .. WG.Translate("interface", "income") .. " +" .. strFormat("%.2f", WG.mouseoverMexIncome))
 		return true
 	end
 
 	if WG.mouseAboveGeo then
-		MakeToolTip_Text(WG.Translate("common", "geospot"))
+		MakeToolTip_Text(WG.Translate("interface", "geospot"))
 		return true
 	end
 end

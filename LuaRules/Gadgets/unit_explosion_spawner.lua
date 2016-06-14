@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		date = "2007-11-18",
 		license = "None",
 		layer = 50,
-		enabled = true
+		enabled = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 	}
 end
 
@@ -48,7 +48,7 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
-function gadget:ProjectileDestroyed(proID)
+function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
 	local weapDefID=Spring.GetProjectileDefID(proID)
 	local teamID=Spring.GetProjectileTeamID(proID)
 	if spawn_defs_id[weapDefID] then

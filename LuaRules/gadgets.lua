@@ -1762,7 +1762,7 @@ local Explosion_GadgetSingle = {}
 
 local Explosion_first = true
 
-function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
+function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID, proID)
 	if Explosion_first then
 		for _,g in ipairs(self.ExplosionList) do
 			local weaponDefs = (g.Explosion_GetWantedWeaponDef and g:Explosion_GetWantedWeaponDef()) or allWeaponDefs
@@ -1790,14 +1790,14 @@ function gadgetHandler:Explosion(weaponID, px, py, pz, ownerID)
 	local single = Explosion_GadgetSingle[weaponID]
 	local map = Explosion_GadgetMap[weaponID]
 	if single then
-		noGfx = single:Explosion(weaponID, px, py, pz, ownerID)
+		noGfx = single:Explosion(weaponID, px, py, pz, ownerID, proID)
 	elseif map then
 		local gadgets = map
 		local data = gadgets.data
 		local g
 		for i = 1, gadgets.count do
 			g = data[i]
-			noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID)
+			noGfx = noGfx or g:Explosion(weaponID, px, py, pz, ownerID, proID)
 		end
 	end
 	return noGfx or false

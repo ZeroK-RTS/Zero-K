@@ -1737,7 +1737,7 @@ MakeSubWindow = function(path, pause)
 				
 				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
 				
-				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton )
+				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey)
 			end
 			
 		elseif option.type == 'label' then	

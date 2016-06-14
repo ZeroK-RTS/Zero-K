@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "CAI 2",
-    desc      = "AI that plays normal ZK",
-    author    = "Google Frog",
-    date      = "12 May 8 2015",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = false  --  loaded by default?
-  }
+	return {
+		name      = "CAI 2",
+		desc      = "Another AI that plays normal ZK",
+		author    = "Google Frog",
+		date      = "12 May 8 2015",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = false  --  loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -18,8 +18,14 @@ end
 
 include("LuaRules/Configs/customcmds.h.lua")
 
+local spGetUnitLosState = Spring.GetUnitLosState
+local spGetTeamInfo     = Spring.GetTeamInfo
+local spGetTeamList     = Spring.GetTeamList
+local spGetTeamLuaAI    = Spring.GetTeamLuaAI
+
 local AllyTeamInfoHandler = VFS.Include("LuaRules/Gadgets/CAI/AllyTeamInfoHandler.lua")
 local AiTeamHandler = VFS.Include("LuaRules/Gadgets/CAI/AiTeamHandler.lua")
+local PathfinderGenerator = VFS.Include("LuaRules/Gadgets/CAI/PathfinderGenerator.lua")
 
 local aiConfigByName = {
 	CAI2 = true,
@@ -34,12 +40,59 @@ if (gadgetHandler:IsSyncedCode()) then
 
 local allyTeamInfo = {}
 local aiTeam = {}
+local pathfinder = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function InitializePathfinder()
+	-- veh, bot, spider, ship, hover, amph, air
+	return {
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["correap"].id, "tank4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["dante"].id, "kbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armcrabe"].id, "tkbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["subarty"].id, "uboat3", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["amphassault"].id, "akbot4", true),
+		PathfinderGenerator.CreatePathfinder(UnitDefNames["armmanni"].id, "hover3"),
+		PathfinderGenerator.CreatePathfinder(),
+	}
+end
+
+function gadget:GameFrame(n)
+	for teamID, aiData in pairs(aiTeam) do
+		aiData.GameFrameUpdate(n)
+	end
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
+		allyTeamData.GameFrameUpdate(n)
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if aiTeam[unitTeam] then
+		aiTeam[unitTeam].UnitCreatedUpdate(unitID, unitDefID, unitTeam)
+	end
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
+		local visibilityTable = spGetUnitLosState(unitID, allyTeamID, false)
+		if visibilityTable and (visibilityTable.los or visibilityTable.typed) then
+			allyTeamData.UnitCreatedUpdate(unitID, unitDefID, unitTeam)
+		end
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if aiTeam[unitTeam] then
+		aiTeam[unitTeam].UnitDestroyedUpdate(unitID, unitDefID, unitTeam)
+	end
+	for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
+		local visibilityTable = spGetUnitLosState(unitID, allyTeamID, false)
+		if visibilityTable and (visibilityTable.los or visibilityTable.typed) then
+			allyTeamData.UnitDestroyedUpdate(unitID, unitDefID, unitTeam)
+		end
+	end
+end
 
 function gadget:Initialize()
-
 	local aiOnTeam = {}
 	usingAI = false
 
@@ -58,13 +111,15 @@ function gadget:Initialize()
 			if (not CustomTeamOptions) or (not CustomTeamOptions["aioverride"]) then -- what is this for?
 				local _,_,_,_,_,allyTeam = spGetTeamInfo(team)
 				
+				if not pathfinder then
+					pathfinder = InitializePathfinder()
+				end
+				
 				if not allyTeamInfo[allyTeam] then
-					allyTeamInfo[allyTeam] = AllyTeamInfoHandler.CreateAllyteamInfoHandler(allyTeam, team)
+					allyTeamInfo[allyTeam] = AllyTeamInfoHandler.CreateAllyTeamInfoHandler(allyTeam, team, pathfinder)
 				end
 				
 				aiTeam[team] = AiTeamHandler.CreateAiTeam(allyteamID, team, allyTeamInfo[allyTeam])
-				
-				initialiseAiTeam(team, allyTeam, aiConfigByName[spGetTeamLuaAI(team)])
 				aiOnTeam[allyTeam] = true
 				usingAI = true
 			end
@@ -72,19 +127,26 @@ function gadget:Initialize()
 	end
 	
 	--// Setup AI if they exist or do nothing else.
-	if not usingAI then
+	if usingAI then
+		Spring.SetGameRulesParam("CAI2_disabled", 0)
+	else
 		Spring.SetGameRulesParam("CAI2_disabled", 1)
 		gadgetHandler:RemoveGadget()
 		return 
 	end
 	
+	local allUnits = Spring.GetAllUnits()
+	for _, unitID in pairs(allUnits) do
+		local udid = Spring.GetUnitDefID(unitID)
+		if udid then
+			gadget:UnitCreated(unitID, udid, Spring.GetUnitTeam(unitID))
+		end
+	end
 end
-
 
 --------------------------------------------------------------------------------
 else -- UNSYNCED
 --------------------------------------------------------------------------------
-
 
 
 end

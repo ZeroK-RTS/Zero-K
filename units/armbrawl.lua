@@ -101,8 +101,9 @@ unitDef = {
       craterMult              = 0.3,
 
       customparams = {
-		light_camera_height = 2000,
-		light_color = [[0.9 0.84 0.45]],
+        combatrange = 650,
+        light_camera_height = 2000,
+        light_color = [[0.9 0.84 0.45]],
         light_ground_height = 120,
       },
 	  
@@ -119,7 +120,7 @@ unitDef = {
       interceptedByShieldType = 1,
 	  myGravity               = 0.15,
       noSelfDamage            = true,
-      range                   = 650,
+      range                   = 600,
       reloadtime              = 0.45,
       rgbColor                = [[1 0.95 0.5]],
       soundHit                = [[weapon/cannon/emg_hit]],

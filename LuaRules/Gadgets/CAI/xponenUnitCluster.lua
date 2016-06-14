@@ -14,8 +14,8 @@ function xponenUnitCluster.CreateUnitCluster(static)
 	local clusterNoiseList_UnitIDs = {}
 	local clusterCircle_Pos = {}
 	
-	function UpdateClustering(minimumUnitCount,maximumConnectionDistance)
-		-- This function translate unit position into an ordered objects than hint a clustering information,
+	local function UpdateClustering(minimumUnitCount,maximumConnectionDistance)
+		-- This local function translate unit position into an ordered objects than hint a clustering information,
 		-- big "maximumConnectionDistance" allow multiple cluster 'view' to be created later for wide range of connection distance with almost no cost at all,
 		-- however big "maximumConnectionDistance" will increase code running time significantly because each iteration will loop over bigger number of neighbor.
 		
@@ -32,8 +32,8 @@ function xponenUnitCluster.CreateUnitCluster(static)
 		clusterInitialized = true
 	end
 	
-	function ExtractCluster(desiredConnectionDistance)
-		-- This function translate OPTIC's result into clusters,
+	local function ExtractCluster(desiredConnectionDistance)
+		-- This local function translate OPTIC's result into clusters,
 		-- this can be called multiple time for different input without needing to redo the cluster algorithm,
 		-- the "desiredConnectionDistance" must be less than "maximumConnectionDistance".
 		
@@ -47,7 +47,7 @@ function xponenUnitCluster.CreateUnitCluster(static)
 		return clusterList_UnitIDs, clusterNoiseList_UnitIDs
 	end
 	
-	function GetClusterCoordinates()
+	local function GetClusterCoordinates()
 		--This will return a table of {x,0,z,clusterAvgRadius+100,unitCount}
 		--Can be used to see where unit is concentrating.
 		if not clusterExtracted then
@@ -58,7 +58,7 @@ function xponenUnitCluster.CreateUnitCluster(static)
 		return clusterCircle_Pos
 	end
 	
-	function GetClusterCostCentroid()
+	local function GetClusterCostCentroid()
 		--This will return a table of {weightedX,0,weightedZ,totalCost,unitCount}
 		if not clusterExtracted then
 			ExtractCluster(300)

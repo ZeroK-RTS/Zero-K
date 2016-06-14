@@ -1,4 +1,9 @@
 {
+	"gunshipcon" : {
+		"name" : "Wasp",
+		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",
+		"helptext" : "Wasp łączy w sobie mobilność statku powietrznego i wysoką moc budowy."
+	},
     "gunshipsupport": {
         "name": "Rapier",
         "description": "Wielozadaniowy statek powietrzny",
@@ -676,9 +681,9 @@
         "helptext": "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."
     },
     "corfast": {
-        "name": "Freaker",
+        "name": "Constable",
         "description": "Skoczek konstruktor, moc 5 m/s",
-        "helptext": "Szybki konstruktor z możliwością skoku, Freaker świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
+        "helptext": "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
     },
     "chicken_blimpy": {
         "name": "Blimpy",
@@ -1291,105 +1296,5 @@
         "name": "Buoy",
         "description": "Ciężki amfibijny bot harcownik",
         "helptext": "Buoy nie może strzelać pod wodą, ale radzi sobie z tym poprzez wypływanie na powierzchnię. Wtedy może atakować przy użyciu działka o dobrym zasięgu, zadając dodatkowo obrażenia spowalniające. Będąc na powierzchni nie może się poruszać."
-    },
-    
-    /* campaign stuff */
-    "comm_mission_tutorial1" : {
-        "name" : "Tutorial Commander",
-        "description" : "Dowódca szturmowy",
-        "helptext" : "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
-    },
-
-    "comm_campaign_ada" : {
-        "name" : "Ada - Jednostka Dowodzenia",
-        "description" : "Zabytkowa jednostka dowodzenia",
-        "helptext" : "Specjalna załogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia."
-    },
-    "comm_campaign_promethean" : {
-        "name" : "Promethean",
-        "description" : "Założyciel Wolnych Maszyn",
-        "helptext" : "Założyciel Wolnych Maszyn i twórca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walcząca za wolność robotów. Płonie żądzą walki."
-    },
-    "comm_campaign_freemachine" : {
-        "name" : "Libertas Machina",
-        "description" : "Porucznik Prometheana",
-        "helptext" : "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zęby i dobrze opancerzony - nie można go lekceważyć."
-    },
-    "comm_campaign_odin" : {
-        "name" : "Odin",
-        "description" : "Lider Valhalli",
-        "helptext" : "Lider Valhallan, wojownik z krwi i kości, który żyje dla chwały bitwy. Nie ma skrupułów."
-    },
-    "comm_campaign_biovizier" : {
-        "name" : "Biowezyr",
-        "description" : "Strażnik krypt Dynastii",
-        "helptext" : "Sztuczna inteligencja sprawująca pieczę nad kryptami przechowującymi dane genetyczne Dynastii. Zimna i przebiegła."
-    },
-    "comm_campaign_isonade" : {
-        "name" : "Lord Isonade",
-        "description" : "Lord Obediator",
-        "helptext" : "Jeden z lordów-nadludzi Dynastii - ambitny wojownik, który ma zamiar przejąc władzę nad galaktyką. Bestia zmutowana nie do poznania."
-    },
-    "comm_campaign_legion" : {
-        "name" : "Legat Fides",
-        "description" : "Dowódca Straży Imperialnej",
-        "helptext" : "Dowódca Imperialnego Legionu Strażniczego, który wykonuje wolę Imperatora. Wierny i niezłomny żołnierz."
-    },	 
-    "comm_campaign_praetorian" : {
-        "name" : "Scipio Astra",
-        "description" : "Prefekt Straży Pretoriańskiej",
-        "helptext" : "Prefekt Straży Pretoriańskiej, paladynów Imperium. Fanatyczna wyznawczyni kultu Imperatora, która oczyszcza heretyków ogromną siłą ognia."
-    },
-    "comm_campaign_athenion" : {
-        "name" : "Athenion",
-        "description" : "Dowódca rebeliant",
-        "helptext" : "Dowódca grupy rebeliantów walczących przeciwko Imperium."
-    },
-    "comm_campaign_hun" : {
-        "name" : "Hun Dowódca",
-        "description" : "Barbarzynski Dowódca",
-        "helptext" : "Barbarzynski dowódca."
-    },
-    "comm_campaign_ostrogoth" : {
-        "name" : "Ostrogoth Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
-    },
-    "comm_campaign_lombard" : {
-        "name" : "Lombard Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
-    },
-    "comm_campaign_bulgar" : {
-        "name" : "Bulgar Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
-    },
-    "comm_campaign_suevi" : {
-        "name" : "Suevi Dowódca",
-        "description" : "Barbarzynski dowódca",
-        "helptext" : "Barbarzynski dowódca."
-    },
-    
-    "pw_campaign_bunker" : {
-        "name" : "Storage Bunker",
-        "description" : "Magazyn broni",
-        "helptext" : "Bunkry takie jak ten przetrzymywaly uzbrojenie podczas Wojen Planet. Niektore z nich dalej moga zawierac uzyteczne wyposazenie."
-    },
-    "pw_campaign_techlab" : {
-        "name" : "Tech Lab",
-        "description" : "Stacja badawcza",
-        "helptext" : "Jedna ze stacji badawczych zbudowanych podczas Ostatniej Wojny, wartosciowa ze wzgledu na zawarte tu technologie."
-    },
-    "pw_campaign_imperialtomb" : {
-        "name" : "Imperial Tomb",
-        "description" : "Tu spoczywa Imperator",
-        "helptext" : "Miejsce spoczynku Boga-Imperatora Ludzkosci."
-    },
-    
-    "nebula_campaign_daneel" : {
-        "name" : "Daneel Olivaw",
-        "description" : "Statek-matka",
-        "helptext" : "Daneel Olivaw jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony."
     }
 }

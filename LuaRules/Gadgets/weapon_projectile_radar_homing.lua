@@ -1,7 +1,7 @@
 function gadget:GetInfo()
   return {
     name      = "Projectile Radar Homing",
-    desc      = "Implements homing when close enough for starburst launchers.",
+    desc      = "Implements missile and starburst launcher homing on radar dots.",
     author    = "Google Frog",
     date      = "9 January 2016",
     license   = "GNU GPL, v2 or later",
@@ -25,10 +25,16 @@ local UNIT = 117
 local projectiles = {}
 
 local projectileHomingDistance = {
-	[WeaponDefNames["gunshipaa_aa_missile"].id] = 150^2,
-	[WeaponDefNames["hoveraa_weapon"].id] = 150^2,
-	[WeaponDefNames["shieldarty_emp_rocket"].id] = 200^2,
+	[WeaponDefNames["screamer_advsam"].id] = 1200^2,
 }
+
+for wdid = 1, #WeaponDefs do
+	local wd = WeaponDefs[wdid]
+	if (not projectileHomingDistance[wdid]) and wd.tracks and 
+			(wd.type == "TorpedoLauncher" or wd.type == "MissileLauncher" or wd.type == "StarburstLauncher") then
+		projectileHomingDistance[wdid] = (10 * wd.projectilespeed)^2
+	end
+end
 
 function gadget:Initialize()
 	for id, _ in pairs(projectileHomingDistance) do 
@@ -47,9 +53,8 @@ function gadget:GameFrame(n)
 			local _, _, _, ux, uy, uz = Spring.GetUnitPosition(data.unitID, true)
 			if px and ux then
 				if (not Spring.GetUnitIsCloaked(data.unitID)) and Dist3Dsqr(ux - px, uy - py, uz - pz) < data.homeDistance then
-					Spring.SetProjectileTarget(proID, ux, uy, uz)
-				else
-					Spring.SetProjectileTarget(proID, data.unitID)
+					Spring.SetProjectileIgnoreTrackingError(proID, true)
+					projectiles[proID] = nil
 				end
 			end
 		end

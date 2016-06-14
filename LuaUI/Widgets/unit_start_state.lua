@@ -57,8 +57,8 @@ options = {
 					--return
 				end
 			end
-			
         end,
+		noHotkey = true,
 	},
 	
 	categorieslabel = {name = "presetlabel", type = 'label', value = "Categories", path = options_path},
@@ -78,8 +78,8 @@ options = {
 					options[opt].value = false
 				end
 			end
-			
         end,
+		noHotkey = true,
 	},
 	enableTacticalAI = {
 		type='button',
@@ -96,8 +96,8 @@ options = {
 					options[opt].value = true
 				end
 			end
-			
         end,
+		noHotkey = true,
 	},
 
     commander_label = {
@@ -304,6 +304,7 @@ local function addUnit(defName, path)
 			type = 'bool',
 			value = false,
 			path = path,
+			noHotkey = true,
 		}
 		options_order[#options_order+1] = defName .. "_repeat"
 	end
@@ -315,6 +316,7 @@ local function addUnit(defName, path)
 			type = 'bool',
 			value = ud.customParams.airstrafecontrol == "1",
 			path = path,
+			noHotkey = true,
 		}
 		options_order[#options_order+1] = defName .. "_airstrafe1"
 	end
@@ -399,6 +401,7 @@ local function addUnit(defName, path)
 			type = 'bool',
 			value = tacticalAIUnits[defName].value,
 			path = path,
+			noHotkey = true,
 		}
 		options_order[#options_order+1] = defName .. "_tactical_ai_2"
     end
@@ -410,6 +413,7 @@ local function addUnit(defName, path)
             type = 'bool',
             value = true,
             path = path,
+			noHotkey = true,
         }
         options_order[#options_order+1] = defName .. "_fire_at_radar"
 	end
@@ -421,6 +425,7 @@ local function addUnit(defName, path)
             type = 'bool',
             value = ud.customParams.initcloaked,
             path = path,
+			noHotkey = true,
         }
         options_order[#options_order+1] = defName .. "_personal_cloak_0"
     end
@@ -432,6 +437,7 @@ local function addUnit(defName, path)
             type = 'bool',
             value = ud.activateWhenBuilt,
             path = path,
+			noHotkey = true,
         }
         options_order[#options_order+1] = defName .. "_activateWhenBuilt"
 	end

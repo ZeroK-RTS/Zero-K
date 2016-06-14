@@ -12,17 +12,17 @@ function returnedStructure.CreateImportantObject(count)
 	
 	local multiplyNumber = 2
 	
-	function SetMultiply(n)
+	local function SetMultiply(n)
 		multiplyNumber = n
 	end
 	
-	function DoMultiply()
+	local function DoMultiply()
 		for i = 1, count do
 			listOfThings[i] = multiplyNumber*listOfThings[i]
 		end
 	end
 	
-	function GetSum()
+	local function GetSum()
 		local sum = 0
 		for i = 1, count do
 			sum = sum + listOfThings[i]

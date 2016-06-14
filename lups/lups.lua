@@ -85,6 +85,7 @@ local spGetLocalAllyTeamID   = Spring.GetLocalAllyTeamID
 local scGetReadAllyTeam      = Script.GetReadAllyTeam
 local spGetUnitPieceMap      = Spring.GetUnitPieceMap
 local spValidUnitID          = Spring.ValidUnitID
+local spGetUnitIsStunned     = Spring.GetUnitIsStunned
 local spGetProjectilePosition = Spring.GetProjectilePosition
 
 local glUnitPieceMatrix = gl.UnitPieceMatrix
@@ -681,7 +682,10 @@ local function IsUnitFXVisible(fx)
 	local unitActive = true
     local unitID = fx.unit
 	if fx.onActive then
-		unitActive = spGetUnitIsActive(unitID) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
+		unitActive = (spGetUnitIsActive(unitID) and 
+			(spGetUnitRulesParam(unitID, "disarmed") ~= 1) and 
+			(spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
+		) or ((spGetUnitRulesParam(unitID, "unitActiveOverride") == 1) and not spGetUnitIsStunned(unitID))
 		if (unitActive == nil) then
 			unitActive = true
 		end

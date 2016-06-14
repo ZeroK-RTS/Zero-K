@@ -165,7 +165,6 @@ local deployment = {
     		"corraid",
     		"corlevlr",
     		"cormist",
-    		"corvrad",
     		"corfink",
     		"fighter",
     		"corshad",

@@ -173,20 +173,20 @@ local function SetupShaderTable()
 		
 		float alpha = 1.0;
 		#ifdef curvature
-		  if(mirrorX)mirrorVertex.y -= pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0);
-		  if(mirrorZ)mirrorVertex.y -= pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0);
+		  if(mirrorX != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0);
+		  if(mirrorZ != 0.0)mirrorVertex.y -= pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0);
 		  alpha = 0.0;
-			if(mirrorX) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
-			if(mirrorZ) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
+			if(mirrorX != 0.0) alpha -= pow(abs(mirrorVertex.x-left*mirrorX)/lengthX, 2.0);
+			if(mirrorZ != 0.0) alpha -= pow(abs(mirrorVertex.z-up*mirrorZ)/lengthZ, 2.0);
 			alpha = 1.0 + (6.0 * (alpha + 0.18));
 		#endif
   
 		float ff = 20000.0;
-		if((mirrorZ && mirrorX))
+		if((mirrorZ != 0.0 && mirrorX != 0.0))
 		  ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
-		else if(mirrorX)
+		else if(mirrorX != 0.0)
 		  ff=ff/(pow(abs(mirrorVertex.x-left*mirrorX)/150.0, 2.0)+2.0);
-		else if(mirrorZ)
+		else if(mirrorZ != 0.0)
 		  ff=ff/(pow(abs(mirrorVertex.z-up*mirrorZ)/150.0, 2.0)+2.0);
   
 		gl_Position  = gl_ModelViewProjectionMatrix*mirrorVertex;
@@ -340,7 +340,7 @@ local function DrawOMap(useMirrorShader)
 	----draw map compass text
 	gl.PushAttrib(GL.ALL_ATTRIB_BITS)
 	gl.Texture(false)
-	gl.DepthMask(false)
+	-- gl.DepthMask(false)
 	gl.DepthTest(false)
 	gl.Color(1,1,1,1)
 	gl.PopAttrib()
@@ -374,6 +374,7 @@ function widget:Initialize()
 				gl.DepthMask(true)
 				--gl.Texture(tex)
 				gl.CallList(dList)
+				gl.DepthMask(false)
 				gl.Texture(false)
 			end
 		end

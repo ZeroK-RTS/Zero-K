@@ -96,7 +96,7 @@ local function CreateWindow()
 		y      = 0,
 		right  = 0,
 		bottom = 0,
-		caption = WG.Translate ("common", "nuclear_launch_detected"),
+		caption = WG.Translate ("interface", "nuclear_launch_detected"),
 		valign = "center",
  		align  = "center",
 		autosize = false,
@@ -144,7 +144,7 @@ end
 
 local function languageChanged ()
 	if not mainWindow then return end
-	mainWindow.label:SetCaption(WG.Translate ("common", "nuclear_launch_detected"))
+	mainWindow.label:SetCaption(WG.Translate ("interface", "nuclear_launch_detected"))
 end
 
 function widget:Shutdown()

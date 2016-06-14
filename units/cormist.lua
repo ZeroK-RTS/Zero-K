@@ -31,6 +31,7 @@ unitDef = {
 	helptext_de    = [[Halte deinen Slasher immer auf maximaler Distanz zum Feind, um diesen am besten zu belagern. Seine Raketen sind gelenkt und somit ideal, um sich schnell bewegende Einheiten oder Crawling Bomben zu vernichten. Er kann sowohl Land-, als auch Lufteinheiten treffen, aber nicht über Wände und Hügel schießen. Außerdem versagt er kläglich, sobald sich Feinde dicht am ihm befinden. Im Gegensatz zu dem meisten normalen Skirmishern, kann der Slasher nicht Feuern, wenn er sich bewegt.]],
 	helptext_pl    = [[Slasher nie moze strzelac w ruchu. Stojace w miejscu Slashery automatycznie rozstawiaja swoja dalekosiezna wyrzutnie lekkich rakiet samonaprowadzajacych, ktore swietnie nadaja sie do niszczenia lzejszych jednostek i bomb; moga takze sluzyc jako improwizowana obrona przeciwlotnicza. Slasher nie moze jednak strzelac nad przeszkodami i ma niska wytrzymalosc.]],
 	modelradius    = [[13]],
+	chase_everything = [[1]], -- Does not get stupidtarget added to noChaseCats
   },
 
   explodeAs              = [[BIG_UNITEX]],

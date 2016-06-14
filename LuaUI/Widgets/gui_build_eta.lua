@@ -14,9 +14,9 @@ local gl     = gl
 local Spring = Spring
 local table  = table
 
-local stockpilerDefNames =
-	{ "corsilo"
-	, "cornukesub"
+local stockpilerDefNames = { 
+	"corsilo", 
+	"cornukesub"
 }
 
 local stockpilerDefs = {}
@@ -30,6 +30,7 @@ local stockpileEtaTable = {}
 
 local fontSize = 8
 local displayETA = true
+local previousFullview = false
 
 options_path = 'Settings/Interface/Build ETA'
 options_order = { 'showonlyonshift', 'fontsize', 'drawHeight'}
@@ -65,7 +66,9 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 local function MakeETA(unitID,unitDefID)
-	if (unitDefID == nil) then return nil end
+	if (unitDefID == nil) then 
+		return nil 
+	end
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
 	if (buildProgress == nil) then 
 		return nil 
@@ -83,23 +86,22 @@ local function MakeETA(unitID,unitDefID)
 		rate     = nil,
 		lastNewTime = nil,
 		timeLeft = nil,
-		yoffset  = ud.height + 14,
+		yoffset  = Spring.Utilities.GetUnitHeight(ud) + 14,
 	}
 end
 
 local build_eta_translation
 function languageChanged ()
-	build_eta_translation = WG.Translate ("common", "build_eta")
+	build_eta_translation = WG.Translate ("interface", "build_eta")
 end
 
 function widget:Shutdown()
 	WG.ShutdownTranslation(GetInfo().name)
 end
 
-function widget:Initialize()
-
-	WG.InitializeTranslation (languageChanged, GetInfo().name)
-
+local function InitializeUnits()
+	etaTable = {}
+	stockpileEtaTable = {}
 	local spect, spectFull = Spring.GetSpectatingState()
 	local myAllyTeam = Spring.GetMyAllyTeamID()
 	local allUnits = Spring.GetAllUnits()
@@ -118,11 +120,17 @@ function widget:Initialize()
 					lastNewTime = nil,
 					timeLeft = nil,
 					negative = false,
-					yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+					yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[Spring.GetUnitDefID(unitID)]) + 14,
 				}
 			end
 		end
 	end
+end
+
+function widget:Initialize()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+	InitializeUnits()
+	previousFullview = select(2, Spring.GetSpectatingState())
 	WG.etaTable = etaTable
 end
 
@@ -137,8 +145,10 @@ local function updateTime(bi, dt, newTime, negative)
 end
 
 function widget:GameFrame(n)
-
-	if (n % 6 ~= 0) then return end -- 6N because stockpile happens in such increments, else its eta fluctuates
+	-- 6N because stockpile happens in such increments, else its eta fluctuates
+	if (n % 6 ~= 0) then 
+		return 
+	end
 
 	local _,_,pause = Spring.GetGameSpeed()
 	if (pause) then
@@ -175,31 +185,34 @@ function widget:GameFrame(n)
 
 	for unitID,bi in pairs(etaTable) do
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID)) or 0
-		local dp = buildProgress - bi.lastProg 
-		local dt = gs - bi.lastTime
-		if (dt > 2) then
-			bi.firstSet = true
-			bi.rate = nil
-			bi.timeLeft = nil
-		end
-		
-		if dt > 0.5 then
-			local rate = dp / dt
-
-			if (rate ~= 0) then
-				if (bi.firstSet) then
-					if (buildProgress > 0.001) then
-						bi.firstSet = false
+		if buildProgress == 1 then
+			etaTable[unitID] = nil
+		else
+			local dp = buildProgress - bi.lastProg 
+			local dt = gs - bi.lastTime
+			if (dt > 2) then
+				bi.firstSet = true
+				bi.rate = nil
+				bi.timeLeft = nil
+			end
+			
+			if dt > 0.5 then
+				local rate = dp / dt
+				if (rate ~= 0) then
+					if (bi.firstSet) then
+						if (buildProgress > 0.001) then
+							bi.firstSet = false
+						end
+					else
+						if (rate > 0) then
+							updateTime(bi, dt, (1 - buildProgress) / rate, false)
+						elseif (rate < 0) then
+							updateTime(bi, dt, -buildProgress / rate, true)
+						end
 					end
-				else
-					if (rate > 0) then
-						updateTime(bi, dt, (1 - buildProgress) / rate, false)
-					elseif (rate < 0) then
-						updateTime(bi, dt, -buildProgress / rate, true)
-					end
+					bi.lastTime = gs
+					bi.lastProg = buildProgress
 				end
-				bi.lastTime = gs
-				bi.lastProg = buildProgress
 			end
 		end
 	end
@@ -207,7 +220,7 @@ end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam)
 	local buildProgress = select(5, Spring.GetUnitHealth(unitID))
-	if(buildProgress < 1) then
+	if (buildProgress < 1) then
 		local spect,spectFull = Spring.GetSpectatingState()
 		local myTeam = Spring.GetMyTeamID()
 		if Spring.AreTeamsAllied(unitTeam, myTeam) or (spect and spectFull) then
@@ -223,7 +236,9 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 	local spec = Spring.GetSpectatingState()
-	if (spec) then return end
+	if (spec) then 
+		return 
+	end
 
 	if Spring.AreTeamsAllied (Spring.GetMyTeamID(), newTeam) then
 		local buildProgress = select(5, Spring.GetUnitHealth(unitID))
@@ -240,7 +255,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 				lastNewTime = nil,
 				timeLeft = nil,
 				negative = false,
-				yoffset  = UnitDefs[Spring.GetUnitDefID(unitID)].height + 14,
+				yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[Spring.GetUnitDefID(unitID)]) + 14,
 			}
 		end
 	else
@@ -256,9 +271,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		etaTable[unitID] = nil
 	end
 
-	if stockpilerDefs[unitDefID]
-	and not stockpileEtaTable[unitID] -- reclaim into rebuild
-	then
+	if stockpilerDefs[unitDefID] and not stockpileEtaTable[unitID] then -- reclaim into rebuild
 		stockpileEtaTable[unitID] = {
 			firstSet = true,
 			lastTime = Spring.GetGameFrame(),
@@ -267,7 +280,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			lastNewTime = nil,
 			timeLeft = nil,
 			negative = false,
-			yoffset  = UnitDefs[unitDefID].height + 14,
+			yoffset  = Spring.Utilities.GetUnitHeight(UnitDefs[unitDefID]) + 14,
 		}
 	end
 end
@@ -286,6 +299,11 @@ function widget:Update()
 			cameraHeight = cs.py - gy
 		end
 		displayETA = options.drawHeight.value > cameraHeight
+	end
+	local newFullview = select(2, Spring.GetSpectatingState())
+	if newFullview ~= previousFullview then
+		InitializeUnits()
+		previousFullview = newFullview
 	end
 end
 

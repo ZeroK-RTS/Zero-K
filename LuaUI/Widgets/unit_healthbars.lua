@@ -87,7 +87,7 @@ local messages = {
 
 local function languageChanged ()
 	for key, value in pairs(messages) do
-		messages[key] = WG.Translate ("healthbars", key)
+		messages[key] = WG.Translate ("interface", key)
 	end
 end
 
@@ -657,7 +657,7 @@ do
   function DrawUnitInfos(unitID,unitDefID, ud)
     if (not customInfo[unitDefID]) then
       customInfo[unitDefID] = {
-        height        = ud.height+14,
+        height        = Spring.Utilities.GetUnitHeight(ud) + 14,
         canJump       = (ud.customParams.canjump=="1")or(GetUnitRulesParam(unitID,"jumpReload")),
         maxShield     = ud.shieldPower - 10,
         canStockpile  = ud.canStockpile,

@@ -1396,6 +1396,20 @@ local function setUnitPosting(team, unitID)
 	
 end
 
+local function setRetreatState(unitID, unitDefID, unitTeam, num)
+	local unitDef = UnitDefs[unitDefID]
+	if (unitDef.customParams.level) then
+		if not aiTeamData[unitTeam].retreatComm then
+			return
+		end
+	else
+		if not aiTeamData[unitTeam].retreat then
+			return
+		end
+	end
+	spGiveOrderToUnit(unitID, CMD_RETREAT, {num}, 0)
+end
+
 local function getPositionTowardsMiddle(unitID, range, inc, count)
 		count = count or 4	
 	local x,y,z = spGetUnitPosition(unitID)
@@ -3422,7 +3436,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 					a.unassignedCons.count = a.unassignedCons.count + 1
 					a.unassignedCons[a.unassignedCons.count] = unitID
 					controlledUnit.conByID[unitID].finished = true
-					spGiveOrderToUnit(unitID, CMD_RETREAT, { 2 }, {})
+					setRetreatState(unitID, unitDefID, unitTeam, 2)
 				else -- nano turret
 					local x,y,z = spGetUnitPosition(unitID)
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 2 }, {})
@@ -3431,22 +3445,22 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				end
 			elseif controlledUnit.anyByID[unitID].isScout then
 				controlledUnit.scoutByID[unitID].finished = true
-				spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
+				setRetreatState(unitID, unitDefID, unitTeam, 3)
 			elseif controlledUnit.anyByID[unitID].isRaider then
 				controlledUnit.raiderByID[unitID].finished = true
-				spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
+				setRetreatState(unitID, unitDefID, unitTeam, 1)
 			elseif ud.canFly then -- aircraft
 				if ud.maxWeaponRange > 0 then
 					spGiveOrderToUnit(unitID, CMD_MOVE_STATE, { 1 }, {})
 					spGiveOrderToUnit(unitID, CMD_FIRE_STATE, { 2 }, {})
 					if ud.isFighter then -- fighter
 						controlledUnit.fighterByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 2 }, {})
+						setRetreatState(unitID, unitDefID, unitTeam, 2)
 					elseif ud.isBomber then -- bomber
 						controlledUnit.bomberByID[unitID].finished = true
 					else -- gunship
 						controlledUnit.gunshipByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 2 }, {})
+						setRetreatState(unitID, unitDefID, unitTeam, 2)
 					end
 				else -- scout plane
 					controlledUnit.scoutByID[unitID].finished = true
@@ -3457,17 +3471,17 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 				if ud.weapons[1].onlyTargets.land then -- land firing combat
 					if ud.speed >= 3*30 then -- raider
 						controlledUnit.raiderByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 1 }, {})
+						setRetreatState(unitID, unitDefID, unitTeam, 1)
 					elseif ud.maxWeaponRange > 650 then -- arty
 						controlledUnit.artyByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
+						setRetreatState(unitID, unitDefID, unitTeam, 3)
 					else -- other combat
 						controlledUnit.combatByID[unitID].finished = true
-						spGiveOrderToUnit(unitID, CMD_RETREAT, { 2 }, {})
+						setRetreatState(unitID, unitDefID, unitTeam, 2)
 					end
 				else -- mobile anti air
 					controlledUnit.aaByID[unitID].finished = true
-					spGiveOrderToUnit(unitID, CMD_RETREAT, { 3 }, {})
+					setRetreatState(unitID, unitDefID, unitTeam, 3)
 				end
 				
 			elseif ud.isBuilding or ud.speed == 0 then -- building
@@ -3639,7 +3653,9 @@ local function initialiseAiTeam(team, allyteam, aiConfig)
 			airpadByID = {},
 		},
 		
-		suspend = false
+		suspend = false,
+		retreat = true,	-- only applies to new units
+		retreatComm = true,	-- ditto
 	}
 	
 	local a = aiTeamData[team]
@@ -3855,6 +3871,22 @@ local function RemoveUnit(unitID, unitDefID, unitTeam)
 	ProcessUnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
+-- these only apply to new units
+-- for this reason, it needs to be done before Create Units in a mission
+local function SetRetreat(team, bool)
+	if not aiTeamData[team] then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to set retreat toggle for a non-existent CAI team")
+	end
+	aiTeamData[team].retreat = (bool and bool) or (not aiTeamData[team].retreat)
+end
+
+local function SetRetreatComm(team, bool)
+	if not aiTeamData[team] then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "attempt to set retreat toggle for a non-existent CAI team")
+	end
+	aiTeamData[team].retreatComm = (bool and bool) or (not aiTeamData[team].retreatComm)
+end
+
 local function setAllyteamStartLocations(allyTeam)
 	if Game.startPosType ~= 2 then -- 'choose ingame'
 		return
@@ -4064,9 +4096,11 @@ function gadget:Initialize()
 	SetupCmdChangeAIDebug()
 	
 	GG.CAI = GG.CAI or {
-	  SuspendAI = SuspendAI,
-	  SetFactoryDefImportance = SetFactoryDefImportance,
-	  RemoveUnit = RemoveUnit,
+		SuspendAI = SuspendAI,
+		SetFactoryDefImportance = SetFactoryDefImportance,
+		RemoveUnit = RemoveUnit,
+		SetRetreat = SetRetreat,
+		SetRetreatComm = SetRetreatComm,
 	}
 	
 	--// mex spot detection

@@ -40,15 +40,15 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 		end
 	end
 	
-	function UpdateHeatmap(gameFrame)
+	local function UpdateHeatmap(GameFrameUpdate)
 		unscoutedCount = 0
 		unscoutedUnweightedCount = 0
 		for i, j in scoutHeatmap.Iterator() do
 			local x, y, z = scoutHeatmap.ArrayToWorld(i,j)
 			if spIsPosInLos(x, 0, z, allyTeamID) then
-				scoutHeatmap.SetHeatPointByIndex(i, j, gameFrame)
+				scoutHeatmap.SetHeatPointByIndex(i, j, GameFrameUpdate)
 			else
-				if scoutHeatmap.GetValueByIndex(i, j) + SCOUT_DECAY_TIME < gameFrame then
+				if scoutHeatmap.GetValueByIndex(i, j) + SCOUT_DECAY_TIME < GameFrameUpdate then
 					unscoutedUnweightedCount = unscoutedUnweightedCount + 1
 					AddUnscoutedPoint(i,j, {x, y, z})
 				end
@@ -56,7 +56,7 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 		end
 	end
 	
-	function RunJobHandler()
+	local function RunJobHandler()
 		if unscoutedCount > 0 then
 			for unitID,_ in scoutList.Iterator() do
 				local cQueue = spGetCommandQueue(unitID, 1)
@@ -72,7 +72,7 @@ function scoutHandler.CreateScoutHandler(allyTeamID)
 		end
 	end	
 	
-	function GetScoutedProportion()
+	local function GetScoutedProportion()
 		return 1 - unscoutedUnweightedCount/TOTAL_HEAT_POINTS
 	end
 	

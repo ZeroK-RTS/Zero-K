@@ -36,8 +36,10 @@ function gadget:GameFrame (frame)
 			if (data.idleFrame < frame) and (not spGetUnitIsStunned(unitID)) and (spGetUnitRulesParam(unitID, "disarmed") ~= 1) then
 				local slowMult = (1-(spGetUnitRulesParam(unitID,"slowState") or 0))
 				local amount = data.rate * slowMult
-				local health = spGetUnitHealth(unitID) + amount
-				spSetUnitHealth(unitID, health)
+				local health = spGetUnitHealth(unitID)
+				if health then
+					spSetUnitHealth(unitID, health + amount)
+				end
 			end
 			spSetUnitRulesParam(unitID, "idleRegenTimer", data.idleFrame - frame, losTable)
 		end

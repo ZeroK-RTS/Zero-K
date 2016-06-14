@@ -879,6 +879,15 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
+	gunshipcon = {
+		build = "builder_start",
+		ok = {
+			[1] = "gunship_move",
+		},
+		select = {
+			[1] = "light_gunship_select",
+		},
+	},
 	bladew = {
 		ok = {
 			[1] = "gunship_move",
@@ -1228,14 +1237,6 @@ local sounds = {
 	-- Intel
 	--[[
 	corrad = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	corvrad = { NEEDED
-		ok = {
-			[1] = "bot_move",
-		},
 		select = {
 			[1] = "factory_select",
 		},

@@ -18,7 +18,7 @@ local localTeamID = Spring.GetLocalTeamID ()
 
 local under_attack_translation
 function languageChanged ()
-	under_attack_translation = WG.Translate ("common", "unit_under_attack")
+	under_attack_translation = WG.Translate ("interface", "unit_under_attack")
 end
 
 function widget:UnitDamaged (unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)

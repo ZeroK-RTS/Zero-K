@@ -86,16 +86,17 @@ unitDef = {
       coreThickness           = 0.3,
       craterBoost             = 0,
       craterMult              = 0,
-	  --cylinderTargeting	  = 1,
+      --cylinderTargeting     = 1,
 
-	  customparams = {
-		stats_hide_damage = 1, -- continuous laser
-		stats_hide_reload = 1,
-
-		
-		light_color = [[1 0.25 0.25]],
-		light_radius = 175,
-	  },
+      customparams = {
+        stats_hide_damage = 1, -- continuous laser
+        stats_hide_reload = 1,
+        
+        light_color = [[1 0.25 0.25]],
+        light_radius = 175,
+        
+        combatrange = 240,
+      },
 
       damage                  = {
         default = 6.83, -- 6.15
@@ -112,7 +113,7 @@ unitDef = {
       laserFlareSize          = 2,
       minIntensity            = 1,
       noSelfDamage            = true,
-      range                   = 240,
+      range                   = 270,
       reloadtime              = 0.11,
       rgbColor                = [[1 0 0]],
       soundStart              = [[weapon/laser/laser_burn9]],
