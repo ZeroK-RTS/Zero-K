@@ -184,6 +184,7 @@ function widget:Initialize()
 		return
 	end
 	if Spring.SetSunLighting then
+		-- See Mantis https://springrts.com/mantis/view.php?id=5280
 		Spring.Echo("SetSunLighting")
 		Spring.SetSunLighting({groundSpecularColor = {0,0,0,0}})
 	end
