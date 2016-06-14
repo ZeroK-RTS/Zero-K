@@ -52,7 +52,7 @@ commands = {
 				end
 				teamPart = cmdParts[4]
 			end
-			for id, uDef in pairs(UnitDefs) do
+			for id, uDef in ipairs(UnitDefs) do
 				if param == nil or param == "" or uDef.name:starts(param) then
 					local text = uDef.name
 					local desc = "Give " .. uDef.name
@@ -61,7 +61,7 @@ commands = {
 						desc = "Give " .. count .. " " .. uDef.name
 					end
 					if teamPart then
-						for _, teamID in pairs(Spring.GetTeamList()) do
+						for _, teamID in ipairs(Spring.GetTeamList()) do
 							if teamPart == "" or tostring(teamID):starts(teamPart) then
 								local teamText = text .. " " .. teamID
 								local teamDesc = desc .. " to team " .. teamID
@@ -87,7 +87,7 @@ commands = {
 		suggestions = function(cmd, cmdParts)
 			local suggestions = {}
 			local param = cmdParts[2]
-			for _, playerID in pairs(Spring.GetPlayerList()) do
+			for _, playerID in ipairs(Spring.GetPlayerList()) do
 				local playerName = Spring.GetPlayerInfo(playerID)
 				table.insert(suggestions, { command = "/w " .. playerName, text = playerName})
 			end
@@ -99,7 +99,7 @@ commands = {
 		suggestions = function(cmd, cmdParts)
 			local suggestions = {}
 			local param = cmdParts[2]
-			for _, config in pairs(Spring.GetConfigParams()) do
+			for _, config in ipairs(Spring.GetConfigParams()) do
 				if param == nil or param == "" or config.name:starts(param) then
 					local desc = config.description
 					if desc then

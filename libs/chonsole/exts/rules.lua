@@ -1,4 +1,4 @@
-if Spring.Utilities.IsCurrentVersionNewerThan(101, 172) then
+if not (Spring.Utilities and Spring.Utilities.IsCurrentVersionNewerThan) or Spring.Utilities.IsCurrentVersionNewerThan(101, 172) then
 
 commands = {
 	{ 
