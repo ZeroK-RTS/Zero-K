@@ -15,19 +15,26 @@ config = {
 		width = "22%",
 		height = 30,
 		font = {
--- 			file = "LuaUI/fonts/dejavu-sans-mono/DejaVuSansMono.ttf",
+-- 			font = "LuaUI/DejaVuSansMono.ttf",
 			size = 18,
 		},
 		cursorColor = { 0.9, 0.9, 0.9, 0.7 },
 		borderColor = { 0, 0, 0, 0 },
 		focusColor = { 0, 0, 0, 0 },
+
+		keepFocus = true,
 	},
 	suggestions = {
-		h = 0.4, -- FIXME: use chili-style positions
-		y = 150, -- distance from input editbox in absolute values
-		inverted = true, -- if set to true, it will appear above the console
-		fontSize = 16,
-		padding = 4,
+		height = "40%",
+		font = {
+			size = 16,
+		},
+
+		disableMenu = true, -- if set to true, the suggestion popup menu won't appear
+		offsetY = 0, -- distance from input editbox in absolute values
+		--offsetY = 150,
+		forceDirection = nil, -- can be set to "up" or "down" to force suggestions appearing up or down
+		suggestionPadding = 4,
 		pageUpFactor = 10,
 		pageDownFactor = 10,
 
@@ -39,5 +46,11 @@ config = {
 		cheatEnabledColor = green,
 		cheatDisabledColor = red,
 		autoCheatColor = yellow,
+	},
+	chat = {
+		canSpecChat = false,
+		sayChatColor = {1, 1, 1, 1},
+		allyChatColor = {0, 1, 0.2, 1},
+		specChatColor = {0.6, 0.8, 1, 1},
 	},
 }

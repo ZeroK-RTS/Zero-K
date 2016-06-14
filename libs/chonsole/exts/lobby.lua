@@ -167,7 +167,8 @@ context = {
 			if tonumber(txt:trim():sub(2)) ~= nil and txt:sub(#txt, #txt) == " " then
 				local id = tonumber(txt:trim():sub(2))
 				if consoles[id] ~= nil then
-					return true, { display = "\255" .. channelColor .. "[" .. tostring(id) .. ". " .. consoles[id] .. "]\b", name = "channel", id = id, persist = true }
+					ebConsole:SetText("")
+					return { display = "\255" .. channelColor .. "[" .. tostring(id) .. ". " .. consoles[id] .. "]\b", name = "channel", id = id, persist = true }
 				end
 			end
 		end,
