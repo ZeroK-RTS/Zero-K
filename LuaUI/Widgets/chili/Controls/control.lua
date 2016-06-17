@@ -1153,7 +1153,7 @@ end
 
 
 function Control:FocusUpdate(...)
-  self:InvalidateSelf()
+  self:Invalidate()
   return inherited.FocusUpdate(self, ...)
 end
 
