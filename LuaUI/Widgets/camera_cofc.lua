@@ -1151,7 +1151,7 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 end
 
 local lastZoomin
-local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTarget)
+local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTarget, explicitMouseCoords)
 	local cstemp = spGetCameraState()
 	CopyState(cstemp, cs)
 
@@ -1181,8 +1181,10 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTa
 
 	if storeTarget and (mouseMoved or lastZoomin ~= zoomin or not zoomin) then
 		lastZoomin = zoomin
-		if gx then
+		if gx and not explicitMouseCoords then
 			fltMouseX, fltMouseY = Spring.WorldToScreenCoords(gx, gy, gz)
+		elseif explicitMouseCoords then
+			fltMouseX, fltMouseY = mouseX, mouseY
 		end
 		lockPoint = {}
 		lockPoint.worldBegin = {x = gx, y = gy, z = gz}
@@ -1252,22 +1254,35 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 				ls_y = GetMapBoundedGroundHeight(ls_x, ls_z)
 			end
 		end
-		if options.tiltedzoom.value then
-			local cstemp = UpdateCam(cs)
-			if cstemp then cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp) end
-		end
-
-		local oldPy = cs.py
-
 		local cstemp = UpdateCam(cs)
-		if cstemp then cs = cstemp end
+		if options.tiltedzoom.value then
+			if cstemp then
+				if dist then 
+					lockPoint = {}
+					_, x, y, z = VirtTraceRay(cx, cy, cs)
+					cs = ZoomTiltCorrection(cstemp, false, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
+					lockPoint.worldBegin = {x = x, y = y, z = z}
+				else
+					cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp)
+				end
+				cstemp = UpdateCam(cs)
+				if cstemp then cs = cstemp end
+			end
+		else
+			if cstemp then cs = cstemp end
+		end
 
 		if not options.freemode.value then cs.py = min(cs.py, maxDistY) end --Ensure camera never goes higher than maxY
 
-		cs = ApplyCenterBounds(cs) 
-
 		-- spSetCameraState(cs, smoothness) --move
-		OverrideSetCameraStateInterpolate(cs,smoothness)
+		if dist then
+			OverrideSetCameraStateInterpolate(cs,smoothness, lockPoint)
+		else
+			cs = ApplyCenterBounds(cs)
+			OverrideSetCameraStateInterpolate(cs,smoothness)
+		end
+		lastMouseX = nil
 	end
 end
 
@@ -1592,6 +1607,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		if cstemp then cs = cstemp; end
 		-- spSetCameraState(cs, smoothness) --track & zoom
 		OverrideSetCameraStateInterpolate(cs,0, lockPoint)
+		lastMouseX = nil
 	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
@@ -2544,7 +2560,7 @@ function widget:Initialize()
 		end
 	end
 
-	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
+	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that other widgets work with COFC
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
