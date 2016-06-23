@@ -30,6 +30,8 @@ function widget:GetInfo()
     enabled   = false  --  loaded by default?
   }
 end
+include("Widgets/COFCTools/ExportUtilities.lua")
+
 
 --  Central Build AI creates a common build order queue for all units in the
 --	group.  Select this group (or any member of it) and issue build orders
@@ -1075,7 +1077,7 @@ function widget:KeyPress(key, mods, isRepeat)
 				xc,yc,zc = xc+x,yc+y,zc+z
 			end
 			xc,yc,zc = xc/myUnitsCount,yc/myUnitsCount,zc/myUnitsCount
-			Spring.SetCameraTarget(xc, yc, zc)
+			SetCameraTarget(xc, yc, zc)
 		end
 		spSelectUnitMap(myUnits)
 	end

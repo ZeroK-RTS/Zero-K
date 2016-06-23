@@ -13,6 +13,8 @@ function widget:GetInfo()
   }
 end
 
+include("Widgets/COFCTools/ExportUtilities.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local GetSpectatingState = Spring.GetSpectatingState
@@ -324,7 +326,7 @@ function widget:AddChatMessage(msg)
 				return true
 			end		
 			if pp ~= nil then 
-				Spring.SetCameraTarget(pp[1], 0, pp[2],1)
+				SetCameraTarget(pp[1], 0, pp[2],1)
 			end 
 		end},
 	}
@@ -455,7 +457,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		OnMouseDown = {function(self) return true end}, --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
 		OnClick = {function(self)
 			local p = windows_points[window_id]
-			Spring.SetCameraTarget(p.x, p.y, p.z,1)
+			SetCameraTarget(p.x, p.y, p.z,1)
 		end},
 	}
 	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnClick on window

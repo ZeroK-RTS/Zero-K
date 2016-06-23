@@ -12,6 +12,7 @@ function widget:GetInfo()
     enabled   = true  --  loaded by default?
   }
 end
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -93,12 +94,12 @@ local function CyclePointsOrUnits(objID)
 		local target = obj.unitsOrPositions[obj.index]
 		if type(target) == "table" then	-- is a point
 			local y = Spring.GetGroundHeight(target[1], target[2])
-			Spring.SetCameraTarget(target[1], y, target[2])
+			SetCameraTarget(target[1], y, target[2])
 			return
 		else	-- is a unit
 			local x,y,z = Spring.GetUnitPosition(target)
 			if (x and y and z) then
-				Spring.SetCameraTarget(x, y, z)
+				SetCameraTarget(x, y, z)
 				return
 			end
 		end
@@ -125,7 +126,7 @@ local function ModifyObjective(id, title, description, pos, status, color)
 	
 	-- pos is deprecated, use the point/unit tables instead
 	--if pos then
-	--	obj.panel.OnClick = {function() Spring.SetCameraTarget(pos[1], pos[2], pos[3]) end}
+	--	obj.panel.OnClick = {function() SetCameraTarget(pos[1], pos[2], pos[3]) end}
 	--end
 	if status then
 		status = string.lower(status)
