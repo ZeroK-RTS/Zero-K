@@ -31,7 +31,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, radarWobblePenalty, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult = 
+local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -91,23 +91,17 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 				remVisible[allyTeam][targetID] = 1 -- Known type
 			else
 				remVisible[allyTeam][targetID] = 0
+				-- Unidentified radar dots have no params to base priority on, but are generally bad targets.
+				return true, 45
 			end
 		else
 			remVisible[allyTeam][targetID] = 0
 		end
 	end
 	
-	--// Unit type visiblity check
+	--// Unit type visiblity params
 	local visiblity = remVisible[allyTeam][targetID]
-	if visiblity == 0 then
-		-- Cannot see enemy unit type so there is nothing more to base priority on.
-		return true, 7 + (radarWobblePenalty[attackerWeaponDefID] or 0)
-	end
-	
 	local enemyUnitDef = remUnitDefID[targetID]
-	if not enemyUnitDef then
-		return true, 7 + (radarWobblePenalty[attackerWeaponDefID] or 0)
-	end
 	
 	--// Get Base priority of unit. Transporting unit for transports.
 	local defPrio
@@ -133,8 +127,12 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	--// Check whether the unit is in LoS
 	if visiblity ~= 2 then
 		-- A unit which is identified but not visible cannot have priority based on health or other status effects.
-		-- 0.2 is added to make this target less good looking than a visible healthy unit.
-		return true, defPrio + 0.2 + ((remStatic[enemyUnitDef] and radarWobblePenalty[attackerWeaponDefID]) or 0)
+		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
+		if not remStatic[enemyUnitDef] then
+			return true, defPrio + 5
+		else
+			return true, defPrio
+		end
 	end
 
 	--// Get priority modifier based on disabling.
@@ -158,7 +156,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			local armored = Spring.GetUnitArmored(targetID)	
 			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
 			if hp and maxHP then
-				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
+				hpAdd = (hp/maxHP) --0.0 to 1.0
 			else
 				hpAdd = 0
 			end
@@ -181,7 +179,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			local armored = Spring.GetUnitArmored(targetID)	
 			local hp, maxHP, paralyze, capture, build = spGetUnitHealth(targetID)
 			if hp and maxHP then
-				hpAdd = (hp/maxHP)*0.1 --0.0 to 0.1
+				hpAdd = (hp/maxHP) --0.0 to 1.0
 			else
 				hpAdd = 0
 			end
@@ -220,9 +218,9 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	--// Proximity weapon special handling (heatrays).
 	-- Prioritize nearby units.
 	if proximityWeaponDefs[attackerWeaponDefID] then
-		local unitSaperation = spGetUnitSeparation(unitID,targetID,true)
-		local distAdd = (unitSaperation/WeaponDefs[attackerWeaponDefID].range) * 5
-		return true, (hpAdd + defPrio)*0.5 + distAdd
+		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
+		local distAdd = 20 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
+		return true, hpAdd + defPrio + distAdd
 	end
 	
 	--// All weapons without special handling.

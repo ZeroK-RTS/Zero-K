@@ -111,8 +111,8 @@ local shortRangeSkirmieeArray = NameToDefID({
 
 local riotRangeSkirmieeArray = NameToDefID({
 	"panther",
-	"corsh",
 	"armwar",
+	"corsh",
 	"hoverscout",
 	"shipscout",
 	"shipraider",
@@ -147,6 +147,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	"armcom",
 	"armadvcom",
 
+	"armwar",
 	"hoverassault",
 	"arm_venom",
 	
@@ -174,10 +175,14 @@ local medRangeSkirmieeArray = NameToDefID({
 	"correap",
 	"corgol",
 	"tawf114", -- banisher
+	
+	"armfus", -- don't suicide vs fusions if possible.
+	"striderhub", -- strider hubs also explode violently when killed.
+	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 })
 
-for name, data in pairs(UnitDefNames) do -- add all comms to mid range skirm
-	if data.customParams.commtype then
+for name, data in pairs(UnitDefNames) do -- add all comms and facs to mid range skirm, so units avoid their death explosions.
+	if data.customParams.commtype or string.match(name, "factory") or string.match(name, "hub") then
 		medRangeSkirmieeArray[data.id] = true
 	end
 end
@@ -229,10 +234,10 @@ local slasherSkirmieeArray = NameToDefID({
 	"armrock",
 })
 
-local sniperSkirmieeArray = {}
+local allGround = {}
 for name,data in pairs(UnitDefNames) do
-	if data.speed > 0 and not data.canfly then
-		sniperSkirmieeArray[data.id] = true
+	if not data.canfly then
+		allGround[data.id] = true
 	end
 end
 
@@ -475,19 +480,17 @@ local behaviourConfig = {
 	
 	["corgator"] = {
 		skirms = {}, 
-		swarms = lowRangeSwarmieeArray, 
+		swarms = allGround, 
 		flees = {},
 		localJinkOrder = false,
 		jinkTangentLength = 50,
 		circleStrafe = true,
 		strafeOrderLength = 100,
 		minCircleStrafeDistance = 260,
-		skirmLeeway = 60,
 		maxSwarmLeeway = 0,
 		minSwarmLeeway = 100, 
 		swarmLeeway = 300, 
 		stoppingDistance = 8,
-		skirmOrderDis = 150,
 	},
 	
 	["hoverscout"] = {
@@ -612,20 +615,22 @@ local behaviourConfig = {
 		skirmLeeway = -30, 
 		stoppingDistance = 5
 	},
+	
     ["shieldfelon"] = {
-		skirms = lowMedRangeSkirmieeArray, 
+		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
-		skirmLeeway = -30, 
+		skirmLeeway = 50, 
 		stoppingDistance = 5
 	},
+	
 	["hoverriot"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
 		maxSwarmLeeway = 0, 
-		skirmLeeway = -30, 
+		skirmLeeway = -30,
 		stoppingDistance = 5
 	},
 	["tawf114"] = {
@@ -709,20 +714,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 120, 
 		skirmLeeway = 40, 
 	},
-	["corraid"] = {
-		skirms = riotRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		maxSwarmLeeway = 50, 
-		minSwarmLeeway = 120, 
-		skirmLeeway = 40, 
-	},
-	["dante"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 40, 
-	},	
+	
 	["shipraider"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -730,6 +722,15 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 90, 
 		skirmLeeway = 60, 
+	},
+
+	["corraid"] = {
+		skirms = riotRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		maxSwarmLeeway = 50, 
+		minSwarmLeeway = 120, 
+		skirmLeeway = 40, 
 	},		
 	
 	-- med range skirms
@@ -848,28 +849,22 @@ local behaviourConfig = {
 	},
 	
 	-- arty range skirms
-	["armbanth"] = {
-		skirms = artyRangeSkirmieeArray,
-		swarms = {}, 
-		flees = {},
-		skirmLeeway = 60, 
-	},	
-	
 	["armsnipe"] = {
-		skirms = sniperSkirmieeArray, 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 300, 
+		skirmLeeway = 50,
 	},
 	
 	["corgarp"] = {
-		skirms = SetMinus(artyRangeSkirmieeArray, {"corhlt"}), 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
-		skirmLeeway = 10, 
+		skirmLeeway = 50, 
 	},
+	
 	["armham"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
@@ -966,7 +961,10 @@ local behaviourConfig = {
 		fleeLeeway = 100,
 		fleeDistance = 100,
 		minFleeRange = 500,
-        skirmLeeway = 50, 
+        skirmLeeway = 150,
+		swarmLeeway = 250,
+		minSwarmLeeway = 300,
+		maxSwarmLeeway = 200,
 	},
 	["corcrash"] = {
 		skirms = skirmableAir, 
