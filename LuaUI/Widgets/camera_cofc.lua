@@ -114,6 +114,7 @@ options_order = {
 
 local OverviewAction = function() end
 local OverviewSetAction = function() end
+local GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProportion) end
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
 local ApplyCenterBounds = function(cs) end
@@ -727,28 +728,34 @@ local topDownBufferZone = maxDistY * topDownBufferZonePercent
 local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
 -- local targetCenteringHeight = 1200
-local mapEdgeProportion = 1.0/5.9
+local mapEdgeProportion = 1.0/5.9  --map edge buffer is 1/5.9 of the length of the dimension fitted to screen
+local currentFOVhalf_rad = 0
+
+GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProportion, fov)
+	if not edgeBufferProportion then edgeBufferProportion = mapEdgeProportion end
+	if not fov then fov = Spring.GetCameraFOV() end
+
+	local fittingDistance = height/2
+	if vsy/vsx > height/width then fittingDistance = (width * vsy/vsx)/2 end
+	local fittingEdge = fittingDistance/(1/(2 * edgeBufferProportion) - 1)
+	local edgeBuffer = math.max(maxGroundHeight, fittingEdge)
+	local totalFittingLength = fittingDistance + edgeBuffer
+
+	return totalFittingLength/math.tan(currentFOVhalf_rad), edgeBuffer
+end
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
-	-- Spring.Echo(fov .. " degree")
 	
-	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
-	mapEdgeBuffer = groundMax
-	local mapFittingDistance = MHEIGHT/2
-	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
-	local mapFittingEdge = mapFittingDistance/(1/(2 * mapEdgeProportion) - 1) -- map edge buffer is 1/5.9 of the length of the dimension fitted to screen
-	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingEdge)
-
-	local mapLength = mapFittingDistance + mapEdgeBuffer
-	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
+	currentFOVhalf_rad = (fov/2) * RADperDEGREE
+	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax, mapEdgeProportion, fov) --adjust maximum TAB/Overview distance based on camera FOV
 
 	cs.fov = fov
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 17 * math.tan(currentFOVhalf_rad)) * RADperDEGREE
 
 	if cs.name == "free" then
 	  OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
@@ -763,7 +770,7 @@ local function SetSkyBufferProportion(cs)
 	WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
 end
 
-do SetFOV(Spring.GetCameraFOV()) end
+-- do SetFOV(Spring.GetCameraFOV()) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -1260,7 +1267,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 				if dist then 
 					lockPoint = {}
 					_, x, y, z = VirtTraceRay(cx, cy, cs)
-					cs = ZoomTiltCorrection(cstemp, cs.py >= cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
 					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
 					lockPoint.worldBegin = {x = x, y = y, z = z}
 				else
@@ -2535,6 +2542,7 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
+	SetFOV(Spring.GetCameraFOV())
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
