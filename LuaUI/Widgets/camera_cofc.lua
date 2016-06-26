@@ -1260,7 +1260,7 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 				if dist then 
 					lockPoint = {}
 					_, x, y, z = VirtTraceRay(cx, cy, cs)
-					cs = ZoomTiltCorrection(cstemp, false, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					cs = ZoomTiltCorrection(cstemp, cs.py >= cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
 					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
 					lockPoint.worldBegin = {x = x, y = y, z = z}
 				else
