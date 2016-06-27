@@ -7,7 +7,7 @@ satellite = {
   buildCostEnergy        = 300,
   buildCostMetal         = 300,
   builder                = false,
-  buildPic               = [[CORAPE.png]],
+  buildPic               = [[satellite.png]],
   buildTime              = 300,
   canAttack              = false,
   canFly                 = true,
@@ -22,7 +22,7 @@ satellite = {
   footprintX             = 0,
   footprintZ             = 0,
   hoverAttack            = true,
-  iconType               = [[gunshipskirm]],
+  iconType               = [[satellite]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 100000,
@@ -33,6 +33,10 @@ satellite = {
   script                 = [[satellite.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
+  
+  customParams           = {
+    dontcount = [[1]],
+  },
 
   sfxtypes               = {
 

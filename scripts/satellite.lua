@@ -1,3 +1,5 @@
+include "constants.lua"
+
 -- these are satellite pieces
 local LimbA1 = piece('LimbA1');
 local LimbA2 = piece('LimbA2');
@@ -44,12 +46,13 @@ function Shoot()
     while(on) do
         if shooting ~= 0 then
             --EmitSfx(SatelliteMuzzle, FIRE_W2)
-            EmitSfx(EmitterMuzzle, FIRE_W3)
+            EmitSfx(SatelliteMuzzle, FIRE_W3)
             shooting = shooting - 1
         else
             --EmitSfx(SatelliteMuzzle, FIRE_W4)
-            EmitSfx(EmitterMuzzle, FIRE_W5)
+            EmitSfx(SatelliteMuzzle, FIRE_W5)
         end
+        Sleep(30)
     end
 end
 
@@ -59,15 +62,20 @@ end
 
 -- prepare the laser beam, i'm gonna use it tonite
 function mahlazer_EngageTheLaserBeam() -- it's gonna END YOUR LIFE
+    Spring.Echo("ENGAGE THE LASER BEAM");
     on = true
+    Signal(SIG_SHOOT);
+    StartThread(Shoot);
 end
 
 function mahlazer_DisengageTheLaserBeam()
+    Signal(SIG_SHOOT);
     on = false
 end
 
 function mahlazer_AimAt(pitch)
-
+    Turn(SatelliteMuzzle, y_axis, 0)
+    Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
 end
 
 function mahlazer_Undock()

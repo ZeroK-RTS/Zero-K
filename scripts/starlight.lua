@@ -125,6 +125,7 @@ function Undock()
     CallSatelliteScript('mahlazer_Undock')
 
     Sleep(1500);
+    CallSatelliteScript('mahlazer_EngageTheLaserBeam');
     
 	Move(SatelliteMount, z_axis, TARGET_ALT, 30*4)
 end
@@ -133,6 +134,8 @@ function Dock()
 	Move(SatelliteMount, z_axis, 0, 30*4)
     
     WaitForMove(SatelliteMount,z_axis);
+    
+    CallSatelliteScript('mahlazer_DisengageTheLaserBeam');
     
     Sleep(1000)
     
@@ -162,10 +165,10 @@ function TargetingLaser()
 		
 		if awake then
 			--// Aiming
-			local dx, _, dz = Spring.GetUnitDirection(unitID)
+			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 			local currentHeading = Vector.Angle(dx, dz)
 			
-			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi*1.5
 			
 			if aimOff < 0 then
 				aimOff = math.max(-ROTATION_SPEED, aimOff)
@@ -174,6 +177,7 @@ function TargetingLaser()
 			end
 			
 			Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
+            --Spring.SetUnitRotation(satUnitID, 0, wantedDirection, 0)
 			
 			--// Relay range
 			local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
@@ -231,7 +235,7 @@ function script.Activate()
         Hide(LimbC2);
         Hide(LimbD1);
         Hide(LimbD2);
-        --Hide(Satellite)
+        Hide(Satellite)
         Hide(SatelliteMuzzle);
         
         local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
@@ -246,8 +250,7 @@ function script.Activate()
         Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
         Spring.SetUnitRotation(satUnitID, 0, heading, 0);
         Spring.SetUnitLoadingTransport(satUnitID,unitID);
-        --Spring.SetUnitRulesParam(unitID,'paired_immunity',satUnitID);
-        --Spring.SetUnitRulesParam(satUnitID,'paired_immunity',unitID);
+        Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID);
         Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0);
 
         StartThread(SnapSatellite);
@@ -268,18 +271,12 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		
-		local dx, _, dz = Spring.GetUnitDirection(unitID)
+		local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 		local currentHeading = Vector.Angle(dx, dz)
 		
-		wantedDirection = currentHeading - heading
-		
-		--Spring.Echo("Spring heading pitch",  heading*180/math.pi, pitch*180/math.pi)
-		
-		--local newHeading, newPitch = DoAimFromBetterHeading()
-		--if newHeading then
-		--	heading = newHeading
-		--	pitch = newPitch
-		--end
+        wantedDirection = -heading;
+        
+        CallSatelliteScript('mahlazer_AimAt',math.pi*1.5-pitch);
 		
 		Turn(SatelliteMuzzle, y_axis, 0)
 		Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
@@ -293,7 +290,7 @@ function SnapSatellite()
     while true do
         local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
         Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
-        Sleep(1);
+        Sleep(30);
     end
 end
 
@@ -303,6 +300,7 @@ end
 
 function script.FireWeapon(num)
 	shooting = 30
+    CallSatelliteScript('mahlazer_SetShoot',shooting);
 end
 
 function script.AimFromWeapon(num)

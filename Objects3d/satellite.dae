@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.76.0 commit date:2015-11-03, commit time:10:56, hash:f337fea</authoring_tool>
     </contributor>
-    <created>2016-06-27T15:26:47</created>
-    <modified>2016-06-27T15:26:47</modified>
+    <created>2016-06-27T19:27:40</created>
+    <modified>2016-06-27T19:27:40</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -526,7 +526,7 @@
           </node>
         </node>
         <node id="SatelliteMuzzle" name="SatelliteMuzzle" type="NODE">
-          <matrix sid="transform">1 0 0 0.06190221 0 1 0 -0.1286858 0 0 1 -18.62097 0 0 0 1</matrix>
+          <matrix sid="transform">1 0 0 0.003364637 0 -1 8.74228e-8 -0.02567132 0 -8.74228e-8 -1 -18.86106 0 0 0 1</matrix>
         </node>
       </node>
     </visual_scene>
