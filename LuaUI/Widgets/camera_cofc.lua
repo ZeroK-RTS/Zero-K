@@ -18,7 +18,8 @@ include("keysym.h.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
---WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures camera state caching works
+--WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
+--						 	WG.COFC_SetCameraTargetBox: {number minX, number minZ, number maxX, number maxZ, number minDist(, number maxY(, number smoothness(,boolean useSmoothMeshSetting)))} -> {}, Set Camera to contain input box. maxY should be the highest point in the box, defaults to ground height of box center
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
 
 --------------------------------------------------------------------------------
@@ -733,7 +734,6 @@ local currentFOVhalf_rad = 0
 
 GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProportion, fov)
 	if not edgeBufferProportion then edgeBufferProportion = mapEdgeProportion end
-	if not fov then fov = Spring.GetCameraFOV() end
 
 	local fittingDistance = height/2
 	if vsy/vsx > height/width then fittingDistance = (width * vsy/vsx)/2 end
@@ -748,7 +748,7 @@ SetFOV = function(fov)
 	local cs = spGetCameraState()
 	
 	currentFOVhalf_rad = (fov/2) * RADperDEGREE
-	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax, mapEdgeProportion, fov) --adjust maximum TAB/Overview distance based on camera FOV
+	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax) --adjust maximum TAB/Overview distance based on camera FOV
 
 	cs.fov = fov
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
@@ -1291,6 +1291,17 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 		end
 		lastMouseX = nil
 	end
+end
+
+local function SetCameraTargetBox(minX, minZ, maxX, maxZ, minDist, maxY, smoothness, useSmoothMeshSetting)
+	if smoothness == nil then smoothness = options.smoothness.value or 0 end
+
+	local x, z = (minX + maxX) / 2, (minZ + maxZ) / 2
+	local y = GetMapBoundedGroundHeight(x, z)
+	if not maxY then maxY = y end
+
+	local dist = math.max(GetDistForBounds(math.abs(maxX - minX), math.abs(maxZ - minZ), maxY), minDist)
+	SetCameraTarget(x, y, z, smoothness, useSmoothMeshSetting or false, dist)
 end
 
 local function Zoom(zoomin, shift, forceCenter)
@@ -2568,7 +2579,8 @@ function widget:Initialize()
 		end
 	end
 
-	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that other widgets work with COFC
+	WG.COFC_SetCameraTarget = SetCameraTarget
+	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
