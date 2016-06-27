@@ -36,6 +36,8 @@ local Dock_6 = piece('Dock_6');
 local Dock_7 = piece('Dock_7');
 local Emitter = piece('Emitter');
 local EmitterMuzzle = piece('EmitterMuzzle');
+
+-- these are satellite pieces
 local LimbA1 = piece('LimbA1');
 local LimbA2 = piece('LimbA2');
 local LimbB1 = piece('LimbB1');
@@ -44,15 +46,17 @@ local LimbC1 = piece('LimbC1');
 local LimbC2 = piece('LimbC2');
 local LimbD1 = piece('LimbD1');
 local LimbD2 = piece('LimbD2');
-local LongSpikes = piece('LongSpikes');
-local LowerCoil = piece('LowerCoil');
 local Satellite = piece('Satellite');
 local SatelliteMuzzle = piece('SatelliteMuzzle');
+local SatelliteMount = piece('SatelliteMount');
+
+
+local LongSpikes = piece('LongSpikes');
+local LowerCoil = piece('LowerCoil');
+
 local ShortSpikes = piece('ShortSpikes');
 local UpperCoil = piece('UpperCoil');
 
-local InnerLimbs = {LimbA1,LimbB1,LimbC1,LimbD1};
-local OuterLimbs = {LimbA2,LimbB2,LimbC2,LimbD2};
 local DocksClockwise = {Dock,Dock_1,Dock_2,Dock_3};
 local DocksCounterClockwise = {Dock_4,Dock_5,Dock_6,Dock_7};
 local ActuatorBaseClockwise = {ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3}
@@ -77,8 +81,18 @@ local max = math.max
 local soundTime = 0
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
+local satUnitID = false;
+local satelliteCreated = false;
+
 -- Signal definitions
 local SIG_AIM = 2
+
+local function CallSatelliteScript(funcName, args)
+	local func = Spring.UnitScript.GetScriptEnv(satUnitID)[funcName]
+	if func then
+		Spring.UnitScript.CallAsUnit(satUnitID, func, args)
+	end
+end
 
 function script.Create()
 
@@ -104,31 +118,26 @@ function Undock()
 
     Sleep(1000);
 
-    for i=1,4 do
-        Turn(InnerLimbs[i],y_axis,math.rad(-85),1);
-        Turn(OuterLimbs[i],y_axis,math.rad(-85),1);
-    end
+
     
     on = true
 	StartThread(TargetingLaser)
+    CallSatelliteScript('mahlazer_Undock')
 
     Sleep(1500);
     
-	Move(Satellite, z_axis, TARGET_ALT, 30*4)
+	Move(SatelliteMount, z_axis, TARGET_ALT, 30*4)
 end
 
 function Dock()
-	Move(Satellite, z_axis, 0, 30*4)
+	Move(SatelliteMount, z_axis, 0, 30*4)
     
-    WaitForMove(Satellite,z_axis);
-
-    for i=1,4 do
-        Turn(InnerLimbs[i],y_axis,math.rad(0),1);
-        Turn(OuterLimbs[i],y_axis,math.rad(0),1);
-    end
+    WaitForMove(SatelliteMount,z_axis);
     
     Sleep(1000)
     
+    CallSatelliteScript('mahlazer_Dock');
+        
     for i=1,4 do
         Turn(DocksClockwise[i]       ,z_axis,math.rad(0),1);
         Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1);
@@ -164,7 +173,7 @@ function TargetingLaser()
 				aimOff = math.min(ROTATION_SPEED, aimOff)
 			end
 			
-			Spring.SetUnitRotation(unitID, 0, currentHeading - aimOff - math.pi/2, 0)
+			Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
 			
 			--// Relay range
 			local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
@@ -187,11 +196,11 @@ function TargetingLaser()
 			
 			--// Shooting
 			if shooting ~= 0 then
-				EmitSfx(SatelliteMuzzle, FIRE_W2)
+				--EmitSfx(SatelliteMuzzle, FIRE_W2)
 				EmitSfx(EmitterMuzzle, FIRE_W3)
 				shooting = shooting - 1
 			else
-				EmitSfx(SatelliteMuzzle, FIRE_W4)
+				--EmitSfx(SatelliteMuzzle, FIRE_W4)
 				EmitSfx(EmitterMuzzle, FIRE_W5)
 			end
 		end
@@ -203,12 +212,46 @@ end
 function script.Create()
 	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
 	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
+    
+    
 	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()
     Spin(UpperCoil, z_axis, 10,0.5);
     Spin(LowerCoil, z_axis, 10,0.5);
+    
+    if(not satelliteCreated)then
+        satelliteCreated = true;
+        Hide(LimbA1);
+        Hide(LimbA2);
+        Hide(LimbB1);
+        Hide(LimbB2);
+        Hide(LimbC1);
+        Hide(LimbC2);
+        Hide(LimbD1);
+        Hide(LimbD2);
+        --Hide(Satellite)
+        Hide(SatelliteMuzzle);
+        
+        local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
+        local dx, _, dz = Spring.GetUnitDirection(unitID)
+        local heading = Vector.Angle(dx, dz)
+        
+        satUnitID = Spring.CreateUnit('satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
+        Spring.SetUnitNoSelect(satUnitID,true);
+        Spring.SetUnitNoMinimap(satUnitID,true);
+        Spring.SetUnitNeutral(satUnitID,true);
+        Spring.MoveCtrl.Enable(satUnitID);
+        Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
+        Spring.SetUnitRotation(satUnitID, 0, heading, 0);
+        Spring.SetUnitLoadingTransport(satUnitID,unitID);
+        --Spring.SetUnitRulesParam(unitID,'paired_immunity',satUnitID);
+        --Spring.SetUnitRulesParam(satUnitID,'paired_immunity',unitID);
+        Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0);
+
+        StartThread(SnapSatellite);
+    end
     
     StartThread(Undock);
 end
@@ -246,6 +289,14 @@ function script.AimWeapon(num, heading, pitch)
 	return false
 end
 
+function SnapSatellite()
+    while true do
+        local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
+        Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
+        Sleep(1);
+    end
+end
+
 function script.QueryWeapon(num)
 	return SatelliteMuzzle
 end
@@ -260,6 +311,10 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
+    if(satUnitID) then
+        Spring.SetUnitCrashing(satUnitID,true);
+        Spring.MoveCtrl.Disable(satUnitID);
+    end
 	if (severity <= .25) then
 		Explode(Basis, SFX.NONE)
 		return 1 -- corpsetype
