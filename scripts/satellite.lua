@@ -87,14 +87,26 @@ function mahlazer_Dock()
     StartThread(Dock);
 end
 
+function script.AimWeapon(num, heading, pitch)
+	return false
+end
+
+function script.FireWeapon(num)
+    return false
+end
+
+function script.AimFromWeapon(num)
+	return SatelliteMuzzle
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(Satellite, SFX.NONE)
-		return 1 -- corpsetype
+		Explode(Satellite, SFX.SHATTER)
+		return 2 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(Satellite, SFX.NONE)
-		return 1 -- corpsetype
+		Explode(Satellite, SFX.SHATTER)
+		return 2 -- corpsetype
 	else
 		Explode(Satellite, SFX.SHATTER)
 		return 2 -- corpsetype

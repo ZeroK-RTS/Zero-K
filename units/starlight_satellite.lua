@@ -13,7 +13,7 @@ satellite = {
   canFly                 = true,
   canMove                = true,
   canSubmerge            = false,
-  category               = [[GUNSHIP]],
+  category               = [[SINK UNARMED]],
   collide                = false,
   corpse                 = [[DEAD]],
   cruiseAlt              = 140,
@@ -311,21 +311,6 @@ satellite = {
   },
 
   featureDefs            = {
-
-    DEAD  = {
-      description      = [[Wreckage - Owl]],
-      blocking         = true,
-      damage           = 1100,
-      energy           = 0,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      metal            = 120,
-      object           = [[rapier_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
-    },
-
     HEAP  = {
       description      = [[Debris - Owl]],
       blocking         = false,

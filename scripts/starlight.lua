@@ -361,7 +361,7 @@ function script.Killed(recentDamage, maxHealth)
         CallSatelliteScript("mahlazer_DisengageTheLaserBeam");
         Spring.MoveCtrl.Disable(satUnitID);
         Spring.SetUnitCrashing(satUnitID,true);
-        Spring.AddUnitDamage(satUnitID,100000);
+        Spring.DestroyUnit(satUnitID);
     end
 	if (severity <= .25) then
 		Explode(Basis, SFX.NONE)
