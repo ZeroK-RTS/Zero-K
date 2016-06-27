@@ -62,7 +62,6 @@ end
 
 -- prepare the laser beam, i'm gonna use it tonite
 function mahlazer_EngageTheLaserBeam() -- it's gonna END YOUR LIFE
-    Spring.Echo("ENGAGE THE LASER BEAM");
     on = true
     Signal(SIG_SHOOT);
     StartThread(Shoot);
@@ -86,4 +85,18 @@ end
 function mahlazer_Dock()
     Signal(SIG_DOCK);
     StartThread(Dock);
+end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage / maxHealth
+	if (severity <= .25) then
+		Explode(Satellite, SFX.NONE)
+		return 1 -- corpsetype
+	elseif (severity <= .5) then
+		Explode(Satellite, SFX.NONE)
+		return 1 -- corpsetype
+	else
+		Explode(Satellite, SFX.SHATTER)
+		return 2 -- corpsetype
+	end
 end

@@ -83,9 +83,11 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local satUnitID = false;
 local satelliteCreated = false;
+local engaged = false;
 
 -- Signal definitions
 local SIG_AIM = 2
+local SIG_DOCK = 4
 
 local function CallSatelliteScript(funcName, args)
 	local func = Spring.UnitScript.GetScriptEnv(satUnitID)[funcName]
@@ -99,6 +101,10 @@ function script.Create()
 end
 
 function Undock()
+    SetSignalMask(SIG_DOCK);
+
+    docking = false
+
     for i=1,4 do
         Turn(DocksClockwise[i]       ,z_axis,math.rad(-42.5),1);
         Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1);
@@ -125,19 +131,27 @@ function Undock()
     CallSatelliteScript('mahlazer_Undock')
 
     Sleep(1500);
+    engaged = true;
     CallSatelliteScript('mahlazer_EngageTheLaserBeam');
     
 	Move(SatelliteMount, z_axis, TARGET_ALT, 30*4)
 end
 
 function Dock()
-	Move(SatelliteMount, z_axis, 0, 30*4)
-    
-    WaitForMove(SatelliteMount,z_axis);
-    
+    SetSignalMask(SIG_DOCK);
+    docking = true;
     CallSatelliteScript('mahlazer_DisengageTheLaserBeam');
+    engaged = false;
     
+	Move(SatelliteMount, z_axis, 0, 30*4)
+    WaitForMove(SatelliteMount,z_axis);
     Sleep(1000)
+    
+    local dx, _, dz = Spring.GetUnitDirection(unitID)
+    local heading = Vector.Angle(dx, dz)
+    Spring.SetUnitRotation(satUnitID, 0, heading, 0);
+    
+    docking = false
     
     CallSatelliteScript('mahlazer_Dock');
         
@@ -153,9 +167,33 @@ function Dock()
         
         Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2);
         Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2);
+    end
 
-        -- 53 for mid
-        -- 90 for tip
+end
+
+function SpiralDown()
+    SetSignalMask(SIG_DOCK);
+    while(docking) do
+        local dx, _, dz = Spring.GetUnitDirection(satUnitID);
+        local bx, _, bz = Spring.GetUnitDirection(unitID);
+        local currentHeading = Vector.Angle(dx, dz);
+        local baseHeading = Vector.Angle(bx,bz); 
+      
+        local aimOff = (currentHeading - baseHeading)
+        
+        if aimOff < 0 then
+            aimOff = math.max(-ROTATION_SPEED, aimOff)
+        else
+            aimOff = math.min(ROTATION_SPEED, aimOff)
+        end
+        
+        Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
+        
+        if(currentHeading == baseHeading) then
+            break;
+        end
+        
+        Sleep(33)
     end
 end
 
@@ -164,7 +202,15 @@ function TargetingLaser()
 		awake = (not spGetUnitIsStunned(unitID)) and (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1);
 		
 		if awake then
+        
+            if not engaged then
+                engaged = true;
+                CallSatelliteScript('mahlazer_EngageTheLaserBeam');
+            end
+        
 			--// Aiming
+
+            
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 			local currentHeading = Vector.Angle(dx, dz)
 			
@@ -177,7 +223,6 @@ function TargetingLaser()
 			end
 			
 			Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
-            --Spring.SetUnitRotation(satUnitID, 0, wantedDirection, 0)
 			
 			--// Relay range
 			local _, flashY = Spring.GetUnitPiecePosition(unitID, EmitterMuzzle)
@@ -207,6 +252,9 @@ function TargetingLaser()
 				--EmitSfx(SatelliteMuzzle, FIRE_W4)
 				EmitSfx(EmitterMuzzle, FIRE_W5)
 			end
+        elseif engaged then
+            engaged = false;
+            CallSatelliteScript('mahlazer_DisengageTheLaserBeam');
 		end
 		
 		Sleep(30)
@@ -216,8 +264,6 @@ end
 function script.Create()
 	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
 	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
-    
-    
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -255,12 +301,14 @@ function script.Activate()
 
         StartThread(SnapSatellite);
     end
-    
+    Signal(SIG_DOCK);
     StartThread(Undock);
 end
 
 function script.Deactivate()
+    Signal(SIG_DOCK);
     StartThread(Dock);
+    StartThread(SpiralDown);
 	on = false
 	Signal(SIG_AIM)
 end
@@ -310,8 +358,10 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
     if(satUnitID) then
-        Spring.SetUnitCrashing(satUnitID,true);
+        CallSatelliteScript("mahlazer_DisengageTheLaserBeam");
         Spring.MoveCtrl.Disable(satUnitID);
+        Spring.SetUnitCrashing(satUnitID,true);
+        Spring.AddUnitDamage(satUnitID,100000);
     end
 	if (severity <= .25) then
 		Explode(Basis, SFX.NONE)
