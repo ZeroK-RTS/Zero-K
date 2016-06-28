@@ -1300,7 +1300,7 @@ local function SetCameraTargetBox(minX, minZ, maxX, maxZ, minDist, maxY, smoothn
 	local y = GetMapBoundedGroundHeight(x, z)
 	if not maxY then maxY = y end
 
-	local dist = math.max(GetDistForBounds(math.abs(maxX - minX), math.abs(maxZ - minZ), maxY), minDist)
+	local dist = math.max(GetDistForBounds(math.abs(maxX - minX), math.abs(maxZ - minZ), maxY, mapEdgeProportion * 0.67), minDist)
 	SetCameraTarget(x, y, z, smoothness, useSmoothMeshSetting or false, dist)
 end
 
