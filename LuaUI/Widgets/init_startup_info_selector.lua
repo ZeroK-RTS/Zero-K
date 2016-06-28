@@ -12,6 +12,9 @@ function widget:GetInfo()
 		enabled	= true
 	}
 end
+
+include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --[[
@@ -116,11 +119,33 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
 end
 
-
+local cameraMoved = false
 function Close (permanently)
 
 	if mainWindow then
 		mainWindow:Dispose()
+	end
+
+	if not cameraMoved then
+		local startboxes = GetRawBoxes()
+		cameraMoved = true
+		local startbox = startboxes[Spring.GetMyAllyTeamID()]
+		local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
+		-- Spring.Echo(startbox.boxes)
+		if startbox and startbox.boxes then
+			for i = 1, #startbox.boxes do
+				for j = 1, #startbox.boxes[i] do
+					local boxPoint = startbox.boxes[i][j]
+					-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
+					minX = math.min(minX, boxPoint[1])
+					minZ = math.min(minZ, boxPoint[2])
+					maxX = math.max(maxX, boxPoint[1])
+					maxZ = math.max(maxZ, boxPoint[2])
+					maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
+				end
+			end
+			SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 0.67, true)
+		end
 	end
 
 	if permanently then
