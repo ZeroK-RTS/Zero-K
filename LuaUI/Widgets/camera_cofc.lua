@@ -18,7 +18,8 @@ include("keysym.h.lua")
 include("Widgets/COFCtools/Interpolate.lua")
 include("Widgets/COFCtools/TraceScreenRay.lua")
 
---WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures camera state caching works
+--WG Exports: 	WG.COFC_SetCameraTarget: {number gx, number gy, number gz(, number smoothness(,boolean useSmoothMeshSetting(, number dist)))} -> {}, Set Camera target, ensures COFC options are respected
+--						 	WG.COFC_SetCameraTargetBox: {number minX, number minZ, number maxX, number maxZ, number minDist(, number maxY(, number smoothness(,boolean useSmoothMeshSetting)))} -> {}, Set Camera to contain input box. maxY should be the highest point in the box, defaults to ground height of box center
 --							WG.COFC_SkyBufferProportion: {} -> number [0..1], proportion of maximum zoom height the camera is currently at. 0 is the ground, 1 is maximum zoom height.
 
 --------------------------------------------------------------------------------
@@ -114,6 +115,7 @@ options_order = {
 
 local OverviewAction = function() end
 local OverviewSetAction = function() end
+local GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProportion) end
 local SetFOV = function(fov) end
 local SelectNextPlayer = function() end
 local ApplyCenterBounds = function(cs) end
@@ -727,28 +729,33 @@ local topDownBufferZone = maxDistY * topDownBufferZonePercent
 local minZoomTiltAngle = 35
 local angleCorrectionMaximum = 5 * RADperDEGREE
 -- local targetCenteringHeight = 1200
-local mapEdgeProportion = 1.0/5.9
+local mapEdgeProportion = 1.0/5.9  --map edge buffer is 1/5.9 of the length of the dimension fitted to screen
+local currentFOVhalf_rad = 0
+
+GetDistForBounds = function(width, height, maxGroundHeight, edgeBufferProportion, fov)
+	if not edgeBufferProportion then edgeBufferProportion = mapEdgeProportion end
+
+	local fittingDistance = height/2
+	if vsy/vsx > height/width then fittingDistance = (width * vsy/vsx)/2 end
+	local fittingEdge = fittingDistance/(1/(2 * edgeBufferProportion) - 1)
+	local edgeBuffer = math.max(maxGroundHeight, fittingEdge)
+	local totalFittingLength = fittingDistance + edgeBuffer
+
+	return totalFittingLength/math.tan(currentFOVhalf_rad), edgeBuffer
+end
 
 SetFOV = function(fov)
 	local cs = spGetCameraState()
-	-- Spring.Echo(fov .. " degree")
 	
-	local currentFOVhalf_rad = (fov/2) * RADperDEGREE
-	mapEdgeBuffer = groundMax
-	local mapFittingDistance = MHEIGHT/2
-	if vsy/vsx > MHEIGHT/MWIDTH then mapFittingDistance = (MWIDTH * vsy/vsx)/2 end
-	local mapFittingEdge = mapFittingDistance/(1/(2 * mapEdgeProportion) - 1) -- map edge buffer is 1/5.9 of the length of the dimension fitted to screen
-	mapEdgeBuffer = math.max(mapEdgeBuffer, mapFittingEdge)
-
-	local mapLength = mapFittingDistance + mapEdgeBuffer
-	maxDistY = mapLength/math.tan(currentFOVhalf_rad) --adjust maximum TAB/Overview distance based on camera FOV
+	currentFOVhalf_rad = (fov/2) * RADperDEGREE
+	maxDistY, mapEdgeBuffer = GetDistForBounds(MWIDTH, MHEIGHT, groundMax) --adjust maximum TAB/Overview distance based on camera FOV
 
 	cs.fov = fov
 	cs.py = overview_mode and maxDistY or math.min(cs.py, maxDistY)
 
 	--Update Tilt Zoom Constants
 	topDownBufferZone = maxDistY * topDownBufferZonePercent
-	minZoomTiltAngle = (30 + 17 * math.tan(cs.fov/2 * RADperDEGREE)) * RADperDEGREE
+	minZoomTiltAngle = (30 + 17 * math.tan(currentFOVhalf_rad)) * RADperDEGREE
 
 	if cs.name == "free" then
 	  OverrideSetCameraStateInterpolate(cs,options.smoothness.value)
@@ -763,7 +770,7 @@ local function SetSkyBufferProportion(cs)
 	WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
 end
 
-do SetFOV(Spring.GetCameraFOV()) end
+-- do SetFOV(Spring.GetCameraFOV()) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -1151,7 +1158,7 @@ local function GetZoomTiltAngle(gx, gz, cs, zoomin, rayDist)
 end
 
 local lastZoomin
-local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTarget)
+local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTarget, explicitMouseCoords)
 	local cstemp = spGetCameraState()
 	CopyState(cstemp, cs)
 
@@ -1181,8 +1188,10 @@ local function ZoomTiltCorrection(cs, zoomin, mouseX,mouseY, gx, gy, gz, storeTa
 
 	if storeTarget and (mouseMoved or lastZoomin ~= zoomin or not zoomin) then
 		lastZoomin = zoomin
-		if gx then
+		if gx and not explicitMouseCoords then
 			fltMouseX, fltMouseY = Spring.WorldToScreenCoords(gx, gy, gz)
+		elseif explicitMouseCoords then
+			fltMouseX, fltMouseY = mouseX, mouseY
 		end
 		lockPoint = {}
 		lockPoint.worldBegin = {x = gx, y = gy, z = gz}
@@ -1252,23 +1261,48 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 				ls_y = GetMapBoundedGroundHeight(ls_x, ls_z)
 			end
 		end
-		if options.tiltedzoom.value then
-			local cstemp = UpdateCam(cs)
-			if cstemp then cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp) end
-		end
-
-		local oldPy = cs.py
-
 		local cstemp = UpdateCam(cs)
-		if cstemp then cs = cstemp end
+		if options.tiltedzoom.value then
+			if cstemp then
+				if dist then 
+					lockPoint = {}
+					_, x, y, z = VirtTraceRay(cx, cy, cs)
+					cs = ZoomTiltCorrection(cstemp, cs.py > cstemp.py, cx, cy, ls_x, ls_y, ls_z, true, true) 
+					lockPoint.worldEnd = {x = lockPoint.worldBegin.x, y = lockPoint.worldBegin.y, z = lockPoint.worldBegin.z}
+					lockPoint.worldBegin = {x = x, y = y, z = z}
+				else
+					cs.rx = GetZoomTiltAngle(ls_x, ls_z, cstemp)
+				end
+				cstemp = UpdateCam(cs)
+				if cstemp then cs = cstemp end
+			end
+		else
+			if cstemp then cs = cstemp end
+		end
 
 		if not options.freemode.value then cs.py = min(cs.py, maxDistY) end --Ensure camera never goes higher than maxY
 
-		cs = ApplyCenterBounds(cs) 
-
 		-- spSetCameraState(cs, smoothness) --move
-		OverrideSetCameraStateInterpolate(cs,smoothness)
+		if dist then
+			OverrideSetCameraStateInterpolate(cs,smoothness, lockPoint)
+		else
+			cs = ApplyCenterBounds(cs)
+			OverrideSetCameraStateInterpolate(cs,smoothness)
+		end
+		-- lastMouseX = nil
+		lockPoint = {}
 	end
+end
+
+local function SetCameraTargetBox(minX, minZ, maxX, maxZ, minDist, maxY, smoothness, useSmoothMeshSetting)
+	if smoothness == nil then smoothness = options.smoothness.value or 0 end
+
+	local x, z = (minX + maxX) / 2, (minZ + maxZ) / 2
+	local y = GetMapBoundedGroundHeight(x, z)
+	if not maxY then maxY = y end
+
+	local dist = math.max(GetDistForBounds(math.abs(maxX - minX), math.abs(maxZ - minZ), maxY, mapEdgeProportion * 0.67), minDist)
+	SetCameraTarget(x, y, z, smoothness, useSmoothMeshSetting or false, dist)
 end
 
 local function Zoom(zoomin, shift, forceCenter)
@@ -1592,6 +1626,7 @@ local function AutoZoomInOutToCursor() --options.followautozoom (auto zoom camer
 		if cstemp then cs = cstemp; end
 		-- spSetCameraState(cs, smoothness) --track & zoom
 		OverrideSetCameraStateInterpolate(cs,0, lockPoint)
+		lastMouseX = nil
 	end
 	local teamID = Spring.GetLocalTeamID()
 	local _, playerID = Spring.GetTeamInfo(teamID)
@@ -2519,6 +2554,7 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
+	SetFOV(Spring.GetCameraFOV())
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
@@ -2544,7 +2580,8 @@ function widget:Initialize()
 		end
 	end
 
-	WG.COFC_SetCameraTarget = SetCameraTarget --for external use, so that minimap click works with COFC
+	WG.COFC_SetCameraTarget = SetCameraTarget
+	WG.COFC_SetCameraTargetBox = SetCameraTargetBox
 
 	--for external use, so that minimap can scale when zoomed out
 	WG.COFC_SkyBufferProportion = 0 
