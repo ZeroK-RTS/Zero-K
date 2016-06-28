@@ -144,7 +144,7 @@ function Close (permanently)
 					maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
 				end
 			end
-			SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 1, true)
+			SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 0.67, true)
 		end
 	end
 

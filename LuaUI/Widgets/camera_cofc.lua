@@ -1289,7 +1289,8 @@ local function SetCameraTarget(gx,gy,gz,smoothness,useSmoothMeshSetting,dist)
 			cs = ApplyCenterBounds(cs)
 			OverrideSetCameraStateInterpolate(cs,smoothness)
 		end
-		lastMouseX = nil
+		-- lastMouseX = nil
+		lockPoint = {}
 	end
 end
 
