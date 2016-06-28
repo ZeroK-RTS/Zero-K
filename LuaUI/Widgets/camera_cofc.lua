@@ -272,7 +272,7 @@ options = {
 		name = 'Drift zoom target to center',
 		desc = 'Moves object under cursor to screen center. Only works when zooming to cursor.',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 		path = zoomPath,
 	},
@@ -770,7 +770,7 @@ local function SetSkyBufferProportion(cs)
 	WG.COFC_SkyBufferProportion = min(max((cs_py - topDownBufferZoneBottom)/topDownBufferZone + 0.2, 0.0), 1.0) --add 0.2 to start fading little before the straight-down zoomout
 end
 
--- do SetFOV(Spring.GetCameraFOV()) end
+do SetFOV(Spring.GetCameraFOV()) end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local rotate_transit --switch for smoothing "rotate at mouse position instead of screen center"
@@ -2554,7 +2554,6 @@ function widget:DrawScreen()
 end
 
 function widget:Initialize()
-	SetFOV(Spring.GetCameraFOV())
 	helpText = explode( '\n', options.helpwindow.value )
 	cx = vsx * 0.5
 	cy = vsy * 0.5
