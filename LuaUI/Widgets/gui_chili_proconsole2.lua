@@ -15,6 +15,7 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -970,7 +971,7 @@ local function AddMessage(msg, target, remake)
 				end
 				local alt,ctrl, meta,shift = Spring.GetModKeyState()
 				if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
-				Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+				SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 			end}
 		}
 		controlChildren = {sourceTextBox, flagButton, messageTextBoxCont}
@@ -1016,7 +1017,7 @@ local function AddMessage(msg, target, remake)
 						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
 						local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
 						if (mouse == 1 and click_on_text) then
-							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+							SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
 						end
 				end}
 				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles

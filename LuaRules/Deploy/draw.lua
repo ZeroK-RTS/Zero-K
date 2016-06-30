@@ -13,6 +13,7 @@
 --------------------------------------------------------------------------------
 
 VFS.Include('LuaRules/colors.h.lua')
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 
 featureLabel = 'Deployment' -- FIXME
@@ -46,7 +47,7 @@ local function SelectViewComm()
   end
 
   Spring.SelectUnitArray({ team.comm })
-  Spring.SetCameraTarget(team.x, team.y, team.z, 0.75)
+  SetCameraTarget(team.x, team.y, team.z, 0.75)
 end
 
 
