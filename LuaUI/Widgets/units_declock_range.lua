@@ -16,12 +16,12 @@ options={
 	onlyforcloacked={
 		name = 'Draw only for cloacked units', 
 		type = 'bool', 
-		value = false,
+		value = true,
 	},
 	onlyforselected={
 		name = 'Draw only for selected units', 
 		type = 'bool', 
-		value = false,
+		value = true,
 	}
 }
 
@@ -35,7 +35,7 @@ local localTeamID=Spring.GetLocalTeamID()
 local function DrawDecloackArea(unitID,def)
 	local r=def.decloakDistance
 	local x,_,z=Spring.GetUnitPosition(unitID)
-	gl.Color(0,1,0,0.2)
+	gl.Color(0.3,0.3,1.0,0.4)
 	gl.Utilities.DrawGroundCircle(x,z,r)
 end
 
