@@ -68,7 +68,7 @@ local unitRendering = {
 
   spGetAllObjects      = Spring.GetAllUnits,
   spGetObjectPieceList = Spring.GetUnitPieceList,
-
+ 
   spGetMaterial        = Spring.UnitRendering.GetMaterial,
   spSetMaterial        = Spring.UnitRendering.SetMaterial,
   spActivateMaterial   = Spring.UnitRendering.ActivateMaterial,
@@ -187,7 +187,7 @@ local function _CompileMaterialShaders(rendering)
         }
         end
     end
-
+   
     if (mat_src.deferredSource) then
       local GLSLshader = CompileShader(mat_src.deferredSource, mat_src.deferredDefinitions, mat_src.deferredPlugins)
 
@@ -226,7 +226,7 @@ local function GetObjectMaterial(rendering, objectDefID)
 
   local matInfo = rendering.materialInfos[objectDefID]
   local mat = rendering.materialDefs[matInfo[1]]
-
+ 
   if type(objectDefID) == "number" then
     -- Non-number objectDefIDs are default material overrides. They will have
     -- their textures defined in the unit materials files.
@@ -285,22 +285,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function ResetUnit(unitID)
-  local unitDefID = Spring.GetUnitDefID(unitID)
-  gadget:RenderUnitDestroyed(unitID, unitDefID)
-  Spring.UnitRendering.DeactivateMaterial(unitID, 3)
-  if not select(3,Spring.GetUnitIsStunned(unitID)) then --// inbuild?
-    gadget:UnitFinished(unitID,unitDefID)
-  end
-end
-
-local function ResetFeature(featureID)
-  gadget:FeatureDestroyed(featureID)
-  Spring.FeatureRendering.DeactivateMaterial(featureID, 3)
-  gadget:FeatureCreated(featureID)
-end
-
-local function ToggleShadows()
+function ToggleShadows()
   shadows = Spring.HaveShadows()
 
   CompileMaterialShaders()
@@ -308,18 +293,28 @@ local function ToggleShadows()
   unitRendering.bufMaterials = {}
   local units = Spring.GetAllUnits()
   for _, unitID in pairs(units) do
-    ResetUnit(unitID)
+    local unitDefID = Spring.GetUnitDefID(unitID)
+    local teamID    = Spring.GetUnitTeam(unitID)
+    ObjectDestroyed(unitRendering, unitID, unitDefID)
+    Spring.UnitRendering.DeactivateMaterial(unitID, 3)
+    if not select(3,Spring.GetUnitIsStunned(unitID)) then --// inbuild?
+      UnitFinished(nil,unitID,unitDefID,teamID)
+    end
   end
 
   featureRendering.bufMaterials = {}
   local features = Spring.GetAllFeatures()
   for _, featureID in pairs(features) do
-    ResetFeature(featureID)
+    local featureDefID = Spring.GetFeatureDefID(featureID)
+    local teamID       = Spring.GetFeatureTeam(featureID)
+    FeatureDestroyed(nil, featureID)
+    Spring.FeatureRendering.DeactivateMaterial(featureID, 3)
+    FeatureCreated(nil,featureID,featureDefID,teamID)
   end
 end
 
 
-local function ToggleAdvShading()
+function ToggleAdvShading()
   advShading = Spring.HaveAdvShading()
 
   if (not advShading) then
@@ -327,13 +322,13 @@ local function ToggleAdvShading()
     unitRendering.drawList = {}
     local units = Spring.GetAllUnits()
     for _,unitID in pairs(units) do
-      ResetUnit(unitID)
+      Spring.UnitRendering.DeactivateMaterial(unitID, 3)
     end
 
     featureRendering.drawList = {}
     local features = Spring.GetAllFeatures()
     for _, featureID in pairs(features) do
-      ResetFeature(featureID)
+      Spring.FeatureRendering.DeactivateMaterial(featureID, 3)
     end
   elseif (normalmapping) then
     --// reinitializes all shaders
@@ -350,9 +345,9 @@ function ToggleNormalmapping(_,newSetting,_, playerID)
   if newSetting and newSetting~="" then
     normalmapping = (newSetting=="1")
   elseif not newSetting or newSetting=="" then
-    normalmapping = not normalmapping
+    normalmapping = not normalmapping 
   end
-
+ 
   Spring.SetConfigInt("NormalMapping", (normalmapping and 1) or 0)
   Spring.Echo("normalmapping is " .. (normalmapping and "enabled" or "disabled"))
 
@@ -365,7 +360,8 @@ function ToggleNormalmapping(_,newSetting,_, playerID)
       if (unitMat) then
         local mat = unitRendering.materialDefs[unitMat[1]]
         if (not mat.force) then
-          gadget:RenderUnitDestroyed(unitID, unitDefID)
+                ObjectDestroyed(unitRendering, unitID, unitDefID)
+         
         end
       end
     end
@@ -392,7 +388,7 @@ local n = -1
 function gadget:Update()
   if (n<Spring.GetDrawFrame()) then
     n = Spring.GetDrawFrame() + Spring.GetFPS()
-
+   
     if (advShading ~= Spring.HaveAdvShading()) then
       ToggleAdvShading()
     elseif (advShading)and(normalmapping)and(shadows ~= Spring.HaveShadows()) then
@@ -405,17 +401,13 @@ end
 --------------------------------------------------------------------------------
 
 local function GetShaderOverride(objectID, objectDefID)
-  if Spring.ValidUnitID(objectID) then
-    return Spring.GetUnitRulesParam(objectID, "comm_texture")
-  end
-  return false
+	if Spring.ValidUnitID(objectID) then
+		return Spring.GetUnitRulesParam(objectID, "comm_texture")
+	end
+	return false
 end
 
 function ObjectFinished(rendering, objectID, objectDefID)
-  if not advShading then
-    return
-  end
-
   objectDefID = GetShaderOverride(objectID, objectDefID) or objectDefID
   local objectMat = rendering.materialInfos[objectDefID]
   if objectMat then
@@ -444,10 +436,11 @@ function gadget:UnitFinished(unitID, unitDefID)
 end
 
 function gadget:FeatureCreated(featureID)
+        -- Spring.Echo("FeatureCreated",featureID)
   ObjectFinished(featureRendering, featureID, Spring.GetFeatureDefID(featureID))
 end
 
-local function ObjectDestroyed(rendering, objectID, objectDefID)
+function ObjectDestroyed(rendering, objectID, objectDefID)
   rendering.spDeactivateMaterial(objectID, 3)
 
   local mat = rendering.drawList[objectID]
@@ -546,10 +539,10 @@ end
 local function _LoadMaterialConfigFiles(path)
   local unitMaterialDefs = {}
   local featureMaterialDefs = {}
-
+ 
   local files = VFS.DirList(path)
   table.sort(files)
-
+ 
   for i = 1, #files do
     local mats, unitMats = VFS.Include(files[i])
     for k, v in pairs(mats) do

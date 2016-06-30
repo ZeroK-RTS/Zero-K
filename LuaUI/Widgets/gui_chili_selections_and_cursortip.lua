@@ -56,7 +56,6 @@ local glTexRect 	= gl.TexRect
 local strFormat 				= string.format
 
 include("keysym.h.lua")
-include("Widgets/COFCTools/ExportUtilities.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 VFS.Include("LuaRules/Utilities/numberfunctions.lua")
 VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
@@ -1010,7 +1009,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 					end
 				else --button2 (middle)
 					local x,y,z = spGetUnitPosition( squareData.unitids[1] )
-					SetCameraTarget(x,y,z, 1)
+					Spring.SetCameraTarget(x,y,z, 1)
 				end
 			end}
 		};
@@ -1819,7 +1818,7 @@ local function UpdateBuildpic( ud, globalitem_name, unitID )
 					--button2 (middle)
 					local x,y,z = Spring.GetUnitPosition( self.unitID )
 					if x then
-						SetCameraTarget(x,y,z, 1)
+						Spring.SetCameraTarget(x,y,z, 1)
 					end
 				end
 			end}

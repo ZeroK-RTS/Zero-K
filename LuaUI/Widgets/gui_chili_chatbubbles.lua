@@ -1,3 +1,6 @@
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:GetInfo()
   return {
     name      = "Chili Chat Bubbles",
@@ -9,8 +12,6 @@ function widget:GetInfo()
     enabled   = false,
   }
 end
-
-include("Widgets/COFCTools/ExportUtilities.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -323,7 +324,7 @@ function widget:AddChatMessage(msg)
 				return true
 			end		
 			if pp ~= nil then 
-				SetCameraTarget(pp[1], 0, pp[2],1)
+				Spring.SetCameraTarget(pp[1], 0, pp[2],1)
 			end 
 		end},
 	}
@@ -454,7 +455,7 @@ function widget:AddMapPoint(player, caption, px, py, pz)
 		OnMouseDown = {function(self) return true end}, --capture click (don't allow window to pass the click). this prevent user from accidentally clicking on the ground while clicking on the window.
 		OnClick = {function(self)
 			local p = windows_points[window_id]
-			SetCameraTarget(p.x, p.y, p.z,1)
+			Spring.SetCameraTarget(p.x, p.y, p.z,1)
 		end},
 	}
 	function w:HitTest(x,y)  -- FIXME: chili hacked to allow OnClick on window

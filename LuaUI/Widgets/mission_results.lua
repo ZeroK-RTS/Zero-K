@@ -26,10 +26,14 @@ function widget:GameOver(winners)
 	local result = "defeat"
 	local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 	if #winners > 1 then
-		for i = 1, #winners do
-			if (winners[i] == Spring.GetMyAllyTeamID()) then
-				result = "victory"
-				break
+		if Spring.GetSpectatingState() then
+			result = "draw"
+		else
+			for i = 1, #winners do
+				if (winners[i] == Spring.GetMyAllyTeamID()) then
+					result = "victory"
+					break
+				end
 			end
 		end
 	elseif #winners == 1 then

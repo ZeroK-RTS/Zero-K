@@ -15,7 +15,6 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-include("Widgets/COFCTools/ExportUtilities.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 Spring.Utilities = Spring.Utilities or {}
@@ -98,6 +97,14 @@ for name in pairs(exceptionList) do
 end
 
 local nano_name = UnitDefNames.armnanotc.humanName	-- HACK
+
+local function SetCameraTarget(x, y, z)
+	if WG.COFC_SetCameraTarget then
+		WG.COFC_SetCameraTarget(x, y, z)
+	else
+		Spring.SetCameraTarget(x, y, z)
+	end
+end
 
 local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
@@ -1111,7 +1118,7 @@ function widget:Initialize()
 				if left and currentComm then
 					Spring.SelectUnitArray({currentComm}, false)
 					local x, y, z = Spring.GetUnitPosition(currentComm)
-					SetCameraTarget(x, y, z)
+					Spring.SetCameraTarget(x, y, z)
 				elseif right then
 					CycleComm()
 					UpdateCommFull()

@@ -21,7 +21,6 @@ function widget:GetInfo()
 		handler   = true,
 	}
 end
-include("Widgets/COFCTools/ExportUtilities.lua")
 
 --------------------------------------------------------------------------------
 -- SPEED UPS
@@ -1398,12 +1397,12 @@ function widget:MousePress(x,y,button)
 								posY = widgetPosY + widgetHeight - p.posY
 								if right == true then
 									if IsOnButton(x,y, widgetPosX - 28, posY - 1,widgetPosX - 12, posY + 17) then                           --point button
-										SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)                                                  --
+										Spring.SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)                                                  --
 										return true                                                                                           --
 									end                                                                                                     --
 								else                                                                                                      --
 									if IsOnButton(x,y, widgetPosX + widgetWidth + 12, posY-1,widgetPosX + widgetWidth + 28, posY + 17) then --
-										SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)                                                  --
+										Spring.SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)                                                  --
 										return true
 									end
 								end
@@ -1486,12 +1485,12 @@ function widget:MousePress(x,y,button)
 								if p.allyteam == myAllyTeamID then
 									if right == true then
 										if IsOnButton(x,y, widgetPosX - 28, posY - 1,widgetPosX - 12, posY + 17) then
-											SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)
+											Spring.SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)
 											return true
 										end
 									else
 										if IsOnButton(x,y, widgetPosX + widgetWidth + 12, posY-1,widgetPosX + widgetWidth + 28, posY + 17) then
-											SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)
+											Spring.SetCameraTarget(p.pointX,p.pointY,p.pointZ,1)
 											return true
 										end
 									end

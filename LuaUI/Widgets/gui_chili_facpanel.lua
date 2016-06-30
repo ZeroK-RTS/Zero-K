@@ -14,7 +14,6 @@ function widget:GetInfo()
   }
 end
 
-include("Widgets/COFCTools/ExportUtilities.lua")
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -293,7 +292,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 				function(_,_,_,button)
 					if button == 2 then
 						local x,y,z = Spring.GetUnitPosition(unitID)
-						SetCameraTarget(x,y,z)
+						Spring.SetCameraTarget(x,y,z)
 					elseif button == 3 then
 						Spring.Echo("FactoryPanel: Entered Quick Rallypoint mode")
 						Spring.PlaySoundFile(sound_waypoint, 1, 'ui')

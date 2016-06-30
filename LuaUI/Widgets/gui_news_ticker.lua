@@ -9,7 +9,6 @@ function widget:GetInfo()
 		enabled	= false  --  loaded by default?
 	}
 end
-include("Widgets/COFCTools/ExportUtilities.lua")
 
 --[[
 -- Features:
@@ -185,7 +184,7 @@ local function AddEvent(str, unitDefID, color, sound, pos)
 		
 		local posTable
 		if pos then
-			posTable = { function() SetCameraTarget(pos[1], pos[2], pos[3], 1) end }
+			posTable = { function() Spring.SetCameraTarget(pos[1], pos[2], pos[3], 1) end }
 		end
 		
 		

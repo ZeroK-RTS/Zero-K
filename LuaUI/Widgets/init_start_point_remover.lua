@@ -11,8 +11,6 @@ function widget:GetInfo()
   }
 end
 
-include("Widgets/COFCTools/ExportUtilities.lua")
-
 	n=1 --counter just in case there would be more than one unit spawned with only one being the comm but not being the first one. Note that if the Commander is spawned with an offset from the start point the marker may not be erased.
 
 function widget:Initialize()
@@ -37,7 +35,11 @@ function widget:GameFrame(f)
 			if (unitDef.customParams.commtype) then
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				Spring.MarkerErasePosition(x, y, z)
-				SetCameraTarget(x, y, z, 1, true, 1000)
+				if WG.COFC_SetCameraTarget then
+					WG.COFC_SetCameraTarget(x, y, z, 1, true, 1000)
+				else 
+					Spring.SetCameraTarget(x, y, z)
+				end
 				Spring.SelectUnitArray{teamUnits[n]}
 			end
 			n=n+1
