@@ -10,7 +10,7 @@ satellite = {
   buildPic               = [[satellite.png]],
   buildTime              = 300,
   canAttack              = false,
-  canFly                 = true,
+  canFly                 = false,
   canMove                = true,
   canSubmerge            = false,
   category               = [[SINK UNARMED]],
@@ -25,9 +25,10 @@ satellite = {
   iconType               = [[satellite]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  maxDamage              = 100000,
-  maxVelocity            = 3.9,
+  maxDamage              = 1500,
+  maxVelocity            = 0.001,
   minCloakDistance       = 75,
+  movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[satellite.dae]],
   script                 = [[satellite.lua]],
@@ -311,6 +312,20 @@ satellite = {
   },
 
   featureDefs            = {
+    DEAD  = {
+      description      = [[Wreckage - Owl]],
+      blocking         = true,
+      damage           = 1100,
+      energy           = 0,
+      featureDead      = [[HEAP]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      metal            = 120,
+      object           = [[satellite_d.dae]],
+      reclaimable      = true,
+      reclaimTime      = 120,
+    },
+
     HEAP  = {
       description      = [[Debris - Owl]],
       blocking         = false,
