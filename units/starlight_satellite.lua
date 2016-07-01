@@ -48,7 +48,7 @@ satellite = {
   },
 
   sightDistance          = 0,
-  turnRate               = 594,
+  turnRate               = 1,
 
   weapons                       = {
 

@@ -363,7 +363,7 @@ function script.Killed(recentDamage, maxHealth)
         CallSatelliteScript("mahlazer_DisengageTheLaserBeam");
         Spring.SetUnitHealth(satUnitID,500);
         EmitSfx(Satellite, 1025);
-        Spring.MoveCtrl.SetRotationVelocity(satUnitID,math.random(1,10),math.random(1,10),math.random(1,10));
+        Spring.MoveCtrl.SetRotationVelocity(satUnitID,math.random(1,20)-10,math.random(1,20)-10,math.random(1,20)-10);
         Spring.MoveCtrl.Disable(satUnitID);
         Spring.AddUnitImpulse(satUnitID,math.random(1,10)-5,math.random(1,10)-5,math.random(1,10)-5)
     end
