@@ -13,6 +13,13 @@ function widget:GetInfo()
 	}
 end
 
+function CheckForSpec()
+   if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
+    widgetHandler:RemoveWidget()
+    return true
+  end
+end
+
 include("Widgets/COFCTools/ExportUtilities.lua")
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 --------------------------------------------------------------------------------
@@ -285,6 +292,7 @@ function widget:Initialize()
 	if not (WG.Chili) then
 		widgetHandler:RemoveWidget()
 	end
+	CheckForSpec()
 
 	-- chili setup
 	Chili = WG.Chili
