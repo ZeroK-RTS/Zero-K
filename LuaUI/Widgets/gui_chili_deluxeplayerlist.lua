@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Deluxe Player List - Alpha 2.02",
+    name      = "Chili Deluxe Player List - Alpha 2.03",
     desc      = "v0.210 Chili Deluxe Player List, Alpha Release",
     author    = "CarRepairer, KingRaptor, CrazyEddie",
     date      = "2012-06-30",
@@ -53,7 +53,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'show_cpu_ping', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -205,6 +205,13 @@ options = {
 		desc = "Show the clan, country, and rank columns",
 		OnChange = function() SetupPanels() end,
 	},
+	show_cpu_ping = {
+		name = "Show ping and cpu",
+		type = 'bool',
+		value = true,
+		desc = "Show player's ping and cpu",
+		OnChange = function() SetupPanels() end,
+	},
 	rank_as_text = {
 		name = "Show rank as text",
 		type = 'bool',
@@ -351,8 +358,8 @@ local function CalculateWidths()
 	x_e_income_width = options.income_width.value * options.text_height.value / 2 + 10
 	x_m_fill		= options.show_stats.value and x_e_income + x_e_income_width or x_m_mobiles
 	x_e_fill		= x_m_fill + 30
-	x_cpu			= x_e_fill + (options.cpu_ping_as_text.value and 52 or 30)
-	x_ping			= x_cpu + (options.cpu_ping_as_text.value and 46 or 16)
+	x_cpu			= x_e_fill + (options.show_cpu_ping.value and (options.cpu_ping_as_text.value and 52 or 30) or 0)
+	x_ping			= x_cpu + (options.show_cpu_ping.value and (options.cpu_ping_as_text.value and 46 or 16) or 10)
 	x_bound			= x_ping + 28
 	x_windowbound	= x_bound + 0
 end
@@ -749,26 +756,28 @@ end
 --------------------------------------------------------------------------------
 
 local function UpdatePingCpu(entity,pingTime,cpuUsage,pstatus)
-	pingTime = pingTime or 0
-	cpuUsage = cpuUsage or 0
-	if pstatus == 'gone' then
-		pingTime = 0
-		cpuUsage = 0
-	end
-	local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
-	if options.cpu_ping_as_text.value then
-		if entity.cpuLabel then	entity.cpuLabel.font:SetColor(cpuCol) ; entity.cpuLabel:SetCaption(cpuText) end
-		if entity.pingLabel then entity.pingLabel.font:SetColor(pingCol) ; entity.pingLabel:SetCaption(pingText) end
-	else
-		if entity.cpuImg then
-			entity.cpuImg.color = cpuCol
-			if options.show_tooltips.value then entity.cpuImg.tooltip = ('CPU: ' .. cpuText) end
-			entity.cpuImg:Invalidate()
+	if options.show_cpu_ping.value then
+		pingTime = pingTime or 0
+		cpuUsage = cpuUsage or 0
+		if pstatus == 'gone' then
+			pingTime = 0
+			cpuUsage = 0
 		end
-		if entity.pingImg then
-			entity.pingImg.color = pingCol
-			if options.show_tooltips.value then entity.pingImg.tooltip = ('Ping: ' .. pingText) end
-			entity.pingImg:Invalidate()
+		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
+		if options.cpu_ping_as_text.value then
+			if entity.cpuLabel then	entity.cpuLabel.font:SetColor(cpuCol) ; entity.cpuLabel:SetCaption(cpuText) end
+			if entity.pingLabel then entity.pingLabel.font:SetColor(pingCol) ; entity.pingLabel:SetCaption(pingText) end
+		else
+			if entity.cpuImg then
+				entity.cpuImg.color = cpuCol
+				if options.show_tooltips.value then entity.cpuImg.tooltip = ('CPU: ' .. cpuText) end
+				entity.cpuImg:Invalidate()
+			end
+			if entity.pingImg then
+				entity.pingImg.color = pingCol
+				if options.show_tooltips.value then entity.pingImg.tooltip = ('Ping: ' .. pingText) end
+				entity.pingImg:Invalidate()
+			end
 		end
 	end
 end
@@ -889,8 +898,10 @@ local function AddTableHeaders()
 		scroll_cpl:AddChild( Image:New{ x=x_e_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1,  file = 'LuaUI/Images/energy.png',} )
 		scroll_cpl:AddChild( Image:New{ x=x_m_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, file = 'LuaUI/Images/ibeam.png',} )
 	end
-	scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
-	scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	if options.show_cpu_ping.value then
+		scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
+		scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	end
 	if showWins then scroll_cpl:AddChild( Label:New{ x=0, width = wins_width, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize, align = "right"} ) end
 end
 
@@ -993,16 +1004,18 @@ local function AddEntity(entity, teamID, allyTeamID)
 
 		-- ping and cpu icons / labels
 		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pstatus == 'gone' and 0 or entity.pingTime,pstatus == 'gone' and 0 or entity.cpuUsage)
-		if options.cpu_ping_as_text.value then
-			MakeNewLabel(entity,"cpuLabel",{x=x_cpu,width = (fontsize+3)*10/16,caption = cpuText,textColor = cpuCol,align = 'right',})
-			MakeNewLabel(entity,"pingLabel",{x=x_ping,width = (fontsize+3)*10/16,caption = pingText,textColor = pingCol,align = 'right',})
-		else
-			MakeNewIcon(entity,"cpuImg",{x=x_cpu,file=cpuPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'CPU: ' .. cpuText,})
-			MakeNewIcon(entity,"pingImg",{x=x_ping,file=pingPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'Ping: ' .. pingText,})
-			entity.cpuImg.color = cpuCol
-			entity.pingImg.color = pingCol
-			function entity.cpuImg:HitTest(x,y) return self end
-			function entity.pingImg:HitTest(x,y) return self end
+		if options.show_cpu_ping.value then
+			if options.cpu_ping_as_text.value then
+				MakeNewLabel(entity,"cpuLabel",{x=x_cpu,width = (fontsize+3)*10/16,caption = cpuText,textColor = cpuCol,align = 'right',})
+				MakeNewLabel(entity,"pingLabel",{x=x_ping,width = (fontsize+3)*10/16,caption = pingText,textColor = pingCol,align = 'right',})
+			else
+				MakeNewIcon(entity,"cpuImg",{x=x_cpu,file=cpuPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'CPU: ' .. cpuText,})
+				MakeNewIcon(entity,"pingImg",{x=x_ping,file=pingPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'Ping: ' .. pingText,})
+				entity.cpuImg.color = cpuCol
+				entity.pingImg.color = pingCol
+				function entity.cpuImg:HitTest(x,y) return self end
+				function entity.pingImg:HitTest(x,y) return self end
+			end
 		end
 
 		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
