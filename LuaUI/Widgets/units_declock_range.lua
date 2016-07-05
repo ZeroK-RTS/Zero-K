@@ -14,7 +14,7 @@ local Chili
 options_path = 'Settings/Interface/Decloak Ranges'
 options={
 	onlyforcloacked={
-		name = 'Draw only for cloacked units', 
+		name = 'Draw only for cloaked units', 
 		type = 'bool', 
 		value = true,
 	},
