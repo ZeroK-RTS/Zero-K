@@ -1,12 +1,12 @@
 function widget:GetInfo()
 	return {
 		name      = "Decloak Range",
-		desc      = "Display deacloak range around cloaked units",
-		author    = "banana_Ai",
-		date      = "28 Feb 2016",
+		desc      = "Display decloak range around cloaked units",
+		author    = "banana_Ai, dahn",
+		date      = "08 Jul 2016",
 		license   = "GNU GPL v2",
 		layer     = 0,
-		enabled   = true,  --  loaded by default?
+		enabled   = true,
 	}
 end
 
@@ -14,7 +14,12 @@ VFS.Include("LuaRules/Utilities/glVolumes.lua")
 
 local Chili
 options_path = 'Settings/Interface/Decloak Ranges'
-options_order = {"drawranges", "onlyforcloaked", "onlyforselected"}
+options_order = {
+	"drawranges",
+	"onlyforcloaked",
+	"onlyforselected",
+	"fillcolor"
+}
 options = {
 	drawranges = {
 		name = 'Draw decloak ranges', 
@@ -37,13 +42,19 @@ options = {
 		name = 'Draw only for selected units', 
 		type = 'bool', 
 		value = true,
+	},
+	fillcolor = {
+		name = 'Fill color',
+		type = 'colors',
+		value = {0.3,0.3,1.0,0.4},
 	}
 }
 
 local function DrawDecloackArea(unitID,def)
 	local r = def.decloakDistance
 	local x,_,z=Spring.GetUnitPosition(unitID)
-	gl.Color(0.3,0.3,1.0,0.4)
+	local fillcolor = options.fillcolor.value
+	gl.Color(fillcolor[1], fillcolor[2], fillcolor[3], fillcolor[4])
 	gl.Utilities.DrawGroundCircle(x,z,r)
 end
 
