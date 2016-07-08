@@ -154,6 +154,8 @@ function Dock()
     docking = false
     
     CallSatelliteScript('mahlazer_Dock');
+    
+    Sleep(500);
         
     for i=1,4 do
         Turn(DocksClockwise[i]       ,z_axis,math.rad(0),1);
