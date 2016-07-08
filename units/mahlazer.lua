@@ -12,13 +12,12 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
-  buildingGroundDecalType       = [[mahlazer_aoplane.dds]],
-  buildPic                      = [[mahlazer.png]],
+  buildPic                      = [[starlight.png]],
   buildTime                     = 40000,
   canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[120 120 120]],
+  collisionVolumeScales         = [[140 140 140]],
   collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
@@ -36,8 +35,8 @@ unitDef = {
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
-  footprintX                    = 8,
-  footprintZ                    = 8,
+  footprintX                    = 10,
+  footprintZ                    = 10,
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -48,7 +47,7 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[lazer.3do]],
+  objectName                    = [[starlight.dae]],
   script                        = [[mahlazor.lua]],
   onoffable                     = true,
   seismicSignature              = 4,
@@ -58,8 +57,8 @@ unitDef = {
 
     explosiongenerators = {
       [[custom:IMMA_LAUNCHIN_MAH_LAZER]],
+      [[custom:xamelimpact]],
     },
-
   },
 
   side                          = [[ARM]],
@@ -202,8 +201,8 @@ unitDef = {
       beamTime                = 0.001,
       canattackground         = false,
       coreThickness           = 0.5,
-      craterBoost             = 2,
-      craterMult              = 4,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams        	  = {
 		light_radius = 0,
@@ -346,7 +345,7 @@ unitDef = {
       height           = [[40]],
       hitdensity       = [[100]],
       metal            = 16000,
-      object           = [[starlight_d.dae]],
+      object           = [[starlight_dead.dae]],
       reclaimable      = true,
       reclaimTime      = 16000,
       seqnamereclamate = [[TREE1RECLAMATE]],
@@ -374,7 +373,7 @@ unitDef = {
     },
 
   },
-
 }
 
-return lowerkeys({ mahlazer = unitDef })
+
+return lowerkeys({ mahlazer = unitDef})
