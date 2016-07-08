@@ -1,7 +1,7 @@
 function widget:GetInfo()
 	return {
-		name      = "DecloakArea v1.1",
-		desc      = "Display deacloak area around cloaked units",
+		name      = "Decloak Range",
+		desc      = "Display deacloak range around cloaked units",
 		author    = "banana_Ai",
 		date      = "28 Feb 2016",
 		license   = "GNU GPL v2",
