@@ -177,7 +177,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tawf114", -- banisher
 	
 	"armfus", -- don't suicide vs fusions if possible.
-	"striderhub", -- strider hubs also explode violently when killed.
+	"cafus", -- same with singu, at least to make an effort for survival.
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 })
 
