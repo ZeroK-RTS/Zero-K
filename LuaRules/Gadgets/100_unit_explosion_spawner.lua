@@ -1,13 +1,13 @@
 -- $Id: unit_explosion_spawner.lua 3171 2008-11-06 09:06:29Z det $
 function gadget:GetInfo()
 	return {
-		name = "Unit Explosion Spawner",
+		name = "100 Unit Explosion Spawner",
 		desc = "Spawns units using an explosion as a trigger.",
 		author = "KDR_11k (David Becker), lurker",
 		date = "2007-11-18",
 		license = "None",
 		layer = 50,
-		enabled = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
+		enabled = not Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 	}
 end
 
@@ -48,7 +48,7 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
-function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
+function gadget:ProjectileDestroyed(proID)
 	local weapDefID=Spring.GetProjectileDefID(proID)
 	local teamID=Spring.GetProjectileTeamID(proID)
 	if spawn_defs_id[weapDefID] then

@@ -78,12 +78,33 @@ local buildQueueUnsorted = {}	--puts all units of same type into single index; t
 local gridLocation = {}
 
 ------------------------
+--  GRID KEY CONFIG
+------------------------
+------------------------
+
+local gridMap = include("Configs/keyboard_layout.lua")["qwerty"]
+
+local function GenerateGridKeyMap(grid)
+	local ret = {}
+	for i = 1, 3 do
+		for j = 1, 6 do
+			ret[KEYSYMS[grid[i][j]]] = {i, j}
+		end
+	end
+	return ret
+end
+
+gridKeyMap = GenerateGridKeyMap(gridMap)
+------------------------
 --  CONFIG
 ------------------------
 ------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
-options_order = { 'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 'unitshotkeyaltaswell',  'hotkeysWithTabClick',
-					'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'}
+options_order = { 
+	'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 
+	'unitshotkeyaltaswell',  'hotkeysWithTabClick', 'keyboardType',
+	'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'
+}
 options = {
 	background_opacity = {
 		name = "Opacity",
@@ -131,6 +152,25 @@ options = {
 		desc = "Clicking on a tab button enables hotkeys for that tab.",
 		value = false,
 		noHotkey = true,
+	},
+	keyboardType = {
+		type='radioButton', 
+		name='Keyboard Layout',
+		items = {
+			{name = 'QWERTY (standard)',key = 'qwerty', hotkey=nil},
+			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey=nil},
+			{name = 'AZERTY (France)', key = 'azerty', hotkey=nil},
+		},
+		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+		OnChange = function(self)
+			local layout = self.value
+			local layoutConfig = include("Configs/keyboard_layout.lua")
+			if layoutConfig[layout] then
+				gridMap = layoutConfig[layout]
+				gridKeyMap = GenerateGridKeyMap(gridMap)
+			end
+		end,
 	},
 	tab_factory = {
 		name = "Factory Tab",
@@ -268,54 +308,6 @@ local alreadyRemovedTag = {}
 local hotkeyMode = false
 local recentlyInitialized = false
 local wasPlaying = false
-
-local gridKeyMap = {
-	[KEYSYMS.Q] = {1,1}, 
-	[KEYSYMS.W] = {1,2},
-	[KEYSYMS.E] = {1,3},
-	[KEYSYMS.R] = {1,4},
-	[KEYSYMS.T] = {1,5},
-	[KEYSYMS.Y] = {1,6},
-	[KEYSYMS.A] = {2,1}, 
-	[KEYSYMS.S] = {2,2},
-	[KEYSYMS.D] = {2,3},
-	[KEYSYMS.F] = {2,4},
-	[KEYSYMS.G] = {2,5},
-	[KEYSYMS.H] = {2,6},
-	[KEYSYMS.Z] = {3,1}, 
-	[KEYSYMS.X] = {3,2},
-	[KEYSYMS.C] = {3,3},
-	[KEYSYMS.V] = {3,4},
-	[KEYSYMS.B] = {3,5},
-	[KEYSYMS.N] = {3,6},
-}
-
-local gridMap = {
-	[1] = {
-		[1] = "Q",
-		[2] = "W",
-		[3] = "E",
-		[4] = "R",
-		[5] = "T",
-		[6] = "Y",
-	},
-	[2] = {
-		[1] = "A",
-		[2] = "S",
-		[3] = "D",
-		[4] = "F",
-		[5] = "G",
-		[6] = "H",
-	},
-	[3] = {
-		[1] = "Z",
-		[2] = "X",
-		[3] = "C",
-		[4] = "V",
-		[5] = "B",
-		[6] = "N",
-	},
-}
 
 -- DGun button progressbar, for listening to special-weapon reload progress
 --VFS.Include("LuaRules/Configs/customcmds.h.lua") --already included in "include("Configs/integral_menu_commands.lua")"

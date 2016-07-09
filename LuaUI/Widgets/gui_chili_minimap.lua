@@ -11,6 +11,7 @@ function widget:GetInfo()
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 --// gl const
 
@@ -596,7 +597,7 @@ local function MakeMinimapButton(file, params)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
-			Spring.Echo(command)
+			
 			if command then
 				local left, right = true, false
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -806,11 +807,7 @@ function widget:MousePress(x, y, button)
 				end
 			end
 			if coord then
-				if (WG.COFC_SetCameraTarget) then
-					WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
-				else
-			 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-				end
+				SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 				leftClickDraggingCamera = true
 				return true
 			end
@@ -826,11 +823,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 			coord = traceValue
 		end
 		if coord then
-			if (WG.COFC_SetCameraTarget) then
-				WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
-			else
-		 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-			end
+			SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 			leftClickDraggingCamera = true
 			return true
 		end
