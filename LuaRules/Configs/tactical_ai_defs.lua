@@ -578,7 +578,7 @@ local behaviourConfig = {
 		swarms = {}, 
 		flees = {},
 		maxSwarmLeeway = 0, 
-		skirmLeeway = 0, 
+		skirmLeeway = 20, 
 		velocityPrediction = 20
 	},
 	["spiderriot"] = {
@@ -749,6 +749,12 @@ local behaviourConfig = {
 		maxSwarmLeeway = 10, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 20, 
+	},
+	["dante"] = {
+		skirms = medRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = 40, 
 	},
 	["amphfloater"] = {
 		skirms = medRangeSkirmieeArray, 
