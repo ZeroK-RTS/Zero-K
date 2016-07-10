@@ -110,6 +110,7 @@ local staticO_small = {
 local staticO_big = {
 	corsilo = 1,
 	mahlazer = 1,
+	starlight_satellite=1,
 	zenith = 1,
 	raveparty = 1,
 }
