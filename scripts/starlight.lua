@@ -96,7 +96,7 @@ local function CallSatelliteScript(funcName, args)
 end
 
 function script.Create()
-
+    wantedDirection = Spring.GetUnitHeading(unitID);
 end
 
 function Undock()
@@ -215,8 +215,8 @@ function TargetingLaser()
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 			local currentHeading = Vector.Angle(dx, dz)
 			
-			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi*1.5
-			
+			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
+            	
 			if aimOff < 0 then
 				aimOff = math.max(-ROTATION_SPEED, aimOff)
 			else
@@ -286,6 +286,7 @@ function script.Activate()
         local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
         local dx, _, dz = Spring.GetUnitDirection(unitID)
         local heading = Vector.Angle(dx, dz)
+        wantedDirection = heading
         
         satUnitID = Spring.CreateUnit('satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
         Spring.SetUnitNoSelect(satUnitID,true);

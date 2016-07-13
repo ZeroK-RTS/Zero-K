@@ -22,7 +22,7 @@ local on = false;
 local shooting = 0;
 
 function script.Create()
-    -- um. do nothing i guess.
+    Turn(Satellite,z_axis,-math.pi/2);
 end
 
 function Dock()
@@ -45,11 +45,9 @@ function Shoot()
     SetSignalMask(SIG_SHOOT)
     while(on) do
         if shooting ~= 0 then
-            --EmitSfx(SatelliteMuzzle, FIRE_W2)
             EmitSfx(SatelliteMuzzle, FIRE_W2)
             shooting = shooting - 1
         else
-            --EmitSfx(SatelliteMuzzle, FIRE_W4)
             EmitSfx(SatelliteMuzzle, FIRE_W4)
         end
         Sleep(30)
@@ -58,6 +56,22 @@ end
 
 function mahlazer_SetShoot(n)
     shooting = n;
+end
+
+function mahlazer_Hide()
+    for i=1,4 do
+        Hide(InnerLimbs[i]);
+        Hide(OuterLimbs[i]);
+    end
+    Hide(Satellite);
+end
+
+function mahlazer_Show()
+    for i=1,4 do
+        Show(InnerLimbs[i]);
+        Show(OuterLimbs[i]);
+    end
+    Show(Satellite);
 end 
 
 -- prepare the laser beam, i'm gonna use it tonite
@@ -73,7 +87,6 @@ function mahlazer_DisengageTheLaserBeam()
 end
 
 function mahlazer_AimAt(pitch)
-    Turn(SatelliteMuzzle, y_axis, 0)
     Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
 end
 
