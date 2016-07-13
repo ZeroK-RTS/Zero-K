@@ -22,7 +22,7 @@ local on = false;
 local shooting = 0;
 
 function script.Create()
-    Turn(Satellite,z_axis,-math.pi/2);
+   --Turn(Satellite,z_axis,-math.pi/2);
 end
 
 function Dock()

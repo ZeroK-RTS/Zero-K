@@ -96,7 +96,7 @@ local function CallSatelliteScript(funcName, args)
 end
 
 function script.Create()
-    wantedDirection = Spring.GetUnitHeading(unitID);
+--    wantedDirection = Spring.GetUnitHeading(unitID);
 end
 
 function Undock()
@@ -286,7 +286,6 @@ function script.Activate()
         local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
         local dx, _, dz = Spring.GetUnitDirection(unitID)
         local heading = Vector.Angle(dx, dz)
-        wantedDirection = heading
         
         satUnitID = Spring.CreateUnit('satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
         Spring.SetUnitNoSelect(satUnitID,true);
@@ -321,10 +320,10 @@ function script.AimWeapon(num, heading, pitch)
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		
-		local dx, _, dz = Spring.GetUnitDirection(satUnitID)
+		local dx, _, dz = Spring.GetUnitDirection(unitID)
 		local currentHeading = Vector.Angle(dx, dz)
 		
-        wantedDirection = -heading;
+		wantedDirection =  currentHeading - heading
         
         CallSatelliteScript('mahlazer_AimAt',math.pi*1.5-pitch);
 		
