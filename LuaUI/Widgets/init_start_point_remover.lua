@@ -12,6 +12,7 @@ function widget:GetInfo()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
 	n=1 --counter just in case there would be more than one unit spawned with only one being the comm but not being the first one. Note that if the Commander is spawned with an offset from the start point the marker may not be erased.
 
@@ -19,6 +20,16 @@ function widget:Initialize()
 
   if (CheckForSpec()) then return false end
  
+end
+
+local init = false
+local cameraMoved = false
+function widget:GameSetup()
+	if not init then
+		local startboxes = GetRawBoxes()
+		if startboxes and #startboxes > 0 then cameraMoved = true end
+		init = true
+	end
 end
 
 function CheckForSpec()
@@ -37,7 +48,7 @@ function widget:GameFrame(f)
 			if (unitDef.customParams.commtype) then
 				local x, y, z = Spring.GetUnitPosition(unitID)
 				Spring.MarkerErasePosition(x, y, z)
-				SetCameraTarget(x, y, z, 1, true, 1000)
+				if not cameraMoved then SetCameraTarget(x, y, z, 1, true, 1000) end
 				Spring.SelectUnitArray{teamUnits[n]}
 			end
 			n=n+1

@@ -597,7 +597,7 @@ local function MakeMinimapButton(file, params)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
-			Spring.Echo(command)
+			
 			if command then
 				local left, right = true, false
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
