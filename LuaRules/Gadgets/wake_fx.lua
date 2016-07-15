@@ -5,20 +5,22 @@ if not gadgetHandler:IsSyncedCode() then
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-SFXTYPE_WAKE1 = 2
-SFXTYPE_WAKE2 = 3
 
 function gadget:GetInfo()
-  return {
-    name      = "Wade Effects",
-    desc      = "Spawn wakes when non-ship ground units move while partially, but not completely submerged",
-    author    = "Anarchid",
-    date      = "March 2016",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = true  --  loaded by default?
-  }
+	return {
+		name      = "Wade Effects",
+		desc      = "Spawn wakes when non-ship ground units move while partially, but not completely submerged",
+		author    = "Anarchid",
+		date      = "March 2016",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true  --  loaded by default?
+	}
 end
+
+local SFXTYPE_WAKE1 = 2
+local SFXTYPE_WAKE2 = 3
+
 local unit = {}
 local units = {count = 0, data = {}}
 
@@ -28,7 +30,7 @@ local current_fold = 1
 
 function canWade(unitDefID)
     local moveDef = UnitDefs[unitDefID].moveDef
-    if(moveDef and moveDef.family) then
+    if (moveDef and moveDef.family) then
         local mdFamily = moveDef.family
         if mdFamily == "kbot" or mdFamily == "tank" then
             return true
@@ -38,17 +40,17 @@ function canWade(unitDefID)
 end
 
 function isMoving(unitID)
-    local _,_,_,velocity = Spring.GetUnitVelocity(unitID);
+    local _,_,_,velocity = Spring.GetUnitVelocity(unitID)
     return velocity > 0
 end
 
 function gadget:UnitCreated(unitID, unitDefID)
-    if(canWade(unitDefID)) then
+    if canWade(unitDefID) then
         local uddim = Spring.GetUnitDefDimensions(unitDefID)
         if not unit[unitID] then
             units.count = units.count + 1
             units.data[units.count] = unitID
-            unit[unitID] = {id=units.count,h=uddim.height}
+            unit[unitID] = {id = units.count, h = uddim.height}
         end
     end
 end
@@ -69,20 +71,29 @@ function gadget:GameFrame(n)
         if current_fold > n_folds then
              current_fold = 1
         end
-        for i=current_fold, units.count, n_folds do
-            local u = listData[i]             
-            local x,y,z = Spring.GetUnitPosition(u)
-            local h = unit[u].h
-            if y > -h and y <= 0 and isMoving(u) and not Spring.GetUnitIsCloaked(u) then -- emit wakes only when moving and not completely submerged
-                local radius = Spring.GetUnitRadius(u);
-                local effect = SFXTYPE_WAKE1
-                if radius>50 then effect = SFXTYPE_WAKE2 end
-                Spring.UnitScript.CallAsUnit(u, function()
-                    Spring.UnitScript.EmitSfx(1,effect);
-                end);
+		
+        for i = current_fold, units.count, n_folds do
+            local unitID = listData[i]             
+            local x,y,z = Spring.GetUnitPosition(unitID)
+            local h = unit[unitID].h
+            if y and h then
+				-- emit wakes only when moving and not completely submerged
+				if y > -h and y <= 0 and isMoving(unitID) and not Spring.GetUnitIsCloaked(unitID) then 
+					local radius = Spring.GetUnitRadius(unitID)
+					local effect = SFXTYPE_WAKE1
+					if radius > 50 then 
+						effect = SFXTYPE_WAKE2 
+					end
+					Spring.UnitScript.CallAsUnit(unitID, 
+						function()
+							Spring.UnitScript.EmitSfx(1,effect);
+						end
+					)
+				end
+			else
+				gadget:UnitDestroyed(unitID)
             end
-
         end
-        current_fold = current_fold+1
+        current_fold = current_fold + 1
     end
 end

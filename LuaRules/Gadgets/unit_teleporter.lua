@@ -579,7 +579,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	
 	if tele[unitID] then
 		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
-			Spring.DestroyUnit(tele[unitID].link, true)
+			Spring.DestroyUnit(tele[unitID].link, true) -- Recursion error can happen here.
 		end
 		tele[teleID.data[teleID.count]].index = tele[unitID].index
 		teleID.data[tele[unitID].index] = teleID.data[teleID.count]
