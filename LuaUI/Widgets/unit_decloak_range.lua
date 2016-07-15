@@ -3,7 +3,7 @@ function widget:GetInfo()
 		name      = "Decloak Range",
 		desc      = "Display decloak range around cloaked units. v2",
 		author    = "banana_Ai, dahn",
-		date      = "08 Jul 2016",
+		date      = "15 Jul 2016",
 		license   = "GNU GPL v2",
 		layer     = 0,
 		enabled   = true,
