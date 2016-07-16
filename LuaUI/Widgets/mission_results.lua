@@ -41,6 +41,7 @@ function widget:GameOver(winners)
 	end
 	missionVars.result = result
 	WG.SavePythonOrJSONDict(missionVars, "cache/", "mission_results.json", "", {json = true, endOfFile = true})
+	WG.SaveTable(missionVars, "cache/", "mission_results.lua", "", {endOfFile = true, prefixReturn = true})
 	varsWritten = true
 end
 
