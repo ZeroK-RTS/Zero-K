@@ -229,7 +229,7 @@ local function WritePythonOrJSONDict(dict, dictName, params)
 	return str
 end
 
-local function SavePythonOrJSONDict(dir, fileName, dict, dictName, params)
+local function SavePythonOrJSONDict(dict, dir, fileName, dictName, params)
 	Spring.CreateDir(dir)
 	params = params or {}
 	local file,err = io.open (dir .. fileName, "w")
