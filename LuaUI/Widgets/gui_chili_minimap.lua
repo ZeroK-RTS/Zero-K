@@ -28,7 +28,7 @@ local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
 local GL_COLOR_ATTACHMENT3_EXT = 0x8CE3
 
 --// gl vars
- 
+
 local fbo
 local offscreentex
 
@@ -40,7 +40,7 @@ local boundsLoc
 
 local window
 local fakewindow
-local map_panel 
+local map_panel
 local buttons_panel
 local Chili
 local glDrawMiniMap = gl.DrawMiniMap
@@ -67,7 +67,7 @@ local function toggleTeamColors()
 	else
 		Spring.SendCommands("luaui enablewidget Local Team Colors")
 	end
-end 
+end
 
 local mapRatio = Game.mapX/Game.mapY
 local mapIsWider = mapRatio > 1
@@ -108,56 +108,56 @@ local minimap_path = 'Settings/HUD Panels/Minimap'
 --local radar_path = 'Settings/Interface/Map/Radar View Colors'
 local radar_path = 'Settings/Interface/Map/Radar Color'
 local radar_path_edit = 'Settings/Interface/Map/Radar Color'
-options_order = { 
-	'label_drawing', 
+options_order = {
+	'label_drawing',
 	'drawinmap',
-	'clearmapmarks', 
+	'clearmapmarks',
 	'lastmsgpos',
-	
-	'lblViews', 
-	'viewstandard', 
-	'viewheightmap', 
-	'viewblockmap', 
+
+	'lblViews',
+	'viewstandard',
+	'viewheightmap',
+	'viewblockmap',
 	'viewfow',
 	'showeco',
-	
-	'lable_initialView', 
-	'initialSensorState', 
+
+	'lable_initialView',
+	'initialSensorState',
 	'start_with_showeco',
-	
+
 	-- Radar view configuration
 	'radar_view_colors_label1',
-	'radar_fog_brightness1', 
-	
+	'radar_fog_brightness1',
+
 	-- Radar view editing
-	'radar_view_colors_label2', 
-	'radar_radar_color', 
+	'radar_view_colors_label2',
+	'radar_radar_color',
 	'radar_radar2_color',
-	'radar_jammer_color', 
+	'radar_jammer_color',
 
 	-- Radar view presets
 	'radar_view_presets_label1',
-	'radar_preset_only_los', 
-	'radar_preset_double_outline', 
-	'radar_preset_blue_line',  
-	'radar_preset_green', 
-	'radar_preset_green_in_blue', 
-	
+	'radar_preset_only_los',
+	'radar_preset_double_outline',
+	'radar_preset_blue_line',
+	'radar_preset_green',
+	'radar_preset_green_in_blue',
+
 	-- Minimap options
 	'use_map_ratio',
-	'opacity', 
-	'alwaysResizable', 
-	'buttonsOnRight', 
-	'hidebuttons', 
+	'opacity',
+	'alwaysResizable',
+	'buttonsOnRight',
+	'hidebuttons',
 	'minimizable',
 	'lblblank1',
 
-	'leftClickOnMinimap', 
-	'fadeMinimapOnZoomOut', 
+	'leftClickOnMinimap',
+	'fadeMinimapOnZoomOut',
 }
 options = {
 	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
-	
+
 	drawinmap = {
 		name = 'Map Drawing Hotkey',
 		desc = 'Hold this hotkey to draw on the map and write messages. Left click to draw, right click to erase, middle click to place a marker. Double left click to type a marker message.',
@@ -169,14 +169,14 @@ options = {
 		desc = 'Erases all map drawing and markers (for you, not for others on your team).',
 		type = 'button',
 		action = 'clearmapmarks',
-	},	
+	},
 	lastmsgpos = {
 		name = 'Zoom To Last Message',
 		desc = 'Moves the camera to the most recently placed map marker or message.',
 		type = 'button',
 		action = 'lastmsgpos',
-	},	
-	
+	},
+
 	lblViews = { type = 'label', name = 'Map Overlays', },
 
 	viewstandard = {
@@ -197,14 +197,14 @@ options = {
 		type = 'button',
 		action = 'showpathtraversability',
 	},
-	
+
 	viewfow = {
 		name = 'Toggle Line of Sight',
 		desc = 'Shows sight distance and radar coverage.',
 		type = 'button',
 		action = 'togglelos',
 	},
-	
+
 	showeco = {
 		name = 'Toggle Economy Overlay',
 		desc = 'Show metal, geo spots and energy grid',
@@ -217,10 +217,10 @@ options = {
 				WG.ToggleShoweco()
 			end
 		end,
-	},	
-	
+	},
+
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
-	
+
 	initialSensorState = {
 		name = "Start with LOS enabled",
 		desc = "Game starts with Line of Sight Overlay enabled",
@@ -240,16 +240,16 @@ options = {
 			end
 		end,
 	},
-	
-	
+
+
 --------------------------------------------------------------------------
 -- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
---------------------------------------------------------------------------	
-	
-	radar_view_colors_label1 = { 
+--------------------------------------------------------------------------
+
+	radar_view_colors_label1 = {
 		type = 'label', name = 'Other Options',
 	},
-	
+
 	radar_fog_brightness1 = {
 		name = "Fog Brightness",
 		type = "number",
@@ -257,12 +257,12 @@ options = {
 		OnChange =  function() updateRadarColors() end,
 		path = radar_path,
 	},
-	
+
 --------------------------------------------------------------------------
 -- Radar view color editing 'Settings/Interface/Map/Radar'
 --------------------------------------------------------------------------
-	
-	radar_view_colors_label2 = { 
+
+	radar_view_colors_label2 = {
 		type = 'label', name = '* Note: These colors are additive.', path = radar_path_edit,
 	},
 
@@ -287,15 +287,15 @@ options = {
 		OnChange = function() updateRadarColors() end,
 		path = radar_path_edit,
 	},
-	
+
 --------------------------------------------------------------------------
 -- Radar view presets 'Settings/Interface/Map/Radar'
 --------------------------------------------------------------------------
-	
-	radar_view_presets_label1 = { 
+
+	radar_view_presets_label1 = {
 		type = 'label', name = 'Radar Presets', path = radar_path,
 	},
-	
+
 	radar_preset_only_los = {
 		name = 'Only LOS',
 		type = 'button',
@@ -311,7 +311,7 @@ options = {
 		end,
 		path = radar_path,
 	},
-	
+
 	radar_preset_double_outline = {
 		name = 'Double Outline (default)',
 		type = 'button',
@@ -339,7 +339,7 @@ options = {
 		end,
 		path = radar_path,
 	},
-	
+
 	radar_preset_green = {
 		name = 'Green Area Fill',
 		type = 'button',
@@ -353,7 +353,7 @@ options = {
 		end,
 		path = radar_path,
 	},
-	
+
 	radar_preset_green_in_blue = {
 		name = 'Green in Blue Outline',
 		type = 'button',
@@ -367,8 +367,8 @@ options = {
 		end,
 		path = radar_path,
 	},
-	
-	
+
+
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
@@ -388,11 +388,11 @@ options = {
 				local maxSize = math.max(window.width, window.height)
 				local w,h = AdjustToMapAspectRatio(maxSize, maxSize, options.buttonsOnRight.value)
 				window:Resize(w,h,false,false)
-			end 
+			end
 		end,
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	opacity = {
 		name = "Opacity",
 		type = "number",
@@ -417,7 +417,7 @@ options = {
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
 		type = 'bool',
@@ -430,9 +430,9 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) 
-			iconsize = self.value and 0 or 20 
-			MakeMinimapWindow() 
+		OnChange= function(self)
+			iconsize = self.value and 0 or 20
+			MakeMinimapWindow()
 		end,
 		value = false,
 		path = minimap_path,
@@ -458,7 +458,7 @@ options = {
 		},
 		path = minimap_path,
 		noHotkey = true,
-	},	
+	},
 	fadeMinimapOnZoomOut = {
 		name = "Minimap fading when zoomed out",
 		type = 'radioButton',
@@ -478,7 +478,7 @@ options = {
 	simpleMinimapColors = {
 		name = 'Simplified Minimap Colors',
 		type = 'bool',
-		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).', 
+		desc = 'Show minimap blips as green for you, teal for allies and red for enemies (only minimap will use this simple color scheme).',
 		springsetting = 'SimpleMiniMapColors',
 		OnChange = function(self) Spring.SendCommands{"minimap simplecolors " .. (self.value and 1 or 0) } end,
 		path = minimap_path,
@@ -487,14 +487,14 @@ options = {
 }
 
 function WG.Minimap_SetOptions(aspect, opacity, resizable, buttonRight, minimizable)
-	if aspect == 'arwindow' or aspect == 'armap' or aspect == 'arnone' then 
+	if aspect == 'arwindow' or aspect == 'armap' or aspect == 'arnone' then
 		options.use_map_ratio.value = aspect
 	end
 	options.opacity.value = opacity
 	options.alwaysResizable.value = resizable
 	options.buttonsOnRight.value = buttonRight
 	options.minimizable.value = minimizable
-	
+
 	options.opacity.OnChange(options.opacity)
 	options.use_map_ratio.OnChange(options.use_map_ratio)
 	options.alwaysResizable.OnChange(options.alwaysResizable)
@@ -517,8 +517,8 @@ function updateRadarColors()
 	else
 		Spring.SetLosViewColors(
 			{ fog[1], los[1], radar[1], jam[1]},
-			{ fog[2], los[2], radar[2], jam[2]}, 
-			{ fog[3], los[3], radar[3], jam[3]} 
+			{ fog[2], los[2], radar[2], jam[2]},
+			{ fog[3], los[3], radar[3], jam[3]}
 		)
 	end
 end
@@ -579,13 +579,13 @@ local function MakeMinimapButton(file, params)
 	action = action or params.action
 	hotkey = WG.crude.GetHotkey(action)
 	command = params.command
-	
+
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
 	end
-		
-	return Chili.Button:New{ 
-		height=iconsize, width=iconsize, 
+
+	return Chili.Button:New{
+		height=iconsize, width=iconsize,
 		caption="",
 		margin={0,0,0,0},
 		padding={2,2,2,2},
@@ -597,7 +597,7 @@ local function MakeMinimapButton(file, params)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
-			
+
 			if command then
 				local left, right = true, false
 				local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -624,17 +624,17 @@ MakeMinimapWindow = function()
 	if (window) then
 		window:Dispose()
 	end
-	
+
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local width, height = screenWidth/6, screenWidth/6
-	
+
 	if options.buttonsOnRight.value then
 		width = width + iconsize
 	else
 		height = height + iconsize
 	end
-	
+
 	if height > 0 and width > 0 and screenHeight > 0 and screenWidth > 0 then
 		if width/height > screenWidth/screenHeight then
 			screenHeight = height*screenWidth/width
@@ -642,10 +642,10 @@ MakeMinimapWindow = function()
 			screenWidth = width*screenHeight/height
 		end
 	end
-	
+
 	local map_panel_bottom = iconsize*1.3
 	local map_panel_right = 0
-	
+
 	local buttons_height = iconsize+3
 	local buttons_width = iconsize*13
 	if options.buttonsOnRight.value then
@@ -654,18 +654,18 @@ MakeMinimapWindow = function()
 		buttons_height = iconsize*13
 		buttons_width = iconsize+3
 	end
-	
+
 	map_panel = Chili.Panel:New {
 		x = 0,
 		y = 0,
 		bottom = map_panel_bottom,
 		right = map_panel_right,
-		
+
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
 		backgroundColor = bgColor_panel
 		}
-	
+
 	buttons_panel = Chili.StackPanel:New{
 		name = "Minimap buttons_panel",
 		orientation = 'horizontal',
@@ -673,20 +673,20 @@ MakeMinimapWindow = function()
 		width=buttons_width,
 		bottom = 5,
 		right=5,
-		
+
 		padding={1,1,1,1},
 		--margin={0,0,0,0},
 		itemMargin={0,0,0,0},
-		
+
 		autosize = false,
 		resizeItems = false,
 		autoArrangeH = false,
 		autoArrangeV = false,
 		centerItems = false,
-		
+
 		children = {
-			Chili.Button:New{ 
-				height=iconsize, width=iconsize, 
+			Chili.Button:New{
+				height=iconsize, width=iconsize,
 				caption="",
 				margin={0,0,0,0},
 				padding={2,2,2,2},
@@ -702,31 +702,31 @@ MakeMinimapWindow = function()
 					}
 				},
 			},
-			
+
 			MakeMinimapButton( 'LuaUI/images/map/fow.png', {option = 'viewfow'} ),
-			
+
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
+
 			MakeMinimapButton( nil, {option = 'viewstandard'} ),
 			MakeMinimapButton( 'LuaUI/images/map/heightmap.png', {option = 'viewheightmap'} ),
 			MakeMinimapButton( 'LuaUI/images/map/blockmap.png', {option = 'viewblockmap'} ),
 			MakeMinimapButton( 'LuaUI/images/map/metalmap.png', {name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}),	-- handled differently because command is registered in another widget
-			
+
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
+
 			MakeMinimapButton( 'LuaUI/images/commands/Bold/retreat.png', {name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}),
 			MakeMinimapButton( 'LuaUI/images/commands/Bold/ferry.png', {name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}),
-			
+
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
+
 			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
-			
+
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
-			
+
 		},
 	}
-	
+
 	window = Chili.Window:New{
 		parent = Chili.Screen0,
 		name   = 'Minimap Window',
@@ -749,9 +749,9 @@ MakeMinimapWindow = function()
 		maxHeight = screenHeight*0.8,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 	}
-	
+
 	options.use_map_ratio.OnChange(options.use_map_ratio)
-	
+
 	fakewindow = Chili.Panel:New{
 		backgroundColor = {1,1,1, final_opacity},
 		parent = window,
@@ -789,7 +789,7 @@ function widget:MousePress(x, y, button)
 		end
 		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
 			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
-			local coord 
+			local coord
 			if traceType == "ground" then
 				coord = traceValue
 			end
@@ -818,7 +818,7 @@ end
 function widget:MouseMove(x, y, dx, dy, button)
 	if leftClickDraggingCamera and Spring.IsAboveMiniMap(x, y) then
 		local traceType,traceValue = Spring.TraceScreenRay(x,y,true,true)
-		local coord 
+		local coord
 		if traceType == "ground" then
 			coord = traceValue
 		end
@@ -859,7 +859,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
-	
+
 	Chili = WG.Chili
 
 	MakeMinimapWindow()
@@ -923,10 +923,10 @@ function widget:Initialize()
 		      tex0 = 0,
 		    },
 		    uniform = {
-		    	alpha = 1,
-		    	bounds = 2,
-		    	screen = 3,
-		  	},
+		      alpha = 0,
+		      bounds = {0,0,0,0},
+		      screen = {0,0},
+		    },
 		  })
 
 		  if (fadeShader == nil) then
@@ -962,7 +962,7 @@ function widget:Shutdown()
 	end
 
 	WG.MinimapDraggingCamera = nil
-end 
+end
 
 local lx, ly, lw, lh, last_window_x, last_window_y
 
@@ -971,15 +971,15 @@ local function DrawMiniMap()
   glDrawMiniMap()
 end
 
-function widget:DrawScreen() 
+function widget:DrawScreen()
 	local cs = Spring.GetCameraState()
-	if (window.hidden or cs.name == "ov") then 
+	if (window.hidden or cs.name == "ov") then
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0
 		lh = 0
 		lw = 0
-		return 
+		return
 	end
 
 	local cx,cy,cw,ch = Chili.unpack4(map_panel.clientArea)
@@ -987,7 +987,7 @@ function widget:DrawScreen()
 	if (options.use_map_ratio.value == 'armap') then
 		cx,cy,cw,ch = AdjustMapAspectRatioToWindow(cx,cy,cw,ch)
 	end
-	
+
 	local vsx,vsy = gl.GetViewSizes()
 	if (lw ~= cw or lh ~= ch or lx ~= cx or ly ~= cy or last_window_x ~= window.x or last_window_y ~= window.y) then
 		lx = cx
@@ -996,7 +996,7 @@ function widget:DrawScreen()
 		lw = cw
 		last_window_x = window.x
 		last_window_y = window.y
-		
+
 		cx,cy = map_panel:LocalToScreen(cx,cy)
 		gl.ConfigMiniMap(cx,vsy-ch-cy,cw,ch)
 	end
@@ -1020,7 +1020,7 @@ function widget:DrawScreen()
 		end
 
 		--Guarantees a buffer of 0 alpha near full zoom-out, to help account for the camera following the map's elevation
-		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end 
+		if alpha < 1 then alpha = math.min(math.max((alpha - 0.2) / 0.8, alphaMin), 1.0) end
 	end
 
 	if math.abs(last_alpha - alpha) > 0.0001 then
@@ -1030,11 +1030,11 @@ function widget:DrawScreen()
 		fakewindow.backgroundColor = {1,1,1, final_opacity}
 		local final_map_bg_color = options.fadeMinimapOnZoomOut.value == 'full' and bgColor_panel[4]*alpha or bgColor_panel[4]
 		map_panel.backgroundColor = {1,1,1, final_map_bg_color}
-		if alpha < 0.1 then 
-			fakewindow.children = {map_panel} 
-		else 
-			fakewindow.children = {map_panel, buttons_panel} 
-		end 
+		if alpha < 0.1 then
+			fakewindow.children = {map_panel}
+		else
+			fakewindow.children = {map_panel, buttons_panel}
+		end
 		fakewindow:Invalidate()
 		map_panel:Invalidate()
 	end
@@ -1073,5 +1073,5 @@ function widget:DrawScreen()
 	gl.MatrixMode(GL.MODELVIEW)
 	gl.PopMatrix()
 	gl.PopAttrib()
-end 
+end
 
