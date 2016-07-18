@@ -17,12 +17,43 @@ local OuterLimbs = {LimbA2,LimbB2,LimbC2,LimbD2};
 
 local SIG_DOCK  = 2;
 local SIG_SHOOT = 4;
+local SIG_WATCH = 8;
 
 local on = false;
 local shooting = 0;
 
+local parentUnitID;
+
 function script.Create()
-   --Turn(Satellite,z_axis,-math.pi/2);
+   StartThread(MonitorHost);
+end
+
+function MonitorHost()
+    SetSignalMask(SIG_WATCH);
+    while true do
+        if(parentUnitID) then
+            if not Spring.ValidUnitID(parentUnitID) then
+                on = false;
+                Signal(SIG_DOCK+SIG_SHOOT);
+                Spring.SetUnitHealth(unitID,500);
+                EmitSfx(Satellite, 1025);
+                Spring.MoveCtrl.SetRotationVelocity(unitID,math.random(1,20)-10,math.random(1,20)-10,math.random(1,20)-10);
+                Spring.MoveCtrl.Disable(unitID);
+                Spring.AddUnitImpulse(unitID,math.random(1,10)-5,math.random(1,10)-5,math.random(1,10)-5)
+                Spring.SetUnitNoSelect(unitID,false);
+                Spring.SetUnitNoMinimap(unitID,false);
+                Spring.SetUnitNeutral(unitID,false);
+                Spring.SetUnitRulesParam(unitID,'untargetable',nil);
+                Spring.SetUnitCollisionVolumeData(unitID, 30,30,30, 10,0,0, 0,0,0);
+                Dock()
+                return;
+            end
+        else
+            parentUnitID = Spring.GetUnitRulesParam(unitID,'cannot_damage_unit');
+            --if not parentUnitID then return end
+        end
+        Sleep(33)
+    end
 end
 
 function Dock()

@@ -43,6 +43,7 @@ satellite = {
 
     explosiongenerators = {
       [[custom:IMMA_LAUNCHIN_MAH_LAZER]],
+      [[custom:xamelimpact]],
     },
 
   },
