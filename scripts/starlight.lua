@@ -178,12 +178,14 @@ end
 function SpiralDown()
     SetSignalMask(SIG_DOCK);
     while(docking) do
+        -- this ignores base unit rotation. because it wants to snap to multiples of 90, and base unit is guaranteed to be
+        -- always snapped to multiples of 90 because of how buildings are
+        -- this is an invitation for someone to implement arbitrary 360-deg rotation and break this. I dare you. Fight me.
+        
         local dx, _, dz = Spring.GetUnitDirection(satUnitID);
-        local bx, _, bz = Spring.GetUnitDirection(unitID);
-        local currentHeading = Vector.Angle(dx, dz);
-        local baseHeading = Vector.Angle(bx,bz); 
-      
-        local aimOff = (currentHeading - baseHeading)
+        local currentHeading  = Vector.Angle(dx, dz);
+        local closestMultiple = math.round(currentHeading/(math.pi/2))*math.pi/2
+        local aimOff = closestMultiple - currentHeading
         
         if aimOff < 0 then
             aimOff = math.max(-ROTATION_SPEED, aimOff)
@@ -191,9 +193,9 @@ function SpiralDown()
             aimOff = math.min(ROTATION_SPEED, aimOff)
         end
         
-        Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
+        Spring.SetUnitRotation(satUnitID, 0, currentHeading + aimOff, 0)
         
-        if(currentHeading == baseHeading) then
+        if(currentHeading == closestMultiple) then
             break;
         end
         
