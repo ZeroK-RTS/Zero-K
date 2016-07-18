@@ -96,6 +96,8 @@ local function CallSatelliteScript(funcName, args)
 end
 
 function script.Create()
+    Move(ShortSpikes,z_axis, -5);
+    Move(LongSpikes,z_axis, -10);
 --    wantedDirection = Spring.GetUnitHeading(unitID);
 end
 
@@ -144,11 +146,12 @@ function Dock()
     
 	Move(SatelliteMount, z_axis, 0, 30*4)
     WaitForMove(SatelliteMount,z_axis);
+    Move(ShortSpikes,z_axis, -5,1);
+    Move(LongSpikes,z_axis, -10,1.5);
     Sleep(1000)
     
     local dx, _, dz = Spring.GetUnitDirection(unitID)
     local heading = Vector.Angle(dx, dz)
-    Spring.SetUnitRotation(satUnitID, 0, heading, 0);
     
     docking = false
     
@@ -270,6 +273,9 @@ function script.Activate()
     Spin(UpperCoil, z_axis, 10,0.5);
     Spin(LowerCoil, z_axis, 10,0.5);
     
+    Move(ShortSpikes,z_axis, 0,1);
+    Move(LongSpikes,z_axis, 0,1.5);
+    
     if(not satelliteCreated)then
         satelliteCreated = true;
         Hide(LimbA1);
@@ -293,7 +299,7 @@ function script.Activate()
         Spring.SetUnitNeutral(satUnitID,true);
         Spring.MoveCtrl.Enable(satUnitID);
         Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
-        Spring.SetUnitRotation(satUnitID, 0, heading, 0);
+        Spring.SetUnitRotation(satUnitID, 0, heading-math.pi/2, 0);
         Spring.SetUnitLoadingTransport(satUnitID,unitID);
         Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID);
         Spring.SetUnitRulesParam(satUnitID,'untargetable',1);
