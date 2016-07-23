@@ -1,5 +1,7 @@
 return {
 	[0] = {
+		nameLong = "Robot Defenders",
+		nameShort = "Base",
 		startpoints = {
 			{1434,1536},
 		},

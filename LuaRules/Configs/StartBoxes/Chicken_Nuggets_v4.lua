@@ -1,5 +1,7 @@
 return {
 	[0] = {
+		nameLong = "Robot Defenders",
+		nameShort = "Base",
 		startpoints = {
 			{1229,1536},
 		},
@@ -13,6 +15,8 @@ return {
 		},
 	},
 	[1] = {
+		nameLong = "Chicken Hive",
+		nameShort = "Hive",
 		startpoints = {
 			{6963,1536},
 		},

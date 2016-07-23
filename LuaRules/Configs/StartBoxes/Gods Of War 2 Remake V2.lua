@@ -1,5 +1,7 @@
 return {
 	[0] = {
+		nameLong = "South-West",
+		nameShort = "W",
 		startpoints = {
 			{824,6344},
 		},
@@ -13,6 +15,8 @@ return {
 		},
 	},
 	[1] = {
+		nameLong = "North-East",
+		nameShort = "NE",
 		startpoints = {
 			{6344,824},
 		},
@@ -26,6 +30,8 @@ return {
 		},
 	},
 	[2] = {
+		nameLong = "West",
+		nameShort = "W",
 		startpoints = {
 			{824,2975},
 		},
@@ -39,6 +45,8 @@ return {
 		},
 	},
 	[3] = {
+		nameLong = "East",
+		nameShort = "E",
 		startpoints = {
 			{6344,4050},
 		},
@@ -52,6 +60,8 @@ return {
 		},
 	},
 	[4] = {
+		nameLong = "North",
+		nameShort = "N",
 		startpoints = {
 			{2975,824},
 		},
@@ -65,6 +75,8 @@ return {
 		},
 	},
 	[5] = {
+		nameLong = "South",
+		nameShort = "S",
 		startpoints = {
 			{4050,6344},
 		},

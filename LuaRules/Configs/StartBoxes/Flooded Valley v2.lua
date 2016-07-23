@@ -1,5 +1,7 @@
 return {
 	[0] = {
+		nameLong = "North",
+		nameShort = "N",
 		startpoints = {
 			{2560,256},
 		},
@@ -13,6 +15,8 @@ return {
 		},
 	},
 	[1] = {
+		nameLong = "South",
+		nameShort = "S",
 		startpoints = {
 			{2560,4864},
 		},
