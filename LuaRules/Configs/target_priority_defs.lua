@@ -89,15 +89,12 @@ local unitIsBadAgainstGround = {
 	[UnitDefNames["fighter"].id] = true,
 }
 
--- Prioritize bombers/heavy gunships
+-- Prioritize bombers
 local unitIsBomber = {
 	[UnitDefNames["corshad"].id] = true,
 	[UnitDefNames["corhurc2"].id] = true,
 	[UnitDefNames["armcybr"].id] = true,
 	[UnitDefNames["armstiletto_laser"].id] = true,
-	[UnitDefNames["corcrw"].id] = true,
-	[UnitDefNames["armbrawl"].id] = true,
-	[UnitDefNames["blackdawn"].id] = true,
 }
 
 -- Hardcode things which do high burst damage with a long cooldown
@@ -174,6 +171,17 @@ for wdid = 1, #WeaponDefs do
 	end
 end
 
+local radarWobblePenalty = {
+	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
+	[WeaponDefNames["armmship_rocket"].id] = 5,
+	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
+	[WeaponDefNames["armanni_ata"].id] = 5,
+	[WeaponDefNames["armmanni_ata"].id] = 5,
+	[WeaponDefNames["hammer_weapon"].id] = 5,
+}
+
+
+
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if unitIsBadAgainstFastStuff[i] then
@@ -249,7 +257,16 @@ for uid = 1, #UnitDefs do
 		else
 			targetTable[uid][wid] = unitHealthRatio[uid]
 		end
+		
+		-- Autogenerate some wobble penalties.
+		if not radarWobblePenalty[wid] then
+			local wd = WeaponDefs[wid]
+			local weaponType = wd.type
+			if weaponType == "BeamLaser" or weaponType == "LaserCannon" or weaponType == "LightningCannon" then
+				radarWobblePenalty[wid] = 5
+			end
+		end
 	end
 end
 
-return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult
+return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult

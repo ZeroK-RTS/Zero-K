@@ -31,7 +31,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult = 
+local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -92,7 +92,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			else
 				remVisible[allyTeam][targetID] = 0
 				-- Unidentified radar dots have no params to base priority on, but are generally bad targets.
-				return true, 45
+				return true, 25 + (radarWobblePenalty[attackerWeaponDefID] or 0)
 			end
 		else
 			remVisible[allyTeam][targetID] = 0
@@ -129,7 +129,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		-- A unit which is identified but not visible cannot have priority based on health or other status effects.
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if not remStatic[enemyUnitDef] then
-			return true, defPrio + 5
+			return true, defPrio + (radarWobblePenalty[attackerWeaponDefID] or 0)
 		else
 			return true, defPrio
 		end
@@ -144,7 +144,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 
 	if remStunnedOrOverkill[targetID] == 1 then
-		defPrio = defPrio + 25
+		defPrio = defPrio + 20
 	end
 	
 	--// Get priority modifier for health and capture progress.
@@ -219,7 +219,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	-- Prioritize nearby units.
 	if proximityWeaponDefs[attackerWeaponDefID] then
 		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
-		local distAdd = 20 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
+		local distAdd = 10 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
 		return true, hpAdd + defPrio + distAdd
 	end
 	

@@ -26,15 +26,36 @@ end
 local function SetMinus(set, exclusion)
 	local copy = {}
 	for i,v in pairs(set) do
-		copy[i] = v
-	end
-	for _, unitName in ipairs(exclusion) do
-		local ud = UnitDefNames[unitName]
-		if ud and ud.id then
-			copy[ud.id] = nil
+		if not exclusion[i] then
+			copy[i] = v
 		end
 	end
+	
 	return copy
+end
+
+-- general arrays
+local allGround = {}
+local armedLand = {}
+local unarmedLand = {}
+
+for name,data in pairs(UnitDefNames) do
+	if not data.canfly then
+		allGround[data.id] = true
+		if data.canAttack and data.weapons[1] and data.weapons[1].onlyTargets.land then
+			armedLand[data.id] = true
+		else
+			unarmedLand[data.id] = true
+		end
+	end
+end
+
+
+for name,data in pairs(UnitDefNames) do
+	if data.canAttack and (not data.canfly) 
+	and data.weapons[1] and data.weapons[1].onlyTargets.land then
+		armedLand[data.id] = true 
+	end
 end
 
 -- swarm arrays
@@ -79,6 +100,23 @@ lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 
 -- skirm arrays
 -- these are not strictly required they just help with inputting the units
+local scorcherSkirmieeArray = NameToDefID({
+	"armtick",
+	"corroach",
+	"puppy",
+	"corsktl",
+	"spherepole",
+	"armpw",
+	"corak",
+	"corcan",
+	"hoverdepthcharge",
+	"armestor", -- scorchers tend to get blown up on pylons
+	
+	"chicken",
+	"chickena",
+	"chicken_tiamat",
+	"chicken_dragon"
+})
 
 local veryShortRangeSkirmieeArray = NameToDefID({
 	"corclog",
@@ -175,6 +213,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"correap",
 	"corgol",
 	"tawf114", -- banisher
+	"scorpion",
 	
 	"armfus", -- don't suicide vs fusions if possible.
 	"cafus", -- same with singu, at least to make an effort for survival.
@@ -234,13 +273,7 @@ local slasherSkirmieeArray = NameToDefID({
 	"armrock",
 })
 
-local allGround = {}
-for name,data in pairs(UnitDefNames) do
-	if not data.canfly then
-		allGround[data.id] = true
-	end
-end
-
+local fleaSkirmieeArray = Union(veryShortRangeSkirmieeArray, unarmedLand)
 shortRangeSkirmieeArray = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeArray)
 riotRangeSkirmieeArray = Union(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
@@ -294,13 +327,8 @@ local fleeables = NameToDefID({
 	"corsumo",
 })
 
-local armedLand = {}
-for name,data in pairs(UnitDefNames) do
-	if data.canAttack and (not data.canfly) 
-	and data.weapons[1] and data.weapons[1].onlyTargets.land then
-		armedLand[data.id] = true 
-	end
-end
+-- scorcher dive list
+local scorcherSwarmieeArray = SetMinus(allGround, scorcherSkirmieeArray)
 
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
 -- sea: table of behaviour for sea. Note that these tables are optional.
@@ -408,12 +436,13 @@ local behaviourConfig = {
 	},
 	
 	["armflea"] = {
-		skirms = veryShortRangeSkirmieeArray, 
+		skirms = fleaSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = fleeables,
-		circleStrafe = true, 
+		circleStrafe = true,
+		skirmLeeway = 5,
 		maxSwarmLeeway = 5, 
-		swarmLeeway = 30, 
+		swarmLeeway = 30,
 		stoppingDistance = 0,
 		strafeOrderLength = 100,
 		minCircleStrafeDistance = 20,
@@ -479,8 +508,8 @@ local behaviourConfig = {
 	},
 	
 	["corgator"] = {
-		skirms = {}, 
-		swarms = allGround, 
+		skirms = scorcherSkirmieeArray,
+		swarms = scorcherSwarmieeArray, 
 		flees = {},
 		localJinkOrder = false,
 		jinkTangentLength = 50,
@@ -488,8 +517,9 @@ local behaviourConfig = {
 		strafeOrderLength = 100,
 		minCircleStrafeDistance = 260,
 		maxSwarmLeeway = 0,
-		minSwarmLeeway = 100, 
-		swarmLeeway = 300, 
+		minSwarmLeeway = 100,
+		swarmLeeway = 300,
+		skirmLeeway = 10,
 		stoppingDistance = 8,
 	},
 	
@@ -822,6 +852,14 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
+	["amphassault"] = {
+		skirms = longRangeSkirmieeArray, 
+		swarms = longRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 20, 
+	},
 	["corcrw"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = {}, 
@@ -856,28 +894,50 @@ local behaviourConfig = {
 	
 	-- arty range skirms
 	["armsnipe"] = {
-		skirms = allGround, 
+		skirms = allGround,
+		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
 		skirmLeeway = 50,
 	},
 	
 	["corgarp"] = {
-		skirms = allGround, 
+		skirms = allGround,
+		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
 		skirmLeeway = 50, 
 	},
 	
+	["armmerl"] = {
+		skirms = allGround,
+		skirmRadar = true, 
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = 150, 
+	},
+	
+	["cormart"] = {
+		skirms = allGround,
+		skirmRadar = true,
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = 100, 
+	},
+	
+	["armraven"] = {
+		skirms = allGround,
+		skirmRadar = true,
+		swarms = {}, 
+		flees = {},
+		skirmLeeway = 100, 
+	},
+	
 	["armham"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 	},
 	--["subarty"] = {
@@ -901,7 +961,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},
 	["firewalker"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
@@ -919,13 +979,11 @@ local behaviourConfig = {
 		skirmLeeway = 150, 
 	},	
 	["armmanni"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
+		skirmLeeway = 200, 
 	},	
 	-- cowardly support units
 	--[[
