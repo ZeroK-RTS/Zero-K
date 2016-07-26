@@ -3,6 +3,8 @@ return {
 		startpoints = {
 			{942,4096},
 		},
+		nameLong = "West",
+		nameShort = "W",
 		boxes = {
 			{
 				{0,0},
@@ -16,6 +18,8 @@ return {
 		startpoints = {
 			{7250,4096},
 		},
+		nameLong = "East",
+		nameShort = "E",
 		boxes = {
 			{
 				{6308,0},
