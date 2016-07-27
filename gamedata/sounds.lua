@@ -122,6 +122,7 @@ local function AutoAdd(subDir, generalOpts)
 				maxdist = opts.maxdist, 
 				maxconcurrent = opts.maxconcurrent, 
 				priority = opts.priority, 
+				in3d = opts.in3d,
 				gain = opts.gain, 
 				gainmod = opts.gainmod, 
 				pitch = opts.pitch, 
