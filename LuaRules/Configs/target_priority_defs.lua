@@ -173,11 +173,11 @@ end
 
 local radarWobblePenalty = {
 	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
-	[WeaponDefNames["armmship_rocket"].id] = 5,
+	[WeaponDefNames["reef_armmship_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
 	[WeaponDefNames["armanni_ata"].id] = 5,
 	[WeaponDefNames["armmanni_ata"].id] = 5,
-	[WeaponDefNames["hammer_weapon"].id] = 5,
+	[WeaponDefNames["armham_hammer_weapon"].id] = 5,
 }
 
 
