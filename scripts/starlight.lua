@@ -290,7 +290,7 @@ function script.Activate()
         Hide(LimbD2);
         Hide(Satellite)
         Hide(SatelliteMuzzle);
-        
+
         local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
         local dx, _, dz = Spring.GetUnitDirection(unitID)
         local heading = Vector.Angle(dx, dz)
@@ -322,6 +322,37 @@ function script.Deactivate()
 	Signal(SIG_AIM)
 end
 
+function DoAimFromBetterHeading()
+    local type,user,target = Spring.GetUnitWeaponTarget(unitID, 1)
+    local ax, ay, az
+
+    if (type == 1) then
+        ax, ay, az = Spring.GetUnitPosition(target);
+    elseif (type == 2) then
+        ax = target[1]
+        ay = target[2]
+        az = target[3]
+    else
+        return false
+    end
+	
+	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(unitID, SatelliteMuzzle)
+	
+	local horVec = {ax - px, az - pz}
+	local vertVec = {Vector.AbsVal(horVec), ay - py}
+	
+	local myHeading = Vector.Angle(horVec) - math.pi/2
+	local myPitch   = Vector.Angle(vertVec)
+	
+	local fudge = 0---0.0091
+	local pitchFudge = 0
+	
+	myHeading = myHeading + fudge 
+	myPitch   = myPitch   + pitchFudge
+	
+	--Spring.Echo("My        heading pitch",  myHeading*180/math.pi, myPitch*180/math.pi)
+	return myHeading, myPitch
+end
 
 function script.AimWeapon(num, heading, pitch)
 	if on and awake and num == 1 then
@@ -330,10 +361,18 @@ function script.AimWeapon(num, heading, pitch)
 		
 		local dx, _, dz = Spring.GetUnitDirection(unitID)
 		local currentHeading = Vector.Angle(dx, dz)
+
+		local newHeading, newPitch = DoAimFromBetterHeading()
+		if newHeading then
+			heading = newHeading
+			pitch = newPitch
+		end
 		
-		wantedDirection =  currentHeading - heading
+		wantedDirection = heading - currentHeading
+
         
-        CallSatelliteScript('mahlazer_AimAt',math.pi*1.5-pitch);
+        
+        CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2);
 		
 		Turn(SatelliteMuzzle, y_axis, 0)
 		Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
@@ -342,6 +381,7 @@ function script.AimWeapon(num, heading, pitch)
 	end
 	return false
 end
+
 
 function SnapSatellite()
     while true do
