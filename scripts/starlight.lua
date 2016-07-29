@@ -366,11 +366,8 @@ function script.AimWeapon(num, heading, pitch)
 		if newHeading then
 			heading = newHeading
 			pitch = newPitch
+    		wantedDirection = heading - math.pi/2
 		end
-		
-		wantedDirection = heading - currentHeading
-
-        
         
         CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2);
 		
