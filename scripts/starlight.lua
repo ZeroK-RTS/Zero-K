@@ -301,7 +301,7 @@ function script.Activate()
         Spring.SetUnitNeutral(satUnitID,true);
         Spring.MoveCtrl.Enable(satUnitID);
         Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
-        Spring.SetUnitRotation(satUnitID, 0, heading-math.pi/2, 0);
+        Spring.SetUnitRotation(satUnitID, 0, heading, 0);
         Spring.SetUnitLoadingTransport(satUnitID,unitID);
         Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID);
         Spring.SetUnitRulesParam(satUnitID,'untargetable',1);
