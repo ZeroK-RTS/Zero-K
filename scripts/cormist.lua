@@ -257,6 +257,9 @@ function script.Create()
 	StartThread(Suspension)
 	StartThread(AnimControl)
 	StartThread(SmokeUnit, smokePiece)
+	
+	Turn(exhaust1, x_axis, math.rad(180))
+	Turn(exhaust2, x_axis, math.rad(180))
 end
 
 -- Weapons
