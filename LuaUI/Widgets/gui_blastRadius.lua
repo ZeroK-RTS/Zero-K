@@ -192,7 +192,7 @@ function DrawBuildMenuBlastRange()
 	
 	local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
 	local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
-	local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage
+	local defaultDamage = weapTab[deathBlasId].customParams.shield_damage	--get default damage
 		
 	local mx, my = spGetMouseState()
 	local _, coords = spTraceScreenRay(mx, my, true, true)
@@ -263,8 +263,8 @@ function DrawUnitBlastRadius( unitID )
 		blastRadius = weapTab[blastId].damageAreaOfEffect
 		deathblastRadius = weapTab[deathBlasId].damageAreaOfEffect
 						
-		blastDamage = weapTab[blastId].damages[0]
-		deathblastDamage = weapTab[deathBlasId].damages[0]
+		blastDamage = weapTab[blastId].customParams.shield_damage
+		deathblastDamage = weapTab[deathBlasId].customParams.shield_damage
 					
 		local height = Spring.GetGroundHeight(x,z)
 		local halfSquare = deathblastRadius*0.5

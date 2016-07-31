@@ -240,16 +240,13 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-        statsprojectiles = 3,
-        statsdamage = 600,
-		
-		light_color = [[0.1 0.4 0.1]],
+		light_color = [[0.2 0.8 0.2]],
       },
       
       damage                  = {
-        default = 300,
-        planes  = 300,
-        subs    = 15,
+        default = 600,
+        planes  = 600,
+        subs    = 45,
       },
 
       explosionGenerator      = [[custom:flash1green]],
@@ -262,7 +259,7 @@ unitDef = {
       laserFlareSize          = 10.4,
       minIntensity            = 1,
       noSelfDamage            = true,
-      projectiles             = 6,
+      projectiles             = 3,
       range                   = 600,
       reloadtime              = 6,
       rgbColor                = [[0 1 0]],
@@ -270,10 +267,10 @@ unitDef = {
       soundStart              = [[weapon/laser/heavy_laser3]],
       soundStartVolume        = 2,
       sweepfire               = false,
-      texture1                = [[largelaserdark]],
-      texture2                = [[flaredark]],
-      texture3                = [[flaredark]],
-      texture4                = [[smallflaredark]],
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
       thickness               = 8,
       tileLength              = 300,
       tolerance               = 10000,

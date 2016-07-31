@@ -408,7 +408,7 @@ local function weapons2Table(cells, ws, unitID)
 
 		local stun_time = 0
 
-		local val = tonumber(cp.statsdamage) or wd.damages[0] or 0
+		local val = tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0
 		
 		if cp.disarmdamagemult then
 			damd = val * cp.disarmdamagemult

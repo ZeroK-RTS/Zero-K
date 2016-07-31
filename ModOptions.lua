@@ -292,6 +292,14 @@ local options = {
     type   = 'section',
   },
   {
+    key    = 'shield_merge',
+    name   = 'Enable shield merge',
+    desc   = 'Shield merge causes shields to share charge perfectly with their neighbors.',
+    type   = 'bool',
+    section= 'experimental',
+    def    = false,
+  },
+  {
     key    = 'marketandbounty',
     name   = 'Enable MarketPlace and Bounties (dysfunctional)',
     desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',

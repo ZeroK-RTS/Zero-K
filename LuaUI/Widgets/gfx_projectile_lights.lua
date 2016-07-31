@@ -166,7 +166,7 @@ local function GetLightsFromUnitDefs()
 	local plighttable = {}
 	for weaponDefID = 1, #WeaponDefs do
 		--These projectiles should have lights:
-			--Cannon (projectile size: tempsize = 2.0f + std::min(wd.damages[0] * 0.0025f, wd.damageAreaOfEffect * 0.1f);)
+			--Cannon (projectile size: tempsize = 2.0f + std::min(wd.customParams.shield_damage * 0.0025f, wd.damageAreaOfEffect * 0.1f);)
 			--Dgun
 			--MissileLauncher
 			--StarburstLauncher

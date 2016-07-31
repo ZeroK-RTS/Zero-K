@@ -20,6 +20,10 @@ end
 local devCompatibility = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 
 local passedProjectile = {}
+local shieldDamages = {}
+for i = 1, #WeaponDefs do
+	shieldDamages[i] = tonumber(WeaponDefs[i].customParams.shield_damage)
+end
 
 function gadget:ProjectileDestroyed(proID)
 	if passedProjectile[proID] then
@@ -50,17 +54,17 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	return false
 	--]]
 	
-	local wname = Spring.GetProjectileName(proID)
+	local weaponDefID = Spring.GetProjectileDefID(proID)
 	if passedProjectile[proID] then
 		return true
 	--elseif select(2, Spring.GetProjectilePosition(proID)) < 0 then
 	--	passedProjectile[proID] = true
 	--	return true
-	elseif wname and  shieldCarrierUnitID and shieldEmitterWeaponNum then
-		local wd = WeaponDefNames[wname]
+	elseif weaponDefID and shieldCarrierUnitID and shieldEmitterWeaponNum then
+		local wd = WeaponDefs[weaponDefID]
 		if wd and wd.noExplode then
 			local on, charge = Spring.GetUnitShieldState(shieldCarrierUnitID)	--FIXME figure out a way to get correct shield
-			if charge and wd.damages[0] < charge then
+			if charge and shieldDamages[weaponDefID] < charge then
 				--Spring.MarkerAddPoint(x,y,z,"")
 				if devCompatibility then
 					Spring.DeleteProjectile(proID)

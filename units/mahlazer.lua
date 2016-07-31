@@ -114,6 +114,7 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -156,11 +157,14 @@ unitDef = {
       craterMult              = 8,
 
 	  customParams        	  = {
-		stats_damage = 3000,
+		statsdamage = 5430,
+		script_reload = 20,
 
 		light_color = [[5 0.3 6]],
 		light_radius = 2000,
 		light_beam_start = 0.8,
+		
+		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -207,6 +211,8 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+		
+		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -253,6 +259,9 @@ unitDef = {
 		light_color = [[3 0.2 4]],
 		light_radius = 1200,
 		light_beam_start = 0.8,
+		
+		script_reload = 1/30,
+		effective_beam_time = 1/30,
 	  },
 	  
       damage                  = {
@@ -299,6 +308,8 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+		
+		effective_beam_time = 1/30,
 	  },
 
       damage                  = {

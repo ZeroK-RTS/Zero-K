@@ -148,6 +148,12 @@ for name, wd in pairs(DEFS.weaponDefs) do
 			wd.damage.default = wd.damage.default * GAUSS_DAMAGE_MOD
 		end
 	end
+	wd.customparams.shield_damage = wd.damage.default/((wd.customparams.effective_beam_time or wd.beamtime or 1/30) * 30)
+	if wd.beamtime and wd.beamtime >= 0.1 then
+		-- Settings damage default to 0 removes cratering and impulse so is not universally applied.
+		-- It fixes long beams vs shield cases.
+		wd.damage.default = 0.001
+	end
 end
 
 --------------------------------------------------------------------------------
