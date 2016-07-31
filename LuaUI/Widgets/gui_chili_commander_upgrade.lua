@@ -893,6 +893,9 @@ function SaveModuleLoadout()
 	end
 	local profileID = upgradeSignature.profileID
 	local level = upgradeSignature.level
+	if not (profileID and level) then
+		return
+	end
 	savedSlotLoadout[profileID] = savedSlotLoadout[profileID] or {}
 	savedSlotLoadout[profileID][level] = GetCurrentModules()
 end
