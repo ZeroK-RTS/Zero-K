@@ -79,9 +79,3 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	
 	return damage
 end
-
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer)
-	if paralyzer and (not already_stunned) and spGetUnitIsStunned(unitID) then
-		GG.ScriptNotifyEMPed(unitID)
-	end
-end
