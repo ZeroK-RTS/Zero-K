@@ -5,9 +5,17 @@ function IterableMap.New()
 	local indexByKey = {}
 	local dataByKey = {}
 	local indexMax = 0
+	local unusedKey = 1
 	local keyByIndex = {}
 	
 	local api = {}
+
+	function api.GetUnusedKey()
+		while api.InMap(unusedKey) do
+			unusedKey = unusedKey + 1
+		end
+		return unusedKey
+	end
 	
 	function api.Add(key, data)
 		if not key then
@@ -37,6 +45,20 @@ function IterableMap.New()
 		indexByKey[key] = nil
 		dataByKey[key] = nil
 		indexMax = indexMax - 1
+	end
+	
+	function api.ReplaceKey(oldKey, newKey)
+		if (not oldKey) or (not indexByKey[oldKey]) or indexByKey[newKey] then
+			return false
+		end
+		
+		keyByIndex[indexByKey[oldKey]] = newKey
+		indexByKey[newKey] = indexByKey[oldKey]
+		dataByKey[newKey] = dataByKey[oldKey]
+		
+		indexByKey[oldKey] = nil
+		dataByKey[oldKey] = nil
+		return true
 	end
 	
 	-- Get is also set in the case of tables because tables pass by reference
@@ -74,18 +96,31 @@ function IterableMap.New()
 	-- Using the third argument, index, is a little evil because index should
 	-- be private.
 	function api.Apply(funcToApply, ...)
-		for i = 1, indexMax do
+		local i = 1
+		while i <= indexMax do
 			local key = keyByIndex[i]
-			funcToApply(key, dataByKey[key], i, ...)
+			if funcToApply(key, dataByKey[key], i, ...) then
+				-- Return true to remove element
+				api.Remove(key)
+			else
+				i = i + 1
+			end
 		end
 	end
 	
 	function api.ApplyNoArg(funcToApply)
-		for i = 1, indexMax do
+		local i = 1
+		while i <= indexMax do
 			local key = keyByIndex[i]
-			funcToApply(key, dataByKey[key], i)
+			if funcToApply(key, dataByKey[key], i) then
+				-- Return true to remove element
+				api.Remove(key)
+			else
+				i = i + 1
+			end
 		end
 	end
+	
 	
 	-- This 'method' of iteration is for barbarians. Seems to have performance
 	-- similar to Apply.

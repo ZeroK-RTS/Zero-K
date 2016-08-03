@@ -320,8 +320,9 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 				units[unitID] = nil
 			end
 		end
+		return false
 	end
-	
+	return true
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -336,8 +337,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
 		return true  -- command was not used
 	end	
-	PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
-	return false  -- command was used
+	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
 end
 
 --------------------------------------------------------------------------------

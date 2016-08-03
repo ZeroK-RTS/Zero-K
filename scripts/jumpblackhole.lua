@@ -170,6 +170,10 @@ function script.FireWeapon1()
 	EmitSfx(flare, 1025)
 end
 
+function script.BlockShot(num, targetID)
+	return GG.OverkillPreventionPlaceholder_CheckBlock(unitID, targetID, Spring.GetUnitAllyTeam(unitID))
+end
+
 function preJump(turn, distance)
 end
 
@@ -193,7 +197,6 @@ function endJump()
 	EmitSfx(lfoot, UNIT_SFX4)
 	EmitSfx(rfoot, UNIT_SFX4)
 end
-
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
