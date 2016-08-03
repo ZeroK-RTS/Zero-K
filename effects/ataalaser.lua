@@ -3,7 +3,7 @@ return {
 		
     groundsmoke = {
       class              = [[CSimpleParticleSystem]],
-      count              = 1,
+      count              = 2,
       ground             = 0,	
 						unit = 1,
 
@@ -15,7 +15,7 @@ return {
         emitrotspread      = 20,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 2, 0]],
-        numparticles       = 1,
+        numparticles       = 3,
         particlelife       = 4,
         particlelifespread = 10,
         particlesize       = 4,
@@ -31,7 +31,7 @@ return {
 	
 	flash = {
       class              = [[CSimpleParticleSystem]],
-      count              = 1,
+      count              = 2,
       ground             = 1,	
       air = 1,
 
@@ -43,7 +43,7 @@ return {
         emitrotspread      = 20,
         emitvector         = [[0, 1, 0]],
         gravity            = [[0, 2, 0]],
-        numparticles       = 1,
+        numparticles       = 3,
         particlelife       = 8,
         particlelifespread = 8,
         particlesize       = 4,
@@ -87,7 +87,7 @@ return {
 	stacheln1 = {
       air                = true,
       class              = [[explspike]],
-      count              = 2,
+      count              = 8,
       ground             = true,
       water              = true,
       properties = {
@@ -104,7 +104,7 @@ return {
 	
 	funken = {
       class              = [[CSimpleParticleSystem]],
-      count              = 1,
+      count              = 5,
       ground             = true,
       unit               = 1,
       properties = {

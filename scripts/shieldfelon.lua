@@ -1,5 +1,3 @@
-local spGetUnitShieldState = Spring.GetUnitShieldState
-local spSetUnitShieldState = Spring.SetUnitShieldState
 include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
@@ -205,11 +203,7 @@ function script.BlockShot(num)
 	end
 
 	if aimTime <= 0 then
-		local shieldPow = select(2, spGetUnitShieldState(unitID))
-		if shieldPow > DRAIN then
-			spSetUnitShieldState(unitID, shieldPow - DRAIN)
-			return false
-		end
+		return GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN, 0)
 	end
 	return true
 end

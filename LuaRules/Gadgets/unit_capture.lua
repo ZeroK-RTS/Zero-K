@@ -241,7 +241,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- check damage (armourmod, range falloff) if enabled
 	local newCaptureDamage = captureWeaponDefs[weaponID].captureDamage
 	if captureWeaponDefs[weaponID].scaleDamage then 
-		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].damages[0]) 
+		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].customParams.shield_damage) 
 	end	--scale damage based on real damage (i.e. take into account armortypes etc.)
 	-- scale damage based on target health
 	local health, maxHealth = spGetUnitHealth(unitID)

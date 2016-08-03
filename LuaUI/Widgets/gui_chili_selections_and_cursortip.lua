@@ -2549,18 +2549,19 @@ function widget:Update(dt)
 			local shieldPower = Spring.GetUnitRulesParam(stt_unitID, "comm_shield_max") or stt_ud.shieldPower
 			if shieldbar and shieldPower and (shieldPower > 0) then
 				local shieldEnabled, shieldCurrentPower = Spring.GetUnitShieldState(stt_unitID, Spring.GetUnitRulesParam(stt_unitID, "comm_shield_num") or -1)
+				if shieldCurrentPower then
+					local wd = WeaponDefs[UnitDefs[Spring.GetUnitDefID(stt_unitID)].shieldWeaponDef]
+					local regen = ""
+					if shieldCurrentPower < shieldPower then
+						regen = " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
+					end
 
-				local wd = WeaponDefs[UnitDefs[Spring.GetUnitDefID(stt_unitID)].shieldWeaponDef]
-				local regen = ""
-				if shieldCurrentPower < shieldPower then
-					regen = " (+" .. (wd.customParams.shield_rate or wd.shieldPowerRegen) .. ")"
-				end
-
-				shieldbar:SetValue(shieldCurrentPower / shieldPower,true)
-				if shieldEnabled then
-					shieldbar:SetCaption( numformat(math.floor(shieldCurrentPower)) .. ' / ' .. numformat(shieldPower) .. regen)
-				else
-					shieldbar:SetCaption('Shield offline')
+					shieldbar:SetValue(shieldCurrentPower / shieldPower,true)
+					if shieldEnabled then
+						shieldbar:SetCaption( numformat(math.floor(shieldCurrentPower)) .. ' / ' .. numformat(shieldPower) .. regen)
+					else
+						shieldbar:SetCaption('Shield offline')
+					end
 				end
 			end
 		end

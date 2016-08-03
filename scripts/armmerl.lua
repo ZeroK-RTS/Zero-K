@@ -134,7 +134,18 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return (targetID and GG.DontFireRadar_CheckBlock(unitID, targetID)) and true or false
+	if not targetID then
+		return false
+	end
+	if GG.DontFireRadar_CheckBlock(unitID, targetID) then
+		return true
+	end
+	-- Seperation check is not required as the physics of the missile seems to result in a
+	-- time to impact of between 140 and 150 frames in almost all cases.
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 150, false, false, true) then
+		return true
+	end
+	return false
 end
 
 function script.QueryWeapon(num) 

@@ -923,9 +923,9 @@ function widget:Initialize()
 		      tex0 = 0,
 		    },
 		    uniform = {
-		    	alpha = 1,
-		    	bounds = 2,
-		    	screen = 3,
+              alpha = 0,
+              bounds = {0,0,0,0},
+              screen = {0,0},
 		  	},
 		  })
 

@@ -257,6 +257,9 @@ function script.Create()
 	StartThread(Suspension)
 	StartThread(AnimControl)
 	StartThread(SmokeUnit, smokePiece)
+	
+	Turn(exhaust1, x_axis, math.rad(180))
+	Turn(exhaust2, x_axis, math.rad(180))
 end
 
 -- Weapons
@@ -295,7 +298,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 25 * distMult)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 25 * distMult)
 	end
 	return false
 end

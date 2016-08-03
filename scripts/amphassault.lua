@@ -297,9 +297,9 @@ function script.QueryWeapon(num)
 	if num == 1 then
 		if beamCount < 6 then
 			if beamCount == 1 then
-				Spring.SetUnitWeaponState(unitID, 1, "range", 1)
+				--Spring.SetUnitWeaponState(unitID, 1, "range", 1)
 			elseif beamCount == 2 then
-				Spring.SetUnitWeaponState(unitID, 1, "range", 600)
+				--Spring.SetUnitWeaponState(unitID, 1, "range", 600)
 			end
 			return mflare
 		else

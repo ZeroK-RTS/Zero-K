@@ -292,6 +292,19 @@ local options = {
     type   = 'section',
   },
   {
+    key    = 'shield_merge',
+    name   = 'Shield type',
+    desc   = 'Shield merge method.',
+    type   = 'list',
+    section= 'experimental',
+    def    = 'none',
+    items = {
+      {key = 'none', name = "None", desc = 'Shield link only'},
+      {key = 'share', name = "Impact sharing", desc = 'On impact, neighbours contribute charge to make up the required charge.'},
+      {key = 'penetrate', name = "Partial Penetrate", desc = 'Projectiles drain shields that they penetrate but lose effective damage for subsequent shield impacts.'},
+    },
+  },
+  {
     key    = 'marketandbounty',
     name   = 'Enable MarketPlace and Bounties (dysfunctional)',
     desc   = 'Adds option to sell your units, buy units from allies (including temporary allies). Also allows you to place a bounty on a unit.',

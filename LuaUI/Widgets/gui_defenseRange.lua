@@ -603,7 +603,7 @@ function widget:Initialize()
 		end
 		local deathBlasId = weapNamTab[lower(udef["deathExplosion"])].id
 		local blastRadius = weapTab[deathBlasId].damageAreaOfEffect
-		local defaultDamage = weapTab[deathBlasId].damages[0]	--get default damage]]--
+		local defaultDamage = weapTab[deathBlasId].customParams.shield_damage	--get default damage]]--
 	end
 end
 

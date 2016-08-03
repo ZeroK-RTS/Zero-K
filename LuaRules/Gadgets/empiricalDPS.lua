@@ -31,7 +31,7 @@ function gadget:UnitDamaged(unitID, unitDefID,  unitTeam, unitDamage, paralyzer,
 	--	local aoe = wd.damageAreaOfEffect
 	--	local dist = 0.09
 	--	local edgeEff = wd.edgeEffectiveness
-	--	local writeDamage = wd.damages[0]
+	--	local writeDamage = wd.customParams.shield_damage
 	--	local theoryDamage = writeDamage*(aoe-dist)/(aoe + 0.01 - dist*edgeEff)
 	--	local theoryDist = -unitDamage/writeDamage*(aoe + 0.01)+aoe
 	--	Spring.Echo(wd.customParams.statsdamage)

@@ -1,9 +1,8 @@
 -- see http://springrts.com/wiki/Sounds.lua for help
 local Sounds = {
 	SoundItems = {
-		--default = {
-		--pitchmod = 0.04,
-		--}
+		default = {
+		},
 		IncomingChat = {
 			--file = "sounds/talk.wav",
 			file = nil,
@@ -90,6 +89,8 @@ local noVariation = {
 	in3d = false,
 	pitchmod = 0,
 	gainmod = 0,
+	pitch = 1,
+	gaim = 1,
 }
 
 local ignoredExtensions = {
@@ -122,6 +123,7 @@ local function AutoAdd(subDir, generalOpts)
 				maxdist = opts.maxdist, 
 				maxconcurrent = opts.maxconcurrent, 
 				priority = opts.priority, 
+				in3d = opts.in3d,
 				gain = opts.gain, 
 				gainmod = opts.gainmod, 
 				pitch = opts.pitch, 

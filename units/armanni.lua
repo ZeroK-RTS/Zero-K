@@ -87,16 +87,14 @@ unitDef = {
       craterMult              = 0,
       
       customParams            = {
-        statsprojectiles = 1,
-        statsdamage = 4000,
-		
-		light_color = [[0.32 0.21 0.45]],
+		light_color = [[1.6 1.05 2.25]],
 		light_radius = 320,
       },
 
       damage                  = {
-        default = 800.1,
-        subs    = 40,
+        default = 4000.1,
+        planes  = 4000.1,
+        subs    = 200.1,
       },
 
       explosionGenerator      = [[custom:ataalaser]],
@@ -109,16 +107,15 @@ unitDef = {
       laserFlareSize          = 16.94,
       minIntensity            = 1,
       noSelfDamage            = true,
-      projectiles             = 5,
       range                   = 1200,
       reloadtime              = 10,
       rgbColor                = [[0.25 0 1]],
       soundStart              = [[weapon/laser/heavy_laser6]],
       soundStartVolume        = 3,
-      texture1                = [[largelaserdark]],
-      texture2                = [[flaredark]],
-      texture3                = [[flaredark]],
-      texture4                = [[smallflaredark]],
+      texture1                = [[largelaser]],
+      texture2                = [[flare]],
+      texture3                = [[flare]],
+      texture4                = [[smallflare]],
       thickness               = 16.94,
       tolerance               = 10000,
       turret                  = true,
