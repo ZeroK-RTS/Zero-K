@@ -35,7 +35,8 @@ local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
 
 local modOptions = Spring.GetModOptions()
-local MERGE_ENABLED = modOptions.shield_merge
+local MERGE_ENABLED = (modOptions.shield_merge == "share")
+local PARTIAL_PENETRATE = (modOptions.shield_merge == "penetrate")
 
 local allyTeamShields = {}
 local gameFrame = 0
@@ -218,6 +219,7 @@ local beamMultiHitException = {
 	[UnitDefNames["armorco"].id] = true,
 }
 local repeatedHits = {}
+local penetrationPower = {}
 
 function gadget:GameFrame(n)
 	repeatedHits = {} -- Feel sorry for GC
@@ -246,9 +248,15 @@ local function SetCharge(unitID, _, index)
 	Spring.SetUnitShieldState(unitID, -1, true, shieldCharges[index]*chargeProportion)
 end
 
-local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage)
+local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage, proID)
 	local _, charge = Spring.GetUnitShieldState(unitID)
-
+	local origDamage = damage
+	
+	if PARTIAL_PENETRATE and penetrationPower[proID] then
+		damage = penetrationPower[proID]
+		penetrationPower[proID] = nil
+	end
+	
 	if charge and damage < charge then
 		Spring.SetUnitShieldState(unitID, -1, true, charge - damage + realDamage)
 		return false
@@ -270,6 +278,17 @@ local function DrainShieldAndCheckProjectilePenetrate(unitID, damage, realDamage
 			return false
 		end
 		shieldCharges = nil
+	elseif PARTIAL_PENETRATE and proID then
+		local remainingPower = damage - charge
+		penetrationPower[proID] = remainingPower
+		Spring.SetUnitShieldState(unitID, -1, true, 0)
+		if Spring.GetProjectileDefID(proID) then -- some projectile IDs are not integers.
+			local gravity = Spring.GetProjectileGravity(proID)
+			local vx, vy, vz = Spring.GetProjectileVelocity(proID)
+			local mult = 0.75 + 0.25*remainingPower/origDamage
+			Spring.SetProjectileGravity(proID, gravity*mult^2)
+			Spring.SetProjectileVelocity(proID, vx*mult, vy*mult, vz*mult)
+		end
 	end
 	return true
 end
@@ -311,7 +330,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	local wd = WeaponDefs[weaponDefID]
 	local damage = shieldDamages[weaponDefID]
 	
-	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[0])
+	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[0], hackyProID or proID)
 	
 	if hackyProID then
 		repeatedHits[shieldCarrierUnitID][hackyProID] = projectilePasses

@@ -293,11 +293,16 @@ local options = {
   },
   {
     key    = 'shield_merge',
-    name   = 'Enable shield merge',
-    desc   = 'Shield merge causes shields to share charge perfectly with their neighbors.',
-    type   = 'bool',
+    name   = 'Shield type',
+    desc   = 'Shield merge method.',
+    type   = 'list',
     section= 'experimental',
-    def    = false,
+    def    = 'none',
+    items = {
+      {key = 'none', name = "None", desc = 'Shield link only'},
+      {key = 'share', name = "Impact sharing", desc = 'On impact, neighbours contribute charge to make up the required charge.'},
+      {key = 'penetrate', name = "Partial Penetrate", desc = 'Projectiles drain shields that they penetrate but lose effective damage for subsequent shield impacts.'},
+    },
   },
   {
     key    = 'marketandbounty',
