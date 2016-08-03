@@ -75,22 +75,6 @@ local unitIsTooFastToHit = {
 	[UnitDefNames["puppy"].id] = true,
 }
 
-local unitIsRaider = {
-	[UnitDefNames["armflea"].id] = true,
-	[UnitDefNames["armpw"].id] = true,
-	[UnitDefNames["corfav"].id] = true,
-	[UnitDefNames["corgator"].id] = true,
-	[UnitDefNames["corsh"].id] = true,
-	[UnitDefNames["corak"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
-	[UnitDefNames["armkam"].id] = true,
-	[UnitDefNames["corpyro"].id] = true,
-	[UnitDefNames["logkoda"].id] = true,
-	[UnitDefNames["panther"].id] = true,
-	[UnitDefNames["fighter"].id] = true,
-	[UnitDefNames["spherepole"].id] = true,
-}
-
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
 	[UnitDefNames["fighter"].id] = true,
@@ -115,14 +99,36 @@ local unitIsBomber = {
 
 -- Hardcode things which do high burst damage with a long cooldown
 local unitIsHeavyHitter = {
+	[UnitDefNames["armanni"].id] = true,
 	[UnitDefNames["armmanni"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["shieldarty"].id] = true,
+	[UnitDefNames["nsaclash"].id] = true,
+	[UnitDefNames["armbanth"].id] = true,
 }
 
 local unitIsCheap = {
 	[UnitDefNames["corrl"].id] = true,
 	[UnitDefNames["corllt"].id] = true,
+}
+
+local unitIsHeavy = {
+	[UnitDefNames["shieldfelon"].id] = true,
+	[UnitDefNames["correap"].id] = true,
+	[UnitDefNames["armmanni"].id] = true,
+	[UnitDefNames["armsnipe"].id] = true,
+	[UnitDefNames["corgol"].id] = true,
+	[UnitDefNames["tawf114"].id] = true,
+	[UnitDefNames["amphassault"].id] = true,
+	[UnitDefNames["armcrabe"].id] = true,
+	[UnitDefNames["corcrw"].id] = true,
+	[UnitDefNames["corsumo"].id] = true,
+	[UnitDefNames["dante"].id] = true,
+	[UnitDefNames["scorpion"].id] = true,
+	[UnitDefNames["funnelweb"].id] = true,
+	[UnitDefNames["armraven"].id] = true,
+	[UnitDefNames["armbanth"].id] = true,
+	[UnitDefNames["armorco"].id] = true,
 }
 
 -- Hardcode things which should not fire at things too fast to hit
@@ -141,6 +147,9 @@ local unitIsBadAgainstFastStuff = {
 	[UnitDefNames["shiparty"].id] = true,
 	[UnitDefNames["cormart"].id] = true,
 	[UnitDefNames["trem"].id] = true,
+	[UnitDefNames["corshad"].id] = true,
+	[UnitDefNames["armcybr"].id] = true,
+	[UnitDefNames["armbanth"].id] = true,
 }
 
 local captureWeaponDefs = {
@@ -154,19 +163,24 @@ local gravityWeaponDefs = {
 	[WeaponDefNames["corsumo_gravity_pos"].id] = true,
 }
 
-local radarWobblePenalty = {
-	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 8,
-	[WeaponDefNames["armsnipe_shockrifle"].id] = 6,
-	[WeaponDefNames["armanni_ata"].id] = 6,
-	[WeaponDefNames["armmanni_ata"].id] = 4,
-}
-
+-- for heatrays
 local proximityWeaponDefs = {}
 for wdid = 1, #WeaponDefs do
 	if WeaponDefs[wdid].customParams.dyndamageexp then
 		proximityWeaponDefs[wdid] = true
 	end
 end
+
+local radarWobblePenalty = {
+	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
+	[WeaponDefNames["reef_armmship_rocket"].id] = 5,
+	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
+	[WeaponDefNames["armanni_ata"].id] = 5,
+	[WeaponDefNames["armmanni_ata"].id] = 5,
+	[WeaponDefNames["armham_hammer_weapon"].id] = 5,
+}
+
+
 
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -176,13 +190,6 @@ for i=1, #UnitDefs do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
 			weaponBadCats[realWD].fastStuff = true
-		end
-	elseif unitIsRaider[i] then
-		local weapons = ud.weapons
-		for j = 1, #weapons do
-			local wd = weapons[j]
-			local realWD = wd.weaponDef
-			weaponBadCats[realWD].raider = true -- technically used as a "good" category here.
 		end
 	elseif unitIsBadAgainstGround[i] then
 		local weapons = ud.weapons
@@ -197,11 +204,12 @@ for i=1, #UnitDefs do
 			local wd = weapons[j]
 			local realWD = wd.weaponDef
 			weaponBadCats[realWD].cheap = true
+			weaponBadCats[realWD].heavy = true
 		end
 	end
 end
 
--- Check to output expected priority values.
+-- Uncomment to output expected base priority values.
 --[[
 local baseUnitPriority = {}
 for i=1, #UnitDefs do
@@ -243,7 +251,8 @@ for uid = 1, #UnitDefs do
 			or (weaponBadCats[wid].ground and unitIsGround[uid])
 			or (weaponBadCats[wid].cheap and unitIsCheap[uid])then
 				targetTable[uid][wid] = unitHealthRatio[uid] + 15
-		elseif unitIsBomber[uid] and weaponIsAA[wid] then
+		elseif (unitIsBomber[uid] and weaponIsAA[wid])
+			or (weaponBadCats[wid].heavy and unitIsHeavy[uid]) then
 			targetTable[uid][wid] = unitHealthRatio[uid]*0.3
 		else
 			targetTable[uid][wid] = unitHealthRatio[uid]
@@ -254,10 +263,10 @@ for uid = 1, #UnitDefs do
 			local wd = WeaponDefs[wid]
 			local weaponType = wd.type
 			if weaponType == "BeamLaser" or weaponType == "LaserCannon" or weaponType == "LightningCannon" then
-				radarWobblePenalty[wid] = 2
+				radarWobblePenalty[wid] = 5
 			end
 		end
 	end
 end
 
-return targetTable, radarWobblePenalty, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, transportMult
+return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult
