@@ -72,7 +72,7 @@ local function LoadParams(param)
 end
 
 options_path = 'Settings/Graphics/Lighting'
-options_order = {'light_projectile_enable', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options_order = {'light_projectile_enable', 'useLOD', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
 	light_projectile_enable = {
 		name = "Enable Projectile Lights",
@@ -82,6 +82,12 @@ options = {
 			lightsEnabled = self.value
 		end,
 		noHotkey = true,
+	},
+	useLOD = {
+		name = 'Use LOD',
+		type = 'bool',
+		desc = 'Reduces the number of lights drawn based on camera distance and current fps.',
+		value = true,
 	},
 	light_override = {
 		name = "Override Parameters",
@@ -326,7 +332,7 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 				if wantLoadParams and lightParams then
 					LoadParams(lightParams)
 				end
-				if lightParams and ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight) then
+				if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight)) then
 					if lightParams.beam then --BEAM type
 						local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
 						if lightParams.beamOffset then
