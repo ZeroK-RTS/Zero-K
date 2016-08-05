@@ -102,9 +102,6 @@ unitDef = {
 		light_camera_height = 1200,
 		light_color = [[0.8 0.76 0.38]],
 		light_radius = 120,
-
-		script_reload = 0.1,
-		statsprojectiles = 1,
       },
 
       damage                  = {
