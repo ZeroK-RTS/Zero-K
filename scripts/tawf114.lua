@@ -14,7 +14,6 @@ local SIG_Aim = 2
 local SIG_Move = 4
 local SIG_ROCK_X = 8
 local SIG_ROCK_Z = 16
-local SIG_Stun = 32
 
 local ROCK_FIRE_FORCE = 0.06
 local ROCK_SPEED = 18		--Number of half-cycles per second around x-axis.
@@ -39,6 +38,7 @@ for i = 2, 7 do
 end
 
 local disarmed = false
+local stuns = {false, false, false}
 local isMoving = false
 local isAiming = false
 local currentMissile = 1
@@ -73,10 +73,9 @@ function TracksControl()
 end
 
 local function RestoreAfterDelay()
-	Signal (SIG_Restore)
-	SetSignalMask (SIG_Restore)
+	SetSignalMask (SIG_Aim)
 
-	Sleep (8000)
+	Sleep (5000)
 
 	Turn (turret, y_axis, 0, math.rad (50))
 	Turn (sleeve, x_axis, 0, math.rad (50))
@@ -86,24 +85,30 @@ local function RestoreAfterDelay()
 	isAiming = false
 end
 
-function StunnedThread()
+function StunThread()
 	disarmed = true
-	Signal (SIG_Restore)
-	Signal (SIG_Stun)
-	SetSignalMask (SIG_Stun)
+	Signal (SIG_Aim)
 	StopTurn(turret, y_axis)
 	StopTurn(sleeve, x_axis)
-	while IsDisarmed() do
-		Sleep (100)
-	end
+end
+
+function UnstunThread()
 	disarmed = false
 	if isAiming then
 		StartThread(RestoreAfterDelay)
 	end
 end
 
-function Stunned(isFull)
-	StartThread (StunnedThread) -- for Sleep()
+function Stunned (stun_type)
+	-- since only the turret is animated, treat all types the same since they all disable weaponry
+	stuns[stun_type] = true
+	StartThread (StunThread)
+end
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread (UnstunThread)
+	end
 end
 
 function script.StartMoving()
@@ -130,16 +135,16 @@ function script.AimWeapon(num, heading, pitch)
 	isAiming = true
 
 	while disarmed do
-		Sleep (100)
+		Sleep (34)
 	end
 
 	local slowMult = (1 - (Spring.GetUnitRulesParam (unitID, "slowState") or 0))
 	Turn (turret, y_axis, heading, math.rad(200)*slowMult)
 	Turn (sleeve, x_axis, -pitch, math.rad(200)*slowMult)
 
-	StartThread (RestoreAfterDelay)
 	WaitForTurn (turret, y_axis)
 	WaitForTurn (sleeve, x_axis)
+	StartThread (RestoreAfterDelay)
 
 	gunHeading = heading
 

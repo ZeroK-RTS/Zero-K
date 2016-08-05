@@ -11,21 +11,51 @@ include "pieceControl.lua"
 -- Signal definitions
 local SIG_AIM = 2
 
+local function RestoreAfterDelay()
+	Sleep(5000)
+	Turn(barrel, x_axis, 0, math.rad(10)) 
+	Turn(turret, y_axis, 0, math.rad(10)) 
+end
+
+local stuns = {false, false, false}
+local disarmed = false
+
 function script.Create()
 	StartThread(SmokeUnit, {base})
 end
 
-function Stunned ()
+local function StunThread ()
+	Signal (SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	disarmed = true
+
 	StopTurn (turret, y_axis)
 	StopTurn (barrel, x_axis)
+end
+
+local function UnstunThread ()
+	disarmed = false
+	SetSignalMask(SIG_AIM)
+	RestoreAfterDelay()
+end
+
+function Stunned (stun_type)
+	stuns[stun_type] = true
+	StartThread (StunThread)
+end
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread (UnstunThread)
+	end
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 
-	while Spring.GetUnitRulesParam(unitID,"disarmed") == 1 do
-		Sleep(100)
+	while disarmed do
+		Sleep(34)
 	end
 
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
@@ -33,6 +63,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn(barrel, x_axis, -pitch, math.rad(200)*slowMult)
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(barrel, x_axis)
+	StartThread (RestoreAfterDelay)
 	return true
 end
 

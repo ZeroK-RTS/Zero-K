@@ -6,34 +6,41 @@ local base, turret, sleeve, barrel, flare, muzzle, ejector = piece('base', 'turr
 local explodables = {barrel, flare, sleeve, turret}
 local smokePiece = { base, turret }
 
+local stuns = {false, false, false}
 local disarmed = false
 
 local SigAim = 1
 
 local function RestoreAfterDelay()
-	Sleep (10000)
+	Sleep (5000)
 	Turn (turret, y_axis, 0, math.rad(10))
 	Turn (sleeve, x_axis, 0, math.rad(10))
 end
 
 local function StunThread ()
-	disarmed = true
 	Signal (SigAim)
 	SetSignalMask(SigAim)
+	disarmed = true
 
 	StopTurn (turret, y_axis)
 	StopTurn (sleeve, x_axis)
+end
 
-	while (IsDisarmed()) do
-		Sleep (200)
-	end
-
+local function UnstunThread ()
 	disarmed = false
+	SetSignalMask(SigAim)
 	RestoreAfterDelay()
 end
 
-function Stunned ()
+function Stunned (stun_type)
+	stuns[stun_type] = true
 	StartThread (StunThread)
+end
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread (UnstunThread)
+	end
 end
 
 function script.Create()
@@ -50,7 +57,7 @@ function script.AimWeapon (num, heading, pitch)
 	SetSignalMask (SigAim)
 
 	while disarmed do
-		Sleep (100)
+		Sleep (34)
 	end
 
 	StartThread (RestoreAfterDelay)
