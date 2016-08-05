@@ -348,19 +348,17 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(leg4, sfxNone)
 		return 1
 	elseif (severity <= .99) then
-		Explode(base, sfxShatter)
-		Explode(leg1, sfxShatter)
-		Explode(leg2, sfxShatter)
-		Explode(leg3, sfxShatter)
-		Explode(leg4, sfxShatter)
+		Explode(leg1, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg2, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg3, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg4, sfxFall + sfxSmoke + sfxFire)
 		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		return 2
 	else
-		Explode(base, sfxShatter)
-		Explode(leg1, sfxShatter)
-		Explode(leg2, sfxShatter)
-		Explode(leg3, sfxShatter)
-		Explode(leg4, sfxShatter)
+		Explode(leg1, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg2, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg3, sfxFall + sfxSmoke + sfxFire)
+		Explode(leg4, sfxFall + sfxSmoke + sfxFire)
 		Explode(turret, sfxFall + sfxSmoke + sfxFire + sfxExplode)
 		Explode(canon, sfxFall + sfxSmoke + sfxFire)
 		return 2

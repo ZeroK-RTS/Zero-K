@@ -49,7 +49,6 @@ function script.HitByWeapon (x, z, weaponDefID, damage)
 end
 
 function script.Killed(recentDamage, maxHealth)
-	Explode(base, SFX.SHATTER)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
 		return 1 -- corpsetype

@@ -147,16 +147,12 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if (severity <= .25) then
-		Explode(base, sfxNone)
-		Explode(fan, sfxNone)
 		return 1 -- corpsetype
 	elseif (severity <= .5) then
-		Explode(base, sfxNone)
-		Explode(fan, sfxShatter)	
+		Explode(fan, sfxFall)	
 		return 1 -- corpsetype
 	else
-		Explode(base, sfxShatter)
-		Explode(fan, sfxExplode)	
+		Explode(fan, sfxFall)	
 		return 2 -- corpsetype
 	end
 end
