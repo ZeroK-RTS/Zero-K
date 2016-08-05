@@ -176,7 +176,6 @@ return {
 		{	"epic_chili_integral_menu_tab_economy",	"x",},
 		{	"epic_chili_integral_menu_tab_defence",	"c",},
 		{	"epic_chili_integral_menu_tab_special",	"v",},
-		{	"epic_chili_gesture_menu_markingmenu",	"b",},
 		{	"exitwindow",	"s+escape",},
 		{	"crudesubmenu",	"f10"},
 		{	"epic_chili_pro_console_enableconsole", "f8"}, 
