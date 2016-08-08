@@ -102,12 +102,25 @@ local materials = {
 
 local featureMaterials = {}
 local featureNameStubs = {
-	-- all of the 0ad, beherith and artturi features start with these.
-	{str = "ad0_", prefix = true}, 
-	{str = "btree", prefix = true}, 
-	{str = "art", prefix = true}, 
-	-- Other trees will probably contain "tree" as a substring.
+	-- Support all features ever made for spring
 	{str = "tree", prefix = false}, 
+	{str = "bush", prefix = false},
+	{str = "vegetation", prefix = false},
+	{str = "baobob", prefix = false},
+	{str = "aleppo", prefix = false},
+	{str = "pine", prefix = false},
+	{str = "senegal", prefix = false},
+	{str = "palm", prefix = false},
+	{str = "shrub", prefix = false},
+	{str = "bloodthorn", prefix = false},
+	{str = "birch", prefix = false},
+	{str = "maple", prefix = false},
+	{str = "oak", prefix = false},
+	{str = "fern", prefix = false},
+	{str = "grass", prefix = false},
+	{str = "weed", prefix = false},
+	{str = "plant", prefix = false},
+	{str = "palmetto", prefix = false},
 } 
 local tex1_to_normaltex = {}
 -- All feature defs that contain the string "aleppo" will be affected by it
