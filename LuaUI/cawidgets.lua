@@ -15,6 +15,7 @@
 --------------------------------------------------------------------------------
 
 -- stable release?
+local ignorelist = {} -- Ignore workaround for WG table.
 local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
@@ -610,6 +611,8 @@ function widgetHandler:NewWidget()
       self.mouseOwner = nil
     end
   end
+  wh.Ignore = function (_,name) ignorelist[name] = true end
+  wh.Unignore = function (_,name) ignorelist[name] = nil end
 
   wh.isStable = function (_) return self:isStable() end
 
@@ -1182,6 +1185,7 @@ function widgetHandler:Shutdown()
 	w:Shutdown()
   end
   Spring.Echo("End widgetHandler:Shutdown")
+  
   return
 end
 
@@ -1236,7 +1240,6 @@ function widgetHandler:ConfigureLayout(command)
   end
   return false
 end
-
 
 function widgetHandler:CommandNotify(id, params, options)
   for _,w in ipairs(self.CommandNotifyList) do
@@ -1345,8 +1348,13 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
+        -- IGNORE FEATURE--
+        if ignorelist[select(1,Spring.GetPlayerInfo(playerID_msg))] then
+            return
+        end
 	end
 	
+    
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
@@ -1370,6 +1378,16 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 		end
 	end
+    --Ignore's lobby blocker--
+    if newMsg.msgtype == 'autohost' and newMsg.argument and string.sub(newMsg.argument, 1, 1) == "<" then
+	  local endChar = string.find(newMsg.argument, ">")
+	  if endChar then
+		local name = string.sub(newMsg.argument, 2, endChar-1)
+        if ignorelist[name] then
+          return -- block chat
+        end
+      end
+    end
   
 	--send message to widget:AddConsoleLine
 	for _,w in ipairs(self.AddConsoleLineList) do
@@ -1899,7 +1917,7 @@ end
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
   local customkeys = select(10, Spring.GetPlayerInfo(playerID))
-  if customkeys and customkeys.muted then
+  if ignorelist[select(1,Spring.GetPlayerInfo(playerID))] or (customkeys and customkeys.muted) then
     return true
   end
   
