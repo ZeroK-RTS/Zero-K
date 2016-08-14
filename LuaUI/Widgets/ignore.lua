@@ -36,7 +36,7 @@ else
 end
 
 if VFS.FileExists("ZeroKLobbyConfig.xml") then -- load ignore list from ZKL config
-  Spring.Echo("Ignore: Found ZKL Config")
+  Spring.Echo("Ignorelist: Found ZKL Config. Loading ZKL ignore list.")
   local file = VFS.LoadFile("ZeroKLobbyConfig.xml")
   local beginof = string.find(file,"<IgnoredUsers>") + 15
   local endof = string.find(file,"</IgnoredUsers>") -1
@@ -44,19 +44,17 @@ if VFS.FileExists("ZeroKLobbyConfig.xml") then -- load ignore list from ZKL conf
   ignorelist = string.gsub(ignorelist,"\n","~")
   ignorelist = string.gsub(ignorelist,"%s","")
   ignorelist = string.gsub(ignorelist,"~"," ")
-  Spring.Echo("Ignore: " .. ignorelist)
+  --Spring.Echo("Ignore: " .. ignorelist)
   local names = ProcessIgnoreList(ignorelist)
   for i=1,#names do
     names[i] = string.gsub(names[i],"string>","")
     names[i] = string.gsub(names[i],"<","")
     names[i] = string.gsub(names[i],"/","")
     names[i] = string.gsub(names[i],"%s","")
-    Spring.Echo("Ignore: found " .. names[i])
+    --Spring.Echo("Ignore: found " .. names[i])
     WG.IgnoreList[names[i]] = true
   end
   file,beginof,endof,ignorelist,names = nil
-else
-  Spring.Echo("No zkl file found!")
 end
 
 function widget:Initialize()
