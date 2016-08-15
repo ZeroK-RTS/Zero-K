@@ -42,8 +42,6 @@ local function Burrow()
 	Turn(r_wing, side, RIGHT_ANGLE, 5)
 	Move(base, up, 8, 8)
 	--Move(base, forward, -4, 5)
-	Spring.SetUnitCloak(unitID, 2)
-	Spring.SetUnitStealth(unitID, true)
 end
 
 local function UnBurrow()
@@ -65,6 +63,11 @@ end
 
 function script.Activate()
 	StartThread(UnBurrow)
+end
+
+function script.Deactivate()
+	Spring.SetUnitCloak(unitID, 2)
+	Spring.SetUnitStealth(unitID, true)
 end
 
 function script.StopMoving()
