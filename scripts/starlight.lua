@@ -124,15 +124,12 @@ function Undock()
     end
 
     Sleep(1000);
-
-
-    
-    on = true
-	StartThread(TargetingLaser)
     CallSatelliteScript('mahlazer_Undock')
-
-    Sleep(1500);
+    
+    Sleep(1200);
+    on = true
     engaged = true;
+    StartThread(TargetingLaser)
     CallSatelliteScript('mahlazer_EngageTheLaserBeam');
     
 	Move(SatelliteMount, z_axis, TARGET_ALT, 30*4)
