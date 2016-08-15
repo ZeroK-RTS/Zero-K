@@ -1,4 +1,4 @@
-satellite = {
+starlight_satellite = {
   unitname               = [[starlight_satellite]],
   name                   = [[Owl]],
   description            = [[A satellite that does not interact with the game in any ways whatsoever.]],
@@ -30,8 +30,8 @@ satellite = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM SUB]],
-  objectName             = [[satellite.dae]],
-  script                 = [[satellite.lua]],
+  objectName             = [[starlight_satellite.dae]],
+  script                 = [[starlight_satellite.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
   
@@ -344,4 +344,4 @@ satellite = {
 
 }
 
-return lowerkeys({ satellite = satellite})
+return lowerkeys({ starlight_satellite = starlight_satellite})

@@ -295,7 +295,7 @@ function script.Activate()
         local dx, _, dz = Spring.GetUnitDirection(unitID)
         local heading = Vector.Angle(dx, dz)
         
-        satUnitID = Spring.CreateUnit('satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
+        satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
         Spring.SetUnitNoSelect(satUnitID,true);
         Spring.SetUnitNoMinimap(satUnitID,true);
         Spring.SetUnitNeutral(satUnitID,true);
