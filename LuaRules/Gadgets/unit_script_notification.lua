@@ -40,6 +40,14 @@ local function ScriptNotifyDisarmed (unitID, state)
 	end
 end
 
+local function ScriptNotifyUnpowered (unitID, state)
+	if state then
+		callScript (unitID, "Stunned", 4)
+	else
+		callScript (unitID, "Unstunned", 4)
+	end
+end
+
 function gadget:UnitReverseBuilt (unitID)
 	callScript (unitID, "Stunned", 3)
 end
@@ -49,4 +57,5 @@ end
 
 function gadget:Initialize ()
 	GG.ScriptNotifyDisarmed = ScriptNotifyDisarmed
+	GG.ScriptNotifyUnpowered = ScriptNotifyUnpowered
 end

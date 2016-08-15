@@ -1095,8 +1095,10 @@ function gadget:GameFrame(n)
 					if pylonData.neededLink then
 						if pylonData.gridID == 0 or pylonData.neededLink > maxGridCapacity[pylonData.gridID] then
 							spSetUnitRulesParam(unitID,"lowpower",1, inlosTrueTable)
+							GG.ScriptNotifyUnpowered(unitID, true)
 						else
 							spSetUnitRulesParam(unitID,"lowpower",0, inlosTrueTable)
+							GG.ScriptNotifyUnpowered(unitID, false)
 						end
 					end
 				elseif not spammedError then
