@@ -160,6 +160,7 @@ end
 
 function endJump()
 	Spring.UnitScript.StopSpin(pelvis, x_axis)
+	Turn(pelvis, x_axis, math.rad(0))
 	Turn(box, x_axis, math.rad(40),math.rad(400))
 	Move(pelvis, y_axis, -8, 80)
 	jumpLegLand(leftLeg)
