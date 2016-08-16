@@ -43,14 +43,13 @@ if VFS.FileExists("ZeroKLobbyConfig.xml") then -- load ignore list from ZKL conf
   local ignorelist = string.sub(file,beginof,endof)
   ignorelist = string.gsub(ignorelist,"\n","~")
   ignorelist = string.gsub(ignorelist,"%s","")
+  ignorelist = string.gsub(ignorelist,"string>","")
+  ignorelist = string.gsub(ignorelist,"<","")
+  ignroelist = string.gsub(ignorelist,"/","")
   ignorelist = string.gsub(ignorelist,"~"," ")
   --Spring.Echo("Ignore: " .. ignorelist)
   local names = ProcessIgnoreList(ignorelist)
   for i=1,#names do
-    names[i] = string.gsub(names[i],"string>","")
-    names[i] = string.gsub(names[i],"<","")
-    names[i] = string.gsub(names[i],"/","")
-    names[i] = string.gsub(names[i],"%s","")
     --Spring.Echo("Ignore: found " .. names[i])
     WG.IgnoreList[names[i]] = true
   end
