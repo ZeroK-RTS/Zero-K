@@ -1348,10 +1348,10 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
-        -- IGNORE FEATURE--
-        if ignorelist[select(1,Spring.GetPlayerInfo(playerID_msg))] then
-            return
-        end
+		-- IGNORE FEATURE--
+        	if ignorelist[select(1,Spring.GetPlayerInfo(playerID_msg))] then
+			return
+        	end
 	end
 	
     
@@ -1378,16 +1378,16 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 		end
 	end
-    --Ignore's lobby blocker--
-    if newMsg.msgtype == 'autohost' and newMsg.argument and string.sub(newMsg.argument, 1, 1) == "<" then
-	  local endChar = string.find(newMsg.argument, ">")
-	  if endChar then
-		local name = string.sub(newMsg.argument, 2, endChar-1)
-        if ignorelist[name] then
-          return -- block chat
-        end
-      end
-    end
+	--Ignore's lobby blocker--
+	if newMsg.msgtype == 'autohost' and newMsg.argument and string.sub(newMsg.argument, 1, 1) == "<" then
+		local endChar = string.find(newMsg.argument, ">")
+		if endChar then
+			local name = string.sub(newMsg.argument, 2, endChar-1)
+			if ignorelist[name] then
+				return -- block chat
+			end
+		end
+	end
   
 	--send message to widget:AddConsoleLine
 	for _,w in ipairs(self.AddConsoleLineList) do
