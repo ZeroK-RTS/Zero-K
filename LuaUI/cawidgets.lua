@@ -613,7 +613,7 @@ function widgetHandler:NewWidget()
   end
   wh.Ignore = function (_,name) ignorelist[name] = true end
   wh.Unignore = function (_,name) ignorelist[name] = nil end
-  wh.IgnoreList = function (_) return ignorelist end
+  wh.GetIgnoreList = function (_) return ignorelist end
 
   wh.isStable = function (_) return self:isStable() end
 
