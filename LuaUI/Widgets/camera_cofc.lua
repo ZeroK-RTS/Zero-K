@@ -1923,13 +1923,25 @@ function widget:Update(dt)
 	if init or ((cs.name ~= "free") and (cs.name ~= "ov") and not fpsmode) then 
 		-- spSendCommands("viewfree") 
 		cs = DetermineInitCameraState()
+
 		init = false
 		cs.tiltSpeed = 0
 		cs.scrollSpeed = 0
 		--cs.gndOffset = options.mingrounddist.value
 		cs.gndOffset = options.freemode.value and 0 or 1 --this tell engine to block underground motion, ref: Spring\rts\Game\Camera\FreeController.cpp
 		-- spSetCameraState(cs,0)
+		if not initialBoundsSet then cs.py = maxDistY end
+
 		OverrideSetCameraStateInterpolate(cs,0)
+
+		if not initialBoundsSet then 
+			local oldzoomouttocenterValue = options.zoomouttocenter.value
+			options.zoomouttocenter.value = false
+			SetCameraTarget(MWIDTH/2, 10, MHEIGHT/2, 0)
+			options.zoomouttocenter.value = oldzoomouttocenterValue
+			if options.tiltedzoom.value then ResetCam() end
+			initialBoundsSet = true
+		end
 	end
 
 	--//HANDLE TIMER FOR VARIOUS SECTION
@@ -2193,18 +2205,6 @@ function widget:Update(dt)
 			springscroll = false
 			missedMouseRelease = false
 		end
-	end
-
-	if not initialBoundsSet then
-		initialBoundsSet = true
-		if options.tiltedzoom.value then ResetCam() end
-	end
-end
-
-function widget:GamePreload()
-	if not initialBoundsSet then --Tilt zoom initial overhead view (Engine 91)
-		initialBoundsSet = true
-		if options.tiltedzoom.value then ResetCam() end
 	end
 end
 
@@ -2483,13 +2483,6 @@ end
 local screenFrame = 0
 function widget:DrawScreen()
 	SetSkyBufferProportion()
-
-	--Reset Camera for tiltzoom at game start (Engine 92+)
-	if screenFrame == 3 then --detect frame no.2
-		if options.tiltedzoom.value then ResetCam() end
-		initialBoundsSet = true
-	end
-	screenFrame = screenFrame+1
 
   hideCursor = false
 	if not cx then return end
