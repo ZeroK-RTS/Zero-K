@@ -55,6 +55,7 @@ function widget:TextCommand(command)
 		if prcmd[2] then
 			Spring.Echo("game_message: Ignoring " .. prcmd[2])
 			widgetHandler:Ignore(prcmd[2])
+			WG.IgnoreList[prcmd[2]] = true
 		end
 	end
 	if string.lower(prcmd[1]) == "ignorelist" then
