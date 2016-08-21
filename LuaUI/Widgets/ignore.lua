@@ -35,7 +35,6 @@ if VFS.FileExists("ZeroKLobbyConfig.xml") then -- load ignore list from ZKL conf
 	local names = ProcessString(ignorelist)
 	for i=1,#names do
 		IgnoreList[names[i]] = true
-        widgetHandler:Ignore(names[i])
 	end
 end
 
