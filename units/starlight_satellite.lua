@@ -1,7 +1,7 @@
 starlight_satellite = {
   unitname               = [[starlight_satellite]],
   name                   = [[Owl]],
-  description            = [[A satellite that does not interact with the game in any ways whatsoever.]],
+  description            = [[Starlight relay satellite]],
   acceleration           = 0.152,
   brakeRate              = 0.152,
   buildCostEnergy        = 300,

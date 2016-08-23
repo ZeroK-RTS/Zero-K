@@ -1,4 +1,9 @@
 {
+	"starlight_satellite" : {
+		"name" : "Owl",
+		"description" : "Satelita",
+		"helptext" : "Satelita pomocniczy Starlighta."
+	},
 	"gunshipcon" : {
 		"name" : "Wasp",
 		"description" : "Ciężki powietrzny konstruktor, moc 7.5 M/s",

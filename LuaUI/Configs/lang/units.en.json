@@ -1,4 +1,9 @@
 {
+	"starlight_satellite" : {
+		"name" : "Owl",
+		"description" : "Starlight relay satellite",
+		"helptext" : "This is the satellite used by Starlight for targeting."
+	},
 	"gunshipcon" : {
 		"name" : "Wasp",
 		"description" : "Heavy Gunship Constructor, builds at 7.5 M/s",
