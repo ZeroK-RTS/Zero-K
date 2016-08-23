@@ -66,8 +66,8 @@ local DISARM_DECAY_FRAMES = 1200
 
 local messages = {
 	shield = "shield",
-	health = "health",
-	building = "buildingbla",
+	health_bar = "health",
+	building = "building",
 	morph = "morph",
 	stockpile = "stockpile",
 	paralyze = "paralyze",
@@ -738,7 +738,7 @@ do
         hp100 = hp*100; hp100 = hp100 - hp100%1; --//same as floor(hp*100), but 10% faster
         if (hp100<0) then hp100=0 elseif (hp100>100) then hp100=100 end
         if (drawFullHealthBars)or(hp100<100) then
-          AddBar(messages.health,hp,nil,(fullText and hp100..'%') or '',bfcolormap[hp100])
+          AddBar(messages.health_bar,hp,nil,(fullText and hp100..'%') or '',bfcolormap[hp100])
         end
       end
 
@@ -983,7 +983,7 @@ do
       --// HEALTH
       if (hp<featureHpThreshold)and(drawFeatureHealth) then
         local hpcolor = {GetColor(fhpcolormap,hp)}
-        AddBar(messages.health,hp,nil,(fullText and floor(hp*100)..'%') or '',hpcolor)
+        AddBar(messages.health_bar,hp,nil,(fullText and floor(hp*100)..'%') or '',hpcolor)
       end
 
       --// RESURRECT

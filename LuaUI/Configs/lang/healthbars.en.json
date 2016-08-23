@@ -1,6 +1,6 @@
 {
 	"shield" : "shield",
-	"health" : "health",
+	"health_bar" : "health",
 	"building" : "building",
 	"morph" : "morph",
 	"stockpile" : "stockpile",
