@@ -40,7 +40,7 @@ function widget:Update (dt)
 	if t < 1 then return end
 	t = t - 1
 
-	if running then
+	if running and not select(3, Spring.GetGameSpeed()) then
 		serverFrame = serverFrame + 30
 	end
 
