@@ -799,7 +799,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		height = barHeight,
 		value  = 0,
 		fontShadow = false,
-		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximun storage is reached and you start wasting metal.",
+		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximum storage is reached and you start wasting metal.",
 		font   = {
 			size = 20, 
 			color = {.8,.8,.8,.95}, 
@@ -959,7 +959,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		right  = barRight,
 		height = barHeight,
 		fontShadow = false,
-		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximun storage is reached and you start wasting energy.",
+		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximum storage is reached and you start wasting energy.",
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
