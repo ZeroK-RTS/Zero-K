@@ -160,6 +160,54 @@ function ParseBoxes ()
 					nameShort = shortName
 				}
 			end
+		else
+			if Game.mapSizeZ > Game.mapSizeX then
+				startBoxConfig[0] = {
+					boxes = {
+						{0, 0, 0, Game.mapSizeZ * 0.3, Game.mapSizeX, Game.mapSizeZ * 0.3},
+						{0, 0, Game.mapSizeX, Game.mapSizeZ * 0.3, Game.mapSizeX, 0}
+					},
+					startpoints = {
+						{Game.mapSizeX / 2, Game.mapSizeZ * 0.15}
+					},
+					nameLong = "North",
+					nameShort = "N"
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{0, Game.mapSizeZ * 0.7, 0, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ},
+						{0, Game.mapSizeZ * 0.7, Game.mapSizeX, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ * 0.7}
+					},
+					startpoints = {
+						{Game.mapSizeX / 2, Game.mapSizeZ * 0.85}
+					},
+					nameLong = "South",
+					nameShort = "S"
+				}
+			else
+				startBoxConfig[0] = {
+					boxes = {
+						{0, 0, Game.mapSizeX * 0.3, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, 0},
+						{0, 0, 0, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, Game.mapSizeZ - 1}
+					},
+					startpoints = {
+						{Game.mapSizeX * 0.15, Game.mapSizeZ / 2}
+					},
+					nameLong = "West",
+					nameShort = "W"
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{Game.mapSizeX * 0.7, 0, Game.mapSizeX, Game.mapSizeZ - 1, Game.mapSizeX, 0},
+						{Game.mapSizeX * 0.7, 0, Game.mapSizeX * 0.7, Game.mapSizeZ - 1, Game.mapSizeX, Game.mapSizeZ - 1}
+					},
+					startpoints = {
+						{Game.mapSizeX * 0.85, Game.mapSizeZ / 2}
+					},
+					nameLong = "East",
+					nameShort = "E"
+				}
+			end
 		end
 	end
 
@@ -196,6 +244,50 @@ function GetRawBoxes ()
 							{box[3], box[2]},
 						},
 					}
+				}
+			end
+		else
+			if Game.mapSizeZ > Game.mapSizeX then
+				startBoxConfig[0] = {
+					boxes = {
+						{
+							{0, 0},
+							{0, Game.mapSizeZ * 0.3},
+							{Game.mapSizeX, Game.mapSizeZ * 0.3},
+							{Game.mapSizeX, 0}
+						},
+					},
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{
+							{0, Game.mapSizeZ * 0.7},
+							{0, Game.mapSizeZ},
+							{Game.mapSizeX, Game.mapSizeZ},
+							{Game.mapSizeX, Game.mapSizeZ * 0.7}
+						},
+					},
+				}
+			else
+				startBoxConfig[0] = {
+					boxes = {
+						{
+							{0, 0},
+							{0, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.3, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.3, 0},
+						},
+					},
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{
+							{Game.mapSizeX * 0.7, 0},
+							{Game.mapSizeX * 0.7, Game.mapSizeZ - 1},
+							{Game.mapSizeX, Game.mapSizeZ - 1},
+							{Game.mapSizeX, 0},
+						},
+					},
 				}
 			end
 		end
