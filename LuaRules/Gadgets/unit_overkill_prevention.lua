@@ -80,11 +80,11 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corstorm"].id] = true,
 	[UnitDefNames["corthud"].id] = true,
 	[UnitDefNames["spiderassault"].id] = true,
+	[UnitDefNames["armrock"].id] = true,
 	-- Needs LUS
 	--[UnitDefNames["correap"].id] = true,
 	--[UnitDefNames["corraid"].id] = true,
 	--[UnitDefNames["corgol"].id] = true,
-	--[UnitDefNames["armrock"].id] = true,
 	--[UnitDefNames["armham"].id] = true,
 }
 

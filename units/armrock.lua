@@ -55,6 +55,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],
+  script                 = "armrock.lua",
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -103,7 +104,6 @@ unitDef = {
 
       damage                  = {
         default = 180,
-        planes  = 180,
         subs    = 9,
       },
 
@@ -138,7 +138,7 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Rocko]],
       blocking         = true,
-      damage           = 350,
+      damage           = 390,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -152,7 +152,7 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Rocko]],
       blocking         = false,
-      damage           = 350,
+      damage           = 390,
       energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
