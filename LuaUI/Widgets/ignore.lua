@@ -23,18 +23,21 @@ end
 if VFS.FileExists("ZeroKLobbyConfig.xml") then -- load ignore list from ZKL config. Temporary until server side ignore is exposed to lua.
 	Spring.Echo("Ignorelist: Found ZKL Config. Loading ZKL ignore list.")
 	local file = VFS.LoadFile("ZeroKLobbyConfig.xml")
-	local beginof = string.find(file,"<IgnoredUsers>") + 15
-	local endof = string.find(file,"</IgnoredUsers>") -1
-	local ignorelist = string.sub(file,beginof,endof)
-	ignorelist = string.gsub(ignorelist,"\n","~")
-	ignorelist = string.gsub(ignorelist,"%s","")
-	ignorelist = string.gsub(ignorelist,"string>","")
-	ignorelist = string.gsub(ignorelist,"<","")
-	ignorelist = string.gsub(ignorelist,"/","")
-	ignorelist = string.gsub(ignorelist,"~"," ")
-	local names = ProcessString(ignorelist)
-	for i=1,#names do
-		IgnoreList[names[i]] = true
+	local beginof = string.find(file,"<IgnoredUsers>")
+	if beginof ~= nil then
+		beginof = beginof + 15
+		local endof = string.find(file,"</IgnoredUsers>") -1
+		local ignorelist = string.sub(file,beginof,endof)
+		ignorelist = string.gsub(ignorelist,"\n","~")
+		ignorelist = string.gsub(ignorelist,"%s","")
+		ignorelist = string.gsub(ignorelist,"string>","")
+		ignorelist = string.gsub(ignorelist,"<","")
+		ignorelist = string.gsub(ignorelist,"/","")
+		ignorelist = string.gsub(ignorelist,"~"," ")
+		local names = ProcessString(ignorelist)
+		for i=1,#names do
+			IgnoreList[names[i]] = true
+		end
 	end
 end
 
