@@ -103,26 +103,27 @@ local materials = {
 local featureMaterials = {}
 local featureNameStubs = {
 	-- all of the 0ad, beherith and artturi features start with these.
-	{str = "ad0_", prefix = true}, 
-	{str = "btree", prefix = true}, 
-	{str = "art", prefix = true}, 
+	{str = "ad0_", prefix = true},
+	{str = "btree", prefix = true},
+	{str = "art", prefix = true},
 	-- Other trees will probably contain "tree" as a substring.
-	{str = "tree", prefix = false}, 
-} 
+	{str = "tree", prefix = false},
+}
 local tex1_to_normaltex = {}
 -- All feature defs that contain the string "aleppo" will be affected by it
 for id, featureDef in pairs(FeatureDefs) do
-	Spring.PreloadFeatureDefModel(id)
 	for _,stubData in ipairs (featureNameStubs) do
-		if featureDef.model.textures and featureDef.model.textures.tex1 and featureDef.name:find(stubData.str) and 
+		if featureDef.name:find(stubData.str) and
 			((not stubData.prefix) or featureDef.name:find(stubData.str) == 1) then
 			--if featureDef.customParam.normaltex then
+			if featureDef.model.textures and featureDef.model.textures.tex1 then
 				Spring.Echo('Feature',featureDef.name,'seems like a nice tree, assigning the default normal texture to it.')
 				if featureDef.name:find('btree') == 1 then --beherith's old trees suffer if they get shitty normals
 					featureMaterials[id] = {"feature_tree", NORMALTEX = "unittextures/blank_normal.tga"}
 				else
 					featureMaterials[id] = {"feature_tree", NORMALTEX = "unittextures/default_tree_normal.tga"}
 				end
+			end
 
 			--TODO: dont forget the feature normals!
 			--TODO: actually generate normals for all these old-ass features, and include them in BAR
