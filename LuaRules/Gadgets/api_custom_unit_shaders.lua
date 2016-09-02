@@ -612,6 +612,9 @@ function gadget:Initialize()
 
   --// load the materials config files
   local MATERIALS_DIR = "ModelMaterials/"
+  if not Spring.Utilities.IsCurrentVersionNewerThan(103, 0) then
+    MATERIALS_DIR = "ModelMaterials_103/"
+  end
   local unitMaterialDefs, featureMaterialDefs = _LoadMaterialConfigFiles(MATERIALS_DIR)
   --// process the materials (compile shaders, load textures, ...)
   _ProcessMaterials(unitRendering,    unitMaterialDefs)
