@@ -259,7 +259,13 @@ local function SetupControls()
 		height=B_HEIGHT;
 		caption="Exit",
 		OnClick = {
-			function() Spring.SendCommands("quit","quitforce") end
+			function() 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					Spring.SendCommands("quit","quitforce")
+				end
+			 end
 		};
 		parent = window_endgame;
 	}

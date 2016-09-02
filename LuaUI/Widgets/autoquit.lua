@@ -52,7 +52,11 @@ function widget:Update(dt)
       -- widgetHandler:RemoveWidget()
     elseif DiffTimers(GetTimer(), endTime) > delay then
       Echo("<autoquit> Autoquit sending quit command.")
-      SendCommands("quitforce")
+	  if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+		Spring.Reload("")
+	  else
+		SendCommands("quitforce")
+	  end
     end
   end
 end

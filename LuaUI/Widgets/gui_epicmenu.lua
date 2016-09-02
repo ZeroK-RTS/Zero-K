@@ -2378,8 +2378,8 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Exit to Desktop...',
-		desc = "Exit game completely",
+		name='Quit',
+		desc = "Leave the game.",
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
@@ -2387,7 +2387,11 @@ local function MakeQuitButtons()
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
-				spSendCommands{"quit","quitforce"} 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					spSendCommands{"quit","quitforce"} 
+				end
 			end)
 		end,
 		key='Exit to Desktop',
