@@ -391,7 +391,9 @@ function widgetHandler:Initialize()
   -- Add ignorelist --
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
   if customkeys["ignored"] then
-    ignorelist = customkeys["ignored"]
+    for ignoree in string.match(customkeys["ignored"],",") do
+      ignorelist[ignoree] = true
+    end
   end
   self:LoadOrderList()
   self:LoadConfigData()
