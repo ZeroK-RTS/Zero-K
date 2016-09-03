@@ -2378,7 +2378,7 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Quit',
+		name='Quit...',
 		desc = "Leave the game.",
 		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
