@@ -385,8 +385,6 @@ local function MakeButton(container, cmd, insertItem, index)
 			fakeButtons[cmd.row] = fakeButtons[cmd.row] or {}
 			fakeButtons[cmd.row][cmd.col] = Button:New{
 				parent=container;
-				padding = {1,1,1,1},
-				margin = {0, 0, 0, 0},
 				caption="";
 				isDisabled = true;
 				backgroundColor = {0,0,0,0},
@@ -494,8 +492,6 @@ local function MakeButton(container, cmd, insertItem, index)
 		
 		local button = Button:New {
 			parent=container;
-			padding = {5, 5, 5, 5},
-			margin = {0, 0, 0, 0},
 			caption="";
 			isDisabled = cmd.disabled;
 			tooltip = tooltip;
@@ -504,16 +500,19 @@ local function MakeButton(container, cmd, insertItem, index)
 			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse) end}
 		}
 		if (isState) then 
-			button.padding = {4,4,2.5,2}
+			button.padding = {2,3,2,2}
 --			button.backgroundColor = {0,0,0,0}
-		end 
-		if (isBuild) then
+		elseif (isBuild) then
+			button.padding = {1,1,1,1}
+		else
 			button.padding = {1,1,1,1}
 		end
 		
 		local label 
 		if (not cmd.onlyTexture and text and text ~= '') or gridHotkeyed or menuChoice == 6 then 
 			label = Label:New {
+				x = 3,
+				y = 3,
 				width="100%";
 				height="100%";
 				autosize=false;
@@ -530,7 +529,7 @@ local function MakeButton(container, cmd, insertItem, index)
 			local costLabel = Label:New {
 				parent = button,
 				right = 0;
-				y = 0;
+				y = 2;
 				x = 3;
 				bottom = 3;
 				autosize=true; -- this (autosize=true) allow text to be truncated/cut off if button size is too small (prevent a wall-of-text on build icon if button is too small)
@@ -544,12 +543,12 @@ local function MakeButton(container, cmd, insertItem, index)
 		
 		local image
 		if (texture and texture ~= "") then
-			image= Image:New {
-				width="90%";
-				height= (not isBuild) and nil or "90%";
-				bottom = (isBuild) and 10 or nil;
-				y="5%";
-				x="5%";
+			image = Image:New {
+				x = "5%",
+				y = "5%",
+				right = "5%",
+				height= (not isBuild) and nil or "90%",
+				bottom = (isBuild) and 11 or nil,
 --				color = color;
 				keepAspect = not isBuild,	--true,	--isState;
 				file = texture;
@@ -978,10 +977,10 @@ local function ManageCommandIcons(useRowSort)
 			end
 		end	
 	end
-	for i=1, numRows do
+	for i = 1, numRows do
 		SetContainerNeedUpdate(sp_commands[i], commandRows[i])
 	end
-	for i=1, numRows do
+	for i = 1, numRows do
 		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
 	end
 	
@@ -1444,13 +1443,13 @@ function widget:Initialize()
 		parent = window,
 		resizeItems = true;
 		columns = 6;
-		orientation   = "horizontal";
+		orientation = "horizontal";
 		height = "15%";
-		width = "99%";
-		x = '1%';
-		y = 0;
+		x = 0,
+		y = 0,
+		right = 0,
 		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
+		itemMargin  = {1, 1, 1, -1},
 		OnMouseDown={ function(self) 
 			local _,_, meta,_ = Spring.GetModKeyState()
 			if not meta then return false end --allow button to continue its function
@@ -1472,7 +1471,7 @@ function widget:Initialize()
 		width = COMMAND_SECTION_WIDTH.."%";
 		x = "0%";
 		y = "0%";
-		padding = {4, 4, 0, 4},
+		padding = {2, 2, 0, 2},
 		itemMargin  = {0, 0, 0, 0},
 		noSelfHitTest = true,
 		NCHitTest = function(self,x,y)
@@ -1489,7 +1488,7 @@ function widget:Initialize()
 			return false
 		end,	
 	}
-	for i=1,numRows do
+	for i = 1, numRows do
 		sp_commands[i] = StackPanel:New{
 			name = "sp_commands " .. i,
 			parent = commands_main,
@@ -1500,7 +1499,7 @@ function widget:Initialize()
 			x = "0%";
 			y = math.floor(100/numRows)*(i-1).."%";
 			padding = {0, 0, 0, 0},
-			itemMargin  = {0, 0, 0, 0},
+			itemMargin  = {1, 1, 0, 0},
 			index = i,
 			i_am_sp_commands = true,
 		}
@@ -1515,7 +1514,7 @@ function widget:Initialize()
 		--x = tostring(100-STATE_SECTION_WIDTH).."%";
 		right = 0;
 		y = "0%";
-		padding = {0, 4, 4, 4},
+		padding = {0, 2, 2, 2},
 		itemMargin  = {0, 0, 0, 0},
 		OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu,
 			local _,_, meta,_ = Spring.GetModKeyState()
@@ -1525,7 +1524,7 @@ function widget:Initialize()
 			return true --stop the button's function, else unit-state button will look bugged. 
 		end },			
 	}
-	for i=1, numStateColumns do
+	for i = 1, numStateColumns do
 		sp_states[i] = StackPanel:New {
 			name = "sp_states " .. i,
 			parent = states_main,
@@ -1533,10 +1532,10 @@ function widget:Initialize()
 			orientation   = "vertical";
 			height = "100%";
 			width = math.floor(100/numStateColumns).."%";
-			x = (100 - (math.floor(100/numStateColumns))*i).."%";
+			x = (100 - (math.ceil(100/numStateColumns))*i).."%";
 			y = "0%";
 			padding = {0, 0, 0, 0},
-			itemMargin  = {0, 0, 0, 0},		
+			itemMargin  = {1, 1, 0, 0},		
 		}
 	end
 	
