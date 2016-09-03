@@ -117,7 +117,7 @@ end
 
 --//=============================================================================
 
-local curScissor = {1,1,1e9,1e9}
+local curScissor = {0,0,1e9,1e9}
 local stack = {curScissor}
 local stackN = 1
 
