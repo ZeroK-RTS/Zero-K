@@ -10,8 +10,6 @@ function widget:GetInfo()
 	}
 end
 
-local IgnoreList = {}
-
 local function ProcessString(str)
 	local strtbl = {}
 	for w in string.gmatch(str, "%S+") do
@@ -26,43 +24,38 @@ function widget:TextCommand(command)
 		if prcmd[2] then
 			Spring.Echo("game_message: Ignoring " .. prcmd[2])
 			widgetHandler:Ignore(prcmd[2])
-			IgnoreList[prcmd[2]] = true
 		end
 	end
 	if string.lower(prcmd[1]) == "ignorelist" then
-		ignorestring = "game_message: You are ignoring the following users:"
+		local IgnoreList = widgetHandler:GetIgnoreList()
+		ignorestring = "game_message: You are ignoring " .. #IgnoreList .. " users"
 		for name,_ in pairs(IgnoreList) do
-			ignorestring = ignorestring .. "\n-" .. name
+			ignorestring = ignorestring .. "\n- " .. name
 		end
 		Spring.Echo(ignorestring)
 	end
 	if string.lower(prcmd[1]) == "unignore" then
-		if prcmd[2] and IgnoreList[prcmd[2]] then
-			Spring.Echo("game_message: Unignoring " .. prcmd[2])
-			widgetHandler:Unignore(prcmd[2])
-			IgnoreList[prcmd[2]] = nil
+		if not prcmd[2] then
+			return
+		end
+		local IgnoreList = widgetHandler:GetIgnoreList()
+		if not IgnoreList[prcmd[2]] then
+			Spring.Echo("game_message: You were not ignoring " .. prcmd[2])
+			return
+		end
+		Spring.Echo("game_message: Unignoring " .. prcmd[2])
+		widgetHandler:Unignore(prcmd[2])
 		end
 	end
 end
 
 function widget:GetConfigData()
-	return IgnoreList
+	return widgetHandler:GetIgnoreList()
 end
 
 function widget:SetConfigData(data)
 	data = data or {}
 	for ignoree,_ in pairs(data) do
-		IgnoreList[ignoree] = true
-	end
-end
-
-function widget:Initialize()
-	local alreadyignored = {}
-	alreadyignored = widgetHandler:GetIgnoreList()
-	for ignoree,_ in pairs(IgnoreList) do
 		widgetHandler:Ignore(ignoree)
-	end
-	for ignoree,_ in pairs(alreadyignored) do -- no point in telling WH to ignore already ignored users.
-		IgnoreList[ignoree] = true
 	end
 end
