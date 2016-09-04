@@ -391,8 +391,12 @@ function widgetHandler:Initialize()
   -- Add ignorelist --
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
   if customkeys["ignored"] then
-    for ignoree in string.match(customkeys["ignored"],",") do
-      ignorelist[ignoree] = true
+    if string.find(customkeys["ignored"],",") then
+      for ignoree in string.gmatch(customkeys["ignored"],",") do
+        ignorelist[ignoree] = true
+      end
+    elseif string.len(customkeys["ignored"]) > 1 then
+      ignorelist[customkeys["ignored"]] = true
     end
   end
   self:LoadOrderList()
@@ -618,8 +622,8 @@ function widgetHandler:NewWidget()
       self.mouseOwner = nil
     end
   end
-  wh.Ignore = function (_,name) ignorelist[name] = true end
-  wh.Unignore = function (_,name) ignorelist[name] = nil end
+  wh.Ignore = function (_,name) table.insert(ignorelist,name) end
+  wh.Unignore = function (_,name) table.remove(ignorelist,name) end
   wh.GetIgnoreList = function (_) return ignorelist end
 
   wh.isStable = function (_) return self:isStable() end
