@@ -348,7 +348,6 @@ function DoAimFromBetterHeading()
 	myHeading = myHeading + fudge 
 	myPitch   = myPitch   + pitchFudge
 	
-	--Spring.Echo("My        heading pitch",  myHeading*180/math.pi, myPitch*180/math.pi)
 	return myHeading, myPitch
 end
 
@@ -363,15 +362,13 @@ function script.AimWeapon(num, heading, pitch)
 		local newHeading, newPitch = DoAimFromBetterHeading()
 		if newHeading then
 			heading = newHeading
-			pitch = newPitch
     		wantedDirection = heading - math.pi/2
 		end
         
-        CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2);
-		
-		Turn(SatelliteMuzzle, y_axis, 0)
-		Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
-		WaitForTurn(SatelliteMuzzle, x_axis)
+		CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2);
+		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2));
+		WaitForTurn(SatelliteMuzzle, x_axis);
+        
 		return true
 	end
 	return false
