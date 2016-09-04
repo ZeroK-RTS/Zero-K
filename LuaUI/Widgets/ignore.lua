@@ -28,16 +28,13 @@ function widget:TextCommand(command)
 	end
 	if string.lower(prcmd[1]) == "ignorelist" then
 		local IgnoreList = widgetHandler:GetIgnoreList()
-		ignorestring = "game_message: You are ignoring " .. #IgnoreList .. " users"
+		ignorestring = "game_message: You are ignoring " .. #IgnoreList .. " users:"
 		for name,_ in pairs(IgnoreList) do
 			ignorestring = ignorestring .. "\n- " .. name
 		end
 		Spring.Echo(ignorestring)
 	end
 	if string.lower(prcmd[1]) == "unignore" then
-		if not prcmd[2] then
-			return
-		end
 		local IgnoreList = widgetHandler:GetIgnoreList()
 		if not IgnoreList[prcmd[2]] then
 			Spring.Echo("game_message: You were not ignoring " .. prcmd[2])
