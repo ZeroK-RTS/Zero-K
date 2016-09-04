@@ -42,7 +42,6 @@ function widget:TextCommand(command)
 		end
 		Spring.Echo("game_message: Unignoring " .. prcmd[2])
 		widgetHandler:Unignore(prcmd[2])
-		end
 	end
 end
 
