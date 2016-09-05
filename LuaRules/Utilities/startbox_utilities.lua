@@ -99,9 +99,11 @@ function ParseBoxes ()
 	else
 		startBoxConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
+		local startboxStringLoadedBoxes = false
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				startboxStringLoadedBoxes = true -- Autohost always sends a table. Often it is empty.
 				local midX = (box[1]+box[3]) / 2
 				local midZ = (box[2]+box[4]) / 2
 
@@ -160,7 +162,9 @@ function ParseBoxes ()
 					nameShort = shortName
 				}
 			end
-		else
+		end
+		
+		if not startboxStringLoadedBoxes then
 			if Game.mapSizeZ > Game.mapSizeX then
 				startBoxConfig[0] = {
 					boxes = {
@@ -228,9 +232,11 @@ function GetRawBoxes ()
 	else
 		startBoxConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
+		local startboxStringLoadedBoxes = false
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				startboxStringLoadedBoxes = true -- Autohost always sends a table. Often it is empty.
 				box[1] = box[1]*Game.mapSizeX
 				box[2] = box[2]*Game.mapSizeZ
 				box[3] = box[3]*Game.mapSizeX
@@ -246,7 +252,9 @@ function GetRawBoxes ()
 					}
 				}
 			end
-		else
+		end
+		
+		if not startboxStringLoadedBoxes then
 			if Game.mapSizeZ > Game.mapSizeX then
 				startBoxConfig[0] = {
 					boxes = {
