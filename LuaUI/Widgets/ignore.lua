@@ -47,12 +47,6 @@ function widget:TextCommand(command)
 		Spring.Echo("game_message: Unignoring " .. prcmd[2])
 		widgetHandler:Unignore(prcmd[2])
 	end
-	if string.lower(prcmd[1]) == "clearlist" then
-		local IgnoreList,_ = widgetHandler:GetIgnoreList()
-		for i=1,#IgnoreList do
-			widgetHandler:Unignore(IgnoreList[i])
-		end
-	end
 end
 
 function widget:GetConfigData()
