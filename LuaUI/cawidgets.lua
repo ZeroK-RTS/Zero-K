@@ -15,7 +15,7 @@
 --------------------------------------------------------------------------------
 
 -- stable release?
-local ignorelist = {} -- Ignore workaround for WG table.
+local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
 local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
@@ -392,13 +392,19 @@ function widgetHandler:Initialize()
   local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
   if customkeys["ignored"] then
     if string.find(customkeys["ignored"],",") then
-      for ignoree in string.gmatch(customkeys["ignored"],",") do
-        ignorelist[ignoree] = true
+      local newignorelist = string.gsub(customkeys["ignored"],","," ")
+      Spring.Echo("Setting Serverside ignorelist: " .. newignorelist)
+      for ignoree in string.gmatch(newignorelist,"%S+") do
+        ignorelist.ignorees[ignoree] = true
+        ignorelist.count = ignorelist.count + 1
       end
+      newignorelist = nil
     elseif string.len(customkeys["ignored"]) > 1 then
-      ignorelist[customkeys["ignored"]] = true
+      ignorelist.ignorees[customkeys["ignored"]] = true
+      ignorelist.count = ignorelist.count + 1
     end
   end
+  customkeys = nil
   self:LoadOrderList()
   self:LoadConfigData()
 
@@ -622,9 +628,9 @@ function widgetHandler:NewWidget()
       self.mouseOwner = nil
     end
   end
-  wh.Ignore = function (_,name) table.insert(ignorelist,name) end
-  wh.Unignore = function (_,name) table.remove(ignorelist,name) end
-  wh.GetIgnoreList = function (_) return ignorelist end
+  wh.Ignore = function (_,name) if not ignorelist.ignorees[name] then ignorelist.ignorees[name] = true;ignorelist.count = ignorelist.count + 1 end end
+  wh.Unignore = function (_,name) ignorelist.ignorees[name] = nil;ignorelist.count = ignorelist.count - 1 end
+  wh.GetIgnoreList = function (_) return ignorelist["ignorees"],ignorelist.count end
 
   wh.isStable = function (_) return self:isStable() end
 
@@ -1361,7 +1367,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
 		-- IGNORE FEATURE--
-        	if ignorelist[select(1,Spring.GetPlayerInfo(playerID_msg))] then
+        	if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg))] then
 			return
         	end
 	end
@@ -1395,7 +1401,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 		local endChar = string.find(newMsg.argument, ">")
 		if endChar then
 			local name = string.sub(newMsg.argument, 2, endChar-1)
-			if ignorelist[name] then
+			if ignorelist.ignorees[name] then
 				return -- block chat
 			end
 		end
@@ -1929,7 +1935,7 @@ end
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
   local customkeys = select(10, Spring.GetPlayerInfo(playerID))
-  if ignorelist[select(1,Spring.GetPlayerInfo(playerID))] or (customkeys and customkeys.muted) then
+  if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID))] or (customkeys and customkeys.muted) then
     return true
   end
   
