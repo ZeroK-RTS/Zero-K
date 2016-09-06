@@ -27,19 +27,19 @@ function widget:TextCommand(command)
 		end
 	end
 	if string.lower(prcmd[1]) == "ignorelist" then
-		local IgnoreList = widgetHandler:GetIgnoreList()
+		local IgnoreList,count = widgetHandler:GetIgnoreList()
 		if #IgnoreList ~= 1 then
-			ignorestring = "game_message: You are ignoring " .. #IgnoreList .. " users:"
+			ignorestring = "game_message: You are ignoring " .. count .. " users:"
 		else
-			ignorestring = "game_message: You are ignoring " .. #IgnoreList .. " user:"
+			ignorestring = "game_message: You are ignoring " .. count .. " user:"
 		end
-		for i=1,#IgnoreList do
-			ignorestring = ignorestring .. "\n- " .. IgnoreList[i]
+		for ignoree,_ in pairs(IgnoreList) do
+			ignorestring = ignorestring .. "\n- " .. ignoree
 		end
 		Spring.Echo(ignorestring)
 	end
 	if string.lower(prcmd[1]) == "unignore" then
-		local IgnoreList = widgetHandler:GetIgnoreList()
+		local IgnoreList,_ = widgetHandler:GetIgnoreList()
 		if not IgnoreList[prcmd[2]] then
 			Spring.Echo("game_message: You were not ignoring " .. prcmd[2])
 			return
@@ -47,10 +47,17 @@ function widget:TextCommand(command)
 		Spring.Echo("game_message: Unignoring " .. prcmd[2])
 		widgetHandler:Unignore(prcmd[2])
 	end
+	if string.lower(prcmd[1]) == "clearlist" then
+		local IgnoreList,_ = widgetHandler:GetIgnoreList()
+		for i=1,#IgnoreList do
+			widgetHandler:Unignore(IgnoreList[i])
+		end
+	end
 end
 
 function widget:GetConfigData()
-	return widgetHandler:GetIgnoreList()
+	local ignorelist,_ = widgetHandler:GetIgnoreList()
+	return ignorelist
 end
 
 function widget:SetConfigData(data)
