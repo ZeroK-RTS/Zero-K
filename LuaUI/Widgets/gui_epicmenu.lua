@@ -2346,7 +2346,7 @@ local function MakeQuitButtons()
 		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
 				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
-					spSendCommands("say !voteresign")
+					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
