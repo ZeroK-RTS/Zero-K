@@ -283,7 +283,14 @@ end
 
 function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	local command = "ai_is_valid_startpos:"
-	if not dataStr:find(command,1,true) then return end
+	local command2 = "ai_is_valid_enemy_startpos:"
+	if not dataStr:find(command,1,true) and not dataStr:find(command2,1,true) then return end
+	
+	if dataStr:find(command2,1,true) then
+		command = command2
+	end
+
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
 	local xz = dataStr:sub(command:len()+1)
 	local slash = xz:find("/",1,true)
@@ -293,10 +300,33 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	local z = tonumber(xz:sub(slash+1))
 	if not x or not z then return end
 
-	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-	if (not boxID) or CheckStartbox(boxID, x, z) then
-		return "1"
+	if not dataStr:find(command2,1,true) then
+		-- for checking own startpos
+		if (not boxID) or CheckStartbox(boxID, x, z) then
+			return "1"
+		else
+			return "0"
+		end
 	else
-		return "0"
+		-- for checking enemy startpos
+		local enemyboxes = {}
+		local allyteamid = Spring.GetAllyTeamID(teamID)
+		local allyteams = Spring.GetAllyTeamList()
+		
+		for _,value in pairs(allyteams) do
+			if value ~= allyteamid then
+				local enemyteams = Spring.GetTeamList(value)
+				enemyboxes[Spring.GetTeamRulesParam(enemyteams[1], "start_box_id")] = true
+			end
+		end
+		
+		local valid = "0"
+		for bid,_ in pairs(enemyboxes) do
+			if CheckStartbox(bid, x, z) then
+				valid = "1"
+				break
+			end
+		end
+		return valid
 	end
 end
