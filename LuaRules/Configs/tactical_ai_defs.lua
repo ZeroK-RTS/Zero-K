@@ -985,6 +985,13 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 200, 
 	},	
+	["armbanth"] = {
+		skirms = allGround, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		skirmLeeway = 120, 
+	},	
 	-- cowardly support units
 	--[[
 	["example"] = {
