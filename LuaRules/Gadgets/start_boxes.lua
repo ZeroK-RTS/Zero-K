@@ -310,7 +310,7 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	else
 		-- for checking enemy startpos
 		local enemyboxes = {}
-		local allyteamid = Spring.GetAllyTeamID(teamID)
+		local _,_,_,_,_,allyteamid,_,_ = Spring.GetTeamInfo(teamID)
 		local allyteams = Spring.GetAllyTeamList()
 		
 		if shuffleMode == "allshuffle" then
@@ -323,7 +323,13 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 			for _,value in pairs(allyteams) do
 				if value ~= allyteamid then
 					local enemyteams = Spring.GetTeamList(value)
-					enemyboxes[Spring.GetTeamRulesParam(enemyteams[1], "start_box_id")] = true
+					for _,value1 in pairs(enemyteams) do
+						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id")
+						if (enemybox) then
+							enemyboxes[enemybox] = true
+						end
+						break
+					end
 				end
 			end
 		end
