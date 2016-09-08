@@ -111,7 +111,8 @@ for name, wd in pairs(DEFS.weaponDefs) do
 
 	-- Stats
 	wd.customparams.statsdamage = wd.customparams.statsdamage or maxDamage
-	
+	wd.customparams.raw_damage = maxDamage/((wd.customparams.effective_beam_time or wd.beamtime or 1/30) * 30)
+
 	-- damage vs shields
 	if wd.customparams and wd.customparams.damage_vs_shield then
 		wd.damage.default = tonumber(wd.customparams.damage_vs_shield)

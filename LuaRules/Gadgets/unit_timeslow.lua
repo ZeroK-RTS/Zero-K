@@ -107,7 +107,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- add slow damage
 	local slowdown = attritionWeaponDefs[weaponID].slowDamage
 	if attritionWeaponDefs[weaponID].scaleSlow then
-		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.shield_damage)
+		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.raw_damage)
 	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
 
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
