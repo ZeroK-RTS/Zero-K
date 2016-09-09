@@ -152,7 +152,8 @@ function gadget:Initialize()
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
 	local rawBoxes = GetRawBoxes()
-	for box_id, polygons in pairs(rawBoxes) do
+	for box_id, rawbox in pairs(rawBoxes) do
+		local polygons = rawbox.boxes
 		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
 		for i = 1, #polygons do
 			local polygon = polygons[i]

@@ -1,80 +1,26 @@
-return {
-	[0] = {
-		startpoints = {
-			{4137,1188},
-		},
-		boxes = {
-			{
-				{4096,1147},
-				{4178,1147},
-				{4178,1229},
-				{4096,1229},
-			},
-		},
-	},
-	[1] = {
-		startpoints = {
-			{7004,3318},
-		},
-		boxes = {
-			{
-				{6963,3277},
-				{7045,3277},
-				{7045,3359},
-				{6963,3359},
-			},
-		},
-	},
-	[2] = {
-		startpoints = {
-			{5775,6513},
-		},
-		boxes = {
-			{
-				{5734,6472},
-				{5816,6472},
-				{5816,6554},
-				{5734,6554},
-			},
-		},
-	},
-	[3] = {
-		startpoints = {
-			{2253,6513},
-		},
-		boxes = {
-			{
-				{2212,6472},
-				{2294,6472},
-				{2294,6554},
-				{2212,6554},
-			},
-		},
-	},
-	[4] = {
-		startpoints = {
-			{942,3400},
-		},
-		boxes = {
-			{
-				{901,3359},
-				{983,3359},
-				{983,3441},
-				{901,3441},
-			},
-		},
-	},
-	[5] = {
-		startpoints = {
-			{4096,4096},
-		},
-		boxes = {
-			{
-				{3686,3686},
-				{4506,3686},
-				{4506,4506},
-				{3686,4506},
-			},
-		},
-	},
+local starting_points = {
+	{4161, 1161, "North", "N"},
+	{5789, 6492, "South-East", "SE"},
+	{ 942, 3374, "West", "W"},
+	{7047, 3333, "East", "E"},
+	{2216, 6469, "South-West", "SW"},
 }
+local radius = 256
+
+local ret = {}
+for i = 1, #starting_points do
+	ret[i-1] = {
+		nameLong  = starting_points[i][3],
+		nameShort = starting_points[i][4],
+		startpoints = { { starting_points[i][1], starting_points[i][2] } },
+		boxes = { { } },
+	}
+	for j = 1, 10 do
+		ret[i-1].boxes[1][j] = {
+			starting_points[i][1] + radius * math.sin(j * math.pi / 5),
+			starting_points[i][2] + radius * math.cos(j * math.pi / 5),
+		}
+	end
+end
+
+return ret
