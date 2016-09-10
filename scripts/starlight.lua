@@ -85,6 +85,7 @@ local DOCKED = 1
 local READY = 2
 local FALLING = 3
 
+local aimingDone = false
 local isStunned = true
 local state = DOCKED
 
@@ -206,9 +207,12 @@ function SpiralDown()
 			aimOff = math.min(ROTATION_SPEED, aimOff)
 		end
 		
+		CallSatelliteScript('mahlazer_AimAt',0)
+		Turn(SatelliteMuzzle, x_axis, 0, math.rad(1.2))
+		
 		Spring.SetUnitRotation(satUnitID, 0, currentHeading + aimOff - math.pi/2 , 0)
 		
-		if(currentHeading == closestMultiple) then
+		if (currentHeading == closestMultiple) then
 			break
 		end
 		
@@ -228,11 +232,21 @@ function TargetingLaser()
 			local currentHeading = Vector.Angle(dx, dz)
 			
 			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
-				
+			
 			if aimOff < 0 then
-				aimOff = math.max(-ROTATION_SPEED, aimOff)
+				if aimOff < -ROTATION_SPEED then
+					aimOff = -ROTATION_SPEED
+					aimingDone = false
+				else
+					aimingDone = true
+				end
 			else
-				aimOff = math.min(ROTATION_SPEED, aimOff)
+				if aimOff > ROTATION_SPEED then
+					aimOff = ROTATION_SPEED
+					aimingDone = false
+				else
+					aimingDone = true
+				end
 			end
 			
 			Spring.SetUnitRotation(satUnitID, 0, currentHeading - aimOff - math.pi/2, 0)
@@ -325,37 +339,6 @@ function script.Deactivate()
 	Signal(SIG_AIM)
 end
 
-function DoAimFromBetterHeading()
-	local type,user,target = Spring.GetUnitWeaponTarget(unitID, 1)
-	local ax, ay, az
-
-	if (type == 1) then
-		ax, ay, az = Spring.GetUnitPosition(target)
-	elseif (type == 2) then
-		ax = target[1]
-		ay = target[2]
-		az = target[3]
-	else
-		return false
-	end
-	
-	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(unitID, SatelliteMuzzle)
-	
-	local horVec = {ax - px, az - pz}
-	local vertVec = {Vector.AbsVal(horVec), ay - py}
-	
-	local myHeading = Vector.Angle(horVec) - math.pi/2
-	local myPitch   = Vector.Angle(vertVec)
-	
-	local fudge = 0---0.0091
-	local pitchFudge = 0
-	
-	myHeading = myHeading + fudge 
-	myPitch   = myPitch   + pitchFudge
-	
-	return myHeading, myPitch
-end
-
 function script.AimWeapon(num, heading, pitch)
 	if (not isStunned) and state == READY and num == 1 then
 		Signal(SIG_AIM)
@@ -363,22 +346,17 @@ function script.AimWeapon(num, heading, pitch)
 		
 		local dx, _, dz = Spring.GetUnitDirection(unitID)
 		local currentHeading = Vector.Angle(dx, dz)
-
-		local newHeading, newPitch = DoAimFromBetterHeading()
-		if newHeading then
-			heading = newHeading
-			wantedDirection = heading - math.pi/2
-		end
 		
-		CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2)
+		wantedDirection = currentHeading - heading + math.pi
+		
+		CallSatelliteScript('mahlazer_AimAt',pitch + math.pi/2)
 		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2))
 		WaitForTurn(SatelliteMuzzle, x_axis)
 		
-		return true
+		return aimingDone
 	end
 	return false
 end
-
 
 function SnapSatellite()
 	while true do
