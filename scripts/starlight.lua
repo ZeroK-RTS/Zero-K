@@ -100,12 +100,6 @@ local function CallSatelliteScript(funcName, args)
 	end
 end
 
-function script.Create()
-	Move(ShortSpikes,z_axis, -5)
-	Move(LongSpikes,z_axis, -10)
-	--wantedDirection = Spring.GetUnitHeading(unitID)
-end
-
 local isFiring = false
 local function SetFiringState(shouldFire)
 	if isFiring == shouldFire then
@@ -287,6 +281,12 @@ function script.Create()
 	Spring.SetUnitWeaponState(unitID, 2, "range", 9300)
 	Spring.SetUnitWeaponState(unitID, 4, "range", 9300)
 	StartThread(SmokeUnit, smokePiece)
+
+	--Move(ShortSpikes,z_axis, -5)
+	--Move(LongSpikes,z_axis, -10)
+	local facing = Spring.GetUnitBuildFacing(unitID)
+	
+	wantedDirection = math.pi*(3 - facing)/2 
 end
 
 function script.Activate()
@@ -312,7 +312,7 @@ function script.Activate()
 		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
 		local dx, _, dz = Spring.GetUnitDirection(unitID)
 		local heading = Vector.Angle(dx, dz)
-		Spring.Echo("Unit direction",dx, dz, heading*180/math.pi)
+		--Spring.Echo("Unit direction",dx, dz, heading*180/math.pi)
 		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
 		Spring.SetUnitNoSelect(satUnitID,true)
 		Spring.SetUnitNoMinimap(satUnitID,true)
