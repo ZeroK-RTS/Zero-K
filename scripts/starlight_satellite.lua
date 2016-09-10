@@ -26,112 +26,112 @@ local parentUnitID;
 
 function script.Create()
 	--Move(Satellite, y_axis, -10)
-    --Spin(Satellite, x_axis, math.rad(80))
+	--Spin(Satellite, x_axis, math.rad(80))
 	StartThread(MonitorHost);
 end
 
 function MonitorHost()
-    SetSignalMask(SIG_WATCH);
-    while true do
-        if(parentUnitID) then
-            if not Spring.ValidUnitID(parentUnitID) then
-                on = false;
-                Signal(SIG_DOCK+SIG_SHOOT);
-                Spring.SetUnitHealth(unitID,500);
-                EmitSfx(Satellite, 1025);
-                Spring.MoveCtrl.SetRotationVelocity(unitID,math.random(1,20)-10,math.random(1,20)-10,math.random(1,20)-10);
-                Spring.MoveCtrl.Disable(unitID);
-                Spring.AddUnitImpulse(unitID,math.random(1,10)-5,math.random(1,10)-5,math.random(1,10)-5)
-                Spring.SetUnitNoSelect(unitID,false);
-                Spring.SetUnitNoMinimap(unitID,false);
-                Spring.SetUnitNeutral(unitID,false);
-                Spring.SetUnitRulesParam(unitID,'untargetable',nil);
-                Spring.SetUnitCollisionVolumeData(unitID, 30,30,30, 10,0,0, 0,0,0);
-                Dock()
-                return;
-            end
-        else
-            parentUnitID = Spring.GetUnitRulesParam(unitID,'cannot_damage_unit');
-            --if not parentUnitID then return end
-        end
-        Sleep(33)
-    end
+	SetSignalMask(SIG_WATCH);
+	while true do
+		if(parentUnitID) then
+			if not Spring.ValidUnitID(parentUnitID) then
+				on = false;
+				Signal(SIG_DOCK+SIG_SHOOT);
+				Spring.SetUnitHealth(unitID,500);
+				EmitSfx(Satellite, 1025);
+				Spring.MoveCtrl.SetRotationVelocity(unitID,math.random(1,20)-10,math.random(1,20)-10,math.random(1,20)-10);
+				Spring.MoveCtrl.Disable(unitID);
+				Spring.AddUnitImpulse(unitID,math.random(1,10)-5,math.random(1,10)-5,math.random(1,10)-5)
+				Spring.SetUnitNoSelect(unitID,false);
+				Spring.SetUnitNoMinimap(unitID,false);
+				Spring.SetUnitNeutral(unitID,false);
+				Spring.SetUnitRulesParam(unitID,'untargetable',nil);
+				Spring.SetUnitCollisionVolumeData(unitID, 30,30,30, 10,0,0, 0,0,0);
+				Dock()
+				return;
+			end
+		else
+			parentUnitID = Spring.GetUnitRulesParam(unitID,'cannot_damage_unit');
+			--if not parentUnitID then return end
+		end
+		Sleep(33)
+	end
 end
 
 function Dock()
-    SetSignalMask(SIG_DOCK);
-    for i=1,4 do
-        Turn(InnerLimbs[i],y_axis,math.rad(0),1);
-        Turn(OuterLimbs[i],y_axis,math.rad(0),1);
-    end
+	SetSignalMask(SIG_DOCK);
+	for i=1,4 do
+		Turn(InnerLimbs[i],y_axis,math.rad(0),1);
+		Turn(OuterLimbs[i],y_axis,math.rad(0),1);
+	end
 end
 
 function Undock()
-    SetSignalMask(SIG_DOCK);
-    for i=1,4 do
-        Turn(InnerLimbs[i],y_axis,math.rad(-85),1);
-        Turn(OuterLimbs[i],y_axis,math.rad(-85),1);
-    end
+	SetSignalMask(SIG_DOCK);
+	for i=1,4 do
+		Turn(InnerLimbs[i],y_axis,math.rad(-85),1);
+		Turn(OuterLimbs[i],y_axis,math.rad(-85),1);
+	end
 end
 
 function Shoot()
-    SetSignalMask(SIG_SHOOT)
-    while(on) do
-        if shooting ~= 0 then
-            EmitSfx(SatelliteMuzzle, FIRE_W2)
-            shooting = shooting - 1
-        else
-            EmitSfx(SatelliteMuzzle, FIRE_W4)
-        end
-        Sleep(30)
-    end
+	SetSignalMask(SIG_SHOOT)
+	while(on) do
+		if shooting ~= 0 then
+			EmitSfx(SatelliteMuzzle, FIRE_W2)
+			shooting = shooting - 1
+		else
+			EmitSfx(SatelliteMuzzle, FIRE_W4)
+		end
+		Sleep(30)
+	end
 end
 
 function mahlazer_SetShoot(n)
-    shooting = n;
+	shooting = n;
 end
 
 function mahlazer_Hide()
-    for i=1,4 do
-        Hide(InnerLimbs[i]);
-        Hide(OuterLimbs[i]);
-    end
-    Hide(Satellite);
+	for i=1,4 do
+		Hide(InnerLimbs[i]);
+		Hide(OuterLimbs[i]);
+	end
+	Hide(Satellite);
 end
 
 function mahlazer_Show()
-    for i=1,4 do
-        Show(InnerLimbs[i]);
-        Show(OuterLimbs[i]);
-    end
-    Show(Satellite);
+	for i=1,4 do
+		Show(InnerLimbs[i]);
+		Show(OuterLimbs[i]);
+	end
+	Show(Satellite);
 end 
 
 -- prepare the laser beam, i'm gonna use it tonite
 function mahlazer_EngageTheLaserBeam() -- it's gonna END YOUR LIFE
-    on = true
-    Signal(SIG_SHOOT);
-    StartThread(Shoot);
+	on = true
+	Signal(SIG_SHOOT);
+	StartThread(Shoot);
 end
 
 function mahlazer_DisengageTheLaserBeam()
-    Signal(SIG_SHOOT);
-    on = false
+	Signal(SIG_SHOOT);
+	on = false
 end
 
 function mahlazer_AimAt(pitch)
-    Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
-    Turn(Satellite, x_axis, pitch/2, math.rad(0.6))
+	Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
+	Turn(Satellite, x_axis, pitch/2, math.rad(0.6))
 end
 
 function mahlazer_Undock()
-    Signal(SIG_DOCK);
-    StartThread(Undock);
+	Signal(SIG_DOCK);
+	StartThread(Undock);
 end
 
 function mahlazer_Dock()
-    Signal(SIG_DOCK);
-    StartThread(Dock);
+	Signal(SIG_DOCK);
+	StartThread(Dock);
 end
 
 function script.AimWeapon(num, heading, pitch)
@@ -139,7 +139,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num)
-    return false
+	return false
 end
 
 function script.AimFromWeapon(num)
@@ -148,10 +148,10 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if (severity <= .25) then
+	if (severity <= 0.25) then
 		Explode(Satellite, SFX.SHATTER)
 		return 0 -- corpsetype
-	elseif (severity <= .5) then
+	elseif (severity <= 0.5) then
 		Explode(Satellite, SFX.SHATTER)
 		return 1 -- corpsetype
 	else

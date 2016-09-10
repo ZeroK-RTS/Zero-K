@@ -1,64 +1,64 @@
 include "constants.lua"
 
-local ActuatorBase = piece('ActuatorBase');
-local ActuatorBase_1 = piece('ActuatorBase_1');
-local ActuatorBase_2 = piece('ActuatorBase_2');
-local ActuatorBase_3 = piece('ActuatorBase_3');
-local ActuatorBase_4 = piece('ActuatorBase_4');
-local ActuatorBase_5 = piece('ActuatorBase_5');
-local ActuatorBase_6 = piece('ActuatorBase_6');
-local ActuatorBase_7 = piece('ActuatorBase_7');
-local ActuatorMiddle = piece('ActuatorMiddle');
-local ActuatorMiddle_1 = piece('ActuatorMiddle_1');
-local ActuatorMiddle_2 = piece('ActuatorMiddle_2');
-local ActuatorMiddle_3 = piece('ActuatorMiddle_3');
-local ActuatorMiddle_4 = piece('ActuatorMiddle_4');
-local ActuatorMiddle_5 = piece('ActuatorMiddle_5');
-local ActuatorMiddle_6 = piece('ActuatorMiddle_6');
-local ActuatorMiddle_7 = piece('ActuatorMiddle_7');
-local ActuatorTip = piece('ActuatorTip');
-local ActuatorTip_1 = piece('ActuatorTip_1');
-local ActuatorTip_2 = piece('ActuatorTip_2');
-local ActuatorTip_3 = piece('ActuatorTip_3');
-local ActuatorTip_4 = piece('ActuatorTip_4');
-local ActuatorTip_5 = piece('ActuatorTip_5');
-local ActuatorTip_6 = piece('ActuatorTip_6');
-local ActuatorTip_7 = piece('ActuatorTip_7');
+local ActuatorBase = piece('ActuatorBase')
+local ActuatorBase_1 = piece('ActuatorBase_1')
+local ActuatorBase_2 = piece('ActuatorBase_2')
+local ActuatorBase_3 = piece('ActuatorBase_3')
+local ActuatorBase_4 = piece('ActuatorBase_4')
+local ActuatorBase_5 = piece('ActuatorBase_5')
+local ActuatorBase_6 = piece('ActuatorBase_6')
+local ActuatorBase_7 = piece('ActuatorBase_7')
+local ActuatorMiddle = piece('ActuatorMiddle')
+local ActuatorMiddle_1 = piece('ActuatorMiddle_1')
+local ActuatorMiddle_2 = piece('ActuatorMiddle_2')
+local ActuatorMiddle_3 = piece('ActuatorMiddle_3')
+local ActuatorMiddle_4 = piece('ActuatorMiddle_4')
+local ActuatorMiddle_5 = piece('ActuatorMiddle_5')
+local ActuatorMiddle_6 = piece('ActuatorMiddle_6')
+local ActuatorMiddle_7 = piece('ActuatorMiddle_7')
+local ActuatorTip = piece('ActuatorTip')
+local ActuatorTip_1 = piece('ActuatorTip_1')
+local ActuatorTip_2 = piece('ActuatorTip_2')
+local ActuatorTip_3 = piece('ActuatorTip_3')
+local ActuatorTip_4 = piece('ActuatorTip_4')
+local ActuatorTip_5 = piece('ActuatorTip_5')
+local ActuatorTip_6 = piece('ActuatorTip_6')
+local ActuatorTip_7 = piece('ActuatorTip_7')
 
-local Basis = piece('Basis');
-local Dock = piece('Dock');
-local Dock_1 = piece('Dock_1');
-local Dock_2 = piece('Dock_2');
-local Dock_3 = piece('Dock_3');
-local Dock_4 = piece('Dock_4');
-local Dock_5 = piece('Dock_5');
-local Dock_6 = piece('Dock_6');
-local Dock_7 = piece('Dock_7');
-local Emitter = piece('Emitter');
-local EmitterMuzzle = piece('EmitterMuzzle');
+local Basis = piece('Basis')
+local Dock = piece('Dock')
+local Dock_1 = piece('Dock_1')
+local Dock_2 = piece('Dock_2')
+local Dock_3 = piece('Dock_3')
+local Dock_4 = piece('Dock_4')
+local Dock_5 = piece('Dock_5')
+local Dock_6 = piece('Dock_6')
+local Dock_7 = piece('Dock_7')
+local Emitter = piece('Emitter')
+local EmitterMuzzle = piece('EmitterMuzzle')
 
 -- these are satellite pieces
-local LimbA1 = piece('LimbA1');
-local LimbA2 = piece('LimbA2');
-local LimbB1 = piece('LimbB1');
-local LimbB2 = piece('LimbB2');
-local LimbC1 = piece('LimbC1');
-local LimbC2 = piece('LimbC2');
-local LimbD1 = piece('LimbD1');
-local LimbD2 = piece('LimbD2');
-local Satellite = piece('Satellite');
-local SatelliteMuzzle = piece('SatelliteMuzzle');
-local SatelliteMount = piece('SatelliteMount');
+local LimbA1 = piece('LimbA1')
+local LimbA2 = piece('LimbA2')
+local LimbB1 = piece('LimbB1')
+local LimbB2 = piece('LimbB2')
+local LimbC1 = piece('LimbC1')
+local LimbC2 = piece('LimbC2')
+local LimbD1 = piece('LimbD1')
+local LimbD2 = piece('LimbD2')
+local Satellite = piece('Satellite')
+local SatelliteMuzzle = piece('SatelliteMuzzle')
+local SatelliteMount = piece('SatelliteMount')
 
 
-local LongSpikes = piece('LongSpikes');
-local LowerCoil = piece('LowerCoil');
+local LongSpikes = piece('LongSpikes')
+local LowerCoil = piece('LowerCoil')
 
-local ShortSpikes = piece('ShortSpikes');
-local UpperCoil = piece('UpperCoil');
+local ShortSpikes = piece('ShortSpikes')
+local UpperCoil = piece('UpperCoil')
 
-local DocksClockwise = {Dock,Dock_1,Dock_2,Dock_3};
-local DocksCounterClockwise = {Dock_4,Dock_5,Dock_6,Dock_7};
+local DocksClockwise = {Dock,Dock_1,Dock_2,Dock_3}
+local DocksCounterClockwise = {Dock_4,Dock_5,Dock_6,Dock_7}
 local ActuatorBaseClockwise = {ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3}
 local ActuatorBaseCCW = {ActuatorBase_4,ActuatorBase_5,ActuatorBase_6,ActuatorBase_7}
 local ActuatorMidCW =  {ActuatorMiddle,ActuatorMiddle_1,ActuatorMiddle_2,ActuatorMiddle_3}
@@ -68,8 +68,6 @@ local ActuatorTipCCW = {ActuatorTip_4,ActuatorTip_5,ActuatorTip_6,ActuatorTip_7}
 
 local smokePiece = {Basis,ActuatorBase,ActuatorBase_1,ActuatorBase_2,ActuatorBase_3,ActuatorBase_4,ActuatorBase_5,ActuatorBase_6,ActuatorBase_7}
 
-local on = false;
-local awake = false;
 local oldHeight = 0
 local shooting = 0
 local wantedDirection = 0
@@ -80,9 +78,15 @@ local max = math.max
 local soundTime = 0
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
-local satUnitID = false;
-local satelliteCreated = false;
-local engaged = false;
+local satUnitID = false
+local satelliteCreated = false
+
+local DOCKED = 1
+local READY = 2
+local FALLING = 3
+
+local isStunned = true
+local state = DOCKED
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -96,130 +100,135 @@ local function CallSatelliteScript(funcName, args)
 end
 
 function script.Create()
-    Move(ShortSpikes,z_axis, -5);
-    Move(LongSpikes,z_axis, -10);
---    wantedDirection = Spring.GetUnitHeading(unitID);
+	Move(ShortSpikes,z_axis, -5)
+	Move(LongSpikes,z_axis, -10)
+	--wantedDirection = Spring.GetUnitHeading(unitID)
+end
+
+local isFiring = false
+local function SetFiringState(shouldFire)
+	if isFiring == shouldFire then
+		return
+	end
+	isFiring = shouldFire
+
+	if shouldFire then
+		CallSatelliteScript('mahlazer_EngageTheLaserBeam')
+	else
+		CallSatelliteScript('mahlazer_DisengageTheLaserBeam')
+	end
 end
 
 function Undock()
-    SetSignalMask(SIG_DOCK);
+	SetSignalMask(SIG_DOCK)
+	
+	if state == DOCKED then
+		for i = 1, 4 do
+			Turn(DocksClockwise[i]	   ,z_axis,math.rad(-42.5),1)
+			Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1)
+			
+			Turn(ActuatorBaseClockwise[i],z_axis,math.rad(-86),2)
+			Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad( 86),2)
+			
+			Turn(ActuatorMidCW [i],z_axis,math.rad( 53),1.5)
+			Turn(ActuatorMidCCW[i],z_axis,math.rad( 53),1.5)
+			
+			Turn(ActuatorTipCW [i],z_axis,math.rad( 90),2.2)
+			Turn(ActuatorTipCCW[i],z_axis,math.rad( 90),2.2)
 
-    docking = false
+			-- 53 for mid
+			-- 90 for tip
+		end
 
-    for i=1,4 do
-        Turn(DocksClockwise[i]       ,z_axis,math.rad(-42.5),1);
-        Turn(DocksCounterClockwise[i],z_axis,math.rad( 42.5),1);
-        
-        Turn(ActuatorBaseClockwise[i],z_axis,math.rad(-86),2);
-        Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad( 86),2);
-        
-        Turn(ActuatorMidCW [i],z_axis,math.rad( 53),1.5);
-        Turn(ActuatorMidCCW[i],z_axis,math.rad( 53),1.5);
-        
-        Turn(ActuatorTipCW [i],z_axis,math.rad( 90),2.2);
-        Turn(ActuatorTipCCW[i],z_axis,math.rad( 90),2.2);
-
-        -- 53 for mid
-        -- 90 for tip
-    end
-
-    Sleep(1000);
-    CallSatelliteScript('mahlazer_Undock')
-    
-    Sleep(1200);
-    on = true
-    engaged = true;
-    StartThread(TargetingLaser)
-    CallSatelliteScript('mahlazer_EngageTheLaserBeam');
-    
+		Sleep(1000)
+		CallSatelliteScript('mahlazer_Undock')
+		
+		Sleep(1200)
+	end
+	state = READY
+	StartThread(TargetingLaser)
+	
 	Move(SatelliteMount, z_axis, TARGET_ALT, 30*4)
 end
 
 function Dock()
-    SetSignalMask(SIG_DOCK);
-    docking = true;
-    CallSatelliteScript('mahlazer_DisengageTheLaserBeam');
-    engaged = false;
-    
+	SetSignalMask(SIG_DOCK)
+	state = FALLING
+	SetFiringState(false)
+	
 	Move(SatelliteMount, z_axis, 0, 30*4)
-    WaitForMove(SatelliteMount,z_axis);
-    Move(ShortSpikes,z_axis, -5,1);
-    Move(LongSpikes,z_axis, -10,1.5);
-    Sleep(1000)
-    
-    local dx, _, dz = Spring.GetUnitDirection(unitID)
-    local heading = Vector.Angle(dx, dz)
-    
-    docking = false
-    
-    CallSatelliteScript('mahlazer_Dock');
-    
-    Sleep(500);
-        
-    for i=1,4 do
-        Turn(DocksClockwise[i]       ,z_axis,math.rad(0),1);
-        Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1);
-        
-        Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2);
-        Turn(ActuatorBaseCCW[i]      ,z_axis,math.rad(0),2);
-        
-        Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5);
-        Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5);
-        
-        Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2);
-        Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2);
-    end
+	WaitForMove(SatelliteMount,z_axis)
+	
+	state = DOCKED
+	Move(ShortSpikes,z_axis, -5,1)
+	Move(LongSpikes,z_axis, -10,1.5)
+	Sleep(100)
+	
+	local dx, _, dz = Spring.GetUnitDirection(unitID)
+	local heading = Vector.Angle(dx, dz)
+	
+	CallSatelliteScript('mahlazer_Dock')
+	
+	Sleep(100)
+		
+	for i = 1, 4 do
+		Turn(DocksClockwise[i]	   ,z_axis,math.rad(0),1)
+		Turn(DocksCounterClockwise[i],z_axis,math.rad(0),1)
+		
+		Turn(ActuatorBaseClockwise[i],z_axis,math.rad(0),2)
+		Turn(ActuatorBaseCCW[i]	  ,z_axis,math.rad(0),2)
+		
+		Turn(ActuatorMidCW [i],z_axis,math.rad( 0),1.5)
+		Turn(ActuatorMidCCW[i],z_axis,math.rad( 0),1.5)
+		
+		Turn(ActuatorTipCW [i],z_axis,math.rad( 0),2.2)
+		Turn(ActuatorTipCCW[i],z_axis,math.rad( 0),2.2)
+	end
 
 end
 
 function SpiralDown()
-    SetSignalMask(SIG_DOCK);
-    
-    while(docking) do
-        -- this ignores base unit rotation. because it wants to snap to multiples of 90, and base unit is guaranteed to be
-        -- always snapped to multiples of 90 because of how buildings are
-        -- this is an invitation for someone to implement arbitrary 360-deg rotation and break this. I dare you. Fight me.
-        
-        local dx, _, dz = Spring.GetUnitDirection(satUnitID);
-        local currentHeading  = Vector.Angle(dx, dz);
-        local closestMultiple = math.round(currentHeading/(math.pi/2))*math.pi/2
-        local aimOff = closestMultiple - currentHeading
+	SetSignalMask(SIG_DOCK)
+	
+	while state == FALLING do
+		-- this ignores base unit rotation. because it wants to snap to multiples of 90, and base unit is guaranteed to be
+		-- always snapped to multiples of 90 because of how buildings are
+		-- this is an invitation for someone to implement arbitrary 360-deg rotation and break this. I dare you. Fight me.
+		
+		local dx, _, dz = Spring.GetUnitDirection(satUnitID)
+		local currentHeading  = Vector.Angle(dx, dz)
+		local closestMultiple = math.round(currentHeading/(math.pi/2))*math.pi/2
+		local aimOff = closestMultiple - currentHeading
 
-        if aimOff < 0 then
-            aimOff = math.max(-ROTATION_SPEED, aimOff)
-        else
-            aimOff = math.min(ROTATION_SPEED, aimOff)
-        end
-        
-        Spring.SetUnitRotation(satUnitID, 0, currentHeading + aimOff - math.pi/2 , 0)
-        
-        if(currentHeading == closestMultiple) then
-            break;
-        end
-        
-        Sleep(33)
-    end
+		if aimOff < 0 then
+			aimOff = math.max(-ROTATION_SPEED, aimOff)
+		else
+			aimOff = math.min(ROTATION_SPEED, aimOff)
+		end
+		
+		Spring.SetUnitRotation(satUnitID, 0, currentHeading + aimOff - math.pi/2 , 0)
+		
+		if(currentHeading == closestMultiple) then
+			break
+		end
+		
+		Sleep(33)
+	end
 end
 
 function TargetingLaser()
-	while on do
-		awake = (not spGetUnitIsStunned(unitID)) and (Spring.GetUnitRulesParam(unitID,"disarmed") ~= 1);
+	while state == READY do
+		isStunned = spGetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		
-		if awake then
-        
-            if not engaged then
-                engaged = true;
-                CallSatelliteScript('mahlazer_EngageTheLaserBeam');
-            end
-        
+		SetFiringState(not isStunned)
+		
+		if not isStunned then
 			--// Aiming
-
-            
 			local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 			local currentHeading = Vector.Angle(dx, dz)
 			
 			local aimOff = (currentHeading - wantedDirection + math.pi)%(2*math.pi) - math.pi
-            	
+				
 			if aimOff < 0 then
 				aimOff = math.max(-ROTATION_SPEED, aimOff)
 			else
@@ -254,9 +263,6 @@ function TargetingLaser()
 			else
 				EmitSfx(EmitterMuzzle, FIRE_W5)
 			end
-        elseif engaged then
-            engaged = false;
-            CallSatelliteScript('mahlazer_DisengageTheLaserBeam');
 		end
 		
 		Sleep(30)
@@ -270,69 +276,68 @@ function script.Create()
 end
 
 function script.Activate()
-    Spin(UpperCoil, z_axis, 10,0.5);
-    Spin(LowerCoil, z_axis, 10,0.5);
-    
-    Move(ShortSpikes,z_axis, 0,1);
-    Move(LongSpikes,z_axis, 0,1.5);
-    
-    if(not satelliteCreated)then
-        satelliteCreated = true;
-        Hide(LimbA1);
-        Hide(LimbA2);
-        Hide(LimbB1);
-        Hide(LimbB2);
-        Hide(LimbC1);
-        Hide(LimbC2);
-        Hide(LimbD1);
-        Hide(LimbD2);
-        Hide(Satellite)
-        Hide(SatelliteMuzzle);
+	Spin(UpperCoil, z_axis, 10,0.5)
+	Spin(LowerCoil, z_axis, 10,0.5)
+	
+	Move(ShortSpikes,z_axis, 0,1)
+	Move(LongSpikes,z_axis, 0,1.5)
+	
+	if(not satelliteCreated)then
+		satelliteCreated = true
+		Hide(LimbA1)
+		Hide(LimbA2)
+		Hide(LimbB1)
+		Hide(LimbB2)
+		Hide(LimbC1)
+		Hide(LimbC2)
+		Hide(LimbD1)
+		Hide(LimbD2)
+		Hide(Satellite)
+		Hide(SatelliteMuzzle)
 
-        local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
-        local dx, _, dz = Spring.GetUnitDirection(unitID)
-        local heading = Vector.Angle(dx, dz)
-        
-        satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID));
-        Spring.SetUnitNoSelect(satUnitID,true);
-        Spring.SetUnitNoMinimap(satUnitID,true);
-        Spring.SetUnitNeutral(satUnitID,true);
-        Spring.MoveCtrl.Enable(satUnitID);
-        Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
-        Spring.SetUnitRotation(satUnitID, 0, heading+math.pi/2, 0);
-        Spring.SetUnitLoadingTransport(satUnitID,unitID);
-        Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID);
-        Spring.SetUnitRulesParam(satUnitID,'untargetable',1);
-        Spring.SetUnitRulesParam(unitID,'has_satellite',satUnitID);
-        Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0);
+		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
+		local dx, _, dz = Spring.GetUnitDirection(unitID)
+		local heading = Vector.Angle(dx, dz)
+		Spring.Echo("Unit direction",dx, dz, heading*180/math.pi)
+		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
+		Spring.SetUnitNoSelect(satUnitID,true)
+		Spring.SetUnitNoMinimap(satUnitID,true)
+		Spring.SetUnitNeutral(satUnitID,true)
+		Spring.MoveCtrl.Enable(satUnitID)
+		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+		Spring.SetUnitRotation(satUnitID, 0, heading+math.pi/2, 0)
+		Spring.SetUnitLoadingTransport(satUnitID,unitID)
+		Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID)
+		Spring.SetUnitRulesParam(satUnitID,'untargetable',1)
+		Spring.SetUnitRulesParam(unitID,'has_satellite',satUnitID)
+		Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0)
 
-        StartThread(SnapSatellite);
-    end
-    Signal(SIG_DOCK);
-    StartThread(Undock);
+		StartThread(SnapSatellite)
+	end
+	Signal(SIG_DOCK)
+	StartThread(Undock)
 end
 
 function script.Deactivate()
-    Signal(SIG_DOCK);
-    StartThread(Dock);
-    StartThread(SpiralDown);
-	on = false
+	Signal(SIG_DOCK)
+	StartThread(Dock)
+	StartThread(SpiralDown)
 	Signal(SIG_AIM)
 end
 
 function DoAimFromBetterHeading()
-    local type,user,target = Spring.GetUnitWeaponTarget(unitID, 1)
-    local ax, ay, az
+	local type,user,target = Spring.GetUnitWeaponTarget(unitID, 1)
+	local ax, ay, az
 
-    if (type == 1) then
-        ax, ay, az = Spring.GetUnitPosition(target);
-    elseif (type == 2) then
-        ax = target[1]
-        ay = target[2]
-        az = target[3]
-    else
-        return false
-    end
+	if (type == 1) then
+		ax, ay, az = Spring.GetUnitPosition(target)
+	elseif (type == 2) then
+		ax = target[1]
+		ay = target[2]
+		az = target[3]
+	else
+		return false
+	end
 	
 	local px, py, pz, dx, dy, dz = Spring.GetUnitPiecePosDir(unitID, SatelliteMuzzle)
 	
@@ -352,7 +357,7 @@ function DoAimFromBetterHeading()
 end
 
 function script.AimWeapon(num, heading, pitch)
-	if on and awake and num == 1 then
+	if (not isStunned) and state == READY and num == 1 then
 		Signal(SIG_AIM)
 		SetSignalMask(SIG_AIM)
 		
@@ -362,13 +367,13 @@ function script.AimWeapon(num, heading, pitch)
 		local newHeading, newPitch = DoAimFromBetterHeading()
 		if newHeading then
 			heading = newHeading
-    		wantedDirection = heading - math.pi/2
+			wantedDirection = heading - math.pi/2
 		end
-        
-		CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2);
-		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2));
-		WaitForTurn(SatelliteMuzzle, x_axis);
-        
+		
+		CallSatelliteScript('mahlazer_AimAt',pitch+math.pi/2)
+		Turn(SatelliteMuzzle, x_axis, math.pi/2+pitch, math.rad(1.2))
+		WaitForTurn(SatelliteMuzzle, x_axis)
+		
 		return true
 	end
 	return false
@@ -376,11 +381,11 @@ end
 
 
 function SnapSatellite()
-    while true do
-        local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount);
-        Spring.MoveCtrl.SetPosition(satUnitID,x,y,z);
-        Sleep(30);
-    end
+	while true do
+		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
+		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+		Sleep(30)
+	end
 end
 
 function script.QueryWeapon(num)
@@ -389,7 +394,7 @@ end
 
 function script.FireWeapon(num)
 	shooting = 30
-    CallSatelliteScript('mahlazer_SetShoot',shooting);
+	CallSatelliteScript('mahlazer_SetShoot',shooting)
 end
 
 function script.AimFromWeapon(num)
@@ -399,10 +404,10 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 
-	if (severity <= .25) then
+	if (severity <= 0.25) then
 		Explode(Basis, SFX.NONE)
 		return 1 -- corpsetype
-	elseif (severity <= .5) then
+	elseif (severity <= 0.5) then
 		Explode(Basis, SFX.NONE)
 		return 1 -- corpsetype
 	else
@@ -410,4 +415,4 @@ function script.Killed(recentDamage, maxHealth)
 		return 2 -- corpsetype
 	end
 end
-     
+
