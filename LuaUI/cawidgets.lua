@@ -15,6 +15,7 @@
 --------------------------------------------------------------------------------
 
 -- stable release?
+local ignorelist = {count = 0,ignorees ={}} -- Ignore workaround for WG table.
 local isStable = false
 local resetWidgetDetailLevel = false -- has widget detail level changed
 
@@ -387,6 +388,23 @@ function widgetHandler:Initialize()
     isStable = true
   end
 
+  -- Add ignorelist --
+  local customkeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID()))
+  if customkeys["ignored"] then
+    if string.find(customkeys["ignored"],",") then
+      local newignorelist = string.gsub(customkeys["ignored"],","," ")
+      Spring.Echo("Setting Serverside ignorelist: " .. newignorelist)
+      for ignoree in string.gmatch(newignorelist,"%S+") do
+        ignorelist.ignorees[ignoree] = true
+        ignorelist.count = ignorelist.count + 1
+      end
+      newignorelist = nil
+    elseif string.len(customkeys["ignored"]) > 1 then
+      ignorelist.ignorees[customkeys["ignored"]] = true
+      ignorelist.count = ignorelist.count + 1
+    end
+  end
+  customkeys = nil
   self:LoadOrderList()
   self:LoadConfigData()
 
@@ -610,6 +628,9 @@ function widgetHandler:NewWidget()
       self.mouseOwner = nil
     end
   end
+  wh.Ignore = function (_,name) if not ignorelist.ignorees[name] then ignorelist.ignorees[name] = true;ignorelist.count = ignorelist.count + 1 end end
+  wh.Unignore = function (_,name) ignorelist.ignorees[name] = nil;ignorelist.count = ignorelist.count - 1 end
+  wh.GetIgnoreList = function (_) return ignorelist["ignorees"],ignorelist.count end
 
   wh.isStable = function (_) return self:isStable() end
 
@@ -1182,6 +1203,7 @@ function widgetHandler:Shutdown()
 	w:Shutdown()
   end
   Spring.Echo("End widgetHandler:Shutdown")
+  
   return
 end
 
@@ -1236,7 +1258,6 @@ function widgetHandler:ConfigureLayout(command)
   end
   return false
 end
-
 
 function widgetHandler:CommandNotify(id, params, options)
   for _,w in ipairs(self.CommandNotifyList) do
@@ -1345,8 +1366,13 @@ function widgetHandler:AddConsoleLine(msg, priority)
 			end
 			--TODO: improve chili_chat2 spam-filter/dedupe-detection too.
 		end
+		-- IGNORE FEATURE--
+        	if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID_msg))] then
+			return
+        	end
 	end
 	
+    
 	if MUTE_LOBBY and newMsg.msgtype == 'autohost' then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if (not spectating) and newMsg.argument then
@@ -1367,6 +1393,16 @@ function widgetHandler:AddConsoleLine(msg, priority)
 				else
 					return
 				end
+			end
+		end
+	end
+	--Ignore's lobby blocker.--
+	if newMsg.msgtype == 'autohost' and newMsg.argument and string.sub(newMsg.argument, 1, 1) == "<" then
+		local endChar = string.find(newMsg.argument, ">")
+		if endChar then
+			local name = string.sub(newMsg.argument, 2, endChar-1)
+			if ignorelist.ignorees[name] then
+				return -- block chat
 			end
 		end
 	end
@@ -1899,7 +1935,7 @@ end
 
 function widgetHandler:MapDrawCmd(playerID, cmdType, px, py, pz, ...)
   local customkeys = select(10, Spring.GetPlayerInfo(playerID))
-  if customkeys and customkeys.muted then
+  if ignorelist.ignorees[select(1,Spring.GetPlayerInfo(playerID))] or (customkeys and customkeys.muted) then
     return true
   end
   
