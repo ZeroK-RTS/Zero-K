@@ -83,10 +83,10 @@ end
 
 local function ProcessCommand(id, params, options)
   local alt,ctrl,meta,shift = Spring.GetModKeyState() --must use this because "options" table turn into different format when right+click. Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
-  if (ctrl) and not (meta) and (id==CMD.RECLAIM or id==CMD.REPAIR) then --Reclaim + CTRL
+  if (ctrl) and not (meta) and id==CMD.REPAIR then
 	local opt = 0
 	if options.alt or alt then opt = opt + CMD.OPT_ALT end
-	opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit
+	opt = opt + CMD.OPT_META
 	if options.right then opt = opt + CMD.OPT_RIGHT end
 	if options.shift or shift then opt = opt + CMD.OPT_SHIFT end
 	Spring.GiveOrder(id,params,opt)
@@ -97,10 +97,10 @@ local function ProcessCommand(id, params, options)
     local insertfront=false
     if options.alt or alt then opt = opt + CMD.OPT_ALT end
 	if options.ctrl or ctrl then
-		if (id~=CMD.RECLAIM and id~=CMD.REPAIR) then  
-			opt = opt + CMD.OPT_CTRL --add CTRL like normal
-		else --add CTRL+Reclaim as force-reclaim
-			opt = opt + CMD.OPT_META; --add META. Force-reclaim-own-unit(originally META+Reclaim). Can't change CommandInsert() to other modifier because META is already established (culturally) for CommandInsert()
+		if id~=CMD.REPAIR then  
+			opt = opt + CMD.OPT_CTRL
+		else
+			opt = opt + CMD.OPT_META
 		end
 	end
     if options.right then opt = opt + CMD.OPT_RIGHT end
