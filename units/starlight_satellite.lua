@@ -29,6 +29,7 @@ starlight_satellite = {
   maxVelocity            = 0.001,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
+  noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[starlight_satellite.dae]],
   script                 = [[starlight_satellite.lua]],
@@ -55,8 +56,7 @@ starlight_satellite = {
 
     {
       def                = [[TARGETER]],
-      badTargetCategory  = [[FIXEDWING GUNSHIP SATELLITE]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER FIXEDWING GUNSHIP SATELLITE]],
+      onlyTargetCategory = [[NONE]],
     },  
   
     {

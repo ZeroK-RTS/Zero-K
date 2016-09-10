@@ -25,7 +25,9 @@ local shooting = 0;
 local parentUnitID;
 
 function script.Create()
-   StartThread(MonitorHost);
+	--Move(Satellite, y_axis, -10)
+    --Spin(Satellite, x_axis, math.rad(80))
+	StartThread(MonitorHost);
 end
 
 function MonitorHost()
@@ -119,6 +121,7 @@ end
 
 function mahlazer_AimAt(pitch)
     Turn(SatelliteMuzzle, x_axis, pitch, math.rad(1.2))
+    Turn(Satellite, x_axis, pitch/2, math.rad(0.6))
 end
 
 function mahlazer_Undock()
