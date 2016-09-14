@@ -637,8 +637,9 @@ local function MakeFlags()
 		country = myCountry, 
 		countryLang = country_langs[myCountry] or 'en',
 		width='50%',
-		textColor = color.sub_button_fg,
-		backgroundColor = color.sub_button_bg, 
+		classname = "submenu_navigation_button",
+		--textColor = color.sub_button_fg,
+		--backgroundColor = color.sub_button_bg, 
 		OnClick = { SetCountry }  
 	}
 	
@@ -652,8 +653,9 @@ local function MakeFlags()
 		flagChildren[#flagChildren + 1] = Button:New{ caption = country:upper(),
 			name = 'countryButton' .. country;
 			width='50%',
-			textColor = color.sub_button_fg,
-			backgroundColor = color.sub_button_bg,
+			classname = "submenu_navigation_button",
+			--textColor = color.sub_button_fg,
+			--backgroundColor = color.sub_button_bg,
 			country = country,
 			countryLang = countryLang,
 			OnClick = { SetCountry } 
@@ -689,8 +691,10 @@ local function MakeFlags()
 			Button:New{ caption = 'Close',  x=10, y=0-B_HEIGHT, bottom=5, right=5,
 				name = 'makeFlagCloseButton';
 				OnClick = { function(self) window_flags:Dispose(); window_flags = nil; end },  
-				width=window_width-20, backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
-				},
+				width=window_width-20, 
+				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
+				classname = "navigation_button",
+			},
 		}
 	}
 end
@@ -719,9 +723,13 @@ local function MakeHelp(caption, text)
 				}
 			},
 			--Close button
-			Button:New{ caption = 'Close', OnClick = { function(self) self.parent:Dispose() end }, x=10, bottom=1, right=50, height=B_HEIGHT,
-			name = 'makeHelpCloseButton';
-			backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, },
+			Button:New{ 
+				caption = 'Close', OnClick = { function(self) self.parent:Dispose() end }, 
+				x=10, bottom=1, right=50, height=B_HEIGHT,
+				name = 'makeHelpCloseButton';
+				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, 
+				classname = "navigation_button",
+			},
 		}
 	}
 end
@@ -1448,8 +1456,9 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 			width = hklength,
 			caption = hotkeystring, 
 			OnClick = { kbfunc },
-			backgroundColor = color.sub_button_bg,
-			textColor = color.sub_button_fg, 
+			classname = "submenu_navigation_button",
+			--backgroundColor = color.sub_button_bg,
+			--textColor = color.sub_button_fg, 
 			tooltip = 'Hotkey: ' .. hotkeystring,
 		}
 		
@@ -1723,8 +1732,9 @@ MakeSubWindow = function(path, pause)
 					--caption = option.name, 
 					caption = '', 
 					OnClick = escapeSearch and {function() filterUserInsertedTerm = ''; end,option.OnChange} or {option.OnChange},
-					backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
-					textColor = disabled and color.disabled_fg or color.sub_button_fg, 
+					--backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
+					--textColor = disabled and color.disabled_fg or color.sub_button_fg, 
+					classname = (disabled and "navigation_button_disabled") or "navigation_button",
 					tooltip = option.desc,
 					
 					padding={2,2,2,2},
@@ -1751,8 +1761,9 @@ MakeSubWindow = function(path, pause)
 					minHeight = 30,
 					caption = option.name, 
 					OnClick = { function() MakeHelp(option.name, option.value) end },
-					backgroundColor = color.sub_button_bg,
-					textColor = color.sub_button_fg, 
+					classname = "submenu_navigation_button",
+					--backgroundColor = color.sub_button_bg,
+					--textColor = color.sub_button_fg, 
 					tooltip=option.desc
 				}
 			
@@ -1817,8 +1828,9 @@ MakeSubWindow = function(path, pause)
 						width = "100%",
 						caption = item.name, 
 						OnClick = { function(self) option.OnChange(item) end },
-						backgroundColor = color.sub_button_bg,
-						textColor = color.sub_button_fg, 
+						classname = "submenu_navigation_button",
+						--backgroundColor = color.sub_button_bg,
+						--textColor = color.sub_button_fg, 
 						tooltip=item.desc,
 					}
 			end
@@ -1928,7 +1940,9 @@ MakeSubWindow = function(path, pause)
 	--back button
 	if parent_path then
 		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; MakeSubWindow(parent_path, false) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
+			--backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, 
+			classname = "back_button",
+			height=B_HEIGHT,
 			padding= {2,2,2,2},
 			parent = buttonBar;
 			children = {
@@ -1941,7 +1955,9 @@ MakeSubWindow = function(path, pause)
 	--search button
 	Button:New{ name= 'searchButton', caption = '',
 		OnClick = { function() spSendCommands("chat","PasteText /search:" ) end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, 
+		classname = "navigation_button",
+		height=B_HEIGHT,
 		padding= {2,2,2,2},parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=2,  },
@@ -1953,7 +1969,9 @@ MakeSubWindow = function(path, pause)
 		--reset button
 		Button:New{ name= 'resetButton', caption = '',
 			OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-			textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+			classname = "navigation_button",
+			height=B_HEIGHT,
 			padding= {2,2,2,2}, parent = buttonBar;
 			children = {
 				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=2,  },
@@ -1965,7 +1983,9 @@ MakeSubWindow = function(path, pause)
 	--close button
 	Button:New{ name= 'menuCloseButton', caption = '',
 		OnClick = { function() KillSubWindow(); filterUserInsertedTerm = '';  end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+		classname = "navigation_button",
+		height=B_HEIGHT,
 		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=2,  },

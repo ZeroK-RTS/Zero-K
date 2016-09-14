@@ -1421,7 +1421,6 @@ function widget:Initialize()
 		width = inputsize - 3,
 		height = inputsize - 3,
 		padding = { 1,1,1,1 },
-		backgroundColor = {1,1,1,1},
 		caption = '',
 		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},

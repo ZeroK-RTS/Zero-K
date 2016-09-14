@@ -317,8 +317,9 @@ local function CloseButton(width)
 		OnClick = { CloseButtonFunc }, 
 		width=width, 
 		height = B_HEIGHT,
-		backgroundColor=color.sub_back_bg, 
-		textColor=color.sub_back_fg,
+		--backgroundColor=color.sub_back_bg, 
+		--textColor=color.sub_back_fg,
+		classname = "back_button",
 	}
 end
 
@@ -1574,8 +1575,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			right=10,
 			bottom=1,
 			
-			backgroundColor=color.sub_back_bg, 
-			textColor=color.sub_back_fg,
+			--backgroundColor=color.sub_back_bg, 
+			--textColor=color.sub_back_fg,
+			classname = "back_button",
 		}
 	}
 
@@ -1642,8 +1644,9 @@ local function PriceWindow(unitID, action)
 				OnClick = { func, CloseButtonFunc2 }, 
 				width=window_width,
 				height=B_HEIGHT,
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				classname = "back_button",
 			}
 		end
 	end
@@ -1717,8 +1720,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 			caption = 'Unit Info', 
 			OnClick = { function() MakeStatsWindow(ud,x,y) end }, 
 			width=window_width,
-			backgroundColor=color.sub_back_bg, 
-			textColor=color.sub_back_fg,
+			--backgroundColor=color.sub_back_bg, 
+			--textColor=color.sub_back_fg,
+			classname = "back_button",
 		},
 	}
 	local y = scrH-y
@@ -1730,16 +1734,18 @@ local function MakeUnitContextMenu(unitID,x,y)
 				caption = 'Set Sale Price', 
 				OnClick = { function(self) PriceWindow(unitID, 'sell') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				classname = "back_button",
 			}
 		else
 			children[#children+1] =  Button:New{ 
 				caption = 'Offer To Buy', 
 				OnClick = { function(self) PriceWindow(unitID, 'buy') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				classname = "back_button",
 			}
 		end
 		if myAlliance ~= alliance then
@@ -1747,8 +1753,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 				caption = 'Place Bounty', 
 				OnClick = { function(self) PriceWindow(unitID, 'bounty') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				classname = "back_button",
 			}
 		end
 	end

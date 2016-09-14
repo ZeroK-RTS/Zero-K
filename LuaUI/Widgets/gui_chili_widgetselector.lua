@@ -343,8 +343,9 @@ MakeWidgetList = function()
 			Button:New{ 
 				caption = 'Search', 
 				OnClick = { function() Spring.SendCommands("chat","PasteText /search:") end }, 
-				backgroundColor=color.sub_close_bg, 
-				textColor=color.sub_close_fg, 
+				--backgroundColor=color.sub_close_bg, 
+				--textColor=color.sub_close_fg, 
+				classname = "navigation_button",
 				
 				x = '33%',
 				bottom=1,
@@ -356,8 +357,9 @@ MakeWidgetList = function()
 			Button:New{ 
 				caption = 'Close', 
 				OnClick = { KillWidgetList }, 
-				backgroundColor=color.sub_close_bg, 
-				textColor=color.sub_close_fg, 
+				--backgroundColor=color.sub_close_bg, 
+				--textColor=color.sub_close_fg, 
+				classname = "navigation_button",
 				
 				x = '66%',
 				bottom=1,
