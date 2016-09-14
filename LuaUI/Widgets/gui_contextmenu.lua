@@ -319,7 +319,7 @@ local function CloseButton(width)
 		height = B_HEIGHT,
 		--backgroundColor=color.sub_back_bg, 
 		--textColor=color.sub_back_fg,
-		classname = "back_button",
+		--classname = "back_button",
 	}
 end
 
@@ -1577,7 +1577,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			
 			--backgroundColor=color.sub_back_bg, 
 			--textColor=color.sub_back_fg,
-			classname = "back_button",
+			--classname = "back_button",
 		}
 	}
 
@@ -1646,7 +1646,7 @@ local function PriceWindow(unitID, action)
 				height=B_HEIGHT,
 				--backgroundColor=color.sub_back_bg, 
 				--textColor=color.sub_back_fg,
-				classname = "back_button",
+				--classname = "back_button",
 			}
 		end
 	end
@@ -1722,7 +1722,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 			width=window_width,
 			--backgroundColor=color.sub_back_bg, 
 			--textColor=color.sub_back_fg,
-			classname = "back_button",
+			--classname = "back_button",
 		},
 	}
 	local y = scrH-y
@@ -1736,7 +1736,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 				width=window_width, 
 				--backgroundColor=color.sub_back_bg, 
 				--textColor=color.sub_back_fg,
-				classname = "back_button",
+				--classname = "back_button",
 			}
 		else
 			children[#children+1] =  Button:New{ 
@@ -1745,7 +1745,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 				width=window_width, 
 				--backgroundColor=color.sub_back_bg, 
 				--textColor=color.sub_back_fg,
-				classname = "back_button",
+				--classname = "back_button",
 			}
 		end
 		if myAlliance ~= alliance then
@@ -1755,7 +1755,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 				width=window_width, 
 				--backgroundColor=color.sub_back_bg, 
 				--textColor=color.sub_back_fg,
-				classname = "back_button",
+				--classname = "back_button",
 			}
 		end
 	end

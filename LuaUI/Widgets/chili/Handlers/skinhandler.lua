@@ -148,6 +148,7 @@ function SkinHandler.LoadSkin(control, class)
 	local found = false
 	local inherited = class.inherited
 	local classname = control.classname
+	
 	repeat
 		--FIXME scan whole `depend` table
 

@@ -31,6 +31,18 @@ skin.button = {
   padding = {10, 10, 10, 10},
 }
 
+skin.button_disabled = {
+  TileImageFG = ":cl:glass.png",
+  TileImageBK = ":cl:empty.png",
+  tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+
+  DrawControl = DrawButton,
+}
+
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",

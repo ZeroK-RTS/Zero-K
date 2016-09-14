@@ -74,7 +74,7 @@ function Control:New(obj)
   obj.minHeight = obj.minHeight or minimumSize[2]
 
   --// load the skin for this control
-  obj.classname = self.classname
+  obj.classname = obj.classname or self.classname
   theme.LoadThemeDefaults(obj)
   SkinHandler.LoadSkin(obj, self)
 
