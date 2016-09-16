@@ -11,18 +11,15 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
 VFS.Include("LuaRules/Configs/start_setup.lua")
 
 local rankTextures = {}
-do
-	local rankTexBase = 'LuaUI/Images/Ranks/' 
-	rankTextures = {
-	  [0] = nil,
-	  [1] = rankTexBase .. 'dude_smurf.png',
-	  [2] = rankTexBase .. 'dude_user.png',
-	  [3] = rankTexBase .. 'dude_soldier.png',
-	  [4] = rankTexBase .. 'dude_napoleon.png',
-	}
+for i = 0, 7 do
+	rankTextures[i] = {}
+	for j = 0, 7 do
+		rankTextures[i][j] = 'LuaUI/Images/LobbyRanks/' .. i .. '_' .. j .. '.png'
+	end
 end
 --[[
 options_path = 'Settings/Interface/Pregame Setup'
@@ -78,9 +75,10 @@ function widget:Initialize()
 			local playerID = playerList[j]
 			local _,_,spec,_,_,_,_,_,_,customKey = Spring.GetPlayerInfo(playerID) --get customPlayerKey
 			local elo = (customKey and tonumber(customKey.elo))
-			local eloLevel = (elo and math.min(4, math.max(1, math.floor((elo-1000) / 200))))
+			local xp = (customKey and tonumber(customKey.level))
+			elo, xp = Spring.Utilities.TranslateLobbyRank(elo, xp)
 			local validEntry = not (x==y and x==z) and elo and (not spec)
-			playerInfo[#playerInfo +1] = {elo=elo, eloLevel=eloLevel,xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry,
+			playerInfo[#playerInfo +1] = {elo=elo, xp=xp, xyz={x,y,z},playerID=playerID,teamID=teamID, validEntry=validEntry,
 				comDefName=DEFAULT_UNIT_NAME,
 				comDefId=DEFAULT_UNIT
 			}
@@ -94,13 +92,12 @@ function widget:Update(dt)
 	if elapsedSecond>=0.1 then --update every 0.66 second (reason: 0.66 felt not long and not quick)
 		for i=1, #playerInfo do
 			local teamID = playerInfo[i].teamID
-			local elo = playerInfo[i].eloLevel
 			local playerID = playerInfo[i].playerID
 			local comDefName = playerInfo[i].comDefName
 			local _,active,spec = Spring.GetPlayerInfo(playerID)
 			local x,y,z = Spring.GetTeamStartPosition(teamID) --update player's start position (if available).
 			x,y,z = x or 0 ,y or 0, z or 0 --safety for spectating using restricted LOS
-			local validEntry = not (x==y and x==z) and elo and active and (not spec) -- invalidate symmetrical coordinate (since they are not humanly possible, probably indicate issues), and invalidate "nil" elo, and invalidate disconnected players, and invalid spec
+			local validEntry = not (x==y and x==z) and active and (not spec) -- invalidate symmetrical coordinate (since they are not humanly possible, probably indicate issues), and invalidate "nil" elo, and invalidate disconnected players, and invalid spec
 			playerInfo[i].xyz = {x,y,z}
 			playerInfo[i].validEntry = validEntry
 			if comDefName then
@@ -169,7 +166,8 @@ function widget:DrawScreenEffects() --Show icons on the screen. Reference: unit_
 	for i = 1, #playerInfo do
 		local validEntry = playerInfo[i].validEntry --contain valid coordinate and texture
 		if validEntry then
-			local eloLevel = playerInfo[i].eloLevel
+			local elo = playerInfo[i].elo
+			local xp = playerInfo[i].xp
 			local x = playerInfo[i].xyz[1]
 			local y = playerInfo[i].xyz[2]
 			local z = playerInfo[i].xyz[3]
@@ -185,7 +183,7 @@ function widget:DrawScreenEffects() --Show icons on the screen. Reference: unit_
 			local scrnHorzOffset = 0
 			--//
 			x,height,z = Spring.WorldToScreenCoords(x,height,z) --convert unit position into screen coordinate
-			gl.Texture( rankTextures[eloLevel] ) --the icon (4 to choose from)
+			gl.Texture( rankTextures[xp][elo] ) --the icon (4 to choose from)
 			gl.PushMatrix()
 			gl.Translate(x,height,z) --move icon into screen coordinate
 			gl.TexRect(-size*0.5+scrnHorzOffset, -size+scrnVertOffset, size*0.5+scrnHorzOffset, scrnVertOffset) --place this icon just below the player's name

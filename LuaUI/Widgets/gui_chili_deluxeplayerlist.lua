@@ -28,6 +28,8 @@ TODO:
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
+
 function SetupPlayerNames() end
 function ToggleVisibility() end
 
@@ -53,7 +55,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'show_cpu_ping', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'show_cpu_ping', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -147,14 +149,6 @@ options = {
 		OnChange = function() SetupPanels() end,
 		advanced = true
 	},
-	round_elo = {
-		name = "Round Elo display",
-		type = 'bool',
-		value = true,
-		desc = "Round Elo display to the nearest 50 points",
-		OnChange = function() SetupPanels() end,
-		advanced = true
-	},
 	mousewheel = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
@@ -211,13 +205,6 @@ options = {
 		value = true,
 		desc = "Show player's ping and cpu",
 		OnChange = function() SetupPanels() end,
-	},
-	rank_as_text = {
-		name = "Show rank as text",
-		type = 'bool',
-		value = false,
-		desc = "Show rank as text (vs. as an icon)",
-		OnChange = function() SetupPlayerNames() end,
 	},
 	cpu_ping_as_text = {
 		name = "Show ping/cpu as text",
@@ -306,7 +293,6 @@ localAlliance = Spring.GetMyAllyTeamID()
 local x_icon_clan
 local x_icon_country
 local x_icon_rank
-local x_elo
 local x_cf
 local x_status
 local x_name
@@ -341,8 +327,7 @@ local function CalculateWidths()
 	x_icon_clan		= wins_width + 10
 	x_icon_country	= x_icon_clan + 18
 	x_icon_rank		= x_icon_country + 20
-	x_elo			= options.show_ccr.value and x_icon_rank + 16 or x_icon_clan
-	x_cf			= x_elo + 32
+	x_cf			= options.show_ccr.value and x_icon_rank + 16 or x_icon_clan
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
 	x_teamsize		= x_icon_clan
@@ -945,21 +930,14 @@ local function AddEntity(entity, teamID, allyTeamID)
 			elseif entity.faction and entity.faction ~= "" then
 				icon = "LuaUI/Configs/Factions/" .. entity.faction ..".png"
 			end
-			if entity.level and entity.level ~= "" then 
-				icRank = "LuaUI/Images/Ranks/" .. math.min((1+math.floor((entity.level or 0)/10)),9) .. ".png"
+			if entity.level and entity.level ~= "" and entity.elo and entity.elo ~= "" then 
+				local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(entity.elo), tonumber(entity.level))
+				icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 			end
 			if icCountry then MakeNewIcon(entity,"countryIcon",{x=x_icon_country,file=icCountry,}) end 
-			if options.rank_as_text.value then
-				if entity.level then MakeNewLabel(entity,"rankLabel",{x=x_icon_rank,width=14,caption = math.min(entity.level,99),textColor = {0.85,0.85,0.85,1},align = 'right',}) end
-			else
-				if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
-			end
+			if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
 			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end 
 		end
-		if entity.elo and entity.elo ~= "" then
-			elo, eloCol = FormatElo(entity.elo, not options.round_elo.value)
-		end
-		if elo then MakeNewLabel(entity,"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
 
 		-- status (player status and team status)
 		local pstatus = nil
@@ -1085,11 +1063,6 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 			if allyTeamResources[allyTeamID] and allyTeams[allyTeamID] then
 				allyTeamEntities[allyTeamID] = allyTeamEntities[allyTeamID] or {}
 				local allyTeamColor
-				local elo
-				local eloCol
-				if allyTeamsElo[allyTeamID] then
-					elo, eloCol = FormatElo(allyTeamsElo[allyTeamID].total / allyTeamsElo[allyTeamID].count, true)
-				end
 				if (localTeam ~= 0 or teamZeroPlayers[myID]) and allyTeamID == localAlliance then
 					allyTeamColor = {Spring.GetTeamColor(localTeam)}
 				else
@@ -1102,15 +1075,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = teamName,textColor = allyTeamColor,})
 				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
-				local rstring = "smurf"
-				if elo then 
-					MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) 
-					if elo > 1800 then rstring = "napoleon"
-					elseif elo > 1600 then rstring = "soldier"
-					elseif elo > 1400 then rstring = "user"
-					end
-				end
-				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/Ranks/dude_"..rstring..".png",})
+				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/dude.png",})
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 

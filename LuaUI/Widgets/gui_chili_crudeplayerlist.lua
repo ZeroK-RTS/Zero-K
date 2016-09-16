@@ -13,6 +13,8 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spSendCommands			= Spring.SendCommands
@@ -503,12 +505,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 		elseif (customKeys.faction~=nil and customKeys.faction~="") then
 			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 		end 
-		if customKeys.level ~= nil and customKeys.level~="" then 
-			local level = 1+math.floor((customKeys.level or 0)/10)
-			if level > 9 then 
-				level = 9
-			end 
-			icRank = "LuaUI/Images/Ranks/" .. level .. ".png"
+		if customKeys.level and customKeys.level~="" and customKeys.elo and customKeys.elo~="" then
+			local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(customKeys.elo), tonumber(customKeys.level))
+			icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 		end
 	end
 	
