@@ -12,6 +12,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
+  buildingGroundDecalType       = [[starlight_aoplate.dds]],
   buildPic                      = [[starlight.png]],
   buildTime                     = 40000,
   canAttack                     = true,
