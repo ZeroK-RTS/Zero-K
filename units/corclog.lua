@@ -91,6 +91,7 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+        combatrange = 5,
 	  },
 
       damage                  = {

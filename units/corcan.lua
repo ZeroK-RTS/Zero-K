@@ -103,6 +103,8 @@ unitDef = {
 		light_color = [[1 1 0.7]],
 		light_radius = 150,
 		light_beam_start = 0.25,
+		
+        combatrange = 60,
       },
 
       damage                  = {

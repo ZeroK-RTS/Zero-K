@@ -56,7 +56,7 @@ end
 -- Unit Handling
 
 local function AddUnitTexture(unitID, attributes, tex)
-	if (not VFS.FileExists(tex)) then
+	if not (tex and VFS.FileExists(tex)) then
 		return
 	end
 
