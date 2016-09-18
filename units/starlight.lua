@@ -67,7 +67,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
-  yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
+  yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   weapons                       = {
 
