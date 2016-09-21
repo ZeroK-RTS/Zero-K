@@ -77,7 +77,7 @@ unitDef = {
 
     Headbutt = {
       name                    = [[Headbutt]],
-      beamTime                = 0.03,
+      beamTime                = 1/30,
       avoidFeature            = false,
       avoidFriendly           = false,
       avoidGround             = false,
