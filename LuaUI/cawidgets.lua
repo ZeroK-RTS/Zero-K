@@ -1818,6 +1818,8 @@ end
 
 function widgetHandler:GameStart()
   for _,w in ipairs(self.GameStartList) do
+    -- If snd_music stops starting in chobby try doing this.
+	--local info = w:GetInfo()
     w:GameStart()
   end
 

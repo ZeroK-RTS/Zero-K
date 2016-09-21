@@ -309,6 +309,12 @@ function widget:GameStart()
 	newTrackWait = 0	
 end
 
+-- Safety of a heisenbug
+function widget:GameFrame()
+	widget:GameStart()
+	widgetHandler:RemoveCallIn('GameFrame')
+end
+
 function widget:Initialize()
 	WG.Music = WG.Music or {}
 	WG.Music.StartTrack = StartTrack
