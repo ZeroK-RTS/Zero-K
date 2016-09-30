@@ -577,7 +577,7 @@ upgrades = {
 		description = "Generates a small bubble shield",
 		func = function(unitDef)
 				if unitDef.customparams.dynamic_comm then
-					DynamicApplyWeapon(unitDef, "commweapon_personal_shield", 16)
+					DynamicApplyWeapon(unitDef, "commweapon_personal_shield", #unitDef.weapons + 1)
 				else
 					ApplyWeapon(unitDef, "commweapon_personal_shield", 4)
 				end
@@ -600,7 +600,7 @@ upgrades = {
 				--ApplyWeapon(unitDef, "commweapon_areashield", 2)
 				
 				if unitDef.customparams.dynamic_comm then
-					DynamicApplyWeapon(unitDef, "commweapon_areashield", 16)
+					DynamicApplyWeapon(unitDef, "commweapon_areashield", #unitDef.weapons) -- not +1 so as to replace personal
 				else
 					ReplaceWeapon(unitDef, "commweapon_personal_shield", "commweapon_areashield")
 				end
