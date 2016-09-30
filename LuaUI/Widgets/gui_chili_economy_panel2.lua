@@ -80,6 +80,58 @@ local blinkE_status = false
 local time_old = 0
 local excessE = false
 
+local strings = {
+	local_metal_economy = "",
+	local_energy_economy = "",
+	team_metal_economy = "",
+	team_energy_economy = "",
+	resbar_base_extraction = "",
+	resbar_overdrive = "",
+	resbar_reclaim = "",
+	resbar_cons = "",
+	resbar_sharing = "",
+	resbar_construction = "",
+	resbar_reserve = "",
+	resbar_stored = "",
+	resbar_inc = "",
+	resbar_pull = "",
+	resbar_generators = "",
+	resbar_sharing_and_overdrive = "",
+	resbar_other = "",
+	resbar_waste = "",
+	metal = "",
+}
+
+function languageChanged ()
+	for k, v in pairs(strings) do
+		strings[k] = WG.Translate ("interface", k)
+	end
+	if lbl_storage_metal then
+		lbl_storage_metal.tooltip = WG.Translate("interface", "resbar_metal_storage_tooltip")
+	end
+	if lbl_storage_energy then
+		lbl_storage_energy.tooltip = WG.Translate("interface", "resbar_energy_storage_tooltip")
+	end
+	if lbl_income_metal then
+		lbl_income_metal.tooltip = WG.Translate("interface", "resbar_metal_income_tooltip")
+	end
+	if lbl_income_energy then
+		lbl_income_energy.tooltip = WG.Translate("interface", "resbar_energy_income_tooltip")
+	end
+	if bar_metal then
+		bar_metal.tooltip = WG.Translate("interface", "resbar_metal_bar_tooltip")
+	end
+	if bar_energy then
+		bar_energy.tooltip = WG.Translate("interface", "resbar_energy_bar_tooltip")
+	end
+	if lbl_expense_metal then
+		lbl_expense_metal.tooltip = WG.Translate("interface", "resbar_metal_expense_tooltip")
+	end
+	if lbl_expense_energy then
+		lbl_expense_energy.tooltip = WG.Translate("interface", "resbar_energy_expense_tooltip")
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -456,45 +508,45 @@ function widget:GameFrame(n)
 	local team_energyOverdrive = Format(-cp.team_energyOverdrive)
 	local team_energyWaste = Format(-cp.team_energyWaste)
 	local team_energyOther = Format(-teamEnergyExp + teamMSpent + cp.team_energyOverdrive)
-	
-	image_metal.tooltip = "Local Metal Economy" ..
-	"\n  Base Extraction: " .. metalBase ..
-	"\n  Overdrive: " .. metalOverdrive ..
-	"\n  Reclaim: " .. metalReclaim ..
-	"\n  Cons: " .. metalConstructor ..
-	"\n  Sharing: " .. metalShare .. 
-	"\n  Construction: " .. metalConstuction ..
-    "\n  Reserve: " .. math.ceil(cp.metalStorageReserve or 0) ..
-    "\n  Stored: " .. ("%i / %i"):format(mCurr, mStor)  ..
+
+	image_metal.tooltip = strings["local_metal_economy"] ..
+	"\n  " .. strings["resbar_base_extraction"] .. ": " .. metalBase ..
+	"\n  " .. strings["resbar_overdrive"] .. ": " .. metalOverdrive ..
+	"\n  " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
+	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
+	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare .. 
+	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstuction ..
+    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
+    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " .. 
-	"\nTeam Metal Economy  " .. 
-	"\n  Inc: " .. team_metalTotalIncome .. "      Pull: " .. team_metalPull ..
-	"\n  Base Extraction: " .. team_metalBase ..
-	"\n  Overdrive: " .. team_metalOverdrive ..
-	"\n  Reclaim : " .. team_metalReclaim ..
-	"\n  Cons: " .. team_metalConstructor ..
-	"\n  Construction: " .. team_metalConstuction ..
-	"\n  Waste: " .. team_metalWaste ..
-    "\n  Stored: " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
+	"\n" .. strings["team_metal_economy"] .. 
+	"\n  " .. strings["resbar_inc"] .. ": " .. team_metalTotalIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_metalPull ..
+	"\n  " .. strings["resbar_base_extraction"] .. ": " .. team_metalBase ..
+	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_metalOverdrive ..
+	"\n  " .. strings["resbar_reclaim"] .. " : " .. team_metalReclaim ..
+	"\n  " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstuction ..
+	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
+    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
 	
-	image_energy.tooltip = "Local Energy Economy" ..
-	"\n  Generators: " .. energyGenerators ..
-	"\n  Reclaim: " .. energyReclaim ..
-	"\n  Sharing & Overdrive: " .. energyOverdrive .. 
-	"\n  Construction: " .. metalConstuction .. 
-	"\n  Other: " .. energyOther ..
-    "\n  Reserve: " .. math.ceil(cp.energyStorageReserve or 0) ..
-    "\n  Stored: " .. ("%i / %i"):format(eCurr, eStor)  ..
+	image_energy.tooltip = strings["local_energy_economy"] ..
+	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
+	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
+	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive .. 
+	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstuction .. 
+	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
+    "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
+    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
 	"\n " .. 
-	"\nTeam Energy Economy" ..
-	"\n  Inc: " .. team_energyIncome .. "      Pull: " .. team_energyPull ..
-	"\n  Generators: " .. team_energyGenerators ..
-	"\n  Reclaim: " .. team_energyReclaim ..
-	"\n  Overdrive: " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " metal" ..
-	"\n  Construction: " .. team_metalConstuction ..
-	"\n  Other: " .. team_energyOther ..
-	"\n  Waste: " .. team_energyWaste ..
-    "\n  Stored: " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
+	"\n" .. strings["team_energy_economy"] .. 
+	"\n  " .. strings["resbar_inc"] .. ": " .. team_energyIncome .. "      " .. strings["resbar_pull"] .. ": " .. team_energyPull ..
+	"\n  " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
+	"\n  " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
+	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstuction ..
+	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
+	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
+    "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
 
 	--// Storage, income and pull numbers
 	local realEnergyPull = ePull
@@ -571,6 +623,7 @@ end
 
 function widget:Shutdown()
 	window:Dispose()
+	--WG.ShutdownTranslation(GetInfo().name)
 end
 
 function widget:Initialize()
@@ -581,6 +634,7 @@ function widget:Initialize()
 		return
 	end
 
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
     --widgetHandler:RegisterGlobal("ReserveState", ReserveState)
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
@@ -733,7 +787,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = "0",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "Your metal storage.",
 	}
 	
 	lbl_income_metal = Chili.Label:New{
@@ -747,7 +800,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "Your metal Income.\nGained from metal extractors, overdrive and reclaim",
 	}
 	
 	lbl_expense_metal = Chili.Label:New{
@@ -761,7 +813,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "Your metal demand. Construction and morph demand metal.",
 	}
 	
 	bar_reserve_metal = Chili.Multiprogressbar:New{
@@ -799,7 +850,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		height = barHeight,
 		value  = 0,
 		fontShadow = false,
-		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximum storage is reached and you start wasting metal.",
 		font   = {
 			size = 20, 
 			color = {.8,.8,.8,.95}, 
@@ -874,7 +924,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		caption = "0",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, color = {.8,.8,.8,.9}, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "Your energy storage.",
 	}
 	
 	lbl_income_energy = Chili.Label:New{
@@ -888,7 +937,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
  		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "Your energy income.\nGained from powerplants.",
 	}
 	
 	lbl_expense_energy = Chili.Label:New{
@@ -902,7 +950,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		align  = "left",
 		autosize = false,
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
-		tooltip = "This is this total energy demand of your economy and abilities which require energy upkeep",
 	}
 	
 	bar_reserve_energy = Chili.Multiprogressbar:New{
@@ -959,7 +1006,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		right  = barRight,
 		height = barHeight,
 		fontShadow = false,
-		tooltip = "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximum storage is reached and you start wasting energy.",
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
 			if not widgetHandler:InTweakMode() then 
@@ -993,6 +1039,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	function lbl_income_metal:HitTest(x,y) return self end
 	function lbl_expense_energy:HitTest(x,y) return self end
 	function lbl_expense_metal:HitTest(x,y) return self end
+
+	-- set translatable strings
+	languageChanged ()
 end
 
 function DestroyWindow()
