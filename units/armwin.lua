@@ -62,7 +62,6 @@ unitDef = {
       description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       category         = [[corpses]],
-      damage           = 130,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -77,7 +76,6 @@ unitDef = {
       description      = [[Debris - Wind/Tidal Generator]],
       blocking         = false,
       category         = [[heaps]],
-      damage           = 130,
       energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
@@ -90,7 +88,6 @@ unitDef = {
     DEADWATER = {
       description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
-      damage           = 400,
       energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -98,7 +95,10 @@ unitDef = {
       metal            = 14,
       object           = [[arm_wind_generator_dead_water.s3o]],
       reclaimable      = true,
-      reclaimTime      = 14,    
+      reclaimTime      = 14,
+	  customparams = {
+		health_override = 400,
+	  },
     }
 
   },

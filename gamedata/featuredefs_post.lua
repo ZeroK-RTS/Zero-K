@@ -123,6 +123,7 @@ local function ProcessUnitDef(udName, ud)
       FeatureDefs[fullName] = fd
 	  fd.customparams = fd.customparams or {}
 	  fd.customparams.fromunit = "1"
+	  fd.damage = fd.customparams.health_override or ud.maxdamage
       fd.filename = ud.filename
     end
   end
