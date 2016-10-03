@@ -69,26 +69,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Sneaky Pete]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 168,
       object           = [[radarjammer_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 168,
     },
 
     HEAP  = {
       description      = [[Debris - Sneaky Pete]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 84,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 84,
     },
 
   },

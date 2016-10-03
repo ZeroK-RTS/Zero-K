@@ -139,26 +139,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Zeus]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 140,
       object           = [[spherezeus_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 140,
     },
 
     HEAP  = {
       description      = [[Debris - Zeus]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 70,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 70,
     },
 
   },

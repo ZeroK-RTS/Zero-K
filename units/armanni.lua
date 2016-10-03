@@ -130,27 +130,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Annihilator]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 880,
       object           = [[arm_annihilator_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 880,
     },
 
 
     HEAP = {
       description      = [[Debris - Annihilator]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 440,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 440,
     },
 
   },

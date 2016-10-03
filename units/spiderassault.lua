@@ -124,26 +124,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Hermit]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 64,
       object           = [[hermit_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 64,
     },
 
     HEAP  = {
       description      = [[Debris - Hermit]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 32,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
   },

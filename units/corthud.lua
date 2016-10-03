@@ -147,26 +147,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Thug]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[thug_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
     HEAP  = {
       description      = [[Debris - Thug]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

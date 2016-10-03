@@ -133,10 +133,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 640,
       object           = [[crabe_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 640,
     },
 
     HEAP  = {
@@ -144,10 +141,7 @@ unitDef = {
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 320,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 320,
     },
 
   },

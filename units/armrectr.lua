@@ -83,26 +83,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Conjurer]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 56,
       object           = [[spherejeth_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
     HEAP  = {
       description      = [[Debris - Conjurer]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 28,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 28,
     },
 
   },

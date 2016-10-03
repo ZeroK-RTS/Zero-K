@@ -138,26 +138,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Impaler]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 280,
       object           = [[core_diplomat_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 280,
     },
 
     HEAP  = {
       description      = [[Debris - Impaler]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 140,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 140,
     },
 
   },

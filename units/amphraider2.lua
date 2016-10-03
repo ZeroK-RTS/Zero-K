@@ -188,26 +188,18 @@ unitDef = {
     DEAD      = {
       description      = [[Wreckage - Archer]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 80,
       object           = [[amphraider2_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 104,
     },
 
     HEAP      = {
       description      = [[Debris - Archer]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 40,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 52,
     },
 
   },

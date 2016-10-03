@@ -128,27 +128,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Gnat]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[gnat_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
     HEAP = {
       description      = [[Debris - Gnat]],
       blocking         = false,
       category         = [[heaps]],
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 18,
       object           = [[debris1x1b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 18,
     },
 
   },

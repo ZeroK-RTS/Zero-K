@@ -141,26 +141,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Gremlin]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 60,
       object           = [[spherejeth_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
     HEAP = {
       description      = [[Debris - Gremlin]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 30,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 30,
     },
 
   },

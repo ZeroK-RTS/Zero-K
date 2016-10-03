@@ -337,10 +337,7 @@ unitDef = {
       footprintZ       = 6,
       height           = [[60]],
       hitdensity       = [[150]],
-      metal            = 9600,
       object           = [[Detriment_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 9600,
     },
 
     
@@ -352,10 +349,7 @@ unitDef = {
       footprintZ       = 4,
       height           = [[2]],
       hitdensity       = [[105]],
-      metal            = 4800,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 4800,
       world            = [[All Worlds]],
     },
 

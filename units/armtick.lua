@@ -80,10 +80,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 48,
       object           = [[wreck2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 48,
     },
 
     HEAP  = {
@@ -91,10 +88,7 @@ unitDef = {
       blocking         = false,
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 24,
       object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 24,
     },
 
   },

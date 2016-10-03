@@ -147,27 +147,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Placeholder]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 100,
       object           = [[freaker_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
 	
     HEAP  = {
       description      = [[Debris - Placeholder]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 50,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 50,
     },
 
   },

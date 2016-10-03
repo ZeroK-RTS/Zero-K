@@ -64,26 +64,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Missile Silo]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      metal            = 480,
       object           = [[missilesilo_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 480,
     },
 
     HEAP = {
       description      = [[Debris - Missile Silo]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 6,
       footprintZ       = 6,
-      metal            = 240,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
   },

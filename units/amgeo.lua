@@ -55,26 +55,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Advanced Geothermal]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 600,
       object           = [[amgeo_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 600,
     },
 
     HEAP  = {
       description      = [[Debris - Advanced Geothermal]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 300,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 300,
     },
 
   },

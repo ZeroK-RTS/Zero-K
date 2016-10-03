@@ -85,26 +85,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Shield Bot Factory]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 6,
-      metal            = 240,
       object           = [[factory_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
     HEAP  = {
       description      = [[Debris - Shield Bot Factory]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 120,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
   },

@@ -137,26 +137,17 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Venom]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 80,
       object           = [[venom_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-
     },
     HEAP  = {
       description      = [[Debris - Venom]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 40,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
   },

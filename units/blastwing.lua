@@ -79,26 +79,18 @@ unitDef = {
     DEAD      = {
       description      = [[Wreckage - Blastwing]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 22,
       object           = [[wreck2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 22,
     },
 
     HEAP      = {
       description      = [[Debris - Blastwing]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 11,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 11,
     },
 
   },

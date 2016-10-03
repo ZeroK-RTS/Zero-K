@@ -174,27 +174,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Skeeter]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 28,
       object           = [[scoutboat_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 28,
     },
 
     HEAP = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
-      energy           = 0,
       featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 14,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 14,
     },
 
   },

@@ -70,27 +70,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Geothermal Generator]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 200,
       object           = [[geo_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 200,
     },
 
 
     HEAP  = {
       description      = [[Debris - Geothermal Generator]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 100,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
   },

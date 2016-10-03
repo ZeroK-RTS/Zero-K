@@ -71,26 +71,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Eraser]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 240,
       object           = [[eraser_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
     HEAP = {
       description      = [[Debris - Eraser]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 120,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
   },

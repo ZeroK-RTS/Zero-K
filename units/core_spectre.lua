@@ -107,26 +107,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Aspis]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 240,
       object           = [[shield_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
     HEAP = {
       description      = [[Debris - Aspis]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 1,
       footprintZ       = 1,
-      metal            = 120,
       object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
   },

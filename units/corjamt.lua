@@ -107,27 +107,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Aegis]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 210,
       object           = [[shield_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 210,
     },
 
 
     HEAP = {
       description      = [[Debris - Aegis]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 105,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 105,
     },
 
   },

@@ -80,26 +80,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Quill]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 60,
       object           = [[corch_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
     HEAP  = {
       description      = [[Debris - Quill]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 30,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 30,
     },
 
   },

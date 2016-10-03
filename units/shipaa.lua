@@ -199,26 +199,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Shredder]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 160,
       object           = [[aaship_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 160,
     },
 
     HEAP  = {
       description      = [[Debris - Shredder]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 80,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
     },
 
   },

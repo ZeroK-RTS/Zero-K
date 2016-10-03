@@ -80,26 +80,18 @@ unitDef = {
     DEAD      = {
       description      = [[Wreckage - Roach]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 64,
       object           = [[wreck2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 64,
     },
 
     HEAP      = {
       description      = [[Debris - Roach]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 32,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
   },

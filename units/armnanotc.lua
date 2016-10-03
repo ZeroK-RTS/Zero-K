@@ -75,26 +75,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Caretaker]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 88,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
     HEAP = {
       description      = [[Debris - Caretaker]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 44,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

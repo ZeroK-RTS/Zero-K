@@ -121,27 +121,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Big Bertha]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 2000,
       object           = [[armbrtha_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 2000,
     },
 
 
     HEAP  = {
       description      = [[Debris - Big Bertha]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 1000,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1000,
     },
 
   },

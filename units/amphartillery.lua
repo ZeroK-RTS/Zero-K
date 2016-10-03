@@ -151,26 +151,18 @@ unitDef = {
     DEAD      = {
       description      = [[Wreckage - Kraken]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 96,
       object           = [[behecrash_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
     },
 
     HEAP      = {
       description      = [[Debris - Kraken]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 48,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 48,
     },
 
   },

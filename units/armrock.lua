@@ -138,26 +138,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Rocko]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[rocko_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
     HEAP  = {
       description      = [[Debris - Rocko]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 18,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 18,
     },
 
   },

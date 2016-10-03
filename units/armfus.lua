@@ -50,26 +50,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Fusion Reactor]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 400,
       object           = [[arm_fusion_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 400,
     },
 
     HEAP  = {
       description      = [[Debris - Fusion Reactor]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 200,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 200,
     },
 
   },

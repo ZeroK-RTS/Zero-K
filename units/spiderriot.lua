@@ -109,26 +109,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Redback]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 112,
       object           = [[tarantula_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 112,
     },
 
     HEAP  = {
       description      = [[Debris - Redback]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 56,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
   },

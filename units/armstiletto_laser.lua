@@ -159,26 +159,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Thunderbird]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 220,
       object           = [[Stiletto_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 220,
     },
 
     HEAP = {
       description      = [[Debris - Thunderbird]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 110,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 110,
     },
 
   },

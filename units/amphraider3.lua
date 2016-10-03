@@ -164,26 +164,18 @@ unitDef = {
     DEAD      = {
       description      = [[Wreckage - Duck]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 32,
       object           = [[amphraider3_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
     HEAP      = {
       description      = [[Debris - Duck]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 16,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 16,
     },
 
   },

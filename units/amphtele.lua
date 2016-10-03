@@ -62,26 +62,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Djinn]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 300,
       object           = [[amphteleport_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 300,
     },
 
     HEAP = {
       description      = [[Debris - Djinn]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 150,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 150,
     },
 
   },

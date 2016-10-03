@@ -135,26 +135,18 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Spectre]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 300,
       object           = [[sharpshooter_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 300,
     },
 
     HEAP = {
       description      = [[Debris - Spectre]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 150,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 150,
     },
 
   },

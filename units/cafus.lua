@@ -63,27 +63,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Singularity Reactor]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      metal            = 1600,
       object           = [[fus_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1600,
     },
 
 
     HEAP = {
       description      = [[Debris - Singularity Reactor]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 7,
       footprintZ       = 7,
-      metal            = 800,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 800,
     },
 
   },

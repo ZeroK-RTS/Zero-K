@@ -112,27 +112,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Trisula]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[hoverskirm_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
 
     HEAP  = {
       description      = [[Debris - Trisula]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

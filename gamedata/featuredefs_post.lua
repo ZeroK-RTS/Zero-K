@@ -124,6 +124,10 @@ local function ProcessUnitDef(udName, ud)
 	  fd.customparams = fd.customparams or {}
 	  fd.customparams.fromunit = "1"
 	  fd.damage = fd.customparams.health_override or ud.maxdamage
+	  fd.energy = 0
+	  fd.reclaimtime = fd.metal
+	  fd.reclaimable = true
+	  fd.metal = ud.buildcostmetal * (fdName == "heap" and 0.2 or 0.4)
       fd.filename = ud.filename
     end
   end

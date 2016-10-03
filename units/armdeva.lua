@@ -126,10 +126,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 88,
       object           = [[afury_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
 	HEAP  = {
@@ -137,10 +134,7 @@ unitDef = {
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 44,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

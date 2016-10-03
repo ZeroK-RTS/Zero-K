@@ -139,26 +139,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Dagger]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 32,
       object           = [[corsh_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
     HEAP  = {
       description      = [[Debris - Dagger]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 16,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 16,
     },
 
   },

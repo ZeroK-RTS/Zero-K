@@ -198,26 +198,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Reef]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      metal            = 1400,
       object           = [[reef_d.3ds]],
-      reclaimable      = true,
-      reclaimTime      = 1400,
     },
 
     HEAP  = {
       description      = [[Debris - Reef]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 6,
       footprintZ       = 6,
-      metal            = 700,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 700,
     },
 
   },

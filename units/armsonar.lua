@@ -53,26 +53,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Sonar Station]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 180,
       object           = [[novasonar_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 180,
     },
 
     HEAP  = {
       description      = [[Debris - Sonar Station]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 90,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 90,
     },
 
   },

@@ -161,14 +161,10 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Leviathan]],
       blocking         = false,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 1200,
       object           = [[cornukesub_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1200,
 	  collisionVolumeOffsets = [[0 -5 0]],
 	  collisionVolumeScales  = [[30 25 110]],
 	  collisionVolumeType    = [[box]],
@@ -177,13 +173,9 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Leviathan]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 600,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 600,
     },
 
   },

@@ -141,26 +141,18 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Scalpel]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 88,
       object           = [[nsaclash_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
     HEAP  = {
       description      = [[Debris - Scalpel]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 44,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

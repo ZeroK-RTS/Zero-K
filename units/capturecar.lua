@@ -135,27 +135,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Dominatrix]],
       blocking         = true,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 168,
       object           = [[corvrad_big_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 168,
     },
 
 
     HEAP = {
       description      = [[Debris - Dominatrix]],
       blocking         = false,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 84,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 84,
     },
 
   },
