@@ -139,7 +139,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Lancer]],
+      description      = [[Wreckage - Crasher]],
       blocking         = true,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[32 40 52]],
@@ -159,7 +159,7 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Lancer]],
+      description      = [[Debris - Crasher]],
       blocking         = false,
       energy           = 0,
       footprintX       = 2,

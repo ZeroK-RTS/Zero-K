@@ -81,7 +81,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Rector]],
+      description      = [[Wreckage - Conjurer]],
       blocking         = true,
       energy           = 0,
       featureDead      = [[HEAP]],
@@ -94,7 +94,7 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Rector]],
+      description      = [[Debris - Conjurer]],
       blocking         = false,
       energy           = 0,
       footprintX       = 2,
