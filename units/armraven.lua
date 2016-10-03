@@ -138,12 +138,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Catapult]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[catapult_wreck.s3o]],
     },
 
@@ -151,11 +148,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Catapult]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3b.s3o]],
     },
 

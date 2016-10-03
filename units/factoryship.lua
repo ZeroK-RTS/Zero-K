@@ -77,15 +77,10 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Shipyard]],
       blocking         = false,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 9,
       footprintZ       = 14,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[seafac_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
@@ -93,14 +88,9 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Shipyard]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 8,
       footprintZ       = 8,
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

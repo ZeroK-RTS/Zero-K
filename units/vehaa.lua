@@ -148,8 +148,6 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[vehaa_dead.s3o]],
     },
 
@@ -159,8 +157,6 @@ unitDef = {
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2a.s3o]],
     },
 

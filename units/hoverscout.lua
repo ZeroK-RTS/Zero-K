@@ -128,45 +128,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Dagger]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 300,
       featureDead      = [[DEAD2]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corsh_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
       description      = [[Debris - Dagger]],
       blocking         = false,
-      category         = [[heaps]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Dagger]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

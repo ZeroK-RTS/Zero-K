@@ -122,45 +122,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Punisher]],
       blocking         = false,
-      category         = [[corpses]],
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[hoverassault_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
       description      = [[Debris - Punisher]],
       blocking         = false,
-      category         = [[heaps]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Punisher]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

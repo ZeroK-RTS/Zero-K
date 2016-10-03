@@ -142,31 +142,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Stinger]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corhlt_d.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
     
 
     HEAP  = {
       description      = [[Debris - Stinger]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3a.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

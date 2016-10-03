@@ -143,23 +143,17 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Chainsaw]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[chainsaw_d.dae]],
     },
 
     HEAP  = {
       description      = [[Debris - Chainsaw]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3a.s3o]],
     },
 

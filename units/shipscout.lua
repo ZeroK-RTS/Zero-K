@@ -183,7 +183,6 @@ unitDef = {
     HEAP = {
       description      = [[Debris - Skeeter]],
       blocking         = false,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[debris4x4a.s3o]],

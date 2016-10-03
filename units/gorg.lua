@@ -321,31 +321,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Jugglenaut]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[8]],
-      hitdensity       = [[100]],
       object           = [[GORG_DEAD]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Jugglenaut]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[2]],
-      hitdensity       = [[100]],
       object           = [[debris4x4a.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

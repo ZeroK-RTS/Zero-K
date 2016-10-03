@@ -73,12 +73,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Wasp]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[bumblebee_d.dae]],
     },
 
@@ -86,11 +83,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Wasp]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2b.s3o]],
     },
 

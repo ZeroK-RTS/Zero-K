@@ -128,12 +128,9 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Serpent]],
       blocking         = false,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      height           = [[10]],
-      hitdensity       = [[100]],
       object           = [[serpent_dead]],
     },
 
@@ -141,11 +138,8 @@ unitDef = {
     HEAP = {
       description      = [[Debris - Serpent]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 6,
       footprintZ       = 6,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
     },
 

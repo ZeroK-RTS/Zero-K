@@ -126,31 +126,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Behemoth]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corbhmth_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
       description      = [[Debris - Behemoth]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris4x4b.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

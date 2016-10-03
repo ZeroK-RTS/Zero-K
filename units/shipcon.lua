@@ -75,44 +75,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Mariner]],
       blocking         = false,
-      category         = [[corpses]],
       featureDead      = [[DEAD2]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[shipcon_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
       description      = [[Debris - Mariner]],
       blocking         = false,
-      category         = [[heaps]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Mariner]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

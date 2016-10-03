@@ -188,8 +188,6 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[15]],
-      hitdensity       = [[100]],
       object           = [[hunchback_dead.s3o]],
     },
 
@@ -199,8 +197,6 @@ unitDef = {
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
     },
 

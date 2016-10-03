@@ -148,12 +148,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Trident]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[trifighter_dead.s3o]],
     },
 
@@ -161,11 +158,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Trident]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
     },
 

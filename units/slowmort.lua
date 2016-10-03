@@ -220,29 +220,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Moderator]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[CORMORT_DEAD.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description = [[Debris - Moderator]],
       blocking    = false,
-      category    = [[heaps]],
       footprintX  = 2,
       footprintZ  = 2,
-      height      = [[4]],
-      hitdensity  = [[100]],
       object      = [[debris2x2a.s3o]],
-      world       = [[All Worlds]],
     },
 
   },

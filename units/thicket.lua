@@ -52,16 +52,9 @@ unitDef = {
     DEAD = {
       description      = [[Embedded Thicket]],
       blocking         = true,
-      category         = [[dragonteeth]],
-      featurereclamate = [[smudge01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 20,
-      hitdensity       = 100,
-      nodrawundergray  = true,
       object           = [[Tyranid2.s3o]],
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[allworld]],
     },
 
   },

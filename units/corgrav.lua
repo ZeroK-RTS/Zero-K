@@ -179,47 +179,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Newton]],
       blocking         = true,
-      category         = [[core_corpses]],
       featureDead      = [[DEAD2]],
-      featurereclamate = [[smudge01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[25]],
-      hitdensity       = [[100]],
       object           = [[corgrav_dead]],
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
       description      = [[Debris - Newton]],
       blocking         = false,
-      category         = [[heaps]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Newton]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[smudge01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
   },

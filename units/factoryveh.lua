@@ -81,31 +81,19 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Light Vehicle Factory]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 7,
       footprintZ       = 7,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corvp_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Light Vehicle Factory]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 7,
       footprintZ       = 7,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

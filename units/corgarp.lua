@@ -130,46 +130,29 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Wolverine]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 450,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[0]],
-      hitdensity       = [[100]],
       object           = [[corwolv_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[all]],
     },
 
 
     DEAD2 = {
       description      = [[Debris - Wolverine]],
       blocking         = false,
-      category         = [[heaps]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
       description      = [[Debris - Wolverine]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

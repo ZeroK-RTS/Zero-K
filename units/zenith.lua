@@ -343,7 +343,6 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Zenith]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[debris4x4c.s3o]],

@@ -131,12 +131,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Gauss]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[15]],
-      hitdensity       = [[100]],
       object           = [[gauss_91_dead1.dae]],
     },
 
@@ -144,11 +141,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Gauss]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2b.s3o]],
     },
 

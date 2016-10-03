@@ -115,11 +115,8 @@ unitDef = {
       description      = [[Wreckage - Dampener]],
       blocking         = true,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[hoverminer_dead.s3o]],
     },
 
@@ -129,8 +126,6 @@ unitDef = {
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2c.s3o]],
     },
 

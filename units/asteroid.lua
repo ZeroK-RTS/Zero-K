@@ -44,31 +44,18 @@ unitDef = {
     DEAD = {
       description      = [[Asteroid]],
       blocking         = true,
-      category         = [[dragonteeth]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 20,
-      hitdensity       = 100,
-      nodrawundergray  = true,
       object           = [[asteroid.s3o]],
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[allworld]],
     },
     
     HEAP  = {
       description      = [[Debris - Asteroid]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2b.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
     
 

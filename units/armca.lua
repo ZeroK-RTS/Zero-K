@@ -84,12 +84,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Crane]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[crane_d.s3o]],
     },
 
@@ -97,11 +94,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Crane]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2b.s3o]],
     },
 

@@ -161,7 +161,6 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Daimyo]],
       blocking         = false,
-      category         = [[corpses]],
 	  collisionVolumeOffsets = [[0 0 3]],
 	  collisionVolumeScales  = [[32 46 102]],
 	  collisionVolumeTest    = 1,
@@ -169,25 +168,16 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[destroyer_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     
     HEAP  = {
       description      = [[Debris - Daimyo]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
       object           = [[debris4x4b.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

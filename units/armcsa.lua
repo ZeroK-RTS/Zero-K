@@ -107,23 +107,17 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Athena]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[selene_dead.s3o]],
     },
 
     HEAP  = {
       description      = [[Debris - Athena]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2c.s3o]],
     },
 

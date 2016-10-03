@@ -126,12 +126,9 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Sunlance]],
       blocking         = true,
-      category         = [[arm_corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 100,
-      hitdensity       = 100,
       object           = [[heavyturret_dead.s3o]],
     },
 
@@ -139,11 +136,8 @@ unitDef = {
     HEAP = {
       description      = [[Debris - Sunlance]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 4,
-      hitdensity       = 100,
       object           = [[debris4x4b.s3o]],
     },
 

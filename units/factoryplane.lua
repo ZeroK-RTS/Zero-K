@@ -81,31 +81,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Airplane Plant]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 7,
       footprintZ       = 6,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corap_dead.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
       description      = [[Debris - Airplane Plant]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 6,
       footprintZ       = 6,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -331,12 +331,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Detriment]],
       blocking         = true,
-      category         = [[arm_corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      height           = [[60]],
-      hitdensity       = [[150]],
       object           = [[Detriment_wreck.s3o]],
     },
 
@@ -344,13 +341,9 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Detriment]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[2]],
-      hitdensity       = [[105]],
       object           = [[debris4x4b.s3o]],
-      world            = [[All Worlds]],
     },
 
   },

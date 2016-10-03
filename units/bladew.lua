@@ -137,7 +137,6 @@ unitDef = {
     HEAP = {
       description      = [[Debris - Gnat]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[debris1x1b.s3o]],

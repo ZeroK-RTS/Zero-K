@@ -206,15 +206,12 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Vindicator]],
       blocking         = true,
-      category         = [[corpses]],
 	  collisionVolumeScales  = [[60 40 80]],
 	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
       object           = [[heavytrans_d.dae]],
     },
 
@@ -222,11 +219,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Vindicator]],
       blocking         = false,
-      category         = [[heaps]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris3x3c.s3o]],
     },
 

@@ -129,12 +129,9 @@ unitDef = {
     DEAD  = {
       description      = [[Wreckage - Ravager]],
       blocking         = true,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
       object           = [[corraid_dead.s3o]],
     },
 
@@ -142,12 +139,8 @@ unitDef = {
     HEAP  = {
       description      = [[Debris - Ravager]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[debris2x2c.s3o]],
     },
 

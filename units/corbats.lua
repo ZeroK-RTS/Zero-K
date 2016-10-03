@@ -145,29 +145,19 @@ unitDef = {
     DEAD = {
       description      = [[Wreckage - Warlord]],
       blocking         = false,
-      category         = [[corpses]],
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      height           = [[4]],
-      hitdensity       = [[100]],
       object           = [[BATTLESHIP_DEAD.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
       description      = [[Debris - Warlord]],
       blocking         = false,
-      category         = [[heaps]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 7,
       footprintZ       = 7,
-      hitdensity       = [[100]],
       object           = [[debris4x4c.s3o]],
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },
