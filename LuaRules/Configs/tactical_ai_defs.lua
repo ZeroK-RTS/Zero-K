@@ -914,7 +914,7 @@ local behaviourConfig = {
 		skirmRadar = true, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 150, 
+		skirmLeeway = 600, 
 	},
 	
 	["cormart"] = {
@@ -922,7 +922,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 100, 
+		skirmLeeway = 400, 
 	},
 	
 	["armraven"] = {

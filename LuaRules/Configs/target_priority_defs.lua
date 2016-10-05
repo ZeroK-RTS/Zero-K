@@ -84,6 +84,12 @@ local unitIsFighterOrDrone = {
 	[UnitDefNames["carrydrone"].id] = true,
 }
 
+-- Wolverine mines are stupid targets.
+local unitIsClaw = {
+	[UnitDefNames["wolverine_mine"].id] = true,
+}
+
+
 -- swifts should prefer to target air over ground
 local unitIsBadAgainstGround = {
 	[UnitDefNames["fighter"].id] = true,
@@ -171,9 +177,16 @@ for wdid = 1, #WeaponDefs do
 	end
 end
 
+local starburstWeaponDefs = {
+	[WeaponDefNames["armmerl_cortruck_rocket"].id] = true,
+	[WeaponDefNames["reef_armmship_rocket"].id] = true,
+	[WeaponDefNames["armorco_orcone_rocket"].id] = true,
+}
+
 local radarWobblePenalty = {
-	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
-	[WeaponDefNames["reef_armmship_rocket"].id] = 5,
+	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 100,
+	[WeaponDefNames["reef_armmship_rocket"].id] = 100,
+	[WeaponDefNames["armorco_orcone_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
 	[WeaponDefNames["armanni_ata"].id] = 5,
 	[WeaponDefNames["armmanni_ata"].id] = 5,
@@ -244,6 +257,8 @@ for uid = 1, #UnitDefs do
 	for wid = 1, #WeaponDefs do
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 35
+		elseif unitIsClaw[uid] then
+			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
 		elseif (unitIsFighterOrDrone[uid])
 			or (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid])
 			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
@@ -269,4 +284,4 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult
+return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, starburstWeaponDefs, radarWobblePenalty, transportMult

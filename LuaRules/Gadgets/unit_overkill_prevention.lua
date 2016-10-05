@@ -77,6 +77,8 @@ local HandledUnitDefIDs = {
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = true,
 	[UnitDefNames["armmerl"].id] = true,
+	[UnitDefNames["reef"].id] = true,
+	[UnitDefNames["armorco"].id] = true,
 	[UnitDefNames["corstorm"].id] = true,
 	[UnitDefNames["corthud"].id] = true,
 	[UnitDefNames["spiderassault"].id] = true,
@@ -122,7 +124,7 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	return false
 end
 
-local function IsUnitIdentifiedStructure(identified, unitID)
+local function IsUnitIdentifiedStructure(identified, inLOS, unitID)
 	if not identified then
 		return false
 	end
@@ -130,7 +132,21 @@ local function IsUnitIdentifiedStructure(identified, unitID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return false
 	end
-	return not Spring.Utilities.getMovetype(UnitDefs[unitDefID])
+	
+	if (Spring.Utilities.getMovetype(UnitDefs[unitDefID])) then
+		--for units
+		if (inLOS) then
+			local vx, vy, vz, vl = Spring.GetUnitVelocity(unitID)
+			local isNotMoving = (vx == 0 and vy == 0 and vz == 0 and vl == 0)
+			if isNotMoving then
+				return true
+			end
+		end
+		return false
+	else
+		--for buildings
+		return true
+	end
 end
 
 --[[
@@ -165,7 +181,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	local addToIncomingDamage = true
 	
 	if staticOnly then
-		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
+		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetInLoS, targetID)
 	end
 	
 	local adjHealth, disarmFrame
