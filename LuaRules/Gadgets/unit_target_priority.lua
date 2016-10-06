@@ -31,7 +31,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, starburstWeaponDefs, radarWobblePenalty, transportMult = 
+local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -221,18 +221,6 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		local unitSeparation = spGetUnitSeparation(unitID,targetID,true)
 		local distAdd = 20 * (unitSeparation/WeaponDefs[attackerWeaponDefID].range)
 		return true, hpAdd + defPrio + distAdd
-	end
-	
-	--// Starburst weapon handling (cruise missiles).
-	-- De-prioritize moving units.
-	if starburstWeaponDefs[attackerWeaponDefID] then
-		local velAdd = 0
-		local vx, vy, vz, vl = Spring.GetUnitVelocity(targetID)
-		if (vx > 0 or vy > 0 or vz > 0 or vl > 0) then
-			velAdd = 30 * vl
-			return false, hpAdd + defPrio + velAdd
-		end
-		return true, hpAdd + defPrio + velAdd
 	end
 	
 	--// All weapons without special handling.
