@@ -622,8 +622,10 @@ end
 --------------------------------------------------------------------------------
 
 function widget:Shutdown()
-	window:Dispose()
-	--WG.ShutdownTranslation(GetInfo().name)
+	if window then
+		window:Dispose()
+	end
+	WG.ShutdownTranslation(GetInfo().name)
 end
 
 function widget:Initialize()
