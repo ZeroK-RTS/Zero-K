@@ -84,6 +84,11 @@ local unitIsFighterOrDrone = {
 	[UnitDefNames["carrydrone"].id] = true,
 }
 
+--Wolverine mines are stupid targets.
+local unitIsClaw = {
+	[UnitDefNames["wolverine_mine"].id] = true,
+}
+
 -- swifts should prefer to target air over ground
 local unitIsBadAgainstGround = {
 	[UnitDefNames["fighter"].id] = true,
@@ -244,6 +249,8 @@ for uid = 1, #UnitDefs do
 	for wid = 1, #WeaponDefs do
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 35
+		elseif unitIsClaw[uid] then
+			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
 		elseif (unitIsFighterOrDrone[uid])
 			or (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid])
 			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])

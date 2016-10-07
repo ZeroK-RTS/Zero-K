@@ -81,6 +81,8 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corthud"].id] = true,
 	[UnitDefNames["spiderassault"].id] = true,
 	[UnitDefNames["armrock"].id] = true,
+	[UnitDefNames["reef"].id] = true,
+	[UnitDefNames["armorco"].id] = true,
 	-- Needs LUS
 	--[UnitDefNames["correap"].id] = true,
 	--[UnitDefNames["corraid"].id] = true,
