@@ -79,7 +79,6 @@ local soundTime = 0
 local spGetUnitIsStunned = Spring.GetUnitIsStunned
 
 local satUnitID = false
-local satelliteCreated = false
 
 local DOCKED = 1
 local READY = 2
@@ -290,45 +289,52 @@ function script.Create()
 end
 
 function script.Activate()
+	StartThread(DeferredActivate);
+end
+
+function DeferredActivate()
 	Spin(UpperCoil, z_axis, 10,0.5)
 	Spin(LowerCoil, z_axis, 10,0.5)
 	
 	Move(ShortSpikes,z_axis, 0,1)
 	Move(LongSpikes,z_axis, 0,1.5)
 	
-	if(not satelliteCreated)then
-		satelliteCreated = true
-		Hide(LimbA1)
-		Hide(LimbA2)
-		Hide(LimbB1)
-		Hide(LimbB2)
-		Hide(LimbC1)
-		Hide(LimbC2)
-		Hide(LimbD1)
-		Hide(LimbD2)
-		Hide(Satellite)
-		Hide(SatelliteMuzzle)
-
-		local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
-		local dx, _, dz = Spring.GetUnitDirection(unitID)
-		local heading = Vector.Angle(dx, dz)
-		--Spring.Echo("Unit direction",dx, dz, heading*180/math.pi)
+	local x,y,z = Spring.GetUnitPiecePosDir(unitID,SatelliteMount)
+	local dx, _, dz = Spring.GetUnitDirection(unitID)
+	local heading = Vector.Angle(dx, dz)
+	
+	while not Spring.ValidUnitID(satUnitID) do
 		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
-		Spring.SetUnitNoSelect(satUnitID,true)
-		Spring.SetUnitNoMinimap(satUnitID,true)
-		Spring.SetUnitNeutral(satUnitID,true)
-		Spring.MoveCtrl.Enable(satUnitID)
-		Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
-		Spring.SetUnitRotation(satUnitID, 0, heading+math.pi/2, 0)
-		Spring.SetUnitLoadingTransport(satUnitID,unitID)
-		Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID)
-		Spring.SetUnitRulesParam(satUnitID,'parent_unit_id',unitID)
-		Spring.SetUnitRulesParam(satUnitID,'untargetable',1)
-		Spring.SetUnitRulesParam(unitID,'has_satellite',satUnitID)
-		Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0)
-
-		StartThread(SnapSatellite)
+		if satUnitID then
+			satelliteCreated = true
+			Spring.SetUnitNoSelect(satUnitID,true)
+			Spring.SetUnitNoMinimap(satUnitID,true)
+			Spring.SetUnitNeutral(satUnitID,true)
+			Spring.MoveCtrl.Enable(satUnitID)
+			Spring.MoveCtrl.SetPosition(satUnitID,x,y,z)
+			Spring.SetUnitRotation(satUnitID, 0, heading+math.pi/2, 0)
+			Spring.SetUnitLoadingTransport(satUnitID,unitID)
+			Spring.SetUnitRulesParam(satUnitID,'cannot_damage_unit',unitID)
+			Spring.SetUnitRulesParam(satUnitID,'parent_unit_id',unitID)
+			Spring.SetUnitRulesParam(satUnitID,'untargetable',1)
+			Spring.SetUnitRulesParam(unitID,'has_satellite',satUnitID)
+			Spring.SetUnitCollisionVolumeData(satUnitID, 0,0,0, 0,0,0, -1,0,0)
+			Hide(LimbA1)
+			Hide(LimbA2)
+			Hide(LimbB1)
+			Hide(LimbB2)
+			Hide(LimbC1)
+			Hide(LimbC2)
+			Hide(LimbD1)
+			Hide(LimbD2)
+			Hide(Satellite)
+			Hide(SatelliteMuzzle)
+		else
+			Sleep(1)
+		end
 	end
+	
+	StartThread(SnapSatellite)
 	Signal(SIG_DOCK)
 	StartThread(Undock)
 end
