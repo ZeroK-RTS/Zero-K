@@ -64,17 +64,6 @@ for i=1, #UnitDefs do
 	unitHealthRatio[i] = unitHealthRatioOverride[i] or ud.health/ud.buildTime
 end
 
--- Harcode the things which are too fast to hit
-local unitIsTooFastToHit = {
-	[UnitDefNames["armflea"].id] = true,
-	[UnitDefNames["armpw"].id] = true,
-	[UnitDefNames["corfav"].id] = true,
-	[UnitDefNames["corgator"].id] = true,
-	[UnitDefNames["corsh"].id] = true,
-	[UnitDefNames["corak"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
-}
-
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
 	[UnitDefNames["fighter"].id] = true,
@@ -110,11 +99,19 @@ local unitIsHeavyHitter = {
 	[UnitDefNames["shieldarty"].id] = true,
 	[UnitDefNames["nsaclash"].id] = true,
 	[UnitDefNames["armbanth"].id] = true,
+	[UnitDefNames["armcybr"].id] = true,
 }
 
 local unitIsCheap = {
 	[UnitDefNames["corrl"].id] = true,
 	[UnitDefNames["corllt"].id] = true,
+	[UnitDefNames["armflea"].id] = true,
+	[UnitDefNames["armpw"].id] = true,
+	[UnitDefNames["corfav"].id] = true,
+	[UnitDefNames["corgator"].id] = true,
+	[UnitDefNames["corsh"].id] = true,
+	[UnitDefNames["corak"].id] = true,
+	[UnitDefNames["puppy"].id] = true,
 }
 
 local unitIsHeavy = {
@@ -136,25 +133,21 @@ local unitIsHeavy = {
 	[UnitDefNames["armorco"].id] = true,
 }
 
--- Hardcode things which should not fire at things too fast to hit
-local unitIsBadAgainstFastStuff = {
-	[UnitDefNames["correap"].id] = true,
-	[UnitDefNames["corraid"].id] = true,
-	[UnitDefNames["spiderassault"].id] = true,
-	[UnitDefNames["hoverassault"].id] = true,
-	[UnitDefNames["armmanni"].id] = true,
-	[UnitDefNames["armanni"].id] = true,
-	[UnitDefNames["corstorm"].id] = true,
-	[UnitDefNames["armham"].id] = true,
-	[UnitDefNames["armsnipe"].id] = true,
-	[UnitDefNames["armmerl"].id] = true,
-	[UnitDefNames["shieldarty"].id] = true,
-	[UnitDefNames["shiparty"].id] = true,
-	[UnitDefNames["cormart"].id] = true,
-	[UnitDefNames["trem"].id] = true,
-	[UnitDefNames["corshad"].id] = true,
-	[UnitDefNames["armcybr"].id] = true,
-	[UnitDefNames["armbanth"].id] = true,
+-- Hardcode weapons that are bad against fast moving stuff.
+-- weapondefid = maxvelocitytoshootat
+local lowVelWeaponDefs = {
+	[WeaponDefNames["correap_cor_reap"].id] = 3.0,
+	[WeaponDefNames["corraid_plasma"].id] = 3.0,
+	[WeaponDefNames["spiderassault_thud_weapon"].id] = 3.0,
+	[WeaponDefNames["hoverassault_dew"].id] = 3.0,
+	[WeaponDefNames["armsnipe_shockrifle"].id] = 3.0,
+	[WeaponDefNames["cormart_core_artillery"].id] = 3.0,
+	[WeaponDefNames["shiparty_plasma"].id] = 3.0,
+	[WeaponDefNames["corstorm_storm_rocket"].id] = 2.0,
+	[WeaponDefNames["armham_hammer_weapon"].id] = 2.0,
+	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 0.5,
+	[WeaponDefNames["reef_armmship_rocket"].id] = 0.5,
+	[WeaponDefNames["trem_plasma"].id] = 0.5,
 }
 
 local captureWeaponDefs = {
@@ -189,14 +182,7 @@ local radarWobblePenalty = {
 
 for i=1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if unitIsBadAgainstFastStuff[i] then
-		local weapons = ud.weapons
-		for j = 1, #weapons do
-			local wd = weapons[j]
-			local realWD = wd.weaponDef
-			weaponBadCats[realWD].fastStuff = true
-		end
-	elseif unitIsBadAgainstGround[i] then
+	if unitIsBadAgainstGround[i] then
 		local weapons = ud.weapons
 		for j = 1, #weapons do
 			local wd = weapons[j]
@@ -252,7 +238,6 @@ for uid = 1, #UnitDefs do
 		elseif unitIsClaw[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
 		elseif (unitIsFighterOrDrone[uid])
-			or (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid])
 			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
 			or (weaponBadCats[wid].ground and unitIsGround[uid])
@@ -276,4 +261,4 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult
+return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, lowVelWeaponDefs, radarWobblePenalty, transportMult

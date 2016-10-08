@@ -31,7 +31,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult = 
+local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, lowVelWeaponDefs, radarWobblePenalty, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -57,6 +57,9 @@ local remVisible = {}
 
 -- Remebered mass of the target, negative if it is immune to impulse (nanoframes)
 local remScaledMass = {}
+
+-- The number of radar wobble reductions that apply to each ally team.
+local remHalfWobble = {}
 
 --// Fairly unchanging values
 local remAllyTeam = {}
@@ -92,7 +95,19 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 			else
 				remVisible[allyTeam][targetID] = 0
 				-- Unidentified radar dots have no params to base priority on, but are generally bad targets.
-				return true, 25 + (radarWobblePenalty[attackerWeaponDefID] or 0)
+				if remHalfWobble[allyTeam] and remHalfWobble[allyTeam] > 0 then
+					-- don't add wobble penalty if the team has more than 1 half wobble mod
+					if lowVelWeaponDefs[attackerWeaponDefID] then
+						local _,_,_,vl = Spring.GetUnitVelocity(targetID)
+						if vl > lowVelWeaponDefs[attackerWeaponDefID] then
+							-- for fast stuff vs slow projectiles: only when wobble reduction is applied
+							return true, 25 + (15 * (vl/lowVelWeaponDefs[attackerWeaponDefID]))
+						end
+					end
+					return true, 25
+				else
+					return true, 25 + (radarWobblePenalty[attackerWeaponDefID] or 0)
+				end
 			end
 		else
 			remVisible[allyTeam][targetID] = 0
@@ -129,22 +144,49 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		-- A unit which is identified but not visible cannot have priority based on health or other status effects.
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if not remStatic[enemyUnitDef] then
-			return true, defPrio + (radarWobblePenalty[attackerWeaponDefID] or 0)
+			-- if half wobble bonuses basically eliminate wobble
+			if remHalfWobble[allyTeam] and remHalfWobble[allyTeam] > 0 then
+				if lowVelWeaponDefs[attackerWeaponDefID] then
+					local _,_,_,vl = Spring.GetUnitVelocity(targetID)
+					if vl > lowVelWeaponDefs[attackerWeaponDefID] then
+						-- for fast stuff vs slow projectiles
+						return true, defPrio+(15 * (vl/lowVelWeaponDefs[attackerWeaponDefID]))
+					end
+				end
+				-- for everything else, exclude radar wobble penalty if wobble is reduced to nothing
+				return true, defPrio
+			else
+				if lowVelWeaponDefs[attackerWeaponDefID] then
+					if UnitDefs[enemyUnitDef].speed > lowVelWeaponDefs[attackerWeaponDefID] then
+						-- for fast stuff vs slow projectiles, assume the unit is moving at max speed since we can't tell without cheating
+						return true, defPrio + (radarWobblePenalty[attackerWeaponDefID] or 0) + (15 * (vl/lowVelWeaponDefs[attackerWeaponDefID]))
+					end
+				end
+				return true, defPrio + (radarWobblePenalty[attackerWeaponDefID] or 0)
+			end
 		else
+			-- for radar dots of identified statics
 			return true, defPrio
 		end
 	end
 
 	--// Get priority modifier based on disabling.
 	if not remStunnedOrOverkill[targetID] then
-		local stunnedOrInbuild = spGetUnitIsStunned(targetID) or (spGetUnitRulesParam(targetID, "disarmed") == 1)
+		local disarmed = (spGetUnitRulesParam(targetID, "disarmed") == 1)
 		local overkill = GG.OverkillPrevention_IsDoomed(targetID)
 		local disarmExpected = GG.OverkillPrevention_IsDisarmExpected(targetID)
-		remStunnedOrOverkill[targetID] = ((stunnedOrInbuild or overkill or disarmExpected) and 1) or 0
+		remStunnedOrOverkill[targetID] = ((overkill or disarmed or disarmExpected) and 1) or 0
 	end
 
 	if remStunnedOrOverkill[targetID] == 1 then
 		defPrio = defPrio + 20
+	end
+	
+	-- de-prioritize nanoframes relative to how close they are to being finished.
+	local local _,_,nanoframe = spGetUnitIsStunned(unitID)
+	if nanoframe then
+		local _,_,_,_, buildProgress = Spring.GetUnitHealth(unitID)
+		defPrio = defPrio + (5 * (1 - buildProgress))
 	end
 	
 	--// Get priority modifier for health and capture progress.
@@ -223,6 +265,14 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		return true, hpAdd + defPrio + distAdd
 	end
 	
+	-- lowVel Weapon defs, for weapons with slow projectiles
+	if lowVelWeaponDefs[attackerWeaponDefID] then
+		local _,_,_,vl = Spring.GetUnitVelocity(targetID)
+		if vl > lowVelWeaponDefs[attackerWeaponDefID]
+			return defPrio + hpAdd + (15 * (vl/lowVelWeaponDefs[attackerWeaponDefID]))
+		end
+	end
+	
 	--// All weapons without special handling.
 	return true, hpAdd + defPrio -- bigger value have lower priority
 end
@@ -240,14 +290,35 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	remUnitDefID[unitID] = unitDefID
-	remAllyTeam[unitID] = spGetUnitAllyTeam(unitID)
+	local allyTeam = spGetUnitAllyTeam(unitID)
+	remAllyTeam[unitID] = allyTeam
 	remStatic[unitID] = (unitDefID and not Spring.Utilities.getMovetype(UnitDefs[unitDefID]))
+	
+	local _,_,nanoframe = spGetUnitIsStunned(unitID) -- determine if it's still under construction or if it was instantly created
+	if not nanoframe then
+		if UnitDefs[unitDefID].targfac then
+			remHalfWobble[allyTeam] = (remHalfWobble[allyTeam] or 0) + 1
+		end
+	end
+end
+
+function gadget:UnitFinished(unitID, unitDefID)
+	local allyTeam = spGetUnitAllyTeam(unitID)
+	if UnitDefs[unitDefID].targfac then
+		remHalfWobble[allyTeam] = (remHalfWobble[allyTeam] or 0) + 1
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	remUnitDefID[unitID] = nil
-	remAllyTeam[unitID] = nil
 	remStatic[unitID] = nil
+	
+	local allyTeam = remAllyTeam[unitID]
+	if UnitDefs[unitDefID].targfac then
+		remHalfWobble[allyTeam] = remHalfWobble[allyTeam] - 1
+	end
+	
+	remAllyTeam[unitID] = nil
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
