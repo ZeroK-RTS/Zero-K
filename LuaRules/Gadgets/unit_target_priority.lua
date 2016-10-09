@@ -325,6 +325,7 @@ function gadget:UnitDestroyed(unitID, unitDefID)
 	remUnitDefID[unitID] = nil
 	remStatic[unitID] = nil
 	remAllyTeam[unitID] = nil
+	targetingUpgrades[unitID] = nil
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
