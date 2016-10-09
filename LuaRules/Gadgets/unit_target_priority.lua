@@ -60,6 +60,7 @@ local remScaledMass = {}
 
 -- The number of radar wobble reductions that apply to each ally team.
 local remHalfWobble = {}
+local targetingUpgrades = {}
 
 --// Fairly unchanging values
 local remAllyTeam = {}
@@ -285,6 +286,27 @@ function gadget:GameFrame(f)
 		remVisible = {}
 		remScaledMass = {}
 		remStunnedOrOverkill = {}
+		
+		-- update radar wobble status
+		-- first zero all half-wobble counts
+		for key, value in pairs(remHalfWobble) do
+		remHalfWobble[key] = 0
+		end
+	
+		--then sort through extant radar upgrade units and add those which are complete to the ally teams they belong to
+		for unitID, _ in pairs(targetingUpgrades) do
+			local valid = Spring.ValidUnitID(unitID)
+			if not valid then
+				targetingUpgrades[unitID] = nil
+			else
+				local stunned_or_inbuild,_,_ = spGetUnitIsStunned(unitID) -- determine if it's still under construction
+				local disarmed = (spGetUnitRulesParam(targetID, "disarmed") == 1)
+				local allyTeam = spGetUnitAllyTeam(unitID)
+				if not stunned_or_inbuild and not disarmed then
+					remHalfWobble[allyTeam] = (remHalfWobble[allyTeam] or 0) + 1
+				end
+			end
+		end
 	end
 end
 
@@ -294,30 +316,14 @@ function gadget:UnitCreated(unitID, unitDefID)
 	remAllyTeam[unitID] = allyTeam
 	remStatic[unitID] = (unitDefID and not Spring.Utilities.getMovetype(UnitDefs[unitDefID]))
 	
-	local _,_,nanoframe = spGetUnitIsStunned(unitID) -- determine if it's still under construction or if it was instantly created
-	if not nanoframe then
-		if UnitDefs[unitDefID].targfac then
-			remHalfWobble[allyTeam] = (remHalfWobble[allyTeam] or 0) + 1
-		end
-	end
-end
-
-function gadget:UnitFinished(unitID, unitDefID)
-	local allyTeam = spGetUnitAllyTeam(unitID)
 	if UnitDefs[unitDefID].targfac then
-		remHalfWobble[allyTeam] = (remHalfWobble[allyTeam] or 0) + 1
+		targetingUpgrades[unitID] = true
 	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	remUnitDefID[unitID] = nil
 	remStatic[unitID] = nil
-	
-	local allyTeam = remAllyTeam[unitID]
-	if UnitDefs[unitDefID].targfac then
-		remHalfWobble[allyTeam] = remHalfWobble[allyTeam] - 1
-	end
-	
 	remAllyTeam[unitID] = nil
 end
 
