@@ -39,7 +39,6 @@ unitDef = {
   iconType                      = [[advradar]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  isTargetingUpgrade            = true,
   levelGround                   = false,
   maxDamage                     = 330,
   maxSlope                      = 36,

@@ -59,10 +59,6 @@ local remVisible = {}
 -- Remebered mass of the target, negative if it is immune to impulse (nanoframes)
 local remScaledMass = {}
 
--- The number of radar wobble reductions that apply to each ally team.
-local allyTeamTargetUpgrades = {}
-local targetUpgradeUnitList = {}
-
 --// Fairly unchanging values
 local remAllyTeam = {}
 local remUnitDefID = {}
@@ -277,9 +273,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		local wobbleAdd = 0
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDef]) then
-			if (not allyTeamTargetUpgrades[allyTeam]) or allyTeamTargetUpgrades[allyTeam] > 0 then
-				wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
-			end
+			wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
 		end
 		
 		if visiblity == 0 then
@@ -338,27 +332,6 @@ function gadget:GameFrame(f)
 		remScaledMass = {}
 		remStunned = {}
 		remBuildProgress = {}
-		
-		-- update radar wobble status
-		-- first zero all half-wobble counts
-		for key, value in pairs(allyTeamTargetUpgrades) do
-			allyTeamTargetUpgrades[key] = 0
-		end
-	
-		--then sort through extant radar upgrade units and add those which are complete to the ally teams they belong to
-		for unitID, _ in pairs(targetUpgradeUnitList) do
-			local valid = Spring.ValidUnitID(unitID)
-			if not valid then
-				targetUpgradeUnitList[unitID] = nil
-			else
-				local stunned_or_inbuild,_,_ = spGetUnitIsStunned(unitID) -- determine if it's still under construction
-				local disarmed = (spGetUnitRulesParam(unitID, "disarmed") == 1)
-				local allyTeam = spGetUnitAllyTeam(unitID)
-				if not stunned_or_inbuild and not disarmed then
-					allyTeamTargetUpgrades[allyTeam] = (allyTeamTargetUpgrades[allyTeam] or 0) + 1
-				end
-			end
-		end
 	end
 end
 
@@ -367,17 +340,12 @@ function gadget:UnitCreated(unitID, unitDefID)
 	local allyTeam = spGetUnitAllyTeam(unitID)
 	remAllyTeam[unitID] = allyTeam
 	remStatic[unitID] = (unitDefID and not Spring.Utilities.getMovetype(UnitDefs[unitDefID]))
-	
-	if UnitDefs[unitDefID].targfac then
-		targetUpgradeUnitList[unitID] = true
-	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	remUnitDefID[unitID] = nil
 	remStatic[unitID] = nil
 	remAllyTeam[unitID] = nil
-	targetUpgradeUnitList[unitID] = nil
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
