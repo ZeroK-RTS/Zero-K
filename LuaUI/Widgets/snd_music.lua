@@ -106,6 +106,11 @@ local function StartLoopingTrack(trackInit, trackLoop)
 end
 
 local function StartTrack(track)
+	if not peaceTracks then
+		Spring.Echo("Missing peaceTracks file, no music started")
+		return
+	end
+
 	haltMusic = false
 	looping = false
 	Spring.StopSoundStream()

@@ -169,6 +169,7 @@ unitDef = {
       size                    = 5,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
+      soundStartVolume        = 3.8,
       sprayangle              = 2500,
       turret                  = true,
       weaponType              = [[Cannon]],
