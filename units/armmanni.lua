@@ -111,6 +111,7 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 10,
+	  leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 1020,
