@@ -277,7 +277,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		local wobbleAdd = 0
 		-- Mobile units get a penalty for radar wobble. Identified statics experience no wobble.
 		if radarWobblePenalty[attackerWeaponDefID] and (visibility == 0 or not remStatic[enemyUnitDef]) then
-			if (not allyTeamTargetUpgrades[allyTeam] and allyTeamTargetUpgrades[allyTeam] > 0) then
+			if (not allyTeamTargetUpgrades[allyTeam]) or allyTeamTargetUpgrades[allyTeam] > 0) then
 				wobbleAdd = radarWobblePenalty[attackerWeaponDefID]
 			end
 		end
