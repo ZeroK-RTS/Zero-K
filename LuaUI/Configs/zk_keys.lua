@@ -171,7 +171,7 @@ return {
 		{	"select AllMap+_Not_Builder_Not_Building_Transport_Aircraft+_ClearSelection_SelectAll+",	"ctrl+t",},
 		{	"selectidlecon",	"ctrl+v",},
 		{	"select Visible+_InPrevSel+_ClearSelection_SelectAll+",	"ctrl+x",},
-		{	"select AllMap+_InPrevSel+_ClearSelection_SelectAll+",	"ctrl+z",},
+		{	"select AllMap+_InPrevSel_Not_Builder+_ClearSelection_SelectAll+",	"ctrl+z",},
 		{	"epic_chili_integral_menu_tab_factory",	"z",},
 		{	"epic_chili_integral_menu_tab_economy",	"x",},
 		{	"epic_chili_integral_menu_tab_defence",	"c",},
