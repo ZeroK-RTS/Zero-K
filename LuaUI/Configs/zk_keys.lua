@@ -87,6 +87,7 @@ return {
 		{	"areaattack",	"Alt+a",},
 		{	"debug",	"Alt+n",},
 		{	"debugcolvol",	"Alt+b",},
+		{	"repeat",	"Alt+r"}, 
 		{	"selfd",	"C+d",},
 		{	"selectcomm",	"ctrl+c",},
 		{	"manualfire",	"d",},
