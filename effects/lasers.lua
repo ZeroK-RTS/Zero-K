@@ -455,20 +455,8 @@ return {
 
   ["flash1blue"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 0,
-      circlegrowth       = 0,
-      flashalpha         = 1,
-      flashsize          = 20,
-      ttl                = 3,
-      color = {
-        [1]  = 0,
-        [2]  = 0,
-        [3]  = 1,
-      },
-    },
     meltage = {
-      air                = true,
+      air                = false,
       class              = [[CExpGenSpawner]],
       count              = 1,
       ground             = true,
@@ -884,16 +872,22 @@ return {
   },
 
   ["lasers_melt2"] = {
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = -0.02,
-      flashalpha         = 0.6,
-      flashsize          = 6,
-      ttl                = 80,
-      color = {
-        [1]  = 1,
-        [2]  = 0.5,
-        [3]  = 0,
+    cinder = {
+      air                = true,
+      class              = [[heatcloud]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        alwaysvisible      = false,
+        heat               = [[d1 5]],
+        heatfalloff        = 0.1,
+        maxheat            = 15,
+        pos                = 0,
+        size               = [[5]],
+        sizegrowth         = -0.05,
+        speed              = [[0, 0, 0]],
+        texture            = [[redexplo]],
       },
     },
   },

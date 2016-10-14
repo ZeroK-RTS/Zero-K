@@ -472,16 +472,16 @@ local cegs = {
 
   ["beamweapon_hit_red"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = 0.125,
-      flashalpha         = 0.5,
-      flashsize          = 4,
-      ttl                = 32,
-      color = {
-        [1]  = 1,
-        [2]  = 0.5,
-        [3]  = 0,
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
       },
     },
     pikes = {
@@ -568,16 +568,16 @@ local cegs = {
 
   ["beamweapon_hit_orange"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = 0.08,
-      flashalpha         = 0.5,
-      flashsize          = 4,
-      ttl                = 48,
-      color = {
-        [1]  = 1,
-        [2]  = 0.5,
-        [3]  = 0,
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
       },
     },
     pikes = {
@@ -664,16 +664,16 @@ local cegs = {
   
   ["beamweapon_hit_purple"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = 0.125,
-      flashalpha         = 0.5,
-      flashsize          = 8,
-      ttl                = 64,
-      color = {
-        [1]  = 1,
-        [2]  = 0.2,
-        [3]  = 1,
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
       },
     },
     pikes = {
@@ -732,16 +732,16 @@ local cegs = {
 
   ["beamweapon_hit_teal"] = {
     usedefaultexplosions = false,
-    groundflash = {
-      circlealpha        = 1,
-      circlegrowth       = 0.125,
-      flashalpha         = 0.5,
-      flashsize          = 8,
-      ttl                = 64,
-      color = {
-        [1]  = 0,
-        [2]  = 0.4,
-        [3]  = 0.8,
+    meltage = {
+      air                = true,
+      class              = [[CExpGenSpawner]],
+      count              = 1,
+      ground             = true,
+      water              = true,
+      properties = {
+        delay              = 0,
+        explosiongenerator = [[custom:LASERS_MELT2]],
+        pos                = [[0, 0, 0]],
       },
     },
     pikes = {
