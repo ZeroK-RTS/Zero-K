@@ -1155,8 +1155,8 @@
 	},
 	"armarad" : {
 		"name" : "Advanced Radar",
-		"description" : "Long-Range Radar, Halves Radar Wobble",
-		"helptext" : "The advanced Radar Tower has a considerably greater range than the basic version. In addition each advanced radar tower halves the radar wobble of units. This works globally and affects all allied radars. Building one or two can be of great help, at a price."
+		"description" : "Long-Range Radar",
+		"helptext" : "The advanced Radar Tower has a considerably greater range than the basic version and allows you to see further into the enemy's base, at a price."
 	},
 	"amphraider2" : {
 		"name" : "Archer",
