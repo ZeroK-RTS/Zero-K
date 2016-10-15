@@ -22,6 +22,26 @@ function widget:GetInfo()
   }
 end
 
+local onlyShowOnAirOption = true
+
+local ResetWidget --forward-declared
+
+local function OnOptionsChange()
+  ResetWidget()
+end
+
+options_path = 'Settings/Graphics/Unit Visibility/BlobShadow'
+options = {
+  onlyShowOnAir = {
+    name = 'Only on air',
+    desc = 'Only show blob shadows for flying units.  Land units will not display blob shadows',
+    type = 'bool',
+    value = true,
+    advanced = false,
+    OnChange = OnOptionsChange,
+  },
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -52,88 +72,113 @@ local GetUnitDefID         = Spring.GetUnitDefID
 local GetGroundHeight      = Spring.GetGroundHeight
 local GetCameraPosition    = Spring.GetCameraPosition
 local ValidUnitID          = Spring.ValidUnitID
+local GetAllUnits          = Spring.GetAllUnits
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local flyingUnitsCount = 0
-local flyingUnitsList = {}
+local unitsCount = 0
+local unitsList = {}
 
 
-local function AddFlyingUnit(_unitID,unitID)
-  flyingUnitsCount = flyingUnitsCount + 1
-  flyingUnitsList[flyingUnitsCount] = (unitID or _unitID)
-end
-
-
-local function AddFlyingUnitCheck(_,unitID,unitDefID)
+local function AddUnit(unitID,unitDefID)
+  
   local udef = UnitDefs[unitDefID]
-  if (udef and udef.canFly) then
-    flyingUnitsCount = flyingUnitsCount + 1
-    flyingUnitsList[flyingUnitsCount] = (unitID or _unitID)
+  if not onlyShowOnAirOption or (udef and udef.canFly) then
+    unitsCount = unitsCount + 1
+    unitsList[unitsCount] = (unitID)
+  end
+end
+
+function widget:UnitEnteredAir(unitID)
+  if onlyShowOnAirOption then
+    unitsCount = unitsCount + 1
+    unitsList[unitsCount] = (unitID)
+  end
+end
+
+function widget:UnitFinished(unitID, unitDefID)
+  if not onlyShowOnAirOption then
+    AddUnit(unitID,unitDefID)
+  end
+end
+
+function widget:UnitEnteredLos(unitID, unitDefID)
+  AddUnit(unitID, unitDefID)
+end
+
+function widget:UnitLeftAir(unitID)
+  if onlyShowOnAirOption then
+    uid = (unitID or _unitID)
+	  for i=1,unitsCount do
+      if unitsList[i] == uid then
+        unitsList[i] = unitsList[unitsCount]
+        unitsCount = unitsCount - 1
+        return
+      end
+	  end
   end
 end
 
 
-local function RemoveFlyingUnit(_unitID,unitID)
-  local uid = (unitID or _unitID)
-  for i=1,flyingUnitsCount do
-    if (flyingUnitsList[i] == uid) then
-      flyingUnitsList[i] = flyingUnitsList[flyingUnitsCount]
-      flyingUnitsCount = flyingUnitsCount - 1
-      return
-    end
-  end
+local function RemoveUnitByIndex(i)
+  unitsList[i] = unitsList[unitsCount]
+  unitsCount = unitsCount - 1
 end
 
-
-local function RemoveFlyingUnitByIndex(i)
-  flyingUnitsList[i] = flyingUnitsList[flyingUnitsCount]
-  flyingUnitsCount = flyingUnitsCount - 1
+--forward-declared function
+ResetWidget = function()
+  onlyShowOnAirOption = options.onlyShowOnAir.value
+  unitsList = {}
+  unitsCount = 0
+  
+  local units = GetAllUnits() 
+  for _, uid in ipairs(units) do
+    AddUnit(uid, GetUnitDefID(uid))
+  end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-
-local function MyDrawGroundQuad(wx,wz,gy,gy_tl,gy_tr,gy_bl,gy_br,gy_t,gy_b,gy_l,gy_r)
+local function MyDrawGroundQuad(wx,wz,quadSize,gy,gy_tl,gy_tr,gy_bl,gy_br,gy_t,gy_b,gy_l,gy_r)
   --topleft
   glTexCoord(0,0)
-  glVertex(wx-16,gy_bl,wz-16)
+  glVertex(wx-quadSize,gy_bl,wz-quadSize)
   glTexCoord(0,0.5)
-  glVertex(wx-16,gy_l,wz)
+  glVertex(wx-quadSize,gy_l,wz)
   glTexCoord(0.5,0.5)
   glVertex(wx,gy,wz)
   glTexCoord(0.5,0)
-  glVertex(wx,gy_t,wz-16)
+  glVertex(wx,gy_t,wz-quadSize)
 
   --topright
   glTexCoord(0.5,0)
-  glVertex(wx,gy_t,wz-16)
+  glVertex(wx,gy_t,wz-quadSize)
   glTexCoord(0.5,0.5)
   glVertex(wx,gy,wz)
   glTexCoord(1,0.5)
-  glVertex(wx+16,gy_r,wz)
+  glVertex(wx+quadSize,gy_r,wz)
   glTexCoord(1,0)
-  glVertex(wx+16,gy_tr,wz-16)
+  glVertex(wx+quadSize,gy_tr,wz-quadSize)
 
   --bottomright
   glTexCoord(0.5,0.5)
   glVertex(wx,gy,wz)
   glTexCoord(0.5,1)
-  glVertex(wx,gy_b,wz+16)
+  glVertex(wx,gy_b,wz+quadSize)
   glTexCoord(1,1)
-  glVertex(wx+16,gy_br,wz+16)
+  glVertex(wx+quadSize,gy_br,wz+quadSize)
   glTexCoord(1,0.5)
-  glVertex(wx+16,gy_r,wz)
+  glVertex(wx+quadSize,gy_r,wz)
 
   --bottomleft
   glTexCoord(0.5,0)
-  glVertex(wx-16,gy_l,wz)
+  glVertex(wx-quadSize,gy_l,wz)
   glTexCoord(1,0)
-  glVertex(wx-16,gy_bl,wz+16)
+  glVertex(wx-quadSize,gy_bl,wz+quadSize)
   glTexCoord(1,0.5)
-  glVertex(wx,gy_b,wz+16)
+  glVertex(wx,gy_b,wz+quadSize)
   glTexCoord(0.5,0.5)
   glVertex(wx,gy,wz)
 end
@@ -151,27 +196,40 @@ local function DrawShadows()
   local gy_l,gy_r;
 
   local uid;
-  for i=1,flyingUnitsCount do
-    uid = flyingUnitsList[i]
+  local unitDefID;
+  local quadSize;
+  
+  for i=1,unitsCount do
+    uid = unitsList[i]
     if ValidUnitID(uid) then
+    
+      -- calculate quad size
+      unitDefID = GetUnitDefID(uid)
+      local xsize = UnitDefs[unitDefID].xsize 
+      if xsize then
+        quadSize = xsize * 4
+      else
+        quadSize = 16
+      end
+      
       wx, wy, wz = GetUnitViewPosition(uid)
       --dist = (wx - cx)^2 + (wy - cy)^2 + (wz - cz)^2
       --if (dist<9000000) then
         gy = GetGroundHeight(wx, wz)
-        if (IsSphereInView(wx,gy,wz,16)) then
+        if (IsSphereInView(wx,gy,wz,quadSize)) then
 
           -- get ground heights
-          gy_tl,gy_tr = GetGroundHeight(wx-16,wz-16),GetGroundHeight(wx+16,wz-16)
-          gy_bl,gy_br = GetGroundHeight(wx-16,wz+16),GetGroundHeight(wx+16,wz+16)
-          gy_t,gy_b = GetGroundHeight(wx,wz-16),GetGroundHeight(wx,wz+16)
-          gy_l,gy_r = GetGroundHeight(wx-16,wz),GetGroundHeight(wx+16,wz)
+          gy_tl,gy_tr = GetGroundHeight(wx-quadSize,wz-quadSize),GetGroundHeight(wx+quadSize,wz-quadSize)
+          gy_bl,gy_br = GetGroundHeight(wx-quadSize,wz+quadSize),GetGroundHeight(wx+quadSize,wz+quadSize)
+          gy_t,gy_b = GetGroundHeight(wx,wz-quadSize),GetGroundHeight(wx,wz+quadSize)
+          gy_l,gy_r = GetGroundHeight(wx-quadSize,wz),GetGroundHeight(wx+quadSize,wz)
 
-          MyDrawGroundQuad(wx,wz,gy,gy_tl,gy_tr,gy_bl,gy_br,gy_t,gy_b,gy_l,gy_r)
+          MyDrawGroundQuad(wx,wz,quadSize,gy,gy_tl,gy_tr,gy_bl,gy_br,gy_t,gy_b,gy_l,gy_r)
 
         end
       --end
     else
-      RemoveFlyingUnitByIndex(i)
+      RemoveUnitByIndex(i)
     end
   end
 end
@@ -179,9 +237,9 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-widget.UnitEnteredAir = AddFlyingUnit
-widget.UnitLeftAir = RemoveFlyingUnit
-widget.UnitEnteredLos = AddFlyingUnitCheck
+function widget:Initialize()
+  ResetWidget()
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
