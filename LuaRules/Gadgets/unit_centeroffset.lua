@@ -75,11 +75,23 @@ for i=1,#UnitDefs do
 		}
 	end
 	if modelRadius or modelHeight then
-		modelRadii[i] = {
+		modelRadii[i] = true -- mark that we need to initialize this
+	end
+end
+
+-- lazily initialize model radius/height since they force loading the model
+local function GetModelRadii(unitDefID)
+	if modelRadii[unitDefID] == true then
+		local ud = UnitDefs[unitDefID]
+		local modelRadius  = ud.customParams.modelradius
+		local modelHeight  = ud.customParams.modelheight
+		modelRadii[unitDefID] = {
 			radius = ( modelRadius and tonumber(modelRadius) or ud.radius ),
 			height = ( modelHeight and tonumber(modelHeight) or ud.height ),
 		}
 	end
+
+	return modelRadii[unitDefID]
 end
 
 --------------------------------------------------------------------------------
@@ -132,7 +144,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	if modelRadii[unitDefID] then
-		spSetUnitRadiusAndHeight(unitID, modelRadii[unitDefID].radius, modelRadii[unitDefID].height)
+		local mr = GetModelRadii(unitDefID)
+		spSetUnitRadiusAndHeight(unitID, mr.radius, mr.height)
 	end
 	
 	local buildProgress = select(5, spGetUnitHealth(unitID))
