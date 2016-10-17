@@ -279,7 +279,7 @@ if (gadgetHandler:IsSyncedCode()) then
       Spring.Echo("Assigning player id " .. pid .. "(" .. name .. ") to team " .. target)
       if spec then
         Spring.AssignPlayerToTeam(pid,target)
-      else
+      elseif Spring.AreTeamsAllied(player,target) then
         originalplayers[pid]  = player -- Added in case of unmerging
         Spring.AssignPlayerToTeam(pid,target)
         Spring.SetTeamResource(target,"ms",500+targetms)
@@ -290,15 +290,15 @@ if (gadgetHandler:IsSyncedCode()) then
         controlledplayers[player] = target
       end
     elseif target == Spring.GetGaiaTeamID() then
-      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Target is gaia!")
+      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Target is Gaia!")
     elseif spec then --Error messages
       Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Player is spectator. Enable cheats to enable spectator merging.")
     elseif config.special[allyteam] == "none" then
       Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Configuration for this allyteam forbids this! Enable cheats to allow this.")
     elseif Spring.AreTeamsAllied(player,target) == false then
-      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Players are not allied. Enable cheats to enable cross-alliance merging.")
+      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Players are not allied.")
     else
-      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Unknown failure. !cheats may be a fix?")
+      Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Unknown failure. Enable cheats may be a fix?")
     end
     pid,name,spec,metal,mstore,energy,estore,targetms,targetes = nil
   end
