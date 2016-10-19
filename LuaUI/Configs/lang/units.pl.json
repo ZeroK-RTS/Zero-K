@@ -1125,8 +1125,8 @@
     },
     "armarad": {
         "name": "Zaawansowany radar",
-        "description": "Radar dalekiego zasięgu, zmniejsza niepewność pomiaru",
-        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja. Ponadto zmniejsza niepewność pomiaru wszystkich sojuszniczych radarów, co bardzo pomaga w używaniu jednostek snajperskich takich jak Impaler czy Spectre."
+        "description": "Radar dalekiego zasięgu",
+        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja."
     },
     "amphraider2": {
         "name": "Archer",
