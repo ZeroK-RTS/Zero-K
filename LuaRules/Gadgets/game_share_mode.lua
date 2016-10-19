@@ -53,7 +53,9 @@ if config.mergetype == nil then config.mergetype = "invite"; end
 if config.antigrief == nil then config.antigrief = true; end
 if config.unmerging == nil then config.unmerging = true; end
 if config.special == nil then config.special = "all none invite clan"; end
-if config.mintime == nil then config.mintime = 5; end
+if config.mintime == nil then config.mintime = 0; end
+
+config.mintime = (config.mintime * 30) + 5 -- The 5 is here to prevent
 
 if mergetype == "special" then -- parse the special def. commas are delimiters
   local instructions = ProccessCommand(config.special)
