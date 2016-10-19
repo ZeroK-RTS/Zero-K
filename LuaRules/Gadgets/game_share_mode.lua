@@ -40,7 +40,7 @@ end
 
 local config = {
   default = "invite",
-  mergeai   = tobool(modOptions.mergeai),
+  mergeai   = false,
   mergetype = modOptions.sharemode, -- not used yet.
   antigrief = tobool(modOptions.antigrief),
   unmerging = tobool(modOptions.allowunmerge),
@@ -48,7 +48,7 @@ local config = {
   mintime   = modOptions.sharemintime,
 }
 -- check config --
-if config.mergeai == nil then config.mergeai = true; end
+--if config.mergeai == nil then config.mergeai = true; end
 if config.mergetype == nil then config.mergetype = "invite"; end
 if config.antigrief == nil then config.antigrief = true; end
 if config.unmerging == nil then config.unmerging = true; end
