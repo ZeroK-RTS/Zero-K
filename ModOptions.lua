@@ -78,6 +78,56 @@ local options = {
     def    = false,
     section= 'a_important',
   },
+	{
+    key = "sharemodeantigrief",
+    name = "Commshare Antigrief",
+    desc = "Disables self-d for nonkamikaze units in a shared team.",
+    type = "bool",
+    section= 'a_important',
+    def = true,
+  },
+
+  {
+    key = "sharemodeallowunmerge",
+    name = "Allow unmerging",
+    desc = "Dictates if a player can unmerge/be kicked.",
+    type = "bool",
+    section= 'a_important',
+    def = true,
+  },
+
+  {
+    key    = 'sharemodemintime',
+    name   = 'Commshare Merge wait time',
+    desc   = "In seconds.",
+    type   = 'number',
+    section= 'a_important',
+    def=30,
+    min=1,
+    max=10000,
+    step=1,
+  },
+
+ {
+	key		= "sharemodecfg",
+	name	= "Commshare Configuration",
+	desc	= "Configures commshare per team. Use , to seperate allyteams. Any allyteam not configured here will automatically revert to default (invite only)",
+	section	= 'a_important',
+	type	= "string",
+	def		= nil,
+  },
+
+  {
+    key    = 'sharemodemergedincome',
+    name   = 'Commshare party income',
+    desc   = "Dictates how much per cent of a user's share is given to the party. (multiply this by 100 to get the per centage)",
+    type   = 'number',
+    section= 'a_important',
+    def=0.75,
+    min=0,
+    max=1,
+    step=0.01,
+  },
   {
     key = "noelo",
     name = "No Elo",
