@@ -42,10 +42,10 @@ local config = {
   default = "invite",
   mergeai   = false,
   mergetype = modOptions.sharemode, -- not used yet.
-  antigrief = tobool(modOptions.antigrief),
-  unmerging = tobool(modOptions.allowunmerge),
+  antigrief = tobool(modOptions.sharemodeantigrief),
+  unmerging = tobool(modOptions.sharemodeallowunmerge),
   special   = modOptions.sharemodecfg,
-  mintime   = modOptions.sharemintime,
+  mintime   = modOptions.sharemodemintime,
 }
 -- check config --
 --if config.mergeai == nil then config.mergeai = true; end
