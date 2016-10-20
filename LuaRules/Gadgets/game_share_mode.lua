@@ -55,9 +55,9 @@ if config.unmerging == nil then config.unmerging = true; end
 if config.special == nil then config.special = "all none invite clan"; end
 if config.mintime == nil then config.mintime = 0; end
 
-config.mintime = (config.mintime * 30) + 5 -- The 5 is here to prevent
+config.mintime = (config.mintime * 30) + 5 -- The 5 is here to prevent nasty bugs like not getting coms.
 
-if mergetype == "special" then -- parse the special def. commas are delimiters
+if mergetype == "special" then -- parse the special def.
   local instructions = ProccessCommand(config.special)
   config.special = {}
   for allyid,mode in pairs(instructions) do
@@ -220,8 +220,8 @@ if (gadgetHandler:IsSyncedCode()) then
             Spring.SetTeamResource(lowestid,"es",500+targetes)
             Spring.ShareTeamResource(list[i],lowestid,"metal",metal)
             Spring.ShareTeamResource(list[i],lowestid,"energy",energy)
-            Spring.SetTeamResource(list[i],"ms",0)
-            Spring.SetTeamResource(list[i],"es",500)
+            --Spring.SetTeamResource(list[i],"ms",0)
+            --Spring.SetTeamResource(list[i],"es",500)
             for i=1,#units do
               Spring.TransferUnit(units[i],lowestid,false)
             end
@@ -288,7 +288,7 @@ if (gadgetHandler:IsSyncedCode()) then
         Spring.SetTeamResource(target,"es",500+targetes)
         Spring.ShareTeamResource(player,target,"metal",metal)
         Spring.ShareTeamResource(player,target,"energy",energy)
-        Spring.SetTeamResource(player,"ms",0)
+        --Spring.SetTeamResource(player,"ms",0)
         controlledplayers[player] = target
       end
     elseif target == Spring.GetGaiaTeamID() then
@@ -470,7 +470,7 @@ if (gadgetHandler:IsSyncedCode()) then
       	if ai and config.special[i] ~= "none" then
 		  Spring.Echo("Merging AI for team" .. ally[i])
 		  MergeAIPlayers(ally[i])
-		end
+	end
       end
     end
   end
