@@ -87,6 +87,22 @@ local options = {
     def = true,
   },
 
+	{
+		key     = 'sharemode',
+		name    = 'Commshare',
+		desc    = 'Determines whether players can merge together during gameplay.',
+		type    = 'list',
+		section = 'a_important',
+		def     = 'invite',
+		items   = {
+			{ key='all', name = "Merge All", desc = 'Merges all at game start. Recommend using allowunmerge = false with this.' },
+			{ key='clan', name = "Clan+Invite", desc = 'Merges all allied clan members at min-time.' },
+			{ key='invite', name = "Invite Only", desc = 'Allows players to merge only if both give consent.' },
+			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
+			{ key='special', name = "Special", desc = 'Allows special configuration per ally team.'},
+		},
+	},
+	
   {
     key = "sharemodeallowunmerge",
     name = "Allow unmerging",
@@ -103,7 +119,7 @@ local options = {
     type   = 'number',
     section= 'a_important',
     def=30,
-    min=1,
+    min=0,
     max=10000,
     step=1,
   },
@@ -111,23 +127,12 @@ local options = {
  {
 	key		= "sharemodecfg",
 	name	= "Commshare Configuration",
-	desc	= "Configures commshare per team. Use , to seperate allyteams. Any allyteam not configured here will automatically revert to default (invite only)",
+	desc	= "Configures commshare per team. Use space to seperate allyteams. Any allyteam not configured here will automatically revert to default (invite only)",
 	section	= 'a_important',
 	type	= "string",
 	def		= nil,
   },
-
-  {
-    key    = 'sharemodemergedincome',
-    name   = 'Commshare party income',
-    desc   = "Dictates how much per cent of a user's share is given to the party. (multiply this by 100 to get the per centage)",
-    type   = 'number',
-    section= 'a_important',
-    def=0.75,
-    min=0,
-    max=1,
-    step=0.01,
-  },
+	
   {
     key = "noelo",
     name = "No Elo",
