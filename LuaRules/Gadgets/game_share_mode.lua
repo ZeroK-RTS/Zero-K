@@ -88,7 +88,7 @@ if config.special then
   end
 end
 
-Spring.Echo("Config:\nmergeai: " .. tostring(config.mergeai) .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
+Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
 
 local function GetTeamID(playerid)
   local _,_,_,teamid,_ = Spring.GetPlayerInfo(playerid)
