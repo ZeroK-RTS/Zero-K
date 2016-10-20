@@ -78,14 +78,6 @@ local options = {
     def    = false,
     section= 'a_important',
   },
-	{
-    key = "sharemodeantigrief",
-    name = "Commshare Antigrief",
-    desc = "Disables self-d for nonkamikaze units in a shared team.",
-    type = "bool",
-    section= 'a_important',
-    def = true,
-  },
 
 	{
 		key     = 'sharemode',
@@ -102,27 +94,6 @@ local options = {
 			{ key='special', name = "Special", desc = 'Allows special configuration per ally team.'},
 		},
 	},
-	
-  {
-    key = "sharemodeallowunmerge",
-    name = "Allow unmerging",
-    desc = "Dictates if a player can unmerge/be kicked.",
-    type = "bool",
-    section= 'a_important',
-    def = true,
-  },
-
-  {
-    key    = 'sharemodemintime',
-    name   = 'Commshare Merge wait time',
-    desc   = "In seconds.",
-    type   = 'number',
-    section= 'a_important',
-    def=30,
-    min=0,
-    max=10000,
-    step=1,
-  },
 
  {
 	key		= "sharemodecfg",
