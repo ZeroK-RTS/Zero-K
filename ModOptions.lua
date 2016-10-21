@@ -91,18 +91,9 @@ local options = {
 			--{ key='clan', name = "Clan+Invite", desc = 'Merges all allied clan members at min-time.' },
 			{ key='invite', name = "Invite Only", desc = 'Allows players to merge only if both give consent.' },
 			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
-			{ key='special', name = "Special", desc = 'Allows special configuration per ally team.'},
+			--{ key='special', name = "Special", desc = 'Allows special configuration per ally team.'},
 		},
 	},
-
- {
-	key		= "sharemodecfg",
-	name	= "Commshare Configuration",
-	desc	= "Configures commshare per team. Use space to seperate allyteams. Any allyteam not configured here will automatically revert to default (invite only)",
-	section	= 'a_important',
-	type	= "string",
-	def		= nil,
-  },
 	
   {
     key = "noelo",
