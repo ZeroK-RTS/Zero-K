@@ -1,11 +1,11 @@
 function gadget:GetInfo()
 	return {
-		name			= "Share mode",
-		desc			= "Allows one to share control of resources and units with other players.",
-		author		= "_Shaman",
-		date			= "6-23-2016",
+		name	 = "Share mode",
+		desc	 = "Allows one to share control of resources and units with other players.",
+		author	 = "_Shaman",
+		date	 = "6-23-2016",
 		license	 = "Do whatever you want with it, just give credit",
-		layer		 = 0,
+		layer	 = 0,
 		enabled	 = true,
 	}
 end
@@ -42,10 +42,10 @@ local config = {
 	default = "invite",
 	mergeai	 = false,
 	mergetype = modOptions.sharemode, -- not used yet.
-	antigrief = tobool(modOptions.sharemodeantigrief),
-	unmerging = tobool(modOptions.sharemodeallowunmerge),
+	antigrief = true,
+	unmerging = false
 	special	 = modOptions.sharemodecfg,
-	mintime	 = modOptions.sharemodemintime,
+	mintime	 = 5,
 }
 -- check config --
 --if config.mergeai == nil then config.mergeai = true; end
@@ -54,8 +54,6 @@ if config.antigrief == nil then config.antigrief = true; end
 if config.unmerging == nil then config.unmerging = true; end
 if config.special == nil then config.special = "all none invite clan"; end
 if config.mintime == nil then config.mintime = 0; end
-
-config.mintime = (config.mintime * 30) + 5 -- The 5 is here to prevent nasty bugs like not getting coms.
 
 if mergetype == "special" then -- parse the special def.
 	local instructions = ProccessCommand(config.special)
