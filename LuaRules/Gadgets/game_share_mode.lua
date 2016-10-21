@@ -46,7 +46,6 @@ local config = {
 	mergetype = modOptions.sharemode, -- not used yet.
 	antigrief = true,
 	unmerging = false
-	special	 = modOptions.sharemodecfg,
 	mintime	 = 5,
 }
 -- check config --
@@ -54,41 +53,11 @@ local config = {
 if config.mergetype == nil then config.mergetype = "invite"; end
 --if config.antigrief == nil then config.antigrief = true; end
 --if config.unmerging == nil then config.unmerging = true; end
-if config.special == nil then config.special = "all all all all"; end
 --if config.mintime == nil then config.mintime = 0; end
 
 if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
-	
-
-if mergetype == "special" then -- parse the special def.
-	local instructions = ProccessCommand(config.special)
-	config.special = {}
-	for allyid,mode in pairs(instructions) do
-	config.special[allyid] = string.gsub(mode,"%W","")
-	config.special[allyid] = string.gsub(config.special[allyid],"%d","")
-	config.special[allyid] = string.lower(config.special[allyid])
-	end
-end
-if config.special then
-	config.special = {}
-	local allylist = Spring.GetAllyTeamList()
-	if config.mergetype == "special" then
-		for i=1,#allylist do
-			--Verify config--
-			if config.special[i] then
-				if validmodes[config.special[i]] == nil or validmodes[config.special[i]] == false then
-					config.special[i] = config.default
-				end
-			else
-				config.special[i] = config.default
-			end
-		end
-	else
-		config.special = {}
-		for i=1,#allylist do
-			config.special[i] = config.mergetype
-		end
-	end
+for i=1,#allylist do
+	config.special[i] = config.mergetype
 end
 
 --Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
