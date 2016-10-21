@@ -38,6 +38,8 @@ end
 --gadgetHandler:RemoveGadget()
 --end
 
+local validmodes = {};validmodes["all"] = true;validmodes["none"] = true;validmodes["invite"] = true
+
 local config = {
 	default = "invite",
 	mergeai	 = false,
@@ -50,10 +52,13 @@ local config = {
 -- check config --
 --if config.mergeai == nil then config.mergeai = true; end
 if config.mergetype == nil then config.mergetype = "invite"; end
-if config.antigrief == nil then config.antigrief = true; end
-if config.unmerging == nil then config.unmerging = true; end
-if config.special == nil then config.special = "all none invite clan"; end
-if config.mintime == nil then config.mintime = 0; end
+--if config.antigrief == nil then config.antigrief = true; end
+--if config.unmerging == nil then config.unmerging = true; end
+if config.special == nil then config.special = "all all all all"; end
+--if config.mintime == nil then config.mintime = 0; end
+
+if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
+	
 
 if mergetype == "special" then -- parse the special def.
 	local instructions = ProccessCommand(config.special)
@@ -86,7 +91,7 @@ if config.special then
 	end
 end
 
-Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
+--Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
 
 local function GetTeamID(playerid)
 	local _,_,_,teamid,_ = Spring.GetPlayerInfo(playerid)
@@ -122,7 +127,6 @@ local function GetSquadSize(teamid)
 end
 
 if (gadgetHandler:IsSyncedCode()) then
-	local validmodes = {};validmodes["all"] = true;validmodes["none"] = true;validmodes["clan"] = true;validmodes["invite"] = true
 	local Invites = {}
 	local antigriefactiveteams = {}
 
@@ -184,7 +188,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 
-	local function MergeAIPlayers(allyteam) -- Give all units belonging to similar ais to one ai.
+	--[[local function MergeAIPlayers(allyteam) -- Give all units belonging to similar ais to one ai.
 		local teamlist = Spring.GetTeamList(allyteam)
 		local aitypes = {}
 		for _,team in pairs(teamlist) do
@@ -227,7 +231,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				end
 			end
 		end
-	end
+	end]]
 	
 	local function MergeUnits(team,target)
 		local units = Spring.GetTeamUnits(team)
@@ -252,10 +256,10 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		local pid												= 0
 		local name,_,spec,_,_,allyteam	 = Spring.GetPlayerInfo(pid)
-		local metal,_,_									= Spring.GetTeamResources(player,"metal")
+		--[[local metal,_,_									= Spring.GetTeamResources(player,"metal")
 		local energy,_,_								 = Spring.GetTeamResources(player,"energy")
 		local _,targetms,_							 = Spring.GetTeamResources(target,"metal")
-		local _,targetes,_							 = Spring.GetTeamResources(target,"energy")
+		local _,targetes,_							 = Spring.GetTeamResources(target,"energy")]]
 		if isplayerid then
 			pid = player
 			if GetSquadSize(GetTeamID(player))-1 == 0 then
@@ -282,8 +286,8 @@ if (gadgetHandler:IsSyncedCode()) then
 			elseif Spring.AreTeamsAllied(player,target) then
 				originalplayers[pid]	= player -- Added in case of unmerging
 				Spring.AssignPlayerToTeam(pid,target)
-				Spring.SetTeamResource(target,"ms",500+targetms)
-				Spring.SetTeamResource(target,"es",500+targetes)
+				--Spring.SetTeamResource(target,"ms",500+targetms)
+				--Spring.SetTeamResource(target,"es",500+targetes)
 				Spring.ShareTeamResource(player,target,"metal",metal)
 				Spring.ShareTeamResource(player,target,"energy",energy)
 				--Spring.SetTeamResource(player,"ms",0)
@@ -370,7 +374,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 	
-	local function MergeClan(allyteam)
+	--[[local function MergeClan(allyteam)
 		Spring.Echo("Merge Clan")
 		local teamlist = Spring.GetTeamList(allyteam)
 		local clanlist = {}
@@ -397,7 +401,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				end
 			end
 		end
-	end
+	end]]
 	
 	function gadget:Initialize()
 		local playerlist = Spring.GetPlayerList(true)
@@ -452,25 +456,23 @@ if (gadgetHandler:IsSyncedCode()) then
 									end
 								end
 							end
-						elseif config.special[ally[i]] == "clan" and CountNonAI(teamlist) > 0 then
-							MergeClan(ally[i])
 						end
 					end
 				end
 				ally,mergeid,name,isAi = nil
 			end
 		end
-		if f== config.mintime + 600 and config.mergeai then
+		--[[if f== config.mintime + 600 and config.mergeai then
 			local ally = Spring.GetAllyTeamList()
 			for i=1,#ally do
 				local teamlist = Spring.GetTeamList(ally[i])
 				_,ai = GetLowestID(teamlist,false)
 				if ai and config.special[i] ~= "none" then
-			Spring.Echo("Merging AI for team" .. ally[i])
-			MergeAIPlayers(ally[i])
-	end
+					Spring.Echo("Merging AI for team" .. ally[i])
+					MergeAIPlayers(ally[i])
+				end
 			end
-		end
+		end]]
 	end
 	
 	function gadget:RecvLuaMsg(msg,playerid) -- Entry points for widgets to interact with the gadget
