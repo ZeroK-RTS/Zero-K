@@ -59,7 +59,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -68,7 +67,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Wind/Tidal Generator]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,
@@ -76,7 +74,6 @@ unitDef = {
     },
 
     DEADWATER = {
-      description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,

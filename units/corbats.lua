@@ -143,7 +143,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Warlord]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 6,
@@ -153,7 +152,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Warlord]],
       blocking         = false,
       footprintX       = 7,
       footprintZ       = 7,

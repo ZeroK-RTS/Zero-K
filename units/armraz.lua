@@ -177,7 +177,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Razorback]],
       blocking         = true,
       featureDead      = [[DEAD2]],
       footprintX       = 3,
@@ -187,7 +186,6 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Razorback]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -197,7 +195,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Razorback]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

@@ -187,7 +187,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Nebula]],
       blocking         = true,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[40 50 220]],
@@ -201,7 +200,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Nebula]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

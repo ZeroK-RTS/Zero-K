@@ -64,7 +64,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Conch]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -73,7 +72,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Conch]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

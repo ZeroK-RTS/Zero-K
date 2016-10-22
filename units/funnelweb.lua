@@ -155,7 +155,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Funnelweb]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -164,7 +163,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Funnelweb]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

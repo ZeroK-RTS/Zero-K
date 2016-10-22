@@ -51,7 +51,6 @@ unitDef = {
     },
     
     HEAP  = {
-      description      = [[Debris - Asteroid]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

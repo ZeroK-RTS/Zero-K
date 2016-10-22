@@ -57,7 +57,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Advanced Radar]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -66,7 +65,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Advanced Radar]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

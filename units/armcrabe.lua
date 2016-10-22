@@ -128,7 +128,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Crabe]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -137,7 +136,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Crabe]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

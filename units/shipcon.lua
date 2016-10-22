@@ -73,7 +73,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Mariner]],
       blocking         = false,
       featureDead      = [[DEAD2]],
       footprintX       = 5,
@@ -83,7 +82,6 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Mariner]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -93,7 +91,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Mariner]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

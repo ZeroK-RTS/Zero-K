@@ -185,7 +185,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Siege Commander]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -195,7 +194,6 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Siege Commander]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

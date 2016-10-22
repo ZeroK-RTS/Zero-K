@@ -133,7 +133,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Dominatrix]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -143,7 +142,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Dominatrix]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

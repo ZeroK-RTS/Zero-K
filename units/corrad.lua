@@ -163,7 +163,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Radar Tower]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -173,7 +172,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Radar Tower]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

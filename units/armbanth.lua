@@ -255,7 +255,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Bantha]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -265,7 +264,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Bantha]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

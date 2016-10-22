@@ -128,7 +128,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Leveler]],
       blocking         = false,
       featureDead      = [[DEAD2]],
       footprintX       = 2,
@@ -138,7 +137,6 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Leveler]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -148,7 +146,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Leveler]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

@@ -62,7 +62,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Missile Silo]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 6,
@@ -71,7 +70,6 @@ unitDef = {
     },
 
     HEAP = {
-      description      = [[Debris - Missile Silo]],
       blocking         = false,
       footprintX       = 6,
       footprintZ       = 6,

@@ -204,7 +204,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Vindicator]],
       blocking         = true,
 	  collisionVolumeScales  = [[60 40 80]],
 	  collisionVolumeTest	 = 1,
@@ -217,7 +216,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Vindicator]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

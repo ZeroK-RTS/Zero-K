@@ -284,7 +284,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Scorpion]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -292,7 +291,6 @@ unitDef = {
       object           = [[scorpion_dead.s3o]],
     },
     HEAP  = {
-      description      = [[Debris - Scorpion]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

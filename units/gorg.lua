@@ -319,7 +319,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Jugglenaut]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -329,7 +328,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Jugglenaut]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

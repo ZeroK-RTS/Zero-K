@@ -70,7 +70,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Metal Extractor]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -80,7 +79,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Metal Extractor]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

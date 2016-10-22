@@ -82,7 +82,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Spider Factory]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -91,7 +90,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Spider Factory]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

@@ -131,7 +131,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Flail]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -140,7 +139,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Flail]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

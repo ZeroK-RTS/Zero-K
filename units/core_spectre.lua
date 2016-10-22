@@ -105,7 +105,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Aspis]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 1,
@@ -114,7 +113,6 @@ unitDef = {
     },
 
     HEAP = {
-      description      = [[Debris - Aspis]],
       blocking         = false,
       footprintX       = 1,
       footprintZ       = 1,

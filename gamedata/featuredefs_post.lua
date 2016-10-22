@@ -129,6 +129,7 @@ local function ProcessUnitDef(udName, ud)
 	  fd.metal = ud.buildcostmetal * (fdName == "heap" and 0.2 or 0.4)
 	  fd.reclaimtime = fd.metal
       fd.filename = ud.filename
+	  fd.description = fd.description or ((fdName == "heap" and "Debris" or "Wreckage") .. " - " .. ud.name)
     end
   end
 

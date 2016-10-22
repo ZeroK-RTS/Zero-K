@@ -115,7 +115,6 @@ unitDef = {
   featureDefs       = {
 
     DEAD  = {
-      description      = [[Wreckage - Urchin]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -125,7 +124,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Urchin]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

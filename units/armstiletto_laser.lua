@@ -157,7 +157,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Thunderbird]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -166,7 +165,6 @@ unitDef = {
     },
 
     HEAP = {
-      description      = [[Debris - Thunderbird]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

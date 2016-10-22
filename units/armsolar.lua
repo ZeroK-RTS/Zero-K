@@ -61,7 +61,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Solar Collector]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -70,7 +69,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Solar Collector]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

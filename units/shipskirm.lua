@@ -136,7 +136,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Enforcer]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -146,7 +145,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Enforcer]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

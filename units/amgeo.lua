@@ -53,7 +53,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Advanced Geothermal]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -62,7 +61,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Advanced Geothermal]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

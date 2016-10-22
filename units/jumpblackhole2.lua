@@ -216,7 +216,6 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Placeholder2]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -226,7 +225,6 @@ unitDef = {
 
 	
     HEAP  = {
-      description      = [[Debris - Placeholder2]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

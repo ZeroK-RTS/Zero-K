@@ -61,7 +61,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Singularity Reactor]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 7,
@@ -71,7 +70,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Singularity Reactor]],
       blocking         = false,
       footprintX       = 7,
       footprintZ       = 7,

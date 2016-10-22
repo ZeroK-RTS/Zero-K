@@ -183,7 +183,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Archangel]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -193,7 +192,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Archangel]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

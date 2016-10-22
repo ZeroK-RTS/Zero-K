@@ -75,7 +75,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Shipyard]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 9,
@@ -86,7 +85,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Shipyard]],
       blocking         = false,
       footprintX       = 8,
       footprintZ       = 8,

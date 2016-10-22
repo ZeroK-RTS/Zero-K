@@ -177,7 +177,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Newton]],
       blocking         = true,
       featureDead      = [[DEAD2]],
       footprintX       = 5,
@@ -187,7 +186,6 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Newton]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -197,7 +195,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Newton]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

@@ -120,7 +120,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Punisher]],
       blocking         = false,
       featureDead      = [[DEAD2]],
       footprintX       = 3,
@@ -130,7 +129,6 @@ unitDef = {
 
 
     DEAD2 = {
-      description      = [[Debris - Punisher]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -140,7 +138,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Punisher]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

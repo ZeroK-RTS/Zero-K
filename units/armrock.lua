@@ -136,7 +136,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Rocko]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -145,7 +144,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Rocko]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

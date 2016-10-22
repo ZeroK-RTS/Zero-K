@@ -314,7 +314,6 @@ starlight_satellite = {
 
   featureDefs            = {
     DEAD  = {
-      description      = [[Wreckage - Owl]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -323,7 +322,6 @@ starlight_satellite = {
     },
 
     HEAP  = {
-      description      = [[Debris - Owl]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

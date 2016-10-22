@@ -116,7 +116,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Pillager]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -126,7 +125,6 @@ unitDef = {
 
     
     HEAP  = {
-      description      = [[Debris - Pillager]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

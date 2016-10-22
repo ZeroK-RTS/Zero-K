@@ -108,7 +108,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Recon Commander]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -118,7 +117,6 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Recon Commander]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

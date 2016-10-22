@@ -51,7 +51,6 @@ unitDef = {
   featureDefs       = {
 
     DEAD  = {
-      description      = [[Wreckage - Sonar Station]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -60,7 +59,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Sonar Station]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

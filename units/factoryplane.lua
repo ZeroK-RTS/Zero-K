@@ -79,7 +79,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Airplane Plant]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 7,
@@ -89,7 +88,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Airplane Plant]],
       blocking         = false,
       footprintX       = 6,
       footprintZ       = 6,

@@ -159,7 +159,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Daimyo]],
       blocking         = false,
 	  collisionVolumeOffsets = [[0 0 3]],
 	  collisionVolumeScales  = [[32 46 102]],
@@ -173,7 +172,6 @@ unitDef = {
 
     
     HEAP  = {
-      description      = [[Debris - Daimyo]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

@@ -315,7 +315,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Dante]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -325,7 +324,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Dante]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

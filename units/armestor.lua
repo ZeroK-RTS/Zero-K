@@ -55,7 +55,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Energy Pylon]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -64,7 +63,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Energy Pylon]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

@@ -134,7 +134,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Mace]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -144,7 +143,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Mace]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

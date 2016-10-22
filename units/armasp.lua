@@ -63,7 +63,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Air Repair/Rearm Pad]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 9,
@@ -72,7 +71,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Air Repair/Rearm Pad]],
       blocking         = false,
       footprintX       = 1,
       footprintZ       = 1,

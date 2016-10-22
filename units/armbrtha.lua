@@ -119,7 +119,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Big Bertha]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -129,7 +128,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Big Bertha]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

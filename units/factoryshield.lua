@@ -83,7 +83,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Shield Bot Factory]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -92,7 +91,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Shield Bot Factory]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

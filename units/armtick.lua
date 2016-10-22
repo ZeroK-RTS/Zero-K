@@ -75,7 +75,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Tick]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 1,
@@ -84,7 +83,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Tick]],
       blocking         = false,
       footprintX       = 1,
       footprintZ       = 1,

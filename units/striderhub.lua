@@ -94,7 +94,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Strider Hub]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -104,7 +103,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Strider Hub]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

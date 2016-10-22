@@ -333,7 +333,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Disco Rave Party]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -342,7 +341,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Disco Rave Party]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

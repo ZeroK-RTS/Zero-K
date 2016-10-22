@@ -58,7 +58,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Surfboard]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -67,7 +66,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Surfboard]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

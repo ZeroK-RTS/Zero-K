@@ -78,7 +78,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Valkyrie]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -88,7 +87,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Valkyrie]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

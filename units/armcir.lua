@@ -141,7 +141,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Chainsaw]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 4,
@@ -150,7 +149,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Chainsaw]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

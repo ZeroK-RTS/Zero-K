@@ -98,7 +98,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Guardian Commander]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -108,7 +107,6 @@ unitDef = {
 
 
     HEAP      = {
-      description      = [[Debris - Guardian Commander]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

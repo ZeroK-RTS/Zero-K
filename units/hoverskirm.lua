@@ -110,7 +110,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Trisula]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -120,7 +119,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Trisula]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

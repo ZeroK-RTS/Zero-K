@@ -77,7 +77,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Cloaky Bot Factory]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 7,
@@ -86,7 +85,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Cloaky Bot Factory]],
       blocking         = false,
       footprintX       = 7,
       footprintZ       = 7,

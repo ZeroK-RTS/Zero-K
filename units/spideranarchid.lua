@@ -119,7 +119,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Venom]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -127,7 +126,6 @@ unitDef = {
       object           = [[venom_wreck.s3o]],
     },
     HEAP  = {
-      description      = [[Debris - Venom]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

@@ -105,7 +105,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Athena]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -114,7 +113,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Athena]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

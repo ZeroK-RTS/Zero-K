@@ -77,7 +77,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Blastwing]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -86,7 +85,6 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Blastwing]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

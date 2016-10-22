@@ -85,7 +85,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Skuttle]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -94,7 +93,6 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Skuttle]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

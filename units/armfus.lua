@@ -48,7 +48,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Fusion Reactor]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -57,7 +56,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Fusion Reactor]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 4,

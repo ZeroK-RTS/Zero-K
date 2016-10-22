@@ -260,7 +260,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Krow]],
       blocking         = true,
 	  collisionVolumeOffsets = [[0 0 0]],
 	  collisionVolumeScales  = [[80 30 80]],
@@ -274,7 +273,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Krow]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,

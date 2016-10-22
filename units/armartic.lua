@@ -117,7 +117,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Faraday]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -126,7 +125,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Faraday]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

@@ -138,7 +138,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Lotus]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -148,7 +147,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Lotus]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

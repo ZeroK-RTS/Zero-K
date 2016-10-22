@@ -136,7 +136,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Penetrator]],
       blocking         = true,
 	  collisionVolumeScales  = [[40 40 60]],
 	  collisionVolumeTest	 = 1,
@@ -148,7 +147,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Penetrator]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

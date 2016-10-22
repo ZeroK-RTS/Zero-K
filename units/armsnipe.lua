@@ -133,7 +133,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Spectre]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -142,7 +141,6 @@ unitDef = {
     },
 
     HEAP = {
-      description      = [[Debris - Spectre]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

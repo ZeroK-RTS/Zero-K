@@ -68,7 +68,6 @@ unitDef = {
   featureDefs      = {
 
     DEAD  = {
-      description      = [[Wreckage - Amphibious Bot Plant]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 7,
@@ -77,7 +76,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Amphibious Bot Plant]],
       blocking         = false,
       footprintX       = 7,
       footprintZ       = 7,

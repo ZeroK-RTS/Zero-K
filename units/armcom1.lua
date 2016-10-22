@@ -208,7 +208,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Strike Commander]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -217,7 +216,6 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

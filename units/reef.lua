@@ -216,7 +216,6 @@ unitDef = {
 	  collisionVolumeScales  = [[80 80 240]],
 	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
-      description      = [[Wreckage - Reef]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 6,
@@ -225,7 +224,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Reef]],
       blocking         = false,
       footprintX       = 6,
       footprintZ       = 6,

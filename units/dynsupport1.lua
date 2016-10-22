@@ -101,7 +101,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Engineer Commander]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -110,7 +109,6 @@ unitDef = {
     },
 
     HEAP      = {
-      description      = [[Debris - Engineer Commander]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

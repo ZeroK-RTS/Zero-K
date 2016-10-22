@@ -82,7 +82,6 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Jump/Specialist Plant]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 5,
@@ -92,7 +91,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Jump/Specialist Plant]],
       blocking         = false,
       footprintX       = 5,
       footprintZ       = 5,

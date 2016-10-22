@@ -125,7 +125,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Racketeer]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -134,7 +133,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Racketeer]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

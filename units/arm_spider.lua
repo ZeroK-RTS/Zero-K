@@ -83,7 +83,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Weaver]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -92,7 +91,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Weaver]],
       blocking         = false,
       footprintX       = 3,
       footprintZ       = 3,

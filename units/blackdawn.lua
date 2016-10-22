@@ -132,7 +132,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Black Dawn]],
       blocking         = true,
 	  collisionVolumeScales  = [[65 20 65]],
 	  collisionVolumeTest	 = 1,
@@ -145,7 +144,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Black Dawn]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

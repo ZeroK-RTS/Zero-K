@@ -73,7 +73,6 @@ unitDef = {
   featureDefs      = {
 
     DEAD  = {
-      description      = [[Wreckage - Hovercraft Platform]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 8,
@@ -83,7 +82,6 @@ unitDef = {
 
 
     HEAP  = {
-      description      = [[Debris - Hovercraft Platform]],
       blocking         = false,
       footprintX       = 8,
       footprintZ       = 7,

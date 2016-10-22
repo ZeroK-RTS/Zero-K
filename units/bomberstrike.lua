@@ -118,7 +118,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Kestrel]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -127,7 +126,6 @@ unitDef = {
     },
 
     HEAP  = {
-      description      = [[Debris - Kestrel]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

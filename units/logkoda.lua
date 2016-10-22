@@ -184,7 +184,6 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Kodachi]],
       blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
@@ -194,7 +193,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Kodachi]],
       blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,

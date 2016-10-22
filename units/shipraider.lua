@@ -139,7 +139,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Typhoon]],
       blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 3,
@@ -149,7 +148,6 @@ unitDef = {
 
 
     HEAP = {
-      description      = [[Debris - Typhoon]],
       blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,
