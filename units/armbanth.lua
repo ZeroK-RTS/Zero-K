@@ -84,8 +84,8 @@ unitDef = {
 
     {
       def                = [[ATA]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
 
