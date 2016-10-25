@@ -44,7 +44,7 @@ local config = {
 	default = "invite",
 	mergeai	 = false,
 	mergetype = modOptions.sharemode, -- not used yet.
-	antigrief = true,
+	antigrief = false,
 	unmerging = false
 	mintime	 = 5,
 }
