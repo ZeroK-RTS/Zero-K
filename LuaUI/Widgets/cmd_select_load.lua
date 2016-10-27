@@ -18,8 +18,44 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+
+local CMD_MOVE = CMD.MOVE
+local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
+local function CopyMoveThenUnload(transportID, unitID)
+	local cmdQueue = Spring.GetCommandQueue(unitID)
+	if not cmdQueue then
+		return
+	end
+	local commandLocations = {}
+	local queueToRemove = {}
+	for i = 1, #cmdQueue do
+		local cmd = cmdQueue[i]
+		if cmd.id == CMD_MOVE then
+			commandLocations[#commandLocations + 1] = cmd.params
+			commandCopied = true
+		elseif cmd.id ~= CMD_SET_WANTED_MAX_SPEED then
+			break
+		end
+		queueToRemove[#queueToRemove + 1] = cmd.tag
+	end
+	
+	if #commandLocations == 0 then
+		return
+	end
+	local commands = {}
+	for i = 1, #commandLocations - 1 do
+		commands[i] = {CMD.MOVE, commandLocations[i], CMD.OPT_SHIFT}
+	end
+	commandLocations[#commandLocations][4] = 100
+	commands[#commandLocations] = {CMD.UNLOAD_UNITS, commandLocations[#commandLocations], CMD.OPT_SHIFT}
+	
+	Spring.GiveOrderArrayToUnitArray({transportID}, commands)
+	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, {})
+end
 
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports
@@ -60,12 +96,14 @@ local function DoSelectionLoad()
 	for i = 1, lightEnd do 
 		Spring.GiveOrderToUnit(lightTrans[i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
 		Spring.GiveOrderToUnit(light[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+		CopyMoveThenUnload(lightTrans[i], light[i])
 	end
 	
 	local heavyEnd = math.min(#heavy, #heavyTrans)
 	for i = 1, heavyEnd do 
 		Spring.GiveOrderToUnit(heavyTrans[i], CMD.LOAD_UNITS, {heavy[i]}, CMD.OPT_RIGHT)
 		Spring.GiveOrderToUnit(heavy[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+		CopyMoveThenUnload(heavyTrans[i], heavy[i])
 	end
 	
 	--Spring.Echo("light", #light)
@@ -79,6 +117,7 @@ local function DoSelectionLoad()
 		for i = #lightTrans + 1, heavyEnd do 
 			Spring.GiveOrderToUnit(heavyTrans[offset + i], CMD.LOAD_UNITS, {light[i]}, CMD.OPT_RIGHT)
 			Spring.GiveOrderToUnit(light[i], CMD.WAIT, {}, CMD.OPT_RIGHT)
+			CopyMoveThenUnload(heavyTrans[offset + i], light[i])
 		end
 	end
 	Spring.SetActiveCommand(-1)
