@@ -120,7 +120,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -173,8 +173,9 @@ options = {
 		value = false,		
 		noHotkey = true,
 	},
+	lblSelectionIdle = { type='label', name='Idle Units', path='Game/Selection Hotkeys', },
 	selectprecbomber = { type = 'button',
-		name = 'Select precision bomber',
+		name = 'Select idle precision bomber',
 		desc = 'Selects an idle, armed precision bomber. Use multiple times to select more. Deselects any units which are not idle, armed precision bombers.',
 		action = 'selectprecbomber',
 		path = 'Game/Selection Hotkeys',
