@@ -34,26 +34,20 @@ if (Spring.GetModOptions) then
 	modOptions = Spring.GetModOptions()
 end
 
---if modOptions.sharemode == "off" then
---gadgetHandler:RemoveGadget()
---end
+if modOptions.sharemode == "off" then
+	gadgetHandler:RemoveGadget()
+end
 
 local validmodes = {};validmodes["all"] = true;validmodes["none"] = true;validmodes["invite"] = true
 
 local config = {
 	default = "invite",
-	mergeai	 = false,
-	mergetype = modOptions.sharemode, -- not used yet.
-	antigrief = false,
-	unmerging = false
+	mergetype = modOptions.sharemode,
+	unmerging = false,
 	mintime	 = 5,
 }
 -- check config --
---if config.mergeai == nil then config.mergeai = true; end
 if config.mergetype == nil then config.mergetype = "invite"; end
---if config.antigrief == nil then config.antigrief = true; end
---if config.unmerging == nil then config.unmerging = true; end
---if config.mintime == nil then config.mintime = 0; end
 
 if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
 for i=1,#allylist do
@@ -97,7 +91,6 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 	local Invites = {}
-	local antigriefactiveteams = {}
 
 --Note I wished springiee had a way of setting certain variables in game :(
 
@@ -134,9 +127,6 @@ if (gadgetHandler:IsSyncedCode()) then
 		if originalplayers[player] then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
-				if GetSquadSize(GetTeamID(player)) -1 == 1 then
-					antigriefactiveteams[GetTeamID(player)] = nil -- turn antigrief off
-				end
 				local target = originalplayers[player]
 				Spring.SetTeamResource(originalplayers[player],"ms",500)
 				local _,targetms,_	= Spring.GetTeamResources(controlledplayers[player],"metal")
@@ -156,51 +146,6 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 		end
 	end
-
-	--[[local function MergeAIPlayers(allyteam) -- Give all units belonging to similar ais to one ai.
-		local teamlist = Spring.GetTeamList(allyteam)
-		local aitypes = {}
-		for _,team in pairs(teamlist) do
-			local _,_,_,ai,_ = Spring.GetTeamInfo(team)
-			if ai then
-				_,name,_ = Spring.GetAIInfo(team)
-				Spring.Echo("name (aiinfo): " .. name)
-				name = Spring.GetTeamLuaAI(team)
-				Spring.Echo(team .. ": " .. name)
-				if aitypes[name] == nil then
-					aitypes[name] = {}
-					table.insert(aitypes[name],team)
-				else
-					table.insert(aitypes[name],team)
-				end
-			end
-		end
-		for name,list in pairs(aitypes) do
-			Spring.Echo(name .. ": size: " .. #list)
-			if #list > 1 then
-				local lowestid,_ = GetLowestID(list,true)
-				Spring.Echo("Lowest ID is " .. lowestid)
-				for i=1,#list do
-					if list[i] ~= lowestid then
-						local metal,mstore,_						 = Spring.GetTeamResources(list[i],"metal")
-						local energy,estore,_						= Spring.GetTeamResources(list[i],"energy")
-						local _,targetms,_							 = Spring.GetTeamResources(lowestid,"metal")
-						local _,targetes,_							 = Spring.GetTeamResources(lowestid,"energy")
-						local units = Spring.GetTeamUnits(list[i])
-						Spring.SetTeamResource(lowestid,"ms",500+targetms)
-						Spring.SetTeamResource(lowestid,"es",500+targetes)
-						Spring.ShareTeamResource(list[i],lowestid,"metal",metal)
-						Spring.ShareTeamResource(list[i],lowestid,"energy",energy)
-						--Spring.SetTeamResource(list[i],"ms",0)
-						--Spring.SetTeamResource(list[i],"es",500)
-						for i=1,#units do
-							Spring.TransferUnit(units[i],lowestid,false)
-						end
-					end
-				end
-			end
-		end
-	end]]
 	
 	local function MergeUnits(team,target)
 		local units = Spring.GetTeamUnits(team)
@@ -219,9 +164,6 @@ if (gadgetHandler:IsSyncedCode()) then
 		if player == nil then
 			Spring.Echo("game_message: Attempted to merge a nil player!")
 			return
-		end
-		if not antigriefactiveteams[target] then
-			antigriefactiveteams[target] = true
 		end
 		local pid												= 0
 		local name,_,spec,_,_,allyteam	 = Spring.GetPlayerInfo(pid)
@@ -343,35 +285,6 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 	
-	--[[local function MergeClan(allyteam)
-		Spring.Echo("Merge Clan")
-		local teamlist = Spring.GetTeamList(allyteam)
-		local clanlist = {}
-		for _,team in pairs(teamlist) do
-			local _,pid,_ = Spring.GetTeamInfo(team)
-			local customKeys = select(10, Spring.GetPlayerInfo(pid)) or {}
-			local clanShort = customKeys.clan or "none"
-			local clanLong = customKeys.clanfull or "none"
-			if clanShort ~= "none" then
-				if clanlist[clanShort] ~= nil then
-					clanlist[clanShort].members[#members+1] = team
-				else
-					clanlist[clanShort]["members"] = {}
-					clanlist[clanShort].members[#members+1] = team
-				end
-			end
-		end
-		for _,data in pairs(clanlist) do
-			if #data["members"] > 1 then
-				Spring.Echo("game_message: Clan " .. clanLong .. " has been merged!")
-				local lowestid = GetLowestID(data["members"],false)
-				for i=1,#data["members"] do
-					MergePlayers(data["members"][i])
-				end
-			end
-		end
-	end]]
-	
 	function gadget:Initialize()
 		local playerlist = Spring.GetPlayerList(true)
 		local name = ""
@@ -431,17 +344,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				ally,mergeid,name,isAi = nil
 			end
 		end
-		--[[if f== config.mintime + 600 and config.mergeai then
-			local ally = Spring.GetAllyTeamList()
-			for i=1,#ally do
-				local teamlist = Spring.GetTeamList(ally[i])
-				_,ai = GetLowestID(teamlist,false)
-				if ai and config.special[i] ~= "none" then
-					Spring.Echo("Merging AI for team" .. ally[i])
-					MergeAIPlayers(ally[i])
-				end
-			end
-		end]]
 	end
 	
 	function gadget:RecvLuaMsg(msg,playerid) -- Entry points for widgets to interact with the gadget
@@ -533,14 +435,6 @@ if (gadgetHandler:IsSyncedCode()) then
 		if controlledplayers[unitTeam] then
 			Spring.TransferUnit(unitID,controlledplayers[unitTeam],false) -- this is in case of late commer coms,etc. False maybe fixes spamming of unit transfered?
 		end
-	end
-	
-	function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag, synced)
-		if cmdID == CMD.SELFD and config.antigrief and antigriefactiveteams[unitTeam] and UnitDefs[unitDefID].canKamikaze == false then
-			Spring.Echo("[AntiGrief] That's not allowed.")
-			return false
-		end
-		return true
 	end
 	
 else -- unsynced stuff
