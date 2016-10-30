@@ -447,7 +447,7 @@
     },
     "armcarry": {
         "name": "Reef",
-        "description": "Lotniskowiec (z tarczą antyrakietową)",
+        "description": "Lotniskowiec",
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "slowmort": {
@@ -1100,7 +1100,7 @@
     },
     "reef": {
         "name": "Reef",
-        "description": "Lotniskowiec (z tarczą antyrakietową)",
+        "description": "Lotniskowiec",
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "corsumo": {
