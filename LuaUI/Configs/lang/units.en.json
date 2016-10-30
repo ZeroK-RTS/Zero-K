@@ -446,7 +446,7 @@
 	},
 	"armcarry" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment)"
+		"description" : "Aircraft Carrier (Bombardment)",
 		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"slowmort" : {
