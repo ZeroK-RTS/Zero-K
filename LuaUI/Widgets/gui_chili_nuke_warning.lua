@@ -114,12 +114,12 @@ local function CreateWindow()
 end
 
 local function ShowWindow()
-	local _,fullView = Spring.GetSpectatingState()
-	
-	-- Spectators with fullview should not be distracted by nuke warning
-	if fullView then
-		return
-	end
+	--local _,fullView = Spring.GetSpectatingState()
+	--
+	---- Spectators with fullview should not be distracted by nuke warning
+	--if fullView then
+	--	return
+	--end
 	
 	if mainWindow then
 		screen0:AddChild(mainWindow.window)

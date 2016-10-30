@@ -326,6 +326,10 @@ local function DrawNukeOnMouse(cmdID)
 	
 	local mx, my = spGetMouseState()
 	local _, mouse = spTraceScreenRay(mx, my, true, true)
+	if not mouse then
+		return false
+	end
+	
 	mouse = {mouse[1], mouse[2], mouse[3]}
 	
 	if not mouse then
