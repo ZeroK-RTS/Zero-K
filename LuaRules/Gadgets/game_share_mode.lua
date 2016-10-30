@@ -152,63 +152,30 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 	
-	local function MergePlayers(player,target,isplayerid) -- Player merges into target's team.
-	Spring.Echo("Merge Players")
+	local function MergePlayer(playerid,target)
 		if player == nil then
-			Spring.Echo("game_message: Attempted to merge a nil player!")
+			Spring.Echo("Commshare: Tried to merge a nil player!")
 			return
 		end
-		local pid												= 0
-		local name,_,spec,_,_,allyteam	 = Spring.GetPlayerInfo(pid)
-		--[[local metal,_,_									= Spring.GetTeamResources(player,"metal")
-		local energy,_,_								 = Spring.GetTeamResources(player,"energy")
-		local _,targetms,_							 = Spring.GetTeamResources(target,"metal")
-		local _,targetes,_							 = Spring.GetTeamResources(target,"energy")]]
-		if isplayerid then
-			pid = player
-			if GetSquadSize(GetTeamID(player))-1 == 0 then
-				MergeUnits(GetTeamID(player),target)
-			end
-		else
-			_,pid,_ = Spring.GetTeamInfo(player)
-		end
-		if pid == nil then
-			return
-		else
-			if GetSquadSize(player) -1 == 0 then
-				MergeUnits(player,target)
-			end
-		end
-		if target == nil then
-			Spring.Echo("game_message: Encountered a nil target player while attempting to merge " .. name)
-			return
-		end
-		if (Spring.AreTeamsAllied(player,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none") or Spring.IsCheatingEnabled() then
-			Spring.Echo("Assigning player id " .. pid .. "(" .. name .. ") to team " .. target)
-			if spec then
-				Spring.AssignPlayerToTeam(pid,target)
-			elseif Spring.AreTeamsAllied(player,target) then
-				originalplayers[pid]	= player -- Added in case of unmerging
-				Spring.AssignPlayerToTeam(pid,target)
-				--Spring.SetTeamResource(target,"ms",500+targetms)
-				--Spring.SetTeamResource(target,"es",500+targetes)
+		local originalteam = GetTeamID(playerid)
+		local name,_,spec  = Spring.GetPlayerInfo(playerid)
+		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none") then
+			Spring.Echo("Commshare: Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
+			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
+			if GetSquadSize(originalteam) - 1 == 0 then
+				MergeUnits(originalteam)
 				Spring.ShareTeamResource(player,target,"metal",metal)
 				Spring.ShareTeamResource(player,target,"energy",energy)
-				--Spring.SetTeamResource(player,"ms",0)
-				controlledplayers[player] = target
 			end
-		elseif target == Spring.GetGaiaTeamID() then
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Target is Gaia!")
-		elseif spec then --Error messages
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Player is spectator. Enable cheats to enable spectator merging.")
-		elseif config.mergetype == "none" then
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Commshare is off.")
-		elseif Spring.AreTeamsAllied(player,target) == false then
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Players are not allied.")
+			Spring.AssignPlayerToTeam(playerid,target)
+			if originalplayers[playerid] == nil then
+				originalplayers[playerid]	= originalteam
+			end
+			controlledplayers[player] = target
+			GG.RedirectPlayerIncome(playerid,target) -- redirect playerid's share of the team income to target teamid. This is basically 'assigning' the player's share to the team id.
 		else
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Unknown failure. Enable cheats may be a fix?")
+			Spring.Echo("Commshare: Merger error.")
 		end
-		pid,name,spec,metal,mstore,energy,estore,targetms,targetes = nil
 	end
 	
 	local function MergeTeams(team1,team2) -- bandaid for an issue during planning.
@@ -216,11 +183,11 @@ if (gadgetHandler:IsSyncedCode()) then
 		local playerlist2 = Spring.GetPlayerList(team2,true)
 		if GetSquadSize(team1) >= GetSquadSize(team2) then
 			for _,id in pairs(playerlist) do
-				MergePlayers(id,team2,true)
+				MergePlayer(id,team2)
 			end
 		else
 			for _,id in pairs(playerlist2) do
-				MergePlayers(id,team1,true)
+				MergePlayer(id,team1)
 			end
 		end
 		playerlist,playerlist2 = nil
@@ -266,7 +233,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		if Invites[player][target] then
 			Spring.Echo("invite verified")
 			if Invites[player][target]["ismergereq"] then -- player->target
-				MergePlayers(target,GetTeamID(player),true)
+				MergePlayer(target,GetTeamID(player))
 			else -- target->player
 				MergeTeams(GetTeamID(target),GetTeamID(player))
 				teamlist = nil
@@ -282,7 +249,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		if Spring.GetGameFrame() > config.mintime then
 			local name,active,spec,team,ally,_	 = Spring.GetPlayerInfo(playerID)
 			if spec == false and active == true and config.mergetype ~= "none" and controlledplayers[team] then
-				MergePlayers(playerID,controlledplayers[playerID],false)
+				MergePlayer(playerID,controlledplayers[playerID])
 				Spring.Echo("game_message: Player " .. name .. "has been remerged!")
 			end
 		end
@@ -434,7 +401,7 @@ else -- unsynced stuff
 			end
 		end
 	end
-		
+	
 	local function SendToWidgets(_,playerid,target,timeleft,ismerge)
 		if Spring.GetMyPlayerID() == playerid then
 			Spring.SendLuaUIMsg("sharemodeupdater " .. playerid .. " " .. timeleft .. " " .. ismerge,"a")
