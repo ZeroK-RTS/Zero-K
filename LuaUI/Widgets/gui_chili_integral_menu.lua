@@ -814,6 +814,11 @@ local function ManageBuildRow()
 	--if (menuChoice ~= 6) or (not buildRow_visible) or (not selectedFac) then return end
 	local overrun = false
 	RemoveChildren(buildRow)
+	
+	if not buildQueue then
+		return
+	end
+	
 	if buildQueue[MAX_COLUMNS + 1] then 
 		overrun = true 
 	end

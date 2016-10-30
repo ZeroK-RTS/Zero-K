@@ -728,6 +728,7 @@ local moduleDefs = {
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
 			-- Damage boost is applied via clone swapping
+			sharedData.damageMult = (sharedData.damageMult or 1) + 0.1
 			sharedData.speedMult = (sharedData.speedMult or 1) - 0.025
 		end
 	},
@@ -828,26 +829,22 @@ end
 -- clone which was given those modules.
 
 local function GetReconCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
-		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0)
+	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0)
 end
 
 local function GetSupportCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
-		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
 		(modulesByDefID[moduleDefNames.module_resurrect] or 0)
 end
 
 local function GetAssaultCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
-		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 
 local function GetStrikeCloneModulesString(modulesByDefID)
-	return (modulesByDefID[moduleDefNames.module_dmg_booster] or 0) .. 
-		(modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 

@@ -96,7 +96,7 @@ local function EmitWeaponShotSfx(pieceNum, num)
 	end
 end
 
-local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
+local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, damageMult)
 	local weaponDef1 = weaponName1 and unitWeaponNames[weaponName1]
 	local weaponDef2 = weaponName2 and unitWeaponNames[weaponName2]
 	local shieldDef = shieldName and unitWeaponNames[shieldName]
@@ -158,7 +158,14 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 		else
 			maxRange = range
 		end
-		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)
+		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)	
+		
+		local damages = WeaponDefs[weaponDef1.weaponDefID].damages
+		for k, v in pairs(damages) do
+			if type(k) == "number" then
+				Spring.SetUnitWeaponDamages(unitID, weapon1, k, v * damageMult)
+			end
+		end
 	end
 	
 	if weapon2 then
@@ -177,6 +184,13 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 			maxRange = range
 		end
 		Spring.SetUnitWeaponState(unitID, weapon2, "range", range)
+		
+		local damages = WeaponDefs[weaponDef2.weaponDefID].damages
+		for k, v in pairs(damages) do
+			if type(k) == "number" then
+				Spring.SetUnitWeaponDamages(unitID, weapon2, k, v * damageMult)
+			end
+		end
 	end
 	
 	if weapon1 then
@@ -232,7 +246,8 @@ local function Create()
 			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 			Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
-			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
+			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1,
+			Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 		)
 	end
 end
