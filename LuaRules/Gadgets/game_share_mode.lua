@@ -57,6 +57,10 @@ local function GetTeamID(playerid)
 	return select(4,Spring.GetPlayerInfo(playerid))
 end
 
+local function GetTeamLeader(teamid)
+	return select(2,Spring.GetTeamInfo(teamid))
+end
+
 local function IsTeamLeader(playerid)
 	local teamid = GetTeamID(playerid)
 	local teamleaderid = select(2,Spring.GetTeamInfo(teamid))
@@ -117,7 +121,7 @@ if (gadgetHandler:IsSyncedCode()) then
 
 	local function UnmergePlayer(player) -- Takes playerid, not teamid!!!
 		local name,_ = Spring.GetPlayerInfo(player)
-		if originalplayers[player] then
+		if originalplayers[player] and config.unmerging then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
 				GG.ResetIncome(originalplayers[player]) -- Reset team income/storage.
@@ -185,46 +189,42 @@ if (gadgetHandler:IsSyncedCode()) then
 		playerlist,playerlist2 = nil
 	end
 	
-	local function InvitePlayer(player,target,ismergereq)
+	local function SendInvite(player,target,targetid) -- targetplayer is which player is the merger
 		if Spring.GetGameFrame() > config.mintime then
-			Spring.Echo("config.mintime passes")
-			if player ~= target then
-				local _,_,targetspec,_ = Spring.GetPlayerInfo(target)
-				if targetspec then SendToUnsync("errors",player,"You can't merge with specs!") return end
-				local targetteam = GetTeamID(target)
-				local _,_,dead,ai,_ = Spring.GetTeamInfo(targetteam)
-				local _,_,spec,_ = Spring.GetPlayerInfo(player)
-				if spec then
-					SendToUnsynced("errors",player,"You are spectating!")
-					return
-				end
-				if not dead and not ai then
-					Spring.Echo("alive passed")
-					if Invites[player] then
-						Invites[player][target] = {};Invites[player][target]["timeleft"] = 45;Invites[player][target]["ismergereq"] = ismergereq
-					else
-						Invites[player] = {};Invites[player][target] = {};Invites[player][target]["timeleft"] = 45;Invites[player][target]["ismergereq"] = ismergereq
-					end
-					SendToUnsynced("newinvite",target,player,ismergereq)
-					Spring.Echo("newinvite sent to " .. target .. "(" .. player,tostring(ismergereq) .. ")")
-				elseif playerspec then
-					SendToUnsynced("errors",player,"Target squad is dead!")
-				else
-					SendToUnsynced("errors",player,"Target is an AI player!")
-				end
-			else
-				SendToUnsynced("errors",player,"You can't merge with yourself!")
+			local targetspec = select(3,Spring.GetPlayerInfo(target))
+			local _,_,dead,ai,_ = Spring.GetTeamInfo(GetTeamID(targetid))
+			if player == target then
+				SendToUnsync("errors",player,"You can't merge with yourself!")
+				return
 			end
-		else
-			SendToUnsynced("errors",player,"You can't merge this early!")
+			if IsTeamLeader(player) and targetid ~= player then
+				SendToUnsync("errors",player,"You can't invite players when you aren't the team leader!")
+				return
+			end
+			if targetspec then
+				SendToUnsync("errors",player,"You can't merge with specs!")
+				return
+			end
+			if targetid == player then
+				local teamid = GetTeamID(target)
+				target = GetTeamLeader(teamid)
+			end
+			if not dead and not ai then
+				if Invites[player] == nil then
+					Invites[player] = {}
+				end
+				Invites[player][target] = {timeleft = 45,controller = targetid}
+				SendToUnsync("addinvite",player,target,targetid)
+			end
 		end
 	end
 	
+	
 	local function AcceptInvite(player,target)
 		Spring.Echo("verifying invite")
-		if Invites[player][target] then
+		if Invites[player][target] and Invites[target][player] then
 			Spring.Echo("invite verified")
-			if Invites[player][target]["ismergereq"] then -- player->target
+			if Invites[player][target]["controller"] ~= player then
 				MergePlayer(target,GetTeamID(player))
 			else -- target->player
 				MergeTeams(GetTeamID(target),GetTeamID(player))
@@ -295,23 +295,12 @@ if (gadgetHandler:IsSyncedCode()) then
 			if proccmd[2] and string.find(proccmd[2],"invite") then
 				if proccmd[3] then
 					proccmd[3] = string.gsub(proccmd[3],"%D","")
-					if proccmd[3] ~= "" then
-						InvitePlayer(playerid,tonumber(proccmd[3]),false) -- playerid <- proccmd[3] merger
-						Spring.Echo("inviteplayer")
+					if proccmd[3] ~= "" and proccmd[4] then
+						SendInvite(playerid,tonumber(proccmd[3]),tonumber(proccmd[4])) -- #4 should be the controller id.
 						return
 					end
 				else
 					SendToUnsynced("errors",playerid,"Error: Invalid invite!")
-					return
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"mergereq") then -- playerid -> proccmd[3] merger
-				proccmd[3] = string.gsub(proccmd[3],"%D","")
-				if proccmd[3] ~= "" then
-					Spring.Echo("mergereq")
-					InvitePlayer(tonumber(proccmd[3]),playerid,true)
-					return
-				else
-					SendToUnsynced("errors",playerid,"Error: Missing mergeid")
 					return
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"accept") then
@@ -329,12 +318,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				else
 					SendToUnsynced("errors",playerid,"You aren't on any squad!")
 					return
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"restart") then -- Lua was restart! Sender requests invites again.
-				if Invites[playerid] then
-					for k,v in pairs(Invites[playerid]) do
-						SendToUnsynced("widgetstuff",playerid,k,v["timeleft"],v["ismergereq"])
-					end
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"decline") then
 				if proccmd[3] then
@@ -376,6 +359,7 @@ if (gadgetHandler:IsSyncedCode()) then
 	end
 	
 else -- unsynced stuff
+	local unsyncedinvitetable = {}
 	
 	local function Errors(_,playerid,msg)
 		if Spring.GetMyPlayerID() == playerid then
@@ -383,26 +367,29 @@ else -- unsynced stuff
 		end
 	end
 	
-	local function Invite(_,playerid,target,ismerge)
-		if playerid == Spring.GetMyPlayerID() then
-			name,_ = Spring.GetPlayerInfo(target)
-			if ismerge then
-				Spring.Echo("game_message:" .. "You got an invitation from " .. name .. "! Type /squad accept " .. target .. " to accept it")
-			else
-				Spring.Echo("game_message:" .. name .. "has invited you to join their squad! Type /squad accept " .. target .. " to accept it")
-			end
+	local function AddInvite(_,playerid,target,controller)
+		if unsyncedinvitetable[playerid] == nil then
+			unsyncedinvitetable[playerid] = {}
 		end
+		unsyncedinvitetable[playerid][target] = {timeleft = 45, controller = controller}
 	end
 	
-	local function SendToWidgets(_,playerid,target,timeleft,ismerge)
-		if Spring.GetMyPlayerID() == playerid then
-			Spring.SendLuaUIMsg("sharemodeupdater " .. playerid .. " " .. timeleft .. " " .. ismerge,"a")
+	function gadget:GameFrame(f)
+		if f%30 == 0 then
+			for player,invites in pairs(unsyncedinvitetable) do
+				for id,data in pairs(invites) do
+					data["timeleft"] = data["timeleft"] - 1
+					if data["timeleft"] == 0 then
+						data = nil
+					end
+				end
+			end
 		end
+		WG.CommshareInvites = unsyncedinvitetable[Spring.GetMyPlayerID()]
 	end
 	
 	function gadget:Initialize()
 		gadgetHandler:AddSyncAction("errors", Errors)
-		gadgetHandler:AddSyncAction("widgetstuff", SendToWidgets)
-		gadgetHandler:AddSyncAction("newinvite",Invite)
+		gadgetHandler:AddSyncAction("addinvite",AddInvite)
 	end
 end
