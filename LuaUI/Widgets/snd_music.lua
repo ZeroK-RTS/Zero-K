@@ -306,9 +306,11 @@ function widget:Update(dt)
 end
 
 function widget:GameStart()
-	gameStarted = true
-	previousTrackType = musicType
-	StartTrack()
+	if not gameStarted then
+		gameStarted = true
+		previousTrackType = musicType
+		StartTrack()
+	end
 	
 	--Spring.Echo("Track: " .. newTrack)
 	newTrackWait = 0	
