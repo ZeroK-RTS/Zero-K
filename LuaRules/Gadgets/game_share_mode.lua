@@ -50,20 +50,16 @@ local config = {
 if config.mergetype == nil then config.mergetype = "invite"; end
 
 if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
-for i=1,#allylist do
-	config.special[i] = config.mergetype
-end
 
 --Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
 
 local function GetTeamID(playerid)
-	local _,_,_,teamid,_ = Spring.GetPlayerInfo(playerid)
-	return teamid
+	return select(4,Spring.GetPlayerInfo(playerid))
 end
 
 local function IsTeamLeader(playerid)
 	local teamid = GetTeamID(playerid)
-	local _,teamleaderid,_ = Spring.GetTeamInfo(teamid)
+	local teamleaderid = select(2,Spring.GetTeamInfo(teamid))
 	if playerid == teamleaderid then
 		teamid,teamleaderid = nil
 		return true
@@ -91,9 +87,6 @@ end
 
 if (gadgetHandler:IsSyncedCode()) then
 	local Invites = {}
-
---Note I wished springiee had a way of setting certain variables in game :(
-
 	local controlledplayers = {}
 	local originalplayers = {}
 	local originalunits = {}
@@ -103,7 +96,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		local aipresent = false
 		local isAI
 		for _,id in pairs(list) do
-			_,_,_,isAI,_ = Spring.GetTeamInfo(id)
+			isAI = select(4,Spring.GetTeamInfo(id))
 			if isAI then aipresent = true end
 			if id < lowest and id > 0 and isAI == false and includeai == false then lowest = id end
 			if id < lowest and id > 0 and includeai == true then lowest = id end
@@ -190,7 +183,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			Spring.Echo("game_message: Encountered a nil target player while attempting to merge " .. name)
 			return
 		end
-		if (Spring.AreTeamsAllied(player,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.special[allyteam] ~= "none") or Spring.IsCheatingEnabled() then
+		if (Spring.AreTeamsAllied(player,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none") or Spring.IsCheatingEnabled() then
 			Spring.Echo("Assigning player id " .. pid .. "(" .. name .. ") to team " .. target)
 			if spec then
 				Spring.AssignPlayerToTeam(pid,target)
@@ -208,8 +201,8 @@ if (gadgetHandler:IsSyncedCode()) then
 			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Target is Gaia!")
 		elseif spec then --Error messages
 			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Player is spectator. Enable cheats to enable spectator merging.")
-		elseif config.special[allyteam] == "none" then
-			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Configuration for this allyteam forbids this! Enable cheats to allow this.")
+		elseif config.mergetype == "none" then
+			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Commshare is off.")
 		elseif Spring.AreTeamsAllied(player,target) == false then
 			Spring.Echo("game_message: Player " .. name .. " can't be merged into team " .. target .. "! Reason: Players are not allied.")
 		else
@@ -283,23 +276,12 @@ if (gadgetHandler:IsSyncedCode()) then
 		else
 			SendToUnsynced("errors",player,"Invalid merge request!")
 		end
-	end
-	
-	function gadget:Initialize()
-		local playerlist = Spring.GetPlayerList(true)
-		local name = ""
-		for _,player in pairs(playerlist) do
-			name,_,_,_ = Spring.GetPlayerInfo(player)
-			playernametoid[player] = name
-			Spring.Echo(player .. ":" .. name)
-		end
-	end
-		
+	end		
 	
 	function gadget:PlayerAdded(playerID)
 		if Spring.GetGameFrame() > config.mintime then
 			local name,active,spec,team,ally,_	 = Spring.GetPlayerInfo(playerID)
-			if spec == false and active == true and config.special[ally] ~= "none" and controlledplayers[team] then
+			if spec == false and active == true and config.mergetype ~= "none" and controlledplayers[team] then
 				MergePlayers(playerID,controlledplayers[playerID],false)
 				Spring.Echo("game_message: Player " .. name .. "has been remerged!")
 			end
@@ -320,19 +302,17 @@ if (gadgetHandler:IsSyncedCode()) then
 		if f== config.mintime then
 			local ally = Spring.GetAllyTeamList()
 			Spring.Echo("game_message: Share mode avaliable!")
-			if config.mergetype ~= "invite" or config.mergetype ~= "none" then
+			if config.mergetype == "all" then
 				for i=1,#ally do
-					Spring.Echo("Config for ally " .. ally[i] .. ": " .. tostring(config.special[ally[i]]))
 					teamlist = Spring.GetTeamList(ally[i])
-					if teamlist ~= nil and #teamlist > 1 and config.special[i] ~= "none" then
-						if config.special[ally[i]] == "all" then
+					if teamlist ~= nil and #teamlist > 1 then
 							local mergeid,_ = GetLowestID(teamlist,false)
 							for _,team in pairs(teamlist) do
 								if mergeid == team then
 									Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
 								else
 									_,pid,_,isAi = Spring.GetTeamInfo(team)
-									name,_,_,_,_ = Spring.GetPlayerInfo(pid)
+									name = select(1,Spring.GetPlayerInfo(pid))
 									if isAi == false then
 										MergeTeams(team,mergeid)
 									end
