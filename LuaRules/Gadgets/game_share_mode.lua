@@ -108,17 +108,6 @@ if (gadgetHandler:IsSyncedCode()) then
 		return lowest,aipresent
 	end
 
-	local function CountNonAI(list)
-		local count = 0
-		for _,id in pairs(list) do
-			_,_,_,isAI,_ = Spring.GetTeamInfo(id)
-			if isAI == false then
-				count = count + 1
-			end
-		end
-		return count
-	end
-
 	local function UnmergePlayer(player) -- Takes playerid, not teamid!!!
 		local name,_ = Spring.GetPlayerInfo(player)
 		if originalplayers[player] and config.unmerging then
@@ -267,11 +256,11 @@ if (gadgetHandler:IsSyncedCode()) then
 					if teamlist ~= nil and #teamlist > 1 then
 						local mergeid,_ = GetLowestID(teamlist,false)
 						for _,team in pairs(teamlist) do
+							name = select(1,Spring.GetPlayerInfo(pid))
 							if mergeid == team then
 								Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
 							else
 								_,pid,_,isAi = Spring.GetTeamInfo(team)
-								name = select(1,Spring.GetPlayerInfo(pid))
 								if isAi == false then
 									MergeTeams(team,mergeid)
 								end
