@@ -306,16 +306,15 @@ if (gadgetHandler:IsSyncedCode()) then
 				for i=1,#ally do
 					teamlist = Spring.GetTeamList(ally[i])
 					if teamlist ~= nil and #teamlist > 1 then
-							local mergeid,_ = GetLowestID(teamlist,false)
-							for _,team in pairs(teamlist) do
-								if mergeid == team then
-									Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
-								else
-									_,pid,_,isAi = Spring.GetTeamInfo(team)
-									name = select(1,Spring.GetPlayerInfo(pid))
-									if isAi == false then
-										MergeTeams(team,mergeid)
-									end
+						local mergeid,_ = GetLowestID(teamlist,false)
+						for _,team in pairs(teamlist) do
+							if mergeid == team then
+								Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
+							else
+								_,pid,_,isAi = Spring.GetTeamInfo(team)
+								name = select(1,Spring.GetPlayerInfo(pid))
+								if isAi == false then
+									MergeTeams(team,mergeid)
 								end
 							end
 						end
