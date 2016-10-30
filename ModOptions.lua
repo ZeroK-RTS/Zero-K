@@ -88,10 +88,8 @@ local options = {
 		def     = 'invite',
 		items   = {
 			{ key='all', name = "Merge All", desc = 'Merges all at game start. Recommend using allowunmerge = false with this.' },
-			--{ key='clan', name = "Clan+Invite", desc = 'Merges all allied clan members at min-time.' },
 			{ key='invite', name = "Invite Only", desc = 'Allows players to merge only if both give consent.' },
 			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
-			--{ key='special', name = "Special", desc = 'Allows special configuration per ally team.'},
 		},
 	},
 	
