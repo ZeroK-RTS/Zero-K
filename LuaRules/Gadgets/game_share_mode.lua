@@ -120,22 +120,16 @@ if (gadgetHandler:IsSyncedCode()) then
 		if originalplayers[player] then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
+				GG.ResetIncome(originalplayers[player]) -- Reset team income/storage.
 				local target = originalplayers[player]
-				Spring.SetTeamResource(originalplayers[player],"ms",500)
-				local _,targetms,_	= Spring.GetTeamResources(controlledplayers[player],"metal")
-				local _,targetes,_	= Spring.GetTeamResources(controlledplayers[player],"energy")
-				Spring.SetTeamResource(controlledplayers[player],"ms",targetms-500)
-				Spring.SetTeamResource(controlledplayers[player],"es",targetes-500)
 				Spring.AssignPlayerToTeam(player,originalplayers[player])
 				for _,unit in pairs(originalunits[target]) do
 					if Spring.ValidUnitID(unit) and Spring.AreTeamsAllied(Spring.GetUnitTeam(unit),target) then
 						Spring.TransferUnit(unit,target,true)
-					elseif Spring.ValidUnitID(unit) and Spring.AreTeamsAllied(Spring.GetUnitTeam(unit),target) and Spring.IsCheatingEnabled() then
-						Spring.TransferUnit(unit,target,false)
 					end
 				end
 				originalunits[target] = nil
-				targetms,targetes,target,controlledplayers[player] = nil -- cleanup.
+				target,controlledplayers[player] = nil -- cleanup.
 			end
 		end
 	end
@@ -144,9 +138,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		local units = Spring.GetTeamUnits(team)
 		originalunits[team] = units
 		for i=1, #units do
-			if Spring.IsCheatingEnabled() and Spring.ValidUnitID(units[i]) then
-				Spring.TransferUnit(units[i],target,false)
-			elseif Spring.ValidUnitID(units[i]) then
+			if  Spring.ValidUnitID(units[i]) then
 				Spring.TransferUnit(units[i],target,true)
 			end
 		end
@@ -164,14 +156,14 @@ if (gadgetHandler:IsSyncedCode()) then
 			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
 			if GetSquadSize(originalteam) - 1 == 0 then
 				MergeUnits(originalteam,target)
-				Spring.ShareTeamResource(player,target,"metal",metal)
-				Spring.ShareTeamResource(player,target,"energy",energy)
+				Spring.ShareTeamResource(originalteam,target,"metal",metal)
+				Spring.ShareTeamResource(originalteam,target,"energy",energy)
 			end
 			Spring.AssignPlayerToTeam(playerid,target)
 			if originalplayers[playerid] == nil then
 				originalplayers[playerid]	= originalteam
 			end
-			controlledplayers[player] = target
+			controlledplayers[playerid] = target
 			GG.RedirectPlayerIncome(playerid,target) -- redirect playerid's share of the team income to target teamid. This is basically 'assigning' the player's share to the team id.
 		else
 			Spring.Echo("Commshare: Merger error.")
