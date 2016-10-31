@@ -317,6 +317,11 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 			return false
 		end
 	end
+	-- remove fight orders if the bomber is not set to repeat (otherwise fight commands will behave like they're on repeat)
+	local _,_, rpstate, _,_,_,_,_,_ = Spring.GetUnitStates(unitID)
+	if not rpstate then
+		spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
+	end
 	--Spring.Echo(unitID.." requesting rearm")
 	local detectedRearm = false
 	local queue = spGetCommandQueue(unitID, -1) or emptyTable
