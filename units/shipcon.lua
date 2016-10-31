@@ -74,21 +74,11 @@ unitDef = {
 
     DEAD  = {
       blocking         = false,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
       object           = [[shipcon_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[debris4x4c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,
