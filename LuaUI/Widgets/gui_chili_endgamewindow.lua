@@ -305,6 +305,10 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	
 	SetTeamNamesAndColors()
+	
+	if Spring.IsGameOver() then
+		showEndgameWindowTimer = 1
+	end
 end
 
 function widget:GameOver (winners)

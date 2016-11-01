@@ -98,7 +98,8 @@ local function drawIntervals(graphMax)
 		}
 		local label = Chili.Label:New{
 			parent = graphPanel, 
-			x = 0, bottom = (i)/5*100 .. "%", 
+			x = 0,
+			bottom = ((i)/5*100 + 1.1) .. "%",
 			width = "100%", 
 			caption = numFormat(graphMax*i/5)
 		}
@@ -264,6 +265,9 @@ local function getEngineArrays(statistic, labelCaption)
 		end
 	end
 	fixLabelAlignment()
+	
+	graphPanel:Invalidate()
+	graphPanel:UpdateClientArea()
 end
 
 function widget:GameFrame(n)
@@ -377,6 +381,13 @@ function loadpanel()
 	}
 
 	WG.statsPanel = window0
+end
+
+function widget:Initialize()
+	if Spring.IsGameOver() then
+		Spring.SendCommands("endgraph 0")
+		loadpanel()
+	end
 end
 
 function widget:GameOver()
