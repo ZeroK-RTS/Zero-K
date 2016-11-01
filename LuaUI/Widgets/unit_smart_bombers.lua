@@ -1,12 +1,4 @@
--- $Id: cmd_unit_mover.lua 3171 2008-11-06 09:06:29Z det $
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
---  file:    cmd_unit_mover.lua
---  brief:   Allows combat engineers to use repeat when building mobile units (use 2 or more build spots)
---  author:  Owen Martindell
---
---  Copyright (C) 2007.
+--  Copyright (C) 2016.
 --  Licensed under the terms of the GNU GPL, v2 or later.
 --
 --------------------------------------------------------------------------------
