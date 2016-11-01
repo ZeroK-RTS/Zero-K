@@ -36,6 +36,7 @@ local incolor2color
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local showEndgameWindowTimer
 local window_endgame
 local awardPanel
 local awardSubPanel
@@ -354,7 +355,20 @@ function widget:GameOver (winners)
 	end
 	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
+	showEndgameWindowTimer = 2
+end
+
+function widget:Update(dt)
+	if not showEndgameWindowTimer then
+		return
+	end
+	showEndgameWindowTimer = showEndgameWindowTimer - dt
+	if showEndgameWindowTimer > 0 then
+		return
+	end
+	
 	ShowEndGameWindow()
+	showEndgameWindowTimer = nil
 end
 
 function widget:Shutdown()
