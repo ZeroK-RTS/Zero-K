@@ -17,45 +17,107 @@ function widget:GetInfo()
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local spGetCommandQueue = Spring.GetCommandQueue
-local spGetPlayerInfo = Spring.GetPlayerInfo
+local spGetSpectatingState = Spring.GetSpectatingState
 local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local myTeamID = Spring.GetMyTeamID()
-local Echo = Spring.Echo
+local spGetMyTeamID = Spring.GetMyTeamID
+
+local myTeamID
 
 local fightingBombers = {}
 local reservedBombers = {}
-local myID
+
+local bombderDefIDs = {
+	[UnitDefNames["corshad"].id] = true,
+	[UnitDefNames["corhurc2"].id] = true,
+	[UnitDefNames["armstiletto_laser"].id] = true,
+	[UnitDefNames["armcybr"].id] = true,
+}
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-local function checkSpec()
-  local _, _, spec = spGetPlayerInfo(myID)
-  if spec then
-	Echo("Spectating: Widget Removed")
-    widgetHandler:RemoveWidget()
-  end
+local function CheckSpec()
+	myTeamID = spGetMyTeamID()
+	if spGetSpectatingState() then
+		Spring.Echo("Spectating: Widget Removed")
+		widgetHandler:RemoveWidget()
+	end
 end
 
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
 function GetFirstCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1)
-	return queue[1]
+	return queue and queue[1]
 end
+
+local function CheckUnit(unitID, unitDefID)
+	if not bombderDefIDs[unitDefID] then
+		return
+	end
+	local cmd = GetFirstCommand(unitID)
+	if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+		spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""}) -- fire at will
+		fightingBombers[unitID] = true
+	else
+		spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""}) -- hold fire
+		reservedBombers[unitID] = true
+	end
+end
+
+local function CheckBombers()
+	for unitID, _ in pairs(fightingBombers) do
+		-- clean dead or captured bombers
+		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitTeam(unitID) ~= myTeamID) then
+			fightingBombers[unitID] = nil
+		else
+			-- swap bombers whose commands have changed and update their firestate
+			local cmd = GetFirstCommand(unitID)
+			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+				-- do nothing
+			else
+				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""})
+				fightingBombers[unitID] = nil
+				reservedBombers[unitID] = true
+			end
+		end
+	end
+	
+	for unitID, _ in pairs(reservedBombers) do
+		-- clean dead or captured bombers
+		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitTeam(unitID) ~= myTeamID) then
+			reservedBombers[unitID] = nil
+		else
+			-- swap bombers whose commands have changed and update their firestate
+			local cmd = GetFirstCommand(unitID)
+			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""})
+				fightingBombers[unitID] = true
+				reservedBombers[unitID] = nil
+			else
+				-- do nothing
+			end
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Widget interface
 
 function widget:Initialize()
-	myID = Spring.GetMyPlayerID()
-	checkSpec()
+	CheckSpec()
 end
 
-function widget:PlayerChanged(playerID)
-	checkSpec()
+function widget:PlayerChanged()
+	CheckSpec()
 end
 
 function widget:GameFrame(frame)
 	if frame % 15 == 0 then
-		checkBombers()
+		CheckBombers()
 	end
 end
 
@@ -71,55 +133,3 @@ function widget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		CheckUnit(unitID, unitDefID)
 	end
 end
-
-function CheckUnit(unitID, unitDefID)
-	local ud = UnitDefs[unitDefID]
-	if (ud and (ud.name == "corshad" or ud.name == "corhurc2" or ud.name == "armstiletto_laser" or ud.name == "armcybr")) then
-		local cmd = GetFirstCommand(unitID)
-		if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
-			spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""}) -- fire at will
-			fightingBombers[unitID] = true
-		else
-			spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""}) -- hold fire
-			reservedBombers[unitID] = true
-		end
-	end
-end
-
-function checkBombers()
-	for unitID, _ in pairs(fightingBombers) do
-	-- clean dead or captured bombers
-		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitTeam(unitID) ~= myTeamID) then
-			fightingBombers[unitID] = nil
-		else
-		-- swap bombers whose commands have changed and update their firestate
-			local cmd = GetFirstCommand(unitID)
-			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
-				-- do nothing
-			else
-				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""})
-				fightingBombers[unitID] = nil
-				reservedBombers[unitID] = true
-			end
-		end
-	end
-	
-	for unitID, _ in pairs(reservedBombers) do
-	-- clean dead or captured bombers
-		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitTeam(unitID) ~= myTeamID) then
-			reservedBombers[unitID] = nil
-		else
-		-- swap bombers whose commands have changed and update their firestate
-			local cmd = GetFirstCommand(unitID)
-			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
-				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""})
-				fightingBombers[unitID] = true
-				reservedBombers[unitID] = nil
-			else
-				-- do nothing
-			end
-		end
-	end
-end
-
---------------------------------------------------------------------------------
