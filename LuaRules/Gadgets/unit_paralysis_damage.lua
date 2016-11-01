@@ -34,7 +34,6 @@ for wdid = 1, #WeaponDefs do
 	if wd.paralyzer then
 		local rawDamage = tonumber(wd.customParams.raw_damage or 0)
 		if wd.customParams and wd.customParams.extra_damage and rawDamage > 0 then
-			Spring.Echo("wd.customParams.raw_damage", wd.customParams.raw_damage)
 			normalDamageMult[wdid] = wd.customParams.extra_damage/rawDamage
 		end
 		wantedWeaponList[#wantedWeaponList + 1] = wdid
