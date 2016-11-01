@@ -74,6 +74,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["cormist"].id] = true,
 	[UnitDefNames["tawf114"].id] = true, --HT's banisher
 	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
+	[UnitDefNames["corshad"].id] = true,
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = true,
 	[UnitDefNames["armmerl"].id] = true,
