@@ -19,20 +19,19 @@ end
 --------------------------------------------------------------------------------
 
 local spGetCommandQueue = Spring.GetCommandQueue
-local GetPlayerInfo = Spring.GetPlayerInfo
-local GetUnitPosition = Spring.GetUnitPosition
-local GiveOrderToUnit = Spring.GiveOrderToUnit
+local spGetPlayerInfo = Spring.GetPlayerInfo
+local spGiveOrderToUnit = Spring.GiveOrderToUnit
 local myTeamID = Spring.GetMyTeamID()
 local Echo = Spring.Echo
-
---------------------------------------------------------------------------------
 
 local fightingBombers = {}
 local reservedBombers = {}
 local myID
 
+--------------------------------------------------------------------------------
+
 local function checkSpec()
-  local _, _, spec = GetPlayerInfo(myID)
+  local _, _, spec = spGetPlayerInfo(myID)
   if spec then
 	Echo("Spectating: Widget Removed")
     widgetHandler:RemoveWidget()
@@ -50,9 +49,12 @@ function widget:Initialize()
 	checkSpec()
 end
 
+function widget:PlayerChanged(playerID)
+	checkSpec()
+end
+
 function widget:GameFrame(frame)
 	if frame % 15 == 0 then
-		checkSpec()
 		checkBombers()
 	end
 end
@@ -74,11 +76,11 @@ function CheckUnit(unitID, unitDefID)
 	local ud = UnitDefs[unitDefID]
 	if (ud and (ud.name == "corshad" or ud.name == "corhurc2" or ud.name == "armstiletto_laser" or ud.name == "armcybr")) then
 		local cmd = GetFirstCommand(unitID)
-		if cmd and (cmd.id == 16 or cmd.id == 15) then
-			GiveOrderToUnit(unitID, 45, {2}, {""})
+		if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+			spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""}) -- fire at will
 			fightingBombers[unitID] = true
 		else
-			GiveOrderToUnit(unitID, 45, {0}, {""})
+			spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""}) -- hold fire
 			reservedBombers[unitID] = true
 		end
 	end
@@ -92,10 +94,10 @@ function checkBombers()
 		else
 		-- swap bombers whose commands have changed and update their firestate
 			local cmd = GetFirstCommand(unitID)
-			if cmd and (cmd.id == 16 or cmd.id == 15) then
+			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
 				-- do nothing
 			else
-				GiveOrderToUnit(unitID, 45, {0}, {""})
+				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {0}, {""})
 				fightingBombers[unitID] = nil
 				reservedBombers[unitID] = true
 			end
@@ -109,8 +111,8 @@ function checkBombers()
 		else
 		-- swap bombers whose commands have changed and update their firestate
 			local cmd = GetFirstCommand(unitID)
-			if cmd and (cmd.id == 16 or cmd.id == 15) then
-				GiveOrderToUnit(unitID, 45, {2}, {""})
+			if cmd and (cmd.id == CMD.FIGHT or cmd.id == CMD.PATROL) then
+				spGiveOrderToUnit(unitID, CMD.FIRE_STATE, {2}, {""})
 				fightingBombers[unitID] = true
 				reservedBombers[unitID] = nil
 			else
