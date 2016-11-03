@@ -150,7 +150,7 @@ options = {
 		name = 'Enable hotkeys on tab click',
 		type = 'bool',
 		desc = "Clicking on a tab button enables hotkeys for that tab.",
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	keyboardType = {
