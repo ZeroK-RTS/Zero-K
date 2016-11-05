@@ -85,8 +85,8 @@ unitDef = {
 
     {
       def                = [[BOMBSABOT]],
-      --mainDir            = [[0 -1 0]],
-      --maxAngleDif        = 180,
+      mainDir            = [[0 -1 0]],
+      maxAngleDif        = 90,
       onlyTargetCategory = [[LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER SUB]],
     },
 	

@@ -15,14 +15,14 @@ local weapons = {
 local units = {
 	corshad = {
 		diveDamage = 600,
-		diveHeight = 40,
+		diveHeight = 25,
 		diveRate = 1.55,
 		altPerFlightFrame = 6.25,
 		orgHeight = UnitDefNames["corshad"].wantedHeight*FUDGE_FACTOR,
 	},
 	bomberdive = {
 		diveDamage = 600,
-		diveHeight = 40,
+		diveHeight = 25,
 		diveRate = 1.55,
 		altPerFlightFrame = 6.25,
 		orgHeight = UnitDefNames["bomberdive"].wantedHeight*FUDGE_FACTOR,

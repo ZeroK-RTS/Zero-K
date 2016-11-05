@@ -45,11 +45,6 @@ local bomberWeaponNamesDefs, bomberWeaponDefs, bomberUnitDefs = include("LuaRule
 
 local UPDATE_FREQUENCY = 15
 local bombers = {}
-local lowHeight = {}
-
-for unitDefID,data in pairs(bomberUnitDefs) do
-	lowHeight[unitDefID] = data.diveHeight
-end
 
 local heightDef     = {}
 local hitabilityDef = {}
@@ -58,7 +53,10 @@ local hitabilityDef = {}
 --------------------------------------------------------------------------------
 	
 local function setFlyLow(unitID, height)
-	local wantedHeight = bombers[unitID].lowHeight + height
+	local wantedHeight = bombers[unitID].config.diveHeight + height
+	if wantedHeight > bombers[unitID].config.orgHeight then
+		wantedHeight = bombers[unitID].config.orgHeight
+	end
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
 	if env then
 		Spring.UnitScript.CallAsUnit(unitID, env.BomberDive_FlyLow, wantedHeight)
@@ -112,12 +110,17 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 		heightDef[unitDefID] = scaleY/2 + offsetY
 		
 		local horSize = math.min(scaleX, scaleZ)/2
-		local speed = UnitDefs[unitDefID].speed/30
+		local speedMult = (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1)
+		local speed = speedMult*UnitDefs[unitDefID].speed/30
 		
-		hitabilityDef[unitDefID] = horSize/speed
-		
-		if speed > 3 then
-			hitabilityDef[unitDefID] = math.max(0, hitabilityDef[unitDefID] + 2 - speed*1.5)
+		if speedMult == 0 then
+			hitabilityDef[unitDefID] = 1000
+		else
+			hitabilityDef[unitDefID] = horSize/speed
+			
+			if speed > 3 then
+				hitabilityDef[unitDefID] = math.max(0, hitabilityDef[unitDefID] + 2 - speed*1.5)
+			end
 		end
 	end
 	
@@ -278,7 +281,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	bombers[unitID] = {
 		diveState = DEFAULT_COMMAND_STATE, -- 0 = off, 1 = with shield, 2 = when attacking, 3 = always
 		config = bomberUnitDefs[unitDefID],
-		lowHeight = lowHeight[unitDefID],
 		resetTime = false,
 	}
 	
