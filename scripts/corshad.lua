@@ -189,6 +189,9 @@ function script.BlockShot(num, targetID)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)
 		Move(drop, y_axis, dy)
+		if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 120, false, false, true) then
+			return true
+		end
 		return false
 	end
 	return true
