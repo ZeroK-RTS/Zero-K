@@ -75,6 +75,8 @@ local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
 local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
 
+local gameStarted = false
+
 local gridLocation = {}
 
 ------------------------
@@ -1097,7 +1099,7 @@ function ColorTabs(arg, visiblity)
 	tabVisibility = visiblity or tabVisibility
 	RemoveChildren(menuTabRow)
 	for i = 1, 6 do
-		if tabVisibility[i] then
+		if (not gameStarted) or tabVisibility[i] then
 			if i == arg then
 				menuTabs[arg] = MakeMenuTab(arg, 1)
 			else
@@ -1274,7 +1276,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value  and options.unitstabhotkey.value then
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value and options.unitstabhotkey.value then
 		Update(true)
 	end
 end
@@ -1664,6 +1666,9 @@ end
 
 --This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
+	if not gameStarted then
+		gameStarted = true
+	end
 	if options.hide_when_spectating.value and spGetSpectatingState() then return end
 	--set progress bar
 	if n%6 == 0 then
