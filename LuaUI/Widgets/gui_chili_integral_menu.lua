@@ -1091,34 +1091,44 @@ end
 
 --need to recreate the tabs completely because chili is dumb
 --also needs to be non-local so MakeMenuTab can call it
-function ColorTabs(arg)
+local tabVisibility = {}
+function ColorTabs(arg, visiblity)
 	arg = arg or menuChoice
+	tabVisibility = visiblity or tabVisibility
 	RemoveChildren(menuTabRow)
-	for i=1,6 do
-		if i == arg then
-			menuTabs[arg] = MakeMenuTab(arg, 1)
-		else
-			menuTabs[i] = MakeMenuTab(i, 0.4)
+	for i = 1, 6 do
+		if tabVisibility[i] then
+			if i == arg then
+				menuTabs[arg] = MakeMenuTab(arg, 1)
+			else
+				menuTabs[i] = MakeMenuTab(i, 0.4)
+			end
 		end
 	end
 end
+
+local selectNoTabs = {}
+local selectAllTabs = {true, true, true, true, true, true}
+local selectFactoryTabs = {true, false, false, false, false, true}
 
 local function SmartTabSelect()
 	Update()
 	if options.hidetabs.value then
 		menuChoice = 1
-		ColorTabs(1)
+		ColorTabs(1, selectNoTabs)
 	elseif options.disablesmartselect.value then 
 		return
 	elseif #n_units > 0 and #n_econ == 0 then
 		menuChoice = 6	--selected factory, jump to units
-		ColorTabs(6)
-	elseif #n_econ > 0 and menuChoice == 6 then
-		menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
-		ColorTabs(lastBuildChoice)
+		ColorTabs(6, selectFactoryTabs)
+	elseif #n_econ > 0 then
+		if menuChoice == 6 then
+			menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
+		end
+		ColorTabs(menuChoice, selectAllTabs)
 	elseif #n_factories + #n_econ + #n_defense + #n_units == 0 then
 		menuChoice = 1	--selected non-builder, jump to common
-		ColorTabs(1)
+		ColorTabs(1, selectNoTabs)
 	end
 end
 
