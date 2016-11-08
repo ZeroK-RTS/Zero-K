@@ -973,7 +973,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 						--// deselect a single unit
 						local removed = false
 						if squareData.unitid then
-							for i = 1, numSelectedUnits do
+							for i = numSelectedUnits, 1, -1 do
 								if (selectedUnits[i][1] == squareData.unitid) then
 									table.remove(selectedUnits,i)
 									removed = true
@@ -982,7 +982,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 							end
 						end
 						if not removed then
-							for i = 1, numSelectedUnits do
+							for i = numSelectedUnits, 1, -1 do
 								if (selectedUnits[i][2] == squareData.defid) then
 									table.remove(selectedUnits,i)
 									break
