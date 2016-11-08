@@ -18,13 +18,96 @@ local emptyTable = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Add commands to epic menu
+
+local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+
+local function CapCase(str)
+	local str = str:lower()
+	str = str:gsub( '_', ' ' )
+	str = str:sub(1,1):upper() .. str:sub(2)
+	
+	str = str:gsub( ' (.)', 
+		function(x) return (' ' .. x):upper(); end
+		)
+	return str
+end
+
+options = {}
+options_order = {}
+
+local function AddHotkeyOptions()
+	local options_order_tmp_cmd = {}
+	local options_order_tmp_cmd_instant = {}
+	local options_order_tmp_states = {}
+	for cmdname, number in pairs(custom_cmd_actions) do 
+			
+		local cmdnamel = cmdname:lower()
+		local cmdname_disp = CapCase(cmdname)
+		options[cmdnamel] = {
+			name = cmdname_disp,
+			type = 'button',
+			action = cmdnamel,
+			path = 'Game/Command Hotkeys',
+		}
+		if number == 2 then
+			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
+			--options[cmdnamel].isUnitStateCommand = true
+		elseif number == 3 then
+			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdnamel
+			--options[cmdnamel].isUnitInstantCommand = true
+		else
+			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
+			--options[cmdnamel].isUnitCommand = true
+		end
+	end
+
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Command Hotkeys',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Command Hotkeys',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Game/Command Hotkeys',}
+	
+	
+	table.sort(options_order_tmp_cmd)
+	table.sort(options_order_tmp_cmd_instant)
+	table.sort(options_order_tmp_states)
+
+	options_order[#options_order+1] = 'lblcmd'
+	for i=1, #options_order_tmp_cmd do
+		options_order[#options_order+1] = options_order_tmp_cmd[i]
+	end
+	
+	options_order[#options_order+1] = 'lblcmdinstant'
+	for i=1, #options_order_tmp_cmd_instant do
+		options_order[#options_order+1] = options_order_tmp_cmd_instant[i]
+	end
+	
+	options_order[#options_order+1] = 'lblstate'
+	for i=1, #options_order_tmp_states do
+		options_order[#options_order+1] = options_order_tmp_states[i]
+	end
+end
+
+AddHotkeyOptions()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Command List Processing
+
+local function CopyTable(outtable,intable)
+	for i,v in pairs(intable) do 
+		if (type(v)=='table') then
+			if (type(outtable[i])~='table') then 
+				outtable[i] = {} 
+			end
+			CopyTable(outtable[i],v)
+		else
+			outtable[i] = v
+		end
+	end
+end
 
 -- layout handler - its needed for custom commands to work and to delete normal spring menu
 local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
-	--Spring.Echo("===== LayoutHandler =======")
-	--Spring.Utilities.TableEcho(commands)
-	
 	widgetHandler.commands   = commands
 	widgetHandler.commands.n = cmdCount
 	widgetHandler:CommandsChanged()
@@ -35,7 +118,7 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 	
 	local AddCommand = function(command) 
 		local cc = {}
-		Spring.Utilities.CopyTable(cc, command)
+		CopyTable(cc,command )
 		cnt = cnt + 1
 		cc.cmdDescID = cmdCount+cnt
 		if (cc.params) then
@@ -56,15 +139,16 @@ local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
 		customCmds[#customCmds+1] = cc
 	end 
 	
+	
 	--// preprocess the Custom Commands
-	for i = 1, #widgetHandler.customCommands do
+	for i=1,#widgetHandler.customCommands do
 		AddCommand(widgetHandler.customCommands[i])
 	end
 
 	if (cmdCount <= 0) then
-		return "", xIcons, yIcons, emptyTable, customCmds, emptyTable, emptyTable, emptyTable, emptyTable, reParamsCmds, emptyTable --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
 	end
-	return "", xIcons, yIcons, emptyTable, customCmds, emptyTable, emptyTable, emptyTable, emptyTable, reParamsCmds, {[1337]=9001}
+	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
 end 
 
 --------------------------------------------------------------------------------

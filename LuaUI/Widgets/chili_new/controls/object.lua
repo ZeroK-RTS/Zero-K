@@ -446,6 +446,9 @@ end
 --- Sets the visibility of the object
 -- @bool visible visibility status
 function Object:SetVisibility(visible)
+  if self.visible == visible then
+    return
+  end
   if (visible) then
     self.parent:ShowChild(self)
   else

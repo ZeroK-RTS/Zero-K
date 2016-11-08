@@ -301,6 +301,7 @@ local custom_cmd_actions = {
 	firestate=2,
 	idlemode=2,
 	autorepairlevel=2,
+	preventoverkill = 2,
 	
 	      
 	--CUSTOM COMMANDS
