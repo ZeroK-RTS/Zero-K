@@ -178,14 +178,46 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
-local function ClickFunc(mouse, cmdID, isStructure)
+local function QueueClickFunc(eft, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queuePosition)
+	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
+	if not right then
+		for i = 1, inputMult do
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, cmdID, 0 }, {"alt", "ctrl"})
+		end
+		return
+	end
+	
+	local alreadyRemovedTag = {}
+	
+	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	-- delete from back so that the order is not canceled while under construction
+	local i = 0
+	while commands[i+queuePosition] and commands[i+queuePosition].id == cmdID and not alreadyRemovedTag[commands[i+queuePosition].tag] do
+		i = i + 1
+	end
+	i = i - 1
+	j = 0
+	while commands[i+queuePosition] and commands[i+queuePosition].id == cmdID and j < inputMult do
+		Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i+queuePosition].tag}, {"ctrl"})
+		alreadyRemovedTag[commands[i+queuePosition].tag] = true
+		j = j + 1
+		i = i - 1
+	end
+end
+
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queuePosition)
 	local left, right = mouse == 1, mouse == 3
-	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	if factoryUnitID then
+		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queuePosition)
+		return
+	end
+	
 	local mb = (left and 1) or (right and 3)
 	if mb then
 		local index = Spring.GetCmdDescIndex(cmdID)
 		if index then
-			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
+			Spring.SetActiveCommand(index, mb, left, right, alt, ctrl, meta, shift)
 			if alt and isStructure and WG.Terraform_SetPlacingRectangle then
 				WG.Terraform_SetPlacingRectangle(-cmdID)
 			end
@@ -212,7 +244,15 @@ end
 local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
 	local usingGrid
+	local factoryUnitID, queuePosition
 
+	local function DoClick(_, _, _, mouse)
+		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, queuePosition)
+		if onClick then
+			onClick()
+		end
+	end
+	
 	local button = Button:New {
 		x = xStr,
 		y = yStr,
@@ -221,14 +261,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		caption = "",
 		padding = {0, 0, 0, 0},
 		parent = parent,
-		OnClick = {
-			function(self, x, y, mouse) 
-				ClickFunc(mouse, cmdID, isStructure)
-				if onClick then
-					onClick()
-				end
-			end
-		}
+		OnClick = {DoClick}
 	}
 	
 	if not BUTTON_COLOR then
@@ -291,7 +324,8 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 	
 	
 	local externalFunctionsAndData = {
-		button = button
+		button = button,
+		DoClick = DoClick
 	}
 
 	function externalFunctionsAndData.SetProgressBar(proportion)
@@ -319,13 +353,6 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		}
 	end
 	
-	function externalFunctionsAndData.DoClick()
-		ClickFunc(1, cmdID, isStructure)
-		if onClick then
-			onClick()
-		end
-	end
-	
 	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
 		local key = gridMap[y] and gridMap[y][x]
 		if not key then
@@ -333,6 +360,11 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		end
 		usingGrid = true
 		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
+	end
+	
+	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, newQueuePosition)
+		factoryUnitID = newFactoryUnitID
+		queuePosition = newQueuePosition
 	end
 	
 	function externalFunctionsAndData.SetSelection(isSelected)
@@ -528,6 +560,7 @@ local function GetQueuePanel(parent, rows, columns)
 		
 		factoryUnitID = newFactoryUnitID 
 		factoryUnitDefID = newFactoryUnitDefID
+		local uncondensedCommandTotal = 0
 	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
 		local buildDefIDCounts = {}
@@ -536,9 +569,11 @@ local function GetQueuePanel(parent, rows, columns)
 				for udid, count in pairs(buildQueue[i]) do
 					if buttonCount < buttonColumns then
 						buttonCount = buttonCount + 1
+						uncondensedCommandTotal = uncondensedCommandTotal + count
 						local x, y = buttons.IndexToPosition(buttonCount)
 						local button = buttons.GetButton(x,y)
 						button.SetCommand(nil, -udid, true)
+						button.SetQueueCommandParameter(newFactoryUnitID, uncondensedCommandTotal)
 						button.SetBuildQueueCount(count)
 					else
 					
