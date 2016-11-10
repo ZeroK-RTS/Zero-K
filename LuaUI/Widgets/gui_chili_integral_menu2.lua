@@ -203,6 +203,21 @@ local function GetActionHotkey(actionName)
 	return WG.crude.GetHotkey(actionName)
 end
 
+local function TabListsAreIdentical(newTabList, tabList)
+	if (not tabList) or (not newTabList) then
+		return false
+	end
+	if #newTabList ~= #tabList then
+		return false
+	end
+	for i = 1, #newTabList do
+		if newTabList[i].name ~= tabList[i].name then
+			return false
+		end
+	end
+	return true
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Queue Editing Implementation
@@ -360,7 +375,7 @@ end
 --------------------------------------------------------------------------------
 -- Button Panel
 
-local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
+local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
 	local usingGrid
 	local factoryUnitID
@@ -441,6 +456,13 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 			return
 		end
 		
+		if image.file == texture1 and image.file2 == texture2 then
+			return
+		end
+		
+		if image.file == texture1 and image.file2 == texture2 then
+			return
+		end
 		image.file = texture1
 		image.file2 = texture2
 		image:Invalidate()
@@ -466,7 +488,11 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 			textBoxes[textPosition]:BringToFront()
 			return
 		end
-	
+		
+		if text == textBoxes[textPosition].caption then
+			return
+		end
+		
 		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
 		textBoxes[textPosition]:Invalidate()
 	end
@@ -474,7 +500,8 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 	
 	local externalFunctionsAndData = {
 		button = button,
-		DoClick = DoClick
+		DoClick = DoClick,
+		selectionIndex = selectionIndex,
 	}
 
 	function externalFunctionsAndData.SetProgressBar(proportion)
@@ -511,14 +538,37 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
 	end
 	
-	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflowString)
+	local currentOverflow, onMouseOverFun
+	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflow)
 		factoryUnitID = newFactoryUnitID
-		if buttonLayout.dotDotOnOverflow and overflowString then
-			for _,textBox in pairs(textBoxes) do
-				textBox:SetCaption(NO_TEXT)
+		if buttonLayout.dotDotOnOverflow then
+			currentOverflow = overflow 
+			if overflow then
+				button.tooltip = ""
+				for _,textBox in pairs(textBoxes) do
+					textBox:SetCaption(NO_TEXT)
+				end
+				SetImage()
+				
+				if not onMouseOverFun then
+					onMouseOverFun = function ()
+						if not currentOverflow then
+							return
+						end
+						local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
+						
+						local overflowString = ""
+						for i = x, #buildQueue do
+							for udid, count in pairs(buildQueue[i]) do
+								local name = UnitDefs[udid].humanName
+								overflowString = overflowString .. name .. " x" .. count .. ((i < #buildQueue and "\n") or "")
+							end
+						end
+						button.tooltip = overflowString
+					end
+					button.OnMouseOver[#button.OnMouseOver + 1] = onMouseOverFun
+				end
 			end
-			button.tooltip = overflowString
-			SetImage()
 		end
 	end
 	
@@ -540,13 +590,20 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 	end
 	
 	function externalFunctionsAndData.SetBuildQueueCount(count)
+		if not (count or queueCount) then
+			return
+		end
 		queueCount = count
 		SetText(textConfig.queue.name, count)
 	end
 	
 	function externalFunctionsAndData.SetCommand(command, overrideCmdID, notGlobal)
 		-- If overrideCmdID is negative then command can be nil.
-		cmdID = overrideCmdID or command.id
+		local newCmdID = overrideCmdID or command.id
+		if cmdID == newCmdID then
+			return
+		end
+		cmdID = newCmdID
 		if not notGlobal then
 			buttonsByCommand[cmdID] = externalFunctionsAndData
 		end
@@ -612,22 +669,30 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 	
 	local externalFunctions = {}
 	
-	function externalFunctions.ClearButtons()
-		parent:ClearChildren()
+	function externalFunctions.ClearOldButtons(selectionIndex)
+		for i = 1, #buttonList do
+			local button = buttonList[i]
+			if button.selectionIndex ~= selectionIndex then
+				parent:RemoveChild(button.button)
+			end
+		end
 	end
 	
-	function externalFunctions.GetButton(x, y, onlyExisting)
+	function externalFunctions.GetButton(x, y, selectionIndex)
 		if buttons[x] and buttons[x][y] then
 			if not buttons[x][y].button.parent then
-				if onlyExisting then
+				if not selectionIndex then
 					return false
 				end
 				parent:AddChild(buttons[x][y].button)
 			end
+			if selectionIndex then
+				buttons[x][y].selectionIndex = selectionIndex
+			end
 			return buttons[x][y]
 		end
 		
-		if onlyExisting then
+		if not selectionIndex then
 			return false
 		end
 		
@@ -642,7 +707,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 			isStructure = buttonLayoutOverride[x][y].isStructure
 		end
 		
-		newButton = GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
+		newButton = GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap then
@@ -685,7 +750,6 @@ local function GetQueuePanel(parent, columns)
 	
 	local factoryUnitID
 	local factoryUnitDefID
-	local buttonCount = 0
 	
 	local buttonLayoutOverride = {
 		[columns] = {
@@ -698,18 +762,17 @@ local function GetQueuePanel(parent, columns)
 	
 	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, onClick, buttonLayoutOverride)
 
-	function externalFunctions.ClearButtons()
+	function externalFunctions.ClearOldButtons(selectionIndex)
 		factoryUnitID = false
 		factoryUnitDefID = false
-		buttons.ClearButtons()
-		buttonCount = 0
+		buttons.ClearOldButtons(selectionIndex)
 	end
 	
 	function externalFunctions.UpdateBuildProgress()
 		if not factoryUnitID then
 			return
 		end
-		local button = buttons.GetButton(1, 1, true)
+		local button = buttons.GetButton(1, 1)
 		if not button then
 			return
 		end
@@ -721,23 +784,13 @@ local function GetQueuePanel(parent, columns)
 		button.SetProgressBar(progress)
 	end
 	
-	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID)
+	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
+		local buttonCount = 0
 		
 		factoryUnitID = newFactoryUnitID 
 		factoryUnitDefID = newFactoryUnitDefID
 	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
-		
-		local overflowString
-		if #buildQueue > columns then
-			overflowString = ""
-			for i = 6, #buildQueue do
-				for udid, count in pairs(buildQueue[i]) do
-					local name = UnitDefs[udid].humanName
-					overflowString = overflowString .. name .. " x" .. count .. ((i < #buildQueue and "\n") or "")
-				end
-			end
-		end
 	
 		local buildDefIDCounts = {}
 		if buildQueue then
@@ -746,10 +799,10 @@ local function GetQueuePanel(parent, columns)
 					if buttonCount <= columns then
 						buttonCount = buttonCount + 1
 						local x, y = buttons.IndexToPosition(buttonCount)
-						local button = buttons.GetButton(x,y)
+						local button = buttons.GetButton(x, y, selectionIndex)
 						button.SetCommand(nil, -udid, true)
 						button.SetBuildQueueCount(count)
-						button.SetQueueCommandParameter(newFactoryUnitID, overflowString)
+						button.SetQueueCommandParameter(newFactoryUnitID, #buildQueue > columns)
 					end
 					buildDefIDCounts[udid] = (buildDefIDCounts[udid] or 0) + count
 				end
@@ -788,6 +841,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		padding = {0, 0, 0, 0},
 		OnClick = {DoClick}
 	}
+	button.backgroundColor[4] = 0.4
 	
 	local hideHotkey = loiterable
 	
@@ -865,31 +919,52 @@ local function GetTabPanel(parent, rows, columns)
 	
 	local hotkeysActive = true
 	local currentTab
-	local tabList = {}
+	local tabList = false
 	
 	local externalFunctions = {}
 	
-	function externalFunctions.SetTabs(newTabList, showTabs, variableHide)
-		tabList = newTabList
-		tabHolder:ClearChildren()
-		if showTabs then
-			for i = 1, #tabList do
-				tabHolder:AddChild(tabList[i].button)
-				tabList[i].SetHideHotkey(variableHide)
-				tabList[i].SetHotkeyActive(hotkeysActive)
-			end
-		end
-	end
-	
 	function externalFunctions.SwitchToTab(name)
+		if not tabList then
+			return
+		end
 		currentTab = name
 		for i = 1, #tabList do
 			local data = tabList[i]
 			data.SetSelected(data.name == name)
 		end
 	end
+		
+	function externalFunctions.SetTabs(newTabList, showTabs, variableHide, tabToSelect)
+		if TabListsAreIdentical(newTabList, tabList) then
+			return
+		end
+		externalFunctions.SwitchToTab(tabToSelect)
+		tabList = newTabList
+		tabHolder:ClearChildren()
+		for i = 1, #tabList do
+			if showTabs then
+				tabHolder:AddChild(tabList[i].button)
+				tabList[i].SetHideHotkey(variableHide)
+				tabList[i].SetHotkeyActive(hotkeysActive)
+			end
+			if tabList[i].name == tabToSelect then
+				tabList[i].SetSelected(true)
+			end
+		end
+	end
+	
+	function externalFunctions.ClearTabs()
+		if tabList then
+			externalFunctions.SwitchToTab()
+			tabList = false
+			tabHolder:ClearChildren()
+		end
+	end
 	
 	function externalFunctions.SetHotkeysActive(newActive)
+		if not tabList then
+			return
+		end
 		hotkeysActive = newActive
 		for i = 1, #tabList do
 			local data = tabList[i]
@@ -1032,6 +1107,8 @@ local tabPanel
 
 local gridKeyMap, gridMap = GenerateGridKeyMap("qwerty")
 
+local selectionIndex = 0
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling
@@ -1048,7 +1125,7 @@ local function GetSelectedFactory()
 	return false
 end
 
-local function ProcessCommand(command, factorySelected)
+local function ProcessCommand(command, factorySelected, selectionIndex)
 	if hiddenCommands[command.id] or command.hidden then
 		return
 	end
@@ -1058,7 +1135,7 @@ local function ProcessCommand(command, factorySelected)
 		statePanel.commandCount = statePanel.commandCount + 1
 		
 		local x, y = statePanel.buttons.IndexToPosition(statePanel.commandCount)
-		local button = statePanel.buttons.GetButton(x, y)
+		local button = statePanel.buttons.GetButton(x, y, selectionIndex)
 		button.SetCommand(command)
 		return
 	end
@@ -1076,7 +1153,7 @@ local function ProcessCommand(command, factorySelected)
 				x, y = data.buttons.IndexToPosition(data.commandCount)
 			end
 			
-			local button = data.buttons.GetButton(x, y)
+			local button = data.buttons.GetButton(x, y, selectionIndex)
 			
 			button.SetCommand(command)
 			return
@@ -1087,24 +1164,21 @@ end
 local function ProcessAllCommands(commands, customCommands)
 	local factoryUnitID, factoryUnitDefID = GetSelectedFactory()
 
+	selectionIndex = selectionIndex + 1
+	
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		data.buttons.ClearButtons()
 		data.commandCount = 0
-		if data.queue then
-			data.queue.ClearButtons()
-		end
 	end
-		
+	
 	statePanel.commandCount = 0
-	statePanel.buttons.ClearButtons()
 	
 	for i = 1, #commands do
-		ProcessCommand(commands[i], factoryUnitDefID)
+		ProcessCommand(commands[i], factoryUnitDefID, selectionIndex)
 	end
 	
 	for i = 1, #customCommands do
-		ProcessCommand(customCommands[i], factoryUnitDefID)
+		ProcessCommand(customCommands[i], factoryUnitDefID, selectionIndex)
 	end
 	
 	-- Call factory queue update here because the update will globally
@@ -1114,7 +1188,7 @@ local function ProcessAllCommands(commands, customCommands)
 		for i = 1, #commandPanels do
 			local data = commandPanels[i]
 			if data.queue then
-				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID)
+				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
 			end
 		end
 	end
@@ -1133,25 +1207,33 @@ local function ProcessAllCommands(commands, customCommands)
 	
 	-- Determine which tabs to display and which to select
 	for i = 1, #commandPanels do
-		if commandPanels[i].commandCount ~= 0 then
-			tabsToShow[#tabsToShow + 1] = commandPanels[i].tabButton
-			if (not tabToSelect) and commandPanels[i].tabButton.name == lastTabSelected then
+		local data = commandPanels[i]
+		if data.commandCount ~= 0 then
+			tabsToShow[#tabsToShow + 1] = data.tabButton
+			data.buttons.ClearOldButtons(selectionIndex)
+			if data.queue then
+				data.queue.ClearOldButtons(selectionIndex)
+			end
+			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
 				tabToSelect = lastTabSelected
 			end
 		end
 	end
 	
-	tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID)
+	statePanel.holder:SetVisibility(statePanel.commandCount ~= 0)
+	if statePanel.commandCount ~= 0 then
+		statePanel.buttons.ClearOldButtons(selectionIndex)
+	end
 	
 	if not tabToSelect then
 		tabToSelect = "orders"
 	end
 	
 	if #tabsToShow == 0 then
-		tabPanel.SwitchToTab(nil)
+		tabPanel.ClearTabs()
 		lastTabSelected = false
 	else
-		tabPanel.SwitchToTab(tabToSelect)
+		tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID, tabToSelect)
 		lastTabSelected = tabToSelect
 	end
 end
@@ -1221,6 +1303,7 @@ local function InitializeControls()
 			padding = {4, 4, 0, 4},
 			parent = contentHolder,
 		}
+		commandHolder:SetVisibility(false)
 		
 		local hotkey
 		if data.optionName then
@@ -1279,6 +1362,7 @@ local function InitializeControls()
 		padding = {0, 4, 3, 4},
 		parent = contentHolder,
 	}
+	statePanel.holder:SetVisibility(false)
 	
 	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
 end
@@ -1369,7 +1453,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	local pos = gridKeyMap[key]
 	if pos then
 		local x, y = pos[2], pos[1]
-		local button = commandPanel.buttons.GetButton(x, y, true)
+		local button = commandPanel.buttons.GetButton(x, y)
 		if button then
 			button.DoClick()
 			return true
@@ -1396,7 +1480,7 @@ end
 function widget:GameFrame(n)
 	if n%6 == 0 then
 		local unitsFactoryPanel = commandPanelMap.units_factory
-		if unitsFactoryPanel.tabButton.IsTabSelected() then
+		if unitsFactoryPanel and unitsFactoryPanel.tabButton.IsTabSelected() then
 			unitsFactoryPanel.queue.UpdateBuildProgress()
 		end
 	end
