@@ -178,7 +178,46 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
+local function DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, inputMult, reinsertPosition)
+	local alreadyRemovedTag = {}
+	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	
+	if not commands then
+		return
+	end
+	-- The start of the queue can have a stop command?
+	if commands[1] and commands[1].id > 0 then
+		queuePosition = queuePosition + 1
+	end
+	
+	if reinsertPosition == 0 and commands[1] then
+		local startCommandID = (commands[1].id > 0 and commands[2] and commands[2].id) or commands[1].id
+		if startCommandID == cmdID then
+			reinsertPosition = 1
+		end
+	end
+	Spring.Echo("reinsertPosition", reinsertPosition)
+
+	-- delete from back so that the order is not canceled while under construction
+	local i = queuePosition
+	local j = 0
+	while commands[i] and commands[i].id == cmdID and ((not inputMult) or j < inputMult) do
+		Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i].tag}, {"ctrl"})
+		if reinsertPosition then
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+		end
+		alreadyRemovedTag[commands[i].tag] = true
+		j = j + 1
+		i = i - 1
+	end
+end
+
 local function QueueClickFunc(eft, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queuePosition)
+	if alt then
+		DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, false, 0)
+		return
+	end
+
 	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 	if not right then
 		for i = 1, inputMult do
@@ -187,22 +226,7 @@ local function QueueClickFunc(eft, right, alt, ctrl, meta, shift, cmdID, factory
 		return
 	end
 	
-	local alreadyRemovedTag = {}
-	
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
-	-- delete from back so that the order is not canceled while under construction
-	local i = 0
-	while commands[i+queuePosition] and commands[i+queuePosition].id == cmdID and not alreadyRemovedTag[commands[i+queuePosition].tag] do
-		i = i + 1
-	end
-	i = i - 1
-	j = 0
-	while commands[i+queuePosition] and commands[i+queuePosition].id == cmdID and j < inputMult do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i+queuePosition].tag}, {"ctrl"})
-		alreadyRemovedTag[commands[i+queuePosition].tag] = true
-		j = j + 1
-		i = i - 1
-	end
+	DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, inputMult)
 end
 
 local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queuePosition)
