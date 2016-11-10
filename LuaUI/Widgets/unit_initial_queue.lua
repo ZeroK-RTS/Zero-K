@@ -593,6 +593,7 @@ function widget:CommandsChanged()
 		id      = CMD_STOP,
 		type    = CMDTYPE.ICON,
 		tooltip = "Stop",
+		action  = "stop",
 		params  = {}, 
 	})
 end
