@@ -37,8 +37,6 @@ local Control
 -- Chili instances
 local screen0
 
-local emptyTable = {}
-
 local MIN_HEIGHT = 80
 local MIN_WIDTH = 200
 local COMMAND_SECTION_WIDTH = 74 -- percent
@@ -114,6 +112,7 @@ local buttonLayoutConfig = {
 		showCost = false,
 		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
 		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue",
+		dragAndDrop = true,
 	}
 }
 
@@ -178,62 +177,156 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
-local function DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, inputMult, reinsertPosition)
-	local alreadyRemovedTag = {}
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
-	
+local function GetHotkeyText(actionName)
+	local hotkey = WG.crude.GetHotkey(actionName)
+	if hotkey ~= '' then
+		return '\255\0\255\0' .. hotkey
+	end
+	return nil
+end
+
+local function GetActionHotkey(actionName)
+	return WG.crude.GetHotkey(actionName)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Command Queue Editing Implementation
+
+local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePosition, inputMult, reinsertPosition)
 	if not commands then
 		return
 	end
-	-- The start of the queue can have a stop command?
-	if commands[1] and commands[1].id > 0 then
-		queuePosition = queuePosition + 1
-	end
 	
-	if reinsertPosition == 0 and commands[1] then
-		local startCommandID = (commands[1].id > 0 and commands[2] and commands[2].id) or commands[1].id
-		if startCommandID == cmdID then
-			reinsertPosition = 1
-		end
-	end
-	Spring.Echo("reinsertPosition", reinsertPosition)
-
 	-- delete from back so that the order is not canceled while under construction
 	local i = queuePosition
 	local j = 0
-	while commands[i] and commands[i].id == cmdID and ((not inputMult) or j < inputMult) do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i].tag}, {"ctrl"})
-		if reinsertPosition then
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+	while commands[i] and ((not inputMult) or j < inputMult) do
+		local thisCmdID = commands[i].id
+		if thisCmdID < 0 then
+			if thisCmdID ~= cmdID then
+				break
+			end
+	
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i].tag}, {"ctrl"})
+			if reinsertPosition then
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
+			end
+			j = j + 1
+			i = i - 1
 		end
-		alreadyRemovedTag[commands[i].tag] = true
-		j = j + 1
-		i = i - 1
 	end
 end
 
-local function QueueClickFunc(eft, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queuePosition)
+local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBlock)
+	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	if not commands then
+		return
+	end
+	
+	-- Insert at the end of blocks which are after the move block
+	if insertBlock > moveBlock then
+		insertBlock = insertBlock + 1
+	end
+	
+	-- Delete moved commands from the end of the block so look for the start of the next block.
+	moveBlock = moveBlock + 1
+	
+	local movePos, insertPos
+	local lastBlockCmdID
+	local blockCount = 0
+	local lastPosition = 0
+	local i = 1
+	local iterationEnd = #commands + 1
+	while i <= iterationEnd and ((not movePos) or (not insertPos)) do
+		local command = commands[i]
+		local cmdID = command and command.id
+		if (not cmdID) or cmdID < 0 then
+			if cmdID ~= lastBlockCmdID then
+				blockCount = blockCount + 1
+				if blockCount == moveBlock then
+					movePos = lastPosition
+				elseif blockCount == insertBlock then
+					insertPos = lastPosition
+					-- Prevent canceling construction of identical units
+					if cmdID == queueCmdID then
+						insertPos = insertPos + 1
+					end
+				end
+				lastBlockCmdID = cmdID
+			end
+			lastPosition = i
+		end
+		i = i + 1
+	end
+	
+	if not insertPos then
+		insertPos = #commands 
+	end
+	
+	if not (movePos and insertPos) then
+		return
+	end
+	
+	MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, movePos, nil, insertPos)
+end
+
+local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
+	local commands = Spring.GetFactoryCommands(factoryUnitID)
+	if not commands then
+		return
+	end
+	
+	-- Find the end of the block
+	queueBlock = queueBlock + 1
+	
+	local queuePosition
+	local lastBlockCmdID
+	local blockCount = 0
+	local lastPosition = 0
+	local i = 1
+	local iterationEnd = #commands + 1
+	for i = 1, iterationEnd  do
+		local command = commands[i]
+		local cmdID = command and command.id
+		if (not cmdID) or cmdID < 0 then
+			if cmdID ~= lastBlockCmdID then
+				blockCount = blockCount + 1
+				if blockCount == queueBlock then
+					queuePosition = lastPosition
+					break
+				end
+				lastBlockCmdID = cmdID
+			end
+			lastPosition = i
+		end
+	end
+	
+	if not queuePosition then
+		return
+	end
+	
 	if alt then
-		DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, false, 0)
+		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, false, 0)
 		return
 	end
 
 	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
-	if not right then
-		for i = 1, inputMult do
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, cmdID, 0 }, {"alt", "ctrl"})
-		end
+	if right then
+		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, inputMult)
 		return
 	end
 	
-	DeleteCommandsFromPosition(cmdID, factoryUnitID, queuePosition, inputMult)
+	for i = 1, inputMult do
+		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
+	end
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queuePosition)
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID then
-		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queuePosition)
+		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
 		return
 	end
 	
@@ -249,18 +342,6 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queuePosition
 	end
 end
 
-local function GetHotkeyText(actionName)
-	local hotkey = WG.crude.GetHotkey(actionName)
-	if hotkey ~= '' then
-		return '\255\0\255\0' .. hotkey
-	end
-	return nil
-end
-
-local function GetActionHotkey(actionName)
-	return WG.crude.GetHotkey(actionName)
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Button Panel
@@ -268,10 +349,11 @@ end
 local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
 	local usingGrid
-	local factoryUnitID, queuePosition
-
+	local factoryUnitID
+	local queueCount
+	
 	local function DoClick(_, _, _, mouse)
-		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, queuePosition)
+		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, x)
 		if onClick then
 			onClick()
 		end
@@ -287,6 +369,35 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		parent = parent,
 		OnClick = {DoClick}
 	}
+	
+	if buttonLayout.dragAndDrop then
+		button.OnMouseDown = { 
+			function(obj,_,_,mouse) --for drag_drop feature
+				if mouse == 1 then
+					local badX, badY = obj:CorrectlyImplementedLocalToScreen(obj.x, obj.y, true)
+					WG.DrawMouseBuild.SetMouseIcon(-cmdID, obj.width/2, queueCount - 1, badX, badY, obj.width, obj.height)
+				end
+			end
+		}
+		button.OnMouseUp = {
+			function(obj, clickX, clickY, mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to obj
+				WG.DrawMouseBuild.ClearMouseIcon()
+				if not factoryUnitID then
+					return
+				end
+				if clickY < 0 or clickY > button.height or button.width == 0 then
+					return
+				end
+				local clickPosition = math.floor(clickX/button.width) + x
+				if clickPosition < 1 then
+					return
+				end
+				if factoryUnitID and x ~= clickPosition then
+					MoveCommandBlock(factoryUnitID, cmdID, x, clickPosition)
+				end
+			end
+		}
+	end
 	
 	if not BUTTON_COLOR then
 		BUTTON_COLOR = button.backgroundColor
@@ -386,9 +497,8 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
 	end
 	
-	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, newQueuePosition)
+	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID)
 		factoryUnitID = newFactoryUnitID
-		queuePosition = newQueuePosition
 	end
 	
 	function externalFunctionsAndData.SetSelection(isSelected)
@@ -409,6 +519,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 	end
 	
 	function externalFunctionsAndData.SetBuildQueueCount(count)
+		queueCount = count
 		SetText(textConfig.queue.name, count)
 	end
 	
@@ -584,7 +695,6 @@ local function GetQueuePanel(parent, rows, columns)
 		
 		factoryUnitID = newFactoryUnitID 
 		factoryUnitDefID = newFactoryUnitDefID
-		local uncondensedCommandTotal = 0
 	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
 		local buildDefIDCounts = {}
@@ -593,11 +703,10 @@ local function GetQueuePanel(parent, rows, columns)
 				for udid, count in pairs(buildQueue[i]) do
 					if buttonCount < buttonColumns then
 						buttonCount = buttonCount + 1
-						uncondensedCommandTotal = uncondensedCommandTotal + count
 						local x, y = buttons.IndexToPosition(buttonCount)
 						local button = buttons.GetButton(x,y)
 						button.SetCommand(nil, -udid, true)
-						button.SetQueueCommandParameter(newFactoryUnitID, uncondensedCommandTotal)
+						button.SetQueueCommandParameter(newFactoryUnitID)
 						button.SetBuildQueueCount(count)
 					else
 					
