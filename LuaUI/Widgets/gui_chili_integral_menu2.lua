@@ -83,27 +83,37 @@ local textConfig = {
 	},
 }
 
-local imageConfig = {
+local buttonLayoutConfig = {
 	command = {
-		x = "9%",
-		y = "9%",
-		right = "9%",
-		height = "82%",
-		keepAspect = true,
+		image = {
+			x = "9%",
+			y = "9%",
+			right = "9%",
+			height = "82%",
+			keepAspect = true,
+		}
 	},
 	build = {
-		x = "5%",
-		y = "3%",
-		right = "9%",
-		bottom = 13,
-		keepAspect = false,
+		image = {
+			x = "5%",
+			y = "3%",
+			right = "5%",
+			bottom = 13,
+			keepAspect = false,
+		},
+		showCost = true
 	},
 	queue = {
-		x = "5%",
-		y = "5%",
-		right = "5%",
-		height = "90%",
-		keepAspect = false,
+		image = {
+			x = "5%",
+			y = "5%",
+			right = "5%",
+			height = "90%",
+			keepAspect = false,
+		},
+		showCost = false,
+		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
+		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue",
 	}
 }
 
@@ -199,7 +209,7 @@ end
 --------------------------------------------------------------------------------
 -- Button Panel
 
-local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, isStructure, onClick)
+local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 	local cmdID
 	local usingGrid
 
@@ -229,17 +239,18 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, is
 	end
 	
 	local image
+	local buildProgress
 	local textBoxes = {}
 	
 	local function SetImage(texture1, texture2)
 		if not image then
 			image = Image:New {
-				x = imageStyle.x,
-				y = imageStyle.y,
-				right = imageStyle.right,
-				bottom = imageStyle.bottom,
-				height = imageStyle.height,
-				keepAspect = imageStyle.keepAspect,
+				x = buttonLayout.image.x,
+				y = buttonLayout.image.y,
+				right = buttonLayout.image.right,
+				bottom = buttonLayout.image.bottom,
+				height = buttonLayout.image.height,
+				keepAspect = buttonLayout.image.keepAspect,
 				file = texture1,
 				file2 = texture2,
 				parent = button,
@@ -282,6 +293,31 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, is
 	local externalFunctionsAndData = {
 		button = button
 	}
+
+	function externalFunctionsAndData.SetProgressBar(proportion)
+		if buildProgress then
+			buildProgress:SetValue(proportion or 0)
+			return
+		end
+		
+		if not image then
+			SetImage("")
+		end
+		
+		buildProgress = Progressbar:New{
+			x = "5%",
+			y = "5%",
+			right = "5%",
+			bottom = "5%",
+			value = proportion,
+			max = 1,
+			color   		= {0.7, 0.7, 0.4, 0.6},
+			backgroundColor = {1, 1, 1, 0.01},
+			parent = image,
+			skin = nil,
+			skinName = 'default',
+		}
+	end
 	
 	function externalFunctionsAndData.DoClick()
 		ClickFunc(1, cmdID, isStructure)
@@ -320,17 +356,30 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, is
 		SetText(textConfig.queue.name, count)
 	end
 	
-	function externalFunctionsAndData.SetCommand(command)
-		cmdID = command.id
-		buttonsByCommand[cmdID] = externalFunctionsAndData
+	function externalFunctionsAndData.SetCommand(command, overrideCmdID, notGlobal)
+		-- If overrideCmdID is negative then command can be nil.
+		cmdID = overrideCmdID or command.id
+		if not notGlobal then
+			buttonsByCommand[cmdID] = externalFunctionsAndData
+		end
+		if buildProgress then
+			externalFunctionsAndData.SetProgressBar(0)
+		end
 		externalFunctionsAndData.SetSelection(false)
-		 externalFunctionsAndData.SetBuildQueueCount(nil)
+		externalFunctionsAndData.SetBuildQueueCount(nil)
+		
 		if cmdID < 0 then
 			local ud = UnitDefs[-cmdID]
-			local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
-			button.tooltip = tooltip	
+			if buttonLayout.tooltipOverride then
+				button.tooltip = buttonLayout.tooltipOverride
+			else
+				local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
+				button.tooltip = tooltip
+			end
 			SetImage("#" .. -cmdID, WG.GetBuildIconFrame(UnitDefs[-cmdID]))
-			SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
+			if buttonLayout.showCost then
+				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
+			end
 			return
 		end
 		
@@ -364,7 +413,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, is
 	return externalFunctionsAndData
 end
 
-local function GetButtonPanel(parent, rows, columns, vertical, imageStyle, isStructure, onClick, rowOverride)
+local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, rowOverride)
 	local buttons = {}
 	local buttonList = {}
 	
@@ -399,13 +448,13 @@ local function GetButtonPanel(parent, rows, columns, vertical, imageStyle, isStr
 		local xStr = tostring((x - 1)*100/columns) .. "%"
 		local yStr = tostring((y - 1)*100/rows) .. "%"
 		
-		local image, structure = imageStyle, isStructure
+		local buttonLayout, isStructure = generalButtonLayout, generalIsStructure
 		if rowOverride and rowOverride[y] then
-			image = rowOverride[y].imageConfig
-			structure = rowOverride[y].isStructure
+			buttonLayout = rowOverride[y].buttonLayoutConfig
+			isStructure = rowOverride[y].isStructure
 		end
 		
-		newButton = GetButton(parent, x, y, xStr, yStr, width, height, image, structure, onClick)
+		newButton = GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap then
@@ -446,18 +495,61 @@ end
 local function GetQueuePanel(parent, rows, columns)
 	local externalFunctions = {}
 	
-	local buttons = GetButtonPanel(parent, rows, columns, false, imageConfig.queue, false, onClick)
+	local factoryUnitID
+	local factoryUnitDefID
+	local buttonCount = 0
+	local buttonColumns = columns - 1
+	local buttons = GetButtonPanel(parent, rows, columns, false, buttonLayoutConfig.queue, false, onClick)
 
-	function externalFunctions.UpdateFactory(factoryUnitID, factoryUnitDefID)
+	function externalFunctions.ClearButtons()
+		factoryUnitID = false
+		factoryUnitDefID = false
+		buttons.ClearButtons()
+		buttonCount = 0
+	end
+	
+	function externalFunctions.UpdateBuildProgress()
+		if not factoryUnitID then
+			return
+		end
+		local button = buttons.GetButton(1, 1, true)
+		if not button then
+			return
+		end
+		local unitBuildID = Spring.GetUnitIsBuilding(factoryUnitID)
+		if not unitBuildID then 
+			return
+		end
+		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
+		button.SetProgressBar(progress)
+	end
+	
+	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID)
+		
+		factoryUnitID = newFactoryUnitID 
+		factoryUnitDefID = newFactoryUnitDefID
+	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
 		local buildDefIDCounts = {}
 		if buildQueue then
 			for i = 1, #buildQueue do
 				for udid, count in pairs(buildQueue[i]) do
+					if buttonCount < buttonColumns then
+						buttonCount = buttonCount + 1
+						local x, y = buttons.IndexToPosition(buttonCount)
+						local button = buttons.GetButton(x,y)
+						button.SetCommand(nil, -udid, true)
+						button.SetBuildQueueCount(count)
+					else
+					
+					end
+					
 					buildDefIDCounts[udid] = (buildDefIDCounts[udid] or 0) + count
 				end
 			end
 		end
+		
+		externalFunctions.UpdateBuildProgress()
 		
 		for udid, count in pairs(buildDefIDCounts) do
 			local button = buttonsByCommand[-udid]
@@ -474,16 +566,20 @@ end
 --------------------------------------------------------------------------------
 -- Tab Panel
 
-local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable)
+local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
+	
+	local function DoClick()
+		panel.SwitchToTab(name)
+		panel.SetHotkeysActive(loiterable)
+		if OnSelect then
+			OnSelect()
+		end
+	end
+	
 	local button = Button:New {
 		caption = humanName,
 		padding = {0, 0, 0, 0},
-		OnClick = {
-			function ()
-				panel.SwitchToTab(name)
-				panel.SetHotkeysActive(loiterable)
-			end
-		}
+		OnClick = {DoClick}
 	}
 	
 	local hideHotkey = loiterable
@@ -495,13 +591,9 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	
 	local externalFunctionsAndData = {
 		button = button,
-		name = name
+		name = name,
+		DoClick = DoClick,
 	}
-	
-	function externalFunctionsAndData.DoClick()
-		panel.SwitchToTab(name)
-		panel.SetHotkeysActive(loiterable)
-	end
 		
 	function externalFunctionsAndData.IsTabSelected()
 		return contentControl.visible
@@ -617,7 +709,7 @@ local commandPanels = {
 			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
 		end,
 		loiterable = true,
-		imageConfig = imageConfig.command,
+		buttonLayoutConfig = buttonLayoutConfig.command,
 	},
 	{
 		humanName = "Economy",
@@ -631,7 +723,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_economy",
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
 		humanName = "Defence",
@@ -645,7 +737,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_defence",
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
 		humanName = "Special",
@@ -660,10 +752,10 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_special",
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 		rowOverride = {
 			[3] = {
-				imageConfig = imageConfig.command,
+				buttonLayoutConfig = buttonLayoutConfig.command,
 				isStructure = false,
 			}
 		}
@@ -680,7 +772,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_factory",
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
 		humanName = "Units",
@@ -692,7 +784,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_units",
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 	{
 		humanName = "Units",
@@ -714,7 +806,7 @@ local commandPanels = {
 		isBuild = true,
 		hotkeyReplacement = "Orders",
 		gridHotkeys = true,
-		imageConfig = imageConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 }
 
@@ -787,6 +879,9 @@ local function ProcessAllCommands(commands, customCommands)
 		local data = commandPanels[i]
 		data.buttons.ClearButtons()
 		data.commandCount = 0
+		if data.queue then
+			data.queue.ClearButtons()
+		end
 	end
 		
 	statePanel.commandCount = 0
@@ -840,8 +935,13 @@ local function ProcessAllCommands(commands, customCommands)
 		tabToSelect = "orders"
 	end
 	
-	tabPanel.SwitchToTab(tabToSelect)
-	lastTabSelected = tabToSelect
+	if #tabsToShow == 0 then
+		tabPanel.SwitchToTab(nil)
+		lastTabSelected = false
+	else
+		tabPanel.SwitchToTab(tabToSelect)
+		lastTabSelected = tabToSelect
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -916,12 +1016,12 @@ local function InitializeControls()
 		else
 			hotkey = GetActionHotkey(EPIC_NAME_UNITS)
 		end
-		
-		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable)
 
 		if data.returnOnClick then
 			data.onClick = ReturnToOrders
 		end
+		
+		local OnTabSelect
 		
 		data.holder = commandHolder
 		if data.factoryQueue then
@@ -933,7 +1033,7 @@ local function InitializeControls()
 				padding = {0, 0, 0, 0},
 				parent = commandHolder,
 			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.imageConfig, data.isStructure, data.onClick, data.rowOverride)
+			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.rowOverride)
 			
 			local queueHolder = Control:New{
 				x = "0%",
@@ -944,9 +1044,15 @@ local function InitializeControls()
 				parent = commandHolder,
 			}
 			data.queue = GetQueuePanel(queueHolder, 1, 6)
+			
+			-- If many things need doing they must be put in a function
+			-- but this works for now.
+			OnTabSelect = data.queue.UpdateBuildProgress
 		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.imageConfig, data.isStructure, data.onClick, data.rowOverride)
+			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.rowOverride)
 		end
+		
+		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
 		if data.gridHotkeys then
 			data.buttons.ApplyGridHotkeys(gridMap)
@@ -962,7 +1068,7 @@ local function InitializeControls()
 		parent = contentHolder,
 	}
 	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, imageConfig.command)
+	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
 end
 
 local function HotkeyTabEconomy()
@@ -1073,6 +1179,15 @@ function widget:CommandsChanged()
 	local commands = widgetHandler.commands
 	local customCommands = widgetHandler.customCommands
 	ProcessAllCommands(commands, customCommands)
+end
+
+function widget:GameFrame(n)
+	if n%6 == 0 then
+		local unitsFactoryPanel = commandPanelMap.units_factory
+		if unitsFactoryPanel.tabButton.IsTabSelected() then
+			unitsFactoryPanel.queue.UpdateBuildProgress()
+		end
+	end
 end
 
 function widget:Initialize()
