@@ -110,9 +110,23 @@ local buttonLayoutConfig = {
 			keepAspect = false,
 		},
 		showCost = false,
-		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
-		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue",
+		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
 		dragAndDrop = true,
+	},
+	queueWithDots = {
+		image = {
+			x = "5%",
+			y = "5%",
+			right = "5%",
+			height = "90%",
+			keepAspect = false,
+		},
+		caption = "...",
+		showCost = false,
+		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
+		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
+		dragAndDrop = true,
+		dotDotOnOverflow = true,
 	}
 }
 
@@ -364,7 +378,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		y = yStr,
 		width = width,
 		height = height,
-		caption = "",
+		caption = buttonLayout.caption or "",
 		padding = {0, 0, 0, 0},
 		parent = parent,
 		OnClick = {DoClick}
@@ -497,8 +511,15 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
 	end
 	
-	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID)
+	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflowString)
 		factoryUnitID = newFactoryUnitID
+		if buttonLayout.dotDotOnOverflow and overflowString then
+			for _,textBox in pairs(textBoxes) do
+				textBox:SetCaption(NO_TEXT)
+			end
+			button.tooltip = overflowString
+			SetImage()
+		end
 	end
 	
 	function externalFunctionsAndData.SetSelection(isSelected)
@@ -580,7 +601,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, 
 	return externalFunctionsAndData
 end
 
-local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, rowOverride)
+local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, buttonLayoutOverride)
 	local buttons = {}
 	local buttonList = {}
 	
@@ -616,9 +637,9 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		local yStr = tostring((y - 1)*100/rows) .. "%"
 		
 		local buttonLayout, isStructure = generalButtonLayout, generalIsStructure
-		if rowOverride and rowOverride[y] then
-			buttonLayout = rowOverride[y].buttonLayoutConfig
-			isStructure = rowOverride[y].isStructure
+		if buttonLayoutOverride and buttonLayoutOverride[x] and buttonLayoutOverride[x][y] then
+			buttonLayout = buttonLayoutOverride[x][y].buttonLayoutConfig
+			isStructure = buttonLayoutOverride[x][y].isStructure
 		end
 		
 		newButton = GetButton(parent, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
@@ -659,14 +680,23 @@ end
 --------------------------------------------------------------------------------
 -- Queue Panel
 
-local function GetQueuePanel(parent, rows, columns)
+local function GetQueuePanel(parent, columns)
 	local externalFunctions = {}
 	
 	local factoryUnitID
 	local factoryUnitDefID
 	local buttonCount = 0
-	local buttonColumns = columns - 1
-	local buttons = GetButtonPanel(parent, rows, columns, false, buttonLayoutConfig.queue, false, onClick)
+	
+	local buttonLayoutOverride = {
+		[columns] = {
+			[1] = {
+				buttonLayoutConfig = buttonLayoutConfig.queueWithDots,
+				isStructure = false,
+			}
+		}
+	}
+	
+	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, onClick, buttonLayoutOverride)
 
 	function externalFunctions.ClearButtons()
 		factoryUnitID = false
@@ -697,21 +727,30 @@ local function GetQueuePanel(parent, rows, columns)
 		factoryUnitDefID = newFactoryUnitDefID
 	
 		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
+		
+		local overflowString
+		if #buildQueue > columns then
+			overflowString = ""
+			for i = 6, #buildQueue do
+				for udid, count in pairs(buildQueue[i]) do
+					local name = UnitDefs[udid].humanName
+					overflowString = overflowString .. name .. " x" .. count .. ((i < #buildQueue and "\n") or "")
+				end
+			end
+		end
+	
 		local buildDefIDCounts = {}
 		if buildQueue then
 			for i = 1, #buildQueue do
 				for udid, count in pairs(buildQueue[i]) do
-					if buttonCount < buttonColumns then
+					if buttonCount <= columns then
 						buttonCount = buttonCount + 1
 						local x, y = buttons.IndexToPosition(buttonCount)
 						local button = buttons.GetButton(x,y)
 						button.SetCommand(nil, -udid, true)
-						button.SetQueueCommandParameter(newFactoryUnitID)
 						button.SetBuildQueueCount(count)
-					else
-					
+						button.SetQueueCommandParameter(newFactoryUnitID, overflowString)
 					end
-					
 					buildDefIDCounts[udid] = (buildDefIDCounts[udid] or 0) + count
 				end
 			end
@@ -869,6 +908,16 @@ end
 --------------------------------------------------------------------------------
 -- Global Variables
 
+local specialButtonLayoutOverride = {}
+for i = 1, 5 do
+	specialButtonLayoutOverride[i] = {
+		[3] = {
+			buttonLayoutConfig = buttonLayoutConfig.command,
+			isStructure = false,
+		}
+	}
+end
+
 local commandPanels = {
 	{
 		humanName = "Orders",
@@ -921,12 +970,7 @@ local commandPanels = {
 		returnOnClick = "orders",
 		optionName = "tab_special",
 		buttonLayoutConfig = buttonLayoutConfig.build,
-		rowOverride = {
-			[3] = {
-				buttonLayoutConfig = buttonLayoutConfig.command,
-				isStructure = false,
-			}
-		}
+		buttonLayoutOverride = specialButtonLayoutOverride,
 	},
 	{
 		humanName = "Factory",
@@ -1041,7 +1085,7 @@ local function ProcessCommand(command, factorySelected)
 end
 
 local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitID, factoryUnitDefID  = GetSelectedFactory()
+	local factoryUnitID, factoryUnitDefID = GetSelectedFactory()
 
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
@@ -1201,7 +1245,7 @@ local function InitializeControls()
 				padding = {0, 0, 0, 0},
 				parent = commandHolder,
 			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.rowOverride)
+			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
 			
 			local queueHolder = Control:New{
 				x = "0%",
@@ -1211,13 +1255,13 @@ local function InitializeControls()
 				padding = {0, 0, 0, 0},
 				parent = commandHolder,
 			}
-			data.queue = GetQueuePanel(queueHolder, 1, 6)
+			data.queue = GetQueuePanel(queueHolder, 6)
 			
 			-- If many things need doing they must be put in a function
 			-- but this works for now.
 			OnTabSelect = data.queue.UpdateBuildProgress
 		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.rowOverride)
+			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
