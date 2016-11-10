@@ -2,7 +2,7 @@
 
 function widget:GetInfo()
   return {
-    name      = "Chili Integral Menu",
+    name      = "Chili Integral Menu Old",
     desc      = "v0.369 Integral Command Menu",
     author    = "Licho, KingRaptor, Google Frog",
     date      = "12.10.2010", --21.August.2013
@@ -99,7 +99,7 @@ gridKeyMap = GenerateGridKeyMap(gridMap)
 --  CONFIG
 ------------------------
 ------------------------
-options_path = 'Settings/HUD Panels/Command Panel'
+options_path = 'Settings/HUD Panels/Command Panel Old'
 options_order = { 
 	'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 
 	'unitshotkeyaltaswell',  'hotkeysWithTabClick', 'keyboardType',

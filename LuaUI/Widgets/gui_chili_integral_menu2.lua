@@ -3,8 +3,8 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Integral Menu 2",
-		desc      = "Integral Command Menu Improved",
+		name      = "Chili Integral Menu",
+		desc      = "Integral Command Menu",
 		author    = "GoogleFrog",
 		date      = "8 Novemember 2016",
 		license   = "GNU GPL, v2 or later",
@@ -134,11 +134,35 @@ local buttonLayoutConfig = {
 --------------------------------------------------------------------------------
 -- Widget Options
 
-options_path = 'Settings/HUD Panels/Command Panel2'
+options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'tab_economy', 'tab_defence', 'tab_special','tab_factory','tab_units'
+	'background_opacity', 'keyboardType','hide_when_spectating',
+	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
+
 options = {
+	background_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0.8, min = 0, max = 1, step = 0.01,
+	},
+	keyboardType = {
+		type='radioButton', 
+		name='Keyboard Layout',
+		items = {
+			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
+			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
+			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+		},
+		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+	},
+	hide_when_spectating = {
+		name = 'Hide when Spectating',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
 	tab_economy = {
 		name = "Economy Tab",
 		desc = "Switches to economy tab.",
@@ -846,7 +870,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	local hideHotkey = loiterable
 	
 	if hotkey and not hideHotkey then
-		button:SetCaption(humanName .. "(\255\0\255\0" .. hotkey .. "\008)")
+		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
 		button:Invalidate()
 	end
 	
@@ -873,9 +897,9 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		end
 		
 		if isActive then
-			button:SetCaption(humanName .. "(\255\0\255\0" .. hotkey .. "\008)")
+			button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
 		else
-			button:SetCaption(humanName .. "(" .. hotkey .. ")")
+			button:SetCaption(humanName .. " (" .. hotkey .. ")")
 		end
 		button:Invalidate()
 	end
@@ -917,6 +941,7 @@ local function GetTabPanel(parent, rows, columns)
 		orientation = "horizontal",
 	}
 	
+	local currentSelectedIndex
 	local hotkeysActive = true
 	local currentTab
 	local tabList = false
@@ -931,6 +956,7 @@ local function GetTabPanel(parent, rows, columns)
 		for i = 1, #tabList do
 			local data = tabList[i]
 			data.SetSelected(data.name == name)
+			currentSelectedIndex = i
 		end
 	end
 		
@@ -938,7 +964,9 @@ local function GetTabPanel(parent, rows, columns)
 		if TabListsAreIdentical(newTabList, tabList) then
 			return
 		end
-		externalFunctions.SwitchToTab(tabToSelect)
+		if currentSelectedIndex and tabList[currentSelectedIndex] then
+			tabList[currentSelectedIndex].SetSelected(false)
+		end
 		tabList = newTabList
 		tabHolder:ClearChildren()
 		for i = 1, #tabList do
@@ -948,7 +976,7 @@ local function GetTabPanel(parent, rows, columns)
 				tabList[i].SetHotkeyActive(hotkeysActive)
 			end
 			if tabList[i].name == tabToSelect then
-				tabList[i].SetSelected(true)
+				tabList[i].DoClick()
 			end
 		end
 	end
@@ -957,15 +985,16 @@ local function GetTabPanel(parent, rows, columns)
 		if tabList then
 			externalFunctions.SwitchToTab()
 			tabList = false
+			currentSelectedIndex = false
 			tabHolder:ClearChildren()
 		end
 	end
 	
 	function externalFunctions.SetHotkeysActive(newActive)
+		hotkeysActive = newActive
 		if not tabList then
 			return
 		end
-		hotkeysActive = newActive
 		for i = 1, #tabList do
 			local data = tabList[i]
 			data.SetHotkeyActive(hotkeysActive)
@@ -1004,7 +1033,7 @@ local commandPanels = {
 		buttonLayoutConfig = buttonLayoutConfig.command,
 	},
 	{
-		humanName = "Economy",
+		humanName = "Econ",
 		name = "economy",
 		inclusionFunction = function(cmdID)
 			local position = buildCmdEconomy[cmdID]
@@ -1104,8 +1133,6 @@ end
 
 local statePanel = {}
 local tabPanel
-
-local gridKeyMap, gridMap = GenerateGridKeyMap("qwerty")
 
 local selectionIndex = 0
 
@@ -1242,12 +1269,16 @@ end
 --------------------------------------------------------------------------------
 -- Initialization
 
+local gridKeyMap, gridMap, contentHolder -- Configuration requires this
+
 local function InitializeControls()
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local height = math.min(screenHeight/4.5, 200*width/450)
 
+	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
+	
 	local mainWindow = Window:New{
 		name      = 'integralwindow2',
 		x         = 0, 
@@ -1277,7 +1308,7 @@ local function InitializeControls()
 	
 	tabPanel = GetTabPanel(tabHolder)
 	
-	local contentHolder = Panel:New{
+	contentHolder = Panel:New{
 		x = 0,
 		y = "15%",
 		width = "100%",
@@ -1285,7 +1316,7 @@ local function InitializeControls()
 		draggable = false,
 		resizable = false,
 		padding = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 0.8},
+		backgroundColor = {1, 1, 1, options.background_opacity.value},
 		parent = mainWindow,
 	}
 	
@@ -1367,7 +1398,31 @@ local function InitializeControls()
 	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
 end
 
-local function HotkeyTabEconomy()
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Epic Menu Configuration and Hotkey Functions
+
+function options.keyboardType.OnChange(self)
+	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if data.gridHotkeys then
+			data.buttons.ApplyGridHotkeys(gridMap)
+		end
+	end
+end
+
+function options.background_opacity.OnChange(self)
+	contentHolder.backgroundColor[4] = self.value
+	contentHolder:Invalidate()
+end
+
+function options.hide_when_spectating.OnChange(self)
+	local isSpec = Spring.GetSpectatingState()
+	contentHolder:SetVisibility(not (self.value and isSpec))
+end
+
+function options.tab_economy.OnChange()
 	local tab = commandPanelMap.economy.tabButton
 	if tab.IsTabPresent() then
 		tab.DoClick()
@@ -1412,7 +1467,6 @@ local function HotkeyTabUnits()
 	end
 end
 
-options.tab_economy.OnChange = HotkeyTabEconomy
 options.tab_defence.OnChange = HotkeyTabDefence
 options.tab_special.OnChange = HotkeyTabSpecial
 options.tab_factory.OnChange = HotkeyTabFactory
@@ -1465,6 +1519,13 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return true
 	end
 	return false
+end
+
+function widget:PlayerChanged(playerID)
+	if options.hide_when_spectating.value then
+		local isSpec = Spring.GetSpectatingState()
+		contentHolder:SetVisibility(not isSpec)
+	end
 end
 
 function widget:CommandsChanged()
