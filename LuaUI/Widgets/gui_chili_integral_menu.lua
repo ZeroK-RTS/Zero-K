@@ -8,7 +8,7 @@ function widget:GetInfo()
     date      = "12.10.2010", --21.August.2013
     license   = "GNU GPL, v2 or later",
     layer     = math.huge-1,
-    enabled   = true,
+    enabled   = false,
     handler   = true,
   }
 end
@@ -1144,6 +1144,55 @@ function widget:Update(dt)
 	end
 end
 ]]--
+-- layout handler - its needed for custom commands to work and to delete normal spring menu
+local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
+	widgetHandler.commands   = commands
+	widgetHandler.commands.n = cmdCount
+	widgetHandler:CommandsChanged()
+	local reParamsCmds = {}
+	local customCmds = {}
+	
+	local cnt = 0
+	
+	local AddCommand = function(command) 
+		local cc = {}
+		CopyTable(cc,command )
+		cnt = cnt + 1
+		cc.cmdDescID = cmdCount+cnt
+		if (cc.params) then
+			if (not cc.actions) then --// workaround for params
+				local params = cc.params
+				for i=1,#params+1 do
+					params[i-1] = params[i]
+				end
+				cc.actions = params
+			end
+			reParamsCmds[cc.cmdDescID] = cc.params
+		end
+		--// remove api keys (custom keys are prohibited in the engine handler)
+		cc.pos       = nil
+		cc.cmdDescID = nil
+		cc.params    = nil
+		
+		customCmds[#customCmds+1] = cc
+	end 
+	
+	
+	--// preprocess the Custom Commands
+	for i=1,#widgetHandler.customCommands do
+		AddCommand(widgetHandler.customCommands[i])
+	end
+	
+	for i=1,#globalCommands do
+		AddCommand(globalCommands[i])
+	end
+
+	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+	end
+	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
+end 
 
 local function ScrollTabRight()
 	menuChoice = menuChoice + 1
@@ -1295,6 +1344,9 @@ end
 
 -- INITS 
 function widget:Initialize()
+	widgetHandler:ConfigLayoutHandler(LayoutHandler)
+	Spring.ForceLayoutUpdate()
+	
 	recentlyInitialized = true
 	wasPlaying = not spGetSpectatingState()
 	
@@ -1729,6 +1781,11 @@ function widget:SelectionChanged(newSelection)
 	end
 	selectedFac = nil
 	SmartTabSelect()
+end
+
+function widget:Shutdown()
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
+	Spring.ForceLayoutUpdate()
 end
 
 options.hidetabs.OnChange = function(self) 
