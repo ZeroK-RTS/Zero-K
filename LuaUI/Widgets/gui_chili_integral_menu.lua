@@ -75,8 +75,6 @@ local buildRow_visible = false
 local buildQueue = {}	--build order table of selectedFac
 local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
 
-local gameStarted = false
-
 local gridLocation = {}
 
 ------------------------
@@ -152,7 +150,7 @@ options = {
 		name = 'Enable hotkeys on tab click',
 		type = 'bool',
 		desc = "Clicking on a tab button enables hotkeys for that tab.",
-		value = true,
+		value = false,
 		noHotkey = true,
 	},
 	keyboardType = {
@@ -1093,44 +1091,34 @@ end
 
 --need to recreate the tabs completely because chili is dumb
 --also needs to be non-local so MakeMenuTab can call it
-local tabVisibility = {}
-function ColorTabs(arg, visiblity)
+function ColorTabs(arg)
 	arg = arg or menuChoice
-	tabVisibility = visiblity or tabVisibility
 	RemoveChildren(menuTabRow)
-	for i = 1, 6 do
-		if (not gameStarted) or tabVisibility[i] then
-			if i == arg then
-				menuTabs[arg] = MakeMenuTab(arg, 1)
-			else
-				menuTabs[i] = MakeMenuTab(i, 0.4)
-			end
+	for i=1,6 do
+		if i == arg then
+			menuTabs[arg] = MakeMenuTab(arg, 1)
+		else
+			menuTabs[i] = MakeMenuTab(i, 0.4)
 		end
 	end
 end
-
-local selectNoTabs = {}
-local selectAllTabs = {true, true, true, true, true, true}
-local selectFactoryTabs = {true, false, false, false, false, true}
 
 local function SmartTabSelect()
 	Update()
 	if options.hidetabs.value then
 		menuChoice = 1
-		ColorTabs(1, selectNoTabs)
+		ColorTabs(1)
 	elseif options.disablesmartselect.value then 
 		return
 	elseif #n_units > 0 and #n_econ == 0 then
 		menuChoice = 6	--selected factory, jump to units
-		ColorTabs(6, selectFactoryTabs)
-	elseif #n_econ > 0 then
-		if menuChoice == 6 then
-			menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
-		end
-		ColorTabs(menuChoice, selectAllTabs)
+		ColorTabs(6)
+	elseif #n_econ > 0 and menuChoice == 6 then
+		menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
+		ColorTabs(lastBuildChoice)
 	elseif #n_factories + #n_econ + #n_defense + #n_units == 0 then
 		menuChoice = 1	--selected non-builder, jump to common
-		ColorTabs(1, selectNoTabs)
+		ColorTabs(1)
 	end
 end
 
@@ -1227,7 +1215,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value and options.unitstabhotkey.value then
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value  and options.unitstabhotkey.value then
 		Update(true)
 	end
 end
@@ -1614,9 +1602,6 @@ end
 
 --This function update construction progress bar and weapon reload progress bar
 function widget:GameFrame(n)
-	if not gameStarted then
-		gameStarted = true
-	end
 	if options.hide_when_spectating.value and spGetSpectatingState() then return end
 	--set progress bar
 	if n%6 == 0 then
