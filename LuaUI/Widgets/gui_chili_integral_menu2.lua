@@ -58,6 +58,23 @@ local EPIC_NAME_UNITS = "epic_chili_integral_menu_2_tab_units"
 
 local _, _, buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial,_ , commandDisplayConfig, _, hiddenCommands = include("Configs/integral_menu_commands.lua")
 
+local textConfig = {
+	bottomLeft = {
+		name = "bottomLeft",
+		x = "15%",
+		right = 0,
+		bottom = 2,
+		height = 12,
+		fontsize = 14,
+	},
+	topLeft = {
+		name = "topLeft",
+		x = "14%",
+		y = "14%",
+		fontsize = 11,
+	}
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
@@ -190,8 +207,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 	end
 	
 	local image
-	local lowerText
-	local upperText
+	local textBoxes = {}
 	
 	local function SetImage(texture1, texture2)
 		if not image then
@@ -217,43 +233,29 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 		image:Invalidate()
 	end
 	
-	local function SetLowerText(text)
-		if not lowerText then
-			lowerText = TextBox:New {
-				x = "15%",
-				right = 0,
-				bottom = 2,
-				height = 12,
-				fontsize = 14,
-				text = text,
-				parent = button,
-			}
-			return
-		end
-	
-		lowerText:SetText(text)
-		lowerText:Invalidate()
-	end
-	
-	local function SetUpperText(text)
-		if not upperText then
+	local function SetText(textPosition, text)
+		if not textBoxes[textPosition] then
 			if not text then
 				return
 			end
-			upperText = TextBox:New {
-				x = "14%",
-				y = "14%",
-				fontsize = 11,
+			local config = textConfig[textPosition]
+			textBoxes[textPosition] = TextBox:New {
+				x = config.x,
+				y = config.y,
+				right = config.right,
+				bottom = config.bottom,
+				height = config.height,
+				fontsize = config.fontsize,
 				text = text,
 				parent = button,
 			}
-			upperText:BringToFront()
 			return
 		end
-		
-		upperText:SetText(text or NO_TEXT)
-		upperText:Invalidate()
+	
+		textBoxes[textPosition]:SetText(text or NO_TEXT)
+		textBoxes[textPosition]:Invalidate()
 	end
+	
 	
 	local externalFunctionsAndData = {
 		button = button
@@ -272,7 +274,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 			return
 		end
 		usingGrid = true
-		SetUpperText('\255\0\255\0' .. key)
+		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
 	end
 	
 	function externalFunctionsAndData.SetSelection(isSelected)
@@ -301,7 +303,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 			local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
 			button.tooltip = tooltip	
 			SetImage("#" .. -cmdID, WG.GetBuildIconFrame(UnitDefs[-cmdID]))
-			SetLowerText(UnitDefs[-cmdID].metalCost)
+			SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
 			return
 		end
 		
@@ -316,7 +318,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 				tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
 			end
 			if not (isStateCommand or usingGrid) then 
-				SetUpperText(hotkey)
+				SetText(textConfig.topLeft.name, hotkey)
 			end
 		end
 		
