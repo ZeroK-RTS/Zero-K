@@ -65,13 +65,45 @@ local textConfig = {
 		right = 0,
 		bottom = 2,
 		height = 12,
-		fontsize = 14,
+		fontsize = 12,
 	},
 	topLeft = {
 		name = "topLeft",
-		x = "14%",
-		y = "14%",
-		fontsize = 11,
+		x = "12%",
+		y = "11%",
+		fontsize = 12,
+	},
+	queue = {
+		name = "queue",
+		right = "18%",
+		bottom = "14%",
+		align = "right",
+		fontsize = 16,
+		height = 16,
+	},
+}
+
+local imageConfig = {
+	command = {
+		x = "9%",
+		y = "9%",
+		right = "9%",
+		height = "82%",
+		keepAspect = true,
+	},
+	build = {
+		x = "5%",
+		y = "3%",
+		right = "9%",
+		bottom = 13,
+		keepAspect = false,
+	},
+	queue = {
+		x = "5%",
+		y = "5%",
+		right = "5%",
+		height = "90%",
+		keepAspect = false,
 	}
 }
 
@@ -165,19 +197,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Queue Panel
-
-local function GetQueuePanel(parent, rows, columns)
-	local externalFunctions = {}
-
-	return externalFunctions
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Button Panel
 
-local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStructure, onClick)
+local function GetButton(parent, x, y, xStr, yStr, width, height, imageStyle, isStructure, onClick)
 	local cmdID
 	local usingGrid
 
@@ -212,19 +234,17 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 	local function SetImage(texture1, texture2)
 		if not image then
 			image = Image:New {
-				x = "9%",
-				y = "9%",
-				right = "9%",
-				height = (not isBuild) and nil or "82%",
-				bottom = (isBuild) and 16 or nil,
-				keepAspect = not isBuild,
+				x = imageStyle.x,
+				y = imageStyle.y,
+				right = imageStyle.right,
+				bottom = imageStyle.bottom,
+				height = imageStyle.height,
+				keepAspect = imageStyle.keepAspect,
 				file = texture1,
 				file2 = texture2,
 				parent = button,
 			}
-			if upperText then
-				upperText:BringToFront()
-			end
+			image:SendToBack()
 			return
 		end
 		
@@ -239,20 +259,22 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 				return
 			end
 			local config = textConfig[textPosition]
-			textBoxes[textPosition] = TextBox:New {
+			textBoxes[textPosition] = Label:New {
 				x = config.x,
 				y = config.y,
 				right = config.right,
 				bottom = config.bottom,
 				height = config.height,
+				align = config.align,
 				fontsize = config.fontsize,
-				text = text,
+				caption = text,
 				parent = button,
 			}
+			textBoxes[textPosition]:BringToFront()
 			return
 		end
 	
-		textBoxes[textPosition]:SetText(text or NO_TEXT)
+		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
 		textBoxes[textPosition]:Invalidate()
 	end
 	
@@ -294,10 +316,15 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 		return cmdID
 	end
 	
+	function externalFunctionsAndData.SetBuildQueueCount(count)
+		SetText(textConfig.queue.name, count)
+	end
+	
 	function externalFunctionsAndData.SetCommand(command)
 		cmdID = command.id
 		buttonsByCommand[cmdID] = externalFunctionsAndData
 		externalFunctionsAndData.SetSelection(false)
+		 externalFunctionsAndData.SetBuildQueueCount(nil)
 		if cmdID < 0 then
 			local ud = UnitDefs[-cmdID]
 			local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
@@ -337,7 +364,7 @@ local function GetButton(parent, x, y, xStr, yStr, width, height, isBuild, isStr
 	return externalFunctionsAndData
 end
 
-local function GetButtonPanel(parent, rows, columns, vertical, isBuild, isStructure, notBuildRow, onClick)
+local function GetButtonPanel(parent, rows, columns, vertical, imageStyle, isStructure, onClick, rowOverride)
 	local buttons = {}
 	local buttonList = {}
 	
@@ -372,7 +399,13 @@ local function GetButtonPanel(parent, rows, columns, vertical, isBuild, isStruct
 		local xStr = tostring((x - 1)*100/columns) .. "%"
 		local yStr = tostring((y - 1)*100/rows) .. "%"
 		
-		newButton = GetButton(parent, x, y, xStr, yStr, width, height, notBuildRow ~= y and isBuild, notBuildRow ~= y and isStructure, onClick)
+		local image, structure = imageStyle, isStructure
+		if rowOverride and rowOverride[y] then
+			image = rowOverride[y].imageConfig
+			structure = rowOverride[y].isStructure
+		end
+		
+		newButton = GetButton(parent, x, y, xStr, yStr, width, height, image, structure, onClick)
 		
 		buttonList[#buttonList + 1] = newButton
 		if gridMap then
@@ -400,6 +433,37 @@ local function GetButtonPanel(parent, rows, columns, vertical, isBuild, isStruct
 		gridMap = newGridMap
 		for i = 1, #buttonList do
 			buttonList[i].UpdateGridHotkey(gridMap)
+		end
+	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Queue Panel
+
+local function GetQueuePanel(parent, rows, columns)
+	local externalFunctions = {}
+	
+	local buttons = GetButtonPanel(parent, rows, columns, false, imageConfig.queue, false, onClick)
+
+	function externalFunctions.UpdateFactory(factoryUnitID, factoryUnitDefID)
+		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
+		local buildDefIDCounts = {}
+		if buildQueue then
+			for i = 1, #buildQueue do
+				for udid, count in pairs(buildQueue[i]) do
+					buildDefIDCounts[udid] = (buildDefIDCounts[udid] or 0) + count
+				end
+			end
+		end
+		
+		for udid, count in pairs(buildDefIDCounts) do
+			local button = buttonsByCommand[-udid]
+			if button then
+				button.SetBuildQueueCount(count)
+			end
 		end
 	end
 	
@@ -553,6 +617,7 @@ local commandPanels = {
 			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
 		end,
 		loiterable = true,
+		imageConfig = imageConfig.command,
 	},
 	{
 		humanName = "Economy",
@@ -566,6 +631,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_economy",
+		imageConfig = imageConfig.build,
 	},
 	{
 		humanName = "Defence",
@@ -579,6 +645,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_defence",
+		imageConfig = imageConfig.build,
 	},
 	{
 		humanName = "Special",
@@ -593,6 +660,13 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_special",
+		imageConfig = imageConfig.build,
+		rowOverride = {
+			[3] = {
+				imageConfig = imageConfig.command,
+				isStructure = false,
+			}
+		}
 	},
 	{
 		humanName = "Factory",
@@ -606,6 +680,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_factory",
+		imageConfig = imageConfig.build,
 	},
 	{
 		humanName = "Units",
@@ -617,6 +692,7 @@ local commandPanels = {
 		gridHotkeys = true,
 		returnOnClick = "orders",
 		optionName = "tab_units",
+		imageConfig = imageConfig.build,
 	},
 	{
 		humanName = "Units",
@@ -638,6 +714,7 @@ local commandPanels = {
 		isBuild = true,
 		hotkeyReplacement = "Orders",
 		gridHotkeys = true,
+		imageConfig = imageConfig.build,
 	},
 }
 
@@ -655,13 +732,13 @@ local gridKeyMap, gridMap = GenerateGridKeyMap("qwerty")
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function GetSelectedFactoryUnitDefID()	
+local function GetSelectedFactory()	
 	local selection = Spring.GetSelectedUnits()
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
 		if defID and UnitDefs[defID].isFactory then
-			return defID
+			return unitID, defID
 		end
 	end
 	return false
@@ -704,7 +781,7 @@ local function ProcessCommand(command, factorySelected)
 end
 
 local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitDefID = GetSelectedFactoryUnitDefID()
+	local factoryUnitID, factoryUnitDefID  = GetSelectedFactory()
 
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
@@ -723,18 +800,35 @@ local function ProcessAllCommands(commands, customCommands)
 		ProcessCommand(customCommands[i], factoryUnitDefID)
 	end
 	
+	-- Call factory queue update here because the update will globally
+	-- set queue count for the top two rows of the factory tab. Therefore
+	-- the factory tab must have updated its commands.
+	if factoryUnitDefID then
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			if data.queue then
+				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID)
+			end
+		end
+	end
+	
 	local tabsToShow = {}
 	local lastTabSelected = tabPanel.GetCurrentTab()
 	local tabToSelect
 	
+	-- Switch to factory tab is a factory is newly selected.
 	if factoryUnitDefID then
-		tabToSelect = "units_factory"
+		local unitsFactoryTab = commandPanelMap.units_factory.tabButton
+		if not unitsFactoryTab.IsTabPresent() then
+			tabToSelect = "units_factory"
+		end
 	end
 	
+	-- Determine which tabs to display and which to select
 	for i = 1, #commandPanels do
 		if commandPanels[i].commandCount ~= 0 then
 			tabsToShow[#tabsToShow + 1] = commandPanels[i].tabButton
-			if (not factoryUnitDefID) and commandPanels[i].tabButton.name == lastTabSelected then
+			if (not tabToSelect) and commandPanels[i].tabButton.name == lastTabSelected then
 				tabToSelect = lastTabSelected
 			end
 		end
@@ -839,7 +933,7 @@ local function InitializeControls()
 				padding = {0, 0, 0, 0},
 				parent = commandHolder,
 			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.isBuild, data.isStructure, data.notBuildRow, data.onClick)
+			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.imageConfig, data.isStructure, data.onClick, data.rowOverride)
 			
 			local queueHolder = Control:New{
 				x = "0%",
@@ -851,7 +945,7 @@ local function InitializeControls()
 			}
 			data.queue = GetQueuePanel(queueHolder, 1, 6)
 		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.isBuild, data.isStructure, data.notBuildRow, data.onClick)
+			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.imageConfig, data.isStructure, data.onClick, data.rowOverride)
 		end
 	
 		if data.gridHotkeys then
@@ -868,7 +962,7 @@ local function InitializeControls()
 		parent = contentHolder,
 	}
 	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true)
+	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, imageConfig.command)
 end
 
 local function HotkeyTabEconomy()
