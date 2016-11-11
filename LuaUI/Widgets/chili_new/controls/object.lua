@@ -446,6 +446,9 @@ end
 --- Sets the visibility of the object
 -- @bool visible visibility status
 function Object:SetVisibility(visible)
+  if self.visible == visible then
+    return
+  end
   if (visible) then
     self.parent:ShowChild(self)
   else
@@ -476,6 +479,10 @@ function Object:SetChildLayer(child,layer)
   child = UnlinkSafe(child)
   local children = self.children
 
+  if layer < 0 then
+    layer = layer + #children + 1
+  end
+  
   layer = math.min(layer, #children)
 
   --// it isn't at the same pos anymore, search it!
@@ -496,11 +503,13 @@ function Object:SetLayer(layer)
   end
 end
 
+function Object:SendToBack()
+  self:SetLayer(-1)
+end
 
 function Object:BringToFront()
   self:SetLayer(1)
 end
-
 --//=============================================================================
 
 function Object:InheritsFrom(classname)
