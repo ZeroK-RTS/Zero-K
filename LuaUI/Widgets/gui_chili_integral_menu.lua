@@ -405,6 +405,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local factoryUnitID
 	local queueCount
 	local isDisabled = false
+	local isSelected = false
 	local hotkeyText
 	
 	local function DoClick(_, _, _, mouse)
@@ -633,16 +634,19 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 	end
 	
-	function externalFunctionsAndData.SetSelection(isSelected)
+	function externalFunctionsAndData.SetSelection(newIsSelected)
+		if isSelected == newIsSelected then
+			return
+		end
+		isSelected = newIsSelected
+	
 		if isSelected then
 			button.backgroundColor = SELECT_BUTTON_COLOR
 			button.focusColor = SELECT_BUTTON_FOCUS_COLOR
-			button:Invalidate()
-			return
+		else
+			button.backgroundColor = BUTTON_COLOR
+			button.focusColor = BUTTON_FOCUS_COLOR
 		end
-		
-		button.backgroundColor = BUTTON_COLOR
-		button.focusColor = BUTTON_FOCUS_COLOR
 		button:Invalidate()
 	end
 	
@@ -661,6 +665,10 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	function externalFunctionsAndData.SetCommand(command, overrideCmdID, notGlobal)
 		-- If overrideCmdID is negative then command can be nil.
 		local newCmdID = overrideCmdID or command.id
+		
+		externalFunctionsAndData.SetSelection(false)
+		externalFunctionsAndData.SetBuildQueueCount(nil)
+		
 		if cmdID == newCmdID then
 			return
 		end
@@ -671,8 +679,6 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if buildProgress then
 			externalFunctionsAndData.SetProgressBar(0)
 		end
-		externalFunctionsAndData.SetSelection(false)
-		externalFunctionsAndData.SetBuildQueueCount(nil)
 		if command then
 			SetDisabled(command.disabled)
 		end

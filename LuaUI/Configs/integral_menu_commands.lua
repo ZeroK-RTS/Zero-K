@@ -16,6 +16,7 @@ local tooltips = {
 	dropflag = "Drop flag on the ground.",
 }
 
+-- Current system tries to avoid gaps.
 local CONSTRUCTOR =     {order = 1, row = 1, col = 1}
 local RAIDER =          {order = 2, row = 1, col = 2}
 local RIOT =            {order = 3, row = 1, col = 3}
@@ -71,10 +72,10 @@ local units = {
 	cormist = SKIRMISHER, -- Not really but nowhere else to go
 	nsaclash = SKIRMISHER,
 	gunshipsupport = SKIRMISHER,
-	-- No Plane Skirmisher
+	armcybr = SKIRMISHER,
 	armsptk = SKIRMISHER,
 	slowmort = SKIRMISHER,
-	-- No Take Skirmisher
+	cormart = SKIRMISHER,
 	amphfloater = SKIRMISHER,
 	shiptorp = SKIRMISHER,
 	
@@ -86,13 +87,12 @@ local units = {
 	-- No Plane Artillery
 	-- No Spider Artillery
 	firewalker = ARTILLERY,
-	cormart = ARTILLERY,
+	trem = ARTILLERY,
 	-- No Amph Artillery
 	shiparty = ARTILLERY,
 	
 	armmerl = HEAVY_ARTILLERY,
 	corbtrans = HEAVY_ARTILLERY,
-	trem = HEAVY_ARTILLERY,
 	subarty = HEAVY_ARTILLERY,
 	
 	armjeth = ANTI_AIR,
@@ -129,26 +129,26 @@ local units = {
 	spiderassault = ASSAULT,
 	corcan = ASSAULT,
 	correap = ASSAULT,
-	-- No Amph Assault
+	amphassault = ASSAULT,
+	shipskirm = ASSAULT,
 	
 	armsnipe = HEAVY_SOMETHING,
 	shieldfelon = HEAVY_SOMETHING,
 	capturecar = HEAVY_SOMETHING,
 	-- No Hover Heavy
 	corcrw = HEAVY_SOMETHING,
-	armcybr = HEAVY_SOMETHING,
+	armstiletto_laser = HEAVY_SOMETHING,
 	armcrabe = HEAVY_SOMETHING,
 	corsumo = HEAVY_SOMETHING,
 	corgol = HEAVY_SOMETHING,
-	amphassault = HEAVY_SOMETHING,
-	shipskirm = HEAVY_SOMETHING,
+	amphtele = HEAVY_SOMETHING,
+	armtboat = HEAVY_SOMETHING,
 	
 	armtick = SPECIAL,
 	corroach = SPECIAL,
 	-- No Vehicle Special
 	-- No Hover Special
 	blastwing = SPECIAL,
-	arm_stiletto_laser = SPECIAL,
 	armspy = SPECIAL,
 	corsktl = SPECIAL,
 	-- No Tank Special
@@ -156,8 +156,6 @@ local units = {
 	
 	spherecloaker = UTILITY,
 	core_spectre = UTILITY,
-	amphtele = UTILITY,
-	armtboat = UTILITY,
 }
 
 local factories = {

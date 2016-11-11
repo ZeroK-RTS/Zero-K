@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/cursorsmooth_0.png  0.1

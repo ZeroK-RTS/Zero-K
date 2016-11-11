@@ -77,7 +77,6 @@ local buildHeight = {}
 local buildingPlacementID = false
 local buildingPlacementHeight = 0
 
-local buildToGive = false
 local toggleEnabled = false
 
 local pointX = 0
@@ -109,29 +108,34 @@ local function SendCommand()
 		return
 	end
 	
+	local commandRadius = sizeX + math.random()
+	
 	local params = {}
 	params[1] = 1            -- terraform type = level
 	params[2] = Spring.GetMyTeamID()
-	params[3] = 1            -- Loop parameter
-	params[4] = pointY       -- Height parameter of terraform 
-	params[5] = 5            -- Five points in the terraform
-	params[6] = #constructor -- Number of constructors with the command
-	params[7] = 0            -- Ordinary volume selection
+	params[3] = pointX
+	params[4] = pointZ
+	params[5] = commandRadius
+	params[6] = 1            -- Loop parameter
+	params[7] = pointY       -- Height parameter of terraform 
+	params[8] = 5            -- Five points in the terraform
+	params[9] = #constructor -- Number of constructors with the command
+	params[10] = 0            -- Ordinary volume selection
 	
 	-- Rectangle of terraform
-	params[8]  = pointX + sizeX
-	params[9] = pointZ + sizeZ
-	params[10] = pointX + sizeX
-	params[11] = pointZ - sizeZ
-	params[12] = pointX - sizeX
-	params[13] = pointZ - sizeZ
-	params[14] = pointX - sizeX
-	params[15] = pointZ + sizeZ
-	params[16] = pointX + sizeX
-	params[17] = pointZ + sizeZ
+	params[11]  = pointX + sizeX
+	params[12] = pointZ + sizeZ
+	params[13] = pointX + sizeX
+	params[14] = pointZ - sizeZ
+	params[15] = pointX - sizeX
+	params[16] = pointZ - sizeZ
+	params[17] = pointX - sizeX
+	params[18] = pointZ + sizeZ
+	params[19] = pointX + sizeX
+	params[20] = pointZ + sizeZ
 	
 	-- Set constructors
-	local i = 18
+	local i = 21
 	for j = 1, #constructor do
 		params[i] = constructor[j]
 		i = i + 1
@@ -141,30 +145,16 @@ local function SendCommand()
 	
 	local a,c,m,s = spGetModKeyState()
 	
-	if s then
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-	else
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+	if not s then
 		spSetActiveCommand(-1)
 	end
 	
-	local waitFrame = 30	
-	local myPlayerID = Spring.GetMyPlayerID()
-	if myPlayerID then
-		-- ping is in seconds
-		local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
-		waitFrame = 30*ceil(myPing) + 5
+	local height = Spring.GetGroundHeight(pointX, pointZ)
+	for i = 1, #constructor do
+		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, {"shift"})
+		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
 	end
-	
-	buildToGive = {
-		facing = facing,
-		cmdID = -buildingPlacementID,
-		x = pointX,
-		z = pointZ,
-		constructor = constructor,
-		waitFrame = waitFrame,
-		needGameFrame = true
-	}
 end
 
 function widget:KeyPress(key, mods)
@@ -199,11 +189,6 @@ function widget:KeyPress(key, mods)
 end
 
 function widget:Update(dt)
-	if buildToGive and buildToGive.needGameFrame then
-		widgetHandler:UpdateWidgetCallIn("GameFrame", self)
-		buildToGive.needGameFrame = false
-	end 
-	
 	if not CheckEnabled() then
 		buildingPlacementID = false
 		return
@@ -262,24 +247,6 @@ function widget:MousePress(mx, my, button)
 	
 	SendCommand()
 	return true
-end
-
-function widget:GameFrame(f)
-	if not buildToGive then
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-		return
-	end
-	
-	buildToGive.waitFrame = buildToGive.waitFrame - 1
-	if buildToGive.waitFrame < 0 then
-		local constructor = buildToGive.constructor
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
-			i = i + 1
-		end
-		buildToGive = false
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-	end
 end
 
 --------------------------------------------------------------------------------
