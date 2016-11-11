@@ -41,7 +41,7 @@ local units = {
 	corfast = CONSTRUCTOR,
 	coracv =  CONSTRUCTOR,
 	amphcon = CONSTRUCTOR,
-	shipcon = CONSTRUCTOR,
+	a_shipcon = CONSTRUCTOR,
 
 	armpw = RAIDER,
 	corak = RAIDER,
@@ -53,7 +53,7 @@ local units = {
 	corpyro = RAIDER,
 	panther = RAIDER,
 	amphraider3 = RAIDER,
-	subraider = RAIDER,
+	a_shiptorpbt = RAIDER,
 	
 	armwar = RIOT,
 	cormak = RIOT,
@@ -65,7 +65,7 @@ local units = {
 	jumpblackhole = RIOT,
 	tawf114 = RIOT,
 	amphriot = RIOT,
-	shipraider = RIOT,
+	a_shipcorvette = RIOT,
 	
 	armrock = SKIRMISHER,
 	corstorm = SKIRMISHER,
@@ -77,7 +77,7 @@ local units = {
 	slowmort = SKIRMISHER,
 	cormart = SKIRMISHER,
 	amphfloater = SKIRMISHER,
-	shiptorp = SKIRMISHER,
+	a_shipmissile = SKIRMISHER,
 	
 	armham = ARTILLERY,
 	shieldarty = ARTILLERY,
@@ -89,7 +89,7 @@ local units = {
 	firewalker = ARTILLERY,
 	trem = ARTILLERY,
 	-- No Amph Artillery
-	shiparty = ARTILLERY,
+	a_shipcruiser = ARTILLERY,
 	
 	armmerl = HEAVY_ARTILLERY,
 	corbtrans = HEAVY_ARTILLERY,
@@ -106,7 +106,7 @@ local units = {
 	armaak = ANTI_AIR,
 	corsent = ANTI_AIR,
 	amphaa = ANTI_AIR,
-	shipaa = ANTI_AIR,
+	a_shipaa = ANTI_AIR,
 	
 	spherepole = WEIRD_RAIDER,
 	corclog = WEIRD_RAIDER,
@@ -118,7 +118,7 @@ local units = {
 	puppy = WEIRD_RAIDER,
 	logkoda = WEIRD_RAIDER,
 	amphraider2 = WEIRD_RAIDER,
-	shipscout = WEIRD_RAIDER,
+	a_shipscout = WEIRD_RAIDER,
 	
 	armzeus = ASSAULT,
 	corthud = ASSAULT,
@@ -130,7 +130,7 @@ local units = {
 	corcan = ASSAULT,
 	correap = ASSAULT,
 	amphassault = ASSAULT,
-	shipskirm = ASSAULT,
+	a_shipdestroyer = ASSAULT,
 	
 	armsnipe = HEAVY_SOMETHING,
 	shieldfelon = HEAVY_SOMETHING,
@@ -153,9 +153,11 @@ local units = {
 	corsktl = SPECIAL,
 	-- No Tank Special
 	-- No Amph Special
+	a_shipatksub = SPECIAL,
 	
 	spherecloaker = UTILITY,
 	core_spectre = UTILITY,
+	a_shiptransport = UTILITY,
 }
 
 local factories = {
