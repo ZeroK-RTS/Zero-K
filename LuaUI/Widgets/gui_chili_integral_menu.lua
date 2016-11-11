@@ -404,8 +404,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local usingGrid
 	local factoryUnitID
 	local queueCount
+	local isDisabled = false
+	local hotkeyText
 	
 	local function DoClick(_, _, _, mouse)
+		if isDisabled then
+			return
+		end
 		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, x)
 		if onClick then
 			onClick()
@@ -493,6 +498,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	end
 	
 	local function SetText(textPosition, text)
+		if isDisabled then
+			text = false
+		end
 		if not textBoxes[textPosition] then
 			if not text then
 				return
@@ -520,14 +528,38 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
 		textBoxes[textPosition]:Invalidate()
 	end
-	
-	
+		
 	local externalFunctionsAndData = {
 		button = button,
 		DoClick = DoClick,
 		selectionIndex = selectionIndex,
 	}
-
+	
+	local function SetDisabled(newDisabled)
+		if newDisabled == isDisabled then
+			return
+		end
+		isDisabled = newDisabled
+		
+		if not image then
+			SetImage("")
+		end
+		if isDisabled then
+			button.backgroundColor = {0,0,0,1}
+			image.color = {0.3, 0.3, 0.3, 1}
+			externalFunctionsAndData.ClearGridHotkey()
+		else
+			button.backgroundColor = {1,1,1,0.7}
+			image.color = {1, 1, 1, 1}
+			if hotkeyText then
+				SetText(textConfig.topLeft.name, hotkeyText)
+			end
+		end
+			
+		button:Invalidate()
+		image:Invalidate()
+	end
+	
 	function externalFunctionsAndData.SetProgressBar(proportion)
 		if buildProgress then
 			buildProgress:SetValue(proportion or 0)
@@ -559,7 +591,12 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			return
 		end
 		usingGrid = true
-		SetText(textConfig.topLeft.name, '\255\0\255\0' .. key)
+		hotkeyText = '\255\0\255\0' .. key
+		SetText(textConfig.topLeft.name, hotkeyText)
+	end
+	
+	function externalFunctionsAndData.ClearGridHotkey()
+		SetText(textConfig.topLeft.name)
 	end
 	
 	local currentOverflow, onMouseOverFun
@@ -636,7 +673,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 		externalFunctionsAndData.SetSelection(false)
 		externalFunctionsAndData.SetBuildQueueCount(nil)
-		
+		if command then
+			SetDisabled(command.disabled)
+		end
 		if cmdID < 0 then
 			local ud = UnitDefs[-cmdID]
 			if buttonLayout.tooltipOverride then
