@@ -180,15 +180,15 @@ local factories = {
 --you can put too many things into the same row, but the buttons will be squished
 local econ = {
 	cormex =     {order = 1, row = 1, col = 1},
-	armmstor =   {order = 7, row = 1, col = 2},
-	armestor =   {order = 8, row = 1, col = 3},
-	armnanotc =  {order = 9, row = 1, col = 4},
-	armasp =    {order = 10, row = 1, col = 5},
 	armwin =     {order = 2, row = 2, col = 1},
 	armsolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
 	armfus =     {order = 5, row = 2, col = 4},
 	cafus =      {order = 6, row = 2, col = 5},
+	armmstor =   {order = 7, row = 3, col = 1},
+	armestor =   {order = 8, row = 3, col = 2},
+	armnanotc =  {order = 9, row = 3, col = 3},
+	armasp =    {order = 10, row = 3, col = 4},
 }
 
 local defense = {
