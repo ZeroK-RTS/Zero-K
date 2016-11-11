@@ -1343,7 +1343,7 @@ local function InitializeControls()
 	local rightPadding = 0
 	
 	local mainWindow = Window:New{
-		name      = 'integralwindow2',
+		name      = 'integralwindow',
 		x         = 0, 
 		bottom    = 0,
 		width     = width,
