@@ -1197,16 +1197,16 @@ local contentHolder
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function GetSelectedFactory()	
+local function GetSelectionValues()	
 	local selection = Spring.GetSelectedUnits()
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
 		if defID and UnitDefs[defID].isFactory then
-			return unitID, defID
+			return unitID, defID, #selection
 		end
 	end
-	return false
+	return false, nil, #selection
 end
 
 local function ProcessCommand(command, factorySelected, selectionIndex)
@@ -1246,7 +1246,7 @@ local function ProcessCommand(command, factorySelected, selectionIndex)
 end
 
 local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitID, factoryUnitDefID = GetSelectedFactory()
+	local factoryUnitID, factoryUnitDefID, selectedUnitCount = GetSelectionValues()
 
 	selectionIndex = selectionIndex + 1
 	
@@ -1322,7 +1322,7 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Keeps main window for tweak mode.
-	contentHolder:SetVisibility(#tabsToShow ~= 0)
+	contentHolder:SetVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
 
 --------------------------------------------------------------------------------
