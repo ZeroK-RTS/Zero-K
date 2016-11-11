@@ -218,7 +218,7 @@ local rampCmdDesc = {
   id      = CMD_RAMP,
   type    = CMDTYPE.ICON_MAP,
   name    = 'Ramp',
-  cursor  = 'Repair', 
+  cursor  = 'Ramp', 
   action  = 'rampground',
   tooltip = 'Build a Ramp between 2 positions, click 2 times: start and end of ramp',
 }
@@ -227,7 +227,7 @@ local levelCmdDesc = {
   id      = CMD_LEVEL,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Level',
-  cursor  = 'Repair', 
+  cursor  = 'Level', 
   action  = 'levelground',
   tooltip = 'Levels the ground in an area - draw a line or shape while holding mouse',
 }
@@ -236,7 +236,7 @@ local raiseCmdDesc = {
   id      = CMD_RAISE,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Raise',
-  cursor  = 'raise', 
+  cursor  = 'Raise', 
   action  = 'raiseground',
   tooltip = 'Raises/Lowers the ground in an area',
 }
@@ -245,7 +245,7 @@ local smoothCmdDesc = {
   id      = CMD_SMOOTH,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Smooth',
-  cursor  = 'Repair', 
+  cursor  = 'Smooth', 
   action  = 'smoothground',
   tooltip = 'Smooths the ground in an area',
 }
@@ -254,7 +254,7 @@ local restoreCmdDesc = {
   id      = CMD_RESTORE,
   type    = CMDTYPE.ICON_AREA,
   name    = 'Restore2',
-  cursor  = 'Repair', 
+  cursor  = 'Restore2', 
   action  = 'restoreground',
   tooltip = 'Restores the ground to origional height',
 }
@@ -3729,19 +3729,26 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
+	
+	local terraformColor = {0.5, 1, 0, 0.7}
+	
+	Spring.SetCustomCommandDrawData(CMD_RAMP, "Ramp", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_LEVEL, "Level", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_RAISE, "Raise", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_SMOOTH, "Smooth", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_RESTORE, "Restore2", terraformColor, false)
+	
+	Spring.AssignMouseCursor("Ramp", "cursorRamp", true, true)
+	Spring.AssignMouseCursor("Level", "cursorLevel", true, true)
+	Spring.AssignMouseCursor("Raise", "cursorRaise", true, true)
+	Spring.AssignMouseCursor("Smooth", "cursorSmooth", true, true)
+	Spring.AssignMouseCursor("Restore2", "cursorRestore2", true, true)
+	
 	gadgetHandler:RegisterCMDID(CMD_RAMP)
 	gadgetHandler:RegisterCMDID(CMD_LEVEL)
 	gadgetHandler:RegisterCMDID(CMD_RAISE)
 	gadgetHandler:RegisterCMDID(CMD_SMOOTH)
 	gadgetHandler:RegisterCMDID(CMD_RESTORE)
-	
-	Spring.AssignMouseCursor("Raise", "cursorraise", true, true)
-	
-	Spring.SetCustomCommandDrawData(CMD_RAMP, "cursorramp", {0.3, 0.3, 1.0, 0.7}, true)
-	Spring.SetCustomCommandDrawData(CMD_LEVEL, "cursorlevel", {0.3, 0.3, 1.0, 0.7}, true)
-	Spring.SetCustomCommandDrawData(CMD_RAISE, "cursorraise", {0.3, 0.3, 1.0, 0.7}, true)
-	Spring.SetCustomCommandDrawData(CMD_SMOOTH, "cursorsmooth", {0.3, 0.3, 1.0, 0.7}, true)
-	Spring.SetCustomCommandDrawData(CMD_RESTORE, "cursorrestore", {0.3, 0.3, 1.0, 0.7}, true)
 	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		GG.Terraform_RaiseWater(modOptions.waterlevel)

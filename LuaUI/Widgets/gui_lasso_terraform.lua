@@ -155,6 +155,14 @@ local drawingRamp = false
 local setHeight = false
 local terraform_type = 0 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore, 6 = bump
 
+local commandMap = {
+	CMD_LEVEL,
+	CMD_RAISE,
+	CMD_SMOOTH,
+	CMD_RAMP,
+	CMD_RESTORE
+}
+
 local volumeSelection = 0
 
 local currentlyActiveCommand = false
@@ -341,7 +349,7 @@ local function SendCommand()
 	
 	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
 	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], CMD_RESTORE, {pointAveX, height, pointAveZ, commandRadius}, {"shift"})
+		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, {"shift"})
 	end
 		
 	if buildToGive then
