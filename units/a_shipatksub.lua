@@ -192,4 +192,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ seawolf = unitDef })
+return lowerkeys({ a_shipatksub = unitDef })
