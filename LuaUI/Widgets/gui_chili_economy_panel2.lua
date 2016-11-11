@@ -225,7 +225,16 @@ options = {
 		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) if (window) then window.color = {1,1,1,self.value}; window:Invalidate() end end,
+		OnChange = function(self) 
+			if (window_metal) then 
+				window_metal.color = {1,1,1,self.value} 
+				window_metal:Invalidate() 
+			end
+			if (window_energy) then 
+				window_energy.color = {1,1,1,self.value} 
+				window_energy:Invalidate() 
+			end
+		end,
 	},
 	colourBlind = {
 		name  = "Colourblind mode",
@@ -770,7 +779,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 
 	--// WINDOW
 	window = Chili.Window:New{
-		-- color = {1,1,1,options.opacity.value},
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
