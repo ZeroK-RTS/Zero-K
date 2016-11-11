@@ -39,6 +39,8 @@ local Chili
 
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
+local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -50,6 +52,9 @@ local col_reserve = {0, 0, 0, 0}
 --------------------------------------------------------------------------------
 
 local window
+
+local metalWarningPanel
+local energyWarningPanel
 
 local window_main_display
 local image_metal
@@ -100,6 +105,8 @@ local strings = {
 	resbar_other = "",
 	resbar_waste = "",
 	metal = "",
+	metal_excess_warning = "",
+	energy_stall_warning = "",
 }
 
 function languageChanged ()
@@ -159,9 +166,9 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash','opacity',
+	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
-	'colourBlind','fontSize'}
+	'colourBlind','fontSize','warningFontSize'}
  
 options = {
 	ecoPanelHideSpec = {
@@ -202,6 +209,18 @@ options = {
 		value = 0.1, min=0,max=1,step=0.02,
 		desc = "Energy storage will flash when it drops below this fraction of your total storage."
 	},
+	energyWarning = {
+		name  = "Energy Stall Warning", 
+		type  = "number", 
+		value = 0.1, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when energy storage drops below this value."
+	},
+	metalWarning = {
+		name  = "Metal Excess Warning", 
+		type  = "number", 
+		value = 0.9, min = 0,max = 1, step = 0.02,
+		desc = "Recieve a warning when metal storage exceeds this value."
+	},
 	opacity = {
 		name  = "Opacity",
 		type  = "number",
@@ -220,6 +239,12 @@ options = {
 		name  = "Font Size",
 		type  = "number",
 		value = 20, min = 8, max = 40, step = 1,
+		OnChange = option_recreateWindow
+	},
+	warningFontSize = {
+		name  = "Farning Font Size",
+		type  = "number",
+		value = 14, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 }
@@ -483,6 +508,9 @@ function widget:GameFrame(n)
 		bar_energy:SetColor( col_energy )
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
+	
+	metalWarningPanel.ShowWarning(mCurr > mStor * options.metalWarning.value )
+	energyWarningPanel.ShowWarning(eCurr < eStor * options.energyWarning.value )
 
 	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
 	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
@@ -633,6 +661,58 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Warning Panels
+
+local function GetWarningPanel(parent, x, y, right, bottom, text)
+	local holder = Chili.Control:New{
+		x = x,
+		y = y,
+		right = right,
+		bottom = bottom,
+		padding = {0, 0, 0, 0},
+		parent = parent
+	}
+	
+	local image = Chili.Image:New{
+		parent = parent,
+		x      = "1%",
+		y      = 0,
+		bottom = 0,
+		width  = "20%",
+		keepAspect = true,
+		file   = WARNING_IMAGE,
+		parent = holder,
+	}
+	
+	local text = Chili.Label:New{
+		parent = parent,
+		x      = "21%",
+		y      = 0,
+		bottom = "8%",
+		width  = 200,
+		caption = text,
+		valign = "center",
+ 		align  = "left",
+		autosize = false,
+		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		parent = holder,
+	}
+	
+	image:SetVisibility(false)
+	text:SetVisibility(false)
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.ShowWarning(newShow)
+		image:SetVisibility(newShow)
+		text:SetVisibility(newShow)
+	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function widget:Shutdown()
 	if window then
@@ -695,13 +775,13 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="EconomyPanelDefault",
+		name="EconomyPanelDefaultTwo",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
 		clientWidth  = oldW or economyPanelWidth,
-		clientHeight = oldH or 50,
+		clientHeight = oldH or 100,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -717,6 +797,9 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end },
 	}
 	
+	metalWarningPanel = GetWarningPanel(window, "3%", "52%", "53%", "15%", strings.metal_excess_warning)
+	energyWarningPanel = GetWarningPanel(window, "53%", "52%", "3%", "15%", strings.energy_stall_warning)
+	
 	window_main_display = Chili.Panel:New{
 		backgroundColor = {0, 0, 0, 0},
 		parent = window,
@@ -725,7 +808,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		y      = 0,
 		x      = 0,
 		right  = 0,
-		bottom = 0,
+		bottom = "50%",
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -742,8 +825,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// Panel configuration
 	local imageX      = "1%"
 	local imageY      = "10%"
-	local imageWidth  = "80%"
-	local imageHeight = "17%"
+	local imageWidth  = "17%"
+	local imageHeight = "80%"
 	
 	local storageX    = "18%"
 	local incomeX     = "44%"
@@ -785,8 +868,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_metal,
 		x      = imageX,
 		y      = imageY,
-		height = imageWidth,
-		width  = imageHeight,
+		width  = imageWidth,
+		height = imageHeight,
 		keepAspect = true,
 		file   = 'LuaUI/Images/ibeam.png',
 	}
@@ -922,8 +1005,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_energy,
 		x      = imageX,
 		y      = imageY,
-		height = imageWidth,
-		width  = imageHeight,
+		width  = imageWidth,
+		height = imageHeight,
 		keepAspect = true,
 		file   = 'LuaUI/Images/energy.png',
 	}	
