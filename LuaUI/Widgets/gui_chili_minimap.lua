@@ -144,6 +144,7 @@ options_order = {
 	'radar_preset_green_in_blue', 
 	
 	-- Minimap options
+	'hideOnOverview',
 	'use_map_ratio',
 	'opacity', 
 	'alwaysResizable', 
@@ -372,6 +373,14 @@ options = {
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
+	hideOnOverview = {
+		name = 'Hide on Overview',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+		noHotkey = true,
+	},	
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
@@ -548,15 +557,16 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	end
 
 	local cs = Spring.GetCameraState()
-	if cs.name == "ov" and not tabbedMode then
-		Chili.Screen0:RemoveChild(window)
-		tabbedMode = true
+	if not options.hideOnOverview.value then
+		if cs.name == "ov" and not tabbedMode then
+			Chili.Screen0:RemoveChild(window)
+			tabbedMode = true
+		end
+		if cs.name ~= "ov" and tabbedMode then
+			Chili.Screen0:AddChild(window)
+			tabbedMode = false
+		end
 	end
-	if cs.name ~= "ov" and tabbedMode then
-		Chili.Screen0:AddChild(window)
-		tabbedMode = false
-	end
-
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
 	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
@@ -656,6 +666,7 @@ MakeMinimapWindow = function()
 	end
 	
 	map_panel = Chili.Panel:New {
+		--classname = "bottomLeftPanel",
 		x = 0,
 		y = 0,
 		bottom = map_panel_bottom,
@@ -762,7 +773,7 @@ MakeMinimapWindow = function()
 		dockable = false;
 		draggable = false,
 		resizable = false,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, -1},
 		children = {
 			map_panel,
 			buttons_panel,
