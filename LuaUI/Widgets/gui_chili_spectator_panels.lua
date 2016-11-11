@@ -409,7 +409,7 @@ local function UpdateResourceWindowPanel(sideID)
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
 		metalIncome = metalIncome + (mInco or 0)
 		metalStorage = metalStorage + (mCurr or 0)
-		metalStorageMax = metalStorageMax + (mStor or 0)
+		metalStorageMax = metalStorageMax + (mStor or 0) - HIDDEN_STORAGE
 		
 		metalSpent = metalSpent + (mExpe or 0)
 		

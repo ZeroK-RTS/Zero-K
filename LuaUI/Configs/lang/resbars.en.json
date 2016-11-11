@@ -25,4 +25,6 @@
 	"resbar_energy_bar_tooltip" : "Represents your storage capacity. Filled portion is used storage.\nFlashes if maximum storage is reached and you start wasting energy.",
 	"resbar_metal_expense_tooltip" : "Your metal demand. Construction and morph demand metal.",
 	"resbar_energy_expense_tooltip" : "This is this total energy demand of your economy and abilities which require energy upkeep."
+	"metal_excess_warning" : "Build/use more constuctors to spend your metal."
+	"energy_stall_warning" : "Build more energy to prevent energy stall."
 }
