@@ -670,6 +670,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		externalFunctionsAndData.SetBuildQueueCount(nil)
 		
 		if cmdID == newCmdID then
+			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+			if isStateCommand then
+				local state = command.params[1] + 1
+				local displayConfig = commandDisplayConfig[cmdID]
+				local texture = displayConfig.texture[state]
+				SetImage(texture)
+			end
 			return
 		end
 		cmdID = newCmdID
