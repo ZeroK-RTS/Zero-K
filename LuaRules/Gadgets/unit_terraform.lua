@@ -3178,19 +3178,17 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	for index, data in pairs(fallbackConstructors[unitID]) do
-	
-		if data.teamID ~= teamID or data.commandX ~= cmdParams[1] or data.commandZ ~= cmdParams[3] or data.commandRadius ~= cmdParams[4] then
-			return false
+		if not (data.teamID ~= teamID or data.commandX ~= cmdParams[1] or data.commandZ ~= cmdParams[3] or data.commandRadius ~= cmdParams[4]) then
+			constructorOrders = constructorOrders or {}
+			constructorOrders[#constructorOrders + 1] = {
+				unitID = unitID,
+				terraunits = data.terraunits,
+				terraunitList = data.terraunitList,
+			}
+
+			data[index] = nil
+			break
 		end
-		
-		constructorOrders = constructorOrders or {}
-		constructorOrders[#constructorOrders + 1] = {
-			unitID = unitID,
-			terraunits = data.terraunits,
-			terraunitList = data.terraunitList,
-		}
-		
-		fallbackConstructors[unitID][index] = nil
 	end
 	
 	return false
