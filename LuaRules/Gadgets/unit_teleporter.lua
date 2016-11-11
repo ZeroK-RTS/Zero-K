@@ -736,30 +736,31 @@ local function DrawWorldFunc()
 		
 		local shift = select (4, spGetModKeyState())
 		local drawnSomethingYet = false
-		for i=1, beaconCount do
+		for i = 1, beaconCount do
 			local bid = beacons[i]
 			local tid = Spring.GetUnitRulesParam(bid, "connectto")
-			local team = Spring.GetUnitTeam(tid)
-			if spValidUnitID(tid) and spValidUnitID(bid) and (fullview or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
-				
-				if not drawnSomethingYet then
-					gl.PushAttrib(GL.LINE_BITS)
-		
-					gl.DepthTest(true)
+			if tid then
+				local team = Spring.GetUnitTeam(tid)
+				if spValidUnitID(tid) and spValidUnitID(bid) and (fullview or spAreTeamsAllied(myTeam, team)) and (shift or (Spring.IsUnitSelected(tid) or Spring.IsUnitSelected(bid))) then
 					
-					gl.LineWidth(2)
-					gl.LineStipple('')
-					drawnSomethingYet = true
+					if not drawnSomethingYet then
+						gl.PushAttrib(GL.LINE_BITS)
+			
+						gl.DepthTest(true)
+						
+						gl.LineWidth(2)
+						gl.LineStipple('')
+						drawnSomethingYet = true
+					end
+					
+					gl.Color(0.1, 0.3, 1, 0.9)
+					gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
+					
+					local x,y,z = spGetUnitPosition(bid)
+					
+					gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
 				end
-				
-				gl.Color(0.1, 0.3, 1, 0.9)
-				gl.BeginEnd(GL.LINES, DrawFunc, bid, tid)
-				
-				local x,y,z = spGetUnitPosition(bid)
-				
-				gl.DrawGroundCircle(x,y,z, BEACON_TELEPORT_RADIUS, 32)
 			end
-
 		end
 
 		if drawnSomethingYet then
