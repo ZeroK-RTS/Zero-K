@@ -670,6 +670,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		externalFunctionsAndData.SetBuildQueueCount(nil)
 		
 		if cmdID == newCmdID then
+			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
+			if isStateCommand then
+				local state = command.params[1] + 1
+				local displayConfig = commandDisplayConfig[cmdID]
+				local texture = displayConfig.texture[state]
+				SetImage(texture)
+			end
 			return
 		end
 		cmdID = newCmdID
@@ -1184,6 +1191,8 @@ local tabPanel
 
 local selectionIndex = 0
 
+local contentHolder
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Command Handling
@@ -1311,13 +1320,16 @@ local function ProcessAllCommands(commands, customCommands)
 		tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID, tabToSelect)
 		lastTabSelected = tabToSelect
 	end
+	
+	-- Keeps main window for tweak mode.
+	contentHolder:SetVisibility(#tabsToShow ~= 0)
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Initialization
 
-local gridKeyMap, gridMap, contentHolder -- Configuration requires this
+local gridKeyMap, gridMap -- Configuration requires this
 
 local function InitializeControls()
 	-- Set the size for the default settings.
@@ -1326,6 +1338,9 @@ local function InitializeControls()
 	local height = math.min(screenHeight/4.5, 200*width/450)
 
 	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
+	
+	local leftPadding = 0
+	local rightPadding = 0
 	
 	local mainWindow = Window:New{
 		name      = 'integralwindow2',
@@ -1340,15 +1355,15 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent    = screen0,
 	}
 		
 	local tabHolder = Control:New{
-		x = "0%",
+		x = leftPadding,
 		y = "0%",
-		width = "100%",
+		right = rightPadding,
 		height = "15%",
 		padding = {2, 2, 2, 0},
 		parent = mainWindow,
@@ -1357,16 +1372,37 @@ local function InitializeControls()
 	tabPanel = GetTabPanel(tabHolder)
 	
 	contentHolder = Panel:New{
+		--classname = "bottomMiddlePanel",
 		x = 0,
 		y = "15%",
 		width = "100%",
-		height = "85%",
+		bottom = 0,
 		draggable = false,
 		resizable = false,
 		padding = {0, 0, 0, 0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
 		parent = mainWindow,
 	}
+	
+	buttonsHolder = Control:New{
+		x = leftPadding,
+		y = 0,
+		right = rightPadding,
+		bottom = 0,
+		padding = {0, 0, 0, 0},
+		parent = contentHolder,
+	}
+	
+	--local currentSkin = Chili.theme.skin.general.skinName
+	--local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	--
+	--if skin.bottomLeftPanel then
+	--	contentHolder.tiles = skin.bottomLeftPanel.tiles
+	--	contentHolder.TileImageFG = skin.bottomLeftPanel.TileImageFG
+	--	contentHolder.backgroundColor = skin.bottomLeftPanel.backgroundColor
+	--	contentHolder.TileImageBK = skin.bottomLeftPanel.TileImageBK
+	--	contentHolder:Invalidate()
+	--end
 	
 	local function ReturnToOrders()
 		commandPanelMap.orders.tabButton.DoClick()
@@ -1380,7 +1416,7 @@ local function InitializeControls()
 			width = COMMAND_SECTION_WIDTH .. "%",
 			height = "100%",
 			padding = {4, 4, 0, 4},
-			parent = contentHolder,
+			parent = buttonsHolder,
 		}
 		commandHolder:SetVisibility(false)
 		
@@ -1439,7 +1475,7 @@ local function InitializeControls()
 		width = STATE_SECTION_WIDTH .. "%",
 		height = "100%",
 		padding = {0, 4, 3, 4},
-		parent = contentHolder,
+		parent = buttonsHolder,
 	}
 	statePanel.holder:SetVisibility(false)
 	

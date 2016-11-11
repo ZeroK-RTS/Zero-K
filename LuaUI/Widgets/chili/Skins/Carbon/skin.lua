@@ -108,6 +108,36 @@ skin.panel = {
   DrawControl = DrawPanel,
 }
 
+skin.bottomRightPanel = {
+  TileImageBK = ":cl:bottomRightPanel.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {32, 32, 32, 32},
+
+  backgroundColor = {1, 1, 1, 0.8},
+
+  DrawControl = DrawPanel,
+}
+
+skin.bottomLeftPanel = {
+  TileImageBK = ":cl:bottomLeftPanel.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {32, 32, 32, 32},
+
+  backgroundColor = {1, 1, 1, 0.8},
+
+  DrawControl = DrawPanel,
+}
+
+skin.bottomMiddlePanel = {
+  TileImageBK = ":cl:bottomMiddlePanel.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {32, 32, 32, 32},
+
+  backgroundColor = {1, 1, 1, 0.8},
+
+  DrawControl = DrawPanel,
+}
+
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",

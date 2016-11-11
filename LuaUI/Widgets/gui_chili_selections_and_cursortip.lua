@@ -2795,12 +2795,13 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, -1},
         minWidth = 450, 
 		minHeight = 120,
 	}
     
 	window_corner = Panel:New{
+		--classname = "bottomRightPanel",
 		parent = real_window_corner,
         name   = 'unitinfo2';
 		x = 0,
