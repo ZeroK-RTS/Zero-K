@@ -93,9 +93,6 @@ local SIG_AIM = 2
 local SIG_DOCK = 4
 
 local function CallSatelliteScript(funcName, args)
-	if not satUnitID then
-		return
-	end
 	local func = Spring.UnitScript.GetScriptEnv(satUnitID)[funcName]
 	if func then
 		Spring.UnitScript.CallAsUnit(satUnitID, func, args)
@@ -191,9 +188,6 @@ function SpiralDown()
 		-- this ignores base unit rotation. because it wants to snap to multiples of 90, and base unit is guaranteed to be
 		-- always snapped to multiples of 90 because of how buildings are
 		-- this is an invitation for someone to implement arbitrary 360-deg rotation and break this. I dare you. Fight me.
-		if not satUnitID then
-			break
-		end
 		
 		local dx, _, dz = Spring.GetUnitDirection(satUnitID)
 		local currentHeading  = Vector.Angle(dx, dz)
@@ -310,7 +304,6 @@ function DeferredActivate()
 	local heading = Vector.Angle(dx, dz)
 	
 	while not Spring.ValidUnitID(satUnitID) do
-		Sleep(1)
 		satUnitID = Spring.CreateUnit('starlight_satellite',x,y,z,0,Spring.GetUnitTeam(unitID))
 		if satUnitID then
 			satelliteCreated = true
@@ -336,6 +329,8 @@ function DeferredActivate()
 			Hide(LimbD2)
 			Hide(Satellite)
 			Hide(SatelliteMuzzle)
+		else
+			Sleep(1)
 		end
 	end
 	

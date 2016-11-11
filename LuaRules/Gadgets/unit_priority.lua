@@ -714,7 +714,7 @@ function gadget:UnitDestroyed(UnitID, unitDefID, teamID)
 	end
     if ud then
 		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
-			local _, sto = spGetTeamResources(teamID, "metal") - HIDDEN_STORAGE
+			local _, sto = spGetTeamResources(teamID, "metal")
 			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
 				SetMetalReserved(teamID, sto - ud.metalStorage)
 			end

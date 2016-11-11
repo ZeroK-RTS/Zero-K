@@ -27,25 +27,24 @@ VFS.Include("LuaRules/Utilities/unitDefReplacements.lua")
 VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 
 local function GetBuildIconFrame(udef) 
-	local cp = udef.customParams
-	if (udef.isBuilder and udef.speed>0) then
-		return consTex
+  if (udef.isBuilder and udef.speed>0) then
+    return consTex
 
-	elseif (udef.isBuilder or udef.isFactory) then
-		return consTex
+  elseif (udef.isBuilder or udef.isFactory) then
+    return consTex
 
-	elseif (udef.weapons[1] and udef.isBuilding) then
-		return unitTex
+  elseif (udef.weapons[1] and udef.isBuilding) then
+    return unitTex
 
-	elseif (cp.income_energy or cp.ismex or cp.windgen) then
-		return ecoTex
+  elseif ((udef.totalEnergyOut>0) or (udef.customParams.ismex) or (udef.name=="armwin" or udef.name=="corwin")) then
+    return ecoTex
 
-	elseif ((udef.weapons[1] or udef.canKamikaze) and not cp.unarmed) then
-		return unitTex
+  elseif (udef.weapons[1] or udef.canKamikaze) then
+    return unitTex
 
-	else
-		return diffTex
-	end
+  else
+    return diffTex
+  end
 end 
 
 --------------------------------------------------------------------------------

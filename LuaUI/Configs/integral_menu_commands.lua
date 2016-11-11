@@ -16,150 +16,6 @@ local tooltips = {
 	dropflag = "Drop flag on the ground.",
 }
 
-local CONSTRUCTOR =     {order = 1, row = 1, col = 1}
-local RAIDER =          {order = 2, row = 1, col = 2}
-local RIOT =            {order = 3, row = 1, col = 3}
-local SKIRMISHER =      {order = 4, row = 1, col = 4}
-local ARTILLERY =       {order = 5, row = 1, col = 5}
-local HEAVY_ARTILLERY = {order = 6, row = 1, col = 6}
-local ANTI_AIR =        {order = 7, row = 2, col = 1}
-local WEIRD_RAIDER =    {order = 8, row = 2, col = 2}
-local ASSAULT =         {order = 9, row = 2, col = 3}
-local HEAVY_SOMETHING = {order = 10, row = 2, col = 4}
-local SPECIAL =         {order = 11, row = 2, col = 5}
-local UTILITY =         {order = 12, row = 2, col = 6}
-
-local units = {
-	armrectr = CONSTRUCTOR,
-	cornecro = CONSTRUCTOR,
-	corned = CONSTRUCTOR,
-	corch = CONSTRUCTOR,
-	gunshipcon = CONSTRUCTOR,
-	armca = CONSTRUCTOR,
-	arm_spider = CONSTRUCTOR,
-	corfast = CONSTRUCTOR,
-	coracv =  CONSTRUCTOR,
-	amphcon = CONSTRUCTOR,
-	shipcon = CONSTRUCTOR,
-
-	armpw = RAIDER,
-	corak = RAIDER,
-	corgator = RAIDER,
-	corsh = RAIDER,
-	armkam = RAIDER,
-	fighter = RAIDER,
-	armflea = RAIDER,
-	corpyro = RAIDER,
-	panther = RAIDER,
-	amphraider3 = RAIDER,
-	subraider = RAIDER,
-	
-	armwar = RIOT,
-	cormak = RIOT,
-	corlevlr = RIOT,
-	hoverriot = RIOT,
-	armbrawl = RIOT,
-	corhurc2 = RIOT,
-	spiderriot = RIOT,
-	jumpblackhole = RIOT,
-	tawf114 = RIOT,
-	amphriot = RIOT,
-	shipraider = RIOT,
-	
-	armrock = SKIRMISHER,
-	corstorm = SKIRMISHER,
-	cormist = SKIRMISHER, -- Not really but nowhere else to go
-	nsaclash = SKIRMISHER,
-	gunshipsupport = SKIRMISHER,
-	-- No Plane Skirmisher
-	armsptk = SKIRMISHER,
-	slowmort = SKIRMISHER,
-	-- No Take Skirmisher
-	amphfloater = SKIRMISHER,
-	shiptorp = SKIRMISHER,
-	
-	armham = ARTILLERY,
-	shieldarty = ARTILLERY,
-	corgarp = ARTILLERY,
-	armmanni = ARTILLERY,
-	corvalk = ARTILLERY,
-	-- No Plane Artillery
-	-- No Spider Artillery
-	firewalker = ARTILLERY,
-	cormart = ARTILLERY,
-	-- No Amph Artillery
-	shiparty = ARTILLERY,
-	
-	armmerl = HEAVY_ARTILLERY,
-	corbtrans = HEAVY_ARTILLERY,
-	trem = HEAVY_ARTILLERY,
-	subarty = HEAVY_ARTILLERY,
-	
-	armjeth = ANTI_AIR,
-	corcrash = ANTI_AIR,
-	vehaa = ANTI_AIR,
-	armjeth = ANTI_AIR,
-	hoveraa = ANTI_AIR,
-	gunshipaa = ANTI_AIR,
-	corvamp = ANTI_AIR,
-	spideraa = ANTI_AIR,
-	armaak = ANTI_AIR,
-	corsent = ANTI_AIR,
-	amphaa = ANTI_AIR,
-	shipaa = ANTI_AIR,
-	
-	spherepole = WEIRD_RAIDER,
-	corclog = WEIRD_RAIDER,
-	corfav = WEIRD_RAIDER,
-	hoverdepthcharge = WEIRD_RAIDER,
-	bladew = WEIRD_RAIDER,
-	corawac = WEIRD_RAIDER,
-	arm_venom = WEIRD_RAIDER,
-	puppy = WEIRD_RAIDER,
-	logkoda = WEIRD_RAIDER,
-	amphraider2 = WEIRD_RAIDER,
-	shipscout = WEIRD_RAIDER,
-	
-	armzeus = ASSAULT,
-	corthud = ASSAULT,
-	corraid = ASSAULT,
-	hoverassault = ASSAULT,
-	blackdawn = ASSAULT,
-	corshad = ASSAULT,
-	spiderassault = ASSAULT,
-	corcan = ASSAULT,
-	correap = ASSAULT,
-	-- No Amph Assault
-	
-	armsnipe = HEAVY_SOMETHING,
-	shieldfelon = HEAVY_SOMETHING,
-	capturecar = HEAVY_SOMETHING,
-	-- No Hover Heavy
-	corcrw = HEAVY_SOMETHING,
-	armcybr = HEAVY_SOMETHING,
-	armcrabe = HEAVY_SOMETHING,
-	corsumo = HEAVY_SOMETHING,
-	corgol = HEAVY_SOMETHING,
-	amphassault = HEAVY_SOMETHING,
-	shipskirm = HEAVY_SOMETHING,
-	
-	armtick = SPECIAL,
-	corroach = SPECIAL,
-	-- No Vehicle Special
-	-- No Hover Special
-	blastwing = SPECIAL,
-	arm_stiletto_laser = SPECIAL,
-	armspy = SPECIAL,
-	corsktl = SPECIAL,
-	-- No Tank Special
-	-- No Amph Special
-	
-	spherecloaker = UTILITY,
-	core_spectre = UTILITY,
-	amphtele = UTILITY,
-	armtboat = UTILITY,
-}
-
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},
 	factoryshield =   {order = 2, row = 1, col = 2},
@@ -246,7 +102,6 @@ local special_commands = {
 	[CMD_SMOOTH] =  {order = 20, row = 3, col = 5},
 	--[CMD_BUMPY] = {order = 21, row = 3},
 }
-local units_factory_commands = {}
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
@@ -262,7 +117,6 @@ CopyBuildArray(econ, econ_commands)
 CopyBuildArray(aux, special_commands)
 CopyBuildArray(defense, defense_commands)
 CopyBuildArray(super, special_commands)
-CopyBuildArray(units, units_factory_commands)
 
 -- Global commands defined here - they have cmdDesc format + 
 local globalCommands = {
@@ -447,7 +301,6 @@ local custom_cmd_actions = {
 	firestate=2,
 	idlemode=2,
 	autorepairlevel=2,
-	preventoverkill = 2,
 	
 	      
 	--CUSTOM COMMANDS
@@ -507,4 +360,4 @@ local custom_cmd_actions = {
 }
 
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden, units_factory_commands
+return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden

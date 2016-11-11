@@ -39,8 +39,6 @@ local Chili
 
 local spGetTeamRulesParam = Spring.GetTeamRulesParam
 
-local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -52,9 +50,6 @@ local col_reserve = {0, 0, 0, 0}
 --------------------------------------------------------------------------------
 
 local window
-
-local metalWarningPanel
-local energyWarningPanel
 
 local window_main_display
 local image_metal
@@ -77,9 +72,9 @@ local col_income
 local col_expense
 local col_overdrive
 
-local blinkMetal = 0
-local blinkEnergy = 0
-local baseBlinkPeriod = 1.4
+local blink = 0
+local blink_periode = 1.4
+local blink_alpha = 1
 local blinkM_status = false
 local blinkE_status = false
 local time_old = 0
@@ -105,8 +100,6 @@ local strings = {
 	resbar_other = "",
 	resbar_waste = "",
 	metal = "",
-	metal_excess_warning = "",
-	energy_stall_warning = "",
 }
 
 function languageChanged ()
@@ -166,15 +159,16 @@ local function option_colourBlindUpdate()
 end
 
 options_order = {
-	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
+	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash','opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
-	'colourBlind','fontSize','warningFontSize'}
+	'colourBlind','fontSize'}
  
 options = {
 	ecoPanelHideSpec = {
 		name  = 'Hide if spectating', 
 		type  = 'bool', 
 		value = false,
+		advanced = true,
 		noHotkey = true,
 		desc = "Should the panel hide when spectating?",
 		OnChange = option_recreateWindow
@@ -183,6 +177,7 @@ options = {
 		name  = 'Flash On Energy Excess', 
 		type  = 'bool', 
 		value = false,
+		advanced = true,
 		noHotkey = true,
 		desc = "When enabled energy storage will flash if energy is being excessed. This only occurs if too much energy is left unlinked to metal extractors because normally excess is used for overdrive."
 	},
@@ -209,18 +204,6 @@ options = {
 		value = 0.1, min=0,max=1,step=0.02,
 		desc = "Energy storage will flash when it drops below this fraction of your total storage."
 	},
-	energyWarning = {
-		name  = "Energy Stall Warning", 
-		type  = "number", 
-		value = 0.1, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when energy storage drops below this value."
-	},
-	metalWarning = {
-		name  = "Metal Excess Warning", 
-		type  = "number", 
-		value = 0.9, min = 0,max = 1, step = 0.02,
-		desc = "Recieve a warning when metal storage exceeds this value."
-	},
 	opacity = {
 		name  = "Opacity",
 		type  = "number",
@@ -239,12 +222,6 @@ options = {
 		name  = "Font Size",
 		type  = "number",
 		value = 20, min = 8, max = 40, step = 1,
-		OnChange = option_recreateWindow
-	},
-	warningFontSize = {
-		name  = "Farning Font Size",
-		type  = "number",
-		value = 14, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
 }
@@ -285,7 +262,6 @@ function UpdateCustomParamResourceData()
 	if Spring.GetSpectatingState() then
 		local teamID = Spring.GetLocalTeamID()
 		local _, mStor = GetTeamResources(teamID, "metal")
-		mStor = mStor - HIDDEN_STORAGE
 		cp.metalStorageReserve = Spring.GetTeamRulesParam(teamID, "metalReserve") or 0
 		if mStor <= 0 and bar_reserve_metal.bars[1].percent ~= 0 then
 			bar_reserve_metal.bars[1].percent = 0
@@ -296,13 +272,12 @@ function UpdateCustomParamResourceData()
 		end
 		
 		local _, eStor = GetTeamResources(teamID, "energy")
-		mStor = eStor - HIDDEN_STORAGE
 		cp.energyStorageReserve = Spring.GetTeamRulesParam(teamID, "energyReserve") or 0
-		if eStor <= 0 and bar_reserve_energy.bars[1].percent ~= 0 then
+		if eStor <= HIDDEN_STORAGE and bar_reserve_energy.bars[1].percent ~= 0 then
 			bar_reserve_energy.bars[1].percent = 0
 			bar_reserve_energy:Invalidate()
-		elseif bar_reserve_energy.bars[1].percent*eStor ~= cp.energyStorageReserve then
-			bar_reserve_energy.bars[1].percent = cp.energyStorageReserve/eStor
+		elseif bar_reserve_energy.bars[1].percent*(eStor - HIDDEN_STORAGE) ~= cp.energyStorageReserve then
+			bar_reserve_energy.bars[1].percent = cp.energyStorageReserve/(eStor - HIDDEN_STORAGE)
 			bar_reserve_energy:Invalidate()
 		end
 	end
@@ -314,8 +289,8 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 		if value > 1 then value = 1 end
 		if metal then
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-			Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE)) 
-			cp.metalStorageReserve = value*(mStor - HIDDEN_STORAGE)
+			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
+			cp.metalStorageReserve = value*mStor
 			bar_reserve_metal.bars[1].percent = value
 			bar_reserve_metal:Invalidate()
 		end
@@ -340,21 +315,21 @@ local function Mix(startColour, endColour, interpParam)
 end
 
 function widget:Update(s)
+
+	blink = (blink+s)%blink_periode
+	local sawtooth = math.abs(blink/blink_periode - 0.5)*2
+	blink_alpha = sawtooth*0.92
+	
+	blink_colourBlind = options.colourBlind.value and 1 or 0
+
+	--Colour strings are only used for the flashing captions because engine 91.0 has a bug that keeps the string showing when the colour is changed to {0,0,0,0}
+	--Once engine 97+ is adopted officially, the captions should use SetColor (followed by Invalidate if that remains necessary)
+
 	if blinkM_status then
-		local blinkPeriod = baseBlinkPeriod/blinkM_status
-		blinkMetal = (blinkMetal + s)%blinkPeriod
-		local sawtooth = math.abs(blinkMetal/blinkPeriod - 0.5)*2
-		local blink_alpha = sawtooth*0.95
-		
 		bar_metal:SetColor(Mix({col_metal[1], col_metal[2], col_metal[3], 0.65}, col_expense, blink_alpha))
 	end
-	
+
 	if blinkE_status then
-		local blinkPeriod = baseBlinkPeriod/blinkE_status
-		blinkEnergy = (blinkEnergy + s)%blinkPeriod
-		local sawtooth = math.abs(blinkEnergy/blinkPeriod - 0.5)*2
-		local blink_alpha = sawtooth*0.95
-		
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
 	end
 end
@@ -425,7 +400,7 @@ function widget:GameFrame(n)
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		teamTotalMetalStored = teamTotalMetalStored + mCurr
-		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor - HIDDEN_STORAGE 
+		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor
 		
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
 		teamMPull = teamMPull + mPull + extraMetalPull
@@ -441,7 +416,7 @@ function widget:GameFrame(n)
 		teamEnergyExp = teamEnergyExp + eExpe + extraChange
 		teamEnergyReclaim = teamEnergyReclaim + eInco - math.max(0, energyChange)
 		
-		teamTotalEnergyStored = teamTotalEnergyStored + eCurr
+		teamTotalEnergyStored = teamTotalEnergyStored + math.min(eCurr, eStor - HIDDEN_STORAGE)
 		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE 
 	end
 
@@ -465,33 +440,20 @@ function widget:GameFrame(n)
 	ePull = ePull + extraEnergyPull + extraChange - cp.team_energyWaste/cp.allies
 	-- Waste energy is reported as the equal fault of all players.
 	
-	-- reduce by hidden storage
-	mStor = mStor - HIDDEN_STORAGE
-	eStor = eStor - HIDDEN_STORAGE
+	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
+	if eCurr > eStor then 
+		eCurr = eStor -- cap by storage
+	end
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
-	if mCurr >= mStor then
-		blinkM_status = 3
-	elseif mCurr >= mStor * 0.9 then
-		-- Blink less fast
-		blinkM_status = 1
-	elseif blinkM_status then
+	local wastingM = mCurr >= mStor * 0.9
+	if wastingM then
+		blinkM_status = true
+	elseif (blinkM_status) then
 		blinkM_status = false
-		bar_metal:SetColor(col_metal)
+		bar_metal:SetColor( col_metal )
 	end
 
-	-- cap by storage
-	if eCurr > eStor then 
-		eCurr = eStor
-	end
-	if mCurr > mStor then 
-		mCurr = mStor
-	end
-	local teamMetalWaste = math.min(0, teamTotalMetalCapacity - teamTotalMetalStored)
-	if teamTotalMetalStored > teamTotalMetalCapacity then
-		teamTotalMetalStored = teamTotalMetalCapacity
-	end
-	
 	local ODEFlashThreshold = 0.1
 
 	local wastingE = false
@@ -500,17 +462,14 @@ function widget:GameFrame(n)
 	end
 	local stallingE = (eCurr <= eStor * options.energyFlash.value) and (eCurr < 1000) and (eCurr >= 0)
 	if stallingE or wastingE then
-		blinkE_status = 1
+		blinkE_status = true
 		bar_energy:SetValue( 100 )
 		excessE = wastingE
-	elseif blinkE_status then
+	elseif (blinkE_status) then
 		blinkE_status = false
 		bar_energy:SetColor( col_energy )
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
-	
-	metalWarningPanel.ShowWarning(mCurr > mStor * options.metalWarning.value )
-	energyWarningPanel.ShowWarning(eCurr < eStor * options.energyWarning.value )
 
 	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
 	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
@@ -535,7 +494,7 @@ function widget:GameFrame(n)
 	local team_metalReclaim = Format(math.max(0, teamMInco - cp.team_metalOverdrive - cp.team_metalBase - cp.team_metalMisc))
 	local team_metalConstructor = Format(cp.team_metalMisc)
 	local team_metalConstuction = Format(-teamMSpent)
-	local team_metalWaste = Format(teamMetalWaste)
+	local team_metalWaste = Format(math.min(teamFreeStorage + teamMSpent - teamMInco,0))
 	
 	local energyGenerators = Format(cp.energyIncome)
 	local energyReclaim = Format(eReclaim)
@@ -661,58 +620,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Warning Panels
-
-local function GetWarningPanel(parent, x, y, right, bottom, text)
-	local holder = Chili.Control:New{
-		x = x,
-		y = y,
-		right = right,
-		bottom = bottom,
-		padding = {0, 0, 0, 0},
-		parent = parent
-	}
-	
-	local image = Chili.Image:New{
-		parent = parent,
-		x      = "1%",
-		y      = 0,
-		bottom = 0,
-		width  = "20%",
-		keepAspect = true,
-		file   = WARNING_IMAGE,
-		parent = holder,
-	}
-	
-	local text = Chili.Label:New{
-		parent = parent,
-		x      = "21%",
-		y      = 0,
-		bottom = "8%",
-		width  = 200,
-		caption = text,
-		valign = "center",
- 		align  = "left",
-		autosize = false,
-		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
-		parent = holder,
-	}
-	
-	image:SetVisibility(false)
-	text:SetVisibility(false)
-	
-	local externalFunctions = {}
-	
-	function externalFunctions.ShowWarning(newShow)
-		image:SetVisibility(newShow)
-		text:SetVisibility(newShow)
-	end
-	
-	return externalFunctions
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 function widget:Shutdown()
 	if window then
@@ -775,13 +682,13 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		color = {0, 0, 0, 0},
 		parent = Chili.Screen0,
 		dockable = true,
-		name="EconomyPanelDefaultTwo",
+		name="EconomyPanelDefault",
 		padding = {0,0,0,0},
 		-- right = "50%",
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
 		clientWidth  = oldW or economyPanelWidth,
-		clientHeight = oldH or 100,
+		clientHeight = oldH or 50,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -797,9 +704,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end },
 	}
 	
-	metalWarningPanel = GetWarningPanel(window, "3%", "52%", "53%", "15%", strings.metal_excess_warning)
-	energyWarningPanel = GetWarningPanel(window, "53%", "52%", "3%", "15%", strings.energy_stall_warning)
-	
 	window_main_display = Chili.Panel:New{
 		backgroundColor = {0, 0, 0, 0},
 		parent = window,
@@ -808,7 +712,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		y      = 0,
 		x      = 0,
 		right  = 0,
-		bottom = "50%",
+		bottom = 0,
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -825,8 +729,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// Panel configuration
 	local imageX      = "1%"
 	local imageY      = "10%"
-	local imageWidth  = "17%"
-	local imageHeight = "80%"
+	local imageWidth  = "80%"
+	local imageHeight = "17%"
 	
 	local storageX    = "18%"
 	local incomeX     = "44%"
@@ -868,8 +772,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_metal,
 		x      = imageX,
 		y      = imageY,
-		width  = imageWidth,
-		height = imageHeight,
+		height = imageWidth,
+		width  = imageHeight,
 		keepAspect = true,
 		file   = 'LuaUI/Images/ibeam.png',
 	}
@@ -1005,8 +909,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		parent = window_energy,
 		x      = imageX,
 		y      = imageY,
-		width  = imageWidth,
-		height = imageHeight,
+		height = imageWidth,
+		width  = imageHeight,
 		keepAspect = true,
 		file   = 'LuaUI/Images/energy.png',
 	}	

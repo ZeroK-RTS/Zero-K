@@ -1,24 +1,46 @@
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
+-- TODO: proper tooltips for queue buttons
 
 function widget:GetInfo()
-	return {
-		name      = "Chili Integral Menu",
-		desc      = "Integral Command Menu",
-		author    = "GoogleFrog",
-		date      = "8 Novemember 2016",
-		license   = "GNU GPL, v2 or later",
-		layer     = math.huge-10,
-		enabled   = true,
-		handler   = true,
-	}
+  return {
+    name      = "Chili Integral Menu",
+    desc      = "v0.369 Integral Command Menu",
+    author    = "Licho, KingRaptor, Google Frog",
+    date      = "12.10.2010", --21.August.2013
+    license   = "GNU GPL, v2 or later",
+    layer     = math.huge-1,
+    enabled   = true,
+    handler   = true,
+  }
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Configuration
-
 include("keysym.h.lua")
+--[[
+for i,v in pairs(KEYSYMS) do
+	Spring.Echo(i.."\t"..v)
+end
+--]]
+--[[
+HOW IT WORKS:
+	Main window (invisible) is parent of a fake window.
+		Tabs are buttons in main window, just above fake window.
+		Currently selected tab is highlighted, when tab is changed all tabs are removed and regenerated.
+		
+		Two parent Panels (children of fake window), a column for normal commands and a row for state commands.
+		<numRows> (or <numStateColumns>) StackPanels are nested in each of the parents, at right angles.
+		When sorting commands, it splits commands into batches of <MAX_COLUMNS> and assigns them to children
+			so if there are 10 commands, it puts 6 in first row and 4 in second row
+			Build orders work a little differently, they have a predefined row in the config.
+		Ditto for states, except it uses MAX_STATE_ROWS
+		
+		If unit tab is selected and third command row is free, build queue of first selected factory found in array returned by SelectionChanged is displayed.
+		The queue shows up to <MAX_COLUMNS> batches of units and their exact sequence.
+		
+	All items resize with main window.
+	
+NOTE FOR OTHER GAME DEVS:
+	ZK uses WG.GetBuildIconFrame to draw the unit type border around buildpics.
+	If you're not using them (likely), remove all lines containing that function.
+--]]
 
 -- Chili classes
 local Chili
@@ -36,125 +58,146 @@ local Control
 
 -- Chili instances
 local screen0
+local window		--main window (invisible)
+local fakewindow	--visible Panel
+local menuTabRow	--parent row of tabs
+local menuTabs = {}		--buttons
+local commands_main	--parent column of command buttons
+local fakeButtons = {}
+local sp_commands = {}	--buttons
+local states_main	--parent row of state buttons
+local sp_states = {}	--buttons
+local buildRow	--row of build queue buttons
+local buildRowButtons = {}	--contains arrays indexed by number 1 to MAX_COLUMNS, each of which contains three subobjects: button, label and image
+local buildProgress	--Progressbar, child of buildRowButtons[1].image; updates every gameframe
+local buildRow_dragDrop = {nil,nil,nil} --current buildqueue that is being dragged by user.
+local buildRow_visible = false
+local buildQueue = {}	--build order table of selectedFac
+local buildQueueUnsorted = {}	--puts all units of same type into single index; thus no sequence
 
-local MIN_HEIGHT = 80
-local MIN_WIDTH = 200
-local COMMAND_SECTION_WIDTH = 74 -- percent
-local STATE_SECTION_WIDTH = 24 -- percent
+local gridLocation = {}
 
-local SELECT_BUTTON_COLOR = {0.8, 0, 0, 1}
-local SELECT_BUTTON_FOCUS_COLOR = {0.8, 0, 0, 1}
+------------------------
+--  GRID KEY CONFIG
+------------------------
+------------------------
 
--- Defined upon learning the appropriate colors
-local BUTTON_COLOR
-local BUTTON_FOCUS_COLOR
+local gridMap = include("Configs/keyboard_layout.lua")["qwerty"]
 
-local NO_TEXT = ""
+local function GenerateGridKeyMap(grid)
+	local ret = {}
+	for i = 1, 3 do
+		for j = 1, 6 do
+			ret[KEYSYMS[grid[i][j]]] = {i, j}
+		end
+	end
+	return ret
+end
 
-local EPIC_NAME = "epic_chili_integral_menu_2_"
-local EPIC_NAME_UNITS = "epic_chili_integral_menu_2_tab_units"
-
-local _, _, buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial,_ , commandDisplayConfig, _, hiddenCommands, buildCmdUnits = include("Configs/integral_menu_commands.lua")
-
-local textConfig = {
-	bottomLeft = {
-		name = "bottomLeft",
-		x = "15%",
-		right = 0,
-		bottom = 2,
-		height = 12,
-		fontsize = 12,
-	},
-	topLeft = {
-		name = "topLeft",
-		x = "12%",
-		y = "11%",
-		fontsize = 12,
-	},
-	queue = {
-		name = "queue",
-		right = "18%",
-		bottom = "14%",
-		align = "right",
-		fontsize = 16,
-		height = 16,
-	},
-}
-
-local buttonLayoutConfig = {
-	command = {
-		image = {
-			x = "9%",
-			y = "9%",
-			right = "9%",
-			height = "82%",
-			keepAspect = true,
-		}
-	},
-	build = {
-		image = {
-			x = "5%",
-			y = "3%",
-			right = "5%",
-			bottom = 13,
-			keepAspect = false,
-		},
-		showCost = true
-	},
-	queue = {
-		image = {
-			x = "5%",
-			y = "5%",
-			right = "5%",
-			height = "90%",
-			keepAspect = false,
-		},
-		showCost = false,
-		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
-		dragAndDrop = true,
-	},
-	queueWithDots = {
-		image = {
-			x = "5%",
-			y = "5%",
-			right = "5%",
-			height = "90%",
-			keepAspect = false,
-		},
-		caption = "...",
-		showCost = false,
-		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
-		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
-		dragAndDrop = true,
-		dotDotOnOverflow = true,
-	}
-}
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Widget Options
-
+gridKeyMap = GenerateGridKeyMap(gridMap)
+------------------------
+--  CONFIG
+------------------------
+------------------------
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType','hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
+	'background_opacity', 'disablesmartselect', 'hidetabs', 'unitstabhotkey', 'unitshotkeyrequiremeta', 
+	'unitshotkeyaltaswell',  'hotkeysWithTabClick', 'keyboardType',
+	'tab_factory', 'tab_economy', 'tab_defence', 'tab_special','old_menu_at_shutdown','hide_when_spectating'
 }
-
 options = {
 	background_opacity = {
 		name = "Opacity",
 		type = "number",
 		value = 0.8, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			fakewindow.backgroundColor = {1,1,1,self.value}
+			fakewindow:Invalidate()
+		end,
+	},
+	disablesmartselect = {
+		name = 'Disable Smart Tab Select',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	hidetabs = {
+		name = 'Hide Tab Row',
+		type = 'bool',
+		advanced = true,
+		value = false,
+		noHotkey = true,
+	},
+	unitstabhotkey = {
+		name = 'Units tab hotkeys enabled',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	unitshotkeyrequiremeta = {
+		name = 'Units tab hotkeys require Meta',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	unitshotkeyaltaswell = {
+		name = 'Units tab can use Alt as Meta',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	hotkeysWithTabClick = {
+		name = 'Enable hotkeys on tab click',
+		type = 'bool',
+		desc = "Clicking on a tab button enables hotkeys for that tab.",
+		value = true,
+		noHotkey = true,
 	},
 	keyboardType = {
 		type='radioButton', 
 		name='Keyboard Layout',
 		items = {
-			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
-			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
-			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'QWERTY (standard)',key = 'qwerty', hotkey=nil},
+			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey=nil},
+			{name = 'AZERTY (France)', key = 'azerty', hotkey=nil},
 		},
 		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+		OnChange = function(self)
+			local layout = self.value
+			local layoutConfig = include("Configs/keyboard_layout.lua")
+			if layoutConfig[layout] then
+				gridMap = layoutConfig[layout]
+				gridKeyMap = GenerateGridKeyMap(gridMap)
+			end
+		end,
+	},
+	tab_factory = {
+		name = "Factory Tab",
+		desc = "Switches to factory tab, enables grid hotkeys",
+		type = 'button',
+	},
+	tab_economy = {
+		name = "Economy Tab",
+		desc = "Switches to economy tab, enables grid hotkeys",
+		type = 'button',
+	},
+	tab_defence = {
+		name = "Defence Tab",
+		desc = "Switches to defence tab, enables grid hotkeys",
+		type = 'button',
+	},
+	tab_special = {
+		name = "Special Tab",
+		desc = "Switches to special tab, enables grid hotkeys",
+		type = 'button',
+	},
+	old_menu_at_shutdown = {
+		name = 'Reenable Spring Menu at Shutdown',
+		desc = "Upon widget shutdown (manual or upon crash) reenable Spring's original command menu.",
+		type = 'bool',
+		advanced = true,
+		value = true,
 		noHotkey = true,
 	},
 	hide_when_spectating = {
@@ -163,1437 +206,1198 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
-	tab_economy = {
-		name = "Economy Tab",
-		desc = "Switches to economy tab.",
-		type = 'button',
-	},
-	tab_defence = {
-		name = "Defence Tab",
-		desc = "Switches to defence tab.",
-		type = 'button',
-	},
-	tab_special = {
-		name = "Special Tab",
-		desc = "Switches to special tab.",
-		type = 'button',
-	},
-	tab_factory = {
-		name = "Factory Tab",
-		desc = "Switches to factory tab.",
-		type = 'button',
-	},
-	tab_units = {
-		name = "Units Tab",
-		desc = "Switches to units tab.",
-		type = 'button',
-	},
 }
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Very Global Globals
 
-local buttonsByCommand = {}
+------------------------
+--speedups
+local spGetUnitDefID = Spring.GetUnitDefID
+local spGetUnitHealth     = Spring.GetUnitHealth
+local spGetFullBuildQueue = Spring.GetFullBuildQueue
+local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
+local spGetSelectedUnits = Spring.GetSelectedUnits
+local spGetUnitWeaponState 	= Spring.GetUnitWeaponState
+local spGetGameFrame 		= Spring.GetGameFrame
+local spGetUnitRulesParam	= Spring.GetUnitRulesParam
+local spGetSpectatingState = Spring.GetSpectatingState
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Utility
+local push        = table.insert
 
-local function GenerateGridKeyMap(name)
-	local gridMap = include("Configs/keyboard_layout.lua")[name]
-	local ret = {}
-	for i = 1, 3 do
-		for j = 1, 6 do
-			ret[KEYSYMS[gridMap[i][j]]] = {i, j}
+local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions, widgetSpaceHidden = include("Configs/integral_menu_commands.lua")
+
+local function CapCase(str)
+	local str = str:lower()
+	str = str:gsub( '_', ' ' )
+	str = str:sub(1,1):upper() .. str:sub(2)
+	
+	str = str:gsub( ' (.)', 
+		function(x) return (' ' .. x):upper(); end
+		)
+	return str
+end
+
+local function AddHotkeyOptions()
+	local options_order_tmp_cmd = {}
+	local options_order_tmp_cmd_instant = {}
+	local options_order_tmp_states = {}
+	for cmdname, number in pairs(custom_cmd_actions) do 
+			
+		local cmdnamel = cmdname:lower()
+		local cmdname_disp = CapCase(cmdname)
+		options[cmdnamel] = {
+			name = cmdname_disp,
+			type = 'button',
+			action = cmdnamel,
+			path = 'Game/Command Hotkeys',
+		}
+		if number == 2 then
+			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
+			--options[cmdnamel].isUnitStateCommand = true
+		elseif number == 3 then
+			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdnamel
+			--options[cmdnamel].isUnitInstantCommand = true
+		else
+			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
+			--options[cmdnamel].isUnitCommand = true
 		end
 	end
-	return ret, gridMap
+
+	options.lblcmd 		= { type='label', name='Targeted Commands', path = 'Game/Command Hotkeys',}
+	options.lblcmdinstant	= { type='label', name='Instant Commands', path = 'Game/Command Hotkeys',}
+	options.lblstate	= { type='label', name='State Commands', path = 'Game/Command Hotkeys',}
+	
+	
+	table.sort(options_order_tmp_cmd)
+	table.sort(options_order_tmp_cmd_instant)
+	table.sort(options_order_tmp_states)
+
+	options_order[#options_order+1] = 'lblcmd'
+	for i=1, #options_order_tmp_cmd do
+		options_order[#options_order+1] = options_order_tmp_cmd[i]
+	end
+	
+	options_order[#options_order+1] = 'lblcmdinstant'
+	for i=1, #options_order_tmp_cmd_instant do
+		options_order[#options_order+1] = options_order_tmp_cmd_instant[i]
+	end
+	
+	options_order[#options_order+1] = 'lblstate'
+	for i=1, #options_order_tmp_states do
+		options_order[#options_order+1] = options_order_tmp_states[i]
+	end
 end
 
-local function RemoveAction(cmd, types)
-	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+AddHotkeyOptions()
+
+
+local MAX_COLUMNS = 6
+local MAX_STATE_ROWS = 5
+local MIN_HEIGHT = 80
+local MIN_WIDTH = 200
+local COMMAND_SECTION_WIDTH = 74	-- percent
+local STATE_SECTION_WIDTH = 24	-- percent
+
+local numRows = 3
+local numStateColumns = 3
+
+local forceUpdateFrequency = 0.2	-- seconds
+
+local selectedFac	-- unitID
+local alreadyRemovedTag = {}
+
+local hotkeyMode = false
+local recentlyInitialized = false
+local wasPlaying = false
+
+-- DGun button progressbar, for listening to special-weapon reload progress
+--VFS.Include("LuaRules/Configs/customcmds.h.lua") --already included in "include("Configs/integral_menu_commands.lua")"
+local reverseCompat = (Game.version:find('91.0') == 1) and 1 or 0
+local turnOffReloadableWeaponChecks = false
+local reloadableButton = {
+	[CMD.MANUALFIRE] = {progress=0,status=nil},
+	[CMD_ONECLICK_WEAPON] = {progress=0,status=nil},
+	[CMD_JUMP] = {progress=0,status=nil},
+}
+
+-- arrays with commands to be displayed 
+local n_common = {}
+local n_factories = {}
+local n_econ = {}
+local n_defense = {}
+local n_special = {}
+local n_units = {}
+local n_states = {}
+
+--shortcuts
+local menuChoices = {
+	[1] = { array = n_common, name = "Order", hotkeyName = "Order" },
+	[2] = { array = n_factories, name = "Factory", hotkeyName = "Factory", config = factory_commands, actionName = "epic_chili_integral_menu_tab_factory" },
+	[3] = { array = n_econ, name = "Econ", hotkeyName = "Econ", config = econ_commands, actionName = "epic_chili_integral_menu_tab_economy" },
+	[4] = { array = n_defense, name = "Defense", hotkeyName = "Defense", config = defense_commands, actionName = "epic_chili_integral_menu_tab_defence" },
+	[5] = { array = n_special, name = "Special", hotkeyName = "Special", config = special_commands, actionName = "epic_chili_integral_menu_tab_special" },
+	[6] = { array = n_units, name = "Units", hotkeyName = "Units" },
+}
+
+local menuChoice = 1
+local lastBuildChoice = 2
+
+-- command id indexed field of items - each item is button, label and image 
+local commandButtons = {} 
+local spaceClicked = false
+----------------------------------- COMMAND COLORS  - from cmdcolors.txt - default coloring
+local cmdColors = {}
+
+-- default config
+local config = {
+}
+
+
+------------------------
+--  FUNCTIONS
+------------------------
+-- this gets invoked when button is clicked 
+local function ClickFunc(button, x, y, mouse)
+	local left, right = mouse == 1, mouse == 3
+	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local mb = (left and 1) or (right and 3)
+	if mb then
+		local index = Spring.GetCmdDescIndex(button.cmdid)
+		if index then
+			Spring.SetActiveCommand(index,mb,left,right,alt,ctrl,meta,shift)
+			if alt and button.isStructure and WG.Terraform_SetPlacingRectangle then
+				WG.Terraform_SetPlacingRectangle(-button.cmdid)
+			end
+		end
+	end
 end
 
-local function GetHotkeyText(actionName)
-	local hotkey = WG.crude.GetHotkey(actionName)
+------------------------
+--  Generates or updates chili button - either image or text or both based - container is parent of button, cmd is command desc structure
+------------------------
+local function MakeButton(container, cmd, insertItem, index)
+	if cmd.fake then
+		---- Fake button for padding purposes.
+		if fakeButtons[cmd.row] and fakeButtons[cmd.row][cmd.col] then
+			if insertItem then
+				container:AddChild(fakeButtons[cmd.row][cmd.col])
+			end
+		else
+			fakeButtons[cmd.row] = fakeButtons[cmd.row] or {}
+			fakeButtons[cmd.row][cmd.col] = Button:New{
+				parent=container;
+				caption="";
+				isDisabled = true;
+				backgroundColor = {0,0,0,0},
+				isStructure = true;
+				cmdid = "fake",
+				fake = true,
+				HitTest = function (self, x, y) return false end,	
+			}
+		end
+		return
+	end
+	
+	local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
+	local isBuild = (cmd.id < 0)
+	local isStructure = (cmd.id < 0) and menuChoice ~= 1 and menuChoice ~= 6 
+	local gridHotkeyed = not isState and menuChoice ~= 1 and menuChoice ~= 6 
+	local text
+	local texture
+	local countText = ''
+	local tooltip = cmd.tooltip
+
+	local te = overrides[cmd.id]  -- command overrides 
+	
+	-- text 
+	if te and te.text then 
+		text = te.text 
+	elseif isState then 
+		text = cmd.params[cmd.params[1]+2]
+	elseif isBuild then
+		text = ''
+	else 
+		text = cmd.name 
+	end
+	
+	local hotkey = cmd.action and WG.crude.GetHotkey(cmd.action) or ''
+	
+	if (options.unitstabhotkey.value and menuChoice == 6 and selectedFac and container.i_am_sp_commands) then
+		if options.unitshotkeyrequiremeta.value then
+			local alt,ctrl,meta,shift = Spring.GetModKeyState()
+			if meta or (alt and options.unitshotkeyaltaswell.value) then
+				hotkey = gridMap[container.index][index] or ''
+			end
+		else
+			hotkey = gridMap[container.index][index] or ''
+		end
+	end
+	if gridHotkeyed and hotkeyMode then
+		hotkey = gridMap[container.index][index] or ''
+	end
+	
+	if not isState and hotkey ~= '' then
+		text = '\255\0\255\0' .. hotkey
+	end
+	
+	--count label (for factory build options)
+	if menuChoice == 6 and isBuild and buildQueueUnsorted[-cmd.id] then
+		countText = tostring(buildQueueUnsorted[-cmd.id])
+	end
+	
+	--texture 
+	if te ~= nil and te.texture then 
+		if (isState) then 
+			texture = te.texture[cmd.params[1]+1]
+		else 
+			texture = te.texture
+		end 
+	elseif isBuild then
+		texture = '#'..-cmd.id
+	else
+		texture = cmd.texture
+	end 
+	
+	-- tooltip 
+	if te and te.tooltip then 
+		tooltip = te.tooltip
+	else 
+		tooltip = cmd.tooltip
+	end
+	if isBuild and selectedFac then
+		local ud = UnitDefs[-cmd.id]
+		tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"	-- for special options
+	end
+	
 	if hotkey ~= '' then
-		return '\255\0\255\0' .. hotkey
+		tooltip = tooltip .. ' (\255\0\255\0' .. hotkey .. '\008)'	
 	end
-	return nil
+	
+	-- get cached menu item 
+	local item = commandButtons[cmd.id]
+	if not item then  -- no item, create one 
+		if not insertItem then 
+			Spring.SendMessage("CommandBar - internal error, unexpectedly adding item!")
+		end 
+		-- decide color 
+--[[		local color = {1,1,1,1}
+		if te ~= nil and te.color ~= nil then 
+			color = te.color 
+		elseif cmd.name ~= nil then 
+			local nl = cmd.name:lower()
+			if cmdColors[nl] then 
+				color = cmdColors[nl]
+				color[4] = color[4] + 0.2
+			end 
+		end]]
+		
+		local button = Button:New {
+			parent=container;
+			caption="";
+			isDisabled = cmd.disabled;
+			tooltip = tooltip;
+			cmdid = cmd.id;
+			isStructure = isStructure;
+			OnClick = {function(self, x, y, mouse) ClickFunc(self, x, y, mouse) end}
+		}
+		if (isState) then 
+			button.padding = {2,3,2,2}
+--			button.backgroundColor = {0,0,0,0}
+		elseif (isBuild) then
+			button.padding = {1,1,1,1}
+		else
+			button.padding = {1,1,1,1}
+		end
+		
+		local label 
+		if (not cmd.onlyTexture and text and text ~= '') or gridHotkeyed or menuChoice == 6 then 
+			label = Label:New {
+				x = 3,
+				y = 3,
+				width="100%";
+				height="100%";
+				autosize=false;
+				align="left";
+				valign="top";
+				caption = text;
+				fontSize = 11;
+				fontShadow = true;
+				parent = button;
+			}
+		end
+		
+		if isBuild then
+			local costLabel = Label:New {
+				parent = button,
+				right = 0;
+				y = 2;
+				x = 3;
+				bottom = 3;
+				autosize=true; -- this (autosize=true) allow text to be truncated/cut off if button size is too small (prevent a wall-of-text on build icon if button is too small)
+				align="left";
+				valign="bottom";
+				caption = string.format("%d", UnitDefs[-cmd.id].metalCost);
+				fontSize = 11;
+				fontShadow = true;
+			}		
+		end
+		
+		local image
+		if (texture and texture ~= "") then
+			image = Image:New {
+				x = "5%",
+				y = "5%",
+				right = "5%",
+				height= (not isBuild) and nil or "90%",
+				bottom = (isBuild) and 11 or nil,
+--				color = color;
+				keepAspect = not isBuild,	--true,	--isState;
+				file = texture;
+				parent = button;
+			}
+			if isBuild then 
+				image.file2 = WG.GetBuildIconFrame(UnitDefs[-cmd.id]) 
+			end 
+			
+			if isState then 
+				height = "100%"
+				y = 0
+			end
+		else 
+			if label~=nil then label.valign="center" end
+		end 
+		
+		local countLabel
+		if isBuild then
+			countLabel = Label:New {
+				parent = image,
+				autosize=false;
+				width="100%";
+				height="100%";
+				align="right";
+				valign="bottom";
+				caption = countText;
+				fontSize = 16;
+				fontShadow = true;
+			}
+		end
+		
+
+		--if button is disabled, set effect accordingly
+		if button.isDisabled then 
+			button.backgroundColor = {0,0,0,1};
+			image.color = {0.3, 0.3, 0.3, 1}
+		end
+		
+		item = {
+			button = button,
+			image = image,
+			label = label,
+			countLabel = countLabel,
+		}
+		commandButtons[cmd.id] = item
+	else 
+		if insertItem then 
+			container:AddChild(item.button)
+		end 
+	end 
+	
+	-- update item if something changed
+	if (cmd.disabled ~= item.button.isDisabled) then 
+		if cmd.disabled then 
+			item.button.backgroundColor = {0,0,0,1};
+			item.image.color = {0.3, 0.3, 0.3, 1}
+		else 
+			item.button.backgroundColor = {1,1,1,0.7};
+			item.image.color = {1, 1, 1, 1}
+		end 
+		item.button:Invalidate()
+		item.image:Invalidate()
+		item.button.isDisabled = cmd.disabled
+	end 
+	
+	if (not cmd.onlyTexture and item.label and text ~= item.label.caption) then 
+		item.label:SetCaption(text)
+	end
+	
+	if (item.countLabel and countText ~= item.countLabel.caption) then
+		item.countLabel:SetCaption(countText)
+	end
+	
+	if (item.image and (texture ~= item.image.file or isState) ) then 
+		item.image.file = texture
+		item.image:Invalidate()
+	end
+	
+	if (item.button.tooltip and tooltip ~= item.button.tooltip) then
+		item.button.tooltip = tooltip
+	end
 end
 
-local function GetActionHotkey(actionName)
-	return WG.crude.GetHotkey(actionName)
-end
-
-local function TabListsAreIdentical(newTabList, tabList)
-	if (not tabList) or (not newTabList) then
-		return false
-	end
-	if #newTabList ~= #tabList then
-		return false
-	end
-	for i = 1, #newTabList do
-		if newTabList[i].name ~= tabList[i].name then
-			return false
+--sorts commands into categories
+local function ProcessCommand(cmd) 
+	if not cmd.hidden and not widgetSpaceHidden[cmd.id] then 
+		-- state icons 
+		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
+			n_states[#n_states+1] = cmd 
+		elseif common_commands[cmd.id] then 
+			n_common[#n_common+1] = cmd
+		elseif factory_commands[cmd.id] then
+			n_factories[#n_factories+1] = cmd
+		elseif econ_commands[cmd.id] then
+			n_econ[#n_econ+1] = cmd
+		elseif defense_commands[cmd.id] then
+			n_defense[#n_defense+1] = cmd
+		elseif special_commands[cmd.id] then
+			n_special[#n_special+1] = cmd
+		elseif cmd.id and UnitDefs[-(cmd.id)] then
+			n_units[#n_units+1] = cmd
+		else
+			n_common[#n_common+1] = cmd	--shove unclassified stuff in common
 		end
 	end
-	return true
+end 
+
+local function RemoveChildren(container) 
+	for i = 1, #container.children do 
+		container:RemoveChild(container.children[1])
+	end
+end 
+
+-- Compare chili container with required commands to see if an update is required.
+
+-- These two functions are split in two for a good reason. The function MakeButton
+-- is able to use cached buttons, it does this by setting the parent of a button
+-- for the desired command. If, for example, the new first row should contain a
+-- button that was on the old second row then the parent will be reassigned to 
+-- the first row before the second row had a chance to check whether it should update.
+-- This would cause subsequent rows to fail to update and thus be left with wide 
+-- or incorrect buttons.
+
+-- The solution is to check whether all the containers require updating before
+-- modifying any of the containers.
+local function SetContainerNeedUpdate(container, nl)
+	local cnt = 0 
+	local needUpdate = false 
+	local dif = {}
+	for i =1, #container.children do  
+		if container.children[i].isEmpty then 
+			break 
+		end 
+		cnt = cnt + 1 
+		dif[container.children[i].cmdid] = true 
+	end 
+	
+	if cnt ~= #nl then  -- different counts, we update fully
+		needUpdate = true 
+	else  -- check if some items are different 
+		for i=1, #nl do
+			dif[nl[i].id] = nil
+		end 
+	
+		for _, _ in pairs(dif) do  -- different item found, we do full update 
+			needUpdate = true 
+			break
+		end 
+	end
+	container.needUpdate = needUpdate
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Command Queue Editing Implementation
+local function UpdateContainer(container, nl, columns) 
+	if not columns then 
+		columns = MAX_COLUMNS 
+	end 
 
-local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePosition, inputMult, reinsertPosition)
-	if not commands then
-		return
+	if container.needUpdate then 
+		RemoveChildren(container) 
+		for i=1, #nl do 
+			MakeButton(container, nl[i], true, i)
+		end 
+		for i = 1, columns - #container.children do 
+			Control:New {
+				isEmpty = true,
+				parent = container
+			}
+		end 
+	else 
+		for i=1, #nl do 
+			MakeButton(container, nl[i], false, i)
+		end 
+	end 
+end 
+
+local function BuildRowButtonFunc(num, cmdid, left, right,addInput,insertMode,customUnitID)
+	local targetFactory = customUnitID or selectedFac
+	buildQueue = spGetFullBuildQueue(targetFactory)
+	num = num or (#buildQueue+1) -- insert build at "num" or at end of queue
+	local alt,ctrl,meta,shift = Spring.GetModKeyState()
+	local pos = 1
+	local numInput = 1	--number of times to send the order
+	
+	local function BooleanMult(int, bool)
+		if bool then return int
+		else return 0 end
 	end
 	
-	-- delete from back so that the order is not canceled while under construction
-	local i = queuePosition
-	local j = 0
-	while commands[i] and ((not inputMult) or j < inputMult) do
-		local thisCmdID = commands[i].id
-		if thisCmdID < 0 then
-			if thisCmdID ~= cmdID then
-				break
-			end
+	--CMD.OPT_META = 4
+	--CMD.OPT_RIGHT = 16
+	--CMD.OPT_SHIFT = 32
+	--CMD.OPT_CTRL = 64
+	--CMD.OPT_ALT = 128
 	
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i].tag}, {"ctrl"})
-			if reinsertPosition then
-				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
-			end
-			j = j + 1
-			i = i - 1
+	--it's not using the options, even though it's receiving them correctly
+	--so we have to do it manually
+	if shift then numInput = numInput * 5 end
+	if ctrl then numInput = numInput * 20 end
+	numInput = numInput + (addInput or 0) -- to insert specific amount without SHIFT or CTRL modifier
+	
+	--local options = BooleanMult(CMD.OPT_SHIFT, shift) + BooleanMult(CMD.OPT_ALT, alt) + BooleanMult(CMD.OPT_CTRL, ctrl) + BooleanMult(CMD.OPT_META, meta) + BooleanMult(CMD.OPT_RIGHT, right)
+	
+	--insertion position is by unit rather than batch, so we need to add up all the units in front of us to get the queue
+	
+	for i=1,num-1 do
+		for _,unitCount in pairs(buildQueue[i]) do
+			pos = pos + unitCount
 		end
 	end
-end
-
-local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
-	if not commands then
-		return
-	end
 	
-	-- Insert at the end of blocks which are after the move block
-	if insertBlock > moveBlock then
-		insertBlock = insertBlock + 1
-	end
-	
-	-- Delete moved commands from the end of the block so look for the start of the next block.
-	moveBlock = moveBlock + 1
-	
-	local movePos, insertPos
-	local lastBlockCmdID
-	local blockCount = 0
-	local lastPosition = 0
+	-- skip over the commands with an id of 0, left behind by removal
+	local commands = Spring.GetFactoryCommands(targetFactory)
 	local i = 1
-	local iterationEnd = #commands + 1
-	while i <= iterationEnd and ((not movePos) or (not insertPos)) do
-		local command = commands[i]
-		local cmdID = command and command.id
-		if (not cmdID) or cmdID < 0 then
-			if cmdID ~= lastBlockCmdID then
-				blockCount = blockCount + 1
-				if blockCount == moveBlock then
-					movePos = lastPosition
-				elseif blockCount == insertBlock then
-					insertPos = lastPosition
-					-- Prevent canceling construction of identical units
-					if cmdID == queueCmdID then
-						insertPos = insertPos + 1
-					end
-				end
-				lastBlockCmdID = cmdID
-			end
-			lastPosition = i
+	while i <= pos do
+		if not commands[i] then --end of queue reached
+			break
+		end
+		if commands[i].id == 0 then 
+			pos = pos + 1
 		end
 		i = i + 1
 	end
 	
-	if not insertPos then
-		insertPos = #commands 
-	end
-	
-	if not (movePos and insertPos) then
-		return
-	end
-	
-	MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, movePos, nil, insertPos)
-end
-
-local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
-	local commands = Spring.GetFactoryCommands(factoryUnitID)
-	if not commands then
-		return
-	end
-	
-	-- Find the end of the block
-	queueBlock = queueBlock + 1
-	
-	local queuePosition
-	local lastBlockCmdID
-	local blockCount = 0
-	local lastPosition = 0
-	local i = 1
-	local iterationEnd = #commands + 1
-	for i = 1, iterationEnd  do
-		local command = commands[i]
-		local cmdID = command and command.id
-		if (not cmdID) or cmdID < 0 then
-			if cmdID ~= lastBlockCmdID then
-				blockCount = blockCount + 1
-				if blockCount == queueBlock then
-					queuePosition = lastPosition
-					break
-				end
-				lastBlockCmdID = cmdID
-			end
-			lastPosition = i
+	pos = pos- (insertMode and 1 or 0) -- to insert before this index (possibly replace active nanoframe) or after this index (default)
+	--Spring.Echo(cmdid)
+	if not right then
+		for i = 1, numInput do
+			Spring.GiveOrderToUnit(targetFactory, CMD.INSERT, {pos, cmdid, 0 }, {"alt", "ctrl"})
 		end
-	end
-	
-	if not queuePosition then
-		return
-	end
-	
-	if alt then
-		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, false, 0)
-		return
-	end
-
-	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
-	if right then
-		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, inputMult)
-		return
-	end
-	
-	for i = 1, inputMult do
-		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
+	else
+		-- delete from back so that the order is not canceled while under construction
+		local i = 0
+		while commands[i+pos] and commands[i+pos].id == cmdid and not alreadyRemovedTag[commands[i+pos].tag] do
+			i = i + 1
+		end
+		i = i - 1
+		j = 0
+		while commands[i+pos] and commands[i+pos].id == cmdid and j < numInput do
+			Spring.GiveOrderToUnit(targetFactory, CMD.REMOVE, {commands[i+pos].tag}, {"ctrl"})
+			alreadyRemovedTag[commands[i+pos].tag] = true
+			j = j + 1
+			i = i - 1
+		end 
 	end
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
-	local left, right = mouse == 1, mouse == 3
-	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if factoryUnitID then
-		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
-		return
-	end
-	
-	local mb = (left and 1) or (right and 3)
-	if mb then
-		local index = Spring.GetCmdDescIndex(cmdID)
-		if index then
-			Spring.SetActiveCommand(index, mb, left, right, alt, ctrl, meta, shift)
-			if alt and isStructure and WG.Terraform_SetPlacingRectangle then
-				WG.Terraform_SetPlacingRectangle(-cmdID)
+local function UpdateFactoryBuildQueue() 
+	buildQueue = spGetFullBuildQueue(selectedFac)
+	buildQueueUnsorted = {}
+	if buildQueue then
+		for i=1, #buildQueue do
+			for udid, count in pairs(buildQueue[i]) do
+				buildQueueUnsorted[udid] = (buildQueueUnsorted[udid] or 0) + count
+				--Spring.Echo(udid .. "\t" .. buildQueueUnsorted[udid])
 			end
 		end
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Button Panel
+--uses its own function for more fine control
+local function ManageBuildRow()
+	--if (menuChoice ~= 6) or (not buildRow_visible) or (not selectedFac) then return end
+	local overrun = false
+	RemoveChildren(buildRow)
+	
+	if not buildQueue then
+		return
+	end
+	
+	if buildQueue[MAX_COLUMNS + 1] then 
+		overrun = true 
+	end
 
-local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
-	local cmdID
-	local usingGrid
-	local factoryUnitID
-	local queueCount
-	local isDisabled = false
-	local hotkeyText
-	
-	local function DoClick(_, _, _, mouse)
-		if isDisabled then
-			return
+	for i=1, MAX_COLUMNS do
+		local buttonArray = buildRowButtons[i]
+		if buttonArray.button then
+			RemoveChildren(buttonArray.button)
 		end
-		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, x)
-		if onClick then
-			onClick()
-		end
-	end
-	
-	local button = Button:New {
-		x = xStr,
-		y = yStr,
-		width = width,
-		height = height,
-		caption = buttonLayout.caption or "",
-		padding = {0, 0, 0, 0},
-		parent = parent,
-		OnClick = {DoClick}
-	}
-	
-	if buttonLayout.dragAndDrop then
-		button.OnMouseDown = { 
-			function(obj,_,_,mouse) --for drag_drop feature
-				if mouse == 1 then
-					local badX, badY = obj:CorrectlyImplementedLocalToScreen(obj.x, obj.y, true)
-					WG.DrawMouseBuild.SetMouseIcon(-cmdID, obj.width/2, queueCount - 1, badX, badY, obj.width, obj.height)
-				end
+		if buildQueue[i] then	--adds button for queued unit
+			local udid, count, caption
+			for id, num in pairs(buildQueue[i]) do
+				udid = id
+				count = num
+				break
 			end
-		}
-		button.OnMouseUp = {
-			function(obj, clickX, clickY, mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to obj
-				WG.DrawMouseBuild.ClearMouseIcon()
-				if not factoryUnitID then
-					return
-				end
-				if clickY < 0 or clickY > button.height or button.width == 0 then
-					return
-				end
-				local clickPosition = math.floor(clickX/button.width) + x
-				if clickPosition < 1 then
-					return
-				end
-				if factoryUnitID and x ~= clickPosition then
-					MoveCommandBlock(factoryUnitID, cmdID, x, clickPosition)
-				end
-			end
-		}
-	end
-	
-	if not BUTTON_COLOR then
-		BUTTON_COLOR = button.backgroundColor
-	end
-	if not BUTTON_FOCUS_COLOR then
-		BUTTON_FOCUS_COLOR = button.focusColor
-	end
-	
-	local image
-	local buildProgress
-	local textBoxes = {}
-	
-	local function SetImage(texture1, texture2)
-		if not image then
-			image = Image:New {
-				x = buttonLayout.image.x,
-				y = buttonLayout.image.y,
-				right = buttonLayout.image.right,
-				bottom = buttonLayout.image.bottom,
-				height = buttonLayout.image.height,
-				keepAspect = buttonLayout.image.keepAspect,
-				file = texture1,
-				file2 = texture2,
-				parent = button,
-			}
-			image:SendToBack()
-			return
-		end
-		
-		if image.file == texture1 and image.file2 == texture2 then
-			return
-		end
-		
-		if image.file == texture1 and image.file2 == texture2 then
-			return
-		end
-		image.file = texture1
-		image.file2 = texture2
-		image:Invalidate()
-	end
-	
-	local function SetText(textPosition, text)
-		if isDisabled then
-			text = false
-		end
-		if not textBoxes[textPosition] then
-			if not text then
-				return
-			end
-			local config = textConfig[textPosition]
-			textBoxes[textPosition] = Label:New {
-				x = config.x,
-				y = config.y,
-				right = config.right,
-				bottom = config.bottom,
-				height = config.height,
-				align = config.align,
-				fontsize = config.fontsize,
-				caption = text,
-				parent = button,
-			}
-			textBoxes[textPosition]:BringToFront()
-			return
-		end
-		
-		if text == textBoxes[textPosition].caption then
-			return
-		end
-		
-		textBoxes[textPosition]:SetCaption(text or NO_TEXT)
-		textBoxes[textPosition]:Invalidate()
-	end
-		
-	local externalFunctionsAndData = {
-		button = button,
-		DoClick = DoClick,
-		selectionIndex = selectionIndex,
-	}
-	
-	local function SetDisabled(newDisabled)
-		if newDisabled == isDisabled then
-			return
-		end
-		isDisabled = newDisabled
-		
-		if not image then
-			SetImage("")
-		end
-		if isDisabled then
-			button.backgroundColor = {0,0,0,1}
-			image.color = {0.3, 0.3, 0.3, 1}
-			externalFunctionsAndData.ClearGridHotkey()
-		else
-			button.backgroundColor = {1,1,1,0.7}
-			image.color = {1, 1, 1, 1}
-			if hotkeyText then
-				SetText(textConfig.topLeft.name, hotkeyText)
-			end
-		end
-			
-		button:Invalidate()
-		image:Invalidate()
-	end
-	
-	function externalFunctionsAndData.SetProgressBar(proportion)
-		if buildProgress then
-			buildProgress:SetValue(proportion or 0)
-			return
-		end
-		
-		if not image then
-			SetImage("")
-		end
-		
-		buildProgress = Progressbar:New{
-			x = "5%",
-			y = "5%",
-			right = "5%",
-			bottom = "5%",
-			value = proportion,
-			max = 1,
-			color   		= {0.7, 0.7, 0.4, 0.6},
-			backgroundColor = {1, 1, 1, 0.01},
-			parent = image,
-			skin = nil,
-			skinName = 'default',
-		}
-	end
-	
-	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
-		local key = gridMap[y] and gridMap[y][x]
-		if not key then
-			return
-		end
-		usingGrid = true
-		hotkeyText = '\255\0\255\0' .. key
-		SetText(textConfig.topLeft.name, hotkeyText)
-	end
-	
-	function externalFunctionsAndData.ClearGridHotkey()
-		SetText(textConfig.topLeft.name)
-	end
-	
-	local currentOverflow, onMouseOverFun
-	function externalFunctionsAndData.SetQueueCommandParameter(newFactoryUnitID, overflow)
-		factoryUnitID = newFactoryUnitID
-		if buttonLayout.dotDotOnOverflow then
-			currentOverflow = overflow 
-			if overflow then
-				button.tooltip = ""
-				for _,textBox in pairs(textBoxes) do
-					textBox:SetCaption(NO_TEXT)
-				end
-				SetImage()
+			buildRowButtons[i].cmdid = -udid
+			if overrun and i == MAX_COLUMNS then
+				caption = tostring(#buildQueue - MAX_COLUMNS + 1)
+			elseif count > 1 then caption = tostring(count)
+			else caption = '' end
+			buttonArray.button = Button:New{
+				parent = buildRow;
+				x = (i-1)*(100/MAX_COLUMNS).."%",
+				y = 0,
+				width = (100/MAX_COLUMNS).."%",
+				height = "100%",
+				caption = '', --remove "notext" behind button (which is visible if menu is downsized)
+				OnClick = {	function (self, x, y, mouse) 
+					local left, right = mouse == 1, mouse == 3
+					BuildRowButtonFunc(i, buildRowButtons[i].cmdid, left, right)
+					buildRow_dragDrop[1] = nil
+					end},
+				padding = {1,1,1,1},
+				--keepAspect = true,
 				
-				if not onMouseOverFun then
-					onMouseOverFun = function ()
-						if not currentOverflow then
-							return
-						end
-						local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
-						
-						local overflowString = ""
-						for i = x, #buildQueue do
-							for udid, count in pairs(buildQueue[i]) do
-								local name = UnitDefs[udid].humanName
-								overflowString = overflowString .. name .. " x" .. count .. ((i < #buildQueue and "\n") or "")
+				OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
+					if mouse == 1 then
+						buildRow_dragDrop[1] = i; 
+						buildRow_dragDrop[2] = -buildRowButtons[i].cmdid
+						buildRow_dragDrop[3] = count-1;
+						buildRow_dragDrop[4] = self.width/2
+					end
+					end},
+				OnMouseUp = { function(self,x,y,mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to self
+					local px,py = self:LocalToParent(x,y) --get coordinate with respect to parent
+					if mouse == 1 and (x>self.width or x<0) and px> 0 and px< buildRow.width and py> 0 and py< buildRow.height then
+						local prevIndex = buildRow_dragDrop[1]
+						local currentIndex = math.ceil(px/(buildRow.width/MAX_COLUMNS)) --estimate on which button mouse was released
+						if not buildQueue[currentIndex] then --drag_dropped to the end of queue
+							currentIndex = #buildQueue
+							if currentIndex == prevIndex then --drag_dropped from end of queue to end of queue
+								return
 							end
 						end
-						button.tooltip = overflowString
+						local countTransfer = buildRow_dragDrop[3]
+						if buildRow_dragDrop[1] > currentIndex then --select remove & adding sequence that reduce complication from network delay
+							BuildRowButtonFunc(prevIndex, buildRowButtons[prevIndex].cmdid, false, true,countTransfer) --remove queue on the right, first
+							BuildRowButtonFunc(currentIndex, buildRowButtons[prevIndex].cmdid, true, false,countTransfer,true) --then, add queue to the left
+						else
+							BuildRowButtonFunc(currentIndex+1, buildRowButtons[prevIndex].cmdid, true, false,countTransfer,true) --add queue to the right, first
+							BuildRowButtonFunc(prevIndex, buildRowButtons[prevIndex].cmdid, false, true,countTransfer) --then, remove queue on the left
+						end
+						buildRow_dragDrop[1] = nil
 					end
-					button.OnMouseOver[#button.OnMouseOver + 1] = onMouseOverFun
-				end
-			end
-		end
-	end
-	
-	function externalFunctionsAndData.SetSelection(isSelected)
-		if isSelected then
-			button.backgroundColor = SELECT_BUTTON_COLOR
-			button.focusColor = SELECT_BUTTON_FOCUS_COLOR
-			button:Invalidate()
-			return
-		end
-		
-		button.backgroundColor = BUTTON_COLOR
-		button.focusColor = BUTTON_FOCUS_COLOR
-		button:Invalidate()
-	end
-	
-	function externalFunctionsAndData.GetCommandID()
-		return cmdID
-	end
-	
-	function externalFunctionsAndData.SetBuildQueueCount(count)
-		if not (count or queueCount) then
-			return
-		end
-		queueCount = count
-		SetText(textConfig.queue.name, count)
-	end
-	
-	function externalFunctionsAndData.SetCommand(command, overrideCmdID, notGlobal)
-		-- If overrideCmdID is negative then command can be nil.
-		local newCmdID = overrideCmdID or command.id
-		if cmdID == newCmdID then
-			return
-		end
-		cmdID = newCmdID
-		if not notGlobal then
-			buttonsByCommand[cmdID] = externalFunctionsAndData
-		end
-		if buildProgress then
-			externalFunctionsAndData.SetProgressBar(0)
-		end
-		externalFunctionsAndData.SetSelection(false)
-		externalFunctionsAndData.SetBuildQueueCount(nil)
-		if command then
-			SetDisabled(command.disabled)
-		end
-		if cmdID < 0 then
-			local ud = UnitDefs[-cmdID]
-			if buttonLayout.tooltipOverride then
-				button.tooltip = buttonLayout.tooltipOverride
-			else
-				local tooltip = "Build Unit: " .. ud.humanName .. " - " .. ud.tooltip .. "\n"
-				button.tooltip = tooltip
-			end
-			SetImage("#" .. -cmdID, WG.GetBuildIconFrame(UnitDefs[-cmdID]))
-			if buttonLayout.showCost then
-				SetText(textConfig.bottomLeft.name, UnitDefs[-cmdID].metalCost)
-			end
-			return
-		end
-		
-		local displayConfig = commandDisplayConfig[cmdID]
-		local tooltip = (displayConfig and displayConfig.tooltip) or command.tooltip
-		
-		local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
-		
-		if command.action then
-			local hotkey = GetHotkeyText(command.action)
-			if tooltip and hotkey then
-				tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
-			end
-			if not (isStateCommand or usingGrid) then 
-				SetText(textConfig.topLeft.name, hotkey)
-			end
-		end
-		
-		button.tooltip = tooltip
-		
-		if isStateCommand then
-			local state = command.params[1] + 1
-			local texture = displayConfig.texture[state]
-			SetImage(texture)
-		else
-			local texture = (displayConfig and displayConfig.texture) or command.texture
-			SetImage(texture)
-		end
-	end
-
-	return externalFunctionsAndData
-end
-
-local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayout, generalIsStructure, onClick, buttonLayoutOverride)
-	local buttons = {}
-	local buttonList = {}
-	
-	local width = tostring(100/columns) .. "%"
-	local height = tostring(100/rows) .. "%"
-	
-	local gridMap
-	
-	local externalFunctions = {}
-	
-	function externalFunctions.ClearOldButtons(selectionIndex)
-		for i = 1, #buttonList do
-			local button = buttonList[i]
-			if button.selectionIndex ~= selectionIndex then
-				parent:RemoveChild(button.button)
-			end
-		end
-	end
-	
-	function externalFunctions.GetButton(x, y, selectionIndex)
-		if buttons[x] and buttons[x][y] then
-			if not buttons[x][y].button.parent then
-				if not selectionIndex then
-					return false
-				end
-				parent:AddChild(buttons[x][y].button)
-			end
-			if selectionIndex then
-				buttons[x][y].selectionIndex = selectionIndex
-			end
-			return buttons[x][y]
-		end
-		
-		if not selectionIndex then
-			return false
-		end
-		
-		buttons[x] = buttons[x] or {}
-		
-		local xStr = tostring((x - 1)*100/columns) .. "%"
-		local yStr = tostring((y - 1)*100/rows) .. "%"
-		
-		local buttonLayout, isStructure = generalButtonLayout, generalIsStructure
-		if buttonLayoutOverride and buttonLayoutOverride[x] and buttonLayoutOverride[x][y] then
-			buttonLayout = buttonLayoutOverride[x][y].buttonLayoutConfig
-			isStructure = buttonLayoutOverride[x][y].isStructure
-		end
-		
-		newButton = GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
-		
-		buttonList[#buttonList + 1] = newButton
-		if gridMap then
-			newButton.UpdateGridHotkey(gridMap)
-		end
-		
-		buttons[x][y] = newButton
-		
-		return newButton
-	end
-	
-	function externalFunctions.IndexToPosition(index)
-		if vertical then
-			local y = (index - 1)%rows + 1
-			local x = columns - (index - y)/rows
-			return x, y
-		else
-			local x = (index - 1)%columns + 1
-			local y = (index - x)/columns + 1
-			return x, y
-		end
-	end
-	
-	function externalFunctions.ApplyGridHotkeys(newGridMap)
-		gridMap = newGridMap
-		for i = 1, #buttonList do
-			buttonList[i].UpdateGridHotkey(gridMap)
-		end
-	end
-	
-	return externalFunctions
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Queue Panel
-
-local function GetQueuePanel(parent, columns)
-	local externalFunctions = {}
-	
-	local factoryUnitID
-	local factoryUnitDefID
-	
-	local buttonLayoutOverride = {
-		[columns] = {
-			[1] = {
-				buttonLayoutConfig = buttonLayoutConfig.queueWithDots,
-				isStructure = false,
+					end},
 			}
-		}
-	}
-	
-	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, onClick, buttonLayoutOverride)
-
-	function externalFunctions.ClearOldButtons(selectionIndex)
-		factoryUnitID = false
-		factoryUnitDefID = false
-		buttons.ClearOldButtons(selectionIndex)
-	end
-	
-	function externalFunctions.UpdateBuildProgress()
-		if not factoryUnitID then
-			return
-		end
-		local button = buttons.GetButton(1, 1)
-		if not button then
-			return
-		end
-		local unitBuildID = Spring.GetUnitIsBuilding(factoryUnitID)
-		if not unitBuildID then 
-			return
-		end
-		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
-		button.SetProgressBar(progress)
-	end
-	
-	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
-		local buttonCount = 0
-		
-		factoryUnitID = newFactoryUnitID 
-		factoryUnitDefID = newFactoryUnitDefID
-	
-		local buildQueue = Spring.GetRealBuildQueue(factoryUnitID)
-	
-		local buildDefIDCounts = {}
-		if buildQueue then
-			for i = 1, #buildQueue do
-				for udid, count in pairs(buildQueue[i]) do
-					if buttonCount <= columns then
-						buttonCount = buttonCount + 1
-						local x, y = buttons.IndexToPosition(buttonCount)
-						local button = buttons.GetButton(x, y, selectionIndex)
-						button.SetCommand(nil, -udid, true)
-						button.SetBuildQueueCount(count)
-						button.SetQueueCommandParameter(newFactoryUnitID, #buildQueue > columns)
-					end
-					buildDefIDCounts[udid] = (buildDefIDCounts[udid] or 0) + count
-				end
+			if overrun and i == MAX_COLUMNS then
+				buttonArray.button.caption = '...'
+				buttonArray.button.OnClick = nil
 			end
-		end
-		
-		externalFunctions.UpdateBuildProgress()
-		
-		for udid, count in pairs(buildDefIDCounts) do
-			local button = buttonsByCommand[-udid]
-			if button then
-				button.SetBuildQueueCount(count)
-			end
-		end
-	end
-	
-	return externalFunctions
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Tab Panel
-
-local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
-	
-	local function DoClick()
-		panel.SwitchToTab(name)
-		panel.SetHotkeysActive(loiterable)
-		if OnSelect then
-			OnSelect()
-		end
-	end
-	
-	local button = Button:New {
-		caption = humanName,
-		padding = {0, 0, 0, 0},
-		OnClick = {DoClick}
-	}
-	button.backgroundColor[4] = 0.4
-	
-	local hideHotkey = loiterable
-	
-	if hotkey and not hideHotkey then
-		button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
-		button:Invalidate()
-	end
-	
-	local externalFunctionsAndData = {
-		button = button,
-		name = name,
-		DoClick = DoClick,
-	}
-		
-	function externalFunctionsAndData.IsTabSelected()
-		return contentControl.visible
-	end
-	
-	function externalFunctionsAndData.IsTabPresent()
-		return button.parent and true or false
-	end
-	
-	function externalFunctionsAndData.SetHotkeyActive(isActive)
-		if (not hotkey) or hideHotkey then
-			return
-		end
-		if loiterable then
-			isActive = isActive and (not contentControl.visible)
-		end
-		
-		if isActive then
-			button:SetCaption(humanName .. " (\255\0\255\0" .. hotkey .. "\008)")
-		else
-			button:SetCaption(humanName .. " (" .. hotkey .. ")")
-		end
-		button:Invalidate()
-	end
-	
-	function externalFunctionsAndData.SetHideHotkey(newHidden)
-		if not loiterable then
-			return
-		end
-		hideHotkey = newHidden
-		if hideHotkey then
-			button:SetCaption(humanName)
-			button:Invalidate()
-		end
-	end
-	
-	function externalFunctionsAndData.SetSelected(isSelected)
-		contentControl:SetVisibility(isSelected)
-		if loiterable and not hideHotkey then
-			externalFunctionsAndData.SetHotkeyActive(not isSelected)
-		end
-		button.backgroundColor[4] = isSelected and 1 or 0.4
-		button:Invalidate()
-	end
-	
-	return externalFunctionsAndData
-end
-
-local function GetTabPanel(parent, rows, columns)
-	local tabHolder = StackPanel:New{
-		x = 0,
-		y = 0,
-		right = 0,
-		bottom = 0,
-		padding = {0, 0, 0, 0},
-		itemMargin  = {1, 1, 1, -1},	
-		parent = parent,
-		preserveChildrenOrder = true,
-		resizeItems = true,
-		orientation = "horizontal",
-	}
-	
-	local currentSelectedIndex
-	local hotkeysActive = true
-	local currentTab
-	local tabList = false
-	
-	local externalFunctions = {}
-	
-	function externalFunctions.SwitchToTab(name)
-		if not tabList then
-			return
-		end
-		currentTab = name
-		for i = 1, #tabList do
-			local data = tabList[i]
-			data.SetSelected(data.name == name)
-			if data.name == name then
-				currentSelectedIndex = i
-			end
-		end
-	end
-		
-	function externalFunctions.SetTabs(newTabList, showTabs, variableHide, tabToSelect)
-		if TabListsAreIdentical(newTabList, tabList) then
-			return
-		end
-		if currentSelectedIndex and tabList[currentSelectedIndex] then
-			tabList[currentSelectedIndex].SetSelected(false)
-		end
-		tabList = newTabList
-		tabHolder:ClearChildren()
-		for i = 1, #tabList do
-			if showTabs then
-				tabHolder:AddChild(tabList[i].button)
-				tabList[i].SetHideHotkey(variableHide)
-				tabList[i].SetHotkeyActive(hotkeysActive)
-			end
-			if tabList[i].name == tabToSelect then
-				tabList[i].DoClick()
-			end
-		end
-	end
-	
-	function externalFunctions.ClearTabs()
-		if tabList then
-			externalFunctions.SwitchToTab()
-			tabList = false
-			currentSelectedIndex = false
-			tabHolder:ClearChildren()
-		end
-	end
-	
-	function externalFunctions.SetHotkeysActive(newActive)
-		hotkeysActive = newActive
-		if not tabList then
-			return
-		end
-		for i = 1, #tabList do
-			local data = tabList[i]
-			data.SetHotkeyActive(hotkeysActive)
-		end
-	end
-	
-	function externalFunctions.GetCurrentTab()
-		return currentTab
-	end
-	
-	return externalFunctions
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Global Variables
-
-local specialButtonLayoutOverride = {}
-for i = 1, 5 do
-	specialButtonLayoutOverride[i] = {
-		[3] = {
-			buttonLayoutConfig = buttonLayoutConfig.command,
-			isStructure = false,
-		}
-	}
-end
-
-local commandPanels = {
-	{
-		humanName = "Orders",
-		name = "orders",
-		inclusionFunction = function(cmdID)
-			return cmdID >= 0 and not buildCmdSpecial[cmdID] -- Terraform
-		end,
-		loiterable = true,
-		buttonLayoutConfig = buttonLayoutConfig.command,
-	},
-	{
-		humanName = "Econ",
-		name = "economy",
-		inclusionFunction = function(cmdID)
-			local position = buildCmdEconomy[cmdID]
-			return position and true or false, position
-		end,
-		isBuild = true,
-		isStructure = true,
-		gridHotkeys = true,
-		returnOnClick = "orders",
-		optionName = "tab_economy",
-		buttonLayoutConfig = buttonLayoutConfig.build,
-	},
-	{
-		humanName = "Defence",
-		name = "defence",
-		inclusionFunction = function(cmdID)
-			local position = buildCmdDefence[cmdID]
-			return position and true or false, position
-		end,
-		isBuild = true,
-		isStructure = true,
-		gridHotkeys = true,
-		returnOnClick = "orders",
-		optionName = "tab_defence",
-		buttonLayoutConfig = buttonLayoutConfig.build,
-	},
-	{
-		humanName = "Special",
-		name = "special",
-		inclusionFunction = function(cmdID)
-			local position = buildCmdSpecial[cmdID]
-			return position and true or false, position
-		end,
-		isBuild = true,
-		isStructure = true,
-		notBuildRow = 3,
-		gridHotkeys = true,
-		returnOnClick = "orders",
-		optionName = "tab_special",
-		buttonLayoutConfig = buttonLayoutConfig.build,
-		buttonLayoutOverride = specialButtonLayoutOverride,
-	},
-	{
-		humanName = "Factory",
-		name = "factory",
-		inclusionFunction = function(cmdID)
-			local position = buildCmdFactory[cmdID]
-			return position and true or false, position
-		end,
-		isBuild = true,
-		isStructure = true,
-		gridHotkeys = true,
-		returnOnClick = "orders",
-		optionName = "tab_factory",
-		buttonLayoutConfig = buttonLayoutConfig.build,
-	},
-	{
-		humanName = "Units",
-		name = "units_mobile",
-		inclusionFunction = function(cmdID, factoryUnitDefID)
-			return not factoryUnitDefID -- Only called if previous funcs don't
-		end,
-		isBuild = true,
-		gridHotkeys = true,
-		returnOnClick = "orders",
-		optionName = "tab_units",
-		buttonLayoutConfig = buttonLayoutConfig.build,
-	},
-	{
-		humanName = "Units",
-		name = "units_factory",
-		inclusionFunction = function(cmdID, factoryUnitDefID)
-			if not factoryUnitDefID then
-				return false
-			end
-			local buildOptions = UnitDefs[factoryUnitDefID].buildOptions
-			for i = 1, #buildOptions do
-				if buildOptions[i] == -cmdID then
-					local position = buildCmdUnits[cmdID]
-					return position and true or false, position
-				end
-			end
-			return false
-		end,
-		loiterable = true,
-		factoryQueue = true,
-		isBuild = true,
-		hotkeyReplacement = "Orders",
-		gridHotkeys = true,
-		buttonLayoutConfig = buttonLayoutConfig.build,
-	},
-}
-
-local commandPanelMap = {}
-for i = 1, #commandPanels do
-	commandPanelMap[commandPanels[i].name] = commandPanels[i]
-end
-
-local statePanel = {}
-local tabPanel
-
-local selectionIndex = 0
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Command Handling
-
-local function GetSelectedFactory()	
-	local selection = Spring.GetSelectedUnits()
-	for i = 1, #selection do
-		local unitID = selection[i]
-		local defID = Spring.GetUnitDefID(unitID)
-		if defID and UnitDefs[defID].isFactory then
-			return unitID, defID
-		end
-	end
-	return false
-end
-
-local function ProcessCommand(command, factorySelected, selectionIndex)
-	if hiddenCommands[command.id] or command.hidden then
-		return
-	end
-
-	local isStateCommand = (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
-	if isStateCommand then
-		statePanel.commandCount = statePanel.commandCount + 1
-		
-		local x, y = statePanel.buttons.IndexToPosition(statePanel.commandCount)
-		local button = statePanel.buttons.GetButton(x, y, selectionIndex)
-		button.SetCommand(command)
-		return
-	end
-	
-	for i = 1, #commandPanels do
-		local data = commandPanels[i]
-		local found, position = data.inclusionFunction(command.id, factorySelected)
-		if found then
-			data.commandCount = data.commandCount + 1
+			buttonArray.button.backgroundColor[4] = 0.3
 			
-			local x, y
-			if position then
-				x, y = position.col, position.row
-			else
-				x, y = data.buttons.IndexToPosition(data.commandCount)
+			if not (overrun and i == MAX_COLUMNS) then
+				buttonArray.button.tooltip = "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"..
+					"\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue"
+				buttonArray.image = Image:New {
+					parent = buttonArray.button,
+					width="90%";
+					height="90%";
+					x="5%";
+					y="5%";
+					file = '#'..udid,
+					file2 = WG.GetBuildIconFrame(UnitDefs[udid]),
+					keepAspect = false,
+				}
+				buttonArray.label = Label:New {
+					parent = buttonArray.image,
+					width="100%";
+					height="100%";
+					autosize=false;
+					--x = "70%",
+					--y = "70%",
+					align="right";
+					valign="bottom";
+					--caption = caption;
+					fontSize = 16;
+					fontShadow = true;
+				}
+				buttonArray.label:SetCaption(caption)	-- do it here as workaround for vanishing text
 			end
 			
-			local button = data.buttons.GetButton(x, y, selectionIndex)
-			
-			button.SetCommand(command)
-			return
+			if i == 1 then
+				buttonArray.image:AddChild(buildProgress)
+				--Spring.Echo("Adding build progress bar")
+			end
 		end
 	end
 end
 
-local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitID, factoryUnitDefID = GetSelectedFactory()
+--these two functions place the items into their rows
+local function ManageStateIcons()
+	local stateCols = { }
+	for i=1, numStateColumns do
+		stateCols[i] = {}
+		for v=(MAX_STATE_ROWS * (i-1)) + 1, (MAX_STATE_ROWS*i) do
+			stateCols[i][v - MAX_STATE_ROWS*(i-1)] = n_states[v]
+		end
+	end
+	for i=1, numStateColumns do
+		SetContainerNeedUpdate(sp_states[i], stateCols[i])
+	end
+	for i=1, numStateColumns do
+		UpdateContainer(sp_states[i], stateCols[i], MAX_STATE_ROWS)
+	end
+end
 
-	selectionIndex = selectionIndex + 1
-	
-	for i = 1, #commandPanels do
-		local data = commandPanels[i]
-		data.commandCount = 0
+local function ManageCommandIcons(useRowSort)
+	local sourceArray = menuChoices[menuChoice].array
+	local configArray = menuChoices[menuChoice].config
+	--update factory data
+	if menuChoice == 6 and selectedFac then
+		UpdateFactoryBuildQueue()
 	end
-	
-	statePanel.commandCount = 0
-	
-	for i = 1, #commands do
-		ProcessCommand(commands[i], factoryUnitDefID, selectionIndex)
-	end
-	
-	for i = 1, #customCommands do
-		ProcessCommand(customCommands[i], factoryUnitDefID, selectionIndex)
-	end
-	
-	-- Call factory queue update here because the update will globally
-	-- set queue count for the top two rows of the factory tab. Therefore
-	-- the factory tab must have updated its commands.
-	if factoryUnitDefID then
-		for i = 1, #commandPanels do
-			local data = commandPanels[i]
-			if data.queue then
-				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+	local commandRows = { }
+	--most commands don't use row sorting; econ, defense and special do
+	if not useRowSort then
+		for i=1, numRows do
+			commandRows[i] = {}
+			for v=(MAX_COLUMNS * (i-1)) + 1, (MAX_COLUMNS*i) do
+				commandRows[i][v - MAX_COLUMNS*(i-1)] = sourceArray[v]
 			end
 		end
-	end
-	
-	local tabsToShow = {}
-	local lastTabSelected = tabPanel.GetCurrentTab()
-	local tabToSelect
-	
-	-- Switch to factory tab is a factory is newly selected.
-	if factoryUnitDefID then
-		local unitsFactoryTab = commandPanelMap.units_factory.tabButton
-		if not unitsFactoryTab.IsTabPresent() then
-			tabToSelect = "units_factory"
-		end
-	end
-	
-	-- Determine which tabs to display and which to select
-	for i = 1, #commandPanels do
-		local data = commandPanels[i]
-		if data.commandCount ~= 0 then
-			tabsToShow[#tabsToShow + 1] = data.tabButton
-			data.buttons.ClearOldButtons(selectionIndex)
-			if data.queue then
-				data.queue.ClearOldButtons(selectionIndex)
-			end
-			if (not tabToSelect) and data.tabButton.name == lastTabSelected then
-				tabToSelect = lastTabSelected
-			end
-		end
-	end
-	
-	statePanel.holder:SetVisibility(statePanel.commandCount ~= 0)
-	if statePanel.commandCount ~= 0 then
-		statePanel.buttons.ClearOldButtons(selectionIndex)
-	end
-	
-	if not tabToSelect then
-		tabToSelect = "orders"
-	end
-	
-	if #tabsToShow == 0 then
-		tabPanel.ClearTabs()
-		lastTabSelected = false
 	else
-		tabPanel.SetTabs(tabsToShow, #tabsToShow > 1, not factoryUnitDefID, tabToSelect)
-		lastTabSelected = tabToSelect
+		for i=1, numRows do
+			commandRows[i] = {}
+			for v=1,#sourceArray do
+				if configArray[sourceArray[v].id].row == i then
+					local extra = 0
+					while #commandRows[i] + 1 < configArray[sourceArray[v].id].col do
+						commandRows[i][#commandRows[i]+1] = {
+							fake = true, 
+							row = configArray[sourceArray[v].id].row, 
+							col = configArray[sourceArray[v].id].col + extra,
+							id = false
+						}
+						extra = extra + 1
+					end
+					commandRows[i][#commandRows[i]+1] = sourceArray[v]
+				end
+			end
+		end	
+	end
+	for i = 1, numRows do
+		SetContainerNeedUpdate(sp_commands[i], commandRows[i])
+	end
+	for i = 1, numRows do
+		UpdateContainer(sp_commands[i], commandRows[i], MAX_COLUMNS)
+	end
+	
+	--manage factory queue if needed
+	if menuChoice == 6 and selectedFac and #commandRows[numRows] == 0 then
+		if not buildRow_visible then
+			commands_main:AddChild(buildRow)
+			buildRow_visible = true
+		end
+		ManageBuildRow()
+	else
+		commands_main:RemoveChild(buildRow)
+		buildRow_visible = false
 	end
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Initialization
-
-local gridKeyMap, gridMap, contentHolder -- Configuration requires this
-
-local function InitializeControls()
-	-- Set the size for the default settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
-	local height = math.min(screenHeight/4.5, 200*width/450)
-
-	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
+local function Update(buttonpush) 
+	local commands = widgetHandler.commands
+	local customCommands = widgetHandler.customCommands
+	--most commands don't use row sorting; econ, defense and special do
+	local useRowSort = (menuChoice == 2 or menuChoice == 3 or menuChoice == 4 or menuChoice == 5)
 	
-	local mainWindow = Window:New{
-		name      = 'integralwindow2',
-		x         = 0, 
-		bottom    = 0,
-		width     = width,
-		height    = height,
-		minWidth  = MIN_WIDTH,
-		minHeight = MIN_HEIGHT,
-		dockable  = true,
-		draggable = false,
-		resizable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		padding = {0, 0, 0, 0},
-		color = {0, 0, 0, 0},
-		parent    = screen0,
-	}
-		
-	local tabHolder = Control:New{
-		x = "0%",
-		y = "0%",
-		width = "100%",
-		height = "15%",
-		padding = {2, 2, 2, 0},
-		parent = mainWindow,
-	}
-	
-	tabPanel = GetTabPanel(tabHolder)
-	
-	contentHolder = Panel:New{
-		x = 0,
-		y = "15%",
-		width = "100%",
-		height = "85%",
-		draggable = false,
-		resizable = false,
-		padding = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, options.background_opacity.value},
-		parent = mainWindow,
-	}
-	
-	local function ReturnToOrders()
-		commandPanelMap.orders.tabButton.DoClick()
+	if menuChoice == 1 then
+		hotkeyMode = false
 	end
 	
-	for i = 1, #commandPanels do
-		local data = commandPanels[i]
-		local commandHolder = Control:New{
-			x = "0%",
-			y = "0%",
-			width = COMMAND_SECTION_WIDTH .. "%",
-			height = "100%",
-			padding = {4, 4, 0, 4},
-			parent = contentHolder,
-		}
-		commandHolder:SetVisibility(false)
-		
-		local hotkey
-		if data.optionName then
-			hotkey = GetActionHotkey(EPIC_NAME .. data.optionName)
-		else
-			hotkey = GetActionHotkey(EPIC_NAME_UNITS)
-		end
-
-		if data.returnOnClick then
-			data.onClick = ReturnToOrders
-		end
-		
-		local OnTabSelect
-		
-		data.holder = commandHolder
-		if data.factoryQueue then
-			local buttonHolder = Control:New{
-				x = "0%",
-				y = "0%",
-				width = "100%",
-				height = "66.666%",
-				padding = {0, 0, 0, 0},
-				parent = commandHolder,
-			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
-			
-			local queueHolder = Control:New{
-				x = "0%",
-				y = "66.666%",
-				width = "100%",
-				height = "33.3333%",
-				padding = {0, 0, 0, 0},
-				parent = commandHolder,
-			}
-			data.queue = GetQueuePanel(queueHolder, 6)
-			
-			-- If many things need doing they must be put in a function
-			-- but this works for now.
-			OnTabSelect = data.queue.UpdateBuildProgress
-		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
-		end
-		
-		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
+	--if (#commands + #customCommands == 0) then 
+		---screen0:RemoveChild(window);
+		--window_visible = false;
+	--	return
+	--else 
+		--if not window_visible then 
+			--screen0:AddChild(window);
+			--window_visible = true;
+		--end 
+	--end 
 	
-		if data.gridHotkeys then
-			data.buttons.ApplyGridHotkeys(gridMap)
-		end
+	n_common = {}
+	n_factories = {}
+	n_econ = {}
+	n_defense = {}
+	n_special = {}
+	n_units = {}
+	n_states = {}
+	
+	--Spring.Echo(#commands)
+	for i = 1, #commands do ProcessCommand(commands[i]) end 
+	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
+	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
+	
+	menuChoices[1].array = n_common
+	menuChoices[2].array = n_factories
+	menuChoices[3].array = n_econ
+	menuChoices[4].array = n_defense
+	menuChoices[5].array = n_special
+	menuChoices[6].array = n_units
+	
+	--[[
+	local function Sort(a, b, array)
+		return array[a.id] < array[b.id]
 	end
 	
-	statePanel.holder = Control:New{
-		x = (100 - STATE_SECTION_WIDTH) .. "%",
-		y = "0%",
-		width = STATE_SECTION_WIDTH .. "%",
+	table.sort(n_factories, Sort(a,b, factory_commands))
+	table.sort(n_econ, Sort(a,b, econ_commands))
+	table.sort(n_defense, Sort(a,b, defense_commands))
+	]]--
+	
+	--sorting isn't strictly needed, it uses the same order as listed in buildoptions
+	table.sort(n_factories, function(a,b) return factory_commands[a.id].order < factory_commands[b.id].order end )
+	table.sort(n_econ, function(a,b) return econ_commands[a.id].order < econ_commands[b.id].order end)
+	table.sort(n_defense, function(a,b) return defense_commands[a.id].order < defense_commands[b.id].order end)
+	table.sort(n_special, function(a,b) return special_commands[a.id].order < special_commands[b.id].order end)
+
+	ManageStateIcons()
+	ManageCommandIcons(useRowSort)
+end 
+
+local function MakeMenuTab(i, alpha)
+	local button = Button:New{
+		parent = menuTabRow;
+		y = 0,
 		height = "100%",
-		padding = {0, 4, 3, 4},
-		parent = contentHolder,
+--		font = {
+--			shadow = true
+--		},
+		
+		caption = hotkeyMode and menuChoices[i].name or menuChoices[i].hotkeyName,
+		OnClick = {
+			function()
+				hotkeyMode = options.hotkeysWithTabClick.value
+				menuChoice = i
+				if i >= 2 and i <= 5 then 
+					lastBuildChoice = i 
+				end
+				Update(true)
+				ColorTabs(i)
+			end
+		},
 	}
-	statePanel.holder:SetVisibility(false)
-	
-	statePanel.buttons = GetButtonPanel(statePanel.holder, 5, 3, true, buttonLayoutConfig.command)
+	button.backgroundColor[4] = alpha or 1
+	return button
 end
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Epic Menu Configuration and Hotkey Functions
-
-function options.keyboardType.OnChange(self)
-	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
-	for i = 1, #commandPanels do
-		local data = commandPanels[i]
-		if data.gridHotkeys then
-			data.buttons.ApplyGridHotkeys(gridMap)
+--need to recreate the tabs completely because chili is dumb
+--also needs to be non-local so MakeMenuTab can call it
+local tabVisibility = {}
+function ColorTabs(arg, visiblity)
+	arg = arg or menuChoice
+	tabVisibility = visiblity or tabVisibility
+	RemoveChildren(menuTabRow)
+	for i = 1, 6 do
+		if tabVisibility[i] then
+			if i == arg then
+				menuTabs[arg] = MakeMenuTab(arg, 1)
+			else
+				menuTabs[i] = MakeMenuTab(i, 0.4)
+			end
 		end
 	end
 end
 
-function options.background_opacity.OnChange(self)
-	contentHolder.backgroundColor[4] = self.value
-	contentHolder:Invalidate()
-end
+local selectNoTabs = {}
+local selectAllTabs = {true, true, true, true, true, true}
+local selectFactoryTabs = {true, false, false, false, false, true}
 
-function options.hide_when_spectating.OnChange(self)
-	local isSpec = Spring.GetSpectatingState()
-	contentHolder:SetVisibility(not (self.value and isSpec))
-end
-
-function options.tab_economy.OnChange()
-	local tab = commandPanelMap.economy.tabButton
-	if tab.IsTabPresent() then
-		tab.DoClick()
+local function SmartTabSelect()
+	Update()
+	if options.hidetabs.value then
+		menuChoice = 1
+		ColorTabs(1, selectNoTabs)
+	elseif options.disablesmartselect.value then 
+		return
+	elseif #n_units > 0 and #n_econ == 0 then
+		menuChoice = 6	--selected factory, jump to units
+		ColorTabs(6, selectFactoryTabs)
+	elseif #n_econ > 0 then
+		if menuChoice == 6 then
+			menuChoice = lastBuildChoice	--selected non-fac and in units menu, jump to last build menu
+		end
+		ColorTabs(menuChoice, selectAllTabs)
+	elseif #n_factories + #n_econ + #n_defense + #n_units == 0 then
+		menuChoice = 1	--selected non-builder, jump to common
+		ColorTabs(1, selectNoTabs)
 	end
+end
+
+local function CopyTable(outtable,intable)
+  for i,v in pairs(intable) do 
+    if (type(v)=='table') then
+      if (type(outtable[i])~='table') then outtable[i] = {} end
+      CopyTable(outtable[i],v)
+    else
+      outtable[i] = v
+    end
+  end
+end
+
+-- force update every 0.2 seconds
+--[[
+local timer = 0
+function widget:Update(dt)
+	timer = timer + dt
+	if timer >= forceUpdateFrequency then
+		Update()
+		timer = 0
+	end
+end
+]]--
+-- layout handler - its needed for custom commands to work and to delete normal spring menu
+local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
+	widgetHandler.commands   = commands
+	widgetHandler.commands.n = cmdCount
+	widgetHandler:CommandsChanged()
+	local reParamsCmds = {}
+	local customCmds = {}
+	
+	local cnt = 0
+	
+	local AddCommand = function(command) 
+		local cc = {}
+		CopyTable(cc,command )
+		cnt = cnt + 1
+		cc.cmdDescID = cmdCount+cnt
+		if (cc.params) then
+			if (not cc.actions) then --// workaround for params
+				local params = cc.params
+				for i=1,#params+1 do
+					params[i-1] = params[i]
+				end
+				cc.actions = params
+			end
+			reParamsCmds[cc.cmdDescID] = cc.params
+		end
+		--// remove api keys (custom keys are prohibited in the engine handler)
+		cc.pos       = nil
+		cc.cmdDescID = nil
+		cc.params    = nil
+		
+		customCmds[#customCmds+1] = cc
+	end 
+	
+	
+	--// preprocess the Custom Commands
+	for i=1,#widgetHandler.customCommands do
+		AddCommand(widgetHandler.customCommands[i])
+	end
+	
+	for i=1,#globalCommands do
+		AddCommand(globalCommands[i])
+	end
+
+	Update()
+	if (cmdCount <= 0) then
+		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units  (copied from ca_layout.lua)
+	end
+	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
+end 
+
+local function ScrollTabRight()
+	menuChoice = menuChoice + 1
+	if menuChoice > #menuChoices then menuChoice = 1 end
+	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
+	Update(true)
+	ColorTabs()
+end
+
+local function ScrollTabLeft()
+	menuChoice = menuChoice - 1
+	if menuChoice < 1 then menuChoice = #menuChoices end
+	if menuChoice >= 2 and menuChoice <= 5 then lastBuildChoice = menuChoice end
+	Update(true)
+	ColorTabs()
+end
+
+--------------------------------------
+-- Hotkey Mode
+
+function widget:KeyPress(key, modifier, isRepeat)
+	if (hotkeyMode) and not isRepeat then 
+		local pos = gridKeyMap[key]
+		if pos and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
+			local cmdid = sp_commands[pos[1]].children[pos[2]]
+			if cmdid and not cmdid.fake then
+				cmdid = cmdid.cmdid
+				if cmdid then 
+					local index = Spring.GetCmdDescIndex(cmdid)
+					if index then
+						Spring.SetActiveCommand(index,1,true,false,false,false,false,false)
+					end
+				end
+			end
+		end
+		menuChoice = 1 -- auto-return to orders to make it clear hotkey time is over
+		Update(true)
+		ColorTabs()
+		return (pos and true) or false 
+	elseif menuChoice == 6 and options.unitstabhotkey.value and selectedFac then
+		local pos = gridKeyMap[key]
+		if pos and pos[1] ~= 3 and sp_commands[pos[1]] and sp_commands[pos[1]].children[pos[2]] then
+			local cmdid = sp_commands[pos[1]].children[pos[2]]
+			if cmdid and not cmdid.fake then
+				cmdid = cmdid.cmdid
+				if cmdid then 
+					local index = Spring.GetCmdDescIndex(cmdid)
+					if index then
+						local alt,ctrl,meta,shift = Spring.GetModKeyState()
+						if (meta or (alt and options.unitshotkeyaltaswell.value) or not options.unitshotkeyrequiremeta.value) and not ctrl then
+							local opts = 0
+							if alt then
+								opts = opts + CMD.OPT_ALT
+							end
+							if shift then
+								opts = opts + CMD.OPT_SHIFT
+							end
+							Spring.GiveOrderToUnit(selectedFac, cmdid, {0}, opts)
+							if WG.sounds_gaveOrderToUnit then
+								WG.sounds_gaveOrderToUnit(selectedFac, true)
+							end
+							-- does not work with meta held
+							--Spring.SetActiveCommand(index,1,true,false,alt,false,false,shift)
+							return true
+						end
+					end
+				end
+			end
+		end
+	end
+
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value  and options.unitstabhotkey.value then
+		Update(true)
+	end
+end
+
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.SPACE or ((key == KEYSYMS.RALT or key == KEYSYMS.LALT) and options.unitshotkeyaltaswell.value)) and selectedFac and menuChoice == 6 and options.unitshotkeyrequiremeta.value and options.unitstabhotkey.value then
+		Update(true)
+	end
+end
+
+	--Spring.Echo(CMD.OPT_META) = 4
+	--Spring.Echo(CMD.OPT_RIGHT) = 16
+	--Spring.Echo(CMD.OPT_SHIFT) = 32
+	--Spring.Echo(CMD.OPT_CTRL) = 64
+	--Spring.Echo(CMD.OPT_ALT) = 128
+
+local function HotkeyTabFactory()
+	menuChoice = 2
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
+end
+
+local function HotkeyTabEconomy()
+	menuChoice = 3
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
 end
 
 local function HotkeyTabDefence()
-	local tab = commandPanelMap.defence.tabButton
-	if tab.IsTabPresent() then
-		tab.DoClick()
-	end
+	menuChoice = 4
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
 end
 
 local function HotkeyTabSpecial()
-	local tab = commandPanelMap.special.tabButton
-	if tab.IsTabPresent() then
-		tab.DoClick()
-	end
+	menuChoice = 5
+	hotkeyMode = true
+	Update(true)
+	ColorTabs()
 end
 
-local function HotkeyTabFactory()
-	local tab = commandPanelMap.factory.tabButton
-	if tab.IsTabPresent() then
-		tab.DoClick()
-	end
-end
-
-local function HotkeyTabUnits()
-	local tab = commandPanelMap.units_mobile.tabButton
-	if tab.IsTabPresent() then
-		tab.DoClick()
-		return
-	end
-	local unitsFactoryTab = commandPanelMap.units_factory.tabButton
-	if not unitsFactoryTab.IsTabPresent() then
-		return
-	end
-	if unitsFactoryTab.IsTabSelected() then
-		commandPanelMap.orders.tabButton.DoClick()
-	else
-		unitsFactoryTab.DoClick()
-	end
-end
-
+options.tab_factory.OnChange = HotkeyTabFactory
+options.tab_economy.OnChange = HotkeyTabEconomy
 options.tab_defence.OnChange = HotkeyTabDefence
 options.tab_special.OnChange = HotkeyTabSpecial
-options.tab_factory.OnChange = HotkeyTabFactory
-options.tab_units.OnChange   = HotkeyTabUnits
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Widget Interface
+local function AddAction(cmd, func, data, types)
+	return widgetHandler.actionHandler:AddAction(widget, cmd, func, data, types)
+end
+local function RemoveAction(cmd, types)
+	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
+end
 
-local initialized = false
-
-local lastCmdID
-function widget:Update()
-	local _,cmdID = Spring.GetActiveCommand()
-	if cmdID ~= lastCmdID then
-		if lastCmdID and buttonsByCommand[lastCmdID] then
-			buttonsByCommand[lastCmdID].SetSelection(false)
-		end
-		if buttonsByCommand[cmdID] then
-			buttonsByCommand[cmdID].SetSelection(true)
-		end
-		
-		lastCmdID = cmdID
+--this function add hotkey text to each tab name
+local function updateTabName(num, choice)
+	local hotkey = WG.crude.GetHotkey(choice.actionName)
+	if hotkey ~= '' then
+		choice.hotkeyName = choice.name ..  '(\255\0\255\0' .. hotkey .. '\008)'	
+		choice.name = choice.name ..  '(' .. hotkey .. ')'
 	end
 end
 
-function widget:KeyPress(key, modifier, isRepeat)
-	if isRepeat then
-		return false
+--get reload status for selected weapon
+local function IsWeaponManualFire(unitID, weapNum)
+	local unitDefID = spGetUnitDefID(unitID)
+	local unitDef = UnitDefs[unitDefID]
+	local weaponNoX = (unitDef and unitDef.weapons and unitDef.weapons[weapNum])
+	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
+		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
+		return true,reloadTime
 	end
-	
-	local currentTab = tabPanel.GetCurrentTab()
-	local commandPanel = currentTab and commandPanelMap[currentTab]
-	if (not commandPanel) or (not commandPanel.gridHotkeys) then
-		return false
-	end
-	
-	local pos = gridKeyMap[key]
-	if pos then
-		local x, y = pos[2], pos[1]
-		local button = commandPanel.buttons.GetButton(x, y)
-		if button then
-			button.DoClick()
-			return true
-		end
-	end
-
-	if commandPanel.onClick then
-		commandPanel.onClick()
-		return true
-	end
-	return false
+	return nil --Note: this mean unit doesn't have weapon number 'weapNum'
 end
 
-function widget:PlayerChanged(playerID)
-	if options.hide_when_spectating.value then
-		local isSpec = Spring.GetSpectatingState()
-		contentHolder:SetVisibility(not isSpec)
-	end
-end
-
-function widget:CommandsChanged()
-	if not initialized then
-		return
-	end
-
-	local commands = widgetHandler.commands
-	local customCommands = widgetHandler.customCommands
-	ProcessAllCommands(commands, customCommands)
-end
-
-function widget:GameFrame(n)
-	if n%6 == 0 then
-		local unitsFactoryPanel = commandPanelMap.units_factory
-		if unitsFactoryPanel and unitsFactoryPanel.tabButton.IsTabSelected() then
-			unitsFactoryPanel.queue.UpdateBuildProgress()
-		end
-	end
-end
-
+-- INITS 
 function widget:Initialize()
-	RemoveAction("nextmenu")
-	RemoveAction("prevmenu")
-	initialized = true
+	widgetHandler:ConfigLayoutHandler(LayoutHandler)
+	Spring.ForceLayoutUpdate()
 	
+	recentlyInitialized = true
+	wasPlaying = not spGetSpectatingState()
+	
+	RemoveAction("nextmenu")
+	RemoveAction("prevmenu")	
+	AddAction("nextmenu", ScrollTabRight, nil, "p")
+	AddAction("prevmenu", ScrollTabLeft, nil, "p")
+	
+	--[[local f,it,isFile = nil,nil,false
+	f  = io.open('cmdcolors.txt','r')
+	if f then
+		it = f:lines()
+		isFile = true
+	else
+		f  = VFS.LoadFile('cmdcolors.txt')
+		it = string.gmatch(f, "%a+.-\n")
+	end
+ 
+	local wp = '%s*([^%s]+)'           -- word pattern
+	local cp = '^'..wp..wp..wp..wp..wp -- color pattern
+	local sp = '^'..wp..wp             -- single value pattern like queuedLineWidth
+ 
+	for line in it do
+		local _, _, n, r, g, b, a = string.find(line, cp)
+ 
+		r = tonumber(r or 1.0)
+		g = tonumber(g or 1.0)
+		b = tonumber(b or 1.0)
+		a = tonumber(a or 1.0)
+ 
+		if n then
+			cmdColors[n]= { r, g,b,a}
+		else
+			_, _, n, r= string.find(line:lower(), sp)
+			if n then
+				cmdColors[n]= r
+			end
+		end
+	end]]--
+	
+	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
 	Label = Chili.Label
@@ -1608,5 +1412,412 @@ function widget:Initialize()
 	Control = Chili.Control
 	screen0 = Chili.Screen0
 	
-	InitializeControls()
+	-- Set the size for the default settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
+	local height = math.min(screenHeight/4.5, 200*width/450)
+	
+	--create main Chili elements
+	window = Window:New{
+		parent = screen0,
+		name   = 'integralwindow';
+		color = {0, 0, 0, 0},
+		width = width,
+		height = height,
+		x = 0, 
+		bottom = 0,
+		dockable = true;
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		minWidth = MIN_WIDTH,
+		minHeight = MIN_HEIGHT,
+		padding = {0, 0, 0, 0},
+		--itemMargin  = {0, 0, 0, 0},
+	}
+	
+	fakewindow = Panel:New{
+		parent = window,
+		x = 0,
+		y = '15%',
+		width = "100%";
+		height = "86%";
+		--disableChildrenHitTest = false,
+		--itemMargin  = {0, 0, 0, 0},
+		dockable = false;
+		draggable = false,
+		resizable = false,
+		padding = {0, 0, 0, 0},
+		backgroundColor = {1, 1, 1, options.background_opacity.value},
+--		skinName  = "DarkGlass",
+	}
+
+	menuTabRow = StackPanel:New{
+		name = "Integral menuTabRow",
+		parent = window,
+		resizeItems = true;
+		columns = 6;
+		orientation = "horizontal";
+		height = "15%";
+		x = 0,
+		y = 0,
+		right = 0,
+		padding = {0, 0, 0, 0},
+		itemMargin  = {1, 1, 1, -1},
+		OnMouseDown={ function(self) 
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return false
+		end },		
+	}
+	
+	for i=1,6 do
+		menuTabs[i] = MakeMenuTab(i, 1)
+	end
+	ColorTabs()
+	
+	commands_main = Panel:New{
+		parent = fakewindow,
+		backgroundColor = {0, 0, 0, 0},
+		height = "100%";
+		width = COMMAND_SECTION_WIDTH.."%";
+		x = "0%";
+		y = "0%";
+		padding = {2, 2, 0, 2},
+		itemMargin  = {0, 0, 0, 0},
+		noSelfHitTest = true,
+		NCHitTest = function(self,x,y)
+			if not spaceClicked and x> self.x and y>self.y and x<self.x+self.width and y<self.y+self.height then
+				if select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState()) then -- meta and mouse down
+					spaceClicked = true
+					WG.crude.OpenPath('Game/Commands')  -- click+ space on panel beside command button will open command-hotkey-binder
+					WG.crude.ShowMenu() --make epic Chili menu appear.
+				end
+			end
+			if spaceClicked and not (select(3,Spring.GetMouseState()) and select(3,Spring.GetModKeyState())) then --not meta, not mouse down
+				spaceClicked = false
+			end
+			return false
+		end,	
+	}
+	for i = 1, numRows do
+		sp_commands[i] = StackPanel:New{
+			name = "sp_commands " .. i,
+			parent = commands_main,
+			resizeItems = true;
+			orientation   = "horizontal";
+			height = math.floor(100/numRows).."%";
+			width = "100%";
+			x = "0%";
+			y = math.floor(100/numRows)*(i-1).."%";
+			padding = {0, 0, 0, 0},
+			itemMargin  = {1, 1, 0, 0},
+			index = i,
+			i_am_sp_commands = true,
+		}
+		--Spring.Echo("Command row "..i.." created")
+	end
+	
+	states_main = Panel:New{
+		parent = fakewindow,
+		backgroundColor = {0, 0, 0, 0},
+		height = "100%";
+		width = (STATE_SECTION_WIDTH).."%";
+		--x = tostring(100-STATE_SECTION_WIDTH).."%";
+		right = 0;
+		y = "0%";
+		padding = {0, 2, 2, 2},
+		itemMargin  = {0, 0, 0, 0},
+		OnMouseDown={ function(self) --// click+ space on any unit-State button will open Unit-AI menu,
+			local _,_, meta,_ = Spring.GetModKeyState()
+			if not meta then return false end --allow button to continue its function
+			WG.crude.OpenPath('Game/Unit AI')
+			WG.crude.ShowMenu() --make epic Chili menu appear.
+			return true --stop the button's function, else unit-state button will look bugged. 
+		end },			
+	}
+	for i = 1, numStateColumns do
+		sp_states[i] = StackPanel:New {
+			name = "sp_states " .. i,
+			parent = states_main,
+			resizeItems = true;
+			orientation   = "vertical";
+			height = "100%";
+			width = math.floor(100/numStateColumns).."%";
+			x = (100 - (math.ceil(100/numStateColumns))*i).."%";
+			y = "0%";
+			padding = {0, 0, 0, 0},
+			itemMargin  = {1, 1, 0, 0},		
+		}
+	end
+	
+	buildRow = Panel:New{
+		parent = commands_main,
+		orientation   = "horizontal";
+		height = (math.floor(100/numRows)).."%";
+		width = "100%";
+		x = "0%";
+		y = (math.floor(100/numRows))*(numRows-1).."%";
+		padding = {0, 0, 0, 0},
+		itemMargin  = {0, 0, 0, 0},
+		backgroundColor = {0, 0, 0, 0}
+	}
+
+	buildProgress = Progressbar:New{
+		value = 0.0,
+		name    = 'prog';
+		max     = 1;
+		color   		= {0.7, 0.7, 0.4, 0.6},
+		backgroundColor = {1, 1, 1, 0.01},
+		width = "92%",
+		height = "92%",
+		x = "4%",
+		y = "4%",
+		skin=nil,
+		skinName='default',
+	},
+	
+	commands_main:RemoveChild(buildRow)
+	for i=1,MAX_COLUMNS do
+		buildRowButtons[i] = {}
+	end
+end
+
+local lastCmd = nil  -- last active command 
+local lastColor = nil  -- original color of button with last active command
+local lastFocusColor = nil
+
+-- widget:DrawScreen() is needed to highlight active command
+-- also draw build icon when drag_dropping queue to another factory
+function widget:DrawScreen()
+	-- highlight active command
+	local _,cmdid,_,cmdname = Spring.GetActiveCommand()
+	if cmdid ~= lastCmd then 
+		if cmdid and commandButtons[cmdid]  then 
+			local but = commandButtons[cmdid].button
+			lastColor = but.backgroundColor
+			lastFocusColor = but.focusColor
+			but.backgroundColor = {0.8, 0, 0, 1}
+			but.focusColor = {0.8, 0, 0, 1}
+			but:Invalidate()
+		end 
+		if lastCmd ~= nil and commandButtons[lastCmd] then 
+			local but = commandButtons[lastCmd].button
+			but.backgroundColor = lastColor
+			but.focusColor = lastFocusColor
+			but:Invalidate()
+		end 
+		lastCmd = cmdid
+	end
+	--draw build icon when drag_drop queue to another factory
+	if buildRow_dragDrop[1] then
+		local mx,my,lmb = Spring.GetMouseState()
+		if not lmb then
+			local pointingAt, gpos = Spring.TraceScreenRay(mx,my)
+			if gpos and pointingAt=='unit' and Spring.GetUnitTeam(gpos)==Spring.GetMyTeamID() then
+				local udid = spGetUnitDefID(gpos)
+				local ud = UnitDefs[udid]
+				for _, options in ipairs(ud.buildOptions) do --check if target unit can build this queue. Copied from unit_central_build_ai.lua
+					if ( options == buildRow_dragDrop[2] ) then 
+						local countTransfer = buildRow_dragDrop[3]
+						BuildRowButtonFunc(nil, -buildRow_dragDrop[2], true, false,countTransfer,false,gpos) --add to new factory
+						BuildRowButtonFunc(buildRow_dragDrop[1], -buildRow_dragDrop[2], false, true,countTransfer) --remove from source
+						break -- only one to find.
+					end	
+				end
+			end
+			buildRow_dragDrop[1] = nil
+		else
+			local size = buildRow_dragDrop[4]
+			local udid = buildRow_dragDrop[2]
+			gl.Color(1,1,1,0.5)
+			gl.Texture(WG.GetBuildIconFrame(UnitDefs[udid])) --draw build icon on screen. Copied from gui_chili_gesture_menu.lua
+			gl.TexRect(mx-size*0.2, my-size, mx+size*1.8, my+size)
+			gl.Texture("#"..udid)
+			gl.TexRect(mx-size*0.2, my-size, mx+size*1.8, my+size)
+			gl.Texture(false)
+			gl.Color(1,1,1,1)
+			if buildRow_dragDrop[3]>1 then
+				gl.Text(buildRow_dragDrop[3]+1,mx+size*1.5, my-size*0.57,14,"")
+			end
+		end
+	end
+end
+
+-- Make the hotkeys appear on the menu tabs
+function widget:Update()
+	if recentlyInitialized then
+		for i = 2, 5 do
+			updateTabName(i, menuChoices[i])
+		end
+		recentlyInitialized = false
+		ColorTabs(1)
+	end
+	if wasPlaying == spGetSpectatingState() then
+		wasPlaying = not wasPlaying
+		options.hide_when_spectating.OnChange()
+	end
+end
+
+--This function update construction progress bar and weapon reload progress bar
+function widget:GameFrame(n)
+	if options.hide_when_spectating.value and spGetSpectatingState() then return end
+	--set progress bar
+	if n%6 == 0 then
+		if menuChoice == 6 and selectedFac and buildRowButtons[1] and buildRowButtons[1].image then
+			local progress
+			local unitBuildID      = spGetUnitIsBuilding(selectedFac)
+			if unitBuildID then 
+				progress = select(5, spGetUnitHealth(unitBuildID))
+			end
+			buildProgress:SetValue(progress or 0)
+		end
+	end
+	--update/set dgun progress bar
+	if n%7==0 and not turnOffReloadableWeaponChecks then --every 1/4 second & was not sleeping
+		local oneclickweapon = reloadableButton[CMD_ONECLICK_WEAPON]
+		oneclickweapon.status = nil
+		oneclickweapon.progress = 0
+		local manualfireweapon = reloadableButton[CMD.MANUALFIRE]
+		manualfireweapon.status = nil
+		manualfireweapon.progress = 0
+		local jump = reloadableButton[CMD_JUMP]
+		jump.status = nil
+		jump.progress = 0
+		local selectedUnitList = spGetSelectedUnits()
+		local currentFrame = n
+		for i=1, #selectedUnitList do
+			local unitID = selectedUnitList[i]
+			if not manualfireweapon.status then
+				local _,_, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, 3-reverseCompat) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
+				local isManualFire, reloadTime = IsWeaponManualFire(unitID, 3)
+				if isManualFire and weaponReloadFrame then
+					if weaponReloadFrame > currentFrame then
+						manualfireweapon.status = false
+						local remainingTime = (weaponReloadFrame - currentFrame)*1/30
+						local reloadFraction =1 - remainingTime/reloadTime
+						if manualfireweapon.progress < reloadFraction then
+							manualfireweapon.progress = reloadFraction
+						end
+					else
+						manualfireweapon.status = true
+					end
+				end
+			end
+			if not oneclickweapon.status then
+				local specialReloadFrame = spGetUnitRulesParam(unitID,"specialReloadFrame")
+				local specialReloadStart = spGetUnitRulesParam(unitID,"specialReloadStart")
+				if specialReloadFrame then
+					if specialReloadFrame > currentFrame then
+						oneclickweapon.status = false
+						if specialReloadStart then
+							local reloadTime = specialReloadFrame - specialReloadStart
+							local remainingTime = (specialReloadFrame - currentFrame)
+							local reloadFraction =1 - remainingTime/reloadTime
+							if oneclickweapon.progress < reloadFraction then
+								oneclickweapon.progress = reloadFraction 
+							end
+						end
+					else
+						oneclickweapon.status = true
+					end
+				end
+			end
+			if not jump.status then
+				local jumpReload = spGetUnitRulesParam(unitID,"jumpReload")
+				if jumpReload then
+					if jumpReload < 0.95 then
+						jump.status = false
+						if jump.progress < jumpReload then
+							jump.progress = jumpReload 
+						end
+					else
+						jump.status = true
+					end
+				end
+			end	
+		end
+		for buttonID, status_progress in pairs(reloadableButton) do
+			if commandButtons[buttonID] then
+				if status_progress.status == true then
+					commandButtons[buttonID].image.color = {1, 1, 1, 1}
+					commandButtons[buttonID].image:Invalidate()
+				elseif status_progress.status == false then
+					local progress = status_progress.progress*0.7
+					local grey = 0.3+ progress
+					commandButtons[buttonID].image.color = {grey, grey, grey, 1}
+					commandButtons[buttonID].image:Invalidate()
+				end
+			end
+		end
+		
+		if jump.status == nil and oneclickweapon.status==nil and manualfireweapon.status==nil then 
+			turnOffReloadableWeaponChecks = true --be efficient, turn off check if no reload state detected
+		end
+	end
+end
+
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+	if cmdID == CMD.MANUALFIRE or cmdID == CMD_JUMP or cmdID == CMD_ONECLICK_WEAPON then
+		turnOffReloadableWeaponChecks = false --wake up reload state checking, in case some new unit activated a reload state
+	end
+end
+
+function widget:SelectionChanged(newSelection)
+	--reset reloadable weapon button (newly created unit doesn't have reload state, if user select this unit it need to reset to default value first)
+	for buttonID, _ in pairs(reloadableButton) do
+		if commandButtons[buttonID] then
+			commandButtons[buttonID].image.color = {1, 1, 1, 1}
+			commandButtons[buttonID].image:Invalidate()
+		end
+	end
+	turnOffReloadableWeaponChecks = false;
+	
+	--get new selected fac, if any
+	for i=1,#newSelection do
+		local id = newSelection[i]
+		local defID = spGetUnitDefID(id) --is in LOS?
+		if defID and UnitDefs[defID].isFactory then
+			if selectedFac ~= id then
+				alreadyRemovedTag = {}
+			end
+			selectedFac = id
+			SmartTabSelect()
+			return
+		end
+	end
+	selectedFac = nil
+	SmartTabSelect()
+end
+
+function widget:Shutdown()
+	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins. See Layout.lua
+	Spring.ForceLayoutUpdate()
+end
+
+options.hidetabs.OnChange = function(self) 
+	fakewindow:SetPosRelative(_, self.value and 0 or '15%', _, self.value and '100%' or '86%')
+	fakewindow:SetPosRelative(_, self.value and 0 or '15%', _, self.value and '100%' or '86%')
+	
+	if self.value then 
+		window:RemoveChild(menuTabRow)
+	else
+		window:AddChild(menuTabRow)
+	end
+	menuChoice = 1
+	ColorTabs(1)
+end
+
+options.hide_when_spectating.OnChange = function(self) 	
+	if self.value and spGetSpectatingState() then 
+		window:RemoveChild(fakewindow)
+		window:RemoveChild(menuTabRow)
+	else
+		window:AddChild(fakewindow)
+		window:AddChild(menuTabRow)
+	end
+	ColorTabs()
 end

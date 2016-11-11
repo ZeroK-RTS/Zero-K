@@ -1294,14 +1294,9 @@ function gadget:GameFrame(n)
 						end
 					end
 				end
-				
+
+
 				-- Make changes to team resources
-				local shareToSend = {}
-				local metalStorageToSet = {}
-				local totalToShare = 0
-				local freeSpace = {}
-				local totalFreeSpace = 0
-				local totalMetalIncome = {}
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
@@ -1333,22 +1328,7 @@ function gadget:GameFrame(n)
 
 					sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
 
-					local mCurr, mStor = spGetTeamResources(teamID, "metal")
-					mStor = mStor - HIDDEN_STORAGE
-					
-					if mCurr > mStor then
-						shareToSend[i] = mCurr - mStor
-						metalStorageToSet[i] = mStor
-						totalToShare = totalToShare + shareToSend[i]
-					end
-					
-					local metalIncome = odShare + baseShare + miscShare
-					if mCurr + metalIncome < mStor then
-						freeSpace[i] = mStor - (mCurr + metalIncome)
-						totalFreeSpace = totalFreeSpace + freeSpace[i]
-					end
-					
-					totalMetalIncome[i] = metalIncome
+					spAddTeamResource(teamID, "m", odShare + baseShare + miscShare)
 					--Spring.Echo(teamID .. " got odShare " .. odShare)
 					SetTeamEconomyRulesParams(
 						teamID, metalSplit, -- TeamID of the team as well as number of active allies.
@@ -1369,30 +1349,6 @@ function gadget:GameFrame(n)
 						te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 						te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
 					)
-				end
-				
-				if totalToShare ~= 0 and totalFreeSpace ~= 0 then
-					local shareFactor = math.min(1, totalFreeSpace/totalToShare)/totalFreeSpace
-					for i = 1, allyTeamData.teams do
-						if shareToSend[i] then
-							local sendID = allyTeamData.team[i]
-								
-							for j = 1, allyTeamData.teams do
-								if freeSpace[j] then
-									local recieveID = allyTeamData.team[j]
-									Spring.ShareTeamResource(sendID, recieveID, "metal", shareToSend[i] * freeSpace[j] * shareFactor)
-								end
-							end
-						end
-					end
-				end
-				
-				for i = 1, allyTeamData.teams do
-					local teamID = allyTeamData.team[i]
-					if metalStorageToSet[i] then
-						Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
-					end
-					spAddTeamResource(teamID, "m", totalMetalIncome[i])
 				end
 			else
 				Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")

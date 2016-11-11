@@ -34,7 +34,6 @@ unitDef = {
     morphtime = 30,
 	
 	priority_misc = 1, -- Medium
-	unarmed       = true,
   },
 
   explodeAs              = [[BIG_UNITEX]],

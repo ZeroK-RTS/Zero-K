@@ -23,7 +23,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
 			Spring.SetTeamResource(teamID, "es", START_STORAGE + OVERDRIVE_BUFFER)
-			Spring.SetTeamResource(teamID, "ms", START_STORAGE + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(teamID, "ms", START_STORAGE)
 		end
 		for i, v in pairs(ploppables) do
 			local name = UnitDefNames[v]
@@ -427,7 +427,7 @@ function gadget:GameStart()
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
 			Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
-			Spring.SetTeamResource(team, "ms", 0 + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(team, "ms", 0)
 			Spring.SetTeamResource(team, "energy", 0)
 			Spring.SetTeamResource(team, "metal", 0)
 		end
