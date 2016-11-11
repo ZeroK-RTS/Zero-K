@@ -27,7 +27,7 @@ unitDef = {
     [[armorco]],
     [[cornukesub]],
     [[reef]],
-    [[corbats]],
+    [[a_shipbattle]],
   },
 
   buildPic                      = [[striderhub.png]],

@@ -35,7 +35,7 @@ unitDef = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
-  iconType            = [[hunter]],
+  iconType            = [[a_shiptorpbt]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
@@ -135,9 +135,9 @@ unitDef = {
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[debris4x4c.s3o]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2c.s3o]],
     },
 
   },

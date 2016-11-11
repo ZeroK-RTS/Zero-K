@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Warlord]],
   description            = [[Battleship (Heavy Artillery)]],
   acceleration           = 0.039,
+  activateWhenBuilt   = true,
   brakeRate              = 0.0475,
   buildAngle             = 16384,
   buildCostEnergy        = 3800,

@@ -70,6 +70,7 @@ unitDef = {
 
   side                = [[ARM]],
   sightDistance       = 495,
+  sonarDistance       = 495,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 440,

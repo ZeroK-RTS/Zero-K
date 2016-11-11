@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Penetrator]],
   description         = [[Anti-Heavy Artillery Hovercraft]],
   acceleration        = 0.016,
+  activateWhenBuilt   = true,
   brakeRate           = 0.148,
   buildCostEnergy     = 1000,
   buildCostMetal      = 1000,
@@ -68,6 +69,7 @@ unitDef = {
   
   side                = [[ARM]],
   sightDistance       = 660,
+  sonarDistance       = 660,
   turninplace         = 0,
   turnRate            = 320,
   workerTime          = 0,

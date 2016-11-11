@@ -23,7 +23,7 @@ unitDef = {
     description_de = [[Zerstörer (Artillerie/Semi-U-Boot-Abwehr]],
     description_fr = [[Destroyer Artillerie/Semi-Anti-Sous-Marins]],
     description_pl = [[Niszczyciel (artyleria / przeciwpodwodny)]],
-    helptext       = [[This Destroyer packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against submarines. Beware of aircraft and Corvettes--the Destroyer's weapons have trouble hitting fast-moving targets.]],
+    helptext       = [[This Cruiser packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against submarines. Beware of aircraft and Corvettes--the Cruiser's weapons have trouble hitting fast-moving targets.]],
     helptext_de    = [[Der Zerstörer kombiniert eine kraftvolle, weitreichende Hauptkanone, nützlich für das Bombadieren von festen Standorten und Küstenzielen, mit einem Torpedowerfer gegen U-Boote. Hüte dich vor Flugzeugen und Korvetten - Zerstörer haben einige Probleme damit, schnelle Ziele zu treffen.]],
     helptext_fr    = [[Ce Destroyer embarque un puissant canon longue port?e et un lance grenade sous marines. Utile pour se d?barrasser de menaces sous marines ou de positions fixes, son canon est cependant trop peu pr?cis pour d?truire des menaces rapides.]],
     helptext_pl    = [[Crusader posiada potezna armate sredniego zasiegu idealna do bombardowania nieruchomych wiezyczek broniacych wybrzezy. Jego druga bronia jest wyrzutnia ladunków glebinowych. Latwo pada ofiara jednostek latajacych i korwet, gdyz nie posiada broni skutecznym przeciwko szybkim celom.]],
@@ -37,7 +37,7 @@ unitDef = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[destroyer]],
+  iconType               = [[a_shipcruiser]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
@@ -65,85 +65,36 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
 
-    {
-      def                = [[DEPTHCHARGE]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
-    },
-
   },
 
   weaponDefs             = {
 
-    DEPTHCHARGE = {
-      name                    = [[Depth Charge]],
-      areaOfEffect            = 128,
-      avoidFriendly           = false,
-      collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-      burnblow                = true,
-
-      damage                  = {
-        default = 150,
-		subs = 150,
-      },
-
-      edgeEffectiveness       = 0.6,
-      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE]],
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-      leadlimit               = 0,
-      model                   = [[depthcharge.s3o]],
-      noSelfDamage            = true,
-      predictBoost            = 1,
-      range                   = 260,
-      reloadtime              = 3,
-      soundHit                = [[explosion/wet/ex_underwater]],
-      soundStart              = [[weapon/torpedo]],
-      startVelocity           = 50,
-      tolerance               = 100000,
-      tracks                  = true,
-      turnRate                = 10000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponAcceleration      = 30,
-      weaponType              = [[TorpedoLauncher]],
-      weaponVelocity          = 150,
-    },
-
-    PLASMA      = {
+    PLASMA = {
       name                    = [[Plasma Cannon]],
-	  areaOfEffect            = 48,
-      accuracy                = 100,
+      areaOfEffect            = 64,
+      avoidFeature            = false,
+	  avoidGround             = false,
       craterBoost             = 1,
       craterMult              = 2,
 
-      customParams            = {
-		light_color = [[1.4 0.8 0.3]],
-      },
-
       damage                  = {
-        default = 600.5,
+        default = 601.1,
+        planes  = 601.1,
         subs    = 30,
       },
 
-      explosionGenerator      = [[custom:PLASMA_HIT_32]],
-      impactOnly              = true,
+      explosionGenerator      = [[custom:PLASMA_HIT_64]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      myGravity               = 0.07,
-      noSelfDamage            = true,
+      projectiles             = 1,
       range                   = 1000,
       reloadtime              = 4.0,
-      size                    = 3.8,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 270,
+      weaponVelocity          = 300,
     },
 
   },

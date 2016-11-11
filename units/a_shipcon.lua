@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Mariner]],
   description            = [[Construction Ship, Builds at 7.5 m/s]],
   acceleration           = 0.051375,
+  activateWhenBuilt   = true,
   brakeRate              = 0.061,
   buildCostEnergy        = 200,
   buildCostMetal         = 200,

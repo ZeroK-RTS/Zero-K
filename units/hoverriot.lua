@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Mace]],
   description         = [[Riot Hover]],
   acceleration        = 0.022,
+  activateWhenBuilt   = true,
   brakeRate           = 0.03,
   buildCostEnergy     = 400,
   buildCostMetal      = 400,
@@ -63,6 +64,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 407,
+  sonarDistance       = 407,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 400,

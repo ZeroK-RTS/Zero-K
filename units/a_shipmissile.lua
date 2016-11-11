@@ -33,12 +33,12 @@ unitDef = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[enforcer]],
+  iconType               = [[a_shipmissile]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 30,
-  maxDamage              = 750,
-  maxVelocity            = 3.2,
+  maxDamage              = 550,
+  maxVelocity            = 2.5,
   minCloakDistance       = 350,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
@@ -139,9 +139,9 @@ unitDef = {
 
     HEAP = {
       blocking         = false,
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[debris4x4c.s3o]],
+      footprintX       = 3,
+      footprintZ       = 3,
+      object           = [[debris3x3c.s3o]],
     },
 
   },

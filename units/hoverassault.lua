@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Halberd]],
   description         = [[Blockade Runner Hover]],
   acceleration        = 0.048,
+  activateWhenBuilt   = true,
   brakeRate           = 0.043,
   buildCostEnergy     = 240,
   buildCostMetal      = 240,
@@ -62,6 +63,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 385,
+  sonarDistance       = 385,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 616,

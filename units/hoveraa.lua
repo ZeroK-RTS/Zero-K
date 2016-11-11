@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Flail]],
   description         = [[Anti-Air Hovercraft]],
   acceleration        = 0.048,
+  activateWhenBuilt   = true,
   brakeRate           = 0.043,
   buildCostEnergy     = 300,
   buildCostMetal      = 300,
@@ -61,6 +62,7 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
+  sonarDistance       = 660,
   smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 616,

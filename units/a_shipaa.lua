@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Mistral]],
   description            = [[Anti-Air Frigate]],
   acceleration           = 0.0498,
+  activateWhenBuilt   = true,
   brakeRate              = 0.0808,
   buildAngle             = 16384,
   buildCostEnergy        = 400,

@@ -891,6 +891,26 @@ local icontypes = {
   },
 
   --ship icons
+  a_shipmissile = {
+    bitmap='icons/enforcer.dds',
+    size=2.8,
+  },
+  a_shiptorpbt = {
+	bitmap='icons/hunter.dds',
+    size=2.2,
+  },
+  a_shipcorvette = {
+    bitmap='icons/a_shipcorvette.png',
+	size=2.8,
+  },
+  a_shipdestroyer = {
+    bitmap='icons/corvette.dds',
+	size=2.8,
+  },
+  a_shipcruiser = {
+    bitmap='icons/destroyer.dds',
+	size=3.0,
+  },
   scoutboat = {
     bitmap='icons/scoutboat.dds',
     size=2.2,
