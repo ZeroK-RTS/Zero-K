@@ -136,7 +136,7 @@ local buttonLayoutConfig = {
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType','hide_when_spectating',
+	'background_opacity', 'keyboardType', 'unitsHotkeys', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
 
@@ -155,6 +155,12 @@ options = {
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+	},
+	unitsHotkeys = {
+		name = 'Enable Factory Hotkeys',
+		type = 'bool',
+		value = true,
 		noHotkey = true,
 	},
 	hide_when_spectating = {
@@ -596,6 +602,16 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		SetText(textConfig.topLeft.name, hotkeyText)
 	end
 	
+	function externalFunctionsAndData.RemoveGridHotkey()
+		usingGrid = false
+		if command and command.action then
+			local hotkey = GetHotkeyText(command.action)
+			SetText(textConfig.topLeft.name, hotkey)
+		else
+			SetText(textConfig.topLeft.name, nil)
+		end
+	end
+	
 	function externalFunctionsAndData.ClearGridHotkey()
 		SetText(textConfig.topLeft.name)
 	end
@@ -814,6 +830,13 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		end
 	end
 	
+	function externalFunctions.RemoveGridHotkeys()
+		gridMap = nil
+		for i = 1, #buttonList do
+			buttonList[i].RemoveGridHotkey()
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -858,6 +881,11 @@ local function GetQueuePanel(parent, columns)
 		end
 		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
 		button.SetProgressBar(progress)
+	end
+	
+	function externalFunctions.ClearFactory()
+		factoryUnitID = false
+		factoryUnitDefID = false
 	end
 	
 	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
@@ -1177,6 +1205,7 @@ local commandPanels = {
 		isBuild = true,
 		hotkeyReplacement = "Orders",
 		gridHotkeys = true,
+		disableableKeys = true,
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 }
@@ -1202,11 +1231,11 @@ local function GetSelectionValues()
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
-		if defID and UnitDefs[defID].isFactory then
-			return unitID, defID, #selection
+		if defID and (UnitDefs[defID].isFactory or UnitDefs[defID].customParams.isfakefactory) then
+			return unitID, defID, UnitDefs[defID].customParams.isfakefactory, #selection
 		end
 	end
-	return false, nil, #selection
+	return false, nil, nil, #selection
 end
 
 local function ProcessCommand(command, factorySelected, selectionIndex)
@@ -1246,7 +1275,7 @@ local function ProcessCommand(command, factorySelected, selectionIndex)
 end
 
 local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitID, factoryUnitDefID, selectedUnitCount = GetSelectionValues()
+	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 
 	selectionIndex = selectionIndex + 1
 	
@@ -1272,7 +1301,11 @@ local function ProcessAllCommands(commands, customCommands)
 		for i = 1, #commandPanels do
 			local data = commandPanels[i]
 			if data.queue then
-				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+				if fakeFactory then
+					data.queue.ClearFactory()
+				else
+					data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+				end
 			end
 		end
 	end
@@ -1434,17 +1467,9 @@ local function InitializeControls()
 		local OnTabSelect
 		
 		data.holder = commandHolder
+		data.buttons = GetButtonPanel(commandHolder, 3, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
+		
 		if data.factoryQueue then
-			local buttonHolder = Control:New{
-				x = "0%",
-				y = "0%",
-				width = "100%",
-				height = "66.666%",
-				padding = {0, 0, 0, 0},
-				parent = commandHolder,
-			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
-			
 			local queueHolder = Control:New{
 				x = "0%",
 				y = "66.666%",
@@ -1458,13 +1483,11 @@ local function InitializeControls()
 			-- If many things need doing they must be put in a function
 			-- but this works for now.
 			OnTabSelect = data.queue.UpdateBuildProgress
-		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
-		if data.gridHotkeys then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1490,7 +1513,7 @@ function options.keyboardType.OnChange(self)
 	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.gridHotkeys then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1504,6 +1527,19 @@ end
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
 	contentHolder:SetVisibility(not (self.value and isSpec))
+end
+
+function options.unitsHotkeys.OnChange(self)
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if data.disableableKeys then
+			if not options.unitsHotkeys.value then
+				data.buttons.RemoveGridHotkeys()
+			else
+				data.buttons.ApplyGridHotkeys(gridMap)
+			end
+		end
+	end
 end
 
 function options.tab_economy.OnChange()
@@ -1584,7 +1620,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	
 	local currentTab = tabPanel.GetCurrentTab()
 	local commandPanel = currentTab and commandPanelMap[currentTab]
-	if (not commandPanel) or (not commandPanel.gridHotkeys) then
+	if (not commandPanel) or (not (commandPanel.gridHotkeys and ((not commandPanel.disableableKeys) or options.unitsHotkeys.value))) then
 		return false
 	end
 	
@@ -1598,7 +1634,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		end
 	end
 
-	if commandPanel.onClick then
+	if (key == KEYSYMS.ESCAPE or gridKeyMap[key]) and commandPanel.onClick then
 		commandPanel.onClick()
 		return true
 	end

@@ -156,6 +156,21 @@ local units = {
 	
 	spherecloaker = UTILITY,
 	core_spectre = UTILITY,
+	
+	dynhub_support_base = {order = 1, row = 1, col = 1},
+    dynhub_recon_base =   {order = 2, row = 1, col = 2},
+    dynhub_assault_base = {order = 3, row = 1, col = 3},
+    dynhub_strike_base =  {order = 4, row = 1, col = 4},
+    armcomdgun =          {order = 5, row = 1, col = 5},
+	scorpion =            {order = 6, row = 1, col = 6},
+    dante =               {order = 7, row = 2, col = 1},
+    armraven =            {order = 8, row = 2, col = 2},
+    funnelweb =           {order = 9, row = 2, col = 3},
+    armbanth =           {order = 10, row = 2, col = 4},
+    armorco =            {order = 11, row = 2, col = 5},
+    cornukesub =         {order = 12, row = 2, col = 6},
+    reef =               {order = 13, row = 3, col = 1},
+    corbats =            {order = 14, row = 3, col = 2},
 }
 
 local factories = {
