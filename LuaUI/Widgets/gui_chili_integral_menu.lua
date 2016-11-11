@@ -995,7 +995,9 @@ local function GetTabPanel(parent, rows, columns)
 		for i = 1, #tabList do
 			local data = tabList[i]
 			data.SetSelected(data.name == name)
-			currentSelectedIndex = i
+			if data.name == name then
+				currentSelectedIndex = i
+			end
 		end
 	end
 		
