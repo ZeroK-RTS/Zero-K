@@ -781,12 +781,6 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	if Spring.GetActiveCommand() == 0 then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		if meta and not shift then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
-			WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
-			WG.crude.ShowMenu() --make epic Chili menu appear.
-			return true
-		end
 		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
 			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
 			local coord 
