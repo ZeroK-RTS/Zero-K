@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[a_shipcruiser]],
   name                   = [[Cavalier]],
-  description            = [[Artillery Cruiser]],
+  description            = [[Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,

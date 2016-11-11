@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[a_shiptorpbt]],
   name                = [[Hunter]],
-  description         = [[Torpedo-Boat Raider]],
+  description         = [[Torpedo-Boat (Raider)]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,

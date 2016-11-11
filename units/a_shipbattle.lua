@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[a_shipbattle]],
   name                   = [[Warlord]],
-  description            = [[Heavy Artillery Battleship]],
+  description            = [[Battleship (Heavy Artillery)]],
   acceleration           = 0.039,
   brakeRate              = 0.0475,
   buildAngle             = 16384,

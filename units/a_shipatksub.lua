@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[a_shipatksub]],
   name                   = [[Seawolf]],
-  description            = [[Raider Submarine]],
+  description            = [[Submarine (Stealth Raider)]],
   acceleration           = 0.06,
   activateWhenBuilt      = true,
   brakeRate              = 0.2,

@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[a_shipmissile]],
   name                   = [[Siren]],
-  description            = [[Skirmisher Missile Frigate]],
+  description            = [[Missile Frigate (Skirmisher)]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,

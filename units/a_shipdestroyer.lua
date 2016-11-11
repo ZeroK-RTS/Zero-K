@@ -1,7 +1,7 @@
 unitDef = {
-  unitname               = [[warden]],
+  unitname               = [[a_shipdestroyer]],
   name                   = [[Warden]],
-  description            = [[Assault/Riot Destroyer]],
+  description            = [[Destroyer (Assault/Riot)]],
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
@@ -162,4 +162,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ warden = unitDef })
+return lowerkeys({ a_shipdestroyer = unitDef })
