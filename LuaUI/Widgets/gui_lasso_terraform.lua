@@ -236,104 +236,123 @@ end
 
 local terraTag=-1
 function WG.Terraform_GetNextTag()
-	terraTag=terraTag + 1
+	terraTag = terraTag + 1
 	return terraTag
 end
 
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
-	if terraform_type == 4 then
-		if (#constructor > 0) then 
-			local params = {}
-			params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
-			params[2] = team -- teamID of the team doing the terraform
-			params[3] = loop -- true or false
-			params[4] = terraformHeight -- width of the ramp
-			params[5] = points -- how many points there are in the lasso (2 for ramp)
-			params[6] = #constructor -- how many constructors are working on it
-			params[7] = volumeSelection -- 0 = none, 1 = only raise, 2 = only lower
-			local i = 8
-			for j = 1, points do
-				params[i] = point[j].x
-				params[i + 1] = point[j].y
-				params[i + 2] = point[j].z
-				i = i + 3
-			end
-					
-			for j = 1, #constructor do
-				params[i] = constructor[j]
-				i = i + 1
-			end
-			
-			params[#params + 1] = WG.Terraform_GetNextTag()
+	if (#constructor == 0) or (points == 0) then 
+		return
+	end
+	
+	local commandTag = WG.Terraform_GetNextTag()
+	local pointAveX = 0
+	local pointAveZ = 0
+	local commandRadius = 0
 
-			local a,c,m,s = spGetModKeyState()
-			
-			if s then
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-				originalCommandGiven = true
-			else
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
+	for i = 1, points do
+		pointAveX = pointAveX + point[i].x
+		pointAveZ = pointAveZ + point[i].z
+	end
+	pointAveX = pointAveX/points
+	pointAveZ = pointAveZ/points
+	
+	for i = 1, points do
+		commandRadius = commandRadius + math.abs(point[i].x - pointAveX) + math.abs(point[i].z - pointAveZ)
+	end
+	commandRadius = 16 + 0.7*commandRadius/points + 10*math.random() -- Prevent collisions almost surely.
+	
+	if terraform_type == 4 then
+		local params = {}
+		params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
+		params[2] = team -- teamID of the team doing the terraform
+		params[3] = pointAveX
+		params[4] = pointAveZ
+		params[5] = commandRadius
+		params[6] = loop -- true or false
+		params[7] = terraformHeight -- width of the ramp
+		params[8] = points -- how many points there are in the lasso (2 for ramp)
+		params[9] = #constructor -- how many constructors are working on it
+		params[10] = volumeSelection -- 0 = none, 1 = only raise, 2 = only lower
+		local i = 11
+		for j = 1, points do
+			params[i] = point[j].x
+			params[i + 1] = point[j].y
+			params[i + 2] = point[j].z
+			i = i + 3
+		end
+				
+		for j = 1, #constructor do
+			params[i] = constructor[j]
+			i = i + 1
+		end
+		
+		params[#params + 1] = commandTag
+
+		local a,c,m,s = spGetModKeyState()
+		
+		if s then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
+			originalCommandGiven = true
+		else
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
 	else
-		if (#constructor > 0) then 
-			local params = {}
-			params[1] = terraform_type
-			params[2] = team
-			params[3] = loop
-			params[4] = terraformHeight 
-			params[5] = points
-			params[6] = #constructor
-			params[7] = volumeSelection
-			local i = 8
-			for j = 1, points do
-				params[i] = point[j].x
-				params[i + 1] = point[j].z
-				i = i + 2
-			end
-			
-			for j = 1, #constructor do
-				params[i] = constructor[j]
-				i = i + 1
-			end
-			
-			params[#params + 1] = WG.Terraform_GetNextTag()
-			
-			local a,c,m,s = spGetModKeyState()
-			
-			if s then
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-				originalCommandGiven = true
-			else
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
+		local params = {}
+		params[1] = terraform_type
+		params[2] = team
+		params[3] = pointAveX
+		params[4] = pointAveZ
+		params[5] = commandRadius
+		params[6] = loop
+		params[7] = terraformHeight 
+		params[8] = points
+		params[9] = #constructor
+		params[10] = volumeSelection
+		local i = 11
+		for j = 1, points do
+			params[i] = point[j].x
+			params[i + 1] = point[j].z
+			i = i + 2
+		end
+		
+		for j = 1, #constructor do
+			params[i] = constructor[j]
+			i = i + 1
+		end
+		
+		params[#params + 1] = commandTag
+		
+		local a,c,m,s = spGetModKeyState()
+		
+		if s then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
+			originalCommandGiven = true
+		else
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
 	end
 	
+	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
+	for i = 1, #constructor do
+		spGiveOrderToUnit(constructor[i], CMD_RESTORE, {pointAveX, height, pointAveZ, commandRadius}, {"shift"})
+	end
+		
 	if buildToGive then
 		if currentlyActiveCommand == CMD_LEVEL then
-			if (#constructor > 0) then
-				local myPlayerID = Spring.GetMyPlayerID()
-				buildToGive.needGameFrame = true
-				buildToGive.constructor = constructor
-				if myPlayerID then
-					-- ping is in seconds
-					local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
-					buildToGive.waitFrame = 30*ceil(myPing) + 5
-				else
-					buildToGive.waitFrame = 30
-				end
+			for i = 1, #constructor do
+				spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
 			end
-		else
-			buildToGive = false
 		end
+		buildToGive = false
 	end
+	
 	points = 0		
 end
 
@@ -1689,26 +1708,6 @@ end
 --------------------------------------------------------------------------------
 -- Rectangle placement interaction
 --------------------------------------------------------------------------------
-
-function widget:GameFrame(f)
-	if not (buildToGive and buildToGive.waitFrame) then
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-		return
-	end
-	
-	buildToGive.waitFrame = buildToGive.waitFrame - 1
-	if buildToGive.waitFrame < 0 then
-		local constructor = buildToGive.constructor
-		
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
-			i = i + 1
-		end
-		buildToGive = false
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-	end
-	
-end
 
 function Terraform_SetPlacingRectangle(unitDefID)
 	

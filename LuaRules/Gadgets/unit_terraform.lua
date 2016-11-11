@@ -79,6 +79,7 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT 
 local CMD_STOP = CMD.STOP
 local CMD_REPAIR = CMD.REPAIR
+local CMD_INSERT = CMD.INSERT
 
 local checkCoord = {
 	{x = -8, z = 0},
@@ -194,9 +195,8 @@ local currentCon 			= 0
 
 local checkInterval 		= 0
 
-local unitOrderList 		= {count = 0, data = {}} 
--- workaround: if order is given on the same frame as terraunit creation the order temporarilly
--- points to the ground location
+-- Map of constructors to recieve the command on CommandFallback
+local fallbackConstructors  = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
@@ -225,7 +225,7 @@ local rampCmdDesc = {
 
 local levelCmdDesc = {
   id      = CMD_LEVEL,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Level',
   cursor  = 'Repair', 
   action  = 'levelground',
@@ -234,16 +234,16 @@ local levelCmdDesc = {
 
 local raiseCmdDesc = {
   id      = CMD_RAISE,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Raise',
-  cursor  = 'Repair', 
+  cursor  = 'raise', 
   action  = 'raiseground',
   tooltip = 'Raises/Lowers the ground in an area',
 }
 
 local smoothCmdDesc = {
   id      = CMD_SMOOTH,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Smooth',
   cursor  = 'Repair', 
   action  = 'smoothground',
@@ -252,8 +252,8 @@ local smoothCmdDesc = {
 
 local restoreCmdDesc = {
   id      = CMD_RESTORE,
-  type    = CMDTYPE.ICON_MAP,
-  name    = 'Restore',
+  type    = CMDTYPE.ICON_AREA,
+  name    = 'Restore2',
   cursor  = 'Repair', 
   action  = 'restoreground',
   tooltip = 'Restores the ground to origional height',
@@ -261,11 +261,19 @@ local restoreCmdDesc = {
 
 local bumpyCmdDesc = {
   id      = CMD_BUMPY,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Bumpify',
   cursor  = 'Repair', 
   action  = 'bumpifyground',
   tooltip = 'Makes the ground bumpy',
+}
+
+local fallbackableCommands = {
+	[CMD_RAMP] = true,
+	[CMD_LEVEL] = true,
+	[CMD_RAISE] = true,
+	[CMD_SMOOTH] = true,
+	[CMD_RESTORE] = true,
 }
 
 local cmdDescsArray = {
@@ -441,7 +449,22 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift)
+local function AddFallbackConstructors(constructorCount, constructorList, terraunits, terraunitList, teamID, commandX, commandZ, commandRadius)
+	for i = 1, constructorCount do
+		local unitID = constructorList[i]
+		fallbackConstructors[unitID] = fallbackConstructors[unitID] or {}
+		fallbackConstructors[unitID][commandRadius]	= {
+			terraunits = terraunits,
+			terraunitList = terraunitList,
+			commandX = commandX, 
+			commandZ = commandZ, 
+			commandRadius = commandRadius,
+			teamID = teamID,
+		}
+	end
+end
+
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
 
 	--** Initial constructor processing **
 	local unitsX = 0
@@ -898,24 +921,11 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
-	--[[
-	for i = 1, units do
-		if shift then
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
-		else
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
-		end
-		
-		for j = 2, orderList.count do
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
-		end
-	end--]]
-	
+	--** Add the list of constructors to repair the blocks on command fallback **
+	AddFallbackConstructors(units, unit, orderList.count, orderList.data, team, commandX, commandZ, commandRadius)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1368,30 +1378,11 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		
 	end
 	
-	--** Give repair order for each block to all selected units **
-	
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = {count = blocks, data = block}, shift = shift}
-	--[[	
-	for i = 1, units do
-	
-		if (spValidUnitID(unit[i])) then
-			if shift then
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_SHIFT)
-			else
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_RIGHT)
-			end
-			
-			for j = 2, blocks do
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[j]},CMD_OPT_SHIFT)
-			end
-		end
-	end
-	--]]
-
+	--** Add the list of constructors to repair the blocks on command fallback **
+	AddFallbackConstructors(units, unit, blocks, block, team, commandX, commandZ, commandRadius)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -2013,22 +2004,9 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	if orderList.count == 0 then
 		return
 	end
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
-	--[[
-	for i = 1, units do
-		if shift then
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
-		else
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
-		end
-		
-		for j = 2, orderList.count do
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
-		end
-	end
-	--]]
 	
+	--** Add the list of constructors to repair the blocks on command fallback **
+	AddFallbackConstructors(units, unit, orderList.count, orderList.data, team, commandX, commandZ, commandRadius)
 end
 
 --------------------------------------------------------------------------------
@@ -2046,28 +2024,37 @@ end
 function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
 
   if (cmdID == CMD_TERRAFORM_INTERNAL) then
-
 		local terraform_type = cmdParams[1]
+		local teamID = cmdParams[2]
+		local commandX = cmdParams[3]
+		local commandZ = cmdParams[4]
+		local commandRadius = cmdParams[5]
+		local loop = cmdParams[6]
+		local terraformHeight = cmdParams[7]
+		local pointCount = cmdParams[8]
+		local constructorCount = cmdParams[9]
+		local volumeSelection = cmdParams[10]
+		
 		--level or raise or smooth or restore or bumpify
 		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then 
 			local point = {}
 			local unit = {}
-			local i = 8
-			for j = 1, cmdParams[5] do
+			local i = 11
+			for j = 1, pointCount do
 				point[j] = {x = cmdParams[i], z = cmdParams[i+1]}
 				i = i + 2
 			end
-			for j = 1, cmdParams[6] do
+			for j = 1, constructorCount do
 				unit[j] = cmdParams[i]
 				i = i + 1
 			end
 			
 			local terraTag = cmdParams[i]
 			
-			if cmdParams[3] == 0 then
-				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+			if loop == 0 then
+				TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
 			else
-				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+				TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
 			end
 			
 			return false
@@ -2076,19 +2063,19 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 		
 			local point = {}
 			local unit = {}
-			local i = 8
-			for j = 1, cmdParams[5] do
+			local i = 11
+			for j = 1, pointCount do
 				point[j] = {x = cmdParams[i], y = cmdParams[i+1],z = cmdParams[i+2]}
 				i = i + 3
 			end
-			for j = 1, cmdParams[6] do
+			for j = 1, constructorCount do
 				unit[j] = cmdParams[i]
 				i = i + 1
 			end
 			
 			local terraTag = cmdParams[i]
 			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,terraformHeight*2,unit, constructorCount,teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
 		
 			return false
 			
@@ -3168,28 +3155,46 @@ function gadget:GameFrame(n)
 		end
 	end	
 	
-	-- give orders to the contructors, workaround for order location bug.
-	if unitOrderList.count ~= 0 then
-		for i = 1, unitOrderList.count do
-			local units = unitOrderList.data[i].units
-			local orders = unitOrderList.data[i].orders
-			local shift = unitOrderList.data[i].shift
-			
-			for j = 1, units.count do
-				if shift then
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_SHIFT)
-				else
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_RIGHT)
-				end
-				
-				for k = 2, orders.count do
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[k]},CMD_OPT_SHIFT)
+	-- Give orders here to prevent recursion
+	if constructorOrders then
+		for i = 1, #constructorOrders do
+			local data = constructorOrders[i]
+			if Spring.ValidUnitID(data.unitID) then
+				for j = data.terraunits, 1, -1  do
+					local terraID = data.terraunitList[j]
+					if Spring.ValidUnitID(terraID) and Spring.GetUnitDefID(terraID) == terraunitDefID then
+						spGiveOrderToUnit(data.unitID, CMD_INSERT, {0, CMD_REPAIR, CMD_OPT_RIGHT, terraID}, {"alt"})
+					end
 				end
 			end
 		end
-		unitOrderList = {count = 0, data = {}}
+		constructorOrders = nil
 	end
-end	
+end
+
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if not fallbackableCommands[cmdID] then
+		return false
+	end
+	
+	for index, data in pairs(fallbackConstructors[unitID]) do
+	
+		if data.teamID ~= teamID or data.commandX ~= cmdParams[1] or data.commandZ ~= cmdParams[3] or data.commandRadius ~= cmdParams[4] then
+			return false
+		end
+		
+		constructorOrders = constructorOrders or {}
+		constructorOrders[#constructorOrders + 1] = {
+			unitID = unitID,
+			terraunits = data.terraunits,
+			terraunitList = data.terraunitList,
+		}
+		
+		fallbackConstructors[unitID][index] = nil
+	end
+	
+	return false
+end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
@@ -3717,10 +3722,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 				end
 			end
 		end
-		
-
 	end
-	
 end
 
 --------------------------------------------------------------------------------
@@ -3729,6 +3731,19 @@ end
 
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
+	gadgetHandler:RegisterCMDID(CMD_RAMP)
+	gadgetHandler:RegisterCMDID(CMD_LEVEL)
+	gadgetHandler:RegisterCMDID(CMD_RAISE)
+	gadgetHandler:RegisterCMDID(CMD_SMOOTH)
+	gadgetHandler:RegisterCMDID(CMD_RESTORE)
+	
+	Spring.AssignMouseCursor("Raise", "cursorraise", true, true)
+	
+	Spring.SetCustomCommandDrawData(CMD_RAMP, "cursorramp", {0.3, 0.3, 1.0, 0.7}, true)
+	Spring.SetCustomCommandDrawData(CMD_LEVEL, "cursorlevel", {0.3, 0.3, 1.0, 0.7}, true)
+	Spring.SetCustomCommandDrawData(CMD_RAISE, "cursorraise", {0.3, 0.3, 1.0, 0.7}, true)
+	Spring.SetCustomCommandDrawData(CMD_SMOOTH, "cursorsmooth", {0.3, 0.3, 1.0, 0.7}, true)
+	Spring.SetCustomCommandDrawData(CMD_RESTORE, "cursorrestore", {0.3, 0.3, 1.0, 0.7}, true)
 	
 	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
 		GG.Terraform_RaiseWater(modOptions.waterlevel)
