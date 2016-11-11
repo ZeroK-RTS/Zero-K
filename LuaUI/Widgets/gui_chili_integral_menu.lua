@@ -54,7 +54,7 @@ local NO_TEXT = ""
 local EPIC_NAME = "epic_chili_integral_menu_2_"
 local EPIC_NAME_UNITS = "epic_chili_integral_menu_2_tab_units"
 
-local _, _, buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial,_ , commandDisplayConfig, _, hiddenCommands = include("Configs/integral_menu_commands.lua")
+local _, _, buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial,_ , commandDisplayConfig, _, hiddenCommands, buildCmdUnits = include("Configs/integral_menu_commands.lua")
 
 local textConfig = {
 	bottomLeft = {
@@ -1112,7 +1112,8 @@ local commandPanels = {
 			local buildOptions = UnitDefs[factoryUnitDefID].buildOptions
 			for i = 1, #buildOptions do
 				if buildOptions[i] == -cmdID then
-					return true
+					local position = buildCmdUnits[cmdID]
+					return position and true or false, position
 				end
 			end
 			return false
