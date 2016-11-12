@@ -25,9 +25,6 @@ unitDef = {
     extradrawrange = 200,
     modelradius    = [[17]],
     turnatfullspeed = [[1]],
-	
-	morphto = [[a_shipcruiser_slowform]],
-    morphtime = [[10]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -93,6 +90,97 @@ unitDef = {
       turret                  = true,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
+    },
+	
+	NAPALM_MORTAR = {
+      name                    = [[Napalm Cannon]],
+      accuracy                = 400,
+      areaOfEffect            = 196,
+	  avoidFeature            = false,
+	  cegTag                  = [[custom:gravityless_flamer]],
+      craterBoost             = 1,
+      craterMult              = 2,
+      
+	  customParams        	  = {
+	    setunitsonfire = "1",
+		burntime = 60,
+
+		area_damage = 1,
+		area_damage_radius = 128,
+		area_damage_dps = 20,
+		area_damage_duration = 6,
+
+		--lups_heat_fx = [[firewalker]],
+	  },
+	  
+      damage                  = {
+        default = 80,
+        planes  = 80,
+        subs    = 4,
+      },
+
+      explosionGenerator      = [[custom:napalm_firewalker]],
+      firestarter             = 180,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 1,
+      myGravity               = 0.1,
+      range                   = 1100,
+      reloadtime              = 6,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 8,
+      soundHit                = [[weapon/cannon/wolverine_hit]],
+      soundStart              = [[weapon/cannon/wolverine_fire]],
+      sprayangle              = 1024,
+      turret                  = true,
+      weaponType              = [[Cannon]],
+      weaponVelocity          = 340,
+    },
+	
+	DISBOMB = {
+	  name                    = [[Disruptor Bomb]],
+	  accuracy                = 400,
+	  areaOfEffect            = 256,
+	  avoidFeature            = false,
+	  cegTag                  = [[beamweapon_muzzle_purple]],
+	  craterBoost             = 0,
+	  craterMult              = 0,
+
+	  customParams            = {
+		timeslow_damagefactor = [[4]],
+		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		
+		light_camera_height = 2500,
+		light_color = [[1.5 0.75 1.8]],
+		light_radius = 280,
+	  },
+
+	  damage                  = {
+		default = 150,
+		planes  = 150,
+		subs    = 7.5,
+	  },
+
+	  explosionGenerator      = [[custom:riotballplus_purple]],
+	  explosionSpeed          = 5,
+	  fireStarter             = 100,
+	  impulseBoost            = 0,
+	  impulseFactor           = 0,
+	  interceptedByShieldType = 2,
+	  model                   = [[wep_b_fabby.s3o]],
+	  myGravity               = 0.1,
+      noSelfDamage            = false,
+	  range                   = 1100,
+	  reloadtime              = 6,
+	  smokeTrail              = true,
+	  soundHit                = [[weapon/aoe_aura]],
+	  soundHitVolume          = 8,
+	  soundStart              = [[weapon/cannon/cannon_fire3]],
+	  --startVelocity           = 350,
+	  --trajectoryHeight        = 0.3,
+	  turret                  = true,
+	  weaponType              = [[Cannon]],
+	  weaponVelocity          = 340,
     },
 
   },
