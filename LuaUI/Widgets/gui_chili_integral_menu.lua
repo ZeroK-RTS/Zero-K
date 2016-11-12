@@ -1390,7 +1390,18 @@ local function InitializeControls()
 		tweakResizable = true,
 		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
-		parent    = screen0,
+		parent = screen0,
+		OnMouseDown = { 
+			function(self) 
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then 
+					return false
+				end
+				WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return true
+			end 
+		},
 	}
 		
 	local tabHolder = Control:New{
