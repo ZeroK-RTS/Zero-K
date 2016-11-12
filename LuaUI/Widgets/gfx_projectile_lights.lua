@@ -313,6 +313,59 @@ local function ProjectileLevelOfDetailCheck(param, proID, fps, height)
 	return true
 end
 
+local function GetBeamLights(lightParams, pID, x, y, z)
+	local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
+					
+	if y + deltay < -800 then
+		-- The beam has fallen through the world
+		deltax, deltay, deltaz = InterpolateBeam(x, y, z, deltax, deltay, deltaz)
+	end
+	
+	if lightParams.beamOffset then
+		local m = lightParams.beamOffset
+		x, y, z = x - deltax*m, y - deltay*m, z - deltaz*m
+	end
+	if lightParams.beamStartOffset then
+		local m = lightParams.beamStartOffset
+		x, y, z = x + deltax*m, y + deltay*m, z + deltaz*m
+		deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
+	end
+	
+	local light = {
+		px = x, py = y, pz = z, 
+		dx = deltax, dy = deltay, dz = deltaz, 
+		param = (doOverride and overrideParam) or lightParams
+	}
+	
+	if lightParams.fadeTime then
+		local timeToLive = Spring.GetProjectileTimeToLive(pID)
+		light.colMult = timeToLive/lightParams.fadeTime
+	else
+		light.colMult = 1
+	end
+	
+	return light
+end
+
+local function GetProjectileLight(lightParams, pID, x, y, z)
+	local light = {
+		px = x, py = y, pz = z, 
+		param = (doOverride and overrideParam) or lightParams
+	}
+	-- Use the following to check heatray fadeout parameters.
+	--local timeToLive = Spring.GetProjectileTimeToLive(pID)
+	--Spring.MarkerAddPoint(x,y,z,timeToLive)
+	
+	if lightParams.fadeTime and lightParams.fadeOffset then
+		local timeToLive = Spring.GetProjectileTimeToLive(pID)
+		light.colMult = math.max(0, (timeToLive + lightParams.fadeOffset)/lightParams.fadeTime)
+	else
+		light.colMult = 1
+	end
+	
+	return light
+end
+
 local function GetProjectileLights(beamLights, beamLightCount, pointLights, pointLightCount)
 
 	if not lightsEnabled then
@@ -328,69 +381,31 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 	local cameraHeight = math.floor(GetCameraHeight()*0.01)*100
 	--Spring.Echo("cameraHeight", cameraHeight, "fps", fps)
 	
-
-	local no_duplicate_projectileIDs_hackyfix = {}
 	for i, pID in ipairs(projectiles) do
-		if no_duplicate_projectileIDs_hackyfix[pID] == nil then -- hacky hotfix for https://springrts.com/mantis/view.php?id=4551
-			--Spring.Echo(Spring.GetDrawFrame(), i, pID)
-			no_duplicate_projectileIDs_hackyfix[pID] = true
-			local x, y, z = spGetProjectilePosition(pID)
-			--Spring.Echo("projectilepos = ", x, y, z, 'id', pID)
-			local weapon, piece = spGetProjectileType(pID)
-			if piece then
-				local explosionflags = spGetPieceProjectileParams(pID)
-				if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
-					--Spring.Echo('explosionflag = ', explosionflags)
-					pointLightCount = pointLightCount + 1
-					pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or gibParams, colMult = 1}
-				end
-			else
-				lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
-				if wantLoadParams and lightParams then
-					LoadParams(lightParams)
-				end
-				if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight)) then
-					if lightParams.beam then --BEAM type
-						local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
-						
-						if y + deltay < -800 then
-							-- The beam has fallen through the world
-							deltax, deltay, deltaz = InterpolateBeam(x, y, z, deltax, deltay, deltaz)
-						end
-						
-						if lightParams.beamOffset then
-							local m = lightParams.beamOffset
-							x, y, z = x - deltax*m, y - deltay*m, z - deltaz*m
-						end
-						if lightParams.beamStartOffset then
-							local m = lightParams.beamStartOffset
-							x, y, z = x + deltax*m, y + deltay*m, z + deltaz*m
-							deltax, deltay, deltaz = deltax*(1 - m), deltay*(1 - m), deltaz*(1 - m) 
-						end
-						
-						beamLightCount = beamLightCount + 1
-						beamLights[beamLightCount] = {px = x, py = y, pz = z, dx = deltax, dy = deltay, dz = deltaz, param = (doOverride and overrideParam) or lightParams}
-						
-						if lightParams.fadeTime then
-							local timeToLive = Spring.GetProjectileTimeToLive(pID)
-							beamLights[beamLightCount].colMult = timeToLive/lightParams.fadeTime
-						else
-							beamLights[beamLightCount].colMult = 1
-						end
-					else -- point type
-						if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
-							pointLightCount = pointLightCount + 1
-							pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or lightParams}
-							-- Use the following to check heatray fadeout parameters.
-							--local timeToLive = Spring.GetProjectileTimeToLive(pID)
-							--Spring.MarkerAddPoint(x,y,z,timeToLive)
-							if lightParams.fadeTime and lightParams.fadeOffset then
-								local timeToLive = Spring.GetProjectileTimeToLive(pID)
-								pointLights[pointLightCount].colMult = math.max(0, (timeToLive + lightParams.fadeOffset)/lightParams.fadeTime)
-							else
-								pointLights[pointLightCount].colMult = 1
-							end
-						end
+		Spring.Echo("pID", i, pID)
+		local x, y, z = spGetProjectilePosition(pID)
+		--Spring.Echo("projectilepos = ", x, y, z, 'id', pID)
+		local weapon, piece = spGetProjectileType(pID)
+		if piece then
+			local explosionflags = spGetPieceProjectileParams(pID)
+			if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
+				--Spring.Echo('explosionflag = ', explosionflags)
+				pointLightCount = pointLightCount + 1
+				pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or gibParams, colMult = 1}
+			end
+		else
+			lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
+			if wantLoadParams and lightParams then
+				LoadParams(lightParams)
+			end
+			if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight)) then
+				if lightParams.beam then --BEAM type
+					beamLightCount = beamLightCount + 1
+					beamLights[beamLightCount] = GetBeamLights(lightParams, pID, x, y, z)
+				else -- point type
+					if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
+						pointLightCount = pointLightCount + 1
+						pointLights[pointLightCount] = GetProjectileLight(lightParams, pID, x, y, z)
 					end
 				end
 			end
