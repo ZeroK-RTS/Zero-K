@@ -105,9 +105,9 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 220,
-			planes  = 220,
-			subs    = 220,
+			default = 320,
+			planes  = 320,
+			subs    = 16,
 		},
 		
 		cegTag					= [[sonictrail]],

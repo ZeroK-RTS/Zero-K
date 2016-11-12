@@ -56,7 +56,7 @@ end
 
 function script.AimFromWeapon(num)
 	if num == 1 then return sleeves end
-	return base
+	return missiles[missileNum]
 end
 
 local function RestoreAfterDelay()
