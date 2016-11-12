@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[a_shipcruiser]],
   name                   = [[Cavalier]],
-  description            = [[Morphable Cruiser (Artillery)]],
+  description            = [[Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
@@ -20,7 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. It can morph to replace its main cannon with a fire or slow bomb. Beware of aircraft, submarines and raider ships.]],
+    helptext       = [[This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships.]],
 
     extradrawrange = 200,
     modelradius    = [[17]],
@@ -89,7 +89,7 @@ unitDef = {
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 330,
     },
 	
 	NAPALM_MORTAR = {
