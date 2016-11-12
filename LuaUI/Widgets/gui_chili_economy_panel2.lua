@@ -518,8 +518,10 @@ function widget:GameFrame(n)
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
 	
-	metalWarningPanel.ShowWarning(mCurr > mStor * options.metalWarning.value )
-	energyWarningPanel.ShowWarning(eCurr < eStor * options.energyWarning.value )
+	local metalWarning = mCurr > mStor * options.metalWarning.value
+	local energyWarning = eCurr < eStor * options.energyWarning.value
+	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
+	energyWarningPanel.ShowWarning(energyWarning)
 
 	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
 	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
