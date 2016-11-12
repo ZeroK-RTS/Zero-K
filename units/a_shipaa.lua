@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[a_shipaa]],
-  name                   = [[Mistral]],
+  name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
   acceleration           = 0.0498,
   activateWhenBuilt   = true,
@@ -24,13 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Fr?gate (Anti-Air)]],
-	description_de = [[Flugabwehr Fregatte]],
-	description_pl = [[Fregata przeciwlotnicza]],
-    helptext       = [[With its powerful twin anti-air laser batteries, the Mistral anti-air frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
-    helptext_fr    = [[Le Shredder est ?quip? d'un puissant canon flak, capable de d?cimer les attaques aeriennes gr?ce ? une explosion ? fragmentation. Tr?s utile et moins cher qu'un Enforcer, il prot?ge efficacement toute les flottes.]],
-	helptext_de    = [[Mit seinem schlagkräftigen, doppelläufigen Flugabwehrlaser schützt diese Fregatte deine Flotte vor Luftangriffen. Wie immer ist aber auch diese Flugabwehr gegen Ziele, die sich nicht in der Luft befinden, machtlos.]],
-	helptext_pl    = [[Fregata przeciwlotnicza skutecznie broni floty przed atakami z powietrza, ale nie jest w stanie atakowac innych celow.]],
+    helptext       = [[With its powerful twin anti-air laser batteries, the Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
 	modelradius    = [[17]],
 	turnatfullspeed = [[1]],
   },
