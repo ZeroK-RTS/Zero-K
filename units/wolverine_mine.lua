@@ -115,6 +115,7 @@ unitDef = {
       soundHitVolume          = 5,
       soundStart              = [[weapon/claw]],
       soundStartVolume        = 7,
+      soundTrigger            = 1,
       startVelocity           = 50,
       texture2                = [[darksmoketrail]],
       tracks                  = true,
