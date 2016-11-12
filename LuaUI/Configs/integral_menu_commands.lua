@@ -31,147 +31,160 @@ local SPECIAL =         {order = 11, row = 2, col = 5}
 local UTILITY =         {order = 12, row = 2, col = 6}
 
 local units = {
-	armrectr = CONSTRUCTOR,
-	cornecro = CONSTRUCTOR,
-	corned = CONSTRUCTOR,
-	corch = CONSTRUCTOR,
-	gunshipcon = CONSTRUCTOR,
-	armca = CONSTRUCTOR,
-	arm_spider = CONSTRUCTOR,
-	corfast = CONSTRUCTOR,
-	coracv =  CONSTRUCTOR,
-	amphcon = CONSTRUCTOR,
-	shipcon = CONSTRUCTOR,
-
-	armpw = RAIDER,
-	corak = RAIDER,
-	corgator = RAIDER,
-	corsh = RAIDER,
-	armkam = RAIDER,
-	fighter = RAIDER,
-	armflea = RAIDER,
-	corpyro = RAIDER,
-	panther = RAIDER,
-	amphraider3 = RAIDER,
-	subraider = RAIDER,
-	
-	armwar = RIOT,
-	cormak = RIOT,
-	corlevlr = RIOT,
-	hoverriot = RIOT,
-	armbrawl = RIOT,
-	corhurc2 = RIOT,
-	spiderriot = RIOT,
-	jumpblackhole = RIOT,
-	tawf114 = RIOT,
-	amphriot = RIOT,
-	shipraider = RIOT,
-	
-	armrock = SKIRMISHER,
-	corstorm = SKIRMISHER,
-	cormist = SKIRMISHER, -- Not really but nowhere else to go
-	nsaclash = SKIRMISHER,
-	gunshipsupport = SKIRMISHER,
-	armcybr = SKIRMISHER,
-	armsptk = SKIRMISHER,
-	slowmort = SKIRMISHER,
-	cormart = SKIRMISHER,
-	amphfloater = SKIRMISHER,
-	shiptorp = SKIRMISHER,
-	
-	armham = ARTILLERY,
-	shieldarty = ARTILLERY,
-	corgarp = ARTILLERY,
-	armmanni = ARTILLERY,
-	corvalk = ARTILLERY,
-	-- No Plane Artillery
-	-- No Spider Artillery
-	firewalker = ARTILLERY,
-	trem = ARTILLERY,
-	-- No Amph Artillery
-	shiparty = ARTILLERY,
-	
-	armmerl = HEAVY_ARTILLERY,
-	corbtrans = HEAVY_ARTILLERY,
-	subarty = HEAVY_ARTILLERY,
-	
-	armjeth = ANTI_AIR,
-	corcrash = ANTI_AIR,
-	vehaa = ANTI_AIR,
-	armjeth = ANTI_AIR,
-	hoveraa = ANTI_AIR,
-	gunshipaa = ANTI_AIR,
-	corvamp = ANTI_AIR,
-	spideraa = ANTI_AIR,
-	armaak = ANTI_AIR,
-	corsent = ANTI_AIR,
-	amphaa = ANTI_AIR,
-	shipaa = ANTI_AIR,
-	
-	spherepole = WEIRD_RAIDER,
-	corclog = WEIRD_RAIDER,
-	corfav = WEIRD_RAIDER,
-	hoverdepthcharge = WEIRD_RAIDER,
-	bladew = WEIRD_RAIDER,
-	corawac = WEIRD_RAIDER,
-	arm_venom = WEIRD_RAIDER,
-	puppy = WEIRD_RAIDER,
-	logkoda = WEIRD_RAIDER,
-	amphraider2 = WEIRD_RAIDER,
-	shipscout = WEIRD_RAIDER,
-	
-	armzeus = ASSAULT,
-	corthud = ASSAULT,
-	corraid = ASSAULT,
-	hoverassault = ASSAULT,
-	blackdawn = ASSAULT,
-	corshad = ASSAULT,
-	spiderassault = ASSAULT,
-	corcan = ASSAULT,
-	correap = ASSAULT,
-	amphassault = ASSAULT,
-	shipskirm = ASSAULT,
-	
-	armsnipe = HEAVY_SOMETHING,
-	shieldfelon = HEAVY_SOMETHING,
-	capturecar = HEAVY_SOMETHING,
-	-- No Hover Heavy
-	corcrw = HEAVY_SOMETHING,
-	armstiletto_laser = HEAVY_SOMETHING,
-	armcrabe = HEAVY_SOMETHING,
-	corsumo = HEAVY_SOMETHING,
-	corgol = HEAVY_SOMETHING,
-	amphtele = HEAVY_SOMETHING,
-	armtboat = HEAVY_SOMETHING,
-	
-	armtick = SPECIAL,
-	corroach = SPECIAL,
-	-- No Vehicle Special
-	-- No Hover Special
-	blastwing = SPECIAL,
-	armspy = SPECIAL,
-	corsktl = SPECIAL,
-	-- No Tank Special
-	-- No Amph Special
-	
-	spherecloaker = UTILITY,
-	core_spectre = UTILITY,
-	
-	dynhub_support_base = {order = 1, row = 1, col = 1},
-    dynhub_recon_base =   {order = 2, row = 1, col = 2},
-    dynhub_assault_base = {order = 3, row = 1, col = 3},
-    dynhub_strike_base =  {order = 4, row = 1, col = 4},
-    armcomdgun =          {order = 5, row = 1, col = 5},
-	scorpion =            {order = 6, row = 1, col = 6},
-    dante =               {order = 7, row = 2, col = 1},
-    armraven =            {order = 8, row = 2, col = 2},
-    funnelweb =           {order = 9, row = 2, col = 3},
-    armbanth =           {order = 10, row = 2, col = 4},
-    armorco =            {order = 11, row = 2, col = 5},
-    cornukesub =         {order = 12, row = 2, col = 6},
-    reef =               {order = 13, row = 3, col = 1},
-    corbats =            {order = 14, row = 3, col = 2},
+	factorycloak = {
+		armrectr = CONSTRUCTOR,
+		armpw = RAIDER,
+		armwar = RIOT,
+		armrock = SKIRMISHER,
+		armham = ARTILLERY,
+		armjeth = ANTI_AIR,
+		spherepole = WEIRD_RAIDER,
+		armzeus = ASSAULT,
+		armsnipe = HEAVY_SOMETHING,
+		armtick = SPECIAL,
+		spherecloaker = UTILITY,
+	},
+	factoryshield = {
+		cornecro = CONSTRUCTOR,
+		corak = RAIDER,
+		cormak = RIOT,
+		corstorm = SKIRMISHER,
+		shieldarty = ARTILLERY,
+		corcrash = ANTI_AIR,
+		corclog = WEIRD_RAIDER,
+		corthud = ASSAULT,
+		shieldfelon = HEAVY_SOMETHING,
+		corroach = SPECIAL,
+		core_spectre = UTILITY,	
+	},
+	factoryveh = {
+		corned = CONSTRUCTOR,
+		corgator = RAIDER,
+		corlevlr = RIOT,
+		cormist = SKIRMISHER, -- Not really but nowhere else to go
+		corgarp = ARTILLERY,
+		armmerl = HEAVY_ARTILLERY,
+		vehaa = ANTI_AIR,
+		corfav = WEIRD_RAIDER,
+		corraid = ASSAULT,
+		capturecar = HEAVY_SOMETHING,
+	},
+	factoryhover = {
+		corch = CONSTRUCTOR,
+		corsh = RAIDER,
+		hoverriot = RIOT,
+		nsaclash = SKIRMISHER,
+		armmanni = ARTILLERY,
+		hoveraa = ANTI_AIR,
+		hoverdepthcharge = WEIRD_RAIDER,
+		hoverassault = ASSAULT,
+	},
+	factorygunship = {
+		gunshipcon = CONSTRUCTOR,
+		armkam = RAIDER,
+		armbrawl = RIOT,
+		gunshipsupport = SKIRMISHER,
+		corvalk = ARTILLERY,
+		corbtrans = HEAVY_ARTILLERY,
+		gunshipaa = ANTI_AIR,
+		bladew = WEIRD_RAIDER,
+		blackdawn = ASSAULT,
+		corcrw = HEAVY_SOMETHING,
+		blastwing = SPECIAL,
+	},
+	factoryplane = {
+		armca = CONSTRUCTOR,
+		fighter = RAIDER,
+		corhurc2 = RIOT,
+		armcybr = SKIRMISHER,
+		-- No Plane Artillery
+		corvamp = ANTI_AIR,
+		corawac = WEIRD_RAIDER,
+		corshad = ASSAULT,
+		armstiletto_laser = HEAVY_SOMETHING,
+	},
+	factoryspider = {
+		arm_spider = CONSTRUCTOR,
+		armflea = RAIDER,
+		spiderriot = RIOT,
+		armsptk = SKIRMISHER,
+		-- No Spider Artillery
+		spideraa = ANTI_AIR,
+		arm_venom = WEIRD_RAIDER,
+		spiderassault = ASSAULT,
+		armcrabe = HEAVY_SOMETHING,
+		armspy = SPECIAL,
+	},
+	factoryjump = {
+		corfast = CONSTRUCTOR,
+		corpyro = RAIDER,
+		jumpblackhole = RIOT,
+		slowmort = SKIRMISHER,
+		firewalker = ARTILLERY,
+		armaak = ANTI_AIR,
+		puppy = WEIRD_RAIDER,
+		corcan = ASSAULT,
+		corsumo = HEAVY_SOMETHING,
+		corsktl = SPECIAL,
+	},
+	factorytank = {
+		coracv =  CONSTRUCTOR,
+		panther = RAIDER,
+		tawf114 = RIOT,
+		cormart = SKIRMISHER,
+		trem = ARTILLERY,
+		corsent = ANTI_AIR,
+		logkoda = WEIRD_RAIDER,
+		correap = ASSAULT,
+		corgol = HEAVY_SOMETHING,
+	},
+	factoryamph = {
+		amphcon = CONSTRUCTOR,
+		amphraider3 = RAIDER,
+		amphriot = RIOT,
+		amphfloater = SKIRMISHER,
+		-- No Amph Artillery
+		amphaa = ANTI_AIR,
+		amphraider2 = WEIRD_RAIDER,
+		amphassault = ASSAULT,
+		amphtele = HEAVY_SOMETHING,
+	},
+	factoryship = {
+		shipcon = CONSTRUCTOR,
+		subraider = RAIDER,
+		shipraider = RIOT,
+		shiptorp = SKIRMISHER,
+		shiparty = ARTILLERY,
+		subarty = HEAVY_ARTILLERY,
+		shipaa = ANTI_AIR,
+		shipscout = WEIRD_RAIDER,
+		shipskirm = ASSAULT,
+		armtboat = HEAVY_SOMETHING,
+	},
 }
+
+local function AddBuildQueue(name)
+	units[name] = {}
+	local ud = UnitDefNames[name]
+	if ud and ud.buildOptions then
+		local row = 1
+		local col = 1
+		local order = 1
+		for i = 1, #ud.buildOptions do
+			local buildName = UnitDefs[ud.buildOptions[i]].name
+			units[name][buildName] = {row = row, col = col, order = order}
+			col = col + 1
+			if col == 7 then
+				col = 1
+				row = row + 1
+			end
+			order = order + 1
+		end
+	end
+end
+
+AddBuildQueue("striderhub")
+AddBuildQueue("missilesilo")
 
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},
@@ -275,7 +288,15 @@ CopyBuildArray(econ, econ_commands)
 CopyBuildArray(aux, special_commands)
 CopyBuildArray(defense, defense_commands)
 CopyBuildArray(super, special_commands)
-CopyBuildArray(units, units_factory_commands)
+
+for name, listData in pairs(units) do
+	local unitDefID = UnitDefNames[name]
+	unitDefID = unitDefID and unitDefID.id
+	if unitDefID then
+		units_factory_commands[unitDefID] = {}
+		CopyBuildArray(listData, units_factory_commands[unitDefID])
+	end
+end
 
 -- Global commands defined here - they have cmdDesc format + 
 local globalCommands = {

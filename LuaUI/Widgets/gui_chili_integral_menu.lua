@@ -1188,13 +1188,13 @@ local commandPanels = {
 		humanName = "Units",
 		name = "units_factory",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
-			if not factoryUnitDefID then
+			if not (factoryUnitDefID and buildCmdUnits[factoryUnitDefID]) then
 				return false
 			end
 			local buildOptions = UnitDefs[factoryUnitDefID].buildOptions
 			for i = 1, #buildOptions do
 				if buildOptions[i] == -cmdID then
-					local position = buildCmdUnits[cmdID]
+					local position = buildCmdUnits[factoryUnitDefID][cmdID]
 					return position and true or false, position
 				end
 			end
