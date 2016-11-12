@@ -96,8 +96,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 300.1,
-        subs    = 300.1,
+        default = 250.1,
+        subs    = 250.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
@@ -113,7 +113,7 @@ unitDef = {
 	  numbounce               = 0,
       noSelfDamage            = true,
       range                   = 220,
-      reloadtime              = 5.5,
+      reloadtime              = 4,
       rgbcolor                = [[0.9 0.1 0.9]],
       soundHit                = [[explosion/wet/ex_underwater_pulse]],
       soundHitVolume          = 6,

@@ -22,11 +22,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Torpedofregatte]],
-    description_pl = [[Fregata torpedowa]],
-    helptext       = [[The Hunter is a mobile anti-submarine unit. It boasts a massive area of effect.]],
-	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
-	helptext_pl    = [[Fregata torpedowa to odpowiedz na jednostki podwodne; moze tez strzelac w statki.]],
+    helptext       = [[The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels.]],
 	modelradius    = [[14]],
 	turnatfullspeed = [[1]],
   },

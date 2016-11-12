@@ -35,8 +35,8 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 200,
-  maxDamage              = 1150,
-  maxVelocity            = 3.4,
+  maxDamage              = 1000,
+  maxVelocity            = 3.1,
   minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
@@ -52,11 +52,11 @@ unitDef = {
   sfxtypes               = {
 
     explosiongenerators = {
-	  [[custom:LARGE_MUZZLE_FLASH_FX]],
-      [[custom:PULVMUZZLE]],
+      [[custom:RAIDMUZZLE]],
+      [[custom:RAIDDUST]],
     },
 
-  },  
+  },
   
   smoothAnim             = true,
   sonarDistance          = 500,
@@ -94,11 +94,6 @@ unitDef = {
 	craterBoost             = 0,
 	craterMult              = 0,
 	
-	customParams			= {
-		muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
-		miscEffectFire = [[custom:RIOT_SHELL_L]],
-	},
-	
 	damage                  = {
 		default = 32,
 		planes  = 32,
@@ -113,13 +108,13 @@ unitDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
-	projectiles				= 5,
+	projectiles				= 4,
 	range                   = 320,
 	reloadtime              = 2,
 	rgbColor                = [[1 1 0]],
-	soundHit                = [[weapon/laser/lasercannon_hit]],
+	soundHit                = [[impacts/shotgun_impactv5]],
 	soundStart              = [[weapon/cannon/cannon_fire4]],
-	soundStartVolume		= 0.6,
+	soundStartVolume		= 0.05,
 	soundTrigger            = true,
 	sprayangle				= 3600,
 	thickness               = 2,

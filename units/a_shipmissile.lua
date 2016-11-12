@@ -24,7 +24,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Siren frigate fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs, torpedo boats, and anything else which gets close.]],
+    helptext       = [[This Missile Frigate fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
 	turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },
@@ -37,7 +37,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 30,
-  maxDamage              = 550,
+  maxDamage              = 650,
   maxVelocity            = 2.5,
   minCloakDistance       = 350,
   minWaterDepth          = 10,

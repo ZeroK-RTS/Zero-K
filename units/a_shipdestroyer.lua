@@ -1,16 +1,16 @@
 unitDef = {
   unitname               = [[a_shipdestroyer]],
   name                   = [[Warden]],
-  description            = [[Destroyer (Assault/Riot)]],
+  description            = [[Destroyer (Riot/Assault)]],
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
   buildAngle             = 16384,
-  buildCostEnergy        = 320,
-  buildCostMetal         = 320,
+  buildCostEnergy        = 380,
+  buildCostMetal         = 380,
   builder                = false,
   buildPic               = [[destroyer.png]],
-  buildTime              = 320,
+  buildTime              = 380,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -25,7 +25,7 @@ unitDef = {
 
   customParams           = {
 
-    helptext       = [[The Warden is a brawler, combining strong area-of-effect sonic cannons and armor at a low cost--for a ship. Use these to protect your fleet against surface and underwater raiders and to spearhead assaults.]],
+    helptext       = [[This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets.]],
     modelradius    = [[15]],
 	turnatfullspeed = [[1]],
   },
@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 2400,
+  maxDamage              = 2500,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -89,7 +89,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 220,
+		areaOfEffect            = 180,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -100,7 +100,7 @@ unitDef = {
 			slot = [[5]],
 			muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 			miscEffectFire   = [[custom:RIOT_SHELL_L]],
-			lups_explodelife = 1.4,
+			lups_explodelife = 1.3,
 			lups_explodespeed = 0.8,
 		},
 
@@ -112,9 +112,9 @@ unitDef = {
 		
 		cegTag					= [[sonictrail]],
 		explosionGenerator		= [[custom:sonic_2]],
-		edgeEffectiveness       = 0.9,
+		edgeEffectiveness       = 0.5,
 		fireStarter             = 150,
-		impulseBoost            = 120,
+		impulseBoost            = 300,
 		impulseFactor           = 0.5,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
