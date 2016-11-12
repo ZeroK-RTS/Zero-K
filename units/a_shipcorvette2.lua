@@ -1,7 +1,7 @@
 unitDef = {
-  unitname               = [[a_shipcorvette]],
+  unitname               = [[a_shipcorvette2]],
   name                   = [[Corsair]],
-  description            = [[Corvette (Heavy Raider)]],
+  description            = [[Corvette (Antiair/Heavy Raider)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
@@ -9,7 +9,7 @@ unitDef = {
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
   builder                = false,
-  buildPic               = [[CORESUPP.png]],
+  buildPic               = [[destroyer.png]],
   buildTime              = 200,
   canAttack              = true,
   canGuard               = true,
@@ -23,7 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Corvette comes equipped with two shotguns which are effective against anything which gets close.]],
+    helptext       = [[The Corsair packs a shotgun effective against torpedo boats and light defences, and a light anti-air missile battery. It is defenseless against enemy submarines.]],
 	extradrawrange = 420,
   },
 
@@ -31,7 +31,7 @@ unitDef = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[a_shipcorvette]],
+  iconType               = [[a_shipcorvette2]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 200,
@@ -42,8 +42,8 @@ unitDef = {
   movementClass          = [[BOAT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
-  objectName             = [[vette.s3o]],
-  script				 = [[a_shipcorvette.lua]],
+  objectName             = [[destroyer.s3o]],
+  script				 = [[a_shipcorvette2.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   side                   = [[ARM]],
@@ -75,9 +75,8 @@ unitDef = {
 
 
     {
-      def                = [[SHOTGUN]],
-      badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+      def                = [[MISSILE]],
+      onlyTargetCategory = [[GUNSHIP FIXEDWING]],
     },
 
   },
@@ -129,29 +128,76 @@ unitDef = {
 	weaponVelocity          = 880,
    },
 	
-	
+	MISSILE      = {
+      name                    = [[Corvette AA Missiles]],
+      areaOfEffect            = 48,
+	  canattackground         = false,
+      cegTag                  = [[missiletrailyellow]],
+      craterBoost             = 1,
+      craterMult              = 2,
+	  
+	  customParams        	  = {
+		isaa = [[1]],
+	  },
+
+      damage                  = {
+        default = 14,
+        planes  = 140,
+        subs    = 7,
+      },
+
+      edgeEffectiveness       = 0.5,
+      fireStarter             = 100,
+	  fixedLauncher			  = true,	  
+      flightTime              = 4,
+      impulseBoost            = 0,
+      impulseFactor           = 0.4,
+      interceptedByShieldType = 2,
+      model                   = [[wep_m_hailstorm.s3o]],
+      noSelfDamage            = true,
+      range                   = 320,
+      reloadtime              = 2,
+      smokeTrail              = true,
+      soundHit                = [[weapon/missile/missile_fire12]],
+      soundStart              = [[weapon/missile/missile_fire10]],
+      startVelocity			  = 100,
+      tolerance               = 4000,
+	  tracks				  = true,
+	  turnrate				  = 30000,
+	  turret				  = true,	  
+	  waterWeapon			  = true,
+      weaponAcceleration      = 300,
+      weaponTimer             = 1,
+      weaponType              = [[StarburstLauncher]],
+      weaponVelocity          = 1800,
+    },
   },
 
 
   featureDefs            = {
 
-    DEAD = {
+    DEAD  = {
       blocking         = false,
+	  collisionVolumeOffsets = [[0 0 3]],
+	  collisionVolumeScales  = [[32 46 102]],
+	  collisionVolumeTest    = 1,
+	  collisionVolumeType    = [[box]],	  
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[vette_dead.s3o]],
+      footprintX       = 5,
+      footprintZ       = 5,
+      object           = [[destroyer_dead.s3o]],
     },
+
     
     HEAP  = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3b.s3o]],
+      footprintX       = 4,
+      footprintZ       = 4,
+      object           = [[debris4x4b.s3o]],
     },
 
   },
 
 }
 
-return lowerkeys({ a_shipcorvette = unitDef })
+return lowerkeys({ a_shipcorvette2 = unitDef })

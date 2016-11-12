@@ -91,8 +91,8 @@ end
 function script.Shot(num)
 	if num == 1 then
 		--EmitSfx(gunPieces[gun_1].flare, 1024)
-		gun_1 = 1 - gun_1
 		StartThread(Recoil, gunPieces[gun_1].barrel)
+		gun_1 = 1 - gun_1
 	elseif num == 2 then
 		missileNum = missileNum + 1	
 		if missileNum > 4 then missileNum = 1 end		

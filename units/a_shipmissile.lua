@@ -29,10 +29,10 @@ unitDef = {
     modelradius     = [[24]],
   },
 
-  explodeAs              = [[BIG_UNIT]],
+  explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
-  footprintX             = 3,
-  footprintZ             = 3,
+  footprintX             = 2,
+  footprintZ             = 2,
   iconType               = [[a_shipmissile]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -131,17 +131,17 @@ unitDef = {
     DEAD = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
+      footprintX       = 2,
+      footprintZ       = 2,
       object           = [[logsiren2_dead.s3o]],
     },
 
 
     HEAP = {
       blocking         = false,
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3c.s3o]],
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2c.s3o]],
     },
 
   },

@@ -31,7 +31,7 @@ unitDef = {
 	turnatfullspeed = [[1]],
   },
 
-  explodeAs           = [[BIG_UNITEX]],
+  explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,

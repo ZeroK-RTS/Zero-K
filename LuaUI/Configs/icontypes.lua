@@ -900,10 +900,18 @@ local icontypes = {
     size=2.2,
   },
   a_shipcorvette = {
+    bitmap='icons/corvette.dds',
+	size=2.8,
+  },
+  a_shipcorvette2 = {
     bitmap='icons/a_shipcorvette.png',
 	size=2.8,
   },
   a_shipdestroyer = {
+    bitmap='icons/a_shipcorvette.png',
+	size=2.8,
+  },
+  a_shipdestroyer2 = {
     bitmap='icons/corvette.dds',
 	size=2.8,
   },

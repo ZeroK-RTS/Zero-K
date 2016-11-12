@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[a_shipdestroyer]],
+  unitname               = [[a_shipdestroyer2]],
   name                   = [[Warden]],
   description            = [[Destroyer (Assault/Riot)]],
   acceleration           = 0.0768,
@@ -9,7 +9,7 @@ unitDef = {
   buildCostEnergy        = 320,
   buildCostMetal         = 320,
   builder                = false,
-  buildPic               = [[destroyer.png]],
+  buildPic               = [[CORESUPP.png]],
   buildTime              = 320,
   canAttack              = true,
   canGuard               = true,
@@ -32,22 +32,22 @@ unitDef = {
 
   explodeAs              = [[BIG_UNITEX]],
   floater                = true,
-  footprintX             = 4,
-  footprintZ             = 4,
-  iconType               = [[a_shipdestroyer]],
+  footprintX             = 5,
+  footprintZ             = 5,
+  iconType               = [[a_shipdestroyer2]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 2400,
-  maxVelocity            = 2.0,
+  maxDamage              = 1800,
+  maxVelocity            = 1.8,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
-  objectName             = [[a_shipdestroyer.s3o]],
+  objectName             = [[warden.s3o]],
   scale                  = [[0.5]],
-  script				 = [[a_shipdestroyer.lua]],
+  script				 = [[a_shipdestroyer2.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -76,10 +76,11 @@ unitDef = {
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
+
     {
-      def                = [[MISSILE]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+      def                = [[SONIC]],
+      badTargetCategory  = [[FIXEDWING]],
+      onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
 
   },
@@ -89,7 +90,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 220,
+		areaOfEffect            = 160,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -100,26 +101,26 @@ unitDef = {
 			slot = [[5]],
 			muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 			miscEffectFire   = [[custom:RIOT_SHELL_L]],
-			lups_explodelife = 1.4,
+			lups_explodelife = 1.5,
 			lups_explodespeed = 0.8,
 		},
 
 		damage                  = {
-			default = 220,
-			planes  = 220,
-			subs    = 220,
+			default = 170,
+			planes  = 170,
+			subs    = 170,
 		},
 		
 		cegTag					= [[sonictrail]],
 		explosionGenerator		= [[custom:sonic_2]],
-		edgeEffectiveness       = 0.9,
+		edgeEffectiveness       = 0.75,
 		fireStarter             = 150,
-		impulseBoost            = 120,
+		impulseBoost            = 60,
 		impulseFactor           = 0.5,
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
-		range                   = 380,
-		reloadtime              = 2,
+		range                   = 250,
+		reloadtime              = 2.5,
 		soundStart              = [[weapon/sonicgun]],
 		soundHit                = [[weapon/sonicgun_hit]],
 		soundStartVolume        = 12,
@@ -136,43 +137,6 @@ unitDef = {
 		waterweapon				= true,
 		duration				= 0.15,
 	},
-	
-    MISSILE      = {
-      name                    = [[Destroyer Missiles]],
-      areaOfEffect            = 48,
-      cegTag                  = [[missiletrailyellow]],
-      craterBoost             = 1,
-      craterMult              = 2,
-
-      damage                  = {
-        default = 400,
-        subs    = 400,
-      },
-
-      edgeEffectiveness       = 0.5,
-      fireStarter             = 100,
-	  fixedLauncher			  = true,	  
-      flightTime              = 4,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      model                   = [[wep_m_hailstorm.s3o]],
-      noSelfDamage            = true,
-      range                   = 700,
-      reloadtime              = 10,
-      smokeTrail              = true,
-      soundHit                = [[weapon/missile/missile_fire12]],
-      soundStart              = [[weapon/missile/missile_fire10]],
-      startVelocity			  = 100,
-      tolerance               = 4000,
-	  turnrate				  = 30000,
-	  turret				  = true,	  
-	  --waterWeapon			  = true,
-      weaponAcceleration      = 300,
-      weaponTimer             = 1,
-      weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 1800,
-    },
 
   },
 
@@ -182,9 +146,9 @@ unitDef = {
     DEAD = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[destroyer_dead.s3o]],
+      footprintX       = 5,
+      footprintZ       = 5,
+      object           = [[warden_dead.s3o]],
     },
 
 
@@ -199,4 +163,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shipdestroyer = unitDef })
+return lowerkeys({ a_shipdestroyer2 = unitDef })
