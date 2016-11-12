@@ -150,9 +150,14 @@ local function SendCommand()
 		spSetActiveCommand(-1)
 	end
 	
+	local cmdOpts = {}
+	if s then
+		cmdOpts[#cmdOpts + 1] = "shift"
+	end
+	
 	local height = Spring.GetGroundHeight(pointX, pointZ)
 	for i = 1, #constructor do
-		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, {"shift"})
+		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, cmdOpts)
 		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
 	end
 end
