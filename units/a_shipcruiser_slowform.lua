@@ -1,6 +1,6 @@
 unitDef = {
-  unitname               = [[a_shipcruiser]],
-  name                   = [[Cavalier]],
+  unitname               = [[a_shipcruiser_slowform]],
+  name                   = [[Cavalier (Disruptor)]],
   description            = [[Morphable Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy        = 850,
   buildCostMetal         = 850,
   builder                = false,
-  buildPic               = [[armroy.png]],
+  buildPic               = [[armroy_slow.png]],
   buildTime              = 850,
   canAttack              = true,
   canMove                = true,
@@ -20,13 +20,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. It can morph to replace its main cannon with a fire or slow bomb. Beware of aircraft, submarines and raider ships.]],
+    helptext       = [[This morphed Cruiser packs a long-range disruptor bomb, useful for harassing and slowing enemies from range. Beware of aircraft, submarines and raider ships.]],
 
     extradrawrange = 200,
     modelradius    = [[17]],
     turnatfullspeed = [[1]],
 	
-	morphto = [[a_shipcruiser_slowform]],
+	morphto = [[a_shipcruiser_fireform]],
     morphtime = [[10]],
   },
 
@@ -57,7 +57,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[PLASMA]],
+      def                = [[DISBOMB]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
@@ -66,34 +66,51 @@ unitDef = {
 
   weaponDefs             = {
 
-    PLASMA = {
-      name                    = [[Plasma Cannon]],
-      areaOfEffect            = 64,
-      avoidFeature            = false,
-	  avoidGround             = false,
-      craterBoost             = 1,
-      craterMult              = 2,
+    DISBOMB = {
+	name                    = [[Disruptor Bomb]],
+	accuracy                = 400,
+	areaOfEffect            = 256,
+	avoidFeature            = false,
+	cegTag                  = [[beamweapon_muzzle_purple]],
+	craterBoost             = 0,
+	craterMult              = 0,
 
-      damage                  = {
-        default = 601.1,
-        planes  = 601.1,
-        subs    = 30,
-      },
+	customParams            = {
+		timeslow_damagefactor = [[4]],
+		muzzleEffectFire = [[custom:RAIDMUZZLE]],
+		
+		light_camera_height = 2500,
+		light_color = [[1.5 0.75 1.8]],
+		light_radius = 280,
+	},
 
-      explosionGenerator      = [[custom:PLASMA_HIT_64]],
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 1,
-	  myGravity               = 0.1,
-      projectiles             = 1,
-      range                   = 1200,
-      reloadtime              = 3.0,
-      soundHit                = [[weapon/cannon/cannon_hit2]],
-      soundStart              = [[weapon/cannon/heavy_cannon]],
-      turret                  = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
-    },
+	damage                  = {
+		default = 150,
+		planes  = 150,
+		subs    = 7.5,
+	},
+
+	explosionGenerator      = [[custom:riotballplus_purple]],
+	explosionSpeed          = 5,
+	fireStarter             = 100,
+	impulseBoost            = 0,
+	impulseFactor           = 0,
+	interceptedByShieldType = 2,
+	model                   = [[wep_b_fabby.s3o]],
+	myGravity               = 0.1,
+    noSelfDamage            = false,
+	range                   = 1100,
+	reloadtime              = 6,
+	smokeTrail              = true,
+	soundHit                = [[weapon/aoe_aura]],
+	soundHitVolume          = 8,
+	soundStart              = [[weapon/cannon/cannon_fire3]],
+	--startVelocity           = 350,
+	--trajectoryHeight        = 0.3,
+	turret                  = true,
+	weaponType              = [[Cannon]],
+	weaponVelocity          = 340,
+}
 
   },
 
@@ -118,4 +135,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shipcruiser = unitDef })
+return lowerkeys({ a_shipcruiser_slowform = unitDef })

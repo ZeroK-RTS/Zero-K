@@ -1,6 +1,6 @@
 unitDef = {
-  unitname               = [[a_shipcruiser]],
-  name                   = [[Cavalier]],
+  unitname               = [[a_shipcruiser_fireform]],
+  name                   = [[Cavalier (Napalm)]],
   description            = [[Morphable Cruiser (Artillery)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy        = 850,
   buildCostMetal         = 850,
   builder                = false,
-  buildPic               = [[armroy.png]],
+  buildPic               = [[armroy_fire.png]],
   buildTime              = 850,
   canAttack              = true,
   canMove                = true,
@@ -20,13 +20,13 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. It can morph to replace its main cannon with a fire or slow bomb. Beware of aircraft, submarines and raider ships.]],
+    helptext       = [[This morphed Cruiser packs a long-range napalm cannon, useful for bombarding larger groups of enemies. Beware of aircraft, submarines and raider ships.]],
 
     extradrawrange = 200,
     modelradius    = [[17]],
     turnatfullspeed = [[1]],
 	
-	morphto = [[a_shipcruiser_slowform]],
+	morphto = [[a_shipcruiser]],
     morphtime = [[10]],
   },
 
@@ -57,7 +57,7 @@ unitDef = {
   weapons                = {
 
     {
-      def                = [[PLASMA]],
+      def                = [[NAPALM_MORTAR]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
     },
@@ -66,33 +66,49 @@ unitDef = {
 
   weaponDefs             = {
 
-    PLASMA = {
-      name                    = [[Plasma Cannon]],
-      areaOfEffect            = 64,
-      avoidFeature            = false,
-	  avoidGround             = false,
+	NAPALM_MORTAR = {
+      name                    = [[Napalm Cannon]],
+      accuracy                = 400,
+      areaOfEffect            = 196,
+	  avoidFeature            = false,
+	  cegTag                  = [[custom:gravityless_flamer]],
       craterBoost             = 1,
       craterMult              = 2,
+      
+	  customParams        	  = {
+	    setunitsonfire = "1",
+		burntime = 60,
 
+		area_damage = 1,
+		area_damage_radius = 128,
+		area_damage_dps = 20,
+		area_damage_duration = 6,
+
+		--lups_heat_fx = [[firewalker]],
+	  },
+	  
       damage                  = {
-        default = 601.1,
-        planes  = 601.1,
-        subs    = 30,
+        default = 80,
+        planes  = 80,
+        subs    = 4,
       },
 
-      explosionGenerator      = [[custom:PLASMA_HIT_64]],
+      explosionGenerator      = [[custom:napalm_firewalker]],
+      firestarter             = 180,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-	  myGravity               = 0.1,
-      projectiles             = 1,
-      range                   = 1200,
-      reloadtime              = 3.0,
-      soundHit                = [[weapon/cannon/cannon_hit2]],
-      soundStart              = [[weapon/cannon/heavy_cannon]],
+      myGravity               = 0.1,
+      range                   = 1100,
+      reloadtime              = 6,
+      rgbColor                = [[1 0.5 0.2]],
+      size                    = 8,
+      soundHit                = [[weapon/cannon/wolverine_hit]],
+      soundStart              = [[weapon/cannon/wolverine_fire]],
+      sprayangle              = 1024,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 400,
+      weaponVelocity          = 340,
     },
 
   },
@@ -118,4 +134,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shipcruiser = unitDef })
+return lowerkeys({ a_shipcruiser_fireform = unitDef })
