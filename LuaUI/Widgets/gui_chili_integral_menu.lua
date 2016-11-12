@@ -136,7 +136,7 @@ local buttonLayoutConfig = {
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'unitsHotkeys', 'hide_when_spectating',
+	'background_opacity', 'keyboardType', 'unitsHotkeys', 'unitsUseCtrl', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
 
@@ -161,6 +161,13 @@ options = {
 		name = 'Enable Factory Hotkeys',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+	},
+	unitsUseCtrl = {
+		name = 'Hotkey + Ctrl queues 20',
+		type = 'bool',
+		value = false,
+		advanced = true,
 		noHotkey = true,
 	},
 	hide_when_spectating = {
@@ -330,10 +337,10 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 	MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, movePos, nil, insertPos)
 end
 
-local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
+local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
 	local commands = Spring.GetFactoryCommands(factoryUnitID)
 	if not commands then
-		return
+		return true
 	end
 	
 	-- Find the end of the block
@@ -362,43 +369,46 @@ local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, f
 	end
 	
 	if not queuePosition then
-		return
+		return true
 	end
 	
 	if alt then
 		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, false, 0)
-		return
+		return true
 	end
 
 	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 	if right then
 		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, inputMult)
-		return
+		return true
 	end
 	
 	for i = 1, inputMult do
 		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
 	end
+	return true
 end
 
 local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID then
-		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
-		return
+		QueueClickFunc(mouse, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
+		return true
 	end
 	
-	local mb = (left and 1) or (right and 3)
-	if mb then
-		local index = Spring.GetCmdDescIndex(cmdID)
-		if index then
-			Spring.SetActiveCommand(index, mb, left, right, alt, ctrl, meta, shift)
-			if alt and isStructure and WG.Terraform_SetPlacingRectangle then
-				WG.Terraform_SetPlacingRectangle(-cmdID)
-			end
+	if cmdID < 0 and ctrl and (not mouse) and (not options.unitsUseCtrl.value) then
+		return false
+	end
+	
+	local index = Spring.GetCmdDescIndex(cmdID)
+	if index then
+		Spring.SetActiveCommand(index, mouse or 1, left, right, alt, ctrl, meta, shift)
+		if alt and isStructure and WG.Terraform_SetPlacingRectangle then
+			WG.Terraform_SetPlacingRectangle(-cmdID)
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -416,12 +426,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	
 	local function DoClick(_, _, _, mouse)
 		if isDisabled then
-			return
+			return false
 		end
-		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, x)
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, x)
 		if onClick then
 			onClick()
 		end
+		return sucess
 	end
 	
 	local button = Button:New {
@@ -1625,6 +1636,7 @@ function widget:Update()
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
+
 	if isRepeat then
 		return false
 	end
@@ -1640,8 +1652,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local x, y = pos[2], pos[1]
 		local button = commandPanel.buttons.GetButton(x, y)
 		if button then
-			button.DoClick()
-			return true
+			return button.DoClick()
 		end
 	end
 
