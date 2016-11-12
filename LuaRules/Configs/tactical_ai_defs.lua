@@ -641,9 +641,21 @@ local behaviourConfig = {
 		skirms = {}, 
 		swarms = allGround, 
 		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 90, 
-		skirmLeeway = 60, 
+		
+		localJinkOrder = false,
+		jinkTangentLength = 25,
+		circleStrafe = true,
+		strafeOrderLength = 100,
+		minCircleStrafeDistance = 250,
+		maxSwarmLeeway = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 300,
+		skirmLeeway = 10,
+		stoppingDistance = 8,
+		
+		--maxSwarmLeeway = 30, 
+		--minSwarmLeeway = 90, 
+		--skirmLeeway = 60, 
 	},
 	
 	-- riots

@@ -38,7 +38,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 2500,
+  maxDamage              = 2400,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -105,8 +105,8 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 320,
-			planes  = 320,
+			default = 260,
+			planes  = 260,
 			subs    = 16,
 		},
 		
