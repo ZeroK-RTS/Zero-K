@@ -365,7 +365,13 @@ function widget:CommandNotify(cmdID, params, options)
 				local z = command.z
 				local y = Spring.GetGroundHeight(x, z)
 
-				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+				local handledExternally = false
+				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
+					handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true)
+				end
+				if ( not handledExternally ) then
+					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+				end
 
 				if (options["alt"]) then
 					for i=1, #addons do
@@ -373,11 +379,21 @@ function widget:CommandNotify(cmdID, params, options)
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
-						commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						
+						handledExternally = false
+						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
+							handledExternally = Script.LuaUI.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true)
+						end
+						if ( not handledExternally ) then
+							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						end
 					end
 				end
 			end
-			Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+			
+			if (#commandArrayToIssue > 0) then
+				Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+			end
 		end
   
 		return true
@@ -409,7 +425,7 @@ function widget:CommandNotify(cmdID, params, options)
 			else
 				local handledExternally = false
 				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-					handledExternally = Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options)
+					handledExternally = Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false)
 				end
 				if ( not handledExternally ) then
 					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
