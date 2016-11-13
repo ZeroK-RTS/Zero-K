@@ -71,7 +71,6 @@ unitDef = {
   sightDistance          = 500,
   sonarDistance          = 500,
   smoothAnim             = true,
-  sonarDistance          = 300,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

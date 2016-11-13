@@ -33,7 +33,7 @@ unitDef = {
   seismicSignature  = 4,
   selfDestructAs    = [[SMALL_BUILDINGEX]],
   sightDistance     = 640,
-  sonarDistance     = 1800,
+  sonarDistance     = 640,
   waterLine         = 0,
   yardMap           = [[oo oo]],
   
