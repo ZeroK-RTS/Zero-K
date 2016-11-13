@@ -326,9 +326,17 @@ end
 -- New Functions
 --------------------------------------------------------------------------------
 
+local function IsBadNumber(value, thingToSay)
+	local isBad = (string.find(tostring(value), "n") and true) or false
+	if isBad then
+		Spring.Echo("Terraform bad number detected", thingToSay, value)
+	end
+	return isBad
+end
+
 local function SetTooltip(unitID, spent, estimatedCost)
 	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, {allied = true})
-	if (estimatedCost ~= estimatedCost) then -- NaN
+	if IsBadNumber(estimatedCost, "SetTooltip") then 
 		estimatedCost = 100 -- the estimate is for widgets only so better to have wrong data than to crash
 	end
 	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, {allied = true})
