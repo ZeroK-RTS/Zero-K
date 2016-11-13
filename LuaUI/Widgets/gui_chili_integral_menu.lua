@@ -83,11 +83,12 @@ options = {
 	},
 	keyboardType = {
 		type='radioButton', 
-		name='Keyboard Layout',
+		name='Grid Keyboard Layout',
 		items = {
 			{name = 'QWERTY (standard)',key = 'qwerty', hotkey = nil},
 			{name = 'QWERTZ (central Europe)', key = 'qwertz', hotkey = nil},
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
+			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
 		noHotkey = true,
@@ -151,8 +152,8 @@ local buttonsByCommand = {}
 local function GenerateGridKeyMap(name)
 	local gridMap = include("Configs/keyboard_layout.lua")[name]
 	local ret = {}
-	for i = 1, 3 do
-		for j = 1, 6 do
+	for i = 1, #gridMap do
+		for j = 1, #gridMap[i] do
 			ret[KEYSYMS[gridMap[i][j]]] = {i, j}
 		end
 	end
@@ -538,18 +539,11 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			skinName = 'default',
 		}
 	end
-	
-	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
-		local key = gridMap[y] and gridMap[y][x]
-		if not key then
+		
+	function externalFunctionsAndData.RemoveGridHotkey()
+		if not usingGrid then
 			return
 		end
-		usingGrid = true
-		hotkeyText = '\255\0\255\0' .. key
-		SetText(textConfig.topLeft.name, hotkeyText)
-	end
-	
-	function externalFunctionsAndData.RemoveGridHotkey()
 		usingGrid = false
 		if command and command.action then
 			local hotkey = GetHotkeyText(command.action)
@@ -559,6 +553,17 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 	end
 	
+	function externalFunctionsAndData.UpdateGridHotkey(gridMap)
+		local key = gridMap[y] and gridMap[y][x]
+		if not key then
+			externalFunctionsAndData.RemoveGridHotkey()
+			return
+		end
+		usingGrid = true
+		hotkeyText = '\255\0\255\0' .. key
+		SetText(textConfig.topLeft.name, hotkeyText)
+	end
+
 	function externalFunctionsAndData.ClearGridHotkey()
 		SetText(textConfig.topLeft.name)
 	end
