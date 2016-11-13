@@ -654,11 +654,7 @@ function DrawUnitShapes(unitList, color, underWorld)
 	gl.Blending(true)
 	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.SRC_ALPHA)
 	gl.ColorMask(false,false,false,true)
-	--if underWorld then
-		--gl.DepthTest(GL.GREATER)
-	--else
-		--gl.DepthTest(GL.LEQUAL)
-	--end
+	
 	gl.PolygonOffset(-1.0,-1.0)
 	-- gl.StencilMask(0x01)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)

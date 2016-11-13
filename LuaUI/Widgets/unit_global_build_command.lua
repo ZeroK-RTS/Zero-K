@@ -492,12 +492,8 @@ function widget:DrawWorldPreUnit()
 	end
 	
 	if shift or options.alwaysShow.value then
-		glColor(0.0, 1.0, 0.0, 1) -- building outline color
-		if shift and options.alwaysShow.value then -- draw bolder lines if shift is held and always-show is enabled
-			glLineWidth(2)
-		else
-			glLineWidth(1)
-		end
+		glColor(0.0, 0.65, 1.0, 1) -- building outline color
+		glLineWidth(1)
 		
 		DrawBuildLines() -- draw building outlines
 		

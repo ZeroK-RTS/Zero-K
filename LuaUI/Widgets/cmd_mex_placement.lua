@@ -365,11 +365,8 @@ function widget:CommandNotify(cmdID, params, options)
 				local z = command.z
 				local y = Spring.GetGroundHeight(x, z)
 
-				local handledExternally = false
-				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-					handledExternally = Script.LuaUI.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true)
-				end
-				if ( not handledExternally ) then
+				-- check if some other widget wants to handle the command before sending it to units.
+				if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
 					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 				end
 
@@ -380,11 +377,8 @@ function widget:CommandNotify(cmdID, params, options)
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
 						
-						handledExternally = false
-						if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-							handledExternally = Script.LuaUI.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true)
-						end
-						if ( not handledExternally ) then
+						-- check if some other widget wants to handle the command before sending it to units.
+						if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
 							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
 						end
 					end
@@ -423,11 +417,8 @@ function widget:CommandNotify(cmdID, params, options)
 				end
 				return true
 			else
-				local handledExternally = false
-				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-					handledExternally = Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false)
-				end
-				if ( not handledExternally ) then
+				-- check if some other widget wants to handle the command before sending it to units.
+				if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false) then
 					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
 				end
 				return true
