@@ -18,13 +18,13 @@ local tooltips = {
 
 local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
 local RAIDER          = {order = 2, row = 1, col = 2}
-local RIOT            = {order = 3, row = 1, col = 3}
-local ASSAULT         = {order = 4, row = 1, col = 4}
-local ANTI_AIR        = {order = 5, row = 1, col = 5}
+local SKIRMISHER      = {order = 3, row = 1, col = 3}
+local RIOT            = {order = 4, row = 1, col = 4}
+local ASSAULT         = {order = 5, row = 1, col = 5}
 local ARTILLERY       = {order = 6, row = 1, col = 6}
 
 local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
-local SKIRMISHER      = {order = 8, row = 2, col = 3}
+local ANTI_AIR        = {order = 8, row = 2, col = 3}
 local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
 local SPECIAL         = {order = 10, row = 2, col = 5}
 local UTILITY         = {order = 11, row = 2, col = 6}
@@ -142,7 +142,7 @@ local units = {
 		amphraider3 = RAIDER,
 		amphraider2 = WEIRD_RAIDER,
 		amphriot = RIOT,
-		amphfloater = ASSAULT,
+		amphfloater = SKIRMISHER,
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
 		amphassault = HEAVY_SOMETHING,
@@ -372,6 +372,7 @@ local overrides = {
 	
 	[CMD_PLACE_BEACON] = {text= '', texture = imageDir .. 'Bold/drop_beacon.png'},
 	[CMD_UPGRADE_STOP] = { texture = imageDir .. 'Bold/cancelupgrade.png'},
+	[CMD_STOP_PRODUCTION] = { texture = imageDir .. 'Bold/stopbuild.png'},
 	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},

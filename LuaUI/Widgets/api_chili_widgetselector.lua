@@ -10,6 +10,7 @@ function widget:GetInfo()
     experimental = false,	
     enabled   = true,
 	alwaysStart = true,
+	hidden    = true,
   }
 end
 
