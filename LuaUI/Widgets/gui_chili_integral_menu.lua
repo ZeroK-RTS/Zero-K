@@ -1242,7 +1242,7 @@ local function GetSelectionValues()
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
-		if defID and (UnitDefs[defID].isFactory or UnitDefs[defID].customParams.isfakefactory) then
+		if defID and (UnitDefs[defID].isFactory or UnitDefs[defID].customParams.isfakefactory) and (not UnitDefs[defID].customParams.notreallyafactory) then
 			return unitID, defID, UnitDefs[defID].customParams.isfakefactory, #selection
 		end
 	end
