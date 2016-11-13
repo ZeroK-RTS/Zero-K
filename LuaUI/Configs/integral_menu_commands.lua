@@ -177,13 +177,12 @@ local units = {
 		a_shipcorvette = RIOT,
 		a_shipmissile = SKIRMISHER,
 		a_shipcruiser = ARTILLERY,
-		-- No Ship HEAVY_ARTILLERY
 		a_shipaa = ANTI_AIR,
 		a_shipscout = WEIRD_RAIDER,
 		a_shipdestroyer = ASSAULT,
-		a_shipatksub = HEAVY_SOMETHING, -- another unit should go in HEAVY_SOMETHING but to avoid gaps...
-		a_shiptransport = SPECIAL,
-		-- Transport (or something else) should go in UTILITY but to avoid gaps...
+		-- No Ship HEAVY_SOMETHING (yet)
+		a_shipatksub = SPECIAL,
+		a_shiptransport = UTILITY,
 	},
 
 
