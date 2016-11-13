@@ -71,7 +71,7 @@ local contentHolder
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'unitsHotkeys', 'unitsUseCtrl', 'hide_when_spectating',
+	'background_opacity', 'keyboardType', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
 
@@ -98,11 +98,11 @@ options = {
 		value = true,
 		noHotkey = true,
 	},
-	unitsUseCtrl = {
-		name = 'Hotkey + Ctrl queues 20',
+	ctrlDisableGrid = {
+		name = 'Ctrl Disables Grid',
+		tooltip = "When enabled, grid hotkeys will not be used while Ctrl is held. This allows for Ctrl+key hotkeys to be used while viewing a build list or factory queue.",
 		type = 'bool',
-		value = false,
-		advanced = true,
+		value = true,
 		noHotkey = true,
 	},
 	hide_when_spectating = {
@@ -324,7 +324,7 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	return true
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock, useGrid)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID then
@@ -332,7 +332,7 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
 		return true
 	end
 	
-	if cmdID < 0 and ctrl and (not mouse) and (not options.unitsUseCtrl.value) then
+	if useGrid and ctrl and (not mouse) and options.ctrlDisableGrid.value then
 		return false
 	end
 	
@@ -363,8 +363,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if isDisabled then
 			return false
 		end
-		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, x)
-		if onClick then
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, x, usingGrid)
+		if sucess and onClick then
+			-- Don't do the onClick if the command was not eaten by the menu.
 			onClick()
 		end
 		return sucess
