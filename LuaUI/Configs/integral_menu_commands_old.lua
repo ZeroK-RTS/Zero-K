@@ -16,150 +16,7 @@ local tooltips = {
 	dropflag = "Drop flag on the ground.",
 }
 
-local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
-local RAIDER          = {order = 2, row = 1, col = 2}
-local RIOT            = {order = 3, row = 1, col = 3}
-local ASSAULT         = {order = 4, row = 1, col = 4}
-local ANTI_AIR        = {order = 5, row = 1, col = 5}
-local ARTILLERY       = {order = 6, row = 1, col = 6}
-
-local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
-local SKIRMISHER      = {order = 8, row = 2, col = 3}
-local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
-local SPECIAL         = {order = 10, row = 2, col = 5}
-local UTILITY         = {order = 11, row = 2, col = 6}
-
 local units = {
-	factorycloak = {
-		armrectr = CONSTRUCTOR,
-		armpw = RAIDER,
-		spherepole = WEIRD_RAIDER,
-		armwar = RIOT,
-		armrock = SKIRMISHER,
-		armham = ARTILLERY,
-		armjeth = ANTI_AIR,
-		armzeus = ASSAULT,
-		armsnipe = HEAVY_SOMETHING,
-		armtick = SPECIAL,
-		spherecloaker = UTILITY,
-	},
-	factoryshield = {
-		cornecro = CONSTRUCTOR,
-		corclog = WEIRD_RAIDER,
-		corak = RAIDER,
-		cormak = RIOT,
-		corstorm = SKIRMISHER,
-		shieldarty = ARTILLERY,
-		corcrash = ANTI_AIR,
-		corthud = ASSAULT,
-		shieldfelon = HEAVY_SOMETHING,
-		corroach = SPECIAL,
-		core_spectre = UTILITY,	
-	},
-	factoryveh = {
-		corned = CONSTRUCTOR,
-		corfav = WEIRD_RAIDER,
-		corgator = RAIDER,
-		corlevlr = RIOT,
-		cormist = SKIRMISHER, -- Not really but nowhere else to go
-		corgarp = ARTILLERY,
-		vehaa = ANTI_AIR,
-		corraid = ASSAULT,
-		armmerl = HEAVY_SOMETHING,
-		capturecar = SPECIAL,
-	},
-	factoryhover = {
-		corch = CONSTRUCTOR,
-		corsh = RAIDER,
-		hoverdepthcharge = SPECIAL,
-		hoverriot = RIOT,
-		nsaclash = SKIRMISHER,
-		armmanni = ARTILLERY,
-		hoveraa = ANTI_AIR,
-		hoverassault = ASSAULT,
-	},
-	factorygunship = {
-		gunshipcon = CONSTRUCTOR,
-		bladew = WEIRD_RAIDER,
-		armkam = RAIDER,
-		armbrawl = ARTILLERY,
-		gunshipsupport = SKIRMISHER,
-		corvalk = SPECIAL,
-		corbtrans = UTILITY,
-		gunshipaa = ANTI_AIR,
-		blackdawn = ASSAULT,
-		corcrw = HEAVY_SOMETHING,
-		blastwing = RIOT,
-	},
-	factoryplane = {
-		armca = CONSTRUCTOR,
-		fighter = RAIDER,
-		corhurc2 = RIOT,
-		-- No Plane Artillery
-		corvamp = ANTI_AIR,
-		corawac = WEIRD_RAIDER,
-		corshad = ASSAULT,
-		armcybr = HEAVY_SOMETHING,
-		armstiletto_laser = SPECIAL,
-	},
-	factoryspider = {
-		arm_spider = CONSTRUCTOR,
-		armflea = RAIDER,
-		spiderriot = RIOT,
-		armsptk = SKIRMISHER,
-		-- No Spider Artillery
-		spideraa = ANTI_AIR,
-		arm_venom = WEIRD_RAIDER,
-		spiderassault = ASSAULT,
-		armcrabe = HEAVY_SOMETHING,
-		armspy = SPECIAL,
-	},
-	factoryjump = {
-		corfast = CONSTRUCTOR,
-		puppy = WEIRD_RAIDER,
-		corpyro = RAIDER,
-		jumpblackhole = RIOT,
-		slowmort = SKIRMISHER,
-		firewalker = ARTILLERY,
-		armaak = ANTI_AIR,
-		corcan = ASSAULT,
-		corsumo = HEAVY_SOMETHING,
-		corsktl = SPECIAL,
-	},
-	factorytank = {
-		coracv =  CONSTRUCTOR,
-		logkoda = WEIRD_RAIDER,
-		panther = RAIDER,
-		tawf114 = RIOT,
-		cormart = ARTILLERY,
-		trem = SPECIAL,
-		corsent = ANTI_AIR,
-		correap = ASSAULT,
-		corgol = HEAVY_SOMETHING,
-	},
-	factoryamph = {
-		amphcon = CONSTRUCTOR,
-		amphraider3 = RAIDER,
-		amphraider2 = WEIRD_RAIDER,
-		amphriot = RIOT,
-		amphfloater = ASSAULT,
-		-- No Amph Artillery
-		amphaa = ANTI_AIR,
-		amphassault = HEAVY_SOMETHING,
-		amphtele = SPECIAL,
-	},
-	factoryship = {
-		shipcon = CONSTRUCTOR,
-		shipscout = RAIDER,
-		subraider = WEIRD_RAIDER,
-		shipraider = RIOT,
-		shiptorp = SKIRMISHER,
-		shiparty = ARTILLERY,
-		shipaa = ANTI_AIR,
-		shipskirm = ASSAULT,
-		subarty = HEAVY_SOMETHING,
-		armtboat = SPECIAL,
-	},
 }
 
 local function AddBuildQueue(name)
@@ -182,6 +39,17 @@ local function AddBuildQueue(name)
 	end
 end
 
+AddBuildQueue("factorycloak")
+AddBuildQueue("factoryshield")
+AddBuildQueue("factoryveh")
+AddBuildQueue("factoryhover")
+AddBuildQueue("factorygunship")
+AddBuildQueue("factoryplane")
+AddBuildQueue("factoryspider")
+AddBuildQueue("factoryjump")
+AddBuildQueue("factorytank")
+AddBuildQueue("factoyamph")
+AddBuildQueue("factoryship")
 AddBuildQueue("striderhub")
 AddBuildQueue("missilesilo")
 
