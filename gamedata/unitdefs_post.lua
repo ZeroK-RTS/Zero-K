@@ -834,13 +834,13 @@ end
 
 if modOptions and modOptions.raidDefenseBuildingRangeMult and modOptions.raidDefenseBuildingRangeMult ~= 1 then
     local defenseMult = modOptions.raidDefenseBuildingRangeMult
-    Spring.Echo("Multiplying raid defense building ranges by " .. defenseMult)
+    --Spring.Echo("Multiplying raid defense building ranges by " .. defenseMult)
     for unitDefID, unitDef in pairs(UnitDefs) do
         if unitDef.weapons and unitDef.weapondefs and raidDefenseBuildings[unitDef.unitname] then
             for defName, def in pairs(unitDef.weapondefs) do
                 if def.range then
-                    Spring.Echo("Multiplying the range of the " .. unitDef.name .. " weapon \"" .. def.name .. 
-                    "\" by " .. defenseMult)
+                    --Spring.Echo("Multiplying the range of the " .. unitDef.name .. " weapon \"" .. def.name .. 
+                    --"\" by " .. defenseMult)
                     def.range = math.max(def.range*defenseMult, 1)
                 end
             end
