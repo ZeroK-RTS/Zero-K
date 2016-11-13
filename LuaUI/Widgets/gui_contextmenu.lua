@@ -187,7 +187,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("missilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local _, _, factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id

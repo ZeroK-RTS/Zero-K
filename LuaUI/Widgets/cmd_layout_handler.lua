@@ -20,7 +20,7 @@ local emptyTable = {}
 --------------------------------------------------------------------------------
 -- Add commands to epic menu
 
-local _, _, _, _, _, _, _, _, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local function CapCase(str)
 	local str = str:lower()

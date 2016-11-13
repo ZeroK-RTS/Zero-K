@@ -35,6 +35,7 @@ unitDef = {
     helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
     helptext_pl    = [[Ta Stacja moze naprawiac samoloty i odnawiac amunicje bombowcom. Posiada 4 stanowiska.]],
 	nobuildpower   = 1,
+	notreallyafactory = 1,
   },
 
   explodeAs           = [[LARGE_BUILDINGEX]],

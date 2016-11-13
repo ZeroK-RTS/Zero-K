@@ -478,7 +478,7 @@ AddFactoryOfUnits("missilesilo")
 -- addUnit("armorco","Mech")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local _, _, factory_commands, econ_commands, defense_commands, special_commands, _, _, _ = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
 
 for i = 1, #buildOpts do
 	local name = buildOpts[i]
