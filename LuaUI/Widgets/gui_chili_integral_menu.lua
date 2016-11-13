@@ -54,7 +54,7 @@ local NO_TEXT = ""
 local EPIC_NAME = "epic_chili_integral_menu_"
 local EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
-local _, _, buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial,_ , commandDisplayConfig, _, hiddenCommands, buildCmdUnits = include("Configs/integral_menu_commands.lua")
+local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands = include("Configs/integral_menu_commands.lua")
 
 local textConfig = {
 	bottomLeft = {

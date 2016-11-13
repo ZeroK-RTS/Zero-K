@@ -139,7 +139,7 @@ local tasks = nubtronData.tasks
 local taskOrder = nubtronData.taskOrder
 nubtronData = nil
 
-local common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

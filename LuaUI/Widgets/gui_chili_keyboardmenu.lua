@@ -23,11 +23,11 @@ local echo				= Spring.Echo
 
 -- config
 include("keysym.h.lua")
-local common_commands, states_commands, factory_commands,
-	econ_commands, defense_commands, special_commands,
-	globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
+local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua")
 
-local build_menu_use = include("Configs/marking_menu_menus.lua")
+local custom_cmd_actions = 
+	
+local build_menu_use = include("Configs/customCmdTypes.lua")
 
 local initialBuilder = 'armcom1'
 
@@ -838,16 +838,6 @@ local function ProcessCommand(cmd)
 	if not cmd.hidden and cmd.id ~= CMD.PAGES then
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			curCommands[#curCommands+1] = cmd
-			
-		elseif common_commands[cmd.id] then 
-			curCommands[#curCommands+1] = cmd
-		
-		--elseif factory_commands[cmd.id] then
-		
-		--elseif econ_commands[cmd.id] then
-		
-		--elseif defense_commands[cmd.id] then
-		
 		elseif special_commands[cmd.id] then --curently terraform
 			curCommands[#curCommands+1] = cmd
 			
@@ -913,7 +903,6 @@ local function SetupCommands( modifier )
 	-- [=[
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
-	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
 	--]=]
 	
 	
@@ -1016,7 +1005,7 @@ local function SetupCommands( modifier )
 			elseif hotkey_mod == modifier and key_buttons[hotkey_key] then
 				local override = overrides[cmd.id]  -- command overrides
 				local texture = override and override.texture or cmd.texture
-				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
+				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1)	--is command a state toggle command?
 				if isState and override then 
 					texture = override.texture[cmd.params[1]+1]
 				end

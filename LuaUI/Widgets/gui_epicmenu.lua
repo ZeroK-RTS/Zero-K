@@ -70,7 +70,7 @@ local useUiKeys = false
 
 --file_return = nil
 
-local custom_cmd_actions = select(9, include("Configs/integral_menu_commands.lua"))
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 
 --------------------------------------------------------------------------------
