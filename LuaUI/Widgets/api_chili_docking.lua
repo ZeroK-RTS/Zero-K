@@ -10,7 +10,9 @@ function widget:GetInfo()
     layer     = 50,
     experimental = false,
     handler   = true, -- to read widget status. eg: "widgetHandler.knownWidgets[name]"
-    enabled   = true  --  loaded by default?
+    enabled   = true,  --  loaded by default?
+    alwaysStart = true,
+	hidden    = true,
   }
 end
 
