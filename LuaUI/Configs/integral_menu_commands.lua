@@ -17,28 +17,28 @@ local tooltips = {
 }
 
 -- Current system tries to avoid gaps.
-local CONSTRUCTOR =     {order = 1, row = 1, col = 1}
-local RAIDER =          {order = 2, row = 1, col = 2}
-local RIOT =            {order = 3, row = 1, col = 3}
-local SKIRMISHER =      {order = 4, row = 1, col = 4}
-local ARTILLERY =       {order = 5, row = 1, col = 5}
-local HEAVY_ARTILLERY = {order = 6, row = 1, col = 6}
-local ANTI_AIR =        {order = 7, row = 2, col = 1}
-local WEIRD_RAIDER =    {order = 8, row = 2, col = 2}
-local ASSAULT =         {order = 9, row = 2, col = 3}
-local HEAVY_SOMETHING = {order = 10, row = 2, col = 4}
-local SPECIAL =         {order = 11, row = 2, col = 5}
-local UTILITY =         {order = 12, row = 2, col = 6}
+local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
+local RAIDER          = {order = 2, row = 1, col = 2}
+local RIOT            = {order = 3, row = 1, col = 3}
+local ASSAULT         = {order = 4, row = 1, col = 4}
+local ANTI_AIR        = {order = 5, row = 1, col = 5}
+local ARTILLERY       = {order = 6, row = 1, col = 6}
+
+local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
+local SKIRMISHER      = {order = 8, row = 2, col = 3}
+local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
+local SPECIAL         = {order = 10, row = 2, col = 5}
+local UTILITY         = {order = 11, row = 2, col = 6}
 
 local units = {
 	factorycloak = {
 		armrectr = CONSTRUCTOR,
 		armpw = RAIDER,
+		spherepole = WEIRD_RAIDER,
 		armwar = RIOT,
 		armrock = SKIRMISHER,
 		armham = ARTILLERY,
 		armjeth = ANTI_AIR,
-		spherepole = WEIRD_RAIDER,
 		armzeus = ASSAULT,
 		armsnipe = HEAVY_SOMETHING,
 		armtick = SPECIAL,
@@ -46,12 +46,12 @@ local units = {
 	},
 	factoryshield = {
 		cornecro = CONSTRUCTOR,
+		corclog = WEIRD_RAIDER,
 		corak = RAIDER,
 		cormak = RIOT,
 		corstorm = SKIRMISHER,
 		shieldarty = ARTILLERY,
 		corcrash = ANTI_AIR,
-		corclog = WEIRD_RAIDER,
 		corthud = ASSAULT,
 		shieldfelon = HEAVY_SOMETHING,
 		corroach = SPECIAL,
@@ -59,49 +59,49 @@ local units = {
 	},
 	factoryveh = {
 		corned = CONSTRUCTOR,
+		corfav = WEIRD_RAIDER,
 		corgator = RAIDER,
 		corlevlr = RIOT,
 		cormist = SKIRMISHER, -- Not really but nowhere else to go
 		corgarp = ARTILLERY,
-		armmerl = HEAVY_ARTILLERY,
 		vehaa = ANTI_AIR,
-		corfav = WEIRD_RAIDER,
 		corraid = ASSAULT,
-		capturecar = HEAVY_SOMETHING,
+		armmerl = HEAVY_SOMETHING,
+		capturecar = SPECIAL,
 	},
 	factoryhover = {
 		corch = CONSTRUCTOR,
 		corsh = RAIDER,
+		hoverdepthcharge = SPECIAL,
 		hoverriot = RIOT,
 		nsaclash = SKIRMISHER,
 		armmanni = ARTILLERY,
 		hoveraa = ANTI_AIR,
-		hoverdepthcharge = WEIRD_RAIDER,
 		hoverassault = ASSAULT,
 	},
 	factorygunship = {
 		gunshipcon = CONSTRUCTOR,
-		armkam = RAIDER,
-		armbrawl = RIOT,
-		gunshipsupport = SKIRMISHER,
-		corvalk = ARTILLERY,
-		corbtrans = HEAVY_ARTILLERY,
-		gunshipaa = ANTI_AIR,
 		bladew = WEIRD_RAIDER,
+		armkam = RAIDER,
+		armbrawl = ARTILLERY,
+		gunshipsupport = SKIRMISHER,
+		corvalk = SPECIAL,
+		corbtrans = UTILITY,
+		gunshipaa = ANTI_AIR,
 		blackdawn = ASSAULT,
 		corcrw = HEAVY_SOMETHING,
-		blastwing = SPECIAL,
+		blastwing = RIOT,
 	},
 	factoryplane = {
 		armca = CONSTRUCTOR,
 		fighter = RAIDER,
 		corhurc2 = RIOT,
-		armcybr = SKIRMISHER,
 		-- No Plane Artillery
 		corvamp = ANTI_AIR,
 		corawac = WEIRD_RAIDER,
 		corshad = ASSAULT,
-		armstiletto_laser = HEAVY_SOMETHING,
+		armcybr = HEAVY_SOMETHING,
+		armstiletto_laser = SPECIAL,
 	},
 	factoryspider = {
 		arm_spider = CONSTRUCTOR,
@@ -117,37 +117,37 @@ local units = {
 	},
 	factoryjump = {
 		corfast = CONSTRUCTOR,
+		puppy = WEIRD_RAIDER,
 		corpyro = RAIDER,
 		jumpblackhole = RIOT,
 		slowmort = SKIRMISHER,
 		firewalker = ARTILLERY,
 		armaak = ANTI_AIR,
-		puppy = WEIRD_RAIDER,
 		corcan = ASSAULT,
 		corsumo = HEAVY_SOMETHING,
 		corsktl = SPECIAL,
 	},
 	factorytank = {
 		coracv =  CONSTRUCTOR,
+		logkoda = WEIRD_RAIDER,
 		panther = RAIDER,
 		tawf114 = RIOT,
-		cormart = SKIRMISHER,
-		trem = ARTILLERY,
+		cormart = ARTILLERY,
+		trem = SPECIAL,
 		corsent = ANTI_AIR,
-		logkoda = WEIRD_RAIDER,
 		correap = ASSAULT,
 		corgol = HEAVY_SOMETHING,
 	},
 	factoryamph = {
 		amphcon = CONSTRUCTOR,
 		amphraider3 = RAIDER,
+		amphraider2 = WEIRD_RAIDER,
 		amphriot = RIOT,
-		amphfloater = SKIRMISHER,
+		amphfloater = ASSAULT,
 		-- No Amph Artillery
 		amphaa = ANTI_AIR,
-		amphraider2 = WEIRD_RAIDER,
-		amphassault = ASSAULT,
-		amphtele = HEAVY_SOMETHING,
+		amphassault = HEAVY_SOMETHING,
+		amphtele = SPECIAL,
 	},
 	--factoryship = {
 	--	shipcon = CONSTRUCTOR,
@@ -162,6 +162,16 @@ local units = {
 	--	armtboat = HEAVY_SOMETHING,
 	--},
 	factoryship = {
+		--shipcon = CONSTRUCTOR,
+		--subraider = RAIDER,
+		--shipraider = RIOT,
+		--shiptorp = SKIRMISHER,
+		--shiparty = ARTILLERY,
+		--subarty = HEAVY_ARTILLERY,
+		--shipaa = ANTI_AIR,
+		--shipscout = WEIRD_RAIDER,
+		--shipskirm = ASSAULT,
+		--armtboat = HEAVY_SOMETHING,
 		a_shipcon = CONSTRUCTOR,
 		a_shiptorpbt = RAIDER,
 		a_shipcorvette = RIOT,
@@ -177,7 +187,7 @@ local units = {
 	},
 
 
-	a_shiptransport = UTILITY,
+
 }
 
 local function AddBuildQueue(name)
