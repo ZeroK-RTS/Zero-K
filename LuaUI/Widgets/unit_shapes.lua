@@ -754,10 +754,5 @@ function widget:DrawWorldPreUnit()
 	DrawCircles(false)
 end
 
-function widget:DrawWorld()
-	--DrawCircles(false)
-end
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
