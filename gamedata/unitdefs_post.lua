@@ -826,7 +826,7 @@ end
 local raidDefenseBuildings = {}
 
 local raidDefenseBuildingStrings = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corgrav", "turrettorp", 
-"cordoom", "armanni"}
+"cordoom", "armanni", "corbhmth"}
 
 for i = 1, #raidDefenseBuildingStrings do
     raidDefenseBuildings[raidDefenseBuildingStrings[i]] = true
