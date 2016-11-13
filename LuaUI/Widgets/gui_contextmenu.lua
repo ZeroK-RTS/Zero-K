@@ -166,7 +166,7 @@ end
 local function AddFactoryOfUnits(defName)
 	local ud = UnitDefNames[defName]
     local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
-	addUnit(ud.id, name, true)
+	addUnit(ud.id, "Buildings/Factory", true)
 	for i = 1, #ud.buildOptions do
 		addUnit(ud.buildOptions[i], name, true)
     end

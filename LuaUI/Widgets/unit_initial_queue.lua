@@ -643,7 +643,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if Spring.TestBuildOrder(selDefID, bx, by, bz, buildFacing) ~= 0 then
 		if isMex[selDefID] and WG.metalSpots then
 			local bestSpot = GetClosestMetalSpot(bx, bz)
-			bx, by, bz = bestSpot.x, bestSpot.y, bestSpot.z
+			bx, by, bz = bestSpot.x, math.max(0, bestSpot.y), bestSpot.z
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		local msg
