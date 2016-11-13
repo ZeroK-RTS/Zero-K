@@ -23,7 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Corvette comes equipped with two shotguns which are effective against anything which gets close.]],
+    helptext       = [[This Corvette comes equipped with two shotguns which are effective against anything which gets close.]],
 	extradrawrange = 420,
   },
 
