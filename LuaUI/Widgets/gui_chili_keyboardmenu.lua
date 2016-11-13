@@ -24,10 +24,9 @@ local echo				= Spring.Echo
 -- config
 include("keysym.h.lua")
 local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua")
-
-local custom_cmd_actions = 
 	
-local build_menu_use = include("Configs/customCmdTypes.lua")
+local build_menu_use = include("Configs/marking_menu_menus.lua")
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local initialBuilder = 'armcom1'
 

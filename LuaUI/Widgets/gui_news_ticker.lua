@@ -300,7 +300,7 @@ function widget:GameFrame(n)
 		end
 		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy")
 		estore = estore - HIDDEN_STORAGE
-		if estore > 0and  elevel/estore <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
+		if estore > 0 and  elevel/estore <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
 			AddEvent("Stalling energy", nil, colorOrange, "stallingEnergy")
 			lastEStallEvent = n
 		end
