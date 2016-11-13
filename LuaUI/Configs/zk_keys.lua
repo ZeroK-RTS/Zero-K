@@ -111,6 +111,7 @@ return {
 		{	"groupclear",	"Shift+q",},
 		{	"repair",	"r",},
 		{	"stop",	"s",},
+		{	"stopproduction",	"ctrl+s",},
 		{	"unloadunits",	"u",},
 		{	"pastetext",	"Ctrl+v",},
 		{	"wait",	"ctrl+w",},
