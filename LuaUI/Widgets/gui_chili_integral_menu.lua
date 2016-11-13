@@ -808,8 +808,6 @@ local function GetQueuePanel(parent, columns)
 	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, onClick, buttonLayoutOverride)
 
 	function externalFunctions.ClearOldButtons(selectionIndex)
-		factoryUnitID = false
-		factoryUnitDefID = false
 		buttons.ClearOldButtons(selectionIndex)
 	end
 	
