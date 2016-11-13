@@ -208,6 +208,14 @@ local exceptionArray = {
 	[UnitDefNames["reef"].id] = true,
 }
 
+local terraformUnitDefIDs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud and ud.isBuilder and not ud.isFactory and not exceptionArray[i] then
+		terraformUnitDefIDs[i] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 -- Custom Commands
 --------------------------------------------------------------------------------
@@ -274,6 +282,15 @@ local fallbackableCommands = {
 	[CMD_RAISE] = true,
 	[CMD_SMOOTH] = true,
 	[CMD_RESTORE] = true,
+}
+
+local wantedCommands = {
+	[CMD_RAMP] = true,
+	[CMD_LEVEL] = true,
+	[CMD_RAISE] = true,
+	[CMD_SMOOTH] = true,
+	[CMD_RESTORE] = true,
+	[CMD_TERRAFORM_INTERNAL] = true,
 }
 
 local cmdDescsArray = {
@@ -2014,16 +2031,21 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_TERRAFORM_INTERNAL] = true}
+	return wantedCommands
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()	
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	
+	-- Don't allow non-constructors to queue terraform fallback.
+	if fallbackableCommands[cmdID] and not terraformUnitDefIDs[unitDefID] then
+		return
+	end
 
-  if (cmdID == CMD_TERRAFORM_INTERNAL) then
+	if (cmdID == CMD_TERRAFORM_INTERNAL) then
 		local terraform_type = cmdParams[1]
 		local teamID = cmdParams[2]
 		local commandX = cmdParams[3]
@@ -2078,9 +2100,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,terraformHeight*2,unit, constructorCount,teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
 		
 			return false
-			
 		end
-  
   end
   return true -- allowed
 end
@@ -3616,7 +3636,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
+	if terraformUnitDefIDs[unitDefID] then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end
