@@ -54,6 +54,7 @@ unitDef = {
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[35]],
+	isfakefactory  = [[1]],
   },
 
   defaultmissiontype            = [[Standby]],

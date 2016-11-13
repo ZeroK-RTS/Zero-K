@@ -324,7 +324,6 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
-	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
 	AddOption(pathMouse,
 	{ 	
 		name = 'Hardware Cursor',

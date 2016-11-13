@@ -17,7 +17,7 @@ end
 --------------------------------------------------------------------------------
 -- Widget Options
 
-options_path = 'Settings/Misc'
+options_path = 'Settings/Interface/Mouse Cursor'
 options_order = { 
 	'grabinput',
 }

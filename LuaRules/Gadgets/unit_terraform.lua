@@ -3730,7 +3730,7 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
-	local terraformColor = {0.5, 1, 0, 0.7}
+	local terraformColor = {0.7, 0.75, 0, 0.7}
 	
 	Spring.SetCustomCommandDrawData(CMD_RAMP, "Ramp", terraformColor, false)
 	Spring.SetCustomCommandDrawData(CMD_LEVEL, "Level", terraformColor, false)

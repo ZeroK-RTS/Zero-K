@@ -35,3 +35,6 @@ Sonic blaster impact sound (unfa_blast_2)
 
 ikinz:
 place_beep.wav
+
+Audionautics:
+Claw missile launch sound (derived from https://www.freesound.org/people/Audionautics/sounds/171655/)

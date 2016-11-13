@@ -59,6 +59,7 @@ local SAVE_FILE = "Gadgets/ai_cai.lua"
 --------------------------------------------------------------------------------
 -- commands
 --------------------------------------------------------------------------------
+VFS.Include("LuaRules/Configs/constants.lua")
 include("LuaRules/Configs/customcmds.h.lua")
 
 local CMD_MOVE_STATE	= CMD.MOVE_STATE
@@ -275,7 +276,7 @@ local function updateTeamResourcing(team)
 	local eCur, eMax, ePull, eInc, eExp, eShare, eSent, eRec = spGetTeamResources(team, "energy")
 	local mCur, mMax, mPull, mInc, mExp, mShare, mSent, mRec = spGetTeamResources(team, "metal")	
 	
-	averagedEcon.mStor = mMax -- m storage
+	averagedEcon.mStor = mMax - HIDDEN_STORAGE -- m storage
 	
 	--// average the resourcing over the past few updates to reduce sharp spikes and dips
 	-- update previous frame info

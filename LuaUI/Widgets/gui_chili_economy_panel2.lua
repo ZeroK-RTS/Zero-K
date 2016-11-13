@@ -518,8 +518,10 @@ function widget:GameFrame(n)
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
 	
-	metalWarningPanel.ShowWarning(mCurr > mStor * options.metalWarning.value )
-	energyWarningPanel.ShowWarning(eCurr < eStor * options.energyWarning.value )
+	local metalWarning = mCurr > mStor * options.metalWarning.value
+	local energyWarning = eCurr < eStor * options.energyWarning.value
+	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
+	energyWarningPanel.ShowWarning(energyWarning)
 
 	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
 	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
@@ -672,18 +674,18 @@ end
 --------------------------------------------------------------------------------
 -- Warning Panels
 
-local function GetWarningPanel(parent, x, y, right, bottom, text)
+local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 	local holder = Chili.Control:New{
 		x = x,
 		y = y,
 		right = right,
 		bottom = bottom,
 		padding = {0, 0, 0, 0},
-		parent = parent
+		parent = parentControl
 	}
 	
 	local image = Chili.Image:New{
-		parent = parent,
+		name   = "warningImage",
 		x      = "1%",
 		y      = 0,
 		bottom = 0,
@@ -693,8 +695,8 @@ local function GetWarningPanel(parent, x, y, right, bottom, text)
 		parent = holder,
 	}
 	
-	local text = Chili.Label:New{
-		parent = parent,
+	local label = Chili.Label:New{
+		name   = "warningLabel",
 		x      = "21%",
 		y      = 0,
 		bottom = "8%",
@@ -708,13 +710,13 @@ local function GetWarningPanel(parent, x, y, right, bottom, text)
 	}
 	
 	image:SetVisibility(false)
-	text:SetVisibility(false)
+	label:SetVisibility(false)
 	
 	local externalFunctions = {}
 	
 	function externalFunctions.ShowWarning(newShow)
 		image:SetVisibility(newShow)
-		text:SetVisibility(newShow)
+		label:SetVisibility(newShow)
 	end
 	
 	return externalFunctions

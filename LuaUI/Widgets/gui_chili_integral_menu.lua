@@ -136,7 +136,7 @@ local buttonLayoutConfig = {
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType','hide_when_spectating',
+	'background_opacity', 'keyboardType', 'unitsHotkeys', 'unitsUseCtrl', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
 
@@ -155,6 +155,19 @@ options = {
 			{name = 'AZERTY (France)', key = 'azerty', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+	},
+	unitsHotkeys = {
+		name = 'Enable Factory Hotkeys',
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+	},
+	unitsUseCtrl = {
+		name = 'Hotkey + Ctrl queues 20',
+		type = 'bool',
+		value = false,
+		advanced = true,
 		noHotkey = true,
 	},
 	hide_when_spectating = {
@@ -324,10 +337,10 @@ local function MoveCommandBlock(factoryUnitID, queueCmdID, moveBlock, insertBloc
 	MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, movePos, nil, insertPos)
 end
 
-local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
+local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, factoryUnitID, queueBlock)
 	local commands = Spring.GetFactoryCommands(factoryUnitID)
 	if not commands then
-		return
+		return true
 	end
 	
 	-- Find the end of the block
@@ -356,43 +369,46 @@ local function QueueClickFunc(left, right, alt, ctrl, meta, shift, queueCmdID, f
 	end
 	
 	if not queuePosition then
-		return
+		return true
 	end
 	
 	if alt then
 		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, false, 0)
-		return
+		return true
 	end
 
 	local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
 	if right then
 		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, inputMult)
-		return
+		return true
 	end
 	
 	for i = 1, inputMult do
 		Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {queuePosition, queueCmdID, 0 }, {"alt", "ctrl"})
 	end
+	return true
 end
 
 local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID then
-		QueueClickFunc(left, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
-		return
+		QueueClickFunc(mouse, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
+		return true
 	end
 	
-	local mb = (left and 1) or (right and 3)
-	if mb then
-		local index = Spring.GetCmdDescIndex(cmdID)
-		if index then
-			Spring.SetActiveCommand(index, mb, left, right, alt, ctrl, meta, shift)
-			if alt and isStructure and WG.Terraform_SetPlacingRectangle then
-				WG.Terraform_SetPlacingRectangle(-cmdID)
-			end
+	if cmdID < 0 and ctrl and (not mouse) and (not options.unitsUseCtrl.value) then
+		return false
+	end
+	
+	local index = Spring.GetCmdDescIndex(cmdID)
+	if index then
+		Spring.SetActiveCommand(index, mouse or 1, left, right, alt, ctrl, meta, shift)
+		if alt and isStructure and WG.Terraform_SetPlacingRectangle then
+			WG.Terraform_SetPlacingRectangle(-cmdID)
 		end
 	end
+	return true
 end
 
 --------------------------------------------------------------------------------
@@ -410,12 +426,13 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	
 	local function DoClick(_, _, _, mouse)
 		if isDisabled then
-			return
+			return false
 		end
-		ClickFunc(mouse or 1, cmdID, isStructure, factoryUnitID, x)
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, x)
 		if onClick then
 			onClick()
 		end
+		return sucess
 	end
 	
 	local button = Button:New {
@@ -594,6 +611,16 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		usingGrid = true
 		hotkeyText = '\255\0\255\0' .. key
 		SetText(textConfig.topLeft.name, hotkeyText)
+	end
+	
+	function externalFunctionsAndData.RemoveGridHotkey()
+		usingGrid = false
+		if command and command.action then
+			local hotkey = GetHotkeyText(command.action)
+			SetText(textConfig.topLeft.name, hotkey)
+		else
+			SetText(textConfig.topLeft.name, nil)
+		end
 	end
 	
 	function externalFunctionsAndData.ClearGridHotkey()
@@ -814,6 +841,13 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		end
 	end
 	
+	function externalFunctions.RemoveGridHotkeys()
+		gridMap = nil
+		for i = 1, #buttonList do
+			buttonList[i].RemoveGridHotkey()
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -858,6 +892,11 @@ local function GetQueuePanel(parent, columns)
 		end
 		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
 		button.SetProgressBar(progress)
+	end
+	
+	function externalFunctions.ClearFactory()
+		factoryUnitID = false
+		factoryUnitDefID = false
 	end
 	
 	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
@@ -1160,13 +1199,13 @@ local commandPanels = {
 		humanName = "Units",
 		name = "units_factory",
 		inclusionFunction = function(cmdID, factoryUnitDefID)
-			if not factoryUnitDefID then
+			if not (factoryUnitDefID and buildCmdUnits[factoryUnitDefID]) then
 				return false
 			end
 			local buildOptions = UnitDefs[factoryUnitDefID].buildOptions
 			for i = 1, #buildOptions do
 				if buildOptions[i] == -cmdID then
-					local position = buildCmdUnits[cmdID]
+					local position = buildCmdUnits[factoryUnitDefID][cmdID]
 					return position and true or false, position
 				end
 			end
@@ -1177,6 +1216,7 @@ local commandPanels = {
 		isBuild = true,
 		hotkeyReplacement = "Orders",
 		gridHotkeys = true,
+		disableableKeys = true,
 		buttonLayoutConfig = buttonLayoutConfig.build,
 	},
 }
@@ -1197,16 +1237,16 @@ local contentHolder
 --------------------------------------------------------------------------------
 -- Command Handling
 
-local function GetSelectedFactory()	
+local function GetSelectionValues()	
 	local selection = Spring.GetSelectedUnits()
 	for i = 1, #selection do
 		local unitID = selection[i]
 		local defID = Spring.GetUnitDefID(unitID)
-		if defID and UnitDefs[defID].isFactory then
-			return unitID, defID
+		if defID and (UnitDefs[defID].isFactory or UnitDefs[defID].customParams.isfakefactory) then
+			return unitID, defID, UnitDefs[defID].customParams.isfakefactory, #selection
 		end
 	end
-	return false
+	return false, nil, nil, #selection
 end
 
 local function ProcessCommand(command, factorySelected, selectionIndex)
@@ -1246,7 +1286,7 @@ local function ProcessCommand(command, factorySelected, selectionIndex)
 end
 
 local function ProcessAllCommands(commands, customCommands)
-	local factoryUnitID, factoryUnitDefID = GetSelectedFactory()
+	local factoryUnitID, factoryUnitDefID, fakeFactory, selectedUnitCount = GetSelectionValues()
 
 	selectionIndex = selectionIndex + 1
 	
@@ -1272,7 +1312,11 @@ local function ProcessAllCommands(commands, customCommands)
 		for i = 1, #commandPanels do
 			local data = commandPanels[i]
 			if data.queue then
-				data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+				if fakeFactory then
+					data.queue.ClearFactory()
+				else
+					data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+				end
 			end
 		end
 	end
@@ -1322,7 +1366,7 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Keeps main window for tweak mode.
-	contentHolder:SetVisibility(#tabsToShow ~= 0)
+	contentHolder:SetVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
 end
 
 --------------------------------------------------------------------------------
@@ -1357,7 +1401,18 @@ local function InitializeControls()
 		tweakResizable = true,
 		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
-		parent    = screen0,
+		parent = screen0,
+		OnMouseDown = { 
+			function(self) 
+				local _,_, meta,_ = Spring.GetModKeyState()
+				if not meta then 
+					return false
+				end
+				WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
+				WG.crude.ShowMenu() --make epic Chili menu appear.
+				return true
+			end 
+		},
 	}
 		
 	local tabHolder = Control:New{
@@ -1434,17 +1489,9 @@ local function InitializeControls()
 		local OnTabSelect
 		
 		data.holder = commandHolder
+		data.buttons = GetButtonPanel(commandHolder, 3, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
+		
 		if data.factoryQueue then
-			local buttonHolder = Control:New{
-				x = "0%",
-				y = "0%",
-				width = "100%",
-				height = "66.666%",
-				padding = {0, 0, 0, 0},
-				parent = commandHolder,
-			}
-			data.buttons = GetButtonPanel(buttonHolder, 2, 6,  false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
-			
 			local queueHolder = Control:New{
 				x = "0%",
 				y = "66.666%",
@@ -1458,13 +1505,11 @@ local function InitializeControls()
 			-- If many things need doing they must be put in a function
 			-- but this works for now.
 			OnTabSelect = data.queue.UpdateBuildProgress
-		else
-			data.buttons = GetButtonPanel(commandHolder, 3, 6, false, data.buttonLayoutConfig, data.isStructure, data.onClick, data.buttonLayoutOverride)
 		end
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
-		if data.gridHotkeys then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1490,7 +1535,7 @@ function options.keyboardType.OnChange(self)
 	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.gridHotkeys then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1504,6 +1549,19 @@ end
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
 	contentHolder:SetVisibility(not (self.value and isSpec))
+end
+
+function options.unitsHotkeys.OnChange(self)
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if data.disableableKeys then
+			if not options.unitsHotkeys.value then
+				data.buttons.RemoveGridHotkeys()
+			else
+				data.buttons.ApplyGridHotkeys(gridMap)
+			end
+		end
+	end
 end
 
 function options.tab_economy.OnChange()
@@ -1578,13 +1636,14 @@ function widget:Update()
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
+
 	if isRepeat then
 		return false
 	end
 	
 	local currentTab = tabPanel.GetCurrentTab()
 	local commandPanel = currentTab and commandPanelMap[currentTab]
-	if (not commandPanel) or (not commandPanel.gridHotkeys) then
+	if (not commandPanel) or (not (commandPanel.gridHotkeys and ((not commandPanel.disableableKeys) or options.unitsHotkeys.value))) then
 		return false
 	end
 	
@@ -1593,12 +1652,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 		local x, y = pos[2], pos[1]
 		local button = commandPanel.buttons.GetButton(x, y)
 		if button then
-			button.DoClick()
-			return true
+			return button.DoClick()
 		end
 	end
 
-	if commandPanel.onClick then
+	if (key == KEYSYMS.ESCAPE or gridKeyMap[key]) and commandPanel.onClick then
 		commandPanel.onClick()
 		return true
 	end

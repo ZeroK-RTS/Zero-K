@@ -259,6 +259,8 @@ local function SendCommand()
 	local pointAveX = 0
 	local pointAveZ = 0
 	local commandRadius = 0
+	
+	local a,c,m,s = spGetModKeyState()
 
 	for i = 1, points do
 		pointAveX = pointAveX + point[i].x
@@ -301,11 +303,10 @@ local function SendCommand()
 
 		local a,c,m,s = spGetModKeyState()
 		
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 		if s then
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
 			originalCommandGiven = true
 		else
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 			spSetActiveCommand(-1)
 			originalCommandGiven = false
 		end
@@ -335,21 +336,23 @@ local function SendCommand()
 		
 		params[#params + 1] = commandTag
 		
-		local a,c,m,s = spGetModKeyState()
-		
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 		if s then
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
 			originalCommandGiven = true
 		else
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 			spSetActiveCommand(-1)
 			originalCommandGiven = false
 		end
 	end
 	
+	local cmdOpts = {}
+	if s then
+		cmdOpts[#cmdOpts + 1] = "shift"
+	end
+	
 	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
 	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, {"shift"})
+		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, cmdOpts)
 	end
 		
 	if buildToGive then
