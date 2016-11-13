@@ -158,6 +158,7 @@ return {
 		{	"epic_chili_widget_selector_widgetlist",	"f11",},
 		{	"luaui tweakgui",	"C+f11",},
 		{	"screenshot png",	"f12",},
+		{	"screenshot", "ctrl+f12"}, 
 		{	"movefast",	"Any+shift",},
 		{	"moveslow",	"Any+ctrl",},
 		{	"track",	"alt+t",},
