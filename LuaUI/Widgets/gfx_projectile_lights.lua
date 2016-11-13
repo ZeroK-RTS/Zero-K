@@ -382,7 +382,6 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 	--Spring.Echo("cameraHeight", cameraHeight, "fps", fps)
 	
 	for i, pID in ipairs(projectiles) do
-		Spring.Echo("pID", i, pID)
 		local x, y, z = spGetProjectilePosition(pID)
 		--Spring.Echo("projectilepos = ", x, y, z, 'id', pID)
 		local weapon, piece = spGetProjectileType(pID)
