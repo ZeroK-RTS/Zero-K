@@ -75,6 +75,12 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["tawf114"].id] = true, --HT's banisher
 	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
 	[UnitDefNames["corshad"].id] = true,
+	
+	[UnitDefNames["a_shipscout"].id] = true, 
+	[UnitDefNames["a_shiptorpbt"].id] = true,
+	--[UnitDefNames["a_shipmissile"].id] = true, --waiting on stupid bos
+	[UnitDefNames["a_shipatksub"].id] = true,
+	
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = true,
 	[UnitDefNames["armmerl"].id] = true,
@@ -84,6 +90,9 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["armrock"].id] = true,
 	[UnitDefNames["reef"].id] = true,
 	[UnitDefNames["armorco"].id] = true,
+	
+	[UnitDefNames["a_shipcruiser"].id] = true,
+	
 	-- Needs LUS
 	--[UnitDefNames["correap"].id] = true,
 	--[UnitDefNames["corraid"].id] = true,

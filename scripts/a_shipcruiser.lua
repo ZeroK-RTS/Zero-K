@@ -307,6 +307,11 @@ function script.QueryWeapon(num)
 	end
 end
 
+if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 125, false, false, true) then
+		return true
+	end
+	return false
+
 function script.SweetSpot(num)
 	return base
 end
