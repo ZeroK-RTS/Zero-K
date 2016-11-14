@@ -389,6 +389,18 @@ local options = {
     max    = 10000,
     step   = 0.05,
   },
+    {
+    key    = 'raidDefenseBuildingRangeMult',
+    name   = 'Range Multiplier for Raid-Damaging Buildings',
+    desc   = 'Multiplies the ranges of all buildings that are able to directly damage ground-based raids, excluding ' ..
+    'superweapons, nuclear weapons and the missile silo.',
+    type   = 'number',
+    section= 'experimental',
+    def    = 1,
+    min    = 0,
+    max    = 100000,
+    step   = 0.05,
+  },
   {
     key    = 'defeatmode',
     name   = 'Defeat Mode',

@@ -71,7 +71,7 @@ local contentHolder
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
+	'background_opacity', 'keyboardType', 'selectionClosesTab', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
 }
 
@@ -91,6 +91,13 @@ options = {
 			{name = 'Disable Grid Keys', key = 'none', hotkey = nil},
 		},
 		value = 'qwerty',  --default at start of widget
+		noHotkey = true,
+	},
+	selectionClosesTab = {
+		name = 'Selection Closes Tab',
+		tooltip = "When enabled, selecting a build option will switch the tab back to Orders (except for build options in the factory queue tab).",
+		type = 'bool',
+		value = true,
 		noHotkey = true,
 	},
 	unitsHotkeys = {
@@ -811,7 +818,7 @@ local function GetQueuePanel(parent, columns)
 		}
 	}
 	
-	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, onClick, buttonLayoutOverride)
+	local buttons = GetButtonPanel(parent, 1, columns, false, buttonLayoutConfig.queue, false, nil, buttonLayoutOverride)
 
 	function externalFunctions.ClearOldButtons(selectionIndex)
 		buttons.ClearOldButtons(selectionIndex)
@@ -1267,7 +1274,9 @@ local function InitializeControls()
 	--end
 	
 	local function ReturnToOrders()
-		commandPanelMap.orders.tabButton.DoClick()
+		if options.selectionClosesTab.value then
+			commandPanelMap.orders.tabButton.DoClick()
+		end
 	end
 	
 	for i = 1, #commandPanels do
