@@ -1820,8 +1820,8 @@ function CleanOrders(cmd, isNew)
 						activeJobs[blockerID] = nil -- note this only stops a tiny space leak should a free starting fac be added to the queue
 						-- but it was cheap, so whatever.
 					end
-				elseif canBuildThisThere == blockageType.mobiles and myUnits[blockerID] and UnitDefs[blockerDefID].moveDef.id and myUnits[blockerID].cmdtype ~= commandType.drec then
-				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders...
+				elseif canBuildThisThere == blockageType.mobiles and myUnits[blockerID] and UnitDefs[blockerDefID].moveDef.id and myUnits[blockerID].cmdtype ~= commandType.drec and not IsEmpty(cmd.assignedUnits) then
+				-- if blocked by a mobile unit, and it's one of our constructors, and not a flying unit, and it's not under direct orders, and there's actually a worker assigned to the job...
 					local x,y,z = spGetUnitPosition(blockerID)
 					local dx, dz = GetNormalizedDirection(cx, cz, x, z) 
 					dx = dx*50
@@ -2192,6 +2192,14 @@ function GetNormalizedDirection(x1, z1, x2, z2)
 	x = x/d
 	z = z/d
 	return x, z
+end
+
+-- because lua is a shit language
+function IsEmpty(table)
+	for _ in pairs(table) do
+		return false
+	end
+	return true
 end
 
 --	Borrowed this from CarRepairer's Retreat.  Returns only first command in queue.
