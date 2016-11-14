@@ -125,7 +125,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[shipraidtorp.s3o]],
+      object           = [[shipraidtorp_dead.s3o]],
     },
 
 
