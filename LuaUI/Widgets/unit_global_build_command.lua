@@ -342,6 +342,7 @@ function widget:Initialize()
 	UpdateOneGroupsDetails(options.exclusionGroupID.value)
 	
 	-- ZK compatability stuff
+	widgetHandler:RegisterGlobal("CommandNotifyPreQue", CommandNotifyPreQue) --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 	widgetHandler:RegisterGlobal("CommandNotifyTF", CommandNotifyTF) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
 	widgetHandler:RegisterGlobal("CommandNotifyRaiseAndBuild", CommandNotifyRaiseAndBuild) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
@@ -769,12 +770,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local ud = UnitDefs[unitDefID]
 	local _,_,nanoframe = spGetUnitIsStunned(unitID)
 	if (not nanoframe and ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
-		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-		if cmd and cmd.id then -- if so we mark it as drec
-		myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
-		else -- otherwise we mark it as idle
-			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
-		end
+		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
+		myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
 		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 	end
 end
@@ -880,6 +877,13 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 		idlers[#idlers+1] = unitID -- add it to the idle list to be double-checked at assignment time.
 		idleCheck = true -- set the flag so that the idle list will be processed
 		return
+	end
+end
+
+--	A ZK compatibility function: receive broadcasted event from "unit_initial_queue.lua" (ZK specific) which 
+function CommandNotifyPreQue(unitID)
+	if myUnits[unitID] then
+		myUnits[unitID].cmdtype = commandType.drec
 	end
 end
 
