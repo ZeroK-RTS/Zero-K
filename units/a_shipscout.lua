@@ -38,7 +38,7 @@ unitDef = {
   movementClass          = [[BOAT3]],
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[scoutboat.s3o]],
-  script                 = [[shipscout.lua]],
+  script                 = [[a_shipscout.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
