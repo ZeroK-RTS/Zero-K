@@ -86,7 +86,7 @@ function script.QueryWeapon2()
 end
 
 function script.BlockShot(num, targetID)	
-	--disarm prevention is not really a very good idea
+	--disarm okp is silly
 	--if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 40, 120) then --1 and a bit seconds - timeout, 3 seconds - disarmTimer
 	--	return true
 	--end
