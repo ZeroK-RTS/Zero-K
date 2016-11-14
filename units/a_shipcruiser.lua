@@ -42,6 +42,7 @@ unitDef = {
   movementClass          = [[BOAT4]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
   objectName             = [[armroy.s3o]],
+--  onoffable           = true,
   script                 = [[a_shipcruiser.lua]],
   --script                 = [[a_shipcruiser.cob]],
   seismicSignature       = 4,
@@ -55,6 +56,12 @@ unitDef = {
   weapons                = {
 
     {
+      def                = [[PLASMA]],
+      badTargetCategory  = [[GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
+    },
+	
+	{
       def                = [[PLASMA]],
       badTargetCategory  = [[GUNSHIP]],
       onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
@@ -85,7 +92,7 @@ unitDef = {
 	  myGravity               = 0.1,
       projectiles             = 1,
       range                   = 1200,
-      reloadtime              = 3.5,
+      reloadtime              = 4,
       soundHit                = [[weapon/cannon/cannon_hit2]],
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
@@ -94,9 +101,9 @@ unitDef = {
     },
 	
 	NAPALM_MORTAR = {
-      name                    = [[Napalm Cannon]],
+      name                    = [[Napalm Mortar]],
       accuracy                = 400,
-      areaOfEffect            = 196,
+      areaOfEffect            = 144,
 	  avoidFeature            = false,
 	  cegTag                  = [[custom:gravityless_flamer]],
       craterBoost             = 1,
@@ -109,7 +116,7 @@ unitDef = {
 		area_damage = 1,
 		area_damage_radius = 128,
 		area_damage_dps = 20,
-		area_damage_duration = 6,
+		area_damage_duration = 5,
 
 		--lups_heat_fx = [[firewalker]],
 	  },
@@ -120,22 +127,22 @@ unitDef = {
         subs    = 4,
       },
 
-      explosionGenerator      = [[custom:napalm_firewalker]],
+      explosionGenerator      = [[custom:cavalier_firebomb]],
       firestarter             = 180,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       myGravity               = 0.1,
-      range                   = 1100,
-      reloadtime              = 6,
+      range                   = 1200,
+      reloadtime              = 4,
       rgbColor                = [[1 0.5 0.2]],
       size                    = 8,
       soundHit                = [[weapon/cannon/wolverine_hit]],
-      soundStart              = [[weapon/cannon/wolverine_fire]],
-      sprayangle              = 1024,
+      soundStart              = [[weapon/cannon/heavy_cannon]],
+      sprayangle              = 1536,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 340,
+      weaponVelocity          = 330,
     },
 	
 	DISBOMB = {
@@ -171,7 +178,7 @@ unitDef = {
 	  model                   = [[wep_b_fabby.s3o]],
 	  myGravity               = 0.1,
       noSelfDamage            = false,
-	  range                   = 1100,
+	  range                   = 1200,
 	  reloadtime              = 6,
 	  smokeTrail              = true,
 	  soundHit                = [[weapon/aoe_aura]],
@@ -181,7 +188,7 @@ unitDef = {
 	  --trajectoryHeight        = 0.3,
 	  turret                  = true,
 	  weaponType              = [[Cannon]],
-	  weaponVelocity          = 340,
+	  weaponVelocity          = 330,
     },
 
   },

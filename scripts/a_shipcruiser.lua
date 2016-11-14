@@ -43,6 +43,13 @@ local SIG_ROCK_Z = 16		--Signal( to prevent multiple rocking
 
 local ROCK_Z_FIRE_1 = -5
 local ROCK_FORCE = 0.1
+
+local unitDefID = Spring.GetUnitDefID(unitID)
+local wd1 = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
+local reloadTime1 = wd1 and WeaponDefs[wd1].reload*30 or 30
+
+local wd2 = UnitDefs[unitDefID].weapons[2] and UnitDefs[unitDefID].weapons[2].weaponDef
+local reloadTime2 = wd2 and WeaponDefs[wd2].reload*30 or 30
 --------------------------------------------------------------------
 --variables
 --------------------------------------------------------------------
@@ -235,6 +242,13 @@ end
 
 function script.AimWeapon(num, heading, pitch)
 	if dead then return false end
+	
+	local states = Spring.GetUnitStates(unitID)
+	
+	if (states.active and num == 2) or (not states.active and num == 1 ) then
+		return false
+	end
+	
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
 	Turn( turret , y_axis, heading, math.rad(150.000000) )
@@ -249,10 +263,26 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num) 
+	--put the other weapon on cd equal to second weapon's cd
+	local toChange = 3 - num
+	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+	if reloadSpeedMult <= 0 then
+		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
+		reloadSpeedMult = 1
+	end
+	local reloadTimeMult = 1/reloadSpeedMult
+	
+	if num == 1 then
+		Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime1*reloadTimeMult)
+	else
+		Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime2*reloadTimeMult)
+	end
+	
 	StartThread(Rock, gun_1_yaw, ROCK_FORCE, z_axis)
-	--StartThread(RockZ)
+	
 	gun_1 = 1 - gun_1
-	if  gun_1  then 
+	
+	if  gun_1 == 0 then 
 		Show( fire1)
 		Hide( fire1)
 		Move( barrel1 , z_axis, -8  )
