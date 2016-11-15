@@ -258,6 +258,7 @@ local function SendCommand()
 	local commandTag = WG.Terraform_GetNextTag()
 	local pointAveX = 0
 	local pointAveZ = 0
+	local commandRadius = 0
 	
 	local a,c,m,s = spGetModKeyState()
 
@@ -268,13 +269,18 @@ local function SendCommand()
 	pointAveX = pointAveX/points
 	pointAveZ = pointAveZ/points
 	
+	for i = 1, points do
+		commandRadius = commandRadius + math.abs(point[i].x - pointAveX) + math.abs(point[i].z - pointAveZ)
+	end
+	commandRadius = 16 + 0.7*commandRadius/points + 10*math.random() -- Prevent collisions almost surely.
+	
 	if terraform_type == 4 then
 		local params = {}
 		params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
 		params[2] = team -- teamID of the team doing the terraform
 		params[3] = pointAveX
 		params[4] = pointAveZ
-		params[5] = commandTag
+		params[5] = commandRadius
 		params[6] = loop -- true or false
 		params[7] = terraformHeight -- width of the ramp
 		params[8] = points -- how many points there are in the lasso (2 for ramp)
@@ -292,15 +298,20 @@ local function SendCommand()
 			params[i] = constructor[j]
 			i = i + 1
 		end
+		
+		params[#params + 1] = commandTag
 
 		local a,c,m,s = spGetModKeyState()
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-		if s then
-			originalCommandGiven = true
-		else
-			spSetActiveCommand(-1)
-			originalCommandGiven = false
+		-- check if some other widget wants to handle the commands before sending them to units. 
+		if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyTF(constructor, params, s) then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			if s then
+				originalCommandGiven = true
+			else
+				spSetActiveCommand(-1)
+				originalCommandGiven = false
+			end
 		end
 	else
 		local params = {}
@@ -308,7 +319,7 @@ local function SendCommand()
 		params[2] = team
 		params[3] = pointAveX
 		params[4] = pointAveZ
-		params[5] = commandTag
+		params[5] = commandRadius
 		params[6] = loop
 		params[7] = terraformHeight 
 		params[8] = points
@@ -326,32 +337,44 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-		if s then
-			originalCommandGiven = true
-		else
-			spSetActiveCommand(-1)
-			originalCommandGiven = false
-		end
-	end
-	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
-	end
-	
-	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
-	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
-	end
+		params[#params + 1] = commandTag
 		
-	if buildToGive then
-		if currentlyActiveCommand == CMD_LEVEL then
+		-- send notifications to other widgets, which may want to handle the command instead.
+		local handledExternally = false
+		if WG.GobalBuildCommand and buildToGive then
+			handledExternally = WG.GobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, params, s)
+		elseif WG.GobalBuildCommand then
+			handledExternally = WG.GobalBuildCommand.CommandNotifyTF(constructor, params, s)
+		end
+		
+		if not handledExternally then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			if s then
+				originalCommandGiven = true
+			else
+				spSetActiveCommand(-1)
+				originalCommandGiven = false
+			end
+			
+			local cmdOpts = {}
+			if s then
+				cmdOpts[#cmdOpts + 1] = "shift"
+			end
+	
+			local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
 			for i = 1, #constructor do
-				spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+				spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, cmdOpts)
+			end
+		
+			if buildToGive then
+				if currentlyActiveCommand == CMD_LEVEL then
+					for i = 1, #constructor do
+						spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+					end
+				end
+				buildToGive = false
 			end
 		end
-		buildToGive = false
 	end
 	
 	points = 0		

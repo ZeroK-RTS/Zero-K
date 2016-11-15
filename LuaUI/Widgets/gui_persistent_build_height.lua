@@ -109,14 +109,14 @@ local function SendCommand()
 		return
 	end
 	
-	local commandTag = WG.Terraform_GetNextTag()
+	local commandRadius = sizeX + math.random()
 	
 	local params = {}
 	params[1] = 1            -- terraform type = level
 	params[2] = Spring.GetMyTeamID()
 	params[3] = pointX
 	params[4] = pointZ
-	params[5] = commandTag
+	params[5] = commandRadius
 	params[6] = 1            -- Loop parameter
 	params[7] = pointY       -- Height parameter of terraform 
 	params[8] = 5            -- Five points in the terraform
@@ -142,22 +142,27 @@ local function SendCommand()
 		i = i + 1
 	end
 	
+	params[#params + 1] = WG.Terraform_GetNextTag()
+	
 	local a,c,m,s = spGetModKeyState()
 	
-	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-	if not s then
-		spSetActiveCommand(-1)
-	end
+	-- check whether some other widget wants to handle the commands before sending them to the units.
+	if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, params, s) then
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if not s then
+			spSetActiveCommand(-1)
+		end
 	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
-	end
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
 	
-	local height = Spring.GetGroundHeight(pointX, pointZ)
-	for i = 1, #constructor do
-		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
-		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+		local height = Spring.GetGroundHeight(pointX, pointZ)
+		for i = 1, #constructor do
+			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, cmdOpts)
+			Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+		end
 	end
 end
 
