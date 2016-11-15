@@ -210,11 +210,10 @@ function widget:Update(dt)
 		buildingPlacementID = -activeCommand
 		buildingPlacementHeight = (buildHeight[buildingPlacementID] or defaultBuildHeight)
 		
-		local ud = UnitDefs[buildingPlacementID]
-		
 		facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
 		
+		local ud = UnitDefs[buildingPlacementID]
 		local footX = ud.xsize/2
 		local footZ = ud.zsize/2
 		
@@ -230,14 +229,24 @@ function widget:Update(dt)
 		
 		widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 	end
+		
+	local ud = buildingPlacementID and UnitDefs[buildingPlacementID]
+	if not ud then
+		return
+	end
 	
 	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	-- Should not ignore water if the structure can float. See https://springrts.com/mantis/view.php?id=5390
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 	
 	if pos then
 		pointX = floor((pos[1] + 8 - oddX)/16)*16 + oddX
 		pointZ = floor((pos[3] + 8 - oddZ)/16)*16 + oddZ
-		pointY = spGetGroundHeight(pointX, pointZ) + buildingPlacementHeight	
+		local height = spGetGroundHeight(pointX, pointZ)
+		if ud.floatOnWater and height < 0 then
+			height = 0
+		end
+		pointY = height + buildingPlacementHeight	
 	else 
 		pointX = false
 	end
