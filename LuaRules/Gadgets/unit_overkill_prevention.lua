@@ -78,7 +78,7 @@ local HandledUnitDefIDs = {
 	
 	[UnitDefNames["a_shipscout"].id] = true, 
 	[UnitDefNames["a_shiptorpbt"].id] = true,
-	--[UnitDefNames["a_shipmissile"].id] = true, --waiting on stupid bos
+	[UnitDefNames["a_shipmissile"].id] = true,
 	[UnitDefNames["a_shipatksub"].id] = true,
 	
 	-- Static only OKP below

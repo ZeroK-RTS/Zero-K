@@ -192,6 +192,13 @@ function script.QueryWeapon(num)
 	end
 end
 
+function script.BlockShot(num, targetID)
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 105, 90, 0.25) then
+		return true
+	end
+	return false
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if  severity <= 0.50  then
