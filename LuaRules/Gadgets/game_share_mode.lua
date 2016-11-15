@@ -113,7 +113,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		if originalplayers[player] and config.unmerging then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
-				GG.ResetIncome(originalplayers[player]) -- Reset team income/storage.
+				GG.Overdrive.RemoveTeamIncomeRedirect(originalplayers[player]) -- Reset team income/storage.
 				local target = originalplayers[player]
 				Spring.AssignPlayerToTeam(player,originalplayers[player])
 				for _,unit in pairs(originalunits[target]) do
@@ -154,10 +154,10 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 			Spring.AssignPlayerToTeam(playerid,target)
 			if originalplayers[playerid] == nil then
-				originalplayers[playerid]	= originalteam
+				originalplayers[playerid] = originalteam
 			end
 			controlledplayers[playerid] = target
-			GG.RedirectPlayerIncome(playerid,target) -- redirect playerid's share of the team income to target teamid. This is basically 'assigning' the player's share to the team id.
+			GG.Overdrive.RedirectTeamIncome(originalteam, target)
 		else
 			Spring.Echo("Commshare: Merger error.")
 		end
