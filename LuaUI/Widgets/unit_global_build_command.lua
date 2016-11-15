@@ -342,7 +342,7 @@ function widget:Initialize()
 	UpdateOneGroupsDetails(options.exclusionGroupID.value)
 	
 	-- ZK compatability stuff
-	WG.GobalBuildCommand = { -- add compatibility functions to a table in widget globlals
+	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
 		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
@@ -929,8 +929,8 @@ function CommandNotifyTF(unitArray, params, shift)
 				nextFrame = nextFrame + 5 -- delay the next assignment frame slightly to ensure that the terraunit is created properly
 				break -- we don't need to process more than one unit if shift was held
 			else -- if the command was not given with shift
-			myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
-			captureThis = false
+				myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
+				captureThis = false
 			end
 		end
 	end
@@ -939,6 +939,7 @@ end
 
 -- ZK-Specific: This function captures combination raise-and-build commands
 function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shift)
+	Spring.Echo("CommandNotifyRaiseAndBuild was Received!")
 	local ours = false -- ensure that the order was given to at least one unit that's in our group
 	for i=1, #unitArray do
 		local unitID = unitArray[i]
@@ -948,7 +949,7 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shif
 		end
 	end
 	if not ours then
-	return false -- and stop here if not
+		return false -- and stop here if not
 	end
 	
 	local captureThis = false
