@@ -66,7 +66,8 @@ local posVolume   = {0, 1, 0, 0.1} -- posisive volume
 local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground height
 
 -- colour of lasso during drawing
-local lassoColor = {0.2, 1.0, 0.2, 1.0}
+local lassoColor = {0.2, 1.0, 0.2, 0.8}
+local edgeColor = {0.2, 1.0, 0.2, 0.4}
 
 --------------------------------------------------------------------------------
 -- Local Vars
@@ -90,6 +91,11 @@ local oddX = 0
 local oddZ = 0
 
 local facing = 0
+
+local corner = {
+	[1] = {[1] = 0, [-1] = 0},
+	[-1] = {[1] = 0, [-1] = 0},
+}
 
 --------------------------------------------------------------------------------
 -- Height Handling
@@ -245,6 +251,10 @@ function widget:Update(dt)
 		pointZ = floor((pos[3] + 8 - oddZ)/16)*16 + oddZ
 		local height = spGetGroundHeight(pointX, pointZ)
 		if ud.floatOnWater and height < 0 then
+			if buildingPlacementHeight == 0 and not floating then
+				-- Callin may have been removed
+				widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+			end
 			height = 0
 			floating = true
 			if buildingPlacementHeight == 0 then
@@ -255,6 +265,12 @@ function widget:Update(dt)
 		else
 			floating = false
 			pointY = height + buildingPlacementHeight	
+		end
+		
+		for i = -1, 1, 2 do
+			for j = -1, 1, 2 do
+				corner[i][j] = spGetGroundHeight(pointX + sizeX*i, pointZ + sizeZ*j)
+			end
 		end
 	else 
 		pointX = false
@@ -282,16 +298,34 @@ local function DrawRectangleLine()
 	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
 end
 
+local function DrawRectangleCorners()
+	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
+	glVertex(pointX + sizeX, corner[1][1], pointZ + sizeZ)
+	
+	glVertex(pointX + sizeX, pointY, pointZ - sizeZ)
+	glVertex(pointX + sizeX, corner[1][-1], pointZ - sizeZ)
+	
+	glVertex(pointX - sizeX, pointY, pointZ - sizeZ)
+	glVertex(pointX - sizeX, corner[-1][-1], pointZ - sizeZ)
+	
+	glVertex(pointX - sizeX, pointY, pointZ + sizeZ)
+	glVertex(pointX - sizeX, corner[-1][1], pointZ + sizeZ)
+end
+
 function widget:DrawWorld()
-	if not (buildingPlacementID and buildingPlacementHeight ~= 0) then
+	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating)) then
 		widgetHandler:RemoveWidgetCallIn("DrawWorld", self)
 		return
 	end
 
 	if pointX then
 		--// draw the lines
-		glLineWidth(3.0)
 		
+		glLineWidth(2.0)
+		glColor(edgeColor)
+		glBeginEnd(GL_LINES, DrawRectangleCorners)
+		
+		glLineWidth(3.0)
 		glColor(lassoColor)
 		glBeginEnd(GL_LINE_STRIP, DrawRectangleLine)
 		
