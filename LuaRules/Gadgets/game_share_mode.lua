@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date	 = "6-23-2016",
 		license	 = "Do whatever you want with it, just give credit",
 		layer	 = 0,
-		enabled	 = true,
+		enabled	 = false,
 	}
 end
 
@@ -144,7 +144,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		local originalteam = GetTeamID(playerid)
 		local name,_,spec  = Spring.GetPlayerInfo(playerid)
-		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none") then
+		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none" then
 			Spring.Echo("Commshare: Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
 			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
 			if GetSquadSize(originalteam) - 1 == 0 then
