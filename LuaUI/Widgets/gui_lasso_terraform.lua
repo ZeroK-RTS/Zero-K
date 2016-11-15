@@ -303,12 +303,15 @@ local function SendCommand()
 
 		local a,c,m,s = spGetModKeyState()
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-		if s then
-			originalCommandGiven = true
-		else
-			spSetActiveCommand(-1)
-			originalCommandGiven = false
+		-- check if some other widget wants to handle the commands before sending them to units. 
+		if not Script.LuaUI('CommandNotifyTF') or not Script.LuaUI.CommandNotifyTF(constructor, params, s) then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			if s then
+				originalCommandGiven = true
+			else
+				spSetActiveCommand(-1)
+				originalCommandGiven = false
+			end
 		end
 	else
 		local params = {}
@@ -336,32 +339,42 @@ local function SendCommand()
 		
 		params[#params + 1] = commandTag
 		
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-		if s then
-			originalCommandGiven = true
-		else
-			spSetActiveCommand(-1)
-			originalCommandGiven = false
+		-- send notifications to other widgets, which may want to handle the command instead.
+		local handledExternally = false
+		if Script.LuaUI('CommandNotifyRaiseAndBuild') and buildToGive then
+			handledExternally = Script.LuaUI.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, params, s)
+		elseif Script.LuaUI('CommandNotifyTF') then
+			handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
 		end
-	end
-	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
-	end
-	
-	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
-	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, cmdOpts)
-	end
 		
-	if buildToGive then
-		if currentlyActiveCommand == CMD_LEVEL then
+		if not handledExternally then
+			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+			if s then
+				originalCommandGiven = true
+			else
+				spSetActiveCommand(-1)
+				originalCommandGiven = false
+			end
+			
+			local cmdOpts = {}
+			if s then
+				cmdOpts[#cmdOpts + 1] = "shift"
+			end
+	
+			local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
 			for i = 1, #constructor do
-				spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+				spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, cmdOpts)
+			end
+		
+			if buildToGive then
+				if currentlyActiveCommand == CMD_LEVEL then
+					for i = 1, #constructor do
+						spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+					end
+				end
+				buildToGive = false
 			end
 		end
-		buildToGive = false
 	end
 	
 	points = 0		

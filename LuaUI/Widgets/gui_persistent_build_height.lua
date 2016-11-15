@@ -145,20 +145,23 @@ local function SendCommand()
 	
 	local a,c,m,s = spGetModKeyState()
 	
-	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-	if not s then
-		spSetActiveCommand(-1)
-	end
+	-- check whether some other widget wants to handle the commands before sending them to the units.
+	if not Script.LuaUI('CommandNotifyRaiseAndBuild') or not Script.LuaUI.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, params, s) then
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if not s then
+			spSetActiveCommand(-1)
+		end
 	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
-	end
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
 	
-	local height = Spring.GetGroundHeight(pointX, pointZ)
-	for i = 1, #constructor do
-		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, cmdOpts)
-		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+		local height = Spring.GetGroundHeight(pointX, pointZ)
+		for i = 1, #constructor do
+			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, cmdOpts)
+			Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+		end
 	end
 end
 
