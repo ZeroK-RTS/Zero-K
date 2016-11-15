@@ -487,7 +487,7 @@ function widget:GameFrame(n)
 	if tasker then
 		--Spring.Echo("sending queue to unit")
 		-- notify other widgets that we're giving orders to the commander.
-		if Script.LuaUI('CommandNotifyPreQue') then Script.LuaUI.CommandNotifyPreQue(tasker) end
+		if WG.GobalBuildCommand then WG.GobalBuildCommand.CommandNotifyPreQue(tasker) end
 		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]

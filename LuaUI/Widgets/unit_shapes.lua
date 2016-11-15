@@ -654,7 +654,11 @@ function DrawUnitShapes(unitList, color, underWorld)
 	gl.Blending(true)
 	gl.BlendFunc(GL.ONE_MINUS_SRC_ALPHA, GL.SRC_ALPHA)
 	gl.ColorMask(false,false,false,true)
-	
+	if underWorld then
+		gl.DepthTest(GL.GREATER)
+	else
+		gl.DepthTest(GL.LEQUAL)
+	end
 	gl.PolygonOffset(-1.0,-1.0)
 	-- gl.StencilMask(0x01)
 	gl.StencilFunc(GL.ALWAYS, 0x01, 0xFF)
@@ -717,6 +721,8 @@ end
 local function DrawCircles(underWorld)
 		--if Spring.IsGUIHidden() then return end
 	if (#visibleSelected + #hoveredUnit + #visibleBoxed == 0) and not hasVisibleAllySelections then return end
+	
+	gl.PushAttrib(GL_COLOR_BUFFER_BIT)
 		gl.DepthTest(false)
 		gl.StencilTest(true)
 			hoverColor = cursorIsOn == "enemy" and red or (cursorIsOn == "ally" and yellow or teal)
@@ -748,11 +754,17 @@ local function DrawCircles(underWorld)
 		gl.StencilTest(false)
 		gl.Blending("reset")
 		gl.Color(1,1,1,1)
+	gl.PopAttrib()
 end
 
 function widget:DrawWorldPreUnit()
+	DrawCircles(true)
+end
+
+function widget:DrawWorld()
 	DrawCircles(false)
 end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

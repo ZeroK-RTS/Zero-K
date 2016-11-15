@@ -220,6 +220,7 @@ local spPlaySoundFile		= Spring.PlaySoundFile
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
+local glMatrixMode = gl.MatrixMode
 local glLoadIdentity = gl.LoadIdentity
 local glTranslate	= gl.Translate
 local glBillboard	= gl.Billboard
@@ -342,10 +343,12 @@ function widget:Initialize()
 	UpdateOneGroupsDetails(options.exclusionGroupID.value)
 	
 	-- ZK compatability stuff
-	widgetHandler:RegisterGlobal("CommandNotifyPreQue", CommandNotifyPreQue) --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
-	widgetHandler:RegisterGlobal("CommandNotifyMex", CommandNotifyMex) --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
-	widgetHandler:RegisterGlobal("CommandNotifyTF", CommandNotifyTF) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
-	widgetHandler:RegisterGlobal("CommandNotifyRaiseAndBuild", CommandNotifyRaiseAndBuild) -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+	WG.GobalBuildCommand = { -- add compatibility functions to a table in widget globlals
+		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
+		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
+		CommandNotifyTF = CommandNotifyTF, -- an event called by "gui_lasso_terraform.lua" to notify other widgets of terraform commands.
+		CommandNotifyRaiseAndBuild = CommandNotifyRaiseAndBuild -- an event called by "gui_lasso_terraform.lua" to notify other widgets of raise-and-build commands.
+	}
 end
 
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
@@ -486,7 +489,7 @@ function widget:DrawWorldPreUnit()
 	-- Draw The selection circle for area job remove tool, if active
 	if selectionStarted and selectionRadius > 0 then
 		glColor(1.0, 0.0, 0.0, 0.6)
-		glLineWidth(12)
+		glLineWidth(4)
 		glGroundCircle(selectionCoords.x, selectionCoords.y, selectionCoords.z, selectionRadius, 64)
 		glColor(1, 1, 1, 1)
 		glLineWidth(1)
@@ -505,10 +508,9 @@ function widget:DrawWorldPreUnit()
 		end
 		
 		DrawAreaLines() -- draw circles for area repair/reclaim/res
-		
-		glColor(1, 1, 1, 1)
-		glLineWidth(1)
 	end
+	glColor(1, 1, 1, 1)
+	glLineWidth(1)
 end
 
 --  Paint 'cb' tags on units, draw ghosts of items in central build queue.
@@ -523,17 +525,16 @@ function widget:DrawWorld()
 	--if removeToolIsActive then -- draw the cursor if the job remove tool is active
 		--spSetMouseCursor("cursorrepair")
 	--end
-			
+	glDepthTest(false)
+	glColor(textColor)
 	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in our group
 		if spIsUnitInView(unitID) then
 			local ux, uy, uz = spGetUnitViewPosition(unitID)
 			glPushMatrix()
 			glTranslate(ux, uy, uz)
 			glBillboard()
-			glColor(textColor)
 			glText(myCmd.cmdtype, -10.0, -15.0, textSize, "con")
 			glPopMatrix()
-			glColor(1, 1, 1, 1)
 		end -- if InView
 	end -- for unitID in group
 	    
@@ -545,9 +546,12 @@ function widget:DrawWorld()
 		end
 		
 		glDepthTest(true)
+		glPushMatrix()
 		DrawBuildingGhosts() -- draw building ghosts
+		glPopMatrix()
 		glDepthTest(false)
 		
+		glTexture(true)
 		if shift and options.alwaysShow.value then -- increase the opacity of command icons when shift is held
 			glColor(1, 1, 1, 0.8)
 		else
@@ -573,9 +577,9 @@ function widget:DrawWorld()
 		
 		glTexture(res_icon)
 		DrawSTIcons(stResList)
-		
-		glColor(1, 1, 1, 1)
 	end
+	glTexture(false)
+	glColor(1, 1, 1, 1)
 end
 
 -- This function changes the mouse cursor if the job remove tool is active.
@@ -586,8 +590,8 @@ function widget:DrawScreen()
 end
 
 function DrawBuildLines()
-	for i=1, #buildList do -- draw outlines for building jobs
-		local cmd = buildList[i]
+	for _,cmd in pairs(buildList) do -- draw outlines for building jobs
+		--local cmd = buildList[i]
 		local x, y, z, h = cmd.x, cmd.y, cmd.z, cmd.h
 		local bcmd = abs(cmd.id)
 		glBeginEnd(GL_LINE_STRIP, DrawOutline, bcmd, x, y, z, h)
@@ -609,8 +613,8 @@ function DrawOutline(cmd,x,y,z,h)
 end
 
 function DrawAreaLines()
-	for i=1, #areaList do -- draw circles for area repair/reclaim/resurrect jobs
-		local cmd = areaList[i]
+	for _,cmd in pairs(areaList) do -- draw circles for area repair/reclaim/resurrect jobs
+		--local cmd = areaList[i]
 		local x, y, z, r = cmd.x, cmd.y, cmd.z, cmd.r
 		if cmd.id == 40 then
 			glColor(rep_color)
@@ -624,17 +628,15 @@ function DrawAreaLines()
 end
 
 function DrawBuildingGhosts()
-	for i=1, #buildList do -- draw building "ghosts"
-		local myCmd = buildList[i]
+	for _,myCmd in pairs(buildList) do -- draw building "ghosts"
+		--local myCmd = buildList[i]
 		local bcmd = abs(myCmd.id)
 		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local degrees = h * 90
-		--glPushMatrix()
 		glLoadIdentity()
 		glTranslate(x, y, z)
 		glRotate(degrees, 0, 1.0, 0 )
 		glUnitShape(bcmd, myTeamID, false, false, false)
-		--glPopMatrix()
 	end
 end
 
@@ -733,6 +735,7 @@ HOW THIS WORKS:
 function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
 		Echo( "<Global Build Command> Spectator mode. Widget removed." )
+		WG.GlobalBuildCommand = nil
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -2198,7 +2201,7 @@ function GetNormalizedDirection(x1, z1, x2, z2)
 	return x, z
 end
 
--- because lua is a shit language
+-- determines if a table is empty, because lua does not provide a built in way to do that.
 function IsEmpty(table)
 	for _ in pairs(table) do
 		return false

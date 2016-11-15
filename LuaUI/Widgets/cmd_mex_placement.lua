@@ -366,7 +366,7 @@ function widget:CommandNotify(cmdID, params, options)
 				local y = Spring.GetGroundHeight(x, z)
 
 				-- check if some other widget wants to handle the command before sending it to units.
-				if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
+				if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
 					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
 				end
 
@@ -378,7 +378,7 @@ function widget:CommandNotify(cmdID, params, options)
 						local yy = Spring.GetGroundHeight(xx, zz)
 						
 						-- check if some other widget wants to handle the command before sending it to units.
-						if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
+						if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
 							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
 						end
 					end
@@ -418,7 +418,7 @@ function widget:CommandNotify(cmdID, params, options)
 				return true
 			else
 				-- check if some other widget wants to handle the command before sending it to units.
-				if not Script.LuaUI('CommandNotifyMex') or not Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false) then
+				if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false) then
 					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
 				end
 				return true

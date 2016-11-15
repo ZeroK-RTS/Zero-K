@@ -146,7 +146,7 @@ local function SendCommand()
 	local a,c,m,s = spGetModKeyState()
 	
 	-- check whether some other widget wants to handle the commands before sending them to the units.
-	if not Script.LuaUI('CommandNotifyRaiseAndBuild') or not Script.LuaUI.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, params, s) then
+	if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, params, s) then
 		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 		if not s then
 			spSetActiveCommand(-1)

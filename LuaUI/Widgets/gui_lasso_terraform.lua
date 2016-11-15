@@ -304,7 +304,7 @@ local function SendCommand()
 		local a,c,m,s = spGetModKeyState()
 		
 		-- check if some other widget wants to handle the commands before sending them to units. 
-		if not Script.LuaUI('CommandNotifyTF') or not Script.LuaUI.CommandNotifyTF(constructor, params, s) then
+		if not WG.GobalBuildCommand or not WG.GobalBuildCommand.CommandNotifyTF(constructor, params, s) then
 			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 			if s then
 				originalCommandGiven = true
@@ -341,10 +341,10 @@ local function SendCommand()
 		
 		-- send notifications to other widgets, which may want to handle the command instead.
 		local handledExternally = false
-		if Script.LuaUI('CommandNotifyRaiseAndBuild') and buildToGive then
-			handledExternally = Script.LuaUI.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, params, s)
-		elseif Script.LuaUI('CommandNotifyTF') then
-			handledExternally = Script.LuaUI.CommandNotifyTF(constructor, params, s)
+		if WG.GobalBuildCommand and buildToGive then
+			handledExternally = WG.GobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, params, s)
+		elseif WG.GobalBuildCommand then
+			handledExternally = WG.GobalBuildCommand.CommandNotifyTF(constructor, params, s)
 		end
 		
 		if not handledExternally then
