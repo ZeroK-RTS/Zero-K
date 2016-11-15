@@ -19,6 +19,7 @@ local GetUnitCost = Spring.Utilities.GetUnitCost
 
 local reclaimListByTeam = {}
 local damageDealtByTeam = {}
+local metalExcessByTeam = {}
 local damageReceivedByTeam = {}
 
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
@@ -81,6 +82,7 @@ function gadget:GameFrame(n)
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", damageDealtByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", damageReceivedByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", -reclaimListByTeam[teamID])
+			Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", metalExcessByTeam[teamID])
 			Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", GetTotalUnitValue(teamID))
 		end
 		sum_count = sum_count + 1
@@ -91,6 +93,7 @@ function gadget:GameFrame(n)
 				Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_"    .. stats_index, damageDealtByTeam[teamID])
 				Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_" .. stats_index, damageReceivedByTeam[teamID])
 				Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_" .. stats_index, -reclaimListByTeam[teamID])
+				Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_" .. stats_index, metalExcessByTeam[teamID])
 				Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_" .. stats_index, GetTotalUnitValue(teamID))
 				Spring.SetTeamRulesParam(teamID, "stats_history_metal_income_"  .. stats_index, mIncome[teamID] / sum_count)
 				Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_" .. stats_index, eIncome[teamID] / sum_count)
@@ -103,9 +106,18 @@ function gadget:GameFrame(n)
 	end
 end
 
+
+local externalFunctions = {}
+
+function externalFunctions.AddTeamMetalExcess(teamID, metalExcess)
+	metalExcessByTeam[teamID] = metalExcessByTeam[teamID] + metalExcess
+end
+
 function gadget:Initialize()
 	stats_index = math.floor((Spring.GetGameFrame() + 870) / 450)
 	sum_count = 0
+	
+	GG.EndgameGraphs = externalFunctions
 
 	for i = 1, #teamList do
 		local teamID = teamList[i]
@@ -114,6 +126,7 @@ function gadget:Initialize()
 		eIncome[teamID] = 0
 
 		Spring.SetTeamRulesParam(teamID, "stats_history_metal_reclaim_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current") or 0)
+		Spring.SetTeamRulesParam(teamID, "stats_history_metal_excess_current", Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current") or 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_dealt_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current") or 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_damage_received_current", Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current") or 0)
 		Spring.SetTeamRulesParam(teamID, "stats_history_unit_value_current", GetTotalUnitValue(teamID))
@@ -124,6 +137,7 @@ function gadget:Initialize()
 		Spring.SetTeamRulesParam(teamID, "stats_history_energy_income_0", 0)
 
 		reclaimListByTeam   [teamID] = -Spring.GetTeamRulesParam(teamID, "stats_history_metal_reclaim_current")
+		metalExcessByTeam   [teamID] = Spring.GetTeamRulesParam(teamID, "stats_history_metal_excess_current")
 		damageDealtByTeam   [teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_dealt_current")
 		damageReceivedByTeam[teamID] =  Spring.GetTeamRulesParam(teamID, "stats_history_damage_received_current")
 	end
