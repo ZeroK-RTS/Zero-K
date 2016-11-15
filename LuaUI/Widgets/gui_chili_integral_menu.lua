@@ -837,6 +837,7 @@ local function GetQueuePanel(parent, columns)
 		end
 		local unitBuildID = Spring.GetUnitIsBuilding(factoryUnitID)
 		if not unitBuildID then 
+			button.SetProgressBar(0)
 			return
 		end
 		local progress = select(5, Spring.GetUnitHealth(unitBuildID))
