@@ -78,6 +78,7 @@ local buildingPlacementID = false
 local buildingPlacementHeight = 0
 
 local toggleEnabled = false
+local floating = false
 
 local pointX = 0
 local pointY = 0
@@ -245,15 +246,23 @@ function widget:Update(dt)
 		local height = spGetGroundHeight(pointX, pointZ)
 		if ud.floatOnWater and height < 0 then
 			height = 0
+			floating = true
+			if buildingPlacementHeight == 0 then
+				pointY = 2
+			else
+				pointY = height + buildingPlacementHeight
+			end	
+		else
+			floating = false
+			pointY = height + buildingPlacementHeight	
 		end
-		pointY = height + buildingPlacementHeight	
 	else 
 		pointX = false
 	end
 end
 
 function widget:MousePress(mx, my, button)
-	if not (buildingPlacementID and buildingPlacementHeight ~= 0 and button == 1 and pointX) then
+	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
 		return
 	end
 	
