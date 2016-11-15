@@ -956,13 +956,13 @@ function widget:MousePress(mx, my, button)
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
 		
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
 					local a,c,m,s = spGetModKeyState()
-					local ty, id = spTraceScreenRay(mx, my, false)
+					local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 					if c and ty == "unit" and c then
 						local ud = UnitDefs[spGetUnitDefID(id)]
 						--if (ud.isBuilding == true or ud.maxAcc == 0) then
@@ -1014,7 +1014,7 @@ function widget:MousePress(mx, my, button)
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
 		
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 				
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
@@ -1064,7 +1064,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	if drawingLasso then
 
 		if button == 1 then
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 			local a,c,m,s = spGetModKeyState()
 			if legalPos(pos) and not c then
 				
@@ -1083,7 +1083,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	elseif drawingRectangle then
 
 		if button == 1 then
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		
 			if legalPos(pos) then
 			
@@ -1202,7 +1202,7 @@ function widget:Update(dt)
 		if terraform_type == 1 then
 			local a,c,m,s = spGetModKeyState()
 			if c then
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
@@ -1261,7 +1261,7 @@ function widget:Update(dt)
 	
 	elseif drawingRamp == 2 then
 		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		if legalPos(pos) then
 			local dis = sqrt((point[1].x-pos[1])^2 + (point[1].z-pos[3])^2)
 			if dis ~= 0 then
@@ -1292,7 +1292,7 @@ function widget:Update(dt)
 			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 		else
 			local mx,my = spGetMouseState()
-			pos = select(2, spTraceScreenRay(mx, my, true))
+			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
 		
 		local facing = Spring.GetBuildFacing()
@@ -1315,7 +1315,7 @@ function widget:Update(dt)
 		if (activeid == -mexDefID) and WG.mouseoverMex then
 			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 		else
-			pos = select(2, spTraceScreenRay(mx, my, true))
+			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
 		if pos and legalPos(pos) then
 			if buildingPress then
@@ -1352,7 +1352,7 @@ function widget:MouseRelease(mx, my, button)
 	if drawingLasso then
 		if button == 1 then
 			
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 			if legalPos(pos) then
 				local diffX = abs(point[points].x - pos[1])
 				local diffZ = abs(point[points].z - pos[3])
@@ -1437,11 +1437,11 @@ function widget:MouseRelease(mx, my, button)
 				
 				local x,z
 				
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then
 					
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
-						local ty, id = spTraceScreenRay(mx, my, false)
+						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
 							local x,_,z = spGetUnitPosition(mouseUnit.id)
@@ -1554,12 +1554,12 @@ function widget:MouseRelease(mx, my, button)
 				
 			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
 			
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				local x,z
 				if legalPos(pos) then
 				
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
-						local ty, id = spTraceScreenRay(mx, my, false)
+						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
 							local x,_,z = spGetUnitPosition(mouseUnit.id)
@@ -1683,7 +1683,7 @@ function widget:KeyRelease(key)
 	
 	if ((key == KEYSYMS.LCTRL) or (key == KEYSYMS.RCTRL)) and drawingLasso then
 		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		if legalPos(pos) then
 				
 			local diffX = abs(point[points].x - pos[1])
@@ -1775,7 +1775,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 		pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 	else
 		local mx,my = spGetMouseState()
-		pos = select(2, spTraceScreenRay(mx, my, true))
+		pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 	end
 	
 	SetFixedRectanglePoints(pos)
@@ -1797,7 +1797,7 @@ local function DrawLine()
 	end
 	
 	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 	if legalPos(pos) then
 		glVertex(pos[1],pos[2],pos[3])
 	end

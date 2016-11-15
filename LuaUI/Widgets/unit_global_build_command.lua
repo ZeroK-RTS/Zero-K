@@ -220,7 +220,6 @@ local spPlaySoundFile		= Spring.PlaySoundFile
 
 local glPushMatrix	= gl.PushMatrix
 local glPopMatrix	= gl.PopMatrix
-local glMatrixMode = gl.MatrixMode
 local glLoadIdentity = gl.LoadIdentity
 local glTranslate	= gl.Translate
 local glBillboard	= gl.Billboard
