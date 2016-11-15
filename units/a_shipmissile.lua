@@ -47,7 +47,7 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[logsiren2.s3o]],
   scale                  = [[0.6]],
-  script		         = [[a_shipmissile.cob]],
+  script		         = [[a_shipmissile.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
