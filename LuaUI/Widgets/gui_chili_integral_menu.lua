@@ -151,6 +151,7 @@ options = {
 -- Very Global Globals
 
 local buttonsByCommand = {}
+local alreadyRemovedTag = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -212,12 +213,14 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 	local j = 0
 	while commands[i] and ((not inputMult) or j < inputMult) do
 		local thisCmdID = commands[i].id
-		if thisCmdID < 0 then
+		local cmdTag = commands[i].tag
+		if thisCmdID < 0 and not alreadyRemovedTag[cmdTag] then
 			if thisCmdID ~= cmdID then
 				break
 			end
 	
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {commands[i].tag}, {"ctrl"})
+			alreadyRemovedTag[cmdTag] = true
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.REMOVE, {cmdTag}, {"ctrl"})
 			if reinsertPosition then
 				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
 			end
@@ -847,6 +850,8 @@ local function GetQueuePanel(parent, columns)
 	
 	function externalFunctions.UpdateFactory(newFactoryUnitID, newFactoryUnitDefID, selectionIndex)
 		local buttonCount = 0
+		
+		alreadyRemovedTag = {}
 		
 		factoryUnitID = newFactoryUnitID 
 		factoryUnitDefID = newFactoryUnitDefID
