@@ -225,8 +225,8 @@ local function MoveOrRemoveCommands(cmdID, factoryUnitID, commands, queuePositio
 				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {reinsertPosition, cmdID, 0}, {"alt", "ctrl"})
 			end
 			j = j + 1
-			i = i - 1
 		end
+		i = i - 1
 	end
 end
 
