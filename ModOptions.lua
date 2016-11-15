@@ -78,6 +78,21 @@ local options = {
     def    = false,
     section= 'a_important',
   },
+
+	{
+		key     = 'sharemode',
+		name    = 'Commshare',
+		desc    = 'Determines whether players can merge together during gameplay.',
+		type    = 'list',
+		section = 'a_important',
+		def     = 'invite',
+		items   = {
+			{ key='all', name = "Merge All", desc = 'Merges all at game start. Recommend using allowunmerge = false with this.' },
+			{ key='invite', name = "Invite Only", desc = 'Allows players to merge only if both give consent.' },
+			{ key='none', name = "Off", desc = 'Turns commsharing off.' },
+		},
+	},
+	
   {
     key = "noelo",
     name = "No Elo",
