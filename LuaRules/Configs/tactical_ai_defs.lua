@@ -1075,7 +1075,7 @@ local behaviourConfig = {
 		skirmLeeway = 120, 
 	},	
 	["a_shipcruiser"] = {
-		skirms = artyRangeSkirmieeArray, 
+		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
