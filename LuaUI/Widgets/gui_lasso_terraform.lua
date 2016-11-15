@@ -258,7 +258,6 @@ local function SendCommand()
 	local commandTag = WG.Terraform_GetNextTag()
 	local pointAveX = 0
 	local pointAveZ = 0
-	local commandRadius = 0
 	
 	local a,c,m,s = spGetModKeyState()
 
@@ -269,18 +268,13 @@ local function SendCommand()
 	pointAveX = pointAveX/points
 	pointAveZ = pointAveZ/points
 	
-	for i = 1, points do
-		commandRadius = commandRadius + math.abs(point[i].x - pointAveX) + math.abs(point[i].z - pointAveZ)
-	end
-	commandRadius = 16 + 0.7*commandRadius/points + 10*math.random() -- Prevent collisions almost surely.
-	
 	if terraform_type == 4 then
 		local params = {}
 		params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
 		params[2] = team -- teamID of the team doing the terraform
 		params[3] = pointAveX
 		params[4] = pointAveZ
-		params[5] = commandRadius
+		params[5] = commandTag
 		params[6] = loop -- true or false
 		params[7] = terraformHeight -- width of the ramp
 		params[8] = points -- how many points there are in the lasso (2 for ramp)
@@ -298,8 +292,6 @@ local function SendCommand()
 			params[i] = constructor[j]
 			i = i + 1
 		end
-		
-		params[#params + 1] = commandTag
 
 		local a,c,m,s = spGetModKeyState()
 		
@@ -316,7 +308,7 @@ local function SendCommand()
 		params[2] = team
 		params[3] = pointAveX
 		params[4] = pointAveZ
-		params[5] = commandRadius
+		params[5] = commandTag
 		params[6] = loop
 		params[7] = terraformHeight 
 		params[8] = points
@@ -334,8 +326,6 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		params[#params + 1] = commandTag
-		
 		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 		if s then
 			originalCommandGiven = true
@@ -352,7 +342,7 @@ local function SendCommand()
 	
 	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
 	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandRadius}, cmdOpts)
+		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
 	end
 		
 	if buildToGive then

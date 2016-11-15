@@ -195,8 +195,8 @@ local currentCon 			= 0
 
 local checkInterval 		= 0
 
--- Map of constructors to recieve the command on CommandFallback
-local fallbackConstructors  = {}
+-- Map terraform commands given by teamID and tag.
+local fallbackCommands  = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
@@ -474,22 +474,18 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
-local function AddFallbackConstructors(constructorCount, constructorList, terraunits, terraunitList, teamID, commandX, commandZ, commandRadius)
-	for i = 1, constructorCount do
-		local unitID = constructorList[i]
-		fallbackConstructors[unitID] = fallbackConstructors[unitID] or {}
-		fallbackConstructors[unitID][commandRadius]	= {
-			terraunits = terraunits,
-			terraunitList = terraunitList,
-			commandX = commandX, 
-			commandZ = commandZ, 
-			commandRadius = commandRadius,
-			teamID = teamID,
-		}
-	end
+local function AddFallbackCommand(teamID, commandTag, terraunits, terraunitList, commandX, commandZ)
+	fallbackCommands[teamID] = fallbackCommands[teamID] or {}
+	
+	fallbackCommands[teamID][commandTag] = {
+		terraunits = terraunits,
+		terraunitList = terraunitList,
+		commandX = commandX, 
+		commandZ = commandZ, 
+	}
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandTag)
 
 	--** Initial constructor processing **
 	local unitsX = 0
@@ -946,11 +942,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	--** Add the list of constructors to repair the blocks on command fallback **
-	AddFallbackConstructors(units, unit, orderList.count, orderList.data, team, commandX, commandZ, commandRadius)
+	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandTag)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1403,11 +1398,10 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		
 	end
 	
-	--** Add the list of constructors to repair the blocks on command fallback **
-	AddFallbackConstructors(units, unit, blocks, block, team, commandX, commandZ, commandRadius)
+	AddFallbackCommand(team, commandTag, blocks, block, commandX, commandZ)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandRadius)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift, commandX, commandZ, commandTag)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -2030,8 +2024,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 		return
 	end
 	
-	--** Add the list of constructors to repair the blocks on command fallback **
-	AddFallbackConstructors(units, unit, orderList.count, orderList.data, team, commandX, commandZ, commandRadius)
+	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
 --------------------------------------------------------------------------------
@@ -2058,7 +2051,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 		local teamID = cmdParams[2]
 		local commandX = cmdParams[3]
 		local commandZ = cmdParams[4]
-		local commandRadius = cmdParams[5]
+		local commandTag = cmdParams[5]
 		local loop = cmdParams[6]
 		local terraformHeight = cmdParams[7]
 		local pointCount = cmdParams[8]
@@ -2082,9 +2075,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			local terraTag = cmdParams[i]
 			
 			if loop == 0 then
-				TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
+				TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandTag)
 			else
-				TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
+				TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandTag)
 			end
 			
 			return false
@@ -2105,7 +2098,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 			
 			local terraTag = cmdParams[i]
 			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,terraformHeight*2,unit, constructorCount,teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandRadius)
+			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,terraformHeight*2,unit, constructorCount,teamID, volumeSelection, terraTag, cmdOptions.shift, commandX, commandZ, commandTag)
 		
 			return false
 		end
@@ -3182,43 +3175,45 @@ function gadget:GameFrame(n)
 			i = i + 1
 		end
 	end	
-	
-	-- Give orders here to prevent recursion
-	if constructorOrders then
-		for i = 1, #constructorOrders do
-			local data = constructorOrders[i]
-			if Spring.ValidUnitID(data.unitID) then
-				for j = data.terraunits, 1, -1  do
-					local terraID = data.terraunitList[j]
-					if Spring.ValidUnitID(terraID) and Spring.GetUnitDefID(terraID) == terraunitDefID then
-						spGiveOrderToUnit(data.unitID, CMD_INSERT, {0, CMD_REPAIR, CMD_OPT_RIGHT, terraID}, {"alt"})
-					end
-				end
-			end
-		end
-		constructorOrders = nil
-	end
 end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if not fallbackableCommands[cmdID] then
 		return false
 	end
+	if not fallbackCommands[teamID] then
+		return false
+	end
+	if not (cmdParams and cmdParams[4]) then
+		return false
+	end
+	local command = fallbackCommands[teamID][cmdParams[4]]
+	if not command then
+		return false
+	end
 	
-	for index, data in pairs(fallbackConstructors[unitID]) do
-		if not (data.teamID ~= teamID or data.commandX ~= cmdParams[1] or data.commandZ ~= cmdParams[3] or data.commandRadius ~= cmdParams[4]) then
-			constructorOrders = constructorOrders or {}
-			constructorOrders[#constructorOrders + 1] = {
-				unitID = unitID,
-				terraunits = data.terraunits,
-				terraunitList = data.terraunitList,
-			}
-
-			data[index] = nil
-			break
+	local ux,_,uz = spGetUnitPosition(unitID)
+	
+	local closestID
+	local closestDistance
+	for i = 1, command.terraunits do
+		local terraID = command.terraunitList[i]
+		if (Spring.ValidUnitID(terraID) and Spring.GetUnitDefID(terraID) == terraunitDefID) then
+			local tx,_,tz = spGetUnitPosition(terraID)
+			local distance = (tx-ux)*(tx-ux) + (tz-uz)*(tz-uz) 
+			if (not closestDistance) or (distance < closestDistance) then
+				closestID = terraID
+				closestDistance = distance
+			end
 		end
 	end
 	
+	if closestID then
+		spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_REPAIR, CMD_OPT_RIGHT, closestID}, {"alt"})
+		return true, false
+	end
+	
+	fallbackCommands[teamID][cmdParams[4]] = nil
 	return false
 end
 
