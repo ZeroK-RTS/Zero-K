@@ -51,53 +51,54 @@ local units = {}
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+-- Value is the default state of the command
 local HandledUnitDefIDs = {
-	[UnitDefNames["corrl"].id] = true,
-	[UnitDefNames["armcir"].id] = true,
-	[UnitDefNames["nsaclash"].id] = true,
-	[UnitDefNames["missiletower"].id] = true,
-	[UnitDefNames["screamer"].id] = true,
-	[UnitDefNames["amphaa"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
-	[UnitDefNames["fighter"].id] = true,
-	[UnitDefNames["hoveraa"].id] = true,
-	[UnitDefNames["spideraa"].id] = true,
-	[UnitDefNames["vehaa"].id] = true,
-	[UnitDefNames["gunshipaa"].id] = true,
-	[UnitDefNames["gunshipsupport"].id] = true,
-	[UnitDefNames["armsnipe"].id] = true,
-	[UnitDefNames["amphraider3"].id] = true,
-	[UnitDefNames["amphriot"].id] = true,
-	[UnitDefNames["subarty"].id] = true,
-	[UnitDefNames["subraider"].id] = true,
-	[UnitDefNames["corcrash"].id] = true,
-	[UnitDefNames["cormist"].id] = true,
-	[UnitDefNames["tawf114"].id] = true, --HT's banisher
-	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
-	[UnitDefNames["corshad"].id] = true,
+	[UnitDefNames["corrl"].id] = 1,
+	[UnitDefNames["armcir"].id] = 1,
+	[UnitDefNames["nsaclash"].id] = 1,
+	[UnitDefNames["missiletower"].id] = 1,
+	[UnitDefNames["screamer"].id] = 1,
+	[UnitDefNames["amphaa"].id] = 1,
+	[UnitDefNames["puppy"].id] = 1,
+	[UnitDefNames["fighter"].id] = 1,
+	[UnitDefNames["hoveraa"].id] = 1,
+	[UnitDefNames["spideraa"].id] = 1,
+	[UnitDefNames["vehaa"].id] = 1,
+	[UnitDefNames["gunshipaa"].id] = 1,
+	[UnitDefNames["gunshipsupport"].id] = 1,
+	[UnitDefNames["armsnipe"].id] = 1,
+	[UnitDefNames["amphraider3"].id] = 1,
+	[UnitDefNames["amphriot"].id] = 1,
+	[UnitDefNames["subarty"].id] = 1,
+	[UnitDefNames["subraider"].id] = 1,
+	[UnitDefNames["corcrash"].id] = 1,
+	[UnitDefNames["cormist"].id] = 1,
+	[UnitDefNames["tawf114"].id] = 1, --HT's banisher
+	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
+	[UnitDefNames["corshad"].id] = 1,
 	
-	[UnitDefNames["a_shipscout"].id] = true, 
-	[UnitDefNames["a_shiptorpbt"].id] = true,
-	[UnitDefNames["a_shipmissile"].id] = true,
-	[UnitDefNames["a_shipatksub"].id] = true,
+	[UnitDefNames["a_shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
+	[UnitDefNames["a_shiptorpbt"].id] = 1,
+	[UnitDefNames["a_shipmissile"].id] = 1,
+	[UnitDefNames["a_shipatksub"].id] = 1,
 	
 	-- Static only OKP below
-	[UnitDefNames["amphfloater"].id] = true,
-	[UnitDefNames["armmerl"].id] = true,
-	[UnitDefNames["corstorm"].id] = true,
-	[UnitDefNames["corthud"].id] = true,
-	[UnitDefNames["spiderassault"].id] = true,
-	[UnitDefNames["armrock"].id] = true,
-	[UnitDefNames["reef"].id] = true,
-	[UnitDefNames["armorco"].id] = true,
+	[UnitDefNames["amphfloater"].id] = 1,
+	[UnitDefNames["armmerl"].id] = 1,
+	[UnitDefNames["corstorm"].id] = 1,
+	[UnitDefNames["corthud"].id] = 1,
+	[UnitDefNames["spiderassault"].id] = 1,
+	[UnitDefNames["armrock"].id] = 1,
+	[UnitDefNames["reef"].id] = 1,
+	[UnitDefNames["armorco"].id] = 1,
 	
-	[UnitDefNames["a_shipcruiser"].id] = true,
+	[UnitDefNames["a_shipcruiser"].id] = 1,
 	
 	-- Needs LUS
-	--[UnitDefNames["correap"].id] = true,
-	--[UnitDefNames["corraid"].id] = true,
-	--[UnitDefNames["corgol"].id] = true,
-	--[UnitDefNames["armham"].id] = true,
+	--[UnitDefNames["correap"].id] = 1,
+	--[UnitDefNames["corraid"].id] = 1,
+	--[UnitDefNames["corgol"].id] = 1,
+	--[UnitDefNames["armham"].id] = 1,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -359,7 +360,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if HandledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
-		PreventOverkillToggleCommand(unitID, {1})
+		PreventOverkillToggleCommand(unitID, {HandledUnitDefIDs[unitDefID]})
 	end
 end
 

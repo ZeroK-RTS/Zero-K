@@ -22,7 +22,7 @@ local buttons = {
 	{"metalUsed"       , "Metal Used"},
 	{"metal_income"    , "Metal Income"},
 	{"metal_reclaim"   , "Metal Reclaimed"},
-	{"metalExcess"     , "Metal Excess"},
+	{"metal_excess"     , "Metal Excess"},
 
 	{"energy_income"   , "Energy Income"},
 
@@ -36,6 +36,7 @@ local buttons = {
 }
 
 local rulesParamStats = {
+	metal_excess = true,
 	metal_reclaim = true,
 	unit_value = true,
 	metal_income = true,

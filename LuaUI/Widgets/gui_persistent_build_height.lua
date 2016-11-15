@@ -78,6 +78,7 @@ local buildingPlacementID = false
 local buildingPlacementHeight = 0
 
 local toggleEnabled = false
+local floating = false
 
 local pointX = 0
 local pointY = 0
@@ -108,14 +109,14 @@ local function SendCommand()
 		return
 	end
 	
-	local commandRadius = sizeX + math.random()
+	local commandTag = WG.Terraform_GetNextTag()
 	
 	local params = {}
 	params[1] = 1            -- terraform type = level
 	params[2] = Spring.GetMyTeamID()
 	params[3] = pointX
 	params[4] = pointZ
-	params[5] = commandRadius
+	params[5] = commandTag
 	params[6] = 1            -- Loop parameter
 	params[7] = pointY       -- Height parameter of terraform 
 	params[8] = 5            -- Five points in the terraform
@@ -141,8 +142,6 @@ local function SendCommand()
 		i = i + 1
 	end
 	
-	params[#params + 1] = WG.Terraform_GetNextTag()
-	
 	local a,c,m,s = spGetModKeyState()
 	
 	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
@@ -157,7 +156,7 @@ local function SendCommand()
 	
 	local height = Spring.GetGroundHeight(pointX, pointZ)
 	for i = 1, #constructor do
-		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandRadius}, cmdOpts)
+		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
 		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
 	end
 end
@@ -212,11 +211,10 @@ function widget:Update(dt)
 		buildingPlacementID = -activeCommand
 		buildingPlacementHeight = (buildHeight[buildingPlacementID] or defaultBuildHeight)
 		
-		local ud = UnitDefs[buildingPlacementID]
-		
 		facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
 		
+		local ud = UnitDefs[buildingPlacementID]
 		local footX = ud.xsize/2
 		local footZ = ud.zsize/2
 		
@@ -232,21 +230,39 @@ function widget:Update(dt)
 		
 		widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 	end
+		
+	local ud = buildingPlacementID and UnitDefs[buildingPlacementID]
+	if not ud then
+		return
+	end
 	
 	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	-- Should not ignore water if the structure can float. See https://springrts.com/mantis/view.php?id=5390
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 	
 	if pos then
 		pointX = floor((pos[1] + 8 - oddX)/16)*16 + oddX
 		pointZ = floor((pos[3] + 8 - oddZ)/16)*16 + oddZ
-		pointY = spGetGroundHeight(pointX, pointZ) + buildingPlacementHeight	
+		local height = spGetGroundHeight(pointX, pointZ)
+		if ud.floatOnWater and height < 0 then
+			height = 0
+			floating = true
+			if buildingPlacementHeight == 0 then
+				pointY = 2
+			else
+				pointY = height + buildingPlacementHeight
+			end	
+		else
+			floating = false
+			pointY = height + buildingPlacementHeight	
+		end
 	else 
 		pointX = false
 	end
 end
 
 function widget:MousePress(mx, my, button)
-	if not (buildingPlacementID and buildingPlacementHeight ~= 0 and button == 1 and pointX) then
+	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
 		return
 	end
 	

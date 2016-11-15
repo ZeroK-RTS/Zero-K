@@ -86,10 +86,10 @@ function script.QueryWeapon2()
 end
 
 function script.BlockShot(num, targetID)	
-	--disarm okp is silly
-	--if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 40, 120) then --1 and a bit seconds - timeout, 3 seconds - disarmTimer
-	--	return true
-	--end
+	-- This causes poor behaviour if there is nothing nearby which needs disarming, so OKP for Skeeter is automatically set to 'off' in \LuaRules\Gadgets\unit_overkill_prevention.lua
+	if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 40, 120) then --1 and a bit seconds - timeout, 3 seconds - disarmTimer
+		return true
+	end
 	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 45, 40) then
 		return true
 	end
