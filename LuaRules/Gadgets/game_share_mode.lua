@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date	 = "6-23-2016",
 		license	 = "Do whatever you want with it, just give credit",
 		layer	 = 0,
-		enabled	 = true,
+		enabled	 = false,
 	}
 end
 
@@ -113,7 +113,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		if originalplayers[player] and config.unmerging then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
-				GG.ResetIncome(originalplayers[player]) -- Reset team income/storage.
+				GG.Overdrive.RemoveTeamIncomeRedirect(originalplayers[player]) -- Reset team income/storage.
 				local target = originalplayers[player]
 				Spring.AssignPlayerToTeam(player,originalplayers[player])
 				for _,unit in pairs(originalunits[target]) do
@@ -144,7 +144,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		local originalteam = GetTeamID(playerid)
 		local name,_,spec  = Spring.GetPlayerInfo(playerid)
-		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none") then
+		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none" then
 			Spring.Echo("Commshare: Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
 			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
 			if GetSquadSize(originalteam) - 1 == 0 then
@@ -154,10 +154,10 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 			Spring.AssignPlayerToTeam(playerid,target)
 			if originalplayers[playerid] == nil then
-				originalplayers[playerid]	= originalteam
+				originalplayers[playerid] = originalteam
 			end
 			controlledplayers[playerid] = target
-			GG.RedirectPlayerIncome(playerid,target) -- redirect playerid's share of the team income to target teamid. This is basically 'assigning' the player's share to the team id.
+			GG.Overdrive.RedirectTeamIncome(originalteam, target)
 		else
 			Spring.Echo("Commshare: Merger error.")
 		end

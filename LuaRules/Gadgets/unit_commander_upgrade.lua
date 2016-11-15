@@ -155,8 +155,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
-	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
-		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+	if data.metalIncome and GG.Overdrive then
+		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
 	
 	if data.healthBonus then
