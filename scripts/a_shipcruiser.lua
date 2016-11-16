@@ -300,7 +300,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num) 
-	if gun_1 then 
+	if gun_1 == 1 then 
 		return fire1
 	else 
 		return fire2
