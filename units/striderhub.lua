@@ -25,8 +25,6 @@ unitDef = {
     [[funnelweb]],
     [[armbanth]],
     [[armorco]],
-    [[cornukesub]],
-    [[reef]],
     [[a_shipbattle]],
   },
 
