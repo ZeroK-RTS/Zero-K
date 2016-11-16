@@ -90,7 +90,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 150,
+		areaOfEffect            = 180,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -101,7 +101,7 @@ unitDef = {
 			slot = [[5]],
 			muzzleEffectFire = [[custom:HEAVY_CANNON_MUZZLE]],
 			miscEffectFire   = [[custom:RIOT_SHELL_L]],
-			lups_explodelife = 1.2,
+			lups_explodelife = 1.5,
 			lups_explodespeed = 0.8,
 		},
 
