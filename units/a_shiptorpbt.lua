@@ -70,7 +70,7 @@ unitDef = {
 
     TORPEDO = {
       name                    = [[Torpedo]],
-      areaOfEffect            = 10,
+      areaOfEffect            = 32,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
