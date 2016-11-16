@@ -292,8 +292,6 @@ local function SendCommand()
 			params[i] = constructor[j]
 			i = i + 1
 		end
-
-		local a,c,m,s = spGetModKeyState()
 		
 		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 		if s then
@@ -335,25 +333,34 @@ local function SendCommand()
 		end
 	end
 	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
+	-- check whether global build command wants to handle the commands before giving any orders to units.
+	local handledExternally = false
+	if WG.GlobalBuildCommand and buildToGive then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, s)
+	elseif WG.GlobalBuildCommand then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyTF(constructor, s)
 	end
 	
-	local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
-	for i = 1, #constructor do
-		spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
-	end
+	if not handledExternally then
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
+	
+		local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
+		for i = 1, #constructor do
+			spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
+		end
 		
-	if buildToGive then
-		if currentlyActiveCommand == CMD_LEVEL then
-			for i = 1, #constructor do
-				spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+		if buildToGive then
+			if currentlyActiveCommand == CMD_LEVEL then
+				for i = 1, #constructor do
+					spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
+				end
 			end
 		end
-		buildToGive = false
 	end
-	
+	buildToGive = false
 	points = 0		
 end
 
