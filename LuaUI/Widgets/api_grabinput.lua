@@ -28,7 +28,7 @@ options = {
 		tooltip = "Prevents the cursor from leaving the Window/Screen",
 		type = "bool",
 		value = true,
-		noHotkey = true,
+		noHotkey = false,
 		OnChange = function (self)
 			Spring.SendCommands("grabinput " .. ((self.value and "1") or "0"))
 		end
