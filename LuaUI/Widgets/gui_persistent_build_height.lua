@@ -149,21 +149,27 @@ local function SendCommand()
 	end
 	
 	local a,c,m,s = spGetModKeyState()
-	
+
 	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-	if not s then
-		spSetActiveCommand(-1)
-	end
 	
-	local cmdOpts = {}
-	if s then
-		cmdOpts[#cmdOpts + 1] = "shift"
-	end
+	-- if global build command is active, check if it wants to handle the orders before giving units any commands.
+	if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, s) then
+		if not s then
+			spSetActiveCommand(-1)
+		end
 	
-	local height = Spring.GetGroundHeight(pointX, pointZ)
-	for i = 1, #constructor do
-		Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
-		Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
+	
+		local height = Spring.GetGroundHeight(pointX, pointZ)
+		for i = 1, #constructor do
+			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
+			if not handledExternally then
+				Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+			end
+		end
 	end
 end
 

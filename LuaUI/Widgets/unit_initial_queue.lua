@@ -486,6 +486,9 @@ function widget:GameFrame(n)
 	end
 	if tasker then
 		--Spring.Echo("sending queue to unit")
+		-- notify other widgets that we're giving orders to the commander.
+		if WG.GlobalBuildCommand then WG.GlobalBuildCommand.CommandNotifyPreQue(tasker) end
+		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]
 			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
