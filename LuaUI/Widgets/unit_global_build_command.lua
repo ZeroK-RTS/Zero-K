@@ -30,6 +30,7 @@ function widget:GetInfo()
     date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
+    handler   = true,
     enabled   = false  --  loaded by default?
   }
 end
@@ -91,11 +92,11 @@ end
 --------------------------------------------------------------------------------
 -- Declarations ----------------------------------------------------------------
 include("keysym.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 options_path = 'Game/Worker AI'
 
 options_order = {
-	'exclusionGroupID',
 	'separateConstructors',
 	'splitArea',
 	'autoConvertRes',
@@ -106,16 +107,6 @@ options_order = {
 }
 
 options = {
-	exclusionGroupID = {
-    name = 'Exclusion Group #',
-    type = 'number',
-    min = 0, max = 9, step = 1,
-    value = 0,
-    OnChange = function(self)
-		groupHasChanged = true
-	end,
-	},
-	
 	separateConstructors = {
 		name = 'Separate Constructors',
 		type = 'bool',
@@ -248,7 +239,10 @@ local CMD_REMOVE    = CMD.REMOVE
 local CMD_RECLAIM	= CMD.RECLAIM
 local CMD_GUARD		= CMD.GUARD
 local CMD_STOP		= CMD.STOP
-local CMD_TERRAFORM_INTERNAL = 39801
+local CMD_ONOFF         = CMD.ONOFF
+local CMD_REPEAT        = CMD.REPEAT
+local CMD_MOVE_STATE    = CMD.MOVE_STATE
+local CMD_FIRE_STATE    = CMD.FIRE_STATE
 
 local abs	= math.abs
 local floor	= math.floor
@@ -271,17 +265,22 @@ local rec_color = {0.6, 0.0, 1.0, 1.0}
 local rep_color = {0.0, 0.8, 0.4, 1.0}
 local res_color = {0.4, 0.8, 1.0, 1.0}
 
+-- Zero-K specific icons for showing unit state.
+local idle_icon = "LuaUI/Images/commands/Bold/buildsmall.png"
+local queue_icon = "LuaUI/Images/commands/Bold/build.png"
+local drec_icon = "LuaUI/Images/commands/Bold/action.png"
+local move_icon = "LuaUI/Images/commands/Bold/move.png"
+
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group, of the form myUnits[unitID] = commandType
 local myQueue = {}  --  list of commands for Central Build group, of the form myQueue[BuildHash(cmd)] = cmd
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
-local excludedUnits = {} -- list of units which belong to the excluded group and thus will not be managed by GBC.
+local allBuilders = {} -- list of all mobile builders, which saves whether they are GBC-enabled or not.
 local activeJobs = {} -- list of jobs that have been started, using the UnitID of the building so that we can check completeness via UnitFinished
 local idleCheck = false -- flag if any units went idle
 local areaCmdList = {} -- a list of area commands, for persistently capturing individual reclaim/repair/resurrect jobs from LOS-limited areas. Same form as myQueue.
 local reassignedUnits = {} -- list of units that have already been assigned/reassigned jobs and which don't need to be reassigned until we've cycled through all workers.
-local groupHasChanged = true	--	Flag if group members have changed.
 local hasRes = false
 local queueCount = 0 -- the number of jobs currently on the queue, which must be updated every assignment frame since #aTable only works for arrays
 
@@ -321,25 +320,24 @@ function widget:Initialize()
 	
 	-- add all existing workers to GBC.
 	local units = spGetTeamUnits(myTeamID)
-	--if #units > 0 then
 		for _, uid in ipairs(units) do
 			local unitDefID = spGetUnitDefID(uid)
 			local ud = UnitDefs[unitDefID]
 			local _,_,nanoframe = spGetUnitIsStunned(uid)
-			if (not nanoframe and ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
-				local cmd = GetFirstCommand(uid) -- find out if it already has any orders
-				if cmd and cmd.id then -- if so we mark it as drec
-					myUnits[uid] = {cmdtype=commandType.drec, unreachable={}}
-				else -- otherwise we mark it as idle
-					myUnits[uid] = {cmdtype=commandType.idle, unreachable={}}
+			if (ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
+				allBuilders[uid] = {include=true} -- add it to the group of all workers
+				
+				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
+					local cmd = GetFirstCommand(uid) -- find out if it already has any orders
+					if cmd and cmd.id then -- if so we mark it as drec
+						myUnits[uid] = {cmdtype=commandType.drec, unreachable={}}
+					else -- otherwise we mark it as idle
+						myUnits[uid] = {cmdtype=commandType.idle, unreachable={}}
+					end
+					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 				end
-				UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 			end
 		end
-	--end
-	
-	-- screen the exclusion group
-	UpdateOneGroupsDetails(options.exclusionGroupID.value)
 	
 	-- ZK compatability stuff
 	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
@@ -359,10 +357,6 @@ function widget:GameFrame(thisFrame)
 	
 	if ( thisFrame < nextFrame ) then 
 		return
-	end
-	
-	if groupHasChanged then -- if our control group has added or removed units
-		UpdateOneGroupsDetails(options.exclusionGroupID.value) -- update it
 	end
 	
 	if idleCheck then -- if our idle list has been updated
@@ -740,15 +734,6 @@ function widget:PlayerChanged(playerID)
 	end
 end
 
---	This function detects that a new group has been defined or changed.
---  Borrowed from gunblob's UnitGroups v5.1
-function widget:GroupChanged(groupId)  
-	if groupId == options.exclusionGroupID.value then
-		groupHasChanged = true 
-		-- note: Use it to set a flag because it fires before all units it's going to put into group have actually been put in.
-	end
-end
-
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if busyUnits[builderID] then -- if the builder is one of our busy workers
@@ -768,13 +753,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	end
 	
-	-- add new workers to the worker group. technically it only applies to commanders for UnitCreated.
+	-- add new workers to the tracking group, and commanders to myUnits.
 	local ud = UnitDefs[unitDefID]
-	local _,_,nanoframe = spGetUnitIsStunned(unitID)
-	if (not nanoframe and ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
+		allBuilders[unitID] = {include=true}
 		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
-		myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
-		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		local _,_,nanoframe = spGetUnitIsStunned(unitID)
+		if not nanoframe then
+			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		end
 	end
 end
 
@@ -789,9 +778,8 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		activeJobs[unitID] = nil
 	end
 	
-	-- add new workers to the worker list.
-	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	-- add new workers to the active workers list if they're GBC-enabled.
+	if (allBuilders[unitID] and allBuilders[unitID].include) then
 		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
 		if cmd and cmd.id then -- if so we mark it as drec
 		myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
@@ -813,8 +801,10 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		end
 	elseif activeJobs[unitID] then
 		activeJobs[unitID] = nil
-	elseif excludedUnits[unitID] then
-		excludedUnits[unitID] = nil
+	end
+	
+	if allBuilders[unitID] then
+		allBuilders[unitID] = nil
 	end
 end
 
@@ -879,6 +869,32 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 		idlers[#idlers+1] = unitID -- add it to the idle list to be double-checked at assignment time.
 		idleCheck = true -- set the flag so that the idle list will be processed
 		return
+	end
+end
+
+-- This function adds a state toggle to constructors that sets whether they participate in gbc or not.
+function widget:CommandsChanged()
+	local units = Spring.GetSelectedUnits()
+	for i, id in pairs(units) do
+		if allBuilders[id] then
+			local customCommands = widgetHandler.customCommands
+			local order = 0
+			if allBuilders[id].include then
+				order = 1
+			end
+			table.insert(customCommands, {
+				id      = CMD_GLOBAL_BUILD,
+				type    = CMDTYPE.ICON_MODE,
+				tooltip = 'Toggle using global build command for workers.',
+				name    = 'Global Build Command',
+				cursor  = 'Build',
+				action  = 'globalbuild',
+				params  = {order, 'off', 'on'}, 
+				
+				pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
+			})
+			break
+		end
 	end
 end
 
@@ -986,6 +1002,11 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	end
 	if options.meta then --skip special insert command (spacebar). Handled by CommandInsert() widget
 		return
+	end
+	
+	if id == CMD_GLOBAL_BUILD then
+		ApplyStateToggle()
+		return true
 	end
 	
 	local selectedUnits = spGetSelectedUnits()
@@ -1098,6 +1119,34 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 		end
 	end
 	return false
+end
+
+function ApplyStateToggle()
+	local selectedUnits = spGetSelectedUnits()
+	for _,unitID in pairs(selectedUnits) do
+		if allBuilders[unitID] then
+			allBuilders[unitID].included = not allBuilders[unitID].included
+			if allBuilders[unitID].included then
+				local _,_,nanoframe = spGetUnitIsStunned(unitID)
+				if not myUnits[unitID] and not nanoframe then
+					local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
+					if cmd and cmd.id then -- if so we mark it as drec
+						myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
+					else -- otherwise we mark it as idle
+						myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+					end
+					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+				end
+			elseif myUnits[unitID] then
+				myUnits[unitID] = nil
+				if busyUnits[unitID] then
+					local key = busyUnits[unitID]
+					myQueue[key].assignedUnits[unitID] = nil
+					busyUnits[unitID] = nil
+				end
+			end
+		end
+	end
 end
 
 
@@ -1970,44 +2019,6 @@ HOW THIS WORKS:
 		them idle if not under direct orders. Called when jobs are finished, cancelled, or otherwise
 		invalidated.
 --]]
-
---  This function actually updates the list of builders in the CB group (myGroup).
---	Also borrowed from gunblob's UnitGroups v5.1
-function UpdateOneGroupsDetails(myGroupId)
-	local units = spGetGroupUnits(myGroupId)
-	for _, unitID in ipairs(units) do	--  remove newly excluded units
-		if (myUnits[unitID]) then
-			myUnits[unitID] = nil
-			if busyUnits[unitID] then
-				local key = busyUnits[unitID]
-				myQueue[key].assignedUnits[unitID] = nil
-				busyUnits[unitID] = nil
-			end
-			excludedUnits[unitID] = true
-		end
-	end
-	
-	for unitID,_ in pairs(excludedUnits) do	--  add units that are no longer excluded
-		local isInThere = false
-		for _,unit2 in ipairs(units) do
-			if ( unitID == unit2 ) then
-				isInThere = true
-				break
-			end
-		end
-		if (not isInThere) then
-			excludedUnits[unitID] = nil
-			local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-			if cmd and cmd.id then -- if so we mark it as drec
-			myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
-			else -- otherwise we mark it as idle
-				myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
-			end
-			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
-		end
-	end
-	groupHasChanged = false
-end
 
 --This function tells us if a unit can perform the job in question.
 function CanBuildThis(cmdID, unitID)
