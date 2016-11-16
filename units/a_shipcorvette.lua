@@ -24,7 +24,8 @@ unitDef = {
 
   customParams           = {
     helptext       = [[This Corvette comes equipped with two shotguns which are effective against anything which gets close.]],
-	extradrawrange = 420,
+	turnatfullspeed = [[1]],
+	--extradrawrange = 420,
   },
 
   explodeAs              = [[SMALL_UNITEX]],

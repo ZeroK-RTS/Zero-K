@@ -28,6 +28,7 @@ unitDef = {
     helptext       = [[This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets.]],
     modelradius    = [[15]],
 	turnatfullspeed = [[1]],
+	extradrawrange = 700,
   },
 
   explodeAs              = [[BIG_UNITEX]],
