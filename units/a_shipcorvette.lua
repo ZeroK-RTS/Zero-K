@@ -88,7 +88,7 @@ unitDef = {
 
     SHOTGUN = {
 	name                    = [[Shotgun]],
-	areaOfEffect            = 64,
+	areaOfEffect            = 48,
 	burst					= 4,
 	burstRate				= 0.03,
 	coreThickness           = 0.5,
@@ -117,7 +117,7 @@ unitDef = {
 	soundStart              = [[weapon/cannon/cannon_fire4]],
 	soundStartVolume		= 0.05,
 	soundTrigger            = true,
-	sprayangle				= 3600,
+	sprayangle				= 2600,
 	thickness               = 2,
 	tolerance               = 10000,
 	turret                  = true,
