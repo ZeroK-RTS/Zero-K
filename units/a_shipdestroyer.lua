@@ -39,7 +39,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 3600,
+  maxDamage              = 4200,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -90,7 +90,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 180,
+		areaOfEffect            = 190,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
