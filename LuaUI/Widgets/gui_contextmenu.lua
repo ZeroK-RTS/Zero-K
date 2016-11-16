@@ -1814,7 +1814,7 @@ function widget:MousePress(x,y,button)
 		----------
 		local groundTooltip
 		if WG.customToolTip then --find any custom ground tooltip placed on the ground
-			local _, pos = spTraceScreenRay(x,y, true) --return coordinate of the ground
+			local _, pos = spTraceScreenRay(x,y, true, false, false, true) --return coordinate of the ground
 			for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
 				if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
 					groundTooltip = data.tooltip --copy tooltip
@@ -1832,7 +1832,7 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		local type, data = spTraceScreenRay(x, y)
+		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
 			local unitID = data
 			
