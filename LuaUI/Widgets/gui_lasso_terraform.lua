@@ -250,7 +250,6 @@ end
 
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
-	local handledExternally = false
 
 	if (#constructor == 0) or (points == 0) then 
 		return
@@ -294,18 +293,12 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		if WG.GlobalBuildCommand then
-			handledExternally = WG.GlobalBuildCommand.CommandNotifyTF(constructor, params, s)
-		end
-		
-		if not handledExternally then
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-			if s then
-				originalCommandGiven = true
-			else
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if s then
+			originalCommandGiven = true
+		else
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
 	else
 		local params = {}
@@ -331,21 +324,21 @@ local function SendCommand()
 			i = i + 1
 		end
 		
-		if WG.GlobalBuildCommand and buildToGive then
-			handledExternally = WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, params, s)
-		elseif WG.GlobalBuildCommand then
-			handledExternally = WG.GlobalBuildCommand.CommandNotifyTF(constructor, params, s)
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if s then
+			originalCommandGiven = true
+		else
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
-		
-		if not handledExternally then
-			Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-			if s then
-				originalCommandGiven = true
-			else
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
-		end
+	end
+	
+	-- check whether global build command wants to handle the commands before giving any orders to units.
+	local handledExternally = false
+	if WG.GlobalBuildCommand and buildToGive then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, s)
+	elseif WG.GlobalBuildCommand then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyTF(constructor, s)
 	end
 	
 	if not handledExternally then
@@ -365,9 +358,9 @@ local function SendCommand()
 					spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
 				end
 			end
-			buildToGive = false
 		end
 	end
+	buildToGive = false
 	points = 0		
 end
 

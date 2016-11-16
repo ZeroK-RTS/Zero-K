@@ -898,48 +898,7 @@ function CommandNotifyMex(id,params,options, isAreaMex)
 end
 
 -- A ZK compatibility function: recieves command events broadcast from "gui_lasso_terraform.lua"
-function CommandNotifyTF(unitArray, params, shift)
-	local ours = false -- ensure that the order was given to at least one unit that's in our group
-	for i=1, #unitArray do
-		local unitID = unitArray[i]
-		if myUnits[unitID] then
-			ours = true
-			break
-		end
-	end
-	if not ours then
-	return false -- and stop here if not
-	end
-	
-	local captureThis = false
-	for i=1, #unitArray do
-		local unitID = unitArray[i]
-		if myUnits[unitID] then -- if it's one of our units
-			if busyUnits[unitID] then -- if the worker is also still on our busy list
-				local key = busyUnits[unitID]
-				myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
-				busyUnits[unitID] = nil -- and from busy units
-			end
-		
-			if shift then -- if the command was given with shift
-				spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, params, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
-				myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
-				reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
-				captureThis = true -- return true to tell gui_lasso_terraform that we handled the command externally
-				nextFrame = nextFrame + 5 -- delay the next assignment frame slightly to ensure that the terraunit is created properly
-				break -- we don't need to process more than one unit if shift was held
-			else -- if the command was not given with shift
-				myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
-				captureThis = false
-			end
-		end
-	end
-	return captureThis
-end
-
--- ZK-Specific: This function captures combination raise-and-build commands
-function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shift)
-	Spring.Echo("CommandNotifyRaiseAndBuild was Received!")
+function CommandNotifyTF(unitArray, shift)
 	local ours = false -- ensure that the order was given to at least one unit that's in our group
 	for i=1, #unitArray do
 		local unitID = unitArray[i]
@@ -952,7 +911,40 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shif
 		return false -- and stop here if not
 	end
 	
-	local captureThis = false
+	if shift then
+		return true -- tell lasso terraform not to give any orders besides terraform internal, so that our units won't be disturbed.
+	else
+		-- if the order was direct, we need to update our workers' status and set them to drec.
+		for i=1, #unitArray do
+			local unitID = unitArray[i]
+			if myUnits[unitID] then -- if it's one of our units
+				if busyUnits[unitID] then -- if the worker is also still on our busy list
+					local key = busyUnits[unitID]
+					myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+					busyUnits[unitID] = nil -- and from busy units
+				end
+		
+				myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
+			end
+		end
+	end
+	return false
+end
+
+-- ZK-Specific: This function captures combination raise-and-build commands
+function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, shift)
+	local ours = false -- ensure that the order was given to at least one unit that's in our group
+	for i=1, #unitArray do
+		local unitID = unitArray[i]
+		if myUnits[unitID] then
+			ours = true
+			break
+		end
+	end
+	if not ours then
+		return false -- and stop here if not
+	end
+	
 	local hotkey = string.byte("q")
 	local isQ = spGetKeyState(hotkey)
 	local myCmd
@@ -964,34 +956,26 @@ function CommandNotifyRaiseAndBuild(unitArray, cmdID, x, y, z, h, tfparams, shif
 	
 	local hash = BuildHash(myCmd)
 	
-	if CleanOrders(myCmd, true) or not shift then
-		myQueue[hash] = myCmd
-		UpdateOneJobPathing(hash)
-	end
-	
-	for i=1, #unitArray do
-		local unitID = unitArray[i]
-		if myUnits[unitID] then -- if it's one of our units
-			if busyUnits[unitID] then -- if the worker is also still on our busy list
-				local key = busyUnits[unitID]
-				myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
-				busyUnits[unitID] = nil -- and from busy units
-			end
-		
-			if shift then -- if the command was given with shift
-				spGiveOrderToUnit(unitID, CMD_TERRAFORM_INTERNAL, tfparams, {""}) -- give the unit the TF order immediately so that it creates the 'terraunits'
-				myUnits[unitID].cmdtype = commandType.idle -- mark it as idle so that it gets reassigned
-				reassignedUnits[unitID] = nil -- ensure that it gets reassigned as soon as it creates the terraunits
-				captureThis = true -- return true to tell gui_lasso_terraform that we handled the command externally
-				nextFrame = nextFrame + 5 -- delay the next assignment frame slightly to ensure that the terraunit is created properly
-				break -- we don't need to process more than one unit if shift was held
-			else -- if the command was not given with shift
-			myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it
-			captureThis = false
+	myQueue[hash] = myCmd
+	UpdateOneJobPathing(hash)
+	if shift then
+		return true -- tell the terraform widget not to give any orders besides terraform internal, so that our units won't be disturbed.
+	else
+		-- if the order was direct, we need to update our workers' status and set them to drec.
+		for i=1, #unitArray do
+			local unitID = unitArray[i]
+			if myUnits[unitID] then -- if it's one of our units
+				if busyUnits[unitID] then -- if the worker is also still on our busy list
+					local key = busyUnits[unitID]
+					myQueue[key].assignedUnits[unitID] = nil -- remove it from its current job listing
+				end
+				busyUnits[unitID] = hash -- and update its info in busy units
+				myQueue[hash].assignedUnits[unitID] = true -- add it to the tf/build task so that the building will be correctly identified when created.
+				myUnits[unitID].cmdtype = commandType.drec -- mark our unit as under direct orders and let gui_lasso_terraform handle it.
 			end
 		end
 	end
-	return captureThis
+	return false
 end
 
 --  This function captures build-related commands given to units in our group and adds them to the queue, and also tracks unit state (ie direct orders vs queued).
@@ -1291,7 +1275,7 @@ function GiveWorkToUnits(unitsToWork)
 						local target = localUnits[i]
 						local udid = spGetUnitDefID(target)
 						local unitDef = UnitDefs[udid]
-						if string.match(unitDef.humanName, "erraform") ~= nil and spGetUnitTeam(target) == myTeamID then
+						if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
 							spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, {""})
 							break
 						end
