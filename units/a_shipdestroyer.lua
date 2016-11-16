@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[a_shipdestroyer]],
-  name                   = [[Warden]],
+  name                   = [[Siren]],
   description            = [[Destroyer (Riot/Assault)]],
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
