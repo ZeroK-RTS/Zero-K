@@ -886,12 +886,10 @@ function widget:CommandsChanged()
 				id      = CMD_GLOBAL_BUILD,
 				type    = CMDTYPE.ICON_MODE,
 				tooltip = 'Toggle using global build command for workers.',
-				name    = 'Global Build Command',
-				cursor  = 'Build',
+				name    = 'Global Build',
+				cursor  = 'Repair',
 				action  = 'globalbuild',
 				params  = {order, 'off', 'on'}, 
-				
-				pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
 			})
 			break
 		end
@@ -997,16 +995,16 @@ end
 --  This function captures build-related commands given to units in our group and adds them to the queue, and also tracks unit state (ie direct orders vs queued).
 --  Thanks to Niobium for pointing out CommandNotify().
 function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
+	if id == CMD_GLOBAL_BUILD then
+		ApplyStateToggle()
+		return true
+	end
+	
 	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then -- Global Build Command doesn't handle unit-build commands for factories.
 		return
 	end
 	if options.meta then --skip special insert command (spacebar). Handled by CommandInsert() widget
 		return
-	end
-	
-	if id == CMD_GLOBAL_BUILD then
-		ApplyStateToggle()
-		return true
 	end
 	
 	local selectedUnits = spGetSelectedUnits()
@@ -1125,8 +1123,8 @@ function ApplyStateToggle()
 	local selectedUnits = spGetSelectedUnits()
 	for _,unitID in pairs(selectedUnits) do
 		if allBuilders[unitID] then
-			allBuilders[unitID].included = not allBuilders[unitID].included
-			if allBuilders[unitID].included then
+			allBuilders[unitID].include = not allBuilders[unitID].include
+			if allBuilders[unitID].include then
 				local _,_,nanoframe = spGetUnitIsStunned(unitID)
 				if not myUnits[unitID] and not nanoframe then
 					local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
