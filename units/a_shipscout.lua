@@ -121,7 +121,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams        = {
-        disarmDamageMult = 4,
+        disarmDamageMult = 6.0,
         disarmDamageOnly = 0,
         disarmTimer      = 3, -- seconds
 		
