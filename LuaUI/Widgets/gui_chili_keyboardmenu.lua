@@ -219,14 +219,15 @@ local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
-	for cmdname, number in pairs(custom_cmd_actions) do 
-			
+	for cmdname, cmdData in pairs(custom_cmd_actions) do 
+		local number = cmdData.cmdType
+		
 		local cmdnamel = cmdname:lower()
 		local cmdname_disp = CapCase(cmdname)
 		options[cmdnamel] = {
 			name = cmdname_disp,
 			type = 'button',
-			action = cmdnamel,
+			action = cmdData.name or cmdnamel,
 			path = 'Game/Command Hotkeys',
 		}
 		if number == 2 then

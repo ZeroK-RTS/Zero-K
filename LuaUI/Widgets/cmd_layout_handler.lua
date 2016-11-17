@@ -40,24 +40,25 @@ local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
-	for cmdname, number in pairs(custom_cmd_actions) do 
-			
+	for cmdname, cmdData in pairs(custom_cmd_actions) do 
+		local number = cmdData.cmdType
+		
 		local cmdnamel = cmdname:lower()
-		local cmdname_disp = CapCase(cmdname)
-		options[cmdnamel] = {
+		local cmdname_disp = cmdData.name or CapCase(cmdname)
+		options[cmdname_disp] = {
 			name = cmdname_disp,
 			type = 'button',
 			action = cmdnamel,
 			path = 'Game/Command Hotkeys',
 		}
 		if number == 2 then
-			options_order_tmp_states[#options_order_tmp_states+1] = cmdnamel
+			options_order_tmp_states[#options_order_tmp_states+1] = cmdname_disp
 			--options[cmdnamel].isUnitStateCommand = true
 		elseif number == 3 then
-			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdnamel
+			options_order_tmp_cmd_instant[#options_order_tmp_cmd_instant+1] = cmdname_disp
 			--options[cmdnamel].isUnitInstantCommand = true
 		else
-			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdnamel
+			options_order_tmp_cmd[#options_order_tmp_cmd+1] = cmdname_disp
 			--options[cmdnamel].isUnitCommand = true
 		end
 	end
@@ -153,7 +154,28 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Initialization
+-- Widget Interface
+
+-- To get a list of used action just uncomment this
+--local seenAction = {}
+--function widget:CommandsChanged()
+--	local commands = widgetHandler.commands
+--	local customCommands = widgetHandler.customCommands
+--	for i = 1, #commands do
+--		if commands[i].action and not seenAction[commands[i].action] then
+--			seenAction[commands[i].action] = true
+--			Spring.Echo("action", commands[i].action)
+--		end
+--	end
+--	
+--	for i = 1, #customCommands do
+--		if customCommands[i].action and not seenAction[customCommands[i].action] then
+--			seenAction[customCommands[i].action] = true
+--			Spring.Echo("action", customCommands[i].action)
+--		end
+--	end
+--end
+-- Then find repalce '[f=0000678] action, ' with '"] = true,\n\t["'
 
 function widget:Initialize()
 	widgetHandler:ConfigLayoutHandler(LayoutHandler)
