@@ -45,6 +45,7 @@ unitDef = {
 	commtype = [[1]],
 	--decorationicons = {chest = "friendly", shoulders = "arrows-dot"},
     aimposoffset   = [[0 15 0]],
+	modelradius    = [[25]],
 	dynamic_comm   = 1,
   },
 
