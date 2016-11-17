@@ -26,13 +26,15 @@ CMD_STOP_NEWTON_FIREZONE = 10284
 CMD_FACTORY_GUARD = 13921
 CMD_AREA_GUARD = 13922
 CMD_ORBIT = 13923
-CMD_STOP_PRODUCTION = 13954
 
 -- CMD_CIRCLE_GUARD_DRAW is an evil on the order of CMD.SET_WANTED_MAX_SPEED.
 -- It is required because CMD_CIRCLE_GUARD needs two parameters but this
 -- causes it to not draw in the command queue.
 -- See https://springrts.com/mantis/view.php?id=4931
 CMD_ORBIT_DRAW = 13924
+
+CMD_GLOBAL_BUILD = 13925
+CMD_STOP_PRODUCTION = 13954
 
 CMD_AREA_MEX = 30100
 CMD_STEALTH = 31100

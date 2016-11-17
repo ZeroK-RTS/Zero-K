@@ -6,6 +6,7 @@ local tooltips = {
 	retreat = "Retreat: Retreat to closest retreat point at 30/60/90% of health (right-click to disable)",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
+	globalBuild = "Global Build Command: toggle using worker AI.",
 	diveBomb = "Dive bomb (never; target under shield; any target; always (including moving))",
 
 	fireState = "Fire State: Sets under what conditions a unit will fire without an explicit attack order (never, when attacked, always)",
@@ -231,6 +232,8 @@ local overrides = {
 		caption='', tooltip = tooltips.priority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		caption='', tooltip = tooltips.factoryGuard,},
+	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
+		text='', tooltip = tooltips.globalBuild,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, caption='', tooltip = tooltips.moveState},
 	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, caption='', tooltip = tooltips.fireState},
 	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
@@ -325,6 +328,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	unitai=2,
 	unit_kill_subordinates=2,
 	autoassist=2,
+	globalbuild=2,
 	airstrafe=2,
 	divestate=2,
 
