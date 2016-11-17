@@ -115,11 +115,13 @@ local function SendCommand()
 		return
 	end
 	
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
+	
 	local commandTag = WG.Terraform_GetNextTag()
 	
 	local params = {}
 	params[1] = 1            -- terraform type = level
-	params[2] = Spring.GetMyTeamID()
+	params[2] = team
 	params[3] = pointX
 	params[4] = pointZ
 	params[5] = commandTag
