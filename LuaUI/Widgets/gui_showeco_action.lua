@@ -78,10 +78,126 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- local functions
+-- Utilities
+
+local drawList = 0
+local disabledDrawList = 0
+local fbo
+local offscreentex
+local texStencil
+local lastDrawnFrame = 0
+local lastFrame = 2
+local highlightQueue = false
+local prevCmdID
+local lastCommandsCount
+
+local function InitializeUnits()
+	pylons = {count = 0, data = {}}
+	pylonByID = {}
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, unitTeam)
+	end
+end
+
+local vsx, vsy
+local function ViewResize(viewSizeX, viewSizeY)
+	vsx = viewSizeX
+	vsy = viewSizeY
+	if useRTT and options.mergeCircles.value then
+		fbo.color0 = nil
+		fbo.stencil = nil
+		fbo.depth = nil
+		gl.DeleteRBO(texStencil)
+		gl.DeleteTexture(offscreentex or 0)
+		offscreentex = gl.CreateTexture(vsx,vsy, {
+			border = false,
+			min_filter = GL.LINEAR,
+			mag_filter = GL.LINEAR,
+		})
+
+		texStencil = gl.CreateRBO(vsx, vsy, {
+			format = GL_DEPTH24_STENCIL8,
+		})
+
+		fbo.depth  = texStencil
+		fbo.color0 = offscreentex
+		fbo.stencil = texStencil
+	end
+end
+
+local function Shutdown()
+	if useRTT and offscreentex then
+		gl.DeleteTexture(offscreentex or 0)
+		gl.DeleteRBO(texStencil or 0)
+		gl.DeleteFBO(fbo or 0)
+	end
+	gl.DeleteList(drawList or 0)
+	gl.DeleteList(disabledDrawList or 0)
+end
+
+local function Initialize()
+	if useRTT and options.mergeCircles.value then
+		fbo = gl.CreateFBO()
+	end
+	ViewResize(widgetHandler:GetViewSizes())
+	InitializeUnits()
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Menu Options
+
 local drawAlpha = 0.2
-local colorAlpha = useRTT and 1 or drawAlpha
-local disabledColor = { 0.6,0.7,0.5, colorAlpha}
+local colorAlpha, disabledColor
+
+local function RestartWidget(option)
+	Shutdown()
+	Initialize()
+	lastDrawnFrame = 0
+	
+	colorAlpha = useRTT and option.priv_value and 1 or drawAlpha
+	disabledColor[4] = colorAlpha
+end
+
+options_path = 'Settings/Interface/Economy Overlay'
+options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
+options = {
+	start_with_showeco = {
+		name = "Start with economy overly",
+		desc = "Game starts with Economy Overlay enabled",
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if (self.value) then
+				WG.showeco = self.value
+			end
+		end,
+	},
+	mergeCircles = {
+		name = "Draw merged grid circles", 
+		desc = "Merge overlapping grid circle visualisation. Does not work on older hardware and should automatically disable.",
+		type = 'bool', 
+		value = true, 
+		OnChange = RestartWidget,
+	},
+	drawQueued = {
+		name = "Draw grid in queue", 
+		desc = "Shows the grid of not-yet constructed buildings in the queue of a selected constructor. Activates only when placing grid structures.",
+		type = 'bool', 
+		value = true, 
+	},
+}
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- local functions
+
+colorAlpha = useRTT and options.mergeCircles.value and 1 or drawAlpha
+disabledColor = { 0.6,0.7,0.5, colorAlpha}
 local placementColor = { 0.6, 0.7, 0.5, drawAlpha} -- drawAlpha on purpose!
 
 local function HSLtoRGB(ch,cs,cl)
@@ -164,18 +280,6 @@ end
 -------------------------------------------------------------------------------------
 -- Unit Handling
 
-local function InitializeUnits()
-	pylons = {count = 0, data = {}}
-	pylonByID = {}
-	local allUnits = Spring.GetAllUnits()
-	for i=1, #allUnits do
-		local unitID = allUnits[i]
-		local unitDefID = spGetUnitDefID(unitID)
-		local unitTeam = Spring.GetUnitTeam(unitID)
-		widget:UnitCreated(unitID, unitDefID, unitTeam)
-	end
-end
-
 local function addUnit(unitID, unitDefID, unitTeam)
 	if pylonDefs[unitDefID] and not pylonByID[unitID] then
 		local spec, fullview = spGetSpectatingState()
@@ -229,75 +333,25 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
 -- Drawing
 
-local drawList = 0
-local disabledDrawList = 0
-local fbo
-local offscreentex
-local texStencil
-local vsx, vsy
-local lastDrawnFrame = 0
-local lastFrame = 2
-local highlightQueue = false
-local prevCmdID
-local lastCommandsCount
-
 function widget:Initialize()
-	if useRTT then
-		fbo = gl.CreateFBO()
-	end
-	self:ViewResize(widgetHandler:GetViewSizes())
-	InitializeUnits()
+	Initialize()
 end
 
-function widget:Shutdown(f)
-	if useRTT then
-		gl.DeleteTexture(offscreentex or 0)
-		gl.DeleteRBO(texStencil or 0)
-		gl.DeleteFBO(fbo or 0)
-	end
-	gl.DeleteList(drawList or 0)
-	gl.DeleteList(disabledDrawList or 0)
+function widget:Shutdown()
+	Shutdown()
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
-	vsx = viewSizeX
-	vsy = viewSizeY
-	if useRTT then
-		fbo.color0 = nil
-		fbo.stencil = nil
-		fbo.depth = nil
-		gl.DeleteRBO(texStencil)
-		gl.DeleteTexture(offscreentex or 0)
-
-		offscreentex = gl.CreateTexture(vsx,vsy, {
-			border = false,
-			min_filter = GL.LINEAR,
-			mag_filter = GL.LINEAR,
-		})
-
-		texStencil = gl.CreateRBO(vsx, vsy, {
-			format = GL_DEPTH24_STENCIL8,
-		})
-
-		fbo.depth  = texStencil
-		fbo.color0 = offscreentex
-		fbo.stencil = texStencil
-	end
+	ViewResize(viewSizeX, viewSizeY)
 end
-
 
 function widget:GameFrame(f)
 	if f%32 == 2 then
 		lastFrame = f
 	end
 end
-
 
 local function makePylonListVolume(onlyActive, onlyDisabled)
 	local drawGroundCircle = gl.Utilities.DrawGroundCircle
@@ -353,7 +407,7 @@ end
 local function HighlightPylons()
 	if lastDrawnFrame < lastFrame then
 		lastDrawnFrame = lastFrame
-		if useRTT then
+		if useRTT and options.mergeCircles.value then
 			gl.DeleteList(disabledDrawList or 0)
 			disabledDrawList = gl.CreateList(makePylonListVolume, false, true)
 			gl.DeleteList(drawList or 0)
@@ -363,7 +417,7 @@ local function HighlightPylons()
 			drawList = gl.CreateList(makePylonListVolume)
 		end
 	end
-	if useRTT then
+	if useRTT and options.mergeCircles.value then
 		gl.UnsafeSetFBO(nil, GL_READ_FRAMEBUFFER_EXT) -- default FBO
 		gl.UnsafeSetFBO(fbo, GL_DRAW_FRAMEBUFFER_EXT)
 		gl.BlitFBO(0,0,vsx,vsy,0,0,vsx,vsy,GL.DEPTH_BUFFER_BIT)
@@ -442,7 +496,7 @@ function widget:DrawWorldPreUnit()
 					lastDrawnFrame = 0
 				end
 			end
-			highlightQueue = true
+			highlightQueue = options.drawQueued.value
 			HighlightPylons()
 			highlightQueue = false
 			HighlightPlacement(-cmdID)
