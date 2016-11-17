@@ -103,7 +103,9 @@ options_order = {
 	'autoRepair',
 	'cleanWrecks',
 	'intelliCost',
-	'alwaysShow'
+	'alwaysShow',
+	'drawIcons',
+	'drawText',
 }
 
 options = {
@@ -154,7 +156,21 @@ options = {
 		type = 'bool',
 		desc = 'If this is enabled queued commands will always be displayed, otherwise they are only visible when \255\200\200\200shift\255\255\255\255 is held.\n (default = false)',
 		value = false,
-	}
+	},
+	
+	drawIcons = {
+		name = 'Draw Status Icons',
+		type = 'bool',
+		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
+		value = true,
+	},
+	
+	drawText = {
+		name = 'Draw Status Text',
+		type = 'bool',
+		desc = 'Check to draw a status text tag next to each unit, which shows its command state.\n (default = true)',
+		value = true,
+	},
 }
 
 -- "Localized" API calls, because they run ~33% faster in lua.
@@ -254,7 +270,7 @@ local modf	= math.modf
 
 local nextFrame	= 2
 local myTeamID = spGetMyTeamID()
-local textColor = {0.7, 1.0, 0.7, 1.0}
+local statusColor = {1.0, 1.0, 1.0, 0.85}
 local textSize = 12.0
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
@@ -267,7 +283,7 @@ local res_color = {0.4, 0.8, 1.0, 1.0}
 
 -- Zero-K specific icons for showing unit state.
 local idle_icon = "LuaUI/Images/commands/Bold/buildsmall.png"
-local queue_icon = "LuaUI/Images/commands/Bold/build.png"
+local queue_icon = "LuaUI/Images/commands/Bold/build_light.png"
 local drec_icon = "LuaUI/Images/commands/Bold/action.png"
 local move_icon = "LuaUI/Images/commands/Bold/move.png"
 
@@ -514,23 +530,7 @@ function widget:DrawWorld()
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
-		
-	--if removeToolIsActive then -- draw the cursor if the job remove tool is active
-		--spSetMouseCursor("cursorrepair")
-	--end
-	glDepthTest(false)
-	glColor(textColor)
-	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in our group
-		if spIsUnitInView(unitID) then
-			local ux, uy, uz = spGetUnitViewPosition(unitID)
-			glPushMatrix()
-			glTranslate(ux, uy, uz)
-			glBillboard()
-			glText(myCmd.cmdtype, -10.0, -15.0, textSize, "con")
-			glPopMatrix()
-		end -- if InView
-	end -- for unitID in group
-	    
+	
 	if shift or options.alwaysShow.value then
 		if shift and options.alwaysShow.value then
 			glColor(1, 1, 1, 0.5) -- 0.5 alpha
@@ -571,6 +571,43 @@ function widget:DrawWorld()
 		glTexture(res_icon)
 		DrawSTIcons(stResList)
 	end
+		
+	glDepthTest(false)
+	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in our group
+		if spIsUnitInView(unitID) then
+			local ux, uy, uz = spGetUnitViewPosition(unitID)
+			if options.drawIcons.value then
+				glColor(statusColor)
+				glPushMatrix()
+				if myCmd.cmdtype == commandType.idle then
+					glTexture(idle_icon)
+				elseif myCmd.cmdtype == commandType.buildQueue then
+					glTexture(queue_icon)
+					glColor(1.0, 1.0, 1.0, 0.9)
+				elseif myCmd.cmdtype == commandType.mov then
+					glTexture(move_icon)
+				else
+					glTexture(drec_icon)
+				end
+			
+				glTranslate(ux-20, uy+125, uz+20)
+				glBillboard()
+				glTexRect(0, 0, 40, 40)
+				glPopMatrix()
+			end
+			
+			if options.drawText.value then
+				glPushMatrix()
+				--draw text
+				glColor(0.8, 0.8, 0.8, 1.0)
+				glTranslate(ux, uy, uz)
+				glBillboard()
+				glText(myCmd.cmdtype, -12.0, -18.0, textSize, "con")
+				glPopMatrix()
+			end
+		end -- if InView
+	end -- for unitID in group
+
 	glTexture(false)
 	glColor(1, 1, 1, 1)
 end
