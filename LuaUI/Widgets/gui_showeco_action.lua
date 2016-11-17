@@ -243,6 +243,9 @@ local texStencil
 local vsx, vsy
 local lastDrawnFrame = 0
 local lastFrame = 2
+local highlightQueue = false
+local prevCmdID
+local lastCommandsCount
 
 function widget:Initialize()
 	if useRTT then
@@ -320,6 +323,25 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			pylons.count = pylons.count - 1
 		end
 	end
+	if highlightQueue and not onlyActive then
+		local selUnits = spGetSelectedUnits()
+		for i=1,#selUnits do
+			local unitID = selUnits[i]
+			local unitDefID = spGetUnitDefID(unitID)
+			if UnitDefs[unitDefID].isBuilder then
+				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
+				for i = 1, #cmdQueue do
+					local cmd = cmdQueue[i]
+					local pDef = pylonDefs[-cmd.id]
+					if pDef then
+						glColor(disabledColor)
+						drawGroundCircle(cmd.params[1], cmd.params[3], pDef.range)
+					end
+				end
+			end
+			break
+		end
+	end
 end
 
 local function RenderTex(dList)
@@ -386,15 +408,44 @@ local function HighlightPlacement(unitDefID)
 	end
 end
 
+function widget:SelectionChanged(selectedUnits)
+	-- force regenerating the lists if we've selected a different unit
+	lastDrawnFrame = 0
+end
+
 
 function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
 
-	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
-	if (cmd_id) then
-		if pylonDefs[-cmd_id] then
+	local _, cmdID = spGetActiveCommand()  -- show pylons if pylon is about to be placed
+	if cmdID ~= prevCmdID then
+		-- force regenerating the lists if just picked a building to place
+		lastDrawnFrame = 0
+		prevCmdID = cmdID
+	end
+	if (cmdID) then
+		if pylonDefs[-cmdID] then
+			if lastDrawnFrame ~= 0 then
+				local selUnits = spGetSelectedUnits()
+				local commandsCount = 0
+				for i=1,#selUnits do
+					local unitID = selUnits[i]
+					local unitDefID = spGetUnitDefID(unitID)
+					if UnitDefs[unitDefID].isBuilder then
+						commandsCount = Spring.GetCommandQueue(unitID, 0)
+						break
+					end
+				end
+				if commandsCount ~= lastCommandsCount then
+					-- force regenerating the lists if a building was placed/removed
+					lastCommandsCount = commandsCount
+					lastDrawnFrame = 0
+				end
+			end
+			highlightQueue = true
 			HighlightPylons()
-			HighlightPlacement(-cmd_id)
+			highlightQueue = false
+			HighlightPlacement(-cmdID)
 			glColor(1,1,1,1)
 			return
 		end
