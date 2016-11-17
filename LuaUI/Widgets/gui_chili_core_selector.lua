@@ -120,7 +120,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -133,6 +133,17 @@ options = {
 		},
 		OnChange = CheckHide,
 		noHotkey = true,
+	},
+	vertical = {
+		name = 'Vertical Bar',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,		
 	},
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
@@ -278,6 +289,17 @@ local function GetHealthColor(fraction, returnType)
 	return {r, g, 0, 1}
 end
 
+local function GetButtonPosition(index)
+	if options.vertical.value then
+		local y = (options.maxbuttons.value - index)*(100/options.maxbuttons.value) .. "%"
+		return 0, y, "100%", (100/options.maxbuttons.value) .. "%"
+	else
+		local x = (index - 1)*(100/options.maxbuttons.value) .. "%"
+		return x, 0, (100/options.maxbuttons.value) .. "%", "100%"
+	end
+end
+
+
 -------------------------------------------------------------------------------
 -- core functions
 
@@ -358,12 +380,15 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	if array == facs then
 		pos = pos + CountButtons(comms)
 	end
+	
+	local bX, bY, bWidth, bHeight = GetButtonPosition(pos + 1)
+	
 	array[i].button = Button:New{
 		parent = stack_main;
-		x = (pos)*(100/options.maxbuttons.value).."%",
-		y = 0,
-		width = (100/options.maxbuttons.value).."%",
-		height = "100%",
+		x = bX,
+		y = bY,
+		width = bWidth,
+		height = bHeight,
 		caption = '',
 		OnClick = {	function (self, x, y, mouse)
 				local _, _, meta, shift = Spring.GetModKeyState()
@@ -1078,8 +1103,8 @@ function widget:Initialize()
 		name = "selector_window",
 		x = 0, 
 		bottom = bottom,
-		width  = BUTTON_WIDTH * options.maxbuttons.value,
-		height = BUTTON_HEIGHT,
+		width  = BUTTON_WIDTH * ((options.vertical.value and 1) or options.maxbuttons.value),
+		height = BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1),
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
@@ -1101,53 +1126,21 @@ function widget:Initialize()
 		end },
 	}
 
-	-- for old single comm button system; deprecated
-	--[[
-	commButton.button = Button:New{
-		parent = stack_main;
-		width = (100/options.maxbuttons.value).."%",
-		caption = '',
-		OnClick = {	function () 
-				local _,_,left,_,right = Spring.GetMouseState()
-				if left and currentComm then
-					Spring.SelectUnitArray({currentComm}, false)
-					local x, y, z = Spring.GetUnitPosition(currentComm)
-					SetCameraTarget(x, y, z)
-				elseif right then
-					CycleComm()
-					UpdateCommFull()
-				end
-			end},
-		padding = {1,1,1,1},
-		keepAspect = true,
-		backgroundColor = (not currentComm and buttonColorDisabled) or nil,
-	}
-	commButton.healthbar = Progressbar:New{
-		name	= "commhealthbar",
-		x		= 0,
-		width   = "100%";
-		height	= "15%",
-		y = "85%",
-		max     = 1;
-		caption = "";
-		color   = {0,0.8,0,1};
-	}	
-	UpdateCommButton()
-	]]--
-
 	if WG.crude.GetHotkey("selectidlecon"):upper() and WG.crude.GetHotkey("selectidlecon_all"):upper() then
 		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon"):upper() .. "\n" .. WG.crude.GetHotkey("selectidlecon_all"):upper()
 	else
 		hotkeyCaption = "\255\0\255\0" .. (WG.crude.GetHotkey("selectidlecon"):upper() or WG.crude.GetHotkey("selectidlecon_all"):upper() or '')
 	end
 	
+	local conX, conY, conWidth, conHeight = GetButtonPosition(1)
+	
 	conButton.button = Button:New{
 		parent = stack_main;
 		caption = '',
-		x = 0,
-		y = 0,
-		width = (100/options.maxbuttons.value).."%",
-		height = "100%",
+		x = conX,
+		y = conY,
+		width = conWidth,
+		height = conHeight,
 		OnClick = {	function (self, x, y, mouse)
 				local meta = select(3, Spring.GetModKeyState())
 				if meta then

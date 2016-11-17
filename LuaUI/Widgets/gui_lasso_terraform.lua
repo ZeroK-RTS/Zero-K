@@ -73,8 +73,6 @@ local abs = math.abs
 local modf = math.modf
 local string_format = string.format
 
-local team = Spring.GetMyTeamID()
-
 -- command IDs
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -267,6 +265,8 @@ local function SendCommand()
 	end
 	pointAveX = pointAveX/points
 	pointAveZ = pointAveZ/points
+	
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
 	
 	if terraform_type == 4 then
 		local params = {}

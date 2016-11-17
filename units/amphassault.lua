@@ -29,7 +29,7 @@ unitDef = {
     helptext_pl    = [[Grizzly to klasyczna jednostka szturmowa - dosc wolna i niezdarna, lecz prawie niepowstrzymana. Jego bronia jest laser o duzym zasiegu i obrazeniach, ktory ma problemy wlasciwie tylko z szybkimi jednostkom atakujacym w grupach i lotnictwem. Grizzly moze sie wynurzyc do strzalu, ale nie moze strzelac pod woda.]],
     aimposoffset   = [[0 30 0]],
     midposoffset   = [[0 6 0]],
-    modelradius    = [[35]],
+    modelradius    = [[42]],
   },
 
   explodeAs           = [[BIG_UNIT]],

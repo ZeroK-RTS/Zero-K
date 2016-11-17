@@ -47,6 +47,7 @@ unitDef = {
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
     commtype = [[3]],
+	modelradius    = [[25]],
     aimposoffset   = [[0 10 0]],
 	dynamic_comm   = 1,
   },
