@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Surfboard]],
   description         = [[Transport Platform]],
   acceleration        = 0.102,
+  activateWhenBuilt   = true,
   brakeRate           = 0.115,
   buildCostEnergy     = 220,
   buildCostMetal      = 220,

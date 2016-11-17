@@ -8,12 +8,18 @@ local wake1, wake2 = piece("wake1", "wake2")
 local load_arm, load_shoulder = piece("load_arm", "load_shoulder")
 local slot1 = piece "slot1"
 
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+
 -- constants
 local SIG_Move = 1
+local SIG_COPY = 2
 
 local LOAD_SPEED_XZ = 200
 local LOAD_SPEED_Y = 80
 
+local PRIVATE = {private = true}
+local DEFAULT_SIGHT = UnitDefs[unitDefID].losRadius
 
 -- local vars
 local smokePiece = { base }
@@ -29,6 +35,64 @@ local function Wake()
 			EmitSfx(wake2, 2)
 		end
 		Sleep(200)
+	end
+end
+
+local function ResetSensors()
+	Signal(SIG_COPY)
+	
+	spSetUnitRulesParam(unitID, "radarRangeOverride", 0, PRIVATE)
+	spSetUnitRulesParam(unitID, "sonarRangeOverride", 0, PRIVATE)
+	spSetUnitRulesParam(unitID, "jammingRangeOverride", 0, PRIVATE)
+	spSetUnitRulesParam(unitID, "sightRangeOverride", DEFAULT_SIGHT, PRIVATE)
+	
+	GG.UpdateUnitAttributes(unitID)
+end
+
+local function CopySensors(passengerID)
+	if not (Spring.ValidUnitID(passengerID) and Spring.GetUnitIsTransporting(unitID)) then
+		ResetSensors()
+		return false
+	end
+	local pUnitDefID = Spring.GetUnitDefID(passengerID)
+	if not pUnitDefID then
+		ResetSensors()
+		return false
+	end
+	local pUnitDef = UnitDefs[pUnitDefID]
+	if not pUnitDef then
+		ResetSensors()
+		return false
+	end
+	
+	local radarOverride = spGetUnitRulesParam(passengerID, "radarRangeOverride") or pUnitDef.radarRadius
+	local sonarOverride = spGetUnitRulesParam(passengerID, "sonarRangeOverride") or pUnitDef.sonarRadius
+	local jammerOverride = spGetUnitRulesParam(passengerID, "jammingRangeOverride") or pUnitDef.jammerRadius
+	local sightOverride = spGetUnitRulesParam(passengerID, "sightRangeOverride") or pUnitDef.losRadius
+	
+	if (not Spring.GetUnitStates(passengerID).active) or (spGetUnitRulesParam(passengerID, "att_abilityDisabled") == 1) then
+		radarOverride = 0
+		sonarOverride = 0
+		jammerOverride = 0
+	end
+	
+	spSetUnitRulesParam(unitID, "radarRangeOverride", radarOverride, PRIVATE)
+	spSetUnitRulesParam(unitID, "sonarRangeOverride", sonarOverride, PRIVATE)
+	spSetUnitRulesParam(unitID, "jammingRangeOverride", jammerOverride, PRIVATE)
+	spSetUnitRulesParam(unitID, "sightRangeOverride", math.max(sightOverride, DEFAULT_SIGHT), PRIVATE)
+	
+	GG.UpdateUnitAttributes(unitID)
+	
+	-- Need to repeat if the unit can change state
+	return true
+end
+
+local function CopyTransportieeSensors(passengerID)
+	Signal(SIG_COPY)
+	SetSignalMask(SIG_COPY)
+	
+	while CopySensors(passengerID) do
+		Sleep(500)
 	end
 end
 
@@ -57,7 +121,12 @@ function script.TransportPickup(passengerID)
 		return
 	end
 	
-	if loadedUnitID then return end
+	if loadedUnitID then 
+		return 
+	end
+	
+	StartThread(CopyTransportieeSensors, passengerID)
+	
 	SetUnitValue(COB.BUSY, 1)
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local px2, py2, pz2 = Spring.GetUnitBasePosition(passengerID)
@@ -88,11 +157,16 @@ end
 
 -- note x, y z is in worldspace
 function script.TransportDrop(passengerID, x, y, z)
-	if not loadedUnitID then return end
+	if not loadedUnitID then 
+		return 
+	end
 	
 	local px1, py1, pz1 = Spring.GetUnitBasePosition(unitID)
 	local surfaceY = math.max(0, Spring.GetGroundHeight(px1, pz1))
-	if (py1 - surfaceY > 10) then return end -- don't allow unloading when flying
+	if (py1 - surfaceY > 10) then
+		-- don't allow unloading when flying
+		return 
+	end 
 	
 	SetUnitValue(COB.BUSY, 1)
 	Spring.MoveCtrl.Enable(unitID) -- freeze in place during unloading to make sure the passenger gets unloaded at the right place
@@ -124,6 +198,8 @@ function script.TransportDrop(passengerID, x, y, z)
 	SetUnitValue(COB.BUSY, 0)
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)	-- WAITWAIT magic to make unit continue with any orders it has
 	Spring.GiveOrderToUnit(unitID, CMD.WAIT, emptyTable, 0)
+	
+	ResetSensors()
 end
 
 function script.StartMoving()
@@ -148,9 +224,9 @@ end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
-	if (severity <= .25) then
+	if (severity <= 0.25) then
 		return 1 -- corpsetype
-	elseif (severity <= .5) then
+	elseif (severity <= 0.5) then
 		Explode(fan, sfxFall)	
 		return 1 -- corpsetype
 	else

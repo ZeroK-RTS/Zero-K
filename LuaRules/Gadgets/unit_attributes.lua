@@ -467,6 +467,7 @@ function UpdateUnitAttributes(unitID, frame)
 	
 	if setNewState or radarOverride or sonarOverride or jammerOverride or sightOverride then
 		changedAtt = true
+		abilityDisabled = abilityDisabled and not ud.isFirePlatform -- Can't have surfboard losing sensors
 		UpdateSensorAndJamm(unitID, udid, not abilityDisabled, radarOverride, sonarOverride, jammerOverride, sightOverride)
 	end
 
