@@ -3,14 +3,16 @@ function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
     desc      = "Register an action called Showeco & draw overdrive overlay.", --"acts like F4",
-    author    = "xponen",
+    author    = "xponen, ashdnazg (RTT)",
     date      = "July 19 2013",
     license   = "GNU GPL, v2 or later",
-	layer	  = 0, --only layer > -4 works because it seems to be blocked by something.
-	enabled   = true,  --  loaded by default?
+    layer     = 0, --only layer > -4 works because it seems to be blocked by something.
+    enabled   = true,  --  loaded by default?
     handler   = true,
   }
 end
+
+local useRTT = gl.CreateFBO and gl.BlitFBO and true
 
 local pylon ={}
 
@@ -44,7 +46,7 @@ local spGetUnitPosition    = Spring.GetUnitPosition
 local spValidUnitID        = Spring.ValidUnitID
 local spGetUnitRulesParam  = Spring.GetUnitRulesParam
 local spGetSpectatingState = Spring.GetSpectatingState
-local spGetBuildFacing	   = Spring.GetBuildFacing
+local spGetBuildFacing     = Spring.GetBuildFacing
 local spPos2BuildPos       = Spring.Pos2BuildPos
 
 local glVertex        = gl.Vertex
@@ -53,7 +55,12 @@ local glColor         = gl.Color
 local glBeginEnd      = gl.BeginEnd
 local glCreateList    = gl.CreateList
 
-local GL_TRIANGLE_FAN = GL.TRIANGLE_FAN
+--// gl const
+
+local GL_DEPTH24_STENCIL8 = 0x88F0
+
+local GL_READ_FRAMEBUFFER_EXT = 0x8CA8
+local GL_DRAW_FRAMEBUFFER_EXT = 0x8CA9
 
 local pylons = {count = 0, data = {}}
 local pylonByID = {}
@@ -69,107 +76,22 @@ for i=1,#UnitDefs do
 	end
 end
 
-local floor = math.floor
-local circlePolys = 0 -- list for circles
-
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
--- local functions
+-- Utilities
 
-local disabledColor = { 0.6,0.7,0.5,0.2}
+local drawList = 0
+local disabledDrawList = 0
+local fbo
+local offscreentex
+local texStencil
+local lastDrawnFrame = 0
+local lastFrame = 2
+local highlightQueue = false
+local prevCmdID
+local lastCommandsCount
 
-local function HSLtoRGB(ch,cs,cl)
-
-if cs == 0 then
-  cr = cl
-  cg = cl
-  cb = cl
-else
-  if cl < 0.5 then temp2 = cl * (cl + cs)
-  else temp2 = (cl + cs) - (cl * cs)
-  end
-
-  temp1 = 2 * cl - temp2
-  tempr = ch + 1 / 3
-
-  if tempr > 1 then tempr = tempr - 1 end
-  tempg = ch
-  tempb = ch - 1 / 3
-  if tempb < 0 then tempb = tempb + 1 end
-
-  if tempr < 1 / 6 then cr = temp1 + (temp2 - temp1) * 6 * tempr
-  elseif tempr < 0.5 then cr = temp2
-  elseif tempr < 2 / 3 then cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
-  else cr = temp1
-  end
-
-  if tempg < 1 / 6 then cg = temp1 + (temp2 - temp1) * 6 * tempg
-  elseif tempg < 0.5 then cg = temp2
-  elseif tempg < 2 / 3 then cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
-  else cg = temp1
-  end
-
-  if tempb < 1 / 6 then cb = temp1 + (temp2 - temp1) * 6 * tempb
-  elseif tempb < 0.5 then cb = temp2
-  elseif tempb < 2 / 3 then cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
-  else cb = temp1
-  end
-
-end
-return {cr,cg,cb, 0.2}
-end --HSLtoRGB
-
-
-local function GetGridColor(efficiency)
- 	local n = efficiency
-	-- mex has no esource/esource has no mex
-	if n==0 then
-		return {1, .25, 1, 0.2}
-	else
-		if n < 3.5 then
-			h = 5760/(3.5+2)^2
-		else
-			h=5760/(n+2)^2
-		end
-		return HSLtoRGB(h/255,1,0.5)
-	end
-
---[[
---	average/good - will be green
-	local good = 3
-	--max/inefficient - will be red
-	local bad = 15
-		 -- mex has no esource/esource has no mex
-	if n == 0 then
-		return {1, 0.25, 1, 0.25}
-	else
-                -- red, green, blue
-                r, g, b = 0, 0, 0
-
-                if n <= good then
-                        b = (1 - n/good)^.5
-                        g = (n/good)^.5
-                elseif n <= bad then
-                        -- difference of bad and good
-                        local z = bad-good
-                        -- n - good, since we are inside "good-bad" now
-                        -- n must not be bigger than z
-                        nRemain = min(n-good, z)
-
-                        g = 1 - nRemain/z
-                        r = (nRemain/z)^.3
-                else
-                        r = bad/n
-                end
-        end
-	return {r, g, b, 0.2}]]--
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
--- Unit Handling
-
-function InitializeUnits()
+local function InitializeUnits()
 	pylons = {count = 0, data = {}}
 	pylonByID = {}
 	local allUnits = Spring.GetAllUnits()
@@ -180,6 +102,183 @@ function InitializeUnits()
 		widget:UnitCreated(unitID, unitDefID, unitTeam)
 	end
 end
+
+local vsx, vsy
+local function ViewResize(viewSizeX, viewSizeY)
+	vsx = viewSizeX
+	vsy = viewSizeY
+	if useRTT and options.mergeCircles.value then
+		fbo.color0 = nil
+		fbo.stencil = nil
+		fbo.depth = nil
+		gl.DeleteRBO(texStencil)
+		gl.DeleteTexture(offscreentex or 0)
+		offscreentex = gl.CreateTexture(vsx,vsy, {
+			border = false,
+			min_filter = GL.LINEAR,
+			mag_filter = GL.LINEAR,
+		})
+
+		texStencil = gl.CreateRBO(vsx, vsy, {
+			format = GL_DEPTH24_STENCIL8,
+		})
+
+		fbo.depth  = texStencil
+		fbo.color0 = offscreentex
+		fbo.stencil = texStencil
+	end
+end
+
+local function Shutdown()
+	if useRTT and offscreentex then
+		gl.DeleteTexture(offscreentex or 0)
+		gl.DeleteRBO(texStencil or 0)
+		gl.DeleteFBO(fbo or 0)
+	end
+	gl.DeleteList(drawList or 0)
+	gl.DeleteList(disabledDrawList or 0)
+end
+
+local function Initialize()
+	if useRTT and options.mergeCircles.value then
+		fbo = gl.CreateFBO()
+	end
+	ViewResize(widgetHandler:GetViewSizes())
+	InitializeUnits()
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Menu Options
+
+local drawAlpha = 0.2
+local colorAlpha, disabledColor
+
+local function RestartWidget(option)
+	Shutdown()
+	Initialize()
+	lastDrawnFrame = 0
+	
+	colorAlpha = useRTT and option.priv_value and 1 or drawAlpha
+	disabledColor[4] = colorAlpha
+end
+
+options_path = 'Settings/Interface/Economy Overlay'
+options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
+options = {
+	start_with_showeco = {
+		name = "Start with economy overly",
+		desc = "Game starts with Economy Overlay enabled",
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function(self)
+			if (self.value) then
+				WG.showeco = self.value
+			end
+		end,
+	},
+	mergeCircles = {
+		name = "Draw merged grid circles", 
+		desc = "Merge overlapping grid circle visualisation. Does not work on older hardware and should automatically disable.",
+		type = 'bool', 
+		value = true, 
+		OnChange = RestartWidget,
+	},
+	drawQueued = {
+		name = "Draw grid in queue", 
+		desc = "Shows the grid of not-yet constructed buildings in the queue of a selected constructor. Activates only when placing grid structures.",
+		type = 'bool', 
+		value = true, 
+	},
+}
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- local functions
+
+colorAlpha = useRTT and options.mergeCircles.value and 1 or drawAlpha
+disabledColor = { 0.6,0.7,0.5, colorAlpha}
+local placementColor = { 0.6, 0.7, 0.5, drawAlpha} -- drawAlpha on purpose!
+
+local function HSLtoRGB(ch,cs,cl)
+	local cr, cg, cb
+	if cs == 0 then
+		cr = cl
+		cg = cl
+		cb = cl
+	else
+		local temp2
+		if cl < 0.5 then
+			temp2 = cl * (cl + cs)
+		else
+			temp2 = (cl + cs) - (cl * cs)
+		end
+
+		local temp1 = 2 * cl - temp2
+		local tempr = ch + 1 / 3
+
+		if tempr > 1 then
+			tempr = tempr - 1
+		end
+		local tempg = ch
+		local tempb = ch - 1 / 3
+		if tempb < 0 then
+			tempb = tempb + 1
+		end
+
+		if tempr < 1 / 6 then
+			cr = temp1 + (temp2 - temp1) * 6 * tempr
+		elseif tempr < 0.5 then
+			cr = temp2
+		elseif tempr < 2 / 3 then
+			cr = temp1 + (temp2 - temp1) * ((2 / 3) - tempr) * 6
+		else
+			cr = temp1
+		end
+
+		if tempg < 1 / 6 then
+			cg = temp1 + (temp2 - temp1) * 6 * tempg
+		elseif tempg < 0.5 then
+			cg = temp2
+		elseif tempg < 2 / 3 then
+			cg = temp1 + (temp2 - temp1) * ((2 / 3) - tempg) * 6
+		else
+			cg = temp1
+		end
+
+		if tempb < 1 / 6 then
+			cb = temp1 + (temp2 - temp1) * 6 * tempb
+		elseif tempb < 0.5 then
+			cb = temp2
+		elseif tempb < 2 / 3 then
+			cb = temp1 + (temp2 - temp1) * ((2 / 3) - tempb) * 6
+		else
+			cb = temp1
+		end
+
+	end
+	return {cr,cg,cb, colorAlpha}
+end --HSLtoRGB
+
+
+local function GetGridColor(efficiency)
+ 	local n = efficiency
+	-- mex has no esource/esource has no mex
+	if n==0 then
+		return {1, .25, 1, colorAlpha}
+	else
+		if n < 3.5 then
+			h = 5760/(3.5+2)^2
+		else
+			h=5760/(n+2)^2
+		end
+		return HSLtoRGB(h/255,1,0.5)
+	end
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+-- Unit Handling
 
 local function addUnit(unitID, unitDefID, unitTeam)
 	if pylonDefs[unitDefID] and not pylonByID[unitID] then
@@ -221,47 +320,32 @@ end
 
 local prevFullView = false
 local prevTeamID = -1
-local doTest = 0
 
 function widget:Update(dt)
-	doTest = doTest + 1
-	if doTest > 30 then
-		local teamID = Spring.GetMyTeamID()
-		local _, fullView = Spring.GetSpectatingState()
-		if (fullView ~= prevFullView) or (teamID ~= prevTeamID) then
-			InitializeUnits()
-		end
-		prevFullView = fullView
-		prevTeamID = teamID
-		doTest = 0
+	local teamID = Spring.GetMyTeamID()
+	local _, fullView = Spring.GetSpectatingState()
+	if (fullView ~= prevFullView) or (teamID ~= prevTeamID) then
+		InitializeUnits()
 	end
-end
-
--------------------------------------------------------------------------------------
--------------------------------------------------------------------------------------
-
-function widget:Initialize()
-	local circleDivs = 32
-	circlePolys = glCreateList(function()
-		glBeginEnd(GL_TRIANGLE_FAN, function()
-		local radstep = (2.0 * math.pi) / circleDivs
-			for i = 1, circleDivs do
-				local a = (i * radstep)
-				glVertex(math.sin(a), 0, math.cos(a))
-			end
-		end)
-	end)
-
-	InitializeUnits()
+	prevFullView = fullView
+	prevTeamID = teamID
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- Drawing
 
-local drawList = 0
-local lastDrawnFrame = 0
-local lastFrame = 2
+function widget:Initialize()
+	Initialize()
+end
+
+function widget:Shutdown()
+	Shutdown()
+end
+
+function widget:ViewResize(viewSizeX, viewSizeY)
+	ViewResize(viewSizeX, viewSizeY)
+end
 
 function widget:GameFrame(f)
 	if f%32 == 2 then
@@ -269,21 +353,22 @@ function widget:GameFrame(f)
 	end
 end
 
-local function makePylonListVolume()
+local function makePylonListVolume(onlyActive, onlyDisabled)
+	local drawGroundCircle = gl.Utilities.DrawGroundCircle
 	local i = 1
 	while i <= pylons.count do
 		local data = pylons.data[i]
 		local unitID = data.unitID
 		if spValidUnitID(unitID) then
 			local efficiency = spGetUnitRulesParam(unitID, "gridefficiency") or -1
-			if efficiency == -1 then
+			if efficiency == -1 and not onlyActive then
 				glColor(disabledColor)
-			else
+				drawGroundCircle(data.x, data.z, data.range)
+			elseif efficiency ~= -1 and not onlyDisabled then
 				local color = GetGridColor(efficiency)
 				glColor(color)
+				drawGroundCircle(data.x, data.z, data.range)
 			end
-			--gl.Utilities.DrawMyCylinder(data.x,data.y,data.z,data.range,data.range,35)
-			gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
 			i = i + 1
 		else
 			pylons.data[i] = pylons.data[pylons.count]
@@ -292,62 +377,132 @@ local function makePylonListVolume()
 			pylons.count = pylons.count - 1
 		end
 	end
+	if highlightQueue and not onlyActive then
+		local selUnits = spGetSelectedUnits()
+		for i=1,#selUnits do
+			local unitID = selUnits[i]
+			local unitDefID = spGetUnitDefID(unitID)
+			if UnitDefs[unitDefID].isBuilder then
+				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
+				for i = 1, #cmdQueue do
+					local cmd = cmdQueue[i]
+					local pDef = pylonDefs[-cmd.id]
+					if pDef then
+						glColor(disabledColor)
+						drawGroundCircle(cmd.params[1], cmd.params[3], pDef.range)
+					end
+				end
+			end
+			break
+		end
+	end
+end
+
+local function RenderTex(dList)
+	gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
+	gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
+	gl.CallList(dList)
 end
 
 local function HighlightPylons()
 	if lastDrawnFrame < lastFrame then
 		lastDrawnFrame = lastFrame
-		drawList = gl.CreateList(makePylonListVolume)
-	end
-	--gl.Utilities.DrawVolume(drawList)
-	gl.CallList(drawList)
-	--[[
-	local i = 1
-	while i <= pylons.count do
-		local data = pylons.data[i]
-		local unitID = data.unitID
-		if spValidUnitID(unitID) then
-			local efficiency = spGetUnitRulesParam(unitID, "gridefficiency") or -1
-			if efficiency == -1 then
-				glColor(disabledColor)
-			else
-				local color = GetGridColor(efficiency)
-				glColor(color)
-			end
-
-			gl.Utilities.DrawGroundCircle(data.x, data.z, data.range)
-			i = i + 1
+		if useRTT and options.mergeCircles.value then
+			gl.DeleteList(disabledDrawList or 0)
+			disabledDrawList = gl.CreateList(makePylonListVolume, false, true)
+			gl.DeleteList(drawList or 0)
+			drawList = gl.CreateList(makePylonListVolume, true, false)
 		else
-			pylons.data[i] = pylons.data[pylons.count]
-			pylonByID[pylons.data[i].unitID] = i
-			pylons.data[pylons.count] = nil
-			pylons.count = pylons.count - 1
+			gl.DeleteList(drawList or 0)
+			drawList = gl.CreateList(makePylonListVolume)
 		end
 	end
-	--]]
+	if useRTT and options.mergeCircles.value then
+		gl.UnsafeSetFBO(nil, GL_READ_FRAMEBUFFER_EXT) -- default FBO
+		gl.UnsafeSetFBO(fbo, GL_DRAW_FRAMEBUFFER_EXT)
+		gl.BlitFBO(0,0,vsx,vsy,0,0,vsx,vsy,GL.DEPTH_BUFFER_BIT)
+		gl.UnsafeSetFBO(nil, GL_DRAW_FRAMEBUFFER_EXT)
+
+		gl.ActiveFBO(fbo,RenderTex, drawList)
+		gl.MatrixMode(GL.PROJECTION); gl.PushMatrix(); gl.LoadIdentity()
+		gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity()
+		gl.Texture(offscreentex)
+		glColor(1,1,1,drawAlpha)
+		gl.TexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+		glColor(1,1,1,1)
+		gl.Texture(false)
+		gl.MatrixMode(GL.PROJECTION); gl.PopMatrix()
+		gl.MatrixMode(GL.MODELVIEW);  gl.PopMatrix()
+
+		gl.ActiveFBO(fbo,RenderTex, disabledDrawList)
+		gl.MatrixMode(GL.PROJECTION); gl.PushMatrix(); gl.LoadIdentity()
+		gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity()
+		gl.Texture(offscreentex)
+		glColor(1,1,1,drawAlpha)
+		gl.TexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
+		glColor(1,1,1,1)
+		gl.Texture(false)
+		gl.MatrixMode(GL.PROJECTION); gl.PopMatrix()
+		gl.MatrixMode(GL.MODELVIEW);  gl.PopMatrix()
+	else
+		gl.CallList(drawList)
+	end
 end
 
 local function HighlightPlacement(unitDefID)
+	if not (unitDefID and UnitDefs[unitDefID]) then
+		return
+	end
 	local mx, my = spGetMouseState()
-	local _, coords = spTraceScreenRay(mx, my, true, true, false, true)
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, not Spring.Utilities.BlueprintFloat(UnitDefs[unitDefID]))
 	if coords then
 		local radius = pylonDefs[unitDefID].range
 		if (radius ~= 0) then
 			local x, _, z = spPos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
-			glColor(disabledColor)
+			glColor(placementColor)
 			gl.Utilities.DrawGroundCircle(x,z, radius)
 		end
 	end
 end
 
+function widget:SelectionChanged(selectedUnits)
+	-- force regenerating the lists if we've selected a different unit
+	lastDrawnFrame = 0
+end
+
+
 function widget:DrawWorldPreUnit()
 	if Spring.IsGUIHidden() then return end
 
-	local _, cmd_id = spGetActiveCommand()  -- show pylons if pylon is about to be placed
-	if (cmd_id) then
-		if pylonDefs[-cmd_id] then
+	local _, cmdID = spGetActiveCommand()  -- show pylons if pylon is about to be placed
+	if cmdID ~= prevCmdID then
+		-- force regenerating the lists if just picked a building to place
+		lastDrawnFrame = 0
+		prevCmdID = cmdID
+	end
+	if (cmdID) then
+		if pylonDefs[-cmdID] then
+			if lastDrawnFrame ~= 0 then
+				local selUnits = spGetSelectedUnits()
+				local commandsCount = 0
+				for i=1,#selUnits do
+					local unitID = selUnits[i]
+					local unitDefID = spGetUnitDefID(unitID)
+					if UnitDefs[unitDefID].isBuilder then
+						commandsCount = Spring.GetCommandQueue(unitID, 0)
+						break
+					end
+				end
+				if commandsCount ~= lastCommandsCount then
+					-- force regenerating the lists if a building was placed/removed
+					lastCommandsCount = commandsCount
+					lastDrawnFrame = 0
+				end
+			end
+			highlightQueue = options.drawQueued.value
 			HighlightPylons()
-			HighlightPlacement(-cmd_id)
+			highlightQueue = false
+			HighlightPlacement(-cmdID)
 			glColor(1,1,1,1)
 			return
 		end

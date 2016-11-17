@@ -844,6 +844,9 @@ local function SetFixedRectanglePoints(pos)
 		local z = floor((pos[3] + 8 - placingRectangle.oddZ)/16)*16 + placingRectangle.oddZ
 		
 		point[1].y = spGetGroundHeight(x, z)
+		if placingRectangle.floatOnWater and point[1].y < 2 then
+			point[1].y = 2
+		end
 		point[2].x = x - placingRectangle.halfX
 		point[2].z = z - placingRectangle.halfZ
 		point[3].x = x + placingRectangle.halfX
@@ -1276,7 +1279,7 @@ function widget:Update(dt)
 			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 		else
 			local mx,my = spGetMouseState()
-			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
+			pos = select(2, spTraceScreenRay(mx, my, true, false, false, not placingRectangle.floatOnWater))
 		end
 		
 		local facing = Spring.GetBuildFacing()
@@ -1741,6 +1744,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	end
 	
 	placingRectangle = {
+		floatOnWater = Spring.Utilities.BlueprintFloat(ud),
 		oddX = (footX%2)*8,
 		oddZ = (footZ%2)*8,
 		halfX = footX/2*16,
@@ -1759,7 +1763,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 		pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 	else
 		local mx,my = spGetMouseState()
-		pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
+		pos = select(2, spTraceScreenRay(mx, my, true, false, false, not placingRectangle.floatOnWater))
 	end
 	
 	SetFixedRectanglePoints(pos)

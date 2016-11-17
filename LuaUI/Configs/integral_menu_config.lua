@@ -1,5 +1,14 @@
-
 local buildCmdFactory, buildCmdEconomy, buildCmdDefence, buildCmdSpecial, buildCmdUnits, commandDisplayConfig, hiddenCommands = include("Configs/integral_menu_commands.lua")
+
+local function CommandClickFunction()
+	local _,_, meta,_ = Spring.GetModKeyState()
+	if not meta then 
+		return false
+	end
+	WG.crude.OpenPath("Game/Command Hotkeys")
+	WG.crude.ShowMenu() --make epic Chili menu appear.
+	return true
+end 
 
 local textConfig = {
 	bottomLeft = {
@@ -34,7 +43,8 @@ local buttonLayoutConfig = {
 			right = "9%",
 			height = "82%",
 			keepAspect = true,
-		}
+		},
+		ClickFunction = CommandClickFunction,
 	},
 	build = {
 		image = {

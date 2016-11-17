@@ -146,6 +146,16 @@ options = {
 	},
 }
 
+local function TabClickFunction()
+	local _,_, meta,_ = Spring.GetModKeyState()
+	if not meta then 
+		return false
+	end
+	WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
+	WG.crude.ShowMenu() --make epic Chili menu appear.
+	return true
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Very Global Globals
@@ -371,6 +381,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local hotkeyText
 	
 	local function DoClick(_, _, _, mouse)
+		if buttonLayout.ClickFunction and buttonLayout.ClickFunction() then
+			return false
+		end
 		if isDisabled then
 			return false
 		end
@@ -390,36 +403,36 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		caption = buttonLayout.caption or "",
 		padding = {0, 0, 0, 0},
 		parent = parent,
-		OnClick = {DoClick}
+		OnClick = {DoClick},
 	}
 	
 	if buttonLayout.dragAndDrop then
-		button.OnMouseDown = { 
-			function(obj,_,_,mouse) --for drag_drop feature
-				if mouse == 1 then
-					local badX, badY = obj:CorrectlyImplementedLocalToScreen(obj.x, obj.y, true)
-					WG.DrawMouseBuild.SetMouseIcon(-cmdID, obj.width/2, queueCount - 1, badX, badY, obj.width, obj.height)
-				end
+		button.OnMouseDown = button.OnMouseDown or {}
+		button.OnMouseDown[#button.OnMouseDown + 1] = function(obj,_,_,mouse) --for drag_drop feature
+			if mouse == 1 then
+				local badX, badY = obj:CorrectlyImplementedLocalToScreen(obj.x, obj.y, true)
+				WG.DrawMouseBuild.SetMouseIcon(-cmdID, obj.width/2, queueCount - 1, badX, badY, obj.width, obj.height)
 			end
-		}
-		button.OnMouseUp = {
-			function(obj, clickX, clickY, mouse) -- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to obj
-				WG.DrawMouseBuild.ClearMouseIcon()
-				if not factoryUnitID then
-					return
-				end
-				if clickY < 0 or clickY > button.height or button.width == 0 then
-					return
-				end
-				local clickPosition = math.floor(clickX/button.width) + x
-				if clickPosition < 1 then
-					return
-				end
-				if factoryUnitID and x ~= clickPosition then
-					MoveCommandBlock(factoryUnitID, cmdID, x, clickPosition)
-				end
+		end
+
+		-- MouseRelease event, for drag_drop feature --note: x & y is coordinate with respect to obj
+		button.OnMouseUp = button.OnMouseUp or {}
+		button.OnMouseUp[#button.OnMouseUp + 1] = function(obj, clickX, clickY, mouse) 
+			WG.DrawMouseBuild.ClearMouseIcon()
+			if not factoryUnitID then
+				return
 			end
-		}
+			if clickY < 0 or clickY > button.height or button.width == 0 then
+				return
+			end
+			local clickPosition = math.floor(clickX/button.width) + x
+			if clickPosition < 1 then
+				return
+			end
+			if factoryUnitID and x ~= clickPosition then
+				MoveCommandBlock(factoryUnitID, cmdID, x, clickPosition)
+			end
+		end
 	end
 	
 	if not BUTTON_COLOR then
@@ -896,6 +909,9 @@ end
 local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
 	
 	local function DoClick()
+		if TabClickFunction() then
+			return
+		end
 		panel.SwitchToTab(name)
 		panel.SetHotkeysActive(loiterable)
 		if OnSelect then
@@ -906,7 +922,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	local button = Button:New {
 		caption = humanName,
 		padding = {0, 0, 0, 0},
-		OnClick = {DoClick}
+		OnClick = {DoClick},
 	}
 	button.backgroundColor[4] = 0.4
 	
@@ -1222,17 +1238,6 @@ local function InitializeControls()
 		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent = screen0,
-		OnMouseDown = { 
-			function(self) 
-				local _,_, meta,_ = Spring.GetModKeyState()
-				if not meta then 
-					return false
-				end
-				WG.crude.OpenPath(options_path) --// click+ space on integral-menu tab will open a integral options.
-				WG.crude.ShowMenu() --make epic Chili menu appear.
-				return true
-			end 
-		},
 	}
 		
 	local tabHolder = Control:New{

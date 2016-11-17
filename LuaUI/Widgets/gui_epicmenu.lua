@@ -817,7 +817,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		local isUnitInstantCommand
 		
 		if custom_cmd_actions[actionName] then
-			local number = custom_cmd_actions[actionName]
+			local number = custom_cmd_actions[actionName].cmdType
 			isUnitCommand = number == 1
 			isUnitStateCommand = number == 2
 			isUnitInstantCommand = number == 3

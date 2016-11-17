@@ -122,8 +122,7 @@ options_order = {
 	'showeco',
 	
 	'lable_initialView', 
-	'initialSensorState', 
-	'start_with_showeco',
+	'initialSensorState',
 	
 	-- Radar view configuration
 	'radar_view_colors_label1',
@@ -229,19 +228,6 @@ options = {
 		value = true,
 		noHotkey = true,
 	},
-	start_with_showeco = {
-		name = "Start with economy overly",
-		desc = "Game starts with Economy Overlay enabled",
-		type = 'bool',
-		value = false,
-		noHotkey = true,
-		OnChange = function(self)
-			if (self.value) then
-				WG.showeco = self.value
-			end
-		end,
-	},
-	
 	
 --------------------------------------------------------------------------
 -- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
