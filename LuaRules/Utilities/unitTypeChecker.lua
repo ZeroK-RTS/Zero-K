@@ -31,3 +31,8 @@ function Spring.Utilities.getMovetypeByID(unitDefID)
 	end
 	return false
 end
+
+function Spring.Utilities.BlueprintFloat(ud)
+	return false
+	--return ud.floatOnWater
+end

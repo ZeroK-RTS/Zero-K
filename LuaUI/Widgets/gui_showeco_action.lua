@@ -450,8 +450,11 @@ local function HighlightPylons()
 end
 
 local function HighlightPlacement(unitDefID)
+	if not (unitDefID and UnitDefs[unitDefID]) then
+		return
+	end
 	local mx, my = spGetMouseState()
-	local _, coords = spTraceScreenRay(mx, my, true, true, false, true)
+	local _, coords = spTraceScreenRay(mx, my, true, true, false, not Spring.Utilities.BlueprintFloat(UnitDefs[unitDefID]))
 	if coords then
 		local radius = pylonDefs[unitDefID].range
 		if (radius ~= 0) then
