@@ -2065,9 +2065,8 @@ local function DisposeExitConfirmWindow()
 end
 
 local function LeaveExitConfirmWindow()
-	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
-	ShowHideCrudeMenu(true)
+	KillSubWindow()
 end
 
 local function MakeExitConfirmWindow(text, action)
@@ -2130,7 +2129,7 @@ local function MakeExitConfirmWindow(text, action)
 end
 
 local function MakeMenuBar()
-	local btn_padding = {4,3,2,2}
+	local btn_padding = {4,3,3,2}
 	local btn_margin = {0,0,0,0}
 	local exit_menu_width = 210
 	local exit_menu_height = 280
@@ -2168,7 +2167,7 @@ local function MakeMenuBar()
 		backgroundColor = color.main_bg,
 		color = color.main_bg,
 		margin = {0,0,0,0},
-		padding = {0,0,0,0},
+		padding = {0,0,3,0},
 		parent = screen0,
 		
 		children = {
@@ -2651,6 +2650,7 @@ function widget:Initialize()
 	
 	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
+	AddAction("show_toggle_crudemenu", ToggleActionMenu, nil, "t")
 	AddAction("crudesubmenu", ActionSubmenu, nil, "t")
 	AddAction("viewlobby", ViewLobby, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
@@ -2895,6 +2895,10 @@ function ViewLobby()
 end
 
 function ActionMenu()
+	ActionSubmenu()
+end
+
+function ToggleActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
 	ShowHideCrudeMenu()
