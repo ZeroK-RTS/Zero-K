@@ -755,6 +755,8 @@ function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
 		Echo( "<Global Build Command> Spectator mode. Widget removed." )
 		WG.GlobalBuildCommand = nil
+		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
 		widgetHandler:RemoveWidget()
 		return
 	end
