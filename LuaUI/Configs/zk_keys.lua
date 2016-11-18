@@ -112,6 +112,7 @@ return {
 		{	"repair",	"r",},
 		{	"stop",	"s",},
 		{	"stopproduction",	"ctrl+s",},
+		{	"globalbuildcancel",	"alt+s",},
 		{	"unloadunits",	"u",},
 		{	"pastetext",	"Ctrl+v",},
 		{	"wait",	"ctrl+w",},

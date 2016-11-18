@@ -58,6 +58,7 @@ local custom_cmd_actions = {
 	upgradecomm = {cmdType = 3, name = "Upgrade Commander"},
 	upgradecommstop  = {cmdType = 3, name = "Stop Upgrade Commander"},
 	stopproduction  = {cmdType = 3, name = "Stop Factory Production"},
+	globalbuildcancel  = {cmdType = 1, name = "Cancel Global Build Tasks"},
 	
 	-- terraform
 	rampground = {cmdType = 1, name = "Terraform Ramp"},
@@ -87,7 +88,7 @@ local custom_cmd_actions = {
 	autoassist = {cmdType = 2, name = "Factory Auto Assist"},	
 	airstrafe = {cmdType = 2, name = "Gunship Strafe"},
 	divestate = {cmdType = 2, name = "Raven Dive"},
-	autoeco = {cmdType = 2, name = "Constructor Global AI"},
+	globalbuild = {cmdType = 2, name = "Constructor Global AI"},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
