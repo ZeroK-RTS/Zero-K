@@ -24,7 +24,7 @@ function widget:GetInfo()
     desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
 "You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
-"Hit \255\255\90\90alt-s\255\255\255\255 to get an area select for removing jobs.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
+"Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
 "Configuration is in \nGame->Worker AI",
     author    = "aeonios",
     date      = "July 20, 2009, 8 March 2014",
@@ -176,6 +176,7 @@ options = {
 -- "Localized" API calls, because they run ~33% faster in lua.
 local Echo					= Spring.Echo
 local spIsGUIHidden			= Spring.IsGUIHidden
+local spGetActiveCommand	= Spring.GetActiveCommand
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spGetGroupList		= Spring.GetGroupList
@@ -222,7 +223,7 @@ local spRequestPath			= Spring.RequestPath
 
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 local spTraceScreenRay		= Spring.TraceScreenRay
-local spSetMouseCursor		= Spring.SetMouseCursor
+local spGetMouseState		= Spring.GetMouseState
 local spPlaySoundFile		= Spring.PlaySoundFile
 
 local glPushMatrix	= gl.PushMatrix
@@ -302,11 +303,9 @@ local hasRes = false
 local queueCount = 0 -- the number of jobs currently on the queue, which must be updated every assignment frame since #aTable only works for arrays
 
 -- variables used by the area job remove feature
-local removeToolIsActive = false
 local selectionStarted = false
 local selectionCoords = {}
 local selectionRadius = 0
-local hasBeenUsed = false
 
 -- drawing lists for GL
 local BuildList = {}
@@ -367,15 +366,6 @@ end
 
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
 function widget:GameFrame(frame)
-	--if thisFrame == 1 then -- initialize, using GameFrame since we need to properly account for lag
-		--nextFrame = 30 + ping()
-	--	return
-	--end
-	
-	--if ( thisFrame < nextFrame ) then 
-		--return
-	--end
-	
 	if frame % 15 == 0 then
 		if idleCheck then -- if our idle list has been updated
 			CheckIdlers() -- then check and process it
@@ -421,7 +411,6 @@ function widget:GameFrame(frame)
 			GiveWorkToUnit(unitToWork)
 		end
 	end
-	--nextFrame = thisFrame + ping()	-- repeat as quickly as ping allows.
 end
 
 
@@ -454,6 +443,16 @@ HOW THIS WORKS:
 function widget:Update(dt)
 	if spIsGUIHidden() then
 		return
+	end
+	
+	-- update ground circle information for the area job removal selection.
+	if selectionStarted then
+		local x, y, _,_,_ = spGetMouseState()
+		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
+		if coords then
+			local sx, sz = coords[1], coords[3]
+			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
+		end
 	end
 	
 	buildList = {}
@@ -624,13 +623,6 @@ function widget:DrawWorld()
 	glColor(1, 1, 1, 1)
 end
 
--- This function changes the mouse cursor if the job remove tool is active.
-function widget:DrawScreen()
-	if removeToolIsActive and not spIsGUIHidden() then -- draw the cursor if the job remove tool is active
-		spSetMouseCursor("cursorrepair")
-	end
-end
-
 function DrawBuildLines()
 	for _,cmd in pairs(buildList) do -- draw outlines for building jobs
 		--local cmd = buildList[i]
@@ -757,10 +749,6 @@ HOW THIS WORKS:
 		and adds them to the global queue.
 
  -- area job removal tool stuff --
-	widget:KeyPress()
-		Captures the hotkey for job remove, sets the tool as active.
-	widget:KeyRelease()
-		Captures releases for the shift key, for correct shift behavior.
 	widget:MousePress()
 		Captures the starting coords for the area select, sets state.
 	widget:MouseMove()
@@ -886,6 +874,13 @@ end
 
 -- This function cleans up when workers or nanoframes are captured by an enemy
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+	if unitTeam ~= myTeamID then
+		return -- if it doesn't involve us, don't do anything.
+	end
+	if allBuilders[unitID] then
+		allBuilders[unitID] = nil
+	end
+	
 	if myUnits[unitID] then
 		myUnits[unitID] = nil
 		if busyUnits[unitID] then
@@ -895,7 +890,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 			end
 			busyUnits[unitID] = nil
 		end
-	elseif activeJobs[unitID] then
+	elseif activeJobs[unitID] then -- check if the captured unit was a nanoframe
 		local key = activeJobs[unitID]
 		if myQueue[key] then
 			StopAnyWorker(key)
@@ -904,6 +899,27 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 		activeJobs[unitID] = nil
 	end
 end
+
+-- This function adds new workers when they are captured from the enemy.
+function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
+	if newTeam ~= myTeamID then
+		return -- if it doesn't involve us, don't do anything.
+	end
+	
+	local ud = UnitDefs[unitDefID]
+	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+		allBuilders[unitID] = {include=true}
+		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
+		if cmd and cmd.id then -- if so we mark it as drec
+			myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
+		else -- otherwise we mark it as idle
+			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+		end
+		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		GiveWorkToUnit(unitID)
+	end
+end
+
 
 -- This function implements auto-repair
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
@@ -915,29 +931,6 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 		end
 	end
 end
-
--- This function implements the constructor seperator, borrowed from the old "unit no stuck in factory" widget by msafwan
--- Note: Zero-K specific factDefIDs, customize if porting to another game!
---[[function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam == spGetMyTeamID() and UnitDefs[unitDefID].isBuilder and options.separateConstructors.value then -- if it's our unit, and is a builder, and constructor separator is enabled
-		local facScale -- how far our unit will be told to move
-		if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
-			facScale = 500
-		elseif factDefID == 299 then -- boatfac, needs a huge clearance
-			facScale = 250
-		elseif factDefID == 295 then -- hoverfac, needs extra clearance
-			facScale = 140
-		else -- other facs
-			facScale = 100
-		end
-		
-		local dx,_,dz = spGetUnitDirection(unitID)
-		local x,y,z = spGetUnitPosition(unitID)
-		dx = dx*facScale
-		dz = dz*facScale
-		spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
-	end
-end]]--
 
 --	If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
 function widget:UnitIdle(unitID, unitDefID, teamID)
@@ -958,6 +951,7 @@ function widget:CommandsChanged()
 			if allBuilders[id].include then
 				order = 1
 			end
+			-- add state toggle command
 			table.insert(customCommands, {
 				id      = CMD_GLOBAL_BUILD,
 				type    = CMDTYPE.ICON_MODE,
@@ -967,6 +961,18 @@ function widget:CommandsChanged()
 				action  = 'globalbuild',
 				params  = {order, 'off', 'on'}, 
 			})
+			
+			-- add the cancel jobs command
+			table.insert(customCommands, {
+				id      = CMD_GBCANCEL,
+				type    = CMDTYPE.ICON_AREA,
+				tooltip = 'Area select for removing Global Build Command tasks.',
+				name    = 'Global Build Cancel',
+				cursor  = 'Repair',
+				action  = 'globalbuildcancel',
+				--params  = {order, 'off', 'on'}, 
+			})
+			
 			break
 		end
 	end
@@ -1073,6 +1079,15 @@ end
 function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	if id == CMD_GLOBAL_BUILD then
 		ApplyStateToggle()
+		return true
+	end
+	
+	if id == CMD_GBCANCEL then -- implements the job cancelling command
+		local x, y, z, r = params[1], params[2], params[3], params[4]
+		RemoveJobs(x, z, r)
+		selectionStarted = false
+		selectionRadius = 0
+		selectionCoords = {}
 		return true
 	end
 	
@@ -1226,76 +1241,14 @@ end
 
 -- The following functions are used by the area job removal tool --
 -------------------------------------------------------------------
--- This function gets the hotkey event for triggering the area job remove tool.
-function widget:KeyPress(key, mods, isRepeat)
-	local hotkey = string.byte("s")
-	if key == hotkey and mods.alt then
-		removeToolIsActive = true
-	elseif key == KEYSYMS.ESCAPE and removeToolIsActive then
-		removeToolIsActive = false
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-	end
-end
-
-function widget:KeyRelease(key)
-	if hasBeenUsed and key == 304 then -- if shift is released and the command has been used at least once, cancel it.
-		removeToolIsActive = false
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-		hasBeenUsed = false
-	end
-end
-
 function widget:MousePress(x, y, button)
-	if removeToolIsActive then
+	local _, cmdid = spGetActiveCommand()
+	if cmdid == CMD_GBCANCEL then
 		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
 		if coords then -- nil check in case the mouse points to an area that does not refer to world-space
 			local sx, sy, sz = coords[1], coords[2], coords[3]
 			selectionCoords = {x=sx, y=sy, z=sz}
 			selectionStarted = true
-			return true
-		end
-	end
-	return false
-end
-			
-function widget:MouseMove(x, y, dx, dy, button)
-	if selectionStarted then
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then
-			local sx, sz = coords[1], coords[3]
-			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
-		end
-	end
-end
-
-function widget:MouseRelease(x, y, button)
-	if selectionStarted then
-		local alt, ctrl, meta, shift = spGetModKeyState()
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then
-			local sx, sz = coords[1], coords[3]
-			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
-		end
-		
-		if selectionRadius > 0 then -- if we have a real selection, call RemoveJobs
-			RemoveJobs(selectionCoords.x, selectionCoords.z, selectionRadius)
-		end
-		
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-		spPlaySoundFile("sounds/reply/builder_start.wav", 1) -- Note: Zero-K Specific sound. Customize if porting!
-		
-		if not shift then
-			removeToolIsActive = false
-			hasBeenUsed = false
-		else
-			hasBeenUsed = true
-			return true
 		end
 	end
 	return false
@@ -1566,7 +1519,10 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
-	local unitDef = UnitDefs[abs(job.id)]
+	local unitDef = nil
+	if job.id < 0 then
+		unitDef = UnitDefs[abs(job.id)]
+	end
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
@@ -1589,17 +1545,17 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 			else
 				cost = distance + 400
 			end
-		elseif unitDef.reloadTime > 0 or job.id == 125 then -- for small defenses and resurrect
+		elseif (unitDef and unitDef.reloadTime > 0) or job.id == 125 then -- for small defenses and resurrect
 			cost = distance - 150
-		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then -- for small energy
+		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind")) then -- for small energy
 			cost = distance + 100
 		else -- for resurrect and all other small build jobs
 			cost = distance
 		end
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive buildings and resurrect
-			cost = (distance/2) + (100 * (costMod - 2))
-		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+			cost = (distance/2) + (200 * (costMod - 2))
+		elseif unitDef and unitDef.reloadTime > 0 or unitDef.name == 'armnanotc' then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == 40 then -- for repair
 			if job.target then
@@ -1663,7 +1619,10 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
-	local unitDef = UnitDefs[abs(job.id)]
+	local unitDef = nil
+	if job.id < 0 then
+		unitDef = UnitDefs[abs(job.id)]
+	end
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
@@ -1679,7 +1638,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive jobs and resurrect, no mobbing penalty
 			cost = distance
-		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+		elseif unitDef and unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
 			cost = distance + (800 * (costMod - 2))
 		elseif job.id == 40 or job.id == 90 then -- for repair and reclaim
 			cost = distance + (200 * costMod)
@@ -2109,8 +2068,6 @@ HOW THIS WORKS:
 		Simple 2D distance calculation.
 	GetFirstCommand()
 		Returns the first command in a unit's queue, if there is one, otherwise nil.
-	ping()
-		Returns the greater of 15 frames or latency, so that we can avoid clobbering the network.
 	BuildHash()
 		Takes a command (formatted for myQueue) as input, and returns a unique identifier
 		to use as a hash table key. Allows duplicate jobs to be easily identified, and to easily
@@ -2306,15 +2263,6 @@ end
 function GetFirstCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1)
 	return queue[1]
-end
-
---	Prevent CBAI from canceling orders that just haven't made it to host yet
---	because of high ping. Donated by SkyStar.
-function ping()
-	local playerID = spGetLocalPlayerID()
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  
-	tping = (tping*1000-((tping*1000)%1)) /100 * 4
-	return max( tping, 15 ) --wait minimum 0.5 sec delay
 end
 
 --	Generate unique key value for each command using its parameters.

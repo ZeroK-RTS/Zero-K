@@ -58,6 +58,7 @@ local custom_cmd_actions = {
 	upgradecomm=3,
 	upgradecommstop = 3,
 	stopproduction = 3,
+	globalbuildcancel = 1,
 	
 	-- terraform
 	rampground=1,

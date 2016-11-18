@@ -33,7 +33,8 @@ CMD_ORBIT = 13923
 -- See https://springrts.com/mantis/view.php?id=4931
 CMD_ORBIT_DRAW = 13924
 
-CMD_GLOBAL_BUILD = 13925
+CMD_GLOBAL_BUILD = 13925 -- global build command state toggle command
+CMD_GBCANCEL = 13926 -- global build command area cancel cmd
 CMD_STOP_PRODUCTION = 13954
 
 CMD_AREA_MEX = 30100

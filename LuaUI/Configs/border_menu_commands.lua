@@ -218,6 +218,8 @@ local overrides = {
 	[CMD_ABANDON_PW] = {caption= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
 
 	[CMD_PLACE_BEACON] = {caption= '', texture = imageDir .. 'Bold/drop_beacon.png'},
+	
+	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},
@@ -302,6 +304,7 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	setferry=1,
 	radialmenu=1,
 	placebeacon=1,
+	globalbuildcancel = 1,
 
 	-- terraform
 	rampground=1,
