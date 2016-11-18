@@ -98,20 +98,20 @@ end
 local function CreateSinCosTable(divs)
   local sinTable = {}
   local cosTable = {}
-  
+
   local divAngle = TWO_PI / divs
   local alpha = 0
   local i = 1
   repeat
     sinTable[i] = sin(alpha)
     cosTable[i] = cos(alpha)
-    
+
     alpha = alpha + divAngle
     i = i + 1
   until (alpha >= TWO_PI)
   sinTable[i] = 0.0 -- sin(TWO_PI)
   cosTable[i] = 1.0 -- cos(TWO_PI)
-  
+
   return sinTable, cosTable
 end
 
@@ -121,7 +121,7 @@ function gl.Utilities.DrawMyCylinder(x,y,z, height,radius,divs)
   local sinTable, cosTable = CreateSinCosTable(divs)
   local bottomY = y - (height / 2)
   local topY    = y + (height / 2)
-  
+
   gl.BeginEnd(GL.TRIANGLE_STRIP, function()
     --// top
     for i = #sinTable, 1, -1 do
@@ -239,6 +239,15 @@ function gl.Utilities.DrawGroundCircle(x,z,radius)
   gl.PopMatrix()
 end
 
+-- See comment in DrawMergedVolume
+function gl.Utilities.DrawMergedGroundCircle(x,z,radius)
+  gl.PushMatrix()
+  gl.Translate(x, averageGroundHeight, z)
+  gl.Scale(radius, shapeHeight, radius)
+  gl.Utilities.DrawMergedVolume(cylinder)
+  gl.PopMatrix()
+end
+
 
 local hollowCylinders = {
   [ 0 ] = cylinder,
@@ -279,8 +288,8 @@ function gl.Utilities.DrawVolume(vol_dlist)
   gl.ColorMask(false, false, false, false)
   gl.StencilOp(GL.KEEP, GL.INCR, GL.KEEP)
   --gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP)
-  gl.StencilMask(0x11)
-  gl.StencilFunc(GL.ALWAYS, 0, 0)
+  gl.StencilMask(1)
+  gl.StencilFunc(GL.ALWAYS, 0, 1)
 
   gl.CallList(vol_dlist)
 
@@ -288,8 +297,41 @@ function gl.Utilities.DrawVolume(vol_dlist)
   gl.DepthTest(false)
   gl.ColorMask(true, true, true, true)
   gl.StencilOp(GL.ZERO, GL.ZERO, GL.ZERO)
-  gl.StencilMask(0x11)
-  gl.StencilFunc(GL.NOTEQUAL, 0, 0+1)
+  gl.StencilMask(1)
+  gl.StencilFunc(GL.NOTEQUAL, 0, 1)
+
+  gl.CallList(vol_dlist)
+
+  if (gl.DepthClamp) then gl.DepthClamp(false) end
+  gl.StencilTest(false)
+  -- gl.DepthTest(true)
+  gl.Culling(false)
+end
+
+-- Make sure that you start with a clear stencil and that you
+-- clear it using gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
+-- after finishing all the merged volumes
+function gl.Utilities.DrawMergedVolume(vol_dlist)
+  gl.DepthMask(false)
+  if (gl.DepthClamp) then gl.DepthClamp(true) end
+  gl.StencilTest(true)
+
+  gl.Culling(false)
+  gl.DepthTest(true)
+  gl.ColorMask(false, false, false, false)
+  gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP)
+  --gl.StencilOp(GL.KEEP, GL.INVERT, GL.KEEP)
+  gl.StencilMask(1)
+  gl.StencilFunc(GL.ALWAYS, 0, 1)
+
+  gl.CallList(vol_dlist)
+
+  gl.Culling(GL.FRONT)
+  gl.DepthTest(false)
+  gl.ColorMask(true, true, true, true)
+  gl.StencilOp(GL.KEEP, GL.INCR, GL.INCR)
+  gl.StencilMask(3)
+  gl.StencilFunc(GL.EQUAL, 1, 3)
 
   gl.CallList(vol_dlist)
 

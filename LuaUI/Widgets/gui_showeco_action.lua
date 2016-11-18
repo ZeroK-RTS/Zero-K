@@ -3,7 +3,7 @@ function widget:GetInfo()
   return {
     name      = "Showeco and Grid Drawer",
     desc      = "Register an action called Showeco & draw overdrive overlay.", --"acts like F4",
-    author    = "xponen, ashdnazg (RTT)",
+    author    = "xponen, ashdnazg",
     date      = "July 19 2013",
     license   = "GNU GPL, v2 or later",
     layer     = 0, --only layer > -4 works because it seems to be blocked by something.
@@ -12,19 +12,17 @@ function widget:GetInfo()
   }
 end
 
-local useRTT = gl.CreateFBO and gl.BlitFBO and true
-
 local pylon ={}
 
 local spGetMapDrawMode = Spring.GetMapDrawMode
 local spSendCommands   = Spring.SendCommands
 
 local function ToggleShoweco()
-  WG.showeco = not WG.showeco
+	WG.showeco = not WG.showeco
 
-  if (not WG.metalSpots and (spGetMapDrawMode() == "metal") ~= WG.showeco) then
-    spSendCommands("showmetalmap")
-  end
+	if (not WG.metalSpots and (spGetMapDrawMode() == "metal") ~= WG.showeco) then
+		spSendCommands("showmetalmap")
+	end
 end
 
 WG.ToggleShoweco = ToggleShoweco
@@ -52,15 +50,9 @@ local spPos2BuildPos       = Spring.Pos2BuildPos
 local glVertex        = gl.Vertex
 local glCallList      = gl.CallList
 local glColor         = gl.Color
-local glBeginEnd      = gl.BeginEnd
 local glCreateList    = gl.CreateList
 
 --// gl const
-
-local GL_DEPTH24_STENCIL8 = 0x88F0
-
-local GL_READ_FRAMEBUFFER_EXT = 0x8CA8
-local GL_DRAW_FRAMEBUFFER_EXT = 0x8CA9
 
 local pylons = {count = 0, data = {}}
 local pylonByID = {}
@@ -69,10 +61,9 @@ local pylonDefs = {}
 
 for i=1,#UnitDefs do
 	local udef = UnitDefs[i]
-	if (tonumber(udef.customParams.pylonrange) or 0 > 0) then
-		pylonDefs[i] = {
-			range = tonumber(udef.customParams.pylonrange)
-		}
+	local range = tonumber(udef.customParams.pylonrange)
+	if (range and range > 0) then
+		pylonDefs[i] = range
 	end
 end
 
@@ -82,69 +73,14 @@ end
 
 local drawList = 0
 local disabledDrawList = 0
-local fbo
-local offscreentex
-local texStencil
 local lastDrawnFrame = 0
 local lastFrame = 2
 local highlightQueue = false
 local prevCmdID
 local lastCommandsCount
 
-local function InitializeUnits()
-	pylons = {count = 0, data = {}}
-	pylonByID = {}
-	local allUnits = Spring.GetAllUnits()
-	for i=1, #allUnits do
-		local unitID = allUnits[i]
-		local unitDefID = spGetUnitDefID(unitID)
-		local unitTeam = Spring.GetUnitTeam(unitID)
-		widget:UnitCreated(unitID, unitDefID, unitTeam)
-	end
-end
-
-local vsx, vsy
-local function ViewResize(viewSizeX, viewSizeY)
-	vsx = viewSizeX
-	vsy = viewSizeY
-	if useRTT and options.mergeCircles.value then
-		fbo.color0 = nil
-		fbo.stencil = nil
-		fbo.depth = nil
-		gl.DeleteRBO(texStencil)
-		gl.DeleteTexture(offscreentex or 0)
-		offscreentex = gl.CreateTexture(vsx,vsy, {
-			border = false,
-			min_filter = GL.LINEAR,
-			mag_filter = GL.LINEAR,
-		})
-
-		texStencil = gl.CreateRBO(vsx, vsy, {
-			format = GL_DEPTH24_STENCIL8,
-		})
-
-		fbo.depth  = texStencil
-		fbo.color0 = offscreentex
-		fbo.stencil = texStencil
-	end
-end
-
-local function Shutdown()
-	if useRTT and offscreentex then
-		gl.DeleteTexture(offscreentex or 0)
-		gl.DeleteRBO(texStencil or 0)
-		gl.DeleteFBO(fbo or 0)
-	end
-	gl.DeleteList(drawList or 0)
-	gl.DeleteList(disabledDrawList or 0)
-end
-
-local function Initialize()
-	if useRTT and options.mergeCircles.value then
-		fbo = gl.CreateFBO()
-	end
-	ViewResize(widgetHandler:GetViewSizes())
-	InitializeUnits()
+local function ForceRedraw()
+	lastDrawnFrame = 0
 end
 
 -------------------------------------------------------------------------------------
@@ -152,16 +88,6 @@ end
 -- Menu Options
 
 local drawAlpha = 0.2
-local colorAlpha, disabledColor
-
-local function RestartWidget(option)
-	Shutdown()
-	Initialize()
-	lastDrawnFrame = 0
-	
-	colorAlpha = useRTT and option.priv_value and 1 or drawAlpha
-	disabledColor[4] = colorAlpha
-end
 
 options_path = 'Settings/Interface/Economy Overlay'
 options_order = {'start_with_showeco', 'mergeCircles', 'drawQueued'}
@@ -179,25 +105,25 @@ options = {
 		end,
 	},
 	mergeCircles = {
-		name = "Draw merged grid circles", 
+		name = "Draw merged grid circles",
 		desc = "Merge overlapping grid circle visualisation. Does not work on older hardware and should automatically disable.",
-		type = 'bool', 
-		value = true, 
-		OnChange = RestartWidget,
+		type = 'bool',
+		value = true,
+		OnChange = ForceRedraw,
 	},
 	drawQueued = {
-		name = "Draw grid in queue", 
+		name = "Draw grid in queue",
 		desc = "Shows the grid of not-yet constructed buildings in the queue of a selected constructor. Activates only when placing grid structures.",
-		type = 'bool', 
-		value = true, 
+		type = 'bool',
+		value = true,
+		OnChange = ForceRedraw,
 	},
 }
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- local functions
 
-colorAlpha = useRTT and options.mergeCircles.value and 1 or drawAlpha
-disabledColor = { 0.6,0.7,0.5, colorAlpha}
+local disabledColor = { 0.6,0.7,0.5, drawAlpha}
 local placementColor = { 0.6, 0.7, 0.5, drawAlpha} -- drawAlpha on purpose!
 
 local function HSLtoRGB(ch,cs,cl)
@@ -257,7 +183,7 @@ local function HSLtoRGB(ch,cs,cl)
 		end
 
 	end
-	return {cr,cg,cb, colorAlpha}
+	return {cr,cg,cb, drawAlpha}
 end --HSLtoRGB
 
 
@@ -265,7 +191,7 @@ local function GetGridColor(efficiency)
  	local n = efficiency
 	-- mex has no esource/esource has no mex
 	if n==0 then
-		return {1, .25, 1, colorAlpha}
+		return {1, .25, 1, drawAlpha}
 	else
 		if n < 3.5 then
 			h = 5760/(3.5+2)^2
@@ -287,7 +213,7 @@ local function addUnit(unitID, unitDefID, unitTeam)
 		if spec or spAreTeamsAllied(unitTeam, spGetMyTeamID()) then
 			local x,y,z = spGetUnitPosition(unitID)
 			pylons.count = pylons.count + 1
-			pylons.data[pylons.count] = {unitID = unitID, x = x, y = y, z = z, range = pylonDefs[unitDefID].range}
+			pylons.data[pylons.count] = {unitID = unitID, x = x, y = y, z = z, range = pylonDefs[unitDefID]}
 			pylonByID[unitID] = pylons.count
 		end
 	end
@@ -318,6 +244,18 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function InitializeUnits()
+	pylons = {count = 0, data = {}}
+	pylonByID = {}
+	local allUnits = Spring.GetAllUnits()
+	for i=1, #allUnits do
+		local unitID = allUnits[i]
+		local unitDefID = spGetUnitDefID(unitID)
+		local unitTeam = Spring.GetUnitTeam(unitID)
+		widget:UnitCreated(unitID, unitDefID, unitTeam)
+	end
+end
+
 local prevFullView = false
 local prevTeamID = -1
 
@@ -336,11 +274,12 @@ end
 -- Drawing
 
 function widget:Initialize()
-	Initialize()
+	InitializeUnits()
 end
 
 function widget:Shutdown()
-	Shutdown()
+	gl.DeleteList(drawList or 0)
+	gl.DeleteList(disabledDrawList or 0)
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)
@@ -354,7 +293,7 @@ function widget:GameFrame(f)
 end
 
 local function makePylonListVolume(onlyActive, onlyDisabled)
-	local drawGroundCircle = gl.Utilities.DrawGroundCircle
+	local drawGroundCircle = options.mergeCircles.value and gl.Utilities.DrawMergedGroundCircle or gl.Utilities.DrawGroundCircle
 	local i = 1
 	while i <= pylons.count do
 		local data = pylons.data[i]
@@ -396,18 +335,15 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 			break
 		end
 	end
+	-- Keep clean for everyone after us
+	gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
 end
 
-local function RenderTex(dList)
-	gl.Clear(GL.STENCIL_BUFFER_BIT, 0)
-	gl.Clear(GL.COLOR_BUFFER_BIT,0,0,0,0)
-	gl.CallList(dList)
-end
 
 local function HighlightPylons()
 	if lastDrawnFrame < lastFrame then
 		lastDrawnFrame = lastFrame
-		if useRTT and options.mergeCircles.value then
+		if options.mergeCircles.value then
 			gl.DeleteList(disabledDrawList or 0)
 			disabledDrawList = gl.CreateList(makePylonListVolume, false, true)
 			gl.DeleteList(drawList or 0)
@@ -417,35 +353,9 @@ local function HighlightPylons()
 			drawList = gl.CreateList(makePylonListVolume)
 		end
 	end
-	if useRTT and options.mergeCircles.value then
-		gl.UnsafeSetFBO(nil, GL_READ_FRAMEBUFFER_EXT) -- default FBO
-		gl.UnsafeSetFBO(fbo, GL_DRAW_FRAMEBUFFER_EXT)
-		gl.BlitFBO(0,0,vsx,vsy,0,0,vsx,vsy,GL.DEPTH_BUFFER_BIT)
-		gl.UnsafeSetFBO(nil, GL_DRAW_FRAMEBUFFER_EXT)
-
-		gl.ActiveFBO(fbo,RenderTex, drawList)
-		gl.MatrixMode(GL.PROJECTION); gl.PushMatrix(); gl.LoadIdentity()
-		gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity()
-		gl.Texture(offscreentex)
-		glColor(1,1,1,drawAlpha)
-		gl.TexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
-		glColor(1,1,1,1)
-		gl.Texture(false)
-		gl.MatrixMode(GL.PROJECTION); gl.PopMatrix()
-		gl.MatrixMode(GL.MODELVIEW);  gl.PopMatrix()
-
-		gl.ActiveFBO(fbo,RenderTex, disabledDrawList)
-		gl.MatrixMode(GL.PROJECTION); gl.PushMatrix(); gl.LoadIdentity()
-		gl.MatrixMode(GL.MODELVIEW);  gl.PushMatrix(); gl.LoadIdentity()
-		gl.Texture(offscreentex)
-		glColor(1,1,1,drawAlpha)
-		gl.TexRect(-1-0.5/vsx,1+0.5/vsy,1+0.5/vsx,-1-0.5/vsy)
-		glColor(1,1,1,1)
-		gl.Texture(false)
-		gl.MatrixMode(GL.PROJECTION); gl.PopMatrix()
-		gl.MatrixMode(GL.MODELVIEW);  gl.PopMatrix()
-	else
-		gl.CallList(drawList)
+	gl.CallList(drawList)
+	if options.mergeCircles.value then
+		gl.CallList(disabledDrawList)
 	end
 end
 
@@ -456,7 +366,7 @@ local function HighlightPlacement(unitDefID)
 	local mx, my = spGetMouseState()
 	local _, coords = spTraceScreenRay(mx, my, true, true, false, not Spring.Utilities.BlueprintFloat(UnitDefs[unitDefID]))
 	if coords then
-		local radius = pylonDefs[unitDefID].range
+		local radius = pylonDefs[unitDefID]
 		if (radius ~= 0) then
 			local x, _, z = spPos2BuildPos( unitDefID, coords[1], 0, coords[3], spGetBuildFacing())
 			glColor(placementColor)
