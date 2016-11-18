@@ -21,10 +21,10 @@ local window_widgetlist
 options_path = 'Settings/Misc'
 options =
 {
-	widgetlist = {
+	widgetlist_2 = {
 		name = 'Widget List',
 		type = 'button',
-		hotkey = {key='f11', mod=''},
+		--hotkey = {key='f11', mod='A'}, -- In zk_keys.lua
 		advanced = true,
 		OnChange = function(self)
 			if window_widgetlist then
@@ -294,6 +294,13 @@ MakeWidgetList = function()
 			Label:New{ caption = " ", align='center', }
 	end
 	
+	local hotkey = WG.crude.GetHotkey("epic_chili_widget_selector_widgetlist_2")
+	if hotkey and hotkey ~= "" then 
+		hotkey = " (" .. hotkey .. ")"
+	else
+		hotkey = ''
+	end
+	
 	window_widgetlist = Window:New{
 		x = window_x,
 		y = window_y,
@@ -301,7 +308,7 @@ MakeWidgetList = function()
 		clientHeight = window_h,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
-		caption = 'Widget List (F11)',
+		caption = 'Widget List' .. hotkey,
 		minWidth = 300,
 		minHeight = 400,
 		

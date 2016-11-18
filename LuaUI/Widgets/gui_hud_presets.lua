@@ -138,7 +138,7 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -148,7 +148,7 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 660
+	local resourceBarWidth = math.min(screenWidth - 700, 660)
 	local resourceBarHeight = 100
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
@@ -272,7 +272,7 @@ local function SetupCraftyPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -401,7 +401,7 @@ local function SetupEnsemblePreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -466,7 +466,7 @@ local function SetupWestwoodPreset()
 	local resourceBarWidth = screenWidth*5/22 + 20
 	local resourceBarHeight = 65
 	local resourceBarX = screenWidth - resourceBarWidth
-	WG.SetWindowPosAndSize("EconomyPanel",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -539,7 +539,7 @@ local function SetupWestwoodPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -633,6 +633,14 @@ function widget:Update(dt)
 			SetupDefaultPreset()
 			options.setToDefault.value = false
 		end
+		
+		if options.maintainDefaultUI.value then
+			local screenWidth, screenHeight = Spring.GetWindowGeometry()
+			oldWidth = screenWidth
+			oldHeight = screenHeight
+			SetupDefaultPreset()
+		end
+		
 		firstUpdate = false
 	end
 	
