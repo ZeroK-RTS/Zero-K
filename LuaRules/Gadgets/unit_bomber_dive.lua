@@ -142,10 +142,13 @@ end
 local function temporaryDive(unitID, duration, height, distance)
 	local config = bombers[unitID].config
 	
-	-- The maximum horizontal distance required to dive to that height
-	local diveDistance = (config.orgHeight - height)*config.diveRate
-	if diveDistance < distance then
-		return
+	-- No distance given for shield collision, dive as soon as possible.
+	if distance then
+		-- The maximum horizontal distance required to dive to that height
+		local diveDistance = (config.orgHeight - height)*config.diveRate
+		if diveDistance < distance then
+			return
+		end
 	end
 	
 	setFlyLow(unitID, height)
