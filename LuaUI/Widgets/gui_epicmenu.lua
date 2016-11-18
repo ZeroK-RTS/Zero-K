@@ -2855,13 +2855,15 @@ function widget:KeyPress(key, modifier, isRepeat)
 		window_getkey:Dispose()
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
 		--local hotkey = { key = translatedkey, mod = modstring, }		
+		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
 		local hotkey = modstring .. translatedkey	
+		
+		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
 		
 		if key ~= KEYSYMS.ESCAPE then
 			--otset( keybounditems, kb_action, hotkey )
 			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
 			otset( keybounditems, kb_action, hotkey )
-	
 		end
 		ReApplyKeybinds()
 		

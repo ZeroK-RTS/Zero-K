@@ -82,6 +82,42 @@ local echo = Spring.Echo
 
 local windowPositionX, windowPositionY
 
+function WG.CoreSelector_SetOptions(maxbuttons)
+	options.maxbuttons.value = maxbuttons
+	options.maxbuttons.OnChange(options.maxbuttons)
+end
+
+-- list and interface vars
+local facsByID = {}	-- [unitID] = index of facs[]
+local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, ["repeat"] = boolean, button, image, repeatImage, ["buildProgress"] = ProgressBar,}
+local commsByID = {} -- [unitID] = index of comms[]	
+local comms = {} -- [ordered index] = {commID, commDefID, warningTime, button, image, [healthbar] = ProgressBar,}
+local currentComm	--unitID
+local commDefID = UnitDefNames.armcom1.id
+local idleCons = {}	-- [unitID] = true
+local idleBuilderDefID = UnitDefNames.armrectr.id
+local wantUpdateCons = false
+local readyUntaskedBombers = {}	-- [unitID] = true
+
+--local gamestart = GetGameFrame() > 1
+local myTeamID = false
+local commWarningTime		= 2 -- how long to flash button frame, seconds
+--local commWarningTimeLeft	= -1
+
+-------------------------------------------------------------------------------
+local image_repeat = LUAUI_DIRNAME .. 'Images/repeat.png'
+local buildIcon = LUAUI_DIRNAME .. 'Images/idlecon.png' --LUAUI_DIRNAME .. 'Images/commands/Bold/build.png'
+local buildIcon_bw = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
+
+local teamColors = {}
+local GetTeamColor = Spring.GetTeamColor or function (teamID)
+  local color = teamColors[teamID]
+  if (color) then return unpack(color) end
+  local _,_,_,_,_,_,r,g,b = Spring.GetTeamInfo(teamID)
+  teamColors[teamID] = {r,g,b}
+  return r,g,b
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local UPDATE_FREQUENCY = 0.25
@@ -121,6 +157,10 @@ function widget:PlayerChanged()
 	CheckHide()
 end
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Widget options
+
 local function ResetWidget()
 	if window_selector then
 		windowPositionX = window_selector.x
@@ -132,8 +172,8 @@ local function ResetWidget()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'fancySkinning'}
-options = {
+options_order = {  'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'fancySkinning'}
+options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
 		type = 'radioButton',
@@ -277,40 +317,30 @@ options = {
 	}
 }
 
-function WG.CoreSelector_SetOptions(maxbuttons)
-	options.maxbuttons.value = maxbuttons
-	options.maxbuttons.OnChange(options.maxbuttons)
+local function SelectFactory(index)
+	if not (facs[index] and facs[index].button) then
+		return
+	end
+	
+	facs[index].button.OnClick[1]()
 end
 
--- list and interface vars
-local facsByID = {}	-- [unitID] = index of facs[]
-local facs = {}	-- [ordered index] = {facID, facDefID, buildeeDefID, ["repeat"] = boolean, button, image, repeatImage, ["buildProgress"] = ProgressBar,}
-local commsByID = {} -- [unitID] = index of comms[]	
-local comms = {} -- [ordered index] = {commID, commDefID, warningTime, button, image, [healthbar] = ProgressBar,}
-local currentComm	--unitID
-local commDefID = UnitDefNames.armcom1.id
-local idleCons = {}	-- [unitID] = true
-local idleBuilderDefID = UnitDefNames.armrectr.id
-local wantUpdateCons = false
-local readyUntaskedBombers = {}	-- [unitID] = true
+local SELECT_FACTORY = "epic_chili_core_selector_select_factory_"
 
---local gamestart = GetGameFrame() > 1
-local myTeamID = false
-local commWarningTime		= 2 -- how long to flash button frame, seconds
---local commWarningTimeLeft	= -1
-
--------------------------------------------------------------------------------
-local image_repeat = LUAUI_DIRNAME .. 'Images/repeat.png'
-local buildIcon = LUAUI_DIRNAME .. 'Images/idlecon.png' --LUAUI_DIRNAME .. 'Images/commands/Bold/build.png'
-local buildIcon_bw = LUAUI_DIRNAME .. 'Images/idlecon_bw.png'
-
-local teamColors = {}
-local GetTeamColor = Spring.GetTeamColor or function (teamID)
-  local color = teamColors[teamID]
-  if (color) then return unpack(color) end
-  local _,_,_,_,_,_,r,g,b = Spring.GetTeamInfo(teamID)
-  teamColors[teamID] = {r,g,b}
-  return r,g,b
+-- Factory hotkeys
+local hotkeyPath = 'Settings/HUD Panels/Quick Selection Bar/Hotkeys'
+for i = 1, 16 do
+	local optionName = "select_factory_" .. i
+	options_order[#options_order + 1] = optionName
+	options[optionName] = {
+		name = "Select Factory " .. i,
+		desc = "Selects the factory in position " .. i .. " of the selection bar.",
+		type = 'button',
+		path = hotkeyPath,
+		OnChange = function()
+			SelectFactory(i)
+		end
+	}
 end
 
 -------------------------------------------------------------------------------
@@ -399,7 +429,8 @@ function options.background_opacity.OnChange(self)
 end
 
 -------------------------------------------------------------------------------
--- core functions
+-------------------------------------------------------------------------------
+-- Core functions
 
 local function UpdateFac(unitID, index)
 	if not facs[index].button then
@@ -583,6 +614,10 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	UpdateBackgroundSize()
 end
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Factory Handling
+
 --shifts facs when one of their kind is removed
 local function ShiftFacRow()
 	for i=1,#facs do
@@ -591,8 +626,8 @@ local function ShiftFacRow()
 			facs[i].holder = nil
 		end
 	end
-	for i=1,#facs do
-		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
+	for i = 1, #facs do
+		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID, WG.crude.GetHotkey(SELECT_FACTORY .. i) or '')
 		UpdateFac(facs[i].facID, i)
 	end
 end
@@ -600,7 +635,7 @@ end
 local function AddFac(unitID, unitDefID)
 	local i = #facs + 1
 	facs[i] = {facID = unitID, facDefID = unitDefID}
-	GenerateButton(facs, i, unitID, unitDefID)
+	GenerateButton(facs, i, unitID, unitDefID, WG.crude.GetHotkey(SELECT_FACTORY .. i) or '')
 	facsByID[unitID] = i
 	UpdateFac(unitID, i)
 end
@@ -627,6 +662,10 @@ local function RemoveFac(unitID)
 	UpdateBackgroundSize()
 end
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Commander handling
+
 local function UpdateComm(unitID, index)
 	if not comms[index].button then
 		return
@@ -650,7 +689,7 @@ end
 local function AddComm(unitID, unitDefID)
 	local i = #comms + 1
 	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
-	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("selectcomm"):upper() or '')
+	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("selectcomm") or '')
 	commsByID[unitID] = i
 	UpdateComm(unitID, i)
 	ShiftFacRow()
@@ -689,6 +728,10 @@ local function RemoveComm(unitID)
 	
 	UpdateBackgroundSize()
 end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Constructor Handling
 
 local function UpdateConsButton()
 
@@ -1218,10 +1261,10 @@ function widget:Initialize()
 		options.fancySkinning.OnChange(options.fancySkinning)
 	end
 
-	if WG.crude.GetHotkey("selectidlecon"):upper() and WG.crude.GetHotkey("selectidlecon_all"):upper() then
-		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon"):upper() .. "\n" .. WG.crude.GetHotkey("selectidlecon_all"):upper()
+	if WG.crude.GetHotkey("selectidlecon") and WG.crude.GetHotkey("selectidlecon_all") then
+		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon") .. "\n" .. WG.crude.GetHotkey("selectidlecon_all")
 	else
-		hotkeyCaption = "\255\0\255\0" .. (WG.crude.GetHotkey("selectidlecon"):upper() or WG.crude.GetHotkey("selectidlecon_all"):upper() or '')
+		hotkeyCaption = "\255\0\255\0" .. (WG.crude.GetHotkey("selectidlecon") or WG.crude.GetHotkey("selectidlecon_all") or '')
 	end
 	
 	local conX, conY, conWidth, conHeight = GetButtonPosition(1)
