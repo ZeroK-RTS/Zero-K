@@ -318,6 +318,7 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 			WG.crude.SetSkin( self.value );
 		end,
 		items = {
+			{ key = 'Blueprint', name = 'Blueprint', },
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'DarkHive', name = 'DarkHive', },
