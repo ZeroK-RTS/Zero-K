@@ -105,7 +105,6 @@ options_order = {
 	'intelliCost',
 	'alwaysShow',
 	'drawIcons',
-	'drawText',
 }
 
 options = {
@@ -162,13 +161,6 @@ options = {
 		name = 'Draw Status Icons',
 		type = 'bool',
 		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
-		value = true,
-	},
-	
-	drawText = {
-		name = 'Draw Status Text',
-		type = 'bool',
-		desc = 'Check to draw a status text tag next to each unit, which shows its command state.\n (default = true)',
 		value = true,
 	},
 }
@@ -272,6 +264,7 @@ local modf	= math.modf
 local longCount	= 0
 local myTeamID = spGetMyTeamID()
 local statusColor = {1.0, 1.0, 1.0, 0.85}
+local queueColor = {1.0, 1.0, 1.0, 0.9}
 local textSize = 12.0
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
@@ -282,11 +275,13 @@ local rec_color = {0.6, 0.0, 1.0, 1.0}
 local rep_color = {0.0, 0.8, 0.4, 1.0}
 local res_color = {0.4, 0.8, 1.0, 1.0}
 
--- Zero-K specific icons for showing unit state.
-local idle_icon = "LuaUI/Images/commands/Bold/buildsmall.png"
-local queue_icon = "LuaUI/Images/commands/Bold/build_light.png"
-local drec_icon = "LuaUI/Images/commands/Bold/action.png"
-local move_icon = "LuaUI/Images/commands/Bold/move.png"
+local imgpath = "LuaUI/Images/commands/Bold/"
+local no_icon = {name = 'gbcicon'}
+local noidle_icon = {name = 'gbcidle'}
+local idle_icon = {name = 'gbcidle', texture=imgpath .. "buildsmall.png"}
+local queue_icon = {name = 'gbcicon', texture=imgpath .. "build_light.png", color=queueColor}
+local drec_icon = {name = 'gbcicon', texture=imgpath .. "action.png", color=statusColor}
+local move_icon = {name = 'gbcicon', texture=imgpath .. "move.png", color=statusColor}
 
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group, of the form myUnits[unitID] = commandType
@@ -356,6 +351,7 @@ function widget:Initialize()
 		end
 	
 	-- ZK compatability stuff
+	WG.icons.SetPulse('gbcidle', true)
 	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
@@ -455,6 +451,36 @@ function widget:Update(dt)
 		end
 	end
 	
+	-- update icons for builders
+	if options.drawIcons.value then
+		WG.icons.SetDisplay('gbcicon', true)
+		WG.icons.SetDisplay('gbcidle', true)
+		for unitID, data in pairs(allBuilders) do
+			if data.include and myUnits[unitID] then
+				local myCmd = myUnits[unitID]
+				if myCmd.cmdtype == commandType.idle then
+					WG.icons.SetUnitIcon(unitID, idle_icon)
+					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle icons
+				elseif myCmd.cmdtype == commandType.buildQueue then
+					WG.icons.SetUnitIcon(unitID, queue_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				elseif myCmd.cmdtype == commandType.mov then
+					WG.icons.SetUnitIcon(unitID, move_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				else
+					WG.icons.SetUnitIcon(unitID, drec_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				end
+			else
+				WG.icons.SetUnitIcon(unitID, no_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			end
+		end
+	else
+		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
+	end
+	
 	buildList = {}
 	areaList = {}
 	stRepList = {}
@@ -550,9 +576,7 @@ function widget:DrawWorld()
 		end
 		
 		glDepthTest(true)
-		glPushMatrix()
 		DrawBuildingGhosts() -- draw building ghosts
-		glPopMatrix()
 		glDepthTest(false)
 		
 		glTexture(true)
@@ -582,42 +606,6 @@ function widget:DrawWorld()
 		glTexture(res_icon)
 		DrawSTIcons(stResList)
 	end
-		
-	glDepthTest(false)
-	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in our group
-		if spIsUnitInView(unitID) then
-			local ux, uy, uz = spGetUnitViewPosition(unitID)
-			if options.drawIcons.value then
-				glColor(statusColor)
-				glPushMatrix()
-				if myCmd.cmdtype == commandType.idle then
-					glTexture(idle_icon)
-				elseif myCmd.cmdtype == commandType.buildQueue then
-					glTexture(queue_icon)
-					glColor(1.0, 1.0, 1.0, 0.9)
-				elseif myCmd.cmdtype == commandType.mov then
-					glTexture(move_icon)
-				else
-					glTexture(drec_icon)
-				end
-			
-				glTranslate(ux-20, uy+125, uz+20)
-				glBillboard()
-				glTexRect(0, 0, 40, 40)
-				glPopMatrix()
-			end
-			
-			if options.drawText.value then
-				glPushMatrix()
-				--draw text
-				glColor(0.8, 0.8, 0.8, 1.0)
-				glTranslate(ux, uy, uz)
-				glBillboard()
-				glText(myCmd.cmdtype, -12.0, -18.0, textSize, "con")
-				glPopMatrix()
-			end
-		end -- if InView
-	end -- for unitID in group
 
 	glTexture(false)
 	glColor(1, 1, 1, 1)
@@ -667,10 +655,12 @@ function DrawBuildingGhosts()
 		local bcmd = abs(myCmd.id)
 		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local degrees = h * 90
+		glPushMatrix()
 		glLoadIdentity()
 		glTranslate(x, y, z)
 		glRotate(degrees, 0, 1.0, 0 )
 		glUnitShape(bcmd, myTeamID, false, false, false)
+		glPopMatrix()
 	end
 end
 
@@ -695,7 +685,6 @@ function DrawAreaIcons()
 end
 
 function DrawSTIcons(myList)
-	local alt, ctrl, meta, shift = spGetModKeyState()
 	for i=1, #myList do -- draw single-target command icons
 		local myCmd = myList[i]
 		local x, y, z = myCmd.x, myCmd.y, myCmd.z
@@ -766,6 +755,8 @@ function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
 		Echo( "<Global Build Command> Spectator mode. Widget removed." )
 		WG.GlobalBuildCommand = nil
+		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -1555,7 +1546,7 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive buildings and resurrect
 			cost = (distance/2) + (200 * (costMod - 2))
-		elseif unitDef and unitDef.reloadTime > 0 or unitDef.name == 'armnanotc' then -- for small defenses and caretakers, allow up to two workers before increasing cost
+		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'armnanotc') then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
 		elseif job.id == 40 then -- for repair
 			if job.target then
