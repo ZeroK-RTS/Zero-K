@@ -120,7 +120,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'horPadding', 'vertPadding', 'minSize', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minSize', 'fancySkinning'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -150,42 +150,6 @@ options = {
 		type = 'number',
 		value = 6,
 		min=3,max=16,step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
-	},
-	horPadding = {
-		name = 'Horizontal Padding',
-		type = 'number',
-		value = 0,
-		advanced = true,
-		min = 0, max = 100, step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
-	},
-	vertPadding = {
-		name = 'Vertical Padding',
-		type = 'number',
-		value = 0,
-		advanced = true,
-		min = 0, max = 100, step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
-	},
-	minSize = {
-		name = 'Minimum Size (Percentage)',
-		type = 'number',
-		value = 0,
-		advanced = true,
-		min = 0, max = 800, step=1,
 		OnChange = function() 
 			ClearData(true)
 			window_selector:Dispose()
@@ -253,6 +217,76 @@ options = {
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
+	horPadding = {
+		name = 'Horizontal Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	vertPadding = {
+		name = 'Vertical Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	buttonSpacing = {
+		name = 'Button Spacing',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step = 1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	minSize = {  
+		name = 'Minimum Size',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 800, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.bottomLeftPanel then
+				newClass = skin.bottomLeftPanel
+			end
+			
+			background.tiles = newClass.tiles
+			background.TileImageFG = newClass.TileImageFG
+			background.backgroundColor = newClass.backgroundColor
+			background.TileImageBK = newClass.TileImageBK
+			background:Invalidate()
+		end
+	}
 }
 
 function WG.CoreSelector_SetOptions(maxbuttons)
@@ -348,15 +382,15 @@ local function UpdateBackgroundSize()
 	local buttons = CountButtons(comms) + CountButtons(facs) + 1
 	
 	if options.vertical.value then
-		local top = stack_main.height*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.vertPadding.value/2
-		top = math.max(top, options.minSize.value - options.minSize.value, 0)
+		local top = stack_main.height*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.vertPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
+		top = math.max(math.min(top, stack_main.height - options.minSize.value), 0)
 		
 		background._relativeBounds.top = top
 		background._relativeBounds.bottom = 0
 		background:UpdateClientArea()
 	else
-		local right = stack_main.width*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.horPadding.value/2
-		right = math.max(right, stack_main.width - options.minSize.value, 0)
+		local right = stack_main.width*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.horPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
+		right = math.max(math.min(right, stack_main.width - options.minSize.value), 0)
 		
 		background._relativeBounds.right = right
 		background._relativeBounds.left = 0
@@ -1208,6 +1242,10 @@ function widget:Initialize()
 			return true
 		end },
 	}
+	
+	if options.fancySkinning.value then
+		options.fancySkinning.OnChange(options.fancySkinning)
+	end
 
 	if WG.crude.GetHotkey("selectidlecon"):upper() and WG.crude.GetHotkey("selectidlecon_all"):upper() then
 		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon"):upper() .. "\n" .. WG.crude.GetHotkey("selectidlecon_all"):upper()

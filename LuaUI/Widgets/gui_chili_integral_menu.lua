@@ -74,7 +74,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
 	'background_opacity', 'keyboardType', 'selectionClosesTab', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'leftPadding', 'rightPadding'
+	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'leftPadding', 'rightPadding', 'fancySkinning'
 }
 
 options = {
@@ -166,6 +166,13 @@ options = {
 			ClearData(true)
 		end,	
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+	}
 }
 
 local function TabClickFunction()
@@ -1292,17 +1299,6 @@ local function InitializeControls()
 		parent = contentHolder,
 	}
 	
-	--local currentSkin = Chili.theme.skin.general.skinName
-	--local skin = Chili.SkinHandler.GetSkin(currentSkin)
-	--
-	--if skin.bottomLeftPanel then
-	--	contentHolder.tiles = skin.bottomLeftPanel.tiles
-	--	contentHolder.TileImageFG = skin.bottomLeftPanel.TileImageFG
-	--	contentHolder.backgroundColor = skin.bottomLeftPanel.backgroundColor
-	--	contentHolder.TileImageBK = skin.bottomLeftPanel.TileImageBK
-	--	contentHolder:Invalidate()
-	--end
-	
 	local function ReturnToOrders()
 		if options.selectionClosesTab.value then
 			commandPanelMap.orders.tabButton.DoClick()
@@ -1467,6 +1463,22 @@ end
 
 options.leftPadding.OnChange  = PaddingUpdate
 options.rightPadding.OnChange = PaddingUpdate
+
+function options.fancySkinning.OnChange(self)
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	
+	local newClass = skin.panel
+	if self.value and skin.bottomMiddlePanel then
+		newClass = skin.bottomMiddlePanel
+	end
+	
+	contentHolder.tiles = newClass.tiles
+	contentHolder.TileImageFG = newClass.TileImageFG
+	contentHolder.backgroundColor = newClass.backgroundColor
+	contentHolder.TileImageBK = newClass.TileImageBK
+	contentHolder:Invalidate()
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

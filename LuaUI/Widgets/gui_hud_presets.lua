@@ -26,6 +26,10 @@ local function Selections_SetOptions(group, showInfo, square, iconSize, showComm
 	WG.SetWidgetOption(widgetName, path, "alwaysShowSelectionWin",alwaysShow)
 end
 
+local function ResetOptionsFromNew()
+	local widgetName, path = "Chili Selections & CursorTip","Settings/HUD Panels/Selected Units Window"
+
+end
 ----------------------------------------------------
 ----------------------------------------------------
 -- Useful Functions

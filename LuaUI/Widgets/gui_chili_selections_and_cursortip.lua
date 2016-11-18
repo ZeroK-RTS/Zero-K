@@ -272,6 +272,7 @@ options_order = {
 	
 	--selected units
 	'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
+	'fancySkinning',
 }
 
 local function option_Deselect()
@@ -544,6 +545,29 @@ options = {
 			widget:SelectionChanged(Spring.GetSelectedUnits())
 		end,
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		path = selPath,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.bottomLeftPanel then
+				newClass = skin.bottomLeftPanel
+			end
+			
+			window_corner.tiles = newClass.tiles
+			window_corner.TileImageFG = newClass.TileImageFG
+			window_corner.backgroundColor = newClass.backgroundColor
+			window_corner.TileImageBK = newClass.TileImageBK
+			window_corner:Invalidate()
+		end
+	}
 }
 
 

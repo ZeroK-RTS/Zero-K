@@ -154,6 +154,8 @@ options_order = {
 
 	'leftClickOnMinimap', 
 	'fadeMinimapOnZoomOut', 
+	
+	'fancySkinning',
 }
 options = {
 	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
@@ -425,7 +427,7 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) 
+		OnChange= function(self)
 			iconsize = self.value and 0 or 20 
 			MakeMinimapWindow() 
 		end,
@@ -469,6 +471,29 @@ options = {
 		path = minimap_path,
 		noHotkey = true,
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		path = minimap_path,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.bottomLeftPanel then
+				newClass = skin.bottomLeftPanel
+			end
+			
+			map_panel.tiles = newClass.tiles
+			map_panel.TileImageFG = newClass.TileImageFG
+			map_panel.backgroundColor = newClass.backgroundColor
+			map_panel.TileImageBK = newClass.TileImageBK
+			map_panel:Invalidate()
+		end
+	}
 	--[[
 	simpleMinimapColors = {
 		name = 'Simplified Minimap Colors',
@@ -762,7 +787,7 @@ MakeMinimapWindow = function()
 		padding = {0, 0, 0, -1},
 		children = {
 			map_panel,
-			buttons_panel,
+			((not options.hidebuttons.value) and buttons_panel) or nil,
 		},
 	}
 
