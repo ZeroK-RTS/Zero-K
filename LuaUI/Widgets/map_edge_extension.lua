@@ -347,7 +347,7 @@ local function DrawOMap(useMirrorShader)
 	----	
 end
 
-function widget:Initialize()
+local function Initialize()
 	
 	if not drawingEnabled then
 		return
@@ -390,7 +390,21 @@ function widget:Initialize()
 	end
 	dList = gl.CreateList(DrawOMap, mirrorShader)
 	--Spring.SetDrawGround(false)
+
+	widgetHandler:RemoveCallIn("Update")
 end
+
+function widget:Initialize()
+	if Spring.GetGameRulesParam("waterLevelModifier") then
+		return
+	end
+	Initialize()
+end
+
+function widget:Update()
+	Initialize()
+end
+
 
 function widget:Shutdown()
 	--Spring.SetDrawGround(true)
