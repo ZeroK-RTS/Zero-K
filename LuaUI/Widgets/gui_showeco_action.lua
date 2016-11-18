@@ -282,10 +282,6 @@ function widget:Shutdown()
 	gl.DeleteList(disabledDrawList or 0)
 end
 
-function widget:ViewResize(viewSizeX, viewSizeY)
-	ViewResize(viewSizeX, viewSizeY)
-end
-
 function widget:GameFrame(f)
 	if f%32 == 2 then
 		lastFrame = f
