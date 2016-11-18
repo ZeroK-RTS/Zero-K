@@ -1261,7 +1261,7 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, -1},
+		padding = {-1, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}

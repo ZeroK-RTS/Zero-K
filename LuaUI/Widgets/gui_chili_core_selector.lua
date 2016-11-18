@@ -65,6 +65,7 @@ local stateCommands = {	-- FIXME: is there a better way of doing this?
 
 local Chili
 local Button
+local Control
 local Label
 local Window
 local Panel
@@ -76,9 +77,10 @@ local screen0
 
 local window_selector, stack_main, background
 local conButton = {}	-- {button, image, healthbar/label}
-local commButton = {}	-- unused
 
 local echo = Spring.Echo
+
+local windowPositionX, windowPositionY
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -119,8 +121,18 @@ function widget:PlayerChanged()
 	CheckHide()
 end
 
+local function ResetWidget()
+	if window_selector then
+		windowPositionX = window_selector.x
+		windowPositionY = window_selector.y
+	end
+	ClearData(true)
+	window_selector:Dispose()
+	widget:Initialize()
+end
+
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minSize', 'fancySkinning'}
+options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'fancySkinning'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -139,22 +151,14 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,		
+		OnChange = ResetWidget,	
 	},
 	maxbuttons = {
 		name = 'Maximum number of buttons (3-16)',
 		type = 'number',
 		value = 6,
 		min=3,max=16,step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
+		OnChange = ResetWidget,
 	},
 	background_opacity = {
 		name = "Opacity",
@@ -222,48 +226,32 @@ options = {
 		type = 'number',
 		value = 0,
 		advanced = true,
-		min = 0, max = 100, step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
+		min = 0, max = 100, step = 0.25,
+		OnChange = ResetWidget,
 	},
 	vertPadding = {
 		name = 'Vertical Padding',
 		type = 'number',
 		value = 0,
 		advanced = true,
-		min = 0, max = 100, step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
+		min = 0, max = 100, step = 0.25,
+		OnChange = ResetWidget,
 	},
 	buttonSpacing = {
 		name = 'Button Spacing',
 		type = 'number',
 		value = 0,
 		advanced = true,
-		min = 0, max = 100, step = 1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
+		min = 0, max = 100, step = 0.25,
+		OnChange = ResetWidget,
 	},
-	minSize = {  
-		name = 'Minimum Size',
+	minButtonSpaces = {  
+		name = 'Minimum Button Space',
 		type = 'number',
 		value = 0,
 		advanced = true,
-		min = 0, max = 800, step=1,
-		OnChange = function() 
-			ClearData(true)
-			window_selector:Dispose()
-			widget:Initialize()
-		end,	
+		min = 0, max = 16, step=1,
+		OnChange = ResetWidget,	
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
@@ -379,18 +367,24 @@ local function UpdateBackgroundSize()
 		return
 	end
 	
-	local buttons = CountButtons(comms) + CountButtons(facs) + 1
+	local buttons = math.max(options.minButtonSpaces.value, CountButtons(comms) + CountButtons(facs) + 1)
+	local sideSpacing = 2*((options.vertical.value and options.vertPadding.value) or options.horPadding.value)
+	local buttonSpace = buttons/options.maxbuttons.value
 	
 	if options.vertical.value then
-		local top = stack_main.height*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.vertPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
-		top = math.max(math.min(top, stack_main.height - options.minSize.value), 0)
+		buttonSpace = buttonSpace*stack_main.height
+		
+		local top = stack_main.height - (buttonSpace + sideSpacing)
+		top = math.max(top, 0)
 		
 		background._relativeBounds.top = top
 		background._relativeBounds.bottom = 0
 		background:UpdateClientArea()
 	else
-		local right = stack_main.width*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.horPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
-		right = math.max(math.min(right, stack_main.width - options.minSize.value), 0)
+		buttonSpace = buttonSpace*stack_main.width
+		
+		local right = buttonSpace + sideSpacing
+		right = math.max(right, 0)
 		
 		background._relativeBounds.right = right
 		background._relativeBounds.left = 0
@@ -488,12 +482,24 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	
 	local bX, bY, bWidth, bHeight = GetButtonPosition(pos + 1)
 	
-	array[i].button = Button:New{
-		parent = stack_main;
+	local hPad = ((not options.vertical.value) and options.buttonSpacing.value) or 0
+	local vPad = (options.vertical.value and options.buttonSpacing.value) or 0
+	
+	array[i].holder = Control:New{
+		parent = stack_main,
 		x = bX,
 		y = bY,
 		width = bWidth,
 		height = bHeight,
+		padding = {hPad, vPad, hPad, vPad},
+	}
+	
+	array[i].button = Button:New{
+		parent = array[i].holder,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		caption = '',
 		OnClick = {	function (self, x, y, mouse)
 				local _, _, meta, shift = Spring.GetModKeyState()
@@ -580,15 +586,15 @@ end
 --shifts facs when one of their kind is removed
 local function ShiftFacRow()
 	for i=1,#facs do
-		if facs[i].button then
-			facs[i].button:Dispose()
-			facs[i].button = nil
+		if facs[i].holder then
+			facs[i].holder:Dispose()
+			facs[i].holder = nil
 		end
 	end
 	for i=1,#facs do
 		GenerateButton(facs, i, facs[i].facID, facs[i].facDefID)
 		UpdateFac(facs[i].facID, i)
-	end	
+	end
 end
 
 local function AddFac(unitID, unitDefID)
@@ -603,9 +609,9 @@ local function RemoveFac(unitID)
 	local index = facsByID[unitID]
 	-- move everything to the left
 	local shift = false
-	if facs[index].button then
-		facs[index].button:Dispose()
-		facs[index].button = nil
+	if facs[index].holder then
+		facs[index].holder:Dispose()
+		facs[index].holder = nil
 	end		
 	table.remove(facs, index)
 	for facID,i in pairs(facsByID) do
@@ -618,56 +624,14 @@ local function RemoveFac(unitID)
 	if shift then
 		ShiftFacRow()
 	end
+	UpdateBackgroundSize()
 end
-
---[[	--used by old "one comm button" system
-local function UpdateCommButton()
-	local commDefID = currentComm and GetUnitDefID(currentComm) or commDefID
-	commButton.image = Image:New {
-		parent = commButton.button,
-		width="90%";
-		height="90%";
-		x="5%";
-		y="5%";
-		file = '#'..commDefID,
-		keepAspect = false,
-		color = (not currentComm and imageColorDisabled) or nil,
-	}
-	if currentComm then
-		commButton.image:AddChild(commButton.healthbar)
-	else
-		commButton.image:RemoveChild(commButton.healthbar)
-	end
-	commButton.button.backgroundColor = (currentComm and buttonColor) or buttonColorDisabled
-	commButton.button:Invalidate()
-end
-]]--
 
 local function UpdateComm(unitID, index)
 	if not comms[index].button then
 		return
 	end
-	--[[
-	if not currentComm then
-		if gamestart then
-			commButton.button.tooltip = "Your commander is dead...sorry..."
-		else
-			commButton.button.tooltip = "Waiting for commander spawn..."
-		end
-		return
-	end
-	
-	local health, maxHealth = GetUnitHealth(currentComm)
-	commButton.healthbar:SetValue(health/maxHealth)
-	commButton.healthbar.color = GetHealthColor(health/maxHealth)
-	commButton.healthbar:Invalidate()
-	
-	local commDefID = GetUnitDefID(currentComm)
-	commButton.button.tooltip = "Commander: "..UnitDefs[commDefID].humanName ..
-								"\n\255\0\255\255Health:\008 "..GetHealthColor(health/maxHealth, "char")..math.floor(health).."/"..maxHealth.."\008"..
-								"\n\255\0\255\0Left-click: Select and go to"..
-								"\nRight-click: Cycle commander (if available)\008"
-	]]--
+
 	local health, maxHealth = GetUnitHealth(unitID)
 	if not health then
 		return
@@ -683,14 +647,6 @@ local function UpdateComm(unitID, index)
 							"\n" .. WG.Translate("interface", "shift") .. ": " .. WG.Translate("interface", "append_to_current_selection") .. "\008"
 end
 
---[[
-local function UpdateCommFull()	-- regenerates image etc.
-	commButton.image:Dispose()
-	UpdateCommButton()
-	UpdateComm()
-end
-]]--
-
 local function AddComm(unitID, unitDefID)
 	local i = #comms + 1
 	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
@@ -703,9 +659,9 @@ end
 --shifts comms when one of their kind is removed
 local function ShiftCommRow()
 	for i=1,#comms do
-		if comms[i].button then
-			comms[i].button:Dispose()
-			comms[i].button = nil
+		if comms[i].holder then
+			comms[i].holder:Dispose()
+			comms[i].holder = nil
 		end
 	end
 	for i=1,#comms do
@@ -717,9 +673,9 @@ end
 local function RemoveComm(unitID)
 	local index = commsByID[unitID]
 	-- move everything to the left
-	if comms[index].button then
-		comms[index].button:Dispose()
-		comms[index].button = nil
+	if comms[index].holder then
+		comms[index].holder:Dispose()
+		comms[index].holder = nil
 	end		
 	table.remove(comms, index)
 	for commID,i in pairs(commsByID) do
@@ -730,6 +686,8 @@ local function RemoveComm(unitID)
 	commsByID[unitID] = nil
 	ShiftCommRow()
 	ShiftFacRow()
+	
+	UpdateBackgroundSize()
 end
 
 local function UpdateConsButton()
@@ -1175,6 +1133,7 @@ function widget:Initialize()
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
+	Control = Chili.Control
 	Label = Chili.Label
 	Window = Chili.Window
 	Panel = Chili.Panel
@@ -1200,7 +1159,8 @@ function widget:Initialize()
 		height = '100%',
 		backgroundColor = {0, 0, 0, 0},
 		OnResize = {
-			UpdateBackgroundSize
+			UpdateBackgroundSize,
+			UpdateButtonPositions
 		}
 	}
 	background = Panel:New{
@@ -1212,15 +1172,26 @@ function widget:Initialize()
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
 	}
 	
+	local windowY = bottom - BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1) + 2*vPad
+	
+	local windowWidth, windowHeight
+	if options.vertical.value then
+		windowWidth  = BUTTON_WIDTH + 2*hPad
+		windowHeight = (BUTTON_HEIGHT + 2*options.buttonSpacing.value) * options.maxbuttons.value + 2*vPad
+	else
+		windowWidth  = (BUTTON_WIDTH + 2*options.buttonSpacing.value) * options.maxbuttons.value + 2*hPad
+		windowHeight = BUTTON_HEIGHT + 2*vPad
+	end
+	
 	window_selector = Window:New{
-		padding = {0,0,0,0},
+		padding = {-1,0,0,0},
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = 0, 
-		bottom = bottom,
-		width  = BUTTON_WIDTH * ((options.vertical.value and 1) or options.maxbuttons.value) + 2*hPad,
-		height = BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1) + 2*vPad,
+		x = windowPositionX or 0, 
+		y = windowPositionY or windowY,
+		width  = windowWidth,
+		height = windowHeight,
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
@@ -1255,13 +1226,25 @@ function widget:Initialize()
 	
 	local conX, conY, conWidth, conHeight = GetButtonPosition(1)
 	
-	conButton.button = Button:New{
-		parent = stack_main;
-		caption = '',
+	local hPadCon = ((not options.vertical.value) and options.buttonSpacing.value) or 0
+	local vPadCon = (options.vertical.value and options.buttonSpacing.value) or 0
+	
+	conButton.holder = Control:New{
+		parent = stack_main,
 		x = conX,
 		y = conY,
 		width = conWidth,
 		height = conHeight,
+		padding = {hPadCon, vPadCon, hPadCon, vPadCon},
+	}
+	
+	conButton.button = Button:New{
+		parent = conButton.holder;
+		caption = '',
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		OnClick = {	function (self, x, y, mouse)
 				local meta = select(3, Spring.GetModKeyState())
 				if meta then
