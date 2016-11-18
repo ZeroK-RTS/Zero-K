@@ -65,6 +65,8 @@ local statePanel = {}
 local tabPanel
 local selectionIndex = 0
 local contentHolder
+
+local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Widget Options
@@ -72,7 +74,7 @@ local contentHolder
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
 	'background_opacity', 'keyboardType', 'selectionClosesTab', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units',
+	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'leftPadding', 'rightPadding'
 }
 
 options = {
@@ -143,6 +145,26 @@ options = {
 		name = "Units Tab",
 		desc = "Switches to units tab.",
 		type = 'button',
+	},
+	leftPadding = {
+		name = 'Left Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 500, step=1,
+		OnChange = function() 
+			ClearData(true)
+		end,	
+	},
+	rightPadding = {
+		name = 'Right Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 500, step=1,
+		OnChange = function() 
+			ClearData(true)
+		end,	
 	},
 }
 
@@ -1219,9 +1241,6 @@ local function InitializeControls()
 
 	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
 	
-	local leftPadding = 0
-	local rightPadding = 0
-	
 	local mainWindow = Window:New{
 		name      = 'integralwindow',
 		x         = 0, 
@@ -1240,16 +1259,16 @@ local function InitializeControls()
 		parent = screen0,
 	}
 		
-	local tabHolder = Control:New{
-		x = leftPadding,
+	buildTabHolder = Control:New{
+		x = options.leftPadding.value,
 		y = "0%",
-		right = rightPadding,
+		right = options.rightPadding.value,
 		height = "15%",
 		padding = {2, 2, 2, 0},
 		parent = mainWindow,
 	}
 	
-	tabPanel = GetTabPanel(tabHolder)
+	tabPanel = GetTabPanel(buildTabHolder)
 	
 	contentHolder = Panel:New{
 		--classname = "bottomMiddlePanel",
@@ -1265,9 +1284,9 @@ local function InitializeControls()
 	}
 	
 	buttonsHolder = Control:New{
-		x = leftPadding,
+		x = options.leftPadding.value,
 		y = 0,
-		right = rightPadding,
+		right = options.rightPadding.value,
 		bottom = 0,
 		padding = {0, 0, 0, 0},
 		parent = contentHolder,
@@ -1368,11 +1387,6 @@ function options.keyboardType.OnChange(self)
 	end
 end
 
-function options.background_opacity.OnChange(self)
-	contentHolder.backgroundColor[4] = self.value
-	contentHolder:Invalidate()
-end
-
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
 	contentHolder:SetVisibility(not (self.value and isSpec))
@@ -1440,6 +1454,19 @@ options.tab_defence.OnChange = HotkeyTabDefence
 options.tab_special.OnChange = HotkeyTabSpecial
 options.tab_factory.OnChange = HotkeyTabFactory
 options.tab_units.OnChange   = HotkeyTabUnits
+
+local function PaddingUpdate()
+	buttonsHolder._relativeBounds.left = options.leftPadding.value
+	buttonsHolder._relativeBounds.right = options.rightPadding.value
+	buttonsHolder:UpdateClientArea()
+
+	buildTabHolder._relativeBounds.left = options.leftPadding.value
+	buildTabHolder._relativeBounds.right = options.rightPadding.value
+	buildTabHolder:UpdateClientArea()
+end
+
+options.leftPadding.OnChange  = PaddingUpdate
+options.rightPadding.OnChange = PaddingUpdate
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

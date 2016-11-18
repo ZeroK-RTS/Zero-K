@@ -1447,7 +1447,7 @@ function widget:Initialize()
 		name = "backlogButton",
 		x = ((not options.backlogArrowOnRight.value) and 0) or nil,
 		right = (options.backlogArrowOnRight.value and 0) or nil,
-		bottom = 1,
+		bottom = 4,
 		width = inputsize - 3,
 		height = inputsize - 3,
 		padding = { 1,1,1,1 },
