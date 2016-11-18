@@ -162,6 +162,7 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
 	'toggleBacklog',
@@ -529,9 +530,9 @@ options = {
 					window_chat:RemoveChild(inputspace)
 				end
 				inputspace = WG.Chili.ScrollPanel:New{
-					x = 0,
+					x = (options.backlogArrowOnRight.value and 0) or inputsize,
+					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
-					right = inputsize,
 					height = inputsize,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
@@ -559,6 +560,22 @@ options = {
 				end
 			end
 			window_chat:Invalidate()
+		end,
+	},
+	backlogArrowOnRight = {
+		name = "Backlong Arrow On Right",
+		desc = "Puts the backlong arrow on the right. It appear on the left if disabled..",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function(self)
+			if window_chat and window_chat:GetChildByName("backlogButton") then
+				backlogButton._relativeBounds.left = ((not self.value) and 0) or nil
+				backlogButton._relativeBounds.right = (self.value and 0) or nil
+				backlogButton:UpdateClientArea()
+				
+				window_chat:Invalidate()
+			end
 		end,
 	},
 	changeFont = {
@@ -1313,10 +1330,21 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		local sub = 2 / options.autohide_text_time.value
-		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_chat.x / screen0.width + 0.003, 
-			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
-			window_chat.width / screen0.width)})
+		
+		local inputWidthAdd = 0
+		if not options.backlogArrowOnRight.value then
+			inputWidthAdd = inputsize
+		end
+		
+		Spring.SendCommands(
+			{
+				string.format("inputtextgeo %f %f 0.02 %f", 
+					(window_chat.x + inputWidthAdd)/ screen0.width + 0.003, 
+					1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
+					window_chat.width / screen0.width
+				)
+			}
+		)
 	
 		for k,control in pairs(fadeTracker) do
 			
@@ -1400,9 +1428,9 @@ function widget:Initialize()
 	stack_backchat = MakeMessageStack(1)
 	
 	inputspace = WG.Chili.ScrollPanel:New{
-		x = 0,
+		x = (options.backlogArrowOnRight.value and 0) or inputsize,
+		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
-		right = inputsize,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
@@ -1416,8 +1444,10 @@ function widget:Initialize()
 		file = 'LuaUI/Images/arrowhead.png',
 	}
 	backlogButton = WG.Chili.Button:New{
-		right=0,
-		bottom=1,
+		name = "backlogButton",
+		x = ((not options.backlogArrowOnRight.value) and 0) or nil,
+		right = (options.backlogArrowOnRight.value and 0) or nil,
+		bottom = 1,
 		width = inputsize - 3,
 		height = inputsize - 3,
 		padding = { 1,1,1,1 },
