@@ -966,7 +966,7 @@ function widget:CommandsChanged()
 			table.insert(customCommands, {
 				id      = CMD_GBCANCEL,
 				type    = CMDTYPE.ICON_AREA,
-				tooltip = 'Area select for removing Global Build Command tasks.',
+				tooltip = 'Cancel Global Build tasks.',
 				name    = 'Global Build Cancel',
 				cursor  = 'Repair',
 				action  = 'globalbuildcancel',
