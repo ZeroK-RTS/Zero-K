@@ -293,6 +293,7 @@ local myQueue = {}  --  list of commands for Central Build group, of the form my
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
 local allBuilders = {} -- list of all mobile builders, which saves whether they are GBC-enabled or not.
+local newBuilders = {} -- a list of newly finished builders that have been added to myUnits. These units are assigned immediately on UnitIdle and then removed from the list.
 local activeJobs = {} -- list of jobs that have been started, using the UnitID of the building so that we can check completeness via UnitFinished
 local idleCheck = false -- flag if any units went idle
 local areaCmdList = {} -- a list of area commands, for persistently capturing individual reclaim/repair/resurrect jobs from LOS-limited areas. Same form as myQueue.
@@ -784,6 +785,10 @@ end
 
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if not unitTeam == spGetMyTeamID() then
+		return -- if it's not our unit then ignore it!
+	end
+	
 	if busyUnits[builderID] then -- if the builder is one of our busy workers
 		local key = busyUnits[builderID]
 		local myCmd = myQueue[key]
@@ -811,6 +816,28 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if not nanoframe then
 			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
 			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+			return -- don't apply constructor separator to commanders
+		end
+		
+		-- constructor separator
+		if options.separateConstructors.value then -- if constructor separator is enabled
+			local facDef = UnitDefs[spGetUnitDefID(builderID)]
+			local facScale -- how far our unit will be told to move
+			if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+				facScale = 350
+			elseif facDef.name == 'factoryship' then -- boatfac, needs a huge clearance
+				facScale = 250
+			elseif facDef.name == 'factoryhover' then -- hoverfac, needs extra clearance
+				facScale = 140
+			else -- other facs (and athenas, which are built by regular constructors)
+				facScale = 120
+			end
+		
+			local dx,_,dz = spGetUnitDirection(unitID)
+			local x,y,z = spGetUnitPosition(unitID)
+			dx = dx*facScale
+			dz = dz*facScale
+			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
 		end
 	end
 end
@@ -835,10 +862,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
 		end
 		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
-		
-		if not cmd or not cmd.id then -- if the worker is idle, assign it immediately.
-			GiveWorkToUnit(unitID)
-		end
+		newBuilders[unitID] = true
 	end
 end
 
@@ -894,7 +918,7 @@ end
 
 -- This function implements the constructor seperator, borrowed from the old "unit no stuck in factory" widget by msafwan
 -- Note: Zero-K specific factDefIDs, customize if porting to another game!
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
+--[[function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
 	if unitTeam == spGetMyTeamID() and UnitDefs[unitDefID].isBuilder and options.separateConstructors.value then -- if it's our unit, and is a builder, and constructor separator is enabled
 		local facScale -- how far our unit will be told to move
 		if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
@@ -913,7 +937,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 		dz = dz*facScale
 		spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
 	end
-end
+end]]--
 
 --	If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
 function widget:UnitIdle(unitID, unitDefID, teamID)
@@ -1773,14 +1797,20 @@ function CheckIdlers()
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
 			else -- otherwise if the unit is really idle
 				myUnits[unitID].cmdtype = commandType.idle -- then mark it as idle
-				reassignedUnits[unitID] = nil
-				if busyUnits[unitID] then -- if the worker is also still on our busy list
-					local key = busyUnits[unitID]
-					if areaCmdList[key] then -- if it was an area command
-						areaCmdList[key] = nil -- remove it from the area update list
-						StopAnyWorker(key)
-						myQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
-						busyUnits[unitID] = nil
+				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
+					newBuilders[unitID] = nil
+					GiveWorkToUnit(unitID)
+					reassignedUnits[unitID] = true
+				else
+					reassignedUnits[unitID] = nil
+					if busyUnits[unitID] then -- if the worker is also still on our busy list
+						local key = busyUnits[unitID]
+						if areaCmdList[key] then -- if it was an area command
+							areaCmdList[key] = nil -- remove it from the area update list
+							StopAnyWorker(key)
+							myQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
+							busyUnits[unitID] = nil
+						end
 					end
 				end
 			end

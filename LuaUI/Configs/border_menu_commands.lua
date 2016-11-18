@@ -232,7 +232,7 @@ local overrides = {
 		caption='', tooltip = tooltips.priority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		caption='', tooltip = tooltips.factoryGuard,},
-	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
+	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
 		text='', tooltip = tooltips.globalBuild,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, caption='', tooltip = tooltips.moveState},
 	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, caption='', tooltip = tooltips.fireState},
