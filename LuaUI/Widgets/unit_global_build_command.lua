@@ -277,7 +277,8 @@ local res_color = {0.4, 0.8, 1.0, 1.0}
 
 local imgpath = "LuaUI/Images/commands/Bold/"
 local no_icon = {name = 'gbcicon'}
-local idle_icon = {name = 'gbcicon', texture=imgpath .. "buildsmall.png", color=statusColor}
+local noidle_icon = {name = 'gbcidle'}
+local idle_icon = {name = 'gbcidle', texture=imgpath .. "buildsmall.png"}
 local queue_icon = {name = 'gbcicon', texture=imgpath .. "build_light.png", color=queueColor}
 local drec_icon = {name = 'gbcicon', texture=imgpath .. "action.png", color=statusColor}
 local move_icon = {name = 'gbcicon', texture=imgpath .. "move.png", color=statusColor}
@@ -350,6 +351,7 @@ function widget:Initialize()
 		end
 	
 	-- ZK compatability stuff
+	WG.icons.SetPulse('gbcidle', true)
 	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
@@ -452,24 +454,31 @@ function widget:Update(dt)
 	-- update icons for builders
 	if options.drawIcons.value then
 		WG.icons.SetDisplay('gbcicon', true)
+		WG.icons.SetDisplay('gbcidle', true)
 		for unitID, data in pairs(allBuilders) do
 			if data.include and myUnits[unitID] then
 				local myCmd = myUnits[unitID]
 				if myCmd.cmdtype == commandType.idle then
 					WG.icons.SetUnitIcon(unitID, idle_icon)
+					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle icons
 				elseif myCmd.cmdtype == commandType.buildQueue then
 					WG.icons.SetUnitIcon(unitID, queue_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
 				elseif myCmd.cmdtype == commandType.mov then
 					WG.icons.SetUnitIcon(unitID, move_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
 				else
 					WG.icons.SetUnitIcon(unitID, drec_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
 				end
 			else
 				WG.icons.SetUnitIcon(unitID, no_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
 			end
 		end
 	else
 		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
 	end
 	
 	buildList = {}
