@@ -2065,9 +2065,8 @@ local function DisposeExitConfirmWindow()
 end
 
 local function LeaveExitConfirmWindow()
-	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
-	ShowHideCrudeMenu(true)
+	KillSubWindow()
 end
 
 local function MakeExitConfirmWindow(text, action)
@@ -2130,7 +2129,7 @@ local function MakeExitConfirmWindow(text, action)
 end
 
 local function MakeMenuBar()
-	local btn_padding = {4,3,2,2}
+	local btn_padding = {4,3,3,2}
 	local btn_margin = {0,0,0,0}
 	local exit_menu_width = 210
 	local exit_menu_height = 280
@@ -2139,10 +2138,14 @@ local function MakeMenuBar()
 	local exit_menu_cancel_width = exit_menu_btn_width/2
 	local exit_menu_cancel_height = 2*exit_menu_btn_height/3
 
-	local crude_width = 400
+	local crude_width = 380
 	local crude_height = B_HEIGHT+10
 	
-
+	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
+	if luaMenu then
+		Spring.SendLuaMenuMsg("disableLobbyButton")
+	end
+	
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
 	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
 	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
@@ -2164,7 +2167,7 @@ local function MakeMenuBar()
 		backgroundColor = color.main_bg,
 		color = color.main_bg,
 		margin = {0,0,0,0},
-		padding = {0,0,0,0},
+		padding = {0,0,3,0},
 		parent = screen0,
 		
 		children = {
@@ -2181,33 +2184,86 @@ local function MakeMenuBar()
 				autoArrangeH = false,
 						
 				children = {
-					--GAME LOGO GOES HERE
-					Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
+					----GAME LOGO GOES HERE
+					--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
+					--
+					--Button:New{
+					--	name= 'tweakGuiButton',
+					--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+					--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+					--	children = {
+					--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+					--	},
+					--},
+					--GAME CLOCK AND REAL-LIFE CLOCK
+					Grid:New{
+						orientation = 'horizontal',
+						columns = 1,
+						rows = 2,
+						width = 80,
+						height = '100%',
+						--height = 40,
+						resizeItems = true,
+						autoArrangeV = true,
+						autoArrangeH = true,
+						padding = {0,0,0,0},
+						itemPadding = {0,0,0,0},
+						itemMargin = {0,0,0,0},
+						
+						children = {
+							StackPanel:New{
+								orientation = 'horizontal',
+								width = 70,
+								height = '100%',
+								resizeItems = false,
+								autoArrangeV = false,
+								autoArrangeH = false,
+								padding = {0,0,0,0},
+								itemMargin = {2,0,0,0},
+								children = {
+									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+									lbl_gtime,
+								},
+							},
+							StackPanel:New{
+								orientation = 'horizontal',
+								width = 80,
+								height = '100%',
+								resizeItems = false,
+								autoArrangeV = false,
+								autoArrangeH = false,
+								padding = {0,0,0,0},
+								itemMargin = {2,0,0,0},
+								children = {
+									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+									lbl_clock,
+								},
+							},
+						},
+					},
 					
-					Button:New{
-						name= 'tweakGuiButton',
-						caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
-						padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
-						children = {
-							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
-						},
-					},
-					--MAIN MENU BUTTON
-					Button:New{
-						name= 'subMenuButton',
-						OnClick = { function() ActionSubmenu(nil,'') end, },
-						textColor=color.game_fg,
-						height=B_HEIGHT+12,
-						width=B_WIDTH_TOMAINMENU + 1,
-						caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
-						padding = btn_padding,
-						margin = btn_margin,
-						tooltip = '',
-						children = {
-							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
-							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
-						},
-					},
+					--FPS & FLAG
+					img_flag,
+					--Grid:New{
+					--	orientation = 'horizontal',
+					--	columns = 1,
+					--	rows = 2,
+					--	width = 60,
+					--	height = '100%',
+					--	--height = 40,
+					--	resizeItems = true,
+					--	autoArrangeV = true,
+					--	autoArrangeH = true,
+					--	padding = {0,0,0,0},
+					--	itemPadding = {0,0,0,0},
+					--	itemMargin = {0,0,0,0},
+					--	
+					--	children = {
+					--		lbl_fps,
+					--		img_flag,
+					--	},
+					--},
+					
 					--VOLUME SLIDERS
 					Grid:New{
 						height = '100%',
@@ -2219,7 +2275,6 @@ local function MakeMenuBar()
 						padding = {0,0,0,0},
 						itemPadding = {1,1,1,1},
 						itemMargin = {1,1,1,1},
-						
 						
 						children = {
 							--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
@@ -2274,73 +2329,37 @@ local function MakeMenuBar()
 					
 					},
 
-					--FPS & FLAG
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 1,
-						rows = 2,
-						width = 60,
-						height = '100%',
-						--height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
+					--MAIN MENU BUTTON
+					Button:New{
+						name= 'subMenuButton',
+						OnClick = { function() ActionSubmenu(nil,'') end, },
+						textColor=color.game_fg,
+						height=B_HEIGHT+12,
+						width=B_WIDTH_TOMAINMENU + 1,
+						caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
+						padding = btn_padding,
+						margin = btn_margin,
+						tooltip = '',
 						children = {
-							lbl_fps,
-							img_flag,
+							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
 						},
 					},
-					--GAME CLOCK AND REAL-LIFE CLOCK
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 1,
-						rows = 2,
-						width = 80,
-						height = '100%',
-						--height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
+					luaMenu and Button:New{
+						name = 'lobbyButton',
+						OnClick = { function() ViewLobby() end, },
+						textColor=color.game_fg,
+						height=B_HEIGHT+12,
+						width=B_WIDTH_TOMAINMENU + 1,
+						caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
+						padding = btn_padding,
+						margin = btn_margin,
+						tooltip = '',
 						children = {
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 70,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
-									lbl_gtime,
-								},
-							},
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 80,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
-									lbl_clock,
-								},
-							},
-							
+							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
 						},
-					},				
+					} or nil,				
 				}
 			}
 		}
@@ -2631,7 +2650,9 @@ function widget:Initialize()
 	
 	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
+	AddAction("show_toggle_crudemenu", ToggleActionMenu, nil, "t")
 	AddAction("crudesubmenu", ActionSubmenu, nil, "t")
+	AddAction("viewlobby", ViewLobby, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
 	
 	MakeMenuBar()
@@ -2867,7 +2888,17 @@ function ActionSubmenu(_, submenu)
 	end
 end
 
+function ViewLobby()
+	if Spring.SendLuaMenuMsg then
+		Spring.SendLuaMenuMsg("showLobby")
+	end
+end
+
 function ActionMenu()
+	ActionSubmenu()
+end
+
+function ToggleActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
 	ShowHideCrudeMenu()

@@ -26,6 +26,10 @@ local function Selections_SetOptions(group, showInfo, square, iconSize, showComm
 	WG.SetWidgetOption(widgetName, path, "alwaysShowSelectionWin",alwaysShow)
 end
 
+local function ResetOptionsFromNew()
+	local widgetName, path = "Chili Selections & CursorTip","Settings/HUD Panels/Selected Units Window"
+
+end
 ----------------------------------------------------
 ----------------------------------------------------
 -- Useful Functions
@@ -138,7 +142,7 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -148,10 +152,10 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarWidth = math.min(screenWidth - 700, 660)
+	local resourceBarHeight = 100
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -167,6 +171,13 @@ local function SetupDefaultPreset()
 		consoleWidth,
 		consoleHeight
 	)
+end
+
+----------------------------------------------------
+-- Classic Preset
+----------------------------------------------------
+local function SetupNewPreset()
+	SetupDefaultPreset()
 end
 
 ----------------------------------------------------
@@ -265,7 +276,7 @@ local function SetupCraftyPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -278,7 +289,7 @@ local function SetupCraftyPreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -394,7 +405,7 @@ local function SetupEnsemblePreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -407,7 +418,7 @@ local function SetupEnsemblePreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -459,7 +470,7 @@ local function SetupWestwoodPreset()
 	local resourceBarWidth = screenWidth*5/22 + 20
 	local resourceBarHeight = 65
 	local resourceBarX = screenWidth - resourceBarWidth
-	WG.SetWindowPosAndSize("EconomyPanel",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -532,7 +543,7 @@ local function SetupWestwoodPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -556,7 +567,7 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'maintainDefaultUI', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
+options_order = {'setToDefault', 'maintainDefaultUI', 'presetlabel', 'interfacePresetDefault', 'interfacePresetNew', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
 options = {
 	setToDefault = {
 		name  = "Set To Default Once",
@@ -583,6 +594,12 @@ options = {
 		desc = "The default interface.",
 		type = 'button',
 		OnChange = SetupDefaultPreset,
+	},
+	interfacePresetNew = {
+		name = "New",
+		desc = "The WIP new interface.",
+		type = 'button',
+		OnChange = SetupNewPreset,
 	},
 	interfacePresetCrafty = {
 		name = "Crafty",
@@ -620,6 +637,14 @@ function widget:Update(dt)
 			SetupDefaultPreset()
 			options.setToDefault.value = false
 		end
+		
+		if options.maintainDefaultUI.value then
+			local screenWidth, screenHeight = Spring.GetWindowGeometry()
+			oldWidth = screenWidth
+			oldHeight = screenHeight
+			SetupDefaultPreset()
+		end
+		
 		firstUpdate = false
 	end
 	
@@ -634,6 +659,14 @@ function widget:Update(dt)
 			end
 			timeSinceUpdate = 0
 		end
+	end
+end
+
+function widget:ViewResize(screenWidth, screenHeight)
+	if options.maintainDefaultUI.value then
+		oldWidth = screenWidth
+		oldHeight = screenHeight
+		SetupDefaultPreset()
 	end
 end
 

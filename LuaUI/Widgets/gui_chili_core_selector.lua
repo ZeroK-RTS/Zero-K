@@ -74,7 +74,7 @@ local screen0
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-local window_selector, stack_main
+local window_selector, stack_main, background
 local conButton = {}	-- {button, image, healthbar/label}
 local commButton = {}	-- unused
 
@@ -120,7 +120,7 @@ function widget:PlayerChanged()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm'}
+options_order = { 'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minSize', 'fancySkinning'}
 options = {
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -155,6 +155,11 @@ options = {
 			window_selector:Dispose()
 			widget:Initialize()
 		end,	
+	},
+	background_opacity = {
+		name = "Opacity",
+		type = "number",
+		value = 0, min = 0, max = 1, step = 0.01,
 	},
 	monitoridlecomms = {
 		name = 'Track idle comms',
@@ -212,6 +217,76 @@ options = {
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
+	horPadding = {
+		name = 'Horizontal Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	vertPadding = {
+		name = 'Vertical Padding',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	buttonSpacing = {
+		name = 'Button Spacing',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step = 1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	minSize = {  
+		name = 'Minimum Size',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 800, step=1,
+		OnChange = function() 
+			ClearData(true)
+			window_selector:Dispose()
+			widget:Initialize()
+		end,	
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.bottomLeftPanel then
+				newClass = skin.bottomLeftPanel
+			end
+			
+			background.tiles = newClass.tiles
+			background.TileImageFG = newClass.TileImageFG
+			background.backgroundColor = newClass.backgroundColor
+			background.TileImageBK = newClass.TileImageBK
+			background:Invalidate()
+		end
+	}
 }
 
 function WG.CoreSelector_SetOptions(maxbuttons)
@@ -299,6 +374,35 @@ local function GetButtonPosition(index)
 	end
 end
 
+local function UpdateBackgroundSize()
+	if options.background_opacity.value == 0 or not background then
+		return
+	end
+	
+	local buttons = CountButtons(comms) + CountButtons(facs) + 1
+	
+	if options.vertical.value then
+		local top = stack_main.height*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.vertPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
+		top = math.max(math.min(top, stack_main.height - options.minSize.value), 0)
+		
+		background._relativeBounds.top = top
+		background._relativeBounds.bottom = 0
+		background:UpdateClientArea()
+	else
+		local right = stack_main.width*(options.maxbuttons.value - buttons)/options.maxbuttons.value - options.horPadding.value/2 - options.buttonSpacing.value*(buttons - 1)
+		right = math.max(math.min(right, stack_main.width - options.minSize.value), 0)
+		
+		background._relativeBounds.right = right
+		background._relativeBounds.left = 0
+		background:UpdateClientArea()
+	end
+end
+
+function options.background_opacity.OnChange(self)
+	background.backgroundColor[4] = self.value
+	background:Invalidate()
+	UpdateBackgroundSize()
+end
 
 -------------------------------------------------------------------------------
 -- core functions
@@ -372,7 +476,8 @@ end
 -- makes fac and comm buttons
 local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 	-- don't display surplus buttons
-	if CountButtons(comms) + (array == facs and CountButtons(facs) or 0) > options.maxbuttons.value - 1 then
+	local buttonCount = CountButtons(comms) + (array == facs and CountButtons(facs) or 0)
+	if buttonCount > options.maxbuttons.value - 1 then
 		return
 	end
 	
@@ -468,6 +573,8 @@ local function GenerateButton(array, i, unitID, unitDefID, hotkey)
 			color   = {0,0.8,0,1};
 		}	
 	end
+	
+	UpdateBackgroundSize()
 end
 
 --shifts facs when one of their kind is removed
@@ -1001,7 +1108,7 @@ end
 local timer = 0
 local warningColorPhase = false
 function widget:Update(dt)
-	if myTeamID~=Spring.GetMyTeamID() then
+	if myTeamID ~= Spring.GetMyTeamID() then
 		--Spring.Echo("<Core Selector>: Spectator mode. Widget removed.")
 		--widgetHandler:RemoveWidget()
 		--return false
@@ -1083,19 +1190,28 @@ function widget:Initialize()
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
 	
+	local hPad = options.horPadding.value
+	local vPad = options.vertPadding.value
+	
 	stack_main = Panel:New{
-		padding = {0,0,0,0},
-		--itemPadding = {0, 0, 0, 0},
+		padding = {hPad, vPad, hPad, vPad},
 		itemMargin = {0, 0, 0, 0},
-		columns = options.maxbuttons.value,
 		width= '100%',
 		height = '100%',
 		backgroundColor = {0, 0, 0, 0},
-		--resizeItems = false,
-		--orientation = 'horizontal',
-		--autoArrangeH = true,
-		--centerItems = false,
+		OnResize = {
+			UpdateBackgroundSize
+		}
 	}
+	background = Panel:New{
+		itemMargin = {0, 0, 0, 0},
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		backgroundColor = {1, 1, 1, options.background_opacity.value},
+	}
+	
 	window_selector = Window:New{
 		padding = {0,0,0,0},
 		itemMargin = {0, 0, 0, 0},
@@ -1103,8 +1219,8 @@ function widget:Initialize()
 		name = "selector_window",
 		x = 0, 
 		bottom = bottom,
-		width  = BUTTON_WIDTH * ((options.vertical.value and 1) or options.maxbuttons.value),
-		height = BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1),
+		width  = BUTTON_WIDTH * ((options.vertical.value and 1) or options.maxbuttons.value) + 2*hPad,
+		height = BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1) + 2*vPad,
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
@@ -1116,6 +1232,7 @@ function widget:Initialize()
 		color = {0,0,0,0},
 		children = {
 			stack_main,
+			background,
 		},
 		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
@@ -1125,6 +1242,10 @@ function widget:Initialize()
 			return true
 		end },
 	}
+	
+	if options.fancySkinning.value then
+		options.fancySkinning.OnChange(options.fancySkinning)
+	end
 
 	if WG.crude.GetHotkey("selectidlecon"):upper() and WG.crude.GetHotkey("selectidlecon_all"):upper() then
 		hotkeyCaption = "\255\0\255\0" .. WG.crude.GetHotkey("selectidlecon"):upper() .. "\n" .. WG.crude.GetHotkey("selectidlecon_all"):upper()
@@ -1198,7 +1319,7 @@ function widget:Initialize()
 	UpdateConsButton()
 
 	myTeamID = Spring.GetMyTeamID()
-
+	
 	local viewSizeX, viewSizeY = widgetHandler:GetViewSizes()
 	self:ViewResize(viewSizeX, viewSizeY)
 	
