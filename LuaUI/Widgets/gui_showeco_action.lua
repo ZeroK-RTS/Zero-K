@@ -325,10 +325,10 @@ local function makePylonListVolume(onlyActive, onlyDisabled)
 				local cmdQueue = Spring.GetCommandQueue(unitID, -1)
 				for i = 1, #cmdQueue do
 					local cmd = cmdQueue[i]
-					local pDef = pylonDefs[-cmd.id]
-					if pDef then
+					local radius = pylonDefs[-cmd.id]
+					if radius then
 						glColor(disabledColor)
-						drawGroundCircle(cmd.params[1], cmd.params[3], pDef.range)
+						drawGroundCircle(cmd.params[1], cmd.params[3], radius)
 					end
 				end
 			end
