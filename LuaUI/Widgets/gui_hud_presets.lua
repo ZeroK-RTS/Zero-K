@@ -26,12 +26,48 @@ local function Selections_SetOptions(group, showInfo, square, iconSize, showComm
 	WG.SetWidgetOption(widgetName, path, "alwaysShowSelectionWin",alwaysShow)
 end
 
+local function SetFancySkin()
+	local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
+	local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+	local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
+	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
+	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", true)
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", true)
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", true)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
+	
+	WG.crude.SetMenuSkinClass("panel_0021")
+end
+
+local function SetBoringSkin()
+	local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
+	local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+	local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
+	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
+	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", false)
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", false)
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", false)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
+	
+	WG.crude.SetMenuSkinClass("panel")
+end
+
 local function SetNewOptions()
 	local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
 	local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 	local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
 	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 
 	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0.8)
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0.75)
@@ -61,6 +97,14 @@ local function SetNewOptions()
 	
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", true)
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 7)
+	
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
+	
+	WG.SetWidgetOption(econName, econPath, "opacity", 1)
+	
+	WG.crude.SetMenuSkinClass("panel_0021")
+	
+	needToCallFunction = SetFancySkin
 end
 
 local function ResetOptionsFromNew()
@@ -69,6 +113,8 @@ local function ResetOptionsFromNew()
 	local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
 	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 
 	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0)
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0)
@@ -98,6 +144,14 @@ local function ResetOptionsFromNew()
 	
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", false)
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 0)
+	
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
+	
+	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
+	
+	WG.crude.SetMenuSkinClass("panel")
+	
+	needToCallFunction = SetBoringSkin
 end
 ----------------------------------------------------
 ----------------------------------------------------
@@ -124,6 +178,7 @@ local function SetupDefaultPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -268,6 +323,7 @@ local function SetupNewPreset()
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Global Commands")
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -275,6 +331,10 @@ local function SetupNewPreset()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Bottom of the UI
 	
 	-- Minimap
 	local minimapSize = screenWidth*2.1/11
@@ -324,7 +384,7 @@ local function SetupNewPreset()
 		integralHeight
 	)
 	
-	local thinMode = screenWidth < 16345
+	local thinMode = screenWidth < 1645
 	
 	-- Selections
 	local selectionsHeight = integralHeight*0.85
@@ -359,20 +419,17 @@ local function SetupNewPreset()
 		selectionsHeight
 	)
 	
-	-- Menu
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Top of the UI
+	
 	local menuWidth = 380
 	local menuHeight = 50
-	WG.SetWindowPosAndSize("epicmenubar",
-		screenWidth - menuWidth,
-		0,
-		menuWidth,
-		menuHeight
-	)
 	
 	-- Resource Bar
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
 	local resourceBarHeight = 100
-	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
+	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
@@ -380,12 +437,31 @@ local function SetupNewPreset()
 		resourceBarHeight
 	)
 	
+	-- Menu
+	if screenWidth - (resourceBarX + resourceBarWidth) > menuWidth then
+		menuWidth = screenWidth - (resourceBarX + resourceBarWidth)
+	end
+	WG.SetWindowPosAndSize("epicmenubar",
+		screenWidth - menuWidth,
+		0,
+		menuWidth,
+		menuHeight
+	)
+	
+	-- Global build buttons
+	WG.SetWindowPosAndSize("globalCommandsWindow",
+		0,
+		0,
+		resourceBarX,
+		menuHeight
+	)
+	
 	-- Console
-	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - minimapSize)
+	local consoleWidth = 380
 	local consoleHeight = screenHeight * 0.20
 	WG.SetWindowPosAndSize("ProConsole",
 		screenWidth - consoleHeight,
-		resourceBarHeight,
+		menuHeight,
 		consoleWidth,
 		consoleHeight
 	)
@@ -406,6 +482,7 @@ local function SetupCraftyPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -536,6 +613,7 @@ local function SetupEnsemblePreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -665,6 +743,7 @@ local function SetupWestwoodPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel Default")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -820,7 +899,7 @@ options = {
 	},
 	interfacePresetNew = {
 		name = "New",
-		desc = "The WIP new interface.",
+		desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",
 		type = 'button',
 		OnChange = SetupNewPreset,
 	},
@@ -854,6 +933,11 @@ local oldWidth = 0
 local oldHeight = 0
 
 function widget:Update(dt)
+	if needToCallFunction then
+		needToCallFunction()	
+		needToCallFunction = nil
+	end
+	
 	if firstUpdate then
 		if options.setToDefault.value then
 			-- This is where the defaults are set.
@@ -894,10 +978,14 @@ function widget:Update(dt)
 end
 
 function widget:ViewResize(screenWidth, screenHeight)
-	if options.maintainDefaultUI.value then
+	if options.maintainDefaultUI.value or options.maintainNewUI.value then
 		oldWidth = screenWidth
 		oldHeight = screenHeight
-		SetupDefaultPreset()
+		if options.maintainDefaultUI.value then
+			SetupDefaultPreset()
+		else
+			SetupNewPreset()
+		end
 	end
 end
 
