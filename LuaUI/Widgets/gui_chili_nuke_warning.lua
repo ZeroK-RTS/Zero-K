@@ -69,14 +69,14 @@ local function CreateWindow()
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local screenHorizCentre = screenWidth / 2
 	local windowWidth = 500
-	local resourcePanelHeight = 50
+	local resourcePanelHeight = 100
 
 	data.window = Chili.Window:New{
 		parent = screen0,
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		dockable = true,
-		name = "SpectatorPlayerPanel",
+		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
 		y = resourcePanelHeight,
