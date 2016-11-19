@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[a_shiptorpbt]],
+  unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
   description         = [[Torpedo-Boat (Raider)]],
   acceleration        = 0.048,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy     = 100,
   buildCostMetal      = 100,
   builder             = false,
-  buildPic            = [[DCLSHIP.png]],
+  buildPic            = [[shiptorpraider.png]],
   buildTime           = 100,
   canAttack           = true,
   canGuard            = true,
@@ -31,7 +31,7 @@ unitDef = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
-  iconType            = [[a_shiptorpbt]],
+  iconType            = [[shiptorpraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
@@ -43,8 +43,8 @@ unitDef = {
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
-  objectName          = [[SHIPRAIDTORP]],
-  script              = [[a_shiptorpbt.lua]],
+  objectName          = [[SHIPTORPRAIDER]],
+  script              = [[shiptorpraider.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
   side                = [[ARM]],
@@ -125,7 +125,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[shipraidtorp_dead.s3o]],
+      object           = [[shiptorpraider_dead.s3o]],
     },
 
 
@@ -140,4 +140,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shiptorpbt = unitDef })
+return lowerkeys({ shiptorpraider = unitDef })

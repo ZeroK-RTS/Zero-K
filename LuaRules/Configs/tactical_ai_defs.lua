@@ -596,16 +596,7 @@ local behaviourConfig = {
 		stoppingDistance = 15,
 		skirmOrderDis = 150,
 	},
-
-	["shipscout"] = { -- scout boat
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 30, 
-		stoppingDistance = 8
-	},
+	
 	["amphraider2"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -617,7 +608,7 @@ local behaviourConfig = {
 		velocityPrediction = 20
 	},
 	
-	["a_shipscout"] = { -- scout boat
+	["shipscout"] = { -- scout boat
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -627,7 +618,7 @@ local behaviourConfig = {
 		stoppingDistance = 8
 	},
 	
-	["a_shiptorpbt"] = {
+	["shiptorpraider"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -637,7 +628,7 @@ local behaviourConfig = {
 		stoppingDistance = 8
 	},
 	
-	["a_shipcorvette"] = {
+	["shipriot"] = {
 		skirms = {}, 
 		swarms = allGround, 
 		flees = {},
@@ -774,7 +765,7 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 		},
 	},
-	["a_shipdestroyer"] = {
+	["shipassault"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
@@ -827,15 +818,6 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 	},		
 	
-	["a_shipdestroyer"] = {
-		skirms = lowMedRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		maxSwarmLeeway = 0, 
-		skirmLeeway = -30, 
-		stoppingDistance = 5
-	},
-	
 	-- med range skirms
 	["armrock"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -876,17 +858,6 @@ local behaviourConfig = {
 		skirmLeeway = 30,
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
-	},
-	["shiptorp"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 0,
-		stoppingDistance = -40,
-		skirmOrderDis = 250,
-		velocityPrediction = 40,
 	},
 	["gunshipsupport"] = {
 		skirms = medRangeSkirmieeArray, 
@@ -951,7 +922,7 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 60,
 	},
-	["a_shipmissile"] = {
+	["shipskirm"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
 		flees = {},
@@ -1022,26 +993,6 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 40, 
 	},
-	--["subarty"] = {
-	--	skirms = artyRangeSkirmieeArray, 
-	--	swarms = {}, 
-	--	flees = {},
-	--	skirmRadar = true,
-	--	maxSwarmLeeway = 10, 
-	--	minSwarmLeeway = 130, 
-	--	skirmLeeway = 80, 
-	--	skirmOrderDis = 250,
-	--	velocityPrediction = 40,
-	--},
-	["shiparty"] = {
-		skirms = artyRangeSkirmieeArray, 
-		swarms = {}, 
-		flees = {},
-		skirmRadar = true,
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
-	},
 	["firewalker"] = {
 		skirms = allGround, 
 		swarms = {}, 
@@ -1074,7 +1025,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 120, 
 	},	
-	["a_shipcruiser"] = {
+	["shiparty"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},
@@ -1202,17 +1153,6 @@ local behaviourConfig = {
         skirmLeeway = 50,
 		skirmOrderDis = 200, 
 	},
-	["shipaa"] = {
-		skirms = skirmableAir, 
-		swarms = brawler, 
-		flees = armedLand,
-		minSwarmLeeway = 100,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 500,
-        skirmLeeway = 50,
-		skirmOrderDis = 200, 
-	},
 	["gunshipaa"] = {
 		skirms = skirmableAir, 
 		swarms = brawler, 
@@ -1224,7 +1164,7 @@ local behaviourConfig = {
         skirmLeeway = 50,
 		skirmOrderDis = 200, 
 	},
-	["a_shipaa"] = {
+	["shipaa"] = {
 		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},

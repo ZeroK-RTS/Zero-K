@@ -25,7 +25,7 @@ unitDef = {
     [[funnelweb]],
     [[armbanth]],
     [[armorco]],
-    [[a_shipbattle]],
+    [[shipheavyarty]],
   },
 
   buildPic                      = [[striderhub.png]],

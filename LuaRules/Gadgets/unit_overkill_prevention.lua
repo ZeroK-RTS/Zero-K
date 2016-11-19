@@ -69,18 +69,15 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["armsnipe"].id] = 1,
 	[UnitDefNames["amphraider3"].id] = 1,
 	[UnitDefNames["amphriot"].id] = 1,
-	[UnitDefNames["subarty"].id] = 1,
-	[UnitDefNames["subraider"].id] = 1,
 	[UnitDefNames["corcrash"].id] = 1,
 	[UnitDefNames["cormist"].id] = 1,
 	[UnitDefNames["tawf114"].id] = 1, --HT's banisher
 	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
 	[UnitDefNames["corshad"].id] = 1,
-	
-	[UnitDefNames["a_shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
-	[UnitDefNames["a_shiptorpbt"].id] = 1,
-	[UnitDefNames["a_shipmissile"].id] = 1,
-	[UnitDefNames["a_shipatksub"].id] = 1,
+	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
+	[UnitDefNames["shiptorpraider"].id] = 1,
+	[UnitDefNames["shipskirm"].id] = 1,
+	[UnitDefNames["shipsubraider"].id] = 1,
 	
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,
@@ -89,10 +86,9 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corthud"].id] = 1,
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["armrock"].id] = 1,
-	[UnitDefNames["reef"].id] = 1,
+	--[UnitDefNames["reef"].id] = 1,
 	[UnitDefNames["armorco"].id] = 1,
-	
-	[UnitDefNames["a_shipcruiser"].id] = 1,
+	[UnitDefNames["shiparty"].id] = 1,
 	
 	-- Needs LUS
 	--[UnitDefNames["correap"].id] = 1,

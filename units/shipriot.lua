@@ -1,7 +1,7 @@
 unitDef = {
-  unitname               = [[a_shipcorvette]],
+  unitname               = [[shipriot]],
   name                   = [[Corsair]],
-  description            = [[Corvette (Heavy Raider)]],
+  description            = [[Corvette (Raider/Riot)]],
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
@@ -9,7 +9,7 @@ unitDef = {
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
   builder                = false,
-  buildPic               = [[CORESUPP.png]],
+  buildPic               = [[shipriot.png]],
   buildTime              = 200,
   canAttack              = true,
   canGuard               = true,
@@ -23,7 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[This Corvette comes equipped with two shotguns which are effective against anything which gets close.]],
+    helptext       = [[This Corvette comes equipped with two shotguns which are effective against anything which gets close. It has no weapons effective against underwater targets.]],
 	turnatfullspeed = [[1]],
 	--extradrawrange = 420,
   },
@@ -32,7 +32,7 @@ unitDef = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[a_shipcorvette]],
+  iconType               = [[shipriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 200,
@@ -43,8 +43,8 @@ unitDef = {
   movementClass          = [[BOAT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
-  objectName             = [[vette.s3o]],
-  script				 = [[a_shipcorvette.lua]],
+  objectName             = [[shipriot.s3o]],
+  script				 = [[shipriot.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   side                   = [[ARM]],
@@ -136,7 +136,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[vette_dead.s3o]],
+      object           = [[shipriot_dead.s3o]],
     },
     
     HEAP  = {
@@ -150,4 +150,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shipcorvette = unitDef })
+return lowerkeys({ shipriot = unitDef })

@@ -85,6 +85,17 @@ function script.QueryWeapon2()
 	return firepoint
 end
 
+function script.BlockShot(num, targetID)	
+	-- This causes poor behaviour if there is nothing nearby which needs disarming, so OKP for Skeeter is default set to 'off' in \LuaRules\Gadgets\unit_overkill_prevention.lua
+	if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 40, 120) then --1 and a bit seconds - timeout, 3 seconds - disarmTimer
+		return true
+	end
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 45, 40) then
+		return true
+	end
+	return false
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then

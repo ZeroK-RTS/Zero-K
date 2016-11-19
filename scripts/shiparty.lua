@@ -245,10 +245,6 @@ function script.AimWeapon(num, heading, pitch)
 	
 	local states = Spring.GetUnitStates(unitID)
 	
-	if (states.active and num == 2) or (not states.active and num == 1 ) then
-		return false
-	end
-	
 	Signal( SIG_AIM)
 	SetSignalMask( SIG_AIM)
 	Turn( turret , y_axis, heading, math.rad(150.000000) )
@@ -263,21 +259,6 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.FireWeapon(num) 
-	--put the other weapon on cd equal to second weapon's cd
-	local toChange = 3 - num
-	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
-	if reloadSpeedMult <= 0 then
-		-- Safety for div0. In theory a unit with reloadSpeedMult = 0 cannot fire because it never reloads.
-		reloadSpeedMult = 1
-	end
-	local reloadTimeMult = 1/reloadSpeedMult
-	
-	if num == 1 then
-		Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime1*reloadTimeMult)
-	else
-		Spring.SetUnitWeaponState(unitID, toChange, "reloadFrame", Spring.GetGameFrame() + reloadTime2*reloadTimeMult)
-	end
-	
 	StartThread(Rock, gun_1_yaw, ROCK_FORCE, z_axis)
 	
 	gun_1 = 1 - gun_1
@@ -308,7 +289,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 125, false, false, true) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 125, false, false, true) then
 		return true
 	end
 	return false

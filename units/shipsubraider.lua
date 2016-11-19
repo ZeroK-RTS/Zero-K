@@ -1,15 +1,15 @@
 unitDef = {
-  unitname               = [[subraider]],
-  name                   = [[Snake]],
-  description            = [[Raider Submarine]],
+  unitname               = [[shipsubraider]],
+  name                   = [[Seawolf]],
+  description            = [[Attack Submarine (Stealth Raider)]],
   acceleration           = 0.06,
   activateWhenBuilt      = true,
   brakeRate              = 0.2,
-  buildCostEnergy        = 210,
-  buildCostMetal         = 210,
+  buildCostEnergy        = 200,
+  buildCostMetal         = 200,
   builder                = false,
-  buildPic               = [[CORSUB.png]],
-  buildTime              = 210,
+  buildPic               = [[shipsubraider.png]],
+  buildTime              = 200,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -23,13 +23,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Sous-Marin]],
-	description_de = [[Unterseeboot]],
-	description_pl = [[Lodz podwodna]],
-    helptext       = [[Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Hunters.]],
-    helptext_fr    = [[Le Snake est discret, cher et fragile, mais il peut couler trcs rapidement la plupart de ses ennemis. De plus il peut torpiller r de grande distance. Ne pouvant tirer derricre lui et tournant rapidement, son positionnement initial est la clef de l'éfficacité.]],
-	helptext_de    = [[Teuer, versteckt und gebrechlich ist dieses U-Boot. Es kann nicht nach hinten schießen und seine Ausrichtung dauert lange. Daher lieber gleich richtig positionieren. Achte auf alles mit Anti-U-Boot Ausrüstung, besonders 'Hunter' - Torpedofregatten.]],
-	helptext_pl    = [[Lodzie powolne, mimo ze sa drogie i delikatne, zadaja duze obrazenia i moga zostac wykryte tylko przez sonar. Wyrzutnie torped maja zamontowane tylko z przodu, zatem odpowienie ustawienie jest kluczem w bitwach, w ktorych uczestnicza. Torpedy to glowna kategoria broni, ktora moze atakowac lodzie podwodne, zatem nalezy ich unikac - szczegolnie fregat torpedowych.]],
+    helptext       = [[Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers.]],
 	modelradius    = [[13]],
 	aimposoffset   = [[0 -5 0]],
 	midposoffset   = [[0 -5 0]],
@@ -39,7 +33,7 @@ unitDef = {
   explodeAs              = [[SMALL_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[submarine]],
+  iconType               = [[shipsubraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
@@ -50,8 +44,8 @@ unitDef = {
   movementClass          = [[UBOAT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP HOVER]],
-  objectName             = [[sub.s3o]],
-  script                 = [[subraider.lua]],
+  objectName             = [[shipsubraider.s3o]],
+  script                 = [[shipsubraider.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   side                   = [[CORE]],
@@ -102,8 +96,8 @@ unitDef = {
       },
 
       damage                  = {
-        default = 350.1,
-        subs    = 350.1,
+        default = 250.1,
+        subs    = 250.1,
       },
 
       explosionGenerator      = [[custom:disruptor_missile_hit]],
@@ -119,7 +113,7 @@ unitDef = {
 	  numbounce               = 0,
       noSelfDamage            = true,
       range                   = 220,
-      reloadtime              = 5.5,
+      reloadtime              = 3,
       rgbcolor                = [[0.9 0.1 0.9]],
       soundHit                = [[explosion/wet/ex_underwater_pulse]],
       soundHitVolume          = 6,
@@ -183,7 +177,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[sub_dead.s3o]],
+      object           = [[shipsubraider_dead.s3o]],
     },
 
 
@@ -198,4 +192,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ subraider = unitDef })
+return lowerkeys({ shipsubraider = unitDef })

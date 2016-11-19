@@ -970,6 +970,8 @@ local sounds = {
 	},
 	
 	-- Sea
+	
+	-- New Ships
 	shipcon = {
 		build = "builder_start",
 		ok = {
@@ -991,7 +993,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shipraider = {
+	shiptorpraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1001,7 +1003,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shiptorp = {
+	shipriot = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1011,7 +1013,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	subraider = {
+	shipsubraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1019,6 +1021,16 @@ local sounds = {
 		select = {
 			[1] = "sub_select",
 			volume = 1.1,
+		},
+	},
+	shipassault = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	shiparty = {
@@ -1041,47 +1053,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	subarty = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "sub_select",
-			volume = 1.1,
-		},
-	},
-	cornukesub = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "sub_select",
-			volume = 1.1,
-		},
-	},
-	armcarry = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	reef = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	corbats = {
+	shipheavyarty = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1101,110 +1073,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	
-	-- New Ships
-	a_shipcon = {
-		build = "builder_start",
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipscout = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shiptorpbt = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipcorvette = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipatksub = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "sub_select",
-			volume = 1.1,
-		},
-	},
-	a_shipdestroyer = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipcruiser = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipmissile = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipbattle = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	a_shipaa = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	-- Transport boat apparently doesn't have one by design.
+	-- Transport boat doesn't have one by design.
 	
 	-- Economy
 	cormex = {

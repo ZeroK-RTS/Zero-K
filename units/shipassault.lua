@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[a_shipdestroyer]],
+  unitname               = [[shipassault]],
   name                   = [[Siren]],
   description            = [[Destroyer (Riot/Assault)]],
   acceleration           = 0.0768,
@@ -9,7 +9,7 @@ unitDef = {
   buildCostEnergy        = 600,
   buildCostMetal         = 600,
   builder                = false,
-  buildPic               = [[destroyer.png]],
+  buildPic               = [[shipassault.png]],
   buildTime              = 600,
   canAttack              = true,
   canGuard               = true,
@@ -35,7 +35,7 @@ unitDef = {
   floater                = true,
   footprintX             = 4,
   footprintZ             = 4,
-  iconType               = [[a_shipdestroyer]],
+  iconType               = [[shipassault]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
@@ -46,9 +46,9 @@ unitDef = {
   movementClass          = [[BOAT4]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
-  objectName             = [[a_shipdestroyer.s3o]],
+  objectName             = [[shipassault.s3o]],
   scale                  = [[0.5]],
-  script				 = [[a_shipdestroyer.lua]],
+  script				 = [[shipassault.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -112,7 +112,7 @@ unitDef = {
 		},
 		
 		cegTag					= [[sonictrail]],
-		explosionGenerator		= [[custom:sonic_2]],
+		explosionGenerator		= [[custom:sonic_80]],
 		edgeEffectiveness       = 0.5,
 		fireStarter             = 150,
 		impulseBoost            = 300,
@@ -185,7 +185,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[a_shipdestroyer_dead.s3o]],
+      object           = [[shipassault_dead.s3o]],
     },
 
 
@@ -200,4 +200,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ a_shipdestroyer = unitDef })
+return lowerkeys({ shipassault = unitDef })

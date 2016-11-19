@@ -1,14 +1,15 @@
 unitDef = {
-  unitname               = [[corbats]],
-  name                   = [[Warlord]],
-  description            = [[Heavy Artillery Battleship]],
+  unitname               = [[shipheavyarty]],
+  name                   = [[Shogun]],
+  description            = [[Battleship (Heavy Artillery)]],
   acceleration           = 0.039,
+  activateWhenBuilt   = true,
   brakeRate              = 0.0475,
   buildAngle             = 16384,
   buildCostEnergy        = 3800,
   buildCostMetal         = 3800,
   builder                = false,
-  buildPic               = [[CORBATS.png]],
+  buildPic               = [[shipheavyarty.png]],
   buildTime              = 3800,
   canAttack              = true,
   canGuard               = true,
@@ -24,13 +25,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Navire de Guerre Lourd]],
-	description_de = [[Schlachtschiff (Bombardierung)]],
-	description_pl = [[Pancernik]],
     helptext       = [[A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are.]],
-    helptext_fr    = [[Le Warlord est le seigneur des mers. Sa quadruple batterie de canon plasma lourd peut pilonner ind?finiment une position, sachant qu'un seul tir peut venir ? bout de la plupart des unit?s. L'effet psychologique est aussi d?vastateur que son bombardement. Il n'est cependant pas fait pour ?tre utilis? seul, malgr? son lourd blindage, il est vuln?rable aux attaques rapides, sousmarines ou aeriennes.]],
-	helptext_de    = [[Eine einzige Salve wird einfach jedes Oberflächenziel in Einzelteile zerschmettern. Die psychologischen Auswirkungen der Mündungsfeuer und die Rückstöße des Schiffes sind beeindruckend genug, ganz zu schweigen von den Auswirkungen, die ein Volltreffer erzeugt. Sei gewarnt - Schlachtschiffe sind nicht dazu gedacht, alleine, auf eigene Faust zu agieren, da ihnen dazu die nötige Luft- und U-Boot-Abwehr fehlt.]],
-	helptext_pl    = [[Jedna salwa z pancernika jest w stanie poradzic sobie z wiekszoscia celow na powierzchni lub ladzie. Wymaga jednak ochrony przed jednostkami podwodnymi i powietrznymi.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -38,7 +33,7 @@ unitDef = {
   footprintX             = 6,
   footprintZ             = 6,
   highTrajectory         = 2,
-  iconType               = [[battleship]],
+  iconType               = [[shipheavyarty]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 776,
@@ -50,8 +45,8 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName             = [[battleship.s3o]],
-  script                 = [[corbats.lua]],
+  objectName             = [[shipheavyarty.s3o]],
+  script                 = [[shipheavyarty.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
@@ -67,6 +62,7 @@ unitDef = {
 
   side                   = [[CORE]],
   sightDistance          = 660,
+  sonarDistance          = 660,
   turninplace            = 0,
   turnRate               = 216,
   waterLine              = 4,
@@ -126,7 +122,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       projectiles             = 1,
-      range                   = 1400,
+      range                   = 1600,
       reloadtime              = 10,
       soundHit                = [[explosion/ex_large4]],
       soundStart              = [[explosion/ex_large5]],
@@ -134,7 +130,7 @@ unitDef = {
       tolerance               = 4096,
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 425,
+      weaponVelocity          = 475,
     },
 
   },
@@ -147,7 +143,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      object           = [[BATTLESHIP_DEAD.s3o]],
+      object           = [[shipheavyarty_dead.s3o]],
     },
 
 
@@ -162,4 +158,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corbats = unitDef })
+return lowerkeys({ shipheavyarty = unitDef })
