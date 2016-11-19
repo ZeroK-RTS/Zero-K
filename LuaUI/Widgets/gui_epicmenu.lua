@@ -2183,7 +2183,7 @@ local function MakeMenuBar()
 		backgroundColor = color.empty,
 		color = color.empty,
 		margin = {0,0,0,0},
-		padding = {0,0,2,5},
+		padding = {0,0,3,5},
 		parent = window_crude,
 		
 		children = {
