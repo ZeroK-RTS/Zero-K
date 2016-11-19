@@ -108,35 +108,19 @@ skin.panel = {
   DrawControl = DrawPanel,
 }
 
-skin.bottomRightPanel = {
-  TileImageBK = ":cl:bottomRightPanel.png",
-  TileImageFG = ":cl:empty.png",
-  tiles = {32, 32, 32, 32},
-
-  backgroundColor = {1, 1, 1, 0.8},
-
-  DrawControl = DrawPanel,
+local fancyPanels = {
+	"0100",
+	"0110",
+	"1100",
+	"1120",
+	"2100",
 }
 
-skin.bottomLeftPanel = {
-  TileImageBK = ":cl:bottomLeftPanel.png",
-  TileImageFG = ":cl:empty.png",
-  tiles = {32, 32, 32, 32},
-
-  backgroundColor = {1, 1, 1, 0.8},
-
-  DrawControl = DrawPanel,
-}
-
-skin.bottomMiddlePanel = {
-  TileImageBK = ":cl:bottomMiddlePanel.png",
-  TileImageFG = ":cl:empty.png",
-  tiles = {32, 32, 32, 32},
-
-  backgroundColor = {1, 1, 1, 0.8},
-
-  DrawControl = DrawPanel,
-}
+for i = 1, #fancyPanels do
+	local name = "panel_" .. fancyPanels[i]
+	skin[name] = Spring.Utilities.CopyTable(skin.panel)
+	skin[name].TileImageBK = ":cl:" .. name .. ".png"
+end
 
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",

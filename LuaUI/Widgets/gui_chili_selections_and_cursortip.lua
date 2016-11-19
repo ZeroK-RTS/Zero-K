@@ -272,7 +272,7 @@ options_order = {
 	
 	--selected units
 	'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
-	'fancySkinning',
+	'fancySkinning', 'leftPadding',
 }
 
 local function option_Deselect()
@@ -557,8 +557,8 @@ options = {
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
 			local newClass = skin.panel
-			if self.value and skin.bottomLeftPanel then
-				newClass = skin.bottomLeftPanel
+			if self.value and skin.panel_1120 then
+				newClass = skin.panel_1120
 			end
 			
 			window_corner.tiles = newClass.tiles
@@ -567,7 +567,17 @@ options = {
 			window_corner.TileImageBK = newClass.TileImageBK
 			window_corner:Invalidate()
 		end
-	}
+	},
+	leftPadding = {
+		name = "Left Padding",
+		type = "number",
+		value = 0, min = 0, max = 500, step = 1,
+		OnChange = function(self)
+			window_corner.padding[1] = 8 + self.value
+			window_corner:UpdateClientArea()
+		end,
+		path = selPath,
+	},
 }
 
 
@@ -2830,9 +2840,10 @@ function widget:Initialize()
         name   = 'unitinfo2';
 		x = 0,
 		y = 0,
+		right = 0,
+		bottom = 0,
+		padding = {8 + options.leftPadding.value, 8, 8, 8},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
-		width = "100%";
-		height = "100%";
 		dockable = false,
 		resizable   = false;
 		draggable = false,

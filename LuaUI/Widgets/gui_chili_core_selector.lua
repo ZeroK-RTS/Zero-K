@@ -304,8 +304,8 @@ options = {
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
 			local newClass = skin.panel
-			if self.value and skin.bottomLeftPanel then
-				newClass = skin.bottomLeftPanel
+			if self.value and skin.panel_1100 then
+				newClass = skin.panel_1100
 			end
 			
 			background.tiles = newClass.tiles
@@ -1227,7 +1227,7 @@ function widget:Initialize()
 	end
 	
 	window_selector = Window:New{
-		padding = {-1,0,0,0},
+		padding = {-1,0,0,-1},
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",

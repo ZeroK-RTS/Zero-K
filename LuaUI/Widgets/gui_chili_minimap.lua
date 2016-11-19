@@ -483,8 +483,8 @@ options = {
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
 			local newClass = skin.panel
-			if self.value and skin.bottomLeftPanel then
-				newClass = skin.bottomLeftPanel
+			if self.value and skin.panel_1100 then
+				newClass = skin.panel_1100
 			end
 			
 			map_panel.tiles = newClass.tiles

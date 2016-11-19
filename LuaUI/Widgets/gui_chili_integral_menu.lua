@@ -1469,8 +1469,8 @@ function options.fancySkinning.OnChange(self)
 	local skin = Chili.SkinHandler.GetSkin(currentSkin)
 	
 	local newClass = skin.panel
-	if self.value and skin.bottomMiddlePanel then
-		newClass = skin.bottomMiddlePanel
+	if self.value and skin.panel_2100 then
+		newClass = skin.panel_2100
 	end
 	
 	contentHolder.tiles = newClass.tiles
