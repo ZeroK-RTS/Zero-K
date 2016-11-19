@@ -33,12 +33,14 @@ local function SetFancySkin()
 	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 	
 	WG.SetWidgetOption(coreName, corePath, "fancySkinning", true)
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", true)
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", true)
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	
 	WG.crude.SetMenuSkinClass("panel_0021")
 end
@@ -50,12 +52,14 @@ local function SetBoringSkin()
 	local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 	
 	WG.SetWidgetOption(coreName, corePath, "fancySkinning", false)
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", false)
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", false)
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
 	
 	WG.crude.SetMenuSkinClass("panel")
 end
@@ -101,6 +105,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
 	
 	WG.SetWidgetOption(econName, econPath, "opacity", 1)
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	
 	WG.crude.SetMenuSkinClass("panel_0021")
 	
@@ -147,6 +152,7 @@ local function ResetOptionsFromNew()
 	
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
 	
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
 	
 	WG.crude.SetMenuSkinClass("panel")
