@@ -78,6 +78,16 @@ local function Docking_GetWindowSettings(name)
 		return x,y,w,h
 	end
 end
+function WG.GetWindowPosAndSize(windowName)
+	if not windowName then
+		return false
+	end
+	local window = screen0:GetChildByName(windowName)
+	if not window then
+		return false
+	end
+	return window.x, window.y, window.width, window.height
+end
 
 function WG.SetWindowPosAndSize(window,x,y,w,h)
 	lastPos[window] = nil

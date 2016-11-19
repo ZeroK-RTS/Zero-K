@@ -23,13 +23,14 @@ function widget:GetInfo()
     name      = "Global Build Command",
     desc      = version.. "\nGlobal Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
-"You can also exclude workers from GBC's control by adding them to the exclusion group (default control group 0). " ..
-"Hit \255\255\90\90alt-s\255\255\255\255 to get an area select for removing jobs.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
+"You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
+"Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n" ..
 "Configuration is in \nGame->Worker AI",
     author    = "aeonios",
     date      = "July 20, 2009, 8 March 2014",
     license   = "GNU GPL, v2 or later",
     layer     = 10,
+    handler   = true,
     enabled   = false  --  loaded by default?
   }
 end
@@ -91,31 +92,22 @@ end
 --------------------------------------------------------------------------------
 -- Declarations ----------------------------------------------------------------
 include("keysym.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 options_path = 'Game/Worker AI'
 
 options_order = {
-	'exclusionGroupID',
 	'separateConstructors',
 	'splitArea',
 	'autoConvertRes',
 	'autoRepair',
 	'cleanWrecks',
 	'intelliCost',
-	'alwaysShow'
+	'alwaysShow',
+	'drawIcons',
 }
 
 options = {
-	exclusionGroupID = {
-    name = 'Exclusion Group #',
-    type = 'number',
-    min = 0, max = 9, step = 1,
-    value = 0,
-    OnChange = function(self)
-		groupHasChanged = true
-	end,
-	},
-	
 	separateConstructors = {
 		name = 'Separate Constructors',
 		type = 'bool',
@@ -163,12 +155,20 @@ options = {
 		type = 'bool',
 		desc = 'If this is enabled queued commands will always be displayed, otherwise they are only visible when \255\200\200\200shift\255\255\255\255 is held.\n (default = false)',
 		value = false,
-	}
+	},
+	
+	drawIcons = {
+		name = 'Draw Status Icons',
+		type = 'bool',
+		desc = 'Check to draw status icons over each unit, which shows its command state.\n (default = true)',
+		value = true,
+	},
 }
 
 -- "Localized" API calls, because they run ~33% faster in lua.
 local Echo					= Spring.Echo
 local spIsGUIHidden			= Spring.IsGUIHidden
+local spGetActiveCommand	= Spring.GetActiveCommand
 local spGetUnitDefID		= Spring.GetUnitDefID
 local spGetFeatureDefID		= Spring.GetFeatureDefID
 local spGetGroupList		= Spring.GetGroupList
@@ -215,7 +215,7 @@ local spRequestPath			= Spring.RequestPath
 
 local spWorldToScreenCoords = Spring.WorldToScreenCoords
 local spTraceScreenRay		= Spring.TraceScreenRay
-local spSetMouseCursor		= Spring.SetMouseCursor
+local spGetMouseState		= Spring.GetMouseState
 local spPlaySoundFile		= Spring.PlaySoundFile
 
 local glPushMatrix	= gl.PushMatrix
@@ -248,7 +248,10 @@ local CMD_REMOVE    = CMD.REMOVE
 local CMD_RECLAIM	= CMD.RECLAIM
 local CMD_GUARD		= CMD.GUARD
 local CMD_STOP		= CMD.STOP
-local CMD_TERRAFORM_INTERNAL = 39801
+local CMD_ONOFF         = CMD.ONOFF
+local CMD_REPEAT        = CMD.REPEAT
+local CMD_MOVE_STATE    = CMD.MOVE_STATE
+local CMD_FIRE_STATE    = CMD.FIRE_STATE
 
 local abs	= math.abs
 local floor	= math.floor
@@ -258,9 +261,10 @@ local max	= math.max
 local min	= math.min
 local modf	= math.modf
 
-local nextFrame	= 2
+local longCount	= 0
 local myTeamID = spGetMyTeamID()
-local textColor = {0.7, 1.0, 0.7, 1.0}
+local statusColor = {1.0, 1.0, 1.0, 0.85}
+local queueColor = {1.0, 1.0, 1.0, 0.9}
 local textSize = 12.0
 
 -- Zero-K specific icons for drawing repair/reclaim/resurrect, customize if porting!
@@ -271,26 +275,32 @@ local rec_color = {0.6, 0.0, 1.0, 1.0}
 local rep_color = {0.0, 0.8, 0.4, 1.0}
 local res_color = {0.4, 0.8, 1.0, 1.0}
 
+local imgpath = "LuaUI/Images/commands/Bold/"
+local no_icon = {name = 'gbcicon'}
+local noidle_icon = {name = 'gbcidle'}
+local idle_icon = {name = 'gbcidle', texture=imgpath .. "buildsmall.png"}
+local queue_icon = {name = 'gbcicon', texture=imgpath .. "build_light.png", color=queueColor}
+local drec_icon = {name = 'gbcicon', texture=imgpath .. "action.png", color=statusColor}
+local move_icon = {name = 'gbcicon', texture=imgpath .. "move.png", color=statusColor}
+
 --	"global" for this widget.  This is probably not a recommended practice.
 local myUnits = {}	--  list of units in the Central Build group, of the form myUnits[unitID] = commandType
 local myQueue = {}  --  list of commands for Central Build group, of the form myQueue[BuildHash(cmd)] = cmd
 local busyUnits = {} -- list of units that are currently assigned jobs, of the form busyUnits[unitID] = BuildHash(cmd)
 local idlers = {} -- list of units marked idle by widget:UnitIdle, which need to be double checked due to gadget conflicts. Form is idlers[index] = unitID
-local excludedUnits = {} -- list of units which belong to the excluded group and thus will not be managed by GBC.
+local allBuilders = {} -- list of all mobile builders, which saves whether they are GBC-enabled or not.
+local newBuilders = {} -- a list of newly finished builders that have been added to myUnits. These units are assigned immediately on UnitIdle and then removed from the list.
 local activeJobs = {} -- list of jobs that have been started, using the UnitID of the building so that we can check completeness via UnitFinished
 local idleCheck = false -- flag if any units went idle
 local areaCmdList = {} -- a list of area commands, for persistently capturing individual reclaim/repair/resurrect jobs from LOS-limited areas. Same form as myQueue.
 local reassignedUnits = {} -- list of units that have already been assigned/reassigned jobs and which don't need to be reassigned until we've cycled through all workers.
-local groupHasChanged = true	--	Flag if group members have changed.
 local hasRes = false
 local queueCount = 0 -- the number of jobs currently on the queue, which must be updated every assignment frame since #aTable only works for arrays
 
 -- variables used by the area job remove feature
-local removeToolIsActive = false
 local selectionStarted = false
 local selectionCoords = {}
 local selectionRadius = 0
-local hasBeenUsed = false
 
 -- drawing lists for GL
 local BuildList = {}
@@ -321,27 +331,27 @@ function widget:Initialize()
 	
 	-- add all existing workers to GBC.
 	local units = spGetTeamUnits(myTeamID)
-	--if #units > 0 then
 		for _, uid in ipairs(units) do
 			local unitDefID = spGetUnitDefID(uid)
 			local ud = UnitDefs[unitDefID]
 			local _,_,nanoframe = spGetUnitIsStunned(uid)
-			if (not nanoframe and ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
-				local cmd = GetFirstCommand(uid) -- find out if it already has any orders
-				if cmd and cmd.id then -- if so we mark it as drec
-					myUnits[uid] = {cmdtype=commandType.drec, unreachable={}}
-				else -- otherwise we mark it as idle
-					myUnits[uid] = {cmdtype=commandType.idle, unreachable={}}
+			if (ud.isBuilder and ud.speed > 0) then -- if the unit is a mobile builder
+				allBuilders[uid] = {include=true} -- add it to the group of all workers
+				
+				if not nanoframe then -- and add any workers that aren't nanoframes to the active group
+					local cmd = GetFirstCommand(uid) -- find out if it already has any orders
+					if cmd and cmd.id then -- if so we mark it as drec
+						myUnits[uid] = {cmdtype=commandType.drec, unreachable={}}
+					else -- otherwise we mark it as idle
+						myUnits[uid] = {cmdtype=commandType.idle, unreachable={}}
+					end
+					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 				end
-				UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
 			end
 		end
-	--end
-	
-	-- screen the exclusion group
-	UpdateOneGroupsDetails(options.exclusionGroupID.value)
 	
 	-- ZK compatability stuff
+	WG.icons.SetPulse('gbcidle', true)
 	WG.GlobalBuildCommand = { -- add compatibility functions to a table in widget globlals
 		CommandNotifyPreQue = CommandNotifyPreQue, --an event which is called by "unit_initial_queue.lua" to notify other widgets that it is giving pregame commands to the commander.
 		CommandNotifyMex = CommandNotifyMex, --an event which is called by "cmd_mex_placement.lua" to notify other widgets of mex build commands.
@@ -350,56 +360,60 @@ function widget:Initialize()
 	}
 end
 
+-- cleans up if the widget is disabled.
+function widget:Shutdown()
+	WG.GlobalBuildCommand = nil
+	WG.icons.SetDisplay('gbcicon', false)
+	WG.icons.SetDisplay('gbcidle', false)
+end
+
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
-function widget:GameFrame(thisFrame)
-	if thisFrame == 1 then -- initialize, using GameFrame since we need to properly account for lag
-		nextFrame = 30 + ping()
-		return
+function widget:GameFrame(frame)
+	if frame % 15 == 0 then
+		if idleCheck then -- if our idle list has been updated
+			CheckIdlers() -- then check and process it
+		end
+	
+		CheckForRes() -- check if our group includes any units with resurrect, update the global flag
+	end
+		
+	if frame % 25 == 0 then
+		if longCount > 2 then longCount = 0 end
+		
+		if longCount == 0 then
+			if options.splitArea.value then -- if splitting area jobs is enabled
+				UpdateAreaCommands() -- capture targets from area repair/reclaim/resurrect commands as they fall into LOS.
+			end
+		elseif longCount == 1 then
+			if options.cleanWrecks.value then -- if auto-reclaim/res is enabled
+				CleanWrecks() -- capture all non-map-feature targets in LOS
+			end
+		else
+			CaptureTF() -- ZK-Specific: captures "terraunits" from ZK terraform, and adds repair jobs for them.
+		end
+		
+		longCount = longCount + 1
 	end
 	
-	if ( thisFrame < nextFrame ) then 
-		return
-	end
-	
-	if groupHasChanged then -- if our control group has added or removed units
-		UpdateOneGroupsDetails(options.exclusionGroupID.value) -- update it
-	end
-	
-	if idleCheck then -- if our idle list has been updated
-		CheckIdlers() -- then check and process it
-	end
-	
-	CheckForRes() -- check if our group includes any units with resurrect, update the global flag
-	
-	CleanBuilders() -- remove any dead/captured/nonexistent constructors from myUnits and update bookkeeping
-	
-	queueCount = 0 -- reset the queue count
-	for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
-		queueCount = queueCount + 1 -- count the jobs on the queue while checking them, for the constructor separator
-		if not cmd.tfparams then -- ZK-specific: prevents combo TF-build operations from being removed by CleanOrders until the terraform is finished.
-			CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
+	if frame % 30 == 0 then
+		CleanBuilders() -- remove any dead/captured/nonexistent constructors from myUnits and update bookkeeping
+		queueCount = 0 -- reset the queue count
+		for _, cmd in pairs(myQueue) do -- perform validity checks for all the jobs in the queue, and remove any which are no longer valid
+			queueCount = queueCount + 1 -- count the jobs on the queue while checking them, for the constructor separator
+			if not cmd.tfparams then -- ZK-specific: prevents combo TF-build operations from being removed by CleanOrders until the terraform is finished.
+				CleanOrders(cmd, false) -- note: also marks workers whose jobs are invalidated as idle, so that they can be reassigned immediately.
+			end
 		end
 	end
 	
-	CleanBusy() -- removes workers from busyUnits if the job they're assigned to doesn't exist. Prevents crashes.
-	
-	if options.splitArea.value then -- if splitting area jobs is enabled
-		UpdateAreaCommands() -- capture targets from area repair/reclaim/resurrect commands as they fall into LOS.
+	if frame % 3 == 0 then
+		CleanBusy() -- removes workers from busyUnits if the job they're assigned to doesn't exist. Prevents crashes.
+		local unitToWork = FindEligibleWorker()	-- get an eligible worker and assign it a job.
+		if unitToWork then
+			CleanPathing(unitToWork) -- garbage collect pathing for jobs that no longer exist
+			GiveWorkToUnit(unitToWork)
+		end
 	end
-	
-	if options.cleanWrecks.value then -- if auto-reclaim/res is enabled
-		CleanWrecks() -- capture all non-map-feature targets in LOS
-	end
-	
-	CaptureTF() -- ZK-Specific: captures "terraunits" from ZK terraform, and adds repair jobs for them.
-	
-	local unitsToWork = FindEligibleWorker()	-- compile list of eligible units and assign them jobs.
-	if (#unitsToWork > 0) then
-		CleanPathing(unitsToWork) -- garbage collect pathing for jobs that no longer exist
-		GiveWorkToUnits(unitsToWork)
-	end
-	
-	nextFrame = thisFrame + ping()	-- repeat as quickly as ping allows.
 end
 
 
@@ -432,6 +446,46 @@ HOW THIS WORKS:
 function widget:Update(dt)
 	if spIsGUIHidden() then
 		return
+	end
+	
+	-- update ground circle information for the area job removal selection.
+	if selectionStarted then
+		local x, y, _,_,_ = spGetMouseState()
+		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
+		if coords then
+			local sx, sz = coords[1], coords[3]
+			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
+		end
+	end
+	
+	-- update icons for builders
+	if options.drawIcons.value then
+		WG.icons.SetDisplay('gbcicon', true)
+		WG.icons.SetDisplay('gbcidle', true)
+		for unitID, data in pairs(allBuilders) do
+			if data.include and myUnits[unitID] then
+				local myCmd = myUnits[unitID]
+				if myCmd.cmdtype == commandType.idle then
+					WG.icons.SetUnitIcon(unitID, idle_icon)
+					WG.icons.SetUnitIcon(unitID, no_icon) -- disable the non-idle icons
+				elseif myCmd.cmdtype == commandType.buildQueue then
+					WG.icons.SetUnitIcon(unitID, queue_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				elseif myCmd.cmdtype == commandType.mov then
+					WG.icons.SetUnitIcon(unitID, move_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				else
+					WG.icons.SetUnitIcon(unitID, drec_icon)
+					WG.icons.SetUnitIcon(unitID, noidle_icon)
+				end
+			else
+				WG.icons.SetUnitIcon(unitID, no_icon)
+				WG.icons.SetUnitIcon(unitID, noidle_icon)
+			end
+		end
+	else
+		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
 	end
 	
 	buildList = {}
@@ -520,23 +574,7 @@ function widget:DrawWorld()
 		return
 	end
 	local alt, ctrl, meta, shift = spGetModKeyState()
-		
-	--if removeToolIsActive then -- draw the cursor if the job remove tool is active
-		--spSetMouseCursor("cursorrepair")
-	--end
-	glDepthTest(false)
-	glColor(textColor)
-	for unitID,myCmd in pairs(myUnits) do	-- show user which units are in our group
-		if spIsUnitInView(unitID) then
-			local ux, uy, uz = spGetUnitViewPosition(unitID)
-			glPushMatrix()
-			glTranslate(ux, uy, uz)
-			glBillboard()
-			glText(myCmd.cmdtype, -10.0, -15.0, textSize, "con")
-			glPopMatrix()
-		end -- if InView
-	end -- for unitID in group
-	    
+	
 	if shift or options.alwaysShow.value then
 		if shift and options.alwaysShow.value then
 			glColor(1, 1, 1, 0.5) -- 0.5 alpha
@@ -545,9 +583,7 @@ function widget:DrawWorld()
 		end
 		
 		glDepthTest(true)
-		glPushMatrix()
 		DrawBuildingGhosts() -- draw building ghosts
-		glPopMatrix()
 		glDepthTest(false)
 		
 		glTexture(true)
@@ -577,15 +613,9 @@ function widget:DrawWorld()
 		glTexture(res_icon)
 		DrawSTIcons(stResList)
 	end
+
 	glTexture(false)
 	glColor(1, 1, 1, 1)
-end
-
--- This function changes the mouse cursor if the job remove tool is active.
-function widget:DrawScreen()
-	if removeToolIsActive and not spIsGUIHidden() then -- draw the cursor if the job remove tool is active
-		spSetMouseCursor("cursorrepair")
-	end
 end
 
 function DrawBuildLines()
@@ -632,10 +662,12 @@ function DrawBuildingGhosts()
 		local bcmd = abs(myCmd.id)
 		local x, y, z, h = myCmd.x, myCmd.y, myCmd.z, myCmd.h
 		local degrees = h * 90
+		glPushMatrix()
 		glLoadIdentity()
 		glTranslate(x, y, z)
 		glRotate(degrees, 0, 1.0, 0 )
 		glUnitShape(bcmd, myTeamID, false, false, false)
+		glPopMatrix()
 	end
 end
 
@@ -660,7 +692,6 @@ function DrawAreaIcons()
 end
 
 function DrawSTIcons(myList)
-	local alt, ctrl, meta, shift = spGetModKeyState()
 	for i=1, #myList do -- draw single-target command icons
 		local myCmd = myList[i]
 		local x, y, z = myCmd.x, myCmd.y, myCmd.z
@@ -714,10 +745,6 @@ HOW THIS WORKS:
 		and adds them to the global queue.
 
  -- area job removal tool stuff --
-	widget:KeyPress()
-		Captures the hotkey for job remove, sets the tool as active.
-	widget:KeyRelease()
-		Captures releases for the shift key, for correct shift behavior.
 	widget:MousePress()
 		Captures the starting coords for the area select, sets state.
 	widget:MouseMove()
@@ -735,22 +762,19 @@ function widget:PlayerChanged(playerID)
 	if spGetSpectatingState() then
 		Echo( "<Global Build Command> Spectator mode. Widget removed." )
 		WG.GlobalBuildCommand = nil
+		WG.icons.SetDisplay('gbcicon', false)
+		WG.icons.SetDisplay('gbcidle', false)
 		widgetHandler:RemoveWidget()
 		return
 	end
 end
 
---	This function detects that a new group has been defined or changed.
---  Borrowed from gunblob's UnitGroups v5.1
-function widget:GroupChanged(groupId)  
-	if groupId == options.exclusionGroupID.value then
-		groupHasChanged = true 
-		-- note: Use it to set a flag because it fires before all units it's going to put into group have actually been put in.
-	end
-end
-
 -- This function detects when our workers have started a job
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
+	if not unitTeam == spGetMyTeamID() then
+		return -- if it's not our unit then ignore it!
+	end
+	
 	if busyUnits[builderID] then -- if the builder is one of our busy workers
 		local key = busyUnits[builderID]
 		local myCmd = myQueue[key]
@@ -768,13 +792,39 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		end
 	end
 	
-	-- add new workers to the worker group. technically it only applies to commanders for UnitCreated.
+	-- add new workers to the tracking group, and commanders to myUnits.
 	local ud = UnitDefs[unitDefID]
-	local _,_,nanoframe = spGetUnitIsStunned(unitID)
-	if (not nanoframe and ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+		-- add the builder to the global builder tracking table, initialize as controlled by GBC.
+		allBuilders[unitID] = {include=true}
 		-- init our commander as idle, since the initial queue widget will notify us later when it gives the com commands.
-		myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
-		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		local _,_,nanoframe = spGetUnitIsStunned(unitID)
+		if not nanoframe then
+			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+			return -- don't apply constructor separator to commanders
+		end
+		
+		-- constructor separator
+		if options.separateConstructors.value then -- if constructor separator is enabled
+			local facDef = UnitDefs[spGetUnitDefID(builderID)]
+			local facScale -- how far our unit will be told to move
+			if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
+				facScale = 350
+			elseif facDef.name == 'factoryship' then -- boatfac, needs a huge clearance
+				facScale = 250
+			elseif facDef.name == 'factoryhover' then -- hoverfac, needs extra clearance
+				facScale = 140
+			else -- other facs (and athenas, which are built by regular constructors)
+				facScale = 120
+			end
+		
+			local dx,_,dz = spGetUnitDirection(unitID)
+			local x,y,z = spGetUnitPosition(unitID)
+			dx = dx*facScale
+			dz = dz*facScale
+			spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
+		end
 	end
 end
 
@@ -789,16 +839,16 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		activeJobs[unitID] = nil
 	end
 	
-	-- add new workers to the worker list.
-	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+	-- add new workers to the active workers list if they're GBC-enabled.
+	if (allBuilders[unitID] and allBuilders[unitID].include) then
 		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
 		if cmd and cmd.id then -- if so we mark it as drec
-		myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
+			myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
 		else -- otherwise we mark it as idle
 			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
 		end
 		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		newBuilders[unitID] = true
 	end
 end
 
@@ -813,13 +863,22 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam, attackerID, attackerD
 		end
 	elseif activeJobs[unitID] then
 		activeJobs[unitID] = nil
-	elseif excludedUnits[unitID] then
-		excludedUnits[unitID] = nil
+	end
+	
+	if allBuilders[unitID] then
+		allBuilders[unitID] = nil
 	end
 end
 
 -- This function cleans up when workers or nanoframes are captured by an enemy
 function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
+	if unitTeam ~= myTeamID then
+		return -- if it doesn't involve us, don't do anything.
+	end
+	if allBuilders[unitID] then
+		allBuilders[unitID] = nil
+	end
+	
 	if myUnits[unitID] then
 		myUnits[unitID] = nil
 		if busyUnits[unitID] then
@@ -829,7 +888,7 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 			end
 			busyUnits[unitID] = nil
 		end
-	elseif activeJobs[unitID] then
+	elseif activeJobs[unitID] then -- check if the captured unit was a nanoframe
 		local key = activeJobs[unitID]
 		if myQueue[key] then
 			StopAnyWorker(key)
@@ -838,6 +897,27 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
 		activeJobs[unitID] = nil
 	end
 end
+
+-- This function adds new workers when they are captured from the enemy.
+function widget:UnitGiven(unitID, unitDefID, newTeam, unitTeam)
+	if newTeam ~= myTeamID then
+		return -- if it doesn't involve us, don't do anything.
+	end
+	
+	local ud = UnitDefs[unitDefID]
+	if (ud.isBuilder and ud.speed > 0) then -- if the new unit is a mobile builder
+		allBuilders[unitID] = {include=true}
+		local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
+		if cmd and cmd.id then -- if so we mark it as drec
+			myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
+		else -- otherwise we mark it as idle
+			myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+		end
+		UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+		GiveWorkToUnit(unitID)
+	end
+end
+
 
 -- This function implements auto-repair
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, projectileID, attackerID, attackerDefID, attackerTeam)
@@ -850,35 +930,49 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 end
 
--- This function implements the constructor seperator, borrowed from the old "unit no stuck in factory" widget by msafwan
--- Note: Zero-K specific factDefIDs, customize if porting to another game!
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam == spGetMyTeamID() and UnitDefs[unitDefID].isBuilder and options.separateConstructors.value then -- if it's our unit, and is a builder, and constructor separator is enabled
-		local facScale -- how far our unit will be told to move
-		if queueCount == 0 then -- if the queue is empty, we need to increase clearance to stop the fac from getting jammed with idle workers
-			facScale = 500
-		elseif factDefID == 299 then -- boatfac, needs a huge clearance
-			facScale = 250
-		elseif factDefID == 295 then -- hoverfac, needs extra clearance
-			facScale = 140
-		else -- other facs
-			facScale = 100
-		end
-		
-		local dx,_,dz = spGetUnitDirection(unitID)
-		local x,y,z = spGetUnitPosition(unitID)
-		dx = dx*facScale
-		dz = dz*facScale
-		spGiveOrderToUnit(unitID, CMD_MOVE, {x+dx, y, z+dz}, {""}) -- replace the fac rally orders with a short distance move.
-	end
-end
-
 --	If unit detected as idle and it's one of ours, mark it as idle so that it can be assigned work. Note: some ZK gadgets cause false positives for this, which is why we use deferred checks.
 function widget:UnitIdle(unitID, unitDefID, teamID)
 	if myUnits[unitID] then -- if it's one of ours
 		idlers[#idlers+1] = unitID -- add it to the idle list to be double-checked at assignment time.
 		idleCheck = true -- set the flag so that the idle list will be processed
 		return
+	end
+end
+
+-- This function adds a state toggle to constructors that sets whether they participate in gbc or not.
+function widget:CommandsChanged()
+	local units = Spring.GetSelectedUnits()
+	for i, id in pairs(units) do
+		if allBuilders[id] then
+			local customCommands = widgetHandler.customCommands
+			local order = 0
+			if allBuilders[id].include then
+				order = 1
+			end
+			-- add state toggle command
+			table.insert(customCommands, {
+				id      = CMD_GLOBAL_BUILD,
+				type    = CMDTYPE.ICON_MODE,
+				tooltip = 'Toggle using global build command for workers.',
+				name    = 'Global Build',
+				cursor  = 'Repair',
+				action  = 'globalbuild',
+				params  = {order, 'off', 'on'}, 
+			})
+			
+			-- add the cancel jobs command
+			table.insert(customCommands, {
+				id      = CMD_GBCANCEL,
+				type    = CMDTYPE.ICON_AREA,
+				tooltip = 'Cancel Global Build tasks.',
+				name    = 'Global Build Cancel',
+				cursor  = 'Repair',
+				action  = 'globalbuildcancel',
+				--params  = {order, 'off', 'on'}, 
+			})
+			
+			break
+		end
 	end
 end
 
@@ -981,6 +1075,20 @@ end
 --  This function captures build-related commands given to units in our group and adds them to the queue, and also tracks unit state (ie direct orders vs queued).
 --  Thanks to Niobium for pointing out CommandNotify().
 function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
+	if id == CMD_GLOBAL_BUILD then
+		ApplyStateToggle()
+		return true
+	end
+	
+	if id == CMD_GBCANCEL then -- implements the job cancelling command
+		local x, y, z, r = params[1], params[2], params[3], params[4]
+		RemoveJobs(x, z, r)
+		selectionStarted = false
+		selectionRadius = 0
+		selectionCoords = {}
+		return true
+	end
+	
 	if id < 0 and params[1]==nil and params[2]==nil and params[3]==nil then -- Global Build Command doesn't handle unit-build commands for factories.
 		return
 	end
@@ -1100,79 +1208,45 @@ function widget:CommandNotify(id, params, options, isZkMex, isAreaMex)
 	return false
 end
 
+function ApplyStateToggle()
+	local selectedUnits = spGetSelectedUnits()
+	for _,unitID in pairs(selectedUnits) do
+		if allBuilders[unitID] then
+			allBuilders[unitID].include = not allBuilders[unitID].include
+			if allBuilders[unitID].include then
+				local _,_,nanoframe = spGetUnitIsStunned(unitID)
+				if not myUnits[unitID] and not nanoframe then
+					local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
+					if cmd and cmd.id then -- if so we mark it as drec
+						myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
+					else -- otherwise we mark it as idle
+						myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
+					end
+					UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
+				end
+			elseif myUnits[unitID] then
+				myUnits[unitID] = nil
+				if busyUnits[unitID] then
+					local key = busyUnits[unitID]
+					myQueue[key].assignedUnits[unitID] = nil
+					busyUnits[unitID] = nil
+				end
+			end
+		end
+	end
+end
+
 
 -- The following functions are used by the area job removal tool --
 -------------------------------------------------------------------
--- This function gets the hotkey event for triggering the area job remove tool.
-function widget:KeyPress(key, mods, isRepeat)
-	local hotkey = string.byte("s")
-	if key == hotkey and mods.alt then
-		removeToolIsActive = true
-	elseif key == KEYSYMS.ESCAPE and removeToolIsActive then
-		removeToolIsActive = false
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-	end
-end
-
-function widget:KeyRelease(key)
-	if hasBeenUsed and key == 304 then -- if shift is released and the command has been used at least once, cancel it.
-		removeToolIsActive = false
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-		hasBeenUsed = false
-	end
-end
-
 function widget:MousePress(x, y, button)
-	if removeToolIsActive then
+	local _, cmdid = spGetActiveCommand()
+	if cmdid == CMD_GBCANCEL then
 		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
 		if coords then -- nil check in case the mouse points to an area that does not refer to world-space
 			local sx, sy, sz = coords[1], coords[2], coords[3]
 			selectionCoords = {x=sx, y=sy, z=sz}
 			selectionStarted = true
-			return true
-		end
-	end
-	return false
-end
-			
-function widget:MouseMove(x, y, dx, dy, button)
-	if selectionStarted then
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then
-			local sx, sz = coords[1], coords[3]
-			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
-		end
-	end
-end
-
-function widget:MouseRelease(x, y, button)
-	if selectionStarted then
-		local alt, ctrl, meta, shift = spGetModKeyState()
-		local _, coords = spTraceScreenRay(x, y, true, true) -- get ground coords from mouse position
-		if coords then
-			local sx, sz = coords[1], coords[3]
-			selectionRadius = Distance(sx, sz, selectionCoords.x, selectionCoords.z)
-		end
-		
-		if selectionRadius > 0 then -- if we have a real selection, call RemoveJobs
-			RemoveJobs(selectionCoords.x, selectionCoords.z, selectionRadius)
-		end
-		
-		selectionStarted = false
-		selectionRadius = 0
-		selectionCoords = {}
-		spPlaySoundFile("sounds/reply/builder_start.wav", 1) -- Note: Zero-K Specific sound. Customize if porting!
-		
-		if not shift then
-			removeToolIsActive = false
-			hasBeenUsed = false
-		else
-			hasBeenUsed = true
-			return true
 		end
 	end
 	return false
@@ -1184,10 +1258,10 @@ end
 --[[
 HOW THIS WORKS:
 	FindEligibleWorker() 
-		Sorts through our group and returns a list of workers to be assigned,
+		Sorts through our group and returns a worker to be assigned,
 		ensuring that we cycle through all workers (more or less) evenly. Does not consider workers that are under direct orders.
-	GiveWorkToUnits()
-		Iterates over the list returned by FindEligibleWorker(), calling FindCheapestJob() for each,
+	GiveWorkToUnit()
+		Takes a unit as input, calls FindCheapestJob(),
 		and if FindCheapestJob() returns a job it gives the command to the worker and updates relevant info.
 	FindCheapestJob()
 		For a given worker as input, iterates over myQueue, checking each job to see if the worker can build and reach it,
@@ -1215,103 +1289,96 @@ HOW THIS WORKS:
 ]]--
 
 
--- This function returns a list of workers from our group to be assigned/reassigned jobs.
+-- This function returns a worker from our group to be assigned/reassigned to a job.
+-- We only process one worker at a time, every couple of frames to keep performance reasonable.
 function FindEligibleWorker()
-	local unitsToWork = {}
-	local gaveWork = false
+	local unitToWork
 	for unitID,myCmd in pairs(myUnits) do
-		if myCmd.cmdtype == commandType.idle then -- first we assign idle units
-			if #unitsToWork < 25 and (not reassignedUnits[unitID]) then
-				--NOTE: we limit the number of workers processed per cycle since the main loop is triple-nested and may reach very large iteration counts.
-				unitsToWork[#unitsToWork+1] = unitID
+		if not spValidUnitID(unitID) or spUnitIsDead(unitID) or spGetUnitTeam(unitID) ~= myTeamID then
+		-- clean units that don't exist, are dead, or no longer belong to our team..
+			if busyUnits[unitID] then -- if the unit has an assigned job, update bookkeeping
+				myJob = busyUnits[unitID]
+				myQueue[myJob].assignedUnits[unitID] = nil
+				busyUnits[unitID] = nil
+			end
+			myUnits[unitID] = nil -- remove the unit from the list of constructors
+		elseif myCmd.cmdtype == commandType.idle and not reassignedUnits[unitID] then -- first we assign idle units
+			reassignedUnits[unitID] = true
+			return unitID
+		end
+	end
+	--if there are no idlers available, reassign an already assigned unit to see if there is a better job it can be doing.
+	for unitID,cmdstate in pairs(myUnits) do
+		if (not reassignedUnits[unitID]) then
+			if cmdstate.cmdtype == commandType.buildQueue then
 				reassignedUnits[unitID] = true
-				gaveWork = true
+				return unitID
 			end
 		end
 	end
-	--if we still have room after assigning idle workers then we can mark queue-assigned workers to be reassigned in case lower cost jobs become available.
-	if #unitsToWork < 25 then
-		for unitID,cmdstate in pairs(myUnits) do
-			if (not reassignedUnits[unitID]) then
-				if cmdstate.cmdtype == commandType.buildQueue then
-					unitsToWork[#unitsToWork+1] = unitID
-					gaveWork = true
-					reassignedUnits[unitID] = true
-					if (#unitsToWork == 25) then
-						break
-					end
-				end
-			end
-		end
-		if not gaveWork then --no more unit to be reassigned? then reset list
-			reassignedUnits = {}
-		end
-	end
-	return unitsToWork
+	reassignedUnits = {} --no more unit to be reassigned? then reset list
+	return
 end
 
 -- This function finds work for all the workers compiled in our eligible worker list and issues the orders.
-function GiveWorkToUnits(unitsToWork)
-	for i=1, #unitsToWork do
-		local unitID = unitsToWork[i]
-		local myJob = FindCheapestJob(unitID) -- find the cheapest job
-		if myJob and (not busyUnits[unitID] or busyUnits[unitID] ~= hash) then -- if myJob returns a job rather than nil
-		-- if the unit has already been assigned to the same job, we also prevent order spam
-		-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
-			local hash = BuildHash(myJob)
-			if busyUnits[unitID] then -- if we're reassigning, we need to update the entry stored in the queue
-				key = busyUnits[unitID]
-				myQueue[key].assignedUnits[unitID] = nil
-			end
-			if myJob.id < 0 then -- for build jobs
-				if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {""}) -- issue the cheapest job as an order to the unit
-					busyUnits[unitID] = hash -- save the command info for bookkeeping
-					myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-					myQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
-				else -- ZK-Specific: for combination raise-and-build jobs
-					local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
-					for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
-						local target = localUnits[i]
-						local udid = spGetUnitDefID(target)
-						local unitDef = UnitDefs[udid]
-						if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
-							spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, {""})
-							break
-						end
-					end
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {"shift"}) -- add the build part of the command to the end of the queue with options shift
-					busyUnits[unitID] = hash -- save the command info for bookkeeping
-					myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-					myQueue[hash].assignedUnits[unitID] = true
-				end -- end zk-specific guard
-			else -- for repair/reclaim/resurrect
-				if not myJob.target then -- for area commands
-					if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
-						spGiveOrderToUnit(unitID, CMD_MOVE, {myJob.x, myJob.y, myJob.z}, {""})
-						if myJob.alt then -- if alt was held, the job should remain 'permanent'
-							spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt", "shift"})
-						else -- for normal area jobs
-							spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"shift"}) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
-						end
-					elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt"})
-					else -- for normal area jobs
-						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {""})
-					end
-					busyUnits[unitID] = hash -- save the command info for bookkeeping
-					myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-					myQueue[hash].assignedUnits[unitID] = true
-				else -- for single-target commands
-					spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, {""}) -- issue the cheapest job as an order to the unit
-					busyUnits[unitID] = hash -- save the command info for bookkeeping
-					myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
-					myQueue[hash].assignedUnits[unitID] = true
-				end
-			end
-		elseif not myJob then
-			myUnits[unitID].cmdtype = commandType.idle -- otherwise if no valid job is found mark it as idle
+function GiveWorkToUnit(unitID)
+	local myJob = FindCheapestJob(unitID) -- find the cheapest job
+	if myJob and (not busyUnits[unitID] or busyUnits[unitID] ~= hash) then -- if myJob returns a job rather than nil
+	-- if the unit has already been assigned to the same job, we also prevent order spam
+	-- note, order spam stops workers from moving other workers out of the way if they're standing on each other's jobs, and also causes network spam and path-calculation spam.
+		local hash = BuildHash(myJob)
+		if busyUnits[unitID] then -- if we're reassigning, we need to update the entry stored in the queue
+			key = busyUnits[unitID]
+			myQueue[key].assignedUnits[unitID] = nil
 		end
+		if myJob.id < 0 then -- for build jobs
+			if not myJob.tfparams then -- for normal build jobs, ZK-specific guard, remove if porting
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {""}) -- issue the cheapest job as an order to the unit
+				busyUnits[unitID] = hash -- save the command info for bookkeeping
+				myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+				myQueue[hash].assignedUnits[unitID] = true -- save info for CostOfJob and StopAnyWorker
+			else -- ZK-Specific: for combination raise-and-build jobs
+				local localUnits = spGetUnitsInCylinder(myJob.x, myJob.z, 200)
+				for i=1, #localUnits do -- locate the 'terraunit' if it still exists, and give a repair order for it
+					local target = localUnits[i]
+					local udid = spGetUnitDefID(target)
+					local unitDef = UnitDefs[udid]
+					if string.match(unitDef.humanName, "erraform") and spGetUnitTeam(target) == myTeamID then
+						spGiveOrderToUnit(unitID, CMD_REPAIR, {target}, {""})
+						break
+					end
+				end
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.h}, {"shift"}) -- add the build part of the command to the end of the queue with options shift
+				busyUnits[unitID] = hash -- save the command info for bookkeeping
+				myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+				myQueue[hash].assignedUnits[unitID] = true
+			end -- end zk-specific guard
+		else -- for repair/reclaim/resurrect
+			if not myJob.target then -- for area commands
+				if not spIsPosInLos(myJob.x, myJob.y, myJob.z, spGetMyAllyTeamID()) then -- if the job is outside of LOS, we need to convert it to a move command or else the units won't bother exploring it.
+					spGiveOrderToUnit(unitID, CMD_MOVE, {myJob.x, myJob.y, myJob.z}, {""})
+					if myJob.alt then -- if alt was held, the job should remain 'permanent'
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt", "shift"})
+					else -- for normal area jobs
+						spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"shift"}) -- note: we add options->shift here to add our reclaim job to the unit's queue after the move order, to prevent it from falsely going idle.
+					end
+				elseif myJob.alt then -- if alt was held, the job should remain 'permanent'
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {"alt"})
+				else -- for normal area jobs
+					spGiveOrderToUnit(unitID, myJob.id, {myJob.x, myJob.y, myJob.z, myJob.r}, {""})
+				end
+				busyUnits[unitID] = hash -- save the command info for bookkeeping
+				myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+				myQueue[hash].assignedUnits[unitID] = true
+			else -- for single-target commands
+				spGiveOrderToUnit(unitID, myJob.id, {myJob.target}, {""}) -- issue the cheapest job as an order to the unit
+				busyUnits[unitID] = hash -- save the command info for bookkeeping
+				myUnits[unitID].cmdtype = commandType.buildQueue -- and mark the unit as under CB control.
+				myQueue[hash].assignedUnits[unitID] = true
+			end
+		end
+	elseif not myJob then
+		myUnits[unitID].cmdtype = commandType.idle -- otherwise if no valid job is found mark it as idle
 	end
 end
 
@@ -1322,13 +1389,15 @@ function FindCheapestJob(unitID)
     local ux, uy, uz = spGetUnitPosition(unitID)	-- unit location
     
     -- if the worker has already been assigned to a job, we cache it first to increase job 'stickiness'
-    if busyUnits[unitID] then
+    -- This looks redundant but it is not, because cleanorders may remove a worker from busyUnits without necessarily returning false,
+    -- ie if it's standing on top of the job that it's been assigned to and has to be cleared off.
+    if busyUnits[unitID] and CleanOrders(myQueue[busyUnits[unitID]], false) and busyUnits[unitID] then
 		local key = busyUnits[unitID]
 		local jx, jy, jz
 		cachedJob = myQueue[key]
 		
 		if not cachedJob then
-			Echo("Global Build Command: Invalid Job:" .. key)
+			Spring.Echo("GBC FindCheapestJob: cachedJob doesn't exist!!!")
 		end
 		
 		if cachedJob.x then -- for jobs with explicit locations, or for which we've cached locations
@@ -1374,8 +1443,10 @@ function FindCheapestJob(unitID)
 			local isReachableAndBuildable = true
 			if myUnits[unitID].unreachable[hash] then -- check cached values
 				isReachableAndBuildable = false
-			elseif not tmpJob.x and not IsTargetReachable(unitID, jx, jy, jz) then -- for jobs targetting units, which may be mobile, always calculate pathing.
-				isReachableAndBuildable = false
+			elseif not tmpJob.x then -- for jobs targetting units, which may be mobile, always calculate pathing.
+				if not CleanOrders(tmpJob, false) or not IsTargetReachable(unitID, jx, jy, jz) then
+					isReachableAndBuildable = false
+				end
 			end
 			
 			if isReachableAndBuildable then
@@ -1446,7 +1517,10 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
-	local unitDef = UnitDefs[abs(job.id)]
+	local unitDef = nil
+	if job.id < 0 then
+		unitDef = UnitDefs[abs(job.id)]
+	end
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
@@ -1454,21 +1528,45 @@ function IntelliCost(unitID, hash, ux, uz, jx, jz)
 	end
 	
 	if costMod == 1 then -- for starting new jobs
-		if (metalCost and metalCost > 300) or job.id == 40 or job.id == 90 then -- for expensive jobs, repair and reclaim
+		if (metalCost and metalCost > 300) then -- for expensive jobs
+			cost = (distance/math.sqrt(math.sqrt(distance))) + 400
+		elseif job.id == 90 then -- for reclaim
 			cost = distance + 400
-		elseif unitDef.reloadTime > 0 or job.id == 125 then -- for small defenses and resurrect
+		elseif job.id == 40 then -- for repair
+			if job.target then
+				unitDef = UnitDefs[spGetUnitDefID(job.target)]
+				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+					cost = distance - 150
+				else
+					cost = distance + 400
+				end
+			else
+				cost = distance + 400
+			end
+		elseif (unitDef and unitDef.reloadTime > 0) or job.id == 125 then -- for small defenses and resurrect
 			cost = distance - 150
-		elseif string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind") then -- for small energy
+		elseif unitDef and (string.match(unitDef.humanName, "Solar") or string.match(unitDef.humanName, "Wind")) then -- for small energy
 			cost = distance + 100
 		else -- for resurrect and all other small build jobs
 			cost = distance
 		end
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive buildings and resurrect
-			cost = distance
-		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+			cost = (distance/2) + (200 * (costMod - 2))
+		elseif unitDef and (unitDef.reloadTime > 0 or unitDef.name == 'armnanotc') then -- for small defenses and caretakers, allow up to two workers before increasing cost
 			cost = distance - 150 + (800 * (costMod - 2))
-		elseif job.id == 40 or job.id == 90 then -- for repair and reclaim
+		elseif job.id == 40 then -- for repair
+			if job.target then
+				unitDef = UnitDefs[spGetUnitDefID(job.target)]
+				if unitDef.speed == 0 and unitDef.reloadTime > 0 then -- repair orders for porc should be high prio.
+					cost = distance - 150 + (800 * (costMod - 2))
+				else
+					cost = distance + (200 * costMod)
+				end
+			else
+				cost = distance + (200 * costMod)
+			end
+		elseif job.id == 40 or job.id == 90 then -- for reclaim
 			cost = distance + (200 * costMod)
 		else -- for all other small build jobs
 			cost = distance + (600 * costMod)
@@ -1519,7 +1617,10 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	-- FindCheapestJob() always chooses the shortest apparent distance, so smaller cost values mean higher priority.
 	
 	local cost
-	local unitDef = UnitDefs[abs(job.id)]
+	local unitDef = nil
+	if job.id < 0 then
+		unitDef = UnitDefs[abs(job.id)]
+	end
 	local metalCost = false
 	
 	if job.id < 0 then -- for build jobs, get the metal cost
@@ -1535,7 +1636,7 @@ function FlatCost(unitID, hash, ux, uz, jx, jz)
 	else -- for assisting other workers
 		if (metalCost and metalCost > 300) or job.id == 125 then -- for expensive jobs and resurrect, no mobbing penalty
 			cost = distance
-		elseif unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
+		elseif unitDef and unitDef.reloadTime > 0 then -- for small defenses, allow up to two workers before increasing cost
 			cost = distance + (800 * (costMod - 2))
 		elseif job.id == 40 or job.id == 90 then -- for repair and reclaim
 			cost = distance + (200 * costMod)
@@ -1653,14 +1754,20 @@ function CheckIdlers()
 			-- if there's a command on the queue, do nothing and let it be removed from the idle list.
 			else -- otherwise if the unit is really idle
 				myUnits[unitID].cmdtype = commandType.idle -- then mark it as idle
-				reassignedUnits[unitID] = nil
-				if busyUnits[unitID] then -- if the worker is also still on our busy list
-					local key = busyUnits[unitID]
-					if areaCmdList[key] then -- if it was an area command
-						areaCmdList[key] = nil -- remove it from the area update list
-						StopAnyWorker(key)
-						myQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
-						busyUnits[unitID] = nil
+				if newBuilders[unitID] then -- for new units that have just been added and finished following their constructor separator orders.
+					newBuilders[unitID] = nil
+					GiveWorkToUnit(unitID)
+					reassignedUnits[unitID] = true
+				else
+					reassignedUnits[unitID] = nil
+					if busyUnits[unitID] then -- if the worker is also still on our busy list
+						local key = busyUnits[unitID]
+						if areaCmdList[key] then -- if it was an area command
+							areaCmdList[key] = nil -- remove it from the area update list
+							StopAnyWorker(key)
+							myQueue[key] = nil -- remove the job from the queue, since UnitIdle is the only way to tell completeness for area jobs.
+							busyUnits[unitID] = nil
+						end
 					end
 				end
 			end
@@ -1878,7 +1985,7 @@ function CleanOrders(cmd, isNew)
 			local target = cmd.target
 			local good = false
 		
-			if spValidUnitID(target) and spIsUnitAllied(target) then -- if the unit still exists, and hasn't been captured
+			if spValidUnitID(target) and spIsUnitAllied(target) and not spUnitIsDead(target) then -- if the unit still exists, and hasn't been captured
 				local hp, maxhp, _, _, _= spGetUnitHealth(target) -- get the unit hp
 				local _,_,isNano = spGetUnitIsStunned(target) -- and determine if it's still under construction (note: this is an annoying edge case)
 				if hp ~= maxhp or isNano then -- if our target is still damaged or under construction
@@ -1915,7 +2022,7 @@ function CleanOrders(cmd, isNew)
 					good = true
 				end
 			else -- if the target is a unit
-				if spValidUnitID(target) then -- if the unit still exists, then it hasn't been reclaimed fully yet
+				if spValidUnitID(target) and not spUnitIsDead(target) then -- if the unit still exists, then it hasn't been reclaimed fully yet
 					good = true
 				end
 			end
@@ -1959,8 +2066,6 @@ HOW THIS WORKS:
 		Simple 2D distance calculation.
 	GetFirstCommand()
 		Returns the first command in a unit's queue, if there is one, otherwise nil.
-	ping()
-		Returns the greater of 15 frames or latency, so that we can avoid clobbering the network.
 	BuildHash()
 		Takes a command (formatted for myQueue) as input, and returns a unique identifier
 		to use as a hash table key. Allows duplicate jobs to be easily identified, and to easily
@@ -1970,44 +2075,6 @@ HOW THIS WORKS:
 		them idle if not under direct orders. Called when jobs are finished, cancelled, or otherwise
 		invalidated.
 --]]
-
---  This function actually updates the list of builders in the CB group (myGroup).
---	Also borrowed from gunblob's UnitGroups v5.1
-function UpdateOneGroupsDetails(myGroupId)
-	local units = spGetGroupUnits(myGroupId)
-	for _, unitID in ipairs(units) do	--  remove newly excluded units
-		if (myUnits[unitID]) then
-			myUnits[unitID] = nil
-			if busyUnits[unitID] then
-				local key = busyUnits[unitID]
-				myQueue[key].assignedUnits[unitID] = nil
-				busyUnits[unitID] = nil
-			end
-			excludedUnits[unitID] = true
-		end
-	end
-	
-	for unitID,_ in pairs(excludedUnits) do	--  add units that are no longer excluded
-		local isInThere = false
-		for _,unit2 in ipairs(units) do
-			if ( unitID == unit2 ) then
-				isInThere = true
-				break
-			end
-		end
-		if (not isInThere) then
-			excludedUnits[unitID] = nil
-			local cmd = GetFirstCommand(unitID) -- find out if it already has any orders
-			if cmd and cmd.id then -- if so we mark it as drec
-			myUnits[unitID] = {cmdtype=commandType.drec, unreachable={}}
-			else -- otherwise we mark it as idle
-				myUnits[unitID] = {cmdtype=commandType.idle, unreachable={}}
-			end
-			UpdateOneWorkerPathing(unitID) -- then precalculate pathing info
-		end
-	end
-	groupHasChanged = false
-end
 
 --This function tells us if a unit can perform the job in question.
 function CanBuildThis(cmdID, unitID)
@@ -2093,13 +2160,10 @@ function UpdateOneJobPathing(hash)
 end
 
 -- This function performs garbage collection for cached pathing
-function CleanPathing(iUnits)
-	for i=1, #iUnits do
-		local unitID = iUnits[i]
-		for hash,_ in pairs(myUnits[unitID].unreachable) do
-			if not myQueue[hash] then -- remove old, invalid jobs from the unreachable list
-				myUnits[unitID].unreachable[hash] = nil
-			end
+function CleanPathing(unitID)
+	for hash,_ in pairs(myUnits[unitID].unreachable) do
+		if not myQueue[hash] then -- remove old, invalid jobs from the unreachable list
+			myUnits[unitID].unreachable[hash] = nil
 		end
 	end
 end
@@ -2197,15 +2261,6 @@ end
 function GetFirstCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1)
 	return queue[1]
-end
-
---	Prevent CBAI from canceling orders that just haven't made it to host yet
---	because of high ping. Donated by SkyStar.
-function ping()
-	local playerID = spGetLocalPlayerID()
-	local tname, _, tspec, tteam, tallyteam, tping, tcpu = spGetPlayerInfo(playerID)  
-	tping = (tping*1000-((tping*1000)%1)) /100 * 4
-	return max( tping, 15 ) --wait minimum 0.5 sec delay
 end
 
 --	Generate unique key value for each command using its parameters.

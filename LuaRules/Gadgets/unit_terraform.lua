@@ -2110,7 +2110,7 @@ end
 -- Sudden Death Mode
 --------------------------------------------------------------------------------
 
-function GG.Terraform_RaiseWater( raiseAmount)
+function GG.Terraform_RaiseWater(raiseAmount)
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
@@ -2126,7 +2126,6 @@ function GG.Terraform_RaiseWater( raiseAmount)
 		end
 	end
 	--[[ move commands looks as though it will be messy
-	
 	
 	local allUnits = spGetAllUnits()
 	local allUnitsCount = #allUnits
@@ -2144,6 +2143,16 @@ function GG.Terraform_RaiseWater( raiseAmount)
 	--]]
 	spAdjustHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
 	
+	Spring.SetGameRulesParam("waterLevelModifier", raiseAmount)
+	
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		local featureID = features[i]
+		local fx, fy, fz = Spring.GetFeaturePosition(featureID)
+		if featureID and fy then
+			Spring.SetFeaturePosition(featureID, fx, fy - raiseAmount, fz, true)
+		end
+	end
 end
 
 --------------------------------------------------------------------------------

@@ -64,7 +64,7 @@ local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, text
 local statePanel = {}
 local tabPanel
 local selectionIndex = 0
-local contentHolder
+local background
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -236,6 +236,45 @@ local function TabListsAreIdentical(newTabList, tabList)
 		end
 	end
 	return true
+end
+
+local prevClass
+local prevRightPadding
+
+local function UpdateBackgroundSkin()
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	
+	local newClass = skin.panel
+	local newRightPadding = 0
+	
+	if options.fancySkinning.value and skin.panel_2100 then
+		local selectedCount = Spring.GetSelectedUnitsCount()
+		if selectedCount and selectedCount > 0 then
+			newClass = skin.panel_2100
+		else
+			newClass = skin.panel_1100 or skin.panel
+			newRightPadding = options.rightPadding.value
+		end
+	end
+	
+	if prevRightPadding ~= newRightPadding then
+		background._relativeBounds.left = 0
+		background._relativeBounds.right = newRightPadding
+		background:UpdateClientArea()
+		prevRightPadding = newRightPadding
+	end
+	
+	if prevClass == newClass then
+		return
+	end
+	prevClass = newClass
+	
+	background.tiles = newClass.tiles
+	background.TileImageFG = newClass.TileImageFG
+	background.backgroundColor = newClass.backgroundColor
+	background.TileImageBK = newClass.TileImageBK
+	background:Invalidate()
 end
 
 --------------------------------------------------------------------------------
@@ -1231,7 +1270,8 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Keeps main window for tweak mode.
-	contentHolder:SetVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
+	background:SetVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
+	UpdateBackgroundSkin()
 end
 
 --------------------------------------------------------------------------------
@@ -1261,7 +1301,7 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, -1},
+		padding = {-1, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
@@ -1277,11 +1317,19 @@ local function InitializeControls()
 	
 	tabPanel = GetTabPanel(buildTabHolder)
 	
-	contentHolder = Panel:New{
-		--classname = "bottomMiddlePanel",
+	buttonsHolder = Control:New{
+		x = options.leftPadding.value,
+		y = "15%",
+		right = options.rightPadding.value,
+		bottom = 0,
+		padding = {0, 0, 0, 0},
+		parent = mainWindow,
+	}
+	
+	background = Panel:New{
 		x = 0,
 		y = "15%",
-		width = "100%",
+		right = 0,
 		bottom = 0,
 		draggable = false,
 		resizable = false,
@@ -1290,14 +1338,6 @@ local function InitializeControls()
 		parent = mainWindow,
 	}
 	
-	buttonsHolder = Control:New{
-		x = options.leftPadding.value,
-		y = 0,
-		right = options.rightPadding.value,
-		bottom = 0,
-		padding = {0, 0, 0, 0},
-		parent = contentHolder,
-	}
 	
 	local function ReturnToOrders()
 		if options.selectionClosesTab.value then
@@ -1385,7 +1425,7 @@ end
 
 function options.hide_when_spectating.OnChange(self)
 	local isSpec = Spring.GetSpectatingState()
-	contentHolder:SetVisibility(not (self.value and isSpec))
+	background:SetVisibility(not (self.value and isSpec))
 end
 
 function options.unitsHotkeys.OnChange(self)
@@ -1465,19 +1505,7 @@ options.leftPadding.OnChange  = PaddingUpdate
 options.rightPadding.OnChange = PaddingUpdate
 
 function options.fancySkinning.OnChange(self)
-	local currentSkin = Chili.theme.skin.general.skinName
-	local skin = Chili.SkinHandler.GetSkin(currentSkin)
-	
-	local newClass = skin.panel
-	if self.value and skin.bottomMiddlePanel then
-		newClass = skin.bottomMiddlePanel
-	end
-	
-	contentHolder.tiles = newClass.tiles
-	contentHolder.TileImageFG = newClass.TileImageFG
-	contentHolder.backgroundColor = newClass.backgroundColor
-	contentHolder.TileImageBK = newClass.TileImageBK
-	contentHolder:Invalidate()
+	UpdateBackgroundSkin()
 end
 
 --------------------------------------------------------------------------------
@@ -1532,7 +1560,7 @@ end
 function widget:PlayerChanged(playerID)
 	if options.hide_when_spectating.value then
 		local isSpec = Spring.GetSpectatingState()
-		contentHolder:SetVisibility(not isSpec)
+		background:SetVisibility(not isSpec)
 	end
 end
 

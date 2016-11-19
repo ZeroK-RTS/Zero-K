@@ -142,7 +142,7 @@ confdata.subMenuIcons = {
 	['Game/New Unit States'] 		= imgPath..'epicmenu/robot2.png',
 	['Game/Unit Behaviour'] 		= imgPath..'epicmenu/robot2.png',
 	['Game/Transport AI'] 			= imgPath..'epicmenu/robot2.png',
-	['Game/Worker AI'] 				= imgPath..'epicmenu/robot2.png',
+	['Game/Worker AI'] 				= imgPath..'commands/Bold/build_light.png',
 	['Game/Unit Marker'] 			= imgPath..'epicmenu/marker.png',
 	['Game/Construction Hotkeys'] 	= imgPath..'epicmenu/keyboard.png',
 	['Game/Selection Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
@@ -242,8 +242,8 @@ local gameSpeedPath = 'Game/Game Speed'
 local GBCPath = 'Game/Worker AI'
 local gbcinfo = "Global Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
 "then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
-"You can also exclude workers from GBC's control by adding them to the exclusion group (default control group 0). " ..
-"Hit \255\255\90\90alt-s\255\255\255\255 to get an area select for removing jobs.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n"
+"You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
+"Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n"
 ShButton(GBCPath, 'Toggle Global Build Command', function() Spring.SendCommands{"luaui togglewidget Global Build Command"} end, gbcinfo)
 
 --- CAMERA ---
