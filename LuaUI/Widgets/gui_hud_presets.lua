@@ -136,6 +136,7 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(integralName, integralPath, "hide_when_spectating", false)
 	WG.SetWidgetOption(integralName, integralPath, "leftPadding", 0)
 	WG.SetWidgetOption(integralName, integralPath, "rightPadding", 0)
+	WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
 	
 	WG.SetWidgetOption(minimapName, minimapPath, "alwaysResizable", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", false)
@@ -215,7 +216,7 @@ local function SetupDefaultPreset()
 
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(480, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		0,
 		screenHeight - integralHeight,
@@ -377,10 +378,23 @@ local function SetupNewPreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(480, screenWidth*0.4))
-	local integralHeight = 20*math.floor(math.min(screenHeight/4.5, 200*integralWidth/450)/20)
+	local integralHeight = 20*math.floor(math.min(screenHeight/4.5, 200*integralWidth/450)/20) + 8
+	if integralWidth/integralHeight > 2.5 then
+		integralWidth = integralHeight*2.5
+	end
 	if minimapSize + selectorWidth + integralWidth < screenWidth/2 then
 		local extraPadding = screenWidth/2 - (minimapSize + selectorWidth + integralWidth)
 		integralWidth = screenWidth/2 - (minimapSize + selectorWidth)
+	end
+	
+	Spring.Echo("integralWidth", integralWidth)
+	
+	if integralWidth < 480 then
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480))
+	else
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
 	end
 	
 	WG.SetWindowPosAndSize("integralwindow",
@@ -397,6 +411,9 @@ local function SetupNewPreset()
 	local selectionsWidth = 450
 	if thinMode then
 		selectionsWidth = screenWidth - (minimapSize + selectorWidth + integralWidth)
+	end
+	if screenWidth > 1750 then
+		selectionsWidth = 475
 	end
 	
 	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
@@ -532,7 +549,7 @@ local function SetupCraftyPreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		screenWidth - integralWidth,
 		screenHeight - integralHeight,
@@ -639,7 +656,7 @@ local function SetupEnsemblePreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		0,
 		screenHeight - integralHeight,
@@ -791,7 +808,7 @@ local function SetupWestwoodPreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, resourceBarWidth))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		screenWidth - integralWidth,
 		resourceBarHeight + minimapHeight,
