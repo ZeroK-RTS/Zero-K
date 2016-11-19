@@ -374,9 +374,9 @@ options = {
 		type = 'radioButton',
 		value = 'arwindow',
 		items = {
-			{key = 'arwindow', 	name='Aspect Ratio Window'},
-			{key ='armap', 		name='Aspect Ratio Map'},
-			{key ='arnone', 		name='Map Fills Window'},
+			{key = 'arwindow',  name = 'Aspect Ratio Window'},
+			{key = 'armap',     name = 'Aspect Ratio Map'},
+			{key = 'arnone',    name = 'Map Fills Window'},
 		},
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
@@ -492,6 +492,12 @@ options = {
 			map_panel.backgroundColor = newClass.backgroundColor
 			map_panel.TileImageBK = newClass.TileImageBK
 			map_panel:Invalidate()
+			
+			fakewindow.tiles = newClass.tiles
+			fakewindow.TileImageFG = newClass.TileImageFG
+			fakewindow.backgroundColor = newClass.backgroundColor
+			fakewindow.TileImageBK = newClass.TileImageBK
+			fakewindow:Invalidate()
 		end
 	}
 	--[[
@@ -686,8 +692,8 @@ MakeMinimapWindow = function()
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
 		backgroundColor = bgColor_panel
-		}
-	
+	}
+
 	buttons_panel = Chili.StackPanel:New{
 		name = "Minimap buttons_panel",
 		orientation = 'horizontal',
@@ -790,6 +796,10 @@ MakeMinimapWindow = function()
 			((not options.hidebuttons.value) and buttons_panel) or nil,
 		},
 	}
+		
+	if options.fancySkinning.value then
+		options.fancySkinning.OnChange(options.fancySkinning)
+	end
 
 end
 
