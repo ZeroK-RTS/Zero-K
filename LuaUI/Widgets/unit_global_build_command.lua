@@ -360,6 +360,13 @@ function widget:Initialize()
 	}
 end
 
+-- cleans up if the widget is disabled.
+function widget:Shutdown()
+	WG.GlobalBuildCommand = nil
+	WG.icons.SetDisplay('gbcicon', false)
+	WG.icons.SetDisplay('gbcidle', false)
+end
+
 --	The main process loop, which calls the core code to update state and assign orders as often as ping allows.
 function widget:GameFrame(frame)
 	if frame % 15 == 0 then
