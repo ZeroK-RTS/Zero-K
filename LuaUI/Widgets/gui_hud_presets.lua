@@ -34,6 +34,7 @@ local function SetFancySkin()
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
+	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 	
 	WG.SetWidgetOption(coreName, corePath, "fancySkinning", true)
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
@@ -41,6 +42,7 @@ local function SetFancySkin()
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", true)
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
 	
 	WG.crude.SetMenuSkinClass("panel_0021")
 end
@@ -53,6 +55,7 @@ local function SetBoringSkin()
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
+	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 	
 	WG.SetWidgetOption(coreName, corePath, "fancySkinning", false)
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
@@ -60,6 +63,7 @@ local function SetBoringSkin()
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", false)
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", false)
 	
 	WG.crude.SetMenuSkinClass("panel")
 end
@@ -72,6 +76,7 @@ local function SetNewOptions()
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
+	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 
 	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0.8)
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0.75)
@@ -107,6 +112,8 @@ local function SetNewOptions()
 	WG.SetWidgetOption(econName, econPath, "opacity", 1)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
+	
 	WG.crude.SetMenuSkinClass("panel_0021")
 	
 	needToCallFunction = SetFancySkin
@@ -120,6 +127,7 @@ local function ResetOptionsFromNew()
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
+	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 
 	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0)
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0)
@@ -155,6 +163,8 @@ local function ResetOptionsFromNew()
 	
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
+	
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", false)
 	
 	WG.crude.SetMenuSkinClass("panel")
 	
@@ -458,6 +468,13 @@ local function SetupNewPreset()
 		0,
 		resourceBarWidth,
 		resourceBarHeight
+	)
+	
+	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		menuHeight
 	)
 	
 	-- Menu

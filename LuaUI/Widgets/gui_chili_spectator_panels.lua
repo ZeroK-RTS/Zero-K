@@ -135,6 +135,7 @@ options_order = {
 	'resourceMainFontSize', 
 	'resourceFontSize',
 	'colourBlind', 
+	'fancySkinning',
 }
  
 options = {
@@ -237,6 +238,33 @@ options = {
 		OnChange = option_ColourBlindUpdate, 
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		path = minimap_path,
+		OnChange = function (self)
+			if not (playerWindow and playerWindow.mainPanel) then
+				return
+			end
+			
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.panel_2021 then
+				newClass = skin.panel_2021
+			end
+			
+			playerWindow.mainPanel.tiles = newClass.tiles
+			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
+			playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
+			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
+			playerWindow.mainPanel:Invalidate()
+		end
+	}
 }
 
 --------------------------------------------------------------------------------
@@ -705,6 +733,7 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
+		classname = (options.fancySkinning.value and "panel_2021") or nil,
 		backgroundColor = {1,1,1,options.resourceOpacity.value},
 		color = {1,1,1,options.resourceOpacity.value},
 		parent = data.window,

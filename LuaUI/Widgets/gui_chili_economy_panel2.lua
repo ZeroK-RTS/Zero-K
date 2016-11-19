@@ -885,6 +885,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// METAL
 	
 	window_metal = Chili.Panel:New{
+		classname = (options.fancySkinning.value and "panel_2021") or nil,
 		parent = window_main_display,
 		name = "Metal",
 		y      = 0,
@@ -1022,6 +1023,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// ENERGY
 
 	window_energy = Chili.Panel:New{
+		classname = (options.fancySkinning.value and "panel_2021") or nil,
 		parent = window_main_display,
 		name = "Energy",
 		y      = 0,
