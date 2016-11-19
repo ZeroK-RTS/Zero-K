@@ -452,6 +452,24 @@ local function SetupNewPreset()
 		selectionsHeight
 	)
 	
+	-- Commander Upgrade
+	local commUpgradeWidth = 200
+	local commUpgradeHeight = 325
+	local commUpgradeY = screenHeight - integralHeight - commUpgradeHeight - 25
+	WG.SetWindowPosAndSize("CommanderUpgradeWindow",
+		minimapSize + selectorWidth,
+		commUpgradeY,
+		commUpgradeWidth,
+		commUpgradeHeight
+	)
+	
+	WG.SetWindowPosAndSize("ModuleSelectionWindow",
+		minimapSize + selectorWidth + commUpgradeWidth,
+		commUpgradeY,
+		500,
+		500
+	)
+	
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
 	-- Top of the UI
