@@ -736,6 +736,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 				local texture = displayConfig.texture[state]
 				SetImage(texture)
 			end
+			if command then
+				SetDisabled(command.disabled)
+			end
 			return
 		end
 		cmdID = newCmdID
