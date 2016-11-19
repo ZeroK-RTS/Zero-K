@@ -558,7 +558,17 @@ options = {
 			
 			local newClass = skin.panel
 			if self.value and skin.panel_1120 then
-				newClass = skin.panel_1120
+				local screenWidth, screenHeight = Spring.GetWindowGeometry()
+				
+				if real_window_corner and real_window_corner.x + real_window_corner.width > screenWidth - 10 then
+					newClass = skin.panel_0120
+					real_window_corner.padding[3] = -1
+				else
+					if real_window_corner then
+						real_window_corner.padding[3] = 0
+					end
+					newClass = skin.panel_1120
+				end
 			end
 			
 			window_corner.tiles = newClass.tiles
@@ -2832,6 +2842,13 @@ function widget:Initialize()
 		padding = {-1, 0, 0, -1},
         minWidth = 450, 
 		minHeight = 120,
+		OnResize = {
+			function()
+				if options.fancySkinning.value then
+					options.fancySkinning.OnChange(options.fancySkinning)
+				end
+			end
+		}
 	}
     
 	window_corner = Panel:New{

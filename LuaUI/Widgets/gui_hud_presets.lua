@@ -342,7 +342,6 @@ local function SetupNewPreset()
 	)
 	
 	-- Player List
-	
 	local playerlistWidth = 296
 	local playerlistHeight = 150
 	WG.SetWindowPosAndSize("Player List",
