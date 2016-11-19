@@ -245,7 +245,6 @@ local defense = {
 
 local aux = {	--merged into special
 	corrad =   {order = 10, row = 1, col = 1},
-	armsonar = {order = 11, row = 1, col = 2},
 	armjamt =  {order = 12, row = 1, col = 3},
 	armarad =  {order = 14, row = 1, col = 4},
 }
