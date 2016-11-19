@@ -96,7 +96,9 @@ local screen0
 
 --------------------------------------------------------------------------------
 -- Global chili controls
-local window_crude 
+local window_crude
+local panel_crude
+local panel_background
 local window_exit
 local window_exit_confirm
 local window_flags
@@ -2154,21 +2156,35 @@ local function MakeMenuBar()
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	
 	window_crude = Window:New{
-		name='epicmenubar',
-		right = 0,  
+		name = 'epicmenubar',
+		x = screen_width - crude_width,
 		y = 0,
-		dockable = true,
-		clientWidth = crude_width,
-		clientHeight = crude_height,
+		width = crude_width,
+		height = 50,
+		minWidth = crude_width,
 		draggable = false,
 		tweakDraggable = true,
+		tweakResizable = true,
 		resizable = false,
 		minimizable = false,
-		backgroundColor = color.main_bg,
-		color = color.main_bg,
-		margin = {0,0,0,0},
-		padding = {0,0,3,0},
+		dockable = true,
+		backgroundColor = color.empty,
+		color = color.empty,
+		padding = {0,0,0,0},
 		parent = screen0,
+	}
+	
+	panel_crude = Panel:New{
+		y = 0,
+		right = 0,  
+		width = crude_width,
+		clientWidth = crude_width,
+		clientHeight = 50,
+		backgroundColor = color.empty,
+		color = color.empty,
+		margin = {0,0,0,0},
+		padding = {0,0,2,5},
+		parent = window_crude,
 		
 		children = {
 			StackPanel:New{
@@ -2363,6 +2379,17 @@ local function MakeMenuBar()
 				}
 			}
 		}
+	}
+	
+	panel_background = Panel:New{
+		classname = settings.menuClassname,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		backgroundColor = color.main_bg,
+		color = color.main_bg,
+		parent = window_crude,
 	}
 	settings.show_crudemenu = true
 	--ShowHideCrudeMenu()
@@ -2648,6 +2675,25 @@ function widget:Initialize()
 		end
 	end
 	
+	function WG.crude.SetMenuSkinClass(newClassName)
+		if newClassName == settings.menuClassname then
+			return
+		end
+		settings.menuClassname = newClassName
+		
+		local currentSkin = Chili.theme.skin.general.skinName
+		local skin = Chili.SkinHandler.GetSkin(currentSkin)
+		
+		local newClass = skin[newClassName]
+		panel_background.classname = newClassName
+		
+		panel_background.tiles = newClass.tiles
+		panel_background.TileImageFG = newClass.TileImageFG
+		panel_background.backgroundColor = newClass.backgroundColor
+		panel_background.TileImageBK = newClass.TileImageBK
+		panel_background:Invalidate()
+	end
+		
 	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
 	AddAction("show_toggle_crudemenu", ToggleActionMenu, nil, "t")

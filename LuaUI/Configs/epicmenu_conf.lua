@@ -26,6 +26,7 @@ local color = {
 	transblack2 = {0,0,0,0.7},
 	transGray = {0.1,0.1,0.1,0.8},
 	
+	empty = {0,0,0,0},
 	null = {nil, nil, nil, 1},
 	transnull = {nil, nil, nil, 0.3},
 	transnull2 = {nil, nil, nil, 0.5},
@@ -37,7 +38,7 @@ color.tooltip_fg = color.null
 color.tooltip_info = color.cyan
 color.tooltip_help = color.green
 
-color.main_bg = color.transnull2
+color.main_bg = color.transnull3
 color.main_fg = color.null
 
 color.menu_bg = color.null

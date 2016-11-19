@@ -57,9 +57,11 @@ local metalWarningPanel
 local energyWarningPanel
 
 local window_main_display
+local window_metal
 local image_metal
 local bar_metal
 local bar_reserve_metal
+local window_energy
 local image_energy
 local bar_energy
 local bar_overlay_energy
@@ -168,7 +170,7 @@ end
 options_order = {
 	'ecoPanelHideSpec', 'eExcessFlash', 'energyFlash', 'energyWarning', 'metalWarning', 'opacity',
 	'enableReserveBar','defaultEnergyReserve','defaultMetalReserve',
-	'colourBlind','fontSize','warningFontSize'}
+	'colourBlind','fontSize','warningFontSize', 'fancySkinning'}
  
 options = {
 	ecoPanelHideSpec = {
@@ -227,11 +229,11 @@ options = {
 		value = 0.6, min = 0, max = 1, step = 0.01,
 		OnChange = function(self) 
 			if (window_metal) then 
-				window_metal.color = {1,1,1,self.value} 
+				window_metal.backgroundColor[4] = self.value
 				window_metal:Invalidate() 
 			end
 			if (window_energy) then 
-				window_energy.color = {1,1,1,self.value} 
+				window_energy.backgroundColor[4] = self.value 
 				window_energy:Invalidate() 
 			end
 		end,
@@ -256,6 +258,35 @@ options = {
 		value = 14, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		path = minimap_path,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.panel_2021 then
+				newClass = skin.panel_2021
+			end
+			
+			window_metal.tiles = newClass.tiles
+			window_metal.TileImageFG = newClass.TileImageFG
+			window_metal.backgroundColor = newClass.backgroundColor
+			window_metal.TileImageBK = newClass.TileImageBK
+			window_metal:Invalidate()
+			
+			window_energy.tiles = newClass.tiles
+			window_energy.TileImageFG = newClass.TileImageFG
+			window_energy.backgroundColor = newClass.backgroundColor
+			window_energy.TileImageBK = newClass.TileImageBK
+			window_energy:Invalidate()
+		end
+	}
 }
 
 --------------------------------------------------------------------------------
@@ -853,7 +884,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	--// METAL
 	
-	local window_metal = Chili.Panel:New{
+	window_metal = Chili.Panel:New{
 		parent = window_main_display,
 		name = "Metal",
 		y      = 0,
@@ -861,7 +892,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = subWindowWidth,
 		bottom = 0,
 		padding = {0,0,0,0},
-		color = {1,1,1,options.opacity.value},
+		backgroundColor = {1,1,1,options.opacity.value},
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -990,14 +1021,14 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	
 	--// ENERGY
 
-	local window_energy = Chili.Panel:New{
+	window_energy = Chili.Panel:New{
 		parent = window_main_display,
 		name = "Energy",
 		y      = 0,
 		x      = '50%',
 		width  = subWindowWidth,
 		bottom = 0,
-		color = {1,1,1,options.opacity.value},
+		backgroundColor = {1,1,1,options.opacity.value},
 		padding = {0,0,0,0},
 		dockable = false;
 		draggable = false,

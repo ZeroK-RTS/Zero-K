@@ -15,6 +15,8 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local BUTTON_Y = 5
 local BUTTON_SIZE = 40
 
+local contentHolder
+
 -- Chili classes
 local Chili
 local Button
@@ -112,6 +114,29 @@ options = {
 			end
 		end,
 	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		path = minimap_path,
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local newClass = skin.panel
+			if self.value and skin.panel_2001 then
+				newClass = skin.panel_2001
+			end
+			
+			contentHolder.tiles = newClass.tiles
+			contentHolder.TileImageFG = newClass.TileImageFG
+			contentHolder.backgroundColor = newClass.backgroundColor
+			contentHolder.TileImageBK = newClass.TileImageBK
+			contentHolder:Invalidate()
+		end
+	},
 }
 
 local commandButtonMouseDown = { 
@@ -191,8 +216,6 @@ local function MakeCommandButton(parent, x, file, params)
 		},
 	}
 end
-
-local contentHolder
 
 local function InitializeControls()
 	local mainWindow = Window:New{
