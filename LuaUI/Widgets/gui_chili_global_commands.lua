@@ -12,8 +12,8 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local BUTTON_Y = 5
-local BUTTON_SIZE = 40
+local BUTTON_Y = 8
+local BUTTON_SIZE = 32
 
 local contentHolder
 
@@ -163,7 +163,7 @@ local globalMouseDown = {
 	end 
 }
 
-local function MakeCommandButton(parent, x, file, params)
+local function MakeCommandButton(parent, position, file, params, vertical, onClick)
 	local option = params.option
 	local name, desc, action, hotkey, command
 	if option then
@@ -181,9 +181,9 @@ local function MakeCommandButton(parent, x, file, params)
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
 	end
 		
-	return Chili.Button:New{
-		x = x,
-		y = BUTTON_Y,
+	Chili.Button:New{
+		x = (vertical and 0) or ((position - 1)*34 + 5),
+		y = (vertical and ((position - 1)*34 + 5)) or BUTTON_Y,
 		width = BUTTON_SIZE, 
 		height = BUTTON_SIZE,
 		caption = "",
@@ -202,6 +202,9 @@ local function MakeCommandButton(parent, x, file, params)
 				else
 					Spring.SendCommands(action)
 				end
+				if onClick then
+					onClick()
+				end
 			end 
 		},
 		children = {
@@ -215,6 +218,72 @@ local function MakeCommandButton(parent, x, file, params)
 			} or nil
 		},
 	}
+end
+
+local function MakeDropdownButtons(parent, position, overlays)
+	
+	local overlayPanel = Panel:New{
+		x = 0,
+		y = 50,
+		width = 44,
+		height = (#overlays)*34 + 14,
+		parent = screen0,
+		padding = {6,4,0,0}
+	}
+		
+	local function HideSelector()
+		overlayPanel:SetVisibility(false)
+	end
+	HideSelector()
+	
+	local overlayImageMap = {}
+	for i = 1, #overlays do
+		MakeCommandButton(overlayPanel, i, overlays[i][1], {option = overlays[i][2]}, true, HideSelector)
+		
+		overlayImageMap[overlays[i][3]] = overlays[i][1]
+	end
+	
+	local overlaySelector = Chili.Button:New{
+		x = (position - 1)*34 + 5,
+		y = BUTTON_Y,
+		width = BUTTON_SIZE, 
+		height = BUTTON_SIZE,
+		caption = "",
+		margin = {0,0,0,0},
+		padding = {2,2,2,2},
+		tooltip = "Set map overlay", 
+		parent = parent,
+		OnMouseDown = globalMouseDown,
+		OnClick = {
+			function(self)
+				overlayPanel:SetVisibility(true)
+			end 
+		},
+	}
+		
+	local currentOverlayImage = Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = overlaySelector,
+	}
+	
+	local externalFunctions = {}
+	
+	local oldDrawMode
+	function externalFunctions.UpdateOverlayImage()
+		local newDrawMode = Spring.GetMapDrawMode()
+		if newDrawMode == oldDrawMode then
+			return
+		end
+		oldDrawMode = newDrawMode
+		
+		currentOverlayImage.file = overlayImageMap[newDrawMode]
+		currentOverlayImage:Invalidate()
+	end
+	
+	return externalFunctions
 end
 
 local function InitializeControls()
@@ -248,45 +317,37 @@ local function InitializeControls()
 		parent = mainWindow,
 	}
 
-	MakeCommandButton(contentHolder, 10,
-		'LuaUI/images/map/fow.png', 
-		{option = 'viewfow'} 
-	)
-	MakeCommandButton(contentHolder, 50,
-		nil,
-		{option = 'viewstandard'} 
-	)
-	MakeCommandButton(contentHolder, 90,
-		'LuaUI/images/map/heightmap.png', 
-		{option = 'viewheightmap'} 
-	)
-	MakeCommandButton(contentHolder, 130,
-		'LuaUI/images/map/blockmap.png', 
-		{option = 'viewblockmap'} 
-	)
-		
+	local overlayConfig = {
+		{nil, 'viewstandard', "normal"},
+		{'LuaUI/images/map/fow.png', 'viewfow', "los"},
+		{'LuaUI/images/map/heightmap.png', 'viewheightmap', "height"},
+		{'LuaUI/images/map/blockmap.png', 'viewblockmap', "pathTraversability"}, 
+	}
+	
+	mapOverlay = MakeDropdownButtons(contentHolder, 1, overlayConfig)
+	mapOverlay.UpdateOverlayImage()
+	
 	-- handled differently because command is registered in another widget
-	MakeCommandButton(contentHolder, 170,
+	MakeCommandButton(contentHolder, 2,
 		'LuaUI/images/map/metalmap.png', 
 		{name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}
 	)
-	
-	MakeCommandButton(contentHolder, 210,
-		'LuaUI/images/commands/Bold/retreat.png', 
-		{name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}
-	)
-	MakeCommandButton(contentHolder, 250,
-		'LuaUI/images/commands/Bold/ferry.png', 
-		{name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}
-	)
-  
-	MakeCommandButton(contentHolder, 290,
+	MakeCommandButton(contentHolder, 3,
 		'LuaUI/images/drawingcursors/eraser.png', 
 		{option = 'clearmapmarks'} 
 	)
-	MakeCommandButton(contentHolder, 330,
+	MakeCommandButton(contentHolder, 4,
 		'LuaUI/images/Crystal_Clear_action_flag.png', 
 		{option = 'lastmsgpos'} 
+	)
+	
+	MakeCommandButton(contentHolder, 5.5,
+		'LuaUI/images/commands/Bold/retreat.png', 
+		{name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}
+	)
+	MakeCommandButton(contentHolder, 6.5,
+		'LuaUI/images/commands/Bold/ferry.png', 
+		{name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}
 	)
 	
 end	
@@ -294,6 +355,10 @@ end
 function options.background_opacity.OnChange(self)
 	contentHolder.backgroundColor[4] = self.value
 	contentHolder:Invalidate()
+end
+
+function widget:Update()
+	mapOverlay.UpdateOverlayImage()
 end
 			
 function widget:Initialize()
