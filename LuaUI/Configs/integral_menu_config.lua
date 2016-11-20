@@ -65,6 +65,7 @@ local buttonLayoutConfig = {
 			keepAspect = false,
 		},
 		showCost = false,
+		queueButton = true,
 		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
 		dragAndDrop = true,
 	},
@@ -78,6 +79,7 @@ local buttonLayoutConfig = {
 		},
 		caption = "...",
 		showCost = false,
+		queueButton = true,
 		-- "\255\1\255\1Hold Left mouse \255\255\255\255: drag drop to different factory or position in queue\n"
 		tooltipOverride = "\255\1\255\1Left/Right click \255\255\255\255: Add to/subtract from queue\n\255\1\255\1Hold Left mouse \255\255\255\255: Drag to a different position in queue",
 		dragAndDrop = true,

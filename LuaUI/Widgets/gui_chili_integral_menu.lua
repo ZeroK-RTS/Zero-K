@@ -73,7 +73,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'selectionClosesTab', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
+	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'fancySkinning'
 }
 
@@ -100,6 +100,13 @@ options = {
 		tooltip = "When enabled, selecting a build option will switch the tab back to Orders (except for build options in the factory queue tab).",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
+	},
+	altInsertBehind = {
+		name = 'Alt Inserts Behind',
+		tooltip = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
+		type = 'bool',
+		value = false,
 		noHotkey = true,
 	},
 	unitsHotkeys = {
@@ -401,6 +408,10 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 		return true
 	end
 	
+	if WG.noises then
+		WG.noises.PlayResponse(factoryUnitID, cmdID)
+	end
+	
 	if alt then
 		MoveOrRemoveCommands(queueCmdID, factoryUnitID, commands, queuePosition, false, 0)
 		return true
@@ -418,16 +429,27 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	return true
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, queueBlock, useGrid)
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, queueBlock, useGrid)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
-	if factoryUnitID then
+	if factoryUnitID and isQueueButton then
 		QueueClickFunc(mouse, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
 		return true
 	end
 	
 	if useGrid and ctrl and (not mouse) and options.ctrlDisableGrid.value then
 		return false
+	end
+	
+	if alt and factoryUnitID and options.altInsertBehind.value then
+		local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
+		for i = 1, inputMult do
+			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, {"alt", "ctrl"})
+		end
+		if WG.noises then
+			WG.noises.PlayResponse(factoryUnitID, cmdID)
+		end
+		return true
 	end
 	
 	local index = Spring.GetCmdDescIndex(cmdID)
@@ -451,6 +473,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	local queueCount
 	local isDisabled = false
 	local isSelected = false
+	local isQueueButton = buttonLayout.queueButton
 	local hotkeyText
 	
 	local function DoClick(_, _, _, mouse)
@@ -460,7 +483,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if isDisabled then
 			return false
 		end
-		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, x, usingGrid)
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, x, usingGrid)
 		if sucess and onClick then
 			-- Don't do the onClick if the command was not eaten by the menu.
 			onClick()
@@ -1166,7 +1189,7 @@ local function GetSelectionValues()
 	return false, nil, nil, #selection
 end
 
-local function ProcessCommand(command, factorySelected, selectionIndex)
+local function ProcessCommand(command, factoryUnitID, factoryUnitDefID, selectionIndex)
 	if hiddenCommands[command.id] or command.hidden then
 		return
 	end
@@ -1183,7 +1206,7 @@ local function ProcessCommand(command, factorySelected, selectionIndex)
 	
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		local found, position = data.inclusionFunction(command.id, factorySelected)
+		local found, position = data.inclusionFunction(command.id, factoryUnitDefID)
 		if found then
 			data.commandCount = data.commandCount + 1
 			
@@ -1197,6 +1220,9 @@ local function ProcessCommand(command, factorySelected, selectionIndex)
 			local button = data.buttons.GetButton(x, y, selectionIndex)
 			
 			button.SetCommand(command)
+			if data.factoryQueue then
+				button.SetQueueCommandParameter(factoryUnitID)
+			end
 			return
 		end
 	end
@@ -1215,11 +1241,11 @@ local function ProcessAllCommands(commands, customCommands)
 	statePanel.commandCount = 0
 	
 	for i = 1, #commands do
-		ProcessCommand(commands[i], factoryUnitDefID, selectionIndex)
+		ProcessCommand(commands[i], factoryUnitID, factoryUnitDefID, selectionIndex)
 	end
 	
 	for i = 1, #customCommands do
-		ProcessCommand(customCommands[i], factoryUnitDefID, selectionIndex)
+		ProcessCommand(customCommands[i], factoryUnitID, factoryUnitDefID, selectionIndex)
 	end
 	
 	-- Call factory queue update here because the update will globally
@@ -1232,7 +1258,7 @@ local function ProcessAllCommands(commands, customCommands)
 				if fakeFactory then
 					data.queue.ClearFactory()
 				else
-					data.queue.UpdateFactory(factoryUnitID, factoryUnitDefID, selectionIndex)
+					data.queue.UpdateFactory(factoryUnitID, factoryUnitID, selectionIndex)
 				end
 			end
 		end

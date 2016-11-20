@@ -114,16 +114,6 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	end
 end
 
-function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) 
-	myTeamID = team
-	WG.noises = true
-end
-
-function widget:Shutdown()
-	WG.noises = nil
-end
-
 function widget:SelectionChanged(selection)
 	if doNotPlayNextSelection then
 		doNotPlayNextSelection = false
@@ -163,11 +153,7 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 	end
 end
 
-function widget:CommandNotify(cmdID)
-	local unitID = GetSelectedUnits()[1]
-	if (not unitID) then
-		return
-	end
+local function PlayResponse(unitID, cmdID)
 	local unitDefID = GetUnitDefID(unitID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return false
@@ -181,6 +167,14 @@ function widget:CommandNotify(cmdID)
 	elseif (sounds and sounds.build) then
 		CoolNoisePlay(sounds.build, 0.5, options.ordernoisevolume.value)
 	end
+end
+
+function widget:CommandNotify(cmdID)
+	local unitID = GetSelectedUnits()[1]
+	if (not unitID) then
+		return
+	end
+	PlayResponse(unitID, cmdID)
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
@@ -203,6 +197,26 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if unitInSelection[unitID] then
 		doNotPlayNextSelection = true
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- External Functions
+
+local externalFunctions = {}
+
+function externalFunctions.PlayResponse(unitID, cmdID)
+	PlayResponse(unitID, cmdID)
+end
+
+function widget:Initialize()
+	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) 
+	myTeamID = team
+	WG.noises = externalFunctions
+end
+
+function widget:Shutdown()
+	WG.noises = nil
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
