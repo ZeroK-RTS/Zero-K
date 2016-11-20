@@ -39,7 +39,7 @@ unitDef = {
   maneuverleashlength = [[1280]],
   mass                = 240,
   maxDamage           = 310,
-  maxVelocity         = 4.0,
+  maxVelocity         = 4.2,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
   movementClass       = [[BOAT3]],
@@ -71,7 +71,7 @@ unitDef = {
     TORPEDO = {
 
       name                    = [[Torpedo]],
-      areaOfEffect            = 32,
+      areaOfEffect            = 64,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
