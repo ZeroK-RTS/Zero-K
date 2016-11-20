@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 200,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,
   canMove             = true,
   canPatrol           = true,
   category            = [[SWIM]],

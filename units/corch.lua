@@ -15,7 +15,6 @@ unitDef = {
   buildPic            = [[CORCH.png]],
   buildTime           = 150,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   canreclamate        = [[1]],

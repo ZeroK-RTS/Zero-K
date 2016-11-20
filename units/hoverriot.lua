@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 400,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],

@@ -11,7 +11,6 @@ unitDef = {
   buildPic              = [[chicken_dodo.png]],
   buildTime             = 170,
   canGuard              = true,
-  canHover              = false,
   canMove               = true,
   canPatrol             = true,
   canstop               = [[1]],
