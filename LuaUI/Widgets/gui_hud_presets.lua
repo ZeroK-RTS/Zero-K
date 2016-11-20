@@ -393,7 +393,7 @@ local function SetupNewPreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(480, screenWidth*0.4))
-	local integralHeight = 20*math.floor(math.min(screenHeight/4.5, 200*integralWidth/450)/20) + 8
+	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
 	if integralWidth/integralHeight > 2.5 then
 		integralWidth = integralHeight*2.5
 	end
@@ -401,8 +401,6 @@ local function SetupNewPreset()
 		local extraPadding = screenWidth/2 - (minimapSize + selectorWidth + integralWidth)
 		integralWidth = screenWidth/2 - (minimapSize + selectorWidth)
 	end
-	
-	Spring.Echo("integralWidth", integralWidth)
 	
 	if integralWidth < 480 then
 		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
@@ -441,7 +439,7 @@ local function SetupNewPreset()
 		selectionsHeight
 	)
 	
-	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight - 1)
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
 	
 	-- Player List
 	local playerlistWidth = 296
