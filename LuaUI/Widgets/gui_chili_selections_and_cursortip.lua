@@ -102,6 +102,7 @@ local old_mx, old_my = -1,-1
 local mx, my = -1,-1
 local showExtendedTip = false
 local changeNow = false
+local forceAnUpdate = true -- Makes widget:Update update things like healthbars.
 
 local window_tooltip2
 local windows = {}
@@ -2064,6 +2065,8 @@ local function MakeToolTip_Unit(data)
 	
 	UpdateBuildpic( tt_ud, 'buildpic_unit' )
 	BuildTooltip2('unit2', tt_structure)
+	
+	forceAnUpdate = true -- Update healthbars
 end
 
 
@@ -2107,6 +2110,8 @@ local function MakeToolTip_SelUnit(data)
 			
 		},
 	}
+	
+	forceAnUpdate = true -- Update healthbars
 	
 	UpdateBuildpic( stt_ud, 'buildpic_selunit', stt_unitID )
 	return BuildTooltip2('selunit2', tt_structure, true)
@@ -2543,7 +2548,8 @@ function widget:Update(dt)
 	end
 	
 	timer = timer + dt
-	if timer >= updateFrequency  then
+	if timer >= updateFrequency or forceAnUpdate then
+		forceAnUpdate = false
 		
 		local hotkeys = WG.crude.GetHotkeys("drawinmap")
 		drawHotkeyBytes = {}

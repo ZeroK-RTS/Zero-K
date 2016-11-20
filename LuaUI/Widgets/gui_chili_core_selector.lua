@@ -141,9 +141,73 @@ local function RefreshConsList() end	-- redefined later
 local function ClearData(reinitialize) end
 
 local hidden = false
-local function CheckHide()
-	local shouldShow = (options.showCoreSelector.value == 'always') or (options.showCoreSelector.value == 'spec' and (not Spring.GetSpectatingState()))
+local panelHidden = false
+local fancySkinning = false
 
+local function UpdateBackgroundSkin()
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+
+	local newClass = skin.panel
+	if fancySkinning and skin.panel_1100 then
+		if panelHidden and skin.panel_0100 then
+			newClass = skin.panel_0100
+		else
+			newClass = skin.panel_1100
+		end
+	end
+
+	background.tiles = newClass.tiles
+	background.TileImageFG = newClass.TileImageFG
+	background.backgroundColor = newClass.backgroundColor
+	background.TileImageBK = newClass.TileImageBK
+	background:Invalidate()
+end
+
+local function UpdateBackground(showPanel)
+	if showPanel and panelHidden then
+		panelHidden = false
+		window_selector:AddChild(stack_main)
+		stack_main:BringToFront()
+		UpdateBackgroundSkin()
+		UpdateBackgroundSize()
+		
+		background:SetVisibility(true)
+		
+		window_selector.padding[3] = -1
+		window_selector:UpdateClientArea()
+	elseif not showPanel and not panelHidden then
+		panelHidden = true
+		window_selector:RemoveChild(stack_main)
+		UpdateBackgroundSkin()
+		UpdateBackgroundSize()
+		
+		background:SetVisibility(WG.IntegralVisible)
+		
+		window_selector.padding[3] = 0
+		window_selector:UpdateClientArea()
+	end
+end
+
+local function CheckHide()
+	local spec = Spring.GetSpectatingState()
+	local shouldShow, showPanel
+	if options.showCoreSelector.value == 'always' then
+		showPanel = true
+		shouldShow = true
+	elseif options.showCoreSelector.value == 'specSpace' then
+		showPanel = not spec
+		shouldShow = true
+	elseif options.showCoreSelector.value == 'specHide' then
+		showPanel = true
+		shouldShow = not spec
+	else
+		showPanel = true
+		shouldShow = false
+	end
+	
+	Spring.Echo("CheckHide", options.showCoreSelector.value)
+	
 	if shouldShow and hidden then
 		hidden = false
 		screen0:AddChild(window_selector)
@@ -151,6 +215,8 @@ local function CheckHide()
 		hidden = true
 		screen0:RemoveChild(window_selector)
 	end
+	
+	UpdateBackground(showPanel)
 end
 
 function widget:PlayerChanged()
@@ -172,16 +238,17 @@ local function ResetWidget()
 end
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'fancySkinning'}
+options_order = {  'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
 options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
 		type = 'radioButton',
-		value = 'spec',
+		value = 'specHide',
 		items = {
-			{key ='always', name='Always enabled'},
-			{key ='spec',   name='Hide when spectating'},
-			{key ='never',  name='Always disabled'},
+			{key = 'always',    name = 'Always enabled'},
+			{key = 'specSpace', name = 'Only keep space when spectating'},
+			{key = 'specHide',  name = 'Hide when spectating'},
+			{key = 'never',     name = 'Always disabled'},
 		},
 		OnChange = CheckHide,
 		noHotkey = true,
@@ -293,6 +360,15 @@ options = {
 		min = 0, max = 16, step=1,
 		OnChange = ResetWidget,	
 	},
+	specSpaceOverride = {
+		name = 'Spectating Space Override',
+		desc = 'Size of the spacer which is present while spectating with "Only keep space when spectating".',
+		type = 'number',
+		value = 50,
+		advanced = true,
+		min = 0, max = 400, step = 1,
+		OnChange = ResetWidget,	
+	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
@@ -300,19 +376,8 @@ options = {
 		advanced = true,
 		noHotkey = true,
 		OnChange = function (self)
-			local currentSkin = Chili.theme.skin.general.skinName
-			local skin = Chili.SkinHandler.GetSkin(currentSkin)
-			
-			local newClass = skin.panel
-			if self.value and skin.panel_1100 then
-				newClass = skin.panel_1100
-			end
-			
-			background.tiles = newClass.tiles
-			background.TileImageFG = newClass.TileImageFG
-			background.backgroundColor = newClass.backgroundColor
-			background.TileImageBK = newClass.TileImageBK
-			background:Invalidate()
+			fancySkinning = self.value
+			UpdateBackgroundSkin()
 		end
 	}
 }
@@ -392,9 +457,14 @@ local function GetButtonPosition(index)
 	end
 end
 
-local function UpdateBackgroundSize()
+function UpdateBackgroundSize()
 	if options.background_opacity.value == 0 or not background then
 		return
+	end
+	
+	local sizeOverride
+	if panelHidden then
+		sizeOverride = options.specSpaceOverride.value
 	end
 	
 	local buttons = math.max(options.minButtonSpaces.value, CountButtons(comms) + CountButtons(facs) + 1)
@@ -404,8 +474,10 @@ local function UpdateBackgroundSize()
 	if options.vertical.value then
 		buttonSpace = buttonSpace*stack_main.height
 		
-		local top = stack_main.height - (buttonSpace + sideSpacing)
+		local top = window_selector.height - (sizeOverride or (buttonSpace + sideSpacing))
 		top = math.max(top, 0)
+	
+		Spring.Echo("UpdateBackgroundSize", sizeOverride, window_selector.height, top)
 		
 		background._relativeBounds.top = top
 		background._relativeBounds.bottom = 0
@@ -413,7 +485,7 @@ local function UpdateBackgroundSize()
 	else
 		buttonSpace = buttonSpace*stack_main.width
 		
-		local right = buttonSpace + sideSpacing
+		local right = buttonSpace + (sizeOverride or sideSpacing)
 		right = math.max(right, 0)
 		
 		background._relativeBounds.right = right
@@ -1161,6 +1233,18 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+-- External functions
+
+local externalFunctions = {}
+
+function externalFunctions.SetSpecSpaceVisible(newVisible)
+	if panelHidden and background then
+		background:SetVisibility(newVisible)
+	end
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 
 function widget:Initialize()
 	if (not WG.Chili) then
@@ -1195,26 +1279,6 @@ function widget:Initialize()
 	local hPad = options.horPadding.value
 	local vPad = options.vertPadding.value
 	
-	stack_main = Panel:New{
-		padding = {hPad, vPad, hPad, vPad},
-		itemMargin = {0, 0, 0, 0},
-		width= '100%',
-		height = '100%',
-		backgroundColor = {0, 0, 0, 0},
-		OnResize = {
-			UpdateBackgroundSize,
-			UpdateButtonPositions
-		}
-	}
-	background = Panel:New{
-		itemMargin = {0, 0, 0, 0},
-		x = 0,
-		y = 0,
-		right = 0,
-		bottom = 0,
-		backgroundColor = {1, 1, 1, options.background_opacity.value},
-	}
-	
 	local windowY = bottom - BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1) + 2*vPad
 	
 	local windowWidth, windowHeight
@@ -1226,8 +1290,10 @@ function widget:Initialize()
 		windowHeight = BUTTON_HEIGHT + 2*vPad
 	end
 	
+	local specChanges = Spring.GetSpectatingState() and options.showCoreSelector.value == 'specSpace'
+	
 	window_selector = Window:New{
-		padding = {-1,0,0,-1},
+		padding = {-1, 0, (specChanges and 0) or -1, -1},
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
@@ -1244,10 +1310,6 @@ function widget:Initialize()
 		minWidth = 32,
 		minHeight = 32,
 		color = {0,0,0,0},
-		children = {
-			stack_main,
-			background,
-		},
 		OnClick={ function(self)
 			local alt, ctrl, meta, shift = Spring.GetModKeyState()
 			if not meta then return false end
@@ -1255,7 +1317,37 @@ function widget:Initialize()
 			WG.crude.ShowMenu()
 			return true
 		end },
+	}	
+	
+	local stack_mainParent = window_selector
+	if specChanges then
+		stack_mainParent = nil
+	end
+	stack_main = Panel:New{
+		padding = {hPad, vPad, hPad, vPad},
+		itemMargin = {0, 0, 0, 0},
+		width= '100%',
+		height = '100%',
+		backgroundColor = {0, 0, 0, 0},
+		OnResize = {
+			UpdateBackgroundSize,
+			UpdateButtonPositions
+		},
+		parent = stack_mainParent,
 	}
+	background = Panel:New{
+		itemMargin = {0, 0, 0, 0},
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		backgroundColor = {1, 1, 1, options.background_opacity.value},
+		parent = window_selector,
+	}
+	
+	if not stack_mainParent then
+		UpdateBackgroundSize()
+	end
 	
 	if options.fancySkinning.value then
 		options.fancySkinning.OnChange(options.fancySkinning)
@@ -1353,6 +1445,8 @@ function widget:Initialize()
 	
 	hidden = false
 	CheckHide()
+	
+	WG.CoreSelector = externalFunctions
 end
 
 function widget:Shutdown()

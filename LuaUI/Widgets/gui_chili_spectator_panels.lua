@@ -734,8 +734,8 @@ local function CreatePlayerWindow()
 	
 	data.mainPanel = Chili.Panel:New{
 		classname = (options.fancySkinning.value and "panel_2021") or nil,
-		backgroundColor = {1,1,1,options.resourceOpacity.value},
-		color = {1,1,1,options.resourceOpacity.value},
+		backgroundColor = {1,1,1,options.playerOpacity.value},
+		color = {1,1,1,options.playerOpacity.value},
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -947,21 +947,26 @@ function option_CheckEnable(self)
 			RemoveEconomyWindows()
 			enabled = false
 		end
-		return
-	end
-	
-	if enabled then
-		return
+		return false
 	end
 	
 	local spectating = select(1, Spring.GetSpectatingState())
 	if not spectating then
-		return
+		if enabled then
+			RemovePlayerWindow()
+			RemoveEconomyWindows()
+			enabled = false
+		end
+		return false
+	end
+	
+	if enabled then
+		return true
 	end
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
-		return
+		return false
 	end
 	
 	if options.enablePlayerPanel.value then
@@ -973,6 +978,7 @@ function option_CheckEnable(self)
 	end
 	
 	enabled = true
+	return true
 end
 
 function option_CheckEnablePlayer(self)
@@ -1004,6 +1010,15 @@ end
 
 function widget:Shutdown()
 	--window:Dispose()
+end
+
+function widget:PlayerChanged(pID)
+	if pID == Spring.GetMyPlayerID() then
+		local newEnabled = option_CheckEnable(options.enableSpectator)
+		if WG.EconomyPanel then
+			WG.EconomyPanel.SetVisibility(not newEnabled)
+		end
+	end
 end
 
 function widget:Initialize()
