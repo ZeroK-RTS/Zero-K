@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
-  buildAngle                    = 8192,
   buildCostEnergy               = 220,
   buildCostMetal                = 220,
   builder                       = false,

@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,

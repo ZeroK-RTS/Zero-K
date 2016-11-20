@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Long-Range Anti-Air Missile Battery]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 65536,
   buildCostEnergy               = 900,
   buildCostMetal                = 900,
   builder                       = false,

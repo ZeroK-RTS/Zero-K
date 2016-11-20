@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Anti-Air Frigate]],
   acceleration           = 0.0498,
   brakeRate              = 0.0808,
-  buildAngle             = 16384,
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
   builder                = false,

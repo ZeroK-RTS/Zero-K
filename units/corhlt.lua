@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[High-Energy Laser Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 420,
   buildCostMetal                = 420,
   builder                       = false,

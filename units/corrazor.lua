@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[corrazor]],
   name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
-  buildAngle                    = 8192,
   buildCostEnergy               = 280,
   buildCostMetal                = 280,
   builder                       = false,

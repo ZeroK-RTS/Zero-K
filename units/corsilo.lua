@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 8000,
   buildCostMetal                = 8000,
   builder                       = false,

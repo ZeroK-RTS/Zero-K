@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt             = true,
   autoHeal                      = 5,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 1000,
   buildCostMetal                = 1000,
   builder                       = false,

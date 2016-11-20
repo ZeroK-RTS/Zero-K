@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Spawns Chickens]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
   builder                       = true,

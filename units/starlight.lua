@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 32700,
   buildCostEnergy               = 40000,
   buildCostMetal                = 40000,
   builder                       = false,

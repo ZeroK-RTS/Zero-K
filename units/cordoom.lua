@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt             = true,
   armoredMultiple               = 0.25,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 1600,
   buildCostMetal                = 1600,
   builder                       = false,

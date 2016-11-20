@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Heavy Artillery Battleship]],
   acceleration           = 0.039,
   brakeRate              = 0.0475,
-  buildAngle             = 16384,
   buildCostEnergy        = 3800,
   buildCostMetal         = 3800,
   builder                = false,

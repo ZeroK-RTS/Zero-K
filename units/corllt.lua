@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Light Laser Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 32768,
   buildCostEnergy               = 90,
   buildCostMetal                = 90,
   builder                       = false,
