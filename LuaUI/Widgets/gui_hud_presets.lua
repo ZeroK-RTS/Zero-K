@@ -99,7 +99,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(minimapName, minimapPath, "hidebuttons", true)
 	WG.SetWidgetOption(minimapName, minimapPath, "leftClickOnMinimap", "camera")
 	WG.SetWidgetOption(minimapName, minimapPath, "minimizable", false)
-	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 0.8)
+	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 1)
 	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "armap")
 	
 	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnRight", false)
@@ -109,10 +109,11 @@ local function SetNewOptions()
 	
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
 	
-	WG.SetWidgetOption(econName, econPath, "opacity", 1)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
+	WG.SetWidgetOption(econName, econPath, "opacity", 0.95)
 	
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
+	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.95)
 	
 	WG.crude.SetMenuSkinClass("panel_0021")
 	
@@ -165,6 +166,7 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
 	
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", false)
+	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.6)
 	
 	WG.crude.SetMenuSkinClass("panel")
 	

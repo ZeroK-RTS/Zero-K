@@ -79,6 +79,8 @@ local col_income
 local col_expense
 local col_overdrive
 
+local updateOpacity = false
+
 local blinkMetal = 0
 local blinkEnergy = 0
 local baseBlinkPeriod = 1.4
@@ -148,15 +150,14 @@ options_path = 'Settings/HUD Panels/Economy Panel'
 
 local function option_recreateWindow()
 	local x,y,w,h = DestroyWindow()
-	if (not options.ecoPanelHideSpec.value) or (not Spring.GetSpectatingState()) then
-		CreateWindow(x,y,w,h)
+	if options.ecoPanelHideSpec.value then
+		local spectating = select(1, Spring.GetSpectatingState())
+		if spectating then
+			return
+		end
 	end
-end
-
-function widget:PlayerChanged(pID)
-	if pID == Spring.GetMyPlayerID() then
-		option_recreateWindow()
-	end
+		
+	CreateWindow(x,y,w,h)
 end
 
 local function option_colourBlindUpdate()
@@ -227,15 +228,8 @@ options = {
 		name  = "Opacity",
 		type  = "number",
 		value = 0.6, min = 0, max = 1, step = 0.01,
-		OnChange = function(self) 
-			if (window_metal) then 
-				window_metal.backgroundColor[4] = self.value
-				window_metal:Invalidate() 
-			end
-			if (window_energy) then 
-				window_energy.backgroundColor[4] = self.value 
-				window_energy:Invalidate() 
-			end
+		OnChange = function(self)
+			updateOpacity = self.value
 		end,
 	},
 	colourBlind = {
@@ -396,6 +390,18 @@ function widget:Update(s)
 		local blink_alpha = sawtooth*0.95
 		
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
+	end
+	
+	if updateOpacity then
+		if (window_metal) then 
+			window_metal.backgroundColor[4] = updateOpacity
+			window_metal:Invalidate() 
+		end
+		if (window_energy) then 
+			window_energy.backgroundColor[4] = updateOpacity
+			window_energy:Invalidate() 
+		end
+		updateOpacity = false
 	end
 end
 
@@ -568,7 +574,7 @@ function widget:GameFrame(n)
 	local metalReclaim = Format(math.max(0, mInco - cp.metalOverdrive - cp.metalBase - cp.metalMisc - mReci))
 	local metalConstructor = Format(cp.metalMisc)
 	local metalShare = Format(mReci - mSent)
-	local metalConstuction = Format(-mExpe)
+	local metalConstruction = Format(-mExpe)
 	
 	local team_metalTotalIncome = Format(teamMInco)
 	local team_metalPull = Format(-teamMPull)
@@ -576,7 +582,7 @@ function widget:GameFrame(n)
 	local team_metalOverdrive = Format(cp.team_metalOverdrive)
 	local team_metalReclaim = Format(math.max(0, teamMInco - cp.team_metalOverdrive - cp.team_metalBase - cp.team_metalMisc))
 	local team_metalConstructor = Format(cp.team_metalMisc)
-	local team_metalConstuction = Format(-teamMSpent)
+	local team_metalConstruction = Format(-teamMSpent)
 	local team_metalWaste = Format(teamMetalWaste)
 	
 	local energyGenerators = Format(cp.energyIncome)
@@ -598,7 +604,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. metalReclaim ..
 	"\n  " .. strings["resbar_cons"] .. ": " .. metalConstructor ..
 	"\n  " .. strings["resbar_sharing"] .. ": " .. metalShare .. 
-	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstuction ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction ..
     "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.metalStorageReserve or 0) ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(mCurr, mStor)  ..
 	"\n " .. 
@@ -608,7 +614,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_metalOverdrive ..
 	"\n  " .. strings["resbar_reclaim"] .. " : " .. team_metalReclaim ..
 	"\n  " .. strings["resbar_cons"] .. ": " .. team_metalConstructor ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstuction ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_metalWaste ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalMetalStored, teamTotalMetalCapacity)
 	
@@ -616,7 +622,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_generators"] .. ": " .. energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. energyReclaim ..
 	"\n  " .. strings["resbar_sharing_and_overdrive"] .. ": " .. energyOverdrive .. 
-	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstuction .. 
+	"\n  " .. strings["resbar_construction"] .. ": " .. metalConstruction .. 
 	"\n  " .. strings["resbar_other"] .. ": " .. energyOther ..
     "\n  " .. strings["resbar_reserve"] .. ": " .. math.ceil(cp.energyStorageReserve or 0) ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(eCurr, eStor)  ..
@@ -626,7 +632,7 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_generators"] .. ": " .. team_energyGenerators ..
 	"\n  " .. strings["resbar_reclaim"] .. ": " .. team_energyReclaim ..
 	"\n  " .. strings["resbar_overdrive"] .. ": " .. team_energyOverdrive .. " -> " .. team_metalOverdrive .. " " .. strings["metal"] ..
-	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstuction ..
+	"\n  " .. strings["resbar_construction"] .. ": " .. team_metalConstruction ..
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
@@ -756,6 +762,18 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local externalFunctions = {}
+
+function externalFunctions.SetVisibility(newVisibility)
+	local x,y,w,h = DestroyWindow()
+	if newVisibility then
+		CreateWindow(x,y,w,h)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 function widget:Shutdown()
 	if window then
 		window:Dispose()
@@ -770,6 +788,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	
+	WG.EconomyPanel = externalFunctions
 
 	WG.InitializeTranslation (languageChanged, GetInfo().name)
 	--widgetHandler:RegisterGlobal("MexEnergyEvent", MexEnergyEvent)
