@@ -69,7 +69,7 @@ local function AddUnitTexture(unitID, attributes, tex)
 		textures[tex].units[unitID] = {data = {}, count = 0}
 	end	
 		
-	for i=1,#attributes do
+	for i = 1,#attributes do
 		textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
 		textures[tex].units[unitID].data[textures[tex].units[unitID].count] = {
 			piece = pieceMap[attributes[i].piece],
@@ -207,7 +207,8 @@ local function DrawWorldFunc()
 					glPopMatrix()
 				end
 			else
-				RemoveUnit(unitID, textureName)
+				-- Requires more work
+				--RemoveUnit(unitID, textureName)
 			end
 		end
 	end

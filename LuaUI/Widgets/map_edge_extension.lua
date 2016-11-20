@@ -64,14 +64,14 @@ options = {
 		type='radioButton', 
 		name='Exterior Effect',
 		items = {
-			{name = 'Texture',  key = 'texture', desc = "Mirror the heightmap and texture.",              hotkey=nil},
-			{name = 'Grid',     key = 'grid',    desc = "Mirror the heightmap with grid texture.",        hotkey=nil},
-			{name = 'Cutaway',  key = 'cutaway', desc = "Draw the edge of the map with a cutaway effect", hotkey=nil},
-			{name = 'Disable',  key = 'disable', desc = "Draw no edge extension",                         hotkey=nil},
+			{name = 'Texture',  key = 'texture', desc = "Mirror the heightmap and texture.",              hotkey = nil},
+			{name = 'Grid',     key = 'grid',    desc = "Mirror the heightmap with grid texture.",        hotkey = nil},
+			{name = 'Cutaway',  key = 'cutaway', desc = "Draw the edge of the map with a cutaway effect", hotkey = nil},
+			{name = 'Disable',  key = 'disable', desc = "Draw no edge extension",                         hotkey = nil},
 		},
 		value = 'grid',  --default at start of widget is to be disabled!
 		OnChange = function(self)
-			Spring.SendCommands("mapborder " .. ((self.value == 'cutaway') and "1" or "0"))
+			Spring.SendCommands("mapborder " .. ((self.value == 'cutaway' or self.value == 'texture') and "1" or "0"))
 			drawingEnabled = (self.value == "texture") or (self.value == "grid") 
 			ResetWidget()
 		end,
@@ -354,7 +354,7 @@ local function Initialize()
 	end
 	
 	
-	Spring.SendCommands("mapborder " .. ((options and (options.mapBorderStyle.value == 'cutaway')) and "1" or "0"))
+	Spring.SendCommands("mapborder " .. ((options and (options.mapBorderStyle.value == 'cutaway' or options.mapBorderStyle.value == 'texture')) and "1" or "0"))
 	
 	if island == nil then
 		island = IsIsland()
