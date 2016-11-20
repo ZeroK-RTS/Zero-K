@@ -80,7 +80,6 @@ unitDef = {
   side                = [[CORE]],
   sightDistance       = 375,
   smoothAnim          = true,
-  TEDClass            = [[CNSTR]],
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

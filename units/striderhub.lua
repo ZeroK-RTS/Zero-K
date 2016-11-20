@@ -83,7 +83,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 380,
   smoothAnim                    = true,
-  TEDClass                      = [[CNSTR]],
   terraformSpeed                = 600,
   turnRate                      = 1,
   upright                       = true,

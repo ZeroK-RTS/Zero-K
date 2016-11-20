@@ -66,7 +66,6 @@ unitDef = {
   side                          = [[CORE]],
   sightDistance                 = 660,
   smoothAnim                    = true,
-  TEDClass                      = [[METAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

@@ -50,7 +50,6 @@ unitDef = {
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   side                          = [[CORE]],
   sightDistance                 = 506,
-  TEDClass                      = [[FORT]],
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
   yardMap                       = [[oooo]],

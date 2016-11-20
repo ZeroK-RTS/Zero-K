@@ -69,7 +69,6 @@ unitDef = {
   showNanoSpray                 = false,
   side                          = [[CORE]],
   sightDistance                 = 273,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline						= 0,

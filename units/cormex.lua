@@ -61,7 +61,6 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 273,
   smoothAnim             = true,
-  TEDClass               = [[METAL]],
   turnRate               = 0,
   waterline              = 1,
   workerTime             = 0,

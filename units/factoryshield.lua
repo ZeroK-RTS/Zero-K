@@ -74,7 +74,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 273,
   smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

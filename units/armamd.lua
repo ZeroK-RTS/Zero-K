@@ -56,7 +56,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 660,
   smoothAnim                    = true,
-  TEDClass                      = [[FORT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

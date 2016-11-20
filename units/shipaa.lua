@@ -60,7 +60,6 @@ unitDef = {
   side                   = [[CORE]],
   sightDistance          = 660,
   smoothAnim             = true,
-  TEDClass               = [[SHIP]],
   turninplace            = 0,
   turnRate               = 486,
   waterline              = 4,

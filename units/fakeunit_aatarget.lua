@@ -44,7 +44,6 @@ unitDef = {
   side                  = [[ARM]],
   sightDistance         = 0.2,
   smoothAnim            = true,
-  TEDClass              = [[VTOL]],
   turnRate              = 0,
   workerTime            = 0,
 }

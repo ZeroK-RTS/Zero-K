@@ -85,7 +85,6 @@ unitDef = {
   sightDistance       = 500,
   smoothAnim          = true,
   sonarDistance       = 300,
-  TEDClass            = [[COMMANDER]],
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
