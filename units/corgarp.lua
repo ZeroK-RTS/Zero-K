@@ -63,7 +63,6 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 660,
-  smoothAnim          = true,
   trackOffset         = 6,
   trackStrength       = 5,
   trackStretch        = 1,

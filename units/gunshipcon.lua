@@ -62,7 +62,6 @@ unitDef = {
   showNanoSpray       = false,
   side                = [[ARM]],
   sightDistance       = 350,
-  smoothAnim          = true,
   terraformSpeed      = 450,
   turnRate            = 500,
   workerTime          = 7.5,

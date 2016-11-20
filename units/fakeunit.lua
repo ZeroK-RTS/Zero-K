@@ -40,7 +40,6 @@ unitDef = {
   selfDestructCountdown         = 0,
   side                          = [[ARM]],
   sightDistance                 = 0.2,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

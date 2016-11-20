@@ -68,7 +68,6 @@ unitDef = {
   showNanoSpray       = false,
   script              = [[corch.lua]],
   sightDistance       = 325,
-  smoothAnim          = true,
   terraformSpeed      = 300,
   turninplace         = 0,
   turnRate            = 550,

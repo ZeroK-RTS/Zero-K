@@ -62,7 +62,6 @@ unitDef = {
   showNanoSpray          = false,
   side                   = [[CORE]],
   sightDistance          = 325,
-  smoothAnim             = true,
   terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,

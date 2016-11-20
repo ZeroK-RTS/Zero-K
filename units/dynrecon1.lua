@@ -91,7 +91,6 @@ unitDef = {
   showNanoSpray       = false,
   side                = [[ARM]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 300,
   trackOffset         = 0,
   trackStrength       = 8,

@@ -59,7 +59,6 @@ unitDef = {
   selfDestructCountdown  = 0,
   side                   = [[CORE]],
   sightDistance          = 64,
-  smoothAnim             = true,
   stealth                = true,
   turnRate               = 0,
   waterline              = 1,

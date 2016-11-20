@@ -62,7 +62,6 @@ unitDef = {
 
   side                = [[CORE]],
   sightDistance       = 407,
-  smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 400,
   workerTime          = 0,

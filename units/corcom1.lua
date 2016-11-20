@@ -85,7 +85,6 @@ unitDef = {
   showPlayerName      = true,
   side                = [[CORE]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 300,
   trackOffset         = 0,
   trackStrength       = 8,

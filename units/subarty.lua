@@ -55,7 +55,6 @@ unitDef = {
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[ARM]],
   sightDistance          = 660,
-  smoothAnim             = true,
   sonarDistance          = 300,
   turninplace            = 0,
   turnRate               = 250,

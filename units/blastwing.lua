@@ -67,7 +67,6 @@ unitDef = {
   selfDestructCountdown  = 0,
   side                   = [[CORE]],
   sightDistance          = 380,
-  smoothAnim             = true,
   turnRate               = 1144,
   upright                = false,
   workerTime             = 0,

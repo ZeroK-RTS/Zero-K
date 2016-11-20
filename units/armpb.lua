@@ -60,7 +60,6 @@ unitDef = {
   }, 
 
   sightDistance                 = 660,
-  smoothAnim                    = true,
   useBuildingGroundDecal        = true,
 
   weapons                       = {

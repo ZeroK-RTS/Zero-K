@@ -74,7 +74,6 @@ unitDef = {
 
   side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   transportCapacity      = 1,
   transportSize          = 25,
   turninplace            = 0,

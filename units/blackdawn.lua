@@ -57,7 +57,6 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[CORE]],
   sightDistance       = 585,
-  smoothAnim          = true,
   turnRate            = 849,
 
   weapons             = {

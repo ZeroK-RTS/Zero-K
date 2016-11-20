@@ -58,7 +58,6 @@ unitDef = {
 
   side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   trackOffset         = 7,
   trackStrength       = 9,
   trackStretch        = 1,

@@ -66,7 +66,6 @@ unitDef = {
 
   side                          = [[THUNDERBIRDS]],
   sightDistance                 = 512,
-  smoothAnim                    = true,
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,

@@ -50,7 +50,6 @@ unitDef = {
   selfDestructAs                = [[ATOMIC_BLAST]],
   side                          = [[CORE]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

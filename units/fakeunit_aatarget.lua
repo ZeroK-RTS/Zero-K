@@ -43,7 +43,6 @@ unitDef = {
   selfDestructCountdown = 0,
   side                  = [[ARM]],
   sightDistance         = 0.2,
-  smoothAnim            = true,
   turnRate              = 0,
   workerTime            = 0,
 }

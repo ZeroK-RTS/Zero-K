@@ -65,7 +65,6 @@ unitDef = {
   showNanoSpray                 = false,
   side                          = [[CORE]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

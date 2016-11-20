@@ -67,7 +67,6 @@ unitDef = {
   showNanoSpray          = false,
   side                   = [[CORE]],
   sightDistance          = 255,
-  smoothAnim             = true,
   terraformSpeed         = 300,
   trackOffset            = 3,
   trackStrength          = 6,

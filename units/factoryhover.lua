@@ -62,7 +62,6 @@ unitDef = {
   showNanoSpray    = false,
   side             = [[ARM]],
   sightDistance    = 273,
-  smoothAnim       = true,
   turnRate         = 0,
   waterline        = 1,
   workerTime       = 10,

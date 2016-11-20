@@ -57,7 +57,6 @@ unitDef = {
   selfDestructAs         = [[BIG_UNITEX]],
   side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   turninplace            = 0,
   turnRate               = 486,
   waterline              = 4,

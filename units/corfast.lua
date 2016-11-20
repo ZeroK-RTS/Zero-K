@@ -79,7 +79,6 @@ unitDef = {
   showNanoSpray       = false,
   side                = [[CORE]],
   sightDistance       = 375,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

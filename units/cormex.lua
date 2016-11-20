@@ -58,7 +58,6 @@ unitDef = {
   selfDestructAs         = [[SMALL_BUILDINGEX]],
   side                   = [[CORE]],
   sightDistance          = 273,
-  smoothAnim             = true,
   turnRate               = 0,
   waterline              = 1,
   workerTime             = 0,

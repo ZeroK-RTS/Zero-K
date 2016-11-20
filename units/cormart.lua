@@ -51,7 +51,6 @@ unitDef = {
   selfDestructAs      = [[BIG_UNITEX]],
   side                = [[CORE]],
   sightDistance       = 660,
-  smoothAnim          = true,
   trackOffset         = 8,
   trackStrength       = 8,
   trackStretch        = 1,

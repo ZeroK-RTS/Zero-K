@@ -93,7 +93,6 @@ unitDef = {
   showPlayerName      = true,
   side                = [[THUNDERBIRDS]],
   sightDistance       = 1024,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 8,
   trackStrength       = 8,

@@ -53,7 +53,6 @@ unitDef = {
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   side                          = [[ARM]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

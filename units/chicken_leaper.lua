@@ -57,7 +57,6 @@ unitDef = {
 
   side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  smoothAnim          = true,
   turnRate            = 1600,
   upright             = true,
   workerTime          = 0,

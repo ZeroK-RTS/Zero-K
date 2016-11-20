@@ -66,7 +66,6 @@ unitDef = {
 
   side                   = [[CORE]],
   sightDistance          = 700,
-  smoothAnim             = true,
   turninplace            = 0,
   turnRate               = 230,
   waterline              = 4,

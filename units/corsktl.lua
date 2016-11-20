@@ -72,7 +72,6 @@ unitDef = {
   selfDestructCountdown  = 0,
   script                 = [[corsktl.lua]],
   sightDistance          = 280,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

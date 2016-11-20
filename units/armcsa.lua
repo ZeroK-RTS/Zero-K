@@ -95,7 +95,6 @@ unitDef = {
   side                = [[ARM]],
   sightDistance       = 380,
   sonarDistance       = 600,
-  smoothAnim          = true,
   resurrectSpeed      = 3.75,
   terraformSpeed      = 300,
   turnRate            = 148,

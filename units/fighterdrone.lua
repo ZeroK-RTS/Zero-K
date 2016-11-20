@@ -77,7 +77,6 @@ unitDef = {
 
   side                   = [[CORE]],
   sightDistance          = 520,
-  smoothAnim             = true,
   speedToFront           = 0,
   turnRate               = 9001,
   turnRadius             = 90,

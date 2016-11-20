@@ -61,7 +61,6 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   side                = [[CORE]],
   sightDistance       = 1400,
-  smoothAnim          = true,
   sonarDistance       = 1400,
   turnRadius          = 80,
   workerTime          = 0,

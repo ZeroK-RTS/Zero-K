@@ -64,7 +64,6 @@ unitDef = {
   selfDestructAs         = [[GUNSHIPEX]],
   side                   = [[CORE]],
   sightDistance          = 750,
-  smoothAnim             = true,
   speedToFront           = 0.5,
   turnRadius             = 400,
 
