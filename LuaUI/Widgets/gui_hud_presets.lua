@@ -85,7 +85,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(coreName, corePath, "maxbuttons", 6)
 	WG.SetWidgetOption(coreName, corePath, "minButtonSpaces", 3)
 	WG.SetWidgetOption(coreName, corePath, "minSize", 196)
-	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "always")
+	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specSpace")
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", 6.25)
 	WG.SetWidgetOption(coreName, corePath, "vertical", true)
 	
@@ -137,7 +137,7 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(coreName, corePath, "maxbuttons", 6)
 	WG.SetWidgetOption(coreName, corePath, "minButtonSpaces", 0)
 	WG.SetWidgetOption(coreName, corePath, "minSize", 0)
-	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "spec")
+	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specHidden")
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", 0)
 	WG.SetWidgetOption(coreName, corePath, "vertical", false)
 	
@@ -351,12 +351,14 @@ local function SetupNewPreset()
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
+	local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
+	
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
 	-- Bottom of the UI
 	
 	-- Minimap
-	local minimapSize = screenWidth*2.1/11
+	local minimapSize = math.floor(screenWidth*2.1/11)
 	if minimapSize < 1650*2.1/11 then
 		if screenWidth > 1340 then
 			minimapSize = 1650*2.1/11
@@ -381,6 +383,7 @@ local function SetupNewPreset()
 	end
 	
 	local _,_, selectorWidth, selectorHeight = WG.GetWindowPosAndSize("selector_window")
+	selectorWidth = math.ceil(selectorWidth)
 	WG.SetWindowPosAndSize("selector_window", 
 		minimapSize, 
 		screenHeight - selectorHeight, 
@@ -409,6 +412,8 @@ local function SetupNewPreset()
 		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
 	end
 	
+	integralWidth = math.floor(integralWidth)
+	
 	WG.SetWindowPosAndSize("integralwindow",
 		minimapSize + selectorWidth,
 		screenHeight - integralHeight,
@@ -435,6 +440,8 @@ local function SetupNewPreset()
 		selectionsWidth,
 		selectionsHeight
 	)
+	
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight - 1)
 	
 	-- Player List
 	local playerlistWidth = 296

@@ -1283,8 +1283,14 @@ local function ProcessAllCommands(commands, customCommands)
 	end
 	
 	-- Keeps main window for tweak mode.
-	background:SetVisibility(not (#tabsToShow == 0 and selectedUnitCount == 0))
+	local visible = not (#tabsToShow == 0 and selectedUnitCount == 0)
+	background:SetVisibility(visible)
 	UpdateBackgroundSkin()
+	
+	WG.IntegralVisible = visible
+	if WG.CoreSelector.SetSpecSpaceVisible then
+		WG.CoreSelector.SetSpecSpaceVisible(visible)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -1314,7 +1320,7 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {-1, 0, 0, -1},
+		padding = {0, 0, 0, -1},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
