@@ -13,7 +13,6 @@ unitDef = {
   buildoptions           = {
   },
 
-
   buildPic               = [[shipcon.png]],
   buildTime              = 200,
   canGuard               = true,
@@ -63,9 +62,7 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   showNanoSpray          = false,
-
   sightDistance          = 325,
-
   sonarDistance          = 325,  terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,

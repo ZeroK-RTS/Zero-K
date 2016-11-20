@@ -19,7 +19,6 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 6 5]],
   collisionVolumeScales  = [[55 55 130]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
   --Core_color.dds Core_other.dds
@@ -61,9 +60,7 @@ unitDef = {
 
   },
 
-  side                   = [[CORE]],
   sightDistance          = 430,
-  smoothAnim             = true,
   sonarDistance          = 430,
   turninplace            = 0,
   turnRate               = 360,

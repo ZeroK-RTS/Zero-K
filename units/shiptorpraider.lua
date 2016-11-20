@@ -2,16 +2,13 @@ unitDef = {
 
   unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
-,
   description         = [[Torpedo-Boat (Raider)]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,
-,
   buildCostEnergy     = 100,
   buildCostMetal      = 100,
   builder             = false,
-
   buildPic            = [[shiptorpraider.png]],
   buildTime           = 100,
   canAttack           = true,
@@ -19,10 +16,8 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
-
   collisionVolumeOffsets = [[0 2 0]],
   collisionVolumeScales  = [[20 20 40]],
-
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
@@ -36,7 +31,6 @@ unitDef = {
 
   explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
-
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[shiptorpraider]],
@@ -44,26 +38,19 @@ unitDef = {
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
   mass                = 240,
-
   maxDamage           = 310,
   maxVelocity         = 4.0,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
-
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
-
   objectName          = [[SHIPTORPRAIDER]],
   script              = [[shiptorpraider.lua]],
   seismicSignature    = 4,
-
   selfDestructAs      = [[SMALL_UNITEX]],
-
   sightDistance       = 450,
-
   sonarDistance       = 450,
-
   turnRate            = 800,
   waterline           = 4,
   workerTime          = 0,

@@ -1,16 +1,13 @@
 unitDef = {
   unitname               = [[shipskirm]],
-,
   name                   = [[Mistral]],
   description            = [[Missile Frigate (Skirmisher)]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,
-
   buildCostEnergy        = 240,
   buildCostMetal         = 240,
   builder                = false,
-
   buildPic               = [[shipskirm.png]],
   buildTime              = 240,
   canAttack              = true,
@@ -19,10 +16,8 @@ unitDef = {
   canPatrol              = true,
   canstop                = [[1]],
   category               = [[SHIP]],
-
   collisionVolumeOffsets = [[0 2 0]],
   collisionVolumeScales  = [[24 24 65]],
-
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -35,31 +30,25 @@ unitDef = {
 
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
-
   footprintX             = 2,
   footprintZ             = 2,
   iconType               = [[shipskirm]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 30,
-
   maxDamage              = 650,
   maxVelocity            = 2.5,
   minCloakDistance       = 350,
   minWaterDepth          = 10,
-
   movementClass          = [[BOAT3]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
-
   objectName             = [[shipskirm.s3o]],
   scale                  = [[0.6]],
-
   script		         = [[shipskirm.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-
   sfxtypes               = {
 
     explosiongenerators = {
@@ -71,9 +60,7 @@ unitDef = {
 
   sightDistance          = 720,
   sonarDistance          = 720,
-
   turninplace            = 0,
-
   turnRate               = 400,
   waterline              = 4,
   workerTime             = 0,

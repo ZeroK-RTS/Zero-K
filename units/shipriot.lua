@@ -18,7 +18,6 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[32 32 102]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -47,7 +46,6 @@ unitDef = {
   script				 = [[shipriot.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 500,
   
   sfxtypes               = {
@@ -59,7 +57,6 @@ unitDef = {
 
   },
   
-  smoothAnim             = true,
   sonarDistance          = 500,
   turninplace            = 0,
   turnRate               = 500,

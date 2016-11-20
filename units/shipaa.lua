@@ -21,7 +21,6 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 4]],
   collisionVolumeScales  = [[32 32 128]],
-
   collisionVolumeType    = [[CylZ]],
   corpse                 = [[DEAD]],
 
@@ -36,7 +35,6 @@ unitDef = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
-
   iconType               = [[shipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -50,16 +48,13 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-
   objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
   scale                  = [[0.6]],
   script				 = [[shipaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-
   sightDistance          = 660,
-
   sonarDistance          = 660,  turninplace            = 0,
   turnRate               = 486,
   waterline              = 4,
