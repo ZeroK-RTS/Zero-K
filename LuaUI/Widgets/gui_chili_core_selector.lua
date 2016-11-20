@@ -168,11 +168,11 @@ local function UpdateBackground(showPanel)
 	if showPanel and panelHidden then
 		panelHidden = false
 		window_selector:AddChild(stack_main)
-		stack_main:BringToFront()
 		UpdateBackgroundSkin()
 		UpdateBackgroundSize()
 		
 		background:SetVisibility(true)
+		stack_main:BringToFront()
 		
 		window_selector.padding[3] = -1
 		window_selector:UpdateClientArea()
@@ -205,8 +205,6 @@ local function CheckHide()
 		showPanel = true
 		shouldShow = false
 	end
-	
-	Spring.Echo("CheckHide", options.showCoreSelector.value)
 	
 	if shouldShow and hidden then
 		hidden = false
@@ -476,8 +474,6 @@ function UpdateBackgroundSize()
 		
 		local top = window_selector.height - (sizeOverride or (buttonSpace + sideSpacing))
 		top = math.max(top, 0)
-	
-		Spring.Echo("UpdateBackgroundSize", sizeOverride, window_selector.height, top)
 		
 		background._relativeBounds.top = top
 		background._relativeBounds.bottom = 0
@@ -1289,6 +1285,7 @@ function widget:Initialize()
 		windowWidth  = (BUTTON_WIDTH + 2*options.buttonSpacing.value) * options.maxbuttons.value + 2*hPad
 		windowHeight = BUTTON_HEIGHT + 2*vPad
 	end
+	windowHeight = math.ceil(windowHeight)
 	
 	local specChanges = Spring.GetSpectatingState() and options.showCoreSelector.value == 'specSpace'
 	

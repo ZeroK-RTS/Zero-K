@@ -1338,7 +1338,7 @@ local function InitializeControls()
 	
 	buttonsHolder = Control:New{
 		x = options.leftPadding.value,
-		y = "15%",
+		y = (100/7) .. "%",
 		right = options.rightPadding.value,
 		bottom = 0,
 		padding = {0, 0, 0, 0},
