@@ -256,7 +256,7 @@ local function MakeDropdownButtons(parent, position, overlays)
 		OnMouseDown = globalMouseDown,
 		OnClick = {
 			function(self)
-				overlayPanel:SetVisibility(true)
+				overlayPanel:SetVisibility(not overlayPanel.visible)
 			end 
 		},
 	}

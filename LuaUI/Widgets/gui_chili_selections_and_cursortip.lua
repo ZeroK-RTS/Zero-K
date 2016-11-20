@@ -1110,6 +1110,7 @@ local function MakeUnitGroupSelectionToolTip()
 			--width   = "100%";
 			right = options.showgroupinfo.value and infoSection_size or 0, --expand to right
 			--columns = 5;
+			padding     = {0,0,0,0},
 			itemPadding = {0,0,0,0};
 			itemMargin  = {0,0,2,2};
 			tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
@@ -2823,7 +2824,7 @@ function widget:Initialize()
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	local x = integralWidth
 	local height = integralHeight*0.84
 	
@@ -2859,7 +2860,7 @@ function widget:Initialize()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		padding = {8 + options.leftPadding.value, 8, 8, 8},
+		padding = {8 + options.leftPadding.value, 6, 4, 4},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
 		dockable = false,
 		resizable   = false;

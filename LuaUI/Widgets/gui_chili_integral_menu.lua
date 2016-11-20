@@ -74,7 +74,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
 	'background_opacity', 'keyboardType', 'selectionClosesTab', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'leftPadding', 'rightPadding', 'fancySkinning'
+	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'fancySkinning'
 }
 
 options = {
@@ -155,6 +155,11 @@ options = {
 		OnChange = function() 
 			ClearData(true)
 		end,	
+	},
+	tabFontSize = {
+		name = "Tab Font Size",
+		type = "number",
+		value = 14, min = 8, max = 30, step = 1,
 	},
 	rightPadding = {
 		name = 'Right Padding',
@@ -736,6 +741,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 				local texture = displayConfig.texture[state]
 				SetImage(texture)
 			end
+			if command then
+				SetDisabled(command.disabled)
+			end
 			return
 		end
 		cmdID = newCmdID
@@ -1051,6 +1059,11 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		button:Invalidate()
 	end
 	
+	function externalFunctionsAndData.SetFontSize(newSize)
+		button.font.size = newSize
+		button:Invalidate()
+	end
+	
 	return externalFunctionsAndData
 end
 
@@ -1284,7 +1297,7 @@ local function InitializeControls()
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local width = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
-	local height = math.min(screenHeight/4.5, 200*width/450)
+	local height = math.min(screenHeight/4.5, 200*width/450)  + 8
 
 	gridKeyMap, gridMap = GenerateGridKeyMap(options.keyboardType.value)
 	
@@ -1352,7 +1365,7 @@ local function InitializeControls()
 			y = "0%",
 			width = COMMAND_SECTION_WIDTH .. "%",
 			height = "100%",
-			padding = {4, 4, 0, 4},
+			padding = {4, 6, 0, 4},
 			parent = buttonsHolder,
 		}
 		commandHolder:SetVisibility(false)
@@ -1401,7 +1414,7 @@ local function InitializeControls()
 		y = "0%",
 		width = STATE_SECTION_WIDTH .. "%",
 		height = "100%",
-		padding = {0, 4, 3, 4},
+		padding = {0, 6, 3, 4},
 		parent = buttonsHolder,
 	}
 	statePanel.holder:SetVisibility(false)
@@ -1490,6 +1503,15 @@ options.tab_defence.OnChange = HotkeyTabDefence
 options.tab_special.OnChange = HotkeyTabSpecial
 options.tab_factory.OnChange = HotkeyTabFactory
 options.tab_units.OnChange   = HotkeyTabUnits
+
+function options.tabFontSize.OnChange(self)
+	if commandPanels then
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			data.tabButton.SetFontSize(self.value)
+		end
+	end
+end
 
 local function PaddingUpdate()
 	buttonsHolder._relativeBounds.left = options.leftPadding.value

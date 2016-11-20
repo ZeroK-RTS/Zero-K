@@ -511,6 +511,23 @@ local options = {
     type   = 'section',
   },
   {
+    key    = 'chickenailevel',
+    name   = 'Chicken AI Difficulty',
+    desc   = "Option for automatically adding an AI to the script. Implemented by Springies and Chobby.",
+    type   = 'list',
+    section= 'chicken',
+    def    = 'none',
+    items = {
+      { key = 'none', name = "none", desc = 'No chickens at all.' },
+      { key = 'Chicken: Very Easy', name = "Chicken: Very Easy", desc = 'Very Easy Chicken.' },
+      { key = 'Chicken: Easy', name = "Chicken: Easy", desc = 'Easy Chicken.' },
+      { key = 'Chicken: Normal', name = "Chicken: Normal", desc = 'Normal Chicken.' },
+      { key = 'Chicken: Hard', name = "Chicken: Hard", desc = 'Hard Chicken.' },
+      { key = 'Chicken: Suicidal', name = "Chicken: Suicidal", desc = 'Suicidal Chicken.' },
+      { key = 'Chicken: Custom', name = "Chicken: Custom", desc = 'Customize your chicken.' },
+    },
+  },
+  {
     key = "playerchickens",
     name = "Players as chickens",
     desc = "Shared chickens with players, take commanders away",
