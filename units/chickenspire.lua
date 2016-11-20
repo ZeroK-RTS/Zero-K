@@ -19,7 +19,6 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 48 0]],
   collisionVolumeScales         = [[58 176 58]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {

@@ -24,7 +24,6 @@ unitDef = {
   canPatrol                     = false,
   canstop                       = true,
   category                      = [[SINK UNARMED]],
-  collisionVolumeTest           = 1,
   corpse                        = [[DEAD]],
 
   customParams                  = {

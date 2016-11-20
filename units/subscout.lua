@@ -18,7 +18,6 @@ unitDef = {
   category              = [[SUB FIREPROOF]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[18 12 38]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],  
 
   customParams          = {

@@ -21,7 +21,6 @@ unitDef = {
   collisionSphereScale   = 1,
   collisionVolumeOffsets = [[0 -5 -5]],
   collisionVolumeScales  = [[30 70 70]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   customParams           = {

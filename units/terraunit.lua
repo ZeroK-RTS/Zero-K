@@ -14,7 +14,6 @@ unitDef = {
   category               = [[TERRAFORM STUPIDTARGET]],
   collisionVolumeOffsets = [[0 -3000 0]],
   collisionVolumeScales  = [[32 32 32]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   customParams           = {

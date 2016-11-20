@@ -13,7 +13,6 @@ unitDef = {
   buildPic                      = [[ARMFUS.png]],
   buildTime                     = 1000,
   category                      = [[SINK UNARMED]],
-  collisionVolumeTest           = 1,
   corpse                        = [[DEAD]],
 
   customParams                  = {

@@ -18,7 +18,6 @@ unitDef = {
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 17 0]],
   collisionVolumeScales         = [[36 110 36]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 

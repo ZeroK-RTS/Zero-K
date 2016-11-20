@@ -17,7 +17,6 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[48 58 48]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]], 
   corpse              = [[DEAD]],
 
@@ -138,7 +137,6 @@ unitDef = {
     DEAD  = {
       blocking         = true,
 	  collisionVolumeScales  = [[40 40 60]],
-	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 3,

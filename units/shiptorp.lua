@@ -17,7 +17,6 @@ unitDef = {
   category            = [[SHIP]],
   collisionVolumeOffsets = [[0 -7 0]],
   collisionVolumeScales  = [[34 34 80]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 

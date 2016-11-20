@@ -26,7 +26,6 @@ unitDef = {
   canPatrol        = true,
   canstop          = [[1]],
   category         = [[UNARMED FLOAT]],
-  collisionVolumeTest           = 1,
   corpse           = [[DEAD]],
 
   customParams     = {

@@ -18,7 +18,6 @@ unitDef = {
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[25 8 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   crashDrag              = 0.02,
   cruiseAlt              = 250,

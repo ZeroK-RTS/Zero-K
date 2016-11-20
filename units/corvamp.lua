@@ -18,7 +18,6 @@ unitDef = {
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[30 12 50]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.01,

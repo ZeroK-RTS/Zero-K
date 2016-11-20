@@ -14,7 +14,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets 		= [[0 0 0]],
   collisionVolumeScales  		= [[120 100 130]],
-  collisionVolumeTest    		= 1,
   collisionVolumeType    		= [[Box]],
   --corpse                        = [[DEAD]],
 

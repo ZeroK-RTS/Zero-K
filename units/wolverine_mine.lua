@@ -19,7 +19,6 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 -4 0]],
   collisionVolumeScales  = [[20 20 20]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {

@@ -21,7 +21,6 @@ unitDef = {
   category               = [[GUNSHIP]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[36 36 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],

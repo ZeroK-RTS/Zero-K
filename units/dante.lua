@@ -15,7 +15,6 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
-  collisionVolumeTest = 1,
   corpse              = [[DEAD]],
   
   customParams        = {

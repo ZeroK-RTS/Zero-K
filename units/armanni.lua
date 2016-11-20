@@ -17,7 +17,6 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   --collisionVolumeScales         = [[75 100 75]],
-  --collisionVolumeTest           = 1,
   --collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
