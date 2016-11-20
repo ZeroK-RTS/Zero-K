@@ -123,6 +123,11 @@ function script.Create()
 	--bMoving = false
 	--restore_delay = 3000
 	Hide( radardish)
+	Hide( depthcharge1)
+	Hide( depthcharge2)
+	Hide( depthcharge3)
+	Hide( depthcharge4)
+	Hide( depthcharge5)
 	StartThread(SmokeUnit, smokePiece)
 	Spin( sonar , y_axis, math.rad(60) )
 	Spin( radarpole , y_axis, math.rad(-90) )
