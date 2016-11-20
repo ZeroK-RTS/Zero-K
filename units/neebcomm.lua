@@ -21,7 +21,6 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND UNARMED]],
-  commander           = true,
 
   customParams        = {
     description_pl = [[Karny kurczak]],
@@ -67,9 +66,7 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 300,
   trackOffset         = 8,
   trackStrength       = 8,

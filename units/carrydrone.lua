@@ -21,7 +21,6 @@ unitDef = {
   category            = [[GUNSHIP]],
   collisionVolumeOffsets   = [[0 0 0]],
   collisionVolumeScales    = [[26 26 26]],
-  collisionVolumeTest      = 1,
   collisionVolumeType      = [[ellipsoid]],
   collide             = false,
   cruiseAlt           = 100,
@@ -65,10 +64,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[ARM]],
   sightDistance       = 500,
-  smoothAnim          = true,
   turnRate            = 792,
   upright             = true,
 

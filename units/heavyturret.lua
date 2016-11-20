@@ -27,7 +27,6 @@ unitDef = {
     pylonrange     = 50,	
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,
@@ -51,9 +50,7 @@ unitDef = {
       [[custom:none]],
     },
 
-  },  
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

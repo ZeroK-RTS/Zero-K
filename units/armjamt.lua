@@ -17,7 +17,6 @@ unitDef = {
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 

@@ -21,10 +21,8 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
-  commander           = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],  
   corpse              = [[DEAD]],
 
@@ -72,7 +70,6 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  norestrict          = [[1]],
   objectName          = [[commrecon.s3o]],
   script              = [[dynrecon.lua]],
   seismicSignature    = 16,
@@ -92,9 +89,7 @@ unitDef = {
   },
 
   showNanoSpray       = false,
-  side                = [[ARM]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 500,
   trackOffset         = 0,
   trackStrength       = 8,

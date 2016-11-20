@@ -16,7 +16,6 @@ unitDef = {
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 45 45]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -32,7 +31,6 @@ unitDef = {
     midposoffset   = [[0 4 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,

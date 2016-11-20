@@ -23,7 +23,6 @@ unitDef = {
   cloakCostMoving        = 24,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[42 42 42]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -67,10 +66,8 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  side                   = [[ARM]],
   sightDistance          = 500,
--- sonarDistance          = 500,
-  smoothAnim             = true,
+
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

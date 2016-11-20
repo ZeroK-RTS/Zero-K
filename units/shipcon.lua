@@ -13,6 +13,7 @@ unitDef = {
   buildoptions           = {
   },
 
+
   buildPic               = [[shipcon.png]],
   buildTime              = 200,
   canGuard               = true,
@@ -23,7 +24,7 @@ unitDef = {
   category               = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 8 0]],
   collisionVolumeScales  = [[25 25 96]],
-  collisionVolumeTest    = 1,
+
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -62,12 +63,10 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   showNanoSpray          = false,
-  side                   = [[CORE]],
+
   sightDistance          = 325,
-  sonarDistance          = 325,
-  smoothAnim             = true,
-  TEDClass               = [[CNSTR]],
-  terraformSpeed         = 600,
+
+  sonarDistance          = 325,  terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,
   workerTime             = 7.5,

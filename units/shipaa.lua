@@ -1,14 +1,16 @@
 unitDef = {
   unitname               = [[shipaa]],
+
   name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
   acceleration           = 0.0498,
   activateWhenBuilt   = true,
   brakeRate              = 0.0808,
-  buildAngle             = 16384,
+
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
   builder                = false,
+
   buildPic               = [[shipaa.png]],
   buildTime              = 400,
   canAttack              = true,
@@ -19,11 +21,12 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 4]],
   collisionVolumeScales  = [[32 32 128]],
-  collisionVolumeTest    = 1,
+
   collisionVolumeType    = [[CylZ]],
   corpse                 = [[DEAD]],
 
   customParams           = {
+    
     helptext       = [[With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
 	modelradius    = [[17]],
 	turnatfullspeed = [[1]],
@@ -33,6 +36,7 @@ unitDef = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
+
   iconType               = [[shipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -46,18 +50,17 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
+
   objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
   scale                  = [[0.6]],
   script				 = [[shipaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[CORE]],
+
   sightDistance          = 660,
-  sonarDistance          = 660,
-  smoothAnim             = true,
-  TEDClass               = [[SHIP]],
-  turninplace            = 0,
+
+  sonarDistance          = 660,  turninplace            = 0,
   turnRate               = 486,
   waterline              = 4,
   workerTime             = 0,

@@ -24,9 +24,7 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
-  commander              = true,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -68,7 +66,6 @@ unitDef = {
   modelCenterOffset		 = [[0 1 0]],
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  norestrict             = [[1]],
   objectName             = [[cremcom.s3o]],
   script                 = [[cremcom.lua]],
   seismicSignature       = 16,
@@ -85,7 +82,6 @@ unitDef = {
 
   showNanoSpray          = false,
   showPlayerName         = true,
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 300,
   trackOffset            = 0,

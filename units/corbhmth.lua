@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 2500,
   buildCostMetal                = 2500,
   builder                       = false,
@@ -58,11 +57,8 @@ unitDef = {
 	  [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
-  },  
-  
-  side                          = [[CORE]],
+  },
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

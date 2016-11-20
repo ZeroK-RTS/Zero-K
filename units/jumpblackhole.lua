@@ -17,7 +17,6 @@ unitDef = {
   category              = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 48 30]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                = [[DEAD]],
 
@@ -61,10 +60,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[CORE]],
   sightDistance         = 605,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,

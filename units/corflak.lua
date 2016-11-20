@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Anti-Air Flak Gun]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,
@@ -19,7 +18,6 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 11 -4]],
   collisionVolumeScales         = [[50 86 50]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -61,10 +59,7 @@ unitDef = {
     },
 
   },
-  
-  side                          = [[CORE]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

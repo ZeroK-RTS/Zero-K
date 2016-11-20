@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt             = true,
   armoredMultiple               = 0.25,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 1600,
   buildCostMetal                = 1600,
   builder                       = false,
@@ -21,7 +20,6 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 100 45]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -70,9 +68,7 @@ unitDef = {
       [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
-  },  
-  
-  side                          = [[CORE]],
+  },
   sightDistance                 = 780,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

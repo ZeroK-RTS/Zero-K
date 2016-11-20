@@ -24,7 +24,6 @@ unitDef = {
   collide                = true,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[86 22 86]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 120,
@@ -71,8 +70,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 633,
   turnRate               = 250,
   upright                = true,
@@ -263,7 +260,6 @@ unitDef = {
       blocking         = true,
 	  collisionVolumeOffsets = [[0 0 0]],
 	  collisionVolumeScales  = [[80 30 80]],
-	  collisionVolumeTest    = 1,
 	  collisionVolumeType    = [[ellipsoid]],	  
       featureDead      = [[HEAP]],
       footprintX       = 5,

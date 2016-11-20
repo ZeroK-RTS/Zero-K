@@ -18,7 +18,6 @@ unitDef = {
   category              = [[SUB FIREPROOF]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[18 12 38]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],  
 
   customParams          = {
@@ -50,7 +49,6 @@ unitDef = {
   seismicSignature      = 4,
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
-  side                  = [[ARM]],
   sightDistance         = 550,
   sonarDistance         = 450,
   turnRate              = 500,

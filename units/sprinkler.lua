@@ -18,7 +18,6 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 50 24]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -54,11 +53,8 @@ unitDef = {
     explosiongenerators = {
       [[custom:flashmuzzle1]],
     },
-  }, 
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
 

@@ -30,7 +30,6 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT UNARMED]],
-  collisionVolumeTest           = 1,
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -67,9 +66,7 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
-  side                          = [[CORE]],
   sightDistance                 = 273,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   waterline						= 0,

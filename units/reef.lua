@@ -20,7 +20,6 @@ unitDef = {
   CollisionSphereScale   = 0.6,
   collisionVolumeOffsets = [[-5 -10 0]],
   collisionVolumeScales  = [[80 80 240]],
-  collisionVolumeTest	 = 1,
   collisionVolumeType    = [[CylZ]],
   corpse                 = [[DEAD]],
 
@@ -166,7 +165,6 @@ unitDef = {
       CollisionSphereScale   = 0.6,
       collisionVolumeOffsets = [[-5 -10 0]],
 	  collisionVolumeScales  = [[80 80 240]],
-	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
       blocking         = false,
       featureDead      = [[HEAP]],

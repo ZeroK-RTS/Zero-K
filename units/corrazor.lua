@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[corrazor]],
   name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
-  buildAngle                    = 8192,
   buildCostEnergy               = 280,
   buildCostMetal                = 280,
   builder                       = false,
@@ -17,7 +16,6 @@ unitDef = {
   category                      = [[FLOAT UNARMED STUPIDTARGET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 36 50]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 

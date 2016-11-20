@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 200,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
@@ -51,10 +50,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[ARM]],
   sightDistance       = 484,
-  smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 500,
   workerTime          = 0,

@@ -18,7 +18,6 @@ unitDef = {
   category               = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
@@ -67,10 +66,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 425,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,

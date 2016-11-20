@@ -16,7 +16,6 @@ unitDef = {
   category                      = [[UNARMED FLOAT]],
   collisionVolumeOffsets        = [[0 -8 0]],
   collisionVolumeScales         = [[32 83 32]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 

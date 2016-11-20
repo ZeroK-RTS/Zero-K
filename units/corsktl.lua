@@ -19,7 +19,6 @@ unitDef = {
   cloakCostMoving        = 15,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -73,7 +72,6 @@ unitDef = {
   selfDestructCountdown  = 0,
   script                 = [[corsktl.lua]],
   sightDistance          = 280,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

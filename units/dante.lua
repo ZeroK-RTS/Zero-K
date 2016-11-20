@@ -15,7 +15,6 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
-  collisionVolumeTest = 1,
   corpse              = [[DEAD]],
   
   customParams        = {
@@ -58,10 +57,7 @@ unitDef = {
       [[custom:RAIDMUZZLE]],
     },
   },
-
-  side                = [[CORE]],
   sightDistance       = 600,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 0.6,

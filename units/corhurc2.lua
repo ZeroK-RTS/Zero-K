@@ -19,7 +19,6 @@ unitDef = {
   collide             = false,
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[55 15 70]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
   cruiseAlt           = 180,
@@ -69,8 +68,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 660,
   turnRadius          = 120,
   workerTime          = 0,

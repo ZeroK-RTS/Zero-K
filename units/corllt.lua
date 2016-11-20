@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Light Laser Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 32768,
   buildCostEnergy               = 90,
   buildCostMetal                = 90,
   builder                       = false,
@@ -19,7 +18,6 @@ unitDef = {
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 90 30]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -37,7 +35,6 @@ unitDef = {
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
-  healtime                      = [[4]],
   iconType                      = [[defenseraider]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -62,8 +59,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 520,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

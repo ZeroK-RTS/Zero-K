@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
-  buildAngle                    = 8192,
   buildCostEnergy               = 220,
   buildCostMetal                = 220,
   builder                       = false,
@@ -17,7 +16,6 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[42 53 42]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -54,8 +52,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 500,
   useBuildingGroundDecal        = true,
   waterline						= 10,

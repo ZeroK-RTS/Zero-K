@@ -22,7 +22,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[60 60 60]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -73,9 +72,7 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  side                   = [[CORE]],
   sightDistance          = 280,
-  smoothAnim             = true,
   terraformSpeed         = 450,
   trackOffset            = 3,
   trackStrength          = 6,

@@ -43,7 +43,6 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND]],
-  commander           = true,
 
   customParams        = {
     description_fr = [[Reine pondeuse]],
@@ -92,11 +91,8 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 1024,
-  smoothAnim          = true,
   sonarDistance       = 450,
-  TEDClass            = [[COMMANDER]],
   trackOffset         = 8,
   trackStrength       = 8,
   trackStretch        = 1,

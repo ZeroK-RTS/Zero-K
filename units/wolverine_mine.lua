@@ -19,7 +19,6 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 -4 0]],
   collisionVolumeScales  = [[20 20 20]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
@@ -58,9 +57,7 @@ unitDef = {
   seismicSignature       = 16,
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
-  side                   = [[CORE]],
   sightDistance          = 64,
-  smoothAnim             = true,
   stealth                = true,
   turnRate               = 0,
   waterline              = 1,

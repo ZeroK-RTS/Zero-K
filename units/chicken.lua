@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 25,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,
   canMove             = true,
   canPatrol           = true,
   category            = [[SWIM]],
@@ -55,11 +54,8 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  sonarDistance       = 200,  
-  smoothAnim          = true,
+  sonarDistance       = 200,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

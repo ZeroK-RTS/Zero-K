@@ -48,7 +48,6 @@ unitDef = {
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
-  healtime            = [[8]],
   iconType            = [[builder]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
@@ -78,10 +77,7 @@ unitDef = {
   },
 
   showNanoSpray       = false,
-  side                = [[CORE]],
   sightDistance       = 375,
-  smoothAnim          = true,
-  TEDClass            = [[CNSTR]],
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

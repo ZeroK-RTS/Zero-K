@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.0417,
   activateWhenBuilt      = true,
   brakeRate              = 0.142,
-  buildAngle             = 16384,
   buildCostEnergy        = 700,
   buildCostMetal         = 700,
   builder                = false,
@@ -18,7 +17,6 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 0 3]],
   collisionVolumeScales  = [[32 46 102]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
@@ -50,7 +48,6 @@ unitDef = {
   script				 = [[destroyer.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 500,
   
   sfxtypes               = {
@@ -60,9 +57,7 @@ unitDef = {
       [[custom:PULVMUZZLE]],
     },
 
-  },  
-  
-  smoothAnim             = true,
+  },
   sonarDistance          = 700,
   turninplace            = 0,
   turnRate               = 311,
@@ -162,7 +157,6 @@ unitDef = {
       blocking         = false,
 	  collisionVolumeOffsets = [[0 0 3]],
 	  collisionVolumeScales  = [[32 46 102]],
-	  collisionVolumeTest    = 1,
 	  collisionVolumeType    = [[box]],	  
       featureDead      = [[HEAP]],
       footprintX       = 5,

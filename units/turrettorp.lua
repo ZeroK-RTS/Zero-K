@@ -5,7 +5,7 @@ unitDef = {
   acceleration      = 0,
   activateWhenBuilt = true,
   brakeRate         = 0,
-  buildAngle        = 16384,
+
   buildCostEnergy   = 120,
   buildCostMetal    = 120,
   builder           = false,
@@ -16,7 +16,7 @@ unitDef = {
   category          = [[FLOAT]],
   collisionVolumeOffsets        = [[0 -5 0]],
   collisionVolumeScales         = [[42 50 42]],
-  collisionVolumeTest	        = 1,
+
   collisionVolumeType	        = [[CylY]],
   corpse            = [[DEAD]],
 
@@ -40,6 +40,7 @@ unitDef = {
   idleAutoHeal      = 5,
   idleTime          = 1800,
   mass              = 215,
+
   maxDamage         = 1020,
   maxSlope          = 18,
   maxVelocity       = 0,
@@ -50,7 +51,7 @@ unitDef = {
   script            = [[turrettorp.lua]],
   seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
-  side              = [[CORE]],
+
   sightDistance     = 610,
   sonarDistance     = 610,
   turnRate          = 0,

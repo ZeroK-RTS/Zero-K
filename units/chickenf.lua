@@ -45,14 +45,12 @@ unitDef = {
   maxSlope            = 18,
   maxVelocity         = 10,
   minCloakDistance    = 75,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],
   power               = 450,
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -63,10 +61,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   turnRate            = 6000,
   workerTime          = 0,
 

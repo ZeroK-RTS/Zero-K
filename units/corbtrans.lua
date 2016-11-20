@@ -23,7 +23,6 @@ unitDef = {
   collide                = false,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[60 25 100]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 250,
@@ -72,10 +71,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   transportCapacity      = 1,
   transportSize          = 25,
   turninplace            = 0,
@@ -206,7 +202,6 @@ unitDef = {
     DEAD  = {
       blocking         = true,
 	  collisionVolumeScales  = [[60 40 80]],
-	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 2,

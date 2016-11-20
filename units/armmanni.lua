@@ -12,13 +12,11 @@ unitDef = {
   buildTime           = 1000,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[48 58 48]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]], 
   corpse              = [[DEAD]],
 
@@ -65,9 +63,7 @@ unitDef = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
     },
 
-  },  
-  
-  side                = [[ARM]],
+  },
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,
@@ -140,7 +136,6 @@ unitDef = {
     DEAD  = {
       blocking         = true,
 	  collisionVolumeScales  = [[40 40 60]],
-	  collisionVolumeTest	 = 1,
 	  collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
       footprintX       = 3,

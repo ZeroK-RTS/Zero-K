@@ -59,10 +59,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 0,
-  smoothAnim          = true,
   stealth             = true,
   trackOffset         = 0,
   trackStrength       = 6,

@@ -18,7 +18,6 @@ unitDef = {
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 70 24]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -33,7 +32,6 @@ unitDef = {
     aimposoffset   = [[0 20 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[BIG_UNITEX]],
   floater                       = true,
   footprintX                    = 2,
@@ -63,11 +61,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
-  TEDClass                      = [[METAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

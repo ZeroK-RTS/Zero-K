@@ -17,7 +17,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 -5 0]],
   collisionVolumeScales  = [[70 60 65]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
@@ -64,9 +63,7 @@ unitDef = {
   },
 
   --script		 = [[gorg.lua]],
-  side                   = [[CORE]],
   sightDistance          = 650,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

@@ -19,7 +19,6 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 20 22]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
@@ -64,11 +63,8 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 240,
   sonarDistance          = 260,
-  smoothAnim             = true,
   turnRate               = 3000,
   workerTime             = 0,
 

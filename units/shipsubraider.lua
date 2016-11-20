@@ -18,7 +18,6 @@ unitDef = {
   category               = [[SUB SINK]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 22 89]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylZ]],
   corpse                 = [[DEAD]],
 
@@ -48,7 +47,6 @@ unitDef = {
   script                 = [[shipsubraider.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-  side                   = [[CORE]],
   sightDistance          = 360,
   sonarDistance          = 360,
   turninplace            = 0,

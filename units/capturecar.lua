@@ -16,7 +16,6 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[26 26 50]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
@@ -51,7 +50,6 @@ unitDef = {
   script              = [[capturecar.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 550,
   trackOffset         = -7,
   trackStrength       = 5,

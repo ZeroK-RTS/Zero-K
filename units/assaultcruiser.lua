@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
-  buildAngle             = 16384,
   buildCostEnergy        = 1600,
   buildCostMetal         = 1600,
   builder                = false,
@@ -18,7 +17,6 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 -2]],
   collisionVolumeScales  = [[72 42 128]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
 
@@ -56,8 +54,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 600,
   sonarDistance			 = 800,
   turninplace            = 0,

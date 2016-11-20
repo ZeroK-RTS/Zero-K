@@ -1,13 +1,17 @@
 unitDef = {
+
   unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
+,
   description         = [[Torpedo-Boat (Raider)]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,
+,
   buildCostEnergy     = 100,
   buildCostMetal      = 100,
   builder             = false,
+
   buildPic            = [[shiptorpraider.png]],
   buildTime           = 100,
   canAttack           = true,
@@ -15,20 +19,24 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
+
   collisionVolumeOffsets = [[0 2 0]],
   collisionVolumeScales  = [[20 20 40]],
-  collisionVolumeTest    = 1,
+
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
+
     helptext       = [[The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels.]],
 	modelradius    = [[14]],
 	turnatfullspeed = [[1]],
   },
 
+
   explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
+
   footprintX          = 2,
   footprintZ          = 2,
   iconType            = [[shiptorpraider]],
@@ -36,21 +44,26 @@ unitDef = {
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
   mass                = 240,
+
   maxDamage           = 310,
   maxVelocity         = 4.0,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
+
   movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
+
   objectName          = [[SHIPTORPRAIDER]],
   script              = [[shiptorpraider.lua]],
   seismicSignature    = 4,
+
   selfDestructAs      = [[SMALL_UNITEX]],
-  side                = [[ARM]],
+
   sightDistance       = 450,
-  smoothAnim          = true,
+
   sonarDistance       = 450,
+
   turnRate            = 800,
   waterline           = 4,
   workerTime          = 0,
@@ -69,23 +82,27 @@ unitDef = {
   weaponDefs          = {
 
     TORPEDO = {
+
       name                    = [[Torpedo]],
       areaOfEffect            = 32,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
 	  burnblow                = 1,
+
       canAttackGround		  = false,	-- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
+
         default = 200.1,
         subs    = 200.1,
       },
 
       edgeEffectiveness       = 0.6,
+
       explosionGenerator      = [[custom:TORPEDO_HIT]],
       fixedLauncher           = true,
       groundbounce            = 1,
@@ -98,6 +115,7 @@ unitDef = {
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
+
       range                   = 230,
       reloadtime              = 2.5,
       soundHit                = [[TorpedoHitVariable]],
@@ -123,6 +141,7 @@ unitDef = {
     DEAD  = {
       blocking         = false,
       featureDead      = [[HEAP]],
+
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[shiptorpraider_dead.s3o]],
@@ -131,6 +150,7 @@ unitDef = {
 
     HEAP  = {
       blocking         = false,
+
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[debris2x2c.s3o]],
@@ -139,5 +159,6 @@ unitDef = {
   },
 
 }
+
 
 return lowerkeys({ shiptorpraider = unitDef })

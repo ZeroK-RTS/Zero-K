@@ -23,7 +23,6 @@ unitDef = {
   category            = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[144 40 144]],
-  collisionVolumeTest	 = 1,
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
 
@@ -54,7 +53,6 @@ unitDef = {
   seismicSignature    = 4,
   selfDestructAs      = [[LARGE_BUILDINGEX]],
   showNanoSpray       = false,
-  side                = [[ARM]],
   sightDistance       = 273,
   turnRate            = 0,
   waterline           = 8,

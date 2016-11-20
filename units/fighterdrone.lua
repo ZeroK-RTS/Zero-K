@@ -18,7 +18,6 @@ unitDef = {
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[25 8 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   crashDrag              = 0.02,
   cruiseAlt              = 250,
@@ -39,7 +38,6 @@ unitDef = {
     is_drone = 1,
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   fireState              = 2,
   floater                = true,
@@ -76,10 +74,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 520,
-  smoothAnim             = true,
   speedToFront           = 0,
   turnRate               = 9001,
   turnRadius             = 90,

@@ -17,7 +17,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[65 65 65]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
 
@@ -52,9 +51,7 @@ unitDef = {
   script		 = [[armraven.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
-  side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,

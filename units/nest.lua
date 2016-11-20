@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Spawns Chickens]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
   builder                       = true,
@@ -35,7 +34,6 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  commander                     = false,
 
   customParams                  = {
     description_de = [[Erzeugt Chicken]],
@@ -80,10 +78,7 @@ unitDef = {
   },
 
   showNanoSpray                 = false,
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 21,

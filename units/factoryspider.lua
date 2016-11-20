@@ -32,7 +32,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[100 100 100]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -72,8 +71,6 @@ unitDef = {
   showNanoSpray                 = false,
   script                        = [[factoryspider.lua]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,

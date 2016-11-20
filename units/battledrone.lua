@@ -57,8 +57,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[ARM]],
   sightDistance       = 500,
   turnRate            = 792,
   upright             = true,

@@ -17,7 +17,6 @@ unitDef = {
   category               = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 0 2]],
   collisionVolumeScales  = [[14 14 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -54,9 +53,7 @@ unitDef = {
   objectName             = [[CORFAV.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-  side                   = [[CORE]],
   sightDistance          = 580,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 4,
   trackStretch           = 1,

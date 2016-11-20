@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[High-Energy Laser Tower]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 420,
   buildCostMetal                = 420,
   builder                       = false,
@@ -19,7 +18,6 @@ unitDef = {
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 17 0]],
   collisionVolumeScales         = [[36 110 36]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -63,10 +61,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

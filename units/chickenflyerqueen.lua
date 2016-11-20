@@ -47,7 +47,6 @@ unitDef = {
   maxSlope			  = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chickenflyerqueen.s3o]],
@@ -55,7 +54,6 @@ unitDef = {
   script              = [[chickenflyerqueen.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -66,10 +64,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 4096,
-  smoothAnim          = true,
   turnRate            = 900,
   workerTime          = 0,
 

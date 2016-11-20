@@ -41,10 +41,7 @@ unitDef = {
   seismicSignature      = 0,
   selfDestructAs        = [[TINY_BUILDINGEX]],
   selfDestructCountdown = 0,
-  side                  = [[ARM]],
   sightDistance         = 0.2,
-  smoothAnim            = true,
-  TEDClass              = [[VTOL]],
   turnRate              = 0,
   workerTime            = 0,
 }

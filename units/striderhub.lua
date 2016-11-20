@@ -39,7 +39,6 @@ unitDef = {
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 70 70]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -55,7 +54,6 @@ unitDef = {
 	isfakefactory  = [[1]],
   },
 
-  defaultmissiontype            = [[Standby]],
   energyMake                    = 0.3,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
@@ -79,11 +77,7 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   showNanoSpray                 = false,
-  side                          = [[ARM]],
   sightDistance                 = 380,
-  smoothAnim                    = true,
-  steeringmode                  = [[1]],
-  TEDClass                      = [[CNSTR]],
   terraformSpeed                = 600,
   turnRate                      = 1,
   upright                       = true,

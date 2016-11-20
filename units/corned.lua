@@ -22,7 +22,6 @@ unitDef = {
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[28 28 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -66,9 +65,7 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
-  side                   = [[CORE]],
   sightDistance          = 255,
-  smoothAnim             = true,
   terraformSpeed         = 300,
   trackOffset            = 3,
   trackStrength          = 6,

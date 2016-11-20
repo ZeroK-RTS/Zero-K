@@ -30,7 +30,6 @@ unitDef = {
   category               = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[-15 -20 -15]],
   collisionVolumeScales  = [[120 120 160]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -64,9 +63,7 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
   showNanoSpray          = false,
-  side                   = [[CORE]],
   sightDistance          = 273,
-  TEDClass               = [[PLANT]],
   turnRate               = 0,
   waterline              = 0,
   workerTime             = 10,

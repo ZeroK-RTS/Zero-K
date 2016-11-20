@@ -12,13 +12,11 @@ unitDef = {
   buildTime           = 80,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[19 19 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],  
   corpse              = [[DEAD]],
 
@@ -60,10 +58,9 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 560,
   sonarDistance       = 560,
-  smoothAnim          = true,
+
   turninplace         = 0,
   turnRate            = 673,
   workerTime          = 0,

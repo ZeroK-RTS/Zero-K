@@ -21,7 +21,6 @@ unitDef = {
   collisionSphereScale   = 1,
   collisionVolumeOffsets = [[0 0 15]],
   collisionVolumeScales  = [[46 110 120]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   customParams           = {
@@ -62,10 +61,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[THUNDERBIRDS]],
   sightDistance          = 2048,
-  smoothAnim             = true,
   sonarDistance          = 450,
   trackOffset            = 18,
   trackStrength          = 8,

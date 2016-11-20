@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 900,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,  
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
@@ -58,10 +57,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 1200,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 6,
   trackStrength       = 8,

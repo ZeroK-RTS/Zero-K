@@ -20,7 +20,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 10 0]],
   collisionVolumeScales  = [[92 120 92]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
 
@@ -56,7 +55,6 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
-  side                   = [[ARM]],
   sightDistance          = 910,
 --  sonarDistance          = 910,
   trackOffset            = 0,

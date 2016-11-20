@@ -11,7 +11,6 @@ unitDef = {
   buildPic              = [[chicken_dodo.png]],
   buildTime             = 170,
   canGuard              = true,
-  canHover              = false,
   canMove               = true,
   canPatrol             = true,
   canstop               = [[1]],
@@ -61,10 +60,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[THUNDERBIRDS]],
   sightDistance         = 256,
-  smoothAnim            = true,
   trackOffset           = 1,
   trackStrength         = 6,
   trackStretch          = 1,
