@@ -33,7 +33,6 @@ unitDef = {
     aimposoffset   = [[0 20 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[BIG_UNITEX]],
   floater                       = true,
   footprintX                    = 2,

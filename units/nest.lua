@@ -35,7 +35,6 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  commander                     = false,
 
   customParams                  = {
     description_de = [[Erzeugt Chicken]],

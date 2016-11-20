@@ -45,7 +45,6 @@ unitDef = {
 	refuelturnradius = [[80]],
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   fireState              = 2,
   floater                = true,

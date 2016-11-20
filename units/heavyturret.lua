@@ -27,7 +27,6 @@ unitDef = {
     pylonrange     = 50,	
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,

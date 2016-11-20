@@ -32,7 +32,6 @@ unitDef = {
     midposoffset   = [[0 4 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,

@@ -37,7 +37,6 @@ unitDef = {
   explodeAs                     = [[SMALL_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
-  healtime                      = [[4]],
   iconType                      = [[defenseraider]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,

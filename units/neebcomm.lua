@@ -21,7 +21,6 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND UNARMED]],
-  commander           = true,
 
   customParams        = {
     description_pl = [[Karny kurczak]],

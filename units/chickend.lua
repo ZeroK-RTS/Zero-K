@@ -28,7 +28,6 @@ unitDef = {
 	helptext_pl    = [[Ta tuba to jedyna obrona kurczakow; ostrzeliwuje zarowno cele ladowe, jak i powietrzne.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   energyMake                    = 2,
   explodeAs                     = [[NOWEAPON]],
   footprintX                    = 3,

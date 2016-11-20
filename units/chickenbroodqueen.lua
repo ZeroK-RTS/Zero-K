@@ -43,7 +43,6 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND]],
-  commander           = true,
 
   customParams        = {
     description_fr = [[Reine pondeuse]],

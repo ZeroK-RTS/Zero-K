@@ -8,7 +8,6 @@ unitDef = {
   buildPic               = [[corvamp.png]],
   buildTime              = 300,
   canAttack              = true,
-  canDropFlare           = false,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

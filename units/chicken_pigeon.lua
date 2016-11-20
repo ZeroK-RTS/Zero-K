@@ -43,14 +43,12 @@ unitDef = {
   maxDamage           = 150,
   maxSlope            = 18,
   maxVelocity         = 10,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 

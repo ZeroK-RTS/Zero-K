@@ -27,7 +27,6 @@ unitDef = {
   collisionVolumeScales  = [[45 50 45]],
   collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
-  commander              = true,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -59,7 +58,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  norestrict             = [[1]],
   objectName             = [[strikecom.dae]],
   script                 = [[commstrike.lua]],
   seismicSignature       = 16,

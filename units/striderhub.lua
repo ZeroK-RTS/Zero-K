@@ -57,7 +57,6 @@ unitDef = {
 	isfakefactory  = [[1]],
   },
 
-  defaultmissiontype            = [[Standby]],
   energyMake                    = 0.3,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
@@ -84,7 +83,6 @@ unitDef = {
   side                          = [[ARM]],
   sightDistance                 = 380,
   smoothAnim                    = true,
-  steeringmode                  = [[1]],
   TEDClass                      = [[CNSTR]],
   terraformSpeed                = 600,
   turnRate                      = 1,

@@ -39,7 +39,6 @@ unitDef = {
     is_drone = 1,
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   fireState              = 2,
   floater                = true,

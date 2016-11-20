@@ -48,7 +48,6 @@ unitDef = {
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
-  healtime            = [[8]],
   iconType            = [[builder]],
   idleAutoHeal        = 5,
   idleTime            = 1800,

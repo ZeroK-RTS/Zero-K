@@ -43,7 +43,6 @@ unitDef = {
   maxSlope			  = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chicken_roc.s3o]],
@@ -51,7 +50,6 @@ unitDef = {
   script              = [[chicken_roc.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 

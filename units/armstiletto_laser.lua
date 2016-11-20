@@ -8,7 +8,6 @@ unitDef = {
   buildPic            = [[armstiletto_laser.png]],
   buildTime           = 550,
   canAttack           = true,
-  canDropFlare        = false,
   canFly              = true,
   canMove             = true,
   canSubmerge         = false,
