@@ -51,7 +51,6 @@ unitDef = {
   script		 = [[armraven.cob]],
   seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
-  side                   = [[CORE]],
   sightDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 8,

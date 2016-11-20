@@ -50,7 +50,6 @@ unitDef = {
   script                        = [[armsolar.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
-  side                          = [[ARM]],
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

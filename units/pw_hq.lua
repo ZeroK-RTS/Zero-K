@@ -44,7 +44,6 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown         = 60,
-  side                          = [[ARM]],
   sightDistance                 = 0,
   waterline                     = 10,
   turnRate                      = 0,

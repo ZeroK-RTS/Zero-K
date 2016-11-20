@@ -38,7 +38,6 @@ unitDef = {
   script                        = [[nullscript.lua]],
   seismicSignature              = 16,
   selfDestructCountdown         = 0,
-  side                          = [[ARM]],
   sightDistance                 = 0.2,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

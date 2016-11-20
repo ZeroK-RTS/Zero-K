@@ -57,8 +57,6 @@ unitDef = {
       [[custom:RAIDMUZZLE]],
     },
   },
-
-  side                = [[CORE]],
   sightDistance       = 600,
   trackOffset         = 0,
   trackStrength       = 8,

@@ -66,8 +66,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[ARM]],
   sightDistance          = 720,
   trackOffset            = 0,
   trackStrength          = 8,

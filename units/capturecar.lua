@@ -50,7 +50,6 @@ unitDef = {
   script              = [[capturecar.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 550,
   trackOffset         = -7,
   trackStrength       = 5,

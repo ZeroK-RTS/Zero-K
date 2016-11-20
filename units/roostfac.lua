@@ -74,7 +74,6 @@ unitDef = {
   },
 
   showNanoSpray                 = false,
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

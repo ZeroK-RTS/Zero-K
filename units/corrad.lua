@@ -59,7 +59,6 @@ unitDef = {
   radarEmitHeight			    = 32,
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
-  side                          = [[CORE]],
   sightDistance                 = 800,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

@@ -49,7 +49,6 @@ unitDef = {
   pushResistant       = 0,
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 660,
   trackOffset         = 8,
   trackStrength       = 8,

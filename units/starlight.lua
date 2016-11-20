@@ -60,8 +60,6 @@ unitDef = {
       [[custom:IMMA_LAUNCHIN_MAH_LAZER]],
     },
   },
-
-  side                          = [[ARM]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

@@ -55,8 +55,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 700,
   sonarDistance       = 450,
   trackOffset         = 0.5,

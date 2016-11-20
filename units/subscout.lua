@@ -49,7 +49,6 @@ unitDef = {
   seismicSignature      = 4,
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
-  side                  = [[ARM]],
   sightDistance         = 550,
   sonarDistance         = 450,
   turnRate              = 500,

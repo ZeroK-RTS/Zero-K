@@ -79,7 +79,6 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   showNanoSpray                 = false,
-  side                          = [[ARM]],
   sightDistance                 = 380,
   terraformSpeed                = 600,
   turnRate                      = 1,

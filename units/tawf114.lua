@@ -49,7 +49,6 @@ unitDef = {
   script              = [[tawf114.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 400,
   trackOffset         = 8,
   trackStrength       = 10,

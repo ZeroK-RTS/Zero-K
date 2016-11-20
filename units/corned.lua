@@ -65,7 +65,6 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
-  side                   = [[CORE]],
   sightDistance          = 255,
   terraformSpeed         = 300,
   trackOffset            = 3,

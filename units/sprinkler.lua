@@ -53,9 +53,7 @@ unitDef = {
     explosiongenerators = {
       [[custom:flashmuzzle1]],
     },
-  }, 
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

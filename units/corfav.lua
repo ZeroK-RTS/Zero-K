@@ -53,7 +53,6 @@ unitDef = {
   objectName             = [[CORFAV.s3o]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-  side                   = [[CORE]],
   sightDistance          = 580,
   trackOffset            = 0,
   trackStrength          = 4,

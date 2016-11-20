@@ -56,7 +56,6 @@ unitDef = {
   script                        = [[geo.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
-  side                          = [[ARM]],
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

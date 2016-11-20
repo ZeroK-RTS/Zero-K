@@ -53,7 +53,6 @@ unitDef = {
   seismicSignature    = 4,
   selfDestructAs      = [[LARGE_BUILDINGEX]],
   showNanoSpray       = false,
-  side                = [[ARM]],
   sightDistance       = 273,
   turnRate            = 0,
   waterline           = 8,

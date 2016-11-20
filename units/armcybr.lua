@@ -60,7 +60,6 @@ unitDef = {
   script			  = [[armcybr.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[ARM]],
   sightDistance       = 660,
   turnRadius          = 180,
   workerTime          = 0,

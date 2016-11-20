@@ -56,7 +56,6 @@ unitDef = {
   script                 = "cormex.lua",
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_BUILDINGEX]],
-  side                   = [[CORE]],
   sightDistance          = 273,
   turnRate               = 0,
   waterline              = 1,

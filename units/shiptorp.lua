@@ -50,7 +50,6 @@ unitDef = {
   script              = [[shiptorp.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[ARM]],
   sightDistance       = 390,
   sonarDistance       = 450,
   turninplace         = 0,

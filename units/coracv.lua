@@ -72,7 +72,6 @@ unitDef = {
   },
 
   showNanoSpray          = false,
-  side                   = [[CORE]],
   sightDistance          = 280,
   terraformSpeed         = 450,
   trackOffset            = 3,

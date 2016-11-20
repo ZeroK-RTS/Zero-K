@@ -46,7 +46,6 @@ unitDef = {
   script              = [[logkoda.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 600,
   trackOffset         = 6,
   trackStrength       = 5,

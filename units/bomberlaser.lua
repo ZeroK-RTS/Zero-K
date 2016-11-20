@@ -68,8 +68,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 660,
   turnRadius          = 120,
   workerTime          = 0,

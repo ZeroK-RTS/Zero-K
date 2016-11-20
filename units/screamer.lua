@@ -54,7 +54,6 @@ unitDef = {
   script						= [[screamer.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[BIG_UNITEX]],
-  side                          = [[CORE]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

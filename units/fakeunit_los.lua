@@ -41,7 +41,6 @@ unitDef = {
   objectName            = [[debris1x1b.s3o]],
   script                = [[fakeunit_los.lua]],
   seismicSignature      = 0,
-  side                  = [[ARM]],
   sightDistance         = 500,
   stealth               = true,
   turnRate              = 0,

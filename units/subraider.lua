@@ -53,7 +53,6 @@ unitDef = {
   script                 = [[subraider.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
-  side                   = [[CORE]],
   sightDistance          = 360,
   sonarDistance          = 360,
   turninplace            = 0,

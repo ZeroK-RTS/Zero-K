@@ -57,7 +57,6 @@ unitDef = {
   seismicSignature       = 16,
   selfDestructAs         = [[NOWEAPON]],
   selfDestructCountdown  = 0,
-  side                   = [[CORE]],
   sightDistance          = 64,
   stealth                = true,
   turnRate               = 0,

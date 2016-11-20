@@ -63,7 +63,6 @@ unitDef = {
   },
 
   --script		 = [[gorg.lua]],
-  side                   = [[CORE]],
   sightDistance          = 650,
   trackOffset            = 0,
   trackStrength          = 8,

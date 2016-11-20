@@ -62,7 +62,6 @@ unitDef = {
   script			  = [[bomberassault.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[ARM]],
   sightDistance       = 660,
   turnRadius          = 90,
   workerTime          = 0,

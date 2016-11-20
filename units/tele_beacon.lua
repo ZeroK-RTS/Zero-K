@@ -39,7 +39,6 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[TINY_BUILDINGEX]],
   selfDestructCountdown			= 5,
-  side                          = [[ARM]],
   sightDistance                 = 0,
   turnRate                      = 0,
   useBuildingGroundDecal        = false,

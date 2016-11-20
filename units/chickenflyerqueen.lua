@@ -64,8 +64,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 4096,
   turnRate            = 900,
   workerTime          = 0,

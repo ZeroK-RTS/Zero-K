@@ -75,8 +75,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 480,
   trackOffset         = 0,
   trackStrength       = 8,

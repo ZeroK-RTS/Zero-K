@@ -52,8 +52,6 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {},
-
-  side                = [[CORE]],
   sightDistance       = 660,
   turnRadius          = 80,
   workerTime          = 0,

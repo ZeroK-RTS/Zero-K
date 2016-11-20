@@ -59,8 +59,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 407,
   turninplace         = 0,
   turnRate            = 400,

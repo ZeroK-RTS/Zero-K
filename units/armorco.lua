@@ -54,7 +54,6 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
-  side                   = [[ARM]],
   sightDistance          = 910,
   trackOffset            = 0,
   trackStrength          = 8,

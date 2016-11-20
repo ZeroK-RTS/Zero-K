@@ -59,7 +59,6 @@ unitDef = {
   script              = [[corawac.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[CORE]],
   sightDistance       = 1400,
   sonarDistance       = 1400,
   turnRadius          = 80,

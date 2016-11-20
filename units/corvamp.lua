@@ -62,7 +62,6 @@ unitDef = {
   script                 = [[corvamp.lua]],
   seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
-  side                   = [[CORE]],
   sightDistance          = 750,
   speedToFront           = 0.5,
   turnRadius             = 400,

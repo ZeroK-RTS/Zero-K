@@ -41,7 +41,6 @@ unitDef = {
   script                 = [[nullscript.lua]],
   seismicSignature       = 4,
   selfDestructCountdown  = 1,
-  side                   = [[ARM]],
   sightDistance          = 0,
   airSightDistance		 = 0,
   stealth                = true,

@@ -71,7 +71,6 @@ unitDef = {
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
-  side                = [[ARM]],
   sightDistance       = 380,
   terraformSpeed      = 240,
   turnRate            = 500,

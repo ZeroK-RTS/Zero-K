@@ -65,8 +65,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 300,
   transportCapacity   = 1,
   transportSize       = 25,

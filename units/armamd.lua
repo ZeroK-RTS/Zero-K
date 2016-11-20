@@ -51,7 +51,6 @@ unitDef = {
   script                        = [[armamd.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
-  side                          = [[ARM]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

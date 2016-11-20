@@ -63,9 +63,7 @@ unitDef = {
       [[custom:HEAVYHOVERS_ON_GROUND]],
     },
 
-  },  
-  
-  side                = [[ARM]],
+  },
   sightDistance       = 660,
   turninplace         = 0,
   turnRate            = 320,

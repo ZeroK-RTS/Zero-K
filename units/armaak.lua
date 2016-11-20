@@ -56,7 +56,6 @@ unitDef = {
   script			  = [[armaak.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[ARM]],
   sightDistance       = 660,
   trackOffset         = 0,
   trackStrength       = 8,

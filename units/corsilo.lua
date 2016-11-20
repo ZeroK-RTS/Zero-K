@@ -48,7 +48,6 @@ unitDef = {
   script                        = [[corsilo.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
-  side                          = [[CORE]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

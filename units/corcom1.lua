@@ -83,7 +83,6 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[CORE]],
   sightDistance       = 500,
   sonarDistance       = 300,
   trackOffset         = 0,

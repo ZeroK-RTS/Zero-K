@@ -55,7 +55,6 @@ unitDef = {
   script				 = [[shipaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[CORE]],
   sightDistance          = 660,
   turninplace            = 0,
   turnRate               = 486,

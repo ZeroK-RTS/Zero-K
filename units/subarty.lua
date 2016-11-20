@@ -53,7 +53,6 @@ unitDef = {
   script                 = [[subarty.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 660,
   sonarDistance          = 300,
   turninplace            = 0,

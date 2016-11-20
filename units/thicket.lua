@@ -39,7 +39,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[Tyranid2.s3o]],
   seismicSignature              = 4,
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 1,
   turnRate                      = 0,
   upright                       = false,

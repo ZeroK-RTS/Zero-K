@@ -48,7 +48,6 @@ unitDef = {
   script            = [[turrettorp.lua]],
   seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
-  side              = [[CORE]],
   sightDistance     = 660,
   sonarDistance     = 550,
   turnRate          = 0,

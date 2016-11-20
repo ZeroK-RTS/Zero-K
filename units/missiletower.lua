@@ -52,8 +52,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 500,
   useBuildingGroundDecal        = true,
   waterline						= 10,

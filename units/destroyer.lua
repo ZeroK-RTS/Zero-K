@@ -48,7 +48,6 @@ unitDef = {
   script				 = [[destroyer.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  side                   = [[ARM]],
   sightDistance          = 500,
   
   sfxtypes               = {

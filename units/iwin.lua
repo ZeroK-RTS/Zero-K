@@ -53,8 +53,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[ARM]],
   sightDistance                 = 99999,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

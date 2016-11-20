@@ -47,7 +47,6 @@ unitDef = {
   onoffable                     = true,
   seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
-  side                          = [[CORE]],
   sightDistance                 = 506,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

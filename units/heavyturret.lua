@@ -50,9 +50,7 @@ unitDef = {
       [[custom:none]],
     },
 
-  },  
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,

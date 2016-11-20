@@ -57,9 +57,7 @@ unitDef = {
 	  [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
-  },  
-  
-  side                          = [[CORE]],
+  },
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,

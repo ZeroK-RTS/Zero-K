@@ -65,7 +65,6 @@ unitDef = {
   seismicSignature       = 0,
   selfDestructAs         = [[BLASTWING_EXPLOSION]],
   selfDestructCountdown  = 0,
-  side                   = [[CORE]],
   sightDistance          = 380,
   turnRate               = 1144,
   upright                = false,

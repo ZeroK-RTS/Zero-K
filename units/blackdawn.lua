@@ -55,7 +55,6 @@ unitDef = {
   script              = [[blackdawn.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
-  side                = [[CORE]],
   sightDistance       = 585,
   turnRate            = 849,
 
