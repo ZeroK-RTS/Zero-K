@@ -442,14 +442,18 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton
 	end
 	
 	if alt and factoryUnitID and options.altInsertBehind.value then
-		local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
-		for i = 1, inputMult do
-			Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, {"alt", "ctrl"})
+		local state = Spring.GetUnitStates(factoryUnitID)
+		-- Repeat alt has to be handled by engine so that the command is removed after completion.
+		if state and not state["repeat"] then
+			local inputMult = 1*(shift and 5 or 1)*(ctrl and 20 or 1)
+			for i = 1, inputMult do
+				Spring.GiveOrderToUnit(factoryUnitID, CMD.INSERT, {1, cmdID, 0 }, {"alt", "ctrl"})
+			end
+			if WG.noises then
+				WG.noises.PlayResponse(factoryUnitID, cmdID)
+			end
+			return true
 		end
-		if WG.noises then
-			WG.noises.PlayResponse(factoryUnitID, cmdID)
-		end
-		return true
 	end
 	
 	local index = Spring.GetCmdDescIndex(cmdID)
