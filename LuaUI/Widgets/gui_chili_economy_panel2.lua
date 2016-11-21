@@ -502,8 +502,8 @@ function widget:GameFrame(n)
 	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
 	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
 	
-	local eReclaim = eInco
-	eInco = eInco + cp.energyIncome - math.max(0, cp.energyChange)
+	local eReclaim = eInco - math.max(0, cp.energyChange)
+	eInco = eReclaim + cp.energyIncome
 	
 	totalPull = totalPull - cp.team_energyWaste
 	teamEnergyExp = teamEnergyExp - cp.team_energyWaste
