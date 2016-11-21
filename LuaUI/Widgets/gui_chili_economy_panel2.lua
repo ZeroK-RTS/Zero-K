@@ -141,6 +141,12 @@ function languageChanged ()
 	if lbl_expense_energy then
 		lbl_expense_energy.tooltip = WG.Translate("interface", "resbar_energy_expense_tooltip")
 	end
+	if metalWarningPanel then
+		metalWarningPanel.SetText(strings.metal_excess_warning)
+	end
+	if energyWarningPanel then
+		energyWarningPanel.SetText(strings.energy_stall_warning)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -754,6 +760,9 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 	function externalFunctions.ShowWarning(newShow)
 		image:SetVisibility(newShow)
 		label:SetVisibility(newShow)
+	end
+	function externalFunctions.SetText(newText)
+		label:SetCaption(newText)
 	end
 	
 	return externalFunctions
