@@ -83,7 +83,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[crane_d.s3o]],
+      object           = [[crane_d.dae]],
     },
 
 
