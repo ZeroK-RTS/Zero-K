@@ -5,8 +5,8 @@ unitDef = {
   acceleration           = 0.051375,
   activateWhenBuilt   = true,
   brakeRate              = 0.061,
-  buildCostEnergy        = 200,
-  buildCostMetal         = 200,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
   buildDistance          = 330,
   builder                = true,
 
@@ -14,7 +14,7 @@ unitDef = {
   },
 
   buildPic               = [[shipcon.png]],
-  buildTime              = 200,
+  buildTime              = 220,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
