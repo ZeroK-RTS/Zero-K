@@ -924,10 +924,30 @@ local function SetupWestwoodPreset()
 end
 
 ----------------------------------------------------
+-- Preset selection
+----------------------------------------------------
+
+local presetFunction = {
+	default = SetupDefaultPreset,
+	new = SetupNewPreset, 
+	crafty = SetupCraftyPreset,
+	ensemble = SetupEnsemblePreset,
+	westwood = SetupWestwoodPreset,
+}
+
+local function UpdateInterfacePreset(self)
+	local presetKey = self.value
+	Spring.Echo("UpdateInterfacePreset", presetKey)
+	if presetFunction[presetKey] then
+		presetFunction[presetKey]()
+	end
+end
+
+----------------------------------------------------
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'maintainDefaultUI', 'maintainNewUI', 'presetlabel', 'interfacePresetDefault', 'interfacePresetNew', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
+options_order = {'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
 options = {
 	setToDefault = {
 		name  = "Set To Default Once",
@@ -941,50 +961,24 @@ options = {
 		name  = "Reset on screen resolution change",
 		type  = "bool", 
 		value = false, 
-		desc = "Resets the UI to default when screen resolution changes. Disable if you plan to customise your UI.",
+		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
-	maintainNewUI = {
-		name  = "Set New on screen resolution change",
-		type  = "bool", 
-		value = false, 
-		desc = "Sets the UI to New when the screen resolution changes. Disable if you plan to customise your UI.",
+	interfacePreset = {
+		name = 'UI Preset',
+		type = 'radioButton',
+		value = 'default',
+		items = {
+			{key = 'default', name = 'Default', desc = "The default UI.",},
+			{key = 'new', name = 'New UI', desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",},
+			{key = 'minimapLeft', name = 'New UI Minimap Left'},
+			{key = 'minimapRight', name = 'New UI Minimap Right'},
+			{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
+			{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
+			{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
+		},
 		noHotkey = true,
-	},
-	presetlabel = {
-		name = "presetlabel",
-		type = 'label', 
-		value = "Presets", 
-	},
-	interfacePresetDefault = {
-		name = "Default",
-		desc = "The default interface.",
-		type = 'button',
-		OnChange = SetupDefaultPreset,
-	},
-	interfacePresetNew = {
-		name = "New",
-		desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",
-		type = 'button',
-		OnChange = SetupNewPreset,
-	},
-	interfacePresetCrafty = {
-		name = "Crafty",
-		desc = "Interface reminiscent of the craft of war and stars.",
-		type = 'button',
-		OnChange = SetupCraftyPreset,
-	},
-	interfacePresetEnsemble = {
-		name = "Ensemble",
-		desc = "Interface reminiscent of the imperial ages.",
-		type = 'button',
-		OnChange = SetupEnsemblePreset,
-	},
-	interfacePresetWestwood = {
-		name = "Westwood",
-		desc = "Interface reminiscent of the conquest of dunes.",
-		type = 'button',
-		OnChange = SetupWestwoodPreset,
+		OnChange = UpdateInterfacePreset
 	},
 }
 
@@ -1007,35 +1001,28 @@ function widget:Update(dt)
 		if options.setToDefault.value then
 			-- This is where the defaults are set.
 			SetupDefaultPreset()
+			options.interfacePreset.value = "default"
 			options.setToDefault.value = false
 		end
 		
-		if options.maintainDefaultUI.value or options.maintainNewUI.value then
+		if options.maintainDefaultUI.value then
 			local screenWidth, screenHeight = Spring.GetWindowGeometry()
 			oldWidth = screenWidth
 			oldHeight = screenHeight
-			if options.maintainDefaultUI.value then
-				SetupDefaultPreset()
-			else
-				SetupNewPreset()
-			end
+			UpdateInterfacePreset(options.interfacePreset)
 		end
 		
 		firstUpdate = false
 	end
 	
-	if options.maintainDefaultUI.value or options.maintainNewUI.value then
+	if options.maintainDefaultUI.value  then
 		timeSinceUpdate = timeSinceUpdate + dt 
 		if timeSinceUpdate > UPDATE_FREQUENCY then
 			local screenWidth, screenHeight = Spring.GetWindowGeometry()
 			if oldWidth ~= screenWidth or oldHeight ~= screenHeight then
 				oldWidth = screenWidth
 				oldHeight = screenHeight
-				if options.maintainDefaultUI.value then
-					SetupDefaultPreset()
-				else
-					SetupNewPreset()
-				end
+				UpdateInterfacePreset(options.interfacePreset)
 			end
 			timeSinceUpdate = 0
 		end
@@ -1043,14 +1030,10 @@ function widget:Update(dt)
 end
 
 function widget:ViewResize(screenWidth, screenHeight)
-	if options.maintainDefaultUI.value or options.maintainNewUI.value then
+	if options.maintainDefaultUI.value then
 		oldWidth = screenWidth
 		oldHeight = screenHeight
-		if options.maintainDefaultUI.value then
-			SetupDefaultPreset()
-		else
-			SetupNewPreset()
-		end
+		UpdateInterfacePreset(options.interfacePreset)
 	end
 end
 

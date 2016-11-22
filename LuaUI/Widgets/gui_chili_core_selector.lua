@@ -231,7 +231,9 @@ local function ResetWidget()
 		windowPositionY = window_selector.y
 	end
 	ClearData(true)
-	window_selector:Dispose()
+	if window_selector then
+		window_selector:Dispose()
+	end
 	widget:Initialize()
 end
 
@@ -701,6 +703,9 @@ local function ShiftFacRow()
 end
 
 local function AddFac(unitID, unitDefID)
+	if facsByID[unitID] then
+		return
+	end
 	local i = #facs + 1
 	facs[i] = {facID = unitID, facDefID = unitDefID}
 	GenerateButton(facs, i, unitID, unitDefID, WG.crude.GetHotkey(SELECT_FACTORY .. i) or '')
@@ -755,6 +760,9 @@ local function UpdateComm(unitID, index)
 end
 
 local function AddComm(unitID, unitDefID)
+	if commsByID[unitID] then
+		return
+	end
 	local i = #comms + 1
 	comms[i] = {commID = unitID, commDefID = unitDefID, warningTime = -1}
 	GenerateButton(comms, i, unitID, unitDefID, WG.crude.GetHotkey("selectcomm") or '')
@@ -779,6 +787,11 @@ end
 
 local function RemoveComm(unitID)
 	local index = commsByID[unitID]
+	if not index then
+		Spring.Utilities.TableEcho(comms, "comms")
+		Spring.Utilities.TableEcho(commsByID, "commsByID")
+		Spring.Echo(debug.traceback())
+	end
 	-- move everything to the left
 	if comms[index].holder then
 		comms[index].holder:Dispose()
