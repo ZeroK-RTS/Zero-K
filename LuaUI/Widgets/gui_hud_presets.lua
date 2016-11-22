@@ -383,7 +383,8 @@ local function SetupNewPreset()
 	end
 	
 	local _,_, selectorWidth, selectorHeight = WG.GetWindowPosAndSize("selector_window")
-	selectorWidth = math.ceil(selectorWidth)
+	selectorHeight = selectorHeight or 150
+	selectorWidth = math.ceil(selectorWidth or 60)
 	WG.SetWindowPosAndSize("selector_window", 
 		minimapSize, 
 		screenHeight - selectorHeight, 
