@@ -928,6 +928,8 @@ end
 -- Preset selection
 ----------------------------------------------------
 
+local firstUpdate = true
+
 local presetFunction = {
 	default = SetupDefaultPreset,
 	new = SetupNewPreset, 
@@ -937,6 +939,10 @@ local presetFunction = {
 }
 
 local function UpdateInterfacePreset(self)
+	if firstUpdate then
+		-- Don't reset IU while initializing 
+		return
+	end
 	local presetKey = self.value
 	Spring.Echo("UpdateInterfacePreset", presetKey)
 	if presetFunction[presetKey] then
@@ -986,7 +992,6 @@ options = {
 ----------------------------------------------------
 -- Callins
 ----------------------------------------------------
-local firstUpdate = true
 local timeSinceUpdate = 0
 local UPDATE_FREQUENCY = 5
 local oldWidth = 0
@@ -999,6 +1004,8 @@ function widget:Update(dt)
 	end
 	
 	if firstUpdate then
+		firstUpdate = false
+		
 		if options.setToDefault.value then
 			-- This is where the defaults are set.
 			SetupDefaultPreset()
@@ -1012,8 +1019,6 @@ function widget:Update(dt)
 			oldHeight = screenHeight
 			UpdateInterfacePreset(options.interfacePreset)
 		end
-		
-		firstUpdate = false
 	end
 	
 	if options.maintainDefaultUI.value  then
