@@ -1318,7 +1318,7 @@ local function ProcessAllCommands(commands, customCommands)
 	UpdateBackgroundSkin()
 	
 	WG.IntegralVisible = visible
-	if WG.CoreSelector.SetSpecSpaceVisible then
+	if WG.CoreSelector then
 		WG.CoreSelector.SetSpecSpaceVisible(visible)
 	end
 end
