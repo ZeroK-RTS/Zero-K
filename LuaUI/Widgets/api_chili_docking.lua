@@ -303,9 +303,6 @@ function widget:Update()
 					end
 					
 					win:SetPos(settingsPos[1], settingsPos[2])
-					if (not options.dockEnabled.value) then 
-						lastPos[win.name] = { win.x, win.y, win.x + win.width, win.y + win.height}
-					end 
 				end 
 			elseif lastWinPos[1] ~= win.x or lastWinPos[2] ~= win.y or lastWinPos[3] ~= win.x+win.width or lastWinPos[4] ~= win.y + win.height then  -- window changed position
 				posChanged = true 
@@ -403,14 +400,14 @@ function widget:Update()
 		end
 	end
 	
-	if forceUpdate or (posChanged and options.dockEnabled.value) then 
+	if forceUpdate or posChanged then 
 		forceUpdate = false
 		local dockWindows = {}	 -- make work array of windows 
 		for _, win in ipairs(screen0.children) do
 			local dock = win.collide or win.dockable
 			if (dock) then 
-				if win.dockableSavePositionOnly then
-					local winPos = { win.x, win.y, win.x + win.width, win.y + win.height }
+				if win.dockableSavePositionOnly or (not options.dockEnabled.value) then
+					local winPos = {win.x, win.y, win.x + win.width, win.y + win.height}
 					lastPos[win.name] = winPos
 					settings[win.name] = winPos
 				else

@@ -353,12 +353,18 @@ local function Initialize()
 		return
 	end
 	
-	
-	Spring.SendCommands("mapborder " .. ((options and (options.mapBorderStyle.value == 'cutaway' or options.mapBorderStyle.value == 'texture')) and "1" or "0"))
-	
 	if island == nil then
 		island = IsIsland()
 	end
+	
+	local enableMapBorder = false
+	if island and not options.drawForIslands.value then
+		enableMapBorder = false
+	elseif options and (options.mapBorderStyle.value == 'cutaway' or options.mapBorderStyle.value == 'texture') then
+		enableMapBorder = true
+	end
+	
+	Spring.SendCommands("mapborder " .. ((enableMapBorder and "1") or "0"))
 
 	SetupShaderTable()
 	Spring.SendCommands("luaui disablewidget External VR Grid")

@@ -418,8 +418,10 @@ function widget:CommandNotify(cmdID, params, options)
 				return true
 			else
 				-- check if some other widget wants to handle the command before sending it to units.
-				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options, false) then
-					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
+				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
+				Spring.Echo("commandHeight", commandHeight)
+				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false) then
+					spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options.coded)
 				end
 				return true
 			end
