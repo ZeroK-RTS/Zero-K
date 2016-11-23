@@ -162,6 +162,7 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	'backlogArrowOnlyOnChat',
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
@@ -561,6 +562,17 @@ options = {
 			end
 			window_chat:Invalidate()
 		end,
+	},
+	backlogArrowOnlyOnChat = {
+		name = "Chat shows hacklog arrow",
+		desc = "When enabled, the backlog arrow will be visible only when chatting.",
+		type = 'bool',
+		value = true,
+		OnChange = function(self)
+			if backlogButton and backlogButton.parent then
+				backlogButton:SetVisibility(WG.enteringText)
+			end
+		end
 	},
 	backlogArrowOnRight = {
 		name = "Backlong Arrow On Right",
@@ -1094,12 +1106,20 @@ local function ShowInputSpace()
 	inputspace.backgroundColor = {1,1,1,1}
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
+	
+	if options.backlogArrowOnlyOnChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(true)
+	end
 end
 local function HideInputSpace()
 	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
+	
+	if options.backlogArrowOnlyOnChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(false)
+	end
 end
 
 local function MakeMessageStack(margin)
@@ -1201,7 +1221,7 @@ options.toggleBacklog.OnChange = SwapBacklog
 
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key == KEYSYMS.RETURN) then
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -1218,6 +1238,11 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end 
 end
 
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
+		HideInputSpace()
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1252,8 +1277,13 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
-	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
+	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then 
+		return 
+	end
+	
+	if msg.msgtype == 'other' and (msg.argument):find('added point') then 
+		return 
+	end
 	
 	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
@@ -1309,12 +1339,6 @@ function widget:AddConsoleMessage(msg)
 	end
 	
 	removeToMaxLines()
-	
-	-- if playername == myName then
-		if WG.enteringText then
-			HideInputSpace()
-		end 		
-	-- end
 end
 
 -----------------------------------------------------------------------
