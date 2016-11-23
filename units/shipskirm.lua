@@ -89,8 +89,8 @@ unitDef = {
 
       damage                  = {
 
-        default = 105,
-        subs    = 10.5,
+        default = 130,
+        subs    = 13,
       },
 
       edgeEffectiveness       = 0.4,
@@ -106,7 +106,7 @@ unitDef = {
       noSelfDamage            = true,
 
       range                   = 650,
-      reloadtime              = 2.8,
+      reloadtime              = 2.5,
       smokeTrail              = false,
 
       soundHit                = [[explosion/ex_small13]],

@@ -61,7 +61,7 @@ unitDef = {
       def                = [[FAKEWEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 180,
+      maxAngleDif        = 200,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
@@ -70,7 +70,7 @@ unitDef = {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
       mainDir            = [[0 0 1]],
-      maxAngleDif        = 190,
+      maxAngleDif        = 210,
       onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 
