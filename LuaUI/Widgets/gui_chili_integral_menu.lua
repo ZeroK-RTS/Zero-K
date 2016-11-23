@@ -74,7 +74,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
 	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
-	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'fancySkinning'
+	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
 }
 
 options = {
@@ -178,13 +178,20 @@ options = {
 			ClearData(true)
 		end,	
 	},
+	flushLeft = {
+		name = 'Flush Left',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
 		value = false,
 		advanced = true,
 		noHotkey = true,
-	}
+	},
 }
 
 local function TabClickFunction()
@@ -251,7 +258,7 @@ local function TabListsAreIdentical(newTabList, tabList)
 end
 
 local prevClass
-local prevRightPadding
+local prevRightPadding, prevLeftPadding
 
 local function UpdateBackgroundSkin()
 	local currentSkin = Chili.theme.skin.general.skinName
@@ -259,23 +266,37 @@ local function UpdateBackgroundSkin()
 	
 	local newClass = skin.panel
 	local newRightPadding = 0
+	local newLeftPadding = 0
 	
-	if options.fancySkinning.value and skin.panel_2100 then
+	if options.fancySkinning.value then
 		local selectedCount = Spring.GetSelectedUnitsCount()
 		if selectedCount and selectedCount > 0 then
-			newClass = skin.panel_2100
+			if options.flushLeft.value then
+				newClass = skin.panel_0120
+			else
+				newClass = skin.panel_2100
+			end
 		else
-			newClass = skin.panel_1100 or skin.panel
-			newRightPadding = options.rightPadding.value
+			if options.flushLeft.value then
+				newClass = skin.panel_0110
+				newLeftPadding = options.leftPadding.value
+			else
+				newClass = skin.panel_1100
+				newRightPadding = options.rightPadding.value
+			end
 		end
 	end
 	
-	if prevRightPadding ~= newRightPadding then
-		background._relativeBounds.left = 0
+	if prevRightPadding ~= newRightPadding or prevLeftPadding ~= newLeftPadding then
+		background._relativeBounds.left = newLeftPadding
+		background._givenBounds.left = newLeftPadding
 		background._relativeBounds.right = newRightPadding
 		background:UpdateClientArea()
 		prevRightPadding = newRightPadding
+		prevLeftPadding = newLeftPadding
 	end
+	
+	newClass = newClass or skin.panel
 	
 	if prevClass == newClass then
 		return
@@ -1561,10 +1582,8 @@ end
 
 options.leftPadding.OnChange  = PaddingUpdate
 options.rightPadding.OnChange = PaddingUpdate
-
-function options.fancySkinning.OnChange(self)
-	UpdateBackgroundSkin()
-end
+options.flushLeft.OnChange = UpdateBackgroundSkin
+options.fancySkinning.OnChange = UpdateBackgroundSkin
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

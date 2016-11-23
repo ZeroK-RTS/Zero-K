@@ -172,13 +172,13 @@ end
 local function ButtonHolderResize(self)
 	local longSize, shortSize = self.clientArea[3], self.clientArea[4]
 	
-	local longPadding = options.horPadding.value
+	local longPadding = options.horPaddingRight.value + options.horPaddingLeft.value
 	if options.vertical.value then
 		longSize, shortSize = shortSize, longSize
-		longPadding = options.vertPadding.value
+		longPadding = 2*options.vertPadding.value
 	end
 	
-	longSize = longSize - 2*longPadding
+	longSize = longSize - longPadding
 	
 	buttonSizeShort = shortSize
 	buttonCountLimit = math.max(0, math.floor(longSize/(options.buttonSizeLong.value + options.buttonSpacing.value)))
@@ -200,7 +200,7 @@ end
 -- Widget options
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPaddingLeft', 'horPaddingRight', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
 options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -225,7 +225,7 @@ options = {
 	buttonSizeLong = {
 		name = 'Button Size',
 		type = 'number',
-		value = 40,
+		value = 50,
 		min = 10, max = 200, step = 1,
 		OnChange = OptionsUpdateLayout,
 	},
@@ -293,8 +293,16 @@ options = {
 		path = 'Game/Selection Hotkeys',
 		dontRegisterAction = true,
 	},
-	horPadding = {
-		name = 'Horizontal Padding',
+	horPaddingLeft = {
+		name = 'Horizontal Padding Left',
+		type = 'number',
+		value = 0,
+		advanced = true,
+		min = 0, max = 100, step = 0.25,
+		OnChange = OptionsUpdateLayout,
+	},
+	horPaddingRight = {
+		name = 'Horizontal Padding Right',
 		type = 'number',
 		value = 0,
 		advanced = true,
@@ -597,7 +605,7 @@ local function GetBackground(parent)
 		if options.vertical.value then
 			size = size + 2*options.vertPadding.value
 		else
-			size = size + 2*options.horPadding.value
+			size = size + options.horPaddingRight.value + options.horPaddingLeft.value
 		end
 		
 		if panelHidden and size < options.specSpaceOverride.value then
@@ -830,8 +838,8 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		
 		local index = position - 1
 		if options.vertical.value then
-			button._relativeBounds.left = options.horPadding.value
-			button._relativeBounds.right = options.horPadding.value
+			button._relativeBounds.left = options.horPaddingLeft.value
+			button._relativeBounds.right = options.horPaddingRight.value
 			button._relativeBounds.top = nil
 			button._givenBounds.top = nil
 			button._relativeBounds.bottom = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.vertPadding.value
@@ -840,7 +848,7 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 			button._relativeBounds.height = options.buttonSizeLong.value
 			button:UpdateClientArea()
 		else
-			button._relativeBounds.left = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.horPadding.value
+			button._relativeBounds.left = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.horPaddingLeft.value
 			button._relativeBounds.right = nil
 			button._givenBounds.right = nil
 			button._relativeBounds.top = options.vertPadding.value
@@ -1481,9 +1489,6 @@ local function InitializeControls()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
-	
-	local hPad = options.horPadding.value
-	local vPad = options.vertPadding.value
 	
 	local windowY = bottom - BUTTON_HEIGHT
 	
