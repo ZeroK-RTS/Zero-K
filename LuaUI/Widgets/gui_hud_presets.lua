@@ -36,10 +36,10 @@ local function SetFancySkin()
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 	
-	WG.SetWidgetOption(coreName, corePath, "fancySkinning", true)
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
-	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", true)
-	WG.SetWidgetOption(selName, selPath, "fancySkinning", true)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_0120")
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
@@ -57,10 +57,10 @@ local function SetBoringSkin()
 	local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 	local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
 	
-	WG.SetWidgetOption(coreName, corePath, "fancySkinning", false)
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel")
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
-	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", false)
-	WG.SetWidgetOption(selName, selPath, "fancySkinning", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel")
 	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", false)

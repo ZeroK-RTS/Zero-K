@@ -548,28 +548,23 @@ options = {
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
+		type = 'radioButton',
+		value = 'panel',
 		path = selPath,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1130', name = 'Bottom Left Flush',},
+			{key = 'panel_0120', name = 'Bot Mid Left Flush',},
+			{key = 'panel_2120', name = 'Bot Mid Both Flush',},
+		},
 		OnChange = function (self)
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
+			local className = self.value
 			local newClass = skin.panel
-			if self.value and skin.panel_1120 then
-				local screenWidth, screenHeight = Spring.GetWindowGeometry()
-				
-				if real_window_corner and real_window_corner.x + real_window_corner.width > screenWidth - 10 then
-					newClass = skin.panel_0120
-					real_window_corner.padding[3] = -1
-				else
-					if real_window_corner then
-						real_window_corner.padding[3] = 0
-					end
-					newClass = skin.panel_1120
-				end
+			if skin[className] then
+				newClass = skin[className]
 			end
 			
 			window_corner.tiles = newClass.tiles
@@ -577,7 +572,9 @@ options = {
 			window_corner.backgroundColor = newClass.backgroundColor
 			window_corner.TileImageBK = newClass.TileImageBK
 			window_corner:Invalidate()
-		end
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 	leftPadding = {
 		name = "Left Padding",
@@ -2849,17 +2846,10 @@ function widget:Initialize()
 		padding = {-1, 0, 0, -1},
         minWidth = 450, 
 		minHeight = 120,
-		OnResize = {
-			function()
-				if options.fancySkinning.value then
-					options.fancySkinning.OnChange(options.fancySkinning)
-				end
-			end
-		}
 	}
     
 	window_corner = Panel:New{
-		--classname = "bottomRightPanel",
+		classname = options.fancySkinning.value,
 		parent = real_window_corner,
         name   = 'unitinfo2';
 		x = 0,

@@ -116,25 +116,6 @@ end
 
 local hidden = false
 local panelHidden = false
-local fancySkinning = false
-
-local function UpdateBackgroundSkin()
-	local currentSkin = Chili.theme.skin.general.skinName
-	local skin = Chili.SkinHandler.GetSkin(currentSkin)
-
-	local newClass = skin.panel
-	if fancySkinning then
-		if panelHidden then
-			mainBackground.SetSkin("panel_0100")
-			return
-		else
-			mainBackground.SetSkin("panel_1100")
-			return
-		end
-	end
-	
-	mainBackground.SetSkin()
-end
 
 local function UpdateBackground(showPanel)
 	if showPanel and panelHidden then
@@ -355,14 +336,20 @@ options = {
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
-		type = 'bool',
-		value = false,
+		type = 'radioButton',
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1100', name = 'Bottom Left',},
+			{key = 'panel_0110', name = 'Bottom Right'},
+		},
+		OnChange = function (self)
+			if mainBackground then
+				mainBackground.SetSkin(self.value)
+			end
+		end,
 		advanced = true,
 		noHotkey = true,
-		OnChange = function (self)
-			fancySkinning = self.value
-			UpdateBackgroundSkin()
-		end
 	}
 }
 
@@ -569,6 +556,7 @@ local function GetBackground(parent)
 	}
 	
 	local panel = Panel:New{
+		classname = options.fancySkinning.value,
 		x = "5%",
 		backgroundColor = {1, 1, 1, opacity},
 		parent = parent,
@@ -589,6 +577,7 @@ local function GetBackground(parent)
 			newClass = skin[className]
 		end
 
+		panel.classname = className
 		panel.tiles = newClass.tiles
 		panel.TileImageFG = newClass.TileImageFG
 		panel.backgroundColor = newClass.backgroundColor
@@ -655,7 +644,7 @@ local function GetBackground(parent)
 		panel:Invalidate()
 		externalFunctions.UpdateSize(buttonCount)
 	end
-	
+		
 	return externalFunctions
 end
 
@@ -1538,10 +1527,6 @@ local function InitializeControls()
 	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
 		
 	buttonHolder.OnResize[#buttonHolder.OnResize + 1] = ButtonHolderResize
-	
-	if options.fancySkinning.value then
-		options.fancySkinning.OnChange(options.fancySkinning)
-	end
 	
 	InitializeUnits()
 	hidden = false
