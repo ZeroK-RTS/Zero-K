@@ -577,24 +577,6 @@ local function SetupMinimapLeftPreset()
 	end
 	integralWidth = math.floor(integralWidth)
 	
-	-- Minimap
-	local selectionsHeight = integralHeight*0.85
-	
-	local mapRatio = Game.mapX/Game.mapY
-	
-	local minimapWidth, minimapHeight
-	if mapRatio > 1 then
-		minimapWidth = math.floor(screenWidth*2.1/11)
-		minimapHeight = (minimapWidth/mapRatio)
-	else
-		minimapHeight = math.floor(screenWidth*2.1/11)
-		minimapWidth = math.floor(minimapHeight*mapRatio)
-	end
-	
-	if minimapHeight < selectionsHeight + 16 then
-		minimapHeight = selectionsHeight + 16
-	end
-	
 	-- Core Selector
 	local coreSelectorHeight = screenHeight/2
 	local coreSelectorWidth = math.ceil(integralHeight/3)
@@ -606,28 +588,57 @@ local function SetupMinimapLeftPreset()
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
 	
+	local coreMinHeight = 3*(coreSelectorWidth - 2*hPad - 1) + 2*math.floor(hPad/2) + 2*math.floor(1.5*hPad)
+	
+	-- Minimap
+	local mapRatio = Game.mapX/Game.mapY
+	
+	local minimapWidth, minimapHeight
+	if mapRatio > 1 then
+		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapHeight = (minimapWidth/mapRatio)
+	else
+		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapHeight < coreMinHeight then
+		minimapHeight = coreMinHeight
+	end
+	
 	-- Selections
+	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
 	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
 	--WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
 	
+	-- Chat
+	local chatWidth = math.floor(screenWidth/5)
+	local chatHeight = selectionsHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX + chatWidth > screenWidth - coreSelectorWidth - integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
 	-- Player List
-	local playerlistWidth = 296
+	local playerlistWidth = 240
 	local playerlistHeight = 150
 	WG.SetWindowPosAndSize("Player List",
 		0,
-		50,
+		screenHeight - playerlistHeight - minimapHeight,
 		playerlistWidth,
 		playerlistHeight
 	)
 	
 	-- Chat
 	WG.SetWindowPosAndSize("ProChat",
-		0,
-		screenHeight - playerlistHeight - selectionsHeight,
-		minimapWidth,
-		selectionsHeight
+		chatX,
+		chatY,
+		chatWidth,
+		chatHeight
 	)
 	
 	-- Set Windows
@@ -722,7 +733,7 @@ local function SetupMinimapLeftPreset()
 	local consoleWidth = 380
 	local consoleHeight = screenHeight * 0.20
 	WG.SetWindowPosAndSize("ProConsole",
-		screenWidth - consoleHeight,
+		screenWidth - consoleWidth,
 		menuHeight,
 		consoleWidth,
 		consoleHeight
@@ -787,24 +798,6 @@ local function SetupMinimapRightPreset()
 	end
 	integralWidth = math.floor(integralWidth)
 	
-	-- Minimap
-	local selectionsHeight = integralHeight*0.85
-	
-	local mapRatio = Game.mapX/Game.mapY
-	
-	local minimapWidth, minimapHeight
-	if mapRatio > 1 then
-		minimapWidth = math.floor(screenWidth*2.1/11)
-		minimapHeight = (minimapWidth/mapRatio)
-	else
-		minimapHeight = math.floor(screenWidth*2.1/11)
-		minimapWidth = math.floor(minimapHeight*mapRatio)
-	end
-	
-	if minimapHeight < selectionsHeight + 16 then
-		minimapHeight = selectionsHeight + 16
-	end
-	
 	-- Core Selector
 	local coreSelectorHeight = screenHeight/2
 	local coreSelectorWidth = math.ceil(integralHeight/3)
@@ -816,28 +809,57 @@ local function SetupMinimapRightPreset()
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
 	
+	local coreMinHeight = 3*(coreSelectorWidth - 2*hPad - 1) + 2*math.floor(hPad/2) + 2*math.floor(1.5*hPad)
+	
+	-- Minimap
+	local mapRatio = Game.mapX/Game.mapY
+	
+	local minimapWidth, minimapHeight
+	if mapRatio > 1 then
+		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapHeight = (minimapWidth/mapRatio)
+	else
+		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapHeight < coreMinHeight then
+		minimapHeight = coreMinHeight
+	end
+	
 	-- Selections
+	local selectionsHeight = integralHeight*0.85
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
 	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
 	--WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
 	
+	-- Chat
+	local chatWidth = math.floor(screenWidth/5)
+	local chatHeight = selectionsHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX < coreSelectorWidth + integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
 	-- Player List
-	local playerlistWidth = 296
+	local playerlistWidth = 240
 	local playerlistHeight = 150
 	WG.SetWindowPosAndSize("Player List",
-		0,
-		50,
+		screenWidth - playerlistWidth,
+		screenHeight - playerlistHeight - minimapHeight,
 		playerlistWidth,
 		playerlistHeight
 	)
 	
 	-- Chat
 	WG.SetWindowPosAndSize("ProChat",
-		coreSelectorWidth + integralWidth + selectionsWidth,
-		screenHeight - playerlistHeight - selectionsHeight,
-		minimapWidth,
-		selectionsHeight
+		chatX,
+		chatY,
+		chatWidth,
+		chatHeight
 	)
 	
 	-- Set Windows
@@ -932,7 +954,7 @@ local function SetupMinimapRightPreset()
 	local consoleWidth = 380
 	local consoleHeight = screenHeight * 0.20
 	WG.SetWindowPosAndSize("ProConsole",
-		screenWidth - consoleHeight,
+		screenWidth - consoleWidth,
 		menuHeight,
 		consoleWidth,
 		consoleHeight
