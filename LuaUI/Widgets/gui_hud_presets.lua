@@ -241,7 +241,7 @@ local function SetupDefaultPreset()
 	local selectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
 	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
+	
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
 		screenHeight - selectorHeight - integralHeight, 
@@ -372,15 +372,6 @@ local function SetupNewPreset()
 		minimapSize,
 		minimapSize
 	)
-
-	-- Core Selector
-	if screenWidth < 1900 then
-		if screenWidth > 1340 then
-			WG.CoreSelector_SetOptions(5)
-		else
-			WG.CoreSelector_SetOptions(4)
-		end
-	end
 	
 	local _,_, selectorWidth, selectorHeight = WG.GetWindowPosAndSize("selector_window")
 	selectorHeight = selectorHeight or 150
@@ -582,7 +573,6 @@ local function SetupCraftyPreset()
 	local selectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
 	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
 		screenHeight - minimapHeight - selectorHeight, 
@@ -734,7 +724,6 @@ local function SetupEnsemblePreset()
 	local selectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
 	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
 	WG.SetWindowPosAndSize("selector_window", 
 		integralWidth, 
 		screenHeight - selectionsHeight - selectorHeight, 
@@ -875,7 +864,6 @@ local function SetupWestwoodPreset()
 	local selectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(resourceBarWidth/selectorButtonWidth)))
 	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
 	WG.SetWindowPosAndSize("selector_window", 
 		screenWidth - selectionsWidth, 
 		screenHeight - selectionsHeight - selectorHeight, 

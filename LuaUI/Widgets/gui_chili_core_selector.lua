@@ -62,34 +62,27 @@ local screen0
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-local mainWindow, buttonsHolder, background
-local conButton = {}	-- {button, image, healthbar/label}
+local mainWindow, buttonHolder, mainBackground
 
 local echo = Spring.Echo
-
-local windowPositionX, windowPositionY
-
-function WG.CoreSelector_SetOptions(maxbuttons)
-	options.maxbuttons.value = maxbuttons
-	options.maxbuttons.OnChange(options.maxbuttons)
-end
 
 -- list and interface vars
 local buttonList 
 
 local factoryList = {}
 local commanderList = {}
-
 local idleCons = {}	-- [unitID] = true
+
 local wantUpdateCons = false
 local readyUntaskedBombers = {}	-- [unitID] = true
 local idleConCount = 0
 local factoryIndex = 1
 local commanderIndex = 1
 
-local buttonCountLimit = 7
-
 local myTeamID = Spring.GetMyTeamID()
+
+local buttonSizeShort = 4
+local buttonCountLimit = 7
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -121,8 +114,6 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local function ClearData(reinitialize) end
-
 local hidden = false
 local panelHidden = false
 local fancySkinning = false
@@ -132,40 +123,35 @@ local function UpdateBackgroundSkin()
 	local skin = Chili.SkinHandler.GetSkin(currentSkin)
 
 	local newClass = skin.panel
-	if fancySkinning and skin.panel_1100 then
-		if panelHidden and skin.panel_0100 then
-			newClass = skin.panel_0100
+	if fancySkinning then
+		if panelHidden then
+			mainBackground.SetSkin("panel_0100")
+			return
 		else
-			newClass = skin.panel_1100
+			mainBackground.SetSkin("panel_1100")
+			return
 		end
 	end
-
-	background.tiles = newClass.tiles
-	background.TileImageFG = newClass.TileImageFG
-	background.backgroundColor = newClass.backgroundColor
-	background.TileImageBK = newClass.TileImageBK
-	background:Invalidate()
+	
+	mainBackground.SetSkin()
 end
 
 local function UpdateBackground(showPanel)
 	if showPanel and panelHidden then
 		panelHidden = false
-		mainWindow:AddChild(buttonsHolder)
 		UpdateBackgroundSkin()
 		UpdateBackgroundSize()
 		
-		background:SetVisibility(true)
-		buttonsHolder:BringToFront()
+		background.SetVisible(true)
 		
 		mainWindow.padding[3] = -1
 		mainWindow:UpdateClientArea()
 	elseif not showPanel and not panelHidden then
 		panelHidden = true
-		mainWindow:RemoveChild(buttonsHolder)
 		UpdateBackgroundSkin()
 		UpdateBackgroundSize()
 		
-		background:SetVisibility(WG.IntegralVisible)
+		background.SetVisible(WG.IntegralVisible)
 		
 		mainWindow.padding[3] = 0
 		mainWindow:UpdateClientArea()
@@ -191,21 +177,41 @@ local function CheckHide()
 	
 	if shouldShow and hidden then
 		hidden = false
-		if not screen0:GetChildByName("selector_window") then
-			screen0:AddChild(mainWindow)
-		end
 	elseif not shouldShow and not hidden then
 		hidden = true
-		if screen0:GetChildByName("selector_window") then
-			screen0:RemoveChild(mainWindow)
-		end
 	end
 	
-	UpdateBackground(showPanel)
+	--UpdateBackground(showPanel)
 end
 
 function widget:PlayerChanged()
 	CheckHide()
+end
+
+local function ButtonHolderResize(self)
+	local longSize, shortSize = self.clientArea[3], self.clientArea[4]
+	
+	local longPadding = options.horPadding.value
+	if options.vertical.value then
+		longSize, shortSize = shortSize, longSize
+		longPadding = options.vertPadding.value
+	end
+	
+	longSize = longSize - 2*longPadding
+	
+	buttonSizeShort = shortSize
+	buttonCountLimit = math.max(0, math.floor(longSize/(options.buttonSizeLong.value + options.buttonSpacing.value)))
+	if (buttonCountLimit + 1)*options.buttonSizeLong.value + buttonCountLimit*options.buttonSpacing.value < longSize then
+		buttonCountLimit = buttonCountLimit + 1
+	end
+	
+	buttonList.UpdateLayout()
+end
+
+local function OptionsUpdateLayout()
+	if buttonHolder then
+		ButtonHolderResize(buttonHolder)
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -213,7 +219,7 @@ end
 -- Widget options
 
 options_path = 'Settings/HUD Panels/Quick Selection Bar'
-options_order = {  'showCoreSelector', 'vertical', 'maxbuttons', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
+options_order = {  'showCoreSelector', 'vertical', 'buttonSizeLong', 'background_opacity', 'monitoridlecomms','monitoridlenano', 'monitorInbuiltCons', 'leftMouseCenter', 'lblSelectionIdle', 'selectprecbomber', 'selectidlecon', 'selectidlecon_all', 'lblSelection', 'selectcomm', 'horPadding', 'vertPadding', 'buttonSpacing', 'minButtonSpaces', 'specSpaceOverride', 'fancySkinning'}
 options = { 
 	showCoreSelector = {
 		name = 'Selection Bar Visibility',
@@ -233,17 +239,25 @@ options = {
 		type = 'bool',
 		value = false,
 		noHotkey = true,
+		OnChange = OptionsUpdateLayout,
 	},
-	maxbuttons = {
-		name = 'Maximum number of buttons (3-16)',
+	buttonSizeLong = {
+		name = 'Button Size',
 		type = 'number',
-		value = 6,
-		min=3,max=16,step=1,
+		value = 40,
+		min = 10, max = 200, step = 1,
+		OnChange = OptionsUpdateLayout,
 	},
 	background_opacity = {
 		name = "Opacity",
 		type = "number",
 		value = 0, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			if mainBackground then
+				mainBackground.SetOpacity(self.value)
+				OptionsUpdateLayout()
+			end
+		end
 	},
 	monitoridlecomms = {
 		name = 'Track idle comms',
@@ -304,6 +318,7 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 100, step = 0.25,
+		OnChange = OptionsUpdateLayout,
 	},
 	vertPadding = {
 		name = 'Vertical Padding',
@@ -311,6 +326,7 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 100, step = 0.25,
+		OnChange = OptionsUpdateLayout,
 	},
 	buttonSpacing = {
 		name = 'Button Spacing',
@@ -318,13 +334,15 @@ options = {
 		value = 0,
 		advanced = true,
 		min = 0, max = 100, step = 0.25,
+		OnChange = OptionsUpdateLayout,
 	},
 	minButtonSpaces = {  
 		name = 'Minimum Button Space',
 		type = 'number',
 		value = 0,
 		advanced = true,
-		min = 0, max = 16, step=1,
+		min = 0, max = 16, step = 1,
+		OnChange = OptionsUpdateLayout,
 	},
 	specSpaceOverride = {
 		name = 'Spectating Space Override',
@@ -333,6 +351,7 @@ options = {
 		value = 50,
 		advanced = true,
 		min = 0, max = 400, step = 1,
+		OnChange = OptionsUpdateLayout,
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
@@ -528,54 +547,116 @@ local function GetHealthColor(fraction, wantString)
 	end
 end
 
-local function GetButtonPosition(index)
-	index = index - 1
-	if options.vertical.value then
-		return 0, index*60, 60, 60
-	else
-		return index*60, 0, 60, 60
-	end
-end
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Background Handling
 
-function UpdateBackgroundSize()
-	if options.background_opacity.value == 0 or not background then
-		return
+local function GetBackground(parent)
+	
+	local buttonCount = 0
+	local opacity = options.background_opacity.value
+	local visible = true
+	local buttonPanelVisible = true
+	
+	local buttonsPanel = Control:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		padding = {0, 0, 0, 0},
+		itemMargin = {0, 0, 0, 0},
+		parent = parent,
+	}
+	
+	local panel = Panel:New{
+		x = "5%",
+		backgroundColor = {1, 1, 1, opacity},
+		parent = parent,
+	}
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.GetButtonsHolder()
+		return buttonsPanel
 	end
 	
-	local sizeOverride
-	if panelHidden then
-		sizeOverride = options.specSpaceOverride.value
-	end
-	
-	local buttons = math.max(options.minButtonSpaces.value, 3 + 1)
-	local sideSpacing = 2*((options.vertical.value and options.vertPadding.value) or options.horPadding.value)
-	local buttonSpace = buttons/options.maxbuttons.value
-	
-	if options.vertical.value then
-		buttonSpace = buttonSpace*buttonsHolder.height
-		
-		local top = mainWindow.height - (sizeOverride or (buttonSpace + sideSpacing))
-		top = math.max(top, 0)
-		
-		background._relativeBounds.top = top
-		background._relativeBounds.bottom = 0
-		background:UpdateClientArea()
-	else
-		buttonSpace = buttonSpace*buttonsHolder.width
-		
-		local right = buttonSpace + (sizeOverride or sideSpacing)
-		right = math.max(right, 0)
-		
-		background._relativeBounds.right = right
-		background._relativeBounds.left = 0
-		background:UpdateClientArea()
-	end
-end
+	function externalFunctions.SetSkin(className)
+		local currentSkin = Chili.theme.skin.general.skinName
+		local skin = Chili.SkinHandler.GetSkin(currentSkin)
 
-function options.background_opacity.OnChange(self)
-	background.backgroundColor[4] = self.value
-	background:Invalidate()
-	UpdateBackgroundSize()
+		local newClass = skin.panel
+		if className and skin[className] then
+			newClass = skin[className]
+		end
+
+		panel.tiles = newClass.tiles
+		panel.TileImageFG = newClass.TileImageFG
+		panel.backgroundColor = newClass.backgroundColor
+		panel.TileImageBK = newClass.TileImageBK
+		panel:Invalidate()
+	end
+
+	function externalFunctions.UpdateSize(newButtonCount, layoutChange)
+		buttonCount = newButtonCount
+		if opacity == 0 or not visible then
+			return
+		end
+		
+		local buttons = math.min(buttonCountLimit, math.max(buttonCount, options.minButtonSpaces.value))
+		
+		local size = buttons*options.buttonSizeLong.value + (buttons - 1)*options.buttonSpacing.value
+		if options.vertical.value then
+			size = size + 2*options.vertPadding.value
+		else
+			size = size + 2*options.horPadding.value
+		end
+		
+		if panelHidden and size < options.specSpaceOverride.value then
+			size = options.specSpaceOverride.value
+		end
+		
+		if options.vertical.value then
+			panel._relativeBounds.left = 0
+			panel._relativeBounds.right = 0
+			panel._relativeBounds.top = nil
+			panel._givenBounds.top = nil
+			panel._relativeBounds.bottom = 0
+			panel._relativeBounds.width = nil
+			panel._relativeBounds.height = size
+			panel:UpdateClientArea()
+		else
+			panel._relativeBounds.left = 0
+			panel._relativeBounds.right = nil
+			panel._relativeBounds.top = 0
+			panel._givenBounds.top = 0
+			panel._relativeBounds.bottom = 0
+			panel._relativeBounds.width = size
+			panel._relativeBounds.height = nil
+			panel:UpdateClientArea()
+		end
+	end
+	
+	function externalFunctions.SetVisible(newVisible)
+		if newVisible == visible then
+			return
+		end
+		visible = newVisibility
+		if visible then
+			panel:SetVisibility(true)
+			buttonsPanel:BringToFront()
+		else
+			panel:SetVisibility(false)
+		end
+	end
+	
+	function externalFunctions.SetOpacity(newOpacity)
+		opacity = newOpacity
+		panel.backgroundColor[4] = opacity
+		panel:Invalidate()
+		externalFunctions.UpdateSize(buttonCount)
+	end
+	
+	return externalFunctions
 end
 
 --------------------------------------------------------------------------------
@@ -583,21 +664,17 @@ end
 -- Button Handling
 
 local function GetNewButton(parent, onClick, category, index, backgroundColor, imageFile, imageFile2)
-	local hPad = ((not options.vertical.value) and options.buttonSpacing.value) or 0
-	local vPad = (options.vertical.value and options.buttonSpacing.value) or 0
-	
 	local position = 1
-	local bX, bY, bWidth, bHeight = GetButtonPosition(position)
 	
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
 	
 	-- Controls
 	local button = Button:New{
 		parent = parent,
-		x = bX,
-		y = bY,
-		width = bWidth,
-		height = bHeight,
+		x = "5%", -- Makes the button relative
+		y = "5%",
+		right = "5%",
+		bottom = "5%",
 		caption = '',
 		padding = {1,1,1,1},
 		backgroundColor = backgroundColor,
@@ -752,19 +829,48 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	end
 	
 	-- Movement
-	function externalFunctions.GetPosition()
-		return position
-	end
-	
-	function externalFunctions.SetPosition(newPosition)
-		position = newPosition
+	function externalFunctions.UpdatePosition()
 		if position > buttonCountLimit then
 			button:SetVisibility(false)
 			return
 		end
 		button:SetVisibility(true)
-		bX, bY, bWidth, bHeight = GetButtonPosition(position)
-		button:SetPos(bX, bY, bWidth, bHeight)
+		
+		local hPad = ((not options.vertical.value) and options.buttonSpacing.value) or 0
+		local vPad = (options.vertical.value and options.buttonSpacing.value) or 0
+		
+		local index = position - 1
+		if options.vertical.value then
+			button._relativeBounds.left = options.horPadding.value
+			button._relativeBounds.right = options.horPadding.value
+			button._relativeBounds.top = nil
+			button._givenBounds.top = nil
+			button._relativeBounds.bottom = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.vertPadding.value
+			button._relativeBounds.width = nil
+			button._givenBounds.width = nil
+			button._relativeBounds.height = options.buttonSizeLong.value
+			button:UpdateClientArea()
+		else
+			button._relativeBounds.left = index*(options.buttonSizeLong.value + options.buttonSpacing.value) + options.horPadding.value
+			button._relativeBounds.right = nil
+			button._givenBounds.right = nil
+			button._relativeBounds.top = options.vertPadding.value
+			button._givenBounds.top = options.vertPadding.value
+			button._relativeBounds.bottom = options.vertPadding.value
+			button._relativeBounds.width = options.buttonSizeLong.value
+			button._relativeBounds.height = nil
+			button._givenBounds.height = nil
+			button:UpdateClientArea()
+		end
+	end
+	
+	function externalFunctions.SetPosition(newPosition)
+		position = newPosition
+		externalFunctions.UpdatePosition()
+	end
+	
+	function externalFunctions.GetPosition()
+		return position
 	end
 	
 	function externalFunctions.MoveUp(compCategory, compIndex)
@@ -866,6 +972,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 	local externalFunctions = {
 		unitID = unitID,
 		GetOrder = button.GetOrder,
+		UpdatePosition = button.UpdatePosition,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -995,6 +1102,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		MoveUp = button.MoveUp,
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
+		UpdatePosition = button.UpdatePosition,
 	}
 	
 	function externalFunctions.UpdateButton(dt)
@@ -1083,6 +1191,7 @@ local function GetConstructorButton(parent)
 		MoveUp = button.MoveUp,
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
+		UpdatePosition = button.UpdatePosition,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1127,13 +1236,13 @@ end
 -------------------------------------------------------------------------------
 -- Unit List Handler
 
-local function GetButtonListHandler()
+local function GetButtonListHandler(buttonBackground)
 
 	local buttons = {}
 	local buttonMap = {}
 	local buttonList = {}
 	local buttonCount = 0
-
+	
 	local externalFunctions = {}
 	
 	function externalFunctions.GetButton(buttonID)
@@ -1162,22 +1271,17 @@ local function GetButtonListHandler()
 		buttonCount = buttonCount - 1
 		
 		externalFunctions.MoveDown(category, index)
+		buttonBackground.UpdateSize(buttonCount)
 	end
 		
 	function externalFunctions.MoveUp(category, index)
 		local position = 1
-		local i = 1
-		while i <= buttonCount do
+		for i = 1, buttonCount do
 			local buttonID = buttonList[i]
 			local button = buttons[buttonID]
-			local moved, toRemove = button.MoveUp(category, index)
+			local moved = button.MoveUp(category, index)
 			if not moved then
 				position = position + 1
-			end
-			if toRemove then
-				externalFunctions.RemoveButton(buttonID)
-			else
-				i = i + 1
 			end
 		end
 		return position
@@ -1193,6 +1297,7 @@ local function GetButtonListHandler()
 		buttonCount = buttonCount + 1
 		buttonList[buttonCount] = buttonID
 		buttonMap[buttonID] = buttonCount
+		buttonBackground.UpdateSize(buttonCount)
 	end
 	
 	function externalFunctions.UpdateButtons(dt)
@@ -1205,6 +1310,26 @@ local function GetButtonListHandler()
 				externalFunctions.RemoveButton(buttonID)
 			end
 		end
+	end
+	
+	function externalFunctions.UpdateLayout()
+		for i = 1, buttonCount do
+			local button = buttons[buttonList[i]]
+			button.UpdatePosition()
+		end
+		buttonBackground.UpdateSize(buttonCount)
+	end
+	
+	function externalFunctions.DeleteButtons()
+		for i = 1, buttonCount do
+			local button = buttons[buttonList[i]]
+			button.Destroy()
+		end
+		buttons = {}
+	    buttonMap = {}
+	    buttonList = {}
+	    buttonCount = 0
+		buttonBackground.UpdateSize(buttonCount)
 	end
 	
 	function externalFunctions.Destroy()
@@ -1226,7 +1351,7 @@ local function AddComm(unitID, unitDefID)
 		return
 	end
 	
-	local button = GetCommanderButton(buttonsHolder, unitID, unitDefID, commanderIndex)
+	local button = GetCommanderButton(buttonHolder, unitID, unitDefID, commanderIndex)
 	commanderIndex = commanderIndex + 1
 	
 	commanderList[#commanderList + 1] = button
@@ -1257,7 +1382,7 @@ local function AddFac(unitID, unitDefID)
 		return
 	end
 	
-	local button = GetFactoryButton(buttonsHolder, unitID, unitDefID, factoryIndex)
+	local button = GetFactoryButton(buttonHolder, unitID, unitDefID, factoryIndex)
 	factoryIndex = factoryIndex + 1
 	
 	factoryList[#factoryList + 1] = button
@@ -1363,8 +1488,7 @@ end
 local function InitializeControls()
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
-	local BUTTON_WIDTH = math.min(60, screenHeight/16)
-	local BUTTON_HEIGHT = 55*BUTTON_WIDTH/60
+	local BUTTON_HEIGHT = 55*options.buttonSizeLong.value/60
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
 	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
 	local bottom = integralHeight
@@ -1372,17 +1496,7 @@ local function InitializeControls()
 	local hPad = options.horPadding.value
 	local vPad = options.vertPadding.value
 	
-	local windowY = bottom - BUTTON_HEIGHT * ((options.vertical.value and options.maxbuttons.value) or 1) + 2*vPad
-	
-	local windowWidth, windowHeight
-	if options.vertical.value then
-		windowWidth  = BUTTON_WIDTH + 2*hPad
-		windowHeight = (BUTTON_HEIGHT + 2*options.buttonSpacing.value) * options.maxbuttons.value + 2*vPad
-	else
-		windowWidth  = (BUTTON_WIDTH + 2*options.buttonSpacing.value) * options.maxbuttons.value + 2*hPad
-		windowHeight = BUTTON_HEIGHT + 2*vPad
-	end
-	windowHeight = math.ceil(windowHeight)
+	local windowY = bottom - BUTTON_HEIGHT
 	
 	local specChanges = Spring.GetSpectatingState() and options.showCoreSelector.value == 'specSpace'
 	
@@ -1391,10 +1505,10 @@ local function InitializeControls()
 		itemMargin = {0, 0, 0, 0},
 		dockable = true,
 		name = "selector_window",
-		x = windowPositionX or 0, 
-		y = windowPositionY or windowY,
-		width  = windowWidth,
-		height = windowHeight,
+		x = 0, 
+		y = windowY,
+		width  = integralWidth,
+		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
 		draggable = false,
 		tweakDraggable = true,
@@ -1404,49 +1518,49 @@ local function InitializeControls()
 		minWidth = 32,
 		minHeight = 32,
 		color = {0,0,0,0},
-		OnClick={ function(self)
-			local alt, ctrl, meta, shift = Spring.GetModKeyState()
-			if not meta then return false end
-			WG.crude.OpenPath(options_path)
-			WG.crude.ShowMenu()
-			return true
-		end },
-	}	
-	
-	buttonsHolder = Control:New{
-		x = 0,
-		y = 0,
-		right = 0,
-		bottom = 0,
-		padding = {hPad, vPad, hPad, vPad},
-		itemMargin = {0, 0, 0, 0},
-		OnResize = {
-			UpdateBackgroundSize,
-			UpdateButtonPositions
+		OnClick = {
+			function(self)
+				local alt, ctrl, meta, shift = Spring.GetModKeyState()
+				if not meta then
+					return false
+				end
+				WG.crude.OpenPath(options_path)
+				WG.crude.ShowMenu()
+				return true
+			end
 		},
-		parent = mainWindow,
-	}
-	background = Panel:New{
-		x = 0,
-		y = 0,
-		right = 0,
-		bottom = 0,
-		backgroundColor = {1, 1, 1, options.background_opacity.value},
-		parent = mainWindow,
-	}
+	}	
+
+	mainBackground = GetBackground(mainWindow)
+	buttonHolder = mainBackground.GetButtonsHolder()
 	
-	buttonList = GetButtonListHandler()
-	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonsHolder))
-	
+	buttonList = GetButtonListHandler(mainBackground)
+	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
+		
+	buttonHolder.OnResize[#buttonHolder.OnResize + 1] = ButtonHolderResize
 	
 	if options.fancySkinning.value then
 		options.fancySkinning.OnChange(options.fancySkinning)
 	end
 	
 	InitializeUnits()
-	
 	hidden = false
 	CheckHide()
+end
+
+local function ClearData()
+	buttonList.DeleteButtons()
+	factoryList = {}
+	commanderList = {}
+	idleCons = {}
+
+	wantUpdateCons = false
+	readyUntaskedBombers = {}
+	idleConCount = 0
+	factoryIndex = 1
+	commanderIndex = 1
+
+	InitializeUnits()
 end
 
 -------------------------------------------------------------------------------
@@ -1456,8 +1570,8 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetSpecSpaceVisible(newVisible)
-	if panelHidden and background then
-		background:SetVisibility(newVisible)
+	if panelHidden and mainBackground then
+		mainBackground.SetVisible(newVisible)
 	end
 end
 
@@ -1586,8 +1700,7 @@ local timer = 0
 function widget:Update(dt)
 	if myTeamID ~= Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
-		ClearData(false)
-		InitializeUnits()
+		ClearData()
 	end
 	
 	if wantUpdateCons then
