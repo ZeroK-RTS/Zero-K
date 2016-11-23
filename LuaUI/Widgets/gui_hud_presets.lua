@@ -106,7 +106,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 1)
 	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "armap")
 	
-	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnRight", false)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnlyOnChat", true)
 	
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 7)
 	
@@ -158,7 +158,7 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 0)
 	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "arwindow")
 	
-	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnRight", true)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnlyOnChat", false)
 	
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 0)
 	
@@ -591,12 +591,8 @@ local function SetupMinimapLeftPreset()
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
-	if minimapHeight < selectionsHeight + 32 then
-		if minimapHeight > selectionsHeight then
-			minimapHeight = selectionsHeight + 32
-		else
-			minimapHeight = selectionsHeight
-		end
+	if minimapHeight < selectionsHeight + 16 then
+		minimapHeight = selectionsHeight + 16
 	end
 	
 	-- Core Selector
@@ -805,12 +801,8 @@ local function SetupMinimapRightPreset()
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
-	if minimapHeight < selectionsHeight + 32 then
-		if minimapHeight > selectionsHeight then
-			minimapHeight = selectionsHeight + 32
-		else
-			minimapHeight = selectionsHeight
-		end
+	if minimapHeight < selectionsHeight + 16 then
+		minimapHeight = selectionsHeight + 16
 	end
 	
 	-- Core Selector
@@ -847,7 +839,6 @@ local function SetupMinimapRightPreset()
 		minimapWidth,
 		selectionsHeight
 	)
-	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnRight", true)
 	
 	-- Set Windows
 	WG.SetWindowPosAndSize("Minimap Window", 

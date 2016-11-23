@@ -1277,13 +1277,6 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	
-	if msg.player == myName then
-		if WG.enteringText then
-			HideInputSpace()
-		end 		
-	end
-
 	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then 
 		return 
 	end
