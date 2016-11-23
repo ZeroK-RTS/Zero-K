@@ -473,18 +473,25 @@ options = {
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
-		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
+		type = 'radioButton',
+		value = 'panel',
 		path = minimap_path,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1100', name = 'Bottom Left',},
+			{key = 'panel_2100', name = 'Bottom Left Flush',},
+			{key = 'panel_0110', name = 'Bottom Right'},
+			{key = 'panel_0120', name = 'Bottom Right Flush'},
+			{key = 'panel_1001', name = 'Top Left',},
+		},
 		OnChange = function (self)
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
+			local className = self.value
 			local newClass = skin.panel
-			if self.value and skin.panel_1100 then
-				newClass = skin.panel_1100
+			if skin[className] then
+				newClass = skin[className]
 			end
 			
 			map_panel.tiles = newClass.tiles
@@ -498,8 +505,10 @@ options = {
 			fakewindow.backgroundColor = newClass.backgroundColor
 			fakewindow.TileImageBK = newClass.TileImageBK
 			fakewindow:Invalidate()
-		end
-	}
+		end,
+		advanced = true,
+		noHotkey = true,
+	},
 	--[[
 	simpleMinimapColors = {
 		name = 'Simplified Minimap Colors',

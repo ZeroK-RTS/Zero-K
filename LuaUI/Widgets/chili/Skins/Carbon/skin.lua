@@ -119,6 +119,7 @@ local fancyPanels = {
 	"0021",
 	"2001",
 	"2021",
+	"2120",
 }
 
 for i = 1, #fancyPanels do
