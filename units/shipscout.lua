@@ -128,7 +128,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 45.1,
+        default = 34.1,
         subs    = 5,
       },
 
@@ -143,7 +143,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_armpt.s3o]],
       range                   = 330,
-      reloadtime              = 2,
+      reloadtime              = 1.5,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],

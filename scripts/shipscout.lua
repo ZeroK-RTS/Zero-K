@@ -40,10 +40,10 @@ end
 
 local function shootyThingo()
 	Sleep(33)
-	Move(turret, y_axis, 0,20)
+	Move(turret, y_axis, 0,40)
 	Hide(missile)
 	Sleep(1000)
-	Move(turret, y_axis, 20, 20)
+	Move(turret, y_axis, 20, 40)
 	Show(missile)
 end
 	
