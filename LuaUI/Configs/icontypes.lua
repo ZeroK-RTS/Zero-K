@@ -935,7 +935,7 @@ local icontypes = {
     bitmap='icons/shipheavyarty.dds',
     size=4,
   },
-  shipsubmissile = {
+  shipsubtacmissile = {
     bitmap='icons/shipsubmissile.dds',
     size=4,
   },

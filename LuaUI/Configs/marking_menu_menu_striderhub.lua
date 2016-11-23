@@ -33,23 +33,23 @@ local menu = {
 		},
 		{
 			angle = 90,
-			unit = "cornukesub",
+			unit = "shipsubtacmissile",
 			label = "Sub",
 		},
 		{
 			angle = 135,
-			unit = "corbats",
+			unit = "shipheavyarty",
 			label = "Ship",
-			items = {
-				{
-					angle = -135,
-					unit = "armcarry"
-				},
-				{
-					angle = -135,
-					unit = "reef"
-				},
-			}
+			--items = {
+			--	{
+			--		angle = -135,
+			--		unit = "armcarry"
+			--	},
+			--	{
+			--		angle = -135,
+			--		unit = "reef"
+			--	},
+			--}
 		},
 		{
 			angle = 180,

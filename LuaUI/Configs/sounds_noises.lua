@@ -1063,6 +1063,16 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
+	shipsubtacmissile = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "sub_select",
+			volume = 1.1,
+		},
+	},
 	shipaa = {
 		ok = {
 			[1] = "rumble2",

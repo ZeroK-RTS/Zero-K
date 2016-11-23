@@ -126,7 +126,7 @@ local sea = { --not used yet
 	"armpt", --skeeter
 	"armroy", --crusader
 	"coresupp", --supporter
-	"cornukesub", --leviathan
+	"shipsubtacmissile", --leviathan
 	"armboat", --surboat(sea transporter)
 }
 
