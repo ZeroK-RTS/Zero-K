@@ -1285,6 +1285,10 @@ function widget:AddConsoleMessage(msg)
 		return 
 	end
 	
+	if msg.msgtype == 'other' and (msg.argument):find("LuaMenuServerMessage") then
+		return
+	end
+	
 	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
 	local messages = isChat and chatMessages or consoleMessages
