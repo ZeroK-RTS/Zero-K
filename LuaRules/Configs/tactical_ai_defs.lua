@@ -646,7 +646,7 @@ local behaviourConfig = {
 	["shipriot"] = {
 		skirms = {}, 
 		swarms = allSurface, 
-		flees = subfleeables,
+		--flees = subfleeables,
 		
 		localJinkOrder = false,
 		jinkTangentLength = 25,
@@ -658,8 +658,8 @@ local behaviourConfig = {
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
-		fleeLeeway = 250,
-		fleeDistance = 300,
+		--fleeLeeway = 250,
+		--fleeDistance = 300,
 		
 		--maxSwarmLeeway = 30, 
 		--minSwarmLeeway = 90, 
