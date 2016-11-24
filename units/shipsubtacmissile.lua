@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipsubtacmissile]],
-  name                   = [[Leviathan]],
-  description            = [[Tactical Nuke Missile Sub, Drains 6.25 m/s, 90 second stockpile]],
+  name                   = [[Scylla]],
+  description            = [[Tactical Nuke Missile Sub, Drains 10 m/s, 60 second stockpile]],
   acceleration           = 0.0372,
   activateWhenBuilt      = true,
   brakeRate              = 0.1942,
@@ -22,10 +22,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    helptext       = [[The Leviathan provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
+    helptext       = [[The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
 	modelradius    = [[15]],
-	stockpiletime  = [[90]],
-	stockpilecost  = [[500]],
+	stockpiletime  = [[60]],
+	stockpilecost  = [[600]],
 	priority_misc  = 1, -- Medium
   },
 
