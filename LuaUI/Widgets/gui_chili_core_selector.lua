@@ -84,6 +84,8 @@ local myTeamID = Spring.GetMyTeamID()
 local buttonSizeShort = 4
 local buttonCountLimit = 7
 
+local reuseButtons = {}
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
@@ -666,16 +668,14 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
 	
 	-- Controls
-	local button = Button:New{
-		parent = parent,
-		x = "5%", -- Makes the button relative
-		y = "5%",
-		right = "5%",
-		bottom = "5%",
-		caption = '',
-		padding = {1,1,1,1},
-		backgroundColor = backgroundColor,
-		OnClick = {	
+	local button
+	if reuseButtons and #reuseButtons > 0 then
+		button = reuseButtons[#reuseButtons]
+		button.backgroundColor = backgroundColor
+		button:ClearChildren()
+		button:Invalidate()
+		reuseButtons[#reuseButtons] = nil
+		button.OnClick = {	
 			function (self, x, y, mouse)
 				local _, _, meta, shift = Spring.GetModKeyState()
 				if meta then
@@ -685,8 +685,30 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				end
 				onClick(mouse)
 			end
-		},
-	}
+		}
+	else
+		button = Button:New{
+			parent = parent,
+			x = "5%", -- Makes the button relative
+			y = "5%",
+			right = "5%",
+			bottom = "5%",
+			caption = '',
+			padding = {1,1,1,1},
+			backgroundColor = backgroundColor,
+			OnClick = {	
+				function (self, x, y, mouse)
+					local _, _, meta, shift = Spring.GetModKeyState()
+					if meta then
+						WG.crude.OpenPath(options_path)
+						WG.crude.ShowMenu()
+						return true
+					end
+					onClick(mouse)
+				end
+			},
+		}
+	end
 	
 	local image = Image:New {
 		parent = button,
@@ -892,9 +914,13 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		return category, index
 	end
 	
-	-- Desctruction
-	function externalFunctions.Destroy()
-		button:Dispose()
+	-- Destruction
+	function externalFunctions.Destroy(doDispose)
+		if doDispose then
+			button:Dispose()
+		else
+			reuseButtons[#reuseButtons + 1] = button
+		end
 		button = nil
 	end
 	
@@ -1234,7 +1260,9 @@ end
 -- Unit List Handler
 
 local function GetButtonListHandler(buttonBackground)
-
+	
+	local buttonHolder = buttonBackground.GetButtonsHolder()
+	
 	local buttons = {}
 	local buttonMap = {}
 	local buttonList = {}
@@ -1320,7 +1348,7 @@ local function GetButtonListHandler(buttonBackground)
 	function externalFunctions.DeleteButtons()
 		for i = 1, buttonCount do
 			local button = buttons[buttonList[i]]
-			button.Destroy()
+			button.Destroy(false)
 		end
 		buttons = {}
 	    buttonMap = {}
@@ -1543,7 +1571,7 @@ local function ClearData()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
-
+	
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
 	idleConCount = 0
@@ -1551,6 +1579,12 @@ local function ClearData()
 	commanderIndex = 1
 
 	InitializeUnits()
+	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
+	
+	for i = 1, #reuseButtons do
+		reuseButtons[i]:Dispose()
+	end
+	reuseButtons = {}
 end
 
 -------------------------------------------------------------------------------
