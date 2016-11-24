@@ -82,7 +82,7 @@ local spGetFrameTimeOffset   = Spring.GetFrameTimeOffset
 local spGetUnitPieceList     = Spring.GetUnitPieceList
 local spGetSpectatingState   = Spring.GetSpectatingState
 local spGetLocalAllyTeamID   = Spring.GetLocalAllyTeamID
-local scGetReadAllyTeam      = Script.GetReadAllyTeam
+local spGetReadAllyTeam      = Script.GetReadAllyTeam
 local spGetUnitPieceMap      = Spring.GetUnitPieceMap
 local spValidUnitID          = Spring.ValidUnitID
 local spGetUnitIsStunned     = Spring.GetUnitIsStunned
@@ -663,19 +663,19 @@ local DrawScreenEffectsVisibleFx
 local DrawInMiniMapVisibleFx
 
 function IsPosInLos(x,y,z)
-	return LocalAllyTeamID == -2 or Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInLos(x,y,z, LocalAllyTeamID or 0)
 end
 
 function IsPosInRadar(x,y,z)
-	return LocalAllyTeamID == -2 or Spring.IsPosInRadar(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInRadar(x,y,z, LocalAllyTeamID or 0)
 end
 
 function IsPosInAirLos(x,y,z)
-	return LocalAllyTeamID == -2 or Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID)
+	return LocalAllyTeamID == -2 or Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID or 0)
 end
 
 function GetUnitLosState(unitID)
-	return LocalAllyTeamID == -2 or (Spring.GetUnitLosState(unitID, LocalAllyTeamID) or {}).los or false
+	return LocalAllyTeamID == -2 or (Spring.GetUnitLosState(unitID, LocalAllyTeamID or 0) or {}).los or false
 end
 
 local function IsUnitFXVisible(fx)
@@ -826,7 +826,7 @@ local function GameFrame(_,n)
   --// update team/player status
   local spec, specFullView = spGetSpectatingState()
   if (specFullView) then
-    LocalAllyTeamID = scGetReadAllyTeam()
+    LocalAllyTeamID = spGetReadAllyTeam()
   else
     LocalAllyTeamID = spGetLocalAllyTeamID()
   end
