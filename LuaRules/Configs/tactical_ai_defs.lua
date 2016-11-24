@@ -36,6 +36,7 @@ end
 
 -- general arrays
 local allGround = {}
+local allSurface = {}
 local armedLand = {}
 local unarmedLand = {}
 
@@ -46,6 +47,9 @@ for name,data in pairs(UnitDefNames) do
 			armedLand[data.id] = true
 		else
 			unarmedLand[data.id] = true
+		end
+		if not name == "shipsubraider" or name == "amphraider3" or name == "amphriot" then
+			allSurface[data.id] = true
 		end
 	end
 end
@@ -69,7 +73,7 @@ local longRangeSwarmieeArray = NameToDefID({
 	"shiparty",
 	"armham",
 	
-	"a_shipcruiser",
+	"shiparty",
 })
 
 local medRangeSwarmieeArray = NameToDefID({ 
@@ -77,7 +81,7 @@ local medRangeSwarmieeArray = NameToDefID({
 	"amphfloater",
 	"chickens",
 	
-	"a_shipmissile",
+	"shipskirm",
 })
 
 local lowRangeSwarmieeArray = NameToDefID({
@@ -184,8 +188,8 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"spherecloaker",
 	"core_spectre",
 	
-	"a_shiptorpbt",
-	"a_shipscout",
+	"shiptorpraider",
+	"shipscout",
 })
 
 local lowMedRangeSkirmieeArray = NameToDefID({
@@ -200,7 +204,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	"corthud",
 	"corraid",
 	
-	"a_shipcorvette",
+	"shipriot",
 })
 
 local medRangeSkirmieeArray = NameToDefID({
@@ -228,7 +232,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 	
-	"a_shipdestroyer",
+	"shipassault",
 })
 
 for name, data in pairs(UnitDefNames) do -- add all comms and facs to mid range skirm, so units avoid their death explosions.
@@ -254,7 +258,6 @@ local longRangeSkirmieeArray = NameToDefID({
 })
 
 local artyRangeSkirmieeArray = NameToDefID({
-	"shipskirm",
 	"armsptk",
 	"corstorm",
 	"cormist",
@@ -267,7 +270,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 	"armorco",
 	"amphartillery",
 	
-	"a_shipmissile",
+	"shipskirm",
 })
 
 local slasherSkirmieeArray = NameToDefID({
@@ -341,6 +344,12 @@ local fleeables = NameToDefID({
     "shieldfelon",
 	"corsumo",
 })
+
+-- Submarines to be fled by soem things
+local subfleeables = NameToDefID({
+	"shipsubraider",
+})
+
 
 -- scorcher dive list
 local scorcherSwarmieeArray = SetMinus(allGround, scorcherSkirmieeArray)
@@ -611,11 +620,15 @@ local behaviourConfig = {
 	["shipscout"] = { -- scout boat
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
-		flees = {},
+		flees = subfleeables,
 		circleStrafe = true, 
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
+		fleeLeeway = 250,
+		fleeDistance = 300,
 	},
 	
 	["shiptorpraider"] = {
@@ -625,13 +638,15 @@ local behaviourConfig = {
 		circleStrafe = true, 
 		maxSwarmLeeway = 40, 
 		swarmLeeway = 30, 
-		stoppingDistance = 8
+		stoppingDistance = 8,
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
 	},
 	
 	["shipriot"] = {
 		skirms = {}, 
-		swarms = allGround, 
-		flees = {},
+		swarms = allSurface, 
+		flees = subfleeables,
 		
 		localJinkOrder = false,
 		jinkTangentLength = 25,
@@ -643,6 +658,8 @@ local behaviourConfig = {
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
+		fleeLeeway = 250,
+		fleeDistance = 300,
 		
 		--maxSwarmLeeway = 30, 
 		--minSwarmLeeway = 90, 
@@ -929,6 +946,8 @@ local behaviourConfig = {
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
 	},
 	
 	
