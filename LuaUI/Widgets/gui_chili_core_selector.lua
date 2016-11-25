@@ -69,6 +69,12 @@ local echo = Spring.Echo
 -- list and interface vars
 local buttonList 
 
+-- Fixes change team flicker. Buttons are not visible in the frame after they 
+-- are created. Images are visible immediately. The solution is to hide the 
+-- images of the old button list when creating a new one. The old button list
+-- is destroyed fully one frame later.
+local oldButtonList 
+
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
@@ -892,6 +898,10 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		return category, index
 	end
 	
+	function externalFunctions.SetImageVisible(newVisible)
+		image:SetVisibility(newVisible)
+	end
+	
 	-- Desctruction
 	function externalFunctions.Destroy()
 		button:Dispose()
@@ -970,6 +980,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		unitID = unitID,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1100,6 +1111,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton(dt)
@@ -1189,6 +1201,7 @@ local function GetConstructorButton(parent)
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1327,6 +1340,13 @@ local function GetButtonListHandler(buttonBackground)
 	    buttonList = {}
 	    buttonCount = 0
 		buttonBackground.UpdateSize(buttonCount)
+	end
+	
+	function externalFunctions.SetImagesVisible(newVisible)
+		for i = 1, buttonCount do
+			local buttonID = buttonList[i]
+			buttons[buttonID].SetImageVisible(newVisible)
+		end
 	end
 	
 	function externalFunctions.Destroy()
@@ -1539,19 +1559,23 @@ local function InitializeControls()
 end
 
 local function ClearData()
-	buttonList.DeleteButtons()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
-
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
+	
 	idleConCount = 0
 	factoryIndex = 1
 	commanderIndex = 1
-
+	
+	oldButtonList = buttonList
+	
+	buttonList = GetButtonListHandler(mainBackground)
 	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
 	InitializeUnits()
+	
+	buttonList.SetImagesVisible(false)
 end
 
 -------------------------------------------------------------------------------
@@ -1689,6 +1713,11 @@ end
 
 local timer = 0
 function widget:Update(dt)
+	if oldButtonList then
+		oldButtonList.Destroy()
+		buttonList.SetImagesVisible(true)
+		oldButtonList = nil
+	end
 	if myTeamID ~= Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		ClearData()
