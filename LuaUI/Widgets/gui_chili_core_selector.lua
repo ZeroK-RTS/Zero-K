@@ -69,6 +69,12 @@ local echo = Spring.Echo
 -- list and interface vars
 local buttonList 
 
+-- Fixes change team flicker. Buttons are not visible in the frame after they 
+-- are created. Images are visible immediately. The solution is to hide the 
+-- images of the old button list when creating a new one. The old button list
+-- is destroyed fully one frame later.
+local oldButtonList 
+
 local factoryList = {}
 local commanderList = {}
 local idleCons = {}	-- [unitID] = true
@@ -83,8 +89,6 @@ local myTeamID = Spring.GetMyTeamID()
 
 local buttonSizeShort = 4
 local buttonCountLimit = 7
-
-local reuseButtons = {}
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -116,55 +120,28 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local hidden = false
-local panelHidden = false
-
-local function UpdateBackground(showPanel)
-	if showPanel and panelHidden then
-		panelHidden = false
-		UpdateBackgroundSkin()
-		UpdateBackgroundSize()
-		
-		background.SetVisible(true)
-		
-		mainWindow.padding[3] = -1
-		mainWindow:UpdateClientArea()
-	elseif not showPanel and not panelHidden then
-		panelHidden = true
-		UpdateBackgroundSkin()
-		UpdateBackgroundSize()
-		
-		background.SetVisible(WG.IntegralVisible)
-		
-		mainWindow.padding[3] = 0
-		mainWindow:UpdateClientArea()
-	end
-end
-
 local function CheckHide()
 	local spec = Spring.GetSpectatingState()
-	local shouldShow, showPanel
+	local showButtons, showBackground
 	if options.showCoreSelector.value == 'always' then
-		showPanel = true
-		shouldShow = true
+		showBackground = true
+		showButtons = true
 	elseif options.showCoreSelector.value == 'specSpace' then
-		showPanel = not spec
-		shouldShow = true
+		showBackground = true
+		showButtons = not spec
 	elseif options.showCoreSelector.value == 'specHide' then
-		showPanel = true
-		shouldShow = not spec
+		showBackground = not spec
+		showButtons = not spec
 	else
-		showPanel = true
-		shouldShow = false
+		showBackground = false
+		showButtons = false
 	end
 	
-	if shouldShow and hidden then
-		hidden = false
-	elseif not shouldShow and not hidden then
-		hidden = true
+	buttonHolder:SetVisibility(showButtons)
+	if showBackground == showButtons then
+		mainBackground.SetVisible(showBackground)
 	end
-	
-	--UpdateBackground(showPanel)
+	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons)
 end
 
 function widget:PlayerChanged()
@@ -553,7 +530,8 @@ local function GetBackground(parent)
 	local buttonCount = 0
 	local opacity = options.background_opacity.value
 	local visible = true
-	local buttonPanelVisible = true
+	local specShowMode = false
+	local specShow = false
 	
 	local buttonsPanel = Control:New{
 		x = 0,
@@ -565,9 +543,12 @@ local function GetBackground(parent)
 		parent = parent,
 	}
 	
-	local panel = Panel:New{
+	local backgroundPanel = Panel:New{
+		name = "core_backgroundPanel",
 		classname = options.fancySkinning.value,
 		x = "5%",
+		draggable = false,
+		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
 		parent = parent,
 	}
@@ -582,24 +563,25 @@ local function GetBackground(parent)
 		local currentSkin = Chili.theme.skin.general.skinName
 		local skin = Chili.SkinHandler.GetSkin(currentSkin)
 
+		if specShowMode and className ~= "panel" then
+			className = "panel_0100"
+		end
+		
 		local newClass = skin.panel
 		if className and skin[className] then
 			newClass = skin[className]
 		end
-
-		panel.classname = className
-		panel.tiles = newClass.tiles
-		panel.TileImageFG = newClass.TileImageFG
-		panel.backgroundColor = newClass.backgroundColor
-		panel.TileImageBK = newClass.TileImageBK
-		panel:Invalidate()
+		
+		backgroundPanel.classname = className
+		backgroundPanel.tiles = newClass.tiles
+		backgroundPanel.TileImageFG = newClass.TileImageFG
+		backgroundPanel.backgroundColor = newClass.backgroundColor
+		backgroundPanel.TileImageBK = newClass.TileImageBK
+		backgroundPanel:Invalidate()
 	end
 
-	function externalFunctions.UpdateSize(newButtonCount, layoutChange)
-		buttonCount = newButtonCount
-		if opacity == 0 or not visible then
-			return
-		end
+	function externalFunctions.UpdateSize(newButtonCount)
+		buttonCount = newButtonCount or buttonCount
 		
 		local buttons = math.min(buttonCountLimit, math.max(buttonCount, options.minButtonSpaces.value))
 		
@@ -610,28 +592,28 @@ local function GetBackground(parent)
 			size = size + options.horPaddingRight.value + options.horPaddingLeft.value
 		end
 		
-		if panelHidden and size < options.specSpaceOverride.value then
+		if specShowMode then
 			size = options.specSpaceOverride.value
 		end
 		
 		if options.vertical.value then
-			panel._relativeBounds.left = 0
-			panel._relativeBounds.right = 0
-			panel._relativeBounds.top = nil
-			panel._givenBounds.top = nil
-			panel._relativeBounds.bottom = 0
-			panel._relativeBounds.width = nil
-			panel._relativeBounds.height = size
-			panel:UpdateClientArea()
+			backgroundPanel._relativeBounds.left = 0
+			backgroundPanel._relativeBounds.right = 0
+			backgroundPanel._relativeBounds.top = nil
+			backgroundPanel._givenBounds.top = nil
+			backgroundPanel._relativeBounds.bottom = 0
+			backgroundPanel._relativeBounds.width = nil
+			backgroundPanel._relativeBounds.height = size
+			backgroundPanel:UpdateClientArea()
 		else
-			panel._relativeBounds.left = 0
-			panel._relativeBounds.right = nil
-			panel._relativeBounds.top = 0
-			panel._givenBounds.top = 0
-			panel._relativeBounds.bottom = 0
-			panel._relativeBounds.width = size
-			panel._relativeBounds.height = nil
-			panel:UpdateClientArea()
+			backgroundPanel._relativeBounds.left = 0
+			backgroundPanel._relativeBounds.right = nil
+			backgroundPanel._relativeBounds.top = 0
+			backgroundPanel._givenBounds.top = 0
+			backgroundPanel._relativeBounds.bottom = 0
+			backgroundPanel._relativeBounds.width = size
+			backgroundPanel._relativeBounds.height = nil
+			backgroundPanel:UpdateClientArea()
 		end
 	end
 	
@@ -639,22 +621,53 @@ local function GetBackground(parent)
 		if newVisible == visible then
 			return
 		end
-		visible = newVisibility
+		visible = newVisible
 		if visible then
-			panel:SetVisibility(true)
-			buttonsPanel:BringToFront()
+			backgroundPanel:SetVisibility(true)
+			backgroundPanel:SendToBack()
+			externalFunctions.UpdateSize()
 		else
-			panel:SetVisibility(false)
+			backgroundPanel:SetVisibility(false)
 		end
 	end
 	
 	function externalFunctions.SetOpacity(newOpacity)
 		opacity = newOpacity
-		panel.backgroundColor[4] = opacity
-		panel:Invalidate()
-		externalFunctions.UpdateSize(buttonCount)
+		backgroundPanel.backgroundColor[4] = opacity
+		backgroundPanel:Invalidate()
+	end
+	
+	function externalFunctions.UpdateSpecShowMode(newSpecShowMode)
+		if newSpecShowMode == specShowMode then
+			return
+		end
+		specShowMode = newSpecShowMode
+		
+		if options.fancySkinning.value ~= "panel" then
+			externalFunctions.SetSkin(options.fancySkinning.value)
+		end
+		
+		externalFunctions.UpdateSize()
+		if specShowMode then
+			externalFunctions.SetVisible(specShow)
+			mainWindow.padding[3] = 0
+			mainWindow:Invalidate()
+		else
+			mainWindow.padding[3] = -1
+			mainWindow:Invalidate()
+		end
 	end
 		
+	function externalFunctions.UpdateSpecSpace(newSpecShow)
+		if newSpecShow == specShow then
+			return
+		end
+		specShow = newSpecShow
+		if specShowMode then
+			externalFunctions.SetVisible(specShow)
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -668,14 +681,16 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 	local hotkeyLabel, buildProgress, repeatImage, healthBar, hotkeyText, bottomLabel
 	
 	-- Controls
-	local button
-	if reuseButtons and #reuseButtons > 0 then
-		button = reuseButtons[#reuseButtons]
-		button.backgroundColor = backgroundColor
-		button:ClearChildren()
-		button:Invalidate()
-		reuseButtons[#reuseButtons] = nil
-		button.OnClick = {	
+	local button = Button:New{
+		parent = parent,
+		x = "5%", -- Makes the button relative
+		y = "5%",
+		right = "5%",
+		bottom = "5%",
+		caption = '',
+		padding = {1,1,1,1},
+		backgroundColor = backgroundColor,
+		OnClick = {	
 			function (self, x, y, mouse)
 				local _, _, meta, shift = Spring.GetModKeyState()
 				if meta then
@@ -685,30 +700,8 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 				end
 				onClick(mouse)
 			end
-		}
-	else
-		button = Button:New{
-			parent = parent,
-			x = "5%", -- Makes the button relative
-			y = "5%",
-			right = "5%",
-			bottom = "5%",
-			caption = '',
-			padding = {1,1,1,1},
-			backgroundColor = backgroundColor,
-			OnClick = {	
-				function (self, x, y, mouse)
-					local _, _, meta, shift = Spring.GetModKeyState()
-					if meta then
-						WG.crude.OpenPath(options_path)
-						WG.crude.ShowMenu()
-						return true
-					end
-					onClick(mouse)
-				end
-			},
-		}
-	end
+		},
+	}
 	
 	local image = Image:New {
 		parent = button,
@@ -914,13 +907,13 @@ local function GetNewButton(parent, onClick, category, index, backgroundColor, i
 		return category, index
 	end
 	
-	-- Destruction
-	function externalFunctions.Destroy(doDispose)
-		if doDispose then
-			button:Dispose()
-		else
-			reuseButtons[#reuseButtons + 1] = button
-		end
+	function externalFunctions.SetImageVisible(newVisible)
+		image:SetVisibility(newVisible)
+	end
+	
+	-- Desctruction
+	function externalFunctions.Destroy()
+		button:Dispose()
 		button = nil
 	end
 	
@@ -996,6 +989,7 @@ local function GetFactoryButton(parent, unitID, unitDefID, categoryOrder)
 		unitID = unitID,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1126,6 +1120,7 @@ local function GetCommanderButton(parent, unitID, unitDefID, categoryOrder)
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton(dt)
@@ -1215,6 +1210,7 @@ local function GetConstructorButton(parent)
 		MoveDown = button.MoveDown,
 		GetOrder = button.GetOrder,
 		UpdatePosition = button.UpdatePosition,
+		SetImageVisible = button.SetImageVisible,
 	}
 	
 	function externalFunctions.UpdateButton()
@@ -1260,9 +1256,7 @@ end
 -- Unit List Handler
 
 local function GetButtonListHandler(buttonBackground)
-	
-	local buttonHolder = buttonBackground.GetButtonsHolder()
-	
+
 	local buttons = {}
 	local buttonMap = {}
 	local buttonList = {}
@@ -1348,13 +1342,20 @@ local function GetButtonListHandler(buttonBackground)
 	function externalFunctions.DeleteButtons()
 		for i = 1, buttonCount do
 			local button = buttons[buttonList[i]]
-			button.Destroy(false)
+			button.Destroy()
 		end
 		buttons = {}
 	    buttonMap = {}
 	    buttonList = {}
 	    buttonCount = 0
 		buttonBackground.UpdateSize(buttonCount)
+	end
+	
+	function externalFunctions.SetImagesVisible(newVisible)
+		for i = 1, buttonCount do
+			local buttonID = buttonList[i]
+			buttons[buttonID].SetImageVisible(newVisible)
+		end
 	end
 	
 	function externalFunctions.Destroy()
@@ -1520,23 +1521,20 @@ local function InitializeControls()
 	
 	local windowY = bottom - BUTTON_HEIGHT
 	
-	local specChanges = Spring.GetSpectatingState() and options.showCoreSelector.value == 'specSpace'
-	
 	mainWindow = Window:New{
-		padding = {-1, 0, (specChanges and 0) or -1, -1},
+		padding = {-1, 0, -1, -1},
 		itemMargin = {0, 0, 0, 0},
-		dockable = true,
 		name = "selector_window",
 		x = 0, 
 		y = windowY,
 		width  = integralWidth,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
+		dockable  = true,
 		draggable = false,
+		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		resizable = false,
-		dragUseGrip = false,
 		minWidth = 32,
 		minHeight = 32,
 		color = {0,0,0,0},
@@ -1562,29 +1560,27 @@ local function InitializeControls()
 	buttonHolder.OnResize[#buttonHolder.OnResize + 1] = ButtonHolderResize
 	
 	InitializeUnits()
-	hidden = false
 	CheckHide()
 end
 
 local function ClearData()
-	buttonList.DeleteButtons()
 	factoryList = {}
 	commanderList = {}
 	idleCons = {}
-	
 	wantUpdateCons = false
 	readyUntaskedBombers = {}
+	
 	idleConCount = 0
 	factoryIndex = 1
 	commanderIndex = 1
-
-	InitializeUnits()
-	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
 	
-	for i = 1, #reuseButtons do
-		reuseButtons[i]:Dispose()
-	end
-	reuseButtons = {}
+	oldButtonList = buttonList
+	
+	buttonList = GetButtonListHandler(mainBackground)
+	buttonList.AddButton(CONSTRUCTOR_BUTTON_ID, GetConstructorButton(buttonHolder))
+	InitializeUnits()
+	
+	buttonList.SetImagesVisible(false)
 end
 
 -------------------------------------------------------------------------------
@@ -1594,8 +1590,8 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetSpecSpaceVisible(newVisible)
-	if panelHidden and mainBackground then
-		mainBackground.SetVisible(newVisible)
+	if mainBackground then
+		mainBackground.UpdateSpecSpace(newVisible)
 	end
 end
 
@@ -1722,6 +1718,11 @@ end
 
 local timer = 0
 function widget:Update(dt)
+	if oldButtonList then
+		oldButtonList.Destroy()
+		buttonList.SetImagesVisible(true)
+		oldButtonList = nil
+	end
 	if myTeamID ~= Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		ClearData()

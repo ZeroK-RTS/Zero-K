@@ -2835,7 +2835,7 @@ function widget:Initialize()
 		name  = 'selections',
 		color = {0, 0, 0, 0},
 		x = x,
-		y = screenHeight-height,
+		y = screenHeight - height,
         width = 450,
 		height = height,
 		dockable = true,
