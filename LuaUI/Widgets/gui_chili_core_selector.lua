@@ -120,55 +120,28 @@ for name in pairs(exceptionList) do
 	end
 end
 
-local hidden = false
-local panelHidden = false
-
-local function UpdateBackground(showPanel)
-	if showPanel and panelHidden then
-		panelHidden = false
-		UpdateBackgroundSkin()
-		UpdateBackgroundSize()
-		
-		background.SetVisible(true)
-		
-		mainWindow.padding[3] = -1
-		mainWindow:UpdateClientArea()
-	elseif not showPanel and not panelHidden then
-		panelHidden = true
-		UpdateBackgroundSkin()
-		UpdateBackgroundSize()
-		
-		background.SetVisible(WG.IntegralVisible)
-		
-		mainWindow.padding[3] = 0
-		mainWindow:UpdateClientArea()
-	end
-end
-
 local function CheckHide()
 	local spec = Spring.GetSpectatingState()
-	local shouldShow, showPanel
+	local showButtons, showBackground
 	if options.showCoreSelector.value == 'always' then
-		showPanel = true
-		shouldShow = true
+		showBackground = true
+		showButtons = true
 	elseif options.showCoreSelector.value == 'specSpace' then
-		showPanel = not spec
-		shouldShow = true
+		showBackground = true
+		showButtons = not spec
 	elseif options.showCoreSelector.value == 'specHide' then
-		showPanel = true
-		shouldShow = not spec
+		showBackground = not spec
+		showButtons = not spec
 	else
-		showPanel = true
-		shouldShow = false
+		showBackground = false
+		showButtons = false
 	end
 	
-	if shouldShow and hidden then
-		hidden = false
-	elseif not shouldShow and not hidden then
-		hidden = true
+	buttonHolder:SetVisibility(showButtons)
+	if showBackground == showButtons then
+		mainBackground.SetVisible(showBackground)
 	end
-	
-	--UpdateBackground(showPanel)
+	mainBackground.UpdateSpecShowMode(showBackground ~= showButtons)
 end
 
 function widget:PlayerChanged()
@@ -557,7 +530,8 @@ local function GetBackground(parent)
 	local buttonCount = 0
 	local opacity = options.background_opacity.value
 	local visible = true
-	local buttonPanelVisible = true
+	local specShowMode = false
+	local specShow = false
 	
 	local buttonsPanel = Control:New{
 		x = 0,
@@ -569,9 +543,12 @@ local function GetBackground(parent)
 		parent = parent,
 	}
 	
-	local panel = Panel:New{
+	local backgroundPanel = Panel:New{
+		name = "core_backgroundPanel",
 		classname = options.fancySkinning.value,
 		x = "5%",
+		draggable = false,
+		resizable = false,
 		backgroundColor = {1, 1, 1, opacity},
 		parent = parent,
 	}
@@ -586,24 +563,25 @@ local function GetBackground(parent)
 		local currentSkin = Chili.theme.skin.general.skinName
 		local skin = Chili.SkinHandler.GetSkin(currentSkin)
 
+		if specShowMode and className ~= "panel" then
+			className = "panel_0100"
+		end
+		
 		local newClass = skin.panel
 		if className and skin[className] then
 			newClass = skin[className]
 		end
-
-		panel.classname = className
-		panel.tiles = newClass.tiles
-		panel.TileImageFG = newClass.TileImageFG
-		panel.backgroundColor = newClass.backgroundColor
-		panel.TileImageBK = newClass.TileImageBK
-		panel:Invalidate()
+		
+		backgroundPanel.classname = className
+		backgroundPanel.tiles = newClass.tiles
+		backgroundPanel.TileImageFG = newClass.TileImageFG
+		backgroundPanel.backgroundColor = newClass.backgroundColor
+		backgroundPanel.TileImageBK = newClass.TileImageBK
+		backgroundPanel:Invalidate()
 	end
 
-	function externalFunctions.UpdateSize(newButtonCount, layoutChange)
-		buttonCount = newButtonCount
-		if opacity == 0 or not visible then
-			return
-		end
+	function externalFunctions.UpdateSize(newButtonCount)
+		buttonCount = newButtonCount or buttonCount
 		
 		local buttons = math.min(buttonCountLimit, math.max(buttonCount, options.minButtonSpaces.value))
 		
@@ -614,28 +592,28 @@ local function GetBackground(parent)
 			size = size + options.horPaddingRight.value + options.horPaddingLeft.value
 		end
 		
-		if panelHidden and size < options.specSpaceOverride.value then
+		if specShowMode then
 			size = options.specSpaceOverride.value
 		end
 		
 		if options.vertical.value then
-			panel._relativeBounds.left = 0
-			panel._relativeBounds.right = 0
-			panel._relativeBounds.top = nil
-			panel._givenBounds.top = nil
-			panel._relativeBounds.bottom = 0
-			panel._relativeBounds.width = nil
-			panel._relativeBounds.height = size
-			panel:UpdateClientArea()
+			backgroundPanel._relativeBounds.left = 0
+			backgroundPanel._relativeBounds.right = 0
+			backgroundPanel._relativeBounds.top = nil
+			backgroundPanel._givenBounds.top = nil
+			backgroundPanel._relativeBounds.bottom = 0
+			backgroundPanel._relativeBounds.width = nil
+			backgroundPanel._relativeBounds.height = size
+			backgroundPanel:UpdateClientArea()
 		else
-			panel._relativeBounds.left = 0
-			panel._relativeBounds.right = nil
-			panel._relativeBounds.top = 0
-			panel._givenBounds.top = 0
-			panel._relativeBounds.bottom = 0
-			panel._relativeBounds.width = size
-			panel._relativeBounds.height = nil
-			panel:UpdateClientArea()
+			backgroundPanel._relativeBounds.left = 0
+			backgroundPanel._relativeBounds.right = nil
+			backgroundPanel._relativeBounds.top = 0
+			backgroundPanel._givenBounds.top = 0
+			backgroundPanel._relativeBounds.bottom = 0
+			backgroundPanel._relativeBounds.width = size
+			backgroundPanel._relativeBounds.height = nil
+			backgroundPanel:UpdateClientArea()
 		end
 	end
 	
@@ -643,22 +621,53 @@ local function GetBackground(parent)
 		if newVisible == visible then
 			return
 		end
-		visible = newVisibility
+		visible = newVisible
 		if visible then
-			panel:SetVisibility(true)
-			buttonsPanel:BringToFront()
+			backgroundPanel:SetVisibility(true)
+			backgroundPanel:SendToBack()
+			externalFunctions.UpdateSize()
 		else
-			panel:SetVisibility(false)
+			backgroundPanel:SetVisibility(false)
 		end
 	end
 	
 	function externalFunctions.SetOpacity(newOpacity)
 		opacity = newOpacity
-		panel.backgroundColor[4] = opacity
-		panel:Invalidate()
-		externalFunctions.UpdateSize(buttonCount)
+		backgroundPanel.backgroundColor[4] = opacity
+		backgroundPanel:Invalidate()
+	end
+	
+	function externalFunctions.UpdateSpecShowMode(newSpecShowMode)
+		if newSpecShowMode == specShowMode then
+			return
+		end
+		specShowMode = newSpecShowMode
+		
+		if options.fancySkinning.value ~= "panel" then
+			externalFunctions.SetSkin(options.fancySkinning.value)
+		end
+		
+		externalFunctions.UpdateSize()
+		if specShowMode then
+			externalFunctions.SetVisible(specShow)
+			mainWindow.padding[3] = 0
+			mainWindow:Invalidate()
+		else
+			mainWindow.padding[3] = -1
+			mainWindow:Invalidate()
+		end
 	end
 		
+	function externalFunctions.UpdateSpecSpace(newSpecShow)
+		if newSpecShow == specShow then
+			return
+		end
+		specShow = newSpecShow
+		if specShowMode then
+			externalFunctions.SetVisible(specShow)
+		end
+	end
+	
 	return externalFunctions
 end
 
@@ -1512,23 +1521,20 @@ local function InitializeControls()
 	
 	local windowY = bottom - BUTTON_HEIGHT
 	
-	local specChanges = Spring.GetSpectatingState() and options.showCoreSelector.value == 'specSpace'
-	
 	mainWindow = Window:New{
-		padding = {-1, 0, (specChanges and 0) or -1, -1},
+		padding = {-1, 0, -1, -1},
 		itemMargin = {0, 0, 0, 0},
-		dockable = true,
 		name = "selector_window",
 		x = 0, 
 		y = windowY,
 		width  = integralWidth,
 		height = BUTTON_HEIGHT,
 		parent = Chili.Screen0,
+		dockable  = true,
 		draggable = false,
+		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		resizable = false,
-		dragUseGrip = false,
 		minWidth = 32,
 		minHeight = 32,
 		color = {0,0,0,0},
@@ -1554,7 +1560,6 @@ local function InitializeControls()
 	buttonHolder.OnResize[#buttonHolder.OnResize + 1] = ButtonHolderResize
 	
 	InitializeUnits()
-	hidden = false
 	CheckHide()
 end
 
@@ -1585,8 +1590,8 @@ end
 local externalFunctions = {}
 
 function externalFunctions.SetSpecSpaceVisible(newVisible)
-	if panelHidden and mainBackground then
-		mainBackground.SetVisible(newVisible)
+	if mainBackground then
+		mainBackground.UpdateSpecSpace(newVisible)
 	end
 end
 

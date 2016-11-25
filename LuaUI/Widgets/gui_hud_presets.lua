@@ -611,7 +611,7 @@ local function SetupMinimapLeftPreset()
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
 	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
-	--WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat
 	local chatWidth = math.floor(screenWidth/5)
@@ -832,7 +832,7 @@ local function SetupMinimapRightPreset()
 	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
 
 	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
-	--WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat
 	local chatWidth = math.floor(screenWidth/5)
@@ -1416,6 +1416,7 @@ options = {
 			{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
 			{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
 			{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
+			{key = 'none', name = 'None', desc = "No preset.",},
 		},
 		noHotkey = true,
 		OnChange = UpdateInterfacePreset
