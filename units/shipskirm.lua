@@ -102,7 +102,7 @@ unitDef = {
       impulseFactor           = 0.4,
       impactOnly              = false,
       interceptedByShieldType = 2,
-      model                   = [[wep_m_havoc.s3o]],
+      model                   = [[hobbes.s3o]],
       noSelfDamage            = true,
 
       range                   = 650,
@@ -112,22 +112,22 @@ unitDef = {
       soundHit                = [[explosion/ex_small13]],
       soundHitVolume          = 2.5,
 
-      soundStart              = [[weapon/missile/missile_fire11]],
+	  soundStart              = [[weapon/missile/rapid_rocket_fire]],
       soundStartVolume        = 2.5,
 
-      startVelocity           = 300,
+      startVelocity           = 400,
       tolerance               = 9000,
       tracks                  = true,
       trajectoryHeight        = 0.7,
 
       turnRate                = 6000,
       turret                  = true,
-      weaponAcceleration      = 70,
+      weaponAcceleration      = 300,
 
       weaponTimer             = 8,
       weaponType              = [[MissileLauncher]],
 
-      weaponVelocity          = 500,
+      weaponVelocity          = 750,
     },
 
   },
