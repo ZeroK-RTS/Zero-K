@@ -646,6 +646,7 @@ local behaviourConfig = {
 	["shipriot"] = {
 		skirms = {}, 
 		swarms = allSurface, 
+		flees = {},
 		--flees = subfleeables,
 		
 		localJinkOrder = false,
