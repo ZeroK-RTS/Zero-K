@@ -352,12 +352,16 @@ function script.QueryWeapon(num)
 end
 
 local function AimRifle(heading, pitch, isDgun)
-	if isDgun then dgunning = true end
-	--[[
-	if dgunning and not isDgun then
-		return false
+	if isDgun then
+		dgunning = true
 	end
-	]]--
+	
+	if pitch < -0.75 then
+		Move(flare, z_axis, -16)
+	else
+		Move(flare, z_axis, 0)
+	end
+	
 	--torso	
 	Turn(torso, x_axis, math.rad(5), math.rad(250))
 	Turn(torso, y_axis, 0, math.rad(250))
