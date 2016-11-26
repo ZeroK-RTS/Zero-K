@@ -53,6 +53,8 @@ local col_reserve = {0, 0, 0, 0}
 
 local window
 
+local fancySkinLeft, fancySkinRight
+
 local metalWarningPanel
 local energyWarningPanel
 
@@ -166,6 +168,22 @@ local function option_recreateWindow()
 	CreateWindow(x,y,w,h)
 end
 
+local function ApplySkin(skinWindow, className)
+	local currentSkin = Chili.theme.skin.general.skinName
+	local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	
+	local newClass = skin.panel
+	if className and skin[className] then
+		newClass = skin[className]
+	end
+	
+	skinWindow.tiles = newClass.tiles
+	skinWindow.TileImageFG = newClass.TileImageFG
+	skinWindow.backgroundColor = newClass.backgroundColor
+	skinWindow.TileImageBK = newClass.TileImageBK
+	skinWindow:Invalidate()
+end
+
 local function option_colourBlindUpdate()
 	positiveColourStr = (options.colourBlind.value and YellowStr) or GreenStr
 	negativeColourStr = (options.colourBlind.value and BlueStr) or RedStr
@@ -261,31 +279,27 @@ options = {
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
-		path = minimap_path,
+		value = 'panel',
+		items = {
+			-- Item keys correspond to what the metal panel should look like.
+			{key = 'panel', name = 'None'},
+			{key = 'panel_2021', name = 'Flush',},
+			{key = 'panel_2011', name = 'Not Flush',},
+		},
 		OnChange = function (self)
-			local currentSkin = Chili.theme.skin.general.skinName
-			local skin = Chili.SkinHandler.GetSkin(currentSkin)
-			
-			local newClass = skin.panel
-			if self.value and skin.panel_2021 then
-				newClass = skin.panel_2021
+			if self.value == "panel_2011" then
+				fancySkinLeft = "panel_2011"
+				fancySkinRight = "panel_1021"
+			else
+				fancySkinLeft = self.value
+				fancySkinRight = self.value
 			end
 			
-			window_metal.tiles = newClass.tiles
-			window_metal.TileImageFG = newClass.TileImageFG
-			window_metal.backgroundColor = newClass.backgroundColor
-			window_metal.TileImageBK = newClass.TileImageBK
-			window_metal:Invalidate()
-			
-			window_energy.tiles = newClass.tiles
-			window_energy.TileImageFG = newClass.TileImageFG
-			window_energy.backgroundColor = newClass.backgroundColor
-			window_energy.TileImageBK = newClass.TileImageBK
-			window_energy:Invalidate()
-		end
+			ApplySkin(window_metal, fancySkinLeft)
+			ApplySkin(window_energy, fancySkinRight)
+		end,
+		advanced = true,
+		noHotkey = true,
 	}
 }
 
@@ -914,7 +928,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// METAL
 	
 	window_metal = Chili.Panel:New{
-		classname = (options.fancySkinning.value and "panel_2021") or nil,
+		classname = fancySkinLeft,
 		parent = window_main_display,
 		name = "Metal",
 		y      = 0,
@@ -1052,7 +1066,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	--// ENERGY
 
 	window_energy = Chili.Panel:New{
-		classname = (options.fancySkinning.value and "panel_2021") or nil,
+		classname = fancySkinRight,
 		parent = window_main_display,
 		name = "Energy",
 		y      = 0,

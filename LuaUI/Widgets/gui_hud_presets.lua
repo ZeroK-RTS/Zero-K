@@ -28,6 +28,7 @@ local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Se
 local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
+local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
@@ -44,17 +45,25 @@ end
 ----------------------------------------------------
 -- Enabled Skinning
 
+local fancySkinOverride = {}
+
+local SKIN_DEFAULT = {}
+local SKIN_FLUSH = {
+	epic = "panel_0001",
+	global = "panel_0001",
+}
+
 local function SetFancySkin()
 	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
 	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_0120")
-	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
-	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
-	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2021")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_0001")
 	
-	WG.crude.SetMenuSkinClass("panel_0011_small")
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0021")
 end
 
 local function SetFancySkinBottomLeft()
@@ -63,11 +72,11 @@ local function SetFancySkinBottomLeft()
 	WG.SetWidgetOption(integralName, integralPath, "flushLeft", true)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_2100")
-	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
-	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
-	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2011")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_1011")
 	
-	WG.crude.SetMenuSkinClass("panel_0011_small")
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0011_small")
 end
 
 local function SetFancySkinBottomRight()
@@ -76,11 +85,11 @@ local function SetFancySkinBottomRight()
 	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_0110")
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_0120")
-	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", true)
-	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
-	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2011")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_1011")
 	
-	WG.crude.SetMenuSkinClass("panel_0011_small")
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0011_small")
 end
 
 local function SetNewOptions()
@@ -113,6 +122,8 @@ local function SetNewOptions()
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.95)
 	
 	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.95)
+	
+	WG.SetWidgetOption(dockName, dockPath, "dockEnabledPanels", false)
 end
 
 ----------------------------------------------------
@@ -124,9 +135,9 @@ local function SetBoringSkin()
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel")
 	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel")
-	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", false)
-	WG.SetWidgetOption(econName, econPath, "fancySkinning", false)
-	WG.SetWidgetOption(specName, specPath, "fancySkinning", false)
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel")
 	
 	WG.crude.SetMenuSkinClass("panel")
 end
@@ -165,6 +176,8 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
 	
 	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.6)
+	
+	WG.SetWidgetOption(dockName, dockPath, "dockEnabledPanels", true)
 end
 
 ----------------------------------------------------
@@ -341,6 +354,7 @@ local function SetupNewPreset()
 	
 	Spring.SendCommands("resbar 0")
 	
+	fancySkinOverride = {}
 	SetFancySkin()
 	needToCallFunction = SetFancySkin
 	
@@ -523,6 +537,77 @@ end
 ----------------------------------------------------
 -- New with Minimap Left
 ----------------------------------------------------
+
+local function SetupNewUITop()
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	local sideHeight = 30
+	local flushTop = (screenWidth <= 1650)
+	
+	-- Resource Bar
+	local resourceBarWidth = math.min(screenWidth - 700, 660)
+	local resourceBarHeight = 100
+	
+	-- Menu
+	local menuWidth, globalWidth
+	if flushTop then
+		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2))
+		globalWidth = screenWidth - resourceBarWidth - menuWidth
+	else
+		menuWidth = math.floor((screenWidth - resourceBarWidth)/2)
+		if menuWidth > 440 then
+			menuWidth = 440
+		elseif menuWidth > 380 then
+			menuWidth = 380
+		else
+			menuWidth = 350
+		end
+		globalWidth = menuWidth
+	end
+	
+	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
+	
+	-- Set Window Positions
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		resourceBarHeight
+	)
+	
+	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		50
+	)
+	
+	WG.SetWindowPosAndSize("epicmenubar",
+		screenWidth - menuWidth - 1,
+		0,
+		menuWidth,
+		sideHeight
+	)
+	
+	-- Global build buttons
+	WG.SetWindowPosAndSize("globalCommandsWindow",
+		0,
+		0,
+		globalWidth,
+		sideHeight
+	)
+	
+	-- Console
+	local consoleWidth = 380
+	local consoleHeight = screenHeight * 0.20
+	WG.SetWindowPosAndSize("ProConsole",
+		screenWidth - consoleWidth,
+		sideHeight,
+		consoleWidth,
+		consoleHeight
+	)
+end
+
 local function SetupMinimapLeftPreset()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
@@ -548,13 +633,18 @@ local function SetupMinimapLeftPreset()
 	
 	Spring.SendCommands("resbar 0")
 	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	if screenWidth <= 1650 then
+		fancySkinOverride = SKIN_FLUSH
+	else
+		fancySkinOverride = SKIN_DEFAULT
+	end
 	SetFancySkinBottomLeft()
 	needToCallFunction = SetFancySkinBottomLeft
 	
 	SetNewOptions()
-	
-	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
@@ -685,60 +775,7 @@ local function SetupMinimapLeftPreset()
 		500
 	)
 	
-	------------------------------------------------------------------------
-	------------------------------------------------------------------------
-	-- Top of the UI
-	
-	local menuWidth = 380
-	local menuHeight = 50
-	
-	-- Resource Bar
-	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
-	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
-	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
-		resourceBarX,
-		0,
-		resourceBarWidth,
-		resourceBarHeight
-	)
-	
-	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
-		resourceBarX,
-		0,
-		resourceBarWidth,
-		menuHeight
-	)
-	
-	-- Menu
-	if screenWidth - (resourceBarX + resourceBarWidth) > menuWidth then
-		menuWidth = screenWidth - (resourceBarX + resourceBarWidth)
-	end
-	WG.SetWindowPosAndSize("epicmenubar",
-		screenWidth - menuWidth,
-		0,
-		menuWidth,
-		menuHeight
-	)
-	
-	-- Global build buttons
-	WG.SetWindowPosAndSize("globalCommandsWindow",
-		0,
-		0,
-		resourceBarX,
-		menuHeight
-	)
-	
-	-- Console
-	local consoleWidth = 380
-	local consoleHeight = screenHeight * 0.20
-	WG.SetWindowPosAndSize("ProConsole",
-		screenWidth - consoleWidth,
-		menuHeight,
-		consoleWidth,
-		consoleHeight
-	)
-
+	SetupNewUITop()
 end
 
 ----------------------------------------------------
@@ -769,13 +806,18 @@ local function SetupMinimapRightPreset()
 	
 	Spring.SendCommands("resbar 0")
 	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	if screenWidth <= 1650 then
+		fancySkinOverride = SKIN_FLUSH
+	else
+		fancySkinOverride = SKIN_DEFAULT
+	end
 	SetFancySkinBottomRight()
 	needToCallFunction = SetFancySkinBottomRight
 	
 	SetNewOptions()
-	
-	-- Settings for window positions and settings.
-	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
 	------------------------------------------------------------------------
 	------------------------------------------------------------------------
@@ -906,60 +948,7 @@ local function SetupMinimapRightPreset()
 		500
 	)
 	
-	------------------------------------------------------------------------
-	------------------------------------------------------------------------
-	-- Top of the UI
-	
-	local menuWidth = 380
-	local menuHeight = 50
-	
-	-- Resource Bar
-	local resourceBarWidth = math.min(screenWidth - 700, 660)
-	local resourceBarHeight = 100
-	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
-	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
-		resourceBarX,
-		0,
-		resourceBarWidth,
-		resourceBarHeight
-	)
-	
-	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
-		resourceBarX,
-		0,
-		resourceBarWidth,
-		menuHeight
-	)
-	
-	-- Menu
-	if screenWidth - (resourceBarX + resourceBarWidth) > menuWidth then
-		menuWidth = screenWidth - (resourceBarX + resourceBarWidth)
-	end
-	WG.SetWindowPosAndSize("epicmenubar",
-		screenWidth - menuWidth,
-		0,
-		menuWidth,
-		menuHeight
-	)
-	
-	-- Global build buttons
-	WG.SetWindowPosAndSize("globalCommandsWindow",
-		0,
-		0,
-		resourceBarX,
-		menuHeight
-	)
-	
-	-- Console
-	local consoleWidth = 380
-	local consoleHeight = screenHeight * 0.20
-	WG.SetWindowPosAndSize("ProConsole",
-		screenWidth - consoleWidth,
-		menuHeight,
-		consoleWidth,
-		consoleHeight
-	)
-
+	SetupNewUITop()
 end
 
 ----------------------------------------------------

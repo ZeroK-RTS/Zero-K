@@ -117,17 +117,20 @@ options = {
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
-		path = minimap_path,
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_0001', name = 'Flush',},
+			{key = 'panel_1001_small', name = 'Top Left',},
+		},
 		OnChange = function (self)
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
+			local className = self.value
 			local newClass = skin.panel
-			if self.value and skin.panel_2001 then
-				newClass = skin.panel_2001
+			if skin[className] then
+				newClass = skin[className]
 			end
 			
 			contentHolder.tiles = newClass.tiles
@@ -135,7 +138,9 @@ options = {
 			contentHolder.backgroundColor = newClass.backgroundColor
 			contentHolder.TileImageBK = newClass.TileImageBK
 			contentHolder:Invalidate()
-		end
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 }
 
@@ -293,7 +298,8 @@ local function InitializeControls()
 		y         = 0,
 		width     = 370,
 		height    = 50,
-		minHeight = 50,
+		minWidth  = 200,
+		minHeight = 30,
 		dockable  = true,
 		draggable = false,
 		resizable = false,
@@ -305,7 +311,7 @@ local function InitializeControls()
 	}
 	
 	contentHolder = Panel:New{
-		--classname = "panel2220",
+		classname = options.fancySkinning.value,
 		x = 0,
 		y = 0,
 		right = 0,

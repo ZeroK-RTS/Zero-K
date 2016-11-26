@@ -2447,6 +2447,18 @@ local function GetMainPanel(parent, width, height)
 	--	},
 	--},
 	
+	-- Game Logo
+	--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
+	--
+	--Button:New{
+	--	name= 'tweakGuiButton',
+	--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+	--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+	--	children = {
+	--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+	--	},
+	--},
+	
 	local mainPanel = Panel:New{
 		y = 0,
 		right = 0, 
@@ -2517,7 +2529,7 @@ local function MakeMenuBar()
 		dockable = true,
 		backgroundColor = color.empty,
 		color = color.empty,
-		padding = {0,0,0,0},
+		padding = {-1,0,0,0},
 		parent = screen0,
 		OnResize = {
 			function (obj)

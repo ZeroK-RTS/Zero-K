@@ -809,7 +809,6 @@ MakeMinimapWindow = function()
 	if options.fancySkinning.value then
 		options.fancySkinning.OnChange(options.fancySkinning)
 	end
-
 end
 
 local leftClickDraggingCamera = false

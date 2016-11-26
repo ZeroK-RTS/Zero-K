@@ -36,9 +36,9 @@ options = {
 		noHotkey = true,
 	},
 	pausemusic = {
-		name='Pause Music',
-		type='bool',
-		value=false,
+		name = 'Pause Music',
+		type = 'bool',
+		value = false,
 		desc = "Music pauses with game",
 		noHotkey = true,
 	},
