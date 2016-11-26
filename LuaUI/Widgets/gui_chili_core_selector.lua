@@ -577,7 +577,7 @@ local function GetBackground(parent)
 		backgroundPanel.classname = className
 		backgroundPanel.tiles = newClass.tiles
 		backgroundPanel.TileImageFG = newClass.TileImageFG
-		backgroundPanel.backgroundColor = newClass.backgroundColor
+		--backgroundPanel.backgroundColor = newClass.backgroundColor
 		backgroundPanel.TileImageBK = newClass.TileImageBK
 		backgroundPanel:Invalidate()
 	end

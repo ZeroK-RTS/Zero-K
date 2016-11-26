@@ -2857,7 +2857,7 @@ function widget:Initialize()
 		
 		panel_background.tiles = newClass.tiles
 		panel_background.TileImageFG = newClass.TileImageFG
-		panel_background.backgroundColor = newClass.backgroundColor
+		--panel_background.backgroundColor = newClass.backgroundColor
 		panel_background.TileImageBK = newClass.TileImageBK
 		panel_background:Invalidate()
 	end

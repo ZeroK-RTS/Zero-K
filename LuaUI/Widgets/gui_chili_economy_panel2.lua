@@ -179,7 +179,7 @@ local function ApplySkin(skinWindow, className)
 	
 	skinWindow.tiles = newClass.tiles
 	skinWindow.TileImageFG = newClass.TileImageFG
-	skinWindow.backgroundColor = newClass.backgroundColor
+	--skinWindow.backgroundColor = newClass.backgroundColor
 	skinWindow.TileImageBK = newClass.TileImageBK
 	skinWindow:Invalidate()
 end

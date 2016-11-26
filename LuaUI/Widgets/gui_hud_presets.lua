@@ -150,10 +150,10 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", 0)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", 0)
-	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", 50)
+	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", 55)
 	WG.SetWidgetOption(coreName, corePath, "minButtonSpaces", 0)
 	WG.SetWidgetOption(coreName, corePath, "minSize", 0)
-	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specHidden")
+	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specHide")
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", 0)
 	WG.SetWidgetOption(coreName, corePath, "vertical", false)
 	
@@ -1346,18 +1346,13 @@ end
 local firstUpdate = true
 
 local presetFunction = {
-	default = SetupDefaultPreset,
+	default2 = SetupDefaultPreset,
 	new = SetupNewPreset, 
 	minimapLeft = SetupMinimapLeftPreset,
 	minimapRight = SetupMinimapRightPreset,
 	crafty = SetupCraftyPreset,
 	ensemble = SetupEnsemblePreset,
 	westwood = SetupWestwoodPreset,
-}
-
-local alwaysResetOnStart = {
-	minimapLeft = true,
-	minimapRight = true,
 }
 
 local function UpdateInterfacePreset(self)
@@ -1398,14 +1393,14 @@ options = {
 		type = 'radioButton',
 		value = 'default',
 		items = {
-			{key = 'default', name = 'Default', desc = "The default UI.",},
+			{key = 'default2', name = 'Default', desc = "The default UI.",},
 			{key = 'new', name = 'New UI', desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",},
 			{key = 'minimapLeft', name = 'New UI Minimap Left'},
 			{key = 'minimapRight', name = 'New UI Minimap Right'},
 			{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
 			{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
 			{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
-			{key = 'none', name = 'None', desc = "No preset.",},
+			{key = 'default', name = 'None', desc = "No preset. Select this if you want to modify your UI and have the changes rememberd on subsequent launches.",},
 		},
 		noHotkey = true,
 		OnChange = UpdateInterfacePreset
@@ -1420,28 +1415,31 @@ local UPDATE_FREQUENCY = 5
 local oldWidth = 0
 local oldHeight = 0
 
+local callCount = 0
+
 function widget:Update(dt)
 	if needToCallFunction then
-		needToCallFunction()	
-		needToCallFunction = nil
+		needToCallFunction()
+		callCount = callCount + 1
+		if callCount > 4 then
+			needToCallFunction = nil
+			callCount = 0
+		end
+	end
+	
+	if options.setToDefault.value then
+		options.interfacePreset.value = "default2"
+		options.interfacePreset.OnChange(options.interfacePreset)
+		options.setToDefault.value = false
 	end
 	
 	if firstUpdate then
 		firstUpdate = false
 		
-		if options.setToDefault.value then
-			-- This is where the defaults are set.
-			SetupDefaultPreset()
-			options.interfacePreset.value = "default"
-			options.setToDefault.value = false
-		end
-		
-		if options.maintainDefaultUI.value or alwaysResetOnStart[options.interfacePreset.value] then
-			local screenWidth, screenHeight = Spring.GetWindowGeometry()
-			oldWidth = screenWidth
-			oldHeight = screenHeight
-			UpdateInterfacePreset(options.interfacePreset)
-		end
+		local screenWidth, screenHeight = Spring.GetWindowGeometry()
+		oldWidth = screenWidth
+		oldHeight = screenHeight
+		UpdateInterfacePreset(options.interfacePreset)
 	end
 	
 	if options.maintainDefaultUI.value  then

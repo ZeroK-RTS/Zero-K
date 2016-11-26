@@ -137,7 +137,7 @@ options = {
 			
 			contentHolder.tiles = newClass.tiles
 			contentHolder.TileImageFG = newClass.TileImageFG
-			contentHolder.backgroundColor = newClass.backgroundColor
+			--contentHolder.backgroundColor = newClass.backgroundColor
 			contentHolder.TileImageBK = newClass.TileImageBK
 			contentHolder:Invalidate()
 		end,

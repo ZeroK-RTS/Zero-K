@@ -262,7 +262,7 @@ options = {
 			
 			playerWindow.mainPanel.tiles = newClass.tiles
 			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
-			playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
+			--playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
 			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
 			playerWindow.mainPanel:Invalidate()
 		end,
