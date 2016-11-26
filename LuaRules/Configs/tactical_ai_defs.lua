@@ -48,7 +48,7 @@ for name,data in pairs(UnitDefNames) do
 		else
 			unarmedLand[data.id] = true
 		end
-		if not name == "shipsubraider" or name == "amphraider3" or name == "amphriot" then
+		if not name == "subraider" or name == "amphraider3" or name == "amphriot" then
 			allSurface[data.id] = true
 		end
 	end
@@ -347,7 +347,7 @@ local fleeables = NameToDefID({
 
 -- Submarines to be fled by soem things
 local subfleeables = NameToDefID({
-	"shipsubraider",
+	"subraider",
 })
 
 

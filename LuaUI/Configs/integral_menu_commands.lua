@@ -159,7 +159,7 @@ local units = {
 		shipscout = WEIRD_RAIDER,
 		shipassault = ASSAULT,
 		-- No Ship HEAVY_SOMETHING (yet)
-		shipsubraider = SPECIAL,
+		subraider = SPECIAL,
 		shiptransport = UTILITY,
 	},
 

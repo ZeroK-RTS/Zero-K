@@ -77,7 +77,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
 	[UnitDefNames["shiptorpraider"].id] = 1,
 	[UnitDefNames["shipskirm"].id] = 1,
-	[UnitDefNames["shipsubraider"].id] = 1,
+	[UnitDefNames["subraider"].id] = 1,
 	
 	-- Static only OKP below
 	[UnitDefNames["amphfloater"].id] = 1,

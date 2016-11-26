@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[shipsubraider]],
+  unitname               = [[subraider]],
   name                   = [[Seawolf]],
   description            = [[Attack Submarine (Stealth Raider)]],
   acceleration           = 0.06,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy        = 200,
   buildCostMetal         = 200,
   builder                = false,
-  buildPic               = [[shipsubraider.png]],
+  buildPic               = [[subraider.png]],
   buildTime              = 200,
   canAttack              = true,
   canGuard               = true,
@@ -32,7 +32,7 @@ unitDef = {
   explodeAs              = [[SMALL_UNITEX]],
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[shipsubraider]],
+  iconType               = [[subraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 240,
@@ -43,8 +43,8 @@ unitDef = {
   movementClass          = [[UBOAT3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP HOVER]],
-  objectName             = [[shipsubraider.s3o]],
-  script                 = [[shipsubraider.lua]],
+  objectName             = [[subraider.s3o]],
+  script                 = [[subraider.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 360,
@@ -175,7 +175,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[shipsubraider_dead.s3o]],
+      object           = [[subraider_dead.s3o]],
     },
 
 
@@ -190,4 +190,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ shipsubraider = unitDef })
+return lowerkeys({ subraider = unitDef })
