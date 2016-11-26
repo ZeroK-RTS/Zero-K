@@ -827,9 +827,6 @@ local function GameFrame(_,n)
   local spec, specFullView = spGetSpectatingState()
   if (specFullView) then
     LocalAllyTeamID = scGetReadAllyTeam()
-    if LocalAllyTeamID == -1 then
-      LocalAllyTeamID = spGetLocalAllyTeamID() or LocalAllyTeamID
-    end
   else
     LocalAllyTeamID = spGetLocalAllyTeamID()
   end
