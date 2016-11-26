@@ -54,7 +54,7 @@ local function SetFancySkin()
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
 	
-	WG.crude.SetMenuSkinClass("panel_0021")
+	WG.crude.SetMenuSkinClass("panel_0011_small")
 end
 
 local function SetFancySkinBottomLeft()
@@ -67,7 +67,7 @@ local function SetFancySkinBottomLeft()
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
 	
-	WG.crude.SetMenuSkinClass("panel_0021")
+	WG.crude.SetMenuSkinClass("panel_0011_small")
 end
 
 local function SetFancySkinBottomRight()
@@ -80,7 +80,7 @@ local function SetFancySkinBottomRight()
 	WG.SetWidgetOption(econName, econPath, "fancySkinning", true)
 	WG.SetWidgetOption(specName, specPath, "fancySkinning", true)
 	
-	WG.crude.SetMenuSkinClass("panel_0021")
+	WG.crude.SetMenuSkinClass("panel_0011_small")
 end
 
 local function SetNewOptions()

@@ -545,17 +545,17 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
---[[
-path='Settings/Audio'
-	AddOption({
-		name = 'Sound Volume',
+
+local pathAudio = 'Settings/Audio'
+	AddOption(pathAudio,{
+		name = 'Master Volume',
 		type = 'number',
 		min = 0, 
 		max = 100,
 		springsetting = 'snd_volmaster',
 		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end
-	} )
-	AddOption({
+	})
+	AddOption(pathAudio,{
 		name = 'Music Volume',
 		type = 'number',
 		min = 0, 
@@ -563,19 +563,18 @@ path='Settings/Audio'
 		step = 0.01,
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)	
-				if (WG.music_start_volume or 0 > 0) then 
-					Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-				else 
-					Spring.SetSoundStreamVolume(self.value) 
-				end
-				local prevValue = WG.music_volume
-				--settings.music_volume = self.value
-				WG.music_volume = self.value
-				if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
-				if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
-			end,
-	} )
-]]
+			if (WG.music_start_volume or 0 > 0) then 
+				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+			else 
+				Spring.SetSoundStreamVolume(self.value) 
+			end
+			local prevValue = WG.music_volume
+			--settings.music_volume = self.value
+			WG.music_volume = self.value
+			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
+			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+		end,
+	})
 		
 --- HELP ---
 local pathHelp = 'Help'
