@@ -708,7 +708,7 @@ local function SetupMinimapLeftPreset()
 	
 	-- Player List
 	local playerlistWidth = 310
-	local playerlistHeight = 200
+	local playerlistHeight = screenHeight/2
 	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
 	if playerListControl then
 		playerlistWidth = playerListControl.minWidth
@@ -886,7 +886,7 @@ local function SetupMinimapRightPreset()
 	
 	-- Player List
 	local playerlistWidth = 310
-	local playerlistHeight = 200
+	local playerlistHeight = screenHeight/2
 	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
 	if playerListControl then
 		playerlistWidth = playerListControl.minWidth
