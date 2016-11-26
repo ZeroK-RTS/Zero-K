@@ -569,7 +569,7 @@ options = {
 			
 			window_corner.tiles = newClass.tiles
 			window_corner.TileImageFG = newClass.TileImageFG
-			window_corner.backgroundColor = newClass.backgroundColor
+			--window_corner.backgroundColor = newClass.backgroundColor
 			window_corner.TileImageBK = newClass.TileImageBK
 			window_corner:Invalidate()
 		end,

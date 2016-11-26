@@ -241,30 +241,34 @@ options = {
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
-		path = minimap_path,
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_0001', name = 'Flush',},
+			{key = 'panel_1011', name = 'Not Flush',},
+		},
 		OnChange = function (self)
 			if not (playerWindow and playerWindow.mainPanel) then
 				return
 			end
-			
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
+			local className = self.value
 			local newClass = skin.panel
-			if self.value and skin.panel_2021 then
-				newClass = skin.panel_2021
+			if skin[className] then
+				newClass = skin[className]
 			end
 			
 			playerWindow.mainPanel.tiles = newClass.tiles
 			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
-			playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
+			--playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
 			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
 			playerWindow.mainPanel:Invalidate()
-		end
-	}
+		end,
+		advanced = true,
+		noHotkey = true,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -733,7 +737,7 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
-		classname = (options.fancySkinning.value and "panel_2021") or nil,
+		classname = options.fancySkinning.value,
 		backgroundColor = {1,1,1,options.playerOpacity.value},
 		color = {1,1,1,options.playerOpacity.value},
 		parent = data.window,

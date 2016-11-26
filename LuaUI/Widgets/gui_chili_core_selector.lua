@@ -206,7 +206,7 @@ options = {
 	buttonSizeLong = {
 		name = 'Button Size',
 		type = 'number',
-		value = 50,
+		value = 58,
 		min = 10, max = 200, step = 1,
 		OnChange = OptionsUpdateLayout,
 	},
@@ -577,7 +577,7 @@ local function GetBackground(parent)
 		backgroundPanel.classname = className
 		backgroundPanel.tiles = newClass.tiles
 		backgroundPanel.TileImageFG = newClass.TileImageFG
-		backgroundPanel.backgroundColor = newClass.backgroundColor
+		--backgroundPanel.backgroundColor = newClass.backgroundColor
 		backgroundPanel.TileImageBK = newClass.TileImageBK
 		backgroundPanel:Invalidate()
 	end

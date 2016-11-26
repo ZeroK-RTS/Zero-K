@@ -1408,7 +1408,6 @@ local function InitializeControls()
 		parent = mainWindow,
 	}
 	
-	
 	local function ReturnToOrders()
 		if options.selectionClosesTab.value then
 			commandPanelMap.orders.tabButton.DoClick()

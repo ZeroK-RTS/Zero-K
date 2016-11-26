@@ -496,13 +496,13 @@ options = {
 			
 			map_panel.tiles = newClass.tiles
 			map_panel.TileImageFG = newClass.TileImageFG
-			map_panel.backgroundColor = newClass.backgroundColor
+			--map_panel.backgroundColor = newClass.backgroundColor
 			map_panel.TileImageBK = newClass.TileImageBK
 			map_panel:Invalidate()
 			
 			fakewindow.tiles = newClass.tiles
 			fakewindow.TileImageFG = newClass.TileImageFG
-			fakewindow.backgroundColor = newClass.backgroundColor
+			--fakewindow.backgroundColor = newClass.backgroundColor
 			fakewindow.TileImageBK = newClass.TileImageBK
 			fakewindow:Invalidate()
 		end,

@@ -34,7 +34,7 @@ local lastHeight = 0
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Panels/Docking'
-options_order = { 'dockEnabled', 'minimizeEnabled', 'dockThreshold'}
+options_order = { 'dockEnabled', 'dockEnabledPanels', 'minimizeEnabled', 'dockThreshold'}
 options = {
 	dockThreshold = {
 		name = "Docking distance",
@@ -47,12 +47,20 @@ options = {
 		end },
 	},
 	dockEnabled = {
-		name = 'Use docking',
+		name = 'Enable docking',
 		advanced = false,
 		type = 'bool',
 		value = true,
 		noHotkey = true,
-		desc = 'Dock windows to screen edges and each other to prevent overlaps',
+		desc = 'Dock windows to screen edges',
+	},
+	dockEnabledPanels = {
+		name = 'Use docking between panels',
+		advanced = false,
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Dock windows each other to prevent overlaps. Requires docking to be enabled via the previous setting.',
 	},
 	minimizeEnabled = {
 		name = 'Minimizable windows',
@@ -165,7 +173,7 @@ local function GetBoxRelation(boxa, boxb)
 end
 
 -- returns closest axis to snap to existing windows or screen edges - first parameter is axis (L/R/T/D) second is snap distance 
-local function GetClosestAxis(winPos, dockWindows, win)
+local function GetClosestAxis(winPos, dockWindows, win, screenEdgeOnly)
 	local dockDist = options.dockThreshold.value 
 	local minDist =  dockDist + 1
 	local minAxis= 'L'	
@@ -188,6 +196,10 @@ local function GetClosestAxis(winPos, dockWindows, win)
 	if (minDist < dockDist and minDist ~= 0) then 
 		return minAxis, minDist  -- screen edges have priority ,dont check anything else
 	end 
+	
+	if screenEdgeOnly then
+		return nil, nil
+	end
 	
 	for w, dp in pairs(dockWindows) do 
 		if win ~= w then 
@@ -423,14 +435,13 @@ function widget:Update()
 				local numTries = 5
 				repeat 
 					--Spring.Echo("box "..wp[1].. " " ..wp[2] .. " " ..wp[3] .. " " .. wp[4])
-					local a,d = GetClosestAxis(wp,dockWindows, win)
+					local a,d = GetClosestAxis(wp, dockWindows, win, not options.dockEnabledPanels.value)
 					if a~=nil then 
 						SnapBox(wp,a,d)
 						--Spring.Echo("snap "..a .. "  " ..d)
 					end 
 					numTries = numTries - 1 
 				until a == nil or numTries == 0
-				
 				win:SetPos(wp[1], wp[2])
 				local winPos = { win.x, win.y, win.x + win.width, win.y + win.height }
 				lastPos[win.name] = winPos

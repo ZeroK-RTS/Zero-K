@@ -113,6 +113,7 @@ local explodeSearchTerm = {text="", terms={}} -- store exploded "filterUserInser
 --------------------------------------------------------------------------------
 -- Misc
 local B_HEIGHT = 26
+local B_HEIGHT_MAIN = 26
 local B_WIDTH_TOMAINMENU = 80
 local C_HEIGHT = 16
 
@@ -2130,61 +2131,344 @@ local function MakeExitConfirmWindow(text, action)
 	}
 end
 
-local function MakeMenuBar()
-	local btn_padding = {4,3,3,2}
-	local btn_margin = {0,0,0,0}
-	local exit_menu_width = 210
-	local exit_menu_height = 280
-	local exit_menu_btn_width = 7*exit_menu_width/8
-	local exit_menu_btn_height = max(exit_menu_height/8, 30)
-	local exit_menu_cancel_width = exit_menu_btn_width/2
-	local exit_menu_cancel_height = 2*exit_menu_btn_height/3
-
-	local crude_width = 380
-	local crude_height = B_HEIGHT+10
+local oldWidth, oldHeight
+local function GetMainPanel(parent, width, height)
+	if oldWidth == width and oldHeight == height then
+		return false
+	end
+	oldWidth = width
+	oldHeight = height
 	
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
 		Spring.SendLuaMenuMsg("disableLobbyButton")
+	end	
+	
+	local stackChildren = {}
+	local holderWidth = 6
+	local sliderWidth = 100
+	if width < 372 then
+		sliderWidth = width - 272
 	end
 	
-	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
-	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
-	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,6}  }
+	if height < 45 then
+		
+		if width > 435 then
+			stackChildren[#stackChildren + 1] = StackPanel:New{
+				orientation = 'horizontal',
+				width = 62,
+				height = '100%',
+				resizeItems = false,
+				autoArrangeV = false,
+				autoArrangeH = false,
+				padding = {0,2,0,0},
+				itemMargin = {1,0,0,0},
+				children = {
+					Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+					lbl_clock,
+				},
+			}
+			holderWidth = holderWidth + 64
+		end
+		
+		stackChildren[#stackChildren + 1] = StackPanel:New{
+			orientation = 'horizontal',
+			width = 74,
+			height = '100%',
+			resizeItems = false,
+			autoArrangeV = false,
+			autoArrangeH = false,
+			padding = {0,2,0,0},
+			itemMargin = {1,0,0,0},
+			children = {
+				Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+				lbl_gtime,
+			},
+		}
+		holderWidth = holderWidth + 76
+		
+		stackChildren[#stackChildren + 1] = Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, }
+		stackChildren[#stackChildren + 1] = Grid:New{
+			height = 24,
+			width = sliderWidth - 25,
+			columns = 1,
+			rows = 2,
+			resizeItems = false,
+			margin = {0,0,0,0},
+			padding = {0,-2,0,0},
+			itemPadding = {0,0,0,0},
+			itemMargin = {0,0,0,0},
+			
+			children = {
+				Trackbar:New{
+					tooltip = 'Volume',
+					height = 12,
+					width = sliderWidth - 25,
+					trackColor = color.main_fg,
+					value = spGetConfigInt("snd_volmaster", 50),
+					OnChange = {
+						function(self)
+							spSendCommands{"set snd_volmaster " .. self.value}
+							if WG.ttsNotify then 
+								WG.ttsNotify() 
+							end
+						end	
+					},
+				},
+				
+				Trackbar:New{
+					tooltip = 'Music',
+					height = 12,
+					width = sliderWidth - 25,
+					min = 0,
+					max = 1,
+					step = 0.01,
+					trackColor = color.main_fg,
+					value = settings.music_volume or 0.5,
+					prevValue = settings.music_volume or 0.5,
+					OnChange = { 
+						function(self)
+							if ((WG.music_start_volume or 0) > 0) then 
+								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+							else 
+								Spring.SetSoundStreamVolume(self.value) 
+							end 
+							settings.music_volume = self.value
+							WG.music_volume = self.value
+							if (self.prevValue > 0 and self.value <=0) then 
+								widgetHandler:DisableWidget("Music Player") 
+							end 
+							if (self.prevValue <=0 and self.value > 0) then
+								-- Disable first in case widget is already enabled.
+								-- This is required for it to notice the volume
+								-- change from 0 in some cases.
+								widgetHandler:DisableWidget("Music Player")
+								widgetHandler:EnableWidget("Music Player") 
+							end 
+							self.prevValue = self.value
+						end	
+					},
+				},
+			},
+		}
+		--stackChildren[#stackChildren + 1] = Trackbar:New{
+		--	tooltip = 'Volume',
+		--	height = 15,
+		--	width = sliderWidth - 25,
+		--	trackColor = color.main_fg,
+		--	value = spGetConfigInt("snd_volmaster", 50),
+		--	OnChange = {
+		--		function(self)
+		--			spSendCommands{"set snd_volmaster " .. self.value}
+		--			if WG.ttsNotify then 
+		--				WG.ttsNotify() 
+		--			end
+		--		end	
+		--	},
+		--}
+		
+		holderWidth = holderWidth + sliderWidth + 2
+	else
+		stackChildren[#stackChildren + 1] = Grid:New{
+			orientation = 'horizontal',
+			columns = 1,
+			rows = 2,
+			width = 80,
+			height = '100%',
+			--height = 40,
+			resizeItems = true,
+			autoArrangeV = true,
+			autoArrangeH = true,
+			padding = {0,0,0,0},
+			itemPadding = {0,0,0,0},
+			itemMargin = {0,0,0,0},
+			
+			children = {
+				StackPanel:New{
+					orientation = 'horizontal',
+					width = 70,
+					height = '100%',
+					resizeItems = false,
+					autoArrangeV = false,
+					autoArrangeH = false,
+					padding = {0,1,0,0},
+					itemMargin = {2,0,0,0},
+					children = {
+						Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+						lbl_gtime,
+					},
+				},
+				StackPanel:New{
+					orientation = 'horizontal',
+					width = 80,
+					height = '100%',
+					resizeItems = false,
+					autoArrangeV = false,
+					autoArrangeH = false,
+					padding = {0,0,0,0},
+					itemMargin = {2,0,0,0},
+					children = {
+						Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+						lbl_clock,
+					},
+				},
+			},
+		}
+		
+		holderWidth = holderWidth + 82
+		
+		stackChildren[#stackChildren + 1] = Grid:New{
+			height = '100%',
+			width = sliderWidth,
+			columns = 2,
+			rows = 2,
+			resizeItems = false,
+			margin = {0,0,0,0},
+			padding = {0,0,0,0},
+			itemPadding = {1,1,1,1},
+			itemMargin = {1,1,1,1},
+			
+			children = {
+				--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
+				Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, },
+				Trackbar:New{
+					tooltip = 'Volume',
+					height = 15,
+					width = sliderWidth - 25,
+					trackColor = color.main_fg,
+					value = spGetConfigInt("snd_volmaster", 50),
+					OnChange = {
+						function(self)
+							spSendCommands{"set snd_volmaster " .. self.value}
+							if WG.ttsNotify then 
+								WG.ttsNotify() 
+							end
+						end	
+					},
+				},
+				
+				Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
+				Trackbar:New{
+					tooltip = 'Music',
+					height = 15,
+					width = sliderWidth - 25,
+					min = 0,
+					max = 1,
+					step = 0.01,
+					trackColor = color.main_fg,
+					value = settings.music_volume or 0.5,
+					prevValue = settings.music_volume or 0.5,
+					OnChange = { 
+						function(self)
+							if ((WG.music_start_volume or 0) > 0) then 
+								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+							else 
+								Spring.SetSoundStreamVolume(self.value) 
+							end 
+							settings.music_volume = self.value
+							WG.music_volume = self.value
+							if (self.prevValue > 0 and self.value <=0) then 
+								widgetHandler:DisableWidget("Music Player") 
+							end 
+							if (self.prevValue <=0 and self.value > 0) then
+								-- Disable first in case widget is already enabled.
+								-- This is required for it to notice the volume
+								-- change from 0 in some cases.
+								widgetHandler:DisableWidget("Music Player")
+								widgetHandler:EnableWidget("Music Player") 
+							end 
+							self.prevValue = self.value
+						end	
+					},
+				},
+			},
+		}
+		
+		holderWidth = holderWidth + sliderWidth + 2
+	end
 	
-	local screen_width,screen_height = Spring.GetWindowGeometry()
+	stackChildren[#stackChildren + 1] = img_flag
+	holderWidth = holderWidth + 26
 	
-	window_crude = Window:New{
-		name = 'epicmenubar',
-		x = screen_width - crude_width,
-		y = 0,
-		width = crude_width,
-		height = 50,
-		minWidth = crude_width,
-		draggable = false,
-		tweakDraggable = true,
-		tweakResizable = true,
-		resizable = false,
-		minimizable = false,
-		dockable = true,
-		backgroundColor = color.empty,
-		color = color.empty,
-		padding = {0,0,0,0},
-		parent = screen0,
+	stackChildren[#stackChildren + 1] = Button:New{
+		name= 'subMenuButton',
+		OnClick = { function() ActionSubmenu(nil,'') end, },
+		textColor = color.game_fg,
+		height = height - 6,
+		width = B_WIDTH_TOMAINMENU + 1,
+		caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
+		padding = btn_padding,
+		margin = btn_margin,
+		tooltip = '',
+		children = {
+			--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+			--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
+		},
 	}
+	holderWidth = holderWidth + 80
 	
-	panel_crude = Panel:New{
+	if luaMenu then
+		stackChildren[#stackChildren + 1] = Button:New{
+			name = 'lobbyButton',
+			OnClick = { function() ViewLobby() end, },
+			textColor = color.game_fg,
+			height = height - 6,
+			width = B_WIDTH_TOMAINMENU + 1,
+			caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
+			padding = btn_padding,
+			margin = btn_margin,
+			tooltip = '',
+			children = {
+				--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+				--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
+			},
+		}
+		holderWidth = holderWidth + 80
+	end
+	
+	-- FPS
+	--Grid:New{
+	--	orientation = 'horizontal',
+	--	columns = 1,
+	--	rows = 2,
+	--	width = 60,
+	--	height = '100%',
+	--	--height = 40,
+	--	resizeItems = true,
+	--	autoArrangeV = true,
+	--	autoArrangeH = true,
+	--	padding = {0,0,0,0},
+	--	itemPadding = {0,0,0,0},
+	--	itemMargin = {0,0,0,0},
+	--	
+	--	children = {
+	--		lbl_fps,
+	--		img_flag,
+	--	},
+	--},
+	
+	-- Game Logo
+	--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
+	--
+	--Button:New{
+	--	name= 'tweakGuiButton',
+	--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+	--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+	--	children = {
+	--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+	--	},
+	--},
+	
+	local mainPanel = Panel:New{
 		y = 0,
-		right = 0,  
-		width = crude_width,
-		clientWidth = crude_width,
-		clientHeight = 50,
+		right = 0, 
+		bottom = 0,
+		clientWidth = holderWidth,
 		backgroundColor = color.empty,
 		color = color.empty,
 		margin = {0,0,0,0},
 		padding = {0,0,3,5},
-		parent = window_crude,
+		parent = parent,
 		
 		children = {
 			StackPanel:New{
@@ -2199,185 +2483,65 @@ local function MakeMenuBar()
 				autoArrangeV = false,
 				autoArrangeH = false,
 						
-				children = {
-					----GAME LOGO GOES HERE
-					--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
-					--
-					--Button:New{
-					--	name= 'tweakGuiButton',
-					--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
-					--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
-					--	children = {
-					--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
-					--	},
-					--},
-					--GAME CLOCK AND REAL-LIFE CLOCK
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 1,
-						rows = 2,
-						width = 80,
-						height = '100%',
-						--height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
-						children = {
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 70,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
-									lbl_gtime,
-								},
-							},
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 80,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
-									lbl_clock,
-								},
-							},
-						},
-					},
-					
-					--FPS & FLAG
-					img_flag,
-					--Grid:New{
-					--	orientation = 'horizontal',
-					--	columns = 1,
-					--	rows = 2,
-					--	width = 60,
-					--	height = '100%',
-					--	--height = 40,
-					--	resizeItems = true,
-					--	autoArrangeV = true,
-					--	autoArrangeH = true,
-					--	padding = {0,0,0,0},
-					--	itemPadding = {0,0,0,0},
-					--	itemMargin = {0,0,0,0},
-					--	
-					--	children = {
-					--		lbl_fps,
-					--		img_flag,
-					--	},
-					--},
-					
-					--VOLUME SLIDERS
-					Grid:New{
-						height = '100%',
-						width = 100,
-						columns = 2,
-						rows = 2,
-						resizeItems = false,
-						margin = {0,0,0,0},
-						padding = {0,0,0,0},
-						itemPadding = {1,1,1,1},
-						itemMargin = {1,1,1,1},
-						
-						children = {
-							--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
-							Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, },
-							Trackbar:New{
-								tooltip = 'Volume',
-								height=15,
-								width=70,
-								trackColor = color.main_fg,
-								value = spGetConfigInt("snd_volmaster", 50),
-								OnChange = { function(self)
-									spSendCommands{"set snd_volmaster " .. self.value}
-									if WG.ttsNotify then WG.ttsNotify() end
-								end	},
-							},
-							
-							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
-							Trackbar:New{
-								tooltip = 'Music',
-								height=15,
-								width=70,
-								min = 0,
-								max = 1,
-								step = 0.01,
-								trackColor = color.main_fg,
-								value = settings.music_volume or 0.5,
-								prevValue = settings.music_volume or 0.5,
-								OnChange = { 
-									function(self)
-										if ((WG.music_start_volume or 0) > 0) then 
-											Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-										else 
-											Spring.SetSoundStreamVolume(self.value) 
-										end 
-										settings.music_volume = self.value
-										WG.music_volume = self.value
-										if (self.prevValue > 0 and self.value <=0) then 
-											widgetHandler:DisableWidget("Music Player") 
-										end 
-										if (self.prevValue <=0 and self.value > 0) then
-											-- Disable first in case widget is already enabled.
-											-- This is required for it to notice the volume
-											-- change from 0 in some cases.
-											widgetHandler:DisableWidget("Music Player")
-											widgetHandler:EnableWidget("Music Player") 
-										end 
-										self.prevValue = self.value
-									end	
-								},
-							},
-						},
-					
-					},
-
-					--MAIN MENU BUTTON
-					Button:New{
-						name= 'subMenuButton',
-						OnClick = { function() ActionSubmenu(nil,'') end, },
-						textColor=color.game_fg,
-						height=B_HEIGHT+12,
-						width=B_WIDTH_TOMAINMENU + 1,
-						caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
-						padding = btn_padding,
-						margin = btn_margin,
-						tooltip = '',
-						children = {
-							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
-							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
-						},
-					},
-					luaMenu and Button:New{
-						name = 'lobbyButton',
-						OnClick = { function() ViewLobby() end, },
-						textColor=color.game_fg,
-						height=B_HEIGHT+12,
-						width=B_WIDTH_TOMAINMENU + 1,
-						caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
-						padding = btn_padding,
-						margin = btn_margin,
-						tooltip = '',
-						children = {
-							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
-							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
-						},
-					} or nil,				
-				}
+				children = stackChildren,
 			}
+		}
+	}
+	
+	return mainPanel
+end
+
+local function MakeMenuBar()
+	local btn_padding = {4,3,3,2}
+	local btn_margin = {0,0,0,0}
+	local exit_menu_width = 210
+	local exit_menu_height = 280
+	local exit_menu_btn_width = 7*exit_menu_width/8
+	local exit_menu_btn_height = max(exit_menu_height/8, 30)
+	local exit_menu_cancel_width = exit_menu_btn_width/2
+	local exit_menu_cancel_height = 2*exit_menu_btn_height/3
+
+	local crude_width = 380
+	local crude_minWidth = 350
+	local crude_height = B_HEIGHT_MAIN + 8
+	
+	-- A bit evil, but par for the course
+	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
+	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
+	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
+	
+	local screen_width,screen_height = Spring.GetWindowGeometry()
+	
+	window_crude = Window:New{
+		name = 'epicmenubar',
+		x = screen_width - crude_width,
+		y = 0,
+		width = crude_width,
+		height = crude_height,
+		minHeight = crude_height,
+		minWidth = crude_minWidth,
+		draggable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		resizable = false,
+		minimizable = false,
+		dockable = true,
+		backgroundColor = color.empty,
+		color = color.empty,
+		padding = {-1,0,0,0},
+		parent = screen0,
+		OnResize = {
+			function (obj)
+				local newPanel = GetMainPanel(obj, obj.width, obj.height)
+				if newPanel then
+					if panel_crude then
+						panel_crude:Dispose()
+					end
+					panel_crude = newPanel
+				end
+				panel_crude:BringToFront()
+			end
 		}
 	}
 	
@@ -2685,11 +2849,15 @@ function widget:Initialize()
 		local skin = Chili.SkinHandler.GetSkin(currentSkin)
 		
 		local newClass = skin[newClassName]
+		if not newClass then
+			newClass = skin.panel
+			newClassName = "panel"
+		end
 		panel_background.classname = newClassName
 		
 		panel_background.tiles = newClass.tiles
 		panel_background.TileImageFG = newClass.TileImageFG
-		panel_background.backgroundColor = newClass.backgroundColor
+		--panel_background.backgroundColor = newClass.backgroundColor
 		panel_background.TileImageBK = newClass.TileImageBK
 		panel_background:Invalidate()
 	end

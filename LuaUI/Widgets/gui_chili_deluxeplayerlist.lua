@@ -1420,7 +1420,7 @@ SetupScrollPanel = function ()
 	local scpl = {
 		parent = window_cpl,
 		--width = "100%",
-		--height = "100%",
+		height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		borderColor = {1,1,1,options.backgroundOpacity.value},
 		padding = {0, 0, 0, 0},
@@ -1501,7 +1501,6 @@ SetupPanels = function ()
 		minimizable = false,
 		minWidth = x_windowbound,
 	}
-
 	SetupScrollPanel()
 
 	ToggleVisibility()

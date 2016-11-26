@@ -12,8 +12,9 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local BUTTON_Y = 8
-local BUTTON_SIZE = 32
+local BUTTON_Y = 3
+local BUTTON_SIZE = 24
+local BUTTON_PLACE_SPACE = 26
 
 local contentHolder
 
@@ -117,25 +118,31 @@ options = {
 	fancySkinning = {
 		name = 'Fancy Skinning',
 		type = 'bool',
-		value = false,
-		advanced = true,
-		noHotkey = true,
-		path = minimap_path,
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_0001', name = 'Flush',},
+			{key = 'panel_0001_small', name = 'Flush Small',},
+			{key = 'panel_1001_small', name = 'Top Left',},
+		},
 		OnChange = function (self)
 			local currentSkin = Chili.theme.skin.general.skinName
 			local skin = Chili.SkinHandler.GetSkin(currentSkin)
 			
+			local className = self.value
 			local newClass = skin.panel
-			if self.value and skin.panel_2001 then
-				newClass = skin.panel_2001
+			if skin[className] then
+				newClass = skin[className]
 			end
 			
 			contentHolder.tiles = newClass.tiles
 			contentHolder.TileImageFG = newClass.TileImageFG
-			contentHolder.backgroundColor = newClass.backgroundColor
+			--contentHolder.backgroundColor = newClass.backgroundColor
 			contentHolder.TileImageBK = newClass.TileImageBK
 			contentHolder:Invalidate()
-		end
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 }
 
@@ -182,8 +189,8 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 	end
 		
 	Chili.Button:New{
-		x = (vertical and 0) or ((position - 1)*34 + 5),
-		y = (vertical and ((position - 1)*34 + 5)) or BUTTON_Y,
+		x = (vertical and 0) or ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y),
+		y = (vertical and ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y)) or BUTTON_Y,
 		width = BUTTON_SIZE, 
 		height = BUTTON_SIZE,
 		caption = "",
@@ -224,9 +231,9 @@ local function MakeDropdownButtons(parent, position, overlays)
 	
 	local overlayPanel = Panel:New{
 		x = 0,
-		y = 50,
-		width = 44,
-		height = (#overlays)*34 + 14,
+		y = 30,
+		width = 36,
+		height = (#overlays)*BUTTON_PLACE_SPACE + 8,
 		parent = screen0,
 		padding = {6,4,0,0}
 	}
@@ -244,7 +251,7 @@ local function MakeDropdownButtons(parent, position, overlays)
 	end
 	
 	local overlaySelector = Chili.Button:New{
-		x = (position - 1)*34 + 5,
+		x = (position - 1)*BUTTON_PLACE_SPACE + 5,
 		y = BUTTON_Y,
 		width = BUTTON_SIZE, 
 		height = BUTTON_SIZE,
@@ -293,7 +300,8 @@ local function InitializeControls()
 		y         = 0,
 		width     = 370,
 		height    = 50,
-		minHeight = 50,
+		minWidth  = 200,
+		minHeight = 32,
 		dockable  = true,
 		draggable = false,
 		resizable = false,
@@ -305,7 +313,7 @@ local function InitializeControls()
 	}
 	
 	contentHolder = Panel:New{
-		--classname = "panel2220",
+		classname = options.fancySkinning.value,
 		x = 0,
 		y = 0,
 		right = 0,
