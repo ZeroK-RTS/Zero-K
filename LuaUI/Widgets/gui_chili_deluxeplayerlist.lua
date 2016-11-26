@@ -1501,7 +1501,6 @@ SetupPanels = function ()
 		minimizable = false,
 		minWidth = x_windowbound,
 	}
-
 	SetupScrollPanel()
 
 	ToggleVisibility()

@@ -14,10 +14,6 @@ end
 
 ----------------------------------------------------
 ----------------------------------------------------
--- Fancy Skin
-
-----------------------------------------------------
-----------------------------------------------------
 -- Widget option functions
 
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
@@ -617,13 +613,16 @@ local function SetupMinimapLeftPreset()
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
-	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	widgetHandler:EnableWidget("Chili Global Commands")
+	
+	if not WG.Chili.Screen0:GetChildByName("Player List") then
+		widgetHandler:EnableWidget("Chili Crude Player List")
+	end
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -710,6 +709,11 @@ local function SetupMinimapLeftPreset()
 	-- Player List
 	local playerlistWidth = 310
 	local playerlistHeight = 200
+	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	if playerListControl then
+		playerlistWidth = playerListControl.minWidth
+	end
+	
 	WG.SetWindowPosAndSize("Player List",
 		0,
 		screenHeight - playerlistHeight - minimapHeight,
@@ -787,13 +791,16 @@ local function SetupMinimapRightPreset()
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
-	widgetHandler:EnableWidget("Chili Crude Player List")
 	widgetHandler:EnableWidget("Chili Integral Menu")
 	widgetHandler:EnableWidget("Chili Pro Console")
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	widgetHandler:EnableWidget("Chili Global Commands")
+	
+	if not WG.Chili.Screen0:GetChildByName("Player List") then
+		widgetHandler:EnableWidget("Chili Crude Player List")
+	end
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -880,6 +887,11 @@ local function SetupMinimapRightPreset()
 	-- Player List
 	local playerlistWidth = 310
 	local playerlistHeight = 200
+	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	if playerListControl then
+		playerlistWidth = playerListControl.minWidth
+	end
+	
 	WG.SetWindowPosAndSize("Player List",
 		screenWidth - playerlistWidth,
 		screenHeight - playerlistHeight - minimapHeight,

@@ -899,6 +899,7 @@ function widget:Initialize()
 
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local x_bound = 310
 	
 	window_cpl = Window:New{  
 		dockable = true,
