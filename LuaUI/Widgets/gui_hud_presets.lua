@@ -49,8 +49,8 @@ local fancySkinOverride = {}
 
 local SKIN_DEFAULT = {}
 local SKIN_FLUSH = {
-	epic = "panel_0001",
-	global = "panel_0001",
+	epic = "panel_0001_small",
+	global = "panel_0001_small",
 }
 
 local function SetFancySkin()
@@ -541,11 +541,11 @@ end
 local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
-	local sideHeight = 30
+	local sideHeight = 32
 	local flushTop = (screenWidth <= 1650)
 	
 	-- Resource Bar
-	local resourceBarWidth = math.min(screenWidth - 700, 660)
+	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
 	local resourceBarHeight = 100
 	
 	-- Menu

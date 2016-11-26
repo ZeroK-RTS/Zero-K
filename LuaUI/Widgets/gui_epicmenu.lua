@@ -2189,13 +2189,13 @@ local function GetMainPanel(parent, width, height)
 		
 		stackChildren[#stackChildren + 1] = Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, }
 		stackChildren[#stackChildren + 1] = Grid:New{
-			height = '100%',
+			height = 24,
 			width = sliderWidth - 25,
 			columns = 1,
 			rows = 2,
 			resizeItems = false,
 			margin = {0,0,0,0},
-			padding = {0,0,0,0},
+			padding = {0,-2,0,0},
 			itemPadding = {0,0,0,0},
 			itemMargin = {0,0,0,0},
 			
@@ -2503,7 +2503,7 @@ local function MakeMenuBar()
 
 	local crude_width = 380
 	local crude_minWidth = 350
-	local crude_height = B_HEIGHT_MAIN + 6
+	local crude_height = B_HEIGHT_MAIN + 8
 	
 	-- A bit evil, but par for the course
 	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }

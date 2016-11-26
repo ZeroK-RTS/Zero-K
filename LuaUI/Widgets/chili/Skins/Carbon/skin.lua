@@ -142,6 +142,7 @@ local fancyPanels = {
 local fancyPanelsSmall = {
 	"0011_small",
 	"1001_small",
+	"0001_small",
 }
 
 for i = 1, #fancyPanels do
