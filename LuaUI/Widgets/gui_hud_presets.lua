@@ -332,9 +332,6 @@ end
 local function SetupNewPreset()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
-	widgetHandler:DisableWidget("Chili FactoryBar")
-	widgetHandler:DisableWidget("Chili FactoryPanel")
 	widgetHandler:DisableWidget("Chili Gesture Menu")
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
@@ -611,9 +608,6 @@ end
 local function SetupMinimapLeftPreset()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
-	widgetHandler:DisableWidget("Chili FactoryBar")
-	widgetHandler:DisableWidget("Chili FactoryPanel")
 	widgetHandler:DisableWidget("Chili Gesture Menu")
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
@@ -714,8 +708,8 @@ local function SetupMinimapLeftPreset()
 	end
 	
 	-- Player List
-	local playerlistWidth = 240
-	local playerlistHeight = 150
+	local playerlistWidth = 310
+	local playerlistHeight = 200
 	WG.SetWindowPosAndSize("Player List",
 		0,
 		screenHeight - playerlistHeight - minimapHeight,
@@ -784,9 +778,6 @@ end
 local function SetupMinimapRightPreset()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
-	widgetHandler:DisableWidget("Chili FactoryBar")
-	widgetHandler:DisableWidget("Chili FactoryPanel")
 	widgetHandler:DisableWidget("Chili Gesture Menu")
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
@@ -887,8 +878,8 @@ local function SetupMinimapRightPreset()
 	end
 	
 	-- Player List
-	local playerlistWidth = 240
-	local playerlistHeight = 150
+	local playerlistWidth = 310
+	local playerlistHeight = 200
 	WG.SetWindowPosAndSize("Player List",
 		screenWidth - playerlistWidth,
 		screenHeight - playerlistHeight - minimapHeight,
@@ -935,14 +926,14 @@ local function SetupMinimapRightPreset()
 	local commUpgradeHeight = 325
 	local commUpgradeY = screenHeight - integralHeight - commUpgradeHeight - 25
 	WG.SetWindowPosAndSize("CommanderUpgradeWindow",
-		minimapWidth + selectionsWidth,
+		coreSelectorWidth,
 		commUpgradeY,
 		commUpgradeWidth,
 		commUpgradeHeight
 	)
 	
 	WG.SetWindowPosAndSize("ModuleSelectionWindow",
-		minimapWidth + selectionsWidth + commUpgradeWidth,
+		coreSelectorWidth + commUpgradeWidth,
 		commUpgradeY,
 		500,
 		500
