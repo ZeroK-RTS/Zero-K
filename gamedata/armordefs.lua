@@ -22,8 +22,8 @@ local armorDefs = {
     "subraider",
     "subscout",
 	"cornukesub",
-	"shipsubraider",
-    "shipsubtacmissile",
+	"subraider",
+    "subtacmissile",
   },
 
   CHICKEN = {

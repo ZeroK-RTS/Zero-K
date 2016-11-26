@@ -26,7 +26,7 @@ unitDef = {
     [[armbanth]],
     [[armorco]],
     [[shipheavyarty]],
-	[[shipsubtacmissile]],
+	[[subtacmissile]],
   },
 
   buildPic                      = [[striderhub.png]],

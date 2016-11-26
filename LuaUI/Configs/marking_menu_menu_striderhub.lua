@@ -33,7 +33,7 @@ local menu = {
 		},
 		{
 			angle = 90,
-			unit = "shipsubtacmissile",
+			unit = "subtacmissile",
 			label = "Sub",
 		},
 		{

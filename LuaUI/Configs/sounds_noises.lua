@@ -1013,7 +1013,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shipsubraider = {
+	subraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1063,7 +1063,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shipsubtacmissile = {
+	subtacmissile = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,

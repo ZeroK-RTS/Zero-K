@@ -16,7 +16,7 @@ local table  = table
 
 local stockpilerDefNames = { 
 	"corsilo", 
-	"shipsubtacmissile"
+	"subtacmissile"
 }
 
 local stockpilerDefs = {}

@@ -1013,12 +1013,12 @@
 		"description" : "Missile Frigate (Skirmisher)",
 		"helptext" : "This Missile Frigate fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
 	},
-	"shipsubraider" : {
+	"subraider" : {
 		"name" : "Seawolf",
 		"description" : "Attack Submarine (Stealth Raider)",
 		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers."
 	},
-	"shipsubtacmissile" : {
+	"subtacmissile" : {
 		"name" : "Scylla",
 		"description" : "Tactical Nuke Missile Sub, Drains 10 m/s, 60 second stockpile",
 		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."

@@ -907,8 +907,8 @@ local icontypes = {
 	bitmap='icons/shiptorpraider.dds',
     size=2.2,
   },
-  shipsubraider = {
-	bitmap='icons/shipsubraider.dds',
+  subraider = {
+	bitmap='icons/subraider.dds',
     size=3.0,
   },
   shipriot = {
@@ -935,8 +935,8 @@ local icontypes = {
     bitmap='icons/shipheavyarty.dds',
     size=4,
   },
-  shipsubtacmissile = {
-    bitmap='icons/shipsubmissile.dds',
+  subtacmissile = {
+    bitmap='icons/subtacmissile.dds',
     size=4,
   },
   shipcarrier = {

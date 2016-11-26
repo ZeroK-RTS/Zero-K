@@ -12,7 +12,7 @@ unitDef = {
     [[shipcon]],
     [[shipscout]],
     [[shiptorpraider]],
-    [[shipsubraider]],
+    [[subraider]],
     [[shipriot]],
     [[shipskirm]],
 	[[shipassault]],
