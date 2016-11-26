@@ -29,6 +29,8 @@ local spGetUnitHealth     = Spring.GetUnitHealth
 local spGetFullBuildQueue = Spring.GetFullBuildQueue
 local spGetMouseState     = Spring.GetMouseState
 local spTraceScreenRay    = Spring.TraceScreenRay
+local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spGetUnitPosition   = Spring.GetUnitPosition
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
