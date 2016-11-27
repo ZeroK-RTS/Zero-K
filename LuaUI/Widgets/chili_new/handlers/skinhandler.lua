@@ -85,7 +85,7 @@ for i,skinConfig in ipairs(SkinHandler.knownSkins) do
       dirs[#dirs+1] = dependSkin.info.dir
       table.merge(skinConfig, dependSkin)
     else
-      Spring.Echo("Chili: Skin " .. skinConfig.info.name .. " depends on an unknown skin named " .. dependSkinName .. ".")
+      Spring.Log("Chili", "error", "Skin " .. skinConfig.info.name .. " depends on an unknown skin named " .. dependSkinName .. ".")
     end
   end
 

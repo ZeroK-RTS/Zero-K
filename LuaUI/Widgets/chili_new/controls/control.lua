@@ -74,7 +74,9 @@ Control = Object:Inherit{
   skinName        = nil,
 
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
-  noSelfHitTest = true,
+
+  useRTT = false, --((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+  useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
 
   OnResize        = {},
 }
@@ -92,8 +94,9 @@ function Control:New(obj)
     obj._hasCustomDrawControl = true
   end
 
+
   --// load the skin for this control
-  obj.classname = self.classname
+  obj.classname = obj.classname or self.classname
   theme.LoadThemeDefaults(obj)
   SkinHandler.LoadSkin(obj, self)
 
@@ -177,7 +180,7 @@ end
 -- @tparam object.Object obj parent object
 function Control:SetParent(obj)
   inherited.SetParent(self,obj)
-  self:RequestRealign()
+  if obj then self:RequestRealign() end
 end
 
 --- Adds a child object to the control
@@ -370,7 +373,7 @@ function Control:UpdateClientArea(dontRedraw)
   end
 
   if not dontRedraw then self:Invalidate() end --FIXME only when RTT!
-  self:CallListeners(self.OnResize) --FIXME more arguments and filter unchanged resizes
+  self:CallListeners(self.OnResize, self.clientWidth, self.clientHeight) --FIXME more arguments and filter unchanged resizes
 end
 
 
@@ -886,7 +889,11 @@ end
 --//=============================================================================
 
 function Control:_CheckIfRTTisAppreciated()
-	if self._cantUseRTT then
+	if (self.width <= 0)or(self.height <= 0) then
+		return false
+	end
+
+	if self._cantUseRTT or not(self.useRTT) then
 		return false
 	end
 
@@ -907,12 +914,10 @@ end
 function Control:_UpdateOwnDList()
 	if not self.parent then return end
 	if not self:IsInView() then return end
-
-	self:CallChildren('_UpdateOwnDList')
+	if not self.useDLists then return end
 
 	gl.DeleteList(self._own_dlist)
-	--self._own_dlist = nil
-	--self._own_dlist = gl.CreateList(self.DrawControl, self)
+	self._own_dlist = gl.CreateList(self.DrawControl, self)
 end
 
 
@@ -925,15 +930,21 @@ function Control:_UpdateChildrenDList()
 		if (contentWidth <= 0)or(contentHeight <= 0) then return end
 		self:CreateViewTexture("children", contentWidth, contentHeight, self.DrawChildrenForList, self, true)
 	end
+
+	--FIXME
+	--if self.useDLists then
+	--	self._children_dlist = gl.CreateList(self.DrawChildrenForList, self, true)
+	--end
 end
 
 
 function Control:_UpdateAllDList()
 	if not self.parent then return end
 	if not self:IsInView() then return end
-	if (self.width <= 0)or(self.height <= 0) then return end
 
 	local RTT = self:_CheckIfRTTisAppreciated()
+
+	gl.DeleteList(self._all_dlist)
 
 	if RTT then
 		self._usingRTT = true
@@ -945,19 +956,23 @@ function Control:_UpdateAllDList()
 		local fboName = "_fbo_" .. suffix_name
 		local texw = "_texw_" .. suffix_name
 		local texh = "_texh_" .. suffix_name
-		gl.DeleteFBO(self[fboName])
-		gl.DeleteTexture(self[texname])
-		gl.DeleteRBO(self[texStencilName])
+		if gl.DeleteFBO then
+			gl.DeleteFBO(self[fboName])
+			gl.DeleteTexture(self[texname])
+			gl.DeleteRBO(self[texStencilName])
+		end
 		self[texStencilName] = nil
 		self[texname] = nil
 		self[fboName] = nil
 		self[texw] = nil
 		self[texh] = nil
 		self._usingRTT = false
-	end
 
-	--gl.DeleteList(self._all_dlist)
-	--self._all_dlist = gl.CreateList(self.DrawForList,self)
+		--FIXME
+		--if self.useDLists then
+		--	self._all_dlist = gl.CreateList(self.DrawForList,self)
+		--end
+	end
 
 	if (self.parent)and(not self.parent._needRedraw)and(self.parent._UpdateAllDList) then
 		TaskHandler.RequestInstantUpdate(self.parent)
@@ -1251,7 +1266,6 @@ end
 function Control:Draw()
 	self._redrawCounter = (self._redrawCounter or 0) + 1
 	if (not self._in_update and not self._usingRTT and self:_CheckIfRTTisAppreciated()) then self:InvalidateSelf() end
-	if (self.width <= 0)or(self.height <= 0) then return end
 
 	if (self._tex_all) then
 		gl.PushMatrix()
@@ -1356,14 +1370,14 @@ function Control:HitTest(x,y)
     end
   end
 
-  if (not self.noSelfHitTest) and
-	(self.tooltip
+  if
+	self.tooltip
 	or (#self.OnMouseDown > 0)
 	or (#self.OnMouseUp > 0)
 	or (#self.OnClick > 0)
 	or (#self.OnDblClick > 0)
 	or (#self.OnMouseMove > 0)
-	or (#self.OnMouseWheel > 0))
+	or (#self.OnMouseWheel > 0)
   then
     return self
   end
@@ -1431,6 +1445,23 @@ function Control:MouseMove(x, y, dx, dy, ...)
       end
     end
 
+	-- fixes resizing components that have a right or bottom bound
+	if self._relativeBounds.right ~= nil and type(self._relativeBounds.right) == "number" then
+	  local deltaW = w - self.width
+	  self._relativeBounds.right = self._relativeBounds.right - deltaW
+	  if self._relativeBounds.right < 0 then
+	    w = w + self._relativeBounds.right
+	    self._relativeBounds.right = 0
+      end
+    end
+	if self._relativeBounds.bottom ~= nil and type(self._relativeBounds.bottom) == "number" then
+	  local deltaH = h - self.height
+	  self._relativeBounds.bottom = self._relativeBounds.bottom - deltaH
+	  if self._relativeBounds.bottom < 0 then
+	    h = h + self._relativeBounds.bottom
+	    self._relativeBounds.bottom = 0
+      end
+    end
     self:SetPos(nil,nil,w,h)
     return self
   end

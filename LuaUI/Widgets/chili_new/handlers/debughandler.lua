@@ -27,7 +27,7 @@ setmetatable(DebugHandler.objectsOwnedByWidgets, {
     local st = {};
     setmetatable(st,{__mode="v"});
     if (not i) then
-      Spring.Echo("WAAA",debug.traceback())
+      Spring.Log("Chili", "error", "WAAA",debug.traceback())
     end
     t[i] = st;
     return st;
@@ -52,8 +52,8 @@ setmetatable(DebugHandler.allObjects, {
 --// Now this errorhandler removes the widget itself (and its owned chili objects)
 --// w/o crashing the whole framework.
 
-DebugHandler.maxStackLength = 20
-DebugHandler.maxChiliErrors = 20
+DebugHandler.maxStackLength = 7
+DebugHandler.maxChiliErrors = 5
 local numChiliErrors = 0
 local lastError = 0
 
@@ -73,7 +73,10 @@ local function ChiliErrorHandler(msg,...)
       end
       if (name == "self") then
         if (value._widget ~= widget) then --// ignore controls owned by Chili Framework!
-          control = value
+          --// ignore non-chili objects; TODO: implement a better way of checking whether something is a chili object
+          if value.name and value.Dispose then
+            control = value
+          end
         end
       end
 
@@ -251,7 +254,7 @@ SafeCall = xpcall_va --// external code should access it via Chili.SafeCall()
 local orig_gl = gl
 local cdCreateList = gl.CreateList
 gl = {}
-setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i]; return t[i]; end}) --// use metatable to copy table entries on-demand
+setmetatable(gl,{__index=function(t,i) t[i] = orig_gl[i] or false; return t[i]; end}) --// use metatable to copy table entries on-demand
 gl.CreateList = function(...)
 	return cdCreateList(xpcall_va, ...)
 end
