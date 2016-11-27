@@ -75,8 +75,8 @@ Control = Object:Inherit{
 
   drawcontrolv2 = nil, --// disable backward support with old DrawControl gl state (with 2.1 self.xy translation isn't needed anymore)
 
-  useRTT = false, --((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
-  useDLists = false, --(gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
+  useRTT = ((gl.CreateFBO and gl.BlendFuncSeparate) ~= nil),
+  useDLists = (gl.CreateList ~= nil), --FIXME broken in combination with RTT (wrong blending)
 
   OnResize        = {},
 }
@@ -1101,7 +1101,7 @@ function Control:_DrawInClientArea(fnc,...)
 	local sx,sy = self:LocalToScreen(clientX,clientY)
 	sy = select(2,gl.GetViewSizes()) - (sy + clientHeight)
 
-	if PushLimitRenderRegion(self, sx, sy, clientWidth, clientHeight) then
+	if self.parent and PushLimitRenderRegion(self, sx, sy, clientWidth, clientHeight) then
 		fnc(...)
 		PopLimitRenderRegion(self, sx, sy, clientWidth, clientHeight)
 	end

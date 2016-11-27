@@ -42,6 +42,18 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  TileImageBK = ":cl:tech_button.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {32, 32, 32, 32}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+
+  DrawControl = DrawButton,
+}
+
 skin.checkbox = {
   TileImageFG = ":cl:tech_checkbox_checked.png",
   TileImageBK = ":cl:tech_checkbox_unchecked.png",
@@ -96,10 +108,60 @@ skin.panel = {
   DrawControl = DrawPanel,
 }
 
+skin.panelSmall = {
+  --TileImageFG = ":cl:glassFG.png",
+  --TileImageBK = ":cl:glassBK.png",
+  --tiles = {17,15,17,20},
+  TileImageBK = ":cl:tech_button.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {16, 16, 16, 16},
+
+  backgroundColor = {1, 1, 1, 0.8},
+
+  DrawControl = DrawPanel,
+}
+
+local fancyPanels = {
+	"0100",
+	"0110",
+	"1100",
+	"0011",
+	"1120",
+	"2100",
+	"0120",
+	"0001",
+	"0021",
+	"2001",
+	"2021",
+	"2120",
+	"1011",
+	"2011",
+	"1021",
+}
+
+local fancyPanelsSmall = {
+	"0011_small",
+	"1001_small",
+	"0001_small",
+}
+
+for i = 1, #fancyPanels do
+	local name = "panel_" .. fancyPanels[i]
+	skin[name] = Spring.Utilities.CopyTable(skin.panel)
+	skin[name].TileImageBK = ":cl:" .. name .. ".png"
+end
+
+for i = 1, #fancyPanelsSmall do
+	local name = "panel_" .. fancyPanelsSmall[i]
+	skin[name] = Spring.Utilities.CopyTable(skin.panelSmall)
+	skin[name].TileImageBK = ":cl:" .. name .. ".png"
+end
+
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",
   tiles       = {16, 16, 16, 16},
+  fillPadding     = {4, 3, 4, 3},
 
   font = {
     shadow = true,

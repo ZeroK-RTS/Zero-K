@@ -108,6 +108,8 @@ SkinHandler.defaultSkin = GetSkin('default')
 --//=============================================================================
 --// API
 
+SkinHandler.GetSkin = GetSkin
+
 function SkinHandler.IsValidSkin(skinname)
   return (not not GetSkin(skinname))
 end
