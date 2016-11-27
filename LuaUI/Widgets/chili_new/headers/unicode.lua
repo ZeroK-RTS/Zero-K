@@ -109,6 +109,7 @@ function Utf8NextChar(s, pos)
 end
 
 function Utf8BackspaceAt(s, pos)
+	if pos <= 1 then return s, pos end
 	local p = Utf8PrevChar(s, pos)
 	return Utf8DeleteAt(s, p), p
 end

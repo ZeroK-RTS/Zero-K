@@ -172,9 +172,7 @@ local function PopScissor()
 		local x,y, right,bottom = unpack4(curScissor)
 		local w = right  - x
 		local h = bottom - y
-		if w >= 0 and h >= 0 then
-			gl.Scissor(x,y,w,h)
-		end
+		gl.Scissor(x,y,w,h)
 	end
 end
 
@@ -407,6 +405,7 @@ function table:merge(table2)
       self[i] = v
     end
   end
+  return self
 end
 
 function table:iequal(table2)

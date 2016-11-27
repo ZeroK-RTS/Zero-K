@@ -132,7 +132,7 @@ end
 -- nil -> nil
 function Object:Dispose(_internal)
   if (not self.disposed) then
-
+Spring.Echo("Dispose", self.name)
     --// check if the control is still referenced (if so it would indicate a bug in chili's gc)
     if _internal then
       if self._hlinks and next(self._hlinks) then

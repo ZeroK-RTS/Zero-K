@@ -50,6 +50,13 @@ function Checkbox:Toggle()
   self:Invalidate()
 end
 
+function Checkbox:SetToggle(value)
+  self:CallListeners(self.OnChange, value)
+  self.checked = value
+  self.state.checked = self.checked
+  self:Invalidate()
+end
+
 --//=============================================================================
 
 function Checkbox:DrawControl()

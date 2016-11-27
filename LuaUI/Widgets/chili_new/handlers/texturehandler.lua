@@ -32,6 +32,8 @@ local placeholderFilename = theme.skin.icons.imageplaceholder
 local placeholderDL = gl.CreateList(gl.Texture,CHILI_DIRNAME .. "skins/default/empty.png")
 --local placeholderDL = gl.CreateList(gl.Texture,placeholderFilename)
 
+local isEngineTexture = { [string.byte("!")] = true, [string.byte("%")] = true, [string.byte("#")] = true, [string.byte("$")] = true, [string.byte("^")] = true }
+
 local function AddRequest(filename,obj)
   local req = requested
   if (req[filename]) then
@@ -71,13 +73,17 @@ function TextureHandler.LoadTexture(arg1,arg2,arg3)
      filename = arg1
      obj = arg2
   end
-
+  
   local tex = loaded[filename]
-  if (not tex) then
-    AddRequest(filename,obj)
-    glActiveTexture(activeTexID,glCallList,placeholderDL)
-  else
+  if (tex) then
     glActiveTexture(activeTexID,glCallList,tex.dl)
+  else
+    AddRequest(filename,obj)
+    if isEngineTexture[filename:byte(1)] then
+      gl.Texture(activeTexID, filename)
+    else
+      glActiveTexture(activeTexID,glCallList,placeholderDL)
+    end
   end
 end
 

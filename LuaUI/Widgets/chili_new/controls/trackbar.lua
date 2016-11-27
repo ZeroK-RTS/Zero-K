@@ -120,7 +120,7 @@ end
 -- @int v value of the track abr
 function Trackbar:SetValue(v)
   if type(v) ~= "number" then
-    Spring.Echo("Chili: wrong param to Trackbar:SetValue(number v)")
+    Spring.Log("Chili", "error", "Wrong param to Trackbar:SetValue(number v)")
     return
   end
   local r = v % self.step
@@ -150,18 +150,22 @@ function Trackbar:HitTest()
   return self
 end
 
-function Trackbar:MouseDown(x,y)
-  local percent = self:_GetPercent(x,y)
-  self:SetValue(self.min + percent*(self.max-self.min))
+function Trackbar:MouseDown(x,y,button)
+  if (button==1) then
+    inherited.MouseDown(self,x,y)
+    local percent = self:_GetPercent(x,y)
+    self:SetValue(self.min + percent*(self.max-self.min))
+  end
   return self
 end
 
 function Trackbar:MouseMove(x,y,dx,dy,button)
   if (button==1) then
+    inherited.MouseMove(self,x,y,dx,dy,button)
     local percent = self:_GetPercent(x,y)
     self:SetValue(self.min + percent*(self.max-self.min))
-    return self
   end
+  return self
 end
 
 --//=============================================================================
