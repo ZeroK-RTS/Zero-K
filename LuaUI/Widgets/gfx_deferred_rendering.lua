@@ -5,8 +5,8 @@ function widget:GetInfo()
   return {
 	name      = "Deferred rendering",
 	version   = 3,
-	desc      = "Collects and renders point and beam lights.",
-	author    = "beherith",
+	desc      = "Collects and renders point and beam lights using HDR and applies bloom.",
+	author    = "beherith, aeonios",
 	date      = "2015 Sept.",
 	license   = "GPL V2",
 	layer     = -1000000000,
