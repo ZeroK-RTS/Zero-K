@@ -15,6 +15,13 @@ for i = 1, 3 do
 	end
 end
 
+local fakepetals = {}
+for i = 1, 6 do
+	for j = 1, 4 do
+		fakepetals[#fakepetals + 1] = piece ('fakepetal_' .. i .. j)
+	end
+end
+
 local bomblets = {}
 for i = 1, 5 do
 	bomblets[i] = {}
@@ -53,6 +60,10 @@ local function Remove ()
 end
 
 function script.Create()
+	for i = 1, #fakepetals do
+		Hide (fakepetals[i])
+	end
+
 	Turn (base, y_axis, math.random()*pi);
 	Spin (stalk[4], y_axis, math.rad(30))
 
@@ -64,6 +75,7 @@ function script.Create()
 	end
 
 	for i = 1, #petals do
+		Move (petals[i][1], y_axis, 100)
 		Turn (petals[i][1], y_axis, i * 2 * pi / #petals)
 		Turn (petals[i][2], x_axis, math.rad(-70), math.rad(49))
 		Turn (petals[i][3], x_axis, math.rad(-20), math.rad(14))
