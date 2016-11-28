@@ -349,7 +349,8 @@ function widget:Initialize()
 							// tone mapping
 							// I'm using exponential exposure for tone mapping here, because reinhard is suseptible
 							// to precision overflows which propogate to the blur shaders, causing artifacts.
-							color = vec3(1.0) - exp(-color);
+							color = vec3(1.0) - exp(-color * 1.5);
+							color = mix(vec3(dot(color, vec3(0.299, 0.587, 0.114))), color, saturation); // increase saturation because exponential exposure reduces it.
 							gl_FragColor = vec4(color.rgb, 1.0);
 						} else {
 							gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
