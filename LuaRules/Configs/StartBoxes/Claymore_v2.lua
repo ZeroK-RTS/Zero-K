@@ -389,7 +389,8 @@ end
 
 local teams = GetTeamCount()
 
-if (teams < 6) then return combineTables({L5}, {S5}), supported_teamcounts
+if (teams == 1) then return combineTables({L1}, {S1}), supported_teamcounts
+elseif (teams < 6) then return combineTables({L5}, {S5}), supported_teamcounts
 elseif (teams == 6) then return combineTables({L5,L1}, {S5,S1}), supported_teamcounts
 elseif (teams < 11) then return combineTables({L10}, {S10}), supported_teamcounts
 elseif (teams == 11) then return combineTables({L10,L1}, {S10,S1}), supported_teamcounts
