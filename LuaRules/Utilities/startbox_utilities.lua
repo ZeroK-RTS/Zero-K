@@ -311,18 +311,8 @@ function GetTeamCount()
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
-			local isTeamValid = true
-			for j = 1, #teamList do
-				local luaAI = Spring.GetTeamLuaAI(teamList[j])
-				if luaAI and luaAI:find("Chicken") then
-					isTeamValid = false
-				end
-			end
-			if isTeamValid then
-				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
-			end
+			actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
 		end
 	end
 	return #actualAllyTeamList
 end
-
