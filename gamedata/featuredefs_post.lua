@@ -181,6 +181,9 @@ for name, def in pairs(FeatureDefs) do
 	if def.resurrectable ~= 1 then
 		def.resurrectable = 0
 	end
+	if not def.metal or def.metal == 0 then
+		def.autoreclaimable = false
+	end
 end
  
 --------------------------------------------------------------------------------
