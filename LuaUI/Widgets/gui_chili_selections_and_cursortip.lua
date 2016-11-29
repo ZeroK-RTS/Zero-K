@@ -1471,6 +1471,7 @@ local function GetResources(tooltip_type, unitID, ud)
 		if unitID then
 			local m, _, e, _, _ = Spring.GetFeatureResources(unitID)
 			metal = m or metal
+			if (metal < 1) then metal = 0 end
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'

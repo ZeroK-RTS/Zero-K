@@ -181,6 +181,10 @@ for name, def in pairs(FeatureDefs) do
 	if def.resurrectable ~= 1 then
 		def.resurrectable = 0
 	end
+	if not def.metal or def.metal == 0 then
+		def.metal = 0.001 -- engine deprioritises things with 0m in force-reclaim mode
+		def.autoreclaimable = false
+	end
 end
  
 --------------------------------------------------------------------------------
