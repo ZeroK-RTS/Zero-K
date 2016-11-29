@@ -85,7 +85,7 @@ options_order = {'useHDR', 'useBloom', 'illumThreshold', 'maxBrightness'}
 
 options = {
 	useHDR	 		= { type='bool', 	name='Use High Dynamic Range Color', 	value=true,	noHotkey = true,advanced = false,	},
-	useBloom 		= { type='bool', 	name='Apply Bloom Effect', 	value=true,	noHotkey = true,advanced = false,	},
+	useBloom 		= { type='bool', 	name='Apply Bloom Effect (HDR Only)', 	value=true,	noHotkey = true,advanced = false,	},
 	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.65, 		min=0, max=1,step=0.05, 	},
 	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.5,		min=0.05, max=1.0,step=0.05,},
 }
@@ -96,16 +96,19 @@ local useHDR = 1					-- use high dynamic range color? [0 | 1]
 local maxBrightness = 0.5			-- maximum brightness of bloom additions [1, n]
 local illumThreshold = 0.65			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
 
+local initialized = false
+
 local function OnchangeFunc()
 	useBloom 		= options.useBloom.value and 1 or 0
 	useHDR	 		= options.useHDR.value and 1 or 0
 	maxBrightness 	= options.maxBrightness.value
 	illumThreshold 	= options.illumThreshold.value
+	
+	widget:Initialize()
 end
 for key,option in pairs(options) do
 	option.OnChange = OnchangeFunc
 end
-OnchangeFunc()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -120,19 +123,19 @@ local screenratio = 1.0
 local kernelRadius = 32
 
 -- dynamic light shaders
-local depthPointShader
-local depthBeamShader
+local depthPointShader = nil
+local depthBeamShader = nil
 
 -- bloom shaders
-local brightShader
-local blurShaderH71
-local blurShaderV71
-local combineShader
+local brightShader = nil
+local blurShaderH71 = nil
+local blurShaderV71 = nil
+local combineShader = nil
 
 -- HDR textures
-local screenHDR
-local brightTexture1
-local brightTexture2
+local screenHDR = nil
+local brightTexture1 = nil
+local brightTexture2 = nil
 
 -- shader uniforms
 local lightposlocPoint = nil
@@ -207,24 +210,38 @@ function widget:ViewResize()
 	glDeleteTexture(brightTexture1 or "")
 	glDeleteTexture(brightTexture2 or "")
 	glDeleteTexture(screenHDR or "")
-	screenHDR = glCreateTexture(vsx, vsy, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
-	})
-	brightTexture1 = glCreateTexture(vsx/4, vsy/4, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
-	})
-	brightTexture2 = glCreateTexture(vsx/4, vsy/4, {
-		fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-		format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
-	})
+	screenHDR, brightTexture1, brightTexture2 = nil, nil, nil
 	
-	kernelRadius = vsx / 36.0
+	if useHDR ==1 then
+		screenHDR = glCreateTexture(vsx, vsy, {
+			fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+			format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+		})
+		
+		if useBloom == 1 then
+			brightTexture1 = glCreateTexture(vsx/4, vsy/4, {
+				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+				format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+			})
+			brightTexture2 = glCreateTexture(vsx/4, vsy/4, {
+				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
+				format = GL_RGB16F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+			})
 	
-	if not brightTexture1 or not brightTexture2 or not screenHDR then
-		Spring.Echo('Deferred Rendering: Failed to create offscreen buffers!') 
-		widgetHandler:RemoveWidget()
+			kernelRadius = vsx / 36.0
+			
+			if not brightTexture1 or not brightTexture2 then
+				Spring.Echo('Deferred Rendering: Failed to create bloom buffers!') 
+				options.useBloom.value = false
+				useBloom = 0
+			end
+		end
+		
+		if not screenHDR then
+			Spring.Echo('Deferred Rendering: Failed to create HDR buffer!') 
+			options.useHDR.value = false
+			useHDR = 0
+		end
 	end
 end
 
@@ -251,6 +268,12 @@ local function DeferredLighting_RegisterFunction(func)
 end
 
 function widget:Initialize()
+	if not initialized then
+		initialized = true
+		OnchangeFunc()
+		return
+	end
+	
 	if (glCreateShader == nil) then
 		Spring.Echo('Deferred Rendering requires shader support!') 
 		widgetHandler:RemoveWidget()
@@ -271,9 +294,9 @@ function widget:Initialize()
 			GLSLRenderer = false
 			widgetHandler:RemoveWidget()
 		else
-			fragSrc = VFS.LoadFile("shaders\\deferred_lighting.glsl", VFS.ZIP)
+			fragSrc = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\deferred_lighting.fs", VFS.ZIP)
 			--Spring.Echo('gfx_deferred_rendering.lua: Shader code:', fragSrc)
-			depthPointShader = glCreateShader({
+			depthPointShader = depthPointShader or glCreateShader({
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
@@ -297,7 +320,7 @@ function widget:Initialize()
 				uniformViewPrjInvPoint = glGetUniformLocation(depthPointShader, 'viewProjectionInv')
 			end
 			fragSrc = "#define BEAM_LIGHT \n" .. fragSrc
-			depthBeamShader = glCreateShader({
+			depthBeamShader = depthBeamShader or glCreateShader({
 				vertex = vertSrc,
 				fragment = fragSrc,
 				uniformInt = {
@@ -322,184 +345,84 @@ function widget:Initialize()
 				uniformViewPrjInvBeam = glGetUniformLocation(depthBeamShader, 'viewProjectionInv')
 			end
 			
-			brightShader = glCreateShader({
-				fragment = [[
-					uniform sampler2D texture0;
-					uniform float illuminationThreshold;
-					uniform float inverseRX;
-					uniform float inverseRY;
+			if useHDR == 1 and useBloom == 1 then
+				brightShader = brightShader or glCreateShader({
+					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_bright.fs", VFS.ZIP),
 
-					void main(void) {
-						vec2 C0 = vec2(gl_TexCoord[0]);
-						vec3 color = vec3(texture2D(texture0, C0));
-						float illum = dot(color, vec3(0.2990, 0.5870, 0.1140));
-
-						if (illum > illuminationThreshold) {
-							// Apply tone mapping when adding to the bloom texture, because otherwise the bloom intensity setting has no effect.
-							// white point correction
-							const float whiteStart = 2.0; // the minimum color intensity for starting white point transition
-							const float whiteMax = 0.35; // the maximum amount of white shifting applied
-							const float whiteScale = 0.1; // the rate at which to transition to white 
-							
-							float mx = max(color.r, max(color.g, color.b));
-							if (mx > whiteStart) {
-								color.rgb += min(vec3((mx - whiteStart) * whiteScale), vec3(whiteMax));
-							}
-							
-							// tone mapping
-							// I'm using exponential exposure for tone mapping here, because reinhard is suseptible
-							// to precision overflows which propogate to the blur shaders, causing artifacts.
-							color = vec3(1.0) - exp(-color * 1.5);
-							color = mix(vec3(dot(color, vec3(0.299, 0.587, 0.114))), color, saturation); // increase saturation because exponential exposure reduces it.
-							gl_FragColor = vec4(color.rgb, 1.0);
-						} else {
-							gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-						}
-					}
-				]],
-
-				uniformInt = {texture0 = 0},
-				uniformFloat = {illuminationThreshold, inverseRX, inverseRY}
-			})
+					uniformInt = {texture0 = 0},
+					uniformFloat = {illuminationThreshold, inverseRX, inverseRY}
+				})
+			
+				if not brightShader then
+					Spring.Echo('Deferred Rendering Widget: brightShader failed to compile!')
+					Spring.Echo(gl.GetShaderLog())
+				end
 		
-			blurShaderH71 = glCreateShader({
-				fragment = [[
-					uniform sampler2D texture0;
-					uniform float inverseRX;
-					uniform float fragKernelRadius;
-					float bloomSigma = fragKernelRadius / 2.0;
+				blurShaderH71 = blurShaderH71 or glCreateShader({
+					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_blurH.fs", VFS.ZIP),
 
-					void main(void) {
-						vec2 C0 = vec2(gl_TexCoord[0]);
-
-						vec4 S = texture2D(texture0, C0);
-						float weight = 1.0 / (2.50663 * bloomSigma);
-						float total_weight = weight;
-						S *= weight;
-						for (float r = 1.5; r < fragKernelRadius; r += 2.0)
-						{
-							weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
-							S += texture2D(texture0, C0 - vec2(r * inverseRX, 0.0)) * weight;
-							S += texture2D(texture0, C0 + vec2(r * inverseRX, 0.0)) * weight;
-
-							total_weight += 2*weight;
-						}
-
-						gl_FragColor = vec4(S.rgb/total_weight, 1.0);
-					}
-				]],
-
-				uniformInt = {texture0 = 0},
-				uniformFloat = {inverseRX, fragKernelRadius, exposure}
-			})
+					uniformInt = {texture0 = 0},
+					uniformFloat = {inverseRX, fragKernelRadius, exposure}
+				})
+			
+				if not blurShaderH71 then
+					Spring.Echo('Deferred Rendering Widget: blurshaderH71 failed to compile!')
+					Spring.Echo(gl.GetShaderLog())
+				end
 		
-			blurShaderV71 = glCreateShader({
-				fragment = [[
-					uniform sampler2D texture0;
-					uniform float inverseRY;
-					uniform float fragKernelRadius;
-					float bloomSigma = fragKernelRadius / 2.0;
+				blurShaderV71 = blurShaderV71 or glCreateShader({
+					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_blurV.fs", VFS.ZIP),
 
-					void main(void) {
-						vec2 C0 = vec2(gl_TexCoord[0]);
-
-						vec4 S = texture2D(texture0, C0);
-						float weight = 1.0 / (2.50663 * bloomSigma);
-						float total_weight = weight;
-						S *= weight;
-						for (float r = 1.5; r < fragKernelRadius; r += 2.0)
-						{
-							weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
-							S += texture2D(texture0, C0 - vec2(0.0, r * inverseRY)) * weight;
-							S += texture2D(texture0, C0 + vec2(0.0, r * inverseRY)) * weight;
-
-							total_weight += 2*weight;
-						}
-
-						gl_FragColor = vec4(S.rgb/total_weight, 1.0);
-					}
-				]],
-
-				uniformInt = {texture0 = 0},
-				uniformFloat = {inverseRY, fragKernelRadius}
-			})
+					uniformInt = {texture0 = 0},
+					uniformFloat = {inverseRY, fragKernelRadius}
+				})
+			
+				if not blurShaderV71 then
+					Spring.Echo('Deferred Rendering Widget: blueShaderV71 failed to compile!')
+					Spring.Echo(gl.GetShaderLog())
+				end
 		
-			combineShader = glCreateShader({
-				fragment = [[
-					uniform sampler2D texture0;
-					uniform sampler2D texture1;
-					uniform float illuminationThreshold;
-					uniform float fragMaxBrightness;
-					uniform int useBloom;
-					uniform int useHDR;
-					
-					vec3 toneMapReinhard(vec3 color){
-						const float whitePoint = 1.0;
-						
-						float lum = dot(color, vec3(0.2126, 0.7152, 0.0722));
-						float lumLDR =  ((lum * (1.0 + (lum/(whitePoint * whitePoint)))))/(lum + 1.0);
-						return color * (lumLDR/lum);
-					}
+				if not brightShader or not blurShaderH71 or not blurShaderV71 then
+					Spring.Echo('Deferred Rendering Widget: Failed to create bloom shaders!')
+					options.useBloom.value = false
+					useBloom = 0
+				else
+					brightShaderText0Loc = glGetUniformLocation(brightShader, "texture0")
+					brightShaderInvRXLoc = glGetUniformLocation(brightShader, "inverseRX")
+					brightShaderInvRYLoc = glGetUniformLocation(brightShader, "inverseRY")
+					brightShaderIllumLoc = glGetUniformLocation(brightShader, "illuminationThreshold")
 
-					void main(void) {
-						vec2 C0 = vec2(gl_TexCoord[0]);
-						vec4 S0 = texture2D(texture0, C0);
-						vec4 S1 = texture2D(texture1, C0);
-					
-						S1 = S1 * fragMaxBrightness;
-						vec4 hdr = bool(useBloom) ? S1 + S0 : S0;
-						
-						if (bool(useHDR)){
-							// white point correction
-							// give super bright lights a white shift
-							const float whiteStart = 1.5; // the minimum color intensity for starting white point transition
-							const float whiteMax = 0.75; // the maximum amount of white shifting applied
-							const float whiteScale = 0.2; // the rate at which to transition to white 
-							
-							float mx = max(hdr.r, max(hdr.g, hdr.b));
-							if (mx > whiteStart) {
-								hdr.rgb += vec3(min((mx - whiteStart) * whiteScale,  whiteMax));
-							}
-						
-							// tone mapping
-							hdr.rgb = toneMapReinhard(hdr.rgb);
-						}
-						
-						vec4 map = vec4(hdr.rgb, 1.0);
-											
-						gl_FragColor = map;
-					}
-				]],
-
-				uniformInt = { texture0 = 0, texture1 = 1, useBloom = 1, useHDR = 1},
-				uniformFloat = {illuminationThreshold, fragMaxBrightness}
-			})
-		
-			if not brightShader or not blurShaderH71 or not blurShaderV71 or not combineShader then
-				Spring.Echo('Deferred Rendering Widget: Failed to create shaders!')
-				Spring.Echo(gl.GetShaderLog())
-				widgetHandler:RemoveWidget()
-				return
+					blurShaderH71Text0Loc = glGetUniformLocation(blurShaderH71, "texture0")
+					blurShaderH71InvRXLoc = glGetUniformLocation(blurShaderH71, "inverseRX")
+					blurShaderH71FragLoc = glGetUniformLocation(blurShaderH71, "fragKernelRadius")
+					blurShaderV71Text0Loc = glGetUniformLocation(blurShaderV71, "texture0")
+					blurShaderV71InvRYLoc = glGetUniformLocation(blurShaderV71, "inverseRY")
+					blurShaderV71FragLoc = glGetUniformLocation(blurShaderV71, "fragKernelRadius")
+				end
 			end
-		
-			brightShaderText0Loc = glGetUniformLocation(brightShader, "texture0")
-			brightShaderInvRXLoc = glGetUniformLocation(brightShader, "inverseRX")
-			brightShaderInvRYLoc = glGetUniformLocation(brightShader, "inverseRY")
-			brightShaderIllumLoc = glGetUniformLocation(brightShader, "illuminationThreshold")
+			
+			if useHDR == 1 then
+				combineShader = combineShader or glCreateShader({
+					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_combine.fs", VFS.ZIP),
 
-			blurShaderH71Text0Loc = glGetUniformLocation(blurShaderH71, "texture0")
-			blurShaderH71InvRXLoc = glGetUniformLocation(blurShaderH71, "inverseRX")
-			blurShaderH71FragLoc = glGetUniformLocation(blurShaderH71, "fragKernelRadius")
-			blurShaderV71Text0Loc = glGetUniformLocation(blurShaderV71, "texture0")
-			blurShaderV71InvRYLoc = glGetUniformLocation(blurShaderV71, "inverseRY")
-			blurShaderV71FragLoc = glGetUniformLocation(blurShaderV71, "fragKernelRadius")
-
-			combineShaderUseBloomLoc = glGetUniformLocation(combineShader, "useBloom")
-			combineShaderUseHDRLoc = glGetUniformLocation(combineShader, "useHDR")
-			combineShaderTexture0Loc = glGetUniformLocation(combineShader, "texture0")
-			combineShaderTexture1Loc = glGetUniformLocation(combineShader, "texture1")
-			combineShaderIllumLoc = glGetUniformLocation(combineShader, "illuminationThreshold")
-			combineShaderFragLoc = glGetUniformLocation(combineShader, "fragMaxBrightness")
+					uniformInt = { texture0 = 0, texture1 = 1, useBloom = 1, useHDR = 1},
+					uniformFloat = {illuminationThreshold, fragMaxBrightness}
+				})
+			
+				if not combineShader then
+					Spring.Echo('Deferred Rendering Widget: combineShader failed to compile!')
+					options.useHDR.value = false
+					useHDR = 0
+					Spring.Echo(gl.GetShaderLog())
+				else
+					combineShaderUseBloomLoc = glGetUniformLocation(combineShader, "useBloom")
+					combineShaderUseHDRLoc = glGetUniformLocation(combineShader, "useHDR")
+					combineShaderTexture0Loc = glGetUniformLocation(combineShader, "texture0")
+					combineShaderTexture1Loc = glGetUniformLocation(combineShader, "texture1")
+					combineShaderIllumLoc = glGetUniformLocation(combineShader, "illuminationThreshold")
+					combineShaderFragLoc = glGetUniformLocation(combineShader, "fragMaxBrightness")
+				end
+			end
 			
 			WG.DeferredLighting_RegisterFunction = DeferredLighting_RegisterFunction
 		end
@@ -507,6 +430,8 @@ function widget:Initialize()
 	else
 		GLSLRenderer = false
 	end
+	
+	widget:ViewResize()
 end
 
 function widget:Shutdown()
@@ -519,6 +444,10 @@ function widget:Shutdown()
 			glDeleteShader(blurShaderV71)
 			glDeleteShader(combineShader)
 		end
+		glDeleteTexture(brightTexture1 or "")
+		glDeleteTexture(brightTexture2 or "")
+		glDeleteTexture(screenHDR or "")
+		screenHDR, brightTexture1, brightTexture2 = nil, nil, nil
 	end
 end
 
@@ -617,7 +546,7 @@ end
 local function Bloom()
 	gl.Color(1, 1, 1, 1)
 	
-	if useBloom then
+	if useHDR == 1 and useBloom == 1 then
 		glUseShader(brightShader)
 			glUniformInt(brightShaderText0Loc, 0)
 			glUniform(   brightShaderInvRXLoc, ivsx)
@@ -656,7 +585,9 @@ local function Bloom()
 		local dx, dy, dz = ocoords[4], ocoords[5], ocoords[6]
 		glDepthTest(false)
 		glTexture(0, screenHDR)
-		glTexture(1, brightTexture1)
+		if useBloom == 1 then
+			glTexture(1, brightTexture1)
+		end
 		glTexRect(0, 0, vsx, vsy, false, true)
 		glTexture(0, false)
 		glTexture(1, false)
@@ -670,7 +601,9 @@ function widget:DrawScreenEffects()
 		return
 	end
 	
-	glCopyToTexture(screenHDR, 0, 0, 0, 0, vsx, vsy) -- copy the screen to an HDR texture
+	if useHDR == 1 then
+		glCopyToTexture(screenHDR, 0, 0, 0, 0, vsx, vsy) -- copy the screen to an HDR texture
+	end
 	
 	local beamLights = {}
 	local beamLightCount = 0
@@ -684,12 +617,22 @@ function widget:DrawScreenEffects()
 	glBlending(GL.DST_COLOR, GL.ONE) -- Set add blending mode
 	
 	if beamLightCount > 0 then
-		glRenderToTexture(screenHDR, DrawLightType, beamLights, beamLightCount, 1)
+		if useHDR == 1 then
+			glRenderToTexture(screenHDR, DrawLightType, beamLights, beamLightCount, 1)
+		else
+			DrawLightType(beamLights, beamLightCount, 1)
+		end
 	end
 	if pointLightCount > 0 then
-		glRenderToTexture(screenHDR, DrawLightType, pointLights, pointLightCount, 0)
+		if useHDR == 1 then
+			glRenderToTexture(screenHDR, DrawLightType, pointLights, pointLightCount, 0)
+		else
+			DrawLightType(pointLights, pointLightCount, 0)
+		end
 	end
 	glBlending(false)
 	
-	Bloom()
+	if useHDR == 1 then
+		Bloom()
+	end
 end
