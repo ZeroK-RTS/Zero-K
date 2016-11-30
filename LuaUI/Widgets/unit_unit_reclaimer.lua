@@ -1,94 +1,53 @@
+function widget:GetInfo() return {
+	name    = "Specific Unit Reclaimer",
+	desc    = "Reclaims targeted unit types in an area",
+	author  = "Google Frog",
+	date    = "May 12, 2008",
+	license = "GNU GPL, v2 or later",
+	layer   = 0,
+	enabled = true
+} end
 
-function widget:GetInfo()
-  return {
-    name      = "Specific Unit Reclaimer",
-    desc      = "Reclaims targeted unit types in an area",
-    author    = "Google Frog",
-    date      = "May 12, 2008",
-    license   = "GNU GPL, v2 or later",
-    layer     = 0,
-    enabled   = false  --  loaded by default?
-  }
-end
+function widget:CommandNotify(cmdID, params, options)
 
-local team = Spring.GetMyTeamID()
-local allyTeam = Spring.GetMyAllyTeamID()
-
--- Speedups
-
-local spGiveOrderToUnit = Spring.GiveOrderToUnit
-local spGiveOrderToUnitArray = Spring.GiveOrderToUnitArray
-local spGetSelectedUnits = Spring.GetSelectedUnits
-local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
-local spWorldToScreenCoords = Spring.WorldToScreenCoords
-local spTraceScreenRay = Spring.TraceScreenRay
-local spGetUnitDefID = Spring.GetUnitDefID
-local spGetUnitAllyTeam = Spring.GetUnitAllyTeam
-
-local reclaimEnemy = Game.reclaimAllowEnemies
-
---
-function widget:Initialize()
-	 if (Spring.GetSpectatingState() or Spring.IsReplay()) and (not Spring.IsCheatingEnabled()) then
-		Spring.Echo("<Specific Unit Reclaimer>: disabled for spectators")
-		widgetHandler:RemoveWidget()
+	if not options.ctrl or (cmdID ~= CMD.RECLAIM) or (#params ~= 4) then
+		return
 	end
-end
 
-function spEcho(text)
-  Spring.Echo(text)
-end
-
-function widget:CommandNotify(id, params, options)
-
-
-  if (id == 90) and (#params == 4) then
-    
 	local cx, cy, cz = params[1], params[2], params[3]
-	
-	local mx,my,mz = spWorldToScreenCoords(cx, cy, cz)
-    local cType,id = spTraceScreenRay(mx,my) 
-	
-	if (cType == "unit") then 
-  
-	  local cr = params[4]
+	local mx, my = Spring.WorldToScreenCoords(cx, cy, cz)
+	local cType, targetID = Spring.TraceScreenRay(mx, my)
 
-	  local selUnits = spGetSelectedUnits()
-	  
-	  local shift = options.shift
-	  
-	  if not shift then
-	    for i, sid in ipairs(selUnits) do 
-		  spGiveOrderToUnit(sid, CMD.STOP, {}, CMD.OPT_RIGHT)
-	    end
-	  end
-	  
-	  if reclaimEnemy and spGetUnitAllyTeam(id) ~= allyTeam then
-	    
-		local areaUnits = spGetUnitsInCylinder(cx ,cz , cr)
-		
-	    for i, aid in ipairs(areaUnits) do 
-		  if spGetUnitAllyTeam(aid) ~= allyTeam then
-		    spGiveOrderToUnitArray( selUnits, CMD.RECLAIM, {aid}, CMD.OPT_SHIFT)
-		  end
-	    end
-	  
-	  else
-	  
-	    local areaUnits = spGetUnitsInCylinder(cx ,cz , cr, team)
-	    local unitDef = spGetUnitDefID(id)
-	  
-        for i, aid in ipairs(areaUnits) do 
-		  if spGetUnitDefID(aid) == unitDef then
-		    spGiveOrderToUnitArray( selUnits, CMD.RECLAIM, {aid}, CMD.OPT_SHIFT)
-		  end
-	    end
-		
-	  end
-	  
-	return true 
-	  
+	if (cType ~= "unit") then
+		return
 	end
-	
-  end
+
+	if not options.shift and not options.meta then
+		Spring.GiveOrder (CMD.STOP, {}, CMD.OPT_RIGHT)
+		options.shift = true
+	end
+
+	local myAllyTeam = Spring.GetMyAllyTeamID()
+	if myAllyTeam ~= Spring.GetUnitAllyTeam(targetID) then
+		return
+	end
+
+	local cr = params[4]
+	local areaUnits = Spring.GetUnitsInCylinder(cx, cz, cr)
+	local unitDefID = Spring.GetUnitDefID(targetID)
+
+	local paramTable = {-1}
+	for i = 1, #areaUnits do
+		local unitID = areaUnits[i]
+		if Spring.GetUnitDefID(unitID) == unitDefID
+		and Spring.GetUnitAllyTeam(unitID) == myAllyTeam
+		then
+			paramTable[1] = unitID
+			if not WG.CommandInsert or not WG.CommandInsert(CMD.RECLAIM, paramTable, options) then
+				Spring.GiveOrder(CMD.RECLAIM, paramTable, options)
+			end
+		end
+	end
+
+	return true
 end
