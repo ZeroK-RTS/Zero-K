@@ -87,15 +87,15 @@ options_order = {'useHDR', 'useBloom', 'illumThreshold', 'maxBrightness'}
 options = {
 	useHDR	 		= { type='bool', 	name='Use High Dynamic Range Color', 	value=true,	noHotkey = true,advanced = false,	},
 	useBloom 		= { type='bool', 	name='Apply Bloom Effect (HDR Only)', 	value=true,	noHotkey = true,advanced = false,	},
-	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.65, 		min=0, max=1,step=0.05, 	},
-	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.5,		min=0.05, max=1.0,step=0.05,},
+	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.85, 		min=0, max=1,step=0.05, 	},
+	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.35,		min=0.05, max=1.0,step=0.05,},
 }
 
 -- config params
 local useBloom = 1					-- apply the bloom effect? [0 | 1]
 local useHDR = 1					-- use high dynamic range color? [0 | 1]
-local maxBrightness = 0.5			-- maximum brightness of bloom additions [1, n]
-local illumThreshold = 0.65			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
+local maxBrightness = 0.35			-- maximum brightness of bloom additions [1, n]
+local illumThreshold = 0.85			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
 
 local initialized = false
 
