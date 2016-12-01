@@ -26,7 +26,7 @@ unitDef = {
     [[armbanth]],
     [[armorco]],
     [[shipheavyarty]],
-	[[shipcarrier]],
+	--[[shipcarrier]],
 	[[subtacmissile]],
   },
 
