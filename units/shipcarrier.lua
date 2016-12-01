@@ -1,14 +1,14 @@
 unitDef = {
-  unitname               = [[reef]],
+  unitname               = [[shipcarrier]],
   name                   = [[Reef]],
   description            = [[Aircraft Carrier (Bombardment)]],
   acceleration           = 0.0354,
-  activateWhenBuilt      = true,
+  activateWhenBuilt   	 = true,
   brakeRate              = 0.0466,
   buildCostEnergy        = 3500,
   buildCostMetal         = 3500,
   builder                = false,
-  buildPic               = [[reef.png]],
+  buildPic               = [[shipcarrier.png]],
   buildTime              = 3500,
   canAssist              = false,
   canMove                = true,
@@ -37,7 +37,7 @@ unitDef = {
   floater                = true,
   footprintX             = 6,
   footprintZ             = 6,
-  iconType               = [[carrier]],
+  iconType               = [[shipcarrier]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 7500,
@@ -45,8 +45,8 @@ unitDef = {
   minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT6]],
-  objectName             = [[lmcarrier.dae]],
-  script                 = [[reef.lua]],
+  objectName             = [[shipcarrier.dae]],
+  script                 = [[shipcarrier.lua]],
   radarEmitHeight        = 48,
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
@@ -58,7 +58,8 @@ unitDef = {
     },
   },
   showNanoSpray          = false,
-  sightDistance          = 1105,
+  sightDistance          = 660,
+  sonarDistance          = 660,
   turninplace            = 0,
   turnRate               = 233,
   waterline              = 20,
@@ -170,7 +171,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
-      object           = [[lmcarrier_dead.dae]],
+      object           = [[shipcarrier_dead.dae]],
     },
 
     HEAP  = {
@@ -184,4 +185,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ reef = unitDef })
+return lowerkeys({ shipcarrier = unitDef })

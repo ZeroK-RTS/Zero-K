@@ -86,7 +86,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["corthud"].id] = 1,
 	[UnitDefNames["spiderassault"].id] = 1,
 	[UnitDefNames["armrock"].id] = 1,
-	--[UnitDefNames["reef"].id] = 1,
+	[UnitDefNames["shipcarrier"].id] = 1,
 	[UnitDefNames["armorco"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
 	

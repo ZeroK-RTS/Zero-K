@@ -40,16 +40,12 @@ local menu = {
 			angle = 135,
 			unit = "shipheavyarty",
 			label = "Ship",
-			--items = {
-			--	{
-			--		angle = -135,
-			--		unit = "armcarry"
-			--	},
-			--	{
-			--		angle = -135,
-			--		unit = "reef"
-			--	},
-			--}
+			items = {
+				{
+					angle = -135,
+					unit = "shipcarrier"
+				},
+			},
 		},
 		{
 			angle = 180,

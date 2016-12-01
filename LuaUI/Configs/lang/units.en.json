@@ -1048,7 +1048,6 @@
 		"description" : "Transport Platform",
 		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
 	},
-	
 	"shipheavyarty" : {
 		"name" : "Shogun",
 		"description" : "Battleship (Heavy Artillery)",
@@ -1124,7 +1123,7 @@
 		"description" : "Ranged Support Strider",
 		"helptext" : "The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."
 	},
-	"reef" : {
+	"shipcarrier" : {
 		"name" : "Reef",
 		"description" : "Aircraft Carrier (Bombardment)",
 		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."

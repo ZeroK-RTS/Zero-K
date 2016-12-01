@@ -205,7 +205,7 @@ local corclogDefID = UnitDefNames["corclog"].id
 
 local exceptionArray = {
 	[UnitDefNames["armcarry"].id] = true,
-	[UnitDefNames["reef"].id] = true,
+	[UnitDefNames["shipcarrier"].id] = true,
 }
 
 local terraformUnitDefIDs = {}
