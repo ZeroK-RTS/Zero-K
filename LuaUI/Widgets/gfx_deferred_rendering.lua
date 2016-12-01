@@ -19,6 +19,7 @@ end
 
 local GL_RGB16F_ARB          = 0x881B
 local GL_RGB32F_ARB          = 0x8815
+local GL_RGB8				 = 0x8051
 local GL_MODELVIEW           = GL.MODELVIEW
 local GL_NEAREST             = GL.NEAREST
 local GL_ONE                 = GL.ONE
@@ -218,21 +219,15 @@ function widget:ViewResize()
 		})
 		
 		if useBloom == 1 then
-			local width, height
-			if vsx > 1280 then
-				width = vsx/8
-				height = vsy/8
-			else
-				width = vsx/4
-				height = vsy/4
-			end
+			local width, height = vsx/2, vsy/2
+			
 			brightTexture1 = glCreateTexture(width, height, {
 				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-				wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 			})
 			brightTexture2 = glCreateTexture(width, height, {
 				fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
-				wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
+				format = GL_RGB8, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 			})
 			
 			if not brightTexture1 or not brightTexture2 then
