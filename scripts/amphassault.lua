@@ -5,12 +5,18 @@ local rbarrel1, rbarrel2, lbarrel1, lbarrel2, rflare, lflare, mflare = piece('rb
 local rfleg, rffoot, lfleg, lffoot, rbleg, rbfoot, lbleg, lbfoot = piece('rfleg', 'rffoot', 'lfleg', 'lffoot', 'rbleg', 'rbfoot', 'lbleg', 'lbfoot')
 
 local vents = {rffoot, lffoot, rbfoot, lbfoot, piece('ventf1', 'ventf2', 'ventr1', 'ventr2', 'ventr3')}
+local feet = {rffoot, lffoot, rbfoot, lbfoot}
 
 local SIG_WALK = 1
 local SIG_AIM = 2
 local SIG_RESTORE = 4
 local SIG_BOB = 8
 local SIG_FLOAT = 32
+
+SIG_WADE = 64
+WADE_SFX = SFXTYPE_WAKE1
+WADE_PIECE = feet
+include "wade.lua"
 
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
@@ -277,9 +283,15 @@ end
 
 function script.StartMoving()
 	StartThread(Walk)
+	isMoving = true
+	if inWater then 
+		StartThread(Wade);
+	end
 end
 
 function script.StopMoving()
+	Signal(SIG_WADE)
+	isMoving = false
 	StartThread(Stopping)
 	GG.Floating_StopMoving(unitID)
 end
