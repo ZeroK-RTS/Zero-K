@@ -83,6 +83,8 @@ local function MakeRealTable(proxy)
 	return ret
 end
 
+Spring.Utilities.MakeRealTable = MakeRealTable
+
 local function TableEcho(data, name, indent, tableChecked)
 	name = name or "TableEcho"
 	indent = indent or ""
