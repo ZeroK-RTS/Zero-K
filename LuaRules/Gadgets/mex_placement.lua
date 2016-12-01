@@ -109,6 +109,15 @@ function gadget:Initialize()
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+
+	local scalingFactor = 2 * Game.squareSize
+	for i = 1, #metalSpots do
+		local spot = metalSpots[i]
+		for x = -1, 1 do
+		for z = -1, 1 do
+			Spring.SetSquareBuildingMask(spot.x / scalingFactor + x, spot.z / scalingFactor + z, 2)
+		end end
+	end
 end
 
 --------------------------------------------------------------------------------

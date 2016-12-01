@@ -1,6 +1,6 @@
 unitDef = {
   unitname               = [[armcarry]],
-  name                   = [[Reef]],
+  name                   = [[Reef (Classic)]],
   description            = [[Aircraft Carrier (Bombardment) & Anti-Nuke]],
   acceleration           = 0.0354,
   activateWhenBuilt      = true,

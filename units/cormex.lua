@@ -8,6 +8,7 @@ unitDef = {
   buildCostEnergy        = 75,
   buildCostMetal         = 75,
   builder                = false,
+  buildingMask           = 0,
   buildPic               = [[cormex.png]],
   buildTime              = 75,
   category               = [[UNARMED FLOAT]],
