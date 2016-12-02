@@ -3,7 +3,6 @@ local weaponDef = {
 	name                    = [[Heat Ray]],
 	accuracy                = 512,
 	areaOfEffect            = 20,
-	cegTag                  = [[HEATRAY_CEG]],
 	coreThickness           = 0.5,
 	craterBoost             = 0,
 	craterMult              = 0,
