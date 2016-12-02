@@ -2,23 +2,6 @@
 -- heatray_hit
 
 return {
-  ["heatray_ceg"] = {
-    light = {
-      air                = true,
-      class              = [[CSimpleGroundFlash]],
-      count              = 1,
-      ground             = true,
-      water              = true,
-      properties = {
-        colormap           = [[1 0.5 0 0.03  0 0 0 0.01]],
-        size               = 80,
-        sizegrowth         = 0,
-        texture            = [[groundflash]],
-        ttl                = 5,
-      },
-    },
-  },
-
   ["heatray_hit"] = {
     usedefaultexplosions = false,
     cinder = {
