@@ -1225,8 +1225,12 @@ options.toggleBacklog.OnChange = SwapBacklog
 -- callins
 -----------------------------------------------------------------------
 
+local keypadEnterPressed = false
 
 function widget:KeyPress(key, modifier, isRepeat)
+	if key == KEYSYMS.KP_ENTER then
+		keypadEnterPressed = true
+	end
 	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
@@ -1246,8 +1250,13 @@ end
 
 function widget:KeyRelease(key, modifier, isRepeat)
 	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
+		if key == KEYSYMS.KP_ENTER and keypadEnterPressed then
+			keypadEnterPressed = false
+			return
+		end
 		HideInputSpace()
 	end
+	keypadEnterPressed = false
 end
 
 --------------------------------------------------------------------------------
