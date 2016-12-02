@@ -27,4 +27,4 @@ configurationName = "Configs/integral_menu_config_old.lua"
 
 options_path = 'Settings/HUD Panels/Command Panel Old'
 
-options.unitsHotkeys.value = false
+options.unitsHotkeys2.value = false

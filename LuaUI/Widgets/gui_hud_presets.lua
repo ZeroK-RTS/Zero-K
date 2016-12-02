@@ -111,7 +111,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 1)
 	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "armap")
 	
-	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnlyOnChat", true)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogHideNotChat", true)
 	
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 7)
 	
@@ -165,7 +165,7 @@ local function ResetOptionsFromNew()
 	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 0)
 	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "arwindow")
 	
-	WG.SetWidgetOption(consoleName, consolePath, "backlogArrowOnlyOnChat", false)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogHideNotChat", false)
 	
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 0)
 	

@@ -73,7 +73,7 @@ local buildTabHolder, buttonsHolder -- Required for padding update setting
 
 options_path = 'Settings/HUD Panels/Command Panel'
 options_order = { 
-	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys', 'ctrlDisableGrid', 'hide_when_spectating',
+	'background_opacity', 'keyboardType', 'selectionClosesTab', 'altInsertBehind', 'unitsHotkeys2', 'ctrlDisableGrid', 'hide_when_spectating',
 	'tab_economy', 'tab_defence', 'tab_special', 'tab_factory',  'tab_units', 'tabFontSize', 'leftPadding', 'rightPadding', 'flushLeft', 'fancySkinning'
 }
 
@@ -109,10 +109,10 @@ options = {
 		value = false,
 		noHotkey = true,
 	},
-	unitsHotkeys = {
+	unitsHotkeys2 = {
 		name = 'Enable Factory Hotkeys',
 		type = 'bool',
-		value = true,
+		value = false,
 		noHotkey = true,
 	},
 	ctrlDisableGrid = {
@@ -1460,7 +1460,7 @@ local function InitializeControls()
 		
 		data.tabButton = GetTabButton(tabPanel, commandHolder, data.name, data.humanName, hotkey, data.loiterable, OnTabSelect)
 	
-		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1486,7 +1486,7 @@ function options.keyboardType.OnChange(self)
 	gridKeyMap, gridMap = GenerateGridKeyMap(self.value)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
-		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys.value) then
+		if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
 			data.buttons.ApplyGridHotkeys(gridMap)
 		end
 	end
@@ -1497,11 +1497,11 @@ function options.hide_when_spectating.OnChange(self)
 	background:SetVisibility(not (self.value and isSpec))
 end
 
-function options.unitsHotkeys.OnChange(self)
+function options.unitsHotkeys2.OnChange(self)
 	for i = 1, #commandPanels do
 		local data = commandPanels[i]
 		if data.disableableKeys then
-			if not options.unitsHotkeys.value then
+			if not options.unitsHotkeys2.value then
 				data.buttons.RemoveGridHotkeys()
 			else
 				data.buttons.ApplyGridHotkeys(gridMap)
@@ -1613,7 +1613,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 	
 	local currentTab = tabPanel.GetCurrentTab()
 	local commandPanel = currentTab and commandPanelMap[currentTab]
-	if (not commandPanel) or (not (commandPanel.gridHotkeys and ((not commandPanel.disableableKeys) or options.unitsHotkeys.value))) then
+	if (not commandPanel) or (not (commandPanel.gridHotkeys and ((not commandPanel.disableableKeys) or options.unitsHotkeys2.value))) then
 		return false
 	end
 	

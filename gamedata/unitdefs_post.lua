@@ -832,8 +832,8 @@ for i = 1, #raidDefenseBuildingStrings do
     raidDefenseBuildings[raidDefenseBuildingStrings[i]] = true
 end
 
-if modOptions and modOptions.raidDefenseBuildingRangeMult and modOptions.raidDefenseBuildingRangeMult ~= 1 then
-    local defenseMult = modOptions.raidDefenseBuildingRangeMult
+if modOptions and modOptions.raid_defense_building_range_mult and modOptions.raid_defense_building_range_mult ~= 1 then
+    local defenseMult = modOptions.raid_defense_building_range_mult
     --Spring.Echo("Multiplying raid defense building ranges by " .. defenseMult)
     for unitDefID, unitDef in pairs(UnitDefs) do
         if unitDef.weapons and unitDef.weapondefs and raidDefenseBuildings[unitDef.unitname] then

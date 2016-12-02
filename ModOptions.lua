@@ -405,7 +405,7 @@ local options = {
     step   = 0.05,
   },
     {
-    key    = 'raidDefenseBuildingRangeMult',
+    key    = 'raid_defense_building_range_mult',
     name   = 'Range Multiplier for Raid-Damaging Buildings',
     desc   = 'Multiplies the ranges of all buildings that are able to directly damage ground-based raids, excluding ' ..
     'superweapons, nuclear weapons and the missile silo.',
