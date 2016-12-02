@@ -162,7 +162,7 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
-	'backlogArrowOnlyOnChat',
+	'backlogHideNotChat',
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
@@ -519,7 +519,7 @@ options = {
 		end,
 	},
 	enableSwap = {
-		name = "Backlog Arrow",
+		name = "Show backlog arrow",
 		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
@@ -563,14 +563,20 @@ options = {
 			window_chat:Invalidate()
 		end,
 	},
-	backlogArrowOnlyOnChat = {
-		name = "Chat shows hacklog arrow",
-		desc = "When enabled, the backlog arrow will be visible only when chatting.",
+	backlogHideNotChat = {
+		name = "Hide arrow when not chatting",
+		desc = "Enable to hide the backlog arrow when not entering chat.",
 		type = 'bool',
-		value = true,
+		value = false,
 		OnChange = function(self)
-			if backlogButton and backlogButton.parent then
-				backlogButton:SetVisibility(WG.enteringText)
+			if self.value then
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(WG.enteringText)
+				end
+			else
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(true)
+				end
 			end
 		end
 	},
@@ -1107,7 +1113,7 @@ local function ShowInputSpace()
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
 	
-	if options.backlogArrowOnlyOnChat.value and backlogButton and backlogButton.parent then
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
 		backlogButton:SetVisibility(true)
 	end
 end
@@ -1117,7 +1123,7 @@ local function HideInputSpace()
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
 	
-	if options.backlogArrowOnlyOnChat.value and backlogButton and backlogButton.parent then
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
 		backlogButton:SetVisibility(false)
 	end
 end
