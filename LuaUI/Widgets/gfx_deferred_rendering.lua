@@ -82,30 +82,23 @@ local spGetSmoothMeshHeight  = Spring.GetSmoothMeshHeight
 
 local GLSLRenderer = true
 
-options_path = 'Settings/Graphics/HDR'
-options_order = {'useHDR', 'useBloom', 'illumThreshold', 'maxBrightness'}
+options_path = 'Settings/Graphics/HDR (experimental)'
+options_order = {'enableHDR', 'enableBloom', 'illumThreshold', 'maxBrightness'}
 
 options = {
-	useHDR	 		= { type='bool', 	name='Use High Dynamic Range Color', 	value=true,	noHotkey = true,advanced = false,	},
-	useBloom 		= { type='bool', 	name='Apply Bloom Effect (HDR Only)', 	value=true,	noHotkey = true,advanced = false,	},
-	illumThreshold 	= { type='number', 		name='Illumination Threshold', 	value=0.85, 		min=0, max=1,step=0.05, 	},
-	maxBrightness 	= { type='number', 		name='Maximum Highlight Brightness', 			value=0.35,		min=0.05, max=1.0,step=0.05,},
+	enableHDR      = {type = 'bool',   name = 'Use High Dynamic Range Color',  value = false,},
+	enableBloom    = {type = 'bool',   name = 'Apply Bloom Effect (HDR Only)', value = true,},
+	
+	-- how bright does a fragment need to be before being considered a glow source? [0, 1]
+	illumThreshold = {type = 'number', name = 'Illumination Threshold',       value = 0.85, min = 0,    max = 1, step = 0.05,},
+	
+	-- maximum brightness of bloom additions [1, n]
+	maxBrightness  = {type = 'number', name = 'Maximum Highlight Brightness', value = 0.35, min = 0.05, max = 1, step = 0.05,},
 }
-
--- config params
-local useBloom = 1					-- apply the bloom effect? [0 | 1]
-local useHDR = 1					-- use high dynamic range color? [0 | 1]
-local maxBrightness = 0.35			-- maximum brightness of bloom additions [1, n]
-local illumThreshold = 0.85			-- how bright does a fragment need to be before being considered a glow source? [0, 1]
 
 local initialized = false
 
 local function OnchangeFunc()
-	useBloom 		= options.useBloom.value and 1 or 0
-	useHDR	 		= options.useHDR.value and 1 or 0
-	maxBrightness 	= options.maxBrightness.value
-	illumThreshold 	= options.illumThreshold.value
-	
 	widget:Initialize()
 end
 for key,option in pairs(options) do
@@ -212,13 +205,13 @@ function widget:ViewResize()
 	glDeleteTexture(screenHDR or "")
 	screenHDR, brightTexture1, brightTexture2 = nil, nil, nil
 	
-	if useHDR ==1 then
+	if options.enableHDR.value then
 		screenHDR = glCreateTexture(vsx, vsy, {
 			fbo = true, min_filter = GL.LINEAR, mag_filter = GL.LINEAR,
 			format = GL_RGB32F_ARB, wrap_s = GL.CLAMP, wrap_t = GL.CLAMP,
 		})
 		
-		if useBloom == 1 then
+		if options.enableBloom.value then
 			local width, height = vsx/2, vsy/2
 			
 			brightTexture1 = glCreateTexture(width, height, {
@@ -232,15 +225,13 @@ function widget:ViewResize()
 			
 			if not brightTexture1 or not brightTexture2 then
 				Spring.Echo('Deferred Rendering: Failed to create bloom buffers!') 
-				options.useBloom.value = false
-				useBloom = 0
+				options.enableBloom.value = false
 			end
 		end
 		
 		if not screenHDR then
 			Spring.Echo('Deferred Rendering: Failed to create HDR buffer!') 
-			options.useHDR.value = false
-			useHDR = 0
+			options.enableHDR.value = false
 		end
 	end
 end
@@ -345,7 +336,7 @@ function widget:Initialize()
 				uniformViewPrjInvBeam = glGetUniformLocation(depthBeamShader, 'viewProjectionInv')
 			end
 			
-			if useHDR == 1 and useBloom == 1 then
+			if options.enableHDR.value and options.enableBloom.value then
 				brightShader = brightShader or glCreateShader({
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_bright.fs", VFS.ZIP),
 
@@ -384,8 +375,7 @@ function widget:Initialize()
 		
 				if not brightShader or not blurShaderH71 or not blurShaderV71 then
 					Spring.Echo('Deferred Rendering Widget: Failed to create bloom shaders!')
-					options.useBloom.value = false
-					useBloom = 0
+					options.enableBloom.value = false
 				else
 					brightShaderText0Loc = glGetUniformLocation(brightShader, "texture0")
 					brightShaderInvRXLoc = glGetUniformLocation(brightShader, "inverseRX")
@@ -401,7 +391,7 @@ function widget:Initialize()
 				end
 			end
 			
-			if useHDR == 1 then
+			if options.enableHDR.value then
 				combineShader = combineShader or glCreateShader({
 					fragment = VFS.LoadFile("LuaUI\\Widgets\\Shaders\\bloom_combine.fs", VFS.ZIP),
 
@@ -411,8 +401,7 @@ function widget:Initialize()
 			
 				if not combineShader then
 					Spring.Echo('Deferred Rendering Widget: combineShader failed to compile!')
-					options.useHDR.value = false
-					useHDR = 0
+					options.enableHDR.value = false
 					Spring.Echo(gl.GetShaderLog())
 				else
 					combineShaderUseBloomLoc = glGetUniformLocation(combineShader, "useBloom")
@@ -544,12 +533,12 @@ end
 local function Bloom()
 	gl.Color(1, 1, 1, 1)
 	
-	if useHDR == 1 and useBloom == 1 then
+	if options.enableHDR.value and options.enableBloom.value then
 		glUseShader(brightShader)
 			glUniformInt(brightShaderText0Loc, 0)
 			glUniform(   brightShaderInvRXLoc, ivsx)
 			glUniform(   brightShaderInvRYLoc, ivsy)
-			glUniform(   brightShaderIllumLoc, illumThreshold)
+			glUniform(   brightShaderIllumLoc, options.illumThreshold.value)
 			mglRenderToTexture(brightTexture1, screenHDR, 1, -1)
 		glUseShader(0)
 
@@ -569,12 +558,12 @@ local function Bloom()
 	end
 
 	glUseShader(combineShader)
-		glUniformInt(combineShaderUseBloomLoc, useBloom)
+		glUniformInt(combineShaderUseBloomLoc, options.enableBloom.value and 1 or 0)
 		glUniformInt(combineShaderTexture0Loc, 0)
 		glUniformInt(combineShaderTexture1Loc, 1)
-		glUniform(   combineShaderFragLoc, maxBrightness)
+		glUniform(   combineShaderFragLoc, options.maxBrightness.value)
 		glTexture(0, screenHDR)
-		if useBloom == 1 then
+		if options.enableBloom.value then
 			glTexture(1, brightTexture1)
 		end
 		glTexRect(0, 0, vsx, vsy, false, true)
@@ -590,7 +579,7 @@ function widget:DrawScreenEffects()
 		return
 	end
 	
-	if useHDR == 1 then
+	if options.enableHDR.value then
 		glCopyToTexture(screenHDR, 0, 0, 0, 0, vsx, vsy) -- copy the screen to an HDR texture
 	end
 	
@@ -606,14 +595,14 @@ function widget:DrawScreenEffects()
 	glBlending(GL.DST_COLOR, GL.ONE) -- Set add blending mode
 	
 	if beamLightCount > 0 then
-		if useHDR == 1 then
+		if options.enableHDR.value then
 			glRenderToTexture(screenHDR, DrawLightType, beamLights, beamLightCount, 1)
 		else
 			DrawLightType(beamLights, beamLightCount, 1)
 		end
 	end
 	if pointLightCount > 0 then
-		if useHDR == 1 then
+		if options.enableHDR.value then
 			glRenderToTexture(screenHDR, DrawLightType, pointLights, pointLightCount, 0)
 		else
 			DrawLightType(pointLights, pointLightCount, 0)
@@ -622,7 +611,7 @@ function widget:DrawScreenEffects()
 	
 	glBlending(false)
 	
-	if useHDR == 1 then
+	if options.enableHDR.value then
 		Bloom()
 	end
 end
