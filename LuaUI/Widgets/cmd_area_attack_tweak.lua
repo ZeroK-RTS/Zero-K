@@ -157,25 +157,27 @@ function GetAAUnitList(units)
 	for i=1, #units,1 do  --catalog AA and non-AA
 		local unitID = units[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
-		if (unitDef_primaryWeapon~= nil) then
-			local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
-			local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
-								not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
-			--[[
-			Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
-			for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
-				Spring.Echo(name)
-				Spring.Echo(content)
-			end
-			--]]
-			if (exclusiveAA) then 
-				antiAirUnits[#antiAirUnits +1]= unitID 
+		if unitDefID then
+			local unitDef_primaryWeapon = UnitDefs[unitDefID].weapons[1]
+			if (unitDef_primaryWeapon~= nil) then
+				local primaryWeapon_target = UnitDefs[unitDefID].weapons[1].onlyTargets
+				local exclusiveAA = (primaryWeapon_target["fixedwing"] and primaryWeapon_target["gunship"]) and 
+									not (primaryWeapon_target["sink"] or primaryWeapon_target["land"] or primaryWeapon_target["sub"])
+				--[[
+				Spring.Echo(UnitDefs[unitDefID].weapons[1].onlyTargets)
+				for name,content in pairs(UnitDefs[unitDefID].weapons[1].onlyTargets) do
+					Spring.Echo(name)
+					Spring.Echo(content)
+				end
+				--]]
+				if (exclusiveAA) then 
+					antiAirUnits[#antiAirUnits +1]= unitID 
+				else
+					normalUnits[#normalUnits +1]= unitID 
+				end
 			else
-				normalUnits[#normalUnits +1]= unitID 
+				normalUnits[#normalUnits +1]= unitID
 			end
-		else
-			normalUnits[#normalUnits +1]= unitID
 		end
 	end
 	return antiAirUnits, normalUnits
