@@ -222,6 +222,14 @@ local function GetLightsFromUnitDefs()
 			end
 		end
 		
+		-- For long lasers or projectiles
+		if customParams.light_beam_mult then
+			weaponData.beamOffset = 1
+			weaponData.beam = true
+			weaponData.beamMult = tonumber(customParams.light_beam_mult)
+			weaponData.beamMultFrames = tonumber(customParams.light_beam_mult_frames)
+		end
+		
 		if customParams.light_fade_time and customParams.light_fade_offset then
 			weaponData.fadeTime = tonumber(customParams.light_fade_time)
 			weaponData.fadeOffset = tonumber(customParams.light_fade_offset)
@@ -315,7 +323,20 @@ end
 
 local function GetBeamLights(lightParams, pID, x, y, z)
 	local deltax, deltay, deltaz = spGetProjectileVelocity(pID) -- for beam types, this returns the endpoint of the beam]
-					
+	local timeToLive
+	
+	if lightParams.beamMult then
+		local mult = lightParams.beamMult
+		if lightParams.beamMultFrames then
+			timeToLive = timeToLive or Spring.GetProjectileTimeToLive(pID)
+			if (not lightParams.maxTTL) or lightParams.maxTTL < timeToLive then
+				lightParams.maxTTL = timeToLive
+			end
+			mult = mult * (1 - math.min(1, (timeToLive - (lightParams.maxTTL - lightParams.beamMultFrames))/lightParams.beamMultFrames))
+		end
+		deltax, deltay, deltaz = mult*deltax, mult*deltay, mult*deltaz
+	end
+	
 	if y + deltay < -800 then
 		-- The beam has fallen through the world
 		deltax, deltay, deltaz = InterpolateBeam(x, y, z, deltax, deltay, deltaz)
@@ -338,8 +359,8 @@ local function GetBeamLights(lightParams, pID, x, y, z)
 	}
 	
 	if lightParams.fadeTime then
-		local timeToLive = Spring.GetProjectileTimeToLive(pID)
-		light.colMult = timeToLive/lightParams.fadeTime
+		timeToLive = timeToLive or Spring.GetProjectileTimeToLive(pID)
+		light.colMult = math.max(0, (timeToLive + lightParams.fadeOffset)/lightParams.fadeTime)
 	else
 		light.colMult = 1
 	end

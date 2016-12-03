@@ -236,6 +236,8 @@ unitDef = {
 		
 		light_color = [[0.85 0.2 0.2]],
 		light_radius = 140,
+		light_beam_mult_frames = 9,
+		light_beam_mult = 8,
 	  },
 	  
       damage                  = {
@@ -271,7 +273,6 @@ unitDef = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
       areaOfEffect            = 20,
-      cegTag                  = [[HEATRAY_CEG]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,

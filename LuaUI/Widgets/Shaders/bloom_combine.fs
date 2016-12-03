@@ -4,7 +4,19 @@ uniform float fragMaxBrightness;
 uniform int useBloom;
 
 vec3 toneMapEXP(vec3 color){
-	return vec3(1.0) - exp(-color * 1.4);
+	float L = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+	float nL = (1.0 - exp(-L * 0.7)) * 1.5;
+	float scale = nL / L;
+	return color * scale;
+	// return vec3(1.0) - exp(-color * 1.4);
+}
+
+vec3 toneMapRein(vec3 color)
+{
+	float L = 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b;
+	float nL = (L * (1.0 + L/1.5)) / (1.0 + L);
+	float scale = nL / L;
+	return color * scale;
 }
 
 vec3 levelsControl(vec3 color, float blackPoint, float whitePoint){
@@ -27,9 +39,10 @@ void main(void) {
 	}
 
 	// tone mapping and color correction
-	hdr.rgb = toneMapEXP(hdr.rgb);
-	hdr.rgb = levelsControl(hdr.rgb, 0.15, 0.85);
-	hdr.rgb = mix(vec3(dot(hdr.rgb, vec3(0.299, 0.587, 0.114))), hdr.rgb, 1.05);
+	// hdr.rgb = toneMapEXP(hdr.rgb);
+	hdr.rgb = toneMapRein(hdr.rgb);
+	hdr.rgb = levelsControl(hdr.rgb, 0.02, 0.87);
+	hdr.rgb = mix(vec3(dot(hdr.rgb, vec3(0.299, 0.587, 0.114))), hdr.rgb, 0.94);
 
 	vec4 map = vec4(hdr.rgb, 1.0);
 					

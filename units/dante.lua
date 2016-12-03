@@ -119,8 +119,11 @@ unitDef = {
 		burntime = [[450]],
 
 		light_camera_height = 1800,
-		light_color = [[0.9 0.6 0.25]],
+        light_color = [[0.6 0.39 0.18]],
 		light_radius = 260,
+		light_fade_time = 13,
+		light_beam_mult_frames = 5,
+		light_beam_mult = 5,
 	  },
 	  
       damage                  = {
@@ -157,7 +160,6 @@ unitDef = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
       areaOfEffect            = 20,
-      cegTag                  = [[HEATRAY_CEG]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -168,6 +170,8 @@ unitDef = {
 		light_radius = 180,
 		light_fade_time = 35,
 		light_fade_offset = 10,
+		light_beam_mult_frames = 9,
+		light_beam_mult = 8,
 	  },
 	  
       damage                  = {
