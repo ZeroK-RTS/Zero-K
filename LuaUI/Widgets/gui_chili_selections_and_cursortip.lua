@@ -2844,7 +2844,7 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {-1, 0, 0, -1},
+		padding = {-1, 0, -1, -1},
         minWidth = 450, 
 		minHeight = 120,
 	}
