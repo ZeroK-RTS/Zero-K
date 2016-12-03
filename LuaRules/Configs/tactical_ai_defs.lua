@@ -910,19 +910,21 @@ local behaviourConfig = {
 	},
 	
 	["armmerl"] = {
-		skirms = allGround,
+		skirms = artyRangeSkirmieeArray,
 		skirmRadar = true, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 400, 
+		skirmLeeway = 400,
+		skirmOnlyNearEnemyRange = 350,
 	},
 	
 	["cormart"] = {
-		skirms = allGround,
+		skirms = artyRangeSkirmieeArray,
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50, 
+		skirmLeeway = 50,
+		skirmOnlyNearEnemyRange = 250,
 	},
 	
 	["armraven"] = {
@@ -979,11 +981,12 @@ local behaviourConfig = {
 		skirmLeeway = 150, 
 	},	
 	["armmanni"] = {
-		skirms = allGround, 
+		skirms = artyRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
-		skirmLeeway = 200, 
+		skirmLeeway = 200,
+		skirmOnlyNearEnemyRange = 250,
 	},	
 	["armbanth"] = {
 		skirms = allGround, 
