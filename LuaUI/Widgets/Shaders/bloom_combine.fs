@@ -19,6 +19,10 @@ vec3 levelsControl(vec3 color, float blackPoint, float whitePoint){
 	return min(max(color - vec3(blackPoint), vec3(0.0)) / (vec3(whitePoint) - vec3(blackPoint)), vec3(1.0));
 }
 
+vec3 saturate(vec3 color, float saturation){
+	return mix(vec3(dot(color, vec3(0.299, 0.587, 0.114))), color, saturation);
+}
+
 void main(void) {
 	vec2 C0 = vec2(gl_TexCoord[0]);
 	vec4 hdr = bool(useBloom) ? texture2D(texture0, C0) + (texture2D(texture1, C0) * fragMaxBrightness) : texture2D(texture0, C0);
@@ -33,7 +37,6 @@ void main(void) {
 	float mx = max(hdr.r, max(hdr.g, hdr.b));
 	if (mx > whiteStart) {
 		hdr.rgb = mix(hdr.rgb, vec3(mx), (mx - whiteStart)/(((mx - whiteStart) * whiteScale) + 1.0));
-		//hdr.rgb += min(((mx - whiteStart) * whiteScale), vec3(whiteMax));
 	}
 
 	// tone mapping and color correction
@@ -43,7 +46,7 @@ void main(void) {
 	// but causes HSV shifting in the resulting color which is difficult to correct and impossible to correct completely.
 	//hdr.rgb = toneMapEXP(hdr.rgb);
 	//hdr.rgb = levelsControl(hdr.rgb, 0.15, 0.85);
-	//hdr.rgb = mix(vec3(dot(hdr.rgb, vec3(0.299, 0.587, 0.114))), hdr.rgb, 1.05);
+	//hdr.rgb = saturate(hdr.rgb, 1.05); // satuation
 
 	vec4 map = vec4(hdr.rgb, 1.0);
 					
