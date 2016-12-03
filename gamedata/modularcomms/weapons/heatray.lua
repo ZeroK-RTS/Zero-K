@@ -15,6 +15,8 @@ local weaponDef = {
 		light_radius = 180,
 		light_fade_time = 40,
 		light_fade_offset = 10,
+		light_beam_mult_frames = 9,
+		light_beam_mult = 8,
 	},		  
 
 	damage                  = {
