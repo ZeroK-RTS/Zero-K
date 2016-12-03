@@ -219,6 +219,7 @@ local function GetLightsFromUnitDefs()
 			weaponData.beam = true
 			if weaponDef.beamTTL > 2 then
 				weaponData.fadeTime = weaponDef.beamTTL
+				weaponData.fadeOffset = 0
 			end
 		end
 		
