@@ -16,7 +16,7 @@ options_path = 'Settings/Graphics/Effects/Depth of Field'
 options_order = {'useDoF'}
 
 options = {
-	useDoF = { type='bool', name='Apply Depth of Field Effect', value=true,	noHotkey = true, advanced = false}
+	useDoF = { type='bool', name='Apply Depth of Field Effect', value=false, noHotkey = true, advanced = false}
 }
 
 local function onChangeFunc()
