@@ -311,7 +311,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move,n)
 		
 		ClampedRawMove(unitID, cx,cy,cz, data)
 		return true
-	else
+	elseif not behaviour.skirmKeepOrder then
 		ClearMoveGoal(unitID, data)
 	end
 

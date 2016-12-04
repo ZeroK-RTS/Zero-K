@@ -353,7 +353,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 		data.cx,data.cy,data.cz = cx,cy,cz
 		data.receivedOrder = true
 		return true
-	elseif #cQueue > 0 and move then
+	elseif #cQueue > 0 and move and not behaviour.skirmKeepOrder then
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
