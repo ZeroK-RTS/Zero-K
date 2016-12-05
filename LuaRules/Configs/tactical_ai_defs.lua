@@ -132,6 +132,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"chicken_tiamat",
 	"chicken_dragon",
 	"hoverdepthcharge",
+	"armwin",
 	
 	"corgator",
 	"armflea",
@@ -220,6 +221,9 @@ local medRangeSkirmieeArray = NameToDefID({
 	"scorpion",
 	
 	"armfus", -- don't suicide vs fusions if possible.
+	"geo",
+	"amgeo",
+	"armestor",
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 	
