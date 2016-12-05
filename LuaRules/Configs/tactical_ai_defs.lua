@@ -36,7 +36,7 @@ end
 
 -- general arrays
 local allGround = {}
-local allSurface = {}
+local allSurface = {} --allGround minus submarines, for surface-firing ships
 local armedLand = {}
 local unarmedLand = {}
 
@@ -72,7 +72,6 @@ local longRangeSwarmieeArray = NameToDefID({
 	"corstorm",
 	"shiparty",
 	"armham",
-	
 	"shiparty",
 })
 
@@ -80,7 +79,6 @@ local medRangeSwarmieeArray = NameToDefID({
 	"armrock",
 	"amphfloater",
 	"chickens",
-	
 	"shipskirm",
 })
 
@@ -345,7 +343,7 @@ local fleeables = NameToDefID({
 	"corsumo",
 })
 
--- Submarines to be fled by soem things
+-- Submarines to be fled by some things
 local subfleeables = NameToDefID({
 	"subraider",
 })
@@ -643,11 +641,11 @@ local behaviourConfig = {
 		velocityPrediction = 90,
 	},
 	
+	-- could flee subs but isn't fast enough for it to be useful
 	["shipriot"] = {
 		skirms = {}, 
 		swarms = allSurface, 
 		flees = {},
-		--flees = subfleeables,
 		
 		localJinkOrder = false,
 		jinkTangentLength = 25,
@@ -659,12 +657,6 @@ local behaviourConfig = {
 		swarmLeeway = 300,
 		skirmLeeway = 10,
 		stoppingDistance = 8,
-		--fleeLeeway = 250,
-		--fleeDistance = 300,
-		
-		--maxSwarmLeeway = 30, 
-		--minSwarmLeeway = 90, 
-		--skirmLeeway = 60, 
 	},
 	
 	-- riots
