@@ -479,9 +479,9 @@ local function FinishMorph(unitID, morphData)
 	
 	local newPara = 0
 	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
-	local slowDamage = GG.getSlowDamage(unitID)
+	local slowDamage = Spring.GetUnitRulesParam(unitID,"slowState")
 	if slowDamage then
-		GG.addSlowDamage(newUnit, slowDamage)
+		GG.addSlowDamage(newUnit, slowDamage*newMaxHealth)
 	end
 	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
 	

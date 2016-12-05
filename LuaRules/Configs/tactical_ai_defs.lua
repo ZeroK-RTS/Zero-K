@@ -987,7 +987,9 @@ local behaviourConfig = {
 		skirmRadar = true, 
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 400, 
+		skirmLeeway = 100,
+		stoppingDistance = -80,
+		velocityPrediction = 0,
 	},
 	
 	["cormart"] = {
@@ -995,7 +997,11 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50, 
+		skirmLeeway = 200,
+		skirmKeepOrder = true,
+		stoppingDistance = -180,
+		velocityPrediction = 0,
+		skirmOrderDis = 250,
 	},
 	
 	["armraven"] = {
@@ -1036,7 +1042,11 @@ local behaviourConfig = {
 		swarms = {}, 
 		flees = {},
 		skirmRadar = true,
-		skirmLeeway = 200, 
+		skirmKeepOrder = true,
+		skirmLeeway = 150,
+		skirmOrderDis = 200,
+		stoppingDistance = -100,
+		velocityPrediction = 0,
 	},	
 	["armbanth"] = {
 		skirms = allGround, 

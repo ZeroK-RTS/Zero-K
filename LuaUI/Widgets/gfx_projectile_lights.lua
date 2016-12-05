@@ -27,8 +27,15 @@ local spGetProjectileVelocity     = Spring.GetProjectileVelocity
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Local Variables
+local previousProjectileDrawParams
+local fadeProjectiles, fadeProjectileTimes = {}, {}
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Config
 local lightsEnabled = true
+local FADE_TIME = 20
 
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
@@ -37,6 +44,7 @@ local overrideParam = {r = 1, g = 1, b = 1, radius = 200}
 local doOverride = false
 
 local wantLoadParams = false
+
 
 local function Format(value)
 	return string.format("%.2f", value)
@@ -72,7 +80,7 @@ local function LoadParams(param)
 end
 
 options_path = 'Settings/Graphics/Lighting'
-options_order = {'light_projectile_enable', 'useLOD', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
+options_order = {'light_projectile_enable', 'useLOD', 'projectileFade', 'light_override', 'light_radius', 'light_brightness', 'light_color', 'light_reload'}
 options = {
 	light_projectile_enable = {
 		name = "Enable Projectile Lights",
@@ -87,6 +95,12 @@ options = {
 		name = 'Use LOD',
 		type = 'bool',
 		desc = 'Reduces the number of lights drawn based on camera distance and current fps.',
+		value = true,
+	},
+	projectileFade = {
+		name = 'Fade Projectiles',
+		type = 'bool',
+		desc = 'Projectile lights smoothly fade out after the projectile disappears.',
 		value = true,
 	},
 	light_override = {
@@ -219,6 +233,7 @@ local function GetLightsFromUnitDefs()
 			weaponData.beam = true
 			if weaponDef.beamTTL > 2 then
 				weaponData.fadeTime = weaponDef.beamTTL
+				weaponData.fadeOffset = 0
 			end
 		end
 		
@@ -353,9 +368,11 @@ local function GetBeamLights(lightParams, pID, x, y, z)
 	end
 	
 	local light = {
+		pID = pID,
 		px = x, py = y, pz = z, 
 		dx = deltax, dy = deltay, dz = deltaz, 
-		param = (doOverride and overrideParam) or lightParams
+		param = (doOverride and overrideParam) or lightParams,
+		beam = true
 	}
 	
 	if lightParams.fadeTime then
@@ -370,6 +387,7 @@ end
 
 local function GetProjectileLight(lightParams, pID, x, y, z)
 	local light = {
+		pID = pID,
 		px = x, py = y, pz = z, 
 		param = (doOverride and overrideParam) or lightParams
 	}
@@ -394,24 +412,33 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 	end
 
 	local projectiles = spGetVisibleProjectiles()
-	if #projectiles == 0 then
+	local projectileCount = #projectiles
+	if (not options.projectileFade.value) and projectileCount == 0 then
 		return beamLights, beamLightCount, pointLights, pointLightCount
 	end
 	
 	local fps = Spring.GetFPS()
 	local cameraHeight = math.floor(GetCameraHeight()*0.01)*100
 	--Spring.Echo("cameraHeight", cameraHeight, "fps", fps)
+	local projectilePresent = {}
+	local projectileDrawParams = options.projectileFade.value and {}
 	
-	for i, pID in ipairs(projectiles) do
+	for i = 1, projectileCount do
+		local pID = projectiles[i]
 		local x, y, z = spGetProjectilePosition(pID)
 		--Spring.Echo("projectilepos = ", x, y, z, 'id', pID)
+		projectilePresent[pID] = true
 		local weapon, piece = spGetProjectileType(pID)
 		if piece then
 			local explosionflags = spGetPieceProjectileParams(pID)
-			if explosionflags and (explosionflags%32) > 15  then --only stuff with the FIRE explode tag gets a light
+			if explosionflags and (explosionflags%32) > 15 then --only stuff with the FIRE explode tag gets a light
 				--Spring.Echo('explosionflag = ', explosionflags)
+				local drawParams = {pID = pID, px = x, py = y, pz = z, param = (doOverride and overrideParam) or gibParams, colMult = 1}
 				pointLightCount = pointLightCount + 1
-				pointLights[pointLightCount] = {px = x, py = y, pz = z, param = (doOverride and overrideParam) or gibParams, colMult = 1}
+				pointLights[pointLightCount] = drawParams
+				if projectileDrawParams then
+					projectileDrawParams[#projectileDrawParams + 1] = drawParams
+				end
 			end
 		else
 			lightParams = projectileLightTypes[spGetProjectileDefID(pID)]
@@ -420,18 +447,67 @@ local function GetProjectileLights(beamLights, beamLightCount, pointLights, poin
 			end
 			if lightParams and (not options.useLOD.value or ProjectileLevelOfDetailCheck(lightParams, pID, fps, cameraHeight)) then
 				if lightParams.beam then --BEAM type
+					local drawParams = GetBeamLights(lightParams, pID, x, y, z)
 					beamLightCount = beamLightCount + 1
-					beamLights[beamLightCount] = GetBeamLights(lightParams, pID, x, y, z)
+					beamLights[beamLightCount] = drawParams
+					if projectileDrawParams then
+						-- Don't add beams (for now?)
+						--projectileDrawParams[#projectileDrawParams + 1] = drawParams
+					end
 				else -- point type
 					if not (lightParams.groundHeightLimit and lightParams.groundHeightLimit < (y - math.max(Spring.GetGroundHeight(y, y), 0))) then
+						local drawParams = GetProjectileLight(lightParams, pID, x, y, z)
 						pointLightCount = pointLightCount + 1
-						pointLights[pointLightCount] = GetProjectileLight(lightParams, pID, x, y, z)
+						pointLights[pointLightCount] = drawParams
+						if projectileDrawParams then
+							projectileDrawParams[#projectileDrawParams + 1] = drawParams
+						end
 					end
 				end
 			end
 		end
-	end 
-
+	end
+	
+	if options.projectileFade.value then
+		local frame = Spring.GetGameFrame()
+		if previousProjectileDrawParams then
+			for i = 1, #previousProjectileDrawParams do
+				local pID = previousProjectileDrawParams[i].pID
+				if not projectilePresent[pID] then
+					local params = previousProjectileDrawParams[i]
+					params.startColMul = params.colMul or 1
+					params.py = params.py + 10
+					fadeProjectiles[#fadeProjectiles + 1] = params
+					fadeProjectileTimes[#fadeProjectileTimes + 1] = frame + FADE_TIME
+				end
+			end
+		end
+		
+		local i = 1
+		while i <= #fadeProjectiles do
+			local strength = (fadeProjectileTimes[i] - frame)/FADE_TIME
+			if strength <= 0 then
+				fadeProjectileTimes[i] = fadeProjectileTimes[#fadeProjectileTimes]
+				fadeProjectileTimes[#fadeProjectileTimes] = nil
+				fadeProjectiles[i] = fadeProjectiles[#fadeProjectiles]
+				fadeProjectiles[#fadeProjectiles] = nil
+			else
+				local params = fadeProjectiles[i]
+				params.colMult = strength*params.startColMul
+				if params.beam then
+					beamLightCount = beamLightCount + 1
+					beamLights[beamLightCount] = params
+				else
+					pointLightCount = pointLightCount + 1
+					pointLights[pointLightCount] = params
+				end
+				i = i + 1
+			end
+		end
+		
+		previousProjectileDrawParams = projectileDrawParams
+	end
+	
 	return beamLights, beamLightCount, pointLights, pointLightCount
 end
 
