@@ -172,10 +172,6 @@ local menu_armcom = {
         angle = 135,
         unit = "armjamt"
       },
-      {
-        angle = 45,
-        unit = "armsonar"
-      },
 	  {
         angle = -45,
         unit = "armestor"

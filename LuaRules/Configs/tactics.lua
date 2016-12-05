@@ -69,7 +69,6 @@ local deployment = {
     		"armnanotc",
     		"armgeo",
     		"armwin",
-    		"armsonar",
     		"armfrad",
     		"armrectr",
     		"armfast",

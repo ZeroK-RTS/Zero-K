@@ -265,6 +265,7 @@ local cegs = {
       },
     },
   },
+  
   ["napalm_firewalker_small"] = {
     usedefaultexplosions = false,
     groundflash = {
@@ -469,6 +470,14 @@ local cegs = {
 }
 
 local altforms = {
+   napalmfireball_150 = {
+    source = "napalmfireball_200",
+    modifications = {
+      rocks = {
+	properties = {particlelife = 50, particlelifespread = 100},
+      },
+    },
+  },
   napalmfireball_75 = {
     source = "napalmfireball_200",
     modifications = {

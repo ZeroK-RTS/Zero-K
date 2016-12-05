@@ -1,14 +1,14 @@
 unitDef = {
-  unitname               = [[cornukesub]],
-  name                   = [[Leviathan]],
-  description            = [[Tactical Nuke Missile Sub, Drains 6.25 m/s, 90 second stockpile]],
+  unitname               = [[subtacmissile]],
+  name                   = [[Scylla]],
+  description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
   acceleration           = 0.0372,
   activateWhenBuilt      = true,
   brakeRate              = 0.1942,
   buildCostEnergy        = 3000,
   buildCostMetal         = 3000,
   builder                = false,
-  buildPic               = [[cornukesub.png]],
+  buildPic               = [[subtacmissile.png]],
   buildTime              = 3000,
   canAttack              = true,
   canGuard               = true,
@@ -22,16 +22,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Sous-Marin Lance Missile Tactique]],
-	description_de = [[Taktisches Raketen U-Boot]],
-	description_pl = [[Lodz podwodna z rakietami taktycznymi]],
-    helptext       = [[The Leviathan provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
-    helptext_fr    = [[Le Leviathan est la terreur des profondeurs. Tapi au fond des océans, il utilise ses missiles amphibies pour lancer ses terribles tete nucléaires tactiques sur de grande distances. Capable de réduire r néant une base en quelques tirs bien ajustés, il scme la terreur car on voit rarement venir la menace. (Il faut lancer la construction de missiles depuis le sousmarin)]],
-	helptext_de    = [[Der Leviathan bietet taktische Raketen - eine Präzisionswaffe. Er besitzt keinen Schutz gegen direkte Angriffe und sollte aus diesem Grund jeden direkten Kontakt mit feindlichen Einheiten vermeiden.]],
-	helptext_pl    = [[Leviathan oferuje rakiety taktyczne - precyzyjna bron dalekiego zasiegu; jest jednak bezbronny w bezposrednim starciu.]],
+    helptext       = [[The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
 	modelradius    = [[15]],
-	stockpiletime  = [[90]],
-	stockpilecost  = [[500]],
+	stockpiletime  = [[30]],
+	stockpilecost  = [[600]],
 	priority_misc  = 1, -- Medium
   },
 
@@ -39,7 +33,7 @@ unitDef = {
   fireState              = 0,
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[missilesub]],
+  iconType               = [[subtacmissile]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   mass                   = 556,
@@ -50,11 +44,12 @@ unitDef = {
   movementClass          = [[UBOAT3]],
   moveState              = 0,
   noAutoFire             = false,
-  objectName             = [[CORNUKESUB]],
+  objectName             = [[SUBTACMISSILE]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
-  script                 = [[cornukesub.lua]],
+  script                 = [[subtacmissile.lua]],
   sightDistance          = 660,
+  sonarDistance          = 660,
   turninplace            = 0,
   turnRate               = 307,
   upright                = true,
@@ -163,7 +158,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[cornukesub_dead.s3o]],
+      object           = [[subtacmissile_dead.s3o]],
 	  collisionVolumeOffsets = [[0 -5 0]],
 	  collisionVolumeScales  = [[30 25 110]],
 	  collisionVolumeType    = [[box]],
@@ -180,4 +175,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cornukesub = unitDef })
+return lowerkeys({ subtacmissile = unitDef })

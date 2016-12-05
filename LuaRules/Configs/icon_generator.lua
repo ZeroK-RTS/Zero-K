@@ -78,7 +78,7 @@ backgrounds = {
   {check={name="chickenq"},                                  texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
 
 --// stuff that needs hardcoding
-  {check={name="reef"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
+  {check={name="shipcarrier"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
 
   
 --[[terraforms

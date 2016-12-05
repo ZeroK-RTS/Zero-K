@@ -66,7 +66,7 @@ local hasSensorOrJamm = {
 	[ UnitDefNames['armsonar'].id ] = true,
 	[ UnitDefNames['corrad'].id ] = true,
 	[ UnitDefNames['corawac'].id ] = true,
-	[ UnitDefNames['reef'].id ] = true,
+	[ UnitDefNames['shipcarrier'].id ] = true,
 }
 
 local radarUnitDef = {}

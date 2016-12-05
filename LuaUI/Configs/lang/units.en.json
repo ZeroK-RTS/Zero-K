@@ -74,11 +74,6 @@
 		"description" : "Impulse Shenanigans Jumpbot",
 		"helptext" : "Shenanigans jumpbot."
 	},
-	"destroyer" : {
-		"name" : "Daimyo",
-		"description" : "Destroyer (Riot/Antisub)",
-		"helptext" : "The Daimyo class destroyer packs a wallop with its main gun, a powerful riot cannon. It also features missiles that can hit submarines and surface targets alike. The Daimyo is best attacked from afar, using surface ships or hovercraft with long-range weapons."
-	},
 	"armtick" : {
 		"name" : "Tick",
 		"description" : "All Terrain EMP Bomb (Burrows)",
@@ -143,11 +138,6 @@
 		"description" : "Heavy Attack Flyer",
 		"helptext" : "Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken."
 	},
-	"shipraider" : {
-		"name" : "Typhoon",
-		"description" : "Assault/Raider Corvette",
-		"helptext" : "The Typhoon is a brawler, combining high speed, decent armor, and strong firepower at a low cost--for a ship. Use corvette packs against anything on the surface, but watch out for submarines."
-	},
 	"screamer" : {
 		"name" : "Screamer",
 		"description" : "Very Long-Range Anti-Air Missile Tower",
@@ -172,11 +162,6 @@
 		"name" : "Light Vehicle Factory",
 		"description" : "Produces Wheeled Vehicles, Builds at 10 m/s",
 		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
-	},
-	"cornukesub" : {
-		"name" : "Leviathan",
-		"description" : "Tactical Nuke Missile Sub, Drains 6.25 m/s, 90 second stockpile",
-		"helptext" : "The Leviathan provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
 	},
 	"armpb" : {
 		"name" : "Gauss",
@@ -468,11 +453,6 @@
 		"name" : "Chainsaw",
 		"description" : "Long-Range Anti-Air Missile Battery",
 		"helptext" : "The Chainsaw is a long range anti-air turret, dealing out massive damage, able to knock bombers out of the sky very quickly. It can't take very much damage in return, though, and does poorly when attacked directly."
-	},
-	"shiptorp" : {
-		"name" : "Hunter",
-		"description" : "Torpedo Riot Frigate",
-		"helptext" : "The Hunter is a mobile anti-submarine unit. It boasts a massive area of effect."
 	},
 	"corsilo" : {
 		"name" : "Silencer",
@@ -824,11 +804,6 @@
 		"description" : "EMP Turret",
 		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
 	},
-	"corbats" : {
-		"name" : "Warlord",
-		"description" : "Heavy Artillery Battleship",
-		"helptext" : "A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are."
-	},
 	"factoryspider" : {
 		"name" : "Spider Factory",
 		"description" : "Produces Spiders, Builds at 10 m/s",
@@ -1018,15 +993,65 @@
 		"description" : "Amphibious Teleport Bridge",
 		"helptext" : "Djinn excels at moving large land based armies across bodies of water. When deployed it teleports units from around its pre-placed static beacon to its present location. The teleportation is one-way, so ensure the destination is safe."
 	},
-	"shipskirm" : {
-		"name" : "Enforcer",
-		"description" : "Skirmisher/Artillery Missile Cruiser",
-		"helptext" : "This cruiser packs powerful, long-range missiles, useful for bombarding sea and shore targets. Beware of subs and Corvettes."
+	"shipcon" : {
+		"name" : "Mariner",
+		"description" : "Construction Ship, Builds at 7.5 m/s",
+		"helptext" : "Although expensive, the Construction Ship boasts extremely high nano power, combined with tough armor and good speed."
 	},
 	"shipscout" : {
-		"name" : "Skeeter",
-		"description" : "Disarming Scout Boat",
-		"helptext" : "Cheap, fast, and fragile, this Patrol Boat is good as a raider and spotting for longer-ranged ships. It lacks the firepower or armor for brawling."
+		"name" : "Cutter",
+		"description" : "Picket Ship (Disarming Scout)",
+		"helptext" : "Cheap, fast, and fragile, this Picket Ship is a good scout and spotter for more expensive ships. In numbers, their disarming missiles are effective against larger targets."
+	},
+	"shiptorpraider" : {
+		"name" : "Hunter",
+		"description" : "Torpedo-Boat (Raider)",
+		"helptext" : "The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels."
+	},
+	"shipskirm" : {
+		"name" : "Mistral",
+		"description" : "Missile Frigate (Skirmisher)",
+		"helptext" : "This Missile Frigate fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
+	},
+	"subraider" : {
+		"name" : "Seawolf",
+		"description" : "Attack Submarine (Stealth Raider)",
+		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Torpedo Boats and Destroyers."
+	},
+	"subtacmissile" : {
+		"name" : "Scylla",
+		"description" : "Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile",
+		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
+	},
+	"shipriot" : {
+		"name" : "Corsair",
+		"description" : "Corvette (Raider/Riot)",
+		"helptext" : "This Corvette comes equipped with two shotguns which are effective against anything which gets close. It has no weapons effective against underwater targets."
+	},
+	"shipassault" : {
+		"name" : "Siren",
+		"description" : "Destroyer (Riot/Assault)",
+		"helptext" : "This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets."
+	},
+	"shiparty" : {
+		"name" : "Ronin",
+		"description" : "Cruiser (Artillery)",
+		"helptext" : "This Cruiser packs a powerful, long-range artillery cannon, useful for bombarding fixed emplacements and shore targets. Beware of aircraft, submarines and raider ships."
+	},
+	"shipaa" : {
+		"name" : "Zephyr",
+		"description" : "Anti-Air Frigate",
+		"helptext" : "With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne."
+	},
+	"shiptransport" : {
+		"name" : "Surfboard",
+		"description" : "Transport Platform",
+		"helptext" : "The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it."
+	},
+	"shipheavyarty" : {
+		"name" : "Shogun",
+		"description" : "Battleship (Heavy Artillery)",
+		"helptext" : "A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are."
 	},
 	"armcom1" : {
 		"name" : "Strike Commander",
@@ -1052,16 +1077,6 @@
 		"name" : "Drone",
 		"description" : "Morphs Into Chicken Structures",
 		"helptext" : "A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures."
-	},
-	"shipcon" : {
-		"name" : "Mariner",
-		"description" : "Construction Ship, Builds at 7.5 m/s",
-		"helptext" : "Although expensive, the Construction Ship boasts extremely high nano power, combined with tough armor and good speed."
-	},
-	"shiparty" : {
-		"name" : "Crusader",
-		"description" : "Artillery Destroyer, Light Anti-Sub",
-		"helptext" : "This Destroyer packs a powerful, long-range main cannon, useful for bombarding fixed emplacements and shore targets, as well as a depth charge launcher for use against submarines. Beware of aircraft and Corvettes--the Destroyer's weapons have trouble hitting fast-moving targets."
 	},
 	"assaultcruiser" : {
 		"name" : "Vanquisher",
@@ -1108,10 +1123,10 @@
 		"description" : "Ranged Support Strider",
 		"helptext" : "The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own."
 	},
-	"reef" : {
+	"shipcarrier" : {
 		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment)",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
+		"description" : "Aircraft Carrier (Bombardment), Stockpiles tacnukes at 10 m/s",
+		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire tactical missile launcher for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"corflak" : {
 		"name" : "Cobra",

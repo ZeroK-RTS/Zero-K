@@ -1,14 +1,14 @@
 unitDef = {
   unitname               = [[shipscout]],
-  name                   = [[Skeeter]],
-  description            = [[Disarming Scout Boat]],
+  name                   = [[Cutter]],
+  description            = [[Picket Ship (Disarming Scout)]],
   acceleration           = 0.0984,
   activateWhenBuilt      = true,
   brakeRate              = 0.0475,
   buildCostEnergy        = 70,
   buildCostMetal         = 70,
   builder                = false,
-  buildPic               = [[ARMPT.png]],
+  buildPic               = [[shipscout.png]],
   buildTime              = 70,
   canAttack              = true,
   canMove                = true,
@@ -19,14 +19,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_de = [[Wachboot (Scout/Raider)]],
-    description_fr = [[Navire de Patrouille Éclaireur et Anti-Air]],
-    description_pl = [[Lodz zwiadowcza]],
-    helptext       = [[Cheap, fast, and fragile, this Patrol Boat is good as a raider and spotting for longer-ranged ships. It lacks the firepower or armor for brawling.]],
-    helptext_de    = [[Günstig, schnell und gebrechlich. Dieses Wachboot eignet sich gut als Raider und zum Auskundschaften von Schiffen mit größerer Reichweite. Zum Kämpfen fehlt es ihm an Feuerkraft und der nötigen Panzerung.]],
-    helptext_fr    = [[Pas cher, rapide et peu solide, voici venir le Skeeter et ses canons laser. Utile en début de conflit ou en tant qu'éclaireur son blindage le rends trcs vite obsolcte.]],
-    helptext_pl    = [[Lekki i szybki, Skeeter jest dobrym zwiadowca dla wiekszych okretow. Nie ma jednak wytrzymalosci ani sily ognia potrzebnych do dluzszej walki.]],
-
+    helptext       = [[Cheap, fast, and fragile, this Picket Ship is a good scout and spotter for more expensive ships. In numbers, their disarming missiles are effective against larger targets.]],
     modelradius    = [[12]],
     turnatfullspeed = [[1]],
   },
@@ -35,7 +28,7 @@ unitDef = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[scoutboat]],
+  iconType               = [[shipscout]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maxDamage              = 240,
@@ -43,7 +36,7 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[BOAT3]],
   noChaseCategory        = [[TERRAFORM SUB]],
-  objectName             = [[scoutboat.s3o]],
+  objectName             = [[shipscout.s3o]],
   script                 = [[shipscout.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
@@ -57,7 +50,7 @@ unitDef = {
   },
   
   sightDistance          = 800,
-  sonarDistance          = 350,
+  sonarDistance          = 800,
   turninplace            = 0,
   turnRate               = 740,
   waterline              = 2,
@@ -101,7 +94,7 @@ unitDef = {
       impulseFactor           = 0,
       interceptedByShieldType = 2,
       model                   = [[wep_m_fury.s3o]],
-      range                   = 230,
+      range                   = 330,
       reloadtime              = 2,
       smokeTrail              = true,
       startVelocity           = 300,
@@ -127,7 +120,7 @@ unitDef = {
       cylinderTargeting       = 1,
 
       customParams        = {
-        disarmDamageMult = 4,
+        disarmDamageMult = 5.0,
         disarmDamageOnly = 0,
         disarmTimer      = 3, -- seconds
 		
@@ -135,7 +128,7 @@ unitDef = {
       },
 	  
       damage                  = {
-        default = 45.1,
+        default = 34.1,
         subs    = 5,
       },
 
@@ -149,8 +142,8 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_armpt.s3o]],
-      range                   = 260,
-      reloadtime              = 2,
+      range                   = 330,
+      reloadtime              = 1.5,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/small_lightning_missile]],
       soundStart              = [[weapon/missile/missile_fire7]],
@@ -175,7 +168,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[scoutboat_dead.s3o]],
+      object           = [[shipscout_dead.s3o]],
     },
 
     HEAP = {

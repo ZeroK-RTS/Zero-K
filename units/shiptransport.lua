@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[armtboat]],
+  unitname            = [[shiptransport]],
   name                = [[Surfboard]],
   description         = [[Transport Platform]],
   acceleration        = 0.102,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostEnergy     = 220,
   buildCostMetal      = 220,
   builder             = false,
-  buildPic            = [[armtboat.png]],
+  buildPic            = [[shiptransport.png]],
   buildTime           = 220,
   canAttack           = false,
   canMove             = true,
@@ -45,12 +45,13 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[BOAT4]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName          = [[ARMTBOAT]],
+  objectName          = [[shiptransport]],
   releaseHeld         = true,
-  script              = [[armtboat.lua]],
+  script              = [[shiptransport.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 325,
+  sonarDistance       = 325,
   transportCapacity   = 1,
   transportSize       = 3,
   turnRate            = 590,
@@ -62,7 +63,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[surfboard_d.dae]],
+      object           = [[shiptransport_dead.dae]],
     },
 
     HEAP  = {
@@ -76,4 +77,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armtboat = unitDef })
+return lowerkeys({ shiptransport = unitDef })

@@ -17,6 +17,7 @@ unitDef = {
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[38 38 38]],
+
   collisionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
 
@@ -65,11 +66,13 @@ unitDef = {
     },
 
   },
+
   sightDistance       = 495,
+  sonarDistance       = 495,  
   turninplace         = 0,
   turnRate            = 440,
   workerTime          = 0,
-
+  
   weapons             = {
 
     {

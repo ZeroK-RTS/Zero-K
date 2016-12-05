@@ -25,9 +25,9 @@ unitDef = {
     [[funnelweb]],
     [[armbanth]],
     [[armorco]],
-    [[cornukesub]],
-    [[reef]],
-    [[corbats]],
+    [[shipheavyarty]],
+	[[shipcarrier]],
+	[[subtacmissile]],
   },
 
   buildPic                      = [[striderhub.png]],

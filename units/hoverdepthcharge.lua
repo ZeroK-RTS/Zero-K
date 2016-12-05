@@ -55,7 +55,7 @@ unitDef = {
 
   },
   sightDistance       = 385,
-  sonarDistance       = 370,
+  sonarDistance       = 385,
   turninplace         = 0,
   turnRate            = 390,
   workerTime          = 0,

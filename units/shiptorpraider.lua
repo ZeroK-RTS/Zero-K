@@ -1,59 +1,57 @@
 unitDef = {
-  unitname            = [[shiptorp]],
+
+  unitname            = [[shiptorpraider]],
   name                = [[Hunter]],
-  description         = [[Torpedo Riot Frigate]],
+  description         = [[Torpedo-Boat (Raider)]],
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,
-  buildCostEnergy     = 350,
-  buildCostMetal      = 350,
+  buildCostEnergy     = 100,
+  buildCostMetal      = 100,
   builder             = false,
-  buildPic            = [[DCLSHIP.png]],
-  buildTime           = 350,
+  buildPic            = [[shiptorpraider.png]],
+  buildTime           = 100,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
-  collisionVolumeOffsets = [[0 -7 0]],
-  collisionVolumeScales  = [[34 34 80]],
+  collisionVolumeOffsets = [[0 2 0]],
+  collisionVolumeScales  = [[20 20 40]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_de = [[Torpedofregatte]],
-    description_pl = [[Fregata torpedowa]],
-    helptext       = [[The Hunter is a mobile anti-submarine unit. It boasts a massive area of effect.]],
-	helptext_de    = [[Die relativ günstige Torpedofregatte besitzt eine Waffe speziell zur U-Jagd, die auch im Stande ist Schiffe zu treffen.]],
-	helptext_pl    = [[Fregata torpedowa to odpowiedz na jednostki podwodne; moze tez strzelac w statki.]],
+
+    helptext       = [[The Torpedo Boat is a mobile raider and anti-submarine unit. It is effective against underwater units and large vessels.]],
 	modelradius    = [[14]],
 	turnatfullspeed = [[1]],
   },
 
-  explodeAs           = [[BIG_UNITEX]],
+
+  explodeAs           = [[SMALL_UNITEX]],
   floater             = true,
-  footprintX          = 4,
-  footprintZ          = 4,
-  iconType            = [[hunter]],
+  footprintX          = 2,
+  footprintZ          = 2,
+  iconType            = [[shiptorpraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
   mass                = 240,
-  maxDamage           = 1200,
-  maxVelocity         = 2.2,
+  maxDamage           = 310,
+  maxVelocity         = 4.2,
   minCloakDistance    = 75,
   minWaterDepth       = 5,
-  movementClass       = [[BOAT4]],
+  movementClass       = [[BOAT3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
-  objectName          = [[DCLSHIP]],
-  script              = [[shiptorp.lua]],
+  objectName          = [[SHIPTORPRAIDER]],
+  script              = [[shiptorpraider.lua]],
   seismicSignature    = 4,
-  selfDestructAs      = [[BIG_UNITEX]],
-  sightDistance       = 390,
+  selfDestructAs      = [[SMALL_UNITEX]],
+  sightDistance       = 450,
   sonarDistance       = 450,
-  turninplace         = 0,
-  turnRate            = 420,
+  turnRate            = 800,
   waterline           = 4,
   workerTime          = 0,
 
@@ -71,26 +69,28 @@ unitDef = {
   weaponDefs          = {
 
     TORPEDO = {
-      name                    = [[Concussion Torpedo]],
-      areaOfEffect            = 160,
+
+      name                    = [[Torpedo]],
+      areaOfEffect            = 64,
       avoidFriendly           = false,
       bouncerebound           = 0.5,
       bounceslip              = 0.5,
 	  burnblow                = 1,
-      burst		              = 3,
-      burstRate		          = 0.15,
+
       canAttackGround		  = false,	-- workaround for range hax
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
 
       damage                  = {
-        default = 62,
-        subs    = 62,
+
+        default = 200.1,
+        subs    = 200.1,
       },
 
       edgeEffectiveness       = 0.6,
-      explosionGenerator      = [[custom:TORPEDO_HIT_LARGE_WEAK]],
+
+      explosionGenerator      = [[custom:TORPEDO_HIT]],
       fixedLauncher           = true,
       groundbounce            = 1,
       impulseBoost            = 1,
@@ -102,8 +102,9 @@ unitDef = {
       myGravity               = 10.1,
       numbounce               = 4,
       noSelfDamage            = true,
-      range                   = 350,
-      reloadtime              = 2.2,
+
+      range                   = 230,
+      reloadtime              = 2.5,
       soundHit                = [[TorpedoHitVariable]],
       soundHitVolume          = 2.8,
       soundStart              = [[weapon/torp_land]],
@@ -127,21 +128,24 @@ unitDef = {
     DEAD  = {
       blocking         = false,
       featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[hunter_d.3ds]],
+
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[shiptorpraider_dead.s3o]],
     },
 
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 4,
-      footprintZ       = 4,
-      object           = [[debris4x4c.s3o]],
+
+      footprintX       = 2,
+      footprintZ       = 2,
+      object           = [[debris2x2c.s3o]],
     },
 
   },
 
 }
 
-return lowerkeys({ shiptorp = unitDef })
+
+return lowerkeys({ shiptorpraider = unitDef })

@@ -5,6 +5,7 @@ unitDef = {
   acceleration      = 0,
   activateWhenBuilt = true,
   brakeRate         = 0,
+
   buildCostEnergy   = 120,
   buildCostMetal    = 120,
   builder           = false,
@@ -15,6 +16,7 @@ unitDef = {
   category          = [[FLOAT]],
   collisionVolumeOffsets        = [[0 -5 0]],
   collisionVolumeScales         = [[42 50 42]],
+
   collisionVolumeType	        = [[CylY]],
   corpse            = [[DEAD]],
 
@@ -38,7 +40,8 @@ unitDef = {
   idleAutoHeal      = 5,
   idleTime          = 1800,
   mass              = 215,
-  maxDamage         = 1000,
+
+  maxDamage         = 1020,
   maxSlope          = 18,
   maxVelocity       = 0,
   minCloakDistance  = 150,
@@ -48,8 +51,9 @@ unitDef = {
   script            = [[turrettorp.lua]],
   seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
-  sightDistance     = 660,
-  sonarDistance     = 550,
+
+  sightDistance     = 610,
+  sonarDistance     = 610,
   turnRate          = 0,
   waterline         = 1,
   workerTime        = 0,
@@ -91,7 +95,7 @@ unitDef = {
       interceptedByShieldType = 1,
       model                   = [[wep_t_longbolt.s3o]],
       numbounce               = 4,
-      range                   = 590,
+      range                   = 550,
       reloadtime              = 3.2,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],

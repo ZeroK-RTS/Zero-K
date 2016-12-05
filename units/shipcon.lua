@@ -3,17 +3,18 @@ unitDef = {
   name                   = [[Mariner]],
   description            = [[Construction Ship, Builds at 7.5 m/s]],
   acceleration           = 0.051375,
+  activateWhenBuilt   = true,
   brakeRate              = 0.061,
-  buildCostEnergy        = 200,
-  buildCostMetal         = 200,
+  buildCostEnergy        = 220,
+  buildCostMetal         = 220,
   buildDistance          = 330,
   builder                = true,
 
   buildoptions           = {
   },
 
-  buildPic               = [[SHIPCON.png]],
-  buildTime              = 200,
+  buildPic               = [[shipcon.png]],
+  buildTime              = 220,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -22,6 +23,7 @@ unitDef = {
   category               = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 8 0]],
   collisionVolumeScales  = [[25 25 96]],
+
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -61,7 +63,7 @@ unitDef = {
   selfDestructAs         = [[SMALL_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 325,
-  terraformSpeed         = 600,
+  sonarDistance          = 325,  terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,
   workerTime             = 7.5,

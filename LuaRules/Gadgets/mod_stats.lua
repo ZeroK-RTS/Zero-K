@@ -46,7 +46,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 -- drones are counted as parent for damage done, ignored for damage received
 -- key = drone, value = parent
 local drones = {
-	carrydrone = "reef",
+	carrydrone = "shipcarrier",
 	wolverine_mine = "corgarp",
 }
 

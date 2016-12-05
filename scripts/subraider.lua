@@ -12,7 +12,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 350.1, 25, 0.5)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 250.1, 25, 0.5)
 end
 
 local submerged = true

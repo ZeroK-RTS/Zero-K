@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Grizzly]],
   description         = [[Heavy Amphibious Assault Walker]],
   acceleration        = 0.1,
+  activateWhenBuilt   = true,
   brakeRate           = 0.1,
   buildCostEnergy     = 2000,
   buildCostMetal      = 2000,
@@ -58,6 +59,7 @@ unitDef = {
   },
 
   sightDistance       = 660,
+  sonarDistance       = 660,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,

@@ -891,58 +891,58 @@ local icontypes = {
   },
 
   --ship icons
-  scoutboat = {
-    bitmap='icons/scoutboat.dds',
+  shipcon = {
+    bitmap='icons/shipcon.dds',
     size=2.2,
   },
-  corvette = {
-    bitmap='icons/corvette.dds',
+  shipscout = {
+    bitmap='icons/shipscout.dds',
+    size=2.2,
+  },
+  shipskirm = {
+    bitmap='icons/shipskirm.dds',
     size=2.8,
   },
-  hunter = {
-    bitmap='icons/hunter.dds',
-    size=2.8,
+  shiptorpraider = {
+	bitmap='icons/shiptorpraider.dds',
+    size=2.2,
   },
-  vanquisher = {
-    bitmap='icons/vanquisher.dds',
-    size=3.2,
-  },
-  destroyer = {
-    bitmap='icons/destroyer.dds',
-    size=3.2,
-  },
-  aaship = {
-    bitmap='icons/aaship.dds',
-    size=2.9,
-  },
-  enforcer = {
-    bitmap='icons/enforcer.dds',
-    size=3.2,
-  },
-  submarine = {
-    bitmap='icons/submarine.dds',
+  subraider = {
+	bitmap='icons/subraider.dds',
     size=3.0,
   },
-  snipersub = {
-    bitmap='icons/snipersub.dds',
-    size=3.5,
+  shipriot = {
+    bitmap='icons/shipriot.dds',
+	size=2.8,
   },
-  missilesub = {
-    bitmap='icons/missilesub.dds',
-    size=4,
+  shipassault = {
+    bitmap='icons/shipassault.png',
+	size=2.8,
   },
-  battleship = {
-    bitmap='icons/battleship.dds',
-    size=4,
+  shiparty = {
+    bitmap='icons/shiparty.dds',
+	size=3.0,
   },
-  carrier = {
-    bitmap='icons/carrier.dds',
-    size=4,
+  shipaa = {
+    bitmap='icons/shipaa.dds',
+	size=3.0,
   },
   shiptransport = {
     bitmap='icons/shiptransport.dds',
     size=2.5,
-  },    
+  },   
+  shipheavyarty = {
+    bitmap='icons/shipheavyarty.dds',
+    size=4,
+  },
+  subtacmissile = {
+    bitmap='icons/subtacmissile.dds',
+    size=4,
+  },
+  shipcarrier = {
+    bitmap='icons/shipcarrier.dds',
+    size=4,
+  },  
 
   --icon for energy buildings of various tiers, including pylon
   energy_med = {

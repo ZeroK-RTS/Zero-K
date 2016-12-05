@@ -740,7 +740,7 @@ end
 -- Min Build Range back to what it used to be
 -- 
 for name, ud in pairs(UnitDefs) do
-	if ud.builddistance and ud.builddistance < 128 and name ~= "armasp" and name ~= "armcarry" then
+	if ud.builddistance and ud.builddistance < 128 and name ~= "armasp" and name ~= "armcarry" and name ~= "shipcarrier" then
 		ud.builddistance = 128 
 	end
 end

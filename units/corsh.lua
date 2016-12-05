@@ -57,12 +57,13 @@ unitDef = {
     },
 
   },
+
   sightDistance       = 560,
-  sonarDistance       = 350,
+  sonarDistance       = 560,
   turninplace         = 0,
   turnRate            = 673,
   workerTime          = 0,
-
+  
   weapons             = {
 
     {

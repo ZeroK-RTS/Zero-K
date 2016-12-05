@@ -11,14 +11,14 @@ unitDef = {
   buildoptions           = {
     [[shipcon]],
     [[shipscout]],
+    [[shiptorpraider]],
     [[subraider]],
-    [[shipraider]],
-    [[shiptorp]],
+    [[shipriot]],
     [[shipskirm]],
+	[[shipassault]],
     [[shiparty]],
-    [[subarty]],
     [[shipaa]],
-    [[armtboat]],
+	[[shiptransport]],
   },
 
   buildPic               = [[FACTORYSHIP.png]],

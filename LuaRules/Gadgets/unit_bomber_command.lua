@@ -53,7 +53,7 @@ local airpadDefs = {
 		cap = 9, 
 		padPieceName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}
 	},
-	[UnitDefNames["reef"].id] = {
+	[UnitDefNames["shipcarrier"].id] = {
 		mobile = true, 
 		cap = 2, 
 		padPieceName={"LandingFore","LandingAft"}

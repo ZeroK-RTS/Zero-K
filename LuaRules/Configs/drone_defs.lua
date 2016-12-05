@@ -19,7 +19,7 @@ local carrierDefNames = {
 		},
 	},
 	
-	reef = {
+	shipcarrier = {
 		spawnPieces = {"DroneAft", "DroneFore", "DroneLower","DroneUpper"},
 		{
 			drone = UnitDefNames.carrydrone.id, 

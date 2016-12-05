@@ -151,16 +151,20 @@ local units = {
 	},
 	factoryship = {
 		shipcon = CONSTRUCTOR,
-		shipscout = RAIDER,
-		subraider = WEIRD_RAIDER,
-		shipraider = RIOT,
-		shiptorp = SKIRMISHER,
+		shiptorpraider = RAIDER,
+		shipriot = RIOT,
+		shipskirm = SKIRMISHER,
 		shiparty = ARTILLERY,
 		shipaa = ANTI_AIR,
-		shipskirm = ASSAULT,
-		subarty = HEAVY_SOMETHING,
-		armtboat = SPECIAL,
+		shipscout = WEIRD_RAIDER,
+		shipassault = ASSAULT,
+		-- No Ship HEAVY_SOMETHING (yet)
+		subraider = SPECIAL,
+		shiptransport = UTILITY,
 	},
+
+
+
 }
 
 local function AddBuildQueue(name)
@@ -241,7 +245,6 @@ local defense = {
 
 local aux = {	--merged into special
 	corrad =   {order = 10, row = 1, col = 1},
-	armsonar = {order = 11, row = 1, col = 2},
 	armjamt =  {order = 12, row = 1, col = 3},
 	armarad =  {order = 14, row = 1, col = 4},
 }

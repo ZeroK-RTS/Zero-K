@@ -68,12 +68,14 @@ local longRangeSwarmieeArray = NameToDefID({
 	"corstorm",
 	"shiparty",
 	"armham",
+	"shiparty",
 })
 
 local medRangeSwarmieeArray = NameToDefID({ 
 	"armrock",
 	"amphfloater",
 	"chickens",
+	"shipskirm",
 })
 
 local lowRangeSwarmieeArray = NameToDefID({
@@ -152,9 +154,6 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"armwar",
 	"corsh",
 	"hoverscout",
-	"shipscout",
-	"shipraider",
-	"subraider",
 	"amphriot",
 	"armcomdgun",
 	"dante",
@@ -179,6 +178,9 @@ local riotRangeSkirmieeArray = NameToDefID({
 	
 	"spherecloaker",
 	"core_spectre",
+	
+	"shiptorpraider",
+	"subraider",
 })
 
 local lowMedRangeSkirmieeArray = NameToDefID({
@@ -192,6 +194,8 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 	"cormak",
 	"corthud",
 	"corraid",
+	
+	"shipriot",
 })
 
 local medRangeSkirmieeArray = NameToDefID({
@@ -218,6 +222,9 @@ local medRangeSkirmieeArray = NameToDefID({
 	"armfus", -- don't suicide vs fusions if possible.
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
+	
+	"shipscout",
+	"shipassault",
 })
 
 for name, data in pairs(UnitDefNames) do -- add all comms and facs to mid range skirm, so units avoid their death explosions.
@@ -238,10 +245,11 @@ local longRangeSkirmieeArray = NameToDefID({
 	"corllt",
 	"armdeva",
 	"armartic",
+	
+	
 })
 
 local artyRangeSkirmieeArray = NameToDefID({
-	"shipskirm",
 	"armsptk",
 	"corstorm",
 	"cormist",
@@ -253,6 +261,8 @@ local artyRangeSkirmieeArray = NameToDefID({
 	"cordoom",
 	"armorco",
 	"amphartillery",
+	
+	"shipskirm",
 })
 
 local slasherSkirmieeArray = NameToDefID({
@@ -326,6 +336,12 @@ local fleeables = NameToDefID({
     "shieldfelon",
 	"corsumo",
 })
+
+-- Submarines to be fled by some things
+local subfleeables = NameToDefID({
+	"subraider",
+})
+
 
 -- scorcher dive list
 local scorcherSwarmieeArray = SetMinus(allGround, scorcherSkirmieeArray)
@@ -581,16 +597,7 @@ local behaviourConfig = {
 		stoppingDistance = 15,
 		skirmOrderDis = 150,
 	},
-
-	["shipscout"] = { -- scout boat
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = {},
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 30, 
-		stoppingDistance = 8
-	},
+	
 	["amphraider2"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -600,6 +607,35 @@ local behaviourConfig = {
 		skirmLeeway = 30, 
 		minCircleStrafeDistance = 10,
 		velocityPrediction = 20
+	},
+	
+	["shiptorpraider"] = {
+		skirms = shortRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = {},
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		swarmLeeway = 30, 
+		stoppingDistance = 8,
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
+	},
+	
+	-- could flee subs but isn't fast enough for it to be useful
+	["shipriot"] = {
+		skirms = {}, 
+		swarms = scorcherSwarmieeArray, 
+		flees = {},
+		localJinkOrder = false,
+		jinkTangentLength = 50,
+		circleStrafe = true,
+		strafeOrderLength = 100,
+		minCircleStrafeDistance = 260,
+		maxSwarmLeeway = 0,
+		minSwarmLeeway = 100,
+		swarmLeeway = 300,
+		skirmLeeway = 10,
+		stoppingDistance = 8,
 	},
 	
 	-- riots
@@ -718,6 +754,28 @@ local behaviourConfig = {
 		skirmLeeway = 40, 
 		},
 	},
+	["shipscout"] = { -- scout boat
+		skirms = medRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = subfleeables,
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		swarmLeeway = 30, 
+		stoppingDistance = 8,
+		skirmLeeway = 100,
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
+		fleeLeeway = 250,
+		fleeDistance = 300,
+	},
+	["shipassault"] = {
+		skirms = lowMedRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		maxSwarmLeeway = 0, 
+		skirmLeeway = -30, 
+		stoppingDistance = 5
+	},
 		
 	--assaults
 	["armzeus"] = {
@@ -804,17 +862,6 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 90,
 	},
-	["shiptorp"] = {
-		skirms = medRangeSkirmieeArray, 
-		swarms = medRangeSwarmieeArray, 
-		flees = {},
-		maxSwarmLeeway = 30, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 0,
-		stoppingDistance = -40,
-		skirmOrderDis = 250,
-		velocityPrediction = 40,
-	},
 	["gunshipsupport"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
@@ -878,6 +925,17 @@ local behaviourConfig = {
 		skirmOrderDis = 200,
 		velocityPrediction = 60,
 	},
+	["shipskirm"] = {
+		skirms = longRangeSkirmieeArray, 
+		swarms = longRangeSwarmieeArray, 
+		flees = {},
+		maxSwarmLeeway = 30, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 10, 
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
+	},
+	
 	
 	-- weird stuff
 	["cormist"] = {
@@ -946,26 +1004,6 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 40, 
 	},
-	--["subarty"] = {
-	--	skirms = artyRangeSkirmieeArray, 
-	--	swarms = {}, 
-	--	flees = {},
-	--	skirmRadar = true,
-	--	maxSwarmLeeway = 10, 
-	--	minSwarmLeeway = 130, 
-	--	skirmLeeway = 80, 
-	--	skirmOrderDis = 250,
-	--	velocityPrediction = 40,
-	--},
-	["shiparty"] = {
-		skirms = allGround, 
-		swarms = {}, 
-		flees = {},
-		skirmRadar = true,
-		maxSwarmLeeway = 10, 
-		minSwarmLeeway = 130, 
-		skirmLeeway = 40, 
-	},
 	["firewalker"] = {
 		skirms = allGround, 
 		swarms = {}, 
@@ -1002,6 +1040,16 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 120, 
 	},	
+	["shiparty"] = {
+		skirms = allGround, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
+	},
+	
 	-- cowardly support units
 	--[[
 	["example"] = {
@@ -1120,17 +1168,6 @@ local behaviourConfig = {
         skirmLeeway = 50,
 		skirmOrderDis = 200, 
 	},
-	["shipaa"] = {
-		skirms = skirmableAir, 
-		swarms = brawler, 
-		flees = armedLand,
-		minSwarmLeeway = 100,
-		fleeLeeway = 100,
-		fleeDistance = 100,
-		minFleeRange = 500,
-        skirmLeeway = 50,
-		skirmOrderDis = 200, 
-	},
 	["gunshipaa"] = {
 		skirms = skirmableAir, 
 		swarms = brawler, 
@@ -1141,6 +1178,15 @@ local behaviourConfig = {
 		minFleeRange = 500,
         skirmLeeway = 50,
 		skirmOrderDis = 200, 
+	},
+	["shipaa"] = {
+		skirms = artyRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		skirmRadar = true,
+		maxSwarmLeeway = 10, 
+		minSwarmLeeway = 130, 
+		skirmLeeway = 40, 
 	},
 }
 

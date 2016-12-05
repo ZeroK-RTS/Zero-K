@@ -1,13 +1,17 @@
 unitDef = {
   unitname               = [[shipaa]],
-  name                   = [[Shredder]],
+
+  name                   = [[Zephyr]],
   description            = [[Anti-Air Frigate]],
   acceleration           = 0.0498,
+  activateWhenBuilt   = true,
   brakeRate              = 0.0808,
+
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
   builder                = false,
-  buildPic               = [[CORARCH.png]],
+
+  buildPic               = [[shipaa.png]],
   buildTime              = 400,
   canAttack              = true,
   canGuard               = true,
@@ -21,13 +25,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_fr = [[Fr?gate (Anti-Air)]],
-	description_de = [[Flugabwehr Fregatte]],
-	description_pl = [[Fregata przeciwlotnicza]],
-    helptext       = [[With its powerful twin anti-air laser batteries, the anti-air frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
-    helptext_fr    = [[Le Shredder est ?quip? d'un puissant canon flak, capable de d?cimer les attaques aeriennes gr?ce ? une explosion ? fragmentation. Tr?s utile et moins cher qu'un Enforcer, il prot?ge efficacement toute les flottes.]],
-	helptext_de    = [[Mit seinem schlagkräftigen, doppelläufigen Flugabwehrlaser schützt diese Fregatte deine Flotte vor Luftangriffen. Wie immer ist aber auch diese Flugabwehr gegen Ziele, die sich nicht in der Luft befinden, machtlos.]],
-	helptext_pl    = [[Fregata przeciwlotnicza skutecznie broni floty przed atakami z powietrza, ale nie jest w stanie atakowac innych celow.]],
+    
+    helptext       = [[With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
 	modelradius    = [[17]],
 	turnatfullspeed = [[1]],
   },
@@ -36,7 +35,7 @@ unitDef = {
   floater                = true,
   footprintX             = 3,
   footprintZ             = 3,
-  iconType               = [[aaship]],
+  iconType               = [[shipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 40,
@@ -49,14 +48,14 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName             = [[aaship.s3o]],
+  objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
   scale                  = [[0.6]],
   script				 = [[shipaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
-  turninplace            = 0,
+  sonarDistance          = 660,  turninplace            = 0,
   turnRate               = 486,
   waterline              = 4,
   workerTime             = 0,
@@ -196,7 +195,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[aaship_dead.s3o]],
+      object           = [[shipaa_dead.s3o]],
     },
 
     HEAP  = {
