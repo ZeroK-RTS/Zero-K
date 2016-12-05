@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[subtacmissile]],
   name                   = [[Scylla]],
-  description            = [[Tactical Nuke Missile Sub, Drains 10 m/s, 60 second stockpile]],
+  description            = [[Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile]],
   acceleration           = 0.0372,
   activateWhenBuilt      = true,
   brakeRate              = 0.1942,
@@ -24,7 +24,7 @@ unitDef = {
   customParams           = {
     helptext       = [[The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy.]],
 	modelradius    = [[15]],
-	stockpiletime  = [[60]],
+	stockpiletime  = [[30]],
 	stockpilecost  = [[600]],
 	priority_misc  = 1, -- Medium
   },

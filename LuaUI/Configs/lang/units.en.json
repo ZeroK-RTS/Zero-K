@@ -1020,7 +1020,7 @@
 	},
 	"subtacmissile" : {
 		"name" : "Scylla",
-		"description" : "Tactical Nuke Missile Sub, Drains 10 m/s, 60 second stockpile",
+		"description" : "Tactical Nuke Missile Sub, Drains 20 m/s, 30 second stockpile",
 		"helptext" : "The Tactical Nuke Missile Sub provides a standoff precision strike weapon in the form of tactical missiles. It has no defense against direct attacks and should avoid contact with the enemy."
 	},
 	"shipriot" : {
