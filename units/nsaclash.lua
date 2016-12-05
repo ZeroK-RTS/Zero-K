@@ -12,7 +12,6 @@ unitDef = {
   buildTime           = 220,
   canAttack           = true,
   canGuard            = true,
-
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
@@ -69,11 +68,11 @@ unitDef = {
   },
 
   sightDistance       = 495,
-
-  sonarDistance       = 495,  turninplace         = 0,
+  sonarDistance       = 495,  
+  turninplace         = 0,
   turnRate            = 440,
   workerTime          = 0,
-
+  
   weapons             = {
 
     {

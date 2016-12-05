@@ -64,6 +64,7 @@ unitDef = {
     },
 
   },
+  
   sightDistance       = 660,
   sonarDistance       = 660,
   turninplace         = 0,

@@ -59,11 +59,10 @@ unitDef = {
   },
 
   sightDistance       = 660,
-
-  sonarDistance       = 660,  turninplace         = 0,
+  sonarDistance       = 660,  
+  turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,
-
   weapons             = {
 
     {
