@@ -169,7 +169,7 @@ local function SitOnPad(unitID)
 			
 			landDuration = landDuration + 1
 			
-			if landDuration%15 == 0 then
+			if landDuration%20 == 0 then
 				local stunned_or_inbuild = spGetUnitIsStunned(landData.padID) or (spGetUnitRulesParam(landData.padID,"disarmed") == 1)
 				if stunned_or_inbuild then
 					if drainingEnergy then
