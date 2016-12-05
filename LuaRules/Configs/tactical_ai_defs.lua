@@ -36,7 +36,6 @@ end
 
 -- general arrays
 local allGround = {}
-local allSurface = {} --allGround minus submarines, for surface-firing ships
 local armedLand = {}
 local unarmedLand = {}
 
@@ -47,9 +46,6 @@ for name,data in pairs(UnitDefNames) do
 			armedLand[data.id] = true
 		else
 			unarmedLand[data.id] = true
-		end
-		if not name == "subraider" or name == "amphraider3" or name == "amphriot" then
-			allSurface[data.id] = true
 		end
 	end
 end
@@ -158,9 +154,6 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"armwar",
 	"corsh",
 	"hoverscout",
-	"shipscout",
-	"shipraider",
-	"subraider",
 	"amphriot",
 	"armcomdgun",
 	"dante",
@@ -187,7 +180,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"core_spectre",
 	
 	"shiptorpraider",
-	"shipscout",
+	"subraider",
 })
 
 local lowMedRangeSkirmieeArray = NameToDefID({
@@ -230,6 +223,7 @@ local medRangeSkirmieeArray = NameToDefID({
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 	
+	"shipscout",
 	"shipassault",
 })
 
@@ -615,20 +609,6 @@ local behaviourConfig = {
 		velocityPrediction = 20
 	},
 	
-	["shipscout"] = { -- scout boat
-		skirms = shortRangeSkirmieeArray, 
-		swarms = lowRangeSwarmieeArray, 
-		flees = subfleeables,
-		circleStrafe = true, 
-		maxSwarmLeeway = 40, 
-		swarmLeeway = 30, 
-		stoppingDistance = 8,
-		skirmOrderDis = 200,
-		velocityPrediction = 90,
-		fleeLeeway = 250,
-		fleeDistance = 300,
-	},
-	
 	["shiptorpraider"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
@@ -644,14 +624,13 @@ local behaviourConfig = {
 	-- could flee subs but isn't fast enough for it to be useful
 	["shipriot"] = {
 		skirms = {}, 
-		swarms = allSurface, 
+		swarms = scorcherSwarmieeArray, 
 		flees = {},
-		
 		localJinkOrder = false,
-		jinkTangentLength = 25,
+		jinkTangentLength = 50,
 		circleStrafe = true,
 		strafeOrderLength = 100,
-		minCircleStrafeDistance = 250,
+		minCircleStrafeDistance = 260,
 		maxSwarmLeeway = 0,
 		minSwarmLeeway = 100,
 		swarmLeeway = 300,
@@ -774,6 +753,20 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 40, 
 		},
+	},
+	["shipscout"] = { -- scout boat
+		skirms = medRangeSkirmieeArray, 
+		swarms = lowRangeSwarmieeArray, 
+		flees = subfleeables,
+		circleStrafe = true, 
+		maxSwarmLeeway = 40, 
+		swarmLeeway = 30, 
+		stoppingDistance = 8,
+		skirmLeeway = 100,
+		skirmOrderDis = 200,
+		velocityPrediction = 90,
+		fleeLeeway = 250,
+		fleeDistance = 300,
 	},
 	["shipassault"] = {
 		skirms = lowMedRangeSkirmieeArray, 

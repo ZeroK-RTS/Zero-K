@@ -168,7 +168,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["armcomdgun_disintegrator"].id]  = {2.8},
 	[WeaponDefNames["dante_napalm_rockets"].id]      = {2.8},
 	[WeaponDefNames["armraven_rocket"].id]           = {0.5},
-	[WeaponDefNames["shipcarrier_armmship_rocket"].id]      = {0.5},
+--	[WeaponDefNames["shipcarrier_armmship_rocket"].id]      = {0.5},
 	[WeaponDefNames["shipheavyarty_plasma"].id]      = {2.5},
 	[WeaponDefNames["shipskirm_missile"].id]         = {2.8},
 	[WeaponDefNames["shiparty_plasma"].id]           = {2.0},
@@ -202,7 +202,7 @@ end
 
 local radarWobblePenalty = {
 	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
-	[WeaponDefNames["shipcarrier_armmship_rocket"].id] = 5,
+--	[WeaponDefNames["shipcarrier_armmship_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
 	[WeaponDefNames["armanni_ata"].id] = 5,
 	[WeaponDefNames["armmanni_ata"].id] = 5,

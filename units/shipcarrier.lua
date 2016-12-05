@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipcarrier]],
   name                   = [[Reef]],
-  description            = [[Aircraft Carrier (Bombardment)]],
+  description            = [[Aircraft Carrier (Bombardment), Stockpiles tacnukes at 10 m/s]],
   acceleration           = 0.0354,
   activateWhenBuilt   	 = true,
   brakeRate              = 0.0466,
@@ -12,6 +12,7 @@ unitDef = {
   buildTime              = 3500,
   canAssist              = false,
   canMove                = true,
+  canManualFire          = true,
   canReclaim             = false,
   canRepair              = false,
   canRestore             = false,
@@ -27,10 +28,13 @@ unitDef = {
     description_de = [[Flugzeugträger (Bomber)]],
     description_fr = [[Porte-Avion Bombardier]],
     description_pl = [[Lotniskowiec z tarcza antyrakietowa]],
-    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
+    helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire tactical missile launcher for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[50]],
+	stockpiletime  = [[60]],
+	stockpilecost  = [[600]],
 	priority_misc = 2, -- High
+	extradrawrange = 3000,
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -72,53 +76,53 @@ unitDef = {
       onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
     },
 
-    {
-      def                = [[ARMMSHIP_ROCKET]],
-      badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-      onlyTargetCategory = [[SWIM LAND SINK TURRET FLOAT SHIP HOVER]],
+	{
+      def                = [[TACNUKE]],
+      badTargetCategory  = [[SWIM LAND SUB SHIP HOVER]],
+      onlyTargetCategory = [[SWIM LAND SUB SINK TURRET FLOAT SHIP HOVER]],
     },
 	
   },
 
   weaponDefs             = {
 
-    ARMMSHIP_ROCKET    = {
-      name                    = [[Cruise Missile]],
-      areaOfEffect            = 96,
-      cegTag                  = [[cruisetrail]],
+	TACNUKE        = {
+      name                    = [[Tactical Nuke]],
+      areaOfEffect            = 256,
       collideFriendly         = false,
-      craterBoost             = 1,
-      craterMult              = 2,
-	  
-      customParams            = {
-        nuke_coverage = 1200,
-	  },
-	  
+      commandfire             = true,
+      craterBoost             = 4,
+      craterMult              = 3.5,
+
       damage                  = {
-        default = 902,
-        subs    = 45,
+        default = 3500,
+        planes  = 3500,
+        subs    = 175,
       },
 
-      explosionGenerator      = [[custom:STARFIRE]],
-      fireStarter             = 100,
-      flightTime              = 8,
+      edgeEffectiveness       = 0.4,
+      explosionGenerator      = [[custom:NUKE_150]],
+      fireStarter             = 0,
+      flightTime              = 10,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      metalpershot            = 0,
-      model                   = [[wep_m_kickback.s3o]],
+      interceptedByShieldType = 1,
+      model                   = [[wep_tacnuke.s3o]],
       noSelfDamage            = true,
-      range                   = 1550,
-      reloadtime              = 6,
-      smokeTrail              = false,
-      soundHit                = [[weapon/missile/vlaunch_hit]],
-      soundStart              = [[weapon/missile/missile_launch]],
+      range                   = 3000,
+      reloadtime              = 1,
+      smokeTrail              = true,
+      soundHit                = [[explosion/mini_nuke]],
+      soundStart              = [[weapon/missile/tacnuke_launch]],
+      stockpile               = true,
+      stockpileTime           = 10^5,
       tolerance               = 4000,
       turnrate                = 18000,
-      weaponAcceleration      = 355,
-      weaponTimer             = 2,
+      waterWeapon             = true,
+      weaponAcceleration      = 180,
+      weaponTimer             = 4,
       weaponType              = [[StarburstLauncher]],
-      weaponVelocity          = 10000,
+      weaponVelocity          = 1200,
     },
 
     carriertargeting   = {
@@ -139,7 +143,7 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 1600,
+      range                   = 1000,
       reloadtime              = 1.25,
       size                    = 1E-06,
       smokeTrail              = false,
