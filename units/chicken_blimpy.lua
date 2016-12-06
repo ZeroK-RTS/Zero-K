@@ -94,7 +94,7 @@ unitDef = {
   weaponDefs          = {
 
     BOGUS_BOMB  = {
-      name                    = [[BogusBomb]],
+      name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
       commandfire             = true,
       craterBoost             = 0,
@@ -119,7 +119,7 @@ unitDef = {
 
 
     BOMBTRIGGER = {
-      name                    = [[Bogus BOMBTRIGGER]],
+      name                    = [[Fake BOMBTRIGGER]],
       accuracy                = 12000,
       areaOfEffect            = 1,
       beamTime                = 0.1,
