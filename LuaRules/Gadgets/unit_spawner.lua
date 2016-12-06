@@ -239,7 +239,6 @@ SetGlobals(luaAI or defaultDifficulty) -- set difficulty
 -- adjust for player and chicken bot count
 local playerCount = SetCount(humanTeams)
 local malus     = playerCount^playerMalus
-Spring.SetGameRulesParam("malus", malus)
 
 burrowRegressTime = burrowRegressTime/playerCount
 humanAggroPerBurrow = humanAggroPerBurrow/playerCount
@@ -277,31 +276,10 @@ local function SetupUnit(unitName)
   Spring.SetGameRulesParam(unitName.."Kills", 0)
 end
 
-Spring.SetGameRulesParam("lagging",           0)
-Spring.SetGameRulesParam("techAccel", 0)
-Spring.SetGameRulesParam("queenTime",        queenTime)
-Spring.SetGameRulesParam("humanAggro", 0)
-
 local baseQueenTime = queenTime
-
-for unitName in pairs(chickenTypes) do
-  SetupUnit(unitName)
-end
-
-for unitName in pairs(defenders) do
-  SetupUnit(unitName)
-end
-
-for unitName in pairs(supporters) do
-  SetupUnit(unitName)
-end
-
-SetupUnit(burrowName)
-SetupUnit(queenName)
 
 
 local difficulty = modes[luaAI or defaultDifficulty]
-Spring.SetGameRulesParam("difficulty", difficulty)
 
 --if tobool(Spring.GetModOptions().burrowrespawn) or forceBurrowRespawn then respawnBurrows = true end
 
@@ -1372,6 +1350,30 @@ function gadget:Load(zip)
 	morphFrame = data.morphFrame - gameFrameOffset
 	morphed = data.morphed
 	specialPowerCooldown = data.specialPowerCooldown
+end
+
+function gadget:Initialize()
+	Spring.SetGameRulesParam("malus", malus)
+	Spring.SetGameRulesParam("lagging", 0)
+	Spring.SetGameRulesParam("techAccel", 0)
+	Spring.SetGameRulesParam("queenTime", queenTime)
+	Spring.SetGameRulesParam("humanAggro", 0)
+	Spring.SetGameRulesParam("difficulty", difficulty)
+
+	for unitName in pairs(chickenTypes) do
+		SetupUnit(unitName)
+	end
+
+	for unitName in pairs(defenders) do
+		SetupUnit(unitName)
+	end
+
+	for unitName in pairs(supporters) do
+		SetupUnit(unitName)
+	end
+
+	SetupUnit(burrowName)
+	SetupUnit(queenName)
 end
 
 --------------------------------------------------------------------------------
