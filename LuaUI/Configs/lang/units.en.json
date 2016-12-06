@@ -687,7 +687,7 @@
 	"armcsa" : {
 		"name" : "Athena",
 		"description" : "Airborne SpecOps Engineer, Builds at 7.5 m/s",
-		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield while cloaked, adding them to your army."
+		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
 	"armsonar" : {
 		"name" : "Sonar Station",
