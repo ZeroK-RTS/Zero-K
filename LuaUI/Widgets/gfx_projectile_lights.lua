@@ -35,7 +35,7 @@ local fadeProjectiles, fadeProjectileTimes = {}, {}
 --------------------------------------------------------------------------------
 -- Config
 local lightsEnabled = true
-local FADE_TIME = 20
+local FADE_TIME = 5
 
 local colorOverride = {1, 1, 1}
 local colorBrightness = 1
