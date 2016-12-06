@@ -16,7 +16,7 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[SHIP]],
-  collisionVolumeOffsets = [[0 2 0]],
+  collisionVolumeOffsets = [[0 -1 0]],
   collisionVolumeScales  = [[20 20 40]],
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
@@ -52,7 +52,7 @@ unitDef = {
   sightDistance       = 450,
   sonarDistance       = 450,
   turnRate            = 800,
-  waterline           = 4,
+  waterline           = 0,
   workerTime          = 0,
 
   weapons             = {
