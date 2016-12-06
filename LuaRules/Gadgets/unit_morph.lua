@@ -543,8 +543,13 @@ end
 
 
 local function UpdateMorph(unitID, morphData)
-	if Spring.GetUnitTransporter(unitID) then
-		return true 
+	local transportID = Spring.GetUnitTransporter(unitID)
+	local transportUnitDefID = 0
+	if transportID then
+		transportUnitDefID = Spring.GetUnitDefID(transportID)
+		if not UnitDefs[transportUnitDefID].isFirePlatform then
+			return true 
+		end
 	end
 	
 	-- if EMPd or disarmed do not morph
@@ -572,7 +577,7 @@ local function UpdateMorph(unitID, morphData)
 			morphData.progress = morphData.progress + morphData.increment*morphData.morphRate
 		end
 	end
-	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1) then
+	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1 and not transportID) then
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
 	end
