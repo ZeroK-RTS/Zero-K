@@ -219,19 +219,24 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tawf114", -- banisher
 	"scorpion",
 	
-	"armfus", -- don't suicide vs fusions if possible.
-	"cafus", -- same with singu, at least to make an effort for survival.
-	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 	
 	"shipscout",
 	"shipassault",
 })
 
+local medRangeExplodables = {
+	"armfus", -- don't suicide vs fusions if possible.
+	"cafus", -- same with singu, at least to make an effort for survival.
+	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
+}
+
 for name, data in pairs(UnitDefNames) do -- add all comms and facs to mid range skirm, so units avoid their death explosions.
 	if data.customParams.commtype or string.match(name, "factory") or string.match(name, "hub") then
-		medRangeSkirmieeArray[data.id] = true
+		medRangeExplodables[data.id] = true
 	end
 end
+
+local medRangeSkirmieeArray = Union(medRangeSkirmieeArray, medRangeExplodables)
 
 local longRangeSkirmieeArray = NameToDefID({
 	"armrock",
@@ -387,6 +392,8 @@ local scorcherSwarmieeArray = SetMinus(allGround, scorcherSkirmieeArray)
 
 --*** hugs(defaults to empty): the table of units to close range with.
 -- hugRange (default in config): Range to close to
+
+--*** fightOnlyUnits(defaults to empty): the table of units that the unit will only interact with when it has a fight command. No AI invoked with manual attack or leashing.
 
 --- Array loaded into gadget 
 local behaviourDefaults = {
@@ -891,6 +898,7 @@ local behaviourConfig = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
 		flees = {},
+		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 30, 
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
