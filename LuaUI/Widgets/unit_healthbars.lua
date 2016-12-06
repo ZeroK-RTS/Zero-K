@@ -773,7 +773,7 @@ do
       --// PARALYZE
 	  local paraTime = false
 	  local stunned = GetUnitIsStunned(unitID)
-	  if (emp>0) and ((not morph) or morph.combatMorph)and(emp<1e8) then
+	  if (emp>0) and(emp<1e8) then
         local infotext = ""
         stunned = stunned and paralyzeDamage >= empHP
 		if (stunned) then

@@ -16,7 +16,7 @@ function gadget:GetInfo()
 	return {
 		name     = "UnitMorph",
 		desc     = "Adds unit morphing",
-		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer)",
+		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
 		date     = "Jan, 2008",
 		license  = "GNU GPL, v2 or later",
 		layer    = -1, --must start after unit_priority.lua gadget to use GG.AddMiscPriority()
@@ -226,6 +226,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetMorphRate(unitID)
+	return (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+end
+
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	-- do not allow morph for unfinsihed units
 	if not isFinished(unitID) then 
@@ -250,6 +254,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		morphID = morphID,
 		teamID = teamID,
 		combatMorph = morphDef.combatMorph,
+		morphRate = 0.0,
 	}
 	
 	if morphDef.cmd then
@@ -262,7 +267,10 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	end
 
 	SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-	GG.StartMiscPriorityResourcing(unitID, teamID, (morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+	
+	local newMorphRate = GetMorphRate(unitID)
+	GG.StartMiscPriorityResourcing(unitID, teamID, (newMorphRate*morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
+	morphUnits[unitID].morphRate = newMorphRate
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
@@ -539,10 +547,29 @@ local function UpdateMorph(unitID, morphData)
 		return true 
 	end
 	
+	-- if EMPd or disarmed do not morph
+	if (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or (Spring.GetUnitIsStunned(unitID)) then
+		return true
+	end
+	
 	if (morphData.progress < 1.0) then
+		
+		local newMorphRate = GetMorphRate(unitID)
+		
+		if (morphData.morphRate ~= newMorphRate) then
+			--GG.StopMiscPriorityResourcing(unitID, morphData.teamID, 2) not necessary
+			GG.StartMiscPriorityResourcing(unitID, teamID, (newMorphRate*morphData.def.metal/morphData.def.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Modifies resource drain if slowness has changed.
+			morphData.morphRate = newMorphRate
+		end
 		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
-		if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
-			morphData.progress = morphData.progress + morphData.increment
+		
+		local resourceUse = {
+			m = (morphData.def.resTable.m * morphData.morphRate),
+			e = (morphData.def.resTable.e * morphData.morphRate),
+		}
+		
+		if allow and (Spring.UseUnitResource(unitID, resourceUse)) then
+			morphData.progress = morphData.progress + morphData.increment*morphData.morphRate
 		end
 	end
 	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1) then
