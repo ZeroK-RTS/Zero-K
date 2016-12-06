@@ -219,10 +219,6 @@ local medRangeSkirmieeArray = NameToDefID({
 	"tawf114", -- banisher
 	"scorpion",
 	
-	"armfus", -- don't suicide vs fusions if possible.
-	"cafus", -- same with singu, at least to make an effort for survival.
-	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
-	
 	"shipscout",
 	"shipassault",
 })
