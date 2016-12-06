@@ -289,7 +289,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 end
 
 
-local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n)
+local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, n, doHug)
 
 	local data = unit[unitID]
 	
@@ -327,9 +327,9 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
 	end
-	local skirmRange = GetEffectiveWeaponRange(data.udID, -(ey+vy*behaviour.velocityPrediction), behaviour.weaponNum) - behaviour.skirmLeeway
+	local skirmRange = (doHug and behaviour.hugRange) or (GetEffectiveWeaponRange(data.udID, -(ey+vy*behaviour.velocityPrediction), behaviour.weaponNum) - behaviour.skirmLeeway)
 
-	if skirmRange > predictedDist then
+	if doHug or skirmRange > predictedDist then
 	
 		if behaviour.skirmOnlyNearEnemyRange then
 			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
@@ -337,7 +337,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 				return behaviour.skirmKeepOrder
 			end
 		end
-
+		
 		local wantedDis = min(behaviour.skirmOrderDis, skirmRange - behaviour.stoppingDistance - predictedDist)
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
@@ -503,9 +503,10 @@ local function updateUnits(frame, start, increment)
 					end
 				end
 				if checkSkirm then
-					if enemy and ((typeKnown and behaviour.skirms[enemyUnitDef]) or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+					local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
+					if enemy and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
 						--Spring.Echo("unit checking skirm")
-						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
+						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
 							clearOrder(unitID,data,cQueue)
 						end
 					else
@@ -581,6 +582,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		skirms = behaviourData.skirms, 
 		swarms = behaviourData.swarms, 
 		flees  = behaviourData.flees,
+		hugs   = behaviourData.hugs,
 		weaponNum = (behaviourData.weaponNum or 1), 
 		circleStrafe = (behaviourData.circleStrafe or false), 
 		skirmRadar = (behaviourData.skirmRadar or false), 
@@ -608,6 +610,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
 		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
 		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
+		hugRange = (behaviourData.hugRange or behaviourDefaults.defaultHugRange),
 	}
 	
 	behaviourTable.minFleeRange = behaviourTable.minFleeRange - behaviourTable.fleeLeeway
