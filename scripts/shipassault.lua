@@ -59,6 +59,13 @@ function script.AimFromWeapon(num)
 	return missiles[missileNum]
 end
 
+function script.BlockShot(num, targetID)
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 400.1, 90, false, false, true) then
+		return true
+	end
+	return false
+end
+
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)

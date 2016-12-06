@@ -88,6 +88,7 @@ local HandledUnitDefIDs = {
 	[UnitDefNames["armrock"].id] = 1,
 --	[UnitDefNames["shipcarrier"].id] = 1,
 	[UnitDefNames["armorco"].id] = 1,
+	[UnitDefNames["shipassault"].id] = 1,
 	[UnitDefNames["shiparty"].id] = 1,
 	
 	-- Needs LUS
