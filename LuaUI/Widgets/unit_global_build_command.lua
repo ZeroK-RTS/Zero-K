@@ -325,7 +325,7 @@ local commandType = {
 function widget:Initialize()
 	if spGetSpectatingState() then
 		Echo( "<Global Build Command>: Spectator mode. Widget removed." )
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget)
 		return
 	end
 	
@@ -764,7 +764,7 @@ function widget:PlayerChanged(playerID)
 		WG.GlobalBuildCommand = nil
 		WG.icons.SetDisplay('gbcicon', false)
 		WG.icons.SetDisplay('gbcidle', false)
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget)
 		return
 	end
 end
