@@ -2130,6 +2130,7 @@ local function MakeExitConfirmWindow(text, action)
 		bottom = 4,
 	}
 end
+WG.crude.MakeExitConfirmWindow = MakeExitConfirmWindow
 
 local oldWidth, oldHeight
 local function GetMainPanel(parent, width, height)
