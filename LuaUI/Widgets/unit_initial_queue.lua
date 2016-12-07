@@ -112,10 +112,11 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.Color(1.0, 1.0, 1.0, buildingAlpha)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(bx, by, bz)
 		gl.Rotate(90 * facing, 0, 1, 0)
 		gl.Texture("%"..bDefID..":0") --.s3o texture atlas for .s3o model
-		gl.UnitShape(bDefID, teamID, false, true, false)
+		gl.UnitShape(bDefID, teamID, false, false, false)
 		gl.Texture(false)
 	gl.PopMatrix()
 
@@ -131,9 +132,10 @@ local function DrawUnitDef(uDefID, uTeam, ux, uy, uz, rot)
 	gl.Lighting(true)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(ux, uy, uz)
 		gl.Rotate(rot, 0, 1, 0)
-		gl.UnitShape(uDefID, uTeam, false, true, true)
+		gl.UnitShape(uDefID, uTeam, false, false, true)
 	gl.PopMatrix()
 
 	gl.Lighting(false)
