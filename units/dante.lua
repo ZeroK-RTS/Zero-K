@@ -35,7 +35,6 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 50,
-  mass                = 716,
   maxDamage           = 11000,
   maxSlope            = 36,
   maxVelocity         = 1.75,

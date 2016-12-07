@@ -37,7 +37,6 @@ unitDef = {
   iconType            = [[hoverassault]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 184,
   maxDamage           = 1250,
   maxSlope            = 36,
   maxVelocity         = 3.2,

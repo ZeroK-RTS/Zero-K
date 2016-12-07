@@ -43,7 +43,6 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 0,
   kamikazeUseLOS         = true,
-  mass                   = 39,
   maxDamage              = 40,
   maxSlope               = 255,
   maxVelocity            = 0,

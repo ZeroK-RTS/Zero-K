@@ -27,7 +27,6 @@ unitDef = {
   iconType                      = [[statictransport]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 336,
   maxDamage                     = 1500,
   maxSlope                      = 18,
   maxVelocity                   = 0,

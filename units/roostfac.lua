@@ -50,7 +50,6 @@ unitDef = {
   iconType                      = [[factory]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 380,
   maxDamage                     = 8000,
   maxSlope                      = 15,
   maxVelocity                   = 0,

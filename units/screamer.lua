@@ -42,7 +42,6 @@ unitDef = {
   iconType                      = [[heavysam]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 476,
   maxDamage                     = 1570,
   maxSlope                      = 18,
   maxVelocity                   = 0,

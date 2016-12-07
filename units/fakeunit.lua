@@ -26,7 +26,6 @@ unitDef = {
   idleTime                      = 300,
   kamikazeDistance              = 64,
   levelGround                   = false,
-  mass                          = 1427,
   maxDamage                     = 100000,
   maxSlope                      = 255,
   maxVelocity                   = 0,

@@ -34,7 +34,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 287,
   maxDamage           = 3650,
   maxSlope            = 37,
   maxVelocity         = 2.3,

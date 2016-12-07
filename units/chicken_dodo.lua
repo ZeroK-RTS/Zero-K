@@ -35,7 +35,6 @@ unitDef = {
   kamikaze              = true,
   kamikazeDistance      = 80,
   leaveTracks           = true,
-  mass                  = 117,
   maxDamage             = 200,
   maxSlope              = 36,
   maxVelocity           = 7,

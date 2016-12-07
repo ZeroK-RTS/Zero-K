@@ -26,7 +26,6 @@ unitDef = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[gunship]],
-  mass                = 84,
   maxDamage           = 430,
   maxVelocity         = 5,
   minCloakDistance    = 75,

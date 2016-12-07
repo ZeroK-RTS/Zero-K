@@ -76,7 +76,6 @@ unitDef = {
   hoverAttack         = true,
   iconType            = [[t3builder]],
   initCloaked         = false,
-  mass                = 196,
   maxDamage           = 750,
   maxSlope            = 36,
   maxVelocity         = 7,

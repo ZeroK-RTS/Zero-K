@@ -43,7 +43,6 @@ unitDef = {
   iconType            = [[radarplane]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 182,
   maxAcc              = 0.5,
   maxDamage           = 950,
   maxAileron          = 0.018,

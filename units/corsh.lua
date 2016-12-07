@@ -36,7 +36,6 @@ unitDef = {
   iconType            = [[hoverraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 97,
   maxDamage           = 300,
   maxSlope            = 36,
   maxVelocity         = 4.8,

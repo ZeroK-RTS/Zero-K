@@ -47,7 +47,6 @@ unitDef = {
   iconType            = [[gunshiptransport]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 90,
   maxDamage           = 300,
   maxVelocity         = 10.7,
   minCloakDistance    = 75,

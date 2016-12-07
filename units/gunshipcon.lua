@@ -48,7 +48,6 @@ unitDef = {
   iconType            = [[builderair]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 130,
   maxDamage           = 600,
   maxVelocity         = 3.1,
   metalMake           = 0.225,

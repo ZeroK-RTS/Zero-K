@@ -46,7 +46,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
-  mass                = 1000,
   maxAcc              = 0.5,
   maxDamage           = 4000,
   maxElevator         = 0.01,

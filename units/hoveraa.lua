@@ -36,7 +36,6 @@ unitDef = {
   iconType            = [[hoveraa]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 200,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 3.54,

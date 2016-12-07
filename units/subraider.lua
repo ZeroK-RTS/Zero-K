@@ -35,7 +35,6 @@ unitDef = {
   iconType               = [[subraider]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 240,
   maxDamage              = 600,
   maxVelocity            = 3.7,
   minCloakDistance       = 75,

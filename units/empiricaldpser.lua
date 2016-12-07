@@ -17,7 +17,6 @@ unitDef = {
   iconType                = [[mahlazer]],
   idleAutoHeal            = 5,
   idleTime                = 1800,
-  mass                    = 17500,
   maxDamage               = 15000,
   maxSlope                = 18,
   maxVelocity             = 0,

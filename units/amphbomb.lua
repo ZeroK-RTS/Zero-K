@@ -37,7 +37,6 @@ unitDef = {
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 100,
   maxDamage              = 140,
   maxSlope               = 36,
   maxVelocity            = 4.1,

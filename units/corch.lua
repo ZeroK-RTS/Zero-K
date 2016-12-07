@@ -45,7 +45,6 @@ unitDef = {
   iconType            = [[builder]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 150,
   maxDamage           = 800,
   maxSlope            = 36,
   maxVelocity         = 2.8,

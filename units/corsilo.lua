@@ -37,7 +37,6 @@ unitDef = {
   iconType                      = [[nuke]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 869,
   maxDamage                     = 5000,
   maxSlope                      = 18,
   maxVelocity                   = 0,

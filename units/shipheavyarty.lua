@@ -34,7 +34,6 @@ unitDef = {
   iconType               = [[shipheavyarty]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 776,
   maxDamage              = 12000,
   maxVelocity            = 2.2,
   minCloakDistance       = 75,

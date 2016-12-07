@@ -36,7 +36,6 @@ unitDef = {
   iconType            = [[bomber]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 234,
   maxAcc              = 0.5,
   maxDamage           = 900,
   maxElevator         = 0.02,

@@ -57,7 +57,6 @@ unitDef = {
   kamikazeDistance       = 25,
   kamikazeUseLOS         = true,
   maneuverleashlength    = [[140]],
-  mass                   = 210,
   maxDamage              = 250,
   maxSlope               = 36,
   maxVelocity            = 1.5225,

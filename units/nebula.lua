@@ -51,7 +51,6 @@ unitDef = {
   iconType               = [[nebula]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 886,
   maxDamage              = 11000,
   maxVelocity            = 3.3,
   minCloakDistance       = 150,

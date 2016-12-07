@@ -51,7 +51,6 @@ unitDef = {
   iconType               = [[stealthfighter]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 187,
   maxAcc                 = 0.5,
   maxDamage              = 1000,
   maxVelocity            = 7.6,

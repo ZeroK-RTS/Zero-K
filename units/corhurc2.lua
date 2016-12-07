@@ -43,7 +43,6 @@ unitDef = {
   iconType            = [[bomberraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 180,
   maxAcc              = 0.5,
   maxDamage           = 650,
   maxAileron          = 0.018,

@@ -33,7 +33,6 @@ unitDef = {
   iconType               = [[vanquisher]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 400,
   maxDamage              = 9600,
   maxVelocity            = 2.7,
   minCloakDistance       = 75,

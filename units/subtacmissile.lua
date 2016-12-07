@@ -36,7 +36,6 @@ unitDef = {
   iconType               = [[subtacmissile]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 556,
   maxDamage              = 3000,
   maxVelocity            = 2.79,
   minCloakDistance       = 75,

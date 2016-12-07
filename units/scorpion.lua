@@ -34,7 +34,6 @@ unitDef = {
   idleTime               = 1800,
   initCloaked			 = true,
   leaveTracks            = true,
-  mass                   = 700,
   maxDamage              = 12000,
   maxSlope               = 72,
   maxVelocity            = 1.3,

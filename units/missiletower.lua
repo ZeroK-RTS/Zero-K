@@ -33,7 +33,6 @@ unitDef = {
   footprintZ                    = 3,
   iconType                      = [[defenseskirmaa]],
   levelGround                   = false,
-  mass                          = 208,
   maxDamage                     = 580,
   maxSlope                      = 18,
   minCloakDistance              = 150,

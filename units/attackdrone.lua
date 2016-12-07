@@ -26,7 +26,6 @@ unitDef = {
   footprintZ          = 2,
   hoverAttack         = true,
   iconType            = [[fighter]],
-  mass                = 84,
   maxDamage           = 180,
   maxVelocity         = 7,
   minCloakDistance    = 75,

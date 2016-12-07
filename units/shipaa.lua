@@ -39,7 +39,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 40,
-  mass                   = 243,
   maxDamage              = 1900,
   maxVelocity            = 2.84,
   minCloakDistance       = 75,

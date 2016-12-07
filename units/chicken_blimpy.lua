@@ -39,7 +39,6 @@ unitDef = {
   idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
-  mass                = 258,
   maxDamage           = 1850,
   maxSlope            = 18,
   maxVelocity         = 5,

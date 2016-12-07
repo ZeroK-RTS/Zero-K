@@ -41,7 +41,6 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 40,
-  mass                          = 94,
   maxDamage                     = 300,
   maxSlope                      = 36,
   maxVelocity                   = 0,

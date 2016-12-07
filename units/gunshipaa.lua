@@ -49,7 +49,6 @@ unitDef = {
   iconType               = [[gunshipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 208,
   maxDamage              = 900,
   maxVelocity            = 3.8,
   minCloakDistance       = 75,

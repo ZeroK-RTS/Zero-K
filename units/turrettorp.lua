@@ -39,7 +39,6 @@ unitDef = {
   iconType          = [[defensetorp]],
   idleAutoHeal      = 5,
   idleTime          = 1800,
-  mass              = 215,
 
   maxDamage         = 1020,
   maxSlope          = 18,

@@ -32,7 +32,6 @@ unitDef = {
   iconType            = [[chicken]],
   idleAutoHeal        = 20,
   idleTime            = 300,
-  mass                = 99999,
   maxDamage           = 700,
   maxSlope            = 72,
   maxVelocity         = 0.3,

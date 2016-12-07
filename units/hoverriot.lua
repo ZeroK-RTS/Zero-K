@@ -38,7 +38,6 @@ unitDef = {
   iconType            = [[hoverriot]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 215,
   maxDamage           = 1200,
   maxSlope            = 36,
   maxVelocity         = 2.2,

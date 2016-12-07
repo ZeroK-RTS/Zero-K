@@ -32,7 +32,6 @@ unitDef = {
   hoverAttack         = true,
   iconType            = [[smallgunship]],
   maneuverleashlength = [[900]],
-  mass                = 84,
   maxDamage           = 180,
   maxVelocity         = 8.56,
   minCloakDistance    = 75,

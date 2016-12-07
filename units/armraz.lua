@@ -36,7 +36,6 @@ unitDef = {
   iconType               = [[t3generic]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 750,
   maxDamage              = 11000,
   maxSlope               = 36,
   maxVelocity            = 1.9,

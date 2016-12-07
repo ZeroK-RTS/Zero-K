@@ -33,7 +33,6 @@ unitDef = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 368,
   maxDamage           = 1350,
   maxSlope            = 36,
   maxVelocity         = 3.3,

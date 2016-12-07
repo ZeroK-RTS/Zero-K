@@ -37,7 +37,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   maneuverleashlength = [[1280]],
-  mass                = 240,
   maxDamage           = 310,
   maxVelocity         = 4.2,
   minCloakDistance    = 75,

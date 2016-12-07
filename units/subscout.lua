@@ -37,7 +37,6 @@ unitDef = {
   idleTime              = 1800,
   kamikaze              = true,
   kamikazeDistance      = 80,
-  mass                  = 175,
   maxDamage             = 200,
   maxVelocity           = 3.8,
   minCloakDistance      = 75,

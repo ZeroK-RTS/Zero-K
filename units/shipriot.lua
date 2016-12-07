@@ -34,7 +34,6 @@ unitDef = {
   iconType               = [[shipriot]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 200,
   maxDamage              = 1350,
   maxVelocity            = 3.2,
   minCloakDistance       = 75,

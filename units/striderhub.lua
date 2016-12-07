@@ -66,7 +66,6 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   maneuverleashlength           = [[380]],
-  mass                          = 100000,
   maxDamage                     = 2000,
   maxSlope                      = 15,
   maxVelocity                   = 0,

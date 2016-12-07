@@ -27,7 +27,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 120,
   maxDamage                     = 500,
   maxSlope                      = 36,
   maxVelocity                   = 0,

@@ -37,7 +37,6 @@ unitDef = {
   iconType                      = [[staticarty]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 605,
   maxDamage                     = 3750,
   maxSlope                      = 18,
   maxVelocity                   = 0,

@@ -41,7 +41,6 @@ unitDef = {
   iconType               = [[krogoth]],
   leaveTracks            = true,
   losEmitHeight          = 100,
-  mass                   = 2233,
   maxDamage              = 85800,
   maxSlope               = 37,
   maxVelocity            = 1.2,

@@ -43,7 +43,6 @@ unitDef = {
   iconType            = [[building]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 100000,
   maxDamage           = 1860,
   maxSlope            = 18,
   maxVelocity         = 0,

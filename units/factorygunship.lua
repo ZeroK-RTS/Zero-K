@@ -56,7 +56,6 @@ unitDef = {
   iconType                      = [[facgunship]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,

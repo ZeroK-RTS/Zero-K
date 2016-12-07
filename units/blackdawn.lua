@@ -44,7 +44,6 @@ unitDef = {
   footprintZ          = 3,
   hoverAttack         = true,
   iconType            = [[heavygunshipassault]],
-  mass                = 341,
   maxDamage           = 3400,
   maxVelocity         = 4.5,
   minCloakDistance    = 75,

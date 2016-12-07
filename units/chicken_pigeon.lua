@@ -39,7 +39,6 @@ unitDef = {
   iconType            = [[scoutplane]],
   idleAutoHeal        = 20,
   idleTime            = 300,
-  mass                = 69,
   maxDamage           = 150,
   maxSlope            = 18,
   maxVelocity         = 10,

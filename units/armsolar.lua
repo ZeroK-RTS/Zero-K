@@ -38,7 +38,6 @@ unitDef = {
   iconType                      = [[energy_med]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 104,
   maxDamage                     = 500,
   maxSlope                      = 18,
   maxVelocity                   = 0,

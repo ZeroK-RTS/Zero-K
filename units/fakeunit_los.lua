@@ -32,7 +32,6 @@ unitDef = {
   idleAutoHeal          = 10,
   idleTime              = 300,
   levelGround           = false,
-  mass                  = 10,
   maxDamage             = 900000,
   maxVelocity           = 5,
   maxWaterDepth         = 0,

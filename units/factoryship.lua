@@ -51,7 +51,6 @@ unitDef = {
   iconType               = [[facship]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 324,
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
