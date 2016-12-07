@@ -1161,7 +1161,7 @@ local function MakeMessageWindow(name, enabled)
 		local resourceBarWidth = 430
 		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
 		bottom = nil
-		width  = screenWidth * 0.30
+		width  = 380 - 4	--screenWidth * 0.30	-- 380 is epic menu bar width
 		height = screenHeight * 0.20
 		x = screenWidth - width
 		y = 50

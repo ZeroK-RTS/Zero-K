@@ -154,9 +154,10 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
 end
 
 local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
-	local vsx, vsy = gl.GetViewSizes()
+	local vsx, vsy = Spring.GetWindowGeometry()
 	--local x = math.floor((vsx - width)/2)
-	local y = math.floor((vsy - height)/2)
+	local y = 50 + vsy * 0.20 + 64	-- put it under proconsole and objectives button
+	--local y = math.floor((vsy - height)/2)
 	
 	width = width or 360
 	height = height or 160
