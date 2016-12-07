@@ -93,23 +93,6 @@ lowRangeSwarmieeArray = Union(lowRangeSwarmieeArray,medRangeSwarmieeArray)
 -- skirm arrays
 ---------------------------------------------------------------------------
 -- these are not strictly required they just help with inputting the units
-local scorcherSkirmieeArray = NameToDefID({
-	"armtick",
-	"corroach",
-	"puppy",
-	"corsktl",
-	"spherepole",
-	"armpw",
-	"corak",
-	"corcan",
-	"hoverdepthcharge",
-	"armestor", -- scorchers tend to get blown up on pylons
-	
-	"chicken",
-	"chickena",
-	"chicken_tiamat",
-	"chicken_dragon"
-})
 
 local veryShortRangeSkirmieeArray = NameToDefID({
 	"corclog",
@@ -364,9 +347,8 @@ local subfleeables = NameToDefID({
 	"subraider",
 })
 
-
--- scorcher dive list
-local scorcherSwarmieeArray = SetMinus(allGround, scorcherSkirmieeArray)
+-- Some short ranged units dive everything that they don't skirm or swarm.
+local shortRangeDiveArray = SetMinus(SetMinus(allGround, shortRangeSkirmieeArray), lowRangeSwarmieeArray)
 
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
 -- sea: table of behaviour for sea. Note that these tables are optional.
@@ -558,10 +540,11 @@ local behaviourConfig = {
 	},
 	
 	["corgator"] = {
-		skirms = scorcherSkirmieeArray,
-		swarms = {}, -- Put things here like Rogue.
+		skirms = shortRangeSkirmieeArray,
+		swarms = lowRangeSwarmieeArray,
 		flees = {},
-		hugs = scorcherSwarmieeArray, 
+		hugs = shortRangeDiveArray,
+		fightOnlyUnits = shortRangeExplodables, 
 		localJinkOrder = false,
 		jinkTangentLength = 50,
 		circleStrafe = true,
@@ -665,9 +648,11 @@ local behaviourConfig = {
 	
 	-- could flee subs but isn't fast enough for it to be useful
 	["shipriot"] = {
-		skirms = {}, 
-		swarms = scorcherSwarmieeArray, 
+		skirms = shortRangeSkirmieeArray,
+		swarms = lowRangeSwarmieeArray,
 		flees = {},
+		hugs = shortRangeDiveArray,
+		fightOnlyUnits = shortRangeExplodables, 
 		localJinkOrder = false,
 		jinkTangentLength = 50,
 		circleStrafe = true,
