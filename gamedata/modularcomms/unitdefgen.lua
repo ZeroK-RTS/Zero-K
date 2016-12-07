@@ -435,10 +435,6 @@ for name, data in pairs(commDefs) do
 		array.customparams.unit = data.unitname
 	end
 	
-	-- set mass
-	data.mass = ((data.buildtime/2 + data.maxdamage/10)^0.55)*9
-	--Spring.Echo("mass " .. (data.mass or "nil") .. " BT/HP " .. (data.buildtime or "nil") .. "  " .. (data.maxdamage or "nil"))
-	
 	-- rez speed
 	if data.canresurrect then 
 		data.resurrectspeed = data.workertime*0.5
