@@ -236,6 +236,11 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		return true 
 	end
 	
+	-- do not allow morph for units being transported which are not combat morphs
+	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
+		return true
+	end
+	
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
 
 	if not morphDef.combatMorph then
@@ -546,6 +551,11 @@ local function UpdateMorph(unitID, morphData)
 	local transportID = Spring.GetUnitTransporter(unitID)
 	local transportUnitDefID = 0
 	if transportID then
+		if not morphData.combatMorph then
+			StopMorph(unitID, morphUnits[unitID])
+			morphUnits[unitID] = nil
+			return true
+		end
 		transportUnitDefID = Spring.GetUnitDefID(transportID)
 		if not UnitDefs[transportUnitDefID].isFirePlatform then
 			return true 
@@ -788,22 +798,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	local morphData = morphUnits[unitID]
 	if (morphData) then
 		if (cmdID == morphData.def.stopCmd) or (cmdID == CMD.STOP and not morphData.def.combatMorph) or (cmdID == CMD_MORPH_STOP) then
-		
-			local morphCancelAllowedByTransport = 1
-			local transportID = Spring.GetUnitTransporter(unitID)
-			local transportUnitDefID = 0
-			if transportID then
-				transportUnitDefID = Spring.GetUnitDefID(transportID)
-				if not UnitDefs[transportUnitDefID].isFirePlatform then
-					morphCancelAllowedByTransport = 0
-				end
-			end
-			
-			if morphCancelAllowedByTransport then
 				StopMorph(unitID, morphData)
 				morphUnits[unitID] = nil
 				return false
-			end
 		elseif cmdID == CMD.SELFD then
 			StopMorph(unitID, morphData)
 			morphUnits[unitID] = nil
