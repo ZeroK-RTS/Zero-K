@@ -788,7 +788,18 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	local morphData = morphUnits[unitID]
 	if (morphData) then
 		if (cmdID == morphData.def.stopCmd) or (cmdID == CMD.STOP and not morphData.def.combatMorph) or (cmdID == CMD_MORPH_STOP) then
-			if not Spring.GetUnitTransporter(unitID) then
+		
+			local morphCancelAllowedByTransport = 1
+			local transportID = Spring.GetUnitTransporter(unitID)
+			local transportUnitDefID = 0
+			if transportID then
+				transportUnitDefID = Spring.GetUnitDefID(transportID)
+				if not UnitDefs[transportUnitDefID].isFirePlatform then
+					morphCancelAllowedByTransport = 0
+				end
+			end
+			
+			if morphCancelAllowedByTransport then
 				StopMorph(unitID, morphData)
 				morphUnits[unitID] = nil
 				return false
