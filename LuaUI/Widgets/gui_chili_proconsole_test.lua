@@ -163,6 +163,7 @@ options_order = {
 	'mousewheelBacklog',
 	'enableSwap',
 	'backlogHideNotChat',
+	'backlogShowWithChatEntry',
 	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
@@ -579,6 +580,12 @@ options = {
 				end
 			end
 		end
+	},
+	backlogShowWithChatEntry = {
+		name = "Show backlog when echatting",
+		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
+		type = 'bool',
+		value = false,
 	},
 	backlogArrowOnRight = {
 		name = "Backlong Arrow On Right",
@@ -1219,6 +1226,13 @@ local function SwapBacklog()
 	showingBackchat = not showingBackchat
 end
 
+local function SetBacklogShow(newShow)
+	if newShow == showingBackchat then
+		return
+	end
+	SwapBacklog()
+end
+
 options.toggleBacklog.OnChange = SwapBacklog
 
 -----------------------------------------------------------------------
@@ -1242,8 +1256,14 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(true)
+		end
 		ShowInputSpace()
 	else
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
+		end
 		HideInputSpace()
 	end 
 end
@@ -1253,6 +1273,9 @@ function widget:KeyRelease(key, modifier, isRepeat)
 		if key == KEYSYMS.KP_ENTER and keypadEnterPressed then
 			keypadEnterPressed = false
 			return
+		end
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
 		end
 		HideInputSpace()
 	end
