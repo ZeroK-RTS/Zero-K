@@ -57,6 +57,9 @@ local function CopyMoveThenUnload(transportID, unitID)
 	Spring.GiveOrderToUnit(unitID, CMD.REMOVE, queueToRemove, {})
 end
 
+local valkMaxMass = UnitDefNames.corvalk.transportMass
+local valkMaxSize = UnitDefNames.corvalk.transportSize * 2
+
 local function DoSelectionLoad()
 	-- Find the units which can transport and the units which are transports
 	local selectedUnits = Spring.GetSelectedUnits()
@@ -74,7 +77,7 @@ local function DoSelectionLoad()
 				if ud.isTransport then
 					local transportUnits = Spring.GetUnitIsTransporting(unitID)
 					if transportUnits and #transportUnits == 0 then
-						if ud.transportMass > 330 then
+						if ud.transportMass > valkMaxMass then
 							heavyTrans[#heavyTrans + 1] = unitID
 						else
 							lightTrans[#lightTrans + 1] = unitID
@@ -82,7 +85,7 @@ local function DoSelectionLoad()
 					end
 				end
 			else
-				if (ud.mass > 330) or (ud.xsize > 8) or (ud.zsize > 8) then
+				if (ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize) then
 					heavy[#heavy + 1] = unitID
 				else
 					light[#light + 1] = unitID
