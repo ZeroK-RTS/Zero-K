@@ -39,9 +39,11 @@ local allGround = {}
 local armedLand = {}
 
 for name,data in pairs(UnitDefNames) do
-	if data.canAttack and (not data.canfly) 
-	and data.weapons[1] and data.weapons[1].onlyTargets.land then
-		armedLand[data.id] = true 
+	if not data.canfly then
+		allGround[data.id] = true
+		if data.canAttack and data.weapons[1] and data.weapons[1].onlyTargets.land then
+			armedLand[data.id] = true
+		end
 	end
 end
 
