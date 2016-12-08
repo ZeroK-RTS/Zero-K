@@ -55,48 +55,10 @@ local gun1 = 0
 local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
-
-
-
--- SmokeUnit(healthpercent, Sleep(time, smoketype)
-
-	-- while  get BUILD_PERCENT_LEFT  do
-	
-		-- sleep 400)
-	-- end
-	-- while  true  do
-	
-		-- healthpercent = get HEALTH)
-		-- if  healthpercent < 66  then
-		
-			-- smoketype = 256 + sfx2
-			-- if  1, 66 ) < healthpercent  then
-			
-				-- smoketype = 256 + sfx1
-			-- end
-			-- EmitSfx( hull,  smoketype )
-		-- end
-		-- Sleep(time = healthpercent * 50)
-		-- if  Sleep(time < 200  then
-		
-			-- sleeptime = 200)
-		-- end
-		-- Sleep( sleeptime)
-	-- end
--- end
-
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	InitializeRock(ROCK_PIECE, ROCK_Z_SPEED, ROCK_Z_DECAY, ROCK_Z_MIN, ROCK_Z_MAX, SIG_ROCK_Z, z_axis)
-	--gun1 = 0
-	--restore_delay = 3000
-	--RockZInit()
-	--StartThread(SmokeUnit)
 end
-
--- SetMaxReloadTime(Func_Var_1)
-	-- restore_delay = Func_Var_1 * 2
--- end
 
 local function RestoreAfterDelay()
 	Sleep( restore_delay)
@@ -130,8 +92,8 @@ function script.AimWeapon(num, heading, pitch)
 	Signal( 2)
 	SetSignalMask( 2)
 	Turn( turret , y_axis, heading, math.rad(70.000000) )
-	Turn( arml , x_axis, 0, math.rad(40.000000) )
-	Turn( armr , x_axis, 0, math.rad(40.000000) )
+	Turn( arml , x_axis, -pitch, math.rad(40.000000) )
+	Turn( armr , x_axis, -pitch, math.rad(40.000000) )
 	WaitForTurn(turret, y_axis)
 	WaitForTurn(arml, x_axis)
 	WaitForTurn(armr, x_axis)
@@ -193,7 +155,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 105, 35, 0.25) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 130, 35, 0.25) then
 		return true
 	end
 	return false

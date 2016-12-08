@@ -60,7 +60,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 400.1, 90, false, false, true) then
+	if num == 2 and GG.OverkillPrevention_CheckBlock(unitID, targetID, 400.1, 90, false, false, true) then
 		return true
 	end
 	return false
