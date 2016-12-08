@@ -60,7 +60,7 @@ unitDef = {
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,
-  sonarDistance       = 1400,
+  sonarDistance       = 700,
   turnRadius          = 80,
   workerTime          = 0,
 
