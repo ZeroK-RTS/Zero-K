@@ -16,6 +16,8 @@ end
 ----------------------------------------------------
 -- Widget option functions
 
+local CHAT_PADDING = 100
+
 local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
 local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
 local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
@@ -697,7 +699,8 @@ local function SetupMinimapLeftPreset()
 	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat
-	local chatWidth = math.floor(screenWidth/5)
+	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
+	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
 	local chatHeight = selectionsHeight
 	
 	local chatX = math.floor((screenWidth - chatWidth)/2)
@@ -875,7 +878,8 @@ local function SetupMinimapRightPreset()
 	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
 	
 	-- Chat
-	local chatWidth = math.floor(screenWidth/5)
+	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
+	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
 	local chatHeight = selectionsHeight
 	
 	local chatX = math.floor((screenWidth - chatWidth)/2)
