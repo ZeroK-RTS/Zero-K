@@ -33,6 +33,7 @@ local weaponDef = {
 	explosionGenerator      = [[custom:SMOKE]],
 	fallOffRate             = 1,
 	fireStarter             = 100,
+	heightMod               = 1,
 	impulseBoost            = 0,
 	impulseFactor           = 0,
 	interceptedByShieldType = 1,
