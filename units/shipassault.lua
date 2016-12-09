@@ -6,11 +6,11 @@ unitDef = {
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
   buildAngle             = 16384,
-  buildCostEnergy        = 560,
-  buildCostMetal         = 560,
+  buildCostEnergy        = 590,
+  buildCostMetal         = 590,
   builder                = false,
   buildPic               = [[shipassault.png]],
-  buildTime              = 560,
+  buildTime              = 590,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -72,6 +72,8 @@ unitDef = {
       def                = [[SONIC]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
+	  mainDir            = [[0 -1 0]],
+      maxAngleDif        = 240,
     },
 
     {
