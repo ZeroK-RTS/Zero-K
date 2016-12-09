@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[cafus]],
   name                          = [[Singularity Reactor]],
-  description                   = [[Produces Energy (225) - HAZARDOUS]],
+  description                   = [[Large Powerplant (+225) - HAZARDOUS]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

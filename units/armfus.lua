@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armfus]],
   name                          = [[Fusion Reactor]],
-  description                   = [[Produces Energy (35)]],
+  description                   = [[Medium Powerplant (+35)]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 1000,
   buildCostMetal                = 1000,
