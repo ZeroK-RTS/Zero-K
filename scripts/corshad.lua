@@ -189,7 +189,17 @@ function script.BlockShot(num, targetID)
 		Move(drop, z_axis, dz)
 		dy = math.max(dy, -30)
 		Move(drop, y_axis, dy)
-		if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, 120, false, false, true) then
+		local distance = (Spring.GetUnitSeparation(unitID, targetID) or 0)
+		local unitHeight = (GG.GetUnitHeight and GG.GetUnitHeight(targetID)) or 0
+		distance = math.max(0, distance - unitHeight/2)
+		local projectileTime = 35*math.min(1, distance/340)
+		
+		if GG.OverkillPrevention_CheckBlock(unitID, targetID, 800.1, projectileTime, false, false, true) then
+			-- Remove attack command on blocked target, it's already dead so move on.
+			local cQueue = Spring.GetCommandQueue(unitID, 1)
+			if cQueue and cQueue[1] and cQueue[1].id == CMD.ATTACK and (not cQueue[1].params[2]) and cQueue[1].params[1] == targetID then
+				Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {} )
+			end
 			return true
 		end
 		return false

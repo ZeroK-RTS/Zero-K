@@ -91,6 +91,20 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetUnitHeight(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local isNanoframe = select(3, Spring.GetUnitIsStunned(unitID))
+	if (not heightDef[unitDefID]) or isNanoframe then
+		-- Collision volume is always full size for non-nanoframes.
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
+		if isNanoframe then
+			return scaleY/2 + offsetY
+		end
+		heightDef[unitDefID] = scaleY/2 + offsetY
+	end
+	return heightDef[unitDefID]
+end
+
 local function GetWantedBomberHeight(unitID, config, underShield)
 	local _,_,_, x,y,z = Spring.GetUnitPosition(unitID, true)
 	if not x then
@@ -106,7 +120,6 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 	if not heightDef[unitDefID] then
 		-- Collision volume is always full size for non-nanoframes.
 		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
-		local height = Spring.GetUnitHeight(unitID)
 		heightDef[unitDefID] = scaleY/2 + offsetY
 		
 		local horSize = math.min(scaleX, scaleZ)/2
@@ -306,6 +319,8 @@ function gadget:Initialize()
 	_G.bombers = bombers
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_BOMBER_DIVE_STATE)
+	
+	GG.GetUnitHeight = GetUnitHeight
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
