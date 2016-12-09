@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Ultimatum]],
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
   acceleration           = 0.18,
-  activateWhenBuilt      = false,
+  activateWhenBuilt      = true,
   amphibious             = [[1]],
   autoHeal               = 5,
   brakeRate              = 0.375,
@@ -67,7 +67,7 @@ unitDef = {
 
   showNanoSpray          = false,
   sightDistance          = 500,
-
+  sonarDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
