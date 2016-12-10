@@ -27,8 +27,10 @@ local function Wake()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
 	while true do
-		EmitSfx(wake1, 2)
-		EmitSfx(wake2, 2)
+		if not Spring.GetUnitIsCloaked(unitID) then
+			EmitSfx(wake1, 2)
+			EmitSfx(wake2, 2)
+		end
 		Sleep(200)
 	end
 end
