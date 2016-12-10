@@ -25,7 +25,7 @@ unitDef = {
   customParams           = {
 
     helptext       = [[This Destroyer is a general-purpose combat vessel, combining a strong area-of-effect sonic cannon, a medium-range vertical launch missile, and strong armor. Use its sonic gun against smaller opponents above and below the water, and its missile against static targets.]],
-    modelradius    = [[15]],
+    modelradius    = [[55]],
 	turnatfullspeed = [[1]],
 	extradrawrange = 800,
   },

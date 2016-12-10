@@ -27,7 +27,7 @@ unitDef = {
   customParams           = {
     
     helptext       = [[With its powerful twin anti-air laser batteries, this Anti-Air Frigate protects your fleet from aerial attackers. As always, it is useless against targets that aren't airborne.]],
-	modelradius    = [[17]],
+	modelradius    = [[45]],
 	turnatfullspeed = [[1]],
   },
 

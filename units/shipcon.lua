@@ -35,7 +35,7 @@ unitDef = {
     helptext_fr    = [[Meme si il est couteux, le Shipcon construit plus vite qu'un constructeur terrestre et est aussi rapide que solide.]],
 	helptext_de    = [[Obwohl teuer, bietet diese Konstruktionseinheit extrem hohe Nanoleistung, kombiniert mit robuster Panzerung und Schnelligkeit.]],
 	helptext_pl    = [[Mimo ze jest drogi, statek konstrukcyjny ma wysoka moc, duza wytrzymalosc i jest w miare szybki.]],
-	modelradius    = [[15]],
+	modelradius    = [[40]],
 	turnatfullspeed = [[1]],
   },
 
