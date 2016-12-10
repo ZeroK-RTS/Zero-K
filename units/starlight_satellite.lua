@@ -319,6 +319,9 @@ starlight_satellite = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[satellite_d.dae]],
+	customParams = {
+		unit = "mahlazer",
+	},
     },
 
     HEAP  = {
@@ -326,6 +329,9 @@ starlight_satellite = {
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[debris2x2c.s3o]],
+	customParams = {
+		unit = "mahlazer",
+	},
     },
 
   },
