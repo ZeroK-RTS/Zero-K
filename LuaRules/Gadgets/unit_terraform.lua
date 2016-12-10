@@ -106,7 +106,7 @@ for i = 0, 64, 8 do
 end
 
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
-local updateFrequency = 30 -- how many frames to update
+local updateFrequency = 3 -- how many frames to update
 local areaSegMaxSize = 200 -- max width and height of terraform squares
 
 local maxWallPoints = 700 -- max points that can makeup a wall
