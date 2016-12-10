@@ -18,7 +18,6 @@ unitDef = {
 	[[shipassault]],
     [[shiparty]],
     [[shipaa]],
-	[[shiptransport]],
   },
 
   buildPic               = [[FACTORYSHIP.png]],
