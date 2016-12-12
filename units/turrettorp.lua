@@ -104,7 +104,6 @@ unitDef = {
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 22,
-      weaponTimer             = 3,
       weaponType              = [[TorpedoLauncher]],
       weaponVelocity          = 320,
     },

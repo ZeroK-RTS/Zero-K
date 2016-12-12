@@ -112,7 +112,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterweapon             = true,	  
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
     },  

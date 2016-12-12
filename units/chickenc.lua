@@ -110,7 +110,6 @@ unitDef = {
       sprayAngle              = 1024,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

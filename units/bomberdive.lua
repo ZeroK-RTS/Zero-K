@@ -194,7 +194,6 @@ unitDef = {
       turret                  = true,
 	  trajectoryHeight        = 1.5,
       weaponAcceleration      = 2000,
-	  weaponTimer             = 0,
 	  weaponType              = [[MissileLauncher]],
       weaponVelocity          = 2000,
 	  waterWeapon             = true,

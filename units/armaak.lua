@@ -124,7 +124,6 @@ unitDef = {
       sweepfire               = false,
       tolerance               = 8192,
       turret                  = true,
-      weaponTimer             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1500,
     },
