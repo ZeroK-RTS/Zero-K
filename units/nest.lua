@@ -40,7 +40,6 @@ unitDef = {
     description_pl = [[Rozmnaza kurczaki]],
 	helptext       = [[Nests such as this one are where the basic Thunderbirds are hatched.]],
 	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
-	helptext_pl    = [[W tym gniezdzie rodza sie podstawowe kurczaki.]],
     chickenFac = [[true]],
   },
 

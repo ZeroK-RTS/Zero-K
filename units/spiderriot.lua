@@ -22,7 +22,6 @@ unitDef = {
   customParams           = {
     helptext       = [[A rapid fire spider which excels at picking off fast units.]],
     description_pl = [[Pajak wsparcia]],
-    helptext_pl    = [[Szybkostrzelny pajak, ktory swietnie radzi sobie z niszczeniem lekkich jednostek.]],
     aimposoffset   = [[0 10 0]],
   },
 

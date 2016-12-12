@@ -24,7 +24,6 @@ unitDef = {
     description_pl = [[Radar Dalekiego Zasiegu z ulepszeniem dokladnosci]],
     helptext       = [[The advanced Radar Tower has a considerably greater range than the basic version. ]],
     helptext_de    = [[Der erweiterte Radarturm hat eine weitaus größere Radarreichweite als die Standardvariante. ]],
-    helptext_pl    = [[Ten radar ma zdecydowanie wiekszy zasieg niz podstawowa wersja.]],
     modelradius    = [[16]],
 	removewait     = 1,
 	priority_misc  = 2, -- High

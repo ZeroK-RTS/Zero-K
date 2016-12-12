@@ -25,10 +25,8 @@ unitDef = {
     description_fr = [[Bombardier desarmant]],
     description_pl = [[Bombowiec rozbrajajacy]],
     helptext       = [[Fast bomber armed with a lightning generator that disarms units in a wide area under it.]],
-    helptext_bp    = [[Bombardeiro rapido, que dispara raios de desarmar.]],
     helptext_de    = [[Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons desarmant pouvant désarmer les unités dans une large bande.]],
-    helptext_pl    = [[Szybki bombowiec, ktory jest w stanie rozbroic jednostki w szerokim obszarze.]],
     modelradius    = [[10]],
   },
 

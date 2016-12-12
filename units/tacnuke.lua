@@ -24,7 +24,6 @@ unitDef = {
     helptext       = [[A long-range precision strike weapon. The Eos' blast radius is small, but lethal.]],
     helptext_fr    = [[Le Eos est un lance missile nucléaire tactique. Les tetes nucléaires ne sont pas aussi lourdes que celles du Silencer et la portée moindre. Mais bien placé, il peut faire des ravages, et présente un rapport cout/efficacité plus qu'interressant.]],
     helptext_de    = [[Eine weitreichende, präzise Waffe. Die Druckwelle ist zwar klein, aber tödlich.]],
-    helptext_pl    = [[Jednorazowa rakieta dalekiego zasiegu, ktorej wybuch obejmuje maly obszar, lecz jest bardzo silny.]],
     mobilebuilding = [[1]],
   },
 

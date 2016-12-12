@@ -32,7 +32,6 @@ unitDef = {
     description_pl = [[Stacja naprawy i dozbrajania samolotow, moc stanowiska 2.5 e/s]],
     helptext       = [[The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers.]],
     helptext_de    = [[Das Air Repair/Rearm Pad repariert bis zu vier Flugzeuge gleichzeitig. Es befüllt und betankt außerdem die Bomber.]],
-    helptext_pl    = [[Ta Stacja moze naprawiac samoloty i odnawiac amunicje bombowcom. Posiada 4 stanowiska.]],
 	nobuildpower   = 1,
 	notreallyafactory = 1,
   },

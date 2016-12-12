@@ -25,7 +25,6 @@ unitDef = {
     description_pl = [[Niszczyciel]],
 	description_de = [[Zerstörer]],
     helptext       = [[The Daimyo class destroyer packs a wallop with its main gun, a powerful riot cannon. It also features missiles that can hit submarines and surface targets alike. The Daimyo is best attacked from afar, using surface ships or hovercraft with long-range weapons.]],
-    helptext_pl    = [[Glowna bronia Daimyo jest mocne dzialo; jest takze wyposazony w rakiety, ktore moga zanurzyc sie i uderzac w cele podwodne. Walczac przeciwko Daimyo, najlepiej atakowac z bezpiecznej odleglosci.]],
 	extradrawrange = 420,
   },
 

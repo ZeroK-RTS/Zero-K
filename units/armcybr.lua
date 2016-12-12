@@ -31,10 +31,8 @@ unitDef = {
     description_de = [[Implosion Bomber]],
     description_fr = [[Bombardier r Implosion]],
     description_pl = [[Bombowiec Implozyjny]],
-    helptext_bp    = [[]],
     helptext_de    = [[Wyvern ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
     helptext_fr    = [[Le Wyvern est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
-    helptext_pl    = [[Wyvern spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie.]],
     modelradius    = [[10]],
   },
 

@@ -31,10 +31,8 @@ unitDef = {
     --description_de = [[Implosion Bomber]],
     --description_fr = [[Bombardier r Implosion]],
     description_pl = [[Bombowiec szturmowy (na budynki)]],
-    --helptext_bp    = [[]],
     --helptext_de    = [[Licho ist ein mÃ¤chtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher fÃ¼r Angriffe auf einzelne Ziele prÃ¤destiniert.]],
     --helptext_fr    = [[Le Licho est tout simplement la mort venue du ciel. Ce bombardier lourdement blindÃ© et relativement lent transporte une tete nuclÃ©aire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de dÃ©truire des structures lourdement blindÃ©es. Tout simplement mortel utilisÃ© en petites escadres.]],
-    helptext_pl    = [[Mimo ze przez swoj rozmiar latwo go trafic, Eclipse jest w stanie wytrzymac ciezki ostrzal, by spuscic na swoj cel potezna bombe, ktora jednak spada na tyle wolno, ze nie mozna liczyc na trafienie w ruchome jednostki.]],
     modelradius    = [[10]],
   },
 

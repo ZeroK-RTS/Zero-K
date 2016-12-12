@@ -36,7 +36,6 @@ unitDef = {
   customParams     = {
     description_pl = [[Buduje amfibijne boty, moc 10 m/s]],
     helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged.]],
-    helptext_pl    = [[Ta fabryka produkuje amfibijne boty, ktore skutecznie prowadza walke zarowno na ladzie jak i w wodzie. Wiele z tutejszych jednostek regeneruje sie przy zanurzeniu w wodzie.]],
     aimposoffset   = [[0 0 -20]],
     midposoffset   = [[0 0 -20]],
     sortName = [[8]],

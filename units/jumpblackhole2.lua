@@ -23,7 +23,6 @@ unitDef = {
     description_de = [[Riot Roboter]],
     description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

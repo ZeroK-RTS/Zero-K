@@ -22,7 +22,6 @@ unitDef = {
     helptext       = [[A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures.]],
     helptext_fr    = [[Un organisme sans d?fenses dont la seule vocation semble ?tre de se transformer en structure poulet.]],
 	helptext_de    = [[Ein unglücklicher Nicht-Angriff Organismus, dessen einziger Zweck es ist, sich in eine Chickenstruktur zu verwandeln.]],
-	helptext_pl    = [[Nieszkodliwy kurczak, ktorego celem zyciowym jest przeobrazic sie w jeden ze statycznych organizmow kurczakow.]],
   },
 
   energyMake          = 0,

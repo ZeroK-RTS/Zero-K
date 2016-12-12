@@ -23,7 +23,6 @@ unitDef = {
   customParams          = {
     description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
     midposoffset   = [[0 10 0]],
   },
 

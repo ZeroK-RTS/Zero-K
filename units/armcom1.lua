@@ -35,7 +35,6 @@ unitDef = {
 	description_pl = [[Wszechstronny Dowodca, moc 10 m/s]],
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.]],
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung.]],
-	helptext_pl    = [[Strike to wszechstronny Dowodca, ktory moze uzywac wiekszosci modulow i ma dobra predkosc, wytrzymalosc i samonaprawe.]],
 	level = [[1]],
 	statsname = [[armcom1]],
 	soundok = [[heavy_bot_move]],

@@ -26,7 +26,6 @@ unitDef = {
     amph_submerged_at = 40,
     description_pl = [[Amfibijna bomba spowalniajaca]],
     helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
-    helptext_pl    = [[Dzieki malym rozmiarom i szybkosci Limpet moze unikac wolniejszych pociskow, co pozwala mu podejsc pod jednostki przeciwnika i zdetonowac sie, zadajac obrazenia i spowalniajac.]],
  	maxwatertank = [[100]],
  },
 

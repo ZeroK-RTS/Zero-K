@@ -25,7 +25,6 @@ unitDef = {
     description_pl = [[Chodzaca rakieta]],
     helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
 	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu überfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfältigen.]],
-	helptext_pl    = [[Ta samobojcza jednostka dobrze nadaje sie do najazdow na przeciwnika i niszczeniu lekkich celow. Gdy stoi w poblizu zlomu, samoczynnie pobiera metal i replikuje sie.]],
 	modelradius    = [[10]],
 
 	grey_goo = 1,

@@ -29,7 +29,6 @@ unitDef = {
 	helptext       = [[The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own.]],
     helptext_de    = [[Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist.]],
     helptext_fr    = [[Le Bantha est aussi cher et lent qu'il est inarretable. Il dispose de canons EMP, d'un canon accelerateur tachyon et de missiles. Courez.]],
-	helptext_pl    = [[Bantha to ciezki robot bojowy, ktory jest uzbrojony po zeby i bardzo wytrzymaly. Posiada rakiety EMP dalekiego zasiegu, ciezki laser oraz dzialka EMP. Nie ma jednak zadnej obrony przeciwlotniczej i slabo radzi sobie bez wsparcia mniejszych jednostek.]],
     aimposoffset   = [[0 -8 0]],
 	midposoffset   = [[0 -8 0]],
 	modelradius    = [[17]],

@@ -23,10 +23,8 @@ unitDef = {
     description_de = [[Mobile Marschflugkörperabschussrampe]],
     description_pl = [[Mobilna Wyrzutnia Rakiet Kinetycznych]],
     helptext       = [[The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings.]],
-    helptext_bp    = [[Impaler dispara verticalmente um míssel de grande precis?o, dano e alcançe. Seu alto ângulo disparo o faz capaz de atirar sobre qualquer obstáculo, mas como consequ?ncia o tempo de voo é t?o longo que é quase impossível acertar alvos móveis. Use-o para matar construç?es específicas. ]],
     helptext_de    = [[Der Impaler feuert seine Ballistgeschoss senkrecht ab. Ihn zeichnen seine hohe Präzision und die lange Reichweite seiner Flugkörper, sowie die Möglichkeit über Hindernisse zu schießen, aus. Die große Flugzeit macht ihn aber nutzlos gegenüber sich bewegenden Einheiten. Nutze den Impaler, um spezielle Einheiten/Gebäude zu zerstören.]],
     helptext_fr    = [[Le Impaler tire verticallement des missiles de croisi?res qui retombent exactement sur leur cible, causant de puissant dommages sur une tr?s petite zone. Cependant le temps de voyage des missiles le rends inefficace contre les unit?s mobiles. ]],
-    helptext_pl    = [[Impaler jest wyrzutnia ciezkich pociskow kinetycznych duzego zasiegu. Po wystrzeleniu pocisk wznosi sie wysoko w powietrze, a nastepnie opada na wczesniej wyznaczony punkt. Pozwala to ominac wiekszosc przeszkod i uderzyc z duza moca w konkretny budynek. Niestety, Impaler jest absolutnie bezuzyteczny przeciwko mobilnym jednostkom.]],
 
     dontfireatradarcommand = '1',
   },

@@ -25,7 +25,6 @@ unitDef = {
   customParams        = {
     description_pl = [[Ciezki kurczak powietrzny]],
     helptext       = [[Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken.]],
-    helptext_pl    = [[Roc to latajacy kurczak, ktory jest w stanie skutecznie zwalczac zarowno cele ladowe, jak i powietrzne.]],
   },
 
   explodeAs           = [[NOWEAPON]],

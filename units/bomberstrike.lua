@@ -25,7 +25,6 @@ unitDef = {
   customParams        = {
     description_pl = [[Bombowiec taktyczny]],
     helptext       = [[The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets.]],
-    helptext_pl    = [[Kestrel wystrzeliwuje rakiety krotkiego zasiegu, ktore moga trafic cele naziemne, nawodne lub podwodne. Sposrod bombowcow najlepiej nadaje sie do niszczenia pojedynczych jednostek.]],
     --modelradius    = [[10]],
   },
 

@@ -25,7 +25,6 @@ unitDef = {
     helptext       = [[The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion.]],
     helptext_de    = [[Das Moho Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
     helptext_fr    = [[La centrale géothermique Moho produit une quantité important d'énergie. Son explosion peut être catastrophique selon son emplacement.]],
-    helptext_pl    = [[Elektrownia Moho-geotermiczna wytwarza ogromne ilosci energii, jednak wymaga ochrony, jako ze jej zniszczenie wiaze sie z katastroficznym wybuchem.]],
     pylonrange     = 150,
 	removewait     = 1,
   },

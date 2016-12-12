@@ -21,7 +21,6 @@ unitDef = {
     description_pl = [[Bariera]],
 	helptext       = [[Thickets are the Thunderbirds' perimeter defense.]],
 	helptext_de    = [[Der Thicket ist ein defensiv Poller des Thunderbirds.]],
-	helptext_pl    = [[Thicket to forma obronnej zapory, uzywana przez kurczaki.]],
   },
 
   corpse                        = [[DEAD]],

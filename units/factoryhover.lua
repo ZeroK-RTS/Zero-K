@@ -33,7 +33,6 @@ unitDef = {
     description_pl = [[Buduje poduszkowce, moc 10 m/s]],
     helptext       = [[The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Penetrator]],
 	helptext_de    = [[Die Hovercraft Platform ist schnell und tödlich und eröffnet dir die Möglichkeit Wasser und Boden gleichzeitig zu überqueren und somit deinen Gegner geschickt zu überlisten. Wichtigste Einheiten: Dagger, Halberd, Scalpel, Mace, Penetrator]],
-	helptext_pl    = [[Poduszkowce sa szybkie i smiercionosne; sa w stanie poruszac sie zarowno na morzu, jak i po ladzie, co pozwala im na okrazenie lub ominiecie przeciwnika. Najwazniejsze jednostki: Dagger, Halberd, Scalpel, Mace, Penetrator]],
     sortName = [[8]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -25 0]],

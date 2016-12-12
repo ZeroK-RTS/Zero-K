@@ -33,7 +33,6 @@ unitDef = {
     description_de = [[Behalter voller Dreck]],
     description_pl = [[Pudlo z piachem]],
     helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
-    helptext_pl    = [[Dirtbag istnieje po to, by blokowac ruch przeciwnika i sie mu naprzykrzac. Po zniszczeniu wysypuje sie z nich piach, tworzac utrudniajacy poruszanie sie pagorek. Dirtbag moze takze uzywac swojego pudelka, by uderzac przeciwnikow z dynki, sprawdza sie tez jako zwiadowca.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],

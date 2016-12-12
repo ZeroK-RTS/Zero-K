@@ -32,7 +32,6 @@ unitDef = {
 	description_pl = [[Bot konstrukcyjny z tarcza, moc 5 m/s]],
     helptext       = [[The Convict is a fairly standard construction bot with a twist: a light shield to defend itself and support allied shieldbots.]],
     helptext_de    = [[Der Convict ist ein ziemlich normaler Konstruktionsroboter mit einem Vorteil: er hat ein Schild um sich zu schutzen.]],
-    helptext_pl    = [[Convict to bot konstrukcyjny wyposazony w ochronna tarcze.]],
   },
 
   energyMake          = 0.15,

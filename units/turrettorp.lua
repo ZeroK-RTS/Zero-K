@@ -28,7 +28,6 @@ unitDef = {
     helptext       = [[This Torpedo Launcher provides defense against both surface and submerged vessels.]], -- Remember to build sonar so that the Torpedo Launcher can hit submerged targets. 
     helptext_fr    = [[Ce lance torpille permet de torpiller les unites flottantes ou immergees.]], -- Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. 
 	helptext_de    = [[Dieser Torpedowerfer dient zur Verteidigung gegen Schiffe und U-Boote..]], -- Achte darauf, dass du ein Sonar baust, damit der Torpedowerfer U-Boote lokalisieren kann. 
-	helptext_pl    = [[Torpedy sa w stanie trafic zarowno cele plywajace po powierzchni jak i pod woda.]], -- Pamietaj, ze do atakowania zanurzonych celow potrzebny jest sonar.
 	aimposoffset   = [[0 15 0]],
 	midposoffset   = [[0 15 0]],
   },

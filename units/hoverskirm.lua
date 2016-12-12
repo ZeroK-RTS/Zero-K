@@ -22,7 +22,6 @@ unitDef = {
   customParams        = {
     description_pl = [[Poduszkowiec bojowy]],
     helptext       = [[The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one.]],
-    helptext_pl    = [[Trisula to w miare szybki, wytrzymaly poduszkowiec uzbrojony w rozszczepiany promien, ktory moze zniszczyc kilka mniejszych jednostek lub mocno uszkodzic jedna wieksza.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],

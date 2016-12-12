@@ -37,7 +37,6 @@ unitDef = {
     description_pl = [[Buduje czolgi, moc 10 m/s]],
     helptext       = [[The Heavy Tank Factory is the ultimate in brute force methods - nothing gets the job done quite like a sustained artillery barrage followed by a decisive push with the largest tanks in the field. Key units: Pillager, Reaper, Banisher, Goliath]],
 	helptext_de    = [[Die Heavy Tank Factory ist das Ultimum für brachiale Gewalt. Nicht erledigt den Auftrag zu gut, wie ein anhaltendes Artilleriefeuer, gefolgt von einem entscheidenen Vorstoß mit den größten Panzern auf dem Feld. Wichtigste Einheiten: Pillager, Reaper, Banisher, Goliath]],
-	helptext_pl    = [[Czolgi reprezentuja najprostsze podejscie do problemow - brutalna sile. Fabryka czolgow oferuje najciezsze sposrod polowych jednostek.]],
     sortName = [[6]],
   },
 

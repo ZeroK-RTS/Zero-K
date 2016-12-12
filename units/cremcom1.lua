@@ -33,7 +33,6 @@ unitDef = {
 	description_pl = [[Wszechstronny Dowodca, moc 10 m/s]],
 	helptext       = [[The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.]],
 	helptext_de    = [[Der Knight Commander bietet ein sehr ausgeglichenes Ger?t, das mit den meisten Modulen ausger?tet werden kann, mit anständiger Geschwindigkeit und Panzerung. Seine Basiswaffe ist ein Allzwecklaser und bei entsprechender Aufr?tung erhält er eine Disintegratorkanone.]],
-	helptext_pl    = [[Knight to wszechstronny Dowodca, ktory moze uzywac wiekszosci modulow i ma dobra predkosc, wytrzymalosc i samonaprawe.]],
 	level = [[1]],
 	statsname = [[cremcom1]],
 	soundok = [[heavy_bot_move]],

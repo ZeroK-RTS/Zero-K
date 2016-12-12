@@ -36,13 +36,9 @@ unitDef = {
     description_it = [[Ragno do costruzione, costruisce a 7.5 m/s]],
     description_pl = [[Pajak konstruktor, moc 7.5 m/s]],
     helptext       = [[The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar.]],
-    helptext_bp    = [[Weaver é o construtor escalador. Pode subir qualquer obstáculo, mas constrói mais devagar que construtores normais.]],
     helptext_de    = [[Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann. Er hat auch ein Radar.]],
-    helptext_es    = [[El Weaver es el constructor que puede treparse sobre qualquier obstáculo y construir defensas en terreno alto]],
-    helptext_fi    = [[Weaver pystyy liikkumaan vaikeakulkuisimmassakin maastossa ja rakentamaan vaivatta my?s useimmille muille rakentajille saavuttamattomiin paikkoihin.]],
     helptext_fr    = [[Le Weaver est un robot de construction arachnide tout terrain pouvant atteindre des zones élevées. Il a un radar.]],
     helptext_it    = [[Il Weaver é un costruttore che puo arrampicarsi su qualunque ostacolo e costruire difese nel terreno alto ed ha un radar.]],
-    helptext_pl    = [[Weaver jest konstruktorem mogacym wspinac sie po kazdej powierzchni. Jest wyposazony w radar krotkiego zasiegu.]],
 	modelradius    = [[15]],
   },
 

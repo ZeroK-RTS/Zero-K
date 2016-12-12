@@ -27,7 +27,6 @@ unitDef = {
     description_fr = [[Avion Sonar/Radar Furtif]],
 	description_de = [[Tarnkappen Radar/Sonar Flugzeug]],
     helptext       = [[The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath.]],
-    helptext_bp    = [[Este avi?o possui radar, sonar e um grande raio de vis?o, e desta forma pode encontrar inimigos escondidos com maior facilidade que a maioria das unidades batedoras.]],
     helptext_fr    = [[Summum de la technologie d'information, ses multiples capteurs vous renseigneront sur toutes les activit?s ennemies: terrestre aerienne ou sousmarine.]],
 	helptext_de    = [[Der Vulture bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren. Er hat auch ein Stoersender der gegen feindliche Radare wirkt.]],
 	modelradius    = [[20]],

@@ -24,7 +24,6 @@ unitDef = {
   customParams                  = {
     helptext       = [[The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
     helptext_de    = [[Der Disco Rave Party verschieÃŸt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Ãœberraschung darstellt. Ein SpaÃ?fÃ¼r die ganze Familie!]],
-    helptext_pl    = [[Disco Rave Party wystrzeliwuje kolorowe bomby, z ktorych kazda ma inny efekt. Swietna zabawa dla calej rodziny!]],
 	description_de = [[Regenbogen-Ãœberraschungs Superwaffe]],
     description_pl = [[Teczowa Niespodzianka!]],
     modelradius    = [[35]],
