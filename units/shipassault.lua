@@ -89,7 +89,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 190,
+		areaOfEffect            = 150,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -105,9 +105,9 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 260,
-			planes  = 260,
-			subs    = 260,
+			default = 230,
+			planes  = 230,
+			subs    = 230,
 		},
 		
 		cegTag					= [[sonictrail]],
@@ -119,7 +119,7 @@ unitDef = {
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
 		range                   = 380,
-		reloadtime              = 2,
+		reloadtime              = 3,
 		soundStart              = [[weapon/sonicgun]],
 		soundHit                = [[weapon/sonicgun_hit]],
 		soundStartVolume        = 12,
@@ -139,28 +139,28 @@ unitDef = {
 	
     MISSILE      = {
       name                    = [[Destroyer Missiles]],
-      areaOfEffect            = 48,
+      areaOfEffect            = 30,
       cegTag                  = [[missiletrailyellow]],
 	  collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 400,
-        subs    = 400,
+        default = 360,
+        subs    = 360,
       },
 
       edgeEffectiveness       = 0.5,
       fireStarter             = 100,
 	  fixedLauncher			  = true,	  
-      flightTime              = 4,
+      flightTime              = 5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
       range                   = 800,
-      reloadtime              = 10,
+      reloadtime              = 9,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/missile_fire12]],
       soundStart              = [[weapon/missile/missile_fire10]],
