@@ -194,7 +194,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
     },

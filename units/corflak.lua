@@ -112,7 +112,6 @@ unitDef = {
       soundHit                = [[weapon/flak_hit]],
       soundStart              = [[weapon/flak_fire]],
       turret                  = true,
-      weaponTimer             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 2000,
     },

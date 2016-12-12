@@ -160,7 +160,6 @@ unitDef = {
       turnrate                = 10000,
       turret                  = true,
       weaponAcceleration      = 400,
-      weaponTimer             = 0.0,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

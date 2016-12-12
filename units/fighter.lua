@@ -188,7 +188,6 @@ unitDef = {
       tracks                  = true,
       turnRate                = 40000,
       weaponAcceleration      = 550,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },

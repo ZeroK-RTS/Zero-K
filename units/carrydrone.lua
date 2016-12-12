@@ -115,7 +115,6 @@ unitDef = {
       soundStartVolume        = 2,
       sprayAngle              = 512,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1000,
     },

@@ -160,7 +160,6 @@ unitDef = {
       stages                  = 10,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
     },

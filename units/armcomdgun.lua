@@ -116,7 +116,6 @@ unitDef = {
       tolerance               = 10000,
       turret                  = true,
 	  waterWeapon             = true,
-      weaponTimer             = 4.2,
       weaponType              = [[DGun]],
       weaponVelocity          = 300,
     },

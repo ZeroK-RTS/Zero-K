@@ -123,7 +123,6 @@ unitDef = {
       turnRate                = 60000,
       turret                  = true,
       weaponAcceleration      = 300,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },
