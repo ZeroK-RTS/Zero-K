@@ -60,6 +60,7 @@ unitDef = {
 
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
+  yardmap                       = "ooooooooo",
 
   weapons                       = {
 
