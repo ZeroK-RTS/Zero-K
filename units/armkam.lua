@@ -23,15 +23,11 @@ unitDef = {
 
   customParams           = {
     airstrafecontrol = [[1]],
-    description_bp = [[Aeronave agressora]],
     description_fr = [[ADAV Pilleur]],
 	description_de = [[Plünder Kampfhubschrauber]],
-	description_pl = [[Lekki statek powietrzny]],
     helptext       = [[The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense.]],
-    helptext_bp    = [[Banshee é a aeronave agressora leve de Nova. Tem uma resist?ncia decente mas causa pouco dano. Funciona bem contra poderio anti-aério pouco resistente, sendo capaz de destruílo e ent?o atacar o resto do inimigo com impunidade por algum tempo, mas funciona mal contra poderio anti-aéreo pesado como metralhadoras anti-aéreas. Pode facilmente acertar unidades móveis e constitui defesa excelente contra inimigos que n?o incluem unidades anti-aéreas em seus grupos de ataque.]],
     helptext_fr    = [[Le Banshee est un ADAV l?ger, un blindage l?ger et peu de d?g?ts en font la hantise des d?buts de conflits. Envoy? dans une base non pr?par?e ou contre une arm?e sans d?fense Anti Air, son attaque rapide est bien souvent fatale.]],
 	helptext_de    = [[Der Banshee ist ein leichter Kampfhubschrauber. Er besitzt nur wenig Ausdauer und macht wenig DPS. Er ist gut für direkte Attacken auf die Verteidiger (z.B. um Luftabwehr auszuschalten). Er trifft bewegte Einheiten sehr gut und erweist sich auch bei Verteidigung gegen Gegner ohne Luftabwehr als sehr nützlich.]],
-	helptext_pl    = [[Banshee ma bardzo duza predkosc i dosc dobre obrazenia, co pozwala na szybkie najazdy w celu zniszczenia budynkow ekonomicznych przeciwnika lub niecelnych jednostek, na przyklad szturmowych. Pulap lotu Banshee jest jednak na tyle niski, ze moze zostac ostrzelana nawet przez jednostki o krotszym zasiegu.]],
 	modelradius    = [[18]],
   },
 
@@ -133,30 +129,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Banshee]],
       blocking         = true,
-      damage           = 860,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 88,
       object           = [[banshee_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
     HEAP  = {
-      description      = [[Debris - Banshee]],
       blocking         = false,
-      damage           = 860,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 44,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

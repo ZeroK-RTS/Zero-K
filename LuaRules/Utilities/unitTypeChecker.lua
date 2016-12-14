@@ -23,3 +23,15 @@ function Spring.Utilities.getMovetype(ud)
 	end
 	return false -- For structures or any other invalid movetype
 end
+
+function Spring.Utilities.getMovetypeByID(unitDefID)
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if ud then
+		Spring.Utilities.getMovetype(ud)
+	end
+	return false
+end
+
+function Spring.Utilities.BlueprintFloat(ud)
+	return Spring.Utilities.IsCurrentVersionNewerThan(103, 289) and ud.floatOnWater 
+end

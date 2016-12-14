@@ -66,7 +66,8 @@ local posVolume   = {0, 1, 0, 0.1} -- posisive volume
 local groundGridColor  = {0.3, 0.2, 1, 0.8} -- grid representing new ground height
 
 -- colour of lasso during drawing
-local lassoColor = {0.2, 1.0, 0.2, 1.0}
+local lassoColor = {0.2, 1.0, 0.2, 0.8}
+local edgeColor = {0.2, 1.0, 0.2, 0.4}
 
 --------------------------------------------------------------------------------
 -- Local Vars
@@ -77,8 +78,8 @@ local buildHeight = {}
 local buildingPlacementID = false
 local buildingPlacementHeight = 0
 
-local buildToGive = false
 local toggleEnabled = false
+local floating = false
 
 local pointX = 0
 local pointY = 0
@@ -90,6 +91,11 @@ local oddX = 0
 local oddZ = 0
 
 local facing = 0
+
+local corner = {
+	[1] = {[1] = 0, [-1] = 0},
+	[-1] = {[1] = 0, [-1] = 0},
+}
 
 --------------------------------------------------------------------------------
 -- Height Handling
@@ -109,62 +115,64 @@ local function SendCommand()
 		return
 	end
 	
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
+	
+	local commandTag = WG.Terraform_GetNextTag()
+	
 	local params = {}
 	params[1] = 1            -- terraform type = level
-	params[2] = Spring.GetMyTeamID()
-	params[3] = 1            -- Loop parameter
-	params[4] = pointY       -- Height parameter of terraform 
-	params[5] = 5            -- Five points in the terraform
-	params[6] = #constructor -- Number of constructors with the command
-	params[7] = 0            -- Ordinary volume selection
+	params[2] = team
+	params[3] = pointX
+	params[4] = pointZ
+	params[5] = commandTag
+	params[6] = 1            -- Loop parameter
+	params[7] = pointY       -- Height parameter of terraform 
+	params[8] = 5            -- Five points in the terraform
+	params[9] = #constructor -- Number of constructors with the command
+	params[10] = 0            -- Ordinary volume selection
 	
 	-- Rectangle of terraform
-	params[8]  = pointX + sizeX
-	params[9] = pointZ + sizeZ
-	params[10] = pointX + sizeX
-	params[11] = pointZ - sizeZ
-	params[12] = pointX - sizeX
-	params[13] = pointZ - sizeZ
-	params[14] = pointX - sizeX
-	params[15] = pointZ + sizeZ
-	params[16] = pointX + sizeX
-	params[17] = pointZ + sizeZ
+	params[11]  = pointX + sizeX
+	params[12] = pointZ + sizeZ
+	params[13] = pointX + sizeX
+	params[14] = pointZ - sizeZ
+	params[15] = pointX - sizeX
+	params[16] = pointZ - sizeZ
+	params[17] = pointX - sizeX
+	params[18] = pointZ + sizeZ
+	params[19] = pointX + sizeX
+	params[20] = pointZ + sizeZ
 	
 	-- Set constructors
-	local i = 18
+	local i = 21
 	for j = 1, #constructor do
 		params[i] = constructor[j]
 		i = i + 1
 	end
 	
-	params[#params + 1] = WG.Terraform_GetNextTag()
-	
 	local a,c,m,s = spGetModKeyState()
+
+	Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
 	
-	if s then
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-	else
-		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-		spSetActiveCommand(-1)
+	-- if global build command is active, check if it wants to handle the orders before giving units any commands.
+	if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, -buildingPlacementID, pointX, pointY, pointZ, facing, s) then
+		if not s then
+			spSetActiveCommand(-1)
+		end
+	
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
+	
+		local height = Spring.GetGroundHeight(pointX, pointZ)
+		for i = 1, #constructor do
+			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
+			if not handledExternally then
+				Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
+			end
+		end
 	end
-	
-	local waitFrame = 30	
-	local myPlayerID = Spring.GetMyPlayerID()
-	if myPlayerID then
-		-- ping is in seconds
-		local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
-		waitFrame = 30*ceil(myPing) + 5
-	end
-	
-	buildToGive = {
-		facing = facing,
-		cmdID = -buildingPlacementID,
-		x = pointX,
-		z = pointZ,
-		constructor = constructor,
-		waitFrame = waitFrame,
-		needGameFrame = true
-	}
 end
 
 function widget:KeyPress(key, mods)
@@ -199,11 +207,6 @@ function widget:KeyPress(key, mods)
 end
 
 function widget:Update(dt)
-	if buildToGive and buildToGive.needGameFrame then
-		widgetHandler:UpdateWidgetCallIn("GameFrame", self)
-		buildToGive.needGameFrame = false
-	end 
-	
 	if not CheckEnabled() then
 		buildingPlacementID = false
 		return
@@ -222,11 +225,10 @@ function widget:Update(dt)
 		buildingPlacementID = -activeCommand
 		buildingPlacementHeight = (buildHeight[buildingPlacementID] or defaultBuildHeight)
 		
-		local ud = UnitDefs[buildingPlacementID]
-		
 		facing = Spring.GetBuildFacing()
 		local offFacing = (facing == 1 or facing == 3)
 		
+		local ud = UnitDefs[buildingPlacementID]
 		local footX = ud.xsize/2
 		local footZ = ud.zsize/2
 		
@@ -242,44 +244,54 @@ function widget:Update(dt)
 		
 		widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 	end
+		
+	local ud = buildingPlacementID and UnitDefs[buildingPlacementID]
+	if not ud then
+		return
+	end
 	
 	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	-- Should not ignore water if the structure can float. See https://springrts.com/mantis/view.php?id=5390
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, not Spring.Utilities.BlueprintFloat(ud))
 	
 	if pos then
 		pointX = floor((pos[1] + 8 - oddX)/16)*16 + oddX
 		pointZ = floor((pos[3] + 8 - oddZ)/16)*16 + oddZ
-		pointY = spGetGroundHeight(pointX, pointZ) + buildingPlacementHeight	
+		local height = spGetGroundHeight(pointX, pointZ)
+		if ud.floatOnWater and height < 0 then
+			if buildingPlacementHeight == 0 and not floating then
+				-- Callin may have been removed
+				widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+			end
+			height = 0
+			floating = true
+			if buildingPlacementHeight == 0 then
+				pointY = 2
+			else
+				pointY = height + buildingPlacementHeight
+			end	
+		else
+			floating = false
+			pointY = height + buildingPlacementHeight	
+		end
+		
+		for i = -1, 1, 2 do
+			for j = -1, 1, 2 do
+				corner[i][j] = spGetGroundHeight(pointX + sizeX*i, pointZ + sizeZ*j)
+			end
+		end
 	else 
 		pointX = false
 	end
 end
 
 function widget:MousePress(mx, my, button)
-	if not (buildingPlacementID and buildingPlacementHeight ~= 0 and button == 1 and pointX) then
+	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
 		return
 	end
 	
 	SendCommand()
 	return true
-end
-
-function widget:GameFrame(f)
-	if not buildToGive then
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-		return
-	end
-	
-	buildToGive.waitFrame = buildToGive.waitFrame - 1
-	if buildToGive.waitFrame < 0 then
-		local constructor = buildToGive.constructor
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
-			i = i + 1
-		end
-		buildToGive = false
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-	end
 end
 
 --------------------------------------------------------------------------------
@@ -294,16 +306,34 @@ local function DrawRectangleLine()
 	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
 end
 
+local function DrawRectangleCorners()
+	glVertex(pointX + sizeX, pointY, pointZ + sizeZ)
+	glVertex(pointX + sizeX, corner[1][1], pointZ + sizeZ)
+	
+	glVertex(pointX + sizeX, pointY, pointZ - sizeZ)
+	glVertex(pointX + sizeX, corner[1][-1], pointZ - sizeZ)
+	
+	glVertex(pointX - sizeX, pointY, pointZ - sizeZ)
+	glVertex(pointX - sizeX, corner[-1][-1], pointZ - sizeZ)
+	
+	glVertex(pointX - sizeX, pointY, pointZ + sizeZ)
+	glVertex(pointX - sizeX, corner[-1][1], pointZ + sizeZ)
+end
+
 function widget:DrawWorld()
-	if not (buildingPlacementID and buildingPlacementHeight ~= 0) then
+	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating)) then
 		widgetHandler:RemoveWidgetCallIn("DrawWorld", self)
 		return
 	end
 
 	if pointX then
 		--// draw the lines
-		glLineWidth(3.0)
 		
+		glLineWidth(2.0)
+		glColor(edgeColor)
+		glBeginEnd(GL_LINES, DrawRectangleCorners)
+		
+		glLineWidth(3.0)
 		glColor(lassoColor)
 		glBeginEnd(GL_LINE_STRIP, DrawRectangleLine)
 		

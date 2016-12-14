@@ -19,13 +19,10 @@ unitDef = {
 
   customParams          = {
     canjump        = [[1]],
-    description_es = [[Invasor Caminante Jumpjet]],
     description_fr = [[Marcheur Pilleur r Jetpack]],
-    description_it = [[Invasore Camminatore Jumpjet]],
 	description_de = [[Raider Jumpjet Roboter]],
     fireproof      = [[1]],
     helptext       = [[The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies.]],
-    helptext_es    = [[El Pyro es un invasor caminante barato con un lanzallamas. El lanzallamas hace mucho da?o a unidades grandes, pero poco da?o a las peque?as. Puede da?ar multiples enemigos a la vez. El Pyro explota violentemente cuando es destruido. Sus armas queman a los enemigos. El Pyro viene con jumpjets, que le permiten brincar sobre obstáculos y aterrizar cerca de los enemigos.]],
     helptext_fr    = [[Le Pyro est un marcheur facile r produire et rapide. Son lanceflamme fait des ravage au corps r corps et son jetpack lui permet des attaques par des angles surprenants. Les dommages sont plus ?lev?s sur les cibles de gros calibres comme les b?timents, et il peut tirer sur plusieurs cibles r la fois. Attention cependant r ne pas les grouper, car le Pyro explose fortement et peut entrainer une r?action en chaine.]],
     helptext_it    = [[Il Pyro é un camminatore veloce ed economico con un lanciafiamme. Il lanciafiamme fa un danno incredibile alle unita grandi, ma poco a quelle piccole. Puo colpire molte cose alla stessa volta. Il Pyro esplode violentamente quando é distrutto. Le armi del Pyro bruciano i nemici. Il Pyro viene con jumpjets, che gli permettono di saltare sopra gli ostacoli e atterrare vicino ai nemici.]],
 	helptext_de    = [[Der Pyro ist ein günstiger und schneller Roboter, der mit einem Flammenwerfer ausgestattet ist. Dieser fügt großen Zielen erheblichen Schaden zu und kleineren entsprechend weniger. Außerdem können mehrere Ziele gleichzeitig getroffen werden, welche auch im Feuer aufgehen können. Der Pyro explodiert brutalst, sobald er zerstört wird. Zusätzlich besitzt er noch ein Jetpack, welches ihm zum Beispiel das Springen über Hindernisse ermöglicht.]],
@@ -38,7 +35,6 @@ unitDef = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
-  mass                  = 157,
   maxDamage             = 700,
   maxSlope              = 36,
   maxVelocity           = 3,
@@ -63,10 +59,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[CORE]],
   sightDistance         = 420,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -141,42 +134,19 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Pyro]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 700,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 88,
       object           = [[m-5_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 	
     HEAP  = {
-      description      = [[Debris - Pyro]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 700,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
-      metal            = 44,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

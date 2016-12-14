@@ -82,7 +82,6 @@ local buildoptions = {
 
 	{-- special
 		{ "corrad" },
-		{ "armsonar",  notLand=true},
 		{ "armarad",  tech=2 },
 		{ "corjamt",  tech=2 },-- Aegis
 		{ "armjamt",  tech=2 },-- Sneaky Pete

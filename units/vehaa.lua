@@ -17,16 +17,13 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[18 20 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
     description_de = [[Schnelles Flugabwehr Fahrzeug]],
-    description_pl = [[Szybki pojazd przeciwlotniczy]],
     helptext       = [[The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
     helptext_de    = [[Crasher ist eine schnelle Antwort auf Flugzeuge. Er ist also gut genug gegen Hubschrauber.]],
-    helptext_pl    = [[Crasher to szybka odpowiedz na wrogie lotnictwo; dobrze spisuje sie takze przeciwko statkom powietrznym.]],
 	modelradius    = [[9]],
   },
 
@@ -38,7 +35,6 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   maneuverleashlength    = [[30]],
-  mass                   = 242,
   maxDamage              = 900,
   maxSlope               = 18,
   maxVelocity            = 3.7,
@@ -60,10 +56,7 @@ unitDef = {
     },
 
   },
-  
-  side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 6,
   trackStrength          = 5,
   trackStretch           = 1,
@@ -128,7 +121,6 @@ unitDef = {
       turnRate                = 63000,
       turret                  = true,
       weaponAcceleration      = 250,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 700,
     },
@@ -139,39 +131,22 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Lancer]],
       blocking         = true,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[32 40 52]],
-      collisionVolumeTest    = 1,
       collisionVolumeType    = [[box]],      
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 88,
       object           = [[vehaa_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Lancer]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 44,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

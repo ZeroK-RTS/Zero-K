@@ -130,9 +130,9 @@ for i = 1, #chassisDefs do
 	local name = chassisDefs[i].name
 	local unitDef = UnitDefs[name]
 	
-	for _, wreckDef in pairs(unitDef.featuredefs) do
-		wreckDef.metal = wreckDef.metal*commanderCost/1200
-		wreckDef.reclaimtime = wreckDef.reclaimtime*commanderCost/1200
+	for wreckName, wreckDef in pairs(unitDef.featuredefs) do
+		wreckDef.metal = commanderCost * (wreckName == "heap" and 0.2 or 0.4)
+		wreckDef.reclaimtime = wreckDef.metal
 	end
 	
 	for key, data in pairs(statOverrides) do

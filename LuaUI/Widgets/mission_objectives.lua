@@ -8,7 +8,7 @@ function widget:GetInfo()
     author    = "KingRaptor (L.J. Lim)",
     date      = "Dec 2011",
     license   = "GNU GPL, v2 or later",
-    layer     = 1, 
+    layer     = -1,	-- make sure it draws before point tracker 
     enabled   = true  --  loaded by default?
   }
 end
@@ -30,7 +30,7 @@ local Label
 local Image
 local screen0
 
-local mainWindow
+local mainWindow, buttonWindow
 local expandButton, expandButtonImage
 local minimizeButton, minimizeButtonImage
 local mainPanel
@@ -41,9 +41,9 @@ local colorGrey = {0.4, 0.4, 0.4, 1}
 local colorWhite = {1,1,1,1}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local statusImageWidth = 24
-local panelHeight = 30
-local fontsize = 14
+local statusImageWidth = 30
+local panelHeight = 36
+local fontsize = 16
 
 local statusImages = {
 	complete = "LuaUI/Images/commands/states/fire_atwill.png",
@@ -59,11 +59,15 @@ local statusColors = {
 local objectives = {}	-- [objID] = {panel, label, image, status, unitsOrPositions = {}, uolIndex = 0}
 local unitsWithObjectives = {}
 local unread = false
+local open = false
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local function Expand()
-	mainWindow:AddChild(mainPanel)
-	mainWindow:RemoveChild(expandButton)
+	--mainWindow.x = buttonWindow.x - (mainWindow.width - buttonWindow.width)
+	--mainWindow.y = buttonWindow.y
+	--mainWindow:AddChild(mainPanel)
+	--mainWindow:RemoveChild(expandButton)
+	screen0:AddChild(mainWindow)
 	if unread then
 		expandButton.backgroundColor = colorGrey
 		expandButtonImage.color = colorGrey
@@ -71,11 +75,14 @@ local function Expand()
 		expandButton:Invalidate()
 		unread = false
 	end
+	open = true
 end
 
 local function Minimize()
-	mainWindow:RemoveChild(mainPanel)
-	mainWindow:AddChild(expandButton)
+	--mainWindow:RemoveChild(mainPanel)
+	--mainWindow:AddChild(expandButton)
+	screen0:RemoveChild(mainWindow)
+	open = false
 end
 
 
@@ -317,19 +324,35 @@ function widget:Initialize()
 	Image		= Chili.Image
 	screen0		= Chili.Screen0
 	
-	local vsx, vsy = gl.GetViewSizes()
+	local vsx, vsy = Spring.GetWindowGeometry()
+	local width, height = 480, 240
+	local y = vsy * 0.20 + 50	-- put it under proconsole
 	
-	mainWindow = Window:New{  
+	mainWindow = Window:New{
+		name = "objectivesWindow",
+		dockable = false,
+		x = (vsx - width)/2,
+		y = (vsy - height)/2,
+		width  = width,
+		height = height,
+		padding = {0,0,0,0};
+		draggable = true,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+	}
+	
+	buttonWindow = Window:New{
+		name = "objectivesButtonWindow",
+		parent = screen0,
 		dockable = true,
 		collide = false,
-		name = "objectivesWindow",
 		color = {0,0,0,0},
 		right = 0,  
-		bottom = vsy * 0.7,
-		width  = 350,
-		height = 150,
+		y = y,
+		width  = 64,
+		height = 64,
 		padding = {0,0,0,0};
-		parent = screen0,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -338,14 +361,14 @@ function widget:Initialize()
 	}
 	
 	expandButton = Button:New{
-		parent = mainWindow;
+		parent = buttonWindow;
 		right = 0,
 		y = 0,
 		height = 64,
 		width = 64,
 		caption = '',
 		OnClick = {	function () 
-				Expand()
+				if open then Minimize(); else Expand(); end
 			end},
 		padding = {8,8,8,8},
 		keepAspect = true,
@@ -373,24 +396,24 @@ function widget:Initialize()
 	
 	minimizeButton = Button:New{
 		parent = mainPanel,
-		right = 0,
-		y = 0,
-		height = 24,
-		width = 24,
+		right = 2,
+		y = 2,
+		height = 26,
+		width = 26,
 		caption = '',
 		OnClick = {	function () 
 				Minimize()
 			end},
 		backgroundColor = {1, 1, 1, 0},
-		padding = {4,4,4,4},
+		padding = {2,2,2,2},
 		keepAspect = true,
 		tooltip = "Hide objectives"
 	}
 	
 	minimizeButtonImage = Image:New{
 		parent = minimizeButton,
-		width=16;
-		height=16;
+		width="100%";
+		height="100%";
 		x=0;
 		y=0;
 		file = "LuaUI/Images/closex_16.png",
@@ -401,7 +424,7 @@ function widget:Initialize()
 		parent = mainPanel;
 		x = 2, y = 4,
 		height = mainPanel.height - 12;
-		width =  mainPanel.width - 24;
+		right = 28,
 		horizontalScrollbar = false,
 		verticalSmartScroll = true,
 		backgroundColor = {0, 0, 0, 0},
@@ -421,8 +444,6 @@ function widget:Initialize()
 		padding = {1, 3, 3, 3},
 		itemMargin  = {0, 1, 1, 1},
 	}
-	
-	mainWindow:RemoveChild(mainPanel)
 	
 	WG.AddObjective = AddObjective
 	WG.ModifyObjective = ModifyObjective

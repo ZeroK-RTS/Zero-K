@@ -24,7 +24,6 @@ unitDef = {
   collide                = true,
   collisionVolumeOffsets = [[0 00 0]],
   collisionVolumeScales  = [[40 50 220]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   corpse                 = [[DEAD]],
@@ -32,15 +31,11 @@ unitDef = {
 
   customParams           = {
     cantuseairpads = 1,
-   -- description_bp = [[Fortaleza voadora]],
    -- description_fr = [[Forteresse Volante]],
     description_de = [[Lufttraeger]], -- "aerial carrier"
-    description_pl = [[Statek-matka]],
     helptext       = [[As maneuverable as a brick and only modestly armed itself, the Nebula is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement.]],
-   -- helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
    -- helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
     helptext_de    = [[Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen.]],
-    helptext_pl    = [[Nebula jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony.]],
     modelradius    = [[40]],
   },
 
@@ -52,7 +47,6 @@ unitDef = {
   iconType               = [[nebula]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 886,
   maxDamage              = 11000,
   maxVelocity            = 3.3,
   minCloakDistance       = 150,
@@ -72,8 +66,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 633,
   turnRate               = 100,
   upright                = true,
@@ -187,47 +179,22 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Nebula]],
       blocking         = true,
-      category         = [[corpses]],
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[40 50 220]],
-      collisionVolumeTest    = 1,
       collisionVolumeType    = [[box]],	  
-      damage           = 11000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 2400,
       object           = [[nebula_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 2400,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Nebula]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 11000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 1200,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

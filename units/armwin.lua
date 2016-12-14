@@ -15,18 +15,15 @@ unitDef = {
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[30 60 30]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Produziert Energie (variabel)]],
     description_fr = [[Produit de l'énergie]],
-    description_pl = [[Produkuje Energie]],
     helptext       = [[Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output.]],
     helptext_de    = [[Windräder produzieren eine variable Menge an Energie, je nach Höhenlage und Windgeschwindigkeit. Sie sind extrem verletzlich und explodieren in einer Kettenreaktion, sobald sie zerstört werden. Platziere sie also mit Bedacht.]],
     helptext_fr    = [[Sur terre, l'éolienne produit de l'énergie en quantité variable, selon l'altitude et la vitesse du vent. Elles sont très fragiles et explosent à la chaine quand elles sont trop proches l'une de l'autre. Dans l'eau, la génératrice marémotrice est plus résistante et produit une énérgie constante.]],
-    helptext_pl    = [[Ta elektrownia funkcjonuje roznie zaleznie od lokalizacji. Na ladzie jest elektrownia wiatrowa, ktora produkuje zmienna ilosc energii: wiatraki znajdujace sie wyzej produkuja wiecej. W wodzie staje sie elektrownia plywowa - jest wytrzymalsza i produkuje stala ilosc energii niezalezna od glebokosci.]],
     pylonrange     = 60,
     windgen        = true,
     modelradius    = [[15]],
@@ -59,46 +56,29 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 130,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 14,
       object           = [[arm_wind_generator_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 14,
     },
 
     HEAP  = {
-      description      = [[Debris - Wind/Tidal Generator]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 130,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 7,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 7,
     },
 
     DEADWATER = {
-      description      = [[Wreckage - Wind/Tidal Generator]],
       blocking         = true,
-      damage           = 400,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 14,
       object           = [[arm_wind_generator_dead_water.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 14,    
+	  customparams = {
+		health_override = 400,
+	  },
     }
 
   },

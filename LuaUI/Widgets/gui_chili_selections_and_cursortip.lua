@@ -102,6 +102,7 @@ local old_mx, old_my = -1,-1
 local mx, my = -1,-1
 local showExtendedTip = false
 local changeNow = false
+local forceAnUpdate = true -- Makes widget:Update update things like healthbars.
 
 local window_tooltip2
 local windows = {}
@@ -272,6 +273,7 @@ options_order = {
 	
 	--selected units
 	'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
+	'fancySkinning', 'leftPadding',
 }
 
 local function option_Deselect()
@@ -543,6 +545,46 @@ options = {
 			end
 			widget:SelectionChanged(Spring.GetSelectedUnits())
 		end,
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'radioButton',
+		value = 'panel',
+		path = selPath,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1130', name = 'Bottom Left Flush',},
+			{key = 'panel_0120', name = 'Bot Mid Left Flush',},
+			{key = 'panel_2120', name = 'Bot Mid Both Flush',},
+		},
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local className = self.value
+			local newClass = skin.panel
+			if skin[className] then
+				newClass = skin[className]
+			end
+			
+			window_corner.tiles = newClass.tiles
+			window_corner.TileImageFG = newClass.TileImageFG
+			--window_corner.backgroundColor = newClass.backgroundColor
+			window_corner.TileImageBK = newClass.TileImageBK
+			window_corner:Invalidate()
+		end,
+		advanced = true,
+		noHotkey = true,
+	},
+	leftPadding = {
+		name = "Left Padding",
+		type = "number",
+		value = 0, min = 0, max = 500, step = 1,
+		OnChange = function(self)
+			window_corner.padding[1] = 8 + self.value
+			window_corner:UpdateClientArea()
+		end,
+		path = selPath,
 	},
 }
 
@@ -973,7 +1015,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 						--// deselect a single unit
 						local removed = false
 						if squareData.unitid then
-							for i = 1, numSelectedUnits do
+							for i = numSelectedUnits, 1, -1 do
 								if (selectedUnits[i][1] == squareData.unitid) then
 									table.remove(selectedUnits,i)
 									removed = true
@@ -982,7 +1024,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 							end
 						end
 						if not removed then
-							for i = 1, numSelectedUnits do
+							for i = numSelectedUnits, 1, -1 do
 								if (selectedUnits[i][2] == squareData.defid) then
 									table.remove(selectedUnits,i)
 									break
@@ -1066,6 +1108,7 @@ local function MakeUnitGroupSelectionToolTip()
 			--width   = "100%";
 			right = options.showgroupinfo.value and infoSection_size or 0, --expand to right
 			--columns = 5;
+			padding     = {0,0,0,0},
 			itemPadding = {0,0,0,0};
 			itemMargin  = {0,0,2,2};
 			tooltip = "Left Click: Select unit(s)\nRight Click: Deselect unit(s)\nMid Click: Focus camera to unit";
@@ -1428,6 +1471,7 @@ local function GetResources(tooltip_type, unitID, ud)
 		if unitID then
 			local m, _, e, _, _ = Spring.GetFeatureResources(unitID)
 			metal = m or metal
+			if (metal < 1) then metal = 0 end
 			energy =  e or energy
 		end
 	else --tooltip_type == 'unit' or 'selunit'
@@ -2019,6 +2063,8 @@ local function MakeToolTip_Unit(data)
 	
 	UpdateBuildpic( tt_ud, 'buildpic_unit' )
 	BuildTooltip2('unit2', tt_structure)
+	
+	forceAnUpdate = true -- Update healthbars
 end
 
 
@@ -2062,6 +2108,8 @@ local function MakeToolTip_SelUnit(data)
 			
 		},
 	}
+	
+	forceAnUpdate = true -- Update healthbars
 	
 	UpdateBuildpic( stt_ud, 'buildpic_selunit', stt_unitID )
 	return BuildTooltip2('selunit2', tt_structure, true)
@@ -2498,7 +2546,8 @@ function widget:Update(dt)
 	end
 	
 	timer = timer + dt
-	if timer >= updateFrequency  then
+	if timer >= updateFrequency or forceAnUpdate then
+		forceAnUpdate = false
 		
 		local hotkeys = WG.crude.GetHotkeys("drawinmap")
 		drawHotkeyBytes = {}
@@ -2779,7 +2828,7 @@ function widget:Initialize()
 	-- Set the size for the default settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	local integralWidth = math.max(350, math.min(450, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	local x = integralWidth
 	local height = integralHeight*0.84
 	
@@ -2787,7 +2836,7 @@ function widget:Initialize()
 		name  = 'selections',
 		color = {0, 0, 0, 0},
 		x = x,
-		y = screenHeight-height,
+		y = screenHeight - height,
         width = 450,
 		height = height,
 		dockable = true,
@@ -2795,19 +2844,21 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, 0},
+		padding = {-1, 0, -1, -1},
         minWidth = 450, 
 		minHeight = 120,
 	}
     
 	window_corner = Panel:New{
+		classname = options.fancySkinning.value,
 		parent = real_window_corner,
         name   = 'unitinfo2';
 		x = 0,
 		y = 0,
+		right = 0,
+		bottom = 0,
+		padding = {8 + options.leftPadding.value, 6, 4, 4},
 		backgroundColor = {1, 1, 1, options.selection_opacity.value},
-		width = "100%";
-		height = "100%";
 		dockable = false,
 		resizable   = false;
 		draggable = false,

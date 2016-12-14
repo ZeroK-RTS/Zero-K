@@ -30,7 +30,7 @@ local nukeDefs = {
 
 local interceptorRanges = {
 	[UnitDefNames["armamd"].id] = 2500^2,
-	[UnitDefNames["reef"].id] = 1200^2,
+	--[UnitDefNames["reef"].id] = 1200^2,
 }
 
 --------------------------------------------------------------------------------

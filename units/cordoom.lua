@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt             = true,
   armoredMultiple               = 0.25,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 1600,
   buildCostMetal                = 1600,
   builder                       = false,
@@ -21,18 +20,15 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 100 45]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_fr = [[Forteresse Arm?e]],
 	description_de = [[Verteidigungsfestung mittlerer Reichweite - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.]],
-	description_pl = [[Forteca obronna]],
     helptext       = [[Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so.]],
     helptext_fr    = [[Arm?e d'un canon plasma lourd de moyenne port?e et d'un rayon ? chaleur la Doomday Machine ou DDM comme on la surnomme, est capable de faire face ? tous type de menace. Nu?e, unit?s blind?es voire aerienne si assez proche, tout y passe! Son prix relativement ?lev? en limite cependant l'usage.]],
 	helptext_de    = [[Bewaffnet mit einer schweren Plasmakanone und einem Hitzestrahl nimmt die Doomsday Machine einen zentralen Punkt in der Verteidigung gegen feindliche Angriffsoffensiven ein. Die Maschine kann sich verbarrikadieren, um weitreichenden Artilleriebeschuss oder Luftangriffe zu ?erstehen, dabei kann sie aber nicht weiter feuern.]],
-	helptext_pl    = [[Na uzbrojenie tej wiezy sklada sie promien cieplny, ktory zadaje tym wiecej obrazen, im blizej znajduje sie cel, oraz ciezkie dzialo plazmowe, ktore zadaje wysokie obrazenia na duzym obszarze, ale ktore do strzalu wymaga, aby wieza byla podlaczona do sieci energetycznej o mocy co najmniej 50 energii. W trybie przetrwania glowne dzialo nie strzela, ale obrazenia otrzymywane przez wieze zmniejszaja sie czterokrotnie.]],
     keeptooltip    = [[any string I want]],
     neededlink     = 50,
     pylonrange     = 50,
@@ -51,7 +47,6 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 70,
-  mass                          = 636,
   maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -70,9 +65,7 @@ unitDef = {
       [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
-  },  
-  
-  side                          = [[CORE]],
+  },
   sightDistance                 = 780,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -103,7 +96,6 @@ unitDef = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
       areaOfEffect            = 20,
-      cegTag                  = [[HEATRAY_CEG]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -114,6 +106,8 @@ unitDef = {
 		light_radius = 180,
 		light_fade_time = 35,
 		light_fade_offset = 10,
+		light_beam_mult_frames = 9,
+		light_beam_mult = 8,
 	  },
 
       damage                  = {
@@ -192,39 +186,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Doomsday Machine]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 10000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 640,
       object           = [[ddm_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 640,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
-      description      = [[Debris - Doomsday Machine]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 10000,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 320,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 320,
     },
 
   },

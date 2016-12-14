@@ -24,26 +24,16 @@ unitDef = {
   category               = [[LAND UNARMED]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 30 30]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha e de construçao, Constrói a 7.5 m/s]],
     description_de = [[Konstruktionsspinne, Baut mit 7.5 M/s]],
-    description_es = [[Aranha de construcción, construye a 7.5 m/s]],
-    description_fi = [[Rakentaja/kaikuluotainkiipeilij?, rakentaa 7.5m/s nopeudella]],
     description_fr = [[Araignée de Construction, construit à 7.5 m/s]],
-    description_it = [[Ragno do costruzione, costruisce a 7.5 m/s]],
-    description_pl = [[Pajak konstruktor, moc 7.5 m/s]],
     helptext       = [[The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar.]],
-    helptext_bp    = [[Weaver é o construtor escalador. Pode subir qualquer obstáculo, mas constrói mais devagar que construtores normais.]],
     helptext_de    = [[Der Weaver ist eine bauende Einheit, die Hindernisse überwinden und somit Verteidigungsanlagen auf Erhöhungen bauen kann. Er hat auch ein Radar.]],
-    helptext_es    = [[El Weaver es el constructor que puede treparse sobre qualquier obstáculo y construir defensas en terreno alto]],
-    helptext_fi    = [[Weaver pystyy liikkumaan vaikeakulkuisimmassakin maastossa ja rakentamaan vaivatta my?s useimmille muille rakentajille saavuttamattomiin paikkoihin.]],
     helptext_fr    = [[Le Weaver est un robot de construction arachnide tout terrain pouvant atteindre des zones élevées. Il a un radar.]],
     helptext_it    = [[Il Weaver é un costruttore che puo arrampicarsi su qualunque ostacolo e costruire difese nel terreno alto ed ha un radar.]],
-    helptext_pl    = [[Weaver jest konstruktorem mogacym wspinac sie po kazdej powierzchni. Jest wyposazony w radar krotkiego zasiegu.]],
 	modelradius    = [[15]],
   },
 
@@ -83,28 +73,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Weaver]],
       blocking         = true,
-      damage           = 820,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 80,
       object           = [[weaver_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
     },
 
     HEAP  = {
-      description      = [[Debris - Weaver]],
       blocking         = false,
-      damage           = 820,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 40,
       object           = [[debris3x3b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
   },

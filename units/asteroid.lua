@@ -18,7 +18,6 @@ unitDef = {
   idleTime                      = 1800,
   isFeature                     = true,
   levelGround                   = false,
-  mass                          = 86,
   maxDamage                     = 500,
   maxSlope                      = 255,
   maxVelocity                   = 0,
@@ -34,9 +33,7 @@ unitDef = {
   yardMap                       = [[ff ff]],
 
   customParams        = {
-	description_pl = [[Meteoryt]],
 	helptext       = [[Asteroids can be manipulated to fall onto the planet by the Meteor Controller; they serve primarily as a weapon to crush the units they fall on, but they can also be reclaimed for resources.]],
-	helptext_pl    = [[Asteroidy sciagniete z orbity miazdza jednostki, na ktore spadna; mozna z nich takze odzyskac surowce.]],
   },
 
   featureDefs                   = {
@@ -44,41 +41,17 @@ unitDef = {
     DEAD = {
       description      = [[Asteroid]],
       blocking         = true,
-      category         = [[dragonteeth]],
-      damage           = 500,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 20,
-      hitdensity       = 100,
-      metal            = 10,
-      nodrawundergray  = true,
       object           = [[asteroid.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 10,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[allworld]],
     },
     
     HEAP  = {
-      description      = [[Debris - Asteroid]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 500,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 5,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 5,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
     
 

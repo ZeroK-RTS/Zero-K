@@ -16,14 +16,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô dispersador]],
-    description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
-    description_it = [[Robot da rissa]],
     description_de = [[Riot Roboter]],
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -33,7 +28,6 @@ unitDef = {
   idleAutoHeal           = 30,
   idleTime               = 150,
   leaveTracks            = true,
-  mass                   = 2570,
   maxDamage              = 3000,
   maxSlope               = 36,
   maxVelocity            = 2.1,
@@ -162,7 +156,6 @@ unitDef = {
       turnrate                = 10000,
       turret                  = true,
       weaponAcceleration      = 400,
-      weaponTimer             = 0.0,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },
@@ -216,42 +209,19 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Placeholder2]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 3000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 200,
       object           = [[m-5_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 	
     HEAP  = {
-      description      = [[Debris - Placeholder2]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 3000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
-      metal            = 100,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

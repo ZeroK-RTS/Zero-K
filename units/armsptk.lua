@@ -17,21 +17,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha escaramucadora]],
     description_de = [[Skrimish Spinne (Indirektes Feuer)]],
-    description_es = [[Ara?a escaramuzadora]],
-    description_fi = [[Kahakkakiipeilij?]],
     description_fr = [[Araignée à salve de missiles]],
-    description_it = [[Ragno scaramuzzatore]],
-    description_pl = [[Pajak harcownik]],
     helptext       = [[An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range.]],
-    helptext_bp    = [[Uma unidade escaladora lancadora de mi­sseis. Suba muros com este robo aranha e surpreenda o inimigo.]],
     helptext_de    = [[Eine raketenschiessende Einheit, die jedes Terrain betreten kann. Klettere mit der Spinne an Waeden hoch und ueberrasche deine Gegner mit Angriffen aus unmoeglichen Lagen. Die Raketen ohne Zielfuehrung treffen aber selten schnelle Ziele, trotzdem darf man ihre grosse Reichweite nicht vernachlaessigen.]],
-    helptext_es    = [[Una unidad all-terrain que dispara cohetes. Trepate en los muros y coge al enemigo de sorpresa. Los cohetes no son guiados y no pueden coger a los enemigos que se mueven rapidamente, pero tiene un alcanze bastante grande.]],
-    helptext_fi    = [[T?ll? maastokelpoisella ohjuslavetteja ampuvalla yksik?ll? pystyt l?p?isem??n vaikeimmankin maaston ja yll?tt?m??n vastustajasi.]],
     helptext_fr    = [[Une unité lance-missiles tout-terrain. Grimpe le long des parois et les reliefs impraticables pour surprendre vos ennemis. Les salves de roquettes non-guidées ne peuvent atteindre une cible très mobile que par chance mais elles ont une portée importante. Peut être aisément éliminée si utilisée sans soutien.]],
     helptext_it    = [[Un unita all-terrain lancia-razzi. Arrampicati sui muri con questo camminatore ragno e sorprendi al nemico. I razzi non-guidati no riescono a colpire unita che si muovon rapidamente, pero hanno un raggio piuttosto lungo]],
-    helptext_pl    = [[Terenowa jednostka rakietowa. Jako pajak, moze wspiac sie po dowolnie stromej scianie i wziac przeciwnika z zaskoczenia. Rakiety maja problemy z trafianiem lekkich i szybkich jednostek, jednak maja daleki zasieg.]],
 	midposoffset   = [[0 -5 0]],
   },
 
@@ -124,30 +115,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Recluse]],
       blocking         = true,
-      damage           = 650,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 112,
       object           = [[recluse_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 112,
     },
 
     HEAP  = {
-      description      = [[Debris - Recluse]],
       blocking         = false,
-      damage           = 650,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 56,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
   },

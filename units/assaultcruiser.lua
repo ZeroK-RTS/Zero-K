@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.0768,
   activateWhenBuilt      = true,
   brakeRate              = 0.042,
-  buildAngle             = 16384,
   buildCostEnergy        = 1600,
   buildCostMetal         = 1600,
   builder                = false,
@@ -18,14 +17,11 @@ unitDef = {
   category               = [[SHIP]],
   collisionVolumeOffsets = [[0 4 -2]],
   collisionVolumeScales  = [[72 42 128]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[Box]],
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki krazownik szturmowy]],
     helptext       = [[The Vanquisher cruiser boasts excellent armor and lethal close-in firepower. Its gauss cannons slice through surface targets like butter, while its missiles support it against enemies above and below the water surface. Its short range and lack of anti-air firepower leaves it vulnerable to standoff units and aircraft.]],
-    helptext_pl    = [[Vanquisher to krazownik bojowy z duza sila ognia i wysoka wytrzymaloscia. Jego dziala bez problemu przebijaja sie przez cele na powierzchni, a jego rakiety niszcza cele pod i nad nia. Jego glownym problemem jest niski zasieg; ponadto, rakiety nie radza sobie z jednostkami latajacymi w duzych ilosciach.]],
   },
 
   explodeAs              = [[BIG_UNIT]],
@@ -35,7 +31,6 @@ unitDef = {
   iconType               = [[vanquisher]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 400,
   maxDamage              = 9600,
   maxVelocity            = 2.7,
   minCloakDistance       = 75,
@@ -56,8 +51,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 600,
   sonarDistance			 = 800,
   turninplace            = 0,
@@ -235,7 +228,6 @@ unitDef = {
 	  turret				  = true,	  
 	  waterWeapon			  = true,
       weaponAcceleration      = 300,
-      weaponTimer             = 1,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 600,
     },	
@@ -245,42 +237,19 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Vanquisher]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 9600,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 640,
       object           = [[cremcrus_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 640,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
-      description      = [[Debris - Vanquisher]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 9600,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 320,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 320,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -26,19 +26,15 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetUnitArmored   = Spring.GetUnitArmored
 local spAddUnitDamage    = Spring.AddUnitDamage
 
-local extraNormalDamageList = {}
-local extraNormalDamageFalloffList = {}
-
+local normalDamageMult = {}
 local wantedWeaponList = {}
 
 for wdid = 1, #WeaponDefs do
 	local wd = WeaponDefs[wdid]
 	if wd.paralyzer then
-		if wd.customParams and wd.customParams.extra_damage then 
-			extraNormalDamageList[wdid] = wd.customParams.extra_damage
-			if wd.customParams.extra_damage_falloff_max then
-				extraNormalDamageFalloffList[wdid] = 1/wd.customParams.extra_damage_falloff_max
-			end
+		local rawDamage = tonumber(wd.customParams.raw_damage or 0)
+		if wd.customParams and wd.customParams.extra_damage and rawDamage > 0 then
+			normalDamageMult[wdid] = wd.customParams.extra_damage/rawDamage
 		end
 		wantedWeaponList[#wantedWeaponList + 1] = wdid
 	end
@@ -59,18 +55,18 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer,
 	if paralyzer then -- the weapon deals paralysis damage
 		already_stunned = spGetUnitIsStunned(unitID)
 		local health, maxHealth = spGetUnitHealth(unitID)
-		if extraNormalDamageList[weaponDefID] then
+		if normalDamageMult[weaponDefID] then
 			attackerID = attackerID or -1
-			local extraDamage = extraNormalDamageList[weaponDefID]
-			if extraNormalDamageFalloffList[weaponDefID] then
-				local armored, mult = spGetUnitArmored(unitID)
-				if armored then
-					extraDamage = extraDamage/mult
-				end
-				extraDamage = extraDamage*damage*extraNormalDamageFalloffList[weaponDefID]
+			local damageMult = normalDamageMult[weaponDefID]
+			
+			-- Don't apply armour twice
+			local armored, mult = spGetUnitArmored(unitID)
+			if armored then
+				damageMult = damageMult/mult
 			end
+			
 			-- be careful; this line can cause recursion! don't make it do paralyzer damage
-			spAddUnitDamage(unitID, extraDamage, 0, attackerID, weaponDefID)
+			spAddUnitDamage(unitID, damageMult*damage, 0, attackerID, weaponDefID)
 		end
 		if health and maxHealth and health ~= 0 then -- taking no chances.
 			return damage*maxHealth/health

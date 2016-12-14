@@ -224,6 +224,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 		elseif destroy_type == 'destroy' then	-- kaboom
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
 			EchoUIMessage(name .. " has been destroyed!")
+			local frame = Spring.GetGameFrame() + 50
 			for i=1,#teamList do
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 
@@ -235,7 +236,9 @@ local function DestroyAlliance(allianceID, skipCheck)
 						spTransferUnit(u, gaiaTeamID, true)		-- don't blow up PW buildings
 						GG.allowTransfer = false
 					else
-						toDestroy[u] = true
+						local destroyFrame = frame - math.ceil((math.random()*7)^2)
+						toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
+						toDestroy[destroyFrame][u] = true
 					end
 				end
 				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
@@ -477,7 +480,6 @@ function gadget:UnitDestroyed(u, ud, team)
 		finishedUnits[u] = nil
 		RemoveAllianceUnit(u, ud, team)
 	end
-	toDestroy[u] = nil
 end
 
 -- note: Taken comes before Given
@@ -517,16 +519,18 @@ function gadget:Initialize()
 end
 
 function gadget:GameFrame(n)
-	-- check for last ally:
-	-- end condition: only 1 ally with human players, no AIs in other ones
-	if (n % 45 == 0) then
-		if toDestroy then
-			for u in pairs(toDestroy) do
+	if toDestroy[n] then
+		for u in pairs(toDestroy[n]) do
+			if Spring.ValidUnitID(u) then
 				spDestroyUnit(u, true)
 			end
 		end
-		
-		toDestroy = {}
+		toDestroy[n] = nil
+	end
+	
+	-- check for last ally:
+	-- end condition: only 1 ally with human players, no AIs in other ones
+	if (n % 45 == 0) then
 		if not gameover and not spGetGameRulesParam("loadedGame") then
 			ProcessLastAlly()
 		end

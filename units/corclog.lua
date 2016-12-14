@@ -27,13 +27,9 @@ unitDef = {
     jump_from_midair   = 0,
     jump_spread_exception = 1,
 
-    description_es = [[Caja de tierra]],
     description_fr = [[]],
-    description_it = [[Scatola di terra]],
     description_de = [[Behalter voller Dreck]],
-    description_pl = [[Pudlo z piachem]],
     helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
-    helptext_pl    = [[Dirtbag istnieje po to, by blokowac ruch przeciwnika i sie mu naprzykrzac. Po zniszczeniu wysypuje sie z nich piach, tworzac utrudniajacy poruszanie sie pagorek. Dirtbag moze takze uzywac swojego pudelka, by uderzac przeciwnikow z dynki, sprawdza sie tez jako zwiadowca.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],
@@ -138,38 +134,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Dirtbag]],
       blocking         = false,
-      damage           = 600,
       featureDead      = [[HEAP]],
-      featurereclamate = [[smudge01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 12,
       object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 12,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
-      description      = [[Debris - Dirtbag]],
       blocking         = false,
-      damage           = 600,
-      featurereclamate = [[smudge01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 6,
       object           = [[debris1x1a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 6,
-      seqnamereclamate = [[tree1reclamate]],
-      world            = [[All Worlds]],
     },
 
   },

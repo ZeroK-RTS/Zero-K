@@ -6,7 +6,7 @@ unitDef = {
   brakeRate           = 0.205,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -21,12 +21,9 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND UNARMED]],
-  commander           = true,
 
   customParams        = {
-    description_pl = [[Karny kurczak]],
     helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
-    helptext_pl    = [[Karny kurczak za zle zachowanie. Popraw sie!]],
 	level		   = [[1]],
   },
 
@@ -38,7 +35,6 @@ unitDef = {
   idleAutoHeal        = 0,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 712,
   maxDamage           = 2000,
   maxSlope            = 36,
   maxVelocity         = 1.2,
@@ -67,9 +63,7 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 300,
   trackOffset         = 8,
   trackStrength       = 8,

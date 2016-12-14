@@ -17,16 +17,13 @@ unitDef = {
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 70 32]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Verhüllender Turm / Störsender]],
-    description_pl = [[Wieza zaklocajaco-maskujaca]],
     helptext       = [[Jammers such as this intefere with enemy radar waves, concealing your units' radar returns. Sneaky Pete is also equipped with a cloak shield to hide nearby units from enemy sight.]],
     helptext_de    = [[Störsender wie diese behindern das feindliche Radar, verschleiern, die von deinen Einheiten ausgelösten, Radarechos. Sneaky Pete bietet außerdem noch ein Deckmantel, um Einheiten in der Nähe vor dem Gegner zu verstecken.]],
-    helptext_pl    = [[Wieze zaklocajace sprawiaja, ze radary nie sa w stanie wylapac sygnalu okolicznych jednostek. Ponadto pole maskujace moze zapewnic im maskowanie.]],
 	removewait     = 1,
 
     morphto = [[spherecloaker]],
@@ -67,30 +64,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Sneaky Pete]],
       blocking         = true,
-      damage           = 700,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 168,
       object           = [[radarjammer_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 168,
     },
 
     HEAP  = {
-      description      = [[Debris - Sneaky Pete]],
       blocking         = false,
-      damage           = 700,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 84,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 84,
     },
 
   },

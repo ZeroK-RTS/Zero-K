@@ -33,16 +33,13 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[112 112 112]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Produziert Spezial- und Sprungdüsenroboter, Baut mit 10 M/s]],
-    description_pl = [[Buduje specjalistyczne roboty, moc 10 m/s]],
     helptext       = [[The esoteric Jumpjet/Specialist Plant offers unique tactical options for rapidly closing the distance in a knife fight, or getting over hills and rivers to cut a path through enemy lines. Key units: Pyro, Moderator, Jack, Firewalker, Sumo]],
     helptext_de    = [[Hier werden außergewöhnliche Einheiten erzeugt, die durch spezielle Fähigkeiten Distanzen schnell überbrücken können, um in den Nahkampf zu treten oder auch, um Hindernisse schnell zu überbrücken. Wichtigste Einheiten: Pyro, Moderator, Jack, Firewalker, Sumo]],
-    helptext_pl    = [[W tej fabryce produkowane sa specjalistyczne jednostki, z ktorych wiekszosc posiada mozliwosc skoku, co pozwala im na szybkie zblizenie sie do przeciwnika, ucieczke lub ominiecie trudnego terenu.]],
     canjump  = [[1]],
 	no_jump_handling = [[1]],
     sortName = [[5]],
@@ -57,7 +54,6 @@ unitDef = {
   iconType                      = [[facjumpjet]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 324,
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -70,10 +66,7 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
-  side                          = [[CORE]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
@@ -82,31 +75,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Jump/Specialist Plant]],
       blocking         = true,
-      damage           = 4000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 6,
-      metal            = 240,
       object           = [[factoryjump_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Jump/Specialist Plant]],
       blocking         = false,
-      damage           = 4000,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 120,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
   },

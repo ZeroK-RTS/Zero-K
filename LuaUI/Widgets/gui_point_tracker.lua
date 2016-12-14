@@ -32,6 +32,7 @@ local minimapHighlightSize = 8
 local minimapHighlightLineMin = 6
 local minimapHighlightLineMax = 10
 
+local useFade = true
 ----------------------------------------------------------------
 --speedups
 ----------------------------------------------------------------
@@ -87,6 +88,13 @@ local function StartTime()
 	on = true
 end
 
+local function ClearPoints()
+	mapPoints = {}
+end
+
+local function SetUseFade(bool)
+	useFade = bool
+end
 ----------------------------------------------------------------
 --callins
 ----------------------------------------------------------------
@@ -95,6 +103,15 @@ function widget:Initialize()
 	timeNow = false
 	timePart = false
 	myPlayerID = Spring.GetMyPlayerID()
+	
+	WG.PointTracker = {
+		ClearPoints = ClearPoints,
+		SetUseFade = SetUseFade
+	}
+end
+
+function widget:Shutdown()
+	WG.PointTracker = nil
 end
 
 function widget:DrawScreen()
@@ -222,7 +239,9 @@ function widget:Update(dt)
 	if (not timeNow) then
 		StartTime()
 	else
-		timeNow = timeNow + dt
+		if useFade then
+			timeNow = timeNow + dt
+		end
 		timePart = timePart + dt
 		if (timePart > blinkPeriod and blinkPeriod > 0) then
 			timePart = timePart - blinkPeriod

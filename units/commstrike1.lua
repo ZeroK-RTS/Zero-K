@@ -8,7 +8,7 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostEnergy        = 1200,
   buildCostMetal         = 1200,
-  buildDistance          = 120,
+  buildDistance          = 128,
   builder                = true,
 
   buildoptions           = {
@@ -25,9 +25,7 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
-  commander              = true,
   corpse                 = [[DEAD]],
 
   customParams           = {
@@ -51,7 +49,6 @@ unitDef = {
   idleTime               = 0,
   leaveTracks            = true,
   losEmitHeight          = 40,
-  mass                   = 411,
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 1.35,
@@ -59,7 +56,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  norestrict             = [[1]],
   objectName             = [[strikecom.dae]],
   script                 = [[commstrike.lua]],
   seismicSignature       = 16,
@@ -191,30 +187,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Strike Commander]],
       blocking         = true,
-      damage           = 2500,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 480,
       object           = [[strikecom_dead_1.dae]],
-      reclaimable      = true,
-      reclaimTime      = 480,
     },
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
       blocking         = false,
-      damage           = 2500,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 240,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
 

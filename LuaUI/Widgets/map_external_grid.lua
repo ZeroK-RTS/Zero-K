@@ -334,11 +334,24 @@ function widget:MousePress(x, y, button)
 	end
 end
 
-function widget:Initialize()
+local function Initialize()
 	Spring.SendCommands("luaui disablewidget Map Edge Extension")
 	island = IsIsland()
 	InitGroundHeights()
 	DspLst = glCreateList(DrawTiles)
+	
+	widgetHandler:RemoveCallIn("Update")
+end
+
+function widget:Initialize()
+	if Spring.GetGameRulesParam("waterLevelModifier") then
+		return
+	end
+	Initialize()
+end
+
+function widget:Update()
+	Initialize()
 end
 
 function widget:Shutdown()

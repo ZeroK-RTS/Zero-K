@@ -28,11 +28,6 @@ local intDefs = {
 		oddX = (5 % 2)*8,
 		oddZ = (8 % 2)*8,
 	},
-	[UnitDefNames["reef"].id] ={
-		range = 1200,
-		rangeSq = 1200^2,
-		static = false,
-	},
 }
 
 --------------------------------------------------------------------------------
@@ -331,6 +326,10 @@ local function DrawNukeOnMouse(cmdID)
 	
 	local mx, my = spGetMouseState()
 	local _, mouse = spTraceScreenRay(mx, my, true, true)
+	if not mouse then
+		return false
+	end
+	
 	mouse = {mouse[1], mouse[2], mouse[3]}
 	
 	if not mouse then

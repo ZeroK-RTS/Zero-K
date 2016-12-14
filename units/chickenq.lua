@@ -21,17 +21,14 @@ unitDef = {
   collisionSphereScale   = 1,
   collisionVolumeOffsets = [[0 0 15]],
   collisionVolumeScales  = [[46 110 120]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   customParams           = {
     description_fr = [[Le mal incarn?!]],
 	description_de = [[Lachende Hˆllenbrut!]],
-	description_pl = [[Krolowa Kurnika]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
     helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re attis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seulement les assauts les plus brutaux et coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
 	helptext_de    = [[Zwei Worte: LAUF WEG! Die Chicken Queen ist die Matriarchin der Thunderbirdkolonie und sobald ver‰rgert ist es eigentlich unmˆglich sie noch zu stoppen. Sie kann kraftvolle S‰ure spucken, Landchicken abwerfen und Sporen gegen Lufteinheiten versprÅEen. Nur der entschlossenste und konzentrierteste Angriff kann es ermˆglichen dieses Biest eventuell doch noch zu stoppen.]],
-	helptext_pl    = [[Dwa slowa: W NOGI! Krolowa kolonii kurczakow moze zostac powstrzymana tylko dzieki pelnej determinacji i przy udziale wielkiej sily ognia; pluje kwasem, wystrzeliwuje mase zarodnikow, rozdeptuje mniejsze jednostki i jest w stanie rozszarpac nawet ciezkie roboty szturmowe.]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -41,7 +38,6 @@ unitDef = {
   idleAutoHeal           = 0,
   idleTime               = 300,
   leaveTracks            = true,
-  mass                   = 4251,
   maxDamage              = 200000,
   maxVelocity            = 2.5,
   minCloakDistance       = 75,
@@ -62,10 +58,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[THUNDERBIRDS]],
   sightDistance          = 2048,
-  smoothAnim             = true,
   sonarDistance          = 450,
   trackOffset            = 18,
   trackStrength          = 8,
@@ -153,7 +146,6 @@ unitDef = {
       sprayAngle              = 6100,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },

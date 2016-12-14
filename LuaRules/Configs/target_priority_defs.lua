@@ -64,17 +64,6 @@ for i=1, #UnitDefs do
 	unitHealthRatio[i] = unitHealthRatioOverride[i] or ud.health/ud.buildTime
 end
 
--- Harcode the things which are too fast to hit
-local unitIsTooFastToHit = {
-	[UnitDefNames["armflea"].id] = true,
-	[UnitDefNames["armpw"].id] = true,
-	[UnitDefNames["corfav"].id] = true,
-	[UnitDefNames["corgator"].id] = true,
-	[UnitDefNames["corsh"].id] = true,
-	[UnitDefNames["corak"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
-}
-
 -- Don't shoot at fighters or drones, they are unimportant.
 local unitIsFighterOrDrone = {
 	[UnitDefNames["fighter"].id] = true,
@@ -82,6 +71,11 @@ local unitIsFighterOrDrone = {
 	[UnitDefNames["attackdrone"].id] = true,
 	[UnitDefNames["battledrone"].id] = true,
 	[UnitDefNames["carrydrone"].id] = true,
+}
+
+--Wolverine mines are stupid targets.
+local unitIsClaw = {
+	[UnitDefNames["wolverine_mine"].id] = true,
 }
 
 -- swifts should prefer to target air over ground
@@ -105,11 +99,19 @@ local unitIsHeavyHitter = {
 	[UnitDefNames["shieldarty"].id] = true,
 	[UnitDefNames["nsaclash"].id] = true,
 	[UnitDefNames["armbanth"].id] = true,
+	[UnitDefNames["armcybr"].id] = true,
 }
 
 local unitIsCheap = {
 	[UnitDefNames["corrl"].id] = true,
 	[UnitDefNames["corllt"].id] = true,
+	[UnitDefNames["armflea"].id] = true,
+	[UnitDefNames["armpw"].id] = true,
+	[UnitDefNames["corfav"].id] = true,
+	[UnitDefNames["corgator"].id] = true,
+	[UnitDefNames["corsh"].id] = true,
+	[UnitDefNames["corak"].id] = true,
+	[UnitDefNames["puppy"].id] = true,
 }
 
 local unitIsHeavy = {
@@ -131,25 +133,52 @@ local unitIsHeavy = {
 	[UnitDefNames["armorco"].id] = true,
 }
 
--- Hardcode things which should not fire at things too fast to hit
-local unitIsBadAgainstFastStuff = {
-	[UnitDefNames["correap"].id] = true,
-	[UnitDefNames["corraid"].id] = true,
-	[UnitDefNames["spiderassault"].id] = true,
-	[UnitDefNames["hoverassault"].id] = true,
-	[UnitDefNames["armmanni"].id] = true,
-	[UnitDefNames["armanni"].id] = true,
-	[UnitDefNames["corstorm"].id] = true,
-	[UnitDefNames["armham"].id] = true,
-	[UnitDefNames["armsnipe"].id] = true,
-	[UnitDefNames["armmerl"].id] = true,
-	[UnitDefNames["shieldarty"].id] = true,
-	[UnitDefNames["shiparty"].id] = true,
-	[UnitDefNames["cormart"].id] = true,
-	[UnitDefNames["trem"].id] = true,
-	[UnitDefNames["corshad"].id] = true,
-	[UnitDefNames["armcybr"].id] = true,
-	[UnitDefNames["armbanth"].id] = true,
+-- Hardcode weapons that are bad against fast moving stuff.
+-- [weapondefid] = {Threshold for penalty to apply, base penalty, additional penantly per excess velocity}
+local VEL_DEFAULT_BASE = 1
+local VEL_DEFAULT_SCALE = 8
+
+local velocityPenaltyDefs = {
+	[WeaponDefNames["corthud_thud_weapon"].id]       = {2.5},
+	[WeaponDefNames["corstorm_storm_rocket"].id]     = {2.0},
+	[WeaponDefNames["corcrash_armkbot_missile"].id]  = {16.0},
+	[WeaponDefNames["armrock_bot_rocket"].id]        = {2.5},
+	[WeaponDefNames["armham_hammer_weapon"].id]      = {1.5},
+	[WeaponDefNames["armsnipe_shockrifle"].id]       = {2.5},
+	[WeaponDefNames["cormist_cortruck_missile"].id]  = {11.0},
+	[WeaponDefNames["corraid_plasma"].id]            = {2.5},
+	[WeaponDefNames["armmerl_cortruck_rocket"].id]   = {0.5},
+	[WeaponDefNames["vehaa_missile"].id]             = {14.0},
+	[WeaponDefNames["armbrawl_emg"].id]              = {3.0},
+	[WeaponDefNames["gunshipaa_aa_missile"].id]      = {14.0},
+	[WeaponDefNames["nsaclash_missile"].id]          = {4.5},
+	[WeaponDefNames["hoverassault_dew"].id]          = {2.5},
+	[WeaponDefNames["amphraider3_torpmissile"].id]   = {4.5},
+	[WeaponDefNames["amphfloater_cannon"].id]        = {2.5},
+	[WeaponDefNames["amphaa_missile"].id]            = {14.0},
+	[WeaponDefNames["spiderassault_thud_weapon"].id] = {2.5},
+	[WeaponDefNames["armsptk_adv_rocket"].id]        = {2.5},
+	[WeaponDefNames["armcrabe_arm_crabe_gauss"].id]  = {2.5},
+	[WeaponDefNames["spideraa_aa"].id]               = {11.0},
+	[WeaponDefNames["puppy_missile"].id]             = {8.0},
+	[WeaponDefNames["correap_cor_reap"].id]          = {2.5},
+	[WeaponDefNames["corgol_cor_gol"].id]            = {2.0},
+	[WeaponDefNames["cormart_core_artillery"].id]    = {1.5},
+	[WeaponDefNames["trem_plasma"].id]               = {0.5},
+	[WeaponDefNames["armcomdgun_disintegrator"].id]  = {2.8},
+	[WeaponDefNames["dante_napalm_rockets"].id]      = {2.8},
+	[WeaponDefNames["armraven_rocket"].id]           = {0.5},
+--	[WeaponDefNames["shipcarrier_armmship_rocket"].id]      = {0.5},
+	[WeaponDefNames["shipheavyarty_plasma"].id]      = {2.5},
+	[WeaponDefNames["shipskirm_missile"].id]         = {2.8},
+	[WeaponDefNames["shiparty_plasma"].id]           = {2.0},
+	[WeaponDefNames["corrl_armrl_missile"].id]       = {14.0},
+	[WeaponDefNames["armdeva_armdeva_weapon"].id]    = {5.0},
+	[WeaponDefNames["corrazor_aagun"].id]            = {7.0, 0, 3},
+	[WeaponDefNames["missiletower_missile"].id]      = {16.0},
+	[WeaponDefNames["armcir_missile"].id]            = {14.0},
+	[WeaponDefNames["corbhmth_plasma"].id]           = {2.5},
+	[WeaponDefNames["armbrtha_plasma"].id]           = {2.0},
 }
 
 local captureWeaponDefs = {
@@ -173,25 +202,16 @@ end
 
 local radarWobblePenalty = {
 	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
-	[WeaponDefNames["reef_armmship_rocket"].id] = 5,
+--	[WeaponDefNames["shipcarrier_armmship_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
 	[WeaponDefNames["armanni_ata"].id] = 5,
 	[WeaponDefNames["armmanni_ata"].id] = 5,
 	[WeaponDefNames["armham_hammer_weapon"].id] = 5,
 }
 
-
-
-for i=1, #UnitDefs do
+for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if unitIsBadAgainstFastStuff[i] then
-		local weapons = ud.weapons
-		for j = 1, #weapons do
-			local wd = weapons[j]
-			local realWD = wd.weaponDef
-			weaponBadCats[realWD].fastStuff = true
-		end
-	elseif unitIsBadAgainstGround[i] then
+	if unitIsBadAgainstGround[i] then
 		local weapons = ud.weapons
 		for j = 1, #weapons do
 			local wd = weapons[j]
@@ -244,8 +264,9 @@ for uid = 1, #UnitDefs do
 	for wid = 1, #WeaponDefs do
 		if unitIsUnarmed[uid] then
 			targetTable[uid][wid] = unitHealthRatio[uid] + 35
+		elseif unitIsClaw[uid] then
+			targetTable[uid][wid] = unitHealthRatio[uid] + 1000
 		elseif (unitIsFighterOrDrone[uid])
-			or (weaponBadCats[wid].fastStuff and unitIsTooFastToHit[uid])
 			or (weaponBadCats[wid].fixedwing and unitIsFixedwing[uid])
 			or (weaponBadCats[wid].gunship and unitIsGunship[uid])
 			or (weaponBadCats[wid].ground and unitIsGround[uid])
@@ -269,4 +290,12 @@ for uid = 1, #UnitDefs do
 	end
 end
 
-return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, radarWobblePenalty, transportMult
+-- Modify the velocity penalty defs to implement 'additional penantly per excess velocity'
+for weaponDefID, data in pairs(velocityPenaltyDefs) do
+	data[2] = data[2] or VEL_DEFAULT_BASE
+	data[3] = data[3] or VEL_DEFAULT_SCALE
+	
+	data[2] = data[2] - data[1]*data[3]
+end
+
+return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult

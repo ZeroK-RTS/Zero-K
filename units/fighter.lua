@@ -18,18 +18,15 @@ unitDef = {
   collide                = false,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[25 8 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse                 = [[DEAD]],
   crashDrag              = 0.02,
   cruiseAlt              = 200,
 
   customParams           = {
-    description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
 	description_de = [[Mehrzweck-Tarnkappenjäger]],
     helptext       = [[The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
-    helptext_bp    = [[Este caça pode atacar unidades aéreas e terrestres e protege bem outras unidades contra unidades aéreas, mas é morto rapidamente por fogo anti-aéreo e caças de superioridade aérea. Funciona melhor contra unidades terrestres quando em grandes números.]],
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Swift n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
 	helptext_de    = [[Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 
@@ -45,7 +42,6 @@ unitDef = {
 	refuelturnradius = [[80]],
   },
 
-  defaultmissiontype     = [[VTOL_standby]],
   explodeAs              = [[GUNSHIPEX]],
   fireState              = 2,
   floater                = true,
@@ -56,9 +52,9 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maneuverleashlength    = [[1280]],
-  mass                   = 114,
   maxAcc                 = 0.5,
   maxDamage              = 300,
+  maxRudder              = 0.007,
   maxVelocity            = 13,
   minCloakDistance       = 75,
   mygravity              = 1,
@@ -79,11 +75,9 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 520,
-  smoothAnim             = true,
   speedToFront           = 0,
+  turnRadius             = 150,
   turnRate               = 839,
 
   weapons                = {
@@ -193,7 +187,6 @@ unitDef = {
       tracks                  = true,
       turnRate                = 40000,
       weaponAcceleration      = 550,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },
@@ -204,43 +197,19 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Swift]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 300,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 60,
       object           = [[fighter_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Swift]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 300,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 30,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 30,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

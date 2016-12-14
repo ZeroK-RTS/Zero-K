@@ -12,20 +12,16 @@ unitDef = {
   buildTime           = 330,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[55 55 55]],
-  collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
   corpse              = [[DEAD]],
 
   customParams        = {
     helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
-    description_pl  = [[Poduszkowiec przeciwpodwodny]],
-    helptext_pl     = [[Claymore jest uzbrojony w ciezkie ladunki glebinowe, ktore moze wyrzucac takze na ladzie.]],
     turnatfullspeed = [[1]],
   },
 
@@ -35,7 +31,6 @@ unitDef = {
   iconType            = [[hoverspecial]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 368,
   maxDamage           = 1350,
   maxSlope            = 36,
   maxVelocity         = 3.3,
@@ -56,10 +51,8 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 385,
-  sonarDistance       = 370,
+  sonarDistance       = 385,
   turninplace         = 0,
   turnRate            = 390,
   workerTime          = 0,
@@ -221,42 +214,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Claymore]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 1350,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 132,
       object           = [[hoverdepthcharge_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 132,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Claymore]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 1350,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
-      metal            = 66,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 66,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

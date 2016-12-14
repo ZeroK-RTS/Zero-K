@@ -10,6 +10,7 @@ function widget:GetInfo()
 	}
 end
 include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include("LuaRules/Configs/constants.lua")
 
 --[[
 -- Features:
@@ -48,7 +49,6 @@ local UPDATE_PERIOD = 0.03	-- seconds
 local UPDATE_PERIOD_LONG = 0.5	-- seconds
 local UPDATE_PERIOD_RESOURCES = 90	-- gameframes
 local RESOURCE_WARNING_PERIOD = 900	-- gameframes
-local OD_BUFFER = 10000
 local MAX_EVENTS = 20
 
 local mIncome = 0
@@ -292,13 +292,15 @@ end
 function widget:GameFrame(n)
 	if n%UPDATE_PERIOD_RESOURCES == 0 then
 		local mlevel, mstore,mpull,mincome = spGetTeamRes(myTeam, "metal")
+		mstore = mstore - HIDDEN_STORAGE
 		mIncome = mincome	-- global = our local
-		if mlevel/mstore >= 0.95 and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
+		if mstore > 0 and mlevel/mstore >= 0.95 and lastMExcessEvent + RESOURCE_WARNING_PERIOD < n then
 			AddEvent("Excessing metal", nil, colorYellow, "excessMetal")
 			lastMExcessEvent = n
 		end
 		local elevel,estore,epull,eincome = spGetTeamRes(myTeam, "energy")
-		if elevel/(estore - OD_BUFFER) <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
+		estore = estore - HIDDEN_STORAGE
+		if estore > 0 and  elevel/estore <= 0.2 and lastEStallEvent + RESOURCE_WARNING_PERIOD < n  then
 			AddEvent("Stalling energy", nil, colorOrange, "stallingEnergy")
 			lastEStallEvent = n
 		end

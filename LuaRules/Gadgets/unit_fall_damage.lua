@@ -210,6 +210,16 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- ground collision
 	if weaponDefID == -2 and attackerID == nil and Spring.ValidUnitID(unitID) and UnitDefs[unitDefID] then
 	
+		-- Unit AI and script workarounds.
+		if NeedWaitWait[unitDefID] then
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+		end
+		local env = Spring.UnitScript.GetScriptEnv(unitID)
+		if env and env.script.StartMoving then
+			Spring.UnitScript.CallAsUnit(unitID, env.script.StartMoving)
+		end
+	
 		if unitImmune[unitID] then
 			if unitImmune[unitID] >= gameframe then
 				return 0
@@ -233,12 +243,6 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 		Spring.SetUnitVelocity(unitID,0,0,0)
 		Spring.AddUnitImpulse(unitID,vx,vy,vz) --must do impulse because SetUnitVelocity() is not fully functional in Spring 91 (only work with vertical velocity OR when assigned 0)
 		local damgeSpeed = math.sqrt((nx + tx*TANGENT_DAMAGE)^2 + (ny + ty*TANGENT_DAMAGE)^2 + (nz + tz*TANGENT_DAMAGE)^2)
-	
-		if NeedWaitWait[unitDefID] then
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
-		end
-		
 		return LocalSpeedToDamage(unitID, unitDefID, damgeSpeed) + outsideMapDamage(unitID, unitDefID)
 	end
 	

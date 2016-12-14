@@ -16,17 +16,14 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[26 26 50]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],
   corpse              = [[DEAD]],
 
   customParams        = {
     post_capture_reload = 360,
     description_de = [[Kaperungsfahrzeug]],
-    description_pl = [[Pojazd do przejmowania jednostek]],
     helptext       = [[The Dominatrix captures enemies, turning them against their former allies. Multiple Dominatrix can capture a single target faster, although only one becomes the controller. After taking control of a unit the Dominatrix cannot fire for 12 seconds. If a Dominatrix is destroyed all units it controls are freed.]],
 	helptext_de    = [[Der Dominatrix erobert Einheiten, hetzt sie gegen die ehemaligen Verbündeten auf. Mehrere Dominatrixe können ein Ziel schneller erobern, obwohl nur einer von ihnen der Kontrolleur dieser Einheit wird. Nachdem eine gegnerische Einheit unter Kontrolle gebracht wurde, kann der Dominatrix für fünf Sekunden nicht schießen. Sobald ein Dominatrix zerstört wurde, sind alle Einheiten unter seiner Kontrolle wieder frei.]],
-	helptext_pl    = [[Domiantrix przejmuje jednostki wroga pod swoja kontrole. Wiele Dominatrix moze wspolpracowac przy przejmowaniu danej jednostki, ale tylko jednej z nich zostanie przypisana. Po przejeciu jednostki, Dominatrix nie moze przejmowac przez kolejne 12 sekund. Zniszczenie powoduje zwrot wszystkich przypisanych jednostek do pierwotnego wlasciciela.]],
 	modelradius    = [[13]],
   },
 
@@ -37,7 +34,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 205,
   maxDamage           = 820,
   maxSlope            = 18,
   maxVelocity         = 2.2,
@@ -51,7 +47,6 @@ unitDef = {
   script              = [[capturecar.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
-  side                = [[CORE]],
   sightDistance       = 550,
   trackOffset         = -7,
   trackStrength       = 5,
@@ -133,31 +128,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Dominatrix]],
       blocking         = true,
-      damage           = 820,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 168,
       object           = [[corvrad_big_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 168,
     },
 
 
     HEAP = {
-      description      = [[Debris - Dominatrix]],
       blocking         = false,
-      damage           = 820,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 84,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 84,
     },
 
   },

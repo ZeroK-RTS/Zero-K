@@ -15,18 +15,15 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[90 70 90]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[Box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Erzeugt Energie (100) - RISKANT]],
     description_fr = [[Produit de l'énergie (100) - DANGEREUX]],
-    description_pl = [[Produkuje Energie (100) - NIEBEZPIECZNE]],
     helptext       = [[The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion.]],
     helptext_de    = [[Das Moho Geothermisches Kraftwerk erzeugt eine große Menge an Energie, doch stellt es auch ein lohnendes Angriffsziel dar.]],
     helptext_fr    = [[La centrale géothermique Moho produit une quantité important d'énergie. Son explosion peut être catastrophique selon son emplacement.]],
-    helptext_pl    = [[Elektrownia Moho-geotermiczna wytwarza ogromne ilosci energii, jednak wymaga ochrony, jako ze jej zniszczenie wiaze sie z katastroficznym wybuchem.]],
     pylonrange     = 150,
 	removewait     = 1,
   },
@@ -53,30 +50,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Advanced Geothermal]],
       blocking         = true,
-      damage           = 3250,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 600,
       object           = [[amgeo_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 600,
     },
 
     HEAP  = {
-      description      = [[Debris - Advanced Geothermal]],
       blocking         = false,
-      damage           = 3250,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 300,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 300,
     },
 
   },

@@ -162,6 +162,9 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	'backlogHideNotChat',
+	'backlogShowWithChatEntry',
+	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
 	'toggleBacklog',
@@ -517,7 +520,7 @@ options = {
 		end,
 	},
 	enableSwap = {
-		name = "Backlog Arrow",
+		name = "Show backlog arrow",
 		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
@@ -529,9 +532,9 @@ options = {
 					window_chat:RemoveChild(inputspace)
 				end
 				inputspace = WG.Chili.ScrollPanel:New{
-					x = 0,
+					x = (options.backlogArrowOnRight.value and 0) or inputsize,
+					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
-					right = inputsize,
 					height = inputsize,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
@@ -559,6 +562,45 @@ options = {
 				end
 			end
 			window_chat:Invalidate()
+		end,
+	},
+	backlogHideNotChat = {
+		name = "Hide arrow when not chatting",
+		desc = "Enable to hide the backlog arrow when not entering chat.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			if self.value then
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(WG.enteringText)
+				end
+			else
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(true)
+				end
+			end
+		end
+	},
+	backlogShowWithChatEntry = {
+		name = "Show backlog when echatting",
+		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
+		type = 'bool',
+		value = false,
+	},
+	backlogArrowOnRight = {
+		name = "Backlong Arrow On Right",
+		desc = "Puts the backlong arrow on the right. It appear on the left if disabled..",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function(self)
+			if window_chat and window_chat:GetChildByName("backlogButton") then
+				backlogButton._relativeBounds.left = ((not self.value) and 0) or nil
+				backlogButton._relativeBounds.right = (self.value and 0) or nil
+				backlogButton:UpdateClientArea()
+				
+				window_chat:Invalidate()
+			end
 		end,
 	},
 	changeFont = {
@@ -1077,12 +1119,20 @@ local function ShowInputSpace()
 	inputspace.backgroundColor = {1,1,1,1}
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
+	
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(true)
+	end
 end
 local function HideInputSpace()
 	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
+	
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(false)
+	end
 end
 
 local function MakeMessageStack(margin)
@@ -1118,7 +1168,7 @@ local function MakeMessageWindow(name, enabled)
 		local resourceBarWidth = 430
 		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
 		bottom = nil
-		width  = screenWidth * 0.30
+		width  = 380 - 4	--screenWidth * 0.30	-- 380 is epic menu bar width
 		height = screenHeight * 0.20
 		x = screenWidth - width
 		y = 50
@@ -1176,15 +1226,26 @@ local function SwapBacklog()
 	showingBackchat = not showingBackchat
 end
 
+local function SetBacklogShow(newShow)
+	if newShow == showingBackchat then
+		return
+	end
+	SwapBacklog()
+end
+
 options.toggleBacklog.OnChange = SwapBacklog
 
 -----------------------------------------------------------------------
 -- callins
 -----------------------------------------------------------------------
 
+local keypadEnterPressed = false
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key == KEYSYMS.RETURN) then
+	if key == KEYSYMS.KP_ENTER then
+		keypadEnterPressed = true
+	end
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -1195,12 +1256,31 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(true)
+		end
 		ShowInputSpace()
 	else
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
+		end
 		HideInputSpace()
 	end 
 end
 
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
+		if key == KEYSYMS.KP_ENTER and keypadEnterPressed then
+			keypadEnterPressed = false
+			return
+		end
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
+		end
+		HideInputSpace()
+	end
+	keypadEnterPressed = false
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1235,8 +1315,17 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
-	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
+	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then 
+		return 
+	end
+	
+	if msg.msgtype == 'other' and (msg.argument):find('added point') then 
+		return 
+	end
+	
+	if msg.msgtype == 'other' and (msg.argument):find("LuaMenuServerMessage") then
+		return
+	end
 	
 	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
@@ -1292,12 +1381,6 @@ function widget:AddConsoleMessage(msg)
 	end
 	
 	removeToMaxLines()
-	
-	-- if playername == myName then
-		if WG.enteringText then
-			HideInputSpace()
-		end 		
-	-- end
 end
 
 -----------------------------------------------------------------------
@@ -1313,10 +1396,21 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		local sub = 2 / options.autohide_text_time.value
-		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_chat.x / screen0.width + 0.003, 
-			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
-			window_chat.width / screen0.width)})
+		
+		local inputWidthAdd = 0
+		if not options.backlogArrowOnRight.value then
+			inputWidthAdd = inputsize
+		end
+		
+		Spring.SendCommands(
+			{
+				string.format("inputtextgeo %f %f 0.02 %f", 
+					(window_chat.x + inputWidthAdd)/ screen0.width + 0.003, 
+					1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
+					window_chat.width / screen0.width
+				)
+			}
+		)
 	
 		for k,control in pairs(fadeTracker) do
 			
@@ -1400,9 +1494,9 @@ function widget:Initialize()
 	stack_backchat = MakeMessageStack(1)
 	
 	inputspace = WG.Chili.ScrollPanel:New{
-		x = 0,
+		x = (options.backlogArrowOnRight.value and 0) or inputsize,
+		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
-		right = inputsize,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
@@ -1416,8 +1510,10 @@ function widget:Initialize()
 		file = 'LuaUI/Images/arrowhead.png',
 	}
 	backlogButton = WG.Chili.Button:New{
-		right=0,
-		bottom=1,
+		name = "backlogButton",
+		x = ((not options.backlogArrowOnRight.value) and 0) or nil,
+		right = (options.backlogArrowOnRight.value and 0) or nil,
+		bottom = 4,
 		width = inputsize - 3,
 		height = inputsize - 3,
 		padding = { 1,1,1,1 },

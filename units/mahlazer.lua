@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 32700,
   buildCostEnergy               = 40000,
   buildCostMetal                = 40000,
   builder                       = false,
@@ -19,18 +18,15 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[120 120 120]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_fr = [[Lazer ? Charge ?liptique]],
 	description_de = [[Planetarischer Energiemeißel]],
-	description_pl = [[Laser Orbitalny]],
     helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
     helptext_fr    = [[Le Starlight est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
 	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
-	helptext_pl    = [[Starlight to precyzyjne narzedzie przeznaczone do szybkiego niszczenia celow w dowolnym miejscu na mapie.]],
 	modelradius    = [[60]],
 	select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
   },
@@ -41,7 +37,6 @@ unitDef = {
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 2013,
   maxDamage                     = 10000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -61,8 +56,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[ARM]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -345,43 +338,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Starlight]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 10000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 16000,
       object           = [[starlight_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 16000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Starlight]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 10000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 8000,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 8000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

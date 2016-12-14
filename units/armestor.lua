@@ -15,7 +15,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[48 48 48]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -23,10 +22,8 @@ unitDef = {
     pylonrange = 500,
 
     description_de = [[Erweitert den Bereich des Overdrive-Energienetzes]],
-    description_pl = [[Wezel Energetyczny]],
     helptext       = [[Energy Transmission Pylons help extend energy grids and connect more Extractors or energy sources. This in turn helps Extractors overdrive, producing more metal. Pylons can also provide a fast way to power defenses that rely on the energy grid. Note that over short distances or in low-energy situations using energy producers like solar collectors to connect grids can be a more cost efficient alternative.]],
     helptext_de    = [[Durch das Energy Pylon wird es dir ermöglicht, weitere Energiequellen oder Metallextraktoren an ein bestehendes Overdrive-Energienetz anzuschließen.]],
-    helptext_pl    = [[Ten wezel pozwala tanio rozszerzyc siec energetyczna, aby zapewnic kopalniom dodatkowa moc lub zasilic niektore potezniejsze wieze.]],
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -6 0]],
     modelradius    = [[24]],
@@ -55,30 +52,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Energy Pylon]],
       blocking         = true,
-      damage           = 1000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 80,
       object           = [[ARMESTOR_DEAD.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
     },
 
     HEAP  = {
-      description      = [[Debris - Energy Pylon]],
       blocking         = false,
-      damage           = 1000,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 40,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
   },

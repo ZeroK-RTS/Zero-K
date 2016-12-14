@@ -18,7 +18,6 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 -2]],
   collisionVolumeScales  = [[60 80 60]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
   corpse                 = [[DEAD]],
 
@@ -26,11 +25,9 @@ unitDef = {
     extradrawrange = 465,
     description_fr = [[Mechwarrior d'Assaut Lourd]],
 	description_de = [[Schwerer Kampfstreicher]],
-	description_pl = [[Ciezki robot bojowy]],
 	helptext       = [[The Bantha is an even heavier solution to a particularly uncrackable defense line, with a tachyon projector and EMP missiles for stand-off engagements, lightning hand cannons for general purpose combat, and a good deal of armor. Beware though, for it is defenseless against air and cannot be used effectively on its own.]],
     helptext_de    = [[Der Bantha ist die Lösung für eine besonders schwierig zu knackende Verteidigungslinie. Dazu besitzt er einen Tachyonen Beschleuniger und Marschflugkörper für Pattsituationen, blitzschnelle Handfeuerwaffen für den normalen Kampf und haufenweise Munition. Dennoch gib Acht darauf, dass er gegen Luftangriffe fast schutzlos ist.]],
     helptext_fr    = [[Le Bantha est aussi cher et lent qu'il est inarretable. Il dispose de canons EMP, d'un canon accelerateur tachyon et de missiles. Courez.]],
-	helptext_pl    = [[Bantha to ciezki robot bojowy, ktory jest uzbrojony po zeby i bardzo wytrzymaly. Posiada rakiety EMP dalekiego zasiegu, ciezki laser oraz dzialka EMP. Nie ma jednak zadnej obrony przeciwlotniczej i slabo radzi sobie bez wsparcia mniejszych jednostek.]],
     aimposoffset   = [[0 -8 0]],
 	midposoffset   = [[0 -8 0]],
 	modelradius    = [[17]],
@@ -44,7 +41,6 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight          = 60,
-  mass                   = 1387,
   maxDamage              = 32000,
   maxSlope               = 36,
   maxVelocity            = 1.55,
@@ -67,10 +63,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[ARM]],
   sightDistance          = 720,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.5,
@@ -84,8 +77,8 @@ unitDef = {
 
     {
       def                = [[ATA]],
-      badTargetCategory  = [[GUNSHIP]],
-      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP HOVER]],
+      badTargetCategory  = [[FIXEDWING GUNSHIP]],
+      onlyTargetCategory = [[SWIM LAND SHIP SINK TURRET FLOAT GUNSHIP FIXEDWING HOVER]],
     },
 
 
@@ -130,6 +123,7 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 16.94,
+	  leadLimit               = 18,
       minIntensity            = 1,
       range                   = 950,
       reloadtime              = 10,
@@ -198,7 +192,6 @@ unitDef = {
       turnRate                = 8000,
       turret                  = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 250,
       wobble                  = 18000,
@@ -254,43 +247,19 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Bantha]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 36000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 4200,
       object           = [[bantha_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 4200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Bantha]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 36000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 2100,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 2100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

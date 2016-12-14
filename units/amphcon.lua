@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.25,
   buildCostEnergy     = 180,
   buildCostMetal      = 180,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -25,9 +25,7 @@ unitDef = {
   customParams        = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    description_pl = [[Amfibijny konstruktor, moc 7.5 m/s]],
     helptext       = [[The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
-    helptext_pl    = [[Conch to wytrzymaly konstruktor, ktory moze wykonywac swoje obowiazki zarowno na ladzie, jak i gleboko pod woda.]],
   },
 
   energyMake          = 0.225,
@@ -50,7 +48,7 @@ unitDef = {
   script              = [[amphcon.lua]],
   showNanoSpray       = false,
   sightDistance       = 375,
-  sonarDistance       = 400,
+  sonarDistance       = 375,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -64,30 +62,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Conch]],
       blocking         = true,
-      damage           = 850,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[amphcon_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
     HEAP  = {
-      description      = [[Debris - Conch]],
       blocking         = false,
-      damage           = 850,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

@@ -29,7 +29,6 @@ unitDef = {
   idleAutoHeal          = 5,
   idleTime              = 1800,
   leaveTracks           = true,
-  mass                  = 157,
   maxDamage             = 900,
   maxSlope              = 36,
   maxVelocity           = 2,
@@ -54,10 +53,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[CORE]],
   sightDistance         = 550,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -131,42 +127,19 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Placeholder]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 200,
       object           = [[m-5_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 	
     HEAP  = {
-      description      = [[Debris - Placeholder]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 900,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
-      metal            = 100,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

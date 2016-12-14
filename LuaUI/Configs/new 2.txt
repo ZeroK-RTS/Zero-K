@@ -1,0 +1,11 @@
+shipcon
+shipscout
+shiptorpraider
+shipsubraider
+shipriot
+shipassault
+shipskirm
+shiparty
+shipaa
+shiptransport
+shipheavyarty

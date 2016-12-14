@@ -135,6 +135,7 @@ options_order = {
 	'resourceMainFontSize', 
 	'resourceFontSize',
 	'colourBlind', 
+	'fancySkinning',
 }
  
 options = {
@@ -236,6 +237,37 @@ options = {
 		noHotkey = true,
 		OnChange = option_ColourBlindUpdate, 
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'bool',
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_0001', name = 'Flush',},
+			{key = 'panel_1011', name = 'Not Flush',},
+		},
+		OnChange = function (self)
+			if not (playerWindow and playerWindow.mainPanel) then
+				return
+			end
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local className = self.value
+			local newClass = skin.panel
+			if skin[className] then
+				newClass = skin[className]
+			end
+			
+			playerWindow.mainPanel.tiles = newClass.tiles
+			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
+			--playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
+			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
+			playerWindow.mainPanel:Invalidate()
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 }
 
@@ -409,7 +441,7 @@ local function UpdateResourceWindowPanel(sideID)
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
 		metalIncome = metalIncome + (mInco or 0)
 		metalStorage = metalStorage + (mCurr or 0)
-		metalStorageMax = metalStorageMax + (mStor or 0)
+		metalStorageMax = metalStorageMax + (mStor or 0) - HIDDEN_STORAGE
 		
 		metalSpent = metalSpent + (mExpe or 0)
 		
@@ -705,8 +737,9 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
-		backgroundColor = {1,1,1,options.resourceOpacity.value},
-		color = {1,1,1,options.resourceOpacity.value},
+		classname = options.fancySkinning.value,
+		backgroundColor = {1,1,1,options.playerOpacity.value},
+		color = {1,1,1,options.playerOpacity.value},
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -918,21 +951,26 @@ function option_CheckEnable(self)
 			RemoveEconomyWindows()
 			enabled = false
 		end
-		return
-	end
-	
-	if enabled then
-		return
+		return false
 	end
 	
 	local spectating = select(1, Spring.GetSpectatingState())
 	if not spectating then
-		return
+		if enabled then
+			RemovePlayerWindow()
+			RemoveEconomyWindows()
+			enabled = false
+		end
+		return false
+	end
+	
+	if enabled then
+		return true
 	end
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
-		return
+		return false
 	end
 	
 	if options.enablePlayerPanel.value then
@@ -944,6 +982,7 @@ function option_CheckEnable(self)
 	end
 	
 	enabled = true
+	return true
 end
 
 function option_CheckEnablePlayer(self)
@@ -975,6 +1014,15 @@ end
 
 function widget:Shutdown()
 	--window:Dispose()
+end
+
+function widget:PlayerChanged(pID)
+	if pID == Spring.GetMyPlayerID() then
+		local newEnabled = option_CheckEnable(options.enableSpectator)
+		if WG.EconomyPanel then
+			WG.EconomyPanel.SetVisibility(not newEnabled)
+		end
+	end
 end
 
 function widget:Initialize()

@@ -25,9 +25,7 @@ unitDef = {
     amph_regen = 20,
     amph_submerged_at = 40,
 	sink_on_emp    = 1,
-    description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
-    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowac glowne lotnicze zagrozenie dla amfibii - bombowiec Raven. Dwa Anglery moga wyplynac na powierzchnie i zestrzelic pojedynczego Ravena.]],
     floattoggle = [[1]],
   },
 
@@ -57,7 +55,7 @@ unitDef = {
   },
 
   sightDistance          = 660,
-  sonarDistance          = 250,
+  sonarDistance          = 660,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -131,29 +129,17 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Angler]],
       blocking         = true,
-      damage           = 1100,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[amphaa_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
     HEAP      = {
-      description      = [[Debris - Angler]],
       blocking         = false,
-      damage           = 1100,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

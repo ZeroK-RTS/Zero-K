@@ -18,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Morph en structures poulet]],
 	description_de = [[Verwandelt sich in eine Chickenstruktur]],
-	description_pl = [[Morfuje w budynki kurczakow]],
     helptext       = [[A hapless non-combat organism whose sole purpose in life is to morph into one of the Chicken Hive's structures.]],
     helptext_fr    = [[Un organisme sans d?fenses dont la seule vocation semble ?tre de se transformer en structure poulet.]],
 	helptext_de    = [[Ein unglücklicher Nicht-Angriff Organismus, dessen einziger Zweck es ist, sich in eine Chickenstruktur zu verwandeln.]],
-	helptext_pl    = [[Nieszkodliwy kurczak, ktorego celem zyciowym jest przeobrazic sie w jeden ze statycznych organizmow kurczakow.]],
   },
 
   energyMake          = 0,
@@ -35,7 +33,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 75,
   maxDamage           = 170,
   maxSlope            = 36,
   maxVelocity         = 1.8,
@@ -61,10 +58,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  smoothAnim          = true,
   trackOffset         = 1,
   trackStrength       = 6,
   trackStretch        = 1,

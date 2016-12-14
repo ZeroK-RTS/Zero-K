@@ -1,15 +1,24 @@
 --//=============================================================================
 --// 
 
+local function CheckNoneNil(x, fallback)
+	if (x ~= nil) then
+		return x
+	else
+		return fallback
+	end
+end
+
+
 function BackwardCompa(obj)
 	obj.font = obj.font or {}
-	obj.font.outline = obj.font.outline or obj.fontOutline
-	obj.font.color = obj.font.color or obj.captionColor
-	obj.font.color = obj.font.color or obj.textColor
-	obj.font.size = obj.font.size or obj.fontSize
-	obj.font.size = obj.font.size or obj.fontsize
-	obj.font.shadow = obj.font.shadow or obj.fontShadow
-	obj.bolderColor = obj.borderColor or obj.borderColor1
+	obj.font.outline = CheckNoneNil(obj.font.outline, obj.fontOutline)
+	obj.font.color = CheckNoneNil(obj.font.color, obj.captionColor)
+	obj.font.color = CheckNoneNil(obj.font.color, obj.textColor)
+	obj.font.size = CheckNoneNil(obj.font.size, obj.fontSize)
+	obj.font.size = CheckNoneNil(obj.font.size, obj.fontsize)
+	obj.font.shadow = CheckNoneNil(obj.font.shadow, obj.fontShadow)
+	obj.bolderColor = CheckNoneNil(obj.borderColor, obj.borderColor1)
 	obj.fontOutline = nil
 	obj.textColor = nil
 	obj.captionColor = nil

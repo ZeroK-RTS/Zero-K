@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 200,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,  
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
@@ -19,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Artillerie l?g?re]],
 	description_de = [[Artillerie]],
-	description_pl = [[Artyleria]],
     helptext       = [[A form of organic artillery, the Lobber hurls balls of venom at a high trajectory over long distances. It proves a problem for those who rely excessively on static defenses, but is practically helpless when attacked directly.]],
     helptext_fr    = [[Un genre d'artillerie organique, le Lobber projette des boules envenim?es corrosives selon une trajectoire en cloche sur de longues distances, ce qui pose un probl?me de taille aux ennemis se concentrant sur une d?fense statique. Mais il est sans d?fenses face aux attaques raproch?es.]],
 	helptext_de    = [[Eine Form organischer Artillerie. Der Lobber schleudert Giftbälle in einer hohen Flugkurve über lange Distanzen. Er stellt eine Problem für diejenigen dar, die sich auf stationäre Verteidigungsanlagen verlassen. Relativ hilflos ist er, sobald er direkt angegriffen wird.]],
-	helptext_pl    = [[Lobber wypluwa kwas na duze odleglosci; stwarza problem uzytkownikom wiezyczek, ale jest bezbronny w bezposredniej walce.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -34,7 +31,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 142,
   maxDamage           = 500,
   maxSlope            = 36,
   maxVelocity         = 1.8,
@@ -57,10 +53,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 1000,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 6,
   trackStrength       = 8,
@@ -116,7 +109,6 @@ unitDef = {
       sprayAngle              = 256,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 300,
     },

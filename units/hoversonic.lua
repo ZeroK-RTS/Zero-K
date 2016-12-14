@@ -12,16 +12,13 @@ unitDef = {
   buildTime           = 300,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Poduszkowiec do walki podwodnej]],
     helptext       = [[The Morningstar comes armed with a sonic pulse cannon which completely doesn't care whether target is above or under water.]],
-    helptext_pl    = [[Morningstar jest uzbrojony w dzialo dzwiekowe, ktore moze strzelac w cele zarowno nad, jak i pod woda.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -30,7 +27,6 @@ unitDef = {
   iconType            = [[hoverassault]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 184,
   maxDamage           = 900,
   maxSlope            = 36,
   maxVelocity         = 3,
@@ -51,10 +47,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 385,
-  smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,
@@ -127,62 +120,28 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Punisher]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 1200,
-      energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 96,
       object           = [[hoverassault_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
-      description      = [[Debris - Punisher]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 1200,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
-      metal            = 96,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Punisher]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 1200,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
-      metal            = 48,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 48,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

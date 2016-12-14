@@ -89,7 +89,7 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
 	if (not weapon2) and weapon1 then
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local weaponName = "0_" .. weapon1
@@ -109,9 +109,11 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	
 	rangeMult = rangeMult or 1
 	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
+	damageMult = damageMult or 1
+	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
@@ -153,8 +155,8 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
-	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
-		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+	if data.metalIncome and GG.Overdrive then
+		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
 	
 	if data.healthBonus then
@@ -196,7 +198,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local effectiveMass = (((totalCost/2) + (maxHealth/8))^0.6)*6.5
 	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
 	
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
 	
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)

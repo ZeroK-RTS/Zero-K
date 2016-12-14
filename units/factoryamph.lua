@@ -30,14 +30,11 @@ unitDef = {
   category         = [[UNARMED SINK]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[90 60 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
   corpse           = [[DEAD]],
 
   customParams     = {
-    description_pl = [[Buduje amfibijne boty, moc 10 m/s]],
     helptext       = [[The Amphibious Operations Plant builds the slow but sturdy amphibious bots, providing an alternative approach to land/sea warfare. Units from this factory typically regenerate while submerged.]],
-    helptext_pl    = [[Ta fabryka produkuje amfibijne boty, ktore skutecznie prowadza walke zarowno na ladzie jak i w wodzie. Wiele z tutejszych jednostek regeneruje sie przy zanurzeniu w wodzie.]],
     aimposoffset   = [[0 0 -20]],
     midposoffset   = [[0 0 -20]],
     sortName = [[8]],
@@ -68,30 +65,18 @@ unitDef = {
   featureDefs      = {
 
     DEAD  = {
-      description      = [[Wreckage - Amphibious Bot Plant]],
       blocking         = true,
-      damage           = 4000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 7,
       footprintZ       = 7,
-      metal            = 240,
       object           = [[FACTORY2_DEAD.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
     HEAP  = {
-      description      = [[Debris - Amphibious Bot Plant]],
       blocking         = false,
-      damage           = 4000,
-      energy           = 0,
       footprintX       = 7,
       footprintZ       = 7,
-      metal            = 120,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
   },

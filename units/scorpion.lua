@@ -20,9 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki pajak bojowy]],
     helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
-    helptext_pl    = [[Scorpion to bojowy pajak, ktory paralizuje i szybko niszczy przeciwnikow; jego pancerz jest bardzo wytrzymaly i zapewnia mu maskowanie.]],
     cloakstealth   = [[1]],
   },
 
@@ -34,7 +32,6 @@ unitDef = {
   idleTime               = 1800,
   initCloaked			 = true,
   leaveTracks            = true,
-  mass                   = 700,
   maxDamage              = 12000,
   maxSlope               = 72,
   maxVelocity            = 1.3,
@@ -58,8 +55,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[ARM]],
   sightDistance          = 440,
   trackOffset            = 0,
   trackStrength          = 10,
@@ -284,42 +279,17 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Scorpion]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 12000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 1200,
       object           = [[scorpion_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-	  
     },
     HEAP  = {
-      description      = [[Debris - Scorpion]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 12000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 600,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 600,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

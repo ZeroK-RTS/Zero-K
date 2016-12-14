@@ -13,15 +13,12 @@ unitDef = {
   buildPic                      = [[ARMFUS.png]],
   buildTime                     = 1000,
   category                      = [[SINK UNARMED]],
-  collisionVolumeTest           = 1,
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Produziert Energie (35)]],
-    description_pl = [[Produkuje Energie (35)]],
     helptext       = [[Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units.]],
     helptext_de    = [[Der Fusionsreaktor liefert eine gute Menge an konstanter Energie zu einem fairen Preis. Sie sind aber attraktive Ziele und schlecht gepanzert, also beschütze sie gut. Sobald ein Reaktor zerstört wird, werden Einheiten in der Nähe beschädigt.]],
-    helptext_pl    = [[Reaktory fuzyjne pozwalaja osiagnac wysoka produkcje energii za niewygorowana cene. Sa jednak dobrym celem dla przeciwnikow i nie sa zbyt wytrzymale. Wybuch reaktora zadaje wysokie obrazenia okolicznym jednostkom, totez nie warto stawiac ich jeden obok drugiego.]],
     pylonrange = 150,
 	removewait = 1,
   },
@@ -48,30 +45,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Fusion Reactor]],
       blocking         = true,
-      damage           = 2200,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 400,
       object           = [[arm_fusion_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 400,
     },
 
     HEAP  = {
-      description      = [[Debris - Fusion Reactor]],
       blocking         = false,
-      damage           = 2200,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 200,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 200,
     },
 
   },

@@ -171,6 +171,7 @@ local function CreateModuleSelectionWindow()
 	local minimapHeight = screenWidth/6 + 45
 	
 	local selectionWindowMain = Window:New{
+		name = "ModuleSelectionWindow",
 		fontsize = 20,
 		x = 200,  
 		y = minimapHeight,
@@ -181,6 +182,7 @@ local function CreateModuleSelectionWindow()
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
+		dockable = true,
 		dockableSavePositionOnly = true,
 		dockableNoResize = true,
 		tweakDraggable = true,
@@ -580,7 +582,7 @@ local function CreateMainWindow()
 	local mainHeight = math.min(420, math.max(325, screenHeight - 450))
 	
 	mainWindow = Window:New{
-		name = "ModulesWindow",
+		name = "CommanderUpgradeWindow",
 		fontsize = 20,
 		x = 0,  
 		y = minimapHeight, 
@@ -591,6 +593,7 @@ local function CreateMainWindow()
 		padding = {0, 0, 0, 0},	
 		resizable = false,
 		draggable = false,
+		dockable = true,
 		dockableSavePositionOnly = true,
 		tweakDraggable = true,
 		tweakResizable = true,

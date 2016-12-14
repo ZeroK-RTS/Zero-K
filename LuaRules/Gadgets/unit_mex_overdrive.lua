@@ -1005,7 +1005,7 @@ function gadget:GameFrame(n)
 							local stunned_or_inbuld = spGetUnitIsStunned(unitID)
 							local states = spGetUnitStates(unitID)
 							local currentlyActive = not stunned_or_inbuld
-							metal, energy = 0, 0, 0
+							local metal, energy = 0, 0
 							if currentlyActive then
 								local incomeFactor = spGetUnitRulesParam(unitID,"resourceGenerationFactor") or 1
 								metal  = data.metalIncome*incomeFactor
@@ -1239,13 +1239,13 @@ function gadget:GameFrame(n)
 				-- Payback from energy production
 
 				local summedOverdriveMetalAfterPayback = summedOverdrive
-				local teamPacybackOD = {}
+				local teamPaybackOD = {}
 				if enableEnergyPayback then
 					for i = 1, allyTeamData.teams do
 						local teamID = allyTeamData.team[i]
 						if activeTeams[teamID] then
 							local te = teamEnergy[teamID]
-							teamPacybackOD[teamID] = 0
+							teamPaybackOD[teamID] = 0
 
 							local paybackInfo = teamPayback[teamID]
 							if paybackInfo then
@@ -1265,7 +1265,7 @@ function gadget:GameFrame(n)
 													local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
 													data[j].repaid = data[j].repaid + repayMetal
 													summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
-													teamPacybackOD[teamID] = teamPacybackOD[teamID] + repayMetal
+													teamPaybackOD[teamID] = teamPaybackOD[teamID] + repayMetal
 													paybackInfo.metalDueOD = paybackInfo.metalDueOD - repayMetal
 													--Spring.Echo("Repaid " .. data[j].repaid)
 												else
@@ -1294,9 +1294,14 @@ function gadget:GameFrame(n)
 						end
 					end
 				end
-
-
+				
 				-- Make changes to team resources
+				local shareToSend = {}
+				local metalStorageToSet = {}
+				local totalToShare = 0
+				local freeSpace = {}
+				local totalFreeSpace = 0
+				local totalMetalIncome = {}
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
@@ -1321,14 +1326,29 @@ function gadget:GameFrame(n)
 					local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
 
 					if activeTeams[teamID] or activeCount == 0 then
-						odShare = (summedOverdriveMetalAfterPayback / metalSplit + (teamPacybackOD[teamID] or 0)) or 0
+						odShare = (summedOverdriveMetalAfterPayback / metalSplit + (teamPaybackOD[teamID] or 0)) or 0
 						baseShare = (summedBaseMetalAfterPrivate / metalSplit + (privateBaseMetal[teamID] or 0)) or 0
 						miscShare = allyTeamMiscMetalIncome / metalSplit
 					end
 
 					sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
 
-					spAddTeamResource(teamID, "m", odShare + baseShare + miscShare)
+					local mCurr, mStor = spGetTeamResources(teamID, "metal")
+					mStor = mStor - HIDDEN_STORAGE
+					
+					if mCurr > mStor then
+						shareToSend[i] = mCurr - mStor
+						metalStorageToSet[i] = mStor
+						totalToShare = totalToShare + shareToSend[i]
+					end
+					
+					local metalIncome = odShare + baseShare + miscShare
+					if mCurr + metalIncome < mStor then
+						freeSpace[i] = mStor - (mCurr + metalIncome)
+						totalFreeSpace = totalFreeSpace + freeSpace[i]
+					end
+					
+					totalMetalIncome[i] = metalIncome
 					--Spring.Echo(teamID .. " got odShare " .. odShare)
 					SetTeamEconomyRulesParams(
 						teamID, metalSplit, -- TeamID of the team as well as number of active allies.
@@ -1349,6 +1369,34 @@ function gadget:GameFrame(n)
 						te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
 						te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
 					)
+				end
+				
+				if totalToShare ~= 0 then
+					local excessFactor = 1 - math.min(1, totalFreeSpace/totalToShare)
+					local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
+					for i = 1, allyTeamData.teams do
+						if shareToSend[i] then
+							local sendID = allyTeamData.team[i]
+								
+							for j = 1, allyTeamData.teams do
+								if freeSpace[j] then
+									local recieveID = allyTeamData.team[j]
+									Spring.ShareTeamResource(sendID, recieveID, "metal", shareToSend[i] * freeSpace[j] * shareFactorPerSpace)
+								end
+							end
+							if excessFactor ~= 0 and GG.EndgameGraphs then
+								GG.EndgameGraphs.AddTeamMetalExcess(sendID, shareToSend[i] * excessFactor)
+							end
+						end
+					end
+				end
+				
+				for i = 1, allyTeamData.teams do
+					local teamID = allyTeamData.team[i]
+					if metalStorageToSet[i] then
+						Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
+					end
+					spAddTeamResource(teamID, "m", totalMetalIncome[i])
 				end
 			else
 				Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
@@ -1493,33 +1541,6 @@ local function AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	resourceGenoratingUnit[unitID] = true
 end
 
-local function Overdrive_AddUnitResourceGeneration(unitID, metal, energy)
-	if not unitID then
-		return
-	end
-	local teamID = Spring.GetUnitTeam(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
-
-	if not teamID or not generator[allyTeamID] or not generator[allyTeamID][teamID] then
-		return
-	end
-
-	if not generator[allyTeamID][teamID][unitID] then
-		AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
-	end
-
-	local genData = generator[allyTeamID][teamID][unitID]
-
-	local metalIncome = math.max(0, genData.metalIncome + (metal * (Spring.GetModOptions().metalmult or 1)))
-	local energyIncome = math.max(0, genData.energyIncome + (energy * (Spring.GetModOptions().energymult or 1)))
-
-	genData.metalIncome = metalIncome
-	genData.energyIncome = energyIncome
-
-	spSetUnitRulesParam(unitID, "wanted_metalIncome", metalIncome, inlosTrueTable)
-	spSetUnitRulesParam(unitID, "wanted_energyIncome", energyIncome, inlosTrueTable)
-end
-
 local function RemoveResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
 	allyTeamID = allyTeamID or spGetUnitAllyTeam(unitID)
 	teamID = teamID or spGetUnitTeam(unitID)
@@ -1561,10 +1582,51 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
+-- External functions
+
+local externalFunctions = {}
+
+function externalFunctions.AddUnitResourceGeneration(unitID, metal, energy)
+	if not unitID then
+		return
+	end
+	local teamID = Spring.GetUnitTeam(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+
+	if not teamID or not generator[allyTeamID] or not generator[allyTeamID][teamID] then
+		return
+	end
+
+	if not generator[allyTeamID][teamID][unitID] then
+		AddResourceGenerator(unitID, unitDefID, teamID, allyTeamID)
+	end
+
+	local genData = generator[allyTeamID][teamID][unitID]
+
+	local metalIncome = math.max(0, genData.metalIncome + (metal * (Spring.GetModOptions().metalmult or 1)))
+	local energyIncome = math.max(0, genData.energyIncome + (energy * (Spring.GetModOptions().energymult or 1)))
+
+	genData.metalIncome = metalIncome
+	genData.energyIncome = energyIncome
+
+	spSetUnitRulesParam(unitID, "wanted_metalIncome", metalIncome, inlosTrueTable)
+	spSetUnitRulesParam(unitID, "wanted_energyIncome", energyIncome, inlosTrueTable)
+end
+
+function externalFunctions.RedirectTeamIncome(giveTeamID, recieveTeamID)
+
+end
+
+function externalFunctions.RemoveTeamIncomeRedirect(teamID)
+
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 
 function gadget:Initialize()
 
-	GG.Overdrive_AddUnitResourceGeneration = Overdrive_AddUnitResourceGeneration
+	GG.Overdrive = externalFunctions
 
 	_G.pylon = pylon
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

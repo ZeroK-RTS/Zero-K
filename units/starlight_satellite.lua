@@ -314,30 +314,24 @@ starlight_satellite = {
 
   featureDefs            = {
     DEAD  = {
-      description      = [[Wreckage - Owl]],
       blocking         = true,
-      damage           = 1100,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 120,
       object           = [[satellite_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 120,
+	customParams = {
+		unit = "mahlazer",
+	},
     },
 
     HEAP  = {
-      description      = [[Debris - Owl]],
       blocking         = false,
-      damage           = 1100,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 60,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
+	customParams = {
+		unit = "mahlazer",
+	},
     },
 
   },

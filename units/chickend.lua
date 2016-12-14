@@ -21,14 +21,11 @@ unitDef = {
   customParams                  = {
     description_fr = [[Defense d'antres]],
 	description_de = [[Verteidigung und Energiequelle]],
-	description_pl = [[Wiezyczka i zrodlo energii]],
     helptext       = [[The Tube is the chickens' only defense structure, firing deadly spores at air and ground targets alike.]],
     helptext_fr    = [[La d?fense basique des antres de poulets, employant des spores ? grande dur?e de vie poursuivant l'adversaire avant de le percuter brutalement.]],
 	helptext_de    = [[Tube ist die einzige Verteidigungsanlage der Chicken und verschießt tödliche Sporen gleichermaßen gegen Luft- und Bodenziele.]],
-	helptext_pl    = [[Ta tuba to jedyna obrona kurczakow; ostrzeliwuje zarowno cele ladowe, jak i powietrzne.]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   energyMake                    = 2,
   explodeAs                     = [[NOWEAPON]],
   footprintX                    = 3,
@@ -37,7 +34,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 120,
   maxDamage                     = 500,
   maxSlope                      = 36,
   maxVelocity                   = 0,
@@ -59,11 +55,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 512,
-  smoothAnim                    = true,
-  TEDClass                      = [[METAL]],
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,

@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt             = true,
   autoHeal                      = 5,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 1000,
   buildCostMetal                = 1000,
   builder                       = false,
@@ -15,13 +14,11 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets 		= [[0 0 0]],
   collisionVolumeScales  		= [[120 100 130]],
-  collisionVolumeTest    		= 1,
   collisionVolumeType    		= [[Box]],
   --corpse                        = [[DEAD]],
 
   customParams                  = {
 	helptext       = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
-	helptext_pl    = [[Ten budynek daje korzysci wlascicielom planety, na ktorej sie znajduje.]],
   	dontcount = [[1]],
   },
 
@@ -33,7 +30,6 @@ unitDef = {
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 336,
   maxDamage                     = 5000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -45,7 +41,6 @@ unitDef = {
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown			= 120,
-  side                          = [[ARM]],
   sightDistance                 = 0,
   turnRate                      = 0,
   useBuildingGroundDecal        = false,

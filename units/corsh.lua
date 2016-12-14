@@ -12,24 +12,20 @@ unitDef = {
   buildTime           = 80,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 -2 0]],
   collisionVolumeScales  = [[19 19 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],  
   corpse              = [[DEAD]],
 
   customParams        = {
     description_fr = [[Hovercraft d'Attaque Éclair]],
     description_de = [[Schnellangriff Luftkissenboot]],
-    description_pl = [[Lekki poduszkowiec]],
     helptext       = [[The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light Gauss gun can also hit underwater targets.]],
     helptext_fr    = [[Le Dagger est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance.]],
     helptext_de    = [[Der Dagger ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen. Es kann auch U-Booten schiessen.]],
-    helptext_pl    = [[Dagger to lekki poduszkowiec, ktory nadaje sie zarowno do zwiadu, jak i atakowania przeciwnika. Jest w stanie atakowac rowniez cele podwodne.]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -38,7 +34,6 @@ unitDef = {
   iconType            = [[hoverraider]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 97,
   maxDamage           = 300,
   maxSlope            = 36,
   maxVelocity         = 4.8,
@@ -60,14 +55,12 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 560,
-  sonarDistance       = 350,
-  smoothAnim          = true,
+  sonarDistance       = 560,
   turninplace         = 0,
   turnRate            = 673,
   workerTime          = 0,
-
+  
   weapons             = {
 
     {
@@ -137,30 +130,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Dagger]],
       blocking         = false,
-      damage           = 300,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 32,
       object           = [[corsh_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
     HEAP  = {
-      description      = [[Debris - Dagger]],
       blocking         = false,
-      damage           = 300,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 16,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 16,
     },
 
   },

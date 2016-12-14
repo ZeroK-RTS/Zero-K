@@ -1445,9 +1445,9 @@ function gadgetHandler:UnitIdle(unitID, unitDefID, unitTeam)
 end
 
 
-function gadgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+function gadgetHandler:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
   for _,g in ipairs(self.UnitCmdDoneList) do
-    g:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
+    g:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
   end
   return
 end

@@ -217,23 +217,23 @@ end
 -- Must match dynamic_comm_defs.lua around line 800 (top of the chassis defs)
 --------------------------------------------------------------------------------------
 MakeCommanderChassisClones("dynrecon", 
-	{{1, 0}, {3, 1}, {5, 1}, {8, 1}, {8, 1}}, 
-	{"module_dmg_booster", "module_personal_shield"}
+	{{0}, {1}, {1}, {1}, {1}}, 
+	{"module_personal_shield"}
 )
 
 MakeCommanderChassisClones("dynsupport",
-	{{1, 0, 0, 0}, {3, 1, 0, 1}, {5, 1, 1, 1}, {8, 1, 1, 1}, {8, 1, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield", "module_resurrect"}
+	{{0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+	{"module_personal_shield", "module_areashield", "module_resurrect"}
 )
 
 MakeCommanderChassisClones("dynassault", 
-	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
+	{"module_personal_shield", "module_areashield"}
 )
 
 MakeCommanderChassisClones("dynstrike", 
-	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
+	{"module_personal_shield", "module_areashield"}
 )
 
 --[[

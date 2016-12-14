@@ -36,6 +36,7 @@ local incolor2color
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local showEndgameWindowTimer
 local window_endgame
 local awardPanel
 local awardSubPanel
@@ -304,6 +305,10 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	
 	SetTeamNamesAndColors()
+	
+	if Spring.IsGameOver() then
+		showEndgameWindowTimer = 1
+	end
 end
 
 function widget:GameOver (winners)
@@ -354,7 +359,20 @@ function widget:GameOver (winners)
 	end
 	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
+	showEndgameWindowTimer = 2
+end
+
+function widget:Update(dt)
+	if not showEndgameWindowTimer then
+		return
+	end
+	showEndgameWindowTimer = showEndgameWindowTimer - dt
+	if showEndgameWindowTimer > 0 then
+		return
+	end
+	
 	ShowEndGameWindow()
+	showEndgameWindowTimer = nil
 end
 
 function widget:Shutdown()

@@ -73,8 +73,6 @@ local abs = math.abs
 local modf = math.modf
 local string_format = string.format
 
-local team = Spring.GetMyTeamID()
-
 -- command IDs
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -154,6 +152,14 @@ local drawingRectangle = false
 local drawingRamp = false
 local setHeight = false
 local terraform_type = 0 -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore, 6 = bump
+
+local commandMap = {
+	CMD_LEVEL,
+	CMD_RAISE,
+	CMD_SMOOTH,
+	CMD_RAMP,
+	CMD_RESTORE
+}
 
 local volumeSelection = 0
 
@@ -236,104 +242,125 @@ end
 
 local terraTag=-1
 function WG.Terraform_GetNextTag()
-	terraTag=terraTag + 1
+	terraTag = terraTag + 1
 	return terraTag
 end
 
 local function SendCommand()
 	local constructor = spGetSelectedUnits()
 
-	if terraform_type == 4 then
-		if (#constructor > 0) then 
-			local params = {}
-			params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
-			params[2] = team -- teamID of the team doing the terraform
-			params[3] = loop -- true or false
-			params[4] = terraformHeight -- width of the ramp
-			params[5] = points -- how many points there are in the lasso (2 for ramp)
-			params[6] = #constructor -- how many constructors are working on it
-			params[7] = volumeSelection -- 0 = none, 1 = only raise, 2 = only lower
-			local i = 8
-			for j = 1, points do
-				params[i] = point[j].x
-				params[i + 1] = point[j].y
-				params[i + 2] = point[j].z
-				i = i + 3
-			end
-					
-			for j = 1, #constructor do
-				params[i] = constructor[j]
-				i = i + 1
-			end
-			
-			params[#params + 1] = WG.Terraform_GetNextTag()
+	if (#constructor == 0) or (points == 0) then 
+		return
+	end
+	
+	local commandTag = WG.Terraform_GetNextTag()
+	local pointAveX = 0
+	local pointAveZ = 0
+	
+	local a,c,m,s = spGetModKeyState()
 
-			local a,c,m,s = spGetModKeyState()
-			
-			if s then
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-				originalCommandGiven = true
-			else
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
+	for i = 1, points do
+		pointAveX = pointAveX + point[i].x
+		pointAveZ = pointAveZ + point[i].z
+	end
+	pointAveX = pointAveX/points
+	pointAveZ = pointAveZ/points
+	
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
+	
+	if terraform_type == 4 then
+		local params = {}
+		params[1] = terraform_type -- 1 = level, 2 = raise, 3 = smooth, 4 = ramp, 5 = restore
+		params[2] = team -- teamID of the team doing the terraform
+		params[3] = pointAveX
+		params[4] = pointAveZ
+		params[5] = commandTag
+		params[6] = loop -- true or false
+		params[7] = terraformHeight -- width of the ramp
+		params[8] = points -- how many points there are in the lasso (2 for ramp)
+		params[9] = #constructor -- how many constructors are working on it
+		params[10] = volumeSelection -- 0 = none, 1 = only raise, 2 = only lower
+		local i = 11
+		for j = 1, points do
+			params[i] = point[j].x
+			params[i + 1] = point[j].y
+			params[i + 2] = point[j].z
+			i = i + 3
+		end
+				
+		for j = 1, #constructor do
+			params[i] = constructor[j]
+			i = i + 1
+		end
+		
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if s then
+			originalCommandGiven = true
+		else
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
 	else
-		if (#constructor > 0) then 
-			local params = {}
-			params[1] = terraform_type
-			params[2] = team
-			params[3] = loop
-			params[4] = terraformHeight 
-			params[5] = points
-			params[6] = #constructor
-			params[7] = volumeSelection
-			local i = 8
-			for j = 1, points do
-				params[i] = point[j].x
-				params[i + 1] = point[j].z
-				i = i + 2
-			end
-			
-			for j = 1, #constructor do
-				params[i] = constructor[j]
-				i = i + 1
-			end
-			
-			params[#params + 1] = WG.Terraform_GetNextTag()
-			
-			local a,c,m,s = spGetModKeyState()
-			
-			if s then
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {"shift"})
-				originalCommandGiven = true
-			else
-				Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
-				spSetActiveCommand(-1)
-				originalCommandGiven = false
-			end
+		local params = {}
+		params[1] = terraform_type
+		params[2] = team
+		params[3] = pointAveX
+		params[4] = pointAveZ
+		params[5] = commandTag
+		params[6] = loop
+		params[7] = terraformHeight 
+		params[8] = points
+		params[9] = #constructor
+		params[10] = volumeSelection
+		local i = 11
+		for j = 1, points do
+			params[i] = point[j].x
+			params[i + 1] = point[j].z
+			i = i + 2
+		end
+		
+		for j = 1, #constructor do
+			params[i] = constructor[j]
+			i = i + 1
+		end
+		
+		Spring.GiveOrderToUnit(constructor[1], CMD_TERRAFORM_INTERNAL, params, {})
+		if s then
+			originalCommandGiven = true
+		else
+			spSetActiveCommand(-1)
+			originalCommandGiven = false
 		end
 	end
 	
-	if buildToGive then
-		if currentlyActiveCommand == CMD_LEVEL then
-			if (#constructor > 0) then
-				local myPlayerID = Spring.GetMyPlayerID()
-				buildToGive.needGameFrame = true
-				buildToGive.constructor = constructor
-				if myPlayerID then
-					-- ping is in seconds
-					local myPing = select(6, Spring.GetPlayerInfo(myPlayerID))
-					buildToGive.waitFrame = 30*ceil(myPing) + 5
-				else
-					buildToGive.waitFrame = 30
+	-- check whether global build command wants to handle the commands before giving any orders to units.
+	local handledExternally = false
+	if WG.GlobalBuildCommand and buildToGive then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyRaiseAndBuild(constructor, buildToGive.cmdID, buildToGive.x, terraformHeight, buildToGive.z, buildToGive.facing, s)
+	elseif WG.GlobalBuildCommand then
+		handledExternally = WG.GlobalBuildCommand.CommandNotifyTF(constructor, s)
+	end
+	
+	if not handledExternally then
+		local cmdOpts = {}
+		if s then
+			cmdOpts[#cmdOpts + 1] = "shift"
+		end
+	
+		local height = Spring.GetGroundHeight(pointAveX, pointAveZ)
+		for i = 1, #constructor do
+			spGiveOrderToUnit(constructor[i], commandMap[terraform_type], {pointAveX, height, pointAveZ, commandTag}, cmdOpts)
+		end
+		
+		if buildToGive then
+			if currentlyActiveCommand == CMD_LEVEL then
+				for i = 1, #constructor do
+					spGiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
 				end
 			end
-		else
-			buildToGive = false
 		end
 	end
+	buildToGive = false
 	points = 0		
 end
 
@@ -817,6 +844,9 @@ local function SetFixedRectanglePoints(pos)
 		local z = floor((pos[3] + 8 - placingRectangle.oddZ)/16)*16 + placingRectangle.oddZ
 		
 		point[1].y = spGetGroundHeight(x, z)
+		if placingRectangle.floatOnWater and point[1].y < 2 then
+			point[1].y = 2
+		end
 		point[2].x = x - placingRectangle.halfX
 		point[2].z = z - placingRectangle.halfZ
 		point[3].x = x + placingRectangle.halfX
@@ -913,13 +943,13 @@ function widget:MousePress(mx, my, button)
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
 		
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
 					orHeight = spGetGroundHeight(pos[1],pos[3])
 					
 					local a,c,m,s = spGetModKeyState()
-					local ty, id = spTraceScreenRay(mx, my, false)
+					local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 					if c and ty == "unit" and c then
 						local ud = UnitDefs[spGetUnitDefID(id)]
 						--if (ud.isBuilding == true or ud.maxAcc == 0) then
@@ -971,7 +1001,7 @@ function widget:MousePress(mx, my, button)
 		if button == 1 then
 			if not spIsAboveMiniMap(mx, my) then
 		
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 				
 					widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
@@ -1021,7 +1051,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	if drawingLasso then
 
 		if button == 1 then
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 			local a,c,m,s = spGetModKeyState()
 			if legalPos(pos) and not c then
 				
@@ -1040,7 +1070,7 @@ function widget:MouseMove(mx, my, dx, dy, button)
 	elseif drawingRectangle then
 
 		if button == 1 then
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		
 			if legalPos(pos) then
 			
@@ -1159,7 +1189,7 @@ function widget:Update(dt)
 		if terraform_type == 1 then
 			local a,c,m,s = spGetModKeyState()
 			if c then
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then	
 					terraformHeight = spGetGroundHeight(pos[1],pos[3])
 					storedHeight = terraformHeight
@@ -1218,7 +1248,7 @@ function widget:Update(dt)
 	
 	elseif drawingRamp == 2 then
 		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		if legalPos(pos) then
 			local dis = sqrt((point[1].x-pos[1])^2 + (point[1].z-pos[3])^2)
 			if dis ~= 0 then
@@ -1249,7 +1279,7 @@ function widget:Update(dt)
 			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 		else
 			local mx,my = spGetMouseState()
-			pos = select(2, spTraceScreenRay(mx, my, true))
+			pos = select(2, spTraceScreenRay(mx, my, true, false, false, not placingRectangle.floatOnWater))
 		end
 		
 		local facing = Spring.GetBuildFacing()
@@ -1272,7 +1302,7 @@ function widget:Update(dt)
 		if (activeid == -mexDefID) and WG.mouseoverMex then
 			pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 		else
-			pos = select(2, spTraceScreenRay(mx, my, true))
+			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
 		if pos and legalPos(pos) then
 			if buildingPress then
@@ -1309,7 +1339,7 @@ function widget:MouseRelease(mx, my, button)
 	if drawingLasso then
 		if button == 1 then
 			
-			local _, pos = spTraceScreenRay(mx, my, true)
+			local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 			if legalPos(pos) then
 				local diffX = abs(point[points].x - pos[1])
 				local diffZ = abs(point[points].z - pos[3])
@@ -1394,11 +1424,11 @@ function widget:MouseRelease(mx, my, button)
 				
 				local x,z
 				
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				if legalPos(pos) then
 					
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
-						local ty, id = spTraceScreenRay(mx, my, false)
+						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
 							local x,_,z = spGetUnitPosition(mouseUnit.id)
@@ -1511,12 +1541,12 @@ function widget:MouseRelease(mx, my, button)
 				
 			elseif terraform_type == 3 or terraform_type == 5 or terraform_type == 6 then
 			
-				local _, pos = spTraceScreenRay(mx, my, true)
+				local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 				local x,z
 				if legalPos(pos) then
 				
 					if mouseUnit.id and point[1].x == point[2].x and point[1].z == point[2].z then
-						local ty, id = spTraceScreenRay(mx, my, false)
+						local ty, id = spTraceScreenRay(mx, my, false, false, false, true)
 						if ty == "unit" and id == mouseUnit.id then
 							
 							local x,_,z = spGetUnitPosition(mouseUnit.id)
@@ -1640,7 +1670,7 @@ function widget:KeyRelease(key)
 	
 	if ((key == KEYSYMS.LCTRL) or (key == KEYSYMS.RCTRL)) and drawingLasso then
 		local mx,my = spGetMouseState()
-		local _, pos = spTraceScreenRay(mx, my, true)
+		local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 		if legalPos(pos) then
 				
 			local diffX = abs(point[points].x - pos[1])
@@ -1690,26 +1720,6 @@ end
 -- Rectangle placement interaction
 --------------------------------------------------------------------------------
 
-function widget:GameFrame(f)
-	if not (buildToGive and buildToGive.waitFrame) then
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-		return
-	end
-	
-	buildToGive.waitFrame = buildToGive.waitFrame - 1
-	if buildToGive.waitFrame < 0 then
-		local constructor = buildToGive.constructor
-		
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], buildToGive.cmdID, {buildToGive.x, 0, buildToGive.z, buildToGive.facing}, {"shift"})
-			i = i + 1
-		end
-		buildToGive = false
-		widgetHandler:RemoveWidgetCallIn("GameFrame", self)
-	end
-	
-end
-
 function Terraform_SetPlacingRectangle(unitDefID)
 	
 	-- Do no terraform with pregame placement.
@@ -1734,6 +1744,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 	end
 	
 	placingRectangle = {
+		floatOnWater = Spring.Utilities.BlueprintFloat(ud),
 		oddX = (footX%2)*8,
 		oddZ = (footZ%2)*8,
 		halfX = footX/2*16,
@@ -1752,7 +1763,7 @@ function Terraform_SetPlacingRectangle(unitDefID)
 		pos = {WG.mouseoverMex.x, WG.mouseoverMex.y, WG.mouseoverMex.z}
 	else
 		local mx,my = spGetMouseState()
-		pos = select(2, spTraceScreenRay(mx, my, true))
+		pos = select(2, spTraceScreenRay(mx, my, true, false, false, not placingRectangle.floatOnWater))
 	end
 	
 	SetFixedRectanglePoints(pos)
@@ -1774,7 +1785,7 @@ local function DrawLine()
 	end
 	
 	local mx,my = spGetMouseState()
-	local _, pos = spTraceScreenRay(mx, my, true)
+	local _, pos = spTraceScreenRay(mx, my, true, false, false, true)
 	if legalPos(pos) then
 		glVertex(pos[1],pos[2],pos[3])
 	end

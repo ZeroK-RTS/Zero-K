@@ -23,15 +23,11 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 1,
 
-    description_bp = [[Robô de assaulto]],
     description_fr = [[Robot d'Assaut]],
 	description_de = [[Melee Sturmangriff Springer]],
-	description_pl = [[Skaczacy robot szturmowy]],
     helptext       = [[The Jack is a melee assault walker with jumpjets. A few Jacks can easily level most fortification lines. Its small range and very low speed make it very vulnerable to skirmishers.]],
-    helptext_bp    = [[Jack é o principal robô de assaulto. Alguns podem facilmente destruir a maioria das linhas de defesa, e n?o podem ser "sufocados" por agressores devido a sua rápida velocidade de disparo. Sua velocidade e principalmente alcançe s?o muito baixos, tornando-o um alvo fácil, embora resistente, a escaramuçadores.]],
     helptext_fr    = [[Le Jack est un robot extr?mement bien blind? ?quip? d'un jetpack et d'un lance a syst?me hydrolique. Il ne frappe qu'au corps ? corps, mais il frappe fort. ]],
 	helptext_de    = [[Der Jack ist ein Melee Sturmangriff Roboter mit Sprungdüsen. Ein paar Jacks können schnell die meisten Verteidigungslinien egalisieren. Seine kleine Reichweite und die Langsamkeit machen ihn aber sehr verwundbar gegen Skirmisher.]],
-	helptext_pl    = [[Jacek to robot szturmowy walczacy w zwarciu; posiada takze mozliwosc skoku. Kilka Jackow jest w stanie zrownac z ziemia wiekszosc fortyfikacji. Jest jednak wolny i nie moze atakowac na odleglosc, co czyni go latwym celem dla szybszych jednostek.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -41,7 +37,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 362,
   maxDamage           = 5000,
   maxSlope            = 36,
   maxVelocity         = 1.81,
@@ -63,10 +58,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 350,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -139,43 +131,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Jack]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 5000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 240,
       object           = [[corcan_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Jack]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 5000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 120,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

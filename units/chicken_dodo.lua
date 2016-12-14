@@ -11,7 +11,6 @@ unitDef = {
   buildPic              = [[chicken_dodo.png]],
   buildTime             = 170,
   canGuard              = true,
-  canHover              = false,
   canMove               = true,
   canPatrol             = true,
   canstop               = [[1]],
@@ -20,11 +19,9 @@ unitDef = {
   customParams          = {
     description_fr = [[Chicken kamikaze]],
 	description_de = [[Chicken Bombe]],
-	description_pl = [[Bomba]],
     helptext       = [[The Dodo's body contains a volatile mixture of organic explosives. At the slightest provocation, it explodes spectacularly, with the resulting shockwave throwing nearby units into the air. Beware as its flying limbs and spikes will do residual damage.]],
     helptext_fr    = [[Le corps du Dodo renferme un m?lange hautement volatile d'explosifs organiques. Au moindre choc il explose spectaculairement en produisant une onde de choc repoussant avec force les unit?s ? proximit?. Attention en explosant il ?parpille divers restes solides provoquant des dommages supl?mentaires.]],
 	helptext_de    = [[Dodos Körper besteht aus einer impulsiven Mixtur von organichen Sprengstoffen. Die kleinste Penetration und Dodo explodiert spektakulär mit einer Schockwelle, die nahegelegene Einheiten zurück schleudert. Hüte dich vor den fliegenden Gliedmaßen, die bleibende Schäden hinterlassen können.]],
-	helptext_pl    = [[Dodo zawiera w sobie niestabilna mieszanke i jest w stanie wybuchnac; rozrzucone wokolo kolce z jego skorupy takze zadaja obrazenia.]],
   },
 
   explodeAs             = [[DODO_DEATH]],
@@ -36,7 +33,6 @@ unitDef = {
   kamikaze              = true,
   kamikazeDistance      = 80,
   leaveTracks           = true,
-  mass                  = 117,
   maxDamage             = 200,
   maxSlope              = 36,
   maxVelocity           = 7,
@@ -61,10 +57,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[THUNDERBIRDS]],
   sightDistance         = 256,
-  smoothAnim            = true,
   trackOffset           = 1,
   trackStrength         = 6,
   trackStretch          = 1,

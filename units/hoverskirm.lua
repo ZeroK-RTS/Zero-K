@@ -11,20 +11,16 @@ unitDef = {
   buildTime           = 180,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[50 25 50]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Poduszkowiec bojowy]],
     helptext       = [[The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one.]],
-    helptext_pl    = [[Trisula to w miare szybki, wytrzymaly poduszkowiec uzbrojony w rozszczepiany promien, ktory moze zniszczyc kilka mniejszych jednostek lub mocno uszkodzic jedna wieksza.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -110,31 +106,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Trisula]],
       blocking         = false,
-      damage           = 1300,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[hoverskirm_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Trisula]],
       blocking         = false,
-      damage           = 1300,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

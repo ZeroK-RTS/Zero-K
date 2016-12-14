@@ -47,7 +47,6 @@ function MonitorHost()
 				Spring.SetUnitNeutral(unitID,false);
 				Spring.SetUnitRulesParam(unitID,'untargetable',nil);
 				Spring.SetUnitCollisionVolumeData(unitID, 30,30,30, 10,0,0, 0,0,0);
-				Dock()
 				return;
 			end
 		else

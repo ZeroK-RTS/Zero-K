@@ -8,6 +8,14 @@
 -- zeusgroundflash
 -- lightningplosion_smallbolts
 
+local circleString = "r%.5f y10 -1 x10x10 y10 %d a10 y10      r6.283 y11 -3.1415 a11 y11 -0.5x11x11         y0 0.0417x11x11x11x11 y1 -0.00139x11x11x11x11x11x11 y2 0.0000248015x11x11x11x11x11x11x11x11 y3 -0.000000275573x11x11x11x11x11x11x11x11x11x11 y4 0.00000000208768x11x11x11x11x11x11x11x11x11x11x11x11 y5 1 a0 a1 a2 a3 a4 a5 x10, %d, -0.1667x11x11x11 y0 0.00833x11x11x11x11x11 y1 -0.000198412x11x11x11x11x11x11x11 y2 0.00000275573192x11x11x11x11x11x11x11x11x11 y3 -0.00000002505210838x11x11x11x11x11x11x11x11x11x11x11 y4 0 a11 a0 a1 a2 a3 a4 x10"
+
+local function GetCircle(radius, yPos)
+	radius = radius
+	local weightedRadius = radius^(1/2)
+	return circleString:format(weightedRadius, radius, yPos)
+end
+
 return {
 
   ["lightningplosion"] = {
@@ -32,7 +40,7 @@ return {
       properties = {
         delay              = [[10 r200]],
         explosiongenerator = [[custom:LIGHTNINGPLOSION_STORMBOLT]],
-        pos                = [[-100 r200, 1, -100 r200]],
+        pos                = GetCircle(100, 1),
       },
     },
     groundflash = {
@@ -99,7 +107,7 @@ return {
       properties = {
         delay              = [[1 r20]],
         explosiongenerator = [[custom:YELLOW_LIGHTNING_STORMBOLT]],
-        pos                = [[-100 r200, 1, -100 r200]],
+        pos                = GetCircle(100, 1),
       },
     },
     electricstorm = {
@@ -111,7 +119,7 @@ return {
       properties = {
         delay              = [[10 r200]],
         explosiongenerator = [[custom:LIGHTNINGPLOSION_STORMBOLT]],
-        pos                = [[-100 r200, 1, -100 r200]],
+        pos                = GetCircle(100, 1),
       },
     },
     groundflash = {
@@ -354,7 +362,7 @@ return {
       properties = {
         delay              = [[10 r200]],
         explosiongenerator = [[custom:LIGHTNINGPLOSION_STORMBOLT]],
-        pos                = [[-100 r200, 1, -100 r200]],
+        pos                = GetCircle(100, 1),
       },
     },
     groundflash = {

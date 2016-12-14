@@ -19,22 +19,18 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_pl = [[Wiezyczka przeciwpancerna]],
     helptext       = [[The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks.]],
-    helptext_pl    = [[Sunlance posiada ciezki promien spowalniajacy, ktory spacyfikuje i zniszczy nawet najciezsze jednostki szturmowe, ale ktory do strzalu wymaga, by wiezyczka byla podlaczona do sieci energetycznej o mocy co najmniej 25 energii. ]],
     keeptooltip    = [[any string I want]],
     neededlink     = 25,
     pylonrange     = 50,	
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[defenseheavy]],
   levelGround                   = false,
-  mass                          = 333,
   maxDamage                     = 5600,
   maxSlope                      = 18,
   minCloakDistance              = 150,
@@ -51,9 +47,7 @@ unitDef = {
       [[custom:none]],
     },
 
-  },  
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -124,35 +118,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Sunlance]],
       blocking         = true,
-      category         = [[arm_corpses]],
-      damage           = 5600,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 100,
-      hitdensity       = 100,
-      metal            = 280,
       object           = [[heavyturret_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 280,
     },
 
 
     HEAP = {
-      description      = [[Debris - Sunlance]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 5600,
       footprintX       = 3,
       footprintZ       = 3,
-      height           = 4,
-      hitdensity       = 100,
-      metal            = 140,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 140,
     },
 
   },

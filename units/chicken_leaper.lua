@@ -17,11 +17,9 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Sauteur de combat]],
-    description_pl = [[Lekki skoczek]],
     helptext       = [[The Leaper is the chickens' fast attack unit, running down enemies and leaping over obstacles.]],
     helptext_fr    = [[Le Leaper est l'unit? d'attaque rapide des poulets, plongeant sur l'enemi et sautant les obstacles sur sa route.]],
 	helptext_de    = [[Der Leaper ist die am schnellsten angreifende Chickeneinheit. Er überrennt die Gegner und kann Hindernisse überspringen.]],
-	helptext_pl    = [[Leaper to lekki i szybki kurczak, ktory skacze nad przeszkodami i kopie przeciwnikow.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = false,
-  mass                = 115,
   maxDamage           = 720,
   maxSlope            = 36,
   maxVelocity         = 4,
@@ -54,10 +51,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  smoothAnim          = true,
   turnRate            = 1600,
   upright             = true,
   workerTime          = 0,
@@ -112,7 +106,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
-      weaponTimer             = 0.1,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2200,
     },

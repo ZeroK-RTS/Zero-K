@@ -434,10 +434,11 @@ function widget:GameFrame(frame)
 						local cmd = Spring.GetCommandQueue(unitID, 1)
 						if #cmd == 0 or cmd[1].id ~= CMD.LOAD_UNITS then
 							local choice = math.floor(math.random(1,unitsToTransport.count))
-							local ud = UnitDefs[Spring.GetUnitDefID(unitsToTransport.unit[choice])]
+							local choiceUnitID = unitsToTransport.unit[choice]
+							local ud = UnitDefs[Spring.GetUnitDefID(choiceUnitID)]
 							if ud.xsize <= trans.maxSize and ud.zsize <= trans.maxSize and ud.mass <= trans.maxMass then
-								Spring.GiveOrderToUnit(unitID, CMD.LOAD_UNITS, {unitsToTransport.unit[choice]}, {} )
-								route.unitsQueuedToBeTransported[unitsToTransport.unit[choice]] = frame
+								Spring.GiveOrderToUnit(unitID, CMD.LOAD_UNITS, {choiceUnitID}, {} )
+								route.unitsQueuedToBeTransported[choiceUnitID] = frame
 								
 								unitsToTransport.unit[choice] = unitsToTransport.unit[unitsToTransport.count]
 								unitsToTransport.unit[unitsToTransport.count] = nil

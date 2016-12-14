@@ -19,10 +19,8 @@ unitDef = {
 
   customParams        = {
     description_de = [[Kurzstrahl Roboter]],
-    description_pl = [[Robot spowalniajacy]],
     helptext       = [[The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50% in addition to dealing damage, making it effective against almost all targets.]],
     helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%, deshalb sind sie effektiv gegen fast alle Ziele.]],
-    helptext_pl    = [[Promien spowalniajacy Moderatora oprocz zadawania obrazen zmniejsza predkosc ruchu i ataku trafionych jednostek maksymalnie dwukrotnie, dzieki czemu jest pomocny w walce z kazdym przeciwnikiem.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 164,
   maxDamage           = 450,
   maxSlope            = 36,
   maxVelocity         = 1.9,
@@ -56,7 +53,6 @@ unitDef = {
   },
 
   sightDistance       = 660,
-  smoothAnim          = true,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 0.8,
@@ -218,41 +214,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Moderator]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 450,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 96,
       object           = [[CORMORT_DEAD.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description = [[Debris - Moderator]],
       blocking    = false,
-      category    = [[heaps]],
-      damage      = 450,
-      energy      = 0,
       footprintX  = 2,
       footprintZ  = 2,
-      height      = [[4]],
-      hitdensity  = [[100]],
-      metal       = 48,
       object      = [[debris2x2a.s3o]],
-      reclaimable = true,
-      reclaimTime = 48,
-      world       = [[All Worlds]],
     },
 
   },

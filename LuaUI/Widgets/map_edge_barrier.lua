@@ -197,13 +197,25 @@ local function DrawMapWall()
 	----
 end
 
+local function Initialize()
+	island = IsIsland()
+	dListWall = gl.CreateList(DrawMapWall)
+	widgetHandler:RemoveCallIn("Update")
+end
+
 function widget:Initialize()
-        island = IsIsland()
-        dListWall = gl.CreateList(DrawMapWall)
+	if Spring.GetGameRulesParam("waterLevelModifier") then
+		return
+	end
+	Initialize()
+end
+
+function widget:Update()
+	Initialize()
 end
 
 function widget:Shutdown()
-        gl.DeleteList(dListWall)
+	gl.DeleteList(dListWall)
 end
 
 local function DrawWorldFunc()

@@ -18,15 +18,12 @@ unitDef = {
   collide             = false,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[80 10 30]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse              = [[DEAD]],
   cruiseAlt           = 160,
 
   customParams        = {
-    description_pl = [[Bombowiec taktyczny]],
     helptext       = [[The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets.]],
-    helptext_pl    = [[Kestrel wystrzeliwuje rakiety krotkiego zasiegu, ktore moga trafic cele naziemne, nawodne lub podwodne. Sposrod bombowcow najlepiej nadaje sie do niszczenia pojedynczych jednostek.]],
     --modelradius    = [[10]],
   },
 
@@ -37,7 +34,6 @@ unitDef = {
   iconType            = [[bomber]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 234,
   maxAcc              = 0.5,
   maxDamage           = 900,
   maxElevator         = 0.02,
@@ -53,8 +49,6 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {},
-
-  side                = [[CORE]],
   sightDistance       = 660,
   turnRadius          = 80,
   workerTime          = 0,
@@ -107,7 +101,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 90,
-      weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },
@@ -118,42 +111,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Kestrel]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 160,
       object           = [[bomberstrike_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 160,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
-      description      = [[Debris - Kestrel]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 900,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 80,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

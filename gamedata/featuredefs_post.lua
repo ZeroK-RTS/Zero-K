@@ -123,7 +123,13 @@ local function ProcessUnitDef(udName, ud)
       FeatureDefs[fullName] = fd
 	  fd.customparams = fd.customparams or {}
 	  fd.customparams.fromunit = "1"
+	  fd.damage = fd.customparams.health_override or ud.maxdamage
+	  fd.energy = 0
+	  fd.reclaimable = true
+	  fd.metal = ud.buildcostmetal * (fdName == "heap" and 0.2 or 0.4)
+	  fd.reclaimtime = fd.metal
       fd.filename = ud.filename
+	  fd.description = fd.description or ((fdName == "heap" and "Debris" or "Wreckage") .. " - " .. ud.name)
     end
   end
 
@@ -174,6 +180,10 @@ end
 for name, def in pairs(FeatureDefs) do
 	if def.resurrectable ~= 1 then
 		def.resurrectable = 0
+	end
+	if not def.metal or def.metal == 0 then
+		def.metal = 0.001 -- engine deprioritises things with 0m in force-reclaim mode
+		def.autoreclaimable = false
 	end
 end
  

@@ -16,23 +16,19 @@ unitDef = {
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 45 45]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Anti-Schwarm EMG]],
     description_fr = [[Mitrailleurs Anti-Nuée]],
-    description_pl = [[Wiezyczka Wsparcia]],
     helptext       = [[The Stardust sports a powerful autocannon. While it has a short range and is thus even more vulnerable to skirmishers than the LLT, its high rate of fire and AoE allow it to quickly chew up swarms of lighter units.]],
     helptext_de    = [[Stardust ist ein Geschützturm mit einem lang perfektionierten und tödlichen energetischen Maschinengewehr. Zwar besitzt es nur eine kurze Reichweite, wodurch es sehr verletzbar gegenüber Skirmishern ist, dennoch machen es die hohe Feuerrate und die AoE zu einer guten Verteidigung gegen Schwärme und leichte Einheiten.]],
     helptext_fr    = [[Le Stardust est une tourelle mitrailleuse r haute energie. Son incroyable cadence de tir lui permettent d'arreter quasiment nimporte quelle nuée de Pilleur ou d'unités légcres, cependant sa portée est relativement limitée, et étant prcs du sol nimporte quel obstacle l'empeche de tirer.]],
-    helptext_pl    = [[Stardust posiada dzialko o bardzo duzej sile i szerokim obszarze dzialania, co pozwala mu niszczyc hordy lzejszych jednostek. Ma jednak niski zasieg, co pozwala harcownikom i jednostkom z wiekszym zasiegiem atakowac go bez mozliwosci kontrataku.]],
     aimposoffset   = [[0 12 0]],
     midposoffset   = [[0 4 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[LARGE_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 3,
@@ -121,28 +117,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Stardust]],
       blocking         = true,
-      damage           = 1500,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 88,
       object           = [[afury_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
     },
 
 	HEAP  = {
-      description      = [[Debris - Stardust]],
       blocking         = false,
-      damage           = 1500,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 44,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
     },
 
   },

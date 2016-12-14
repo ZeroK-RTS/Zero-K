@@ -18,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Lanceur de spores tout terrain (Anti-Air/Skirm)]],
 	description_de = [[Gel‰ndeg‰ngige Sporen (Luftabwehr/Skirmish)]],
-	description_pl = [[Zarodniki przeciwlotnicze]],
     helptext       = [[The Sporeshooter shoots spores to drop aircraft and hit land targets from a distance. Can climb walls for surprise attacks.]],
     helptext_fr    = [[Le Sporeshooter lance des salves de spores ? t?te chercheuse sur les unit?s adverses, tant terrestres qu'a?riennes, tout en ?tant tr?s mobile et pouvant grimper m?me les parois les plus escarp?es afin de surprendre l'adversaire.]],
 	helptext_de    = [[Der Sporeshooter verschieﬂt Sporen, um Flugzeuge und Landziele aus der Distanz zu vernichten. Kann auch W‰nde erklimmen und somit ÅEerraschende Angriffe ausfÅEren.]],
-	helptext_pl    = [[Sporeshooter wystrzeliwuje zarodniki, sluzac jako obrona przeciwlotnicza, ale moze tez skutecznie atakowac cele naziemne dzieki dobremu zasiegowi. Moze wspinac sie na strome wzniesienia.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 237,
   maxDamage           = 1800,
   maxSlope            = 72,
   maxVelocity         = 2.2,
@@ -55,10 +52,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 0.5,
   trackStrength       = 9,

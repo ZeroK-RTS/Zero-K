@@ -17,14 +17,11 @@ unitDef = {
   category              = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[30 48 30]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                = [[DEAD]],
 
   customParams          = {
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
     midposoffset   = [[0 10 0]],
   },
 
@@ -36,7 +33,6 @@ unitDef = {
   idleTime              = 1800,
   leaveTracks           = true,
   losEmitHeight         = 40,
-  mass                  = 157,
   maxDamage             = 900,
   maxSlope              = 36,
   maxVelocity           = 2,
@@ -61,10 +57,7 @@ unitDef = {
     },
 
   },
-
-  side                  = [[CORE]],
   sightDistance         = 605,
-  smoothAnim            = true,
   trackOffset           = 0,
   trackStrength         = 8,
   trackStretch          = 1,
@@ -145,31 +138,19 @@ unitDef = {
   featureDefs           = {
 
     DEAD  = {
-      description      = [[Wreckage - Placeholder]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 100,
       object           = [[freaker_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
 	
     HEAP  = {
-      description      = [[Debris - Placeholder]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 50,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 50,
     },
 
   },

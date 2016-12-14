@@ -18,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Detecteur sismic mobile enfoui]],
 	description_de = [[Grabender, mobiler Körperschallmelder]],
-	description_pl = [[Podziemny detektor sejsmiczny]],
     helptext       = [[The Listener is an evolved form of the Digger. While it has lost all fighting ability, it has gained a unique sense of hearing that allows it to pinpoint the location of enemy ground forces.]],
     helptext_fr    = [[Le Listener est une forme ?volu?e du Digger. Ayant perdu ses capacit?s d'attaque il a en retour gagn? une puissante ouie qui lui permet de d?terminer avec pr?cision l'emplacement des troupes terrestres enemies.]],
 	helptext_de    = [[Der Listener ist eine weiterentwickelte Form des Diggers. Zwar hat er seine Kampffertigkeiten verloren, doch im Gegenzug eine einzigartige Sinnesempfindung im Hören erhalten, was es ihm erlaubt gegnerische Bodentruppen haargenau zu lokalisieren.]],
-	helptext_pl    = [[Listener, choc nie jest w stanie walczyc, wyczuwa drgania ziemi, co pozwala mu z daleka wykrywac obecnosc wrogich jednostek.]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -32,7 +30,6 @@ unitDef = {
   iconType            = [[chicken]],
   idleAutoHeal        = 20,
   idleTime            = 300,
-  mass                = 99999,
   maxDamage           = 700,
   maxSlope            = 72,
   maxVelocity         = 0.3,
@@ -57,10 +54,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 0,
-  smoothAnim          = true,
   stealth             = true,
   turnRate            = 806,
   upright             = false,

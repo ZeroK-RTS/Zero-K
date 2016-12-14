@@ -18,14 +18,11 @@ unitDef = {
   category              = [[SUB FIREPROOF]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[18 12 38]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylZ]],  
 
   customParams          = {
     fireproof = [[1]],
-    description_pl = [[Lodz podwodna - samobojczy zwiadowca]],
     helptext       = [[The Lancelet is basically a large smart torpedo with scouting functionality. It can remain hidden in the depths to observe enemy movements, then detonate its explosive charge to sink unwary ships.]],
-    helptext_pl    = [[Lancelet to w gruncie rzeczy duza samowystarczalna torpeda wyposazona w sensory. Moze pozostawac niewykryta pod woda, aby sledzic ruchy przeciwnika, bedac w kazdej chwili gotowa do detonacji.]],
 	turnatfullspeed = [[1]],
   },
 
@@ -38,7 +35,6 @@ unitDef = {
   idleTime              = 1800,
   kamikaze              = true,
   kamikazeDistance      = 80,
-  mass                  = 175,
   maxDamage             = 200,
   maxVelocity           = 3.8,
   minCloakDistance      = 75,
@@ -50,7 +46,6 @@ unitDef = {
   seismicSignature      = 4,
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
-  side                  = [[ARM]],
   sightDistance         = 550,
   sonarDistance         = 450,
   turnRate              = 500,

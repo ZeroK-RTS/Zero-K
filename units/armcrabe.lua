@@ -20,20 +20,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô dispersador pesado.]],
-    description_es = [[Unidad pesante de alborote/escaramuzador]],
-    description_fi = [[Raskas mellakka/kahakoitsijarobotti]],
     description_fr = [[Marcheur arachnide lourd]],
-    description_it = [[Unita pesante da rissa/scaramucciatore]],
 	description_de = [[Schwere Riot/Skirmish Spinne - Zieht sich bei Stillstand in seine Panzerung zurück]],
-	description_pl = [[Ciezki pajak]],
 	helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form reducing incoming damage to a third. The Crabe's main weakness is its lack of mobility.]],
     helptext_de    = [[Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung.]],
-    helptext_es    = [[Las balas enormes del Crabe arrasan pelotones de unidades baratas enemigas, y tienes alcance mayor que muchas defensas básicas. Cuando para de caminar, Crabe se enrosca en su forma acorazada. La debilidad principal del Crabe es su falta de movilidad.]],
-    helptext_fi    = [[Craben massiiviset plasma-ammukset vahingoittavat yksik?it? laajalla alueella. Pys?htyess??n Crabe linnoittautuu v?hent?en itseens? kohdistuvaa vahinkoa.]],
     helptext_fr    = [[Le canon à plasma lourd du Crabe peut éliminer facilement les défenses basiques ainsi que des hordes d'unités énemies légères grâce à son importante aire d'effet. Lorsqu'il s'arrête de marcher, le Crabe se replie sur lui-même, ses pattes formant une carapace blindée autour de lui réduisant les dommages qu'il reçoit à un tier. Sa faiblesse tient en sa lenteur, tant de déplacement que de tir.]],
     helptext_it    = [[I proiettili enrmi del crabe obliterano sciami di unita economiche, e ha un raggio maggiore di molte difese basiche. Quando smette di camminare, Crabe si raggomitola nella sua forma corazzata. La deboleza principale del crabe é la mancanza di mobilitá.]],
-    helptext_pl    = [[Ciezkie pociski Craba niszcza grupy lekkich jednostek i maja wiekszy zasieg niz podstawowe wiezyczki. Gdy sie nie porusza, Crab zwija sie, otrzymujac tylko cwierc obrazen. Jego glowna wada jest niska ruchliwosc.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[30]],
@@ -128,28 +120,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Crabe]],
       blocking         = true,
-      damage           = 4000,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 4,
-      metal            = 640,
       object           = [[crabe_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 640,
     },
 
     HEAP  = {
-      description      = [[Debris - Crabe]],
       blocking         = false,
-      damage           = 4000,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 320,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 320,
     },
 
   },

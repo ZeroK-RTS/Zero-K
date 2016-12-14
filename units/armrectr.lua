@@ -7,7 +7,7 @@ unitDef = {
   brakeRate              = 0.5,
   buildCostEnergy        = 140,
   buildCostMetal         = 140,
-  buildDistance          = 90,
+  buildDistance          = 128,
   builder                = true,
 
   buildoptions           = {
@@ -30,19 +30,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô de contru??o e captura, constrói a 5 m/s]],
     description_de = [[Getarnter Konstruktionsroboter, Baut mit 5 M/s]],
-    description_es = [[Robot de Construccion/Captura, Construye a 5 m/s]],
-    description_fi = [[Rakentaja/kaappaajarobotti, rakentaa 5m/s  nopeudella]],
     description_fr = [[Robot de Construction/Capture, Construit ? 5 m/s]],
-    description_it = [[Robot da Costruzzione/Cattura, Costruisce a 5 m/s]],
-    description_pl = [[Bot konstruktor z maskowaniem, moc 5 m/s]],
     helptext       = [[The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance.]],
-    helptext_bp    = [[]],
-    helptext_fi    = [[Pystyy rakentamisen lis?ksi kaappaamaan yksik?t koodaamalla ne nurin.]],
     helptext_fr    = [[]],
     helptext_de    = [[Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können.]],
-    helptext_pl    = [[Conjurer moze sie maskowac i ma zaklocacz radaru bardzo krotkiego zasiegu, co pozwala mu pracowac w ukryciu.]],
 	modelradius    = [[14]],
   },
 
@@ -81,30 +73,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Rector]],
       blocking         = true,
-      damage           = 450,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 56,
       object           = [[spherejeth_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
     HEAP  = {
-      description      = [[Debris - Rector]],
       blocking         = false,
-      damage           = 450,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 28,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 28,
     },
 
   },

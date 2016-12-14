@@ -15,7 +15,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[60 60 60]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]], 
   corpse                        = [[DEAD]],
   energyStorage                 = 500,
@@ -39,10 +38,8 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Lagert Energie und Metall (500)]],
-    description_pl = [[Przechowuje surowce (500)]],
     helptext       = [[Storages act as a buffer when one expects a big influx of metal, such as reclaiming a vast wreckage field. However, longer periods of increased metal income are better dealt with by acquiring more buildpower.]],
     helptext_de    = [[Dieser Energie- und Metallspeicher erweitert deine Lagermöglichkeiten um 500.]],
-    helptext_pl    = [[Magazyn pozwala na przechowywanie surowcow na wypadek, gdy nie masz wystarczajaco duzo budowniczych, by je wykorzystac. Lepiej jest jednak zbudowac wiecej budowniczych, a magazynu uzywac bardziej jako bufora na wypadek duzych, niespodziewanych zyskow, na przyklad zbierania duzego zlomowiska.]],
     modelradius    = [[30]],
 	removewait     = 1,
   },
@@ -50,30 +47,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Storage]],
       blocking         = true,
-      damage           = 700,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 40,
       object           = [[storage_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
     HEAP  = {
-      description      = [[Debris - Storage]],
       blocking         = false,
-      damage           = 700,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 20,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 20,
     },
 
   },

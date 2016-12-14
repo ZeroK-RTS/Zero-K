@@ -17,22 +17,17 @@ unitDef = {
   collide                = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[32 32 32]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 140,
 
   customParams           = {
     airstrafecontrol = [[1]],
-    description_bp = [[Aeronave flutuadora agressora]],
     description_fr = [[ADAV Pilleur]],
     description_de = [[Skirmisher/Flugabwehr Hubschrauber]],
-    description_pl = [[Wielozadaniowy statek powietrzny]],
     helptext       = [[The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets.]],
-    --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
     --helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
-    helptext_pl    = [[Rapier to lekki bojowy statek powietrzny, ktorego rakiety sa na tyle celne, ze dobrze radzi sobie z lekkimi, szybkimi jednostkami, a nawet z lotnictwem. Mimo ze nie zadaja wysokich obrazen, spowalniaja swoje cele.]],
     modelradius    = [[16]],
   },
 
@@ -128,30 +123,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Rapier]],
       blocking         = true,
-      damage           = 1100,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 120,
       object           = [[rapier_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
     HEAP  = {
-      description      = [[Debris - Rapier]],
       blocking         = false,
-      damage           = 1100,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 60,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
   },

@@ -25,11 +25,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Lanceur de pikes volant]],
 	description_de = [[Fliegender Dornenspucker]],
-	description_pl = [[Latajacy wypluwacz kolcow]],
     helptext       = [[It's a flying chicken! The Talon is a lethal predator that takes down enemy aircraft with its spikes, but will also happily employ them on ground targets. It can be defeated like any other air unit, however.]],
     helptext_fr    = [[Un poulet volant ! Le talon est un pr?dateur mortel qui peut d?truire un avion adverse avec ses dards ainsi que les employer sur des cibles terrestres. Il reste dependant vuln?rable ? toute d?fense ? capacit? anti a?rienne.]],
 	helptext_de    = [[Talon ist ein fliegenes Chicken! Er ist ein tödliches Rauptier, das feindliche Lufteinheiten mit seinen dicken Bolzen vom Himmel holt, diese aber auch außerordentlich gerne gegen Bodenziele richtet.]],
-	helptext_pl    = [[Talon to latajacy drapieznik; wypluwa kolce we wszystko, co sie rusza. Mozna go potraktowac jak mysliwiec.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -40,19 +38,16 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 231,
   maxDamage           = 1200,
   maxSlope            = 18,
   maxVelocity         = 10,
   minCloakDistance    = 75,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],
   power               = 450,
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -63,10 +58,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   turnRate            = 6000,
   workerTime          = 0,
 
@@ -118,7 +110,6 @@ unitDef = {
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },

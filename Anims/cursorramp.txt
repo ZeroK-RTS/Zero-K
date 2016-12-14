@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/cursorramp_0.png  0.1

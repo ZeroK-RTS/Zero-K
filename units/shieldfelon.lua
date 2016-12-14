@@ -17,9 +17,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Konwerter tarczy]],
     helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
-    helptext_pl    = [[Felon rozladowuje swoja tarcze, przemieniajac ja na obrazenia zadawane wrogom w celnych seriach. Nie moze strzelac, gdy ma calkowicie wyczerpana tarcze.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -144,30 +142,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Felon]],
       blocking         = true,
-      damage           = 1400,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 248,
       object           = [[shieldfelon_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 248,
     },
 
     HEAP  = {
-      description      = [[Debris - Felon]],
       blocking         = false,
-      damage           = 1400,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 124,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 124,
     },
 
   },

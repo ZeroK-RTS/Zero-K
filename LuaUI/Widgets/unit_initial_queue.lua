@@ -112,10 +112,11 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.Color(1.0, 1.0, 1.0, buildingAlpha)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(bx, by, bz)
 		gl.Rotate(90 * facing, 0, 1, 0)
 		gl.Texture("%"..bDefID..":0") --.s3o texture atlas for .s3o model
-		gl.UnitShape(bDefID, teamID, false, true, false)
+		gl.UnitShape(bDefID, teamID, false, false, false)
 		gl.Texture(false)
 	gl.PopMatrix()
 
@@ -131,9 +132,10 @@ local function DrawUnitDef(uDefID, uTeam, ux, uy, uz, rot)
 	gl.Lighting(true)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(ux, uy, uz)
 		gl.Rotate(rot, 0, 1, 0)
-		gl.UnitShape(uDefID, uTeam, false, true, true)
+		gl.UnitShape(uDefID, uTeam, false, false, true)
 	gl.PopMatrix()
 
 	gl.Lighting(false)
@@ -486,6 +488,9 @@ function widget:GameFrame(n)
 	end
 	if tasker then
 		--Spring.Echo("sending queue to unit")
+		-- notify other widgets that we're giving orders to the commander.
+		if WG.GlobalBuildCommand then WG.GlobalBuildCommand.CommandNotifyPreQue(tasker) end
+		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]
 			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
@@ -593,6 +598,7 @@ function widget:CommandsChanged()
 		id      = CMD_STOP,
 		type    = CMDTYPE.ICON,
 		tooltip = "Stop",
+		action  = "stop",
 		params  = {}, 
 	})
 end
@@ -642,7 +648,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if Spring.TestBuildOrder(selDefID, bx, by, bz, buildFacing) ~= 0 then
 		if isMex[selDefID] and WG.metalSpots then
 			local bestSpot = GetClosestMetalSpot(bx, bz)
-			bx, by, bz = bestSpot.x, bestSpot.y, bestSpot.z
+			bx, bz = bestSpot.x, bestSpot.z
+			by = math.max(0, Spring.GetGroundHeight(bx, bz))
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		local msg

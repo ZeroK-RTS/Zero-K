@@ -13,10 +13,23 @@ function widget:GetInfo()
 end
 
 ----------------------------------------------------
--- widget option functions
+----------------------------------------------------
+-- Widget option functions
+
+local CHAT_PADDING = 100
+
+local coreName, corePath = "Chili Core Selector", "Settings/HUD Panels/Quick Selection Bar"
+local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+local minimapName, minimapPath = "Chili Minimap", "Settings/HUD Panels/Minimap"
+local consoleName, consolePath = "Chili Pro Console", "Settings/HUD Panels/Chat"
+local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
+local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
+local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
+local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
+local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
-	local widgetName, path = "Chili Selections & CursorTip","Settings/HUD Panels/Selected Units Window"
+	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"
 	WG.SetWidgetOption(widgetName, path, "groupalways",group)
 	WG.SetWidgetOption(widgetName, path, "showgroupinfo",showInfo)
 	WG.SetWidgetOption(widgetName, path, "squarepics",square)
@@ -24,6 +37,147 @@ local function Selections_SetOptions(group, showInfo, square, iconSize, showComm
 	WG.SetWidgetOption(widgetName, path, "manualWeaponReloadBar",showDgun)
 	WG.SetWidgetOption(widgetName, path, "unitCommand",showCommand)
 	WG.SetWidgetOption(widgetName, path, "alwaysShowSelectionWin",alwaysShow)
+end
+
+----------------------------------------------------
+----------------------------------------------------
+-- Enabled Skinning
+
+local fancySkinOverride = {}
+
+local SKIN_DEFAULT = {}
+local SKIN_FLUSH = {
+	epic = "panel_0001_small",
+	global = "panel_0001_small",
+}
+
+local function SetFancySkin()
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
+	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_0120")
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2021")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_0001")
+	
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0021")
+end
+
+local function SetFancySkinBottomLeft()
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_0110")
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
+	WG.SetWidgetOption(integralName, integralPath, "flushLeft", true)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_2100")
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2011")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_1011")
+	
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0011_small")
+end
+
+local function SetFancySkinBottomRight()
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
+	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_0110")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel_0120")
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", fancySkinOverride.global or "panel_1001_small")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", fancySkinOverride.econ or "panel_2011")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel_1011")
+	
+	WG.crude.SetMenuSkinClass(fancySkinOverride.epic or "panel_0011_small")
+end
+
+local function SetNewOptions()
+	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0.8)
+	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0.75)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", 5)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", 6)
+	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", 50)
+	WG.SetWidgetOption(coreName, corePath, "minButtonSpaces", 3)
+	WG.SetWidgetOption(coreName, corePath, "minSize", 196)
+	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specSpace")
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", 6.25)
+	WG.SetWidgetOption(coreName, corePath, "vertical", true)
+	
+	WG.SetWidgetOption(integralName, integralPath, "hide_when_spectating", false)
+	WG.SetWidgetOption(integralName, integralPath, "leftPadding", 8)
+	WG.SetWidgetOption(integralName, integralPath, "rightPadding", 10)
+	
+	WG.SetWidgetOption(minimapName, minimapPath, "alwaysResizable", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "hidebuttons", true)
+	WG.SetWidgetOption(minimapName, minimapPath, "leftClickOnMinimap", "camera")
+	WG.SetWidgetOption(minimapName, minimapPath, "minimizable", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 1)
+	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "armap")
+	
+	WG.SetWidgetOption(consoleName, consolePath, "backlogHideNotChat", true)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogShowWithChatEntry", true)
+	
+	WG.SetWidgetOption(selName, selPath, "leftPadding", 7)
+	
+	WG.SetWidgetOption(econName, econPath, "opacity", 0.95)
+	
+	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.95)
+	
+	WG.SetWidgetOption(dockName, dockPath, "dockEnabledPanels", false)
+end
+
+----------------------------------------------------
+----------------------------------------------------
+-- Disable skinning
+
+local function SetBoringSkin()
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel")
+	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(selName, selPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(globalName, globalPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(econName, econPath, "fancySkinning", "panel")
+	WG.SetWidgetOption(specName, specPath, "fancySkinning", "panel")
+	
+	WG.crude.SetMenuSkinClass("panel")
+end
+
+local function ResetOptionsFromNew()
+	SetBoringSkin()
+	needToCallFunction = SetBoringSkin
+
+	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0)
+	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", 0)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", 0)
+	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", 58)
+	WG.SetWidgetOption(coreName, corePath, "minButtonSpaces", 0)
+	WG.SetWidgetOption(coreName, corePath, "minSize", 0)
+	WG.SetWidgetOption(coreName, corePath, "showCoreSelector", "specHide")
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", 0)
+	WG.SetWidgetOption(coreName, corePath, "vertical", false)
+	
+	WG.SetWidgetOption(integralName, integralPath, "hide_when_spectating", false)
+	WG.SetWidgetOption(integralName, integralPath, "leftPadding", 0)
+	WG.SetWidgetOption(integralName, integralPath, "rightPadding", 0)
+	WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
+	
+	WG.SetWidgetOption(minimapName, minimapPath, "alwaysResizable", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "hidebuttons", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "leftClickOnMinimap", "unitselection")
+	WG.SetWidgetOption(minimapName, minimapPath, "minimizable", false)
+	WG.SetWidgetOption(minimapName, minimapPath, "opacity", 0)
+	WG.SetWidgetOption(minimapName, minimapPath, "use_map_ratio", "arwindow")
+	
+	WG.SetWidgetOption(consoleName, consolePath, "backlogHideNotChat", false)
+	WG.SetWidgetOption(consoleName, consolePath, "backlogShowWithChatEntry", false)
+	
+	WG.SetWidgetOption(selName, selPath, "leftPadding", 0)
+	
+	WG.SetWidgetOption(econName, econPath, "opacity", 0.8)
+	
+	WG.SetWidgetOption(specName, specPath, "playerOpacity", 0.6)
+	
+	WG.SetWidgetOption(dockName, dockPath, "dockEnabledPanels", true)
 end
 
 ----------------------------------------------------
@@ -51,6 +205,7 @@ local function SetupDefaultPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -62,6 +217,8 @@ local function SetupDefaultPreset()
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	
 	Spring.SendCommands("resbar 0")
+	
+	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -79,7 +236,7 @@ local function SetupDefaultPreset()
 
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(480, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		0,
 		screenHeight - integralHeight,
@@ -89,15 +246,15 @@ local function SetupDefaultPreset()
 	
 	-- Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
-	local selectorHeight = 55*selectorButtonWidth/60
+	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
-	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
+	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
+	
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
-		screenHeight - selectorHeight - integralHeight, 
-		selectorWidth, 
-		selectorHeight
+		screenHeight - coreSelectorHeight - integralHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
 	)
 	
 	-- Selections
@@ -138,7 +295,7 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -148,10 +305,10 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Resource Bar
-	local resourceBarWidth = 660
-	local resourceBarHeight = 50
+	local resourceBarWidth = math.min(screenWidth - 700, 660)
+	local resourceBarHeight = 100
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -170,14 +327,11 @@ local function SetupDefaultPreset()
 end
 
 ----------------------------------------------------
--- Crafty Preset
+-- New Preset
 ----------------------------------------------------
-local function SetupCraftyPreset()
+local function SetupNewPreset()
 	-- Disable
 	widgetHandler:DisableWidget("Chili Chat 2.2")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
-	widgetHandler:DisableWidget("Chili FactoryBar")
-	widgetHandler:DisableWidget("Chili FactoryPanel")
 	widgetHandler:DisableWidget("Chili Gesture Menu")
 	widgetHandler:DisableWidget("Chili Chat Bubbles")
 	widgetHandler:DisableWidget("Chili Keyboard Menu")
@@ -193,8 +347,648 @@ local function SetupCraftyPreset()
 	widgetHandler:EnableWidget("Chili Economy Panel Default")
 	widgetHandler:EnableWidget("Chili Core Selector")
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Global Commands")
 	
 	Spring.SendCommands("resbar 0")
+	
+	fancySkinOverride = {}
+	SetFancySkin()
+	needToCallFunction = SetFancySkin
+	
+	SetNewOptions()
+	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Bottom of the UI
+	
+	-- Minimap
+	local minimapSize = math.floor(screenWidth*2.1/11)
+	if minimapSize < 1650*2.1/11 then
+		if screenWidth > 1340 then
+			minimapSize = 1650*2.1/11
+		else
+			minimapSize = screenWidth*2.1/11
+		end
+	end
+	WG.SetWindowPosAndSize("Minimap Window", 
+		0, 
+		screenHeight - minimapSize, 
+		minimapSize,
+		minimapSize
+	)
+	
+	local _,_, coreSelectorWidth, coreSelectorHeight = WG.GetWindowPosAndSize("selector_window")
+	coreSelectorHeight = coreSelectorHeight or 150
+	coreSelectorWidth = math.ceil(coreSelectorWidth or 60)
+	WG.SetWindowPosAndSize("selector_window", 
+		minimapSize, 
+		screenHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
+	)
+	
+	-- Integral Menu
+	local integralWidth = math.max(350, math.min(480, screenWidth*0.4))
+	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
+	if integralWidth/integralHeight > 2.5 then
+		integralWidth = integralHeight*2.5
+	end
+	if minimapSize + coreSelectorWidth + integralWidth < screenWidth/2 then
+		local extraPadding = screenWidth/2 - (minimapSize + coreSelectorWidth + integralWidth)
+		integralWidth = screenWidth/2 - (minimapSize + coreSelectorWidth)
+	end
+	
+	if integralWidth < 480 then
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480))
+	else
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
+	end
+	
+	integralWidth = math.floor(integralWidth)
+	
+	WG.SetWindowPosAndSize("integralwindow",
+		minimapSize + coreSelectorWidth,
+		screenHeight - integralHeight,
+		integralWidth,
+		integralHeight
+	)
+	
+	local thinMode = screenWidth < 1645
+	
+	-- Selections
+	local selectionsHeight = integralHeight*0.85
+	local selectionsWidth = 450
+	if thinMode then
+		selectionsWidth = screenWidth - (minimapSize + coreSelectorWidth + integralWidth)
+	end
+	if screenWidth > 1750 then
+		selectionsWidth = 475
+	end
+	
+	Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	WG.SetWindowPosAndSize("selections",
+		math.max(screenWidth/2, minimapSize + coreSelectorWidth + integralWidth),
+		screenHeight - selectionsHeight,
+		selectionsWidth,
+		selectionsHeight
+	)
+	
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", selectionsHeight, integralHeight)
+	
+	-- Player List
+	local playerlistWidth = 296
+	local playerlistHeight = 150
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth,
+		screenHeight - playerlistHeight - ((thinMode and selectionsHeight) or 0),
+		playerlistWidth,
+		playerlistHeight
+	)
+	
+	-- Chat
+	WG.SetWindowPosAndSize("ProChat",
+		0,
+		screenHeight - minimapSize - selectionsHeight,
+		minimapSize,
+		selectionsHeight
+	)
+	
+	-- Commander Upgrade
+	local commUpgradeWidth = 200
+	local commUpgradeHeight = 325
+	local commUpgradeY = screenHeight - integralHeight - commUpgradeHeight - 25
+	WG.SetWindowPosAndSize("CommanderUpgradeWindow",
+		minimapSize + coreSelectorWidth,
+		commUpgradeY,
+		commUpgradeWidth,
+		commUpgradeHeight
+	)
+	
+	WG.SetWindowPosAndSize("ModuleSelectionWindow",
+		minimapSize + coreSelectorWidth + commUpgradeWidth,
+		commUpgradeY,
+		500,
+		500
+	)
+	
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Top of the UI
+	
+	local menuWidth = 380
+	local menuHeight = 50
+	
+	-- Resource Bar
+	local resourceBarWidth = math.min(screenWidth - 700, 660)
+	local resourceBarHeight = 100
+	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		resourceBarHeight
+	)
+	
+	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		menuHeight
+	)
+	
+	-- Menu
+	if screenWidth - (resourceBarX + resourceBarWidth) > menuWidth then
+		menuWidth = screenWidth - (resourceBarX + resourceBarWidth)
+	end
+	WG.SetWindowPosAndSize("epicmenubar",
+		screenWidth - menuWidth,
+		0,
+		menuWidth,
+		menuHeight
+	)
+	
+	-- Global build buttons
+	WG.SetWindowPosAndSize("globalCommandsWindow",
+		0,
+		0,
+		resourceBarX,
+		menuHeight
+	)
+	
+	-- Console
+	local consoleWidth = 380
+	local consoleHeight = screenHeight * 0.20
+	WG.SetWindowPosAndSize("ProConsole",
+		screenWidth - consoleHeight,
+		menuHeight,
+		consoleWidth,
+		consoleHeight
+	)
+end
+
+----------------------------------------------------
+-- New with Minimap Left
+----------------------------------------------------
+
+local function SetupNewUITop()
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	local sideHeight = 32
+	local flushTop = (screenWidth <= 1650)
+	
+	-- Resource Bar
+	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
+	local resourceBarHeight = 100
+	
+	-- Menu
+	local menuWidth, globalWidth
+	if flushTop then
+		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2))
+		globalWidth = screenWidth - resourceBarWidth - menuWidth
+	else
+		menuWidth = math.floor((screenWidth - resourceBarWidth)/2)
+		if menuWidth > 440 then
+			menuWidth = 440
+		elseif menuWidth > 380 then
+			menuWidth = 380
+		else
+			menuWidth = 350
+		end
+		globalWidth = menuWidth
+	end
+	
+	local resourceBarX = math.floor(math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth))
+	
+	-- Set Window Positions
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		resourceBarHeight
+	)
+	
+	WG.SetWindowPosAndSize("SpectatorPlayerPanel",
+		resourceBarX,
+		0,
+		resourceBarWidth,
+		50
+	)
+	
+	WG.SetWindowPosAndSize("epicmenubar",
+		screenWidth - menuWidth - 1,
+		0,
+		menuWidth,
+		sideHeight
+	)
+	
+	-- Global build buttons
+	WG.SetWindowPosAndSize("globalCommandsWindow",
+		0,
+		0,
+		globalWidth,
+		sideHeight
+	)
+	
+	-- Console
+	local consoleWidth = 380
+	local consoleHeight = screenHeight * 0.20
+	WG.SetWindowPosAndSize("ProConsole",
+		screenWidth - consoleWidth,
+		sideHeight,
+		consoleWidth,
+		consoleHeight
+	)
+end
+
+local function SetupMinimapLeftPreset()
+	-- Disable
+	widgetHandler:DisableWidget("Chili Chat 2.2")
+	widgetHandler:DisableWidget("Chili Gesture Menu")
+	widgetHandler:DisableWidget("Chili Chat Bubbles")
+	widgetHandler:DisableWidget("Chili Keyboard Menu")
+	widgetHandler:DisableWidget("Chili Radial Build Menu")
+	widgetHandler:DisableWidget("Chili Resource Bars Classic")
+	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	
+	-- Enable
+	widgetHandler:EnableWidget("Chili Minimap")
+	widgetHandler:EnableWidget("Chili Integral Menu")
+	widgetHandler:EnableWidget("Chili Pro Console")
+	widgetHandler:EnableWidget("Chili Economy Panel Default")
+	widgetHandler:EnableWidget("Chili Core Selector")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Global Commands")
+	
+	if not WG.Chili.Screen0:GetChildByName("Player List") then
+		widgetHandler:EnableWidget("Chili Crude Player List")
+	end
+	
+	Spring.SendCommands("resbar 0")
+	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	if screenWidth <= 1650 then
+		fancySkinOverride = SKIN_FLUSH
+	else
+		fancySkinOverride = SKIN_DEFAULT
+	end
+	SetFancySkinBottomLeft()
+	needToCallFunction = SetFancySkinBottomLeft
+	
+	SetNewOptions()
+	
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Bottom of the UI
+	
+	-- Integral Menu
+	local integralWidth = math.max(350, math.min(500, screenWidth*0.4))
+	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
+	
+	if integralWidth/integralHeight > 2.5 then
+		integralWidth = integralHeight*2.5
+	end
+	
+	if integralWidth < 480 then
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480))
+	else
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
+	end
+	integralWidth = math.floor(integralWidth)
+	
+	-- Core Selector
+	local coreSelectorHeight = screenHeight/2
+	local coreSelectorWidth = math.ceil(integralHeight/3)
+	
+	local hPad = math.ceil(screenWidth/300)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad + 3)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad - 2)
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
+	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
+	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
+	
+	local coreMinHeight = 3*(coreSelectorWidth - 2*hPad - 1) + 2*math.floor(hPad/2) + 2*math.floor(1.5*hPad)
+	
+	-- Minimap
+	local mapRatio = Game.mapX/Game.mapY
+	
+	local minimapWidth, minimapHeight
+	if mapRatio > 1 then
+		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapHeight = (minimapWidth/mapRatio)
+	else
+		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapHeight < coreMinHeight then
+		minimapHeight = coreMinHeight
+	end
+	
+	-- Selections
+	local selectionsHeight = integralHeight*0.85
+	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
+
+	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
+	
+	-- Chat
+	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
+	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
+	local chatHeight = selectionsHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX + chatWidth > screenWidth - coreSelectorWidth - integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
+	-- Player List
+	local playerlistWidth = 310
+	local playerlistHeight = screenHeight/2
+	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	if playerListControl then
+		playerlistWidth = playerListControl.minWidth
+	end
+	
+	WG.SetWindowPosAndSize("Player List",
+		0,
+		screenHeight - playerlistHeight - minimapHeight,
+		playerlistWidth,
+		playerlistHeight
+	)
+	
+	-- Chat
+	WG.SetWindowPosAndSize("ProChat",
+		chatX,
+		chatY,
+		chatWidth,
+		chatHeight
+	)
+	
+	-- Set Windows
+	WG.SetWindowPosAndSize("Minimap Window", 
+		0, 
+		screenHeight - minimapHeight, 
+		minimapWidth,
+		minimapHeight
+	)
+	WG.SetWindowPosAndSize("selections",
+		minimapWidth,
+		screenHeight - selectionsHeight,
+		selectionsWidth,
+		selectionsHeight
+	)
+	WG.SetWindowPosAndSize("integralwindow",
+		minimapWidth + selectionsWidth,
+		screenHeight - integralHeight,
+		integralWidth,
+		integralHeight
+	)
+	WG.SetWindowPosAndSize("selector_window", 
+		minimapWidth + selectionsWidth + integralWidth, 
+		screenHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
+	)
+	
+	-- Commander Upgrade
+	local commUpgradeWidth = 200
+	local commUpgradeHeight = 325
+	local commUpgradeY = screenHeight - integralHeight - commUpgradeHeight - 25
+	WG.SetWindowPosAndSize("CommanderUpgradeWindow",
+		minimapWidth + selectionsWidth,
+		commUpgradeY,
+		commUpgradeWidth,
+		commUpgradeHeight
+	)
+	
+	WG.SetWindowPosAndSize("ModuleSelectionWindow",
+		minimapWidth + selectionsWidth + commUpgradeWidth,
+		commUpgradeY,
+		500,
+		500
+	)
+	
+	SetupNewUITop()
+end
+
+----------------------------------------------------
+-- New with Minimap Right
+----------------------------------------------------
+local function SetupMinimapRightPreset()
+	-- Disable
+	widgetHandler:DisableWidget("Chili Chat 2.2")
+	widgetHandler:DisableWidget("Chili Gesture Menu")
+	widgetHandler:DisableWidget("Chili Chat Bubbles")
+	widgetHandler:DisableWidget("Chili Keyboard Menu")
+	widgetHandler:DisableWidget("Chili Radial Build Menu")
+	widgetHandler:DisableWidget("Chili Resource Bars Classic")
+	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	
+	-- Enable
+	widgetHandler:EnableWidget("Chili Minimap")
+	widgetHandler:EnableWidget("Chili Integral Menu")
+	widgetHandler:EnableWidget("Chili Pro Console")
+	widgetHandler:EnableWidget("Chili Economy Panel Default")
+	widgetHandler:EnableWidget("Chili Core Selector")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	widgetHandler:EnableWidget("Chili Global Commands")
+	
+	if not WG.Chili.Screen0:GetChildByName("Player List") then
+		widgetHandler:EnableWidget("Chili Crude Player List")
+	end
+	
+	Spring.SendCommands("resbar 0")
+	
+	-- Settings for window positions and settings.
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	
+	if screenWidth <= 1650 then
+		fancySkinOverride = SKIN_FLUSH
+	else
+		fancySkinOverride = SKIN_DEFAULT
+	end
+	SetFancySkinBottomRight()
+	needToCallFunction = SetFancySkinBottomRight
+	
+	SetNewOptions()
+	
+	------------------------------------------------------------------------
+	------------------------------------------------------------------------
+	-- Bottom of the UI
+	
+	-- Integral Menu
+	local integralWidth = math.max(350, math.min(500, screenWidth*0.4))
+	local integralHeight = 7*math.floor((math.min(screenHeight/4.5, 200*integralWidth/450))/7)
+	
+	if integralWidth/integralHeight > 2.5 then
+		integralWidth = integralHeight*2.5
+	end
+	
+	if integralWidth < 480 then
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", math.floor(13*integralWidth/480))
+	else
+		local integralName, integralPath = "Chili Integral Menu", "Settings/HUD Panels/Command Panel"
+		WG.SetWidgetOption(integralName, integralPath, "tabFontSize", 14)
+	end
+	integralWidth = math.floor(integralWidth)
+	
+	-- Core Selector
+	local coreSelectorHeight = screenHeight/2
+	local coreSelectorWidth = math.ceil(integralHeight/3)
+	
+	local hPad = math.ceil(screenWidth/300)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad - 2)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad + 3)
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
+	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
+	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
+	
+	local coreMinHeight = 3*(coreSelectorWidth - 2*hPad - 1) + 2*math.floor(hPad/2) + 2*math.floor(1.5*hPad)
+	
+	-- Minimap
+	local mapRatio = Game.mapX/Game.mapY
+	
+	local minimapWidth, minimapHeight
+	if mapRatio > 1 then
+		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapHeight = (minimapWidth/mapRatio)
+	else
+		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapHeight < coreMinHeight then
+		minimapHeight = coreMinHeight
+	end
+	
+	-- Selections
+	local selectionsHeight = integralHeight*0.85
+	local selectionsWidth = screenWidth - integralWidth - minimapWidth - coreSelectorWidth
+
+	--Selections_SetOptions(false, true, false, GetSelectionIconSize(selectionsHeight), false, true, false)
+	WG.SetWidgetOption(coreName, corePath, "specSpaceOverride", math.floor(integralHeight*6/7))
+	
+	-- Chat
+	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
+	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
+	local chatHeight = selectionsHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX < coreSelectorWidth + integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
+	-- Player List
+	local playerlistWidth = 310
+	local playerlistHeight = screenHeight/2
+	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	if playerListControl then
+		playerlistWidth = playerListControl.minWidth
+	end
+	
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth,
+		screenHeight - playerlistHeight - minimapHeight,
+		playerlistWidth,
+		playerlistHeight
+	)
+	
+	-- Chat
+	WG.SetWindowPosAndSize("ProChat",
+		chatX,
+		chatY,
+		chatWidth,
+		chatHeight
+	)
+	
+	-- Set Windows
+	WG.SetWindowPosAndSize("Minimap Window", 
+		coreSelectorWidth + integralWidth + selectionsWidth, 
+		screenHeight - minimapHeight, 
+		minimapWidth,
+		minimapHeight
+	)
+	WG.SetWindowPosAndSize("selections",
+		coreSelectorWidth + integralWidth,
+		screenHeight - selectionsHeight,
+		selectionsWidth,
+		selectionsHeight
+	)
+	WG.SetWindowPosAndSize("integralwindow",
+		coreSelectorWidth,
+		screenHeight - integralHeight,
+		integralWidth,
+		integralHeight
+	)
+	WG.SetWindowPosAndSize("selector_window", 
+		0, 
+		screenHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
+	)
+	
+	-- Commander Upgrade
+	local commUpgradeWidth = 200
+	local commUpgradeHeight = 325
+	local commUpgradeY = screenHeight - integralHeight - commUpgradeHeight - 25
+	WG.SetWindowPosAndSize("CommanderUpgradeWindow",
+		coreSelectorWidth,
+		commUpgradeY,
+		commUpgradeWidth,
+		commUpgradeHeight
+	)
+	
+	WG.SetWindowPosAndSize("ModuleSelectionWindow",
+		coreSelectorWidth + commUpgradeWidth,
+		commUpgradeY,
+		500,
+		500
+	)
+	
+	SetupNewUITop()
+end
+
+----------------------------------------------------
+-- Crafty Preset
+----------------------------------------------------
+local function SetupCraftyPreset()
+	-- Disable
+	widgetHandler:DisableWidget("Chili Chat 2.2")
+	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
+	widgetHandler:DisableWidget("Chili FactoryBar")
+	widgetHandler:DisableWidget("Chili FactoryPanel")
+	widgetHandler:DisableWidget("Chili Gesture Menu")
+	widgetHandler:DisableWidget("Chili Chat Bubbles")
+	widgetHandler:DisableWidget("Chili Keyboard Menu")
+	widgetHandler:DisableWidget("Chili Radial Build Menu")
+	widgetHandler:DisableWidget("Chili Resource Bars Classic")
+	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
+	
+	-- Enable
+	widgetHandler:EnableWidget("Chili Minimap")
+	widgetHandler:EnableWidget("Chili Crude Player List")
+	widgetHandler:EnableWidget("Chili Integral Menu")
+	widgetHandler:EnableWidget("Chili Pro Console")
+	widgetHandler:EnableWidget("Chili Economy Panel Default")
+	widgetHandler:EnableWidget("Chili Core Selector")
+	widgetHandler:EnableWidget("Chili Selections & CursorTip")
+	
+	Spring.SendCommands("resbar 0")
+	
+	ResetOptionsFromNew()
 	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
@@ -212,20 +1006,19 @@ local function SetupCraftyPreset()
 	
 	-- Quick Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
-	local selectorHeight = 55*selectorButtonWidth/60
+	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(minimapWidth/selectorButtonWidth)))
-	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
+	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
 	WG.SetWindowPosAndSize("selector_window", 
 		0, 
-		screenHeight - minimapHeight - selectorHeight, 
-		selectorWidth, 
-		selectorHeight
+		screenHeight - minimapHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
 	)
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		screenWidth - integralWidth,
 		screenHeight - integralHeight,
@@ -265,7 +1058,7 @@ local function SetupCraftyPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -278,7 +1071,7 @@ local function SetupCraftyPreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -312,6 +1105,7 @@ local function SetupEnsemblePreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -324,13 +1118,14 @@ local function SetupEnsemblePreset()
 	
 	Spring.SendCommands("resbar 0")
 	
+	ResetOptionsFromNew()
+	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
-	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, screenWidth*screenHeight*0.0004))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		0,
 		screenHeight - integralHeight,
@@ -362,15 +1157,14 @@ local function SetupEnsemblePreset()
 
 	-- Quick Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
-	local selectorHeight = 55*selectorButtonWidth/60
+	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(integralWidth/selectorButtonWidth)))
-	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
+	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
 	WG.SetWindowPosAndSize("selector_window", 
 		integralWidth, 
-		screenHeight - selectionsHeight - selectorHeight, 
-		selectorWidth, 
-		selectorHeight
+		screenHeight - selectionsHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
 	)
 	
 	-- Player List
@@ -394,7 +1188,7 @@ local function SetupEnsemblePreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth,
@@ -407,7 +1201,7 @@ local function SetupEnsemblePreset()
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
-	WG.SetWindowPosAndSize("EconomyPanelDefault",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -440,6 +1234,7 @@ local function SetupWestwoodPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel Default")
+	widgetHandler:DisableWidget("Chili Global Commands")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -452,6 +1247,8 @@ local function SetupWestwoodPreset()
 	
 	Spring.SendCommands("resbar 0")
 	
+	ResetOptionsFromNew()
+	
 	-- Settings for window positions and settings.
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
@@ -459,7 +1256,7 @@ local function SetupWestwoodPreset()
 	local resourceBarWidth = screenWidth*5/22 + 20
 	local resourceBarHeight = 65
 	local resourceBarX = screenWidth - resourceBarWidth
-	WG.SetWindowPosAndSize("EconomyPanel",
+	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
 		resourceBarWidth,
@@ -479,7 +1276,7 @@ local function SetupWestwoodPreset()
 	
 	-- Integral Menu
 	local integralWidth = math.max(350, math.min(500, resourceBarWidth))
-	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)
+	local integralHeight = math.min(screenHeight/4.5, 200*integralWidth/450)  + 8
 	WG.SetWindowPosAndSize("integralwindow",
 		screenWidth - integralWidth,
 		resourceBarHeight + minimapHeight,
@@ -500,15 +1297,14 @@ local function SetupWestwoodPreset()
 	
 	-- Quick Selection Bar
 	local selectorButtonWidth = math.min(60, screenHeight/16)
-	local selectorHeight = 55*selectorButtonWidth/60
+	local coreSelectorHeight = 55*selectorButtonWidth/60
 	local selectionButtonCount = math.min(12,math.max(4,math.floor(resourceBarWidth/selectorButtonWidth)))
-	local selectorWidth = selectorButtonWidth*selectionButtonCount
-	WG.CoreSelector_SetOptions(selectionButtonCount)
+	local coreSelectorWidth = selectorButtonWidth*selectionButtonCount
 	WG.SetWindowPosAndSize("selector_window", 
 		screenWidth - selectionsWidth, 
-		screenHeight - selectionsHeight - selectorHeight, 
-		selectorWidth, 
-		selectorHeight
+		screenHeight - selectionsHeight - coreSelectorHeight, 
+		coreSelectorWidth, 
+		coreSelectorHeight
 	)
 	
 	-- Player List
@@ -532,7 +1328,7 @@ local function SetupWestwoodPreset()
 	)
 	
 	-- Menu
-	local menuWidth = 400
+	local menuWidth = 380
 	local menuHeight = 50
 	WG.SetWindowPosAndSize("epicmenubar",
 		0,
@@ -553,10 +1349,38 @@ local function SetupWestwoodPreset()
 end
 
 ----------------------------------------------------
+-- Preset selection
+----------------------------------------------------
+
+local firstUpdate = true
+
+local presetFunction = {
+	default2 = SetupDefaultPreset,
+	new = SetupNewPreset, 
+	minimapLeft = SetupMinimapLeftPreset,
+	minimapRight = SetupMinimapRightPreset,
+	crafty = SetupCraftyPreset,
+	ensemble = SetupEnsemblePreset,
+	westwood = SetupWestwoodPreset,
+}
+
+local function UpdateInterfacePreset(self)
+	if firstUpdate then
+		-- Don't reset IU while initializing 
+		return
+	end
+	local presetKey = self.value
+	Spring.Echo("UpdateInterfacePreset", presetKey)
+	if presetFunction[presetKey] then
+		presetFunction[presetKey]()
+	end
+end
+
+----------------------------------------------------
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'maintainDefaultUI', 'presetlabel', 'interfacePresetDefault', 'interfacePresetCrafty', 'interfacePresetEnsemble', 'interfacePresetWestwood'}
+options_order = {'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
 options = {
 	setToDefault = {
 		name  = "Set To Default Once",
@@ -570,70 +1394,82 @@ options = {
 		name  = "Reset on screen resolution change",
 		type  = "bool", 
 		value = false, 
-		desc = "Resets the UI to default when screen resolution changes. Disable if you plan to customise your UI.",
+		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
-	presetlabel = {
-		name = "presetlabel",
-		type = 'label', 
-		value = "Presets", 
-	},
-	interfacePresetDefault = {
-		name = "Default",
-		desc = "The default interface.",
-		type = 'button',
-		OnChange = SetupDefaultPreset,
-	},
-	interfacePresetCrafty = {
-		name = "Crafty",
-		desc = "Interface reminiscent of the craft of war and stars.",
-		type = 'button',
-		OnChange = SetupCraftyPreset,
-	},
-	interfacePresetEnsemble = {
-		name = "Ensemble",
-		desc = "Interface reminiscent of the imperial ages.",
-		type = 'button',
-		OnChange = SetupEnsemblePreset,
-	},
-	interfacePresetWestwood = {
-		name = "Westwood",
-		desc = "Interface reminiscent of the conquest of dunes.",
-		type = 'button',
-		OnChange = SetupWestwoodPreset,
+	interfacePreset = {
+		name = 'UI Preset',
+		type = 'radioButton',
+		value = 'default',
+		items = {
+			{key = 'default2', name = 'Default', desc = "The default UI.",},
+			{key = 'new', name = 'New UI', desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",},
+			{key = 'minimapLeft', name = 'New UI Minimap Left'},
+			{key = 'minimapRight', name = 'New UI Minimap Right'},
+			{key = 'crafty', name = 'Crafty', desc = "Interface reminiscent of the craft of war and stars.",},
+			{key = 'ensemble', name = 'Ensemble', desc = "Interface reminiscent of the imperial ages.",},
+			{key = 'westwood', name = 'Westwood', desc = "Interface reminiscent of the conquest of dunes.",},
+			{key = 'default', name = 'None', desc = "No preset. Select this if you want to modify your UI and have the changes rememberd on subsequent launches.",},
+		},
+		noHotkey = true,
+		OnChange = UpdateInterfacePreset
 	},
 }
 
 ----------------------------------------------------
 -- Callins
 ----------------------------------------------------
-local firstUpdate = true
 local timeSinceUpdate = 0
 local UPDATE_FREQUENCY = 5
 local oldWidth = 0
 local oldHeight = 0
 
+local callCount = 0
+
 function widget:Update(dt)
-	if firstUpdate then
-		if options.setToDefault.value then
-			-- This is where the defaults are set.
-			SetupDefaultPreset()
-			options.setToDefault.value = false
+	if needToCallFunction then
+		needToCallFunction()
+		callCount = callCount + 1
+		if callCount > 4 then
+			needToCallFunction = nil
+			callCount = 0
 		end
-		firstUpdate = false
 	end
 	
-	if options.maintainDefaultUI.value then
+	if options.setToDefault.value then
+		options.interfacePreset.value = "default2"
+		options.interfacePreset.OnChange(options.interfacePreset)
+		options.setToDefault.value = false
+	end
+	
+	if firstUpdate then
+		firstUpdate = false
+		
+		local screenWidth, screenHeight = Spring.GetWindowGeometry()
+		oldWidth = screenWidth
+		oldHeight = screenHeight
+		UpdateInterfacePreset(options.interfacePreset)
+	end
+	
+	if options.maintainDefaultUI.value  then
 		timeSinceUpdate = timeSinceUpdate + dt 
 		if timeSinceUpdate > UPDATE_FREQUENCY then
 			local screenWidth, screenHeight = Spring.GetWindowGeometry()
 			if oldWidth ~= screenWidth or oldHeight ~= screenHeight then
 				oldWidth = screenWidth
 				oldHeight = screenHeight
-				SetupDefaultPreset()
+				UpdateInterfacePreset(options.interfacePreset)
 			end
 			timeSinceUpdate = 0
 		end
+	end
+end
+
+function widget:ViewResize(screenWidth, screenHeight)
+	if options.maintainDefaultUI.value then
+		oldWidth = screenWidth
+		oldHeight = screenHeight
+		UpdateInterfacePreset(options.interfacePreset)
 	end
 end
 

@@ -16,18 +16,15 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 194 70]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Strategische Plasma Kanone]],
     description_fr = [[Canon ? Plasma Strat?gique]],
-    description_pl = [[Strategiczne Dzialo Plazmowe]],
     helptext       = [[The Bertha is a massive cannon that fires high-energy plasmoids across the map. Used appropriately, it can effectively suppress enemy operations from the safety of your base. Do not expect it to win battles alone for you, however.]],
     helptext_de    = [[Die Bertha ist eine massive Kanone, welche hochenergetische Plasmoide über die Karte verschiesst. Angemessener Gebrauch der Waffe kann gengerische Operationen von der eigenen, sicheren Basis aus schnell unterdrücken. Trotzdem erwarte nicht, dass du nur dich diese Waffe die Schlachten gewinnen wirst.]],
     helptext_fr    = [[Le Big Bertha est un canon ? plasma lourd, tr?s lourd. Un seul impact de son tir peut r?duire ? n?ant plusieurs unit?s ou structures. Sa port?e de tir op?rationnelle est immense et n'?gale que son co?t de construction et d'usage. En effet chaque tir consomme 300 unit?s d'?nergie. Notez que le Big Bertha effectue des tirs tendus. Autrement dit, pensez ? le placer en hauteur, ou le moindre relief servira de refuge ? l'ennemi.]],
-    helptext_pl    = [[Gruba Berta to masywne dzialo o ogromnym zasiegu. W dobrych rekach jest w stanie niweczyc wazne przedsiewziecia przeciwnika z bezpiecznego miejsca we wlasnej bazie. Nie jest jednak w stanie zastapic mobilnych jednostek i nie zapewni ci sama zwyciestwa.]],
 
     modelradius    = [[35]],
   },
@@ -119,31 +116,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Big Bertha]],
       blocking         = true,
-      damage           = 4800,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 2000,
       object           = [[armbrtha_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 2000,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Big Bertha]],
       blocking         = false,
-      damage           = 4800,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 1000,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1000,
     },
 
   },

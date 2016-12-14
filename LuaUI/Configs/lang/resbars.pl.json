@@ -24,5 +24,7 @@
 	"resbar_metal_bar_tooltip" : "Pasek reprezentujący zapełnienie magazynów metalem.\nMruga, gdy nie ma miejsca i metal się marnuje.",
 	"resbar_energy_bar_tooltip" : "Pasek reprezentujący zapełnienie magazynów energią.\nMruga, gdy nie ma miejsca i energia się marnuje.",
 	"resbar_metal_expense_tooltip" : "Zapotrzebowanie na metal Twojej budowy i ulepszeń.",
-	"resbar_energy_expense_tooltip" : "Zapotrzebowanie energetyczne Twojej ekonomii i jednostek."
+	"resbar_energy_expense_tooltip" : "Zapotrzebowanie energetyczne Twojej ekonomii i jednostek.",
+	"metal_excess_warning" : "Buduj coś bo metal się marnuje.",
+	"energy_stall_warning" : "Zbuduj więcej elektrowni, brakuje energii."
 }

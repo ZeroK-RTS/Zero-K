@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 8192,
   buildCostEnergy               = 2500,
   buildCostMetal                = 2500,
   builder                       = false,
@@ -22,10 +21,8 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Plasmabatterie - Benötigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu können.]],
-    description_pl = [[Bateria plazmowa]],
     helptext       = [[The Behemoth offers long-range artillery/counter-artillery capability, making it excellent for area denial. It is not designed as a defense turret, and will go down if attacked directly.]],
 	helptext_de    = [[Der Behemoth besitzt eine weitreichende (Erwiderungs-)Artilleriefähigkeit, um Zugang zu größeren Arealen zu verhindern. Er wurde nicht als Verteidigungsturm entwickelt und wird bei direktem Angriff in die Knie gezwungen.]],
-	helptext_pl    = [[Behemoth to bateria (przeciw-)artyleryjska. Swietnie radzi sobie z zabezpieczaniem terytorium, jednak latwo go zniszczyc bezposrednio. Aby strzelac, musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii.]],
     keeptooltip = [[any string I want]],
     neededlink  = 50,
     pylonrange  = 50,
@@ -38,7 +35,6 @@ unitDef = {
   iconType                      = [[staticarty]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 605,
   maxDamage                     = 3750,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -58,11 +54,8 @@ unitDef = {
 	  [[custom:LARGE_MUZZLE_FLASH_FX]],
     },
 
-  },  
-  
-  side                          = [[CORE]],
+  },
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -124,43 +117,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Behemoth]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 3750,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 1000,
       object           = [[corbhmth_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
-      description      = [[Debris - Behemoth]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 3750,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 500,
       object           = [[debris4x4b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 500,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

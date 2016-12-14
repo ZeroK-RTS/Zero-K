@@ -18,7 +18,6 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 50 24]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -37,7 +36,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 252,
   maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -54,11 +52,8 @@ unitDef = {
     explosiongenerators = {
       [[custom:flashmuzzle1]],
     },
-  }, 
-  
-  side                          = [[ARM]],
+  },
   sightDistance                 = 660,
-  smoothAnim                    = true,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
 
@@ -115,64 +110,28 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Gauss]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 2250,
-      energy           = 0,
       featureDead      = [[DEAD2]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[15]],
-      hitdensity       = [[100]],
-      metal            = 160,
       object           = [[gauss_91_dead1.dae]],
-      reclaimable      = true,
-      reclaimTime      = 160,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     DEAD2 = {
-      description      = [[Debris - Gauss]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 2250,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 160,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 160,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Gauss]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 2250,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 80,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

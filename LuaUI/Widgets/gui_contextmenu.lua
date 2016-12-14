@@ -107,6 +107,9 @@ local colorPurple = {0.9, 0.2, 1, 1}
 local colorDisarm = {0.5, 0.5, 0.5, 1}
 local colorCapture = {0.6, 1, 0.6, 1}
 
+local valkMaxMass = UnitDefNames.corvalk.transportMass
+local valkMaxSize = UnitDefNames.corvalk.transportSize * 2
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -166,7 +169,7 @@ end
 local function AddFactoryOfUnits(defName)
 	local ud = UnitDefNames[defName]
     local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
-	addUnit(ud.id, name, true)
+	addUnit(ud.id, "Buildings/Factory", true)
 	for i = 1, #ud.buildOptions do
 		addUnit(ud.buildOptions[i], name, true)
     end
@@ -187,7 +190,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("missilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local _, _, factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
@@ -412,7 +415,7 @@ local function weapons2Table(cells, ws, unitID)
 		local val = tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0
 		
 		if cp.disarmdamagemult then
-			damd = val * cp.disarmdamagemult
+			damd = val * cp.disarmdamagemult * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if (cp.disarmdamageonly == "1") then
 				val = 0
 			end
@@ -420,7 +423,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.timeslow_damagefactor then
-			dams = val * cp.timeslow_damagefactor
+			dams = val * cp.timeslow_damagefactor * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
 			end
@@ -436,13 +439,15 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if wd.paralyzer then
-			damw = val
+			damw = val * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if stun_time == 0 then
 				stun_time = wd.damages.paralyzeDamageTime
 			end
 		else
 			dam = val
 		end
+		
+		dam = dam * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -1324,7 +1329,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 	
 	if legacyModules then
@@ -1812,7 +1817,7 @@ function widget:MousePress(x,y,button)
 		----------
 		local groundTooltip
 		if WG.customToolTip then --find any custom ground tooltip placed on the ground
-			local _, pos = spTraceScreenRay(x,y, true) --return coordinate of the ground
+			local _, pos = spTraceScreenRay(x,y, true, false, false, true) --return coordinate of the ground
 			for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
 				if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
 					groundTooltip = data.tooltip --copy tooltip
@@ -1830,7 +1835,7 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		local type, data = spTraceScreenRay(x, y)
+		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
 			local unitID = data
 			

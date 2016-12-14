@@ -23,9 +23,7 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-    description_pl = [[Ciezki kurczak powietrzny]],
     helptext       = [[Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken.]],
-    helptext_pl    = [[Roc to latajacy kurczak, ktory jest w stanie skutecznie zwalczac zarowno cele ladowe, jak i powietrzne.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -38,12 +36,10 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
-  mass                = 600,
   maxDamage           = 2500,
   maxSlope			  = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chicken_roc.s3o]],
@@ -51,7 +47,6 @@ unitDef = {
   script              = [[chicken_roc.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -62,10 +57,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 750,
-  smoothAnim          = true,
   turnRate            = 1350,
   workerTime          = 0,
 
@@ -126,7 +118,6 @@ unitDef = {
       sprayAngle              = 1200,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },

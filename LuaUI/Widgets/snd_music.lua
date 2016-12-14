@@ -36,9 +36,9 @@ options = {
 		noHotkey = true,
 	},
 	pausemusic = {
-		name='Pause Music',
-		type='bool',
-		value=false,
+		name = 'Pause Music',
+		type = 'bool',
+		value = false,
 		desc = "Music pauses with game",
 		noHotkey = true,
 	},
@@ -106,6 +106,11 @@ local function StartLoopingTrack(trackInit, trackLoop)
 end
 
 local function StartTrack(track)
+	if not peaceTracks then
+		Spring.Echo("Missing peaceTracks file, no music started")
+		return
+	end
+
 	haltMusic = false
 	looping = false
 	Spring.StopSoundStream()
@@ -301,9 +306,11 @@ function widget:Update(dt)
 end
 
 function widget:GameStart()
-	gameStarted = true
-	previousTrackType = musicType
-	StartTrack()
+	if not gameStarted then
+		gameStarted = true
+		previousTrackType = musicType
+		StartTrack()
+	end
 	
 	--Spring.Echo("Track: " .. newTrack)
 	newTrackWait = 0	

@@ -26,6 +26,7 @@ local projectiles = {}
 
 local projectileHomingDistance = {
 	[WeaponDefNames["screamer_advsam"].id] = 1200^2,
+	[WeaponDefNames["amphraider3_torpedo"].id] = 200^2,
 }
 
 for wdid = 1, #WeaponDefs do

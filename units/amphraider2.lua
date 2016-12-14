@@ -22,8 +22,6 @@ unitDef = {
     amph_submerged_at = 40,
 	sink_on_emp    = 1,
     helptext       = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units.]],
-    description_pl = [[Plywajacy bot wsparcia]],
-    helptext_pl    = [[Archer uzywa silnego strumienia wody do niszczenia przeciwnikow. W miare strzelania zbiornik oproznia sie, zmniejszajac sile i zasieg - Archer moze go ponownie napelnic, wchodzac do wody. Archer moze wynurzyc sie, aby prowadzic walke z jednostkami powierzchniowymi.]],
     maxwatertank   = [[180]],
     floattoggle    = [[1]],
   },
@@ -53,7 +51,7 @@ unitDef = {
   },
 
   sightDistance          = 500,
-  sonarDistance          = 200,
+  sonarDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -186,30 +184,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Archer]],
       blocking         = true,
-      damage           = 820,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 80,
       object           = [[amphraider2_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 104,
     },
 
     HEAP      = {
-      description      = [[Debris - Archer]],
       blocking         = false,
-      damage           = 820,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 40,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 52,
     },
 
   },

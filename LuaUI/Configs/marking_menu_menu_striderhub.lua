@@ -33,23 +33,19 @@ local menu = {
 		},
 		{
 			angle = 90,
-			unit = "cornukesub",
+			unit = "subtacmissile",
 			label = "Sub",
 		},
 		{
 			angle = 135,
-			unit = "corbats",
+			unit = "shipheavyarty",
 			label = "Ship",
 			items = {
 				{
 					angle = -135,
-					unit = "armcarry"
+					unit = "shipcarrier"
 				},
-				{
-					angle = -135,
-					unit = "reef"
-				},
-			}
+			},
 		},
 		{
 			angle = 180,

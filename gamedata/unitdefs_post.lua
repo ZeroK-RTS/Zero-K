@@ -346,49 +346,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Different aircraft turn radius in new engine
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if name == "fighter" then
-			ud.turnradius = 150
-			ud.maxrudder = 0.007
-		elseif name == "corvamp" then
-			ud.turnradius = 80
-			ud.maxrudder = 0.006
-		elseif name == "bomberdive" then
-			ud.turnradius = 40
-		elseif name == "corhurc2" then
-			ud.turnradius = 20
-		elseif name == "armstiletto_laser" then
-			ud.turnradius = 20
-		elseif name == "armcybr" then
-			ud.turnradius = 20
-		elseif "corawac" then
-			ud.turnradius = 60
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Increase pathable areas of yardmaps for new engine as a test.
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if name == "factorytank" then
-			ud.yardmap = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy"
-		elseif name == "factoryveh" then
-			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
-		elseif name == "factorycloak" then
-			ud.yardmap = "ooooooo ooooooo ooooooo occccco occccco occccco occccco"
-		end
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
 -- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 
@@ -504,19 +461,6 @@ if (modOptions and modOptions.metalmult) then
 		UnitDefs[name].metalmake = (UnitDefs[name].metalmake or 0) * modOptions.metalmult
 	end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- OD mex divide by 20
---
-
-for _,ud in pairs(UnitDefs) do
-    local em = tonumber(ud.extractsmetal)
-    if (em) then
-		ud.extractsmetal = em * 0.05
-    end
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -737,17 +681,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Min Build Range back to what it used to be
--- 
-for name, ud in pairs(UnitDefs) do
-	if ud.builddistance and ud.builddistance < 128 and name ~= "armasp" and name ~= "armcarry" then
-		ud.builddistance = 128 
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 --  No leveling ground
 
 
@@ -816,6 +749,38 @@ if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
         end
     end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Raid defense building range multiplier modoption
+-- 
+
+
+local raidDefenseBuildings = {}
+
+local raidDefenseBuildingStrings = {"corrl", "corllt", "armdeva", "armartic", "armpb", "corhlt", "corgrav", "turrettorp", 
+"cordoom", "armanni", "corbhmth"}
+
+for i = 1, #raidDefenseBuildingStrings do
+    raidDefenseBuildings[raidDefenseBuildingStrings[i]] = true
+end
+
+if modOptions and modOptions.raid_defense_building_range_mult and modOptions.raid_defense_building_range_mult ~= 1 then
+    local defenseMult = modOptions.raid_defense_building_range_mult
+    --Spring.Echo("Multiplying raid defense building ranges by " .. defenseMult)
+    for unitDefID, unitDef in pairs(UnitDefs) do
+        if unitDef.weapons and unitDef.weapondefs and raidDefenseBuildings[unitDef.unitname] then
+            for defName, def in pairs(unitDef.weapondefs) do
+                if def.range then
+                    --Spring.Echo("Multiplying the range of the " .. unitDef.name .. " weapon \"" .. def.name .. 
+                    --"\" by " .. defenseMult)
+                    def.range = math.max(def.range*defenseMult, 1)
+                end
+            end
+        end
+    end
+end
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

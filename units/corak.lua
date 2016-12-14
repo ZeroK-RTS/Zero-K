@@ -19,19 +19,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô agressor]],
-    description_es = [[Robot de invasión]],
     description_fr = [[Robot Pilleur]],
-    description_it = [[Robot d'invasione]],
 	description_de = [[Mittel-leichter Raider Roboter]],
-	description_pl = [[Lekki bot]],
     helptext       = [[The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs.]],
-    helptext_bp    = [[O AK é um rob? agressor. ? um pouco mais forte que seu equivalente de Nova, mas ainda algo que voç? n?o envia contra forças entrincheiradas. Defenda-se dele com unidades dispersadoras e torres de laser leve.]],
-    helptext_es    = [[Como unidad de invasión, el Bandit sacrifica poder de fuego en favor de supervivencia. es un poco mas resistente de su euivalente Nova, pero como quiera no es para lanzarlo en contra de enemigos atrincherados. Se contrastan con unidades de alboroto y llt.]],
     helptext_fr    = [[Le Bandit est plus puissant que sa contre partie ennemie, le Glaive. Il n'est cependant pas tr?s puissant et ne passera pas contre quelques d?fenses: LLT ou ?meutiers. ]],
     helptext_it    = [[Come unita d'invasione, il Bandit sacrifica potenza di fuoco per sopravvivenza. ? pi? resistente del suo equivalente Nova, ma comnque non ? da mandare contro nemici ben difesi. Si contrastano con unita da rissa ed llt.]],
 	helptext_de    = [[Als Raider opfert der Bandit die rohe Feuerkraft der Überlebensfähigkeit. Er ist etwas stärker als der Glaive, aber immer noch nicht stark genug, um gegen größere Kräfte zu bestehen. Mit Rioteinheiten und LLT entgegenwirken.]],
-	helptext_pl    = [[Bandit jest szybkim i lekkim botem - jest troche wytrzymalszy niz jego odpowiednik Glaive. Nie jest jednak na tyle mocny, by mozna go bylo uzywac przeciwko obwarowanym przeciwnikom. Przegrywa w bezposrednim starciu z jednostkami wsparcia i wiezyczkami.]],
 	modelradius    = [[12]],
   },
 
@@ -127,30 +120,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Bandit]],
       blocking         = false,
-      damage           = 250,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 30,
       object           = [[mbot_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 30,
     },
 
     HEAP  = {
-      description      = [[Debris - Bandit]],
       blocking         = false,
-      damage           = 250,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 15,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 15,
     },
 
   },

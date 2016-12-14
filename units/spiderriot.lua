@@ -16,14 +16,11 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[36 36 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
     helptext       = [[A rapid fire spider which excels at picking off fast units.]],
-    description_pl = [[Pajak wsparcia]],
-    helptext_pl    = [[Szybkostrzelny pajak, ktory swietnie radzi sobie z niszczeniem lekkich jednostek.]],
     aimposoffset   = [[0 10 0]],
   },
 
@@ -107,30 +104,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Redback]],
       blocking         = true,
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 112,
       object           = [[tarantula_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 112,
     },
 
     HEAP  = {
-      description      = [[Debris - Redback]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 56,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
   },

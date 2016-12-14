@@ -19,10 +19,8 @@ unitDef = {
 
   customParams           = {
     description_de = [[Artillerieroboter für Sättigungsfeuer]],
-    description_pl = [[Robot wsparcia artyleryjskiego]],
     helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
 	helptext_de    = [[Der Firewalker setzt mit seinem Mörser auf mittlerer Distanz Gebiete in Brand und macht sie somit für kurze Zeit unbrauchbar. Die Einheit selber ist schwerfällig und langsam zu manövrieren.]],
-	helptext_pl    = [[Firewalker uzywa swoich dzial sredniego zasiegu do podpalania wyznaczonych obszarow, co zadaje obrazenia jednostkom, ktore tam pozostana.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 347,
   maxDamage              = 1250,
   maxSlope               = 36,
   maxVelocity            = 2.1,
@@ -55,10 +52,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,
@@ -169,6 +163,7 @@ unitDef = {
       size                    = 5,
       soundHit                = [[weapon/cannon/wolverine_hit]],
       soundStart              = [[weapon/cannon/wolverine_fire]],
+      soundStartVolume        = 3.8,
       sprayangle              = 2500,
       turret                  = true,
       weaponType              = [[Cannon]],
@@ -181,35 +176,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Firewalker]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 1250,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 360,
       object           = [[firewalker_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 360,
     },
 
     HEAP  = {
-      description      = [[Debris - Firewalker]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 1250,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      hitdensity       = [[100]],
-      metal            = 180,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 180,
     },
 
   },

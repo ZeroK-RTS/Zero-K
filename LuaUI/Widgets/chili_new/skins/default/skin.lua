@@ -681,7 +681,6 @@ skin.window = {
   DrawDragGrip = DrawDragGrip,
   DrawResizeGrip = DrawResizeGrip,
 
-  color = {0.1, 0.1, 0.1, 0.7},
   hitpadding = {4, 4, 4, 4},
   boxes = {
     resize = {-21, -21, -10, -10},

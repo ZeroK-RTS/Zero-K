@@ -18,9 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-      description_pl = [[Lekki bot amfibijny]],
       helptext       = [[The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged.]],
-      helptext_pl    = [[Grebe to lekki bot z granatami krotkiego zasiegu, ktore dobrze sprawdzaja sie przeciwko ciezszym celom. Mimo ze jest amfibijny, nie moze atakowac spod wody.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -149,30 +147,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Grebe]],
       blocking         = true,
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 120,
       object           = [[wreck2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
     HEAP      = {
-      description      = [[Debris - Grebe]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 60,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
   },

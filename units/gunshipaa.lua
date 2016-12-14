@@ -21,22 +21,17 @@ unitDef = {
   category               = [[GUNSHIP]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[36 36 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
   collide                = true,
   corpse                 = [[DEAD]],
   cruiseAlt              = 110,
 
   customParams           = {
-    --description_bp = [[Aeronave flutuadora agressora]],
     --description_fr = [[ADAV Pilleur]],
 	description_de = [[Flugabwehr Hubschrauber]],
-	description_pl = [[Przeciwlotniczy statek powietrzny]],
     helptext       = [[The Trident is a slow gunship that cuts down enemy aircraft with missiles. It is much slower than other gunships, so it is much easier to kill the Trident with ground units than with planes.]],
-    --helptext_bp    = [[A aeronave flutuante agressora leve de Logos. Seus mísseis s?o precisos e pode atingir o ar, tornando-a útil contra alvos pequenos e outras aeronaves agressoras.]],
     --helptext_fr    = [[des missiles pr?cis et une vitesse de vol appr?ciable, le Rapier saura vous d?fendre contre d'autres pilleurs ou mener des assauts rapides.]],
 	--helptext_de    = [[Der Rapier ist ein leichter Raiderhubschrauber. Seine Raketen sind akkurat und treffen auch Lufteinheiten. Des Weiteren erweist er sich gegen kleine Ziele und als Gegenwehr gegen andere Raider als sehr nützlich.]],
-	helptext_pl    = [[Trident to wolny statek powietrzny, ktory niszczy lotnictwo silnymi rakietami. Jego szybkosc i niski pulap sprawiaja jednak, ze mozna go latwo zniszczyc jednostkami naziemnymi.]],
 	modelradius    = [[18]],
 	midposoffset   = [[0 15 0]],
 	selection_velocity_heading = 1,
@@ -50,7 +45,6 @@ unitDef = {
   iconType               = [[gunshipaa]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 208,
   maxDamage              = 900,
   maxVelocity            = 3.8,
   minCloakDistance       = 75,
@@ -68,10 +62,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 660,
-  smoothAnim             = true,
   turnRate               = 0,
   workerTime             = 0,
 
@@ -146,37 +137,19 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Trident]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 108,
       object           = [[trifighter_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 108,
     },
 
     
     HEAP  = {
-      description      = [[Debris - Trident]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 900,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 54,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 54,
     },
 
   },

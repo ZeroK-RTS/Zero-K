@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Flail]],
   description         = [[Anti-Air Hovercraft]],
   acceleration        = 0.048,
+  activateWhenBuilt   = true,
   brakeRate           = 0.043,
   buildCostEnergy     = 300,
   buildCostMetal      = 300,
@@ -11,22 +12,18 @@ unitDef = {
   buildTime           = 300,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   collisionVolumeOffsets = [[0 0 -5]],
   collisionVolumeScales  = [[40 40 40]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse              = [[DEAD]],
 
   customParams        = {
     description_de = [[Fulgabwehrgleiter]],
-    description_pl = [[Poduszkowiec przeciwlotniczy]],
     helptext       = [[The Flail launches a single large, short-medium range SAM that does heavy damage.]],
 	helptext_de    = [[Der Flail verschießt eine einzige, große Flugabwehrrakete auf mittlerer Distanz, die wirklich großen Schaden anrichtet.]],
-	helptext_pl    = [[Flail wystrzeliwuje rakiety przeciwlotnicze sredniego zasiegu, ktore zadaja wysokie obrazenia.]],
 	modelradius    = [[20]],
 	midposoffset   = [[0 8 0]],
   },
@@ -37,7 +34,6 @@ unitDef = {
   iconType            = [[hoveraa]],
   idleAutoHeal        = 5,
   idleTime            = 1800,
-  mass                = 200,
   maxDamage           = 1300,
   maxSlope            = 36,
   maxVelocity         = 3.54,
@@ -59,13 +55,11 @@ unitDef = {
 
   },
 
-  side                = [[CORE]],
   sightDistance       = 660,
-  smoothAnim          = true,
+  sonarDistance       = 660,  
   turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,
-
   weapons             = {
 
     {
@@ -131,41 +125,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Flail]],
       blocking         = false,
-      category         = [[corpses]],
-      damage           = 1300,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 200,
       object           = [[hoveraa_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
-      description      = [[Debris - Flail]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 1600,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      hitdensity       = [[100]],
-      metal            = 100,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

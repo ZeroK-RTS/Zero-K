@@ -43,16 +43,13 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND]],
-  commander           = true,
 
   customParams        = {
     description_fr = [[Reine pondeuse]],
 	description_de = [[Pflegt und hegt das Nest]],
-	description_pl = [[Dba o Kurnik]],
     helptext       = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
     helptext_fr    = [[Cette reine pondeuse n'est pas aussi effrayante en combat que l'autre reine mais peut ? long terme se montrer une menace bien plus grande. En ?ffet elle peut engendrer rapidement par elle-m?me toutes les unit?s poulet.]],
 	helptext_de    = [[Die eierlegende, brÅEende Kˆnigin ist im Gefecht nicht ganz so furchterregend wie die anderen Kˆniginnen, aber auf weite Sicht kann sie sogar eine grˆﬂere Gefahr darstellen. Sie erzeugt all die verschiedenen Chickenrassen der Thunderbirds.]],
-	helptext_pl    = [[Matka roju - zajmuje sie skladaniem i ochrona jajek, a zatem bierze glowny udzial w tworzeniu sil zbrojnych Kurczakow.]],
   },
 
   energyStorage       = 0,
@@ -63,7 +60,6 @@ unitDef = {
   idleAutoHeal        = 0,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 712,
   maxDamage           = 3000,
   maxSlope            = 72,
   maxVelocity         = 2,
@@ -92,11 +88,8 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 1024,
-  smoothAnim          = true,
   sonarDistance       = 450,
-  TEDClass            = [[COMMANDER]],
   trackOffset         = 8,
   trackStrength       = 8,
   trackStretch        = 1,

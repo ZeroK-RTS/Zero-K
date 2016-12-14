@@ -9,7 +9,7 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostEnergy        = 1200,
   buildCostMetal         = 1200,
-  buildDistance          = 120,
+  buildDistance          = 128,
   builder                = true,
 
   buildoptions           = {
@@ -26,18 +26,14 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 50 45]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],
-  commander              = true,
   corpse                 = [[DEAD]],
 
   customParams           = {
 	cloakstealth = [[1]],
 	description_de = [[Mobiler Sturmkommandant, Baut mit 10 M/s]],
-	description_pl = [[Wszechstronny Dowodca, moc 10 m/s]],
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.]],
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung.]],
-	helptext_pl    = [[Strike to wszechstronny Dowodca, ktory moze uzywac wiekszosci modulow i ma dobra predkosc, wytrzymalosc i samonaprawe.]],
 	level = [[1]],
 	statsname = [[armcom1]],
 	soundok = [[heavy_bot_move]],
@@ -60,7 +56,6 @@ unitDef = {
   idleTime               = 1800,
   leaveTracks            = true,
   losEmitHeight       = 40,
-  mass                   = 411,
   maxDamage              = 2500,
   maxSlope               = 36,
   maxVelocity            = 1.35,
@@ -70,7 +65,6 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  norestrict             = [[1]],
   objectName             = [[ARMCOM]],
   script                 = [[armcom.lua]],
   seismicSignature       = 16,
@@ -87,7 +81,6 @@ unitDef = {
 
   showNanoSpray          = false,
   showPlayerName         = true,
-  side                   = [[ARM]],
   sightDistance          = 500,
   sonarDistance          = 300,
   trackOffset            = 0,
@@ -208,30 +201,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Strike Commander]],
       blocking         = true,
-      damage           = 2500,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 480,
       object           = [[armcom1_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 480,
     },
 
     HEAP      = {
-      description      = [[Debris - Strike Commander]],
       blocking         = false,
-      damage           = 2500,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 240,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
     },
 
 

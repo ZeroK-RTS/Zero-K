@@ -18,7 +18,6 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 39 30]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
   explodeAs                     = [[BIG_UNITEX]],
@@ -47,16 +46,15 @@ unitDef = {
 
   customParams        = {
     description_de = [[Leichte Abschirmeinrichtung]],
-    description_pl = [[Tarcza obszarowa]],
     helptext       = [[The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons.]],
     helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
-    helptext_pl    = [[Aegis tworzy obszarowa tarcze, ktora detonuje pociski na jej obwodzie. Utrzymanie i regeneracja tarczy kosztuja znaczne ilosci energii, a niektore pociski sa zbyt mocne, by je zatrzymac.]],
 	removewait     = 1,
 
     morphto = [[core_spectre]],
     morphtime = [[30]],
 	
 	priority_misc = 1, -- Medium
+	unarmed       = true,
   },  
   
   weapons                       = {
@@ -105,31 +103,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Aegis]],
       blocking         = true,
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 210,
       object           = [[shield_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 210,
     },
 
 
     HEAP = {
-      description      = [[Debris - Aegis]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 105,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 105,
     },
 
   },

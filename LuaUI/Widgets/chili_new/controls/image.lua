@@ -17,6 +17,7 @@ Image = Button:Inherit{
   defaultHeight = 64,
   padding = {0,0,0,0},
   color = {1,1,1,1},
+  color2 = nil,
 
   file  = nil,
   file2 = nil,
@@ -25,6 +26,8 @@ Image = Button:Inherit{
   flip2 = true;
 
   keepAspect = true;
+
+  useRTT = false;
 
   OnClick  = {},
 }
@@ -60,16 +63,17 @@ end
 
 function Image:DrawControl()
   if (not (self.file or self.file2)) then return end
-  gl.Color(self.color)
 
   if (self.keepAspect) then
     if (self.file2) then
+      gl.Color(self.color2 or self.color)
       TextureHandler.LoadTexture(0,self.file2,self)
       local texInfo = gl.TextureInfo(self.file2) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
       _DrawTextureAspect(0,0,self.width,self.height, tw,th, self.flip2)
     end
     if (self.file) then
+      gl.Color(self.color)
       TextureHandler.LoadTexture(0,self.file,self)
       local texInfo = gl.TextureInfo(self.file) or {xsize=1, ysize=1}
       local tw,th = texInfo.xsize, texInfo.ysize
@@ -77,10 +81,12 @@ function Image:DrawControl()
     end
   else
     if (self.file2) then
+      gl.Color(self.color2 or self.color)
       TextureHandler.LoadTexture(0,self.file2,self)
       gl.TexRect(0,0,self.width,self.height,false,self.flip2)
     end
     if (self.file) then
+      gl.Color(self.color)
       TextureHandler.LoadTexture(0,self.file,self)
       gl.TexRect(0,0,self.width,self.height,false,self.flip)
     end

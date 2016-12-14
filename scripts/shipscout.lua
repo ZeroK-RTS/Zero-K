@@ -40,10 +40,10 @@ end
 
 local function shootyThingo()
 	Sleep(33)
-	Move(turret, y_axis, 0,20)
+	Move(turret, y_axis, 0,40)
 	Hide(missile)
 	Sleep(1000)
-	Move(turret, y_axis, 20, 20)
+	Move(turret, y_axis, 20, 40)
 	Show(missile)
 end
 	
@@ -83,6 +83,17 @@ end
 
 function script.QueryWeapon2()
 	return firepoint
+end
+
+function script.BlockShot(num, targetID)	
+	-- This causes poor behaviour if there is nothing nearby which needs disarming, so OKP for Skeeter is default set to 'off' in \LuaRules\Gadgets\unit_overkill_prevention.lua
+	if GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, 180, 20, 120) then --less than 1 second - timeout, 3 seconds - disarmTimer
+		return true
+	end
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 45, 20) then
+		return true
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

@@ -11,15 +11,12 @@ unitDef = {
   category               = [[SINK UNARMED]],
   collisionVolumeOffsets = [[0 15 0]],
   collisionVolumeScales  = [[20 50 20]],
-  collisionVolumeTest	 = 1,
   collisionVolumeType	 = [[CylY]],
 
   customParams           = {
     description_de = [[EMP Rakete]],
-    description_pl = [[Rakieta EMP]],
     helptext       = [[The Shockley disables units in a small area for up to 45 seconds.]],
     helptext_de    = [[Der Shockley paralysiert Einheiten in seiner kleinen Reichweite für bis zu 45 Sekunden.]],
-    helptext_pl    = [[Jednorazowa rakieta dalekiego zasiegu, ktora paralizuje trafione jednostki do 45 sekund.]],
     mobilebuilding = [[1]],
   },
 

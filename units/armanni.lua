@@ -17,18 +17,15 @@ unitDef = {
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   --collisionVolumeScales         = [[75 100 75]],
-  --collisionVolumeTest           = 1,
   --collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_fr = [[Acc?lerateur Tachyon]],
     description_de = [[Tachyonen Beschleuniger - BenÃ¶tigt ein angeschlossenes Stromnetz von 50 Energie, um feuern zu kÃ¶nnen.]],
-    description_pl = [[Projektor Tachyonow]],
     helptext       = [[Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter.]],
     helptext_fr    = [[ProtÃ©gÃ© derri?re le blindage lourd de l'Annihilator se trouve le terrible Canon AccÃ©lerateur de Tachyon. Cette arme terrifiante est capable d'envoyer des quantitÃ©s colossales d'Ã©nergie sur un point prÃ©cis, percant tous les blindages aisÃ©ment, le tout ? une distance terrifiante. Son co?t et sa consommation d'Ã©nergie la rendent cependant difficile ? employer.]],
     helptext_de    = [[Innerhalb der hart gepanzerten HÃ¼lle befindet sich ein verheerender Tachyonen Beschleuniger. Diese furchteinregende Waffe ist imstande in einem riesigen Umkreis punktgenaue ZerstÃ¶rung nach sich zu ziehen, vorausgesetzt du verbindest es mit einer Energiequelle. Beachte aber, dass der Anniilator eine dezidierte UnterstÃ¼tzungswaffe ist; unbewacht wird er schnell von Angreifern Ã¼berrumpelt.]],
-    helptext_pl    = [[Pod ciezkim pancerzem Annihilatora znajduje sie niszczycielski Projektor Tachyonow. Ta straszliwa bron pozwala na zadawanie wysokich obrazen oddalonym celom zakladajac, ze masz dosc energii, by ja zasilic - musi znajdowac sie w sieci energetycznej o mocy co najmniej 50 energii. Mimo swej mocy Annihilator nie jest odpowiedzia na wszystkie problemy - ma niska szybkostrzelnosc, co czyni go podatnym na ataki wielu lekkich jednostek. W razie ostrzalu artylerii lub nalotu mozna schowac dzialo, co nie pozwala na strzelanie, ale zmniejsza otrzymywane obrazenia czterokrotnie.]],
 
     keeptooltip    = [[any string I want]],
 
@@ -105,6 +102,7 @@ unitDef = {
       interceptedByShieldType = 1,
       largeBeamLaser          = true,
       laserFlareSize          = 16.94,
+	  leadLimit               = 18,
       minIntensity            = 1,
       noSelfDamage            = true,
       range                   = 1200,
@@ -128,31 +126,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD = {
-      description      = [[Wreckage - Annihilator]],
       blocking         = true,
-      damage           = 6000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 880,
       object           = [[arm_annihilator_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 880,
     },
 
 
     HEAP = {
-      description      = [[Debris - Annihilator]],
       blocking         = false,
-      damage           = 6000,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 440,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 440,
     },
 
   },

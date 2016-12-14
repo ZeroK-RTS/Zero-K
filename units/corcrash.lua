@@ -20,19 +20,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô anti-aéreo]],
-    description_es = [[Robot Antiaéreo]],
     description_fr = [[Robot Anti-Air]],
-    description_it = [[Robot da contraerea]],
 	description_de = [[Flugabwehr Roboter]],
-	description_pl = [[Bot przeciwlotniczy]],
     helptext       = [[The Vandal is a cheap, hardy and reliable dedicated anti-air bot. Defenseless vs. land forces.]],
-    helptext_bp    = [[O Vandal é um robô anti-ar barato. Dá aos robôs uma vantagem definitiva contra aeronaves. N?o pode ser defender de unidades terrestres.]],
-    helptext_es    = [[El Vandal es un robot antiaéreo barato. Ofrece una ventaja definitiva para los kbots contra aviones. No tiene defensas contra unidades de tierra.]],
     helptext_fr    = [[Le Vandal est l'unit? anti-air de base, il tire des missiles guid?s ? une cadence peu rapide. Redoutable en groupe, il sert ? prot?ger bases et troupes.]],
     helptext_it    = [[Il Vandal é un economico robot da contraerea. Offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
 	helptext_de    = [[Der Vandal ist ein billiger, dedizierter Flugabwehr Roboter, der den Robotern einen bestimmten Vorteil gegenüber Flugzeugen bringt. Schutzlos gegenüber Landstreitkräften.]],
-	helptext_pl    = [[Vandal to tani, wytrzymaly i niezawodny bot przeciwlotniczy. Jest bezbronny przeciwko wojskom ladowym.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -134,30 +127,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Vandal]],
       blocking         = true,
-      damage           = 650,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[crasher_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
     HEAP = {
-      description      = [[Debris - Vandal]],
       blocking         = false,
-      damage           = 650,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 18,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 18,
     },
 
   },

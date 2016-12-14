@@ -122,8 +122,7 @@ options_order = {
 	'showeco',
 	
 	'lable_initialView', 
-	'initialSensorState', 
-	'start_with_showeco',
+	'initialSensorState',
 	
 	-- Radar view configuration
 	'radar_view_colors_label1',
@@ -144,6 +143,7 @@ options_order = {
 	'radar_preset_green_in_blue', 
 	
 	-- Minimap options
+	'hideOnOverview',
 	'use_map_ratio',
 	'opacity', 
 	'alwaysResizable', 
@@ -154,6 +154,8 @@ options_order = {
 
 	'leftClickOnMinimap', 
 	'fadeMinimapOnZoomOut', 
+	
+	'fancySkinning',
 }
 options = {
 	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
@@ -228,19 +230,6 @@ options = {
 		value = true,
 		noHotkey = true,
 	},
-	start_with_showeco = {
-		name = "Start with economy overly",
-		desc = "Game starts with Economy Overlay enabled",
-		type = 'bool',
-		value = false,
-		noHotkey = true,
-		OnChange = function(self)
-			if (self.value) then
-				WG.showeco = self.value
-			end
-		end,
-	},
-	
 	
 --------------------------------------------------------------------------
 -- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
@@ -372,14 +361,22 @@ options = {
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
+	hideOnOverview = {
+		name = 'Hide on Overview',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+		noHotkey = true,
+	},	
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
 		value = 'arwindow',
 		items = {
-			{key = 'arwindow', 	name='Aspect Ratio Window'},
-			{key ='armap', 		name='Aspect Ratio Map'},
-			{key ='arnone', 		name='Map Fills Window'},
+			{key = 'arwindow',  name = 'Aspect Ratio Window'},
+			{key = 'armap',     name = 'Aspect Ratio Map'},
+			{key = 'arnone',    name = 'Map Fills Window'},
 		},
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
@@ -430,7 +427,7 @@ options = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) 
+		OnChange= function(self)
 			iconsize = self.value and 0 or 20 
 			MakeMinimapWindow() 
 		end,
@@ -472,6 +469,44 @@ options = {
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed, for the background opacity
 			end,
 		path = minimap_path,
+		noHotkey = true,
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'radioButton',
+		value = 'panel',
+		path = minimap_path,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1100', name = 'Bottom Left',},
+			{key = 'panel_2100', name = 'Bottom Left Flush',},
+			{key = 'panel_0110', name = 'Bottom Right'},
+			{key = 'panel_0120', name = 'Bottom Right Flush'},
+			{key = 'panel_1001', name = 'Top Left',},
+		},
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local className = self.value
+			local newClass = skin.panel
+			if skin[className] then
+				newClass = skin[className]
+			end
+			
+			map_panel.tiles = newClass.tiles
+			map_panel.TileImageFG = newClass.TileImageFG
+			--map_panel.backgroundColor = newClass.backgroundColor
+			map_panel.TileImageBK = newClass.TileImageBK
+			map_panel:Invalidate()
+			
+			fakewindow.tiles = newClass.tiles
+			fakewindow.TileImageFG = newClass.TileImageFG
+			--fakewindow.backgroundColor = newClass.backgroundColor
+			fakewindow.TileImageBK = newClass.TileImageBK
+			fakewindow:Invalidate()
+		end,
+		advanced = true,
 		noHotkey = true,
 	},
 	--[[
@@ -548,15 +583,16 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	end
 
 	local cs = Spring.GetCameraState()
-	if cs.name == "ov" and not tabbedMode then
-		Chili.Screen0:RemoveChild(window)
-		tabbedMode = true
+	if not options.hideOnOverview.value then
+		if cs.name == "ov" and not tabbedMode then
+			Chili.Screen0:RemoveChild(window)
+			tabbedMode = true
+		end
+		if cs.name ~= "ov" and tabbedMode then
+			Chili.Screen0:AddChild(window)
+			tabbedMode = false
+		end
 	end
-	if cs.name ~= "ov" and tabbedMode then
-		Chili.Screen0:AddChild(window)
-		tabbedMode = false
-	end
-
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
 	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
@@ -656,6 +692,7 @@ MakeMinimapWindow = function()
 	end
 	
 	map_panel = Chili.Panel:New {
+		--classname = "bottomLeftPanel",
 		x = 0,
 		y = 0,
 		bottom = map_panel_bottom,
@@ -664,8 +701,8 @@ MakeMinimapWindow = function()
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
 		backgroundColor = bgColor_panel
-		}
-	
+	}
+
 	buttons_panel = Chili.StackPanel:New{
 		name = "Minimap buttons_panel",
 		orientation = 'horizontal',
@@ -731,7 +768,7 @@ MakeMinimapWindow = function()
 		parent = Chili.Screen0,
 		name   = 'Minimap Window',
 		color = {0, 0, 0, 0},
-		padding = {0, 0, 0, 0},
+		padding = {0, -1, 0, -1},
 		width = (window and window.width) or width,
 		height = (window and window.height) or height,
 		x = (window and window.x) or 0,
@@ -762,12 +799,16 @@ MakeMinimapWindow = function()
 		dockable = false;
 		draggable = false,
 		resizable = false,
-		padding = {0, 0, 0, 0},
+		padding = {0, 0, 0, -1},
 		children = {
 			map_panel,
-			buttons_panel,
+			((not options.hidebuttons.value) and buttons_panel) or nil,
 		},
 	}
+		
+	if options.fancySkinning.value then
+		options.fancySkinning.OnChange(options.fancySkinning)
+	end
 
 end
 
@@ -781,12 +822,6 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	if Spring.GetActiveCommand() == 0 then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		if meta and not shift then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
-			WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
-			WG.crude.ShowMenu() --make epic Chili menu appear.
-			return true
-		end
 		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
 			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
 			local coord 

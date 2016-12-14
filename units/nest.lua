@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Spawns Chickens]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
   builder                       = true,
@@ -35,14 +34,11 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  commander                     = false,
 
   customParams                  = {
     description_de = [[Erzeugt Chicken]],
-    description_pl = [[Rozmnaza kurczaki]],
 	helptext       = [[Nests such as this one are where the basic Thunderbirds are hatched.]],
 	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
-	helptext_pl    = [[W tym gniezdzie rodza sie podstawowe kurczaki.]],
     chickenFac = [[true]],
   },
 
@@ -55,7 +51,6 @@ unitDef = {
   iconType                      = [[factory]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 208,
   maxDamage                     = 2000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -80,10 +75,7 @@ unitDef = {
   },
 
   showNanoSpray                 = false,
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 21,

@@ -26,6 +26,7 @@ local color = {
 	transblack2 = {0,0,0,0.7},
 	transGray = {0.1,0.1,0.1,0.8},
 	
+	empty = {0,0,0,0},
 	null = {nil, nil, nil, 1},
 	transnull = {nil, nil, nil, 0.3},
 	transnull2 = {nil, nil, nil, 0.5},
@@ -37,7 +38,7 @@ color.tooltip_fg = color.null
 color.tooltip_info = color.cyan
 color.tooltip_help = color.green
 
-color.main_bg = color.transnull2
+color.main_bg = color.transnull3
 color.main_fg = color.null
 
 color.menu_bg = color.null
@@ -142,6 +143,7 @@ confdata.subMenuIcons = {
 	['Game/New Unit States'] 		= imgPath..'epicmenu/robot2.png',
 	['Game/Unit Behaviour'] 		= imgPath..'epicmenu/robot2.png',
 	['Game/Transport AI'] 			= imgPath..'epicmenu/robot2.png',
+	['Game/Worker AI'] 				= imgPath..'commands/Bold/build_light.png',
 	['Game/Unit Marker'] 			= imgPath..'epicmenu/marker.png',
 	['Game/Construction Hotkeys'] 	= imgPath..'epicmenu/keyboard.png',
 	['Game/Selection Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
@@ -235,8 +237,19 @@ local gameSpeedPath = 'Game/Game Speed'
 		
 	ShLabel(gamePath, '')
 	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
+	
+	--ShButton(gamePath, 'Save Game', (function() WG.SaveGame.CreateWindow(true) end), nil, nil, nil)
+	--ShButton(gamePath, 'Load Game', (function() WG.SaveGame.CreateWindow(false) end), nil, nil, nil)
+	
 --	ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
+-- global build command
+local GBCPath = 'Game/Worker AI'
+local gbcinfo = "Global Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
+"then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
+"You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
+"Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n"
+ShButton(GBCPath, 'Toggle Global Build Command', function() Spring.SendCommands{"luaui togglewidget Global Build Command"} end, gbcinfo)
 
 --- CAMERA ---
 local cameraPath = 'Settings/Camera'
@@ -310,6 +323,7 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 			WG.crude.SetSkin( self.value );
 		end,
 		items = {
+			{ key = 'Blueprint', name = 'Blueprint', },
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
 			{ key = 'DarkHive', name = 'DarkHive', },
@@ -324,7 +338,6 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
-	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
 	AddOption(pathMouse,
 	{ 	
 		name = 'Hardware Cursor',
@@ -536,17 +549,17 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
---[[
-path='Settings/Audio'
-	AddOption({
-		name = 'Sound Volume',
+
+local pathAudio = 'Settings/Audio'
+	AddOption(pathAudio,{
+		name = 'Master Volume',
 		type = 'number',
 		min = 0, 
 		max = 100,
 		springsetting = 'snd_volmaster',
 		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end
-	} )
-	AddOption({
+	})
+	AddOption(pathAudio,{
 		name = 'Music Volume',
 		type = 'number',
 		min = 0, 
@@ -554,19 +567,18 @@ path='Settings/Audio'
 		step = 0.01,
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)	
-				if (WG.music_start_volume or 0 > 0) then 
-					Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-				else 
-					Spring.SetSoundStreamVolume(self.value) 
-				end
-				local prevValue = WG.music_volume
-				--settings.music_volume = self.value
-				WG.music_volume = self.value
-				if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
-				if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
-			end,
-	} )
-]]
+			if (WG.music_start_volume or 0 > 0) then 
+				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+			else 
+				Spring.SetSoundStreamVolume(self.value) 
+			end
+			local prevValue = WG.music_volume
+			--settings.music_volume = self.value
+			WG.music_volume = self.value
+			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
+			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+		end,
+	})
 		
 --- HELP ---
 local pathHelp = 'Help'

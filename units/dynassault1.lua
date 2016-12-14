@@ -8,7 +8,7 @@ unitDef = {
   brakeRate           = 0.375,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -21,10 +21,8 @@ unitDef = {
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
-  commander           = true,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[45 54 45]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[CylY]],  
   corpse              = [[DEAD]],
 
@@ -38,6 +36,7 @@ unitDef = {
 	soundselect = [[bot_select]],
 	soundbuild = [[builder_start]],
 	commtype = [[5]],
+	modelradius    = [[27]],
 	dynamic_comm   = 1,
   },
 
@@ -52,7 +51,6 @@ unitDef = {
   idleTime            = 0,
   leaveTracks         = true,
   losEmitHeight       = 40,
-  mass                = 423,
   maxDamage           = 3000,
   maxSlope            = 36,
   maxVelocity         = 1.35,
@@ -61,7 +59,6 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
-  norestrict          = [[1]],
   objectName          = [[benzcom1.s3o]],
   script              = [[dynassault.lua]],
   seismicSignature    = 16,
@@ -81,10 +78,8 @@ unitDef = {
   },
 
   showNanoSpray       = false,
-  side                = [[CORE]],
   sightDistance       = 500,
-  smoothAnim          = true,
-  sonarDistance       = 300,
+  sonarDistance       = 500,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -98,42 +93,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD      = {
-      description      = [[Wreckage - Guardian Commander]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 2250,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 480,
       object           = [[benzcom1_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 480,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP      = {
-      description      = [[Debris - Guardian Commander]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 2250,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      hitdensity       = [[100]],
-      metal            = 240,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 240,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

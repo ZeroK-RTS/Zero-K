@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[missiletower]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
-  buildAngle                    = 8192,
   buildCostEnergy               = 220,
   buildCostMetal                = 220,
   builder                       = false,
@@ -17,16 +16,13 @@ unitDef = {
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[42 53 42]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Flugabwehrraketenturm]],
-    description_pl = [[Wieza przeciwlotnicza]],
     helptext       = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
 	helptext_de    = [[Seine Zwillingsraketen können sogar die schwersten Bomber mit einem Schuss vom Himmel holen, brauchen aber eine beachtliche Zeit zum Nachladen, was sie gegen leichtere Ziele nicht sehr effektiv macht.]],
-	helptext_pl    = [[Podwojne rakiety, ktore wystrzeliwuje Hacksaw, zadaja bardzo duze obrazenia, jednak maja rownie dlugi czas przeladowania.]],
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -35,7 +31,6 @@ unitDef = {
   footprintZ                    = 3,
   iconType                      = [[defenseskirmaa]],
   levelGround                   = false,
-  mass                          = 208,
   maxDamage                     = 580,
   maxSlope                      = 18,
   minCloakDistance              = 150,
@@ -54,8 +49,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 500,
   useBuildingGroundDecal        = true,
   waterline						= 10,
@@ -117,7 +110,6 @@ unitDef = {
       turnRate                = 70000,
       turret                  = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 1000,
     },
@@ -128,41 +120,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Hacksaw]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 580,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 88,
       object           = [[missiletower_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 88,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Hacksaw]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 580,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 44,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 44,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

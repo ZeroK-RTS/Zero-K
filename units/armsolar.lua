@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 70,
   buildCostMetal                = 70,
   builder                       = false,
@@ -20,10 +19,8 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Erzeugt Energie (2)]],
-    description_pl = [[Produkuje Energię (2)]],
     helptext       = [[Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders.]],
     helptext_de    = [[Solaranlagen sind von den Energiestrukturen die mit der geringsten Kosteneffizienz, aber sie sind auch die verlässlichsten und stabilsten unter ihnen. Sobald sie angegriffen werden ziehen sie sich in eine gepanzerte Form fur 8 Sekunden zurück, die als exzellenter Schutz gegen Raider fungiert.]],
-    helptext_pl    = [[Choc panele sloneczne to najmniej efektywne sposrod elektrowni, sa jednak tanie, wytrzymale i niezawodne. Swietna ochrone zapewnia im mozliwosc zamkniecia sie, co sprawia, ze otrzymuja tylko cwierc obrazen. Zaatakowane, automatycznie zamykaja sie na 8 sekund.]],
     pylonrange = 100,
 	aimposoffset   = [[0 16 0]],
 	midposoffset   = [[0 0 0]],
@@ -39,7 +36,6 @@ unitDef = {
   iconType                      = [[energy_med]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 104,
   maxDamage                     = 500,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -51,7 +47,6 @@ unitDef = {
   script                        = [[armsolar.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
-  side                          = [[ARM]],
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -61,30 +56,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Solar Collector]],
       blocking         = true,
-      damage           = 500,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 28,
       object           = [[arm_solar_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 28,
     },
 
     HEAP  = {
-      description      = [[Debris - Solar Collector]],
       blocking         = false,
-      damage           = 500,
-      energy           = 0,
       footprintX       = 5,
       footprintZ       = 5,
-      metal            = 14,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 14,
     },
 
   },

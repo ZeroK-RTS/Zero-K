@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 2048,
   buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,
@@ -18,17 +17,14 @@ unitDef = {
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[84 84 84]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
   
 
   customParams                  = {
     description_de = [[Erzeugt Energie (25)]],
-    description_pl = [[Produkuje energie (25)]],
     helptext       = [[Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent.]],
     helptext_de    = [[Geothermische Anlagen sind hocheffiziente Energiequellen, die nur auf Thermalquellen auf der Karte gebaut werden können. Sie explodieren heftig, wenn sie zerstört werden. Von daher vermeide es, sie in unmittelbarer Nähe zu deiner Basis zu bauen.]],
-    helptext_pl    = [[Elektrownie geotermalne sa bardzo oszczednym i efektywnym zrodlem energii, jednak moga byc budowane tylko na wylotach geotermalnych, a zniszczenie ich wiaze sie z dosc silnym wybuchem.]],
     pylonrange = 150,
     aimposoffset   = [[0 0 0]],
     midposoffset   = [[0 -10 0]],
@@ -58,7 +54,6 @@ unitDef = {
   script                        = [[geo.lua]],
   seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
-  side                          = [[ARM]],
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -68,31 +63,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Geothermal Generator]],
       blocking         = true,
-      damage           = 1750,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 200,
       object           = [[geo_dead.dae]],
-      reclaimable      = true,
-      reclaimTime      = 200,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Geothermal Generator]],
       blocking         = false,
-      damage           = 1750,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 100,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
   },

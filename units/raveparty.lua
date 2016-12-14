@@ -18,16 +18,13 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 194 70]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[cylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     helptext       = [[The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
     helptext_de    = [[Der Disco Rave Party verschieÃŸt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Ãœberraschung darstellt. Ein SpaÃ?fÃ¼r die ganze Familie!]],
-    helptext_pl    = [[Disco Rave Party wystrzeliwuje kolorowe bomby, z ktorych kazda ma inny efekt. Swietna zabawa dla calej rodziny!]],
 	description_de = [[Regenbogen-Ãœberraschungs Superwaffe]],
-    description_pl = [[Teczowa Niespodzianka!]],
     modelradius    = [[35]],
   },
 
@@ -40,7 +37,6 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 100,
-  mass                          = 791,
   maxDamage                     = 16000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -62,8 +58,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[ARM]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -333,42 +327,18 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Disco Rave Party]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 16000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 12800,
       object           = [[raveparty_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 12800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
     HEAP  = {
-      description      = [[Debris - Disco Rave Party]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 16000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 6400,
       object           = [[debris4x4c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 6400,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

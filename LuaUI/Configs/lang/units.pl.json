@@ -447,7 +447,7 @@
     },
     "armcarry": {
         "name": "Reef",
-        "description": "Lotniskowiec (z tarczą antyrakietową)",
+        "description": "Lotniskowiec",
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "slowmort": {
@@ -1100,7 +1100,7 @@
     },
     "reef": {
         "name": "Reef",
-        "description": "Lotniskowiec (z tarczą antyrakietową)",
+        "description": "Lotniskowiec",
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "corsumo": {
@@ -1125,8 +1125,8 @@
     },
     "armarad": {
         "name": "Zaawansowany radar",
-        "description": "Radar dalekiego zasięgu, zmniejsza niepewność pomiaru",
-        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja. Ponadto zmniejsza niepewność pomiaru wszystkich sojuszniczych radarów, co bardzo pomaga w używaniu jednostek snajperskich takich jak Impaler czy Spectre."
+        "description": "Radar dalekiego zasięgu",
+        "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja."
     },
     "amphraider2": {
         "name": "Archer",

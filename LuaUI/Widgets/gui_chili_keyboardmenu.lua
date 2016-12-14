@@ -23,11 +23,10 @@ local echo				= Spring.Echo
 
 -- config
 include("keysym.h.lua")
-local common_commands, states_commands, factory_commands,
-	econ_commands, defense_commands, special_commands,
-	globalCommands, overrides, custom_cmd_actions = include("Configs/integral_menu_commands.lua")
-
+local factory_commands,econ_commands, defense_commands, special_commands, _, overrides = include("Configs/integral_menu_commands.lua")
+	
 local build_menu_use = include("Configs/marking_menu_menus.lua")
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 local initialBuilder = 'armcom1'
 
@@ -220,14 +219,15 @@ local function AddHotkeyOptions()
 	local options_order_tmp_cmd = {}
 	local options_order_tmp_cmd_instant = {}
 	local options_order_tmp_states = {}
-	for cmdname, number in pairs(custom_cmd_actions) do 
-			
+	for cmdname, cmdData in pairs(custom_cmd_actions) do 
+		local number = cmdData.cmdType
+		
 		local cmdnamel = cmdname:lower()
 		local cmdname_disp = CapCase(cmdname)
 		options[cmdnamel] = {
 			name = cmdname_disp,
 			type = 'button',
-			action = cmdnamel,
+			action = cmdData.name or cmdnamel,
 			path = 'Game/Command Hotkeys',
 		}
 		if number == 2 then
@@ -353,57 +353,6 @@ local function BuildPrev()
 		Spring.SetActiveCommand(last_cmdid)
 	end
 end
-
--- layout handler - its needed for custom commands to work and to delete normal spring menu
-local function LayoutHandler(xIcons, yIcons, cmdCount, commands)
-	widgetHandler.commands   = commands
-	widgetHandler.commands.n = cmdCount
-	widgetHandler:CommandsChanged()
-	local reParamsCmds = {}
-	local customCmds = {}
-	
-	local cnt = 0
-	
-	local AddCommand = function(command) 
-		local cc = {}
-		CopyTable(cc,command )
-		cnt = cnt + 1
-		cc.cmdDescID = cmdCount+cnt
-		if (cc.params) then
-			if (not cc.actions) then --// workaround for params
-				local params = cc.params
-				for i=1,#params+1 do
-					params[i-1] = params[i]
-				end
-				cc.actions = params
-			end
-			reParamsCmds[cc.cmdDescID] = cc.params
-		end
-		--// remove api keys (custom keys are prohibited in the engine handler)
-		cc.pos       = nil
-		cc.cmdDescID = nil
-		cc.params    = nil
-		
-		customCmds[#customCmds+1] = cc
-	end 
-	
-	
-	--// preprocess the Custom Commands
-	for i=1,#widgetHandler.customCommands do
-		AddCommand(widgetHandler.customCommands[i])
-	end
-	
-	for i=1,#globalCommands do
-		AddCommand(globalCommands[i])
-	end
-
-	Update()
-	if (cmdCount <= 0) then
-		return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {} --prevent CommandChanged() from being called twice when deselecting all units (copied from ca_layout.lua)
-	end	
-	return "", xIcons, yIcons, {}, customCmds, {}, {}, {}, {}, reParamsCmds, {[1337]=9001}
-end --LayoutHandler
-
 
 local function SetButtonColor(button, color)
 	button.backgroundColor = color
@@ -889,16 +838,6 @@ local function ProcessCommand(cmd)
 	if not cmd.hidden and cmd.id ~= CMD.PAGES then
 		if (cmd.type == CMDTYPE.ICON_MODE and cmd.params ~= nil and #cmd.params > 1) then 
 			curCommands[#curCommands+1] = cmd
-			
-		elseif common_commands[cmd.id] then 
-			curCommands[#curCommands+1] = cmd
-		
-		--elseif factory_commands[cmd.id] then
-		
-		--elseif econ_commands[cmd.id] then
-		
-		--elseif defense_commands[cmd.id] then
-		
 		elseif special_commands[cmd.id] then --curently terraform
 			curCommands[#curCommands+1] = cmd
 			
@@ -964,7 +903,6 @@ local function SetupCommands( modifier )
 	-- [=[
 	for i = 1, #commands do ProcessCommand(commands[i]) end 
 	for i = 1, #customCommands do ProcessCommand(customCommands[i]) end 
-	for i = 1, #globalCommands do ProcessCommand(globalCommands[i]) end
 	--]=]
 	
 	
@@ -1067,7 +1005,7 @@ local function SetupCommands( modifier )
 			elseif hotkey_mod == modifier and key_buttons[hotkey_key] then
 				local override = overrides[cmd.id]  -- command overrides
 				local texture = override and override.texture or cmd.texture
-				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1) or states_commands[cmd.id]	--is command a state toggle command?
+				local isState = (cmd.type == CMDTYPE.ICON_MODE and #cmd.params > 1)	--is command a state toggle command?
 				if isState and override then 
 					texture = override.texture[cmd.params[1]+1]
 				end
@@ -1142,9 +1080,6 @@ end
 --callins
 
 function widget:Initialize()
-	widgetHandler:ConfigLayoutHandler(LayoutHandler)
-	Spring.ForceLayoutUpdate()
-	
 	widget:SelectionChanged(Spring.GetSelectedUnits())
 
 	-- setup Chili
@@ -1228,8 +1163,6 @@ function widget:Initialize()
 end 
 
 function widget:Shutdown()
-	widgetHandler:ConfigLayoutHandler(options.old_menu_at_shutdown.value) --true: activate Default menu, false: activate dummy (empty) menu, nil: disable menu & CommandChanged() callins . See Layout.lua
-	Spring.ForceLayoutUpdate()
 	if not customKeyBind then
 		Spring.SendCommands("unbind d radialbuildmenu")
 	end

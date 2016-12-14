@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildAngle                    = 32700,
   buildCostEnergy               = 250000,
   buildCostMetal                = 250000,
   builder                       = false,
@@ -19,14 +18,11 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[120 120 120]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_pl = [[Wielki Guzik Wygranej]],
     helptext       = [[I Win!!!]],
-    helptext_pl    = [[Wygralam!!!]],
 	modelradius    = [[60]],
   },
 
@@ -36,7 +32,6 @@ unitDef = {
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 2013,
   maxDamage                     = 12000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -55,8 +50,6 @@ unitDef = {
     },
 
   },
-
-  side                          = [[ARM]],
   sightDistance                 = 99999,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
@@ -120,43 +113,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Starlight]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 12000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 14000,
       object           = [[wreck7x7a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 14000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Starlight]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 12000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 7000,
       object           = [[debris3x3c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 7000,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
   },
 

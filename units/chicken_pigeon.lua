@@ -25,11 +25,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Scout volant]],
 	description_de = [[Fliegender Spore Scout]],
-	description_pl = [[Latajacy zwiadowca]],
     helptext       = [[A small flying chicken scout with spore.]],
     helptext_fr    = [[Le Pigeon est une unit? a?rienne l?g?re mais dot?e d'une attaque ? mi chemin entre la bombe et le missile guid? provoquant des dommages non n?gligeables.]],
 	helptext_de    = [[Ein kleiner, fliegender Chickenaufklärer mit Sporen.]],
-	helptext_pl    = [[Maly latajacy kurczak zwiadowczy, ktory moze wypuszczac zarodniki.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -39,18 +37,15 @@ unitDef = {
   iconType            = [[scoutplane]],
   idleAutoHeal        = 20,
   idleTime            = 300,
-  mass                = 69,
   maxDamage           = 150,
   maxSlope            = 18,
   maxVelocity         = 10,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
   seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -61,10 +56,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   turnRate            = 6000,
   workerTime          = 0,
 

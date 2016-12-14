@@ -16,9 +16,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Artyleria rozbrajajaca]],
     helptext       = [[The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless.]],
-    helptext_pl    = [[Racketeer to wyrzutnia pociskow dalekiego zasiegu, ktore rozbrajaja trafione jednostki. Swietnie nadaje sie do unieszkodliwiania ciezkich jednostek i do wyczerpywania wrogich tarcz.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -106,9 +104,11 @@ unitDef = {
       reloadtime              = 6,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
+      soundHitVolume          = 9.0,
       soundStart              = [[weapon/missile/missile_launch_high]],
+      soundStartVolume        = 11.0,
       startvelocity           = 250,
---      texture1                = [[spark]], --flare
+	  --texture1                = [[spark]], --flare
       texture3                = [[spark]], --flame
       tolerance               = 4000,
       tracks                  = true,
@@ -123,30 +123,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Racketeer]],
       blocking         = true,
-      damage           = 950,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 140,
       object           = [[dominator_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 140,
     },
 
     HEAP  = {
-      description      = [[Debris - Racketeer]],
       blocking         = false,
-      damage           = 950,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 70,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 70,
     },
 
   },
