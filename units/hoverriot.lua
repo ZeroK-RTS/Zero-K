@@ -25,7 +25,7 @@ unitDef = {
 	description_de = [[Riotgleiter]],
     helptext       = [[The Mace is a mobile maser tower. Its high firepower is useful for killing light enemy units. It is perfectly accurate and is good against gunships and fast units. However, its thin armor makes it vulnerable when targetted directly, especially by skirmishers.]],
     helptext_fr    = [[Le Mace est une tour maser mobile. Sa forte puissance de feu et sa pr?cision parfaite sont appreciable pour se debarrasser de petites unit?s.]],
-	helptext_de    = [[Der Mace ist ein mobiler Maserturm. Seine hohe Feuerkraft ist nÃ¼tzlich, um leichte, feindliche Einheiten zu tÃ¶ten. Er schieÃt hÃ¶chst prÃ¤zise und erweist sich gegen Hubschrauber und schnelle Einheiten als nÃ¼tzlich. Trotzdem macht ihn seine einfache Verteidigung anfÃ¤llig fÃ¼r direkte Angriffe, vor allem durch Skirmisher.]],
+	helptext_de    = [[Der Mace ist ein mobiler Maserturm. Seine hohe Feuerkraft ist nützlich, um leichte, feindliche Einheiten zu töten. Er schießt höchst präzise und erweist sich gegen Hubschrauber und schnelle Einheiten als nützlich. Trotzdem macht ihn seine einfache Verteidigung anfällig für direkte Angriffe, vor allem durch Skirmisher.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
