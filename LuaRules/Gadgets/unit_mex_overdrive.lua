@@ -58,7 +58,7 @@ local enableMexPayback = ((odSharingModOptions == "investmentreturn") or (odShar
 
 include("LuaRules/Configs/constants.lua")
 
-local QUADFIELD_SQUARE_SIZE = 0 -- set to be twice the largest pylon range (so a pylon can be in 4 quads at most)
+local QUADFIELD_SQUARE_SIZE = 0
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -84,6 +84,7 @@ for i = 1, #UnitDefs do
 		}
 	end
 end
+QUADFIELD_SQUARE_SIZE = QUADFIELD_SQUARE_SIZE * 2 -- set to be twice the largest pylon range (so a pylon can be in 4 quads at most)
 
 local alliedTrueTable = {allied = true}
 local inlosTrueTable = {inlos = true}
