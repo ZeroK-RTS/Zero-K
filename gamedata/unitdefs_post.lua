@@ -372,23 +372,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Increase pathable areas of yardmaps for new engine as a test.
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if name == "factorytank" then
-			ud.yardmap = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy"
-		elseif name == "factoryveh" then
-			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
-		elseif name == "factorycloak" then
-			ud.yardmap = "ooooooo ooooooo ooooooo occccco occccco occccco occccco"
-		end
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
 -- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
 

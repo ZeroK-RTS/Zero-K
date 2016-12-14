@@ -71,7 +71,7 @@ unitDef = {
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = [[ooooooo ooooooo ooooooo oocccoo oocccoo oocccoo oocccoo]],
+  yardMap                       = "ooooooo ooooooo ooooooo occccco occccco occccco occccco",
 
   featureDefs                   = {
 
