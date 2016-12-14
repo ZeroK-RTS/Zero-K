@@ -237,24 +237,30 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 	end
 	
+	function gadget:GameStart()
+		Spring.SetGameRulesParam("sharemode",config.mergetype)
+	end
+	
 	function gadget:GameFrame(f)
 		if f%30 == 0 then
 			local invitestring
 			for player,invites in pairs(Invites) do
 				invitestring = ""
-				for _,data in pairs(invites) do
-					data["timeleft"] = data["timeleft"] - 1
-					if data["timeleft"] == 0 then
-						data = nil
+				for key,data in pairs(invites) do
+					if data["timeleft"] > 0 then
+						data["timeleft"] = data["timeleft"] - 1
 					end
-					if data and invitestring ~= "" then
+					if data["timeleft"] == 0 then
+						invites[key] = nil
+					end
+					if data and invitestring ~= "" and data["timeleft"] > 0 then
 						invitestring = invitestring .. ", " .. data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
 					else
 						invitestring = data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
 					end
 				end
-				Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
-				Spring.SetTeamRulesParam(player,"invites",invitestring,'private')
+				--Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
+				Spring.SetTeamRulesParam(player,"invites",invitestring,{private=true})
 			end
 		end
 		if f== config.mintime then
