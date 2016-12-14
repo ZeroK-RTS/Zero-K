@@ -6,7 +6,7 @@ unitDef = {
   brakeRate           = 0.26,
   buildCostEnergy     = 160,
   buildCostMetal      = 160,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
