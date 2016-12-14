@@ -22,7 +22,6 @@ unitDef = {
 
   customParams           = {
     description_de = [[Schnelles Flugabwehr Fahrzeug]],
-    description_pl = [[Szybki pojazd przeciwlotniczy]],
     helptext       = [[The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships.]],
     helptext_de    = [[Crasher ist eine schnelle Antwort auf Flugzeuge. Er ist also gut genug gegen Hubschrauber.]],
 	modelradius    = [[9]],

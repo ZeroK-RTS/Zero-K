@@ -22,7 +22,6 @@ unitDef = {
 
   customParams           = {
     description_fr = [[Destroyer]],
-    description_pl = [[Niszczyciel]],
 	description_de = [[Zerstörer]],
     helptext       = [[The Daimyo class destroyer packs a wallop with its main gun, a powerful riot cannon. It also features missiles that can hit submarines and surface targets alike. The Daimyo is best attacked from afar, using surface ships or hovercraft with long-range weapons.]],
 	extradrawrange = 420,

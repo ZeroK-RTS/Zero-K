@@ -20,7 +20,6 @@ unitDef = {
     amph_regen = 60,
     amph_submerged_at = 30,
 	sink_on_emp    = 0,
-    description_pl = [[Amfibijny bot plywak]],
     helptext       = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
     floattoggle    = [[1]],
   },

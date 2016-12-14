@@ -21,7 +21,6 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
     midposoffset   = [[0 10 0]],
   },

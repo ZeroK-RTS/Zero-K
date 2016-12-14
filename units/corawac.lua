@@ -23,7 +23,6 @@ unitDef = {
   cruiseAlt           = 250,
 
   customParams        = {
-    description_bp = [[Avi?o invisível a radar com radar e sonar]],
     description_fr = [[Avion Sonar/Radar Furtif]],
 	description_de = [[Tarnkappen Radar/Sonar Flugzeug]],
     helptext       = [[The Vulture provides an unparalleled means for deep scouting, and can locate underwater targets with its sonar. It is also equipped with an area jammer, which prevents radar from working in the area underneath.]],

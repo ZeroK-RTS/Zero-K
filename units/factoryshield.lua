@@ -35,12 +35,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_es = [[Produce robot de infanter?a, Construye a 10 m/s]],
-    description_fi = [[Jalkav?kirobottitehdas. Rakentaa jalkav?kirobotteja 10m/s nopeudella]],
     description_fr = [[Produit des Robots d'Infanterie L. une vitesse de 10 m/s]],
-    description_it = [[Produce robot d'infanteria, Costruisce a 10 m/s]],
 	description_de = [[Produziert zähe Roboter, Baut mit 10 M/s]],
-	description_pl = [[Buduje opancerzone roboty, moc 10 m/s]],
     helptext       = [[The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer]],
     helptext_it    = [[L'Infantry Bot Factory ? una fabbrica ideale per manovre tattiche in terreno difficile, con una selezione diversa di unit? da invasione, da scaramuccia, e da rissa. Quello che gli manca in forza lo recupera in mobilit? e numeri.]],
 	helptext_de    = [[Die Shield Bot Factory ist robust aber flexibel. Diese Einheiten werden gebaut, um all die Schmerzen auf sich zu nehmen und wieder zu verteilen, aber ohne Kompromisse bei der Mobilität. Schlauer Einsatz von Einheitenkombos wird gut belohnt. Wichtigste Einheiten: Bandit, Thug, Outlaw, Roach, Dirtbag]],

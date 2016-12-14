@@ -20,12 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô agressor]],
-    description_es = [[Robot de invasi?n]],
-    description_fi = [[Hy?kk??j?robotti]],
     description_fr = [[Robot Pilleur]],
-    description_it = [[Robot d'invasione]],
-    description_pl = [[Lekki bot]],
 	description_de = [[Leichter Raider Roboter]],
     helptext       = [[Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmanouver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat.]],
     helptext_fr    = [[L?ger et peut couteux, le Glaive peut ?tre produit en masse , mais meurt tres rapidement et n'offre aucune r?sistance face ? des opposants s?rieux. A contrer avec des ?meutiers ou des LLTs]],

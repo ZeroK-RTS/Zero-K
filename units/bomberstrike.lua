@@ -23,7 +23,6 @@ unitDef = {
   cruiseAlt           = 160,
 
   customParams        = {
-    description_pl = [[Bombowiec taktyczny]],
     helptext       = [[The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets.]],
     --modelradius    = [[10]],
   },

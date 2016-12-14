@@ -21,11 +21,7 @@ unitDef = {
 
   customParams           = {
     description_de = [[Geländegängige Sturmspinne]],
-    description_bp = [[Rob?assaltante]],
-    description_es = [[Robot de Asalto]],
     description_fr = [[Robot d'assaut arachnide]],
-    description_it = [[Robot d'assalto]],
-    description_pl = [[Pajak szturmowy]],
     helptext       = [[The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses.]],
     helptext_fr    = [[Le Hermit est extraordinairement résistant pour sa taille. Si son canon ?plasma n'a pas la précision requise pour abattre les cibles rapides il reste néanmoins un bouclier parfait pour des unités moins solides telles que les Recluses.]],
     helptext_it    = [[Il Hermit ?incredibilmente resistente, ed e utile come scudo per i Recluse che fanno pi?danno]],

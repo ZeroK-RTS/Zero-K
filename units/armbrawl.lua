@@ -27,10 +27,8 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_bp = [[Aeronave de ataque terrestre]],
     description_fr = [[ADAV d'Assaut Terrestre]],
 	description_de = [[Luftnaher Unterstützungskampfhubschrauber]],
-	description_pl = [[Statek powietrzny wsparcia]],
 	helptext       = [[The Brawler is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put.]],
     helptext_de    = [[Der Brawler ist eine Angriffseinheit, die den meisten Bodenrakten ausweichen kann. Der Brawler besitzt genug Munition, um begrenztes Anti-Air Feuer zu überleben und seine Zwillings-EMGs zerfetzen die Panzerung als wäre es Papier.]],
     helptext_fr    = [[Le Brawler est un ADAV lourd, de par son blondage comme de par le calibre de ses mitrailleuses. Il peut donc résister r des défenses anti air assez longtemps pour s'en débarrasser. Un redoutable ADAV, mais cependant sans défense contre l'air.]],

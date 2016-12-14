@@ -19,7 +19,6 @@ unitDef = {
   customParams        = {
     description_fr = [[Taupe Scout/Raider]],
 	description_de = [[Eingrabender Scout/Raider]],
-	description_pl = [[Podziemny zwiadowca]],
 	-- Currently Diggers only appear through ninja spawn (not actual unburrowing) and there is no "seismic detection equipment"
     -- helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment.]],
     helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can undetectably travel underground and appear anyplace it can cause mayhem. Protect your valuables directly, as Diggers can bypass your main defense lines.]],

@@ -19,7 +19,6 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_pl = [[Wiezyczka przeciwpancerna]],
     helptext       = [[The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks.]],
     keeptooltip    = [[any string I want]],
     neededlink     = 25,

@@ -23,7 +23,6 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-    description_pl = [[Ciezki kurczak powietrzny]],
     helptext       = [[Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken.]],
   },
 

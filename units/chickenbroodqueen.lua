@@ -47,7 +47,6 @@ unitDef = {
   customParams        = {
     description_fr = [[Reine pondeuse]],
 	description_de = [[Pflegt und hegt das Nest]],
-	description_pl = [[Dba o Kurnik]],
     helptext       = [[The egg-laying brood queen is not quite as fearsome in combat as the other queen, but can in the long run present an even bigger threat. It produces all the different chicken breeds of the Thunderbirds.]],
     helptext_fr    = [[Cette reine pondeuse n'est pas aussi effrayante en combat que l'autre reine mais peut ? long terme se montrer une menace bien plus grande. En ?ffet elle peut engendrer rapidement par elle-m?me toutes les unit?s poulet.]],
 	helptext_de    = [[Die eierlegende, brEende Königin ist im Gefecht nicht ganz so furchterregend wie die anderen Königinnen, aber auf weite Sicht kann sie sogar eine größere Gefahr darstellen. Sie erzeugt all die verschiedenen Chickenrassen der Thunderbirds.]],

@@ -46,7 +46,6 @@ unitDef = {
 
   customParams        = {
     description_de = [[Leichte Abschirmeinrichtung]],
-    description_pl = [[Tarcza obszarowa]],
     helptext       = [[The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons.]],
     helptext_de    = [[Aegis schützt deine Einheiten in mit seinem Schild vor Angriffen, die durch den Schild absorbiert werden können, aber nur solange die nötige Energieversorgung gewährleistet ist und der Beschuss nicht zu stark wird.]],
 	removewait     = 1,

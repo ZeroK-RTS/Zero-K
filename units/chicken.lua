@@ -17,7 +17,6 @@ unitDef = {
 
   customParams        = {
     description_fr = [[Soldat de colonie]],
-	description_pl = [[Wojownik kolonii]],
 	description_de = [[Schwärmer]],
     helptext       = [[The footsoldier of the Thunderbirds is an aggressive zergling-type unit. What it lacks in individual strength, it compensates for with its sheer numbers, overwhelming enemies with floods and floods of little chickens. A good riot unit is recommended for stopping them.]],
     helptext_fr    = [[Le soldat de base terrestre des poulets est une petite créature rapide et agressive apparentée aux Zergs. Seul peu utile, sa force se révèle lors d'assaut en masse compacte, submergeant l'adversaire sous un flôt continu d'unités pouvant réduire en cendres une base entière. Pour les contrer rien de mieux qu'une arme anti émeute. Plusieurs étant préférable.]],

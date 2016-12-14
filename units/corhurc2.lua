@@ -24,10 +24,8 @@ unitDef = {
   cruiseAlt           = 180,
 
   customParams        = {
-    description_bp = [[Bombardeiro de Napalm]],
     description_fr = [[Bombardier Napalm]],
 	description_de = [[Napalmbomber]],
-	description_pl = [[Bombowiec z napalmem]],
     helptext       = [[The Phoenix's napalm bombs decimate large clumps of units and light structures.]],
     helptext_fr    = [[Une escardre de Phoenix est une des pires chose qui puisse apparaître sur les radars ennemis. Rapides et efficaces, le Firestorm tapisse le sol de bombes au napalm faisant des dégâts r l'impact et sur la durée.]],
 	helptext_de    = [[Die Napalmbomben des Firestorms dezimieren große Haufen an Einheiten und leichten Bauwerken.]],

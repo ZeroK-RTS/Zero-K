@@ -28,7 +28,6 @@ unitDef = {
   customParams        = {
     description_fr = [[Hovercraft de Construction, Construit r 5 m/s]],
 	description_de = [[Konstruktionsluftkissenboot, Baut mit 5 M/s]],
-	description_pl = [[Poduszkowiec konstrukcyjny, moc 5 m/s]],
     helptext       = [[The Quill allows smooth expansion across both land and sea.]],
     helptext_fr    = [[L'Hovercon est rapide et agile mais son blindage et ses nanoconstructeurs sont de mauvaise facture.]],
     helptext_de    = [[Quill erlaubt dir leichtgängige Expansionen über Land und See.]],

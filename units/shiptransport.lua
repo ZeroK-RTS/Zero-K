@@ -22,7 +22,6 @@ unitDef = {
   customParams        = {
     description_de = [[Transportboot]],
     description_fr = [[Barge de Transport]],
-    description_pl = [[Platforma Transportowa]],
     helptext       = [[The Surfboard serves as a naval transport and firing platform--that is, any unit on the Surfboard can fire off of it.]],
     helptext_de    = [[Das Surfboard bietet sich als Wassertransportmittel und als Feuerplattform an, denn alle auf dem Surfboard transportierten Einheiten können weiter feuern.]],
     helptext_fr    = [[Le Surfboard est un navire de transport et une plateforme de tir. Les unités transportées peuvent se servir de leurs armes.]],

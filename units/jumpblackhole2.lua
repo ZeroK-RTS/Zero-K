@@ -16,12 +16,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô dispersador]],
-    description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
-    description_it = [[Robot da rissa]],
     description_de = [[Riot Roboter]],
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
   },
 

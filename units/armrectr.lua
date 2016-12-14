@@ -30,13 +30,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô de contru??o e captura, constrói a 5 m/s]],
     description_de = [[Getarnter Konstruktionsroboter, Baut mit 5 M/s]],
-    description_es = [[Robot de Construccion/Captura, Construye a 5 m/s]],
-    description_fi = [[Rakentaja/kaappaajarobotti, rakentaa 5m/s  nopeudella]],
     description_fr = [[Robot de Construction/Capture, Construit ? 5 m/s]],
-    description_it = [[Robot da Costruzzione/Cattura, Costruisce a 5 m/s]],
-    description_pl = [[Bot konstruktor z maskowaniem, moc 5 m/s]],
     helptext       = [[The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance.]],
     helptext_fr    = [[]],
     helptext_de    = [[Der Conjurer besitzt einen Störsender mit kurzer Reichweite und ein Tarngerät, um geheim und unerkannt expandieren zu können.]],

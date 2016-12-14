@@ -19,12 +19,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô agressor]],
-    description_es = [[Robot de invasión]],
     description_fr = [[Robot Pilleur]],
-    description_it = [[Robot d'invasione]],
 	description_de = [[Mittel-leichter Raider Roboter]],
-	description_pl = [[Lekki bot]],
     helptext       = [[The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs.]],
     helptext_fr    = [[Le Bandit est plus puissant que sa contre partie ennemie, le Glaive. Il n'est cependant pas tr?s puissant et ne passera pas contre quelques d?fenses: LLT ou ?meutiers. ]],
     helptext_it    = [[Come unita d'invasione, il Bandit sacrifica potenza di fuoco per sopravvivenza. ? pi? resistente del suo equivalente Nova, ma comnque non ? da mandare contro nemici ben difesi. Si contrastano con unita da rissa ed llt.]],

@@ -17,13 +17,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha escaramucadora]],
     description_de = [[Skrimish Spinne (Indirektes Feuer)]],
-    description_es = [[Ara?a escaramuzadora]],
-    description_fi = [[Kahakkakiipeilij?]],
     description_fr = [[Araignée à salve de missiles]],
-    description_it = [[Ragno scaramuzzatore]],
-    description_pl = [[Pajak harcownik]],
     helptext       = [[An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range.]],
     helptext_de    = [[Eine raketenschiessende Einheit, die jedes Terrain betreten kann. Klettere mit der Spinne an Waeden hoch und ueberrasche deine Gegner mit Angriffen aus unmoeglichen Lagen. Die Raketen ohne Zielfuehrung treffen aber selten schnelle Ziele, trotzdem darf man ihre grosse Reichweite nicht vernachlaessigen.]],
     helptext_fr    = [[Une unité lance-missiles tout-terrain. Grimpe le long des parois et les reliefs impraticables pour surprendre vos ennemis. Les salves de roquettes non-guidées ne peuvent atteindre une cible très mobile que par chance mais elles ont une portée importante. Peut être aisément éliminée si utilisée sans soutien.]],

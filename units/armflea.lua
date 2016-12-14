@@ -17,13 +17,8 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Robô batedor escalador]],
     description_de = [[Ultraleichte Kundschafter Spinne]],
-    description_es = [[Robot All-Terrain de exploración]],
-    description_fi = [[Maastokelpoinen tiedustelurobotti]],
     description_fr = [[Éclaireur tout terrain ultra léger]],
-    description_it = [[Robot All-Terrain da ricognizione]],
-    description_pl = [[Terenowy Pajak Zwiadowczy]],
     helptext       = [[The Flea can hide in inaccessible locations where its sophisticated sensor suite allows it to see further than it can be seen. It can be used in small groups to effectively raid mexes early on, and in maps with tall cliffs can attack from unexpected angles. It does very little damage and dies to any form of opposition.]],
     helptext_de    = [[Flea kann sich in unerreichbaren Gegenden verstecken, wo ein durchdachter Sensor es ermöglicht weiter zu sehen als Flea gesehen werden kann. In kleinen Gruppen kann es effektiv die gegnerischen Extraktoren überlaufen. Es macht aber nur wenig Schaden und stirbt sofort bei irgendeiner Gegenwehr.]],
     helptext_fr    = [[Le Flea, unité ultra légère invisible une fois immobile, peut se cacher dans des endroits inaccessibles d'où il peut observer de loin grâce à ses capteurs sophistiqués sans être vu, tel un éclaireur. Il peut aussi être utilisé en petit groupe pour effectuer des raids surprises sur les éléments de production enemis non protégés, en début de jeu. Il ne cause que très peu de dégats et meurt aisément face à toute opposition.]],

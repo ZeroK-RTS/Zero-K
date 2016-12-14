@@ -23,7 +23,6 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Erzeugt Energie (25)]],
-    description_pl = [[Produkuje energie (25)]],
     helptext       = [[Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent.]],
     helptext_de    = [[Geothermische Anlagen sind hocheffiziente Energiequellen, die nur auf Thermalquellen auf der Karte gebaut werden können. Sie explodieren heftig, wenn sie zerstört werden. Von daher vermeide es, sie in unmittelbarer Nähe zu deiner Basis zu bauen.]],
     pylonrange = 150,

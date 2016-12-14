@@ -23,7 +23,6 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-    description_pl = [[Karny kurczak]],
     helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
 	level		   = [[1]],
   },

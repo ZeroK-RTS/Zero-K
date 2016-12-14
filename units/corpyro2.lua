@@ -19,9 +19,7 @@ unitDef = {
 
   customParams          = {
     canjump        = [[1]],
-    description_es = [[Invasor Caminante Jumpjet]],
     description_fr = [[Marcheur Pilleur r Jetpack]],
-    description_it = [[Invasore Camminatore Jumpjet]],
 	description_de = [[Raider Jumpjet Roboter]],
     fireproof      = [[1]],
     helptext       = [[The Pyro is a cheap, fast walker with a flamethrower. The flamethrower deals increased damage to large units and can hit multiple targets at the same time. When killed, the Pyro sets surrounding units on fire. Additionally, Pyros also come with jetpacks, allowing them to jump over obstacles or get the drop on enemies.]],

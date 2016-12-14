@@ -26,12 +26,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Veículo construtor, constrói a 5 m/s]],
-    description_es = [[vehículo para Construcción, construye a 5 m/s]],
     description_fr = [[V?hicule de Construction, Construit ? 5 m/s]],
-    description_it = [[Veicolo da Costruzzione, costruisce a 5 m/s]],
 	description_de = [[Konstruktionsfahrzeug, Baut mir 5 M/s]],
-	description_pl = [[Pojazd konstruktor, moc 5 m/s]],
     helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
     helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
     helptext_it    = [[Altamente mobile e capace di prendere parecchi colpi, il Mason pu? rapidamente espandere il tuo territorio in una grande area]],

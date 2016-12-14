@@ -22,10 +22,8 @@ unitDef = {
   corpse                        = [[DEAD]],
   
   customParams = {
-    description_bp = [[]],
     description_fr = [[]],
     description_de = [[Frühwarnsystem]],
-    description_pl = [[System wczesnego ostrzegania]],
     helptext       = [[The Radar tower provides early warning of enemy units and their movements over a moderate distance at virtually no cost. It has a very small but steady energy cost and will automatically shut down if you run out of energy. Radar coverage is blocked by terrain such as mountains.]],
     helptext_fr    = [[]],
     helptext_de    = [[Dieser Radarturm ermöglicht die frühzeitige Lokalisierung von feindlichen Einheiten in der entsprechenden Reichweite. Für den Betrieb wird eine sehr kleine Menge Energie benötigt. Die Radarbedeckung wird durch Gelände - beispielsweise Berge - blockiert.]],

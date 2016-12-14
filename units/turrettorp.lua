@@ -23,7 +23,6 @@ unitDef = {
   customParams      = {
     description_fr = [[Lance Torpille]],
 	description_de = [[Torpedowerfer]],
-	description_pl = [[Wyrzutnia torped]],
 	-- commented out: mentions of exterior sonar (now torp has its own)
     helptext       = [[This Torpedo Launcher provides defense against both surface and submerged vessels.]], -- Remember to build sonar so that the Torpedo Launcher can hit submerged targets. 
     helptext_fr    = [[Ce lance torpille permet de torpiller les unites flottantes ou immergees.]], -- Construisez un sonar afin de d?tecter le plus t?t possible les cibles potentielles du Harpoon. 

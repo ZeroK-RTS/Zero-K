@@ -22,7 +22,6 @@ unitDef = {
   customParams        = {
     description_fr = [[Hovercraft d'Attaque Éclair]],
     description_de = [[Schnellangriff Luftkissenboot]],
-    description_pl = [[Lekki poduszkowiec]],
     helptext       = [[The Dagger is the hover plant's scout. It provides a cheap, disposable method of getting intel, and can also hit economic targets of opportunity. Its light sonic cannon can attack surface and underwater targets alike.]],
     helptext_fr    = [[Le Dagger est petit, maniable, rapide et n'a qu'une faible puissance de feu. Idéal pour les attaques surprises depuis la mer, il surprendra bien des ennemis. Son blindage est cependant trop faible pour faire face r une quelquonque résistance. ]],
     helptext_de    = [[Der Dagger ist der Aufklärer unter den Luftkissenbooten. Es bietet dir eine kostengünstige, entbehrliche Möglichkeit deinen Feind frühzeitig um seine Rohstoffquellen zu bringen.]],

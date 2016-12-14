@@ -36,7 +36,6 @@ unitDef = {
     pad_count = 1,
     landflystate   = [[0]],
     description_de = [[Produziert Flugzeuge, Baut mit 10 M/s]],
-    description_pl = [[Buduje samoloty, moc 10 m/s]],
     helptext       = [[The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms. The plant also comes bundled with one rearm pad.]],
 	helptext_de    = [[Das Airplane Plant ermöglicht den Bau vielfältiger Starrflügelflugzeuge, um deine Bedürfnisse zu stillen. Wähle zwischen Allzweckjägern, die sowohl leichte Attacken fliegen können, als auch als Abfangjäger fungieren, und präzisen Bombern, um spezielle Ziele zu vernichten. Es befüllt außerdem die Bomber.]],
     sortName = [[4]],

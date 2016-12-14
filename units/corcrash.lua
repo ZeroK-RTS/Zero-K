@@ -20,12 +20,8 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô anti-aéreo]],
-    description_es = [[Robot Antiaéreo]],
     description_fr = [[Robot Anti-Air]],
-    description_it = [[Robot da contraerea]],
 	description_de = [[Flugabwehr Roboter]],
-	description_pl = [[Bot przeciwlotniczy]],
     helptext       = [[The Vandal is a cheap, hardy and reliable dedicated anti-air bot. Defenseless vs. land forces.]],
     helptext_fr    = [[Le Vandal est l'unit? anti-air de base, il tire des missiles guid?s ? une cadence peu rapide. Redoutable en groupe, il sert ? prot?ger bases et troupes.]],
     helptext_it    = [[Il Vandal é un economico robot da contraerea. Offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],

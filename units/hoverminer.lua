@@ -17,7 +17,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Poduszkowiec - stawiacz min]],
     helptext       = [[The Dampener deploys mines a short distance from itself.]],
   },
 

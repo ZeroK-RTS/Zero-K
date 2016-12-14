@@ -27,11 +27,8 @@ unitDef = {
     jump_from_midair   = 0,
     jump_spread_exception = 1,
 
-    description_es = [[Caja de tierra]],
     description_fr = [[]],
-    description_it = [[Scatola di terra]],
     description_de = [[Behalter voller Dreck]],
-    description_pl = [[Pudlo z piachem]],
     helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
   },
 

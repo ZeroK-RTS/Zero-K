@@ -18,7 +18,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Poduszkowiec do walki podwodnej]],
     helptext       = [[The Morningstar comes armed with a sonic pulse cannon which completely doesn't care whether target is above or under water.]],
   },
 

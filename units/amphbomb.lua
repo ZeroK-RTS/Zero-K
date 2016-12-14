@@ -24,7 +24,6 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    description_pl = [[Amfibijna bomba spowalniajaca]],
     helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
  	maxwatertank = [[100]],
  },

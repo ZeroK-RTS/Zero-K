@@ -35,7 +35,6 @@ unitDef = {
 
   customParams           = {
     description_de = [[Produziert Schiffe, Baut mit 10 M/s]],
-    description_pl = [[Stocznia, moc 10 m/s]],
 	helptext       = [[Shipyard is where both ships and submarines are built. Other waterborne units such as hovercraft and amphibious bots have separate factories.]],
 	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
     sortName       = [[7]],

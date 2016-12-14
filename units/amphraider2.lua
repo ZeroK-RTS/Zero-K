@@ -22,7 +22,6 @@ unitDef = {
     amph_submerged_at = 40,
 	sink_on_emp    = 1,
     helptext       = [[The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units.]],
-    description_pl = [[Plywajacy bot wsparcia]],
     maxwatertank   = [[180]],
     floattoggle    = [[1]],
   },

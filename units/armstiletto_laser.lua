@@ -20,10 +20,8 @@ unitDef = {
   cruiseAlt           = 180,
 
   customParams        = {
-    description_bp = [[Bombardeiro de desarmar]],
     description_de = [[Entwaffnungbomber]],
     description_fr = [[Bombardier desarmant]],
-    description_pl = [[Bombowiec rozbrajajacy]],
     helptext       = [[Fast bomber armed with a lightning generator that disarms units in a wide area under it.]],
     helptext_de    = [[Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons desarmant pouvant désarmer les unités dans une large bande.]],

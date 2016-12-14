@@ -30,10 +30,8 @@ unitDef = {
     jump_reload      = 10,
     jump_from_midair = 0,
 
-    description_bp = [[Bomba rastejante avançada e camuflável]],
     description_fr = [[Bombe Rampante Avancée Camouflable]],
 	description_de = [[Fortgeschrittene, verschleierbare Crawling Bombe]],
-	description_pl = [[Skaczaca bomba z maskowaniem]],
     helptext       = [[This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it.]],
     helptext_fr    = [[Le Skuttle est une arme redoutable, il s'agit en fait d'un mine armée d'une tete nucléaire légcre, équipée d'un camouflage optique et d'un jetpack. Capable de se faufiler dans les endroits les plus inatendus, le souffle de son explosion est capable de faire des dégâts effroyables. Il se fera cependant détecter si il approche trop d'une cible ennemie. ]],
 	helptext_de    = [[Der Skuttle wirft sich als Kamikazekrieger in die Schlacht und kann dir enorme Vorteile erarbeiten. Hochwirksam gegen schwere Ziele. Der Explosionsradius ist minimal, deshalb gilt: sorgfältig nutzen.]],

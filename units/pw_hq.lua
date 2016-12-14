@@ -16,7 +16,6 @@ unitDef = {
 
   customParams                  = {
     description_de = [[PlanetWars Hauptquartier (verandert Einflussgewinn)]],
-    description_pl = [[Kwatera Glowna PlanetWars (zwieksza wplywy)]],
     helptext       = [[This building is integral to strategic control of the planet. If the winning team is an attacker and has lost their Command Center, their influence gains are halved. If the defender wins, their loss of the CC causes the attacker to keep 20% of the influence gain.]],
     helptext_de    = [[Dieses Gebäude ist für die strategische Kontrolle des Planeten unerlässlich. Wenn das Gewinnerteam seine Kommandozentrale verloren hat, erhält es nur die Hälfte der Einflusspunkte.]],
   	dontcount = [[1]],

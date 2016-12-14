@@ -35,7 +35,6 @@ unitDef = {
 
 	cloakstealth = [[1]],
 	description_de = [[Hochmobiler Kommandant]],
-	description_pl = [[Mobilny Dowodca]],
 	helptext       = [[The Recon Commander revolves around mobility and guile; this lightly armored platform can mount many special weapons and modules and comes pre-equipped with jumpjets.]],
 	helptext_de    = [[Bei dem Recon Commander dreht sich alles um Mobilit‰t und List. Dieser schwach gepanzerte Grundsatz kann um viele Spezialwaffen und -module erweitert werden. Er besitzt auﬂerdem einen D?enstrahl zum Springen.]],
 	level = [[1]],

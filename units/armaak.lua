@@ -22,11 +22,8 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 0,
 
-    description_bp = [[Robô anti-ar pesado]],
     description_de = [[Flugabwehr Springer]],
-    description_fi = [[Korkeatehoinen ilmatorjuntarobotti]],
     description_fr = [[Marcheur Anti-Air Lourd]],
-    description_pl = [[Ciezki robot przeciwlotniczy (skacze)]],
     helptext       = [[The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape.]],
 	helptext_de    = [[Der Archangel besitzt ein Doppel-Anti-Air-Laser und eine automatische Kanone, um gegnerische Lufteinheiten zu zerstören. Der Archangel kann auch einen Sprung machen.]],
     helptext_fr    = [[L'Archangel est munis d'un laser double anti air et d'un autocannon similaire au packo pour pouvoir an?antire les avions enemis.]],

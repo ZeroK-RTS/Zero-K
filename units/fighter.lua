@@ -24,7 +24,6 @@ unitDef = {
   cruiseAlt              = 200,
 
   customParams           = {
-    description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
 	description_de = [[Mehrzweck-Tarnkappenjäger]],
     helptext       = [[The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],

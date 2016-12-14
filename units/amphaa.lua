@@ -25,7 +25,6 @@ unitDef = {
     amph_regen = 20,
     amph_submerged_at = 40,
 	sink_on_emp    = 1,
-    description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
     floattoggle = [[1]],
   },

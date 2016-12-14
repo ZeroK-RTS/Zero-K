@@ -19,7 +19,6 @@ unitDef = {
 
   customParams           = {
     description_de = [[Artillerieroboter für Sättigungsfeuer]],
-    description_pl = [[Robot wsparcia artyleryjskiego]],
     helptext       = [[The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver.]],
 	helptext_de    = [[Der Firewalker setzt mit seinem Mörser auf mittlerer Distanz Gebiete in Brand und macht sie somit für kurze Zeit unbrauchbar. Die Einheit selber ist schwerfällig und langsam zu manövrieren.]],
   },

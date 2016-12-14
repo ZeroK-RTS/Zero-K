@@ -57,7 +57,6 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_pl = [[Latajacy konstruktor do zadan specjalnych, moc 7.5 m/s]],
     description_fr = [[ADAV de Construcion Furtif Camouflable, Construit r 7.5 m/s]],
     description_de = [[Fliegender SpecOps Bauleiter, Baut mit 7.5 m/s]],
     helptext       = [[The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army.]],

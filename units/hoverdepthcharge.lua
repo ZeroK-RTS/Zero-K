@@ -22,7 +22,6 @@ unitDef = {
 
   customParams        = {
     helptext        = [[The somewhat suicidal Claymore is armed with a heavy depthcharge launcher and has no qualms about dropping it on land.]],
-    description_pl  = [[Poduszkowiec przeciwpodwodny]],
     turnatfullspeed = [[1]],
   },
 

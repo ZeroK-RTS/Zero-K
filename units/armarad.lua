@@ -21,7 +21,6 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Langstreckenradar, halbiert Radarungenauigkeit]],
-    description_pl = [[Radar Dalekiego Zasiegu z ulepszeniem dokladnosci]],
     helptext       = [[The advanced Radar Tower has a considerably greater range than the basic version. ]],
     helptext_de    = [[Der erweiterte Radarturm hat eine weitaus größere Radarreichweite als die Standardvariante. ]],
     modelradius    = [[16]],

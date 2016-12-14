@@ -22,7 +22,6 @@ unitDef = {
   customParams                  = {
     description_fr = [[Laser Anti-Air]],
     description_de = [[Gehärtetes Flugabwehrlaser]],
-    description_pl = [[Laser przeciwlotniczy]],
     helptext       = [[The Razor is a hardy anti-air turret. Its high hit points and 4x armour bonus when closed makes it very hard for the enemy to dislodge.]],
     helptext_fr    = [[Le Razor est une tourelle Anti-Air de portée moyenne. Enterrée et protégée par un blindage, elle sort et tir avec son laser r haute cadence. Assez imprécise r distance, elle compense par sa solidité.]],
     helptext_de    = [[Der Razor ist ein abgehärteter Flugabwehrturm, dessen hohe Trefferpunkte und Panzerungsbonus es für Gegner, sobald geschlossen, enorm schwer macht, ihn zu zerstören.]],

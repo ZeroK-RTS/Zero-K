@@ -36,10 +36,8 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_fi = [[Taktinen robottitehdas. Rakentaa erikoistuneita robotteja 10m/s nopeudella]],
 	description_fr = [[Produit des unitées arachnides, construit à 10 M/s]],
 	description_de = [[Produziert Spinnen, Baut mit 10 M/s]],
-	description_pl = [[Buduje pajaki, moc 10 m/s]],
     helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crabe]],
 	helptext_fr    = [[Optimisée pour les terrains accidentés, la fabrique à araignées produit des unités exotiques centrées principalement sur la portée et la manuvrabilité au détriment de la force brute, à quelques exceptions près.]],
 	helptext_de    = [[Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crabe]],

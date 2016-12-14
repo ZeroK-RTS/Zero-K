@@ -25,7 +25,6 @@ unitDef = {
   customParams        = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    description_pl = [[Amfibijny konstruktor, moc 7.5 m/s]],
     helptext       = [[The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
   },
 
