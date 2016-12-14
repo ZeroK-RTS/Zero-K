@@ -59,7 +59,7 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,
   sonarDistance       = 700,
-  turnRadius          = 80,
+  turnRadius          = 60,
   workerTime          = 0,
 
   featureDefs         = {

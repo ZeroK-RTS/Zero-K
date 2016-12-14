@@ -48,7 +48,7 @@ unitDef = {
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 130,
+  turnRadius          = 20,
 
   weapons             = {
 

@@ -55,6 +55,7 @@ unitDef = {
   maneuverleashlength    = [[1280]],
   maxAcc                 = 0.5,
   maxDamage              = 300,
+  maxRudder              = 0.007,
   maxVelocity            = 13,
   minCloakDistance       = 75,
   mygravity              = 1,
@@ -77,6 +78,7 @@ unitDef = {
   },
   sightDistance          = 520,
   speedToFront           = 0,
+  turnRadius             = 150,
   turnRate               = 839,
 
   weapons                = {

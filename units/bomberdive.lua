@@ -66,7 +66,7 @@ unitDef = {
 
   },
   sightDistance       = 660,
-  turnRadius          = 180,
+  turnRadius          = 40,
   workerTime          = 0,
 
   weapons             = {

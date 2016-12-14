@@ -51,6 +51,7 @@ unitDef = {
   idleTime               = 1800,
   maxAcc                 = 0.5,
   maxDamage              = 1000,
+  maxRudder              = 0.006,
   maxVelocity            = 7.6,
   minCloakDistance       = 75,
   mygravity              = 1,
@@ -61,7 +62,7 @@ unitDef = {
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
   speedToFront           = 0.5,
-  turnRadius             = 400,
+  turnRadius             = 80,
 
   weapons                = {
 
