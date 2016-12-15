@@ -201,10 +201,10 @@ if (gadgetHandler:IsSyncedCode()) then
 				target = GetTeamLeader(teamid)
 			end
 			if not dead and not ai then
-				if Invites[player] == nil then
-					Invites[player] = {}
+				if Invites[target] == nil then
+					Invites[target] = {}
 				end
-				Invites[player][target] = {id = target,timeleft = 60,controller = targetid}
+				Invites[target][player] = {id = player,timeleft = 60,controller = targetid}
 			end
 		end
 	end
@@ -260,7 +260,7 @@ if (gadgetHandler:IsSyncedCode()) then
 					end
 				end
 				Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
-				Spring.SetTeamRulesParam(player,"invites",invitestring,{private=true})
+				Spring.SetTeamRulesParam(GetTeamID(player),"invites",invitestring,{private=true})
 				if invitestring == "" then -- Cleanup the table so that next second this doesn't run.
 					Invites[player] = nil
 				end
@@ -298,14 +298,14 @@ if (gadgetHandler:IsSyncedCode()) then
 			local cmdlower = string.lower(msg)
 			local proccmd = {}
 			proccmd = ProccessCommand(cmdlower)
-			for i=1,#proccmd do
-				Spring.Echo(playerid .. "sent:\n" .. i .. ":" .. tostring(proccmd[i]))
-			end
 			if proccmd[2] and string.find(proccmd[2],"invite") then
 				if proccmd[3] then
 					proccmd[3] = string.gsub(proccmd[3],"%D","")
 					if proccmd[3] ~= "" and proccmd[4] then
 						SendInvite(playerid,tonumber(proccmd[3]),tonumber(proccmd[4])) -- #4 should be the controller id.
+						if Invites[playerid] and Invites[playerid][tonumber(proccmd[3])] and Invites[tonumber(proccmd[3])][playerid] then
+							AcceptInvite(playerid,tonumber(proccmd[3]))
+						end
 						return
 					end
 				else
