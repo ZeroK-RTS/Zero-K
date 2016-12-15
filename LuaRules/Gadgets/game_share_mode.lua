@@ -204,7 +204,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				if Invites[player] == nil then
 					Invites[player] = {}
 				end
-				Invites[player][target] = {id = target,timeleft = 45,controller = targetid}
+				Invites[player][target] = {id = target,timeleft = 60,controller = targetid}
 			end
 		end
 	end
@@ -259,8 +259,11 @@ if (gadgetHandler:IsSyncedCode()) then
 						invitestring = data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
 					end
 				end
-				--Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
+				Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
 				Spring.SetTeamRulesParam(player,"invites",invitestring,{private=true})
+				if invitestring == "" then -- Cleanup the table so that next frame this doesn't run.
+					Invites[player] = nil
+				end
 			end
 		end
 		if f== config.mintime then
