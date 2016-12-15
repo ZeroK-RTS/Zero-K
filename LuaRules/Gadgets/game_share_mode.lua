@@ -188,7 +188,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				SendToUnsync("errors",player,"You can't merge with yourself!")
 				return
 			end
-			if IsTeamLeader(player) and targetid ~= player then
+			if not IsTeamLeader(player) and targetid ~= player then
 				SendToUnsync("errors",player,"You can't invite players when you aren't the team leader!")
 				return
 			end
@@ -261,7 +261,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				end
 				Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
 				Spring.SetTeamRulesParam(player,"invites",invitestring,{private=true})
-				if invitestring == "" then -- Cleanup the table so that next frame this doesn't run.
+				if invitestring == "" then -- Cleanup the table so that next second this doesn't run.
 					Invites[player] = nil
 				end
 			end
@@ -372,13 +372,13 @@ if (gadgetHandler:IsSyncedCode()) then
 	
 else -- unsynced stuff
 	
-	local function Errors(_,playerid,msg)
+	local function errors(_,playerid,msg)
 		if Spring.GetMyPlayerID() == playerid then
 			Spring.Echo("game_message: " .. msg)
 		end
 	end
 	
 	function gadget:Initialize()
-		gadgetHandler:AddSyncAction("errors", Errors)
+		gadgetHandler:AddSyncAction("errors", errors)
 	end
 end
