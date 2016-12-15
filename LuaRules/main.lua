@@ -30,4 +30,4 @@ end
 
 
     VFS.Include(Script.GetName() .. '/gadgets.lua', nil, VFS.ZIP_ONLY)
-    Spring.Echo("LUARULES-DRAW  (GADGETS)")
+    Spring.Echo("LUARULES-MAIN  (GADGETS)")
