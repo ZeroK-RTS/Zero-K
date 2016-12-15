@@ -286,28 +286,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Special Air
---
-
---if (modOptions and tobool(modOptions.specialair)) then
---  local replacements = VFS.Include("LuaRules/Configs/specialair.lua")
---  if (replacements[modOptions.specialair]) then
---    replacements = replacements[modOptions.specialair]
---    for name, ud in pairs(UnitDefs) do
---      if (ud.buildoptions) then
---        for buildKey, buildOption in pairs(ud.buildoptions) do
---          if (replacements[buildOption]) then
---            ud.buildoptions[buildKey] = replacements[buildOption];
---          end
---        end
---      end
---    end
---  end
---end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Energy Bonus, fac cost mult
 --
 
@@ -414,20 +392,6 @@ for name, unitDef in pairs(UnitDefs) do
 		unitDef.losEmitHeight = 30
     end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Burrowed
--- 
-
---for name, ud in pairs(UnitDefs) do
---  if (ud.weapondefs) then
---    for wName,wDef in pairs(ud.weapondefs) do      
---      wDef.damage.burrowed = 0.001
---    end
---  end
---end --for
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
