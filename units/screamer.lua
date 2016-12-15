@@ -34,7 +34,7 @@ unitDef = {
 	stockpiletime  = [[20]],
   },
 
-  explodeAs                     = [[BIG_UNITEX]],
+  explodeAs                     = [[ESTOR_BUILDING]],
   footprintX                    = 4,
   footprintZ                    = 4,
   iconType                      = [[heavysam]],
@@ -50,7 +50,7 @@ unitDef = {
   onoffable                     = false,
   script						= [[screamer.lua]],
   seismicSignature              = 4,
-  selfDestructAs                = [[BIG_UNITEX]],
+  selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
