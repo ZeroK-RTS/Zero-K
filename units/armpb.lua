@@ -16,8 +16,8 @@ unitDef = {
   canMove                       = false,
   canstop                       = [[1]],
   category                      = [[SINK TURRET]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[28 80 28]],
+  collisionVolumeOffsets        = [[0 20 0]],
+  collisionVolumeScales         = [[28 40 28]],
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
@@ -45,7 +45,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[gauss_91.dae]],
+  objectName                    = [[gauss.dae]],
   script                 		= [[armpb.lua]],
   seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
@@ -58,6 +58,10 @@ unitDef = {
 
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[gauss_aoplate.dds]],
 
   weapons                       = {
 
