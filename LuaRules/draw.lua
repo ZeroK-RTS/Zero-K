@@ -34,5 +34,6 @@ function Spring.GetModOption(s,bool,default)
 end
 
 
-    VFS.Include(Script.GetName() .. '/gadgets.lua', nil, VFS.ZIP_ONLY)
-    Spring.Echo("LUARULES-DRAW  (GADGETS)")
+Spring.Echo("Unsynced LuaRules: starting loading")
+VFS.Include('LuaRules/gadgets.lua', nil, VFS.ZIP_ONLY)
+Spring.Echo("Unsynced LuaRules: finished loading")

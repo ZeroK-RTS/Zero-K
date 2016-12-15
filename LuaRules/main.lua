@@ -28,6 +28,6 @@ function Spring.GetModOption(s,bool,default)
   end
 end
 
-
-    VFS.Include(Script.GetName() .. '/gadgets.lua', nil, VFS.ZIP_ONLY)
-    Spring.Echo("LUARULES-MAIN  (GADGETS)")
+Spring.Echo("Synced LuaRules: starting loading")
+VFS.Include('LuaRules/gadgets.lua', nil, VFS.ZIP_ONLY)
+Spring.Echo("Synced LuaRules: finished loading")
