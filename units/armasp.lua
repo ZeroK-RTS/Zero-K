@@ -9,10 +9,6 @@ unitDef = {
   buildCostMetal      = 350,
   buildDistance       = 6,
   builder             = true,
-
-  buildoptions        = {
-  },
-
   buildPic            = [[ARMASP.png]],
   buildTime           = 350,
   canMove             = true,

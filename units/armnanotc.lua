@@ -12,10 +12,6 @@ unitDef = {
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[armnanotc_aoplane.dds]],
-
-  buildoptions                  = {
-  },
-
   buildPic                      = [[armnanotc.png]],
   buildTime                     = 220,
   canGuard                      = true,

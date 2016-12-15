@@ -7,10 +7,6 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostEnergy        = 180,
   buildCostMetal         = 180,
-
-  buildoptions           = {
-  },
-
   buildPic               = [[amphaa.png]],
   buildTime              = 180,
   canAttack              = true,

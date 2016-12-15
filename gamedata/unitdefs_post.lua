@@ -170,85 +170,17 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
- 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Set unit faction and build options
---
-
-local function TagTree(unit, faction, newbuildoptions)
- -- local morphDefs = VFS.Include"LuaRules/Configs/morph_defs.lua"
-  
-  local function Tag(unit)
-    if (not UnitDefs[unit] or UnitDefs[unit].faction) then
-      return
-    end
-	local ud = UnitDefs[unit]
-    ud.faction = faction
-    if (UnitDefs[unit].buildoptions) and (ud.workertime and ud.workertime > 0) then
-	  if ud.maxvelocity and (ud.maxvelocity > 0) and unit ~= "armcsa" then
-	    ud.buildoptions = newbuildoptions
-	  end	
-	  for _, buildoption in ipairs(ud.buildoptions) do
-        Tag(buildoption)
-      end
-    end	
-    --if (morphDefs[unit]) then
-    --  if (morphDefs[unit].into) then
-    --    Tag(morphDefs[unit].into)
-    --  else
-    --    for _, t in ipairs(morphDefs[unit]) do
-    --      Tag(t.into)
-    --    end
-    --  end        
-    --end
-  
-  end
-
-  Tag(unit)
+-- Set build options
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
+if modOptions and tobool(modOptions.iwinbutton) then
+	buildOpts[#buildOpts+1] = 'iwin'
 end
-
-local function ProcessCommBuildOpts()
-	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom", "benzcom"}
-	local commanders = {}
-	local numLevels = 5
-	
-	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-	
-    if modOptions and tobool(modOptions.iwinbutton) then
-        buildOpts[#buildOpts+1] = 'iwin'
-    end
-    
-	for _, name in pairs(chassisList) do
-		for i=1, numLevels do
-			commanders[#commanders + 1] = name..i
-		end
-	end
-	
-	--add procedural comms
-	for name in pairs(commDefs) do
-		commanders[#commanders + 1] = name
-	end
-	
-	commanders[#commanders + 1] = "neebcomm"
-	commanders[#commanders + 1] = "commbasic"
-
-	for _,name in pairs(commanders) do
-		TagTree(name, "arm", buildOpts)
-	end
-end
-ProcessCommBuildOpts()
 
 for name, ud in pairs(UnitDefs) do
-	--Spring.Echo(name, ud.faction)
-	if not name:find("chicken") then
-		ud.faction = "arm"
-	else
-		ud.faction = "chicken"
+	if ud.buildoptions and (#ud.buildoptions == 0) then
+		ud.buildoptions = buildOpts
 	end
-end 
-
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
