@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
   amphibious          = true,
+  brakerate           = 0.4,
   buildCostEnergy     = 400,
   buildCostMetal      = 400,
   builder             = false,

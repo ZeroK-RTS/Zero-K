@@ -4,6 +4,7 @@ unitDef = {
   description         = [[Singularity Bomber]],
   amphibious          = true,
   --autoheal			  = 25,
+  brakerate           = 0.4,
   buildCostEnergy     = 2000,
   buildCostMetal      = 2000,
   builder             = false,

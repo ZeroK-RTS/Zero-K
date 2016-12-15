@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Raven]],
   description         = [[Precision Bomber]],
   amphibious          = true,
+  brakerate           = 0.4,
   buildCostEnergy     = 300,
   buildCostMetal      = 300,
   builder             = false,

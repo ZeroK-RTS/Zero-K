@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Pheonix with mini-laser]],
   description         = [[Napalm Bomber]],
   amphibious          = true,
+  brakerate           = 0.4,
   buildCostEnergy     = 360,
   buildCostMetal      = 360,
   builder             = false,

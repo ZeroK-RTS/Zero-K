@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Swift]],
   description            = [[Multi-role Fighter]],
   amphibious             = true,
+  brakerate              = 0.4,
   buildCostEnergy        = 150,
   buildCostMetal         = 150,
   buildPic               = [[fighter.png]],

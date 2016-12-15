@@ -4,6 +4,7 @@ unitDef = {
   description         = [[Assault Bomber (Anti-Static)]],
   amphibious          = true,
   --autoheal			  = 25,
+  brakerate           = 0.4,
   buildCostEnergy     = 1000,
   buildCostMetal      = 1000,
   builder             = false,
