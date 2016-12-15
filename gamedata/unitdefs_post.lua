@@ -308,11 +308,6 @@ for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
 		
-		-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-		if ud.acceleration == ud.brakerate and not reverseCompat then
-			ud.brakerate = ud.brakerate * 3
-		end
-		
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
 			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
