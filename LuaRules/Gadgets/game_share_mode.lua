@@ -185,15 +185,15 @@ if (gadgetHandler:IsSyncedCode()) then
 			local targetspec = select(3,Spring.GetPlayerInfo(target))
 			local _,_,dead,ai,_ = Spring.GetTeamInfo(GetTeamID(targetid))
 			if player == target then
-				SendToUnsync("errors",player,"You can't merge with yourself!")
+				SendToUnsynced("errors",player,"You can't merge with yourself!")
 				return
 			end
 			if not IsTeamLeader(player) and targetid ~= player then
-				SendToUnsync("errors",player,"You can't invite players when you aren't the team leader!")
+				SendToUnsynced("errors",player,"You can't invite players when you aren't the team leader!")
 				return
 			end
 			if targetspec then
-				SendToUnsync("errors",player,"You can't merge with specs!")
+				SendToUnsynced("errors",player,"You can't merge with specs!")
 				return
 			end
 			if targetid == player then
