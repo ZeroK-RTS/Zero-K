@@ -226,7 +226,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	-- no messagebox exists, make one
 	msgBoxPersistent = Chili.Window:New{
 		parent = Chili.Screen0,
-		name   = 'msgWindow';
+		name   = 'msgPersistentWindow';
 		width = width,
 		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,

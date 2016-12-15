@@ -346,7 +346,6 @@ function widget:Initialize()
 		name = "objectivesButtonWindow",
 		parent = screen0,
 		dockable = true,
-		collide = false,
 		color = {0,0,0,0},
 		right = 0,  
 		y = y,
