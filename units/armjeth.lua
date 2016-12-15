@@ -27,7 +27,6 @@ unitDef = {
     helptext       = [[Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.]],
     helptext_de    = [[Durch seine Fähigkeit mobile Kräft vor Luftangriffen zu beschützen, gibt der Gremlin den entsprechenden Einheiten einen wichtigen Vorteil gegenüber Lufteinheiten. Verteidigungslos gegenüber Landeinheiten.]],
     helptext_fr    = [[Se situant entre le Defender et le Razor pour la d?fense a?rienne, en ayant la faiblaisse d'aucun des deux et pouvant offrire un d?fense d?cissive pour les forces mobile, le Gremlin done un avantage d?finis pour les robots. Il est sans d?fense contre les unit?s terriennes.]],
-    helptext_it    = [[Un passo tra un Defender ed un Razor, senza le sue debolezze, e con l'abilitá di proteggere bene una forza mobile, il Gremlin offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
 	modelradius    = [[11]],
   },
 

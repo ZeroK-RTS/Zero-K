@@ -20,7 +20,6 @@ unitDef = {
   customParams           = {
 	description_de     = [[Extrahiert Metall]],
     helptext           = [[The metal extractor is the primary means of getting metal. If you have excess energy, metal extractors will automatically use it to extract more metal.]],
-    helptext_it        = [[L'estrattore di metallo ? il metodo principale di ottenere metallo. Se hai energia in eccesso, gli estrattore di metallo la useranno automaticamente per estrarre pi? metallo.]],
 	helptext_de        = [[Der Metallextraktor ist die primäre Quelle für die Metallförderung. Wenn du Energie bereitstellst, werden deine Extraktoren diese automatisch dazu nutzen, ihre Produktivität zu erhöhen und somit mehr Metall fördern.]],
     occupationStrength = 1,
     pylonrange         = 50,

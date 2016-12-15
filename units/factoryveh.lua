@@ -36,7 +36,6 @@ unitDef = {
   customParams                  = {
 	description_de = [[Produziert Radfahrzeug, Baut mit 10 M/s]],
     helptext       = [[A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher]],
-    helptext_it    = [[Un favorito tradizionale, la fabbrica de veicoli Logos ? la fabbrica "blitzkrieg" ideale con le sue unita veloci ed aggressive. Quelle unita a cui manca la velocita lo compensano con una potenza di fuoco copiosa.]],
 	helptext_de    = [[Der Traditionalist unter den Fabriken. Die Vehicle Plant ist ideal für den Blitzkrieg, denn schnelle und hoch aggressive Einheiten werden hier gebaut. Diese Einheiten machen ihren Mangel an Geschwindigkeit mit reichlich Feuerkraft wieder wett. Wichtigste Einheiten: Dart, Scorcher, Ravager, Leveler, Slasher]],
     sortName       = [[2]],
   },

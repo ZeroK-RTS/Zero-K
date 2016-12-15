@@ -25,7 +25,6 @@ unitDef = {
 	helptext       = [[The Crabe's huge shells obliterate large swarms of cheap units, and can also outrange basic defenses. When it stops walking, Crabe curls up into armored form reducing incoming damage to a third. The Crabe's main weakness is its lack of mobility.]],
     helptext_de    = [[Die große Panzerung kann auch große Gruppen von billigen Einheiten wegstecken, sowie grundlegende Verteidigung. Sobald die Spinne zum Stillstand kommt, zieht sie sich in die gepanzerte Form zurück: ein gewaltiger Verteidigungsturm. Der Nachteil ist die große Bewegungseinschränkung.]],
     helptext_fr    = [[Le canon à plasma lourd du Crabe peut éliminer facilement les défenses basiques ainsi que des hordes d'unités énemies légères grâce à son importante aire d'effet. Lorsqu'il s'arrête de marcher, le Crabe se replie sur lui-même, ses pattes formant une carapace blindée autour de lui réduisant les dommages qu'il reçoit à un tier. Sa faiblesse tient en sa lenteur, tant de déplacement que de tir.]],
-    helptext_it    = [[I proiettili enrmi del crabe obliterano sciami di unita economiche, e ha un raggio maggiore di molte difese basiche. Quando smette di camminare, Crabe si raggomitola nella sua forma corazzata. La deboleza principale del crabe é la mancanza di mobilitá.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[30]],

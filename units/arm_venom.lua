@@ -24,7 +24,6 @@ unitDef = {
     description_de = [[Unterstützende EMP Spinne]],
     helptext       = [[The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher.]],
     helptext_fr    = [[Le Venom est une araignée tout terrain rapide spécialement conçue pour paralyser l'ennemi afin que d'autres unités puissent les détruire rapidement et sans risques. Sa faible portée est compensée par son effet de zone pouvant affecter plusieurs unités à proximité de sa cible. Est particulièrement efficace en tandem avec le Recluse ou l'Hermit.]],
-    helptext_it    = [[Il Venom é un'unita all-terrain fatta per paralizzare i nemici cosi che altre unita le possano distruggere facilmente. Ha un AdE ed é utile come unita da rissa, per tenere lontano sciame di nemici. Funziona bene con i recluse per non peremttere ai nemici di avvicinarsi troppo al fragili scaramuzzatore.]],
 	helptext_de    = [[Venom ist eine geländeunabhängige Einheit, welche Gegner paralysieren kann, damit andere Einheiten diese einfach zerstören können. Venom besitzt eine AoE und ist nützlich, um gengerische Schwärme in Schach zu halten.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -6 0]],

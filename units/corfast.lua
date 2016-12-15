@@ -32,7 +32,6 @@ unitDef = {
 	description_de = [[Konstruktionsjumpjet, Baut mit 5 M/s]],
     helptext       = [[Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support.]],
     helptext_fr    = [[R la fois rapide et capable de sauter sur de courtes distances grâce r son jetpack, le Constable est un superbe outil pour favoriser son expansion.]],
-    helptext_it    = [[Veloce e capace di saltare per corte distanze o altezze, il Constable é il costruttore ideale per l'espanzione rapida]],
 	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion.]],
   },
 

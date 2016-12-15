@@ -30,7 +30,6 @@ unitDef = {
 	description_de = [[Konstruktionsfahrzeug, Baut mir 5 M/s]],
     helptext       = [[Highly mobile and capable of taking a beating, the Mason can quickly expand over a large area.]],
     helptext_fr    = [[Alliant rapidit? et blindage important, le Mason permet de s'?tendre rapidement en s?curit?.]],
-    helptext_it    = [[Altamente mobile e capace di prendere parecchi colpi, il Mason pu? rapidamente espandere il tuo territorio in una grande area]],
 	helptext_de    = [[Hochmobiles, bewaffnetes Konstruktionsfahrzeug, das sich ideal für schnelle Expansionen über große Flächen eignet.]],
 	modelradius    = [[14]],
   },
