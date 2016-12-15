@@ -350,26 +350,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Tactics GameMode
---
-
-if (modOptions and (modOptions.zkmode == "tactics")) then
-  -- remove all build options
-  Game = { gameSpeed = 30 };  --  required by tactics.lua
-  local options = VFS.Include("LuaRules/Configs/tactics.lua")
-  local customBuilds = options.customBuilds
-  for name, ud in pairs(UnitDefs) do
-    if tobool(ud.commander) then
-      ud.buildoptions = (customBuilds[name] or {}).allow or {}
-    else
-      ud.buildoptions = {}
-    end
-  end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 -- Energy Bonus, fac cost mult
 --
 

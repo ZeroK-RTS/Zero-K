@@ -34,26 +34,6 @@ function Spring.GetModOption(s,bool,default)
 end
 
 
-if (Spring.GetModOption("zkmode")=="deploy")or
-   (Spring.GetModOption("zkmode")=="tactics")
-then
-
-  -----------------------------
-  -- DEPLOYMENT MODE
-  -----------------------------
-  if (not Spring.IsDevLuaEnabled()) then
-    VFS.Include(Script.GetName() .. "/Deploy/draw.lua", nil, VFS.ZIP_ONLY)
-    Spring.Echo("LUARULES-DRAW  (DEPLOYMENT)")
-  else
-    VFS.Include(Script.GetName() .. "/Deploy/draw.lua", nil, VFS.RAW_ONLY)
-    Spring.Echo("LUARULES-DRAW  (DEPLOYMENT)  --  DEVMODE")
-  end
-
-else
-
-  -----------------------------
-  -- NORMAL MODE
-  -----------------------------
   if (not Spring.IsDevLuaEnabled()) then
     VFS.Include(Script.GetName() .. '/gadgets.lua', nil, VFS.ZIP_ONLY)
     Spring.Echo("LUARULES-DRAW  (GADGETS)")
@@ -62,4 +42,3 @@ else
     Spring.Echo("LUARULES-DRAW  (GADGETS)  --  DEVMODE")
   end
 
-end
