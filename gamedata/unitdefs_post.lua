@@ -36,8 +36,6 @@ if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
 
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
-
 Spring.Echo("Loading UnitDefs_posts")
 
 --------------------------------------------------------------------------------
@@ -263,18 +261,6 @@ for name, ud in pairs(UnitDefs) do
 		end
     end
 end 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Use old diving bomber for 91.0
-
-if reverseCompat then
-	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
-		if name == "bomberdive" then
-			UnitDefs.factoryplane.buildoptions[i] = "corshad"
-		end
-	end
-end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -519,25 +505,17 @@ end
 --------------------------------------------------------------------------------
 -- Set incomes
 --
-if not reverseCompat then 
-	for name, ud in pairs(UnitDefs) do
-		if ud.metalmake and ud.metalmake > 0 then
-			ud.customparams.income_metal = ud.metalmake
-			ud.activatewhenbuilt = true
-			ud.metalmake = 0
-		end
-		if ud.energymake and ud.energymake > 0 then
-			ud.customparams.income_energy = ud.energymake
-			ud.activatewhenbuilt = true
-			ud.energymake = 0
-		end
+
+for name, ud in pairs(UnitDefs) do
+	if ud.metalmake and ud.metalmake > 0 then
+		ud.customparams.income_metal = ud.metalmake
+		ud.activatewhenbuilt = true
+		ud.metalmake = 0
 	end
-else
-	for name, ud in pairs(UnitDefs) do
-		if name == "armsolar" then
-			ud.energymake = 0
-			ud.energyuse = -2
-		end
+	if ud.energymake and ud.energymake > 0 then
+		ud.customparams.income_energy = ud.energymake
+		ud.activatewhenbuilt = true
+		ud.energymake = 0
 	end
 end
 
