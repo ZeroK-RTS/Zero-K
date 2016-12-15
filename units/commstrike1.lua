@@ -29,7 +29,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	cloakstealth = [[1]],
 	level = [[1]],
 	statsname = [[dynstrike1]],
 	soundok = [[heavy_bot_move]],

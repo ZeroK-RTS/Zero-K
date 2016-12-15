@@ -29,7 +29,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	cloakstealth = [[1]],
 	description_de = [[Mobiler Sturmkommandant]],
 	helptext       = [[The Strike Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration.]],
 	helptext_de    = [[Der Strike Commander bietet ein sehr ausgeglichenes Gerüst, das mit den meisten Modulen ausgerüstet werden kann, mit anständiger Geschwindigkeit, Panzerung und Selbstreparierung.]],

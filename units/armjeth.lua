@@ -22,7 +22,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    cloakstealth   = [[1]],
     description_de = [[Flugabwehr Roboter]],
     description_fr = [[Robot Anti-Air]],
     helptext       = [[Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.]],

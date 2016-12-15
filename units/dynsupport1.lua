@@ -28,7 +28,6 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    cloakstealth = [[1]],
     description_de = [[Ökonomie/Untersützung Kommandant]],
     helptext       = [[The esoteric Engineer chassis uses a more unorthodox weapon set. Though lacking armor or speed, this chassis is still favored due to its intrinsic buildpower bonus.]],
     helptext_de    = [[Der geheimnisvolle Support Commander nutzt ein eher unothodoxes Waffenset besteht. Jedoch fehlt es ihm an Rüstung und Geschwindigkeit, darum macht sich dieser Unterbau vor allem durch den inhärenten Baubonus beliebt.]],
