@@ -160,6 +160,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 			controlledplayers[playerid] = target
 			GG.Overdrive.RedirectTeamIncome(originalteam, target)
+			SendToUnsynced("mergealert",playerid,target) -- Notifier
 		else
 			Spring.Echo("Commshare: Merger error.")
 		end
@@ -372,6 +373,12 @@ if (gadgetHandler:IsSyncedCode()) then
 	
 else -- unsynced stuff
 	
+	local function mergealert(_,playerid,target)
+		if Spring.GetMyPlayerID() == playerid then
+			Spring.SendLuaUIMsg("playerchangedteam " .. playerid .. " " .. target,"a") -- spring doesn't have a callin for player changing team yet :( -- Remove me if engine devs ever make something for this!
+		end
+	end
+	
 	local function errors(_,playerid,msg)
 		if Spring.GetMyPlayerID() == playerid then
 			Spring.Echo("game_message: " .. msg)
@@ -380,5 +387,6 @@ else -- unsynced stuff
 	
 	function gadget:Initialize()
 		gadgetHandler:AddSyncAction("errors", errors)
+		gadgetHandler:AddSyncAction("mergealert",mergealert)
 	end
 end
