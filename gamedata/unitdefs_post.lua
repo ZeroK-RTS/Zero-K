@@ -318,11 +318,6 @@ if (modOptions and modOptions.energymult) then
     if (em) then
       UnitDefs[name].energymake = em * modOptions.energymult
     end
-	-- for solars
-	em = (UnitDefs[name].energyuse and tonumber(UnitDefs[name].energyuse) < 0) and UnitDefs[name].energyuse
-	if (em) then
-      UnitDefs[name].energyuse = em * modOptions.energymult
-    end
   end
 end
 
