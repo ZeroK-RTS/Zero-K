@@ -44,7 +44,6 @@ ShieldJitter.Default = {
   --texture    = 'bitmaps/GPL/Lups/perlin_noise.jpg',
 
   repeatEffect = false,
-  onActive     = true,
   dieGameFrame = math.huge
 }
 
