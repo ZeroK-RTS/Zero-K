@@ -15,7 +15,6 @@ unitDef = {
 
   buildPic            = [[CORNECRO.png]],
   buildTime           = 140,
-  canAssist           = true,
   canBuild            = true,
   canMove             = true,
   canPatrol           = true,
