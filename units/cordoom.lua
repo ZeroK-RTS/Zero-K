@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Medium Range Defense Fortress - Requires 50 Power (Main Gun)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
-  armoredMultiple               = 0.25,
   brakeRate                     = 0,
   buildCostEnergy               = 1600,
   buildCostMetal                = 1600,
