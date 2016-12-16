@@ -46,7 +46,7 @@
 	},
 	"armfus" : {
 		"name" : "Fusion Reactor",
-		"description" : "Produces Energy (35)",
+		"description" : "Medium Powerplant (+35)",
 		"helptext" : "Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units."
 	},
 	"chickenlandqueen" : {
@@ -287,7 +287,7 @@
 	},
 	"cafus" : {
 		"name" : "Singularity Reactor",
-		"description" : "Produces Energy (225) - HAZARDOUS",
+		"description" : "Large Powerplant (+225) - HAZARDOUS",
 		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
 	"armstiletto_laser" : {
@@ -322,7 +322,7 @@
 	},
 	"amgeo" : {
 		"name" : "Advanced Geothermal",
-		"description" : "Produces Energy (100) - HAZARDOUS",
+		"description" : "Large Powerplant (+100) - HAZARDOUS",
 		"helptext" : "The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
 	"armnanotc" : {
@@ -391,7 +391,7 @@
 	},
 	"armsolar" : {
 		"name" : "Solar Collector",
-		"description" : "Produces Energy (2)",
+		"description" : "Small Powerplant (+2)",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
 	},
 	"armbrawl" : {
@@ -476,7 +476,7 @@
 	},
 	"armwin" : {
 		"name" : "Wind/Tidal Generator",
-		"description" : "Produces Energy",
+		"description" : "Small Powerplant",
 		"helptext" : "Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output."
 	},
 	"amphassault" : {
@@ -666,7 +666,7 @@
 	},
 	"geo" : {
 		"name" : "Geothermal Generator",
-		"description" : "Produces Energy (25)",
+		"description" : "Medium Powerplant (+25)",
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
 	},
 	"corfast" : {

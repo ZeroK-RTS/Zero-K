@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[amgeo]],
   name                          = [[Advanced Geothermal]],
-  description                   = [[Produces Energy (100) - HAZARDOUS]],
+  description                   = [[Large Powerplant (+100) - HAZARDOUS]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 1500,
   buildCostMetal                = 1500,
