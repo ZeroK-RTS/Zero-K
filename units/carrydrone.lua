@@ -28,7 +28,6 @@ unitDef = {
   floater             = true,
   footprintX          = 2,
   footprintZ          = 2,
-  hideDamage          = true,
   hoverAttack         = true,
   iconType            = [[smallgunship]],
   maneuverleashlength = [[900]],
