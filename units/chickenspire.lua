@@ -24,11 +24,9 @@ unitDef = {
   customParams                  = {
     description_fr = [[Artillerie statique]],
 	description_de = [[Stationäre Artillerie]],
-	description_pl = [[Artyleria stacjonarna]],
     helptext       = [[Long range static artillery.]],
     helptext_fr    = [[La terreur verte projette des amas commpos?s de d'acides corrosifs et de germes sur de tr?s longues distances.]],
 	helptext_de    = [[Weitreichende, stationäre Artillerie.]],
-	helptext_pl    = [[Dalekosiezna stacjonarna artyleria. Delikatna i bezbronna w bezposredniej walce.]],
   },
 
   energyMake                    = 0,
@@ -112,7 +110,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterweapon             = true,	  
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
     },  

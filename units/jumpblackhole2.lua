@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Hoarder]],
   description            = [[Assault/Riot Bot]],
   acceleration           = 0.35,
-  brakeRate              = 0.35,
+  brakeRate              = 1.05,
   buildCostEnergy        = 100,
   buildCostMetal         = 100,
   buildPic               = [[cormak.png]],
@@ -16,14 +16,9 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô dispersador]],
-    description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
-    description_it = [[Robot da rissa]],
     description_de = [[Riot Roboter]],
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Hoarder is a riot/assault unit. It generates a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -161,7 +156,6 @@ unitDef = {
       turnrate                = 10000,
       turret                  = true,
       weaponAcceleration      = 400,
-      weaponTimer             = 0.0,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

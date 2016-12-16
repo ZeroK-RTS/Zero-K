@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
-  description            = [[Missile Frigate (Skirmisher)]],
+  description            = [[Missile Boat (Skirmisher)]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,
@@ -22,7 +22,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-       helptext       = [[This Missile Frigate fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
+       helptext       = [[This Missile Boat fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
 	turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },
@@ -97,7 +97,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 20,
-      flightTime              = 5,
+      flightTime              = 3,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       impactOnly              = false,
@@ -116,7 +116,6 @@ unitDef = {
       turnRate                = 6000,
       turret                  = true,
       weaponAcceleration      = 300,
-      weaponTimer             = 8,
       weaponType              = [[MissileLauncher]],
 
       weaponVelocity          = 750,

@@ -23,11 +23,9 @@ unitDef = {
   customParams           = {
     description_de = [[Schwerer Raketen-Artillerie Läufer]],
     description_fr = [[Mechwarrior Lance-Roquette Lourd]],
-    description_pl = [[Ciężka Artyleria Rakietowa]],
     helptext       = [[The Catapult is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces.]],
     helptext_de    = [[Das Catapult ist ein Läufer mit Mehrfachraketenwerfer-Artilleriesystem. Es kann eine Salve von Raketen starten, was die Zerstörung von fast allem im Zielgebiet garantieren kann. Infolgedessen kann es sich schnell in freundliches Gebiet hinter den Fronteinheiten zurückziehen.]],
     helptext_fr    = [[Le Catapult est le plus fragile des Mechwarriors. Il est cependant trcs rapide et tire un nombre incalculable de roquettes r grande distance grâce r ses deux batteries lance missiles embarquées. Une seule salve peut tapisser une large zone, et rares sont les survivant.]],
-    helptext_pl    = [[Catapult wystrzeliwuje seri�?rakiet, która jest w stanie zniszczy�?prawie wszystko w wyznaczonym obszarze. Podczas przeładowywania może schowa�?si�?wśród innych jednostek.]],
   },
 
   explodeAs              = [[ATOMIC_BLASTSML]],
@@ -120,7 +118,6 @@ unitDef = {
       turnRate                = 2500,
       turret                  = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 250,
       wobble                  = 7000,

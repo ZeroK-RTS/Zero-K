@@ -5,7 +5,7 @@ unitDef = {
   acceleration        = 1.2,
   airHoverFactor      = 0,
   amphibious          = true,
-  brakeRate           = 1,
+  brakeRate           = 0.8,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -23,9 +23,7 @@ unitDef = {
   cruiseAlt           = 150,
 
   customParams        = {
-    description_pl = [[Ciezki kurczak powietrzny]],
     helptext       = [[Large, angry and capable of fighting both air and land opposition, the Roc is a formidable flying chicken.]],
-    helptext_pl    = [[Roc to latajacy kurczak, ktory jest w stanie skutecznie zwalczac zarowno cele ladowe, jak i powietrzne.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -120,7 +118,6 @@ unitDef = {
       sprayAngle              = 1200,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },

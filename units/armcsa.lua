@@ -6,7 +6,7 @@ unitDef = {
   airStrafe           = 0,
   amphibious          = true,
   autoHeal            = 20,
-  brakeRate           = 0.1,
+  brakeRate           = 0.08,
   buildCostEnergy     = 500,
   buildCostMetal      = 500,
   buildDistance       = 180,
@@ -57,13 +57,11 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_pl = [[Latajacy konstruktor do zadan specjalnych, moc 7.5 m/s]],
     description_fr = [[ADAV de Construcion Furtif Camouflable, Construit r 7.5 m/s]],
     description_de = [[Fliegender SpecOps Bauleiter, Baut mit 7.5 m/s]],
     helptext       = [[The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army.]],
     helptext_de    = [[Athene ist die Spitze der Tarnungsschlagkraft. AusgerÃ¼stet mit einem VerhÃ¼llungsgerÃ¤te und einem RadarstÃ¶rer kann es durch gegnerische Verteidigungslinien fliegen und Truppen aus Angreifern zusammenstellen, die dann VerwÃ¼stung nachsichziehen werden und die gegnerische Logistik vernichten kÃ¶nnen.]],
     helptext_fr    = [[Le Athena est un ingÃ©nieur de combat non armÃ©. ÃquipÃ© d'un brouilleur radar et d'un camouflage optique il peut construire certaines infrastructures et des unitÃ©s nimporte ou, et ainsi surprendre l'enneme.]],
-    helptext_pl    = [[Athena to technologiczne cacko pod wzgledem kamuflazu i precyzyjnych operacji. Maskowanie i zaklocacz radaru pozwalaja Athenie przeslizgnac sie niezauwazenie przez linie obrony przeciwnika, gdzie moze sledzic jego ruchy i budowac jednostki bezposrednio na polu walki.]],
     modelradius    = [[15]],
   },
 

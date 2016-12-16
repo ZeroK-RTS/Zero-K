@@ -8,7 +8,7 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostEnergy        = 1200,
   buildCostMetal         = 1200,
-  buildDistance          = 120,
+  buildDistance          = 128,
   builder                = true,
 
   buildoptions           = {
@@ -29,7 +29,6 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-	cloakstealth = [[1]],
 	level = [[1]],
 	statsname = [[dynstrike1]],
 	soundok = [[heavy_bot_move]],

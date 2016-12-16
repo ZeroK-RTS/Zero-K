@@ -387,7 +387,7 @@ do
     if (RawCanAttack(ud)) then
       canAttack = true
     elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname == "armasp") then
-      if (FacCanAttack(ud) or ud.unitname == "armasp") then
+      if (ud.unitname == "armasp" or FacCanAttack(ud)) then
         canAttack = true
       end
     end

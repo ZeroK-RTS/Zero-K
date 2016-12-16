@@ -3,7 +3,7 @@ unitDef = {
   name                  = [[Placeholder]],
   description           = [[Black Hole Launcher]],
   acceleration          = 0.4,
-  brakeRate             = 0.4,
+  brakeRate             = 1.2,
   buildCostEnergy       = 250,
   buildCostMetal        = 250,
   builder               = false,
@@ -21,9 +21,7 @@ unitDef = {
   corpse                = [[DEAD]],
 
   customParams          = {
-    description_pl = [[Wyrzutnia czarnych dziur]],
     helptext       = [[The Placeholder is a support unit. Its projectiles create a vacuum that sucks in nearby units, clustering and holding them in place to help finish them off.]],
-    helptext_pl    = [[Pociski Placeholdera zasysaja i utrzymuja w miejscu okoliczne jednostki, co pozwala je skutecznie wykonczyc.]],
     midposoffset   = [[0 10 0]],
   },
 

@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Swift]],
   description            = [[Multi-role Fighter]],
   amphibious             = true,
+  brakerate              = 0.4,
   buildCostEnergy        = 150,
   buildCostMetal         = 150,
   buildPic               = [[fighter.png]],
@@ -24,11 +25,9 @@ unitDef = {
   cruiseAlt              = 200,
 
   customParams           = {
-    description_bp = [[Caça básico]],
     description_fr = [[Chasseur Multirôle]],
 	description_de = [[Mehrzweck-Tarnkappenjäger]],
     helptext       = [[The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers.]],
-    helptext_bp    = [[Este caça pode atacar unidades aéreas e terrestres e protege bem outras unidades contra unidades aéreas, mas é morto rapidamente por fogo anti-aéreo e caças de superioridade aérea. Funciona melhor contra unidades terrestres quando em grandes números.]],
     helptext_fr    = [[Capable de tirer en l'air ou au sol le Swift n'est efficace qu'en groupe. Sa puissance de feu limité le rends moins éfficace qu'un aeronef dédié au combat Air/Sol ou au Air/Air.]],
 	helptext_de    = [[Der Swift kann sowohl Land-, als auch Lufteinheiten treffen. Er eignet sich gut zur Verteidigung gegen Lufteinheiten, aber feindliche Flugabwehr und Luftüberlegenheitsjäger werden ihn schnell erlegen. Zuhauf kann er aber Landeinheiten durchaus auf die Nerven gehen.]],
 
@@ -56,6 +55,7 @@ unitDef = {
   maneuverleashlength    = [[1280]],
   maxAcc                 = 0.5,
   maxDamage              = 300,
+  maxRudder              = 0.007,
   maxVelocity            = 13,
   minCloakDistance       = 75,
   mygravity              = 1,
@@ -78,6 +78,7 @@ unitDef = {
   },
   sightDistance          = 520,
   speedToFront           = 0,
+  turnRadius             = 150,
   turnRate               = 839,
 
   weapons                = {
@@ -187,7 +188,6 @@ unitDef = {
       tracks                  = true,
       turnRate                = 40000,
       weaponAcceleration      = 550,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },

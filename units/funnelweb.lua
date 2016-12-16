@@ -17,9 +17,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki pajak wsparcia]],
     helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
-    helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Posiada tarcze obszarowa oraz produkuje zestaw dronow.]],
 	priority_misc  = 1, -- Medium
   },
 

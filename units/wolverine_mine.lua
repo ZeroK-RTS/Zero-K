@@ -24,9 +24,7 @@ unitDef = {
   customParams           = {
     helptext       = [[This mine doesn't explode - instead, it releases a flurry of bomblets at trespassing enemies. It deactivates after one minute.]],
     description_de = [[Mine]],
-    description_pl = [[Mina]],
     helptext_de    = [[Statt explodieren, diese Mine schiesst Projektile an Eindringlingen.]],
-    helptext_pl    = [[Ta mina nie eksploduje, lecz wystrzeliwuje kilka pociskow w aktywujacego ja wroga. Po minucie deaktywuje sie.]],
     dontcount = [[1]],
 	mobilebuilding = [[1]],
 	idle_cloak = 1,
@@ -118,7 +116,6 @@ unitDef = {
       turnRate                = 36000,
       turret                  = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 1,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 300,
     },

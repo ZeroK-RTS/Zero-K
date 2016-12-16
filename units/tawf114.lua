@@ -17,15 +17,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Tanque de mísseis pesado]],
     description_fr = [[Tank Lance-Missile Lourd]],
 	description_de = [[Schwerer Riot Unterstützungspanzer]],
-	description_pl = [[Ciezki czolg wsparcia]],
     helptext       = [[Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach.]],
-    helptext_bp    = [[Como um escaramuçador pesado, O Banisher adiciona poder de fogo de alcançe médio-longo para a força de assalto de Logos. Seus mísseis guiados s?o rápidos e devastadores contra unidades terrestres e aéreas, embora tenham um tempo de recarga significante. Banishers n?o acompanhados por outras unidades podem ser superados facilmente por grandes grupos de pequenas unidades.]],
     helptext_fr    = [[Les Banishers sont arm?s de deux lance-missiles lourds ? t?te chercheuse. Capable d'attaquer les cibles au sol ou dans les airs, ils font d'?normes d?g?ts, mais sont lent a recharger. Impuissant contre les nu?es d'ennemis et indispensable contre les grosses cibles, son blindage ne lui permet pas d'?tre en premi?re ligne.]],
 	helptext_de    = [[Erstaunlich beweglich für eine Rioteinheit. Der Banisher ist mit Zwillings-Hochgeschwindigkeits Splitterraketen ausgerüstet, die verheerend für leichte Einheiten und Lufteinheiten sind, obwohl sie nur eine begrenzte Reichweite haben. Der Banisher wird schnell von Sturmeinheiten überrascht und sogar von Raider, weshalb du ihn mit deinen Abschirmungseinheiten beschützen musst. Anders als andere Rioteinheiten besitzt der Banisher die nötige Geschwindigkeit und Reichweite, um sich gegen die meisten Skirmishern zu halten.]],
-	helptext_pl    = [[Ruchomy jak na jednostke wsparcia, Banisher posiada ciezkie rakiety krotkiego zasiegu, ktore szybko niszcza grupy lekkich jednostek, sa skuteczne przeciw lotnictwu i wyrownuja teren. Banishera latwo zniszczyc jednostkami szturmowymi lub rozdzielonymi lekkimi jednostkami, ale dobrze radzi sobie z innymi, wolniejszmi jednostkami o mniejszym zasiegu.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -113,7 +109,6 @@ unitDef = {
       turnRate                = 22000,
       turret                  = true,
       weaponAcceleration      = 70,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },

@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Dirtbag]],
   description            = [[Box of Dirt]],
   acceleration           = 0.2,
-  brakeRate              = 0.2,
+  brakeRate              = 0.6,
   buildCostEnergy        = 30,
   buildCostMetal         = 30,
   buildPic               = [[corclog.png]],
@@ -27,13 +27,9 @@ unitDef = {
     jump_from_midair   = 0,
     jump_spread_exception = 1,
 
-    description_es = [[Caja de tierra]],
     description_fr = [[]],
-    description_it = [[Scatola di terra]],
     description_de = [[Behalter voller Dreck]],
-    description_pl = [[Pudlo z piachem]],
     helptext       = [[The Dirtbag exists to block enemy movement and generally get in the way. They are so dedicated to this task that they release their dirt payload upon death to form little annoying mounds. While waiting for their fate Dirtbags enjoy headbutting and scouting.]],
-    helptext_pl    = [[Dirtbag istnieje po to, by blokowac ruch przeciwnika i sie mu naprzykrzac. Po zniszczeniu wysypuje sie z nich piach, tworzac utrudniajacy poruszanie sie pagorek. Dirtbag moze takze uzywac swojego pudelka, by uderzac przeciwnikow z dynki, sprawdza sie tez jako zwiadowca.]],
   },
 
   explodeAs              = [[CLOGGER_EXPLODE]],

@@ -9,7 +9,7 @@ unitDef = {
   brakeRate           = 0.375,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -31,10 +31,8 @@ unitDef = {
 
   customParams        = {
 	description_de = [[Schwerer Kampfkommandant, Baut mit 10 M/s]],
-	description_pl = [[Ciezki Dowodca bojowy, moc 10 m/s]],
 	helptext       = [[The Battle Commander emphasizes firepower and armor, at the expense of speed and support equipment.]],
 	helptext_de    = [[Der Battle Commander verbindet Feuerkraft mit starker Panzerung, auf Kosten der Geschwindigkeit und seiner Unterstutzungsausrustung.]],
-	helptext_pl    = [[Battle to Dowodca, ktory reprezentuje brutalna sile i duza wytrzymalosc; jest jednak wolny i nie moze montowac zbyt wielu modulow wsparcia.]],
 	level = [[1]],
 	statsname = [[corcom1]],
 	soundok = [[heavy_bot_move]],

@@ -7,7 +7,7 @@ unitDef = {
   airStrafe              = 0,
   amphibious             = true,
   bankingAllowed         = false,
-  brakeRate              = 0.6,
+  brakeRate              = 0.48,
   buildCostEnergy        = 6000,
   buildCostMetal         = 6000,
   builder                = false,
@@ -31,15 +31,11 @@ unitDef = {
 
   customParams           = {
     cantuseairpads = 1,
-   -- description_bp = [[Fortaleza voadora]],
    -- description_fr = [[Forteresse Volante]],
     description_de = [[Lufttraeger]], -- "aerial carrier"
-    description_pl = [[Statek-matka]],
     helptext       = [[As maneuverable as a brick and only modestly armed itself, the Nebula is still a fearsome force due to its ability to survive long-range attacks due to its shield, as well as shred lesser foes with its fighter-drone complement.]],
-   -- helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
    -- helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
     helptext_de    = [[Die Nebula ist stark und ungeschickt, aber sie hat ein Schild um sich zu schutzen und kann seine einige Jaegerdrohne herstellen.]],
-    helptext_pl    = [[Nebula jest wytrzymala i ma problemy ze zwrotnoscia niczym latajaca cegla, jednak jest ona uzbrojona w oddzial dronow bojowych oraz tarcze obszarowa do ich ochrony.]],
     modelradius    = [[40]],
   },
 

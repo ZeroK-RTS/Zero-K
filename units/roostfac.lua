@@ -34,10 +34,8 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Erzeugt groﬂe Chicken]],
-    description_pl = [[Rozmnaza wieksze kurczaki]],
 	helptext       = [[Roosts such as this one are where the more powerful Thunderbirds are hatched.]],
 	helptext_de    = [[M‰chtige Kreaturen werden hier erzeugt und losgelassen.]],
-	helptext_pl    = [[W tym gniezdzie rodza sie wieksze, bardziej zaawansowane kurczaki.]],
     chickenFac = [[true]],
   },
 

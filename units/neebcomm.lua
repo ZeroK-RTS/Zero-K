@@ -6,7 +6,7 @@ unitDef = {
   brakeRate           = 0.205,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -23,9 +23,7 @@ unitDef = {
   category            = [[LAND UNARMED]],
 
   customParams        = {
-    description_pl = [[Karny kurczak]],
     helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
-    helptext_pl    = [[Karny kurczak za zle zachowanie. Popraw sie!]],
 	level		   = [[1]],
   },
 

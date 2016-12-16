@@ -3,6 +3,7 @@ unitDef = {
   name                = [[Kestrel]],
   description         = [[Tactical Strike Bomber]],
   amphibious          = true,
+  brakerate           = 0.4,
   buildCostEnergy     = 400,
   buildCostMetal      = 400,
   builder             = false,
@@ -23,9 +24,7 @@ unitDef = {
   cruiseAlt           = 160,
 
   customParams        = {
-    description_pl = [[Bombowiec taktyczny]],
     helptext       = [[The Kestrel launches short-range surface attack missiles that can also hit submarines. It is the best bomber for picking off single mobile targets.]],
-    helptext_pl    = [[Kestrel wystrzeliwuje rakiety krotkiego zasiegu, ktore moga trafic cele naziemne, nawodne lub podwodne. Sposrod bombowcow najlepiej nadaje sie do niszczenia pojedynczych jednostek.]],
     --modelradius    = [[10]],
   },
 
@@ -103,7 +102,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 90,
-      weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 200,
     },

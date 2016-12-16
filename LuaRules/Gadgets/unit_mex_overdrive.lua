@@ -51,10 +51,10 @@ local mexDefs = {}
 --local energyDefs = {}
 local pylonDefs = {}
 local generatorDefs = {}
-local odSharingModOptions = (Spring.GetModOptions()).overdrivesharingscheme or "investmentreturn"
+local isReturnOfInvestment = (Spring.GetModOptions().overdrivesharingscheme ~= "0")
 
-local enableEnergyPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_od"))
-local enableMexPayback = ((odSharingModOptions == "investmentreturn") or (odSharingModOptions == "investmentreturn_base"))
+local enableEnergyPayback = isReturnOfInvestment
+local enableMexPayback = isReturnOfInvestment
 
 include("LuaRules/Configs/constants.lua")
 

@@ -20,9 +20,7 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    description_pl = [[Amfibijny bot wsparcia]],
     helptext       = [[A typical riot unit, the Scallop is armed with impact explosives for underwater use and a quadruple shotgun when on land.]],
-    helptext_pl    = [[Scallop to wszechstronna jednostka, ktora oprocz podwodnych pociskow ma takze shotgun do walk na ladzie.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

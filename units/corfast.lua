@@ -3,10 +3,10 @@ unitDef = {
   name                = [[Constable]],
   description         = [[Jumpjet Constructor, Builds at 5 m/s]],
   acceleration        = 0.26,
-  brakeRate           = 0.26,
+  brakeRate           = 0.78,
   buildCostEnergy     = 160,
   buildCostMetal      = 160,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
@@ -28,19 +28,11 @@ unitDef = {
     jump_reload        = 10,
     jump_from_midair   = 1,
 
-    description_bp = [[Construtor saltador, produz a 5 m/s]],
-    description_es = [[Constructor jumpjet, construye a 5 m/s]],
     description_fr = [[Constructeur r Jetpack, Construit r 5 m/s]],
-    description_it = [[Costruttore jumpjet, costruisce a 5 m/s]],
 	description_de = [[Konstruktionsjumpjet, Baut mit 5 M/s]],
-	description_pl = [[Skaczacy konstruktor, moc 5 m/s]],
     helptext       = [[Fast and capable of jumping over short distances or heights, the Constable is the ideal constructor for rapid expansion. Armed with a light slowbeam, it can also provide combat support.]],
-    helptext_bp    = [[Rápido e capaz de saltar por sobre distâncias curtas ou pequenos obstáculos, Constable é ideal para expans?o rápida.]],
-    helptext_es    = [[Rápido y capaz de brincar sobre cortas distancias o alturas, el Constable es el constructor ideal para la expansión rápida]],
     helptext_fr    = [[R la fois rapide et capable de sauter sur de courtes distances grâce r son jetpack, le Constable est un superbe outil pour favoriser son expansion.]],
-    helptext_it    = [[Veloce e capace di saltare per corte distanze o altezze, il Constable é il costruttore ideale per l'espanzione rapida]],
 	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion.]],
-	helptext_pl    = [[Predki i majacy mozliwosc skoku, Constable to idealny konstruktor do szybkiej rozbudowy. Posiada takze lekki promien spowalniajacy, dzieki ktoremu zapewnia wsparcie w walce.]],
   },
 
   energyMake          = 0.15,

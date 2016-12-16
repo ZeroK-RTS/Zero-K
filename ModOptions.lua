@@ -186,34 +186,12 @@ local options = {
   },
   {
     key = "overdrivesharingscheme",
-    name = "Overdrive Resource Distribution Scheme",
-    desc = "Different scheme designed for distributing overdrive share.",
-    type = "list",
+    name = "Economy returns investment",
+    desc = "In a team game, resource gathering buildings return their cost over time to the players who build them.",
+    type = 'bool',
     section= 'a_important',
-    def = "investmentreturn",
-    items = {
-      {
-        key  = "investmentreturn",
-        name = "Investment Return",
-        desc = "Extra income is given to active players who built economy structure until the cost of the structure is paid.",
-      },
-      {
-        key  = "investmentreturn_od",
-        name = "Overdrive Return",
-        desc = "Extra overdrive is given to active players who built energy structure until the cost of the structure is paid.",
-      },
-      {
-        key  = "investmentreturn_base",
-        name = "Extractor Return",
-        desc = "Extra income is given to active players who built metal extractor until the cost of the structure is paid.",
-      },
-      {
-        key  = "communism",
-        name = "Equal Sharing",
-        desc = "All overdrive is shared equally among active players at all time.",
-      },
-    },
-  },  
+    def = true,
+  },
   {
     key         = "allyreclaim",
     name        = "Reclaimable allies",

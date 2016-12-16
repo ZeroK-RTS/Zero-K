@@ -7,10 +7,6 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostEnergy        = 180,
   buildCostMetal         = 180,
-
-  buildoptions           = {
-  },
-
   buildPic               = [[amphaa.png]],
   buildTime              = 180,
   canAttack              = true,
@@ -25,9 +21,7 @@ unitDef = {
     amph_regen = 20,
     amph_submerged_at = 40,
 	sink_on_emp    = 1,
-    description_pl = [[Amfibijny Bot Przeciwlotniczy]],
     helptext       = [[Angler is amphibious anti-air bot designed to counter the factory's nemesis - Raven. Two of them together can float to the surface and kill a single Raven.]],
-    helptext_pl    = [[Angler to amfibijna jednostka przeciwlotnicza zaprojektowana, by likwidowac glowne lotnicze zagrozenie dla amfibii - bombowiec Raven. Dwa Anglery moga wyplynac na powierzchnie i zestrzelic pojedynczego Ravena.]],
     floattoggle = [[1]],
   },
 

@@ -115,7 +115,6 @@ unitDef = {
       turret                  = true,
       waterWeapon             = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 280,
     },

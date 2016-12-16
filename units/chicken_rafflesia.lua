@@ -15,9 +15,7 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
-    description_pl = [[Tarcza]],
     helptext       = [[The Rafflesia protects nearby chicken units and structures with its shield.]],
-    helptext_pl    = [[Rafflesia chroni okoliczne kurczaki swoja tarcza.]],
   },
 
   explodeAs                     = [[NOWEAPON]],

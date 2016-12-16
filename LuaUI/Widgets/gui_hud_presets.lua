@@ -191,6 +191,76 @@ local function GetSelectionIconSize(height)
 end
 
 ----------------------------------------------------
+----------------------------------------------------
+
+local function SetupMissionGUI(preset)
+	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	-- mission objectives
+	local objOnLeft = (preset == "new") or (preset == "newMinimapLeft") or (preset == "newMinimapRight") or (preset == "westwood") or (preset == "crafty") or (preset == "ensemble")
+	local objX = objOnLeft and 0 or screenWidth - 64
+	local objY = 50 + screenHeight * 0.2	-- menu bar height + console height
+	if (preset == "crafty") then
+		objY = 50	-- resource bar height
+	elseif (preset == "new") then
+		objY = 50	-- thick button bar height
+	elseif (preset == "newMinimapLeft") or (preset == "newMinimapRight") then
+		objY = 32 -- thin menu/button bar height
+	elseif (preset == "ensemble") then
+		objY = screenHeight * 0.2	-- console height
+	end
+	
+	WG.SetWindowPosAndSize("objectivesButtonWindow",
+		objX,
+		objY,
+		64,
+		64
+	)
+	
+	local persistentOnLeft = (preset == "newMinimapRight") or (preset == "westwood") -- or (preset == "crafty")
+	local persistentY = objY + 64
+	if (preset == "new") then
+		persistentY = 50 + screenHeight * 0.2	-- menu bar height + console height
+	elseif (preset == "newMinimapLeft") then
+		persistentY = 32 + screenHeight * 0.2	-- thin menu bar height + console height
+	elseif (preset == "ensemble") then
+		persistentY = 50	-- menu bar height
+	elseif (preset == "crafty") then
+		persistentY = 100	-- approximate resbar height
+	end
+	
+	-- mission persistent messagebox
+	WG.SetWindowPosAndSize("msgPersistentWindow",
+		persistentOnLeft and 0 or screenWidth - 64,	-- let it be auto-pushed to the left
+		persistentY,
+		360,
+		160
+	)
+	
+	-- tutorial next button
+	local nextButtonY = persistentY + 200 + 60
+	if (preset == "new") or (preset == "crafty") then
+		nextButtonY = 50	-- button/menu bar height
+	elseif (preset == "newMinimapRight") then
+		nextButtonY = 32	-- thin menu/button bar height
+	elseif (preset == "ensemble") then
+		nextButtonY = screenHeight * 0.2	-- console height
+	end
+	local nextButtonHeight = 48
+	local nextButtonX = persistentOnLeft and 0 or screenWidth - 80
+	if (preset == "new") or (preset == "newMinimapRight") or (preset == "crafty") or (preset == "ensemble") then
+		nextButtonX = 64	-- next to objectives button
+		nextButtonHeight = 64
+	end
+	
+	WG.SetWindowPosAndSize("uitutorial_nextButtonWindow",
+		nextButtonX,
+		nextButtonY,
+		80,
+		nextButtonHeight
+	)
+end
+
+----------------------------------------------------
 -- Default Preset
 ----------------------------------------------------
 local function SetupDefaultPreset()
@@ -308,6 +378,7 @@ local function SetupDefaultPreset()
 	local resourceBarWidth = math.min(screenWidth - 700, 660)
 	local resourceBarHeight = 100
 	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
+	local resourceBarRight = resourceBarWidth + resourceBarX
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
 		0,
@@ -316,14 +387,16 @@ local function SetupDefaultPreset()
 	)
 	
 	-- Console
-	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - minimapWidth)
+	local consoleWidth = math.min(screenWidth * 0.30, screenWidth - minimapWidth, resourceBarRight - 2)
 	local consoleHeight = screenHeight * 0.20
 	WG.SetWindowPosAndSize("ProConsole",
 		screenWidth - consoleHeight,
-		resourceBarHeight,
+		menuHeight,
 		consoleWidth,
 		consoleHeight
 	)
+	
+	SetupMissionGUI("default")
 end
 
 ----------------------------------------------------
@@ -529,6 +602,8 @@ local function SetupNewPreset()
 		consoleWidth,
 		consoleHeight
 	)
+	
+	SetupMissionGUI("new")
 end
 
 ----------------------------------------------------
@@ -779,6 +854,7 @@ local function SetupMinimapLeftPreset()
 	)
 	
 	SetupNewUITop()
+	SetupMissionGUI("newMinimapLeft")
 end
 
 ----------------------------------------------------
@@ -958,6 +1034,7 @@ local function SetupMinimapRightPreset()
 	)
 	
 	SetupNewUITop()
+	SetupMissionGUI("newMinimapRight")
 end
 
 ----------------------------------------------------
@@ -1070,10 +1147,10 @@ local function SetupCraftyPreset()
 	-- Resource Bar
 	local resourceBarWidth = 660
 	local resourceBarHeight = 50
-	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth)
+	local resourceBarX = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - resourceBarWidth - menuWidth + 4)
 	WG.SetWindowPosAndSize("EconomyPanelDefaultTwo",
 		resourceBarX,
-		0,
+		0 - 4,
 		resourceBarWidth,
 		resourceBarHeight
 	)
@@ -1087,6 +1164,8 @@ local function SetupCraftyPreset()
 		consoleWidth,
 		consoleHeight
 	)
+	
+	SetupMissionGUI("crafty")
 end
 
 
@@ -1217,6 +1296,8 @@ local function SetupEnsemblePreset()
 		consoleWidth,
 		consoleHeight
 	)
+	
+	SetupMissionGUI("ensemble")
 end
 
 ----------------------------------------------------
@@ -1346,6 +1427,8 @@ local function SetupWestwoodPreset()
 		consoleWidth,
 		consoleHeight
 	)
+	
+	SetupMissionGUI("westwood")
 end
 
 ----------------------------------------------------

@@ -21,10 +21,8 @@ unitDef = {
 
   customParams                  = {
     description_de = [[Flugabwehrraketenturm]],
-    description_pl = [[Wieza przeciwlotnicza]],
     helptext       = [[The Hacksaw's twin missiles can drop even the most heavily armored bomber in one pair of hits, but take a considerable amount of time to reload, making them less than ideal against light targets.]],
 	helptext_de    = [[Seine Zwillingsraketen können sogar die schwersten Bomber mit einem Schuss vom Himmel holen, brauchen aber eine beachtliche Zeit zum Nachladen, was sie gegen leichtere Ziele nicht sehr effektiv macht.]],
-	helptext_pl    = [[Podwojne rakiety, ktore wystrzeliwuje Hacksaw, zadaja bardzo duze obrazenia, jednak maja rownie dlugi czas przeladowania.]],
   },
 
   explodeAs                     = [[SMALL_BUILDINGEX]],
@@ -112,7 +110,6 @@ unitDef = {
       turnRate                = 70000,
       turret                  = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 1000,
     },

@@ -27,7 +27,6 @@ unitDef = {
   customParams           = {
     description_de = [[Flugzeugträger (Bomber)]],
     description_fr = [[Porte-Avion Bombardier]],
-    description_pl = [[Lotniskowiec z tarcza antyrakietowa]],
     helptext       = [[The most versatile ship on the high seas, the carrier serves several functions. It is equipped with a manual-fire tactical missile launcher for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets.]],
 	midposoffset   = [[0 -10 0]],
     modelradius    = [[50]],

@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Redback]],
   description            = [[Riot Spider]],
   acceleration           = 0.22,
-  brakeRate              = 0.22,
+  brakeRate              = 0.66,
   buildCostEnergy        = 280,
   buildCostMetal         = 280,
   buildPic               = [[spiderriot.png]],
@@ -21,8 +21,6 @@ unitDef = {
 
   customParams           = {
     helptext       = [[A rapid fire spider which excels at picking off fast units.]],
-    description_pl = [[Pajak wsparcia]],
-    helptext_pl    = [[Szybkostrzelny pajak, ktory swietnie radzi sobie z niszczeniem lekkich jednostek.]],
     aimposoffset   = [[0 10 0]],
   },
 

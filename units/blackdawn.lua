@@ -4,7 +4,7 @@ unitDef = {
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.135,
   amphibious          = true,
-  brakeRate           = 0.135,
+  brakeRate           = 0.108,
   buildCostEnergy     = 900,
   buildCostMetal      = 900,
   builder             = false,
@@ -26,15 +26,11 @@ unitDef = {
 
   customParams        = {
     airstrafecontrol = [[1]],
-    description_bp = [[Aeronave flutuante de assalto terrestre]],
     description_fr = [[ADAV d'Assaut Terrestre]],
 	description_de = [[Bodenangriff-Kampfhubschrauber]],
-	description_pl = [[Ciezki statek powietrzny wsparcia]],
     helptext       = [[The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken.]],
-    helptext_bp    = [[Black Dawn é a aeronave flutuante de assalto de logos. ? muito resistente e causa muito dano, mas lenta e pouco precisa, especialmente contro alvos em movimento. Funciona bem para atacar bases compactas e unidades lentas ou fixas.]],
     helptext_fr    = [[Le Black Dawn est un ADAV Air/Sol au blindage ?pais et aux missiles puissants, cependant ils sont impr?cis. Pratique pour d?truire des cibles mass?es ou non mouvantes.]],
 	helptext_de    = [[Der Black Dawn feuert salvenartig ungelenkte Raketen. Er besitzt eine hohe Lebensenergie und hat einen großen Schadensoutput, aber er ist teuer und unpräzise, vor allem gegen sich bewegende Ziele. Er ist gut, um Basisstrukturen und langsame oder stationäre Einheiten zu zerstören.]],
-	helptext_pl    = [[Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, ktore jednak nie sa samonaprowadzajace i przez to maja klopoty z trafianiem szybkich jednostek. Blackdawn jest wytrzymaly, ale tez drogi i ma niska szybkostrzelnosc, zatem oczekujac miedzy atakami warto oddalic sie, aby nie otrzymywac niepotrzebnych obrazen.]],
 	modelradius    = [[10]],
   },
 
@@ -116,7 +112,6 @@ unitDef = {
       turnRate                = 1400,
       turret                  = true,
       weaponAcceleration      = 100,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 250,
       wobble                  = 8000,

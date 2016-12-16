@@ -22,9 +22,7 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    description_pl = [[Wielki Guzik Wygranej]],
     helptext       = [[I Win!!!]],
-    helptext_pl    = [[Wygralam!!!]],
 	modelradius    = [[60]],
   },
 

@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Tarantula]],
   description            = [[Anti-Air Spider]],
   acceleration           = 0.22,
-  brakeRate              = 0.22,
+  brakeRate              = 0.66,
   buildCostEnergy        = 400,
   buildCostMetal         = 400,
   buildPic               = [[spideraa.png]],
@@ -17,15 +17,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Aranha anti-aérea]],
     description_fr = [[Araignée AA]],
 	description_de = [[Flugabwehr Spinne]],
-	description_pl = [[Pajak przeciwlotniczy]],
     helptext       = [[An all-terrain AA unit that supports other spiders against air with its medium-range missiles.]],
-    helptext_bp    = [[Uma unidade escaladora anti-aérea. Use para proteger outras aranhas contra ataques aéreos.]],
     helptext_fr    = [[Une unité araignée lourde anti-air, son missile a décollage vertical est lent à tirer mais très efficace contre des cibles aériennes blindées.]],
 	helptext_de    = [[Eine geländegängige Flugabwehreinheit, die andere Spinnen mit ihren mittellangen Raketen gegen Luftangriffe verteidigt.]],
-	helptext_pl    = [[Jako pajak, Tarantula jest w stanie wejsc na kazde wzniesienie, aby zapewnic wsparcie przeciwlotnicze swoimi rakietami sredniego zasiegu.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],

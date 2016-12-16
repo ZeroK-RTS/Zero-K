@@ -3,7 +3,7 @@ unitDef = {
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
   acceleration           = 0.26,
-  brakeRate              = 0.26,
+  brakeRate              = 0.78,
   buildCostEnergy        = 3000,
   buildCostMetal         = 3000,
   builder                = false,
@@ -20,10 +20,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki pajak bojowy]],
     helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
-    helptext_pl    = [[Scorpion to bojowy pajak, ktory paralizuje i szybko niszczy przeciwnikow; jego pancerz jest bardzo wytrzymaly i zapewnia mu maskowanie.]],
-    cloakstealth   = [[1]],
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],

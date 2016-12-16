@@ -4,6 +4,7 @@ unitDef = {
   description         = [[Singularity Bomber]],
   amphibious          = true,
   --autoheal			  = 25,
+  brakerate           = 0.4,
   buildCostEnergy     = 2000,
   buildCostMetal      = 2000,
   builder             = false,
@@ -27,14 +28,10 @@ unitDef = {
 
   customParams        = {
     helptext       = [[The Wyvern drops a single powerful bomb that can send units flying. It is sturdy enough to penetrate moderate AA and escape to repair, but should not be used recklessly - it's too expensive for that.]],
-    description_bp = [[Bombardeiro de implos?o]],
     description_de = [[Implosion Bomber]],
     description_fr = [[Bombardier r Implosion]],
-    description_pl = [[Bombowiec Implozyjny]],
-    helptext_bp    = [[]],
     helptext_de    = [[Wyvern ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
     helptext_fr    = [[Le Wyvern est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
-    helptext_pl    = [[Wyvern spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie.]],
     modelradius    = [[10]],
   },
 
@@ -60,7 +57,7 @@ unitDef = {
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
-  turnRadius          = 180,
+  turnRadius          = 20,
   workerTime          = 0,
 
   weapons             = {
@@ -117,7 +114,6 @@ unitDef = {
       tracks                  = true,
       turnRate                = 30000,
 	  weaponAcceleration      = 200,
-      weaponTimer             = 6,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },

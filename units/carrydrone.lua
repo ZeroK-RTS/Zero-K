@@ -6,7 +6,7 @@ unitDef = {
   airHoverFactor      = 4,
   amphibious          = true,
   bankscale           = [[1]],
-  brakeRate           = 0.3,
+  brakeRate           = 0.24,
   buildCostEnergy     = 75,
   buildCostMetal      = 75,
   builder             = false,
@@ -46,9 +46,7 @@ unitDef = {
   customParams        = {
 	helptext       = [[Carrier drones accompany their parent ship, guarding it and sharing its attack targets. They cannot venture far from it on their own, however. The Carrier can produce a pair of drones every 15 seconds, up to a total of 8.]],
 	description_de = [[Trägerdrohne]],
-	description_pl = [[Dron lotniskowca]],
 	helptext_de    = [[Die Drohnen schutzen den Traeger und teilen seine Ziele, aber sie koennen nicht zu weit allein gehen. Der Traeger herstellt ein Paar Drohnen jede 15 Sekunden, bis zu 8.]],
-	helptext_pl    = [[Drony bronia swojego lotniskowca i dziela z nim cele, jednak nie moga sie od niego zbytnio oddalac na wlasna reke. Lotniskowiec produkuje drony w parach co 15 sekund i moze kontrolowac do 8.]],
 
 	is_drone = 1,
 	modelradius    = [[13]],
@@ -116,7 +114,6 @@ unitDef = {
       soundStartVolume        = 2,
       sprayAngle              = 512,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 1000,
     },
