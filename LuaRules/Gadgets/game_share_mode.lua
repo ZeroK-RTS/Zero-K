@@ -1,385 +1,422 @@
-function gadget:GetInfo()
+-- WARNING: This is a temporary file. Please modify as you see fit! --
+function widget:GetInfo()
 	return {
-		name	 = "Share mode",
-		desc	 = "Allows one to share control of resources and units with other players.",
-		author	 = "_Shaman",
-		date	 = "6-23-2016",
-		license	 = "Do whatever you want with it, just give credit",
-		layer	 = 0,
-		enabled	 = true,
+		name	= "Chili Share menu",
+		desc	= "Press H to bring up the chili share menu.",
+		author	= "_Shaman",
+		date	= "12-3-2016",
+		license	= "Do whatever with it (cuz a license isn't going to stop you ;) )",
+		layer	= 2000,
+		enabled	= true,
 	}
 end
 
-local function ProccessCommand(str)
+local invites = {}
+local built = false
+local sharemode = false
+local playersingame = {}
+include("keysym.h.lua")
+local playerlist, chili, window, screen0,updateme,invitelist,invwindow
+local keytopress = KEYSYMS.H
+local showing = false
+local sizefontcache = {}
+local images = {
+	inviteplayer = 'LuaUI/Images/epicmenu/whiteflag_check.png',
+	accept = 'LuaUI/Images/epicmenu/check.png',
+	decline = 'LuaUI/Images/advplayerslist/cross.png',
+	pending = 'LuaUI/Images/epicmenu/questionmark.png',
+	leave = 'LuaUI/Images/epicmenu/exit.png',
+	kick = 'LuaUI/Images/advplayerslist/cross.png', -- REPLACE ME
+	leader = 'LuaUI/Images/Ranks/star.png',
+	join = 'LuaUI/Images/epicmenu/people.png', -- REPLACE ME
+	give = 'LuaUI/Images/gift2.png',
+	giftmetal = 'LuaUI/Images/ibeam.png',
+	giftenergy = 'LuaUI/Images/energy.png',
+}
+local amounts = {
+	default = 100,
+	shift = 20,
+}
+
+local function StringToTable(str)
 	local strtbl = {}
+	local num = 0
 	for w in string.gmatch(str, "%S+") do
-	strtbl[#strtbl+1] = w
+		num = num+1
+		strtbl[num] = {}
+		w = string.gsub(w,","," ")
+		for x in string.gmatch(w,"%S+") do
+			strtbl[num][#strtbl[num]+1] = x
+		end
 	end
 	return strtbl
 end
 
-local function tobool(var)
-	Spring.Echo("tobool: " .. tostring(var))
-	if tonumber(var) == 1 or tostring(var) == "true" then
-		return true
-	elseif var ~= nil then
-		return false
+local function InvitePlayer(playerid,request)
+	local name = select(1,Spring.GetPlayerInfo(playerid))
+	if request == true then -- we're asking to join the player's team
+		Spring.SendLuaRulesMsg("sharemode invite " .. playerid .. " " .. playerid)
+		Spring.SendCommands("say a:I sent a request to join " .. name .."'s squad.")
 	else
-		return nil
+		Spring.SendLuaRulesMsg("sharemode invite " .. playerid .. " " .. Spring.GetMyPlayerID())
+		if #Spring.GetPlayerList(select(4,Spring.GetPlayerInfo(playerid))) > 1 then
+			Spring.SendCommands("say a:I invited " .. name .. "'s squad to a merger.")
+		else
+			Spring.SendCommands("say a:I invited " .. name .. " to join my squad.")
+		end
 	end
 end
 
-local modOptions = {}
-if (Spring.GetModOptions) then
-	modOptions = Spring.GetModOptions()
+local function LeaveMySquad()
+	Spring.SendCommands("say a: I left " .. select(1,Spring.GetPlayerInfo(select(2,Spring.GetTeamInfo(Spring.GetMyTeamID())))) .. "'s squad.") -- this line is a mess D:
+	Spring.SendLuaRulesMsg("sharemode unmerge")
 end
 
-if modOptions.sharemode == "off" then
-	gadgetHandler:RemoveGadget()
-end
-
-local validmodes = {};validmodes["all"] = true;validmodes["none"] = true;validmodes["invite"] = true
-
-local config = {
-	default = "invite",
-	mergetype = modOptions.sharemode,
-	unmerging = false,
-	mintime	 = 5,
-}
--- check config --
-if config.mergetype == nil then config.mergetype = "invite"; end
-
-if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
-
---Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
-
-local function GetTeamID(playerid)
-	return select(4,Spring.GetPlayerInfo(playerid))
-end
-
-local function GetTeamLeader(teamid)
-	return select(2,Spring.GetTeamInfo(teamid))
-end
-
-local function IsTeamLeader(playerid)
-	local teamid = GetTeamID(playerid)
-	local teamleaderid = select(2,Spring.GetTeamInfo(teamid))
-	if playerid == teamleaderid then
-		teamid,teamleaderid = nil
-		return true
+local function InviteChange(playerid,success,merge)
+	local name = select(1,Spring.GetPlayerInfo(playerid))
+	if success == true then
+		Spring.SendLuaRulesMsg("sharemode accept " .. playerid)
+		if merge == true then
+			Spring.SendCommands("say a:I have joined " .. name .. "'s team.")
+		else
+			Spring.SendCommands("say a:I have accepted " .. name .. "'s request. Welcome aboard.")
+		end
 	else
-		teamid,teamleaderid = nil
-		return false
+		Spring.SendLuaRulesMsg("sharemode decline " .. playerid)
+		if merge == true then
+			Spring.SendCommands("say a:I have declined " .. name .. "'s invite.")
+		else
+			Spring.SendCommands("say a:I have declined " .. name .. "'s request.")
+		end
 	end
 end
 
-local function IsPlayerOnSameTeam(playerid,playerid2)
-	local id1 = GetTeamID(playerid)
-	local id2 = GetTeamID(playerid2)
-	if id1 == id2 then
-		id1,id2 = nil
-		return true
+local function Hideme()
+	window:Hide()
+	showing = false
+end
+
+local function KickPlayer(playerid)
+	Spring.SendCommands("say a: I kicked " .. select(1,Spring.GetPlayerInfo(playerid)) .. " from my squad.")
+	Spring.SendLuaRulesMsg("sharemode kick " .. playerid)
+end
+
+local function GiveUnit(target)
+	local num = Spring.GetSelectedUnitsCount()
+	if num == 0 then
+		Spring.Echo("game_message: You should probably select some units first before you try to give some away.")
+		return
+	end
+	local playerslist = Spring.GetPlayerList(target)
+	local units = "units"
+	if num == 1 then
+		units = "unit"
+	end
+	local leader = select(2,Spring.GetTeamInfo(target))
+	local name = select(1,Spring.GetPlayerInfo(leader))
+	if select(4,Spring.GetTeamInfo(target)) then
+		name = select(2,Spring.GetAIInfo(target))
+	end
+	if #playerslist > 1 then
+		name = name .. "'s squad"
+	end
+	Spring.SendCommands("say a: I gave " .. num .. " " .. units .. " to " .. name .. ".")
+	Spring.ShareResources(target,"units")
+end
+
+local function GiveResource(target,kind)
+	--mod = 20,500,all
+	local alt,ctrl,_,shift = Spring.GetModKeyState()
+	if alt then mod = "all"
+	elseif ctrl then mod = 500
+	elseif shift then mod = 20
+	else mod = 100 end
+	local leader = select(2,Spring.GetTeamInfo(target))
+	local name = select(1,Spring.GetPlayerInfo(leader))
+	if select(4,Spring.GetTeamInfo(target)) then
+		name = select(2,Spring.GetAIInfo(target))
+	end
+	local playerslist = Spring.GetPlayerList(target,true)
+	if #playerslist > 1 then
+		name = name .. "'s squad"
+	end
+	local num = 0
+	if mod == "all" then
+		num = Spring.GetTeamResources(select(1,Spring.GetMyTeamID(),kind))
+	elseif mod ~= nil then
+		num = mod
 	else
-		id1,id2 = nil
-		return false
+		return
+	end
+	Spring.SendCommands("say a: I gave " .. math.floor(num) .. " " .. kind .. " to " .. name .. ".")
+	Spring.ShareResources(target,kind,num)
+end
+
+local function GetPlayers()
+	local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
+	local playersonteam = {}
+	for i=1, #teamlist do
+		if teamlist[i] ~= nil then
+			playersonteam = Spring.GetPlayerList(teamlist[i])
+			for s=1,#playersonteam do
+				Spring.Echo("Player info for " .. playersonteam[s] .. "(" .. select(1,Spring.GetPlayerInfo(playersonteam[s])) .. "):" .. tostring(select(2,Spring.GetPlayerInfo(playersonteam[s]))))
+				if playersonteam[s] ~= nil  and select(2,Spring.GetPlayerInfo(playersonteam[s])) == true then
+					playersingame[playersonteam[s]] = true
+				end
+			end
+		end
 	end
 end
 
-local function GetSquadSize(teamid)
-	return #Spring.GetPlayerList(teamid,true)
+
+local function HideInvites()
+	invwindow:Hide()
+	window:Show()
 end
 
-if (gadgetHandler:IsSyncedCode()) then
-	local Invites = {}
-	local controlledplayers = {}
-	local originalplayers = {}
-	local originalunits = {}
+local function BuildInvites()
+	if sharemode then
+		invwindow = chili.Window:New{parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
+		chili.Button:New{parent=invwindow,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Back",OnClick={function () HideInvites(); end},tooltip="Return to menu."}
+		chili.TextBox:New{parent=invwindow, width = '80%',height = '20%',x='40%',y='1%',text="Pending Invites",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
+		invwindow:Hide()
+	end
+end
 
-	local function GetLowestID(list,includeai)
-		local lowest = 9001
-		local aipresent = false
-		local isAI
-		for _,id in pairs(list) do
-			isAI = select(4,Spring.GetTeamInfo(id))
-			if isAI then aipresent = true end
-			if id < lowest and id > 0 and isAI == false and includeai == false then lowest = id end
-			if id < lowest and id > 0 and includeai == true then lowest = id end
+local function Buildme()
+	Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
+	window = chili.Window:New{parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
+	Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
+	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='25%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
+	local playerlistsize = 91
+	chili.Button:New{parent=window,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Close",OnClick={function () Hideme(); end},tooltip="Closes this window"}
+	local players = {}
+	local playersonteam = {}
+	local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
+	local teamleaderid = 0
+	for i=1, #teamlist do
+		if teamlist[i] ~= nil then
+			playersonteam = Spring.GetPlayerList(teamlist[i])
+			teamleaderid = select(2,Spring.GetTeamInfo(teamlist[i]))
+			Spring.Echo(teamlist[i] .. ": leader: " .. teamleaderid)
+			if select(4,Spring.GetTeamInfo(teamlist[i])) then -- this is an ai
+				players[#players+1] = {name = select(2,Spring.GetAIInfo(teamlist[i])),active=false,team=teamlist[i],isai=true}
+			end
+			for s=1,#playersonteam do
+				if playersonteam[s] ~= nil and playersingame[playersonteam[s]] then
+					players[#players+1] = {id= playersonteam[s],name = select(1,Spring.GetPlayerInfo(playersonteam[s])),spec = select(3,Spring.GetPlayerInfo(playersonteam[s])), team = teamlist[i], teamleader = false}
+					Spring.Echo("player " .. players[#players].id .. ": " .. players[#players].name)
+					if teamleaderid == playersonteam[s] then
+						players[#players].teamleader = true
+					end
+				end
+			end
 		end
-		return lowest,aipresent
 	end
+	playersonteam,teamlist,teamleaderid = nil
+	local playerpanels = {}
+	for i=1, #players do
+		playerpanels[i] = chili.Panel:New{backgroundColor={0,0,0,0}}
+	end
+	if #players > 8 or (playerlistsize == 40 and #players > 5) then 
+		chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children={chili.Grid:New{columns=1,x=0,y=0,children=playerpanels,itemPadding={0,0,0,0},height=9900,width='100%',centerItems=false,resizeItems=true,maxHeight=575,minHeight=575}},backgroundColor= {0,0,0,0}}
+	else
+		chili.Panel:New{parent=window,y='5%',width='100%',height= playerlistsize .. '%',children={chili.Grid:New{columns=1,x=0,y=0,children=playerpanels,itemPadding={0,0,0,0},height=1700,width='100%',centerItems=false,resizeItems=true,maxHeight=475,minHeight=300}},padding={0,0,0,0}}
+	end
+	local r,g,b,a,newy,sizefont,wantedfs,distance,numbuttons,wide
+	if playerlistsize == 91 then
+		numbuttons = 3
+	else
+		numbuttons = 5
+	end
+	wantedfs = 22
+	local buttonsize = math.min(100,60 + -1*((4-#players)*10))
+	if buttonsize ~= 100 then
+		newy = (100-buttonsize)/2 -- this centers it on the Y axis. So 75% button size would be 12.5% on the y axis
+	else
+		newy = 0
+	end
+	for i=1,#players do
+		sizefont = wantedfs
+		repeat
+			Spring.Echo("Fontsize for " .. players[i].name .. ": " .. sizefont)
+			if sizefont*((string.len(players[i].name)+5.5)/4.25) > playerpanels[i].width*0.6 then
+				sizefont = sizefont - 0.5
+			end
+		until sizefont*((string.len(players[i].name)+5.5)/4.25) <= playerpanels[i].width*0.6
+		if players[i].id ~= Spring.GetMyPlayerID() then
+			if players[i].isai or (select(2,Spring.GetPlayerInfo(players[i].id)) and players[i].teamleader) then -- Padding is ~2% between buttons.
+				chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x='2%',y= newy..'%',OnClick= {function () GiveUnit(players[i].team) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
+				chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '12%',y=newy..'%',OnClick = {function () GiveResource(players[i].team,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 500.\nHolding shift will give 20.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
+				chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '22%',y=newy..'%',OnClick = {function () GiveResource(players[i].team,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 500.\nHolding shift will give 20.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
+			end
+			if sharemode and select(4,Spring.GetTeamInfo(players[i].team)) == false then
+				if players[i].teamleader and players[i].team ~= Spring.GetMyTeamID() then
+					chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '32%',y=newy..'%',OnClick = {function () InvitePlayer(players[i].id,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
+					chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '42%',y=newy..'%',OnClick = {function () InvitePlayer(players[i].id,true) end}, padding={1,1,1,1}, tooltip = "Request to join this player's squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.", children={chili.Image:New{file=images.join,width='100%',height='100%'}},caption=" "}
+				elseif select(2,Spring.GetTeamInfo(Spring.GetMyTeamID())) == Spring.GetMyPlayerID() and players[i].id ~= Spring.GetMyPlayerID() then
+					chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '32%',y=newy..'%',OnClick = {function () KickPlayer(players[i].id) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+				end
+			end
+		end
+		if players[i].id == Spring.GetMyPlayerID() and select(2,Spring.GetTeamInfo(Spring.GetMyTeamID())) ~= Spring.GetMyPlayerID() then
+			chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '10%',x= '32%',y=newy..'%',OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='100%',height='100%'}},caption=" "}
+		end
+		if sharemode and players[i].id == Spring.GetMyPlayerID() and select(2,Spring.GetTeamInfo(Spring.GetMyTeamID())) == Spring.GetMyPlayerID() then
+			updateme = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '50%',x='2%',y=newy..'%',caption="Invites [0]",OnClick={function () Hideme(); invwindow:Show(); end},tooltip="Contains invites you currently have."}
+		end
+		r,g,b,a = Spring.GetTeamColor(players[i].team)
+		Spring.Echo("Playerpanel size: " .. playerpanels[i].width .. "x" .. playerpanels[i].height .. "\nTextbox size: " .. playerpanels[i].width*0.4 .. "x" .. playerpanels[i].height)
+		local texty = 35.5
+		if #players < 3 then
+			texty = 44.5
+		end
+		if players[i].spec then
+			chili.TextBox:New{parent=playerpanels[i],height='100%',width='40%',fontsize=sizefont,x='60%',text=players[i].name .. "(RSGN)", textColor={0.5,0,0,1},y=texty..'%'}
+		elseif not players[i].isai and not select(2,Spring.GetPlayerInfo(players[i].id)) then
+			chili.TextBox:New{parent=playerpanels[i],height='100%',width='40%',fontsize=sizefont,x='60%',text=players[i].name .. "(QT)", textColor={1,0,0,1},y=texty..'%'}
+		else
+			chili.TextBox:New{parent=playerpanels[i],height='100%',width='40%',fontsize=sizefont,x='60%',text=players[i].name, textColor={r,g,b,a},y='33%',y=texty..'%'}
+		end
+	end
+	if showing then
+		window:Show()
+	else
+		window:Hide()
+	end
+	if invites and #invites > 0 then
+		updateme:SetCaption("Invites [" .. #invites .. "]")
+	end
+	built = true
+end
 
-	local function UnmergePlayer(player) -- Takes playerid, not teamid!!!
-		local name,_ = Spring.GetPlayerInfo(player)
-		if originalplayers[player] and config.unmerging then
-			Spring.Echo("game_message: Unmerging player " .. name)
-			if originalplayers[player] then
-				GG.Overdrive.RemoveTeamIncomeRedirect(originalplayers[player]) -- Reset team income/storage.
-				local target = originalplayers[player]
-				Spring.AssignPlayerToTeam(player,originalplayers[player])
-				for _,unit in pairs(originalunits[target]) do
-					if Spring.ValidUnitID(unit) and Spring.AreTeamsAllied(Spring.GetUnitTeam(unit),target) then
-						Spring.TransferUnit(unit,target,true)
-					end
-				end
-				originalunits[target] = nil
-				target,controlledplayers[player] = nil -- cleanup.
-			end
+local function InvitesChanged()
+	window:ClearChildren()
+	window:Dispose()
+	Buildme()
+end
+
+local function UpdateInviteTable()
+	local newinvites = {}
+	local invitestring = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"invites")
+	if string.len(invitestring) < 2 then
+		newinvites = {}
+	else
+		--Spring.Echo("Invitestring:" .. invitestring)
+		invitestring = string.gsub(invitestring," ",";")
+		--Spring.Echo("Invitestring2:" .. invitestring)
+		invitestring = string.gsub(invitestring,","," ")
+		invitestring = string.gsub(invitestring,";",",")
+		--Spring.Echo("New Invite string:" .. invitestring)
+		local newtable = StringToTable(invitestring)
+		for i=1,#newtable do
+			newinvites[#newinvites+1] = {id= newtable[i][1],timeleft = newtable[i][2], controller=newtable[i][3]}
 		end
 	end
-	
-	local function MergeUnits(team,target)
-		local units = Spring.GetTeamUnits(team)
-		originalunits[team] = units
-		for i=1, #units do
-			if  Spring.ValidUnitID(units[i]) then
-				Spring.TransferUnit(units[i],target,true)
-			end
-		end
+	if invites == nil or #newinvites ~= #invites then
+		invites = newinvites
+		InvitesChanged()
 	end
-	
-	local function MergePlayer(playerid,target)
-		if playerid == nil then
-			Spring.Echo("Commshare: Tried to merge a nil player!")
-			return
-		end
-		local originalteam = GetTeamID(playerid)
-		local name,_,spec  = Spring.GetPlayerInfo(playerid)
-		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none" then
-			Spring.Echo("Commshare: Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
-			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
-			if GetSquadSize(originalteam) - 1 == 0 then
-				local metal = select(1,Spring.GetTeamResources(originalteam,"metal"))
-				local energy = select(1,Spring.GetTeamResources(originalteam,"energy"))
-				Spring.ShareTeamResource(originalteam,target,"metal",metal)
-				Spring.ShareTeamResource(originalteam,target,"energy",energy)
-				MergeUnits(originalteam,target)
-			end
-			Spring.AssignPlayerToTeam(playerid,target)
-			if originalplayers[playerid] == nil then
-				originalplayers[playerid] = originalteam
-			end
-			controlledplayers[playerid] = target
-			GG.Overdrive.RedirectTeamIncome(originalteam, target)
+	if invitelist then
+		invitelist:Dispose()
+	end
+	local invitetab = {}
+	for i=1,#invites do
+		invitetab[#invitetab+1] = chili.Panel:New{backgroundColor={0,0,0,0}}
+	end
+	invitelist = chili.ScrollPanel:New{parent=invwindow,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= 90 .. '%',scrollBarSize=20,children={chili.Grid:New{columns=2,x=0,y=0,children=invitetab,itemPadding={0,0,0,0},height=1700,width='100%',centerItems=false,resizeItems=true,maxHeight=65,minHeight=65}},padding={0,0,0,0}}
+	local merge = false
+	local r,g,b,a
+	for i=1,#invitetab do
+		if invites[i].controller == Spring.GetMyPlayerID() then
+			merge = true
 		else
-			Spring.Echo("Commshare: Merger error.")
+			merge = false
 		end
-	end
-	
-	local function MergeTeams(team1,team2) -- bandaid for an issue during planning.
-		local playerlist = Spring.GetPlayerList(team1,true)
-		local playerlist2 = Spring.GetPlayerList(team2,true)
-		if GetSquadSize(team1) >= GetSquadSize(team2) then
-			for i=1,#playerlist do
-				MergePlayer(playerlist[i],team2)
-			end
+		r,g,b,a = Spring.GetTeamColor(select(4,Spring.GetPlayerInfo(invites[i].id)))
+		chili.Button:New{parent = invitetab[i],height = 100 .. '%', width = '10%',x= '2%',y='0%',OnClick = {function ()  InviteChange(invites[i].id,true,merge) end}, padding={1,1,1,1}, tooltip = "Accept this invite", children={chili.Image:New{file=images.accept,width='100%',height='100%'}},caption=" "}
+		chili.Button:New{parent = invitetab[i],height = 100 .. '%', width = '10%',x= '13%',y='0%',OnClick = {function () InviteChange(invites[i].id,false,merge) end}, padding={1,1,1,1}, tooltip = "Reject this invite", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+		if merge == true then
+			chili.TextBox:New{parent= invitetab[i],height='100%',width='70%',fontsize=16.5,x='26%',text=select(1,Spring.GetPlayerInfo(invites[i].id)) .. " (merge)", textColor={r,g,b,a},y='35%'}
 		else
-			for i=1,#playerlist2 do
-				MergePlayer(playerlist2[i],team1)
-			end
-		end
-		playerlist,playerlist2 = nil
-	end
-	
-	local function SendInvite(player,target,targetid) -- targetplayer is which player is the merger
-		if Spring.GetGameFrame() > config.mintime then
-			local targetspec = select(3,Spring.GetPlayerInfo(target))
-			local _,_,dead,ai,_ = Spring.GetTeamInfo(GetTeamID(targetid))
-			if player == target then
-				SendToUnsynced("errors",player,"You can't merge with yourself!")
-				return
-			end
-			if not IsTeamLeader(player) and targetid ~= player then
-				SendToUnsynced("errors",player,"You can't invite players when you aren't the team leader!")
-				return
-			end
-			if targetspec then
-				SendToUnsynced("errors",player,"You can't merge with specs!")
-				return
-			end
-			if targetid == player then
-				local teamid = GetTeamID(target)
-				target = GetTeamLeader(teamid)
-			end
-			if not dead and not ai then
-				if Invites[target] == nil then
-					Invites[target] = {}
-				end
-				Invites[target][player] = {id = player,timeleft = 60,controller = targetid}
-			end
+			chili.TextBox:New{parent= invitetab[i],height='100%',width='70%',fontsize=16.5,x='26%',text=select(1,Spring.GetPlayerInfo(invites[i].id)) .. " (join)", textColor={r,g,b,a},y='35%'}
 		end
 	end
-	
-	
-	local function AcceptInvite(player,target)
-		Spring.Echo("verifying invite")
-		if Invites[player][target] and Invites[target][player] then
-			Spring.Echo("invite verified")
-			if Invites[player][target]["controller"] ~= player then
-				MergePlayer(target,GetTeamID(player))
-			else -- target->player
-				MergeTeams(GetTeamID(target),GetTeamID(player))
-				teamlist = nil
-			end
-			Invites[player][target] = nil
-			Invites[target][player] = nil
-		else
-			SendToUnsynced("errors",player,"Invalid merge request!")
+end
+
+function widget:KeyPress(key,mod,repeating)
+	if key == keytopress and not showing and not repeating and window ~= nil then
+		if invwindow ~= nil and invwindow.visible then
+			invwindow:Hide()
 		end
-	end		
-	
-	function gadget:PlayerAdded(playerID)
-		if Spring.GetGameFrame() > config.mintime then
-			local name,active,spec,team,ally,_	 = Spring.GetPlayerInfo(playerID)
-			if spec == false and active == true and config.mergetype ~= "none" and controlledplayers[team] then
-				MergePlayer(playerID,controlledplayers[playerID])
-				Spring.Echo("game_message: Player " .. name .. "has been remerged!")
-			end
+		showing = true
+		window:Show()
+	elseif key == keytopress and showing and not repeating and window ~= nil then
+		showing = false
+		window:Hide()
+	end
+end
+
+function widget:PlayerRemoved(playerID)
+	local team = select(4,Spring.GetPlayerInfo(playerID))
+	if team == Spring.GetMyAllyTeamID() and showing then
+		window:ClearChildren()
+		window:Dispose()
+		Buildme()
+	end
+end
+
+function widget:TeamChanged()
+	window:ClearChildren()
+	window:Dispose()
+	Buildme()
+end
+
+function widget:PlayerChanged(id)
+	local team = select(5,Spring.GetPlayerInfo(id))
+	if team == Spring.GetMyAllyTeamID() and built then
+		window:ClearChildren()
+		window:Dispose()
+		Buildme()
+	end
+	if id == Spring.GetMyPlayerID() and select(3,Spring.GetPlayerInfo(id)) then
+		Spring.Echo("Detected spectator mode. Removing Share menu.")
+		widgetHandler:RemoveWidget() -- resigned?
+	end
+end
+
+function widget:GameFrame(f)
+	if f == 2 then
+		if Spring.GetGameRulesParam("sharemode") == "invite" then
+			sharemode = true
+			Spring.Echo("game_message: Sharemode is ON")
+		end
+		GetPlayers()
+		Buildme()
+		BuildInvites()
+	end
+	if f%30 == 1 then -- Update my invite table.
+		if Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"invites") then
+			UpdateInviteTable()
 		end
 	end
-	
-	function gadget:GameStart()
-		Spring.SetGameRulesParam("sharemode",config.mergetype)
-	end
-	
-	function gadget:GameFrame(f)
-		if f%30 == 0 then
-			local invitestring
-			for player,invites in pairs(Invites) do
-				invitestring = ""
-				for key,data in pairs(invites) do
-					if data["timeleft"] > 0 then
-						data["timeleft"] = data["timeleft"] - 1
-					end
-					if data["timeleft"] == 0 then
-						invites[key] = nil
-					end
-					if data and invitestring ~= "" and data["timeleft"] > 0 then
-						invitestring = invitestring .. ", " .. data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
-					else
-						invitestring = data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
-					end
-				end
-				--Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
-				Spring.SetTeamRulesParam(GetTeamID(player),"invites",invitestring,{private=true})
-				if invitestring == "" then -- Cleanup the table so that next second this doesn't run.
-					Invites[player] = nil
-				end
-			end
+end
+
+function widget:Initialize()
+	local spectating = Spring.GetSpectatingState()
+	chili = WG.Chili
+	screen0 = chili.Screen0
+	if Spring.GetGameFrame() > 2 then
+		--Spring.Echo("game_message: Share mode is " .. tostring(Spring.GetGameRulesParam("sharemode")))
+		if Spring.GetGameRulesParam("sharemode") == "invite" then
+			sharemode = true
 		end
-		if f== config.mintime then
-			local ally = Spring.GetAllyTeamList()
-			Spring.Echo("game_message: Commshare avaliable!")
-			if config.mergetype == "all" then
-				for i=1,#ally do
-					teamlist = Spring.GetTeamList(ally[i])
-					if teamlist ~= nil and #teamlist > 1 then
-						local mergeid,_ = GetLowestID(teamlist,false)
-						for i=1,#teamlist do
-							Spring.Echo("Checking team " .. teamlist[i])
-							if mergeid == teamlist[i] then
-								name = select(1,Spring.GetPlayerInfo(mergeid))
-								Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
-							else
-								_,pid,_,isAi = Spring.GetTeamInfo(teamlist[i])
-								if not isAi then
-									MergeTeams(teamlist[i],mergeid)
-								end
-							end
-						end
-					end
-				end
-				ally,mergeid,name,isAi = nil
-			end
-		end
+		GetPlayers()
+		Buildme()
+		BuildInvites()
 	end
-	
-	function gadget:RecvLuaMsg(msg,playerid) -- Entry points for widgets to interact with the gadget
-		if string.find(msg,"sharemode") then -- Format for messages: sharemode_cmd_aug1_aug2
-			local cmdlower = string.lower(msg)
-			local proccmd = {}
-			proccmd = ProccessCommand(cmdlower)
-			Spring.Echo("Got: " .. proccmd[2] .. " " .. tostring(proccmd[3]))
-			if proccmd[2] and string.find(proccmd[2],"invite") then
-				if proccmd[3] then
-					proccmd[3] = string.gsub(proccmd[3],"%D","")
-					if proccmd[3] ~= "" and proccmd[4] then
-						SendInvite(playerid,tonumber(proccmd[3]),tonumber(proccmd[4])) -- #4 should be the controller id.
-						if Invites[playerid] and Invites[playerid][tonumber(proccmd[3])] and Invites[tonumber(proccmd[3])][playerid] then
-							AcceptInvite(playerid,tonumber(proccmd[3]))
-						end
-						return
-					end
-				else
-					SendToUnsynced("errors",playerid,"Error: Invalid invite!")
-					return
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"accept") then
-				proccmd[3] = string.gsub(proccmd[3],"%D","")
-				if proccmd[3] then proccmd[3] = tonumber(proccmd[3]) end
-				if proccmd[3] and Invites[proccmd[3]] and Invites[proccmd[3]][playerid] and IsTeamLeader(playerid) then
-					AcceptInvite(proccmd[3],playerid)
-					Spring.Echo("invite accepted")
-					return
-				elseif not IsTeamLeader(playerid) then
-					SendToUnsynced("errors",playerid,"You aren't team leader! You can't accept/decline invites!")
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"unmerge") then
-				if controlledplayers[playerid] then
-					UnmergePlayer(playerid)
-					return
-				else
-					SendToUnsynced("errors",playerid,"You aren't on any squad!")
-					return
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"decline") and IsTeamLeader(playerid) then
-				if proccmd[3] then
-					proccmd[3] = string.gsub(proccmd[3],"%D","")
-					Invites[tonumber(proccmd[3])][playerid] = nil
-					return
-				elseif not IsTeamLeader(playerid) then
-					SendToUnsynced("errors",playerid,"You aren't team leader! You can't accept/decline invites!")
-				else
-					SendToUnsynced("errors",playerid,"Invalid decline.")
-				end
-			elseif proccmd[2] and string.find(proccmd[2],"kick") and proccmd[3] then
-				if IsTeamLeader(playerid) then
-					proccmd[3] = string.gsub(proccmd[3],"%D","")
-					if proccmd[3] then
-						if IsPlayerOnSameTeam(playerid,tonumber(proccmd[3])) then
-							UnmergePlayer(tonumber(proccmd[3]))
-							SendToUnsynced("errors",proccmd[3],"You were kicked from the squad.")
-							return
-						else
-							SendToUnsynced("errors",playerid,"Player isn't on the same squad!")
-							return
-						end
-					else
-						SendToUnsynced("errors",playerid,"Invalid kick command")
-						return
-					end
-				else
-					SendToUnsynced("errors",playerid,"You aren't squad leader!")
-					return
-				end
-			end
-		end
-	end
-	
-	function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-		if controlledplayers[unitTeam] then
-			Spring.TransferUnit(unitID,controlledplayers[unitTeam],false) -- this is in case of late commer coms,etc. False maybe fixes spamming of unit transfered?
-		end
-	end
-	
-else -- unsynced stuff
-	
-	local function errors(_,playerid,msg)
-		if Spring.GetMyPlayerID() == playerid then
-			Spring.Echo("game_message: " .. msg)
-		end
-	end
-	
-	function gadget:Initialize()
-		gadgetHandler:AddSyncAction("errors", errors)
+	if spectating or select(3,Spring.GetPlayerInfo(Spring.GetMyPlayerID())) then
+		Spring.Echo("Spectator mode detected. Removing Share menu.")
+		widgetHandler:RemoveWidget()
 	end
 end
