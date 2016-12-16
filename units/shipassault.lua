@@ -45,7 +45,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
   objectName             = [[shipassault.s3o]],
-  scale                  = [[0.5]],
   script				 = [[shipassault.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],

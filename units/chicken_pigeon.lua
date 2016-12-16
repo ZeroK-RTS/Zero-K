@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Pigeon]],
   description         = [[Flying Spore Scout]],
   acceleration        = 0.8,
-  bankscale           = [[1]],
   brakeRate           = 0.32,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,

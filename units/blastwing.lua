@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Blastwing]],
   description            = [[Flying Bomb (Burrows)]],
   acceleration           = 0.25,
-  bankscale              = [[1.64]],
   brakeRate              = 0.2,
   buildCostEnergy        = 55,
   buildCostMetal         = 55,

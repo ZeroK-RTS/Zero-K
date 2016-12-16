@@ -45,7 +45,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
-  scale                  = [[0.6]],
   script		         = [[shipskirm.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],

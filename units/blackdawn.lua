@@ -45,7 +45,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[Black_Dawn.s3o]],
-  scale               = [[1.5]],
   script              = [[blackdawn.lua]],
   seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
