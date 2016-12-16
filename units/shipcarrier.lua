@@ -15,7 +15,6 @@ unitDef = {
   canManualFire          = true,
   canReclaim             = false,
   canRepair              = false,
-  canRestore             = false,
   cantBeTransported      = true,
   category               = [[SHIP]],
   CollisionSphereScale   = 0.6,
