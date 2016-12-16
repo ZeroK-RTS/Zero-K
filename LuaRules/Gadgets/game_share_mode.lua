@@ -160,7 +160,6 @@ if (gadgetHandler:IsSyncedCode()) then
 			end
 			controlledplayers[playerid] = target
 			GG.Overdrive.RedirectTeamIncome(originalteam, target)
-			SendToUnsynced("mergealert",playerid,target) -- Notifier
 		else
 			Spring.Echo("Commshare: Merger error.")
 		end
@@ -260,7 +259,7 @@ if (gadgetHandler:IsSyncedCode()) then
 						invitestring = data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
 					end
 				end
-				Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
+				--Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
 				Spring.SetTeamRulesParam(GetTeamID(player),"invites",invitestring,{private=true})
 				if invitestring == "" then -- Cleanup the table so that next second this doesn't run.
 					Invites[player] = nil
@@ -269,7 +268,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		if f== config.mintime then
 			local ally = Spring.GetAllyTeamList()
-			Spring.Echo("game_message: Share mode avaliable!")
+			Spring.Echo("game_message: Commshare avaliable!")
 			if config.mergetype == "all" then
 				for i=1,#ally do
 					teamlist = Spring.GetTeamList(ally[i])
@@ -299,6 +298,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			local cmdlower = string.lower(msg)
 			local proccmd = {}
 			proccmd = ProccessCommand(cmdlower)
+			Spring.Echo("Got: " .. proccmd[2] .. " " .. tostring(proccmd[3]))
 			if proccmd[2] and string.find(proccmd[2],"invite") then
 				if proccmd[3] then
 					proccmd[3] = string.gsub(proccmd[3],"%D","")
@@ -334,7 +334,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			elseif proccmd[2] and string.find(proccmd[2],"decline") and IsTeamLeader(playerid) then
 				if proccmd[3] then
 					proccmd[3] = string.gsub(proccmd[3],"%D","")
-					Invites[playerid][tonumber(proccmd[3])] = nil
+					Invites[tonumber(proccmd[3])][playerid] = nil
 					return
 				elseif not IsTeamLeader(playerid) then
 					SendToUnsynced("errors",playerid,"You aren't team leader! You can't accept/decline invites!")
@@ -345,8 +345,8 @@ if (gadgetHandler:IsSyncedCode()) then
 				if IsTeamLeader(playerid) then
 					proccmd[3] = string.gsub(proccmd[3],"%D","")
 					if proccmd[3] then
-						if IsPlayerOnSameTeam(playerid,proccmd[3]) then
-							UnmergePlayer(proccmd[3])
+						if IsPlayerOnSameTeam(playerid,tonumber(proccmd[3])) then
+							UnmergePlayer(tonumber(proccmd[3]))
 							SendToUnsynced("errors",proccmd[3],"You were kicked from the squad.")
 							return
 						else
@@ -373,12 +373,6 @@ if (gadgetHandler:IsSyncedCode()) then
 	
 else -- unsynced stuff
 	
-	local function mergealert(_,playerid,target)
-		if Spring.GetMyPlayerID() == playerid then
-			Spring.SendLuaUIMsg("playerchangedteam " .. playerid .. " " .. target,"a") -- spring doesn't have a callin for player changing team yet :( -- Remove me if engine devs ever make something for this!
-		end
-	end
-	
 	local function errors(_,playerid,msg)
 		if Spring.GetMyPlayerID() == playerid then
 			Spring.Echo("game_message: " .. msg)
@@ -387,6 +381,5 @@ else -- unsynced stuff
 	
 	function gadget:Initialize()
 		gadgetHandler:AddSyncAction("errors", errors)
-		gadgetHandler:AddSyncAction("mergealert",mergealert)
 	end
 end
