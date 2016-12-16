@@ -12,7 +12,6 @@ unitDef = {
   canAttack           = true,
   canFly              = true,
   canGuard            = true,
-  canLoopbackAttack   = false,
   canMove             = true,
   canPatrol           = true,
   canSubmerge         = false,

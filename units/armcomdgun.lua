@@ -11,7 +11,6 @@ unitDef = {
   buildPic               = [[armcomdgun.png]],
   buildTime              = 2000,
   canAttack              = true,
-  canDGun                = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -9,7 +9,6 @@ unitDef = {
   buildPic               = [[corclog.png]],
   buildTime              = 30,
   canAttack              = false,
-  canFight               = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
