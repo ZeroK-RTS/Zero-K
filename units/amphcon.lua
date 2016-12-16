@@ -15,7 +15,6 @@ unitDef = {
 
   buildPic            = [[amphcon.png]],
   buildTime           = 180,
-  canBuild            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND UNARMED]],

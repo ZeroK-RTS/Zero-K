@@ -15,10 +15,8 @@ unitDef = {
 
   buildPic               = [[ARMRECTR.png]],
   buildTime              = 140,
-  canBuild               = true,
   canMove                = true,
   canPatrol              = true,
-  canreclamate           = [[1]],
   canstop                = [[1]],
   category               = [[LAND UNARMED]],
   cloakCost              = 0.1,

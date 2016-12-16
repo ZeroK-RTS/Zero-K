@@ -15,10 +15,8 @@ unitDef = {
 
   buildPic            = [[CORNECRO.png]],
   buildTime           = 140,
-  canBuild            = true,
   canMove             = true,
   canPatrol           = true,
-  canreclamate        = [[1]],
   category            = [[LAND UNARMED]],
   corpse              = [[DEAD]],
 
