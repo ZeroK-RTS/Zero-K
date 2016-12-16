@@ -272,6 +272,10 @@ local shortRangeExplodables = NameToDefID({
 	"armestor",
 })
 
+local scorcherExplodables = NameToDefID({
+	"armestor",
+})
+
 local medRangeExplodables = NameToDefID({
 	"armfus", -- don't suicide vs fusions if possible.
 	"geo",
@@ -290,6 +294,7 @@ end
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
+local scorcherSkirmieeArray = Union(shortRangeSkirmieeArray, scorcherExplodables)
 shortRangeSkirmieeArray     = Union(shortRangeSkirmieeArray, shortRangeExplodables)
 riotRangeSkirmieeArray      = Union(riotRangeSkirmieeArray, shortRangeExplodables)
 
@@ -350,7 +355,7 @@ local subfleeables = NameToDefID({
 })
 
 -- Some short ranged units dive everything that they don't skirm or swarm.
-local shortRangeDiveArray = SetMinus(SetMinus(allGround, shortRangeSkirmieeArray), lowRangeSwarmieeArray)
+local shortRangeDiveArray = SetMinus(SetMinus(allGround, scorcherSkirmieeArray), lowRangeSwarmieeArray)
 
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
 -- sea: table of behaviour for sea. Note that these tables are optional.
@@ -542,7 +547,7 @@ local behaviourConfig = {
 	},
 	
 	["corgator"] = {
-		skirms = shortRangeSkirmieeArray,
+		skirms = scorcherSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		hugs = shortRangeDiveArray,
