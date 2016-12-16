@@ -50,7 +50,6 @@ unitDef = {
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
-  windGenerator                 = 0,
   yardMap                       = [[ooooooooo]],
 
   featureDefs                   = {

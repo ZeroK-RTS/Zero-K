@@ -41,7 +41,6 @@ unitDef = {
   seismicSignature       = 4,
   selfDestructCountdown  = 1,
   sightDistance          = 0,
-  airSightDistance		 = 0,
   stealth                = true,
   turnRate               = 0,
   upright                = false,
