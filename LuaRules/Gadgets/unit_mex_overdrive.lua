@@ -58,7 +58,7 @@ local enableMexPayback = isReturnOfInvestment
 
 include("LuaRules/Configs/constants.lua")
 
-local QUADFIELD_SQUARE_SIZE = 300 -- set to be twice the largest pylon range (so a pylon can be in 4 quads at most)
+local QUADFIELD_SQUARE_SIZE = 0 -- set to be twice the largest pylon range (so a pylon can be in 4 quads at most)
 
 for i = 1, #UnitDefs do
 	local udef = UnitDefs[i]
@@ -72,6 +72,7 @@ for i = 1, #UnitDefs do
 			neededLink = tonumber(udef.customParams.neededlink) or false,
 			keeptooltip = udef.customParams.keeptooltip or false,
 		}
+		QUADFIELD_SQUARE_SIZE = max(QUADFIELD_SQUARE_SIZE, pylonRange)
 	end
 	local metalIncome = tonumber(udef.customParams.income_metal) or 0
 	local energyIncome = tonumber(udef.customParams.income_energy) or 0
