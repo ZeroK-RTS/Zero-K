@@ -2,7 +2,6 @@ unitDef = {
   unitname            = [[armstiletto_laser]],
   name                = [[Thunderbird]],
   description         = [[Disarming Lightning Bomber]],
-  amphibious          = true,
   brakerate           = 0.4,
   buildCostEnergy     = 550,
   buildCostMetal      = 550,

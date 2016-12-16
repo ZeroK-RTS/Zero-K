@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   autoHeal               = 5,
   brakeRate              = 0.375,
   buildCostEnergy        = 2000,

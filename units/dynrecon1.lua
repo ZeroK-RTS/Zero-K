@@ -4,7 +4,6 @@ unitDef = {
   description         = [[High Mobility Commander]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
-  amphibious          = [[1]],
   brakeRate           = 0.45,
   buildCostEnergy     = 1200,
   buildCostMetal      = 1200,

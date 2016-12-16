@@ -2,7 +2,6 @@ unitDef = {
   unitname            = [[corhurc2]],
   name                = [[Phoenix]],
   description         = [[Saturation Napalm Bomber]],
-  amphibious          = true,
   brakerate           = 0.4,
   buildCostEnergy     = 360,
   buildCostMetal      = 360,

@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Flying Spike Spitter]],
   acceleration        = 0.8,
   airHoverFactor      = 0,
-  amphibious          = true,
   brakeRate           = 0.32,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,

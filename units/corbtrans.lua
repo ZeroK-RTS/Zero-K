@@ -3,7 +3,6 @@ unitDef = {
   name                   = [[Vindicator]],
   description            = [[Armed Heavy Air Transport]],
   acceleration           = 0.2,
-  amphibious             = true,
   airStrafe              = 0,
   brakeRate              = 0.248,
   buildCostEnergy        = 500,

@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Carrier Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
-  amphibious          = true,
   bankscale           = [[1]],
   brakeRate           = 0.24,
   buildCostEnergy     = 75,

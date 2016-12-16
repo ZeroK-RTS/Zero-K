@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Black Dawn]],
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.135,
-  amphibious          = true,
   brakeRate           = 0.108,
   buildCostEnergy     = 900,
   buildCostMetal      = 900,

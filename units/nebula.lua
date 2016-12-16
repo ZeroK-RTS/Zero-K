@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.04,
   activateWhenBuilt      = true,
   airStrafe              = 0,
-  amphibious             = true,
   bankingAllowed         = false,
   brakeRate              = 0.48,
   buildCostEnergy        = 6000,

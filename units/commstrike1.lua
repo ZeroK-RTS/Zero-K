@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Mobile Assault Commander]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
-  amphibious             = [[1]],
   brakeRate              = 0.375,
   buildCostEnergy        = 1200,
   buildCostMetal         = 1200,

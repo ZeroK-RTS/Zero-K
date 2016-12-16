@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Econ/Support Commander, Builds at 12 m/s]],
   acceleration        = 0.25,
   activateWhenBuilt   = true,
-  amphibious          = [[1]],
   autoHeal            = 5,
   brakeRate           = 0.45,
   buildCostEnergy     = 1200,

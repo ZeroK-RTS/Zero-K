@@ -2,7 +2,6 @@ unitDef = {
   unitname               = [[corvamp]],
   name                   = [[Hawk]],
   description            = [[Air Superiority Fighter]],
-  amphibious             = true,
   brakerate              = 0.4,
   buildCostEnergy        = 300,
   buildCostMetal         = 300,

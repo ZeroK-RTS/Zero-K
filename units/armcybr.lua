@@ -2,7 +2,6 @@ unitDef = {
   unitname            = [[armcybr]],
   name                = [[Wyvern]],
   description         = [[Singularity Bomber]],
-  amphibious          = true,
   --autoheal			  = 25,
   brakerate           = 0.4,
   buildCostEnergy     = 2000,

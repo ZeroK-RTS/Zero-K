@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Anti-Air Gunship]],
   acceleration           = 0.18,
   airStrafe              = 0,
-  amphibious             = true,
   bankingAllowed         = false,
   brakeRate              = 0.4,
   buildCostEnergy        = 270,

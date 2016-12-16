@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Advanced Battle Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
-  amphibious          = true,
   brakeRate           = 0.24,
   buildCostEnergy     = 120,
   buildCostMetal      = 120,

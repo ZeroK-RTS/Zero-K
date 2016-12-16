@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Brawler]],
   description         = [[Fire Support Gunship]],
   acceleration        = 0.2,
-  amphibious          = true,
   bankscale           = [[1]],
   brakeRate           = 0.16,
   buildCostEnergy     = 760,
