@@ -56,21 +56,6 @@ local options = {
     type   = 'section',
   },
   {
-    key    = 'zkmode',
-    name   = 'Game Mode',
-    desc   = 'Change the game mode.',
-    type   = 'list',
-    section= 'silly',
-    def    = 'normal',
-    items  = {
-      {
-        key  = 'normal',
-        name = 'Normal',
-        desc = 'Normal game mode',
-      },
-    },
-  },
-  {
     key    = 'commends',
     name   = 'Team Commander Ends',
     desc   = 'Causes an allyteam to lose if they have no commanders left on their team',

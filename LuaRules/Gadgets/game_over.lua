@@ -23,10 +23,6 @@ end
 --	its active players have units left.
 --------------------------------------------------------------------------------
 
---if Spring.GetModOption("zkmode",false,nil) == nil then
---	Spring.Echo("game_message: <Game Over> Testing mode. Gadget removed.")
---	return
---end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetTeamInfo       = Spring.GetTeamInfo
