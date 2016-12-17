@@ -15,10 +15,6 @@ include("LuaRules/Configs/constants.lua")
 local TESTMODE = false
 local BOUNTYTIME = 60*5
 
-if not tobool(Spring.GetModOptions().marketandbounty) then
-	return
-end 
-
 local echo 				= Spring.Echo
 local spGetPlayerInfo	= Spring.GetPlayerInfo
 local spGetTeamInfo		= Spring.GetTeamInfo

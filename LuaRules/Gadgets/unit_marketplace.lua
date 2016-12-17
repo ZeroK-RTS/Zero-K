@@ -13,15 +13,11 @@ function gadget:GetInfo()
     date      = "2010-07-22",
     license   = "GNU GPL, v2 or later",
     layer     = 1,
-    enabled   = true,
+    enabled   = false,
   }
 end
 
 local TESTMODE = false
-
-if not tobool(Spring.GetModOptions().marketandbounty) then
-	return
-end 
 
 local echo 				= Spring.Echo
 local spGetPlayerInfo	= Spring.GetPlayerInfo

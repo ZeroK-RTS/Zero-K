@@ -250,11 +250,6 @@ if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
   ceasefires = false
 end 
 
-if tobool(Spring.GetModOptions().marketandbounty) then
-	marketandbounty = true
-end 
-
-
 function comma_value(amount, displayPlusMinus)
 	local formatted
 

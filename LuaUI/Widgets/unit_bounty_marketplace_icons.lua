@@ -127,7 +127,7 @@ end
 
 
 function widget:Initialize()
-	if not tobool(Spring.GetModOptions().marketandbounty) then
+	if marketandbounty then
 		echo('Marketplace and Bounty Icons: Widget removed.')
 		widgetHandler:RemoveWidget()
 	end 
