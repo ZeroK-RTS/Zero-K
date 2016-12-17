@@ -32,7 +32,7 @@ _ Show a windows at game start with pictures to choose commander type.
 --------------------------------------------------------------------------------
 local spGetGameRulesParam = Spring.GetGameRulesParam
 -- FIXME use tobool instead of this string comparison silliness
-local coop = (Spring.GetModOptions().coop == "1") or false
+local coop = false
 local forcejunior = (Spring.GetModOptions().forcejunior == "1") or false
 
 local Chili

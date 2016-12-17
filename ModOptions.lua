@@ -370,14 +370,6 @@ local options = {
     section= 'silly',
     def    = false,
   },
-  {
-    key    = "coop",
-    name   = "Cooperation Mode",
-    desc   = "Cooperation Mode",
-    type   = "bool",
-    section= "startconds",
-    def    = false,
-  },
   --{
   --  key		= "enableunlocks",
   --  name	= "Enable unlock system",
