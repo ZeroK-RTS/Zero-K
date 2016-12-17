@@ -7,9 +7,6 @@ local HP_MULT = 1
 if (Spring.GetModOptions) then
 	local modOptions = Spring.GetModOptions()
     if modOptions then
-        if (modOptions.commtest and modOptions.commtest ~= 0) then
-            COST_MULT = 0.1
-        end
         if modOptions.hpmult and modOptions.hpmult ~= 1 then
             HP_MULT = modOptions.hpmult
         end
