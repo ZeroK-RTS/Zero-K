@@ -67,7 +67,7 @@ local function IsFFA()
 	return numAllyTeams > 2
 end
 	
-local cf = Spring.GetModOptions().noceasefire ~= "1" and IsFFA()
+local cf = (not Spring.FixedAllies()) and IsFFA()
 
 if not WG.rzones then
 	WG.rzones = {

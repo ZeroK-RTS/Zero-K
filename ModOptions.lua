@@ -230,15 +230,6 @@ local options = {
       },
     },
   },
-
-  {
-    key    = 'noceasefire',
-    name   = 'Disable ceasefire panel',
-    desc   = 'Disable ceasefire control panel (When "Fixed ingame alliances" is off).',
-    type   = 'bool',
-    section = 'startconds',
-    def    = false,
-  },
   {
     key='typemapsetting',
     name='Terrain Speed Boost',

@@ -95,7 +95,7 @@ local scrH, scrW 		= 0,0
 local myAlliance 		= Spring.GetLocalAllyTeamID()
 local myTeamID 			= Spring.GetLocalTeamID()
 
-local ceasefires 		= true
+local ceasefires 		= (not Spring.FixedAllies())
 local marketandbounty 	= false
 
 local window_unitcontext, window_unitstats
@@ -245,10 +245,6 @@ local function tobool(val)
   end
   return false
 end
-
-if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
-  ceasefires = false
-end 
 
 function comma_value(amount, displayPlusMinus)
 	local formatted
