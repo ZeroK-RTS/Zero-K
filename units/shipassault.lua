@@ -37,7 +37,7 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   losEmitHeight          = 25,
-  maxDamage              = 4200,
+  maxDamage              = 5400,
   maxVelocity            = 2.0,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
@@ -87,7 +87,7 @@ unitDef = {
 
     SONIC         = {
 		name                    = [[Sonic Blaster]],
-		areaOfEffect            = 190,
+		areaOfEffect            = 160,
 		avoidFeature            = true,
 		avoidFriendly           = true,
 		burnblow                = true,
@@ -103,9 +103,9 @@ unitDef = {
 		},
 
 		damage                  = {
-			default = 260,
-			planes  = 260,
-			subs    = 260,
+			default = 230,
+			planes  = 230,
+			subs    = 230,
 		},
 		
 		cegTag					= [[sonictrail]],
@@ -117,7 +117,7 @@ unitDef = {
 		interceptedByShieldType = 1,
 		noSelfDamage            = true,
 		range                   = 380,
-		reloadtime              = 2,
+		reloadtime              = 3,
 		soundStart              = [[weapon/sonicgun]],
 		soundHit                = [[weapon/sonicgun_hit]],
 		soundStartVolume        = 12,
@@ -137,28 +137,28 @@ unitDef = {
 	
     MISSILE      = {
       name                    = [[Destroyer Missiles]],
-      areaOfEffect            = 48,
+      areaOfEffect            = 30,
       cegTag                  = [[missiletrailyellow]],
 	  collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
 
       damage                  = {
-        default = 400,
-        subs    = 400,
+        default = 360,
+        subs    = 360,
       },
 
       edgeEffectiveness       = 0.5,
       fireStarter             = 100,
 	  fixedLauncher			  = true,	  
-      flightTime              = 4,
+      flightTime              = 5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
       model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
       range                   = 800,
-      reloadtime              = 10,
+      reloadtime              = 11,
       smokeTrail              = true,
       soundHit                = [[weapon/missile/missile_fire12]],
       soundStart              = [[weapon/missile/missile_fire10]],
