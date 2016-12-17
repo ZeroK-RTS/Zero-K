@@ -227,7 +227,7 @@ function CreateTheUI()
 			padding = {0, 0, 0,0},
 			margin = {0, 0, 0, 0},
 			caption="skip pregame chatter",
-			tooltip = "Skip the pregame chat and startposition chosing, directly to the action!";
+			tooltip = "Skip the pregame chat and startposition choosing, go directly to the action!";
 			OnClick = {function()
 				skipPreGameChatter ()
 				end}
