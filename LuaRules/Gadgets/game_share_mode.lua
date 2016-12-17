@@ -244,25 +244,26 @@ if (gadgetHandler:IsSyncedCode()) then
 	
 	function gadget:GameFrame(f)
 		if f%30 == 0 then
-			local invitestring
+			local invitecount
 			for player,invites in pairs(Invites) do
-				invitestring = ""
+				invitecount = 0
 				for key,data in pairs(invites) do
+					invitecount = invitecount+1
 					if data["timeleft"] > 0 then
 						data["timeleft"] = data["timeleft"] - 1
 					end
-					if data["timeleft"] == 0 then
+					if data["timeleft"] == -1 then -- this is so we know an invite has expired. UI will remove the invite at timeleft = 0, but gadget will remove it at -1. Otherwise UI will just see it constantly at 1.
+						invitecount = invitecount-1
 						invites[key] = nil
 					end
-					if data and invitestring ~= "" and data["timeleft"] > 0 then
-						invitestring = invitestring .. ", " .. data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
-					else
-						invitestring = data["id"] .. " " .. data["timeleft"] .. " " .. data["controller"]
+					if data and data["timeleft"] > -1 then
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_timeleft",data["timeleft"],{private=true})
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_id",data["id"],{private=true})
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_controller",data["controller"],{private=true})
 					end
 				end
-				--Spring.Echo("DEBUG: Got Invitestring: " .. invitestring)
-				Spring.SetTeamRulesParam(GetTeamID(player),"invites",invitestring,{private=true})
-				if invitestring == "" then -- Cleanup the table so that next second this doesn't run.
+				Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invitecount",invitecount,{private=true})
+				if invitecount == 0 then -- Cleanup the table so that next second this doesn't run.
 					Invites[player] = nil
 				end
 			end
