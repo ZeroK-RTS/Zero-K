@@ -217,19 +217,11 @@ local options = {
   },
   {
     key='typemapsetting',
-    name='Terrain Speed Boost',
-    desc='Choose which map Speed Boost to use',
-    type='list',
+    name='No roads',
+    desc='Some maps have roads that allow faster unit movement. When enabled, units will move at their regular unboosted speed on roads.',
+    type='bool',
     section= 'mapsettings',
-    def='auto',
-    items = {
-      { key='auto', name="Automatic", desc='Use one of the other options based on a mod-defined list, defaulting to Keep Equal' },
-      { key='mapdefault', name="Map Default", desc='Use map speed boost' },
-      { key='average', name="Average", desc='Each terrain types speed boost is averaged' },
-      { key='keepequal', name="Keep Equal", desc='Non-equal speedboost removed' },
-      { key='onlyimpassable', name="Only Impassable", desc='Override all speedboost except impassable terrain' },
-      { key='alloff', name="All Off", desc='Disable all speed boost' },
-    },
+    def=false,
   },
   { -- Might cause desync, check if they occur.
     key    = 'waterlevel',
