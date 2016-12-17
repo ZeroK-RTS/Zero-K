@@ -57,7 +57,6 @@ local min = math.min
 --------------------------------------------------------------------------------
 
 local mobilePadDefs = {
-	[UnitDefNames["armcarry"].id] = true,
 	[UnitDefNames["shipcarrier"].id] = true,
 }
 

@@ -196,7 +196,7 @@
 		"name" : "Fake AA target",
 		"description" : "Used by the jumpjet script."
 	},
-	"mahlazer" : {
+	"starlight" : {
 		"name" : "Starlight",
 		"description" : "Planetary Energy Chisel",
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
@@ -428,11 +428,6 @@
 		"name" : "Skuttle",
 		"description" : "Cloaked Jumping Anti-Heavy Bomb",
 		"helptext" : "This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it."
-	},
-	"armcarry" : {
-		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment)",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"slowmort" : {
 		"name" : "Moderator",
