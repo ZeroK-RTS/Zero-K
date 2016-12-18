@@ -75,8 +75,14 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
-		local x = math.ceil(cmdParams[1])
-		local z = math.ceil(cmdParams[3])
+		local x, z
+		if cmdID == CMD.INSERT then
+			x = cmdParams[4] and math.ceil(cmdParams[4])
+			z = cmdParams[6] and math.ceil(cmdParams[6])
+		else
+			x = cmdParams[1] and math.ceil(cmdParams[1])
+			z = cmdParams[3] and math.ceil(cmdParams[3])
+		end
 		if x and z then
 			if metalSpotsByPos[x] and metalSpotsByPos[x][z] then
 				return true
