@@ -72,6 +72,7 @@ local offset = {
 local teleID = {count = 0, data = {}}
 local tele = {}
 local beacon = {}
+local orphanedBeacons = {}
 
 local isPlacingBeacon = {} --remember if a unit is currently trying to teleport a beacon bridge. Purpose is for compatibility with "repeat" state.
 local beaconWaiter = {}
@@ -355,7 +356,15 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 end
 
 function gadget:GameFrame(f)
+
+	if #orphanedBeacons > 0 then
+		for i = 1, #orphanedBeacons do
+			Spring.DestroyUnit(orphanedBeacons[i], true)
+		end
+		orphanedBeacons = {}
+	end
 	
+
 	for i = 1, teleID.count do
 		local tid = teleID.data[i]	
 		local bid = tele[tid].link
@@ -572,14 +581,16 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	
+
 	if teleportingUnit[unitID] then
 		interruptTeleport(teleportingUnit[unitID])
 	end
-	
+
 	if tele[unitID] then
-		if tele[unitID].link and Spring.ValidUnitID(tele[unitID].link) then
-			Spring.DestroyUnit(tele[unitID].link, true) -- Recursion error can happen here.
+		local beaconID = tele[unitID].link
+		if beaconID and Spring.ValidUnitID(beaconID) then
+			orphanedBeacons[#orphanedBeacons + 1] = beaconID
+			beacon[beaconID] = nil
 		end
 		tele[teleID.data[teleID.count]].index = tele[unitID].index
 		teleID.data[tele[unitID].index] = teleID.data[teleID.count]
