@@ -51,8 +51,6 @@ if config.mergetype == nil then config.mergetype = "invite"; end
 
 if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
 
---Spring.Echo("Config:\n" .. "\nmergetype:" .. config.mergetype .. "\nantigrief:" .. tostring(config.antigrief) .. "\nunmerging: " .. tostring(config.unmerging))
-
 local function GetTeamID(playerid)
 	return select(4,Spring.GetPlayerInfo(playerid))
 end
@@ -236,10 +234,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				Spring.Echo("game_message: Player " .. name .. "has been remerged!")
 			end
 		end
-	end
-	
-	function gadget:GameStart()
-		Spring.SetGameRulesParam("sharemode",config.mergetype)
 	end
 	
 	function gadget:GameFrame(f)
