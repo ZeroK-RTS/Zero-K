@@ -70,7 +70,7 @@ end
 local function GetCommandPos(command)	--- get the command position
   if command.id<0 or command.id==CMD.MOVE or command.id==CMD.REPAIR or command.id==CMD.RECLAIM or 
   command.id==CMD.RESURRECT or command.id==CMD.MANUALFIRE or command.id==CMD.GUARD or 
-  command.id==CMD.FIGHT or command.id==CMD.ATTACK or command.id == CMD_JUMP then
+  command.id==CMD.FIGHT or command.id==CMD.ATTACK or command.id == CMD_JUMP or command.id == CMD_LEVEL then
     if table.getn(command.params)>=3 then
 		  return command.params[1], command.params[2], command.params[3]			
 	  elseif table.getn(command.params)>=1 then

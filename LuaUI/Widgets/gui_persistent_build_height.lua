@@ -159,18 +159,22 @@ local function SendCommand()
 		if not s then
 			spSetActiveCommand(-1)
 		end
-	
+
 		local cmdOpts = {}
 		if s then
 			cmdOpts[#cmdOpts + 1] = "shift"
 		end
-	
+		if m then
+			cmdOpts[#cmdOpts + 1] = "meta"
+		end
+
 		local height = Spring.GetGroundHeight(pointX, pointZ)
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
-			if not handledExternally then
-				Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
-			end
+
+		if WG.CommandInsert and WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts) then
+			WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
+		else
+			Spring.GiveOrder(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
+			Spring.GiveOrder(-buildingPlacementID, {pointX, height, pointZ, facing}, {"shift"})
 		end
 	end
 end
