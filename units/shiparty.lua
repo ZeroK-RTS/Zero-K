@@ -88,7 +88,7 @@ unitDef = {
       soundStart              = [[weapon/cannon/heavy_cannon]],
       turret                  = true,
       weaponType              = [[Cannon]],
-      weaponVelocity          = 330,
+      weaponVelocity          = 400,
     },
   },
 

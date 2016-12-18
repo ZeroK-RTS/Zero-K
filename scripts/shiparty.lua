@@ -59,50 +59,6 @@ local restore_delay = 3000
 local gun_1_yaw = 0
 local dead = false
 
-
--- SmokeUnit(healthpercent, Sleep(time, smoketype)
-
-	-- while  get BUILD_PERCENT_LEFT  do
-	
-		-- sleep 400)
-	-- end
-	-- while  true  do
-	
-		-- healthpercent = get HEALTH)
-		-- if  healthpercent < 66  then
-		
-			-- smoketype = 256 + sfx2
-			-- if  1, 66 ) < healthpercent  then
-			
-				-- smoketype = 256 + sfx1
-			-- end
-			-- EmitSfx( base,  smoketype )
-		-- end
-		-- Sleep(time = healthpercent * 50)
-		-- if  Sleep(time < 200  then
-		
-			-- sleeptime = 200)
-		-- end
-		-- Sleep( sleeptime)
-	-- end
--- end
-
--- EmitWakes()
-
-	-- while  true  do
-	
-		-- if  bMoving  then
-		
-			-- EmitSfx( wake1,  2 )
-			-- EmitSfx( wake2,  2 )
-			-- EmitSfx( wake3,  2 )
-			-- EmitSfx( wake4,  2 )
-			-- EmitSfx( propeller,  259 )
-		-- end
-		-- Sleep( 150)
-	-- end
--- end
-
 local function Wake()
 	Signal(SIG_MOVE)
 	SetSignalMask(SIG_MOVE)
@@ -119,9 +75,6 @@ local function Wake()
 end
 
 function script.Create()
-	--gun_1 = 0
-	--bMoving = false
-	--restore_delay = 3000
 	Hide( radardish)
 	Hide( depthcharge1)
 	Hide( depthcharge2)
@@ -157,10 +110,7 @@ end
 
 function script.StartMoving()
 	StartThread(Wake)
-	--Signal( SIG_MOVE)
-	--SetSignalMask( SIG_MOVE)
 
-	-- bMoving = true
 	Spin( propeller , z_axis, math.rad(720) )
 end
 
@@ -294,7 +244,7 @@ function script.QueryWeapon(num)
 end
 
 function script.BlockShot(num, targetID)
-	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 125, false, false, true) then
+	if GG.OverkillPrevention_CheckBlock(unitID, targetID, 600.1, 95, false, false, true) then
 		return true
 	end
 	return false
@@ -304,19 +254,12 @@ function script.SweetSpot(num)
 	return base
 end
 
---function script.Killed(severity, corpsetype)
-
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	Explode( body, sfxShatter)
 	if  severity <= 0.25  then 
-		--Explode( turret, sfxShatter)
-		--Explode( barrel1, sfxShatter)
-		--Explode( barrel2, sfxShatter)
-		--Explode( depthcharge1, sfxShatter)
 		return 1
 	elseif  severity <= 0.50  then 
-		--Explode( turret, sfxShatter)
 		Explode( sleeve1, sfxFall)
 		Explode( sleeve2, sfxFall)
 		Explode( barrel1, sfxFall)
@@ -347,45 +290,3 @@ function script.Killed(recentDamage, maxHealth)
 		return 2
 	end
 end
-
--- function script.Killed(recentDamage, maxHealth)
-	-- local severity = recentDamage/maxHealth
-	-- Explode( body, sfxBITMAPONLY + sfxBITMAP1)
-	-- if  severity <= 25  then 
-		-- Explode( turret, sfxBITMAPONLY + sfxBITMAP1)
-		-- Explode( barrel1, sfxBITMAPONLY + sfxBITMAP1)
-		-- Explode( barrel2, sfxBITMAPONLY + sfxBITMAP1)
-		-- Explode( depthcharge1, sfxBITMAPONLY + sfxBITMAP1)
-		-- return 1
-	-- elseif  severity <= 50  then 
-		-- Explode( turret, sfxBITMAPONLY + sfxBITMAP1)
-		-- Explode( sleeve1, sfxFall + sfxBITMAP1)
-		-- Explode( sleeve2, sfxFall + sfxBITMAP1)
-		-- Explode( barrel1, sfxFall + sfxBITMAP1)
-		-- Explode( barrel2, sfxFall + sfxBITMAP1)
-		-- Explode( depthcharge1, sfxFall + sfxBITMAP1)
-		-- Explode( depthcharge2, sfxFall + sfxBITMAP1)
-		-- Explode( depthcharge3, sfxFall + sfxBITMAP1)
-		-- Explode( depthcharge4, sfxFall + sfxBITMAP1)
-		-- Explode( depthcharge5, sfxFall + sfxBITMAP1)
-		-- Explode( radarpole, sfxFall + sfxBITMAP1)
-		-- Explode( radardish, sfxFall + sfxBITMAP1)
-		-- Explode( propeller, sfxFall + sfxBITMAP1)
-		-- return 1
-	-- else 
-		-- Explode( turret, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( sleeve1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( sleeve2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( barrel1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( barrel2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( depthcharge1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( depthcharge2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( depthcharge3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( depthcharge4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( depthcharge5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( radarpole, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( radardish, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- Explode( propeller, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit + sfxBITMAP1)
-		-- return 2
-	-- end
--- end
