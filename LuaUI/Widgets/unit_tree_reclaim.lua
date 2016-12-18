@@ -42,14 +42,10 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		end
 
 		cmdOptions.ctrl = true
-		if not WG.CommandInsert or not WG.CommandInsert(cmdID, cmdParams, cmdOptions) then
-			Spring.GiveOrder(cmdID, cmdParams, cmdOptions)
-		end
+		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	else
 		cmdOptions.ctrl = not cmdOptions.ctrl
-		if not WG.CommandInsert or not WG.CommandInsert(cmdID, cmdParams, cmdOptions) then
-			Spring.GiveOrder(cmdID, cmdParams, cmdOptions)
-		end
+		WG.CommandInsert(cmdID, cmdParams, cmdOptions)
 	end
 	return true	
 end

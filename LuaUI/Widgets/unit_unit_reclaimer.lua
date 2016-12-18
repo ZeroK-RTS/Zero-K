@@ -43,9 +43,7 @@ function widget:CommandNotify(cmdID, params, options)
 		and Spring.GetUnitAllyTeam(unitID) == myAllyTeam
 		then
 			paramTable[1] = unitID
-			if not WG.CommandInsert or not WG.CommandInsert(CMD.RECLAIM, paramTable, options) then
-				Spring.GiveOrder(CMD.RECLAIM, paramTable, options)
-			end
+			WG.CommandInsert(CMD.RECLAIM, paramTable, options)
 		end
 	end
 

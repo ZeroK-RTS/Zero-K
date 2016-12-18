@@ -170,12 +170,8 @@ local function SendCommand()
 
 		local height = Spring.GetGroundHeight(pointX, pointZ)
 
-		if WG.CommandInsert and WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts) then
-			WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
-		else
-			Spring.GiveOrder(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
-			Spring.GiveOrder(-buildingPlacementID, {pointX, height, pointZ, facing}, {"shift"})
-		end
+		WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
+		WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
 	end
 end
 

@@ -413,9 +413,7 @@ function widget:CommandNotify(cmdID, params, options)
 			if foundUnit then
 				local build = select(5, spGetUnitHealth(foundUnit))
 				if build ~= 1 then
-					if not WG.CommandInsert or not WG.CommandInsert(CMD.REPAIR, {foundUnit}, options) then
-						spGiveOrder(CMD.REPAIR, {foundUnit}, options)
-					end
+					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
 				end
 				return true
 			else
@@ -424,9 +422,7 @@ function widget:CommandNotify(cmdID, params, options)
 				Spring.Echo("commandHeight", commandHeight)
 				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
 				if not GBC_processed then
-					if not WG.CommandInsert or not WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options) then
-						spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options.coded)
-					end
+					WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
 				end
 				return true
 			end

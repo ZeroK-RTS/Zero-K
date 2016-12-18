@@ -13,6 +13,8 @@ function widget:GetInfo()
     license = "GNU GPL, v2 or later",
     layer = 5,
     enabled = true,
+    api = true,
+    hidden = true,
   }
 end
 
@@ -155,13 +157,13 @@ local function ProcessCommand(id, params, options, sequence_order)
   return false
 end 
 
-
-
 function widget:CommandNotify(id, params, options)
   return ProcessCommand(id, params, options)
 end
 
-
-function widget:Initialize()
-  WG.CommandInsert = ProcessCommand
-end 
+local shift_table = {"shift"}
+function WG.CommandInsert(id, params, options, seq)
+	if not ProcessCommand(id, params, options, seq) then
+		Spring.GiveOrder(id, params, (seq or 0) > 0 and shift_table or options)
+	end
+end
