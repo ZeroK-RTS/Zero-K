@@ -80,7 +80,7 @@ local function GetCommandPos(command)	--- get the command position
   return -10,-10,-10
 end
 
-local function ProcessCommand(id, params, options)
+local function ProcessCommand(id, params, options, sequence_order)
   local alt,ctrl,meta,shift = Spring.GetModKeyState() --must use this because "options" table turn into different format when right+click. Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
   if (ctrl) and not (meta) and id==CMD.REPAIR then
 	local opt = 0
@@ -106,7 +106,7 @@ local function ProcessCommand(id, params, options)
     if options.shift or shift then 
       opt = opt + CMD.OPT_SHIFT       
     else
-      Spring.GiveOrder(CMD.INSERT,{0,id,opt,unpack(params)},{"alt"})
+      Spring.GiveOrder(CMD.INSERT,{sequence_order or 0,id,opt,unpack(params)},{"alt"})
       return true
     end
     
@@ -147,7 +147,7 @@ local function ProcessCommand(id, params, options)
         --Spring.GiveOrderToUnit(unit_id,id,params,options)
         Spring.GiveOrderToUnit(unit_id,id,params,{"shift"})
       else   
-        Spring.GiveOrderToUnit(unit_id,CMD.INSERT,{insert_pos-1,id,opt,unpack(params)},{"alt"})
+        Spring.GiveOrderToUnit(unit_id,CMD.INSERT,{insert_pos - 1 + (sequence_order or 0),id,opt,unpack(params)},{"alt"})
       end
     end
     return true
