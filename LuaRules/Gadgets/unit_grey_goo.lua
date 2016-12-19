@@ -56,8 +56,6 @@ local unitIndex = {count = 0, info = {}}
 
 local killedFeature = {}
 
-Spring.SetGameRulesParam("gooState",1)
-
 local LOS_ACCESS = {inlos = true}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -273,6 +271,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:Initialize()
+	Spring.SetGameRulesParam("gooState",1)
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
