@@ -362,14 +362,6 @@ local options = {
     section= 'silly',
     def    = false,
   },
-  {
-    key    = 'iwinbutton',
-    name   = 'Enable giant expensive "I Win" button',
-    desc   = "For speed games. Race to build it!",
-    type   = 'bool',
-    section= 'silly',
-    def    = false,
-  },
   --{
   --  key		= "enableunlocks",
   --  name	= "Enable unlock system",

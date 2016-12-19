@@ -844,11 +844,6 @@
 		"description" : "Precision Artillery Vehicle",
 		"helptext" : "The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings."
 	},
-	"iwin" : {
-		"name" : "I Win Button",
-		"description" : "Giant \"I Win\" Button",
-		"helptext" : "I Win!!!"
-	},
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",

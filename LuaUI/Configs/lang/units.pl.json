@@ -865,11 +865,6 @@
         "description": "Pojazd artylerii precyzyjnej",
         "helptext": "Impaler wystrzeliwuje potężne pociski kinetyczne dalekiego zasięgu, które dzięki wysokiej trajektorii są w stanie omijać większość przeszkód, choć są jednak przez to bezużyteczne przeciw poruszającym się celom. Impaler jest przeznaczony do niszczenia budynków."
     },
-    "iwin": {
-        "name": "Guzik Wygranej",
-        "description": "Wielki Guzik Wygranej",
-        "helptext": "Wygrałam!"
-    },
     "chicken_digger_b": {
         "name": "Digger (zakopany)",
         "description": "Podziemny zwiadowca",

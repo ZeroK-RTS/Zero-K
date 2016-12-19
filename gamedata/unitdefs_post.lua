@@ -170,10 +170,6 @@ end
 
 -- Set build options
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-if modOptions and tobool(modOptions.iwinbutton) then
-	buildOpts[#buildOpts+1] = 'iwin'
-end
-
 for name, ud in pairs(UnitDefs) do
 	if ud.buildoptions and (#ud.buildoptions == 0) then
 		ud.buildoptions = buildOpts
