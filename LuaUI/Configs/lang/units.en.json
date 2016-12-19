@@ -14,11 +14,6 @@
 		"description" : "Multi-Role Support Gunship",
 		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
 	},
-	"sprinkler" : {
-		"name" : "Sprinkler",
-		"description" : "Important irrigation structure",
-		"helptext" : "The Sprinkler is an indispensable agriculture utility agreed for some sorts cleansing."
-	},
 	"factorycloak" : {
 		"name" : "Cloaky Bot Factory",
 		"description" : "Produces Cloaky Robots, Builds at 10 m/s",

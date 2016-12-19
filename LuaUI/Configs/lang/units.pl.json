@@ -14,11 +14,6 @@
         "description": "Wielozadaniowy statek powietrzny",
         "helptext": "Rapier to lekki bojowy statek powietrzny. Chociaż jego pociski nie zadają wysokich obrażeń, to są celne i spowalniają trafione jednostki."
     },
-    "sprinkler": {
-        "name": "Sprinkler",
-        "description": "Zraszacz",
-        "helptext": "Do podlewania kaktusa."
-    },
     "factorycloak": {
         "name": "Fabryka cichociemnych",
         "description": "Buduje cichociemne boty, moc 10 m/s",
