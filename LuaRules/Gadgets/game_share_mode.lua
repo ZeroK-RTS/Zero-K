@@ -19,7 +19,6 @@ local function ProccessCommand(str)
 end
 
 local function tobool(var)
-	Spring.Echo("tobool: " .. tostring(var))
 	if tonumber(var) == 1 or tostring(var) == "true" then
 		return true
 	elseif var ~= nil then
@@ -137,13 +136,13 @@ if (gadgetHandler:IsSyncedCode()) then
 	
 	local function MergePlayer(playerid,target)
 		if playerid == nil then
-			Spring.Echo("Commshare: Tried to merge a nil player!")
+			Spring.Echo("[Commshare] Tried to merge a nil player!")
 			return
 		end
 		local originalteam = GetTeamID(playerid)
 		local name,_,spec  = Spring.GetPlayerInfo(playerid)
 		if Spring.AreTeamsAllied(originalteam,target) and spec == false and target ~= Spring.GetGaiaTeamID() and config.mergetype ~= "none" then
-			Spring.Echo("Commshare: Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
+			Spring.Echo("[Commshare] Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
 			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
 			if GetSquadSize(originalteam) - 1 == 0 then
 				local metal = select(1,Spring.GetTeamResources(originalteam,"metal"))
@@ -159,7 +158,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			controlledplayers[playerid] = target
 			GG.Overdrive.RedirectTeamIncome(originalteam, target)
 		else
-			Spring.Echo("Commshare: Merger error.")
+			Spring.Echo("[Commshare] Merger error.")
 		end
 	end
 	
@@ -183,15 +182,15 @@ if (gadgetHandler:IsSyncedCode()) then
 			local targetspec = select(3,Spring.GetPlayerInfo(target))
 			local _,_,dead,ai,_ = Spring.GetTeamInfo(GetTeamID(target))
 			if player == target then
-				Spring.Echo(player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to merge with theirself!")
+				Spring.Echo("[Commshare] " .. player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to merge with theirself!")
 				return
 			end
 			if not IsTeamLeader(player) and targetid ~= player then
-				Spring.Echo(player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to send an invite as a member of a squad (You must be leader!)!")
+				Spring.Echo("[Commshare] " .. player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to send an invite as a member of a squad (You must be leader!)!")
 				return
 			end
 			if targetspec then
-				Spring.Echo(player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to merge with spectator!")
+				Spring.Echo("[Commshare] " .. player .. "(" .. select(1,Spring.GetPlayerInfo(player)) .. ") tried to merge with spectator!")
 				return
 			end
 			if targetid == player then
@@ -221,7 +220,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			Invites[player][target] = nil
 			if Invites[target] and Invites[target][player] then Invites[target][player] = nil end
 		else
-			Spring.Echo("Invalid invite: " .. player,target .. "!")
+			Spring.Echo("[Commshare] Invalid invite: " .. player,target .. "!")
 		end
 	end		
 	
@@ -273,7 +272,7 @@ if (gadgetHandler:IsSyncedCode()) then
 							Spring.Echo("Checking team " .. teamlist[i])
 							if mergeid == teamlist[i] then
 								name = select(1,Spring.GetPlayerInfo(mergeid))
-								Spring.Echo("MergeID is " .. mergeid .. "(" .. tostring(name) .. ")")
+								Spring.Echo("[Commshare] MergeID for allyteam " .. i .. " is " .. mergeid .. "(" .. tostring(name) .. ")")
 							else
 								_,pid,_,isAi = Spring.GetTeamInfo(teamlist[i])
 								if not isAi then
@@ -305,7 +304,7 @@ if (gadgetHandler:IsSyncedCode()) then
 						return
 					end
 				else
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid invite!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid invite!")
 					return
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"accept") then
@@ -314,14 +313,14 @@ if (gadgetHandler:IsSyncedCode()) then
 					AcceptInvite(playerid,tonumber(proccmd[3]))
 					return
 				elseif not IsTeamLeader(playerid) then
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"unmerge") then
 				if controlledplayers[playerid] then
 					UnmergePlayer(playerid)
 					return
 				else
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't on a squad!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't on a squad!")
 					return
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"decline") and IsTeamLeader(playerid) then
@@ -330,9 +329,9 @@ if (gadgetHandler:IsSyncedCode()) then
 					Invites[playerid][tonumber(proccmd[3])] = nil
 					return
 				elseif not IsTeamLeader(playerid) then
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
 				else
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid invite!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid invite!")
 				end
 			elseif proccmd[2] and string.find(proccmd[2],"kick") and proccmd[3] then
 				if IsTeamLeader(playerid) then
@@ -342,15 +341,15 @@ if (gadgetHandler:IsSyncedCode()) then
 							UnmergePlayer(tonumber(proccmd[3]))
 							return
 						else
-							Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") tried to kick a player that isn't on their team! ID: " .. proccmd[3])
+							Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") tried to kick a player that isn't on their team! ID: " .. proccmd[3])
 							return
 						end
 					else
-						Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid kick command!")
+						Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") sent an invalid kick command!")
 						return
 					end
 				else
-					Spring.Echo(playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
+					Spring.Echo("[Commshare] " .. playerid .. "(" .. select(1,Spring.GetPlayerInfo(playerid)) .. ") isn't a leader!")
 					return
 				end
 			end
