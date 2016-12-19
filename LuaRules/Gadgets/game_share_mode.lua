@@ -202,7 +202,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				if Invites[target] == nil then
 					Invites[target] = {}
 				end
-				Spring.Echo("Invites[" .. target .. "][" .. player .. "]: controller: " .. targetid)
 				Invites[target][player] = {id = player,timeleft = 60,controller = targetid}
 			end
 		end
