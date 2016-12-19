@@ -27,10 +27,7 @@ if modOptions.sharemode == "off" then
 	gadgetHandler:RemoveGadget()
 end
 
-local validmodes = {};validmodes["all"] = true;validmodes["none"] = true;validmodes["invite"] = true
-
 local config = {
-	default = "invite",
 	mergetype = modOptions.sharemode,
 	unmerging = false,
 	mintime	 = 5,
