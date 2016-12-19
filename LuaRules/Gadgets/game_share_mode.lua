@@ -18,16 +18,6 @@ local function ProccessCommand(str)
 	return strtbl
 end
 
-local function tobool(var)
-	if tonumber(var) == 1 or tostring(var) == "true" then
-		return true
-	elseif var ~= nil then
-		return false
-	else
-		return nil
-	end
-end
-
 local modOptions = {}
 if (Spring.GetModOptions) then
 	modOptions = Spring.GetModOptions()
