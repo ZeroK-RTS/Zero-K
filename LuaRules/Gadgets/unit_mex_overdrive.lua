@@ -1242,7 +1242,7 @@ function gadget:GameFrame(n)
 				if enableEnergyPayback then
 					for i = 1, allyTeamData.teams do
 						local teamID = allyTeamData.team[i]
-						if activeTeams[teamID] then
+						if activeTeams[teamID] > 0 then
 							local te = teamEnergy[teamID]
 							teamPaybackOD[teamID] = 0
 
@@ -1324,10 +1324,11 @@ function gadget:GameFrame(n)
 
 					local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
 
-					if activeTeams[teamID] or activeCount == 0 then
-						odShare = (summedOverdriveMetalAfterPayback / metalSplit + (teamPaybackOD[teamID] or 0)) or 0
-						baseShare = (summedBaseMetalAfterPrivate / metalSplit + (privateBaseMetal[teamID] or 0)) or 0
-						miscShare = allyTeamMiscMetalIncome / metalSplit
+					local share = ((activeTeams[teamID] > 0) and activeTeams[teamID]) or ((activeCount == 0) and 1) or 0
+					if share > 0 then
+						odShare = ((share * summedOverdriveMetalAfterPayback / metalSplit) + (teamPaybackOD[teamID] or 0)) or 0
+						baseShare = ((share * summedBaseMetalAfterPrivate / metalSplit) + (privateBaseMetal[teamID] or 0)) or 0
+						miscShare = share * allyTeamMiscMetalIncome / metalSplit
 					end
 
 					sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
