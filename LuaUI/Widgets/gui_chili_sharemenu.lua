@@ -298,7 +298,11 @@ end
 
 local function UpdateInviteTable()
 	for i=1,Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_count") do
-		invites[i] = {id= Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_id"),timeleft = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_timeleft"), controller=Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_controller")}
+		invites[i] = {
+			id= Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_id"),
+			timeleft = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_timeleft"),
+			controller=Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_controller")
+			}
 	end
 	if invites == nil or #newinvites ~= #invites then
 		invites = newinvites
@@ -378,13 +382,9 @@ end
 function widget:GameFrame(f)
 	if f == 2 then
 		local modOptions = {}
-		if (Spring.GetModOptions) then
-			modOptions = Spring.GetModOptions()
-		else
-			Spring.Echo("NIL MODOPTIONS!")
-		end
+		modOptions = Spring.GetModOptions()
 		Spring.Echo("game_message: Share mode is " .. tostring(modOptions["sharemode"]))
-		if modOptions["sharemode"] == "invite" then
+		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
 		modOptions = nil
@@ -405,13 +405,9 @@ function widget:Initialize()
 	screen0 = chili.Screen0
 	if Spring.GetGameFrame() > 2 then
 		local modOptions = {}
-		if (Spring.GetModOptions) then
-			modOptions = Spring.GetModOptions()
-		else
-			Spring.Echo("NIL MODOPTIONS!")
-		end
+		modOptions = Spring.GetModOptions()
 		Spring.Echo("game_message: Share mode is " .. tostring(modOptions["sharemode"]))
-		if modOptions["sharemode"] == "invite" then
+		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
 		GetPlayers()
