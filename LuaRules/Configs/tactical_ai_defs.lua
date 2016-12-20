@@ -1021,7 +1021,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50,
+		skirmLeeway = 40,
 	},
 	
 	["corgarp"] = {
@@ -1029,7 +1029,9 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50, 
+		skirmLeeway = 20, 
+		skirmOrderDis = 200,
+		skirmOrderDisMin = 100, -- Make it turn around.
 	},
 	
 	["armmerl"] = {

@@ -340,6 +340,9 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 		end
 		
 		local wantedDis = min(behaviour.skirmOrderDis, skirmRange - behaviour.stoppingDistance - predictedDist)
+		if behaviour.skirmOrderDisMin and behaviour.skirmOrderDisMin > wantedDis then
+			wantedDis = behaviour.skirmOrderDisMin
+		end
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
@@ -611,6 +614,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		minFleeRange = (behaviourData.minFleeRange or 0), 
 		swarmLeeway = (behaviourData.swarmLeeway or 50), 
 		skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
+		skirmOrderDisMin = behaviourData.skirmOrderDisMin, -- can be nil
 		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
 		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
 		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
