@@ -55,6 +55,8 @@ options = {
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local mexDefID = UnitDefNames["cormex"].id
+
 local INCREMENT_SIZE = 20
 local heightIncrease = KEYSYMS.C
 local heightDecrease = KEYSYMS.V
@@ -115,8 +117,28 @@ local function SendCommand()
 		return
 	end
 	
-	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
+	-- Snap mex to metal spots
+	if buildingPlacementID == mexDefID and WG.GetClosestMetalSpot then
+		local pos = WG.GetClosestMetalSpot(pointX, pointZ)
+		if pos then
+			pointX, pointZ = pos.x, pos.z
+			
+			local height = spGetGroundHeight(pointX, pointZ)
+			if height < 0 then
+				height = 0
+				if buildingPlacementHeight == 0 then
+					pointY = 2
+				else
+					pointY = height + buildingPlacementHeight
+				end	
+			else
+				pointY = height + buildingPlacementHeight	
+			end
+		end
+	end
 	
+	-- Setup parameters for terraform command
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
 	local commandTag = WG.Terraform_GetNextTag()
 	
 	local params = {}

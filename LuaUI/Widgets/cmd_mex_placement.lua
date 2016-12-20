@@ -502,6 +502,8 @@ local function Initialize()
 	else
 		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
+	
+	WG.GetClosestMetalSpot = GetClosestMetalSpot
 end
 
 local mexSpotToDraw = false
