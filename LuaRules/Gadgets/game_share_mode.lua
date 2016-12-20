@@ -10,6 +10,8 @@ function gadget:GetInfo()
 	}
 end
 
+local private = {private = true}
+
 local function ProccessCommand(str)
 	local strtbl = {}
 	for w in string.gmatch(str, "%S+") do
@@ -205,7 +207,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				teamlist = nil
 			end
 			Invites[player][target] = nil
-			if Invites[target] and Invites[target][player] then Invites[target][player] = nil end
+			Invites[target][player] = nil
 		else
 			Spring.Echo("[Commshare] Invalid invite: " .. player,target .. "!")
 		end
@@ -236,12 +238,12 @@ if (gadgetHandler:IsSyncedCode()) then
 						invites[key] = nil
 					end
 					if data and data["timeleft"] > -1 then
-						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_timeleft",data["timeleft"],{private=true})
-						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_id",data["id"],{private=true})
-						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_controller",data["controller"],{private=true})
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_timeleft",data["timeleft"],private)
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_id",data["id"],private)
+						Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invite_"..invitecount.."_controller",data["controller"],private)
 					end
 				end
-				Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invitecount",invitecount,{private=true})
+				Spring.SetTeamRulesParam(GetTeamID(player),"commshare_invitecount",invitecount,private)
 				if invitecount == 0 then -- Cleanup the table so that next second this doesn't run.
 					Invites[player] = nil
 				end
