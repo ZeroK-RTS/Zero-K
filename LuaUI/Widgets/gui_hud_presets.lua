@@ -661,7 +661,14 @@ local function SetupNewUITop()
 		sideHeight
 	)
 	
-	-- Global build buttons
+	-- Left Side
+	WG.SetWindowPosAndSize("votes",
+		0,
+		resourceBarHeight,
+		300,
+		120
+	)
+	
 	WG.SetWindowPosAndSize("globalCommandsWindow",
 		0,
 		0,
