@@ -1463,8 +1463,15 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
+options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
 options = {
+	updateNewDefaults = {
+		name  = "Stay up to date",
+		type  = "bool", 
+		value = true, 
+		desc = "Updates your UI when new defaults are released.",
+		noHotkey = true,
+	},
 	setToDefault = {
 		name  = "Set To Default Once",
 		type  = "bool", 
@@ -1476,14 +1483,14 @@ options = {
 	maintainDefaultUI = {
 		name  = "Reset on screen resolution change",
 		type  = "bool", 
-		value = false, 
+		value = true, 
 		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
 	interfacePreset = {
 		name = 'UI Preset',
 		type = 'radioButton',
-		value = 'default',
+		value = 'minimapRight',
 		items = {
 			{key = 'default2', name = 'Default', desc = "The default UI.",},
 			{key = 'new', name = 'New UI', desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",},
@@ -1520,7 +1527,7 @@ function widget:Update(dt)
 	end
 	
 	if options.setToDefault.value then
-		options.interfacePreset.value = "default2"
+		options.interfacePreset.value = "minimapRight"
 		options.interfacePreset.OnChange(options.interfacePreset)
 		options.setToDefault.value = false
 	end
