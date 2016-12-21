@@ -38,6 +38,7 @@ local oldAllyTeam = {} -- allyTeam which player was on last frame
 local factories = {}
 local transferredFactories = {} -- unitDef and health states of the unit that was being produced be the transferred factory
 local shareLevels = {}
+local originalteams = {} -- track commshare team switching.
 
 GG.Lagmonitor_activeTeams = {}
 
@@ -67,7 +68,14 @@ for i=1,#allyTeamList do
 	local allyTeamID = allyTeamList[i]
 	local teamList = Spring.GetTeamList(allyTeamID)
 	GG.Lagmonitor_activeTeams[allyTeamID] = {count = #teamList}
+	local playerlist = {}
 	for j=1,#teamList do
+		-- take count of which player is on what team --
+		playerlist = Spring.GetPlayerList(teamList[j],true)
+		for k=1,#playerlist do
+			originalteams[playerlist[k]] = teamList[j]
+		end
+		-- other stuff --
 		local teamID = teamList[j]
 		GG.Lagmonitor_activeTeams[allyTeamID][teamID] = true
 	end
@@ -370,6 +378,22 @@ function gadget:GameFrame(n)
 			end	-- if
 		end	-- for
 	end	-- if
+end
+
+function gadget:PlayerChanged(id)
+	local _,_,spectator,newteamid,allyid,_ = Spring.GetPlayerInfo(id)
+	if originalteams[id] then
+		if newteamid ~= originalteams[id] and not spectator then -- commshare has gone and done its job. make note of new team
+			if #Spring.GetPlayerList(originalteams[id],true) == 0 and GG.Lagmonitor_activeTeams[allyid][originalteams[id]] then -- team is now empty :O tell OD immediately!
+				GG.Lagmonitor_activeTeams[allyid][originalteams[id]] = false
+				GG.Lagmonitor_activeTeams[allyid].count = GG.Lagmonitor_activeTeams[allyid].count - 1
+			elseif #Spring.GetPlayerList(newteamid,true) > 0 and GG.Lagmonitor_activeTeams[allyid][originalteams[id]] == false then -- player either got kicked or something.
+				GG.Lagmonitor_activeTeams[allyid][newteamid] = true
+				GG.Lagmonitor_activeTeams[allyid].count = GG.Lagmonitor_activeTeams[allyid].count + 1
+			end
+			originalteams[id] = newteamid
+		end
+	end
 end
 
 function gadget:GameOver()
