@@ -595,11 +595,6 @@
         "description": "Летающая бомба",
         "name": "Крылатая бомба"
     },
-    "gorg": {
-        "helptext": "The Jugglenaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic disruptor beams, the Jugg is even more bizzare with its three gravity guns and a standard laser cannon complementing a negative gravity core that can be activated to lift up and throw nearby units. This beast is slow and expensive, but seemingly impervious to enemy fire.",
-        "description": "Heavy Assault Strider",
-        "name": "gorg"
-    },
     "pw_generic": {
         "helptext": "Данная структура дает бонусы фракции, контролирующей планету. Только члены атакующий или защищающейся фракции могут повредить её.",
         "description": "Особенность не указана",

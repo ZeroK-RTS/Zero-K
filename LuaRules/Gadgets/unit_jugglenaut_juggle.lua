@@ -22,7 +22,9 @@ local getMovetype = Spring.Utilities.getMovetype
 
 local throwWeaponID = {}
 local throwWeaponName = {}
-local throwShooterID = {[UnitDefNames["gorg"].id] = true}
+local throwShooterID = {
+	-- [UnitDefNames["gorg"].id] = true
+}
 
 for i=1,#WeaponDefs do
 	local wd = WeaponDefs[i]

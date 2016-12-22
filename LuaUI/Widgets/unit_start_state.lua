@@ -474,7 +474,6 @@ AddFactoryOfUnits("missilesilo")
 -- addUnit("dante","Mech")
 -- addUnit("armraven","Mech")
 -- addUnit("armbanth","Mech")
--- addUnit("gorg","Mech")
 -- addUnit("armorco","Mech")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")

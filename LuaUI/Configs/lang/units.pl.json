@@ -590,11 +590,6 @@
         "description": "Latająca bomba (zakopuje się)",
         "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
     },
-    "gorg": {
-        "name": "Jugglenaut",
-        "description": "Ciężki mech szturmowy",
-        "helptext": "Jugglenaut, niczym starszy brat Sumo, jest ciężką, powolną jednostką o ogromnej wytrzymałości i używającą działek grawitacyjnych; ma także rdzeń grawitacyjny, który można aktywować, aby podnieść okoliczne jednostki i rzucić nimi."
-    },
     "pw_generic": {
         "name": "Neutralny Budynek",
         "description": "pusty",
