@@ -620,6 +620,10 @@ local function SetupNewUITop()
 	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
 	local resourceBarHeight = 100
 	
+	-- Chicken
+	local chickenWidth = 189
+	local chickenHeight = 270
+	
 	-- Menu
 	local menuWidth, globalWidth
 	if flushTop then
@@ -654,11 +658,19 @@ local function SetupNewUITop()
 		50
 	)
 	
+	-- Right Side
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth - 1,
 		0,
 		menuWidth,
 		sideHeight
+	)
+	
+	WG.SetWindowPosAndSize("chickenpanel",
+		screenWidth - chickenWidth - 1,
+		resourceBarHeight,
+		chickenWidth,
+		chickenHeight
 	)
 	
 	-- Left Side
