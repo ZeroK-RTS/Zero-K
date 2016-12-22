@@ -746,6 +746,7 @@ local behaviourConfig = {
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
+		skirmOrderDis = 220,
 		skirmLeeway = -30, 
 		stoppingDistance = 10
 	},
@@ -871,6 +872,14 @@ local behaviourConfig = {
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
 		skirmLeeway = 40, 
+	},	
+	["correap"] = {
+		skirms = lowMedRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		fightOnlyUnits = shortRangeExplodables,
+		skirmOrderDis = 220,
+		skirmLeeway = 50, 
 	},		
 	
 	-- med range skirms
