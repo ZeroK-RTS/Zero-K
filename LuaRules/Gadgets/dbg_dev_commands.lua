@@ -519,6 +519,15 @@ local function bisect(cmd,line,words,player)
 	end
 end
 
+local function nocost(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local enabled = not (tonumber(words[1]) == 0)
+	GG.SetFreeMorph(enabled)
+	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
+end
+
 function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
@@ -526,6 +535,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
+	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
 end
 
 -------------------------------------------------------------------------------------

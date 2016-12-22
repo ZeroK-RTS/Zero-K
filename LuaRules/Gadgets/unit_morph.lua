@@ -120,7 +120,8 @@ local spGetUnitPosition = Spring.GetUnitPosition
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local stopPenalty	= 0.667
+local stopPenalty = 0.667
+local freeMorph = false
 
 local PRIVATE = {private = true}
 
@@ -583,7 +584,9 @@ local function UpdateMorph(unitID, morphData)
 			e = (morphData.def.resTable.e * morphData.morphRate),
 		}
 		
-		if allow and (Spring.UseUnitResource(unitID, resourceUse)) then
+		if freeMorph then
+			morphData.progress = 1
+		elseif allow and (Spring.UseUnitResource(unitID, resourceUse)) then
 			morphData.progress = morphData.progress + morphData.increment*morphData.morphRate
 		end
 	end
@@ -598,6 +601,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function SetFreeMorph(newFree)
+	freeMorph = newFree
+end
+
 function gadget:Initialize()
 	--// get the morphDefs
 	morphDefs, MAX_MORPH = include("LuaRules/Configs/morph_defs.lua")
@@ -605,6 +612,8 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
+	
+	GG.SetFreeMorph = SetFreeMorph
 
 	--// make it global for unsynced access via SYNCED
 	_G.morphUnits         = morphUnits

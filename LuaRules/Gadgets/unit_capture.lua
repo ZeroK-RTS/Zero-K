@@ -621,6 +621,7 @@ local function DrawWire(units, spec)
 				point[4] = {xxx,yyy,zzz}
 				gl.PushAttrib(GL.LINE_BITS)
 				gl.DepthTest(true)
+				glLineWidth(3)
 				gl.Color (teamR or 0.5, teamG or 0.5, teamB or 0.5, math.random()*0.1+0.3)
 				gl.BeginEnd(GL_LINES, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
 				gl.DepthTest(false)
