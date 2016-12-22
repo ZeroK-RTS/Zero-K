@@ -74,7 +74,6 @@ local tele = {}
 local beacon = {}
 local orphanedBeacons = {}
 
-local isPlacingBeacon = {} --remember if a unit is currently trying to teleport a beacon bridge. Purpose is for compatibility with "repeat" state.
 local beaconWaiter = {}
 local teleportingUnit = {}
 
@@ -163,7 +162,6 @@ function tele_undeployTeleport(unitID)
 end
 
 function tele_createBeacon(unitID,x,z)
-	isPlacingBeacon[unitID]=nil
 	local y = Spring.GetGroundHeight(x,z)
 	local place, feature = Spring.TestBuildOrder(beaconDef, x, y, z, 1)
 	changeSpeed(unitID, nil, 1)
@@ -218,7 +216,6 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	
 	return canTeleport
 end
 
@@ -227,6 +224,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,
 	
 	if teleportingUnit[unitID] and not (cmdID == CMD.INSERT or cmdOptions.shift) and cmdID ~= CMD.REMOVE and cmdID ~= CMD.FIRESTATE and cmdID ~= CMD.MOVESTATE and cmdID ~= CMD_WANT_CLOAK then
 		interruptTeleport(teleportingUnit[unitID])
+	end
+	
+	if cmdID == CMD.STOP and not (cmdID == CMD.INSERT or cmdOptions.shift) and tele[unitID] then
+		local func = Spring.UnitScript.GetScriptEnv(unitID).StopCreateBeacon
+		Spring.UnitScript.CallAsUnit(unitID,func)
 	end
 	
 	local ud = UnitDefs[unitDefID]
@@ -285,36 +287,35 @@ function gadget:CommandFallback(unitID, unitDefID, teamID,    -- keeps getting
 		local tx, ty, tz = Spring.GetUnitBasePosition(unitID)
 		
 		local ux,_,uz = Spring.GetUnitPosition(unitID)
-		if --[[BEACON_PLACE_RANGE_SQR > (cmdParams[1]-ux)^2 + (cmdParams[3]-uz)^2 and]] ty == Spring.GetGroundHeight(tx, tz) then
+		if ty == Spring.GetGroundHeight(tx, tz) then
 			local cx, cz = math.floor((cmdParams[1]+8)/16)*16, math.floor((cmdParams[3]+8)/16)*16
-			local posString = cx..","..cz
 			local inLos = Spring.IsPosInLos(cx,0,cz,Spring.GetUnitAllyTeam(unitID))
-			local blocked = false --assume no obstacle in target location
+			
+			local beaconX = Spring.GetUnitRulesParam(unitID, "tele_creating_beacon_x")
+			local beaconZ = Spring.GetUnitRulesParam(unitID, "tele_creating_beacon_z")
+			
+			if cx == beaconX and cz == beaconZ then
+				return true, false -- command was used but don't remove it
+			end
+			
 			if (inLos) then --if LOS: check for obstacle
 				local place, feature = Spring.TestBuildOrder(beaconDef, cx, 0, cz, 1)
 				if not (place == 2 and feature == nil) then
-					blocked = true
+					return true, true -- command was used and remove it
 				end
 			end
 			
-			if not blocked then --if no obstacle: check for duplicate
-				local prvsOrder = isPlacingBeacon[unitID] or ""
-				local duplicate = (prvsOrder == posString)
-				local myBeacon = Spring.GetUnitsInRectangle(cx-1,cz-1,cx+1,cz+1,teamID)
-				if duplicate or #myBeacon>0 then --check if beacon is already in progress here
-					blocked = true 
-				end
+			local myBeacon = Spring.GetUnitsInRectangle(cx-1,cz-1,cx+1,cz+1,teamID)
+			if #myBeacon > 0 then -- check if beacon is already in progress here
+				return true, true -- command was used and remove it
 			end
 			
-			if not blocked then --if no obstacle & no duplicate: create beacon
-				isPlacingBeacon[unitID] = posString
-				Spring.SetUnitMoveGoal(unitID, ux,0,uz)
-				Spring.MoveCtrl.Enable(unitID)
-				Spring.SetUnitVelocity(unitID, 0, 0, 0)
-				local func = Spring.UnitScript.GetScriptEnv(unitID).Create_Beacon
-				Spring.UnitScript.CallAsUnit(unitID,func,cx,cz)
-			end
-			return true, true -- command was used and remove it
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+			Spring.GiveOrderToUnit(unitID,CMD.WAIT, {}, {})
+			local func = Spring.UnitScript.GetScriptEnv(unitID).Create_Beacon
+			Spring.UnitScript.CallAsUnit(unitID,func,cx,cz)
+			
+			return true, false -- command was used but don't remove it
 		end
 		
 		return true, false -- command was used but don't remove it
