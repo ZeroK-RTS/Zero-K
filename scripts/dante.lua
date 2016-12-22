@@ -67,7 +67,6 @@ local SALVO_TIME = 1000
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[3] and UnitDefs[unitDefID].weapons[3].weaponDef
 
-local base_speed = 100
 --------------------------------------------------------------------------------
 -- vars
 --------------------------------------------------------------------------------
@@ -156,8 +155,8 @@ end
 --------------------------------------------------------------------------------
 -- Walking
 
-local PACE = 3.8
-local SLEEP_TIME = 1050/PACE
+local PACE = 3.9
+local SLEEP_TIME = 1080/PACE
 
 local walkCycle = 1 -- Alternate between 1 and 2
 
@@ -214,15 +213,15 @@ local walkAngle = {
 	},
 	{ -- Do each cycle
 		{
-			pelvisMove = {4.5, 3 * PACE},
+			pelvisMove = {4.6, 2.9 * PACE},
 			pelvisTurn = {math.rad(0.8), math.rad(1.6) * PACE},
 		},
 		{
-			pelvisMove = {3.7, 0.9 * PACE},
+			pelvisMove = {3.8, 0.9 * PACE},
 			pelvisTurn = {math.rad(2), math.rad(1.2) * PACE},
 		},
 		{
-			pelvisMove = {1.5, 2.2 * PACE},
+			pelvisMove = {1.7, 2.1 * PACE},
 			pelvisTurn = {math.rad(0.8), math.rad(1.6) * PACE},
 		},
 	}
@@ -276,116 +275,7 @@ local function Walk()
 	end
 end
 
-local function WalkOld()
-	Signal(SIG_WALK)
-	SetSignalMask(SIG_WALK)
-	
-	local speedMult = 1
-	if armsFree then
-		Turn(torso, y_axis, 0, math.rad(90))
-		Turn(larm, y_axis, 0, math.rad(120))
-		Turn(rarm, y_axis, 0, math.rad(120))
-		Turn(luparm, x_axis, 0, math.rad(240))
-		Turn(ruparm, x_axis, 0, math.rad(240))
-	end
-	
-	while true do
-		Turn(lupleg, x_axis, math.rad(20), math.rad(50.010989))
-		Turn(rupleg, x_axis, math.rad(-20), math.rad(50.010989))
-		Turn(lfoot, x_axis, math.rad(-15.016484), math.rad(70.016484))
-		Turn(rfoot, x_axis, math.rad(5), math.rad(50.010989))
-		Turn(rleg, x_axis, math.rad(-10), math.rad(70.016484))
-		if armsFree then
-			Turn(torso, x_axis, math.rad(-1), math.rad(5))
-			Turn(ruparm, y_axis, math.rad(-2.50), math.rad(25))
-			Turn(luparm, y_axis, math.rad(-2.50), math.rad(25))
-		end
-		Sleep(304)
-		
-		Turn(lfoot, x_axis, math.rad(20), math.rad(100))
-		Turn(rfoot, x_axis, math.rad(10), math.rad(50.010989))
-		Turn(rleg, x_axis, math.rad(20), math.rad(100))
-		Turn(ltoef, x_axis, math.rad(22), math.rad(100))
-		Turn(ltoer, x_axis, math.rad(-22), math.rad(100))
-		Turn(rtoef, x_axis, 0, math.rad(100))
-		Sleep(360)
-		
-		Turn(rtoer, x_axis, 0, math.rad(100))
-		Move(pelvis, y_axis, 0, 5)
-		Turn(pelvis, z_axis, math.rad(-(-3.50)), math.rad(3))
-		Turn(lupleg, x_axis, math.rad(-20), math.rad(50.010989))
-		Turn(rupleg, x_axis, math.rad(20), math.rad(50.010989))
-		Turn(rfoot, x_axis, math.rad(-20), math.rad(130.027473))
-		Turn(lleg, x_axis, math.rad(-20), math.rad(100))
-		Sleep(650)
-	
-		Turn(rfoot, x_axis, math.rad(20), math.rad(100))
-		Turn(lleg, x_axis, math.rad(20), math.rad(100))
-		Move(pelvis, y_axis, 0, 5)
-		Turn(ltoef, x_axis, 0, math.rad(100))
-		Turn(rtoef, x_axis, math.rad(22), math.rad(100))
-		Turn(rtoer, x_axis, math.rad(-22), math.rad(100))
-		Sleep(360)
-
-		Turn(ltoer, x_axis, 0, math.rad(100))
-		Move(pelvis, y_axis, 10, 5)
-		Turn(pelvis, z_axis, math.rad(-(3.5)), math.rad(8))
-		Turn(lupleg, x_axis, math.rad(20), math.rad(50.010989))
-		Turn(rupleg, x_axis, math.rad(-20), math.rad(50.010989))
-		Turn(lfoot, x_axis, math.rad(-20), math.rad(130.027473))
-		Turn(rleg, x_axis, math.rad(-20), math.rad(100))
-		if armsFree then
-			Turn(torso, y_axis, math.rad(2.5), math.rad(12))
-			Turn(torso, x_axis, math.rad(1), math.rad(6))
-			Turn(ruparm, y_axis, math.rad(2.5), math.rad(25))
-			Turn(luparm, y_axis, math.rad(2.5), math.rad(25))
-		end
-		Sleep(650)
-		
-		Turn(lfoot, x_axis, math.rad(20), math.rad(100))
-		Turn(rfoot, x_axis, math.rad(20), math.rad(70.016484))
-		Turn(rleg, x_axis, math.rad(20), math.rad(100))
-		Move(pelvis, y_axis, 0, 5)
-		Turn(ltoef, x_axis, math.rad(22), math.rad(100))
-		Turn(ltoer, x_axis, math.rad(-22), math.rad(100))
-		Turn(rtoef, x_axis, 0, math.rad(100))
-		Sleep(360)
-			
-		Turn(rtoer, x_axis, 0, math.rad(100))
-		Move(pelvis, y_axis, 10, 5)
-		Turn(pelvis, z_axis, math.rad(-(-3.50)), math.rad(8))
-		Turn(lupleg, x_axis, math.rad(-20), math.rad(50.010989))
-		Turn(rupleg, x_axis, math.rad(20), math.rad(50.010989))
-		Turn(rfoot, x_axis, math.rad(-20), math.rad(130.027473))
-		Turn(lleg, x_axis, math.rad(-20), math.rad(100))
-		
-		
-		if armsFree then
-			Turn(torso, y_axis, math.rad(-2.5), math.rad(12))
-			Turn(torso, x_axis, math.rad(-1), math.rad(6))
-			Turn(ruparm, y_axis, math.rad(5), math.rad(25))
-			Turn(luparm, y_axis, math.rad(5), math.rad(25))
-		end
-		Sleep(650)
-
-		Turn(rfoot, x_axis, math.rad(20), math.rad(100))
-		Turn(lleg, x_axis, math.rad(20), math.rad(100))
-		Move(pelvis, y_axis, 0, 5)
-		Turn(ltoef, x_axis, 0, math.rad(100))
-		Turn(rtoef, x_axis, math.rad(22), math.rad(100))
-		Turn(rtoer, x_axis, math.rad(-22), math.rad(100))
-		Sleep(360)
-
-		Turn(ltoer, x_axis, 0, math.rad(100))
-		Move(pelvis, y_axis, 10, 5)
-		Turn(pelvis, z_axis, math.rad(-(3.5)), math.rad(8))
-		Sleep(2)
-	end
-end
-
-
 function script.Create()
-	base_speed = GetUnitValue(COB.MAX_SPEED)
 	Hide(flame1)
 	Hide(flame2)
 	Hide(rf1)
@@ -409,7 +299,7 @@ local function Stopping()
 end
 
 function script.StartMoving()
-	StartThread((unitID%2 == 0 and WalkOld) or Walk)
+	StartThread(Walk)
 	Signal(SIG_IDLE)
 end
 
