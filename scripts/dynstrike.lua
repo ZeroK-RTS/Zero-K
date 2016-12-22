@@ -287,12 +287,12 @@ end
 ---------------------------------------------------------------------
 -- Walking
 
-local PACE = 2.05
+local PACE = 2.18
 local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
 local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
 local PACE = PACE * VELOCITY/BASE_VELOCITY
 
-local SLEEP_TIME = 1000*10/30 -- Empirically determined
+local SLEEP_TIME = 935*10/30 -- Empirically determined
 
 local walkCycle = 1 -- Alternate between 1 and 2
 
@@ -300,7 +300,7 @@ local walkAngle = {
 	{ -- Moving forwards
 		wait = HipLeft,
 		{
-			hip = {math.rad(-12), math.rad(40) * PACE},
+			hip = {math.rad(-14), math.rad(40) * PACE},
 			leg = {math.rad(80), math.rad(100) * PACE},
 			foot = {math.rad(15), math.rad(150) * PACE},
 			arm = {math.rad(5), math.rad(20) * PACE},
@@ -309,7 +309,7 @@ local walkAngle = {
 		{
 			hip = {math.rad(-32), math.rad(30) * PACE},
 			leg = {math.rad(16), math.rad(90) * PACE},
-			foot = {math.rad(-30), math.rad(160) * PACE},
+			foot = {math.rad(-40), math.rad(180) * PACE},
 		},
 	},
 	{ -- Moving backwards
@@ -335,10 +335,12 @@ local function Walk()
 	SetSignalMask(SIG_WALK)
 	
 	local speedMult = 1
+	local scaleMult = dyncomm.GetScale()
 	
 	while true do
 		walkCycle = 3 - walkCycle
 		speedMult = math.max(0.05, (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace())
+		speedMult = speedMult*0.96
 		
 		local left = walkAngle[walkCycle] 
 		local right = walkAngle[3 - walkCycle] 
@@ -360,7 +362,7 @@ local function Walk()
 			Turn(HandRight, x_axis, right[1].hand[1], right[1].hand[2] * speedMult)
 		end
 		
-		Move(Base, z_axis, 1, 2 * speedMult)
+		Move(Base, z_axis, 0.5 * scaleMult, 40 * speedMult * scaleMult)
 		
 		--WaitForTurn(left.wait, x_axis)
 		--Spring.Echo(Spring.GetGameFrame())
@@ -379,7 +381,7 @@ local function Walk()
 			Turn(Stomach, z_axis, -0.3*(walkCycle - 1.5), 0.4 * speedMult)
 		end
 		
-		Move(Base, z_axis, 0, 2 * speedMult)
+		Move(Base, z_axis, 0.5 * scaleMult, 40 * speedMult * scaleMult)
 		
 		--WaitForTurn(left.wait, x_axis)
 		--Spring.Echo(Spring.GetGameFrame())

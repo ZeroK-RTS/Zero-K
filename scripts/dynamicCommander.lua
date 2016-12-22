@@ -8,6 +8,7 @@ local shield
 local weaponNumMap = {}
 local weaponsInitialized = false
 local paceMult
+local scaleMult
 
 local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
 local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
@@ -40,22 +41,35 @@ local function IsManualFire(num)
 	return isManual[num]
 end
 
+local levelScale = {
+    [0] = 1,
+    [1] = 1,
+    [2] = 1.1,
+    [3] = 1.2,
+    [4] = 1.25,
+    [5] = 1.3,
+}
+local levelToPace = {}
+for key, value in pairs(levelScale) do
+	levelToPace[key] = 1/value
+end
+
 local function CalculatePaceMult()
-	local levelToPace = {
-		[0] = 1,
-		[1] = 1,
-		[2] = 0.94,
-		[3] = 0.88,
-		[4] = 0.85,
-		[5] = 0.8,
-	}
-	
-	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	paceMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
 	return paceMult
 end
 
 local function GetPace()
 	return paceMult or CalculatePaceMult()
+end
+
+local function CalculateScaleMult()
+	scaleMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	return scaleMult
+end
+
+local function GetScale()
+	return scaleMult or CalculateScaleMult()
 end
 
 local function GetWeapon(num)
@@ -304,6 +318,7 @@ end
 
 return {
 	GetPace           = GetPace,
+	GetScale          = GetScale,
 	GetWeapon         = GetWeapon,
 	EmitWeaponFireSfx = EmitWeaponFireSfx,
 	EmitWeaponShotSfx = EmitWeaponShotSfx,
