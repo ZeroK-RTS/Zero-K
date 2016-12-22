@@ -659,19 +659,19 @@ local beaconCount = 0
 
 local function DrawBezierCurve(pointA, pointB, pointC,pointD, amountOfPoints)
 	local step = 1/amountOfPoints
-	glVertex (pointA[1]+3, pointA[2]+3, pointA[3]+3)
+	glVertex (pointA[1], pointA[2], pointA[3])
 	for i=0, 1, step do
 		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
 		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
 		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
 		glVertex(x,y,z)
 	end
-	glVertex(pointD[1]+3,pointD[2]+3,pointD[3]+3)
+	glVertex(pointD[1],pointD[2],pointD[3])
 end
 
 local function GetUnitTop (unitID, x,y,z)
 	local height = Spring.GetUnitHeight(unitID) -- previously hardcoded to 50
-	local top = select (2, spGetUnitVectors(unitID))
+	local top = select(2, spGetUnitVectors(unitID))
 	local offX = top[1]*height
 	local offY = top[2]*height
 	local offZ = top[3]*height
@@ -685,13 +685,12 @@ local function DrawWire(spec)
 
 		if tid and (Spring.GetUnitRulesParam(tid, "deploy") == 1) then
 			local point = {nil, nil, nil, nil}
-			local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(tid, true)
 			local teleportiee = Spring.GetUnitRulesParam(tid, "teleportiee")
 			if (teleportiee >= 0) and spValidUnitID(teleportiee) and spValidUnitID(bid) then
 				local los1 = spGetUnitLosState(teleportiee, myTeam, false)
 				local los2 = spGetUnitLosState(bid, myTeam, false)
 				if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(teleportiee) or spIsUnitInView(bid)) then
-					_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
+					local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(bid, true)
 					local topX, topY, topZ = GetUnitTop(bid, xxx, yyy, zzz)
 					point[1] = {xxx, yyy, zzz}
 					point[2] = {topX, topY, topZ}
