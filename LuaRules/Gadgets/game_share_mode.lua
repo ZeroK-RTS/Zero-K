@@ -134,8 +134,8 @@ if (gadgetHandler:IsSyncedCode()) then
 			Spring.Echo("[Commshare] Assigning player id " .. playerid .. "(" .. name .. ") to team " .. target)
 			local name,_,spec,_,_,allyteam = Spring.GetPlayerInfo(playerid)
 			if GetSquadSize(originalteam) - 1 == 0 then
-				local metal = select(1,Spring.GetTeamResources(originalteam,"metal"))
-				local energy = select(1,Spring.GetTeamResources(originalteam,"energy"))
+				local metal,_ = Spring.GetTeamResources(originalteam,"metal")
+				local energy,_ = Spring.GetTeamResources(originalteam,"energy")
 				Spring.ShareTeamResource(originalteam,target,"metal",metal)
 				Spring.ShareTeamResource(originalteam,target,"energy",energy)
 				MergeUnits(originalteam,target)
