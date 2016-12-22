@@ -319,6 +319,7 @@ function gadget:GameFrame(f)
 					if largestDamage < allyData.totalDamage then
 						largestDamage = allyData.totalDamage
 					end
+					j = j + 1
 				end
 			end
 			
