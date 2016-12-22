@@ -78,6 +78,8 @@ local dgunning = false
 local targetHeading = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Arm Animation
+
 local function RestorePose()
 	Turn(torso, x_axis, 0, math.rad(100))
 	
@@ -91,8 +93,9 @@ local function RestorePose()
 	Turn(ltoer, x_axis, 0, math.rad(100))
 	Turn(rtoef, x_axis, 0, math.rad(100))
 	Turn(rtoer, x_axis, 0, math.rad(100))
+	Turn(pelvis, z_axis, 0, math.rad(100))
 
-	Move(pelvis, y_axis, 0, 5)
+	Move(pelvis, y_axis, 0, 25)
 end
 
 local function IdleAnim()
@@ -149,9 +152,87 @@ local function RestoreAfterDelay()
 	armsFree = true
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Walking
+
+local PACE = 3.8
+local SLEEP_TIME = 1050/PACE
+
+local walkCycle = 1 -- Alternate between 1 and 2
+
+local tempSpeed = 40
+
+local walkAngle = {
+	{ -- Moving forwards
+		{
+			hip = {math.rad(0), math.rad(20) * PACE},
+			leg = {math.rad(-20), math.rad(40) * PACE},
+			foot = {math.rad(15), math.rad(54) * PACE},
+			toeFront = {math.rad(22), math.rad(45) * PACE},
+			toeRear = {math.rad(-22), math.rad(45) * PACE},
+			arm = {math.rad(4), math.rad(12) * PACE},
+		},
+		{
+			hip = {math.rad(-35), math.rad(35) * PACE},
+			leg = {math.rad(0), math.rad(20) * PACE},
+			foot = {math.rad(-5), math.rad(20) * PACE},
+			toeFront = {math.rad(22), 0},
+			toeRear = {math.rad(-6), 10},
+		},
+		{
+			hip = {math.rad(-60), math.rad(25) * PACE},
+			leg = {math.rad(30), math.rad(30) * PACE},
+			foot = {math.rad(31), math.rad(36) * PACE},
+			toeFront = {0, math.rad(45) * PACE},
+			toeRear = {math.rad(10), math.rad(30) * PACE},
+		},
+	},
+	{ -- Moving backwards
+		{
+			hip = {math.rad(-35), math.rad(25) * PACE},
+			leg = {math.rad(20), math.rad(10) * PACE},
+			foot = {math.rad(15), math.rad(16) * PACE},
+			toeFront = {0, 0},
+			toeRear = {0, math.rad(40) * PACE},
+			arm = {math.rad(4), math.rad(12) * PACE},
+		},
+		{
+			hip = {math.rad(-5), math.rad(30) * PACE},
+			leg = {math.rad(10), math.rad(10) * PACE},
+			foot = {math.rad(-3), math.rad(18) * PACE},
+			toeFront = {0, 0},
+			toeRear = {0, 0},
+		},
+		{
+			hip = {math.rad(20), math.rad(25) * PACE},
+			leg = {math.rad(20), math.rad(10) * PACE},
+			foot = {math.rad(-39), math.rad(36) * PACE},
+			toeFront = {0, 0},
+			toeRear = {0, 0},
+		},
+	},
+	{ -- Do each cycle
+		{
+			pelvisMove = {4.5, 3 * PACE},
+			pelvisTurn = {math.rad(0.8), math.rad(1.6) * PACE},
+		},
+		{
+			pelvisMove = {3.7, 0.9 * PACE},
+			pelvisTurn = {math.rad(2), math.rad(1.2) * PACE},
+		},
+		{
+			pelvisMove = {1.5, 2.2 * PACE},
+			pelvisTurn = {math.rad(0.8), math.rad(1.6) * PACE},
+		},
+	}
+}
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
+	local speedMult = 1
 	if armsFree then
 		Turn(torso, y_axis, 0, math.rad(90))
 		Turn(larm, y_axis, 0, math.rad(120))
@@ -159,6 +240,55 @@ local function Walk()
 		Turn(luparm, x_axis, 0, math.rad(240))
 		Turn(ruparm, x_axis, 0, math.rad(240))
 	end
+	
+	while true do
+		walkCycle = 3 - walkCycle
+		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)
+		
+		local left = walkAngle[walkCycle] 
+		local right = walkAngle[3 - walkCycle]
+		local main = walkAngle[3]
+		
+		for i = 1, 3 do
+			Turn(lupleg, x_axis,  left[i].hip[1],  left[i].hip[2] * speedMult)
+			Turn(lleg, x_axis, left[i].leg[1],  left[i].leg[2] * speedMult)
+			Turn(lfoot, x_axis, left[i].foot[1], left[i].foot[2] * speedMult)
+			Turn(ltoef, x_axis, left[i].toeFront[1], left[i].toeFront[2] * speedMult)
+			Turn(ltoer, x_axis, left[i].toeRear[1], left[i].toeRear[2] * speedMult)
+			
+			Turn(rupleg, x_axis,  right[i].hip[1],  right[i].hip[2] * speedMult)
+			Turn(rleg, x_axis, right[i].leg[1],  right[i].leg[2] * speedMult)
+			Turn(rfoot, x_axis,  right[i].foot[1], right[i].foot[2] * speedMult)
+			Turn(rtoef, x_axis, right[i].toeFront[1], right[i].toeFront[2] * speedMult)
+			Turn(rtoer, x_axis, right[i].toeRear[1], right[i].toeRear[2] * speedMult)
+			
+			if armsFree and left[i].arm then
+				local parity = 3 - walkCycle*2
+				Turn(larm, y_axis, left[i].arm[1] * parity, left[i].arm[2] * speedMult)
+				Turn(rarm, y_axis, right[i].arm[1] * parity, right[i].arm[2] * speedMult)
+				
+				Turn(pelvis, z_axis, main[i].pelvisTurn[1] * parity, main[i].pelvisTurn[2] * speedMult)
+			end
+			
+			Move(pelvis, y_axis, main[i].pelvisMove[1], main[i].pelvisMove[2] * speedMult)
+			Sleep(SLEEP_TIME / speedMult)
+		end
+	end
+end
+
+local function WalkOld()
+	Signal(SIG_WALK)
+	SetSignalMask(SIG_WALK)
+	
+	local speedMult = 1
+	if armsFree then
+		Turn(torso, y_axis, 0, math.rad(90))
+		Turn(larm, y_axis, 0, math.rad(120))
+		Turn(rarm, y_axis, 0, math.rad(120))
+		Turn(luparm, x_axis, 0, math.rad(240))
+		Turn(ruparm, x_axis, 0, math.rad(240))
+	end
+	
 	while true do
 		Turn(lupleg, x_axis, math.rad(20), math.rad(50.010989))
 		Turn(rupleg, x_axis, math.rad(-20), math.rad(50.010989))
@@ -279,13 +409,17 @@ local function Stopping()
 end
 
 function script.StartMoving()
-	StartThread(Walk)
+	StartThread((unitID%2 == 0 and WalkOld) or Walk)
 	Signal(SIG_IDLE)
 end
 
 function script.StopMoving()
 	StartThread(Stopping)
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Weaponry
 
 function script.AimFromWeapon(num)
 	return weaponPieces[num].aimFrom

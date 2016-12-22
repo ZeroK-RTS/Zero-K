@@ -108,7 +108,6 @@ local walkCycle = 1 -- Alternate between 1 and 2
 
 local walkAngle = {
 	{ -- Moving forwards
-		wait = lupleg,
 		{
 			hip = {math.rad(-12), math.rad(35) * PACE},
 			leg = {math.rad(80), math.rad(100) * PACE},
@@ -122,7 +121,6 @@ local walkAngle = {
 		},
 	},
 	{ -- Moving backwards
-		wait = rupleg,
 		{
 			hip = {math.rad(2), math.rad(50) * PACE},
 			leg = {math.rad(2), math.rad(40) * PACE},
@@ -166,8 +164,6 @@ local function Walk()
 			Turn(rarm, x_axis, right[1].arm[1],  right[1].arm[2] * speedMult)
 		end
 		
-		--WaitForTurn(left.wait, x_axis)
-		--Spring.Echo(Spring.GetGameFrame())
 		Sleep(SLEEP_TIME / speedMult)
 		-----------------------------------------------------------------------------------
 		
@@ -183,8 +179,6 @@ local function Walk()
 			Turn(torso, z_axis, -0.1*(walkCycle - 1.5), 0.12 * speedMult)
 		end
 		
-		--WaitForTurn(left.wait, x_axis)
-		--Spring.Echo(Spring.GetGameFrame())
 		Sleep(SLEEP_TIME / speedMult)
 	end
 end
