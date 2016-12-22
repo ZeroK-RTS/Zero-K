@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[cordoom]],
   name                          = [[Doomsday Machine]],
-  description                   = [[Medium Range Defense Fortress - Requires 50 Power (Main Gun)]],
+  description                   = [[Medium Range Defense Fortress - Requires 50 Power]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

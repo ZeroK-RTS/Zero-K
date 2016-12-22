@@ -1055,7 +1055,7 @@
 	},
 	"cordoom" : {
 		"name" : "Doomsday Machine",
-		"description" : "Medium Range Defense Fortress - Requires 50 Power (Main Gun)",
+		"description" : "Medium Range Defense Fortress - Requires 50 Power",
 		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
 	},
 	"corgrav" : {
