@@ -274,7 +274,7 @@ local function SetupUnit(unitDef, unitID)
 			local weaponDef = WeaponDefs[weapon.weaponDef]
 			if (weaponDef) then
 				local aoe = weaponDef.damageAreaOfEffect
-				if (num == 3  and unitDef.canManualFire) or num == manualfireWeapon then
+				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
 					if retDgunInfo.range and rangeMult then
 						retDgunInfo.range = retDgunInfo.range * rangeMult

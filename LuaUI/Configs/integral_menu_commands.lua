@@ -160,7 +160,6 @@ local units = {
 		shipassault = ASSAULT,
 		-- No Ship HEAVY_SOMETHING (yet)
 		subraider = SPECIAL,
-		shiptransport = UTILITY,
 	},
 
 

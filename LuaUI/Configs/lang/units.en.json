@@ -14,11 +14,6 @@
 		"description" : "Multi-Role Support Gunship",
 		"helptext" : "The Rapier is a light combat gunship. While its missiles are not the most damaging thing around, they are quite accurate and their disruption warheads slow down their targets."
 	},
-	"sprinkler" : {
-		"name" : "Sprinkler",
-		"description" : "Important irrigation structure",
-		"helptext" : "The Sprinkler is an indispensable agriculture utility agreed for some sorts cleansing."
-	},
 	"factorycloak" : {
 		"name" : "Cloaky Bot Factory",
 		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
@@ -46,7 +41,7 @@
 	},
 	"armfus" : {
 		"name" : "Fusion Reactor",
-		"description" : "Produces Energy (35)",
+		"description" : "Medium Powerplant (+35)",
 		"helptext" : "Fusion reactors provide a good amount of steady energy output at a fair price. They are attractive targets and not very well-armored, so keep them well-protected. When killed, fusion reactors will cause heavy damage to nearby units."
 	},
 	"chickenlandqueen" : {
@@ -287,7 +282,7 @@
 	},
 	"cafus" : {
 		"name" : "Singularity Reactor",
-		"description" : "Produces Energy (225) - HAZARDOUS",
+		"description" : "Large Powerplant (+225) - HAZARDOUS",
 		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
 	"armstiletto_laser" : {
@@ -322,7 +317,7 @@
 	},
 	"amgeo" : {
 		"name" : "Advanced Geothermal",
-		"description" : "Produces Energy (100) - HAZARDOUS",
+		"description" : "Large Powerplant (+100) - HAZARDOUS",
 		"helptext" : "The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
 	"armnanotc" : {
@@ -391,7 +386,7 @@
 	},
 	"armsolar" : {
 		"name" : "Solar Collector",
-		"description" : "Produces Energy (2)",
+		"description" : "Small Powerplant (+2)",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
 	},
 	"armbrawl" : {
@@ -476,7 +471,7 @@
 	},
 	"armwin" : {
 		"name" : "Wind/Tidal Generator",
-		"description" : "Produces Energy",
+		"description" : "Small Powerplant",
 		"helptext" : "Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output."
 	},
 	"amphassault" : {
@@ -666,7 +661,7 @@
 	},
 	"geo" : {
 		"name" : "Geothermal Generator",
-		"description" : "Produces Energy (25)",
+		"description" : "Medium Powerplant (+25)",
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."
 	},
 	"corfast" : {
@@ -849,11 +844,6 @@
 		"description" : "Precision Artillery Vehicle",
 		"helptext" : "The Impaler fires vertically a high damage, high accuracy kinetic missile at long range. Its high arc makes it able to fire over any obstacle, however that makes the flight time so high that it's useless against moving targets. Use the Impaler to kill specific buildings."
 	},
-	"iwin" : {
-		"name" : "I Win Button",
-		"description" : "Giant \"I Win\" Button",
-		"helptext" : "I Win!!!"
-	},
 	"zenith" : {
 		"name" : "Zenith",
 		"description" : "Meteor Controller",
@@ -1010,8 +1000,8 @@
 	},
 	"shipskirm" : {
 		"name" : "Mistral",
-		"description" : "Missile Boat (Skirmisher)",
-		"helptext" : "This Missile Boat fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
+		"description" : "Rocket Boat (Skirmisher)",
+		"helptext" : "This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close."
 	},
 	"subraider" : {
 		"name" : "Seawolf",
@@ -1065,7 +1055,7 @@
 	},
 	"cordoom" : {
 		"name" : "Doomsday Machine",
-		"description" : "Medium Range Defense Fortress - Requires 50 Power (Main Gun)",
+		"description" : "Medium Range Defense Fortress - Requires 50 Power",
 		"helptext" : "Armed with a heavy plasma cannon and a Heat Ray, the Doomsday Machine forms a focal defense point against enemy assault pushes. It can bunker down to survive attack by long-range artillery or air attacks to reduce incoming damage to a quarter, although it cannot fire its weapons while doing so."
 	},
 	"corgrav" : {

@@ -5,7 +5,7 @@ function gadget:GetInfo() return {
 		date    = "May 14, 2008", --last update 2015-05-05
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
-		enabled = not (Spring.GetModOptions().impulsejump  == "1"), -- loaded by default?
+		enabled = true,
 } end
 
 if (not gadgetHandler:IsSyncedCode()) then return end
@@ -421,6 +421,7 @@ local function UpdateCoroutines()
 end
 
 function gadget:Initialize()
+	Spring.SetGameRulesParam("jumpJets", 1)
 	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
 	Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
 	gadgetHandler:RegisterCMDID(CMD_JUMP)

@@ -143,6 +143,7 @@ options_order = {
 	'radar_preset_green_in_blue', 
 	
 	-- Minimap options
+	'disableMinimap',
 	'hideOnOverview',
 	'use_map_ratio',
 	'opacity', 
@@ -361,6 +362,13 @@ options = {
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
+	disableMinimap = {
+		name = 'Disable Minimap',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+	},
 	hideOnOverview = {
 		name = 'Hide on Overview',
 		type = 'bool',
@@ -659,6 +667,10 @@ end
 MakeMinimapWindow = function()
 	if (window) then
 		window:Dispose()
+	end
+	
+	if options.disableMinimap.value then
+		return
 	end
 	
 	-- Set the size for the default settings.
@@ -1008,7 +1020,7 @@ end
 
 function widget:DrawScreen() 
 	local cs = Spring.GetCameraState()
-	if (window.hidden or cs.name == "ov") then 
+	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0

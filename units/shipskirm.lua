@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[shipskirm]],
   name                   = [[Mistral]],
-  description            = [[Missile Boat (Skirmisher)]],
+  description            = [[Rocket Boat (Skirmisher)]],
   acceleration           = 0.039,
   activateWhenBuilt      = true,
   brakeRate              = 0.115,
@@ -22,7 +22,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-       helptext       = [[This Missile Boat fires medium-range missiles, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
+    helptext       = [[This Rocket Boat fires a salvo of four medium-range rockets, useful for bombarding sea and shore targets. Beware of subs and anything with enough speed to get close.]],
 	turnatfullspeed = [[1]],
     modelradius     = [[24]],
   },
@@ -37,7 +37,7 @@ unitDef = {
   idleTime               = 1800,
   losEmitHeight          = 30,
   maxDamage              = 650,
-  maxVelocity            = 2.5,
+  maxVelocity            = 2.3,
   minCloakDistance       = 350,
   minWaterDepth          = 10,
   movementClass          = [[BOAT3]],
@@ -45,7 +45,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
-  scale                  = [[0.6]],
   script		         = [[shipskirm.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
@@ -67,58 +66,60 @@ unitDef = {
 
   weapons                = {
 
-    {
-      def                = [[MISSILE]],
+	{
+      def                = [[ROCKET]], 
 	  badTargetCategory	 = [[FIXEDWING GUNSHIP]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
     },
-
+	
   },
 
 
   weaponDefs             = {
 
-    MISSILE = {
-
-      name                    = [[Guided Missile]],
-      areaOfEffect            = 10,
-      cegTag                  = [[missiletrailyellow]],
+     ROCKET = {
+      name                    = [[Unguided Rocket]],
+      areaOfEffect            = 75,
+	  burst                   = 4,
+	  burstRate               = 0.3,
+      cegTag                  = [[missiletrailred]],
       craterBoost             = 1,
       craterMult              = 2,
 
-
+      customParams        = {
+		light_camera_height = 1800,
+      },
+	  
       damage                  = {
-
-        default = 130,
-        subs    = 13,
+        default = 280,
+        planes  = 280,
+        subs    = 28,
       },
 
-      edgeEffectiveness       = 0.4,
-
-      explosionGenerator      = [[custom:FLASH2]],
-      fireStarter             = 20,
-      flightTime              = 3,
+      fireStarter             = 70,
+      flightTime              = 3.5,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
-      impactOnly              = false,
       interceptedByShieldType = 2,
-      model                   = [[hobbes.s3o]],
+      model                   = [[wep_m_hailstorm.s3o]],
       noSelfDamage            = true,
-      range                   = 650,
-      reloadtime              = 2.5,
-      smokeTrail              = false,
-      soundHit                = [[explosion/ex_small13]],
-	  soundStart              = [[weapon/missile/missile_fire11]],
-      startVelocity           = 400,
-      tolerance               = 9000,
-      tracks                  = true,
-      trajectoryHeight        = 0.7,
-      turnRate                = 6000,
+      predictBoost            = 1,
+      range                   = 610,
+      reloadtime              = 8.0,
+      smokeTrail              = true,
+      soundHit                = [[explosion/ex_med4]],
+      soundHitVolume          = 8,
+      soundStart              = [[weapon/missile/missile2_fire_bass]],
+      soundStartVolume        = 7,
+      startVelocity           = 230,
+      texture2                = [[darksmoketrail]],
+      tracks                  = false,
+      trajectoryHeight        = 0.6,
+      turnrate                = 1000,
       turret                  = true,
-      weaponAcceleration      = 300,
       weaponType              = [[MissileLauncher]],
-
-      weaponVelocity          = 750,
+      weaponVelocity          = 230,
+	  wobble                  = 5000,
     },
 
   },

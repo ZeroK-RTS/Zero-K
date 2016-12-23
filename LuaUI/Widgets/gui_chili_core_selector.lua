@@ -1758,6 +1758,7 @@ function widget:Shutdown()
 	end
 	widgetHandler:RemoveAction("selectcomm")
 	widgetHandler:RemoveAction("selectprecbomber")
+	WG.CoreSelector = nil
 end
 
 function widget:Initialize()

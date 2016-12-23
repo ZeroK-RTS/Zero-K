@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armsolar]],
   name                          = [[Solar Collector]],
-  description                   = [[Produces Energy (2)]],
+  description                   = [[Small Powerplant (+2)]],
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,

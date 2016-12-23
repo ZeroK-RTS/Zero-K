@@ -680,12 +680,12 @@ end
 
 local function IsUnitFXVisible(fx)
 	local unitActive = true
-    local unitID = fx.unit
+	local unitID = fx.unit
 	if fx.onActive then
-		unitActive = (spGetUnitIsActive(unitID) and 
-			(spGetUnitRulesParam(unitID, "disarmed") ~= 1) and 
-			(spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
-		) or ((spGetUnitRulesParam(unitID, "unitActiveOverride") == 1) and not spGetUnitIsStunned(unitID))
+		unitActive = ((spGetUnitIsActive(unitID) or spGetUnitRulesParam(unitID, "unitActiveOverride") == 1)
+			and	(spGetUnitRulesParam(unitID, "disarmed") ~= 1)
+			and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
+			and not spGetUnitIsStunned(unitID))
 		if (unitActive == nil) then
 			unitActive = true
 		end

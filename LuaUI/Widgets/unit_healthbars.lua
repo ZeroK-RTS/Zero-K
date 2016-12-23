@@ -49,7 +49,6 @@ local infoDistance = 700000
 
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
-local drawJumpJet        = Spring.GetGameRulesParam("jumpJets")
 
 --// this table is used to shows the hp of perimeter defence, and filter it for default wreckages
 local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,fortification_core=true,spike=true,floatingteeth=true,floatingteeth_core=true,spike=true}
@@ -898,7 +897,7 @@ do
       end
 	  
       --// JUMPJET
-      if (drawJumpJet)and(ci.canJump) then
+      if ci.canJump then
         local jumpReload = GetUnitRulesParam(unitID,"jumpReload")
         if (jumpReload and (jumpReload>0) and (jumpReload<1)) then
           AddBar(messages.jump,jumpReload,"jump",(fullText and floor(jumpReload*100)..'%') or '')

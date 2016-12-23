@@ -17,7 +17,6 @@ unitDef = {
   canGuard                      = true,
   canMove                       = false,
   canPatrol                     = true,
-  canReclaim                    = true,
   canStop                       = true,
   cantBeTransported             = true,
   category                      = [[FLOAT UNARMED]],

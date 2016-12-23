@@ -170,10 +170,6 @@ end
 
 -- Set build options
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-if modOptions and tobool(modOptions.iwinbutton) then
-	buildOpts[#buildOpts+1] = 'iwin'
-end
-
 for name, ud in pairs(UnitDefs) do
 	if ud.buildoptions and (#ud.buildoptions == 0) then
 		ud.buildoptions = buildOpts
@@ -264,16 +260,18 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Maneuverablity Buff
--- 
+-- Maneuverability multipliers, useful for testing.
+-- TODO: migrate the x3 and x5 ones to defs, leave at x1 for easy testing
 
+local TURNRATE_MULT = 1
 local ACCEL_MULT = 3
 local ACCEL_MULT_HIGH = 5
 
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
-		
+
+		ud.turnrate = ud.turnrate * TURNRATE_MULT
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
 			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2

@@ -52,7 +52,6 @@ unitDef = {
 	helptext_de    = [[Die eierlegende, brEende Königin ist im Gefecht nicht ganz so furchterregend wie die anderen Königinnen, aber auf weite Sicht kann sie sogar eine größere Gefahr darstellen. Sie erzeugt all die verschiedenen Chickenrassen der Thunderbirds.]],
   },
 
-  energyStorage       = 0,
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
@@ -65,7 +64,6 @@ unitDef = {
   maxVelocity         = 2,
   maxWaterDepth       = 22,
   metalMake           = 0.4,
-  metalStorage        = 0,
   minCloakDistance    = 75,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,

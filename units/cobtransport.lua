@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Valkyrie]],
   description         = [[Air Transport]],
   acceleration        = 0.15,
-  amphibious          = true,
   brakeRate           = 6,
   buildCostEnergy     = 80,
   buildCostMetal      = 80,

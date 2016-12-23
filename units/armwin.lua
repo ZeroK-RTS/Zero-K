@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[armwin]],
   name                          = [[Wind/Tidal Generator]],
-  description                   = [[Produces Energy]],
+  description                   = [[Small Powerplant]],
   activateWhenBuilt             = true,
   buildCostEnergy               = 35,
   buildCostMetal                = 35,
@@ -50,7 +50,6 @@ unitDef = {
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
-  windGenerator                 = 0,
   yardMap                       = [[ooooooooo]],
 
   featureDefs                   = {

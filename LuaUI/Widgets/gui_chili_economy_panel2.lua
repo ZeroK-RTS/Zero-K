@@ -161,11 +161,12 @@ local function option_recreateWindow()
 	if options.ecoPanelHideSpec.value then
 		local spectating = select(1, Spring.GetSpectatingState())
 		if spectating then
-			return
+			return false
 		end
 	end
 		
 	CreateWindow(x,y,w,h)
+	return true
 end
 
 local function ApplySkin(skinWindow, className)
@@ -455,9 +456,15 @@ end
 local initialReserveSet = false
 function widget:GameFrame(n)
 
-	if (n%TEAM_SLOWUPDATE_RATE ~= 0) or not window then 
+	if (n%TEAM_SLOWUPDATE_RATE ~= 0) then 
         return 
     end
+	
+	if not window then
+		if not option_recreateWindow() then
+			return
+		end
+	end
 	
 	if n > 5 and not initialReserveSet then
 		updateReserveBars(true, false, options.defaultMetalReserve.value, true)

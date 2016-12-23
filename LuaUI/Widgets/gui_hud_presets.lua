@@ -620,6 +620,10 @@ local function SetupNewUITop()
 	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
 	local resourceBarHeight = 100
 	
+	-- Chicken
+	local chickenWidth = 189
+	local chickenHeight = 270
+	
 	-- Menu
 	local menuWidth, globalWidth
 	if flushTop then
@@ -654,6 +658,7 @@ local function SetupNewUITop()
 		50
 	)
 	
+	-- Right Side
 	WG.SetWindowPosAndSize("epicmenubar",
 		screenWidth - menuWidth - 1,
 		0,
@@ -661,7 +666,21 @@ local function SetupNewUITop()
 		sideHeight
 	)
 	
-	-- Global build buttons
+	WG.SetWindowPosAndSize("chickenpanel",
+		screenWidth - chickenWidth - 1,
+		resourceBarHeight,
+		chickenWidth,
+		chickenHeight
+	)
+	
+	-- Left Side
+	WG.SetWindowPosAndSize("votes",
+		0,
+		resourceBarHeight,
+		300,
+		120
+	)
+	
 	WG.SetWindowPosAndSize("globalCommandsWindow",
 		0,
 		0,
@@ -1463,8 +1482,15 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
+options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
 options = {
+	updateNewDefaults = {
+		name  = "Stay up to date",
+		type  = "bool", 
+		value = true, 
+		desc = "Updates your UI when new defaults are released.",
+		noHotkey = true,
+	},
 	setToDefault = {
 		name  = "Set To Default Once",
 		type  = "bool", 
@@ -1476,7 +1502,7 @@ options = {
 	maintainDefaultUI = {
 		name  = "Reset on screen resolution change",
 		type  = "bool", 
-		value = false, 
+		value = true, 
 		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
 	},
@@ -1520,7 +1546,7 @@ function widget:Update(dt)
 	end
 	
 	if options.setToDefault.value then
-		options.interfacePreset.value = "default2"
+		options.interfacePreset.value = "minimapRight"
 		options.interfacePreset.OnChange(options.interfacePreset)
 		options.setToDefault.value = false
 	end

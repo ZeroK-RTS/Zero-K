@@ -272,6 +272,10 @@ local shortRangeExplodables = NameToDefID({
 	"armestor",
 })
 
+local diverExplodables = NameToDefID({
+	"armestor",
+})
+
 local medRangeExplodables = NameToDefID({
 	"armfus", -- don't suicide vs fusions if possible.
 	"geo",
@@ -290,6 +294,7 @@ end
 -- Notably, this occurs after the skirm nested union
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
+local diverSkirmieeArray = Union(shortRangeSkirmieeArray, diverExplodables)
 shortRangeSkirmieeArray     = Union(shortRangeSkirmieeArray, shortRangeExplodables)
 riotRangeSkirmieeArray      = Union(riotRangeSkirmieeArray, shortRangeExplodables)
 
@@ -350,7 +355,7 @@ local subfleeables = NameToDefID({
 })
 
 -- Some short ranged units dive everything that they don't skirm or swarm.
-local shortRangeDiveArray = SetMinus(SetMinus(allGround, shortRangeSkirmieeArray), lowRangeSwarmieeArray)
+local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lowRangeSwarmieeArray)
 
 -- waterline(defaults to 0): Water level at which the unit switches between land and sea behaviour
 -- sea: table of behaviour for sea. Note that these tables are optional.
@@ -542,7 +547,7 @@ local behaviourConfig = {
 	},
 	
 	["corgator"] = {
-		skirms = shortRangeSkirmieeArray,
+		skirms = diverSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		hugs = shortRangeDiveArray,
@@ -650,7 +655,7 @@ local behaviourConfig = {
 	
 	-- could flee subs but isn't fast enough for it to be useful
 	["shipriot"] = {
-		skirms = shortRangeSkirmieeArray,
+		skirms = diverSkirmieeArray,
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		hugs = shortRangeDiveArray,
@@ -741,6 +746,7 @@ local behaviourConfig = {
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
 		maxSwarmLeeway = 0, 
+		skirmOrderDis = 220,
 		skirmLeeway = -30, 
 		stoppingDistance = 10
 	},
@@ -866,6 +872,14 @@ local behaviourConfig = {
 		maxSwarmLeeway = 50, 
 		minSwarmLeeway = 120, 
 		skirmLeeway = 40, 
+	},	
+	["correap"] = {
+		skirms = lowMedRangeSkirmieeArray, 
+		swarms = {}, 
+		flees = {},
+		fightOnlyUnits = shortRangeExplodables,
+		skirmOrderDis = 220,
+		skirmLeeway = 50, 
 	},		
 	
 	-- med range skirms
@@ -1016,7 +1030,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50,
+		skirmLeeway = 40,
 	},
 	
 	["corgarp"] = {
@@ -1024,7 +1038,9 @@ local behaviourConfig = {
 		skirmRadar = true,
 		swarms = {}, 
 		flees = {},
-		skirmLeeway = 50, 
+		skirmLeeway = 20, 
+		skirmOrderDis = 200,
+		skirmOrderDisMin = 100, -- Make it turn around.
 	},
 	
 	["armmerl"] = {

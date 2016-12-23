@@ -1,3 +1,0 @@
-hotspot topleft
-frame  anims/ca_static/cursorpatrol_0.png  5
-

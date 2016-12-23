@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Attack Drone]],
   acceleration        = 0.3,
   airHoverFactor      = 4,
-  amphibious          = true,
   brakeRate           = 0.24,
   buildCostEnergy     = 50,
   buildCostMetal      = 50,

@@ -58,6 +58,7 @@ unitDef = {
 
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
+  yardmap                       = [[ooooooooo]],
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,

@@ -2,7 +2,6 @@ unitDef = {
   unitname               = [[fighterdrone]],
   name                   = [[Spicula]],
   description            = [[Fighter Drone]],
-  amphibious             = true,
   brakerate              = 0.4,
   buildCostEnergy        = 100,
   buildCostMetal         = 100,

@@ -3,7 +3,6 @@ unitDef = {
   name                = [[Blimpy]],
   description         = [[Dodo Bomber]],
   airHoverFactor      = 0,
-  amphibious          = true,
   brakerate           = 0.4,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,

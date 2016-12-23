@@ -55,6 +55,8 @@ options = {
 include("keysym.h.lua")
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local mexDefID = UnitDefNames["cormex"].id
+
 local INCREMENT_SIZE = 20
 local heightIncrease = KEYSYMS.C
 local heightDecrease = KEYSYMS.V
@@ -115,8 +117,28 @@ local function SendCommand()
 		return
 	end
 	
-	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
+	-- Snap mex to metal spots
+	if buildingPlacementID == mexDefID and WG.GetClosestMetalSpot then
+		local pos = WG.GetClosestMetalSpot(pointX, pointZ)
+		if pos then
+			pointX, pointZ = pos.x, pos.z
+			
+			local height = spGetGroundHeight(pointX, pointZ)
+			if height < 0 then
+				height = 0
+				if buildingPlacementHeight == 0 then
+					pointY = 2
+				else
+					pointY = height + buildingPlacementHeight
+				end	
+			else
+				pointY = height + buildingPlacementHeight	
+			end
+		end
+	end
 	
+	-- Setup parameters for terraform command
+	local team = Spring.GetUnitTeam(constructor[1]) or Spring.GetMyTeamID()
 	local commandTag = WG.Terraform_GetNextTag()
 	
 	local params = {}
@@ -159,19 +181,19 @@ local function SendCommand()
 		if not s then
 			spSetActiveCommand(-1)
 		end
-	
+
 		local cmdOpts = {}
 		if s then
 			cmdOpts[#cmdOpts + 1] = "shift"
 		end
-	
-		local height = Spring.GetGroundHeight(pointX, pointZ)
-		for i = 1, #constructor do
-			Spring.GiveOrderToUnit(constructor[i], CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
-			if not handledExternally then
-				Spring.GiveOrderToUnit(constructor[i], -buildingPlacementID, {pointX, 0, pointZ, facing}, {"shift"})
-			end
+		if m then
+			cmdOpts[#cmdOpts + 1] = "meta"
 		end
+
+		local height = Spring.GetGroundHeight(pointX, pointZ)
+
+		WG.CommandInsert(CMD_LEVEL, {pointX, height, pointZ, commandTag}, cmdOpts)
+		WG.CommandInsert(-buildingPlacementID, {pointX, height, pointZ, facing}, cmdOpts, 1)
 	end
 end
 

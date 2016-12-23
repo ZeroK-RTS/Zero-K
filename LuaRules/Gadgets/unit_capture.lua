@@ -319,6 +319,7 @@ function gadget:GameFrame(f)
 					if largestDamage < allyData.totalDamage then
 						largestDamage = allyData.totalDamage
 					end
+					j = j + 1
 				end
 			end
 			
@@ -550,6 +551,7 @@ local spGetMyAllyTeamID 	= Spring.GetMyAllyTeamID
 local spGetGameFrame        = Spring.GetGameFrame
 local spGetSpectatingState  = Spring.GetSpectatingState
 local spGetUnitRulesParam   = Spring.GetUnitRulesParam
+local spGetUnitVectors      = Spring.GetUnitVectors
 
 local glVertex 		= gl.Vertex
 local glPushAttrib  = gl.PushAttrib
@@ -572,30 +574,58 @@ local unitCount = 0
 local drawList = 0
 local drawAnything = false
 
-function gadget:DrawWorld()
-    if drawAnything then
-        glPushAttrib(GL.LINE_BITS)
-		glDepthTest(true)
-		glLineWidth(2)
-        glLineStipple('')
-        glColor(1, 1, 1, 0.9)
-        glCallList(drawList)
-        glColor(1,1,1,1)
-        glLineStipple(false)
-        glPopAttrib()
-    end
+local function DrawBezierCurve(pointA, pointB, pointC, pointD, amountOfPoints)
+	local step = 1/amountOfPoints
+	glVertex (pointA[1], pointA[2], pointA[3])
+	local px, py, pz
+	for i = 0, 1, step do
+		local x = pointA[1]*((1-i)^3) + pointB[1]*(3*i*(1-i)^2) + pointC[1]*(3*i*i*(1-i)) + pointD[1]*(i*i*i)
+		local y = pointA[2]*((1-i)^3) + pointB[2]*(3*i*(1-i)^2) + pointC[2]*(3*i*i*(1-i)) + pointD[2]*(i*i*i)
+		local z = pointA[3]*((1-i)^3) + pointB[3]*(3*i*(1-i)^2) + pointC[3]*(3*i*i*(1-i)) + pointD[3]*(i*i*i)
+		glVertex(x,y,z)
+		if px then
+			glVertex(px,py,pz)
+		end
+		px, py, pz = x, y, z
+	end
+	glVertex(pointD[1],pointD[2],pointD[3])
+	if px then
+		glVertex(px,py,pz)
+	end
 end
 
-local function drawFunc(units, spec)
+local function GetUnitTop(unitID, x,y,z)
+	local height = Spring.GetUnitHeight(unitID)*1.5 -- previously hardcoded to 50
+	local top = select(2, spGetUnitVectors(unitID))
+	local offX = top[1]*height
+	local offY = top[2]*height
+	local offZ = top[3]*height
+	return x+offX, y+offY, z+offZ
+end
+
+local function DrawWire(units, spec)
 	for controliee, controller in pairs(drawingUnits) do
 		if spValidUnitID(controliee) and spValidUnitID(controller) then
-			local los1 = spGetUnitLosState(controliee, myTeam, false)
-			local los2 = spGetUnitLosState(controller, myTeam, false)
-			if (spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(controliee) or spIsUnitInView(controller)) then
-				local _,_,_,x1, y1, z1 = spGetUnitPosition(controller, true)
-				local _,_,_,x2, y2, z2 = spGetUnitPosition(controliee, true)
-				glVertex(x1, y1, z1)
-				glVertex(x2, y2, z2)
+			local point = {}
+			local teamID = Spring.GetUnitTeam(controller)
+			if teamID and ((spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(controliee) or spIsUnitInView(controller))) then
+				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
+				
+				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controller, true)
+				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz)
+				point[1] = {xxx, yyy, zzz}
+				point[2] = {topX, topY, topZ}
+				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controliee, true)
+				topX, topY, topZ = GetUnitTop(controliee, xxx, yyy, zzz)
+				point[3] = {topX,topY,topZ}
+				point[4] = {xxx,yyy,zzz}
+				gl.PushAttrib(GL.LINE_BITS)
+				gl.DepthTest(true)
+				glLineWidth(3)
+				gl.Color (teamR or 0.5, teamG or 0.5, teamB or 0.5, math.random()*0.1+0.3)
+				gl.BeginEnd(GL_LINES, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
+				gl.DepthTest(false)
+				gl.PopAttrib()
 			end
 		else
 			drawingUnits[controliee] = nil
@@ -604,17 +634,36 @@ local function drawFunc(units, spec)
 	end
 end
 
-function gadget:GameFrame()
+local function UpdateList()
 	if unitCount ~= 0 then
 		local spec, fullview = spGetSpectatingState()
 		spec = spec or fullview
 		glDeleteList(drawList)
 		 
 		drawAnything = true
-		drawList = glCreateList(function () glBeginEnd(GL_LINES, drawFunc, drawingUnits, spec) end)
+		drawList = glCreateList(function () glBeginEnd(GL_LINES, DrawWire, drawingUnits, spec) end)
 	else
 		drawAnything = false
 	end
+end
+
+local lastFrame = 0
+function gadget:DrawWorld()
+    if Spring.GetGameFrame() ~= lastFrame then
+		UpdateList()
+	end
+	
+	if drawAnything then
+        glPushAttrib(GL.LINE_BITS)
+		glLineWidth(3)
+		gl.DepthTest(true)
+        --glLineStipple('')
+        glCallList(drawList)
+		gl.DepthTest(false)
+        glColor(1,1,1,1)
+        --glLineStipple(false)
+        glPopAttrib()
+    end
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
@@ -636,6 +685,10 @@ function gadget:UnitDestroyed (unitID)
 	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 	if morphedTo then gadget:UnitGiven(morphedTo) end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Save/Load
 
 function gadget:Load(zip)
 	for _, unitID in ipairs(Spring.GetAllUnits()) do

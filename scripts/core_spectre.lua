@@ -141,7 +141,8 @@ local function Flutter()
 	end
 end
 
-function script.Create()	
+function script.Create()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)	-- don't lose jitter effect with on/off button
 	Turn(lf_leaf, x_axis, l_angle, 1)
 	Turn(lf_leaf, z_axis, -l_angle, 1)
 	Turn(rf_leaf, x_axis, l_angle, 1)

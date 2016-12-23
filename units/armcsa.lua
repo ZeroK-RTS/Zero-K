@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Airborne SpecOps Engineer, Builds at 7.5 m/s]],
   acceleration        = 0.1,
   airStrafe           = 0,
-  amphibious          = true,
   autoHeal            = 20,
   brakeRate           = 0.08,
   buildCostEnergy     = 500,

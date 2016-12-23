@@ -21,7 +21,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Spring.SetGameRulesParam("unitsOnFire",1)
 
 --// customparams values
 -- setunitsonfire: 
@@ -169,3 +168,6 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:Initialize()
+	Spring.SetGameRulesParam("unitsOnFire",1)
+end

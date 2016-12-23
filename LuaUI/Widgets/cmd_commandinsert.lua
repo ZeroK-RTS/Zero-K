@@ -13,6 +13,8 @@ function widget:GetInfo()
     license = "GNU GPL, v2 or later",
     layer = 5,
     enabled = true,
+    api = true,
+    hidden = true,
   }
 end
 
@@ -70,7 +72,7 @@ end
 local function GetCommandPos(command)	--- get the command position
   if command.id<0 or command.id==CMD.MOVE or command.id==CMD.REPAIR or command.id==CMD.RECLAIM or 
   command.id==CMD.RESURRECT or command.id==CMD.MANUALFIRE or command.id==CMD.GUARD or 
-  command.id==CMD.FIGHT or command.id==CMD.ATTACK or command.id == CMD_JUMP then
+  command.id==CMD.FIGHT or command.id==CMD.ATTACK or command.id == CMD_JUMP or command.id == CMD_LEVEL then
     if table.getn(command.params)>=3 then
 		  return command.params[1], command.params[2], command.params[3]			
 	  elseif table.getn(command.params)>=1 then
@@ -80,7 +82,7 @@ local function GetCommandPos(command)	--- get the command position
   return -10,-10,-10
 end
 
-local function ProcessCommand(id, params, options)
+local function ProcessCommand(id, params, options, sequence_order)
   local alt,ctrl,meta,shift = Spring.GetModKeyState() --must use this because "options" table turn into different format when right+click. Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
   if (ctrl) and not (meta) and id==CMD.REPAIR then
 	local opt = 0
@@ -106,7 +108,7 @@ local function ProcessCommand(id, params, options)
     if options.shift or shift then 
       opt = opt + CMD.OPT_SHIFT       
     else
-      Spring.GiveOrder(CMD.INSERT,{0,id,opt,unpack(params)},{"alt"})
+      Spring.GiveOrder(CMD.INSERT,{sequence_order or 0,id,opt,unpack(params)},{"alt"})
       return true
     end
     
@@ -147,7 +149,7 @@ local function ProcessCommand(id, params, options)
         --Spring.GiveOrderToUnit(unit_id,id,params,options)
         Spring.GiveOrderToUnit(unit_id,id,params,{"shift"})
       else   
-        Spring.GiveOrderToUnit(unit_id,CMD.INSERT,{insert_pos-1,id,opt,unpack(params)},{"alt"})
+        Spring.GiveOrderToUnit(unit_id,CMD.INSERT,{insert_pos - 1 + (sequence_order or 0),id,opt,unpack(params)},{"alt"})
       end
     end
     return true
@@ -155,13 +157,13 @@ local function ProcessCommand(id, params, options)
   return false
 end 
 
-
-
 function widget:CommandNotify(id, params, options)
   return ProcessCommand(id, params, options)
 end
 
-
-function widget:Initialize()
-  WG.CommandInsert = ProcessCommand
-end 
+local shift_table = {"shift"}
+function WG.CommandInsert(id, params, options, seq)
+	if not ProcessCommand(id, params, options, seq) then
+		Spring.GiveOrder(id, params, (seq or 0) > 0 and shift_table or options)
+	end
+end

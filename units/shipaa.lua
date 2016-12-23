@@ -49,7 +49,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
-  scale                  = [[0.6]],
   script				 = [[shipaa.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],

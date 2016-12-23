@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Construction Aircraft, Builds at 4 m/s]],
   acceleration        = 0.1,
   airStrafe           = 0,
-  amphibious          = true,
   brakeRate           = 0.08,
   buildCostEnergy     = 220,
   buildCostMetal      = 220,

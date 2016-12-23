@@ -413,15 +413,16 @@ function widget:CommandNotify(cmdID, params, options)
 			if foundUnit then
 				local build = select(5, spGetUnitHealth(foundUnit))
 				if build ~= 1 then
-					spGiveOrder(CMD.REPAIR, {foundUnit}, options.coded)
+					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
 				end
 				return true
 			else
 				-- check if some other widget wants to handle the command before sending it to units.
 				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
 				Spring.Echo("commandHeight", commandHeight)
-				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false) then
-					spGiveOrder(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options.coded)
+				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
+				if not GBC_processed then
+					WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
 				end
 				return true
 			end
@@ -501,6 +502,8 @@ local function Initialize()
 	else
 		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
+	
+	WG.GetClosestMetalSpot = GetClosestMetalSpot
 end
 
 local mexSpotToDraw = false

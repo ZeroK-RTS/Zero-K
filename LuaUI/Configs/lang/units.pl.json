@@ -14,11 +14,6 @@
         "description": "Wielozadaniowy statek powietrzny",
         "helptext": "Rapier to lekki bojowy statek powietrzny. Chociaż jego pociski nie zadają wysokich obrażeń, to są celne i spowalniają trafione jednostki."
     },
-    "sprinkler": {
-        "name": "Sprinkler",
-        "description": "Zraszacz",
-        "helptext": "Do podlewania kaktusa."
-    },
     "factorycloak": {
         "name": "Fabryka cichociemnych",
         "description": "Buduje cichociemne boty, moc 10 m/s",
@@ -46,7 +41,7 @@
     },
     "armfus": {
         "name": "Reaktor fuzyjny",
-        "description": "Wytwarza energię (35)",
+        "description": "Średnia elektrownia (+35)",
         "helptext": "Reaktory fuzyjne zapewniają stały przypływ dużej ilości energii za niewygórowaną cenę. Są jednak dobrym celem dla wroga i nie są zbyt wytrzymałe, toteż warto zapewnić im ochronę. Wybuch reaktora zadaje wysokie obrażenia okolicznym jednostkom."
     },
     "chickenlandqueen": {
@@ -303,7 +298,7 @@
     },
     "cafus": {
         "name": "Reaktor grawitacyjny",
-        "description": "Wytwarza energię (225) - NIEBEZPIECZNE",
+        "description": "Duża elektrownia (+225) - NIEBEZPIECZNE",
         "helptext": "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
     },
     "armstiletto_laser": {
@@ -338,7 +333,7 @@
     },
     "amgeo": {
         "name": "Ulepszona Geotermia",
-        "description": "Produkuje energię (100) - NIEBEZPIECZNE",
+        "description": "Duża elektrownia (+100) - NIEBEZPIECZNE",
         "helptext": "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."
     },
     "armnanotc": {
@@ -407,7 +402,7 @@
     },
     "armsolar": {
         "name": "Panel słoneczny",
-        "description": "Wytwarza energię (2)",
+        "description": "Mała elektrownia (+2)",
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
     },
     "armbrawl": {
@@ -497,7 +492,7 @@
     },
     "armwin": {
         "name": "Turbina",
-        "description": "Wytwarza energię",
+        "description": "Mała elektrownia",
         "helptext": "Turbiny produkują różną ilość energii zależnie od tego, gdzie się je zbuduje. Na lądzie produkują zmienną ilość energii, która zwiększa się wraz z wysokością nad poziomem morza. Wiatraki są bardzo delikatne, zatem należy stawiać je rozważnie. W wodzie turbiny produkują stałą ilość energii i są nieco wytrzymalsze niż wiatraki."
     },
     "amphassault": {
@@ -682,7 +677,7 @@
     },
     "geo": {
         "name": "Geotermia",
-        "description": "Wytwarza energię (25)",
+        "description": "Średnia elektrownia (+25)",
         "helptext": "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."
     },
     "corfast": {
@@ -869,11 +864,6 @@
         "name": "Impaler",
         "description": "Pojazd artylerii precyzyjnej",
         "helptext": "Impaler wystrzeliwuje potężne pociski kinetyczne dalekiego zasięgu, które dzięki wysokiej trajektorii są w stanie omijać większość przeszkód, choć są jednak przez to bezużyteczne przeciw poruszającym się celom. Impaler jest przeznaczony do niszczenia budynków."
-    },
-    "iwin": {
-        "name": "Guzik Wygranej",
-        "description": "Wielki Guzik Wygranej",
-        "helptext": "Wygrałam!"
     },
     "chicken_digger_b": {
         "name": "Digger (zakopany)",

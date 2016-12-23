@@ -24,7 +24,7 @@ alwaysEggs			 = true			--spawn limited-lifespan eggs when not in Eggs mode?
 eggDecayTime		 = 180
 burrowEggs           = 15       -- number of eggs each burrow spawns
 
-gameMode		= true	--Spring.GetModOption("zkmode")
+gameMode		= true
 tooltipMessage	= "Kill chickens and collect their eggs to get metal."
 
 mexesUnitDefID = {

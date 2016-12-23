@@ -18,7 +18,6 @@ unitDef = {
 	[[shipassault]],
     [[shiparty]],
     [[shipaa]],
-	[[shiptransport]],
   },
 
   buildPic               = [[FACTORYSHIP.png]],
@@ -28,8 +27,8 @@ unitDef = {
   canPatrol              = true,
   canStop                = true,
   category               = [[UNARMED FLOAT]],
-  collisionVolumeOffsets = [[-15 -20 -15]],
-  collisionVolumeScales  = [[120 120 160]],
+  collisionVolumeOffsets = [[-10 5 0]],
+  collisionVolumeScales  = [[40 40 184]],
   collisionVolumeType    = [[cylZ]],
   corpse                 = [[DEAD]],
 
@@ -39,13 +38,18 @@ unitDef = {
 	helptext_de    = [[Im Shipyard kannst du Schiffe jeder Art und für jeden Zweck bauen.]],
     sortName       = [[7]],
 	unstick_help   = 1,
+    aimposoffset   = [[50 0 -15]],
+    midposoffset   = [[50 0 -15]],
+	solid_factory = [[3]],
+	modelradius    = [[50]],
+	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
   },
 
   energyMake             = 0.3,
   energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
-  footprintX             = 9,
-  footprintZ             = 14,
+  footprintX             = 8,
+  footprintZ             = 12,
   iconType               = [[facship]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
@@ -64,7 +68,7 @@ unitDef = {
   turnRate               = 0,
   waterline              = 0,
   workerTime             = 10,
-  yardMap                = [[yyyyyyyyy yoooooooy yoooooooy yooccccoy yooccccoy yooccccoy yooccccoy yooccccoy yooccccoy yooccccoy yooccccoy yooccccoy yocccccoy yocccccoy]],
+  yardMap                = [[oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc oooccccc]],
 
   featureDefs            = {
 

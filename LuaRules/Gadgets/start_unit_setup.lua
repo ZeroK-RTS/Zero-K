@@ -65,11 +65,8 @@ local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 
-local coop = Spring.Utilities.tobool(Spring.GetModOption("coop", false, false))
-local dotaMode = Spring.GetModOptions().zkmode == "dota"
-local ctfMode = Spring.GetModOptions().zkmode == "ctf"
+local coop = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
---Spring.Echo(coop == 1, coop == 0)
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))

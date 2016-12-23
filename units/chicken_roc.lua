@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Heavy Attack Flyer]],
   acceleration        = 1.2,
   airHoverFactor      = 0,
-  amphibious          = true,
   brakeRate           = 0.8,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,

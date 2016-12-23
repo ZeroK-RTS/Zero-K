@@ -10,10 +10,6 @@ function gadget:GetInfo()
   }
 end
 
-if not tobool(Spring.GetModOptions().marketandbounty) then
-	return
-end 
-
 local echo 				= Spring.Echo
 
 

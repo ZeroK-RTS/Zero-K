@@ -17,11 +17,17 @@ local SIG_WALK = 1
 local SIG_DEPLOY = 2
 local SIG_BEACON = 2
 
+local PRIVATE = {private = true}
+
+local deployed = false
+local beaconCreateX, beaconCreateZ
+
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Create beacon animation and delay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local BEACON_SPAWN_SPEED = 9 / tonumber(UnitDef.customParams.teleporter_beacon_spawn_time)
+
 
 local function Create_Beacon_Thread(x,z)
 	local y = Spring.GetGroundHeight(x,z) or 0
@@ -30,6 +36,10 @@ local function Create_Beacon_Thread(x,z)
 	Signal(SIG_BEACON)
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_BEACON)
+	
+	beaconCreateX, beaconCreateZ = x, z
+	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", x, PRIVATE)
+	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", z, PRIVATE)
 	
 	activity_mode(3)
 	
@@ -51,15 +61,32 @@ local function Create_Beacon_Thread(x,z)
 		end
 	end
 
-	Spring.MoveCtrl.Disable(unitID)
 	GG.tele_createBeacon(unitID,x,z)
+	
+	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
+	Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)
+	beaconCreateX, beaconCreateZ = nil, nil
 	
 	Spring.SpawnCEG("teleport_in", x, y, z, 0, 0, 0, 1)
 	
 	DeployTeleport()
 end
 
+function StopCreateBeacon(resetAnimation)
+	Signal(SIG_BEACON)
+	if beaconCreateX then
+		Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_x", nil, PRIVATE)
+		Spring.SetUnitRulesParam(unitID, "tele_creating_beacon_z", nil, PRIVATE)
+		beaconCreateX, beaconCreateZ = nil, nil
+		Turn(body, y_axis, 0, math.rad(40))
+		activity_mode(deployed and 3 or 1)
+	end
+end
+
 function Create_Beacon(x,z)
+	if x == beaconCreateX and z == beaconCreateZ then
+		return
+	end
 	Signal(SIG_WALK)
 	StartThread(Create_Beacon_Thread,x,z)
 end
@@ -67,14 +94,12 @@ end
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
 -- Deploy into static mode animation and delay
-
-local deployed = false
 local DEPLOY_SPEED = 0.3
 
 local function DeployTeleport_Thread()
 	
 	Signal(SIG_DEPLOY)
-	Signal(SIG_BEACON)
+	StopCreateBeacon()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_DEPLOY)
 	
@@ -105,7 +130,6 @@ local function DeployTeleport_Thread()
 	Sleep(1000/DEPLOY_SPEED)
 	
 	GG.tele_deployTeleport(unitID)
-	
 end
 
 function DeployTeleport()
@@ -169,7 +193,7 @@ local function Walk()
 	Turn(body, y_axis, math.rad(0), math.rad(80))
 	
 	Signal(SIG_DEPLOY)
-	Signal(SIG_BEACON)
+	StopCreateBeacon()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	while true do

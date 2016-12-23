@@ -69,12 +69,12 @@ for i=1,#allyTeamList do
 	GG.Lagmonitor_activeTeams[allyTeamID] = {count = #teamList}
 	for j=1,#teamList do
 		local teamID = teamList[j]
-		GG.Lagmonitor_activeTeams[allyTeamID][teamID] = true
+		GG.Lagmonitor_activeTeams[allyTeamID][teamID] = 1
 	end
 end
 
 local LAG_THRESHOLD = 25000
-local AFK_THRESHOLD = 30
+local AFK_THRESHOLD = 5 -- In seconds, usually 30
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -285,7 +285,7 @@ function gadget:GameFrame(n)
 
 						afkTeams[team] = nil
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
-						GG.Lagmonitor_activeTeams[allyTeam][team] = true
+						GG.Lagmonitor_activeTeams[allyTeam][team] = 1
 					end
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
@@ -321,7 +321,7 @@ function gadget:GameFrame(n)
 					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following, but do nothing for the same AFK-er.
 						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player & normally unit will be sent (redirected back) to the non-AFK-er, but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will can also run twice for the AFK-er ally and it will effect 'unit_mex_overdrive.lua'.
 						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
-						GG.Lagmonitor_activeTeams[allyTeam][team] = false
+						GG.Lagmonitor_activeTeams[allyTeam][team] = 0
 					end
 					afkTeams[team] = true --mark team as AFK -- orly
 					

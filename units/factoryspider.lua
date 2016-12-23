@@ -31,8 +31,8 @@ unitDef = {
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[100 100 100]],
-  collisionVolumeType	        = [[ellipsoid]],
+  collisionVolumeScales         = [[104 50 36]],
+  collisionVolumeType           = [[box]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
@@ -41,15 +41,18 @@ unitDef = {
     helptext       = [[Optimized for rough terrain, the Spider Factory relies primarily on range and maneuverability rather than brute force. Key units: Flea, Recluse, Hermit, Crabe]],
 	helptext_fr    = [[Optimisée pour les terrains accidentés, la fabrique à araignées produit des unités exotiques centrées principalement sur la portée et la manuvrabilité au détriment de la force brute, à quelques exceptions près.]],
 	helptext_de    = [[Ideal für unwegsames Gelände, liegt der Fokus der Spider Factory eher auf Einheiten mit großer Reichweite und Wendigkeit und weniger auf roher Gewalt. Wichtigste Einheiten: Flea, Recluse, Hermit, Crabe]],
+    aimposoffset   = [[0 0 -26]],
+    midposoffset   = [[0 0 -26]],
     sortName       = [[5]],
-	modelradius    = [[50]],
+	modelradius    = [[38]],
+	solid_factory = [[3]],
   },
 
   energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
-  footprintX                    = 6,
-  footprintZ                    = 6,
+  footprintX                    = 7,
+  footprintZ                    = 7,
   iconType                      = [[facspider]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -69,7 +72,7 @@ unitDef = {
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 10,
-  yardMap                       = [[oooooo oooooo occcco occcco occcco occcco]],
+  yardMap                       = [[ooooooo ooooooo ooooooo ccccccc ccccccc ccccccc ccccccc]],
 
   featureDefs                   = {
 

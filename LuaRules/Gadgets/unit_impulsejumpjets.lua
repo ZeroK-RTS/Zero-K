@@ -18,8 +18,6 @@ if (not gadgetHandler:IsSyncedCode()) then
 	return false -- no unsynced code
 end
 
-Spring.SetGameRulesParam("jumpJets",1)
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -509,6 +507,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 function gadget:Initialize()
+	Spring.SetGameRulesParam("jumpJets", 1)
 	Spring.SetCustomCommandDrawData(CMD_JUMP, "Jump", {0, 1, 0, 0.7})
 	Spring.AssignMouseCursor("Jump", "cursorJump", true, true)
 	gadgetHandler:RegisterCMDID(CMD_JUMP)
