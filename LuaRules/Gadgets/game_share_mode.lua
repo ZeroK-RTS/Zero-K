@@ -11,6 +11,7 @@ function gadget:GetInfo()
 end
 
 local private = {private = true}
+local public = {public = true}
 
 local function ProccessCommand(str)
 	local strtbl = {}
@@ -107,6 +108,7 @@ if (gadgetHandler:IsSyncedCode()) then
 						Spring.TransferUnit(unit,target,true)
 					end
 				end
+				Spring.SetTeamRulesParam(originalplayers[player],"isCommsharing",false,public)
 				originalunits[target] = nil
 				target,controlledplayers[player] = nil -- cleanup.
 			end
@@ -139,6 +141,7 @@ if (gadgetHandler:IsSyncedCode()) then
 				Spring.ShareTeamResource(originalteam,target,"metal",metal)
 				Spring.ShareTeamResource(originalteam,target,"energy",energy)
 				MergeUnits(originalteam,target)
+				Spring.SetTeamRulesParam(originalteam,"isCommsharing",true,public)
 			end
 			Spring.AssignPlayerToTeam(playerid,target)
 			if originalplayers[playerid] == nil then
