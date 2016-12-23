@@ -1509,7 +1509,7 @@ options = {
 	interfacePreset = {
 		name = 'UI Preset',
 		type = 'radioButton',
-		value = 'minimapRight',
+		value = 'default',
 		items = {
 			{key = 'default2', name = 'Default', desc = "The default UI.",},
 			{key = 'new', name = 'New UI', desc = "The WIP new interface. NOTE: '/luaui reload' might be required to switch the skinning.",},
