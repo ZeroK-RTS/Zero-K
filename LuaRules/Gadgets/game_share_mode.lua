@@ -108,9 +108,7 @@ if (gadgetHandler:IsSyncedCode()) then
 						Spring.TransferUnit(unit,target,true)
 					end
 				end
-				if Spring.GetTeamRulesParam(originalplayers[player],"isCommsharing") and Spring.GetTeamRulesParam(originalplayers[player],"isCommsharing") == true then
-					Spring.SetTeamRulesParam(originalplayers[player],"isCommsharing",false,public)
-				end
+				Spring.SetTeamRulesParam(originalplayers[player],"isCommsharing",false,public)
 				originalunits[target] = nil
 				target,controlledplayers[player] = nil -- cleanup.
 			end
