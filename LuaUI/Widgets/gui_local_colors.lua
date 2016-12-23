@@ -145,7 +145,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function UpdateColor()
 	is_speccing = Spring.GetSpectatingState()
 	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
@@ -154,6 +154,14 @@ function widget:Initialize()
 	end
 	
 	NotifyColorChange()
+end
+
+function widget:Initialize()
+	UpdateColor()
+end
+
+function widget:PlayerChanged()
+	UpdateColor()
 end
 
 function widget:Shutdown()
