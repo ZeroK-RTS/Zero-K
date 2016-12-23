@@ -74,7 +74,7 @@ for i=1,#allyTeamList do
 end
 
 local LAG_THRESHOLD = 25000
-local AFK_THRESHOLD = 30
+local AFK_THRESHOLD = 5 -- In seconds, usually 30
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
