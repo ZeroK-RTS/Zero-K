@@ -608,7 +608,10 @@ local function DrawWire(units, spec)
 		if spValidUnitID(controliee) and spValidUnitID(controller) then
 			local point = {}
 			local teamID = Spring.GetUnitTeam(controller)
-			if teamID and ((spec or (los1 and los1.los) or (los2 and los2.los)) and (spIsUnitInView(controliee) or spIsUnitInView(controller))) then
+			local los1 = spGetUnitLosState(controller, myTeam, false)
+			local los2 = spGetUnitLosState(controliee, myTeam, false)
+			if teamID and (spec or (los1 and los1.los) or (los2 and los2.los)) then
+				-- (spIsUnitInView(controliee) or spIsUnitInView(controller)) -- Doesn't quite work because capture line may be long.
 				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
 				
 				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controller, true)
