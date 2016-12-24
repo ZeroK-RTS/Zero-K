@@ -419,7 +419,6 @@ function widget:CommandNotify(cmdID, params, options)
 			else
 				-- check if some other widget wants to handle the command before sending it to units.
 				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
-				Spring.Echo("commandHeight", commandHeight)
 				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
 				if not GBC_processed then
 					WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
