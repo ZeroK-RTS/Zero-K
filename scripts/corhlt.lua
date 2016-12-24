@@ -1,5 +1,6 @@
 include "constants.lua"
 include "pieceControl.lua"
+include "aimPosTerraform.lua"
 
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
@@ -41,6 +42,17 @@ end
 -- Script Functions
 
 function script.Create()
+	local ud = UnitDefs[unitDefID]
+	local midTable = ud
+	if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
+		midTable = ud.model
+	end
+	
+	local mid = {midTable.midx, midTable.midy, midTable.midz}
+	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}
+
+	SetupAimPosTerraform(mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -59,7 +71,7 @@ local function StunThread ()
 	StopTurn (housing, x_axis)
 end
 
-local function UnstunThread ()
+local function UnstunThread()
 	disarmed = false
 	SetSignalMask(SIG_AIM)
 	RestoreAfterDelay()

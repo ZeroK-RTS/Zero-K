@@ -7,6 +7,7 @@ local flare = piece 'flare'
 
 include "constants.lua"
 include "pieceControl.lua"
+--include "aimPosTerraform.lua"
 
 -- Signal definitions
 local SIG_AIM = 2
@@ -21,6 +22,17 @@ local stuns = {false, false, false}
 local disarmed = false
 
 function script.Create()
+	--local ud = UnitDefs[unitDefID]
+	--local midTable = ud
+	--if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
+	--	midTable = ud.model
+	--end
+	--
+	--local mid = {midTable.midx, midTable.midy, midTable.midz}
+	--local aim = {midTable.midx, midTable.midy + 25, midTable.midz}
+    --
+	--SetupAimPosTerraform(mid, aim, midTable.midy + 25, midTable.midy + 40, 15, 40)
+	--
 	StartThread(SmokeUnit, {base})
 end
 

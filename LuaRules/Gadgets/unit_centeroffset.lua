@@ -155,7 +155,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	-- Sertup growth scale
-	
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, 
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
@@ -194,6 +193,19 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	UpdateUnitGrow(unitID, growScale)
 end
 
+local function OverrideMidAndAimPos(unitID, mid, aim)
+	if not spValidUnitID(unitID) then
+		return
+	end
+	
+	-- Do not override growing units
+	if growUnit[unitID] then
+		return
+	end
+	
+	spSetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if growUnit[unitID] then
 		UpdateUnitGrow(unitID, 1)
@@ -224,6 +236,8 @@ function gadget:GameFrame(f)
 end
 
 function gadget:Initialize()
+	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
+	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)
