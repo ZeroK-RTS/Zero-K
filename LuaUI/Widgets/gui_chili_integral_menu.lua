@@ -45,6 +45,10 @@ local STATE_SECTION_WIDTH = 24 -- percent
 local SELECT_BUTTON_COLOR = {0.8, 0, 0, 1}
 local SELECT_BUTTON_FOCUS_COLOR = {0.8, 0, 0, 1}
 
+local DRAW_NAME_COMMANDS = {
+	[CMD.STOCKPILE] = true, -- draws stockpile progress (command handler sends correct string).
+}
+
 -- Defined upon learning the appropriate colors
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
@@ -781,6 +785,11 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		externalFunctionsAndData.SetSelection(false)
 		externalFunctionsAndData.SetBuildQueueCount(nil)
 		
+		-- Update stockpile progress
+		if DRAW_NAME_COMMANDS[command.id] and command.name then
+			SetText(textConfig.bottomRightLarge.name, command.name)
+		end
+		
 		if cmdID == newCmdID then
 			local isStateCommand = command and (command.type == CMDTYPE.ICON_MODE and #command.params > 1)
 			if isStateCommand then
@@ -833,7 +842,6 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 				SetText(textConfig.topLeft.name, hotkey)
 			end
 		end
-		
 		button.tooltip = tooltip
 		
 		if isStateCommand then
@@ -843,6 +851,11 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		else
 			local texture = (displayConfig and displayConfig.texture) or command.texture
 			SetImage(texture)
+			
+			-- Remove stockpile progress
+			if not (DRAW_NAME_COMMANDS[command.id] and command.name) then
+				SetText(textConfig.bottomRightLarge.name, nil)
+			end
 		end
 	end
 

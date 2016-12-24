@@ -25,6 +25,12 @@ local textConfig = {
 		y = "11%",
 		fontsize = 12,
 	},
+	bottomRightLarge = {
+		name = "bottomRightLarge",
+		right = "14%",
+		bottom = "16%",
+		fontsize = 14,
+	},
 	queue = {
 		name = "queue",
 		right = "18%",
