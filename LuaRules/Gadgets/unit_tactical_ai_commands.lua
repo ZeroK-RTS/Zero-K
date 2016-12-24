@@ -312,7 +312,11 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
 	
 	-- The d vector is also relative to unit position.
-	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
+	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	if behaviour.selfVelocityPrediction then
+		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
+		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
+	end
 	
 	local eDistSq = ex^2 + ey^2 + ez^2
 	local eDist = sqrt(eDistSq)
@@ -328,12 +332,13 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, 
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
 	end
-	local skirmRange = (doHug and behaviour.hugRange) or (GetEffectiveWeaponRange(data.udID, -(ey+vy*behaviour.velocityPrediction), behaviour.weaponNum) - behaviour.skirmLeeway)
+	
+	local skirmRange = (doHug and behaviour.hugRange) or (GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) - behaviour.skirmLeeway)
 
 	if doHug or skirmRange > predictedDist then
 	
 		if behaviour.skirmOnlyNearEnemyRange then
-			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
+			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef, dy,behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
 			if enemyRange < predictedDist then
 				return behaviour.skirmKeepOrder
 			end
@@ -389,8 +394,12 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local cx,cy,cz -- command position	
-	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
+	local cx,cy,cz -- command position		
+	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	if behaviour.selfVelocityPrediction then
+		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
+		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
+	end
 	
 	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
@@ -616,6 +625,7 @@ local function GetBehaviourTable(behaviourData, ud)
 		skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
 		skirmOrderDisMin = behaviourData.skirmOrderDisMin, -- can be nil
 		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
+		selfVelocityPrediction = behaviourData.selfVelocityPrediction,
 		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
 		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
 		hugRange = (behaviourData.hugRange or behaviourDefaults.defaultHugRange),

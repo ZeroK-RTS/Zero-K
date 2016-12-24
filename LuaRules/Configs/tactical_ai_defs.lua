@@ -374,6 +374,7 @@ local shortRangeDiveArray = SetMinus(SetMinus(allGround, diverSkirmieeArray), lo
 -- skirmOrderDis (defaults in config): max distance the move order is from the unit when skirming
 -- skirmKeepOrder (defaults to false): If true the unit does not clear its move order when too far away from the unit it is skirming.
 -- velocityPrediction (defaults in config): number of frames of enemy velocity prediction for skirming and fleeing
+-- selfVelocityPrediction (defaults to false): Whether the unit predicts its own velocity when calculating range.
 
 --*** swarms(defaults to empty): the table of units that this unit will jink towards and strafe
 -- maxSwarmLeeway (defaults to Weapon range): (Weapon range - maxSwarmLeeway) = Max range that the unit will begin strafing targets while swarming
@@ -932,6 +933,9 @@ local behaviourConfig = {
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
 		fightOnlyUnits = medRangeExplodables,
+		skirmOrderDis = 120,
+		selfVelocityPrediction = true,
+		velocityPrediction = 30,
 	},
 	["corcrw"] = {
 		skirms = medRangeSkirmieeArray, 
