@@ -22,7 +22,6 @@ local armorDefs = {
     "subraider",
     "subscout",
 	"cornukesub",
-	"subraider",
     "subtacmissile",
   },
 
