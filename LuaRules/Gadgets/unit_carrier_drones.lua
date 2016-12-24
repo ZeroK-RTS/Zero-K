@@ -144,7 +144,10 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		Spring.MoveCtrl.Disable(droneID)
 		Spring.SetUnitCOBValue(droneID, 82, (rot - math.pi)*65536/2/math.pi)
 		
+		
+		local states = Spring.GetUnitStates(unitID) or emptyTable
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
+		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
 		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + random(-300, 300), 60, z + random(-300, 300)}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
@@ -466,6 +469,7 @@ local function UpdateCarrierTarget(carrierID)
 			for droneID in pairs(set.drones) do
 				tempCONTAINER = droneList[droneID]
 				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0)
 				if target then
 					GiveOrderToUnit(droneID, CMD.ATTACK, target, 0)
 				else
@@ -489,6 +493,7 @@ local function UpdateCarrierTarget(carrierID)
 					
 					local temp = droneList[droneID]
 					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+					GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0)
 					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-100, 100), (py+120), pz + random(-100, 100)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 					droneList[droneID] = temp
