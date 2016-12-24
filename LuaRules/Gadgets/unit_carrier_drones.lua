@@ -146,7 +146,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-		GiveClampedOrderToUnit(droneID, CMD.FIGHT, {x + random(-300, 300), 60, z + random(-300, 300)}, {""})
+		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + random(-300, 300), 60, z + random(-300, 300)}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 		SetUnitNoSelect(droneID, true)
@@ -419,6 +419,9 @@ local function UpdateCarrierTarget(carrierID)
 	local droneSendDistance = nil
 	local px, py, pz
 	local target
+	local orderUndetermined = true
+	
+	--Handles an attack order given to the carrier.
 	if cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
 		local ox, oy, oz = GetUnitPosition(carrierID)
 		local params = cQueueC[1].params
@@ -431,7 +434,26 @@ local function UpdateCarrierTarget(carrierID)
 		if px then
 			droneSendDistance = GetDistance(ox, px, oz, pz)
 		end
-		
+		orderUndetermined = false --attack order overrides set target
+	end
+	
+	--Handles a setTarget order given to the carrier.
+	if orderUndetermined then
+		local targetType = spGetUnitRulesParam(carrierID,"target_type")
+		if targetType and targetType > 0 then
+			local ox, oy, oz = GetUnitPosition(carrierID)
+			if targetType == 1 then --targeting ground
+				px, py, pz = spGetUnitRulesParam(carrierID,"target_x"), spGetUnitRulesParam(carrierID,"target_y"), spGetUnitRulesParam(carrierID,"target_z")
+			end
+			if targetType == 2 then --targeting units
+				local target_id = spGetUnitRulesParam(carrierID,"target_id")
+				target = {target_id}
+				px, py, pz = GetUnitPosition(target_id)
+			end
+			if px then
+				droneSendDistance = GetDistance(ox, px, oz, pz)
+			end
+		end
 	end
 	
 	local states = Spring.GetUnitStates(carrierID) or emptyTable
