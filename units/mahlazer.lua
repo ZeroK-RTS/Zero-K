@@ -46,7 +46,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[starlight.dae]],
-  script                        = [[starlight.lua]],
+  script                        = [[mahlazer.lua]],
   onoffable                     = true,
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
@@ -347,4 +347,4 @@ unitDef = {
 }
 
 
-return lowerkeys({ starlight = unitDef})
+return lowerkeys({ mahlazer = unitDef})

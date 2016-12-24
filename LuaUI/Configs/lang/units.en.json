@@ -196,7 +196,7 @@
 		"name" : "Fake AA target",
 		"description" : "Used by the jumpjet script."
 	},
-	"starlight" : {
+	"mahlazer" : {
 		"name" : "Starlight",
 		"description" : "Planetary Energy Chisel",
 		"helptext" : "This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases."
