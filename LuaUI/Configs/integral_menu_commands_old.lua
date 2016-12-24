@@ -217,6 +217,8 @@ local overrides = {
 	[CMD_STOP_PRODUCTION] = { texture = imageDir .. 'Bold/stopbuild.png'},
 	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
 	
+	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
+	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},

@@ -22,6 +22,8 @@ end
 --24/6/2014 added carrier building drone on emit point. 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+include("LuaRules/Configs/customcmds.h.lua")
+
 local AddUnitDamage     = Spring.AddUnitDamage
 local CreateUnit        = Spring.CreateUnit
 local GetCommandQueue   = Spring.GetCommandQueue
@@ -34,15 +36,21 @@ local SetUnitPosition   = Spring.SetUnitPosition
 local SetUnitNoSelect   = Spring.SetUnitNoSelect
 local TransferUnit      = Spring.TransferUnit
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
+local spSetUnitRulesParam = Spring.SetUnitRulesParam
+local spGetGameFrame    = Spring.GetGameFrame
 local random            = math.random
 local CMD_ATTACK		= CMD.ATTACK
 
 local emptyTable = {}
 
--- thingsWhichAreDrones is an optimisation for AllowCommand
+-- thingsWhichAreDrones is an optimisation for AllowCommand, no longer used but it'll stay here for now
 local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL = include "LuaRules/Configs/drone_defs.lua"
 
 local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
+local IDLE_DISTANCE = 100
+local ACTIVE_DISTANCE = 150
+local DRONE_HEIGHT = 120
+local RECALL_TIMEOUT = 300
 
 local carrierList = {}
 local droneList = {}
@@ -50,6 +58,15 @@ local drones_to_move = {}
 local killList = {}
 
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
+
+local recallDronesCmdDesc = {
+	id      = CMD_RECALL_DRONES,
+	type    = CMDTYPE.ICON,
+	name    = 'Recall Drones',
+	cursor  = 'Load units',
+	action  = 'recalldrones',
+	tooltip = 'Recall any owned drones to the mothership.',
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -90,6 +107,8 @@ local function Drones_InitializeDynamicCarrier(unitID)
 		if drones then
 			carrierData[#carrierData + 1] = data
 			maxDronesOverride[#maxDronesOverride + 1] = drones
+			Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
+			spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
 		end
 	end
 	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
@@ -149,7 +168,7 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + random(-300, 300), 60, z + random(-300, 300)}, {""})
+		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + random(-IDLE_DISTANCE, IDLE_DISTANCE), y + DRONE_HEIGHT, z + random(-IDLE_DISTANCE, IDLE_DISTANCE)}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 		SetUnitNoSelect(droneID, true)
@@ -417,7 +436,7 @@ local function GetDistance(x1, x2, y1, y2)
 	return ((x1-x2)^2 + (y1-y2)^2)^0.5
 end
 
-local function UpdateCarrierTarget(carrierID)
+local function UpdateCarrierTarget(carrierID, frame)
 	local cQueueC = GetCommandQueue(carrierID, 1)
 	local droneSendDistance = nil
 	local px, py, pz
@@ -459,27 +478,46 @@ local function UpdateCarrierTarget(carrierID)
 		end
 	end
 	
+	--checks if there is an active recall order
+	local recallDrones = false
+	local recallFrame = spGetUnitRulesParam(carrierID,"recall_frame_start")
+	if recallFrame and recallFrame > 0 then
+		if frame > recallFrame + RECALL_TIMEOUT then
+			--recall has expired
+			spSetUnitRulesParam(carrierID,"recall_frame_start",-RECALL_TIMEOUT)
+		else
+			recallDrones = true
+		end
+	end
+	
 	local states = Spring.GetUnitStates(carrierID) or emptyTable
 	local holdfire = states.firestate == 0
 	
 	for i = 1, #carrierList[carrierID].droneSets do
+	
 		local set = carrierList[carrierID].droneSets[i]
-		if droneSendDistance and droneSendDistance < set.config.range then
-			local tempCONTAINER --temporarily keep table when "droneList[]" is emptied and restored.
-			for droneID in pairs(set.drones) do
-				tempCONTAINER = droneList[droneID]
-				droneList[droneID] = nil -- to keep AllowCommand from blocking the order
-				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0)
+		local tempCONTAINER
+		
+		for droneID in pairs(set.drones) do
+			tempCONTAINER = droneList[droneID]
+			droneList[droneID] = nil -- to keep AllowCommand from blocking the order
+			
+			GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0) -- update firestate
+			
+			if recallDrones then
+				-- move drones to carrier
+				px, py, pz = GetUnitPosition(carrierID)
+				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
+				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
+			elseif droneSendDistance and droneSendDistance < set.config.range then
+				-- attacking
 				if target then
 					GiveOrderToUnit(droneID, CMD.ATTACK, target, 0)
 				else
-					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {(px + (random(0, 300) - 150)), (py+120), (pz + (random(0, 300) - 150))} , 0)
+					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + random(-ACTIVE_DISTANCE, ACTIVE_DISTANCE), (py+120), pz + random(-ACTIVE_DISTANCE, ACTIVE_DISTANCE)}  , 0)
 				end
-				--GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-				droneList[droneID] = tempCONTAINER --restore original table
-			end
-		else
-			for droneID in pairs(set.drones) do
+			else
+				-- return to carrier unless in combat
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
 				for i=1, (cQueue and #cQueue or 0) do
@@ -490,16 +528,14 @@ local function UpdateCarrierTarget(carrierID)
 				end
 				if not engaged then
 					px, py, pz = GetUnitPosition(carrierID)
-					
-					local temp = droneList[droneID]
-					droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-					GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0)
-					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-100, 100), (py+120), pz + random(-100, 100)} , 0)
+					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
-					droneList[droneID] = temp
 				end
 			end
-		end	
+			
+			droneList[droneID] = tempCONTAINER
+		end
+		
 	end
 end
 
@@ -511,10 +547,59 @@ function gadget:AllowCommand_GetWantedCommand()
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()
-	return thingsWhichAreDrones
+	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if (carrierList[unitID] ~= nil and cmdID == CMD.ATTACK) then
+		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
+		return true
+	end
+	if (carrierList[unitID] ~= nil and cmdID == CMD_RECALL_DRONES) then
+		
+		-- Cancels set target on the carrier
+		local targetType = spGetUnitRulesParam(unitID,"target_type")
+		if targetType and targetType > 0 then
+			GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET, {}, {})
+		end
+		
+		-- Cancels current (or queued directly after current) attack/fight orders on the carrier
+		local queue = Spring.GetCommandQueue(unitID, -1)
+		if queue then
+			local toRemoveCount = 1
+			local queueToRemove = {}
+			for j=1,#queue do
+				command = queue[j]
+				if command.id == CMD.ATTACK or command.id == CMD.FIGHT or command.id == CMD.SET_WANTED_MAX_SPEED then
+					queueToRemove[toRemoveCount] = command.tag
+					toRemoveCount = toRemoveCount + 1
+				else
+					break -- don't remove attack/fight moves which are queued after a move or similar
+				end
+			end
+			Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove,{})
+		end
+		
+		-- Gives drones a command to recall to the carrier
+		for i = 1, #carrierList[unitID].droneSets do
+			local set = carrierList[unitID].droneSets[i]
+			
+			for droneID in pairs(set.drones) do
+				px, py, pz = GetUnitPosition(unitID)
+				
+				local temp = droneList[droneID]
+				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
+				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
+				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
+				droneList[droneID] = temp
+			end
+		end
+		
+		frame = spGetGameFrame()
+		spSetUnitRulesParam(unitID,"recall_frame_start",frame)
+		
+		return false
+	end
 	if (droneList[unitID] ~= nil) then
 		return false
 	else
@@ -564,6 +649,13 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			droneSet.drones[unitID] = nil
 		end
 		droneList[unitID] = nil
+	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, unitTeam)
+	if (carrierDefs[unitDefID]) then
+		Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
+		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
 	end
 end
 
@@ -637,19 +729,21 @@ function gadget:GameFrame(n)
 	end
 	if ((n % DEFAULT_UPDATE_ORDER_FREQUENCY) == 0) then
 		for i, _ in pairs(carrierList) do
-			UpdateCarrierTarget(i)
+			UpdateCarrierTarget(i, n)
 		end
 	end
 	UpdateCoroutines() --maintain nanoframe position relative to carrier
 end
 
 function gadget:Initialize()
+gadgetHandler:RegisterCMDID(CMD_RECALL_DRONES)
 	GG.Drones_InitializeDynamicCarrier = Drones_InitializeDynamicCarrier
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local team = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, team)
 		local build  = select(5, Spring.GetUnitHealth(unitID))
 		if build == 1 then
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local team = Spring.GetUnitTeam(unitID)
 			gadget:UnitFinished(unitID, unitDefID, team)
 		end
 	end
