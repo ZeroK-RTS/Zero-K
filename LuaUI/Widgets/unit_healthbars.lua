@@ -759,11 +759,8 @@ do
 		if ci.gadgetStock then
 			stockpileBuild = GetUnitRulesParam(unitID,"gadgetStockpile")
 		end
-        if (numStockpiled) then
-          stockpileBuild = stockpileBuild or 0
-          if (stockpileBuild>0) then
-            AddBar(messages.stockpile,stockpileBuild,"stock",(fullText and floor(stockpileBuild*100)..'%') or '')
-          end
+        if numStockpiled and stockpileBuild and (numStockpiled < numStockpileQued) then
+          AddBar(messages.stockpile,stockpileBuild,"stock",(fullText and floor(stockpileBuild*100)..'%') or '')
         end
       else
         numStockpiled = false
