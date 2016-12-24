@@ -786,7 +786,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		externalFunctionsAndData.SetBuildQueueCount(nil)
 		
 		-- Update stockpile progress
-		if DRAW_NAME_COMMANDS[command.id] and command.name then
+		if command and DRAW_NAME_COMMANDS[command.id] and command.name then
 			SetText(textConfig.bottomRightLarge.name, command.name)
 		end
 		
@@ -853,7 +853,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			SetImage(texture)
 			
 			-- Remove stockpile progress
-			if not (DRAW_NAME_COMMANDS[command.id] and command.name) then
+			if not (command and DRAW_NAME_COMMANDS[command.id] and command.name) then
 				SetText(textConfig.bottomRightLarge.name, nil)
 			end
 		end
