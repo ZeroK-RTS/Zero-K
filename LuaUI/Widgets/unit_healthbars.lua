@@ -755,11 +755,11 @@ do
       --// STOCKPILE
       if (ci.canStockpile) then
         local stockpileBuild
-		numStockpiled,numStockpileQued,stockpileBuild = GetUnitStockpile(unitID)
+		numStockpiled, numStockpileQued, stockpileBuild = GetUnitStockpile(unitID)
 		if ci.gadgetStock then
 			stockpileBuild = GetUnitRulesParam(unitID,"gadgetStockpile")
 		end
-        if numStockpiled and stockpileBuild and (numStockpiled < numStockpileQued) then
+        if numStockpiled and stockpileBuild and (numStockpileQued ~= 0) then
           AddBar(messages.stockpile,stockpileBuild,"stock",(fullText and floor(stockpileBuild*100)..'%') or '')
         end
       else
