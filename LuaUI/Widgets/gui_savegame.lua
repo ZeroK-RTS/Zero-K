@@ -210,7 +210,7 @@ local function SaveGame(filename)
 		saveData.gameframe = Spring.GetGameFrame()
 		saveData.campaignID = currentCampaignID
 		table.save(saveData, path)
-		Spring.SendCommands("luasave " .. filename)
+		Spring.SendCommands("luasave " .. filename .. " -y")
 		
 		saveFilenameEdit:SetText(filename)
 		Spring.Log(widget:GetInfo().name, LOG.INFO, "Saved game to " .. path)
@@ -222,24 +222,8 @@ local function SaveGame(filename)
 	end
 end
 
-local function LoadGame(saveData)
-	local success, err = pcall(function()
-		
-		if saveData.description then
-			saveDescEdit:SetText(saveData.description)
-		end
-		
-		--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
-		DisposeWindow()
-	end)
-	if (not success) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
-	end
-end
-
--- FIXME
 local function LoadGameByFilename(filename)
-	local saveData = GetSave(filename)
+	local saveData = GetSave(SAVE_DIR .. '/' .. filename .. ".lua")
 	if saveData then
 		local success, err = pcall(function()
 			if saveData.description then
@@ -248,6 +232,7 @@ local function LoadGameByFilename(filename)
 			
 			--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
 			DisposeWindow()
+			--Spring.Restart(saveData.path, "")	-- does not work
 		end)
 		if (not success) then
 			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
@@ -278,23 +263,24 @@ end
 -- Save/Load UI
 --------------------------------------------------------------------------------
 local function SaveLoadConfirmationDialogPopup(filename, saveMode)
-	local text = saveMode and WG.Translate("interface", "save_overwrite_confirm") or WG.Translate("interface", "load_confirm")
+	local text = saveMode and (WG.Translate("interface", "save_overwrite_confirm") or ("Overwrite this save?"))
+				or WG.Translate("interface", "load_confirm") or ("Loading will lose any unsaved progress.\nDo you wish to continue?")
 	local yesFunc = function()
 			if (saveMode) then
 				SaveGame(filename)
 				-- TODO refresh UI
 			else
-				LoadGameByID(filename)
+				LoadGameByFilename(filename)
 			end
 		end
-	WG.Chobby.ConfirmationPopup(yesFunc, text, nil, 360, 200)
+	WG.crude.MakeExitConfirmWindow(text, yesFunc)
 end
 
 local function PromptSave(filename)
 	filename = filename or saveFilenameEdit.text
 	local saveExists = filename and VFS.FileExists(SAVE_DIR .. "/" .. filename .. ".lua") or false
 	if saveExists then
-		SaveLoadConfirmationDialogPopup(id, true)
+		SaveLoadConfirmationDialogPopup(filename, true)
 	else
 		SaveGame(filename)
 	end
@@ -328,7 +314,7 @@ local function AddSaveEntryButton(saveFile, saveMode)
 					if ingame then
 						SaveLoadConfirmationDialogPopup(filename, false)
 					else
-						LoadGameByFilename(filename)
+						LoadGameByFilename(saveFile.filename)
 					end
 				end
 			end
