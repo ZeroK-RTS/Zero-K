@@ -272,7 +272,7 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, n, doHug
 	
 	-- The d vector is also relative to unit position.
 	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
-	if behaviour,selfVelocityPrediction then
+	if behaviour.selfVelocityPrediction then
 		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
 		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
 	end
