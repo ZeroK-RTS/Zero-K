@@ -88,6 +88,10 @@ local function DisposeWindow()
 	end
 end
 
+local function trim(str)
+  return str:match'^()%s*$' and '' or str:match'^%s*(.*%S)'
+end
+
 --------------------------------------------------------------------------------
 -- Savegame utlity functions
 --------------------------------------------------------------------------------
@@ -197,7 +201,7 @@ end
 local function SaveGame(filename)
 	local success, err = pcall(function()
 		Spring.CreateDir(SAVE_DIR)
-		filename = filename or ("save" .. string.format("%03d", FindFirstEmptySaveSlot()))
+		filename = (filename and trim(filename)) or ("save" .. string.format("%03d", FindFirstEmptySaveSlot()))
 		path = SAVE_DIR .. "/" .. filename .. ".lua"
 		local saveData = {}
 		--saveData.filename = filename
@@ -208,7 +212,7 @@ local function SaveGame(filename)
 		saveData.engineVersion = Game.version
 		saveData.map = Game.mapName
 		saveData.gameframe = Spring.GetGameFrame()
-		saveData.campaignID = currentCampaignID
+		saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 		table.save(saveData, path)
 		Spring.SendCommands("luasave " .. filename .. " -y")
 		
@@ -232,7 +236,18 @@ local function LoadGameByFilename(filename)
 			
 			--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
 			DisposeWindow()
-			--Spring.Restart(saveData.path, "")	-- does not work
+			local script = [[
+[GAME]
+{
+	SaveFile=__FILE__;
+	IsHost=1;
+	OnlyLocal=1;
+	MyPlayerName=__PLAYERNAME__;
+}
+]]
+			script = script:gsub("__FILE__", filename .. ".slsf")
+			script = script:gsub("__PLAYERNAME__", saveData.playerName)
+			Spring.Reload(script)
 		end)
 		if (not success) then
 			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
@@ -263,7 +278,7 @@ end
 -- Save/Load UI
 --------------------------------------------------------------------------------
 local function SaveLoadConfirmationDialogPopup(filename, saveMode)
-	local text = saveMode and (WG.Translate("interface", "save_overwrite_confirm") or ("Overwrite this save?"))
+	local text = saveMode and (WG.Translate("interface", "save_overwrite_confirm") or ("Save \"" .. filename .. "\" already exists. Overwrite?"))
 				or WG.Translate("interface", "load_confirm") or ("Loading will lose any unsaved progress.\nDo you wish to continue?")
 	local yesFunc = function()
 			if (saveMode) then
@@ -278,6 +293,7 @@ end
 
 local function PromptSave(filename)
 	filename = filename or saveFilenameEdit.text
+	filename = trim(filename)
 	local saveExists = filename and VFS.FileExists(SAVE_DIR .. "/" .. filename .. ".lua") or false
 	if saveExists then
 		SaveLoadConfirmationDialogPopup(filename, true)
@@ -311,11 +327,7 @@ local function AddSaveEntryButton(saveFile, saveMode)
 				if saveMode then
 					PromptSave(saveFile and saveFile.filename or nil)
 				else
-					if ingame then
-						SaveLoadConfirmationDialogPopup(filename, false)
-					else
-						LoadGameByFilename(saveFile.filename)
-					end
+					SaveLoadConfirmationDialogPopup(saveFile.filename, false)
 				end
 			end
 		}
