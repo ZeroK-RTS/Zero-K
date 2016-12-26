@@ -108,7 +108,7 @@ local function Drones_InitializeDynamicCarrier(unitID)
 			carrierData[#carrierData + 1] = data
 			maxDronesOverride[#maxDronesOverride + 1] = drones
 			Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
-			spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
+			spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 		end
 	end
 	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
@@ -441,10 +441,22 @@ local function UpdateCarrierTarget(carrierID, frame)
 	local droneSendDistance = nil
 	local px, py, pz
 	local target
-	local orderUndetermined = true
+	local recallDrones = false
+	local attackOrder = false
+	
+	--checks if there is an active recall order
+	local recallFrame = spGetUnitRulesParam(carrierID,"recall_frame_start")
+	if recallFrame then
+		if frame > recallFrame + RECALL_TIMEOUT then
+			--recall has expired
+			spSetUnitRulesParam(carrierID,"recall_frame_start",nil)
+		else
+			recallDrones = true
+		end
+	end
 	
 	--Handles an attack order given to the carrier.
-	if cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
+	if not recallDrones and cQueueC and cQueueC[1] and cQueueC[1].id == CMD_ATTACK then
 		local ox, oy, oz = GetUnitPosition(carrierID)
 		local params = cQueueC[1].params
 		if #params == 1 then
@@ -456,11 +468,11 @@ local function UpdateCarrierTarget(carrierID, frame)
 		if px then
 			droneSendDistance = GetDistance(ox, px, oz, pz)
 		end
-		orderUndetermined = false --attack order overrides set target
+		attackOrder = true --attack order overrides set target
 	end
 	
 	--Handles a setTarget order given to the carrier.
-	if orderUndetermined then
+	if not recallDrones and not attackOrder then
 		local targetType = spGetUnitRulesParam(carrierID,"target_type")
 		if targetType and targetType > 0 then
 			local ox, oy, oz = GetUnitPosition(carrierID)
@@ -475,18 +487,6 @@ local function UpdateCarrierTarget(carrierID, frame)
 			if px then
 				droneSendDistance = GetDistance(ox, px, oz, pz)
 			end
-		end
-	end
-	
-	--checks if there is an active recall order
-	local recallDrones = false
-	local recallFrame = spGetUnitRulesParam(carrierID,"recall_frame_start")
-	if recallFrame and recallFrame > 0 then
-		if frame > recallFrame + RECALL_TIMEOUT then
-			--recall has expired
-			spSetUnitRulesParam(carrierID,"recall_frame_start",-RECALL_TIMEOUT)
-		else
-			recallDrones = true
 		end
 	end
 	
@@ -552,7 +552,7 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (carrierList[unitID] ~= nil and (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD.PATROL or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE)) then
-		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
+		spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 		return true
 	end
 	if (carrierList[unitID] ~= nil and cmdID == CMD_RECALL_DRONES) then
@@ -632,7 +632,7 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (carrierDefs[unitDefID]) then
 		Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
-		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
+		spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 	end
 end
 
