@@ -18,7 +18,6 @@ Spring.Echo("Loading ArmorDefs_posts")
 local armorDefs = {
   
   SUBS = {
-    "subarty",
     "subraider",
     "subscout",
 	"cornukesub",

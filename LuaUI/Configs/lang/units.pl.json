@@ -938,11 +938,6 @@
         "description": "Lekka łódź podwodna",
         "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami i ładunkami głębinowymi."
     },
-    "subarty": {
-        "name": "Serpent",
-        "description": "Łódź podwodna artylerii precyzyjnej",
-        "helptext": "Serpent jest bardzo drogi, powolny i ma niską wytrzymałość, ale jego potężne torpedy dalekiego zasięgu zatapiają wszystko, co pływa."
-    },
     "armanni": {
         "name": "Annihilator",
         "description": "Akcelerator tachionów - wymaga sieci energetycznej 50 E",

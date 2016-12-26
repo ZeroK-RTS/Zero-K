@@ -79,7 +79,6 @@ local canRetreatDefs = {
 	"armcarry",
 	"reef",
 	"corroy",
-	"serpent",
 }
 
 local energyDefs = {
