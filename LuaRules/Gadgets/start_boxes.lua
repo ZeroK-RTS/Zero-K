@@ -191,7 +191,7 @@ function gadget:Initialize()
 		end
 	end
 
-	if (shuffleMode == "off") then
+	if (shuffleMode == "off") or (shuffleMode == "disable") then
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
@@ -275,6 +275,13 @@ function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
+
+	if (shuffleMode == "disable") then
+		-- note this is after the AI check; toasters still have to obey
+		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
+		return true
+	end
+
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
 	if (not boxID) or CheckStartbox(boxID, x, z) then
