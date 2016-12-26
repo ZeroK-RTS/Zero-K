@@ -551,7 +551,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (carrierList[unitID] ~= nil and cmdID == CMD.ATTACK) then
+	if (carrierList[unitID] ~= nil and (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE)) then
 		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
 		return true
 	end
