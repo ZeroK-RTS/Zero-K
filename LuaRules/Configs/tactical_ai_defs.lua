@@ -552,7 +552,7 @@ local behaviourConfig = {
 		swarms = lowRangeSwarmieeArray,
 		flees = {},
 		hugs = shortRangeDiveArray,
-		fightOnlyUnits = shortRangeExplodables, 
+		fightOnlyUnits = diverExplodables, 
 		localJinkOrder = false,
 		jinkTangentLength = 50,
 		circleStrafe = true,
@@ -562,6 +562,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 100,
 		swarmLeeway = 300,
 		skirmLeeway = 10,
+		skirmOrderDis = 30,
 		stoppingDistance = 8,
 	},
 	
