@@ -551,34 +551,11 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (carrierList[unitID] ~= nil and (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE)) then
+	if (carrierList[unitID] ~= nil and (cmdID == CMD.ATTACK or cmdID == CMD.FIGHT or cmdID == CMD.PATROL or cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE)) then
 		spSetUnitRulesParam(unitID,"recall_frame_start",-RECALL_TIMEOUT)
 		return true
 	end
 	if (carrierList[unitID] ~= nil and cmdID == CMD_RECALL_DRONES) then
-		
-		-- Cancels set target on the carrier
-		local targetType = spGetUnitRulesParam(unitID,"target_type")
-		if targetType and targetType > 0 then
-			GiveOrderToUnit(unitID, CMD_UNIT_CANCEL_TARGET, {}, {})
-		end
-		
-		-- Cancels current (or queued directly after current) attack/fight orders on the carrier
-		local queue = Spring.GetCommandQueue(unitID, -1)
-		if queue then
-			local toRemoveCount = 1
-			local queueToRemove = {}
-			for j=1,#queue do
-				command = queue[j]
-				if command.id == CMD.ATTACK or command.id == CMD.FIGHT or command.id == CMD.SET_WANTED_MAX_SPEED then
-					queueToRemove[toRemoveCount] = command.tag
-					toRemoveCount = toRemoveCount + 1
-				else
-					break -- don't remove attack/fight moves which are queued after a move or similar
-				end
-			end
-			Spring.GiveOrderToUnit (unitID,CMD.REMOVE, queueToRemove,{})
-		end
 		
 		-- Gives drones a command to recall to the carrier
 		for i = 1, #carrierList[unitID].droneSets do
