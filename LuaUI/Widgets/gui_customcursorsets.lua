@@ -31,6 +31,9 @@ options = {
 		type = 'bool',
 		value = false,
 		OnChange = function (self) 
+			if Spring.IsGUIHidden() then
+				return
+			end
 			if not self.value then
 				RestoreCursor()
 			else
