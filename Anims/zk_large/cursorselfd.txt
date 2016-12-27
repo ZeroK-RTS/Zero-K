@@ -1,3 +1,0 @@
-hotspot center
-frame  Anims/zk_large/cursorselfd_0.png  0.1
-frame  Anims/zk_large/cursorselfd_1.png  0.1
