@@ -5,19 +5,6 @@ local BUILD_UPDATE_INTERVAL = 15
 local carrierDefs = {}
 
 local carrierDefNames = {
-	armcarry = {
-		spawnPieces = {"base"},
-		{
-			drone = UnitDefNames.carrydrone.id, 
-			reloadTime = 15, 
-			maxDrones = 8, 
-			spawnSize = 2, 
-			range = 1600, 
-			buildTime = 3, 
-			maxBuild = 1,
-			offsets = {0, 60, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
-		},
-	},
 	
 	shipcarrier = {
 		spawnPieces = {"DroneAft", "DroneFore", "DroneLower","DroneUpper"},

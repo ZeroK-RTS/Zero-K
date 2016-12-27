@@ -440,11 +440,6 @@
         "description": "Skacząca niewidzialna bomba",
         "helptext": "Mimo że jest powolna, droga i ma niski obszar rażenia, ta niesamowicie niszczycielska bomba wyposażona w niewidzialność i możliwość skakania jest postrachem wszystkich ciężkich jednostek. Dobrą obronę przed nią stanowią lekkie jednostki przeczesujące okolicę."
     },
-    "armcarry": {
-        "name": "Reef",
-        "description": "Lotniskowiec",
-        "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
-    },
     "slowmort": {
         "name": "Moderator",
         "description": "Bot harcownik spowalniacz",

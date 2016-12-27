@@ -75,9 +75,8 @@ local canRetreatDefs = {
 	"armbanth",
 	"armorco",
 	
-	"corbats",
-	"armcarry",
-	"reef",
+	"shipheavyarty",
+	"shipcarry",
 	"corroy",
 	"serpent",
 }

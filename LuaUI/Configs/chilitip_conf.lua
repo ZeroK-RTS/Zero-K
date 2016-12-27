@@ -1,7 +1,6 @@
 local ignoreweapon =
 {
 	armaak = {1},
-	armcarry = {1},
 	shipcarrier = {1},
 	armaas = {1},
 	armraz = {2},

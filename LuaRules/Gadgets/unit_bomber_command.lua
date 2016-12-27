@@ -48,11 +48,6 @@ local airpadDefs = {
 		cap = 4, 
 		padPieceName={"land1","land2","land3","land4"}
 	},
-	[UnitDefNames["armcarry"].id] = {
-		mobile = true, 
-		cap = 9, 
-		padPieceName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}
-	},
 	[UnitDefNames["shipcarrier"].id] = {
 		mobile = true, 
 		cap = 2, 
