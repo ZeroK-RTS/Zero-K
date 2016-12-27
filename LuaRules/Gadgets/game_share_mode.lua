@@ -79,6 +79,7 @@ end
 if (gadgetHandler:IsSyncedCode()) then
 	local Invites = {}
 	local controlledplayers = {}
+	local controlledteams = {}
 	local originalplayers = {}
 	local originalunits = {}
 
@@ -100,9 +101,10 @@ if (gadgetHandler:IsSyncedCode()) then
 		if originalplayers[player] and config.unmerging then
 			Spring.Echo("game_message: Unmerging player " .. name)
 			if originalplayers[player] then
-				GG.Overdrive.RemoveTeamIncomeRedirect(originalplayers[player]) -- Reset team income/storage.
 				local target = originalplayers[player]
 				Spring.AssignPlayerToTeam(player,originalplayers[player])
+				local originalteam = originalplayers[player]
+				controlledteams[originalteam] = nil
 				for _,unit in pairs(originalunits[target]) do
 					if Spring.ValidUnitID(unit) and Spring.AreTeamsAllied(Spring.GetUnitTeam(unit),target) then
 						Spring.TransferUnit(unit,target,true)
@@ -138,6 +140,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			if GetSquadSize(originalteam) - 1 == 0 then
 				local metal = Spring.GetTeamResources(originalteam,"metal")
 				local energy = Spring.GetTeamResources(originalteam,"energy")
+				controlledteams[originalteam] = target
 				Spring.ShareTeamResource(originalteam,target,"metal",metal)
 				Spring.ShareTeamResource(originalteam,target,"energy",energy)
 				MergeUnits(originalteam,target)
@@ -148,7 +151,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				originalplayers[playerid] = originalteam
 			end
 			controlledplayers[playerid] = target
-			GG.Overdrive.RedirectTeamIncome(originalteam, target)
 		else
 			Spring.Echo("[Commshare] Merger error.")
 		end
@@ -207,7 +209,6 @@ if (gadgetHandler:IsSyncedCode()) then
 				MergePlayer(player,GetTeamID(target))
 			else -- target->player
 				MergeTeams(GetTeamID(target),GetTeamID(player))
-				teamlist = nil
 			end
 			Invites[player][target] = nil
 			Invites[target][player] = nil
@@ -257,7 +258,7 @@ if (gadgetHandler:IsSyncedCode()) then
 			Spring.Echo("game_message: Commshare avaliable!")
 			if config.mergetype == "all" then
 				for i=1,#ally do
-					teamlist = Spring.GetTeamList(ally[i])
+					local teamlist = Spring.GetTeamList(ally[i])
 					if teamlist ~= nil and #teamlist > 1 then
 						local mergeid,_ = GetLowestID(teamlist,false)
 						for i=1,#teamlist do
@@ -349,8 +350,14 @@ if (gadgetHandler:IsSyncedCode()) then
 	end
 	
 	function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-		if controlledplayers[unitTeam] then
-			Spring.TransferUnit(unitID,controlledplayers[unitTeam],false) -- this is in case of late commer coms,etc. False maybe fixes spamming of unit transfered?
+		if controlledteams[unitTeam] then
+			Spring.TransferUnit(unitID,controlledteams[unitTeam],true) -- this is in case of late commer coms,etc.
+		end
+	end
+	
+	function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
+		if controlledteams[newTeam] then
+			Spring.TransferUnit(unitID,controlledteams[newTeam],true)
 		end
 	end
 end
