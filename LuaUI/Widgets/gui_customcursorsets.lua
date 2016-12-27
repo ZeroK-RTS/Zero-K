@@ -112,7 +112,7 @@ end
 			for i=1, #cursorNames do
 				local cursor = cursorNames[i]
 				local topLeft = (cursor == 'cursornormal' and cursorSet ~= 'k_haos_girl')
-				Spring.ReplaceMouseCursor(cursor, "empty/"..cursor, topLeft)
+				Spring.ReplaceMouseCursor(cursor, "cursorempty", topLeft)
 			end
 		end 
 	end 
