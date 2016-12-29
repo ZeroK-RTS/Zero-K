@@ -595,9 +595,9 @@
 		"helptext" : "Expensive and powerful, the Ravager is capable of holding its own against most opposition. Though its maneuverability is terrible, its strength is when moving at a considerable top speed in a straight line. Due to this, it is almost impossible to skirmish using raiders. In combat, you should attempt to keep travelling forward and not turn too suddenly, so as to maintain top speed. Circling your target at the edge of your range is a good tactic. An arcing projectile allows it to shoot over wreckage, other tanks, etc. Vulnerable to crawling bombs when in swarms."
 	},
 	"raveparty" : {
-		"name" : "Disco Rave Party",
-		"description" : "Rainbow Surprise Superweapon",
-		"helptext" : "The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!"
+		"name" : "Discord",
+		"description" : "Destructive Rainbow Projector",
+		"helptext" : "The Discord throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!"
 	},
 	"corllt" : {
 		"name" : "Lotus",

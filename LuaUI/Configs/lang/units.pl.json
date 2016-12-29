@@ -616,9 +616,9 @@
         "helptext": "Drogi, lecz potężny, Ravager jest w stanie poradzić sobie z większoscią przeciwników. Chociaż jego zwrotność jest bardzo niska, ma wysoką prędkość maksymalną, dzięki czemu jest w stanie dogonić i zniszczyć lżejsze jednostki. Jego działo może strzelać nad przeszkodami, na przykład wrakami lub innymi czołgami. Duże grupy Ravagerów można skutecznie niszczyć bombami."
     },
     "raveparty": {
-        "name": "Disco Rave Party",
-        "description": "Tęczowa niespodzianka",
-        "helptext": "Disco Rave Party wystrzeliwuje kolorowe kulki, z których każda zawiera inną niespodziankę. Świetna zabawa dla całej rodziny!"
+        "name": "Discord",
+        "description": "Destruktywny projektor tęczy",
+        "helptext": "Discord wystrzeliwuje kolorowe kulki, z których każda zawiera inną niespodziankę. Świetna zabawa dla całej rodziny!"
     },
     "corllt": {
         "name": "Lotus",
