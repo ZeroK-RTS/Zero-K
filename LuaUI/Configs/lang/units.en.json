@@ -318,7 +318,7 @@
 	"amgeo" : {
 		"name" : "Advanced Geothermal",
 		"description" : "Large Powerplant (+100) - HAZARDOUS",
-		"helptext" : "The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
+		"helptext" : "The Advanced Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
 	"armnanotc" : {
 		"name" : "Caretaker",
