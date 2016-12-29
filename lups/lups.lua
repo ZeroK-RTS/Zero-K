@@ -691,13 +691,13 @@ local function IsUnitFXVisible(fx)
 		end
 	end
 
-	if (not fx.onActive)or(unitActive) then
+	if (not fx.onActive) or (unitActive) then
 		if fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then
 			return fx:Visible()
 		else
-			local unitRadius = (spGetUnitRadius(unitID) + 40)
+			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
 			local r = fx.radius or 0
 			return Spring.IsUnitVisible(unitID, unitRadius + r)
 		end
