@@ -254,7 +254,7 @@ if (gadgetHandler:IsSyncedCode()) then
 		end
 		if f== config.mintime then
 			local ally = Spring.GetAllyTeamList()
-			Spring.Echo("game_message: Commshare avaliable!")
+			Spring.Echo("Commshare avaliable!")
 			if config.mergetype == "all" then
 				for i=1,#ally do
 					teamlist = Spring.GetTeamList(ally[i])
