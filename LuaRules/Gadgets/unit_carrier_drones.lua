@@ -47,8 +47,8 @@ local emptyTable = {}
 local carrierDefs, thingsWhichAreDrones, unitRulesCarrierDefs, BUILD_UPDATE_INTERVAL = include "LuaRules/Configs/drone_defs.lua"
 
 local DEFAULT_UPDATE_ORDER_FREQUENCY = 40 -- gameframes
-local IDLE_DISTANCE = 100
-local ACTIVE_DISTANCE = 150
+local IDLE_DISTANCE = 120
+local ACTIVE_DISTANCE = 180
 local DRONE_HEIGHT = 120
 local RECALL_TIMEOUT = 300
 
@@ -70,6 +70,12 @@ local recallDronesCmdDesc = {
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local function RandomPointInUnitCircle()
+	local angle = random(0, 2*math.pi)
+	local distance = math.pow(random(0, 1), 0.5)
+	return math.cos(angle)*distance, math.sin(angle)*distance
+end
+
 local function InitCarrier(unitID, carrierData, teamID, maxDronesOverride)
 	local toReturn  = {teamID = teamID, droneSets = {}, occupiedPieces={}, droneInQueue= {}}
 	local unitPieces = GetUnitPieceMap(unitID)
@@ -167,7 +173,8 @@ local function NewDrone(unitID, droneName, setNum, droneBuiltExternally)
 		GiveOrderToUnit(droneID, CMD.MOVE_STATE, { 2 }, 0)
 		GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.movestate }, 0)
 		GiveOrderToUnit(droneID, CMD.IDLEMODE, { 0 }, 0)
-		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + random(-IDLE_DISTANCE, IDLE_DISTANCE), y + DRONE_HEIGHT, z + random(-IDLE_DISTANCE, IDLE_DISTANCE)}, {""})
+		local rx, rz = RandomPointInUnitCircle()
+		GiveClampedOrderToUnit(droneID, CMD.MOVE, {x + rx*IDLE_DISTANCE, y+DRONE_HEIGHT, z + rz*IDLE_DISTANCE}, {""})
 		GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 
 		SetUnitNoSelect(droneID, true)
@@ -491,11 +498,13 @@ local function UpdateCarrierTarget(carrierID, frame)
 	
 	local states = Spring.GetUnitStates(carrierID) or emptyTable
 	local holdfire = states.firestate == 0
+	local rx, rz
 	
 	for i = 1, #carrierList[carrierID].droneSets do
 	
 		local set = carrierList[carrierID].droneSets[i]
 		local tempCONTAINER
+		
 		
 		for droneID in pairs(set.drones) do
 			tempCONTAINER = droneList[droneID]
@@ -506,14 +515,16 @@ local function UpdateCarrierTarget(carrierID, frame)
 			if recallDrones then
 				-- move drones to carrier
 				px, py, pz = GetUnitPosition(carrierID)
-				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
+				rx, rz = RandomPointInUnitCircle()
+				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
 				GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 			elseif droneSendDistance and droneSendDistance < set.config.range then
 				-- attacking
 				if target then
 					GiveOrderToUnit(droneID, CMD.ATTACK, target, 0)
 				else
-					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + random(-ACTIVE_DISTANCE, ACTIVE_DISTANCE), (py+120), pz + random(-ACTIVE_DISTANCE, ACTIVE_DISTANCE)}  , 0)
+					rx, rz = RandomPointInUnitCircle()
+					GiveClampedOrderToUnit(droneID, CMD.FIGHT, {px + rx*ACTIVE_DISTANCE, py+DRONE_HEIGHT, pz + rz*ACTIVE_DISTANCE}, 0)
 				end
 			else
 				-- return to carrier unless in combat
@@ -527,7 +538,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				end
 				if not engaged then
 					px, py, pz = GetUnitPosition(carrierID)
-					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
+					rx, rz = RandomPointInUnitCircle()
+					GiveClampedOrderToUnit(droneID, holdfire and CMD.MOVE or CMD.FIGHT, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
 					GiveOrderToUnit(droneID, CMD.GUARD, {carrierID} , {"shift"})
 				end
 			end
@@ -565,7 +577,8 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				
 				local temp = droneList[droneID]
 				droneList[droneID] = nil	-- to keep AllowCommand from blocking the order
-				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + random(-IDLE_DISTANCE, IDLE_DISTANCE), (py+DRONE_HEIGHT), pz + random(-IDLE_DISTANCE, IDLE_DISTANCE)} , 0)
+				local rx, rz = RandomPointInUnitCircle()
+				GiveClampedOrderToUnit(droneID, CMD.MOVE, {px + rx*IDLE_DISTANCE, py+DRONE_HEIGHT, pz + rz*IDLE_DISTANCE}, 0)
 				GiveOrderToUnit(droneID, CMD.GUARD, {unitID} , {"shift"})
 				droneList[droneID] = temp
 			end
