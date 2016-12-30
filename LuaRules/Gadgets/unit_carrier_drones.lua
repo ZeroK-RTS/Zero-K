@@ -108,7 +108,6 @@ local function Drones_InitializeDynamicCarrier(unitID)
 			carrierData[#carrierData + 1] = data
 			maxDronesOverride[#maxDronesOverride + 1] = drones
 			Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
-			spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 		end
 	end
 	carrierList[unitID] = InitCarrier(unitID, carrierData, Spring.GetUnitTeam(unitID), maxDronesOverride)
@@ -632,7 +631,6 @@ end
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 	if (carrierDefs[unitDefID]) then
 		Spring.InsertUnitCmdDesc(unitID, recallDronesCmdDesc)
-		spSetUnitRulesParam(unitID,"recall_frame_start",nil)
 	end
 end
 
