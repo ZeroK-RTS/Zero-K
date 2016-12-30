@@ -216,6 +216,8 @@ local overrides = {
 	[CMD_ABANDON_PW] = {caption= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
 
 	[CMD_PLACE_BEACON] = {caption= '', texture = imageDir .. 'Bold/drop_beacon.png'},
+	
+	[CMD_RECALL_DRONES] = {caption= '', texture = imageDir .. 'Bold/recall_drones.png'},
 
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, caption=''},

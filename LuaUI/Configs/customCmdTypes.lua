@@ -52,6 +52,7 @@ local custom_cmd_actions = {
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
 	placebeacon = {cmdType = 1, name = "Place Teleport Beacon"},
+	recalldrones = {cmdType = 1, name = "Recall Drones to Carrier"},
 	buildprev = {cmdType = 1, name = "Build Previous"},
 	areaguard = {cmdType = 1, name = "Area Guard"},
 	dropflag = {cmdType = 3, name = "Drop Flag"},
