@@ -19,6 +19,7 @@ if not VFS.FileExists("mission.lua") then
 	return
 end
 
+local RESULTS_FOLDER = "Saves/"
 local missionVars = {}
 local varsWritten = false
 
@@ -40,8 +41,8 @@ function widget:GameOver(winners)
 		result = "draw"
 	end
 	missionVars.result = result
-	WG.SavePythonOrJSONDict(missionVars, "cache/", "mission_results.json", "", {json = true, endOfFile = true})
-	WG.SaveTable(missionVars, "cache/", "mission_results.lua", "", {endOfFile = true, prefixReturn = true})
+	WG.SavePythonOrJSONDict(missionVars, RESULTS_FOLDER, "mission_results.json", "", {json = true, endOfFile = true})
+	WG.SaveTable(missionVars, RESULTS_FOLDER, "mission_results.lua", "", {endOfFile = true, prefixReturn = true})
 	varsWritten = true
 end
 
