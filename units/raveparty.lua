@@ -1,6 +1,6 @@
 unitDef = {
   unitname                      = [[raveparty]],
-  name                          = [[Discord]],
+  name                          = [[Disco Rave Party]],
   description                   = [[Destructive Rainbow Projector]],
   acceleration                  = 0,
   brakeRate                     = 0,
@@ -22,9 +22,9 @@ unitDef = {
   corpse                        = [[DEAD]],
 
   customParams                  = {
-    helptext       = [[The Discord throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
-    helptext_de    = [[Das Discord verschießt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Überraschung darstellt. Ein Spaß für die ganze Familie!]],
-	description_de = [[Zerstörendregenbogenwerfer]],
+    helptext       = [[The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!]],
+    helptext_de    = [[Der Disco Rave Party verschieÃŸt sechs verschiedene Partygeschosse auf deinen Feind, wobei jedes Geschoss eine Ãœberraschung darstellt. Ein SpaÃ?fÃ¼r die ganze Familie!]],
+	description_de = [[Regenbogen-Ãœberraschungs Superwaffe]],
     modelradius    = [[35]],
   },
 
