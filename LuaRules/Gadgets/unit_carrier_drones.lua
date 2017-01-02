@@ -20,6 +20,8 @@ end
 --Version 1.003
 --Changelog:
 --24/6/2014 added carrier building drone on emit point. 
+
+--around 1/1/2017: added hold fire functionality, recall drones button, circular drone leash, drones pay attention to set target
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 include("LuaRules/Configs/customcmds.h.lua")
@@ -449,6 +451,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 	local target
 	local recallDrones = false
 	local attackOrder = false
+	local setTargetOrder = false
 	
 	--checks if there is an active recall order
 	local recallFrame = spGetUnitRulesParam(carrierID,"recall_frame_start")
@@ -493,6 +496,7 @@ local function UpdateCarrierTarget(carrierID, frame)
 			if px then
 				droneSendDistance = GetDistance(ox, px, oz, pz)
 			end
+			setTargetOrder = true
 		end
 	end
 	
@@ -509,8 +513,16 @@ local function UpdateCarrierTarget(carrierID, frame)
 		for droneID in pairs(set.drones) do
 			tempCONTAINER = droneList[droneID]
 			droneList[droneID] = nil -- to keep AllowCommand from blocking the order
+			local droneStates = Spring.GetUnitStates(carrierID) or emptyTable
 			
-			GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0) -- update firestate
+			if attackOrder or setTargetOrder then
+				-- drones fire at will if carrier has an attack/target order
+				-- a drone bomber probably should not do this
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { 2 }, 0) 
+			else
+				-- update firestate based on that of carrier
+				GiveOrderToUnit(droneID, CMD.FIRE_STATE, { states.firestate }, 0) 
+			end
 			
 			if recallDrones then
 				-- move drones to carrier
@@ -531,7 +543,8 @@ local function UpdateCarrierTarget(carrierID, frame)
 				local cQueue = GetCommandQueue(droneID, -1)
 				local engaged = false
 				for i=1, (cQueue and #cQueue or 0) do
-					if cQueue[i].id == CMD.FIGHT then
+					if cQueue[i].id == CMD.FIGHT and droneStates.firestate > 0 then
+						-- if currently fighting AND not on hold fire
 						engaged = true
 						break
 					end
