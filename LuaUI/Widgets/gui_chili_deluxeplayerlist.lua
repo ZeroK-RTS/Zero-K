@@ -1260,8 +1260,8 @@ SetupPlayerNames = function()
 					  if (teams[a].isDead or not teams[a].isPlaying) and not (teams[b].isDead or not teams[b].isPlaying) then return false end
 					  if (teams[b].isDead or not teams[b].isPlaying) and not (teams[a].isDead or not teams[a].isPlaying) then return true end
 					  if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
-						  if teams[a].roster[1].isActive and not teams[b].roster[1].isActive then return true end
-						  if teams[b].roster[1].isActive and not teams[a].roster[1].isActive then return false end
+						  if (teams[a].roster and teams[a].roster[1].isActive) and not (teams[b].roster and teams[b].roster[1].isActive) then return true end
+						  if (teams[b].roster and teams[b].roster[1].isActive) and not (teams[a].roster and teams[a].roster[1].isActive) then return false end
 					  end
 					  if localTeam ~= 0 or teamZeroPlayers[myID] then
 						  if a == localTeam then return true end
