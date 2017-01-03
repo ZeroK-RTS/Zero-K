@@ -35,6 +35,7 @@ if config.mergetype == "all" then config.unmerging = false else config.unmerging
 local private = {private = true}
 local public = {public = true}
 local Invites = {}
+local coroutinestate = false -- Used for staggering. When false, it means it's done/not started. When true, it is suspended/executing.
 local controlledplayers = {}
 local controlledteams = {}
 local originalteamids = {} -- takes playerid as the key, gives the team as the value.
@@ -184,10 +185,43 @@ local function MergeAllHumans(ally)
 		elseif not AI and mergeid == -1 then
 			mergeid = teamlist[i]
 			Spring.Echo("[Commshare] MergeID for ally " .. ally .. " is " .. mergeid)
-		else
-			Spring.Echo("[Commshare] Cannot merge team " .. teamlist[i] .. " -- AI team.")
 		end
 	end
+end
+
+local function MergeAll()
+	local ally = Spring.GetAllyTeamList()
+	local teammanagement = 1
+	local neededteams = 0
+	for i=1,#ally do
+		local teamlist = Spring.GetTeamList(ally[i])
+		if #teamlist > 1 then
+			if #teamlist < 5 then
+				MergeAllHumans(ally[i])
+			else -- do up to 5 here.
+				local AI
+				local mergeid = -1
+				local count = 0
+				for i=1,#teamlist do
+					count = count + 1
+					AI = select(4,Spring.GetTeamInfo(teamlist[i]))
+					if not AI and mergeid ~= -1 then
+						Spring.Echo("[Commshare] Merging team " .. teamlist[i])
+						MergeTeams(teamlist[i],mergeid)
+					elseif not AI and mergeid == -1 then
+						mergeid = teamlist[i]
+						Spring.Echo("[Commshare] MergeID for ally " .. ally .. " is " .. mergeid)
+					end
+					if count > 5 then
+						count = 0
+						coroutine.yield()
+					end
+				end
+			end
+		end
+		coroutine.yield()
+	end
+	coroutinestate = false
 end
 
 local function SendInvite(player,target,targetid) -- targetplayer is which player is the merger
@@ -273,12 +307,11 @@ function gadget:GameFrame(f)
 		end
 	end
 	if f== config.mintime and config.mergetype == "all" then
-		local ally = Spring.GetAllyTeamList()
-		for i=1,#ally do
-			if #Spring.GetTeamList(ally[i]) > 1 then
-				MergeAllHumans(ally[i])
-			end
-		end
+		staggeredmerge = coroutine.create(function () MergeAll(); end)
+		coroutinestate = true
+	end
+	if f%2 == 0 and coroutinestate == true then
+		coroutine.resume(staggeredmerge)
 	end
 end
 	
