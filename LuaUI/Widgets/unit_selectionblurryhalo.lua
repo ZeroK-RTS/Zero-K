@@ -43,7 +43,7 @@ options = {
     name = 'Outline Thickness',
     desc = 'How thick the outline appears around objects',
     type = 'number',
-    min = 1, max = 16, step = 1,
+    min = 6, max = 16, step = 1,
     value = 14,
   },
   
@@ -243,8 +243,10 @@ function widget:DrawScreenEffects()
 	end
 	
 	local x, y, z = spGetCameraPosition()
+	local _, coords = spTraceScreenRay(vsx/2, vsy/2, true)
+	y = y - coords[2]
 	y = math.max(1, y)
-	local thickness = options.thickness.value * math.min(1.0, 1500/y)
+	local thickness = options.thickness.value * math.min(2.0, math.max(500/y, 0.5))
 	
 	-- apply blur
 	glBlending(false)
