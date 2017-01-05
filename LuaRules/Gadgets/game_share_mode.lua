@@ -10,6 +10,8 @@ function gadget:GetInfo()
 	}
 end
 
+-- Remove unsync and remove if off --
+
 if gadgetHandler:IsSyncedCode() == false then
 	return
 end
@@ -18,9 +20,10 @@ local modOptions = {}
 modOptions = Spring.GetModOptions()
 
 if modOptions["sharemode"] == "off" then
-	Spring.Echo("[Commshare] Commshare is off. Removing gadget.")
+	Spring.Echo("[Commshare] Commshare is off. Shutting down.")
 	gadgetHandler:RemoveGadget()
 end
+
 -- set up config --
 local config = {
 	mergetype = modOptions["sharemode"],
@@ -31,17 +34,17 @@ modOptions = nil -- no longer needed.
 if config.mergetype == nil then config.mergetype = "invite"; end
 if config.mergetype == "all" then config.unmerging = false else config.unmerging = true end
 
------------------- Variables --
+------------------ Variables ------------------
 local private = {private = true}
 local public = {public = true}
 local Invites = {}
 local coroutinestate = false -- Used for staggering. When false, it means it's done/not started. When true, it is suspended/executing.
-local controlledplayers = {}
-local controlledteams = {}
+local controlledplayers = {} -- table containing which team a playerid should be under.
+local controlledteams = {} -- contains which team a team of players should be under.
 local originalteamids = {} -- takes playerid as the key, gives the team as the value.
-local originalunits = {}
+local originalunits = {} -- contains which units are owned by a team that has commshared.
 
------------------- tool box functions --
+------------------ tool box functions ------------------
 local function GetTeamID(playerid)
 	return select(4,Spring.GetPlayerInfo(playerid))
 end
@@ -80,17 +83,20 @@ end
 
 
 local function ProccessCommand(str)
-	local strings = {}
+	local command,aug1,aug2
 	local i = 1
-	for w in string.gmatch(str, "%S+") do
-		strings[#strings+1] = w
-		if i == 4 then -- only care about the first 4 'words'
+	for word in string.gmatch(str, "%S+") do
+		if i == 2 then
+			command = word
+		elseif i == 3 then
+			aug1 = word
+		elseif i == 4 then
+			aug2 = word
 			break
-		else
-			i = i + 1
 		end
+		i = i + 1
 	end
-	return strings[2],strings[3],strings[4] -- less creating tables this way
+	return command,aug1,aug2 -- less creating tables this way
 end
 
 local function UnmergePlayer(player) -- Takes playerid, not teamid!!!
@@ -189,7 +195,7 @@ local function MergeAllHumans(ally)
 	end
 end
 
-local function MergeAll()
+local function MergeAll() -- Coroutine, only allow 5 teams to be merged per 2 frames.
 	local ally = Spring.GetAllyTeamList()
 	local teammanagement = 1
 	local neededteams = 0
@@ -269,19 +275,17 @@ local function AcceptInvite(player,target)
 	end
 end
 
------------------- Callins --
+------------------ Callins ------------------
 function gadget:PlayerAdded(playerID)
-	if Spring.GetGameFrame() > config.mintime then
-		local name,active,spec,team,ally,_	 = Spring.GetPlayerInfo(playerID)
-		if spec == false and active == true and config.mergetype ~= "none" and controlledplayers[team] then
-			MergePlayer(playerID,controlledplayers[playerID])
-			Spring.Echo("game_message: Player " .. name .. "has been remerged!")
-		end
+	local name,active,spec,team,ally,_	 = Spring.GetPlayerInfo(playerID)
+	if not spec and active and controlledplayers[playerID] then
+		MergePlayer(playerID,controlledplayers[playerID])
+		Spring.Echo("game_message: Player " .. name .. "has been remerged!")
 	end
 end
 	
-function gadget:GameFrame(f)
-	if f%30 == 0 then
+function gadget:GameFrame(frame)
+	if frame%30 == 0 then
 		local invitecount
 		for player,invites in pairs(Invites) do
 			invitecount = 0
@@ -306,19 +310,18 @@ function gadget:GameFrame(f)
 			end
 		end
 	end
-	if f== config.mintime and config.mergetype == "all" then
+	if frame == config.mintime and config.mergetype == "all" then
 		staggeredmerge = coroutine.create(function () MergeAll(); end)
 		coroutinestate = true
 	end
-	if f%2 == 0 and coroutinestate == true then
+	if coroutinestate == true and frame%2 == 0 then
 		coroutine.resume(staggeredmerge)
 	end
 end
 	
-function gadget:RecvLuaMsg(msg,playerid) -- Entry points for widgets to interact with the gadget
-	if string.find(msg,"sharemode") then
-		local cmdlower = string.lower(msg)
-		local command,aug1,aug2 = ProccessCommand(cmdlower)
+function gadget:RecvLuaMsg(message,playerid) -- Entry points for widgets to interact with the gadget
+	if string.find(message,"sharemode") then
+		local command,aug1,aug2 = ProccessCommand(string.lower(message))
 		local name = select(1,Spring.GetPlayerInfo(playerid)) 
 		if command == nil then
 			Spring.Echo("[Commshare] " .. player .. "(" .. name .. ") sent an invalid command")
@@ -337,6 +340,7 @@ function gadget:RecvLuaMsg(msg,playerid) -- Entry points for widgets to interact
 				aug2 = tonumber(aug2)
 			end
 		end
+		-- Do commands --
 		if string.find(command,"invite") then
 			if type(aug1) == "number" and type(aug2) == "number" then
 				SendInvite(playerid,aug1,aug2) -- #4 should be the controller id.
