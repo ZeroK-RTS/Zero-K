@@ -28,7 +28,7 @@ options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
 options_order = {
 	'showAlly',
 	'thickness',
-	'opacity',
+	'blur',
 }
 
 options = {
@@ -40,20 +40,20 @@ options = {
 	},
 	
 	thickness = {
-    name = 'Outline Thickness',
-    desc = 'How thick the outline appears around objects',
-    type = 'number',
-    min = 6, max = 16, step = 1,
-    value = 14,
-  },
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 1, max = 16, step = 1,
+		value = 10,
+    },
   
-  opacity = {
-    name = 'Outline Opacity',
-    desc = 'How bright the outlines appear',
-    type = 'number',
-    min = 0.05, max = 1.0, step = 0.05,
-    value = 0.7,
-  },
+	blur = {
+		name = 'Outline Blurriness',
+		desc = 'How smooth the outlines appear',
+		type = 'number',
+		min = 2, max = 16, step = 1,
+		value = 16,
+	},
 }
 
 --------------------------------------------------------------------------------
@@ -65,12 +65,14 @@ local masktex
 
 local fbo
 
+local featherShader_h
+local featherShader_v
 local blurShader_h
 local blurShader_v
 local maskGenShader
 local maskApplyShader
-local invRXloc, invRYloc
-local radiusXloc, radiusYloc
+local invRXloc, invRYloc, screenXloc, screenYloc
+local radiusXloc, radiusYloc, thkXloc, thkYloc
 local haloOpacityloc
 
 local vsx, vsy = 1,1
@@ -92,6 +94,7 @@ local spIsUnitSelected	= Spring.IsUnitSelected
 local spGetMouseState	= Spring.GetMouseState
 local spTraceScreenRay	= Spring.TraceScreenRay
 local spGetCameraPosition = Spring.GetCameraPosition
+local spGetGroundHeight = Spring.GetGroundHeight
 local spGetPlayerControlledUnit		= Spring.GetPlayerControlledUnit
 local spGetVisibleUnits			= Spring.GetVisibleUnits
 local spIsUnitIcon = Spring.IsUnitIcon
@@ -244,21 +247,57 @@ function widget:DrawScreenEffects()
 	
 	local x, y, z = spGetCameraPosition()
 	local _, coords = spTraceScreenRay(vsx/2, vsy/2, true)
-	y = y - coords[2]
+	if (coords) then
+		y = y - coords[2]
+	else
+		local iy = spGetGroundHeight(x, z)
+		if iy then
+			y = y - iy
+		end
+	end
 	y = math.max(1, y)
-	local thickness = options.thickness.value * math.min(2.0, math.max(500/y, 0.5))
 	
-	-- apply blur
 	glBlending(false)
+	
+	-- apply feathering
+	local thickness = options.thickness.value * math.min(2.0, math.max(750/y, 0.2))
+	thickness = math.max(thickness, 1)
+	glUseShader(featherShader_h)
+		glUniform(screenXloc, ivsx)
+		glUniform(thkXloc, thickness)
+		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
+	glUseShader(0)
+	
+	glUseShader(featherShader_v)
+		glUniform(screenYloc, ivsy)
+		glUniform(thkYloc, thickness)
+		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
+	glUseShader(0)
+	
+	-- apply blur over two iterations to approximate a gaussian
+	local blur = options.blur.value * math.min(2.0, math.max(750/y, 0.2))
+	blur = math.max(1, math.ceil(blur/2))
 	glUseShader(blurShader_h)
 		glUniform(invRXloc, ivsx)
-		glUniform(radiusXloc, thickness)
+		glUniform(radiusXloc, blur)
 		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
 	glUseShader(0)
 		
 	glUseShader(blurShader_v)
 		glUniform(invRYloc, ivsy)
-		glUniform(radiusYloc, thickness)
+		glUniform(radiusYloc, blur)
+		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
+	glUseShader(0)
+	
+	glUseShader(blurShader_h)
+		glUniform(invRXloc, ivsx)
+		glUniform(radiusXloc, blur)
+		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
+	glUseShader(0)
+		
+	glUseShader(blurShader_v)
+		glUniform(invRYloc, ivsy)
+		glUniform(radiusYloc, blur)
 		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
 	glUseShader(0)
 	
@@ -267,7 +306,6 @@ function widget:DrawScreenEffects()
 	glTexture(0, blurtex1)
 	glTexture(1, masktex)
 	glUseShader(maskApplyShader)
-		glUniform(haloOpacityloc, options.opacity.value)
 		glTexRect(0, 0, vsx, vsy, false, true)
 	glUseShader(0)
 	glTexture(0, false)
@@ -320,6 +358,75 @@ function widget:Initialize()
     widgetHandler:RemoveWidget()
     return false
   end
+  
+  featherShader_h = gl.CreateShader({
+    fragment = [[
+      uniform sampler2D tex0;
+      uniform float screenX;
+      uniform float thickness;
+	  
+      void main(void) {
+        vec2 texCoord  = gl_TexCoord[0].st;
+        vec4 color = texture2D(tex0, texCoord);
+        
+        for (int i = 1; i <= thickness; i++){
+			vec4 tmpcolor1 = texture2D(tex0, vec2(texCoord.s + i * screenX,texCoord.t));
+			vec4 tmpcolor2 = texture2D(tex0, vec2(texCoord.s - i * screenX,texCoord.t));
+			
+			color.r = max(color.r, max(tmpcolor1.r, tmpcolor2.r));
+			color.g = max(color.g, max(tmpcolor1.g, tmpcolor2.g));
+			color.b = max(color.b, max(tmpcolor1.b, tmpcolor2.b));
+			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
+        }
+
+        gl_FragColor = color;
+      }
+    ]],
+    uniformInt = {
+      tex0 = 0,
+    },
+  })
+
+
+  if (featherShader_h == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: hfeather shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
+
+	featherShader_v = gl.CreateShader({
+    fragment = [[
+		uniform sampler2D tex0;
+      uniform float screenY;
+      uniform float thickness;
+
+      void main(void) {
+        vec2 texCoord  = gl_TexCoord[0].st;
+        vec4 color = texture2D(tex0, texCoord);
+        
+        for (int i = 1; i <= thickness; i++){
+			vec4 tmpcolor1 = texture2D(tex0, vec2(texCoord.s,texCoord.t + i * screenY));
+			vec4 tmpcolor2 = texture2D(tex0, vec2(texCoord.s,texCoord.t - i * screenY));
+			
+			color.r = max(color.r, max(tmpcolor1.r, tmpcolor2.r));
+			color.g = max(color.g, max(tmpcolor1.g, tmpcolor2.g));
+			color.b = max(color.b, max(tmpcolor1.b, tmpcolor2.b));
+			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
+        }
+        
+        gl_FragColor = color;
+      }
+    ]],
+    uniformInt = {
+      tex0 = 0,
+    },
+  })
+
+  if (featherShader_v == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: vfeather shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
 
   blurShader_h = gl.CreateShader({
     fragment = [[
@@ -341,7 +448,7 @@ function widget:Initialize()
 				S += texture2D(texture0, C0 - vec2(r * inverseRX, 0.0)) * weight;
 				S += texture2D(texture0, C0 + vec2(r * inverseRX, 0.0)) * weight;
 
-				total_weight += weight;
+				total_weight += 2.0 * weight;
 			}
 
 			gl_FragColor = S/total_weight;
@@ -379,7 +486,7 @@ function widget:Initialize()
 				S += texture2D(texture0, C0 - vec2(0.0, r * inverseRY)) * weight;
 				S += texture2D(texture0, C0 + vec2(0.0, r * inverseRY)) * weight;
 
-				total_weight += weight;
+				total_weight += 2.0 * weight;
 			}
 
 			gl_FragColor = S/total_weight;
@@ -400,12 +507,11 @@ function widget:Initialize()
     fragment = [[
       uniform sampler2D tex0;
       uniform sampler2D tex1;
-      uniform float opacity;
 
       void main(void) {
 		vec2 coord = gl_TexCoord[0].st;
 		vec4 haloColor = texture2D(tex0, coord);
-		haloColor.a = max(haloColor.r, max(haloColor.g, haloColor.b)) * opacity;
+		haloColor.a = max(haloColor.r, max(haloColor.g, haloColor.b));
 		haloColor.a *= texture2D(tex1, coord).a;
         gl_FragColor = haloColor;
       }
@@ -422,11 +528,14 @@ function widget:Initialize()
     return false
   end
 
+  screenXloc  = gl.GetUniformLocation(featherShader_h, 'screenX')
+  screenYloc  = gl.GetUniformLocation(featherShader_v, 'screenY')
+  thkXloc  = gl.GetUniformLocation(featherShader_h, 'thickness')
+  thkYloc  = gl.GetUniformLocation(featherShader_v, 'thickness')
   invRXloc  = gl.GetUniformLocation(blurShader_h, 'inverseRX')
   invRYloc  = gl.GetUniformLocation(blurShader_v, 'inverseRY')
   radiusXloc = gl.GetUniformLocation(blurShader_h, 'fragKernelRadius')
   radiusYloc = gl.GetUniformLocation(blurShader_v, 'fragKernelRadius')
-  haloOpacityloc = gl.GetUniformLocation(maskApplyShader, 'opacity')
 
   ShowSelectionSquares(false)
 end
@@ -493,6 +602,8 @@ function widget:Shutdown()
 
 	if (gl.DeleteShader) then
 		gl.DeleteShader(maskGenShader or 0)
+		gl.DeleteShader(featherShader_h or 0)
+		gl.DeleteShader(featherShader_v or 0)
 		gl.DeleteShader(blurShader_h or 0)
 		gl.DeleteShader(blurShader_v or 0)
 		gl.DeleteShader(maskApplyShader or 0)
