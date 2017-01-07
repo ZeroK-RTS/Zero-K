@@ -4,10 +4,10 @@
 function widget:GetInfo()
   return {
     name      = "Selection BlurryHalo",
-    desc      = "Shows a halo for selected, hovered ally-selected units. (Doesn't work on ati cards!)",
-    author    = "CarRepairer, from jK's gfx_halo, modified by Shadowfury333",
-    date      = "Jan, 2008",
-    version   = "0.004",
+    desc      = "Shows a halo for selected, hovered ally-selected units.",
+    author    = "CarRepairer, from jK's gfx_halo, modified by Shadowfury333 and aeonios",
+    date      = "Jan, 2017",
+    version   = "1.0",
     license   = "GNU GPL, v2 or later",
     layer     = -11,
     enabled   = false  --  loaded by default?
@@ -23,158 +23,60 @@ local IsUnitInSelectionBox = function(unitID) return SafeWGCall(WG.PreSelection_
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local showAlly = false
-local visibleAllySelUnits = {}
-local visibleSelected = {}
-local thickness = 1.0
-
-local function UpdateHaloColors(self) end
-
 options_path = 'Settings/Interface/Selection/Blurry Halo Selections'
 
 options_order = {
-	'showally',
-	'useteamcolors',
+	'showAlly',
 	'thickness',
-
-
-	'lblPresetColors',
-	'selectColor',
-	'allySelectColor',
-	'myHoverColor',
-	'allyHoverColor',
-	'enemyHoverColor',
-	'featureHoverColor',
-
-
+	'blur',
 }
 
 options = {
-	showally = {
+	showAlly = {
 		name = 'Show Ally Selections',
 		type = 'bool',
 		desc = 'Highlight the units your allies currently have selected.',
 		value = true,
-		OnChange = function(self)
-			visibleAllySelUnits = {}
-			showAlly = self.value
-		end,
 	},
-	useteamcolors = {
-		name = 'Use Team Colors',
-		type = 'bool',
-		desc = 'Highlight your allies\' selections with their team colors instead of the preset colors.',
-		value = false,
-    noHotkey = true,
-	},
-
+	
 	thickness = {
-    name = 'Outline Thickness',
-    desc = 'How thick the outline appears around objects',
-    type = 'number',
-    min = 0.4, max = 2, step = 0.01,
-    value = 0.8,
-    OnChange = function(self) UpdateHaloColors(); end
-  },
-	-----
-
-	lblPresetColors = {type='label', name = 'Preset Colors' },
-	selectColor = {
-		name = 'Selected Units Color',
-		type = 'colors',
-		value = { 0.1, 1, 0.25, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
+		name = 'Outline Thickness',
+		desc = 'How thick the outline appears around objects',
+		type = 'number',
+		min = 1, max = 16, step = 1,
+		value = 10,
+    },
+  
+	blur = {
+		name = 'Outline Blurriness',
+		desc = 'How smooth the outlines appear',
+		type = 'number',
+		min = 2, max = 16, step = 1,
+		value = 16,
 	},
-
-	allySelectColor = {
-		name = 'Ally Selected Units Color',
-		type = 'colors',
-		value = { 1, 1, 0.25, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
-	},
-
-	myHoverColor = {
-		name = 'My Unit Hover Color',
-		type = 'colors',
-		value = { 0.3, 1, 1, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
-	},
-
-	allyHoverColor = {
-		name = 'Ally Unit Hover Color',
-		type = 'colors',
-		value = { 0.2, 0.2, 1, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
-	},
-
-	enemyHoverColor = {
-		name = 'Enemy Unit Hover Color',
-		type = 'colors',
-		value = { 1, 0.3, 0.2, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
-	},
-
-
-	featureHoverColor = {
-		name = 'Feature Hover Color',
-		type = 'colors',
-		value = { 1, 0.25, 1, 1 },
-		OnChange = function(self) UpdateHaloColors(); end
-	},
-
-
-
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
---// user var
+local blurtex1
+local blurtex2
+local masktex
 
-local gAlpha = 0.8
-
---// app var
-
-local offscreentex
-local outlinemasktex
-local blurtex
 local fbo
 
+local featherShader_h
+local featherShader_v
 local blurShader_h
 local blurShader_v
 local maskGenShader
 local maskApplyShader
-local uniformScreenX, uniformScreenY
-local uniformThicknessX, uniformThicknessY
+local invRXloc, invRYloc, screenXloc, screenYloc
+local radiusXloc, radiusYloc, thkXloc, thkYloc
+local haloOpacityloc
 
-local vsx, vsy = 0,0
-local resChanged = false
-
-
---more
-local featureHoverColor = { 1, 0, 1, 1}
-local myHoverColor 	    = { 0, 1, 1, 1 }
-local allyHoverColor 	= { 0.2, 0.2, 1, 1 }
-local enemyHoverColor   = { 1, 0, 0, 1 }
-local selectColor 	    = { 0, 1, 0, 1 }
-local allySelectColor 	= { 1, 1, 0, 1 }
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
---// gl const
-
-local GL_DEPTH_BITS = 0x0D56
-
-local GL_DEPTH_COMPONENT   = 0x1902
-local GL_DEPTH_COMPONENT16 = 0x81A5
-local GL_DEPTH_COMPONENT24 = 0x81A6
-local GL_DEPTH_COMPONENT32 = 0x81A7
-
-local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
-local GL_COLOR_ATTACHMENT1_EXT = 0x8CE1
-local GL_COLOR_ATTACHMENT2_EXT = 0x8CE2
-local GL_COLOR_ATTACHMENT3_EXT = 0x8CE3
+local vsx, vsy = 1,1
+local ivsx, ivsy = 1,1
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -191,6 +93,8 @@ local spIsUnitAllied	= Spring.IsUnitAllied
 local spIsUnitSelected	= Spring.IsUnitSelected
 local spGetMouseState	= Spring.GetMouseState
 local spTraceScreenRay	= Spring.TraceScreenRay
+local spGetCameraPosition = Spring.GetCameraPosition
+local spGetGroundHeight = Spring.GetGroundHeight
 local spGetPlayerControlledUnit		= Spring.GetPlayerControlledUnit
 local spGetVisibleUnits			= Spring.GetVisibleUnits
 local spIsUnitIcon = Spring.IsUnitIcon
@@ -201,13 +105,15 @@ local GL_MODELVIEW  = GL.MODELVIEW
 local GL_PROJECTION = GL.PROJECTION
 local GL_COLOR_BUFFER_BIT = GL.COLOR_BUFFER_BIT
 local GL_DEPTH_BUFFER_BIT = GL.DEPTH_BUFFER_BIT
+local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
+
+local glCreateTexture = gl.CreateTexture
+local glDeleteTexture = gl.DeleteTexture
 
 local glUnit            = gl.Unit
 local glFeature         = gl.Feature
-local glCopyToTexture   = gl.CopyToTexture
 local glRenderToTexture = gl.RenderToTexture
-local glCallList        = gl.CallList
-local glActiveFBO       = gl.ActiveFBO
+local glActiveFBO		= gl.ActiveFBO
 
 local glUseShader  = gl.UseShader
 local glUniform    = gl.Uniform
@@ -217,181 +123,194 @@ local glClear     = gl.Clear
 local glTexRect   = gl.TexRect
 local glColor     = gl.Color
 local glTexture   = gl.Texture
-local glCulling   = gl.Culling
 local glDepthTest = gl.DepthTest
-
-local glResetMatrices = gl.ResetMatrices
-local glMatrixMode    = gl.MatrixMode
-local glPushMatrix    = gl.PushMatrix
-local glLoadIdentity  = gl.LoadIdentity
-local glPopMatrix     = gl.PopMatrix
-local glBlending      = gl.Blending
+local glBlending  = gl.Blending
 
 local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---functions
-
-UpdateHaloColors = function(self)
-	selectColor = options.selectColor.value
-	allySelectColor = options.allySelectColor.value
-	myHoverColor = options.myHoverColor.value
-
-	allyHoverColor = options.allyHoverColor.value
-	enemyHoverColor = options.enemyHoverColor.value
-	featureHoverColor = options.featureHoverColor.value
-
-  thickness = options.thickness.value
-end
 
 local function GetVisibleUnits()
-  local units = spGetVisibleUnits(-1, 30, false)
-  local boxedUnits = GetUnitsInSelectionBox();
+	local units = spGetVisibleUnits(-1, 30, false)
+	local boxedUnits = GetUnitsInSelectionBox();
 
 	local visibleAllySelUnits = {}
-  local visibleSelected = {}
-  local visibleBoxed = {}
+	local visibleSelected = {}
+	local visibleBoxed = {}
 
-  for i=1, #units do
-    local unitID = units[i]
-    if (spIsUnitSelected(unitID)) then
-	    visibleSelected[#visibleSelected+1] = unitID
-    elseif showAlly and WG.allySelUnits and WG.allySelUnits[unitID] then
-	    visibleAllySelUnits[#visibleAllySelUnits+1] = unitID
-    end
-    if IsUnitInSelectionBox(unitID) then
-      visibleBoxed[#visibleBoxed+1] = unitID
-    end
-  end
-
-  return visibleAllySelUnits, visibleSelected, visibleBoxed
-
+	for i=1, #units do
+		local unitID = units[i]
+		if (spIsUnitSelected(unitID)) then
+			visibleSelected[#visibleSelected+1] = unitID
+		elseif options.showAlly.value and WG.allySelUnits and WG.allySelUnits[unitID] then
+			visibleAllySelUnits[spGetUnitTeam(unitID)][unitID] = true
+		end
+		if IsUnitInSelectionBox(unitID) then
+			visibleBoxed[#visibleBoxed+1] = unitID
+		end
+	end
+	return visibleAllySelUnits, visibleSelected, visibleBoxed
 end
 
 
-local function DrawHaloFunc()
-	visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
+local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
+	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+	
+	local featureHoverColor = { 1, 0, 1, 1}
+	local myHoverColor 	    = { 0, 1, 1, 1 }
+	local allyHoverColor 	= { 0.2, 0.2, 1, 1 }
+	local enemyHoverColor   = { 1, 0, 0, 1 }
+	local selectColor 	    = { 0, 1, 0, 1}
 
 	glColor(selectColor)
 	for i=1,#visibleSelected do
 		local unitID = visibleSelected[i]
 		glUnit(unitID,true,-1)
 	end
-
-	if not options.useteamcolors.value then glColor(allySelectColor) end
-	for i=1,#visibleAllySelUnits do
-		local unitID = visibleAllySelUnits[i]
-		if options.useteamcolors.value then
-			local teamID = spGetUnitTeam(unitID)
-			if teamID then
-        local r, g, b = Spring.GetTeamColor(teamID);
-				glColor(r, g, b, allySelectColor[4])
-			else
-				glColor(allySelectColor)
-			end
+	
+	for team, data in pairs(visibleAllySelUnits) do
+		local r, g, b = Spring.GetTeamColor(teamID)
+		glColor(r, g, b, 1)
+		for unitID, _ in pairs(data) do
+			glUnit(unitID,true,-1)
 		end
+	end
+
+	glColor(myHoverColor)
+	for i=1, #visibleBoxed do
+		local unitID = visibleBoxed[i]
 		glUnit(unitID,true,-1)
 	end
 
-  glColor(myHoverColor)
-  for i=1, #visibleBoxed do
-    local unitID = visibleBoxed[i]
-    glUnit(unitID,true,-1)
-  end
-
 	local mx, my = spGetMouseState()
-  local pointedType, data = spTraceScreenRay(mx, my, false, true)
-  if pointedType == 'unit' then 
-    data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
-  end
+	local pointedType, data = spTraceScreenRay(mx, my, false, true)
+	if pointedType == 'unit' then 
+		data = GetUnitUnderCursor(false) --Does minimap check and handles selection box as well
+	end
 
-	if pointedType == 'unit' and data and spValidUnitID(data) then -- and not spIsUnitIcon(data) then
-  	local teamID = spGetUnitTeam(data)
-  	if teamID == spGetMyTeamID() then
-  		glColor(myHoverColor)
-  	elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
-  		glColor(allyHoverColor)
-  	else
-  		glColor(enemyHoverColor)
-  	end
+	if pointedType == 'unit' and data and spValidUnitID(data) then
+		local teamID = spGetUnitTeam(data)
+		if teamID == spGetMyTeamID() then
+			glColor(myHoverColor)
+		elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
+			glColor(allyHoverColor)
+		else
+			glColor(enemyHoverColor)
+		end
 
-  	glUnit(data, true,-1)
-  elseif (pointedType == 'feature') and ValidFeatureID(data) then
-  	glColor(featureHoverColor)
-  	glFeature(data, true)
-  end
+		glUnit(data, true,-1)
+	elseif (pointedType == 'feature') and ValidFeatureID(data) then
+		glColor(featureHoverColor)
+		glFeature(data, true)
+	end
+	
+	glColor(1,1,1,1)
 end
 
-local DrawVisibleUnits
+local function maskGen()
+	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
+	glUseShader(maskGenShader)
+		glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+	glUseShader(0)
+end
 
-DrawVisibleUnits = DrawHaloFunc
+local function renderToTextureFunc(tex, s, t)
+	glTexture(tex)
+	glTexRect(-1 * s, -1 * t,  1 * s, 1 * t)
+	glTexture(false)
+end
 
-local MyDrawVisibleUnits = function()
-  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-  DrawVisibleUnits()
-  glColor(1,1,1,1)
-end
-local maskGen = function()
-  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-  glUseShader(maskGenShader)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
-end
-local blur_h = function()
-  glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-  glUseShader(blurShader_h)
-    glUniform(uniformThicknessX, thickness)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
-end
-local blur_v = function()
-  glUseShader(blurShader_v)
-    glUniform(uniformThicknessY, thickness)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
+local function mglRenderToTexture(FBOTex, tex, s, t)
+	glRenderToTexture(FBOTex, renderToTextureFunc, tex, s, t)
 end
 
 function widget:DrawWorldPreUnit()
-  if Spring.IsGUIHidden() then
-	return
-  end
+	if Spring.IsGUIHidden() then
+		return
+	end
 
-  glBlending(true)
-
-  if (resChanged) then
-    resChanged = false
-    if (vsx==1) or (vsy==1) then return end
-     glUseShader(blurShader_h)
-    glUniformInt(uniformScreenX,  vsx )
-     glUseShader(blurShader_v)
-    glUniformInt(uniformScreenY,  vsy )
-  end
-
-  glDepthTest(false)
-  glActiveFBO(fbo,MyDrawVisibleUnits)
-
-  glTexture(offscreentex)
-  glRenderToTexture(outlinemasktex, maskGen)
-  glRenderToTexture(blurtex, blur_h)
-  glTexture(blurtex)
-  glRenderToTexture(offscreentex, blur_v)
-
-  glBlending(false)
+	glBlending(false)
+	glDepthTest(false)
+	local visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
+	glActiveFBO(fbo, DrawSelected, visibleAllySelUnits, visibleSelected, visibleBoxed)
+	
+	glTexture(blurtex1)
+	glRenderToTexture(masktex, maskGen)
+	glTexture(false)
 end
 
 function widget:DrawScreenEffects()
-  if Spring.IsGUIHidden() then
-  return
-  end
-  glBlending(true)
-
-  glColor(1,1,1,gAlpha)
-
-  glCallList(enter2d)
-  glTexture(0, offscreentex)
-  glTexture(1, outlinemasktex)
-  glUseShader(maskApplyShader)
-  glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy) --this line breaks mearth labels
-  glCallList(leave2d)
-  glBlending(false)
+	if Spring.IsGUIHidden() then
+		return
+	end
+	
+	local x, y, z = spGetCameraPosition()
+	local _, coords = spTraceScreenRay(vsx/2, vsy/2, true)
+	if (coords) then
+		y = y - coords[2]
+	else
+		local iy = spGetGroundHeight(x, z)
+		if iy then
+			y = y - iy
+		end
+	end
+	y = math.max(1, y)
+	
+	glBlending(false)
+	
+	-- apply feathering
+	local thickness = options.thickness.value * math.min(2.0, math.max(750/y, 0.2))
+	thickness = math.max(thickness, 1)
+	glUseShader(featherShader_h)
+		glUniform(screenXloc, ivsx)
+		glUniform(thkXloc, thickness)
+		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
+	glUseShader(0)
+	
+	glUseShader(featherShader_v)
+		glUniform(screenYloc, ivsy)
+		glUniform(thkYloc, thickness)
+		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
+	glUseShader(0)
+	
+	-- apply blur over two iterations to approximate a gaussian
+	local blur = options.blur.value * math.min(2.0, math.max(750/y, 0.2))
+	blur = math.max(1, math.ceil(blur/2))
+	glUseShader(blurShader_h)
+		glUniform(invRXloc, ivsx)
+		glUniform(radiusXloc, blur)
+		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
+	glUseShader(0)
+		
+	glUseShader(blurShader_v)
+		glUniform(invRYloc, ivsy)
+		glUniform(radiusYloc, blur)
+		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
+	glUseShader(0)
+	
+	glUseShader(blurShader_h)
+		glUniform(invRXloc, ivsx)
+		glUniform(radiusXloc, blur)
+		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
+	glUseShader(0)
+		
+	glUseShader(blurShader_v)
+		glUniform(invRYloc, ivsy)
+		glUniform(radiusYloc, blur)
+		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
+	glUseShader(0)
+	
+	-- apply the halos and mask to the screen
+	glBlending(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA)
+	glTexture(0, blurtex1)
+	glTexture(1, masktex)
+	glUseShader(maskApplyShader)
+		glTexRect(0, 0, vsx, vsy, false, true)
+	glUseShader(0)
+	glTexture(0, false)
+	glTexture(1, false)
+	glBlending(false)
 end
 
 
@@ -408,26 +327,25 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---call ins
+-- initializers
 
 function widget:Initialize()
-	showAlly = options.showally.value
+	if not gl.CreateShader or not gl.CreateFBO then
+		Spring.Echo("Blurry Halo Selections: your card does not support shaders!")
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	fbo = gl.CreateFBO()
+	self:ViewResize()
 
-  if (not gl.CreateShader)or(not gl.CreateFBO) then
-    Spring.Echo("Halo widget: your card is unsupported!")
-    widgetHandler:RemoveWidget()
-    return
-  end
-
-  vsx, vsy = widgetHandler:GetViewSizes()
-
-  maskGenShader = gl.CreateShader({
+	maskGenShader = gl.CreateShader({
     fragment = [[
       uniform sampler2D tex0;
 
       void main(void) {
         vec4 color = texture2D(tex0, gl_TexCoord[0].st);
-        gl_FragColor = vec4(1.0 - ((color.r + color.g + color.b) * 255.0));
+        gl_FragColor = vec4(1.0 - max(color.r, max(color.g, color.b)));
       }
     ]],
     uniformInt = {
@@ -440,35 +358,104 @@ function widget:Initialize()
     widgetHandler:RemoveWidget()
     return false
   end
-
-  blurShader_h = gl.CreateShader({
+  
+  featherShader_h = gl.CreateShader({
     fragment = [[
       uniform sampler2D tex0;
-      uniform int screenX;
+      uniform float screenX;
       uniform float thickness;
-
+	  
       void main(void) {
-        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
-        gl_FragColor = vec4(0.0);
+        vec2 texCoord  = gl_TexCoord[0].st;
+        vec4 color = texture2D(tex0, texCoord);
+        
+        for (int i = 1; i <= thickness; i++){
+			vec4 tmpcolor1 = texture2D(tex0, vec2(texCoord.s + i * screenX,texCoord.t));
+			vec4 tmpcolor2 = texture2D(tex0, vec2(texCoord.s - i * screenX,texCoord.t));
+			
+			color.r = max(color.r, max(tmpcolor1.r, tmpcolor2.r));
+			color.g = max(color.g, max(tmpcolor1.g, tmpcolor2.g));
+			color.b = max(color.b, max(tmpcolor1.b, tmpcolor2.b));
+			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
+        }
 
-        float pixelsize = thickness/float(screenX);
-        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s + 2.0*pixelsize,texCoord.t) );
-        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s + pixelsize,texCoord.t) );
-
-        gl_FragColor += texture2D(tex0, texCoord );
-
-        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s - 1.0*pixelsize,texCoord.t) );
-        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s - 2.0*pixelsize,texCoord.t) );
-
-        gl_FragColor.rgb /= max(max(gl_FragColor.r, gl_FragColor.g), max(gl_FragColor.b, 1.0));
+        gl_FragColor = color;
       }
     ]],
     uniformInt = {
       tex0 = 0,
-      screenX = vsx,
     },
-    uniformFloat = {
-      thickness = 1.0,
+  })
+
+
+  if (featherShader_h == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: hfeather shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
+
+	featherShader_v = gl.CreateShader({
+    fragment = [[
+		uniform sampler2D tex0;
+      uniform float screenY;
+      uniform float thickness;
+
+      void main(void) {
+        vec2 texCoord  = gl_TexCoord[0].st;
+        vec4 color = texture2D(tex0, texCoord);
+        
+        for (int i = 1; i <= thickness; i++){
+			vec4 tmpcolor1 = texture2D(tex0, vec2(texCoord.s,texCoord.t + i * screenY));
+			vec4 tmpcolor2 = texture2D(tex0, vec2(texCoord.s,texCoord.t - i * screenY));
+			
+			color.r = max(color.r, max(tmpcolor1.r, tmpcolor2.r));
+			color.g = max(color.g, max(tmpcolor1.g, tmpcolor2.g));
+			color.b = max(color.b, max(tmpcolor1.b, tmpcolor2.b));
+			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
+        }
+        
+        gl_FragColor = color;
+      }
+    ]],
+    uniformInt = {
+      tex0 = 0,
+    },
+  })
+
+  if (featherShader_v == nil) then
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: vfeather shader error: "..gl.GetShaderLog())
+    widgetHandler:RemoveWidget()
+    return false
+  end
+
+  blurShader_h = gl.CreateShader({
+    fragment = [[
+		uniform sampler2D texture0;
+		uniform float inverseRX;
+		uniform float fragKernelRadius;
+		float bloomSigma = fragKernelRadius / 2.0;
+
+		void main(void) {
+			vec2 C0 = vec2(gl_TexCoord[0]);
+
+			vec4 S = texture2D(texture0, C0);
+			float weight = 1.0 / (2.50663 * bloomSigma);
+			float total_weight = weight;
+			S *= weight;
+			for (float r = 1.5; r < fragKernelRadius; r += 2.0)
+			{
+				weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
+				S += texture2D(texture0, C0 - vec2(r * inverseRX, 0.0)) * weight;
+				S += texture2D(texture0, C0 + vec2(r * inverseRX, 0.0)) * weight;
+
+				total_weight += 2.0 * weight;
+			}
+
+			gl_FragColor = S/total_weight;
+		}
+    ]],
+    uniformInt = {
+      texture0 = 0,
     },
   })
 
@@ -480,32 +467,33 @@ function widget:Initialize()
   end
 
   blurShader_v = gl.CreateShader({
-    fragment = [[      uniform sampler2D tex0;
-      uniform int screenY;
-      uniform float thickness;
+    fragment = [[
+		uniform sampler2D texture0;
+		uniform float inverseRY;
+		uniform float fragKernelRadius;
+		float bloomSigma = fragKernelRadius / 2.0;
 
-      void main(void) {
-        vec2 texCoord  = vec2(gl_TextureMatrix[0] * gl_TexCoord[0]);
-        gl_FragColor = vec4(0.0);
+		void main(void) {
+			vec2 C0 = vec2(gl_TexCoord[0]);
 
-        float pixelsize = thickness/float(screenY);
-        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t + 2.0*pixelsize) );
-        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t + pixelsize) );
+			vec4 S = texture2D(texture0, C0);
+			float weight = 1.0 / (2.50663 * bloomSigma);
+			float total_weight = weight;
+			S *= weight;
+			for (float r = 1.5; r < fragKernelRadius; r += 2.0)
+			{
+				weight = exp(-((r*r)/(2.0 * bloomSigma * bloomSigma)))/(2.50663 * bloomSigma);
+				S += texture2D(texture0, C0 - vec2(0.0, r * inverseRY)) * weight;
+				S += texture2D(texture0, C0 + vec2(0.0, r * inverseRY)) * weight;
 
-        gl_FragColor += texture2D(tex0, texCoord );
+				total_weight += 2.0 * weight;
+			}
 
-        gl_FragColor += 0.7 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 1.0*pixelsize) );
-        gl_FragColor += 0.6 * texture2D(tex0, vec2(texCoord.s,texCoord.t - 2.0*pixelsize) );
-
-        gl_FragColor.rgb /= max(max(gl_FragColor.r, gl_FragColor.g), max(gl_FragColor.b, 1.0));
-      }
+			gl_FragColor = S/total_weight;
+		}
     ]],
     uniformInt = {
-      tex0 = 0,
-      screenY = vsy,
-    },
-    uniformFloat = {
-      thickness = 1.0,
+      texture0 = 0,
     },
   })
 
@@ -521,7 +509,10 @@ function widget:Initialize()
       uniform sampler2D tex1;
 
       void main(void) {
-        gl_FragColor = texture2D(tex0, gl_TexCoord[0].st) * texture2D(tex1, gl_TexCoord[0].st);
+		vec2 coord = gl_TexCoord[0].st;
+		vec4 haloColor = texture2D(tex0, coord);
+		haloColor.a *= texture2D(tex1, coord).a;
+        gl_FragColor = haloColor;
       }
     ]],
     uniformInt = {
@@ -531,103 +522,93 @@ function widget:Initialize()
   })
 
   if (maskApplyShader == nil) then
-    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Halo selection widget: mask application shader error: "..gl.GetShaderLog())
+    Spring.Log(widget:GetInfo().name, LOG.ERROR, "Blurry Halo Selections: mask application shader error: "..gl.GetShaderLog())
     widgetHandler:RemoveWidget()
     return false
   end
 
-  uniformScreenX  = gl.GetUniformLocation(blurShader_h, 'screenX')
-  uniformScreenY  = gl.GetUniformLocation(blurShader_v, 'screenY')
-  uniformThicknessX = gl.GetUniformLocation(blurShader_h, 'thickness')
-  uniformThicknessY = gl.GetUniformLocation(blurShader_v, 'thickness')
-
-  fbo = gl.CreateFBO()
-
-  self:ViewResize(vsx,vsy)
-
-  enter2d = gl.CreateList(function()
-    glUseShader(0)
-    glMatrixMode(GL_PROJECTION); glPushMatrix(); glLoadIdentity()
-    glMatrixMode(GL_MODELVIEW);  glPushMatrix(); glLoadIdentity()
-  end)
-  leave2d = gl.CreateList(function()
-    glMatrixMode(GL_PROJECTION); glPopMatrix()
-    glMatrixMode(GL_MODELVIEW);  glPopMatrix()
-    glTexture(0, false)
-    glTexture(1, false)
-    glUseShader(0)
-  end)
-
+  screenXloc  = gl.GetUniformLocation(featherShader_h, 'screenX')
+  screenYloc  = gl.GetUniformLocation(featherShader_v, 'screenY')
+  thkXloc  = gl.GetUniformLocation(featherShader_h, 'thickness')
+  thkYloc  = gl.GetUniformLocation(featherShader_v, 'thickness')
+  invRXloc  = gl.GetUniformLocation(blurShader_h, 'inverseRX')
+  invRYloc  = gl.GetUniformLocation(blurShader_v, 'inverseRY')
+  radiusXloc = gl.GetUniformLocation(blurShader_h, 'fragKernelRadius')
+  radiusYloc = gl.GetUniformLocation(blurShader_v, 'fragKernelRadius')
 
   ShowSelectionSquares(false)
-end --init
+end
 
-function widget:ViewResize(viewSizeX, viewSizeY)
-  vsx = viewSizeX
-  vsy = viewSizeY
+function widget:ViewResize()
+	vsx, vsy = gl.GetViewSizes()
+	ivsx = 1/vsx
+	ivsy = 1/vsy
 
-  fbo.color0 = nil
+	fbo.color0 = nil
 
-  gl.DeleteTextureFBO(offscreentex or 0)
-  gl.DeleteTextureFBO(blurtex or 0)
-  gl.DeleteTextureFBO(outlinemasktex or 0)
+	gl.DeleteTextureFBO(blurtex1 or "")
+	gl.DeleteTextureFBO(blurtex2 or "")
+	gl.DeleteTextureFBO(masktex or "")
 
-  offscreentex = gl.CreateTexture(vsx,vsy, {
-    border = false,
-    min_filter = GL.LINEAR,
-    mag_filter = GL.LINEAR,
-    wrap_s = GL.CLAMP,
-    wrap_t = GL.CLAMP,
-    fbo = true,
-  })
+	blurtex1 = gl.CreateTexture(vsx,vsy, {
+		border = false,
+		min_filter = GL.LINEAR,
+		mag_filter = GL.LINEAR,
+		wrap_s = GL.CLAMP,
+		wrap_t = GL.CLAMP,
+		fbo = true,
+	})
 
-  outlinemasktex = gl.CreateTexture(vsx,vsy, {
-    border = false,
-    min_filter = GL.LINEAR,
-    mag_filter = GL.LINEAR,
-    wrap_s = GL.CLAMP,
-    wrap_t = GL.CLAMP,
-    fbo = true,
-  })
+	blurtex2 = gl.CreateTexture(vsx,vsy, {
+		border = false,
+		min_filter = GL.LINEAR,
+		mag_filter = GL.LINEAR,
+		wrap_s = GL.CLAMP,
+		wrap_t = GL.CLAMP,
+		fbo = true,
+	})
 
-  blurtex = gl.CreateTexture(math.floor(vsx*0.5),math.floor(vsy*0.5), {
-    border = false,
-    min_filter = GL.LINEAR,
-    mag_filter = GL.LINEAR,
-    wrap_s = GL.CLAMP,
-    wrap_t = GL.CLAMP,
-    fbo = true,
-  })
-
-  fbo.color0 = offscreentex
-  fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
-
-  resChanged = true
+	masktex = gl.CreateTexture(vsx, vsy, {
+		border = false,
+		min_filter = GL.LINEAR,
+		mag_filter = GL.LINEAR,
+		wrap_s = GL.CLAMP,
+		wrap_t = GL.CLAMP,
+		fbo = true,
+	})
+  
+	if not blurtex1 or not blurtex2 or not masktex then
+		Spring.Echo("Blurry Halo Selections: Failed to create offscreen textures!")
+		widgetHandler:RemoveWidget()
+		return
+	end
+	
+	fbo.color0 = blurtex1
+	fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
 end
 
 
 function widget:Shutdown()
-  if (gl.DeleteTextureFBO) then
-    gl.DeleteTextureFBO(offscreentex)
-    gl.DeleteTextureFBO(blurtex)
-    gl.DeleteTextureFBO(outlinemasktex)
-  end
+	if (gl.DeleteTextureFBO) then
+		gl.DeleteTextureFBO(blurtex1 or "")
+		gl.DeleteTextureFBO(blurtex2 or "")
+		gl.DeleteTextureFBO(masktex or "")
+	end
+	
+	if (gl.DeleteFBO) then
+		gl.DeleteFBO(fbo)
+	end
 
-  if (gl.DeleteFBO) then
-    gl.DeleteFBO(fbo or 0)
-  end
-
-  if (gl.DeleteShader) then
-    gl.DeleteShader(maskGenShader or 0)
-    gl.DeleteShader(blurShader_h or 0)
-    gl.DeleteShader(blurShader_v or 0)
-    gl.DeleteShader(maskApplyShader or 0)
-  end
-
-  gl.DeleteList(enter2d)
-  gl.DeleteList(leave2d)
-
-    ShowSelectionSquares(true)
+	if (gl.DeleteShader) then
+		gl.DeleteShader(maskGenShader or 0)
+		gl.DeleteShader(featherShader_h or 0)
+		gl.DeleteShader(featherShader_v or 0)
+		gl.DeleteShader(blurShader_h or 0)
+		gl.DeleteShader(blurShader_v or 0)
+		gl.DeleteShader(maskApplyShader or 0)
+	end
+	
+	ShowSelectionSquares(true)
 end
 
 --------------------------------------------------------------------------------
