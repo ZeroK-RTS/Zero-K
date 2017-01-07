@@ -414,10 +414,6 @@ function widget:Initialize()
 			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
         }
         
-        if (color == vec4(0.0, 0.0, 0.0, 0.0)){
-			color = vec4(0.5, 0.5, 0.5, 0.0);
-        }
-        
         gl_FragColor = color;
       }
     ]],
