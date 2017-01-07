@@ -160,6 +160,7 @@ function widget:Initialize()
 	UpdateColor()
 end
 
+-- This function is alright but other, poorly written widgets cause a massive spike when team colours change. 
 --function widget:PlayerChanged()
 --	if Spring.GetSpectatingState() then
 --		return
