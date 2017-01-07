@@ -414,6 +414,10 @@ function widget:Initialize()
 			color.a = max(color.a, max(tmpcolor1.a, tmpcolor2.a));
         }
         
+        if (color == vec4(0.0, 0.0, 0.0, 0.0)){
+			color = vec4(0.5, 0.5, 0.5, 0.0);
+        }
+        
         gl_FragColor = color;
       }
     ]],
@@ -511,7 +515,6 @@ function widget:Initialize()
       void main(void) {
 		vec2 coord = gl_TexCoord[0].st;
 		vec4 haloColor = texture2D(tex0, coord);
-		haloColor.a = max(haloColor.r, max(haloColor.g, haloColor.b));
 		haloColor.a *= texture2D(tex1, coord).a;
         gl_FragColor = haloColor;
       }
