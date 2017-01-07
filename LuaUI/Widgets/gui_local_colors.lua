@@ -160,12 +160,12 @@ function widget:Initialize()
 	UpdateColor()
 end
 
-function widget:PlayerChanged()
-	if Spring.GetSpectatingState() then
-		return
-	end
-	UpdateColor()
-end
+--function widget:PlayerChanged()
+--	if Spring.GetSpectatingState() then
+--		return
+--	end
+--	UpdateColor()
+--end
 
 function widget:Shutdown()
 	ResetOldTeamColors()
