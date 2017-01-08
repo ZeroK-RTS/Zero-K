@@ -130,9 +130,15 @@ local function GetSave(path)
 		ret = saveData
 	end)
 	if (not success) then
-		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error getting saves: " .. err)
+		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error getting save " .. path .. ": " .. err)
 	else
-		return ret
+		local engineSaveFilename = string.sub(path, 1, -5) .. ".slsf"
+		if not VFS.FileExists(engineSaveFilename) then
+			--Spring.Log(widget:GetInfo().name, LOG.ERROR, "Save " .. engineSaveFilename .. " does not exist")
+			return nil
+		else
+			return ret
+		end
 	end
 end
 
