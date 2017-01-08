@@ -138,18 +138,26 @@ local function GetVisibleUnits()
 	local visibleAllySelUnits = {}
 	local visibleSelected = {}
 	local visibleBoxed = {}
-
+	
+	
 	for i=1, #units do
 		local unitID = units[i]
 		if (spIsUnitSelected(unitID)) then
 			visibleSelected[#visibleSelected+1] = unitID
 		elseif options.showAlly.value and WG.allySelUnits and WG.allySelUnits[unitID] then
-			visibleAllySelUnits[spGetUnitTeam(unitID)][unitID] = true
+			local team = spGetUnitTeam(unitID)
+			if team then
+				if not visibleAllySelUnits[team] then
+					visibleAllySelUnits[team] = {}
+				end
+				visibleAllySelUnits[team][unitID] = true
+			end
 		end
 		if IsUnitInSelectionBox(unitID) then
 			visibleBoxed[#visibleBoxed+1] = unitID
 		end
 	end
+	
 	return visibleAllySelUnits, visibleSelected, visibleBoxed
 end
 
@@ -169,7 +177,7 @@ local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
 		glUnit(unitID,true,-1)
 	end
 	
-	for team, data in pairs(visibleAllySelUnits) do
+	for teamID, data in pairs(visibleAllySelUnits) do
 		local r, g, b = Spring.GetTeamColor(teamID)
 		glColor(r, g, b, 1)
 		for unitID, _ in pairs(data) do
