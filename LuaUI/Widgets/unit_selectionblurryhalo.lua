@@ -73,7 +73,7 @@ local maskGenShader
 local maskApplyShader
 local invRXloc, invRYloc, screenXloc, screenYloc
 local radiusXloc, radiusYloc, thkXloc, thkYloc
-local haloOpacityloc
+local haloColorloc
 
 local vsx, vsy = 1,1
 local ivsx, ivsy = 1,1
@@ -106,6 +106,7 @@ local GL_PROJECTION = GL.PROJECTION
 local GL_COLOR_BUFFER_BIT = GL.COLOR_BUFFER_BIT
 local GL_DEPTH_BUFFER_BIT = GL.DEPTH_BUFFER_BIT
 local GL_COLOR_ATTACHMENT0_EXT = 0x8CE0
+local GL_COLOR_ATTACHMENT1_EXT = 0x8CE1
 
 local glCreateTexture = gl.CreateTexture
 local glDeleteTexture = gl.DeleteTexture
@@ -163,15 +164,12 @@ end
 
 
 local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
-	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-	
 	local featureHoverColor = { 1, 0, 1, 1}
 	local myHoverColor 	    = { 0, 1, 1, 1 }
-	local allyHoverColor 	= { 0.2, 0.2, 1, 1 }
 	local enemyHoverColor   = { 1, 0, 0, 1 }
 	local selectColor 	    = { 0, 1, 0, 1}
 
-	glColor(selectColor)
+	glUniform(haloColorloc, selectColor[1], selectColor[2], selectColor[3], selectColor[4])
 	for i=1,#visibleSelected do
 		local unitID = visibleSelected[i]
 		glUnit(unitID,true,-1)
@@ -179,13 +177,13 @@ local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
 	
 	for teamID, data in pairs(visibleAllySelUnits) do
 		local r, g, b = Spring.GetTeamColor(teamID)
-		glColor(r, g, b, 1)
+		glUniform(haloColorloc, r, g, b, 1)
 		for unitID, _ in pairs(data) do
 			glUnit(unitID,true,-1)
 		end
 	end
 
-	glColor(myHoverColor)
+	glUniform(haloColorloc, myHoverColor[1], myHoverColor[2], myHoverColor[3], myHoverColor[4])
 	for i=1, #visibleBoxed do
 		local unitID = visibleBoxed[i]
 		glUnit(unitID,true,-1)
@@ -200,27 +198,18 @@ local function DrawSelected(visibleAllySelUnits, visibleSelected, visibleBoxed)
 	if pointedType == 'unit' and data and spValidUnitID(data) then
 		local teamID = spGetUnitTeam(data)
 		if teamID == spGetMyTeamID() then
-			glColor(myHoverColor)
+			glUniform(haloColorloc, myHoverColor[1], myHoverColor[2], myHoverColor[3], myHoverColor[4])
 		elseif (teamID and Spring.AreTeamsAllied(teamID, Spring.GetMyTeamID()) ) then
-			glColor(allyHoverColor)
+			glUniform(haloColorloc, myHoverColor[1], myHoverColor[2], myHoverColor[3], myHoverColor[4])
 		else
-			glColor(enemyHoverColor)
+			glUniform(haloColorloc, enemyHoverColor[1], enemyHoverColor[2], enemyHoverColor[3], enemyHoverColor[4])
 		end
 
 		glUnit(data, true,-1)
 	elseif (pointedType == 'feature') and ValidFeatureID(data) then
-		glColor(featureHoverColor)
+		glUniform(haloColorloc, featureHoverColor[1], featureHoverColor[2], featureHoverColor[3], featureHoverColor[4])
 		glFeature(data, true)
 	end
-	
-	glColor(1,1,1,1)
-end
-
-local function maskGen()
-	glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
-	glUseShader(maskGenShader)
-		glTexRect(-1-0.25/vsx,1+0.25/vsy,1+0.25/vsx,-1-0.25/vsy)
-	glUseShader(0)
 end
 
 local function renderToTextureFunc(tex, s, t)
@@ -240,12 +229,12 @@ function widget:DrawWorldPreUnit()
 
 	glBlending(false)
 	glDepthTest(false)
+	glRenderToTexture(blurtex1, glClear, GL_COLOR_BUFFER_BIT,0,0,0,0)
+	glRenderToTexture(masktex, glClear, GL_COLOR_BUFFER_BIT,1,1,1,1)
 	local visibleAllySelUnits, visibleSelected, visibleBoxed = GetVisibleUnits()
-	glActiveFBO(fbo, DrawSelected, visibleAllySelUnits, visibleSelected, visibleBoxed)
-	
-	glTexture(blurtex1)
-	glRenderToTexture(masktex, maskGen)
-	glTexture(false)
+	glUseShader(maskGenShader)
+		glActiveFBO(fbo, DrawSelected, visibleAllySelUnits, visibleSelected, visibleBoxed)
+	glUseShader(0)
 end
 
 function widget:DrawScreenEffects()
@@ -349,16 +338,13 @@ function widget:Initialize()
 
 	maskGenShader = gl.CreateShader({
     fragment = [[
-      uniform sampler2D tex0;
+      uniform vec4 color;
 
       void main(void) {
-        vec4 color = texture2D(tex0, gl_TexCoord[0].st);
-        gl_FragColor = vec4(1.0 - max(color.r, max(color.g, color.b)));
+        gl_FragData[0] = color;
+        gl_FragData[1] = vec4(0.0, 0.0, 0.0, 0.0);
       }
     ]],
-    uniformInt = {
-      tex0 = 0,
-    },
   })
 
   if (maskGenShader == nil) then
@@ -543,6 +529,7 @@ function widget:Initialize()
   invRYloc  = gl.GetUniformLocation(blurShader_v, 'inverseRY')
   radiusXloc = gl.GetUniformLocation(blurShader_h, 'fragKernelRadius')
   radiusYloc = gl.GetUniformLocation(blurShader_v, 'fragKernelRadius')
+  haloColorloc = gl.GetUniformLocation(maskGenShader, 'color')
 
   ShowSelectionSquares(false)
 end
@@ -592,7 +579,8 @@ function widget:ViewResize()
 	end
 	
 	fbo.color0 = blurtex1
-	fbo.drawbuffers = GL_COLOR_ATTACHMENT0_EXT
+	fbo.color1 = masktex
+	fbo.drawbuffers = {GL_COLOR_ATTACHMENT0_EXT, GL_COLOR_ATTACHMENT1_EXT}
 end
 
 
