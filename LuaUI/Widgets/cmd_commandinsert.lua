@@ -109,13 +109,13 @@ local function ProcessCommand(id, params, options, sequence_order)
 		if options.alt or alt then
 			opt = opt + CMD.OPT_ALT
 		end
-	if options.ctrl or ctrl then
-		if id == CMD.REPAIR then
-			opt = opt + CMD.OPT_META
-		else
-			opt = opt + CMD.OPT_CTRL
+		if options.ctrl or ctrl then
+			if id == CMD.REPAIR then
+				opt = opt + CMD.OPT_META
+			else
+				opt = opt + CMD.OPT_CTRL
+			end
 		end
-	end
 		if options.right then 
 			opt = opt + CMD.OPT_RIGHT 
 		end
