@@ -273,19 +273,7 @@ function widget:DrawScreenEffects()
 	
 	-- apply blur over two iterations to approximate a gaussian
 	local blur = options.blur.value * math.min(2.0, math.max(750/y, 0.2))
-	blur = math.max(1, math.ceil(blur/2))
-	glUseShader(blurShader_h)
-		glUniform(invRXloc, ivsx)
-		glUniform(radiusXloc, blur)
-		mglRenderToTexture(blurtex2, blurtex1, 1, -1)
-	glUseShader(0)
-		
-	glUseShader(blurShader_v)
-		glUniform(invRYloc, ivsy)
-		glUniform(radiusYloc, blur)
-		mglRenderToTexture(blurtex1, blurtex2, 1, -1)
-	glUseShader(0)
-	
+	blur = math.max(1, blur)
 	glUseShader(blurShader_h)
 		glUniform(invRXloc, ivsx)
 		glUniform(radiusXloc, blur)
