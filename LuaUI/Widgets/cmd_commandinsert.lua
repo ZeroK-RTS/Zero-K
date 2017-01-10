@@ -20,6 +20,9 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
+local shift_table = {"shift"}
+local alt_table = {"alt"}
+
 --[[
 -- use this for debugging:
 function table.val_to_str ( v )
@@ -59,7 +62,6 @@ function table.tostring( tbl )
 end
 --]]
 
-
 local function GetUnitOrFeaturePosition(id)
 	if id <= Game.maxUnits then
 		return Spring.GetUnitPosition(id)
@@ -83,46 +85,48 @@ end
 
 local function ProcessCommand(id, params, options, sequence_order)
 	local alt, ctrl, meta, shift = Spring.GetModKeyState() 
-	--must use this because "options" table turn into different format when right + click. Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 (options in online game coded different than in local game)
+	-- Must use this because "options" table turn into different format when right + click. 
+	-- Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 
+	-- (options in online game coded different than in local game)
 	if (ctrl) and not (meta) and id == CMD.REPAIR then
 		local opt = 0
 		if options.alt or alt then 
-			opt = opt  +  CMD.OPT_ALT 
+			opt = opt + CMD.OPT_ALT 
 		end
-		opt = opt  +  CMD.OPT_META
+		opt = opt + CMD.OPT_META
 		if options.right then 
-			opt = opt  +  CMD.OPT_RIGHT 
+			opt = opt + CMD.OPT_RIGHT 
 		end
 		if options.shift or shift then 
-			opt = opt  +  CMD.OPT_SHIFT
+			opt = opt + CMD.OPT_SHIFT
 		end
 		Spring.GiveOrder(id, params, opt)
 		return true
 	end
 	if (meta) then
 		local opt = 0
-		local insertfront=false
+		local insertfront = false
 		if options.alt or alt then
-			opt = opt  +  CMD.OPT_ALT
+			opt = opt + CMD.OPT_ALT
 		end
 	if options.ctrl or ctrl then
 		if id == CMD.REPAIR then
-			opt = opt  +  CMD.OPT_META
+			opt = opt + CMD.OPT_META
 		else
-			opt = opt  +  CMD.OPT_CTRL
+			opt = opt + CMD.OPT_CTRL
 		end
 	end
 		if options.right then 
-			opt = opt  +  CMD.OPT_RIGHT 
+			opt = opt + CMD.OPT_RIGHT 
 		end
 		if options.shift or shift then 
-			opt = opt  +  CMD.OPT_SHIFT
+			opt = opt + CMD.OPT_SHIFT
 		else
-			Spring.GiveOrder(CMD.INSERT,{sequence_order or 0,id,opt,unpack(params)},{"alt"})
+			Spring.GiveOrder(CMD.INSERT, {sequence_order or 0, id, opt, unpack(params)}, alt_table)
 			return true
 		end
 		
-		-- Spring.GiveOrder(CMD.INSERT,{0,id,opt,unpack(params)},{"alt"})
+		-- Spring.GiveOrder(CMD.INSERT, {0, id, opt, unpack(params)}, alt_table)
 		local my_command ={["id"] = id, ["params"] = params}
 		local cx,cy,cz = GetCommandPos(my_command)
 		if cx < -1 then
@@ -157,9 +161,9 @@ local function ProcessCommand(id, params, options, sequence_order)
 				--options.meta=nil
 				--options.shift=true
 				--Spring.GiveOrderToUnit(unit_id,id,params,options)
-				Spring.GiveOrderToUnit(unit_id,id,params, {"shift"})
-			else	 
-				Spring.GiveOrderToUnit(unit_id,CMD.INSERT, {insert_pos - 1  +  (sequence_order or 0), id, opt, unpack(params)}, {"alt"})
+				Spring.GiveOrderToUnit(unit_id, id, params, shift_table)
+			else
+				Spring.GiveOrderToUnit(unit_id, CMD.INSERT, {insert_pos - 1 + (sequence_order or 0), id, opt, unpack(params)}, alt_table)
 			end
 		end
 		return true
@@ -171,7 +175,6 @@ function widget:CommandNotify(id, params, options)
 	return ProcessCommand(id, params, options)
 end
 
-local shift_table = {"shift"}
 function WG.CommandInsert(id, params, options, seq)
 	if not ProcessCommand(id, params, options, seq) then
 		Spring.GiveOrder(id, params, (seq or 0) > 0 and shift_table or options)
