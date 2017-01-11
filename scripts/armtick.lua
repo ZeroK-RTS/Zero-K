@@ -228,6 +228,10 @@ function StopMoving()
 	StartThread(Burrow)
 end
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)

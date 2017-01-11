@@ -9,6 +9,18 @@ local oneClickWepDefNames = {
 	hoverdepthcharge = {
 		{ functionToCall = "ShootDepthcharge", reloadTime = 256, name = "Drop Depthcharge", tooltip = "Drops a depthchage.", weaponToReload = 1, texture = "LuaUI/Images/Commands/Bold/dgun.png",},
 	},
+	armtick = {
+		{ functionToCall = "Detonate", reloadTime = 256, name = "Detonate", tooltip = "Detonate selected bomb units.", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
+	corroach = {
+		{ functionToCall = "Detonate", reloadTime = 256, name = "Detonate", tooltip = "Detonate selected bomb units.", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
+	corsktl = {
+		{ functionToCall = "Detonate", reloadTime = 256, name = "Detonate", tooltip = "Detonate selected bomb units.", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
+	blastwing = {
+		{ functionToCall = "Detonate", reloadTime = 256, name = "Detonate", tooltip = "Detonate selected bomb units.", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/detonate.png",},
+	},
 	--[[
 	logkoda = {
 		{ functionToCall = "FlameTrail", reloadTime = 850, name = "Flame Trail", tooltip = "Leave a path of flame in your wake", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
