@@ -6,9 +6,9 @@ function gadget:GetInfo()
 	return {
 		name     = "Nano Frame Rate Limit",
 		desc     = "Limits the rate at which constructors (not factories or carriers) can make nanoframes.",
-		author	 = "GoogleFrog",
+		author   = "GoogleFrog",
 		date     = "January 10, 2017",
-		license	 = "GNU GPL, v2 or later",
+		license  = "GNU GPL, v2 or later",
 		layer    = -10,
 		enabled  = true
 	}
@@ -18,7 +18,7 @@ end
 --------------------------------------------------------------------------------
 
 if (not gadgetHandler:IsSyncedCode()) then
-	return false	--	no unsynced code
+	return false -- no unsynced code
 end
 
 --------------------------------------------------------------------------------

@@ -8,7 +8,7 @@ function widget:GetInfo()
 		desc = "[v" .. version .. "] Allow you to add command into existing queue. Based on FrontInsert by jK" ..
 		  "\n• SPACEBAR + SHIFT insert command to arbitrary places in queue." ..
 		  "\n• SPACEBAR insert command in front of queue.",
-		author = "dizekat",
+		author = "dizekat, GoogleFrog (structure block order)",
 		date = "Jan,2008", --16 October 2013
 		license = "GNU GPL, v2 or later",
 		layer = 5,
@@ -62,6 +62,13 @@ function table.tostring( tbl )
 end
 --]]
 
+-- Place the structure commands in the order issued by the user.
+local structureSquenceCount
+
+-- Use the first position in a block of structure commands as the command position
+-- to keep the block together.
+local structOverrideX, structOverrideY, structOverrideZ
+
 local function GetUnitOrFeaturePosition(id)
 	if id <= Game.maxUnits then
 		return Spring.GetUnitPosition(id)
@@ -74,9 +81,9 @@ local function GetCommandPos(command) -- get the command position
 	if command.id < 0 or command.id == CMD.MOVE or command.id == CMD.REPAIR or command.id == CMD.RECLAIM or 
 			command.id == CMD.RESURRECT or command.id == CMD.MANUALFIRE or command.id == CMD.GUARD or 
 			command.id == CMD.FIGHT or command.id == CMD.ATTACK or command.id == CMD_JUMP or command.id == CMD_LEVEL then
-		if table.getn(command.params) >= 3 then
+		if #command.params >= 3 then
 			return command.params[1], command.params[2], command.params[3]
-		elseif table.getn(command.params) >= 1 then
+		elseif #command.params >= 1 then
 			return GetUnitOrFeaturePosition(command.params[1])
 		end	
 	end
@@ -88,6 +95,24 @@ local function ProcessCommand(id, params, options, sequence_order)
 	-- Must use this because "options" table turn into different format when right + click. 
 	-- Similar problem with different trigger see: https://code.google.com/p/zero-k/issues/detail?id=1824 
 	-- (options in online game coded different than in local game)
+	
+	local cx, cy, cz -- command position
+	local setPositionOverride = false
+	
+	-- Structure block checking
+	if shift and id < 0 then
+		-- If the command is possibly part of a block of structures
+		if structureSquenceCount then
+			structureSquenceCount = structureSquenceCount + 1
+			cx, cy, cz = structOverrideX, structOverrideY, structOverrideZ
+		else
+			setPositionOverride = true
+			structureSquenceCount = 0
+		end
+		sequence_order = structureSquenceCount + (sequence_order or 0)
+	end
+	
+	-- Redefine the way in which modifiers apply to Repair
 	if (ctrl) and not (meta) and id == CMD.REPAIR then
 		local opt = 0
 		if options.alt or alt then 
@@ -103,6 +128,8 @@ local function ProcessCommand(id, params, options, sequence_order)
 		Spring.GiveOrder(id, params, opt)
 		return true
 	end
+	
+	-- Command insert
 	if (meta) then
 		local opt = 0
 		local insertfront = false
@@ -126,41 +153,45 @@ local function ProcessCommand(id, params, options, sequence_order)
 			return true
 		end
 		
-		-- Spring.GiveOrder(CMD.INSERT, {0, id, opt, unpack(params)}, alt_table)
-		local my_command ={["id"] = id, ["params"] = params}
-		local cx,cy,cz = GetCommandPos(my_command)
+		local my_command = {["id"] = id, ["params"] = params}
+		if not cx then
+			-- cx has a value if it has been overridden
+			cx, cy, cz = GetCommandPos(my_command)
+		end
+		--Spring.Echo("cx, cy, cz", cx, cy, cz)
+		if setPositionOverride then
+			structOverrideX, structOverrideY, structOverrideZ = cx, cy, cz
+		end
 		if cx < -1 then
 			return false
 		end
 		
+		-- Insert the command at the appropriate spot in each selected units queue.
 		local units = Spring.GetSelectedUnits()
 		for i, unit_id in ipairs(units) do
 			local commands = Spring.GetCommandQueue(unit_id, -1)
 			local px,py,pz = Spring.GetUnitPosition(unit_id)
 			local min_dlen = 1000000
-			local insert_tag = 0
 			local insert_pos = 0
-			for j=1, #commands do
+			for j = 1, #commands do
 				local command = commands[j]
 				--Spring.Echo("cmd:"..table.tostring(command))
-				local px2,py2,pz2 = GetCommandPos(command)
-				if px2>-1 then
+				local px2, py2, pz2 = GetCommandPos(command)
+				if px2 > -1 then
+					-- dlen is the change in travel distance if the command is inserted at this position.
 					local dlen = math.sqrt(((px2-cx)^2) + ((py2-cy)^2) + ((pz2-cz)^2)) + math.sqrt(((px-cx)^2) + ((py-cy)^2) + ((pz-cz)^2)) - math.sqrt((((px2-px)^2) + ((py2-py)^2) + ((pz2-pz)^2)))
-					--Spring.Echo("dlen "..dlen)
+					--Spring.Echo("dlen", #commands, dlen, min_dlen, px, py, pz, px2, py2, pz2, cx, cy, cz)
 					if dlen < min_dlen then
 						min_dlen = dlen
-						insert_tag = command.tag
 						insert_pos = j
 					end
-					px,py,pz = px2,py2,pz2
+					px, py, pz = px2, py2, pz2
 				end	 
 			end
 			-- check for insert at end of queue if its shortest walk.
 			local dlen = math.sqrt(((px-cx)^2) + ((py-cy)^2) + ((pz-cz)^2))
-			if dlen<min_dlen then
-				--options.meta=nil
-				--options.shift=true
-				--Spring.GiveOrderToUnit(unit_id,id,params,options)
+			--Spring.Echo("insert_pos", insert_pos, sequence_order, dlen, min_dlen)
+			if dlen < min_dlen then
 				Spring.GiveOrderToUnit(unit_id, id, params, shift_table)
 			else
 				Spring.GiveOrderToUnit(unit_id, CMD.INSERT, {insert_pos - 1 + (sequence_order or 0), id, opt, unpack(params)}, alt_table)
@@ -169,7 +200,13 @@ local function ProcessCommand(id, params, options, sequence_order)
 		return true
 	end
 	return false
-end 
+end
+
+function widget:Update()
+	if structureSquenceCount then
+		structureSquenceCount = nil
+	end
+end
 
 function widget:CommandNotify(id, params, options)
 	return ProcessCommand(id, params, options)
