@@ -454,26 +454,17 @@ function gadget:UnitDestroyed(oldUnitID, unitDefID)
 	end
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return true
-end
-
-local boolDef = {}
-for udid,_ in pairs(jumpDefs) do
-	boolDef[udid] = true
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
-	return boolDef
-end
-
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	if (jumpDefs[unitDefID].noJumpHandling) then 
-		return true
-	end
-	
+
 	if cmdID == CMD.INSERT and cmdParams[2] == CMD_JUMP then
 		return gadget:AllowCommand(unitID, unitDefID, teamID, CMD_JUMP, {cmdParams[4], cmdParams[5], cmdParams[6]}, cmdParams[3])
+	end
+	
+	if ((not jumpDefs[unitDefID]) or jumpDefs[unitDefID].noJumpHandling) then 
+		if cmdID == CMD_JUMP then
+			return false
+		end
+		return true
 	end
 	
 	if cmdID == CMD_JUMP and cmdParams[3] then
