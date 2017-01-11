@@ -363,7 +363,7 @@ function gadget:DrawGenesis()
 				local sx = square.x
 				local sz = square.z
 				if not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
-					gl.GenerateMipmap("!" .. mapTex[sx][sz].cur)
+					gl.GenerateMipmap(mapTex[sx][sz].cur)
 					spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
 					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
 					updatedSquareMap[sx] = updatedSquareMap[sx] or {}
