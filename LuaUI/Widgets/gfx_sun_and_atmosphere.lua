@@ -114,6 +114,7 @@ local function GetOptions()
 				end
 			end,
 			advanced = true,
+			developmentOnly = true,
 			path = path
 		}
 		options_order[#options_order + 1] = name
@@ -132,6 +133,7 @@ local function GetOptions()
 				end
 			end,
 			advanced = true,
+			developmentOnly = true,
 			path = path
 		}
 		options_order[#options_order + 1] = name
