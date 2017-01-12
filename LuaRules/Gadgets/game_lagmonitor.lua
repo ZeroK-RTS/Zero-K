@@ -351,5 +351,13 @@ function externalFunctions.GetResourceShares()
 end
 
 function gadget:Initialize()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local allyTeamID = select(6, spGetTeamInfo(teamID))
+		teamResourceShare[teamID] = 1
+		allyTeamResourceShares[allyTeamID] = (allyTeamResourceShares[allyTeamID] or 0) + 1
+	end
+
 	GG.Lagmonitor = externalFunctions
 end
