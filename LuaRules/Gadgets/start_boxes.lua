@@ -199,7 +199,7 @@ function gadget:Initialize()
 			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
-					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)
+					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID, {public=true})
 				end
 			end
 		end
@@ -218,7 +218,7 @@ function gadget:Initialize()
 			if startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
-					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)
+					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID,  {public=true})
 				end
 			end
 		end
@@ -238,7 +238,7 @@ function gadget:Initialize()
 			if boxID and startboxConfig[boxID] then
 				local teamList = Spring.GetTeamList(allyTeamID) or {}
 				for j = 1, #teamList do
-					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID)
+					Spring.SetTeamRulesParam(teamList[j], "start_box_id", boxID,  {public=true})
 				end
 			end
 		end
