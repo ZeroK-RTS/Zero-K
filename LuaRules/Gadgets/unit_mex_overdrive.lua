@@ -943,6 +943,12 @@ end
 local lastTeamOverdriveSpending = {}
 
 function gadget:GameFrame(n)
+	
+	if not (GG.Lagmonitor and GG.Lagmonitor.GetActiveTeams) then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
+	end
+	local teamActivity = GG.Lagmonitor.GetActiveTeams()
+	
 	if (n%TEAM_SLOWUPDATE_RATE == 1) then
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
@@ -1218,188 +1224,184 @@ function gadget:GameFrame(n)
 			end
 
 			--// Share Overdrive Metal
-			if GG.Lagmonitor_activeTeams then
-				local activeTeams = GG.Lagmonitor_activeTeams[allyTeamID]
-				local activeCount = activeTeams.count or 1
-				local summedBaseMetalAfterPrivate = summedBaseMetal
+			local activeTeams = teamActivity[allyTeamID]
+			local activeCount = activeTeams.count or 1
+			local summedBaseMetalAfterPrivate = summedBaseMetal
 
-				-- Extra base share from mex production
-				for i = 1, allyTeamData.teams do  -- calculate active team OD sum
-					local teamID = allyTeamData.team[i]
-					if privateBaseMetal[teamID] then
-						summedBaseMetalAfterPrivate = summedBaseMetalAfterPrivate - privateBaseMetal[teamID]
-					end
+			-- Extra base share from mex production
+			for i = 1, allyTeamData.teams do  -- calculate active team OD sum
+				local teamID = allyTeamData.team[i]
+				if privateBaseMetal[teamID] then
+					summedBaseMetalAfterPrivate = summedBaseMetalAfterPrivate - privateBaseMetal[teamID]
 				end
+			end
 
-				--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
+			--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
 
-				sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
+			sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
 
-				-- Payback from energy production
+			-- Payback from energy production
 
-				local summedOverdriveMetalAfterPayback = summedOverdrive
-				local teamPaybackOD = {}
-				if enableEnergyPayback then
-					for i = 1, allyTeamData.teams do
-						local teamID = allyTeamData.team[i]
-						if activeTeams[teamID] > 0 then
-							local te = teamEnergy[teamID]
-							teamPaybackOD[teamID] = 0
+			local summedOverdriveMetalAfterPayback = summedOverdrive
+			local teamPaybackOD = {}
+			if enableEnergyPayback then
+				for i = 1, allyTeamData.teams do
+					local teamID = allyTeamData.team[i]
+					if activeTeams[teamID] > 0 then
+						local te = teamEnergy[teamID]
+						teamPaybackOD[teamID] = 0
 
-							local paybackInfo = teamPayback[teamID]
-							if paybackInfo then
-								local data = paybackInfo.data
-								local toRemove = paybackInfo.toRemove
-								local j = 1
-								while j <= paybackInfo.count do
-									local unitID = data[j].unitID
-									local removeNow = toRemove[unitID]
+						local paybackInfo = teamPayback[teamID]
+						if paybackInfo then
+							local data = paybackInfo.data
+							local toRemove = paybackInfo.toRemove
+							local j = 1
+							while j <= paybackInfo.count do
+								local unitID = data[j].unitID
+								local removeNow = toRemove[unitID]
 
-									if not removeNow then
-										if spValidUnitID(unitID) then
-											local inc = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
-											if inc > 0 then
-												local repayRatio = data[j].repaid/data[j].cost
-												if repayRatio < 1 then
-													local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
-													data[j].repaid = data[j].repaid + repayMetal
-													summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
-													teamPaybackOD[teamID] = teamPaybackOD[teamID] + repayMetal
-													paybackInfo.metalDueOD = paybackInfo.metalDueOD - repayMetal
-													--Spring.Echo("Repaid " .. data[j].repaid)
-												else
-													removeNow = true
-												end
+								if not removeNow then
+									if spValidUnitID(unitID) then
+										local inc = spGetUnitRulesParam(unitID, "current_energyIncome") or 0
+										if inc > 0 then
+											local repayRatio = data[j].repaid/data[j].cost
+											if repayRatio < 1 then
+												local repayMetal = inc/allyTeamEnergyIncome * summedOverdrive * paybackFactorFunction(repayRatio)
+												data[j].repaid = data[j].repaid + repayMetal
+												summedOverdriveMetalAfterPayback = summedOverdriveMetalAfterPayback - repayMetal
+												teamPaybackOD[teamID] = teamPaybackOD[teamID] + repayMetal
+												paybackInfo.metalDueOD = paybackInfo.metalDueOD - repayMetal
+												--Spring.Echo("Repaid " .. data[j].repaid)
+											else
+												removeNow = true
 											end
-										else
-											-- This should never happen in theory
-											removeNow = true
 										end
-									end
-
-									if removeNow then
-										paybackInfo.metalDueOD = paybackInfo.metalDueOD + data[j].repaid - data[j].cost
-										data[j] = data[paybackInfo.count]
-										if toRemove[unitID] then
-											toRemove[unitID] = nil
-										end
-										data[paybackInfo.count] = nil
-										paybackInfo.count = paybackInfo.count - 1
 									else
-										j = j + 1
+										-- This should never happen in theory
+										removeNow = true
 									end
 								end
-							end
-						end
-					end
-				end
-				
-				-- Make changes to team resources
-				local shareToSend = {}
-				local metalStorageToSet = {}
-				local totalToShare = 0
-				local freeSpace = {}
-				local totalFreeSpace = 0
-				local totalMetalIncome = {}
-				for i = 1, allyTeamData.teams do
-					local teamID = allyTeamData.team[i]
-					local te = teamEnergy[teamID]
 
-					--// Energy
-					-- Inactive teams still interact normally with energy for a few reasons:
-					-- * Energy shared to them would disappear otherwise.
-					-- * If they have reclaim (somehow) then they could build up storage without sharing.
-					if te.overdriveEnergyNet + te.inc > 0 then
-						spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
-						lastTeamOverdriveSpending[teamID] = 0
-					elseif te.overdriveEnergyNet + te.inc < 0 then
-						spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
-						lastTeamOverdriveSpending[teamID] = -(te.overdriveEnergyNet + te.inc)
-					end
-
-					-- Metal
-					local odShare = 0
-					local baseShare = 0
-					local miscShare = 0
-
-					local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
-
-					local share = ((activeTeams[teamID] > 0) and activeTeams[teamID]) or ((activeCount == 0) and 1) or 0
-					if share > 0 then
-						odShare = ((share * summedOverdriveMetalAfterPayback / metalSplit) + (teamPaybackOD[teamID] or 0)) or 0
-						baseShare = ((share * summedBaseMetalAfterPrivate / metalSplit) + (privateBaseMetal[teamID] or 0)) or 0
-						miscShare = share * allyTeamMiscMetalIncome / metalSplit
-					end
-
-					sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
-
-					local mCurr, mStor = spGetTeamResources(teamID, "metal")
-					mStor = mStor - HIDDEN_STORAGE
-					
-					if mCurr > mStor then
-						shareToSend[i] = mCurr - mStor
-						metalStorageToSet[i] = mStor
-						totalToShare = totalToShare + shareToSend[i]
-					end
-					
-					local metalIncome = odShare + baseShare + miscShare
-					if mCurr + metalIncome < mStor then
-						freeSpace[i] = mStor - (mCurr + metalIncome)
-						totalFreeSpace = totalFreeSpace + freeSpace[i]
-					end
-					
-					totalMetalIncome[i] = metalIncome
-					--Spring.Echo(teamID .. " got odShare " .. odShare)
-					SetTeamEconomyRulesParams(
-						teamID, metalSplit, -- TeamID of the team as well as number of active allies.
-
-						summedBaseMetal, -- AllyTeam base metal extrator income
-						summedOverdrive, -- AllyTeam overdrive income
-						allyTeamMiscMetalIncome, -- AllyTeam constructor income
-
-						allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
-						overdriveEnergySpending, -- AllyTeam energy spent on overdrive
-						energyWasted, -- AllyTeam energy excess
-
-						baseShare, -- Team share of base metal extractor income
-						odShare, -- Team share of overdrive income
-						miscShare, -- Team share of constructor metal income
-
-						te.inc, -- Non-reclaim energy income for the team
-						te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
-						te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
-					)
-				end
-				
-				if totalToShare ~= 0 then
-					local excessFactor = 1 - math.min(1, totalFreeSpace/totalToShare)
-					local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
-					for i = 1, allyTeamData.teams do
-						if shareToSend[i] then
-							local sendID = allyTeamData.team[i]
-								
-							for j = 1, allyTeamData.teams do
-								if freeSpace[j] then
-									local recieveID = allyTeamData.team[j]
-									Spring.ShareTeamResource(sendID, recieveID, "metal", shareToSend[i] * freeSpace[j] * shareFactorPerSpace)
+								if removeNow then
+									paybackInfo.metalDueOD = paybackInfo.metalDueOD + data[j].repaid - data[j].cost
+									data[j] = data[paybackInfo.count]
+									if toRemove[unitID] then
+										toRemove[unitID] = nil
+									end
+									data[paybackInfo.count] = nil
+									paybackInfo.count = paybackInfo.count - 1
+								else
+									j = j + 1
 								end
 							end
-							if excessFactor ~= 0 and GG.EndgameGraphs then
-								GG.EndgameGraphs.AddTeamMetalExcess(sendID, shareToSend[i] * excessFactor)
-							end
 						end
 					end
 				end
-				
-				for i = 1, allyTeamData.teams do
-					local teamID = allyTeamData.team[i]
-					if metalStorageToSet[i] then
-						Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
-					end
-					spAddTeamResource(teamID, "m", totalMetalIncome[i])
+			end
+			
+			-- Make changes to team resources
+			local shareToSend = {}
+			local metalStorageToSet = {}
+			local totalToShare = 0
+			local freeSpace = {}
+			local totalFreeSpace = 0
+			local totalMetalIncome = {}
+			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
+				local te = teamEnergy[teamID]
+
+				--// Energy
+				-- Inactive teams still interact normally with energy for a few reasons:
+				-- * Energy shared to them would disappear otherwise.
+				-- * If they have reclaim (somehow) then they could build up storage without sharing.
+				if te.overdriveEnergyNet + te.inc > 0 then
+					spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
+					lastTeamOverdriveSpending[teamID] = 0
+				elseif te.overdriveEnergyNet + te.inc < 0 then
+					spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
+					lastTeamOverdriveSpending[teamID] = -(te.overdriveEnergyNet + te.inc)
 				end
-			else
-				Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
+
+				-- Metal
+				local odShare = 0
+				local baseShare = 0
+				local miscShare = 0
+
+				local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
+
+				local share = ((activeTeams[teamID] > 0) and activeTeams[teamID]) or ((activeCount == 0) and 1) or 0
+				if share > 0 then
+					odShare = ((share * summedOverdriveMetalAfterPayback / metalSplit) + (teamPaybackOD[teamID] or 0)) or 0
+					baseShare = ((share * summedBaseMetalAfterPrivate / metalSplit) + (privateBaseMetal[teamID] or 0)) or 0
+					miscShare = share * allyTeamMiscMetalIncome / metalSplit
+				end
+
+				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
+
+				local mCurr, mStor = spGetTeamResources(teamID, "metal")
+				mStor = mStor - HIDDEN_STORAGE
+				
+				if mCurr > mStor then
+					shareToSend[i] = mCurr - mStor
+					metalStorageToSet[i] = mStor
+					totalToShare = totalToShare + shareToSend[i]
+				end
+				
+				local metalIncome = odShare + baseShare + miscShare
+				if mCurr + metalIncome < mStor then
+					freeSpace[i] = mStor - (mCurr + metalIncome)
+					totalFreeSpace = totalFreeSpace + freeSpace[i]
+				end
+				
+				totalMetalIncome[i] = metalIncome
+				--Spring.Echo(teamID .. " got odShare " .. odShare)
+				SetTeamEconomyRulesParams(
+					teamID, metalSplit, -- TeamID of the team as well as number of active allies.
+
+					summedBaseMetal, -- AllyTeam base metal extrator income
+					summedOverdrive, -- AllyTeam overdrive income
+					allyTeamMiscMetalIncome, -- AllyTeam constructor income
+
+					allyTeamEnergyIncome, -- AllyTeam total energy income (everything)
+					overdriveEnergySpending, -- AllyTeam energy spent on overdrive
+					energyWasted, -- AllyTeam energy excess
+
+					baseShare, -- Team share of base metal extractor income
+					odShare, -- Team share of overdrive income
+					miscShare, -- Team share of constructor metal income
+
+					te.inc, -- Non-reclaim energy income for the team
+					te.overdriveEnergyNet, -- Amount of energy spent or recieved due to overdrive and income
+					te.overdriveEnergyNet + te.inc -- real change in energy due to overdrive
+				)
+			end
+			
+			if totalToShare ~= 0 then
+				local excessFactor = 1 - math.min(1, totalFreeSpace/totalToShare)
+				local shareFactorPerSpace = (1 - excessFactor)/totalFreeSpace
+				for i = 1, allyTeamData.teams do
+					if shareToSend[i] then
+						local sendID = allyTeamData.team[i]
+							
+						for j = 1, allyTeamData.teams do
+							if freeSpace[j] then
+								local recieveID = allyTeamData.team[j]
+								Spring.ShareTeamResource(sendID, recieveID, "metal", shareToSend[i] * freeSpace[j] * shareFactorPerSpace)
+							end
+						end
+						if excessFactor ~= 0 and GG.EndgameGraphs then
+							GG.EndgameGraphs.AddTeamMetalExcess(sendID, shareToSend[i] * excessFactor)
+						end
+					end
+				end
+			end
+			
+			for i = 1, allyTeamData.teams do
+				local teamID = allyTeamData.team[i]
+				if metalStorageToSet[i] then
+					Spring.SetTeamResource(teamID, "metal", metalStorageToSet[i])
+				end
+				spAddTeamResource(teamID, "m", totalMetalIncome[i])
 			end
 		end
 	end

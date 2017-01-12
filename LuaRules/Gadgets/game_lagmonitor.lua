@@ -38,8 +38,7 @@ local oldAllyTeam = {} -- allyTeam which player was on last frame
 local factories = {}
 local transferredFactories = {} -- unitDef and health states of the unit that was being produced be the transferred factory
 local shareLevels = {}
-
-GG.Lagmonitor_activeTeams = {}
+local activeTeams = {}
 
 local spAddTeamResource   = Spring.AddTeamResource
 local spEcho              = Spring.Echo
@@ -63,18 +62,19 @@ local spSetUnitHealth     = Spring.SetUnitHealth
 local gameFrame = -1
 
 local allyTeamList = Spring.GetAllyTeamList()
-for i=1,#allyTeamList do
+for i = 1, #allyTeamList do
 	local allyTeamID = allyTeamList[i]
 	local teamList = Spring.GetTeamList(allyTeamID)
-	GG.Lagmonitor_activeTeams[allyTeamID] = {count = #teamList}
-	for j=1,#teamList do
+	activeTeams[allyTeamID] = {count = #teamList}
+	for j = 1, #teamList do
 		local teamID = teamList[j]
-		GG.Lagmonitor_activeTeams[allyTeamID][teamID] = 1
+		activeTeams[allyTeamID][teamID] = 1
 	end
 end
 
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30 -- In seconds
+local UPDATE_PERIOD = 50 -- gameframes
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -132,11 +132,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	end
 end
 
-function gadget:UnitFinished(unitID, unitDefID, unitTeam) --player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
+function gadget:UnitFinished(unitID, unitDefID, unitTeam)
+	--player who finished a unit will own that unit; its lineage will be deleted and the unit will never be returned to the lagging team.
 	if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
 		factories[unitID] = {}
 	else
-		if lineage[unitID] and (not unitAlreadyFinished[unitID]) then --(relinguish ownership for all unit except factories so the returning player has something to do)
+		if lineage[unitID] and (not unitAlreadyFinished[unitID]) then 
+		--(relinguish ownership for all unit except factories so the returning player has something to do)
 			lineage[unitID] = {} --relinguish the original ownership of the unit
 		end
 	end
@@ -153,7 +155,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local UPDATE_PERIOD = 50	-- gameframes, 1.67 second
 
 local function GetRecepient(allyTeam, laggers)
 	local teams = spGetTeamList(allyTeam)
@@ -161,7 +162,7 @@ local function GetRecepient(allyTeam, laggers)
 	local candidatesForTake = {}
 	local target
 	-- look for active people to give units to, including AIs
-	for i=1,#teams do
+	for i = 1, #teams do
 		local leader = select(2, spGetTeamInfo(teams[i]))
 		local name, active, spectator, _, _, _, _, _, _, customKeys = spGetPlayerInfo(leader)
 		if active and not spectator and not laggers[leader] and not spGetTeamRulesParam(teams[i], "WasKilled") then -- only consider giving to someone in position to take!
@@ -170,7 +171,7 @@ local function GetRecepient(allyTeam, laggers)
 	end
 
 	-- pick highest rank
-	for i=1,#candidatesForTake do
+	for i = 1, #candidatesForTake do
 		local player = candidatesForTake[i]
 		if player.rank > highestRank then
 			highestRank = player.rank
@@ -215,7 +216,7 @@ local function TransferUnitAndKeepProduction(unitID, newTeamID, given)
 end
 
 function gadget:GameFrame(n)
-	gameFrame = n;
+	gameFrame = n
 
 	if n % 15 == 0 then  -- check factories that haven't recreated the produced unit after transfer
 		for factoryID, data in pairs(transferredFactories) do
@@ -234,9 +235,9 @@ function gadget:GameFrame(n)
 		local gameSecond = spGetGameSeconds()
 		--local afkPlayers = "" -- remember which player is AFK/Lagg. Information will be sent to 'gui_take_remind.lua' as string
 
-		for i=1,#players do
+		for i = 1, #players do
 			local playerID = players[i]
-			local name,active,spec,team,allyTeam,ping = spGetPlayerInfo(playerID)
+			local name, active, spec, team, allyTeam, ping = spGetPlayerInfo(playerID)
 
 			local justResigned = false
 			if oldTeam[playerID] then
@@ -273,7 +274,7 @@ function gadget:GameFrame(n)
 								end
 								-- remove all teams after the previous owner (inclusive)
 								if (delete) then
-									lineage[unitID][i] = nil;
+									lineage[unitID][i] = nil
 								end
 							end
 						end
@@ -284,8 +285,8 @@ function gadget:GameFrame(n)
 						end
 
 						afkTeams[team] = nil
-						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count + 1
-						GG.Lagmonitor_activeTeams[allyTeam][team] = 1
+						activeTeams[allyTeam].count = activeTeams[allyTeam].count + 1
+						activeTeams[allyTeam][team] = 1
 					end
 				end
 				if (not active or ping >= LAG_THRESHOLD or afk > AFK_THRESHOLD) then -- player afk: mark him, except AIs
@@ -304,10 +305,10 @@ function gadget:GameFrame(n)
 			local allyTeam = lagger.allyTeam
 			local playersInTeam = spGetPlayerList(team, true) --return only active player
 			local discontinue = false
-			for j=1,#playersInTeam do
+			for j = 1, #playersInTeam do
 				local playerID = playersInTeam[j]
 				if not (laggers[playerID] or specList[playerID]) then --Note: we need the extra specList check because Spectators is sharing same teamID as team 0
-					discontinue = true	-- someone on same team is not lagging & not spec, don't move units around!
+					discontinue = true -- someone on same team is not lagging & not spec, don't move units around!
 					break
 				end
 			end
@@ -319,9 +320,12 @@ function gadget:GameFrame(n)
 				-- okay, we have someone to give to, prep transfer
 				if recepientByAllyTeam[allyTeam] then
 					if (afkTeams[team] == nil) then -- if team was not an AFK-er (but now is an AFK-er) then process the following, but do nothing for the same AFK-er.
-						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice for the same player & normally unit will be sent (redirected back) to the non-AFK-er, but (unfortunately) equation:"GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1" will can also run twice for the AFK-er ally and it will effect 'unit_mex_overdrive.lua'.
-						GG.Lagmonitor_activeTeams[allyTeam].count = GG.Lagmonitor_activeTeams[allyTeam].count - 1
-						GG.Lagmonitor_activeTeams[allyTeam][team] = 0
+						--REASON for WHY THE ABOVE^ CHECK was ADDED: if someone sent units to this AFK-er then (typically) var:"laggers[playerID]" will be filled twice 
+						-- for the same player & normally unit will be sent (redirected back) to the non-AFK-er, but (unfortunately) equation: 
+						-- "activeTeams[allyTeam].count = activeTeams[allyTeam].count - 1" 
+						-- will can also run twice for the AFK-er ally and it will effect 'unit_mex_overdrive.lua'.
+						activeTeams[allyTeam].count = activeTeams[allyTeam].count - 1
+						activeTeams[allyTeam][team] = 0
 					end
 					afkTeams[team] = true --mark team as AFK -- orly
 					
@@ -340,7 +344,7 @@ function gadget:GameFrame(n)
 					if #units > 0 then -- transfer units when number of units in AFK team is > 0
 						-- Transfer Units
 						GG.allowTransfer = true
-						for j=1,#units do
+						for j = 1, #units do
 							local unit = units[j]
 							if allyTeam == spGetUnitAllyTeam(unit) then
 								-- add this team to the lineage list, then send the unit away
@@ -367,11 +371,23 @@ function gadget:GameFrame(n)
 						spEcho("game_message: " .. lagger.name .. " resigned")
 					end
 				end
-			end	-- if
-		end	-- for
-	end	-- if
+			end -- if
+		end -- for
+	end -- if
 end
 
 function gadget:GameOver()
 	gadgetHandler:RemoveGadget() --shutdown after game over, so that at end of a REPLAY Lagmonitor doesn't bounce unit among player
+end
+
+----------------------------------------------------------------------------------------
+-- External Functions
+----------------------------------------------------------------------------------------
+local externalFunctions = {}
+function externalFunctions.GetActiveTeams()
+	return activeTeams
+end
+
+function gadget:Initialize()
+	GG.Lagmonitor = externalFunctions
 end
