@@ -146,7 +146,7 @@ end
 --------------------------------------------------------------------------------
 -- Unit Transfer, handles factories
 
-local function TransferUnitAndKeepProduction(unitID, newTeamID, given)
+local function TransferUnitAndKeepProduction(unitID, newTeamID)
 	if (factories[unitID]) then --is a factory
 		local producedUnitID = spGetUnitIsBuilding(unitID)
 		if (producedUnitID) then
@@ -170,7 +170,7 @@ local function TransferUnitAndKeepProduction(unitID, newTeamID, given)
 		end
 	end
 	GG.allowTransfer = true
-	spTransferUnit(unitID, newTeamID, given)
+	spTransferUnit(unitID, newTeamID, true)
 	GG.allowTransfer = false
 end
 
@@ -208,7 +208,7 @@ local function UpdateTeamActivity(teamID)
 		end
 	end
 	
-	local _, leaderID, _, isAiTeam = spGetTeamInfo(teamID)
+	local _, leaderID, _, isAiTeam, _, allyTeamID = spGetTeamInfo(teamID)
 	if isAiTeam then
 		-- Treat the AI as an active player.
 		resourceShare = resourceShare + 1
@@ -220,17 +220,18 @@ local function UpdateTeamActivity(teamID)
 		
 		for unitID, teamList in pairs(teamLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
 			local delete = false
-			for i = 1, #teamList do
-				local otherTeam = teamList[i];
-				if (otherTeam == teamID) then
-					if allyTeam == spGetUnitAllyTeam(unitID) then
-						TransferUnitAndKeepProduction(unitID, teamID, true)
+			local unitAllyTeamID = spGetUnitAllyTeam(unitID)
+			if unitAllyTeamID == allyTeamID then
+				for i = 1, #teamList do
+					local otherTeam = teamList[i]
+					if (otherTeam == teamID) then
+						TransferUnitAndKeepProduction(unitID, teamID)
 						delete = true
 					end
-				end
-				-- remove all teams after the previous owner (inclusive)
-				if delete then
-					teamLineageUnits[unitID][i] = nil
+					-- remove all teams after the previous owner (inclusive)
+					if delete then
+						teamLineageUnits[unitID][i] = nil
+					end
 				end
 			end
 		end
@@ -289,16 +290,16 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			-- Transfer Units
 			GG.allowTransfer = true
 			for j = 1, #units do
-				local unit = units[j]
-				if allyTeam == spGetUnitAllyTeam(unit) then
+				local unitID = units[j]
+				if allyTeamID == spGetUnitAllyTeam(unitID) then
 					-- add this team to the teamLineageUnits list, then send the unit away
-					if teamLineageUnits[unit] == nil then
-						teamLineageUnits[unit] = {giveTeamID}
+					if teamLineageUnits[unitID] == nil then
+						teamLineageUnits[unitID] = {giveTeamID}
 					else
 						-- this unit belonged to someone else before me, add me to the end of the list
-						teamLineageUnits[unit][#teamLineageUnits[unit]+1] = giveTeamID
+						teamLineageUnits[unitID][#teamLineageUnits[unitID]+1] = giveTeamID
 					end
-					TransferUnitAndKeepProduction(unit, recieveTeamID, true)
+					TransferUnitAndKeepProduction(unitID, recieveTeamID)
 				end
 			end
 			GG.allowTransfer = false
