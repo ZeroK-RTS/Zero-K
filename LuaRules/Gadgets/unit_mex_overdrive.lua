@@ -264,7 +264,7 @@ local privateTable = {private = true}
 local previousData = {}
 
 local function SetTeamEconomyRulesParams(
-			teamID, activeCount, -- TeamID of the team as well as number of active allies.
+			teamID, resourceShares, -- TeamID of the team as well as number of active allies.
 
 			summedBaseMetal, -- AllyTeam base metal extrator income
 			summedOverdrive, -- AllyTeam overdrive income
@@ -284,7 +284,7 @@ local function SetTeamEconomyRulesParams(
 
 	if previousData[teamID] then
 		local pd = previousData[teamID]
-		spSetTeamRulesParam(teamID, "OD_allies",               pd.activeCount, privateTable)
+		spSetTeamRulesParam(teamID, "OD_allies",               pd.resourceShares, privateTable)
 
 		spSetTeamRulesParam(teamID, "OD_team_metalBase",       pd.summedBaseMetal, privateTable)
 		spSetTeamRulesParam(teamID, "OD_team_metalOverdrive",  pd.summedOverdrive, privateTable)
@@ -310,7 +310,7 @@ local function SetTeamEconomyRulesParams(
 
 	local pd = previousData[teamID]
 
-	pd.activeCount = activeCount
+	pd.resourceShares = resourceShares
 
 	pd.summedBaseMetal = summedBaseMetal
 	pd.summedOverdrive = summedOverdrive
@@ -944,10 +944,10 @@ local lastTeamOverdriveSpending = {}
 
 function gadget:GameFrame(n)
 	
-	if not (GG.Lagmonitor and GG.Lagmonitor.GetActiveTeams) then
+	if not (GG.Lagmonitor and GG.Lagmonitor.GetResourceShares) then
 		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Lag monitor doesn't work so Overdrive is STUFFED")
 	end
-	local teamActivity = GG.Lagmonitor.GetActiveTeams()
+	local allyTeamResourceShares, teamResourceShare = GG.Lagmonitor.GetResourceShares()
 	
 	if (n%TEAM_SLOWUPDATE_RATE == 1) then
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
@@ -1223,12 +1223,8 @@ function gadget:GameFrame(n)
 				end
 			end
 
-			--// Share Overdrive Metal
-			local activeTeams = teamActivity[allyTeamID]
-			local activeCount = activeTeams.count or 1
-			local summedBaseMetalAfterPrivate = summedBaseMetal
-
 			-- Extra base share from mex production
+			local summedBaseMetalAfterPrivate = summedBaseMetal
 			for i = 1, allyTeamData.teams do  -- calculate active team OD sum
 				local teamID = allyTeamData.team[i]
 				if privateBaseMetal[teamID] then
@@ -1237,17 +1233,15 @@ function gadget:GameFrame(n)
 			end
 
 			--Spring.Echo(allyTeamID .. " energy sum " .. teamODEnergySum)
-
 			sendAllyTeamInformationToAwards(allyTeamID, summedBaseMetal, summedOverdrive, allyTeamEnergyIncome, ODenergy, energyWasted)
 
 			-- Payback from energy production
-
 			local summedOverdriveMetalAfterPayback = summedOverdrive
 			local teamPaybackOD = {}
 			if enableEnergyPayback then
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
-					if activeTeams[teamID] > 0 then
+					if teamResourceShare[teamID] then
 						local te = teamEnergy[teamID]
 						teamPaybackOD[teamID] = 0
 
@@ -1299,6 +1293,14 @@ function gadget:GameFrame(n)
 				end
 			end
 			
+			--// Share Overdrive Metal and Energy
+			local resourceShares = allyTeamResourceShares[allyTeamID]
+			local splitByShare = true
+			if (not resourceShares) or resourceShares < 1 then
+				splitByShare = false
+				resourceShares = allyTeamData.teams
+			end
+			
 			-- Make changes to team resources
 			local shareToSend = {}
 			local metalStorageToSet = {}
@@ -1327,13 +1329,11 @@ function gadget:GameFrame(n)
 				local baseShare = 0
 				local miscShare = 0
 
-				local metalSplit = (activeCount >= 1 and activeCount) or allyTeamData.teams
-
-				local share = ((activeTeams[teamID] > 0) and activeTeams[teamID]) or ((activeCount == 0) and 1) or 0
+				local share = (splitByShare and teamResourceShare[teamID]) or 1
 				if share > 0 then
-					odShare = ((share * summedOverdriveMetalAfterPayback / metalSplit) + (teamPaybackOD[teamID] or 0)) or 0
-					baseShare = ((share * summedBaseMetalAfterPrivate / metalSplit) + (privateBaseMetal[teamID] or 0)) or 0
-					miscShare = share * allyTeamMiscMetalIncome / metalSplit
+					odShare = ((share * summedOverdriveMetalAfterPayback / resourceShares) + (teamPaybackOD[teamID] or 0)) or 0
+					baseShare = ((share * summedBaseMetalAfterPrivate / resourceShares) + (privateBaseMetal[teamID] or 0)) or 0
+					miscShare = share * allyTeamMiscMetalIncome / resourceShares
 				end
 
 				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
@@ -1356,7 +1356,7 @@ function gadget:GameFrame(n)
 				totalMetalIncome[i] = metalIncome
 				--Spring.Echo(teamID .. " got odShare " .. odShare)
 				SetTeamEconomyRulesParams(
-					teamID, metalSplit, -- TeamID of the team as well as number of active allies.
+					teamID, resourceShares, -- TeamID of the team as well as number of active allies.
 
 					summedBaseMetal, -- AllyTeam base metal extrator income
 					summedOverdrive, -- AllyTeam overdrive income
