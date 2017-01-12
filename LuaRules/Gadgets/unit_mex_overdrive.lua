@@ -1048,7 +1048,7 @@ function gadget:GameFrame(n)
 
 			-- This is how much energy will be spent on overdrive. It remains to determine how much
 			-- is spent by each player.
-			local energyForOverdrive = max(0, allyTeamEnergySpare)*max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMax))
+			local energyForOverdrive = max(0, allyTeamEnergySpare)*((allyTeamEnergyMax > 0 and max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMax))) or 1)
 
 			-- The following inequality holds:
 			-- energyForOverdrive <= allyTeamEnergySpare <= allyTeamPositiveSpare

@@ -587,8 +587,8 @@ function widget:GameFrame(n)
 	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
 	energyWarningPanel.ShowWarning(energyWarning)
 
-	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
-	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
+	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 100
+	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 100
 	
 	mPercent = math.min(math.max(mPercent, 0), 100)
 	ePercent = math.min(math.max(ePercent, 0), 100)

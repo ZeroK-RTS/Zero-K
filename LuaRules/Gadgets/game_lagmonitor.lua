@@ -36,7 +36,6 @@ local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
 local factories = {}
 local transferredFactories = {} -- unitDef and health states of the unit that was being produced be the transferred factory
-local activeShareLevel = {}
 
 local spAddTeamResource   = Spring.AddTeamResource
 local spEcho              = Spring.Echo
@@ -235,11 +234,6 @@ local function UpdateTeamActivity(teamID)
 				end
 			end
 		end
-
-		if (activeShareLevel[teamID]) then
-			Spring.SetTeamShareLevel(teamID, "metal",  activeShareLevel[teamID])
-			activeShareLevel[teamID] = nil
-		end
 	end
 	
 	-- Note that AIs do not have a rank so a team with just an AI will have teamRank = false
@@ -285,12 +279,6 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	
 	for i = 1, #giveAwayTeams do
 		local giveTeamID = giveAwayTeams[i]
-		
-		local mShareLevel = select(6, Spring.GetTeamResources(giveTeamID, "metal"))
-		if (mShareLevel > 0) then
-			activeShareLevel[giveTeamID] = mShareLevel
-		end
-		Spring.SetTeamShareLevel(giveTeamID, "metal",  0)
 		
 		-- Energy share is not set because the storage needs to be full for full overdrive.
 		-- Also energy income is mostly private and a large energy influx to the rest of the 
