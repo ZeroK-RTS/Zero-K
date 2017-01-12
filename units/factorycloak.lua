@@ -40,7 +40,6 @@ unitDef = {
   },
 
   energyMake                    = 0.3,
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
   footprintZ                    = 7,
@@ -50,7 +49,6 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[cremfactory.s3o]],

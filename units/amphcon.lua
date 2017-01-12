@@ -37,7 +37,6 @@ unitDef = {
   maxDamage           = 850,
   maxSlope            = 36,
   maxVelocity         = 1.7,
-  metalMake           = 0.225,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],

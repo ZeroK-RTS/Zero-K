@@ -47,7 +47,6 @@ unitDef = {
   maxDamage                     = 500,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   movementClass                 = [[KBOT1]],
   objectName                    = [[armsenan.s3o]],

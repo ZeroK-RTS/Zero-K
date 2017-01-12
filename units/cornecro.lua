@@ -39,7 +39,6 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   objectName          = [[conbot.s3o]],

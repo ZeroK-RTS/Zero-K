@@ -35,7 +35,6 @@ unitDef = {
   },
 
   energyMake          = 0.15,
-  energyUse           = 0,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -47,7 +46,6 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,

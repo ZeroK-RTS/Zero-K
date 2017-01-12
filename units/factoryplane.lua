@@ -44,7 +44,6 @@ unitDef = {
   },
 
   energyMake                    = 0.3,
-  energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
   footprintX                    = 8,
@@ -55,7 +54,6 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],

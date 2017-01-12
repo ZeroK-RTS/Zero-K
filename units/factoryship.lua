@@ -46,7 +46,6 @@ unitDef = {
   },
 
   energyMake             = 0.3,
-  energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 8,
   footprintZ             = 12,
@@ -56,7 +55,6 @@ unitDef = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  metalMake              = 0.3,
   minCloakDistance       = 150,
   minWaterDepth          = 15,
   objectName             = [[seafac.s3o]],
