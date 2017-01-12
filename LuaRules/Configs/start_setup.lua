@@ -41,7 +41,7 @@ ploppables = {
 START_METAL   = 400
 START_ENERGY  = 400
 
-START_STORAGE = 0
+START_STORAGE = 5
 
 COMM_SELECT_TIMEOUT = 30 * 15 -- 15 seconds
 
