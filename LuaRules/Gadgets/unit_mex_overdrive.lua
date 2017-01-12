@@ -1031,7 +1031,7 @@ function gadget:GameFrame(n)
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
 				te.exp = math.max(0, te.exp - (lastTeamOverdriveSpending[teamID] or 0))
 
-				te.max = te.max - HIDDEN_STORAGE
+				te.max = math.max(0.4, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				te.inc = sumEnergy -- Income only from energy structures and constructors. Possibly add reclaim here
 
 				allyTeamMiscMetalIncome = allyTeamMiscMetalIncome + sumMetal
@@ -1124,7 +1124,10 @@ function gadget:GameFrame(n)
 				local teamID = allyTeamData.team[i]
 				local te = teamEnergy[teamID]
 				-- Storage capacing + eexpected spending is the maximun allowed storage.
-				te.freeStorage = te.max + te.exp - te.cur
+				
+				-- Allow a refund up to the to the spare energy contributed to the system. This allows
+				-- people with zero storage to build.
+				te.freeStorage = te.max + te.exp - te.cur + te.spare 
 				if te.freeStorage > 0 then
 					totalFreeStorage = totalFreeStorage + te.freeStorage
 				else
@@ -1339,7 +1342,7 @@ function gadget:GameFrame(n)
 				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
 
 				local mCurr, mStor = spGetTeamResources(teamID, "metal")
-				mStor = mStor - HIDDEN_STORAGE
+				mStor = math.max(0.4, mStor - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				
 				if mCurr > mStor then
 					shareToSend[i] = mCurr - mStor

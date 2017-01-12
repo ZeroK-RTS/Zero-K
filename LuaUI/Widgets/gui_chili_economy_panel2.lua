@@ -587,8 +587,24 @@ function widget:GameFrame(n)
 	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
 	energyWarningPanel.ShowWarning(energyWarning)
 
-	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 100
-	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 100
+	--// Storage, income and pull numbers
+	local realEnergyPull = ePull
+	
+	local mPercent, ePercent 
+	if mStor > 0 then
+		mPercent = 100 * mCurr / mStor
+	elseif mInco + mReci > mPull then
+		mPercent = 100
+	else
+		mPercent = 0
+	end
+	if eStor > 0 then
+		ePercent = 100 * eCurr / eStor
+	elseif eInco > realEnergyPull then
+		ePercent = 100
+	else
+		ePercent = 0
+	end
 	
 	mPercent = math.min(math.max(mPercent, 0), 100)
 	ePercent = math.min(math.max(ePercent, 0), 100)
@@ -663,9 +679,6 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
-
-	--// Storage, income and pull numbers
-	local realEnergyPull = ePull
 	
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )

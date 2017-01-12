@@ -308,13 +308,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		-- the adding of existing resources is necessary for handling /take and spawn
-		local bonus = (keys and tonumber(keys.bonusresources)) or 0
-
-		Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore  + bonus)
-		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore + bonus)
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy + bonus)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal + bonus)
+		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
+		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})

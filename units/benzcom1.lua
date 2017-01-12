@@ -39,6 +39,7 @@ unitDef = {
   },
 
   energyMake          = 6,
+  energyStorage       = 500,
   energyUse           = 0,
   explodeAs           = [[ESTOR_BUILDINGEX]],
   footprintX          = 2,
@@ -53,6 +54,7 @@ unitDef = {
   maxVelocity         = 1.25,
   maxWaterDepth       = 5000,
   metalMake           = 4,
+  metalStorage        = 500,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
