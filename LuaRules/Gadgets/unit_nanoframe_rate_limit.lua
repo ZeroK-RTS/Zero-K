@@ -28,7 +28,6 @@ local unitLastFrame = {}
 local FRAME_GAP = 1
 
 function gadget:AllowUnitCreation(udefID, builderID)
-	Spring.Echo("AllowUnitCreation", builderID)
 	if not builderID then
 		return true
 	end
