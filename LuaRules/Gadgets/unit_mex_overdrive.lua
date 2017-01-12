@@ -949,7 +949,7 @@ function gadget:GameFrame(n)
 	end
 	local allyTeamResourceShares, teamResourceShare = GG.Lagmonitor.GetResourceShares()
 	
-	if (n%TEAM_SLOWUPDATE_RATE == 1) then
+	if (n % TEAM_SLOWUPDATE_RATE == 1) then
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			local list = pylonList[allyTeamID]

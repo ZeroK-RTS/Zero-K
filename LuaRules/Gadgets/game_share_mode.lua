@@ -321,7 +321,7 @@ function gadget:GameFrame(frame)
 end
 
 function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to interact with the gadget
-	if strFind(message,"sharemode") then
+	if strFind(message, "sharemode") then
 		local command,aug1,aug2 = ProccessCommand(strLower(message))
 		local name = select(1, spGetPlayerInfo(playerID)) 
 		if command == nil then

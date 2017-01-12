@@ -57,9 +57,11 @@ local spGetUnitIsBuilding = Spring.GetUnitIsBuilding
 local spGetUnitHealth     = Spring.GetUnitHealth
 local spSetUnitHealth     = Spring.SetUnitHealth
 
+include("LuaRules/Configs/constants.lua")
+
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30 -- In seconds
-local UPDATE_PERIOD = 50 -- gameframes
+local FACTORY_UPDATE_PERIOD = 15 -- gameframes
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -271,6 +273,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	if not recieveTeamID then
 		-- Nobody can recieve units so there is not much more to do
 		for i = 1, #giveAwayTeams do
+			local giveTeamID = giveAwayTeams[i]
 			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
 			if giveResigned then
 				local giveName = Spring.GetPlayerInfo(giveTeamID)
@@ -329,7 +332,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 end
 
 function gadget:GameFrame(n)
-	if n % 15 == 0 then  -- check factories that haven't recreated the produced unit after transfer
+	if n % FACTORY_UPDATE_PERIOD == 0 then  -- check factories that haven't recreated the produced unit after transfer
 		for factoryID, data in pairs(transferredFactories) do
 			if (data.expirationFrame <= n) then
 				ApplyProductionCancelRefund(data, spGetUnitTeam(factoryID)) --refund metal to current team
@@ -338,7 +341,7 @@ function gadget:GameFrame(n)
 		end
 	end
 
-	if n % UPDATE_PERIOD == 0 then
+	if n % TEAM_SLOWUPDATE_RATE == 0 then -- Just before overdrive
 		local allyTeamList = Spring.GetAllyTeamList()
 		for i = 1, #allyTeamList do
 			UpdateAllyTeamActivity(allyTeamList[i])
