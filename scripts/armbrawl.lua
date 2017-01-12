@@ -66,8 +66,8 @@ function script.Create()
 	Turn(rrjet, x_axis, math.rad(-90))
 	Turn(lrjet, x_axis, math.rad(-90))
 
-	Turn(rrfanbase, z_axis, math.rad(-22.5))
-	Turn(lrfanbase, z_axis, math.rad(22.5))
+	Turn(rrfanbase, z_axis, math.rad(22.5))
+	Turn(lrfanbase, z_axis, math.rad(-22.5))
 
 	StartThread(SmokeUnit, smokePiece)
 	StartThread(TiltBody)

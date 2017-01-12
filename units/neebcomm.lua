@@ -28,6 +28,7 @@ unitDef = {
   },
 
   energyMake		  = 2,
+  energyStorage       = 500,
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
@@ -40,6 +41,7 @@ unitDef = {
   maxVelocity         = 1.2,
   maxWaterDepth       = 22,
   metalMake           = 2,
+  metalStorage        = 500,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,

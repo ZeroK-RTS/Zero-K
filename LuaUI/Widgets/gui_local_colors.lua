@@ -145,7 +145,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function UpdateColor()
+function UpdateColor(doNotNotify)
 	is_speccing = Spring.GetSpectatingState()
 	if options.simpleColors.value then
 		SetNewSimpleTeamColors()
@@ -153,20 +153,30 @@ function UpdateColor()
 		SetNewTeamColors()
 	end
 	
-	NotifyColorChange()
+	if not doNotNotify then
+		NotifyColorChange()
+	end
 end
 
 function widget:Initialize()
 	UpdateColor()
 end
 
+local oldTeamID = Spring.GetMyTeamID()
 -- This function is alright but other, poorly written widgets cause a massive spike when team colours change. 
---function widget:PlayerChanged()
---	if Spring.GetSpectatingState() then
---		return
---	end
---	UpdateColor()
---end
+function widget:PlayerChanged()
+	if Spring.GetSpectatingState() then
+		return
+	end
+	
+	local newTeamID = Spring.GetMyTeamID()
+	if oldTeamID == newTeamID then
+		return
+	end
+	oldTeamID = newTeamID
+	
+	UpdateColor(true)
+end
 
 function widget:Shutdown()
 	ResetOldTeamColors()
