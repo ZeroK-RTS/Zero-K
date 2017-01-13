@@ -59,6 +59,7 @@ unitDef = {
   metalMake              = 0.3,
   minCloakDistance       = 150,
   minWaterDepth          = 15,
+  moveState        		 = 1,
   objectName             = [[seafac.s3o]],
   script				 = [[factoryship.lua]],
   seismicSignature       = 4,

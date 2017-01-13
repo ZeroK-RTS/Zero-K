@@ -47,7 +47,6 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 155,
   movementClass          = [[KBOT2]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
   script                 = [[armsnipe.lua]],

@@ -21,6 +21,9 @@ local holdPosException = {
     ["factoryplane"] = true,
     ["factorygunship"] = true,
     ["armnanotc"] = true,
+    ["armcrabe"] = true,
+    ["cormist"] = true,
+    ["trem"] = true,
 }
 
 local dontFireAtRadarUnits = {
@@ -37,10 +40,29 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'presetlabel', 'holdPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
+options_order = { 'presetlabel', 'resetMoveStates', 'holdPosition', 'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
 options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
+	resetMoveStates = {
+		type='button',
+		name= "Reset Move States",
+		desc = "Return all land units to the default move states",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_movestate1")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and not holdPosException[name] and IsGround(ud) then
+					options[opt].value = -1
+				end
+			end
+        end,
+		noHotkey = true,
+	},
+	
 	holdPosition = {
 		type='button',
 		name= "Hold Position",
@@ -54,7 +76,63 @@ options = {
 				local ud = name and UnitDefNames[name]
 				if ud and not holdPosException[name] and IsGround(ud) then
 					options[opt].value = 0
-					--return
+				end
+			end
+        end,
+		noHotkey = true,
+	},
+	
+	skirmHoldPosition = {
+		type='button',
+		name= "Hold Position (Skirmishers)",
+		desc = "Set all skirmishers to hold position",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_movestate1")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and string.match(ud.tooltip, 'Skirm') and not holdPosException[name] and IsGround(ud) then
+					options[opt].value = 0
+				end
+			end
+        end,
+		noHotkey = true,
+	},
+	
+	artyHoldPosition = {
+		type='button',
+		name= "Hold Position (Arty)",
+		desc = "Set all artillery units to hold position",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_movestate1")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and string.match(ud.tooltip, 'Arti') and not holdPosException[name] and IsGround(ud) then
+					options[opt].value = 0
+				end
+			end
+        end,
+		noHotkey = true,
+	},
+	
+	aaHoldPosition = {
+		type='button',
+		name= "Hold Position (Anti-Air)",
+		desc = "Set all non-flying anti-air units to hold position",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_movestate1")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud and string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air') and not holdPosException[name] and IsGround(ud) then
+					options[opt].value = 0
 				end
 			end
         end,

@@ -39,7 +39,6 @@ unitDef = {
   minCloakDistance       = 75,
   minWaterDepth          = 15,
   movementClass          = [[BOAT6]],
-  moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[shipheavyarty.s3o]],

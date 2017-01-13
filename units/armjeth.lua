@@ -44,7 +44,6 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 140,
   movementClass          = [[KBOT2]],
-  moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[spherejeth.s3o]],
   seismicSignature       = 4,

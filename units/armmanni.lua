@@ -44,7 +44,6 @@ unitDef = {
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
-  moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[penetrator_lordmuffe.s3o]],
