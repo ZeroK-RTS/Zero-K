@@ -39,7 +39,7 @@ unitDef = {
   maxDamage                     = 500,
   maxSlope                      = 18,
   maxVelocity                   = 0,
-  maxWaterDepth                 = 0,
+  maxWaterDepth                 = 6,
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[arm_solar.s3o]],
@@ -50,7 +50,7 @@ unitDef = {
   sightDistance                 = 273,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
-  workerTime                    = 0,
+  waterLine                     = 0,
   yardMap                       = [[ooooooooooooooooooooooooo]],
 
   featureDefs                   = {
