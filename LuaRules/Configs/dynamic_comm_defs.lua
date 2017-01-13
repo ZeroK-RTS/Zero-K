@@ -486,7 +486,7 @@ local moduleDefs = {
 	{
 		name = "econ",
 		humanName = "Vanguard Economy Pack",
-		description = "Vanguard Economy Pack - A vital part of establishing a beachhead, this module is equiped by all new commanders to kickstart their economy. Provides 3.7 metal and 5.7 energy income as well as 500 storage.",
+		description = "Vanguard Economy Pack - A vital part of establishing a beachhead, this module is equiped by all new commanders to kickstart their economy. Provides 3.7 metal income and 5.7 energy income.",
 		image = "unitpics/module_energy_cell.png",
 		limit = 1,
 		unequipable = true,
