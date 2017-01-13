@@ -78,7 +78,7 @@ local function DrawGhostFeatures()
 			gl.PushMatrix()
 			gl.Translate(x, y, z)
 
-			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, false, false)
+			gl.FeatureShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, true, false)
 
 			gl.PopMatrix()
 		else
@@ -116,7 +116,7 @@ local function DrawGhostSites()
 				gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
 
 				gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
-				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], false, false, false)
+				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
 				gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
 			else
 				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID])
