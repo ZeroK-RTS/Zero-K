@@ -457,9 +457,7 @@ function widget:Initialize()
 	
 	-- fetch objectives from gadget
 	-- doesn't catch the case if widget is toggled before game start but meh
-	if Spring.GetGameFrame() > 0 then
-		Spring.SendLuaRulesMsg("sendMissionObjectives")
-	end
+	Spring.SendLuaRulesMsg("sendMissionObjectives")
 end
 
 function widget:Shutdown()
