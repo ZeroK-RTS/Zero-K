@@ -262,6 +262,7 @@ function gadget:DrawGenesis()
 							wrap_s = GL.CLAMP_TO_EDGE, 
 							wrap_t = GL.CLAMP_TO_EDGE,
 							fbo = true,
+							min_filter = GL.LINEAR_MIPMAP_NEAREST,
 						}),
 						orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
 							wrap_s = GL.CLAMP_TO_EDGE, 
