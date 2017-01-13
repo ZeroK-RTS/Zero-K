@@ -1077,10 +1077,15 @@ local function printAbilities(ud, unitID)
 	end
 
 	if ud.metalStorage > 0 then
-		cells[#cells+1] = 'Stores: '
+		cells[#cells+1] = 'Stores metal: '
 		cells[#cells+1] = ud.metalStorage .. " M"
 	end
-
+	
+	if ud.energyStorage > 0 then
+		cells[#cells+1] = 'Stores energy: '
+		cells[#cells+1] = ud.energyStorage .. " E"
+	end
+	
 	if (#cells > 2 and cells[#cells-1] == '') then
 		cells[#cells] = nil
 		cells[#cells] = nil
@@ -1288,6 +1293,13 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
+	local metal = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_metalIncome") or 0) or ((ud.metalMake or 0) + (ud.customParams.income_metal or 0)))
+
+	if metal ~= 0 then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Metal: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (metal > 0 and '+' or '') .. numformat(metal,2) .. " M/s", textColor = color.stats_fg, }
+	end
+	
 	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
