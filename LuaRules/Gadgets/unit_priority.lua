@@ -705,22 +705,22 @@ function gadget:UnitFinished(unitID, unitDefID, teamID)
 
 end 
 
-function gadget:UnitDestroyed(UnitID, unitDefID, teamID) 
-	UnitPriority[UnitID] = nil
-	LastUnitFromFactory[UnitID] = nil
+function gadget:UnitDestroyed(unitID, unitDefID, teamID) 
+	UnitPriority[unitID] = nil
+	LastUnitFromFactory[unitID] = nil
     local ud = UnitDefs[unitDefID]
 	if UnitMiscPriority[unitID] then
 		RemoveMiscPriorityUnit(unitID,teamID)
 	end
     if ud then
 		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
-			local _, sto = spGetTeamResources(teamID, "metal") - HIDDEN_STORAGE
+			local sto = select(2, spGetTeamResources(teamID, "metal")) - HIDDEN_STORAGE
 			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
 				SetMetalReserved(teamID, sto - ud.metalStorage)
 			end
 		end
 		if ud.energyStorage and ud.energyStorage > 0 and TeamEnergyReserved[teamID] then
-			local _, sto = spGetTeamResources(teamID, "energy") - HIDDEN_STORAGE
+			local sto = select(2, spGetTeamResources(teamID, "energy")) - HIDDEN_STORAGE
 			if sto and TeamEnergyReserved[teamID] > sto - ud.energyStorage then
 				SetEnergyReserved(teamID, sto - ud.energyStorage)
 			end

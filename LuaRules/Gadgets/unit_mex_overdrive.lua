@@ -104,7 +104,7 @@ local function paybackFactorFunction(repayRatio)
 	end
 end
 
-
+local MIN_STORAGE = 1
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
 
@@ -1031,7 +1031,7 @@ function gadget:GameFrame(n)
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
 				te.exp = math.max(0, te.exp - (lastTeamOverdriveSpending[teamID] or 0))
 
-				te.max = math.max(0.4, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
+				te.max = math.max(MIN_STORAGE, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				te.inc = sumEnergy -- Income only from energy structures and constructors. Possibly add reclaim here
 
 				allyTeamMiscMetalIncome = allyTeamMiscMetalIncome + sumMetal
@@ -1342,7 +1342,7 @@ function gadget:GameFrame(n)
 				sendTeamInformationToAwards(teamID, baseShare, odShare, te.overdriveEnergyNet)
 
 				local mCurr, mStor = spGetTeamResources(teamID, "metal")
-				mStor = math.max(0.4, mStor - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
+				mStor = math.max(MIN_STORAGE, mStor - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				
 				if mCurr > mStor then
 					shareToSend[i] = mCurr - mStor
