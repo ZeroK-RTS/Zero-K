@@ -25,15 +25,26 @@ end
 --------------------------------------------------------------------------------
 
 local unitLastFrame = {}
+local unitLastX = {}
+local unitLastZ = {}
 local FRAME_GAP = 1
 
-function gadget:AllowUnitCreation(udefID, builderID)
+function gadget:AllowUnitCreation(unitDefID, builderID, builderTeam, x, y, z, facing)
 	if not builderID then
 		return true
 	end
 	local frame = Spring.GetGameFrame()
 	if (not unitLastFrame[builderID]) or frame >= unitLastFrame[builderID] + FRAME_GAP then
 		unitLastFrame[builderID] = frame
+		unitLastX[builderID] = x
+		unitLastZ[builderID] = z
+		return true
+	end
+	
+	-- If you insert many build orders at the start of a construction queue, in range of the constructor,
+	-- then AllowUnitCreation seems to call as if it were AllowCommand. However, all of these calls have the
+	-- x,y,z,facing of the first structure in the queue so this check can be used to let them through.
+	if x == unitLastX[builderID] and z == unitLastZ[builderID] then
 		return true
 	end
 	return false
