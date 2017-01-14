@@ -103,7 +103,7 @@ options = {
 	
 	artyHoldPosition = {
 		type='button',
-		name= "Hold Position (Arty)",
+		name= "Hold Position (Artillery)",
 		desc = "Set all artillery units to hold position",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
