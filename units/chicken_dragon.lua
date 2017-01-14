@@ -1,7 +1,7 @@
 unitDef = {
   unitname               = [[chicken_dragon]],
   name                   = [[White Dragon]],
-  description            = [[Über Assault Chicken]],
+  description            = [[Prime Assault Chicken]],
   acceleration           = 1,
   autoHeal               = 0,
   brakeRate              = 3,
