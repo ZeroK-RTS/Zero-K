@@ -55,7 +55,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and not holdPosException[name] and IsGround(ud) then
+				if ud and not holdPosException[name] and not string.match(name, "factory") and IsGround(ud) then
 					options[opt].value = -1
 				end
 			end
