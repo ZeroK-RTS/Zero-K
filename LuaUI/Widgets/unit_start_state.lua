@@ -18,8 +18,6 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 
 local holdPosException = { 
-    ["factoryplane"] = true,
-    ["factorygunship"] = true,
     ["armnanotc"] = true,
     ["armcrabe"] = true,
     ["cormist"] = true,
@@ -36,7 +34,7 @@ local dontFireAtRadarUnits = {
 --local rememberToSetHoldPositionPreset = false
 
 local function IsGround(ud)
-    return not ud.canFly
+    return not ud.canFly and not string.match(ud.name, "factory")
 end
 
 options_path = 'Game/New Unit States'
@@ -55,7 +53,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and not holdPosException[name] and not string.match(name, "factory") and IsGround(ud) then
+				if ud and not holdPosException[name] and IsGround(ud) then
 					options[opt].value = -1
 				end
 			end
@@ -93,7 +91,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Skirm') and not holdPosException[name] and IsGround(ud) then
+				if ud and string.match(ud.tooltip, 'Skirm') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -112,7 +110,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Arti') and not holdPosException[name] and IsGround(ud) then
+				if ud and string.match(ud.tooltip, 'Arti') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -131,7 +129,7 @@ options = {
 				local find = string.find(opt, "_movestate1")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
-				if ud and string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air') and not holdPosException[name] and IsGround(ud) then
+				if ud and string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air') and IsGround(ud) then
 					options[opt].value = 0
 				end
 			end
@@ -310,17 +308,31 @@ local function addUnit(defName, path)
     end
 
     if (ud.canMove or ud.canPatrol) and ((not ud.isBuilding) or ud.isFactory) then
-        options[defName .. "_movestate1"] = {
-            name = "  Movestate",
-            desc = "Values: inherit from factory, hold position, maneuver, roam",
-            type = 'number',
-            value = ud.moveState,
-            min = -1,
-            max = 2,
-            step = 1,
-            path = path,
-        }
-        options_order[#options_order+1] = defName .. "_movestate1"
+		if string.match(ud.tooltip, 'Skirm') or string.match(ud.tooltip, 'Arti') or (string.match(ud.tooltip, 'Anti') and string.match(ud.tooltip, 'Air')) then
+			options[defName .. "_movestate1"] = {
+				name = "  Movestate",
+				desc = "Values: inherit from factory, hold position, maneuver, roam",
+				type = 'number',
+				value = 0, -- skirmishers, arty and AA are hold pos by default
+				min = -1,
+				max = 2,
+				step = 1,
+				path = path,
+			}
+			options_order[#options_order+1] = defName .. "_movestate1"
+		else
+			options[defName .. "_movestate1"] = {
+				name = "  Movestate",
+				desc = "Values: inherit from factory, hold position, maneuver, roam",
+				type = 'number',
+				value = ud.moveState,
+				min = -1,
+				max = 2,
+				step = 1,
+				path = path,
+			}
+			options_order[#options_order+1] = defName .. "_movestate1"
+        end
     end
 	
 	if (ud.canFly) then
