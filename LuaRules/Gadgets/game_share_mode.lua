@@ -211,7 +211,8 @@ local function MergeAllHumans(teamlist)
 		AI = select(4, spGetTeamInfo(teamlist[i]))
 		if not AI and mergeid ~= -1 then
 			spEcho("[Commshare] Merging team " .. teamlist[i])
-			teamLeader = select(2,spGetTeamInfo(teamlist[i])) -- Needed because of recursion. Only one player on a team at game start anyways.
+			teamLeader = select(2,spGetTeamInfo(teamlist[i])) 
+			-- Needed because of recursion error. Only one player on a team at game start anyways.
 			MergePlayer(teamLeader,mergeid)
 		elseif not AI and mergeid == -1 then
 			mergeid = teamlist[i]
@@ -233,7 +234,7 @@ local function MergeAll()
 	end
 end
 
-local function SendInvite(player, target, targetid) -- targetplayer is which player is the merger
+local function SendInvite(player, target, targetid) -- targetid is which player is the merger
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target))
 		local _,_,dead,ai,_ = spGetTeamInfo(GetTeamID(target))
@@ -347,7 +348,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			end
 		elseif strFind(command, "accept") then
 			if type(targetID) ~= "number" then
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid augment for Accept.")
+				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid targetID for Accept.")
 				return
 			end
 			if invites[playerID] and invites[playerID][targetID] then
