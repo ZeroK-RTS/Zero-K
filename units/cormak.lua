@@ -3,6 +3,7 @@ unitDef = {
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
+  activateWhenBuilt      = true,
   brakeRate              = 0.75,
   buildCostEnergy        = 250,
   buildCostMetal         = 250,

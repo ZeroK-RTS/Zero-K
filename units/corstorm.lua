@@ -43,6 +43,7 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[storm.s3o]],
   script                 = [[corstorm.lua]],

@@ -55,6 +55,7 @@ unitDef = {
   maxWaterDepth                 = 0,
   metalMake                     = 0.3,
   minCloakDistance              = 150,
+  moveState        				= 1,
   noAutoFire                    = false,
   objectName                    = [[corvp.s3o]],
   seismicSignature              = 4,
