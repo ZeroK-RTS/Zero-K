@@ -39,6 +39,7 @@ unitDef = {
   maxVelocity         = 3.54,
   minCloakDistance    = 75,
   movementClass       = [[HOVER3]],
+  moveState			  = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName          = [[hoveraa.s3o]],

@@ -24,7 +24,7 @@ unitDef = {
   cruiseAlt           = 240,
 
   customParams        = {
-    airstrafecontrol = [[1]],
+    airstrafecontrol = [[0]],
     description_fr = [[ADAV d'Assaut Terrestre]],
 	description_de = [[Luftnaher Unterstützungskampfhubschrauber]],
 	helptext       = [[The Brawler is a fire support gunship that flies out of the reach of most ground mobiles. It is tough enough to survive limited anti-air fire, and its twin EMGs chew through units stupid enough to stay put.]],

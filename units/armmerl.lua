@@ -39,6 +39,7 @@ unitDef = {
   maxVelocity         = 2.25,
   minCloakDistance    = 75,
   movementClass       = [[TANK3]],
+  moveState			  = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName          = [[core_diplomat.s3o]],
   script              = [[armmerl.lua]],

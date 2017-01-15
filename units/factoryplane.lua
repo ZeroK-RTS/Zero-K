@@ -57,6 +57,7 @@ unitDef = {
   maxVelocity                   = 0,
   metalMake                     = 0.3,
   minCloakDistance              = 150,
+  moveState        				= 2,
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],
   script                        = [[factoryplane.lua]],
