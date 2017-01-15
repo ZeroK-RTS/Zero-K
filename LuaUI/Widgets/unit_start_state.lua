@@ -19,7 +19,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 
 local function IsGround(ud)
-    return not ud.canFly and not string.match(ud.name, "factory")
+    return not ud.canFly and not ud.isFactory
 end
 
 options_path = 'Game/New Unit States'
