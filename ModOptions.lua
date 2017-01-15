@@ -219,6 +219,11 @@ local options = {
         name = "Auto",
         desc = "Shuffle if FFA.",
       },
+      {
+        key  = "disable",
+        name = "Disable boxes",
+        desc = "Allow to place anywhere. Boxes are still drawn for reference but are not obligatory.",
+      },
     },
   },
   {

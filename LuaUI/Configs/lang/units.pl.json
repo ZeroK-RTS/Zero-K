@@ -169,10 +169,10 @@
         "description": "Buduje pojazdy, moc 10 m/s",
         "helptext": "Fabryka pojazdów to ucieleśnienie wojny błyskawicznej - oddaje do dyspozycji szybkie, agresywne jednostki skuteczne w bezpośredniej walce."
     },
-    "cornukesub": {
-        "name": "Leviathan",
-        "description": "Łódź atomowa, moc 6.25 m/s, 90s przeładowanie",
-        "helptext": "Leviathan jest w stanie wytwarzać i wysyłać rakiety taktyczne. Nie ma jednak broni do walki bezpośredniej i należy trzymać go jak najdalej od wrogich jednostek."
+    "subtacmissile": {
+        "name": "Scylla",
+        "description": "Łódź atomowa, moc 20 m/s, 30s przeładowanie",
+        "helptext": "Scylla jest w stanie wytwarzać i wysyłać rakiety taktyczne. Nie ma jednak broni do walki bezpośredniej i należy trzymać ją jak najdalej od wrogich jednostek."
     },
     "armpb": {
         "name": "Gauss",
@@ -590,11 +590,6 @@
         "description": "Latająca bomba (zakopuje się)",
         "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
     },
-    "gorg": {
-        "name": "Jugglenaut",
-        "description": "Ciężki mech szturmowy",
-        "helptext": "Jugglenaut, niczym starszy brat Sumo, jest ciężką, powolną jednostką o ogromnej wytrzymałości i używającą działek grawitacyjnych; ma także rdzeń grawitacyjny, który można aktywować, aby podnieść okoliczne jednostki i rzucić nimi."
-    },
     "pw_generic": {
         "name": "Neutralny Budynek",
         "description": "pusty",
@@ -942,11 +937,6 @@
         "name": "Snake",
         "description": "Lekka łódź podwodna",
         "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami i ładunkami głębinowymi."
-    },
-    "subarty": {
-        "name": "Serpent",
-        "description": "Łódź podwodna artylerii precyzyjnej",
-        "helptext": "Serpent jest bardzo drogi, powolny i ma niską wytrzymałość, ale jego potężne torpedy dalekiego zasięgu zatapiają wszystko, co pływa."
     },
     "armanni": {
         "name": "Annihilator",

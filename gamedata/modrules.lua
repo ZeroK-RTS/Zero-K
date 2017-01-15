@@ -65,6 +65,8 @@ local modrules  = {
     requireSonarUnderWater = true,  -- defaults to true
     
     los = {
+	  -- Don't bother changing these values.
+	  -- In a test, both mip levels from 2 -> 4 changed the usage from around 1% to 0.6%.
       losMipLevel = 2,  -- defaults to 1
       losMul      = 1,  -- defaults to 1
       airMipLevel = 2,  -- defaults to 2

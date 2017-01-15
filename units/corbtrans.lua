@@ -116,7 +116,7 @@ unitDef = {
       craterMult              = 0,
 
       customParams        = {
-        combatrange = 100,
+        combatrange = 60,
         light_camera_height = 1200,
         light_radius = 160,
       },
@@ -135,7 +135,7 @@ unitDef = {
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
       noSelfDamage            = true,
-      range                   = 300,
+      range                   = 325,
       reloadtime              = 0.2,
       rgbColor                = [[1 0 0]],
       soundHit                = [[weapon/laser/lasercannon_hit]],

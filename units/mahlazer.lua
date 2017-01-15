@@ -11,13 +11,13 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 11,
   buildingGroundDecalSizeY      = 11,
-  buildingGroundDecalType       = [[mahlazer_aoplane.dds]],
+  buildingGroundDecalType       = [[starlight_aoplate.dds]],
   buildPic                      = [[mahlazer.png]],
   buildTime                     = 40000,
   canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[120 120 120]],
+  collisionVolumeScales         = [[160 160 160]],
   collisionVolumeType           = [[ellipsoid]],
   corpse                        = [[DEAD]],
 
@@ -27,13 +27,15 @@ unitDef = {
     helptext       = [[This large scale tool is used to shape terrain for terraforming projects. Also useful as a cleanser of obstacles such as pesky enemy units and bases.]],
     helptext_fr    = [[Le Starlight est un b?timent abritant un puissant g?n?rateur de faisceau laser ?liptique, dont l'impact est param?trable. Sa puissance est telle qu'il coupe tout sur son passage, y compris les alli?s. Pensez ? pr?voir un espace d?gag? autour de lui pour ?viter que le laser ne coupe votre base en deux en d?marrant.]],
 	helptext_de    = [[Diese gigantische Waffe nutzt ihren energetischen Strahl, um große Gräben im Terrain zu hinterlassen und dabei alles, was sich ihr in den Weg stellt, auszulöschen. Ebenfalls als Auslöscher von störenden Hindernissen, wie zum Beispiel nervtötende feindliche Enheiten und Basen, sehr nützlich.]],
-	modelradius    = [[60]],
+	modelradius    = [[80]],
+	aimposoffset   = [[0 35 0]],
+	midposoffset   = [[0 0 0]],
 	select_no_rotate   = [[1]], -- tells selection widgets to treat the unit as if it has no rotation.
   },
 
   explodeAs                     = [[ATOMIC_BLAST]],
-  footprintX                    = 8,
-  footprintZ                    = 8,
+  footprintX                    = 10,
+  footprintZ                    = 10,
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
@@ -43,8 +45,8 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[lazer.3do]],
-  script                        = [[mahlazor.lua]],
+  objectName                    = [[starlight.dae]],
+  script                        = [[mahlazer.lua]],
   onoffable                     = true,
   seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
@@ -54,13 +56,12 @@ unitDef = {
     explosiongenerators = {
       [[custom:IMMA_LAUNCHIN_MAH_LAZER]],
     },
-
   },
   sightDistance                 = 660,
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
-  yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
+  yardMap                       = [[oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo]],
 
   weapons                       = {
 
@@ -107,7 +108,6 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
-		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -127,9 +127,9 @@ unitDef = {
       soundStart              = [[weapon/laser/heavy_laser4]],
       soundTrigger            = true,
       texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      texture2                = [[none]],
+      texture3                = [[none]],
+      texture4                = [[none]],
       thickness               = 0,
       tolerance               = 65536,
       turret                  = true,
@@ -150,14 +150,11 @@ unitDef = {
       craterMult              = 8,
 
 	  customParams        	  = {
-		statsdamage = 5430,
-		script_reload = 20,
+		stats_damage = 3000,
 
 		light_color = [[5 0.3 6]],
 		light_radius = 2000,
 		light_beam_start = 0.8,
-		
-		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -178,9 +175,9 @@ unitDef = {
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      --texture2                = [[flare]],
+      --texture3                = [[flare]],
+      --texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
 	  tileLength              = 10000,
@@ -199,13 +196,11 @@ unitDef = {
       beamTime                = 1/30,
       canattackground         = false,
       coreThickness           = 0.5,
-      craterBoost             = 2,
-      craterMult              = 4,
+      craterBoost             = 0,
+      craterMult              = 0,
 
 	  customParams        	  = {
 		light_radius = 0,
-		
-		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -225,9 +220,9 @@ unitDef = {
 	  scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      --texture2                = [[flare]],
+      --texture3                = [[flare]],
+      --texture4                = [[smallflare]],
       thickness               = 100,
       tolerance               = 65536,
 	  tileLength              = 10000,
@@ -252,9 +247,6 @@ unitDef = {
 		light_color = [[3 0.2 4]],
 		light_radius = 1200,
 		light_beam_start = 0.8,
-		
-		script_reload = 1/30,
-		effective_beam_time = 1/30,
 	  },
 	  
       damage                  = {
@@ -275,9 +267,9 @@ unitDef = {
       soundStartVolume        = 1,
       soundTrigger            = true,
       texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      --texture2                = [[flare]],
+      --texture3                = [[flare]],
+      --texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
 	  tileLength              = 10000,
@@ -301,8 +293,6 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
-		
-		effective_beam_time = 1/30,
 	  },
 
       damage                  = {
@@ -322,9 +312,9 @@ unitDef = {
 	  scrollSpeed             = 8,
       soundTrigger            = true,
       texture1                = [[largelaser]],
-      texture2                = [[flare]],
-      texture3                = [[flare]],
-      texture4                = [[smallflare]],
+      --texture2                = [[flare]],
+      --texture3                = [[flare]],
+      --texture4                = [[smallflare]],
       thickness               = 50,
       tolerance               = 65536,
 	  tileLength              = 10000,
@@ -342,7 +332,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[starlight_d.dae]],
+      object           = [[starlight_dead.dae]],
     },
 
 
@@ -354,7 +344,6 @@ unitDef = {
     },
 
   },
-
 }
 
-return lowerkeys({ starlight = unitDef })
+return lowerkeys({ mahlazer = unitDef })

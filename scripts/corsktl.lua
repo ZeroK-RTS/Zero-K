@@ -96,6 +96,10 @@ end
 function preJump () end
 function jumping() end
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.Create ()
 	StartThread (SmokeUnit, smokePiece)
 end

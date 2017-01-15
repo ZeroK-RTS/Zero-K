@@ -10,7 +10,6 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 2, 
     enabled   = true,  --  loaded by default?
-    handler   = true,
   }
 end
 
@@ -26,7 +25,7 @@ local stackPersistent
 local msgBoxConvo
 
 local convoQueue = {}
-local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imagePath}
 local persistentMsgIndex = {}
 
 local useChiliConvo = false
@@ -153,11 +152,10 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
   }
 end
 
-local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
-	local vsx, vsy = Spring.GetWindowGeometry()
+local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
+	local vsx, vsy = gl.GetViewSizes()
 	--local x = math.floor((vsx - width)/2)
-	local y = 50 + vsy * 0.20 + 64	-- put it under proconsole and objectives button
-	--local y = math.floor((vsy - height)/2)
+	local y = math.floor((vsy - height)/2)
 	
 	width = width or 360
 	height = height or 160
@@ -182,11 +180,11 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
 		msgBoxPersistent.x = vsx - width
 		
-		local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
-		if imageDir then
+		local x = ((imagePath and imagePersistent.width + imagePersistent.x) or 0) + 5
+		if imagePath then
 			imagePersistent.width = PERSISTENT_IMAGE_HEIGHT
 			imagePersistent.height = PERSISTENT_IMAGE_HEIGHT
-			imagePersistent.file = imageDir
+			imagePersistent.file = imagePath
 			imagePersistent.color = {1, 1, 1, 1}
 			
 			scrollPersistent.width = (width - x - 12)
@@ -226,7 +224,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	-- no messagebox exists, make one
 	msgBoxPersistent = Chili.Window:New{
 		parent = Chili.Screen0,
-		name   = 'msgPersistentWindow';
+		name   = 'msgWindow';
 		width = width,
 		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,
@@ -248,11 +246,11 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		y = 10;
 		x = 5;
 		keepAspect = true,
-		file = imageDir;
+		file = imagePath;
 		parent = msgBoxPersistent;
 	}
 	
-	local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
+	local x = ((imagePath and imagePersistent.width + imagePersistent.x) or 0) + 5
 	scrollPersistent = Chili.ScrollPanel:New{
 		parent  = msgBoxPersistent;
 		right	= 4,
@@ -331,13 +329,13 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	}
 end
 
-local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+local function ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
 	text = ProcessColorCodes(text)
 	persistentMsgIndex = #persistentMsgHistory + 1
-	persistentMsgHistory[persistentMsgIndex] = {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+	persistentMsgHistory[persistentMsgIndex] = {text = text, width = width, height = height, fontsize = fontsize, image = imagePath}
 	flashTime = TIME_TO_FLASH
 	Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
-	_ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+	_ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
 end
 
 local function HidePersistentMessageBox()
@@ -459,6 +457,19 @@ local function ClearConvoQueue()
   convoQueue = {}
 end
 
+function ReceivePersistentMessages(newMessages)
+  if #newMessages == #persistentMsgHistory then
+    return
+  end
+  
+  ClearPersistentMessageHistory()
+  for index, msg in pairs(newMessages) do
+    ShowPersistentMessageBox(msg.message, msg.width, msg.height, msg.fontSize, msg.image)
+  end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:GameFrame(n)
   if convoExpireFrame and convoExpireFrame <= n then
     ClearConvoBox(false)
@@ -579,6 +590,9 @@ function widget:Initialize()
     WG.AddNoHideWidget(self)
   end
   
+  widgetHandler:RegisterGlobal("MissionPersistentMessagesFromSynced", ReceivePersistentMessages)
+  Spring.SendLuaRulesMsg("sendMissionPersistentMessages")
+  
   -- testing
   --[[
   local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
@@ -609,6 +623,7 @@ function widget:Shutdown()
   WG.HidePersistentMessageBox = nil
   WG.AddConvo = nil
   WG.ClearConvoQueue = nil
+  widgetHandler:DeregisterGlobal("MissionPersistentMessagesFromSynced")
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)

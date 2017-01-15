@@ -318,7 +318,7 @@
 	"amgeo" : {
 		"name" : "Advanced Geothermal",
 		"description" : "Large Powerplant (+100) - HAZARDOUS",
-		"helptext" : "The Moho Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
+		"helptext" : "The Advanced Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."
 	},
 	"armnanotc" : {
 		"name" : "Caretaker",
@@ -569,11 +569,6 @@
 		"description" : "Flying Bomb (Burrows)",
 		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
-	"gorg" : {
-		"name" : "Jugglenaut",
-		"description" : "Heavy Assault Strider",
-		"helptext" : "The Jugglenaut is the big daddy to the Sumo. Where its smaller cousin sported the exotic disruptor beams, the Jugg is even more bizzare with its three gravity guns and a standard laser cannon complementing a negative gravity core that can be activated to lift up and throw nearby units. This beast is slow and expensive, but seemingly impervious to enemy fire."
-	},
 	"pw_generic" : {
 		"name" : "Generic Neutral Structure",
 		"description" : "Blank",
@@ -601,7 +596,7 @@
 	},
 	"raveparty" : {
 		"name" : "Disco Rave Party",
-		"description" : "Rainbow Surprise Superweapon",
+		"description" : "Destructive Rainbow Projector",
 		"helptext" : "The Disco Rave Party throws six different party shots at your enemy for a different surprise each time. Fun for the whole family!"
 	},
 	"corllt" : {
@@ -912,11 +907,6 @@
 		"name" : "Snake",
 		"description" : "Raider Submarine",
 		"helptext" : "Stealthy, fast, and fragile, this Submarine can quickly strike unprotected targets. Slow damage allows it to effectively kill lone units. Watch out for anything with anti-sub weaponry, especially Hunters."
-	},
-	"subarty" : {
-		"name" : "Serpent",
-		"description" : "Precise Artillery/Anti-Heavy Submarine",
-		"helptext" : "The Serpent is truly a nightmare, for its long-range, deadly accurate, high lethality heavy torpedoes can sink almost any ship in a few shots. It is however extremely expensive and not particularly agile."
 	},
 	"striderhub" : {
 		"name" : "Strider Hub",

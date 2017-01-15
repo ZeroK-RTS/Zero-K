@@ -1489,11 +1489,11 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 	}
 end
 
+local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _,elem in ipairs(pathoptions[path]) do
 		local option = elem[2]
-		
-		if not ({button=1, label=1, menu=1})[option.type] then
+		if not (unresetableSettings[option.type] or option.developmentOnly) then
 			if option.default ~= nil then --fixme : need default
 				if option.type == 'bool' or option.type == 'number' then
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default

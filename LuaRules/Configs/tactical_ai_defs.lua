@@ -206,7 +206,6 @@ local longRangeSkirmieeArray = NameToDefID({
 	"capturecar",
 	"chickenc",
 	"armbanth",
-	"gorg",
 	"corllt",
 	"armdeva",
 	"armartic",

@@ -1,7 +1,7 @@
 unitDef = {
   unitname                      = [[raveparty]],
   name                          = [[Disco Rave Party]],
-  description                   = [[Rainbow Surprise Superweapon]],
+  description                   = [[Destructive Rainbow Projector]],
   acceleration                  = 0,
   brakeRate                     = 0,
   buildCostEnergy               = 32000,

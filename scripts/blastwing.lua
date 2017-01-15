@@ -57,6 +57,10 @@ local function UnBurrow()
 	--Move(base, forward, 0, 5)
 end
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end

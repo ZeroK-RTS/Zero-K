@@ -104,7 +104,6 @@ local heavies = { --not used yet
 	"corgol", --goliath
 	"corcan",
 	"corsumo",
-	"gorg", --juggernaut
 	"dante",
 }
 

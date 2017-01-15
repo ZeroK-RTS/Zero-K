@@ -537,14 +537,6 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	gorg = {
-		ok = {
-			[1] = "turret_select",
-		},
-		select = {
-			[1] = "turret_select",
-		},
-	},
 	scorpion = {
 		ok = {
 			[1] = "spy_move",

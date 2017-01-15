@@ -11,8 +11,8 @@ local nanoPieces = {[0] = lnano, [1] = rnano}
 local smokePiece = {torso}
 --------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------
-local PERIOD = 500
-local INTERMISSION = 100
+local PERIOD = 250
+local INTERMISSION = 50
 
 local LEG_FRONT_DISPLACEMENT = 4
 local LEG_BACK_DISPLACEMENT = -4

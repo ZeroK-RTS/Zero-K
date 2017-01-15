@@ -74,8 +74,8 @@ unitDef = {
       areaOfEffect            = 240,
       canAttackGround         = false,
       cegTag                  = [[screamertrail]],
-      craterBoost             = 1,
-      craterMult              = 2,
+      craterBoost             = 0.1,
+      craterMult              = 0.2,
       cylinderTargeting       = 3.2,
 
 	  customParams        	  = {

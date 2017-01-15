@@ -691,13 +691,13 @@ local function IsUnitFXVisible(fx)
 		end
 	end
 
-	if (not fx.onActive)or(unitActive) then
+	if (not fx.onActive) or (unitActive) then
 		if fx.alwaysVisible then
 			return true
 		elseif (fx.Visible) then
 			return fx:Visible()
 		else
-			local unitRadius = (spGetUnitRadius(unitID) + 40)
+			local unitRadius = (spGetUnitRadius(unitID) or 0) + 40
 			local r = fx.radius or 0
 			return Spring.IsUnitVisible(unitID, unitRadius + r)
 		end
@@ -826,9 +826,9 @@ local function GameFrame(_,n)
   --// update team/player status
   local spec, specFullView = spGetSpectatingState()
   if (specFullView) then
-    LocalAllyTeamID = scGetReadAllyTeam()
+    LocalAllyTeamID = scGetReadAllyTeam() or 0
   else
-    LocalAllyTeamID = spGetLocalAllyTeamID()
+    LocalAllyTeamID = spGetLocalAllyTeamID() or 0
   end
   --// create delayed FXs
   if (effectsInDelay[1]) then

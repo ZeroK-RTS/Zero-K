@@ -218,7 +218,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[CORMORT_DEAD.s3o]],
+      object           = [[cormort_dead_no_gun.s3o]],
     },
 
 

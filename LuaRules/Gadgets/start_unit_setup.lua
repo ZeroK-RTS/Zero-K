@@ -11,7 +11,8 @@ function gadget:GetInfo()
 end
 
 -- partially based on Spring's unit spawn gadget
-include "LuaRules/Configs/start_setup.lua"
+include("LuaRules/Configs/start_setup.lua")
+include("LuaRules/Configs/constants.lua")
 
 if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
 	if not gadgetHandler:IsSyncedCode() then
@@ -22,8 +23,8 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 
 	function gadget:Initialize()
 		for _, teamID in ipairs(Spring.GetTeamList()) do
-			Spring.SetTeamResource(teamID, "es", START_STORAGE + OVERDRIVE_BUFFER)
-			Spring.SetTeamResource(teamID, "ms", START_STORAGE + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
+			Spring.SetTeamResource(teamID, "ms", START_STORAGE + HIDDEN_STORAGE)
 		end
 		for i, v in pairs(ploppables) do
 			local name = UnitDefNames[v]
@@ -307,13 +308,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		local metal, metalStore = Spring.GetTeamResources(teamID, "metal")
 		local energy, energyStore = Spring.GetTeamResources(teamID, "energy")
 
-		-- the adding of existing resources is necessary for handling /take and spawn
-		local bonus = (keys and tonumber(keys.bonusresources)) or 0
-
-		Spring.SetTeamResource(teamID, "es", START_STORAGE + energyStore  + bonus)
-		Spring.SetTeamResource(teamID, "ms", START_STORAGE + metalStore + bonus)
-		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy + bonus)
-		Spring.SetTeamResource(teamID, "metal", START_METAL + metal + bonus)
+		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
+		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
 
 		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
@@ -423,8 +419,8 @@ function gadget:GameStart()
 		-- clear resources
 		-- actual resources are set depending on spawned unit and setup
 		if not loadGame then
-			Spring.SetTeamResource(team, "es", 0 + OVERDRIVE_BUFFER)
-			Spring.SetTeamResource(team, "ms", 0 + OVERDRIVE_BUFFER)
+			Spring.SetTeamResource(team, "es", 0 + HIDDEN_STORAGE)
+			Spring.SetTeamResource(team, "ms", 0 + HIDDEN_STORAGE)
 			Spring.SetTeamResource(team, "energy", 0)
 			Spring.SetTeamResource(team, "metal", 0)
 		end

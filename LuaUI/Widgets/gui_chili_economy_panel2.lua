@@ -30,10 +30,8 @@ WG.lowPriorityBP = 0
 --------------------------------------------------------------------------------
 
 local abs = math.abs
-local GetMyTeamID = Spring.GetMyTeamID
-local GetTeamResources = Spring.GetTeamResources
-local GetTimer = Spring.GetTimer
-local DiffTimers = Spring.DiffTimers
+local spGetMyTeamID = Spring.GetMyTeamID
+local spGetTeamResources = Spring.GetTeamResources
 local spGetModKeyState = Spring.GetModKeyState
 local Chili
 
@@ -81,14 +79,16 @@ local col_income
 local col_expense
 local col_overdrive
 
+local RESERVE_SEND_TIME = 1
+
 local updateOpacity = false
 
+local reserveSentTimer = false
 local blinkMetal = 0
 local blinkEnergy = 0
 local baseBlinkPeriod = 1.4
 local blinkM_status = false
 local blinkE_status = false
-local time_old = 0
 local excessE = false
 
 local strings = {
@@ -337,10 +337,9 @@ function UpdateCustomParamResourceData()
 	
 	-- Spectators read the reserve state of the player they are spectating.
 	-- Players have the resource bar keep track of reserve locally.
-	if Spring.GetSpectatingState() then
+	if (not reserveSentTimer) or Spring.GetSpectatingState() then
 		local teamID = Spring.GetLocalTeamID()
-		local _, mStor = GetTeamResources(teamID, "metal")
-		mStor = mStor - HIDDEN_STORAGE
+		local mStor = select(2, spGetTeamResources(teamID, "metal")) - HIDDEN_STORAGE
 		cp.metalStorageReserve = Spring.GetTeamRulesParam(teamID, "metalReserve") or 0
 		if mStor <= 0 and bar_reserve_metal.bars[1].percent ~= 0 then
 			bar_reserve_metal.bars[1].percent = 0
@@ -350,8 +349,7 @@ function UpdateCustomParamResourceData()
 			bar_reserve_metal:Invalidate()
 		end
 		
-		local _, eStor = GetTeamResources(teamID, "energy")
-		mStor = eStor - HIDDEN_STORAGE
+		local eStor = select(2, spGetTeamResources(teamID, "energy")) - HIDDEN_STORAGE
 		cp.energyStorageReserve = Spring.GetTeamRulesParam(teamID, "energyReserve") or 0
 		if eStor <= 0 and bar_reserve_energy.bars[1].percent ~= 0 then
 			bar_reserve_energy.bars[1].percent = 0
@@ -363,20 +361,31 @@ function UpdateCustomParamResourceData()
 	end
 end
 
-local function updateReserveBars(metal, energy, value, overrideOption)
+local function UpdateReserveBars(metal, energy, value, overrideOption, localOnly)
 	if options.enableReserveBar.value or overrideOption then
-		if value < 0 then value = 0 end
-		if value > 1 then value = 1 end
+		if value < 0 then 
+			value = 0 
+		end
+		if value > 1 then 
+			value = 1 
+		end
+		
+		reserveSentTimer = RESERVE_SEND_TIME
+		
 		if metal then
-			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-			Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE)) 
+			local _, mStor = spGetTeamResources(spGetMyTeamID(), "metal")
+			if not localOnly then
+				Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE))
+			end
 			cp.metalStorageReserve = value*(mStor - HIDDEN_STORAGE)
 			bar_reserve_metal.bars[1].percent = value
 			bar_reserve_metal:Invalidate()
 		end
 		if energy then
-			local _, eStor = GetTeamResources(GetMyTeamID(), "energy")
-			Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE)) 
+			local _, eStor = spGetTeamResources(spGetMyTeamID(), "energy")
+			if not localOnly then
+				Spring.SendLuaRulesMsg("ereserve:"..value*(eStor - HIDDEN_STORAGE))
+			end
 			cp.energyStorageReserve = value*(eStor - HIDDEN_STORAGE)
 			bar_reserve_energy.bars[1].percent = value
 			bar_reserve_energy:Invalidate()
@@ -394,7 +403,7 @@ local function Mix(startColour, endColour, interpParam)
 	endColour[4] * interpParam + startColour[4] * (1 - interpParam), }
 end
 
-function widget:Update(s)
+local function UpdateBlink(s)
 	if blinkM_status then
 		local blinkPeriod = baseBlinkPeriod/blinkM_status
 		blinkMetal = (blinkMetal + s)%blinkPeriod
@@ -412,7 +421,9 @@ function widget:Update(s)
 		
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
 	end
-	
+end	
+
+local function UpdateWindowOpacity()
 	if updateOpacity then
 		if (window_metal) then 
 			window_metal.backgroundColor[4] = updateOpacity
@@ -426,8 +437,17 @@ function widget:Update(s)
 	end
 end
 
+local function UpdateReserveSentTimer(dt)
+	if not reserveSentTimer then
+		return
+	end
+	reserveSentTimer = reserveSentTimer - dt
+	if reserveSentTimer < 0 then
+		reserveSentTimer = false
+	end
+end
+
 local function Format(input, override)
-	
 	local leadingString = positiveColourStr .. "+"
 	if input < 0 then
 		leadingString = negativeColourStr .. "-"
@@ -467,8 +487,8 @@ function widget:GameFrame(n)
 	end
 	
 	if n > 5 and not initialReserveSet then
-		updateReserveBars(true, false, options.defaultMetalReserve.value, true)
-		updateReserveBars(false, true, options.defaultEnergyReserve.value, true)
+		UpdateReserveBars(true, false, options.defaultMetalReserve.value, true)
+		UpdateReserveBars(false, true, options.defaultEnergyReserve.value, true)
 		initialReserveSet = true
 	end
 	
@@ -493,7 +513,7 @@ function widget:GameFrame(n)
 	local teamTotalEnergyStored = 0
 	local teamTotalEnergyCapacity = 0
 	for i = 1, #teams do
-		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(teams[i], "metal")
+		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
@@ -503,7 +523,7 @@ function widget:GameFrame(n)
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
 		teamMPull = teamMPull + mPull + extraMetalPull
 		
-		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(teams[i], "energy")
+		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teams[i], "energy")
 		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
 		
 		local energyOverdrive = spGetTeamRulesParam(teams[i], "OD_energyOverdrive") or 0
@@ -520,8 +540,8 @@ function widget:GameFrame(n)
 
 	local teamEnergyIncome = teamEnergyReclaim + cp.team_energyIncome
 	
-	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = GetTeamResources(myTeamID, "energy")
-	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = GetTeamResources(myTeamID, "metal")
+	local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(myTeamID, "energy")
+	local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(myTeamID, "metal")
 	
 	local eReclaim = eInco - math.max(0, cp.energyChange)
 	eInco = eReclaim + cp.energyIncome
@@ -587,8 +607,24 @@ function widget:GameFrame(n)
 	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
 	energyWarningPanel.ShowWarning(energyWarning)
 
-	local mPercent = (mStor > 0 and 100 * mCurr / mStor) or 0
-	local ePercent = (eStor > 0 and 100 * eCurr / eStor) or 0 
+	--// Storage, income and pull numbers
+	local realEnergyPull = ePull
+	
+	local mPercent, ePercent 
+	if mStor > 0 then
+		mPercent = 100 * mCurr / mStor
+	elseif mInco + mReci > mPull then
+		mPercent = 100
+	else
+		mPercent = 0
+	end
+	if eStor > 0 then
+		ePercent = 100 * eCurr / eStor
+	elseif eInco > realEnergyPull then
+		ePercent = 100
+	else
+		ePercent = 0
+	end
 	
 	mPercent = math.min(math.max(mPercent, 0), 100)
 	ePercent = math.min(math.max(ePercent, 0), 100)
@@ -663,9 +699,6 @@ function widget:GameFrame(n)
 	"\n  " .. strings["resbar_other"] .. ": " .. team_energyOther ..
 	"\n  " .. strings["resbar_waste"] .. ": " .. team_energyWaste ..
     "\n  " .. strings["resbar_stored"] .. ": " .. ("%i / %i"):format(teamTotalEnergyStored, teamTotalEnergyCapacity)
-
-	--// Storage, income and pull numbers
-	local realEnergyPull = ePull
 	
 	lbl_expense_metal:SetCaption( negativeColourStr..Format(mPull, negativeColourStr.." -") )
 	lbl_expense_energy:SetCaption( negativeColourStr..Format(realEnergyPull, negativeColourStr.." -") )
@@ -811,6 +844,12 @@ function widget:Shutdown()
 	WG.ShutdownTranslation(GetInfo().name)
 end
 
+function widget:Update(dt)
+	UpdateBlink(dt)
+	UpdateWindowOpacity()
+	UpdateReserveSentTimer(dt)
+end
+
 function widget:Initialize()
 	Chili = WG.Chili
 
@@ -827,8 +866,6 @@ function widget:Initialize()
 	--widgetHandler:RegisterGlobal("SendWindProduction", SendWindProduction)
 	--widgetHandler:RegisterGlobal("PriorityStats", PriorityStats)
 
-	time_old = GetTimer()
-
 	Spring.SendCommands("resbar 0")
 	option_colourBlindUpdate()
 
@@ -844,11 +881,11 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		
 		local reserve = (x) / (self.width - self.padding[1] - self.padding[3])
 		if mouse ~= 1 then
-			updateReserveBars(true, true, reserve)
+			UpdateReserveBars(true, true, reserve)
 		elseif metal then
-			updateReserveBars(true, false, reserve)
+			UpdateReserveBars(true, false, reserve)
 		else
-			updateReserveBars(false, true, reserve)
+			UpdateReserveBars(false, true, reserve)
 		end
 	end
 	

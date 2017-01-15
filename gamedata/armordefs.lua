@@ -1,14 +1,3 @@
--- $Id: armordefs.lua 4523 2009-05-02 05:11:19Z saktoth $
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
---  file:    armorDefs.lua
---  brief:   armor definitions
---
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
 
 Spring.Echo("Loading ArmorDefs_posts")
 
@@ -18,10 +7,8 @@ Spring.Echo("Loading ArmorDefs_posts")
 local armorDefs = {
   
   SUBS = {
-    "subarty",
     "subraider",
     "subscout",
-	"cornukesub",
     "subtacmissile",
   },
 
@@ -157,25 +144,6 @@ for name, wd in pairs(DEFS.weaponDefs) do
 		wd.damage.default = 0.001
 	end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
--- convert to named maps  (does anyone know what 99 is for?  :)
-
-if reverseCompat then
-	for categoryName, categoryTable in pairs(armorDefs) do
-		local t = categoryTable
-		for _, unitName in pairs(categoryTable) do
-			t[unitName] = 99
-		end
-		armorDefs[categoryName] = t
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
 local system = VFS.Include('gamedata/system.lua')
 

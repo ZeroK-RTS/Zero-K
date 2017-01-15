@@ -111,6 +111,15 @@ return {
 		decorations = {"skin_recon_dark", "banner_overhead"},
 		images = {overhead = "184"}
 	},
+	dynfancy_support = {
+		name = "Engineer Trainer",
+		chassis = "support",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_support_zebra", "banner_overhead"},
+		images = {overhead = "184"}
+	},
 	dynfancy_strike = {
 		name = "Strike Trainer",
 		chassis = "strike",
