@@ -165,7 +165,7 @@ local function TransferUnitAndKeepProduction(unitID, newTeamID)
 
 				transferredFactories[unitID] = data
 
-				spSetUnitHealth(producedUnitID, { build = 0 })  -- reset buildProgress to 0 before transfer factory, so no resources are given to AFK team when cancelling current build queue
+				spSetUnitHealth(producedUnitID, {build = 0})  -- reset buildProgress to 0 before transfer factory, so no resources are given to AFK team when cancelling current build queue
 			end
 		end
 	end
@@ -202,7 +202,7 @@ local function UpdateTeamActivity(teamID)
 		local activeRank = GetPlayerActivity(players[i])
 		if activeRank then
 			resourceShare = resourceShare + 1
-			if (not teamRank) or activeRank > teamRank then
+			if (not teamRank) or (activeRank > teamRank) then
 				teamRank = activeRank
 			end
 		end
@@ -216,7 +216,7 @@ local function UpdateTeamActivity(teamID)
 	
 	if resourceShare > 0 and not teamResourceShare[teamID] then
 		local playerName = Spring.GetPlayerInfo(leaderID)
-		spEcho("game_message: Player " .. playerName .. " is no longer lagging or AFK; returning all their units.")
+		local unitsRecieved = false
 		
 		for unitID, teamList in pairs(teamLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
 			local delete = false
@@ -226,6 +226,7 @@ local function UpdateTeamActivity(teamID)
 					local otherTeam = teamList[i]
 					if (otherTeam == teamID) then
 						TransferUnitAndKeepProduction(unitID, teamID)
+						unitsRecieved = true
 						delete = true
 					end
 					-- remove all teams after the previous owner (inclusive)
@@ -234,6 +235,10 @@ local function UpdateTeamActivity(teamID)
 					end
 				end
 			end
+		end
+		
+		if unitsRecieved then
+			spEcho("game_message: Player " .. playerName .. " is no longer lagging or AFK; returning all their units.")
 		end
 	end
 	
@@ -257,7 +262,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			if teamResourceShare[teamID] then
 				giveAwayTeams[#giveAwayTeams + 1] = teamID
 			end
-		elseif teamRank and ((not recieveRank) or teamRank > recieveRank) then
+		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
 			recieveRank = teamRank
 			recieveTeamID = teamID
 		end
@@ -305,8 +310,8 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			GG.allowTransfer = false
 		end
 		
-		local recieveName = Spring.GetPlayerInfo(recieveTeamID)
-		local giveName = Spring.GetPlayerInfo(giveTeamID)
+		local recieveName = select(1, Spring.GetPlayerInfo(recieveTeamID)) or "unknown"
+		local giveName = select(1, Spring.GetPlayerInfo(giveTeamID)) or "unknown"
 		local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
 		
 		-- Send message
@@ -314,8 +319,6 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			spEcho("game_message: " .. giveName .. " resigned, giving all units to " .. recieveName)
 		elseif #units > 0 then
 			spEcho("game_message: Giving all units of ".. giveName .. " to " .. recieveName .. " due to lag/AFK")
-		else
-			spEcho("game_message: " .. giveName .. " resigned")
 		end
 	end
 end
