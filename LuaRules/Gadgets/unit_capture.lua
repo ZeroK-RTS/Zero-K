@@ -622,13 +622,8 @@ local function DrawWire(units, spec)
 				topX, topY, topZ = GetUnitTop(controliee, xxx, yyy, zzz)
 				point[3] = {topX,topY,topZ}
 				point[4] = {xxx,yyy,zzz}
-				gl.PushAttrib(GL.LINE_BITS)
-				gl.DepthTest(true)
-				glLineWidth(3)
 				gl.Color (teamR or 0.5, teamG or 0.5, teamB or 0.5, math.random()*0.1+0.3)
 				gl.BeginEnd(GL_LINES, DrawBezierCurve, point[1], point[2], point[3], point[4], 10)
-				gl.DepthTest(false)
-				gl.PopAttrib()
 			end
 		else
 			drawingUnits[controliee] = nil
@@ -652,21 +647,19 @@ end
 
 local lastFrame = 0
 function gadget:DrawWorld()
-    if Spring.GetGameFrame() ~= lastFrame then
+	if Spring.GetGameFrame() ~= lastFrame then
 		UpdateList()
 	end
 	
 	if drawAnything then
-        glPushAttrib(GL.LINE_BITS)
+		glPushAttrib(GL.LINE_BITS)
 		glLineWidth(3)
 		gl.DepthTest(true)
-        --glLineStipple('')
-        glCallList(drawList)
+		glCallList(drawList)
 		gl.DepthTest(false)
-        glColor(1,1,1,1)
-        --glLineStipple(false)
-        glPopAttrib()
-    end
+		glColor(1,1,1,1)
+		glPopAttrib()
+	end
 end
 
 function gadget:UnitGiven(unitID, unitDefID, teamID, oldTeamID)
