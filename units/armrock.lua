@@ -42,6 +42,7 @@ unitDef = {
   maxWaterDepth          = 20,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
+  moveState				 = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],
   script                 = "armrock.lua",
