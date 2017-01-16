@@ -259,14 +259,15 @@ local function UpdateAllyTeamActivity(allyTeamID)
 		local resourceShare, teamRank = UpdateTeamActivity(teamID)
 		totalResourceShares = totalResourceShares + resourceShare
 		if resourceShare == 0 then
-			if teamResourceShare[teamID] then
+			if teamResourceShare[teamID] ~= 0 then
+				-- The team is newly afk.
 				giveAwayTeams[#giveAwayTeams + 1] = teamID
 			end
 		elseif teamRank and ((not recieveRank) or (teamRank > recieveRank)) then
 			recieveRank = teamRank
 			recieveTeamID = teamID
 		end
-		teamResourceShare[teamID] = resourceShare > 0 and resourceShare
+		teamResourceShare[teamID] = resourceShare
 	end
 	allyTeamResourceShares[allyTeamID] = totalResourceShares
 	
