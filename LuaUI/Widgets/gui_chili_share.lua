@@ -33,10 +33,7 @@ local images = {
 	giftmetal = 'LuaUI/Images/ibeam.png',
 	giftenergy = 'LuaUI/Images/energy.png',
 }
-local amounts = {
-	default = 100,
-	shift = 20,
-}
+local defaultamount = 100
 
 local function StringToTable(str)
 	local strtbl = {}
@@ -128,9 +125,9 @@ local function GiveResource(target,kind)
 	--mod = 20,500,all
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if alt then mod = "all"
-	elseif ctrl then mod = 500
-	elseif shift then mod = 20
-	else mod = 100 end
+	elseif ctrl then mod = defaultamount*20
+	elseif shift then mod = defaultamount*5
+	else mod = defaultamount end
 	local leader = select(2,Spring.GetTeamInfo(target))
 	local name = select(1,Spring.GetPlayerInfo(leader))
 	if select(4,Spring.GetTeamInfo(target)) then
