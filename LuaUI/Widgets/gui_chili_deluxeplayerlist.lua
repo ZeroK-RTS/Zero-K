@@ -1265,10 +1265,12 @@ SetupPlayerNames = function()
 							return true
 						end
 						if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
-							if (teams[a].roster and teams[a].roster[1].isActive) and not (teams[b].roster and teams[b].roster[1].isActive) then
+							local aActive = teams[a].roster and teams[a].roster[1] and teams[a].roster[1].isActive
+							local bActive = teams[b].roster and teams[b].roster[1] and teams[b].roster[1].isActive
+							if aActive and not bActive then
 								return true
 							end
-							if (teams[b].roster and teams[b].roster[1].isActive) and not (teams[a].roster and teams[a].roster[1].isActive) then
+							if bActive and not aActive then
 								return false
 							end
 						end
