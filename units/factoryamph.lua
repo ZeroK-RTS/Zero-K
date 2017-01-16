@@ -54,6 +54,7 @@ unitDef = {
   maxSlope         = 15,
   metalMake        = 0.3,
   minCloakDistance = 150,
+  moveState        = 1,
   noAutoFire       = false,
   objectName       = [[factory2.s3o]],
   script           = "factoryamph.lua",

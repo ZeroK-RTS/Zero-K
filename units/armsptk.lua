@@ -38,6 +38,7 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
   script				 = [[armsptk.lua]],

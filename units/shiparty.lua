@@ -39,6 +39,7 @@ unitDef = {
   minCloakDistance       = 75,
   minWaterDepth          = 10,
   movementClass          = [[BOAT4]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
   objectName             = [[shiparty.s3o]],
   script                 = [[shiparty.lua]],

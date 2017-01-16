@@ -37,6 +37,7 @@ unitDef = {
   maxVelocity            = 1.6,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[amphaa.s3o]],
   script                 = [[amphaa.lua]],
