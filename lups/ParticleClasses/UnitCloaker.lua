@@ -265,13 +265,7 @@ function UnitCloaker:CreateParticle()
 end
 
 function UnitCloaker:Visible()
-  if self.allyTeam == LocalAllyTeamID then
-    return Spring.IsUnitVisible(self.unit)
-  end
-
-  local _, specFullView = Spring.GetSpectatingState()
-  local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
-  return specFullView or (losState and losState.los)
+  return GetUnitLosState(self.unit) and Spring.IsUnitVisible(self.unit)
 end
 
 -----------------------------------------------------------------------------------------------------------------
