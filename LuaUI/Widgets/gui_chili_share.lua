@@ -383,7 +383,7 @@ function widget:GameFrame(f)
 	if f == 2 then
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-		Spring.Echo("game_message: Share mode is " .. tostring(modOptions["sharemode"]))
+		Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
@@ -406,7 +406,7 @@ function widget:Initialize()
 	if Spring.GetGameFrame() > 2 then
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-		Spring.Echo("game_message: Share mode is " .. tostring(modOptions["sharemode"]))
+		Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
