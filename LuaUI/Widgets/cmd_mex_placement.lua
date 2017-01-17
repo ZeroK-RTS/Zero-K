@@ -459,6 +459,9 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID)
+	if mexBuilder[unitID] then
+		mexBuilder[unitID] = nil
+	end
 	if unitDefID == mexDefID and spotByID[unitID] then
 		spotData[spotByID[unitID]] = nil
 		spotByID[unitID] = nil
