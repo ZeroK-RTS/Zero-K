@@ -18,6 +18,7 @@ end
 
 include("colors.h.lua")
 VFS.Include("LuaRules/Configs/constants.lua")
+local MIN_STORAGE = 0.5
 
 WG.allies = 1
 --[[
@@ -522,7 +523,7 @@ function widget:GameFrame(n)
 	local teamTotalEnergyCapacity = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
-		mStor = math.max(mStor - HIDDEN_STORAGE, 0.5)
+		mStor = math.max(mStor - HIDDEN_STORAGE, MIN_STORAGE)
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
@@ -533,7 +534,7 @@ function widget:GameFrame(n)
 		teamMPull = teamMPull + mPull + extraMetalPull
 		
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teams[i], "energy")
-		eStor = math.max(eStor - HIDDEN_STORAGE, 0.5)
+		eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
 		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
 		
 		local energyOverdrive = spGetTeamRulesParam(teams[i], "OD_energyOverdrive") or 0
@@ -569,8 +570,8 @@ function widget:GameFrame(n)
 	-- Waste energy is reported as the equal fault of all players.
 	
 	-- reduce by hidden storage
-	mStor = math.max(mStor - HIDDEN_STORAGE, 0.5)
-	eStor = math.max(eStor - HIDDEN_STORAGE, 0.5)
+	mStor = math.max(mStor - HIDDEN_STORAGE, MIN_STORAGE)
+	eStor = math.max(eStor - HIDDEN_STORAGE, MIN_STORAGE)
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	if mCurr >= mStor then
