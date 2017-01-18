@@ -181,9 +181,9 @@ local function BuildInvites()
 end
 
 local function Buildme()
-	Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
+	--Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
 	window = chili.Window:New{parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
-	Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
+	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='25%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
 	local playerlistsize = 91
 	chili.Button:New{parent=window,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Close",OnClick={function () Hideme(); end},tooltip="Closes this window"}
@@ -236,7 +236,7 @@ local function Buildme()
 	for i=1,#players do
 		sizefont = wantedfs
 		repeat
-			Spring.Echo("Fontsize for " .. players[i].name .. ": " .. sizefont)
+			--Spring.Echo("Fontsize for " .. players[i].name .. ": " .. sizefont)
 			if sizefont*((string.len(players[i].name)+5.5)/4.25) > playerpanels[i].width*0.6 then
 				sizefont = sizefont - 0.5
 			end
@@ -263,7 +263,7 @@ local function Buildme()
 			updateme = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '50%',x='2%',y=newy..'%',caption="Invites [0]",OnClick={function () Hideme(); invwindow:Show(); end},tooltip="Contains invites you currently have."}
 		end
 		r,g,b,a = Spring.GetTeamColor(players[i].team)
-		Spring.Echo("Playerpanel size: " .. playerpanels[i].width .. "x" .. playerpanels[i].height .. "\nTextbox size: " .. playerpanels[i].width*0.4 .. "x" .. playerpanels[i].height)
+		--Spring.Echo("Playerpanel size: " .. playerpanels[i].width .. "x" .. playerpanels[i].height .. "\nTextbox size: " .. playerpanels[i].width*0.4 .. "x" .. playerpanels[i].height)
 		local texty = 35.5
 		if #players < 3 then
 			texty = 44.5
