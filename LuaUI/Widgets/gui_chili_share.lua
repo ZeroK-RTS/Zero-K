@@ -15,9 +15,7 @@ local invites = {}
 local built = false
 local sharemode = false
 local playersingame = {}
-include("keysym.h.lua")
 local playerlist, chili, window, screen0,updateme,invitelist,invwindow
-local keytopress = KEYSYMS.H
 local showing = false
 local sizefontcache = {}
 local images = {
@@ -34,6 +32,33 @@ local images = {
 	giftenergy = 'LuaUI/Images/energy.png',
 }
 local defaultamount = 100
+
+function BringUpShareMenu()
+	if window then
+		window:ToggleVisibility()
+		if invwindow.visible then
+			invwindow:ToggleVisibility()
+		end
+	end
+end
+
+options_path = 'Settings/Interface/Share Menu' -- Change me if necessary.
+--Note: remerge is used in case of bugs! Do not remove!
+options = {
+        remerge = {
+                name = 'Hot Remerge',
+                desc = 'Use this in case you weren\'t remerged automatically.',
+                type = 'button',
+                OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
+        },
+        sharemenu = {
+                name = 'Bring up share menu',
+                desc = 'Press this button to bring up the share menu.',
+                type = 'button',
+				hotkey = "H",
+				OnChange = function() BringUpShareMenu() end,
+        },
+}
 
 local function StringToTable(str)
 	local strtbl = {}
@@ -330,22 +355,6 @@ local function UpdateInviteTable()
 			chili.TextBox:New{parent= invitetab[i],height='100%',width='70%',fontsize=16.5,x='26%',text=select(1,Spring.GetPlayerInfo(invites[i].id)) .. " (join)", textColor={r,g,b,a},y='35%'}
 		end
 	end
-end
-
-function widget:KeyPress(key,mod,repeating)
-	if key == keytopress and not showing and not repeating and window ~= nil then
-		if invwindow ~= nil and invwindow.visible then
-			invwindow:Hide()
-		end
-		showing = true
-		window:Show()
-		return true
-	elseif key == keytopress and showing and not repeating and window ~= nil then
-		showing = false
-		window:Hide()
-		return true
-	end
-	return false
 end
 
 function widget:PlayerRemoved(playerID)
