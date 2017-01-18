@@ -104,7 +104,7 @@ local function paybackFactorFunction(repayRatio)
 	end
 end
 
-local MIN_STORAGE = 1
+local MIN_STORAGE = 0.5
 local PAYBACK_FACTOR = 0.5
 local MEX_REFUND_SHARE = 0.5 -- refund starts at 50%
 

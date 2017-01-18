@@ -42,9 +42,11 @@ local WARNING_IMAGE = LUAUI_DIRNAME .. "Images/Crystal_Clear_app_error.png"
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local col_metal = {136/255,214/255,251/255,1}
-local col_energy = {.93,.93,0,1}
+local col_metal   = {136/255,214/255,251/255,1}
+local col_energy  = {.93,.93,0,1}
+local col_line    = {220/255,220/255,220/255,1}
 local col_reserve = {0, 0, 0, 0}
+local text_red    = '\255\255\100\100'
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -55,6 +57,8 @@ local fancySkinLeft, fancySkinRight
 
 local metalWarningPanel
 local energyWarningPanel
+local metalNoStorage
+local energyNoStorage
 
 local window_main_display
 local window_metal
@@ -86,7 +90,7 @@ local updateOpacity = false
 local reserveSentTimer = false
 local blinkMetal = 0
 local blinkEnergy = 0
-local baseBlinkPeriod = 1.4
+local BASE_BLINK_PERIOD = 1.4
 local blinkM_status = false
 local blinkE_status = false
 local excessE = false
@@ -104,6 +108,7 @@ local strings = {
 	resbar_construction = "",
 	resbar_reserve = "",
 	resbar_stored = "",
+	resbar_no_storage = "",
 	resbar_inc = "",
 	resbar_pull = "",
 	resbar_generators = "",
@@ -405,7 +410,7 @@ end
 
 local function UpdateBlink(s)
 	if blinkM_status then
-		local blinkPeriod = baseBlinkPeriod/blinkM_status
+		local blinkPeriod = BASE_BLINK_PERIOD/blinkM_status
 		blinkMetal = (blinkMetal + s)%blinkPeriod
 		local sawtooth = math.abs(blinkMetal/blinkPeriod - 0.5)*2
 		local blink_alpha = sawtooth*0.95
@@ -414,13 +419,16 @@ local function UpdateBlink(s)
 	end
 	
 	if blinkE_status then
-		local blinkPeriod = baseBlinkPeriod/blinkE_status
+		local blinkPeriod = BASE_BLINK_PERIOD/blinkE_status
 		blinkEnergy = (blinkEnergy + s)%blinkPeriod
 		local sawtooth = math.abs(blinkEnergy/blinkPeriod - 0.5)*2
 		local blink_alpha = sawtooth*0.95
 		
 		bar_overlay_energy:SetColor(col_expense[1], col_expense[2], col_expense[3], blink_alpha)
 	end
+	
+	metalNoStorage.UpdateFlash(s)
+	energyNoStorage.UpdateFlash(s)
 end	
 
 local function UpdateWindowOpacity()
@@ -514,16 +522,18 @@ function widget:GameFrame(n)
 	local teamTotalEnergyCapacity = 0
 	for i = 1, #teams do
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
+		mStor = math.max(mStor - HIDDEN_STORAGE, 0.5)
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
 		teamTotalMetalStored = teamTotalMetalStored + mCurr
-		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor - HIDDEN_STORAGE 
+		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor 
 		
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
 		teamMPull = teamMPull + mPull + extraMetalPull
 		
 		local eCurr, eStor, ePull, eInco, eExpe, eShar, eSent, eReci = spGetTeamResources(teams[i], "energy")
+		eStor = math.max(eStor - HIDDEN_STORAGE, 0.5)
 		local extraEnergyPull = spGetTeamRulesParam(teams[i], "extraEnergyPull") or 0
 		
 		local energyOverdrive = spGetTeamRulesParam(teams[i], "OD_energyOverdrive") or 0
@@ -535,7 +545,7 @@ function widget:GameFrame(n)
 		teamEnergyReclaim = teamEnergyReclaim + eInco - math.max(0, energyChange)
 		
 		teamTotalEnergyStored = teamTotalEnergyStored + eCurr
-		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor - HIDDEN_STORAGE 
+		teamTotalEnergyCapacity = teamTotalEnergyCapacity + eStor
 	end
 
 	local teamEnergyIncome = teamEnergyReclaim + cp.team_energyIncome
@@ -559,8 +569,8 @@ function widget:GameFrame(n)
 	-- Waste energy is reported as the equal fault of all players.
 	
 	-- reduce by hidden storage
-	mStor = mStor - HIDDEN_STORAGE
-	eStor = eStor - HIDDEN_STORAGE
+	mStor = math.max(mStor - HIDDEN_STORAGE, 0.5)
+	eStor = math.max(eStor - HIDDEN_STORAGE, 0.5)
 	
 	--// BLINK WHEN EXCESSING OR ON LOW ENERGY
 	if mCurr >= mStor then
@@ -611,20 +621,25 @@ function widget:GameFrame(n)
 	local realEnergyPull = ePull
 	
 	local mPercent, ePercent 
-	if mStor > 0 then
+	if mStor > 1 then
 		mPercent = 100 * mCurr / mStor
-	elseif mInco + mReci > mPull then
-		mPercent = 100
 	else
 		mPercent = 0
+		mCurr = 0
+		local excess = math.min(0, mReci - mSent) - teamMetalWaste
+		metalNoStorage.SetFlash(excess > 0.01)
 	end
-	if eStor > 0 then
+	
+	if eStor > 1 then
 		ePercent = 100 * eCurr / eStor
-	elseif eInco > realEnergyPull then
-		ePercent = 100
 	else
 		ePercent = 0
+		eCurr = 0
+		energyNoStorage.SetFlash(cp.team_energyWaste > 0)
 	end
+	
+	metalNoStorage.Show(mStor <= 1)
+	energyNoStorage.Show(eStor <= 1)
 	
 	mPercent = math.min(math.max(mPercent, 0), 100)
 	ePercent = math.min(math.max(ePercent, 0), 100)
@@ -818,6 +833,104 @@ local function GetWarningPanel(parentControl, x, y, right, bottom, text)
 	function externalFunctions.SetText(newText)
 		label:SetCaption(newText)
 	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- No Storage Warning Panels
+
+local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder)
+	local holder = Chili.Control:New{
+		x = x,
+		y = y,
+		right = right,
+		height = height,
+		padding = {0, 0, 0, 0},
+		parent = parentControl
+	}
+	
+	local line = Chili.Line:New{
+		x = 0,
+		y = "25%",
+		right = 0,
+		height = 4,
+		borderColor = col_line,
+		parent = holder,
+	}
+	
+	local label = Chili.Label:New{
+		name   = "warningLabel",
+		x      = "30%",
+		y      = 0,
+		bottom = "8%",
+		width  = "40%",
+		caption = strings.resbar_no_storage,
+		valign = "center",
+ 		align  = "center",
+		autosize = false,
+		font   = {size = options.warningFontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
+		parent = holder,
+	}
+	
+	label:BringToFront()
+	holder:SetVisibility(false)
+	
+	local show = false
+	local flash = false
+	local text = strings.resbar_no_storage
+	local blinkValue = 0
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.SetText(newText)
+		if newText then
+			text = newText
+		end
+		if flash then
+			label:SetCaption(text_red .. text)
+		else
+			label:SetCaption(text)
+		end
+	end
+	
+	function externalFunctions.Show(newShow)
+		if show == newShow then
+			return
+		end
+		show = newShow
+		holder:SetVisibility(show)
+		if barHolder then
+			barHolder:SetVisibility(not show)
+		end
+	end
+	
+	function externalFunctions.SetFlash(newFlash)
+		if flash == newFlash then
+			return
+		end
+		flash = newFlash
+		externalFunctions.SetText()
+		
+		if not flash then
+			line.borderColor = col_line
+			line:Invalidate()
+		end
+	end
+	
+	function externalFunctions.UpdateFlash(s)
+		if not flash then
+			return
+		end
+		blinkValue = (blinkValue + s)%BASE_BLINK_PERIOD
+		local sawtooth = math.abs(blinkValue/BASE_BLINK_PERIOD - 0.5)*2
+		local blink_alpha = sawtooth*0.95
+		
+		line.borderColor = Mix({col_line[1], col_line[2], col_line[3], 0.65}, col_expense, blink_alpha)
+		line:Invalidate()
+	end
+	
 	
 	return externalFunctions
 end
@@ -1043,14 +1156,23 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
 	
-	bar_reserve_metal = Chili.Multiprogressbar:New{
-		parent = window_metal,
-		orientation = "horizontal",
-		value  = 0,
+	local metalBarHolder = Chili.Control:New{
 		x      = barX,
 		y      = barY,
 		right  = barRight,
 		height = barHeight,
+		padding = {0,0,0,0},
+		parent = window_metal,
+	}
+	
+	bar_reserve_metal = Chili.Multiprogressbar:New{
+		parent = metalBarHolder,
+		orientation = "horizontal",
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		value  = 0,
 		min = 0,
 		max = 1,
 		noSkin = true,
@@ -1069,13 +1191,13 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	}
 	
 	bar_metal = Chili.Progressbar:New{
-		parent = window_metal,
+		parent = metalBarHolder,
 		color  = col_metal,
 		orientation = "horizontal",
-		x      = barX,
-		y      = barY,
-		right  = barRight,
-		height = barHeight,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		value  = 0,
 		fontShadow = false,
 		font   = {
@@ -1106,6 +1228,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 			SetReserveByMouse(self, x, y, mouseDownOnReserve, true)
 		end},
 	}
+	
+	metalNoStorage = GetNoStorageWarning(window_metal, barX, barY, barRight, barHeight, metalBarHolder)
 	
 	--// ENERGY
 
@@ -1181,14 +1305,23 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		font   = {size = options.fontSize.value, outline = true, outlineWidth = 2, outlineWeight = 2},
 	}
 	
-	bar_reserve_energy = Chili.Multiprogressbar:New{
-		parent = window_energy,
-		orientation = "horizontal",
-		value  = 0,
+	local energyBarHolder = Chili.Control:New{
 		x      = barX,
 		y      = barY,
 		right  = barRight,
 		height = barHeight,
+		padding = {0,0,0,0},
+		parent = window_energy,
+	}
+	
+	bar_reserve_energy = Chili.Multiprogressbar:New{
+		parent = energyBarHolder,
+		orientation = "horizontal",
+		value  = 0,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		min = 0,
 		max = 1,
 		noSkin = true,
@@ -1207,14 +1340,14 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	}
 	
 	bar_overlay_energy = Chili.Progressbar:New{
-		parent = window_energy,
+		parent = energyBarHolder,
 		orientation = "horizontal",
 		value  = 100,
 		color  = {0,0,0,0},
-		x      = barX,
-		y      = barY,
-		right  = barRight,
-		height = barHeight,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		noSkin = true,
 		font   = {
 			size = 20, 
@@ -1226,14 +1359,14 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 	}
     
 	bar_energy = Chili.Progressbar:New{
-		parent = window_energy,
+		parent = energyBarHolder,
 		color  = col_energy,
 		value  = 0,
 		orientation = "horizontal",
-		x      = barX,
-		y      = barY,
-		right  = barRight,
-		height = barHeight,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
 		fontShadow = false,
 		OnMouseDown = {function(self, x, y, mouse) 
 			mouseDownOnReserve = mouse
@@ -1257,6 +1390,8 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		end},
 	}
 
+	energyNoStorage = GetNoStorageWarning(window_energy, barX, barY, barRight, barHeight, energyBarHolder)
+	
 	-- Activate tooltips for lables and bars, they do not have them in default chili
 	function image_metal:HitTest(x,y) return self end
 	function bar_metal:HitTest(x,y) return self	end
