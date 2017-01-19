@@ -399,8 +399,11 @@ function gadget:GameFrame(n)
 			
 			--SendToUnsynced("PriorityStats", teamID,  prioSpending, lowPrioSpending, n)   
 
-			local level, _, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
-			local elevel, _, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
+			local level, mStor, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
+			local elevel, eStor, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
+			
+			mStor = mStor - HIDDEN_STORAGE
+			eStor = eStor - HIDDEN_STORAGE
 			
 			-- Take away the constant income which was gained this frame (innate, reclaim)
 			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
@@ -516,8 +519,8 @@ function gadget:GameFrame(n)
 				end
 			
 				if pri == 3 then
-					nextMetalLevel = nextMetalLevel - (TeamMetalReserved[teamID] or 0)
-					nextEnergyLevel = nextEnergyLevel - (TeamEnergyReserved[teamID] or 0)
+					nextMetalLevel = nextMetalLevel - math.min(mStor, TeamMetalReserved[teamID] or 0)
+					nextEnergyLevel = nextEnergyLevel - math.min(eStor, TeamEnergyReserved[teamID] or 0)
 				end
 			end
 			
