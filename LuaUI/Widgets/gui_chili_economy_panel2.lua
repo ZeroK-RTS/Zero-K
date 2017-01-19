@@ -612,14 +612,17 @@ function widget:GameFrame(n)
 		bar_energy:SetColor( col_energy )
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
-	
-	local metalWarning = mCurr > mStor * options.metalWarning.value
-	local energyWarning = eCurr < eStor * options.energyWarning.value
-	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
-	energyWarningPanel.ShowWarning(energyWarning)
 
 	--// Storage, income and pull numbers
 	local realEnergyPull = ePull
+
+	local netMetal = mInco - mPull + mReci
+	local netEnergy = eInco - realEnergyPull
+	
+	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
+	local energyWarning = eStor > 1 and eCurr < eStor * options.energyWarning.value
+	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
+	energyWarningPanel.ShowWarning(energyWarning)
 	
 	local mPercent, ePercent 
 	if mStor > 1 then
@@ -627,8 +630,7 @@ function widget:GameFrame(n)
 	else
 		mPercent = 0
 		mCurr = 0
-		local excess = math.min(0, mReci - mSent) - teamMetalWaste
-		metalNoStorage.SetFlash(excess > 0.01)
+		metalNoStorage.SetFlash(metalWarning)
 	end
 	
 	if eStor > 1 then
@@ -724,7 +726,6 @@ function widget:GameFrame(n)
 	lbl_storage_metal:SetCaption(("%.0f"):format(mCurr))
 
 	--// Net income indicator on resource bars.
-	local netMetal = mInco - mPull + mReci
 	if netMetal < -27.5 then
 		bar_metal:SetCaption(negativeColourStr.."<<<<<<")
 	elseif netMetal < -22.5 then
@@ -753,7 +754,6 @@ function widget:GameFrame(n)
 		bar_metal:SetCaption(positiveColourStr..">>>>>>")
 	end
 	
-	local netEnergy = eInco - realEnergyPull
 	if netEnergy < -27.5 then
 		bar_overlay_energy:SetCaption(negativeColourStr.."<<<<<<")
 	elseif netEnergy < -22.5 then
