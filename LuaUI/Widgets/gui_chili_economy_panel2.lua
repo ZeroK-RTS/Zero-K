@@ -630,8 +630,7 @@ function widget:GameFrame(n)
 	else
 		mPercent = 0
 		mCurr = 0
-		local excess = math.min(0, mReci - mSent) - teamMetalWaste
-		metalNoStorage.SetFlash(metalWarning)--excess > 0.01)
+		metalNoStorage.SetFlash(metalWarning)
 	end
 	
 	if eStor > 1 then
@@ -639,7 +638,7 @@ function widget:GameFrame(n)
 	else
 		ePercent = 0
 		eCurr = 0
-		energyNoStorage.SetFlash(energyWarning)--cp.team_energyWaste > 0)
+		energyNoStorage.SetFlash(energyWarning)
 	end
 	
 	metalNoStorage.Show(mStor <= 1)
