@@ -1288,8 +1288,10 @@ SetupPlayerNames = function()
 							false
 						end
 					end
-					if teams[a].roster[1].elo and teams[b].roster[1].elo then
-						return teams[a].roster[1].elo > teams[b].roster[1].elo
+					local aElo = teams[a].roster and teams[a].roster[1] and teams[a].roster[1].elo
+					local bElo = teams[b].roster and teams[b].roster[1] and teams[b].roster[1].elo
+					if aElo and bElo then
+						return aElo > bElo
 					end
 					return a > b
 				end
