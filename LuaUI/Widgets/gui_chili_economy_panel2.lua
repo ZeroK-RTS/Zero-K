@@ -620,7 +620,7 @@ function widget:GameFrame(n)
 	local netEnergy = eInco - realEnergyPull
 	
 	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
-	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or (eStor <= 1 and eInco < mInco + mReci)
+	local energyWarning = eStor > 1 and eCurr < eStor * options.energyWarning.value
 	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
 	energyWarningPanel.ShowWarning(energyWarning)
 	
@@ -638,7 +638,7 @@ function widget:GameFrame(n)
 	else
 		ePercent = 0
 		eCurr = 0
-		energyNoStorage.SetFlash(energyWarning)
+		energyNoStorage.SetFlash(cp.team_energyWaste > 0)
 	end
 	
 	metalNoStorage.Show(mStor <= 1)
