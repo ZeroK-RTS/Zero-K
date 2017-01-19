@@ -150,7 +150,7 @@ local function GiveResource(target,kind)
 	--mod = 20,500,all
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if alt then mod = "all"
-	elseif ctrl then mod = defaultamount*20
+	elseif ctrl then mod = defaultamount/5
 	elseif shift then mod = defaultamount*5
 	else mod = defaultamount end
 	local leader = select(2,Spring.GetTeamInfo(target))
