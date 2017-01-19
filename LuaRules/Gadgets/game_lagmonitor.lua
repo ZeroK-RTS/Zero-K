@@ -61,8 +61,22 @@ include("LuaRules/Configs/constants.lua")
 local LAG_THRESHOLD = 25000
 local AFK_THRESHOLD = 30 -- In seconds
 local FACTORY_UPDATE_PERIOD = 15 -- gameframes
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Utilities
+
+local function GetTeamName(teamID)
+	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
+	if isAiTeam then
+		return select(2, Spring.GetAIInfo()) or "Unknown AI"
+	end
+	return select(1, Spring.GetPlayerInfo(leaderID)) or "Unknown Player"
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Factory and Lineage
 
 local function ApplyProductionCancelRefund(data, factoryTeam)  -- return invested metal if produced unit wasn't recreated
 	local ud = UnitDefs[data.producedDefID]
@@ -214,7 +228,7 @@ local function UpdateTeamActivity(teamID)
 		resourceShare = resourceShare + 1
 	end
 	
-	if resourceShare > 0 and not teamResourceShare[teamID] then
+	if resourceShare > 0 and teamResourceShare[teamID] == 0 then
 		local playerName = Spring.GetPlayerInfo(leaderID)
 		local unitsRecieved = false
 		
@@ -277,8 +291,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			local giveTeamID = giveAwayTeams[i]
 			local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
 			if giveResigned then
-				local giveName = Spring.GetPlayerInfo(giveTeamID)
-				spEcho("game_message: " .. giveName .. " resigned")
+				spEcho("game_message: " .. GetTeamName(giveTeamID) .. " resigned")
 			end
 		end
 		return
@@ -311,8 +324,8 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			GG.allowTransfer = false
 		end
 		
-		local recieveName = select(1, Spring.GetPlayerInfo(recieveTeamID)) or "unknown"
-		local giveName = select(1, Spring.GetPlayerInfo(giveTeamID)) or "unknown"
+		local recieveName = GetTeamName(recieveTeamID)
+		local giveName = GetTeamName(giveTeamID)
 		local giveResigned = select(3, Spring.GetTeamInfo(giveTeamID))
 		
 		-- Send message
