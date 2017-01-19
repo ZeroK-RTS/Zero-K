@@ -1239,6 +1239,12 @@ SetupPlayerNames = function()
 						if a.playerID == myID then return true end
 						if b.playerID == myID then return false end
 					end
+					if not a.elo then
+						return false
+					end
+					if not b.elo then
+						return true
+					end
 					return a.elo > b.elo
 				end
 			)
