@@ -374,6 +374,7 @@ function widget:Update(dt)
 end
 
 function widget:Shutdown()
+	cameraMoved = true -- do not move camera to startbox
 	Close(true)
 end
 

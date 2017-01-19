@@ -37,6 +37,7 @@ unitDef = {
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[TKBOT3]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[tarantula.s3o]],
   script				 = [[spideraa.lua]],

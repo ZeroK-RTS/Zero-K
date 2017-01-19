@@ -1,7 +1,7 @@
 unitDef = {
   unitname            = [[slowmort]],
   name                = [[Moderator]],
-  description         = [[Distruptor Skirmisher Walker]],
+  description         = [[Disruptor Skirmisher Walker]],
   acceleration        = 0.2,
   activateWhenBuilt   = true,
   brakeRate           = 0.6,

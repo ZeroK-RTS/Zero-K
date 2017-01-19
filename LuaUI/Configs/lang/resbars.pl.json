@@ -11,6 +11,7 @@
 	"resbar_construction" : "Budowa",
 	"resbar_reserve" : "Rezerwa",
 	"resbar_stored" : "Magazyn",
+	"resbar_no_storage" : "No Storage",
 	"resbar_inc" : "Podaż",
 	"resbar_pull" : "Popyt",
 	"resbar_generators" : "Elektrownie i jednostki",

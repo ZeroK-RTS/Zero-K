@@ -826,9 +826,9 @@ local function GameFrame(_,n)
   --// update team/player status
   local spec, specFullView = spGetSpectatingState()
   if (specFullView) then
-    LocalAllyTeamID = scGetReadAllyTeam()
+    LocalAllyTeamID = scGetReadAllyTeam() or 0
   else
-    LocalAllyTeamID = spGetLocalAllyTeamID()
+    LocalAllyTeamID = spGetLocalAllyTeamID() or 0
   end
   --// create delayed FXs
   if (effectsInDelay[1]) then

@@ -152,6 +152,9 @@ local function SitOnPad(unitID)
 					mcDisable(unitID)
 					unitMovectrled[unitID] = nil
 					GG.UpdateUnitAttributes(unitID)
+					
+					-- activate unit and its jets. An attempt at the Vulture-losing-radar bug.
+					Spring.SetUnitCOBValue(unitID, COB.ACTIVATION, 1)
 				end
 				landingUnit[unitID] = nil
 				return
