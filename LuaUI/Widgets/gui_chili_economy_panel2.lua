@@ -612,11 +612,6 @@ function widget:GameFrame(n)
 		bar_energy:SetColor( col_energy )
 		bar_overlay_energy:SetColor({0,0,0,0})
 	end
-	
-	local metalWarning = mCurr > mStor * options.metalWarning.value
-	local energyWarning = eCurr < eStor * options.energyWarning.value
-	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
-	energyWarningPanel.ShowWarning(energyWarning)
 
 	--// Storage, income and pull numbers
 	local realEnergyPull = ePull
@@ -781,6 +776,11 @@ function widget:GameFrame(n)
 	else
 		bar_overlay_energy:SetCaption(positiveColourStr..">>>>>>")
 	end
+	
+	local metalWarning = (mStor > 1 and mCurr > mStor * options.metalWarning.value) or (mStor <= 1 and netMetal > 0)
+	local energyWarning = (eStor > 1 and eCurr < eStor * options.energyWarning.value) or (eStor <= 1 and eInco < mInco + mReci)
+	metalWarningPanel.ShowWarning(metalWarning and not energyWarning)
+	energyWarningPanel.ShowWarning(energyWarning)
 end
 
 --------------------------------------------------------------------------------
