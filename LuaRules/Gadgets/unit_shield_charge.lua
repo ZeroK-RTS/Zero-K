@@ -96,7 +96,7 @@ function gadget:GameFrame(n)
 			-- Get changed charge rate based on slow
 			local newChargeRate = GetChargeRate(unitID)
 			if data.oldChargeRate ~= newChargeRate then
-				GG.StartMiscPriorityResourcing(unitID, data.teamID, def.perSecondCost*newChargeRate, true)
+				GG.StartMiscPriorityResourcing(unitID, def.perSecondCost*newChargeRate, true)
 				
 				data.oldChargeRate = newChargeRate
 				data.resTable.e = def.perUpdateCost*newChargeRate
@@ -137,7 +137,7 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if (shieldUnitDefID[unitDefID] or (GG.Upgrades_UnitShieldDef and GG.Upgrades_UnitShieldDef(unitID))) and not unitMap[unitID] then
-		GG.AddMiscPriorityUnit(unitID, teamID)
+		GG.AddMiscPriorityUnit(unitID)
 	end
 end
 

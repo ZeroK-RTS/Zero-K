@@ -75,7 +75,7 @@ function gadget:GameFrame(n)
 			local newStockSpeed = GetStockSpeed(unitID)
 			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
+					GG.StartMiscPriorityResourcing(unitID, def.stockDrain*newStockSpeed)
 				end
 				data.stockSpeed = newStockSpeed
 			end
@@ -98,7 +98,7 @@ function gadget:GameFrame(n)
 		else
 			if data.stockSpeed ~= 0 then
 				if def.stockCost > 0 then
-					GG.StopMiscPriorityResourcing(unitID, data.teamID)
+					GG.StopMiscPriorityResourcing(unitID)
 				end
 				data.stockSpeed = 0
 			end
@@ -110,7 +110,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]
 		if def.stockCost > 0 then
-			GG.AddMiscPriorityUnit(unitID, teamID)
+			GG.AddMiscPriorityUnit(unitID)
 		end
 	end
 end

@@ -566,9 +566,9 @@ function AddMiscPriorityUnit(unitID) --remotely add a priority command.
 	end
 end
 
-function StartMiscPriorityResourcing(unitID, teamID, drain, energyOnly, key) --remotely add a priority command.
+function StartMiscPriorityResourcing(unitID, drain, energyOnly, key) --remotely add a priority command.
 	if not UnitMiscPriority[unitID] then
-		AddMiscPriorityUnit(unitID,teamID)
+		AddMiscPriorityUnit(unitID)
 	end
 	if not miscResourceDrain[unitID] then
 		miscResourceDrain[unitID]  = {}
@@ -579,7 +579,7 @@ function StartMiscPriorityResourcing(unitID, teamID, drain, energyOnly, key) --r
 	MiscUnitOnlyEnergy[unitID][key] = energyOnly
 end
 
-function StopMiscPriorityResourcing(unitID, teamID, key) --remotely remove a forced priority command.
+function StopMiscPriorityResourcing(unitID, key) --remotely remove a forced priority command.
 	if miscResourceDrain[unitID] then
 		key = key or 1
 		miscResourceDrain[unitID][key] = nil
@@ -587,7 +587,7 @@ function StopMiscPriorityResourcing(unitID, teamID, key) --remotely remove a for
 	end
 end
 
-function RemoveMiscPriorityUnit(unitID,teamID) --remotely remove a forced priority command.
+function RemoveMiscPriorityUnit(unitID) --remotely remove a forced priority command.
 	if UnitMiscPriority[unitID] then
 		if miscResourceDrain[unitID] then
 			miscResourceDrain[unitID]  = nil
@@ -708,22 +708,7 @@ end
 function gadget:UnitDestroyed(unitID, unitDefID, teamID) 
 	UnitPriority[unitID] = nil
 	LastUnitFromFactory[unitID] = nil
-    local ud = UnitDefs[unitDefID]
 	if UnitMiscPriority[unitID] then
-		RemoveMiscPriorityUnit(unitID,teamID)
+		RemoveMiscPriorityUnit(unitID)
 	end
-    if ud then
-		if ud.metalStorage and ud.metalStorage > 0 and TeamMetalReserved[teamID] then
-			local sto = select(2, spGetTeamResources(teamID, "metal")) - HIDDEN_STORAGE
-			if sto and TeamMetalReserved[teamID] > sto - ud.metalStorage then
-				SetMetalReserved(teamID, sto - ud.metalStorage)
-			end
-		end
-		if ud.energyStorage and ud.energyStorage > 0 and TeamEnergyReserved[teamID] then
-			local sto = select(2, spGetTeamResources(teamID, "energy")) - HIDDEN_STORAGE
-			if sto and TeamEnergyReserved[teamID] > sto - ud.energyStorage then
-				SetEnergyReserved(teamID, sto - ud.energyStorage)
-			end
-		end
-    end
 end
