@@ -329,10 +329,10 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		end
 		-- Do commands --
 		if strFind(command,"remerge") then -- remerging seems impossible gadget side.
-			local active,spec = spGetPlayerInfo(playerID)
+			local _,active,spec,_ = spGetPlayerInfo(playerID)
 			if controlledPlayers[playerID] and not spec then
-				MergePlayer(playerID, controlledPlayers[playerID])
-				spEcho("game_message: Player " .. name .. "has been remerged!")
+				spAssignPlayerToTeam(playerID, controlledPlayers[playerID])
+				spEcho("game_message: Player " .. name .. " has been remerged!")
 			end
 		end
 		if strFind(command, "invite") then
