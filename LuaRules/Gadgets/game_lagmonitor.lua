@@ -30,7 +30,7 @@ end
 --3) wait 3 strike (3 time AFK & Ping) before --> mark player as AFK/Lagging
 
 --Everything else: anti-bug, syntax, methods, ect
-local teamLineageUnits = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
+local playerLineageUnits = {} --keep track of unit ownership: Is populated when gadget give away units, and when units is created. Depopulated when units is destroyed, or is finished construction, or when gadget return units to owner.
 local teamResourceShare = {}
 local allyTeamResourceShares = {}
 local unitAlreadyFinished = {}
@@ -44,7 +44,6 @@ local spGetPlayerInfo     = Spring.GetPlayerInfo
 local spGetTeamInfo       = Spring.GetTeamInfo
 local spGetTeamList       = Spring.GetTeamList
 local spGetTeamResources  = Spring.GetTeamResources
-local spGetTeamRulesParam = Spring.GetTeamRulesParam
 local spGetTeamUnits      = Spring.GetTeamUnits
 local spGetUnitAllyTeam   = Spring.GetUnitAllyTeam
 local spGetUnitDefID      = Spring.GetUnitDefID
@@ -74,6 +73,18 @@ local function GetTeamName(teamID)
 	return select(1, Spring.GetPlayerInfo(leaderID)) or "Unknown Player"
 end
 
+local function PlayerIDToTeamID(playerID)
+	local _, _, spectator, teamID = spGetPlayerInfo(playerID)
+	if spectator then
+		return false
+	end
+	return teamID
+end
+
+local function TeamIDToPlayerID(teamID)
+	return select(2, spGetTeamInfo(teamID))
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Factory and Lineage
@@ -85,17 +96,17 @@ local function ApplyProductionCancelRefund(data, factoryTeam)  -- return investe
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if GG.wasMorphedTo and GG.wasMorphedTo[unitID] then --copy teamLineageUnits for unit Morph
+	if GG.wasMorphedTo and GG.wasMorphedTo[unitID] then --copy playerLineageUnits for unit Morph
 		local newUnitID = GG.wasMorphedTo[unitID]
-		local originalTeamIDs = teamLineageUnits[unitID]
-		if originalTeamIDs ~= nil and #originalTeamIDs > 0 then
-			-- teamLineageUnits of the morphed unit will be the same as its pre-morph
-			teamLineageUnits[newUnitID] = {unpack(originalTeamIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
+		local originalPlayerIDs = playerLineageUnits[unitID]
+		if originalPlayerIDs ~= nil and #originalPlayerIDs > 0 then
+			-- playerLineageUnits of the morphed unit will be the same as its pre-morph
+			playerLineageUnits[newUnitID] = {unpack(originalPlayerIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
 		end
 		unitAlreadyFinished[newUnitID] = true --for reverse build -- what is reverse build?
 	end
 
-	teamLineageUnits[unitID] = nil --to delete any units that do not need returning.
+	playerLineageUnits[unitID] = nil --to delete any units that do not need returning.
 	unitAlreadyFinished[unitID] = nil
 
 	if transferredFactories[unitID] then --the dying unit is the factory we transfered to other team but it haven't continued previous build queue yet. 
@@ -106,7 +117,6 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	--teamLineageUnits[unitID] = builderID and (teamLineageUnits[builderID] or spGetUnitTeam(builderID)) or unitTeam
 	if not builderID then
 		return
 	end
@@ -115,10 +125,10 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local ud = (builderDefID and UnitDefs[builderDefID])
 	if ud and (not ud.isFactory) then 
 		--(set ownership to original owner for all units except units from factory so that receipient player didn't lose his investment creating that unit)
-		local originalTeamIDs = teamLineageUnits[builderID]
-		if originalTeamIDs ~= nil and #originalTeamIDs > 0 then
-			-- teamLineageUnits of the new unit will be the same as its builder
-			teamLineageUnits[unitID] = {unpack(originalTeamIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
+		local originalPlayerIDs = playerLineageUnits[builderID]
+		if originalPlayerIDs ~= nil and #originalPlayerIDs > 0 then
+			-- playerLineageUnits of the new unit will be the same as its builder
+			playerLineageUnits[unitID] = {unpack(originalPlayerIDs)} --NOTE!: this copy value to new table instead of copying table-reference (to avoid bug)
 		end
 	elseif transferredFactories[builderID] then --this unit was created inside a recently transfered factory
 		local data = transferredFactories[builderID]
@@ -136,13 +146,13 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	--player who finished a unit will own that unit; its teamLineageUnits will be deleted and the unit will never be returned to the lagging team.
+	--player who finished a unit will own that unit; its playerLineageUnits will be deleted and the unit will never be returned to the lagging team.
 	if unitDefID and UnitDefs[unitDefID] and UnitDefs[unitDefID].isFactory then
 		factories[unitID] = {}
 	else
-		if teamLineageUnits[unitID] and (not unitAlreadyFinished[unitID]) then 
+		if playerLineageUnits[unitID] and (not unitAlreadyFinished[unitID]) then 
 		--(relinguish ownership for all unit except factories so the returning player has something to do)
-			teamLineageUnits[unitID] = {} --relinguish the original ownership of the unit
+			playerLineageUnits[unitID] = {} --relinguish the original ownership of the unit
 		end
 	end
 	unitAlreadyFinished[unitID] = true --for reverse build
@@ -232,20 +242,21 @@ local function UpdateTeamActivity(teamID)
 		local playerName = Spring.GetPlayerInfo(leaderID)
 		local unitsRecieved = false
 		
-		for unitID, teamList in pairs(teamLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
+		for unitID, playerList in pairs(playerLineageUnits) do --Return unit to the oldest inheritor (or to original owner if possible)
 			local delete = false
 			local unitAllyTeamID = spGetUnitAllyTeam(unitID)
 			if unitAllyTeamID == allyTeamID then
-				for i = 1, #teamList do
-					local otherTeam = teamList[i]
-					if (otherTeam == teamID) then
+				for i = 1, #playerList do
+					local otherPlayerID = playerList[i]
+					local otherTeamID = PlayerIDToTeamID(otherPlayerID)
+					if (otherTeamID == teamID) then
 						TransferUnitAndKeepProduction(unitID, teamID)
 						unitsRecieved = true
 						delete = true
 					end
 					-- remove all teams after the previous owner (inclusive)
 					if delete then
-						teamLineageUnits[unitID][i] = nil
+						playerLineageUnits[unitID][i] = nil
 					end
 				end
 			end
@@ -299,6 +310,7 @@ local function UpdateAllyTeamActivity(allyTeamID)
 	
 	for i = 1, #giveAwayTeams do
 		local giveTeamID = giveAwayTeams[i]
+		local givePlayerID = TeamIDToPlayerID(giveTeamID)
 		
 		-- Energy share is not set because the storage needs to be full for full overdrive.
 		-- Also energy income is mostly private and a large energy influx to the rest of the 
@@ -311,12 +323,14 @@ local function UpdateAllyTeamActivity(allyTeamID)
 			for j = 1, #units do
 				local unitID = units[j]
 				if allyTeamID == spGetUnitAllyTeam(unitID) then
-					-- add this team to the teamLineageUnits list, then send the unit away
-					if teamLineageUnits[unitID] == nil then
-						teamLineageUnits[unitID] = {giveTeamID}
-					else
-						-- this unit belonged to someone else before me, add me to the end of the list
-						teamLineageUnits[unitID][#teamLineageUnits[unitID]+1] = giveTeamID
+					if givePlayerID then
+						-- add this team to the playerLineageUnits list, then send the unit away
+						if playerLineageUnits[unitID] == nil then
+							playerLineageUnits[unitID] = {givePlayerID}
+						else
+							-- this unit belonged to someone else before me, add me to the end of the list
+							playerLineageUnits[unitID][#playerLineageUnits[unitID]+1] = givePlayerID
+						end
 					end
 					TransferUnitAndKeepProduction(unitID, recieveTeamID)
 				end
