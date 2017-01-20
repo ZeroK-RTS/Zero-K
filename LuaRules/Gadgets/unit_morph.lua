@@ -337,7 +337,7 @@ local function FinishMorph(unitID, morphData)
 	local defName = udDst.name
 	local unitTeam = morphData.teamID
 	-- copy dominatrix stuff
-	local originTeam, originAllyTeam, controllerID, controllerAllyTeam = GG.getMastermind(unitID)
+	local originTeam, originAllyTeam, controllerID, controllerAllyTeam = GG.Capture.GetMastermind(unitID)
 	
 	-- you see, Anarchid's exploit is fixed this way
 	if (originTeam ~= nil) and (Spring.ValidUnitID(controllerID)) then
@@ -456,7 +456,7 @@ local function FinishMorph(unitID, morphData)
 	
 	-- copy dominatrix lineage
 	if (originTeam ~= nil) then
-		GG.setMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
+		GG.Capture.SetMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
 	end
 	
 	Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true

@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-   return {
-      name      = "Capture",
-      desc      = "Handles Yuri Style Capture System",
-      author    = "Google Frog",
-      date      = "30/9/2010",
-      license   = "GNU GPL, v2 or later",
-      layer     = 0,
-      enabled   = true   
-   }
+	return {
+		name      = "Capture",
+		desc      = "Handles Yuri Style Capture System",
+		author    = "Google Frog",
+		date      = "30/9/2010",
+		license   = "GNU GPL, v2 or later",
+		layer     = 0,
+		enabled   = true   
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ local RETAKING_DEGRADE_TIMER = 15
 local GENERAL_DEGRADE_TIMER = 5
 local DEGRADE_FACTOR = 0.04
 
-local DAMAGE_MULT = 3	-- n times faster when target is at 0% health
+local DAMAGE_MULT = 3 -- n times faster when target is at 0% health
 
 local SAVE_FILE = "Gadgets/unit_capture.lua"
 
@@ -33,8 +33,8 @@ local unitKillSubordinatesCmdDesc = {
 	type    = CMDTYPE.ICON_MODE,
 	name    = 'Kill Subordinates',
 	action  = 'killsubordinates',
-	tooltip	= 'Toggles auto self-d of captured units',
-	params 	= {0, 'Kill Off','Kill On'}
+	tooltip = 'Toggles auto self-d of captured units',
+	params  = {0, 'Kill Off','Kill On'}
 }
 
 --SYNCED
@@ -42,6 +42,7 @@ if gadgetHandler:IsSyncedCode() then
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spAreTeamsAllied		= Spring.AreTeamsAllied
 local spSetUnitHealth		= Spring.SetUnitHealth
@@ -60,6 +61,7 @@ local spEditUnitCmdDesc     = Spring.EditUnitCmdDesc
 local spInsertUnitCmdDesc   = Spring.InsertUnitCmdDesc
 
 local LOS_ACCESS = {inlos = true}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -67,11 +69,8 @@ local captureWeaponDefs, captureUnitDefs = include("LuaRules/Configs/capture_def
 
 local damageByID = {data = {}, count = 0}
 local unitDamage = {}
-
 local capturedUnits = {}
-
 local controllers = {} 
-
 local reloading = {}
 
 --------------------------------------------------------------------------------
@@ -81,12 +80,12 @@ _G.unitDamage    = unitDamage
 _G.capturedUnits = capturedUnits
 _G.controllers   = controllers
 _G.reloading     = reloading
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Utilities
 
 local function checkThingsDoubleTable(things, thingByID)
-	
 	local covered = {}
 	
 	for i = 1, thingByID.count do
@@ -187,6 +186,10 @@ local function recusivelyTransfer(unitID, newTeam, newAlly, newControllerID)
 	spGiveOrderToUnit(unitID, CMD_STOP, {}, {})
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Weapon Handling
+
 function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	local wantedWeaponList = {}
 	for wdid = 1, #WeaponDefs do
@@ -197,9 +200,7 @@ function gadget:UnitPreDamaged_GetWantedWeaponDef()
 	return wantedWeaponList
 end
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
-                            attackerID, attackerDefID, attackerTeam)
-        
+function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,attackerID, attackerDefID, attackerTeam)
 	if (not weaponID) or (not captureWeaponDefs[weaponID]) then 
 		return damage
 	end
@@ -242,7 +243,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	local newCaptureDamage = captureWeaponDefs[weaponID].captureDamage
 	if captureWeaponDefs[weaponID].scaleDamage then 
 		newCaptureDamage = newCaptureDamage * (damage/WeaponDefs[weaponID].customParams.shield_damage) 
-	end	--scale damage based on real damage (i.e. take into account armortypes etc.)
+	end --scale damage based on real damage (i.e. take into account armortypes etc.)
 	-- scale damage based on target health
 	local health, maxHealth = spGetUnitHealth(unitID)
 	if health <= 0 then 
@@ -288,10 +289,11 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Update
 
 function gadget:GameFrame(f)
-    if (f-5) % 32 == 0 then
+	if (f - 5)%32 == 0 then
 		local i = 1
 		while i <= damageByID.count do
 			local unitID = damageByID.data[i]
@@ -331,8 +333,8 @@ function gadget:GameFrame(f)
 				spSetUnitHealth(unitID, {capture = damageData.largestDamage/damageData.captureHealth} )
 				i = i + 1
 			end
-        end
-    end
+		end
+	end
 	
 	if reloading[f] then
 		for i = 1, reloading[f].count do
@@ -346,7 +348,9 @@ function gadget:GameFrame(f)
 end
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Command Handling
+
 local function KillToggleCommand(unitID, cmdParams, cmdOptions)
 	if controllers[unitID] then
 		local state = cmdParams[1]
@@ -358,7 +362,6 @@ local function KillToggleCommand(unitID, cmdParams, cmdOptions)
 		end
 		controllers[unitID].killSubordinates = (state == 1)
 	end
-	
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -370,7 +373,6 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-	
 	if (cmdID ~= CMD_UNIT_KILL_SUBORDINATES) then
 		return true  -- command was not used
 	end
@@ -378,39 +380,11 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	return false  -- command was used
 end
 
--- morph uses this
-local function setMastermind(unitID, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
-	-- give the unit
-	capturedUnits[unitID] = {
-		originTeam = originTeam,
-		originAllyTeam = originAllyTeam,
-		controllerID = controllerID,
-		controllerAllyTeam = controllerAllyTeam,
-	}
-
-	spSetUnitRulesParam(unitID, "capture_controller", controllerID, LOS_ACCESS)
-	
-	local unitByID = controllers[controllerID].unitByID
-	unitByID.count = unitByID.count + 1
-	unitByID.data[unitByID.count] = unitID
-	controllers[controllerID].units[unitID] = unitByID.count
-end
-
-local function getMastermind(unitID)
-  local ca = capturedUnits[unitID]
-  if ca~=nil then
-    return ca.originTeam, ca.originAllyTeam, ca.controllerID, ca.controllerAllyTeam
-  else
-    return nil
-  end
-end
-
+--------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Unit Handling
 
-
 function gadget:UnitCreated(unitID, unitDefID, teamID)
-
 	if not captureUnitDefs[unitDefID] then
 		return
 	end
@@ -428,9 +402,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	KillToggleCommand(unitID, {0}, {})
 end
 
-
 function gadget:UnitDestroyed(unitID)
-
 	if controllers[unitID] then
 		local unitByID = controllers[unitID].unitByID
 		local i = 1
@@ -455,16 +427,46 @@ function gadget:UnitDestroyed(unitID)
 	if unitDamage[unitID] then
 		removeThingFromDoubleTable(unitID, unitDamage, damageByID)
 	end
-
 end
 
-------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- External Functions
+
+local externalFunctions = {}
+
+function externalFunctions.SetMastermind(unitID, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
+	capturedUnits[unitID] = {
+		originTeam = originTeam,
+		originAllyTeam = originAllyTeam,
+		controllerID = controllerID,
+		controllerAllyTeam = controllerAllyTeam,
+	}
+	
+	spSetUnitRulesParam(unitID, "capture_controller", controllerID, LOS_ACCESS)
+	
+	local unitByID = controllers[controllerID].unitByID
+	unitByID.count = unitByID.count + 1
+	unitByID.data[unitByID.count] = unitID
+	controllers[controllerID].units[unitID] = unitByID.count
+end
+
+function externalFunctions.GetMastermind(unitID)
+	local ca = capturedUnits[unitID]
+	if ca ~= nil then
+		return ca.originTeam, ca.originAllyTeam, ca.controllerID, ca.controllerAllyTeam
+	else
+		return nil
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:Initialize()
 	-- morph uses this
-	GG.getMastermind = getMastermind
-	GG.setMastermind = setMastermind
-
+	GG.Capture = externalFunctions
+	
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_KILL_SUBORDINATES)
 	
@@ -474,7 +476,6 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
-	
 end
 
 function gadget:Load(zip)
@@ -511,7 +512,7 @@ function gadget:Load(zip)
 	
 	for oldUnitID, data in pairs(loadData.controllers) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
-
+		
 		controllers[unitID] = {
 			postCaptureReload = data.postCaptureReload,
 			units = GG.SaveLoad.GetNewUnitIDKeys(data.units),
@@ -538,8 +539,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---UNSYNCED
-else
+else --UNSYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -679,7 +679,9 @@ end
 
 function gadget:UnitDestroyed (unitID)
 	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-	if morphedTo then gadget:UnitGiven(morphedTo) end
+	if morphedTo then
+		gadget:UnitGiven(morphedTo)
+	end
 end
 
 --------------------------------------------------------------------------------
