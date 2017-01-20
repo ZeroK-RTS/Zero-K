@@ -404,7 +404,7 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 end
 
 function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeam)
-	if controlledTeams[newTeam] then
+	if controlledTeams[newTeam] and GetSquadSize(oldTeam) > 0 then
 		spTransferUnit(unitID, controlledTeams[newTeam], true)
 	end
 end
