@@ -126,6 +126,15 @@ local function ProccessCommand(str)
 	return command, targetID -- less creating tables this way. Old version would create a table, this one is slightly smarter.
 end
 
+local function IsTeamAfk(teamID)
+	local _, shares = GG.Lagmonitor.GetResourceShares()
+	if shares == 0 then
+		return true
+	else
+		return false
+	end
+end
+
 local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 	local name,_ = spGetPlayerInfo(playerID)
 	if not config.permanentMerge then
@@ -358,7 +367,9 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid accept command: " .. targetID .. " doesn't exist.")
 			end
 		elseif strFind(command,"unmerge") then
-			if controlledPlayers[playerID] then
+			local afk = IsTeamAfk(GetTeamID(playerID))
+			spEcho("team is afk: " .. tostring(afk))
+			if controlledPlayers[playerID] and not afk then
 				UnmergePlayer(playerID)
 				return
 			else
