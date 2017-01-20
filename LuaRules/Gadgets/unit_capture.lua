@@ -384,6 +384,25 @@ end
 --------------------------------------------------------------------------------
 -- Unit Handling
 
+local function GetActiveTeam(teamID, allyTeamID)
+	if not GG.Lagmonitor then
+		return teamID
+	end
+	local allyTeamResourceShares, teamResourceShare = GG.Lagmonitor.GetResourceShares()
+	if teamResourceShare[teamID] ~= 0 or allyTeamResourceShares[allyTeamID] == 0 then
+		return teamID
+	end
+	
+	local teamList = Spring.GetTeamList(allyTeamID)
+	for i = 1, #teamList do
+		if teamResourceShare[teamList[i]] ~= 0 then
+			return teamList[i]
+		end
+	end
+	
+	return teamID
+end
+
 function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if not captureUnitDefs[unitDefID] then
 		return
@@ -408,7 +427,8 @@ function gadget:UnitDestroyed(unitID)
 		local i = 1
 		while i <= unitByID.count do
 			local cid = unitByID.data[i]
-			recusivelyTransfer(cid, capturedUnits[cid].originTeam, capturedUnits[cid].originAllyTeam, unitID)
+			local transferTeamID = GetActiveTeam(capturedUnits[cid].originTeam, capturedUnits[cid].originAllyTeam)
+			recusivelyTransfer(cid, transferTeamID, capturedUnits[cid].originAllyTeam, unitID)
 			if cid == unitByID.data[i] then
 				i = i + 1
 			end
@@ -594,8 +614,8 @@ local function DrawBezierCurve(pointA, pointB, pointC, pointD, amountOfPoints)
 	end
 end
 
-local function GetUnitTop(unitID, x,y,z)
-	local height = Spring.GetUnitHeight(unitID)*1.5 -- previously hardcoded to 50
+local function GetUnitTop(unitID, x, y ,z, bonus)
+	local height = Spring.GetUnitHeight(unitID)*1.5
 	local top = select(2, spGetUnitVectors(unitID))
 	local offX = top[1]*height
 	local offY = top[2]*height
@@ -615,7 +635,7 @@ local function DrawWire(units, spec)
 				local teamR, teamG, teamB = Spring.GetTeamColor(teamID)
 				
 				local _,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controller, true)
-				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz)
+				local topX, topY, topZ = GetUnitTop(controller, xxx, yyy, zzz, 50)
 				point[1] = {xxx, yyy, zzz}
 				point[2] = {topX, topY, topZ}
 				_,_,_,xxx,yyy,zzz = Spring.GetUnitPosition(controliee, true)
