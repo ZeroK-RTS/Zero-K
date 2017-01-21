@@ -243,16 +243,16 @@ local function MergeAll()
 	end
 end
 
-local function SendInvite(player, target, targetid) -- targetid is which player is the merger
+local function SendInvite(player, target) -- targetid is which player is the merger
 	if spGetGameFrame() > config.mintime then
 		local targetspec = select(3, spGetPlayerInfo(target))
 		local _,_,dead,ai,_ = spGetTeamInfo(GetTeamID(target))
-		if player == target then
-			spEcho("[Commshare] " .. player .. "(" .. select(1,spGetPlayerInfo(player)) .. ") tried to merge with theirself!")
+		if player == target or GetTeamID(target) == GetTeamID(player) then
+			spEcho("[Commshare] " .. select(1,spGetPlayerInfo(player)) .. " tried to merge with theirself or a squad member!")
 			return
 		end
 		if targetspec then
-			spEcho("[Commshare] " .. player .. "(" .. select(1,spGetPlayerInfo(player)) .. ") tried to merge with spectator!")
+			spEcho("[Commshare] " .. select(1,spGetPlayerInfo(player)) .. " tried to merge with a spectator!")
 			return
 		end
 		if targetid == player then
@@ -263,7 +263,7 @@ local function SendInvite(player, target, targetid) -- targetid is which player 
 			if invites[target] == nil then
 				invites[target] = {}
 			end
-			invites[target][player] = {id = player, timeleft = 60, controller = targetid}
+			invites[target][player] = {id = player, timeleft = 60}
 		end
 	end
 end
@@ -272,13 +272,16 @@ local function AcceptInvite(player,target)
 	spEcho("verifying invite")
 	if invites[player][target] then
 		spEcho("invite verified")
-		if invites[player][target]["controller"] ~= player then
-			MergePlayer(player,GetTeamID(target))
-		else -- target->player
+		local teamID = GetTeamID(player)
+		if GetTeamLeader(teamID) == player and GetSquadSize(teamID) > 1 then
 			MergeTeams(GetTeamID(target),GetTeamID(player))
+		else
+			MergePlayer(player,GetTeamID(target))
 		end
 		invites[player][target] = nil
-		invites[target][player] = nil
+		if invites[target] then
+			invites[target][player] = nil
+		end
 	else
 		spEcho("[Commshare] Invalid invite: " .. player,target .. "!")
 	end
@@ -296,16 +299,13 @@ function gadget:GameFrame(frame)
 				if data.timeleft > 0 then
 					data.timeleft = data.timeleft - 1
 				end
-				if data.timeleft == -1 then 
-					-- this is so we know an invite has expired. UI will remove the invite at timeleft = 0, 
-					-- but gadget will remove it at -1. Otherwise UI will just see it constantly at 1.
+				if data.timeleft == 0 then 
 					invitecount = invitecount-1
 					invites[key] = nil
 				end
 				if data and data.timeleft > -1 then
 					spSetTeamRulesParam(GetTeamID(player), "commshare_invite_" .. invitecount .. "_timeleft", data.timeleft, private)
 					spSetTeamRulesParam(GetTeamID(player), "commshare_invite_" .. invitecount .. "_id", data.id, private)
-					spSetTeamRulesParam(GetTeamID(player), "commshare_invite_" .. invitecount .. "_controller", data.controller, private)
 				end
 			end
 			spSetTeamRulesParam(GetTeamID(player),"commshare_invitecount",invitecount,private)
@@ -346,7 +346,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 		end
 		if strFind(command, "invite") then
 			if type(targetID) == "number" then
-				SendInvite(playerID, targetID, playerID)
+				SendInvite(playerID, targetID)
 				if invites[playerID] and invites[playerID][targetID] and invites[targetID][playerID] then
 					AcceptInvite(playerID,targetID)
 				end
