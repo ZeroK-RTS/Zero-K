@@ -772,9 +772,7 @@ local function formatMessage(msg)
 end
 
 local function MessageIsChatInfo(msg)
-	return string.find(msg.argument,'enabled!') or
-	string.find(msg.argument,'disabled!') or 
-	string.find(msg.argument,'Speed set to') or
+	return string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
 	string.find(msg.argument,'exited') or 
