@@ -403,6 +403,9 @@ end
 --------------------------------------------------------------------------------
 -- Make Chili controls
 --------------------------------------------------------------------------------
+
+local externalFunctions = {}
+
 local function CreateWindow(save)
 	DisposeWindow()
 
@@ -478,6 +481,14 @@ local function CreateWindow(save)
 	AddSaveEntryButtons(save)
 end
 
+function externalFunctions.CreateSaveWindow()
+	CreateWindow(true)
+end
+
+function externalFunctions.CreateLoadWindow()
+	CreateWindow(false)
+end
+
 --------------------------------------------------------------------------------
 -- callins
 --------------------------------------------------------------------------------
@@ -491,9 +502,7 @@ function widget:Initialize()
 	TextBox = Chili.TextBox
 	Button = Chili.Button
 	
-	WG.SaveGame = {
-		CreateWindow = CreateWindow
-	}
+	WG.SaveGame = externalFunctions
 end
 
 function widget:Shutdown()
