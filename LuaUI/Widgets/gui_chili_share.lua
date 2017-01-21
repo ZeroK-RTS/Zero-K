@@ -393,6 +393,12 @@ function widget:GameFrame(f)
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
+		if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
+			local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
+			Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
+			--Spring.SendCommands("unbind " .. hotkey .. " sharedialog") --Does not work!
+			WG.crude.SetHotkey("sharedialog","")
+		end
 		modOptions = nil
 		GetPlayers()
 		Buildme()
