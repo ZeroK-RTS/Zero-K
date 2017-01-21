@@ -7,6 +7,7 @@ local muzzle = piece 'muzzle'
 local exhaust = piece 'exhaust'
 local turner = piece 'turner'
 local aimpoint = piece 'aimpoint'
+local gunemit = piece 'gunemit'
 
 local thigh = {piece 'lthigh', piece 'rthigh'}
 local shin = {piece 'lshin', piece 'rshin'}
@@ -72,11 +73,11 @@ function script.Create()
 end
 
 function script.AimFromWeapon(num)
-	return aimpoint
+	return gunemit
 end
 
 function script.QueryWeapon(num)
-	return muzzle
+	return gunemit
 end
 
 local function RestoreAfterDelay()
@@ -93,7 +94,7 @@ function script.AimWeapon(num, heading, pitch)
 	Turn (hips, x_axis, 0)
 	Turn (chest, x_axis, 0)
 	Turn (gun, x_axis, -pitch, math.rad(100))
-	Turn (turner, y_axis, heading + math.rad(4), math.rad(200))
+	Turn (turner, y_axis, heading + math.rad(5), math.rad(200))
 
 	WaitForTurn (turner, y_axis)
 	WaitForTurn (gun, x_axis)
