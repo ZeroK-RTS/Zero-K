@@ -582,7 +582,7 @@ options = {
 		end
 	},
 	backlogShowWithChatEntry = {
-		name = "Show backlog when echatting",
+		name = "Auto-toggle backlog",
 		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
 		type = 'bool',
 		value = false,
