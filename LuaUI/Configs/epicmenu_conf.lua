@@ -189,6 +189,9 @@ confdata.subMenuIcons = {
 
 -- SETUP MENU HERE
 
+ShButton('', 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, imgPath .. 'commands/Bold/unload.png')
+ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, imgPath .. 'commands/Bold/load.png')
+
 --- GENERAL SETTINGS --- settings about settings
 local generalPath = 'Settings/Reset Settings'
 	ShLabel(generalPath, 'Reset graphic settings to minimum.')
@@ -238,8 +241,6 @@ local gameSpeedPath = 'Game/Game Speed'
 	ShLabel(gamePath, '')
 	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
 	
-	ShButton(gamePath, 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, nil)
-	--ShButton(gamePath, 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, nil)
 	--ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
 -- global build command

@@ -25,6 +25,7 @@ local MAX_SAVES = 999
 --------------------------------------------------------------------------------
 local Chili
 local Window
+local Control
 local Panel
 local Grid
 local StackPanel
@@ -33,17 +34,8 @@ local TextBox
 local Label
 local Button
 
--- chili elements
-local window
-local saveGrid
-local saveScroll
-local saveFilenameEdit, saveDescEdit
-local saveControls = {}	-- {filename, container, titleLabel, descTextBox, image (someday), isNew}
+local mainWindow
 
---------------------------------------------------------------------------------
--- data
---------------------------------------------------------------------------------
-local saves = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Makes a control grey for disabled, or whitish for enabled
@@ -82,9 +74,9 @@ local function SecondsToClock(seconds)
 end
 
 local function DisposeWindow()
-	if window then
-		window:Dispose()
-		window = nil
+	if mainWindow then
+		mainWindow:Dispose()
+		mainWindow = nil
 	end
 end
 
@@ -145,7 +137,7 @@ end
 -- Loads the list of save files and their contents
 local function GetSaves()
 	Spring.CreateDir(SAVE_DIR)
-	saves = {}
+	local saves = {}
 	local savefiles = VFS.DirList(SAVE_DIR, "*.lua")
 	for i=1,#savefiles do
 		local path = savefiles[i]
@@ -155,6 +147,7 @@ local function GetSaves()
 		end
 	end
 	table.sort(saves, SortSavesByFilename)
+	return saves
 end
 
 -- e.g. if save slots 1, 2, 5, and 7 are used, return 3
@@ -178,23 +171,6 @@ local function GetSaveDescText(saveFile)
 		.. "\n" .. WriteDate(saveFile.date)
 end
 
-local function RemoveSaveControls(filename)
-	local function remove(tbl, filename)
-		local parent = nil
-		for i=1,#tbl do
-			local entry = tbl[i]
-			if entry.filename == filename then
-				parent = entry.container.parent
-				entry.container:Dispose()
-				table.remove(tbl, i)
-				break
-			end
-		end
-		parent:Invalidate()
-	end
-	remove(saveControls, filename)
-end
-
 local function RemoveAllSaveControls()
 	for i=1,#saveControls do
 		saveControls[i].container:Dispose()
@@ -204,29 +180,30 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function SaveGame(filename)
-	local success, err = pcall(function()
-		Spring.CreateDir(SAVE_DIR)
-		filename = (filename and trim(filename)) or ("save" .. string.format("%03d", FindFirstEmptySaveSlot()))
-		path = SAVE_DIR .. "/" .. filename .. ".lua"
-		local saveData = {}
-		--saveData.filename = filename
-		saveData.date = os.date('*t')
-		saveData.description = isAutosave and "" or saveDescEdit.text
-		saveData.gameName = Game.gameName
-		saveData.gameVersion = Game.gameVersion
-		saveData.engineVersion = Game.version
-		saveData.map = Game.mapName
-		saveData.gameframe = Spring.GetGameFrame()
-		saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
-		table.save(saveData, path)
-		Spring.SendCommands("luasave " .. filename .. " -y")
-		
-		saveFilenameEdit:SetText(filename)
-		Spring.Log(widget:GetInfo().name, LOG.INFO, "Saved game to " .. path)
-		
-		DisposeWindow()
-	end)
+local function SaveGame(filename, description)
+	local success, err = pcall(
+		function()
+			Spring.CreateDir(SAVE_DIR)
+			filename = (filename and trim(filename)) or ("save" .. string.format("%03d", FindFirstEmptySaveSlot()))
+			path = SAVE_DIR .. "/" .. filename .. ".lua"
+			local saveData = {}
+			--saveData.filename = filename
+			saveData.date = os.date('*t')
+			saveData.description = description or "No description"
+			saveData.gameName = Game.gameName
+			saveData.gameVersion = Game.gameVersion
+			saveData.engineVersion = Game.version
+			saveData.map = Game.mapName
+			saveData.gameframe = Spring.GetGameFrame()
+			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
+			table.save(saveData, path)
+			
+			Spring.SendCommands("luasave " .. filename .. " -y")
+			Spring.Log(widget:GetInfo().name, LOG.INFO, "Saved game to " .. path)
+			
+			DisposeWindow()
+		end
+	)
 	if (not success) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error saving game: " .. err)
 	end
@@ -235,14 +212,12 @@ end
 local function LoadGameByFilename(filename)
 	local saveData = GetSave(SAVE_DIR .. '/' .. filename .. ".lua")
 	if saveData then
-		local success, err = pcall(function()
-			if saveData.description then
-				saveDescEdit:SetText(saveData.description)
-			end
-			
-			--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
-			DisposeWindow()
-			local script = [[
+		local success, err = pcall(
+			function()
+				-- This should perhaps be handled in chobby first?
+				--Spring.Log(widget:GetInfo().name, LOG.INFO, "Save file " .. path .. " loaded")
+				
+				local script = [[
 [GAME]
 {
 	SaveFile=__FILE__;
@@ -251,10 +226,11 @@ local function LoadGameByFilename(filename)
 	MyPlayerName=__PLAYERNAME__;
 }
 ]]
-			script = script:gsub("__FILE__", filename .. ".slsf")
-			script = script:gsub("__PLAYERNAME__", saveData.playerName)
-			Spring.Reload(script)
-		end)
+				script = script:gsub("__FILE__", filename .. ".slsf")
+				script = script:gsub("__PLAYERNAME__", saveData.playerName)
+				Spring.Reload(script)
+			end
+		)
 		if (not success) then
 			Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error loading game: " .. err)
 		end
@@ -272,23 +248,26 @@ local function DeleteSave(filename)
 		local pathNoExtension = SAVE_DIR .. "/" .. filename
 		os.remove(pathNoExtension .. ".lua")
 		os.remove(pathNoExtension .. ".slsf")
-		RemoveSaveControls(filename)
 	end)
 	if (not success) then
 		Spring.Log(widget:GetInfo().name, LOG.ERROR, "Error deleting save " .. filename .. ": " .. err)
 	end
 end
 
-
 --------------------------------------------------------------------------------
 -- Save/Load UI
 --------------------------------------------------------------------------------
-local function SaveLoadConfirmationDialogPopup(filename, saveMode)
-	local text = saveMode and (WG.Translate("interface", "save_overwrite_confirm") or ("Save \"" .. filename .. "\" already exists. Overwrite?"))
-				or WG.Translate("interface", "load_confirm") or ("Loading will lose any unsaved progress.\nDo you wish to continue?")
+local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
+	local text
+	if saveMode then
+		text = WG.Translate("interface", "save_overwrite_confirm") or ("Save \"" .. filename .. "\" already exists. Overwrite?")
+	else
+		text = WG.Translate("interface", "load_confirm") or ("Loading will lose any unsaved progress.\nDo you wish to continue?")
+	end
+	
 	local yesFunc = function()
 			if (saveMode) then
-				SaveGame(filename)
+				SaveGame(filename, description)
 				-- TODO refresh UI
 			else
 				LoadGameByFilename(filename)
@@ -297,33 +276,31 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode)
 	WG.crude.MakeExitConfirmWindow(text, yesFunc)
 end
 
-local function PromptSave(filename)
+local function PromptSave(filename, description)
 	filename = filename or saveFilenameEdit.text
 	filename = trim(filename)
 	local saveExists = filename and VFS.FileExists(SAVE_DIR .. "/" .. filename .. ".lua") or false
 	if saveExists then
 		SaveLoadConfirmationDialogPopup(filename, true)
 	else
-		SaveGame(filename)
+		SaveGame(filename, description)
 	end
 end
 
 -- Makes a button for a save game on the save/load screen
-local function AddSaveEntryButton(saveFile, saveMode)
+local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 	local controlsEntry = {filename = saveFile and saveFile.filename}
-	local parent = saveStack
 	
-	controlsEntry.container = Panel:New {
-		parent = parent,
+	local holder = Control:New {
+		name = "save_" .. saveFile.filename,
 		height = SAVEGAME_BUTTON_HEIGHT,
 		width = "100%",
 		x = 0,
-		--y = (SAVEGAME_BUTTON_HEIGHT) * count,
-		caption = "",
-		backgroundColor = {1,1,1,0},
+		parent = parent,
 	}
-	controlsEntry.button = Button:New {
-		parent = controlsEntry.container,
+	
+	local button = Button:New {
+		parent = holder,
 		x = 0,
 		right = (saveFile and 96 + 8 or 0) + 0,
 		y = 0,
@@ -331,7 +308,7 @@ local function AddSaveEntryButton(saveFile, saveMode)
 		caption = "",
 		OnClick = { function(self)
 				if saveMode then
-					PromptSave(saveFile and saveFile.filename or nil)
+					PromptSave(saveFile.filename, saveFile.description)
 				else
 					SaveLoadConfirmationDialogPopup(saveFile.filename, false)
 				end
@@ -346,57 +323,46 @@ local function AddSaveEntryButton(saveFile, saveMode)
 	--	resizeItems = false,
 	--	autoArrangeV = false,	
 	--}
-	local caption = saveFile and saveFile.filename or (WG.Translate("interface", "save_new_game") or "New save")
-	controlsEntry.titleLabel = Label:New {
-		parent = controlsEntry.button,
-		caption = caption,
+	local titleLabel = Label:New {
+		parent = button,
+		caption = saveFile and saveFile.filename,
 		valign = "center",
 		x = 8,
 		y = 2,
 		font = { size = 16 },
 	}
-	if saveFile then
-		controlsEntry.descTextbox = TextBox:New {
-			parent = controlsEntry.button,
-			x = 8,
-			y = 24,
-			right = 8,
-			bottom = 8,
-			text = GetSaveDescText(saveFile),
-			font = { size = 14 },
+	local descTextbox = TextBox:New {
+		parent = button,
+		x = 8,
+		y = 24,
+		right = 8,
+		bottom = 8,
+		text = GetSaveDescText(saveFile),
+		font = { size = 14 },
+	}
+	local deleteButton = Button:New {
+		parent = holder,
+		width = 96,
+		right = 0,
+		y = 4,
+		bottom = 4,
+		caption = WG.Translate("interface", "delete") or "Delete",
+		--backgroundColor = {0.4,0.4,0.4,1},
+		OnClick = { function(self)
+				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
+					DeleteSave(saveFile.filename)
+					holder:Dispose()
+				end)
+			end
 		}
-		controlsEntry.deleteButton = Button:New {
-			parent = controlsEntry.container,
-			width = 96,
-			right = 0,
-			y = 4,
-			bottom = 4,
-			caption = WG.Translate("interface", "delete") or "Delete",
-			--backgroundColor = {0.4,0.4,0.4,1},
-			OnClick = { function(self)
-					WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
-						DeleteSave(saveFile.filename)
-					end)
-				end
-			}
-		}
-	end
+	}
 	return controlsEntry
 end
 
 -- Generates the buttons for the savegames on the save/load screen
-local function AddSaveEntryButtons(saveMode)
-	local startIndex = #saves
-	local count = 0
-	if (saveMode) then
-		-- add new game panel
-		saveControls[#saveControls + 1] = AddSaveEntryButton(nil, true)
-		count = 1
-	end
-	
-	for i=startIndex,1,-1 do
-		saveControls[#saveControls + 1] = AddSaveEntryButton(saves[i], saveMode)
-		count = count + 1;
+local function FillSaveStackWithSaves(parent, saves, saveMode)
+	for i = #saves, 1, -1 do
+		AddSaveEntryButton(parent, saves[i], i, saveMode)
 	end
 end
 
@@ -404,23 +370,10 @@ end
 -- Make Chili controls
 --------------------------------------------------------------------------------
 
-local externalFunctions = {}
-
-local function CreateWindow(save)
-	DisposeWindow()
-
-	saveScroll = ScrollPanel:New {
-		name = 'zk_saveUI_saveScroll',
-		orientation = "vertical",
-		x = 0,
-		y = 12,
-		width = "100%",
-		bottom = 64,
-		children = {}
-	}
-	saveStack = StackPanel:New {
+local function GetSavesList(parent, saveMode)
+	local saveStack = StackPanel:New {
 		name = 'zk_saveUI_saveStack',
-		parent = saveScroll,
+		parent = parent,
 		orientation = "vertical",
 		x = 0,
 		width = "100%",
@@ -429,57 +382,101 @@ local function CreateWindow(save)
 		resizeItems = false,
 		autoArrangeV = false,
 	}
-	saveFilenameEdit = Chili.EditBox:New {
-		name = 'zk_saveUI_saveFilename',
-		x = 0,
-		right = 88,
-		bottom = 36,
-		height = 20,
-		width = "100%",
-		text = "Save filename",
-		font = { size = 16 },
-	}
-	saveDescEdit = Chili.EditBox:New {
-		name = 'zk_saveUI_saveDesc',
-		x = 0,
-		right = 88,
-		bottom = 4,
-		height = 20,
-		width = "100%",
-		text = "Save description",
-		font = { size = 16 },
-	}
 	
-	window = Window:New {
+	local saves = GetSaves()
+	FillSaveStackWithSaves(saveStack, saves, saveMode)
+end
+
+local function CreateWindow(saveMode)
+	DisposeWindow()
+	
+	mainWindow = Window:New {
 		name = 'zk_saveUI_saveWindow',
-		parent = Chili.Screen0,
 		x = Chili.Screen0.width / 2 - 320,
 		y = "20%",
 		width = 640,
 		height = "60%",
 		backgroundColor = {0, 0, 0, 0},
-		caption = save and "Save Game" or "Load Game",
+		caption = saveMode and "Save Game" or "Load Game",
 		resizable = false,
 		tweakResizable = false,
-		children = {
-			Button:New {
-				name = 'zk_saveUI_saveBack',
-				width = 80,
-				height = 64,
-				bottom = 0,
-				right = 0,
-				caption = WG.Translate("interface", "close") or "Close",
-				OnClick = {function() DisposeWindow() end},
-				font = {size = 18}
-			},
-			saveFilenameEdit,
-			saveDescEdit,
-			saveScroll,
-		}
+		parent = Chili.Screen0,
 	}
-	GetSaves()
-	AddSaveEntryButtons(save)
+	
+	local saveScroll = ScrollPanel:New {
+		name = 'zk_saveUI_saveScroll',
+		orientation = "vertical",
+		x = 0,
+		y = 12,
+		width = "100%",
+		bottom = 74,
+		parent = mainWindow,
+	}
+	
+	GetSavesList(saveScroll, saveMode)
+	
+	if saveMode then
+		local saveFilenameEdit = Chili.EditBox:New {
+			name = 'zk_saveUI_saveFilename',
+			x = 0,
+			right = (saveMode and 168) or 88,
+			bottom = 38,
+			height = 28,
+			width = "100%",
+			hint = "Save Filename",
+			font = {size = 16},
+			parent = mainWindow,
+		}
+		
+		local saveDescEdit = Chili.EditBox:New {
+			name = 'zk_saveUI_saveDesc',
+			x = 0,
+			right = (saveMode and 168) or 88,
+			bottom = 4,
+			height = 28,
+			width = "100%",
+			hint = "Save Description",
+			font = {size = 16},
+			parent = mainWindow,
+		}
+	
+		local saveButton = Button:New {
+			name = 'saveButton',
+			width = 80,
+			height = 68,
+			bottom = 0,
+			right = 85,
+			caption = WG.Translate("interface", "save") or "Save",
+			OnClick = {
+				function ()
+					if saveFilenameEdit.text and string.len(saveFilenameEdit.text) ~= 0 then
+						PromptSave(saveFilenameEdit.text, saveDescEdit.text)
+					end
+				end
+			},
+			font = {size = 18},
+			parent = mainWindow,
+		}
+	end
+	
+	local closeButton = Button:New {
+		name = 'closeButton',
+		width = 80,
+		height = 68,
+		bottom = 0,
+		right = 0,
+		caption = WG.Translate("interface", "close") or "Close",
+		OnClick = {DisposeWindow},
+		font = {size = 18},
+		parent = mainWindow,
+	}
 end
+
+--------------------------------------------------------------------------------
+-- External Functions
+--------------------------------------------------------------------------------
+
+local externalFunctions = {}
 
 function externalFunctions.CreateSaveWindow()
 	CreateWindow(true)
@@ -494,6 +491,7 @@ end
 --------------------------------------------------------------------------------
 function widget:Initialize()
 	Chili = WG.Chili
+	Control = Chili.Control
 	Window = Chili.Window
 	Panel = Chili.Panel
 	StackPanel = Chili.StackPanel

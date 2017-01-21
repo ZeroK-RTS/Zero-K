@@ -69,6 +69,7 @@ skin.editbox = {
   
   focusColor  = {1, 1, 1, 1},
   borderColor = {1, 1, 1, 0.6},
+  padding = {6,2,2,3},
 
   TileImageBK = ":cl:panel2_bg.png",
   TileImageFG = ":cl:panel2.png",
@@ -206,6 +207,7 @@ skin.scrollpanel = {
   HKnobTiles     = {8,8,8,8},
 
   KnobColorSelected = {0.0, 0.6, 1.0, 1.0},
+  padding = {2, 2, 2, 2},
 
   scrollbarSize = 12,
   DrawControl = DrawScrollPanel,
