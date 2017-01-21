@@ -2,8 +2,11 @@
 -- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
 -- This table is used in Epicmenu for hotkey management.
 local custom_cmd_actions = {
-	-- states are 2, targeted commands (e.g. attack) are 1, instant commands (e.g. selfd) are 3
-	-- can (probably) set to 1 instead of 3 if order doesn't need to be queueable
+	-- cmdTypes are:
+	-- 1: Targeted commands (eg attack)
+	-- 2: State commands (eg on/off)
+	-- 3: Instant commands (eg self-d)
+	
 	--SPRING COMMANDS
 	selfd = {cmdType = 3, name = "Self Destruct"},
 	attack = {cmdType = 1, name = "Force Fire"},
@@ -52,7 +55,7 @@ local custom_cmd_actions = {
 	cancelfirezone = {cmdType = 3, name = "Cancel Newton Fire Zone"},
 	radialmenu = {cmdType = 3, name = "Open Radial Build Menu"},
 	placebeacon = {cmdType = 1, name = "Place Teleport Beacon"},
-	recalldrones = {cmdType = 1, name = "Recall Drones to Carrier"},
+	recalldrones = {cmdType = 3, name = "Recall Drones to Carrier"},
 	buildprev = {cmdType = 1, name = "Build Previous"},
 	areaguard = {cmdType = 1, name = "Area Guard"},
 	dropflag = {cmdType = 3, name = "Drop Flag"},
@@ -138,8 +141,9 @@ local usedActions = {
 	["autorepairlevel"] = true,
 	["idlemode"] = true,
 	["areaattack"] = true,
-	["rearm"] = true,
+	--["rearm"] = true, -- Not useful to send directly so unbindable to prevent confusion. Right click on pad is better.
 	["find_pad"] = true,
+	["recalldrones"] = true,
 	["divestate"] = true,
 	["wantcloak"] = true,
 	["oneclickwep"] = true,
