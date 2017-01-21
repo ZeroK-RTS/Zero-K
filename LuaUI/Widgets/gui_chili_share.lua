@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.1",
+		name	= "Chili Share menu v1.2",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "_Shaman",
 		date	= "12-3-2016",
@@ -343,10 +343,10 @@ local function Buildme()
 		local playerID = players[i].id
 		repeat
 			--Spring.Echo("Fontsize for " .. players[i].name .. ": " .. sizefont)
-			if sizefont*((string.len(players[i].name)+5.5)/4.25) > playerpanels[i].width*0.5 then
+			if sizefont*((string.len(players[i].name)+5.5)/4.25) > playerpanels[i].width*0.8 then
 				sizefont = sizefont - 0.5
 			end
-		until sizefont*((string.len(players[i].name)+5.5)/4.25) <= playerpanels[i].width*0.5
+		until sizefont*((string.len(players[i].name)+5.5)/4.25) <= playerpanels[i].width*0.8
 		playerfontsize[playerID] = sizefont
 		givemebuttons[playerID] = {}
 		if players[i].id ~= Spring.GetMyPlayerID() then
@@ -369,7 +369,7 @@ local function Buildme()
 			texty = 44.5
 		end
 		if not players[i].spec then
-			givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanels[i],height='100%',width='45%',fontsize=sizefont,x='55%',text=players[i].name, textColor={r,g,b,a},y=texty..'%'}
+			givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanels[i],height='100%',width='45%',fontsize=sizefont,x='50%',text=players[i].name, textColor={r,g,b,a},y=texty..'%'}
 		end
 	end
 	window:SetVisibility(false)
