@@ -261,6 +261,12 @@ local function _DrawCursor(x, y, w, h)
 	gl.Vertex(x + w, y + h)
 end
 
+local function _DrawSelection(x, y, w, h)
+	gl.Vertex(x, y)
+	gl.Vertex(x, y + h)
+	gl.Vertex(x + w, y)
+	gl.Vertex(x + w, y + h)
+end
 
 --//=============================================================================
 --//
@@ -362,6 +368,8 @@ end
 function DrawEditBox(obj)
 	local skLeft,skTop,skRight,skBottom = unpack4(obj.tiles)
 
+	gl.Translate(obj.x, obj.y, 0) -- Remove with new chili, does translates for us.
+	
 	gl.Color(obj.backgroundColor)
 	TextureHandler.LoadTexture(0,obj.TileImageBK,obj)
 	local texInfo = gl.TextureInfo(obj.TileImageBK) or {xsize=1, ysize=1}
@@ -536,6 +544,8 @@ function DrawEditBox(obj)
 			end
         end
 	end
+	
+	gl.Translate(-obj.x, -obj.y, 0) -- Remove with new chili, does translates for us.
 end
 
 --//=============================================================================

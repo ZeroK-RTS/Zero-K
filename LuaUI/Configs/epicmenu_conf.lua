@@ -238,8 +238,8 @@ local gameSpeedPath = 'Game/Game Speed'
 	ShLabel(gamePath, '')
 	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
 	
-	ShButton(gamePath, 'Save Game', (function() WG.SaveGame.CreateWindow(true) end), nil, nil, nil)
-	--ShButton(gamePath, 'Load Game', (function() WG.SaveGame.CreateWindow(false) end), nil, nil, nil)
+	ShButton(gamePath, 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, nil)
+	--ShButton(gamePath, 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, nil)
 	--ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
 -- global build command
