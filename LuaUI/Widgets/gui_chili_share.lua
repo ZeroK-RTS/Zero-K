@@ -385,6 +385,14 @@ function widget:PlayerChanged(id)
 	end
 end
 
+function widget:GameProgress(serverFrameNum)
+	if needsremerging and serverFrameNum - Spring.GetGameFrame() < 90 then
+		needsremerging = false
+		Spring.SendLuaRulesMsg("sharemode remerge")
+		Spring.Echo("Sent remerge request")
+	end
+end
+
 function widget:GameFrame(f)
 	if f == 2 then
 		local modOptions = {}
@@ -392,12 +400,6 @@ function widget:GameFrame(f)
 		Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
-		end
-		if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
-			local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
-			Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
-			--Spring.SendCommands("unbind " .. hotkey .. " sharedialog") --Does not work!
-			WG.crude.SetHotkey("sharedialog","")
 		end
 		modOptions = nil
 		GetPlayers()
@@ -415,10 +417,21 @@ function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	chili = WG.Chili
 	screen0 = chili.Screen0
+	if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
+		local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
+		Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
+		--Spring.SendCommands("unbind " .. hotkey .. " sharedialog") --Does not work!
+		WG.crude.SetHotkey("sharedialog","")
+	end
 	if Spring.GetGameFrame() > 2 then
+		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing") or 0
+		if iscommsharing == 1 then
+			needsremerging = true
+			--This will send a remerge request when we catch up if we're rejoining.
+		end
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-    Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
+		Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
