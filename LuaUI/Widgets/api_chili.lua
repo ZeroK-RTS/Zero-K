@@ -170,6 +170,13 @@ function widget:KeyRelease()
 end
 
 
+function widget:TextInput(utf8, ...)
+	if Spring.IsGUIHidden() then return false end
+
+	return screen0:TextInput(utf8, ...)
+end
+
+
 function widget:ViewResize(vsx, vsy) 
 	screen0:Resize(vsx, vsy)
 end 

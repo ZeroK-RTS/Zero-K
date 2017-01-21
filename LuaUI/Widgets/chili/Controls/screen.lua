@@ -271,4 +271,13 @@ function Screen:KeyPress(...)
 	return (not not inherited:KeyPress(...))
 end
 
+
+function Screen:TextInput(...)
+        local focusedControl = UnlinkSafe(self.focusedControl)
+        if focusedControl then
+                return (not not focusedControl:TextInput(...))
+        end
+        return (not not inherited:TextInput(...))
+end
+
 --//=============================================================================

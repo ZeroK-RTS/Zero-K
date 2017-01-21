@@ -1147,11 +1147,6 @@ function Control:MouseWheel(x, y, ...)
 end
 
 
-function Control:KeyPress(...)
-  return inherited.KeyPress(self, ...)
-end
-
-
 function Control:FocusUpdate(...)
   return inherited.FocusUpdate(self, ...)
 end
