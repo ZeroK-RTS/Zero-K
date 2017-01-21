@@ -76,6 +76,15 @@ local function StringToTable(str)
 	return strtbl
 end
 
+local function SetUpVisibility(playerID,metal,energy,unit,commshare,kick,accept)
+	givemebuttons[playerID]["metal"]:SetVisibility(metal)
+	givemebuttons[playerID]["energy"]:SetVisibility(energy)
+	givemebuttons[playerID]["unit"]:SetVisibility(unit)
+	givemebuttons[playerID]["commshare"]:SetVisibility(commshare)
+	givemebuttons[playerID]["kick"]:SetVisibility(kick)
+	givemebuttons[playerID]["accept"]:SetVisibility(accept)
+end
+
 local function UpdatePlayer(playerID)
 	if givemebuttons[playerID] == nil or built == false then
 		local name = select(1,Spring.GetPlayerInfo(playerID))
@@ -91,10 +100,7 @@ local function UpdatePlayer(playerID)
 	if playerID ~= Spring.GetMyPlayerID() and spec then
 		givemebuttons[playerID]["text"]:Dispose()
 		givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x='60%',text=name .. " (RSGN)", textColor={1,0,0,1},y=texty}
-		givemebuttons[playerID]["metal"]:SetVisibility(false)
-		givemebuttons[playerID]["energy"]:SetVisibility(false)
-		givemebuttons[playerID]["unit"]:SetVisibility(false)
-		givemebuttons[playerID]["commshare"]:SetVisibility(false)
+		SetUpVisibility(playerID,false,false,false,false,false,false)
 	elseif active and not spec then
 		if playerID == Spring.GetMyPlayerID()  then
 			local r,g,b,a = Spring.GetTeamColor(teamid)
@@ -112,40 +118,21 @@ local function UpdatePlayer(playerID)
 		givemebuttons[playerID]["text"]:Dispose()
 		givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x='60%',text=name, textColor={r,g,b,a},y=texty}
 		if teamid == Spring.GetMyTeamID() and leader == Spring.GetMyPlayerID() then
-			givemebuttons[playerID]["metal"]:SetVisibility(false)  -- This could probably be chopped down to size
-			givemebuttons[playerID]["energy"]:SetVisibility(false) -- Using some sort of function..
-			givemebuttons[playerID]["unit"]:SetVisibility(false)   -- Because it's ugly.. but it works!
-			givemebuttons[playerID]["commshare"]:SetVisibility(false)
-			givemebuttons[playerID]["kick"]:SetVisibility(true)
-			givemebuttons[playerID]["accept"]:SetVisibility(false)
+			SetUpVisibility(playerID,false,false,false,false,true,false)
 		elseif teamid == Spring.GetMyTeamID() and leader ~= Spring.GetMyPlayerID() then
-			givemebuttons[playerID]["metal"]:SetVisibility(false)
-			givemebuttons[playerID]["energy"]:SetVisibility(false)
-			givemebuttons[playerID]["unit"]:SetVisibility(false)
-			givemebuttons[playerID]["commshare"]:SetVisibility(false)
-			givemebuttons[playerID]["accept"]:SetVisibility(false)
-			givemebuttons[playerID]["kick"]:SetVisibility(false)
+			SetUpVisibility(playerID,false,false,false,false,false,false)
 		elseif leader ~= playerID then
-			givemebuttons[playerID]["metal"]:SetVisibility(false)
-			givemebuttons[playerID]["energy"]:SetVisibility(false)
-			givemebuttons[playerID]["unit"]:SetVisibility(false)
-			givemebuttons[playerID]["commshare"]:SetVisibility(true)
-			givemebuttons[playerID]["kick"]:SetVisibility(false)
-			givemebuttons[playerID]["accept"]:SetVisibility(false)
+			SetUpVisibility(playerID,false,false,false,false,false,false)
 		else
-			givemebuttons[playerID]["metal"]:SetVisibility(true)
-			givemebuttons[playerID]["energy"]:SetVisibility(true)
-			givemebuttons[playerID]["unit"]:SetVisibility(true)
-			givemebuttons[playerID]["commshare"]:SetVisibility(true)
-			givemebuttons[playerID]["accept"]:SetVisibility(false)
-			givemebuttons[playerID]["kick"]:SetVisibility(false)
+			SetUpVisibility(playerID,true,true,true,true,false,false)
 		end
 	elseif not active and not spec then
+		SetUpVisibility(playerID,false,false,false,false,false,false)
 		givemebuttons[playerID]["text"]:SetText(name .. "(QUIT)")
-		givemebuttons[playerID]["metal"]:SetVisibility(false)
-		givemebuttons[playerID]["energy"]:SetVisibility(false)
-		givemebuttons[playerID]["unit"]:SetVisibility(false)
+	end
+	if sharemode == false and playerID ~= Spring.GetMyPlayerID() then
 		givemebuttons[playerID]["commshare"]:SetVisibility(false)
+		givemebuttons[playerID]["accept"]:SetVisibility(false)
 		givemebuttons[playerID]["kick"]:SetVisibility(false)
 	end
 end
@@ -248,11 +235,11 @@ local function SetUpInitialStates()
 		local playerID = players[i].id
 		local teamID = players[i].team
 		if playerID then
-			if playerID == myplayerID and players[i].teamleader then
+			if playerID == myplayerID and (players[i].teamleader or sharemode == false) then
 				givemebuttons[playerID]["leave"]:SetVisibility(false)
-			elseif playerID == myplayerID and not players[i].teamleader and #Spring.GetPlayerList(myteamID) > 1 then
+			elseif playerID == myplayerID and not players[i].teamleader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
 				givemebuttons[playerID]["leave"]:SetVisibility(true)
-			else -- other people's stuff.
+			elseif playerID ~= myplayerID then -- other people's stuff.
 				givemebuttons[playerID]["accept"]:SetVisibility(false)
 				if teamID == myteamID then
 					if amiteamleader then
@@ -269,6 +256,11 @@ local function SetUpInitialStates()
 						givemebuttons[playerID]["metal"]:SetVisibility(false)
 						givemebuttons[playerID]["energy"]:SetVisibility(false)
 						givemebuttons[playerID]["unit"]:SetVisibility(false)
+					end
+					if sharemode == false then
+						givemebuttons[playerID]["commshare"]:SetVisibility(false)
+						givemebuttons[playerID]["accept"]:SetVisibility(false)
+						givemebuttons[playerID]["kick"]:SetVisibility(false)
 					end
 				else
 					givemebuttons[playerID]["kick"]:SetVisibility(false)
@@ -353,11 +345,9 @@ local function Buildme()
 			givemebuttons[playerID]["unit"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x='2%',y= newy..'%',OnClick= {function () GiveUnit(playerID) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
 			givemebuttons[playerID]["metal"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '13%',y=newy..'%',OnClick = {function () GiveResource(playerID,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
 			givemebuttons[playerID]["energy"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '24%',y=newy..'%',OnClick = {function () GiveResource(playerID,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
-			if sharemode then
-				givemebuttons[playerID]["commshare"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InvitePlayer(playerID,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
-				givemebuttons[playerID]["accept"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InviteChange(playerID,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
-				givemebuttons[playerID]["kick"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '2%',y=newy..'%',OnClick = {function () KickPlayer(playerID) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
-			end
+			givemebuttons[playerID]["commshare"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InvitePlayer(playerID,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
+			givemebuttons[playerID]["accept"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InviteChange(playerID,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
+			givemebuttons[playerID]["kick"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '2%',y=newy..'%',OnClick = {function () KickPlayer(playerID) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
 		end
 		if playerID == Spring.GetMyPlayerID() then
 			givemebuttons[playerID]["leave"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '2%',y=newy..'%',OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
