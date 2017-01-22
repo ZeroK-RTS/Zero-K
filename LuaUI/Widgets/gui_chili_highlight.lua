@@ -15,6 +15,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+local WHITE = {1,1,1}
 
 local Chili
 
@@ -26,8 +27,8 @@ local timer = 0
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local function AddControl(name, color)
-  controls[name] = {color = color or {1,1,1}, control = Chili.Screen0:GetObjectByName(name)}
+local function AddControl(name, color, width)
+  controls[name] = {control = Chili.Screen0:GetObjectByName(name), color = color, width = width}
 end
 
 local function RemoveControl(name)
@@ -42,11 +43,12 @@ local function CircleVertices(circleDivs)
   end
 end
 
-local function DrawCircle(control, color)
+local function DrawCircle(control, color, width)
   local x, y = control:LocalToScreen(0, 0)
   y = Chili.Screen0.height - y
   y = y - control.height/2
   x = x + control.width/2
+  gl.LineWidth(width)
   --Spring.Echo(x, y)
   gl.PushMatrix()
   gl.Translate(x, y, 0)
@@ -61,12 +63,11 @@ end
 --------------------------------------------------------------------------------
 function widget:DrawScreen()
   gl.LineStipple(true)
-  gl.LineWidth(2)
   for name, data in pairs(controls) do
     local control = data.control
     if control and (not control.disposed) then
       if control.visible then
-        DrawCircle(control, data.color)
+        DrawCircle(control, data.color or WHITE, data.width or 4)
       end
     else
       RemoveControl(name)
