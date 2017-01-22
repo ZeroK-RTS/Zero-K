@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.2",
+		name	= "Chili Share menu v1.21",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "_Shaman",
 		date	= "12-3-2016",
@@ -10,6 +10,7 @@ function widget:GetInfo()
 		enabled	= true,
 	}
 end
+local automergeid = -1
 local players = {}
 local needsremerging = false
 local invites = {}
@@ -47,6 +48,13 @@ options_path = 'Settings/Interface/Share Menu'
 --[[ Change path if necessary. I just dumped it here because it made sense.
 Note: remerge is used in case of bugs! Feel free to remove it in a few stables.]]
 options = {
+		automation_clanmerge = {
+			name = 'Auto clan merge',
+			desc = 'Automatically merge with clan members.',
+			type = 'bool',
+			value = false,
+			noHotkey = true,
+		},
         remerge = {
                 name = 'Manual Remerge',
                 desc = 'Use this in case you weren\'t remerged automatically.',
@@ -148,6 +156,48 @@ local function InvitePlayer(playerid)
 		Spring.SendCommands("say a:I invited " .. name .. " to join my squad.")
 	end
 end
+
+local function MergeWithClanMembers()
+	local playerID = Spring.GetMyPlayerID()
+	local customKeys = select(10, Spring.GetPlayerInfo(playerID)) or {}
+	local myclanShort = customKeys.clan     or ""
+	local myclanLong  = customKeys.clanfull or ""
+	if myclanShort ~= "" then
+		Spring.Echo("[Share menu] Searching for clan members belonging to " .. myclanLong)
+		local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
+		local clanmembers = {}
+		for i=1, #teamlist do
+			local players = Spring.GetPlayerList(teamlist[i],true)
+			for j=1, #players do
+				local customKeys = select(10, Spring.GetPlayerInfo(players[j])) or {}
+				local clanShort = customKeys.clan     or ""
+				local clanLong  = customKeys.clanfull or ""
+				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
+				if clanLong == myclanLong and players[j] ~= Spring.GetMyPlayerID() and select(4,Spring.GetPlayerInfo(players[j])) ~= Spring.GetMyTeamID() then
+					clanmembers[#clanmembers+1] = players[j]
+				end
+			end
+			if #clanmembers > 0 then
+				local lowestid = playerID
+				local recipent = false
+				for i=1, #clanmembers do
+					if lowestid > clanmembers[i] then
+						recipent = true
+						lowestid = clanmembers[i]
+					end
+				end
+				if recipent == false then
+					for i=1, #clanmembers do
+						Spring.SendLuaRulesMsg("sharemode invite " .. clanmembers[i])
+					end
+				else
+					automergeid = lowestid
+				end
+			end
+		end
+	end
+end
+	
 
 local function LeaveMySquad()
 	local leader = select(2,Spring.GetTeamInfo(Spring.GetMyTeamID()))
@@ -376,9 +426,15 @@ local function UpdateInviteTable()
 			mycurrentteamid = Spring.GetMyTeamID()
 		end
 	end
-	for i=1,Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invitecount") do
-		local playerID = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_id")
-		local timeleft = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invite_"..i.."_timeleft")
+	local myPlayerID = Spring.GetMyPlayerID()
+	for i=1,Spring.GetGameRulesParam("commshare_" .. myPlayerID .. "_invitecount") do
+		local playerID = Spring.GetGameRulesParam("commshare_invite_"..myPlayerID.."_"..i.."_id")
+		local timeleft = Spring.GetGameRulesParam("commshare_invite_"..myPlayerID.."_"..i.."_timeleft") or 0
+		--Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
+		if playerID == automergeid then
+			InviteChange(playerID)
+			return
+		end
 		--Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
 		if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
 			invites[playerID] = timeleft
@@ -450,14 +506,13 @@ function widget:GameProgress(serverFrameNum)
 		--Spring.Echo("Sent remerge request")
 	end
 end
-	
 
 function widget:GameFrame(f)
 	if f == 1 then
 		mycurrentteamid = Spring.GetMyTeamID()
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-		Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
+		--Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
@@ -466,9 +521,17 @@ function widget:GameFrame(f)
 	end
 	if buildframe > -1 and f == buildframe + 1 then
 		built = true -- block PlayerChanged from doing anything until we've set up initial states.
+		local modOptions = {}
+		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing") or 0
+		modOptions = Spring.GetModOptions()
+		--Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
+		if sharemode and iscommsharing == 0 and options.automation_clanmerge.value == true then
+			--Spring.Echo("Clan merge is enabled!")
+			MergeWithClanMembers()
+		end
 	end
 	if f%30 == 0 then -- Update my invite table.
-		local invitecount = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"commshare_invitecount")
+		local invitecount = Spring.GetGameRulesParam("commshare_" .. Spring.GetMyPlayerID() .. "_invitecount")
 		if invitecount and invitecount > 0 and built then
 			UpdateInviteTable()
 		end
@@ -501,7 +564,7 @@ function widget:Initialize()
 		Buildme()
 	end
 	if spectating or select(3,Spring.GetPlayerInfo(Spring.GetMyPlayerID())) then
-		Spring.Echo("Spectator mode detected. Removing Share menu.")
+		Spring.Echo("[Share menu] Spectator mode detected. Shutting down.")
 		widgetHandler:RemoveWidget()
 	end
 end
