@@ -68,9 +68,9 @@ local FACTORY_UPDATE_PERIOD = 15 -- gameframes
 local function GetTeamName(teamID)
 	local _, leaderID, _, isAiTeam = Spring.GetTeamInfo(teamID)
 	if isAiTeam then
-		return select(2, Spring.GetAIInfo()) or "Unknown AI"
+		return select(2, Spring.GetAIInfo()) or "Unknown AI on team " .. (teamID or "???")
 	end
-	return select(1, Spring.GetPlayerInfo(leaderID)) or "Unknown Player"
+	return select(1, Spring.GetPlayerInfo(leaderID)) or ("Unknown Player on team " .. (teamID or "???"))
 end
 
 local function PlayerIDToTeamID(playerID)
