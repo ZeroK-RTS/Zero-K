@@ -339,18 +339,29 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			end
 		end
 
-		if type(targetID) ~= "number" then
-			return
-		end
-
-		-- Do commands --
 		if strFind(command,"remerge") then -- remerging seems impossible gadget side.
 			local _,active,spec,_ = spGetPlayerInfo(playerID)
 			if controlledPlayers[playerID] and not spec then
 				spAssignPlayerToTeam(playerID, controlledPlayers[playerID])
 				spEcho("game_message: Player " .. name .. " has been remerged!")
 			end
+		elseif strFind(command,"unmerge") then
+			local afk = IsTeamAfk(GetTeamID(playerID))
+			spEcho("team is afk: " .. tostring(afk))
+			if controlledPlayers[playerID] and not afk then
+				UnmergePlayer(playerID)
+				return
+			else
+				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't on a squad!")
+				return
+			end
 		end
+
+		if type(targetID) ~= "number" then
+			return
+		end
+
+		-- Do commands --
 		if strFind(command, "invite") then
 			SendInvite(playerID, targetID)
 			if invites[playerID] and invites[playerID][targetID] and invites[targetID][playerID] then
@@ -362,16 +373,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				return
 			else
 				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid accept command: " .. targetID .. " doesn't exist.")
-			end
-		elseif strFind(command,"unmerge") then
-			local afk = IsTeamAfk(GetTeamID(playerID))
-			spEcho("team is afk: " .. tostring(afk))
-			if controlledPlayers[playerID] and not afk then
-				UnmergePlayer(playerID)
-				return
-			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't on a squad!")
-				return
 			end
 		elseif strFind(command,"decline") then
 			invites[playerID][targetID] = nil
