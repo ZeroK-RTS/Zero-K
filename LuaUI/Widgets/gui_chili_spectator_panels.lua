@@ -1022,7 +1022,7 @@ function widget:PlayerChanged(pID)
 		if WG.EconomyPanel then
 			-- new second arg is "dispose"
 			-- I don't know if it specifically requires panel to be disposed, but let's do so to avoid behavior changes - KR
-			WG.EconomyPanel.SetVisibility(not newEnabled, true)
+			WG.EconomyPanel.SetEconomyPanelVisibility(not newEnabled, true)
 		end
 	end
 end

@@ -941,7 +941,7 @@ end
 
 local externalFunctions = {}
 
-function externalFunctions.SetVisibility(newVisibility, dispose)
+function externalFunctions.SetEconomyPanelVisibility(newVisibility, dispose)
 	if dispose then
 		local x,y,w,h = DestroyWindow()
 		if newVisibility then
