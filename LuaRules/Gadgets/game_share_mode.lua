@@ -45,7 +45,7 @@ local spGetGameFrame = Spring.GetGameFrame
 
 -- Other --
 local public = {public = true}
-local GaiaID = -9999
+local GaiaID = Spring.GetGaiaTeamID()
 
 --------------------------------------------------------
 -- Configuration
@@ -404,10 +404,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			end
 		end
 	end
-end
-
-function gadget:GameStart()
-	GaiaID = Spring.GetGaiaTeamID()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
