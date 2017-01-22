@@ -26,7 +26,7 @@ local strLower = string.lower
 
 -- Spring API --
 local spEcho = Spring.Echo
-local spSetGameRulesParam = Spring.SetGameRulesParam
+local spSetPlayerRulesParam = Spring.SetPlayerRulesParam
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetPlayerList = Spring.GetPlayerList
@@ -303,14 +303,14 @@ function gadget:GameFrame(frame)
 				if data.timeleft == 0 then 
 					invitecount = invitecount-1
 					invites[key] = nil
-					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_id", nil)
-					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_timeleft", nil)
+					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_id", nil)
+					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_timeleft", nil)
 				elseif data.timeleft > 0 then
-					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_timeleft", data.timeleft)
-					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_id", data.id)
+					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_timeleft", data.timeleft)
+					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_id", data.id)
 				end
 			end
-			spSetGameRulesParam("commshare_" .. player .. "_invitecount",invitecount)
+			spSetPlayerRulesParam("commshare_invitecount",invitecount)
 			if invitecount == 0 then 
 				-- Cleanup the table so that next second this doesn't run.
 				invites[player] = nil
