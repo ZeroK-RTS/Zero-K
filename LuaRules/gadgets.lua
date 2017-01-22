@@ -134,6 +134,10 @@ local callInLists = {
 	"GameID",
 	"TeamDied",
 
+	"PlayerAdded",
+	"PlayerChanged",
+	"PlayerRemoved",
+
 	"GameFrame",
 
 	"ViewResize",  -- FIXME ?
@@ -1123,6 +1127,27 @@ end
 function gadgetHandler:TeamDied(teamID)
   for _,g in ipairs(self.TeamDiedList) do
     g:TeamDied(teamID)
+  end
+  return
+end
+
+function gadgetHandler:PlayerAdded(playerID)
+  for _,g in ipairs(self.PlayerAddedList) do
+    g:PlayerAdded(playerID)
+  end
+  return
+end
+
+function gadgetHandler:PlayerChanged(playerID)
+  for _,g in ipairs(self.PlayerChangedList) do
+    g:PlayerChanged(playerID)
+  end
+  return
+end
+
+function gadgetHandler:PlayerRemoved(playerID, reason)
+  for _,g in ipairs(self.PlayerRemovedList) do
+    g:PlayerRemoved(playerID, reason)
   end
   return
 end
