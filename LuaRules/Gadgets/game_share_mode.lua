@@ -26,6 +26,7 @@ local strLower = string.lower
 
 -- Spring API --
 local spEcho = Spring.Echo
+local spSetGameRulesParam = Spring.SetGameRulesParam
 local spGetPlayerInfo = Spring.GetPlayerInfo
 local spGetTeamInfo = Spring.GetTeamInfo
 local spGetPlayerList = Spring.GetPlayerList
@@ -42,7 +43,7 @@ local spGetTeamUnits = Spring.GetTeamUnits
 local spGetAllyTeamList = Spring.GetAllyTeamList
 local spGetGameFrame = Spring.GetGameFrame
 
-local private = {private = true}
+-- Other --
 local public = {public = true}
 local GaiaID = -9999
 
@@ -302,13 +303,14 @@ function gadget:GameFrame(frame)
 				if data.timeleft == 0 then 
 					invitecount = invitecount-1
 					invites[key] = nil
-				end
-				if data and data.timeleft > -1 then
-					spSetTeamRulesParam(GetTeamID(player), "commshare_invite_" .. invitecount .. "_timeleft", data.timeleft, private)
-					spSetTeamRulesParam(GetTeamID(player), "commshare_invite_" .. invitecount .. "_id", data.id, private)
+					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_id", nil)
+					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_timeleft", nil)
+				elseif data.timeleft > 0 then
+					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_timeleft", data.timeleft)
+					spSetGameRulesParam("commshare_invite_" .. player .. "_" .. invitecount .. "_id", data.id)
 				end
 			end
-			spSetTeamRulesParam(GetTeamID(player),"commshare_invitecount",invitecount,private)
+			spSetGameRulesParam("commshare_" .. player .. "_invitecount",invitecount)
 			if invitecount == 0 then 
 				-- Cleanup the table so that next second this doesn't run.
 				invites[player] = nil
