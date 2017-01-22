@@ -303,14 +303,14 @@ function gadget:GameFrame(frame)
 				if data.timeleft == 0 then 
 					invitecount = invitecount-1
 					invites[key] = nil
-					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_id", nil)
-					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_timeleft", nil)
+					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_id", nil)
+					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_timeleft", nil)
 				elseif data.timeleft > 0 then
-					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_timeleft", data.timeleft)
-					spSetPlayerRulesParam("commshare_invite_" .. invitecount .. "_id", data.id)
+					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_timeleft", data.timeleft)
+					spSetPlayerRulesParam(player, "commshare_invite_" .. invitecount .. "_id", data.id)
 				end
 			end
-			spSetPlayerRulesParam("commshare_invitecount",invitecount)
+			spSetPlayerRulesParam(player, "commshare_invitecount",invitecount)
 			if invitecount == 0 then 
 				-- Cleanup the table so that next second this doesn't run.
 				invites[player] = nil
