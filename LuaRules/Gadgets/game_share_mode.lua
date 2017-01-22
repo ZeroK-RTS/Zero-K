@@ -62,7 +62,7 @@ local config = GetConfig()
 
 if not config.mergeEnabled then
 	spEcho("[Commshare] Commshare is off. Shutting down.")
-	gadgetHandler:RemoveGadget()
+	return
 end
 
 --------------------------------------------------------
