@@ -941,10 +941,14 @@ end
 
 local externalFunctions = {}
 
-function externalFunctions.SetVisibility(newVisibility)
-	local x,y,w,h = DestroyWindow()
-	if newVisibility then
-		CreateWindow(x,y,w,h)
+function externalFunctions.SetVisibility(newVisibility, dispose)
+	if dispose then
+		local x,y,w,h = DestroyWindow()
+		if newVisibility then
+			CreateWindow(x,y,w,h)
+		end
+	else
+		window:SetVisibility(newVisibility)
 	end
 end
 

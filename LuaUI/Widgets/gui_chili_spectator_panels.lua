@@ -1020,7 +1020,9 @@ function widget:PlayerChanged(pID)
 	if pID == Spring.GetMyPlayerID() then
 		local newEnabled = option_CheckEnable(options.enableSpectator)
 		if WG.EconomyPanel then
-			WG.EconomyPanel.SetVisibility(not newEnabled)
+			-- new second arg is "dispose"
+			-- I don't know if it specifically requires panel to be disposed, but let's do so to avoid behavior changes - KR
+			WG.EconomyPanel.SetVisibility(not newEnabled, true)
 		end
 	end
 end
