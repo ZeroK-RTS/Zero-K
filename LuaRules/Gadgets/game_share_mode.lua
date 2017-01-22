@@ -338,6 +338,11 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				targetID = tonumber(targetID)
 			end
 		end
+
+		if type(targetID) ~= "number" then
+			return
+		end
+
 		-- Do commands --
 		if strFind(command,"remerge") then -- remerging seems impossible gadget side.
 			local _,active,spec,_ = spGetPlayerInfo(playerID)
@@ -347,21 +352,11 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 			end
 		end
 		if strFind(command, "invite") then
-			if type(targetID) == "number" then
-				SendInvite(playerID, targetID)
-				if invites[playerID] and invites[playerID][targetID] and invites[targetID][playerID] then
-					AcceptInvite(playerID,targetID)
-				end
-				return
-			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid invite!")
-				return
+			SendInvite(playerID, targetID)
+			if invites[playerID] and invites[playerID][targetID] and invites[targetID][playerID] then
+				AcceptInvite(playerID,targetID)
 			end
 		elseif strFind(command, "accept") then
-			if type(targetID) ~= "number" then
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid targetID for Accept.")
-				return
-			end
 			if invites[playerID] and invites[playerID][targetID] then
 				AcceptInvite(playerID,targetID)
 				return
@@ -379,15 +374,9 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 				return
 			end
 		elseif strFind(command,"decline") then
-			if type(targetID) == "number" then
-				invites[playerID][targetID] = nil
-				return
-			else
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid targetID for Decline.")
-				return
-			end
+			invites[playerID][targetID] = nil
 		elseif strFind(command,"kick") then
-			if IsTeamLeader(playerID) and type(targetID) == "number" then
+			if IsTeamLeader(playerID) then
 				if IsPlayerOnSameTeam(playerID,targetID) then
 					UnmergePlayer(targetID)
 					return
@@ -395,9 +384,6 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 					spEcho("[Commshare] " .. playerID .. "(" .. name .. ") tried to kick a player that isn't on their team! ID: " .. targetID)
 					return
 				end
-			elseif type(targetID) ~= "number" and IsTeamLeader(playerID) then
-				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") sent an invalid kick command!")
-				return
 			else
 				spEcho("[Commshare] " .. playerID .. "(" .. name .. ") isn't a leader! Cannot kick this player.")
 				return
