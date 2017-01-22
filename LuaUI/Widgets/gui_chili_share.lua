@@ -427,9 +427,9 @@ local function UpdateInviteTable()
 		end
 	end
 	local myPlayerID = Spring.GetMyPlayerID()
-	for i=1,Spring.GetGameRulesParam("commshare_" .. myPlayerID .. "_invitecount") do
-		local playerID = Spring.GetGameRulesParam("commshare_invite_"..myPlayerID.."_"..i.."_id")
-		local timeleft = Spring.GetGameRulesParam("commshare_invite_"..myPlayerID.."_"..i.."_timeleft") or 0
+	for i=1,Spring.GetPlayerRulesParam(myPlayerID, "commshare_invitecount") do
+		local playerID = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_id")
+		local timeleft = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_timeleft") or 0
 		--Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
 		if playerID == automergeid then
 			InviteChange(playerID)
@@ -531,7 +531,7 @@ function widget:GameFrame(f)
 		end
 	end
 	if f%30 == 0 then -- Update my invite table.
-		local invitecount = Spring.GetGameRulesParam("commshare_" .. Spring.GetMyPlayerID() .. "_invitecount")
+		local invitecount = Spring.GetPlayerRulesParam(Spring.GetMyPlayerID(), "commshare_invitecount")
 		if invitecount and invitecount > 0 and built then
 			UpdateInviteTable()
 		end
