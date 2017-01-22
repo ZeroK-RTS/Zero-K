@@ -14,6 +14,19 @@ end
 
 Spring.ValidUnitID = newValidUnitID
 
+local function SetPlayerRulesParam(playerID, key, value)
+	return Spring.SetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key, value)
+end
+local function GetPlayerRulesParam(playerID, key)
+	return Spring.GetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
+end
+if not Spring.SetPlayerRulesParam then
+	Spring.SetPlayerRulesParam = SetPlayerRulesParam
+end
+if not Spring.GetPlayerRulesParam then
+	Spring.GetPlayerRulesParam = GetPlayerRulesParam
+end
+
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
 if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
