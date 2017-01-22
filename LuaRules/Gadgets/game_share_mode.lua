@@ -407,7 +407,7 @@ function gadget:RecvLuaMsg(message, playerID) -- Entry points for widgets to int
 end
 
 function gadget:GameStart()
-	GaiaID = Spring.GetGaiaTeamID
+	GaiaID = Spring.GetGaiaTeamID()
 end
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
