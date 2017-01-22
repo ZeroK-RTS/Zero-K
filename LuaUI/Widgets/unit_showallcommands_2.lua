@@ -80,7 +80,6 @@ options = {
 			{name = 'Selected units on SHIFT',key='showminimal', desc="Commands always hidden, pressing SHIFT will draw it on selected units.", hotkey=nil},
 		},
 		value = 'onlyselection',  --default at start of widget
-		noHotkey = true,
 		OnChange = function(self)
 			local key = self.value
 			if key == 'showallcommand' then
