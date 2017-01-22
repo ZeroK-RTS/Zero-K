@@ -20,8 +20,12 @@ end
 local function GetPlayerRulesParam(playerID, key)
 	return Spring.GetGameRulesParam("playerRulesParam_" .. playerID .. "_" .. key)
 end
-Spring.SetPlayerRulesParam = SetPlayerRulesParam
-Spring.GetPlayerRulesParam = GetPlayerRulesParam
+if not Spring.SetPlayerRulesParam then
+	Spring.SetPlayerRulesParam = SetPlayerRulesParam
+end
+if not Spring.GetPlayerRulesParam then
+	Spring.GetPlayerRulesParam = GetPlayerRulesParam
+end
 
 -----------------------------------------------------------------------------------
 -----------------------------------------------------------------------------------
