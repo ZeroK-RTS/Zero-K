@@ -3733,21 +3733,24 @@ function gadget:UnitCreated(unitID, unitDefID)
 						structure[unitID].checkAtDeath = true
 						
 						local recalc = false
+						local area = terraformUnit[oid].area
 						for k = 1, terraformUnit[oid].points do
-							if structure[unitID].area[terraformUnit[oid].point[k].x] then
-								if structure[unitID].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] then
-									terraformUnit[oid].point[k].diffHeight = 0.0001
-									terraformUnit[oid].point[k].structure = true
-									--terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z].building = true
-									recalc = true
+							local point = terraformUnit[oid].point[k]
+							local x, z = point.x, point.z
+							if structure[unitID].area[x] and structure[unitID].area[x][z] then
+								terraformUnit[oid].point[k].diffHeight = 0.0001
+								terraformUnit[oid].point[k].structure = true
+								if area[x] and area[x][z] then
+									area[x][z] = nil
 								end
+								recalc = true
 							end
 						end
 						
 						if recalc then
 							updateTerraformCost(oid)
+							updateTerraformEdgePoints(oid)
 						end
-						
 					end
 				end
 			end
