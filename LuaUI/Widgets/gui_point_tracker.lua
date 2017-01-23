@@ -61,7 +61,8 @@ local GL_FILL = GL.FILL
 ----------------------------------------------------------------
 --table; i = {r, g, b, a, px, pz, label, expiration}
 local mapPoints = {}
-local lastPoint = 1
+local mapPointCount = 0
+local MAP_POINT_LIMIT = 50
 local myPlayerID
 local timeNow, timePart
 local on = false
@@ -119,11 +120,14 @@ function widget:DrawScreen()
 	
 	glLineWidth(lineWidth)
 	
-	for i=lastPoint,#mapPoints do
+	local i = 1
+	while i <= mapPointCount do
 		local curr = mapPoints[i]
 		local alpha = maxAlpha * (curr[6] - timeNow) / ttl
 		if (alpha <= 0) then
-			lastPoint = lastPoint + 1
+			mapPoints[i] = mapPoints[mapPointCount]
+			mapPoints[mapPointCount] = nil
+			mapPointCount = mapPointCount - 1
 		else
 			local sx, sy, sz = WorldToScreenCoords(curr[2], curr[3], curr[4])
 			glColor(curr[1][1], curr[1][2], curr[1][3], alpha)
@@ -201,6 +205,7 @@ function widget:DrawScreen()
 				glColor(1, 1, 1, alpha)
 				glText(curr[5], textX, textY, fontSize, textOptions)
 			end
+			i = i + 1
 		end
 	end
 	
@@ -217,6 +222,9 @@ function widget:ViewResize(viewSizeX, viewSizeY)
 end
 
 function widget:MapDrawCmd(playerID, cmdType, px, py, pz, label)
+	if mapPointCount >= MAP_POINT_LIMIT then
+		return
+	end
 	if (not timeNow) then
 		StartTime()
 	end
@@ -232,7 +240,8 @@ function widget:MapDrawCmd(playerID, cmdType, px, py, pz, label)
 	local color = {r, g, b}
 	local expiration = timeNow + ttl
 	
-	table.insert(mapPoints, {color, px, py, pz, strSub(label, 1, maxLabelLength), expiration})
+	mapPointCount = mapPointCount + 1
+	mapPoints[mapPointCount] = {color, px, py, pz, strSub(label, 1, maxLabelLength), expiration}
 end
 
 function widget:Update(dt)
@@ -257,28 +266,33 @@ function widget:DrawInMiniMap(sx, sy)
 	local ratioX = sx / mapX
 	local ratioY = sy / mapY
 	
-	for i=lastPoint,#mapPoints do
+	local i = 1
+	while i <= mapPointCount do
 		local curr = mapPoints[i]
 		local x = curr[2] * ratioX
 		local y = sy - curr[4] * ratioY
 		local alpha = maxAlpha * (curr[6] - timeNow) / ttl
 		if (alpha <= 0) then
-			lastPoint = lastPoint + 1
+			mapPoints[i] = mapPoints[mapPointCount]
+			mapPoints[mapPointCount] = nil
+			mapPointCount = mapPointCount - 1
 		else
 			glColor(curr[1][1], curr[1][2], curr[1][3], alpha)
 			local vertices = {
-					{v = {x, y - minimapHighlightLineMin, 0}},
-					{v = {x, y - minimapHighlightLineMax, 0}},
-					{v = {x, y + minimapHighlightLineMin, 0}},
-					{v = {x, y + minimapHighlightLineMax, 0}},
-					{v = {x - minimapHighlightLineMin, y, 0}},
-					{v = {x - minimapHighlightLineMax, y, 0}},
-					{v = {x + minimapHighlightLineMin, y, 0}},
-					{v = {x + minimapHighlightLineMax, y, 0}},
-				}
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
-				glRect(x - minimapHighlightSize, y - minimapHighlightSize, x + minimapHighlightSize, y + minimapHighlightSize)
-				glShape(GL_LINES, vertices)
+				{v = {x, y - minimapHighlightLineMin, 0}},
+				{v = {x, y - minimapHighlightLineMax, 0}},
+				{v = {x, y + minimapHighlightLineMin, 0}},
+				{v = {x, y + minimapHighlightLineMax, 0}},
+				{v = {x - minimapHighlightLineMin, y, 0}},
+				{v = {x - minimapHighlightLineMax, y, 0}},
+				{v = {x + minimapHighlightLineMin, y, 0}},
+				{v = {x + minimapHighlightLineMax, y, 0}},
+			}
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
+			glRect(x - minimapHighlightSize, y - minimapHighlightSize, x + minimapHighlightSize, y + minimapHighlightSize)
+			glShape(GL_LINES, vertices)
+			
+			i = i + 1
 		end
 	end
 	
