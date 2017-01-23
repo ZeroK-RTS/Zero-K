@@ -34,8 +34,10 @@ end
 
 function gadget:UnitCloaked(unitID)
 	Spring.SetUnitStealth(unitID, true)
+	Spring.SetUnitSonarStealth(unitID, true)
 end
 
 function gadget:UnitDecloaked(unitID)
 	Spring.SetUnitStealth(unitID, false)
+	Spring.SetUnitSonarStealth(unitID, false)
 end
