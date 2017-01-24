@@ -1,4 +1,4 @@
-local versionNum = '3.031'
+local versionNum = '3.032'
 
 function widget:GetInfo()
   return {
@@ -118,7 +118,6 @@ options = {
 }
 
 local finiGroup = {}
-local myTeam
 local selUnitDefs = {}
 local loadGroups = true
 local createdFrame = {}
@@ -155,7 +154,6 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return false
 	end
-	myTeam = team
 end
 
 function widget:DrawWorld()
@@ -181,7 +179,7 @@ end
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if (unitTeam == myTeam and unitID ~= nil) then
+	if (unitTeam == Spring.GetMyTeamID() and unitID ~= nil) then
 		if (createdFrame[unitID] == GetGameFrame()) then
 			local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP>: Unit finished " ..  unitID) --
@@ -193,14 +191,14 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID) 
-	if (unitTeam == myTeam) then
+	if (unitTeam == Spring.GetMyTeamID()) then
 		createdFrame[unitID] = GetGameFrame()
 	end
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam) 
 	if options.immediate.value or groupableBuildings[unitDefID] then
-		if (unitTeam == myTeam) then
+		if (unitTeam == Spring.GetMyTeamID()) then
 			createdFrame[unitID] = GetGameFrame()
 			local gr = unit2group[unitDefID]
 			if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -216,7 +214,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
 function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-	if (newTeamID == myTeam) then
+	if (newTeamID == Spring.GetMyTeamID()) then
 		local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP> : Unit given "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -226,7 +224,7 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	if (teamID == myTeam) then
+	if (teamID == Spring.GetMyTeamID()) then
 		local gr = unit2group[unitDefID]
 --printDebug("<AUTOGROUP> : Unit taken "..  unit2group[unitDefID])
 		if gr ~= nil then SetUnitGroup(unitID, gr) end
@@ -236,7 +234,7 @@ function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function widget:UnitIdle(unitID, unitDefID, unitTeam) 
-	if (unitTeam == myTeam and finiGroup[unitID]~=nil) then
+	if (unitTeam == Spring.GetMyTeamID() and finiGroup[unitID]~=nil) then
 		local gr = unit2group[unitDefID]
 		if gr ~= nil then SetUnitGroup(unitID, gr)
 --printDebug("<AUTOGROUP> : Unit idle " ..  gr)
@@ -289,7 +287,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 					end
 				end
 				if options.addall.value then
-					local myUnits = Spring.GetTeamUnits(myTeam)
+					local myUnits = Spring.GetTeamUnits(Spring.GetMyTeamID())
 					for _, unitID in pairs(myUnits) do
 						local curUnitDefID = GetUnitDefID(unitID)
 						if selUnitDefIDs[curUnitDefID] then
