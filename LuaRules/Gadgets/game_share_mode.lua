@@ -151,7 +151,7 @@ local function UnmergePlayer(playerID) -- Takes playerID, not teamID!!!
 					spTransferUnit(unitID, orgTeamID, true)
 				end
 			end
-			spSetTeamRulesParam(originalTeamID[playerID], "isCommsharing", 0, public)
+			spSetTeamRulesParam(originalTeamID[playerID], "isCommsharing", nil)
 			originalUnits[orgTeamID],controlledPlayers[playerID] = nil
 		else
 			spEcho("[Commshare]: Tried to unmerge a player that never merged (Perhaps cheated in?)")
@@ -188,7 +188,7 @@ local function MergePlayer(playerID,target)
 			spShareTeamResource(orgTeamID,target,"metal",metal)
 			spShareTeamResource(orgTeamID,target,"energy",energy)
 			MergeUnits(orgTeamID,target)
-			spSetTeamRulesParam(orgTeamID,"isCommsharing",1,public)
+			spSetTeamRulesParam(orgTeamID,"isCommsharing",target,public)
 		end
 		spAssignPlayerToTeam(playerID,target)
 		if originalTeamID[playerID] == nil then

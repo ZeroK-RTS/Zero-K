@@ -522,10 +522,10 @@ function widget:GameFrame(f)
 	if buildframe > -1 and f == buildframe + 1 then
 		built = true -- block PlayerChanged from doing anything until we've set up initial states.
 		local modOptions = {}
-		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing") or 0
+		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing")
 		modOptions = Spring.GetModOptions()
 		--Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
-		if sharemode and iscommsharing == 0 and options.automation_clanmerge.value == true then
+		if sharemode and not iscommsharing and options.automation_clanmerge.value == true then
 			--Spring.Echo("Clan merge is enabled!")
 			MergeWithClanMembers()
 		end
@@ -550,9 +550,9 @@ function widget:Initialize()
 	end
 	if Spring.GetGameFrame() > 1 then
 		mycurrentteamid = Spring.GetMyTeamID()
-		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing") or 0
+		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing")
 		--Spring.Echo("isCommsharing: " .. tostring(iscommsharing))
-		if iscommsharing == 1 then
+		if iscommsharing then
 			needsremerging = true
 		end
 		local modOptions = {}
