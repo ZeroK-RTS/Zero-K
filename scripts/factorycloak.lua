@@ -16,7 +16,7 @@ local pipesl = piece "pipesl"
 
 -- action pieces
 local nanoPieces = { claw1 }
-local smokePiece = { base }
+local smokePiece = { doorl, doorr, roofr, roofl, arm1, arm2 }
 
 local function Open ()
 	SetSignalMask (1)
