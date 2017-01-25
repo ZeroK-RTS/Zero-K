@@ -131,6 +131,7 @@ local resources = {
       lightsmoketrail= "lightsmoketrail.tga",
       muzzlefront= "muzzlefront.tga",
       muzzleside= "muzzleside.tga",
+	  new_dirta = "smoke/new_dirta.png",
       null= "pd/null.tga",
       orangesmoke= "pd/orangesmoke.tga",
       orangesmoke2= "pd/smokeorange.tga",

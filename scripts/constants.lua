@@ -1,6 +1,8 @@
 --x_axis = 1
 --y_axis = 2
 --z_axis = 3
+local common = include("evoHeader.lua")
+
 SetSFXOccupy = setSFXoccupy		--standard case for function names
 
 GetPieceRotation = Spring.UnitScript.GetPieceRotation
@@ -89,6 +91,7 @@ function SmokeUnit(smokePiece)
 		--How is the unit doing?
 		local healthPercent = GetUnitValue(COB.HEALTH)
 		if (healthPercent < 66) and not spGetUnitIsCloaked(unitID) then -- only smoke if less then 2/3rd health left
+			--common.CustomEmitter(smokePiece[math.random(1,#smokePiece)], "blacksmoke")
 			EmitSfx(smokePiece[math.random(1,#smokePiece)], SMOKEPUFF)
 		end
 		Sleep(8*healthPercent + math.random(100,200))
