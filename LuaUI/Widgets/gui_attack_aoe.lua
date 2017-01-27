@@ -320,41 +320,39 @@ local function UpdateSelection()
 	aoeUnitID = nil
 
 	for unitDefID, unitIDs in pairs(sel) do
-		if unitDefID == "n" then
-			break
-		end
-		
-		local unitID = unitIDs[1]
-		local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
-		
-		if dynamicComm and not unitHasBeenSetup[unitID] then
-			unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
-			unitHasBeenSetup[unitID] = true
-		end
-		
-		if (dgunInfo[unitDefID]) then 
-			dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
-			dgunUnitID = unitID
-		end
-
-		if (aoeDefInfo[unitDefID]) then
-			local currCost = UnitDefs[unitDefID].cost * #unitIDs
-			if (currCost > maxCost) then
-				maxCost = currCost
-				aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
-				aoeUnitID = unitID
+		if unitDefID ~= "n" then
+			local unitID = unitIDs[1]
+			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
+			
+			if dynamicComm and not unitHasBeenSetup[unitID] then
+				unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
+				unitHasBeenSetup[unitID] = true
 			end
-		end
+			
+			if (dgunInfo[unitDefID]) then 
+				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				dgunUnitID = unitID
+			end
 
-		local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
-		if extraDrawParam then
-			extraDrawRange = extraDrawParam
-		else
-			extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
-		end
-		
-		if extraDrawRange then
-			selUnitID = unitID
+			if (aoeDefInfo[unitDefID]) then
+				local currCost = UnitDefs[unitDefID].cost * #unitIDs
+				if (currCost > maxCost) then
+					maxCost = currCost
+					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+					aoeUnitID = unitID
+				end
+			end
+
+			local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
+			if extraDrawParam then
+				extraDrawRange = extraDrawParam
+			else
+				extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
+			end
+			
+			if extraDrawRange then
+				selUnitID = unitID
+			end
 		end
 	end
 end
