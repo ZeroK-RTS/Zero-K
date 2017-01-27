@@ -506,6 +506,10 @@ options = {
 			map_panel.TileImageFG = newClass.TileImageFG
 			--map_panel.backgroundColor = newClass.backgroundColor
 			map_panel.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				map_panel.padding = newClass.padding
+				map_panel:UpdateClientArea()
+			end
 			map_panel:Invalidate()
 			
 			fakewindow.tiles = newClass.tiles

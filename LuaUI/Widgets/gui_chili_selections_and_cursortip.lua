@@ -553,7 +553,7 @@ options = {
 		path = selPath,
 		items = {
 			{key = 'panel', name = 'None'},
-			{key = 'panel_1130', name = 'Bottom Left Flush',},
+			{key = 'panel_1120', name = 'Bottom Left Flush',},
 			{key = 'panel_0120', name = 'Bot Mid Left Flush',},
 			{key = 'panel_2120', name = 'Bot Mid Both Flush',},
 		},
@@ -571,6 +571,10 @@ options = {
 			window_corner.TileImageFG = newClass.TileImageFG
 			--window_corner.backgroundColor = newClass.backgroundColor
 			window_corner.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				window_corner.padding = newClass.padding
+				window_corner:UpdateClientArea()
+			end
 			window_corner:Invalidate()
 		end,
 		advanced = true,
@@ -2844,7 +2848,7 @@ function widget:Initialize()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {-1, 0, -1, -1},
+		padding = {0, 0, 0, -1},
         minWidth = 450, 
 		minHeight = 120,
 	}

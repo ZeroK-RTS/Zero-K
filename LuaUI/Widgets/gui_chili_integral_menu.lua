@@ -86,6 +86,10 @@ options = {
 		name = "Opacity",
 		type = "number",
 		value = 0.8, min = 0, max = 1, step = 0.01,
+		OnChange = function(self)
+			background.backgroundColor = {1,1,1,self.value}
+			background:Invalidate()
+		end,
 	},
 	keyboardType = {
 		type='radioButton', 
@@ -276,9 +280,9 @@ local function UpdateBackgroundSkin()
 		local selectedCount = Spring.GetSelectedUnitsCount()
 		if selectedCount and selectedCount > 0 then
 			if options.flushLeft.value then
-				newClass = skin.panel_0120
+				newClass = skin.panel_0120_small
 			else
-				newClass = skin.panel_2100
+				newClass = skin.panel_2100_small
 			end
 		else
 			if options.flushLeft.value then
@@ -309,9 +313,14 @@ local function UpdateBackgroundSkin()
 	
 	background.tiles = newClass.tiles
 	background.TileImageFG = newClass.TileImageFG
-	background.backgroundColor = newClass.backgroundColor
 	background.TileImageBK = newClass.TileImageBK
 	background:Invalidate()
+	
+	-- Update buttons holder padding, not background.
+	if newClass.padding then
+		buttonsHolder.padding = newClass.padding
+		buttonsHolder:UpdateClientArea()
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -525,6 +534,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		y = yStr,
 		width = width,
 		height = height,
+		classname = "button_integral",
 		caption = buttonLayout.caption or "",
 		padding = {0, 0, 0, 0},
 		parent = parent,
@@ -1057,6 +1067,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	local button = Button:New {
+		classname = "button_tab",
 		caption = humanName,
 		padding = {0, 0, 0, 0},
 		OnClick = {DoClick},
@@ -1384,11 +1395,12 @@ local function InitializeControls()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		padding = {0, 0, 0, -1},
+		padding = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		parent = screen0,
 	}
-		
+	mainWindow:SendToBack()
+	
 	buildTabHolder = Control:New{
 		x = options.leftPadding.value,
 		y = "0%",

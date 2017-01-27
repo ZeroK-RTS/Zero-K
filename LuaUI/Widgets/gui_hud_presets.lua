@@ -52,7 +52,7 @@ local SKIN_FLUSH = {
 }
 
 local function SetFancySkin()
-	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100_small")
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
 	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_1100")
@@ -78,7 +78,7 @@ local function SetFancySkinBottomLeft()
 end
 
 local function SetFancySkinBottomRight()
-	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100")
+	WG.SetWidgetOption(coreName, corePath, "fancySkinning", "panel_1100_small")
 	WG.SetWidgetOption(integralName, integralPath, "fancySkinning", true)
 	WG.SetWidgetOption(integralName, integralPath, "flushLeft", false)
 	WG.SetWidgetOption(minimapName, minimapPath, "fancySkinning", "panel_0110")
@@ -91,7 +91,7 @@ local function SetFancySkinBottomRight()
 end
 
 local function SetNewOptions()
-	WG.SetWidgetOption(coreName, corePath, "background_opacity", 0.8)
+	WG.SetWidgetOption(coreName, corePath, "background_opacity", 1)
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", 0.75)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", 5)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", 6)
@@ -102,6 +102,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", 6.25)
 	WG.SetWidgetOption(coreName, corePath, "vertical", true)
 	
+	WG.SetWidgetOption(integralName, integralPath, "background_opacity", 1)
 	WG.SetWidgetOption(integralName, integralPath, "hide_when_spectating", false)
 	WG.SetWidgetOption(integralName, integralPath, "leftPadding", 8)
 	WG.SetWidgetOption(integralName, integralPath, "rightPadding", 10)
@@ -116,6 +117,7 @@ local function SetNewOptions()
 	WG.SetWidgetOption(consoleName, consolePath, "backlogHideNotChat", true)
 	WG.SetWidgetOption(consoleName, consolePath, "backlogShowWithChatEntry", true)
 	
+	WG.SetWidgetOption(selName, selPath, "selection_opacity", 1)
 	WG.SetWidgetOption(selName, selPath, "leftPadding", 7)
 	
 	WG.SetWidgetOption(econName, econPath, "opacity", 0.95)
@@ -760,11 +762,11 @@ local function SetupMinimapLeftPreset()
 	
 	-- Core Selector
 	local coreSelectorHeight = screenHeight/2
-	local coreSelectorWidth = math.ceil(integralHeight/3)
+	local coreSelectorWidth = math.ceil(integralHeight/3) + 3
 	
-	local hPad = math.ceil(screenWidth/300)
-	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad + 3)
-	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad - 2)
+	local hPad = math.ceil(screenWidth/300) + 2
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad + 5)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad - 5)
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
@@ -781,6 +783,10 @@ local function SetupMinimapLeftPreset()
 	else
 		minimapHeight = math.floor(screenWidth*2.1/11)
 		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapWidth < 160 then
+		minimapWidth = 160
 	end
 	
 	if minimapHeight < coreMinHeight then
@@ -836,15 +842,15 @@ local function SetupMinimapLeftPreset()
 		minimapHeight
 	)
 	WG.SetWindowPosAndSize("selections",
-		minimapWidth,
+		minimapWidth - 3,
 		screenHeight - selectionsHeight,
-		selectionsWidth,
+		selectionsWidth + 3,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
 		minimapWidth + selectionsWidth,
 		screenHeight - integralHeight,
-		integralWidth,
+		integralWidth + 3,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window", 
@@ -940,11 +946,11 @@ local function SetupMinimapRightPreset()
 	
 	-- Core Selector
 	local coreSelectorHeight = screenHeight/2
-	local coreSelectorWidth = math.ceil(integralHeight/3)
+	local coreSelectorWidth = math.ceil(integralHeight/3) + 3
 	
-	local hPad = math.ceil(screenWidth/300)
-	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad - 2)
-	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad + 3)
+	local hPad = math.ceil(screenWidth/300) + 2
+	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad - 5)
+	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad + 5)
 	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
@@ -961,6 +967,10 @@ local function SetupMinimapRightPreset()
 	else
 		minimapHeight = math.floor(screenWidth*2.1/11)
 		minimapWidth = math.floor(minimapHeight*mapRatio)
+	end
+	
+	if minimapWidth < 160 then
+		minimapWidth = 160
 	end
 	
 	if minimapHeight < coreMinHeight then
@@ -1018,13 +1028,13 @@ local function SetupMinimapRightPreset()
 	WG.SetWindowPosAndSize("selections",
 		coreSelectorWidth + integralWidth,
 		screenHeight - selectionsHeight,
-		selectionsWidth,
+		selectionsWidth + 3,
 		selectionsHeight
 	)
 	WG.SetWindowPosAndSize("integralwindow",
-		coreSelectorWidth,
+		coreSelectorWidth - 3,
 		screenHeight - integralHeight,
-		integralWidth,
+		integralWidth + 3,
 		integralHeight
 	)
 	WG.SetWindowPosAndSize("selector_window", 

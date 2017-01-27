@@ -188,6 +188,10 @@ local function ApplySkin(skinWindow, className)
 	skinWindow.TileImageFG = newClass.TileImageFG
 	--skinWindow.backgroundColor = newClass.backgroundColor
 	skinWindow.TileImageBK = newClass.TileImageBK
+	if newClass.padding then
+		skinWindow.padding = newClass.padding
+		skinWindow:UpdateClientArea()
+	end
 	skinWindow:Invalidate()
 end
 

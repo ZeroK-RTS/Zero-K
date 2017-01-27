@@ -2860,6 +2860,10 @@ function widget:Initialize()
 		panel_background.TileImageFG = newClass.TileImageFG
 		--panel_background.backgroundColor = newClass.backgroundColor
 		panel_background.TileImageBK = newClass.TileImageBK
+		if newClass.padding then
+			panel_background.padding = newClass.padding
+			panel_background:UpdateClientArea()
+		end
 		panel_background:Invalidate()
 	end
 		

@@ -139,6 +139,10 @@ options = {
 			contentHolder.TileImageFG = newClass.TileImageFG
 			--contentHolder.backgroundColor = newClass.backgroundColor
 			contentHolder.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				contentHolder.padding = className.padding
+				contentHolder:UpdateClientArea()
+			end
 			contentHolder:Invalidate()
 		end,
 		advanced = true,

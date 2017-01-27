@@ -264,6 +264,10 @@ options = {
 			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
 			--playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
 			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				playerWindow.mainPanel.padding = newClass.padding
+				playerWindow.mainPanel:UpdateClientArea()
+			end
 			playerWindow.mainPanel:Invalidate()
 		end,
 		advanced = true,

@@ -329,8 +329,8 @@ options = {
 		value = 'panel',
 		items = {
 			{key = 'panel', name = 'None'},
-			{key = 'panel_1100', name = 'Bottom Left',},
-			{key = 'panel_0110', name = 'Bottom Right'},
+			{key = 'panel_1100_small', name = 'Bottom Left',},
+			{key = 'panel_0110_small', name = 'Bottom Right'},
 		},
 		OnChange = function (self)
 			if mainBackground then
@@ -1551,7 +1551,8 @@ local function InitializeControls()
 				return true
 			end
 		},
-	}	
+	}
+	mainWindow:BringToFront()
 
 	mainBackground = GetBackground(mainWindow)
 	buttonHolder = mainBackground.GetButtonsHolder()
