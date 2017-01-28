@@ -22,7 +22,7 @@ skin.general = {
     outlineColor = {0.05,0.05,0.05,0.9},
     outline = false,
     shadow  = true,
-    size    = 14,
+    size    = 13,
   },
 
   --padding         = {5, 5, 5, 5}, --// padding: left, top, right, bottom
@@ -35,26 +35,29 @@ skin.icons = {
 
 skin.button = {
   TileImageBK = ":cl:tech_button_bright_small_bk.png",
-  TileImageFG = ":cl:tech_button_small_fg.png",
+  TileImageFG = ":cl:tech_button_bright_small_fg.png",
   tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
-
-  backgroundColor = {0.3, 0.3, 0.3, 0.9},
-  focusColor  = {0.94, 0.50, 0.23, 0.7},
-  borderColor = {0.6,0.9,1,0.5},
-
+  
+  backgroundColor = {0.15, 0.39, 0.45, 0.85},
+  focusColor  = {0.20, 0.52, 0.60, 0.9},
+  borderColor = {0.20, 0.52, 0.60, 0.15},
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
+  
   DrawControl = DrawButton,
 }
 
-skin.button_integral = {
-  TileImageBK = ":cl:tech_button_bright_small_bk.png",
-  TileImageFG = ":cl:tech_button_small_fg.png",
-  tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
-  padding = {10, 10, 10, 10},
-
-  backgroundColor = {0.3, 0.3, 0.3, 0.9},
-  focusColor  = {0.94, 0.50, 0.23, 0.7},
-  borderColor = {0.6,0.9,1,0.5},
+skin.button_tab = {
+  -- yes these are reverted, but also a lie (see images), only one is used
+  TileImageFG = ":cl:tech_tabbaritem_fg.png",
+  TileImageBK = ":cl:tech_tabbaritem_bk.png",
+  tiles = {10, 10, 10, 0}, --// tile widths: left,top,right,bottom
+  padding = {1, 1, 1, 2},
+  -- since it's color multiplication, it's easier to control white color (1, 1, 1) than black color (0, 0, 0) to get desired results
+  backgroundColor = {0, 0, 0, 1.0},
+  -- actually kill this anyway
+  borderColor     = {0.46, 0.54, 0.68, 0.4},
+  focusColor      = {0.46, 0.54, 0.68, 1.0},
 
   DrawControl = DrawButton,
 }
@@ -240,7 +243,7 @@ local fancySmallBase = {
 }
 
 local fancyPanels = {
-	"0100",
+	{"0100", {30, 8, 30, 0}, {0, 4, 0, 0}},
 	{"0110", {156, 36, 1, 0}, {12, 4, 0, 0}},
 	{"1100", {0, 36, 156, 0}, {0, 4, 12, 0}},
 	"0011",
@@ -432,8 +435,8 @@ skin.tabbar = {
 
 skin.tabbaritem = {
   -- yes these are reverted, but also a lie (see images), only one is used
-  TileImageFG = ":cl:tech_tabbaritem_bk.png",
-  TileImageBK = ":cl:tech_tabbaritem_fg.png",
+  TileImageFG = ":cl:tech_tabbaritem_fg.png",
+  TileImageBK = ":cl:tech_tabbaritem_bk.png",
   tiles = {10, 10, 10, 0}, --// tile widths: left,top,right,bottom
   padding = {1, 1, 1, 2},
   -- since it's color multiplication, it's easier to control white color (1, 1, 1) than black color (0, 0, 0) to get desired results

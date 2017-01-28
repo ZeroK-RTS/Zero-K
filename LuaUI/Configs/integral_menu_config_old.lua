@@ -214,4 +214,23 @@ for i = 1, #commandPanels do
 	commandPanelMap[commandPanels[i].name] = commandPanels[i]
 end
 
-return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig
+local instantCommands = {
+	[CMD.SELFD] = true,
+	[CMD.STOP] = true,
+	[CMD.WAIT] = true,
+	[CMD_FIND_PAD] = true,
+	[CMD_EMBARK] = true,
+	[CMD_DISEMBARK] = true,
+	[CMD_LOADUNITS_SELECTED] = true,
+	[CMD_ONECLICK_WEAPON] = true,
+	[CMD_UNIT_CANCEL_TARGET] = true,
+	[CMD_STOP_NEWTON_FIREZONE] = true,
+	[CMD_RECALL_DRONES] = true,
+	[CMD_MORPH_UPGRADE_INTERNAL] = true,
+	[CMD_UPGRADE_STOP] = true,
+	[CMD_STOP_PRODUCTION] = true,
+	[CMD_RESETFIRE] = true,
+	[CMD_RESETMOVE] = true,
+}
+
+return commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands

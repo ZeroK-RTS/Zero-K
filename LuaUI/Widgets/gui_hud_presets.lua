@@ -761,7 +761,7 @@ local function SetupMinimapLeftPreset()
 	integralWidth = math.floor(integralWidth)
 	
 	-- Core Selector
-	local coreSelectorHeight = screenHeight/2
+	local coreSelectorHeight = math.floor(screenHeight/2)
 	local coreSelectorWidth = math.ceil(integralHeight/3) + 3
 	
 	local hPad = math.ceil(screenWidth/300) + 2
@@ -945,7 +945,7 @@ local function SetupMinimapRightPreset()
 	integralWidth = math.floor(integralWidth)
 	
 	-- Core Selector
-	local coreSelectorHeight = screenHeight/2
+	local coreSelectorHeight = math.floor(screenHeight/2)
 	local coreSelectorWidth = math.ceil(integralHeight/3) + 3
 	
 	local hPad = math.ceil(screenWidth/300) + 2

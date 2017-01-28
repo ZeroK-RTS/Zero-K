@@ -326,9 +326,11 @@ local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 			{ key = 'Blueprint', name = 'Blueprint', },
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
+			--{ key = 'DarkGlass', name = 'DarkGlass', }, -- Broken
 			{ key = 'DarkHive', name = 'DarkHive', },
-			{ key = 'Evolved', name = 'Evolved', },
 			{ key = 'DarkHiveSquare', name = 'DarkHive (square)', },
+			{ key = 'Evolved', name = 'Evolved', },
+			--{ key = 'Glass', name = 'Glass', }, -- Broken
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})

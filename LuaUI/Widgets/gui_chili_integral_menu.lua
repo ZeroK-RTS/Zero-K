@@ -63,7 +63,8 @@ EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 -- Command Handling and lower variables
 
 configurationName = "Configs/integral_menu_config.lua"
-local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig -- In Initialize = include("Configs/integral_menu_config.lua")
+local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands -- In Initialize = include("Configs/integral_menu_config.lua")
+local customCmdActions = include("Configs/customCmdTypes.lua")
 
 local statePanel = {}
 local tabPanel
@@ -222,6 +223,19 @@ local alreadyRemovedTag = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Utility
+
+local lastCmdID
+local function UpdateButtonSelection(cmdID)
+	if cmdID ~= lastCmdID then
+		if lastCmdID and buttonsByCommand[lastCmdID] then
+			buttonsByCommand[lastCmdID].SetSelection(false)
+		end
+		if buttonsByCommand[cmdID] then
+			buttonsByCommand[cmdID].SetSelection(true)
+		end
+		lastCmdID = cmdID
+	end
+end
 
 local function GenerateGridKeyMap(name)
 	local gridMap = include("Configs/keyboard_layout.lua")[name]
@@ -493,6 +507,9 @@ local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton
 	local index = Spring.GetCmdDescIndex(cmdID)
 	if index then
 		Spring.SetActiveCommand(index, mouse or 1, left, right, alt, ctrl, meta, shift)
+		if not instantCommands[cmdID] then
+			UpdateButtonSelection(cmdID)
+		end
 		if alt and isStructure and WG.Terraform_SetPlacingRectangle then
 			WG.Terraform_SetPlacingRectangle(-cmdID)
 		end
@@ -534,7 +551,6 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		y = yStr,
 		width = width,
 		height = height,
-		classname = "button_integral",
 		caption = buttonLayout.caption or "",
 		padding = {0, 0, 0, 0},
 		parent = parent,
@@ -657,17 +673,17 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if not image then
 			SetImage("")
 		end
-		if isDisabled then
-			button.backgroundColor = {0,0,0,1}
-			image.color = {0.3, 0.3, 0.3, 1}
-			externalFunctionsAndData.ClearGridHotkey()
-		else
-			button.backgroundColor = {1,1,1,0.7}
-			image.color = {1, 1, 1, 1}
-			if hotkeyText then
-				SetText(textConfig.topLeft.name, hotkeyText)
-			end
-		end
+		--if isDisabled then
+		--	button.backgroundColor = {0,0,0,1}
+		--	image.color = {0.3, 0.3, 0.3, 1}
+		--	externalFunctionsAndData.ClearGridHotkey()
+		--else
+		--	button.backgroundColor = {1,1,1,0.7}
+		--	image.color = {1, 1, 1, 1}
+		--	if hotkeyText then
+		--		SetText(textConfig.topLeft.name, hotkeyText)
+		--	end
+		--end
 			
 		button:Invalidate()
 		image:Invalidate()
@@ -1127,7 +1143,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		if loiterable and not hideHotkey then
 			externalFunctionsAndData.SetHotkeyActive(not isSelected)
 		end
-		button.backgroundColor[4] = isSelected and 1 or 0.4
+		button.backgroundColor[4] = isSelected and 0.8 or 0.4
 		button:Invalidate()
 	end
 	
@@ -1406,7 +1422,7 @@ local function InitializeControls()
 		y = "0%",
 		right = options.rightPadding.value,
 		height = "15%",
-		padding = {2, 2, 2, 0},
+		padding = {2, 2, 2, -1},
 		parent = mainWindow,
 	}
 	
@@ -1432,6 +1448,8 @@ local function InitializeControls()
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
 		parent = mainWindow,
 	}
+	
+	buildTabHolder:SendToBack() -- behind background
 	
 	local function ReturnToOrders()
 		if options.selectionClosesTab.value then
@@ -1615,19 +1633,9 @@ options.fancySkinning.OnChange = UpdateBackgroundSkin
 
 local initialized = false
 
-local lastCmdID
 function widget:Update()
 	local _,cmdID = Spring.GetActiveCommand()
-	if cmdID ~= lastCmdID then
-		if lastCmdID and buttonsByCommand[lastCmdID] then
-			buttonsByCommand[lastCmdID].SetSelection(false)
-		end
-		if buttonsByCommand[cmdID] then
-			buttonsByCommand[cmdID].SetSelection(true)
-		end
-		
-		lastCmdID = cmdID
-	end
+	UpdateButtonSelection(cmdID)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
@@ -1685,7 +1693,7 @@ function widget:GameFrame(n)
 end
 
 function widget:Initialize()
-	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig = include(configurationName)
+	commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands = include(configurationName)
 	
 	RemoveAction("nextmenu")
 	RemoveAction("prevmenu")

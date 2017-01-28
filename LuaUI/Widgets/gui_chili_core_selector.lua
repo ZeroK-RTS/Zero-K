@@ -35,8 +35,8 @@ local spGetUnitPosition   = Spring.GetUnitPosition
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-local BUTTON_COLOR = {nil, nil, nil, 1}
-local BUTTON_COLOR_FACTORY = {0.6, 0.6, 0.6, 0.3}
+local BUTTON_COLOR = {0.15, 0.39, 0.45, 0.85}
+local BUTTON_COLOR_FACTORY = {0.15, 0.39, 0.45, 0.85}
 local BUTTON_COLOR_WARNING = {1, 0.2, 0.1, 1}
 local BUTTON_COLOR_DISABLED = {0.2,0.2,0.2,1}
 local IMAGE_COLOR_DISABLED = {0.3, 0.3, 0.3, 1}
@@ -652,9 +652,14 @@ local function GetBackground(parent)
 		externalFunctions.UpdateSize()
 		if specShowMode then
 			externalFunctions.SetVisible(specShow)
-			mainWindow.padding[3] = 0
+			if mainWindow.x < 100 then
+				mainWindow.padding[3] = 3
+			else
+				mainWindow.padding[1] = 3
+			end
 			mainWindow:Invalidate()
 		else
+			mainWindow.padding[1] = -1
 			mainWindow.padding[3] = -1
 			mainWindow:Invalidate()
 		end
