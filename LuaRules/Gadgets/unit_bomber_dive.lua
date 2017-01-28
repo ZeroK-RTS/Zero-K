@@ -121,7 +121,11 @@ local function GetWantedBomberHeight(unitID, config, underShield)
 		-- Collision volume is always full size for non-nanoframes.
 		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
 		heightDef[unitDefID] = scaleY/2 + offsetY
-		
+	end
+	
+	if not hitabilityDef[unitDefID] then
+		-- Collision volume is always full size for non-nanoframes.
+		local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ = Spring.GetUnitCollisionVolumeData(unitID)
 		local horSize = math.min(scaleX, scaleZ)/2
 		local speedMult = (Spring.GetUnitRulesParam(unitID, "upgradesSpeedMult") or 1)
 		local speed = speedMult*UnitDefs[unitDefID].speed/30
