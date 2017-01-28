@@ -884,6 +884,17 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			end
 		end
 	end
+	
+	function externalFunctionsAndData.GetScreenPosition()
+		local x, y = button:LocalToScreen(0, 0)
+		if not x then
+			return false
+		end
+		y = screen0.height - y
+		y = y - button.height/2
+		x = x + button.width/2
+		return x, y
+	end
 
 	return externalFunctionsAndData
 end
@@ -1150,6 +1161,17 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	function externalFunctionsAndData.SetFontSize(newSize)
 		button.font.size = newSize
 		button:Invalidate()
+	end
+	
+	function externalFunctionsAndData.GetScreenPosition()
+		local x, y = button:LocalToScreen(0, 0)
+		if not x then
+			return false
+		end
+		y = screen0.height - y
+		y = y - button.height/2
+		x = x + button.width/2
+		return x, y
 	end
 	
 	return externalFunctionsAndData
@@ -1629,6 +1651,33 @@ options.fancySkinning.OnChange = UpdateBackgroundSkin
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- External functions
+
+local externalFunctions = {} -- Appear unused in repo but are used by missions.
+
+function externalFunctions.GetCommandButtonPosition(cmdID)
+	if not buttonsByCommand[cmdID] then
+		return false
+	end
+	local button = buttonsByCommand[cmdID]
+	local x, y = button.GetScreenPosition()
+	return x, y
+end
+
+function externalFunctions.GetTabPosition(tabName)
+	for i = 1, #commandPanels do
+		local data = commandPanels[i]
+		if data.name == tabName then
+			local tab = data.tabButton
+			local x, y = tab.GetScreenPosition()
+			return x, y
+		end
+	end
+	return false
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Widget Interface
 
 local initialized = false
@@ -1714,4 +1763,6 @@ function widget:Initialize()
 	screen0 = Chili.Screen0
 	
 	InitializeControls()
+	
+	WG.IntegralMenu = externalFunctions
 end
