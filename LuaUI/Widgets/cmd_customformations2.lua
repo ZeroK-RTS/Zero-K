@@ -79,7 +79,6 @@ local formationCmds = {
 	[CMD.MOVE] = true,
 	[CMD.FIGHT] = true,
 	[CMD.ATTACK] = true,
-	[CMD.MANUALFIRE] = true,
 	[CMD.PATROL] = true,
 	[CMD.UNLOAD_UNIT] = true,
 	[CMD_JUMP] = true, -- jump
@@ -266,7 +265,6 @@ end
 local function SetColor(cmdID, alpha)
 	if     cmdID == CMD_MOVE       then glColor(0.5, 1.0, 0.5, alpha) -- Green
 	elseif cmdID == CMD_ATTACK     then glColor(1.0, 0.2, 0.2, alpha) -- Red
-	elseif cmdID == CMD.MANUALFIRE then glColor(1.0, 1.0, 1.0, alpha) -- White
 	elseif cmdID == CMD_UNLOADUNIT then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
 	elseif cmdID == CMD_UNIT_SET_TARGET then glColor(1, 0.75, 0, alpha) -- Orange
 	elseif cmdID == CMD_UNIT_SET_TARGET_CIRCLE then glColor(1, 0.75, 0, alpha) -- Orange
