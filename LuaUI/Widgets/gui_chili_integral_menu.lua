@@ -42,8 +42,10 @@ local MIN_WIDTH = 200
 local COMMAND_SECTION_WIDTH = 74 -- percent
 local STATE_SECTION_WIDTH = 24 -- percent
 
-local SELECT_BUTTON_COLOR = {0.8, 0, 0, 1}
-local SELECT_BUTTON_FOCUS_COLOR = {0.8, 0, 0, 1}
+local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
+local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
+local BUTTON_DISABLE_COLOR = {0.1, 0.1, 0.1, 0.85}
+local BUTTON_DISABLE_FOCUS_COLOR = {0.1, 0.1, 0.1, 0.85}
 
 local DRAW_NAME_COMMANDS = {
 	[CMD.STOCKPILE] = true, -- draws stockpile progress (command handler sends correct string).
@@ -52,6 +54,7 @@ local DRAW_NAME_COMMANDS = {
 -- Defined upon learning the appropriate colors
 local BUTTON_COLOR
 local BUTTON_FOCUS_COLOR
+local BUTTON_BORDER_COLOR
 
 local NO_TEXT = ""
 
@@ -592,6 +595,9 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	if not BUTTON_FOCUS_COLOR then
 		BUTTON_FOCUS_COLOR = button.focusColor
 	end
+	if not BUTTON_BORDER_COLOR then
+		BUTTON_BORDER_COLOR = button.borderColor
+	end
 	
 	local image
 	local buildProgress
@@ -673,17 +679,21 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if not image then
 			SetImage("")
 		end
-		--if isDisabled then
-		--	button.backgroundColor = {0,0,0,1}
-		--	image.color = {0.3, 0.3, 0.3, 1}
-		--	externalFunctionsAndData.ClearGridHotkey()
-		--else
-		--	button.backgroundColor = {1,1,1,0.7}
-		--	image.color = {1, 1, 1, 1}
-		--	if hotkeyText then
-		--		SetText(textConfig.topLeft.name, hotkeyText)
-		--	end
-		--end
+		if isDisabled then
+			button.backgroundColor = BUTTON_DISABLE_COLOR
+			button.focusColor = BUTTON_DISABLE_FOCUS_COLOR
+			button.borderColor = BUTTON_DISABLE_FOCUS_COLOR
+			image.color = {0.3, 0.3, 0.3, 1}
+			externalFunctionsAndData.ClearGridHotkey()
+		else
+			button.backgroundColor = BUTTON_COLOR
+			button.focusColor = BUTTON_FOCUS_COLOR
+			button.borderColor = BUTTON_BORDER_COLOR
+			image.color = {1, 1, 1, 1}
+			if hotkeyText then
+				SetText(textConfig.topLeft.name, hotkeyText)
+			end
+		end
 			
 		button:Invalidate()
 		image:Invalidate()
