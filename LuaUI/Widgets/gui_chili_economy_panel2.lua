@@ -1101,7 +1101,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		x      = 0,
 		width  = subWindowWidth,
 		bottom = 0,
-		padding = {0,0,0,0},
 		backgroundColor = {1,1,1,options.opacity.value},
 		dockable = false;
 		draggable = false,
@@ -1251,7 +1250,6 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		width  = subWindowWidth,
 		bottom = 0,
 		backgroundColor = {1,1,1,options.opacity.value},
-		padding = {0,0,0,0},
 		dockable = false;
 		draggable = false,
 		resizable = false,

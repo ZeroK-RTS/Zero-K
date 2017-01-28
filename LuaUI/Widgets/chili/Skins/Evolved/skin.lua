@@ -47,6 +47,20 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_tiny = {
+  TileImageBK = ":cl:tech_button_bright_tiny_bk.png",
+  TileImageFG = ":cl:tech_button_bright_tiny_fg.png",
+  tiles = {12, 12, 12, 12}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+  
+  backgroundColor = {0.15, 0.39, 0.45, 0.85},
+  focusColor  = {0.20, 0.52, 0.60, 0.9},
+  borderColor = {0.20, 0.52, 0.60, 0.15},
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
+  
+  DrawControl = DrawButton,
+}
+
 skin.button_tab = {
   -- yes these are reverted, but also a lie (see images), only one is used
   TileImageFG = ":cl:tech_tabbaritem_fg.png",
@@ -234,18 +248,20 @@ local fancyBase = {
   TileImageFG = ":cl:empty.png",
   tiles = {32, 32, 32, 32},
   DrawControl = DrawPanel,
+  backgroundColor = {1,1,1,1},
 }
 
 local fancySmallBase = {
   TileImageFG = ":cl:empty.png",
   tiles = {16, 16, 16, 16},
   DrawControl = DrawPanel,
+  backgroundColor = {1,1,1,1},
 }
 
 local fancyPanels = {
 	{"0100", {30, 8, 30, 0}, {0, 4, 0, 0}},
-	{"0110", {156, 36, 1, 0}, {12, 4, 0, 0}},
-	{"1100", {0, 36, 156, 0}, {0, 4, 12, 0}},
+	{"0110", {156, 36, 1, 0}, {14, 10, 4, 4}},
+	{"1100", {0, 36, 156, 0}, {4, 10, 14, 4}},
 	"0011",
 	"1120",
 	"2100",
@@ -257,18 +273,18 @@ local fancyPanels = {
 	"2021",
 	"2120",
 	"1011",
-	"2011",
-	"1021",
+	{"2011", {172, 0, 8, 37}, {4, 0, 8, 4}},
+	{"1021", {8, 0, 172, 37}, {8, 0, 4, 4}},
 }
 
 local fancyPanelsSmall = {
-	"0011_small",
+	{"0011_small", {175, 0, 102, 10}, {12, 0, 0, 6}},
+	{"1001_small", {102, 0, 175, 10}, {0, 0, 12, 6}},
 	{"0110_small", {58, 36, 1, 0}, {12, 4, 0, 0}},
 	{"1100_small", {1, 36, 58, 0}, {0, 4, 12, 0}},
 	{"0120_small", {80, 36, 195, 0}, {6, 12, 0, 0}},
 	{"2100_small", {195, 36, 80, 0}, {0, 12, 6, 0}},
-	"1001_small",
-	"0001_small",
+	{"0001_small", {92, 0, 92, 10}, {0, 0, 0, 6}},
 }
 
 for i = 1, #fancyPanels do

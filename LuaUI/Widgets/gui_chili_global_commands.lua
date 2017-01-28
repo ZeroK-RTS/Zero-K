@@ -12,9 +12,9 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local BUTTON_Y = 3
-local BUTTON_SIZE = 24
-local BUTTON_PLACE_SPACE = 26
+local BUTTON_Y = 0
+local BUTTON_SIZE = 25
+local BUTTON_PLACE_SPACE = 27
 
 local contentHolder
 
@@ -52,7 +52,7 @@ options = {
 	background_opacity = {
 		name = "Opacity",
 		type = "number",
-		value = 0.8, min = 0, max = 1, step = 0.01,
+		value = 1, min = 0, max = 1, step = 0.01,
 	},
 	clearmapmarks = {
 		name = 'Erase Map Drawing',
@@ -121,7 +121,7 @@ options = {
 		value = 'panel',
 		items = {
 			{key = 'panel', name = 'None'},
-			{key = 'panel_0001', name = 'Flush',},
+			--{key = 'panel_0001', name = 'Flush',},
 			{key = 'panel_0001_small', name = 'Flush Small',},
 			{key = 'panel_1001_small', name = 'Top Left',},
 		},
@@ -197,6 +197,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 		y = (vertical and ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y)) or BUTTON_Y,
 		width = BUTTON_SIZE, 
 		height = BUTTON_SIZE,
+		classname = "button_tiny",
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
@@ -255,10 +256,11 @@ local function MakeDropdownButtons(parent, position, overlays)
 	end
 	
 	local overlaySelector = Chili.Button:New{
-		x = (position - 1)*BUTTON_PLACE_SPACE + 5,
+		x = (position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y,
 		y = BUTTON_Y,
 		width = BUTTON_SIZE, 
 		height = BUTTON_SIZE,
+		classname = "button_tiny",
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
@@ -324,7 +326,7 @@ local function InitializeControls()
 		bottom = 0,
 		draggable = false,
 		resizable = false,
-		padding = {0, 0, 0, 0},
+		padding = {0,0,0,0},
 		backgroundColor = {1, 1, 1, options.background_opacity.value},
 		parent = mainWindow,
 	}

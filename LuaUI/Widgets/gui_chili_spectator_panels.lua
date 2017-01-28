@@ -244,7 +244,7 @@ options = {
 		value = 'panel',
 		items = {
 			{key = 'panel', name = 'None'},
-			{key = 'panel_0001', name = 'Flush',},
+			--{key = 'panel_0001', name = 'Flush',},
 			{key = 'panel_1011', name = 'Not Flush',},
 		},
 		OnChange = function (self)

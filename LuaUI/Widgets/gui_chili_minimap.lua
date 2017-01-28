@@ -602,6 +602,7 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 		end
 		if cs.name ~= "ov" and tabbedMode then
 			Chili.Screen0:AddChild(window)
+			window:BringToFront()
 			tabbedMode = false
 		end
 	end
@@ -784,7 +785,7 @@ MakeMinimapWindow = function()
 		parent = Chili.Screen0,
 		name   = 'Minimap Window',
 		color = {0, 0, 0, 0},
-		padding = {0, -1, 0, -1},
+		padding = {0, 0, 0, 0},
 		width = (window and window.width) or width,
 		height = (window and window.height) or height,
 		x = (window and window.x) or 0,
@@ -802,6 +803,7 @@ MakeMinimapWindow = function()
 		maxHeight = screenHeight*0.8,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 	}
+	window:BringToFront()
 	
 	options.use_map_ratio.OnChange(options.use_map_ratio)
 	
@@ -815,7 +817,7 @@ MakeMinimapWindow = function()
 		dockable = false;
 		draggable = false,
 		resizable = false,
-		padding = {0, 0, 0, -1},
+		padding = {0, 0, 0, 0},
 		children = {
 			map_panel,
 			((not options.hidebuttons.value) and buttons_panel) or nil,

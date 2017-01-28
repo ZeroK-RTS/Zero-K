@@ -2165,7 +2165,7 @@ local function GetMainPanel(parent, width, height)
 				padding = {0,2,0,0},
 				itemMargin = {1,0,0,0},
 				children = {
-					Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+					Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 26,  },
 					lbl_clock,
 				},
 			}
@@ -2182,7 +2182,7 @@ local function GetMainPanel(parent, width, height)
 			padding = {0,2,0,0},
 			itemMargin = {1,0,0,0},
 			children = {
-				Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+				Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 26,  },
 				lbl_gtime,
 			},
 		}
@@ -2395,7 +2395,7 @@ local function GetMainPanel(parent, width, height)
 		name= 'subMenuButton',
 		OnClick = { function() ActionSubmenu(nil,'') end, },
 		textColor = color.game_fg,
-		height = height - 6,
+		height = height - 9,
 		width = B_WIDTH_TOMAINMENU + 1,
 		caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
 		padding = btn_padding,
@@ -2413,7 +2413,7 @@ local function GetMainPanel(parent, width, height)
 			name = 'lobbyButton',
 			OnClick = { function() ViewLobby() end, },
 			textColor = color.game_fg,
-			height = height - 6,
+			height = height - 9,
 			width = B_WIDTH_TOMAINMENU + 1,
 			caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
 			padding = btn_padding,
@@ -2468,7 +2468,7 @@ local function GetMainPanel(parent, width, height)
 		backgroundColor = color.empty,
 		color = color.empty,
 		margin = {0,0,0,0},
-		padding = {0,0,3,5},
+		padding = {0,0,3,6},
 		parent = parent,
 		
 		children = {
@@ -2483,7 +2483,7 @@ local function GetMainPanel(parent, width, height)
 				itemMargin = {1,1,1,1},
 				autoArrangeV = false,
 				autoArrangeH = false,
-						
+				
 				children = stackChildren,
 			}
 		}
@@ -2530,7 +2530,7 @@ local function MakeMenuBar()
 		dockable = true,
 		backgroundColor = color.empty,
 		color = color.empty,
-		padding = {-1,0,0,0},
+		padding = {0,0,0,0},
 		parent = screen0,
 		OnResize = {
 			function (obj)
@@ -2552,8 +2552,6 @@ local function MakeMenuBar()
 		y = 0,
 		right = 0,
 		bottom = 0,
-		backgroundColor = color.main_bg,
-		color = color.main_bg,
 		parent = window_crude,
 	}
 	settings.show_crudemenu = true

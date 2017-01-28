@@ -615,12 +615,12 @@ end
 local function SetupNewUITop()
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
 	
-	local sideHeight = 32
+	local sideHeight = 38
 	local flushTop = (screenWidth <= 1650)
 	
 	-- Resource Bar
 	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
-	local resourceBarHeight = 100
+	local resourceBarHeight = 108
 	
 	-- Chicken
 	local chickenWidth = 189
@@ -629,12 +629,12 @@ local function SetupNewUITop()
 	-- Menu
 	local menuWidth, globalWidth
 	if flushTop then
-		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2))
-		globalWidth = screenWidth - resourceBarWidth - menuWidth
+		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2)) + 3
+		globalWidth = screenWidth - resourceBarWidth - menuWidth + 3
 	else
 		menuWidth = math.floor((screenWidth - resourceBarWidth)/2)
-		if menuWidth > 440 then
-			menuWidth = 440
+		if menuWidth > 448 then
+			menuWidth = 448
 		elseif menuWidth > 380 then
 			menuWidth = 380
 		else
@@ -767,7 +767,7 @@ local function SetupMinimapLeftPreset()
 	local hPad = math.ceil(screenWidth/300) + 2
 	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad + 5)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad - 5)
-	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(hPad))
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
 	
@@ -785,6 +785,7 @@ local function SetupMinimapLeftPreset()
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
+	minimapWidth = minimapWidth + 4 -- padding differences
 	if minimapWidth < 160 then
 		minimapWidth = 160
 	end
@@ -951,7 +952,7 @@ local function SetupMinimapRightPreset()
 	local hPad = math.ceil(screenWidth/300) + 2
 	WG.SetWidgetOption(coreName, corePath, "horPaddingLeft", hPad - 5)
 	WG.SetWidgetOption(coreName, corePath, "horPaddingRight", hPad + 5)
-	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(1.5*hPad))
+	WG.SetWidgetOption(coreName, corePath, "vertPadding", math.floor(hPad))
 	WG.SetWidgetOption(coreName, corePath, "buttonSpacing", math.floor(hPad/2))
 	WG.SetWidgetOption(coreName, corePath, "buttonSizeLong", coreSelectorWidth - 2*hPad - 1)
 	
@@ -969,6 +970,7 @@ local function SetupMinimapRightPreset()
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
+	minimapWidth = minimapWidth + 4 -- padding differences
 	if minimapWidth < 160 then
 		minimapWidth = 160
 	end
