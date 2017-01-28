@@ -154,6 +154,19 @@ skin.negative_button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  TileImageBK = ":cl:tech_button_bright_small_bk.png",
+  TileImageFG = ":cl:tech_button_bright_small_fg.png",
+  tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+  
+  backgroundColor = {0.2, 0.2, 0.2, 0.65},
+  focusColor  = {0, 0, 0, 0},
+  borderColor = {0.2, 0.2, 0.2, 0.15},
+
+  DrawControl = DrawButton,
+}
+
 skin.combobox = {
 	TileImageBK = ":cl:combobox_ctrl.png",
 	TileImageFG = ":cl:combobox_ctrl_fg.png",
@@ -249,7 +262,7 @@ skin.panel = {
   TileImageBK = ":c:tech_overlaywindow.png",
   TileImageFG = ":cl:empty.png",
   tiles = {2, 2, 2, 2},
-  backgroundColor = {0.1, 0.1, 0.1, 0.7},
+  backgroundColor = {1, 1, 1, 0.7},
 
   DrawControl = DrawPanel,
 }
@@ -266,7 +279,7 @@ skin.overlay_panel = {
   TileImageBK = ":c:tech_overlaywindow.png",
   TileImageFG = ":cl:empty.png",
   tiles = {2, 2, 2, 2}, --// tile widths: left,top,right,bottom
-  backgroundColor = {0.1, 0.1, 0.1, 0.7},
+  backgroundColor = {1, 1, 1, 0.7},
 
   DrawControl = DrawPanel,
 }
@@ -288,7 +301,7 @@ local fancySmallBase = {
 local fancyPanels = {
 	{"0100", {30, 8, 30, 0}, {0, 4, 0, 0}},
 	{"0110", {156, 36, 1, 0}, {14, 10, 4, 4}},
-	{"1100", {0, 36, 156, 0}, {4, 10, 14, 4}},
+	{"1100", {1, 36, 156, 0}, {4, 10, 14, 4}},
 	"0011",
 	"1120",
 	"2100",
@@ -418,7 +431,7 @@ skin.window = {
 
   captionColor = {1, 1, 1, 0.45},
 
-  backgroundColor = {0.1, 0.1, 0.1, 0.7},
+  color = {1, 1, 1, 0.7},
 
   boxes = {
     resize = {-21, -21, -10, -10},

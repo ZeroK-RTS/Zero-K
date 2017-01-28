@@ -88,11 +88,11 @@ options = {
 ---------------------------------
 
 function widget:Initialize()
-	if (not Spring.IsReplay()) then
-		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
-		widgetHandler:RemoveWidget(self)
-		return
-	end
+	--if (not Spring.IsReplay()) then
+	--	Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
+	--	widgetHandler:RemoveWidget(self)
+	--	return
+	--end
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
@@ -112,7 +112,7 @@ function CreateTheUI()
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
+	local windowY = screenWidth*2/11 + 32
 	
 	local labelHeight = 24
 	local fontSize = 16
@@ -133,11 +133,11 @@ function CreateTheUI()
 	
 	window = Window:New{
 		--parent = screen0,
-		name   = 'replaycontroller';
+		name   = 'replaycontroller2';
 		width = 300;
 		height = 85;
 		right = 10; 
-		y = "20%";
+		y = windowY;
 		dockable = false;
 		draggable = true,
 		resizable = false,

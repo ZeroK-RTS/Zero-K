@@ -440,12 +440,12 @@ local function SetupNewPreset()
 	-- Bottom of the UI
 	
 	-- Minimap
-	local minimapSize = math.floor(screenWidth*2.1/11)
-	if minimapSize < 1650*2.1/11 then
+	local minimapSize = math.floor(screenWidth*options.minimapScreenSpace.value)
+	if minimapSize < 1650*options.minimapScreenSpace.value then
 		if screenWidth > 1340 then
-			minimapSize = 1650*2.1/11
+			minimapSize = 1650*options.minimapScreenSpace.value
 		else
-			minimapSize = screenWidth*2.1/11
+			minimapSize = screenWidth*options.minimapScreenSpace.value
 		end
 	end
 	WG.SetWindowPosAndSize("Minimap Window", 
@@ -778,10 +778,10 @@ local function SetupMinimapLeftPreset()
 	
 	local minimapWidth, minimapHeight
 	if mapRatio > 1 then
-		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(screenWidth*options.minimapScreenSpace.value)
 		minimapHeight = (minimapWidth/mapRatio)
 	else
-		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapHeight = math.floor(screenWidth*options.minimapScreenSpace.value)
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
@@ -963,10 +963,10 @@ local function SetupMinimapRightPreset()
 	
 	local minimapWidth, minimapHeight
 	if mapRatio > 1 then
-		minimapWidth = math.floor(screenWidth*2.1/11)
+		minimapWidth = math.floor(screenWidth*options.minimapScreenSpace.value)
 		minimapHeight = (minimapWidth/mapRatio)
 	else
-		minimapHeight = math.floor(screenWidth*2.1/11)
+		minimapHeight = math.floor(screenWidth*options.minimapScreenSpace.value)
 		minimapWidth = math.floor(minimapHeight*mapRatio)
 	end
 	
@@ -1494,7 +1494,7 @@ end
 -- Options
 ----------------------------------------------------
 options_path = 'Settings/HUD Presets'
-options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'interfacePreset'}
+options_order = {'updateNewDefaults', 'setToDefault', 'maintainDefaultUI', 'minimapScreenSpace', 'interfacePreset'}
 options = {
 	updateNewDefaults = {
 		name  = "Stay up to date",
@@ -1517,6 +1517,15 @@ options = {
 		value = true, 
 		desc = "Resets the UI when screen resolution changes. Disable if you plan to customise your UI.",
 		noHotkey = true,
+	},
+	minimapScreenSpace = {
+		name = "Minimap Size",
+		type = "number",
+		value = 0.19, min = 0.05, max = 0.4, step = 0.01,
+		--desc = "Controls minimap size for the New UI presets.", -- supresses value tooltip
+		OnChange = function(self)
+			UpdateInterfacePreset(options.interfacePreset)
+		end,
 	},
 	interfacePreset = {
 		name = 'UI Preset',

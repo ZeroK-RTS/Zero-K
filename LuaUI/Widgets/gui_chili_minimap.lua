@@ -799,8 +799,8 @@ MakeMinimapWindow = function()
 		dragUseGrip = false,
 		minWidth = 100,
 		minHeight = 100,
-		maxWidth = screenWidth*0.8,
-		maxHeight = screenHeight*0.8,
+		maxWidth = screenWidth,
+		maxHeight = screenHeight,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 	}
 	window:BringToFront()
