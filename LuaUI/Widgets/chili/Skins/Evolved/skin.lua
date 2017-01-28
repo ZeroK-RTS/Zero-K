@@ -188,14 +188,31 @@ skin.combobox_item = {
 	borderColor = {1, 1, 1, 0};
 }
 
-
 skin.checkbox = {
-  TileImageFG = ":cl:tech_checkbox_checked.png",
-  TileImageBK = ":cl:tech_checkbox_unchecked.png",
+  TileImageFG = ":cl:checkbox_arrow.png",
+  TileImageBK = ":cl:checkbox.png",
   tiles       = {3,3,3,3},
   boxsize     = 13,
 
   DrawControl = DrawCheckbox,
+}
+
+
+skin.editbox = {
+  hintFont = table.merge({color = {1,1,1,0.7}}, skin.general.font),
+  
+  backgroundColor = {0.1, 0.1, 0.1, 0},
+  cursorColor     = {1.0, 0.7, 0.1, 0.8},
+  
+  focusColor  = {1, 1, 1, 1},
+  borderColor = {1, 1, 1, 0.6},
+
+  TileImageBK = ":cl:panel2_bg.png",
+  TileImageFG = ":cl:editbox_border.png",
+  tiles       = {2, 2, 2, 2},
+  cursorFramerate = 1, -- Per second
+
+  DrawControl = DrawEditBox,
 }
 
 skin.imagelistview = {
@@ -229,9 +246,10 @@ skin.imagelistviewitem = {
 --]]
 
 skin.panel = {
-  TileImageBK = ":cl:tech_button.png",
+  TileImageBK = ":c:tech_overlaywindow.png",
   TileImageFG = ":cl:empty.png",
   tiles = {2, 2, 2, 2},
+  backgroundColor = {0.1, 0.1, 0.1, 0.7},
 
   DrawControl = DrawPanel,
 }
@@ -240,6 +258,15 @@ skin.panelSmall = {
   TileImageBK = ":cl:tech_button.png",
   TileImageFG = ":cl:empty.png",
   tiles = {2, 2, 2, 2},
+
+  DrawControl = DrawPanel,
+}
+
+skin.overlay_panel = {
+  TileImageBK = ":c:tech_overlaywindow.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {2, 2, 2, 2}, --// tile widths: left,top,right,bottom
+  backgroundColor = {0.1, 0.1, 0.1, 0.7},
 
   DrawControl = DrawPanel,
 }
@@ -384,37 +411,7 @@ skin.treeview = {
 }
 
 skin.window = {
-  TileImage = ":c:tech_dragwindow.png",
-  --TileImage = ":cl:tech_window.png",
-  --TileImage = ":cl:window_tooltip.png",
-  --tiles = {25, 25, 25, 25}, --// tile widths: left,top,right,bottom
-  tiles = {2, 2, 2, 2}, --// tile widths: left,top,right,bottom
-  padding = {13, 13, 13, 13},
-  hitpadding = {4, 4, 4, 4},
-
-  captionColor = {1, 1, 1, 0.45},
-
-  backgroundColor = {0.1, 0.1, 0.1, 0.7},
-
-  boxes = {
-    resize = {-21, -21, -10, -10},
-    drag = {0, 0, "100%", 10},
-  },
-
-  NCHitTest = NCHitTestWithPadding,
-  NCMouseDown = WindowNCMouseDown,
-  NCMouseDownPostChildren = WindowNCMouseDownPostChildren,
-
-  DrawControl = DrawWindow,
-  DrawDragGrip = function() end,
-  DrawResizeGrip = DrawResizeGrip,
-}
-
-skin.overlay_window = {
   TileImage = ":c:tech_overlaywindow.png",
-  --TileImage = ":cl:tech_window.png",
-  --TileImage = ":cl:window_tooltip.png",
-  --tiles = {25, 25, 25, 25}, --// tile widths: left,top,right,bottom
   tiles = {2, 2, 2, 2}, --// tile widths: left,top,right,bottom
   padding = {13, 13, 13, 13},
   hitpadding = {4, 4, 4, 4},

@@ -629,16 +629,16 @@ local function SetupNewUITop()
 	-- Menu
 	local menuWidth, globalWidth
 	if flushTop then
-		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2)) + 3
-		globalWidth = screenWidth - resourceBarWidth - menuWidth + 3
+		menuWidth = math.max(350, math.ceil((screenWidth - resourceBarWidth)/2))
+		globalWidth = screenWidth - resourceBarWidth - menuWidth
 	else
 		menuWidth = math.floor((screenWidth - resourceBarWidth)/2)
-		if menuWidth > 448 then
-			menuWidth = 448
-		elseif menuWidth > 380 then
-			menuWidth = 380
+		if menuWidth > 445 then
+			menuWidth = 445
+		elseif menuWidth > 377 then
+			menuWidth = 377
 		else
-			menuWidth = 350
+			menuWidth = 347
 		end
 		globalWidth = menuWidth
 	end
@@ -662,9 +662,9 @@ local function SetupNewUITop()
 	
 	-- Right Side
 	WG.SetWindowPosAndSize("epicmenubar",
-		screenWidth - menuWidth - 1,
+		screenWidth - menuWidth - 3,
 		0,
-		menuWidth,
+		menuWidth + 3,
 		sideHeight
 	)
 	
@@ -686,7 +686,7 @@ local function SetupNewUITop()
 	WG.SetWindowPosAndSize("globalCommandsWindow",
 		0,
 		0,
-		globalWidth,
+		globalWidth + 3,
 		sideHeight
 	)
 	

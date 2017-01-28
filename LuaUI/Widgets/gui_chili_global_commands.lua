@@ -236,9 +236,10 @@ local function MakeDropdownButtons(parent, position, overlays)
 	
 	local overlayPanel = Panel:New{
 		x = 0,
-		y = 30,
+		y = 38,
 		width = 36,
 		height = (#overlays)*BUTTON_PLACE_SPACE + 8,
+		classname = "overlay_panel",
 		parent = screen0,
 		padding = {6,4,0,0}
 	}
