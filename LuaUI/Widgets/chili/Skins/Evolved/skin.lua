@@ -39,9 +39,9 @@ skin.button = {
   tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
   
-  backgroundColor = {0.15, 0.39, 0.45, 0.85},
-  focusColor  = {0.20, 0.52, 0.60, 0.9},
-  borderColor = {0.20, 0.52, 0.60, 0.15},
+  backgroundColor = {0.20, 0.20, 0.23, 0.95},
+  focusColor  = {0.20, 0.42, 0.50, 0.9},
+  borderColor = {0.20, 0.42, 0.50, 0.15},
   pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
   
   DrawControl = DrawButton,
