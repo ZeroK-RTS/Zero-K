@@ -224,7 +224,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	-- no messagebox exists, make one
 	msgBoxPersistent = Chili.Window:New{
 		parent = Chili.Screen0,
-		name   = 'msgWindow';
+		name   = 'msgPersistentWindow';
 		width = width,
 		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,
@@ -464,7 +464,8 @@ function ReceivePersistentMessages(newMessages)
   
   ClearPersistentMessageHistory()
   for index, msg in pairs(newMessages) do
-    ShowPersistentMessageBox(msg.message, msg.width, msg.height, msg.fontSize, msg.image)
+    local image = (msg.imageFromArchive and "" or "LuaUI/Images/") .. msg.image
+    ShowPersistentMessageBox(msg.message, msg.width, msg.height, msg.fontSize, image)
   end
 end
 
