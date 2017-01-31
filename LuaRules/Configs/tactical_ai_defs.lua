@@ -242,9 +242,11 @@ local slasherSkirmieeArray = NameToDefID({
 	"corraid",
 	"corlevlr",
 	"hoverriot",
-    "shieldfelon",
+	"shieldfelon",
 	"correap",
 	"armrock",
+	"armpb",
+	"corstorm",
 })
 
 -- Nested union so long ranged things also skirm the things skirmed by short ranged things
@@ -254,6 +256,8 @@ lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArra
 medRangeSkirmieeArray    = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
 longRangeSkirmieeArray   = Union(longRangeSkirmieeArray,medRangeSkirmieeArray)
 artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray,longRangeSkirmieeArray)
+
+slasherSkirmieeArray     = Union(slasherSkirmieeArray, longRangeSkirmieeArray)
 
 ---------------------------------------------------------------------------
 -- Explosion avoidance
