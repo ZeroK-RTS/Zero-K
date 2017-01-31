@@ -16,7 +16,7 @@ include "constants.lua"
 include "RockPiece.lua"
 include "JumpRetreat.lua"
 
-local smokePiece = {turret}
+local smokePieces = {turret}
 
 local gunHeading = 0
 local walking = false
