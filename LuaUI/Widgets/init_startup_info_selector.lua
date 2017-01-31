@@ -181,8 +181,8 @@ local function CreateWindow()
 		draggable = false,
 		clientWidth  = WINDOW_WIDTH,
 		clientHeight = WINDOW_HEIGHT,
-		x = (vsx - WINDOW_WIDTH)/2,
-		y = ((vsy - WINDOW_HEIGHT)/2),
+		x = math.floor((vsx - WINDOW_WIDTH)/2),
+		y = math.floor((vsy - WINDOW_HEIGHT)/2),
 		parent = screen0,
 		caption = "COMMANDER SELECTOR",
 		}
@@ -345,6 +345,7 @@ function widget:Initialize()
 			height = "100%",
 			x = 0,
 			y = 0,
+			classname = "overlay_button",
 			OnClick = {function() Spring.SendCommands({"luaui "..actionShow}) end}
 		}
 		
