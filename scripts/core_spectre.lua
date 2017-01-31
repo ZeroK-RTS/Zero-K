@@ -1,4 +1,7 @@
 --by Chris Mackey
+
+include "constants.lua"
+
 local ALLY_ACCESS = {allied = true}
 
 --pieces
