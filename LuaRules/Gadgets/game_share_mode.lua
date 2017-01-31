@@ -202,15 +202,8 @@ end
 
 local function MergeTeams(team1,team2) -- bandaid for an issue during planning.
 	local playerlist = spGetPlayerList(team1,true)
-	local playerlist2 = spGetPlayerList(team2,true)
-	if GetSquadSize(team1) >= GetSquadSize(team2) then
-		for i = 1, #playerlist do
-			MergePlayer(playerlist[i],team2)
-		end
-	else
-		for i = 1, #playerlist2 do
-			MergePlayer(playerlist2[i],team1)
-		end
+	for i = 1, #playerlist do
+		MergePlayer(playerlist[i],team2)
 	end
 end
 
@@ -275,7 +268,7 @@ local function AcceptInvite(player,target)
 		spEcho("invite verified")
 		local teamID = GetTeamID(player)
 		if GetTeamLeader(teamID) == player and GetSquadSize(teamID) > 1 then
-			MergeTeams(GetTeamID(target),GetTeamID(player))
+			MergeTeams(GetTeamID(player),GetTeamID(target))
 		else
 			MergePlayer(player,GetTeamID(target))
 		end
