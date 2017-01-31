@@ -13,7 +13,7 @@ local wakes =
 } 
 local beam = piece 'beam'
 
-local smokePiece = {torso, claw1, turret}
+local smokePiece = {body, claw1, turret}
 local nanoPieces = {beam}
 
 local SIG_Build = 1
