@@ -16,7 +16,6 @@ local armorDefs = {
     "nest",
 	"chicken_drone",
     "chicken_digger",
-    "chicken",
     "chickens",
     "chickenr",
     "chicken_dodo",
