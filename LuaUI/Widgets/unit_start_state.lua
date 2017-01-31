@@ -510,8 +510,12 @@ for i = 1, #buildOpts do
 	end
 end
 
+local function AmITeamLeader (teamID)
+	return teamID == Spring.GetMyTeamID() and Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo (teamID))
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if unitTeam ~= Spring.GetMyTeamID() or not unitDefID or not UnitDefs[unitDefID] then
+	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] then
 		return
 	end
 
@@ -658,7 +662,7 @@ function widget:UnitDestroyed(unitID)
 end
 
 function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam ~= Spring.GetMyTeamID() or not unitDefID or not UnitDefs[unitDefID] then
+	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] then
 		return
 	end
 
@@ -674,7 +678,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:UnitFinished(unitID, unitDefID, unitTeam)
-	if unitTeam ~= Spring.GetMyTeamID() or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
+	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] or (Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1) then
 		return
 	end
 
