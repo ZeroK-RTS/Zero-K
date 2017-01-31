@@ -804,6 +804,14 @@ function Object:LocalToObject(x, y, obj)
   return self.parent:LocalToObject(x, y, obj)
 end
 
+
+function Object:IsVisibleOnScreen()
+  if (not self.parent) or (not self.visible) then
+    return false
+  end
+  return (self.parent):IsVisibleOnScreen()
+end
+
 --//=============================================================================
 
 function Object:_GetMaxChildConstraints(child)

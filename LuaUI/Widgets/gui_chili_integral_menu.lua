@@ -896,13 +896,15 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 	end
 	
 	function externalFunctionsAndData.GetScreenPosition()
+		if not button:IsVisibleOnScreen() then
+			return false
+		end
 		local x, y = button:LocalToScreen(0, 0)
 		if not x then
 			return false
 		end
-		y = screen0.height - y
-		y = y - button.height/2
 		x = x + button.width/2
+		y = y + button.height/2
 		return x, y
 	end
 
@@ -1174,13 +1176,15 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 	end
 	
 	function externalFunctionsAndData.GetScreenPosition()
+		if not button:IsVisibleOnScreen() then
+			return false
+		end
 		local x, y = button:LocalToScreen(0, 0)
 		if not x then
 			return false
 		end
-		y = screen0.height - y
-		y = y - button.height/2
 		x = x + button.width/2
+		y = y + button.height/2
 		return x, y
 	end
 	

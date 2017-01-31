@@ -103,6 +103,10 @@ function Screen:IsRectInView(x,y,w,h)
 end
 
 
+function Screen:IsVisibleOnScreen()
+  return true
+end
+
 --//=============================================================================
 
 function Screen:Resize(w,h)
