@@ -49,6 +49,14 @@ local fastForwardTo = -1
 local demoStarted = false
 local showProgress = true
 
+local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
+local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
+
+-- Defined upon learning the appropriate colors
+local BUTTON_COLOR
+local BUTTON_FOCUS_COLOR
+local BUTTON_BORDER_COLOR
+
 ---------------------------------
 -- Epic Menu
 ---------------------------------
@@ -88,11 +96,11 @@ options = {
 ---------------------------------
 
 function widget:Initialize()
-	--if (not Spring.IsReplay()) then
-	--	Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
-	--	widgetHandler:RemoveWidget(self)
-	--	return
-	--end
+	if (not Spring.IsReplay()) then
+		Spring.Echo ("<" .. widgetName .. "> Live mode. Widget removed.")
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	-- setup Chili
 	Chili = WG.Chili
 	Button = Chili.Button
@@ -112,7 +120,7 @@ function CreateTheUI()
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local windowY = screenWidth*2/11 + 32
+	local windowY = math.floor(screenWidth*2/11 + 32)
 	
 	local labelHeight = 24
 	local fontSize = 16
@@ -195,26 +203,43 @@ function CreateTheUI()
 	}
 	
 	for i = 1, #speeds do
-		button_setspeed[i] = Button:New {
-		width = 40,
-		height = 20,
-		y = 36,
-		x = 10+(i-1)*40,
-		parent=window;
-		padding = {0, 0, 0,0},
-		margin = {0, 0, 0, 0},
-		backgroundColor = (i==currSpeed and {0, 0, 1, 1}) or {1, 1, 0, 1}, -- 1x selected by default
-		caption=speeds[i] .."x",
-		tooltip = "play at " .. speeds[i] .. "x speed";
-		OnClick = {function()
-			snapButton(i)
-			progress_target:SetValue(0)
-			setReplaySpeed (speeds[i], i)
-			if isPaused then
-				unpause()
-			end
-		end}
-	}
+		local button = Button:New {
+			width = 40,
+			height = 20,
+			y = 36,
+			x = 10+(i-1)*40,
+			classname = "button_tiny",
+			parent=window;
+			padding = {0, 0, 0,0},
+			margin = {0, 0, 0, 0},
+			caption=speeds[i] .."x",
+			tooltip = "play at " .. speeds[i] .. "x speed";
+			OnClick = {
+				function()
+					snapButton(i)
+					progress_target:SetValue(0)
+					setReplaySpeed (speeds[i], i)
+					if isPaused then
+						unpause()
+					end
+				end
+			}
+		}	
+		if not BUTTON_COLOR then
+			BUTTON_COLOR = button.backgroundColor
+		end
+		if not BUTTON_FOCUS_COLOR then
+			BUTTON_FOCUS_COLOR = button.focusColor
+		end
+		if not BUTTON_BORDER_COLOR then
+			BUTTON_BORDER_COLOR = button.borderColor
+		end
+		if i == currSpeed then
+			button.backgroundColor = SELECT_BUTTON_COLOR
+			button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+			button:Invalidate()
+		end
+		button_setspeed[i] = button
 	end
 	
 	if (frame == 0) then 
@@ -223,6 +248,7 @@ function CreateTheUI()
 			height = 20,
 			y = 58,
 			x = 100,
+			classname = "button_tiny",
 			parent=window;
 			padding = {0, 0, 0,0},
 			margin = {0, 0, 0, 0},
@@ -252,6 +278,7 @@ function CreateTheUI()
 		height = 20,
 		y = 58,
 		x = 10,
+			classname = "button_tiny",
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
@@ -299,9 +326,11 @@ function CreateTheUI()
 end
 
 function snapButton(pushButton)
-	button_setspeed[window.currSpeed].backgroundColor = {1, 1, 0, 1}
+	button_setspeed[window.currSpeed].backgroundColor = BUTTON_COLOR
+	button_setspeed[window.currSpeed].focusColor = BUTTON_FOCUS_COLOR
 	button_setspeed[window.currSpeed]:Invalidate()
-	button_setspeed[pushButton].backgroundColor = {0, 0, 1, 1}
+	button_setspeed[pushButton].backgroundColor = SELECT_BUTTON_COLOR
+	button_setspeed[pushButton].focusColor = SELECT_BUTTON_FOCUS_COLOR
 	button_setspeed[pushButton]:Invalidate()
 end
 
