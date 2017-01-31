@@ -3,7 +3,7 @@ include "constants.lua"
 local base1, base2, turret, arm_1, arm_2, arm_3, nanobase, nanoemit, pad, nozzle, cylinder, body = piece ('base1', 'base2', 'turret', 'arm_1', 'arm_2', 'arm_3', 'nanobase', 'nanoemit', 'pad', 'nozzle', 'cylinder')
 
 local nanoPieces = { nanoemit }
-local smokePiece = { base }
+local smokePiece = { arm_1 }
 
 local function Open ()
 	Signal (1)

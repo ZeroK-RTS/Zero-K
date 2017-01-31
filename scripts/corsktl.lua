@@ -12,7 +12,7 @@ local Tail = piece 'tail'
 
 include "constants.lua"
 
-local smokePiece = { hump }
+local smokePiece = { Hump }
 
 local moving = false
 local SIG_MOVE = 1

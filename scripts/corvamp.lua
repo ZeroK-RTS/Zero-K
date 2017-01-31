@@ -30,6 +30,7 @@ end
 function script.Create()
 	Turn(thrust1, x_axis, -math.rad(90), 1)
 	Turn(thrust2, x_axis, -math.rad(90), 1)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()

@@ -180,6 +180,7 @@ function script.Create()
 	--Move(LeftTurretSeat,y_axis,-1.1)
 	--Move(LeftTurretSeat,z_axis,17)
 	--SetDGunCMD()
+	StartThread(SmokeUnit, {RearTurret, RightTurret, LeftTurret})
 	StartThread(EmitDust)
 end
 

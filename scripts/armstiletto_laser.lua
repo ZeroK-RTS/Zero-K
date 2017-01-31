@@ -17,12 +17,12 @@ function script.Create()
 	Hide(drop)
 	
 	FakeUprightInit(xp, zp, drop)
-	
 	Turn(Lwing, z_axis, math.rad(90))
 	Turn(Rwing, z_axis, math.rad(-90))	
 	Turn(LwingTip, z_axis, math.rad(-165))
 	Turn(RwingTip, z_axis, math.rad(165))
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()

@@ -291,6 +291,7 @@ function script.Create()
 	
 	Turn(rbleg, x_axis, math.rad(0))
 	Turn(rbfoot, x_axis, math.rad(0))
+	StartThread(SmokeUnit, {turret})
 end
 
 function script.QueryWeapon(num)

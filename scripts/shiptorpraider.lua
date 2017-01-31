@@ -64,7 +64,7 @@ end
 
 function script.Create()
 	StartThread(MoveScript)
-	StartThread(SmokeUnit, {main, turret})
+	StartThread(SmokeUnit, {sleeve, turret})
 end
 
 function script.AimFromWeapon(id)
