@@ -181,6 +181,7 @@ local function MergePlayer(playerID,target)
 	local name,_,spec,_,_,allyteam  = spGetPlayerInfo(playerID)
 	if spAreTeamsAllied(orgTeamID,target) and (not spec) and target ~= GaiaID then
 		spEcho("[Commshare] Assigning player id " .. playerID .. "(" .. name .. ") to team " .. target)
+		spAssignPlayerToTeam(playerID,target)
 		if GetSquadSize(orgTeamID) - 1 == 0 then
 			local metal = spGetTeamResources(orgTeamID,"metal")
 			local energy = spGetTeamResources(orgTeamID,"energy")
@@ -190,7 +191,6 @@ local function MergePlayer(playerID,target)
 			MergeUnits(orgTeamID,target)
 			spSetTeamRulesParam(orgTeamID,"isCommsharing",target,public)
 		end
-		spAssignPlayerToTeam(playerID,target)
 		if originalTeamID[playerID] == nil then
 			originalTeamID[playerID] = orgTeamID
 		end
@@ -201,16 +201,9 @@ local function MergePlayer(playerID,target)
 end
 
 local function MergeTeams(team1,team2) -- bandaid for an issue during planning.
-	local playerlist = spGetPlayerList(team1,true)
-	local playerlist2 = spGetPlayerList(team2,true)
-	if GetSquadSize(team1) >= GetSquadSize(team2) then
-		for i = 1, #playerlist do
-			MergePlayer(playerlist[i],team2)
-		end
-	else
-		for i = 1, #playerlist2 do
-			MergePlayer(playerlist2[i],team1)
-		end
+	local playerlist = spGetPlayerList(team2,true)
+	for i=1, #playerlist do
+		MergePlayer(playerlist[i],team1)
 	end
 end
 
