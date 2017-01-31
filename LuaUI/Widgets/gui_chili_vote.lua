@@ -263,6 +263,7 @@ function widget:Initialize()
 			x = "80%",
 			width = "20%",
 			height = "100%",
+			classname = "overlay_button",
 			caption = (i==1) and 'Yes' or 'No',
 			OnClick = {	function () 
 					--if voteAntiSpam then return end
@@ -284,10 +285,10 @@ function widget:Initialize()
 		height = 20,
 		y = 0,
 		right = 0,
+		classname = "overlay_button_tiny",
 		parent=window;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 0.4},
 		caption="";
 		tooltip = "Hide this vote";
 		OnClick = {function() 

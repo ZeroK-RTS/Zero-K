@@ -61,6 +61,45 @@ skin.button_tiny = {
   DrawControl = DrawButton,
 }
 
+skin.overlay_button = {
+  TileImageBK = ":cl:tech_button_small_bk.png",
+  TileImageFG = ":cl:tech_button_small_fg.png",
+  tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+  
+  backgroundColor = {0, 0, 0, 0.7},
+  focusColor  = {0.94, 0.50, 0.23, 0.7},
+  borderColor = {1,1,1,0},
+  
+  DrawControl = DrawButton,
+}
+
+skin.overlay_button_tiny = {
+  TileImageBK = ":cl:tech_button_tiny_bk.png",
+  TileImageFG = ":cl:tech_button_tiny_fg.png",
+  tiles = {12, 12, 12, 12}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+  
+  backgroundColor = {0, 0, 0, 0.7},
+  focusColor  = {0.94, 0.50, 0.23, 0.7},
+  borderColor = {1,1,1,0},
+  
+  DrawControl = DrawButton,
+}
+
+skin.button_square = {
+  TileImageBK = ":cl:tech_button_action_bk.png",
+  TileImageFG = ":cl:tech_button_action_fg.png",
+  tiles = {22, 22, 22, 22}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  backgroundColor = {0, 0, 0, 0.7},
+  focusColor  = {0.94, 0.50, 0.23, 0.4},
+  borderColor = {1,1,1,0},
+
+  DrawControl = DrawButton,
+}
+
 skin.button_tab = {
   -- yes these are reverted, but also a lie (see images), only one is used
   TileImageFG = ":cl:tech_tabbaritem_fg.png",
