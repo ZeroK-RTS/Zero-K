@@ -1031,7 +1031,7 @@ function CreateWindow(oldX, oldY, oldW, oldH)
 		x = oldX or (screenHorizCentre - economyPanelWidth/2),
 		y = oldY or 0,
 		clientWidth  = oldW or economyPanelWidth,
-		clientHeight = oldH or 100,
+		clientHeight = oldH or 110,
 		minHeight = 100,
 		draggable = false,
 		resizable = false,

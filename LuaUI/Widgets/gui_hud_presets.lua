@@ -616,7 +616,7 @@ local function SetupNewUITop()
 	
 	-- Resource Bar
 	local resourceBarWidth = math.max(580, math.min(screenWidth - 700, 660))
-	local resourceBarHeight = 108
+	local resourceBarHeight = 110
 	
 	-- Chicken
 	local chickenWidth = 189
@@ -653,7 +653,7 @@ local function SetupNewUITop()
 		resourceBarX,
 		0,
 		resourceBarWidth,
-		50
+		55
 	)
 	
 	-- Right Side
