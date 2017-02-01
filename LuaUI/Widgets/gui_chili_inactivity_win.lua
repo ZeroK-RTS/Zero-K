@@ -113,9 +113,6 @@ local timeSinceLastUpdate = 0
 local mainWindow
 
 local function GetDesiredWindowActivation()
-	if true then
-		return true
-	end
 	local allyTeamID = Spring.GetMyAllyTeamID()
 	if not allyTeamID then
 		return false
