@@ -495,8 +495,17 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
-
+local sentBug = false
 local function GetFullKey(path, option)
+	if not option.key then
+		if not sentBug then
+			Spring.Echo("Error, option missing key", path, option)
+			Spring.Utilities.TableEcho(option, "option")
+			Spring.Echo("Error, option missing key", path, option)
+			sentBug = true
+		end
+		return "badKey"
+	end
 	--local curkey = path .. '_' .. option.key
 	local fullkey = ('epic_'.. option.wname .. '_' .. option.key)
 	fullkey = fullkey:gsub(' ', '_')

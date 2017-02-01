@@ -35,8 +35,9 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 	local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "some string")
 	private_seed = math.random(13,37) * public_seed
 
+	Spring.Echo("Startboxes public_seed", public_seed)
 	Spring.SetGameRulesParam("public_random_seed", public_seed)
-	startboxConfig = ParseBoxes()
+	startboxConfig = ParseBoxes(public_seed)
 	math.randomseed(private_seed)
 
 	GG.startBoxConfig = startboxConfig
