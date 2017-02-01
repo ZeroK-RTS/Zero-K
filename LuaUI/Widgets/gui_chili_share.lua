@@ -44,7 +44,7 @@ function BringUpShareMenu()
 	end
 end
 
-options_path = 'Settings/Interface/Share Menu' 
+options_path = 'Settings/HUD Panels/Share Menu' 
 --[[ Change path if necessary. I just dumped it here because it made sense.
 Note: remerge is used in case of bugs! Feel free to remove it in a few stables.]]
 options = {

@@ -117,7 +117,7 @@ ShowOptions = {ShowOptions}
 --------------------------------------------------------------------------------
 -- Options
 
-options_path = 'Settings/HUD Panels/Extras/Spectating'
+options_path = 'Settings/HUD Panels/Spectator Panels'
 
 options_order = {
 	'enableSpectator',

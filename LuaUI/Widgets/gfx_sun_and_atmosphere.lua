@@ -109,7 +109,8 @@ local function GetOptions()
 			value = { 0.8, 0.8, 0.8, 1},
 			OnChange = function (self)
 				if initialized then
-					Spring.Echo("ColorFunction", name, self.value)
+					Spring.Echo("ColorFunction")
+					Spring.Utilities.TableEcho(self.value, name)
 					ColorFunction({[name] = self.value})
 				end
 			end,

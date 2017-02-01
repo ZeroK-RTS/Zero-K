@@ -26,7 +26,7 @@ local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Se
 local globalName, globalPath = "Chili Global Commands", "Settings/HUD Panels/Global Commands"
 local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 local specName, specPath = "Chili Spectator Panels", "Settings/HUD Panels/Extras/Spectating"
-local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Docking"
+local dockName, dockPath = "Chili Docking", "Settings/HUD Panels/Extras/Docking"
 
 local function Selections_SetOptions(group, showInfo, square, iconSize, showCommand, showDgun, alwaysShow)
 	local selName, selPath = "Chili Selections & CursorTip", "Settings/HUD Panels/Selected Units Panel"

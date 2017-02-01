@@ -183,7 +183,7 @@ confdata.subMenuIcons = {
 	['Settings/HUD Panels/Replay Controls'] 		= imgPath..'epicmenu/key_play_pause.png',
 	['Settings/HUD Panels/Unit Stats Help Window'] 	= imgPath..'advplayerslist/random.png',
 	['Settings/HUD Panels/Player List'] 			= imgPath..'epicmenu/people.png',
-	['Settings/HUD Panels/Docking'] 				= imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Extras/Docking'] 				= imgPath..'epicmenu/anchor.png',
 	['Settings/HUD Panels/Selected Units Panel'] 	= imgPath..'epicmenu/grid.png',
 }
 

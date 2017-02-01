@@ -33,7 +33,7 @@ local lastHeight = 0
 ----------------------------------------------------
 -- Options
 ----------------------------------------------------
-options_path = 'Settings/HUD Panels/Docking'
+options_path = 'Settings/HUD Panels/Extras/Docking'
 options_order = { 'dockEnabled', 'dockEnabledPanels', 'minimizeEnabled', 'dockThreshold'}
 options = {
 	dockThreshold = {
