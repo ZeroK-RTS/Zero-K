@@ -106,7 +106,7 @@ for i = 0, 64, 8 do
 end
 
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
-local updateFrequency = 3 -- how many frames to update
+local updateFrequency = 15 -- how many frames to update
 local areaSegMaxSize = 200 -- max width and height of terraform squares
 
 local maxWallPoints = 700 -- max points that can makeup a wall
@@ -119,7 +119,7 @@ local maxHeightDifference = 30 -- max difference of height around terraforming, 
 local maxRampGradient = 5
 
 local volumeCost = 0.0128
-local pointExtraAreaCost = 0--.027
+local pointExtraAreaCost = 0 -- 0.027
 local pointExtraAreaCostDepth = 6
 local pointExtraPerimeterCost = 0.1
 local pointExtraPerimeterCostDepth = 6
