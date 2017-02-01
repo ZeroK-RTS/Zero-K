@@ -78,7 +78,7 @@ local function CheckLabs(checkFeatures, onlyUnstick)
 		end
 		
 		local clearUnits = data.unitExpulsionParameters
-		units = spGetUnitsInRectangle(clearUnits[1] - 8, clearUnits[2] - 8, clearUnits[3] + 8, clearUnits[4] + 8)
+		units = spGetUnitsInRectangle(clearUnits[1], clearUnits[2], clearUnits[3], clearUnits[4])
 		for i = 1, #units do
 			local unitID = units[i]
 			local unitDefID = spGetUnitDefID(unitID)
@@ -246,13 +246,13 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 					end
 				end
 				if solidFace == 0 then -- South
-					unitExpulsionParameters[4] = unitExpulsionParameters[2] + (solidFactoryLimit*16 + 0.2)
+					unitExpulsionParameters[4] = unitExpulsionParameters[2] + (solidFactoryLimit*16)
 				elseif solidFace == 1 then -- East
-					unitExpulsionParameters[3] = unitExpulsionParameters[1] + (solidFactoryLimit*16 + 0.2)
+					unitExpulsionParameters[3] = unitExpulsionParameters[1] + (solidFactoryLimit*16)
 				elseif solidFace == 2 then -- North
-					unitExpulsionParameters[2] = unitExpulsionParameters[4] - (solidFactoryLimit*16 + 0.2)
+					unitExpulsionParameters[2] = unitExpulsionParameters[4] - (solidFactoryLimit*16)
 				elseif solidFace == 3 then -- West
-					unitExpulsionParameters[1] = unitExpulsionParameters[3] - (solidFactoryLimit*16 + 0.2)
+					unitExpulsionParameters[1] = unitExpulsionParameters[3] - (solidFactoryLimit*16)
 				end
 			end
 			
