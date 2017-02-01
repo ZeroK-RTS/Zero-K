@@ -51,8 +51,8 @@ function Sound:CreateParticle()
   local pos    = self.pos
 
   if (self.unit) then
-    local losState = GetUnitLosState(self.unit)
-    if not losState then return false end
+    local losState = Spring.GetUnitLosState(self.unit,LocalAllyTeamID) or {}
+    if not(losState and losState.los) then return false end
     pos = {Spring.GetUnitPosition(self.unit)}
   end
 

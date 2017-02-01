@@ -169,7 +169,7 @@ function NanoLasers:ReInitialize()
 end
 
 function NanoLasers:Visible()
-  if (not IsAllyteamAllied(self.allyID)) and(self.visibility == 0) then
+  if (self.allyID ~= LocalAllyTeamID) and (LocalAllyTeamID >= 0) and(self.visibility == 0) then
     return false
   end
 

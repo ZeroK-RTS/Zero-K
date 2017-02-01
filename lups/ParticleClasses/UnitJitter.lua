@@ -269,9 +269,10 @@ function UnitJitter:Visible()
   if (self.enemyHit) then
     local x,y,z = Spring.GetUnitPosition(self.unit)
     if (x==nil) then return false end
-    inLos = select(2, GetPositionLosState(x,y,z))
+    inLos = select(2, Spring.GetPositionLosState(x,y,z, LocalAllyTeamID))
   else
-    inLos = GetUnitLosState(self.unit)
+    local losState = Spring.GetUnitLosState(self.unit, LocalAllyTeamID) or {}
+    inLos = (inLos)and(not losState.los)
   end
   return (inLos)and(Spring.IsUnitVisible(self.unit))
 end
