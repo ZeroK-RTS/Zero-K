@@ -486,9 +486,9 @@ options = {
 		path = minimap_path,
 		items = {
 			{key = 'panel', name = 'None'},
-			{key = 'panel_1100', name = 'Bottom Left',},
+			{key = 'panel_1100_large', name = 'Bottom Left',},
 			{key = 'panel_2100', name = 'Bottom Left Flush',},
-			{key = 'panel_0110', name = 'Bottom Right'},
+			{key = 'panel_0110_large', name = 'Bottom Right'},
 			{key = 'panel_0120', name = 'Bottom Right Flush'},
 			{key = 'panel_1001', name = 'Top Left',},
 		},

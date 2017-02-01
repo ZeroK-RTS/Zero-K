@@ -339,18 +339,10 @@ local fancySmallBase = {
 
 local fancyPanels = {
 	{"0100", {30, 8, 30, 1}, {0, 4, 0, 0}},
-	{"0110", {156, 36, 1, 1}, {11, 7, 0, 0}},
-	{"1100", {1, 36, 156, 1}, {0, 7, 11, 0}},
-	"0011",
-	"1120",
-	"2100",
-	{"0120", {185, 36, 236, 1}, {6, 12, 0, 0}},
-	{"2100", {236, 36, 185, 1}, {0, 12, 6, 0}},
-	"0001",
-	"0021",
-	"2001",
-	"2021",
-	"2120",
+	{"0110", {156, 36, 1, 1}, {0, 10, 0, 0}},
+	{"1100", {1, 36, 156, 1}, {0, 10, 0, 0}},
+	{"0120", {212, 36, 212, 1}, {6, 16, 0, 0}},
+	{"2100", {212, 36, 212, 1}, {0, 16, 6, 0}},
 	{"1011", {172, 1, 172, 37}, {8, 0, 8, 4}},
 	{"2011", {172, 1, 8, 37}, {4, 0, 8, 4}},
 	{"1021", {8, 1, 172, 37}, {8, 0, 4, 4}},
@@ -361,24 +353,35 @@ local fancyPanelsSmall = {
 	{"1001_small", {102, 1, 175, 10}, {0, 0, 12, 6}},
 	{"0110_small", {58, 36, 1, 1}, {12, 4, 0, 0}},
 	{"1100_small", {1, 36, 58, 1}, {0, 4, 12, 0}},
-	{"0120_small", {80, 36, 195, 1}, {6, 12, 0, 0}},
-	{"2100_small", {195, 36, 80, 1}, {0, 12, 6, 0}},
+	{"0120_small", {80, 36, 195, 1}, {0, 10, 0, 0}},
+	{"2100_small", {195, 36, 80, 1}, {0, 10, 0, 0}},
 	{"0001_small", {92, 1, 92, 10}, {0, 0, 0, 6}},
 }
 
-for i = 1, #fancyPanels do
-	if type(fancyPanels[i]) == "string" then
-		local name = "panel_" .. fancyPanels[i]
-		skin[name] = Spring.Utilities.CopyTable(fancyBase)
-		skin[name].TileImageBK = ":cl:" .. name .. ".png"
-	else
-		local name = "panel_" .. fancyPanels[i][1]
-		skin[name] = Spring.Utilities.CopyTable(fancyBase)
-		skin[name].tiles = fancyPanels[i][2]
-		skin[name].padding = fancyPanels[i][3]
-		skin[name].TileImageBK = ":cl:" .. name .. ".png"
+local fancyPanelsLarge = {
+	{"0110_large", {156, 36, 1, 1}, {11, 7, 0, 0}},
+	{"1100_large", {1, 36, 156, 1}, {0, 7, 11, 0}},
+}
+
+local function LoadPanels(panelList)
+	for i = 1, #panelList do
+		if type(fancyPanels[i]) == "string" then
+			local name = "panel_" .. panelList[i]
+			skin[name] = Spring.Utilities.CopyTable(fancyBase)
+			skin[name].TileImageBK = ":cl:" .. name .. ".png"
+		else
+			local name = "panel_" .. panelList[i][1]
+			skin[name] = Spring.Utilities.CopyTable(fancyBase)
+			skin[name].tiles = panelList[i][2]
+			skin[name].padding = panelList[i][3]
+			skin[name].TileImageBK = ":cl:" .. name .. ".png"
+		end
 	end
 end
+
+LoadPanels(fancyPanels)
+LoadPanels(fancyPanelsSmall)
+LoadPanels(fancyPanelsLarge)
 
 for i = 1, #fancyPanelsSmall do
 	if type(fancyPanelsSmall[i]) == "string" then
