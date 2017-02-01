@@ -88,24 +88,26 @@ unitDef = {
       areaOfEffect            = 160,
 	  avoidFeature            = false,
 	  avoidGround             = false,
+	  craterAreaOfEffect      = 240,
       craterBoost             = 0,
-      craterMult              = 0,
+      craterMult              = 0.1,
 	  
 	  customParams            = {
-	    gatherradius     = [[192]],
-	    smoothradius     = [[96]],
-		smoothmult       = [[0.25]],
+	    gatherradius     = [[240]],
+	    smoothradius     = [[120]],
+		smoothmult       = [[0.4]],
 		lups_noshockwave = [[1]],
 		
         light_ground_height = 200,
 	  },
 	  
       damage                  = {
-        default = 135,
-        planes  = 135,
+        default = 145,
+        planes  = 145,
         subs    = 7,
       },
 	  
+	  edgeEffectiveness       = 0.5,
       explosionGenerator      = [[custom:tremor]],
       impulseBoost            = 0,
       impulseFactor           = 0.4,
