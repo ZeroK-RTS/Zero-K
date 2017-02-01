@@ -138,13 +138,16 @@ options_order = {
 	'fancySkinning',
 }
  
+local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 options = {
 	enableSpectator = {
 		name  = "Enable as Spectator",
 		type  = "bool", 
 		value = false, 
-		OnChange = function(self) option_CheckEnable(self) end, 
-		noHotkey = true,
+		OnChange = function(self)
+			option_CheckEnable(self)
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", self.value)
+		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
 	clanNameLengthCutoff = {
