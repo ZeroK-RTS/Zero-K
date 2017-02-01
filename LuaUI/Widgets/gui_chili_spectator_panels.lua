@@ -921,9 +921,9 @@ local function GetOpposingAllyTeams()
 				end
 			end
 
-			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
-			if string.len(name) > options.clanNameLengthCutoff.value then
-				name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID)
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) or "Unknown"
+			if name and string.len(name) > options.clanNameLengthCutoff.value then
+				name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) or name
 			end
 
 			returnData[#returnData + 1] = {
