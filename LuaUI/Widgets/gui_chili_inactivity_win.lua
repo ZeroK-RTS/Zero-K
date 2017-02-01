@@ -80,15 +80,15 @@ local function SetupWindow()
 		autosize = false;
 		align  = "center";
 		valign = "top";
-		text   = "Connection problems detected for opposition \n\n       Wait  or  Win";
+		text   = "Connection problems detected for opposition \n\n       Wait  or";
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 	}
 	
 	local button_win = Button:New {
 		y = "55%",
 		bottom = "24%",
-		x = "52%",
-		right = "29%",
+		x = "51%",
+		right = "30%",
 		parent = panel_main;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
@@ -113,6 +113,9 @@ local timeSinceLastUpdate = 0
 local mainWindow
 
 local function GetDesiredWindowActivation()
+	if true then
+		return true
+	end
 	local allyTeamID = Spring.GetMyAllyTeamID()
 	if not allyTeamID then
 		return false
