@@ -100,7 +100,7 @@ function UpdateNanoParticles(self)
 
 
   --// UPDATE LOS
-  local allied = (self.allyID==LocalAllyTeamID)or(LocalAllyTeamID==Script.ALL_ACCESS_TEAM)
+  local allied = IsAllyteamAllied(self.allyID)
   local lastup_los = self._lastupdate_los or (thisGameFrame - 16)
   if
     (not self._lastupdate_los) or
@@ -122,8 +122,8 @@ function UpdateNanoParticles(self)
       self.visibility = 1
     else
       self.visibility = 0
-      local _,startLos = Spring.GetPositionLosState(startPos[1],startPos[2],startPos[3], LocalAllyTeamID)
-      local _,endLos   = Spring.GetPositionLosState(  endPos[1],  endPos[2],  endPos[3], LocalAllyTeamID)
+      local _,startLos = GetPositionLosState(startPos[1],startPos[2],startPos[3])
+      local _,endLos   = GetPositionLosState(  endPos[1],  endPos[2],  endPos[3])
 
       if (not startLos)and(not endLos) then
         self.visibility = 0
@@ -134,7 +134,7 @@ function UpdateNanoParticles(self)
         local losRayTile = math.ceil(Vlength(dir)/Game.squareSize)
         for i=losRayTile,0,-1 do
           local losPos = Vadd(self.pos,Vmul(dir,i/losRayTile))
-          local _,los = Spring.GetPositionLosState(losPos[1],losPos[2],losPos[3], LocalAllyTeamID)
+          local _,los = GetPositionLosState(losPos[1],losPos[2],losPos[3])
           if (los) then self.visibility = i/losRayTile; break end
         end
         endPos = Vadd(endPos,Vmul(dir,self.visibility-1))
@@ -144,7 +144,7 @@ function UpdateNanoParticles(self)
         local losRayTile = math.ceil(Vlength(dir)/Game.squareSize)
         for i=0,losRayTile do
           local losPos = Vadd(self.pos,Vmul(dir,i/losRayTile))
-          local _,los  = Spring.GetPositionLosState(losPos[1],losPos[2],losPos[3], LocalAllyTeamID)
+          local _,los  = GetPositionLosState(losPos[1],losPos[2],losPos[3])
           if (los) then self.visibility = -i/losRayTile; break end
         end
         startPos = Vadd(startPos,Vmul(dir,-self.visibility))

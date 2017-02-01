@@ -323,7 +323,7 @@ function NanoParticles:Update(n)
 end
 
 function NanoParticles:Visible()
-  if (self.allyID ~= LocalAllyTeamID)and(self.visibility == 0) then
+  if not IsAllyteamAllied(self.allyID) and(self.visibility == 0) then
     return false
   end
 

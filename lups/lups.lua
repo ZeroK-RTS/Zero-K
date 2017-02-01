@@ -663,19 +663,27 @@ local DrawScreenEffectsVisibleFx
 local DrawInMiniMapVisibleFx
 
 function IsPosInLos(x,y,z)
-	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and Spring.IsPosInLos(x,y,z, LocalAllyTeamID))
+	return Spring.IsPosInLos(x,y,z, LocalAllyTeamID)
 end
 
 function IsPosInRadar(x,y,z)
-	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and Spring.IsPosInRadar(x,y,z, LocalAllyTeamID))
+	return Spring.IsPosInRadar(x,y,z,LocalAllyTeamID)
 end
 
 function IsPosInAirLos(x,y,z)
-	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and Spring.IsPosInAirLos(x,y,z, LocalAllyTeamID))
+	return Spring.IsPosInAirLos(x,y,z,LocalAllyTeamID)
 end
 
 function GetUnitLosState(unitID)
-	return LocalAllyTeamID == Script.ALL_ACCESS_TEAM or (LocalAllyTeamID ~= Script.NO_ACCESS_TEAM and (Spring.GetUnitLosState(unitID, LocalAllyTeamID) or {}).los) or false
+	return (Spring.GetUnitLosState(unitID,LocalAllyTeamID) or {}).los
+end
+
+function IsAllyteamAllied(allyTeamID)
+	return not LocalAllyTeamID or LocalAllyTeamID == allyTeamID
+end
+
+function GetPositionLosState(x, y, z)
+	return Spring.GetPositionLosState(x, y, z, LocalAllyTeamID)
 end
 
 local function IsUnitFXVisible(fx)
@@ -825,10 +833,10 @@ local function GameFrame(_,n)
 
   --// update team/player status
   local spec, specFullView = spGetSpectatingState()
-  if (specFullView) then
-    LocalAllyTeamID = scGetReadAllyTeam() or 0
+  if (not specFullView and scGetReadAllyTeam() == Script.ALL_ACCESS_TEAM) then -- player + unsynced gadget
+    LocalAllyTeamID = spGetLocalAllyTeamID()
   else
-    LocalAllyTeamID = spGetLocalAllyTeamID() or 0
+    LocalAllyTeamID = nil -- uses default when passed to functions
   end
   --// create delayed FXs
   if (effectsInDelay[1]) then
