@@ -82,8 +82,15 @@ local Grid = 16 -- grid size, do not change without other changes.
 -- Epic Menu
 ---------------------------------
 options_path = 'Settings/Interface/Building Placement'
-options_order = { 'staticMouseTime'}
+options_order = {'holdMouseForStructureTerraform', 'staticMouseTime'}
 options = {
+	holdMouseForStructureTerraform = {
+		name = "Hold Mouse To Terraform Structures",
+		type = "bool",
+		value = false,
+		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
+		noHotkey = true,
+	},
 	staticMouseTime = {
 		name = "Structure Terraform Press Time",
 		type = "number",
@@ -1304,7 +1311,7 @@ function widget:Update(dt)
 		else
 			pos = select(2, spTraceScreenRay(mx, my, true, false, false, true))
 		end
-		if pos and legalPos(pos) then
+		if pos and legalPos(pos) and options.holdMouseForStructureTerraform.value then
 			if buildingPress then
 				if pos[1] ~= buildingPress.pos[1] or pos[3] ~= buildingPress.pos[3] then
 					local a,c,m,s = spGetModKeyState()
