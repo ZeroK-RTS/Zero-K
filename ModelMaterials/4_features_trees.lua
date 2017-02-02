@@ -117,7 +117,7 @@ for id, featureDef in pairs(FeatureDefs) do
 			((not stubData.prefix) or featureDef.name:find(stubData.str) == 1) then
 			--if featureDef.customParam.normaltex then
 			if featureDef.model.textures and featureDef.model.textures.tex1 then
-				Spring.Echo('Feature',featureDef.name,'seems like a nice tree, assigning the default normal texture to it.')
+				-- Spring.Echo('Feature',featureDef.name,'seems like a nice tree, assigning the default normal texture to it.')
 				if featureDef.name:find('btree') == 1 then --beherith's old trees suffer if they get shitty normals
 					featureMaterials[id] = {"feature_tree", NORMALTEX = "unittextures/blank_normal.tga"}
 				else
