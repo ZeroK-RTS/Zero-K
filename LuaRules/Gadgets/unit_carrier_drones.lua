@@ -227,7 +227,7 @@ end
 local coroutines = {}
 local coroutineCount = 0
 local coroutine = coroutine
-local Sleep	    = coroutine.yield
+local Sleep     = coroutine.yield
 local assert    = assert
 local function StartScript(fn)
 	local co = coroutine.create(fn)
@@ -237,8 +237,8 @@ end
 
 function UpdateCoroutines() 
 	coroutineCount = #coroutines
-	local i=1
-	while (i<=coroutineCount) do
+	local i = 1
+	while (i <= coroutineCount) do
 		local co = coroutines[i] 
 		if (coroutine.status(co) ~= "dead") then 
 			assert(coroutine.resume(co))
@@ -246,7 +246,7 @@ function UpdateCoroutines()
 		else
 			coroutines[i] = coroutines[coroutineCount]
 			coroutines[coroutineCount] = nil
-			coroutineCount = coroutineCount -1
+			coroutineCount = coroutineCount - 1
 		end
 	end 
 end
