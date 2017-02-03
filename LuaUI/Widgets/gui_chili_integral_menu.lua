@@ -73,6 +73,7 @@ local statePanel = {}
 local tabPanel
 local selectionIndex = 0
 local background
+local returnToOrdersCommand = false
 
 local buildTabHolder, buttonsHolder -- Required for padding update setting
 --------------------------------------------------------------------------------
@@ -108,8 +109,8 @@ options = {
 		noHotkey = true,
 	},
 	selectionClosesTab = {
-		name = 'Selection Closes Tab',
-		tooltip = "When enabled, selecting a build option will switch the tab back to Orders (except for build options in the factory queue tab).",
+		name = 'Construction Closes Tab',
+		tooltip = "When enabled, issuing or cancelling a construction command will switch back to the Orders tab (except for build options in the factory queue tab).",
 		type = 'bool',
 		value = true,
 		noHotkey = true,
@@ -238,6 +239,39 @@ local function UpdateButtonSelection(cmdID)
 		end
 		lastCmdID = cmdID
 	end
+end
+
+local gridKeysEnabled = true
+local function SetGridHotkeysEnabled(newEnabled)
+	if newEnabled == gridKeysEnabled then
+		return
+	end
+	gridKeysEnabled = newEnabled
+	
+	if gridKeysEnabled then
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
+				data.buttons.ApplyGridHotkeys()
+			end
+		end
+	else
+		for i = 1, #commandPanels do
+			local data = commandPanels[i]
+			if data.gridHotkeys and ((not data.disableableKeys) or options.unitsHotkeys2.value) then
+				data.buttons.RemoveGridHotkeys()
+			end
+		end
+	end
+end
+
+local function UpdateReturnToOrders(cmdID)
+	if returnToOrdersCommand and returnToOrdersCommand ~= cmdID then
+		commandPanelMap.orders.tabButton.DoClick()
+		returnToOrdersCommand = false
+	end
+	
+	SetGridHotkeysEnabled(not returnToOrdersCommand)
 end
 
 local function GenerateGridKeyMap(name)
@@ -544,7 +578,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, x, usingGrid)
 		if sucess and onClick then
 			-- Don't do the onClick if the command was not eaten by the menu.
-			onClick()
+			onClick(cmdID)
 		end
 		return sucess
 	end
@@ -747,7 +781,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		hotkeyText = '\255\0\255\0' .. key
 		SetText(textConfig.topLeft.name, hotkeyText)
 	end
-
+	
 	function externalFunctionsAndData.ClearGridHotkey()
 		SetText(textConfig.topLeft.name)
 	end
@@ -919,6 +953,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 	local height = tostring(100/rows) .. "%"
 	
 	local gridMap
+	local gridEnabled = true
 	
 	local externalFunctions = {}
 	
@@ -963,7 +998,7 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 		newButton = GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height, buttonLayout, isStructure, onClick)
 		
 		buttonList[#buttonList + 1] = newButton
-		if gridMap then
+		if gridMap and gridEnabled then
 			newButton.UpdateGridHotkey(gridMap)
 		end
 		
@@ -985,14 +1020,15 @@ local function GetButtonPanel(parent, rows, columns, vertical, generalButtonLayo
 	end
 	
 	function externalFunctions.ApplyGridHotkeys(newGridMap)
-		gridMap = newGridMap
+		gridMap = newGridMap or gridMap
+		gridEnabled = true
 		for i = 1, #buttonList do
 			buttonList[i].UpdateGridHotkey(gridMap)
 		end
 	end
 	
 	function externalFunctions.RemoveGridHotkeys()
-		gridMap = nil
+		gridEnabled = false
 		for i = 1, #buttonList do
 			buttonList[i].RemoveGridHotkey()
 		end
@@ -1487,9 +1523,9 @@ local function InitializeControls()
 	
 	buildTabHolder:SendToBack() -- behind background
 	
-	local function ReturnToOrders()
-		if options.selectionClosesTab.value then
-			commandPanelMap.orders.tabButton.DoClick()
+	local function ReturnToOrders(cmdID)
+		if options.selectionClosesTab.value and cmdID then
+			returnToOrdersCommand = cmdID
 		end
 	end
 	
@@ -1699,11 +1735,15 @@ local initialized = false
 function widget:Update()
 	local _,cmdID = Spring.GetActiveCommand()
 	UpdateButtonSelection(cmdID)
+	UpdateReturnToOrders(cmdID)
 end
 
 function widget:KeyPress(key, modifier, isRepeat)
-
 	if isRepeat then
+		return false
+	end
+	
+	if returnToOrdersCommand then
 		return false
 	end
 	
