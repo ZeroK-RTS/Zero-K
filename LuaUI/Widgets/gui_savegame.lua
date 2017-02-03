@@ -180,7 +180,7 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local function SaveGame(filename, description)
+local function SaveGame(filename, description, requireOverwrite)
 	local success, err = pcall(
 		function()
 			Spring.CreateDir(SAVE_DIR)
@@ -198,7 +198,11 @@ local function SaveGame(filename, description)
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())
 			table.save(saveData, path)
 			
-			Spring.SendCommands("luasave " .. filename .. " -y")
+			if requireOverwrite then
+				Spring.SendCommands("luasave " .. filename .. " -y")
+			else
+				Spring.SendCommands("luasave " .. filename)
+			end
 			Spring.Log(widget:GetInfo().name, LOG.INFO, "Saved game to " .. path)
 			
 			DisposeWindow()
@@ -267,7 +271,7 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 	
 	local yesFunc = function()
 			if (saveMode) then
-				SaveGame(filename, description)
+				SaveGame(filename, description, true)
 				-- TODO refresh UI
 			else
 				LoadGameByFilename(filename)
@@ -295,6 +299,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 		name = "save_" .. saveFile.filename,
 		height = SAVEGAME_BUTTON_HEIGHT,
 		width = "100%",
+		y = (position - 1)*SAVEGAME_BUTTON_HEIGHT + 4,
 		x = 0,
 		parent = parent,
 	}
@@ -371,20 +376,8 @@ end
 --------------------------------------------------------------------------------
 
 local function GetSavesList(parent, saveMode)
-	local saveStack = StackPanel:New {
-		name = 'zk_saveUI_saveStack',
-		parent = parent,
-		orientation = "vertical",
-		x = 0,
-		width = "100%",
-		y = 0,
-		autosize = true,
-		resizeItems = false,
-		autoArrangeV = false,
-	}
-	
 	local saves = GetSaves()
-	FillSaveStackWithSaves(saveStack, saves, saveMode)
+	FillSaveStackWithSaves(parent, saves, saveMode)
 end
 
 local function CreateWindow(saveMode)
