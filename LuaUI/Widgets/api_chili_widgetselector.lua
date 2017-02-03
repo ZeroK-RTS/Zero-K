@@ -315,7 +315,7 @@ MakeWidgetList = function()
 		
 		children = {
 			ScrollPanel:New{
-				x=1,
+				x=5,
 				y=15,
 				right=5, 
 				bottom = C_HEIGHT*2,
@@ -336,16 +336,17 @@ MakeWidgetList = function()
 			
 			
 			--Categorization checkbox
-			Checkbox:New{ 
+			Checkbox:New{
 				caption = 'Categorize', 
 				tooltip = 'List widgets by category',
 				OnClick = { function() widget_categorize = not widget_categorize end, KillWidgetList, MakeWidgetList }, 
 				textColor=color.sub_fg, 
 				checked = widget_categorize,
 				
+				x = 5,
 				width = '30%',
 				height= C_HEIGHT,
-				bottom=1,
+				bottom=4,
 			},
 			
 			--Search button
@@ -357,7 +358,7 @@ MakeWidgetList = function()
 				--classname = "navigation_button",
 				
 				x = '33%',
-				bottom=1,
+				bottom=4,
 				width='30%',
 				height=B_HEIGHT,
 			},
@@ -371,7 +372,7 @@ MakeWidgetList = function()
 				--classname = "navigation_button",
 				
 				x = '66%',
-				bottom=1,
+				bottom=4,
 				width='30%',
 				height=B_HEIGHT,
 			},
