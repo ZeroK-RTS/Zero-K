@@ -516,7 +516,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	local data = {}
 	
 	--// Panel configuration
-	local incomeX      = "3%"
+	local incomeX      = "1%"
 	local incomeY      = "10%"
 	local incomeWidth  = "24%"
 	local incomeHeight = "70%"
@@ -532,7 +532,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	local barRight  = "4%"
 	local barHeight = "36%"
 	
-	data.mainPanel = Chili.Panel:New{
+	data.mainPanel = Chili.Control:New{
 		parent = parentPanel,
 		x      = left,
 		width  = width,
@@ -640,15 +640,13 @@ local function CreateResourceWindow(allyTeamDataNumber, x, width)
 	
 	data.window = Chili.Window:New{
 		parent = screen0,
-		backgroundColor = {0, 0, 0, 0},
-		color = {0, 0, 0, 0},
 		dockable = true,
-		name = "SpectatorEconomyPanel" .. allyTeamDataNumber,
-		padding = {0,0,0,0},
+		name = "SpectatorEconomyPanel_vz_" .. allyTeamDataNumber,
 		x = x,
-		y = 0,
-		clientWidth  = width,
-		clientHeight = 50,
+		y = 58,
+		width  = width,
+		height = 62,
+		classname = "main_window_small_very_flat",
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -658,8 +656,7 @@ local function CreateResourceWindow(allyTeamDataNumber, x, width)
 		tooltip = "Economy for " .. allyTeamData[allyTeamDataNumber].name,
 	}
 	
-	data.mainPanel = Chili.Panel:New{
-		backgroundColor = {0, 0, 0, 0},
+	data.mainPanel = Chili.Control:New{
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -694,12 +691,12 @@ local function AddEconomyWindows()
 		
 		local screenWidth,screenHeight = Spring.GetWindowGeometry()
 		local screenHorizCentre = screenWidth / 2
-		local playerWindowWidth = 500
-		local econWidth = 460
+		local spacing = 360
+		local econWidth = 480
 		
 		economyWindowData = {
-			[1] = CreateResourceWindow(1, screenHorizCentre - playerWindowWidth/2 - econWidth, econWidth),
-			[2] = CreateResourceWindow(2, screenHorizCentre + playerWindowWidth/2, econWidth),
+			[1] = CreateResourceWindow(1, screenHorizCentre - spacing/2 - econWidth, econWidth),
+			[2] = CreateResourceWindow(2, screenHorizCentre + spacing/2, econWidth),
 		}
 	end
 	enabledEconomy = true

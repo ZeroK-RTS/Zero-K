@@ -681,13 +681,14 @@ local function MakeFlags()
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small_tall",
 		maxWidth = 200,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		children = {
 			ScrollPanel:New{
-				x=0,y=15,
-				right=5,bottom=0+B_HEIGHT,
+				x=5,y=15,
+				right=5,bottom=3+B_HEIGHT,
 				
 				children = {
 					Grid:New{
@@ -700,7 +701,7 @@ local function MakeFlags()
 				}
 			},
 			--close button
-			Button:New{ caption = 'Close',  x=10, y=0-B_HEIGHT, bottom=5, right=5,
+			Button:New{ caption = 'Close',  x=5, y=0-B_HEIGHT, bottom=5, right=5,
 				name = 'makeFlagCloseButton';
 				OnClick = { function(self) window_flags:Dispose(); window_flags = nil; end },  
 				width=window_width-20, 
@@ -722,13 +723,14 @@ local function MakeHelp(caption, text)
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small",
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		children = {
 			ScrollPanel:New{
-				x=0,y=15,
+				x=5,y=15,
 				right=5,
-				bottom=B_HEIGHT,
+				bottom=B_HEIGHT + 3,
 				height = window_height - B_HEIGHT*3 ,
 				children = {
 					TextBox:New{ x=0,y=10, text = text, textColor = color.sub_fg, width  = window_width - 40, }
@@ -737,7 +739,7 @@ local function MakeHelp(caption, text)
 			--Close button
 			Button:New{ 
 				caption = 'Close', OnClick = { function(self) self.parent:Dispose() end }, 
-				x=10, bottom=1, right=50, height=B_HEIGHT,
+				x=45, bottom=1, right=45, height=B_HEIGHT,
 				name = 'makeHelpCloseButton';
 				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, 
 				--classname = "navigation_button",
@@ -1392,6 +1394,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 		caption = 'Set a HotKey',
 		x = (scrW-window_width)/2,  
 		y = (scrH-window_height)/2,  
+		classname = "main_window_small_flat",
 		clientWidth  = window_width,
 		clientHeight = window_height,
 		parent = screen0,
@@ -1399,8 +1402,8 @@ local function MakeKeybindWindow( path, option, hotkey )
 		resizable=false,
 		draggable=false,
 		children = {
-			Label:New{ y=10, caption = 'Press a key combo', textColor = color.sub_fg, },
-			Label:New{ y=30, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg, },
+			Label:New{x = 8, y=20, caption = 'Press a key combo', textColor = color.sub_fg, },
+			Label:New{x = 8, y=38, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg, },
 		}
 	}
 end
@@ -1896,9 +1899,9 @@ MakeSubWindow = function(path, pause)
 	local window_children = {}
 	window_children[#window_children+1] =
 		ScrollPanel:New{
-			x=0,y=15,
-			bottom=B_HEIGHT+20,
-			width = '100%',
+			x=5,y=15,
+			bottom=B_HEIGHT+26,
+			right = 5,
 			children = {
 				StackPanel:New{
 					x=0,
@@ -1921,8 +1924,8 @@ MakeSubWindow = function(path, pause)
 	window_height = window_height + B_HEIGHT
 	
 	local buttonBar = Grid:New{
-		x=0;bottom=0;
-		right=10,height=B_HEIGHT,
+		x=5;bottom=5;
+		right=5,height=B_HEIGHT,
 		columns = 4,
 		padding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0}, --{1, 1, 1, 1},
@@ -1935,7 +1938,7 @@ MakeSubWindow = function(path, pause)
 		--x=0,
 		width=180;
 		right = 5,
-		bottom=B_HEIGHT;
+		bottom=B_HEIGHT + 5;
 		
 		caption = 'Show Advanced Settings', 
 		checked = settings.showAdvanced, 
@@ -2012,6 +2015,7 @@ MakeSubWindow = function(path, pause)
 		x = settings.sub_pos_x,  
 		y = math.floor(settings.sub_pos_y), 
 		clientWidth = window_width,
+		classname = "main_window_tall",
 		--clientHeight = window_height+B_HEIGHT*4,
 		height = math.floor(settings.subwindow_height),
 		minWidth = 250,
@@ -2093,6 +2097,7 @@ local function MakeExitConfirmWindow(text, action)
 		parent = screen0,
 		x = math.floor(screen_width/2 - menu_width/2),  
 		y = math.floor(screen_height/2 - menu_height/2),  
+		classname = "main_window_small_flat",
 		dockable = false,
 		clientWidth = menu_width,
 		clientHeight = menu_height,

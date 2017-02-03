@@ -67,6 +67,7 @@ function widget:Initialize()
 		y = 3*vsy/4-20,
 		width  = 200,
 		padding = {5, 0, 5,5},
+		classname = "main_window_small_tall",
 		textColor = {1,1,1,0.55}, 
 		height = math.min(112,vsy/2),
 		parent = Chili.Screen0,

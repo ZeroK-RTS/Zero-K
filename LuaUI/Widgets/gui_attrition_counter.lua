@@ -397,6 +397,7 @@ function CreateWindow()
 		parent = Chili.Screen0,
 		dockable = true,
 		name = "AttritionCounter",
+		classname = "main_window_small_flat",
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		right = 0,

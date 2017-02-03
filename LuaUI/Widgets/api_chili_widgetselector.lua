@@ -306,6 +306,7 @@ MakeWidgetList = function()
 		y = window_y,
 		clientWidth  = window_w,
 		clientHeight = window_h,
+		classname = "main_window_small_tall",
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		caption = 'Widget List' .. hotkey,

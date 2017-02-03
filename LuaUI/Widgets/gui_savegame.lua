@@ -396,6 +396,7 @@ local function CreateWindow(saveMode)
 		y = "20%",
 		width = 640,
 		height = "60%",
+		classname = "main_window_small",
 		backgroundColor = {0, 0, 0, 0},
 		caption = saveMode and "Save Game" or "Load Game",
 		resizable = false,

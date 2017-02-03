@@ -141,19 +141,17 @@ function CreateTheUI()
 	
 	window = Window:New{
 		--parent = screen0,
-		name   = 'replaycontroller2';
-		width = 300;
-		height = 85;
+		name   = 'replaycontroller3';
+		width = 310;
+		height = 86;
 		right = 10; 
 		y = windowY;
+		classname = "main_window_small_flat",
 		dockable = false;
 		draggable = true,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		minWidth = MIN_WIDTH, 
-		minHeight = MIN_HEIGHT,
-		padding = {0, 0, 0, 0},
 		--informational tag:
 		currSpeed = currSpeed, 
 		lastClick = Spring.GetTimer(),
@@ -206,8 +204,8 @@ function CreateTheUI()
 		local button = Button:New {
 			width = 40,
 			height = 20,
-			y = 36,
-			x = 10+(i-1)*40,
+			y = 28,
+			x = 5+(i-1)*40,
 			classname = "button_tiny",
 			parent=window;
 			padding = {0, 0, 0,0},
@@ -246,8 +244,8 @@ function CreateTheUI()
 		button_skipPreGame = Button:New {
 			width = 180,
 			height = 20,
-			y = 58,
-			x = 100,
+			y = 50,
+			x = 95,
 			classname = "button_tiny",
 			parent=window;
 			padding = {0, 0, 0,0},
@@ -267,8 +265,8 @@ function CreateTheUI()
 	label_hoverTime = Label:New {
 		width = 20,
 		height = 15,
-		y = 58,
-		x = 133,
+		y = 54,
+		x = 125,
 		parent=window;
 		caption=" ",
 	}
@@ -276,8 +274,8 @@ function CreateTheUI()
 	button_startStop = Button:New {
 		width = 80,
 		height = 20,
-		y = 58,
-		x = 10,
+		y = 50,
+		x = 5,
 			classname = "button_tiny",
 		parent=window;
 		padding = {0, 0, 0,0},
@@ -295,9 +293,9 @@ function CreateTheUI()
 	
 	progress_target = Progressbar:New{
 			parent = window,
-			y =  8,
-			x		= 10,
-			width   = 280,
+			y =  5,
+			x		= 5,
+			right = 5,
 			height	= 20, 
 			max     = 1;
 			color   = {0.75,0.75,0.75,0.5} ;
@@ -308,9 +306,9 @@ function CreateTheUI()
 	local replayLen = (replayLen and replayLen* 30) or 100-- in frame
 	progress_speed = Progressbar:New{
 			parent = window,
-			y =  8,
-			x		= 10,
-			width   = 280,
+			y =  5,
+			x		= 5,
+			right = 5,
 			height	= 20, 
 			max     = replayLen;
 			caption = showProgress and (frame/replayLen*100 .. "%") or " ",

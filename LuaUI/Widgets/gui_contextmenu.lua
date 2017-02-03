@@ -1601,6 +1601,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg, 
+		classname = "main_window_small",
 		
 		minWidth = 250,
 		minHeight = 300,
@@ -1799,6 +1800,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		y = y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small",
 		resizable = false,
 		parent = screen0,
 		backgroundColor = color.context_bg, 

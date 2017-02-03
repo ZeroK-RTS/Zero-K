@@ -293,6 +293,7 @@ local function AnimWindow(unitID)
 		width='20%',
 		minHeight=300,
 		minWidth=200,
+		classname = "main_window_small",
 		--height = '30%',
 		resizable = true,
 		parent = screen0,

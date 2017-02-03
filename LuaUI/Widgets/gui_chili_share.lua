@@ -330,7 +330,9 @@ end
 
 local function Buildme()
 	--Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
-	window = chili.Window:New{parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
+	window = chili.Window:New{ -- Just awful whitespace....
+		classname = "main_window",
+		parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='25%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
 	local playerlistsize = 91

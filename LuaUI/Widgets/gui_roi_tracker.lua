@@ -94,6 +94,7 @@ function CreateWindow()
 		minWidth = 320,
 		clientHeight = 100,
 		minHeight = 50,
+		classname = "main_window_small",
 		draggable = true,
 		resizable = true,
 		tweakDraggable = true,
