@@ -271,7 +271,12 @@ local function UpdateReturnToOrders(cmdID)
 		returnToOrdersCommand = false
 	end
 	
-	SetGridHotkeysEnabled(not returnToOrdersCommand)
+	if (not returnToOrdersCommand) and options.ctrlDisableGrid.value then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		SetGridHotkeysEnabled(not ctrl)
+	else
+		SetGridHotkeysEnabled(not returnToOrdersCommand)
+	end
 end
 
 local function GenerateGridKeyMap(name)
@@ -514,17 +519,14 @@ local function QueueClickFunc(mouse, right, alt, ctrl, meta, shift, queueCmdID, 
 	return true
 end
 
-local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, queueBlock, useGrid)
+local function ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, queueBlock)
 	local left, right = mouse == 1, mouse == 3
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if factoryUnitID and isQueueButton then
 		QueueClickFunc(mouse, right, alt, ctrl, meta, shift, cmdID, factoryUnitID, queueBlock)
 		return true
 	end
-	
-	if useGrid and ctrl and (not mouse) and options.ctrlDisableGrid.value then
-		return false
-	end
+
 	
 	if alt and factoryUnitID and options.altInsertBehind.value then
 		local state = Spring.GetUnitStates(factoryUnitID)
@@ -575,7 +577,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		if isDisabled then
 			return false
 		end
-		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, x, usingGrid)
+		local sucess = ClickFunc(mouse, cmdID, isStructure, factoryUnitID, isQueueButton, x)
 		if sucess and onClick then
 			-- Don't do the onClick if the command was not eaten by the menu.
 			onClick(cmdID)
@@ -1743,7 +1745,7 @@ function widget:KeyPress(key, modifier, isRepeat)
 		return false
 	end
 	
-	if returnToOrdersCommand then
+	if returnToOrdersCommand or (modifier.ctrl and options.ctrlDisableGrid.value) then
 		return false
 	end
 	
