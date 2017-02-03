@@ -23,7 +23,21 @@ local function IsGround(ud)
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'inheritcontrol', 'presetlabel', 'resetMoveStates', 'holdPosition', 'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
+options_order = {
+	'inheritcontrol', 'presetlabel', 
+	'resetMoveStates', 'holdPosition', 
+	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 
+	'enableTacticalAI', 'disableTacticalAI',
+	'enableAutoAssist', 'disableAutoAssist', 
+	'categorieslabel', 
+	'commander_label', 
+	'commander_firestate0', 
+	'commander_movestate1', 
+	'commander_constructor_buildpriority', 
+	'commander_misc_priority', 
+	'commander_retreat'
+}
+
 options = {
 	inheritcontrol = {
 		name = "Inherit Factory Control Group", 
@@ -169,7 +183,44 @@ options = {
 		end,
 		noHotkey = true,
 	},
-
+	
+	enableAutoAssist = {
+		type='button',
+		name= "Enable Auto Assist",
+		desc = "Enables auto assist for all factories.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_auto_assist")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = true
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	disableAutoAssist = {
+		type='button',
+		name= "Disable Auto Assist",
+		desc = "Disables auto assist for all factories.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_auto_assist")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = false
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	
 	commander_label = {
 		name = "label",
 		type = 'label',
