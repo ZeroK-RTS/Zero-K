@@ -11,17 +11,20 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:GetInfo()
+function gadget:GetInfo()
   return {
     name      = "Constructor Auto Assist",
     desc      = "Assigns new builders to assist their source factory",
     author    = "trepan & GoogleFrog", -- trepan origional code has been lost to the iterations
     date      = "Jan 8, 2007",
     license   = "GNU GPL, v2 or later",
-	handler   = true,
     layer     = 0,
     enabled   = true  --  loaded by default?
   }
+end
+
+if (not gadgetHandler:IsSyncedCode()) then
+	return
 end
 
 --------------------------------------------------------------------------------
@@ -39,9 +42,9 @@ local spGetUnitGroup       = Spring.GetUnitGroup
 local spGetUnitPosition    = Spring.GetUnitPosition
 local spGetUnitRadius      = Spring.GetUnitRadius
 local spGiveOrderToUnit    = Spring.GiveOrderToUnit
-local spSetUnitGroup       = Spring.SetUnitGroup
-local spGetUnitDefID	   = Spring.GetUnitDefID
-local spGetTeamUnits	   = Spring.GetTeamUnits
+local spFindUnitCmdDesc    = Spring.FindUnitCmdDesc
+local spInsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
+local spEditUnitCmdDesc    = Spring.EditUnitCmdDesc
 
 VFS.Include("LuaRules/Utilities/ClampPosition.lua")
 local GiveClampedOrderToUnit = Spring.Utilities.GiveClampedOrderToUnit
@@ -66,36 +69,18 @@ local factories = {}
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Game/New Unit States/Auto Assist'
-options_order = { 'inheritcontrol', 'label'}
-options = {
-	inheritcontrol = {name = "Inherit Factory Control Group", type = 'bool', value = false, noHotkey = true,},
-	label = {name = "label", type = 'label', value = "Set the default Auto Assist for each type\n of factory"}
+local commandDesc = {
+	id      = CMD_FACTORY_GUARD,
+	type    = CMDTYPE.ICON_MODE,
+	tooltip = 'Newly built constructors automatically assist their factory',
+	name    = 'Auto Assist',
+	cursor  = 'Repair',
+	action  = 'autoassist',
+	params  = {0, 'off', 'on'}, 
 }
 
-for id,value in pairs(factoryDefs) do
-	options[UnitDefs[id].name] = {name = Spring.Utilities.GetHumanName(UnitDefs[id]), type = 'bool', value = (value ~= 0), noHotkey = true, }
-	options_order[#options_order+1] = UnitDefs[id].name
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-local function ClearGroup(unitID, factID)
-	-- clear the unit's group if it's the same as the factory's
-	local unitGroup = spGetUnitGroup(unitID)
-	if (not unitGroup) then
-		return
-	end
-	local factGroup = spGetUnitGroup(factID)
-	if (not factGroup) then
-		return
-	end
-	if (unitGroup == factGroup) then
-		spSetUnitGroup(unitID, -1)
-	end
-end
-
 
 local function GuardFactory(unitID, unitDefID, factID, factDefID)
 	-- is this a factory?
@@ -177,28 +162,49 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 	spGiveOrderToUnit(unitID, CMD_GUARD, { factID },            { "shift" })
 end
 
+--------------------
+-- interface stuff to add command
+
+local function SetAssistState(unitID, state) 
+	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_FACTORY_GUARD)
+	if (cmdDescID) then
+		commandDesc.params[1] = state
+		spEditUnitCmdDesc(unitID, cmdDescID, { params = commandDesc.params})
+		factories[unitID].assist = state == 1
+	end
+end 
+
+function gadget:AllowCommand_GetWantedCommand()
+	return {[CMD_FACTORY_GUARD] = true}
+end
+
+function gadget:AllowCommand_GetWantedUnitDefID()	
+	return true
+end
+
+function gadget:AllowCommand(unitID, unitDefID, teamID,
+                             cmdID, cmdParams, cmdOptions)
+	if cmdID == CMD_FACTORY_GUARD and factoryDefs[unitDefID] then
+		SetAssistState(unitID, cmdParams[1]) 
+		return false  -- command was used
+	end
+	return true  -- command was not used
+end
 
 --------------------------------------------------------------------------------
+-- Unit Handling
 
-function widget:UnitCreated( unitID,  unitDefID,  unitTeam)
+function gadget:UnitCreated(unitID, unitDefID,  unitTeam)
 	if factoryDefs[unitDefID] then
-		factories[unitID] = {assist = options[UnitDefs[unitDefID].name].value}
+		factories[unitID] = {assist = false}
+		commandDesc.params[1] = 0
+		spInsertUnitCmdDesc(unitID, commandDesc)
 	end
 end
 
-function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
-  widget:UnitCreated(unitID, unitDefID, newTeamID)
-end
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam,
+function gadget:UnitFromFactory(unitID, unitDefID, unitTeam,
                                 factID, factDefID, userOrders)
 
-	if (unitTeam ~= spGetMyTeamID()) then
-		return -- not my unit
-	end
-	if not options.inheritcontrol.value then
-		ClearGroup(unitID, factID)
-	end
 	if (userOrders) then
 		return -- already has user assigned orders
 	end
@@ -207,78 +213,16 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam,
 	end
 end
 
-function widget:Initialize() 
-	initFrame = Spring.GetGameFrame()+1 -- init units after epic menu loads, it might have the massive negative layer for a good reason
+function gadget:Initialize() 
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		gadget:UnitCreated(unitID, Spring.GetUnitDefID(unitID))
+	end
 end
 
-function widget:GameFrame(frame)
-	if frame == initFrame then
-		local myTeam = spGetMyTeamID()
-		local units = spGetTeamUnits(myTeam)
-		for i=1,#units do
-			local id = units[i]
-			widget:UnitCreated(id, spGetUnitDefID(id),myTeam)
-		end
-	end
-end 
-
-function widget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
+function gadget:UnitDestroyed( unitID,  unitDefID,  unitTeam)
 	if factories[unitID] then
 		factories[unitID] = nil
 	end
 end
-
---------------------
--- interface stuff to add command
-
-function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_FACTORY_GUARD then 
-		local selectedUnits = Spring.GetSelectedUnits()
-		local newState = nil
-		for i=1, #selectedUnits do
-			local unitID = selectedUnits[i]
-			if factories[unitID] then
-				if newState == nil then
-					newState = not factories[unitID].assist
-				end
-				factories[unitID].assist = newState
-			end
-		end
-		return true
-	end
-end
-
-local CMD_ONOFF         = CMD.ONOFF
-local CMD_REPEAT        = CMD.REPEAT
-local CMD_MOVE_STATE    = CMD.MOVE_STATE
-local CMD_FIRE_STATE    = CMD.FIRE_STATE
-
-function widget:CommandsChanged()
-
-	local units = Spring.GetSelectedUnits()
-	for i, id in pairs(units) do 
-		if factories[id] then
-			local customCommands = widgetHandler.customCommands
-			local order = 0
-			if factories[id].assist then
-				order = 1
-			end
-			table.insert(customCommands, {
-				id      = CMD_FACTORY_GUARD,
-				type    = CMDTYPE.ICON_MODE,
-				tooltip = 'Newly built constructors automatically assist their factory',
-				name    = 'Auto Assist',
-				cursor  = 'Repair',
-				action  = 'autoassist',
-				params  = {order, 'off', 'on'}, 
-				
-				pos = {CMD_ONOFF,CMD_REPEAT,CMD_MOVE_STATE,CMD_FIRE_STATE, CMD_RETREAT},
-			})
-			break
-		end
-	end
-	
-end
-
 
 --------------------------------------------------------------------------------

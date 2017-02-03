@@ -16,15 +16,23 @@ end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local alwaysHoldPos, holdPosException, dontFireAtRadarUnits = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
+local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
 
 local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
 end
 
 options_path = 'Game/New Unit States'
-options_order = { 'presetlabel', 'resetMoveStates', 'holdPosition', 'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
+options_order = { 'inheritcontrol', 'presetlabel', 'resetMoveStates', 'holdPosition', 'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 'disableTacticalAI', 'enableTacticalAI', 'categorieslabel', 'commander_label', 'commander_firestate0', 'commander_movestate1', 'commander_constructor_buildpriority', 'commander_misc_priority', 'commander_retreat'}
 options = {
+	inheritcontrol = {
+		name = "Inherit Factory Control Group", 
+		type = 'bool', 
+		value = false, 
+		noHotkey = true,
+		path = "Settings/Interface/Control Groups",
+	},
+
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
 	resetMoveStates = {
@@ -326,13 +334,25 @@ local function addUnit(defName, path)
 	if ud.isFactory then
 		options[defName .. "_repeat"] = {
 			name = "  Repeat",
-			desc = "Repeat: check box to turn it on",
+			desc = "Repeat construction queue.",
 			type = 'bool',
 			value = false,
 			path = path,
 			noHotkey = true,
 		}
 		options_order[#options_order+1] = defName .. "_repeat"
+	end
+	
+	if factoryDefs[ud.id] then
+		options[defName .. "_auto_assist"] = {
+			name = "  Auto Assist",
+			desc = "Newly built constructors assist the factory",
+			type = 'bool',
+			value = false,
+			path = path,
+			noHotkey = true,
+		}
+		options_order[#options_order+1] = defName .. "_auto_assist"
 	end
 
 	if ud.customParams and ud.customParams.airstrafecontrol then
@@ -514,6 +534,25 @@ local function AmITeamLeader (teamID)
 	return teamID == Spring.GetMyTeamID() and Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo (teamID))
 end
 
+local function SetControlGroup(unitID, factID)
+	local factGroup = Spring.GetUnitGroup(factID)
+	if (not factGroup) then
+		return
+	end
+	if options.inheritcontrol.value  then
+		Spring.SetUnitGroup(unitID, factGroup)
+		return
+	end
+	
+	local unitGroup = Spring.GetUnitGroup(unitID)
+	if (not unitGroup) then
+		return
+	end
+	if (unitGroup == factGroup) then
+		Spring.SetUnitGroup(unitID, -1)
+	end
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] then
 		return
@@ -582,7 +621,11 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if options[name .. "_repeat"] and options[name .. "_repeat"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD.REPEAT, {options[name .. "_repeat"].value and 1 or 0}, {"shift"}}
 		end
-
+		
+		if options[name .. "_auto_assist"] and options[name .. "_auto_assist"].value ~= nil then
+			orderArray[#orderArray + 1] = {CMD_FACTORY_GUARD, {options[name .. "_auto_assist"].value and 1 or 0}, {"shift"}}
+		end
+		
 		if options[name .. "_airstrafe1"] and options[name .. "_airstrafe1"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_AIR_STRAFE, {options[name .. "_airstrafe1"].value and 1 or 0}, {"shift"}}
 		end
@@ -665,6 +708,8 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] then
 		return
 	end
+	
+	SetControlGroup(unitID, factID)
 
 	local name = UnitDefs[unitDefID].name
 	if options[name .. "_constructor_buildpriority"] and options[name .. "_constructor_buildpriority"].value then
