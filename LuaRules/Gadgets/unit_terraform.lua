@@ -106,7 +106,6 @@ for i = 0, 64, 8 do
 end
 
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
-local updateFrequency = 15 -- how many frames to update
 local areaSegMaxSize = 200 -- max width and height of terraform squares
 
 local maxWallPoints = 700 -- max points that can makeup a wall
@@ -194,6 +193,13 @@ local constructors			= 0
 local currentCon 			= 0 
 
 local checkInterval 		= 0
+
+-- Performance
+local MIN_UPDATE_PERIOD     = 3
+local MAX_UPDATE_PERIOD     = 30
+local updatePeriod          = 15 -- how many frames to update
+local terraformOperations   = 0 -- tracks how many operations. Used to prevent slowdown.
+local nextUpdateCheck       = 0 -- Time at which to check performance
 
 -- Map terraform commands given by teamID and tag.
 local fallbackCommands  = {}
@@ -2879,6 +2885,8 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		i = i + 1
 	end
 	
+	terraformOperations = terraformOperations + extraPoints
+	
 	local oldCostDiff = costDiff
 	
 	local edgeTerraMult = 1
@@ -3046,6 +3054,14 @@ function gadget:GameFrame(n)
 	--	GG.Terraform_RaiseWater(-20)
 	--end
 	
+	if n >= nextUpdateCheck then
+		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
+		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
+		terraformOperations = 0
+		nextUpdateCheck = n + updatePeriod
+	end
+	
+	
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
@@ -3068,7 +3084,7 @@ function gadget:GameFrame(n)
 					diffProgress = health/terraUnitHP - terraformUnit[id].progress
 				end
 				
-				if n - terraformUnit[id].lastUpdate > updateFrequency then
+				if n - terraformUnit[id].lastUpdate >= updatePeriod then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
 					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
