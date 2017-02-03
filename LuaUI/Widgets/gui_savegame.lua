@@ -396,7 +396,7 @@ local function CreateWindow(saveMode)
 		y = "20%",
 		width = 640,
 		height = "60%",
-		classname = "main_window_small",
+		classname = "main_window",
 		backgroundColor = {0, 0, 0, 0},
 		caption = saveMode and "Save Game" or "Load Game",
 		resizable = false,
@@ -407,10 +407,10 @@ local function CreateWindow(saveMode)
 	local saveScroll = ScrollPanel:New {
 		name = 'zk_saveUI_saveScroll',
 		orientation = "vertical",
-		x = 0,
-		y = 12,
-		width = "100%",
-		bottom = 74,
+		x = 5,
+		y = 18,
+		right = 5,
+		bottom = 80,
 		parent = mainWindow,
 	}
 	
@@ -419,9 +419,9 @@ local function CreateWindow(saveMode)
 	if saveMode then
 		local saveFilenameEdit = Chili.EditBox:New {
 			name = 'zk_saveUI_saveFilename',
-			x = 0,
-			right = (saveMode and 168) or 88,
-			bottom = 38,
+			x = 5,
+			right = (saveMode and 174) or 94,
+			bottom = 42,
 			height = 28,
 			width = "100%",
 			hint = "Save Filename",
@@ -431,9 +431,9 @@ local function CreateWindow(saveMode)
 		
 		local saveDescEdit = Chili.EditBox:New {
 			name = 'zk_saveUI_saveDesc',
-			x = 0,
-			right = (saveMode and 168) or 88,
-			bottom = 4,
+			x = 5,
+			right = (saveMode and 174) or 94,
+			bottom = 8,
 			height = 28,
 			width = "100%",
 			hint = "Save Description",
@@ -444,9 +444,9 @@ local function CreateWindow(saveMode)
 		local saveButton = Button:New {
 			name = 'saveButton',
 			width = 80,
-			height = 68,
-			bottom = 0,
-			right = 85,
+			height = 66,
+			bottom = 6,
+			right = 90,
 			caption = WG.Translate("interface", "save") or "Save",
 			OnClick = {
 				function ()
@@ -463,9 +463,9 @@ local function CreateWindow(saveMode)
 	local closeButton = Button:New {
 		name = 'closeButton',
 		width = 80,
-		height = 68,
-		bottom = 0,
-		right = 0,
+		height = 66,
+		bottom = 6,
+		right = 5,
 		caption = WG.Translate("interface", "close") or "Close",
 		OnClick = {DisposeWindow},
 		font = {size = 18},
