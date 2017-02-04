@@ -111,10 +111,12 @@ local function DrawGhostSites()
 			gl.Rotate(ghost[PARAM_FACING], 0, 1, 0)
 			
 			if devCompat then
-				gl.UseShader(shaderObj.shader)
-				gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
-				gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
-
+				if shaderObj then
+					gl.UseShader(shaderObj.shader)
+					gl.Uniform(shaderObj.teamColorID, ghostTeamColor[1], ghostTeamColor[2], ghostTeamColor[3], 0.25)
+					gl.Uniform(shaderObj.tint, 0.1, 1, 0.2)
+				end
+				
 				gl.UnitShapeTextures(ghost[PARAM_DEFID], true)
 				gl.UnitShape(ghost[PARAM_DEFID], ghost[PARAM_TEAMID], true)
 				gl.UnitShapeTextures(ghost[PARAM_DEFID], false)
@@ -222,7 +224,7 @@ function widget:Update(dt)
 end
 
 function widget:DrawWorld()
-	if devCompat and not shaderObj then
+	if gl.CreateShader and devCompat and not shaderObj then
 		InitShader()
 	end
 	
