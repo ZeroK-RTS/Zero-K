@@ -2610,7 +2610,10 @@ local function MakeQuitButtons()
 						if (paused) and AllowPauseOnMenuChange() then
 							spSendCommands("pause")
 						end
-						spSendCommands{"spectator"} 
+						local frame = Spring.GetGameFrame()
+						if frame and frame > 0 then
+							spSendCommands{"spectator"}
+						end
 					end)
 				end
 			end,
