@@ -941,7 +941,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		end
 		x = x + button.width/2
 		y = y + button.height/2
-		return x, y
+		return x, y, button.width, button.height
 	end
 
 	return externalFunctionsAndData
@@ -1223,7 +1223,7 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		end
 		x = x + button.width/2
 		y = y + button.height/2
-		return x, y
+		return x, y, button.width, button.height
 	end
 	
 	return externalFunctionsAndData
@@ -1709,11 +1709,11 @@ local externalFunctions = {} -- Appear unused in repo but are used by missions.
 
 function externalFunctions.GetCommandButtonPosition(cmdID)
 	if not buttonsByCommand[cmdID] then
-		return false
+		return
 	end
 	local button = buttonsByCommand[cmdID]
-	local x, y = button.GetScreenPosition()
-	return x, y
+	local x, y, w, h = button.GetScreenPosition()
+	return x, y, w, h
 end
 
 function externalFunctions.GetTabPosition(tabName)
@@ -1721,8 +1721,8 @@ function externalFunctions.GetTabPosition(tabName)
 		local data = commandPanels[i]
 		if data.name == tabName then
 			local tab = data.tabButton
-			local x, y = tab.GetScreenPosition()
-			return x, y
+			local x, y, w, h = tab.GetScreenPosition()
+			return x, y, w, h
 		end
 	end
 	return false
