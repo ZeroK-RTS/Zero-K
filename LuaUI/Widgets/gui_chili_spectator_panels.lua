@@ -329,7 +329,7 @@ local function Format(input, override)
 	leadingString = override or leadingString
 	input = math.abs(input)
 	
-	if input < 0.01 then
+	if input < 0.05 then
 		if override then
 			return override .. "0.0"
 		end

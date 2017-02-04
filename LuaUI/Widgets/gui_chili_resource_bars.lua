@@ -204,7 +204,7 @@ local function Format(input, override)
 	leadingString = override or leadingString
 	input = math.abs(input)
 	
-	if input < 0.01 then
+	if input < 0.05 then
 		return WhiteStr .. "0"
 	elseif input < 5 then
 		return leadingString .. ("%.2f"):format(input) .. WhiteStr
