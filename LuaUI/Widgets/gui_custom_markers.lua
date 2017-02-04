@@ -2,10 +2,10 @@ function widget:GetInfo()
   return {
     name      = "Custom Markers",
     desc      = "Alternative to Spring map markers",
-    author    = "Evil4Zerggin",
+    author    = "Evil4Zerggin (adapted by KingRaptor)",
     date      = "29 December 2008",
     license   = "GNU LGPL, v2.1 or later",
-    layer     = -math.huge,
+    layer     = -100000.5,	-- lower than minimap but higher than epic
     enabled   = true  --  loaded by default?
   }
 end
@@ -20,7 +20,7 @@ local highlightSize = 32
 local highlightLineMin = 24
 local highlightLineMax = 40
 local edgeMarkerSize = 16
-local lineWidth = 1
+local lineWidth = 2
 local maxAlpha = 1
 local fontSize = 24
 local fontSizeLarge = 32
@@ -110,8 +110,6 @@ local function StartTime()
 	on = true
 end
 
-
-
 local function SetUseFade(bool)
 	useFade = bool
 end
@@ -142,6 +140,16 @@ local function ClearPoints()
 	end
 end
 
+-- makes a color char from a color table
+-- explanation for string.char: http://springrts.com/phpbb/viewtopic.php?f=23&t=24952
+local function GetColorChar(colorTable)
+	if colorTable == nil then return string.char(255,255,255,255) end
+	local col = {}
+	for i=1,4 do
+		col[i] = math.ceil((colorTable[i] or 1)*255)
+	end
+	return string.char(col[4],col[1],col[2],col[3])
+end
 ----------------------------------------------------------------
 --callins
 ----------------------------------------------------------------
@@ -214,8 +222,7 @@ function widget:DrawScreen()
 				glShape(GL_LINES, vertices)
 				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
 				if point.text then
-					glColor(1,1,1,alpha)
-					glText(point.text, sx, sy + 16, fontSizeLarge, 'cno')
+					glText(GetColorChar(point.color)..point.text.."\008", sx, sy + 16, fontSizeLarge, 'cno')
 				end
 			else
 				--out of screen
@@ -273,8 +280,7 @@ function widget:DrawScreen()
 				end
 				glShape(GL_TRIANGLES, vertices)
 				if point.text then
-					glColor(1, 1, 1, alpha)
-					glText(point.text, textX, textY, fontSize, textOptions .. 'o')
+					glText(GetColorChar(point.color)..point.text.."\008", textX, textY, fontSize, textOptions .. 'o')
 				end
 			end
 		end
