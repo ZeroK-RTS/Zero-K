@@ -207,7 +207,10 @@ options = {
 	},
 }
 
-local function TabClickFunction()
+local function TabClickFunction(mouse)
+	if not mouse then
+		return false
+	end
 	local _,_, meta,_ = Spring.GetModKeyState()
 	if not meta then 
 		return false
@@ -1132,8 +1135,8 @@ end
 
 local function GetTabButton(panel, contentControl, name, humanName, hotkey, loiterable, OnSelect)
 	
-	local function DoClick()
-		if TabClickFunction() then
+	local function DoClick(mouse)
+		if TabClickFunction(mouse) then
 			return
 		end
 		panel.SwitchToTab(name)
@@ -1147,7 +1150,11 @@ local function GetTabButton(panel, contentControl, name, humanName, hotkey, loit
 		classname = "button_tab",
 		caption = humanName,
 		padding = {0, 0, 0, 0},
-		OnClick = {DoClick},
+		OnClick = {
+			function()
+				DoClick(true)
+			end
+		},
 	}
 	button.backgroundColor[4] = 0.4
 	
