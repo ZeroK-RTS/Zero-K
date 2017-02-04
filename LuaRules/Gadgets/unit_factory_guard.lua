@@ -166,11 +166,14 @@ end
 -- interface stuff to add command
 
 local function SetAssistState(unitID, state) 
+	if not (unitID and factories[unitID]) then
+		return
+	end
 	local cmdDescID = spFindUnitCmdDesc(unitID, CMD_FACTORY_GUARD)
-	if (cmdDescID) then
+	if cmdDescID then
 		commandDesc.params[1] = state
-		spEditUnitCmdDesc(unitID, cmdDescID, { params = commandDesc.params})
-		factories[unitID].assist = state == 1
+		spEditUnitCmdDesc(unitID, cmdDescID, {params = commandDesc.params})
+		factories[unitID].assist = (state == 1)
 	end
 end 
 
