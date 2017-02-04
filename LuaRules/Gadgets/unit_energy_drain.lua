@@ -125,7 +125,7 @@ function gadget:GameFrame(n)
 			end
 
 			-- Check drain
-			local enabled = (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true) and spUseUnitResource(unitID, data.resTable))
+			local enabled = (GG.AllowMiscPriorityBuildStep(unitID, data.teamID, true, data.resTable) and spUseUnitResource(unitID, data.resTable))
 			
 			if enabled ~= data.oldEnabled then
 				spSetUnitRulesParam(unitID, "forcedOff", (enabled and 0) or 1, INLOS_ACCESS)

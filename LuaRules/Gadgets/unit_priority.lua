@@ -224,9 +224,33 @@ local function GetMiscPrioritySpendScale(unitID, teamID, onlyEnergy)
 	return 1 -- Units have full spending if they do not know otherwise.
 end
 
+local function CheckReserveResourceUse(teamID, onlyEnergy, resTable)
+	local energyReserve = TeamEnergyReserved[teamID] or 0
+	if energyReserve ~= 0 then
+		local eCurr = spGetTeamResources(teamID, "energy")
+		if eCurr <= energyReserve - ((resTable and resTable.e) or 0) then
+			return false
+		end
+	end
+	
+	if onlyEnergy then
+		return true
+	end
+	
+	local metalReserve = TeamMetalReserved[teamID] or 0
+	if metalReserve ~= 0 then
+		local mCurr = spGetTeamResources(teamID, "metal")
+		if mCurr <= metalReserve - ((resTable and resTable.m) or 0) then
+			return false
+		end
+	end
+	
+	return true
+end
+
 -- This is the other way that Misc Priority tasks can build at the correct rate.
 -- It is quite like AllowUnitBuildStep.
-local function AllowMiscPriorityBuildStep(unitID, teamID, onlyEnergy)
+local function AllowMiscPriorityBuildStep(unitID, teamID, onlyEnergy, resTable)
 
 	local conAmount = UnitMiscPortion[unitID] or math.random()
 
@@ -248,7 +272,7 @@ local function AllowMiscPriorityBuildStep(unitID, teamID, onlyEnergy)
 		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then  
 			UnitMiscPortion[unitID] = conAmount - 1
-			return true
+			return priorityLevel == 3 or CheckReserveResourceUse(teamID, onlyEnergy, resTable)
 		else 
 			UnitMiscPortion[unitID] = conAmount
 			return false
@@ -300,7 +324,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then  
 			UnitConPortion[builderID] = conAmount - 1
-			return true
+			return priorityLevel == 3 or CheckReserveResourceUse(teamID, false)
 		else 
 			UnitConPortion[builderID] = conAmount
 			return false
