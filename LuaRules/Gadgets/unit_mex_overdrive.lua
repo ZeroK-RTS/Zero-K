@@ -989,7 +989,8 @@ function gadget:GameFrame(n)
 			local allyTeamEnergyMax = 0
 
 			local allyTeamMiscMetalIncome = 0
-
+			
+			local energyContributorCount = 0
 			local sumInc = 0
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
@@ -1044,6 +1045,17 @@ function gadget:GameFrame(n)
 				allyTeamEnergySpare = allyTeamEnergySpare + te.spare
 				allyTeamPositiveSpare = allyTeamPositiveSpare + max(0, te.spare)
 				allyTeamNegativeSpare = allyTeamNegativeSpare + max(0, -te.spare)
+				
+				if te.inc > 0 then
+					energyContributorCount = energyContributorCount + 1
+				end
+			end
+			
+			if energyContributorCount == 0 then
+				energyContributorCount = allyTeamData.teams
+				if energyContributorCount == 0 then
+					energyContributorCount = 1
+				end
 			end
 
 			-- This is how much energy will be spent on overdrive. It remains to determine how much
@@ -1125,9 +1137,9 @@ function gadget:GameFrame(n)
 				local te = teamEnergy[teamID]
 				-- Storage capacing + eexpected spending is the maximun allowed storage.
 				
-				-- Allow a refund up to the to the spare energy contributed to the system. This allows
+				-- Allow a refund up to the to the average spare energy contributed to the system. This allows
 				-- people with zero storage to build.
-				te.freeStorage = te.max + te.exp - te.cur + te.spare 
+				te.freeStorage = te.max + te.exp - te.cur + allyTeamEnergySpare/energyContributorCount
 				if te.freeStorage > 0 then
 					totalFreeStorage = totalFreeStorage + te.freeStorage
 				else
