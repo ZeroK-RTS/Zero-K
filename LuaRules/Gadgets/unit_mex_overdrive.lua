@@ -941,7 +941,7 @@ local function teamEcho(team, st)
     end
 end
 
-local lastTeamOverdriveSpending = {}
+local lastTeamOverdriveNetLoss = {}
 
 function gadget:GameFrame(n)
 	
@@ -1036,7 +1036,7 @@ function gadget:GameFrame(n)
 				teamEnergy[teamID] = {}
 				local te = teamEnergy[teamID]
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
-				te.exp = math.max(0, te.exp - (lastTeamOverdriveSpending[teamID] or 0))
+				te.exp = te.exp - (lastTeamOverdriveNetLoss[teamID] or 0)
 
 				te.max = math.max(MIN_STORAGE, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				te.inc = sumEnergy -- Income only from energy structures and constructors. Possibly add reclaim here
@@ -1047,18 +1047,15 @@ function gadget:GameFrame(n)
 				allyTeamEnergyMax = allyTeamEnergyMax + te.max
 				allyTeamExpense = allyTeamExpense + te.exp
 
-				if te.max <= MIN_STORAGE then
-					te.spare = te.cur
-				else
-					te.spare = te.inc - te.exp
-				end
+				te.spare = te.inc - te.exp
 				allyTeamEnergySpare = allyTeamEnergySpare + te.spare
 				allyTeamPositiveSpare = allyTeamPositiveSpare + max(0, te.spare)
 				allyTeamNegativeSpare = allyTeamNegativeSpare + max(0, -te.spare)
 				
 				if debugMode then
-					Spring.Echo("Team Economy", teamID, "inc", te.inc, "exp", te.exp, "spare", te.spare)
-					Spring.Echo("last spend", lastTeamOverdriveSpending[teamID], "cur", te.cur, "max", te.max)
+					Spring.Echo("--- Team Economy ---", teamID)
+					Spring.Echo("inc", te.inc, "exp", te.exp, "spare", te.spare)
+					Spring.Echo("last spend", lastTeamOverdriveNetLoss[teamID], "cur", te.cur, "max", te.max)
 				end
 				
 				if te.inc > 0 then
@@ -1078,7 +1075,8 @@ function gadget:GameFrame(n)
 			local energyForOverdrive = max(0, allyTeamEnergySpare)*((allyTeamEnergyMax > 0 and max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMax))) or 1)
 
 			if debugMode then
-				Spring.Echo("AllyTeam Economy", allyTeamID, "inc", allyTeamEnergyIncome, "exp", allyTeamExpense, "spare", allyTeamEnergySpare)
+				Spring.Echo("=== AllyTeam Economy ===", allyTeamID)
+				Spring.Echo("inc", allyTeamEnergyIncome, "exp", allyTeamExpense, "spare", allyTeamEnergySpare)
 				Spring.Echo("+spare", allyTeamPositiveSpare, "-spare", allyTeamNegativeSpare, "cur", allyTeamEnergyCurrent, "max", allyTeamEnergyMax, "energyForOverdrive", energyForOverdrive)
 			end
 			
@@ -1351,20 +1349,17 @@ function gadget:GameFrame(n)
 				-- Inactive teams still interact normally with energy for a few reasons:
 				-- * Energy shared to them would disappear otherwise.
 				-- * If they have reclaim (somehow) then they could build up storage without sharing.
-				if te.overdriveEnergyNet + te.inc > 0 then
-					spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
+				local energyChange = te.overdriveEnergyNet + te.inc
+				if energyChange > 0 then
+					spAddTeamResource(teamID, "e", energyChange)
+					lastTeamOverdriveNetLoss[teamID] = 0
 				elseif te.overdriveEnergyNet + te.inc < 0 then
-					spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
-				end
-
-				if te.overdriveEnergyNet < 0 then
-					lastTeamOverdriveSpending[teamID] = -te.overdriveEnergyNet
-				else
-					lastTeamOverdriveSpending[teamID] = 0
+					spUseTeamResource(teamID, "e", -energyChange)
+					lastTeamOverdriveNetLoss[teamID] = -energyChange
 				end
 				
 				if debugMode then
-					Spring.Echo("Team energy income", teamID, "inc", lastTeamOverdriveSpending[teamID], "OD net", te.overdriveEnergyNet)
+					Spring.Echo("Team energy income", teamID, "change", energyChange, "inc", te.inc, "net", te.overdriveEnergyNet)
 				end
 				
 				-- Metal
