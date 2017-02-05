@@ -208,7 +208,6 @@ local generalPath = 'Settings/Reset Settings'
 						'mapborder 1',
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
-						"luaui disablewidget UnitShapes",
 					}
 				end,
 				'Use this if your performance is poor'
@@ -313,6 +312,7 @@ local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
+	ShButton(HUDPath .. "/Display Keys", 'Toggle input visualizer', function() spSendCommands{"luaui togglewidget Display Keys"} end, "Shows pressed key combinations and mouse buttons.")
 
 local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	AddOption(HUDSkinPath,

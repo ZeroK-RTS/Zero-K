@@ -34,17 +34,17 @@ options = {
 	keyReleaseTimeout = {
 		name  = "Key Release Timeout",
 		type  = "number",
-		value = 0.6, min = 0, max = 5, step = 0.025,
+		value = 0.6, min = 0, max = 2, step = 0.025,
 	},
 	mouseReleaseTimeout = {
 		name  = "Mouse Release Timeout",
 		type  = "number",
-		value = 0.3, min = 0, max = 5, step = 0.025,
+		value = 0.3, min = 0, max = 2, step = 0.025,
 	},
 }
 
 local panelColor = {1,1,1,0.7}
-local highlightColor = {1,0.8, 0.1, 0.9}
+local highlightColor = {1,0.7, 0, 1}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -57,8 +57,6 @@ local function InitializeDisplayLabelControl(name)
 
 	local window = Chili.Window:New{
 		parent = screen0,
-		backgroundColor = {0, 0, 0, 0},
-		color = {0, 0, 0, 0},
 		dockable = true,
 		name = name,
 		padding = {0,0,0,0},
@@ -66,6 +64,7 @@ local function InitializeDisplayLabelControl(name)
 		y = 740,
 		clientWidth  = 380,
 		clientHeight = 64,
+		classname = "main_window_small_very_flat",
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -74,23 +73,8 @@ local function InitializeDisplayLabelControl(name)
 		OnMouseDown = ShowOptions,
 	}
 	
-	local mainPanel = Chili.Panel:New{
-		backgroundColor = {1,1,1,0.7},
-		color = {1,1,1, 0.7},
-		parent = window,
-		padding = {0,0,0,0},
-		y      = 0,
-		x      = 0,
-		right  = 0,
-		bottom = 0,
-		dockable = false;
-		draggable = false,
-		resizable = false,
-		OnMouseDown = ShowOptions,
-	}
-	
 	local displayLabel = Chili.Label:New{
-		parent = mainPanel,
+		parent = window,
 		x      = 15,
 		y      = 10,
 		right  = 10,
@@ -152,6 +136,7 @@ local function InitializeMouseButtonControl(name)
 		x      = 0,
 		right  = "62%",
 		bottom = 0,
+		classname = "panel_button",
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -166,6 +151,7 @@ local function InitializeMouseButtonControl(name)
 		x      = "38%",
 		right  = "38%",
 		bottom = 0,
+		classname = "panel_button",
 		dockable = false;
 		draggable = false,
 		resizable = false,
@@ -180,6 +166,7 @@ local function InitializeMouseButtonControl(name)
 		x      = "62%",
 		right  = 0,
 		bottom = 0,
+		classname = "panel_button",
 		dockable = false;
 		draggable = false,
 		resizable = false,

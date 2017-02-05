@@ -306,6 +306,19 @@ skin.panel = {
   DrawControl = DrawPanel,
 }
 
+skin.panel_button = {
+  TileImageBK = ":cl:tech_button_bright_small_bk.png",
+  TileImageFG = ":cl:tech_button_bright_small_fg.png",
+  tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  backgroundColor = {0.2, 0.25, 0.35, 0.7},
+  focusColor  = {0.3, 0.375, 0.525, 0.5},
+  borderColor = {1,1,1,0},
+
+  DrawControl = DrawPanel,
+}
+
 skin.panelSmall = {
   TileImageBK = ":cl:tech_button.png",
   TileImageFG = ":cl:empty.png",
