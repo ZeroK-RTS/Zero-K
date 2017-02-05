@@ -996,7 +996,7 @@ function gadget:GameFrame(n)
 				Spring.Echo("=============== Overdrive Debug " .. allyTeamID .. " ===============")
 			end
 			
-			local energyContributorCount = 0
+			local energyProducerOrUserCount = 0
 			local sumInc = 0
 			for i = 1, allyTeamData.teams do
 				local teamID = allyTeamData.team[i]
@@ -1036,7 +1036,7 @@ function gadget:GameFrame(n)
 				teamEnergy[teamID] = {}
 				local te = teamEnergy[teamID]
 				te.cur, te.max, te.pull, _, te.exp, _, te.sent, te.rec = spGetTeamResources(teamID, "energy")
-				te.exp = te.exp - (lastTeamOverdriveNetLoss[teamID] or 0)
+				te.exp = math.max(0, te.exp - (lastTeamOverdriveNetLoss[teamID] or 0))
 
 				te.max = math.max(MIN_STORAGE, te.max - HIDDEN_STORAGE) -- Caretakers spend in chunks of 0.33
 				te.inc = sumEnergy -- Income only from energy structures and constructors. Possibly add reclaim here
@@ -1058,15 +1058,22 @@ function gadget:GameFrame(n)
 					Spring.Echo("last spend", lastTeamOverdriveNetLoss[teamID], "cur", te.cur, "max", te.max)
 				end
 				
-				if te.inc > 0 then
-					energyContributorCount = energyContributorCount + 1
+				if te.inc > 0 or te.exp > 0 then
+					-- Include expense in case someone has no economy at all (not even cons) and wants to run cloak.
+					te.energyProducerOrUser = true
+					energyProducerOrUserCount = energyProducerOrUserCount + 1
 				end
 			end
 			
-			if energyContributorCount == 0 then
-				energyContributorCount = allyTeamData.teams
-				if energyContributorCount == 0 then
-					energyContributorCount = 1
+			if energyProducerOrUserCount == 0 then
+				for i = 1, allyTeamData.teams do
+					local teamID = allyTeamData.team[i]
+					local te = teamEnergy[teamID]
+					te.energyProducerOrUser = true
+				end
+				energyProducerOrUserCount = allyTeamData.teams
+				if energyProducerOrUserCount == 0 then
+					energyProducerOrUserCount = 1
 				end
 			end
 			
@@ -1075,7 +1082,7 @@ function gadget:GameFrame(n)
 			local energyForOverdrive = max(0, allyTeamEnergySpare)*((allyTeamEnergyMax > 0 and max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMax))) or 1)
 
 			if debugMode then
-				Spring.Echo("=== AllyTeam Economy ===", allyTeamID)
+				Spring.Echo("=========== AllyTeam Economy ===========", allyTeamID)
 				Spring.Echo("inc", allyTeamEnergyIncome, "exp", allyTeamExpense, "spare", allyTeamEnergySpare)
 				Spring.Echo("+spare", allyTeamPositiveSpare, "-spare", allyTeamNegativeSpare, "cur", allyTeamEnergyCurrent, "max", allyTeamEnergyMax, "energyForOverdrive", energyForOverdrive)
 			end
@@ -1157,30 +1164,54 @@ function gadget:GameFrame(n)
 				
 				-- Allow a refund up to the to the average spare energy contributed to the system. This allows
 				-- people with zero storage to build.
-				te.freeStorage = te.max + te.exp - te.cur + allyTeamEnergySpare/energyContributorCount
+				te.freeStorage = te.max + te.exp - te.cur
+				if te.energyProducerOrUser then
+					te.freeStorage = te.freeStorage + allyTeamEnergySpare/energyProducerOrUserCount
+				end
 				if te.freeStorage > 0 then
-					totalFreeStorage = totalFreeStorage + te.freeStorage
+					if te.energyProducerOrUser then
+						totalFreeStorage = totalFreeStorage + te.freeStorage
+						if debugMode then
+							Spring.Echo(teamID, "Free", te.freeStorage)
+						end
+					end
 				else
+					-- Even sides that do not produce or consume may have excess energy.
 					energyToRefund = energyToRefund - te.freeStorage
 					te.overdriveEnergyNet = te.overdriveEnergyNet + te.freeStorage
 					te.freeStorage = 0
+					if debugMode then
+						Spring.Echo(teamID, "Overflow", -te.freeStorage)
+					end
 				end
+			end
+			
+			if debugMode then
+				Spring.Echo("AllyTeam totalFreeStorage", totalFreeStorage)
 			end
 
 			if totalFreeStorage > energyToRefund then
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*te.freeStorage/totalFreeStorage
+					if te.energyProducerOrUser then
+						te.overdriveEnergyNet = te.overdriveEnergyNet + energyToRefund*te.freeStorage/totalFreeStorage
+					end
                 end
 				energyWasted = 0
 			else
 				for i = 1, allyTeamData.teams do
 					local teamID = allyTeamData.team[i]
 					local te = teamEnergy[teamID]
-					te.overdriveEnergyNet = te.overdriveEnergyNet + te.freeStorage
+					if te.energyProducerOrUser then
+						te.overdriveEnergyNet = te.overdriveEnergyNet + te.freeStorage
+					end
 				end
 				energyWasted = energyToRefund - totalFreeStorage
+			end
+			
+			if debugMode then
+				Spring.Echo("AllyTeam energyWasted", energyWasted)
 			end
 
 			--// Income For non-Gridded mexes
@@ -1356,6 +1387,8 @@ function gadget:GameFrame(n)
 				elseif te.overdriveEnergyNet + te.inc < 0 then
 					spUseTeamResource(teamID, "e", -energyChange)
 					lastTeamOverdriveNetLoss[teamID] = -energyChange
+				else
+					lastTeamOverdriveNetLoss[teamID] = 0
 				end
 				
 				if debugMode then
