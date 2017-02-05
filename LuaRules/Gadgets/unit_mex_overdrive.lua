@@ -118,7 +118,8 @@ local paybackDefs = { -- cost is how much to pay back
 }
 
 local spammedError = false
-local debugMode = false
+local debugGridMode = false
+local debugAllyTeam = false
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -338,7 +339,7 @@ local function AddPylonToGrid(unitID)
 	local pX,_,pZ = spGetUnitPosition(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("AddPylonToGrid " .. unitID)
 	end
 
@@ -450,7 +451,7 @@ local function AddPylonToGrid(unitID)
 end
 
 local function QueueAddPylonToGrid(unitID)
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("QueueAddPylonToGrid " .. unitID)
 	end
 	if not pylonGridQueue then
@@ -460,7 +461,7 @@ local function QueueAddPylonToGrid(unitID)
 end
 
 local function RemovePylonsFromGridQueue(unitID)
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("RemovePylonsFromGridQueue " .. unitID)
 	end
 	if pylonGridQueue then
@@ -512,7 +513,7 @@ local function AddPylon(unitID, unitDefID, range)
 
 	pylon[allyTeamID][unitID].listID = list.count
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("AddPylon " .. unitID)
 		UnitEcho(unitID, list.count .. ", " .. unitID)
 	end
@@ -556,7 +557,7 @@ end
 local function DestroyGrid(allyTeamID,oldGridID)
 	local ai = allyTeamInfo[allyTeamID]
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("DestroyGrid " .. oldGridID)
 	end
 
@@ -583,7 +584,7 @@ local function ReactivatePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("ReactivatePylon " .. unitID)
 	end
 
@@ -612,7 +613,7 @@ local function DeactivatePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 	local ai = allyTeamInfo[allyTeamID]
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("DeactivatePylon " .. unitID)
 	end
 
@@ -638,7 +639,7 @@ end
 local function RemovePylon(unitID)
 	local allyTeamID = spGetUnitAllyTeam(unitID)
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("RemovePylon start " .. unitID)
 		TableEcho(pylonList[allyTeamID])
 		TableEcho(pylon[allyTeamID])
@@ -727,7 +728,7 @@ local function RemovePylon(unitID)
 		end
 	end
 
-	if debugMode then
+	if debugGridMode then
 		Spring.Echo("RemovePylon end " .. unitID)
 		TableEcho(pylonList[allyTeamID])
 		TableEcho(pylon[allyTeamID])
@@ -951,6 +952,7 @@ function gadget:GameFrame(n)
 	
 	if (n % TEAM_SLOWUPDATE_RATE == 1) then
 		for allyTeamID, allyTeamData in pairs(allyTeamInfo) do
+			local debugMode = debugAllyTeam and debugAllyTeam[allyTeamID]
 			--// Check if pylons changed their active status (emp, reverse-build, ..)
 			local list = pylonList[allyTeamID]
 			for i = 1, list.count do
@@ -989,6 +991,10 @@ function gadget:GameFrame(n)
 			local allyTeamEnergyMax = 0
 
 			local allyTeamMiscMetalIncome = 0
+		
+			if debugMode then
+				Spring.Echo("=============== Overdrive Debug " .. allyTeamID .. " ===============")
+			end
 			
 			local energyContributorCount = 0
 			local sumInc = 0
@@ -1041,10 +1047,19 @@ function gadget:GameFrame(n)
 				allyTeamEnergyMax = allyTeamEnergyMax + te.max
 				allyTeamExpense = allyTeamExpense + te.exp
 
-				te.spare = te.inc - te.exp
+				if te.max <= MIN_STORAGE then
+					te.spare = te.cur
+				else
+					te.spare = te.inc - te.exp
+				end
 				allyTeamEnergySpare = allyTeamEnergySpare + te.spare
 				allyTeamPositiveSpare = allyTeamPositiveSpare + max(0, te.spare)
 				allyTeamNegativeSpare = allyTeamNegativeSpare + max(0, -te.spare)
+				
+				if debugMode then
+					Spring.Echo("Team Economy", teamID, "inc", te.inc, "exp", te.exp, "spare", te.spare)
+					Spring.Echo("last spend", lastTeamOverdriveSpending[teamID], "cur", te.cur, "max", te.max)
+				end
 				
 				if te.inc > 0 then
 					energyContributorCount = energyContributorCount + 1
@@ -1057,11 +1072,16 @@ function gadget:GameFrame(n)
 					energyContributorCount = 1
 				end
 			end
-
+			
 			-- This is how much energy will be spent on overdrive. It remains to determine how much
 			-- is spent by each player.
 			local energyForOverdrive = max(0, allyTeamEnergySpare)*((allyTeamEnergyMax > 0 and max(0, min(1, allyTeamEnergyCurrent/allyTeamEnergyMax))) or 1)
 
+			if debugMode then
+				Spring.Echo("AllyTeam Economy", allyTeamID, "inc", allyTeamEnergyIncome, "exp", allyTeamExpense, "spare", allyTeamEnergySpare)
+				Spring.Echo("+spare", allyTeamPositiveSpare, "-spare", allyTeamNegativeSpare, "cur", allyTeamEnergyCurrent, "max", allyTeamEnergyMax, "energyForOverdrive", energyForOverdrive)
+			end
+			
 			-- The following inequality holds:
 			-- energyForOverdrive <= allyTeamEnergySpare <= allyTeamPositiveSpare
 			-- which means the redistribution is guaranteed to work
@@ -1333,12 +1353,20 @@ function gadget:GameFrame(n)
 				-- * If they have reclaim (somehow) then they could build up storage without sharing.
 				if te.overdriveEnergyNet + te.inc > 0 then
 					spAddTeamResource(teamID, "e", te.overdriveEnergyNet + te.inc)
-					lastTeamOverdriveSpending[teamID] = 0
 				elseif te.overdriveEnergyNet + te.inc < 0 then
 					spUseTeamResource(teamID, "e", -(te.overdriveEnergyNet + te.inc))
-					lastTeamOverdriveSpending[teamID] = -(te.overdriveEnergyNet + te.inc)
 				end
 
+				if te.overdriveEnergyNet < 0 then
+					lastTeamOverdriveSpending[teamID] = -te.overdriveEnergyNet
+				else
+					lastTeamOverdriveSpending[teamID] = 0
+				end
+				
+				if debugMode then
+					Spring.Echo("Team energy income", teamID, "inc", lastTeamOverdriveSpending[teamID], "OD net", te.overdriveEnergyNet)
+				end
+				
 				-- Metal
 				local odShare = 0
 				local baseShare = 0
@@ -1582,8 +1610,8 @@ end
 
 local function OverdriveDebugToggle()
 	if Spring.IsCheatingEnabled() then
-		debugMode = not debugMode
-		if debugMode then
+		debugGridMode = not debugGridMode
+		if debugGridMode then
 			local allyTeamList = Spring.GetAllyTeamList()
 			for i=1,#allyTeamList do
 				local allyTeamID = allyTeamList[i]
@@ -1597,6 +1625,28 @@ local function OverdriveDebugToggle()
 	end
 end
 
+local function OverdriveDebugEconomyToggle(cmd, line, words, player)
+	if not Spring.IsCheatingEnabled() then 
+		return
+	end
+	local allyTeamID = tonumber(words[1])
+	Spring.Echo("Debug priority for allyTeam " .. (allyTeamID or "nil"))
+	if allyTeamID then
+		if not debugAllyTeam then
+			debugAllyTeam = {}
+		end
+		if debugAllyTeam[allyTeamID] then
+			debugAllyTeam[allyTeamID] = nil
+			if #debugAllyTeam == 0 then
+				debugAllyTeam = {}
+			end
+			Spring.Echo("Disabled")
+		else
+			debugAllyTeam[allyTeamID] = true
+			Spring.Echo("Enabled")
+		end
+	end
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 -- External functions
@@ -1671,7 +1721,8 @@ function gadget:Initialize()
 		}
 	end
 
-	gadgetHandler:AddChatAction("odb",OverdriveDebugToggle,"Toggles debug mode for overdrive.")
+	gadgetHandler:AddChatAction("debuggrid", OverdriveDebugToggle, "Toggles grid debug mode for overdrive.")
+	gadgetHandler:AddChatAction("debugecon", OverdriveDebugEconomyToggle, "Toggles economy debug mode for overdrive.")
 end
 
 -------------------------------------------------------------------------------------
