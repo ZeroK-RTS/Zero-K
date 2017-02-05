@@ -77,6 +77,8 @@ local TeamScale = {}  -- TeamScale[TeamID] = {0, 0.4, 1} how much to scale resou
 local TeamScaleEnergy = {} -- TeamScaleEnergy[TeamID] = {0, 0.4, 1} how much to scale energy only resourcing
 local TeamMetalReserved = {} -- how much metal is reserved for high priority in each team
 local TeamEnergyReserved = {} -- ditto for energy
+local effectiveTeamMetalReserved = {} -- Takes max storage into account
+local effectiveTeamEnergyReserved = {} -- ditto for energy
 local LastUnitFromFactory = {} -- LastUnitFromFactory[FactoryUnitID] = lastUnitID
 local UnitOnlyEnergy = {} -- UnitOnlyEnergy[unitID] = true if the unit does not try to drain metal
 
@@ -225,7 +227,7 @@ local function GetMiscPrioritySpendScale(unitID, teamID, onlyEnergy)
 end
 
 local function CheckReserveResourceUse(teamID, onlyEnergy, resTable)
-	local energyReserve = TeamEnergyReserved[teamID] or 0
+	local energyReserve = effectiveTeamEnergyReserved[teamID] or 0
 	if energyReserve ~= 0 then
 		local eCurr = spGetTeamResources(teamID, "energy")
 		if eCurr <= energyReserve - ((resTable and resTable.e) or 0) then
@@ -237,7 +239,7 @@ local function CheckReserveResourceUse(teamID, onlyEnergy, resTable)
 		return true
 	end
 	
-	local metalReserve = TeamMetalReserved[teamID] or 0
+	local metalReserve = effectiveTeamMetalReserved[teamID] or 0
 	if metalReserve ~= 0 then
 		local mCurr = spGetTeamResources(teamID, "metal")
 		if mCurr <= metalReserve - ((resTable and resTable.m) or 0) then
@@ -429,6 +431,9 @@ function gadget:GameFrame(n)
 			mStor = mStor - HIDDEN_STORAGE
 			eStor = eStor - HIDDEN_STORAGE
 			
+			effectiveTeamMetalReserved[teamID] = math.min(mStor, TeamMetalReserved[teamID] or 0)
+			effectiveTeamEnergyReserved[teamID] = math.min(eStor, TeamEnergyReserved[teamID] or 0)
+			
 			-- Take away the constant income which was gained this frame (innate, reclaim)
 			-- This is to ensure that level + total income is exactly what will be gained in the next second (if nothing is spent).
 			local lumpIncome = (spGetTeamRulesParam(teamID, "OD_metalBase") or 0) + 
@@ -543,8 +548,8 @@ function gadget:GameFrame(n)
 				end
 			
 				if pri == 3 then
-					nextMetalLevel = nextMetalLevel - math.min(mStor, TeamMetalReserved[teamID] or 0)
-					nextEnergyLevel = nextEnergyLevel - math.min(eStor, TeamEnergyReserved[teamID] or 0)
+					nextMetalLevel = nextMetalLevel - effectiveTeamMetalReserved[teamID]
+					nextEnergyLevel = nextEnergyLevel - effectiveTeamEnergyReserved[teamID]
 				end
 			end
 			
