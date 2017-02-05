@@ -17,7 +17,7 @@ unitDef = {
   canstop             = [[1]],
   category            = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[0 0 0]],
-  collisionVolumeScales  = [[144 40 144]],
+  collisionVolumeScales  = [[130 40 130]],
   collisionVolumeType    = [[box]],
   corpse              = [[DEAD]],
 
