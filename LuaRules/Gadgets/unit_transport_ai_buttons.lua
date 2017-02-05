@@ -108,11 +108,17 @@ end
 
 local function RemoveCmdDesc(unitID)
   local cmdEmbarkID = FindUnitCmdDesc(unitID, CMD_EMBARK)
-  RemoveUnitCmdDesc(unitID, cmdEmbarkID);
+  if cmdTransportToID then
+    RemoveUnitCmdDesc(unitID, cmdTransportToID);
+  end
   local cmdDisembarkID = FindUnitCmdDesc(unitID, CMD_DISEMBARK)
-  RemoveUnitCmdDesc(unitID, cmdDisembarkID);
+  if cmdDisembarkID then
+    RemoveUnitCmdDesc(unitID, cmdDisembarkID);
+  end
   local cmdTransportToID = FindUnitCmdDesc(unitID, CMD_TRANSPORTTO)
-  RemoveUnitCmdDesc(unitID, cmdTransportToID);  
+  if cmdTransportToID then
+    RemoveUnitCmdDesc(unitID, cmdTransportToID);
+  end
 end
 
 --------------------------------------------------------------------------------

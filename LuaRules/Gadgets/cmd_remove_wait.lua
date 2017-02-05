@@ -52,7 +52,9 @@ function gadget:UnitCreated(unitID, unitDefID)
 	if waitRemoveDefs[unitDefID] then
 		for i = 1, #removeCommands do
 			local cmdDesc = spFindUnitCmdDesc(unitID, removeCommands[i])
-			spRemoveUnitCmdDesc(unitID, cmdDesc)
+			if cmdDesc then
+				spRemoveUnitCmdDesc(unitID, cmdDesc)
+			end
 		end
 	end
 end
