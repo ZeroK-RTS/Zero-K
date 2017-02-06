@@ -193,16 +193,16 @@ local options = {
   },
   {
     key    = "shuffle",
-    name   = "Shuffle Start Boxes",
-    desc   = "Shuffles start boxes.",
+    name   = "Start Boxes",
+    desc   = "Start box settings.",
     type   = "list",
     section= 'startconds',
     def    = "auto",
     items  = {
       {
         key  = "off",
-        name = "Off",
-        desc = "Do nothing.",
+        name = "Fixed",
+        desc = "Startboxes have a fixed correspondence to teams.",
       },
       {
         key  = "shuffle",
@@ -216,15 +216,23 @@ local options = {
       },
       {
         key  = "auto",
-        name = "Auto",
+        name = "Autodetect",
         desc = "Shuffle if FFA.",
       },
       {
         key  = "disable",
-        name = "Disable boxes",
+        name = "Start Anywhere",
         desc = "Allow to place anywhere. Boxes are still drawn for reference but are not obligatory.",
       },
     },
+  },
+  {
+    key='setaispawns',
+    name='Set AI Spawns',
+    desc='Allow players to set the start positions of AIs.',
+    type='bool',
+    section= 'startconds',
+    def=false,
   },
   {
     key='typemapsetting',
