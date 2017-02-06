@@ -29,7 +29,7 @@ function gadget:GetInfo()
 	}
 end
 
-if (tobool(Spring.GetModOptions().enableunlocks) == false) then
+if not Spring.GetModOptions().enableunlocks then
 	return
 end
 

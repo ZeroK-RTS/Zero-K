@@ -214,6 +214,29 @@ end
 ------------------------------------------------------------
 -- Initialize/shutdown
 ------------------------------------------------------------
+
+local function GetUnlockedBuildOptions(fullOptions)
+	local teamID = Spring.GetMyTeamID()
+	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
+	if not unlockedCount then
+		return fullOptions
+	end
+	local unlockedMap = {}
+	for i = 1, unlockedCount do
+		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
+		if unitDefID then
+			unlockedMap[unitDefID] = true
+		end
+	end
+	local newOptions = {}
+	for i = 1, #fullOptions do
+		if unlockedMap[fullOptions[i]] then
+			newOptions[#newOptions + 1] = fullOptions[i]
+		end
+	end
+	return newOptions
+end
+
 function widget:Initialize()
 	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
 		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
@@ -233,6 +256,8 @@ function widget:Initialize()
 		isMex[UnitDefNames["cormex"].id] = true;
 	end
 	WG.InitialQueue = true
+	
+	buildOptions = GetUnlockedBuildOptions(buildOptions)
 end
 
 function widget:Shutdown()
