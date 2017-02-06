@@ -1539,7 +1539,7 @@ end
 local function SearchElement(termToSearch,path)
 	local filtered_pathOptions = {}
 	local tree_children = {} --used for displaying buttons
-	local maximumResult = 23 --maximum result to display. Any more it will just say "too many"
+	local maximumResult = 50 --maximum result to display. Any more it will just say "too many"
 	
 	local DiggDeeper = function() end --must declare itself first before callin self within self
 	DiggDeeper = function(currentPath)
@@ -1561,7 +1561,7 @@ local function SearchElement(termToSearch,path)
 				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
 					local menupath = option.desc
 					if pathoptions[menupath] then
-						if #pathoptions[menupath] >= 1 then
+						if #pathoptions[menupath] >= 1 and menupath ~= "" then
 							DiggDeeper(menupath) --travel into & search into this branch
 						else --dead end
 							hide = true
