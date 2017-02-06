@@ -7,8 +7,8 @@ end
 --------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
-		name = "Mission Lock and Place Units",
-		desc = "Implements locking of units and placement of structures.",
+		name = "Galaxy Campaign Battle Handler",
+		desc = "Implements unit locks and structure placement. Communicates battle result.",
 		author = "GoogleFrog",
 		date = "6 February 2017",
 		license = "GNU GPL, v2 or later",
