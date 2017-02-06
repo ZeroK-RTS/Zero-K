@@ -174,6 +174,11 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 end
 
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
+	
+	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, unitDefID) then
+		return
+	end
+	
 	morphCmdDesc.tooltip = GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 	
 	GG.AddMiscPriorityUnit(unitID)

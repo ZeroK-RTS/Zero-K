@@ -131,6 +131,17 @@ local function InitializeUnlocks()
 	end
 end
 
+local Unlocks = {}
+
+function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
+	if unlockedUnitsByTeam[teamID] then
+		if not (unlockedUnitsByTeam[teamID][unitDefID]) then 
+			return false
+		end
+	end
+	return true
+end
+
 function gadget:Initialize()
 	InitializeUnlocks()
 	
@@ -141,4 +152,6 @@ function gadget:Initialize()
 			gadget:UnitCreated(unitID, unitDefID, Spring.GetUnitTeam(unitID))
 		end
 	end
+	
+	GG.Unlocks = Unlocks
 end
