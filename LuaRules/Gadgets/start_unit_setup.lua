@@ -14,49 +14,6 @@ end
 include("LuaRules/Configs/start_setup.lua")
 include("LuaRules/Configs/constants.lua")
 
-if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
-	if not gadgetHandler:IsSyncedCode() then
-		return false -- no unsynced code
-	end
-
-	local ploppableDefs = {}
-
-	function gadget:Initialize()
-		for _, teamID in ipairs(Spring.GetTeamList()) do
-			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
-			Spring.SetTeamResource(teamID, "ms", START_STORAGE + HIDDEN_STORAGE)
-		end
-		for i, v in pairs(ploppables) do
-			local name = UnitDefNames[v]
-			if name then
-				local ud = name.id
-				if ud then
-					ploppableDefs[ud] = true
-				end
-			end
-		end
-	end
-
-	function GG.SetStartLocation() 
-	end
-
-	function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
-		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
-	end
-
-	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-		if ploppableDefs[unitDefID] and builderID and (Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
-			Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
-			local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-			Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
-			local x,y,z = Spring.GetUnitPosition(unitID)
-			Spring.SpawnCEG("gate", x, y, z)
-		end
-	end
-
-	return
-end
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetTeamInfo 		= Spring.GetTeamInfo
@@ -78,11 +35,58 @@ local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 --------------------------------------------------------------------------------
 
 if (gadgetHandler:IsSyncedCode()) then
-  
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 
-local ploppableDefs = {}
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Functions shared between missions and non-missions
+
+local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
+	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
+		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
+		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.SpawnCEG("gate", x, y, z)
+		if GG.mod_stats_AddFactoryPlop then
+			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
+		end
+		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Mission Handling
+
+if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set starting storage (and enable facplopping)
+	if not gadgetHandler:IsSyncedCode() then
+		return false -- no unsynced code
+	end
+
+	function gadget:Initialize()
+		for _, teamID in ipairs(Spring.GetTeamList()) do
+			Spring.SetTeamResource(teamID, "es", START_STORAGE + HIDDEN_STORAGE)
+			Spring.SetTeamResource(teamID, "ms", START_STORAGE + HIDDEN_STORAGE)
+		end
+	end
+
+	function GG.SetStartLocation() 
+	end
+
+	function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
+		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
+	end
+
+	function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+		CheckFacplopUse(unitID, unitDefID, teamID, builderID)
+	end
+
+	return
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local gamestart = false
 --local createBeforeGameStart = {}	-- no longer used
@@ -120,17 +124,7 @@ local loadGame = false	-- was this loaded from a savegame?
 --------------------------------------------------------------------------------
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
-	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
-		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
-		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
-		local x,y,z = Spring.GetUnitPosition(unitID)
-		Spring.SpawnCEG("gate", x, y, z)
-		if GG.mod_stats_AddFactoryPlop then
-			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
-		end
-		-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss
-	end
+	CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 end
 
 local function InitUnsafe()
@@ -139,17 +133,6 @@ end
 
 
 function gadget:Initialize()
--- self linking
-	for i, v in pairs(ploppables) do
-		local name = UnitDefNames[v]
-		if name then
-			local ud = name.id
-			if ud then
-				ploppableDefs[ud] = true
-			end
-		end
-	end
-
 	-- needed if you reload luarules
 	local frame = Spring.GetGameFrame()
 	if frame and frame > 0 then
