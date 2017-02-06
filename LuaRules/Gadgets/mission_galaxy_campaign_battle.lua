@@ -8,7 +8,7 @@ end
 function gadget:GetInfo()
 	return {
 		name = "Galaxy Campaign Battle Handler",
-		desc = "Implements unit locks and structure placement. Communicates battle result.",
+		desc = "Implements unit locks and structure placement.",
 		author = "GoogleFrog",
 		date = "6 February 2017",
 		license = "GNU GPL, v2 or later",
@@ -17,7 +17,8 @@ function gadget:GetInfo()
 	}
 end
 
-if not Spring.GetModOptions().issingleplayercampaign then
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
+if not campaignBattleID then
 	return
 end
 
