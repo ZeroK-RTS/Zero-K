@@ -90,7 +90,7 @@ local noVariation = {
 	pitchmod = 0,
 	gainmod = 0,
 	pitch = 1,
-	gaim = 1,
+	gain = 1,
 }
 
 local ignoredExtensions = {
