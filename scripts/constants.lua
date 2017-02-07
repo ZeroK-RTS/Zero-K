@@ -91,8 +91,8 @@ function SmokeUnit(smokePiece)
 		--How is the unit doing?
 		local healthPercent = GetUnitValue(COB.HEALTH)
 		if (healthPercent < 66) and not spGetUnitIsCloaked(unitID) then -- only smoke if less then 2/3rd health left
-			--common.CustomEmitter(smokePiece[math.random(1,#smokePiece)], "blacksmoke")
-			EmitSfx(smokePiece[math.random(1,#smokePiece)], SMOKEPUFF)
+			common.CustomEmitter(smokePiece[math.random(1,#smokePiece)], "blacksmoke")
+			--EmitSfx(smokePiece[math.random(1,#smokePiece)], SMOKEPUFF)
 		end
 		Sleep(8*healthPercent + math.random(100,200))
 	end
