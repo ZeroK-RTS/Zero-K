@@ -39,10 +39,10 @@ skin.button = {
   tiles = {20, 14, 20, 14}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
   
-  backgroundColor = {0.20, 0.30, 0.36, 0.85},
+  backgroundColor = {0.20, 0.38, 0.46, 0.95},
   focusColor  = {0.20, 0.42, 0.50, 0.9},
   borderColor = {0.20, 0.42, 0.50, 0.15},
-  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85}, 
   
   DrawControl = DrawButton,
 }
@@ -53,10 +53,10 @@ skin.button_tiny = {
   tiles = {12, 12, 12, 12}, --// tile widths: left,top,right,bottom
   padding = {10, 10, 10, 10},
   
-  backgroundColor = {0.20, 0.30, 0.36, 0.85},
+  backgroundColor = {0.20, 0.38, 0.46, 0.95},
   focusColor  = {0.20, 0.42, 0.50, 0.9},
   borderColor = {0.20, 0.42, 0.50, 0.15},
-  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85},
+  pressBackgroundColor = {0.14, 0.365, 0.42, 0.85}, 
   
   DrawControl = DrawButton,
 }
