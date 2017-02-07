@@ -22,6 +22,6 @@ end
 function gadget:Initialize()
 	local name = Game.modName
 	Spring.SetWMIcon("LuaUI/Images/ZK_logo.png")
-	Spring.SetWMCaption(name .. " (Spring " .. Game.version .. ")", name)
+	Spring.SetWMCaption(name .. " (Spring " .. Spring.Utilities.GetEngineVersion() .. ")", name)
 	gadgetHandler:RemoveGadget()
 end

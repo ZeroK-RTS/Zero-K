@@ -299,7 +299,7 @@ function script.Killed(recentDamage, maxHealth)
 	return 10 -- don't spawn second wreck
 end
 
-if (Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil) then
+if (Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil) then
 	script.Killed = function(recentDamage, maxHealth)
 	 -- spawn debris etc.
 		local wreckLevel = Killed(recentDamage, maxHealth)

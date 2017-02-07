@@ -78,7 +78,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
-local reverseCompat = (Game.version:find('91.0') == 1)
+local reverseCompat = (Spring.Utilities.GetEngineVersion():find('91.0') == 1)
 --------------------------------------------------------------------------------
 
 function pgl() -- (print gadget list)  FIXME: move this into a gadget

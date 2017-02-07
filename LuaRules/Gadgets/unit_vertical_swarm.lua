@@ -30,7 +30,7 @@ local HORIZONTAL_IMPULSE = 2 -- Impulse applied after snap
 local VERTICAL_IMPULSE = 1.2*Game.gravity/70 -- Impulse applied after snap
 local MAGIC_Y_CONSTANT = 10
 
-if Game.version:find(95.) then
+if Spring.Utilities.GetEngineVersion():find(95.) then
 	MAGIC_Y_CONSTANT = 0
 	--HORIZONTAL_IMPULSE = HORIZONTAL_IMPULSE * 0.5
 	--VERTICAL_IMPULSE = VERTICAL_IMPULSE * 0.5

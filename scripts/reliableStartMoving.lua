@@ -1,4 +1,4 @@
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+local isNewEngine = not ((Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil))
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity

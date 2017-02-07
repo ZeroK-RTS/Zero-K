@@ -31,7 +31,7 @@ local scanForRemovalUnits    = {}
 local scanForRemovalFeatures = {}
 local dontCheckFeatures = {}
 
-local gaiaTeamID = ((Game.version:find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
+local gaiaTeamID = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1)) and -1 or Spring.GetGaiaTeamID()
 
 local shaderObj
 function InitShader()

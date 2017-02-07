@@ -8,7 +8,7 @@
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-local reverseCompat = (Game.version:find('91.0') == 1)
+local reverseCompat = (Spring.Utilities.GetEngineVersion():find('91.0') == 1)
 
 local function IsFeatureInRange(unitID, featureID, range)
 	if reverseCompat then

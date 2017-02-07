@@ -1,4 +1,4 @@
-if (Game.version:find('91.0') == 1) then
+if (Spring.Utilities.GetEngineVersion():find('91.0') == 1) then
   local SetUnitWeaponState = Spring.SetUnitWeaponState
   local GetUnitWeaponState = Spring.GetUnitWeaponState
   local GetUnitWeaponVectors = Spring.GetUnitWeaponVectors

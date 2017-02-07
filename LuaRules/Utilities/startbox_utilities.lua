@@ -90,6 +90,7 @@ function ParseBoxes (backupSeed)
 	local startBoxConfig
 
 	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
+	Spring.Echo("read public_random_seed", Spring.GetGameRulesParam("public_random_seed"), backupSeed)
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)
@@ -219,12 +220,13 @@ function ParseBoxes (backupSeed)
 	return startBoxConfig
 end
 
-function GetRawBoxes ()
+function GetRawBoxes(backupSeed)
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
+	backupSeed = backupSeed or 0
 
 	local startBoxConfig
-	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)

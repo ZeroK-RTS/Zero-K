@@ -192,7 +192,7 @@ local function SaveGame(filename, description, requireOverwrite)
 			saveData.description = description or "No description"
 			saveData.gameName = Game.gameName
 			saveData.gameVersion = Game.gameVersion
-			saveData.engineVersion = Game.version
+			saveData.engineVersion = Spring.Utilities.GetEngineVersion()
 			saveData.map = Game.mapName
 			saveData.gameframe = Spring.GetGameFrame()
 			saveData.playerName = Spring.GetPlayerInfo(Spring.GetMyPlayerID())

@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------------------------------------------
 
 --// only works with >=77b1
-if (Game.version=="0.76b1") then
+if (Spring.Utilities.GetEngineVersion()=="0.76b1") then
 	return false
 end
 

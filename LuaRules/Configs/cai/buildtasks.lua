@@ -22,7 +22,7 @@ factory job indexes:
 	5 = gunship
 --]]
 
-local reverseCompat = ((Game.version:find('91.0') == 1))
+local reverseCompat = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1))
 
 factionBuildConfig = {
 	robots = {

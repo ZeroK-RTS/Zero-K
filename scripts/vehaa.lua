@@ -20,7 +20,7 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+local isNewEngine = not ((Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil))
 
 local SUSPENSION_BOUND = 7
 local WHEEL_TURN_MULT = 1.2

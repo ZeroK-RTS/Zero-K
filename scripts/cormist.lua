@@ -19,7 +19,7 @@ local moving, runSpin, wheelTurnSpeed
 
 local deployed = false
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
+local isNewEngine = not ((Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil))
 
 local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},

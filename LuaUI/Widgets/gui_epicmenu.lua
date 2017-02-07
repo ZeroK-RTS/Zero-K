@@ -135,7 +135,7 @@ local showTidal = false
 if not confdata.description then confdata.description = '' end
 local gameInfoText = ''
 	..Game.modName ..br..br
-	..'Spring Engine version: '..Game.version..br..br	
+	..'Spring Engine version: '..Spring.Utilities.GetEngineVersion()..br..br	
 	..'Map: ' ..Game.mapName ..br
 		
 	..'    Size: '..Game.mapX..' x '..Game.mapY..br        
