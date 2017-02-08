@@ -145,7 +145,7 @@ function script.Activate()
 	activate()
 end
 
-function script.StopMoving()
+function script.Deactivate()
 	deactivate()
 end
  
