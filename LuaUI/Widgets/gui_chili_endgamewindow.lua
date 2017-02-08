@@ -209,7 +209,7 @@ local function SetupControls()
 	
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
-		x=10;y=55;
+		x=10;y=50;
 		bottom=10;right=10;
 		autosize = true,
 		scrollbarSize = 6,
@@ -217,8 +217,8 @@ local function SetupControls()
 		hitTestAllowEmpty = true;
 		tooltip = "",
 	}
-	statsPanel = StackPanel:New{
-		x=10;y=40;
+	statsPanel = ScrollPanel:New{
+		x=10;y=50;
 		bottom=10;right=10;
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},

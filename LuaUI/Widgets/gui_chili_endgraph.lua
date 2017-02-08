@@ -291,12 +291,12 @@ function loadpanel()
 	local screen0 = Chili.Screen0
 	local selW = 150
 
-	window0 = Chili.Panel:New {
+	window0 = Chili.Control:New {
 		x = "0",
 		y = "0",
 		width = "100%", 
 		height = "100%",
-		padding = {5,5,5,5}
+		padding = {0,0,0,4}
 	}
 	lineLabels 	= Chili.Control:New {
 		parent = window0,
@@ -318,7 +318,7 @@ function loadpanel()
 	}
 	graphPanel = Chili.Panel:New {
 		parent = window0,
-		x = selW, 
+		x = selW + 4, 
 		right = 30,
 		y = 0, 
 		bottom = 40,
