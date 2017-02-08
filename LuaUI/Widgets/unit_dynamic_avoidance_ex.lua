@@ -79,7 +79,6 @@ local mathRandom = math.random
 -- Constant:
 -- Switches:
 local turnOnEcho =0 --1:Echo out all numbers for debugging the system, 2:Echo out alert when fail. (default = 0)
-local isOldSpringG = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1)) and 1 or 0 --integer:[0,1]: weaponState index compatibility for Spring older than 94.1++ (default = 0. 0:for Spring 94.1.1 and above, 1: for Spring 94.1 and below)
 local activateAutoReverseG=1 --integer:[0,1], activate a one-time-reverse-command when unit is about to collide with an enemy (default = 1)
 local activateImpatienceG=0 --integer:[0,1], auto disable auto-reverse & half the 'distanceCONSTANT' after 6 continuous auto-avoidance (3 second). In case the unit stuck (default = 0)
 
@@ -1339,7 +1338,6 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 	local criticalShieldLevel =criticalShieldLevelG 
 	local minimumRemainingReloadTime =minimumRemainingReloadTimeG
 	local secondPerGameFrame =secondPerGameFrameG
-	local isOldSpring = isOldSpringG --for Spring < 95 compatibility
 	------
 	--local unitType = unitInMotionSingleUnitTable["unitType"] --retrieve stored unittype
 	local shieldIsCritical =false
@@ -1367,7 +1365,7 @@ function CheckIfUnitIsReloading(unitInMotionSingleUnitTable)
 				-- unitValidForReloadEvasion = fastestReloadTime > 2.5 --check if unit will have enough time to return from *this widget* evasion
 			-- end
 			-- if unitValidForReloadEvasion then
-				local weaponReloadFrame = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon-isOldSpring, "reloadFrame") --Somehow the weapon table actually start at "0", so minus 1 from actual value
+				local weaponReloadFrame = spGetUnitWeaponState(unitID, unitFastestReloadableWeapon, "reloadFrame") --Somehow the weapon table actually start at "0", so minus 1 from actual value
 				local currentFrame, _ = spGetGameFrame() 
 				local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame --convert to second
 				-- weaponIsEmpty = (remainingTime > math.max(minimumRemainingReloadTime,fastestReloadTime*0.25))

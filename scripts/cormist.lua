@@ -19,8 +19,6 @@ local moving, runSpin, wheelTurnSpeed
 
 local deployed = false
 
-local isNewEngine = not ((Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil))
-
 local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},
 	[2] = {firepoint = firepoint2, exhaust = exhaust2}
@@ -190,12 +188,7 @@ function Suspension()
 		
 		if y - height < 1 then -- If I am on the ground
 			
-			if isNewEngine then
-				speed = select(4,spGetUnitVelocity(unitID))
-			else
-				x,y,z = spGetUnitVelocity(unitID)
-				speed = math.sqrt(x*x+y*y+z*z)
-			end
+			speed = select(4,spGetUnitVelocity(unitID))
 			wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 			if moving then

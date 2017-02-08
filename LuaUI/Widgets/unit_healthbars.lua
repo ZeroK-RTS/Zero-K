@@ -24,8 +24,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
---//for backward compatibility with old weapon indexes
-local reverseCompat = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1)) and 1 or 0
 
 local barHeight = 3
 local barWidth  = 14  --// (barWidth)x2 total width!!!
@@ -858,9 +856,9 @@ do
       --// RELOAD
       if ci.dyanmicComm or (ci.reloadTime >= options.minReloadTime.value) then
         local primaryWeapon = GetUnitRulesParam(unitID, "primary_weapon_override") or ci.primaryWeapon
-        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon - reverseCompat)
+        _,reloaded,reloadFrame = GetUnitWeaponState(unitID,primaryWeapon)
         if (reloaded==false) then
-		  local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon - reverseCompat , 'reloadTime')
+		  local reloadTime = Spring.GetUnitWeaponState(unitID, primaryWeapon, 'reloadTime')
 		  if (not ci.dyanmicComm) or (reloadTime >= options.minReloadTime.value) then 
 		    ci.reloadTime = reloadTime
 		    -- When weapon is disabled the reload time is constantly set to be almost complete. 
