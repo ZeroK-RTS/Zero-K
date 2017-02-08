@@ -1264,8 +1264,7 @@ function gadget:GameFrame(n)
 
 					if not pylonData.mex then
 						local unitDefID = spGetUnitDefID(unitID)
-						local unitDef = unitDefID and UnitDefs[unitDefID]
-						if not unitDef then
+						if not unitDefID then
 							if not spammedError then
 								Spring.Log(gadget:GetInfo().name, LOG.ERROR, "unitDefID missing for pylon")
 								spammedError = true
