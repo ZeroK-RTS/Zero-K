@@ -69,7 +69,6 @@ local transkey = include("Configs/transkey.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local reverseCompat = (Spring.Utilities.GetEngineVersion():find('91.0') == 1) and 1 or 0
 
 local Chili
 local Button
@@ -727,7 +726,7 @@ local function GetWeaponReloadStatus(unitID, weapNum)
 	local weaponNoX = (unitDef and unitDef.weapons and unitDef.weapons[weapNum]) --Note: weapon no.3 is by ZK convention is usually used for user controlled weapon
 	if (weaponNoX ~= nil) and WeaponDefs[weaponNoX.weaponDef].manualFire then
 		local reloadTime = WeaponDefs[weaponNoX.weaponDef].reload
-		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum-reverseCompat) --select weapon no.X
+		local _, _, weaponReloadFrame, _, _ = spGetUnitWeaponState(unitID, weapNum) --select weapon no.X
 		if weaponReloadFrame then
 			local currentFrame, _ = spGetGameFrame() 
 			local remainingTime = (weaponReloadFrame - currentFrame)*secondPerGameFrame
