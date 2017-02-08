@@ -20,8 +20,6 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
-local isNewEngine = not ((Spring.Utilities.GetEngineVersion():find('91.0') == 1) and (Spring.Utilities.GetEngineVersion():find('91.0.1') == nil))
-
 local SUSPENSION_BOUND = 7
 local WHEEL_TURN_MULT = 1.2
 local ANIM_PERIOD = 50
@@ -119,12 +117,7 @@ function Suspension()
 		
 		if y - height < 1 then -- If I am on the ground
 			
-			if isNewEngine then
-				speed = select(4,spGetUnitVelocity(unitID))
-			else
-				x,y,z = spGetUnitVelocity(unitID)
-				speed = math.sqrt(x*x+y*y+z*z)
-			end
+			speed = select(4,spGetUnitVelocity(unitID))
 			wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
 			if moving then
