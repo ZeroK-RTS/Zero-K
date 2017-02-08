@@ -90,6 +90,9 @@ function widget:AddConsoleMessage(msg)
 end
 
 function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
+	if not textToSpeechEnabled then
+		return
+	end
 	if (select(1, Spring.GetSpectatingState()) or playerId == myPlayerID) then
 		return
 	end
