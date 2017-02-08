@@ -118,6 +118,9 @@ end
 -------------------------------------------------------------------------------------
 
 local buildTimes = {}
+local variableCostUnit = {
+	[UnitDefNames["terraunit"].id] = true
+}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local realBuildTime = ud.customParams.real_buildtime
@@ -126,16 +129,19 @@ for i = 1, #UnitDefs do
 	else
 		buildTimes[i] = ud.buildTime
 	end
+	if ud.level then
+		variableCostUnit[i] = true
+	end
 end
 
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
-	if unitID then
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if unitID and variableCostUnit[unitDefID] then
 		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 		if realCost then
 			return realCost
 		end
 	end
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if unitDefID and buildTimes[unitDefID] then
 		return buildTimes[unitDefID] 
 	end

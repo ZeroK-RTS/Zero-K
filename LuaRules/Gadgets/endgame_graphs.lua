@@ -22,6 +22,13 @@ local damageDealtByTeam = {}
 local metalExcessByTeam = {}
 local damageReceivedByTeam = {}
 
+local dontCountUnits = {}
+for unitDefID = 1, #UnitDefs do
+	if UnitDefs[unitDefID].customParams.dontcount then
+		dontCountUnits[unitDefID] = true
+	end
+end
+
 function gadget:AllowFeatureBuildStep(builderID, builderTeam, featureID, featureDefID, part)
 	if (part < 0) then
 		reclaimListByTeam[builderTeam] = reclaimListByTeam[builderTeam] + (part * FeatureDefs[featureDefID].metal)
@@ -51,8 +58,8 @@ local function GetTotalUnitValue (teamID)
 	for i = 1, #teamUnits do
 		local unitID = teamUnits[i]
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		if not UnitDefs[unitDefID].customParams.dontcount then
-			totalValue = totalValue + (Spring.Utilities.GetUnitCost(unitID, unitDefID) * select(5, Spring.GetUnitHealth(unitID)))
+		if not dontCountUnits[unitDefID] then
+			totalValue = totalValue + Spring.Utilities.GetUnitCost(unitID, unitDefID) * select(5, Spring.GetUnitHealth(unitID))
 		end
 	end
 	return totalValue
