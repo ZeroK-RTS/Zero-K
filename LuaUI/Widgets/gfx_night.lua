@@ -55,7 +55,6 @@ local secondsPerDay        = 600                 --seconds per day
 
 local maxBeamDivergent = 2 					--how big the light beam can expand if unit get further away from ground
 
-local reverseCompatibility = (Spring.Utilities.GetEngineVersion():find('91.0') == 1) or (Spring.Utilities.GetEngineVersion():find('94') and not Spring.Utilities.GetEngineVersion():find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------
 --other vars
 --------------------------------------------------------------------------------
@@ -337,8 +336,7 @@ local function DrawSearchlights()
 			leadDistance = cache[defID].leadDist
 			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius
-		  elseif (reverseCompatibility and (unitDef.type == "Bomber" or unitDef.type == "Fighter") or 
-		  (unitDef.isBomberAirUnit or unitDef.isFighterAirUnit)) then --https://github.com/spring/spring/blob/develop/doc/changelog.txt
+		  elseif unitDef.isBomberAirUnit or unitDef.isFighterAirUnit then
 			local vx, _, vz = GetUnitVelocity(unitID)
 			if not vx or not vz then --sometimes happen when seeing enemy airplane
 				vx=0
