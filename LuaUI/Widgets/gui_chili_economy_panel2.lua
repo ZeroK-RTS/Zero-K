@@ -873,10 +873,10 @@ local function GetNoStorageWarning(parentControl, x, y, right, height, barHolder
 	
 	local label = Chili.Label:New{
 		name   = "warningLabel",
-		x      = "30%",
+		x      = "5%",
 		y      = 0,
 		bottom = "8%",
-		width  = "40%",
+		width  = "90%",
 		caption = strings.resbar_no_storage,
 		valign = "center",
  		align  = "center",
