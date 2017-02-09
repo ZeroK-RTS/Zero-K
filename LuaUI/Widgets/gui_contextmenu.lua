@@ -1568,9 +1568,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	local children = {
 		ScrollPanel:New{
 			--horizontalScrollbar = false,
-			x=0,y=15,
-			width='100%',
-			bottom = B_HEIGHT*2,
+			x=5,y=15,
+			right = 5,
+			bottom = B_HEIGHT + 10,
 			padding = {2,2,2,2},
 			children = printunitinfo(ud, window_width, unitID) ,
 		},	
@@ -1578,10 +1578,10 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			caption = 'Close', 
 			OnClick = { function(self) KillStatsWindow(num) end }, 
 			
-			x=0,
+			x=5,
 			height=B_HEIGHT,
-			right=10,
-			bottom=1,
+			right=5,
+			bottom=5,
 			
 			--backgroundColor=color.sub_back_bg, 
 			--textColor=color.sub_back_fg,
@@ -1611,7 +1611,6 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		children = children,
 	}
 	AdjustWindow(statswindows[num])
-	
 end
 
 local function PriceWindow(unitID, action)
