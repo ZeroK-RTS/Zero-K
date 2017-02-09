@@ -155,6 +155,12 @@ function languageChanged ()
 	if energyWarningPanel then
 		energyWarningPanel.SetText(strings.energy_stall_warning)
 	end
+	if metalNoStorage then
+		metalNoStorage.SetText(strings.resbar_no_storage)
+	end
+	if energyNoStorage then
+		energyNoStorage.SetText(strings.resbar_no_storage)
+	end
 end
 
 --------------------------------------------------------------------------------
