@@ -40,12 +40,38 @@ local lastFacPlop = {}
 local lastRearm = {}
 local lastRetreat = {}
 
+local lowPowerUnitDef = {}
+local facPlopUnitDef = {}
+local rearmUnitDef = {}
+local retreatUnitDef = {}
+for unitDefID = 1, #UnitDefs do
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.neededlink then
+		lowPowerUnitDef[unitDefID] = true
+	end
+	if ud.customParams.level then
+		facPlopUnitDef[unitDefID] = true
+	end
+	if ud.customParams.requireammo then
+		rearmUnitDef[unitDefID] = true
+	end
+	if not (ud.speed == 0 or ud.isBuilding) then
+		retreatUnitDef[unitDefID] = true
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 function SetIcons(unitID)
-	for _,unitID in ipairs(Spring.GetAllUnits()) do
-		local lowpower = Spring.GetUnitRulesParam(unitID, "lowpower") 
+	local units = Spring.GetAllUnits()
+	for i = 1, #units do
+		local unitID = units[i]
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		
+		-- calculate which units can have these states and check them first
+		
+		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower") 
 		if lowpower then
 			local _,_,inbuild = Spring.GetUnitIsStunned(unitID)
 			if inbuild then
@@ -61,7 +87,7 @@ function SetIcons(unitID)
 			end
 		end
 		
-		local facplop = Spring.GetUnitRulesParam(unitID, "facplop") 
+		local facplop = facPlopUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "facplop") 
 		if facplop or lastFacPlop[unitID] == 1 then
 			if not facplop then
 				facplop = 0
@@ -77,7 +103,7 @@ function SetIcons(unitID)
 			end
 		end
 		
-		local rearm = Spring.GetUnitRulesParam(unitID, "noammo") 
+		local rearm = rearmUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "noammo") 
 		if rearm then
 			if (not lastRearm[unitID]) or lastRearm[unitID] ~= rearm then
 				lastRearm[unitID] = rearm
@@ -91,7 +117,7 @@ function SetIcons(unitID)
 			end
 		end
 		
-		local retreat = Spring.GetUnitRulesParam(unitID, "retreat") 
+		local retreat = retreatUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "retreat") 
 		if retreat then
 			if (not lastRetreat[unitID]) or lastRetreat[unitID] ~= retreat then
 				lastRetreat[unitID] = retreat
@@ -122,7 +148,6 @@ function widget:GameFrame(f)
 		SetIcons()
 	end
 end
-
 
 function widget:Initialize()
 	WG.icons.SetOrder( 'lowpower', 2 )
