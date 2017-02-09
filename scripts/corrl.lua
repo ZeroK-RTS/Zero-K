@@ -99,7 +99,7 @@ local function FireAndReload(num)
 	
 	Sleep(500)
 	local adjustedDuration = 0
-	while adjustedDuration < 7 do
+	while adjustedDuration < 8 do
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
 		adjustedDuration = adjustedDuration + reloadMult
@@ -125,7 +125,7 @@ local function FireAndReload(num)
 	end
 	
 	Sleep(500)
-	while adjustedDuration < 9 do
+	while adjustedDuration < 10 do
 		local stunnedOrInbuild = Spring.GetUnitIsStunned(unitID)
 		local reloadMult = (stunnedOrInbuild and 0) or (Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1)
 		adjustedDuration = adjustedDuration + reloadMult

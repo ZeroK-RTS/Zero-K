@@ -88,7 +88,7 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
-		script_reload = [[11]],
+		script_reload = [[12.5]],
 		script_burst = [[3]],
 		
 		light_camera_height = 2000,
