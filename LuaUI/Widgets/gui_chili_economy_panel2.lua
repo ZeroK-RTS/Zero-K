@@ -282,7 +282,7 @@ options = {
 		OnChange = option_recreateWindow
 	},
 	warningFontSize = {
-		name  = "Farning Font Size",
+		name  = "Warning Font Size",
 		type  = "number",
 		value = 14, min = 8, max = 40, step = 1,
 		OnChange = option_recreateWindow
