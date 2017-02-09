@@ -15,14 +15,14 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local WHITE = {1,1,1}
-local SIZE_MULT = 1.05
+local DEFAULT_COLOR = {.05, .96, .95}
+local CIRCLE_SIZE_MULT = 1.05
 local PADDING_X = 4
 local PADDING_Y = 4
 
 local Chili
 
-local circleDrawList
+local circleDrawList, rectangleDrawList
 
 local controls = {} -- [control name] = {control = control, color = color}
 local alpha = 1
@@ -74,6 +74,28 @@ local function GetAngleFromVector(x, y)
   return theta
 end
 
+-- from gfx_commands_fx.lua
+local function CircleVertices(circleDivs)
+  for i = 1, circleDivs do
+    local theta = 2 * math.pi * i / circleDivs
+    gl.Vertex(math.cos(theta), math.sin(theta), 0)
+  end
+end
+
+local function RoundedRectangleVertices()
+  gl.Vertex(-1, 0.9, 0) -- top left 1
+  gl.Vertex(-0.9, 1, 0)  -- top left 2
+  gl.Vertex(0.9, 1, 0)   -- top right 1
+  gl.Vertex(1, 0.9, 0)   -- top right 2
+  gl.Vertex(1, -0.9, 0)  -- borrom right 1
+  gl.Vertex(0.9, -1, 0)  -- bottom right 2
+  gl.Vertex(-0.9, -1, 0) -- bottom left 1
+  gl.Vertex(-1, -0.9, 0) -- bottom left 2
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local function DrawArrow(x, y, controlWidth, controlHeight, color, angle)
   controlHeight = controlHeight/2 + vsy * 0.02 * alpha
   local halfWidth = vsx*0.01
@@ -106,23 +128,22 @@ local function DrawArrow(x, y, controlWidth, controlHeight, color, angle)
   gl.PopMatrix()
 end
 
--- from gfx_commands_fx.lua
-local function CircleVertices(circleDivs)
-  for i = 1, circleDivs do
-    local theta = 2 * math.pi * i / circleDivs
-    gl.Vertex(math.cos(theta), math.sin(theta), 0)
-  end
-end
-
 local function DrawCircle(x, y, width, height, color, lineWidth, drawArrow)
+  local rectangle = (width/height >= 1.5) or (height/width >= 1.5)
+  local sizeMult = rectangle and 1 or CIRCLE_SIZE_MULT
+  
   y = vsy - y
   gl.LineWidth(lineWidth)
   gl.PushMatrix()
   gl.Translate(x, y, 0)
-  gl.Scale((width*SIZE_MULT + PADDING_X)/2, (height*SIZE_MULT + PADDING_Y)/2, 1)
+  gl.Scale((width*sizeMult + PADDING_X)/2, (height*sizeMult + PADDING_Y)/2, 1)
   gl.Color(color[1], color[2], color[3], alpha)
   gl.LineStipple(true)
-  gl.CallList(circleDrawList)
+  if rectangle then
+    gl.CallList(rectangleDrawList)
+  else
+    gl.CallList(circleDrawList)
+  end
   gl.PopMatrix()
   
   if drawArrow then
@@ -149,15 +170,18 @@ end
 function widget:DrawScreen()
   for name, data in pairs(controls) do
     if data.func then
-      local x, y, w, h = unpack(data.func())
-      if x and w then
-        DrawCircle(x, y, w, h, data.color or WHITE, data.width or 4, data.drawArrow)
+      local pos = data.func()
+      if pos then
+        local x, y, w, h = unpack(pos)
+        if x and w then
+          DrawCircle(x, y, w, h, data.color or DEFAULT_COLOR, data.width or 4, data.drawArrow)
+        end
       end
     else
       local control = data.control
       if control and (not control.disposed) then
         if control.visible then
-          DrawCircleForControl(control, data.color or WHITE, data.width or 4, data.drawArrow)
+          DrawCircleForControl(control, data.color or DEFAULT_COLOR, data.width or 4, data.drawArrow)
         end
       else
         RemoveControl(name)
@@ -185,6 +209,7 @@ function widget:Initialize()
   }
   
   circleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, CircleVertices, 18)
+  rectangleDrawList = gl.CreateList(gl.BeginEnd, GL.LINE_LOOP, RoundedRectangleVertices, 18)
   --WG.ChiliHighlight.AddControl("Metal", nil, true)
   --WG.ChiliHighlight.AddControl("Energy", nil, 180)
   --WG.ChiliHighlight.AddControlFunc("econTab", function() return {WG.IntegralMenu.GetTabPosition("units_mobile")} end, nil, true)
@@ -195,6 +220,8 @@ end
 
 function widget:Shutdown()
   WG.ChiliHighlight = nil
+  gl.DeleteList(circleDrawList)
+  gl.DeleteList(rectangleDrawList)
 end
 
 --------------------------------------------------------------------------------
