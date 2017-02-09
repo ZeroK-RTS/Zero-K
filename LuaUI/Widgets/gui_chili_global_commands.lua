@@ -117,7 +117,7 @@ options = {
 	},
 	fancySkinning = {
 		name = 'Fancy Skinning',
-		type = 'bool',
+		type = 'radioButton',
 		value = 'panel',
 		items = {
 			{key = 'panel', name = 'None'},
