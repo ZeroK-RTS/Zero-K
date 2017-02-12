@@ -1495,23 +1495,9 @@ local function tooltipBreakdown(tooltip)
 	local unitname = nil
 
 	if tooltip:find('Build', 1, true) == 1 then
-		local start,fin = tooltip:find([[ - ]], 1, true)
-		if start and fin then
-			local unitHumanName
-			local buildType
-			if (tooltip:find('Build Unit:', 1, true) == 1) then
-				buildType = 'buildunit'
-				unitHumanName = tooltip:sub(13,start-1)
-			else
-				buildType = 'build'
-				unitHumanName = tooltip:sub(8,start-1)
-			end
-			local udef = GetUnitDefByHumanName(unitHumanName)
-			
-			return udef or false
-			
-		end
-		
+		local name = string.sub(tooltip, 6)
+		local ud = name and UnitDefNames[name]
+		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
 		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
 		local udef = GetUnitDefByHumanName(unitHumanName)

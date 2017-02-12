@@ -14,6 +14,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 local spGetMouseState = Spring.GetMouseState
 local spTraceScreenRay = Spring.TraceScreenRay
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
@@ -50,14 +52,80 @@ local yellow = '\255\255\255\1'
 
 local HEALTH_IMAGE = 'LuaUI/images/commands/bold/health.png'
 local COST_IMAGE = 'LuaUI/images/cost.png'
+local TIME_IMAGE = 'LuaUI/images/clock.png'
 local METAL_IMAGE = 'LuaUI/images/ibeam.png'
 local ENERGY_IMAGE = 'LuaUI/images/energy.png'
 local METAL_RECLAIM_IMAGE = 'LuaUI/images/ibeamReclaim.png'
 local ENERGY_RECLAIM_IMAGE = 'LuaUI/images/energyReclaim.png'
 
+local CURSOR_ERASE = 'eraser'
+local CURSOR_POINT = 'flagtext'
+local CURSOR_DRAW = 'pencil'
+local CURSOR_ERASE_NAME = "map_erase"
+local CURSOR_POINT_NAME = "map_point"
+local CURSOR_DRAW_NAME = "map_draw"
+
 local iconTypesPath = LUAUI_DIRNAME .. "Configs/icontypes.lua"
 local icontypes = VFS.FileExists(iconTypesPath) and VFS.Include(iconTypesPath)
 local _, iconFormat = VFS.Include(LUAUI_DIRNAME .. "Configs/chilitip_conf.lua" , nil, VFS.RAW_FIRST)
+
+local terraformGeneralTip = 
+	green.. 'Click&Drag'..white..': Free draw terraform. \n'..
+	green.. 'Alt+Click&Drag'..white..': Box terraform. \n'..
+	green.. 'Alt+Ctrl+Click&Drag'..white..': Hollow box terraform. \n'..
+	green.. 'Ctrl+Click on unit' ..white..': Terraform around unit. \n'..
+	'\n'
+
+local terraCmdTip = {
+	[CMD_RAMP] = 
+		green.. 'Step 1'..white..': Click to start ramp \n    OR click&drag to start a ramp at desired height. \n'..
+		green.. 'Step 2'..white..': Click to set end of ramp \n    OR click&drag to set end of ramp at desired height. \n    Hold '..green..'Alt'..white..' to snap to certain levels of pathability. \n'..
+		green.. 'Step 3'..white..': Move mouse to set ramp width, click to complete. \n'..
+		'\n'..
+		yellow..'[Any Time]\n'..
+		green.. 'Space'..white..': Cycle through only raise/lower \n'..
+		'\n'..
+		yellow..'[Wireframe indicator colors]\n'..
+		green.. 'Green'..white..': All units can traverse. \n'..
+		green.. 'Yellow'..white..': Vehicles cannot traverse. \n'..
+		green.. 'Red'..white..': Only all-terrain / spiders can traverse.',
+	[CMD_LEVEL] = terraformGeneralTip ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		'\n'..
+		yellow..'[After Terraform Draw]\n'..
+		green.. 'Alt'..white..': Snap to starting height / below water level (prevent ships) / below water level (prevent land units). \n'..
+		green.. 'Ctrl'..white..': Hold and point at terrain to level to height pointed at.\n'..
+		'\n'..
+		yellow..'[Any Time]\n'..
+		green.. 'Space'..white..': Cycle through only raise/lower',
+	[CMD_RAISE] = terraformGeneralTip ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment. \n'..
+		'\n'..
+		yellow..'[After Terraform Draw]\n'..
+		green.. 'Alt'..white..': Snap to steps of 15 height. \n'..
+		green.. 'Ctrl'..white..': Snap to 0 height.',
+	[CMD_SMOOTH] = terraformGeneralTip ..
+		yellow..'[During Terraform Draw]\n'..
+		green.. 'Ctrl'..white..': Draw straight line segment.',
+	[CMD_RESTORE] = terraformGeneralTip ..
+		yellow..'[Any Time]\n'..
+		green.. 'Space'..white..': Limit to only raise/lower',
+}
+
+local DRAWING_TOOLTIP = 
+	green.. 'Left click'..white..': Draw on map. \n' ..
+	green.. 'Right click'..white..': Erase. \n' ..
+	green.. 'Middle click'..white..': Place marker. \n' ..
+	green.. 'Double click'..white..': Place marker with label.'
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Variables
+
+local drawHotkeyBytes = {}
+local drawHotkeyBytesCount = 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -197,9 +265,58 @@ local function GetPlayerCaption(teamID)
 	return WG.Translate("interface", "player") .. ': ' .. teamColor .. playerName
 end
 
+local function GetIsHoldingDrawKey()
+	if drawHotkeyBytesCount == 0 then
+	WG.drawtoolKeyPressed = false
+		return false
+	end
+	for i = 1, drawHotkeyBytesCount do
+		local key = drawHotkeyBytes[i]
+		if Spring.GetKeyState(key) then
+			WG.drawtoolKeyPressed = true
+			return true
+		end
+	end
+	WG.drawtoolKeyPressed = false
+	return false
+end
+
+local function UpdateMouseCursor(holdingDrawKey)
+	if not holdingDrawKey then
+		return
+	end
+	local x, y, drawing, addingPoint, erasing = Spring.GetMouseState()
+	if addingPoint then
+		Spring.SetMouseCursor(CURSOR_POINT_NAME)
+	elseif erasing then
+		Spring.SetMouseCursor(CURSOR_ERASE_NAME)
+	else
+		Spring.SetMouseCursor(CURSOR_DRAW_NAME)
+	end
+end
+
+local UnitDefIDByHumanName_cache = {}
+local function GetUnitDefByHumanName(humanName)
+	local cached_unitDefID = UnitDefIDByHumanName_cache[humanName]
+	if (cached_udef ~= nil) then
+		return cached_udef
+	end
+	
+	for i = 1, #UnitDefs do
+		local ud = UnitDefs[i]
+		if (ud.humanName == humanName) then
+			UnitDefIDByHumanName_cache[humanName] = i
+			return i
+		end
+	end
+	
+	UnitDefIDByHumanName_cache[humanName] = false
+	return false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Unit tooltip window
+-- Unit tooltip window components
 
 local function GetBar(parentControl, initY, imageFile, color, colorFunc)
 	local image = Chili.Image:New{
@@ -283,7 +400,7 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 		end
 		if yPos then
 			image:SetPos(nil, yPos)
-			label:SetPos(nil, yPos + 2)
+			label:SetPos(nil, yPos + textOffset)
 		end
 		label:SetCaption(newCaption)
 		if newImage ~= imageFile then
@@ -300,6 +417,80 @@ local function GetImageWithText(parentControl, initY, imageFile, caption, fontSi
 	
 	return Update
 end
+
+local function GetMorphInfo(parentControl, yPos)
+	local holder = Chili.Control:New{
+		x = 0,
+		y = yPos,
+		right = 0,
+		height = ICON_SIZE,
+		padding = {0,0,0,0},
+		parent = parentControl,
+	}
+	
+	local morphLabel = Chili.Label:New{
+		x = 4,
+		y = 0,
+		height = ICON_SIZE, 
+		width = 50,
+		valign = 'center', 
+		caption = cyan .. 'Morph:',
+		fontSize = BAR_FONT,
+		parent = holder,
+	}
+	local timeImage = Chili.Image:New{
+		x = 54,
+		y = 0,
+		width = ICON_SIZE,
+		height = ICON_SIZE,
+		file = TIME_IMAGE,
+		parent = holder,
+	}
+	local timeLabel = Chili.Label:New{
+		x = 54 + ICON_SIZE + 4,
+		y = 4,
+		right = 0,
+		height = BAR_SIZE,
+		caption = BAR_FONT,
+		fontSize = fontSize,
+		parent = holder,
+	}
+	local costImage = Chili.Image:New{
+		x = 114,
+		y = 0,
+		width = ICON_SIZE,
+		height = ICON_SIZE,
+		file = COST_IMAGE,
+		parent = holder,
+	}
+	local costLabel = Chili.Label:New{
+		x = 113 + ICON_SIZE + 4,
+		y = 4,
+		right = 0,
+		height = BAR_SIZE,
+		caption = BAR_FONT,
+		fontSize = fontSize,
+		parent = holder,
+	}
+	
+	local function Update(visible, newTime, newCost, yPos)
+		holder:SetVisibility(visible)
+		if not visible then
+			return
+		end
+		if yPos then
+			holder:SetPos(nil, yPos)
+		end
+		timeLabel:SetCaption(cyan .. newTime)
+		costLabel:SetCaption(cyan .. newCost)
+	end
+	
+	return Update
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Unit tooltip window
 
 local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 	
@@ -343,16 +534,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		parent = rightPanel,
 	}
 	
-	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, COST_IMAGE, nil, nil, ICON_SIZE, 3)
-	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 3)
-	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 3)
+	local costInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 4, COST_IMAGE, nil, nil, ICON_SIZE, 5)
+	local metalInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + LEFT_SPACE + 4, METAL_IMAGE, nil, nil, ICON_SIZE, 5)
+	local energyInfoUpdate = GetImageWithText(leftPanel, PIC_HEIGHT + 2*LEFT_SPACE + 4, ENERGY_IMAGE, nil, nil, ICON_SIZE, 5)
 	
 	local healthBarUpdate = GetBar(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, {0, 1, 0, 1}, GetHealthColor)
 	
 	local metalInfo
 	local energyInfo
 	
-	local spaceClickLabel, shieldBar, buildBar, morphInfo, playerNameLabel
+	local spaceClickLabel, shieldBar, buildBar, morphInfo, playerNameLabel, maxHealthLabel, morphInfo
 	if isTooltipVersion then
 		playerNameLabel = Chili.Label:New{
 			name = "playerNameLabel",
@@ -372,8 +563,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			caption = green .. WG.Translate("interface", "space_click_show_stats"),
 			parent = rightPanel,
 		}
-		
-		--morphInfo
+		maxHealthLabel = GetImageWithText(rightPanel, PIC_HEIGHT + 4, HEALTH_IMAGE, nil, NAME_FONT, ICON_SIZE, 3)
+		morphInfo = GetMorphInfo(rightPanel, PIC_HEIGHT + LEFT_SPACE + 3)
 	else
 		--shieldBar
 		--buildBar
@@ -385,6 +576,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		local teamID
 		local addedName
 		local metalInfoShown = false
+		local maxHealthShown = false
+		local morphShown = false
 		
 		if featureID then
 			teamID = Spring.GetFeatureTeam(featureID)
@@ -412,8 +605,8 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 			
 			healthBarUpdate(false)
 			if unitDefID then
-				playerNameLabel:SetPos(nil, PIC_HEIGHT + 4)
-				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 28)
+				playerNameLabel:SetPos(nil, PIC_HEIGHT + 10)
+				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 34)
 			else
 				leftOffset = 1
 				costInfoUpdate(false)
@@ -450,7 +643,16 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 				playerNameLabel:SetPos(nil, PIC_HEIGHT + 31)
 				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 55)
 			elseif not featureDefID then
-				spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
+				healthBarUpdate(false)
+				maxHealthLabel(true, ud.health, HEALTH_IMAGE)
+				maxHealthShown = true
+				if morphTime then
+					morphInfo(true, morphTime, morphCost)
+					morphShown = true
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + LEFT_SPACE + 31)
+				else
+					spaceClickLabel:SetPos(nil, PIC_HEIGHT + 30)
+				end
 			end
 		end
 		
@@ -484,6 +686,13 @@ local function GetSingleUnitInfoPanel(parentControl, isTooltipVersion)
 		
 		if spaceClickLabel then
 			spaceClickLabel:SetVisibility(visibleUnitDefID)
+		end
+		
+		if maxHealthLabel and not maxHealthShown then
+			maxHealthLabel(false)
+		end
+		if morphInfo and not morphShown then
+			morphInfo(false)
 		end
 	end
 	
@@ -554,13 +763,12 @@ local function GetUnitTooltip()
 end
 
 local function UpdateTooltip()
+	local holdingDrawKey = GetIsHoldingDrawKey()
+	local holdingSpace = select(3, Spring.GetModKeyState())
+	UpdateMouseCursor(holdingDrawKey)
 	
-	local chiliTooltip = screen0.currentTooltip
-	-- Mouseover command tooltip (screen0.currentTooltip)
-	-- Map drawing tooltip
-	-- Terraform tooltip (spring.GetActiveCommand)
-	-- Placing structure tooltip (spring.GetActiveCommand)
 	-- Mouseover build option tooltip (screen0.currentTooltip)
+	local chiliTooltip = screen0.currentTooltip
 	if chiliTooltip and string.find(chiliTooltip, "Build") then
 		local name = string.sub(chiliTooltip, 6)
 		local ud = name and UnitDefNames[name]
@@ -572,12 +780,39 @@ local function UpdateTooltip()
 	
 	-- Mouseover morph tooltip (screen0.currentTooltip)
 	if chiliTooltip and string.find(chiliTooltip, "Morph") then
+		local unitHumanName = chiliTooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
+		local morphTime = chiliTooltip:gsub('.*time:(.*)metal.*', '%1'):gsub('[^%d]', '')
+		local morphCost = chiliTooltip:gsub('.*metal: (.*)energy.*', '%1'):gsub('[^%d]', '')
+		local unitDefID = GetUnitDefByHumanName(unitHumanName)
+		if unitDefID and morphTime and morphCost then
+			tooltipWindow.SetUnitishTooltip(nil, unitDefID, nil, nil, morphTime, morphCost)
+		end
 		return
 	end
 	
 	-- Generic chili text tooltip
 	if chiliTooltip then
 		tooltipWindow.SetTextTooltip(chiliTooltip)
+		return
+	end
+	
+	-- Map drawing tooltip
+	if holdingDrawKey then
+		tooltipWindow.SetTextTooltip(DRAWING_TOOLTIP)
+		return
+	end
+	
+	
+	-- Terraform tooltip (spring.GetActiveCommand)
+	local index, cmdID, cmdType, cmdName = Spring.GetActiveCommand()
+	if cmdID and terraCmdTip[cmdID] then -- options.showterratooltip.value and
+		tooltipWindow.SetTextTooltip(terraCmdTip[cmdID])
+		return
+	end
+	
+	-- Placing structure tooltip (spring.GetActiveCommand)
+	if cmdID and cmdID < 0 then
+		tooltipWindow.SetUnitishTooltip(nil, -cmdID)
 		return
 	end
 	
@@ -589,6 +824,7 @@ local function UpdateTooltip()
 		tooltipWindow.SetUnitishTooltip(thingParam, unitDefID)
 		return
 	end
+	
 	-- Feature tooltip (trace screen ray (surely))
 	if thingType == "feature" then
 		local featureDefID = Spring.GetFeatureDefID(thingParam)
@@ -597,8 +833,19 @@ local function UpdateTooltip()
 	end
 	
 	-- Ground position tooltip (spGetCurrentTooltip())
+	if holdingSpace then
+		tooltipWindow.SetTextTooltip(Spring.GetCurrentTooltip())
+		return
+	end
+	
 	-- Start position tooltip (really bad widget interface)
+	-- Don't want to implement this as is (pairs over positions registered in WG).
+	
 	-- Geothermal tooltip (WG.mouseAboveGeo)
+	if WG.mouseAboveGeo then
+		WG.Translate("interface", "geospot")
+		return
+	end
 end
 
 function widget:SelectionChanged(newSelection)
@@ -619,6 +866,16 @@ end
 function widget:Initialize()
 	Chili = WG.Chili
 	screen0 = Chili.Screen0
+	
+	Spring.AssignMouseCursor(CURSOR_ERASE_NAME, CURSOR_ERASE, true, false) -- Hotspot center.
+	Spring.AssignMouseCursor(CURSOR_POINT_NAME, CURSOR_POINT, true, true)
+	Spring.AssignMouseCursor(CURSOR_DRAW_NAME, CURSOR_DRAW, true, true)
+	
+	local hotkeys = WG.crude.GetHotkeys("drawinmap")
+	for k,v in pairs(hotkeys) do
+		drawHotkeyBytesCount = drawHotkeyBytesCount + 1
+		drawHotkeyBytes[drawHotkeyBytesCount] = v:byte(-1)
+	end
 	
 	tooltipWindow = GetTooltipWindow()
 end
