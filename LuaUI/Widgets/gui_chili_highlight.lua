@@ -115,14 +115,14 @@ local function DrawArrow(x, y, controlWidth, controlHeight, color, angle)
   end
   
   gl.PushMatrix()
-  gl.Color(color[1], color[2], color[3], 0.7)
+  gl.Color(color[1], color[2], color[3], 0.8)
   gl.Translate(x, y, 0)
   -- arrow fill
   gl.Rotate(angle, 0, 0, 1)
   gl.PolygonMode(GL.FRONT_AND_BACK, GL.FILL)
   gl.Shape(GL.TRIANGLE_FAN, vertices)
   -- outline
-  gl.Color(0, 0, 0, 0.4)
+  gl.Color(0, 0, 0, 0.6)
   gl.LineWidth(1.5)
   gl.Shape(GL.LINE_LOOP, vertices)
   gl.PopMatrix()
