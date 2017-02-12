@@ -53,6 +53,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],
   radarDistanceJam       = 256,
+	script                 = [[armrectr.lua]],
   seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,

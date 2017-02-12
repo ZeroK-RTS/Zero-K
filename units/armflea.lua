@@ -41,7 +41,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[arm_flea.s3o]],
   pushResistant       = 0,
-  script	      = [[armflea.cob]],
+  script	      			= [[armflea.lua]],
   seismicSignature    = 4,
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
