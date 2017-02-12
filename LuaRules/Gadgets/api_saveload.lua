@@ -760,10 +760,8 @@ local function SaveUnits()
 		-- save rulesparams
 		unitInfo.rulesParams = {}		
 		local params = Spring.GetUnitRulesParams(unitID)
-		for i=1,#params do
-			for name,value in pairs(params[i]) do
-				unitInfo.rulesParams[name] = value 
-			end
+		for name,value in pairs(params) do
+			unitInfo.rulesParams[name] = value 
 		end
 	end
 	savedata.unit = data
@@ -840,10 +838,8 @@ local function SaveGeneralInfo()
 	-- gameRulesParams
 	data.gameRulesParams = {}
 	local gameRulesParams = spGetGameRulesParams()
-	for i=1,#gameRulesParams do
-		for name,value in pairs(gameRulesParams[i]) do
-			data.gameRulesParams[name] = value 
-		end
+	for name,value in pairs(gameRulesParams) do
+		data.gameRulesParams[name] = value 
 	end
 	
 	-- team stuff - rulesparams, resources
@@ -858,10 +854,8 @@ local function SaveGeneralInfo()
 		
 		local rulesParams = spGetTeamRulesParams(teamID) or {}
 		data.teams[teamID].rulesParams = {}
-		for j=1,#rulesParams do
-			for name,value in pairs(rulesParams[j]) do
-				data.teams[teamID].rulesParams[name] = value 
-			end
+		for name,value in pairs(rulesParams) do
+			data.teams[teamID].rulesParams[name] = value 
 		end
 	end
 	
