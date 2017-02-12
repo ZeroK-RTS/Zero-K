@@ -62,8 +62,8 @@ queenName            = "chickenflyerqueen"
 queenMorphName		 = "chickenlandqueen"
 miniQueenName		 = "chicken_dragon"
 
-burrowSpawnRate      = 60        -- higher in games with many players, seconds
-chickenSpawnRate     = 59
+burrowSpawnRate      = 45        -- faster in games with many players, seconds
+chickenSpawnRate     = 50
 waveRatio            = 0.6       -- waves are composed by two types of chicken, waveRatio% of one and (1-waveRatio)% of the other
 baseWaveSize		 = 2.5		 -- multiplied by malus, 1 = 1 squadSize of chickens
 waveSizeMult		 = 1
@@ -184,11 +184,11 @@ end
     
 difficulties = {
   ['Chicken: Very Easy'] = {
-    chickenSpawnRate = 120, 
-    burrowSpawnRate  = 60,
+    chickenSpawnRate = 90,
+    burrowSpawnRate  = 90,
     gracePeriod      = 300,
-    waveSizeMult	 = 0.9,
-    timeSpawnBonus   = .02,     -- how much each time level increases spawn size
+    waveSizeMult	 = 0.5,
+    timeSpawnBonus   = .025,     -- how much each time level increases spawn size
     queenTime		 = 40*60,
     queenName        = "chicken_dragon",
     queenMorphName	 = '',
