@@ -791,47 +791,51 @@ local function SaveFeatures()
 	savedata.feature = data
 end
 
+local function GetProjectileSaveInfo(projectileID)
+	local isWeapon, isPiece = Spring.GetProjectileType(projectileID)
+	if not isWeapon then
+		return
+	end
+	
+	local projectileInfo = {}
+	-- basic projectile information
+	local projectileDefID = spGetProjectileDefID(projectileID)
+	projectileInfo.projectileDefID = projectileDefID
+	projectileInfo.teamID = spGetProjectileTeamID(projectileID)
+	projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
+	local timeToLive = spGetProjectileTimeToLive(projectileID)
+	projectileInfo.timeToLive = timeToLive
+	-- save position/velocity
+	projectileInfo.pos = {spGetProjectilePosition(projectileID)}
+	projectileInfo.velocity = {spGetProjectileVelocity(projectileID)}
+	-- save tracking and interception
+	local targetType, target = spGetProjectileTarget(projectileID)
+	projectileInfo.targetType = targetType
+	projectileInfo.target = target
+	projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
+	
+	local wd = WeaponDefs[projectileDefID]
+	if wd and wd.type == "StarburstLauncher" and wd.customParams then
+		local cp = wd.customParams
+		-- Some crazyness with how these values are interpreted:
+		-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
+		-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
+		projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
+	end
+	return projectileInfo
+end
 
 local function SaveProjectiles()
 	local data = {}
 	local projectiles = Spring.GetProjectilesInRectangle(-600, -600, Game.mapSizeX + 600, Game.mapSizeZ + 600)
 	-- Collect projectiles for 600 outside the map to get wobbly ones or those chasing flying units.
-	for i = 1, #projectiles do repeat
+	for i = 1, #projectiles do
 		local projectileID = projectiles[i]
-
-		local isWeapon, isPiece = Spring.GetProjectileType(projectileID)
-		if not isWeapon then
-			break
+		local projectileInfo = GetProjectileSaveInfo(projectileID)
+		if projectileInfo then
+			data[projectileID] = projectileInfo
 		end
-
-		data[projectileID] = {}
-		local projectileInfo = data[projectileID]
-		
-		-- basic projectile information
-		local projectileDefID = spGetProjectileDefID(projectileID)
-		projectileInfo.projectileDefID = projectileDefID
-		projectileInfo.teamID = spGetProjectileTeamID(projectileID)
-		projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
-		local timeToLive = spGetProjectileTimeToLive(projectileID)
-		projectileInfo.timeToLive = timeToLive
-		-- save position/velocity
-		projectileInfo.pos = {spGetProjectilePosition(projectileID)}
-		projectileInfo.velocity = {spGetProjectileVelocity(projectileID)}
-		-- save tracking and interception
-		local targetType, target = spGetProjectileTarget(projectileID)
-		projectileInfo.targetType = targetType
-		projectileInfo.target = target
-		projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
-		
-		local wd = WeaponDefs[projectileDefID]
-		if wd and wd.type == "StarburstLauncher" and wd.customParams then
-			local cp = wd.customParams
-			-- Some crazyness with how these values are interpreted:
-			-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
-			-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
-			projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
-		end
-	until true end
+	end
 	savedata.projectile = data
 end
 
