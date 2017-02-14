@@ -1,13 +1,13 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Chili Selections & CursorTip",
+		name      = "Chili Selections & CursorTip New",
 		desc      = "Chili Selection Window and Cursor Tooltip remake.",
 		author    = "GoogleFrog (CarRepairer and jK orginal)",
 		date      = "9 February 2017",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true,
+		enabled   = false,
 	}
 end
 
@@ -126,6 +126,193 @@ local DRAWING_TOOLTIP =
 
 local drawHotkeyBytes = {}
 local drawHotkeyBytesCount = 0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Settings
+
+options_path = 'Settings/HUD Panels/Tooltip'
+local selPath = 'Settings/HUD Panels/Selected Units Panel'
+
+options_order = {
+	--tooltip
+	'tooltip_delay', 'independant_world_tooltip_delay',
+	'show_for_units', 'show_for_wreckage', 'show_for_unreclaimable', 'show_position', 'show_unit_text', 'showdrawtooltip','showterratooltip',
+	'showDrawTools',
+	
+	--selected units
+	--'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
+	--'fancySkinning', 'leftPadding',
+}
+
+options = {
+	tooltip_delay = {
+		name = 'Tooltip display delay (0 - 4s)',
+		desc = 'Determines how long you can leave the mouse idle until the tooltip is displayed.',
+		type = 'number',
+		min=0,max=4,step=0.05,
+		value = 0,
+	},
+	independant_world_tooltip_delay = {
+		name = 'Unit and Feature tooltip delay (0 - 4s)',
+		--desc = 'Determines how long you can leave the mouse over a unit or feature until the tooltip is displayed.',
+		type = 'number',
+		min=0,max=4,step=0.05,
+		value = 0.2,
+	},
+	show_for_units = {
+		name = "Show Tooltip for Units",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show the tooltip for units.',
+	},
+	show_for_wreckage = {
+		name = "Show Tooltip for Wreckage",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show the tooltip for wreckage and map features.',
+	},
+	show_for_unreclaimable = {
+		name = "Show Tooltip for Unreclaimables",
+		type = 'bool',
+		advanced = true,
+		value = false,
+		noHotkey = true,
+		desc = 'Show the tooltip for unreclaimable features.',
+	},
+	show_position = {
+		name = "Show Position Tooltip",
+		type = 'bool',
+		advanced = true,
+		value = true,
+		noHotkey = true,
+		desc = 'Show the position tooltip, even when showing extended tooltips.',
+	},
+	show_unit_text = {
+		name = "Show Unit Text Tooltips",
+		type = 'bool',
+		advanced = true,
+		value = true,
+		noHotkey = true,
+		desc = 'Show the text-only tooltips for units selected but not pointed at, even when showing extended tooltips.',
+	},
+	showdrawtooltip = {
+		name = "Show Map-drawing Tooltip",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show map-drawing tooltip when holding down the tilde (~).',
+	},
+	showterratooltip = {
+		name = "Show Terraform Tooltip",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show terraform tooltip when performing terraform commands.',
+	},
+	showDrawTools = {
+		name = "Show Drawing Tools When Drawing",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		desc = 'Show pencil or eraser when drawing or erasing.'
+	},
+
+	--selection_opacity = {
+	--	name = "Opacity",
+	--	type = "number",
+	--	value = 0.8, min = 0, max = 1, step = 0.01,
+	--	OnChange = function(self)
+	--		window_corner.backgroundColor = {1,1,1,self.value}
+	--		window_corner:Invalidate()
+	--	end,
+	--	path = selPath,
+	--},
+	--groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
+	--	path = selPath,
+	--},
+	--showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
+	--	path = selPath,
+	--},
+	--squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
+	--	path = selPath,
+	--},
+	--unitCommand = {
+	--	name="Show Unit's Command",
+	--	type='bool',
+	--	value= false,
+	--	noHotkey = true,
+	--	desc = "Display current command on unit's icon (only for ungrouped unit selection)",
+	--	path = selPath,
+	--},
+	--uniticon_size = {
+	--	name = 'Icon size on selection list',
+	--	--desc = 'Determines how small the icon in selection list need to be.',
+	--	type = 'number',
+	--	OnChange = function(self) 
+	--		option_Deselect()
+	--		unitIcon_size = math.modf(self.value)
+	--	end,
+	--	min=30,max=50,step=1,
+	--	value = 50,
+	--	path = selPath,
+	--},
+	--manualWeaponReloadBar = {
+	--	name="Show Unit's Special Weapon Status",
+	--	type='bool',
+	--	value= true,
+	--	noHotkey = true,
+	--	desc = "Show reload progress for weapon that use manual trigger (only for ungrouped unit selection)",
+	--	path = selPath,
+	--	OnChange = option_Deselect,
+	--},
+	--fancySkinning = {
+	--	name = 'Fancy Skinning',
+	--	type = 'radioButton',
+	--	value = 'panel',
+	--	path = selPath,
+	--	items = {
+	--		{key = 'panel', name = 'None'},
+	--		{key = 'panel_1120', name = 'Bottom Left Flush',},
+	--		{key = 'panel_0120', name = 'Bot Mid Left Flush',},
+	--		{key = 'panel_2120', name = 'Bot Mid Both Flush',},
+	--	},
+	--	OnChange = function (self)
+	--		local currentSkin = Chili.theme.skin.general.skinName
+	--		local skin = Chili.SkinHandler.GetSkin(currentSkin)
+	--		
+	--		local className = self.value
+	--		local newClass = skin.panel
+	--		if skin[className] then
+	--			newClass = skin[className]
+	--		end
+	--		
+	--		window_corner.tiles = newClass.tiles
+	--		window_corner.TileImageFG = newClass.TileImageFG
+	--		--window_corner.backgroundColor = newClass.backgroundColor
+	--		window_corner.TileImageBK = newClass.TileImageBK
+	--		if newClass.padding then
+	--			window_corner.padding = newClass.padding
+	--			window_corner:UpdateClientArea()
+	--		end
+	--		window_corner:Invalidate()
+	--	end,
+	--	advanced = true,
+	--	noHotkey = true,
+	--},
+	--leftPadding = {
+	--	name = "Left Padding",
+	--	type = "number",
+	--	value = 0, min = 0, max = 500, step = 1,
+	--	OnChange = function(self)
+	--		window_corner.padding[1] = 8 + self.value
+	--		window_corner:UpdateClientArea()
+	--	end,
+	--	path = selPath,
+	--},
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -766,6 +953,8 @@ local function UpdateTooltip()
 	local holdingDrawKey = GetIsHoldingDrawKey()
 	local holdingSpace = select(3, Spring.GetModKeyState())
 	UpdateMouseCursor(holdingDrawKey)
+	
+	local mx, my = spGetMouseState()
 	
 	-- Mouseover build option tooltip (screen0.currentTooltip)
 	local chiliTooltip = screen0.currentTooltip
