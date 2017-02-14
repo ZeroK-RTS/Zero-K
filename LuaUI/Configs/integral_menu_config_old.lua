@@ -55,11 +55,23 @@ local buttonLayoutConfig = {
 	build = {
 		image = {
 			x = "5%",
-			y = "3%",
+			y = "4%",
 			right = "5%",
-			bottom = 13,
+			bottom = 12,
 			keepAspect = false,
 		},
+		tooltipPrefix = "Build",
+		showCost = true
+	},
+	buildunit = {
+		image = {
+			x = "5%",
+			y = "4%",
+			right = "5%",
+			bottom = 12,
+			keepAspect = false,
+		},
+		tooltipPrefix = "BuildUnit",
 		showCost = true
 	},
 	queue = {
@@ -205,7 +217,7 @@ local commandPanels = {
 		hotkeyReplacement = "Orders",
 		gridHotkeys = true,
 		disableableKeys = true,
-		buttonLayoutConfig = buttonLayoutConfig.build,
+		buttonLayoutConfig = buttonLayoutConfig.buildunit,
 	},
 }
 

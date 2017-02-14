@@ -893,7 +893,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			if buttonLayout.tooltipOverride then
 				button.tooltip = buttonLayout.tooltipOverride
 			else
-				local tooltip = "Build" .. ud.name
+				local tooltip = (buttonLayout.tooltipPrefix or "") .. ud.name
 				button.tooltip = tooltip
 			end
 			SetImage("#" .. -cmdID, WG.GetBuildIconFrame(UnitDefs[-cmdID]))
