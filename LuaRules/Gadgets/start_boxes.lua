@@ -265,7 +265,7 @@ function gadget:Initialize()
 	end
 end
 
-function gadget:AllowStartPosition(x, y, z, playerID, readyState)
+function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry, rz)
 	if (x == 0 and z == 0) then
 		-- engine default startpos
 		return false

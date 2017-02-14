@@ -78,7 +78,7 @@ VFS.Include(SCRIPT_DIR .. 'utilities.lua', nil, VFSMODE)
 
 local actionHandler = VFS.Include(HANDLER_DIR .. 'actions.lua', nil, VFSMODE)
 
-local reverseCompat = (Spring.Utilities.GetEngineVersion():find('91.0') == 1)
+local reverseCompatAllowStartPosition = not Spring.Utilities.IsCurrentVersionNewerThan(103, 629)
 --------------------------------------------------------------------------------
 
 function pgl() -- (print gadget list)  FIXME: move this into a gadget
@@ -1060,10 +1060,6 @@ end
 --    end
 --  end
 --
---  if (reverseCompat and IsSyncedCode()) then
---    SendToUnsynced(player, msg)
---  end
---
 --  return false
 --end
 
@@ -1220,9 +1216,12 @@ function gadgetHandler:AllowCommand(unitID, unitDefID, unitTeam,
   return true
 end
 
-function gadgetHandler:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)
+function gadgetHandler:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)
+  if reverseCompatAllowStartPosition then
+    cx, cy, cz, playerID, readyState, rx, ry, rz = playerID, teamID, readyState, cx, cy, cz, rx, ry
+  end
   for _,g in ipairs(self.AllowStartPositionList) do
-    if (not g:AllowStartPosition(cx, cy, cz, playerID, readyState, rx, ry, rz)) then
+    if (not g:AllowStartPosition(playerID, teamID, readyState, cx, cy, cz, rx, ry, rz)) then
       return false
     end
   end
@@ -2159,10 +2158,6 @@ function gadgetHandler:GotChatMsg(msg, player)
     end
   end
 
-  if (reverseCompat and IsSyncedCode()) then
-    SendToUnsynced("proxy_ChatMsg", msg, player)	-- ours
-    --SendToUnsynced(player, msg)	-- base
-  end
   return false
 end
 
