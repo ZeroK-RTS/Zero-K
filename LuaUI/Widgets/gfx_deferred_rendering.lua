@@ -86,7 +86,7 @@ options_path = 'Settings/Graphics/HDR (experimental)'
 options_order = {'enableHDR', 'enableBloom', 'illumThreshold', 'maxBrightness'}
 
 options = {
-	enableHDR      = {type = 'bool',   name = 'Use High Dynamic Range Color',  value = false,},
+	enableHDR      = {type = 'bool',   name = 'Use High Dynamic Range Color',  value = true,},
 	enableBloom    = {type = 'bool',   name = 'Apply Bloom Effect (HDR Only)', value = true,},
 	
 	-- how bright does a fragment need to be before being considered a glow source? [0, 1]
