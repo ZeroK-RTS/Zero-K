@@ -796,8 +796,14 @@ local function SaveProjectiles()
 	local data = {}
 	local projectiles = Spring.GetProjectilesInRectangle(-600, -600, Game.mapSizeX + 600, Game.mapSizeZ + 600)
 	-- Collect projectiles for 600 outside the map to get wobbly ones or those chasing flying units.
-	for i = 1, #projectiles do
+	for i = 1, #projectiles do repeat
 		local projectileID = projectiles[i]
+
+		local isWeapon, isPiece = Spring.GetProjectileType(projectileID)
+		if not isWeapon then
+			break
+		end
+
 		data[projectileID] = {}
 		local projectileInfo = data[projectileID]
 		
@@ -825,7 +831,7 @@ local function SaveProjectiles()
 			-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
 			projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
 		end
-	end
+	until true end
 	savedata.projectile = data
 end
 
