@@ -15,6 +15,9 @@ unitDef = {
   collisionVolumeOffsets = [[0 -3000 0]],
   collisionVolumeScales  = [[32 32 32]],
   collisionVolumeType    = [[box]],
+  selectionVolumeOffsets = [[0 0 0]],
+  selectionVolumeScales  = [[32 16 32]],
+  selectionVolumeType    = [[box]],
 
   customParams           = {
     dontcount      = [[1]],
