@@ -107,6 +107,13 @@ local function UpdateUnitGrow(unitID, growScale)
 			unit.scale[1], unit.scale[2], unit.scale[3], 
 			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
 			unit.volumeType, unit.testType, unit.primaryAxis)
+			
+		if Spring.SetUnitSelectionVolumeData then
+			Spring.SetUnitSelectionVolumeData(unitID,
+				unit.scale[1], unit.scale[2], unit.scale[3], 
+				unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
+				unit.volumeType, unit.testType, unit.primaryAxis)
+		end
 	else
 		spSetUnitCollisionVolumeData(unitID,
 			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
