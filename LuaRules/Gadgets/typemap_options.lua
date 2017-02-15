@@ -22,7 +22,7 @@ function gadget:Initialize()
 	else
 		for i = 0, 255 do
 			local _, _, t, k, h, s = Spring.GetTerrainTypeData(i)
-			if not (t == k and k == h and h == s) then
+			if not (t == k and k == h and h == s and t ~= 0) then
 				Spring.SetTerrainTypeData(i, 1,1,1,1)
 			end
 		end
