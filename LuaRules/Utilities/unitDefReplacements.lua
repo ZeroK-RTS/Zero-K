@@ -129,7 +129,7 @@ for i = 1, #UnitDefs do
 	else
 		buildTimes[i] = ud.buildTime
 	end
-	if ud.level then
+	if ud.customParams.level or ud.customParams.dynamic_comm then
 		variableCostUnit[i] = true
 	end
 end
