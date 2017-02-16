@@ -417,13 +417,14 @@ local function Buildme()
 	if (window) then
 		window:Dispose()
 	end
+	windowWidth = 768 
+	windowHeight = 666
 	window = chili.Window:New{ -- Just awful whitespace....
 		classname = "main_window",
-		parent = screen0, dockable = false, width = 768, height = 666, draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
+		parent = screen0, dockable = false, width = windowWidth, height = windowHeight, draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x = (screen0.width - windowWidth)/2,y=(screen0.height - windowHeight)/2,visible=true}
 	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
-	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='32%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
-	local playerlistsize = 91
-	chili.Button:New{parent=window,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Close",OnClick={function () Hideme(); end},tooltip="Closes this window"}
+	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='43%',y='1%',text="P L A Y E R S",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
+	local playerlistsize = 94
 	
 	local playerpanels = {}
 	local allypanels = {}
