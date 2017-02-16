@@ -139,16 +139,6 @@ local function RenderName(subject)
 	end
 end
 
-local function SetUpVisibility(playerID,metal,energy,unit,commshare,kick,accept)
-	givemebuttons[playerID]["metal"]:SetVisibility(metal)
-	givemebuttons[playerID]["energy"]:SetVisibility(energy)
-	givemebuttons[playerID]["unit"]:SetVisibility(unit)
-	givemebuttons[playerID]["commshare"]:SetVisibility(commshare)
-	givemebuttons[playerID]["kick"]:SetVisibility(kick)
-	givemebuttons[playerID]["accept"]:SetVisibility(accept)
-end
-
-
 local function UpdatePlayer(subject)
 	Spring.Echo("playerupdate " .. subject.name)
 	if givemebuttons[subject.id] == nil or built == false then
@@ -194,26 +184,22 @@ local function UpdatePlayer(subject)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 		end
 	else -- other people's stuff.
-		givemebuttons[subject.id]["accept"]:SetVisibility(false)
 		if teamID == myteamID then
 			if amiteamleader then
 				givemebuttons[subject.id]["kick"]:SetVisibility(true)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["accept"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			else
-				givemebuttons[subject.id]["kick"]:SetVisibility(true)
+				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["accept"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			end
 			if sharemode == false then
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
-				givemebuttons[subject.id]["accept"]:SetVisibility(false)
 				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(true)
 				givemebuttons[subject.id]["energy"]:SetVisibility(true)
@@ -226,6 +212,11 @@ local function UpdatePlayer(subject)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
+			else
+				givemebuttons[subject.id]["commshare"]:SetVisibility(true)
+				givemebuttons[subject.id]["metal"]:SetVisibility(true)
+				givemebuttons[subject.id]["energy"]:SetVisibility(true)
+				givemebuttons[subject.id]["unit"]:SetVisibility(true)
 			end
 		end
 	end
@@ -381,12 +372,12 @@ local function InitName(subject, playerPanel)
 		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 0, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={1,1,0,1}, tooltip = "Your ally's metal."}
 		if (subject.player) then
 			givemebuttons[subject.id]["commshare"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 705 - 1 * buttonsize,y=n0,OnClick = {function () InvitePlayer(subject.player,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize, x= 705 - 1 * buttonsize,y=0,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=0,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 705 - 2 * buttonsize,y=0,OnClick = {function () BattleKickPlayer(subject) end}, padding={1,1,1,1}, tooltip = "Kick this player from the battle.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize, x= 705 - 2 * buttonsize,y=0,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=705 - 2 * buttonsize,y=0,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 705 - 3 * buttonsize,y=0,OnClick = {function () BattleKickPlayer(subject) end}, padding={1,1,1,1}, tooltip = "Kick this player from the battle.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
 		end
 	else
-		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 0,y=0,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
+		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 705 - 2 * buttonsize,y=0,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
 	end
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
@@ -395,10 +386,14 @@ local function InitName(subject, playerPanel)
 		local rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 		local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 		local clanImg = nil
+		local avatarImg = nil
 		if pdata.clan and pdata.clan ~= "" then 
 			clanImg = "LuaUI/Configs/Clans/" .. pdata.clan ..".png"
 		elseif pdata.faction and pdata.faction ~= "" then
 			clanImg = "LuaUI/Configs/Factions/" .. pdata.faction ..".png"
+		end
+		if pdata.avatar then
+			avatarImg = ""
 		end
 		chili.Image:New{parent=playerPanel, file=rankImg,width=buttonsize,height=buttonsize, x = buttonsize*7 + barWidth * 1, y = 0}
 		if (countryImg) then
@@ -463,7 +458,7 @@ local function Buildme()
 			if (allyteamID >= 100) then
 				color = {1,1,1,1}
 			end
-			local label = chili.Label:New{ width='100%', height = titleSize, x = '0%', y = heightOffset + 9,caption=name,fontsize=titleSize - 4,textColor=color, align='center'}
+			local label = chili.Label:New{ width='100%', height = titleSize, x = '0%', y = heightOffset + 10,caption=name,fontsize=titleSize - 4,textColor=color, align='center'}
 			allypanels[#allypanels + 1] = label
 			heightOffset = heightOffset + titleSize + 15
 			allypanels[#allypanels + 1] = chili.Panel:New{classname='main_window_small', backgroundColor=color,borderColor=color,children=playerpanels[allyteamID], width='100%', height = height, x = 0, y = heightOffset}
@@ -483,13 +478,9 @@ local function Buildme()
 end
 
 local function UpdateInviteTable()
-	if mycurrentteamid ~= Spring.GetMyTeamID() then
-		--Spring.Echo("Removing invites!")
-		for playerID,_ in pairs(invites) do
-			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
-			givemebuttons[givemesubjects[playerID].id]["commshare"]:SetVisibility(true)
-			invites[playerID] = nil
-			mycurrentteamid = Spring.GetMyTeamID()
+	for _, subject in ipairs(subjects) do
+		if (givemebuttons[subject.id]["accept"]) then
+			givemebuttons[subject.id]["accept"]:SetVisibility(false)
 		end
 	end
 	local myPlayerID = Spring.GetMyPlayerID()
@@ -505,21 +496,17 @@ local function UpdateInviteTable()
 		if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
 			invites[playerID] = timeleft
 			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
-			givemebuttons[givemesubjects[playerID].id]["commshare"]:SetVisibility(false)
 		elseif invites[playerID] == timeleft then
 			invites[playerID] = nil -- dead invite
 			deadinvites[playerID] = timeleft
 			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
-			givemebuttons[givemesubjects[playerID].id]["commshare"]:SetVisibility(true)
 		elseif timeleft == 1 then
 			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
-			givemebuttons[givemesubjects[playerID].id]["commshare"]:SetVisibility(true)
 			invites[playerID] = nil
 		elseif invites[playerID] and timeleft > 1 then
 			invites[playerID] = timeleft
 			if givemebuttons[playerID]["accept"].visible == false then
 				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
-				givemebuttons[givemesubjects[playerID].id]["commshare"]:SetVisibility(false)
 			end
 		end
 	end
@@ -610,6 +597,14 @@ local function UpdateSubjects()
 	end
 end
 
+function widget:PlayerChanged(playerID)
+	if (built) then
+		UpdateSubjects()
+		Spring.Echo("Rebuilding")
+		Buildme()
+	end
+end
+
 
 
 function widget:Update()
@@ -645,7 +640,8 @@ function widget:GameFrame(f)
 	end
 	if f%30 == 0 then -- Update my invite table.
 		local invitecount = Spring.GetPlayerRulesParam(Spring.GetMyPlayerID(), "commshare_invitecount")
-		if invitecount and invitecount > 0 and built then
+		if invitecount and built then
+			Spring.Echo("There are " .. invitecount .. " invites")
 			UpdateInviteTable()
 		end
 	end
