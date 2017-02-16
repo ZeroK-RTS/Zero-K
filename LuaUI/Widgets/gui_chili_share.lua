@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.21",
+		name	= "Chili Share menu v1.22",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "_Shaman",
 		date	= "12-3-2016",
@@ -10,11 +10,13 @@ function widget:GetInfo()
 		enabled	= true,
 	}
 end
+
 local automergeid = -1
-local players = {}
+local subjects = {}
 local needsremerging = false
 local invites = {}
 local givemebuttons = {}
+local givemepanel = {}
 local buildframe = -1
 local built = false
 local sharemode = false
@@ -24,6 +26,9 @@ local showing = false
 local playerfontsize = {}
 local mycurrentteamid = 0
 local myoldteam = {}
+local PlayerNameY = -1
+local mySubjectID = 0;
+local fontSize = 18;
 local images = {
 	inviteplayer = 'LuaUI/Images/Commshare.png',
 	accept = 'LuaUI/Images/epicmenu/check.png',
@@ -84,6 +89,33 @@ local function StringToTable(str)
 	return strtbl
 end
 
+local function RenderName(subject)
+	Spring.Echo("rendername " .. subject.name .. ":" ..PlayerNameY)
+	local name = subject.name
+	local active = subject.ai or subject.active
+	local spec = not subject.ai and subject.spec
+	local sizefont = playerfontsize[subject.id]
+	local playerpanel = givemepanel[subject.id]
+	Spring.Echo("render parent is " .. tostring(playerpanel))
+	if (givemebuttons[subject.id]["text"]) then
+		givemebuttons[subject.id]["text"]:Dispose()
+	end
+	if not spec and subject.id ~= mySubjectID and subject.allyteam == subjects[mySubjectID].allyteam then 
+		local amt, stor = Spring.GetTeamResources(subject.team, "metal")
+		stor = stor - 9999
+		Spring.Echo(amt .. " / ".. stor)
+		givemebuttons[subject.id]["metalbar"].value =  amt / stor
+	end
+	if spec then
+		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=195,text=name .. " ", textColor={1,1,1,1},y=5}
+	elseif active and not spec then
+		local r,g,b,a = Spring.GetTeamColor(subject.team)
+		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=195,text=name, textColor={r,g,b,a},y=5}
+	elseif not active and not spec then
+		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=195,text=name .. " (QUIT)", textColor={r,g,b,a},y=5}
+	end
+end
+
 local function SetUpVisibility(playerID,metal,energy,unit,commshare,kick,accept)
 	givemebuttons[playerID]["metal"]:SetVisibility(metal)
 	givemebuttons[playerID]["energy"]:SetVisibility(energy)
@@ -93,56 +125,50 @@ local function SetUpVisibility(playerID,metal,energy,unit,commshare,kick,accept)
 	givemebuttons[playerID]["accept"]:SetVisibility(accept)
 end
 
-local function UpdatePlayer(playerID)
-	if givemebuttons[playerID] == nil or built == false then
-		local name = select(1,Spring.GetPlayerInfo(playerID))
-		--Spring.Echo("player" .. playerID .. "( " .. name .. ") is not a player!")
+
+local function UpdatePlayer(subject)
+	Spring.Echo("playerupdate " .. subject.name)
+	if givemebuttons[subject.id] == nil or built == false then
+		local name = subject.name
+		Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
 		return
 	end
-	local name,active,spec,teamid,allyteam,_ = Spring.GetPlayerInfo(playerID)
+	local name,active,spec,teamid,allyteam,_ = Spring.GetPlayerInfo(subject.player)
 	local leader = select(2,Spring.GetTeamInfo(teamid))
-	local texty = givemebuttons[playerID]["text"].y
-	local sizefont = playerfontsize[playerID]
-	local playerpanel = givemebuttons[playerID]["text"].parent
-	-- we do disposes on these because there's a lack of SetTextColor (to my knowledge)
-	if playerID ~= Spring.GetMyPlayerID() and spec then
-		givemebuttons[playerID]["text"]:Dispose()
-		givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x='60%',text=name .. " (RSGN)", textColor={1,0,0,1},y=texty}
-		SetUpVisibility(playerID,false,false,false,false,false,false)
+	local sizefont = playerfontsize[subject.id]
+	local playerpanel = givemebuttons[subject.id]["text"].parent
+	if subject.player ~= Spring.GetMyPlayerID() and spec then
+		SetUpVisibility(subject.id,false,false,false,false,false,false)
 	elseif active and not spec then
-		if playerID == Spring.GetMyPlayerID()  then
+		if subject.player == Spring.GetMyPlayerID()  then
 			local r,g,b,a = Spring.GetTeamColor(teamid)
-			givemebuttons[playerID]["text"]:Dispose()
-			givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x='60%',text=name, textColor={r,g,b,a},y=texty}
 			if leader ~= Spring.GetMyPlayerID() then
-				givemebuttons[playerID]["leave"]:SetVisibility(true)
+				givemebuttons[subject.id]["leave"]:SetVisibility(true)
 				return
 			else
-				givemebuttons[playerID]["leave"]:SetVisibility(false)
+				givemebuttons[subject.id]["leave"]:SetVisibility(false)
 				return
 			end
 		end
 		local r,g,b,a = Spring.GetTeamColor(teamid)
-		givemebuttons[playerID]["text"]:Dispose()
-		givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x='60%',text=name, textColor={r,g,b,a},y=texty}
 		if teamid == Spring.GetMyTeamID() and leader == Spring.GetMyPlayerID() then
-			SetUpVisibility(playerID,false,false,false,false,true,false)
+			SetUpVisibility(subject.id,false,false,false,false,true,false)
 		elseif teamid == Spring.GetMyTeamID() and leader ~= Spring.GetMyPlayerID() then
-			SetUpVisibility(playerID,false,false,false,false,false,false)
-		elseif leader ~= playerID then
-			SetUpVisibility(playerID,false,false,false,false,false,false)
+			SetUpVisibility(subject.id,false,false,false,false,false,false)
+		elseif leader ~= subject.player then
+			SetUpVisibility(subject.id,false,false,false,false,false,false)
 		else
-			SetUpVisibility(playerID,true,true,true,true,false,false)
+			SetUpVisibility(subject.id,true,true,true,true,false,false)
 		end
 	elseif not active and not spec then
-		SetUpVisibility(playerID,false,false,false,false,false,false)
-		givemebuttons[playerID]["text"]:SetText(name .. "(QUIT)")
+		SetUpVisibility(subject.id,false,false,false,false,false,false)
 	end
-	if sharemode == false and playerID ~= Spring.GetMyPlayerID() then
-		givemebuttons[playerID]["commshare"]:SetVisibility(false)
-		givemebuttons[playerID]["accept"]:SetVisibility(false)
-		givemebuttons[playerID]["kick"]:SetVisibility(false)
+	if sharemode == false and subject.player ~= Spring.GetMyPlayerID() then
+		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+		givemebuttons[subject.id]["accept"]:SetVisibility(false)
+		givemebuttons[subject.id]["kick"]:SetVisibility(false)
 	end
+	RenderName(subject)
 end
 
 local function InvitePlayer(playerid)
@@ -223,7 +249,6 @@ local function KickPlayer(playerid)
 end
 
 local function GiveUnit(target)
-	target = select(4,Spring.GetPlayerInfo(target))
 	local num = Spring.GetSelectedUnitsCount()
 	if num == 0 then
 		Spring.Echo("game_message: You should probably select some units first before you try to give some away.")
@@ -249,7 +274,6 @@ end
 
 local function GiveResource(target,kind)
 	--mod = 20,500,all
-	target = select(4,Spring.GetPlayerInfo(target))
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if alt then mod = "all"
 	elseif ctrl then mod = defaultamount/5
@@ -276,146 +300,161 @@ local function GiveResource(target,kind)
 	Spring.ShareResources(target,kind,num)
 end
 
-local function SetUpInitialStates()
-	local myplayerID = Spring.GetMyPlayerID()
+
+local function InitName(subject, playerPanel)
+	Spring.Echo("Initializing " .. subject.name .. " with parent " .. tostring(playerPanel))
+	local buttonsize = fontSize + 4
+	local barWidth = 40
+	playerfontsize[subject.id] = fontSize
+	givemebuttons[subject.id] = {}
+	givemepanel[subject.id] = playerPanel
+	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
+		givemebuttons[subject.id]["unit"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=0,OnClick= {function () GiveUnit(subject.team) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
+		givemebuttons[subject.id]["metal"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*1,y=0,OnClick = {function () GiveResource(subject.team,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
+		givemebuttons[subject.id]["energy"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*2,y=0,OnClick = {function () GiveResource(subject.team,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
+		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 12, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={0.5,0.5,0.5,1}, tooltip = "Your ally's metal."}
+		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 0, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={1,1,0,1}, tooltip = "Your ally's metal."}
+		if (subject.player) then
+			givemebuttons[subject.id]["commshare"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= buttonsize*3 + barWidth * 1,y=n0,OnClick = {function () InvitePlayer(subject.player,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= buttonsize*3 + barWidth * 1,y=0,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=0,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+		end
+	else
+		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 0,y=0,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
+	end
+	if (subject.player) then
+		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
+		local country = select(8, Spring.GetPlayerInfo(subject.player))
+		local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
+		local rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
+		local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
+		chili.Image:New{parent=playerPanel, file=rankImg,width=buttonsize,height=buttonsize, x = buttonsize*5 + barWidth * 1, y = 0}
+		if (countryImg) then
+			chili.Image:New{parent=playerPanel, file=countryImg, width=buttonsize -4 , height= buttonsize-4, x = buttonsize*6 + barWidth * 1+2, y = 2}
+		end
+	end
+	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
+	local isSpec = select(3,Spring.GetPlayerInfo(subject.id))
+	--if not isSpec then
+		RenderName(subject)
+	--end
+end
+
+
+local function Buildme()
+	Spring.Echo("Initializing for " .. #subjects)
+	Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
+	window = chili.Window:New{ -- Just awful whitespace....
+		classname = "main_window",
+		parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
+	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
+	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='32%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
+	local playerlistsize = 91
+	chili.Button:New{parent=window,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Close",OnClick={function () Hideme(); end},tooltip="Closes this window"}
+	
+	local playerpanels = {}
+	local allypanels = {}
+	local allpanels = {}
+	for _, subject in ipairs(subjects) do
+		if (not playerpanels[subject.allyteam]) then
+			playerpanels[subject.allyteam] = {}
+		end
+		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Panel:New{backgroundColor={1,0,0,0}, height = fontSize + 17, width='100%', x = 0, y = #playerpanels[subject.allyteam] * (fontSize + 17)}
+		InitName(subject, playerpanels[subject.allyteam][#playerpanels[subject.allyteam]])
+	end
+	local allyteams = Spring.GetAllyTeamList()
+	allyteams[#allyteams + 1] = 100
+	local heightOffset = 0
+	for _, allyteamID in ipairs(allyteams) do
+		if (playerpanels[allyteamID]) then
+			Spring.Echo(playerpanels[allyteamID])	
+			local height = #playerpanels[allyteamID] * (fontSize + 17) + 10
+			local color = {1,1,0,1}
+			if (allyteamID ~= Spring.GetMyAllyTeamID()) then
+				color = {1,0,0,1}
+			end
+			if (allyteamID >= 100) then
+				color = {1,0.7,1,1}
+			end
+			
+			allypanels[#allypanels + 1] = chili.Panel:New{borderThickness=5, backgroundColor=color,borderColor=color,children=playerpanels[allyteamID], width='100%', height = height, x = 0, y = heightOffset}
+			heightOffset = heightOffset + height + 10
+			if (allyteamID ~= Spring.GetMyAllyTeamID()) then
+			end
+		end
+	end
+	Spring.Echo("window " .. tostring(window.parent))	
+	chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children=allypanels,backgroundColor= {0,0,0,0}, borderColor= {0,0,0,0}}
+	--window:SetVisibility(false)
+	local myPlayerID = Spring.GetMyPlayerID()
 	local myteamID = Spring.GetMyTeamID()
-	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myplayerID)
+	local myallyteamID = Spring.GetMyAllyTeamID()
+	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myPlayerID)
 	--Spring.Echo("I am leader: " .. tostring(amiteamleader))
-	for i=1,#players do
-		local playerID = players[i].id
-		local teamID = players[i].team
-		if playerID then
-			if playerID == myplayerID and (players[i].teamleader or sharemode == false) then
-				givemebuttons[playerID]["leave"]:SetVisibility(false)
-			elseif playerID == myplayerID and not players[i].teamleader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-				givemebuttons[playerID]["leave"]:SetVisibility(true)
-			elseif playerID ~= myplayerID then -- other people's stuff.
-				givemebuttons[playerID]["accept"]:SetVisibility(false)
-				if teamID == myteamID then
-					if amiteamleader then
-						givemebuttons[playerID]["kick"]:SetVisibility(true)
-						givemebuttons[playerID]["commshare"]:SetVisibility(false)
-						givemebuttons[playerID]["accept"]:SetVisibility(false)
-						givemebuttons[playerID]["metal"]:SetVisibility(false)
-						givemebuttons[playerID]["energy"]:SetVisibility(false)
-						givemebuttons[playerID]["unit"]:SetVisibility(false)
-					else
-						givemebuttons[playerID]["kick"]:SetVisibility(true)
-						givemebuttons[playerID]["commshare"]:SetVisibility(false)
-						givemebuttons[playerID]["accept"]:SetVisibility(false)
-						givemebuttons[playerID]["metal"]:SetVisibility(false)
-						givemebuttons[playerID]["energy"]:SetVisibility(false)
-						givemebuttons[playerID]["unit"]:SetVisibility(false)
-					end
-					if sharemode == false then
-						givemebuttons[playerID]["commshare"]:SetVisibility(false)
-						givemebuttons[playerID]["accept"]:SetVisibility(false)
-						givemebuttons[playerID]["kick"]:SetVisibility(false)
-					end
+	for _, subject in ipairs(subjects) do
+		Spring.Echo(subject.name)
+		local teamID = subject.team
+		local allyteamID = subject.allyteam
+		local teamLeader = subject.player and select(2, Spring.GetTeamInfo(teamID)) == subject.player
+		Spring.Echo("leader: " .. tostring(teamLeader))
+		Spring.Echo("ai: " .. tostring(subject.ai))
+		if subject.player and subject.player == myPlayerID and (teamLeader or sharemode == false) then
+			givemebuttons[subject.id]["leave"]:SetVisibility(false)
+		elseif subject.player and subject.player == myPlayerID and not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+			givemebuttons[subject.id]["leave"]:SetVisibility(true)
+		elseif subject.ai then
+			if subject.allyteam ~= myallyteamID then -- hostile ai's stuff.
+				givemebuttons[subject.id]["metal"]:SetVisibility(false)
+				givemebuttons[subject.id]["energy"]:SetVisibility(false)
+				givemebuttons[subject.id]["unit"]:SetVisibility(false)
+				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
+			end
+		elseif subject.allyteam ~= myallyteamID then -- hostile people's stuff.
+			givemebuttons[subject.id]["kick"]:SetVisibility(false)
+			givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+			givemebuttons[subject.id]["accept"]:SetVisibility(false)
+			givemebuttons[subject.id]["metal"]:SetVisibility(false)
+			givemebuttons[subject.id]["energy"]:SetVisibility(false)
+			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
+			givemebuttons[subject.id]["unit"]:SetVisibility(false)
+		else -- other people's stuff.
+			givemebuttons[subject.id]["accept"]:SetVisibility(false)
+			if teamID == myteamID then
+				if amiteamleader then
+					givemebuttons[subject.id]["kick"]:SetVisibility(true)
+					givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+					givemebuttons[subject.id]["accept"]:SetVisibility(false)
+					givemebuttons[subject.id]["metal"]:SetVisibility(false)
+					givemebuttons[subject.id]["energy"]:SetVisibility(false)
+					givemebuttons[subject.id]["unit"]:SetVisibility(false)
 				else
-					givemebuttons[playerID]["kick"]:SetVisibility(false)
-					if players[i].teamleader == false then
-						givemebuttons[playerID]["commshare"]:SetVisibility(false)
-						givemebuttons[playerID]["metal"]:SetVisibility(false)
-						givemebuttons[playerID]["energy"]:SetVisibility(false)
-						givemebuttons[playerID]["unit"]:SetVisibility(false)
-					end
+					givemebuttons[subject.id]["kick"]:SetVisibility(true)
+					givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+					givemebuttons[subject.id]["accept"]:SetVisibility(false)
+					givemebuttons[subject.id]["metal"]:SetVisibility(false)
+					givemebuttons[subject.id]["energy"]:SetVisibility(false)
+					givemebuttons[subject.id]["unit"]:SetVisibility(false)
+				end
+				if sharemode == false then
+					givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+					givemebuttons[subject.id]["accept"]:SetVisibility(false)
+					givemebuttons[subject.id]["kick"]:SetVisibility(false)
+				end
+			else
+				givemebuttons[subject.id]["kick"]:SetVisibility(false)
+				if teamLeader == false then
+					givemebuttons[subject.id]["commshare"]:SetVisibility(false)
+					givemebuttons[subject.id]["metal"]:SetVisibility(false)
+					givemebuttons[subject.id]["energy"]:SetVisibility(false)
+					givemebuttons[subject.id]["unit"]:SetVisibility(false)
 				end
 			end
 		end
 	end
 	buildframe = Spring.GetGameFrame()
-	players = nil
-end
-
-local function Buildme()
-	--Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
-	window = chili.Window:New{ -- Just awful whitespace....
-		classname = "main_window",
-		parent = screen0, dockable = false, width = '30%', height = '60%', draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x ='35%',y='20%',visible=true}
-	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
-	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='25%',y='1%',text="Unit, Control, and Resource sharing",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
-	local playerlistsize = 91
-	chili.Button:New{parent=window,width = '60%',height = '3.5%',x='20%',y='96.5%',caption="Close",OnClick={function () Hideme(); end},tooltip="Closes this window"}
-	local playersonteam = {}
-	local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
-	local teamleaderid = 0
-	for i=1, #teamlist do
-		if teamlist[i] ~= nil then
-			playersonteam = Spring.GetPlayerList(teamlist[i],true)
-			teamleaderid = select(2,Spring.GetTeamInfo(teamlist[i]))
-			--Spring.Echo(teamlist[i] .. ": leader: " .. teamleaderid)
-			if select(4,Spring.GetTeamInfo(teamlist[i])) then -- this is an ai
-				players[#players+1] = {name = select(2,Spring.GetAIInfo(teamlist[i])),active=false,team=teamlist[i],isai=true}
-			end
-			for s=1,#playersonteam do
-				if playersonteam[s] ~= nil then
-					players[#players+1] = {id= playersonteam[s],name = select(1,Spring.GetPlayerInfo(playersonteam[s])),spec = select(3,Spring.GetPlayerInfo(playersonteam[s])), team = teamlist[i], teamleader = false}
-					--Spring.Echo("player " .. players[#players].id .. ": " .. players[#players].name)
-					if teamleaderid == playersonteam[s] then
-						players[#players].teamleader = true
-					end
-				end
-			end
-		end
-	end
-	playersonteam,teamlist,teamleaderid = nil
-	local playerpanels = {}
-	for i=1, #players do
-		playerpanels[i] = chili.Panel:New{backgroundColor={0,0,0,0}}
-	end
-	if #players > 8 or (playerlistsize == 40 and #players > 5) then 
-		chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children={chili.Grid:New{columns=1,x=0,y=0,children=playerpanels,itemPadding={0,0,0,0},height=9900,width='100%',centerItems=false,resizeItems=true,maxHeight=575,minHeight=575}},backgroundColor= {0,0,0,0}}
-	else
-		chili.Panel:New{parent=window,y='5%',width='100%',height= playerlistsize .. '%',children={chili.Grid:New{columns=1,x=0,y=0,children=playerpanels,itemPadding={0,0,0,0},height=1700,width='100%',centerItems=false,resizeItems=true,maxHeight=475,minHeight=300}},padding={0,0,0,0}}
-	end
-	local r,g,b,a,newy,sizefont,wantedfs,distance,numbuttons,wide
-	if playerlistsize == 91 then
-		numbuttons = 3
-	else
-		numbuttons = 5
-	end
-	wantedfs = 22
-	local buttonsize = math.min(100,60 + -1*((4-#players)*10))
-	if buttonsize ~= 100 then
-		newy = (100-buttonsize)/2 -- this centers it on the Y axis. So 75% button size would be 12.5% on the y axis
-	else
-		newy = 0
-	end
-	for i=1,#players do
-		sizefont = wantedfs
-		local playerID = players[i].id
-		repeat
-			--Spring.Echo("Fontsize for " .. players[i].name .. ": " .. sizefont)
-			if sizefont*((string.len(players[i].name)+5.5)/4.25) > playerpanels[i].width*0.8 then
-				sizefont = sizefont - 0.5
-			end
-		until sizefont*((string.len(players[i].name)+5.5)/4.25) <= playerpanels[i].width*0.8
-		playerfontsize[playerID] = sizefont
-		givemebuttons[playerID] = {}
-		if players[i].id ~= Spring.GetMyPlayerID() then
-			givemebuttons[playerID]["unit"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x='2%',y= newy..'%',OnClick= {function () GiveUnit(playerID) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
-			givemebuttons[playerID]["metal"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '13%',y=newy..'%',OnClick = {function () GiveResource(playerID,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
-			givemebuttons[playerID]["energy"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '24%',y=newy..'%',OnClick = {function () GiveResource(playerID,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
-			givemebuttons[playerID]["commshare"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InvitePlayer(playerID,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
-			givemebuttons[playerID]["accept"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '35%',y=newy..'%',OnClick = {function () InviteChange(playerID,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
-			givemebuttons[playerID]["kick"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '2%',y=newy..'%',OnClick = {function () KickPlayer(playerID) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
-		end
-		if playerID == Spring.GetMyPlayerID() then
-			givemebuttons[playerID]["leave"] = chili.Button:New{parent = playerpanels[i],height = buttonsize .. '%', width = '11%',x= '2%',y=newy..'%',OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
-		end
-		r,g,b,a = Spring.GetTeamColor(players[i].team)
-		--Spring.Echo("Playerpanel size: " .. playerpanels[i].width .. "x" .. playerpanels[i].height .. "\nTextbox size: " .. playerpanels[i].width*0.4 .. "x" .. playerpanels[i].height)
-		local texty = 35.5
-		if #players < 3 then
-			texty = 44.5
-		end
-		if not players[i].spec then
-			givemebuttons[playerID]["text"] = chili.TextBox:New{parent=playerpanels[i],height='100%',width='45%',fontsize=sizefont,x='50%',text=players[i].name, textColor={r,g,b,a},y=texty..'%'}
-		end
-	end
-	window:SetVisibility(false)
-	SetUpInitialStates()
+	Spring.Echo("Succesfully initialized")
 end
 
 local function UpdateInviteTable()
@@ -461,45 +500,15 @@ local function UpdateInviteTable()
 	end
 end
 
-function widget:PlayerAdded(playerID)
-	UpdatePlayer(playerID)
-end
-
-function widget:TeamChanged(teamID)
-	--Spring.Echo("TeamChanged: " .. teamID)
-	if Spring.AreTeamsAllied(teamID,Spring.GetMyTeamID()) then
-		local playerlist = Spring.GetPlayerList(teamID,true)
-		for i=1,#playerlist do
-			UpdatePlayer(playerlist[i])
+local function UpdatePlayers()
+	Spring.Echo("Updating players")
+	for _, subject in ipairs(subjects) do
+		if (subject.player) then 
+			UpdatePlayer(subject)
 		end
 	end
 end
 
-function widget:PlayerChanged(playerID)
-	--Spring.Echo("PlayerChanged: " .. playerID)
-	if playerID == Spring.GetMyPlayerID() then
-		--Spring.Echo("I changed teams!")
-		UpdatePlayer(playerID)
-		local playerlist = Spring.GetPlayerList(Spring.GetMyTeamID(),true)
-		for i=1,#playerlist do
-			UpdatePlayer(playerlist[i])
-		end
-		if #myoldteam > 1 then
-			for i=1,#myoldteam do
-				UpdatePlayer(myoldteam[i])
-			end
-		end
-		myoldteam = playerlist
-	end
-	local allyteam = select(5,Spring.GetPlayerInfo(playerID))
-	if allyteam == Spring.GetMyAllyTeamID() and built then
-		UpdatePlayer(playerID)
-	end
-	if id == Spring.GetMyPlayerID() and select(3,Spring.GetPlayerInfo(playerID)) then
-		Spring.Echo("Detected spectator mode. Removing Share menu.")
-		widgetHandler:RemoveWidget() -- resigned?
-	end
-end
 
 function widget:GameProgress(serverFrameNum)
 	if needsremerging and serverFrameNum - Spring.GetGameFrame() < 90 then
@@ -509,8 +518,45 @@ function widget:GameProgress(serverFrameNum)
 	end
 end
 
+local function UpdateAllyTeam(allyTeam)
+	Spring.Echo("Updating subject team " .. allyTeam)
+	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
+		local _, leader, dead, ai = Spring.GetTeamInfo(teamID)
+		if (ai) then 
+			subjects[#subjects + 1] = {id = #subjects + 1, team = teamID, ai = true, name = select(2, Spring.GetAIInfo(teamID)), allyteam = allyTeam, dead = dead}
+		else
+			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
+				local name,active,spec = Spring.GetPlayerInfo(playerID)
+				if (playerID == Spring.GetMyPlayerID()) then
+					mySubjectID = #subjects + 1
+				end
+				if not spec then
+					subjects[#subjects + 1] = {id = #subjects + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
+				end
+			end
+		end
+	end
+end
+
+local function UpdateSubjects()
+	Spring.Echo("Updating subjects")
+	subjects = {}
+	UpdateAllyTeam(Spring.GetMyAllyTeamID())
+	for _, allyteamID in ipairs(Spring.GetAllyTeamList()) do
+		if (allyteamID ~= Spring.GetMyAllyTeamID()) then
+			UpdateAllyTeam(allyteamID)
+		end
+	end
+	for _, playerID in ipairs(Spring.GetPlayerList()) do 
+		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID)
+		if spec then
+			subjects[#subjects + 1] = {id = #subjects + 1, team = teamID, player = playerID, name = name, allyteam = 100, active = active, spec = spec, dead = dead}
+		end
+	end
+end
+
 function widget:GameFrame(f)
-	if f == 1 then
+	if buildframe < 0 then
 		mycurrentteamid = Spring.GetMyTeamID()
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
@@ -519,6 +565,7 @@ function widget:GameFrame(f)
 			sharemode = true
 		end
 		modOptions = nil
+		UpdateSubjects()
 		Buildme()
 	end
 	if buildframe > -1 and f == buildframe + 1 then
@@ -537,6 +584,10 @@ function widget:GameFrame(f)
 		if invitecount and invitecount > 0 and built then
 			UpdateInviteTable()
 		end
+	end
+	if (f%30 == 20) then -- Check for quitters and rejoiners
+		UpdateSubjects()
+		UpdatePlayers()
 	end
 end
 
@@ -563,6 +614,7 @@ function widget:Initialize()
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
+		UpdateSubjects()
 		Buildme()
 	end
 	if spectating or select(3,Spring.GetPlayerInfo(Spring.GetMyPlayerID())) then
