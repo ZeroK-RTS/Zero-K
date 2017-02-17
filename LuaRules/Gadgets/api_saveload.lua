@@ -109,7 +109,7 @@ local function ReadFile(zip, name, file)
 end
 GG.SaveLoad.ReadFile = ReadFile
 
-local function FacingFromHeading (heading)
+local function FacingFromHeading (h)
 	if h > 0 then
 		if h < 8192 then
 			return 's'
