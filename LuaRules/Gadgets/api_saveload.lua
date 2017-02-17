@@ -109,6 +109,26 @@ local function ReadFile(zip, name, file)
 end
 GG.SaveLoad.ReadFile = ReadFile
 
+local function FacingFromHeading (h)
+	if h > 0 then
+		if h < 8192 then
+			return 's'
+		elseif h < 24576 then
+			return 'e'
+		else
+			return 'n'
+		end
+	else
+		if h >= -8192 then
+			return 's'
+		elseif h >= -24576 then
+			return 'w'
+		else
+			return 'n'
+		end
+	end
+end
+
 local function boolToNum(bool)
 	if bool then return 1
 	else return 0 end
@@ -192,15 +212,18 @@ local function LoadUnits()
 		-- with that unitID then the new unit will fail to be created. The old unit
 		-- do not immediately de-allocate their ID on Spring.DestroyUnit so some blocking
 		-- can occur with explicitly set IDs.
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, false)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, FacingFromHeading(data.heading), data.unitTeam, isNanoFrame, false)
 		if newID then
 			data.newID = newID
 			-- position and velocity
 			spSetUnitVelocity(newID, unpack(data.vel))
 			--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
-			Spring.MoveCtrl.Enable(newID)
-			Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
-			Spring.MoveCtrl.Disable(newID)
+			
+			if not UnitDefNames[data.unitDefName].isBuilding then
+				Spring.MoveCtrl.Enable(newID)
+				Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
+				Spring.MoveCtrl.Disable(newID)
+			end
 			-- health
 			spSetUnitMaxHealth(newID, data.maxHealth)
 			spSetUnitHealth(newID, {health = data.health, capture = data.captureProgress, paralyze = data.paralyzeDamage, build = data.buildProgress})
