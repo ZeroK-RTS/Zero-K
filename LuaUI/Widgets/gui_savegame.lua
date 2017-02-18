@@ -283,6 +283,7 @@ end
 local function PromptSave(filename, description)
 	filename = filename or saveFilenameEdit.text
 	filename = trim(filename)
+	filename = string.gsub(filename, " ", "_")
 	local saveExists = filename and VFS.FileExists(SAVE_DIR .. "/" .. filename .. ".lua") or false
 	if saveExists then
 		SaveLoadConfirmationDialogPopup(filename, true)
