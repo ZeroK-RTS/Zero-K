@@ -75,6 +75,7 @@ local messages = {
 	teleport = "teleport",
 	ability = "ability",
 	reload = "reload",
+	reammo = "reammo",
 	slow = "slow",
 	goo = "goo",
 	jump = "jump",
@@ -197,6 +198,7 @@ local barColors = {
   stock   = { 0.50,0.50,0.50,barAlpha },
   reload  = { 0.00,0.60,0.60,barAlpha },
   reload2 = { 0.80,0.60,0.00,barAlpha },
+  reammo  = { 0.00,0.60,0.60,barAlpha },
   jump    = { 0.00,0.90,0.00,barAlpha },
   sheath  = { 0.00,0.20,1.00,barAlpha },
   fuel    = { 0.70,0.30,0.00,barAlpha },
@@ -845,12 +847,17 @@ do
       end
 
 	  --// SPECIAL WEAPON
-	  
 	  local specialReloadState = GetUnitRulesParam(unitID,"specialReloadFrame")
       if (specialReloadState and specialReloadState > gameFrame) then
 		local special = 1-(specialReloadState-gameFrame)/(ud.customParams.specialreloadtime or 1*30)
         AddBar(messages.ability,special,"reload2",(fullText and floor(special*100)..'%') or '')
       end	  
+	  
+	  --// REAMMO
+	  local reammoProgress = GetUnitRulesParam(unitID, "reammoProgress")
+      if reammoProgress then
+        AddBar(messages.reammo,reammoProgress,"reammo",(fullText and floor(reammoProgress*100)..'%') or '')
+      end
 	  
 	  
       --// RELOAD

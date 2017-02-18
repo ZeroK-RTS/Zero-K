@@ -108,7 +108,7 @@ unitDef = {
       minIntensity            = 1,
 	  paralyzer               = true, -- to deal no damage to wrecks
       range                   = 730,
-      reloadtime              = 10,
+      reloadtime              = 1,
       rgbColor                = [[1 1 1]],
       sprayAngle              = 6000,
       texture1                = [[lightning]],
@@ -142,7 +142,7 @@ unitDef = {
       myGravity               = 0.8,
       noSelfDamage            = true,
       range                   = 500,
-      reloadtime              = 10,
+      reloadtime              = 1,
       sprayangle              = 64000,
       weaponType              = [[AircraftBomb]],
     },

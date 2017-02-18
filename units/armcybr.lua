@@ -31,7 +31,8 @@ unitDef = {
     helptext_de    = [[Wyvern ist ein mächtiger Bomber, der alles in Schutt und Asche legt. Seine Schlagkraft und Ausdauer ist riesig, doch muss er nach jedem Angriff Munition nachladen, was ihn eher für Angriffe auf einzelne Ziele prädestiniert.]],
     helptext_fr    = [[Le Wyvern est tout simplement la mort venue du ciel. Ce bombardier lourdement blindé et relativement lent transporte une tete nucléaire tactique r implosion. Capable de faire des ravages dans les lignes ennemies, ou de détruire des structures lourdement blindées. Tout simplement mortel utilisé en petites escadres.]],
     modelradius    = [[10]],
-	requireammo    = [[1]],
+    requireammo    = [[1]],
+    reammoseconds  = [[30]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
@@ -104,7 +105,7 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_m_deathblow.s3o]],
       range                   = 500,
-      reloadtime              = 8,
+      reloadtime              = 1,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/liche_hit]],
       soundStart              = [[weapon/missile/liche_fire]],

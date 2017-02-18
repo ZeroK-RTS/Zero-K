@@ -44,6 +44,7 @@
 	"special" : "Special",
 	"ready" : "Ready",
 	"reloading" : "Reloading",
+	"reammo" : "Rearming",
 	"select" : "Select",
 	"deselect" : "Deselect",
 	"select_type" : "Select type",
