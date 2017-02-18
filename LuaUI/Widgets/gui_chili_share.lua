@@ -505,7 +505,7 @@ local function Buildme()
 			playerpanels[allyteamID] = nil
 		end
 	end
-	windowHeight = math.min(screen0.height - 100, heightOffset + 65)
+	windowHeight = math.min(screen0.height - 100, heightOffset + 60)
 	window = chili.Window:New{classname = "main_window",parent = screen0, dockable = false, width = windowWidth, height = windowHeight, draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x = (screen0.width - windowWidth)/2,y=(screen0.height - windowHeight)/2,visible=true}
 	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='43%',y='1%',text="P L A Y E R S",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
 	chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children=allypanels,backgroundColor= {0,0,0,0}, borderColor= {0,0,0,0}}
