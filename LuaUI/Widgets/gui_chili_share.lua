@@ -28,8 +28,9 @@ local playerfontsize = {}
 local mycurrentteamid = 0
 local myoldteam = {}
 local PlayerNameY = -1
-local mySubjectID = -1;
-local fontSize = 18;
+local mySubjectID = -1
+local fontSize = 18
+local color2incolor = nil
 local images = {
 	inviteplayer = 'LuaUI/Images/Commshare.png',
 	accept = 'LuaUI/Images/epicmenu/check.png',
@@ -109,7 +110,6 @@ function round(num, numDecimalPlaces)
   return (string.format("%." .. (numDecimalPlaces or 0) .. "f", num))
 end
 
-local toDispose = {}
 local function RenderName(subject)
 	Spring.Echo("rendername " .. subject.name .. ":" ..subject.id)
 	local name = subject.name
@@ -119,46 +119,45 @@ local function RenderName(subject)
 	local sizefont = playerfontsize[subject.id]
 	local playerpanel = givemepanel[subject.id]
 	Spring.Echo("render parent is " .. tostring(playerpanel))
-	if (givemebuttons[subject.id]["text"]) then
-		toDispose[#toDispose + 1] = givemebuttons[subject.id]["text"]
+	if (not givemebuttons[subject.id]["text"]) then
+		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name .. " ", y=5}
 	end
 	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local amt, stor = Spring.GetTeamResources(subject.team, "metal")
 		stor = stor - 9999
 		Spring.Echo("metal: " .. amt .. "/" .. stor)
 		local delta = amt - givemebuttons[subject.id]["metalbar"].value * stor
-		local color = {0,1,0,1}
+		local color = '\255\1\255\1'
 		if (delta < 0) then
-			color = {1,0,0,1}
+			color = '\255\255\1\1'
 		end
-		if (givemebuttons[subject.id]["metalin"]) then 
-			toDispose[#toDispose + 1] = givemebuttons[subject.id]["metalin"]
+		if (not givemebuttons[subject.id]["metalin"]) then 
+			givemebuttons[subject.id]["metalin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,text=delta,y=givemebuttons[subject.id]["metalbar"].y + 1}
 		end
 		delta = round(delta, 1)
-		givemebuttons[subject.id]["metalin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,text=delta, textColor=color,y=givemebuttons[subject.id]["metalbar"].y + 1}
+		givemebuttons[subject.id]["metalin"]:SetText(color .. delta)
 		givemebuttons[subject.id]["metalbar"]:SetValue(math.min(1,amt / stor))
 		local amt, stor = Spring.GetTeamResources(subject.team, "energy")
 		stor = stor - 9999
 		Spring.Echo("energy: " .. amt .. "/" .. stor)
 		local delta = amt - givemebuttons[subject.id]["energybar"].value * stor
-		local color = {0,1,0,1}
+		local color = '\255\1\255\1'
 		if (delta < 0) then
-			color = {1,0,0,1}
+			color = '\255\255\1\1'
 		end
-		if (givemebuttons[subject.id]["energyin"]) then 
-			toDispose[#toDispose + 1] = givemebuttons[subject.id]["energyin"]
+		if (not givemebuttons[subject.id]["energyin"]) then 
+			givemebuttons[subject.id]["energyin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,text=delta,y=givemebuttons[subject.id]["energybar"].y+1}
 		end
 		delta = round(delta, 1)
-		givemebuttons[subject.id]["energyin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,text=delta, textColor=color,y=givemebuttons[subject.id]["energybar"].y+1}
+		givemebuttons[subject.id]["energyin"]:SetText(color .. delta)
 		givemebuttons[subject.id]["energybar"]:SetValue(math.min(1,amt / stor))
 	end
 	if spec then
-		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name .. " ", textColor={1,1,1,1},y=5}
+		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name)
 	elseif active and not spec then
-		local r,g,b,a = Spring.GetTeamColor(subject.team)
-		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name, textColor={r,g,b,a},y=5}
+		givemebuttons[subject.id]["text"]:SetText(color2incolor(Spring.GetTeamColor(subject.team)) .. name)
 	elseif not active and not spec then
-		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name .. " (QUIT)", textColor={r,g,b,a},y=5}
+		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name .. " (QUIT)")
 	end
 end
 
@@ -171,7 +170,7 @@ local function UpdatePlayer(subject)
 		Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
 		return
 	end
-	if (oldSubjects[subject.id] and deepcompare(oldSubjects[subject.id], subject)) then
+	if (false and oldSubjects[subject.id] and deepcompare(oldSubjects[subject.id], subject)) then
 		Spring.Echo("Nothing changed")
 		return
 	end
@@ -191,25 +190,31 @@ local function UpdatePlayer(subject)
 	Spring.Echo("allyteam: " .. allyteamID)
 	Spring.Echo("myallyteam: " .. myallyteamID)
 	if subject.player and subject.player == myPlayerID and (teamLeader or sharemode == false or subject.spec) then
+		Spring.Echo("dec1")
 		givemebuttons[subject.id]["leave"]:SetVisibility(false)
 	elseif subject.player and subject.player == myPlayerID and not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
+		Spring.Echo("dec2")
 		givemebuttons[subject.id]["leave"]:SetVisibility(true)
 	elseif subject.ai then
+		Spring.Echo("dec3")
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(true)
 		givemebuttons[subject.id]["energybar"]:SetVisibility(true)
 		givemebuttons[subject.id]["metal"]:SetVisibility(true)
 		givemebuttons[subject.id]["energy"]:SetVisibility(true)
 		givemebuttons[subject.id]["unit"]:SetVisibility(true)
 		if subject.allyteam ~= myallyteamID or mySpec then -- hostile ai's stuff.
+			Spring.Echo("dec4")
 			givemebuttons[subject.id]["metal"]:SetVisibility(false)
 			givemebuttons[subject.id]["energy"]:SetVisibility(false)
 			givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			if (not mySpec ) then
+				Spring.Echo("dec5")
 				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
 				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 			end
 		end
 	elseif subject.allyteam ~= myallyteamID or mySpec then -- hostile people's stuff.
+		Spring.Echo("dec6")
 		givemebuttons[subject.id]["kick"]:SetVisibility(false)
 		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 		givemebuttons[subject.id]["accept"]:SetVisibility(false)
@@ -217,18 +222,21 @@ local function UpdatePlayer(subject)
 		givemebuttons[subject.id]["energy"]:SetVisibility(false)
 		givemebuttons[subject.id]["unit"]:SetVisibility(false)
 		if (not mySpec or subject.spec) then
+			Spring.Echo("dec7")
 			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 		end
 	else -- other people's stuff.
 		if teamID == myteamID then
 			if amiteamleader then
+				Spring.Echo("dec8")
 				givemebuttons[subject.id]["kick"]:SetVisibility(true)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			else
+				Spring.Echo("dec9")
 				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
@@ -236,6 +244,7 @@ local function UpdatePlayer(subject)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			end
 			if sharemode == false then
+				Spring.Echo("dec10")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(true)
@@ -245,11 +254,13 @@ local function UpdatePlayer(subject)
 		else
 			givemebuttons[subject.id]["kick"]:SetVisibility(false)
 			if teamLeader == false then
+				Spring.Echo("dec11")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			else
+				Spring.Echo("dec12")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(true)
 				givemebuttons[subject.id]["metal"]:SetVisibility(true)
 				givemebuttons[subject.id]["energy"]:SetVisibility(true)
@@ -649,13 +660,6 @@ end
 local lastUpdate = -100
 local dtSum = 0
 
-local function disposeChili() 
-
-	for _, obj in ipairs(toDispose) do
-		obj:Dispose()
-	end
-	toDispose = {}
-end
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
@@ -664,13 +668,12 @@ function widget:Update(dt)
 	end
 	dtSum = dtSum + dt
 	if (f - lastUpdate >= 30 or dtSum >= 2) then
-		disposeChili()
 		dtSum = 0
 		lastUpdate = f
 		local invitecount = Spring.GetPlayerRulesParam(Spring.GetMyPlayerID(), "commshare_invitecount")
 		
 		for _, subject in ipairs(subjects) do
-			if (givemebuttons[subject.id]["accept"]) then
+			if (givemebuttons[subject.id] and givemebuttons[subject.id]["accept"]) then
 				givemebuttons[subject.id]["accept"]:SetVisibility(false)
 			end
 		end
@@ -709,14 +712,11 @@ function widget:Update(dt)
 	end
 end
 
-function widget:GameFrame(f) 
-	disposeChili()
-end
-
 
 function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	chili = WG.Chili
+	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0
 	if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
 		local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
