@@ -1772,7 +1772,9 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 
 	if (key == KEYSYMS.ESCAPE or gridKeyMap[key]) and commandPanel.onClick then
-		commandPanel.onClick()
+		if commandPanelMap.orders then
+			commandPanelMap.orders.tabButton.DoClick()
+		end
 		return true
 	end
 	return false
