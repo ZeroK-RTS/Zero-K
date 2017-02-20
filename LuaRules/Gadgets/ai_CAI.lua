@@ -355,8 +355,10 @@ local function conJobAllocator(team)
 					data.bpChange = data.bpChange + controlledUnit.conByID[unitID].bp
 					data.con[unitID] = nil
 					data.assignedBP = data.assignedBP - controlledUnit.conByID[unitID].bp
-					unassignedCons.count = unassignedCons.count + 1
-					unassignedCons[unassignedCons.count] = unitID
+					if Spring.ValidUnitID(unitID) and not Spring.GetUnitIsDead(unitID) then
+						unassignedCons.count = unassignedCons.count + 1
+						unassignedCons[unassignedCons.count] = unitID
+					end
 					changed = true
 					break
 				--end
@@ -702,6 +704,10 @@ local function makeWantedDefence(team,unitID,searchRange, maxDistance, priorityD
 	
 	local x,y,z = spGetUnitPosition(unitID)
 	
+	if not x then
+		return
+	end
+	
 	-- check for nearby nanoframes
 	for tid,data in pairs(turretByID) do
 		local tx,_,tz = spGetUnitPosition(tid)
@@ -757,6 +763,10 @@ local function makeAirDefence(team,unitID, searchRange,maxDistance)
 	local buildDefs = a.buildDefs
 	
 	local x,y,z = spGetUnitPosition(unitID)
+	if not x then
+		return
+	end
+	
 	-- check for nearby nanoframes
 	for tid,data in pairs(turretByID) do
 		local tx,_,tz = spGetUnitPosition(tid)
@@ -858,6 +868,9 @@ local function makeMiscBuilding(team, unitID, defId, searchRange, maxRange)
 	local anyByID = a.controlledUnit.anyByID
 	
 	local ux,uy,uz = spGetUnitPosition(unitID)
+	if not ux then
+		return
+	end
 	-- check for nearby nanoframes
 	for id,data in pairs(anyByID) do
 		if data.ud.id == defId and (not data.finished) then
@@ -894,6 +907,9 @@ local function makeRadar(team, unitID, searchRange, minDistance)
 	local buildDefs = a.buildDefs
 	
 	local ux,uy,uz = spGetUnitPosition(unitID)
+	if not ux then
+		return
+	end
 	-- check for nearby nanoframes - helps with ally radar too!
 	for rid,_ in pairs(at.units.radarByID) do
 		local x,_,z = spGetUnitPosition(rid)
@@ -931,6 +947,10 @@ local function makeMex(team, unitID)
 	local buildDefs = a.buildDefs
 	
 	local x,y,z = spGetUnitPosition(unitID)
+	
+	if not x then
+		return
+	end
 	
 	-- check for nearby nanoframes
 	for i = 1, mex.count do
@@ -978,7 +998,9 @@ local function makeNano(team,unitID)
 	local nanoRangeSQ = (UnitDefs[nanoDefID].buildDistance-60)^2
 	
 	local ux,uy,uz = spGetUnitPosition(unitID)
-	
+	if not ux then
+		return
+	end
 	-- check for nearby nano frames
 	for i = 1, nano.count do
 		local nid = nano[i]
@@ -1046,6 +1068,10 @@ local function makeEnergy(team,unitID)
 	
 	local ux,uy,uz = spGetUnitPosition(unitID)
 	
+	if not ux then
+		return
+	end
+	
 	-- check for nearby nanoframes
 	for i = 1, econ.count do
 		local eid = econ[i]
@@ -1109,6 +1135,9 @@ end
 
 -- assigns con to a factory or builds a new one
 local function assignFactory(team,unitID,cQueue)
+	if not cQueue then
+		return
+	end
 
 	local a = aiTeamData[team]
 	local controlledUnit = a.controlledUnit
