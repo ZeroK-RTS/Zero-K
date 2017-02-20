@@ -244,14 +244,39 @@ local options = {
   },
   { -- Might cause desync, check if they occur.
     key    = 'waterlevel',
-    name   = 'Water Level',
-    desc   = 'Adjusts the water level of the map',
+    name   = 'Manual Water Level',
+    desc   = 'How much to raise water level, in elmos.',
     type   = 'number',
     section= 'mapsettings',
     def    = 0,
     min    = -2000,
     max    = 2000,
     step   = 1,
+  },
+  {
+    key    = 'waterpreset',
+    name   = 'Water Level',
+    desc   = 'Adjusts the water level of the map',
+    type   = "list",
+    section= 'mapsettings',
+    def    = 'manual',
+    items  = {
+      {
+        key  = "manual",
+        name = "Manual",
+        desc = "Input height manually",
+      },
+      {
+        key  = "dry",
+        name = "Dry",
+        desc = "Drain the map of water",
+      },
+      {
+        key  = "flooded",
+        name = "Flooded",
+        desc = "Cover half the map area with water",
+      },
+    },
   },
   {
     key    = 'metalmult',
