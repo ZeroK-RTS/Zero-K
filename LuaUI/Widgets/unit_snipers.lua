@@ -1,9 +1,9 @@
 function widget:GetInfo() return {
-	name    = "Sniper Finder",
+	name    = "Sniper Finder 2",
 	desc    = "sniper on the roof!",
 	license = "PD",
 	layer   = -2,
-	enabled = true,
+	enabled = false,
 } end
 
 local sniperDefID = WeaponDefNames.armsnipe_shockrifle.id
