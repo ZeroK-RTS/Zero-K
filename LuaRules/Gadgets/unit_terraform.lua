@@ -3801,10 +3801,6 @@ function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_SMOOTH)
 	gadgetHandler:RegisterCMDID(CMD_RESTORE)
 	
-	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
-		GG.Terraform_RaiseWater(modOptions.waterlevel)
-	end
-	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = spGetUnitTeam(unitID)
