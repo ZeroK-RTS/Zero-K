@@ -104,7 +104,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		return
 	end
 	
-	Analytics.SendOnetimeEventWithTime("game:unit:first_built:" .. ud.name)
+	if builderID then
+		-- Only trigger for build units. Not capture, share, Claw, commander spawn etc..
+		Analytics.SendOnetimeEventWithTime("game:unit:first_built:" .. ud.name)
+	end
 end
 
 --------------------------------------------------------------------------------
