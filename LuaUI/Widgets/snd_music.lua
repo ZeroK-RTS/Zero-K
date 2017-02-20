@@ -419,17 +419,18 @@ function widget:GameOver()
 		if #victoryTracks <= 0 then return end
 		track = victoryTracks[math.random(1, #victoryTracks)]
 		musicType = "victory"
+		WG.Analytics.SendOnetimeEventWithTime("game:end:won")
 	else
 		if #defeatTracks <= 0 then return end
 		track = defeatTracks[math.random(1, #defeatTracks)]
 		musicType = "defeat"
+		WG.Analytics.SendOnetimeEventWithTime("game:end:lost")
 	end
 	looping = false
 	Spring.StopSoundStream()
 	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
 	WG.music_start_volume = WG.music_volume
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
