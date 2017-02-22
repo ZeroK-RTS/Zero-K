@@ -629,7 +629,10 @@ local function SpawnSupport(burrowID, support, number, force)
   if (not support) or Spring.GetUnitIsDead(burrowID) then return end
   local squadSize = (supporters[support] and supporters[support].squadSize) or 1
   squadSize = squadSize * waveSizeMult * random(75, 125)/100
-
+  if (t < rampUpTime) then
+    squadSize = squadSize * t/rampUpTime
+  end
+  
   if ((not force) and random() > squadSize)  then
     return
   end
@@ -920,6 +923,12 @@ local function Wave()
   local turret = ChooseChicken(defenders)
   local support = ChooseChicken(supporters, true)
   local squadNumber = (t*timeSpawnBonus+waveSizeMult) * (baseWaveSize + math.min(math.max(humanAggro*humanAggroWaveFactor, 0), humanAggroWaveMax)  + burrowCount*burrowWaveSize) / math.max(burrowCount, 1)
+  if (t < rampUpTime) then
+    local oldNumber = squadNumber
+    squadNumber = squadNumber * t/rampUpTime
+    Spring.Echo("Ramping up", oldNumber, squadNumber, t, rampUpTime)
+  end
+  
   --if queenID then squadNumber = squadNumber/2 end
   local chicken1Number = math.ceil(waveRatio * squadNumber * chickenTypes[chicken1Name].squadSize)
   local chicken2Number = math.floor((1-waveRatio) * squadNumber * chickenTypes[chicken2Name].squadSize)
@@ -1010,33 +1019,6 @@ local function MorphQueen()
 	end
 end
 
--------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Get rid of the AI
---
-
-local function DisableUnit(unitID)
-  Spring.MoveCtrl.Enable(unitID)
-  Spring.MoveCtrl.SetNoBlocking(unitID, true)
-  Spring.MoveCtrl.SetPosition(unitID, -4000, -1000, -4000)
-  Spring.SetUnitHealth(unitID, {paralyze=99999999})
-  Spring.SetUnitNoDraw(unitID, true)
-  Spring.SetUnitCloak(unitID, 4)
-  Spring.SetUnitStealth(unitID, true)
-  Spring.SetUnitNoSelect(unitID, true)
-end
-
-local function DisableComputerUnits()
-  for teamID in pairs(computerTeams) do
-    local teamUnits = Spring.GetTeamUnits(teamID)
-    for _, unitID in ipairs(teamUnits) do
-      DisableUnit(unitID)
-    end
-  end
-end
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1072,7 +1054,6 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 end
 
 function gadget:GameStart()
-    --DisableComputerUnits()
 	if pvp then Spring.Echo("Chicken: PvP mode initialized") end
 	--waveSchedule[gracePeriod*30] = true	-- schedule first wave
 	waveSchedule = gracePeriod * 30

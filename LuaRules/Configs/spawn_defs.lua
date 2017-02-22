@@ -76,6 +76,7 @@ defensePerBurrowKill = 0.5	-- number of turrets added to defense pool for each b
 gracePeriod          = 180       -- no chicken spawn in this period, seconds
 gracePenalty		 = 15		-- reduced grace per player over one, seconds
 gracePeriodMin		 = 90
+rampUpTime           = 0	-- if current time < ramp up time, wave size is multiplied by currentTime/rampUpTime; seconds
 
 queenTime            = 60*60    -- time at which the queen appears, seconds
 queenMorphTime		 = {60*30, 120*30}	--lower and upper bounds for delay between morphs, gameframes
@@ -187,7 +188,8 @@ difficulties = {
     chickenSpawnRate = 90,
     burrowSpawnRate  = 90,
     gracePeriod      = 300,
-    waveSizeMult	 = 0.5,
+    rampUpTime       = 900,
+    waveSizeMult	 = 0.6,
     timeSpawnBonus   = .025,     -- how much each time level increases spawn size
     queenTime		 = 40*60,
     queenName        = "chicken_dragon",
@@ -202,6 +204,7 @@ difficulties = {
     chickenSpawnRate = 60, 
     burrowSpawnRate  = 50,
     gracePeriod      = 180,
+    rampUpTime       = 480,
     waveSizeMult	 = 0.8,
     timeSpawnBonus   = .03,
     queenHealthMod	 = 0.5,
@@ -315,6 +318,7 @@ for _, d in pairs(difficulties) do
   TimeModifier(d.supporters, d.timeModifier or 1)
 end
 
+difficulties['Chicken: Very Easy'].chickenTypes.chicken_pigeon.time = 8*60
 difficulties['Chicken: Very Easy'].chickenTypes.chicken_tiamat.time = 999999
 
 defaultDifficulty = 'Chicken: Normal'
