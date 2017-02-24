@@ -11,7 +11,7 @@ return {
 		{	"togglecammode",	"Ctrl+backspace",},
 		{	"togglecammode",	"Shift+backspace",},
 		{	"edit_backspace",	"Any+backspace",},
-		{	"toggleoverview",	"Any+tab",},
+		{	"toggleoverview",	"Any+h",},
 		{	"edit_complete",	"Any+tab",},
 		{
 			"chatally", 			{"Alt+enter", "Alt+numpad_enter"}, 
@@ -99,7 +99,7 @@ return {
 		{	"forcestart",	"Alt+f",},
 		--{	"guard",	"g",},
 		{	"areaguard",	"g",},
-		{	"sharedialog",	"h",},
+		{	"sharedialog",	"None",},
 		{	"gameinfo",	"Ctrl+i",},
 		{	"wantcloak",	"k",},
 		{	"togglelos",	"Ctrl+l",},
@@ -185,5 +185,6 @@ return {
 		{	"exitwindow",	"s+escape",},
 		{	"crudesubmenu",	"f10"},
 		{	"epic_chili_pro_console_enableconsole", "f8"}, 
+		{	"epic_chili_share_menu_v1.22_sharemenu", "tab"},
 	},
 }

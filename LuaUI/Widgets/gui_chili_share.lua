@@ -429,19 +429,19 @@ local function InitName(subject, playerPanel)
 	givemebuttons[subject.id] = {}
 	givemepanel[subject.id] = playerPanel
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
-		givemebuttons[subject.id]["unit"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=0,OnClick= {function () GiveUnit(subject.team) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
-		givemebuttons[subject.id]["metal"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*1,y=0,OnClick = {function () GiveResource(subject.team,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
-		givemebuttons[subject.id]["energy"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*2,y=0,OnClick = {function () GiveResource(subject.team,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
+		givemebuttons[subject.id]["unit"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=1,OnClick= {function () GiveUnit(subject.team) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
+		givemebuttons[subject.id]["metal"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*1,y=1,OnClick = {function () GiveResource(subject.team,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
+		givemebuttons[subject.id]["energy"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*2,y=1,OnClick = {function () GiveResource(subject.team,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
 		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 12, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={0.5,0.5,0.5,1}, tooltip = "Your ally's metal."}
 		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 0, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={1,1,0,1}, tooltip = "Your ally's metal."}
 		if (subject.player) then
-			givemebuttons[subject.id]["commshare"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 1 * buttonsize,y=n0,OnClick = {function () InvitePlayer(subject.player,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize, x= 695 - 2 * buttonsize,y=0,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=695 - 2 * buttonsize,y=0,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 3 * buttonsize,y=0,OnClick = {function () BattleKickPlayer(subject) end}, padding={1,1,1,1}, tooltip = "Kick this player from the battle.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["commshare"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 1 * buttonsize,y=1,OnClick = {function () InvitePlayer(subject.player,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize, x= 695 - 2 * buttonsize,y=1,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=695 - 2 * buttonsize,y=1,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+			givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 3 * buttonsize,y=1,OnClick = {function () BattleKickPlayer(subject) end}, padding={1,1,1,1}, tooltip = "Kick this player from the battle.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
 		end
 	else
-		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 2 * buttonsize,y=0,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='90%',height='90%',x='5%',y='5%'}},caption=" "}
+		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 2 * buttonsize,y=1,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='100%',height='100%',x='0%',y=0}},caption=" "}
 	end
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
@@ -463,8 +463,10 @@ local function InitName(subject, playerPanel)
 		end
 		if (badges) then
 			for i, badge in ipairs(badges:split(",")) do
-				local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
-				chili.Image:New{parent=playerPanel, file=badgeImg,width=badgeWidth, x = 695 - 3 * buttonsize - badgeWidth * i - 3, y = 0, height=badgeHeight}
+				if (badge ~= "") then
+					local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
+					chili.Image:New{parent=playerPanel, file=badgeImg,width=badgeWidth, x = 695 - 3 * buttonsize - badgeWidth * i - 3, y = 0, height=badgeHeight}
+				end
 			end
 		end
 		if (xp > 0 or elo > 0) then
@@ -689,7 +691,9 @@ local dtSum = 0
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
-	if (window and Spring.GetKeyState(Spring.GetKeyCode("tab")) ~= window.visible) then
+	local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.22_sharemenu"))
+	--Spring.Echo(showkey)
+	if (window and Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
 		window:ToggleVisibility()
 	end
 	dtSum = dtSum + dt
