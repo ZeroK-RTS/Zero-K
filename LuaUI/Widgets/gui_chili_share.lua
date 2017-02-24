@@ -48,7 +48,7 @@ local images = {
 local defaultamount = 100
 
 
-options_path = 'Settings/HUD Panels/Share Menu' 
+options_path = 'Settings/HUD Panels/Player List' 
 --[[ Change path if necessary. I just dumped it here because it made sense.
 Note: remerge is used in case of bugs! Feel free to remove it in a few stables.]]
 options = {
@@ -66,8 +66,8 @@ options = {
                 OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
         },
         sharemenu = {
-                name = 'Bring up share menu',
-                desc = 'Press this button to bring up the share menu.',
+                name = 'Show Player List',
+                desc = 'Hold this button to bring up the Player List.',
                 type = 'button',
 				hotkey = "tab",
         },
