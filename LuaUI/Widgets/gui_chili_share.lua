@@ -30,6 +30,8 @@ local myoldteam = {}
 local PlayerNameY = -1
 local mySubjectID = -1
 local fontSize = 18
+local badgeWidth = 59
+local badgeHeight = 24
 local color2incolor = nil
 local images = {
 	inviteplayer = 'LuaUI/Images/Commshare.png',
@@ -71,7 +73,7 @@ options = {
         },
 }
 
-function deepcompare(t1,t2,ignore_mt)
+local function deepcompare(t1,t2,ignore_mt)
 	local ty1 = type(t1)
 	local ty2 = type(t2)
 	if ty1 ~= ty2 then return false end
@@ -89,6 +91,20 @@ function deepcompare(t1,t2,ignore_mt)
 	if v1 == nil or not deepcompare(v1,v2) then return false end
 	end
 	return true
+end
+
+
+function string:split(delimiter)
+  local result = { }
+  local from  = 1
+  local delim_from, delim_to = string.find( self, delimiter, from  )
+  while delim_from do
+    table.insert( result, string.sub( self, from , delim_from-1 ) )
+    from  = delim_to + 1
+    delim_from, delim_to = string.find( self, delimiter, from  )
+  end
+  table.insert( result, string.sub( self, from  ) )
+  return result
 end
 
 
@@ -111,21 +127,21 @@ function round(num, numDecimalPlaces)
 end
 
 local function RenderName(subject)
-	Spring.Echo("rendername " .. subject.name .. ":" ..subject.id)
+	--Spring.Echo("rendername " .. subject.name .. ":" ..subject.id)
 	local name = subject.name
 	local active = subject.ai or subject.active
-	Spring.Echo("active " .. tostring(active))
+	--Spring.Echo("active " .. tostring(active))
 	local spec = not subject.ai and subject.spec
 	local sizefont = playerfontsize[subject.id]
 	local playerpanel = givemepanel[subject.id]
-	Spring.Echo("render parent is " .. tostring(playerpanel))
+	--Spring.Echo("render parent is " .. tostring(playerpanel))
 	if (not givemebuttons[subject.id]["text"]) then
 		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name .. " ", y=5}
 	end
 	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local amt, stor = Spring.GetTeamResources(subject.team, "metal")
 		stor = stor - 9999
-		Spring.Echo("metal: " .. amt .. "/" .. stor)
+		--Spring.Echo("metal: " .. amt .. "/" .. stor)
 		local delta = amt - givemebuttons[subject.id]["metalbar"].value * stor
 		local color = '\255\1\255\1'
 		if (delta < 0) then
@@ -139,7 +155,7 @@ local function RenderName(subject)
 		givemebuttons[subject.id]["metalbar"]:SetValue(math.min(1,amt / stor))
 		local amt, stor = Spring.GetTeamResources(subject.team, "energy")
 		stor = stor - 9999
-		Spring.Echo("energy: " .. amt .. "/" .. stor)
+		--Spring.Echo("energy: " .. amt .. "/" .. stor)
 		local delta = amt - givemebuttons[subject.id]["energybar"].value * stor
 		local color = '\255\1\255\1'
 		if (delta < 0) then
@@ -164,14 +180,14 @@ end
 local oldSubjects = {}
 
 local function UpdatePlayer(subject)
-	Spring.Echo("playerupdate " .. subject.name)
+	--Spring.Echo("playerupdate " .. subject.name)
 	if givemebuttons[subject.id] == nil or built == false then
 		local name = subject.name
-		Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
+		--Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
 		return
 	end
 	if (false and oldSubjects[subject.id] and deepcompare(oldSubjects[subject.id], subject)) then
-		Spring.Echo("Nothing changed")
+		--Spring.Echo("Nothing changed")
 		return
 	end
 	oldSubjects[subject.id] = subject
@@ -180,41 +196,41 @@ local function UpdatePlayer(subject)
 	local myteamID = Spring.GetMyTeamID()
 	local myallyteamID = Spring.GetMyAllyTeamID()
 	local amiteamleader = (select(2,Spring.GetTeamInfo(myteamID)) == myPlayerID)
-	Spring.Echo("I am spec " .. tostring(mySpec))
-	Spring.Echo(subject.name)
+	--Spring.Echo("I am spec " .. tostring(mySpec))
+	--Spring.Echo(subject.name)
 	local teamID = subject.team
 	local allyteamID = subject.allyteam
 	local teamLeader = subject.player and select(2, Spring.GetTeamInfo(teamID)) == subject.player
-	Spring.Echo("leader: " .. tostring(teamLeader))
-	Spring.Echo("ai: " .. tostring(subject.ai))
-	Spring.Echo("allyteam: " .. allyteamID)
-	Spring.Echo("myallyteam: " .. myallyteamID)
+	--Spring.Echo("leader: " .. tostring(teamLeader))
+	--Spring.Echo("ai: " .. tostring(subject.ai))
+	--Spring.Echo("allyteam: " .. allyteamID)
+	--Spring.Echo("myallyteam: " .. myallyteamID)
 	if subject.player and subject.player == myPlayerID and (teamLeader or sharemode == false or subject.spec) then
-		Spring.Echo("dec1")
+		--Spring.Echo("dec1")
 		givemebuttons[subject.id]["leave"]:SetVisibility(false)
 	elseif subject.player and subject.player == myPlayerID and not teamLeader and #Spring.GetPlayerList(myteamID) > 1 and sharemode then
-		Spring.Echo("dec2")
+		--Spring.Echo("dec2")
 		givemebuttons[subject.id]["leave"]:SetVisibility(true)
 	elseif subject.ai then
-		Spring.Echo("dec3")
+		--Spring.Echo("dec3")
 		givemebuttons[subject.id]["metalbar"]:SetVisibility(true)
 		givemebuttons[subject.id]["energybar"]:SetVisibility(true)
 		givemebuttons[subject.id]["metal"]:SetVisibility(true)
 		givemebuttons[subject.id]["energy"]:SetVisibility(true)
 		givemebuttons[subject.id]["unit"]:SetVisibility(true)
 		if subject.allyteam ~= myallyteamID or mySpec then -- hostile ai's stuff.
-			Spring.Echo("dec4")
+			--Spring.Echo("dec4")
 			givemebuttons[subject.id]["metal"]:SetVisibility(false)
 			givemebuttons[subject.id]["energy"]:SetVisibility(false)
 			givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			if (not mySpec ) then
-				Spring.Echo("dec5")
+				--Spring.Echo("dec5")
 				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
 				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 			end
 		end
 	elseif subject.allyteam ~= myallyteamID or mySpec then -- hostile people's stuff.
-		Spring.Echo("dec6")
+		--Spring.Echo("dec6")
 		givemebuttons[subject.id]["kick"]:SetVisibility(false)
 		givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 		givemebuttons[subject.id]["accept"]:SetVisibility(false)
@@ -222,21 +238,21 @@ local function UpdatePlayer(subject)
 		givemebuttons[subject.id]["energy"]:SetVisibility(false)
 		givemebuttons[subject.id]["unit"]:SetVisibility(false)
 		if (not mySpec or subject.spec) then
-			Spring.Echo("dec7")
+			--Spring.Echo("dec7")
 			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 		end
 	else -- other people's stuff.
 		if teamID == myteamID then
 			if amiteamleader then
-				Spring.Echo("dec8")
+				--Spring.Echo("dec8")
 				givemebuttons[subject.id]["kick"]:SetVisibility(true)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			else
-				Spring.Echo("dec9")
+				--Spring.Echo("dec9")
 				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
@@ -244,7 +260,7 @@ local function UpdatePlayer(subject)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			end
 			if sharemode == false then
-				Spring.Echo("dec10")
+				--Spring.Echo("dec10")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["kick"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(true)
@@ -254,13 +270,13 @@ local function UpdatePlayer(subject)
 		else
 			givemebuttons[subject.id]["kick"]:SetVisibility(false)
 			if teamLeader == false then
-				Spring.Echo("dec11")
+				--Spring.Echo("dec11")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(false)
 				givemebuttons[subject.id]["metal"]:SetVisibility(false)
 				givemebuttons[subject.id]["energy"]:SetVisibility(false)
 				givemebuttons[subject.id]["unit"]:SetVisibility(false)
 			else
-				Spring.Echo("dec12")
+				--Spring.Echo("dec12")
 				givemebuttons[subject.id]["commshare"]:SetVisibility(true)
 				givemebuttons[subject.id]["metal"]:SetVisibility(true)
 				givemebuttons[subject.id]["energy"]:SetVisibility(true)
@@ -289,7 +305,7 @@ local function MergeWithClanMembers()
 	local myclanShort = customKeys.clan     or ""
 	local myclanLong  = customKeys.clanfull or ""
 	if myclanShort ~= "" then
-		Spring.Echo("[Share menu] Searching for clan members belonging to " .. myclanLong)
+		--Spring.Echo("[Share menu] Searching for clan members belonging to " .. myclanLong)
 		local teamlist = Spring.GetTeamList(Spring.GetMyAllyTeamID())
 		local clanmembers = {}
 		for i=1, #teamlist do
@@ -298,7 +314,7 @@ local function MergeWithClanMembers()
 				local customKeys = select(10, Spring.GetPlayerInfo(players[j])) or {}
 				local clanShort = customKeys.clan     or ""
 				local clanLong  = customKeys.clanfull or ""
-				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
+				----Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
 				if clanLong == myclanLong and players[j] ~= Spring.GetMyPlayerID() and select(4,Spring.GetPlayerInfo(players[j])) ~= Spring.GetMyTeamID() then
 					clanmembers[#clanmembers+1] = players[j]
 				end
@@ -355,7 +371,7 @@ end
 local function GiveUnit(target)
 	local num = Spring.GetSelectedUnitsCount()
 	if num == 0 then
-		Spring.Echo("game_message: You should probably select some units first before you try to give some away.")
+		--Spring.Echo("game_message: You should probably select some units first before you try to give some away.")
 		--TODO: Remove this, grey out button.
 		return
 	end
@@ -406,7 +422,7 @@ end
 
 
 local function InitName(subject, playerPanel)
-	Spring.Echo("Initializing " .. subject.name .. " with parent " .. tostring(playerPanel))
+	--Spring.Echo("Initializing " .. subject.name .. " with parent " .. tostring(playerPanel))
 	local buttonsize = fontSize + 4
 	local barWidth = 40
 	playerfontsize[subject.id] = fontSize
@@ -431,6 +447,8 @@ local function InitName(subject, playerPanel)
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		local country = select(8, Spring.GetPlayerInfo(subject.player))
 		local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
+		local badges = pdata.badges
+		--Spring.Echo("badges: " .. tostring(badges))
 		local rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 		local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 		local clanImg = nil
@@ -443,7 +461,15 @@ local function InitName(subject, playerPanel)
 		if pdata.avatar then
 			avatarImg = ""
 		end
-		chili.Image:New{parent=playerPanel, file=rankImg,width=buttonsize,height=buttonsize, x = buttonsize*7 + barWidth * 1, y = 0}
+		if (badges) then
+			for i, badge in ipairs(badges:split(",")) do
+				local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
+				chili.Image:New{parent=playerPanel, file=badgeImg,width=badgeWidth, x = 695 - 3 * buttonsize - badgeWidth * i - 3, y = 0, height=badgeHeight}
+			end
+		end
+		if (xp > 0 or elo > 0) then
+			chili.Image:New{parent=playerPanel, file=rankImg,width=buttonsize,height=buttonsize, x = buttonsize*7 + barWidth * 1, y = 0}
+		end
 		if (countryImg) then
 			chili.Image:New{parent=playerPanel, file=countryImg, width=buttonsize -6 , height= buttonsize-6, x = buttonsize*6 + barWidth * 1+3, y = 3}
 		end
@@ -451,7 +477,7 @@ local function InitName(subject, playerPanel)
 			chili.Image:New{parent=playerPanel, file=clanImg, width=buttonsize -6 , height= buttonsize-6, x = buttonsize*5 + barWidth * 1+3, y = 3}
 		end
 	end
-	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
+	----Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
 	local isSpec = select(3,Spring.GetPlayerInfo(subject.id))
 	--if not isSpec then
 		RenderName(subject)
@@ -460,14 +486,14 @@ end
 
 
 local function Buildme()
-	Spring.Echo("Initializing for " .. #subjects)
-	Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
+	--Spring.Echo("Initializing for " .. #subjects)
+	--Spring.Echo("Screen0 size: " .. screen0.width .. "x" .. screen0.height)
 	if (window) then
 		window:Dispose()
 	end
 	windowWidth = 768 
 	windowHeight = 666
-	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
+	----Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
 	local playerlistsize = 94
 	
@@ -488,7 +514,7 @@ local function Buildme()
 	for _, subject in ipairs(subjects) do
 		allyteamID = subject.allyteam
 		if (playerpanels[allyteamID]) then
-			Spring.Echo(playerpanels[allyteamID])	
+			--Spring.Echo(playerpanels[allyteamID])	
 			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyteamID)
 			if (not name) then 
 				name = "Team " .. allyteamID
@@ -522,8 +548,8 @@ local function Buildme()
 	chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children=allypanels,backgroundColor= {0,0,0,0}, borderColor= {0,0,0,0}}
 	window:SetVisibility(false)
 	buildframe = Spring.GetGameFrame()
-	Spring.Echo("window " .. tostring(window.parent))	
-	Spring.Echo("Succesfully initialized")
+	--Spring.Echo("window " .. tostring(window.parent))	
+	--Spring.Echo("Succesfully initialized")
 end
 
 local function UpdateInviteTable()
@@ -531,12 +557,12 @@ local function UpdateInviteTable()
 	for i=1,Spring.GetPlayerRulesParam(myPlayerID, "commshare_invitecount") do
 		local playerID = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_id")
 		local timeleft = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_timeleft") or 0
-		--Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
+		----Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
 		if playerID == automergeid then
 			InviteChange(playerID)
 			return
 		end
-		--Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
+		----Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
 		if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
 			invites[playerID] = timeleft
 			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
@@ -558,10 +584,10 @@ end
 
 local function UpdatePlayers()
 	if (mySubjectID < 0) then
-		Spring.Echo("Invalid subject id")
+		--Spring.Echo("Invalid subject id")
 		return
 	end
-	Spring.Echo("Updating players")
+	--Spring.Echo("Updating players")
 	for _, subject in ipairs(subjects) do
 		UpdatePlayer(subject)
 	end
@@ -572,7 +598,7 @@ function widget:GameProgress(serverFrameNum)
 	if needsremerging and serverFrameNum - Spring.GetGameFrame() < 90 then
 		needsremerging = false
 		Spring.SendLuaRulesMsg("sharemode remerge")
-		--Spring.Echo("Sent remerge request")
+		----Spring.Echo("Sent remerge request")
 	end
 end
 
@@ -589,7 +615,7 @@ local function EloComparator(subject1, subject2)
 end
 
 local function UpdateAllyTeam(allyTeam)
-	--Spring.Echo("Updating subject team " .. allyTeam)
+	----Spring.Echo("Updating subject team " .. allyTeam)
 	local temp = {}
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
 		local _, leader, dead, ai = Spring.GetTeamInfo(teamID)
@@ -619,7 +645,7 @@ local function UpdateAllyTeam(allyTeam)
 end
 
 local function UpdateSubjects()
-	Spring.Echo("Updating subjects")
+	--Spring.Echo("Updating subjects")
 	mySubjectID = -1
 	local oldnum = #subjects
 	subjects = {}
@@ -638,10 +664,10 @@ local function UpdateSubjects()
 			subjects[#subjects + 1] = {id = #subjects + 1, team = teamID, player = playerID, name = name, allyteam = 100, active = active, spec = spec, dead = dead}
 		end
 	end
-	Spring.Echo("My subject ID is " .. mySubjectID)
-	Spring.Echo("Subject count " .. #subjects)
+	--Spring.Echo("My subject ID is " .. mySubjectID)
+	--Spring.Echo("Subject count " .. #subjects)
 	if (#subjects ~= oldnum and built and mySubjectID >= 0) then
-		Spring.Echo("Rebuilding")
+		--Spring.Echo("Rebuilding")
 		Buildme()
 	end
 end
@@ -650,7 +676,7 @@ function widget:PlayerChanged(playerID)
 	if (built) then
 		UpdateSubjects()
 		if ( mySubjectID >= 0) then
-			Spring.Echo("Rebuilding")
+			--Spring.Echo("Rebuilding")
 			Buildme()
 		end
 	end
@@ -678,7 +704,7 @@ function widget:Update(dt)
 			end
 		end
 		if invitecount and built then
-			Spring.Echo("There are " .. invitecount .. " invites")
+			--Spring.Echo("There are " .. invitecount .. " invites")
 			UpdateInviteTable()
 		end
 		UpdateSubjects()
@@ -690,7 +716,7 @@ function widget:Update(dt)
 		mycurrentteamid = Spring.GetMyTeamID()
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-		--Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
+		----Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
@@ -704,9 +730,9 @@ function widget:Update(dt)
 		local modOptions = {}
 		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing")
 		modOptions = Spring.GetModOptions()
-		--Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
+		----Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
 		if sharemode and not iscommsharing and options.automation_clanmerge.value == true then
-			--Spring.Echo("Clan merge is enabled!")
+			----Spring.Echo("Clan merge is enabled!")
 			MergeWithClanMembers()
 		end
 	end
@@ -720,7 +746,7 @@ function widget:Initialize()
 	screen0 = chili.Screen0
 	if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
 		local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
-		Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
+		--Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
 		--Spring.SendCommands("unbind " .. hotkey .. " sharedialog") --Does not work!
 		WG.crude.SetHotkey("sharedialog","")
 	end
