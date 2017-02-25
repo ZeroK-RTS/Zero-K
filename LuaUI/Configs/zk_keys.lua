@@ -82,6 +82,7 @@ return {
 				"Any+^",
 			},
 		},
+		{	"clearmapmarks", "Alt+`"},
 		{	"buildfacing dec",	{"Any+delete", "]","Shift+]",}, },
 		{	"attack",	"f",},
 		{	"areaattack",	"Alt+a",},
