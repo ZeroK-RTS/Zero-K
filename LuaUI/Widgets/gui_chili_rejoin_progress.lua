@@ -79,16 +79,16 @@ local function ActivateGUI_n_TTS (frameDistanceToFinish, ui_active, ttsControlEn
 		if not ui_active then
 			screen0:AddChild(window)
 			ui_active = true
-			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " DISABLE TTS") --eg: output "<playerName> DISABLE TTS"
+			if ttsControlEnabled and WG.TextToSpeech then
+				WG.TextToSpeech.SetEnabled(false)
 			end
 		end
 	elseif frameDistanceToFinish < (altThreshold or 120) then
 		if ui_active then
 			screen0:RemoveChild(window)
 			ui_active = false
-			if ttsControlEnabled then
-				Spring.Echo(Spring.GetPlayerInfo(myPlayerID_G) .. " ENABLE TTS")
+			if ttsControlEnabled and WG.TextToSpeech then
+				WG.TextToSpeech.SetEnabled(true)
 			end		
 		end
 	end

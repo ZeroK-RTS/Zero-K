@@ -17,6 +17,7 @@ end
 
 local luaMenuActive = false
 local textToSpeechEnabled = false
+local enabledWidgetOverride = true
 local myPlayerID, myPlayerName
 
 local function SetupTTS(value)
@@ -56,6 +57,12 @@ options = {
 	},
 }
 
+local TextToSpeech = {}
+
+function TextToSpeech.SetEnabled(newEnabled)
+	enabledWidgetOverride = newEnabled
+end
+
 local function ttsNotify()
 	SetupTTS(options.tts_vol.value)
 end
@@ -63,6 +70,7 @@ end
 function widget:Initialize()
 	luaMenuActive = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	SetupTTS(options.tts_vol.value)
+	WG.TextToSpeech = TextToSpeech
 	WG.ttsNotify = ttsNotify
 	if luaMenuActive then
 		myPlayerID = Spring.GetMyPlayerID()
@@ -80,7 +88,7 @@ function widget:Shutdown()
 end
 
 function widget:AddConsoleMessage(msg)
-	if not textToSpeechEnabled then
+	if not (textToSpeechEnabled and enabledWidgetOverride) then
 		return
 	end
 	if not (msg and msg.msgtype == "player_to_allies" and msg.playername ~= myPlayerName) then
@@ -90,7 +98,7 @@ function widget:AddConsoleMessage(msg)
 end
 
 function widget:MapDrawCmd(playerId, cmdType, px, py, pz, caption)
-	if not textToSpeechEnabled then
+	if not (textToSpeechEnabled and enabledWidgetOverride) then
 		return
 	end
 	if (select(1, Spring.GetSpectatingState()) or playerId == myPlayerID) then
