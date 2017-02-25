@@ -22,6 +22,7 @@ unitDef = {
     helptext       = [[The diminutive Kodachi is a unique raider. Its small yet agile chassis has enough armor and speed to get it close enough to fire its weapon, a napalm bomb. The Kodachi should run in, get a shot off, and withdraw before it takes significant damage. Damaged Kodachis regenerate out of combat.]],
 	helptext_de    = [[Der kleine Kodachi ist ein einzigartiger Raider. Seine kleines, aber feines Fahrwerk hat genug Panzerung und Geschwindigkeit, um nahe genug an den Feind zu kommen, damit seine Waffe, eine Napalmstreubombe, abgefeuert werden kann. Er sollte dabei einen Schuß abgeben und sich danach solange wieder zurückziehen, bis der Nachladevorgang abgeschlossen ist.]],
 	specialreloadtime = [[850]],
+    aimposoffset      = [[0 5 0]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
