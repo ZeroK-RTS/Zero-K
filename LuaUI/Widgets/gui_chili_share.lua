@@ -144,7 +144,15 @@ local function RenderName(subject)
 	local playerpanel = givemepanel[subject.id]
 	--Spring.Echo("render parent is " .. tostring(playerpanel))
 	if (not givemebuttons[subject.id]["text"]) then
-		givemebuttons[subject.id]["text"] = chili.TextBox:New{parent=playerpanel,height='100%',width='40%',fontsize=sizefont,x=219,text=name .. " ", y=5}
+		givemebuttons[subject.id]["text"] = chili.TextBox:New{
+			parent=playerpanel,
+			height='100%',
+			width='40%',
+			fontsize=sizefont,
+			x=219,
+			text=name .. " ",
+			y=5
+		}
 	end
 	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local amt, stor = Spring.GetTeamResources(subject.team, "metal")
@@ -156,7 +164,14 @@ local function RenderName(subject)
 			color = '\255\255\1\1'
 		end
 		if (not givemebuttons[subject.id]["metalin"]) then 
-			givemebuttons[subject.id]["metalin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,text=delta,y=givemebuttons[subject.id]["metalbar"].y + 1}
+			givemebuttons[subject.id]["metalin"] = chili.TextBox:New{
+				parent=playerpanel,
+				height='50%',
+				width=50,
+				fontsize=sizefont/2 + 2,
+				x=givemebuttons[subject.id]["metalbar"].x + givemebuttons[subject.id]["metalbar"].width + 2,
+				text=delta,y=givemebuttons[subject.id]["metalbar"].y + 1
+			}
 		end
 		delta = round(delta, 1)
 		givemebuttons[subject.id]["metalin"]:SetText(color .. delta)
@@ -170,7 +185,15 @@ local function RenderName(subject)
 			color = '\255\255\1\1'
 		end
 		if (not givemebuttons[subject.id]["energyin"]) then 
-			givemebuttons[subject.id]["energyin"] = chili.TextBox:New{parent=playerpanel,height='50%',width=50,fontsize=sizefont/2 + 2,x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,text=delta,y=givemebuttons[subject.id]["energybar"].y+1}
+			givemebuttons[subject.id]["energyin"] = chili.TextBox:New{
+				parent=playerpanel,
+				height='50%',
+				width=50,
+				fontsize=sizefont/2 + 2,
+				x=givemebuttons[subject.id]["energybar"].x + givemebuttons[subject.id]["energybar"].width + 2,
+				text=delta,
+				y=givemebuttons[subject.id]["energybar"].y+1
+			}
 		end
 		delta = round(delta, 1)
 		givemebuttons[subject.id]["energyin"]:SetText(color .. delta)
@@ -437,19 +460,172 @@ local function InitName(subject, playerPanel)
 	givemebuttons[subject.id] = {}
 	givemepanel[subject.id] = playerPanel
 	if subject.ai or subject.player ~= Spring.GetMyPlayerID() then
-		givemebuttons[subject.id]["unit"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=0,y=1,OnClick= {function () GiveUnit(subject.team) end}, padding={5,5,5,5}, children = {chili.Image:New{file=images.give,width='100%',height='100%'}},tooltip="Give selected units.",caption=" "}
-		givemebuttons[subject.id]["metal"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*1,y=1,OnClick = {function () GiveResource(subject.team,"metal") end}, padding={2,2,2,2}, tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftmetal,width='100%',height='100%'}},caption=" "}
-		givemebuttons[subject.id]["energy"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=buttonsize*2,y=1,OnClick = {function () GiveResource(subject.team,"energy") end}, padding={1,1,1,1}, tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.", children={chili.Image:New{file=images.giftenergy,width='100%',height='100%'}},caption=" "}
-		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 12, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={0.5,0.5,0.5,1}, tooltip = "Your ally's metal."}
-		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{parent = playerPanel,height = 9, y= 0, autosize= false,min=0, max=1, width = barWidth,x=buttonsize*3,color={1,1,0,1}, tooltip = "Your ally's metal."}
+		givemebuttons[subject.id]["unit"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x=0,
+			y=1,
+			OnClick= {function () GiveUnit(subject.team) end},
+			padding={5,5,5,5},
+			children = {chili.Image:New{file=images.give,
+			width='100%',
+			height='100%'}},
+			tooltip="Give selected units.",
+			caption=" "
+		}
+		givemebuttons[subject.id]["metal"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x=buttonsize*1,
+			y=1,
+			OnClick = {
+				function () 
+					GiveResource(subject.team,"metal") 
+				end
+			},
+			padding={2,2,2,2},
+			tooltip = "Give 100 metal.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.",
+			children={
+				chili.Image:New{
+					file=images.giftmetal,
+					width='100%',
+					height='100%'
+				}
+			},
+			caption=" "
+		}
+		givemebuttons[subject.id]["energy"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x=buttonsize*2,
+			y=1,
+			OnClick = {
+				function () 
+					GiveResource(subject.team,"energy") 
+				end
+			},
+			padding={1,1,1,1},
+			tooltip = "Give 100 energy.\nHolding ctrl will give 20.\nHolding shift will give 500.\nHolding alt will give all.",
+			children={
+				chili.Image:New{
+					file=images.giftenergy,
+					width='100%',
+					height='100%'
+				}
+			},
+			caption=" "
+		}
+		givemebuttons[subject.id]["metalbar"] = chili.Progressbar:New{
+			parent = playerPanel,
+			height = 9,
+			y= 12,
+			autosize= false,
+			min=0,
+			max=1,
+			width = barWidth,
+			x=buttonsize*3,
+			color={0.5,0.5,0.5,1},
+			tooltip = "Your ally's metal."
+		}
+		givemebuttons[subject.id]["energybar"] = chili.Progressbar:New{
+			parent = playerPanel,
+			height = 9,
+			y= 0,
+			autosize= false,
+			min=0,
+			max=1,
+			width = barWidth,
+			x=buttonsize*3,
+			color={1,1,0,1},
+			tooltip = "Your ally's metal."
+		}
 		if (subject.player) then
-			givemebuttons[subject.id]["commshare"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 1 * buttonsize,y=1,OnClick = {function () InvitePlayer(subject.player,false) end}, padding={1,1,1,1}, tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!", children={chili.Image:New{file=images.inviteplayer,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize, x= 695 - 2 * buttonsize,y=1,OnClick = {function () InviteChange(subject.player,true) end}, padding={1,1,1,1}, tooltip = "Click this to accept this player's invite!", children={chili.Image:New{file=images.merge,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x=695 - 2 * buttonsize,y=1,OnClick = {function () KickPlayer(subject.player) end}, padding={1,1,1,1}, tooltip = "Kick this player from your squad.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
-			givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 3 * buttonsize,y=1,OnClick = {function () BattleKickPlayer(subject) end}, padding={1,1,1,1}, tooltip = "Kick this player from the battle.", children={chili.Image:New{file=images.kick,width='100%',height='100%'}},caption=" "}
+			-- screw this.
+			givemebuttons[subject.id]["commshare"] = chili.Button:New{
+				parent = playerPanel,
+		height = buttonsize,
+		width = buttonsize,
+		x= 695 - 1 * buttonsize,
+		y=1,
+		OnClick = {function () InvitePlayer(subject.player,
+		false) end},
+		padding={1,
+		1,
+		1,
+		1},
+		tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
+		children={chili.Image:New{file=images.inviteplayer,
+		width='100%',
+		height='100%'}},
+		caption=" "}
+		givemebuttons[subject.id]["accept"] = chili.Button:New{parent = playerPanel,
+		height = buttonsize,
+		width = buttonsize,
+		x= 695 - 2 * buttonsize,
+		y=1,
+		OnClick = {function () InviteChange(subject.player,
+		true) end},
+		padding={1,
+		1,
+		1,
+		1},
+		tooltip = "Click this to accept this player's invite!",
+		children={chili.Image:New{file=images.merge,
+		width='100%',
+		height='100%'}},
+		caption=" "}
+		givemebuttons[subject.id]["kick"] = chili.Button:New{parent = playerPanel,
+		height = buttonsize,
+		width = buttonsize,
+		x=695 - 2 * buttonsize,
+		y=1,
+		OnClick = {function () KickPlayer(subject.player) end},
+		padding={1,
+		1,
+		1,
+		1},
+		tooltip = "Kick this player from your squad.",
+		children={chili.Image:New{file=images.kick,
+		width='100%',
+		height='100%'}},
+		caption=" "}
+		givemebuttons[subject.id]["battlekick"] = chili.Button:New{parent = playerPanel,
+		height = buttonsize,
+		width = buttonsize,
+		x= 695 - 3 * buttonsize,
+		y=1,
+		OnClick = {function () BattleKickPlayer(subject) end},
+		padding={1,
+		1,
+		1,
+		1},
+		tooltip = "Kick this player from the battle.",
+		children={chili.Image:New{file=images.kick,
+		width='100%',
+		height='100%'}},
+		caption=" "}
 		end
-	else
-		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,height = buttonsize, width = buttonsize,x= 695 - 2 * buttonsize,y=1,OnClick = {function () LeaveMySquad() end}, padding={1,1,1,1}, tooltip = "Leave your squad.", children={chili.Image:New{file=images.leave,width='100%',height='100%',x='0%',y=0}},caption=" "}
+		else
+		givemebuttons[subject.id]["leave"] = chili.Button:New{parent = playerPanel,
+		height = buttonsize,
+		width = buttonsize,
+		x= 695 - 2 * buttonsize,
+		y=1,
+		OnClick = {function () LeaveMySquad() end},
+		padding={1,
+		1,
+		1,
+		1},
+		tooltip = "Leave your squad.",
+		children={chili.Image:New{file=images.leave,
+		width='100%',
+		height='100%',
+		x='0%',
+		y=0}},
+		caption=" "}
 	end
 	if (subject.player) then
 		local pdata = select(10, Spring.GetPlayerInfo(subject.player))
@@ -473,18 +649,41 @@ local function InitName(subject, playerPanel)
 			for i, badge in ipairs(badges:split(",")) do
 				if (badge ~= "") then
 					local badgeImg = "LuaUI/Images/badges/" .. badge .. ".png"
-					chili.Image:New{parent=playerPanel, file=badgeImg,width=badgeWidth, x = 695 - 3 * buttonsize - badgeWidth * i - 3, y = 0, height=badgeHeight}
+					chili.Image:New{parent=playerPanel,
+						file=badgeImg,
+						width=badgeWidth,
+						x = 695 - 3 * buttonsize - badgeWidth * i - 3,
+						y = 0,
+						height=badgeHeight
+					}
 				end
 			end
 		end
 		if (xp > 0 or elo > 0) then
-			chili.Image:New{parent=playerPanel, file=rankImg,width=buttonsize,height=buttonsize, x = buttonsize*7 + barWidth * 1, y = 0}
+			chili.Image:New{parent=playerPanel,
+				file=rankImg,
+				width=buttonsize,
+				height=buttonsize,
+				x = buttonsize*7 + barWidth * 1,
+				y = 0
+			}
 		end
 		if (countryImg) then
-			chili.Image:New{parent=playerPanel, file=countryImg, width=buttonsize -6 , height= buttonsize-6, x = buttonsize*6 + barWidth * 1+3, y = 3}
+			chili.Image:New{parent=playerPanel,
+				file=countryImg,
+				width=buttonsize -6 ,
+				height= buttonsize-6,
+				x = buttonsize*6 + barWidth * 1+3,
+				y = 3
+			}
 		end
 		if (clanImg) then
-			chili.Image:New{parent=playerPanel, file=clanImg, width=buttonsize -6 , height= buttonsize-6, x = buttonsize*5 + barWidth * 1+3, y = 3}
+			chili.Image:New{parent=playerPanel,
+ file=clanImg,
+ width=buttonsize -6 ,
+ height= buttonsize-6,
+ x = buttonsize*5 + barWidth * 1+3,
+ y = 3}
 		end
 	end
 	----Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
@@ -514,7 +713,14 @@ local function Buildme()
 		if (not playerpanels[subject.allyteam]) then
 			playerpanels[subject.allyteam] = {}
 		end
-		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Panel:New{backgroundColor={1,0,0,0}, height = fontSize + 17, width='100%', x = 0, y = #playerpanels[subject.allyteam] * (fontSize + 17)}
+		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Panel:New{backgroundColor={1,
+0,
+0,
+0},
+ height = fontSize + 17,
+ width='100%',
+ x = 0,
+ y = #playerpanels[subject.allyteam] * (fontSize + 17)}
 		InitName(subject, playerpanels[subject.allyteam][#playerpanels[subject.allyteam]])
 	end
 	local allyteams = Spring.GetAllyTeamList()
@@ -540,12 +746,31 @@ local function Buildme()
 			if (allyteamID >= 100) then
 				color = {1,1,1,1}
 			end
-			local label = chili.Label:New{ width='100%', height = titleSize, x = '0%', y = heightOffset + 10,caption=name,fontsize=titleSize - 4,textColor=color, align='center'}
+			local label = chili.Label:New{
+				width='100%',
+				height = titleSize,
+				x = '0%',
+				y = heightOffset + 10,caption=name,fontsize=titleSize - 4,textColor=color,
+				align='center'
+			}
 			allypanels[#allypanels + 1] = label
 			heightOffset = heightOffset + titleSize + 15
-			allypanels[#allypanels + 1] = chili.Panel:New{classname='main_window_small', backgroundColor=color,borderColor=color,children=playerpanels[allyteamID], width=725, height = height, x = 0, y = heightOffset}
-			local width  = math.max(200, label.font:GetTextWidth(name) + 50)
-			allypanels[#allypanels + 1] = chili.Panel:New{classname='main_window_small_very_flat', width=width, height = titleSize + 20, x = (windowWidth - width ) / 2 - 13 , y = heightOffset - titleSize - 15}
+			allypanels[#allypanels + 1] = chili.Panel:New{
+				backgroundColor=color,borderColor=color,children=playerpanels[allyteamID],
+				width=725,
+				height = height,
+				x = 0,
+				y = heightOffset
+			}
+			local width  = math.max(200,
+			label.font:GetTextWidth(name) + 50)
+			allypanels[#allypanels + 1] = chili.Panel:New{
+				classname='main_window_small_very_flat',
+				width=width,
+				height = titleSize + 20,
+				x = (windowWidth - width ) / 2 - 13,
+				y = heightOffset - titleSize - 15
+			}
 			heightOffset = heightOffset + height + 10
 			if (allyteamID ~= Spring.GetMyAllyTeamID()) then
 			end
@@ -553,9 +778,43 @@ local function Buildme()
 		end
 	end
 	windowHeight = math.min(screen0.height - 100, heightOffset + 60)
-	window = chili.Window:New{classname = "main_window",parent = screen0, dockable = false, width = windowWidth, height = windowHeight, draggable = false, resizable = false, tweakDraggable = false,tweakResizable = false, minimizable = false, x = (screen0.width - windowWidth)/2,y=(screen0.height - windowHeight)/2,visible=true}
-	chili.TextBox:New{parent=window, width = '80%',height = '20%',x='43%',y='1%',text="P L A Y E R S",fontsize=17,textColor={1.0,1.0,1.0,1.0}}
-	chili.ScrollPanel:New{parent=window,y='5%',verticalScrollbar=true,horizontalScrollbar=false,width='100%',height= playerlistsize .. '%',scrollBarSize=20,children=allypanels,backgroundColor= {0,0,0,0}, borderColor= {0,0,0,0}}
+	window = chili.Window:New{
+		classname = "main_window",
+		parent = screen0,
+		dockable = false,
+		width = windowWidth,
+		height = windowHeight,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = false,
+		tweakResizable = false,
+		minimizable = false,
+		x = (screen0.width - windowWidth)/2,
+		y = (screen0.height - windowHeight)/2,
+		visible = true
+	}
+	chili.TextBox:New{
+		parent=window,
+		width = '80%',
+		height = '20%',
+		x='43%',
+		y='1%',
+		text="P L A Y E R S",
+		fontsize=17,
+		textColor={1.0,1.0,1.0,1.0}
+	}
+	chili.ScrollPanel:New{
+		parent=window,
+		y='5%',
+		verticalScrollbar=true,
+		horizontalScrollbar=false,
+		width='100%',
+		height= playerlistsize .. '%',
+		scrollBarSize=20,
+		children=allypanels,
+		backgroundColor= {0,0,0,0},
+		borderColor= {0,0,0,0}
+	}
 	window:SetVisibility(false)
 	buildframe = Spring.GetGameFrame()
 	--Spring.Echo("window " .. tostring(window.parent))	
