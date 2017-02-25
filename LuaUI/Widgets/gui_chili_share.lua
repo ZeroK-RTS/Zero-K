@@ -739,12 +739,12 @@ local function Buildme()
 				name = "Spectators"
 			end
 			local height = #playerpanels[allyteamID] * (fontSize + 17) + 10
-			local color = {0,1,0,1}
+			local color = {0,1,0,0.6}
 			if (allyteamID ~= Spring.GetMyAllyTeamID()) then
-				color = {1,0,0,1}
+				color = {1,0,0,0.6}
 			end
 			if (allyteamID >= 100) then
-				color = {1,1,1,1}
+				color = {1,1,1,0.6}
 			end
 			local label = chili.Label:New{
 				width='100%',
@@ -756,7 +756,10 @@ local function Buildme()
 			allypanels[#allypanels + 1] = label
 			heightOffset = heightOffset + titleSize + 15
 			allypanels[#allypanels + 1] = chili.Panel:New{
-				backgroundColor=color,borderColor=color,children=playerpanels[allyteamID],
+				classname='panel_internal',
+				backgroundColor=color,
+				borderColor=color,
+				children=playerpanels[allyteamID],
 				width=725,
 				height = height,
 				x = 0,
@@ -765,7 +768,7 @@ local function Buildme()
 			local width  = math.max(200,
 			label.font:GetTextWidth(name) + 50)
 			allypanels[#allypanels + 1] = chili.Panel:New{
-				classname='main_window_small_very_flat',
+				classname='panel_internal',
 				width=width,
 				height = titleSize + 20,
 				x = (windowWidth - width ) / 2 - 13,
