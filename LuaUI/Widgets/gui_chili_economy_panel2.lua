@@ -466,6 +466,23 @@ local function UpdateReserveSentTimer(dt)
 	end
 end
 
+local function NoStorageEnergyStall(mInco, mPull, eInco, ePull)
+	if eInco >= ePull then
+		return false
+	end
+	-- Known: eInco < ePull
+	if mInco >= mPull then
+		return true
+	end
+	-- Known: eInco < ePull, mInco < mPull
+	if ePull == 0 or mPull == 0 then
+		-- Should be impossible
+		return false
+	end
+	-- The following fails with some priority arrangements.
+	return eInco/ePull > mInco/mPull
+end
+
 local function Format(input, override)
 	local leadingString = positiveColourStr .. "+"
 	if input < 0 then
@@ -648,7 +665,7 @@ function widget:GameFrame(n)
 	else
 		ePercent = 0
 		eCurr = 0
-		energyNoStorage.SetFlash(cp.team_energyWaste > 0)
+		energyNoStorage.SetFlash((cp.team_energyWaste > 0) or NoStorageEnergyStall(mInco+mReci, mPull, eInco, realEnergyPull))
 	end
 	
 	metalNoStorage.Show(mStor <= 1)
