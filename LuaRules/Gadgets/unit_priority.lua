@@ -326,7 +326,7 @@ function gadget:AllowUnitBuildStep(builderID, teamID, unitID, unitDefID, step)
 		conAmount = conAmount + scale[priorityLevel]
 		if conAmount >= 1 then  
 			UnitConPortion[builderID] = conAmount - 1
-			return priorityLevel == 3 or CheckReserveResourceUse(teamID, false)
+			return priorityLevel == 3 or CheckReserveResourceUse(teamID, UnitOnlyEnergy[builderID])
 		else 
 			UnitConPortion[builderID] = conAmount
 			return false
