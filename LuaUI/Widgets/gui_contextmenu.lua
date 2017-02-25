@@ -1495,7 +1495,7 @@ local function tooltipBreakdown(tooltip)
 	local unitname = nil
 
 	if tooltip:find('Build', 1, true) == 1 then
-		local name = string.sub(tooltip, 6)
+		local name = string.sub(tooltip, ((tooltip:find('BuildUnit', 1, true) == 1) and 10) or 6)
 		local ud = name and UnitDefNames[name]
 		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
