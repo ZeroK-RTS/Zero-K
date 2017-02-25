@@ -222,11 +222,16 @@ end
 
 
 local function ClusterBombThread()
-	local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
-	local sleepTime = 70/slowState
-	for i = 1, SPECIAL_FIRE_COUNT do
-		EmitSfx(subemit[0], FIRE_W5)
-		Sleep(sleepTime)
+	local sleepTime = 70
+	local index = 1
+	while index <= SPECIAL_FIRE_COUNT do
+		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
+		if not stunned_or_inbuild then
+			EmitSfx(subemit[0], FIRE_W5)
+			index = index + 1
+		end
+		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)
+		Sleep(sleepTime/slowState)
 	end
 	Sleep(330)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
