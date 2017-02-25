@@ -52,25 +52,33 @@ options_path = 'Settings/HUD Panels/Player List'
 --[[ Change path if necessary. I just dumped it here because it made sense.
 Note: remerge is used in case of bugs! Feel free to remove it in a few stables.]]
 options = {
-		automation_clanmerge = {
-			name = 'Auto clan merge',
-			desc = 'Automatically merge with clan members.',
-			type = 'bool',
-			value = false,
-			noHotkey = true,
-		},
-        remerge = {
-                name = 'Manual Remerge',
-                desc = 'Use this in case you weren\'t remerged automatically.',
-                type = 'button',
-                OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
-        },
-        sharemenu = {
-                name = 'Show Player List',
-                desc = 'Hold this button to bring up the Player List.',
-                type = 'button',
-				hotkey = "tab",
-        },
+	automation_clanmerge = {
+		name = 'Auto clan merge',
+		desc = 'Automatically merge with clan members.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+	},
+	remerge = {
+		name = 'Manual Remerge',
+		desc = 'Use this in case you weren\'t remerged automatically.',
+		type = 'button',
+		OnChange = function() Spring.SendLuaRulesMsg("sharemode remerge") end,
+	},
+	fixHotkeys = {
+		name  = "Fix hotkeys on start",
+		type  = "bool", 
+		value = true, 
+		desc = "Fixes old hotkey issues once and then disables.",
+		advanced = true,
+		noHotkey = true,
+	},
+	sharemenu = {
+		name = 'Show Player List',
+		desc = 'Hold this button to bring up the Player List.',
+		type = 'button',
+		hotkey = "tab",
+	},
 }
 
 local function deepcompare(t1,t2,ignore_mt)
@@ -691,10 +699,13 @@ local dtSum = 0
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
-	local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.22_sharemenu"))
-	--Spring.Echo(showkey)
-	if (window and Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
-		window:ToggleVisibility()
+	local alt,ctrl,_,shift = Spring.GetModKeyState()
+	if not (ctrl or alt) then
+		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.22_sharemenu"))
+		--Spring.Echo(showkey)
+		if (window and Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
+			window:ToggleVisibility()
+		end
 	end
 	dtSum = dtSum + dt
 	if (f - lastUpdate >= 30 or dtSum >= 2) then
@@ -742,16 +753,14 @@ function widget:Update(dt)
 	end
 end
 
-
 function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
 	chili = WG.Chili
 	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0
-	if Spring.GetActionHotKeys("sharedialog")[1] ~= nil then
-		local hotkey = Spring.GetActionHotKeys("sharedialog")[1]
-		--Spring.Echo("[Share menu] Unbinding sharedialog hotkey. Key is bound to: " .. hotkey)
-		--Spring.SendCommands("unbind " .. hotkey .. " sharedialog") --Does not work!
+	if options.fixHotkeys.value then
+		WG.crude.SetHotkey("toggleoverview","ctrl+tab")
 		WG.crude.SetHotkey("sharedialog","")
+		options.fixHotkeys.value = false
 	end
 end

@@ -11,7 +11,7 @@ return {
 		{	"togglecammode",	"Ctrl+backspace",},
 		{	"togglecammode",	"Shift+backspace",},
 		{	"edit_backspace",	"Any+backspace",},
-		{	"toggleoverview",	"Any+h",},
+		{	"toggleoverview",	"Ctrl+tab",},
 		{	"edit_complete",	"Any+tab",},
 		{
 			"chatally", 			{"Alt+enter", "Alt+numpad_enter"}, 
@@ -99,7 +99,6 @@ return {
 		{	"forcestart",	"Alt+f",},
 		--{	"guard",	"g",},
 		{	"areaguard",	"g",},
-		{	"sharedialog",	"None",},
 		{	"gameinfo",	"Ctrl+i",},
 		{	"wantcloak",	"k",},
 		{	"togglelos",	"Ctrl+l",},
