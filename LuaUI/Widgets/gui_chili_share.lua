@@ -78,6 +78,11 @@ options = {
 		desc = 'Hold this button to bring up the Player List.',
 		type = 'button',
 		hotkey = "tab",
+		OnChange = function(self)
+			if window then
+				window:SetVisibility(true)
+			end
+		end,
 	},
 }
 
@@ -962,10 +967,10 @@ local dtSum = 0
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
-	if not (ctrl or alt) then
+	if window and window.visible then
 		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.22_sharemenu"))
 		--Spring.Echo(showkey)
-		if (window and Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
+		if (Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
 			window:ToggleVisibility()
 		end
 	end
