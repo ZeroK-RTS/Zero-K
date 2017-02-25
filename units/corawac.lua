@@ -30,6 +30,7 @@ unitDef = {
 	helptext_de    = [[Der Vulture bietet dir die beispiellose Möglichkeit zur unerkannten, weitläufigen Aufklärung und kann mit seinem Sonar auch Unterwasserziele lokalisieren. Er hat auch ein Stoersender der gegen feindliche Radare wirkt.]],
 	modelradius    = [[20]],
 	specialreloadtime = [[600]],
+	refuelturnradius = [[120]],
 	priority_misc = 2, -- High
   },
 

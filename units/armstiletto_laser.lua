@@ -26,7 +26,8 @@ unitDef = {
     helptext_de    = [[Schneller Entwaffnungbomber, der mit einem Stossspannungsgenerator zum Entwaffnen großflächiger Gebiete bewaffnet ist.]],
     helptext_fr    = [[Rapide, armé de canons desarmant pouvant désarmer les unités dans une large bande.]],
     modelradius    = [[10]],
-	requireammo    = [[1]],
+    requireammo    = [[1]],
+    refuelturnradius = [[170]],
   },
 
   explodeAs           = [[GUNSHIPEX]],
