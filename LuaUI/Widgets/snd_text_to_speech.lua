@@ -49,7 +49,7 @@ options = {
 		desc = "TTS reads the ally chat.",
 		type = 'number',
 		min = 0, max = 100, 
-		value = 50, step = 1,
+		value = 0, step = 1,
 		noHotkey = true,
 		OnChange = function(self)
 			SetupTTS(self.value)
