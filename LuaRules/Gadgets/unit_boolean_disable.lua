@@ -85,6 +85,9 @@ local function addUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 	byFrame[frame].data[byFrame[frame].count] = unitID
 	byUnitID[unitID] = {frameID = frame, index = byFrame[frame].count}
 
+	if (extraParamFrames > 0) then
+		Spring.SetUnitWeaponState (unitID, 1, "nextSalvo", frame)
+	end
 	Spring.SetUnitRulesParam(unitID, "disarmframe", frame + extraParamFrames, LOS_ACCESS)
 end
 
