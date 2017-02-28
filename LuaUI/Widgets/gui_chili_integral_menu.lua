@@ -119,13 +119,13 @@ options = {
 		name = 'Alt Inserts Behind',
 		tooltip = "When enabled, the Alt modifier will insert construction behind the current item in the queue. When disabled, and if the factory is not set to repeat, Alt will insert the command in front of the current construction (destroying its progress).",
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	unitsHotkeys2 = {
 		name = 'Enable Factory Hotkeys',
 		type = 'bool',
-		value = false,
+		value = true,
 		noHotkey = true,
 	},
 	ctrlDisableGrid = {
