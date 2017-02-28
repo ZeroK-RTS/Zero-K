@@ -69,19 +69,31 @@ end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+local function RemoveUnit(unitID)
+	local index = unitIndex[unitID]
+	unitList[index] = unitList[unitCount]
+	unitIndex[unitList[unitCount]] = index
+	unitList[unitCount] = nil
+	unitCount = unitCount - 1
+	unitIndex[unitID] = nil
+	unitDefIDMap[unitID] = nil
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
+
 function SetIcons(unitID)
-	local limit = math.floor(unitCount/4)
+	local limit = math.ceil(unitCount/4)
 	for i = 1, limit do
-		if currentIndex > unitCount then
-			currentIndex = 0
-		end
 		currentIndex = currentIndex + 1
+		if currentIndex > unitCount then
+			currentIndex = 1
+		end
 		local unitID = unitList[currentIndex]
-		local unitDefID = unitDefIDMap[currentIndex]
-		
 		if not unitID then
 			return
 		end
+		local unitDefID = unitDefIDMap[unitID]
 		-- calculate which units can have these states and check them first
 		
 		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower") 
@@ -165,13 +177,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
 	
 	if unitIndex[unitID] then
-		local index = unitIndex[unitID]
-		unitList[index] = unitList[unitCount]
-		unitIndex[unitList[unitCount]] = index
-		unitList[unitCount] = nil
-		unitCount = unitCount - 1
-		unitIndex[unitID] = nil
-		unitDefIDMap[unitID] = nil
+		RemoveUnit(unitID)
 	end
 end
 
