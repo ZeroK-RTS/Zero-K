@@ -87,7 +87,7 @@ options = {
 	holdMouseForStructureTerraform = {
 		name = "Hold Mouse To Terraform Structures",
 		type = "bool",
-		value = false,
+		value = true,
 		desc = "When enabled, holding down the left mouse button while placing a structure will enter height selection mode.",
 		noHotkey = true,
 	},
