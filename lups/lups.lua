@@ -653,6 +653,27 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Unit activity
+local activeUnit = {}
+local activeUnitCheckTime = {}
+local ACTIVE_CHECK_PERIOD = 10
+
+local function GetUnitIsActive(unitID)
+	if activeUnitCheckTime[unitID] and activeUnitCheckTime[unitID] > thisGameFrame then
+		return activeUnit[unitID]
+	end
+	
+	activeUnitCheckTime[unitID] = thisGameFrame + ACTIVE_CHECK_PERIOD
+	activeUnit[unitID] = (spGetUnitIsActive(unitID) or spGetUnitRulesParam(unitID, "unitActiveOverride") == 1)
+		and	(spGetUnitRulesParam(unitID, "disarmed") ~= 1)
+		and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
+		and not spGetUnitIsStunned(unitID)
+	
+	return activeUnit[unitID]
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local DrawWorldPreUnitVisibleFx
 local DrawWorldVisibleFx
@@ -682,13 +703,7 @@ local function IsUnitFXVisible(fx)
 	local unitActive = true
 	local unitID = fx.unit
 	if fx.onActive then
-		unitActive = ((spGetUnitIsActive(unitID) or spGetUnitRulesParam(unitID, "unitActiveOverride") == 1)
-			and	(spGetUnitRulesParam(unitID, "disarmed") ~= 1)
-			and (spGetUnitRulesParam(unitID, "morphDisable") ~= 1)
-			and not spGetUnitIsStunned(unitID))
-		if (unitActive == nil) then
-			unitActive = true
-		end
+		unitActive = GetUnitIsActive(unitID)
 	end
 
 	if (not fx.onActive) or (unitActive) then

@@ -27,6 +27,12 @@ local floor = math.floor
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 
+local unitList = {}
+local unitIndex = {}
+local unitCount = 0
+local unitDefIDMap = {}
+
+local currentIndex = 0
 
 local myAllyTeamID = 666
 
@@ -64,10 +70,14 @@ end
 -------------------------------------------------------------------------------------
 
 function SetIcons(unitID)
-	local units = Spring.GetAllUnits()
-	for i = 1, #units do
-		local unitID = units[i]
-		local unitDefID = Spring.GetUnitDefID(unitID)
+	local limit = math.floor(unitCount/4)
+	for i = 1, limit do
+		if currentIndex > unitCount then
+			currentIndex = 0
+		end
+		currentIndex = currentIndex + 1
+		local unitID = unitList[currentIndex]
+		local unitDefID = unitDefIDMap[currentIndex]
 		
 		-- calculate which units can have these states and check them first
 		
@@ -131,31 +141,55 @@ function SetIcons(unitID)
 	end
 end
 
+function widget:UnitCreated(unitID, unitDefID, unitTeam)
+	if not (lowPowerUnitDef[unitDefID] or facPlopUnitDef[unitDefID] or rearmUnitDef[unitDefID] or retreatUnitDef[unitDefID]) then
+		return
+	end
+	if unitIndex[unitID] then
+		return
+	end
+	unitCount = unitCount + 1
+	unitList[unitCount] = unitID
+	unitIndex[unitID] = unitCount
+	unitDefIDMap[unitID] = unitDefID
+end
+
 function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	-- There should be a better way to do this, lazy fix.
 	WG.icons.SetUnitIcon( unitID, {name='lowpower', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='facplop', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='rearm', texture=nil} )
 	WG.icons.SetUnitIcon( unitID, {name='retreat', texture=nil} )
+	
+	if unitIndex[unitID] then
+		local index = unitIndex[unitID]
+		unitList[index] = unitList[unitCount]
+		unitIndex[unitList[unitCount]] = index
+		unitList[unitCount] = nil
+		unitCount = unitCount - 1
+		unitDefIDMap[unitID] = nil
+	end
 end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
-
 function widget:GameFrame(f)
-	if f%8 == 0 then
+	if f%4 == 0 then
 		SetIcons()
 	end
 end
 
 function widget:Initialize()
-	WG.icons.SetOrder( 'lowpower', 2 )
+	WG.icons.SetOrder('lowpower', 2)
+	WG.icons.SetOrder('retreat', 5)
+	WG.icons.SetDisplay('retreat', true)
+	WG.icons.SetPulse('retreat', true)
 	
-	
-	WG.icons.SetOrder( 'retreat', 5 )
-	WG.icons.SetDisplay( 'retreat', true )
-	WG.icons.SetPulse( 'retreat', true )
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		widget:UnitCreated(unitID, unitDefID, myTeamID)
+	end
 end
 
 --------------------------------------------------------------------------------
