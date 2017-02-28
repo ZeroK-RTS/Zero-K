@@ -806,14 +806,14 @@ local function Buildme()
 		width = '80%',
 		height = '20%',
 		x='43%',
-		y='1%',
+		y=5,
 		text="P L A Y E R S",
 		fontsize=17,
 		textColor={1.0,1.0,1.0,1.0}
 	}
 	chili.ScrollPanel:New{
 		parent=window,
-		y='5%',
+		y=30,
 		verticalScrollbar=true,
 		horizontalScrollbar=false,
 		width='100%',
