@@ -79,6 +79,9 @@ function SetIcons(unitID)
 		local unitID = unitList[currentIndex]
 		local unitDefID = unitDefIDMap[currentIndex]
 		
+		if not unitID then
+			return
+		end
 		-- calculate which units can have these states and check them first
 		
 		local lowpower = lowPowerUnitDef[unitDefID] and Spring.GetUnitRulesParam(unitID, "lowpower") 
@@ -167,6 +170,7 @@ function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		unitIndex[unitList[unitCount]] = index
 		unitList[unitCount] = nil
 		unitCount = unitCount - 1
+		unitIndex[unitID] = nil
 		unitDefIDMap[unitID] = nil
 	end
 end

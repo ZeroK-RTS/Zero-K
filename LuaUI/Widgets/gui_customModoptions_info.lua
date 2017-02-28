@@ -17,6 +17,10 @@ end
 
 local options = VFS.Include("ModOptions.lua")
 
+local displayExceptions = {
+	mutespec = true,
+}
+
 -- gui elements
 local window2
 	
@@ -30,6 +34,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget() --auto-close in case user do /luaui reload
 		return
 	end
+	
+	displayWindow = false
 
 	local customizedModOptions = {}
 	for i=1, #options do
@@ -48,6 +54,9 @@ function widget:Initialize()
 				value = value or defValue
 			end
 			if value and value ~= defValue then
+				if not displayExceptions[keyName] then
+					displayWindow = true
+				end
 				local index = #customizedModOptions
 				customizedModOptions[index+1] = options[i].name
 				customizedModOptions[index+2] = {"value: "..value,{options[i].desc}}
@@ -55,7 +64,7 @@ function widget:Initialize()
 		end
 	end
 
-	if #customizedModOptions == 0 then
+	if not displayWindow then
 		widgetHandler:RemoveWidget()
 		return
 	end
