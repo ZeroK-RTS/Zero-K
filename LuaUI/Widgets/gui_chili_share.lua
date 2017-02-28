@@ -709,8 +709,6 @@ local function Buildme()
 	windowHeight = 666
 	----Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
-	local playerlistsize = 94
-	
 	local playerpanels = {}
 	local allypanels = {}
 	local allpanels = {}
@@ -760,8 +758,7 @@ local function Buildme()
 			}
 			allypanels[#allypanels + 1] = label
 			heightOffset = heightOffset + titleSize + 15
-			allypanels[#allypanels + 1] = chili.Panel:New{
-				classname='panel_internal',
+			allypanels[#allypanels + 1] = chili.Control:New{
 				backgroundColor=color,
 				borderColor=color,
 				children=playerpanels[allyteamID],
@@ -772,16 +769,21 @@ local function Buildme()
 			}
 			local width  = math.max(200,
 			label.font:GetTextWidth(name) + 50)
-			allypanels[#allypanels + 1] = chili.Panel:New{
-				classname='panel_internal',
+			allypanels[#allypanels + 1] = chili.Control:New{
 				width=width,
-				height = titleSize + 20,
+				height = titleSize + 22,
 				x = (windowWidth - width ) / 2 - 13,
-				y = heightOffset - titleSize - 15
+				y = heightOffset - titleSize - 15,
+				children = {
+					chili.Line:New{
+						x = 10,
+						right = 10,
+						bottom = 3,
+						height = 3,
+					}
+				}
 			}
 			heightOffset = heightOffset + height + 10
-			if (allyteamID ~= Spring.GetMyAllyTeamID()) then
-			end
 			playerpanels[allyteamID] = nil
 		end
 	end
@@ -806,18 +808,18 @@ local function Buildme()
 		width = '80%',
 		height = '20%',
 		x='43%',
-		y='1%',
+		y=10,
 		text="P L A Y E R S",
 		fontsize=17,
 		textColor={1.0,1.0,1.0,1.0}
 	}
 	chili.ScrollPanel:New{
 		parent=window,
-		y='5%',
+		y=30,
 		verticalScrollbar=true,
 		horizontalScrollbar=false,
 		width='100%',
-		height= playerlistsize .. '%',
+		bottom = 10,
 		scrollBarSize=20,
 		children=allypanels,
 		backgroundColor= {0,0,0,0},
