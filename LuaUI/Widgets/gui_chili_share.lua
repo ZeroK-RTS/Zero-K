@@ -1239,29 +1239,34 @@ end
 local function UpdateAllyTeam(allyTeam)
 	----Spring.Echo("Updating subject team " .. allyTeam)
 	local temp = {}
+	local nonSpecs = false
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
 		local _, leader, dead, ai = Spring.GetTeamInfo(teamID)
 		if (ai) then 
 			temp[#temp + 1] = {id = #temp + 1, team = teamID, ai = true, name = select(2, Spring.GetAIInfo(teamID)), allyteam = allyTeam, dead = dead}
+			nonSpecs = true
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
 				if playerID ~= Spring.GetMyPlayerID() then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
+				nonSpecs = nonSpecs or active and not spec 
 			end
 		end
 	end
 	table.sort(temp, EloComparator)
 	
-	for _, subject in ipairs(temp) do
-		subjects[#subjects+1] = subject
-		subjects[#subjects].id = #subjects
-		if (subject.player) then
-			if (subject.player == Spring.GetMyPlayerID()) then
-				mySubjectID = #subjects
+	if (nonSpecs) then
+		for _, subject in ipairs(temp) do
+			subjects[#subjects+1] = subject
+			subjects[#subjects].id = #subjects
+			if (subject.player) then
+				if (subject.player == Spring.GetMyPlayerID()) then
+					mySubjectID = #subjects
+				end
+				givemesubjects[subject.player] = subjects[#subjects]		
 			end
-			givemesubjects[subject.player] = subjects[#subjects]		
 		end
 	end
 end
