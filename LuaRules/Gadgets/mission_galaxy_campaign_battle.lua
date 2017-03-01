@@ -30,6 +30,7 @@ local CMD_INSERT = CMD.INSERT
 -- Variables
 
 local unlockedUnitsByTeam = {}
+local unitLineage = {}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -149,8 +150,13 @@ function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
 	return true
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID)
-	SetBuildOptions(unitID, unitDefID, teamID)
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	if builderID and unitLineage[builderID] then
+		unitLineage[unitID] = unitLineage[builderID]
+	else
+		unitLineage[unitID] = teamID
+	end
+	SetBuildOptions(unitID, unitDefID, unitLineage[unitID])
 end
 
 --------------------------------------------------------------------------------
