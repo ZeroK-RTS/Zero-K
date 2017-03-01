@@ -1003,6 +1003,9 @@ local function InitName(subject, playerPanel)
 			y = givemebuttons[subject.id]["text"].y - 1
 		}
 	end
+	--adjust text  centering
+	givemebuttons[subject.id]["text"].y = givemebuttons[subject.id]["text"].y + (1 + sizefont - givemebuttons[subject.id]["text"].font.size) / 3
+	givemebuttons[subject.id]["text"]:Invalidate()
 	if (avatarImg) then
 		chili.Image:New{parent=playerPanel,
 			file=avatarImg,
@@ -1249,7 +1252,7 @@ local function UpdateAllyTeam(allyTeam)
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
-				if playerID ~= Spring.GetMyPlayerID() or not spec then
+				if playerID ~= Spring.GetMyPlayerID() and teamID ~= 0 or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 				nonSpecs = nonSpecs or active and not spec 
