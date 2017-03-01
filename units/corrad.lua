@@ -30,6 +30,9 @@ unitDef = {
     modelradius    = [[16]],
 	removewait     = 1,
 	priority_misc  = 2, -- High
+    morphto        = [[armarad]],
+    morphtime      = [[40]],	
+	combatmorph    = [[1]],
   },    
   
   energyUse                     = 0.8,
