@@ -393,10 +393,10 @@ local function UpdatePlayer(subject)
 		givemebuttons[subject.id]["metal"]:SetVisibility(false)
 		givemebuttons[subject.id]["energy"]:SetVisibility(false)
 		givemebuttons[subject.id]["unit"]:SetVisibility(false)
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 		if (not mySpec or subject.spec) then
 			--Spring.Echo("dec7")
 			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
-			givemebuttons[subject.id]["pingCtrl"]:SetVisibility(false)
 			givemebuttons[subject.id]["off"]:SetVisibility(false)
 			givemebuttons[subject.id]["def"]:SetVisibility(false)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
@@ -404,6 +404,7 @@ local function UpdatePlayer(subject)
 			givemebuttons[subject.id]["energyin"]:SetVisibility(false)
 		end
 	else -- other people's stuff.
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(true)
 		if teamID == myteamID then
 			if amiteamleader then
 				--Spring.Echo("dec8")
