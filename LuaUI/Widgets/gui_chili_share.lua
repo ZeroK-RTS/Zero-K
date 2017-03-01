@@ -1248,7 +1248,7 @@ local function UpdateAllyTeam(allyTeam)
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
-				if playerID ~= Spring.GetMyPlayerID() then
+				if playerID ~= Spring.GetMyPlayerID() or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 				nonSpecs = nonSpecs or active and not spec 
@@ -1256,7 +1256,6 @@ local function UpdateAllyTeam(allyTeam)
 		end
 	end
 	table.sort(temp, EloComparator)
-	
 	if (nonSpecs) then
 		for _, subject in ipairs(temp) do
 			subjects[#subjects+1] = subject
