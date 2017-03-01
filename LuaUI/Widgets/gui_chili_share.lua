@@ -37,6 +37,7 @@ local fontSize = 18
 local badgeWidth = 59
 local badgeHeight = 24
 local color2incolor = nil
+local teamZeroPlayers = {}
 local images = {
 	inviteplayer = 'LuaUI/Images/Commshare.png',
 	accept = 'LuaUI/Images/epicmenu/check.png',
@@ -301,7 +302,7 @@ local function RenderName(subject)
 		givemebuttons[subject.id]["def"]:SetText(def)
 		
 	end
-	if (subject.player and subject.id ~= mySubjectID) then
+	if (subject.player and subject.player ~= Spring.GetMyPlayerID()) then
 		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player) )
 		
 		local colorPing = '\255\180\180\180'
@@ -1241,7 +1242,7 @@ local function EloComparator(subject1, subject2)
 end
 
 local function UpdateAllyTeam(allyTeam)
-	----Spring.Echo("Updating subject team " .. allyTeam)
+	--Spring.Echo("Updating subject team " .. allyTeam)
 	local temp = {}
 	local nonSpecs = false
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
@@ -1252,7 +1253,7 @@ local function UpdateAllyTeam(allyTeam)
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
-				if playerID ~= Spring.GetMyPlayerID() and teamID ~= 0 or not spec then
+				if playerID ~= Spring.GetMyPlayerID() and (teamID ~= 0 or teamZeroPlayers[playerID]) or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 				nonSpecs = nonSpecs or active and not spec 
@@ -1377,6 +1378,13 @@ end
 
 function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
+	
+	for _, playerID in ipairs(Spring.GetPlayerList()) do 
+		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID)
+		if teamID == 0 and not spec then
+			teamZeroPlayers[playerID] = true
+		end
+	end
 	chili = WG.Chili
 	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0
