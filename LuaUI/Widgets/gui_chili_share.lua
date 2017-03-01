@@ -320,7 +320,7 @@ local function RenderName(subject)
 	elseif active and not spec then
 		givemebuttons[subject.id]["text"]:SetText(color2incolor(Spring.GetTeamColor(subject.team)) .. name)
 	elseif not active and not spec then
-		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name .. " (QUIT)")
+		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name )
 	end
 end
 
@@ -364,9 +364,12 @@ local function UpdatePlayer(subject)
 		givemebuttons[subject.id]["energybar"]:SetVisibility(true)
 		givemebuttons[subject.id]["metalin"]:SetVisibility(true)
 		givemebuttons[subject.id]["energyin"]:SetVisibility(true)
+		givemebuttons[subject.id]["off"]:SetVisibility(true)
+		givemebuttons[subject.id]["def"]:SetVisibility(true)
 		givemebuttons[subject.id]["metal"]:SetVisibility(true)
 		givemebuttons[subject.id]["energy"]:SetVisibility(true)
 		givemebuttons[subject.id]["unit"]:SetVisibility(true)
+		givemebuttons[subject.id]["pingCtrl"]:SetVisibility(false)
 		if subject.allyteam ~= myallyteamID or mySpec then -- hostile ai's stuff.
 			--Spring.Echo("dec4")
 			givemebuttons[subject.id]["metal"]:SetVisibility(false)
@@ -375,6 +378,8 @@ local function UpdatePlayer(subject)
 			if (not mySpec ) then
 				--Spring.Echo("dec5")
 				givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+				givemebuttons[subject.id]["off"]:SetVisibility(false)
+				givemebuttons[subject.id]["def"]:SetVisibility(false)
 				givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 				givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 				givemebuttons[subject.id]["energyin"]:SetVisibility(false)
@@ -391,6 +396,9 @@ local function UpdatePlayer(subject)
 		if (not mySpec or subject.spec) then
 			--Spring.Echo("dec7")
 			givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+			givemebuttons[subject.id]["pingCtrl"]:SetVisibility(false)
+			givemebuttons[subject.id]["off"]:SetVisibility(false)
+			givemebuttons[subject.id]["def"]:SetVisibility(false)
 			givemebuttons[subject.id]["energybar"]:SetVisibility(false)
 			givemebuttons[subject.id]["metalin"]:SetVisibility(false)
 			givemebuttons[subject.id]["energyin"]:SetVisibility(false)
@@ -740,7 +748,7 @@ local function InitName(subject, playerPanel)
 			padding = {0,0,0,0},
 			text= "1.0K"
 		}
-		chili.Control:New{
+		givemebuttons[subject.id]["pingCtrl"] = chili.Control:New{
 			parent=playerPanel,
 			children={
 				chili.Image:New{
@@ -813,24 +821,6 @@ local function InitName(subject, playerPanel)
 			tooltip = "This player's network delay (ping)"
 		}
 		if (subject.player) then
-			givemebuttons[subject.id]["commshare"] = chili.Button:New{
-				parent = playerPanel,
-				height = buttonsize,
-				width = buttonsize,
-				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
-				y= givemebuttons[subject.id]["energy"].y,
-				OnClick = {function () InvitePlayer(subject.player,false) end},
-				padding={1,1,1,1},
-				tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
-				children={
-					chili.Image:New{
-						file=images.inviteplayer,
-						width='100%',
-						height='100%'
-					}
-				},
-				caption=" "
-			}
 			givemebuttons[subject.id]["accept"] = chili.Button:New{
 				parent = playerPanel,
 				height = buttonsize,
@@ -843,6 +833,24 @@ local function InitName(subject, playerPanel)
 				children={
 					chili.Image:New{
 						file=images.merge,
+						width='100%',
+						height='100%'
+					}
+				},
+				caption=" "
+			}
+			givemebuttons[subject.id]["commshare"] = chili.Button:New{
+				parent = playerPanel,
+				height = buttonsize,
+				width = buttonsize,
+				x= givemebuttons[subject.id]["energy"].x  + givemebuttons[subject.id]["text"].width,
+				y= givemebuttons[subject.id]["energy"].y,
+				OnClick = {function () InvitePlayer(subject.player,false) end},
+				padding={1,1,1,1},
+				tooltip = "Invite this player to join your squad.\nPlayers on a squad share control of units and have access to all resources each individual player would have/get normally.\nOnly invite people you trust. Use with caution!",
+				children={
+					chili.Image:New{
+						file=images.inviteplayer,
 						width='100%',
 						height='100%'
 					}
@@ -1169,27 +1177,30 @@ local function UpdateInviteTable()
 	for i=1,Spring.GetPlayerRulesParam(myPlayerID, "commshare_invitecount") do
 		local playerID = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_id")
 		local timeleft = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_timeleft") or 0
-		----Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
-		if playerID == automergeid then
-			InviteChange(playerID)
-			return
-		end
-		----Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
-		if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
-			invites[playerID] = timeleft
-			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
-		elseif invites[playerID] == timeleft then
-			invites[playerID] = nil -- dead invite
-			deadinvites[playerID] = timeleft
-			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
-		elseif timeleft == 1 then
-			givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
-			invites[playerID] = nil
-		elseif invites[playerID] and timeleft > 1 then
-			invites[playerID] = timeleft
-			if givemebuttons[playerID]["accept"].visible == false then
-				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
+		if (givemebuttons[givemesubjects[playerID].id]) then
+			----Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
+			if playerID == automergeid then
+				InviteChange(playerID)
+				return
 			end
+			----Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
+			if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
+				invites[playerID] = timeleft
+				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
+			elseif invites[playerID] == timeleft then
+				invites[playerID] = nil -- dead invite
+				deadinvites[playerID] = timeleft
+				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
+			elseif timeleft == 1 then
+				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(false)
+				invites[playerID] = nil
+			elseif invites[playerID] and timeleft > 1 then
+				invites[playerID] = timeleft
+					givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
+					Spring.Echo("showing")
+			end
+		else
+			Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID)))
 		end
 	end
 end
@@ -1235,7 +1246,7 @@ local function UpdateAllyTeam(allyTeam)
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
-				if not spec then
+				if playerID ~= Spring.GetMyPlayerID() then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 			end
