@@ -12,7 +12,7 @@ function widget:GetInfo()
 end
 
 function widget:Initialize()
-	local x, y, z = 0.01, 1, 0.01
+	local x, y, z = 0.01, 1, 0.01 -- 0/1/0 breaks shadows.
 	local dist = math.sqrt(x*x + y*y + z*z)
 	x, y, z = x/dist, y/dist, z/dist
 	Spring.SetSunDirection(x, y, z)
