@@ -22,6 +22,13 @@ local icontypes = {
     size=0,
     radiusadjust=0,
   },
+  
+--terraform
+    terraunit = {
+    bitmap='icons/terraunit.png',
+    size=1.0,
+    distance=0.0,
+},
 
 -- commanders
   commander0 = {
