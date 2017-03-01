@@ -720,7 +720,7 @@ local function InitName(subject, playerPanel)
 			width='100%',
 			height='100%',
 			x=11,
-			y=3,
+			y=4,
 			textColor={1,1,1,1},
 			fontsize=sizefont/2 + 2,
 			margin = {0,0,0,0},
@@ -769,7 +769,7 @@ local function InitName(subject, playerPanel)
 			width=50,
 			height=8,
 			x = givemebuttons[subject.id]["metalbar"].x ,
-			y = givemebuttons[subject.id]["metalbar"].y + 24,
+			y = givemebuttons[subject.id]["metalbar"].y + 39,
 			height=badgeHeight,
 			tooltip = "This player's network delay (ping)"
 		}
@@ -793,7 +793,7 @@ local function InitName(subject, playerPanel)
 			width=50,
 			height=8,
 			x = givemebuttons[subject.id]["metalbar"].x + 2,
-			y = givemebuttons[subject.id]["metalbar"].y + 37,
+			y = givemebuttons[subject.id]["metalbar"].y + 24,
 			height=badgeHeight,
 			tooltip = "This player's network delay (ping)"
 		}
@@ -817,7 +817,7 @@ local function InitName(subject, playerPanel)
 			width=50,
 			height=8,
 			x = givemebuttons[subject.id]["metalin"].x,
-			y = givemebuttons[subject.id]["metalbar"].y + 37,
+			y = givemebuttons[subject.id]["metalbar"].y + 24,
 			height=badgeHeight,
 			tooltip = "This player's network delay (ping)"
 		}
