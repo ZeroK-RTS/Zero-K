@@ -38,13 +38,21 @@ local ceil = math.ceil
 -- Epic Menu
 ---------------------------------
 options_path = 'Settings/Interface/Building Placement'
-options_order = { 'setHeightWithAlt'}
+options_order = { 'enterSetHeightWithB', 'altMouseToSetHeight'}
 options = {
-	setHeightWithAlt = {
-		name = "Require B to set height",
+	enterSetHeightWithB = {
+		name = "Toggle set height with B",
 		type = "bool",
 		value = true,
+		noHotkey = true,
 		desc = "Press B while placing a structure to set the height of the structure. Keys C and V increase or decrease height."
+	},
+	altMouseToSetHeight = {
+		name = "Alt mouse wheel to set height",
+		type = "bool",
+		value = true,
+		noHotkey = true,
+		desc = "Hold Alt and mouse wheel to set height."
 	},
 }
 
@@ -104,7 +112,7 @@ local corner = {
 --------------------------------------------------------------------------------
 
 local function CheckEnabled()
-	if options.setHeightWithAlt.value then
+	if options.enterSetHeightWithB.value then
 		return toggleEnabled
 	end
 	return true
@@ -203,7 +211,7 @@ function widget:KeyPress(key, mods)
 		return false
 	end
 	
-	if key == toggleHeight and options.setHeightWithAlt.value then
+	if key == toggleHeight and options.enterSetHeightWithB.value then
 		toggleEnabled = not toggleEnabled
 		return true
 	end
@@ -307,11 +315,48 @@ function widget:Update(dt)
 	end
 end
 
+function widget:MouseWheel(up, value)
+	if not options.altMouseToSetHeight.value then
+		return
+	end
+	local _,activeCommand = spGetActiveCommand()
+	if (not activeCommand) or (activeCommand > 0) then
+		return false
+	end
+	local alt, ctrl, meta, shift = Spring.GetModKeyState()
+	if not alt then
+		return
+	end
+	toggleEnabled = true
+	buildingPlacementHeight = (buildingPlacementHeight or 0) + INCREMENT_SIZE*value
+	
+	buildHeight[buildingPlacementID] = buildingPlacementHeight
+	widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+	
+	return true
+end
+
 function widget:MousePress(mx, my, button)
+	if button == 2 and options.altMouseToSetHeight.value then
+		local alt, ctrl, meta, shift = Spring.GetModKeyState()
+		if not alt then
+			return
+		end
+		local _,activeCommand = spGetActiveCommand()
+		if (not activeCommand) or (activeCommand > 0) then
+			return
+		end
+		toggleEnabled = not toggleEnabled
+		if toggleEnabled then
+			widgetHandler:UpdateWidgetCallIn("DrawWorld", self)
+		else
+			buildingPlacementID = false
+		end
+		return true
+	end
 	if not (buildingPlacementID and (buildingPlacementHeight ~= 0 or floating) and button == 1 and pointX) then
 		return
 	end
-	
 	SendCommand()
 	return true
 end
