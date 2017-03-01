@@ -45,7 +45,7 @@ local function SetupWindow()
 
 	local newMainWindow = Window:New{
 		--parent = screen0,
-		name  = 'inactivityWindow';
+		name  = 'inactivityWindow2';
 		width = 280;
 		height = 160;
 		classname = "main_window_small",
@@ -56,8 +56,6 @@ local function SetupWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		minWidth = MIN_WIDTH, 
-		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
