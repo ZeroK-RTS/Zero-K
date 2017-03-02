@@ -207,7 +207,7 @@ end
 
 function widget:KeyPress(key, mods)
 	local _,activeCommand = spGetActiveCommand()
-	if (not activeCommand) or (activeCommand > 0) then
+	if (not activeCommand) or (activeCommand >= 0) then
 		return false
 	end
 	
@@ -243,7 +243,7 @@ function widget:Update(dt)
 	end
 	
 	local _,activeCommand = spGetActiveCommand()
-	if (not activeCommand) or (activeCommand > 0) then
+	if (not activeCommand) or (activeCommand >= 0) then
 		if buildingPlacementID then
 			buildingPlacementID = false
 			toggleEnabled = false
