@@ -56,17 +56,18 @@ unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.bas
 																unitCategories.advancedEnergyBuildings)
 
 unitCategories.lightGroundTurrets = {
-	armartic = true,
-	armdeva  = true,
-	corllt   = true,
+	armartic   = true,
+	armdeva    = true,
+	corllt     = true,
+	corrl      = true,
+	turrettorp = true,
+	corgrav    = true,
 }              
 
 unitCategories.heavyGroundTurrets = {
 	armanni  = true,
 	corbhmth = true,
 	corhlt   = true,
-	corgrav  = true,
-	cortl    = true,
 	cordoom  = true,
 }
 
@@ -91,18 +92,23 @@ unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFact
 														unitCategories.advancedFactories)
 
 unitCategories.builders = {
-	amphcon  = true,
-	armrectr = true,
-	coracv   = true,
-	corfast  = true,
-	corch    = true,
-	cornecro = true,
-	corned   = true,
+	amphcon    = true,
+	armca      = true,
+	-- armcsa  = true,
+	armrectr   = true,
+	arm_spider = true,
+	coracv     = true,
+	corfast    = true,
+	corch      = true,
+	cornecro   = true,
+	corned     = true,
+	gunshipcon = true,
+	shipcon    = true,
 }
 
 unitCategories.gameEnder = {
 	zenith    = true,
-	satellite = true,
+	mahlazer  = true,
 	raveparty = true,
 	armbanth  = true, -- Not really a game ender, but beginners shouldn't build it early.
 	armorco   = true,
