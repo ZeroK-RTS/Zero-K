@@ -16,12 +16,7 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if gadgetHandler:IsSyncedCode() then
-
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
-
+if (not gadgetHandler:IsSyncedCode()) then return end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -3775,41 +3770,4 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
-end
-
---------------------------------------------------------------------------------
--- SYNCED
---------------------------------------------------------------------------------
-
-else
-
---------------------------------------------------------------------------------
--- UNSYNCED
---------------------------------------------------------------------------------
-
-local terraunitDefID = UnitDefNames["terraunit"].id
-
-local terraUnits = {}
-
-function gadget:UnitCreated(unitID, unitDefID)
-	if unitDefID == terraunitDefID then
-		Spring.UnitRendering.SetUnitLuaDraw(unitID, true)
-		terraUnits[unitID] = true
-	end
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID)
-	terraUnits[unitID] = nil
-end
-
-function gadget:DrawUnit(unitID, drawMode)
-	if terraUnits[unitID] then
-		return true --supress engine drawing
-	end
-end
-
-
---------------------------------------------------------------------------------
--- UNSYNCED
---------------------------------------------------------------------------------
 end
