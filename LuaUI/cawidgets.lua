@@ -225,7 +225,11 @@ local callInLists = {
   'TextCommand',
   'CommandNotify',
   'AddConsoleLine',
-  'ReceiveUserInfo',
+  'ReceiveUserInfo', 	-- widget:ReceiveUserInfo(info)
+						-- info is a table with keys name, avatar, icon, badges, admin, clan, faction, country
+							-- values are strings except:
+							-- badges: comma separated string of badge names
+							-- admin: boolean
   'ViewResize',
   'DrawScreen',
   'KeyPress',
@@ -1426,7 +1430,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	end
 	if newMsg.msgtype == 'userinfo' and newMsg.argument then
 	
-		local list = newMsg.argument:split(",")
+		local list = newMsg.argument:split("|")
 		local info = {
 			name = list[1], 
 			avatar = list[2], 
