@@ -60,6 +60,7 @@ unitCategories.lightGroundTurrets = {
 	armdeva  = true,
 	corllt   = true,
 	corrl    = true,
+	turrettorp = true,
 }              
 
 unitCategories.heavyGroundTurrets = {
@@ -67,7 +68,6 @@ unitCategories.heavyGroundTurrets = {
 	corbhmth = true,
 	corhlt   = true,
 	corgrav  = true,
-	cortl    = true,
 	cordoom  = true,
 }
 
