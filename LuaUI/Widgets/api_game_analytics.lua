@@ -92,13 +92,18 @@ unitCategories.factories = Spring.Utilities.MergeTable(	unitCategories.basicFact
 														unitCategories.advancedFactories)
 
 unitCategories.builders = {
-	amphcon  = true,
-	armrectr = true,
-	coracv   = true,
-	corfast  = true,
-	corch    = true,
-	cornecro = true,
-	corned   = true,
+	amphcon    = true,
+	armca      = true,
+	-- armcsa  = true,
+	armrectr   = true,
+	arm_spider = true,
+	coracv     = true,
+	corfast    = true,
+	corch      = true,
+	cornecro   = true,
+	corned     = true,
+	gunshipcon = true,
+	shipcon    = true,
 }
 
 unitCategories.gameEnder = {
