@@ -57,6 +57,7 @@ MessageProcessor.MESSAGE_DEFINITIONS = {
 
 	{ msgtype = 'label', pattern = '^PLAYERNAME added point: (.+)', discard = true }, -- NOTE : these messages are discarded -- points and labels are provided through MapDrawCmd() callin
 	{ msgtype = 'point', pattern = '^PLAYERNAME added point: ', discard = true },
+	{ msgtype = 'userinfo', pattern = '^> SPRINGIE:User (.+)', noplayername = true },
 	{ msgtype = 'autohost', pattern = '^> (.+)', noplayername = true },
 	{ msgtype = 'game_message', pattern = '^game_message:(.)(.*)', isgamemessage = true },
 	{ msgtype = 'other' } -- no pattern... will match anything else
