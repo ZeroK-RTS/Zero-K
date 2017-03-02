@@ -887,6 +887,7 @@ local function SetupMinimapRightPreset()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
+	widgetHandler:DisableWidget("Chili Crude Player List")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -897,9 +898,6 @@ local function SetupMinimapRightPreset()
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	widgetHandler:EnableWidget("Chili Global Commands")
 	
-	if not WG.Chili.Screen0:GetChildByName("Player List") then
-		widgetHandler:EnableWidget("Chili Crude Player List")
-	end
 	
 	Spring.SendCommands("resbar 0")
 	
@@ -980,29 +978,14 @@ local function SetupMinimapRightPreset()
 	
 	-- Chat
 	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
-	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
-	local chatHeight = selectionsHeight
 	
-	local chatX = math.floor((screenWidth - chatWidth)/2)
-	local chatY = screenHeight - chatHeight - selectionsHeight
-	if chatX < coreSelectorWidth + integralWidth then
-		chatY = screenHeight - chatHeight - integralHeight
-	end
+	local chatWidth = minimapWidth
+	local chatHeight = 0.2*screenHeight
 	
-	-- Player List
-	local playerlistWidth = 310
-	local playerlistHeight = screenHeight/2
-	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
-	if playerListControl then
-		playerlistWidth = playerListControl.minWidth
-	end
+	local chatX = screenWidth - chatWidth
+	local chatY = screenHeight - chatHeight - minimapHeight
 	
-	WG.SetWindowPosAndSize("Player List",
-		screenWidth - playerlistWidth,
-		screenHeight - playerlistHeight - minimapHeight,
-		playerlistWidth,
-		playerlistHeight
-	)
+
 	
 	-- Chat
 	WG.SetWindowPosAndSize("ProChat",
