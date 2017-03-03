@@ -27,6 +27,7 @@ unitDef = {
 
   footprintX             = 2,
   footprintZ             = 2,
+  iconType               = [[terraunit]], 
   idleAutoHeal           = 0,
   idleTime               = 1800,
   isFeature              = false,
@@ -38,7 +39,7 @@ unitDef = {
   maxSlope               = 255,
   maxVelocity            = 0,
   minCloakDistance       = 0,
-  objectName             = [[debris1x1b.s3o]],
+  objectName             = [[sphere.s3o]],
   reclaimable            = false,
   script                 = [[nullscript.lua]],
   seismicSignature       = 4,
