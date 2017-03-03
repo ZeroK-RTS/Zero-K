@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.23",
+		name	= "Chili Share menu v1.24",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "Commshare by _Shaman, Playerlist by DeinFreund",
 		date	= "12-3-2016",
@@ -13,6 +13,8 @@ end
 
 
 VFS.Include("LuaRules/Configs/constants.lua")
+VFS.Include("LuaUI/Utilities/json.lua");
+
 local MIN_STORAGE = 0.5
 
 local automergeid = -1
@@ -37,6 +39,8 @@ local fontSize = 18
 local badgeWidth = 59
 local badgeHeight = 24
 local color2incolor = nil
+local teamZeroPlayers = {}
+local playerInfo = {}
 local images = {
 	inviteplayer = 'LuaUI/Images/Commshare.png',
 	accept = 'LuaUI/Images/epicmenu/check.png',
@@ -301,7 +305,7 @@ local function RenderName(subject)
 		givemebuttons[subject.id]["def"]:SetText(def)
 		
 	end
-	if (subject.player and subject.id ~= mySubjectID) then
+	if (subject.player and subject.player ~= Spring.GetMyPlayerID()) then
 		local ping = 1000 * select(6,Spring.GetPlayerInfo(subject.player) )
 		
 		local colorPing = '\255\180\180\180'
@@ -311,7 +315,15 @@ local function RenderName(subject)
 		if (ping > 1000) then
 			colorPing = '\255\255\0\0'
 		end
-		givemebuttons[subject.id]["ping"]:SetText(colorPing .. round(ping, 0).. "ms")
+		if (ping < 1000) then
+			ping = round(ping, 0).. "ms"
+		elseif (ping < 60000) then
+			ping = round(ping/1000, 1).. "sec"
+		else
+			ping = round(ping/60000, 1).. "min"
+		end
+			
+		givemebuttons[subject.id]["ping"]:SetText(colorPing .. ping)
 	elseif givemebuttons[subject.id]["ping"] then
 		givemebuttons[subject.id]["ping"]:SetText("\255\180\180\180 n/a")
 	end
@@ -476,7 +488,7 @@ local function MergeWithClanMembers()
 				local customKeys = select(10, Spring.GetPlayerInfo(players[j])) or {}
 				local clanShort = customKeys.clan     or ""
 				local clanLong  = customKeys.clanfull or ""
-				----Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
+				--Spring.Echo(select(1,Spring.GetPlayerInfo(players[j])) .. " : " .. clanLong)
 				if clanLong == myclanLong and players[j] ~= Spring.GetMyPlayerID() and select(4,Spring.GetPlayerInfo(players[j])) ~= Spring.GetMyTeamID() then
 					clanmembers[#clanmembers+1] = players[j]
 				end
@@ -917,16 +929,32 @@ local function InitName(subject, playerPanel)
 			caption=" "
 		}
 	end
-	local pdata, country, elo, xp, badges
+	local pdata, country, icon, badges, clan, avatar, elo, xp, faction, admin
 	if (subject.player) then
 		pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player))
-		elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
+		--elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
+		icon = pdata.icon
 		badges = pdata.badges
+		clan = pdata.clan
+		avatar = pdata.avatar
+		faction = pdata.faction
 	end
+	if (playerInfo[subject.name]) then
+		--Spring.Echo("Using extra info for " .. subject.name)
+		elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(playerInfo[subject.name].elo), tonumber(playerInfo[subject.name].level))
+		country = playerInfo[subject.name].country
+		clan = playerInfo[subject.name].clan
+		icon = playerInfo[subject.name].icon
+		badges = playerInfo[subject.name].badges
+		avatar = playerInfo[subject.name].avatar
+		faction = playerInfo[subject.name].faction
+		admin = playerInfo[subject.name].admin
+	end
+	
+	elo = 0
+	xp = 0
 	if subject.ai then
-		elo = 2
-		xp = 2
 		if (string.match(string.lower(subject.name), "chicken")) then			
 			elo = 1
 			xp = 7
@@ -943,23 +971,33 @@ local function InitName(subject, playerPanel)
 			elo = 4
 			xp = 5
 		end
+		if (string.match(string.lower(subject.name), "cai")) then			
+			elo = 2
+			xp = 3
+		end
 	end
 	local rankImg
 	--Spring.Echo("badges: " .. tostring(badges))
 	local countryImg = country and country ~= '' and country ~= '??' and "LuaUI/Images/flags/" .. (country) .. ".png" or nil
 	local clanImg = nil
 	local avatarImg = nil
-	local avatar = pdata and pdata.avatar or "clogger"
-	if (elo and xp) then
+	local adminImg = nil
+	avatar = avatar or "clogger"
+	if (icon) then
+		rankImg = "LuaUI/Images/LobbyRanks/" .. icon .. ".png"
+	elseif (elo and xp) then
 		rankImg = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 	end
-	if pdata and pdata.clan and pdata.clan ~= "" then 
-		clanImg = "LuaUI/Configs/Clans/" .. pdata.clan ..".png"
-	elseif pdata and pdata.faction and pdata.faction ~= "" then
-		clanImg = "LuaUI/Configs/Factions/" .. pdata.faction ..".png"
+	if clan and clan ~= "" then 
+		clanImg = "LuaUI/Configs/Clans/" .. clan ..".png"
+	elseif faction and faction ~= "" then
+		clanImg = "LuaUI/Configs/Factions/" .. faction ..".png"
 	end
 	if avatar then
 		avatarImg = "LuaUI/Configs/Avatars/" .. avatar .. ".png"
+	end
+	if admin then
+		adminImg = "LuaUI/Images/playerlist/police.png"
 	end
 	if (badges) then
 		for i, badge in ipairs(badges:split(",")) do
@@ -985,6 +1023,30 @@ local function InitName(subject, playerPanel)
 			y = givemebuttons[subject.id]["text"].y - 1
 		}
 	end
+	if (adminImg) then
+		if givemebuttons[subject.id]["battlekick"] then
+			givemebuttons[subject.id]["battlekick"]:Dispose()
+		end
+		givemebuttons[subject.id]["admin"] = chili.Button:New{
+			parent = playerPanel,
+			height = buttonsize,
+			width = buttonsize,
+			x= topRowStartX + givemebuttons[subject.id]["text"].width + 2 * buttonsize,
+			y= givemebuttons[subject.id]["text"].y - 4,
+			padding={1,1,1,1},
+			tooltip = "Zero-K Administrator",
+			children={
+				chili.Image:New{
+					file=adminImg,
+					width=16,
+					height=16,
+					x = 2,
+					y = 2
+				}
+			},
+			caption=" "
+		}
+	end
 	if (countryImg) then
 		chili.Image:New{parent=playerPanel,
 			file=countryImg,
@@ -1003,6 +1065,9 @@ local function InitName(subject, playerPanel)
 			y = givemebuttons[subject.id]["text"].y - 1
 		}
 	end
+	--adjust text  centering
+	givemebuttons[subject.id]["text"].y = givemebuttons[subject.id]["text"].y + (1 + sizefont - givemebuttons[subject.id]["text"].font.size) / 3
+	givemebuttons[subject.id]["text"]:Invalidate()
 	if (avatarImg) then
 		chili.Image:New{parent=playerPanel,
 			file=avatarImg,
@@ -1012,7 +1077,7 @@ local function InitName(subject, playerPanel)
 			y = 0
 		}
 	end
-	----Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
+	--Spring.Echo("Playerpanel size: " .. playerPanel.width .. "x" .. playerPanel.height .. "\nTextbox size: " .. playerPanel.width*0.4 .. "x" .. playerPanel.height)
 	local isSpec = select(3,Spring.GetPlayerInfo(subject.id))
 	--if not isSpec then
 		RenderName(subject)
@@ -1028,7 +1093,7 @@ local function Buildme()
 	end
 	windowWidth = 768 
 	windowHeight = 666
-	----Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
+	--Spring.Echo("Window size: " .. window.width .. "x" .. window.height)
 	
 	local playerpanels = {}
 	local allypanels = {}
@@ -1179,12 +1244,12 @@ local function UpdateInviteTable()
 		local playerID = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_id")
 		local timeleft = Spring.GetPlayerRulesParam(myPlayerID, "commshare_invite_"..i.."_timeleft") or 0
 		if (givemebuttons[givemesubjects[playerID].id]) then
-			----Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
+			--Spring.Echo("Invite from: " .. tostring(playerID) .. "\nTime left: " .. timeleft)
 			if playerID == automergeid then
 				InviteChange(playerID)
 				return
 			end
-			----Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
+			--Spring.Echo("Invite: " .. playerID .. " : " .. timeleft)
 			if invites[playerID] == nil and timeleft > 1 and deadinvites[playerID] ~= timeleft then
 				invites[playerID] = timeleft
 				givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
@@ -1198,10 +1263,10 @@ local function UpdateInviteTable()
 			elseif invites[playerID] and timeleft > 1 then
 				invites[playerID] = timeleft
 					givemebuttons[givemesubjects[playerID].id]["accept"]:SetVisibility(true)
-					Spring.Echo("showing")
+					--Spring.Echo("showing")
 			end
 		else
-			Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID)))
+			--Spring.Echo("No accept for player " .. select(1, Spring.GetPlayerInfo(playerID)))
 		end
 	end
 end
@@ -1221,7 +1286,7 @@ function widget:GameProgress(serverFrameNum)
 	if needsremerging and serverFrameNum - Spring.GetGameFrame() < 90 then
 		needsremerging = false
 		Spring.SendLuaRulesMsg("sharemode remerge")
-		----Spring.Echo("Sent remerge request")
+		--Spring.Echo("Sent remerge request")
 	end
 end
 
@@ -1238,7 +1303,7 @@ local function EloComparator(subject1, subject2)
 end
 
 local function UpdateAllyTeam(allyTeam)
-	----Spring.Echo("Updating subject team " .. allyTeam)
+	--Spring.Echo("Updating subject team " .. allyTeam)
 	local temp = {}
 	local nonSpecs = false
 	for _, teamID in ipairs(Spring.GetTeamList(allyTeam)) do
@@ -1249,7 +1314,7 @@ local function UpdateAllyTeam(allyTeam)
 		else
 			for _, playerID in ipairs(Spring.GetPlayerList(teamID)) do
 				local name,active,spec = Spring.GetPlayerInfo(playerID)
-				if playerID ~= Spring.GetMyPlayerID() or not spec then
+				if playerID ~= Spring.GetMyPlayerID() and (teamID ~= 0 or teamZeroPlayers[playerID]) or not spec then
 					temp[#temp + 1] = {id = #temp + 1, team = teamID, player = playerID, name = name, allyteam = allyTeam, active = active, spec = spec, dead = dead}
 				end
 				nonSpecs = nonSpecs or active and not spec 
@@ -1299,6 +1364,18 @@ local function UpdateSubjects()
 	end
 end
 
+function widget:ReceiveUserInfo(info)
+	playerInfo[info.name] = info
+	
+	if (built) then
+		UpdateSubjects()
+		if ( mySubjectID >= 0) then
+			--Spring.Echo("Rebuilding")
+			Buildme()
+		end
+	end
+end
+
 function widget:PlayerChanged(playerID)
 	if (built) then
 		UpdateSubjects()
@@ -1312,21 +1389,21 @@ end
 
 local lastUpdate = -100
 local dtSum = 0
-
+local lastWindow = false
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if window and window.visible then
-		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.23_sharemenu"))
+		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.24_sharemenu"))
 		--Spring.Echo(showkey)
 		if (Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
-			UpdatePlayers()
 			window:ToggleVisibility()
 		end
 	end
 	dtSum = dtSum + dt
-	if (f - lastUpdate >= 30 or dtSum >= 2) then
+	if (f - lastUpdate >= 30 or dtSum >= 2 or window and lastWindow ~= window.visible) then
+		lastWindow = window and window.visible
 		dtSum = 0
 		lastUpdate = f
 		local invitecount = Spring.GetPlayerRulesParam(Spring.GetMyPlayerID(), "commshare_invitecount")
@@ -1349,7 +1426,7 @@ function widget:Update(dt)
 		mycurrentteamid = Spring.GetMyTeamID()
 		local modOptions = {}
 		modOptions = Spring.GetModOptions()
-		----Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
+		--Spring.Echo("Share mode is " .. tostring(modOptions["sharemode"]))
 		if modOptions["sharemode"] == "invite" or modOptions["sharemode"] == nil then
 			sharemode = true
 		end
@@ -1363,9 +1440,9 @@ function widget:Update(dt)
 		local modOptions = {}
 		local iscommsharing = Spring.GetTeamRulesParam(Spring.GetMyTeamID(),"isCommsharing")
 		modOptions = Spring.GetModOptions()
-		----Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
+		--Spring.Echo("Automerge: " .. tostring(options.automation_clanmerge.value) .. "\niscommsharing: " .. tostring(iscommsharing == 1))
 		if sharemode and not iscommsharing and options.automation_clanmerge.value == true then
-			----Spring.Echo("Clan merge is enabled!")
+			--Spring.Echo("Clan merge is enabled!")
 			MergeWithClanMembers()
 		end
 		UpdatePlayers()
@@ -1374,6 +1451,13 @@ end
 
 function widget:Initialize()
 	local spectating = Spring.GetSpectatingState()
+	
+	for _, playerID in ipairs(Spring.GetPlayerList()) do 
+		local name,active,spec, teamID, allyTeam = Spring.GetPlayerInfo(playerID)
+		if teamID == 0 and not spec then
+			teamZeroPlayers[playerID] = true
+		end
+	end
 	chili = WG.Chili
 	color2incolor = chili.color2incolor
 	screen0 = chili.Screen0

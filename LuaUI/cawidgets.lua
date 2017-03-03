@@ -54,6 +54,7 @@ local WIDGET_DIRNAME     = LUAUI_DIRNAME .. 'Widgets/'
 local HANDLER_BASENAME = "cawidgets.lua"
 local SELECTOR_BASENAME = 'selector.lua'
 
+
 do
 	local isMission = Game.modDesc:find("Mission Mutator")
 	if isMission then -- all missions will be forced to use a specific name
@@ -224,6 +225,11 @@ local callInLists = {
   'TextCommand',
   'CommandNotify',
   'AddConsoleLine',
+  'ReceiveUserInfo', 	-- widget:ReceiveUserInfo(info)
+						-- info is a table with keys name, avatar, icon, badges, admin, clan, faction, country
+							-- values are strings except:
+							-- badges: comma separated string of badge names
+							-- admin: boolean
   'ViewResize',
   'DrawScreen',
   'KeyPress',
@@ -288,6 +294,21 @@ end
 
 local function ripairs(t)
   return rev_iter, t, (1 + #t)
+end
+
+-- String helper to split by delimiter (userinfo)
+
+function string:split(delimiter)
+  local result = { }
+  local from  = 1
+  local delim_from, delim_to = string.find( self, delimiter, from  )
+  while delim_from do
+    table.insert( result, string.sub( self, from , delim_from-1 ) )
+    from  = delim_to + 1
+    delim_from, delim_to = string.find( self, delimiter, from  )
+  end
+  table.insert( result, string.sub( self, from  ) )
+  return result
 end
 
 --------------------------------------------------------------------------------
@@ -1324,6 +1345,7 @@ end
 
 --NOTE: StringStarts() and MessageProcessor is included in "chat_preprocess.lua"
 function widgetHandler:AddConsoleLine(msg, priority)
+
   if StringStarts(msg, "Error: Invalid command received") or StringStarts(msg, "Error: Dropped command ") then
 	return
   elseif StringStarts(msg, transmitLobbyMagic) then -- sending to the lobby
@@ -1346,7 +1368,7 @@ function widgetHandler:AddConsoleLine(msg, priority)
 	--censor message for muted player. This is mandatory, everyone is forced to close ears to muted players (ie: if it is optional, then everyone will opt to hear muted player for spec-cheat info. Thus it will defeat the purpose of mute)
 	local newMsg = { text = msg, priority = priority }
 	MessageProcessor:ProcessConsoleLine(newMsg) --chat_preprocess.lua
-	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'game_message' then 
+	if newMsg.msgtype ~= 'other' and newMsg.msgtype ~= 'autohost' and newMsg.msgtype ~= 'userinfo' and newMsg.msgtype ~= 'game_message' then 
 		if MUTE_SPECTATORS and newMsg.msgtype == 'spec_to_everyone' then
 			local spectating = select(1, Spring.GetSpectatingState())
 			if not spectating then
@@ -1405,6 +1427,26 @@ function widgetHandler:AddConsoleLine(msg, priority)
 				return -- block chat
 			end
 		end
+	end
+	if newMsg.msgtype == 'userinfo' and newMsg.argument then
+	
+		local list = newMsg.argument:split("|")
+		local info = {
+			name = list[1], 
+			avatar = list[2], 
+			icon = list[3], 
+			badges = list[4],
+			admin = list[5] and string.lower(list[5]) == 'true', 
+			clan = list[6], 
+			faction = list[7], 
+			country = list[8], 
+		}
+		
+		--send message to widget:ReceiveUserInfo
+		for _,w in ipairs(self.ReceiveUserInfoList) do
+			w:ReceiveUserInfo(info) 
+		end
+		return
 	end
   
 	--send message to widget:AddConsoleLine
