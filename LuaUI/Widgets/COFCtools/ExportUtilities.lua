@@ -12,9 +12,10 @@ function SetCameraTargetBox(minX, minZ, maxX, maxZ, minDist, maxY, smoothness, u
 		WG.COFC_SetCameraTargetBox(minX, minZ, maxX, maxZ, minDist, maxY, smoothness, useSmoothMeshSetting)
 	else
 		local x, z = (minX + maxX) / 2, (minZ + maxZ) / 2
-		Spring.SetCameraTarget(x, Spring.GetGroundHeight(x, z), z, smoothness or 0)
 		if height then
-			Spring.SetCameraState({height = height}, smoothness or 0)
+			Spring.SetCameraState({px = x, py = Spring.GetGroundHeight(x, z), pz = z, height = height}, smoothness or 0)
+		else
+			Spring.SetCameraTarget(x, Spring.GetGroundHeight(x, z), z, smoothness or 0)
 		end
 	end
 end

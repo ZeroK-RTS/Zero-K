@@ -75,6 +75,13 @@ local viewAlreadyOwnedButton
 
 local moduleTextColor = {.8,.8,.8,.9}
 
+local commanderUnitDefID = {}
+for i = 1, #UnitDefs do
+	if UnitDefs[i].customParams.dynamic_comm then
+		commanderUnitDefID[i] = true
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- New Module Selection Button Handling
@@ -946,6 +953,23 @@ local function CreateModuleListWindowFromUnit(unitID)
 	ShowModuleListWindow(slotDefaults, level + 1, chassis, alreadyOwned)
 end
 
+local function GetCommanderUpgradeAttributes(unitID, cullMorphing)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not commanderUnitDefID[unitDefID] then
+		return false
+	end
+	if cullMorphing and Spring.GetUnitRulesParam(unitID, "morphing") == 1 then
+		return false
+	end
+	local level = Spring.GetUnitRulesParam(unitID, "comm_level")
+	if not level then
+		return false
+	end
+	local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
+	local staticLevel = Spring.GetUnitRulesParam(unitID, "comm_staticLevel")
+	return level, chassis, staticLevel
+end
+
 function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if cmdID ~= CMD_UPGRADE_UNIT then
 		return false
@@ -955,13 +979,10 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	local upgradeID = false
 	for i = 1, #units do
 		local unitID = units[i]
-		local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-		if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
-			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-			if UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] then
-				upgradeID = unitID
-				break
-			end
+		local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
+		if level and (not staticLevel) and UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] then
+			upgradeID = unitID
+			break
 		end
 	end
 	
@@ -980,9 +1001,8 @@ function widget:CommandsChanged()
 		local foundMatchingComm = false
 		for i = 1, #units do
 			local unitID = units[i]
-			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-			local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-			if level == upgradeSignature.level and chassis == upgradeSignature.chassis then
+			local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID)
+			if level and (not staticLevel) and level == upgradeSignature.level and chassis == upgradeSignature.chassis then
 				local alreadyOwned = {}
 				local moduleCount = Spring.GetUnitRulesParam(unitID, "comm_module_count")
 				for i = 1, moduleCount do
@@ -1021,13 +1041,10 @@ function widget:CommandsChanged()
 		local foundRulesParams = false
 		for i = 1, #units do
 			local unitID = units[i]
-			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
-			if level and Spring.GetUnitRulesParam(unitID, "morphing") ~= 1 then
-				local chassis = Spring.GetUnitRulesParam(unitID, "comm_chassis")
-				if UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] then
-					foundRulesParams = true
-					break
-				end
+			local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
+			if level and (not staticLevel) and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1] )then
+				foundRulesParams = true
+				break
 			end
 		end
 		

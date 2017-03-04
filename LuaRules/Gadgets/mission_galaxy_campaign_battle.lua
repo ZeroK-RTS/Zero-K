@@ -193,12 +193,20 @@ local function PlaceTeamUnits(teamID, customKeys)
 	end
 end
 
-local function InitializeUnlocksAndPlacement()
+local function InitializeUnlocks()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		SetTeamUnlocks(teamID, customKeys)
+	end
+end
+
+local function DoInitialUnitPlacement()
+	local teamList = Spring.GetTeamList()
+	for i = 1, #teamList do
+		local teamID = teamList[i]
+		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		PlaceTeamUnits(teamID, customKeys)
 	end
 end
@@ -215,7 +223,7 @@ function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
 end
 
 function gadget:Initialize()
-	InitializeUnlocksAndPlacement()
+	InitializeUnlocks()
 	
 	local allUnits = Spring.GetAllUnits()
 	for _, unitID in pairs(allUnits) do
@@ -226,4 +234,9 @@ function gadget:Initialize()
 	end
 	
 	GG.Unlocks = Unlocks
+end
+
+function gadget:GameFrame()
+	DoInitialUnitPlacement()
+	gadgetHandler:RemoveCallIn("GameFrame")
 end

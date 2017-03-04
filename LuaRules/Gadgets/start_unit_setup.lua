@@ -155,7 +155,10 @@ local function GetStartUnit(teamID, playerID, isAI)
 
 	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
 	if teamInfo and teamInfo.staticcomm then
-		return (UnitDefNames[teamInfo.staticcomm] and UnitDefNames[teamInfo.staticcomm].id) or UnitDefNames["commbasic"].id
+		local commanderName = teamInfo.staticcomm
+		local commanderLevel = teamInfo.staticcomm_level or 1
+		local commanderProfile = GG.ModularCommAPI.GetCommProfileInfo(commanderName)
+		return commanderProfile.baseUnitDefID
 	end
 
 	if Spring.GetModOption("forcejunior", true, false) then
@@ -222,6 +225,12 @@ local function getMiddleOfStartBox(teamID)
 end
 
 local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartOfTheGame)
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	if teamInfo and teamInfo.nocommander then
+		waitingForComm[teamID] = nil
+		return
+	end
+	
 	local luaAI = Spring.GetTeamLuaAI(teamID)
 	if luaAI and string.find(string.lower(luaAI), "chicken") then
 		return false
@@ -239,7 +248,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 			return false
 		end
 	end
-
+	
 	-- get start unit
 	local startUnit = GetStartUnit(teamID, playerID, isAI)
 
@@ -251,8 +260,9 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		-- replace with shuffled position
 		local x,y,z
 		if fixedStartPos then
-			local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
-			x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+			if teamInfo then
+				x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+			end
 			if x then
 				y = Spring.GetGroundHeight(x, z)
 			else
@@ -285,7 +295,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 
 		-- CREATE UNIT
-		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit))
+		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level))
 		if Spring.GetGameFrame() <= 1 then
 			Spring.SpawnCEG("gate", x, y, z)
 			-- Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z) -- performance loss

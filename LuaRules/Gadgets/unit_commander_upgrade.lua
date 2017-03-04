@@ -223,7 +223,7 @@ local function GetModuleEffectsData(moduleList, level, chassis)
 	return moduleEffectData
 end
 
-local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images, profileID)
+local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images, profileID, staticLevel)
 	-- This function sets the UnitRulesParams and updates the unit attributes after
 	-- a commander has been created. This can either happen internally due to a request
 	-- to spawn a commander or with rezz/construction/spawning.
@@ -239,8 +239,13 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
+	
 	if profileID then
 		Spring.SetUnitRulesParam(unitID, "comm_profileID",     profileID, INLOS)
+	end
+	
+	if staticLevel then -- unmorphable
+		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
 	
 	Spring.SetUnitCosts(unitID, {
@@ -319,7 +324,47 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	return unitID
 end
 
-local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, targetLevel)
+	for i = 1, targetLevel do
+		local levelModules = commProfileInfo.modules[i]
+		if levelModules then
+			for j = 1, #levelModules do
+				local moduleID = moduleDefNames[levelModules[j]]
+				if moduleID and moduleDefs[moduleID] then
+					moduleList[#moduleList + 1] = moduleID
+					moduleCost = moduleCost + moduleDefs[moduleID].cost
+				end
+			end
+		end
+	end
+	
+	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
+	
+	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
+	local chassisData = chassisDefs[chassisDefID]
+	local chassisLevel = math.min(chassisData.maxNormalLevel, targetLevel)
+	local unitDefID = chassisData.levelDefs[chassisLevel].morphUnitDefFunction(moduleByDefID)
+	
+	local upgradeDef = {
+		level = targetLevel,
+		staticLevel = targetLevel,
+		chassis = chassisDefID, 
+		totalCost = UnitDefs[chassisDefID].metalCost + moduleCost,
+		name = commProfileInfo.name,
+		moduleList = moduleList,
+		baseUnitDefID = unitDefID,
+		baseWreckID = commProfileInfo.baseWreckID or chassisData.baseWreckID,
+		baseHeapID = commProfileInfo.baseHeapID or chassisData.baseHeapID,
+		images = commProfileInfo.images,
+		profileID = dyncommID,
+	}
+	
+	local unitID = Upgrades_CreateUpgradedUnit(unitDefID, x, y, z, facing, teamID, false, upgradeDef)
+	
+	return unitID
+end
+
+local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID, staticLevel)
 	--Spring.Echo("Creating starter dyncomm " .. dyncommID)
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
@@ -341,6 +386,10 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 				moduleList[#moduleList + 1] = moduleDefNames[decName]
 			end
 		end
+	end
+	
+	if staticLevel then
+		return CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, staticLevel - 1)
 	end
 	
 	local upgradeDef = {
@@ -379,7 +428,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			internalCreationUpgradeDef.moduleList, 
 			internalCreationModuleEffectData,
 			internalCreationUpgradeDef.images,
-			internalCreationUpgradeDef.profileID
+			internalCreationUpgradeDef.profileID,
+			internalCreationUpgradeDef.staticLevel
 		)
 		return
 	end
@@ -450,6 +500,10 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local pNewCount = params[4]
 	
 	if #params ~= 4 + pAlreadyCount + pNewCount then
+		return false
+	end
+	
+	if Spring.GetUnitRulesParam(unitID, "comm_staticLevel") then
 		return false
 	end
 	

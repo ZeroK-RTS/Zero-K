@@ -136,7 +136,7 @@ local function GetStartZoomBounds()
 		if not x then
 			x, _, z = Spring.GetTeamStartPosition(teamID)
 		end
-		return x, z, x, z, 0, 1800
+		return x, z, x, z, 0, 1800, 0
 	end
 	
 	local startboxes = GetRawBoxes()
@@ -170,8 +170,8 @@ function Close(permanently)
 	
 	if not cameraMoved then
 		cameraMoved = true
-		local minX, minZ, maxX, maxZ, maxY, height = GetStartZoomBounds()
-		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 0.67, true, height)
+		local minX, minZ, maxX, maxZ, maxY, height, smoothness = GetStartZoomBounds()
+		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, smoothness or 0.67, true, height)
 	end
 
 	if permanently then
@@ -392,7 +392,7 @@ end
 local timer = 0
 function widget:Update(dt)
 	timer = timer + dt
-	if timer >= 0.1 then
+	if timer >= 0.01 then
 		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
 			Close(true)
 		end
