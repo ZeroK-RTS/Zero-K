@@ -155,7 +155,7 @@ local function GetStartUnit(teamID, playerID, isAI)
 
 	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
 	if teamInfo and teamInfo.staticcomm then
-		return UnitDefNames["commbasic"].id
+		return (UnitDefNames[teamInfo.staticcomm] and UnitDefNames[teamInfo.staticcomm].id) or UnitDefNames["commbasic"].id
 	end
 
 	if Spring.GetModOption("forcejunior", true, false) then
