@@ -95,6 +95,32 @@ local function PlaceUnit(unitData, teamID)
 	Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID)
 end
 
+local function PlaceRetinueUnit(retinueID, range, unitDefName, spawnX, spawnZ, facing, teamID, experience)
+	local unitDefID = UnitDefNames[unitDefName]
+	unitDefID = unitDefID and unitDefID.id
+	if not unitDefID then
+		return
+	end
+	
+	local validPlacement = false
+	local x, z
+	local tries = 0
+	while not validPlacement do
+		x, z = spawnX + math.random()*range*2 - range, spawnZ + math.random()*range*2 - range
+		if tries < 10 then
+			validPlacement = Spring.TestBuildOrder(unitDefID, x, 0, z, facing)
+		elseif tries < 20 then
+			validPlacement = Spring.TestMoveOrder(unitDefID, x, 0, z)
+		else
+			x, z =  spawnX + math.random()*2 - 1, spawnZ + math.random()*2 - 1
+		end
+	end
+	
+	local retinueUnitID = Spring.CreateUnit(unitDefID, x, Spring.GetGroundHeight(x,z), z, facing, teamID)
+	Spring.SetUnitRulesParam(retinueUnitID, "retinueID", retinueID, {ally = true})
+	Spring.SetUnitExperience(retinueUnitID, experience)
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Implement the locks
@@ -212,6 +238,7 @@ local function DoInitialUnitPlacement()
 end
 
 local Unlocks = {}
+local GalaxyCampaignHandler = {}
 
 function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
 	if unlockedUnitsByTeam[teamID] then
@@ -220,6 +247,18 @@ function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
 		end
 	end
 	return true
+end
+
+function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
+	local customKeys = select(7, Spring.GetTeamInfo(teamID))
+	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
+	if retinueData then
+		local range = 70 + #retinueData*20
+		for i = 1, #retinueData do
+			local unitData = retinueData[i]
+			PlaceRetinueUnit(unitData.retinueID, range, unitData.unitDefName, x, z, facing, teamID, unitData.experience)
+		end
+	end
 end
 
 function gadget:Initialize()
@@ -234,6 +273,7 @@ function gadget:Initialize()
 	end
 	
 	GG.Unlocks = Unlocks
+	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
 function gadget:GameFrame()
