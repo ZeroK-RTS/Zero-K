@@ -459,6 +459,14 @@ local function UpdatePlayer(subject)
 			end
 		end
 	end
+	if (subject.spec and subject.player ~= myPlayerID) then
+		givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+		givemebuttons[subject.id]["off"]:SetVisibility(false)
+		givemebuttons[subject.id]["def"]:SetVisibility(false)
+		givemebuttons[subject.id]["energybar"]:SetVisibility(false)
+		givemebuttons[subject.id]["metalin"]:SetVisibility(false)
+		givemebuttons[subject.id]["energyin"]:SetVisibility(false)
+	end
 	RenderName(subject)
 end
 
