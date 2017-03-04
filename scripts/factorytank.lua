@@ -41,39 +41,41 @@ local nanoPieces = {emit_1,emit_2,emit_3}
 local nanoIdx = 1
 local smokePiece = { piece "wing_1", piece "wing_2", piece "wing_3" }
 
+local animSpeed = 4
+
 --opening animation of the factory
 local function Open()
 	Signal(2) --kill the closing animation if it is in process
 	--SetSignalMask(1) --set the signal to kill the opening animation
 
-	Turn(wing_1, 3, -1.57, 1)
-	Turn(wing_2, 1, -1.57, 1)
-	Turn(wing_3, 3, 1.57, 1)
+	Turn(wing_1, 3, -1.57, animSpeed)
+	Turn(wing_2, 1, -1.57, animSpeed)
+	Turn(wing_3, 3, 1.57, animSpeed)
 
 	WaitForTurn(wing_1,3)
 
-	Turn(bay_1, 3, 1.57, 1)
-	Turn(bay_2, 1, 1.57, 1)
-	Turn(bay_3, 3, -1.57, 1)
+	Turn(bay_1, 3, 1.57, animSpeed)
+	Turn(bay_2, 1, 1.57, animSpeed)
+	Turn(bay_3, 3, -1.57, animSpeed)
 
 	WaitForTurn(bay_1, 3)
 
-	Turn(arm_1, 3, 2.25, 1)
-	Turn(arm_2, 1, 2.25, 1)
-	Turn(arm_3, 3, -2.25, 1)
+	Turn(arm_1, 3, 2.25, animSpeed)
+	Turn(arm_2, 1, 2.25, animSpeed)
+	Turn(arm_3, 3, -2.25, animSpeed)
 
-	Turn(nano_1, 3, -1.85, 1)
-	Turn(nano_2, 1, -1.85, 1)
-	Turn(nano_3, 3, 1.85, 1)
+	Turn(nano_1, 3, -1.85, animSpeed)
+	Turn(nano_2, 1, -1.85, animSpeed)
+	Turn(nano_3, 3, 1.85, animSpeed)
 
 	WaitForTurn(nano_1,3)
 
-	Turn(pow_1, 3, 1.57, 1)
-	Turn(pow_2, 1, 1.57, 1)
-	Turn(pow_3, 3, -1.57, 1)
+	Turn(pow_1, 3, 1.57, animSpeed)
+	Turn(pow_2, 1, 1.57, animSpeed)
+	Turn(pow_3, 3, -1.57, animSpeed)
 
 	WaitForTurn(pow_1, 3)
-	Sleep(300)
+	Sleep(300/animSpeed)
 
 --	SetUnitValue(COB.YARD_OPEN, 1) --Tobi said its not necessary
 	SetUnitValue(COB.BUGGER_OFF, 1)
@@ -89,31 +91,31 @@ local function Close()
 	SetUnitValue(COB.BUGGER_OFF, 0)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 
-	Turn(pow_1, 3, 0, 1)
-	Turn(pow_2, 1, 0, 1)
-	Turn(pow_3, 3, 0, 1)
+	Turn(pow_1, 3, 0, animSpeed)
+	Turn(pow_2, 1, 0, animSpeed)
+	Turn(pow_3, 3, 0, animSpeed)
 
 	WaitForTurn(pow_1,3)
 
-	Turn(arm_1, 3, 0, 1)
-	Turn(arm_2, 1, 0, 1)
-	Turn(arm_3, 3, 0, 1)
+	Turn(arm_1, 3, 0, animSpeed)
+	Turn(arm_2, 1, 0, animSpeed)
+	Turn(arm_3, 3, 0, animSpeed)
 
-	Turn(nano_1, 3, 0, 1)
-	Turn(nano_2, 1, 0, 1)
-	Turn(nano_3, 3, 0, 1)
+	Turn(nano_1, 3, 0, animSpeed)
+	Turn(nano_2, 1, 0, animSpeed)
+	Turn(nano_3, 3, 0, animSpeed)
 
 	WaitForTurn(arm_1, 3)
 
-	Turn(bay_1, 3, 0, 1)
-	Turn(bay_2, 1, 0, 1)
-	Turn(bay_3, 3, 0, 1)
+	Turn(bay_1, 3, 0, animSpeed)
+	Turn(bay_2, 1, 0, animSpeed)
+	Turn(bay_3, 3, 0, animSpeed)
 
 	WaitForTurn(bay_1,3)
 
-	Turn(wing_1, 3, 0, 1)
-	Turn(wing_2, 1, 0, 1)
-	Turn(wing_3, 3, 0, 1)
+	Turn(wing_1, 3, 0, animSpeed)
+	Turn(wing_2, 1, 0, animSpeed)
+	Turn(wing_3, 3, 0, animSpeed)
 end
 
 function script.Create()
