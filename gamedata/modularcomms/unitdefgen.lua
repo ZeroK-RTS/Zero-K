@@ -45,34 +45,39 @@ local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTrans
 -- for examples see testdata.lua
 
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-local err, success
+local commData
 
-local commDataRaw = modOptions.commandertypes
-local commDataFunc, commData
-
-if not (commDataRaw and type(commDataRaw) == 'string') then
-	err = "Comm data entry in modoption is empty or in invalid format"
-	commData = {}
-else
-	commDataRaw = string.gsub(commDataRaw, '_', '=')
-	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	--Spring.Echo(commDataRaw)
-	commDataFunc, err = loadstring("return "..commDataRaw)
+local function DecodeBase64CommData(toDecode, useLegacyTranslator)
+	local commData = {}
+	local commDataFunc
+	local err, success
+	
+	if not (toDecode and type(toDecode) == 'string') then
+		err = "Attempt to decode empty or invalid comm data"
+		return {}
+	end
+	
+	toDecode = string.gsub(toDecode, '_', '=')
+	toDecode = Spring.Utilities.Base64Decode(toDecode)
+	--Spring.Echo(toDecode)
+	commDataFunc, err = loadstring("return "..toDecode)
 	if commDataFunc then
 		success, commData = pcall(commDataFunc)
 		if not success then	-- execute Borat
 			err = commData
 			commData = {}
-		else
+		elseif useLegacyTranslator then
 			commData = legacyTranslators.FixOverheadIcon(commData)
 		end
 	end
-end
-if err then 
-	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
+	if err then 
+		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
+	end
+	return commData
 end
 
 do
+	commData = DecodeBase64CommData(modOptions.commandertypes, true)
 	local commDataPredefined = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua")
 	commData = MergeTable(commData, commDataPredefined)
 end
@@ -344,7 +349,11 @@ end
 -- for use by AI, in missions, etc.
 local staticComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
 local staticComms2 = VFS.Include("gamedata/modularcomms/staticcomms_mission.lua")
+local staticComms3 = DecodeBase64CommData(modOptions.campaign_commanders)
+
 local staticCommsMerged = MergeTable(staticComms2, staticComms, true)
+staticCommsMerged = MergeTable(staticCommsMerged, staticComms3, true)
+
 for name,data in pairs(staticCommsMerged) do
 	ProcessComm(name, data)
 end
