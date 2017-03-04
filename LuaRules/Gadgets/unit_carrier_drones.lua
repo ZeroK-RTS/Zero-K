@@ -329,6 +329,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 	
 	mcEnable(unitID)
 	Spring.SetUnitLeaveTracks(unitID, false)
+	Spring.SetUnitBlocking(unitID, false, false, true, true, false, true, false)
 	mcSetVelocity(unitID, 0, 0, 0)
 	mcSetPosition(unitID, GetPlacementPosition(carrierID, padPieceID))
 	
@@ -392,6 +393,7 @@ function SitOnPad(unitID, carrierID, padPieceID, offsets)
 		carrierList[carrierID].occupiedPieces[padPieceID] = false
 		Spring.SetUnitLeaveTracks(unitID, true)
 		Spring.SetUnitVelocity(unitID, 0, 0, 0)
+		Spring.SetUnitBlocking(unitID, false, true, true, true, false, true, false)
 		mcDisable(unitID)
 		GG.UpdateUnitAttributes(unitID) --update pending attribute changes in unit_attributes.lua if available 
 		

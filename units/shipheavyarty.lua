@@ -24,12 +24,13 @@ unitDef = {
 
   customParams           = {
     helptext       = [[A single salvo from one of these will pummel almost any surface target into submission. The psychological effects of the muzzle flash and the ship recoiling in the water are impressive enough, to say nothing of the effects of a direct hit. Be warned--battleships are not meant to be used on their own, lacking in anti-air and anti-submarine protection as they are.]],
+    modelradius    = [[80]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
   floater                = true,
-  footprintX             = 6,
-  footprintZ             = 6,
+  footprintX             = 10,
+  footprintZ             = 10,
   highTrajectory         = 2,
   iconType               = [[shipheavyarty]],
   idleAutoHeal           = 5,
@@ -38,7 +39,7 @@ unitDef = {
   maxVelocity            = 2.2,
   minCloakDistance       = 75,
   minWaterDepth          = 15,
-  movementClass          = [[BOAT6]],
+  movementClass          = [[BOAT10]],
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
