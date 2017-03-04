@@ -16,7 +16,12 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (not gadgetHandler:IsSyncedCode()) then return end
+if gadgetHandler:IsSyncedCode() then
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -3770,4 +3775,50 @@ function gadget:Initialize()
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+end
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
+else
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+
+local terraunitDefID = UnitDefNames["terraunit"].id
+local terraUnits = {}
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
+
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if unitDefID == terraunitDefID then
+		terraUnits[unitID] = true
+		Spring.UnitRendering.SetUnitLuaDraw(unitID, true)
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if terraUnits[unitID] then
+		terraUnits[unitID] = nil
+	end
+end
+
+function gadget:DrawUnit(unitID, drawMode)
+	if terraUnits[unitID] then
+		return true --supress engine drawing
+	end
+end
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
 end

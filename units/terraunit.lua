@@ -27,7 +27,6 @@ unitDef = {
 
   footprintX             = 2,
   footprintZ             = 2,
-  iconType               = [[terraunit]], 
   idleAutoHeal           = 0,
   idleTime               = 1800,
   isFeature              = false,
