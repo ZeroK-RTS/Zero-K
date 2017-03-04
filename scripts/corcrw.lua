@@ -227,7 +227,7 @@ local function ClusterBombThread()
 	while index <= SPECIAL_FIRE_COUNT do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
-			EmitSfx(subemit[0], FIRE_W5)
+			EmitSfx(subemit[0], FIRE_W3)
 			index = index + 1
 		end
 		local slowState = 1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0)

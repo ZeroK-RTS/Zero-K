@@ -88,7 +88,7 @@ unitDef = {
     },
 	
     {
-      def                = [[SPECIALTRIGGER]],
+      def                = [[CLUSTERBOMB]],
 	  mainDir            = [[0 0 1]],
 	  maxAngleDif        = 360,	  
     },
@@ -99,12 +99,6 @@ unitDef = {
 	  maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-    {
-      --def				 = [[LIGHTNING]],
-	  def				 = [[CLUSTERBOMB]],
-	  --def				 = [[TIMEDISTORT]],		  
     },
 
   },
@@ -153,35 +147,6 @@ unitDef = {
       weaponVelocity          = 2300,
     },
 
-    SPECIALTRIGGER      = {
-      name                    = [[FakeWeapon]],
-	  commandFire			  = true,
-	  cylinderTargeting		  = 1,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = -0.001,
-        planes  = -0.001,
-        subs    = -0.001,
-      },
-
-      explosionGenerator      = [[custom:NONE]],
-	  impactOnly			  = true,
-      impulseBoost            = 0,
-      impulseFactor           = 1,
-      interceptedByShieldType = 0,
-      range                   = 200,
-      reloadtime              = 30,
-      size                    = 0,
-      targetborder            = 1,
-      tolerance               = 20000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 600,
-    },
-    
     TIMEDISTORT    = {
       name                    = [[Time Distortion Field]],
       areaOfEffect            = 600,
@@ -215,7 +180,7 @@ unitDef = {
       accuracy                = 200,
       areaOfEffect            = 128,
 	  burst					  = 75,
-	  burstRate				  = 0.3,	  
+	  burstRate				  = 0.07, -- real value in script; here for widgets	  
       commandFire             = true,
       craterBoost             = 1,
       craterMult              = 2,
@@ -232,7 +197,7 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       model                   = [[wep_b_fabby.s3o]],
-      range                   = 10,
+      range                   = 200,
       reloadtime              = 30, -- if you change this redo the value in oneclick_weapon_defs EMPIRICALLY
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med6]],
