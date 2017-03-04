@@ -23,6 +23,8 @@ end
 --	its active players have units left.
 --------------------------------------------------------------------------------
 
+local isMission = VFS.FileExists("mission.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local spGetTeamInfo       = Spring.GetTeamInfo
@@ -179,8 +181,10 @@ local function CheckForVictory()
 		if ((not lastAllyTeam) or (count == 0)) then
 			Draw()
 		else
-			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
-			EchoUIMessage(name .. " wins!")
+			if not isMission then
+				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
+				EchoUIMessage(name .. " wins!")
+			end
 			spGameOver({lastAllyTeam})
 		end
 	end
@@ -217,8 +221,10 @@ local function DestroyAlliance(allianceID, skipCheck)
 			EchoUIMessage("Game Over: If this is true, then please resign.")
 			return	-- don't perform victory check
 		else -- kaboom
-			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
-			EchoUIMessage(name .. " has been destroyed!")
+			if not isMission then
+				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allianceID)
+				EchoUIMessage(name .. " has been destroyed!")
+			end
 			local frame = Spring.GetGameFrame() + 50
 			for i=1,#teamList do
 				local t = teamList[i]

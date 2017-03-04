@@ -46,6 +46,7 @@ local Button
 
 local vsx, vsy = widgetHandler:GetViewSizes()
 local modoptions = Spring.GetModOptions() --used in LuaUI\Configs\startup_info_selector.lua for planetwars
+local fixedStartPos = modoptions.fixedstartpos
 local selectorShown = false
 local mainWindow
 local scroll
@@ -58,6 +59,7 @@ local actionShow = "showstartupinfoselector"
 local optionData
 
 local noComm = false
+local wantClose = false
 local gameframe = Spring.GetGameFrame()
 local COMM_DROP_FRAME = 450
 local WINDOW_WIDTH = 720
@@ -126,33 +128,50 @@ function widget:ViewResize(viewSizeX, viewSizeY)
   vsy = viewSizeY
 end
 
-local cameraMoved = false
-function Close (permanently)
+local function GetStartZoomBounds()
+	if fixedStartPos then
+		local teamID = Spring.GetMyTeamID()
+		local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+		local x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+		if not x then
+			x, _, z = Spring.GetTeamStartPosition(teamID)
+		end
+		return x, z, x, z, 0, 1800
+	end
+	
+	local startboxes = GetRawBoxes()
+	local startbox = startboxes[Spring.GetMyAllyTeamID()]
+	local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
+	
+	if not (startbox and startbox.boxes) then
+		return minX, minZ, maxX, maxZ, maxY
+	end
+	
+	for i = 1, #startbox.boxes do
+		for j = 1, #startbox.boxes[i] do
+			local boxPoint = startbox.boxes[i][j]
+			-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
+			minX = math.min(minX, boxPoint[1])
+			minZ = math.min(minZ, boxPoint[2])
+			maxX = math.max(maxX, boxPoint[1])
+			maxZ = math.max(maxZ, boxPoint[2])
+			maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
+		end
+	end
+	
+	return minX, minZ, maxX, maxZ, maxY
+end
 
+local cameraMoved = false
+function Close(permanently)
 	if mainWindow then
 		mainWindow:Dispose()
 	end
-
+	
 	if not cameraMoved then
-		local startboxes = GetRawBoxes()
 		cameraMoved = true
-		local startbox = startboxes[Spring.GetMyAllyTeamID()]
-		local minX, minZ, maxX, maxZ, maxY = Game.mapSizeX, Game.mapSizeZ, 0, 0, 0
-		-- Spring.Echo(startbox.boxes)
-		if startbox and startbox.boxes then
-			for i = 1, #startbox.boxes do
-				for j = 1, #startbox.boxes[i] do
-					local boxPoint = startbox.boxes[i][j]
-					-- Spring.Echo("startbox["..i.."]: {"..boxPoint[1]..", "..boxPoint[2].."}, Bounds: x: "..minX.." - "..maxX..", z: "..minZ.." - "..maxZ..", maxY: "..maxY)
-					minX = math.min(minX, boxPoint[1])
-					minZ = math.min(minZ, boxPoint[2])
-					maxX = math.max(maxX, boxPoint[1])
-					maxZ = math.max(maxZ, boxPoint[2])
-					maxY = math.max(maxY, Spring.GetGroundHeight(boxPoint[1], boxPoint[2]))
-				end
-			end
-			SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 0.67, true)
-		end
+		local minX, minZ, maxX, maxZ, maxY, height = GetStartZoomBounds()
+		SetCameraTargetBox(minX, minZ, maxX, maxZ, 1000, maxY, 0.67, true, height)
 	end
 
 	if permanently then
@@ -310,6 +329,12 @@ function widget:Initialize()
 	-- nothing serious, just annoying
 	local playerID = Spring.GetMyPlayerID()
 	local teamID = Spring.GetMyTeamID()
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	if teamInfo and teamInfo.staticcomm then
+		wantClose = true
+		return
+	end
+	
 	if ((coop and playerID and Spring.GetGameRulesParam("commSpawnedPlayer"..playerID) == 1)
 	or (not coop and Spring.GetTeamRulesParam(teamID, "commSpawned") == 1)
 	or (Spring.GetSpectatingState() or Spring.IsReplay() or forcejunior))
@@ -368,7 +393,7 @@ local timer = 0
 function widget:Update(dt)
 	timer = timer + dt
 	if timer >= 0.1 then
-		if (spGetGameRulesParam("loadedGame") == 1) then
+		if (spGetGameRulesParam("loadedGame") == 1) or wantClose then
 			Close(true)
 		end
 		widgetHandler:RemoveCallIn('Update')

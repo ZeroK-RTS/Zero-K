@@ -31,6 +31,8 @@ local gaiaally = select(6, spGetTeamInfo(gaiateam))
 
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
+local fixedStartPos = modOptions.fixedstartpos
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -74,7 +76,7 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 	function GG.SetStartLocation() 
 	end
 
-	function GG.GiveFacplop (unitID) -- deprecated, use rulesparam directly 
+	function GG.GiveFacplop(unitID) -- deprecated, use rulesparam directly 
 		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 	end
 
@@ -150,6 +152,11 @@ function gadget:Initialize()
 end
 
 local function GetStartUnit(teamID, playerID, isAI)
+
+	local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+	if teamInfo and teamInfo.staticcomm then
+		return UnitDefNames["commbasic"].id
+	end
 
 	if Spring.GetModOption("forcejunior", true, false) then
 		return UnitDefNames["commbasic"].id
@@ -243,24 +250,34 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	if startUnit then
 		-- replace with shuffled position
 		local x,y,z
-		local startPosition = luaSetStartPositions[teamID]
-		if not startPosition then
-			if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
-				x,y,z = getMiddleOfStartBox(teamID)
+		if fixedStartPos then
+			local teamInfo = teamID and select(7, Spring.GetTeamInfo(teamID))
+			x, z = tonumber(teamInfo.start_x), tonumber(teamInfo.start_z)
+			if x then
+				y = Spring.GetGroundHeight(x, z)
 			else
-				x,y,z = Spring.GetTeamStartPosition(teamID)
-
-				-- clamp invalid positions
-				-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
-				local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
-				if boxID and not GG.CheckStartbox(boxID, x, z) then
-					x,y,z = getMiddleOfStartBox(teamID)
-				end
+				x, y, z = Spring.GetTeamStartPosition(teamID)
 			end
 		else
-			x,y,z = startPosition.x, startPosition.y, startPosition.z
-		end
+			local startPosition = luaSetStartPositions[teamID]
+			if not startPosition then
+				if not (Spring.GetTeamRulesParam(teamID, "valid_startpos") or isAI) then
+					x,y,z = getMiddleOfStartBox(teamID)
+				else
+					x,y,z = Spring.GetTeamStartPosition(teamID)
 
+					-- clamp invalid positions
+					-- AIs can place them -- remove this once AIs are able to be filtered through AllowStartPosition
+					local boxID = isAI and Spring.GetTeamRulesParam(teamID, "start_box_id")
+					if boxID and not GG.CheckStartbox(boxID, x, z) then
+						x,y,z = getMiddleOfStartBox(teamID)
+					end
+				end
+			else
+				x,y,z = startPosition.x, startPosition.y, startPosition.z
+			end
+		end
+		
 		-- get facing direction
 		local facing = GetFacingDirection(x, z, teamID)
 
