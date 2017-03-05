@@ -46,7 +46,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   initCloaked                   = true,
-  levelGround                   = false,
   maxDamage                     = 700,
   maxSlope                      = 36,
   minCloakDistance              = 100,

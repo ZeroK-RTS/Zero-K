@@ -26,7 +26,6 @@ unitDef = {
   explodeAs                     = [[ATOMIC_BLAST]],
   footprintX                    = 8,
   footprintZ                    = 9,
-  levelGround                   = true,
   iconType                      = [[mahlazer]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,

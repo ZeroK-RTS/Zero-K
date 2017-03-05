@@ -36,7 +36,6 @@ unitDef = {
   iconType                      = [[antinuke]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = false,
   maxDamage                     = 3300,
   maxSlope                      = 18,
   maxVelocity                   = 0,

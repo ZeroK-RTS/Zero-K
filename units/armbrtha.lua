@@ -35,7 +35,6 @@ unitDef = {
   iconType                      = [[lrpc]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = false,
   losEmitHeight                 = 90,
   maxDamage                     = 4800,
   maxSlope                      = 18,

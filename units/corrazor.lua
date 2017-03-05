@@ -33,7 +33,6 @@ unitDef = {
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[defenseaa]],
-  levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
   minCloakDistance              = 150,

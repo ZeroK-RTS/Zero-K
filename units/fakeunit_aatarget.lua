@@ -27,7 +27,6 @@ unitDef = {
   initCloaked           = false,
   kamikaze              = true,
   kamikazeDistance      = 64,
-  levelGround           = false,
   maxDamage             = 900000,
   maxVelocity           = 0,
   maxWaterDepth         = 0,

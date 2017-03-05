@@ -34,7 +34,6 @@ unitDef = {
   footprintX                    = 2,
   footprintZ                    = 2,
   iconType                      = [[defensespecial]],
-  levelGround                   = false,
   maxDamage                     = 1000,
   maxSlope                      = 36,
   maxWaterDepth                 = 0,

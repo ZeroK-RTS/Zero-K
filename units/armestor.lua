@@ -36,7 +36,6 @@ unitDef = {
   iconType                      = [[pylon]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = false,
   maxDamage                     = 1000,
   maxSlope                      = 18,
   minCloakDistance              = 150,

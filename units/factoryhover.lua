@@ -46,7 +46,6 @@ unitDef = {
   iconType         = [[fachover]],
   idleAutoHeal     = 5,
   idleTime         = 1800,
-  levelGround      = false,
   maxDamage        = 4000,
   maxSlope         = 15,
   maxVelocity      = 0,

@@ -37,7 +37,6 @@ unitDef = {
   iconType                      = [[staticaa]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = false,
   maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,

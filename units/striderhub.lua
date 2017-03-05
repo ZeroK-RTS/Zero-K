@@ -61,7 +61,6 @@ unitDef = {
   iconType                      = [[t3hub]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  levelGround                   = false,
   maneuverleashlength           = [[380]],
   maxDamage                     = 2000,
   maxSlope                      = 15,
