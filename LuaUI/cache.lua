@@ -63,7 +63,7 @@ function Spring.GetVisibleUnits(teamID, radius, Icons)
     -- check time
     local now = Spring.GetTimer()
     local diff = Spring.DiffTimers(now, visible.time)
-    if diff > 1/25 then
+    if diff > 1/20 then
       visible.time = now
       update = true
     else
