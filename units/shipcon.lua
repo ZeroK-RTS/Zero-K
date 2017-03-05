@@ -36,7 +36,6 @@ unitDef = {
 	turnatfullspeed = [[1]],
   },
 
-  energyMake             = 0.225,
   energyUse              = 0,
   explodeAs              = [[SMALL_UNITEX]],
   floater                = true,
@@ -47,7 +46,6 @@ unitDef = {
   idleTime               = 1800,
   maxDamage              = 1400,
   maxVelocity            = 2.5,
-  metalMake              = 0.225,
   minCloakDistance       = 75,
   minWaterDepth          = 5,
   movementClass          = [[BOAT3]],

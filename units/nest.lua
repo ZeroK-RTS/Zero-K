@@ -42,7 +42,6 @@ unitDef = {
     chickenFac = [[true]],
   },
 
-  energyMake                    = 0.5,
   energyStorage                 = 50,
   energyUse                     = 0,
   explodeAs                     = [[NOWEAPON]],

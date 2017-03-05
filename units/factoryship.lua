@@ -48,7 +48,6 @@ unitDef = {
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
   },
 
-  energyMake             = 0.3,
   energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 8,
@@ -59,7 +58,6 @@ unitDef = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  metalMake              = 0.3,
   minCloakDistance       = 150,
   minWaterDepth          = 15,
   moveState        		 = 1,

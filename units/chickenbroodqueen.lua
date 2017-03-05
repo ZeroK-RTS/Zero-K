@@ -63,7 +63,6 @@ unitDef = {
   maxSlope            = 72,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  metalMake           = 0.4,
   minCloakDistance    = 75,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,

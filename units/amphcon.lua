@@ -26,7 +26,6 @@ unitDef = {
     helptext       = [[The Conch is a sturdy constructor that can build or reclaim in the deep sea as well as it does on land.]],
   },
 
-  energyMake          = 0.225,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
   footprintZ          = 2,
@@ -37,7 +36,6 @@ unitDef = {
   maxDamage           = 850,
   maxSlope            = 36,
   maxVelocity         = 1.7,
-  metalMake           = 0.225,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],

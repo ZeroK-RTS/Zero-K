@@ -33,7 +33,6 @@ unitDef = {
 	nongroundfac = [[1]],
   },
 
-  energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   fireState                     = 0,
@@ -45,7 +44,6 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
   script                        = [[missilesilo.lua]],

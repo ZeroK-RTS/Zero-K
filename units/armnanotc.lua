@@ -35,7 +35,6 @@ unitDef = {
     modelradius    = [[24]],
   },
 
-  energyMake                    = 0.3,
   explodeAs                     = [[NANOBOOM2]],
   floater                       = true,
   footprintX                    = 3,
@@ -46,7 +45,6 @@ unitDef = {
   maxDamage                     = 500,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   movementClass                 = [[KBOT1]],
   objectName                    = [[armsenan.s3o]],

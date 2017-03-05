@@ -34,7 +34,6 @@ unitDef = {
 	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion.]],
   },
 
-  energyMake          = 0.15,
   energyUse           = 0,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
@@ -47,7 +46,6 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,

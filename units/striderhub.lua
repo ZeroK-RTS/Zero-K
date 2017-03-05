@@ -53,7 +53,6 @@ unitDef = {
 	isfakefactory  = [[1]],
   },
 
-  energyMake                    = 0.3,
   explodeAs                     = [[ESTOR_BUILDINGEX]],
   floater                       = true,
   footprintX                    = 4,
@@ -65,7 +64,6 @@ unitDef = {
   maxDamage                     = 2000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   movementClass                 = [[KBOT4]],
   noAutoFire                    = false,

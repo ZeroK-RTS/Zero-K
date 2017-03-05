@@ -37,7 +37,6 @@ unitDef = {
 	custom_height  = [[55]],
   },
 
-  energyMake          = 0.225,
   energyUse           = 0,
   explodeAs           = [[GUNSHIPEX]],
   floater             = true,
@@ -49,7 +48,6 @@ unitDef = {
   idleTime            = 1800,
   maxDamage           = 600,
   maxVelocity         = 3.1,
-  metalMake           = 0.225,
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
