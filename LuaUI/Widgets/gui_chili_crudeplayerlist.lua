@@ -692,10 +692,16 @@ end
 
 local function AlignScrollPanel()
 	--push things to bottom of window if needed
-	local height = math.ceil(row * (options.text_height.value+1.5) + 8)
-	scroll_cpl.height = math.min(height, window_cpl.height)
+	local height = math.ceil(row * (options.text_height.value+1.5) + 10)
+	if height < window_cpl.height then
+		scroll_cpl.height = height
+		scroll_cpl.verticalScrollbar = false
+	else
+		scroll_cpl.height = window_cpl.height
+		scroll_cpl.verticalScrollbar = true
+	end
 	if not (options.alignToTop.value) then
-		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
+		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height - 2
 	else
 		scroll_cpl.y = 0
 	end
@@ -909,7 +915,7 @@ function widget:Initialize()
 		bottom = 0,
 		width  = x_bound,
 		height = 150,
-		padding = {8, 2, 8, 2};
+		padding = {8, 2, 2, 2};
 		--autosize   = true;
 		parent = screen0,
 		draggable = false,
