@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Constructs Striders, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 1.5,
-  buildCostEnergy               = 600,
   buildCostMetal                = 600,
   buildDistance                 = 300,
   builder                       = true,
@@ -31,7 +30,6 @@ unitDef = {
   },
 
   buildPic                      = [[striderhub.png]],
-  buildTime                     = 600,
   canGuard                      = true,
   canMove                       = false,
   canPatrol                     = true,

@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Advanced Geothermal]],
   description                   = [[Large Powerplant (+100) - HAZARDOUS]],
   activateWhenBuilt             = true,
-  buildCostEnergy               = 1500,
   buildCostMetal                = 1500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -11,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 9,
   buildingGroundDecalType       = [[amgeo_aoplane.dds]],
   buildPic                      = [[AMGEO.png]],
-  buildTime                     = 1500,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 

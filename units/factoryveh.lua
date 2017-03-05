@@ -4,7 +4,6 @@ unitDef = {
   description                   = [[Produces Wheeled Vehicles, Builds at 10 m/s]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostEnergy               = 600,
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -26,7 +25,6 @@ unitDef = {
   },
 
   buildPic                      = [[factoryveh.png]],
-  buildTime                     = 600,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],

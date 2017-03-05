@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.1,
   airStrafe           = 0,
   brakeRate           = 0.08,
-  buildCostEnergy     = 300,
   buildCostMetal      = 300,
   buildDistance       = 160,
   builder             = true,
@@ -15,7 +14,6 @@ unitDef = {
 
   buildPic            = [[GUNSHIPCON.png]],
   buildRange3D        = false,
-  buildTime           = 300,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.5,
   activateWhenBuilt      = true,
   brakeRate              = 1.5,
-  buildCostEnergy        = 140,
   buildCostMetal         = 140,
   buildDistance          = 128,
   builder                = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic               = [[ARMRECTR.png]],
-  buildTime              = 140,
   canMove                = true,
   canPatrol              = true,
   canstop                = [[1]],

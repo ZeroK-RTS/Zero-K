@@ -4,10 +4,8 @@ unitDef = {
   description                   = [[Teleport Bridge Entry Beacon, right click to teleport.]],
   acceleration                  = 0,
   brakeRate                     = 0,
-  buildCostEnergy               = 100,
   buildCostMetal                = 100,
   builder                       = false,
-  buildTime                     = 100,
   category                      = [[SINK UNARMED]],
 
   customParams                  = {

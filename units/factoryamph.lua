@@ -2,7 +2,6 @@ unitDef = {
   unitname         = [[factoryamph]],
   name             = [[Amphibious Bot Plant]],
   description      = [[Produces Amphibious Bots, Builds at 10 m/s]],
-  buildCostEnergy  = 600,
   buildCostMetal   = 600,
   builder          = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -22,7 +21,6 @@ unitDef = {
   },
 
   buildPic         = [[factoryamph.png]],
-  buildTime        = 600,
   canAttack        = true,
   canMove          = true,
   canPatrol        = true,

@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 0.375,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -15,7 +14,6 @@ unitDef = {
   },
 
   buildPic            = [[corcom.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,

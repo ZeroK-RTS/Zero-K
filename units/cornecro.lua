@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.5,
   activateWhenBuilt   = true,
   brakeRate           = 0.3,
-  buildCostEnergy     = 140,
   buildCostMetal      = 140,
   buildDistance       = 128,
   builder             = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[CORNECRO.png]],
-  buildTime           = 140,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND UNARMED]],

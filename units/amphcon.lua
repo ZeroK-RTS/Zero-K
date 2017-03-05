@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.4,
   activateWhenBuilt   = true,
   brakeRate           = 0.25,
-  buildCostEnergy     = 180,
   buildCostMetal      = 180,
   buildDistance       = 128,
   builder             = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[amphcon.png]],
-  buildTime           = 180,
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND UNARMED]],

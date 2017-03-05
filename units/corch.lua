@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.066,
   activateWhenBuilt   = true,
   brakeRate           = 1.5,
-  buildCostEnergy     = 150,
   buildCostMetal      = 150,
   buildDistance       = 160,
   builder             = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[CORCH.png]],
-  buildTime           = 150,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

@@ -6,11 +6,9 @@ unitDef = {
   activateWhenBuilt = true,
   brakeRate         = 0,
 
-  buildCostEnergy   = 120,
   buildCostMetal    = 120,
   builder           = false,
   buildPic          = [[CORTL.png]],
-  buildTime         = 120,
   canAttack         = true,
   canstop           = [[1]],
   category          = [[FLOAT]],

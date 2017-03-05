@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloaky Bot Factory]],
   description                   = [[Produces Cloaky Robots, Builds at 10 m/s]],
-  buildCostEnergy               = 600,
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -25,7 +24,6 @@ unitDef = {
   },
 
   buildPic                      = [[factorycloak.png]],
-  buildTime                     = 600,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],

@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostEnergy        = 250,
   buildCostMetal         = 250,
   buildDistance          = 180,
   builder                = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic               = [[coracv.png]],
-  buildTime              = 250,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.45,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
   buildDistance       = 250,
   builder             = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[commsupport.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,

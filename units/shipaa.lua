@@ -7,12 +7,10 @@ unitDef = {
   activateWhenBuilt   = true,
   brakeRate              = 0.0808,
 
-  buildCostEnergy        = 400,
   buildCostMetal         = 400,
   builder                = false,
 
   buildPic               = [[shipaa.png]],
-  buildTime              = 400,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,

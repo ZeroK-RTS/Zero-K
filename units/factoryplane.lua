@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = false,
   brakeRate                     = 0,
-  buildCostEnergy               = 600,
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -25,7 +24,6 @@ unitDef = {
   },
 
   buildPic                      = [[factoryplane.png]],
-  buildTime                     = 600,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],

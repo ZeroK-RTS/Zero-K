@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Produces Ships, Builds at 10 m/s]],
   acceleration           = 0,
   brakeRate              = 0,
-  buildCostEnergy        = 600,
   buildCostMetal         = 600,
   builder                = true,
 
@@ -21,7 +20,6 @@ unitDef = {
   },
 
   buildPic               = [[FACTORYSHIP.png]],
-  buildTime              = 600,
   canAttack              = true,
   canMove                = true,
   canPatrol              = true,

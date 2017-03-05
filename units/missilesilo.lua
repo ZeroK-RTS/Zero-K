@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[missilesilo]],
   name                          = [[Missile Silo]],
   description                   = [[Produces Tactical Missiles, Builds at 10 m/s]],
-  buildCostEnergy               = 1200,
   buildCostMetal                = 1200,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -18,7 +17,6 @@ unitDef = {
   },
 
   buildPic                      = [[missilesilo.png]],
-  buildTime                     = 1200,
   canFight                      = false,
   canMove                       = false,
   canPatrol                     = false,

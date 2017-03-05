@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Fusion Reactor]],
   description                   = [[Medium Powerplant (+35)]],
   activateWhenBuilt             = true,
-  buildCostEnergy               = 1000,
   buildCostMetal                = 1000,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -11,7 +10,6 @@ unitDef = {
   BuildingGroundDecalSizeY      = 6,
   BuildingGroundDecalType       = [[arm_fusion_ground.dds]],
   buildPic                      = [[ARMFUS.png]],
-  buildTime                     = 1000,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 

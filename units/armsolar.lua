@@ -5,7 +5,6 @@ unitDef = {
   acceleration                  = 0,
   activateWhenBuilt             = true,
   brakeRate                     = 0,
-  buildCostEnergy               = 70,
   buildCostMetal                = 70,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -13,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[arm_solar_ground.dds]],
   buildPic                      = [[ARMSOLAR.png]],
-  buildTime                     = 70,
   category                      = [[SINK UNARMED STUPIDTARGET SOLAR]],
   corpse                        = [[DEAD]],
 

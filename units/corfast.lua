@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Jumpjet Constructor, Builds at 5 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.78,
-  buildCostEnergy     = 160,
   buildCostMetal      = 160,
   buildDistance       = 128,
   builder             = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic            = [[CORFAST.png]],
-  buildTime           = 160,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Construction Vehicle, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostEnergy        = 140,
   buildCostMetal         = 140,
   buildDistance          = 180,
   builder                = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic               = [[corned.png]],
-  buildTime              = 140,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

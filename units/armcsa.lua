@@ -6,7 +6,6 @@ unitDef = {
   airStrafe           = 0,
   autoHeal            = 20,
   brakeRate           = 0.08,
-  buildCostEnergy     = 500,
   buildCostMetal      = 500,
   buildDistance       = 180,
   builder             = true,
@@ -37,7 +36,6 @@ unitDef = {
 
   buildPic            = [[ARMCSA.png]],
   buildRange3D        = false,
-  buildTime           = 500,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

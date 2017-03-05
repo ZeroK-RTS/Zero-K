@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.6,
-  buildCostEnergy        = 200,
   buildCostMetal         = 200,
   buildDistance          = 220,
   builder                = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic               = [[arm_spider.png]],
-  buildTime              = 200,
   canAttack              = false,
   canGuard               = true,
   canMove                = true,

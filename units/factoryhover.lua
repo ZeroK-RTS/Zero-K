@@ -4,7 +4,6 @@ unitDef = {
   description      = [[Produces Hovercraft, Builds at 10 m/s]],
   acceleration     = 0,
   brakeRate        = 0,
-  buildCostEnergy  = 600,
   buildCostMetal   = 600,
   builder          = true,
 
@@ -20,7 +19,6 @@ unitDef = {
   },
 
   buildPic         = [[factoryhover.png]],
-  buildTime        = 600,
   canAttack        = true,
   canMove          = true,
   canPatrol        = true,
