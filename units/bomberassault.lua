@@ -54,7 +54,6 @@ unitDef = {
   objectName          = [[zeppelin.dae]],
   --refuelTime		  = 16,
   script			  = [[bomberassault.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 90,

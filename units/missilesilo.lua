@@ -49,7 +49,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[missilesilo.s3o]],
   script                        = [[missilesilo.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

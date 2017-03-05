@@ -43,7 +43,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[dante.s3o]],
   script			  = [[dante.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[CRAWL_BLASTSML]],
 
   sfxtypes            = {

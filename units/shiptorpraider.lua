@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE HOVER]],
   objectName          = [[SHIPTORPRAIDER]],
   script              = [[shiptorpraider.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
   sightDistance       = 450,
   sonarDistance       = 450,

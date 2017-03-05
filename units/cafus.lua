@@ -47,7 +47,6 @@ unitDef = {
   objectName                    = [[fus.s3o]],
   onoffable                     = false,
   script                        = [[cafus.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SINGULARITY]],
   sightDistance                 = 273,
   turnRate                      = 0,

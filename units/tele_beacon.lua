@@ -33,7 +33,6 @@ unitDef = {
   objectName                    = [[amphteleportbeacon.s3o]],
   reclaimable					= false,
   script                		= [[tele_beacon.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[TINY_BUILDINGEX]],
   selfDestructCountdown			= 5,
   sightDistance                 = 0,

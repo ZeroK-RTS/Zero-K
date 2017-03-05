@@ -52,7 +52,6 @@ unitDef = {
   onoffable              = true,
   pushResistant          = 0,
   script                 = [[core_spectre.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 300,
   trackOffset            = 0,

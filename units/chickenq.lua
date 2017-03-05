@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE]],
   objectName             = [[chickenq.s3o]],
   power                  = 65536,
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {

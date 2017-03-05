@@ -36,7 +36,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],
   script                 = [[shieldarty.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

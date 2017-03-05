@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[lotustest2.s3o]],
   script                        = [[corllt.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {

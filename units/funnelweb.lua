@@ -38,7 +38,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[funnelweb.s3o]],
   onoffable              = true,
-  seismicSignature       = 4,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
   sfxtypes               = {

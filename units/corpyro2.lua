@@ -44,7 +44,6 @@ unitDef = {
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName            = [[m-5_alt.s3o]],
   script				= [[corpyro.cob]],
-  seismicSignature      = 4,
   selfDestructAs        = [[CORPYRO_PYRO_DEATH]],
   selfDestructCountdown = 1,
 

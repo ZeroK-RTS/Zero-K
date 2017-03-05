@@ -55,7 +55,6 @@ unitDef = {
   objectName          = [[ARMCYBR]],
   refuelTime		  = 20,
   script			  = [[armcybr.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,

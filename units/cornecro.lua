@@ -45,7 +45,6 @@ unitDef = {
   objectName          = [[conbot.s3o]],
   onoffable           = false,
   script			  = [[cornecro.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   showNanoSpray       = false,
   sightDistance       = 375,

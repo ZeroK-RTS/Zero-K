@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName          = [[stiletto.s3o]],
   script              = [[armstiletto_laser.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,

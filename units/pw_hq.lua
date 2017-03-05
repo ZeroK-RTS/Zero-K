@@ -38,7 +38,6 @@ unitDef = {
   objectName                    = [[pw_hq.s3o]],
   reclaimable                   = false,
   script                        = [[nullscript.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown         = 60,
   sightDistance                 = 0,

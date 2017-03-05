@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],
   objectName          = [[CORMORT.s3o]],
   script              = [[slowmort.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {

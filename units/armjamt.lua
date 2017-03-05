@@ -55,7 +55,6 @@ unitDef = {
   onoffable                     = true,
   radarDistanceJam              = 550,
   script                        = [[armjamt.lua]],
-  seismicSignature              = 16,
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 250,
   useBuildingGroundDecal        = true,

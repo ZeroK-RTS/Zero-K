@@ -55,7 +55,6 @@ unitDef = {
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
   script                        = [[armanni.lua]],
-  seismicSignature              = 4,
   explodeAs                     = [[ESTOR_BUILDING]],
   sightDistance                 = 780,
   useBuildingGroundDecal        = true,

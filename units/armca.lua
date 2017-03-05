@@ -58,7 +58,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[crane.s3o]],
   script              = [[armca.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 380,

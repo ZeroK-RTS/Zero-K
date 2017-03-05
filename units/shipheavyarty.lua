@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[shipheavyarty.s3o]],
   script                 = [[shipheavyarty.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

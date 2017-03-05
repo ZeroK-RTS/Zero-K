@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory       = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName            = [[infiltrator.s3o]],
   script                = [[armspy.lua]],
-  seismicSignature      = 16,
   selfDestructAs        = [[BIG_UNITEX]],
   sightDistance         = 550,
   trackOffset           = 0,

@@ -41,7 +41,6 @@ unitDef = {
   objectName          = [[thud.s3o]],
   onoffable           = false,
   script			  = [[corthud.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {

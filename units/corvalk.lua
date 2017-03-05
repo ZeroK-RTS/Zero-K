@@ -50,7 +50,6 @@ unitDef = {
   objectName          = [[smallTransport.s3o]],
   script              = [[corvalk.lua]],
   releaseHeld         = true,
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {

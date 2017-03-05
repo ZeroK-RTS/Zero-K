@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[spiderriot.s3o]],
   script                 = [[spiderriot.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 366,
   trackOffset            = 0,

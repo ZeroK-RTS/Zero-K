@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[rapier.s3o]],
   script                 = [[gunshipsupport.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {

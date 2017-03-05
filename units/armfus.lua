@@ -36,7 +36,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[arm_fusion.s3o]],
   script                        = "armfus.lua",
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,

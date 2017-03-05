@@ -60,7 +60,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[factory.s3o]],
   script                        = "factoryshield.lua",
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

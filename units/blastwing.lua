@@ -55,7 +55,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[f-1.s3o]],
   script                 = [[blastwing.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[BLASTWING_EXPLOSION]],
   selfDestructCountdown  = 0,
   sightDistance          = 380,

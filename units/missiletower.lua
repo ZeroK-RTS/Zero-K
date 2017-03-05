@@ -38,7 +38,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[missiletower.s3o]],
   script                        = [[missiletower.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {

@@ -58,7 +58,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[coravp2.s3o]],
   script                        = [[factorytank.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

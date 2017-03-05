@@ -43,7 +43,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[CORSH.s3o]],
   script              = "corsh.lua",
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

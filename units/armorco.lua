@@ -49,7 +49,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[detriment.s3o]],
   script                 = [[armorco.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[NUCLEAR_MISSILE]],
   selfDestructCountdown  = 10,
   sightDistance          = 910,

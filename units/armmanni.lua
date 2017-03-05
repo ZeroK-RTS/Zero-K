@@ -49,7 +49,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[penetrator_lordmuffe.s3o]],
   script	          = [[armmanni.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes            = {

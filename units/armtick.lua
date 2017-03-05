@@ -47,7 +47,6 @@ unitDef = {
   objectName             = [[ARMTICK]],
   pushResistant          = 0,
   script                 = [[armtick.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[ARMTICK_DEATH]],
   selfDestructCountdown  = 0,
 

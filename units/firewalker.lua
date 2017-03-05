@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[firewalker.s3o]],
   script				 = [[firewalker.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

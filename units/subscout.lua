@@ -43,7 +43,6 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE HOVER]],
   objectName            = [[subscout.s3o]],
-  seismicSignature      = 4,
   selfDestructAs        = [[SUBSCOUT_DEATH]],
   selfDestructCountdown = 0,
   sightDistance         = 550,

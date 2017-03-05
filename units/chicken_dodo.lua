@@ -44,7 +44,6 @@ unitDef = {
   objectName            = [[chicken_dodo.s3o]],
   onoffable             = true,
   power                 = 170,
-  seismicSignature      = 4,
   selfDestructAs        = [[DODO_DEATH]],
   selfDestructCountdown = 0,
 

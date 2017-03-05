@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName        = [[torpedo launcher.s3o]],
   script            = [[turrettorp.lua]],
-  seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
 
   sightDistance     = 610,

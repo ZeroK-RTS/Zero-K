@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[bomberstrike.s3o]],
   script              = [[bomberstrike.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {},

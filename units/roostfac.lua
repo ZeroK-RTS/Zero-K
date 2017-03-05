@@ -57,7 +57,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[roostfac_big]],
   power                         = 1000,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

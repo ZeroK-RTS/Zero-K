@@ -39,7 +39,6 @@ unitDef = {
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB TURRET UNARMED]],
   objectName            = [[freaker.s3o]],
   script		        = [[jumpblackhole.lua]],
-  seismicSignature      = 4,
   selfDestructAs        = [[BIG_UNITEX]],
   selfDestructCountdown = 1,
 

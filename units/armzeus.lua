@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],
   script		         = [[armzeus.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

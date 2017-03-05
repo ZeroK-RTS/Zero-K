@@ -37,7 +37,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[hoverskirm.s3o]],
   onoffable           = true,
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {

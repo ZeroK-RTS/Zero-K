@@ -50,7 +50,6 @@ unitDef = {
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
   script                 = [[corroach.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CORROACH_DEATH]],
   selfDestructCountdown  = 0,
 

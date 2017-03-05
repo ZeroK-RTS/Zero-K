@@ -46,7 +46,6 @@ unitDef = {
   objectName                    = [[zenith.s3o]],
   onoffable                     = true,
   script                        = [[zenith.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 660,
   turnRate                      = 0,

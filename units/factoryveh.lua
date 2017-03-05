@@ -58,7 +58,6 @@ unitDef = {
   moveState        				= 1,
   noAutoFire                    = false,
   objectName                    = [[corvp.s3o]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

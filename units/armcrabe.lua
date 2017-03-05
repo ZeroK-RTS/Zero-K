@@ -49,7 +49,6 @@ unitDef = {
   objectName             = [[ARMCRABE]],
   pushResistant          = 0,
   script                 = [[armcrabe.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {

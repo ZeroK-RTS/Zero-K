@@ -41,7 +41,6 @@ unitDef = {
   minCloakDistance    = 75,
   movementClass       = [[AKBOT2]],
   objectName          = [[amphcon.s3o]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   script              = [[amphcon.lua]],
   showNanoSpray       = false,

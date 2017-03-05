@@ -44,7 +44,6 @@ unitDef = {
   objectName          = [[chicken_roc.s3o]],
   power               = 1250,
   script              = [[chicken_roc.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

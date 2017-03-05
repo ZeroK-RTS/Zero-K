@@ -35,7 +35,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[wep_seismic.s3o]],
   script                        = [[cruisemissile.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SEISMIC_WEAPON]],
 
   sfxtypes                      = {

@@ -43,7 +43,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName             = [[destroyer.s3o]],
   script				 = [[destroyer.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 500,
   

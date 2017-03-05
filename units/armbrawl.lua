@@ -49,7 +49,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[stingray.s3o]],
   script              = [[armbrawl.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {

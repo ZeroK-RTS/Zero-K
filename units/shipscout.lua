@@ -38,7 +38,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[shipscout.s3o]],
   script                 = [[shipscout.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes                      = {

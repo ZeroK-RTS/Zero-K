@@ -52,7 +52,6 @@ unitDef = {
   movementClass                 = [[KBOT1]],
   objectName                    = [[armsenan.s3o]],
   script                        = [[armnanotc.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[NANOBOOM2]],
   showNanoSpray                 = false,
   sightDistance                 = 380,

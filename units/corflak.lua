@@ -46,7 +46,6 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[CORFLAK.s3o]],
-  seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes               = {

@@ -49,7 +49,6 @@ unitDef = {
   objectName                    = [[SCREAMER.s3o]],
   onoffable                     = false,
   script						= [[screamer.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 660,
   turnRate                      = 0,

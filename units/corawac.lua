@@ -55,7 +55,6 @@ unitDef = {
   radarDistance       = 2400,
   radarDistanceJam    = 700,
   script              = [[corawac.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,
   sonarDistance       = 700,

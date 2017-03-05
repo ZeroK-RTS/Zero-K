@@ -38,7 +38,6 @@ unitDef = {
   objectName                    = [[pw_techlab.obj]],
   reclaimable					= false,
   script                		= [[nullscript.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown			= 120,
   sightDistance                 = 0,

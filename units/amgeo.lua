@@ -38,7 +38,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[amgeo.s3o]],
   script                        = [[amgeo.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[NUCLEAR_MISSILE]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,

@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
   script				 = [[armsptk.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 627,
   trackOffset            = 0,

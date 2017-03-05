@@ -41,7 +41,6 @@ unitDef = {
   objectName             = [[sphere.s3o]],
   reclaimable            = false,
   script                 = [[nullscript.lua]],
-  seismicSignature       = 4,
   selfDestructCountdown  = 1,
   sightDistance          = 0,
   stealth                = true,

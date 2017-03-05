@@ -29,7 +29,6 @@ unitDef = {
   objectName        = [[novasonar.s3o]],
   onoffable         = true,
   script            = "armsonar.lua",
-  seismicSignature  = 4,
   selfDestructAs    = [[SMALL_BUILDINGEX]],
   sightDistance     = 640,
   sonarDistance     = 640,

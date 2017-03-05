@@ -47,7 +47,6 @@ unitDef = {
   objectName             = [[shipcarrier.dae]],
   script                 = [[shipcarrier.lua]],
   radarEmitHeight        = 48,
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sfxtypes               = {
     explosiongenerators = {

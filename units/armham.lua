@@ -44,7 +44,6 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
   objectName             = [[Milo.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

@@ -40,7 +40,6 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[aapopup.s3o]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {

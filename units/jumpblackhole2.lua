@@ -37,7 +37,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
   onoffable              = true,
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   script                 = [[cormak.lua]],
 

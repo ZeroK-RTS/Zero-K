@@ -33,7 +33,6 @@ unitDef = {
   minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
-  seismicSignature  = 4,
   selfDestructAs    = [[NOWEAPON]],
 
   sfxtypes          = {

@@ -51,7 +51,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[firestorm.s3o]],
   script			  = [[bomberlaser.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {

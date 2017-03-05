@@ -25,7 +25,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[asteroid.s3o]],
   script                        = [[asteroid.lua]],
-  seismicSignature              = 4,
   sightDistance                 = 1,
   turnRate                      = 0,
   upright                       = false,

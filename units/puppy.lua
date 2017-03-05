@@ -50,7 +50,6 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING]],
   objectName             = [[puppy.s3o]],
   script                 = [[puppy.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 5,
 

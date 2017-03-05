@@ -70,7 +70,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[factoryjump.s3o]],
   script						= [[factoryjump.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

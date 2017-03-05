@@ -53,7 +53,6 @@ unitDef = {
   objectName             = [[largeTransport.s3o]],
   script				 = [[corbtrans.lua]],
   releaseHeld            = true,
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {

@@ -39,7 +39,6 @@ unitDef = {
   objectName          = [[shieldfelon.s3o]],
   onoffable           = false,
   script              = [[shieldfelon.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {

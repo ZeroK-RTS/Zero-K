@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[tarantula.s3o]],
   script				 = [[spideraa.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   trackOffset            = 0,

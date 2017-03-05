@@ -45,7 +45,6 @@ unitDef = {
   objectName                    = [[arm_solar.s3o]],
   onoffable                     = true,
   script                        = [[armsolar.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   turnRate                      = 0,

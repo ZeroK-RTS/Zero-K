@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[corbanish.s3o]],
   script              = [[tawf114.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 400,
   trackOffset         = 8,

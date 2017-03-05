@@ -47,7 +47,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName             = [[cortrem.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {

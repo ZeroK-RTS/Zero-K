@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],
   script                 = "armrock.lua",
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

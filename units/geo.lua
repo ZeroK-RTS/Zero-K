@@ -52,7 +52,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[geo.dae]],
   script                        = [[geo.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
   sightDistance                 = 273,
   turnRate                      = 0,

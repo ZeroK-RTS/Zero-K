@@ -37,7 +37,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[wep_tacnuke.s3o]],
   script                        = [[cruisemissile.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[WEAPON]],
 
   sfxtypes                      = {

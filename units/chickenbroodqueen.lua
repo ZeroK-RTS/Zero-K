@@ -71,7 +71,6 @@ unitDef = {
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 2500,
   reclaimable         = false,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

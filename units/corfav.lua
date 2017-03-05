@@ -46,7 +46,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[CORFAV.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 580,
   trackOffset            = 0,

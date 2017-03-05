@@ -48,7 +48,6 @@ unitDef = {
   objectName                    = [[starlight.dae]],
   script                        = [[mahlazer.lua]],
   onoffable                     = true,
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
 
   sfxtypes                      = {

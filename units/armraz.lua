@@ -43,7 +43,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[ARMRAZ]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {

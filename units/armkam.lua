@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
   script                 = [[armkam.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {

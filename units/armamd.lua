@@ -46,7 +46,6 @@ unitDef = {
   radarDistance                 = 2500,
   radarEmitHeight			    = 24,
   script                        = [[armamd.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   sightDistance                 = 660,
   turnRate                      = 0,

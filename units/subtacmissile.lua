@@ -44,7 +44,6 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   objectName             = [[SUBTACMISSILE]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   script                 = [[subtacmissile.lua]],
   sightDistance          = 660,

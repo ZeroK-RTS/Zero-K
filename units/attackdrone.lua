@@ -34,7 +34,6 @@ unitDef = {
   reclaimable         = false,
   refuelTime          = 10,
   script              = [[attackdrone.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {

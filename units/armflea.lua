@@ -42,7 +42,6 @@ unitDef = {
   objectName          = [[arm_flea.s3o]],
   pushResistant       = 0,
   script	      			= [[armflea.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
   sfxtypes            = {

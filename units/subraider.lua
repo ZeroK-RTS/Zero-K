@@ -44,7 +44,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP HOVER]],
   objectName             = [[subraider.s3o]],
   script                 = [[subraider.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 360,
   sonarDistance          = 360,

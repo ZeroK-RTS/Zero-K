@@ -33,7 +33,6 @@ starlight_satellite = {
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[starlight_satellite.dae]],
   script                 = [[starlight_satellite.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
   
   customParams           = {

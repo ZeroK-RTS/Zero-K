@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[cormart.s3o]],
   pushResistant       = 0,
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 660,
   trackOffset         = 8,

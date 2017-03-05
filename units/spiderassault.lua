@@ -43,7 +43,6 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[hermit.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   script                = [[spiderassault.lua]],
 

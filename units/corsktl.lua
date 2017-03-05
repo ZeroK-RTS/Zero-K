@@ -62,7 +62,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[skuttle.s3o]],
-  seismicSignature       = 16,
   selfDestructAs         = [[CORSKTL_DEATH]],
   selfDestructCountdown  = 0,
   script                 = [[corsktl.lua]],

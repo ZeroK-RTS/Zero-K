@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName          = [[core_diplomat.s3o]],
   script              = [[armmerl.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX_MERL]],
 
   sfxtypes            = {

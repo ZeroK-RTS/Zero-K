@@ -43,7 +43,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST]],
   objectName             = [[shiparty.s3o]],
   script                 = [[shiparty.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   sonarDistance          = 660,

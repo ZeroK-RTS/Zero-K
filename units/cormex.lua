@@ -48,7 +48,6 @@ unitDef = {
   objectName             = [[AMETALEXTRACTORLVL1.S3O]],
   onoffable              = false,
   script                 = "cormex.lua",
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_BUILDINGEX]],
   sightDistance          = 273,
   turnRate               = 0,

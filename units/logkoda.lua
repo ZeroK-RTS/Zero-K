@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[logkoda.s3o]],
   script              = [[logkoda.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 600,
   trackOffset         = 6,

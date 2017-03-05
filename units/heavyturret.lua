@@ -38,7 +38,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[heavyturret.s3o]],
   script                        = [[heavyturret.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {

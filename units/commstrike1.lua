@@ -56,7 +56,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[strikecom.dae]],
   script                 = [[commstrike.lua]],
-  seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
   sfxtypes               = {

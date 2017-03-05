@@ -50,7 +50,6 @@ unitDef = {
   objectName             = [[shipaa.s3o]],
   radarDistance          = 1000,
   script				 = [[shipaa.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 660,
   sonarDistance          = 660,

@@ -50,7 +50,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING SATELLITE SUB]],
   objectName             = [[Bantha.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLAST]],
   script                 = [[armbanth.lua]],
   

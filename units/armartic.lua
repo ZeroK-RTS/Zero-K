@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[ARMARTIC]],
   script                        = [[armartic.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
   sfxtypes                      = {

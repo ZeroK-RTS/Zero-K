@@ -44,7 +44,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName          = [[hoveraa.s3o]],
   script              = [[hoveraa.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {

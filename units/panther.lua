@@ -47,7 +47,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[corseal.s3o]],
   script                 = [[panther.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[PANTHER_DEATH]],
 
   sfxtypes               = {

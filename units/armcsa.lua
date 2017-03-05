@@ -84,7 +84,6 @@ unitDef = {
   radarDistance       = 1200,
   radarDistanceJam    = 300,
   script              = [[armcsa.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 380,

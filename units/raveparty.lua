@@ -46,7 +46,6 @@ unitDef = {
   objectName                    = [[raveparty.s3o]],
   --onoffable						= true,
   script						= [[raveparty.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
 
   sfxtypes                      = {

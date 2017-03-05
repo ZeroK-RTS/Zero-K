@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[catapult.s3o]],
   script		 = [[armraven.cob]],
-  seismicSignature       = 4,
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   sightDistance          = 660,
   trackOffset            = 0,

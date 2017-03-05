@@ -68,7 +68,6 @@ unitDef = {
   moveState        				= 1,
   noAutoFire                    = false,
   objectName                    = [[factory3.s3o]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   script                        = [[factoryspider.lua]],

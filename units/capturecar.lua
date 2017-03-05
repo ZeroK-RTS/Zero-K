@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad_big.s3o]],
   script              = [[capturecar.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 550,
   trackOffset         = -7,

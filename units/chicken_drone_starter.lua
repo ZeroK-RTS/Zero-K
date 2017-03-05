@@ -46,7 +46,6 @@ unitDef = {
   objectName          = [[chicken_drone.s3o]],
   onoffable           = true,
   power               = 60,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

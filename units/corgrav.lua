@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[corgrav]],
   onoffable                     = true,
-  seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   sightDistance                 = 506,
   useBuildingGroundDecal        = true,

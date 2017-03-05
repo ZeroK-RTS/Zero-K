@@ -37,7 +37,6 @@ unitDef = {
   objectName          = [[carrydrone.s3o]],
   reclaimable         = false,
   script              = [[carrydrone.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {

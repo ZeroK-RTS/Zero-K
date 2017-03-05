@@ -44,7 +44,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armbrtha.s3o]],
   script                        = [[armbrtha.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
 
   sfxtypes                      = {

@@ -52,7 +52,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[corshad.s3o]],
   script			  = [[bomberdive.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {

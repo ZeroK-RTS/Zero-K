@@ -46,7 +46,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[arm_wind_generator.s3o]],
   script                        = [[armwin.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,

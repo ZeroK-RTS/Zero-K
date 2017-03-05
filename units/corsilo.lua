@@ -43,7 +43,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[Silencer.s3o]],
   script                        = [[corsilo.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 660,
   turnRate                      = 0,

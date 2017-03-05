@@ -50,7 +50,6 @@ unitDef = {
   pushResistant          = 0,
   script                 = [[spherecloaker.lua]],
   radarDistanceJam       = 440,
-  seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 400,
   trackOffset            = 0,

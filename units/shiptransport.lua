@@ -46,7 +46,6 @@ unitDef = {
   objectName          = [[shiptransport]],
   releaseHeld         = true,
   script              = [[shiptransport.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 325,
   sonarDistance       = 325,

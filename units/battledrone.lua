@@ -33,7 +33,6 @@ unitDef = {
   objectName          = [[battledrone.s3o]],
   reclaimable         = false,
   script              = [[battledrone.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[SMALL_BUILDINGEX]],
   
   customParams        = {

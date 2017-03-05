@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE]],
   objectName             = [[shipriot.s3o]],
   script				 = [[shipriot.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 500,
   

@@ -55,7 +55,6 @@ unitDef = {
   radarDistance          = 1200,
   radarEmitHeight        = 12,
   script                 = [[arm_spider.lua]],
-  seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 380,

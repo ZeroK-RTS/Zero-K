@@ -62,7 +62,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[CORAP.s3o]],
   script                        = [[factoryplane.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 273,

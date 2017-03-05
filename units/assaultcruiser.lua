@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB SINK TURRET]],
   objectName             = [[cremcrus.s3o]],
   script				 = [[assaultcruiser.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNIT]],
 
   sfxtypes               = {

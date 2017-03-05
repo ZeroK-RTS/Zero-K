@@ -47,7 +47,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[lmt2.s3o]],
   script                        = [[corrl.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[BIG_UNITEX]],
 
   sfxtypes                      = {

@@ -72,7 +72,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[striderhub.s3o]],
   script                        = [[striderhub.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   showNanoSpray                 = false,
   sightDistance                 = 380,

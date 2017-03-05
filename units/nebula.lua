@@ -53,7 +53,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[nebula.s3o]],
   script                 = [[nebula.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {

@@ -56,7 +56,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
   script                 = [[corvamp.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
   speedToFront           = 0.5,

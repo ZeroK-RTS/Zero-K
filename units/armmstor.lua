@@ -30,7 +30,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[pylon.s3o]],
   script                        = "armmstor.lua",
-  seismicSignature              = 4,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,

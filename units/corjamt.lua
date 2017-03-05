@@ -36,7 +36,6 @@ unitDef = {
   objectName                    = [[m-8.s3o]],
   onoffable                     = true,
   script                        = [[corjamt.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[BIG_UNITEX]],
   sightDistance                 = 200,
   turnRate                      = 0,

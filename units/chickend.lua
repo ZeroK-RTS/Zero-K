@@ -43,7 +43,6 @@ unitDef = {
   objectName                    = [[tube.s3o]],
   onoffable                     = true,
   power                         = 120,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

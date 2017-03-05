@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[amphassault.s3o]],
   script              = [[amphassault.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {

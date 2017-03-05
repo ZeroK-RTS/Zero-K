@@ -47,7 +47,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
   objectName          = [[marshmellow.s3o]],
   script              = [[bladew.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
   sfxtypes            = {

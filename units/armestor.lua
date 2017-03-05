@@ -43,7 +43,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[armestor.s3o]],
   script                        = "armestor.lua",
-  seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,

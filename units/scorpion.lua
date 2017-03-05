@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[scorpion.s3o]],
   script				 = [[scorpion.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {

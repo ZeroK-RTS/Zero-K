@@ -38,7 +38,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER]],
   objectName             = [[amphriot.s3o]],
   script                 = [[amphriot.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

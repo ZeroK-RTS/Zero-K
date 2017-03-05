@@ -52,7 +52,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          	 = [[krow.s3o]],
   script			     = [[corcrw.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {

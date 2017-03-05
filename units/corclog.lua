@@ -47,7 +47,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[clogger.s3o]],
   script                 = [[corclog.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CLOGGER_EXPLODE]],
   selfDestructCountdown  = 0,
   sightDistance          = 300,

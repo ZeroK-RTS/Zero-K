@@ -55,7 +55,6 @@ unitDef = {
   objectName                    = [[DDM.s3o]],
   onoffable                     = true,
   script                        = [[cordoom.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[ESTOR_BUILDING]],
 
   sfxtypes            = {

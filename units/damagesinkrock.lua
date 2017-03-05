@@ -25,7 +25,6 @@ unitDef = {
   minCloakDistance        = 150,
   objectName              = [[zenith.s3o]],
   script                  = [[nullrock.lua]],
-  seismicSignature        = 4,
   sightDistance           = 660,
   turnRate                = 0,
   useBuildingGroundDecal  = true,

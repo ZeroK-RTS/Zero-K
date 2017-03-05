@@ -56,7 +56,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[fighterdrone.dae]],
   script                 = [[fighterdrone.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {

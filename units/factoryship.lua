@@ -65,7 +65,6 @@ unitDef = {
   moveState        		 = 1,
   objectName             = [[seafac.s3o]],
   script				 = [[factoryship.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
   showNanoSpray          = false,
   sightDistance          = 273,

@@ -51,7 +51,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
   script                 = [[armsnipe.lua]],
-  seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {

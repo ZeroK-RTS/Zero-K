@@ -47,7 +47,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName          = [[hunchback.s3o]],
   script			  = [[armaak.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 660,
   trackOffset         = 0,

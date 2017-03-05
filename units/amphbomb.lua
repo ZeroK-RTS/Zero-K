@@ -46,7 +46,6 @@ unitDef = {
   objectName             = [[amphbomb.s3o]],
   pushResistant          = 0,
   script                 = [[amphbomb.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[AMPHBOMB_DEATH]],
   selfDestructCountdown  = 1,
 

@@ -41,7 +41,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
   script                        = "armdeva.lua",
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes                      = {

@@ -45,7 +45,6 @@ unitDef = {
   objectName                    = [[corbhmth.s3o]],
   onoffable                     = false,
   script                        = [[corbhmth.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   
   sfxtypes               = {

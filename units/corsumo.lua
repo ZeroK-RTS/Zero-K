@@ -59,7 +59,6 @@ unitDef = {
   objectName          = [[m-9.s3o]],
   onoffable           = true,
   script              = [[corsumo.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {

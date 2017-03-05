@@ -46,7 +46,6 @@ unitDef = {
   objectName             = [[amphteleport.s3o]],
   script                 = [[amphtele.lua]],
   pushResistant          = 0,
-  seismicSignature       = 16,
   selfDestructAs         = [[BIG_UNIT]],
   sightDistance          = 300,
   sonarDistance          = 300,

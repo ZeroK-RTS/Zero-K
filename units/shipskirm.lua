@@ -46,7 +46,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[shipskirm.s3o]],
   script		         = [[shipskirm.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sfxtypes               = {
 
