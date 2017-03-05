@@ -242,9 +242,13 @@ local slasherSkirmieeArray = NameToDefID({
 	"corraid",
 	"corlevlr",
 	"hoverriot",
-    "shieldfelon",
+	"shieldfelon",
 	"correap",
 	"armrock",
+	"armpb",
+	"corllt",
+	"armdeva",
+	"armartic",
 })
 
 -- Nested union so long ranged things also skirm the things skirmed by short ranged things
