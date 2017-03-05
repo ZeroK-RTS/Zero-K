@@ -614,8 +614,6 @@ local function SetupNewWidgets()
 	widgetHandler:DisableWidget("Chili Radial Build Menu")
 	widgetHandler:DisableWidget("Chili Resource Bars Classic")
 	widgetHandler:DisableWidget("Chili Economy Panel with Balance Bar")
-	widgetHandler:DisableWidget("Chili Crude Player List")
-	widgetHandler:DisableWidget("Chili Deluxe Player List - Alpha 2.02")
 	
 	-- Enable
 	widgetHandler:EnableWidget("Chili Minimap")
@@ -626,9 +624,9 @@ local function SetupNewWidgets()
 	widgetHandler:EnableWidget("Chili Selections & CursorTip")
 	widgetHandler:EnableWidget("Chili Global Commands")
 
-	--if not WG.Chili.Screen0:GetChildByName("Player List") then
-	--	widgetHandler:EnableWidget("Chili Crude Player List")
-	--end
+	if not WG.Chili.Screen0:GetChildByName("Player List") then
+		widgetHandler:EnableWidget("Chili Crude Player List")
+	end
 	
 	Spring.SendCommands("resbar 0")
 end
@@ -696,14 +694,26 @@ local function GetBottomSizes(screenWidth, screenHeight, parity)
 	-- Chat
 	local maxWidth = screenWidth - 2*math.max(minimapWidth, coreSelectorWidth + integralWidth) - CHAT_PADDING
 	
-	local chatWidth = math.max(300, minimapWidth)
-	local chatHeight = 0.2*screenHeight
+	local chatWidth = math.max(maxWidth, math.floor(screenWidth/5))
+	local chatHeight = selectionsHeight
+	
+	--local chatWidth = math.max(300, minimapWidth)
+	--local chatHeight = 0.2*screenHeight
+	
+		-- Player List
+	local playerlistWidth = 310
+	local playerlistHeight = screenHeight/2
+	local playerListControl = WG.Chili.Screen0:GetChildByName("Player List")
+	if playerListControl then
+		playerlistWidth = playerListControl.minWidth
+	end
 	
 	return integralWidth, integralHeight, 
 		coreSelectorWidth, coreSelectorHeight, 
 		minimapWidth, minimapHeight, 
 		selectionsWidth, selectionsHeight, 
-		chatWidth, chatHeight
+		chatWidth, chatHeight,
+		playerlistWidth, playerlistHeight
 end
 
 local function SetupNewUITop()
@@ -820,10 +830,25 @@ local function SetupMinimapLeftPreset()
 		coreSelectorWidth, coreSelectorHeight, 
 		minimapWidth, minimapHeight, 
 		selectionsWidth, selectionsHeight, 
-		chatWidth, chatHeight = GetBottomSizes(screenWidth, screenHeight, -1)
+		chatWidth, chatHeight,
+		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, 1)
 	
-	local chatX = 0
-	local chatY = screenHeight - chatHeight - minimapHeight
+	--local chatX = 0
+	--local chatY = screenHeight - chatHeight - minimapHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX + chatWidth > screenWidth - coreSelectorWidth - integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
+	-- Player List
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth,
+		screenHeight - playerlistHeight - minimapHeight - 5,
+		playerlistWidth,
+		playerlistHeight
+	)
 	
 	-- Chat
 	WG.SetWindowPosAndSize("ProChat",
@@ -908,10 +933,25 @@ local function SetupMinimapRightPreset()
 		coreSelectorWidth, coreSelectorHeight, 
 		minimapWidth, minimapHeight, 
 		selectionsWidth, selectionsHeight, 
-		chatWidth, chatHeight = GetBottomSizes(screenWidth, screenHeight, 1)
+		chatWidth, chatHeight,
+		playerlistWidth, playerlistHeight = GetBottomSizes(screenWidth, screenHeight, 1)
 	
-	local chatX = screenWidth - chatWidth
-	local chatY = screenHeight - chatHeight - minimapHeight
+	--local chatX = screenWidth - chatWidth
+	--local chatY = screenHeight - chatHeight - minimapHeight
+	
+	local chatX = math.floor((screenWidth - chatWidth)/2)
+	local chatY = screenHeight - chatHeight - selectionsHeight
+	if chatX < coreSelectorWidth + integralWidth then
+		chatY = screenHeight - chatHeight - integralHeight
+	end
+	
+	-- Player List
+	WG.SetWindowPosAndSize("Player List",
+		screenWidth - playerlistWidth,
+		screenHeight - playerlistHeight - minimapHeight - 5,
+		playerlistWidth,
+		playerlistHeight
+	)
 	
 	-- Chat
 	WG.SetWindowPosAndSize("ProChat",
