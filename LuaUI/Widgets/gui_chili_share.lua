@@ -55,6 +55,8 @@ local images = {
 }
 local defaultamount = 100
 
+local UpdateListFunction
+local wantRebuild = false
 
 options_path = 'Settings/HUD Panels/Player List' 
 --[[ Change path if necessary. I just dumped it here because it made sense.
@@ -88,6 +90,10 @@ options = {
 		hotkey = "tab",
 		OnChange = function(self)
 			if window then
+				if wantRebuild and UpdateListFunction then
+					UpdateListFunction()
+					wantRebuild = false
+				end
 				window:SetVisibility(true)
 			end
 		end,
@@ -1252,6 +1258,15 @@ local function Buildme()
 	--Spring.Echo("window " .. tostring(window.parent))	
 	--Spring.Echo("Succesfully initialized")
 end
+UpdateListFunction = Buildme
+
+local function SetWantRebuild()
+	if (not window) or (window and window.visible) then
+		Buildme()
+	else
+		wantRebuild = true
+	end
+end
 
 local function UpdateInviteTable()
 	local myPlayerID = Spring.GetMyPlayerID()
@@ -1375,7 +1390,7 @@ local function UpdateSubjects()
 	--Spring.Echo("Subject count " .. #subjects)
 	if (#subjects ~= oldnum and built and mySubjectID >= 0) then
 		--Spring.Echo("Rebuilding")
-		Buildme()
+		SetWantRebuild()
 	end
 end
 
@@ -1386,7 +1401,7 @@ function widget:ReceiveUserInfo(info)
 		UpdateSubjects()
 		if ( mySubjectID >= 0) then
 			--Spring.Echo("Rebuilding")
-			Buildme()
+			SetWantRebuild()
 		end
 	end
 end
@@ -1396,7 +1411,7 @@ function widget:PlayerChanged(playerID)
 		UpdateSubjects()
 		if ( mySubjectID >= 0) then
 			--Spring.Echo("Rebuilding")
-			Buildme()
+			SetWantRebuild()
 		end
 	end
 end
@@ -1447,7 +1462,7 @@ function widget:Update(dt)
 		end
 		modOptions = nil
 		UpdateSubjects()
-		Buildme()
+		SetWantRebuild()
 		UpdatePlayers()
 	end
 	if buildframe > -1 and not built then
