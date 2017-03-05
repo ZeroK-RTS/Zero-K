@@ -163,7 +163,6 @@ unitDef = {
       collisionVolumeOffsets = [[-5 -10 0]],
 	  collisionVolumeScales  = [[80 80 240]],
 	  collisionVolumeType    = [[CylZ]],
-      blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 6,
       footprintZ       = 6,
@@ -171,7 +170,6 @@ unitDef = {
     },
 
     HEAP  = {
-      blocking         = false,
       footprintX       = 6,
       footprintZ       = 6,
       object           = [[debris4x4b.s3o]],

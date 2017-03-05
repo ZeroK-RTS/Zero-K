@@ -120,14 +120,12 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[venom_wreck.s3o]],
     },
     HEAP  = {
-      blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[debris2x2a.s3o]],

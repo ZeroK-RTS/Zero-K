@@ -175,7 +175,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = true,
       collisionVolumeOffsets = [[0 0 0]],
       collisionVolumeScales  = [[40 50 220]],
       collisionVolumeType    = [[box]],	  
@@ -187,7 +186,6 @@ unitDef = {
 
 
     HEAP  = {
-      blocking         = false,
       footprintX       = 4,
       footprintZ       = 4,
       object           = [[debris4x4a.s3o]],

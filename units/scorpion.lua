@@ -275,14 +275,12 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[scorpion_dead.s3o]],
     },
     HEAP  = {
-      blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[debris4x4a.s3o]],

@@ -191,7 +191,6 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = true,
 	  collisionVolumeScales  = [[60 40 80]],
 	  collisionVolumeType    = [[CylZ]],
       featureDead      = [[HEAP]],
@@ -202,7 +201,6 @@ unitDef = {
 
 
     HEAP  = {
-      blocking         = false,
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[debris3x3c.s3o]],
