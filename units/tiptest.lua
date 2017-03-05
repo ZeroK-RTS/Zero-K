@@ -107,20 +107,11 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[corraid_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      object           = [[debris2x2c.s3o]],
-    },
-
 
     HEAP  = {
       footprintX       = 2,

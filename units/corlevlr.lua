@@ -117,20 +117,11 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[leveler_d.dae]],
     },
-
-
-    DEAD2 = {
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      object           = [[debris2x2a.s3o]],
-    },
-
 
     HEAP  = {
       footprintX       = 2,
