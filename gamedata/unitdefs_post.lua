@@ -504,11 +504,13 @@ end
 --  No leveling ground
 
 
---for name, ud in pairs(UnitDefs) do
---  if (ud.yardmap)  then
---    ud.levelGround = false
---  end
---end
+for name, ud in pairs(UnitDefs) do
+  if (ud.yardmap)  then
+	-- ///< if true, map height cannot change under this object (through explosions, etc.) 
+	-- // !buildeeDef->levelGround -- skip the terraforming job
+    ud.levelGround = false 
+  end
+end
 
 
 --------------------------------------------------------------------------------

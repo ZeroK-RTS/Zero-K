@@ -13,7 +13,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-Spring.Echo("Loacing FeatureDefs_posts")
+Spring.Echo("Loading FeatureDefs_posts")
 
 local function isbool(x)   return (type(x) == 'boolean') end
 local function istable(x)  return (type(x) == 'table')   end
