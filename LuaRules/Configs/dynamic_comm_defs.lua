@@ -732,13 +732,14 @@ local moduleDefs = {
 	{
 		name = "module_high_power_servos",
 		humanName = "High Power Servos",
-		description = "High Power Servos - Increases speed by 10%. Limit: 8",
+		description = "High Power Servos - Increases speed by 10%, lightweight alloys reduce health by " .. 100*HP_MULT .. ". Limit: 8",
 		image = "unitpics/module_high_power_servos.png",
 		limit = 8,
 		cost = 150 * COST_MULT,
 		requireLevel = 1,
 		slotType = "module",
 		applicationFunction = function (modules, sharedData)
+			sharedData.healthBonus = (sharedData.healthBonus or 0) - 100*HP_MULT
 			sharedData.speedMult = (sharedData.speedMult or 1) + 0.1
 		end
 	},
