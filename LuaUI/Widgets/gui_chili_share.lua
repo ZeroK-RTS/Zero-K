@@ -244,11 +244,12 @@ local function getEcoInfo(teamID)
 end
 
 local function RenderName(subject)
-	--Spring.Echo("rendername " .. subject.name .. ":" ..subject.id)
+	--Spring.Echo("rendername " .. subject.name .. ":" ..subject.id .. tostring(subject.active) .. tostring(subject.spec) ..tostring(subject.ai))
 	local name = subject.name
 	local active = subject.ai or subject.active
 	--Spring.Echo("active " .. tostring(active))
 	local spec = not subject.ai and subject.spec
+	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
 	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
@@ -327,12 +328,16 @@ local function RenderName(subject)
 	elseif givemebuttons[subject.id]["ping"] then
 		givemebuttons[subject.id]["ping"]:SetText("\255\180\180\180 n/a")
 	end
+	local oldText = givemebuttons[subject.id]["text"].text
 	if spec then
 		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name)
 	elseif active and not spec then
 		givemebuttons[subject.id]["text"]:SetText(color2incolor(Spring.GetTeamColor(subject.team)) .. name)
 	elseif not active and not spec then
 		givemebuttons[subject.id]["text"]:SetText('\255\255\255\255' .. name )
+	end
+	if (oldText ~= givemebuttons[subject.id]["text"].text) then
+		givemebuttons[subject.id]["text"]:Invalidate()
 	end
 end
 
@@ -343,10 +348,6 @@ local function UpdatePlayer(subject)
 	if givemebuttons[subject.id] == nil or built == false then
 		local name = subject.name
 		--Spring.Echo("player" .. subject.id .. "( " .. name .. ") is not a player!")
-		return
-	end
-	if (false and oldSubjects[subject.id] and deepcompare(oldSubjects[subject.id], subject)) then
-		--Spring.Echo("Nothing changed")
 		return
 	end
 	oldSubjects[subject.id] = subject
@@ -457,6 +458,14 @@ local function UpdatePlayer(subject)
 				givemebuttons[subject.id]["unit"]:SetVisibility(true)
 			end
 		end
+	end
+	if (subject.spec and subject.player ~= myPlayerID) then
+		givemebuttons[subject.id]["metalbar"]:SetVisibility(false)
+		givemebuttons[subject.id]["off"]:SetVisibility(false)
+		givemebuttons[subject.id]["def"]:SetVisibility(false)
+		givemebuttons[subject.id]["energybar"]:SetVisibility(false)
+		givemebuttons[subject.id]["metalin"]:SetVisibility(false)
+		givemebuttons[subject.id]["energyin"]:SetVisibility(false)
 	end
 	RenderName(subject)
 end
@@ -933,8 +942,14 @@ local function InitName(subject, playerPanel)
 	if (subject.player) then
 		pdata = select(10, Spring.GetPlayerInfo(subject.player))
 		country = select(8, Spring.GetPlayerInfo(subject.player))
-		--elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
-		icon = pdata.icon
+		if (pdata.elo and pdata.level) then
+			--Spring.Echo("Using elo for " .. subject.name)
+			elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(pdata.elo), tonumber(pdata.level))
+		end
+		if (pdata.icon) then
+			--Spring.Echo("Using icon for " .. subject.name)
+			icon = pdata.icon
+		end
 		badges = pdata.badges
 		clan = pdata.clan
 		avatar = pdata.avatar
@@ -952,9 +967,9 @@ local function InitName(subject, playerPanel)
 		admin = playerInfo[subject.name].admin
 	end
 	
-	elo = 0
-	xp = 0
 	if subject.ai then
+		elo = 0
+		xp = 0
 		if (string.match(string.lower(subject.name), "chicken")) then			
 			elo = 1
 			xp = 7
