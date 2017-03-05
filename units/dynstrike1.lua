@@ -80,7 +80,6 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  terraformSpeed         = 600,
   turnRate               = 1148,
   upright                = true,
   workerTime             = 10,

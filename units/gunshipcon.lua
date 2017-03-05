@@ -56,7 +56,6 @@ unitDef = {
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 350,
-  terraformSpeed      = 450,
   turnRate            = 500,
   workerTime          = 7.5,
 

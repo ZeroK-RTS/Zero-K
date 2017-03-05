@@ -52,7 +52,6 @@ unitDef = {
   selfDestructAs                = [[NANOBOOM2]],
   showNanoSpray                 = false,
   sightDistance                 = 380,
-  terraformSpeed                = 600,
   turnRate                      = 1,
   upright                       = true,
   useBuildingGroundDecal        = true,

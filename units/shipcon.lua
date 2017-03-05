@@ -57,7 +57,6 @@ unitDef = {
   showNanoSpray          = false,
   sightDistance          = 325,
   sonarDistance          = 325,
-  terraformSpeed         = 600,
   turninplace            = 0,
   turnRate               = 508,
   workerTime             = 7.5,

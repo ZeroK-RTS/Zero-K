@@ -49,7 +49,6 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ChickenTrackPointy]],
   trackWidth          = 22,
-  terraformSpeed      = 450,
   turnRate            = 1000,
   upright             = false,
   workerTime          = 7.5,

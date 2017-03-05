@@ -62,7 +62,6 @@ unitDef = {
   script              = [[corch.lua]],
   sightDistance       = 325,
   sonarDistance       = 325,
-  terraformSpeed      = 300,
   turninplace         = 0,
   turnRate            = 550,
   workerTime          = 5,

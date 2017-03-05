@@ -87,7 +87,6 @@ unitDef = {
   sightDistance       = 380,
   sonarDistance       = 600,
   resurrectSpeed      = 3.75,
-  terraformSpeed      = 300,
   turnRate            = 148,
   workerTime          = 7.5,
 

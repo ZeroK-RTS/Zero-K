@@ -53,7 +53,6 @@ unitDef = {
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 255,
-  terraformSpeed         = 300,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,

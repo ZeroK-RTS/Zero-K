@@ -64,7 +64,6 @@ unitDef = {
 
   showNanoSpray          = false,
   sightDistance          = 280,
-  terraformSpeed         = 450,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,
