@@ -190,7 +190,7 @@ end
 --------------------------------------------------------------------------------
 
 local function DrawWorldFunc()
-    if (smoothPolys) then
+  if (smoothPolys) then
     glSmoothing(nil, nil, true)
   end
 

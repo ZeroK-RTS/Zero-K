@@ -450,8 +450,10 @@ function widget:DrawInMiniMap(xSize, ySize)
   if circleList == 0 then
 	CreateLists()
   end
- 
-  glSmoothing(false, false, false)
+  
+  if glSmoothing then
+    glSmoothing(false, false, false)
+  end
   glBlending(GL_SRC_ALPHA, GL_ONE)
   glLineWidth(lineWidth)
   glTexture(false)
@@ -483,7 +485,9 @@ function widget:DrawInMiniMap(xSize, ySize)
   glColor(1,1,1,1)
   gl.Lighting(true)
   glBlending(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-  glSmoothing(true, true, false)
+  if glSmoothing then
+    glSmoothing(true, true, false)
+  end
 end
 
 
