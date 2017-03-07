@@ -279,8 +279,9 @@ local function ProcessComm(name, config)
 		-- set costs
 		config.cost = config.cost or 0
 		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
-		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
-		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
+		--a bit of hack
+		commDefs[name].buildcostenergy = commDefs[name].buildcostmetal
+		commDefs[name].buildtime = commDefs[name].buildcostmetal
 		cp.cost = config.cost
 		
 		if config.power then
