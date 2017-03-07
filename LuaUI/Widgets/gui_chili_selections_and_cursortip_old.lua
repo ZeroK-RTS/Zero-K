@@ -271,7 +271,7 @@ options_order = {
 	'showDrawTools',
 	
 	--selected units
-	'selection_opacity', 'groupalways', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
+	'selection_opacity', 'groupbehaviour', 'showgroupinfo', 'squarepics','uniticon_size','unitCommand', 'manualWeaponReloadBar', 'alwaysShowSelectionWin',
 	'fancySkinning', 'leftPadding',
 }
 
@@ -493,7 +493,14 @@ options = {
 		end,
 		path = selPath,
 	},
-	groupalways = {name='Always Group Units', type='bool', value=false, OnChange = option_Deselect,
+	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton', 
+		value=overflow, 
+		items = {
+			{key = 'overflow',	name = 'On window overflow'},
+			{key = 'multitype',	name = 'With multiple unit types'},
+			{key = 'always',		name = 'Always'},
+		},
+		OnChange = option_Deselect,
 		path = selPath,
 	},
 	showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
@@ -885,6 +892,16 @@ Show = function(obj)
 	end
 end
 
+local function NoNeedForGrouping()
+	if options.groupbehaviour.value == 'overflow' then
+		return numSelectedUnits <= maxPicFit 
+	elseif options.groupbehaviour.value == 'multitype' then
+		return numSelectedUnits <= maxPicFit and #selectionSortOrder <= 1
+	else
+		return false
+	end
+end
+
 local function DisposeSelectionDisplay()
 	local windowCornerData = globalitems["window_corner_direct_child"]
 	if windowCornerData then
@@ -1044,7 +1061,7 @@ local function AddSelectionIcon(index,unitid,defid,unitids,counts)
 					local sel = spGetSelectedUnits()
 					widget:SelectionChanged(sel)
 				elseif button == 1 then
-					if shift then
+					if shift then-- or not NoNeedForGrouping() then
 						spSelectUnitArray(selectedUnitsByDef[squareData.defid]) -- select all
 					else
 						if squareData.unitid then
@@ -1119,32 +1136,37 @@ local function MakeUnitGroupSelectionToolTip()
 	end
 	
 	--estimate how many picture can fit into the selection grid
+	--Note: there is a minor issue here if the window isn't at default size where this thinks 
+	--			the window is at default size, but it clears up after the first time a unit is 
+	--			selected, so it won't likely show up in games, as Comm is selected at game start.
 	local maxRight = window_corner.width - (options.showgroupinfo.value and infoSection_size or 0) - 20
 	local horizontalFit =  math.modf(maxRight/(unitIcon_size+2))
 	local verticalFit = math.modf((window_corner.height  - 20)/(unitIcon_size+2))
 	maxPicFit = horizontalFit*verticalFit
-	local pictureWithinCapacity = (numSelectedUnits <= maxPicFit)
 
 	--WriteGroupInfo() --write selection summary text on right side of the panel
 
 	local index = 1
 	multiSelect.indexByUnitID = {}
 	multiSelect.healthbarByDefID = {}
-	
-	if ( pictureWithinCapacity and (not options.groupalways.value)) then
-		local unitid,defid,unitids
-		while index <= numSelectedUnits do
-			unitid = selectedUnits[index][1]
-			defid  = selectedUnits[index][2]
-			unitids = {unitid}
 
-			AddSelectionIcon(index,unitid,defid,unitids)
-			local squareData = multiSelect.unitSquare.data[index]
-			if not squareData.isChild then
-				multiSelect.barGrid:AddChild(squareData.panel)
-				squareData.isChild = true
+	if NoNeedForGrouping() then
+		local unitid,defid,unitids
+		for defIndex=1, #selectionSortOrder do
+			defid = selectionSortOrder[defIndex]
+			unitids = selectedUnitsByDef[defid]
+			for i=1,#unitids do
+				unitid = unitids[i]
+				fakeUnitIds = {unitid}
+
+				AddSelectionIcon(index,unitid,defid,fakeUnitIds)
+				local squareData = multiSelect.unitSquare.data[index]
+				if not squareData.isChild then
+					multiSelect.barGrid:AddChild(squareData.panel)
+					squareData.isChild = true
+				end
+				index = index + 1
 			end
-			index = index + 1
 		end
 	else
 		local defid,unitids,counts
@@ -1181,7 +1203,7 @@ local function UpdateSelectedUnitsTooltip()
 	if (numSelectedUnits>1) then
 		local barsContainer = window_corner.childrenByName['Bars']
 
-		if ((numSelectedUnits <= maxPicFit) and (not options.groupalways.value)) then
+		if NoNeedForGrouping() then
 			for i=1,numSelectedUnits do
 				local unitid = selectedUnits[i][1]
 				--Spring.Echo(unitid)
@@ -2960,6 +2982,8 @@ function widget:SelectionChanged(newSelection)
 				count = count + 1
 			end
 		end
+
+		table.sort(selectionSortOrder)
 
 		if (numSelectedUnits == 1) then
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
