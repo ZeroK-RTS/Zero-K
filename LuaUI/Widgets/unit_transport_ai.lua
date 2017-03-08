@@ -143,6 +143,38 @@ local goodCommand = {
 	[CMD_JUMP] = true,
 }
 
+local ignoredCommand = {
+	[CMD.ONOFF] = true,
+	[CMD.FIRE_STATE] = true,
+	[CMD.MOVE_STATE] = true,
+	[CMD.REPEAT] = true,
+	[CMD.CLOAK] = true,
+	[CMD.STOCKPILE] = true,
+	[CMD.TRAJECTORY] = true,
+	[CMD.IDLEMODE] = true,
+	[CMD_GLOBAL_BUILD] = true,
+	[CMD_STEALTH] = true,
+	[CMD_CLOAK_SHIELD] = true,
+	[CMD_UNIT_FLOAT_STATE] = true,
+	[CMD_PRIORITY] = true,
+	[CMD_MISC_PRIORITY] = true,
+	[CMD_RETREAT] = true,
+	[CMD_UNIT_BOMBER_DIVE_STATE] = true,
+	[CMD_AP_FLY_STATE] = true,
+	[CMD_AP_AUTOREPAIRLEVEL] = true,
+	[CMD_UNIT_SET_TARGET] = true,
+	[CMD_UNIT_CANCEL_TARGET] = true,
+	[CMD_UNIT_SET_TARGET_CIRCLE] = true,
+	[CMD_ABANDON_PW] = true,
+	[CMD_RECALL_DRONES] = true,
+	[CMD_UNIT_KILL_SUBORDINATES] = true,
+	[CMD_UNIT_AI] = true,
+	[CMD_WANT_CLOAK] = true,
+	[CMD_DONT_FIRE_AT_RADAR] = true,
+	[CMD_AIR_STRAFE] = true,
+	[CMD_PREVENT_OVERKILL] = true,
+}
+
 local function ProcessCommand(cmdID, params, noUsefuless, noPosition)
 	if noUsefuless then
 		return false
@@ -426,6 +458,10 @@ function widget:CommandNotify(id, params, options)
 			SetAutoCallTransportState(unitID, unitDefID, newState)
 		end
 		return true
+	end
+	
+	if ignoredCommand[id] then
+		return false
 	end
 	
 	local sel = nil
