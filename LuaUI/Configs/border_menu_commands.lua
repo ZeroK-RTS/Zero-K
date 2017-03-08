@@ -232,6 +232,8 @@ local overrides = {
 		caption='', tooltip = tooltips.priority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		caption='', tooltip = tooltips.factoryGuard,},
+	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
+		caption='', tooltip = tooltips.factoryGuard,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, caption='', tooltip = tooltips.moveState},
 	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, caption='', tooltip = tooltips.fireState},
 	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
@@ -326,10 +328,9 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	unitai=2,
 	unit_kill_subordinates=2,
 	autoassist=2,
+	autocalltransport=2,
 	airstrafe=2,
 	divestate=2,
-
-
 }
 
 

@@ -165,6 +165,7 @@ local usedActions = {
 	--["nextmenu"] = true,
 	["upgradecomm"] = true,
 	["autoassist"] = true,
+	["autocalltransport"] = true,
 	["setferry"] = true,
 	["sethaven"] = true,
 	["setfirezone"] = true,

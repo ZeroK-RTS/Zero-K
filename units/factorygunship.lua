@@ -44,6 +44,7 @@ unitDef = {
     helptext_de    = [[Kampfhubschrauber bieten aufgrund ihrer Beweglichkeit eine enorme Bandbreite an Einsetzbarkeit.]],
     sortName = [[3]],
 	modelradius    = [[43]],
+	nongroundfac = [[1]],
   },
 
   energyMake                    = 0.3,

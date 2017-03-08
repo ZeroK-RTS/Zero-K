@@ -41,6 +41,7 @@ unitDef = {
     sortName = [[4]],
 	modelradius    = [[50]],
 	midposoffset   = [[0 20 0]],
+	nongroundfac = [[1]],
   },
 
   energyMake                    = 0.3,

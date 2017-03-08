@@ -206,21 +206,25 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
   if (cmdID == CMD_EMBARK) or (cmdID == CMD_DISEMBARK) or (cmdID == CMD_TRANSPORTTO) then
-	if cmdID == CMD_TRANSPORTTO and (cmdOptions.shift) then	return true end --transportTo cannot properly support queue, block when in SHIFT
+	if cmdID == CMD_TRANSPORTTO and (cmdOptions.shift) then
+		return true --transportTo cannot properly support queue, block when in SHIFT
+	end
     local opt = {"alt"}
-	local embark =true
+	local embark = true
     if (cmdID == CMD_DISEMBARK and cmdOptions.shift) then 
 		opt[#opt+1] = "ctrl"  --Note: Disembark only when in SHIFT mode ("ctrl" is used to mark disembark point)
 		embark = false --prevent enter into priority queue
 	end
-	if (cmdOptions.shift) then opt[#opt+1] = "shift" end
+	if (cmdOptions.shift) then
+		opt[#opt+1] = "shift"
+	end
 	if cmdID == CMD_TRANSPORTTO then --only CMD_TRANSPORTTO have coordinate parameter.
 		GiveOrderToUnit(unitID, CMD.MOVE, {cmdParams[1],cmdParams[2],cmdParams[3]}, opt) -- This move command determine transport_AI destination.
 	end
 	if not embark then
 		GiveOrderToUnit(unitID, CMD_WAIT, {}, opt) --Note: transport AI use CMD_WAIT to identify transport unit. "Ctrl" will flag enter/exit transport point.
 	end
-	SendToUnsynced("taiEmbark", unitID, teamID, embark, cmdOptions.shift) --this will put unit into transport_AI's priority (see: unit_transport_ai.lua)
+	SendToUnsynced("taiEmbark", unitID, teamID, embark, cmdOptions.shift, cmdOptions.alt) --this will put unit into transport_AI's priority (see: unit_transport_ai.lua)
     return false
   end
   return true
@@ -235,14 +239,14 @@ else
 --  «UNSYNCED»  ----------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function WrapToLuaUI(_,unitID,teamID, embark, shift)
-  if (Script.LuaUI('taiEmbark')) then
-    Script.LuaUI.taiEmbark(unitID,teamID, embark, shift)
-  end
+function WrapToLuaUI(_,unitID,teamID, embark, shift, internal)
+	if (Script.LuaUI('taiEmbark')) and teamID == Spring.GetMyTeamID() then
+		Script.LuaUI.taiEmbark(unitID,teamID, embark, shift, internal)
+	end
 end
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction('taiEmbark',WrapToLuaUI)
+	gadgetHandler:AddSyncAction('taiEmbark',WrapToLuaUI)
 end
 
 --------------------------------------------------------------------------------

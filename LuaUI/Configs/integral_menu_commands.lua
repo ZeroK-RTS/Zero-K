@@ -371,6 +371,8 @@ local overrides = {
 		text='', tooltip = tooltips.miscpriority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		text='', tooltip = tooltips.factoryGuard,},
+	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
+		text='', tooltip = tooltips.factoryGuard,},
 	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
 		text='', tooltip = tooltips.globalBuild,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text='', tooltip = tooltips.moveState},
@@ -391,7 +393,7 @@ local overrides = {
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
-	}
+}
 
 -- Commands that only exist in LuaUI cannot have a hidden param. Therefore those that should be hidden are placed in this table.
 local widgetSpaceHidden = {

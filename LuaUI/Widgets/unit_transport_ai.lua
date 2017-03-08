@@ -6,11 +6,12 @@ function widget:GetInfo()
 		name    = "Transport AI",
 		desc    = "Automatically transports units going to factory waypoint.\n" ..
 		          "Adds embark=call for transport and disembark=unload from transport command",
-		author  = "Licho",
+		author  = "Licho, xponen, GoogleFrog",
 		date    = "1.11.2007, 9.7.2014",
 		license = "GNU GPL, v2 or later",
 		layer   = 0,
-		enabled = true
+		enabled = true,
+		handler = true
 	}
 end
 
@@ -20,13 +21,14 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
-local CONST_TRANSPORT_STOPDISTANCE = 160 -- how close by has transport be to stop the unit
+local CONST_TRANSPORT_STOPDISTANCE = 200 -- how close by has transport be to stop the unit
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
 local allTransports = {} -- list of all transports key = id, value = {defid} 
 local waitingUnits = {} -- list of units waiting for traqnsport - key = unitID, {unit state, unitDef, factory}
 local priorityUnits = {} -- lists of priority units waiting for key= unitId, value = state
+local autoCallTransportUnits = {} -- map of units that want to be automatically transported
 local toGuard = {} -- list of transports which need to guard something at the end of their queue. key = id, value = guardieeID
 local toPick = {} -- list of units waiting to be picked - key = transportID, value = {id, stoppedState}
 local toPickRev = {} -- list of units waiting to be picked - key = unitID, value=transportID
@@ -56,6 +58,17 @@ local spGetUnitIsTransporting = Spring.GetUnitIsTransporting
 local spGetGroundHeight       = Spring.GetGroundHeight
 local spSetActiveCommand      = Spring.SetActiveCommand
 
+local autoCallTransportCmdDesc = {
+	id      = CMD_AUTO_CALL_TRANSPORT,
+	type    = CMDTYPE.ICON_MODE,
+	tooltip = 'Allows the unit to automatically call for transportation',
+	name    = 'Auto Call Transport',
+	cursor  = 'Repair',
+	action  = 'autocalltransport',
+	params  = {0, 'off', 'on'}, 
+	pos = {CMD.ONOFF, CMD.REPEAT, CMD.MOVE_STATE, CMD.FIRE_STATE, CMD_RETREAT},
+}
+
 options_path = 'Game/Transport AI'
 options = {
 	transportFromFactory = {
@@ -80,6 +93,15 @@ options = {
 		noHotkey = true,
 	},
 }
+
+-- Keep synced with unit_transport_ai_auto_call
+local autoCallTransportDef = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if Spring.Utilities.getMovetype(ud) == 2 or (ud.isFactory and not ud.customParams.nongroundfac) then
+		autoCallTransportDef[i] = true
+	end
+end
 
 local function TableInsert(tab, toInsert)
 	tab[#tab+1] = toInsert
@@ -251,11 +273,13 @@ end
 function widget:Initialize()
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
 	 if spec then
-		widgetHandler:RemoveWidget()
+		widgetHandler:RemoveWidget(widget)
 		return false
 	end
+	WG.autoCallTransportUnits = autoCallTransportUnits
+	
 	myTeamID = teamID
-	widgetHandler:RegisterGlobal('taiEmbark', taiEmbark)
+	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
 
 	local units = spGetTeamUnits(teamID)
 	for i=1,#units do	-- init existing transports
@@ -268,7 +292,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
-	widgetHandler:DeregisterGlobal('taiEmbark')
+	widgetHandler:DeregisterGlobal(widget, 'taiEmbark')
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
@@ -323,6 +347,7 @@ function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if teamID == myTeamID then 
 		allTransports[unitID] = nil
 		toGuard[unitID] = nil
+		autoCallTransportUnits[unitID] = false
 		RemoveUnit(unitID, unitDefID, teamID)
 	end
 end
@@ -399,6 +424,19 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 end
 
 function widget:CommandNotify(id, params, options) 
+	if id == CMD_AUTO_CALL_TRANSPORT then
+		local selectedUnits = Spring.GetSelectedUnits()
+		local newState = (params[1] == 1)
+		for i = 1, #selectedUnits do
+			local unitID = selectedUnits[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if autoCallTransportDef[unitDefID] then
+				autoCallTransportUnits[unitID] = newState
+			end
+		end
+		return true
+	end
+	
 	local sel = nil
 	local alt,ctrl,shift = ExtractModifiedOptions(options)
 	if not (options.shift or shift) then
@@ -418,6 +456,31 @@ function widget:CommandNotify(id, params, options)
 	end
 
 	return false
+end
+
+function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
+	if autoCallTransportUnits[unitID] then
+		local useful, halting = ProcessCommand(cmdID, params, false, true)
+		if useful and halting then
+			spGiveOrderToUnit(unitID, CMD_EMBARK, {}, {"alt"})
+		end
+	end
+end
+
+function widget:CommandsChanged()
+	local units = Spring.GetSelectedUnitsSorted()
+	for unitDefID, units in pairs(units) do
+		if autoCallTransportDef[unitDefID] then
+			local customCommands = widgetHandler.customCommands
+			local order = 0
+			if WG.autoCallTransportUnits and WG.autoCallTransportUnits[units[1]] then
+				order = 1
+			end
+			autoCallTransportCmdDesc.params[1] = order
+			table.insert(customCommands, autoCallTransportCmdDesc)
+			break
+		end
+	end
 end
 
 function widget:Update(deltaTime)
@@ -840,32 +903,36 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 end ]]--
 
-function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
-	if (teamID ~= myTeamID) then return end
+function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
+	if (teamID ~= myTeamID) then
+		return
+	end
 	
 	if (not shift) then
 		RemoveUnit(unitID, spGetUnitDefID(unitID), myTeamID) --remove existing command ASAP
 	end
 	
-	local queue = spGetCommandQueue(unitID, -1)
-	if (queue == nil) and (not shift) then --unit has no command at all?! and not queueing embark/disembark command?!
-		spEcho("Transport: Select destination")
-		spSetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
-		return false --wait until user select destination
-	else
-		local hasMoveCommand
-		for k = 1, #queue do
-			local v = queue[k]
-			local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, false, true)
-			if usefulCommand then
-				hasMoveCommand = true
-				break
-			end
-		end
-		if (not hasMoveCommand) and (not shift) then --unit has no move command?! and not queueing embark/disembark command?!
+	if not internal then
+		local queue = spGetCommandQueue(unitID, -1)
+		if (queue == nil) and (not shift) then --unit has no command at all?! and not queueing embark/disembark command?!
 			spEcho("Transport: Select destination")
-			spSetActiveCommand("transportto") --Force user to add move command.
+			spSetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
 			return false --wait until user select destination
+		else
+			local hasMoveCommand
+			for k = 1, #queue do
+				local v = queue[k]
+				local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, false, true)
+				if usefulCommand then
+					hasMoveCommand = true
+					break
+				end
+			end
+			if (not hasMoveCommand) and (not shift) then --unit has no move command?! and not queueing embark/disembark command?!
+				spEcho("Transport: Select destination")
+				spSetActiveCommand("transportto") --Force user to add move command.
+				return false --wait until user select destination
+			end
 		end
 	end
 	
