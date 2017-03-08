@@ -18,7 +18,7 @@ end
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
-local CONST_TRANSPORT_STOPDISTANCE = 150 -- how close by has transport be to stop the unit
+local CONST_TRANSPORT_STOPDISTANCE = 160 -- how close by has transport be to stop the unit
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
@@ -132,7 +132,7 @@ function IsEmbark(cmd)
 	if (cmd.id == CMD.WAIT and (cmd.options.alt or alt) and not (cmd.options.ctrl or ctrl)) then 
 		return true
 	end
-	return false
+	return true
 end
 
 function IsDisembark(cmd)
@@ -209,8 +209,6 @@ function AddToPick(transportID, unitID, stopped, fact)
 	toPickRev[unitID] = transportID
 end
 
-
-
 function widget:Initialize()
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
 	 if spec then
@@ -233,7 +231,6 @@ end
 function widget:Shutdown()
 	widgetHandler:DeregisterGlobal('taiEmbark')
 end
-
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if teamID == myTeamID then 
@@ -295,7 +292,6 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
-
 function AddTransport(unitID, unitDefID) 
 	if (IsTransport(unitDefID)) then -- and IsIdle(unitID)
 		idleTransports[unitID] = unitDefID
@@ -304,7 +300,6 @@ function AddTransport(unitID, unitDefID)
 	end
 	return false
 end 
-
 
 function widget:UnitIdle(unitID, unitDefID, teamID) 
 	if (teamID ~= myTeamID) or (WG.FerryUnits and WG.FerryUnits[unitID]) then 
@@ -364,7 +359,6 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	end 
 end
 
-
 function widget:CommandNotify(id, params, options) 
 	local sel = nil
 	local alt,ctrl,shift = ExtractModifiedOptions(options)
@@ -387,10 +381,11 @@ function widget:CommandNotify(id, params, options)
 	return false
 end
 
-
 function widget:Update(deltaTime)
 	timer = timer + deltaTime
-	if (timer < 1) then return end
+	if (timer < 1) then
+		return
+	end
 	StopCloseUnits()
 
 	local todel = {}
@@ -410,12 +405,11 @@ function widget:Update(deltaTime)
 	timer = 0
 end
 
-
 function StopCloseUnits() -- stops dune units which are close to transport
 	for transportID, val in pairs(toPick) do 
 		local unitID = val[1]
 		local state = val[2]
-		if (state == ST_ROUTE) then 
+		if (state == ST_ROUTE or state == ST_PRIORITY) then 
 			local dist = spGetUnitSeparation(transportID, unitID, true)
 			if (dist ~= nil and dist < CONST_TRANSPORT_STOPDISTANCE) then
 				local canStop = true
@@ -441,7 +435,6 @@ function StopCloseUnits() -- stops dune units which are close to transport
 		end 
 	end
 end
-
 
 function widget:UnitLoaded(unitID, unitDefID, teamID, transportID) 
 	if (teamID ~= myTeamID or toPick[transportID]==nil) then 
@@ -524,7 +517,6 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 	end
 end
 
-
 function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID) 
 	if (teamID ~= myTeamID or storedQueue[unitID] == nil) then
 		return 
@@ -541,7 +533,6 @@ function widget:UnitUnloaded(unitID, unitDefID, teamID, transportID)
 		spGiveOrderToUnit(unitID, CMD.WAIT, {}, {}) 
 	end 
 end
-
 
 function CanTransport(transportID, unitID) 
 	local udef = spGetUnitDefID(unitID)	
@@ -815,7 +806,7 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 	end
 	
 	local queue = spGetCommandQueue(unitID, -1)
-	if (queue == nil) and (not shift) then	--unit has no command at all?! and not queueing embark/disembark command?!
+	if (queue == nil) and (not shift) then --unit has no command at all?! and not queueing embark/disembark command?!
 		spEcho("Transport: Select destination")
 		spSetActiveCommand("transportto") --Force user to add move command. See unit_transport_ai_buttons.lua for more info.
 		return false --wait until user select destination

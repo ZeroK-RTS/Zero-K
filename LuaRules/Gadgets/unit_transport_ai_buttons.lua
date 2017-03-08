@@ -217,7 +217,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if cmdID == CMD_TRANSPORTTO then --only CMD_TRANSPORTTO have coordinate parameter.
 		GiveOrderToUnit(unitID, CMD.MOVE, {cmdParams[1],cmdParams[2],cmdParams[3]}, opt) -- This move command determine transport_AI destination.
 	end
-	GiveOrderToUnit(unitID, CMD_WAIT, {}, opt) --Note: transport AI use CMD_WAIT to identify transport unit. "Ctrl" will flag enter/exit transport point.
+	if not embark then
+		GiveOrderToUnit(unitID, CMD_WAIT, {}, opt) --Note: transport AI use CMD_WAIT to identify transport unit. "Ctrl" will flag enter/exit transport point.
+	end
 	SendToUnsynced("taiEmbark", unitID, teamID, embark, cmdOptions.shift) --this will put unit into transport_AI's priority (see: unit_transport_ai.lua)
     return false
   end
