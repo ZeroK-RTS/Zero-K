@@ -14,6 +14,8 @@ function widget:GetInfo()
 	}
 end
 
+local floatDefs = VFS.Include("LuaRules/Configs/float_defs.lua") --list of unit able to float for pickup at sea
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
@@ -30,13 +32,12 @@ local toPick = {} -- list of units waiting to be picked - key = transportID, val
 local toPickRev = {} -- list of units waiting to be picked - key = unitID, value=transportID
 local storedQueue = {} -- unit keyed stored queues
 local hackIdle ={} -- temp field to overcome unitIdle problem
-local floatDefs = VFS.Include("LuaRules/Configs/float_defs.lua") --list of unit able to float for pickup at sea
-
 
 local ST_ROUTE = 1 -- unit is enroute from factory
 local ST_PRIORITY = 2 -- unit is in need of priority transport
 local ST_STOPPED = 3 -- unit is enroute from factory but stopped
 
+local MAX_UNITS = Game.maxUnits
 
 local timer = 0
 local myTeamID 
@@ -100,6 +101,44 @@ local function ExtractModifiedOptions(options) --FIXME: pls check again if I'm r
 		end
 	end
 	return alt,ctrl,shift,internal,right
+end
+
+local goodCommand = {
+	[CMD.MOVE] = true,
+	[CMD.WAIT] = true,
+	[CMD.SET_WANTED_MAX_SPEED] = true,
+	[CMD.GUARD] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RESURRECT] = true,
+	[CMD_JUMP] = true,
+}
+
+local function ProcessCommand(cmdID, params, noUsefuless, noPosition)
+	if noUsefuless then
+		return false
+	end
+	if not (goodCommand[cmdID] or cmdID < 0) then
+		return false
+	end
+	local halting = not (cmdID == CMD.MOVE or cmdID == CMD.WAIT or cmdID == CMD.SET_WANTED_MAX_SPEED)
+	if noPosition or cmdID == CMD.WAIT or cmdID == CMD.SET_WANTED_MAX_SPEED then
+		return true, halting
+	end
+	
+	if params[3] then
+		return true, halting, params[1], params[2], params[3]
+	elseif not params[1] then
+		return true, halting
+	end
+	
+	if cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM then
+		local x, y, z = Spring.GetFeaturePosition((params[1] or 0) - MAX_UNITS)
+		return true, halting, x, y, z
+	else
+		local x, y, z = Spring.GetUnitPosition(params[1])
+		return true, halting, x, y, z
+	end
 end
 
 function IsTransport(unitDefID) 
@@ -448,7 +487,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 
 	--spEcho("unit loaded " .. transportID .. " " ..unitID)
 	local torev = {}
-	local vl = nil
+	local lastX, lastY, lastZ
 
 	local ender = false
  
@@ -460,16 +499,17 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		local v = queue[k]
 		local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
 		if not (v.options.internal or internal) then	--not other widget's command
-			if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED or v.id < 0) and not ender) then
+			local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, ender)
+			if usefulCommand then
 				cnt = cnt +1
-				if (v.id == CMD.MOVE) or v.id < 0 then 
-					spGiveOrderToUnit(transportID, CMD.MOVE, v.params, {"shift"})
-					TableInsert(torev, {v.params[1], v.params[2], v.params[3]+20})
-					vl = v.params 
+				if cx then 
+					spGiveOrderToUnit(transportID, CMD.MOVE, {cx, cy, cz}, {"shift"})
+					TableInsert(torev, {cx, cy, cz + 20})
+					lastX, lastY, lastZ = cx, cy, cz
 				end
-				if v.id < 0 or (IsDisembark(v)) then 
+				if haltingCommand or (IsDisembark(v)) then 
 					ender = true
-					if v.id < 0 then
+					if haltingCommand then
 						local opts = {}
 						TableInsert(opts, "shift") -- appending
 						if (v.options.alt or alt)	 then TableInsert(opts, "alt")	 end
@@ -496,8 +536,8 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 	
 	spGiveOrderToUnit(unitID, CMD.STOP, {}, {})
 	
-	if (vl ~= nil) then 
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {vl[1], vl[2], vl[3], CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
+	if lastX then 
+		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {lastX, lastY, lastZ, CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
 		
 		local i = #torev
 		while (i > 0) do 
@@ -565,23 +605,23 @@ function CanTransport(transportID, unitID)
 	return true
 end
 
-local function GetTransportBenefit(unitID, ud, transporter, transDef, unitspeed, unitmass, priorityState)
+local function GetTransportBenefit(unitID, pathLength, transporter, transDef, unitspeed, unitmass, priorityState)
 	local transpeed = UnitDefs[transDef].speed
 	local transMass = UnitDefs[transDef].mass
 	local speedMod  = math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
 
-	local td = spGetUnitSeparation(unitID, transporter, true)
+	local transportDist = spGetUnitSeparation(unitID, transporter, true)
 
-	local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
-	local utime = (ud) / unitspeed
-	local benefit = utime-ttime
-	if priorityState then 
-		benefit = benefit + CONST_PRIORITY_BENEFIT
-	end
+	local ttime = (transportDist + pathLength) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
+	local utime = pathLength / unitspeed
+	local benefit = utime - ttime
 
 	--spEcho ("	 "..transporter.. " " .. unitID .. "	" .. benefit)
 
 	if (benefit > options.minimumTransportBenefit.value) then 
+		if priorityState then 
+			benefit = benefit + CONST_PRIORITY_BENEFIT
+		end
 		return {benefit, transporter, unitID}
 	end
 end
@@ -601,11 +641,11 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 				local unitmass = UnitDefs[waitDefID].mass
 				speedMod =	math.min(1, 3 * unitmass/(transMass +unitmass )) --see unit_transport_speed.lua gadget
 
-				local ud = GetPathLength(id)
-				local td = spGetUnitSeparation(id, transportID, true)
+				local pathLength = GetPathLength(id)
+				local transportDist = spGetUnitSeparation(id, transportID, true)
 
-				local ttime = (td + ud) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
-				local utime = (ud) / unitspeed
+				local ttime = (transportDist + pathLength) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
+				local utime = pathLength / unitspeed
 				local benefit = utime-ttime
 				if (val[1]==ST_PRIORITY) then 
 					 benefit = benefit + CONST_PRIORITY_BENEFIT
@@ -622,12 +662,12 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 		local unitspeed = UnitDefs[unitDefID].speed
 		local unitmass = UnitDefs[unitDefID].mass
 		local priorityState = (waitingUnits[unitID][1] == ST_PRIORITY)
-		local ud = GetPathLength(unitID)
+		local pathLength = GetPathLength(unitID)
 		
 		if not ignoreIdle then
 			for id, def in pairs(idleTransports) do 
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
-					local benefit = GetTransportBenefit(unitID, ud, id, def, unitspeed, unitmass, priorityState)
+					local benefit = GetTransportBenefit(unitID, pathLength, id, def, unitspeed, unitmass, priorityState)
 					if benefit then
 						toGuard[id] = nil
 						TableInsert(best, benefit) 
@@ -641,7 +681,7 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
 					local queue = spGetCommandQueue(id, 1)
 					if queue and queue[1] and queue[1].id == CMD.GUARD and queue[1].params[1] == guardID then
-						local benefit = GetTransportBenefit(unitID, ud, id, def, unitspeed, unitmass, priorityState)
+						local benefit = GetTransportBenefit(unitID, pathLength, id, def, unitspeed, unitmass, priorityState)
 						if benefit then
 							toGuard[id] = guardID
 							TableInsert(best, benefit) 
@@ -702,38 +742,40 @@ function GetPathLength(unitID)
 	local udid = spGetUnitDefID(unitID)
 	local moveID = UnitDefs[udid].moveDef.id
 	if (queue == nil) then return 0 end
-	for k=1, #queue do
+	for k = 1, #queue do
 		local v = queue[k]
-		if (v.id == CMD.MOVE or v.id==CMD.WAIT) then
-			if (v.id == CMD.MOVE) then 
-		local reachable = true --always assume target reachable
-		local waypoints
-		if moveID then --unit has compatible moveID?
-			local result, lastwaypoint
-			result, lastwaypoint, waypoints = IsTargetReachable(moveID,px,py,pz,v.params[1],v.params[2],v.params[3],128)
-			if result == "outofreach" then --abit out of reach?
-				reachable=false --target is unreachable!
-			end
-		end
-		if reachable then 
-			if waypoints then --we have waypoint to destination?
-				local way1,way2,way3 = px,py,pz
-				for i=1, #waypoints do --sum all distance in waypoints
-					d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
-					way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
+		local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params)
+		if usefulCommand then
+			if cx then 
+				local reachable = true --always assume target reachable
+				local waypoints
+				if moveID then --unit has compatible moveID?
+					local result, lastwaypoint
+					result, lastwaypoint, waypoints = IsTargetReachable(moveID, px, py, pz, cx, cy, cz, 128)
+					if result == "outofreach" then --abit out of reach?
+						reachable=false --target is unreachable!
+					end
 				end
-			else --so we don't have waypoint?
-				d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) --we don't have waypoint then measure straight line
-			end
-		else --pathing says target unreachable?!
-			d = d + Dist(px,py, pz, v.params[1], v.params[2], v.params[3]) + 9999 --target unreachable!
-		end
-				px = v.params[1]
-				py = v.params[2]
-				pz = v.params[3]
+				if reachable then 
+					if waypoints then --we have waypoint to destination?
+						local way1,way2,way3 = px,py,pz
+						for i=1, #waypoints do --sum all distance in waypoints
+							d = d + Dist(way1,way2,way3, waypoints[i][1],waypoints[i][2],waypoints[i][3])
+							way1,way2,way3 = waypoints[i][1],waypoints[i][2],waypoints[i][3]
+						end
+					else --so we don't have waypoint?
+						d = d + Dist(px,py, pz, cx, cy, cz) --we don't have waypoint then measure straight line
+					end
+				else --pathing says target unreachable?!
+					d = d + Dist(px,py, pz, cx, cy, cz) + 9999 --target unreachable!
+				end
+				px, py, pz = cx, cy, cz
 				local h = spGetGroundHeight(px,pz)
 				if (h < mini) then mini = h end
 				if (h > maxi) then maxi = h end
+				if haltingCommand then
+					break
+				end
 			end
 		else
 			break
@@ -812,9 +854,10 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		return false --wait until user select destination
 	else
 		local hasMoveCommand
-		for k=1, #queue do
+		for k = 1, #queue do
 			local v = queue[k]
-			if (v.id == CMD.MOVE) or (v.id == 31200) or (v.id == 31201) or (v.id == 31202) or v.id < 0 then
+			local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, false, true)
+			if usefulCommand then
 				hasMoveCommand = true
 				break
 			end

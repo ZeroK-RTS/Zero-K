@@ -102,7 +102,7 @@ local gammaCONSTANT2and1g	= {0.05,0.05,0.05} -- balancing constant; effect behav
 local alphaCONSTANT1g		= {500,0.4,0.4} -- balancing constant; effect behaviour. (default = 500x (All), 0.4x (Cloakies)) (behaviour:(MAINTAIN USER's COMMAND)|(IGNORE USER's COMMAND))
 
 --Move Command constant:
-local halfTargetBoxSize_g = {400, 0, 185, 50} --aka targetReachBoxSizeTrigger, set the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESSURECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
+local halfTargetBoxSize_g = {400, 0, 185, 50} --aka targetReachBoxSizeTrigger, set the distance from a target which widget should de-activate (default: MOVE = 400m (ie:800x800m box/2x constructor range), RECLAIM/RESURRECT=0 (always flee), REPAIR=185 (1x constructor's range), GUARD = 50 (arbitrary))
 local cMD_DummyG = 248 --a fake command ID to flag an idle unit for pure avoidance. (arbitrary value, change if it overlap with existing command)
 local cMD_Dummy_atkG = 249 --same as cMD_DummyG except to differenciate between idle & attacking
 
@@ -1496,9 +1496,9 @@ function ExtractTarget (queueIndex, cQueue,unitInMotionSingleUnit) --//used by I
 		--graphCONSTANTtrigger[2] = 2
 		graphCONSTANTtrigger[1] = 1 --use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 		graphCONSTANTtrigger[2] = 1
-		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESSURECT command
+		boxSizeTrigger=2 --use deactivation 'halfboxsize' for RECLAIM/RESURRECT command
 		
-		if not areaMode then --signature for discrete RECLAIM/RESSURECT command.
+		if not areaMode then --signature for discrete RECLAIM/RESURRECT command.
 			boxSizeTrigger = 1 --change to deactivation 'halfboxsize' similar to MOVE command if user queued a discrete reclaim/ressurect command
 			--graphCONSTANTtrigger[1] = 1 --override: use standard angle scale (take ~10 cycle to do 180 flip, but more predictable)
 			--graphCONSTANTtrigger[2] = 1
@@ -1559,7 +1559,7 @@ function ExtractTarget (queueIndex, cQueue,unitInMotionSingleUnit) --//used by I
 				-- if weaponType==0  then --melee unit set bigger targetReached box.
 					-- boxSizeTrigger = 1 --if user initiate an attack while avoidance is necessary (eg: while reloading), then set deactivation 'halfboxsize' for MOVE command (ie: 400m range)
 				-- elseif weaponType==1 then
-				boxSizeTrigger = 2 --set deactivation 'halfboxsize' for RECLAIM/RESSURECT command (ie: 0m range/ always flee)
+				boxSizeTrigger = 2 --set deactivation 'halfboxsize' for RECLAIM/RESURRECT command (ie: 0m range/ always flee)
 				-- end
 				fixedPointCONSTANTtrigger = 1 --//use general behaviour that balance between target & avoidance
 			end

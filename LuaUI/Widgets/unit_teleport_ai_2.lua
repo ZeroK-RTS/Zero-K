@@ -537,14 +537,14 @@ function ConvertCMDToMOVE(command)
 	if command.id == CMD.RECLAIM
 	or command.id == CMD.REPAIR
 	or command.id == CMD.GUARD
-	or command.id == CMD.RESSURECT then
+	or command.id == CMD.RESURRECT then
 		local isPossible2PartAreaCmd = command.params[5]
 		if not command.params[4] or isPossible2PartAreaCmd then --if not area-command or the is the 2nd part of area-command (1st part have radius at 4th-param, 2nd part have unitID/featureID at 1st-param and radius at 5th-param)
 			if not command.params[2] or isPossible2PartAreaCmd then
 				local x,y,z
 				if command.id == CMD.REPAIR or command.id == CMD.GUARD then
 					x,y,z = GetUnitOrFeaturePosition(command.params[1])
-				elseif command.id == CMD.RECLAIM or command.id == CMD.RESSURECT then
+				elseif command.id == CMD.RECLAIM or command.id == CMD.RESURRECT then
 					x,y,z = GetUnitOrFeaturePosition(command.params[1])
 				end
 				if not x then
