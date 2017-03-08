@@ -91,6 +91,14 @@ local previousSelection
 local unitInSelection = {}
 local doNotPlayNextSelection = false
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local widgetCMD = {
+	[CMD_EMBARK] = true,
+	[CMD_DISEMBARK] = true,
+	[CMD_TRANSPORTTO] = true,
+}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -160,7 +168,7 @@ local function PlayResponse(unitID, cmdID)
 	end
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]
-	if (CMD[cmdID]) then
+	if (CMD[cmdID] or widgetCMD[cmdID]) then
 		if (sounds and sounds.ok) then
 			CoolNoisePlay(sounds.ok[1], 0.5, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
