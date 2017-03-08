@@ -467,16 +467,24 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		local v = queue[k]
 		local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
 		if not (v.options.internal or internal) then	--not other widget's command
-			if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED) and not ender) then
+			if ((v.id == CMD.MOVE or (v.id==CMD.WAIT) or v.id == CMD.SET_WANTED_MAX_SPEED or v.id < 0) and not ender) then
 				cnt = cnt +1
-				if (v.id == CMD.MOVE) then 
-					spGiveOrderToUnit(transportID, CMD.MOVE, v.params, {"shift"})			
+				if (v.id == CMD.MOVE) or v.id < 0 then 
+					spGiveOrderToUnit(transportID, CMD.MOVE, v.params, {"shift"})
 					TableInsert(torev, {v.params[1], v.params[2], v.params[3]+20})
 					vl = v.params 
 				end
-		if (IsDisembark(v)) then 
-			ender = true
-		end
+				if v.id < 0 or (IsDisembark(v)) then 
+					ender = true
+					if v.id < 0 then
+						local opts = {}
+						TableInsert(opts, "shift") -- appending
+						if (v.options.alt or alt)	 then TableInsert(opts, "alt")	 end
+						if (v.options.ctrl or ctrl)	then TableInsert(opts, "ctrl")	end
+						if (v.options.right or right) then TableInsert(opts, "right") end
+						TableInsert(storedQueue[unitID], {v.id, v.params, opts})
+					end
+				end
 			else
 				if (not ender) then 
 					ender = true
@@ -682,15 +690,12 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 	return false -- Unit/Transport is still idle
 end
 
-
-
 function Dist(x,y,z, x2, y2, z2) 
 	local xd = x2-x
 	local yd = y2-y
 	local zd = z2-z
 	return math.sqrt(xd*xd + yd*yd + zd*zd)
 end
-
 
 function GetPathLength(unitID) 
 	local mini = math.huge
@@ -776,7 +781,6 @@ function IsTargetReachable (moveID, ox,oy,oz,tx,ty,tz,radius)
 	return result, lastcoordinate, waypoints
 end
 
-
 --[[
 function widget:KeyPress(key, modifier, isRepeat)
 	if (key == KEYSYMS.Q and not modifier.ctrl) then
@@ -803,8 +807,6 @@ function widget:KeyPress(key, modifier, isRepeat)
 	end
 end ]]--
 
-
-
 function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 	if (teamID ~= myTeamID) then return end
 	
@@ -821,7 +823,7 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		local hasMoveCommand
 		for k=1, #queue do
 			local v = queue[k]
-			if (v.id == CMD.MOVE) or (v.id == 31200) or (v.id == 31201) or (v.id == 31202) then
+			if (v.id == CMD.MOVE) or (v.id == 31200) or (v.id == 31201) or (v.id == 31202) or v.id < 0 then
 				hasMoveCommand = true
 				break
 			end
@@ -841,5 +843,3 @@ function taiEmbark(unitID, teamID, embark, shift) -- called by gadget
 		end
 	end
 end
-
-
