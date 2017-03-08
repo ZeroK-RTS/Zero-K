@@ -15,6 +15,7 @@ local tooltips = {
 	moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
 	["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
 	dropflag = "Drop flag on the ground.",
+	autoCallTransport = "Automatically call transports between constructor tasks."
 }
 
 local units = {
@@ -236,8 +237,8 @@ local overrides = {
 		text='', tooltip = tooltips.miscpriority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		text='', tooltip = tooltips.factoryGuard,},
-	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
-		text='', tooltip = tooltips.factoryGuard,},
+	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/auto_call_off.png', imageDir .. 'states/auto_call_on.png'},
+		text='', tooltip = tooltips.autoCallTransport,},
 	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
 		text='', tooltip = tooltips.globalBuild,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text='', tooltip = tooltips.moveState},

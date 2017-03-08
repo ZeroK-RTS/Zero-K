@@ -21,7 +21,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CONST_HEIGHT_MULTIPLIER = 3 -- how many times to multiply height difference when evaluating distance
 local CONST_TRANSPORT_PICKUPTIME = 9 -- how long (in seconds) does transport land and takeoff with unit
 local CONST_PRIORITY_BENEFIT = 10000 -- how much more important are priority transfers
-local CONST_TRANSPORT_STOPDISTANCE = 200 -- how close by has transport be to stop the unit
+local CONST_TRANSPORT_STOPDISTANCE = 350 -- how close by has transport be to stop the unit
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
@@ -78,6 +78,13 @@ options = {
 		desc = "When enabled newly completed units will be transported to the waypoint of their parent factory.",
 		noHotkey = true,
 	},
+	lingerOnConstructorTransport = {
+		name = "Linger on Constructor Transport",
+		type = "bool",
+		value = true,
+		desc = "Enable to make transports sit next to constructors after transporting them.",
+		noHotkey = true,
+	},
 	ignoreBuilders = {
 		name = "Ignore Constructors From Factory",
 		type = "bool",
@@ -98,7 +105,7 @@ options = {
 local autoCallTransportDef = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
-	if Spring.Utilities.getMovetype(ud) == 2 or (ud.isFactory and not ud.customParams.nongroundfac) then
+	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or (ud.isFactory and not ud.customParams.nongroundfac) then
 		autoCallTransportDef[i] = true
 	end
 end
@@ -179,23 +186,6 @@ function IsTransportable(unitDefID, unitID)
 	return (udc~= nil and ud.speed > 0 and not ud.canFly and (y>-20 or floatDefs[unitDefID]))
 end
 
-
-function IsEmbarkCommand(unitID)
- local queue = spGetCommandQueue(unitID, 1)
- if (queue ~= nil and #queue>=1 and IsEmbark(queue[1])) then 
-	 return true
- end
- return false
-end
-
-function IsEmbark(cmd)
-	local alt,ctrl = ExtractModifiedOptions(cmd.options)
-	if (cmd.id == CMD.WAIT and (cmd.options.alt or alt) and not (cmd.options.ctrl or ctrl)) then 
-		return true
-	end
-	return true
-end
-
 function IsDisembark(cmd)
 	local alt,ctrl = ExtractModifiedOptions(cmd.options)
 	if (cmd.id == CMD.WAIT and (cmd.options.alt or alt) and (cmd.options.ctrl or ctrl)) then
@@ -207,7 +197,7 @@ end
 function IsWaitCommand(unitID)
 	local queue = spGetCommandQueue(unitID, 1);
 	local alt
-	if queue then
+	if queue and queue[1] then
 		alt = ExtractModifiedOptions(queue[1].options)
 	end
 	if (queue ~= nil and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then 
@@ -270,19 +260,23 @@ function AddToPick(transportID, unitID, stopped, fact)
 	toPickRev[unitID] = transportID
 end
 
+local function GetAutoCallTransportState(unitID)
+	return autoCallTransportUnits[unitID]
+end
+
 function widget:Initialize()
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
 	 if spec then
 		widgetHandler:RemoveWidget(widget)
 		return false
 	end
-	WG.autoCallTransportUnits = autoCallTransportUnits
+	WG.GetAutoCallTransportState = GetAutoCallTransportState
 	
 	myTeamID = teamID
 	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
 
 	local units = spGetTeamUnits(teamID)
-	for i=1,#units do	-- init existing transports
+	for i = 1, #units do	-- init existing transports
 		local unitID = units[i]
 		widget:UnitCreated(unitID, spGetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		if AddTransport(unitID, spGetUnitDefID(unitID)) then
@@ -292,6 +286,7 @@ function widget:Initialize()
 end
 
 function widget:Shutdown()
+	WG.GetAutoCallTransportState = nil
 	widgetHandler:DeregisterGlobal(widget, 'taiEmbark')
 end
 
@@ -401,16 +396,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			return 
 		end
 		if (IsTransportable(unitDefID, unitID) and not userOrders) then 
---			spEcho ("new unit from factory "..unitID)
-
-			local commands = spGetCommandQueue(unitID, -1)
-			for i=1, #commands do
-				if (IsEmbark(commands[i])) then 
-					priorityUnits[unitID] = unitDefID
-					return
-				end
-			end
-
+			--spEcho ("new unit from factory "..unitID)
 			waitingUnits[unitID] = {ST_ROUTE, unitDefID, factID}
 			local foundTransport = AssignTransports(0, unitID, factID, not options.transportFromFactory.value) 
 			
@@ -441,7 +427,7 @@ function widget:CommandNotify(id, params, options)
 	local alt,ctrl,shift = ExtractModifiedOptions(options)
 	if not (options.shift or shift) then
 		sel = spGetSelectedUnits()
-		for i=1,#sel do
+		for i = 1, #sel do
 			local uid = sel[i]
 			RemoveUnit(uid, spGetUnitDefID(uid), myTeamID)
 		end
@@ -473,7 +459,7 @@ function widget:CommandsChanged()
 		if autoCallTransportDef[unitDefID] then
 			local customCommands = widgetHandler.customCommands
 			local order = 0
-			if WG.autoCallTransportUnits and WG.autoCallTransportUnits[units[1]] then
+			if autoCallTransportUnits[units[1]] then
 				order = 1
 			end
 			autoCallTransportCmdDesc.params[1] = order
@@ -491,17 +477,13 @@ function widget:Update(deltaTime)
 	StopCloseUnits()
 
 	local todel = {}
-	for i, d in pairs(priorityUnits) do
---		spEcho ("checking prio " ..i)
-		if (IsEmbarkCommand(i)) then --Check for CMD_WAIT
---			spEcho ("prio called " ..i)
-			waitingUnits[i] = {ST_PRIORITY, d}
-			AssignTransports(0, i)
-			TableInsert(todel, i)
-		end
+	for unitID, unitDefID in pairs(priorityUnits) do
+		waitingUnits[unitID] = {ST_PRIORITY, unitDefID}
+		AssignTransports(0, unitID)
+		TableInsert(todel, unitID)
 	end
-	for i=1, #todel do
-		priorityUnits[todel[i] ] = nil
+	for i = 1, #todel do
+		priorityUnits[todel[i]] = nil
 	end
 
 	timer = 0
@@ -530,12 +512,22 @@ function StopCloseUnits() -- stops dune units which are close to transport
 					end
 				end
 				if canStop then 
-					if not IsWaitCommand(unitID) then spGiveOrderToUnit(unitID, CMD.WAIT, {},{}) end 
+					if not IsWaitCommand(unitID) then 
+						spGiveOrderToUnit(unitID, CMD.WAIT, {},{})
+					end 
 					toPick[transportID][2] = ST_STOPPED
 				end
 			end
 		end 
 	end
+end
+
+local function ReturnToPickupLocation(unitDefID)
+	if not options.lingerOnConstructorTransport.value then
+		return false
+	end
+	local ud = unitDefID and UnitDefs[unitDefID]
+	return not (ud and ud.isBuilder)
 end
 
 function widget:UnitLoaded(unitID, unitDefID, teamID, transportID) 
@@ -602,20 +594,22 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 	if lastX then 
 		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {lastX, lastY, lastZ, CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
 		
-		local i = #torev
-		while (i > 0) do 
-			spGiveOrderToUnit(transportID, CMD.MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
-			i = i -1
-		end
+		if toGuard[transportID] or ReturnToPickupLocation(unitDefID) then
+			local i = #torev
+			while (i > 0) do 
+				spGiveOrderToUnit(transportID, CMD.MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
+				i = i -1
+			end
 
-		local x,y,z = spGetUnitPosition(transportID)
-		spGiveOrderToUnit(transportID, CMD.MOVE, {x,y,z}, {"shift"})
-		
-		--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
-		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"})
+			local x,y,z = spGetUnitPosition(transportID)
+			spGiveOrderToUnit(transportID, CMD.MOVE, {x,y,z}, {"shift"})
+			
+			--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
+			spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"})
 
-		if toGuard[transportID] then
-			spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, {"shift"})
+			if toGuard[transportID] then
+				spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, {"shift"})
+			end
 		end
 	end
 end
@@ -689,7 +683,7 @@ local function GetTransportBenefit(unitID, pathLength, transporter, transDef, un
 	end
 end
 
-function AssignTransports(transportID, unitID, guardID, ignoreIdle) 
+function AssignTransports(transportID, unitID, guardID, guardOnly) 
 	local best = {}
 	--spEcho ("assigning " .. transportID .. " " ..unitID)
 	if (transportID~=0) then
@@ -727,7 +721,7 @@ function AssignTransports(transportID, unitID, guardID, ignoreIdle)
 		local priorityState = (waitingUnits[unitID][1] == ST_PRIORITY)
 		local pathLength = GetPathLength(unitID)
 		
-		if not ignoreIdle then
+		if not guardOnly then
 			for id, def in pairs(idleTransports) do 
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
 					local benefit = GetTransportBenefit(unitID, pathLength, id, def, unitspeed, unitmass, priorityState)

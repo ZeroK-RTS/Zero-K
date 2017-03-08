@@ -82,19 +82,7 @@ local transDefs = {
   [ UnitDefNames['corbtrans'].id ] = true,
 }
 
-local factDefs = {
-  [ UnitDefNames['factorycloak'].id ] = true,
-  [ UnitDefNames['factoryshield'].id ] = true,
-  [ UnitDefNames['factoryspider'].id ] = true,
-  [ UnitDefNames['factoryjump'].id ] = true,
-  [ UnitDefNames['factoryhover'].id ] = true,
-  [ UnitDefNames['factoryveh'].id ] = true,
-  [ UnitDefNames['factorytank'].id ] = true,
-  [ UnitDefNames['factoryamph'].id ] = true,
-}
-
 local hasTransports = {}
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -134,12 +122,12 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID)
   if (hasTransports[teamID]) then 
-    if (IsTransportable(unitDefID) or factDefs[unitDefID]) then AddCmdDesc(unitID) end
+    if IsTransportable(unitDefID)  then AddCmdDesc(unitID) end
   elseif (transDefs[unitDefID]) then
     hasTransports[teamID] = true
     for _, id in pairs(GetTeamUnits(teamID)) do
       local def = GetUnitDefID(id)
-      if (IsTransportable(def) or factDefs[def]) then AddCmdDesc(id) end
+      if IsTransportable(def) then AddCmdDesc(id) end
     end
   end
 end
@@ -159,7 +147,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID, attackerID, attackerDef
 			hasTransports[teamID] = false
 			for _, id in pairs(teamUnit) do
 				local def = GetUnitDefID(id)
-				if (IsTransportable(def) or factDefs[def]) then RemoveCmdDesc(id) end
+				if IsTransportable(def) then RemoveCmdDesc(id) end
 			end
 		end
 	end

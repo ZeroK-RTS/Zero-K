@@ -29,13 +29,15 @@ options_order = {
 	'skirmHoldPosition', 'artyHoldPosition', 'aaHoldPosition', 
 	'enableTacticalAI', 'disableTacticalAI',
 	'enableAutoAssist', 'disableAutoAssist', 
+	'enableAutoCallTransport', 'disableAutoCallTransport',
 	'categorieslabel', 
 	'commander_label', 
 	'commander_firestate0', 
 	'commander_movestate1', 
 	'commander_constructor_buildpriority', 
 	'commander_misc_priority', 
-	'commander_retreat'
+	'commander_retreat',
+	'commander_auto_call_transport',
 }
 
 options = {
@@ -221,6 +223,51 @@ options = {
 		noHotkey = true,
 	},
 	
+	enableAutoCallTransport = {
+		type='button',
+		name= "Enable Auto Call Transport",
+		desc = "Enables auto call transport for all factories, sets constructors to inherit.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_auto_call_transport")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					if options[opt].min == 0 then
+						options[opt].value = 1
+					else
+						options[opt].value = -1
+					end
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	disableAutoCallTransport = {
+		type='button',
+		name= "Disable Auto Call Transport",
+		desc = "Disables auto call transport for all factories, sets constructors to inherit.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_auto_call_transport")
+				local name = find and string.sub(opt,0,find-1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					if options[opt].min == 0 then
+						options[opt].value = 0
+					else
+						options[opt].value = -1
+					end
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	
 	commander_label = {
 		name = "label",
 		type = 'label',
@@ -273,12 +320,23 @@ options = {
 	},
 
 	commander_retreat = {
-		name = "  Retreat at value",
+		name = "  Retreat At Value",
 		desc = "Values: no retreat, 30%, 65%, 99% health remaining",
 		type = 'number',
 		value = 0,
 		min = 0,
 		max = 3,
+		step = 1,
+		path = "Game/New Unit States/Misc",
+	},
+	
+	commander_auto_call_transport = {
+		name = "  Auto Call Transport",
+		desc = "Values: Disabled, Enabled",
+		type = 'number',
+		value = 0,
+		min = 0,
+		max = 1,
 		step = 1,
 		path = "Game/New Unit States/Misc",
 	},
@@ -475,7 +533,33 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_misc_priority"
 	end
-
+	
+	if ud.isBuilder and (not (ud.isBuilding or ud.isFactory or ud.speed == 0)) and (not (ud.canFly or ud.isAirUnit)) and not ud.cantBeTransported then
+		options[defName .. "_auto_call_transport"] = {
+			name = "  Auto Call Transport",
+			desc = "Values: Inherit, Disabled, Enabled",
+			type = 'number',
+			value = -1,
+			min = -1,
+			max = 1,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_auto_call_transport"
+	elseif ud.isFactory and not ud.customParams.nongroundfac then
+		options[defName .. "_auto_call_transport"] = {
+			name = "  Auto Call Transport",
+			desc = "Values: Disabled, Enabled",
+			type = 'number',
+			value = 1,
+			min = 0,
+			max = 1,
+			step = 1,
+			path = path,
+		}
+		options_order[#options_order+1] = defName .. "_auto_call_transport"
+	end
+	
 	if (ud.canMove or ud.isFactory) then
 		options[defName .. "_retreatpercent"] = {
 			name = "  Retreat at value",
@@ -619,6 +703,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"}}
 		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
+		if options.commander_auto_call_transport.value == 1 then
+			orderArray[3] = {CMD_AUTO_CALL_TRANSPORT, {options.commander_auto_call_transport.value}, {"shift"}}
+		end
 		if WG['retreat'] then
 			WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value)
 		end
@@ -723,15 +810,31 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 				orderArray[#orderArray + 1] = {CMD_MISC_PRIORITY, {options[name .. "_misc_priority"].value}, {"shift"}}
 			end
 		end
-
+		
+		if options[name .. "_auto_call_transport"] and options[name .. "_auto_call_transport"].value then
+			if options[name .. "_auto_call_transport"].value == -1 then
+				if builderID then
+					local autoCallTransport = WG.GetAutoCallTransportState and WG.GetAutoCallTransportState(builderID)
+					Spring.Echo("autoCallTransport state", autoCallTransport)
+					if autoCallTransport then
+						orderArray[#orderArray + 1] = {CMD_AUTO_CALL_TRANSPORT, {1}, {"shift"}}
+					end
+				end
+			else
+				if options[name .. "_auto_call_transport"].value == 1 then
+					orderArray[#orderArray + 1] = {CMD_AUTO_CALL_TRANSPORT, {1}, {"shift"}}
+				end
+			end
+		end
+		
 		if options[name .. "_tactical_ai_2"] and options[name .. "_tactical_ai_2"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"}}
 		end
-
+		
 		if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_DONT_FIRE_AT_RADAR, {options[name .. "_fire_at_radar"].value and 0 or 1}, {"shift"}}
 		end
-
+		
 		if options[name .. "_personal_cloak_0"] and options[name .. "_personal_cloak_0"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_WANT_CLOAK, {options[name .. "_personal_cloak_0"].value and 1 or 0}, {"shift"}}
 		end
