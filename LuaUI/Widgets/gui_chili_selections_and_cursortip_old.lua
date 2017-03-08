@@ -494,7 +494,7 @@ options = {
 		path = selPath,
 	},
 	groupbehaviour = {name='Unit Grouping Behaviour', type='radioButton', 
-		value=overflow, 
+		value='overflow', 
 		items = {
 			{key = 'overflow',	name = 'On window overflow'},
 			{key = 'multitype',	name = 'With multiple unit types'},
