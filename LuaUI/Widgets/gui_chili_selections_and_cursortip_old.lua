@@ -1150,10 +1150,11 @@ local function MakeUnitGroupSelectionToolTip()
 	multiSelect.indexByUnitID = {}
 	multiSelect.healthbarByDefID = {}
 
+
 	if NoNeedForGrouping() then
 		local unitid,defid,unitids
 		for defIndex=1, #selectionSortOrder do
-			defid = selectionSortOrder[defIndex]
+			defid = selectionSortOrder[defIndex][2]
 			unitids = selectedUnitsByDef[defid]
 			for i=1,#unitids do
 				unitid = unitids[i]
@@ -1172,7 +1173,7 @@ local function MakeUnitGroupSelectionToolTip()
 		local defid,unitids,counts
 		maxPicFit = math.min(#selectionSortOrder,maxPicFit)
 		while index <= maxPicFit do
-			defid   = selectionSortOrder[index]
+			defid   = selectionSortOrder[index][2]
 			unitids = selectedUnitsByDef[defid]
 			counts  = selectedUnitsByDefCounts[defid]
 			AddSelectionIcon(index,nil,defid,unitids,counts)
@@ -2941,6 +2942,7 @@ end
 --function widget:CommandsChanged()
 --end
 --
+
 function widget:SelectionChanged(newSelection)
 	selectedUnits = {}
 	numSelectedUnits = 0
@@ -2978,12 +2980,12 @@ function widget:SelectionChanged(newSelection)
 			defid = selectedUnits[i][2]
 			if (not alreadyInList[defid]) then
 				alreadyInList[defid] = true
-				selectionSortOrder[count] = defid
+				selectionSortOrder[count] = {UnitDefs[defid].name, defid}
 				count = count + 1
 			end
 		end
 
-		table.sort(selectionSortOrder)
+		table.sort(selectionSortOrder, function(a,b) return a[1] < b[1] end)
 
 		if (numSelectedUnits == 1) then
 			local tt_table = tooltipBreakdown( spGetCurrentTooltip() )
