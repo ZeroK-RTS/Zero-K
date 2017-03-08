@@ -703,8 +703,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"}}
 		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
-		if options.commander_auto_call_transport.value == 1 then
-			orderArray[3] = {CMD_AUTO_CALL_TRANSPORT, {options.commander_auto_call_transport.value}, {"shift"}}
+		if WG.SetAutoCallTransportState and options.commander_auto_call_transport.value == 1 then
+			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
 		if WG['retreat'] then
 			WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value)
@@ -811,18 +811,17 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 		end
 		
-		if options[name .. "_auto_call_transport"] and options[name .. "_auto_call_transport"].value then
+		if options[name .. "_auto_call_transport"] and options[name .. "_auto_call_transport"].value and WG.SetAutoCallTransportState then
 			if options[name .. "_auto_call_transport"].value == -1 then
 				if builderID then
 					local autoCallTransport = WG.GetAutoCallTransportState and WG.GetAutoCallTransportState(builderID)
-					Spring.Echo("autoCallTransport state", autoCallTransport)
 					if autoCallTransport then
-						orderArray[#orderArray + 1] = {CMD_AUTO_CALL_TRANSPORT, {1}, {"shift"}}
+						WG.SetAutoCallTransportState(unitID, unitDefID, true)
 					end
 				end
 			else
 				if options[name .. "_auto_call_transport"].value == 1 then
-					orderArray[#orderArray + 1] = {CMD_AUTO_CALL_TRANSPORT, {1}, {"shift"}}
+					WG.SetAutoCallTransportState(unitID, unitDefID, true)
 				end
 			end
 		end

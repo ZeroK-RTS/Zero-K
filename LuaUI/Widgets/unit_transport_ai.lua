@@ -264,6 +264,12 @@ local function GetAutoCallTransportState(unitID)
 	return autoCallTransportUnits[unitID]
 end
 
+local function SetAutoCallTransportState(unitID, unitDefID, newState)
+	if autoCallTransportDef[unitDefID] then
+		autoCallTransportUnits[unitID] = newState
+	end
+end
+
 function widget:Initialize()
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
 	 if spec then
@@ -271,6 +277,7 @@ function widget:Initialize()
 		return false
 	end
 	WG.GetAutoCallTransportState = GetAutoCallTransportState
+	WG.SetAutoCallTransportState = SetAutoCallTransportState
 	
 	myTeamID = teamID
 	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
@@ -409,16 +416,14 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 	end 
 end
 
-function widget:CommandNotify(id, params, options) 
-	if id == CMD_AUTO_CALL_TRANSPORT then
+function widget:CommandNotify(id, params, options)
+	if id == CMD_AUTO_CALL_TRANSPORT then 
 		local selectedUnits = Spring.GetSelectedUnits()
 		local newState = (params[1] == 1)
 		for i = 1, #selectedUnits do
 			local unitID = selectedUnits[i]
 			local unitDefID = Spring.GetUnitDefID(unitID)
-			if autoCallTransportDef[unitDefID] then
-				autoCallTransportUnits[unitID] = newState
-			end
+			SetAutoCallTransportState(unitID, unitDefID, newState)
 		end
 		return true
 	end
