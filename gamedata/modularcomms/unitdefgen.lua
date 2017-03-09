@@ -278,10 +278,11 @@ local function ProcessComm(name, config)
 		
 		-- set costs
 		config.cost = config.cost or 0
-		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
-		--a bit of hack
-		commDefs[name].buildcostenergy = commDefs[name].buildcostmetal
-		commDefs[name].buildtime = commDefs[name].buildcostmetal
+		-- a bit less of a hack
+		local commDefsCost = math.max(commDefs[name].buildcostmetal or 0, commDefs[name].buildcostenergy or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
+		commDefs[name].buildcostmetal = commDefsCost + config.cost
+		commDefs[name].buildcostenergy = commDefsCost + config.cost
+		commDefs[name].buildtime = commDefsCost + config.cost
 		cp.cost = config.cost
 		
 		if config.power then
