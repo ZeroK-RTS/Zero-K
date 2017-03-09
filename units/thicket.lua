@@ -45,6 +45,7 @@ unitDef = {
 
     DEAD = {
       description      = [[Embedded Thicket]],
+      blocking         = true,
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[Tyranid2.s3o]],

@@ -61,6 +61,7 @@ unitDef = {
   featureDefs      = {
 
     DEAD  = {
+      blocking         = false,
       featureDead      = [[HEAP]],
       footprintX       = 8,
       footprintZ       = 7,
@@ -69,6 +70,7 @@ unitDef = {
 
 
     HEAP  = {
+      blocking         = false,
       footprintX       = 8,
       footprintZ       = 7,
       object           = [[debris4x4c.s3o]],
