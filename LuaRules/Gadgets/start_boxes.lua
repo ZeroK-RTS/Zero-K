@@ -16,6 +16,19 @@ local private_seed, startboxConfig
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
+local pwFactions = {
+	-- current factions
+	Hegemony = "Synthetic Hegemony",
+	Rising = "Humanity Rising",
+
+	-- legacy 5-way factions
+	Dynasty = "Dynasty of Man",
+	Liberty = "Liberated Humanity",
+	Machines = "Free Machines",
+	Empire = "Empire Reborn",
+	Cybernetic = "Cybernetic Front",
+}
+
 local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
 	if shuffleMode == "auto" then
 		if GetTeamCount() > 2 then
@@ -86,6 +99,24 @@ end
 local function GetTeamNames (allyTeamID)
 	if allyTeamID == gaiaAllyTeamID then
 		return "Neutral", "Neutral" -- more descriptive than "Gaia"
+	end
+
+	local pwPlanet = Spring.GetModOptions().planet
+	if pwPlanet then
+		if allyTeamID == 0 then -- attacker is always 0, and always present
+			local shortName = Spring.GetModOptions().attackingfaction
+			local longName = pwFactions[shortName]
+			return longName, shortName
+		else
+			local defenderShortName = Spring.GetModOptions().defendingfaction
+			if not defenderShortName then -- attacking a neutral planet
+				local longName = pwPlanet .. " Militia"
+				return longName, "Militia"
+			else
+				local longName = pwFactions[defenderShortName]
+				return longName, defenderShortName
+			end
+		end
 	end
 
 	local teamList = Spring.GetTeamList(allyTeamID) or {}
