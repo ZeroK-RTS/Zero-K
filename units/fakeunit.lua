@@ -25,6 +25,7 @@ unitDef = {
   idleAutoHeal                  = 10,
   idleTime                      = 300,
   kamikazeDistance              = 64,
+  levelGround                   = false,
   maxDamage                     = 100000,
   maxSlope                      = 255,
   maxVelocity                   = 0,

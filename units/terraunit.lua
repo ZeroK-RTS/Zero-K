@@ -31,6 +31,7 @@ unitDef = {
   kamikaze               = true,
   kamikazeDistance       = 0,
   kamikazeUseLOS         = true,
+  levelGround            = false,
   maxDamage              = 1000000,
   maxSlope               = 255,
   maxVelocity            = 0,

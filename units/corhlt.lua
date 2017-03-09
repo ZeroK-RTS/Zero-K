@@ -35,6 +35,7 @@ unitDef = {
   iconType                      = [[defenseheavy]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
+  levelGround                   = false,
   losEmitHeight                 = 80,
   maxDamage                     = 2475,
   maxSlope                      = 36,

@@ -37,6 +37,7 @@ unitDef = {
   iconType                      = [[energywind]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
+  levelGround                   = false,
   losEmitHeight                 = 30,
   maxDamage                     = 130,
   maxSlope                      = 75,

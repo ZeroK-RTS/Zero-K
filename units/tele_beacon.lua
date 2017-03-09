@@ -19,6 +19,7 @@ unitDef = {
   explodeAs                     = [[TINY_BUILDINGEX]],
   footprintX                    = 2,
   footprintZ                    = 2,
+  levelGround                   = false,
   iconType                      = [[statictransport]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,

@@ -35,6 +35,7 @@ unitDef = {
   iconType                      = [[defenseskirm]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
+  levelGround                   = false,
   losEmitHeight                 = 40,
   maxDamage                     = 300,
   maxSlope                      = 36,

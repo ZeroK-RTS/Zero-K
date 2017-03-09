@@ -32,6 +32,7 @@ unitDef = {
   footprintX                    = 3,
   footprintZ                    = 3,
   iconType                      = [[defenseriot]],
+  levelGround                   = false,
   maxDamage                     = 1500,
   maxSlope                      = 18,
   minCloakDistance              = 150,

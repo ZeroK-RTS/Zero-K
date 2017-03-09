@@ -36,6 +36,7 @@ unitDef = {
   iconType               = [[mex]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
+  levelGround            = false,
   maxDamage              = 400,
   maxSlope               = 255,
   maxVelocity            = 0,

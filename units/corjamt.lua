@@ -25,6 +25,7 @@ unitDef = {
   iconType                      = [[defenseshield]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
+  levelGround                   = false,
   maxDamage                     = 900,
   maxSlope                      = 36,
   maxVelocity                   = 0,

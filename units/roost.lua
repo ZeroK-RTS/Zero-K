@@ -23,6 +23,7 @@ unitDef = {
   iconType          = [[special]],
   idleAutoHeal      = 0,
   idleTime          = 1800,
+  levelGround       = false,
   maxDamage         = 1800,
   maxSlope          = 36,
   maxVelocity       = 0,
