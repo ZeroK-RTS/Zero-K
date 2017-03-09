@@ -291,39 +291,38 @@ Shot1()
 
 Killed(severity, corpsetype)
 {
-	if(severity >= 0 AND severity < 25)
+	if(severity <= 25)
 	{
 		corpsetype = 1;
 		explode barrel type BITMAPONLY | BITMAP;
 		explode sleeve type BITMAPONLY | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
+		return (0);
 	}
-	else if(severity >= 25 AND severity < 50)
+	if(severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode barrel type FALL | BITMAP;
 		explode sleeve type FALL | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
+		return (0);
 	}
-	else if(severity >= 50 AND severity < 100)
+	if(severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
+		return (0);
 	}
-	// D-Gunned/Self-D
-	else if(severity >= 100)
-	{
-		corpsetype = 3;
-		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode body type SHATTER | BITMAP;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-	}
+	corpsetype = 2;
+	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode sleeve type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode body type SHATTER | BITMAP;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 }
 
 Create()
