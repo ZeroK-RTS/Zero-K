@@ -236,9 +236,9 @@ end
 --
 local BP2RES = 0.03
 local BP2TERRASPEED = 60 --used to be 60 in most of the cases
-local SEISMICSIG = 4 --used to be 4 in most of the cases
+--local SEISMICSIG = 4 --used to be 4 in most of the cases
 for name, ud in pairs (UnitDefs) do
-        local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
+		local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
 
 		--setting uniform buildTime, M/E cost
 		if not ud.buildcostenergy then ud.buildcostenergy = cost end
@@ -265,19 +265,23 @@ for name, ud in pairs (UnitDefs) do
 			end
 		end
 
-        --setting standard seismicSignature
+		--setting standard seismicSignature
+		--[[
 		if ud.floater or ud.canhover or ud.canfly then
 			if not ud.seismicsignature then ud.seismicsignature = 0 end
-        else
+		else
 			if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
-        end
+		end
+		]]--
 
-        --setting levelGround
+		--setting levelGround
+		--[[
 		if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then --looks like a building
 			if ud.levelGround == nil then
 				ud.levelGround = false -- or true
 			end
-        end
+		end
+		]]--
 end
 
 --------------------------------------------------------------------------------
@@ -299,13 +303,13 @@ end
 -- 
 
 for name, ud in pairs(UnitDefs) do
-    if (ud.canfly) then
+	if (ud.canfly) then
 		ud.usesmoothmesh = false
 		if not ud.maxfuel then
 			ud.maxfuel = 1000000
 			ud.refueltime = ud.refueltime or 1
 		end
-    end
+	end
 end 
 
 --------------------------------------------------------------------------------

@@ -128,11 +128,9 @@ local function ProcessUnitDef(udName, ud)
       if fd.featuredead then -- it's a DEAD feature
         if not fd.metal then fd.metal = ud.buildcostmetal * DEAD_MULT end
         if not fd.description then fd.description = "Wreckage - "..ud.name end
-        if not fd.blocking then fd.blocking = true end
       else --it's a HEAP feature
         if not fd.metal then fd.metal = ud.buildcostmetal * HEAP_MULT end
         if not fd.description then fd.description = "Debris - "..ud.name end
-        if not fd.blocking then fd.blocking = false end
       end
 
       fd.customparams = fd.customparams or {}
