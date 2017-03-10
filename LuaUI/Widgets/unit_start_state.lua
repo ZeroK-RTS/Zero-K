@@ -585,6 +585,18 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_tactical_ai_2"
 	end
+	
+	if (ud.transportCapacity >= 1) and ud.canFly then
+		options[defName .. "_tactical_ai_transport"] = {
+			name = "  Transport AI",
+			desc = "Transport AI: check box to have transports ferry units automatically.",
+			type = 'bool',
+			value = ud.metalCost < 200, -- Automatically enabled for light transports.
+			path = path,
+			noHotkey = true,
+		}
+		options_order[#options_order+1] = defName .. "_tactical_ai_transport"
+	end
 
 	if dontFireAtRadarUnits[ud.id] then
 		options[defName .. "_fire_at_radar"] = {
@@ -828,6 +840,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		
 		if options[name .. "_tactical_ai_2"] and options[name .. "_tactical_ai_2"].value ~= nil then
 			orderArray[#orderArray + 1] = {CMD_UNIT_AI, {options[name .. "_tactical_ai_2"].value and 1 or 0}, {"shift"}}
+		end
+		
+		if options[name .. "_tactical_ai_transport"] and options[name .. "_tactical_ai_transport"].value and WG.AddTransport then
+			WG.AddTransport(unitID, unitDefID)
 		end
 		
 		if options[name .. "_fire_at_radar"] and options[name .. "_fire_at_radar"].value ~= nil then

@@ -69,6 +69,15 @@ local autoCallTransportCmdDesc = {
 	pos = {CMD.ONOFF, CMD.REPEAT, CMD.MOVE_STATE, CMD.FIRE_STATE, CMD_RETREAT},
 }
 
+local unitAICmdDesc = {
+	id      = CMD_UNIT_AI,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Unit AI',
+	action  = 'unitai',
+	tooltip	= 'Toggles smart unit AI for the unit',
+	params 	= {0, 'AI Off','AI On'}
+}
+
 options_path = 'Game/Transport AI'
 options = {
 	transportFromFactory = {
@@ -103,10 +112,14 @@ options = {
 
 -- Keep synced with unit_transport_ai_auto_call
 local autoCallTransportDef = {}
+local transportDef = {}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if (Spring.Utilities.getMovetype(ud) == 2 and ud.isBuilder and not ud.cantBeTransported) or (ud.isFactory and not ud.customParams.nongroundfac) then
 		autoCallTransportDef[i] = true
+	end
+	if (ud.transportCapacity >= 1) and ud.canFly then
+		transportDef[i] = true
 	end
 end
 
@@ -200,11 +213,6 @@ local function ProcessCommand(cmdID, params, noUsefuless, noPosition)
 		local x, y, z = Spring.GetUnitPosition(params[1])
 		return true, halting, x, y, z
 	end
-end
-
-function IsTransport(unitDefID) 
-	ud = UnitDefs[unitDefID]
-	return (ud ~= nil and (ud.transportCapacity >= 1) and ud.canFly)
 end
 
 function IsTransportable(unitDefID, unitID)	
@@ -302,27 +310,6 @@ local function SetAutoCallTransportState(unitID, unitDefID, newState)
 	end
 end
 
-function widget:Initialize()
-	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
-	 if spec then
-		widgetHandler:RemoveWidget(widget)
-		return false
-	end
-	WG.GetAutoCallTransportState = GetAutoCallTransportState
-	WG.SetAutoCallTransportState = SetAutoCallTransportState
-	
-	myTeamID = teamID
-	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
-
-	local units = spGetTeamUnits(teamID)
-	for i = 1, #units do	-- init existing transports
-		local unitID = units[i]
-		widget:UnitCreated(unitID, spGetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
-		if AddTransport(unitID, spGetUnitDefID(unitID)) then
-			AssignTransports(unitID, 0)
-		end
-	end
-end
 
 function widget:Shutdown()
 	WG.GetAutoCallTransportState = nil
@@ -331,58 +318,75 @@ end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 	if teamID == myTeamID then 
-		if AddTransport(unitID, unitDefID) then
-			 AssignTransports(unitID, 0)
+		if AddTransportToIdle(unitID, unitDefID) then
+			AssignTransports(unitID, 0)
 		end
 	end
 end
 
-function widget:UnitCreated(unitID, unitDefID, teamID)
-	if teamID == myTeamID and IsTransport(unitDefID) then
-		allTransports[unitID] = unitDefID
+function RemoveUnit(unitID, unitDefID)
+	--spEcho("unit destroyed " ..unitID)
+	idleTransports[unitID] = nil
+	priorityUnits[unitID] = nil
+	waitingUnits[unitID] = nil
+	local tuid = GetToPickUnit(unitID)
+	if (tuid ~= 0) then -- transport which was about to pick something was destroyed
+		local state = toPick[unitID][2]
+		local fact = toPick[unitID][3]
+		if (state == ST_PRIORITY) then
+			waitingUnits[tuid] = {ST_PRIORITY, spGetUnitDefID(tuid)}
+		else 
+			waitingUnits[tuid] = {ST_ROUTE, spGetUnitDefID(tuid), fact}
+			if (state == ST_STOPPED) then 
+				spGiveOrderToUnit(tuid, CMD.WAIT, {}, {})
+			end
+		end
+		DeleteToPickTran(unitID)
+		AssignTransports(0, tuid)
+	else -- unit which was about to be picked was destroyed
+		local pom = GetToPickTransport(unitID)
+		if (pom~=0) then 
+			DeleteToPickUnit(unitID)
+			spGiveOrderToUnit(pom, CMD.STOP, {}, {})
+			
+			if toGuard[pom] then
+				spGiveOrderToUnit(pom, CMD.GUARD, {toGuard[pom]}, {})
+			end
+		end	-- delete form toPick list
 	end
 end
 
-function RemoveUnit(unitID, unitDefID, teamID)
-	if teamID == myTeamID then 
-		--spEcho("unit destroyed " ..unitID)
-		idleTransports[unitID] = nil
-		priorityUnits[unitID] = nil
-		waitingUnits[unitID] = nil
-		 local tuid = GetToPickUnit(unitID)
-		 if (tuid ~= 0) then -- transport which was about to pick something was destroyed
-			local state = toPick[unitID][2]
-			local fact = toPick[unitID][3]
-			if (state == ST_PRIORITY) then
-				waitingUnits[tuid] = {ST_PRIORITY, spGetUnitDefID(tuid)}
-			else 
-				waitingUnits[tuid] = {ST_ROUTE, spGetUnitDefID(tuid), fact}
-				if (state == ST_STOPPED) then 
-					spGiveOrderToUnit(tuid, CMD.WAIT, {}, {})
-				end
-			end
-			DeleteToPickTran(unitID)
-			AssignTransports(0, tuid)
-		else	-- unit which was about to be picked was destroyed
-			local pom = GetToPickTransport(unitID)
-			if (pom~=0) then 
-				DeleteToPickUnit(unitID)
-				spGiveOrderToUnit(pom, CMD.STOP, {}, {})
-				
-				if toGuard[pom] then
-					spGiveOrderToUnit(pom, CMD.GUARD, {toGuard[pom]}, {})
-				end
-			end	-- delete form toPick list
+function AddTransportToIdle(unitID, unitDefID) 
+	if allTransports[unitID] then
+		idleTransports[unitID] = unitDefID
+		--spEcho ("transport added " .. unitID)
+		return true
+	end
+	return false
+end 
+
+local function RemoveTransport(unitID, unitDefID)
+	if allTransports[unitID] then
+		allTransports[unitID] = nil
+		toGuard[unitID] = nil
+		autoCallTransportUnits[unitID] = false
+		RemoveUnit(unitID, unitDefID)
+	end
+end
+
+local function AddTransport(unitID, unitDefID)
+	if transportDef[unitDefID] then
+		allTransports[unitID] = unitDefID
+		local queueCount = Spring.GetCommandQueue(unitID, 0)
+		if queueCount == 0 then
+			AddTransportToIdle(unitID, unitDefID) 
 		end
 	end
 end
 
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if teamID == myTeamID then 
-		allTransports[unitID] = nil
-		toGuard[unitID] = nil
-		autoCallTransportUnits[unitID] = false
-		RemoveUnit(unitID, unitDefID, teamID)
+		RemoveTransport(unitID, unitDefID)
 	end
 end
 
@@ -390,14 +394,6 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitDestroyed(unitID, unitDefID, teamID)
 end
 
-function AddTransport(unitID, unitDefID) 
-	if (IsTransport(unitDefID)) then -- and IsIdle(unitID)
-		idleTransports[unitID] = unitDefID
-		--spEcho ("transport added " .. unitID)
-		return true
-	end
-	return false
-end 
 
 function widget:UnitIdle(unitID, unitDefID, teamID) 
 	if (teamID ~= myTeamID) or (WG.FerryUnits and WG.FerryUnits[unitID]) then 
@@ -407,7 +403,7 @@ function widget:UnitIdle(unitID, unitDefID, teamID)
 		hackIdle[unitID] = nil
 		return
 	end
-	if (AddTransport(unitID, unitDefID)) then
+	if (AddTransportToIdle(unitID, unitDefID)) then
 		AssignTransports(unitID, 0)
 	else
 		if (IsTransportable(unitDefID, unitID)) then
@@ -460,6 +456,23 @@ function widget:CommandNotify(id, params, options)
 		return true
 	end
 	
+	if id == CMD_UNIT_AI then 
+		local selectedUnits = Spring.GetSelectedUnits()
+		local newState = (params[1] == 1)
+		for i = 1, #selectedUnits do
+			local unitID = selectedUnits[i]
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if transportDef[unitDefID] then
+				if newState then
+					AddTransport(unitID, unitDefID)
+				else
+					RemoveTransport(unitID, unitDefID)
+				end
+			end
+		end
+		return true
+	end
+	
 	if ignoredCommand[id] then
 		return false
 	end
@@ -470,7 +483,7 @@ function widget:CommandNotify(id, params, options)
 		sel = spGetSelectedUnits()
 		for i = 1, #sel do
 			local uid = sel[i]
-			RemoveUnit(uid, spGetUnitDefID(uid), myTeamID)
+			RemoveUnit(uid, spGetUnitDefID(uid))
 		end
 	end
 
@@ -496,8 +509,9 @@ end
 
 function widget:CommandsChanged()
 	local units = Spring.GetSelectedUnitsSorted()
+	local searchCall, searchTransport = true, true
 	for unitDefID, units in pairs(units) do
-		if autoCallTransportDef[unitDefID] then
+		if searchCall and autoCallTransportDef[unitDefID] then
 			local customCommands = widgetHandler.customCommands
 			local order = 0
 			if autoCallTransportUnits[units[1]] then
@@ -505,7 +519,18 @@ function widget:CommandsChanged()
 			end
 			autoCallTransportCmdDesc.params[1] = order
 			table.insert(customCommands, autoCallTransportCmdDesc)
-			break
+			searchCall = false
+		end
+		
+		if searchTransport and transportDef[unitDefID] then
+			local customCommands = widgetHandler.customCommands
+			local order = 0
+			if allTransports[units[1]] then
+				order = 1
+			end
+			unitAICmdDesc.params[1] = order
+			table.insert(customCommands, unitAICmdDesc)
+			searchTransport = false
 		end
 	end
 end
@@ -560,6 +585,27 @@ function StopCloseUnits() -- stops dune units which are close to transport
 				end
 			end
 		end 
+	end
+end
+function widget:Initialize()
+	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
+	 if spec then
+		widgetHandler:RemoveWidget(widget)
+		return false
+	end
+	WG.GetAutoCallTransportState = GetAutoCallTransportState
+	WG.SetAutoCallTransportState = SetAutoCallTransportState
+	WG.AddTransport = AddTransport
+	
+	myTeamID = teamID
+	widgetHandler:RegisterGlobal(widget, 'taiEmbark', taiEmbark)
+
+	local units = spGetTeamUnits(teamID)
+	for i = 1, #units do	-- init existing transports
+		local unitID = units[i]
+		if AddTransportToIdle(unitID, spGetUnitDefID(unitID)) then
+			AssignTransports(unitID, 0)
+		end
 	end
 end
 
@@ -944,7 +990,7 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 	end
 	
 	if (not shift) then
-		RemoveUnit(unitID, spGetUnitDefID(unitID), myTeamID) --remove existing command ASAP
+		RemoveUnit(unitID, spGetUnitDefID(unitID)) --remove existing command ASAP
 	end
 	
 	if not internal then
