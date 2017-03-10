@@ -34,6 +34,7 @@ local toPick = {} -- list of units waiting to be picked - key = transportID, val
 local toPickRev = {} -- list of units waiting to be picked - key = unitID, value=transportID
 local storedQueue = {} -- unit keyed stored queues
 local hackIdle ={} -- temp field to overcome unitIdle problem
+local areaTarget = {} -- indexed by ID, used to match area command targets
 
 local ST_ROUTE = 1 -- unit is enroute from factory
 local ST_PRIORITY = 2 -- unit is in need of priority transport
@@ -188,7 +189,7 @@ local ignoredCommand = {
 	[CMD_PREVENT_OVERKILL] = true,
 }
 
-local function ProcessCommand(cmdID, params, noUsefuless, noPosition)
+local function ProcessCommand(unitID, cmdID, params, noUsefuless, noPosition)
 	if noUsefuless then
 		return false
 	end
@@ -200,17 +201,36 @@ local function ProcessCommand(cmdID, params, noUsefuless, noPosition)
 		return true, halting
 	end
 	
-	if params[3] then
-		return true, halting, params[1], params[2], params[3]
-	elseif not params[1] then
-		return true, halting
+	local targetOverride
+	if #params == 5 and (cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM or cmdID == CMD.REPAIR) then
+		areaTarget[unitID] = {
+			x = params[2],
+			z = params[4],
+			objectID = params[1]
+		}
+	elseif areaTarget[unitID] and #params == 4 then
+		if params[1] == areaTarget[unitID].x and params[3] == areaTarget[unitID].z then
+			targetOverride = areaTarget[unitID].objectID
+		end
+		areaTarget[unitID] = nil
+	elseif areaTarget[unitID] then
+		areaTarget[unitID] = nil
+	end
+	
+	if not targetOverride then
+		if #params == 3 or #params == 4 then
+			Spring.MarkerAddPoint(params[1], params[2], params[3])
+			return true, halting, params[1], params[2], params[3]
+		elseif not params[1] then
+			return true, halting
+		end
 	end
 	
 	if cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM then
-		local x, y, z = Spring.GetFeaturePosition((params[1] or 0) - MAX_UNITS)
+		local x, y, z = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
 		return true, halting, x, y, z
 	else
-		local x, y, z = Spring.GetUnitPosition(params[1])
+		local x, y, z = Spring.GetUnitPosition(targetOverride or params[1])
 		return true, halting, x, y, z
 	end
 end
@@ -500,7 +520,7 @@ end
 
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
 	if autoCallTransportUnits[unitID] then
-		local useful, halting = ProcessCommand(cmdID, params, false, true)
+		local useful, halting = ProcessCommand(unitID, cmdID, params, false, true)
 		if useful and halting then
 			spGiveOrderToUnit(unitID, CMD_EMBARK, {}, {"alt"})
 		end
@@ -641,7 +661,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		local v = queue[k]
 		local alt,ctrl,shift,internal,right = ExtractModifiedOptions(v.options)
 		if not (v.options.internal or internal) then	--not other widget's command
-			local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, ender)
+			local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(unitID, v.id, v.params, ender)
 			if usefulCommand then
 				cnt = cnt +1
 				if cx then 
@@ -888,7 +908,7 @@ function GetPathLength(unitID)
 	if (queue == nil) then return 0 end
 	for k = 1, #queue do
 		local v = queue[k]
-		local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params)
+		local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(unitID, v.id, v.params)
 		if usefulCommand then
 			if cx then 
 				local reachable = true --always assume target reachable
@@ -1003,7 +1023,7 @@ function taiEmbark(unitID, teamID, embark, shift, internal) -- called by gadget
 			local hasMoveCommand
 			for k = 1, #queue do
 				local v = queue[k]
-				local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(v.id, v.params, false, true)
+				local usefulCommand, haltingCommand, cx, cy, cz = ProcessCommand(unitID, v.id, v.params, false, true)
 				if usefulCommand then
 					hasMoveCommand = true
 					break
