@@ -232,6 +232,55 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 	}
 end
 
+local function MakeDropdownButtonsFromWidget(parent, position, tooltip, width, titleImage, widgetName, widgetPath, settingName)
+	
+	local option = WG.GetWidgetOption(widgetName, widgetPath, settingName)
+	if not (option and option.items) then
+		return
+	end
+	local items = {}
+	local keys = {}
+	for i = 1, #option.items do
+		items[i] = option.items[i].name
+		keys[i] = option.items[i].key
+	end
+	
+	Spring.Utilities.TableEcho(option, "option")
+	local overlaySelector = Chili.ComboBox:New{
+		x = (position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y,
+		y = BUTTON_Y,
+		width = BUTTON_SIZE,
+		height = BUTTON_SIZE,
+		selectionOffsetY = 8,
+		itemFontSize = 18,
+		itemHeight = 26,
+		minDropDownWidth = width,
+		ignoreItemCaption = true,
+		classname = "button_tiny",
+		caption = "",
+		margin = {0,0,0,0},
+		padding = {2,2,2,2},
+		tooltip = tooltip,
+		items = items,
+		parent = parent,
+		OnMouseDown = globalMouseDown,
+		OnSelect = {
+			function(obj, index)
+				WG.SetWidgetOption(widgetName, widgetPath, settingName, keys[index])
+			end 
+		},
+	}
+	
+	local currentOverlayImage = Chili.Image:New{
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = overlaySelector,
+		file = titleImage,
+	}
+end
+
 local function MakeDropdownButtons(parent, position, overlays)
 	
 	local overlayPanel = Panel:New{
@@ -339,31 +388,49 @@ local function InitializeControls()
 		{'LuaUI/images/map/blockmap.png', 'viewblockmap', "pathTraversability"}, 
 	}
 	
-	mapOverlay = MakeDropdownButtons(contentHolder, 1, overlayConfig)
+	-- Overlay related buttons
+	local offset = 1
+	
+	mapOverlay = MakeDropdownButtons(contentHolder, offset, overlayConfig)
 	mapOverlay.UpdateOverlayImage()
+	offset = offset + 1
 	
 	-- handled differently because command is registered in another widget
-	MakeCommandButton(contentHolder, 2,
+	MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/map/metalmap.png', 
 		{name = "Toggle Eco Display", action = 'showeco', desc = " (show metal, geo spots and pylon fields)"}
 	)
-	MakeCommandButton(contentHolder, 3,
+	offset = offset + 1
+	
+	MakeDropdownButtonsFromWidget(contentHolder, offset, "Select team colour mode. Options include simple mode and colourblind mode.", 130, 'LuaUI/images/map/minimap_colors_simple.png', "Local Team Colors", "Settings/Interface/Team Colors", "colorSetting")
+	offset = offset + 1
+	
+	MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/drawingcursors/eraser.png', 
 		{option = 'clearmapmarks'} 
 	)
-	MakeCommandButton(contentHolder, 4,
+	offset = offset + 1
+	
+	MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/Crystal_Clear_action_flag.png', 
 		{option = 'lastmsgpos'} 
 	)
+	offset = offset + 1
 	
-	MakeCommandButton(contentHolder, 5.5,
+	-- Global commands
+	offset = offset + 0.5
+	
+	MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/commands/Bold/retreat.png', 
 		{name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}
 	)
-	MakeCommandButton(contentHolder, 6.5,
+	offset = offset + 1
+	
+	MakeCommandButton(contentHolder, offset,
 		'LuaUI/images/commands/Bold/ferry.png', 
 		{name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}
 	)
+	offset = offset + 1
 	
 end	
 

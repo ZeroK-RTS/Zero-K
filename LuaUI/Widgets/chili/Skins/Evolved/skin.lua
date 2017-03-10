@@ -223,7 +223,7 @@ skin.combobox = {
 skin.combobox_window = {
 	clone     = "window";
 	TileImage = ":cl:combobox_wnd.png";
-	tiles     = {10, 10, 10, 10};
+	tiles     = {2, 2, 2, 2};
 	padding   = {4, 3, 3, 4};
 }
 
@@ -239,6 +239,7 @@ skin.combobox_item = {
 	clone       = "button";
 	borderColor = {1, 1, 1, 0};
 }
+
 
 skin.checkbox = {
   TileImageFG = ":cl:checkbox_arrow.png",
