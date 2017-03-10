@@ -31,14 +31,27 @@ local terraIcons = {
 
 local gfRemove = -1
 
+local function UpdateTeamColors()
+	for unitID, info in pairs(terraUnits) do
+		local teamID = Spring.GetUnitTeam(unitID)
+		if teamID then
+			local r, g, b, a = Spring.GetTeamColor(teamID)
+			info.r, info.g, info.b, info.a = r, g, b, a
+		end
+	end
+end
+
 function widget:Initialize()
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		widget:UnitCreated(unitID, unitDefID, teamID)
 	end
+	
+	if WG.LocalColor and WG.LocalColor.RegisterListener then
+		WG.LocalColor.RegisterListener(widget:GetInfo().name, UpdateTeamColors)
+	end
 end
-
 
 function widget:UnitCreated(unitID, unitDefID, teamID)
 	if unitDefID == terraunitDefID then
