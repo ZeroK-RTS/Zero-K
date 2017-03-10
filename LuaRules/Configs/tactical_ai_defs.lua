@@ -202,15 +202,13 @@ local longRangeSkirmieeArray = NameToDefID({
 	"armrock",
 	"slowmort",
 	"amphfloater",
-	"nsclash", -- hover janus
+	"nsaclash", -- hover janus
 	"capturecar",
 	"chickenc",
 	"armbanth",
 	"corllt",
 	"armdeva",
 	"armartic",
-	
-	
 })
 
 local artyRangeSkirmieeArray = NameToDefID({
@@ -256,8 +254,8 @@ shortRangeSkirmieeArray  = Union(shortRangeSkirmieeArray,veryShortRangeSkirmieeA
 riotRangeSkirmieeArray   = Union(riotRangeSkirmieeArray,shortRangeSkirmieeArray)
 lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, riotRangeSkirmieeArray)
 medRangeSkirmieeArray    = Union(medRangeSkirmieeArray, lowMedRangeSkirmieeArray)
-longRangeSkirmieeArray   = Union(longRangeSkirmieeArray,medRangeSkirmieeArray)
-artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray,longRangeSkirmieeArray)
+longRangeSkirmieeArray   = Union(longRangeSkirmieeArray, medRangeSkirmieeArray)
+artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
 
 ---------------------------------------------------------------------------
 -- Explosion avoidance
@@ -298,8 +296,8 @@ end
 veryShortRangeSkirmieeArray = Union(veryShortRangeSkirmieeArray, veryShortRangeExplodables)
 
 local diverSkirmieeArray = Union(shortRangeSkirmieeArray, diverExplodables)
-shortRangeSkirmieeArray     = Union(shortRangeSkirmieeArray, shortRangeExplodables)
-riotRangeSkirmieeArray      = Union(riotRangeSkirmieeArray, shortRangeExplodables)
+shortRangeSkirmieeArray  = Union(shortRangeSkirmieeArray, shortRangeExplodables)
+riotRangeSkirmieeArray   = Union(riotRangeSkirmieeArray, shortRangeExplodables)
 
 lowMedRangeSkirmieeArray = Union(lowMedRangeSkirmieeArray, medRangeExplodables)
 medRangeSkirmieeArray    = Union(medRangeSkirmieeArray, medRangeExplodables)
