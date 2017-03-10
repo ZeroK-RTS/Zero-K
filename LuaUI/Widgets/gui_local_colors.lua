@@ -78,15 +78,13 @@ if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then
 	}
 end
 
-local myColor = colorConfig.default.colors.myColor
-local gaiaColor = colorConfig.default.colors.gaiaColor
-local allyColors = colorConfig.default.colors.allyColors
-local enemyColors = colorConfig.default.colors.enemyColors
+local myColor, gaiaColor, allyColors, enemyColors
 
-local function UpdateColorConfig(self, value)
+local function UpdateColorConfig(self)
 	if not colorConfig[self.value] then
 		return
 	end
+	Spring.Echo("UpdateColorConfig", self.value)
 	myColor = colorConfig[self.value].colors.myColor
 	gaiaColor = colorConfig[self.value].colors.gaiaColor
 	allyColors = colorConfig[self.value].colors.allyColors
@@ -199,7 +197,7 @@ function UpdateColor(doNotNotify)
 end
 
 function widget:Initialize()
-	UpdateColor()
+	UpdateColorConfig(options.colorSetting)
 end
 
 local oldTeamID = Spring.GetMyTeamID()

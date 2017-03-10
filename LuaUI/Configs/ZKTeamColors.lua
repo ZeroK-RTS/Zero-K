@@ -12,7 +12,7 @@ local colors = {
 	
 	allyColors = {
 	  Range({ 020, 105, 255 }),
-	  Range({ 010, 160, 110 }), --{ 010, 100, 040 },
+	  Range({ 010, 100, 040 }),
 	  Range({ 040, 190, 240 }),
 	  Range({ 013, 245, 243 }),
 	  Range({ 130, 255, 210 }),
@@ -84,6 +84,42 @@ local colorsTeal = {
 	},
 }
 
+local colorblind = {
+	myColor		= Range({ 120, 255, 255 }),
+	gaiaColor	= Range({ 200, 200, 200 }),
+	
+	allyColors = {
+	  Range({ 020, 105, 255 }),
+	  Range({ 090, 040, 255 }),
+	  Range({ 120, 120, 255 }),
+	  Range({ 030, 120, 255 }),
+	  Range({ 120, 020, 255 }),
+	  Range({ 030, 040, 255 }),
+	  Range({ 130, 050, 255 }),
+	  Range({ 040, 090, 230 }),
+	  Range({ 170, 110, 255 }),
+	},
+
+	enemyColors = {
+	  Range({ 255, 145, 030 }),
+	  Range({ 200, 030, 075 }),
+	  Range({ 255, 255, 040 }),
+	  Range({ 240, 040, 150 }),
+	  Range({ 230, 150, 170 }),
+	  Range({ 255, 065, 065 }),
+	  Range({ 200, 130, 110 }),
+	  Range({ 225, 220, 140 }),
+	  Range({ 255, 180, 050 }),
+	  Range({ 255, 120, 220 }),
+	  Range({ 180, 100, 100 }),
+	  Range({ 160, 090, 015 }),
+	  Range({ 170, 020, 100 }),
+	  Range({ 125, 100, 020 }),
+	  Range({ 170, 040, 040 }),
+	  Range({ 125, 015, 060 }),
+	},
+}
+
 local simpleColors = {
 	myColor = colors.myColor,
 	gaiaColor = colors.gaiaColor,
@@ -91,11 +127,11 @@ local simpleColors = {
 	enemyColors = {colors.enemyColors[1]},
 }
 
-local simpleColorsTeal = {
-	myColor = colorsTeal.myColor,
-	gaiaColor = colorsTeal.gaiaColor,
-	allyColors = {colorsTeal.allyColors[1]},
-	enemyColors = {colorsTeal.enemyColors[1]},
+local simpleColorblind = {
+	myColor = colorblind.myColor,
+	gaiaColor = colorblind.gaiaColor,
+	allyColors = {colorblind.allyColors[1]},
+	enemyColors = {colorblind.enemyColors[1]},
 }
 
 -- If order is non-sequential then things break.
@@ -115,14 +151,20 @@ local colorConfigs = {
 	defaultTeal = {
 		order = 3,
 		name = "Self Teal",
-		desc = "Allies are blue-ish, enemies are red-ish, self is teal.",
+		desc = "Allies are blue/green-ish, enemies are red/yellow-ish, self is teal.",
 		colors = colorsTeal
 	},
-	simpleTeal = {
+	colorblind = {
 		order = 4,
-		name = "Simple Teal",
-		desc = "Simple colors with self as teal.",
-		colors = simpleColorsTeal
+		name = "Colorblind",
+		desc = "Allies are blue-ish, enemies are red-ish, self is teal.",
+		colors = colorblind
+	},
+	simpleColorblind = {
+		order = 5,
+		name = "Simple Colorblind",
+		desc = "Enemies are red, allies are blue, self is teal.",
+		colors = simpleColorblind
 	},
 }
 return colorConfigs
