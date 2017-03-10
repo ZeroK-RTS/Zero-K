@@ -55,7 +55,7 @@ local function FixRanges(colors)
 	return colors
 end
 
-local colorConfig = VFS.Include("LuaUI/Configs/ZKTeamColors.lua")
+local colorConfig = VFS.Include("LuaUI/Configs/TeamColorConfig.lua")
 local colorSettingsItems = {}
 for key, value in pairs(colorConfig) do
 	colorSettingsItems[value.order] = {
