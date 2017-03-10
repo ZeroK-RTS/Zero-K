@@ -88,6 +88,24 @@ local function GetTeamNames (allyTeamID)
 		return "Neutral", "Neutral" -- more descriptive than "Gaia"
 	end
 
+	local pwPlanet = Spring.GetModOptions().planet
+	if pwPlanet then
+		if allyTeamID == 0 then -- attacker is always 0, and always present
+			local shortName = Spring.GetModOptions().attackingfaction
+			local longName = Spring.GetModOptions().attackingfactionname
+			return longName, shortName
+		else
+			local defenderShortName = Spring.GetModOptions().defendingfaction
+			if not defenderShortName then -- attacking a neutral planet
+				local longName = pwPlanet .. " Militia"
+				return longName, "Militia"
+			else
+				local longName = Spring.GetModOptions().defendingfactionname
+				return longName, defenderShortName
+			end
+		end
+	end
+
 	local teamList = Spring.GetTeamList(allyTeamID) or {}
 	if #teamList == 0 then
 		return "Empty", "Empty"
