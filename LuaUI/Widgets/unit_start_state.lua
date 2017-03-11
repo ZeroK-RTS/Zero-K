@@ -37,7 +37,7 @@ options_order = {
 	'commander_constructor_buildpriority', 
 	'commander_misc_priority', 
 	'commander_retreat',
-	'commander_auto_call_transport',
+	'commander_auto_call_transport_2',
 }
 
 options = {
@@ -231,7 +231,7 @@ options = {
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
-				local find = string.find(opt, "_auto_call_transport")
+				local find = string.find(opt, "_auto_call_transport_2")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
 				if ud then
@@ -253,7 +253,7 @@ options = {
 		OnChange = function ()
 			for i = 1, #options_order do
 				local opt = options_order[i]
-				local find = string.find(opt, "_auto_call_transport")
+				local find = string.find(opt, "_auto_call_transport_2")
 				local name = find and string.sub(opt,0,find-1)
 				local ud = name and UnitDefNames[name]
 				if ud then
@@ -330,7 +330,7 @@ options = {
 		path = "Game/New Unit States/Misc",
 	},
 	
-	commander_auto_call_transport = {
+	commander_auto_call_transport_2 = {
 		name = "  Auto Call Transport",
 		desc = "Values: Disabled, Enabled",
 		type = 'number',
@@ -535,7 +535,7 @@ local function addUnit(defName, path)
 	end
 	
 	if ud.isBuilder and (not (ud.isBuilding or ud.isFactory or ud.speed == 0)) and (not (ud.canFly or ud.isAirUnit)) and not ud.cantBeTransported then
-		options[defName .. "_auto_call_transport"] = {
+		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Inherit, Disabled, Enabled",
 			type = 'number',
@@ -545,19 +545,19 @@ local function addUnit(defName, path)
 			step = 1,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_auto_call_transport"
+		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	elseif ud.isFactory and not ud.customParams.nongroundfac then
-		options[defName .. "_auto_call_transport"] = {
+		options[defName .. "_auto_call_transport_2"] = {
 			name = "  Auto Call Transport",
 			desc = "Values: Disabled, Enabled",
 			type = 'number',
-			value = 1,
+			value = 0,
 			min = 0,
 			max = 1,
 			step = 1,
 			path = path,
 		}
-		options_order[#options_order+1] = defName .. "_auto_call_transport"
+		options_order[#options_order+1] = defName .. "_auto_call_transport_2"
 	end
 	
 	if (ud.canMove or ud.isFactory) then
@@ -715,7 +715,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 
 		orderArray[1] = {CMD.FIRE_STATE, {options.commander_firestate0.value}, {"shift"}}
 		orderArray[2] = {CMD.MOVE_STATE, {options.commander_movestate1.value}, {"shift"}}
-		if WG.SetAutoCallTransportState and options.commander_auto_call_transport.value == 1 then
+		if WG.SetAutoCallTransportState and options.commander_auto_call_transport_2.value == 1 then
 			WG.SetAutoCallTransportState(unitID, unitDefID, true)
 		end
 		if WG['retreat'] then
@@ -823,8 +823,8 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 			end
 		end
 		
-		if options[name .. "_auto_call_transport"] and options[name .. "_auto_call_transport"].value and WG.SetAutoCallTransportState then
-			if options[name .. "_auto_call_transport"].value == -1 then
+		if options[name .. "_auto_call_transport_2"] and options[name .. "_auto_call_transport_2"].value and WG.SetAutoCallTransportState then
+			if options[name .. "_auto_call_transport_2"].value == -1 then
 				if builderID then
 					local autoCallTransport = WG.GetAutoCallTransportState and WG.GetAutoCallTransportState(builderID)
 					if autoCallTransport then
@@ -832,7 +832,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					end
 				end
 			else
-				if options[name .. "_auto_call_transport"].value == 1 then
+				if options[name .. "_auto_call_transport_2"].value == 1 then
 					WG.SetAutoCallTransportState(unitID, unitDefID, true)
 				end
 			end
