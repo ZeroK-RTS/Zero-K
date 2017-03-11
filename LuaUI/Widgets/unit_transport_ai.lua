@@ -25,7 +25,8 @@ local CONST_TRANSPORT_STOPDISTANCE = 350 -- how close by has transport be to sto
 local CONST_UNLOAD_RADIUS = 200 -- how big is the radious for unload command for factory transports
 
 local idleTransports = {} -- list of idle transports key = id, value = {defid}
-local allTransports = {} -- list of all transports key = id, value = {defid} 
+local activeTransports = {} -- list of transports with AI enabled
+local allMyTransports = {} -- list of all transports key = id, value = {defid} 
 local waitingUnits = {} -- list of units waiting for traqnsport - key = unitID, {unit state, unitDef, factory}
 local priorityUnits = {} -- lists of priority units waiting for key= unitId, value = state
 local autoCallTransportUnits = {} -- map of units that want to be automatically transported
@@ -219,7 +220,6 @@ local function ProcessCommand(unitID, cmdID, params, noUsefuless, noPosition)
 	
 	if not targetOverride then
 		if #params == 3 or #params == 4 then
-			Spring.MarkerAddPoint(params[1], params[2], params[3])
 			return true, halting, params[1], params[2], params[3]
 		elseif not params[1] then
 			return true, halting
@@ -330,6 +330,11 @@ local function SetAutoCallTransportState(unitID, unitDefID, newState)
 	end
 end
 
+function widget:UnitCreated(unitID, unitDefID, teamID)
+	if teamID == myTeamID and transportDef[unitDefID] then
+		allMyTransports[unitID] = unitDefID
+	end
+end
 
 function widget:Shutdown()
 	WG.GetAutoCallTransportState = nil
@@ -337,11 +342,7 @@ function widget:Shutdown()
 end
 
 function widget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-	if teamID == myTeamID then 
-		if AddTransportToIdle(unitID, unitDefID) then
-			AssignTransports(unitID, 0)
-		end
-	end
+	widget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function RemoveUnit(unitID, unitDefID)
@@ -377,7 +378,7 @@ function RemoveUnit(unitID, unitDefID)
 end
 
 function AddTransportToIdle(unitID, unitDefID) 
-	if allTransports[unitID] then
+	if activeTransports[unitID] then
 		idleTransports[unitID] = unitDefID
 		--spEcho ("transport added " .. unitID)
 		return true
@@ -386,8 +387,8 @@ function AddTransportToIdle(unitID, unitDefID)
 end 
 
 local function RemoveTransport(unitID, unitDefID)
-	if allTransports[unitID] then
-		allTransports[unitID] = nil
+	if activeTransports[unitID] then
+		activeTransports[unitID] = nil
 		toGuard[unitID] = nil
 		autoCallTransportUnits[unitID] = false
 		RemoveUnit(unitID, unitDefID)
@@ -396,7 +397,7 @@ end
 
 local function AddTransport(unitID, unitDefID)
 	if transportDef[unitDefID] then
-		allTransports[unitID] = unitDefID
+		activeTransports[unitID] = unitDefID
 		local queueCount = Spring.GetCommandQueue(unitID, 0)
 		if queueCount == 0 then
 			AddTransportToIdle(unitID, unitDefID) 
@@ -407,6 +408,9 @@ end
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if teamID == myTeamID then 
 		RemoveTransport(unitID, unitDefID)
+	end
+	if allMyTransports[unitID] then
+		allMyTransports[unitID] = nil
 	end
 end
 
@@ -545,7 +549,7 @@ function widget:CommandsChanged()
 		if searchTransport and transportDef[unitDefID] then
 			local customCommands = widgetHandler.customCommands
 			local order = 0
-			if allTransports[units[1]] then
+			if activeTransports[units[1]] then
 				order = 1
 			end
 			unitAICmdDesc.params[1] = order
@@ -623,6 +627,7 @@ function widget:Initialize()
 	local units = spGetTeamUnits(teamID)
 	for i = 1, #units do	-- init existing transports
 		local unitID = units[i]
+		widget:UnitCreated(unitID, spGetUnitDefID(unitID), Spring.GetUnitTeam(unitID))
 		if AddTransportToIdle(unitID, spGetUnitDefID(unitID)) then
 			AssignTransports(unitID, 0)
 		end
@@ -841,7 +846,7 @@ function AssignTransports(transportID, unitID, guardID, guardOnly)
 		end
 		
 		if guardID then
-			for id, def in pairs(allTransports) do 
+			for id, def in pairs(allMyTransports) do
 				if CanTransport(id, unitID) and IsTransportable(unitDefID, unitID) then
 					local queue = spGetCommandQueue(id, 1)
 					if queue and queue[1] and queue[1].id == CMD.GUARD and queue[1].params[1] == guardID then
