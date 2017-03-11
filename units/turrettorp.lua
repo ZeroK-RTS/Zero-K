@@ -6,11 +6,9 @@ unitDef = {
   activateWhenBuilt = true,
   brakeRate         = 0,
 
-  buildCostEnergy   = 120,
   buildCostMetal    = 120,
   builder           = false,
   buildPic          = [[CORTL.png]],
-  buildTime         = 120,
   canAttack         = true,
   canstop           = [[1]],
   category          = [[FLOAT]],
@@ -46,7 +44,6 @@ unitDef = {
   noChaseCategory   = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName        = [[torpedo launcher.s3o]],
   script            = [[turrettorp.lua]],
-  seismicSignature  = 4,
   selfDestructAs    = [[MEDIUM_BUILDINGEX]],
 
   sightDistance     = 610,

@@ -4,7 +4,6 @@ unitDef = {
   description      = [[Produces Hovercraft, Builds at 10 m/s]],
   acceleration     = 0,
   brakeRate        = 0,
-  buildCostEnergy  = 600,
   buildCostMetal   = 600,
   builder          = true,
 
@@ -20,7 +19,6 @@ unitDef = {
   },
 
   buildPic         = [[factoryhover.png]],
-  buildTime        = 600,
   canAttack        = true,
   canMove          = true,
   canPatrol        = true,
@@ -38,7 +36,6 @@ unitDef = {
 	modelradius    = [[60]],
   },
 
-  energyMake       = 0.3,
   energyUse        = 0,
   explodeAs        = [[LARGE_BUILDINGEX]],
   footprintX       = 8,
@@ -50,12 +47,10 @@ unitDef = {
   maxDamage        = 4000,
   maxSlope         = 15,
   maxVelocity      = 0,
-  metalMake        = 0.3,
   minCloakDistance = 150,
   moveState        = 1,
   noAutoFire       = false,
   objectName       = [[ARMFHP.s3o]],
-  seismicSignature = 4,
   selfDestructAs   = [[LARGE_BUILDINGEX]],
   showNanoSpray    = false,
   sightDistance    = 273,

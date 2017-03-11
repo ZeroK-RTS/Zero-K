@@ -5,11 +5,9 @@ unitDef = {
   acceleration      = 0,
   activateWhenBuilt = true,
   brakeRate         = 0,
-  buildCostEnergy   = 340,
   buildCostMetal    = 340,
   builder           = false,
   buildPic          = [[roost.png]],
-  buildTime         = 340,
   category          = [[SINK]],
 
   customParams      = {
@@ -33,7 +31,6 @@ unitDef = {
   minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
-  seismicSignature  = 4,
   selfDestructAs    = [[NOWEAPON]],
 
   sfxtypes          = {

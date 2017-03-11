@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB STUPIDTARGET]],
   objectName          = [[chickenc.s3o]],
   power               = 520,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

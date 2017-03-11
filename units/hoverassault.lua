@@ -5,11 +5,9 @@ unitDef = {
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,
-  buildCostEnergy     = 240,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[hoverassault.png]],
-  buildTime           = 240,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -44,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hoverassault.s3o]],
   script              = [[hoverassault.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -57,7 +54,8 @@ unitDef = {
   },
 
   sightDistance       = 385,
-  sonarDistance       = 385,  turninplace         = 0,
+  sonarDistance       = 385,
+  turninplace         = 0,
   turnRate            = 616,
   workerTime          = 0,
 

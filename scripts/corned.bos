@@ -195,7 +195,7 @@ QueryNanoPiece(piecenum)
 
 Killed(severity, corpsetype)
 {
-	if(severity >= 0 AND severity < 25)
+	if(severity <= 25)
 	{
 		corpsetype = 1;
 		explode nano type BITMAPONLY | BITMAP;
@@ -203,17 +203,17 @@ Killed(severity, corpsetype)
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
 	}
-	else if(severity >= 25 AND severity < 50)
+	if(severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode nano type FALL | BITMAP;
 		explode cradle type FALL | BITMAP;
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
 	}
-	else if(severity >= 50 AND severity < 100)
+	if(severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode nano type SHATTER | BITMAP;
 		explode rear type SHATTER | BITMAP;
 		explode cradle type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
@@ -224,21 +224,16 @@ Killed(severity, corpsetype)
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
 	}
-	// D-Gunned/Self-D
-	else if(severity >= 100)
-	{
-		corpsetype = 3;
-		explode nano type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode rear type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode cradle type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode panel_t type FALL | BITMAP;
-		explode panel_b type FALL | BITMAP;
-		explode panel_l type FALL | BITMAP;
-		explode panel_r type FALL | BITMAP;
-		explode body type SHATTER | BITMAP;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-	}
-	return corpsetype;
+	corpsetype = 2;
+	explode nano type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode rear type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode cradle type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode panel_t type FALL | BITMAP;
+	explode panel_b type FALL | BITMAP;
+	explode panel_l type FALL | BITMAP;
+	explode panel_r type FALL | BITMAP;
+	explode body type SHATTER | BITMAP;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 }
 Create()
 {

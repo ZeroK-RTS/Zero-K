@@ -48,7 +48,6 @@ unitDef = {
   objectName          = [[chickenflyerqueen.s3o]],
   power               = 45000,
   script              = [[chickenflyerqueen.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

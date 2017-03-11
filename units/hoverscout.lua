@@ -4,11 +4,9 @@ unitDef = {
   description         = [[Fast Attack Hovercraft]],
   acceleration        = 0.066,
   brakeRate           = 0.0835,
-  buildCostEnergy     = 85,
   buildCostMetal      = 85,
   builder             = false,
   buildPic            = [[CORSH.png]],
-  buildTime           = 85,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -42,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[CORSH.s3o]],
   script			  = [[corsh.cob]],
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -124,16 +121,6 @@ unitDef = {
       footprintZ       = 3,
       object           = [[corsh_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

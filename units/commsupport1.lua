@@ -6,7 +6,6 @@ unitDef = {
   activateWhenBuilt   = true,
   autoHeal            = 5,
   brakeRate           = 0.45,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
   buildDistance       = 250,
   builder             = true,
@@ -15,7 +14,6 @@ unitDef = {
   },
 
   buildPic            = [[commsupport.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -61,7 +59,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[commsupport.s3o]],
   script              = [[commsupport.lua]],
-  seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
@@ -82,7 +79,6 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  terraformSpeed      = 600,
   turnRate            = 1350,
   upright             = true,
   workerTime          = 12,

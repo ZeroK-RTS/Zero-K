@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Newton]],
   description                   = [[Gravity Turret - On to Repulse, Off to Attract]],
   activateWhenBuilt             = true,
-  buildCostEnergy               = 200,
   buildCostMetal                = 200,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -11,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[corgrav_aoplane.dds]],
   buildPic                      = [[corgrav.png]],
-  buildTime                     = 200,
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[SINK]],
@@ -42,7 +40,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[corgrav]],
   onoffable                     = true,
-  seismicSignature              = 4,
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   sightDistance                 = 506,
   useBuildingGroundDecal        = true,
@@ -172,16 +169,6 @@ unitDef = {
       footprintZ       = 5,
       object           = [[corgrav_dead]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 5,
-      footprintZ       = 5,
-      object           = [[debris3x3c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

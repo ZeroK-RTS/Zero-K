@@ -4,11 +4,9 @@ unitDef = {
   description            = [[bla]],
   acceleration           = 0.008,
   brakeRate              = 0.0385,
-  buildCostEnergy        = 250,
   buildCostMetal         = 250,
   builder                = false,
   buildPic               = [[corraid.png]],
-  buildTime              = 250,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -44,7 +42,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[CORRAID.s3o]],
   script				 = [[corraid.cob]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -116,16 +113,6 @@ unitDef = {
       footprintZ       = 2,
       object           = [[corraid_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      object           = [[debris2x2c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

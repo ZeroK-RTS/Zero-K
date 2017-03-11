@@ -48,7 +48,6 @@ unitDef = {
   objectName                    = [[spire.s3o]],
   onoffable                     = true,
   power                         = 2500,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

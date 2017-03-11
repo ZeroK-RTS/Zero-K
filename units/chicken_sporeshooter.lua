@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER STUPIDTARGET]],
   objectName          = [[chicken_sporeshooter.s3o]],
   power               = 400,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

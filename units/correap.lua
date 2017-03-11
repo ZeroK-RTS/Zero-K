@@ -4,11 +4,9 @@ unitDef = {
   description         = [[Assault Tank]],
   acceleration        = 0.0237,
   brakeRate           = 0.04786,
-  buildCostEnergy     = 850,
   buildCostMetal      = 850,
   builder             = false,
   buildPic            = [[correap.png]],
-  buildTime           = 850,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -47,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[correap.s3o]],
   script	      = [[correap.cob]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -120,16 +117,6 @@ unitDef = {
       footprintZ       = 3,
       object           = [[correap_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3b.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

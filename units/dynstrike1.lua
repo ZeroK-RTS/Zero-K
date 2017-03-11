@@ -5,7 +5,6 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 1200,
   buildCostMetal         = 1200,
   buildDistance          = 128,
   builder                = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic               = [[commstrike.png]],
-  buildTime              = 1200,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -61,7 +59,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[strikecom.dae]],
   script                 = [[dynstrike.lua]],
-  seismicSignature       = 16,
   selfDestructAs         = [[ESTOR_BUILDINGEX]],
 
   sfxtypes               = {
@@ -81,7 +78,6 @@ unitDef = {
   trackStretch           = 1,
   trackType              = [[ComTrack]],
   trackWidth             = 26,
-  terraformSpeed         = 600,
   turnRate               = 1148,
   upright                = true,
   workerTime             = 10,

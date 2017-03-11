@@ -43,7 +43,6 @@ unitDef = {
   onoffable           = true,
   power               = 300,
   seismicDistance     = 1000,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

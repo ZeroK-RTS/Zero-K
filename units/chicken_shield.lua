@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[chicken_shield.s3o]],
   power               = 350,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

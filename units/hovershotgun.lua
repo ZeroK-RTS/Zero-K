@@ -5,11 +5,9 @@ unitDef = {
   acceleration        = 0.048,
   activateWhenBuilt   = true,
   brakeRate           = 0.043,
-  buildCostEnergy     = 300,
   buildCostMetal      = 300,
   builder             = false,
   buildPic            = [[hoversonic.png]],
-  buildTime           = 300,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -35,7 +33,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[hovershotgun.s3o]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -119,16 +116,6 @@ unitDef = {
       footprintZ       = 3,
       object           = [[hoverassault_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

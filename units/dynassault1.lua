@@ -5,7 +5,6 @@ unitDef = {
   acceleration        = 0.18,
   activateWhenBuilt   = true,
   brakeRate           = 0.375,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -14,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[benzcom.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -59,7 +57,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK]],
   objectName          = [[benzcom1.s3o]],
   script              = [[dynassault.lua]],
-  seismicSignature    = 16,
   selfDestructAs      = [[ESTOR_BUILDINGEX]],
 
   sfxtypes            = {
@@ -83,7 +80,6 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  terraformSpeed      = 600,
   turnRate            = 1148,
   upright             = true,
   workerTime          = 10,

@@ -4,11 +4,9 @@ unitDef = {
   description         = [[Riot Vehicle]],
   acceleration        = 0.0318,
   brakeRate           = 0.124,
-  buildCostEnergy     = 240,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[corlevlr.png]],
-  buildTime           = 240,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -40,7 +38,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[corleveler_512.s3o]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX_LEVELER]],
 
   sfxtypes            = {
@@ -126,16 +123,6 @@ unitDef = {
       footprintZ       = 2,
       object           = [[leveler_d.dae]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      object           = [[debris2x2a.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

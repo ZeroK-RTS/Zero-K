@@ -63,7 +63,6 @@ unitDef = {
   maxSlope            = 72,
   maxVelocity         = 2,
   maxWaterDepth       = 22,
-  metalMake           = 0.4,
   minCloakDistance    = 75,
   movementClass       = [[TKBOT3]],
   noAutoFire          = false,
@@ -71,7 +70,6 @@ unitDef = {
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 2500,
   reclaimable         = false,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

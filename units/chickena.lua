@@ -40,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MINE]],
   objectName          = [[chickena.s3o]],
   power               = 420,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

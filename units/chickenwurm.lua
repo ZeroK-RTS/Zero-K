@@ -42,7 +42,6 @@ unitDef = {
   objectName          = [[chickenwurm.s3o]],
   power               = 350,
   script              = [[chickenwurm.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[CORPYRO_PYRO_DEATH]],
 
   sfxtypes            = {

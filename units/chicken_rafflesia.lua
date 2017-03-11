@@ -34,7 +34,6 @@ unitDef = {
   objectName                    = [[chicken_rafflesia.s3o]],
   onoffable                     = true,
   power                         = 480,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Produces Ships, Builds at 10 m/s]],
   acceleration           = 0,
   brakeRate              = 0,
-  buildCostEnergy        = 600,
   buildCostMetal         = 600,
   builder                = true,
 
@@ -21,7 +20,6 @@ unitDef = {
   },
 
   buildPic               = [[FACTORYSHIP.png]],
-  buildTime              = 600,
   canAttack              = true,
   canMove                = true,
   canPatrol              = true,
@@ -48,7 +46,6 @@ unitDef = {
 	solid_factory_rotation = [[1]], -- 90 degrees counter clockwise
   },
 
-  energyMake             = 0.3,
   energyUse              = 0,
   explodeAs              = [[LARGE_BUILDINGEX]],
   footprintX             = 8,
@@ -59,13 +56,11 @@ unitDef = {
   maxDamage              = 6000,
   maxSlope               = 15,
   maxVelocity            = 0,
-  metalMake              = 0.3,
   minCloakDistance       = 150,
   minWaterDepth          = 15,
   moveState        		 = 1,
   objectName             = [[seafac.s3o]],
   script				 = [[factoryship.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
   showNanoSpray          = false,
   sightDistance          = 273,

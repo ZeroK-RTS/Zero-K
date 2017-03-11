@@ -39,7 +39,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken_leaper.s3o]],
   power               = 100,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

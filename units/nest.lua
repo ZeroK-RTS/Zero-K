@@ -42,7 +42,6 @@ unitDef = {
     chickenFac = [[true]],
   },
 
-  energyMake                    = 0.5,
   energyStorage                 = 50,
   energyUse                     = 0,
   explodeAs                     = [[NOWEAPON]],
@@ -61,7 +60,6 @@ unitDef = {
   objectName                    = [[roost]],
   power                         = 600,
   script                        = [[roost.cob]],
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {

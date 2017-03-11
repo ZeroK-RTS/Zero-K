@@ -499,7 +499,7 @@ Killed(severity, corpsetype)
 	}
 	if( severity <= 50 )
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode hips type SHATTER | BITMAP4;
 		explode luparm type SHATTER | BITMAP4;
 		explode lloarm type SHATTER | BITMAP4;
@@ -524,9 +524,9 @@ Killed(severity, corpsetype)
 		explode canonbarrel2 type SHATTER | BITMAP4;
 		return (0);
 	}
-	if( severity <= 99 )
+	if( severity < 100 )
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode hips type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode luparm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		explode lloarm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
@@ -550,7 +550,7 @@ Killed(severity, corpsetype)
 		explode canonbarrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 		return (0);
 	}
-	corpsetype = 3;
+	corpsetype = 2;
 	explode hips type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode luparm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;
 	explode lloarm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP2;

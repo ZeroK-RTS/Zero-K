@@ -45,7 +45,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE STUPIDTARGET MINE]],
   objectName          = [[chickenf.s3o]],
   power               = 450,
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

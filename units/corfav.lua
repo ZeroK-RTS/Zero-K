@@ -4,11 +4,9 @@ unitDef = {
   description            = [[Raider/Scout Vehicle]],
   acceleration           = 0.14,
   brakeRate              = 0.1555,
-  buildCostEnergy        = 40,
   buildCostMetal         = 40,
   builder                = false,
   buildPic               = [[CORFAV.png]],
-  buildTime              = 40,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -46,7 +44,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[CORFAV.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 580,
   trackOffset            = 0,
@@ -122,16 +119,6 @@ unitDef = {
       footprintZ       = 2,
       object           = [[CORFAV_DEAD.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 2,
-      footprintZ       = 2,
-      object           = [[debris2x2a.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

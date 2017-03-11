@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Jumpjet Constructor, Builds at 5 m/s]],
   acceleration        = 0.26,
   brakeRate           = 0.78,
-  buildCostEnergy     = 160,
   buildCostMetal      = 160,
   buildDistance       = 128,
   builder             = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic            = [[CORFAST.png]],
-  buildTime           = 160,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -34,7 +32,6 @@ unitDef = {
 	helptext_de    = [[Schnell und mit der Möglichkeit ausgestattet über kurze Distanzen oder Höhen zu springen, eignet sich der Constable als ideale Konstruktionseinheit für rasche Expansion.]],
   },
 
-  energyMake          = 0.15,
   energyUse           = 0,
   explodeAs           = [[BIG_UNITEX]],
   footprintX          = 2,
@@ -47,14 +44,12 @@ unitDef = {
   maxSlope            = 36,
   maxVelocity         = 2.1,
   maxWaterDepth       = 22,
-  metalMake           = 0.15,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName          = [[behe_coroner.s3o]],
   script              = [[corfast.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -73,7 +68,6 @@ unitDef = {
   trackStretch        = 1,
   trackType           = [[ComTrack]],
   trackWidth          = 22,
-  terraformSpeed      = 450,
   turnRate            = 1400,
   upright             = true,
   workerTime          = 5,

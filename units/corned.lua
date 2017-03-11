@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Construction Vehicle, Builds at 5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostEnergy        = 140,
   buildCostMetal         = 140,
   buildDistance          = 180,
   builder                = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic               = [[corned.png]],
-  buildTime              = 140,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -33,7 +31,6 @@ unitDef = {
 	modelradius    = [[14]],
   },
 
-  energyMake             = 0.15,
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
@@ -46,17 +43,14 @@ unitDef = {
   maxSlope               = 18,
   maxVelocity            = 2.4,
   maxWaterDepth          = 22,
-  metalMake              = 0.15,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[corcv.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 255,
-  terraformSpeed         = 300,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,
@@ -75,16 +69,6 @@ unitDef = {
       footprintZ       = 3,
       object           = [[corcv_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3b.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

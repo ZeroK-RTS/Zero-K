@@ -4,11 +4,9 @@ unitDef = {
   description         = [[Artillery Minelayer Vehicle]],
   acceleration        = 0.0282,
   brakeRate           = 0.08,
-  buildCostEnergy     = 260,
   buildCostMetal      = 260,
   builder             = false,
   buildPic            = [[corgarp.png]],
-  buildTime           = 260,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -43,7 +41,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[corwolv.s3o]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -128,16 +125,6 @@ unitDef = {
       footprintZ       = 2,
       object           = [[corwolv_dead.s3o]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3c.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

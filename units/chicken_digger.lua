@@ -45,7 +45,6 @@ unitDef = {
   objectName          = [[chicken_digger.s3o]],
   onoffable           = true,
   power               = 40,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

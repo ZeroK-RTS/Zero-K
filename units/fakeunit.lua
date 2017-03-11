@@ -35,7 +35,6 @@ unitDef = {
   objectName                    = [[debris1x1b.s3o]],
   onoffable                     = false,
   script                        = [[nullscript.lua]],
-  seismicSignature              = 16,
   selfDestructCountdown         = 0,
   sightDistance                 = 0.2,
   turnRate                      = 0,

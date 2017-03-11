@@ -4,11 +4,9 @@ unitDef = {
   description            = [[Assault/Riot Strider]],
   acceleration           = 0.156,
   brakeRate              = 0.262,
-  buildCostEnergy        = 4000,
   buildCostMetal         = 4000,
   builder                = false,
   buildPic               = [[ARMRAZ.png]],
-  buildTime              = 4000,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -43,7 +41,6 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[ARMRAZ]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
@@ -175,16 +172,6 @@ unitDef = {
       footprintZ       = 3,
       object           = [[ARMRAZ_DEAD]],
     },
-
-
-    DEAD2 = {
-      blocking         = false,
-      featureDead      = [[HEAP]],
-      footprintX       = 3,
-      footprintZ       = 3,
-      object           = [[debris3x3a.s3o]],
-    },
-
 
     HEAP  = {
       blocking         = false,

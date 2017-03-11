@@ -222,7 +222,7 @@ Shot1()
 
 Killed(severity, corpsetype)
 {
-	if(severity >= 0 AND severity < 25)
+	if(severity <= 25)
 	{
 		corpsetype = 1;
 		explode barrel1 type BITMAPONLY | BITMAP;
@@ -232,9 +232,9 @@ Killed(severity, corpsetype)
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
 	}
-	else if(severity >= 25 AND severity < 50)
+	if(severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode barrel1 type FALL | BITMAP;
 		explode barrel2 type FALL | BITMAP;
 		explode sleeve1 type SHATTER | BITMAP;
@@ -242,9 +242,9 @@ Killed(severity, corpsetype)
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
 	}
-	else if(severity >= 50 AND severity < 100)
+	if(severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode sleeve1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
@@ -252,18 +252,13 @@ Killed(severity, corpsetype)
 		explode body type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
 	}
-	// D-Gunned/Self-D
-	else if(severity >= 100)
-	{
-		corpsetype = 3;
-		explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode sleeve1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode sleeve2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode body type SHATTER | BITMAP;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-	}
-	return corpsetype;
+	corpsetype = 2;
+	explode barrel1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode barrel2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode sleeve1 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode sleeve2 type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode body type SHATTER | BITMAP;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 }
 
 Create()

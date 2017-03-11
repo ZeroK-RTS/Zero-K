@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB STUPIDTARGET]],
   objectName          = [[chicken_pigeon.s3o]],
   power               = 50,
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

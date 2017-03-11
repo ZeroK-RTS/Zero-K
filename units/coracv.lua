@@ -4,7 +4,6 @@ unitDef = {
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
   brakeRate              = 1.5,
-  buildCostEnergy        = 250,
   buildCostMetal         = 250,
   buildDistance          = 180,
   builder                = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic               = [[coracv.png]],
-  buildTime              = 250,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -35,7 +33,6 @@ unitDef = {
 	modelradius    = [[30]],
   },
 
-  energyMake             = 0.225,
   energyUse              = 0,
   explodeAs              = [[BIG_UNITEX]],
   footprintX             = 3,
@@ -48,13 +45,11 @@ unitDef = {
   maxSlope               = 18,
   maxVelocity            = 2.1,
   maxWaterDepth          = 22,
-  metalMake              = 0.225,
   minCloakDistance       = 75,
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[welder.s3o]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -67,7 +62,6 @@ unitDef = {
 
   showNanoSpray          = false,
   sightDistance          = 280,
-  terraformSpeed         = 450,
   trackOffset            = 3,
   trackStrength          = 6,
   trackStretch           = 1,

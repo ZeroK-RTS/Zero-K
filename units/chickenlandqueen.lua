@@ -47,7 +47,6 @@ unitDef = {
   objectName             = [[chickenflyerqueen.s3o]],
   power                  = 65536,
   script                 = [[chickenlandqueen.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {

@@ -42,7 +42,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB STUPIDTARGET MINE]],
   objectName          = [[chickenbroodqueen.s3o]],
   power               = 350,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {

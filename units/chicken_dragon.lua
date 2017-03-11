@@ -48,7 +48,6 @@ unitDef = {
   objectName             = [[chicken_dragon.s3o]],
   power                  = 10500,
   script                 = [[chickenq.cob]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {

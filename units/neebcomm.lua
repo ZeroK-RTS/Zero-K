@@ -4,7 +4,6 @@ unitDef = {
   description         = [[Ugly Turkey]],
   acceleration        = 0.2,
   brakeRate           = 0.205,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
   buildDistance       = 128,
   builder             = true,
@@ -13,7 +12,6 @@ unitDef = {
   },
 
   buildPic            = [[chickenbroodqueen.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -50,7 +48,6 @@ unitDef = {
   power               = 2500,
   reclaimable         = false,
   script			  = [[chickenbroodqueen.cob]],
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[factorycloak]],
   name                          = [[Cloaky Bot Factory]],
   description                   = [[Produces Cloaky Robots, Builds at 10 m/s]],
-  buildCostEnergy               = 600,
   buildCostMetal                = 600,
   builder                       = true,
   buildingGroundDecalDecaySpeed = 30,
@@ -25,7 +24,6 @@ unitDef = {
   },
 
   buildPic                      = [[factorycloak.png]],
-  buildTime                     = 600,
   canMove                       = true,
   canPatrol                     = true,
   canstop                       = [[1]],
@@ -39,7 +37,6 @@ unitDef = {
     sortName       = [[1]],
   },
 
-  energyMake                    = 0.3,
   energyUse                     = 0,
   explodeAs                     = [[LARGE_BUILDINGEX]],
   footprintX                    = 7,
@@ -50,13 +47,11 @@ unitDef = {
   maxDamage                     = 4000,
   maxSlope                      = 15,
   maxWaterDepth                 = 0,
-  metalMake                     = 0.3,
   minCloakDistance              = 150,
   moveState        				= 1,
   noAutoFire                    = false,
   objectName                    = [[cremfactory.s3o]],
   script                        = [[factorycloak.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes                      = {
