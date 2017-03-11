@@ -64,6 +64,13 @@ local Sounds = {
 			pitchmod = 0.1,
 			gainmod = 0.05,
 		},
+			Heatraysound = { -- Weapon firing sound for Heatray Weapons of Scorcher, Commander, DDM
+			file = "sounds/weapon/heatray_firenew.wav",
+			pitchMod = 0.2,
+			gain = 1.4,
+			gainmod = 0.2,
+			maxconcurrent = 6,
+		},
 	},
 }
 
