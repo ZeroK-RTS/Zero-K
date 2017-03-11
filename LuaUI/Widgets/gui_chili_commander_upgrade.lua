@@ -980,7 +980,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	for i = 1, #units do
 		local unitID = units[i]
 		local level, chassis, staticLevel = GetCommanderUpgradeAttributes(unitID, true)
-		if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or (chassisDefs[chassis].levelDefs[level+1]) then
+		if level and (not staticLevel) and chassis and (UNBOUNDED_LEVEL or chassisDefs[chassis].levelDefs[level+1]) then
 			upgradeID = unitID
 			break
 		end
