@@ -412,7 +412,6 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minimizable = true,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)		
 	}
 		
