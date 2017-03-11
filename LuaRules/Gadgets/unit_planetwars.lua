@@ -176,89 +176,95 @@ end
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 
-local function normaliseBoxes(box)
-	box.left = box.left/mapWidth
-	box.top = box.top/mapHeight
-	box.right = box.right/mapWidth
-	box.bottom = box.bottom/mapHeight
+local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRand)
+	if not (type(info) == "table") then
+		return
+	end
+	
+	Spring.Echo("Processing PW structure: "..info.unitname)
+	local giveUp = 0
+	local x = xBase + math.random()*xRand
+	local z = zBase + math.random()*zRand
+	local direction = math.floor(math.random()*4)
+	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
+	
+	if not defID then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
+		return
+	end
+	
+	if info.isDestroyed == 1 then
+		--do nothing
+		return
+	end
+	
+	local unitDef = UnitDefs[defID]
+	local oddX = unitDef.xsize % 4 == 2
+	local oddZ = unitDef.zsize % 4 == 2
+	local sX = unitDef.xsize*4
+	local sZ = unitDef.xsize*4
+	
+	if direction == 1 or direction == 3 then
+		sX, sZ = sZ, sX
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+		x = xBase + math.random()*xRand
+		z = zBase + math.random()*zRand
+		giveUp = giveUp + 1
+		if giveUp > 80 then
+			if startBoxID then
+				xBase = mapWidth*0.35
+				xRand = mapWidth*0.3
+				zBase = mapHeight*0.35
+				zRand = mapHeight*0.3
+				startBoxID = nil
+				giveUp = 0 
+			else
+				break
+			end
+		end
+	end
+	
+	if (unitDef.oddX) then
+		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	if (unitDef.oddZ) then
+		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	
+	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
+	Spring.SetUnitNeutral(unitID,true)
+	Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+	unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
+	Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 end
 
-local function TranslocateBoxes(box)
-	local midX, midY = (box.left + box.right)/2, (box.top + box.bottom)/2
-	local x1 = box.left + TRANSLOCATION_MULT*(0.5 - midX)
-	local y1 = box.top + TRANSLOCATION_MULT*(0.5 - midY)
-	local x2 = box.right + TRANSLOCATION_MULT*(0.5 - midX)
-	local y2 = box.bottom + TRANSLOCATION_MULT*(0.5 - midY)
-	return x1, y1, x2, y2
-end
-
-local function spawnStructures(left, top, right, bottom, team)
+local function SpawnStructuresInBox(left, top, right, bottom, team, startBoxID)
 	local teamID = team or Spring.GetGaiaTeamID()
 	local xBase = mapWidth*left
 	local xRand = mapWidth*(right-left)
 	local zBase = mapHeight*top
 	local zRand = mapHeight*(bottom-top)
 	for _,info in pairs(unitData) do
-		if type(info) == "table" then
-			Spring.Echo("Processing PW structure: "..info.unitname)
-			local giveUp = 0
-			local x = xBase + math.random()*xRand
-			local z = zBase + math.random()*zRand
-			local direction = math.floor(math.random()*4)
-			local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
-			
-			if not defID then
-				Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
-			elseif info.isDestroyed == 1 then
-				--do nothing
-			else
-				local unitDef = UnitDefs[defID]
-				local oddX = unitDef.xsize % 4 == 2
-				local oddZ = unitDef.zsize % 4 == 2
-				local sX = unitDef.xsize*4
-				local sZ = unitDef.xsize*4
-				
-				if direction == 1 or direction == 3 then
-					sX, sZ = sZ, sX
-					oddX, oddZ = oddZ, oddX
-				end
-				
-				if (unitDef.oddX) then
-					x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
-				else
-					x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
-				end
-				if (unitDef.oddZ) then
-					z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
-				else
-					z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
-				end
-				while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
-					  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
-					  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
-					  and giveUp < 50 do
-					x = xBase + math.random()*xRand
-					z = zBase + math.random()*zRand
-					giveUp = giveUp + 1
-				end
-				
-				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
-				Spring.SetUnitNeutral(unitID,true)
-				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
-				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
-				Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
-			end
-		end
+		SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRand)
 	end
 end
 
-
-local function SpawnHQ(left, top, right, bottom, team)
-	local teamID = team or Spring.GetGaiaTeamID()
-	local xBase = mapWidth*left
-	local xRand = mapWidth*(right-left)
-	local zBase = mapHeight*top
-	local zRand = mapHeight*(bottom-top)
+local function SpawnHQ(teamID, startBoxID)
+	teamID = teamID or Spring.GetGaiaTeamID()
+	local xBase = mapWidth*0.05
+	local xRand = mapWidth*0.9
+	local zBase = mapHeight*0.05
+	local zRand = mapHeight*0.9
 	
 	local giveUp = 0
 	
@@ -277,6 +283,27 @@ local function SpawnHQ(left, top, right, bottom, team)
 		oddX, oddZ = oddZ, oddX
 	end
 	
+	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+		x = xBase + math.random()*xRand
+		z = zBase + math.random()*zRand
+		giveUp = giveUp + 1
+		if giveUp > 80 then
+			if startBoxID then
+				xBase = mapWidth*0.35
+				xRand = mapWidth*0.3
+				zBase = mapHeight*0.35
+				zRand = mapHeight*0.3
+				startBoxID = nil
+				giveUp = 0 
+			else
+				break
+			end
+		end
+	end
+	
 	if (unitDef.oddX) then
 		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
 	else
@@ -288,69 +315,39 @@ local function SpawnHQ(left, top, right, bottom, team)
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
 	
-	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
-		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
-		  and giveUp < 25 do
-		x = xBase + math.random()*xRand
-		z = zBase + math.random()*zRand
-		giveUp = giveUp + 1
-	end
-	
 	local unitID = Spring.CreateUnit(HQ_DEF_ID, x, spGetGroundHeight(x,z), z, direction, teamID)
 	hqs[unitID] = true
 	Spring.SetUnitNeutral(unitID,true)
 end
 
-function gadget:GamePreload()
-	local box = {[0] = {}, [1] = {}}
-	
-	local startboxString = Spring.GetModOptions().startboxes
-	if not startboxString then -- legacy boxes
-		box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
-		box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
-		
-		if not (box[0].left) then
-			box[0].left, box[0].top, box[0].right, box[0].bottom = 0, 0, mapWidth, mapHeight
+local function SpawnInDefenderBox()
+	if defenderFaction then
+		local teamList = Spring.GetTeamList(DEFENDER_ALLYTEAM) or {}
+		if teamList[1] then
+			local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+			if startBoxID then
+				local teamID = teamList[math.random(#teamList)]
+				SpawnStructuresInBox(0.05, 0.05, 0.95, 0.95, teamID, startBoxID)
+				return true
+			end
 		end
-		if not (box[1].left) then
-			box[1].left, box[1].top, box[1].right, box[1].bottom = 0, 0, mapWidth, mapHeight
-		end
-		
-		normaliseBoxes(box[0])
-		normaliseBoxes(box[1])
-	else
-		local startboxConfig = loadstring(startboxString)()
-
-		local teamList = Spring.GetTeamList(0)
-		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		box[0] = boxID and startboxConfig[boxID] or {0,0,1,1}
-
-		teamList = Spring.GetTeamList(1)
-		boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		box[1] = boxID and startboxConfig[boxID] or {0,0,1,1}
 	end
+	return false
+end
+
+function gadget:GamePreload()
 
 	-- spawn PW planet structures
-	if defenderFaction then
-		local teams = Spring.GetTeamList(DEFENDER_ALLYTEAM)
-		local team = teams[math.random(#teams)]
-		local x1, y1, x2, y2 = TranslocateBoxes(box[DEFENDER_ALLYTEAM])
-		spawnStructures(x1, y1, x2, y2, team)
-	elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
-		spawnStructures(0.1,0.44,0.9,0.56)
-	elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
-		spawnStructures(0.44,0.1,0.56,0.9)
-	else -- random idk boxes
-		spawnStructures(0.35,0.35,0.65,0.65)
+	if not SpawnInDefenderBox() then
+		SpawnStructuresInBox(0.35,0.35,0.65,0.65)
 	end
 	
 	-- spawn field command centers
-	for i=0, 1 do	--(defenderFaction and 1 or 0) do
-		local x1, y1, x2, y2 = TranslocateBoxes(box[i])
-		local teams = Spring.GetTeamList(i)
-		local team = teams[math.random(#teams)]
-		SpawnHQ(x1, y1, x2, y2, team)
+	for i = 0, 1 do
+		local teamList = Spring.GetTeamList(i) or {}
+		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+		local teamID = teamList[math.random(#teamList)]
+		SpawnHQ(teamID, startBoxID)
 	end
 end
 
@@ -375,7 +372,7 @@ function gadget:Initialize()
 		end
 	else
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-		local pwDataRaw = modOptions.planetwarsstructures
+		local pwDataRaw = "ew0KICBzMTYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiIFdvcm1ob2xlIEdlbmVyYXRvciAodW5vd25lZCkiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIHBsYW5ldCB0byBuZWlnaGJvdXJzIC0gc3ByZWFkcyBpbmZsdWVuY2UgcGVyIHR1cm47IGhhcmRlbmVkIGFnYWluc3QgYm9tYmVyIGF0dGFjayINCiAgfSwNCiAgczE3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dvcm1ob2xlIiwNCiAgICBuYW1lID0gIiBXb3JtaG9sZSBHZW5lcmF0b3IgKHVub3duZWQpIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBwbGFuZXQgdG8gbmVpZ2hib3VycyAtIHNwcmVhZHMgaW5mbHVlbmNlIHBlciB0dXJuOyBoYXJkZW5lZCBhZ2FpbnN0IGJvbWJlciBhdHRhY2siDQogIH0sDQogIHMxOCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFtZSA9ICIgV29ybWhvbGUgR2VuZXJhdG9yICh1bm93bmVkKSIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlua3MgcGxhbmV0IHRvIG5laWdoYm91cnMgLSBzcHJlYWRzIGluZmx1ZW5jZSBwZXIgdHVybjsgaGFyZGVuZWQgYWdhaW5zdCBib21iZXIgYXR0YWNrIg0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiIFdvcm1ob2xlIEdlbmVyYXRvciAodW5vd25lZCkiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIHBsYW5ldCB0byBuZWlnaGJvdXJzIC0gc3ByZWFkcyBpbmZsdWVuY2UgcGVyIHR1cm47IGhhcmRlbmVkIGFnYWluc3QgYm9tYmVyIGF0dGFjayINCiAgfSwNCn0=" --modOptions.planetwarsstructures
 		local pwDataFunc, err, success
 		if not (pwDataRaw and type(pwDataRaw) == 'string') then
 			err = "Planetwars data entry in modoption is empty or in invalid format"
