@@ -387,12 +387,10 @@ function AddTransportToIdle(unitID, unitDefID)
 end 
 
 local function RemoveTransport(unitID, unitDefID)
-	if activeTransports[unitID] then
-		activeTransports[unitID] = nil
-		toGuard[unitID] = nil
-		autoCallTransportUnits[unitID] = false
-		RemoveUnit(unitID, unitDefID)
-	end
+	activeTransports[unitID] = nil
+	toGuard[unitID] = nil
+	autoCallTransportUnits[unitID] = false
+	RemoveUnit(unitID, unitDefID)
 end
 
 local function AddTransport(unitID, unitDefID)
