@@ -523,8 +523,11 @@ end
 function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag) 
 	if autoCallTransportUnits[unitID] then
 		local useful, halting = ProcessCommand(unitID, cmdID, params, false, true)
-		if useful and halting then
+		local queue = Spring.GetCommandQueue(unitID, 0)
+		if useful and halting and queue > 1 then
 			spGiveOrderToUnit(unitID, CMD_EMBARK, {}, {"alt"})
+		else
+			RemoveUnit(unitDefID, spGetUnitDefID(unitDefID))
 		end
 	end
 end
@@ -609,6 +612,7 @@ function StopCloseUnits() -- stops dune units which are close to transport
 		end 
 	end
 end
+
 function widget:Initialize()
 	local _, _, spec, teamID = spGetPlayerInfo(Spring.GetMyPlayerID())
 	 if spec then
@@ -721,6 +725,9 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 				spGiveOrderToUnit(transportID, CMD.GUARD, {toGuard[transportID]}, {"shift"})
 			end
 		end
+	else
+		local x,y,z = Spring.GetUnitPosition(transportID)
+		spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"}) --unload unit at its destination
 	end
 end
 
@@ -814,12 +821,12 @@ function AssignTransports(transportID, unitID, guardID, guardOnly)
 				local ttime = (transportDist + pathLength) / (transpeed*speedMod) + CONST_TRANSPORT_PICKUPTIME
 				local utime = pathLength / unitspeed
 				local benefit = utime-ttime
-				if (val[1]==ST_PRIORITY) then 
-					 benefit = benefit + CONST_PRIORITY_BENEFIT
-				end
 				--spEcho ("	 "..transportID .. " " .. id .. "	" .. benefit)
 
 				if (benefit > options.minimumTransportBenefit.value) then 
+					if (val[1]==ST_PRIORITY) then 
+						 benefit = benefit + CONST_PRIORITY_BENEFIT
+					end
 					TableInsert(best, {benefit, transportID, id}) 
 				end
 			 end 
