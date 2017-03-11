@@ -137,7 +137,7 @@ local function SetNewTeamColors()
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
 		if (allyID == myAlly) then
-			if options.matchColors.value or (myTeam ~= teamID) then
+			if is_speccing or options.matchColors.value or (myTeam ~= teamID) then
 				a = (a % #allyColors) + 1
 				Spring.SetTeamColor(teamID, unpack(allyColors[a]))
 			end
