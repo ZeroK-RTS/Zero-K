@@ -51,6 +51,7 @@ local exceptionList = {	--add exempt units here
 	"armsnipe",
 	"armjeth",
 	"wolverine_mine",
+	"blastwing",
 }
 
 local exceptionArray = {}
