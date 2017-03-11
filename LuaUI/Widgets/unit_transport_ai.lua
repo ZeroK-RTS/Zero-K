@@ -260,7 +260,7 @@ function IsWaitCommand(unitID)
 	if queue and queue[1] then
 		alt = ExtractModifiedOptions(queue[1].options)
 	end
-	if (queue ~= nil and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then 
+	if (queue and queue[1] and queue[1].id == CMD.WAIT and not (queue[1].options.alt or alt)) then 
 		return true
 	end
 	return false
