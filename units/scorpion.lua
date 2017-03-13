@@ -275,7 +275,7 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      blocking         = false,
+      blocking         = true,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
