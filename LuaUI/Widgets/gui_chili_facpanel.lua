@@ -82,7 +82,7 @@ options = {
 		desc = 'When spectating, show the factory queues of all players. When disabled, only shows the factory queue of the currently spectated player.',
 		value = false,
 		OnChange = function() UpdateFactoryList() end,
-	};
+	},
 	
 	showETA = {
 		name = "Show ETA",
@@ -90,7 +90,20 @@ options = {
 		desc = 'Show ETA for the unit currently being built.',
 		value = true,
 		OnChange = function() RecreateFacbar() end,
-	};
+	},
+
+	showBuildPanel = {
+		name = "Show Selected Factory's Units Panel",
+		type = 'radioButton',
+		value = 'always',
+		items = {
+			{key = 'always', 		name = 'Always'},
+			{key = 'playerOnly', name = 'Only when not spectating'},
+			{key = 'never', 			name = 'Never'},
+		},
+		OnChange = function() widget:SelectionChanged(Spring.GetSelectedUnits()) end,
+		noHotkey = true,
+	},
 }
 
 -------------------------------------------------------------------------------
@@ -1020,16 +1033,21 @@ function widget:SelectionChanged(selectedUnits)
 	CheckRemoveFacStack()
 	
 	pressedFac = -1
+
+	local showBuildPanel = options.showBuildPanel.value == 'always' or 
+	(options.showBuildPanel.value == 'playerOnly' and not Spring.GetSpectatingState())
 	
 	if (#selectedUnits == 1) then 
 		for cnt, f in ipairs(facs) do 
 			if f.unitID == selectedUnits[1] then 
 				pressedFac = cnt
+				if showBuildPanel then
 				--local qStack = facs[pressedFac].qStack
-				local boStack = facs[pressedFac].boStack
+					local boStack = facs[pressedFac].boStack
 				--facs[pressedFac].facStack:RemoveChild(qStack)
-				stack_build:AddChild(boStack)
-				stack_build.backgroundColor = {1,1,1,1}
+					stack_build:AddChild(boStack)
+					stack_build.backgroundColor = {1,1,1,1}
+				end
 				facs[pressedFac].facButton.backgroundColor = magenta_table
 				facs[pressedFac].facButton:Invalidate()
 				
