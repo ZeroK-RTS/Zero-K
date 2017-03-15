@@ -227,6 +227,7 @@ local callInLists = {
 	"DrawWorldReflection",
 	"DrawWorldRefraction",
 	"DrawScreenEffects",
+	"DrawScreenPost",
 	"DrawScreen",
 	"DrawInMiniMap",
 	"RecvFromSynced",
@@ -1912,6 +1913,13 @@ end
 function gadgetHandler:DrawScreenEffects(vsx, vsy)
   for _,g in ipairs(self.DrawScreenEffectsList) do
     g:DrawScreenEffects(vsx, vsy)
+  end
+  return
+end
+
+function gadgetHandler:DrawScreenPost(vsx, vsy)
+  for _,g in ipairs(self.DrawScreenPostList) do
+    g:DrawScreenPost(vsx, vsy)
   end
   return
 end
