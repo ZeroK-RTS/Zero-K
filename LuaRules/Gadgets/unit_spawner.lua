@@ -629,6 +629,8 @@ local function SpawnSupport(burrowID, support, number, force)
   if (not support) or Spring.GetUnitIsDead(burrowID) then return end
   local squadSize = (supporters[support] and supporters[support].squadSize) or 1
   squadSize = squadSize * waveSizeMult * random(75, 125)/100
+  
+  local t = spGetGameSeconds()
   if (t < rampUpTime) then
     squadSize = squadSize * t/rampUpTime
   end
