@@ -176,9 +176,13 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePat
 	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
+		local widthChange = width - msgBoxPersistent.width
 		msgBoxPersistent.width = width
 		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
-		msgBoxPersistent.x = vsx - width
+		local onRightSide = msgBoxPersistent.x + (width/2) > (vsx/2)
+		if onRightSide then
+			msgBoxPersistent.x = msgBoxPersistent.x - widthChange
+		end
 		
 		local x = ((imagePath and imagePersistent.width + imagePersistent.x) or 0) + 5
 		if imagePath then
