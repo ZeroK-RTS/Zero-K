@@ -23,7 +23,7 @@ local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 
-local coop = true
+local coop = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
 
 local gaiateam = Spring.GetGaiaTeamID()
