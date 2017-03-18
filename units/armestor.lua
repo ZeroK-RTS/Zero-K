@@ -42,7 +42,7 @@ unitDef = {
   objectName                    = [[armestor.s3o]],
   script                        = "armestor.lua",
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
-  sightDistance                 = 273,
+  sightDistance                 = 512,
   useBuildingGroundDecal        = true,
   yardMap                       = [[ooo ooo ooo]],
 
