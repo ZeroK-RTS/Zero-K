@@ -79,7 +79,7 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			bt = bt,
 			frames = REPAIR_PENALTY_TIME,
 		}
-		if select(5,spGetUnitHealth(unitID)) == 1 then
+		if select(5,spGetUnitHealth(unitID)) == 1 or not buildTimeChangeNeeded[unitDefID] then
 			spSetUnitCosts(unitID, {buildTime = bt*REPAIR_PENALTY})
 			spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
 		end
@@ -87,11 +87,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-	if damagedUnits[unitID] then
-		spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
-		spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
-	elseif buildTimeChangeNeeded[unitDefID] then
-		spSetUnitCosts(unitID, {buildTime = buildTimeChangeNeeded[unitDefID]})
+	if buildTimeChangeNeeded[unitDefID] then
+		if damagedUnits[unitID] then
+			spSetUnitCosts(unitID, {buildTime = damagedUnits[unitID].bt*REPAIR_PENALTY})
+			spSetUnitRulesParam(unitID, "repairRate", 1/REPAIR_PENALTY, ALLY_ACCESS)
+		else
+			spSetUnitCosts(unitID, {buildTime = buildTimeChangeNeeded[unitDefID]})
+		end	
 	end
 end
 
