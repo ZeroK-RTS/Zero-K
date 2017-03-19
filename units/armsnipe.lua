@@ -61,6 +61,7 @@ unitDef = {
   },
 
   sightDistance          = 400,
+  stealth                = true,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
