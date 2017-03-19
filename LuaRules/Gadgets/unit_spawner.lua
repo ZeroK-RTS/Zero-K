@@ -2,15 +2,15 @@
 --------------------------------------------------------------------------------
 
 function gadget:GetInfo()
-  return {
-    name      = "Chicken Spawner",
-    desc      = "Spawns burrows and chickens",
-    author    = "quantum, improved by KingRaptor",
-    date      = "April 29, 2008", --last update: Mei 7, 2014
-    license   = "GNU GPL, v2 or later",
-    layer     = 1000001,  -- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
-    enabled   = true --  loaded by default?
-  }
+	return {
+		name		= "Chicken Spawner",
+		desc		= "Spawns burrows and chickens",
+		author		= "quantum, improved by KingRaptor",
+		date		= "April 29, 2008", --last update: Mei 7, 2014
+		license		= "GNU GPL, v2 or later",
+		layer		= 1000001,	-- must do the GameOver() thing only after gadget:awards.lua has finishes detect queen destroyed else queenKill award won't appear.
+		enabled		= true --	loaded by default?
+	}
 end
 
 --------------------------------------------------------------------------------
@@ -27,42 +27,42 @@ if (gadgetHandler:IsSyncedCode()) then
 -- Speed-ups and upvalues
 --
 
-local Spring              = Spring
-local math                = math
-local Game                = Game
-local table               = table
-local ipairs              = ipairs
-local pairs               = pairs
+local Spring			= Spring
+local math			= math
+local Game			= Game
+local table			= table
+local ipairs			= ipairs
+local pairs			= pairs
 
-local random              = math.random
+local random			= math.random
 
-local CMD_FIGHT           = CMD.FIGHT
-local CMD_ATTACK          = CMD.ATTACK
-local CMD_STOP			  = CMD.STOP
-local spGiveOrderToUnit   = Spring.GiveOrderToUnit
-local spGetTeamUnits      = Spring.GetTeamUnits
-local spGetUnitTeam       = Spring.GetUnitTeam
-local spGetCommandQueue   = Spring.GetCommandQueue
-local spGetGameSeconds    = Spring.GetGameSeconds
-local spGetGroundBlocked  = Spring.GetGroundBlocked
-local spCreateUnit        = Spring.CreateUnit
-local spGetUnitPosition   = Spring.GetUnitPosition
-local spGetUnitDefID	  = Spring.GetUnitDefID
-local spGetUnitSeparation = Spring.GetUnitSeparation
-local spGetGameFrame	  = Spring.GetGameFrame
-local spSetUnitHealth	  = Spring.SetUnitHealth
-local spGetUnitsInCylinder = Spring.GetUnitsInCylinder
-local spValidUnitID = Spring.ValidUnitID
+local CMD_FIGHT			 = CMD.FIGHT
+local CMD_ATTACK		= CMD.ATTACK
+local CMD_STOP			= CMD.STOP
+local spGiveOrderToUnit	 	= Spring.GiveOrderToUnit
+local spGetTeamUnits		= Spring.GetTeamUnits
+local spGetUnitTeam		= Spring.GetUnitTeam
+local spGetCommandQueue		= Spring.GetCommandQueue
+local spGetGameSeconds		= Spring.GetGameSeconds
+local spGetGroundBlocked	= Spring.GetGroundBlocked
+local spCreateUnit		= Spring.CreateUnit
+local spGetUnitPosition	 = Spring.GetUnitPosition
+local spGetUnitDefID		= Spring.GetUnitDefID
+local spGetUnitSeparation	= Spring.GetUnitSeparation
+local spGetGameFrame		= Spring.GetGameFrame
+local spSetUnitHealth		= Spring.SetUnitHealth
+local spGetUnitsInCylinder	= Spring.GetUnitsInCylinder
+local spValidUnitID		= Spring.ValidUnitID
 
 local echo = Spring.Echo
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local emptyTable    = {}
-local roamParam     = {2}
-local maxTries            = 500
-local maxTriesSmall	  = 100
+local emptyTable	= {}
+local roamParam		= {2}
+local maxTries		= 500
+local maxTriesSmall	= 100
 local lava = (Game.waterDamage > 0)
 local eggs = tobool(Spring.GetModOptions().eggs)
 local pvp = false
@@ -73,19 +73,19 @@ local respawnBurrows = false	--the always respawn, not % respawn chance
 
 local queenID
 local miniQueenNum = 1
-local targetCache     
-local luaAI  
+local targetCache
+local luaAI
 local chickenTeamID
-local burrows             = {}
+local burrows		= {}
 
-local computerTeams       = {}
-local humanTeams          = {}
-local lagging             = false
-local cpuUsages           = {}
-local chickenBirths       = {}
-local timeOfLastSpawn     = 0    -- when the last burrow was spawned
-local waveSchedule		  = math.huge	--{}	-- indexed by gameframe, true/nil
-local waveNumber		  = 0
+local computerTeams	= {}
+local humanTeams	= {}
+local lagging		= false
+local cpuUsages		= {}
+local chickenBirths	= {}
+local timeOfLastSpawn	= 0	-- when the last burrow was spawned
+local waveSchedule	= math.huge	--{} -- indexed by gameframe, true/nil
+local waveNumber	= 0
 
 local eggDecay = {}	-- indexed by featureID, value = game second
 local targets = {}	--indexed by unitID, value = teamID
@@ -114,12 +114,12 @@ local gameFrameOffset = 0
 --
 
 do -- load config file
-  local CONFIG_FILE = "LuaRules/Configs/spawn_defs.lua"
-  local VFSMODE = VFS.RAW_FIRST
-  local s = assert(VFS.LoadFile(CONFIG_FILE, VFSMODE))
-  local chunk = assert(loadstring(s, file))
-  setfenv(chunk, gadget)
-  chunk()
+	local CONFIG_FILE = "LuaRules/Configs/spawn_defs.lua"
+	local VFSMODE = VFS.RAW_FIRST
+	local s = assert(VFS.LoadFile(CONFIG_FILE, VFSMODE))
+	local chunk = assert(loadstring(s, file))
+	setfenv(chunk, gadget)
+	chunk()
 end
 
 --------------------------------------------------------------------------------
@@ -129,20 +129,20 @@ end
 --
 
 local function SetToList(set)
-  local list = {}
-  for k in pairs(set) do
-    list[#list+1] = k
-  end
-  return list
+	local list = {}
+	for k in pairs(set) do
+		list[#list+1] = k
+	end
+	return list
 end
 
 
 local function SetCount(set)
-  local count = 0
-  for k in pairs(set) do
-    count = count + 1
-  end
-  return count
+	local count = 0
+	for k in pairs(set) do
+		count = count + 1
+	end
+	return count
 end
 
 --------------------------------------------------------------------------------
@@ -152,63 +152,63 @@ end
 --
 
 for i, v in ipairs(modes) do -- make it bi-directional
-  modes[v] = i
+	modes[v] = i
 end
 
 
 local function CompareDifficulty(...)
-  level = 1
-  for _, difficulty in ipairs{...} do
-    if (modes[difficulty] > level) then
-      level = modes[difficulty]
-    end
-  end
-  return modes[level]
+	level = 1
+	for _, difficulty in ipairs{...} do
+		if (modes[difficulty] > level) then
+			level = modes[difficulty]
+		end
+	end
+	return modes[level]
 end
 
 
 if (not gameMode) then -- set human and computer teams
-  humanTeams[0]    = true
-  computerTeams[1] = true
-  chickenTeamID    = 1
-  luaAI            = 0 --defaultDifficulty
+	humanTeams[0]		= true
+	computerTeams[1]	= true
+	chickenTeamID		= 1
+	luaAI			= 0 --defaultDifficulty
 else
-  local teams = Spring.GetTeamList()
-  local lastChickenTeam = nil
-  -- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
-  -- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
-  for _, teamID in pairs(teams) do
-    local luaAI = Spring.GetTeamLuaAI(teamID)
-    if luaAI and string.find(string.lower(luaAI), "chicken") then
-      lastChickenTeam = teamID
-      --break
-    end
-  end
-  local highestLevel = 0
-  for _, teamID in pairs(teams) do
-    local teamLuaAI = Spring.GetTeamLuaAI(teamID)
-    -- check only for chicken AI teams
-    if (teamLuaAI and teamLuaAI ~= "" and modes[teamLuaAI]) then
-      luaAI = teamLuaAI
-      highestLevel = CompareDifficulty(teamLuaAI, highestLevel)
-      chickenTeamID = teamID
-      computerTeams[teamID] = true
-    elseif lastChickenTeam and Spring.AreTeamsAllied(teamID,lastChickenTeam) then
-      computerTeams[teamID] = true -- count as computer
-    else --if not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
+	local teams = Spring.GetTeamList()
+	local lastChickenTeam = nil
+	-- the problem is with human controlled chickens, otherwise it counts them as robot-players and difficulty increases very much
+	-- probably, ideally this needs to be taught to differentiate between human chickens and human robots...
+	for _, teamID in pairs(teams) do
+		local luaAI = Spring.GetTeamLuaAI(teamID)
+		if luaAI and string.find(string.lower(luaAI), "chicken") then
+			lastChickenTeam = teamID
+			--break
+		end
+	end
+	local highestLevel = 0
+	for _, teamID in pairs(teams) do
+		local teamLuaAI = Spring.GetTeamLuaAI(teamID)
+		-- check only for chicken AI teams
+		if (teamLuaAI and teamLuaAI ~= "" and modes[teamLuaAI]) then
+			luaAI = teamLuaAI
+			highestLevel = CompareDifficulty(teamLuaAI, highestLevel)
+			chickenTeamID = teamID
+			computerTeams[teamID] = true
+		elseif lastChickenTeam and Spring.AreTeamsAllied(teamID,lastChickenTeam) then
+			computerTeams[teamID] = true -- count as computer
+		else --if not (chickenTeamID and Spring.AreTeamsAllied(teamID, chickenTeamID))
 	--then -- well as far as I understood this means to check whether team is chicken enemy then do next
-      humanTeams[teamID]    = true
-    end
-  end
-  luaAI = highestLevel
+			humanTeams[teamID] = true
+		end
+	end
+	luaAI = highestLevel
 end
 
-local gaiaTeamID          = Spring.GetGaiaTeamID()
+local gaiaTeamID = Spring.GetGaiaTeamID()
 computerTeams[gaiaTeamID] = nil
-humanTeams[gaiaTeamID]    = nil
+humanTeams[gaiaTeamID] = nil
 
 local humanTeamsOrdered = {}
-for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end	
+for id,_ in ipairs(humanTeams) do humanTeamsOrdered[#humanTeamsOrdered+1] = id end
 for i=1, #humanTeamsOrdered do
 	if humanTeamsOrdered[i+1] and not Spring.AreTeamsAllied(humanTeamsOrdered[i], humanTeamsOrdered[i+1]) then
 		pvp = true
@@ -228,22 +228,22 @@ GG.Chicken = {}
 
 
 local function SetGlobals(difficulty)
-  for key, value in pairs(gadget.difficulties[difficulty]) do
-    gadget[key] = value
-  end
-  gadget.difficulties = nil
+	for key, value in pairs(gadget.difficulties[difficulty]) do
+		gadget[key] = value
+	end
+	gadget.difficulties = nil
 end
 
 SetGlobals(luaAI or defaultDifficulty) -- set difficulty
 
 -- adjust for player and chicken bot count
 local playerCount = SetCount(humanTeams)
-local malus     = playerCount^playerMalus
+local malus = playerCount^playerMalus
 
 burrowRegressTime = burrowRegressTime/playerCount
 humanAggroPerBurrow = humanAggroPerBurrow/playerCount
 humanAggroDefenseFactor = humanAggroDefenseFactor*playerCount
-defensePerWave  = defensePerWave*playerCount
+defensePerWave	= defensePerWave*playerCount
 
 echo("Chicken configured for "..playerCount.." players")
 
@@ -252,15 +252,15 @@ gracePeriod = math.max(gracePeriod - gracePenalty*(playerCount - 1), gracePeriod
 --humanAggroDecay = humanAggroDecay/playerCount
 
 local function DisableBuildButtons(unitID, buildNames)
-  for _, unitName in ipairs(buildNames) do
-    if (UnitDefNames[unitName]) then
-      local cmdDescID = Spring.FindUnitCmdDesc(unitID, -UnitDefNames[unitName].id)
-      if (cmdDescID) then
-        local cmdArray = {disabled = true, tooltip = tooltipMessage}
-        Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
-      end
-    end
-  end
+	for _, unitName in ipairs(buildNames) do
+		if (UnitDefNames[unitName]) then
+			local cmdDescID = Spring.FindUnitCmdDesc(unitID, -UnitDefNames[unitName].id)
+			if (cmdDescID) then
+				local cmdArray = {disabled = true, tooltip = tooltipMessage}
+				Spring.EditUnitCmdDesc(unitID, cmdDescID, cmdArray)
+			end
+		end
+	end
 end
 
 
@@ -272,8 +272,8 @@ end
 
 
 local function SetupUnit(unitName)
-  Spring.SetGameRulesParam(unitName.."Count", 0)
-  Spring.SetGameRulesParam(unitName.."Kills", 0)
+	Spring.SetGameRulesParam(unitName.."Count", 0)
+	Spring.SetGameRulesParam(unitName.."Kills", 0)
 end
 
 local baseQueenTime = queenTime
@@ -284,22 +284,22 @@ local difficulty = modes[luaAI or defaultDifficulty]
 --if tobool(Spring.GetModOptions().burrowrespawn) or forceBurrowRespawn then respawnBurrows = true end
 
 local function UpdateUnitCount()
-  local teamUnitCounts = Spring.GetTeamUnitsCounts(chickenTeamID)
+	local teamUnitCounts = Spring.GetTeamUnitsCounts(chickenTeamID)
 
-  --[[ if there are no more chickens of one type, the counter for this type
-       is not updated anymore -> counter keeps last known quantity
-       that's why we force to set all counters to zero first ]]
-  for id, type in pairs(chickenTypes) do
-    Spring.SetGameRulesParam(id.."Count", 0)
-  end
-  for id, type in pairs(defenders) do
-    Spring.SetGameRulesParam(id.."Count", 0)
-  end
-  for unitDefID, count in pairs(teamUnitCounts) do
-    if (unitDefID ~= "n") then
-      Spring.SetGameRulesParam(UnitDefs[unitDefID].name.."Count", count)
-    end
-  end
+	--[[ if there are no more chickens of one type, the counter for this type
+			 is not updated anymore -> counter keeps last known quantity
+			 that's why we force to set all counters to zero first ]]
+	for id, type in pairs(chickenTypes) do
+		Spring.SetGameRulesParam(id.."Count", 0)
+	end
+	for id, type in pairs(defenders) do
+		Spring.SetGameRulesParam(id.."Count", 0)
+	end
+	for unitDefID, count in pairs(teamUnitCounts) do
+		if (unitDefID ~= "n") then
+			Spring.SetGameRulesParam(UnitDefs[unitDefID].name.."Count", count)
+		end
+	end
 end
 
 
@@ -310,58 +310,58 @@ end
 --
 
 local function DetectCpuLag()
-  local setspeed,actualspeed,paused = Spring.GetGameSpeed()
-  if paused then return end
-  local n = Spring.GetGameFrame()
-  local players = Spring.GetPlayerList()
-  for i=1, #players do
-    local playerID = players[i]
-    local _, active, spectator, _, _, _, cpuUsage = Spring.GetPlayerInfo(playerID)
-    if active and (not spec) and (cpuUsage > 0) then
-      cpuUsages[playerID] = {cpuUsage=math.min(cpuUsage, 1.2), frame=n}
-    end
-  end
-  if (n > 30*10) then
-    for playerID, t in pairs(cpuUsages) do
-      if (n-t.frame > 30*60) then
-        cpuUsages[playerID] = nil
-      end
-    end
-    local cpuUsageCount = 0
-    local cpuUsageSum   = 0
-    for playerID, t in pairs(cpuUsages) do
-      cpuUsageSum   = cpuUsageSum + t.cpuUsage
-      cpuUsageCount = cpuUsageCount + 1
-    end
-    if cpuUsageCount == 0 then
-      lagging = false
-      return
-    end
-    local averageCpu = (cpuUsageSum/cpuUsageCount) * (setspeed/actualspeed)
-    if (averageCpu > lagTrigger+triggerTolerance) then
-      if (not lagging) then
-        Spring.SetGameRulesParam("lagging", 1)
-      end
-      lagging = true
-    end
-    if (averageCpu < lagTrigger-triggerTolerance) then
-      if (lagging) then
-        Spring.SetGameRulesParam("lagging", 0)
-      end
-      lagging = false
-    end
-  end
+	local setspeed,actualspeed,paused = Spring.GetGameSpeed()
+	if paused then return end
+	local n = Spring.GetGameFrame()
+	local players = Spring.GetPlayerList()
+	for i=1, #players do
+		local playerID = players[i]
+		local _, active, spectator, _, _, _, cpuUsage = Spring.GetPlayerInfo(playerID)
+		if active and (not spec) and (cpuUsage > 0) then
+			cpuUsages[playerID] = {cpuUsage=math.min(cpuUsage, 1.2), frame=n}
+		end
+	end
+	if (n > 30*10) then
+		for playerID, t in pairs(cpuUsages) do
+			if (n-t.frame > 30*60) then
+				cpuUsages[playerID] = nil
+			end
+		end
+		local cpuUsageCount = 0
+		local cpuUsageSum	 = 0
+		for playerID, t in pairs(cpuUsages) do
+			cpuUsageSum	 = cpuUsageSum + t.cpuUsage
+			cpuUsageCount = cpuUsageCount + 1
+		end
+		if cpuUsageCount == 0 then
+			lagging = false
+			return
+		end
+		local averageCpu = (cpuUsageSum/cpuUsageCount) * (setspeed/actualspeed)
+		if (averageCpu > lagTrigger+triggerTolerance) then
+			if (not lagging) then
+				Spring.SetGameRulesParam("lagging", 1)
+			end
+			lagging = true
+		end
+		if (averageCpu < lagTrigger-triggerTolerance) then
+			if (lagging) then
+				Spring.SetGameRulesParam("lagging", 0)
+			end
+			lagging = false
+		end
+	end
 end
 
 
 local function KillOldChicken()
-  local now = spGetGameSeconds()
-  for unitID, birthDate in pairs(chickenBirths) do
-    local age = now - birthDate
-    if (age > maxAge + random(10)) then
-      Spring.DestroyUnit(unitID)
-    end
-  end
+	local now = spGetGameSeconds()
+	for unitID, birthDate in pairs(chickenBirths) do
+		local age = now - birthDate
+		if (age > maxAge + random(10)) then
+			Spring.DestroyUnit(unitID)
+		end
+	end
 end
 
 
@@ -372,17 +372,17 @@ end
 --
 
 local function KillAllComputerUnits()
-  victory = true
-  for teamID in pairs(computerTeams) do
-    --local teamUnits = spGetTeamUnits(teamID)
-    --for i=1,#teamUnits do
-    --  Spring.DestroyUnit(teamUnits[i])
-    --end
-    local allyTeam = select(6, Spring.GetTeamInfo(teamID))
-    if GG.DestroyAlliance then
-      GG.DestroyAlliance(allyTeam)
-    end
-  end
+	victory = true
+	for teamID in pairs(computerTeams) do
+		--local teamUnits = spGetTeamUnits(teamID)
+		--for i=1,#teamUnits do
+		--	Spring.DestroyUnit(teamUnits[i])
+		--end
+		local allyTeam = select(6, Spring.GetTeamInfo(teamID))
+		if GG.DestroyAlliance then
+			GG.DestroyAlliance(allyTeam)
+		end
+	end
 end
 
 
@@ -393,37 +393,37 @@ end
 --
 
 local function IsPlayerUnitNear(x, z, r)
-  for teamID in pairs(humanTeams) do   
-    if (spGetUnitsInCylinder(x, z, r, teamID)[1]) then
-      return true
-    end
-  end
+	for teamID in pairs(humanTeams) do	 
+		if (spGetUnitsInCylinder(x, z, r, teamID)[1]) then
+			return true
+		end
+	end
 end
 
 -- used to generate eggs from burrows
 local function SpawnEggs(x, y, z)
-  local choices,choisesN = {},0
-  local now = spGetGameSeconds() + math.floor(gameFrameOffset/30)
+	local choices,choisesN = {},0
+	local now = spGetGameSeconds() + math.floor(gameFrameOffset/30)
 
-  for name in pairs(chickenTypes) do
-    if (not chickenTypes[name].noegg and chickenTypes[name].time <= now) then
-      choisesN = choisesN + 1
-      choices[choisesN] = name
-    end
-  end
-  for name in pairs(defenders) do
-    if (not defenders[name].noegg and defenders[name].time <= now) then
-      choisesN = choisesN + 1
-      choices[choisesN] = name
-    end
-  end
-  if choisesN <= 0 then return end
-  for i=1, burrowEggs do
-    local choice = choices[random(choisesN)]
-    local rx, rz = random(-30, 30), random(-30, 30)
-    local eggID = Spring.CreateFeature(choice.."_egg", x+rx, y, z+rz, random(-32000, 32000))
-    --if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
-  end
+	for name in pairs(chickenTypes) do
+		if (not chickenTypes[name].noegg and chickenTypes[name].time <= now) then
+			choisesN = choisesN + 1
+			choices[choisesN] = name
+		end
+	end
+	for name in pairs(defenders) do
+		if (not defenders[name].noegg and defenders[name].time <= now) then
+			choisesN = choisesN + 1
+			choices[choisesN] = name
+		end
+	end
+	if choisesN <= 0 then return end
+	for i=1, burrowEggs do
+		local choice = choices[random(choisesN)]
+		local rx, rz = random(-30, 30), random(-30, 30)
+		local eggID = Spring.CreateFeature(choice.."_egg", x+rx, y, z+rz, random(-32000, 32000))
+		--if (eggID and (not eggs)) then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
+	end
 end
 
 --cleans up old eggs
@@ -477,250 +477,247 @@ local function UpdateBurrowTarget(burrowID, targetArg)
 end
 
 local function AttackNearestEnemy(unitID)
-  local targetID = Spring.GetUnitNearestEnemy(unitID)
-  if (targetID) then
-    local tx, ty, tz  = spGetUnitPosition(targetID)
-    spGiveOrderToUnit(unitID, CMD_FIGHT, {tx, ty, tz}, emptyTable)
-  end
+	local targetID = Spring.GetUnitNearestEnemy(unitID)
+	if (targetID) then
+		local tx, ty, tz = spGetUnitPosition(targetID)
+		spGiveOrderToUnit(unitID, CMD_FIGHT, {tx, ty, tz}, emptyTable)
+	end
 end
 
 local function ChooseTarget(unitID)
-  local tries = 0
-  local units = {}
-  if (not unitID) or (spGetUnitTeam(unitID) == gaiaTeamID) then 
-    --makes chicken go for random unit belonging to owner of random player if unitID is NIL
+	local tries = 0
+	local units = {}
+	if (not unitID) or (spGetUnitTeam(unitID) == gaiaTeamID) then 
+		--makes chicken go for random unit belonging to owner of random player if unitID is NIL
 	local humanTeamList = SetToList(humanTeams)
 	if (not humanTeamList[1]) then
-	  return
+		return
 	end
-    repeat
-      local teamID = humanTeamList[random(#humanTeamList)]
-      units  = spGetTeamUnits(teamID)
-      tries = tries + 1
-    until (#units > 0 or tries >= 100)
-  else 
-    --makes chicken go for random unit belonging to owner of closest enemy
-    local teamID = spGetUnitTeam(unitID)
+		repeat
+			local teamID = humanTeamList[random(#humanTeamList)]
+			units	= spGetTeamUnits(teamID)
+			tries = tries + 1
+		until (#units > 0 or tries >= 100)
+	else 
+		--makes chicken go for random unit belonging to owner of closest enemy
+		local teamID = spGetUnitTeam(unitID)
 	units = spGetTeamUnits(teamID)
-  end
-  tries = 0
-  local targetID
-  if (units[2]) then
-    repeat
-	  targetID = units[random(1,#units)]
-      tries = tries + 1
-    until (targetID and not (noTarget[UnitDefs[Spring.GetUnitDefID(targetID)].name]) or tries>=100)
-  else
-    targetID = units[1]
-  end
-  if not targetID then return end
-  return {spGetUnitPosition(targetID)}
+	end
+	tries = 0
+	local targetID
+	if (units[2]) then
+		repeat
+		targetID = units[random(1,#units)]
+			tries = tries + 1
+		until (targetID and not (noTarget[UnitDefs[Spring.GetUnitDefID(targetID)].name]) or tries>=100)
+	else
+		targetID = units[1]
+	end
+	if not targetID then return end
+	return {spGetUnitPosition(targetID)}
 end
 
 
 local function ChooseChicken(units, useTech)
-  local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
-  local units = units or chickenTypes
-  local choices,choisesN = {},0
-  local techMod = 0
-  if useTech then
-    techMod = -totalTechAccel
-  end
-  for chickenName, c in pairs(units) do
-    if (c.time + techMod <= s and (c.obsolete or math.huge) + techMod > s) then
-      local chance = math.floor((c.initialChance or 1) + 
-                                (s-c.time) * (c.chanceIncrease or 0))
-      for i=1, chance do
-        choisesN = choisesN + 1
-        choices[choisesN] = chickenName
-      end
-    end
-  end
-  if (choisesN==0) then
-    return
-  else
-    return choices[random(choisesN)], choices[random(choisesN)]
-  end
+	local s = spGetGameSeconds() + math.floor(gameFrameOffset/30)
+	local units = units or chickenTypes
+	local choices,choisesN = {},0
+	local techMod = 0
+	if useTech then
+		techMod = -totalTechAccel
+	end
+	for chickenName, c in pairs(units) do
+		if (c.time + techMod <= s and (c.obsolete or math.huge) + techMod > s) then
+			local chance = math.floor((c.initialChance or 1) + (s-c.time) * (c.chanceIncrease or 0))
+			for i=1, chance do
+				choisesN = choisesN + 1
+				choices[choisesN] = chickenName
+			end
+		end
+	end
+	if (choisesN==0) then
+		return
+	else
+		return choices[random(choisesN)], choices[random(choisesN)]
+	end
 end
 
 
 local function SpawnChicken(burrowID, spawnNumber, chickenName)
-  local x, z
-  local bx, by, bz    = spGetUnitPosition(burrowID)
-  if (not bx or not by or not bz) then
-    return
-  end
-  local tries         = 0
-  local s             = spawnSquare
-  local now           = spGetGameSeconds()
-  local burrowTarget  = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
-  local tloc = targetCache
-  if (burrowTarget) then tloc = ChooseTarget(burrowTarget) end
-  if pvp and burrows[burrowID].targetID then
+	local x, z
+	local bx, by, bz = spGetUnitPosition(burrowID)
+	if (not bx or not by or not bz) then
+		return
+	end
+	local tries		 = 0
+	local s			= spawnSquare
+	local now		= spGetGameSeconds()
+	local burrowTarget	= Spring.GetUnitNearestEnemy(burrowID, 20000, false)
+	local tloc = targetCache
+	if (burrowTarget) then tloc = ChooseTarget(burrowTarget) end
+	if pvp and burrows[burrowID].targetID then
 	local tx, ty, tz = spGetUnitPosition(burrows[burrowID].targetID)
 	tloc = {tx, ty, tz}
-  end
+	end
 
-  for i=1, spawnNumber do
-
-    repeat
-      x = random(bx - s, bx + s)
-      z = random(bz - s, bz + s)
-      s = s + spawnSquareIncrement
-      tries = tries + 1
-    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
-    local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
-    spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
-    if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
-    chickenBirths[unitID] = now 
-  end
+	for i=1, spawnNumber do
+		repeat
+			x = random(bx - s, bx + s)
+			z = random(bz - s, bz + s)
+			s = s + spawnSquareIncrement
+			tries = tries + 1
+		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
+		local unitID = spCreateUnit(chickenName, x, by, z, "n", chickenTeamID)
+		spGiveOrderToUnit(unitID, CMD.MOVE_STATE, roamParam, emptyTable) --// set moveState to roam
+		if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
+		chickenBirths[unitID] = now 
+	end
 end
 
 local function SpawnTurret(burrowID, turret, number, force)
-  if (not turret) or Spring.GetUnitIsDead(burrowID) then return end
-  if victory then return end
-  
-  local cost = (defenders[turret] and defenders[turret].cost) or 1
-  local squadSize = (defenders[turret] and defenders[turret].squadSize) or 1
-  squadSize = squadSize*defenseQuota/cost * random(75, 125)/100
-  
-  if ((not force) and random() > squadSize) then
-    return
-  end
-  
-  local x, z
-  local bx, by, bz    = spGetUnitPosition(burrowID)
-  if not bx then return end
-  local tries         = 0
-  local s             = spawnSquare
-  local spawnNumber   = number or math.max(squadSize, 1)
-  local now           = spGetGameSeconds()
-  local turretDef
+	if (not turret) or Spring.GetUnitIsDead(burrowID) then return end
+	if victory then return end
+	
+	local cost = (defenders[turret] and defenders[turret].cost) or 1
+	local squadSize = (defenders[turret] and defenders[turret].squadSize) or 1
+	squadSize = squadSize*defenseQuota/cost * random(75, 125)/100
+	
+	if ((not force) and random() > squadSize) then
+		return
+	end
+	
+	local x, z
+	local bx, by, bz = spGetUnitPosition(burrowID)
+	if not bx then return end
+	local tries = 0
+	local s	 = spawnSquare
+	local spawnNumber = number or math.max(squadSize, 1)
+	local now = spGetGameSeconds()
+	local turretDef
 
-  if not force then
-    defensePool = defensePool - cost*spawnNumber
-  end  
-  
-  for i=1, spawnNumber do  
-    repeat
-      x = random(bx - s, bx + s)
-      z = random(bz - s, bz + s)
-      s = s + spawnSquareIncrement
-      tries = tries + 1
-    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
-    
-    local unitID = spCreateUnit(turret, x, by, z, "n", chickenTeamID) -- FIXME
-    turretDef = UnitDefs[spGetUnitDefID(unitID)]
-    if turretDef.canMove then
-      local burrowTarget  = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
-      if (burrowTarget) then
-        local tloc = ChooseTarget(burrowTarget)
-		if tloc then
-			spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
-	  	end
-      end
-    --else
-    --  Spring.SetUnitBlocking(unitID, false)
-    end
-  end
+	if not force then
+		defensePool = defensePool - cost*spawnNumber
+	end	
+	
+	for i=1, spawnNumber do	
+		repeat
+			x = random(bx - s, bx + s)
+			z = random(bz - s, bz + s)
+			s = s + spawnSquareIncrement
+			tries = tries + 1
+		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
+		
+		local unitID = spCreateUnit(turret, x, by, z, "n", chickenTeamID) -- FIXME
+		turretDef = UnitDefs[spGetUnitDefID(unitID)]
+		if turretDef.canMove then
+			local burrowTarget = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
+			if (burrowTarget) then
+				local tloc = ChooseTarget(burrowTarget)
+				if tloc then
+					spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
+				end
+			end
+		--else
+		--	Spring.SetUnitBlocking(unitID, false)
+		end
+	end
 end
 
 local function SpawnSupport(burrowID, support, number, force)
-  if (not support) or Spring.GetUnitIsDead(burrowID) then return end
-  local squadSize = (supporters[support] and supporters[support].squadSize) or 1
-  squadSize = squadSize * waveSizeMult * random(75, 125)/100
-  
-  local t = spGetGameSeconds()
-  if (t < rampUpTime) then
-    squadSize = squadSize * t/rampUpTime
-  end
-  
-  if ((not force) and random() > squadSize)  then
-    return
-  end
-  
-  local x, z
-  local bx, by, bz    = spGetUnitPosition(burrowID)
-  if not bx then return end
-  local tries         = 0
-  local s             = spawnSquare
-  local spawnNumber   = number or math.max(math.floor(squadSize), 1)
+	if (not support) or Spring.GetUnitIsDead(burrowID) then return end
+	local squadSize = (supporters[support] and supporters[support].squadSize) or 1
+	squadSize = squadSize * waveSizeMult * random(75, 125)/100
+	
+	local t = spGetGameSeconds()
+	if (t < rampUpTime) then
+		squadSize = squadSize * t/rampUpTime
+	end
+	
+	if ((not force) and random() > squadSize)	then
+		return
+	end
+	
+	local x, z
+	local bx, by, bz = spGetUnitPosition(burrowID)
+	if not bx then return end
+	local tries = 0
+	local s = spawnSquare
+	local spawnNumber = number or math.max(math.floor(squadSize), 1)
 
-  for i=1, spawnNumber do  
-    repeat
-      x = random(bx - s, bx + s)
-      z = random(bz - s, bz + s)
-      s = s + spawnSquareIncrement
-      tries = tries + 1
-    until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
-    
-    local unitID = spCreateUnit(support, x, by, z, "n", chickenTeamID) -- FIXME
-    local burrowTarget  = Spring.GetUnitNearestEnemy(burrowID, 20000, false)
-    if (burrowTarget) then
-      local tloc = ChooseTarget(burrowTarget)
-		if tloc then
-			spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
-	  	end
-    end
-  end
+	for i=1, spawnNumber do	
+		repeat
+			x = random(bx - s, bx + s)
+			z = random(bz - s, bz + s)
+			s = s + spawnSquareIncrement
+			tries = tries + 1
+		until (not spGetGroundBlocked(x, z) or tries > spawnNumber + maxTriesSmall)
+		
+		local unitID = spCreateUnit(support, x, by, z, "n", chickenTeamID) -- FIXME
+		local burrowTarget	= Spring.GetUnitNearestEnemy(burrowID, 20000, false)
+		if (burrowTarget) then
+			local tloc = ChooseTarget(burrowTarget)
+			if tloc then
+				spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable)
+			end
+		end
+	end
 end
 
 local function SpawnBurrow(number, loc, burrowLevel)
-  if (victory or endgame) then return end
-  
-  local t     = spGetGameSeconds()
-  local unitID
-  --if t < (gracePeriod/4) then return end
-    
-  for i=1, (number or 1) do
-    local x, y, z
-    local tries = 0
-    if loc then
-      x, y, z = unpack(loc)
-    else
-  
-      repeat
-	x = random(spawnSquare, Game.mapSizeX - spawnSquare)
-	z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
-	y = Spring.GetGroundHeight(x, z)
-	tries = tries + 1
-	local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
-	if (blocking == 2) then
-	  if (lava and Spring.GetGroundHeight(x,z) <= 0) then
-	    blocking = 1
-	  end
+	if (victory or endgame) then return end
 	
-	  local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
-	  local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
-	  local humanUnitsInVicinity = false
-	  local humanUnitsInProximity = false
-	  for i=1, #vicinity, 1 do
-	    if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
-	      humanUnitsInVicinity = true
-	      break
-	    end
-	  end
-	
-	  for i=1, #proximity, 1 do
-	    if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
-	      humanUnitsInProximity = true
-	      break
-	    end
-	  end
-	
-	  if (humanUnitsInProximity or not humanUnitsInVicinity) then
-	    blocking = 1
-	  end
-	end
-      until (blocking == 2 or tries > maxTriesSmall)
-    end
+	local t		 = spGetGameSeconds()
+	local unitID
+	--if t < (gracePeriod/4) then return end
+		
+	for i=1, (number or 1) do
+		local x, y, z
+		local tries = 0
+		if loc then
+			x, y, z = unpack(loc)
+		else
+			repeat
+				x = random(spawnSquare, Game.mapSizeX - spawnSquare)
+				z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
+				y = Spring.GetGroundHeight(x, z)
+				tries = tries + 1
+				local blocking = Spring.TestBuildOrder(testBuilding, x, y, z, 1)
+				if (blocking == 2) then
+					if (lava and Spring.GetGroundHeight(x,z) <= 0) then
+						blocking = 1
+					end
+					
+					local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
+					local vicinity = spGetUnitsInCylinder(x, z, maxBaseDistance)
+					local humanUnitsInVicinity = false
+					local humanUnitsInProximity = false
+					for i=1, #vicinity, 1 do
+						if (spGetUnitTeam(vicinity[i]) ~= chickenTeamID) then
+							humanUnitsInVicinity = true
+							break
+						end
+					end
+				
+					for i=1, #proximity, 1 do
+						if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+							humanUnitsInProximity = true
+							break
+						end
+					end
+				
+					if (humanUnitsInProximity or not humanUnitsInVicinity) then
+						blocking = 1
+					end
+				end
+			until (blocking == 2 or tries > maxTriesSmall)
+		end
 
-    unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
-    burrows[unitID] = {targetID = unitID, targetDistance = 100000}
-    UpdateBurrowTarget(unitID, nil)
-    --Spring.SetUnitBlocking(unitID, false)
-  end
-  return unitID
+		unitID = spCreateUnit(burrowName, x, y, z, "n", chickenTeamID)
+		burrows[unitID] = {targetID = unitID, targetDistance = 100000}
+		UpdateBurrowTarget(unitID, nil)
+		--Spring.SetUnitBlocking(unitID, false)
+	end
+	return unitID
 end
 GG.Chicken.SpawnBurrow = SpawnBurrow
 
@@ -741,7 +738,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 			z = random(spawnSquare, Game.mapSizeZ - spawnSquare)
 		else
 			x = random(target[1] - maxDist, target[1] + maxDist)
-			z = random(target[3] - maxDist, target[3] + maxDist)			
+			z = random(target[3] - maxDist, target[3] + maxDist)
 		end
 		y = Spring.GetGroundHeight(x, z)
 		tries = tries + 1
@@ -767,7 +764,7 @@ local function SpawnUnit(unitName, number, minDist, maxDist, target)
 		
 		if (humanUnitsInProximity or not humanUnitsInVicinity) then
 			block = true
-		end	  
+		end
 	until (not spGetGroundBlocked(x, z) or (not block) or (tries > number + maxTries))
 	
 	for i=1, (number or 1) do
@@ -783,58 +780,58 @@ local function SetMorphFrame()
 end
 
 local function SpawnQueen()
-  local x, y, z
-  local tries = 0
-   
-  repeat
-    x = random(0, Game.mapSizeX)
-    z = random(0, Game.mapSizeZ)
-    y = Spring.GetGroundHeight(x, z)
-    tries = tries + 1
-    local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
+	local x, y, z
+	local tries = 0
+	 
+	repeat
+		x = random(0, Game.mapSizeX)
+		z = random(0, Game.mapSizeZ)
+		y = Spring.GetGroundHeight(x, z)
+		tries = tries + 1
+		local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
 	if (blocking == 2) then
-      local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
-      for i=1, #proximity, 1 do
-        if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
-          blocking = 1
-          break
-        end
-      end
-    end
-  until (blocking == 2 or tries > maxTries)
-  
-  queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5) * ((playerCount/2) + 0.5)
-  
-  if queenMorphName ~= '' then SetMorphFrame() end
-  return spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
+			local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
+			for i=1, #proximity, 1 do
+				if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+					blocking = 1
+					break
+				end
+			end
+		end
+	until (blocking == 2 or tries > maxTries)
+	
+	queenHealthMod = queenHealthMod * (0.5*(queenTime/baseQueenTime) + 0.5) * ((playerCount/2) + 0.5)
+	
+	if queenMorphName ~= '' then SetMorphFrame() end
+	return spCreateUnit(queenName, x, y, z, "n", chickenTeamID)
 end
 
 local function SpawnMiniQueen()
-  local x, y, z
-  local tries = 0
-   
-  repeat
-    x = random(0, Game.mapSizeX)
-    z = random(0, Game.mapSizeZ)
-    y = Spring.GetGroundHeight(x, z)
-    tries = tries + 1
-    local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
+	local x, y, z
+	local tries = 0
+	 
+	repeat
+		x = random(0, Game.mapSizeX)
+		z = random(0, Game.mapSizeZ)
+		y = Spring.GetGroundHeight(x, z)
+		tries = tries + 1
+		local blocking = Spring.TestBuildOrder(testBuildingQ, x, y, z, 1)
 	if (blocking == 2) then
-      local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
-      for i=1, #proximity, 1 do
-        if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
-          blocking = 1
-          break
-        end
-      end
-    end
-  until (blocking == 2 or tries > maxTries)
-  local unitID = spCreateUnit(miniQueenName, x, y, z, "n", chickenTeamID)
-  
-  local miniQueenTarget  = Spring.GetUnitNearestEnemy(unitID, 20000, false)
-  local tloc
-  if (miniQueenTarget) then tloc = ChooseTarget(miniQueenTarget) end
-  if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
+			local proximity = spGetUnitsInCylinder(x, z, minBaseDistance)
+			for i=1, #proximity, 1 do
+				if (spGetUnitTeam(proximity[i]) ~= chickenTeamID) then
+					blocking = 1
+					break
+				end
+			end
+		end
+	until (blocking == 2 or tries > maxTries)
+	local unitID = spCreateUnit(miniQueenName, x, y, z, "n", chickenTeamID)
+	
+	local miniQueenTarget	= Spring.GetUnitNearestEnemy(unitID, 20000, false)
+	local tloc
+	if (miniQueenTarget) then tloc = ChooseTarget(miniQueenTarget) end
+	if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
 end
 
 
@@ -875,99 +872,99 @@ end
 
 
 local function Wave()
-  local t = spGetGameSeconds()
-  
-  if lagging or victory then
-    return
-  end
-  
-  if endgame and pvp then
-	  endMiniQueenNum = endMiniQueenNum + 1
-	  if endMiniQueenNum == endMiniQueenWaves then
+	local t = spGetGameSeconds()
+	
+	if lagging or victory then
+		return
+	end
+	
+	if endgame and pvp then
+		endMiniQueenNum = endMiniQueenNum + 1
+		if endMiniQueenNum == endMiniQueenWaves then
 		for i=1,playerCount do SpawnMiniQueen() end
 		endMiniQueenNum = 0 
-	  end
-  end
-  specialPowerCooldown = specialPowerCooldown - 1
-  ProcessSpecialPowers()
-  
-  waveNumber = waveNumber + 1
-  humanAggroPerWave[waveNumber] = humanAggro
-  
-  local burrowCount = SetCount(burrows)
-  --echo("Wave bonus delta this round: "..humanAggroDelta)
-  --echo("Wave bonus this round: "..humanAggro)
-  --reduce all chicken appearance times
-  local techDecel = 0
-  if humanAggro > 0 then
+		end
+	end
+	specialPowerCooldown = specialPowerCooldown - 1
+	ProcessSpecialPowers()
+	
+	waveNumber = waveNumber + 1
+	humanAggroPerWave[waveNumber] = humanAggro
+	
+	local burrowCount = SetCount(burrows)
+	--echo("Wave bonus delta this round: "..humanAggroDelta)
+	--echo("Wave bonus this round: "..humanAggro)
+	--reduce all chicken appearance times
+	local techDecel = 0
+	if humanAggro > 0 then
 	techDecel = humanAggro * humanAggroTechTimeRegress
-  else
+	else
 	techDecel = humanAggro * humanAggroTechTimeProgress
-  end
-  totalTechAccel = totalTechAccel - techDecel + techAccelPerPlayer*(playerCount-1)
-  totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
-  Spring.SetGameRulesParam("techAccel", totalTechAccel)
-  
-  --[[
-  for chickenName, c in pairs(chickenTypes) do
-  	c.time = c.time + techDecel
-  	if c.obsolete then c.obsolete = c.obsolete + techDecel end
-  end
-  for chickenName, c in pairs(supporters) do
-  	c.time = c.time + techDecel
-  	if c.obsolete then c.obsolete = c.obsolete + techDecel end
-  end
-  ]]--
-  --echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
-  --echo("Lifetime tech time reduction: " .. math.ceil(totalTechAccel) .. " seconds")
-  
-  local chicken1Name, chicken2Name = ChooseChicken(chickenTypes, true)
-  local turret = ChooseChicken(defenders)
-  local support = ChooseChicken(supporters, true)
-  local squadNumber = (t*timeSpawnBonus+waveSizeMult) * (baseWaveSize + math.min(math.max(humanAggro*humanAggroWaveFactor, 0), humanAggroWaveMax)  + burrowCount*burrowWaveSize) / math.max(burrowCount, 1)
-  if (t < rampUpTime) then
-    local oldNumber = squadNumber
-    squadNumber = squadNumber * t/rampUpTime
-    Spring.Echo("Ramping up", oldNumber, squadNumber, t, rampUpTime)
-  end
-  
-  --if queenID then squadNumber = squadNumber/2 end
-  local chicken1Number = math.ceil(waveRatio * squadNumber * chickenTypes[chicken1Name].squadSize)
-  local chicken2Number = math.floor((1-waveRatio) * squadNumber * chickenTypes[chicken2Name].squadSize)
-  if (queenID) then
-    SpawnChicken(queenID, chicken1Number*queenSpawnMult, chicken1Name)
-    SpawnChicken(queenID, chicken2Number*queenSpawnMult, chicken2Name)
-  end
+	end
+	totalTechAccel = totalTechAccel - techDecel + techAccelPerPlayer*(playerCount-1)
+	totalTechAccel = math.max(totalTechAccel, -Spring.GetGameSeconds() * (1-techTimeFloorFactor))
+	Spring.SetGameRulesParam("techAccel", totalTechAccel)
+	
+	--[[
+	for chickenName, c in pairs(chickenTypes) do
+		c.time = c.time + techDecel
+		if c.obsolete then c.obsolete = c.obsolete + techDecel end
+	end
+	for chickenName, c in pairs(supporters) do
+		c.time = c.time + techDecel
+		if c.obsolete then c.obsolete = c.obsolete + techDecel end
+	end
+	]]--
+	--echo(burrowCount .. " burrows have reduced tech time by " .. math.ceil(timeReduction) .. " seconds")
+	--echo("Lifetime tech time reduction: " .. math.ceil(totalTechAccel) .. " seconds")
+	
+	local chicken1Name, chicken2Name = ChooseChicken(chickenTypes, true)
+	local turret = ChooseChicken(defenders)
+	local support = ChooseChicken(supporters, true)
+	local squadNumber = (t*timeSpawnBonus+waveSizeMult) * (baseWaveSize + math.min(math.max(humanAggro*humanAggroWaveFactor, 0), humanAggroWaveMax)	+ burrowCount*burrowWaveSize) / math.max(burrowCount, 1)
+	if (t < rampUpTime) then
+		local oldNumber = squadNumber
+		squadNumber = squadNumber * t/rampUpTime
+		Spring.Echo("Ramping up", oldNumber, squadNumber, t, rampUpTime)
+	end
+	
+	--if queenID then squadNumber = squadNumber/2 end
+	local chicken1Number = math.ceil(waveRatio * squadNumber * chickenTypes[chicken1Name].squadSize)
+	local chicken2Number = math.floor((1-waveRatio) * squadNumber * chickenTypes[chicken2Name].squadSize)
+	if (queenID) then
+		SpawnChicken(queenID, chicken1Number*queenSpawnMult, chicken1Name)
+		SpawnChicken(queenID, chicken2Number*queenSpawnMult, chicken2Name)
+	end
 
-  -- some code for defenses
-  local defensePoolDelta = humanAggro * humanAggroDefenseFactor
-  if turret then
-    defensePoolDelta = defensePoolDelta + defensePerWave	-- don't add defensePerWave for the waves where no turrets can be spawned anyway
-  end
-  if defensePoolDelta < 0 then defensePoolDelta = 0 end
-  defensePool = defensePool + defensePoolDelta
-  defenseQuota = defensePool/burrowCount 
-  
-  local spawnDef = false
-  local cost = (defenders[turret] and defenders[turret].cost) or 1
-  if turret and cost < defenseQuota then
-    spawnDef = true
-    --Spring.Echo("Defense pool/quota: " .. defensePool .. " / " .. defenseQuota)    
-  end
-  
+	-- some code for defenses
+	local defensePoolDelta = humanAggro * humanAggroDefenseFactor
+	if turret then
+		defensePoolDelta = defensePoolDelta + defensePerWave	-- don't add defensePerWave for the waves where no turrets can be spawned anyway
+	end
+	if defensePoolDelta < 0 then defensePoolDelta = 0 end
+	defensePool = defensePool + defensePoolDelta
+	defenseQuota = defensePool/burrowCount 
+	
+	local spawnDef = false
+	local cost = (defenders[turret] and defenders[turret].cost) or 1
+	if turret and cost < defenseQuota then
+		spawnDef = true
+		--Spring.Echo("Defense pool/quota: " .. defensePool .. " / " .. defenseQuota)		
+	end
+	
  
-  
-  for burrowID in pairs(burrows) do
-      SpawnChicken(burrowID, chicken1Number, chicken1Name)
-      SpawnChicken(burrowID, chicken2Number, chicken2Name)
-      
-      if spawnDef and not endgame then SpawnTurret(burrowID, turret) end
-      SpawnSupport(burrowID, support)
-  end
-  humanAggro = humanAggro - humanAggroDecay
-  humanAggroDelta = 0
-  Spring.SetGameRulesParam("humanAggro", humanAggro)
-  return chicken1Name, chicken2Name, chicken1Number, chicken2Number
+	
+	for burrowID in pairs(burrows) do
+		SpawnChicken(burrowID, chicken1Number, chicken1Name)
+		SpawnChicken(burrowID, chicken2Number, chicken2Name)
+		
+		if spawnDef and not endgame then SpawnTurret(burrowID, turret) end
+		SpawnSupport(burrowID, support)
+	end
+	humanAggro = humanAggro - humanAggroDecay
+	humanAggroDelta = 0
+	Spring.SetGameRulesParam("humanAggro", humanAggro)
+	return chicken1Name, chicken2Name, chicken1Number, chicken2Number
 end
 
 local function MorphQueen()
@@ -1006,7 +1003,7 @@ local function MorphQueen()
 	local env = Spring.UnitScript.GetScriptEnv(queenID)
 	Spring.UnitScript.CallAsUnit(queenID, env.MorphFunc)
 	--health handling
-	local _,newMaxHealth         = Spring.GetUnitHealth(queenID)
+	local _,newMaxHealth				 = Spring.GetUnitHealth(queenID)
 	newMaxHealth = newMaxHealth * queenHealthMod
 	local newHealth = (oldHealth / oldMaxHealth) * newMaxHealth
 	-- if newHealth >= 1 then newHealth = 1 end
@@ -1028,23 +1025,23 @@ end
 --
 
 function gadget:UnitCreated(unitID, unitDefID, unitTeam)
-  local name = UnitDefs[unitDefID].name
-  if ( chickenTeamID == unitTeam ) then
-    local n = Spring.GetGameRulesParam(name.."Count") or 0
-    Spring.SetGameRulesParam(name.."Count", n+1)
-  end
-  if (alwaysVisible and unitTeam == chickenTeamID) then
-    Spring.SetUnitAlwaysVisible(unitID, true)
-  end
-  if (eggs) then
-    DisableBuildButtons(unitID, mexes)
-  end
+	local name = UnitDefs[unitDefID].name
+	if ( chickenTeamID == unitTeam ) then
+		local n = Spring.GetGameRulesParam(name.."Count") or 0
+		Spring.SetGameRulesParam(name.."Count", n+1)
+	end
+	if (alwaysVisible and unitTeam == chickenTeamID) then
+		Spring.SetUnitAlwaysVisible(unitID, true)
+	end
+	if (eggs) then
+		DisableBuildButtons(unitID, mexes)
+	end
 end
 
 function gadget:UnitFinished(unitID, unitDefID, unitTeam)
-  --burrow targetting
-  local name = UnitDefs[unitDefID].name
-  if (humanTeams[unitTeam]) and (UnitDefs[unitDefID].speed == 0) and (not noTarget.name) then
+	--burrow targetting
+	local name = UnitDefs[unitDefID].name
+	if (humanTeams[unitTeam]) and (UnitDefs[unitDefID].speed == 0) and (not noTarget.name) then
 	--echo("Building ID "..unitID .." added to target array")
 	local x, y, z = spGetUnitPosition(unitID)
 	targets[unitID] = unitTeam
@@ -1052,7 +1049,7 @@ function gadget:UnitFinished(unitID, unitDefID, unitTeam)
 	for burrow, data in pairs(burrows) do
 		UpdateBurrowTarget(burrow, unitID)
 	end
-  end
+	end
 end
 
 function gadget:GameStart()
@@ -1062,44 +1059,44 @@ function gadget:GameStart()
 end
 
 function gadget:GameFrame(n)
-  --if ((n+19 - gracePeriod*30) % (30 * chickenSpawnRate) < 0.1) and (n - gracePeriod*30 > 0) then
-  --if waveSchedule[n] then
-  if n > waveSchedule then
-    --waveSchedule[n + (30 * chickenSpawnRate)] = true
-    waveSchedule = n + (30 * chickenSpawnRate)
-    --Spring.Echo(waveSchedule)
-    local args = {Wave()}
-    if (args[1]) then
-      _G.chickenEventArgs = {type="wave", unpack(args)}
-      SendToUnsynced("ChickenEvent")
-      _G.chickenEventArgs = nil
-    end
+	--if ((n+19 - gracePeriod*30) % (30 * chickenSpawnRate) < 0.1) and (n - gracePeriod*30 > 0) then
+	--if waveSchedule[n] then
+	if n > waveSchedule then
+		--waveSchedule[n + (30 * chickenSpawnRate)] = true
+		waveSchedule = n + (30 * chickenSpawnRate)
+		--Spring.Echo(waveSchedule)
+		local args = {Wave()}
+		if (args[1]) then
+			_G.chickenEventArgs = {type="wave", unpack(args)}
+			SendToUnsynced("ChickenEvent")
+			_G.chickenEventArgs = nil
+		end
 	--waveSchedule[n] = nil	-- just to be sure
-  end
+	end
 
-  if ((n+17) % 30 < 0.1) then
-    UpdateUnitCount()
-    local burrowCount = SetCount(burrows)
-    
-    local t = spGetGameSeconds()
+	if ((n+17) % 30 < 0.1) then
+		UpdateUnitCount()
+		local burrowCount = SetCount(burrows)
+		
+		local t = spGetGameSeconds()
 
-    local timeSinceLastSpawn = t - timeOfLastSpawn
-    local burrowSpawnTime = burrowSpawnRate*0.25*(burrowCount+1)
-    
-    if (burrowSpawnTime < timeSinceLastSpawn and burrowCount < maxBurrows) then
-      SpawnBurrow()
-      timeOfLastSpawn = t
-      _G.chickenEventArgs = {type="burrowSpawn"}
-      SendToUnsynced("ChickenEvent")
-      _G.chickenEventArgs = nil
-    end
+		local timeSinceLastSpawn = t - timeOfLastSpawn
+		local burrowSpawnTime = burrowSpawnRate*0.25*(burrowCount+1)
+		
+		if (burrowSpawnTime < timeSinceLastSpawn and burrowCount < maxBurrows) then
+			SpawnBurrow()
+			timeOfLastSpawn = t
+			_G.chickenEventArgs = {type="burrowSpawn"}
+			SendToUnsynced("ChickenEvent")
+			_G.chickenEventArgs = nil
+		end
 	
-    if (t >= queenTime) then
-      if (not endgame) then
-        _G.chickenEventArgs = {type="queen"}
-        SendToUnsynced("ChickenEvent")
-        _G.chickenEventArgs = nil
-        if not pvp then
+		if (t >= queenTime) then
+			if (not endgame) then
+				_G.chickenEventArgs = {type="queen"}
+				SendToUnsynced("ChickenEvent")
+				_G.chickenEventArgs = nil
+				if not pvp then
 			queenID = SpawnQueen()
 			local xp = (malus or 1) - 1
 			--Spring.SetUnitExperience(queenID, xp)
@@ -1112,42 +1109,42 @@ function gadget:GameFrame(n)
 			for i=1,playerCount do SpawnMiniQueen() end
 		end
 		endgame = true
-      end
-    end
-    
+			end
+		end
+		
 	if miniQueenNum <= #miniQueenTime and (t >= (miniQueenTime[miniQueenNum]*queenTime)) then
 		_G.chickenEventArgs = {type="miniQueen"}
-	        SendToUnsynced("ChickenEvent")
+					SendToUnsynced("ChickenEvent")
 		_G.chickenEventArgs = nil
 		for i=1,playerCount do SpawnMiniQueen() end
 		miniQueenNum = miniQueenNum + 1
 	end
-  end
-  
-  if ((n+29) % 90) < 0.1 then
-    KillOldChicken()
-    DecayEggs()
+	end
+	
+	if ((n+29) % 90) < 0.1 then
+		KillOldChicken()
+		DecayEggs()
 	--DetectCpuLag() -- Was only done in 91.0 for some reason
 	
-    targetCache = ChooseTarget()
+		targetCache = ChooseTarget()
 
-    if (targetCache) then
-      local chickens = spGetTeamUnits(chickenTeamID) 
-      for i=1,#chickens do
-        local unitID = chickens[i]
-        local cmdQueue = spGetCommandQueue(unitID, 1)
-        if (not (cmdQueue and cmdQueue[1])) then
-          --AttackNearestEnemy(unitID)
-          if (difficulty > 1) and (unitID == queenID) then
-            spGiveOrderToUnit(unitID, CMD.MOVE, targetCache, {"shift"})
-          else
-            spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
-          end
-        end
-      end
-    end
-  end
-  
+		if (targetCache) then
+			local chickens = spGetTeamUnits(chickenTeamID) 
+			for i=1,#chickens do
+				local unitID = chickens[i]
+				local cmdQueue = spGetCommandQueue(unitID, 1)
+				if (not (cmdQueue and cmdQueue[1])) then
+					--AttackNearestEnemy(unitID)
+					if (difficulty > 1) and (unitID == queenID) then
+						spGiveOrderToUnit(unitID, CMD.MOVE, targetCache, {"shift"})
+					else
+						spGiveOrderToUnit(unitID, CMD_FIGHT, targetCache, {"shift"})
+					end
+				end
+			end
+		end
+	end
+	
 	--morphs queen
 	if n == morphFrame then
 		--Spring.Echo("Morphing queen")
@@ -1157,8 +1154,8 @@ end
 
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-  chickenBirths[unitID] = nil
-  if targets[unitID] then
+	chickenBirths[unitID] = nil
+	if targets[unitID] then
 	targets[unitID] = nil
 	for burrow, data in pairs(burrows) do 
 		if data.targetID == unitID then		--retarget burrows if needed
@@ -1167,18 +1164,18 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 			UpdateBurrowTarget(burrow, nil)
 		end
 	end
-  end
-  if (unitID == queenID) then
-    KillAllComputerUnits()
-  end
-  local name = UnitDefs[unitDefID].name
-  if (unitTeam == chickenTeamID) then
-    if (chickenTypes[name] or (name == burrowName)) then
-      local kills = Spring.GetGameRulesParam(name.."Kills")
-      Spring.SetGameRulesParam(name.."Kills", kills + 1)
-    end
-  end
-  if (burrows[unitID]) then
+	end
+	if (unitID == queenID) then
+		KillAllComputerUnits()
+	end
+	local name = UnitDefs[unitDefID].name
+	if (unitTeam == chickenTeamID) then
+		if (chickenTypes[name] or (name == burrowName)) then
+			local kills = Spring.GetGameRulesParam(name.."Kills")
+			Spring.SetGameRulesParam(name.."Kills", kills + 1)
+		end
+	end
+	if (burrows[unitID]) then
 	burrows[unitID] = nil
 	local count = 0
 	local burrowsOrdered = {}
@@ -1213,8 +1210,8 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	end
 	]]--
 	
-    if alwaysEggs then SpawnEggs(spGetUnitPosition(unitID)) end
-    if (eggs) then SpawnEggs(spGetUnitPosition(unitID)) end
+		if alwaysEggs then SpawnEggs(spGetUnitPosition(unitID)) end
+		if (eggs) then SpawnEggs(spGetUnitPosition(unitID)) end
 	if (respawnBurrows) or (random() < burrowRespawnChance) then
 		--echo("Respawning burrow")
 		SpawnBurrow()
@@ -1223,15 +1220,15 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	if pvp and endgame then
 		if count == 0 then KillAllComputerUnits() end
 	end
-  end
-  if (chickenTypes[name] and not chickenTypes[name].noegg) or (defenders[name] and not defenders[name].noegg) or (miniQueenName == name) then
-    local x, y, z = spGetUnitPosition(unitID)
-    if alwaysEggs then
+	end
+	if (chickenTypes[name] and not chickenTypes[name].noegg) or (defenders[name] and not defenders[name].noegg) or (miniQueenName == name) then
+		local x, y, z = spGetUnitPosition(unitID)
+		if alwaysEggs then
 		local eggID = Spring.CreateFeature(name.."_egg", x, y, z, random(-32000, 32000))
 		if eggDecayTime > 0 and not eggs then eggDecay[eggID] = spGetGameSeconds() + eggDecayTime end
 	end
 	if eggs then Spring.CreateFeature(name.."_egg", x, y, z, random(-32000, 32000)) end
-  end
+	end
 end
 
 --capturing a chicken counts as killing it
@@ -1241,25 +1238,25 @@ function gadget:AllowUnitTransfer(unitID, unitDefID, oldTeam, newTeam, capture)
 end
 
 function gadget:TeamDied(teamID)
-  humanTeams[teamID] = nil
-  computerTeams[teamID] = nil
+	humanTeams[teamID] = nil
+	computerTeams[teamID] = nil
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return mexesUnitDefID
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
-  if (eggs) then
-	if (mexesUnitDefID[cmdID]) then
-      return false -- command was used
-    end
-  end
-  return true  -- command was not used
+	if (eggs) then
+		if (mexesUnitDefID[cmdID]) then
+			return false -- command was used
+		end
+	end
+	return true	-- command was not used
 end
 
 function gadget:FeatureDestroyed(featureID, allyTeam)
@@ -1287,7 +1284,7 @@ function gadget:GameOver()
 	local time = Spring.GetGameSeconds()
 	local score = math.min(time/queenTime, 1) * 1000	-- 1000 points * queen anger %
 	if endgame then
-		score = score + 250		-- +250 points for making it to endgame
+		score = score + 250	-- +250 points for making it to endgame
 	end
 	if victory then
 		score = score + math.max(60*60 - time, 0) + 250	-- +250 points for winning, +1 point for each second under par
@@ -1372,18 +1369,18 @@ local SYNCED = SYNCED
 
 
 function WrapToLuaUI()
-  if (Script.LuaUI('ChickenEvent')) then
-    local chickenEventArgs = {}
-    for k, v in spairs(SYNCED.chickenEventArgs) do
-      chickenEventArgs[k] = v
-    end
-    Script.LuaUI.ChickenEvent(chickenEventArgs)
-  end
+	if (Script.LuaUI('ChickenEvent')) then
+		local chickenEventArgs = {}
+		for k, v in spairs(SYNCED.chickenEventArgs) do
+			chickenEventArgs[k] = v
+		end
+		Script.LuaUI.ChickenEvent(chickenEventArgs)
+	end
 end
 
 
 function gadget:Initialize()
-  gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
+	gadgetHandler:AddSyncAction('ChickenEvent', WrapToLuaUI)
 end
 
 
