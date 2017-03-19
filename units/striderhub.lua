@@ -13,10 +13,6 @@ unitDef = {
   buildingGroundDecalType       = [[armnanotc_aoplane.dds]],
 
   buildoptions                  = {
-    [[dynhub_support_base]],
-    [[dynhub_recon_base]],
-    [[dynhub_assault_base]],
-    [[dynhub_strike_base]],
     [[armcomdgun]],
 	[[scorpion]],
     [[dante]],
@@ -44,7 +40,7 @@ unitDef = {
   customParams                  = {
     description_de = [[Erzeugt Strider, Baut mit 10 M/s]],
     helptext       = [[The Strider Hub deploys striders, the "humongous mecha" that inspire awe and fear on the battlefield. Unlike a normal factory, the hub is only required to start a project, not to finish it.]],
-	helptext_de    = [[Das Strider Hub erzeugt Strider, welche sehr gefürchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benötigt, um ein Projekt zu starten, nicht, um es zu vollenden.]],
+	helptext_de    = [[Das Strider Hub erzeugt Strider, welche sehr gefÃ¼rchtet sind auf dem Schlachtfeld. Anders als normale Fabriken, wird dieser Hub nur benÃ¶tigt, um ein Projekt zu starten, nicht, um es zu vollenden.]],
 	aimposoffset   = [[0 0 0]],
 	midposoffset   = [[0 -10 0]],
 	modelradius    = [[35]],
