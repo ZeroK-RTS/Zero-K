@@ -357,11 +357,12 @@ function gadget:GameFrame(n)
 			
 			if debugMode then
 				Spring.Echo("====== Frame " .. n .. " ======")
-				Spring.Echo("team " .. i .. " Initial energy only scale:")
 				if scaleEnergy then
-					Spring.Echo("High: " .. (scaleEnergy[3] or "nil"))
-					Spring.Echo("Med: " .. (scaleEnergy[2] or "nil"))
-					Spring.Echo("Low: " .. (scaleEnergy[1] or "nil"))
+					Spring.Echo("team " .. i .. " Initial energy only scale", 
+						"High", scaleEnergy[3], 
+						"Med", scaleEnergy[2], 
+						"Low", scaleEnergy[1]
+					)
 				end
 			end
 			
@@ -428,6 +429,8 @@ function gadget:GameFrame(n)
 			local level, mStor, fakeMetalPull, income, expense, _, _, recieved = spGetTeamResources(teamID, "metal", true)
 			local elevel, eStor, fakeEnergyPull, eincome, eexpense, _, _, erecieved = spGetTeamResources(teamID, "energy", true)
 			
+			eincome = eincome - math.max(0, spGetTeamRulesParam(teamID, "OD_energyChange") or 0) + (spGetTeamRulesParam(teamID, "OD_energyIncome") or 0)
+			
 			mStor = mStor - HIDDEN_STORAGE
 			eStor = eStor - HIDDEN_STORAGE
 			
@@ -450,20 +453,22 @@ function gadget:GameFrame(n)
 			spSetTeamRulesParam(teamID, "extraEnergyPull", energyPull - fakeEnergyPull, ALLY_ACCESS)
 			
 			if debugMode then
-				Spring.Echo("team " .. i .. " Pull:")
-				if scaleEnergy then
-					Spring.Echo("High: " .. (spending[3] or "nil"))
-					Spring.Echo("Med: " .. (spending[2] or "nil"))
-					Spring.Echo("Low: " .. (spending[1] or "nil"))
+				if spending then
+					Spring.Echo("team " .. i .. " Pull", 
+						"High", spending[3], 
+						"Med", spending[2], 
+						"Low", spending[1]
+					)
 				end
 			end
 			
 			if debugMode then
-				Spring.Echo("team " .. i .. " Energy Only Pull:")
-				if scaleEnergy then
-					Spring.Echo("High: " .. (energySpending[3] or "nil"))
-					Spring.Echo("Med: " .. (energySpending[2] or "nil"))
-					Spring.Echo("Low: " .. (energySpending[1] or "nil"))
+				if energySpending then
+					Spring.Echo("team " .. i .. " Energy Only Pull", 
+						"High", energySpending[3], 
+						"Med", energySpending[2], 
+						"Low", energySpending[1]
+					)
 				end
 			end
 			
@@ -554,20 +559,22 @@ function gadget:GameFrame(n)
 			end
 			
 			if debugMode then
-				Spring.Echo("team " .. i .. " Scale:")
-				if scaleEnergy then
-					Spring.Echo("High: " .. (TeamScale[teamID][3] or "nil"))
-					Spring.Echo("Med: " .. (TeamScale[teamID][2] or "nil"))
-					Spring.Echo("Low: " .. (TeamScale[teamID][1] or "nil"))
+				if TeamScale[teamID] then
+					Spring.Echo("team " .. i .. " Scale", 
+						"High", TeamScale[teamID][3], 
+						"Med", TeamScale[teamID][2], 
+						"Low", TeamScale[teamID][1]
+					)
 				end
 			end
 			
 			if debugMode then
-				Spring.Echo("team " .. i .. " Energy Only Scale:")
-				if scaleEnergy then
-					Spring.Echo("High: " .. (TeamScaleEnergy[teamID][3] or "nil"))
-					Spring.Echo("Med: " .. (TeamScaleEnergy[teamID][2] or "nil"))
-					Spring.Echo("Low: " .. (TeamScaleEnergy[teamID][1] or "nil"))
+				if TeamScaleEnergy[teamID] then
+					Spring.Echo("team " .. i .. " Energy Only Scale", 
+						"High", TeamScaleEnergy[teamID][3], 
+						"Med", TeamScaleEnergy[teamID][2], 
+						"Low", TeamScaleEnergy[teamID][1]
+					)
 				end
 			end
 			
