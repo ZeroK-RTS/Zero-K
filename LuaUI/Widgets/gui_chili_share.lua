@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.24",
+		name	= "Chili Share menu v1.25",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "Commshare by _Shaman, Playerlist by DeinFreund",
 		date	= "12-3-2016",
@@ -1121,10 +1121,12 @@ local function Buildme()
 	local allpanels = {}
 	local playerHeight =  64	
 	local playerWidth =  339	
+	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
 			playerpanels[subject.allyteam] = {}
 		end
+		lastAllyTeam = math.max(subject.allyteam, lastAllyTeam)
 		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Control:New{
 			backgroundColor={1,0,0,0},
 			height = playerHeight,
@@ -1162,7 +1164,7 @@ local function Buildme()
 				color = {1,1,1,1}
 			end
 			local panelWidth = playerWidth + 20
-			if (allyTeamID >= 100 and XOffset < 1) then
+			if (allyTeamID >= lastAllyTeam and XOffset < 1) then
 				XOffset = windowWidth / 2 - panelWidth / 2 - 10
 			end
 			local panelX = XOffset
@@ -1420,12 +1422,13 @@ end
 local lastUpdate = -100
 local dtSum = 0
 local lastWindow = false
+local myAllyTeamID = -1
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if window and window.visible then
-		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.24_sharemenu"))
+		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.25_sharemenu"))
 		--Spring.Echo(showkey)
 		if (Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
 			window:ToggleVisibility()
@@ -1448,9 +1451,13 @@ function widget:Update(dt)
 			UpdateInviteTable()
 		end
 		UpdateSubjects()
+		if (Spring.GetMyAllyTeamID() ~= myAllyTeamID) then
+			SetWantRebuild()
+		end
 		if (built and mySubjectID >= 0 and window.visible) then
 			UpdatePlayers()
 		end
+		myAllyTeamID = Spring.GetMyAllyTeamID()
 	end
 	if buildframe < -1 and mySubjectID >= 0 then
 		mycurrentteamid = Spring.GetMyTeamID()
