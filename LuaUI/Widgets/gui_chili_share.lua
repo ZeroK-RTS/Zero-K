@@ -1354,7 +1354,7 @@ local function UpdateAllyTeam(allyTeam)
 		end
 	end
 	table.sort(temp, EloComparator)
-	if (nonSpecs) then
+	if (nonSpecs or Spring.GetGameFrame() < 1) then
 		for _, subject in ipairs(temp) do
 			subjects[#subjects+1] = subject
 			subjects[#subjects].id = #subjects
