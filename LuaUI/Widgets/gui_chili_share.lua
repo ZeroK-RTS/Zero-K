@@ -257,7 +257,7 @@ local function RenderName(subject)
 	local spec = not subject.ai and subject.spec
 	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
-	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
+	if not spec and active and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
 		--Spring.Echo("metal: " .. amt .. "/" .. stor)
 		local colorIncomeM = '\255\1\255\1'
