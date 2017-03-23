@@ -308,7 +308,7 @@ local function RenderName(subject)
 		else
 			def = round(def/1000, 0) .. "K"
 		end
-		givemebuttons[subject.id]["off"]:SetText(off )
+		givemebuttons[subject.id]["off"]:SetText(off)
 		givemebuttons[subject.id]["def"]:SetText(def)
 		
 	end
@@ -1126,7 +1126,7 @@ local function Buildme()
 		if (not playerpanels[subject.allyteam]) then
 			playerpanels[subject.allyteam] = {}
 		end
-		lastAllyTeam = math.max(subject.allyteam, lastAllyTeam)
+		lastAllyTeam = subject.allyteam
 		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Control:New{
 			backgroundColor={1,0,0,0},
 			height = playerHeight,
@@ -1199,12 +1199,12 @@ local function Buildme()
 					chili.Line:New{
 						x = 0,
 						y = 0,
-						width = (panelWidth - width )/2
+						width = math.max(0, (panelWidth - width )/2)
 					},
 					chili.Line:New{
 						x = (panelWidth + width )/2 - 12,
 						y = 0,
-						width = (panelWidth - width )/2 + 12
+						width = math.max(0, (panelWidth - width )/2 + 12)
 					}
 				}
 			}
