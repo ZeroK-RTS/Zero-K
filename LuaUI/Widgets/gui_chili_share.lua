@@ -1,7 +1,7 @@
 -- WARNING: This is a temporary file. Please modify as you see fit! --
 function widget:GetInfo()
 	return {
-		name	= "Chili Share menu v1.25",
+		name	= "Chili Share menu v1.24",
 		desc	= "Press H to bring up the chili share menu.",
 		author	= "Commshare by _Shaman, Playerlist by DeinFreund",
 		date	= "12-3-2016",
@@ -1428,7 +1428,7 @@ function widget:Update(dt)
 	local f = Spring.GetGameFrame()
 	local alt,ctrl,_,shift = Spring.GetModKeyState()
 	if window and window.visible then
-		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.25_sharemenu"))
+		local showkey = string.lower(WG.crude.GetHotkey("epic_chili_share_menu_v1.24_sharemenu"))
 		--Spring.Echo(showkey)
 		if (Spring.GetKeyState(Spring.GetKeyCode(showkey)) ~= window.visible) then
 			window:ToggleVisibility()
