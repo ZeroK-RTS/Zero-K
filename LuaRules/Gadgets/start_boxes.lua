@@ -16,6 +16,147 @@ local private_seed, startboxConfig
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
+
+local function GetAverageStartpoint(boxID)
+	local box = startboxConfig[boxID]
+	local startpoints = box.startpoints
+
+	local x, z = 0, 0
+	for i = 1, #startpoints do
+		x = x + startpoints[i][1]
+		z = z + startpoints[i][2]
+	end
+	x = x / #startpoints
+	z = z / #startpoints
+	
+	return x, z
+end
+
+local function GetBoxID(allyTeamID)
+	local teamID = Spring.GetTeamList(allyTeamID)[1]
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	return boxID
+end
+
+local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
+	local ex = edgeDist * Game.mapSizeX
+	local ez = edgeDist * Game.mapSizeZ
+
+	local attackerBoxID = GetBoxID(0)
+	local defenderBoxID = GetBoxID(1)
+
+	local attackerX, attackerZ = GetAverageStartpoint(attackerBoxID)
+	local defenderX, defenderZ = GetAverageStartpoint(defenderBoxID)
+
+	local function GetPointOnLine(distance)
+		return {
+			x = defenderX + distance * (attackerX - defenderX),
+			z = defenderZ + distance * (attackerZ - defenderZ),
+		}
+	end
+
+	local defenderBoxStart = GetPointOnLine(teamDistance)
+	local attackerBoxStart = GetPointOnLine(1 - teamDistance)
+	local middleBoxStart   = GetPointOnLine(0.5 - (neutralWidth / 2))
+	
+	local defenderBoxEnd = GetPointOnLine(teamDistance + teamWidth)
+	local attackerBoxEnd = GetPointOnLine(1 - (teamDistance + teamWidth))
+	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
+
+	local function GetBasicRectangle(pointA, pointB, isX)
+		if isX then
+			return {
+				{x = pointA.x, z = ez},
+				{x = pointA.x, z = Game.mapSizeZ - ez},
+				{x = pointB.x, z = Game.mapSizeZ - ez},
+				{x = pointB.x, z = ez},
+			}
+		else
+			return {
+				{x = ex,                 z = pointA.z},
+				{x = Game.mapSizeX - ex, z = pointA.z},
+				{x = Game.mapSizeX - ex, z = pointB.z},
+				{x = ex,                 z = pointB.z},
+			}
+		end
+	end
+
+	if math.abs(defenderX - attackerX) < 10 or math.abs(defenderZ - attackerZ) < 10 then
+		local isX = math.abs(defenderX - attackerX) < 10
+		return {
+			[0] = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
+			[1] = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
+			[gaiaAllyTeamID] = GetBasicRectangle(middleBoxStart,   middleBoxEnd,   isX)
+		}
+	end
+	
+	local a = (attackerX - defenderX) / (defenderZ - attackerZ)
+	local function GetEdgePoints(point)
+		local b = point.z - (a * point.x)
+
+		local p11, p12, p21, p22
+		if (a > 0) then
+			p11 = {
+				x = (ez - b) / a,
+				z = ez,
+			}
+			p12 = {
+				x = ex,
+				z = (a * ex) + b,
+			}
+			p21 = {
+				x = Game.mapSizeX - ex,
+				z = (a * (Game.mapSizeX - ex)) + b,
+			}
+
+			p22 = {
+				x = ((Game.mapSizeZ - ez) - b) / a,
+				z = Game.mapSizeZ - ez,
+			}
+		else
+			p11 = {
+				x = (ez - b) / a,
+				z = ez,
+			}
+			p12 = {
+				x = Game.mapSizeX - ex,
+				z = (a * (Game.mapSizeX - ex)) + b,
+			}
+			p21 = {
+				x = ex,
+				z = (a * ex) + b,
+			}
+			p22 = {
+				x = ((Game.mapSizeZ - ez) - b) / a,
+				z = Game.mapSizeZ - ez,
+			}
+		end
+		if p11.x > Game.mapSizeX or p11.x < 0 then
+			p1 = p12
+		else
+			p1 = p11
+		end
+		if p22.x > Game.mapSizeX or p22.x < 0 then
+			p2 = p21
+		else
+			p2 = p22
+		end
+		return {p1, p2}
+	end
+
+	local function GetRectangle(pointA, pointB)
+		local edgesA = GetEdgePoints(pointA)
+		local edgesB = GetEdgePoints(pointB)
+		return {edgesA[1], edgesA[2], edgesB[2], edgesB[1]}
+	end
+
+	return {
+		[0] = GetRectangle(attackerBoxStart, attackerBoxEnd),
+		[1] = GetRectangle(defenderBoxStart, defenderBoxEnd),
+		[gaiaAllyTeamID] = GetRectangle(middleBoxStart,   middleBoxEnd),
+	}
+end
+
 local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
 	if shuffleMode == "auto" then
 		if GetTeamCount() > 2 then
@@ -41,6 +182,7 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 	math.randomseed(private_seed)
 
 	GG.startBoxConfig = startboxConfig
+	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
 end
 
 local function CheckStartbox (boxID, x, z)
