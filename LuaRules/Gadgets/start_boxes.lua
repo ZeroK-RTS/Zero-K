@@ -39,6 +39,8 @@ local function GetBoxID(allyTeamID)
 end
 
 local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
+	local ex = edgeDist * Game.mapSizeX
+	local ez = edgeDist * Game.mapSizeZ
 
 	local attackerBoxID = GetBoxID(0)
 	local defenderBoxID = GetBoxID(1)
@@ -61,9 +63,34 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	local attackerBoxEnd = GetPointOnLine(1 - (teamDistance + teamWidth))
 	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
 
+	local function GetBasicRectangle(pointA, pointB, isX)
+		if isX then
+			return {
+				{x = pointA.x, z = ez},
+				{x = pointA.x, z = Game.mapSizeZ - ez},
+				{x = pointB.x, z = Game.mapSizeZ - ez},
+				{x = pointB.x, z = ez},
+			}
+		else
+			return {
+				{x = ex,                 z = pointA.z},
+				{x = Game.mapSizeX - ex, z = pointA.z},
+				{x = Game.mapSizeX - ex, z = pointB.z},
+				{x = ex,                 z = pointB.z},
+			}
+		end
+	end
+
+	if math.abs(defenderX - attackerX) < 10 or math.abs(defenderZ - attackerZ) < 10 then
+		local isX = math.abs(defenderX - attackerX) < 10
+		return {
+			attacker = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
+			defender = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
+			neutral  = GetBasicRectangle(middleBoxStart,   middleBoxEnd,   isX),
+		}
+	end
+	
 	local a = (attackerX - defenderX) / (defenderZ - attackerZ)
-	local ex = edgeDist * Game.mapSizeX
-	local ez = edgeDist * Game.mapSizeZ
 	local function GetEdgePoints(point)
 		local b = point.z - (invA * point.x)
 
