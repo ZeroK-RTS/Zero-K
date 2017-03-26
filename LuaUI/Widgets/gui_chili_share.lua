@@ -257,7 +257,7 @@ local function RenderName(subject)
 	local spec = not subject.ai and subject.spec
 	--Spring.Echo(tostring(active) .. " " .. tostring(spec))
 	local playerpanel = givemepanel[subject.id]
-	if not spec and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
+	if not spec and active and subject.id ~= mySubjectID and (subject.allyteam == subjects[mySubjectID].allyteam or subjects[mySubjectID].spec) then 
 		local incomeM, incomeE, pullM, pullE, netM, netE, storedM, storedE, storageM, storageE = getEcoInfo(subject.team)
 		--Spring.Echo("metal: " .. amt .. "/" .. stor)
 		local colorIncomeM = '\255\1\255\1'
@@ -308,7 +308,7 @@ local function RenderName(subject)
 		else
 			def = round(def/1000, 0) .. "K"
 		end
-		givemebuttons[subject.id]["off"]:SetText(off )
+		givemebuttons[subject.id]["off"]:SetText(off)
 		givemebuttons[subject.id]["def"]:SetText(def)
 		
 	end
@@ -1121,10 +1121,12 @@ local function Buildme()
 	local allpanels = {}
 	local playerHeight =  64	
 	local playerWidth =  339	
+	local lastAllyTeam = 0
 	for _, subject in ipairs(subjects) do
 		if (not playerpanels[subject.allyteam]) then
 			playerpanels[subject.allyteam] = {}
 		end
+		lastAllyTeam = subject.allyteam
 		playerpanels[subject.allyteam][#playerpanels[subject.allyteam] + 1] = chili.Control:New{
 			backgroundColor={1,0,0,0},
 			height = playerHeight,
@@ -1162,7 +1164,7 @@ local function Buildme()
 				color = {1,1,1,1}
 			end
 			local panelWidth = playerWidth + 20
-			if (allyTeamID >= 100 and XOffset < 1) then
+			if (allyTeamID >= lastAllyTeam and XOffset < 1) then
 				XOffset = windowWidth / 2 - panelWidth / 2 - 10
 			end
 			local panelX = XOffset
@@ -1197,12 +1199,12 @@ local function Buildme()
 					chili.Line:New{
 						x = 0,
 						y = 0,
-						width = (panelWidth - width )/2
+						width = math.max(0, (panelWidth - width )/2)
 					},
 					chili.Line:New{
 						x = (panelWidth + width )/2 - 12,
 						y = 0,
-						width = (panelWidth - width )/2 + 12
+						width = math.max(0, (panelWidth - width )/2 + 12)
 					}
 				}
 			}
@@ -1352,7 +1354,7 @@ local function UpdateAllyTeam(allyTeam)
 		end
 	end
 	table.sort(temp, EloComparator)
-	if (nonSpecs) then
+	if (nonSpecs or Spring.GetGameFrame() < 1) then
 		for _, subject in ipairs(temp) do
 			subjects[#subjects+1] = subject
 			subjects[#subjects].id = #subjects
@@ -1420,6 +1422,7 @@ end
 local lastUpdate = -100
 local dtSum = 0
 local lastWindow = false
+local myAllyTeamID = -1
 
 function widget:Update(dt)
 	local f = Spring.GetGameFrame()
@@ -1448,9 +1451,13 @@ function widget:Update(dt)
 			UpdateInviteTable()
 		end
 		UpdateSubjects()
+		if (Spring.GetMyAllyTeamID() ~= myAllyTeamID) then
+			SetWantRebuild()
+		end
 		if (built and mySubjectID >= 0 and window.visible) then
 			UpdatePlayers()
 		end
+		myAllyTeamID = Spring.GetMyAllyTeamID()
 	end
 	if buildframe < -1 and mySubjectID >= 0 then
 		mycurrentteamid = Spring.GetMyTeamID()
