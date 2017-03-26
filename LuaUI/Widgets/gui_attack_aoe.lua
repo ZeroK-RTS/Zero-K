@@ -48,6 +48,7 @@ local circleList
 local secondPart = 0
 local mouseDistance = 1000
 local extraDrawRange
+local sumoSelected = false
 
 --------------------------------------------------------------------------------
 --speedups
@@ -93,6 +94,12 @@ local floor                  = math.floor
 local max                    = math.max
 local min                    = math.min
 local sqrt                   = math.sqrt
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local sumoDefID = UnitDefNames.corsumo.id
+local sumoAoE = WeaponDefNames.corsumo_landing.damageAreaOfEffect
+local sumoEE = WeaponDefNames.corsumo_landing.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions
@@ -318,9 +325,14 @@ local function UpdateSelection()
 	aoeUnitInfo = nil
 	dgunUnitID = nil
 	aoeUnitID = nil
+	sumoSelected = false
 
 	for unitDefID, unitIDs in pairs(sel) do
 		if unitDefID ~= "n" then
+			if unitDefID == sumoDefID then
+				sumoSelected = true
+			end
+
 			local unitID = unitIDs[1]
 			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
 			
@@ -703,6 +715,9 @@ function widget:DrawWorld()
 			info.range = extraDrawParam
 		end
 		unitID = dgunUnitID
+	elseif (cmd == CMD_JUMP and sumoSelected) then
+		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
+		return
 	else
 		return
 	end
