@@ -17,6 +17,35 @@ local private_seed, startboxConfig
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
 local function GetPlanetwarsBoxes ()
+
+	local attackerTeamID = Spring.GetTeamList(0)[1]
+	local defenderTeamID = Spring.GetTeamList(1)[1]
+
+	local attackerBoxID = Spring.GetTeamRulesParam(attackerTeamID, "start_box_id")
+	local defenderBoxID = Spring.GetTeamRulesParam(defenderTeamID, "start_box_id")
+
+	local attackerBox = startboxConfig[attackerBoxID]
+	local defenderBox = startboxConfig[defenderBoxID]
+
+	local attackerStartpoints = attackerBox.startpoints
+	local defenderStartpoints = defenderBox.startpoints
+
+	local attackerX, attackerZ = 0, 0
+	for i = 1, #attackerStartpoints do
+		attackerX = attackerX + attackerStartpoints[i][1]
+		attackerZ = attackerZ + attackerStartpoints[i][2]
+	end
+	attackerX = attackerX / #attackerStartpoints
+	attackerZ = attackerZ / #attackerStartpoints
+
+	local defenderX, defenderZ = 0, 0
+	for i = 1, #defenderStartpoints do
+		defenderX = defenderX + defenderStartpoints[i][1]
+		defenderZ = defenderZ + defenderStartpoints[i][2]
+	end
+	defenderX = defenderX / #defenderStartpoints
+	defenderZ = defenderZ / #defenderStartpoints
+
 	return {}
 end
 
