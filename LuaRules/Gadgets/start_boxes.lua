@@ -92,41 +92,41 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	
 	local a = (attackerX - defenderX) / (defenderZ - attackerZ)
 	local function GetEdgePoints(point)
-		local b = point.z - (invA * point.x)
+		local b = point.z - (a * point.x)
 
 		local p11, p12, p21, p22
 		if (a > 0) then
-			local p11 = {
+			p11 = {
 				x = (ez - b) / a,
 				z = ez,
 			}
-			local p12 = {
+			p12 = {
 				x = ex,
 				z = (a * ex) + b,
 			}
-			local p21 = {
+			p21 = {
 				x = Game.mapSizeX - ex,
 				z = (a * (Game.mapSizeX - ex)) + b,
 			}
 
-			local p22 = {
+			p22 = {
 				x = ((Game.mapSizeZ - ez) - b) / a,
 				z = Game.mapSizeZ - ez,
 			}
 		else
-			local p11 = {
+			p11 = {
 				x = (ez - b) / a,
 				z = ez,
 			}
-			local p12 = {
+			p12 = {
 				x = Game.mapSizeX - ex,
 				z = (a * (Game.mapSizeX - ex)) + b,
 			}
-			local p21 = {
+			p21 = {
 				x = ex,
 				z = (a * ex) + b,
 			}
-			local p22 = {
+			p22 = {
 				x = ((Game.mapSizeZ - ez) - b) / a,
 				z = Game.mapSizeZ - ez,
 			}
@@ -137,9 +137,9 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 			p1 = p11
 		end
 		if p22.x > Game.mapSizeX or p22.x < 0 then
-			p2 = p22
-		else
 			p2 = p21
+		else
+			p2 = p22
 		end
 		return {p1, p2}
 	end
