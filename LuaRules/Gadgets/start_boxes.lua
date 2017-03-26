@@ -16,35 +16,47 @@ local private_seed, startboxConfig
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
-local function GetPlanetwarsBoxes ()
 
-	local attackerTeamID = Spring.GetTeamList(0)[1]
-	local defenderTeamID = Spring.GetTeamList(1)[1]
+local function GetAverageStartpoint(boxID)
+	local box = startboxConfig[boxID]
+	local startpoints = box.startpoints
 
-	local attackerBoxID = Spring.GetTeamRulesParam(attackerTeamID, "start_box_id")
-	local defenderBoxID = Spring.GetTeamRulesParam(defenderTeamID, "start_box_id")
-
-	local attackerBox = startboxConfig[attackerBoxID]
-	local defenderBox = startboxConfig[defenderBoxID]
-
-	local attackerStartpoints = attackerBox.startpoints
-	local defenderStartpoints = defenderBox.startpoints
-
-	local attackerX, attackerZ = 0, 0
-	for i = 1, #attackerStartpoints do
-		attackerX = attackerX + attackerStartpoints[i][1]
-		attackerZ = attackerZ + attackerStartpoints[i][2]
+	local x, z = 0, 0
+	for i = 1, #startpoints do
+		x = x + startpoints[i][1]
+		z = z + startpoints[i][2]
 	end
-	attackerX = attackerX / #attackerStartpoints
-	attackerZ = attackerZ / #attackerStartpoints
+	x = x / #startpoints
+	z = z / #startpoints
+	
+	return x, z
+end
 
-	local defenderX, defenderZ = 0, 0
-	for i = 1, #defenderStartpoints do
-		defenderX = defenderX + defenderStartpoints[i][1]
-		defenderZ = defenderZ + defenderStartpoints[i][2]
+local function GetBoxID(allyTeamID)
+	local teamID = Spring.GetTeamList(allyTeamID)[1]
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	return boxID
+end
+
+local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth)
+
+	local attackerBoxID = GetBoxID(0)
+	local defenderBoxID = GetBoxID(1)
+
+	local attackerX, attackerZ = GetAverageStartpoint(attackerBoxID)
+	local defenderX, defenderZ = GetAverageStartpoint(defenderBoxID)
+
+	local function GetPointOnLine(distance)
+		return defenderX + distance * (attackerX - defenderX), defenderZ + distance * (attackerZ - defenderZ)
 	end
-	defenderX = defenderX / #defenderStartpoints
-	defenderZ = defenderZ / #defenderStartpoints
+
+	local defenderBoxStartX, defenderBoxStartZ = GetPointOnLine(teamDistance)
+	local attackerBoxStartX, attackerBoxStartZ = GetPointOnLine(1 - teamDistance)
+	local middleBoxStartX,   middleBoxStartZ   = GetPointOnLine(0.5 - (neutralWidth / 2))
+	
+	local defenderBoxEndX, defenderBoxEndZ = GetPointOnLine(teamDistance + teamWidth)
+	local attackerBoxEndX, attackerBoxEndZ = GetPointOnLine(1 - (teamDistance + teamWidth))
+	local middleBoxEndX,   middleBoxEndZ   = GetPointOnLine(0.5 + (neutralWidth / 2))
 
 	return {}
 end
