@@ -38,7 +38,7 @@ local function GetBoxID(allyTeamID)
 	return boxID
 end
 
-local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth)
+local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
 
 	local attackerBoxID = GetBoxID(0)
 	local defenderBoxID = GetBoxID(1)
@@ -47,18 +47,87 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth)
 	local defenderX, defenderZ = GetAverageStartpoint(defenderBoxID)
 
 	local function GetPointOnLine(distance)
-		return defenderX + distance * (attackerX - defenderX), defenderZ + distance * (attackerZ - defenderZ)
+		return {
+			x = defenderX + distance * (attackerX - defenderX),
+			z = defenderZ + distance * (attackerZ - defenderZ),
+		}
 	end
 
-	local defenderBoxStartX, defenderBoxStartZ = GetPointOnLine(teamDistance)
-	local attackerBoxStartX, attackerBoxStartZ = GetPointOnLine(1 - teamDistance)
-	local middleBoxStartX,   middleBoxStartZ   = GetPointOnLine(0.5 - (neutralWidth / 2))
+	local defenderBoxStart = GetPointOnLine(teamDistance)
+	local attackerBoxStart = GetPointOnLine(1 - teamDistance)
+	local middleBoxStart   = GetPointOnLine(0.5 - (neutralWidth / 2))
 	
-	local defenderBoxEndX, defenderBoxEndZ = GetPointOnLine(teamDistance + teamWidth)
-	local attackerBoxEndX, attackerBoxEndZ = GetPointOnLine(1 - (teamDistance + teamWidth))
-	local middleBoxEndX,   middleBoxEndZ   = GetPointOnLine(0.5 + (neutralWidth / 2))
+	local defenderBoxEnd = GetPointOnLine(teamDistance + teamWidth)
+	local attackerBoxEnd = GetPointOnLine(1 - (teamDistance + teamWidth))
+	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
 
-	return {}
+	local a = (attackerX - defenderX) / (defenderZ - attackerZ)
+	local ex = edgeDist * Game.mapSizeX
+	local ez = edgeDist * Game.mapSizeZ
+	local function GetEdgePoints(point)
+		local b = point.z - (invA * point.x)
+
+		local p11, p12, p21, p22
+		if (a > 0) then
+			local p11 = {
+				x = (ez - b) / a,
+				z = ez,
+			}
+			local p12 = {
+				x = ex,
+				z = (a * ex) + b,
+			}
+			local p21 = {
+				x = Game.mapSizeX - ex,
+				z = (a * (Game.mapSizeX - ex)) + b,
+			}
+
+			local p22 = {
+				x = ((Game.mapSizeZ - ez) - b) / a,
+				z = Game.mapSizeZ - ez,
+			}
+		else
+			local p11 = {
+				x = (ez - b) / a,
+				z = ez,
+			}
+			local p12 = {
+				x = Game.mapSizeX - ex,
+				z = (a * (Game.mapSizeX - ex)) + b,
+			}
+			local p21 = {
+				x = ex,
+				z = (a * ex) + b,
+			}
+			local p22 = {
+				x = ((Game.mapSizeZ - ez) - b) / a,
+				z = Game.mapSizeZ - ez,
+			}
+		end
+		if p11.x > Game.mapSizeX or p11.x < 0 then
+			p1 = p12
+		else
+			p1 = p11
+		end
+		if p22.x > Game.mapSizeX or p22.x < 0 then
+			p2 = p22
+		else
+			p2 = p21
+		end
+		return {p1, p2}
+	end
+
+	local function GetRectangle(pointA, pointB)
+		local edgesA = GetEdgePoints(pointA)
+		local edgesB = GetEdgePoints(pointB)
+		return {edgesA[1], edgesA[2], edgesB[2], edgesB[1]}
+	end
+
+	return {
+		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
+		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
+		neutral  = GetRectangle(middleBoxStart,   middleBoxEnd),
+	}
 end
 
 local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
