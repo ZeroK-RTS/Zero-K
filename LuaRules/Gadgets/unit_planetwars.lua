@@ -28,11 +28,11 @@ local floor = math.floor
 include "LuaRules/Configs/customcmds.h.lua"
 
 local abandonCMD = {
-    id      = CMD_ABANDON_PW,
-    name    = "Abandon",
-    action  = "abandon",
+	id      = CMD_ABANDON_PW,
+	name    = "Abandon",
+	action  = "abandon",
 	cursor  = 'Repair',
-    type    = CMDTYPE.ICON,
+	type    = CMDTYPE.ICON,
 	tooltip = "Abandon this building (marks it as neutral)",
 }
 
@@ -59,8 +59,8 @@ GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
 GG.PlanetWars.hqs = hqs
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local noGoZones = {count = 0, data = {}}
 
@@ -136,45 +136,10 @@ local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does 
 	return false
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
-
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-	if unitsByID[unitID] and not paralyzer then
-		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
-		if attackerTeam then
-			unitsByID[unitID].teamDamages[attackerTeam] = (unitsByID[unitID].teamDamages[attackerTeam] or 0) + damage
-		else
-			unitsByID[unitID].anonymous = (unitsByID[unitID].anonymous or 0) + damage
-		end
-	end
-end
-
 local function addStuffToReport(stuff)
 	stuffToReport.count = stuffToReport.count + 1
 	stuffToReport.data[stuffToReport.count] = stuff
 end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if unitsByID[unitID] then
-		local unit = unitsByID[unitID]
-		local name = unit.name
-		addStuffToReport(name .. ",total," .. (unit.totalDamage or 0))
-		addStuffToReport(name .. ",anon," .. (unit.anonymous or 0))
-		for teamID, damage in pairs(unit.teamDamages) do
-			addStuffToReport(name .. "," .. teamID .. "," .. damage)
-		end
-		unitsByID[unitID] = nil
-	end
-	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
-		hqsDestroyed[#hqsDestroyed+1] = allyTeam
-		hqs[unitID] = nil
-	end
-end
-
-------------------------------------------------------------------------
-------------------------------------------------------------------------
 
 local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRand)
 	if not (type(info) == "table") then
@@ -335,8 +300,48 @@ local function SpawnInDefenderBox()
 	return false
 end
 
-function gadget:GamePreload()
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- callins
 
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+	if unitsByID[unitID] and not paralyzer then
+		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
+		if attackerTeam then
+			unitsByID[unitID].teamDamages[attackerTeam] = (unitsByID[unitID].teamDamages[attackerTeam] or 0) + damage
+		else
+			unitsByID[unitID].anonymous = (unitsByID[unitID].anonymous or 0) + damage
+		end
+	end
+end
+
+function gadget:GameFrame(f)
+	if (f%30 == 0) then
+		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
+		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + TELEPORT_BASE_CHARGE)
+	
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	if unitsByID[unitID] then
+		local unit = unitsByID[unitID]
+		local name = unit.name
+		addStuffToReport(name .. ",total," .. (unit.totalDamage or 0))
+		addStuffToReport(name .. ",anon," .. (unit.anonymous or 0))
+		for teamID, damage in pairs(unit.teamDamages) do
+			addStuffToReport(name .. "," .. teamID .. "," .. damage)
+		end
+		unitsByID[unitID] = nil
+	end
+	if hqs[unitID] then
+		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
+		hqsDestroyed[#hqsDestroyed+1] = allyTeam
+		hqs[unitID] = nil
+	end
+end
+
+function gadget:GamePreload()
 	-- spawn PW planet structures
 	if not SpawnInDefenderBox() then
 		SpawnStructuresInBox(0.35,0.35,0.65,0.65)
@@ -437,7 +442,6 @@ function gadget:Initialize()
 			canAttackTeams[team] = true
 		end
 	end
-	
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -478,8 +482,8 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	return damage
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 function gadget:GameOver()	
 	for i =1, stuffToReport.count do
