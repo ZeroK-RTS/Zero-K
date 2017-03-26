@@ -73,6 +73,7 @@ local messages = {
 	capture_reload = "capture reload",
 	water_tank = "water tank",
 	teleport = "teleport",
+	teleport_pw = "teleport",
 	ability = "ability",
 	reload = "reload",
 	reammo = "reammo",
@@ -202,6 +203,7 @@ local barColors = {
 	shield  = { 0.30,0.0,0.90,barAlpha },
 	tank    = { 0.10,0.20,0.90,barAlpha },
 	tele    = { 0.00,0.60,0.60,barAlpha },
+	tele_pw = { 0.00,0.60,0.60,barAlpha },
 	
 	-- Features
 	resurrect = { 1.00,0.50,0.00,featureBarAlpha },
@@ -854,6 +856,15 @@ do
 			end
 			if prog < 1 then
 				AddBar(messages.teleport,prog,"tele",(fullText and floor(prog*100)..'%') or '')
+			end
+		end
+		
+		--// Planetwars teleport progress
+		TeleportEnd = GetUnitRulesParam(unitID,"pw_teleport_progress")
+		if TeleportEnd then
+			local prog = TeleportEnd/(30*10)	-- FIXME magic number
+			if prog < 1 then
+				AddBar(messages.teleport,prog,"tele_pw",(fullText and floor(prog*100)..'%') or '')
 			end
 		end
 

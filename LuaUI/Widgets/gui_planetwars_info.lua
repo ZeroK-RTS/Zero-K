@@ -17,8 +17,8 @@ end
 --------------------------------------------------------------------------------
 local Chili
 
-local window, stackPanelMain
-local stackPanels = {}
+local infoWindow, teleportWindow
+local teleportProgress, teleportLabel, teleportImage
 
 local imageDir = "LuaUI/Configs/Factions/"
 local WINDOW_HEIGHT = 108
@@ -41,31 +41,102 @@ for faction, data in pairs(factions) do
 	end
 end
 
+
+local numCharges = -1
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local function IsSpec()
 	return (Spring.GetSpectatingState() or Spring.IsReplay())
 end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-function widget:GameFrame(n)
-	if n%120 == 1 and (not IsSpec()) then
-		widgetHandler:RemoveWidget()
+
+local function UpdateBar()
+	if not teleportWindow then
+		return
+	end
+	local current = Spring.GetGameRulesParam("pw_teleport_charge")
+	local needed = Spring.GetGameRulesParam("pw_teleport_charge_needed")
+	local currentRemainder = current%needed
+	local numChargesNew = math.floor(current/needed)
+	
+	teleportProgress:SetValue(currentRemainder/needed)
+	local percent = math.floor(currentRemainder/needed * 100 + 0.5)
+	teleportProgress:SetCaption(percent .. "%")
+	
+	if numChargesNew ~= numCharges then
+		local text = " teleport charges"
+		if (numChargesNew > 0)  then
+			text = "\255\0\255\32\ "..numChargesNew.. text .. "\008"
+			teleportImage.color = {1,1,1,1}
+		else
+			text = "\255\128\128\128\ 0" .. text .. "\008"
+			teleportImage.color = {0.3, 0.3, 0.3, 1}
+		end
+		teleportLabel:SetCaption(text)
+		teleportImage:Invalidate()
+		
+		numCharges = numChargesNew
 	end
 end
 
-function widget:Initialize()
+-- FIXME: do not display for attacker
+local function CreateTeleportWindow()
+	teleportWindow = Chili.Window:New{
+		name   = 'pw_teleport_meter';
+		parent = Chili.Screen0;
+		width = 240,
+		height = 64,
+		left = 2,
+		y = 32,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		padding = {8, 8, 8, 8}
+	}
+	teleportImage = Chili.Image:New{
+		parent = teleportWindow,
+		right = 0,
+		y = 0,
+		height = 24,
+		width = 24,
+		file = "LuaUI/Images/commands/Bold/drop_beacon.png"
+	}
+	teleportLabel = Chili.Label:New{
+		parent = teleportWindow,
+		x = 0,
+		y = 0,
+		align = "left";
+		valign = "top";
+		caption = '';
+		height = 18,
+		width = "100%";
+		font = {size = 14};
+	}
+
+	teleportProgress = WG.Chili.Progressbar:New{
+		parent = teleportWindow,
+		x	= 0,
+		bottom 	= 0,
+		right 	= 0,
+		height	= 20,
+		max     = 1;
+		caption = "0%";
+		color   =  {0.15,0.4,0.9,1}
+	}
+	UpdateBar()
+end
+
+
+local function CreateInfoWindow()
 	local modoptions = Spring.GetModOptions()
 	local planet = modoptions.planet
 	local attacker = modoptions.attackingfaction
 	local defender = modoptions.defendingfaction
 	
-	if not planet then
-		widgetHandler:RemoveWidget()
-		return
-	end
-
-	Chili = WG.Chili
+	local stackPanels = {}
 	
-	window = Chili.Window:New{
+	infoWindow = Chili.Window:New{
 		parent = Chili.Screen0,
 		name   = 'pwinfo';
 		width = WINDOW_WIDTH,
@@ -84,7 +155,7 @@ function widget:Initialize()
 	}
 	
 	stackPanelMain = Chili.StackPanel:New{
-		parent = window,
+		parent = infoWindow,
 		resizeItems = false;
 		orientation   = "vertical";
 		height = "100%";
@@ -191,6 +262,30 @@ function widget:Initialize()
 			parent = stackPanels[3];
 		}
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function widget:GameFrame(n)
+	if n%120 == 1 and (not IsSpec()) then
+		if infoWindow then
+			infoWindow:Dispose()
+		end
+	end
+	if n%10 == 3 then
+		UpdateBar()
+	end
+end
+
+function widget:Initialize()
+	if not Spring.GetModOptions().planet then
+		widgetHandler:RemoveWidget()
+		return
+	end
+
+	Chili = WG.Chili
+	CreateInfoWindow()
+	CreateTeleportWindow()
 end
 
 --------------------------------------------------------------------------------

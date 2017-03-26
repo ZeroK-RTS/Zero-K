@@ -29,11 +29,11 @@ include "LuaRules/Configs/customcmds.h.lua"
 
 local abandonCMD = {
 	id      = CMD_ABANDON_PW,
-	name    = "Abandon",
+	name    = "Evacuate",
 	action  = "abandon",
 	cursor  = 'Repair',
 	type    = CMDTYPE.ICON,
-	tooltip = "Abandon this building (marks it as neutral)",
+	tooltip = "Teleports building to safety for the duration of the battle",
 }
 
 local spGetGroundHeight	= Spring.GetGroundHeight
@@ -45,6 +45,13 @@ local lava = (Game.waterDamage > 0)
 local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
+-- takes 24 minutes for full charge
+local TELEPORT_CHARGE_NEEDED = 60 * 0.25	--24
+local TELEPORT_BASE_CHARGE = 1	-- per second
+local TELEPORT_FRAMES = 30*10	--60	-- 1 minute
+local TELEPORT_CHARGE_NEEDED_PARAM = "pw_teleport_charge_needed"
+local TELEPORT_CHARGE_CURRENT_PARAM = "pw_teleport_charge"
+local TELEPORT_PROGRESS_PARAM = "pw_teleport_progress"
 
 local unitData = {}
 local unitsByID = {}
@@ -52,6 +59,8 @@ local hqs = {}
 local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
 local canAttackTeams = {}	-- teams that can attack PW structures
+local teleportees = {}
+local teleportChargeBoosters = {}	-- [unitID] = boostpower
 
 local BUILD_RESOLUTION = 16
 
@@ -300,6 +309,13 @@ local function SpawnInDefenderBox()
 	return false
 end
 
+local function TeleportOut(unitID)
+	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
+	Spring.SpawnCEG("gate", x, y, z)
+	Spring.DestroyUnit(unitID, false, true)
+	teleportees[unitID] = nil
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- callins
@@ -319,7 +335,17 @@ function gadget:GameFrame(f)
 	if (f%30 == 0) then
 		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
 		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + TELEPORT_BASE_CHARGE)
-	
+	end
+	for unitID in pairs(teleportees) do
+		local time = Spring.GetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM)
+		time = time + 1
+		Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, time)
+		if time >= TELEPORT_FRAMES then
+			TeleportOut(unitID)
+		elseif time % 15 == 0 then
+			local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
+			Spring.SpawnCEG("teleport_out", x, y, z)
+		end
 	end
 end
 
@@ -354,6 +380,9 @@ function gadget:GamePreload()
 		local teamID = teamList[math.random(#teamList)]
 		SpawnHQ(teamID, startBoxID)
 	end
+	
+	Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, 0)
+	Spring.SetGameRulesParam(TELEPORT_CHARGE_NEEDED_PARAM, TELEPORT_CHARGE_NEEDED)
 end
 
 function gadget:Initialize()
@@ -374,6 +403,9 @@ function gadget:Initialize()
 			elseif unitDef.name:find("pw_") then	-- is PW
 				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
 			end
+			
+			-- TODO: some buildings make teleport charge faster
+			--local chargeModifier = unitDef.customParams
 		end
 	else
 		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
@@ -452,34 +484,43 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if unitsByID[unitID] and cmdID == CMD_ABANDON_PW then
+		
+		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
+		local neededCharge = TELEPORT_CHARGE_NEEDED
+		Spring.Echo("Charge", currCharge, neededCharge)
+		-- already teleporting, abort
+		if teleportees[unitID] then
+			teleportees[unitID] = nil
+			Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, nil)
+			-- refund charge
+			Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + neededCharge)
+			Spring.SetUnitAlwaysVisible(unitID, false)
+			return true	-- command used, remove
+		end
+
+		if currCharge < neededCharge then
+			return false	-- command used, do not remove
+		end
+		
+		-- needed?
+		--[[
 		local gaiaTeam = Spring.GetGaiaTeamID()
 		GG.allowTransfer = true
 		Spring.TransferUnit(unitID, gaiaTeam, true)
 		GG.allowTransfer = false
 		Spring.SetUnitNeutral(unitID, true)
-		return false
-	elseif cmdID == CMD.ATTACK and #cmdParams == 1 then
-		local unitID = cmdParams[1]
-		if unitsByID[unitID] and (not canAttackTeams[unitTeam]) then
-			local unitName = UnitDefs[unitDefID].humanName
-			--Spring.SendMessageToTeam(unitTeam, unitName .. ": Cannot attack that PW structure")
-			return false
-		end
+		]]
+		
+		-- start teleporting
+		teleportees[unitID] = true
+		Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, 0)
+		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge - neededCharge)
+		Spring.SetUnitAlwaysVisible(unitID, true)
+		return true	-- command used, remove from queue
 	end
-	return true
-end
-
-function gadget:UnitPreDamaged_GetWantedWeaponDef()
-	return WeaponDefs
-end
-
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if attackerTeam and ((unitsByID[unitID] and (not canAttackTeams[attackerTeam])) or (spAreTeamsAllied(unitTeam, attackerTeam) and hqs[unitID])) then
-		return 0
-	end
-	return damage
+	return false	-- command not used
 end
 
 --------------------------------------------------------------------------------
