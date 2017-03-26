@@ -80,6 +80,7 @@ for _, info in pairs(unitData) do
 			structureDefs[info.unitname].name = info.name
 			structureDefs[info.unitname].description = info.description
 		end
+		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
 		
 		structureDefs[info.unitname].buildcostmetal = structureDefs[info.unitname].maxdamage
 		structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage

@@ -49,12 +49,21 @@ local function IsSpec()
 	return (Spring.GetSpectatingState() or Spring.IsReplay())
 end
 
+local function CheckHaveEvacuable()
+	if Spring.GetGameRulesParam("pw_have_evacuable") ~= 1 then
+		if teleportWindow then
+			teleportWindow:Dispose()
+		end
+	end
+end
+
 local function UpdateBar()
 	if not teleportWindow then
 		return
 	end
-	local current = Spring.GetGameRulesParam("pw_teleport_charge")
-	local needed = Spring.GetGameRulesParam("pw_teleport_charge_needed")
+	
+	local current = Spring.GetGameRulesParam("pw_teleport_charge") or 0
+	local needed = Spring.GetGameRulesParam("pw_teleport_charge_needed") or 1
 	local currentRemainder = current%needed
 	local numChargesNew = math.floor(current/needed)
 	
@@ -63,7 +72,7 @@ local function UpdateBar()
 	teleportProgress:SetCaption(percent .. "%")
 	
 	if numChargesNew ~= numCharges then
-		local text = " teleport charges"
+		local text = " teleport charge(s)"
 		if (numChargesNew > 0)  then
 			text = "\255\0\255\32\ "..numChargesNew.. text .. "\008"
 			teleportImage.color = {1,1,1,1}
@@ -78,8 +87,14 @@ local function UpdateBar()
 	end
 end
 
--- FIXME: do not display for attacker
 local function CreateTeleportWindow()
+	if (not IsSpec()) and Spring.GetMyTeamID() == 0 then
+		return
+	end
+	if Spring.GetGameFrame() > 1 and Spring.GetGameRulesParam("pw_have_evacuable") ~= 1 then
+		return
+	end
+
 	teleportWindow = Chili.Window:New{
 		name   = 'pw_teleport_meter';
 		parent = Chili.Screen0;
@@ -273,6 +288,7 @@ function widget:GameFrame(n)
 		end
 	end
 	if n%10 == 3 then
+		--CheckHaveEvacuable()	-- in future we might hide the window once all evacuables are destroyed or teleported away
 		UpdateBar()
 	end
 end
@@ -286,6 +302,10 @@ function widget:Initialize()
 	Chili = WG.Chili
 	CreateInfoWindow()
 	CreateTeleportWindow()
+end
+
+function widget:GamePreload()
+	CheckHaveEvacuable()
 end
 
 --------------------------------------------------------------------------------

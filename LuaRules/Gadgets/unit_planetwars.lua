@@ -17,8 +17,10 @@ function gadget:GetInfo()
 	}
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local DEBUG_MODE = true
+
 --local defenderTeam = nil
 local defenderFaction = Spring.GetModOptions().defendingfaction
 
@@ -46,12 +48,20 @@ local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (dist
 local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
 -- takes 24 minutes for full charge
-local TELEPORT_CHARGE_NEEDED = 60 * 0.25	--24
+local TELEPORT_CHARGE_NEEDED = 60 * 24
 local TELEPORT_BASE_CHARGE = 1	-- per second
-local TELEPORT_FRAMES = 30*10	--60	-- 1 minute
+local TELEPORT_FRAMES = 30*60	-- 1 minute
 local TELEPORT_CHARGE_NEEDED_PARAM = "pw_teleport_charge_needed"
 local TELEPORT_CHARGE_CURRENT_PARAM = "pw_teleport_charge"
 local TELEPORT_PROGRESS_PARAM = "pw_teleport_progress"
+
+if DEBUG_MODE then
+	TELEPORT_CHARGE_NEEDED = 60 * 0.5
+	TELEPORT_FRAMES = 30*15	
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local unitData = {}
 local unitsByID = {}
@@ -61,6 +71,7 @@ local stuffToReport = {data = {}, count = 0}
 local canAttackTeams = {}	-- teams that can attack PW structures
 local teleportees = {}
 local teleportChargeBoosters = {}	-- [unitID] = boostpower
+local haveEvacuable = false
 
 local BUILD_RESOLUTION = 16
 
@@ -217,7 +228,11 @@ local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRa
 	
 	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
 	Spring.SetUnitNeutral(unitID,true)
-	Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+	if unitDef.customParams.canbeevacuated or DEBUG_MODE then
+		Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+		haveEvacuable = true
+	end
+	
 	unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
 	Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 end
@@ -332,6 +347,9 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 end
 
 function gadget:GameFrame(f)
+	if not haveEvacuable then
+		return	
+	end
 	if (f%30 == 0) then
 		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
 		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + TELEPORT_BASE_CHARGE)
@@ -383,6 +401,7 @@ function gadget:GamePreload()
 	
 	Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, 0)
 	Spring.SetGameRulesParam(TELEPORT_CHARGE_NEEDED_PARAM, TELEPORT_CHARGE_NEEDED)
+	Spring.SetGameRulesParam("pw_have_evacuable", haveEvacuable and 1 or 0)
 end
 
 function gadget:Initialize()
