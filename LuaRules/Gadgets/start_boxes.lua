@@ -84,9 +84,9 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	if math.abs(defenderX - attackerX) < 10 or math.abs(defenderZ - attackerZ) < 10 then
 		local isX = math.abs(defenderX - attackerX) < 10
 		return {
-			attacker = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
-			defender = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
-			neutral  = GetBasicRectangle(middleBoxStart,   middleBoxEnd,   isX),
+			[0] = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
+			[1] = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
+			[gaiaAllyTeamID] = GetBasicRectangle(middleBoxStart,   middleBoxEnd,   isX)
 		}
 	end
 	
@@ -151,9 +151,9 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	end
 
 	return {
-		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
-		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
-		neutral  = GetRectangle(middleBoxStart,   middleBoxEnd),
+		[0] = GetRectangle(attackerBoxStart, attackerBoxEnd),
+		[1] = GetRectangle(defenderBoxStart, defenderBoxEnd),
+		[gaiaAllyTeamID] = GetRectangle(middleBoxStart,   middleBoxEnd),
 	}
 end
 
