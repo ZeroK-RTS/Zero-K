@@ -46,7 +46,7 @@ structureConfig = {
 			unitDef.name = "Bomber Fabricator"
 			unitDef.description = "Produces bombers"
 			unitDef.objectname = "pw_dropfac.obj"
-			unitDef.selfdestructcountdown = 180
+
 			
 			unitDef.footprintx = 20			
 			unitDef.footprintz = 16
@@ -66,7 +66,6 @@ structureConfig = {
 			unitDef.description = "Produces dropships"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
-			unitDef.selfdestructcountdown = 180
 			
 			unitDef.footprintx = 16			
 			unitDef.footprintz = 11
@@ -86,7 +85,7 @@ structureConfig = {
 			unitDef.description = "Increases bomber capacity"
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
-			unitDef.selfdestructcountdown = 180
+
 			
 			unitDef.footprintx = 16			
 			unitDef.footprintz = 11
@@ -104,43 +103,42 @@ structureConfig = {
 			unitDef.maxdamage = 10000
 			unitDef.name = "Power Generator Unit"
 			unitDef.description = "Produces 50 energy/turn" 
-			unitDef.objectname = "pw_mine.obj"
-			unitDef.script = "pw_mine.lua"
-			unitDef.selfdestructcountdown = 60
-			
-			unitDef.footprintx = 4		
-			unitDef.footprintz = 4
-			
-			unitDef.explodeas = "ESTOR_BUILDING"
-			unitDef.selfdestructas = "ESTOR_BUILDING"
-			
-			unitDef.customparams.soundselect = "building_select2"
-			unitDef.customparams.helptext = "A small, efficient power generator."
-			unitDef.customparams.helptext_pl = "Maly, efektywny generator planetarny."
-			unitDef.customparams.description_pl = "Wytwarza 50 energii/ture"
-			
-			unitDef.collisionvolumescales = [[56 120 56]]
-			unitDef.modelcenteroffset = [[0 10 0]]
-			unitDef.collisionvolumetype	= [[CylY]]		
-		end,
-		
-	pw_mine2 = function(unitDef)
-			unitDef.maxdamage = 16000
-			unitDef.name = "Orbital Solar Array"
-			unitDef.description = "Produces 100 energy/turn" 
 			unitDef.objectname = "pw_mine2.obj"
 			unitDef.script = "pw_mine2.lua"
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 7
 			
+			unitDef.collisionvolumescales = [[90 125 90]]
+			unitDef.modelcenteroffset = [[0 10 0]]
+			
+			unitDef.customparams.soundselect = "building_select2"
+			unitDef.customparams.helptext = "A small, efficient power generator."
+			unitDef.customparams.helptext_pl = "Maly, efektywny generator planetarny."
+			unitDef.customparams.description_pl = "Wytwarza 50 energii/ture"
+			
+			unitDef.customparams.base_economy_boost = "0.02"
+		end,
+		
+	pw_mine2 = function(unitDef)
+			unitDef.maxdamage = 16000
+			unitDef.name = "Orbital Solar Array"
+			unitDef.description = "Produces 100 energy/turn" 
+			unitDef.objectname = "pw_mine.obj"
+			unitDef.script = "pw_mine.lua"
+			
+			unitDef.footprintx = 4
+			unitDef.footprintz = 4
+			
+			
+			unitDef.collisionvolumescales = [[56 120 56]]
+			unitDef.modelcenteroffset = [[0 10 0]]
+			unitDef.collisionvolumetype	= [[CylY]]
+			
 			unitDef.customparams.soundselect = "building_select2"
 			unitDef.customparams.helptext = "A larger power generator with increased output."
 			unitDef.customparams.helptext_pl = "Sredni generator planetarny."
 			unitDef.customparams.description_pl = "Wytwarza 100 energii/ture"
-			
-			unitDef.collisionvolumescales = [[90 125 90]]
-			unitDef.modelcenteroffset = [[0 10 0]]			
 		end,
 		
 	pw_mine3 = function(unitDef)
@@ -149,7 +147,6 @@ structureConfig = {
 			unitDef.description = "Produces 250 energy/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
-			unitDef.selfdestructcountdown = 240
 			
 			unitDef.footprintx = 12		
 			unitDef.footprintz = 12
@@ -163,7 +160,9 @@ structureConfig = {
 			unitDef.customparams.description_pl = "Wytwarza 250 energii/ture."
 			
 			unitDef.collisionvolumescales = [[130 130 130]]
-			unitDef.modelcenteroffset = [[0 10 0]]					
+			unitDef.modelcenteroffset = [[0 10 0]]
+			
+			unitDef.customparams.base_economy_boost = "0.04"
 		end,
 		
 	pw_garrison = function(unitDef)
@@ -171,7 +170,6 @@ structureConfig = {
 			unitDef.name = "Field Garrison"
 			unitDef.description = "Reduces Influence gain"
 			unitDef.objectname = "pw_wormhole.obj"
-			unitDef.selfdestructcountdown = 90
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
@@ -210,7 +208,7 @@ structureConfig = {
 			unitDef.description = "Defends against everything"
 			unitDef.objectname = "pw_warpjammer.s3o"
 			unitDef.script = "pw_warpjammer.lua"
-			unitDef.selfdestructcountdown = 150
+
 			
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
@@ -230,7 +228,6 @@ structureConfig = {
 			unitDef.name = "Wormhole Generator Beacon"
 			unitDef.description = "Links this planet to nearby planets"
 			unitDef.objectname = "pw_estorage.obj"
-			unitDef.selfdestructcountdown = 90
 			
 			unitDef.footprintx = 3
 			unitDef.footprintz = 3
@@ -270,7 +267,6 @@ structureConfig = {
 			unitDef.description = "Produces warp cores"
 			unitDef.objectname = "pw_techlab.obj"
 			unitDef.script = "pw_techlab.lua"
-			unitDef.selfdestructcountdown = 180
 			
 			unitDef.footprintx = 8		
 			unitDef.footprintz = 9
@@ -287,7 +283,6 @@ structureConfig = {
 			unitDef.description = "Prevents warp attacks"
 			unitDef.objectname = "pw_warpgate.obj"
 			unitDef.script = "pw_warpgate.lua"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
@@ -310,7 +305,6 @@ structureConfig = {
 			unitDef.name = "Wormhole Inhibitor"
 			unitDef.description = "Blocks Influence Spread"
 			unitDef.objectname = "pw_mstorage2.obj"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 5
@@ -330,7 +324,6 @@ structureConfig = {
 			unitDef.description = "Spreads Influence remotely"
 			unitDef.objectname = "pw_gaspowerstation.obj"
 			unitDef.script = "pw_gaspowerstation.lua"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
@@ -354,7 +347,6 @@ structureConfig = {
 			unitDef.description = "Produces Energy"
 			unitDef.objectname = "pw_gaspowerstation.obj"
 			unitDef.script = "pw_gaspowerstation.lua"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
@@ -371,7 +363,6 @@ structureConfig = {
 			unitDef.name = "Metal Storage"
 			unitDef.description = "Stores metal"
 			unitDef.objectname = "pw_mstorage2.obj"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 5
@@ -388,7 +379,6 @@ structureConfig = {
 			unitDef.name = "Energy Storage"
 			unitDef.description = "Stores energy"
 			unitDef.objectname = "pw_estorage.obj"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 3
 			unitDef.footprintz = 3
@@ -405,7 +395,6 @@ structureConfig = {
 			unitDef.name = "Double Energy Storage"
 			unitDef.description = "Stores energy"
 			unitDef.objectname = "pw_estorage2.obj"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 5
 			unitDef.footprintz = 3
@@ -423,7 +412,6 @@ structureConfig = {
 			unitDef.description = "Produces warp cores"
 			unitDef.objectname = "pw_warpgate.obj"
 			unitDef.script = "pw_warpgate.lua"
-			unitDef.selfdestructcountdown = 150
 			
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
