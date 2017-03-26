@@ -16,6 +16,10 @@ local private_seed, startboxConfig
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
+local function GetPlanetwarsBoxes ()
+	return {}
+end
+
 local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
 	if shuffleMode == "auto" then
 		if GetTeamCount() > 2 then
@@ -41,6 +45,7 @@ local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimat
 	math.randomseed(private_seed)
 
 	GG.startBoxConfig = startboxConfig
+	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
 end
 
 local function CheckStartbox (boxID, x, z)
