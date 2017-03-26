@@ -203,10 +203,10 @@ function widget:GameFrame (n)
 						end
 					else
 						if consecutiveX then
-							Spring.MarkerAddLine (consecutiveX, spGetGroundHeight(consecutiveX, consecutiveZ), consecutiveZ, tx, spGetGroundHeight(tx, tz), tz)
+							Spring.MarkerAddLine (consecutiveX, spGetGroundHeight(consecutiveX, consecutiveZ), consecutiveZ, tx, spGetGroundHeight(tx, tz), tz, true)
 							local avgX = (consecutiveX + tx) / 2
 							local avgZ = (consecutiveZ + tz) / 2
-							Spring.MarkerAddPoint (avgX, spGetGroundHeight(avgX, avgZ), avgZ, "!")
+							Spring.MarkerAddPoint (avgX, spGetGroundHeight(avgX, avgZ), avgZ, "!", true)
 							consecutiveX = nil
 						end
 					end
@@ -215,8 +215,8 @@ function widget:GameFrame (n)
 					local tx = x + dx * tacnukeRange
 					local tz = z + dz * tacnukeRange
 					local ty = spGetGroundHeight(tx, tz) + 5
-					Spring.MarkerAddPoint (tx, ty, tz, "!")
-					Spring.MarkerAddLine (x, y, z, tx, ty, tz)
+					Spring.MarkerAddPoint (tx, ty, tz, "!", true)
+					Spring.MarkerAddLine (x, y, z, tx, ty, tz, true)
 				end
 			else -- elseif berthas[defID] then
 				local bertha = bullet.unitID
@@ -226,7 +226,7 @@ function widget:GameFrame (n)
 						potentialBerthas[bertha] = nil
 
 						local tx, tz = 123, 123 -- FIXME: i forgot how to intersect and dont have internet atm to check
-						--Spring.MarkerAddPoint (tx, spGetGroundHeight(tx, tz), tz, "!")
+						--Spring.MarkerAddPoint (tx, spGetGroundHeight(tx, tz), tz, "!", true)
 
 						foundBerthas[bertha] = true
 					elseif not foundBerthas[bertha] then
