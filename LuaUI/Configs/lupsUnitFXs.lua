@@ -302,9 +302,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
   corvamp = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true}},
+    -- jets done in gadget
     {class='Ribbon', options={width=1, size=8, piece="wingtip1"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2"}},
   },
