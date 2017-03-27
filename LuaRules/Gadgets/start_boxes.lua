@@ -64,7 +64,7 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
 
 	local function GetBasicRectangle(pointA, pointB, isX)
-		if isX then
+		if not isX then
 			return {
 				{x = pointA.x, z = ez},
 				{x = pointA.x, z = Game.mapSizeZ - ez},
