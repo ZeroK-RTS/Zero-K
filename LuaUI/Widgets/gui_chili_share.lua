@@ -1304,12 +1304,10 @@ local function UpdateInviteTable()
 end
 
 local function UpdatePlayers()
-	if (mySubjectID < 0) then
-		--Spring.Echo("Invalid subject id")
-		return
-	end
-	for _, subject in ipairs(subjects) do
-		UpdatePlayer(subject)
+	if (mySubjectID >= 0 and subjects[mySubjectID]) then
+		for _, subject in ipairs(subjects) do
+			UpdatePlayer(subject)
+		end
 	end
 end
 
