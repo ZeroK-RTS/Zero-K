@@ -405,7 +405,8 @@ function gadget:GamePreload()
 end
 
 function gadget:Initialize()
-	local planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, 800)
+	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
+	local planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
 	
 	local attackerBox = planetwarsBoxes.defender
 	Spring.MarkerAddPoint(attackerBox[1][1], 0, attackerBox[1][2], "origin")
