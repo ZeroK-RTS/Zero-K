@@ -83,13 +83,13 @@ end
 
 -- Projection of v1 onto v2
 local function Project(v1, v2)
-	return Mult(1/Norm(v2), Dot(v1, v2))
+	return Mult(Dot(v1, v2), Unit(v2))
 end
 
--- The normal of v1 onto v2. Returns such that v2 = normal + projection
+-- The normal of v1 onto v2. Returns such that v1 = normal + projection
 local function Normal(v1, v2)
 	local projection = Project(v1, v2)
-	return Subtract(v2, projection), projection
+	return Subtract(v1, projection), projection
 end
 
 -- Spring.GetHeadingFromVector is actually broken at angles close to pi/4 and reflections
