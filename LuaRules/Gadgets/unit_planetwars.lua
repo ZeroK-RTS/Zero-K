@@ -405,6 +405,13 @@ function gadget:GamePreload()
 end
 
 function gadget:Initialize()
+	local planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, 500)
+	
+	local attackerBox = planetwarsBoxes.attacker
+	Spring.MarkerAddPoint(attackerBox[1][1], 0, attackerBox[1][2])
+	Spring.MarkerAddPoint(attackerBox[2][1], 0, attackerBox[2][2])
+	Spring.MarkerAddPoint(attackerBox[3][1], 0, attackerBox[3][2])
+	
 	if Spring.GetGameRulesParam("planetwars_structures") == 0 then
 		gadgetHandler:RemoveGadget()
 		return

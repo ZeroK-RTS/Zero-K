@@ -32,6 +32,47 @@ local function GetAverageStartpoint(boxID)
 	return x, z
 end
 
+local function RegtangularizeTrapezoid(edgeA, edgeB)
+	local vector = Spring.Utilities.Vector
+	Spring.Echo{1}
+	local unit = vector.Unit(vector.Subtract(edgeA[1], edgeA[2]))
+	Spring.Echo{2}
+	Spring.Echo(edgeA[1])
+	Spring.Echo(edgeB[1])
+	
+	local distANear, distAFar = vector.Dot(edgeA[1], unit), vector.Dot(edgeA[2], unit)
+	local distBNear, distBFar = vector.Dot(edgeB[1], unit), vector.Dot(edgeB[2], unit)
+	Spring.Echo{3}
+	
+	if distANear > distAFar then
+		distANear, distAFar = distAFar, distANear
+		edgeA[1], edgeA[2] = edgeA[2], edgeA[1]
+	end
+	Spring.Echo{4}
+	if distBNear > distBFar then
+		distBNear, distBFar = distBFar, distBNear
+		edgeB[1], edgeB[2] = edgeB[2], edgeB[1]
+	end
+	Spring.Echo{5}
+	Spring.Echo(edgeA[1])
+	Spring.Echo(edgeB[1])
+	
+	local nearDist, farDist = math.max(distANear, distBNear), math.min(distAFar, distBFar)
+	
+	Spring.Echo{6}
+	edgeA[1] = vector.Mult(nearDist, unit)
+	Spring.Echo{7}
+	edgeA[2] = vector.Mult(farDist, unit)
+	Spring.Echo{8}
+	
+	Spring.Echo(edgeA[1])
+	Spring.Echo(edgeB[1])
+	local normal = vector.Normal(edgeB[1], edgeA[1])
+	Spring.Echo{9}
+	
+	return {edgeA[1], vector.Subtract(edgeA[2], edgeA[1]), normal}
+end
+
 local function GetBoxID(allyTeamID)
 	local teamID = Spring.GetTeamList(allyTeamID)[1]
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
@@ -50,8 +91,8 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 
 	local function GetPointOnLine(distance)
 		return {
-			x = defenderX + distance * (attackerX - defenderX),
-			z = defenderZ + distance * (attackerZ - defenderZ),
+			defenderX + distance * (attackerX - defenderX),
+			defenderZ + distance * (attackerZ - defenderZ),
 		}
 	end
 
@@ -66,17 +107,17 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	local function GetBasicRectangle(pointA, pointB, isX)
 		if not isX then
 			return {
-				{x = pointA.x, z = ez},
-				{x = pointA.x, z = Game.mapSizeZ - ez},
-				{x = pointB.x, z = Game.mapSizeZ - ez},
-				{x = pointB.x, z = ez},
+				{pointA[1], ez},
+				{pointA[1], Game.mapSizeZ - ez},
+				{pointB[1], Game.mapSizeZ - ez},
+				{pointB[1], ez},
 			}
 		else
 			return {
-				{x = ex,                 z = pointA.z},
-				{x = Game.mapSizeX - ex, z = pointA.z},
-				{x = Game.mapSizeX - ex, z = pointB.z},
-				{x = ex,                 z = pointB.z},
+				{ex,                 pointA[2]},
+				{Game.mapSizeX - ex, pointA[2]},
+				{Game.mapSizeX - ex, pointB[2]},
+				{ex,                 pointB[2]},
 			}
 		end
 	end
@@ -92,51 +133,52 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	
 	local a = (attackerX - defenderX) / (defenderZ - attackerZ)
 	local function GetEdgePoints(point)
-		local b = point.z - (a * point.x)
+		Spring.MarkerAddPoint(point[1],0, point[2])
+		local b = point[2] - (a * point[1])
 
 		local p11, p12, p21, p22
 		if (a > 0) then
 			p11 = {
-				x = (ez - b) / a,
-				z = ez,
+				(ez - b) / a,
+				ez,
 			}
 			p12 = {
-				x = ex,
-				z = (a * ex) + b,
+				ex,
+				(a * ex) + b,
 			}
 			p21 = {
-				x = Game.mapSizeX - ex,
-				z = (a * (Game.mapSizeX - ex)) + b,
+				Game.mapSizeX - ex,
+				(a * (Game.mapSizeX - ex)) + b,
 			}
 
 			p22 = {
-				x = ((Game.mapSizeZ - ez) - b) / a,
-				z = Game.mapSizeZ - ez,
+				((Game.mapSizeZ - ez) - b) / a,
+				Game.mapSizeZ - ez,
 			}
 		else
 			p11 = {
-				x = (ez - b) / a,
-				z = ez,
+				(ez - b) / a,
+				ez,
 			}
 			p12 = {
-				x = Game.mapSizeX - ex,
-				z = (a * (Game.mapSizeX - ex)) + b,
+				Game.mapSizeX - ex,
+				(a * (Game.mapSizeX - ex)) + b,
 			}
 			p21 = {
-				x = ex,
-				z = (a * ex) + b,
+				ex,
+				(a * ex) + b,
 			}
 			p22 = {
-				x = ((Game.mapSizeZ - ez) - b) / a,
-				z = Game.mapSizeZ - ez,
+				((Game.mapSizeZ - ez) - b) / a,
+				Game.mapSizeZ - ez,
 			}
 		end
-		if p11.x > Game.mapSizeX or p11.x < 0 then
+		if p11[1] > Game.mapSizeX or p11[1] < 0 then
 			p1 = p12
 		else
 			p1 = p11
 		end
-		if p22.x > Game.mapSizeX or p22.x < 0 then
+		if p22[1] > Game.mapSizeX or p22[1] < 0 then
 			p2 = p21
 		else
 			p2 = p22
@@ -147,13 +189,17 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	local function GetRectangle(pointA, pointB)
 		local edgesA = GetEdgePoints(pointA)
 		local edgesB = GetEdgePoints(pointB)
-		return {edgesA[1], edgesA[2], edgesB[2], edgesB[1]}
+		
+		Spring.MarkerAddLine(edgesA[1][1], 0, edgesA[1][2], edgesA[2][1], 0, edgesA[2][2])
+		Spring.MarkerAddLine(pointB[1][1], 0, pointB[1][2], pointB[2][1], 0, pointB[2][2])
+		
+		return RegtangularizeTrapezoid(edgesA, edgesB)
 	end
 
 	return {
-		[0] = GetRectangle(attackerBoxStart, attackerBoxEnd),
-		[1] = GetRectangle(defenderBoxStart, defenderBoxEnd),
-		[gaiaAllyTeamID] = GetRectangle(middleBoxStart,   middleBoxEnd),
+		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
+		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
+		gaia = GetRectangle(middleBoxStart,   middleBoxEnd),
 	}
 end
 
