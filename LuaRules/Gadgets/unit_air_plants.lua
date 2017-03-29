@@ -33,6 +33,7 @@ local GetUnitDefID = Spring.GetUnitDefID
 local AIRPLANT = {
   [UnitDefNames["factoryplane"].id] = {land = true},
   [UnitDefNames["factorygunship"].id] = {land = false},
+  [UnitDefNames["pw_bombercontrol"].id] = {land = false},
 }
 
 local plantList = {}

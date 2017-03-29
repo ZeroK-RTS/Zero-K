@@ -162,8 +162,12 @@ local units = {
 		-- No Ship HEAVY_SOMETHING (yet)
 		subraider = SPECIAL,
 	},
-
-
+	pw_bombercontrol = {
+		corhurc2 = RIOT,
+		corshad = ASSAULT,
+		armcybr = HEAVY_SOMETHING,
+		armstiletto_laser = SPECIAL,
+	},
 
 }
 

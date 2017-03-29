@@ -84,8 +84,8 @@ structureConfig = {
 			unitDef.name = "Bomber Control"
 			unitDef.description = "Increases bomber capacity"
 			unitDef.objectname = "pw_dropdepot.obj"
+			unitDef.script = "pw_bombercontrol.lua"
 			unitDef.waterline = 30
-
 			
 			unitDef.footprintx = 16			
 			unitDef.footprintz = 11
@@ -96,8 +96,24 @@ structureConfig = {
 			unitDef.collisionvolumescales = [[230 210 130]]
 			unitDef.modelcenteroffset = [[15 30 0]]
 			
+			-- builder-related stuff
+			unitDef.builder = true
+			unitDef.canmove = true
+			unitDef.canattack = true
+			unitDef.workertime = 10
+			unitDef.buildoptions = { [[corshad]], [[corhurc2]], [[armstiletto_laser]], [[armcybr]] }
+			unitDef.customparams.nongroundfac = [[1]]
+			unitDef.customparams.landflystate = [[0]]
+			unitDef.icontype = [[facair]]
+			
+			local yardmap = ""
+			for i=1,(unitDef.footprintx * unitDef.footprintz) do
+				yardmap = yardmap .. "o"
+			end
+			unitDef.yardmap = yardmap
+			
 			unitDef.buildpic = "pw_dropdepot.png"
-		end,		
+		end,
 				
 	pw_mine = function(unitDef)
 			unitDef.maxdamage = 10000

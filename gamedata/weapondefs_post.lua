@@ -371,6 +371,9 @@ do
   end
 
   FacCanAttack = function(ud)
+    if not ud.buildoptions then
+      return false
+    end
     for _, name in pairs(ud.buildoptions) do
       if (CanAttack(UnitDefs[name:lower()])) then
         return true
@@ -386,7 +389,7 @@ do
     local canAttack = false
     if (RawCanAttack(ud)) then
       canAttack = true
-    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname == "armasp") then
+    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname:find("pw_") or ud.unitname == "armasp") then
       if (ud.unitname == "armasp" or FacCanAttack(ud)) then
         canAttack = true
       end
