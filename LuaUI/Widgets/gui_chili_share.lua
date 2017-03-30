@@ -554,7 +554,7 @@ local function KickPlayer(playerid)
 end
 
 local function BattleKickPlayer(subject)
-	Spring.SendCommands("say !kick " .. subject.name)
+	Spring.SendCommands("say !poll kick " .. subject.name)
 end
 
 local function GiveUnit(target)
