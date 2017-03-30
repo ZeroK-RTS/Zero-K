@@ -118,7 +118,7 @@ unitDef = {
 
     DEAD  = {
       blocking         = false,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
       object           = [[leveler_d.dae]],
