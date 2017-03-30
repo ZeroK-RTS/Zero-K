@@ -167,7 +167,7 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[ARMRAZ_DEAD]],

@@ -164,7 +164,7 @@ unitDef = {
 
     DEAD  = {
       blocking         = true,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
       object           = [[corgrav_dead]],

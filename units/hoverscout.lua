@@ -116,7 +116,7 @@ unitDef = {
 
     DEAD  = {
       blocking         = false,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
       object           = [[corsh_dead.s3o]],
