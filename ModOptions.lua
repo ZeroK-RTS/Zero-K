@@ -386,18 +386,6 @@ local options = {
     max    = 10000,
     step   = 0.05,
   },
-    {
-    key    = 'raid_defense_building_range_mult',
-    name   = 'Range Multiplier for Raid-Damaging Buildings',
-    desc   = 'Multiplies the ranges of all buildings that are able to directly damage ground-based raids, excluding ' ..
-    'superweapons, nuclear weapons and the missile silo.',
-    type   = 'number',
-    section= 'multipliers',
-    def    = 1,
-    min    = 0,
-    max    = 100000,
-    step   = 0.05,
-  },
   {
     key    = 'xmas',
     name   = 'Enable festive units',
