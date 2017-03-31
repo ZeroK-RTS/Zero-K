@@ -19,6 +19,31 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --	MarkerAddLine(a,b,c,d,e,f,true)
 --end
 
+local spGetProjectileDefID = Spring.GetProjectileDefID
+local sniperWeaponDefID = WeaponDefNames.armsnipe_shockrifle.id
+local function FilterOutSniperBullets(projectiles)
+	local i = 1
+	local n = #projectiles
+	while i <= n do
+		local p = projectiles[i]
+		local pID = spGetProjectileDefID(p)
+		if pID == sniperWeaponDefID then
+			projectiles[i] = projectiles[n]
+			projectiles[n] = nil
+			n = n - 1
+			i = i - 1
+		end
+		i = i + 1
+	end
+	return projectiles
+end
+
+local GetProjectilesInRectangle = Spring.GetProjectilesInRectangle
+function Spring.GetProjectilesInRectangle(x1,z1,x2,z2)
+	local projectiles = GetProjectilesInRectangle(x1,z1,x2,z2)
+	return FilterOutSniperBullets(projectiles)
+end
+
 -- Cutscenes apply F5
 local IsGUIHidden = Spring.IsGUIHidden
 function Spring.IsGUIHidden()
