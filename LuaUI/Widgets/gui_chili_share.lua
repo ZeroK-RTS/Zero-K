@@ -1263,6 +1263,9 @@ end
 UpdateListFunction = Buildme
 
 local function SetWantRebuild()
+	if (mySubjectID < 0 or not subjects[mySubjectID]) then 
+		return
+	end
 	if (not window) or (window and window.visible) then
 		Buildme()
 	else
