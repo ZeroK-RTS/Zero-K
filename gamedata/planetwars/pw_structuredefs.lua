@@ -42,23 +42,24 @@ structureConfig = {
 		end,		
 		
 	pw_dropfac = function(unitDef)
-			unitDef.maxdamage = 25000
-			unitDef.name = "Bomber Fabricator"
-			unitDef.description = "Produces bombers"
-			unitDef.objectname = "pw_dropfac.obj"
+		unitDef.maxdamage = 25000
+		unitDef.name = "Bomber Fabricator"
+		unitDef.description = "Produces bombers"
+		unitDef.objectname = "pw_dropfac.obj"
+		unitDef.icontype = [[pw_dropfac]]
 
-			
-			unitDef.footprintx = 20			
-			unitDef.footprintz = 16
-			
-			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
-			unitDef.customparams.helptext_pl = "Produkuje bombowce orbitalne do atakow na wrogie planety."
-			unitDef.customparams.description_pl = "Produkuje bombowce"
-			
-			unitDef.collisionvolumescales = [[275 120 215]]
-			unitDef.modelcenteroffset = [[0 00 0]]	
-		end,
+		
+		unitDef.footprintx = 20			
+		unitDef.footprintz = 16
+		
+		unitDef.customparams.soundselect = "building_select1"
+		unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
+		unitDef.customparams.helptext_pl = "Produkuje bombowce orbitalne do atakow na wrogie planety."
+		unitDef.customparams.description_pl = "Produkuje bombowce"
+		
+		unitDef.collisionvolumescales = [[275 120 215]]
+		unitDef.modelcenteroffset = [[0 00 0]]	
+	end,
 		
 	pw_dropdepot = function(unitDef)
 			unitDef.maxdamage = 20000
@@ -85,6 +86,7 @@ structureConfig = {
 		unitDef.description = "Produces bombers"
 		unitDef.objectname = "pw_dropdepot.obj"
 		unitDef.script = "pw_bomberfac.lua"
+		unitDef.icontype = [[pw_dropfac]]
 		unitDef.waterline = 30
 		
 		unitDef.footprintx = 16
@@ -106,7 +108,6 @@ structureConfig = {
 		unitDef.buildoptions = { [[corshad]], [[corhurc2]], [[armstiletto_laser]], [[armcybr]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
-		unitDef.icontype = [[facair]]
 		
 		local yardmap = ""
 		for i = 1, (unitDef.footprintx * unitDef.footprintz) do

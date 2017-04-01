@@ -1163,6 +1163,13 @@ local icontypes = {
     bitmap='icons/chickenq.dds', 
     size=5.0, 
   },
+  
+  --planetwars
+  pw_dropfac = {
+    bitmap='icons/pw_dropfac.png',
+	distance = 1.6,
+    size = 3.2,
+  },
 }
 
 --------------------------------------------------------------------------------
