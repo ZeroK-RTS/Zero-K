@@ -288,6 +288,18 @@ warpgateCorona = {
   repeatEffect = true,
 }
 
+warpgateCoronaAlt = {
+  pos         = {0,58.9,0},
+  life        = math.huge,
+  lifeSpread  = 0,
+  size        = 210,
+  sizeGrowth  = 0,
+  colormap    = { {0.1, 0.2, 0.5, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
 zenithCorona = {
   pos         = {0,130,0},
   life        = math.huge,

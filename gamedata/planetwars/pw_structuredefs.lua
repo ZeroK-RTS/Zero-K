@@ -225,7 +225,6 @@ structureConfig = {
 			unitDef.description = "Intercepts approaching bombers"
 			unitDef.objectname = "pw_warpjammer.s3o"
 			unitDef.script = "pw_warpjammer.lua"
-
 			
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
@@ -234,6 +233,14 @@ structureConfig = {
 			unitDef.customparams.helptext = "This structure intercepts incoming bombers."
 			unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
 			unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
+			
+			unitDef.sightdistance = 800
+			unitDef.radardistance = 2100
+			unitDef.radaremitheight = 150
+			unitDef.losemitheight = 150
+			unitDef.onoffable = true
+			unitDef.energyuse = 0.8
+			unitDef.customparams.priority_misc = 2
 			
 			unitDef.collisionvolumescales = [[100 80 100]]
 			unitDef.modelcenteroffset = [[0 0 0]]
@@ -330,6 +337,15 @@ structureConfig = {
 			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
 			unitDef.customparams.helptext_pl = "Zagluszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny przy uzyciu Rdzeni na ta planete."
 			unitDef.customparams.description_pl = "Zagluszacz czasoprzestrzenny"
+			
+			unitDef.customparams.area_cloak = 1
+			unitDef.customparams.area_cloak_upkeep = 12
+			unitDef.customparams.area_cloak_radius = 550
+			unitDef.customparams.area_cloak_decloak_distance = 75
+			unitDef.radardistancejam = 550
+			unitDef.onoffable = true
+			unitDef.energyuse = 1.5
+			unitDef.customparams.priority_misc = 2
 			
 			unitDef.collisionvolumescales = [[120 100 120]]
 			unitDef.modelcenteroffset = [[0 0 0]]
