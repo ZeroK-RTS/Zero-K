@@ -89,6 +89,7 @@ unitDef = {
 
 	  customParams        	  = {
 		light_radius = 0,
+		hide_from_enemy = 1,
 	  },
 	  
       damage                  = {

@@ -1,12 +1,21 @@
 if gadgetHandler:IsSyncedCode() then return end
 
-function gadget:GetInfo() return {
-	name    = "Sniper bullets only visible to own allyteam",
-	layer   = 0,
-	enabled = true,
-} end
+function gadget:GetInfo() 
+	return {
+		name    = "Model projectiles only visible to own allyteam",
+		layer   = 0,
+		enabled = true,
+	}
+end
 
-local sniperWeaponDefID = WeaponDefNames.armsnipe_shockrifle.id
+local hideWeaponDefs = {}
+for i = 1, #WeaponDefs do
+	local wd = WeaponDefs[i]
+	if wd and wd.customParams and wd.customParams.hide_from_enemy then
+		hideWeaponDefs[i] = true
+	end
+end
+
 local spGetProjectileDefID = Spring.GetProjectileDefID
 local spGetProjectileTeamID = Spring.GetProjectileTeamID
 local spGetTeamInfo = Spring.GetTeamInfo
@@ -21,7 +30,7 @@ function gadget:DrawProjectile(pID, pass)
 	end
 
 	local pWeaponDefID = spGetProjectileDefID(pID)
-	if pWeaponDefID ~= sniperWeaponDefID then
+	if not hideWeaponDefs[pWeaponDefID] then
 		return false
 	end
 
