@@ -47,9 +47,10 @@ local lava = (Game.waterDamage > 0)
 local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
 
-local TELEPORT_CHARGE_NEEDED = 20*60 -- 20 minutes to charge without any modifiers.
-local TELEPORT_BASE_CHARGE = 1 -- per second
+local TELEPORT_CHARGE_NEEDED = 20*60 -- seconds
 local TELEPORT_FRAMES = 30*60 -- 1 minute
+local TELEPORT_CHARGE_RATE = 1 -- per second
+local teleportChargeNeededMult = 1
 
 local allyTeamRole = {
 	[0] = "attacker",
@@ -57,8 +58,16 @@ local allyTeamRole = {
 }
 
 if DEBUG_MODE then
-	TELEPORT_CHARGE_NEEDED = 60 * 0.5
+	TELEPORT_CHARGE_NEEDED = 60
 	TELEPORT_FRAMES = 30*15
+end
+
+local wormholeDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.evacuation_speed then
+		wormholeDefs[i] = 1/tonumber(ud.customParams.evacuation_speed)
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -70,6 +79,8 @@ local hqs = {}
 local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
 local haveEvacuable = false
+
+local wormholes = {}
 
 local planetwarsBoxes = {}
 
@@ -84,19 +95,48 @@ GG.PlanetWars.hqs = hqs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local teleportCharge = 0
-local teleportChargeRate = 1
+local teleportCharge = -1
 local teleportingUnit, teleportFrame
 
 local function SetTeleportCharge(newCharge)
-	if newCharge > TELEPORT_CHARGE_NEEDED then
-		newCharge = TELEPORT_CHARGE_NEEDED
+	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+		newCharge = TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult
 	end
 	if newCharge == teleportCharge then
 		return
 	end
 	teleportCharge = newCharge
 	Spring.SetGameRulesParam("pw_teleport_charge", teleportCharge)
+end
+
+local function UpdateTeleportChargeNeeded()
+	local newMult = 1
+	for unitID, mult in pairs(wormholes) do
+		newMult = math.min(mult, newMult)
+	end
+	
+	if newMult == teleportChargeNeededMult then
+		return
+	end
+	teleportChargeNeededMult = newMult
+	SetTeleportCharge(teleportCharge)
+	
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+end
+
+local function AddWormhole(unitID, unitDefID)
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if wormholeDefs[unitDefID] then
+		wormholes[unitID] = wormholeDefs[unitDefID]
+		UpdateTeleportChargeNeeded()
+	end
+end
+
+local function RemoveWormhole(unitID, unitDefID)
+	if wormholes[unitID] then
+		wormholes[unitID] = nil
+		UpdateTeleportChargeNeeded()
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -264,6 +304,8 @@ local function SpawnStructure(info, teamID, boxData)
 	end
 	
 	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
+	AddWormhole(unitID)
+	
 	Spring.SetUnitNeutral(unitID,true)
 	if unitDef.customParams.canbeevacuated or DEBUG_MODE then
 		Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
@@ -368,7 +410,7 @@ function gadget:GameFrame(frame)
 		return
 	end
 	if (frame%30 == 0) then
-		SetTeleportCharge(teleportCharge + teleportChargeRate)
+		SetTeleportCharge(teleportCharge + TELEPORT_CHARGE_RATE)
 	end
 	if teleportingUnit then
 		if frame >= teleportFrame then
@@ -381,6 +423,7 @@ function gadget:GameFrame(frame)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	RemoveWormhole(unitID, unitDefID)
 	if unitsByID[unitID] then
 		local unit = unitsByID[unitID]
 		local name = unit.name
@@ -415,7 +458,7 @@ function gadget:GamePreload()
 		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]])
 	end
 	
-	SetTeleportCharge(teleportCharge + teleportChargeRate)
+	SetTeleportCharge(0)
 	Spring.SetGameRulesParam("pw_have_evacuable", haveEvacuable and 1 or 0)
 end
 
@@ -513,14 +556,14 @@ function gadget:Initialize()
 	--end
 	
 	Spring.SetGameRulesParam("pw_teleport_time", TELEPORT_FRAMES)
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_ABANDON_PW] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
@@ -533,8 +576,8 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 		return true
 	end
 	
-	if teleportCharge < TELEPORT_CHARGE_NEEDED then
-		Spring.Echo("Charge needed", teleportCharge, TELEPORT_CHARGE_NEEDED)
+	if teleportCharge < TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+		Spring.Echo("Charge needed", teleportCharge, TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
 		return true -- command used, do not remove
 	end
 	

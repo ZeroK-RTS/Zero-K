@@ -67,8 +67,8 @@ local function UpdateBar()
 	local currentRemainder = current%needed
 	local numChargesNew = math.floor(current/needed)
 	
-	teleportProgress:SetValue(currentRemainder/needed)
-	local percent = math.floor(currentRemainder/needed * 100 + 0.5)
+	teleportProgress:SetValue(current/needed)
+	local percent = math.floor(current/needed * 100 + 0.5)
 	teleportProgress:SetCaption(percent .. "%")
 	
 	if numChargesNew ~= numCharges then
@@ -88,9 +88,6 @@ local function UpdateBar()
 end
 
 local function CreateTeleportWindow()
-	if (not IsSpec()) and Spring.GetMyTeamID() == 0 then
-		return
-	end
 	if Spring.GetGameFrame() > 1 and Spring.GetGameRulesParam("pw_have_evacuable") ~= 1 then
 		return
 	end
