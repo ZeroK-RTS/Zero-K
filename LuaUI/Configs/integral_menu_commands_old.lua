@@ -54,6 +54,7 @@ AddBuildQueue("factoyamph")
 AddBuildQueue("factoryship")
 AddBuildQueue("striderhub")
 AddBuildQueue("missilesilo")
+AddBuildQueue("bomberfac")
 
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},

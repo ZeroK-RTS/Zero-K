@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 
 -- note name and description are obtained from server and modified at runtime
-ALLOW_SERVER_OVERRIDE_UNIT_TEXT = true
+ALLOW_SERVER_OVERRIDE_UNIT_TEXT = false
 
 structureConfig = {
 	generic_tech = function(unitDef)
@@ -79,42 +79,44 @@ structureConfig = {
 			unitDef.modelcenteroffset = [[15 40 0]]			
 		end,
 
-	pw_bombercontrol = function(unitDef)
-			unitDef.maxdamage = 20000
-			unitDef.name = "Bomber Control"
-			unitDef.description = "Increases bomber capacity"
-			unitDef.objectname = "pw_dropdepot.obj"
-			unitDef.script = "pw_bombercontrol.lua"
-			unitDef.waterline = 30
-			
-			unitDef.footprintx = 16			
-			unitDef.footprintz = 11
-			
-			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
-			
-			unitDef.collisionvolumescales = [[230 210 130]]
-			unitDef.modelcenteroffset = [[15 30 0]]
-			
-			-- builder-related stuff
-			unitDef.builder = true
-			unitDef.canmove = true
-			unitDef.canattack = true
-			unitDef.workertime = 10
-			unitDef.buildoptions = { [[corshad]], [[corhurc2]], [[armstiletto_laser]], [[armcybr]] }
-			unitDef.customparams.nongroundfac = [[1]]
-			unitDef.customparams.landflystate = [[0]]
-			unitDef.icontype = [[facair]]
-			
-			local yardmap = ""
-			for i=1,(unitDef.footprintx * unitDef.footprintz) do
-				yardmap = yardmap .. "o"
-			end
-			unitDef.yardmap = yardmap
-			
-			unitDef.buildpic = "pw_dropdepot.png"
-		end,
-				
+	pw_bomberfac = function(unitDef)
+		unitDef.maxdamage = 20000
+		unitDef.name = "Bomber Factory"
+		unitDef.description = "Produces bombers"
+		unitDef.objectname = "pw_dropdepot.obj"
+		unitDef.script = "pw_bomberfac.lua"
+		unitDef.waterline = 30
+		
+		unitDef.footprintx = 16
+		unitDef.footprintz = 11
+		
+		unitDef.customparams.soundselect = "building_select1"
+		unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
+		
+		unitDef.collisionvolumescales = [[225 140 120]]
+		unitDef.collisionvolumeoffsets = [[-20 -30 0]]
+		unitDef.modelcenteroffset = [[15 30 0]]
+		
+		-- builder-related stuff
+		unitDef.showNanoSpray = false
+		unitDef.builder = true
+		unitDef.canmove = true
+		unitDef.canattack = true
+		unitDef.workertime = 10
+		unitDef.buildoptions = { [[corshad]], [[corhurc2]], [[armstiletto_laser]], [[armcybr]] }
+		unitDef.customparams.nongroundfac = [[1]]
+		unitDef.customparams.landflystate = [[0]]
+		unitDef.icontype = [[facair]]
+		
+		local yardmap = ""
+		for i = 1, (unitDef.footprintx * unitDef.footprintz) do
+			yardmap = yardmap .. "o"
+		end
+		unitDef.yardmap = yardmap
+		
+		unitDef.buildpic = "pw_dropdepot.png"
+	end,
+	
 	pw_mine = function(unitDef)
 			unitDef.maxdamage = 10000
 			unitDef.name = "Power Generator Unit"
@@ -447,7 +449,7 @@ structureConfig = {
 }
 
 -- test data here
-TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyY29udHJvbCIsDQogICAgbmFtZSA9ICJCb21iZXIgQ29udHJvbCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIEJvbWJlciBDYXAiDQogIH0sDQogIHM0ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBnYXRlIiwNCiAgICBuYW1lID0gIldhcnAgQ29yZSBGYWJyaWNhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBXYXJwIENvcmVzIg0KICB9LCAgICANCiAgczUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUiLA0KICAgIG5hbWUgPSAiV29ybWhvbGUgR2VuZXJhdG9yIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaW5rcyBQbGFuZXRzOyBTcHJlYWRzIEluZmx1ZW5jZSINCiAgfSwNCiAgczYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd29ybWhvbGUyIiwNCiAgICBuYW1lID0gIkltcHJvdmVkIFdvcm1ob2xlIFN0YWJpbGl6ZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgR3JlYXRlciBJbmZsdWVuY2UiDQogIH0sDQogIHM3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X3dhcnBqYW1tZXIiLA0KICAgIG5hbWUgPSAiV2FycCBKYW1tZXIiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBXYXJwIEF0dGFja3MiDQogIH0sDQogIHM4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dhc3Bvd2Vyc3RhdGlvbiIsDQogICAgbmFtZSA9ICJHYXMgUG93ZXIgU3RhdGlvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiU21hbGwgUG93ZXIgUHJvZHVjZXIiICAgIA0KICB9LA0KICBzMTAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZSIsDQogICAgbmFtZSA9ICJQb3dlciBHZW5lcmF0b3IgVW5pdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlnaHQgRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTIiLA0KICAgIG5hbWUgPSAiQW5uaWhpbGF0aW9uIFBsYW50IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJNZWRpdW0gRW5lcmd5IFByb2R1Y2VyIg0KICB9LA0KICBzMTIgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfbWluZTMiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IEdlb3RoZXJtYWwgVGFwIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJIZWF2eSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMyA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19tc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBNZXRhbCBTdG9yYWdlIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTdG9yZXMgTWV0YWwiICAgIA0KICB9LA0KICBzMTQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UiLA0KICAgIG5hbWUgPSAiRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTUgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZXN0b3JhZ2UyIiwNCiAgICBuYW1lID0gIkR1YWwgRW5lcmd5IFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBFbmVyZ3kiICAgIA0KICB9LA0KICBzMTYgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3VlcmlsbGEiLA0KICAgIG5hbWUgPSAiR3VlcmlsbGEgSnVtcGdhdGUiLA0KICAgIGRlc2NyaXB0aW9uID0gIlNwcmVhZHMgSW5mbHVlbmNlIFJlbW90ZWx5IiAgICANCiAgfSwNCiAgczE3ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2luaGliaXRvciIsDQogICAgbmFtZSA9ICJXb3JtaG9sZSBJbmhpYml0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkJsb2NrcyBJbmZsdWVuY2UgU3ByZWFkIiAgICANCiAgfSwNCiAgczE4ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2dyaWQiLA0KICAgIG5hbWUgPSAiUGxhbmV0YXJ5IERlZmVuc2UgR3JpZCIsDQogICAgZGVzY3JpcHRpb24gPSAiRGVmZW5kcyBhZ2FpbnN0IGV2ZXJ5dGhpbmciICAgIA0KICB9LA0KICBzMTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2Fycmlzb24iLA0KICAgIG5hbWUgPSAiRmllbGQgR2Fycmlzb24iLA0KICAgIGRlc2NyaXB0aW9uID0gIlJlZHVjZXMgSW5mbHVlbmNlIGdhaW4iICAgIA0KICB9LA0KICBzMjAgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfaW50ZXJjZXB0aW9uIiwNCiAgICBuYW1lID0gIkludGVyY2VwdGlvbiBOZXR3b3JrIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbnRlcmNlcHRzIGFwcHJvYWNoaW5nIGJvbWJlcnMiICAgIA0KICB9LA0KICBzMjEgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGdhdGVhbHQiLA0KICAgIG5hbWUgPSAiV2FycCBDb3JlIEZhYnJpY2F0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFdhcnAgQ29yZXMiDQogIH0sICANCiAgczk5ID0gew0KICAgIHVuaXRuYW1lID0gInB3X2FydGVmYWN0IiwNCiAgICBuYW1lID0gIkFuY2llbnQgQXJ0ZWZhY3QiLA0KICAgIGRlc2NyaXB0aW9uID0gIk15c3RlcmlvdXMgUmVsaWMiDQogIH0sICANCn0="
+TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyZmFjIiwNCiAgICBuYW1lID0gIkJvbWJlciBDb250cm9sIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbmNyZWFzZXMgQm9tYmVyIENhcCINCiAgfSwNCiAgczQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGdhdGUiLA0KICAgIG5hbWUgPSAiV2FycCBDb3JlIEZhYnJpY2F0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFdhcnAgQ29yZXMiDQogIH0sICAgIA0KICBzNSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFtZSA9ICJXb3JtaG9sZSBHZW5lcmF0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgSW5mbHVlbmNlIg0KICB9LA0KICBzNiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZTIiLA0KICAgIG5hbWUgPSAiSW1wcm92ZWQgV29ybWhvbGUgU3RhYmlsaXplciIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlua3MgUGxhbmV0czsgU3ByZWFkcyBHcmVhdGVyIEluZmx1ZW5jZSINCiAgfSwNCiAgczcgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGphbW1lciIsDQogICAgbmFtZSA9ICJXYXJwIEphbW1lciIsDQogICAgZGVzY3JpcHRpb24gPSAiQmxvY2tzIFdhcnAgQXR0YWNrcyINCiAgfSwNCiAgczggPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2FzcG93ZXJzdGF0aW9uIiwNCiAgICBuYW1lID0gIkdhcyBQb3dlciBTdGF0aW9uIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTbWFsbCBQb3dlciBQcm9kdWNlciIgICAgDQogIH0sDQogIHMxMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lIiwNCiAgICBuYW1lID0gIlBvd2VyIEdlbmVyYXRvciBVbml0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaWdodCBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMiIsDQogICAgbmFtZSA9ICJBbm5paGlsYXRpb24gUGxhbnQiLA0KICAgIGRlc2NyaXB0aW9uID0gIk1lZGl1bSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMyIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgR2VvdGhlcm1hbCBUYXAiLA0KICAgIGRlc2NyaXB0aW9uID0gIkhlYXZ5IEVuZXJneSBQcm9kdWNlciINCiAgfSwNCiAgczEzID0gew0KICAgIHVuaXRuYW1lID0gInB3X21zdG9yYWdlMiIsDQogICAgbmFtZSA9ICJEdWFsIE1ldGFsIFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBNZXRhbCIgICAgDQogIH0sDQogIHMxNCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19lc3RvcmFnZSIsDQogICAgbmFtZSA9ICJFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19lc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19ndWVyaWxsYSIsDQogICAgbmFtZSA9ICJHdWVyaWxsYSBKdW1wZ2F0ZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3ByZWFkcyBJbmZsdWVuY2UgUmVtb3RlbHkiICAgIA0KICB9LA0KICBzMTcgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfaW5oaWJpdG9yIiwNCiAgICBuYW1lID0gIldvcm1ob2xlIEluaGliaXRvciIsDQogICAgZGVzY3JpcHRpb24gPSAiQmxvY2tzIEluZmx1ZW5jZSBTcHJlYWQiICAgIA0KICB9LA0KICBzMTggPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3JpZCIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgRGVmZW5zZSBHcmlkIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJEZWZlbmRzIGFnYWluc3QgZXZlcnl0aGluZyIgICAgDQogIH0sDQogIHMxOSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nYXJyaXNvbiIsDQogICAgbmFtZSA9ICJGaWVsZCBHYXJyaXNvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiUmVkdWNlcyBJbmZsdWVuY2UgZ2FpbiIgICAgDQogIH0sDQogIHMyMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbnRlcmNlcHRpb24iLA0KICAgIG5hbWUgPSAiSW50ZXJjZXB0aW9uIE5ldHdvcmsiLA0KICAgIGRlc2NyaXB0aW9uID0gIkludGVyY2VwdHMgYXBwcm9hY2hpbmcgYm9tYmVycyIgICAgDQogIH0sDQogIHMyMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193YXJwZ2F0ZWFsdCIsDQogICAgbmFtZSA9ICJXYXJwIENvcmUgRmFicmljYXRvciIsDQogICAgZGVzY3JpcHRpb24gPSAiUHJvZHVjZXMgV2FycCBDb3JlcyINCiAgfSwgIA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
 --[[
 {
   s0 = {
@@ -466,7 +468,7 @@ TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsD
     description = "Increases Dropship Cap"
   },
   s3 = {
-    unitname = "pw_bombercontrol",
+    unitname = "pw_bomberfac",
     name = "Bomber Control",
     description = "Increases Bomber Cap"
   },
