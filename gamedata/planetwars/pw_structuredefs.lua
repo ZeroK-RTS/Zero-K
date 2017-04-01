@@ -203,27 +203,37 @@ local structureConfig = {
 		end,
 		
 	pw_garrison = function(unitDef)
-			unitDef.maxdamage = 16000
-			unitDef.name = "Field Garrison"
-			unitDef.description = "Reduces Influence gain"
-			unitDef.objectname = "pw_wormhole.obj"
-			unitDef.icontype = [[pw_defense]]
-			unitDef.script = "pw_wormhole.lua"
-			
-			unitDef.canattack = true
-			unitDef.sightdistance = 330
-			
-			unitDef.footprintx = 11
-			unitDef.footprintz = 6
-			
-			unitDef.customparams.soundselect = "factory_select"
-			unitDef.customparams.helptext = "This structure maintains an army which reduces the Influence gained from battles."
-			unitDef.customparams.helptext_pl = "Garnizon sprawuje piecze nad planeta, ograniczajac wrogie wplywy zyskane z bitew."
-			unitDef.customparams.description_pl = "Garnizon - ogranicza wplywy"
-			
-			unitDef.collisionvolumescales = [[160 65 80]]
-			unitDef.modelcenteroffset = [[0 30 0]]					
-		end,
+		unitDef.maxdamage = 16000
+		unitDef.name = "Field Garrison"
+		unitDef.description = "Reduces Influence gain"
+		unitDef.objectname = "pw_wormhole.obj"
+		unitDef.icontype = [[pw_defense]]
+		unitDef.script = "pw_wormhole.lua"
+		
+		unitDef.canattack = true
+		unitDef.sightdistance = 330
+		
+		unitDef.footprintx = 11
+		unitDef.footprintz = 6
+		
+		unitDef.customparams.soundselect = "factory_select"
+		unitDef.customparams.helptext = "This structure maintains an army which reduces the Influence gained from battles."
+		unitDef.customparams.helptext_pl = "Garnizon sprawuje piecze nad planeta, ograniczajac wrogie wplywy zyskane z bitew."
+		unitDef.customparams.description_pl = "Garnizon - ogranicza wplywy"
+		
+		unitDef.weapondefs = {bogus_fake_targeter = fakeWeapon}
+		
+		unitDef.weapons = {
+			{
+				def                = "BOGUS_FAKE_TARGETER",
+				badtargetcategory  = "FIXEDWING",
+				onlytargetcategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
+			},
+		}
+		
+		unitDef.collisionvolumescales = [[160 65 80]]
+		unitDef.modelcenteroffset = [[0 30 0]]					
+	end,
 		
 	pw_interception = function(unitDef)
 		unitDef.maxdamage = 16000
