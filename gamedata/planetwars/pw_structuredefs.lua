@@ -300,7 +300,7 @@ local structureConfig = {
 			unitDef.description = "Produces warp cores"
 			unitDef.objectname = "pw_techlab.obj"
 			unitDef.script = "pw_techlab.lua"
-			unitDef.icontype = [[warpgate]]
+			unitDef.icontype = [[pw_warpgate]]
 			
 			unitDef.footprintx = 8		
 			unitDef.footprintz = 9
