@@ -70,6 +70,19 @@ local carrierDefNames = {
 			offsets = {0, 8, 15, colvolMidX = 0, colvolMidY = 30, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0} --shift colvol to avoid collision.
 		},
 	},
+	pw_garrison = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.attackdrone.id, 
+			reloadTime = 10, 
+			maxDrones = 8, 
+			spawnSize = 1, 
+			range = 800, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
+		},
+	},
 }
 
 local presets = {

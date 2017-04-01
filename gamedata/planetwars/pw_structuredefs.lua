@@ -187,6 +187,7 @@ local structureConfig = {
 			unitDef.description = "Reduces Influence gain"
 			unitDef.objectname = "pw_wormhole.obj"
 			unitDef.icontype = [[pw_defense]]
+			unitDef.script = "pw_wormhole.lua"
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
