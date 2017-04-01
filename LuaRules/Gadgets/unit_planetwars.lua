@@ -38,13 +38,12 @@ local abandonCMD = {
 	tooltip = "Teleports building to safety for the duration of the battle",
 }
 
-local spGetGroundHeight	= Spring.GetGroundHeight
-local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetGroundHeight = Spring.GetGroundHeight
+local spAreTeamsAllied  = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
-local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
 

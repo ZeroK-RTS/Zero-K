@@ -36,10 +36,10 @@ local AIRPLANT = {
 }
 
 if UnitDefNames["pw_bomberfac"] then
-	AIRPLANT[UnitDefNames["pw_bomberfac"].id] = {land = false},
+	AIRPLANT[UnitDefNames["pw_bomberfac"].id] = {land = false}
 end
 if UnitDefNames["pw_dropfac"] then
-	AIRPLANT[UnitDefNames["pw_dropfac"].id] = {land = false},
+	AIRPLANT[UnitDefNames["pw_dropfac"].id] = {land = false}
 end
 
 local plantList = {}

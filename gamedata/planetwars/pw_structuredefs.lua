@@ -1,10 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
--- note name and description are obtained from server and modified at runtime
-ALLOW_SERVER_OVERRIDE_UNIT_TEXT = false
-
-structureConfig = {
+local structureConfig = {
 	generic_tech = function(unitDef)
 			unitDef.maxdamage = 10000
 			unitDef.objectname = "pw_techlab.obj"
@@ -77,25 +74,6 @@ structureConfig = {
 		end
 		unitDef.yardmap = yardmap
 	end,
-		
-	pw_dropdepot = function(unitDef)
-			unitDef.maxdamage = 20000
-			unitDef.name = "Dropship Factory"
-			unitDef.description = "Produces dropships"
-			unitDef.objectname = "pw_dropdepot.obj"
-			unitDef.waterline = 30
-			
-			unitDef.footprintx = 16
-			unitDef.footprintz = 11
-			
-			unitDef.customparams.soundselect = "building_select1"
-			unitDef.customparams.helptext = "Produces space dropships for invading hostile planets."
-			unitDef.customparams.helptext_pl = "Produkuje desantowce orbitalne do inwazji na wrogie planety."
-			unitDef.customparams.description_pl = "Produkuje desantowce"
-			
-			unitDef.collisionvolumescales = [[245 220 145]]
-			unitDef.modelcenteroffset = [[15 40 0]]			
-		end,
 
 	pw_bomberfac = function(unitDef)
 		unitDef.maxdamage = 20000
@@ -220,32 +198,32 @@ structureConfig = {
 		end,
 		
 	pw_interception = function(unitDef)
-			unitDef.maxdamage = 16000
-			unitDef.name = "Interception Network"
-			unitDef.description = "Intercepts approaching bombers"
-			unitDef.objectname = "pw_warpjammer.s3o"
-			unitDef.script = "pw_warpjammer.lua"
-			
-			unitDef.footprintx = 6
-			unitDef.footprintz = 6
-			
-			unitDef.customparams.soundselect = "radar_select"
-			unitDef.customparams.helptext = "This structure intercepts incoming bombers."
-			unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
-			unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
-			
-			unitDef.sightdistance = 800
-			unitDef.radardistance = 2100
-			unitDef.radaremitheight = 150
-			unitDef.losemitheight = 150
-			unitDef.onoffable = true
-			unitDef.energyuse = 0.8
-			unitDef.customparams.priority_misc = 2
-			
-			unitDef.collisionvolumescales = [[100 80 100]]
-			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]
-		end,
+		unitDef.maxdamage = 16000
+		unitDef.name = "Interception Network"
+		unitDef.description = "Intercepts planetary bombers"
+		unitDef.objectname = "pw_warpjammer.s3o"
+		unitDef.script = "pw_warpjammer.lua"
+		
+		unitDef.footprintx = 6
+		unitDef.footprintz = 6
+		
+		unitDef.customparams.soundselect = "radar_select"
+		unitDef.customparams.helptext = "This structure intercepts incoming bombers."
+		unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
+		unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
+		
+		unitDef.sightdistance = 800
+		unitDef.radardistance = 2100
+		unitDef.radaremitheight = 150
+		unitDef.losemitheight = 150
+		unitDef.onoffable = true
+		unitDef.energyuse = 0.8
+		unitDef.customparams.priority_misc = 2
+		
+		unitDef.collisionvolumescales = [[100 80 100]]
+		unitDef.modelcenteroffset = [[0 0 0]]
+		unitDef.collisionvolumetype	= [[Box]]
+	end,
 		
 	pw_grid = function(unitDef)
 			unitDef.maxdamage = 20000
@@ -325,37 +303,37 @@ structureConfig = {
 		end,
 		
 	pw_warpjammer = function(unitDef)
-			unitDef.maxdamage = 12000
-			unitDef.name = "Warp Jammer"
-			unitDef.description = "Prevents warp attacks"
-			unitDef.objectname = "pw_warpgate.obj"
-			unitDef.script = "pw_warpgate.lua"
-			
-			unitDef.footprintx = 8
-			unitDef.footprintz = 8
-			
-			unitDef.explodeas = "GRAV_BLAST"
-			unitDef.selfdestructas = "GRAV_BLAST"
-			
-			unitDef.customparams.soundselect = "radar_select"
-			unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
-			unitDef.customparams.helptext_pl = "Zagluszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny przy uzyciu Rdzeni na ta planete."
-			unitDef.customparams.description_pl = "Zagluszacz czasoprzestrzenny"
-			
-			unitDef.customparams.area_cloak = 1
-			unitDef.customparams.area_cloak_upkeep = 12
-			unitDef.customparams.area_cloak_radius = 550
-			unitDef.customparams.area_cloak_decloak_distance = 75
-			unitDef.radardistancejam = 550
-			unitDef.onoffable = true
-			unitDef.energyuse = 1.5
-			unitDef.customparams.priority_misc = 2
-			
-			unitDef.collisionvolumescales = [[120 100 120]]
-			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
-		end,
-	
+		unitDef.maxdamage = 12000
+		unitDef.name = "Warp Jammer"
+		unitDef.description = "Prevents warp attacks"
+		unitDef.objectname = "pw_warpgate.obj"
+		unitDef.script = "pw_warpgate.lua"
+		
+		unitDef.footprintx = 8
+		unitDef.footprintz = 8
+		
+		unitDef.explodeas = "GRAV_BLAST"
+		unitDef.selfdestructas = "GRAV_BLAST"
+		
+		unitDef.customparams.soundselect = "radar_select"
+		unitDef.customparams.helptext = "The Warp Jammer protects the planet with a field that prevents warpcore-equipped ships from jumping to it."
+		unitDef.customparams.helptext_pl = "Zagluszacz czasoprzestrzenny nie pozwala na skok czasoprzestrzenny przy uzyciu Rdzeni na ta planete."
+		unitDef.customparams.description_pl = "Zagluszacz czasoprzestrzenny"
+		
+		unitDef.customparams.area_cloak = 1
+		unitDef.customparams.area_cloak_upkeep = 12
+		unitDef.customparams.area_cloak_radius = 550
+		unitDef.customparams.area_cloak_decloak_distance = 75
+		unitDef.radardistancejam = 550
+		unitDef.onoffable = true
+		unitDef.energyuse = 1.5
+		unitDef.customparams.priority_misc = 2
+		
+		unitDef.collisionvolumescales = [[120 100 120]]
+		unitDef.modelcenteroffset = [[0 0 0]]
+		unitDef.collisionvolumetype	= [[CylY]]
+	end,
+
 	pw_inhibitor = function(unitDef)
 			unitDef.maxdamage = 15000
 			unitDef.name = "Wormhole Inhibitor"
@@ -486,120 +464,4 @@ structureConfig = {
 		end,
 }
 
--- test data here
-TEST_DEF_STRING = "ew0KICBzMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nZW5lcmljdGVjaCIsDQogICAgbmFtZSA9ICJUZWNoIEJ1aWxkaW5nIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJQcm9kdWNlcyBSZXNlYXJjaCINCiAgfSwgIA0KICBzMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZmFjIiwNCiAgICBuYW1lID0gIlN0YXJzaGlwIEZhY3RvcnkiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFNoaXBzIg0KICB9LA0KICBzMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19kcm9wZGVwb3QiLA0KICAgIG5hbWUgPSAiRmxlZXQgQ29tbWFuZCIsDQogICAgZGVzY3JpcHRpb24gPSAiSW5jcmVhc2VzIERyb3BzaGlwIENhcCINCiAgfSwNCiAgczMgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYm9tYmVyZmFjIiwNCiAgICBuYW1lID0gIkJvbWJlciBDb250cm9sIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJJbmNyZWFzZXMgQm9tYmVyIENhcCINCiAgfSwNCiAgczQgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGdhdGUiLA0KICAgIG5hbWUgPSAiV2FycCBDb3JlIEZhYnJpY2F0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIlByb2R1Y2VzIFdhcnAgQ29yZXMiDQogIH0sICAgIA0KICBzNSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZSIsDQogICAgbmFtZSA9ICJXb3JtaG9sZSBHZW5lcmF0b3IiLA0KICAgIGRlc2NyaXB0aW9uID0gIkxpbmtzIFBsYW5ldHM7IFNwcmVhZHMgSW5mbHVlbmNlIg0KICB9LA0KICBzNiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193b3JtaG9sZTIiLA0KICAgIG5hbWUgPSAiSW1wcm92ZWQgV29ybWhvbGUgU3RhYmlsaXplciIsDQogICAgZGVzY3JpcHRpb24gPSAiTGlua3MgUGxhbmV0czsgU3ByZWFkcyBHcmVhdGVyIEluZmx1ZW5jZSINCiAgfSwNCiAgczcgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfd2FycGphbW1lciIsDQogICAgbmFtZSA9ICJXYXJwIEphbW1lciIsDQogICAgZGVzY3JpcHRpb24gPSAiQmxvY2tzIFdhcnAgQXR0YWNrcyINCiAgfSwNCiAgczggPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ2FzcG93ZXJzdGF0aW9uIiwNCiAgICBuYW1lID0gIkdhcyBQb3dlciBTdGF0aW9uIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJTbWFsbCBQb3dlciBQcm9kdWNlciIgICAgDQogIH0sDQogIHMxMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lIiwNCiAgICBuYW1lID0gIlBvd2VyIEdlbmVyYXRvciBVbml0IiwNCiAgICBkZXNjcmlwdGlvbiA9ICJMaWdodCBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMiIsDQogICAgbmFtZSA9ICJBbm5paGlsYXRpb24gUGxhbnQiLA0KICAgIGRlc2NyaXB0aW9uID0gIk1lZGl1bSBFbmVyZ3kgUHJvZHVjZXIiDQogIH0sDQogIHMxMiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19taW5lMyIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgR2VvdGhlcm1hbCBUYXAiLA0KICAgIGRlc2NyaXB0aW9uID0gIkhlYXZ5IEVuZXJneSBQcm9kdWNlciINCiAgfSwNCiAgczEzID0gew0KICAgIHVuaXRuYW1lID0gInB3X21zdG9yYWdlMiIsDQogICAgbmFtZSA9ICJEdWFsIE1ldGFsIFN0b3JhZ2UiLA0KICAgIGRlc2NyaXB0aW9uID0gIlN0b3JlcyBNZXRhbCIgICAgDQogIH0sDQogIHMxNCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19lc3RvcmFnZSIsDQogICAgbmFtZSA9ICJFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19lc3RvcmFnZTIiLA0KICAgIG5hbWUgPSAiRHVhbCBFbmVyZ3kgU3RvcmFnZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3RvcmVzIEVuZXJneSIgICAgDQogIH0sDQogIHMxNiA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19ndWVyaWxsYSIsDQogICAgbmFtZSA9ICJHdWVyaWxsYSBKdW1wZ2F0ZSIsDQogICAgZGVzY3JpcHRpb24gPSAiU3ByZWFkcyBJbmZsdWVuY2UgUmVtb3RlbHkiICAgIA0KICB9LA0KICBzMTcgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfaW5oaWJpdG9yIiwNCiAgICBuYW1lID0gIldvcm1ob2xlIEluaGliaXRvciIsDQogICAgZGVzY3JpcHRpb24gPSAiQmxvY2tzIEluZmx1ZW5jZSBTcHJlYWQiICAgIA0KICB9LA0KICBzMTggPSB7DQogICAgdW5pdG5hbWUgPSAicHdfZ3JpZCIsDQogICAgbmFtZSA9ICJQbGFuZXRhcnkgRGVmZW5zZSBHcmlkIiwNCiAgICBkZXNjcmlwdGlvbiA9ICJEZWZlbmRzIGFnYWluc3QgZXZlcnl0aGluZyIgICAgDQogIH0sDQogIHMxOSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19nYXJyaXNvbiIsDQogICAgbmFtZSA9ICJGaWVsZCBHYXJyaXNvbiIsDQogICAgZGVzY3JpcHRpb24gPSAiUmVkdWNlcyBJbmZsdWVuY2UgZ2FpbiIgICAgDQogIH0sDQogIHMyMCA9IHsNCiAgICB1bml0bmFtZSA9ICJwd19pbnRlcmNlcHRpb24iLA0KICAgIG5hbWUgPSAiSW50ZXJjZXB0aW9uIE5ldHdvcmsiLA0KICAgIGRlc2NyaXB0aW9uID0gIkludGVyY2VwdHMgYXBwcm9hY2hpbmcgYm9tYmVycyIgICAgDQogIH0sDQogIHMyMSA9IHsNCiAgICB1bml0bmFtZSA9ICJwd193YXJwZ2F0ZWFsdCIsDQogICAgbmFtZSA9ICJXYXJwIENvcmUgRmFicmljYXRvciIsDQogICAgZGVzY3JpcHRpb24gPSAiUHJvZHVjZXMgV2FycCBDb3JlcyINCiAgfSwgIA0KICBzOTkgPSB7DQogICAgdW5pdG5hbWUgPSAicHdfYXJ0ZWZhY3QiLA0KICAgIG5hbWUgPSAiQW5jaWVudCBBcnRlZmFjdCIsDQogICAgZGVzY3JpcHRpb24gPSAiTXlzdGVyaW91cyBSZWxpYyINCiAgfSwgIA0KfQ=="
---[[
-{
-  s0 = {
-    unitname = "pw_generictech",
-    name = "Tech Building",
-    description = "Produces Research"
-  },  
-  s1 = {
-    unitname = "pw_dropfac",
-    name = "Starship Factory",
-    description = "Produces Ships"
-  },
-  s2 = {
-    unitname = "pw_dropdepot",
-    name = "Fleet Command",
-    description = "Increases Dropship Cap"
-  },
-  s3 = {
-    unitname = "pw_bomberfac",
-    name = "Bomber Control",
-    description = "Increases Bomber Cap"
-  },
-  s4 = {
-    unitname = "pw_warpgate",
-    name = "Warp Core Fabricator",
-    description = "Produces Warp Cores"
-  },    
-  s5 = {
-    unitname = "pw_wormhole",
-    name = "Wormhole Generator",
-    description = "Links Planets; Spreads Influence"
-  },
-  s6 = {
-    unitname = "pw_wormhole2",
-    name = "Improved Wormhole Stabilizer",
-    description = "Links Planets; Spreads Greater Influence"
-  },
-  s7 = {
-    unitname = "pw_warpjammer",
-    name = "Warp Jammer",
-    description = "Blocks Warp Attacks"
-  },
-  s8 = {
-    unitname = "pw_gaspowerstation",
-    name = "Gas Power Station",
-    description = "Small Power Producer"    
-  },
-  s10 = {
-    unitname = "pw_mine",
-    name = "Power Generator Unit",
-    description = "Light Energy Producer"
-  },
-  s11 = {
-    unitname = "pw_mine2",
-    name = "Annihilation Plant",
-    description = "Medium Energy Producer"
-  },
-  s12 = {
-    unitname = "pw_mine3",
-    name = "Planetary Geothermal Tap",
-    description = "Heavy Energy Producer"
-  },
-  s13 = {
-    unitname = "pw_mstorage2",
-    name = "Dual Metal Storage",
-    description = "Stores Metal"    
-  },
-  s14 = {
-    unitname = "pw_estorage",
-    name = "Energy Storage",
-    description = "Stores Energy"    
-  },
-  s15 = {
-    unitname = "pw_estorage2",
-    name = "Dual Energy Storage",
-    description = "Stores Energy"    
-  },
-  s16 = {
-    unitname = "pw_guerilla",
-    name = "Guerilla Jumpgate",
-    description = "Spreads Influence Remotely"    
-  },
-  s17 = {
-    unitname = "pw_inhibitor",
-    name = "Wormhole Inhibitor",
-    description = "Blocks Influence Spread"    
-  },
-  s18 = {
-    unitname = "pw_grid",
-    name = "Planetary Defense Grid",
-    description = "Defends against everything"    
-  },
-  s19 = {
-    unitname = "pw_garrison",
-    name = "Field Garrison",
-    description = "Reduces Influence gain"    
-  },
-  s20 = {
-    unitname = "pw_interception",
-    name = "Interception Network",
-    description = "Intercepts approaching bombers"    
-  },
-  s21 = {
-    unitname = "pw_warpgatealt",
-    name = "Warp Core Fabricator",
-    description = "Produces Warp Cores"
-  },  
-  s99 = {
-    unitname = "pw_artefact",
-    name = "Ancient Artefact",
-    description = "Mysterious Relic"
-  },  
-}
-]]--
-
+return structureConfig

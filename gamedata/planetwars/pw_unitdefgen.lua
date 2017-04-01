@@ -15,7 +15,10 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --------------------------------------------------------------------------------
 
 
-VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
+local structureConfig = VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
+
+local ALLOW_SERVER_OVERRIDE_UNIT_TEXT = false
+local LOAD_ALL_STRUCTURES = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -23,10 +26,9 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
-pwDataRaw = pwDataRaw or TEST_DEF_STRING
+pwDataRaw = pwDataRaw
 
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
-	err = "Planetwars data entry in modoption is empty or in invalid format"
 	unitData = {}
 else
 	pwDataRaw = string.gsub(pwDataRaw, '_', '=')
@@ -82,10 +84,22 @@ for _, info in pairs(unitData) do
 		end
 		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
 		
-		structureDefs[info.unitname].buildcostmetal = structureDefs[info.unitname].maxdamage
+		structureDefs[info.unitname].buildcostmetal  = structureDefs[info.unitname].maxdamage
 		structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage
-		structureDefs[info.unitname].buildtime = structureDefs[info.unitname].maxdamage
+		structureDefs[info.unitname].buildtime       = structureDefs[info.unitname].maxdamage
 	end 
+end
+
+if LOAD_ALL_STRUCTURES then
+	for name, structureFunction in pairs(structureConfig) do
+		if not structureDefs[name] then
+			structureDefs[name] = CopyTable(genericStructure, true)
+			structureFunction(structureDefs[name]) -- Yay side effects! >:-/
+			structureDefs[name].buildcostmetal  = structureDefs[name].maxdamage
+			structureDefs[name].buildcostenergy = structureDefs[name].maxdamage
+			structureDefs[name].buildtime       = structureDefs[name].maxdamage
+		end
+	end
 end
 
 -- splice back into unitdefs
