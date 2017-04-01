@@ -223,25 +223,6 @@ structureConfig = {
 			unitDef.maxdamage = 16000
 			unitDef.name = "Interception Network"
 			unitDef.description = "Intercepts approaching bombers"
-			unitDef.objectname = "pw_wormhole2.obj"
-			
-			unitDef.footprintx = 8
-			unitDef.footprintz = 8
-			
-			unitDef.customparams.soundselect = "turret_select"
-			unitDef.customparams.helptext = "This structure intercepts incoming bombers."
-			unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
-			unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
-			
-			unitDef.collisionvolumescales = [[100 90 100]]
-			unitDef.modelcenteroffset = [[0 20 0]]
-			unitDef.collisionvolumetype	= [[CylY]]				
-		end,
-		
-	pw_grid = function(unitDef)
-			unitDef.maxdamage = 20000
-			unitDef.name = "Planetary Defense Grid"
-			unitDef.description = "Defends against everything"
 			unitDef.objectname = "pw_warpjammer.s3o"
 			unitDef.script = "pw_warpjammer.lua"
 
@@ -250,13 +231,32 @@ structureConfig = {
 			unitDef.footprintz = 6
 			
 			unitDef.customparams.soundselect = "radar_select"
+			unitDef.customparams.helptext = "This structure intercepts incoming bombers."
+			unitDef.customparams.helptext_pl = "Ten budynek przechwytuje nadlatujace bombowce orbitalne."
+			unitDef.customparams.description_pl = "Przechwytuje bombowce orbitalne."
+			
+			unitDef.collisionvolumescales = [[100 80 100]]
+			unitDef.modelcenteroffset = [[0 0 0]]
+			unitDef.collisionvolumetype	= [[Box]]
+		end,
+		
+	pw_grid = function(unitDef)
+			unitDef.maxdamage = 20000
+			unitDef.name = "Planetary Defense Grid"
+			unitDef.description = "Defends against everything"
+			unitDef.objectname = "pw_wormhole2.obj"
+			
+			unitDef.footprintx = 8
+			unitDef.footprintz = 8
+			
+			unitDef.customparams.soundselect = "turret_select"
 			unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
 			unitDef.customparams.helptext_pl = "Ten budynek zmniejsza wrogie wplywy z bitew i przechwytuje bombowce orbitalne."
 			unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
 			
-			unitDef.collisionvolumescales = [[100 80 100]]
-			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]					
+			unitDef.collisionvolumescales = [[100 90 100]]
+			unitDef.modelcenteroffset = [[0 20 0]]
+			unitDef.collisionvolumetype	= [[CylY]]
 		end,
 		
 	pw_wormhole = function(unitDef)
@@ -281,20 +281,20 @@ structureConfig = {
 	pw_wormhole2 = function(unitDef)
 			unitDef.maxdamage = 17500
 			unitDef.name = "Improved Wormhole Stabilizer"
-			unitDef.description = "Improved link to nearby planets"
-			unitDef.objectname = "pw_estorage2.obj"
+			unitDef.objectname = "pw_gaspowerstation.obj"
+			unitDef.script = "pw_gaspowerstation.lua"
 			
-			unitDef.footprintx = 3
-			unitDef.footprintz = 5
+			unitDef.footprintx = 6
+			unitDef.footprintz = 6
 			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
 			unitDef.customparams.helptext_pl = "Ulepszony tunel czasoprzestrzenny zwieksza wplywy na polaczonych planetach."
 			unitDef.customparams.description_pl = "Ulepszony tunel czasoprzestrzenny"
 			
-			unitDef.collisionvolumescales = [[64 25 45]]
+			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]				
+			unitDef.collisionvolumetype	= [[CylY]]				
 		end,
 		
 	pw_warpgate = function(unitDef)
