@@ -1,6 +1,27 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local fakeWeapon = {
+	name                    = [[Bogus Fake Targeter]],
+	avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
+	avoidFriendly           = false,
+	avoidFeature            = false,
+	avoidNeutral            = false,
+	damage                  = {
+		default = 11.34,
+		planes  = 11.34,
+		subs    = 0.567,
+	},
+	explosionGenerator      = [[custom:FLASHPLOSION]],
+	noSelfDamage            = true,
+	range                   = 800,
+	reloadtime              = 1,
+	tolerance               = 5000,
+	turret                  = true,
+	weaponType              = [[StarburstLauncher]],
+	weaponVelocity          = 500,
+}
+
 local structureConfig = {
 	generic_tech = function(unitDef)
 			unitDef.maxdamage = 10000
@@ -188,6 +209,9 @@ local structureConfig = {
 			unitDef.objectname = "pw_wormhole.obj"
 			unitDef.icontype = [[pw_defense]]
 			unitDef.script = "pw_wormhole.lua"
+			
+			unitDef.canattack = true
+			unitDef.sightdistance = 330
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
