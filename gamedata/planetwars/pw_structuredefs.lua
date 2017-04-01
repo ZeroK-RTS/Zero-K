@@ -85,7 +85,7 @@ structureConfig = {
 			unitDef.objectname = "pw_dropdepot.obj"
 			unitDef.waterline = 30
 			
-			unitDef.footprintx = 16			
+			unitDef.footprintx = 16
 			unitDef.footprintz = 11
 			
 			unitDef.customparams.soundselect = "building_select1"

@@ -55,6 +55,11 @@ local TELEPORT_CHARGE_NEEDED_PARAM = "pw_teleport_charge_needed"
 local TELEPORT_CHARGE_CURRENT_PARAM = "pw_teleport_charge"
 local TELEPORT_PROGRESS_PARAM = "pw_teleport_progress"
 
+local allyTeamRole = {
+	[0] = "attacker",
+	[1] = "defender",
+}
+
 if DEBUG_MODE then
 	TELEPORT_CHARGE_NEEDED = 60 * 0.5
 	TELEPORT_FRAMES = 30*15	
@@ -72,6 +77,10 @@ local canAttackTeams = {}	-- teams that can attack PW structures
 local teleportees = {}
 local teleportChargeBoosters = {}	-- [unitID] = boostpower
 local haveEvacuable = false
+
+local planetwarsBoxes = {}
+
+local vector = Spring.Utilities.Vector
 
 local BUILD_RESOLUTION = 16
 
@@ -161,15 +170,41 @@ local function addStuffToReport(stuff)
 	stuffToReport.data[stuffToReport.count] = stuff
 end
 
-local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRand)
+local function GetAllyTeamLeader(teamList)
+	local bestRank, bestRankTeams
+	for i = 1, #teamList do
+		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i])
+		if leader and not isAiTeam then
+			local customKeys = select(10, Spring.GetPlayerInfo(leader))
+			local rank = customKeys.pwRank
+			if rank then
+				if (not bestRank) or (rank < bestRank) then
+					bestRank = rank
+					bestRankTeams = {teamID}
+				elseif rank == bestRank then
+					bestRankTeams[#bestRankTeams + 1] = teamID
+				end
+			end
+		end
+	end
+	bestRankTeams = bestRankTeams or teamList
+	return bestRankTeams[math.random(#bestRankTeams)]
+end
+
+local function GetRandomPosition(rectangle)
+	local position = vector.Add(rectangle[1], vector.Add(vector.Mult(math.random(), rectangle[2]),vector.Mult(math.random(), rectangle[3])))
+	return position[1], position[2]
+end
+
+local function SpawnStructure(info, teamID, boxData)
 	if not (type(info) == "table") then
 		return
 	end
 	
+	teamID = info.owner or teamID
+	
 	Spring.Echo("Processing PW structure: "..info.unitname)
-	local giveUp = 0
-	local x = xBase + math.random()*xRand
-	local z = zBase + math.random()*zRand
+	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
 	
@@ -194,24 +229,15 @@ local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRa
 		oddX, oddZ = oddZ, oddX
 	end
 	
+	local giveUp = 0
 	while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
 		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
 		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
-		x = xBase + math.random()*xRand
-		z = zBase + math.random()*zRand
+		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
 		if giveUp > 80 then
-			if startBoxID then
-				xBase = mapWidth*0.35
-				xRand = mapWidth*0.3
-				zBase = mapHeight*0.35
-				zRand = mapHeight*0.3
-				startBoxID = nil
-				giveUp = 0 
-			else
-				break
-			end
+			break
 		end
 	end
 	
@@ -237,28 +263,17 @@ local function SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRa
 	Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 end
 
-local function SpawnStructuresInBox(left, top, right, bottom, team, startBoxID)
-	local teamID = team or Spring.GetGaiaTeamID()
-	local xBase = mapWidth*left
-	local xRand = mapWidth*(right-left)
-	local zBase = mapHeight*top
-	local zRand = mapHeight*(bottom-top)
+local function SpawnStructuresInBox(boxData, teamID)
+	teamID = teamID or Spring.GetGaiaTeamID()
 	for _,info in pairs(unitData) do
-		SpawnStructure(info, teamID, startBoxID, xBase, xRand, zBase, zRand)
+		SpawnStructure(info, teamID, boxData)
 	end
 end
 
-local function SpawnHQ(teamID, startBoxID)
+local function SpawnHQ(teamID, boxData)
 	teamID = teamID or Spring.GetGaiaTeamID()
-	local xBase = mapWidth*0.05
-	local xRand = mapWidth*0.9
-	local zBase = mapHeight*0.05
-	local zRand = mapHeight*0.9
 	
-	local giveUp = 0
-	
-	local x = xBase + math.random()*xRand
-	local z = zBase + math.random()*zRand
+	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	
 	local unitDef = UnitDefs[HQ_DEF_ID]
@@ -272,24 +287,15 @@ local function SpawnHQ(teamID, startBoxID)
 		oddX, oddZ = oddZ, oddX
 	end
 	
+	local giveUp = 0
 	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
 		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
 		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
-		x = xBase + math.random()*xRand
-		z = zBase + math.random()*zRand
+		x, z = GetRandomPosition(boxData)
 		giveUp = giveUp + 1
 		if giveUp > 80 then
-			if startBoxID then
-				xBase = mapWidth*0.35
-				xRand = mapWidth*0.3
-				zBase = mapHeight*0.35
-				zRand = mapHeight*0.3
-				startBoxID = nil
-				giveUp = 0 
-			else
-				break
-			end
+			break
 		end
 	end
 	
@@ -315,8 +321,8 @@ local function SpawnInDefenderBox()
 		if teamList[1] then
 			local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 			if startBoxID then
-				local teamID = teamList[math.random(#teamList)]
-				SpawnStructuresInBox(0.05, 0.05, 0.95, 0.95, teamID, startBoxID)
+				local teamID = GetAllyTeamLeader(teamList)
+				SpawnStructuresInBox(planetwarsBoxes.defender, teamID)
 				return true
 			end
 		end
@@ -388,15 +394,15 @@ end
 function gadget:GamePreload()
 	-- spawn PW planet structures
 	if not SpawnInDefenderBox() then
-		SpawnStructuresInBox(0.35,0.35,0.65,0.65)
+		SpawnStructuresInBox(planetwarsBoxes.neutral)
 	end
 	
 	-- spawn field command centers
 	for i = 0, 1 do
 		local teamList = Spring.GetTeamList(i) or {}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		local teamID = teamList[math.random(#teamList)]
-		SpawnHQ(teamID, startBoxID)
+		local teamID = GetAllyTeamLeader(teamList)
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]])
 	end
 	
 	Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, 0)
@@ -405,19 +411,14 @@ function gadget:GamePreload()
 end
 
 function gadget:Initialize()
-	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
-	local planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
-	
-	local attackerBox = planetwarsBoxes.defender
-	Spring.MarkerAddPoint(attackerBox[1][1], 0, attackerBox[1][2], "origin")
-	Spring.MarkerAddPoint(attackerBox[1][1] + attackerBox[2][1], 0, attackerBox[1][2] + attackerBox[2][2], "v1")
-	Spring.MarkerAddPoint(attackerBox[1][1] + attackerBox[3][1], 0, attackerBox[1][2] + attackerBox[3][2], "v2")
-	
 	if Spring.GetGameRulesParam("planetwars_structures") == 0 then
 		gadgetHandler:RemoveGadget()
 		return
 	end
 
+	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
+	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	
 	initialiseNoGoZones()
 	if Spring.GetGameFrame() > 0 then	--game has started
 		local units = Spring.GetAllUnits()

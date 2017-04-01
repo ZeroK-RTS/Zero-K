@@ -149,7 +149,7 @@ local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDi
 	return {
 		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
 		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
-		gaia = GetRectangle(middleBoxStart, middleBoxEnd),
+		neutral = GetRectangle(middleBoxStart, middleBoxEnd),
 	}
 end
 
