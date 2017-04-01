@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local fakeWeapon = {
+local fakeWeapondef = {
 	name                    = [[Bogus Fake Targeter]],
 	avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
 	avoidFriendly           = false,
@@ -20,6 +20,14 @@ local fakeWeapon = {
 	turret                  = true,
 	weaponType              = [[StarburstLauncher]],
 	weaponVelocity          = 500,
+}
+
+local fakeWeapons = {
+	{
+		def                = "BOGUS_FAKE_TARGETER",
+		badtargetcategory  = "FIXEDWING",
+		onlytargetcategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
+	},
 }
 
 local structureConfig = {
@@ -221,15 +229,8 @@ local structureConfig = {
 		unitDef.customparams.helptext_pl = "Garnizon sprawuje piecze nad planeta, ograniczajac wrogie wplywy zyskane z bitew."
 		unitDef.customparams.description_pl = "Garnizon - ogranicza wplywy"
 		
-		unitDef.weapondefs = {bogus_fake_targeter = fakeWeapon}
-		
-		unitDef.weapons = {
-			{
-				def                = "BOGUS_FAKE_TARGETER",
-				badtargetcategory  = "FIXEDWING",
-				onlytargetcategory = "FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER",
-			},
-		}
+		unitDef.weapondefs = {bogus_fake_targeter = CopyTable(fakeWeapondef, true)}
+		unitDef.weapons = CopyTable(fakeWeapons, true)
 		
 		unitDef.collisionvolumescales = [[160 65 80]]
 		unitDef.modelcenteroffset = [[0 30 0]]					
@@ -263,26 +264,32 @@ local structureConfig = {
 		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 	end,
-		
+	
 	pw_grid = function(unitDef)
-			unitDef.maxdamage = 20000
-			unitDef.name = "Planetary Defense Grid"
-			unitDef.description = "Defends against everything"
-			unitDef.objectname = "pw_wormhole2.obj"
-			unitDef.icontype = [[pw_defense2]]
-			
-			unitDef.footprintx = 8
-			unitDef.footprintz = 8
-			
-			unitDef.customparams.soundselect = "turret_select"
-			unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
-			unitDef.customparams.helptext_pl = "Ten budynek zmniejsza wrogie wplywy z bitew i przechwytuje bombowce orbitalne."
-			unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
-			
-			unitDef.collisionvolumescales = [[100 90 100]]
-			unitDef.modelcenteroffset = [[0 20 0]]
-			unitDef.collisionvolumetype	= [[CylY]]
-		end,
+		unitDef.maxdamage = 20000
+		unitDef.name = "Planetary Defense Grid"
+		unitDef.description = "Defends against everything"
+		unitDef.objectname = "pw_wormhole2.obj"
+		unitDef.icontype = [[pw_defense2]]
+		
+		unitDef.footprintx = 8
+		unitDef.footprintz = 8
+		
+		unitDef.canattack = true
+		unitDef.sightdistance = 385
+		
+		unitDef.customparams.soundselect = "turret_select"
+		unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
+		unitDef.customparams.helptext_pl = "Ten budynek zmniejsza wrogie wplywy z bitew i przechwytuje bombowce orbitalne."
+		unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
+		
+		unitDef.weapondefs = {bogus_fake_targeter = CopyTable(fakeWeapondef, true)}
+		unitDef.weapons = CopyTable(fakeWeapons, true)
+		
+		unitDef.collisionvolumescales = [[100 90 100]]
+		unitDef.modelcenteroffset = [[0 20 0]]
+		unitDef.collisionvolumetype	= [[CylY]]
+	end,
 		
 	pw_wormhole = function(unitDef)
 			unitDef.maxdamage = 12500
