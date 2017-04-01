@@ -168,7 +168,10 @@ local units = {
 		armcybr = HEAVY_SOMETHING,
 		armstiletto_laser = SPECIAL,
 	},
-
+	pw_dropfac = {
+		corvalk = SPECIAL,
+		corbtrans = UTILITY,
+	},
 }
 
 local function AddBuildQueue(name)

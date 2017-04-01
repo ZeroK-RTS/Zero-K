@@ -1,6 +1,16 @@
 pw_dropfac = {
 	pieces = {
-		base = {},
+		base = {
+			nano1 = {
+				offset = {35, 45, 0},
+			},
+			nano2 = {
+				offset = {-65, 45, 0},
+			},
+			build = {
+				offset = {-15, 20, 0},
+			},
+		},
 	},
 
 	radius = 150,

@@ -43,22 +43,39 @@ structureConfig = {
 		
 	pw_dropfac = function(unitDef)
 		unitDef.maxdamage = 25000
-		unitDef.name = "Bomber Fabricator"
-		unitDef.description = "Produces bombers"
+		unitDef.name = "Dropship Fabricator"
+		unitDef.description = "Produces dropships"
 		unitDef.objectname = "pw_dropfac.obj"
 		unitDef.icontype = [[pw_dropfac]]
-
+		unitDef.script = "pw_dropfac.lua"
 		
 		unitDef.footprintx = 20			
 		unitDef.footprintz = 16
 		
 		unitDef.customparams.soundselect = "building_select1"
-		unitDef.customparams.helptext = "Produces space bombers for attacking hostile planets."
-		unitDef.customparams.helptext_pl = "Produkuje bombowce orbitalne do atakow na wrogie planety."
-		unitDef.customparams.description_pl = "Produkuje bombowce"
+		unitDef.customparams.helptext = "Produces space dropships for invading hostile planets."
+		--unitDef.customparams.helptext_pl = "Produkuje desantowce orbitalne do inwazji na wrogie planety."
+		--unitDef.customparams.description_pl = "Produkuje desantowce"
 		
 		unitDef.collisionvolumescales = [[275 120 215]]
-		unitDef.modelcenteroffset = [[0 00 0]]	
+		unitDef.modelcenteroffset = [[0 00 0]]
+		
+		-- builder-related stuff
+		unitDef.showNanoSpray = false
+		unitDef.builder = true
+		unitDef.canmove = true
+		unitDef.canattack = true
+		unitDef.workertime = 10
+		unitDef.buildoptions = { [[corvalk]], [[corbtrans]] }
+		unitDef.customparams.nongroundfac = [[1]]
+		unitDef.customparams.landflystate = [[0]]
+		unitDef.icontype = [[facgunship]]
+		
+		local yardmap = ""
+		for i = 1, (unitDef.footprintx * unitDef.footprintz) do
+			yardmap = yardmap .. "o"
+		end
+		unitDef.yardmap = yardmap
 	end,
 		
 	pw_dropdepot = function(unitDef)
