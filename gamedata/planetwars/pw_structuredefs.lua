@@ -86,7 +86,7 @@ structureConfig = {
 		unitDef.description = "Produces bombers"
 		unitDef.objectname = "pw_dropdepot.obj"
 		unitDef.script = "pw_bomberfac.lua"
-		unitDef.icontype = [[pw_dropfac]]
+		unitDef.icontype = [[pw_bomberfac]]
 		unitDef.waterline = 30
 		
 		unitDef.footprintx = 16
