@@ -1165,13 +1165,68 @@ local icontypes = {
   },
   
   --planetwars 
-  pw_dropfac = {
-    bitmap='icons/pw_dropfac.png',
+  pw_assault = {
+    bitmap='icons/pw_assault.png',
 	distance = 1.6,
     size = 3.2,
   },
   pw_bomberfac = {
     bitmap='icons/pw_bomberfac.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_defense = {
+    bitmap='icons/pw_defense.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_defense2 = {
+    bitmap='icons/pw_defense2.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_energy = {
+    bitmap='icons/pw_energy.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_energy2 = {
+    bitmap='icons/pw_energy2.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_interception = {
+    bitmap='icons/pw_interception.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_jammer = {
+    bitmap='icons/pw_jammer.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_riot = {
+    bitmap='icons/pw_riot.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_special = {
+    bitmap='icons/pw_special.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_warpgate = {
+    bitmap='icons/pw_warpgate.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_wormhole = {
+    bitmap='icons/pw_wormhole.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_wormhole2 = {
+    bitmap='icons/pw_wormhole2.png',
 	distance = 1.6,
     size = 3.2,
   },

@@ -23,6 +23,7 @@ local structureConfig = {
 			unitDef.description = "Mysterious Relic"
 			unitDef.objectname = "pw_artefact.obj"
 			unitDef.script = "pw_artefact.lua"
+			unitDef.icontype = [[pw_special]]
 			
 			unitDef.footprintx = 4			
 			unitDef.footprintz = 4
@@ -66,7 +67,6 @@ local structureConfig = {
 		unitDef.buildoptions = { [[corvalk]], [[corbtrans]] }
 		unitDef.customparams.nongroundfac = [[1]]
 		unitDef.customparams.landflystate = [[0]]
-		unitDef.icontype = [[facgunship]]
 		
 		local yardmap = ""
 		for i = 1, (unitDef.footprintx * unitDef.footprintz) do
@@ -119,6 +119,7 @@ local structureConfig = {
 			unitDef.description = "Produces 50 energy/turn" 
 			unitDef.objectname = "pw_mine2.obj"
 			unitDef.script = "pw_mine2.lua"
+			unitDef.icontype = [[pw_energy]]
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 7
@@ -161,6 +162,7 @@ local structureConfig = {
 			unitDef.description = "Produces 250 energy/turn" 
 			unitDef.objectname = "pw_mine3.obj"
 			unitDef.script = "pw_mine3.lua"
+			unitDef.icontype = [[pw_energy2]]
 			
 			unitDef.footprintx = 12		
 			unitDef.footprintz = 12
@@ -184,6 +186,7 @@ local structureConfig = {
 			unitDef.name = "Field Garrison"
 			unitDef.description = "Reduces Influence gain"
 			unitDef.objectname = "pw_wormhole.obj"
+			unitDef.icontype = [[pw_defense]]
 			
 			unitDef.footprintx = 11
 			unitDef.footprintz = 6
@@ -203,6 +206,7 @@ local structureConfig = {
 		unitDef.description = "Intercepts planetary bombers"
 		unitDef.objectname = "pw_warpjammer.s3o"
 		unitDef.script = "pw_warpjammer.lua"
+		unitDef.icontype = [[pw_interception]]
 		
 		unitDef.footprintx = 6
 		unitDef.footprintz = 6
@@ -230,6 +234,7 @@ local structureConfig = {
 			unitDef.name = "Planetary Defense Grid"
 			unitDef.description = "Defends against everything"
 			unitDef.objectname = "pw_wormhole2.obj"
+			unitDef.icontype = [[pw_defense2]]
 			
 			unitDef.footprintx = 8
 			unitDef.footprintz = 8
@@ -249,6 +254,7 @@ local structureConfig = {
 			unitDef.name = "Wormhole Generator Beacon"
 			unitDef.description = "Links this planet to nearby planets"
 			unitDef.objectname = "pw_estorage.obj"
+			unitDef.icontype = [[pw_wormhole]]
 			
 			unitDef.footprintx = 3
 			unitDef.footprintz = 3
@@ -270,6 +276,7 @@ local structureConfig = {
 			unitDef.name = "Improved Wormhole Stabilizer"
 			unitDef.objectname = "pw_gaspowerstation.obj"
 			unitDef.script = "pw_gaspowerstation.lua"
+			unitDef.icontype = [[pw_wormhole2]]
 			
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
@@ -292,6 +299,7 @@ local structureConfig = {
 			unitDef.description = "Produces warp cores"
 			unitDef.objectname = "pw_techlab.obj"
 			unitDef.script = "pw_techlab.lua"
+			unitDef.icontype = [[warpgate]]
 			
 			unitDef.footprintx = 8		
 			unitDef.footprintz = 9
@@ -308,6 +316,7 @@ local structureConfig = {
 		unitDef.description = "Prevents warp attacks"
 		unitDef.objectname = "pw_warpgate.obj"
 		unitDef.script = "pw_warpgate.lua"
+		unitDef.icontype = [[pw_jammer]]
 		
 		unitDef.footprintx = 8
 		unitDef.footprintz = 8
@@ -339,6 +348,7 @@ local structureConfig = {
 			unitDef.name = "Wormhole Inhibitor"
 			unitDef.description = "Blocks Influence Spread"
 			unitDef.objectname = "pw_mstorage2.obj"
+			unitDef.icontype = [[pw_riot]]
 			
 			unitDef.footprintx = 7
 			unitDef.footprintz = 5
