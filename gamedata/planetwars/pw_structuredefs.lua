@@ -275,6 +275,8 @@ structureConfig = {
 			unitDef.footprintx = 3
 			unitDef.footprintz = 3
 			
+			unitDef.customparams.evacuation_speed = "2"
+			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
 			unitDef.customparams.helptext_pl = "Tunel czasoprzestrzenny laczy planete z sasiadami - pozwala statkom orbitalnym opuszczac planete i szerzy wplywy."
@@ -282,7 +284,7 @@ structureConfig = {
 			
 			unitDef.collisionvolumescales = [[40 45 40]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]			
+			unitDef.collisionvolumetype	= [[CylY]]
 		end,
 		
 	pw_wormhole2 = function(unitDef)
@@ -294,6 +296,8 @@ structureConfig = {
 			unitDef.footprintx = 6
 			unitDef.footprintz = 6
 			
+			unitDef.customparams.evacuation_speed = "4"
+			
 			unitDef.customparams.soundselect = "shield_select"
 			unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
 			unitDef.customparams.helptext_pl = "Ulepszony tunel czasoprzestrzenny zwieksza wplywy na polaczonych planetach."
@@ -301,7 +305,7 @@ structureConfig = {
 			
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]				
+			unitDef.collisionvolumetype	= [[CylY]]
 		end,
 		
 	pw_warpgate = function(unitDef)

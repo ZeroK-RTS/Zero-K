@@ -32,7 +32,7 @@ include "LuaRules/Configs/customcmds.h.lua"
 local abandonCMD = {
 	id      = CMD_ABANDON_PW,
 	name    = "Evacuate",
-	action  = "abandon",
+	action  = "evacuate",
 	cursor  = 'Repair',
 	type    = CMDTYPE.ICON,
 	tooltip = "Teleports building to safety for the duration of the battle",
@@ -47,13 +47,10 @@ local lava = (Game.waterDamage > 0)
 local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 local DEFENDER_ALLYTEAM = 1
 local HQ_DEF_ID = UnitDefNames.pw_hq.id
--- takes 24 minutes for full charge
-local TELEPORT_CHARGE_NEEDED = 60 * 24
-local TELEPORT_BASE_CHARGE = 1	-- per second
-local TELEPORT_FRAMES = 30*60	-- 1 minute
-local TELEPORT_CHARGE_NEEDED_PARAM = "pw_teleport_charge_needed"
-local TELEPORT_CHARGE_CURRENT_PARAM = "pw_teleport_charge"
-local TELEPORT_PROGRESS_PARAM = "pw_teleport_progress"
+
+local TELEPORT_CHARGE_NEEDED = 20*60 -- 20 minutes to charge without any modifiers.
+local TELEPORT_BASE_CHARGE = 1 -- per second
+local TELEPORT_FRAMES = 30*60 -- 1 minute
 
 local allyTeamRole = {
 	[0] = "attacker",
@@ -62,7 +59,7 @@ local allyTeamRole = {
 
 if DEBUG_MODE then
 	TELEPORT_CHARGE_NEEDED = 60 * 0.5
-	TELEPORT_FRAMES = 30*15	
+	TELEPORT_FRAMES = 30*15
 end
 
 --------------------------------------------------------------------------------
@@ -73,9 +70,6 @@ local unitsByID = {}
 local hqs = {}
 local hqsDestroyed = {}
 local stuffToReport = {data = {}, count = 0}
-local canAttackTeams = {}	-- teams that can attack PW structures
-local teleportees = {}
-local teleportChargeBoosters = {}	-- [unitID] = boostpower
 local haveEvacuable = false
 
 local planetwarsBoxes = {}
@@ -87,6 +81,24 @@ local BUILD_RESOLUTION = 16
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
 GG.PlanetWars.hqs = hqs
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local teleportCharge = 0
+local teleportChargeRate = 1
+local teleportingUnit, teleportFrame
+
+local function SetTeleportCharge(newCharge)
+	if newCharge > TELEPORT_CHARGE_NEEDED then
+		newCharge = TELEPORT_CHARGE_NEEDED
+	end
+	if newCharge == teleportCharge then
+		return
+	end
+	teleportCharge = newCharge
+	Spring.SetGameRulesParam("pw_teleport_charge", teleportCharge)
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -334,7 +346,7 @@ local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
 	Spring.DestroyUnit(unitID, false, true)
-	teleportees[unitID] = nil
+	teleportingUnit = nil
 end
 
 --------------------------------------------------------------------------------
@@ -352,22 +364,18 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 	end
 end
 
-function gadget:GameFrame(f)
+function gadget:GameFrame(frame)
 	if not haveEvacuable then
-		return	
+		return
 	end
-	if (f%30 == 0) then
-		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
-		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + TELEPORT_BASE_CHARGE)
+	if (frame%30 == 0) then
+		SetTeleportCharge(teleportCharge + teleportChargeRate)
 	end
-	for unitID in pairs(teleportees) do
-		local time = Spring.GetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM)
-		time = time + 1
-		Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, time)
-		if time >= TELEPORT_FRAMES then
-			TeleportOut(unitID)
-		elseif time % 15 == 0 then
-			local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
+	if teleportingUnit then
+		if frame >= teleportFrame then
+			TeleportOut(teleportingUnit)
+		elseif frame % 5 == 0 then
+			local _,_,_,x,y,z = Spring.GetUnitPosition(teleportingUnit, true)
 			Spring.SpawnCEG("teleport_out", x, y, z)
 		end
 	end
@@ -389,6 +397,9 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 		hqsDestroyed[#hqsDestroyed+1] = allyTeam
 		hqs[unitID] = nil
 	end
+	if unitID == teleportingUnit then
+		teleportingUnit = nil
+	end
 end
 
 function gadget:GamePreload()
@@ -405,8 +416,7 @@ function gadget:GamePreload()
 		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]])
 	end
 	
-	Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, 0)
-	Spring.SetGameRulesParam(TELEPORT_CHARGE_NEEDED_PARAM, TELEPORT_CHARGE_NEEDED)
+	SetTeleportCharge(teleportCharge + teleportChargeRate)
 	Spring.SetGameRulesParam("pw_have_evacuable", haveEvacuable and 1 or 0)
 end
 
@@ -494,14 +504,17 @@ function gadget:Initialize()
 	end
 	
 	-- get list of players that can attack PW structures
-	local players = Spring.GetPlayerList()
-	for i=1,#players do
-		local player = players[i]
-		local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
-		if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
-			canAttackTeams[team] = true
-		end
-	end
+	--local players = Spring.GetPlayerList()
+	--for i=1,#players do
+	--	local player = players[i]
+	--	local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
+	--	if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
+	--		canAttackTeams[team] = true
+	--	end
+	--end
+	
+	Spring.SetGameRulesParam("pw_teleport_time", TELEPORT_FRAMES)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED)
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -513,52 +526,36 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 end
 
 function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if unitsByID[unitID] and cmdID == CMD_ABANDON_PW then
-		
-		local currCharge = Spring.GetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM)
-		local neededCharge = TELEPORT_CHARGE_NEEDED
-		Spring.Echo("Charge", currCharge, neededCharge)
-		-- already teleporting, abort
-		if teleportees[unitID] then
-			teleportees[unitID] = nil
-			Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, nil)
-			-- refund charge
-			Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge + neededCharge)
-			Spring.SetUnitAlwaysVisible(unitID, false)
-			return true	-- command used, remove
-		end
-
-		if currCharge < neededCharge then
-			return false	-- command used, do not remove
-		end
-		
-		-- needed?
-		--[[
-		local gaiaTeam = Spring.GetGaiaTeamID()
-		GG.allowTransfer = true
-		Spring.TransferUnit(unitID, gaiaTeam, true)
-		GG.allowTransfer = false
-		Spring.SetUnitNeutral(unitID, true)
-		]]
-		
-		-- start teleporting
-		teleportees[unitID] = true
-		Spring.SetUnitRulesParam(unitID, TELEPORT_PROGRESS_PARAM, 0)
-		Spring.SetGameRulesParam(TELEPORT_CHARGE_CURRENT_PARAM, currCharge - neededCharge)
-		Spring.SetUnitAlwaysVisible(unitID, true)
-		return true	-- command used, remove from queue
+	if not (unitsByID[unitID] and cmdID == CMD_ABANDON_PW) then
+		return false -- command not used
 	end
-	return false	-- command not used
+	
+	if teleportingUnit then
+		return true
+	end
+	
+	if teleportCharge < TELEPORT_CHARGE_NEEDED then
+		Spring.Echo("Charge needed", teleportCharge, TELEPORT_CHARGE_NEEDED)
+		return true -- command used, do not remove
+	end
+	
+	-- start teleporting
+	teleportingUnit = unitID
+	teleportFrame = Spring.GetGameFrame() + TELEPORT_FRAMES
+	Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
+	SetTeleportCharge(0)
+	Spring.SetUnitAlwaysVisible(unitID, true)
+	return true -- command used, remove from queue
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
 function gadget:GameOver()	
-	for i =1, stuffToReport.count do
+	for i = 1, stuffToReport.count do
 		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled,".. stuffToReport.data[i])
 	end
-	for i=1, #hqsDestroyed do
+	for i = 1, #hqsDestroyed do
 		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])
 	end
 end

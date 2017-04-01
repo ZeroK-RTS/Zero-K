@@ -48,6 +48,8 @@ local infoDistance = 700000
 local drawStunnedOverlay = true
 local drawUnitsOnFire    = Spring.GetGameRulesParam("unitsOnFire")
 
+local TELEPORT_CHARGE_NEEDED = Spring.GetGameRulesParam("pw_teleport_time") or 30*60
+
 --// this table is used to shows the hp of perimeter defence, and filter it for default wreckages
 local walls = {dragonsteeth=true,dragonsteeth_core=true,fortification=true,fortification_core=true,spike=true,floatingteeth=true,floatingteeth_core=true,spike=true}
 
@@ -860,11 +862,11 @@ do
 		end
 		
 		--// Planetwars teleport progress
-		TeleportEnd = GetUnitRulesParam(unitID,"pw_teleport_progress")
+		TeleportEnd = GetUnitRulesParam(unitID, "pw_teleport_frame")
 		if TeleportEnd then
-			local prog = TeleportEnd/(30*10)	-- FIXME magic number
+			local prog = 1 - (TeleportEnd - gameFrame)/TELEPORT_CHARGE_NEEDED
 			if prog < 1 then
-				AddBar(messages.teleport,prog,"tele_pw",(fullText and floor(prog*100)..'%') or '')
+				AddBar(messages.teleport, prog, "tele_pw", (fullText and floor(prog*100)..'%') or '')
 			end
 		end
 
