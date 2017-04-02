@@ -88,7 +88,7 @@ unitDef = {
 
       explosionGenerator      = [[custom:FLASH2]],
       fireStarter             = 70,
-      flightTime              = 3,
+      flightTime              = 10,
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
