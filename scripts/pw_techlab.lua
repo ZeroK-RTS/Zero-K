@@ -1,3 +1,5 @@
+include 'constants.lua'
+
 local base = piece "base"
 local wheel1 = piece "wheel1"
 local wheel2 = piece "wheel2"
@@ -78,3 +80,18 @@ function script.Create()
 	Spin(wheel2, x_axis, -0.5, 0.01)
 end
 
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < .5 then
+		Explode(base, sfxNone)
+		Explode(sliderturret, sfxNone)
+		Explode(slider, sfxNone)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		--Explode(sliderturret, sfxFall + sfxSmoke + sfxFire)
+		Explode(sliderturret, sfxShatter)
+		Explode(slider, sfxFall)
+		return 2
+	end
+end

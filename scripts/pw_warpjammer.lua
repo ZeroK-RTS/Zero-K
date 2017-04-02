@@ -25,11 +25,12 @@ function script.Killed(recentDamage, maxHealth)
 	if severity < .5 then
 		Explode(base, sfxNone)
 		Explode(wheel, sfxNone)
-		Explode(radar, sfxFall)
+		Explode(radar, sfxShatter)
+		return 1
 	else
 		Explode(base, sfxShatter)
 		Explode(wheel, sfxShatter)
 		Explode(radar, sfxShatter)
+		return 2
 	end
-	return 0
 end

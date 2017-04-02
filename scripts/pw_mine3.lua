@@ -1,3 +1,5 @@
+include 'constants.lua'
+
 local base = piece "base"
 local coolera1 = piece "coolera1"
 local coolera2 = piece "coolera2"
@@ -113,4 +115,17 @@ end
 
 function script.Deactivate ()
 	StartThread(Deinitialize)
+end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(base, sfxNone)
+		Explode(fusionsphere, sfxNone)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		Explode(fusionsphere, sfxShatter)
+		return 2
+	end
 end

@@ -44,7 +44,26 @@ function script.QueryWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-    local severity = recentDamage/maxHealth
-    if severity>.50 then
-    end
+	local severity = recentDamage/maxHealth
+	if severity < .5 then
+		Explode(base, sfxNone)
+		Explode(wheel1, sfxNone)
+		Explode(wheel2, sfxNone)
+		Explode(slider1, sfxNone)
+		Explode(slider2, sfxNone)
+		--Explode(focal1, sfxFall)
+		--Explode(focal2, sfxFall)
+		--Explode(panel1, sfxFall)
+		--Explode(panel2, sfxFall)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		Explode(wheel1, sfxShatter)
+		Explode(wheel2, sfxShatter)
+		Explode(slider1, sfxFall + sfxSmoke + sfxFire)
+		Explode(slider2, sfxFall + sfxSmoke + sfxFire)
+		Explode(panel1, sfxFall + sfxSmoke + sfxFire)
+		Explode(panel2, sfxFall + sfxSmoke + sfxFire)
+		return 2
+	end
 end

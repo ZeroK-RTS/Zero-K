@@ -65,7 +65,9 @@ local structureConfig = {
 			unitDef.customparams.description_pl = "Artefakt obcych"
 			
 			unitDef.collisionvolumescales = [[60 70 60]]
-			unitDef.collisionvolumetype	= [[CylY]]			
+			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_artefact_dead.dae"
 		end,		
 		
 	pw_dropfac = function(unitDef)
@@ -102,6 +104,9 @@ local structureConfig = {
 			yardmap = yardmap .. "o"
 		end
 		unitDef.yardmap = yardmap
+		
+		unitDef.featuredefs.dead.object = "pw_dropfac_dead.dae"
+		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
 
 	pw_bomberfac = function(unitDef)
@@ -140,6 +145,8 @@ local structureConfig = {
 		unitDef.yardmap = yardmap
 		
 		unitDef.buildpic = "pw_dropdepot.png"
+		unitDef.featuredefs.dead.object = "pw_dropdepot_dead.dae"
+		unitDef.featuredefs.heap.object = "debris8x8b.s3o"
 	end,
 	
 	pw_mine = function(unitDef)
@@ -162,6 +169,7 @@ local structureConfig = {
 			unitDef.customparams.description_pl = "Wytwarza 50 energii/ture"
 			
 			unitDef.customparams.base_economy_boost = "0.02"
+			unitDef.featuredefs.dead.object = "pw_mine2_dead.dae"
 		end,
 		
 	pw_mine2 = function(unitDef)
@@ -183,6 +191,9 @@ local structureConfig = {
 			unitDef.customparams.helptext = "A larger power generator with increased output."
 			unitDef.customparams.helptext_pl = "Sredni generator planetarny."
 			unitDef.customparams.description_pl = "Wytwarza 100 energii/ture"
+			
+			unitDef.featuredefs.dead.object = "pw_mine_dead.dae"
+			unitDef.featuredefs.heap.object = "debris4x4b.s3o"
 		end,
 		
 	pw_mine3 = function(unitDef)
@@ -208,6 +219,8 @@ local structureConfig = {
 			unitDef.modelcenteroffset = [[0 10 0]]
 			
 			unitDef.customparams.base_economy_boost = "0.04"
+			
+			unitDef.featuredefs.dead.object = "pw_mine3_dead.dae"
 		end,
 		
 	pw_garrison = function(unitDef)
@@ -233,7 +246,9 @@ local structureConfig = {
 		unitDef.weapons = CopyTable(fakeWeapons, true)
 		
 		unitDef.collisionvolumescales = [[160 65 80]]
-		unitDef.modelcenteroffset = [[0 30 0]]					
+		unitDef.modelcenteroffset = [[0 30 0]]
+		
+		--unitDef.featuredefs.dead.object = "pw_wormhole_dead.dae"
 	end,
 		
 	pw_interception = function(unitDef)
@@ -263,6 +278,8 @@ local structureConfig = {
 		unitDef.collisionvolumescales = [[100 80 100]]
 		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
+		
+		unitDef.featuredefs.dead.object = "pw_warpjammer_dead.s3o"
 	end,
 	
 	pw_grid = function(unitDef)
@@ -290,6 +307,8 @@ local structureConfig = {
 		unitDef.collisionvolumescales = [[100 90 100]]
 		unitDef.modelcenteroffset = [[0 20 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
+		
+		unitDef.featuredefs.dead.object = "pw_wormhole2_dead.dae"
 	end,
 		
 	pw_wormhole = function(unitDef)
@@ -312,6 +331,8 @@ local structureConfig = {
 			unitDef.collisionvolumescales = [[40 45 40]]
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_estorage_dead.dae"
 		end,
 		
 	pw_wormhole2 = function(unitDef)
@@ -334,6 +355,8 @@ local structureConfig = {
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
 			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
 		end,
 		
 	pw_warpgate = function(unitDef)
@@ -350,7 +373,9 @@ local structureConfig = {
 			unitDef.customparams.soundselect = "cloaker_select"
 			unitDef.customparams.helptext = "This facility produces the coveted Warp Cores that can send ships across the galaxy in the blink of an eye."	
 			unitDef.customparams.helptext_pl = "Tutaj produkowane sa Rdzenie Czasoprzestrzenne, ktore pozwalaja wysylac statki w dowolne miejsce w galaktyce w mgnieniu oka."	
-			unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"				
+			unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"
+			
+			unitDef.featuredefs.dead.object = "pw_techlab_dead.dae"
 		end,
 		
 	pw_warpjammer = function(unitDef)
@@ -384,6 +409,8 @@ local structureConfig = {
 		unitDef.collisionvolumescales = [[120 100 120]]
 		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
+		
+		unitDef.featuredefs.dead.object = "pw_warpgate_dead.dae"
 	end,
 
 	pw_inhibitor = function(unitDef)
@@ -403,7 +430,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[80 25 60]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]					
+			unitDef.collisionvolumetype	= [[Box]]
+			
+			unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
 		end,
 	pw_guerilla = function(unitDef)
 			unitDef.maxdamage = 15000
@@ -422,7 +451,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
+			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
 		end,
 		
 	------------------------------------------------------------------------
@@ -443,7 +474,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[70 60 70]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
+			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
 		end,
 	pw_mstorage2 = function(unitDef)
 			unitDef.maxdamage = 15000
@@ -459,7 +492,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[80 25 60]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]					
+			unitDef.collisionvolumetype	= [[Box]]
+			
+			unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
 		end,
 	pw_estorage = function(unitDef)
 			unitDef.maxdamage = 10000
@@ -475,7 +510,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[40 45 40]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]					
+			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_estorage_dead.dae"
 		end,
 	pw_estorage2 = function(unitDef)
 			unitDef.maxdamage = 15000
@@ -491,7 +528,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[60 45 40]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[Box]]					
+			unitDef.collisionvolumetype	= [[Box]]
+			
+			unitDef.featuredefs.dead.object = "pw_estorage2_dead.dae"
 		end,
 	pw_warpgatealt = function(unitDef)
 			unitDef.maxdamage = 15000
@@ -513,7 +552,9 @@ local structureConfig = {
 			
 			unitDef.collisionvolumescales = [[120 100 120]]
 			unitDef.modelcenteroffset = [[0 0 0]]
-			unitDef.collisionvolumetype	= [[CylY]]	
+			unitDef.collisionvolumetype	= [[CylY]]
+			
+			unitDef.featuredefs.dead.object = "pw_warpgate_dead.dae"
 		end,
 }
 

@@ -1,3 +1,5 @@
+include 'constants.lua'
+
 local base = piece "base"
 local wheel = piece "wheel"
 local pumpcylinders = piece "pumpcylinders"
@@ -59,4 +61,21 @@ end
 
 function script.HitByWeapon()
 	return 0
+end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(base, sfxNone)
+		Explode(turret, sfxNone)
+		Explode(pumpcylinders, sfxNone)
+		Explode(wheel, sfxFall)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		Explode(turret, sfxShatter)
+		Explode(pumpcylinders, sfxShatter)
+		Explode(wheel, sfxFall + sfxSmoke + sfxFire)
+		return 2
+	end
 end

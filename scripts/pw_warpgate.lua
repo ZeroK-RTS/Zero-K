@@ -21,4 +21,16 @@ function script.Deactivate ()
 end
 
 function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(base, sfxNone)
+		Explode(gen1, sfxNone)
+		Explode(gen2, sfxNone)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		Explode(gen1, sfxShatter)
+		Explode(gen2, sfxShatter)
+		return 2
+	end
 end

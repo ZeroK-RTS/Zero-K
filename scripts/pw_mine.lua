@@ -61,3 +61,16 @@ end
 function script.Deactivate ()
 	StartThread(Deinitialize)
 end
+
+function script.Killed(recentDamage, maxHealth)
+	local severity = recentDamage/maxHealth
+	if severity < 0.5 then
+		Explode(base, sfxNone)
+		Explode(turret, sfxNone)
+		return 1
+	else
+		Explode(base, sfxShatter)
+		Explode(turret, sfxShatter)
+		return 2
+	end
+end

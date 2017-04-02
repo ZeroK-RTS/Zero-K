@@ -13,7 +13,7 @@ unitDef = {
   collisionVolumeOffsets 		= [[0 0 0]],
   collisionVolumeScales  		= [[120 100 130]],
   collisionVolumeType    		= [[Box]],
-  --corpse                        = [[DEAD]],
+  corpse                        = [[DEAD]],
 
   customParams                  = {
 	helptext       = [[This structure offers benefits to the faction holding the planet. Only members of the attacking or defending factions can harm it.]],
@@ -34,8 +34,8 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[pw_techlab.obj]],
-  reclaimable					= false,
-  script                		= [[nullscript.lua]],
+  reclaimable                   = false,
+  script                        = [[nullscriptWithCorpse.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown			= 20,
   sightDistance                 = 273,
@@ -45,6 +45,20 @@ unitDef = {
   --yardMap                       = [[oooooooooooooooooooo]],
 
   featureDefs                   = {
+    DEAD  = {
+      blocking         = true,
+      featureDead      = [[HEAP]],
+      footprintX       = 8,
+      footprintZ       = 8,
+      object           = [[pw_techlab_dead.dae]],	
+    },
+
+    HEAP  = {
+      blocking         = false,
+      footprintX       = 6,
+      footprintZ       = 6,
+      object           = [[debris8x8a.s3o]],
+    },
   },
 
 }
