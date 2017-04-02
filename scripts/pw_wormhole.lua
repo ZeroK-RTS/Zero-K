@@ -5,6 +5,7 @@ local panel1, panel2 = piece('pannel1', 'pannel2')
 local slider1, slider2, focal1, focal2 = piece('slider1', 'slider2', 'focal1', 'focal2')
 local wheel1, wheel2 = piece('wheel1', 'wheel2')
 local turret, cylinder, cannon, cannonbase = piece('turret', 'cylinder', 'canon', 'canonbase')
+local drone = piece('drone')
 
 local spin = math.rad(60)
 
@@ -27,6 +28,19 @@ function script.Create()
     Spin(focal2, y_axis, spin)
     
     
+end
+
+function script.AimFromWeapon(num)
+	return drone
+end
+
+-- fake weapon, do not fire
+function script.AimWeapon(num)
+	return false
+end
+
+function script.QueryWeapon(num)
+	return drone
 end
 
 function script.Killed(recentDamage, maxHealth)

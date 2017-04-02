@@ -11,7 +11,7 @@ unitDef = {
   canAttack                     = true,
   canSelfDestruct               = false,
   category                      = [[FLOAT UNARMED]],
-  --corpse                        = [[DEAD]],
+  corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[PlanetWars Hauptquartier (verandert Einflussgewinn)]],
@@ -36,7 +36,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[pw_hq.s3o]],
   reclaimable                   = false,
-  script                        = [[nullscript.lua]],
+  script                        = [[pw_hq.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
   selfDestructCountdown         = 60,
   sightDistance                 = 330,
@@ -82,6 +82,20 @@ unitDef = {
   },
   
   featureDefs                   = {
+		DEAD  = {
+      blocking         = true,
+      featureDead      = [[HEAP]],
+      footprintX       = 8,
+      footprintZ       = 8,
+      object           = [[pw_hq_dead.s3o]],
+    },
+
+    HEAP  = {
+      blocking         = false,
+      footprintX       = 6,
+      footprintZ       = 6,
+      object           = [[debris4x4b.s3o]],
+    },
   },
 
 }
