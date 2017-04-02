@@ -271,6 +271,7 @@ local structureConfig = {
 		unitDef.description = "Defends against everything"
 		unitDef.objectname = "pw_wormhole2.obj"
 		unitDef.icontype = [[pw_defense2]]
+		unitDef.script = "pw_wormhole2.lua"
 		
 		unitDef.footprintx = 8
 		unitDef.footprintz = 8

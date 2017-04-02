@@ -1,6 +1,10 @@
 pw_wormhole2 = {
 	pieces = {
-		base = {},
+		base = {
+			drone = {
+				offset = {0, 90, 0}
+			}
+		},
 	},
 
 	radius = 60,
