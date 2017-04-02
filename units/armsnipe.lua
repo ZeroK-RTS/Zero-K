@@ -84,12 +84,12 @@ unitDef = {
     SHOCKRIFLE = {
       name                    = [[Pulsed Particle Projector]],
       areaOfEffect            = 16,
+      colormap                = [[0 0 0.4 0   0 0 0.6 0.3   0 0 0.8 0.6   0 0 0.9 0.8   0 0 1 1   0 0 1 1]],
       craterBoost             = 0,
       craterMult              = 0,
 
 	  customParams        	  = {
 		light_radius = 0,
-		hide_from_enemy = 1,
 	  },
 	  
       damage                  = {
@@ -103,10 +103,13 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 1,
-      model                   = [[cloaky_sniper_bullet.dae]],
       noSelfDamage            = true,
       range                   = 700,
       reloadtime              = 17,
+      rgbColor                = [[1 0.2 0.2]],
+      separation              = 1.5,
+      size                    = 5,
+      sizeDecay               = 0,
       soundHit                = [[weapon/laser/heavy_laser6]],
       soundStart              = [[weapon/gauss_fire]],
       turret                  = true,
