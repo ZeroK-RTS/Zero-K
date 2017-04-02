@@ -5,7 +5,7 @@ local turret = piece "turret"
 
 local smokePiece = {turret}
 
-local function TurnTurret ()
+local function TurnTurret()
 	while (true) do
 		Move(turret, y_axis, -10, 4)
 		WaitForMove(turret, y_axis)
@@ -43,10 +43,10 @@ local function TurnTurret ()
 end
 
 local function Initialize()
-		Signal(1)
-		SetSignalMask(2)
+	Signal(1)
+	SetSignalMask(2)
 
-		StartThread(TurnTurret)
+	StartThread(TurnTurret)
 end
 
 local function Deinitialize()
@@ -54,11 +54,11 @@ local function Deinitialize()
 	SetSignalMask(1)
 end
 
-function script.Activate ()
+function script.Activate()
 	StartThread(Initialize)
 end
 
-function script.Deactivate ()
+function script.Deactivate()
 	StartThread(Deinitialize)
 end
 

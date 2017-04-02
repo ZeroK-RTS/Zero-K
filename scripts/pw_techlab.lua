@@ -31,7 +31,7 @@ local speeda = 0.3
 local speedb = 0.5
 
 local function armmove(piece1, piece2, piece3)
-		while(true) do
+	while(true) do
 		Turn(piece1, z_axis, anglea, speeda)
 		Turn(piece2, z_axis, angleb, speeda)
 		Turn(piece3, z_axis, anglec, speeda)
@@ -39,21 +39,21 @@ local function armmove(piece1, piece2, piece3)
 		WaitForTurn(piece1, z_axis)
 		WaitForTurn(piece2, z_axis)
 		WaitForTurn(piece3, z_axis)
-	
-			Turn(piece1, z_axis, anglea, speedb)
-			Turn(piece2, z_axis, angleb, speedb)
-			Turn(piece3, z_axis, anglec, speedb)
-	
-			WaitForTurn(piece1, z_axis)
-			WaitForTurn(piece2, z_axis)	
-			WaitForTurn(piece3, z_axis)
-	
-			Turn(piece1, z_axis, 0, speedb)
-			Turn(piece2, z_axis, 0, speedb)
-			Turn(piece3, z_axis, 0, speedb)
 
-				Sleep (math.random(200,2000))
-		end
+		Turn(piece1, z_axis, anglea, speedb)
+		Turn(piece2, z_axis, angleb, speedb)
+		Turn(piece3, z_axis, anglec, speedb)
+
+		WaitForTurn(piece1, z_axis)
+		WaitForTurn(piece2, z_axis)	
+		WaitForTurn(piece3, z_axis)
+
+		Turn(piece1, z_axis, 0, speedb)
+		Turn(piece2, z_axis, 0, speedb)
+		Turn(piece3, z_axis, 0, speedb)
+
+		Sleep (math.random(200,2000))
+	end
 end
 
 local function moveslider()
@@ -64,17 +64,15 @@ local function moveslider()
 	end
 end
 
-
-
 function script.Create()
-		StartThread(armmove, armabase, arma, armapick)
-		StartThread(armmove, armbbase, armb, armbpick)
-		StartThread(armmove, armcbase, armc, armcpick)
-		StartThread(armmove, armdbase, armd, armdpick)
-		StartThread(armmove, armebase, arme, armepick)
-		StartThread(armmove, armfbase, armf, armfpick)
+	StartThread(armmove, armabase, arma, armapick)
+	StartThread(armmove, armbbase, armb, armbpick)
+	StartThread(armmove, armcbase, armc, armcpick)
+	StartThread(armmove, armdbase, armd, armdpick)
+	StartThread(armmove, armebase, arme, armepick)
+	StartThread(armmove, armfbase, armf, armfpick)
 
-		StartThread(moveslider)
+	StartThread(moveslider)
 	Spin(sliderturret, y_axis, 2, 0.2)
 	Spin(wheel1, x_axis, 0.5, 0.01)
 	Spin(wheel2, x_axis, -0.5, 0.01)

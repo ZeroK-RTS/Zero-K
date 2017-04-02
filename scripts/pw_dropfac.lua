@@ -51,7 +51,7 @@ function script.QueryLandingPads()
 	return { build }
 end
 
-function script.Activate ()
+function script.Activate()
 	StartThread(Open)
 end
 

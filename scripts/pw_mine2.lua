@@ -12,7 +12,7 @@ local wheels = {wheel1, wheel2, wheel3, wheel4}
 
 local smokePiece = {base, wheel1, wheel2, wheel3, wheel4}
 
-function script.Activate ()
+function script.Activate()
 	Spin(cylinder1, y_axis, 0.4, 0.001)
 	Spin(cylinder2, y_axis, -0.4, 0.001)
 	Spin(wheel1, z_axis, 0.3, 0.1)
@@ -21,7 +21,7 @@ function script.Activate ()
 	Spin(wheel4, x_axis, -0.3, 0.1)
 end
 
-function script.Deactivate ()
+function script.Deactivate()
 	StopSpin(cylinder1, y_axis, 0.01)
 	StopSpin(cylinder2, y_axis, 0.01)
 	StopSpin(wheel1, z_axis, 0.01)

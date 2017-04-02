@@ -26,8 +26,6 @@ function script.Create()
     --StartThread(SliderAnim, slider2)  
     Spin(focal1, y_axis, -spin)
     Spin(focal2, y_axis, spin)
-    
-    
 end
 
 function script.AimFromWeapon(num)

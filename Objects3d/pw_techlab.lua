@@ -15,52 +15,51 @@ pw_techlab = {
 					},
 				},
 			},
-                        armbbase = {    
-                                offset = {47.316, 32.656, 0},
-                                armb = {
-                                        offset = {-8.605, 29.659, 0},
-                                        armbpick = {
+			armbbase = {    
+				offset = {47.316, 32.656, 0},
+				armb = {
+					offset = {-8.605, 29.659, 0},
+					armbpick = {
 						offset = {-26.401, 4.840, 0},
 					},
-                                },
-                        },
-                        armcbase = {    
-                                offset = {47.316, 32.656, -30.519},
-                                armc = {
-                                        offset = {-8.605, 29.659, 0},
-                                        armcpick = {
+				},
+			},
+			armcbase = {    
+				offset = {47.316, 32.656, -30.519},
+				armc = {
+					offset = {-8.605, 29.659, 0},
+					armcpick = {
 						offset = {-26.401, 4.840, 0},
 					},
-                                },
-                        },
-                        armdbase = {    
-                                offset = {-47.316, 32.656, -30.519},
-                                armd = {
-                                        offset = {8.605, 29.659, 0},
-                                        armdpick = {
+				},
+			},
+			armdbase = {    
+				offset = {-47.316, 32.656, -30.519},
+				armd = {
+					offset = {8.605, 29.659, 0},
+					armdpick = {
 						offset = {26.401, 4.840, 0},
 					},
-                                },
-                        },
-                        armebase = {    
-                                offset = {-47.316, 32.656, 0},
-                                arme = {
-                                        offset = {8.605, 29.659, 0},
-                                        armepick = {
+				},
+			},
+			armebase = {    
+				offset = {-47.316, 32.656, 0},
+				arme = {
+					offset = {8.605, 29.659, 0},
+					armepick = {
 						offset = {26.401, 4.840, 0},
 					},
-                                },
-                        },
-                        armfbase = {    
-                                offset = {-47.316, 32.656, 30.519},
-                                armf = {
-                                        offset = {8.605, 29.659, 0},
-                                        armfpick = {
+				},
+			},
+			armfbase = {    
+				offset = {-47.316, 32.656, 30.519},
+				armf = {
+					offset = {8.605, 29.659, 0},
+					armfpick = {
 						offset = {26.401, 4.840, 0},
 					},
-                                },
-                        },
-
+				},
+			},
 		},
 	},
 
@@ -71,8 +70,8 @@ pw_techlab = {
 	tex2 = "pw_techlab_2.dds",
 	numpieces = 23,
 
-        globalvertexoffsets = false, -- vertices in global space?
-        localpieceoffsets = true, -- offsets in local space?
+	globalvertexoffsets = false, -- vertices in global space?
+	localpieceoffsets = true, -- offsets in local space?
 }
 
 return pw_techlab
