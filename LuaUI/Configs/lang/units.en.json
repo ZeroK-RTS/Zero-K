@@ -1235,7 +1235,7 @@
 	"carrydrone" : {
 		"name" : "Gull",
 		"description" : "Carrier Drone",
-		"helptext" : "Carrier drones accompany their parent ship, guarding it and sharing its attack targets. They cannot venture far from it on their own, however. The Carrier can produce a pair of drones every 15 seconds, up to a total of 8."
+		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
 	},
 	"corhlt" : {
 		"name" : "Stinger",

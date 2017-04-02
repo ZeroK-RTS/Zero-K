@@ -38,9 +38,9 @@ unitDef = {
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
-	helptext       = [[Carrier drones accompany their parent ship, guarding it and sharing its attack targets. They cannot venture far from it on their own, however. The Carrier can produce a pair of drones every 15 seconds, up to a total of 8.]],
+	helptext       = [[The Gull is a small, aggressive drone armed with an energy MG.]],
 	description_de = [[Trägerdrohne]],
-	helptext_de    = [[Die Drohnen schutzen den Traeger und teilen seine Ziele, aber sie koennen nicht zu weit allein gehen. Der Traeger herstellt ein Paar Drohnen jede 15 Sekunden, bis zu 8.]],
+	--helptext_de    = [[Die Drohnen schutzen den Traeger und teilen seine Ziele, aber sie koennen nicht zu weit allein gehen. Der Traeger herstellt ein Paar Drohnen jede 15 Sekunden, bis zu 8.]],
 
 	is_drone = 1,
 	modelradius    = [[13]],
