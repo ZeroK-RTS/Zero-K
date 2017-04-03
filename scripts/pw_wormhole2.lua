@@ -20,12 +20,13 @@ function script.QueryWeapon(num)
 end
 
 function script.Killed(recentDamage, maxHealth)
-    local severity = recentDamage/maxHealth
-    if severity < .5 then
+	local severity = recentDamage/maxHealth
+	if severity < .5 then
 		Explode(base, sfxNone)
 		return 1
-    else
-		Explode(base, sfxShatter)
+	else
+		--Explode(base, sfxShatter)
+		Explode(base, sfxNone)
 		return 2
 	end
 end
