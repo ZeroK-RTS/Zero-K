@@ -82,8 +82,9 @@ unitDef = {
   },
   
   featureDefs                   = {
-		DEAD  = {
+    DEAD  = {
       blocking         = true,
+      resurrectable    = 0,
       featureDead      = [[HEAP]],
       footprintX       = 8,
       footprintZ       = 8,
