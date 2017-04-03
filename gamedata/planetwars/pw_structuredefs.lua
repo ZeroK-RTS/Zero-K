@@ -14,7 +14,7 @@ local fakeWeapondef = {
 	},
 	explosionGenerator      = [[custom:FLASHPLOSION]],
 	noSelfDamage            = true,
-	range                   = 800,
+	range                   = 300,
 	reloadtime              = 1,
 	tolerance               = 5000,
 	turret                  = true,
@@ -294,7 +294,7 @@ local structureConfig = {
 		unitDef.footprintz = 8
 		
 		unitDef.canattack = true
-		unitDef.sightdistance = 385
+		unitDef.sightdistance = 495
 		
 		unitDef.customparams.soundselect = "turret_select"
 		unitDef.customparams.helptext = "This structure reduces Influence gains as well as intercepting incoming bombers."
@@ -302,6 +302,7 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Kompleks ochrony planetarnej"
 		
 		unitDef.weapondefs = {bogus_fake_targeter = CopyTable(fakeWeapondef, true)}
+		unitDef.weapondefs.range = 450
 		unitDef.weapons = CopyTable(fakeWeapons, true)
 		
 		unitDef.collisionvolumescales = [[100 90 100]]
