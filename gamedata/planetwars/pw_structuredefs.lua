@@ -268,7 +268,7 @@ local structureConfig = {
 		unitDef.collisionvolumescales = [[160 65 80]]
 		unitDef.modelcenteroffset = [[0 30 0]]
 		
-		--unitDef.featuredefs.dead.object = "pw_wormhole_dead.dae"
+		unitDef.featuredefs.dead.object = "pw_wormhole_dead.dae"
 	end,
 		
 	pw_interception = function(unitDef)
@@ -300,7 +300,7 @@ local structureConfig = {
 		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 		
-		unitDef.featuredefs.dead.object = "pw_warpjammer_dead.s3o"
+		unitDef.featuredefs.dead.object = "pw_warpjammer_dead.dae"
 	end,
 	
 	pw_grid = function(unitDef)
