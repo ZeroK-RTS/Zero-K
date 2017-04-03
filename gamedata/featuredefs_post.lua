@@ -132,6 +132,9 @@ local function ProcessUnitDef(udName, ud)
         if not fd.metal then fd.metal = ud.buildcostmetal * HEAP_MULT end
         if not fd.description then fd.description = "Debris - "..ud.name end
       end
+      
+      fd.footprintx = fd.footprintx or ud.footprintx
+      fd.footprintz = fd.footprintz or ud.footprintz
 
       fd.customparams = fd.customparams or {}
       fd.customparams.fromunit = "1"

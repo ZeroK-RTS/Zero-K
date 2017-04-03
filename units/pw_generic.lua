@@ -49,15 +49,15 @@ unitDef = {
       blocking         = true,
       resurrectable    = 0,
       featureDead      = [[HEAP]],
-      footprintX       = 8,
-      footprintZ       = 8,
+      --footprintX       = 8,	-- autoset by featuredefs_post
+      --footprintZ       = 8,
       object           = [[pw_techlab_dead.dae]],	
     },
 
     HEAP  = {
       blocking         = false,
-      footprintX       = 6,
-      footprintZ       = 6,
+      --footprintX       = 8,
+      --footprintZ       = 8,
       object           = [[debris8x8a.s3o]],
     },
   },
