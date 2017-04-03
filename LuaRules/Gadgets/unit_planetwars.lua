@@ -97,6 +97,7 @@ GG.PlanetWars.hqs = hqs
 
 local teleportCharge = -1
 local teleportingUnit, teleportFrame
+local removingTeleportingUnit = false	-- set to true prior to DestroyUnit call when teleporting out, then false immediately after
 
 local function SetTeleportCharge(newCharge)
 	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
@@ -386,7 +387,10 @@ end
 local function TeleportOut(unitID)
 	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
 	Spring.SpawnCEG("gate", x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport2.wav", 10, x, y, z)
+	removingTeleportingUnit = true
 	Spring.DestroyUnit(unitID, false, true)
+	removingTeleportingUnit = false
 	teleportingUnit = nil
 end
 
@@ -424,7 +428,10 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 	RemoveWormhole(unitID, unitDefID)
-	if unitsByID[unitID] then
+	
+	if unitID == teleportingUnit and removingTeleportingUnit then
+		-- unit "died" from being teleported out, do nothing
+	elseif unitsByID[unitID] then
 		local unit = unitsByID[unitID]
 		local name = unit.name
 		addStuffToReport(name .. ",total," .. (unit.totalDamage or 0))
