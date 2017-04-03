@@ -72,12 +72,13 @@ local function UpdateBar()
 	teleportProgress:SetCaption(percent .. "%")
 	
 	if numChargesNew ~= numCharges then
-		local text = " teleport charge(s)"
-		if (numChargesNew > 0)  then
-			text = "\255\0\255\32\ "..numChargesNew.. text .. "\008"
+		local text = ""
+		if (numChargesNew > 0) then
+			-- TODO: localize this
+			text = "\255\0\255\32\Teleport ready\008"
 			teleportImage.color = {1,1,1,1}
 		else
-			text = "\255\128\128\128\ 0" .. text .. "\008"
+			text = "\255\128\128\128\Teleport charging\008"
 			teleportImage.color = {0.3, 0.3, 0.3, 1}
 		end
 		teleportLabel:SetCaption(text)
