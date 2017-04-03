@@ -83,10 +83,6 @@ for _, info in pairs(unitData) do
 			structureDefs[info.unitname].description = info.description
 		end
 		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
-		
-		structureDefs[info.unitname].buildcostmetal  = structureDefs[info.unitname].maxdamage
-		structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage
-		structureDefs[info.unitname].buildtime       = structureDefs[info.unitname].maxdamage
 	end 
 end
 
@@ -95,9 +91,6 @@ if LOAD_ALL_STRUCTURES then
 		if not structureDefs[name] then
 			structureDefs[name] = CopyTable(genericStructure, true)
 			structureFunction(structureDefs[name]) -- Yay side effects! >:-/
-			structureDefs[name].buildcostmetal  = structureDefs[name].maxdamage
-			structureDefs[name].buildcostenergy = structureDefs[name].maxdamage
-			structureDefs[name].buildtime       = structureDefs[name].maxdamage
 		end
 	end
 end
