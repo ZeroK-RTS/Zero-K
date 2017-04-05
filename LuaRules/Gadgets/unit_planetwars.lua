@@ -35,7 +35,7 @@ local evacuateCmdDesc = {
 	action  = "evacuate",
 	cursor  = 'Repair',
 	type    = CMDTYPE.ICON,
-	tooltip = "Teleports building to safety for the duration of the battle",
+	tooltip = "Evacuates the structure from the battle via wormhole teleportation.",
 }
 
 local spGetGroundHeight = Spring.GetGroundHeight
@@ -51,6 +51,8 @@ local TELEPORT_FRAMES = 30*60 -- 1 minute
 local TELEPORT_CHARGE_PERIOD = 30 -- Frames
 local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
 local teleportChargeNeededMult = 1
+
+local STRUCTURE_SPACING = 192
 
 local allyTeamRole = {
 	[0] = "attacker",
@@ -166,11 +168,15 @@ local function CheckSetWormhole(unitID)
 		return
 	end
 	wormholeUnitID = unitID
+	teleportChargeNeededMult = chargeMult
 	
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*chargeMult)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
 end
 
 local function CancelTeleport()
+	if teleportingUnit and Spring.ValidUnitID(teleportingUnit) then
+		Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", nil)
+	end
 	teleportingUnit = nil
 	Spring.SetGameRulesParam("pw_teleport_frame", nil)
 	Spring.SetGameRulesParam("pw_teleport_unitname", nil)
@@ -205,6 +211,9 @@ local function TeleportChargeTick()
 			CancelTeleport()
 		elseif chargeFactor ~= 1 then
 			teleportFrame = teleportFrame + (1 - chargeFactor)*TELEPORT_CHARGE_PERIOD
+			if teleportingUnit and Spring.ValidUnitID(teleportingUnit) then
+				Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
+			end
 			Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
 		end
 	end
@@ -215,6 +224,11 @@ end
 --------------------------------------------------------------------------------
 
 local noGoZones = {count = 0, data = {}}
+
+local function AddNoGoZone(x, z, size)
+	noGoZones.count = noGoZones.count + 1
+	noGoZones.data[noGoZones.count] = {zl = z - size, zu = z + size, xl = x - size, xu = x + size}
+end
 
 local function initialiseNoGoZones()
 
@@ -346,24 +360,30 @@ local function SpawnStructure(info, teamID, boxData)
 		return
 	end
 	
-	teamID = info.owner or teamID
-	
-	Spring.Echo("Processing PW structure: "..info.unitname)
-	local x, z = GetRandomPosition(boxData)
-	local direction = math.floor(math.random()*4)
-	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
-	
-	if not defID then
-		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
-		return
-	end
-	
 	if info.isDestroyed == 1 then
 		--do nothing
 		return
 	end
 	
+	teamID = info.owner or teamID
+	Spring.Echo("Processing PW structure: "..info.unitname)
+	
+	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
+	if not defID then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
+		return
+	end
+	
 	local unitDef = UnitDefs[defID]
+	if info.evacuated then
+		planetwarsStructureCount = planetwarsStructureCount + 1
+		Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+		return
+	end
+	
+	local x, z = GetRandomPosition(boxData)
+	local direction = math.floor(math.random()*4)
+	
 	local oddX = unitDef.xsize % 4 == 2
 	local oddZ = unitDef.zsize % 4 == 2
 	local sX = unitDef.xsize*4
@@ -400,10 +420,15 @@ local function SpawnStructure(info, teamID, boxData)
 	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
 	CheckSetWormhole(unitID)
 	
+	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
-	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
+	if unitDef.customParams.invincible then
+		-- Makes structures not auto-attacked.
+		Spring.SetUnitNeutral(unitID,true) 
+	end
 	
 	if GetUnitCanEvac(unitDef) then
 		Spring.InsertUnitCmdDesc(unitID, 500, evacuateCmdDesc)
@@ -464,6 +489,8 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
+	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	
 	local unitID = Spring.CreateUnit(hqDefID, x, spGetGroundHeight(x,z), z, direction, teamID)
 	hqs[unitID] = true
 	
@@ -473,7 +500,7 @@ end
 local function SpawnInDefenderBox()
 	if defenderFaction then
 		local teamList = Spring.GetTeamList(DEFENDER_ALLYTEAM) or {}
-		if teamList[1] then
+		if teamList and teamList[1] then
 			local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 			if startBoxID then
 				local teamID = GetAllyTeamLeader(teamList)
@@ -568,7 +595,7 @@ function gadget:GamePreload()
 	
 	-- spawn field command centers
 	for i = 0, 1 do
-		local teamList = Spring.GetTeamList(i) or {}
+		local teamList = Spring.GetTeamList(i) or {0}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
 		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
@@ -632,7 +659,7 @@ local function InitializeUnitsToSpawn()
 	for key, data in pairs(unitData) do
 		if replacedStrucutres[data.unitname] then
 			AddEvacuatedStructure(data.unitname)
-			unitData[key] = nil
+			unitData[key].evacuated = true
 		end
 	end
 	
@@ -681,7 +708,7 @@ function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
-function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if not (unitsByID[unitID] and cmdID == CMD_ABANDON_PW) then
 		return false -- command not used
 	end
@@ -699,6 +726,7 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	teleportFrame = Spring.GetGameFrame() + TELEPORT_FRAMES
 	
 	Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
+	Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
 	Spring.SetGameRulesParam("pw_teleport_unitname", UnitDefs[unitDefID].name)
 	
 	SetTeleportCharge(0)

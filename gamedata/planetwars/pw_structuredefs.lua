@@ -60,6 +60,7 @@ local structureConfig = {
 		unitDef.footprintz = 4
 		unitDef.buildcostmetal = 5000*STRUCTURE_COST_MULT
 		
+		unitDef.customparams.invincible = "1"
 		unitDef.customparams.soundselect = "cloaker_select"
 		unitDef.customparams.helptext = "This mysterious alien device houses unimaginable powers. Although it remains poorly understood by our scientists, "
 						.."it could potentially be harnessed as a galaxy-dominating superweapon. The artefact is invulnerable to all known weapons."
@@ -354,6 +355,7 @@ local structureConfig = {
 	pw_wormhole2 = function(unitDef)
 		unitDef.maxdamage = 17500
 		unitDef.name = "Improved Wormhole"
+		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_gaspowerstation.obj"
 		unitDef.script = "pw_gaspowerstation.lua"
 		unitDef.icontype = [[pw_wormhole2]]
