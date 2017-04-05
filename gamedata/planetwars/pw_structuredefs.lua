@@ -75,7 +75,7 @@ local structureConfig = {
 	
 	pw_dropfac = function(unitDef)
 		unitDef.maxdamage = 25000
-		unitDef.name = "Dropship Fabricator"
+		unitDef.name = "Dropship Factory"
 		unitDef.description = "Produces dropships"
 		unitDef.objectname = "pw_dropfac.obj"
 		unitDef.icontype = [[pw_dropfac]]
@@ -336,7 +336,7 @@ local structureConfig = {
 	
 	pw_wormhole = function(unitDef)
 		unitDef.maxdamage = 12500
-		unitDef.name = "Wormhole Generator Beacon"
+		unitDef.name = "Wormhole Generator"
 		unitDef.description = "Links this planet to nearby planets"
 		unitDef.objectname = "pw_estorage.obj"
 		unitDef.icontype = [[pw_wormhole]]
@@ -345,7 +345,7 @@ local structureConfig = {
 		unitDef.footprintz = 3
 		unitDef.buildcostmetal = 75*STRUCTURE_COST_MULT
 		
-		unitDef.customparams.evacuation_speed = "2"
+		unitDef.customparams.evacuation_speed = "1"
 		
 		unitDef.customparams.soundselect = "shield_select"
 		unitDef.customparams.helptext = "Allows ships to leave this planet for its connected neighbours, and projects influence spread to connected planets."
@@ -361,7 +361,7 @@ local structureConfig = {
 	
 	pw_wormhole2 = function(unitDef)
 		unitDef.maxdamage = 17500
-		unitDef.name = "Improved Wormhole Stabilizer"
+		unitDef.name = "Improved Wormhole"
 		unitDef.objectname = "pw_gaspowerstation.obj"
 		unitDef.script = "pw_gaspowerstation.lua"
 		unitDef.icontype = [[pw_wormhole2]]
@@ -370,8 +370,9 @@ local structureConfig = {
 		unitDef.footprintz = 6
 		unitDef.buildcostmetal = 250*STRUCTURE_COST_MULT
 		
-		unitDef.customparams.evacuation_speed = "4"
+		unitDef.customparams.evacuation_speed = "2"
 		
+		unitDef.customparams.pw_replaces = "pw_wormhole"
 		unitDef.customparams.soundselect = "shield_select"
 		unitDef.customparams.helptext = "This structure maintains a stronger wormhole for increased influence spread to neighboring planets."
 		unitDef.customparams.helptext_pl = "Ulepszony tunel czasoprzestrzenny zwieksza wplywy na polaczonych planetach."
@@ -386,7 +387,7 @@ local structureConfig = {
 	
 	pw_warpgate = function(unitDef)
 		unitDef.maxdamage = 15000
-		unitDef.name = "Warp Core Fabricator"
+		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
 		unitDef.objectname = "pw_techlab.obj"
 		unitDef.script = "pw_techlab.lua"
@@ -568,7 +569,7 @@ local structureConfig = {
 	
 	pw_warpgatealt = function(unitDef)
 		unitDef.maxdamage = 15000
-		unitDef.name = "Warp Core Fabricator"
+		unitDef.name = "Warp Gate"
 		unitDef.description = "Produces warp cores"
 		unitDef.objectname = "pw_warpgate.obj"
 		unitDef.script = "pw_warpgate.lua"

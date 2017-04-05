@@ -19,17 +19,17 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local DEBUG_MODE = true
+local DEBUG_MODE = false
 
 --local defenderTeam = nil
 local defenderFaction = Spring.GetModOptions().defendingfaction
 
-local spAreTeamsAllied		= Spring.AreTeamsAllied
+local spAreTeamsAllied = Spring.AreTeamsAllied
 local floor = math.floor
 
 include "LuaRules/Configs/customcmds.h.lua"
 
-local abandonCMD = {
+local evacuateCmdDesc = {
 	id      = CMD_ABANDON_PW,
 	name    = "Evacuate",
 	action  = "evacuate",
@@ -45,11 +45,11 @@ local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
 local DEFENDER_ALLYTEAM = 1
-local HQ_DEF_ID = UnitDefNames.pw_hq.id
 
-local TELEPORT_CHARGE_NEEDED = 20*60 -- seconds
+local TELEPORT_CHARGE_NEEDED = 10*60 -- seconds
 local TELEPORT_FRAMES = 30*60 -- 1 minute
-local TELEPORT_CHARGE_RATE = 1 -- per second
+local TELEPORT_CHARGE_PERIOD = 30 -- Frames
+local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
 local teleportChargeNeededMult = 1
 
 local allyTeamRole = {
@@ -57,9 +57,14 @@ local allyTeamRole = {
 	[1] = "defender",
 }
 
+local hqDefID = {
+	[0] = UnitDefNames["pw_hq_attacker"].id,
+	[1] = UnitDefNames["pw_hq_defender"].id,
+}
+
 if DEBUG_MODE then
-	TELEPORT_CHARGE_NEEDED = 60
-	TELEPORT_FRAMES = 30*15
+	TELEPORT_CHARGE_NEEDED = 10
+	TELEPORT_FRAMES = 30*5
 end
 
 local wormholeDefs = {}
@@ -73,20 +78,32 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local unitData = {}
+local structureSpawnData = {}
 local unitsByID = {}
 local hqs = {}
 local hqsDestroyed = {}
-local stuffToReport = {data = {}, count = 0}
+local destroyedStructures = {data = {}, count = 0}
+local evacuateStructureString = false
 local haveEvacuable = false
 
-local wormholes = {}
+local planetwarsStructureCount = 0 -- For GameRulesParams structure list
+local destroyedStructureCount = 0
+local evacStructureCount = 0
+
+local wormholeUnitID = {}
 
 local planetwarsBoxes = {}
 
 local vector = Spring.Utilities.Vector
 
 local BUILD_RESOLUTION = 16
+
+local EVAC_STATE = {
+	ACTIVE = 1,
+	NO_WORMHOLE = 2,
+	NOTHING_TO_EVAC = 3,
+	WORMHOLE_DESTROYED = 4,
+}
 
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
@@ -95,9 +112,41 @@ GG.PlanetWars.hqs = hqs
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetUnitCanEvac(unitDef)
+	return unitDef.customParams.canbeevacuated or DEBUG_MODE
+end
+
+local function RemoveEvacCommands()
+	for unitID, data in pairs(unitsByID) do
+		local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD_ABANDON_PW)
+		if cmdDesc then
+			Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
+		end
+	end
+end
+
+local function UpdateEvacState()
+	if not haveEvacuable then
+		return
+	end
+	for unitID, data in pairs(unitsByID) do
+		if data.canEvac then
+			return
+		end
+	end
+	
+	haveEvacuable = false
+	RemoveEvacCommands()
+	
+	Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local teleportCharge = -1
 local teleportingUnit, teleportFrame
-local removingTeleportingUnit = false	-- set to true prior to DestroyUnit call when teleporting out, then false immediately after
+local removingTeleportingUnit = false -- set to true prior to DestroyUnit call when teleporting out, then false immediately after
 
 local function SetTeleportCharge(newCharge)
 	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
@@ -110,34 +159,56 @@ local function SetTeleportCharge(newCharge)
 	Spring.SetGameRulesParam("pw_teleport_charge", teleportCharge)
 end
 
-local function UpdateTeleportChargeNeeded()
-	local newMult = 1
-	for unitID, mult in pairs(wormholes) do
-		newMult = math.min(mult, newMult)
-	end
-	
-	if newMult == teleportChargeNeededMult then
+local function CheckSetWormhole(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local chargeMult = wormholeDefs[unitDefID]
+	if not chargeMult then
 		return
 	end
-	teleportChargeNeededMult = newMult
-	SetTeleportCharge(teleportCharge)
+	wormholeUnitID = unitID
 	
-	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*chargeMult)
 end
 
-local function AddWormhole(unitID, unitDefID)
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
-	if wormholeDefs[unitDefID] then
-		wormholes[unitID] = wormholeDefs[unitDefID]
-		UpdateTeleportChargeNeeded()
+local function CancelTeleport()
+	teleportingUnit = nil
+	Spring.SetGameRulesParam("pw_teleport_frame", nil)
+	Spring.SetGameRulesParam("pw_teleport_unitname", nil)
+end
+
+local function CheckRemoveWormhole(unitID, unitDefID)
+	if wormholeUnitID ~= unitID then
+		return
+	end
+	if teleportingUnit == wormholeUnitID then
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+	else
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+	end
+	RemoveEvacCommands()
+	wormholeUnitID = nil
+	if teleportingUnit then
+		CancelTeleport()
 	end
 end
 
-local function RemoveWormhole(unitID, unitDefID)
-	if wormholes[unitID] then
-		wormholes[unitID] = nil
-		UpdateTeleportChargeNeeded()
+local function TeleportChargeTick()
+	if not wormholeUnitID then
+		return
 	end
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeUnitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(wormholeUnitID)
+	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeUnitID, "totalReloadSpeedChange") or 1
+	
+	if teleportingUnit then
+		if chargeFactor == 0 then
+			CancelTeleport()
+		elseif chargeFactor ~= 1 then
+			teleportFrame = teleportFrame + (1 - chargeFactor)*TELEPORT_CHARGE_PERIOD
+			Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
+		end
+	end
+	SetTeleportCharge(teleportCharge + TELEPORT_CHARGE_RATE * chargeFactor)
 end
 
 --------------------------------------------------------------------------------
@@ -217,9 +288,31 @@ local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does 
 	return false
 end
 
-local function addStuffToReport(stuff)
-	stuffToReport.count = stuffToReport.count + 1
-	stuffToReport.data[stuffToReport.count] = stuff
+local function AddDestroyedStructureReport(stuff)
+	destroyedStructures.count = destroyedStructures.count + 1
+	destroyedStructures.data[destroyedStructures.count] = stuff
+end
+
+local function AddEvacuatedStructure(name, unit)
+	evacStructureCount = evacStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureEvacuated_" .. evacStructureCount, name)
+	
+	if evacuateStructureString then
+		evacuateStructureString = evacuateStructureString .. " " .. name
+	else
+		evacuateStructureString = name
+	end
+end
+
+local function AddDestroyedStructure(name, unit)
+	destroyedStructureCount = destroyedStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, name)
+	
+	AddDestroyedStructureReport(name .. ",total," .. (unit.totalDamage or 0))
+	AddDestroyedStructureReport(name .. ",anon," .. (unit.anonymous or 0))
+	for teamID, damage in pairs(unit.teamDamages) do
+		AddDestroyedStructureReport(name .. "," .. teamID .. "," .. damage)
+	end
 end
 
 local function GetAllyTeamLeader(teamList)
@@ -305,32 +398,36 @@ local function SpawnStructure(info, teamID, boxData)
 	end
 	
 	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
-	AddWormhole(unitID)
+	CheckSetWormhole(unitID)
 	
-	Spring.SetUnitNeutral(unitID,true)
-	if unitDef.customParams.canbeevacuated or DEBUG_MODE then
-		Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
+	planetwarsStructureCount = planetwarsStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+	
+	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
+	
+	if GetUnitCanEvac(unitDef) then
+		Spring.InsertUnitCmdDesc(unitID, 500, evacuateCmdDesc)
 		haveEvacuable = true
 	end
 	
-	unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
+	unitsByID[unitID] = {name = info.unitname, teamDamages = {}, canEvac = GetUnitCanEvac(unitDef)}
 	Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 end
 
 local function SpawnStructuresInBox(boxData, teamID)
 	teamID = teamID or Spring.GetGaiaTeamID()
-	for _,info in pairs(unitData) do
+	for _,info in pairs(structureSpawnData) do
 		SpawnStructure(info, teamID, boxData)
 	end
 end
 
-local function SpawnHQ(teamID, boxData)
+local function SpawnHQ(teamID, boxData, hqDefID)
 	teamID = teamID or Spring.GetGaiaTeamID()
 	
 	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	
-	local unitDef = UnitDefs[HQ_DEF_ID]
+	local unitDef = UnitDefs[hqDefID]
 	local oddX = unitDef.xsize % 4 == 2
 	local oddZ = unitDef.zsize % 4 == 2
 	local sX = unitDef.xsize*4
@@ -342,7 +439,7 @@ local function SpawnHQ(teamID, boxData)
 	end
 	
 	local giveUp = 0
-	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
+	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
 		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
 		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
 		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
@@ -364,9 +461,13 @@ local function SpawnHQ(teamID, boxData)
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
 	
-	local unitID = Spring.CreateUnit(HQ_DEF_ID, x, spGetGroundHeight(x,z), z, direction, teamID)
+	planetwarsStructureCount = planetwarsStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+	
+	local unitID = Spring.CreateUnit(hqDefID, x, spGetGroundHeight(x,z), z, direction, teamID)
 	hqs[unitID] = true
-	Spring.SetUnitNeutral(unitID,true)
+	
+	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
 end
 
 local function SpawnInDefenderBox()
@@ -413,8 +514,8 @@ function gadget:GameFrame(frame)
 	if not haveEvacuable then
 		return
 	end
-	if (frame%30 == 0) then
-		SetTeleportCharge(teleportCharge + TELEPORT_CHARGE_RATE)
+	if (frame%TELEPORT_CHARGE_PERIOD == 0) then
+		TeleportChargeTick()
 	end
 	if teleportingUnit then
 		if frame >= teleportFrame then
@@ -427,23 +528,30 @@ function gadget:GameFrame(frame)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	RemoveWormhole(unitID, unitDefID)
 	
-	if unitID == teleportingUnit and removingTeleportingUnit then
-		-- unit "died" from being teleported out, do nothing
-	elseif unitsByID[unitID] then
+	if unitsByID[unitID] then
 		local unit = unitsByID[unitID]
 		local name = unit.name
-		addStuffToReport(name .. ",total," .. (unit.totalDamage or 0))
-		addStuffToReport(name .. ",anon," .. (unit.anonymous or 0))
-		for teamID, damage in pairs(unit.teamDamages) do
-			addStuffToReport(name .. "," .. teamID .. "," .. damage)
+		if unitID == teleportingUnit and removingTeleportingUnit then
+			Spring.SetGameRulesParam("pw_teleport_frame", nil)
+			Spring.SetGameRulesParam("pw_teleport_unitname", nil)
+			
+			-- unit "died" from being teleported out
+			AddEvacuatedStructure(name, unit)
+		else
+			AddDestroyedStructure(name, unit)
 		end
 		unitsByID[unitID] = nil
+		UpdateEvacState()
+		CheckRemoveWormhole(unitID)
 	end
 	if hqs[unitID] then
 		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
 		hqsDestroyed[#hqsDestroyed+1] = allyTeam
+		
+		destroyedStructureCount = destroyedStructureCount + 1
+		Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, UnitDefs[unitDefID].name)
+		
 		hqs[unitID] = nil
 	end
 	if unitID == teleportingUnit then
@@ -462,11 +570,72 @@ function gadget:GamePreload()
 		local teamList = Spring.GetTeamList(i) or {}
 		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
 		local teamID = GetAllyTeamLeader(teamList)
-		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]])
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
 	end
 	
+	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)
+	
 	SetTeleportCharge(0)
-	Spring.SetGameRulesParam("pw_have_evacuable", haveEvacuable and 1 or 0)
+	
+	if haveEvacuable then
+		if wormholeUnitID then
+			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.ACTIVE)
+		else
+			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+			RemoveEvacCommands()
+		end
+	else
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
+	end
+end
+
+local function InitializeUnitsToSpawn()
+	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
+	local pwDataRaw = modOptions.planetwarsstructures
+	local pwDataFunc, err, success, unitData
+	if not (pwDataRaw and type(pwDataRaw) == 'string') then
+		err = "Planetwars data entry in modoption is empty or in invalid format"
+		return {}, false
+	else
+		pwDataRaw = string.gsub(pwDataRaw, '_', '=')
+		pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
+		pwDataFunc, err = loadstring("return "..pwDataRaw)
+		if pwDataFunc then
+			success, unitData = pcall(pwDataFunc)
+			if not success then	-- execute Borat
+				err = unitData
+				unitData = {}
+			end
+		end
+	end
+	if err then 
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
+	end
+
+	if not unitData then 
+		unitData = {} 
+	end
+	
+	local replacedStrucutres = {}
+	for _, data in pairs(unitData) do
+		local ud = UnitDefNames[data.unitname]
+		if ud then
+			if ud.customParams.pw_replaces then
+				replacedStrucutres[ud.customParams.pw_replaces] = true
+			end
+		else
+			replacedStrucutres[data.unitname] = true
+		end
+	end
+	
+	for key, data in pairs(unitData) do
+		if replacedStrucutres[data.unitname] then
+			AddEvacuatedStructure(data.unitname)
+			unitData[key] = nil
+		end
+	end
+	
+	return unitData, true
 end
 
 function gadget:Initialize()
@@ -479,77 +648,14 @@ function gadget:Initialize()
 	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
 	
 	initialiseNoGoZones()
-	if Spring.GetGameFrame() > 0 then	--game has started
-		local units = Spring.GetAllUnits()
-		for i=1,#units do
-			local unitID = units[i]
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local unitDef = UnitDefs[unitDefID]
-			if unitDefID == HQ_DEF_ID then
-				hqs[unitID] = true
-			elseif unitDef.name:find("pw_") then	-- is PW
-				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
-			end
-			
-			-- TODO: some buildings make teleport charge faster
-			--local chargeModifier = unitDef.customParams
-		end
+	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()
+	
+	if spawningAnything then
+		Spring.SetGameRulesParam("planetwars_structures", 1)
 	else
-		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-		local pwDataRaw = modOptions.planetwarsstructures
-		local pwDataFunc, err, success
-		if not (pwDataRaw and type(pwDataRaw) == 'string') then
-			err = "Planetwars data entry in modoption is empty or in invalid format"
-			unitData = {}
-		else
-			pwDataRaw = string.gsub(pwDataRaw, '_', '=')
-			pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
-			pwDataFunc, err = loadstring("return "..pwDataRaw)
-			if pwDataFunc then
-				success, unitData = pcall(pwDataFunc)
-				if not success then	-- execute Borat
-					err = unitData
-					unitData = {}
-				end
-			end
-		end
-		if err then 
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
-		end
-
-		if not unitData then 
-			unitData = {} 
-		end
-		
-		--[[
-		for _,teamID in pairs(Spring.GetTeamList()) do
-			local keys = select(7, Spring.GetTeamInfo(teamID))
-			if keys and keys.defender then
-				defenderTeam = teamID
-				break
-			end
-		end
-		]]
-		
-		-- spawning code
-		--[[
-		local spawningAnything = false
-		for i,v in pairs(unitData) do
-			if (v.isDestroyed~=1) then 
-				spawningAnything = true
-				break
-			end
-		end
-		]]--
-		spawningAnything = pwDataRaw
-		
-		if spawningAnything then
-			Spring.SetGameRulesParam("planetwars_structures", 1)
-		else
-			Spring.SetGameRulesParam("planetwars_structures", 0)
-			gadgetHandler:RemoveGadget()
-			return
-		end
+		Spring.SetGameRulesParam("planetwars_structures", 0)
+		gadgetHandler:RemoveGadget()
+		return
 	end
 	
 	-- get list of players that can attack PW structures
@@ -584,14 +690,16 @@ function gadget:CommandFallback(unitID, unitDefID, unitTeam, cmdID, cmdParams, c
 	end
 	
 	if teleportCharge < TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
-		Spring.Echo("Charge needed", teleportCharge, TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
 		return true -- command used, do not remove
 	end
 	
 	-- start teleporting
 	teleportingUnit = unitID
 	teleportFrame = Spring.GetGameFrame() + TELEPORT_FRAMES
-	Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
+	
+	Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
+	Spring.SetGameRulesParam("pw_teleport_unitname", UnitDefs[unitDefID].name)
+	
 	SetTeleportCharge(0)
 	Spring.SetUnitAlwaysVisible(unitID, true)
 	return true -- command used, remove from queue
@@ -600,9 +708,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:GameOver()	
-	for i = 1, stuffToReport.count do
-		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled,".. stuffToReport.data[i])
+function gadget:GameOver()
+	for i = 1, destroyedStructures.count do
+		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled," .. destroyedStructures.data[i])
+	end
+	if evacuateStructureString then
+		Spring.SendCommands("wbynum 255 SPRINGIE:pwEvacuate " .. evacuateStructureString)
 	end
 	for i = 1, #hqsDestroyed do
 		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])

@@ -96,7 +96,20 @@ local carrierDefNames = {
 			offsets = {0, 5, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
 	},
-	pw_hq = {
+	pw_hq_attacker = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.attackdrone.id, 
+			reloadTime = 10, 
+			maxDrones = 6, 
+			spawnSize = 1, 
+			range = 500, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
+		},
+	},
+	pw_hq_defender = {
 		spawnPieces = {"drone"},
 		{
 			drone = UnitDefNames.attackdrone.id, 
