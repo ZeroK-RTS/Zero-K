@@ -9,6 +9,7 @@ unitDef = {
   builder             = false,
   buildPic            = [[attackdrone.png]],
   canAttack           = true,
+  canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,
   canMove             = true,
