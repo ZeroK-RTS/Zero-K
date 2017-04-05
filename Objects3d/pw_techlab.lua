@@ -1,4 +1,4 @@
-pw_techlab = {
+return {
 	pieces = {
 		base = {
 			wheel1 = {offset = {0, 24.778, -51.046},},
@@ -73,5 +73,3 @@ pw_techlab = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_techlab

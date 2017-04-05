@@ -1,4 +1,4 @@
-pw_warpgate = {
+return {
 	pieces = {
 		base = {
 			radars = {},
@@ -16,7 +16,4 @@ pw_warpgate = {
 
         globalvertexoffsets = false, -- vertices in global space?
         localpieceoffsets = true, -- offsets in local space?
-
 }
-
-return pw_warpgate

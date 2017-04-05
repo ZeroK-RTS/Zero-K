@@ -1,4 +1,4 @@
-pw_artefact = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -42,5 +42,3 @@ pw_artefact = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_artefact

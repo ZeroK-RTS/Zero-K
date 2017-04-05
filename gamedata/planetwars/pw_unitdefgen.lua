@@ -66,6 +66,12 @@ local function makeTechStructure(def, name)
 	structureConfig["generic_tech"](def)
 end
 
+local function commonDefs(def)
+	local fd = def.featuredefs.dead
+	fd.collisionvolumetype = fd.collisionvolumetype or def.collisionvolumetype
+	fd.collisionvolumescales = fd.collisionvolumescales or def.collisionvolumescales
+end
+
 --for name in pairs(unitData) do
 for _, info in pairs(unitData) do
 	if type(info) == "table" and info.isDestroyed ~= 1 then 
@@ -93,6 +99,10 @@ if LOAD_ALL_STRUCTURES then
 			structureFunction(structureDefs[name]) -- Yay side effects! >:-/
 		end
 	end
+end
+
+for name, data in pairs(structureDefs) do
+	commonDefs(data)
 end
 
 -- splice back into unitdefs

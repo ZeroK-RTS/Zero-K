@@ -1,4 +1,4 @@
-uar_airfactory3 = {
+return {
 	pieces = {
 		base = {
 			build = {
@@ -19,12 +19,10 @@ uar_airfactory3 = {
 		},
 	},
 
-	radius = 100,
+	radius = 120,
 	height = 210,
-	midpos = {0, 60, 0},
+	midpos = {0, 90, 0},
 	tex1 = "pw_dropdepot_1.dds",
 	tex2 = "pw_dropdepot_2.dds",
 	numpieces = 1,
 }
-
-return uar_airfactory3

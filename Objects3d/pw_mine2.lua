@@ -1,5 +1,4 @@
--- Spring metadata for uar_nuclearfission.obj
-pw_mine2 = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -31,9 +30,9 @@ pw_mine2 = {
 		},
 	},
 
-	radius = 60,
+	radius = 70,
 	height = 100,
-	midpos = {0.00, 50, 0.00},
+	midpos = {0.00, 60, 0.00},
 
 	tex1 = "pw_mine2_1.dds",
 	tex2 = "pw_mine2_2.dds",
@@ -43,5 +42,3 @@ pw_mine2 = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_mine2

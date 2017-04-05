@@ -91,7 +91,6 @@ local structureConfig = {
 		--unitDef.customparams.description_pl = "Produkuje desantowce"
 		
 		unitDef.collisionvolumescales = [[275 120 215]]
-		unitDef.modelcenteroffset = [[0 00 0]]
 		
 		-- builder-related stuff
 		unitDef.showNanoSpray = false
@@ -129,9 +128,8 @@ local structureConfig = {
 		unitDef.customparams.soundselect = "building_select1"
 		unitDef.customparams.helptext = "Increases the number of bombers that can be deployed to a single planet."
 		
-		unitDef.collisionvolumescales = [[225 140 120]]
-		unitDef.collisionvolumeoffsets = [[-20 -30 0]]
-		unitDef.modelcenteroffset = [[15 30 0]]
+		unitDef.collisionvolumescales = [[240 160 120]]
+		unitDef.collisionvolumeoffsets = [[0 -10 0]]
 		
 		-- builder-related stuff
 		unitDef.showNanoSpray = false
@@ -172,7 +170,6 @@ local structureConfig = {
 		unitDef.buildcostmetal = 100*STRUCTURE_COST_MULT
 		
 		unitDef.collisionvolumescales = [[90 125 90]]
-		unitDef.modelcenteroffset = [[0 10 0]]
 		
 		unitDef.customparams.soundselect = "building_select2"
 		unitDef.customparams.helptext = "A small, efficient power generator."
@@ -199,8 +196,8 @@ local structureConfig = {
 		unitDef.buildcostmetal = 275*STRUCTURE_COST_MULT
 		
 		unitDef.collisionvolumescales = [[56 120 56]]
-		unitDef.modelcenteroffset = [[0 10 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
+		unitDef.collisionvolumeoffsets = [[0 10 0]]
 		
 		unitDef.customparams.soundselect = "building_select2"
 		unitDef.customparams.helptext = "A larger power generator with increased output."
@@ -237,7 +234,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Wytwarza 250 energii/ture."
 		
 		unitDef.collisionvolumescales = [[130 130 130]]
-		unitDef.modelcenteroffset = [[0 10 0]]
 		
 		unitDef.featuredefs.dead.object = "pw_mine3_dead.dae"
 	end,
@@ -266,7 +262,6 @@ local structureConfig = {
 		unitDef.weapons = CopyTable(fakeWeapons, true)
 		
 		unitDef.collisionvolumescales = [[160 65 80]]
-		unitDef.modelcenteroffset = [[0 30 0]]
 		
 		unitDef.featuredefs.dead.object = "pw_wormhole_dead.dae"
 	end,
@@ -297,7 +292,6 @@ local structureConfig = {
 		unitDef.customparams.priority_misc = 2
 		
 		unitDef.collisionvolumescales = [[100 80 100]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 		
 		unitDef.featuredefs.dead.object = "pw_warpjammer_dead.dae"
@@ -328,7 +322,6 @@ local structureConfig = {
 		unitDef.weapons = CopyTable(fakeWeapons, true)
 		
 		unitDef.collisionvolumescales = [[100 90 100]]
-		unitDef.modelcenteroffset = [[0 20 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_wormhole2_dead.dae"
@@ -353,7 +346,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Tunel czasoprzestrzenny"
 		
 		unitDef.collisionvolumescales = [[40 45 40]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_estorage_dead.dae"
@@ -379,7 +371,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Ulepszony tunel czasoprzestrzenny"
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
@@ -435,7 +426,6 @@ local structureConfig = {
 		unitDef.customparams.priority_misc = 2
 		
 		unitDef.collisionvolumescales = [[120 100 120]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_warpgate_dead.dae"
@@ -458,7 +448,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Inhibitor tunelu czasoprzestrzennego"
 		
 		unitDef.collisionvolumescales = [[80 25 60]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 		
 		unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
@@ -481,7 +470,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Zdalnie szerzy wplywy"
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
@@ -504,7 +492,6 @@ local structureConfig = {
 		unitDef.customparams.helptext = "A gas-fired power generator."
 		
 		unitDef.collisionvolumescales = [[70 60 70]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_gaspowerstation_dead.dae"
@@ -523,7 +510,6 @@ local structureConfig = {
 		unitDef.customparams.helptext = "Stores a large quantity of metal for planetary use."
 		
 		unitDef.collisionvolumescales = [[80 25 60]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 		
 		unitDef.featuredefs.dead.object = "pw_mstorage2_dead.dae"
@@ -542,7 +528,6 @@ local structureConfig = {
 		unitDef.customparams.helptext = "A large capacitor bank."
 		
 		unitDef.collisionvolumescales = [[40 45 40]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_estorage_dead.dae"
@@ -561,7 +546,6 @@ local structureConfig = {
 		unitDef.customparams.helptext = "A large double capacitor bank."
 		
 		unitDef.collisionvolumescales = [[60 45 40]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[Box]]
 		
 		unitDef.featuredefs.dead.object = "pw_estorage2_dead.dae"
@@ -586,7 +570,6 @@ local structureConfig = {
 		unitDef.customparams.description_pl = "Produkuje Rdzenie Czasoprzestrzenne"
 		
 		unitDef.collisionvolumescales = [[120 100 120]]
-		unitDef.modelcenteroffset = [[0 0 0]]
 		unitDef.collisionvolumetype	= [[CylY]]
 		
 		unitDef.featuredefs.dead.object = "pw_warpgate_dead.dae"
