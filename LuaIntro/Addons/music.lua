@@ -8,7 +8,7 @@ if addon.InGetInfo then
 		license = "GPL2",
 		layer   = 0,
 		depend  = {"LoadProgress"},
-		enabled = true,
+		enabled = false,
 	}
 end
 
