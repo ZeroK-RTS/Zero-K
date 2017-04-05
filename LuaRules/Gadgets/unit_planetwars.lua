@@ -547,10 +547,15 @@ function gadget:GameFrame(frame)
 	if teleportingUnit then
 		if frame >= teleportFrame then
 			TeleportOut(teleportingUnit)
-		elseif frame % 5 == 0 then
+		else
 			local _,_,_,x,y,z = Spring.GetUnitPosition(teleportingUnit, true)
-			Spring.SpawnCEG("teleport_out", x, y, z)
-			Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 10, x, y, z)
+			local progress = (teleportFrame - frame)/TELEPORT_FRAMES
+			if frame % (3 + math.floor(30*progress)) == 0 then
+				Spring.SpawnCEG("teleport_out", x, y, z)
+			end
+			if frame % 45 == 0 then
+				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z)
+			end
 		end
 	end
 end
