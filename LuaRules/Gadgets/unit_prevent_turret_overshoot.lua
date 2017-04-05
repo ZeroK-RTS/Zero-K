@@ -1,13 +1,16 @@
 if not gadgetHandler:IsSyncedCode() then return end
 
 function gadget:GetInfo() return {
-	name = "Prevent turret overshoot",
-	layer = 0,
+	name    = "Prevent turret overshoot",
+	author  = "Sprung",
+	date    = "3rd April 2017",
+	license = "GNU GPL, v2 or later",
+	layer   = 0,
 	enabled = true,
 } end
 
 local fudgeNames = {
-	corrl  = 25, -- projectile speed is 25 elmo/frame
+	corrl  = 45, -- projectile speed is 25 elmo/frame
 	corhlt = 5,
 	corllt = 5,
 }
