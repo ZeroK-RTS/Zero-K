@@ -41,25 +41,10 @@ local cursorNames = {
 	'cursorSmooth',
 }
 
-local extendedCursors = {
-	cursorattack = true,
-	cursorwait   = true,
-	cursordgun   = true,
-	cursorpatrol = true,
-	cursorrepair = true,
-	cursorwait   = true,
-}
-
-local function ShowCursor (useExtended)
+local function ShowCursor ()
 	for i = 1, #cursorNames do
 		local cursor = cursorNames[i]
-
-		local cursorPath = cursor
-		if (useExtended and extendedCursors[cursor]) then
-			cursorPath = "zk_large/" .. cursorPath
-		end
-
-		Spring.ReplaceMouseCursor (cursor, cursorPath)
+		Spring.ReplaceMouseCursor (cursor, cursor)
 	end
 end
 
@@ -69,30 +54,15 @@ local function HideCursor ()
 	end
 end
 
-options_path = 'Settings/Interface/Mouse Cursor'
-options = {
-	cursor_animated = {
-		name = 'Extended cursor animation',
-		desc = 'Some cursors get more varied animations. WARNING: won\'t render cursors at all on some older graphics cards!',
-		type = 'bool',
-		value = false,
-		OnChange = function (self)
-			if not Spring.IsGUIHidden() then
-				ShowCursor (self.value)
-			end
-		end,
-		noHotkey = true,
-	}
-}
-
 include("keysym.h.lua")
+local KEYSYMS_F5 = KEYSYMS.F5
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key ~= KEYSYMS.F5) then
+	if (key ~= KEYSYMS_F5) then
 		return
 	end
 
 	if Spring.IsGUIHidden() then
-		ShowCursor (options.cursor_animated.value)
+		ShowCursor ()
 	else
 		HideCursor ()
 	end
