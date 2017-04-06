@@ -304,6 +304,17 @@ function GetRawBoxes(backupSeed)
 		end
 	end
 
+	-- fix rendering z-fighting
+	for boxid, box in pairs(startBoxConfig) do
+		for i = 1, #box.boxes do
+			for j = 1, #box.boxes[i] do
+				if box.boxes[i][j][2] > Game.mapSizeZ - 1 then
+					box.boxes[i][j][2] = Game.mapSizeZ - 1
+				end
+			end
+		end
+	end
+
 	return startBoxConfig
 end
 
