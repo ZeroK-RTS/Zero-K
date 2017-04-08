@@ -132,20 +132,20 @@ end
 
 -- times in minutes
 local chickenTypes = {
-	chicken				=  {time = -60,  squadSize = 3, obsolete = 30},
-	chicken_pigeon		=  {time = 6,  squadSize = 1.4, obsolete = 40},
-	chickens			=  {time = 12,  squadSize = 1, obsolete = 40},
-	chickena			=  {time = 18,  squadSize = 0.5, obsolete = 45},
-	chickenr			=  {time = 24,  squadSize = 1.2, obsolete = 50},
+	chicken				=  {time = -60,  squadSize = 3, obsolete = 25},
+	chicken_pigeon		=  {time = 6,  squadSize = 1.4, obsolete = 35},
+	chickens			=  {time = 12,  squadSize = 1, obsolete = 35},
+	chickena			=  {time = 18,  squadSize = 0.5, obsolete = 40},
+	chickenr			=  {time = 24,  squadSize = 1.2, obsolete = 45},
 	--chicken_leaper	=  {time = 24,  squadSize = 2, obsolete = 45},  
 	chickenwurm			=  {time = 28,  squadSize = 0.7},
 	chicken_roc			=  {time = 28,  squadSize = 0.4},  
 	chicken_sporeshooter=  {time = 32,  squadSize = 0.5},
-	chickenf			=  {time = 36,  squadSize = 0.5},
-	chickenc			=  {time = 42,  squadSize = 0.5},
-	chickenblobber		=  {time = 48,  squadSize = 0.3},
-	chicken_blimpy		=  {time = 55,  squadSize = 0.2},
-	chicken_tiamat		=  {time = 60,  squadSize = 0.2},
+	chickenf			=  {time = 32,  squadSize = 0.5},
+	chickenc			=  {time = 40,  squadSize = 0.5},
+	chickenblobber		=  {time = 40,  squadSize = 0.3},
+	chicken_blimpy		=  {time = 48,  squadSize = 0.2},
+	chicken_tiamat		=  {time = 55,  squadSize = 0.2},
 }
 
 local defenders = {
