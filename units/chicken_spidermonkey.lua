@@ -65,73 +65,14 @@ unitDef = {
   weapons             = {
     {
       def                = [[WEB]],
-	  badTargetCategory	 = [[UNARMED]],
+			badTargetCategory	 = [[UNARMED]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-	  mainDir            = [[0 0 1]],
+			mainDir            = [[0 0 1]],
       maxAngleDif        = 180,	  
     },
-
-    --{
-    --  def                = [[SPORES]],
-    --  badTargetCategory  = [[SWIM LAND SHIP HOVER]],
-    --  onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    --},
-
   },
 
-
   weaponDefs          = {
-
-    SPORES = {
-      name                    = [[Spores]],
-      areaOfEffect            = 24,
-      avoidFriendly           = false,
-      burst                   = 5,
-      burstrate               = 0.1,
-      collideFriendly         = false,
-      craterBoost             = 0,
-      craterMult              = 0,
-      
-      customParams            = {
-        light_radius = 0,
-      },
-      
-      damage                  = {
-        default = 75,
-        planes  = [[150]],
-        subs    = 7.5,
-      },
-
-      dance                   = 60,
-      explosionGenerator      = [[custom:NONE]],
-      fireStarter             = 0,
-      fixedlauncher           = 1,
-      flightTime              = 5,
-      groundbounce            = 1,
-      heightmod               = 0.5,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      interceptedByShieldType = 2,
-      model                   = [[chickeneggpink.s3o]],
-      range                   = 600,
-      reloadtime              = 6,
-      smokeTrail              = true,
-      soundstart              = [[weapon/hiss]],
-      startVelocity           = 100,
-      texture1                = [[]],
-      texture2                = [[sporetrail]],
-      tolerance               = 10000,
-      tracks                  = true,
-      turnRate                = 24000,
-      turret                  = true,
-      waterweapon             = true,
-      weaponAcceleration      = 100,
-      weaponType              = [[MissileLauncher]],
-      weaponVelocity          = 500,
-      wobble                  = 32000,
-    },
-
 
     WEB    = {
       name                    = [[Web Weapon]],
@@ -142,6 +83,7 @@ unitDef = {
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
+				light_radius = 0,
       },
       
       craterBoost             = 0,

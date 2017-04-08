@@ -91,7 +91,6 @@ unitDef = {
       
       damage                  = {
         default = 75,
-        planes  = 75,
         subs    = 7.5,
       },
 
@@ -106,7 +105,6 @@ unitDef = {
       impulseBoost            = 0,
       impulseFactor           = 0.4,
       interceptedByShieldType = 2,
-      metalpershot            = 0,
       model                   = [[chickeneggpink.s3o]],
       noSelfDamage            = true,
       range                   = 600,
