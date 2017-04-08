@@ -94,10 +94,12 @@ function script.StopMoving()
 	StartThread(Stopping)
 end
 
+local isBuilding = false
 function script.StartBuilding(heading, pitch)
 	Signal(SIG_BUILD)
 	SetSignalMask(SIG_BUILD)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
+	isBuilding = false
 	
 	-- aim at target location
 	Turn(torso, y_axis, heading, math.rad(200) * PACE)
@@ -114,6 +116,10 @@ function script.StartBuilding(heading, pitch)
 end
 
 function script.StopBuilding()
+	if not isBuilding then
+		return
+	end
+	isBuilding = false
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	
 	Turn(torso, y_axis, 0, math.rad(40) * PACE)
