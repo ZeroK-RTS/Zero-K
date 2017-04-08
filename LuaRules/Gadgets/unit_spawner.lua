@@ -831,7 +831,7 @@ local function SpawnMiniQueen()
 	local miniQueenTarget	= Spring.GetUnitNearestEnemy(unitID, 20000, false)
 	local tloc
 	if (miniQueenTarget) then tloc = ChooseTarget(miniQueenTarget) end
-	if (tloc) then spGiveOrderToUnit(unitID, CMD_FIGHT, tloc, emptyTable) end
+	if (tloc) then spGiveOrderToUnit(unitID, CMD.MOVE, tloc, emptyTable) end
 end
 
 
