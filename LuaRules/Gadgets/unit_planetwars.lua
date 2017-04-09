@@ -46,6 +46,8 @@ local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
 local DEFENDER_ALLYTEAM = 1
 
+local gaiaTeamID = Spring.GetGaiaTeamID()
+
 local TELEPORT_CHARGE_NEEDED = 10*60 -- seconds
 local TELEPORT_FRAMES = 30*60 -- 1 minute
 local TELEPORT_CHARGE_PERIOD = 30 -- Frames
@@ -425,7 +427,7 @@ local function SpawnStructure(info, teamID, boxData)
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
-	if unitDef.customParams.invincible then
+	if unitDef.customParams.invincible or teamID == gaiaTeamID then
 		-- Makes structures not auto-attacked.
 		Spring.SetUnitNeutral(unitID,true) 
 	end
@@ -440,14 +442,14 @@ local function SpawnStructure(info, teamID, boxData)
 end
 
 local function SpawnStructuresInBox(boxData, teamID)
-	teamID = teamID or Spring.GetGaiaTeamID()
+	teamID = teamID or gaiaTeamID
 	for _,info in pairs(structureSpawnData) do
 		SpawnStructure(info, teamID, boxData)
 	end
 end
 
 local function SpawnHQ(teamID, boxData, hqDefID)
-	teamID = teamID or Spring.GetGaiaTeamID()
+	teamID = teamID or gaiaTeamID
 	
 	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
