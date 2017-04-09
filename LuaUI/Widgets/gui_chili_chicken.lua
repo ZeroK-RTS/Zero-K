@@ -342,6 +342,9 @@ function ChickenEvent(chickenEventArgs)
     waveMessage    = {}
     waveMessage[1] = "The Hive is angered!"
     waveTime = Spring.GetTimer()
+  elseif (chickenEventArgs.type == "refresh") then
+    UpdateRules()
+    UpdateAnger()
   end
 end
 

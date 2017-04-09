@@ -108,6 +108,8 @@ local data = {
 	
 	queenTime = 0,
 }
+
+_G.data = data
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
@@ -1258,7 +1260,6 @@ function gadget:Load(zip)
 	local saveData = GG.SaveLoad.ReadFile(zip, "Chicken", SAVE_FILE) or {}
 	data.queenID = GG.SaveLoad.GetNewUnitID(saveData.queenID)
 	data.queenTime = (saveData.queenTime or baseQueenTime) - gameFrameOffset/30
-	Spring.Echo(data.queenTime, baseQueenTime)
 	data.miniQueenNum = saveData.miniQueenNum
 	--data.targetCache = saveData.targetCache	-- not needed
 	data.burrows = GG.SaveLoad.GetNewUnitIDKeys(saveData.burrows)
@@ -1288,6 +1289,9 @@ function gadget:Load(zip)
 	data.specialPowerCooldown = saveData.specialPowerCooldown
 	
 	Spring.SetGameRulesParam("queenTime", data.queenTime)
+	_G.chickenEventArgs = {type="refresh"}
+	SendToUnsynced("ChickenEvent")
+	_G.chickenEventArgs = nil
 end
 
 function gadget:Initialize()
@@ -1343,7 +1347,8 @@ function gadget:Save(zip)
 		return
 	end
 	
-	local chickenTable = {}
+	local chickenTable = SYNCED.data
+	chickenTable = Spring.Utilities.MakeRealTable(chickenTable)
 	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, chickenTable)
 end
 --------------------------------------------------------------------------------

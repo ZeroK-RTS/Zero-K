@@ -164,6 +164,15 @@ local function GetNewFeatureID(oldFeatureID)
 end
 GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
 
+local function GetNewFeatureIDKeys(data)
+	local ret = {}
+	for i, v in pairs(data) do
+		ret[GetNewFeatureID(i)] = v
+	end
+	return ret
+end
+GG.SaveLoad.GetNewFeatureIDKeys = GetNewFeatureIDKeys
+
 local function GetNewProjectileID(oldProjectileID)
 	return savedata.projectile[oldProjectileID] and savedata.projectile[oldProjectileID].newID
 end
