@@ -33,6 +33,8 @@ if not (pwDataRaw and type(pwDataRaw) == 'string') then
 else
 	pwDataRaw = string.gsub(pwDataRaw, '_', '=')
 	pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
+	pwDataRaw = pwDataRaw:gsub("True", "true")
+	pwDataRaw = pwDataRaw:gsub("False", "false")
 	pwDataFunc, err = loadstring("return "..pwDataRaw)
 	if pwDataFunc then
 		success, unitData = pcall(pwDataFunc)
@@ -74,7 +76,7 @@ end
 
 --for name in pairs(unitData) do
 for _, info in pairs(unitData) do
-	if type(info) == "table" and info.isDestroyed ~= 1 then 
+	if type(info) == "table" and info.isDestroyed ~= 1 then
 		structureDefs[info.unitname] = CopyTable(genericStructure, true)
 		structureDefs[info.unitname].customparams = structureDefs[info.unitname].customparams or {}
 		if structureConfig[info.unitname] then

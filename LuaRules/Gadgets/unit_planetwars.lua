@@ -22,7 +22,7 @@ end
 local DEBUG_MODE = false
 
 --local defenderTeam = nil
-local defenderFaction = Spring.GetModOptions().defendingfaction
+local defenderFaction = Spring.GetModOptions().defendingfaction ~= "Mercenary"
 
 local spAreTeamsAllied = Spring.AreTeamsAllied
 local floor = math.floor
@@ -115,7 +115,7 @@ GG.PlanetWars.hqs = hqs
 --------------------------------------------------------------------------------
 
 local function GetUnitCanEvac(unitDef)
-	return unitDef.customParams.canbeevacuated or DEBUG_MODE
+	return (defenderFaction and unitDef.customParams.canbeevacuated) or DEBUG_MODE
 end
 
 local function RemoveEvacCommands()
