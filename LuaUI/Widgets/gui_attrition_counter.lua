@@ -550,6 +550,15 @@ function CreateWindow()
 		end
 	}
 	
+	if WG.GlobalCommandBar then
+		local function ToggleWindow()
+			if window_main then
+				window_main:SetVisibility(not window_main.visible)
+			end
+		end
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/AttritionCounter/Skull.png", "Toggle attrition counter.", ToggleWindow)
+	end
+	
 	return
 end
 

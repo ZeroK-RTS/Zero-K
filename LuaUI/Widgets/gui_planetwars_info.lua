@@ -274,7 +274,9 @@ local function CreateTeleportWindow()
 	
 	if WG.GlobalCommandBar then
 		local function ToggleWindow()
-			holderWindow:SetVisibility(not holderWindow.visible)
+			if holderWindow then
+				holderWindow:SetVisibility(not holderWindow.visible)
+			end
 		end
 		WG.GlobalCommandBar.AddCommand("LuaUI/Images/commands/Bold/drop_beacon.png", "Toggle structure status and evacuation panel.", ToggleWindow)
 	end
@@ -474,7 +476,9 @@ local function CreateGoalWindow()
 	}
 	
 	local function ToggleWindow()
-		instructionWindow:SetVisibility(not instructionWindow.visible)
+		if instructionWindow then
+			instructionWindow:SetVisibility(not instructionWindow.visible)
+		end
 	end
 	
 	Chili.Button:New {
