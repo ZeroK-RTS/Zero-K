@@ -375,23 +375,17 @@ function gadget:GameFrame(f)
 			if flying then
 				interruptTeleport(tid)
 			else
-				local stunned_or_inbuild = isUnitDisabled(tid) or flying or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
+				local stunned_or_inbuild = isUnitDisabled(tid) or isUnitDisabled(bid) or select(3, Spring.GetUnitIsStunned(tele[tid].teleportiee))
 				if stunned_or_inbuild then
-					if not tele[tid].stunned then
-						tele[tid].stunned = true
-						Spring.SetUnitRulesParam(tid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
-						Spring.SetUnitRulesParam(bid,"teleportend",(tele[tid].teleFrame - f)/tele[tid].cost)
-					end
-					
 					tele[tid].teleFrame = tele[tid].teleFrame + 1
+					Spring.SetUnitRulesParam(tid,"teleportend", tele[tid].teleFrame)
+					Spring.SetUnitRulesParam(bid,"teleportend", tele[tid].teleFrame)
 				elseif tele[tid].stunned then
 					checkFrame[tele[tid].teleFrame] = true
-					
 					Spring.SetUnitRulesParam(tid,"teleportend",tele[tid].teleFrame)
 					Spring.SetUnitRulesParam(bid,"teleportend",tele[tid].teleFrame)
-					
-					tele[tid].stunned = false
 				end
+				tele[tid].stunned = stunned_or_inbuild
 			end
 		end
 	end
