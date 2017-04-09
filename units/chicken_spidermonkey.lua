@@ -79,7 +79,7 @@ unitDef = {
       accuracy                = 800,
       
       customParams            = {
-        impulse = [[-200]],
+        impulse = [[-100]],
         timeslow_damagefactor = 1,
         timeslow_onlyslow = 1,
         timeslow_smartretarget = 0.33,
