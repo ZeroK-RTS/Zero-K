@@ -492,7 +492,7 @@ function widget:CommandNotify(id, params, options)
 				end
 			end
 		end
-		return true
+		return false
 	end
 	
 	if ignoredCommand[id] then
