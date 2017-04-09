@@ -334,8 +334,8 @@ local function GetAllyTeamLeader(teamList)
 	for i = 1, #teamList do
 		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i])
 		if leader and not isAiTeam then
-			local customKeys = select(10, Spring.GetPlayerInfo(leader))
-			local rank = customKeys.pwRank
+			local customKeys = select(10, Spring.GetPlayerInfo(leader)) or {}
+			local rank = customKeys.pwrank
 			if rank then
 				if (not bestRank) or (rank < bestRank) then
 					bestRank = rank
