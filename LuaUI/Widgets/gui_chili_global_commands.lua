@@ -17,6 +17,8 @@ local BUTTON_SIZE = 25
 local BUTTON_PLACE_SPACE = 27
 
 local contentHolder
+local commandButtonOffset
+local preInitCommands = {}
 
 -- Chili classes
 local Chili
@@ -185,13 +187,14 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 	name = name or params.name or ""
 	desc = desc or params.desc or ""
 	action = action or params.action
-	hotkey = WG.crude.GetHotkey(action)
+	if action then
+		hotkey = WG.crude.GetHotkey(action)
+		if hotkey ~= '' then
+			hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
+		end
+	end
 	command = params.command
 	
-	if hotkey ~= '' then
-		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
-	end
-		
 	Chili.Button:New{
 		x = (vertical and 0) or ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y),
 		y = (vertical and ((position - 1)*BUTTON_PLACE_SPACE + BUTTON_Y)) or BUTTON_Y,
@@ -201,7 +204,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 		caption = "",
 		margin = {0,0,0,0},
 		padding = {2,2,2,2},
-		tooltip = (name .. desc .. hotkey), 
+		tooltip = (name .. desc .. (hotkey or "")), 
 		parent = parent,
 		OnMouseDown = (command and commandButtonMouseDown) or globalMouseDown,
 		OnClick = {
@@ -211,7 +214,7 @@ local function MakeCommandButton(parent, position, file, params, vertical, onCli
 					local alt, ctrl, meta, shift = Spring.GetModKeyState()
 					local index = Spring.GetCmdDescIndex(command)
 					Spring.SetActiveCommand(index, 1, left, right, alt, ctrl, meta, shift)
-				else
+				elseif action then
 					Spring.SendCommands(action)
 				end
 				if onClick then
@@ -355,6 +358,11 @@ local function MakeDropdownButtons(parent, position, overlays)
 	return externalFunctions
 end
 
+local function AddCommand(imageFile, tooltip, onClick)
+	MakeCommandButton(contentHolder, commandButtonOffset, imageFile, {desc = tooltip}, nil, onClick)
+	commandButtonOffset = commandButtonOffset + 1
+end
+
 local function InitializeControls()
 	local mainWindow = Window:New{
 		name      = 'globalCommandsWindow',
@@ -438,7 +446,13 @@ local function InitializeControls()
 	)
 	offset = offset + 1
 	
-end	
+	commandButtonOffset = offset + 0.5
+	
+	for i = 1, #preInitCommands do
+		AddCommand(preInitCommands[i][1], preInitCommands[i][2], preInitCommands[i][3])
+	end
+	preInitCommands = nil
+end
 
 function options.background_opacity.OnChange(self)
 	contentHolder.backgroundColor[4] = self.value
@@ -448,7 +462,26 @@ end
 function widget:Update()
 	mapOverlay.UpdateOverlayImage()
 end
-			
+
+local GlobalCommandBar = {}
+
+function GlobalCommandBar.AddCommand(imageFile, tooltip, onClick)
+	if preInitCommands then
+		preInitCommands[#preInitCommands + 1] = {
+			imageFile, 
+			tooltip, 
+			onClick
+		}
+		return
+	end
+	AddCommand(imageFile, tooltip, onClick)
+end
+
+
+-- Scary stuff here, registering the command before widget is initialized.
+-- It is allowed as long as GlobalCommandBar remembers what it was told before it initialized.
+WG.GlobalCommandBar = GlobalCommandBar
+
 function widget:Initialize()
 	Chili = WG.Chili
 	Button = Chili.Button

@@ -15,9 +15,11 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local Chili
 
-local infoWindow, teleportWindow
+VFS.Include("LuaRules/Utilities/base64.lua")
+
+local Chili
+local factionDisplayWindow, teleportWindow
 
 local imageDir = "LuaUI/Configs/Factions/"
 
@@ -270,6 +272,13 @@ local function CreateTeleportWindow()
 	
 	externalFunctions.Update()
 	
+	if WG.GlobalCommandBar then
+		local function ToggleWindow()
+			holderWindow:SetVisibility(not holderWindow.visible)
+		end
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/commands/Bold/drop_beacon.png", "Toggle structure status and evacuation panel.", ToggleWindow)
+	end
+	
 	return externalFunctions
 end
 
@@ -277,7 +286,7 @@ end
 --------------------------------------------------------------------------------
 -- Info Window
 
-local function CreateInfoWindow()
+local function CreateFactionDisplayWindow()
 	local modoptions = Spring.GetModOptions()
 	local planet = modoptions.planet
 	local attacker = modoptions.attackingfaction
@@ -290,7 +299,7 @@ local function CreateInfoWindow()
 	local ATTACKER_POS = 20
 	local DEFENDER_POS = 60
 	
-	infoWindow = Chili.Window:New{
+	factionDisplayWindow = Chili.Window:New{
 		classname = "main_window_small",
 		name   = 'pwinfo',
 		width = WINDOW_WIDTH,
@@ -311,7 +320,7 @@ local function CreateInfoWindow()
 	Chili.Label:New {
 		x = 0,
 		y = 4,
-		width = WINDOW_WIDTH - infoWindow.padding[1] - infoWindow.padding[3],
+		width = WINDOW_WIDTH - factionDisplayWindow.padding[1] - factionDisplayWindow.padding[3],
 		height = WINDOW_HEIGHT/3,
 		align = "center",
 		caption = "Planet " .. planet,
@@ -319,7 +328,7 @@ local function CreateInfoWindow()
 			size = 16,
 			shadow = true,
 		},
-		parent = infoWindow,
+		parent = factionDisplayWindow,
 	}
 	
 	if not attacker then
@@ -332,7 +341,7 @@ local function CreateInfoWindow()
 				size = 14,
 				shadow = true,
 			},
-			parent = infoWindow,
+			parent = factionDisplayWindow,
 		}
 	else
 		local attackerIcon = imageDir..attacker..".png"
@@ -344,7 +353,7 @@ local function CreateInfoWindow()
 				height = IMAGE_WIDTH,
 				keepAspect = true,
 				file = attackerIcon,
-				parent = infoWindow,
+				parent = factionDisplayWindow,
 			}
 		end
 		Chili.Label:New {
@@ -358,7 +367,7 @@ local function CreateInfoWindow()
 				shadow = true,
 				color = factions[attacker] and factions[attacker].color,
 			},
-			parent = infoWindow,
+			parent = factionDisplayWindow,
 		}
 	end
 	
@@ -372,7 +381,7 @@ local function CreateInfoWindow()
 				size = 14,
 				shadow = true,
 			},
-			parent = infoWindow,
+			parent = factionDisplayWindow,
 		}
 	else
 		local defenderIcon = imageDir..defender..".png"
@@ -384,7 +393,7 @@ local function CreateInfoWindow()
 				height = IMAGE_WIDTH,
 				keepAspect = true,
 				file = defenderIcon,
-				parent = infoWindow,
+				parent = factionDisplayWindow,
 			}
 		end
 		Chili.Label:New {
@@ -397,8 +406,91 @@ local function CreateInfoWindow()
 				shadow = true,
 				color = factions[defender] and factions[defender].color,
 			},
-			parent = infoWindow,
+			parent = factionDisplayWindow,
 		}
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Info Window
+
+local function CreateGoalWindow()
+	if IsSpec() then
+		return
+	end
+	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID())) or {}
+	if not customKeys.pwinstructions then
+		return
+	end
+	local instructions = Spring.Utilities.Base64Decode(customKeys.pwinstructions)
+	if not instructions then
+		return
+	end
+	
+	local WINDOW_HEIGHT = 320
+	local WINDOW_WIDTH = 480
+	
+	local instructionWindow =  Chili.Window:New{
+		classname = "main_window_small",
+		name   = 'pw_instructions',
+		x = 0,
+		y = 250, 
+		width = WINDOW_WIDTH,
+		height = WINDOW_HEIGHT,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		--color = {1, 1, 1, 0.6},
+		--minimizable = true,
+		--itemMargin  = {0, 0, 0, 0},
+		parent = Chili.Screen0,
+	}
+	
+	Chili.Label:New {
+		x = 0,
+		y = 4,
+		width = WINDOW_WIDTH - instructionWindow.padding[1] - instructionWindow.padding[3],
+		height = 20,
+		align = "center",
+		caption = "Battle Instructions",
+		font = {
+			size = 18,
+			shadow = true,
+		},
+		parent = instructionWindow,
+	}
+	
+	Chili.TextBox:New {
+		x = 6,
+		y = 35,
+		right = 6,
+		bottom = 6,
+		text = instructions,
+		fontsize = 14,
+		parent = instructionWindow,
+	}
+	
+	local function ToggleWindow()
+		instructionWindow:SetVisibility(not instructionWindow.visible)
+	end
+	
+	Chili.Button:New {
+		name = 'closeButton',
+		width = 80,
+		height = 38,
+		bottom = 6,
+		right = 5,
+		caption = WG.Translate("interface", "close") or "Close",
+		OnClick = {ToggleWindow},
+		font = {size = 16},
+		parent = instructionWindow,
+	}
+	
+	if WG.GlobalCommandBar then
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/planetQuestion.png", "Toggle battle instructions panel.", ToggleWindow)
 	end
 end
 
@@ -406,8 +498,8 @@ end
 --------------------------------------------------------------------------------
 function widget:GameFrame(n)
 	if n%120 == 1 and (not IsSpec()) then
-		if infoWindow then
-			infoWindow:Dispose()
+		if factionDisplayWindow then
+			factionDisplayWindow:Dispose()
 		end
 	end
 	if n%10 == 3 then
@@ -426,7 +518,8 @@ function widget:Initialize()
 	end
 
 	Chili = WG.Chili
-	CreateInfoWindow()
+	CreateFactionDisplayWindow()
+	CreateGoalWindow()
 end
 
 function widget:GamePreload()
