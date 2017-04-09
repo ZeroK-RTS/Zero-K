@@ -23,7 +23,8 @@ local spGetPlayerList		= Spring.GetPlayerList
 
 local modOptions = Spring.GetModOptions()
 
-local coop = false
+local DELAYED_AFK_SPAWN = false
+local COOP_MODE = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
 
 local gaiateam = Spring.GetGaiaTeamID()
@@ -133,7 +134,6 @@ local function InitUnsafe()
 	
 end
 
-
 function gadget:Initialize()
 	-- needed if you reload luarules
 	local frame = Spring.GetGameFrame()
@@ -192,6 +192,10 @@ local function GetStartUnit(teamID, playerID, isAI)
 		end
 	end
 
+	if (not startUnit) and (not DELAYED_AFK_SPAWN) then
+		startUnit = DEFAULT_UNIT
+	end
+	
 	-- hack workaround for chicken
 	--local luaAI = Spring.GetTeamLuaAI(teamID)
 	--if luaAI and string.find(string.lower(luaAI), "chicken") then startUnit = nil end
@@ -252,7 +256,7 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 	-- get start unit
 	local startUnit = GetStartUnit(teamID, playerID, isAI)
 
-	if ((coop and playerID and commSpawnedPlayer[playerID]) or (not coop and commSpawnedTeam[teamID])) and not bonusSpawn then
+	if ((COOP_MODE and playerID and commSpawnedPlayer[playerID]) or (not COOP_MODE and commSpawnedTeam[teamID])) and not bonusSpawn then
 		return false
 	end
 
@@ -446,10 +450,12 @@ function gadget:GameStart()
 
 		if team ~= gaiateam and not deadPlayer then
 			local luaAI = Spring.GetTeamLuaAI(team)
-			if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
-				waitingForComm[team] = true
+			if DELAYED_AFK_SPAWN then
+				if not (luaAI and string.find(string.lower(luaAI), "chicken")) then
+					waitingForComm[team] = true
+				end
 			end
-			if coop then
+			if COOP_MODE then
 				-- 1 start unit per player
 				local playerlist = Spring.GetPlayerList(team, true)
 				playerlist = workAroundSpecsInTeamZero(playerlist, team)
@@ -464,7 +470,7 @@ function gadget:GameStart()
 					-- AI etc.
 					SpawnStartUnit(team, nil, true)
 				end
-			else -- no coop
+			else -- no COOP_MODE
 				if (playerID) then
 					local _,_,spec,teamID = spGetPlayerInfo(playerID)
 					if (teamID == team and not spec) then
@@ -553,7 +559,7 @@ function gadget:GameFrame(n)
 			teamSides[team] = DEFAULT_UNIT_NAME
 			--playerSides[playerID] = "basiccomm"
 			scheduledSpawn[n] = scheduledSpawn[n] or {}
-			scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in coop mode
+			scheduledSpawn[n][#scheduledSpawn[n] + 1] = {team, playerID} -- playerID is needed here so the player can't spawn coms 2 times in COOP_MODE mode
 		end
 	end
 	if scheduledSpawn[n] then
