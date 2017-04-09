@@ -24,7 +24,7 @@ unitDef = {
     canjump          = 1,
     jump_range       = 400,
     jump_height      = 120,
-    jump_speed       = 5.2,
+    jump_speed       = 6,
     jump_reload      = 10,
     jump_from_midair = 0,
 

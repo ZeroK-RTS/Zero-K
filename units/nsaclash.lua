@@ -59,10 +59,10 @@ unitDef = {
 
   },
 
-  sightDistance       = 495,
-  sonarDistance       = 495,  
+  sightDistance       = 484,
+  sonarDistance       = 484,  
   turninplace         = 0,
-  turnRate            = 440,
+  turnRate            = 420,
   workerTime          = 0,
   
   weapons             = {
@@ -104,7 +104,7 @@ unitDef = {
 	  leadlimit               = 0,
       model                   = [[wep_m_dragonsfang.s3o]],
       projectiles             = 2,
-      range                   = 450,
+      range                   = 440,
       reloadtime              = 10,
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med5]],

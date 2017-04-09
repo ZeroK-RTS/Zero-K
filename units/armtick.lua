@@ -86,8 +86,9 @@ local weaponDefs = {
     areaOfEffect       = 352,
     craterBoost        = 0,
     craterMult         = 0,
-    edgeEffectiveness  = 0,
+    edgeEffectiveness  = 0.5,
     explosionGenerator = "custom:ARMTICK_EXPLOSION",
+	explosionSpeed     = 10,
     impulseBoost       = 0,
     impulseFactor      = 0,
     name               = "EMP Explosion",
@@ -95,7 +96,7 @@ local weaponDefs = {
     paralyzeTime       = 16,
     soundHit           = "weapon/more_lightning",
     damage = {
-      default          = 2000,
+      default          = 2500,
     },
   },
 }
