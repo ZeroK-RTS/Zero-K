@@ -38,9 +38,8 @@ function InitShader()
 	local shaderTemplate = include("Widgets/Shaders/default_tint.lua")
 
     local shader = gl.CreateShader(shaderTemplate)
-    local errors = gl.GetShaderLog(shader)
-    if errors ~= "" then
-        Spring.Echo(errors)
+    if not shader then
+        Spring.Echo("Ghost Site shader compilation failed: " .. gl.GetShaderLog())
         return
     end
     shaderObj = {
@@ -224,10 +223,6 @@ function widget:Update(dt)
 end
 
 function widget:DrawWorld()
-	if gl.CreateShader and devCompat and not shaderObj then
-		InitShader()
-	end
-	
 	DrawGhostSites()
 	DrawGhostFeatures()
 	ResetGl()
@@ -253,5 +248,11 @@ function widget:UnitEnteredLos(unitID, unitTeam)
 		local facing = Spring.GetUnitBuildFacing(unitID)
 		local y = Spring.GetGroundHeight(x,z) -- every single model is offset by 16, pretty retarded if you ask me.
 		ghostSites[unitID] = {x, y, z, udid, unitTeam, "%"..udid..":0", udef.radius + 100, facing * 90}
+	end
+end
+
+function widget:Initialize()
+	if gl.CreateShader and devCompat then
+		InitShader()
 	end
 end
