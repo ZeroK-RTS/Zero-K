@@ -240,10 +240,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 				local solidFactoryRotation = ud.customParams.solid_factory_rotation and tonumber(ud.customParams.solid_factory_rotation)
 				local solidFace = face
 				if solidFactoryRotation then
-					solidFace = solidFace + solidFactoryRotation
-					if solidFace > 4 then
-						solidFace = solidFace - 4
-					end
+					solidFace = (solidFace + solidFactoryRotation)%4
 				end
 				if solidFace == 0 then -- South
 					unitExpulsionParameters[4] = unitExpulsionParameters[2] + (solidFactoryLimit*16)
@@ -294,7 +291,7 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 
 			--Spring.Echo(xsize)
 			--Spring.Echo(zsize)
-
+			
 			--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[3],0,unitExpulsionParameters[2])
 			--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[1],0,unitExpulsionParameters[4])
 			--Spring.MarkerAddLine(unitExpulsionParameters[3],0,unitExpulsionParameters[4],unitExpulsionParameters[3],0,unitExpulsionParameters[2])
