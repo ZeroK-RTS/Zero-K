@@ -39,6 +39,7 @@ local evacuateCmdDesc = {
 }
 
 local spGetGroundHeight = Spring.GetGroundHeight
+local spSetHeightMap    = Spring.SetHeightMap
 local spAreTeamsAllied  = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
@@ -89,6 +90,8 @@ local hqsDestroyed = {}
 local destroyedStructures = {data = {}, count = 0}
 local evacuateStructureString = false
 local haveEvacuable = false
+
+local flattenAreas = {}
 
 local planetwarsStructureCount = 0 -- For GameRulesParams structure list
 local destroyedStructureCount = 0
@@ -357,6 +360,31 @@ local function GetRandomPosition(rectangle)
 	return position[1], position[2]
 end
 
+local function FlattenFunc(left, top, right, bottom, height)
+	-- top and bottom
+	for x = left + 8, right - 8, 8 do
+		spSetHeightMap(x, top, height, 0.5)
+		spSetHeightMap(x, bottom, height, 0.5)
+	end
+	
+	-- left and right
+	for z = top + 8, bottom - 8, 8 do
+		spSetHeightMap(left, z, height, 0.5)
+		spSetHeightMap(right, z, height, 0.5)
+	end
+	
+	-- corners
+	spSetHeightMap(left, top, height, 0.5)
+	spSetHeightMap(left, bottom, height, 0.5)
+	spSetHeightMap(right, top, height, 0.5)
+	spSetHeightMap(right, bottom, height, 0.5)
+end
+
+local function FlattenRectangle(left, top, right, bottom, height)
+	Spring.LevelHeightMap(left + 8, top + 8, right - 8, bottom - 8, height)
+	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
+end
+
 local function SpawnStructure(info, teamID, boxData)
 	if not (type(info) == "table") then
 		return
@@ -419,7 +447,12 @@ local function SpawnStructure(info, teamID, boxData)
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
 	
-	local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
+	local y = spGetGroundHeight(x,z)
+	if (y > 0 or (not unitDef.floatOnWater)) and flattenAreas then
+		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
+	end
+	
+	local unitID = Spring.CreateUnit(info.unitname, x, y, z, direction, teamID, false, false)
 	CheckSetWormhole(unitID)
 	
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
@@ -488,12 +521,17 @@ local function SpawnHQ(teamID, boxData, hqDefID)
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
 	
+	local y = spGetGroundHeight(x,z)
+	if (y > 0 or (not unitDef.floatOnWater)) and flattenAreas then
+		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
+	end
+	
 	planetwarsStructureCount = planetwarsStructureCount + 1
 	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
 	
 	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
 	
-	local unitID = Spring.CreateUnit(hqDefID, x, spGetGroundHeight(x,z), z, direction, teamID)
+	local unitID = Spring.CreateUnit(hqDefID, x, y, z, direction, teamID)
 	hqs[unitID] = true
 	
 	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
@@ -540,6 +578,13 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weap
 end
 
 function gadget:GameFrame(frame)
+	if flattenAreas then
+		for i = 1, #flattenAreas do
+			local rec = flattenAreas[i]
+			FlattenRectangle(rec[1], rec[2], rec[3], rec[4], rec[5])
+		end
+		flattenAreas = nil
+	end
 	if not haveEvacuable then
 		return
 	end
