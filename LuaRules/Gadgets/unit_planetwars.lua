@@ -97,8 +97,7 @@ local planetwarsStructureCount = 0 -- For GameRulesParams structure list
 local destroyedStructureCount = 0
 local evacStructureCount = 0
 
-local wormholeUnitID = {}
-
+local wormholeUnitID
 local planetwarsBoxes = {}
 
 local vector = Spring.Utilities.Vector
@@ -115,6 +114,25 @@ local EVAC_STATE = {
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
 GG.PlanetWars.hqs = hqs
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function GeneratePlayerNameToTeamIDMap()
+	local map = {}
+	
+	local playerList = Spring.GetPlayerList()
+	for i = 1, #playerList do
+		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i])
+		if name and active and (not spectator) then
+			map[name] = teamID
+		end
+	end
+	
+	return map
+end
+
+local playerNameToTeamID = GeneratePlayerNameToTeamIDMap()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -395,7 +413,7 @@ local function SpawnStructure(info, teamID, boxData)
 		return
 	end
 	
-	teamID = info.owner or teamID
+	teamID = (info.owner and playerNameToTeamID[info.owner]) or teamID
 	Spring.Echo("Processing PW structure: "..info.unitname)
 	
 	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
