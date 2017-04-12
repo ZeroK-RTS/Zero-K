@@ -1475,7 +1475,9 @@ end
 
 
 function widgetHandler:CommandsChanged()
-  widgetHandler:UpdateSelection() -- for selectionchanged
+  if widgetHandler:UpdateSelection() then -- for selectionchanged
+    return -- selection updated, don't call commands changed.
+  end
   self.inCommandsChanged = true
   self.customCommands = {}
   for _,w in ipairs(self.CommandsChangedList) do
@@ -2304,9 +2306,13 @@ function widgetHandler:UpdateSelection()
     changed = true
   end
   if (changed) then
-    widgetHandler:SelectionChanged(newSelection)
+    if widgetHandler:SelectionChanged(newSelection) then
+       -- selection changed, don't set old selection to new selection as it is soon to change.
+      return true
+    end
   end
   oldSelection = newSelection
+  return false
 end
 
 
@@ -2315,10 +2321,10 @@ function widgetHandler:SelectionChanged(selectedUnits)
     local unitArray = w:SelectionChanged(selectedUnits)
     if (unitArray) then
       Spring.SelectUnitArray(unitArray)
-      break
+      return true
     end
   end
-  return
+  return false
 end
 
 

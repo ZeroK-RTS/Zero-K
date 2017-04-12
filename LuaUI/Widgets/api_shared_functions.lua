@@ -7,7 +7,7 @@ function widget:GetInfo()
     author    = "Licho",
     date      = "6.9.2010",
     license   = "GNU GPL, v2 or later",
-    layer     = -math.huge,
+    layer     = -math.huge + 1,
     enabled   = true,
 	api = true,
 	alwaysStart = true,
