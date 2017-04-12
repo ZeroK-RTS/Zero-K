@@ -50,6 +50,9 @@ function widget:SelectionChanged(units)
 		local rank = unitDefID and selectionRank[unitDefID]
 		if rank then
 			if (not bestRank) or (bestRank < rank) then
+				if bestRank then
+					needsChanging = true
+				end
 				bestRank = rank
 				bestUnits = {unitID}
 			elseif bestRank == rank then
