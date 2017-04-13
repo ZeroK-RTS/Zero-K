@@ -25,7 +25,7 @@ end
 local function GetDefaultSelectionRank(ud)
 	if ud.isImmobile or ud.speed == 0 then
 		return 1
-	elseif ud.isMobileBuilder then
+	elseif ud.isMobileBuilder and not ud.customParams.commtype then
 		return 2
 	end
 	return 3

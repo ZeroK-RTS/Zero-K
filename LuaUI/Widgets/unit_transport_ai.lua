@@ -404,8 +404,25 @@ local function AddTransport(unitID, unitDefID)
 	end
 end
 
+local function PossiblyTransferAutoCallThroughMorph(unitID)
+	if not autoCallTransportUnits[unitID] then
+		return
+	end
+	
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if not morphedTo then
+		return
+	end
+	
+	local morphedToDefID = Spring.GetUnitDefID(morphedTo)
+	if morphedToDefID then
+		SetAutoCallTransportState(morphedTo, morphedToDefID, autoCallTransportUnits[unitID])
+	end
+end
+
 function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if teamID == myTeamID then 
+		PossiblyTransferAutoCallThroughMorph(unitID)
 		RemoveTransport(unitID, unitDefID)
 	end
 	if allMyTransports[unitID] then

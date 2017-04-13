@@ -38,7 +38,7 @@ for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.isImmobile or ud.speed == 0 then
 		defaultRank[i] = 1
-	elseif ud.isMobileBuilder then
+	elseif ud.isMobileBuilder and not ud.customParams.commtype then
 		defaultRank[i] = 2
 	else
 		defaultRank[i] = 3
@@ -127,8 +127,18 @@ end
 --------------------------------------------------------------------------------
 -- Unit Handling
 
-function widget:UnitDestroyed(unitID)
+local function PossiblyTransferRankThroughMorph(unitID)
+	local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
+	if not morphedTo then
+		return
+	end
+
+	selectionRank[morphedTo] = selectionRank[unitID]
+end
+
+function widget:UnitDestroyed(unitID, unitDefID, teamID)
 	if unitID and selectionRank[unitID] then
+		PossiblyTransferRankThroughMorph(unitID)
 		selectionRank[unitID] = nil
 	end
 end
