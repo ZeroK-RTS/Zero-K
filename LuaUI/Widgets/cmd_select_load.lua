@@ -24,6 +24,67 @@ local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- From transport AI
+
+local MAX_UNITS = Game.maxUnits
+local areaTarget -- used to match area command targets
+
+local goodCommand = {
+	[CMD.MOVE] = true,
+	[CMD.SET_WANTED_MAX_SPEED] = true,
+	[CMD.GUARD] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RESURRECT] = true,
+	[CMD_JUMP] = true,
+}
+
+local function ProcessCommand(unitID, cmdID, params)
+	if not (goodCommand[cmdID] or cmdID < 0) then
+		return false
+	end
+	local halting = not (cmdID == CMD.MOVE or cmdID == CMD.SET_WANTED_MAX_SPEED)
+	if cmdID == CMD.SET_WANTED_MAX_SPEED then
+		return true, halting
+	end
+	
+	local targetOverride
+	if #params == 5 and (cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM or cmdID == CMD.REPAIR) then
+		areaTarget = {
+			x = params[2],
+			z = params[4],
+			objectID = params[1]
+		}
+	elseif areaTarget and #params == 4 then
+		if params[1] == areaTarget.x and params[3] == areaTarget.z then
+			targetOverride = areaTarget.objectID
+		end
+		areaTarget = nil
+	elseif areaTarget then
+		areaTarget = nil
+	end
+	
+	if not targetOverride then
+		if #params == 3 or #params == 4 then
+			return true, halting, params
+		elseif not params[1] then
+			return true, halting
+		end
+	end
+	
+	if cmdID == CMD.RESURRECT or cmdID == CMD.RECLAIM then
+		local x, y, z = Spring.GetFeaturePosition((targetOverride or params[1] or 0) - MAX_UNITS)
+		return true, halting, {x, y, z}
+	else
+		local x, y, z = Spring.GetUnitPosition(targetOverride or params[1])
+		return true, halting, {x, y, z}
+	end
+	
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local function CopyMoveThenUnload(transportID, unitID)
 	local cmdQueue = Spring.GetCommandQueue(unitID)
@@ -32,15 +93,26 @@ local function CopyMoveThenUnload(transportID, unitID)
 	end
 	local commandLocations = {}
 	local queueToRemove = {}
+	
+	areaTarget = nil
+	
 	for i = 1, #cmdQueue do
 		local cmd = cmdQueue[i]
-		if cmd.id == CMD_MOVE then
-			commandLocations[#commandLocations + 1] = cmd.params
-			commandCopied = true
-		elseif cmd.id ~= CMD_SET_WANTED_MAX_SPEED then
+		
+		local keepGoing, haltAtCommand, moveParams = ProcessCommand(unitID, cmd.id, cmd.params)
+		if not keepGoing then
 			break
 		end
-		queueToRemove[#queueToRemove + 1] = cmd.tag
+		
+		if moveParams then
+			commandLocations[#commandLocations + 1] = moveParams
+		end
+		
+		if haltAtCommand then
+			break
+		else
+			queueToRemove[#queueToRemove + 1] = cmd.tag
+		end
 	end
 	
 	if #commandLocations == 0 then
