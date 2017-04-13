@@ -22,6 +22,15 @@ local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
 end
 
+local function GetDefaultSelectionRank(ud)
+	if ud.isImmobile or ud.speed == 0 then
+		return 1
+	elseif ud.isMobileBuilder then
+		return 2
+	end
+	return 3
+end
+
 options_path = 'Game/New Unit States'
 options_order = {
 	'inheritcontrol', 'presetlabel', 
@@ -38,6 +47,7 @@ options_order = {
 	'commander_misc_priority', 
 	'commander_retreat',
 	'commander_auto_call_transport_2',
+	'commander_selection_rank',
 }
 
 options = {
@@ -340,6 +350,18 @@ options = {
 		step = 1,
 		path = "Game/New Unit States/Misc",
 	},
+	
+	commander_selection_rank = {
+		name = "  Selection Rank",
+		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
+		type = 'number',
+		value = 3,
+		min = 0,
+		max = 3,
+		step = 1,
+		path = path,
+		path = "Game/New Unit States/Misc",
+	},
 }
 
 local tacticalAIDefs, behaviourDefaults = VFS.Include("LuaRules/Configs/tactical_ai_defs.lua", nil, VFS.ZIP)
@@ -573,7 +595,19 @@ local function addUnit(defName, path)
 		}
 		options_order[#options_order+1] = defName .. "_retreatpercent"
 	end
-
+	
+	options[defName .. "_selection_rank"] = {
+		name = "  Selection Rank",
+		desc = "Selection Rank: when selecting multiple units only those of highest rank are selected. Hold shift to ignore rank.",
+		type = 'number',
+		value = GetDefaultSelectionRank(ud),
+		min = 0,
+		max = 3,
+		step = 1,
+		path = path,
+	}
+	options_order[#options_order+1] = defName .. "_selection_rank"
+	
 	if tacticalAIUnits[defName] then
 		options[defName .. "_tactical_ai_2"] = {
 			name = "  Smart AI",
@@ -721,6 +755,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 		if WG['retreat'] then
 			WG['retreat'].addRetreatCommand(unitID, unitDefID, options.commander_retreat.value)
 		end
+		if options.commander_selection_rank and WG.SetSelectionRank then
+			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
 	end
 
 	local name = ud.name
@@ -836,6 +873,10 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 					WG.SetAutoCallTransportState(unitID, unitDefID, true)
 				end
 			end
+		end
+		
+		if options[name .. "_selection_rank"] and WG.SetSelectionRank then
+			WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
 		end
 		
 		if options[name .. "_tactical_ai_2"] and options[name .. "_tactical_ai_2"].value ~= nil then

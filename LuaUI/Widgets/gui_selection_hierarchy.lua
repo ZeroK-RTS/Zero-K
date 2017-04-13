@@ -4,36 +4,85 @@
 function widget:GetInfo()
   return {
     name      = "Selection Hierarchy",
-    desc      = "Do selection hierarchy like military>constructors>buildings.",
+    desc      = "Implements selection heirarchy state.",
     author    = "GoogleFrog",
     date      = "13 April 2017",
     license   = "GNU GPL, v2 or later",
     layer     = -math.huge,
-    enabled   = true  --  loaded by default?
+    enabled   = true, --  loaded by default?
+    handler   = true,
   }
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local selectioRankCmdDesc = {
+	id      = CMD_SELECTION_RANK,
+	type    = CMDTYPE.ICON_MODE,
+	name    = 'Selection Rank',
+	action  = 'selection_rank',
+	tooltip = 'Selection filtering rank: only unts of the highest rank are selected. Hold Shift to ignore filtering.',
+	params  = {0, 'Lowest', 'Low', 'Medium', 'High'}
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
 local selectionRank = {}
+local defaultRank = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	if ud.isImmobile or ud.speed == 0 then
-		selectionRank[i] = 1
+		defaultRank[i] = 1
 	elseif ud.isMobileBuilder then
-		selectionRank[i] = 2
+		defaultRank[i] = 2
 	else
-		selectionRank[i] = 3
+		defaultRank[i] = 3
 	end
 end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Epic Menu Options
 
+local ctrlFlattenRank = 1
+local useSelectionFiltering = true
+
+options_path = 'Settings/Interface/Selection'
+options = {
+	useSelectionFilteringOption = {
+		name = "Use selection filtering",
+		type = "bool",
+		value = true,
+		desc = "Enable to use selection filtering.",
+		OnChange = function (self)
+			useSelectionFiltering = self.value
+		end
+	},
+	ctrlFlattenRankOption = {
+		name = 'Hold Ctrl to ignore rank difference above:',
+		type = 'number',
+		value = 1,
+		min = 0, max = 3, step = 1,
+		noHotkey = true,
+		OnChange = function (self)
+			ctrlFlattenRank = self.value
+		end
+	},
+}
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Selection handling
 
 function widget:SelectionChanged(units)
+	if not useSelectionFiltering then
+		return
+	end
 	if not units then
 		return
 	end
@@ -46,9 +95,15 @@ function widget:SelectionChanged(units)
 	local bestRank, bestUnits 
 	for i = 1, #units do
 		local unitID = units[i]
-		local unitDefID = Spring.GetUnitDefID(unitID)
-		local rank = unitDefID and selectionRank[unitDefID]
+		local rank = unitID and selectionRank[unitID]
+		if not rank then
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			rank = unitDefID and defaultRank[unitDefID]
+		end
 		if rank then
+			if ctrl and rank > ctrlFlattenRank then
+				rank = ctrlFlattenRank
+			end
 			if (not bestRank) or (bestRank < rank) then
 				if bestRank then
 					needsChanging = true
@@ -68,6 +123,57 @@ function widget:SelectionChanged(units)
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Unit Handling
+
+function widget:UnitDestroyed(unitID)
+	if unitID and selectionRank[unitID] then
+		selectionRank[unitID] = nil
+	end
+end
+
+local function SetSelectionRank(unitID, newRank)
+	selectionRank[unitID] = newRank
+end
+
+function widget:Initialize()
+	WG.SetSelectionRank = SetSelectionRank
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Command Handling
+
+function widget:CommandsChanged()
+	if not useSelectionFiltering then
+		return
+	end
+	local selectedUnits = Spring.GetSelectedUnits()
+	local unitID = selectedUnits and selectedUnits[1]
+	local unitDefID = unitID and Spring.GetUnitDefID(unitID)
+	if not unitDefID then
+		return
+	end
+	local rank = selectionRank[unitID] or defaultRank[unitDefID]
+	local customCommands = widgetHandler.customCommands
+	selectioRankCmdDesc.params[1] = rank
+	table.insert(customCommands, selectioRankCmdDesc)
+end
+
+function widget:CommandNotify(id, params, options)
+	if id ~= CMD_SELECTION_RANK then 
+		return false
+	end
+	local newRank = params[1]
+	if options.right then
+		newRank = (newRank + 2)%4
+	end
+	local selectedUnits = Spring.GetSelectedUnits()
+	for i = 1, #selectedUnits do
+		selectionRank[selectedUnits[i]] = newRank
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

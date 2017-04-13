@@ -188,6 +188,7 @@ local ignoredCommand = {
 	[CMD_DONT_FIRE_AT_RADAR] = true,
 	[CMD_AIR_STRAFE] = true,
 	[CMD_PREVENT_OVERKILL] = true,
+	[CMD_SELECTION_RANK] = true,
 }
 
 local function ProcessCommand(unitID, cmdID, params, noUsefuless, noPosition)
@@ -533,9 +534,9 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 end
 
 function widget:CommandsChanged()
-	local units = Spring.GetSelectedUnitsSorted()
+	local selectedSorted = Spring.GetSelectedUnitsSorted()
 	local searchCall, searchTransport = true, true
-	for unitDefID, units in pairs(units) do
+	for unitDefID, units in pairs(selectedSorted) do
 		if searchCall and autoCallTransportDef[unitDefID] then
 			local customCommands = widgetHandler.customCommands
 			local order = 0

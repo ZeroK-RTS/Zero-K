@@ -88,6 +88,7 @@ local custom_cmd_actions = {
 	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", count = 2},
 	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", count = 2},
 	unitai = {cmdType = 2, name = "Unit AI", count = 2},
+	selection_rank = {cmdType = 2, name = "Selection Rank", count = 4},
 	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", count = 2},
 	autoassist = {cmdType = 2, name = "Factory Auto Assist", count = 2},
 	airstrafe = {cmdType = 2, name = "Gunship Strafe", count = 2},
@@ -169,6 +170,7 @@ local usedActions = {
 	["sethaven"] = true,
 	["setfirezone"] = true,
 	["cancelfirezone"] = true,
+	["selection_rank"] = true,
 	
 	-- These actions are used, just not by selecting everything with default UI
 	["upgradecommstop"] = true,
