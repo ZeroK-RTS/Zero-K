@@ -39,6 +39,7 @@ options_order = {
 	'enableTacticalAI', 'disableTacticalAI',
 	'enableAutoAssist', 'disableAutoAssist', 
 	'enableAutoCallTransport', 'disableAutoCallTransport',
+	'setRanksToDefault', 'setRanksToThree',
 	'categorieslabel', 
 	'commander_label', 
 	'commander_firestate0', 
@@ -62,8 +63,8 @@ options = {
 	presetlabel = {name = "presetlabel", type = 'label', value = "Presets", path = options_path},
 
 	resetMoveStates = {
-		type='button',
-		name= "Clear Move States",
+		type = 'button',
+		name = "Clear Move States",
 		desc = "Set all land units to inherit their move state from factory (overrides holdpos for skirms, arty and AA but not crabe, slasher or tremor)",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -81,8 +82,8 @@ options = {
 	},
 
 	holdPosition = {
-		type='button',
-		name= "Hold Position",
+		type = 'button',
+		name = "Hold Position",
 		desc = "Set all land units to hold position",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -100,8 +101,8 @@ options = {
 	},
 
 	skirmHoldPosition = {
-		type='button',
-		name= "Hold Position (Skirmishers)",
+		type = 'button',
+		name = "Hold Position (Skirmishers)",
 		desc = "Set all skirmishers to hold position",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -119,8 +120,8 @@ options = {
 	},
 
 	artyHoldPosition = {
-		type='button',
-		name= "Hold Position (Artillery)",
+		type = 'button',
+		name = "Hold Position (Artillery)",
 		desc = "Set all artillery units to hold position",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -138,8 +139,8 @@ options = {
 	},
 
 	aaHoldPosition = {
-		type='button',
-		name= "Hold Position (Anti-Air)",
+		type = 'button',
+		name = "Hold Position (Anti-Air)",
 		desc = "Set all non-flying anti-air units to hold position",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -159,8 +160,8 @@ options = {
 	categorieslabel = {name = "presetlabel", type = 'label', value = "Categories", path = options_path},
 
 	disableTacticalAI = {
-		type='button',
-		name= "Disable Tactical AI",
+		type = 'button',
+		name = "Disable Tactical AI",
 		desc = "Disables tactical AI (jinking and skirming) for all units.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -178,8 +179,8 @@ options = {
 	},
 
 	enableTacticalAI = {
-		type='button',
-		name= "Enable Tactical AI",
+		type = 'button',
+		name = "Enable Tactical AI",
 		desc = "Enables tactical AI (jinking and skirming) for all units.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -197,8 +198,8 @@ options = {
 	},
 	
 	enableAutoAssist = {
-		type='button',
-		name= "Enable Auto Assist",
+		type = 'button',
+		name = "Enable Auto Assist",
 		desc = "Enables auto assist for all factories.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -215,8 +216,8 @@ options = {
 		noHotkey = true,
 	},
 	disableAutoAssist = {
-		type='button',
-		name= "Disable Auto Assist",
+		type = 'button',
+		name = "Disable Auto Assist",
 		desc = "Disables auto assist for all factories.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -234,8 +235,8 @@ options = {
 	},
 	
 	enableAutoCallTransport = {
-		type='button',
-		name= "Enable Auto Call Transport",
+		type = 'button',
+		name = "Enable Auto Call Transport",
 		desc = "Enables auto call transport for all factories, sets constructors to inherit.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -256,8 +257,8 @@ options = {
 		noHotkey = true,
 	},
 	disableAutoCallTransport = {
-		type='button',
-		name= "Disable Auto Call Transport",
+		type = 'button',
+		name = "Disable Auto Call Transport",
 		desc = "Disables auto call transport for all factories, sets constructors to inherit.",
 		path = "Game/New Unit States/Presets",
 		OnChange = function ()
@@ -272,6 +273,42 @@ options = {
 					else
 						options[opt].value = -1
 					end
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	setRanksToDefault = {
+		type = 'button',
+		name = "Set Selection Ranks to Default",
+		desc = "Resets selection ranks to default, 1 for structures, 2 for constructors and 3 for combat units (including commander).",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				local name = find and string.sub(opt, 0, find - 1)
+				local ud = name and UnitDefNames[name]
+				if ud then
+					options[opt].value = GetDefaultSelectionRank(ud)
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	setRanksToThree = {
+		type = 'button',
+		name = "Set Selection Ranks to Three",
+		desc = "Effectively disables selection ranking while retaining the ability to manually set ranks.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			options.commander_selection_rank.value = 3
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				if find then
+					options[opt].value = 3
 				end
 			end
 		end,
