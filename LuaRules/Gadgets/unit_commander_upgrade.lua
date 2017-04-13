@@ -25,7 +25,7 @@ local interallyCreatedUnit = false
 local internalCreationUpgradeDef
 local internalCreationModuleEffectData
 
-local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield, unitCreatedWeaponNums
+local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedJammingRange, unitCreatedCloakShield, unitCreatedWeaponNums
 
 local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
 	
@@ -44,15 +44,17 @@ local commanderCloakShieldDef = {
 	minrad = 64,
 	maxrad = 350,
 	
-	growRate =	512,
+	growRate = 512,
 	shrinkRate = 2048,
 	selfCloak = true,
 	decloakDistance = 75,
 	isTransport = false,
 	
-	radiusException = {}	
+	radiusException = {}
 }
-	
+
+local COMMANDER_JAMMING_COST = 1.5
+
 for _, eud in pairs (UnitDefs) do
 	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
 		commanderCloakShieldDef.radiusException[eud.id] = true
@@ -127,6 +129,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.radarJammingRange then
 		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_jamming_cost", COMMANDER_JAMMING_COST, INLOS)
 	else
 		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
 		if onOffCmd then
@@ -282,6 +285,10 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedCloak = true
 	end
 	
+	if moduleEffectData.radarJammingRange then
+		unitCreatedJammingRange = COMMANDER_JAMMING_COST
+	end
+	
 	if moduleEffectData.areaCloak then
 		unitCreatedCloakShield = true
 	end
@@ -313,6 +320,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedShieldNum = nil
 	unitCreatedShield = nil
 	unitCreatedCloak = nil
+	unitCreatedJammingRange = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
 	unitCreatedCarrierDef = nil
@@ -655,6 +663,10 @@ end
 
 function GG.Upgrades_UnitCanCloak(unitID)
 	return unitCreatedCloak or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")
+end
+
+function GG.Upgrades_UnitJammerEnergyDrain(unitID)
+	return unitCreatedJammingRange or Spring.GetUnitRulesParam(unitID, "comm_jamming_cost")
 end
 
 function GG.Upgrades_UnitCloakShieldDef(unitID)

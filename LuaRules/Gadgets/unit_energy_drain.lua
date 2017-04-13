@@ -42,6 +42,7 @@ local unitList = {}
 local unitCount = 0
 
 local drainUnitDefID = {}
+local commanderOverrideDef = {}
 
 for unitDefID = 1, #UnitDefs do
 	local ud = UnitDefs[unitDefID]
@@ -61,6 +62,27 @@ for unitDefID = 1, #UnitDefs do
 			drainUnitDefID[unitDefID].cloakerUpkeepPerUpdate = (cloakerUpkeep + (upkeep or 0))*PERIOD/TEAM_SLOWUPDATE_RATE
 		end
 	end
+end
+
+local function GetCommanderDef(unitID)
+	if commanderOverrideDef[unitID] then
+		return commanderOverrideDef[unitID]
+	end
+	
+	local cloakerDef = GG.Upgrades_UnitCloakShieldDef(unitID)
+	local jammerDrain = GG.Upgrades_UnitJammerEnergyDrain(unitID)
+	
+	local drainDef = {
+		upkeep = jammerDrain,
+		upkeepPerUpdate = jammerDrain and jammerDrain*PERIOD/TEAM_SLOWUPDATE_RATE,
+	}
+	if cloakerDef then
+		drainDef.cloakerUpkeep = cloakerDef.energy + (upkeep or 0)
+		drainDef.cloakerUpkeepPerUpdate = (cloakerDef.energy + (jammerDrain or 0))*PERIOD/TEAM_SLOWUPDATE_RATE
+	end
+	
+	commanderOverrideDef[unitID] = drainDef
+	return drainDef
 end
 
 --------------------------------------------------------------------------------
@@ -89,11 +111,13 @@ end
 
 -- Unit is active as far as this function is concerned.
 local function GetUnitUpkeep(unitID, def)
+	def = def or GetCommanderDef(unitID)
 	if def.cloakerUpkeep and ((Spring.GetUnitRulesParam(unitID, "cloak_shield") or 0) > 0) then
 		return def.cloakerUpkeep, def.cloakerUpkeepPerUpdate
 	elseif def.upkeep then
 		return def.upkeep, def.upkeepPerUpdate
 	end
+	return 0, 0
 end
 
 function gadget:GameFrame(n)
@@ -154,8 +178,15 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitFinished(unitID, unitDefID, teamID)
-	if drainUnitDefID[unitDefID] and not unitMap[unitID] then
+	if (drainUnitDefID[unitDefID] and not unitMap[unitID]) or GG.Upgrades_UnitCloakShieldDef(unitID) or GG.Upgrades_UnitJammerEnergyDrain(unitID) then
 		local def = drainUnitDefID[unitDefID]
+		if not def then
+			def = GetCommanderDef(unitID)
+			if not def then
+				return
+			end
+		end
+		
 		unitCount = unitCount + 1
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -188,6 +219,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 		unitMap[unitID] = nil
 		unitCount = unitCount - 1
 	end
+	commanderOverrideDef[unitID] = nil
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
@@ -197,7 +229,6 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
 end
 
 function gadget:Initialize()
-	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
