@@ -4,7 +4,7 @@
 local custom_cmd_actions = {
 	-- cmdTypes are:
 	-- 1: Targeted commands (eg attack)
-	-- 2: State commands (eg on/off)
+	-- 2: State commands (eg on/off). Parameter 'count' creates actions to set a particular state
 	-- 3: Instant commands (eg self-d)
 	
 	--SPRING COMMANDS
@@ -25,14 +25,14 @@ local custom_cmd_actions = {
 	areaattack = {cmdType = 1, name = "Area Attack"},
 	
 	-- states
-	onoff = {cmdType = 2, name = "On/Off"},
-	['repeat'] = {cmdType = 2, name = "Repeat"},
-	wantcloak = {cmdType = 2, name = "Cloak"},
-	movestate = {cmdType = 2, name = "Move State"},
-	firestate = {cmdType = 2, name = "Fire State"},
-	idlemode = {cmdType = 2, name = "Land/Fly"},
-	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold"},
-	preventoverkill = {cmdType = 2, name = "Prevent Overkill"},
+	onoff = {cmdType = 2, name = "On/Off", count = 2},
+	['repeat'] = {cmdType = 2, name = "Repeat", count = 2},
+	wantcloak = {cmdType = 2, name = "Cloak", count = 2},
+	movestate = {cmdType = 2, name = "Move State", count = 3},
+	firestate = {cmdType = 2, name = "Fire State", count = 3},
+	idlemode = {cmdType = 2, name = "Land/Fly", count = 2},
+	autorepairlevel = {cmdType = 2, name = "Air Retreat Threshold", count = 4},
+	preventoverkill = {cmdType = 2, name = "Prevent Overkill", count = 2},
 	
 	      
 	--CUSTOM COMMANDS
@@ -77,22 +77,22 @@ local custom_cmd_actions = {
 	
 	--states
 --	stealth = {cmdType = 2, name = "stealth"}, --no longer applicable
-	cloak_shield = {cmdType = 2, name = "Area Cloaker"},
-	retreat = {cmdType = 2, name = "Retreat Threshold"},
+	cloak_shield = {cmdType = 2, name = "Area Cloaker", count = 2},
+	retreat = {cmdType = 2, name = "Retreat Threshold", count = 4},
 	['luaui noretreat'] = {cmdType = 2, name = "luaui noretreat"},
-	priority = {cmdType = 2, name = "Construction Priority"},
-	miscpriority = {cmdType = 2, name = "Misc. Priority"},
-	ap_fly_state = {cmdType = 2, name = "Land/Fly"},
-	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair"},
-	floatstate = {cmdType = 2, name = "Float State"},
-	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots"},
-	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone"},
-	unitai = {cmdType = 2, name = "Unit AI"},
-	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku"},
-	autoassist = {cmdType = 2, name = "Factory Auto Assist"},	
-	airstrafe = {cmdType = 2, name = "Gunship Strafe"},
-	divestate = {cmdType = 2, name = "Raven Dive"},
-	globalbuild = {cmdType = 2, name = "Constructor Global AI"},
+	priority = {cmdType = 2, name = "Construction Priority", count = 3},
+	miscpriority = {cmdType = 2, name = "Misc. Priority", count = 3},
+	ap_fly_state = {cmdType = 2, name = "Land/Fly", count = 2},
+	ap_autorepairlevel = {cmdType = 2, name = "Auto Repair", count = 4},
+	floatstate = {cmdType = 2, name = "Float State", count = 3},
+	dontfireatradar = {cmdType = 2, name = "Firing at Radar Dots", count = 2},
+	antinukezone = {cmdType = 2, name = "Ceasefire Antinuke Zone", count = 2},
+	unitai = {cmdType = 2, name = "Unit AI", count = 2},
+	unit_kill_subordinates = {cmdType = 2, name = "Dominatrix Seppuku", count = 2},
+	autoassist = {cmdType = 2, name = "Factory Auto Assist", count = 2},
+	airstrafe = {cmdType = 2, name = "Gunship Strafe", count = 2},
+	divestate = {cmdType = 2, name = "Raven Dive", count = 4},
+	globalbuild = {cmdType = 2, name = "Constructor Global AI", count = 2},
 }
 
 -- These actions are created from echoing all actions that appear when all units are selected.
@@ -138,7 +138,6 @@ local usedActions = {
 	["smoothground"] = true,
 	["restoreground"] = true,
 	["jump"] = true,
-	["autorepairlevel"] = true,
 	["idlemode"] = true,
 	["areaattack"] = true,
 	--["rearm"] = true, -- Not useful to send directly so unbindable to prevent confusion. Right click on pad is better.
@@ -183,4 +182,21 @@ for name,_ in pairs(custom_cmd_actions) do
 	end
 end
 
-return custom_cmd_actions
+-- Add toggle-to-particular-state commands
+local fullCustomCmdActions = {}
+for name, data in pairs(custom_cmd_actions) do
+	Spring.Echo("custom_cmd_actions", name, data.count)
+	if data.count then
+		for i = 0, data.count-1 do
+			fullCustomCmdActions[name .. " " .. i] = {
+				cmdType = data.cmdType,
+				name = data.name .. ": " .. i,
+			}
+		end
+	end
+	fullCustomCmdActions[name] = data
+end
+
+Spring.Utilities.TableEcho(fullCustomCmdActions, "fullCustomCmdActions")
+
+return fullCustomCmdActions

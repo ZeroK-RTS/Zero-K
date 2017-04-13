@@ -67,7 +67,6 @@ EPIC_NAME_UNITS = "epic_chili_integral_menu_tab_units"
 
 configurationName = "Configs/integral_menu_config.lua"
 local commandPanels, commandPanelMap, commandDisplayConfig, hiddenCommands, textConfig, buttonLayoutConfig, instantCommands -- In Initialize = include("Configs/integral_menu_config.lua")
-local customCmdActions = include("Configs/customCmdTypes.lua")
 
 local statePanel = {}
 local tabPanel
