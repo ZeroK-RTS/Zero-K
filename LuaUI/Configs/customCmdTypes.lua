@@ -185,7 +185,6 @@ end
 -- Add toggle-to-particular-state commands
 local fullCustomCmdActions = {}
 for name, data in pairs(custom_cmd_actions) do
-	Spring.Echo("custom_cmd_actions", name, data.count)
 	if data.count then
 		for i = 0, data.count-1 do
 			fullCustomCmdActions[name .. " " .. i] = {
@@ -196,7 +195,5 @@ for name, data in pairs(custom_cmd_actions) do
 	end
 	fullCustomCmdActions[name] = data
 end
-
-Spring.Utilities.TableEcho(fullCustomCmdActions, "fullCustomCmdActions")
 
 return fullCustomCmdActions
