@@ -769,6 +769,7 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 		usingGrid = false
 		if command and command.action then
 			local hotkey = GetHotkeyText(command.action)
+			hotkeyText = hotkey
 			SetText(textConfig.topLeft.name, hotkey)
 		else
 			SetText(textConfig.topLeft.name, nil)
@@ -912,7 +913,8 @@ local function GetButton(parent, selectionIndex, x, y, xStr, yStr, width, height
 			if tooltip and hotkey then
 				tooltip = tooltip .. " (\255\0\255\0" .. hotkey .. "\008)"
 			end
-			if not (isStateCommand or usingGrid) then 
+			if not (isStateCommand or usingGrid) then
+				hotkeyText = hotkey
 				SetText(textConfig.topLeft.name, hotkey)
 			end
 		end
