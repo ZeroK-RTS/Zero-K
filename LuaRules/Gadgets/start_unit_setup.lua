@@ -5,7 +5,7 @@ function gadget:GetInfo()
     author    = "Licho, CarRepairer, Google Frog, SirMaverick",
     date      = "2008-2010",
     license   = "GNU GPL, v2 or later",
-    layer     = 0,
+    layer     = -1, -- Before terraforming gadget (for facplop terraforming)
     enabled   = true  --  loaded by default?
   }
 end
@@ -43,14 +43,76 @@ if (gadgetHandler:IsSyncedCode()) then
 --------------------------------------------------------------------------------
 -- Functions shared between missions and non-missions
 
+local spGetGroundHeight = Spring.GetGroundHeight
+local spSetHeightMap    = Spring.SetHeightMap
+
+local function FlattenFunc(left, top, right, bottom, height)
+	-- top and bottom
+	for x = left + 8, right - 8, 8 do
+		spSetHeightMap(x, top, height, 0.5)
+		spSetHeightMap(x, bottom, height, 0.5)
+	end
+	
+	-- left and right
+	for z = top + 8, bottom - 8, 8 do
+		spSetHeightMap(left, z, height, 0.5)
+		spSetHeightMap(right, z, height, 0.5)
+	end
+	
+	-- corners
+	spSetHeightMap(left, top, height, 0.5)
+	spSetHeightMap(left, bottom, height, 0.5)
+	spSetHeightMap(right, top, height, 0.5)
+	spSetHeightMap(right, bottom, height, 0.5)
+end
+
+local function FlattenRectangle(left, top, right, bottom, height)
+	Spring.LevelHeightMap(left + 8, top + 8, right - 8, bottom - 8, height)
+	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
+end
+
 local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 	if ploppableDefs[unitDefID] and (select(5, Spring.GetUnitHealth(unitID)) < 0.1) and (builderID and Spring.GetUnitRulesParam(builderID, "facplop") == 1) then
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
+		
+		-- Instantly complete factory
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
-		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1 })
+		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
+		
+		-- Remove construction order
+		local cQueue = Spring.GetCommandQueue(builderID, 1)
+		if cQueue and cQueue[1] and cQueue[1].id == -unitDefID then
+			Spring.GiveOrderToUnit(builderID, CMD.REMOVE, {cQueue[1].tag}, {})
+		end
+		
+		-- Flatten ground
+		local ud = UnitDefs[unitDefID]
+		local sX = ud.xsize*4
+		local sZ = ud.zsize*4
+		local facing = Spring.GetUnitBuildFacing(unitID)
+		if facing == 1 or facing == 3 then
+			sX, sZ = sZ, sX
+		end
+		
+		local height
+		if facing == 0 then -- South
+			height = spGetGroundHeight(x, z + 0.8*sZ)
+		elseif facing == 1 then -- East
+			height = spGetGroundHeight(x + 0.8*sX, z)
+		elseif facing == 2 then -- North
+			height = spGetGroundHeight(x, z - 0.8*sZ)
+		else -- West
+			height = spGetGroundHeight(x - 0.8*sX, z)
+		end
+		
+		if height > 0 or (not ud.floatOnWater) then
+			FlattenRectangle(x - sX, z - sZ, x + sX, z + sZ, height)
+		end
+		
+		-- Stats collection
 		if GG.mod_stats_AddFactoryPlop then
 			GG.mod_stats_AddFactoryPlop(teamID, unitDefID)
 		end

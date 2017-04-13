@@ -435,7 +435,7 @@ local function SpawnStructure(info, teamID, boxData)
 	local oddX = unitDef.xsize % 4 == 2
 	local oddZ = unitDef.zsize % 4 == 2
 	local sX = unitDef.xsize*4
-	local sZ = unitDef.xsize*4
+	local sZ = unitDef.zsize*4
 	
 	if direction == 1 or direction == 3 then
 		sX, sZ = sZ, sX
