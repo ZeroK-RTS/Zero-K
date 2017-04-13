@@ -542,7 +542,7 @@ function widget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdTag)
 	if autoCallTransportUnits[unitID] then
 		local useful, halting = ProcessCommand(unitID, cmdID, params, false, true)
 		local queue = Spring.GetCommandQueue(unitID, 0)
-		if useful and halting and queue > 1 then
+		if useful and halting and queue >= 1 then
 			spGiveOrderToUnit(unitID, CMD_EMBARK, {}, {"alt"})
 		else
 			RemoveUnit(unitDefID, spGetUnitDefID(unitDefID))
