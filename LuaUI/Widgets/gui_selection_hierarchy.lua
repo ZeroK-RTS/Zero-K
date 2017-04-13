@@ -51,6 +51,7 @@ end
 
 local ctrlFlattenRank = 1
 local useSelectionFiltering = true
+local selectionFilteringOnlyAlt = false
 
 options_path = 'Settings/Interface/Selection'
 options = {
@@ -61,6 +62,15 @@ options = {
 		desc = "Enable to use selection filtering.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
+		end
+	},
+	selectionFilteringOnlyAltOption = {
+		name = "Only filter when Alt is held",
+		type = "bool",
+		value = false,
+		desc = "Enable selection filtering when Alt is held. Required the main selection filtering option to be enabled.",
+		OnChange = function (self)
+			selectionFilteringOnlyAlt = self.value
 		end
 	},
 	ctrlFlattenRankOption = {
@@ -88,6 +98,10 @@ function widget:SelectionChanged(units)
 	end
 	local alt, ctrl, meta, shift = Spring.GetModKeyState()
 	if shift then
+		return
+	end
+	
+	if selectionFilteringOnlyAlt and not alt then
 		return
 	end
 	
