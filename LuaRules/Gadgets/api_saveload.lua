@@ -796,7 +796,7 @@ local function SaveUnits()
 			unitInfo.rulesParams[name] = value 
 		end
 	end
-	savedata.unit = data
+	return data
 end
 
 local function SaveFeatures()
@@ -820,7 +820,7 @@ local function SaveFeatures()
 		featureInfo.health, featureInfo.maxHealth, featureInfo.resurrectProgress = spGetFeatureHealth(featureID)
 		featureInfo.reclaimLeft = select(5, spGetFeatureResources(featureID))
 	end
-	savedata.feature = data
+	return data
 end
 
 local function GetProjectileSaveInfo(projectileID)
@@ -868,7 +868,7 @@ local function SaveProjectiles()
 			data[projectileID] = projectileInfo
 		end
 	end
-	savedata.projectile = data
+	return data
 end
 
 local function SaveGeneralInfo()
@@ -901,7 +901,7 @@ local function SaveGeneralInfo()
 		end
 	end
 	
-	savedata.general = data
+	return data
 end
 
 local function ModifyUnitData(unitID)
@@ -911,18 +911,34 @@ end
 -----------------------------------------------------------------------------------
 -- callins
 function gadget:Save(zip)
-	SaveGeneralInfo()
-	SaveUnits()
-	SaveFeatures()
-	SaveProjectiles()
-	WriteSaveData(zip, generalFile, savedata.general)
-	WriteSaveData(zip, unitFile, savedata.unit)
-	WriteSaveData(zip, featureFile, savedata.feature)
-	WriteSaveData(zip, projectileFile, savedata.projectile)
+	WriteSaveData(zip, generalFile, SaveGeneralInfo())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveGeneralInfo - Done")
+	WriteSaveData(zip, unitFile, SaveUnits())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveUnits - Done")
+	WriteSaveData(zip, featureFile, SaveFeatures())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveFeatures - Done")
+	WriteSaveData(zip, projectileFile, SaveProjectiles())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveProjectiles - Done")
 	
 	for _,entry in pairs(savedata.gadgets) do
 		WriteSaveData(zip, entry.filename, entry.data)
 	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("Save - Done")
 end
 
 function gadget:Initialize()
