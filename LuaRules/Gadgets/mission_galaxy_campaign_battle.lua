@@ -92,7 +92,12 @@ local function PlaceUnit(unitData, teamID)
 		end
 	end
 	
-	Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID)
+	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
+	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build)
+	if build then
+		local _, maxHealth = Spring.GetUnitHealth(unitID)
+		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
+	end
 end
 
 local function PlaceRetinueUnit(retinueID, range, unitDefName, spawnX, spawnZ, facing, teamID, experience)
@@ -276,7 +281,7 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
-function gadget:GameFrame()
-	DoInitialUnitPlacement()
+function gadget:GameFrame() -- Would use GamePreload if it didn't cause Circuit to crash.
 	gadgetHandler:RemoveCallIn("GameFrame")
+	DoInitialUnitPlacement()
 end
