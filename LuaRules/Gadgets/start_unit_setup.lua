@@ -33,6 +33,7 @@ local gaiaally = select(6, spGetTeamInfo(gaiateam))
 local SAVE_FILE = "Gadgets/start_unit_setup.lua"
 
 local fixedStartPos = modOptions.fixedstartpos
+local ordersToRemove
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -48,27 +49,40 @@ local spSetHeightMap    = Spring.SetHeightMap
 
 local function FlattenFunc(left, top, right, bottom, height)
 	-- top and bottom
-	for x = left + 8, right - 8, 8 do
-		spSetHeightMap(x, top, height, 0.5)
-		spSetHeightMap(x, bottom, height, 0.5)
+	for x = left, right, 8 do
+		spSetHeightMap(x, top - 8, height, 0.5)
+		spSetHeightMap(x, bottom + 8, height, 0.5)
 	end
 	
 	-- left and right
-	for z = top + 8, bottom - 8, 8 do
-		spSetHeightMap(left, z, height, 0.5)
-		spSetHeightMap(right, z, height, 0.5)
+	for z = top, bottom, 8 do
+		spSetHeightMap(left - 8, z, height, 0.5)
+		spSetHeightMap(right + 8, z, height, 0.5)
 	end
 	
 	-- corners
-	spSetHeightMap(left, top, height, 0.5)
-	spSetHeightMap(left, bottom, height, 0.5)
-	spSetHeightMap(right, top, height, 0.5)
-	spSetHeightMap(right, bottom, height, 0.5)
+	spSetHeightMap(left - 8, top - 8, height, 0.5)
+	spSetHeightMap(left - 8, bottom + 8, height, 0.5)
+	spSetHeightMap(right + 8, top - 8, height, 0.5)
+	spSetHeightMap(right + 8, bottom + 8, height, 0.5)
 end
 
 local function FlattenRectangle(left, top, right, bottom, height)
-	Spring.LevelHeightMap(left + 8, top + 8, right - 8, bottom - 8, height)
+	Spring.LevelHeightMap(left, top, right, bottom, height)
 	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
+end
+
+local function CheckOrderRemoval()
+	if not ordersToRemove then
+		return
+	end
+	for unitID, factoryDefID in pairs(ordersToRemove) do
+		local cQueue = Spring.GetCommandQueue(unitID, 1)
+		if cQueue and cQueue[1] and cQueue[1].id == -factoryDefID then
+			Spring.GiveOrderToUnit(unitID, CMD.REMOVE, {cQueue[1].tag}, {"alt"})
+		end
+	end
+	ordersToRemove = nil
 end
 
 local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
@@ -76,17 +90,14 @@ local function CheckFacplopUse(unitID, unitDefID, teamID, builderID)
 		-- (select(5, Spring.GetUnitHealth(unitID)) < 0.1) to prevent ressurect from spending facplop.
 		Spring.SetUnitRulesParam(builderID,"facplop",0, {inlos = true})
 		
+		ordersToRemove = ordersToRemove or {}
+		ordersToRemove[builderID] = unitDefID
+		
 		-- Instantly complete factory
 		local maxHealth = select(2,Spring.GetUnitHealth(unitID))
 		Spring.SetUnitHealth(unitID, {health = maxHealth, build = 1})
 		local x,y,z = Spring.GetUnitPosition(unitID)
 		Spring.SpawnCEG("gate", x, y, z)
-		
-		-- Remove construction order
-		local cQueue = Spring.GetCommandQueue(builderID, 1)
-		if cQueue and cQueue[1] and cQueue[1].id == -unitDefID then
-			Spring.GiveOrderToUnit(builderID, CMD.REMOVE, {cQueue[1].tag}, {})
-		end
 		
 		-- Flatten ground
 		local ud = UnitDefs[unitDefID]
@@ -139,6 +150,10 @@ if VFS.FileExists("mission.lua") then -- this is a mission, we just want to set 
 	function GG.SetStartLocation() 
 	end
 
+	function gadget:GameFrame(n)
+		CheckOrderRemoval()
+	end
+	
 	function GG.GiveFacplop(unitID) -- deprecated, use rulesparam directly 
 		Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 	end
@@ -615,6 +630,7 @@ end
 GG.SetStartLocation = SetStartLocation
 
 function gadget:GameFrame(n)
+	CheckOrderRemoval()
 	if n == (COMM_SELECT_TIMEOUT) then
 		for team in pairs(waitingForComm) do
 			local _,playerID = spGetTeamInfo(team)
