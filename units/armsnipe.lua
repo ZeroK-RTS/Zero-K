@@ -99,6 +99,7 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:spectre_hit]],
+      fireTolerance           = 512, -- 2.8 degrees
       impactOnly              = true,
       impulseBoost            = 0,
       impulseFactor           = 0.4,
