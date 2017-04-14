@@ -6,6 +6,8 @@ include "fixedwingTakeOff.lua"
 local base, Lwing, LwingTip, Rwing, RwingTip, jet1, jet2,xp,zp,preDrop, drop, LBSpike, LFSpike,RBSpike, RFSpike = piece("Base", "LWing", "LWingTip", "RWing", "RWingTip", "Jet1", "Jet2","x","z","PreDrop", "Drop", "LBSpike", "LFSpike","RBSpike", "RFSpike")
 local smokePiece = {base, jet1, jet2}
 
+local doingRun = false
+local preDropMoved = false
 local sound_index = 0
 local BOMB_DELAY = 1
 
@@ -41,14 +43,34 @@ function script.Deactivate()
 	StartThread(TakeOffThread, takeoffHeight, SIG_TAKEOFF)
 end
 
-function script.FireWeapon()
+
+function script.FireWeapon(checkHeight)
+	if doingRun then
+		return
+	end
 	if Spring.GetUnitRulesParam(unitID, "noammo") == 1 then
 		return
 	end
 	
-	for i = 1, 80 do
+	doingRun = true
+	
+	local i = 1
+	while i <= 80 do
 		local stunned_or_inbuild = Spring.GetUnitIsStunned(unitID) or (Spring.GetUnitRulesParam(unitID,"disarmed") == 1)
 		if not stunned_or_inbuild then
+			
+			if checkHeight then
+				local x, y, z = Spring.GetUnitPosition(unitID)
+				local height = math.max(0, Spring.GetGroundHeight(x, z))
+				if height + 15 > y then
+					Move(preDrop, y_axis, math.max(15, height - y))
+					preDropMoved = true
+				elseif preDropMoved then
+					Move(preDrop, y_axis,0)
+					preDropMoved = false
+				end
+			end
+			
 			local xx, xy, xz = Spring.GetUnitPiecePosDir(unitID,xp)
 			local zx, zy, zz = Spring.GetUnitPiecePosDir(unitID,zp)
 			local bx, by, bz = Spring.GetUnitPiecePosDir(unitID,base)
@@ -73,14 +95,19 @@ function script.FireWeapon()
 			if sound_index >= 6 then
 				sound_index = 0
 			end
+			i = i + 1
 		end
 		local slowMult = 1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0)
 		Sleep(35/slowMult) -- fire density
 	end
 	
+	doingRun = false
 	Reload()
 end
 
+function StartRun()
+	script.FireWeapon(true)
+end
 
 function script.QueryWeapon()
 	return drop

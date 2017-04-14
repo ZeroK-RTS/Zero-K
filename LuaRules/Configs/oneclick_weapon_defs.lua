@@ -21,6 +21,9 @@ local oneClickWepDefNames = {
 	blastwing = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
+	armstiletto_laser = {
+		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
+	},
 	--[[
 	logkoda = {
 		{ functionToCall = "FlameTrail", reloadTime = 850, name = "Flame Trail", tooltip = "Leave a path of flame in your wake", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
