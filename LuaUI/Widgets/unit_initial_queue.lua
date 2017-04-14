@@ -243,6 +243,10 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget(self)
 		return
 	end
+	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
+		widgetHandler:RemoveWidget(self)
+		return
+	end
 	for uDefID, uDef in pairs(UnitDefs) do
 		if uDef.customParams.ismex then
 			isMex[uDefID] = true
