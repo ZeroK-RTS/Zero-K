@@ -360,18 +360,21 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num)
-
+	local reloadSpeedMult = Spring.GetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
+	if reloadSpeedMult and reloadSpeedMult < 0.5 then
+		reloadSpeedMult = 0.5
+	end
 	EmitSfx(gunFlares[gun], 1024)
 	EmitSfx(rejector, 1025)
-	Sleep(100)
+	Sleep(100/reloadSpeedMult)
 	EmitSfx(gunFlares[gun], 1024)
 	EmitSfx(rejector, 1025)
-	Sleep(100)
+	Sleep(100/reloadSpeedMult)
 	EmitSfx(gunFlares[gun], 1024)
 	EmitSfx(rejector, 1025)
 	Turn(gunBelts[gun].main, x_axis, math.rad(-2), math.rad(50))
 	Turn(gunBelts[gun].other, x_axis, math.rad(2), math.rad(50))
-	Sleep(100)
+	Sleep(100/reloadSpeedMult)
 	
 	gun = 3 - gun
 end
