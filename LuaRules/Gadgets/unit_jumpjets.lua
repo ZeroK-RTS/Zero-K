@@ -280,10 +280,13 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 	local function JumpLoop()
 
 		if delay > 0 then
-			for i=delay, 1, -1 do
+			for i = delay, 1, -1 do
 				Sleep()
 			end
-		
+			
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
+				return 
+			end
 			Spring.UnitScript.CallAsUnit(unitID,env.beginJump)
 
 			if rotateMidAir then
@@ -373,6 +376,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		end
 
 		Sleep()
+		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
+			return 
+		end
 		
 		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 		if morphedTo then
@@ -397,6 +403,9 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
 			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
 			Sleep()
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
+				return 
+			end
 		end
 	end
 

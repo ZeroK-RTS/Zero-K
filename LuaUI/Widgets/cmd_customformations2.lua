@@ -233,6 +233,9 @@ local function GetUnitFinalPosition(uID)
 	local ux, uy, uz = spGetUnitPosition(uID)
 	
 	local cmds = spGetCommandQueue(uID, -1)
+	if not cmds then
+		return 0, 0, 0
+	end
 	for i = #cmds, 1, -1 do
 		
 		local cmd = cmds[i]
