@@ -95,18 +95,26 @@ end
 local function EmitWeaponFireSfx(pieceNum, num)
 	local weaponNum = GetWeapon(num)
 	if weaponNum == 1 then
-		EmitSfx(pieceNum, 1029 + weapon1*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1029 + weapon1*2)
+		end
 	elseif weaponNum == 2 then
-		EmitSfx(pieceNum, 1029 + weapon2*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1029 + weapon2*2)
+		end
 	end
 end
 
 local function EmitWeaponShotSfx(pieceNum, num)
 	local weaponNum = GetWeapon(num)
 	if weaponNum == 1 then
-		EmitSfx(pieceNum, 1030 + weapon1*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1030 + weapon1*2)
+		end
 	elseif weaponNum == 2 then
-		EmitSfx(pieceNum, 1030 + weapon2*2)
+		if weapon2 then
+			EmitSfx(pieceNum, 1030 + weapon2*2)
+		end
 	end
 end
 
