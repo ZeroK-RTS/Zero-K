@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		author    = "SirMaverick, Google Frog, KDR_11k, CarRepairer (unified by KingRaptor)",
 		date      = "2009",
 		license   = "GPL",
-		layer     = 1,
+		layer     = 1, 
 		enabled   = true  --  loaded by default?
 	}
 end
@@ -157,20 +157,9 @@ local function UnitWithinBounds(unitID)
 	return (x > -500) and (x < Game.mapSizeX + 500) and (y > -1000) and (z > -500) and (z < Game.mapSizeZ + 500)
 end
 
-local function KillTeamsAndGameOver(winningAllyTeamID)
-	gameover = true
-	for _, teamID in pairs(spGetTeamList()) do
-		_, _, isDead, _, _, allyTeamID = spGetTeamInfo(teamID)
-		if allyTeamID ~= winningAllyTeamID and not isDead then
-			spKillTeam(teamID)
-		end
-	end
-	spGameOver({winningAllyTeamID})
-end
-
 local function Draw() -- declares a draw
 	EchoUIMessage("The game ended in a draw!")
-	KillTeamsAndGameOver(gaiaAllyTeamID) -- exit uses {} so use Gaia for draw to differentiate
+	spGameOver({gaiaAllyTeamID}) -- exit uses {} so use Gaia for draw to differentiate
 end
 
 -- if only one allyteam left, declare it the victor
@@ -196,7 +185,7 @@ local function CheckForVictory()
 				local name = Spring.GetGameRulesParam("allyteam_long_name_" .. lastAllyTeam)
 				EchoUIMessage(name .. " wins!")
 			end
-			KillTeamsAndGameOver(lastAllyTeam)
+			spGameOver({lastAllyTeam})
 		end
 	end
 end
@@ -206,7 +195,7 @@ local function RevealAllianceUnits(allianceID)
 	local teamList = spGetTeamList(allianceID)
 	for i=1,#teamList do
 		local t = teamList[i]
-		local teamUnits = spGetTeamUnits(t)
+		local teamUnits = spGetTeamUnits(t) 
 		for j=1,#teamUnits do
 			local u = teamUnits[j]
 			-- purge extra-map units
@@ -225,7 +214,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
 		if teamList == nil or (#teamList == 0) then return end	-- empty allyteam, don't bother
-
+		
 		if Spring.IsCheatingEnabled() then
 			EchoUIMessage("Game Over: DEBUG")
 			EchoUIMessage("Game Over: Allyteam " .. allianceID .. " has met the game over conditions.")
@@ -239,7 +228,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 			local frame = Spring.GetGameFrame() + 50
 			for i=1,#teamList do
 				local t = teamList[i]
-				local teamUnits = spGetTeamUnits(t)
+				local teamUnits = spGetTeamUnits(t) 
 				for j=1,#teamUnits do
 					local u = teamUnits[j]
 					local pwUnits = (GG.PlanetWars or {}).unitsByID
@@ -270,13 +259,13 @@ local function CauseVictory(allyTeamID)
 			DestroyAlliance(a)
 		end
 	end
-	--KillTeamsAndGameOver(lastAllyTeam)
+	--spGameOver({lastAllyTeam})
 end
 
 local function AddAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
-
+	
 	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[ud].metalCost
 
 	if UnitDefs[ud].customParams.commtype then
@@ -287,7 +276,7 @@ end
 local function RemoveAllianceUnit(u, ud, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] - 1
-
+	
 	aliveValue[teamID] = aliveValue[teamID] - UnitDefs[ud].metalCost
 	if aliveValue[teamID] < 0 then
 		aliveValue[teamID] = 0
@@ -334,7 +323,7 @@ local function CheckAllUnits()
 end
 
 -- check for active players
-local function ProcessLastAlly()
+local function ProcessLastAlly()	
 	if Spring.IsCheatingEnabled() then
 		return
 	end
@@ -357,7 +346,7 @@ local function ProcessLastAlly()
 			-- except chicken, who are alive even without units
 			local numAlive = aliveCount[t]
 			if #(Spring.GetTeamUnits(t)) == 0 then numAlive = 0 end
-			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then
+			if (numAlive > 0) or (GG.waitingForComm or {})[t] or (GetTeamIsChicken(t)) then	
 				-- count AI teams as active
 				local _,_,_,isAiTeam = spGetTeamInfo(t)
 				if isAiTeam then
@@ -388,12 +377,12 @@ local function ProcessLastAlly()
 		end
 		until true
 	end -- for
-
+	
 	if #activeAllies > 1 and inactiveWinAllyTeam then
 		inactiveWinAllyTeam = false
 		Spring.SetGameRulesParam("inactivity_win", -1)
 	end
-
+	
 	if #activeAllies == 2 then
 		if revealed or activeAllies[1] == chickenAllyTeamID or activeAllies[2] == chickenAllyTeamID then
 			return
@@ -436,7 +425,7 @@ end
 
 local function CheckInactivityWin(cmd, line, words, player)
 	if inactiveWinAllyTeam and not gameover then
-		if player then
+		if player then 
 			local name,_,spec,_,allyTeamID = Spring.GetPlayerInfo(player)
 			if allyTeamID == inactiveWinAllyTeam and not spec then
 				Spring.Echo((name or "") .. " has forced a win due to dropped opposition.")
@@ -479,7 +468,7 @@ function gadget:UnitDestroyed(u, ud, team)
 	if spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
-
+	
 	if (team ~= gaiaTeamID)
 	  and(not doesNotCountList[ud])
 	  and finishedUnits[u]
@@ -504,7 +493,7 @@ function gadget:UnitTaken(u, ud, oldTeam, newTeam)
 	  and(not doesNotCountList[ud])
 	  and finishedUnits[u]
 	then
-		RemoveAllianceUnit(u, ud, oldTeam)
+		RemoveAllianceUnit(u, ud, oldTeam)	
 	end
 end
 
@@ -519,9 +508,9 @@ function gadget:Initialize()
 		end
 	end
 	CheckAllUnits()
-
+	
 	gadgetHandler:AddChatAction('inactivitywin', CheckInactivityWin, "")
-
+	
 	Spring.Log(gadget:GetInfo().name, LOG.INFO, "Game Over initialized")
 end
 
@@ -534,7 +523,7 @@ function gadget:GameFrame(n)
 		end
 		toDestroy[n] = nil
 	end
-
+	
 	-- check for last ally:
 	-- end condition: only 1 ally with human players, no AIs in other ones
 	if (n % 45 == 0) then
@@ -545,6 +534,7 @@ function gadget:GameFrame(n)
 end
 
 function gadget:GameOver()
+	gameover = true
 	if noElo then
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")
 	end
