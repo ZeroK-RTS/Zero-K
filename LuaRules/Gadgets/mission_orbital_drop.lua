@@ -85,13 +85,16 @@ local function StartsWith(s, startString)
 end
 
 
-function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, timeToGround, fallGravity, absSpawnHeight, absBrakeHeight, dyncommID, staticDyncommLevel)
+function GG.DropUnit(unitDefName, x, y, z, facing, teamID, useSetUnitVelocity, timeToGround, fallGravity, absSpawnHeight, absBrakeHeight, dyncommID, staticDyncommLevel, dynamicCommanderOnly)
   local gy = Spring.GetGroundHeight(x, z)
   if y < gy then 
     y = gy 
   end
-  local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID, staticDyncommLevel)) or Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
- if not Spring.ValidUnitID(unitID) then
+  local unitID = (dyncommID and GG.Upgrades_CreateStarterDyncomm and GG.Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID, staticDyncommLevel))
+  if (not unitID) and (not dynamicCommanderOnly) then
+    unitID = Spring.CreateUnit(unitDefName, x, y, z, facing, teamID)
+  end
+  if not Spring.ValidUnitID(unitID) then
     Spring.Echo("Orbital Drop error: unitID from" .. unitDefName .." is invalid. No orbital drop for this unit.")
 	return
   end

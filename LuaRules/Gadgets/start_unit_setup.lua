@@ -376,7 +376,11 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		GG.CommanderSpawnLocation[teamID] = {x = x, y = y, z = z, facing = facing}
 
 		-- CREATE UNIT
-		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level))
+		local unitID = GG.DropUnit(startUnit, x, y, z, facing, teamID, _, _, _, _, _, GG.ModularCommAPI.GetProfileIDByBaseDefID(startUnit), teamInfo and tonumber(teamInfo.static_level), true)
+		
+		if not unitID then
+			return
+		end
 		
 		if GG.GalaxyCampaignHandler then
 			GG.GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)

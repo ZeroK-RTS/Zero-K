@@ -1414,6 +1414,7 @@ local chassisDefs = {
 		baseUnitDef = UnitDefNames and UnitDefNames["dynknight0"].id,
 		extraLevelCostFunction = extraLevelCostFunction,
 		maxNormalLevel = 5,
+		notSelectable = true,
 		secondPeashooter = true,
 		levelDefs = {
 			[0] = {
