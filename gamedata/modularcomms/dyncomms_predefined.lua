@@ -50,6 +50,7 @@ return {
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "166"}
 	},
+	--[[
 	dyntrainer_knight = {
 		name = "Knight Trainer",
 		--notStarter = true,
@@ -64,6 +65,7 @@ return {
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "184"}
 	},
+	]]
 	dynhub_strike = {
 		name = "Strike Support",
 		notStarter = true,

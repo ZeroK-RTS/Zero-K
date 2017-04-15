@@ -273,7 +273,7 @@ function script.Shot(num)
 	end
 end
 	
-function script.Shot(num)
+function script.FireWeapon(num)
 	local weaponNum = dyncomm.GetWeapon(num)
 	if weaponNum == 1 then
 		dyncomm.EmitWeaponFireSfx(flareL, num)
