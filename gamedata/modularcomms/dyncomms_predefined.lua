@@ -50,6 +50,20 @@ return {
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "166"}
 	},
+	dyntrainer_knight = {
+		name = "Knight Trainer",
+		--notStarter = true,
+		chassis = "knight",
+		modules = {
+			{"commweapon_lparticlebeam", "module_radarnet"},
+			{"module_ablative_armor", "module_autorepair"},
+			{"commweapon_lightninggun", "module_personal_cloak", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		--decorations = {"banner_overhead"},
+		--images = {overhead = "184"}
+	},
 	dynhub_strike = {
 		name = "Strike Support",
 		notStarter = true,

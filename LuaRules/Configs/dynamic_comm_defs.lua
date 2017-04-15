@@ -1401,8 +1401,142 @@ local chassisDefs = {
 				},
 			},
 		}
-	}
+	},
+	{
+		name = "knight",
+		humanName = "Knight",
+		baseUnitDef = UnitDefNames and UnitDefNames["dynknight0"].id,
+		extraLevelCostFunction = extraLevelCostFunction,
+		maxNormalLevel = 5,
+		secondPeashooter = true,
+		levelDefs = {
+			[0] = {
+				morphBuildPower = 10,
+				morphBaseCost = 0,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight0"].id
+				end,
+				upgradeSlots = {},
+			},
+			[1] = {
+				morphBuildPower = 10,
+				morphBaseCost = morphCosts[1],
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight1_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotAllows = "basic_weapon",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[2] = {
+				morphBuildPower = 15,
+				morphBaseCost = morphCosts[2] * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12.5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight2_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[3] = {
+				morphBuildPower = 20,
+				morphBaseCost = morphCosts[3] * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.commweapon_beamlaser,
+						slotAllows = {"adv_weapon", "basic_weapon"},
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[4] = {
+				morphBuildPower = 25,
+				morphBaseCost = morphCosts[4] * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 27.5
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight4_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+			[5] = {
+				morphBuildPower = 30,
+				morphBaseCost = morphCosts[5] * COST_MULT,
+				chassisApplicationFunction = function (modules, sharedData)
+					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 35
+				end,
+				morphUnitDefFunction = function(modulesByDefID)
+					return UnitDefNames["dynknight5_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+				end,
+				upgradeSlots = {
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+					{
+						defaultModule = moduleDefNames.nullmodule,
+						slotAllows = "module",
+					},
+				},
+			},
+		}
+	},
 }
+
 
 local chassisDefByBaseDef = {}
 if UnitDefNames then

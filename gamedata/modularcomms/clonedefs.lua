@@ -366,6 +366,35 @@ local copy = {
 			wreckmodel = "benzcom5_wreck.s3o",
 		},
 	},
+	dynknight1 = {
+		dynknight0 = {
+			level = 0,
+		},
+		dynknight2 = {
+			level = 2,
+			mainstats = {maxdamage = 3800, objectname = "cremcom2.s3o", collisionvolumescales  = [[50 55 50]],},
+			customparams = {modelradius = [[28]],},
+			wreckmodel = "cremcom2_dead.s3o",
+		},
+		dynknight3 = {
+			level = 3,
+			mainstats = {maxdamage = 4600, objectname = "cremcom3.s3o", collisionvolumescales  = [[55 60 55]],},
+			customparams = {modelradius = [[30]],},
+			wreckmodel = "cremcom3_dead.s3o",
+		},
+		dynknight4 = {
+			level = 4,
+			mainstats = {maxdamage = 5500, objectname = "cremcom4.s3o", collisionvolumescales  = [[60 65 60]],},
+			customparams = {modelradius = [[33]],},
+			wreckmodel = "cremcom4_dead.s3o",
+		},
+		dynknight5 = {
+			level = 5,
+			mainstats = {maxdamage = 6400, objectname = "cremcom5.s3o", collisionvolumescales  = [[65 70 65]],},
+			customparams = {modelradius = [[35]],},
+			wreckmodel = "cremcom5_dead.s3o",
+		},		
+	},
 }
 
 for sourceName, copyTable in pairs(copy) do

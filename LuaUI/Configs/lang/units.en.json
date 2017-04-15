@@ -1316,5 +1316,10 @@
 		"name" : "Buoy",
 		"description" : "Heavy Amphibious Skirmisher Bot",
 		"helptext" : "The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating."
+	},
+	"dynknight1" : {
+		"name" : "Knight Commander",
+		"description" : "Mobile Assault Commander",
+		"helptext" : "The Knight Commander is a well-balanced command platform that can mount most modules, with decent speed, armor, and regeneration."
 	}
 }
