@@ -96,7 +96,6 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
-	  paralyzer               = true, -- to deal no damage to wrecks
       range                   = 940,
       reloadtime              = 6,
       smokeTrail              = false,

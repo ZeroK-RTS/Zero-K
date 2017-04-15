@@ -104,7 +104,6 @@ unitDef = {
       largeBeamLaser          = true,
       laserFlareSize          = 5,
       minIntensity            = 1,
-	  paralyzer               = true, -- to deal no damage to wrecks
       range                   = 730,
       reloadtime              = 1,
       rgbColor                = [[1 1 1]],
