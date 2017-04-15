@@ -158,6 +158,7 @@ local function UnitWithinBounds(unitID)
 end
 
 local function KillTeamsAndGameOver(winningAllyTeamID)
+	gameover = true
 	for _, teamID in pairs(spGetTeamList()) do
 		_, _, isDead, _, _, allyTeamID = spGetTeamInfo(teamID)
 		if allyTeamID ~= winningAllyTeamID and not isDead then
@@ -544,7 +545,6 @@ function gadget:GameFrame(n)
 end
 
 function gadget:GameOver()
-	gameover = true
 	if noElo then
 		Spring.SendCommands("wbynum 255 SPRINGIE:noElo")
 	end
