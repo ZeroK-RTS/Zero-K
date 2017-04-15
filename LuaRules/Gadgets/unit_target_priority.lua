@@ -30,7 +30,7 @@ local spGetAllUnits = Spring.GetAllUnits
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetUnitSeparation = Spring.GetUnitSeparation
 
-local targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult = 
+local targetTable, stunWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult = 
 	include("LuaRules/Configs/target_priority_defs.lua")
 
 -- Low return number = more worthwhile target
@@ -52,6 +52,7 @@ local remTransportiee = {}
 -- Priority to add based on disabled state.
 local remStunned = {}
 local remBuildProgress = {}
+local remStunAttackers = {}
 
 -- Whether the enemy unit is visible.
 local remVisible = {}
@@ -63,6 +64,10 @@ local remScaledMass = {}
 local remAllyTeam = {}
 local remUnitDefID = {}
 local remStatic = {}
+
+ -- If there are more than STUN_ATTACKERS_IDLE_REQUIREMENT fire-at-will Racketeers or Cutters 
+ -- set targeted on a unit then the extra ones will attack other targets.
+local STUN_ATTACKERS_IDLE_REQUIREMENT = 3
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -254,7 +259,17 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	if GG.GetUnitTarget(unitID) == targetID then
-		return true, 0 -- Maximum priority
+		if stunWeaponDefs[attackerWeaponDefID] then
+			if (remStunAttackers[targetID] or 0) < STUN_ATTACKERS_IDLE_REQUIREMENT then
+				local stunned, buildProgress = GetUnitStunnedOrInBuild(targetID)
+				if stunned ~= 0 then
+					remStunAttackers[targetID] = (remStunAttackers[targetID] or 0) + 1
+				end
+				return true, 0 -- Maximum priority
+			end
+		else
+			return true, 0 -- Maximum priority
+		end
 	end
 	
 	local lastShotBonus = 0
@@ -340,6 +355,7 @@ function gadget:GameFrame(f)
 		remVisible = {}
 		remScaledMass = {}
 		remStunned = {}
+		remStunAttackers = {}
 		remBuildProgress = {}
 	end
 end

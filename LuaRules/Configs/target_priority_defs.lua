@@ -181,6 +181,13 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["armbrtha_plasma"].id]           = {2.0},
 }
 
+local stunWeaponDefs = {
+	[WeaponDefNames["shieldarty_emp_rocket"].id] = true,
+	[WeaponDefNames["shipscout_missile"].id] = true,
+	--[WeaponDefNames["armartic_arm_det_weapon"].id] = true,
+	--[WeaponDefNames["arm_venom_spider"].id] = true,
+}
+
 local captureWeaponDefs = {
 	[WeaponDefNames["capturecar_captureray"].id] = true
 }
@@ -298,4 +305,4 @@ for weaponDefID, data in pairs(velocityPenaltyDefs) do
 	data[2] = data[2] - data[1]*data[3]
 end
 
-return targetTable, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult
+return targetTable, stunWeaponDefs, captureWeaponDefs, gravityWeaponDefs, proximityWeaponDefs, velocityPenaltyDefs, radarWobblePenalty, transportMult
