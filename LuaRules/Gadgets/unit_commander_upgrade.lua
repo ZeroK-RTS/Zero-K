@@ -382,7 +382,7 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID,
 	end
 	
 	local chassisData = chassisDefs[chassisDefID]
-	if chassisData.notSelectable then
+	if chassisData.notSelectable and not staticLevel then
 		Spring.Echo("Chassis not selectable", commProfileInfo.chassis)
 		return false
 	end

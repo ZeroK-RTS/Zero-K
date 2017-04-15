@@ -175,7 +175,7 @@ end
 
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
 	
-	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, unitDefID) then
+	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef) then
 		return
 	end
 	
