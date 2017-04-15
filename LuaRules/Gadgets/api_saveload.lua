@@ -252,11 +252,11 @@ local function LoadUnits()
 			-- states
 			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate or 2}, {})
 			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate or 1}, {})
-			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"] or 0)}, {})
-			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak or 0)}, {})
-			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active) or 1}, {})
-			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory) or 0}, {})
-			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel) or 1}, {})
+			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
+			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
+			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
+			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
+			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 			
 			
 			-- is neutral
@@ -331,6 +331,14 @@ local function LoadUnits()
 				Spring.SetUnitCOBValue(data.newID, COB.INBUILDSTANCE, 1)
 				Spring.SetUnitCOBValue(data.newID, COB.BUGGER_OFF, 1)
 			end
+		end
+	end
+	
+	-- WAIT WAIT everything
+	for oldID, data in pairs(savedata.unit) do
+		if data.newID then
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
 		end
 	end
 	

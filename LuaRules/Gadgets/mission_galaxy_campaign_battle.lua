@@ -234,6 +234,9 @@ local function InitializeUnlocks()
 end
 
 local function DoInitialUnitPlacement()
+	if Spring.GetGameRulesParam("loadedGame") then
+		return
+	end
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
