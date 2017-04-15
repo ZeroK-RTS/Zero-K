@@ -47,6 +47,7 @@ end
 
 local canHandleUnit = {}
 local units = {}
+local lastShot = {} -- List of the last targets, to stop target switching
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
@@ -121,6 +122,10 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 		return (gameFrame <= lastFrame and incomingDamage[targetID].doomed)
 	end
 	return false
+end
+
+function GG.OverkillPrevention_GetLastShot(unitID)
+	return lastShot[unitID]
 end
 
 function GG.OverkillPrevention_IsDisarmExpected(targetID)
@@ -224,6 +229,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	else --new targe
 		if not addToIncomingDamage then
+			lastShot[unitID] = targetID
 			return false
 		end
 		incomingDamage[targetID] = {frames = pmap()}
@@ -275,6 +281,7 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	end
 	
+	lastShot[unitID] = targetID
 	return false
 end
 

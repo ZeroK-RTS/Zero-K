@@ -253,6 +253,15 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		return true, 25
 	end
 	
+	if GG.GetUnitTarget(unitID) == targetID then
+		return true, 0 -- Maximum priority
+	end
+	
+	local lastShotBonus = 0
+	if GG.OverkillPrevention_GetLastShot(unitID) == targetID then
+		lastShotBonus = -0.3
+	end
+	
 	local enemyUnitDef = remUnitDefID[targetID]
 	
 	--// Get Velocity target penalty
@@ -277,10 +286,10 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 		end
 		
 		if visiblity == 0 then
-			return true, 25 + wobbleAdd + velocityAdd
+			return true, 25 + wobbleAdd + velocityAdd + lastShotBonus
 		elseif visiblity == 1 then
 			-- If the unit type is accessible then it can be included in the priority calculation.
-			return true, (targetTable[enemyUnitDef][attackerWeaponDefID] or 5) + wobbleAdd + velocityAdd + 1.5
+			return true, (targetTable[enemyUnitDef][attackerWeaponDefID] or 5) + wobbleAdd + velocityAdd + 1.5 + lastShotBonus
 		end
 	end
 	
@@ -319,7 +328,7 @@ function gadget:AllowWeaponTarget(unitID, targetID, attackerWeaponNum, attackerW
 	end
 	
 	--Spring.Utilities.UnitEcho(targetID, defPrio .. "  " .. velocityAdd)
-	return true, defPrio + velocityAdd -- bigger value have lower priority
+	return true, defPrio + velocityAdd + lastShotBonus -- bigger value have lower priority
 end
 
 function gadget:GameFrame(f)

@@ -36,9 +36,9 @@ local getMovetype = Spring.Utilities.getMovetype
 local CMD_WAIT = CMD.WAIT
 
 -- Constans
-local TARGET_NONE = 0
+local TARGET_NONE   = 0
 local TARGET_GROUND = 1
-local TARGET_UNIT= 2
+local TARGET_UNIT   = 2
 --------------------------------------------------------------------------------
 -- Config
 
