@@ -847,6 +847,12 @@ local function GetStrikeCloneModulesString(modulesByDefID)
 		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0)
 end
 
+local function GetKnightCloneModulesString(modulesByDefID)
+	return (modulesByDefID[moduleDefNames.commweapon_personal_shield] or 0) ..
+		(modulesByDefID[moduleDefNames.commweapon_areashield] or 0) ..
+		(modulesByDefID[moduleDefNames.module_resurrect] or 0)
+end
+
 local morphCosts = {
 	25,
 	100,
@@ -1428,7 +1434,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight1_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+					return UnitDefNames["dynknight1_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1448,7 +1454,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 12.5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight2_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+					return UnitDefNames["dynknight2_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1468,7 +1474,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 20
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight3_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+					return UnitDefNames["dynknight3_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1492,7 +1498,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 27.5
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight4_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+					return UnitDefNames["dynknight4_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
@@ -1516,7 +1522,7 @@ local chassisDefs = {
 					sharedData.autorepairRate = (sharedData.autorepairRate or 0) + 35
 				end,
 				morphUnitDefFunction = function(modulesByDefID)
-					return UnitDefNames["dynknight5_" .. GetStrikeCloneModulesString(modulesByDefID)].id
+					return UnitDefNames["dynknight5_" .. GetKnightCloneModulesString(modulesByDefID)].id
 				end,
 				upgradeSlots = {
 					{
