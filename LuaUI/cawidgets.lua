@@ -2293,32 +2293,48 @@ end
 -- local helper (not a real call-in)
 local oldSelection = {}
 function widgetHandler:UpdateSelection()
-  local changed
-  local newSelection = Spring.GetSelectedUnits()
-  if (#newSelection == #oldSelection) then
-    for i=1, #newSelection do
-      if (newSelection[i] ~= oldSelection[i]) then -- it seems the order stays
-        changed = true
-        break
-      end                                          
-    end
-  else
-    changed = true
-  end
-  if (changed) then
-    if widgetHandler:SelectionChanged(newSelection) then
-       -- selection changed, don't set old selection to new selection as it is soon to change.
-      return true
-    end
-  end
-  oldSelection = newSelection
-  return false
+	local changed
+	local newSelection = Spring.GetSelectedUnits()
+	if (#newSelection == #oldSelection) then
+		for i = 1, #oldSelection do
+			if (newSelection[i] ~= oldSelection[i]) then -- it seems the order stays
+				changed = true
+				break
+			end                                          
+		end
+	else
+		changed = true
+	end
+	if (changed) then
+		local subselection = true
+		if #newSelection > #oldSelection then
+			subselection = false
+		else
+			local newSeen = 0
+			local oldSelectionMap = {}
+			for i = 1, #oldSelection do
+				oldSelectionMap[oldSelection[i]] = true
+			end
+			for i = 1, #newSelection do
+				if not oldSelectionMap[newSelection[i]] then
+					subselection = false
+					break
+				end
+			end
+		end
+		if widgetHandler:SelectionChanged(newSelection, subselection) then
+			-- selection changed, don't set old selection to new selection as it is soon to change.
+			return true
+		end
+	end
+	oldSelection = newSelection
+	return false
 end
 
 
-function widgetHandler:SelectionChanged(selectedUnits)
+function widgetHandler:SelectionChanged(selectedUnits, subselection)
   for _,w in ipairs(self.SelectionChangedList) do
-    local unitArray = w:SelectionChanged(selectedUnits)
+    local unitArray = w:SelectionChanged(selectedUnits, subselection)
     if (unitArray) then
       Spring.SelectUnitArray(unitArray)
       return true

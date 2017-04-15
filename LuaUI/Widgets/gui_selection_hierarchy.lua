@@ -89,9 +89,12 @@ options = {
 --------------------------------------------------------------------------------
 -- Selection handling
 
-function widget:SelectionChanged(units)
+function widget:SelectionChanged(units, subselection)
 	if not useSelectionFiltering then
 		return
+	end
+	if subselection then
+		return -- Don't filter when the change is just that something was deselected
 	end
 	if not units then
 		return

@@ -86,10 +86,6 @@ local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
 local myTeamID
 local cooldown = {}
-local previousSelection
-
-local unitInSelection = {}
-local doNotPlayNextSelection = false
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
@@ -122,17 +118,12 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	end
 end
 
-function widget:SelectionChanged(selection)
-	if doNotPlayNextSelection then
-		doNotPlayNextSelection = false
+function widget:SelectionChanged(selection, subselection)
+	if subselection then
 		return
 	end
 	if (not selection[1]) then
 		return
-	end
-	unitInSelection = {}
-	for i = 1, #selection do
-		unitInSelection[selection[i]] = true
 	end
 	local unitDefID = GetUnitDefID(selection[1])
 	if (unitDefID) then --only make sound when selecting own units
@@ -198,12 +189,6 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 				CoolNoisePlay(sounds.underattack[1], 40, (sounds.underattack.volume or 1)*options.attacknoisevolume.value)
 			end
 		end
-	end
-end
-
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if unitInSelection[unitID] then
-		doNotPlayNextSelection = true
 	end
 end
 
