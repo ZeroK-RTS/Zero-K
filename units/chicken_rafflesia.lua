@@ -11,7 +11,6 @@ unitDef = {
   buildPic                      = [[chicken_rafflesia.png]],
   buildTime                     = 480,
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK]],
 
   customParams                  = {

@@ -13,7 +13,6 @@ unitDef = {
   buildingGroundDecalType       = [[cordoom_aoplane.dds]],
   buildPic                      = [[CORDOOM.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 100 45]],

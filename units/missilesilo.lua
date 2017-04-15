@@ -20,7 +20,6 @@ unitDef = {
   canFight                      = false,
   canMove                       = false,
   canPatrol                     = false,
-  canstop                       = true,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 

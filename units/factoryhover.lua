@@ -22,7 +22,6 @@ unitDef = {
   canAttack        = true,
   canMove          = true,
   canPatrol        = true,
-  canstop          = [[1]],
   category         = [[UNARMED FLOAT]],
   corpse           = [[DEAD]],
 

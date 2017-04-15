@@ -10,7 +10,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 0 7]],
   collisionVolumeScales  = [[35 50 35]],

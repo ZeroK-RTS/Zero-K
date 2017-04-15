@@ -15,7 +15,6 @@ unitDef = {
   buildPic                      = [[chickenspire.png]],
   buildTime                     = 2500,
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 48 0]],
   collisionVolumeScales         = [[58 176 58]],

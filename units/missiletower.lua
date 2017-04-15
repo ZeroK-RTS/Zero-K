@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalType       = [[missiletower_aoplane.dds]],
   buildPic                      = [[missiletower.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[42 53 42]],

@@ -32,7 +32,6 @@ unitDef = {
   CanBeAssisted                 = 0,
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
 
   customParams                  = {

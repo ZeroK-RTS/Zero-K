@@ -23,7 +23,6 @@ unitDef = {
   canAttack              = true,
   canMove                = true,
   canPatrol              = true,
-  canStop                = true,
   category               = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[-22 5 0]],
   collisionVolumeScales  = [[48 48 184]],

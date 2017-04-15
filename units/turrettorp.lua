@@ -10,7 +10,6 @@ unitDef = {
   builder           = false,
   buildPic          = [[CORTL.png]],
   canAttack         = true,
-  canstop           = [[1]],
   category          = [[FLOAT]],
   collisionVolumeOffsets        = [[0 -5 0]],
   collisionVolumeScales         = [[42 50 42]],

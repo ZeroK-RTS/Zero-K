@@ -11,7 +11,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canStop                = true,
   category               = [[SINK]],
   corpse                 = [[DEAD]],
 

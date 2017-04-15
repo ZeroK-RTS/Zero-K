@@ -12,7 +12,6 @@ unitDef = {
   buildPic                      = [[ARMPB.png]],
   canAttack                     = true,
   canMove                       = false,
-  canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 20 0]],
   collisionVolumeScales         = [[28 40 28]],

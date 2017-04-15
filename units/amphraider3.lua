@@ -11,7 +11,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = true,
   category               = [[LAND SINK]],
   corpse                 = [[DEAD]],
 

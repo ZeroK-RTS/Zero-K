@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalType       = [[corrazor_aoplane.dds]],
   buildPic                      = [[corrazor.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT UNARMED STUPIDTARGET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 36 50]],

@@ -12,7 +12,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = true,
   category               = [[SUB SINK]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 22 89]],

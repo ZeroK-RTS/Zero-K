@@ -11,7 +11,6 @@ unitDef = {
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
-  canstop               = [[1]],
   category              = [[LAND]],
   cloakCost             = 4,
   cloakCostMoving       = 12,

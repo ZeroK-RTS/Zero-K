@@ -8,7 +8,6 @@ unitDef = {
   buildPic               = [[armtick.png]],
   canAttack              = true,
   canMove                = true,
-  canStop                = true,
   category               = [[LAND TOOFAST]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],

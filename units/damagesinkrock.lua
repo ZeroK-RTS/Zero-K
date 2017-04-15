@@ -8,7 +8,6 @@ unitDef = {
   builder                 = false,
   buildingGroundDecalType = [[zenith_aoplane.dds]],
   buildPic                = [[zenith.png]],
-  canstop                 = [[1]],
   category                = [[SINK GUNSHIP]],
   energyUse               = 0,
   footprintX              = 2,

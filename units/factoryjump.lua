@@ -27,7 +27,6 @@ unitDef = {
   buildPic                      = [[factoryjump.png]],
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[104 70 40]],

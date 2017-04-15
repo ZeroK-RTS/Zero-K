@@ -14,7 +14,6 @@ unitDef = {
   canLand             = true,
   canMove             = true,
   canPatrol           = true,
-  canstop             = true,
   canSubmerge         = false,
   category            = [[FIXEDWING]],
   collide             = false,

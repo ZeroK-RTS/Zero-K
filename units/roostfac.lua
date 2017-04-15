@@ -29,7 +29,6 @@ unitDef = {
   buildTime                     = 200,
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
 
   customParams                  = {

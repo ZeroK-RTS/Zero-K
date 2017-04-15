@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalType       = [[zenith_aoplane.dds]],
   buildPic                      = [[zenith.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[90 194 90]],

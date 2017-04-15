@@ -24,7 +24,6 @@ unitDef = {
   canAttack        = true,
   canMove          = true,
   canPatrol        = true,
-  canstop          = true,
   category         = [[UNARMED SINK]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[104 70 36]],

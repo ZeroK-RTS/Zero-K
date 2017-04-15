@@ -14,7 +14,6 @@ unitDef = {
   canGuard                      = false,
   canMove                       = false,
   canPatrol                     = false,
-  canstop                       = [[0]],
   category                      = [[SINK]],
   customparams                  = {
     completely_hidden = 1,

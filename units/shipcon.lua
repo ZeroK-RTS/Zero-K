@@ -16,7 +16,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   category               = [[SHIP UNARMED]],
   collisionVolumeOffsets = [[0 8 0]],
   collisionVolumeScales  = [[25 25 96]],

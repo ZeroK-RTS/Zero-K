@@ -26,7 +26,6 @@ unitDef = {
   buildPic                      = [[factoryplane.png]],
   canMove                       = true,
   canPatrol                     = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT UNARMED]],
   corpse                        = [[DEAD]],
 

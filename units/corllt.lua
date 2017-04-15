@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalType       = [[corllt_aoplane.dds]],
   buildPic                      = [[CORLLT.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 90 30]],

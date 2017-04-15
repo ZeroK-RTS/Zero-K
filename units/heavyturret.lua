@@ -12,7 +12,6 @@ unitDef = {
   buildPic                      = [[heavyturret.png]],
   canAttack                     = true,
   canGuard                      = true,
-  canstop                       = [[1]],
   category                      = [[FLOAT]],
   corpse                        = [[DEAD]],
 

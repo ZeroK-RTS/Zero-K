@@ -12,7 +12,6 @@ unitDef = {
   canGuard               = false,
   canMove                = false,
   canPatrol              = false,
-  canstop                = [[0]],
   category               = [[FLOAT MINE STUPIDTARGET]],
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 -4 0]],

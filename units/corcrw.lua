@@ -15,7 +15,6 @@ unitDef = {
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
-  canstop                = [[1]],
   canSubmerge            = false,
   category               = [[GUNSHIP]],
   collide                = true,

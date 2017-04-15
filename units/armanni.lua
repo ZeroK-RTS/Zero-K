@@ -11,7 +11,6 @@ unitDef = {
   buildingGroundDecalType       = [[armanni_aoplane.dds]],
   buildPic                      = [[ARMANNI.png]],
   canAttack                     = true,
-  canstop                       = [[1]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   --collisionVolumeScales         = [[75 100 75]],
