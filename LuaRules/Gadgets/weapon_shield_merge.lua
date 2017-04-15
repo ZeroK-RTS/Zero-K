@@ -38,6 +38,8 @@ local modOptions = Spring.GetModOptions()
 local MERGE_ENABLED = (modOptions.shield_merge == "share")
 local PARTIAL_PENETRATE = (modOptions.shield_merge == "penetrate")
 
+local SHIELD_ARMOR = Game.armorTypes.shield
+
 local allyTeamShields = {}
 local gameFrame = 0
 
@@ -330,7 +332,7 @@ function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shie
 	local wd = WeaponDefs[weaponDefID]
 	local damage = shieldDamages[weaponDefID]
 	
-	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[0], hackyProID or proID)
+	local projectilePasses = DrainShieldAndCheckProjectilePenetrate(shieldCarrierUnitID, damage, wd.damages[SHIELD_ARMOR], hackyProID or proID)
 	
 	if hackyProID then
 		repeatedHits[shieldCarrierUnitID][hackyProID] = projectilePasses

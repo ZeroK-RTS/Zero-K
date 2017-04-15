@@ -89,6 +89,7 @@ local GAUSS_DAMAGE_MOD = 1.5
 for name, wd in pairs(DEFS.weaponDefs) do
 	if wd.weapontype == "Shield" then
 		wd.armortype = "SHIELD"
+		wd.shieldarmortype = "SHIELD"
 	end
 end
 
@@ -149,7 +150,7 @@ for name, wd in pairs(DEFS.weaponDefs) do
 	if wd.beamtime and wd.beamtime >= 0.1 then
 		-- Settings damage default to 0 removes cratering and impulse so is not universally applied.
 		-- It fixes long beams vs shield cases.
-		wd.damage.shield = 0.001
+		wd.damage.shield = 0
 	end
 	
 	-- damage vs features
