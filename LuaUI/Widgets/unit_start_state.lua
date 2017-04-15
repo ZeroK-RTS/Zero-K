@@ -39,7 +39,7 @@ options_order = {
 	'enableTacticalAI', 'disableTacticalAI',
 	'enableAutoAssist', 'disableAutoAssist', 
 	'enableAutoCallTransport', 'disableAutoCallTransport',
-	'setRanksToDefault', 'setRanksToThree',
+	'setRanksToDefault', 'setRanksToThree', 'setFactoryToThree',
 	'categorieslabel', 
 	'commander_label', 
 	'commander_firestate0', 
@@ -309,6 +309,26 @@ options = {
 				local find = string.find(opt, "_selection_rank")
 				if find then
 					options[opt].value = 3
+				end
+			end
+		end,
+		noHotkey = true,
+	},
+	setFactoryToThree = {
+		type = 'button',
+		name = "Set High Factory Selection Rank",
+		desc = "Sets factory selectionrank to three.",
+		path = "Game/New Unit States/Presets",
+		OnChange = function ()
+			for i = 1, #options_order do
+				local opt = options_order[i]
+				local find = string.find(opt, "_selection_rank")
+				if find then
+					local name = find and string.sub(opt, 0, find - 1)
+					local ud = name and UnitDefNames[name]
+					if ud and ud.isFactory then
+						options[opt].value = 3
+					end
 				end
 			end
 		end,
