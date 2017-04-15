@@ -213,7 +213,6 @@ local corclogDefID = UnitDefNames["corclog"].id
 --local novheavymineDefID = UnitDefNames["novheavymine"].id
 
 local exceptionArray = {
-	[UnitDefNames["armcarry"].id] = true,
 	[UnitDefNames["shipcarrier"].id] = true,
 }
 

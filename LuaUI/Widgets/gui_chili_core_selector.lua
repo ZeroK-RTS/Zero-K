@@ -111,7 +111,6 @@ local CONSTRUCTOR_BUTTON_ID = "cons"
 
 local exceptionList = {
 	armasp = true,
-	armcarry = true,
 	reef = true,
 }
 

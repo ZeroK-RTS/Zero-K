@@ -415,11 +415,6 @@
         "description": "Buduje harde boty, moc 10 m/s",
         "helptext": "Boty tu produkowane z reguły wyposażone są w tarcze, co daje im wysoką wytrzymałość. Łączenie tarcz powoduje, że dobrze działają w grupach. Dobra fabryka dla nowicjuszy."
     },
-    "armraz": {
-        "name": "Razorback",
-        "description": "Szturmowy mech bojowy",
-        "helptext": "Razorback posiada dwa działka maszynowe, które pozwalają mu walczyć z hordami mniejszych jednostek, oraz mocny laser krótkiego zasięgu. Mimo że jego siła jest duża, w jej użytku może przeszkadzać jego krótki zasięg."
-    },
     "chickena": {
         "name": "Cockatrice",
         "description": "Szturmowy kurczak",
@@ -439,11 +434,6 @@
         "name": "Skuttle",
         "description": "Skacząca niewidzialna bomba",
         "helptext": "Mimo że jest powolna, droga i ma niski obszar rażenia, ta niesamowicie niszczycielska bomba wyposażona w niewidzialność i możliwość skakania jest postrachem wszystkich ciężkich jednostek. Dobrą obronę przed nią stanowią lekkie jednostki przeczesujące okolicę."
-    },
-    "armcarry": {
-        "name": "Reef",
-        "description": "Lotniskowiec",
-        "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety kinetyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
     "slowmort": {
         "name": "Moderator",

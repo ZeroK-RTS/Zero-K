@@ -399,11 +399,6 @@
 		"description" : "Produces Tough Robots, Builds at 10 m/s",
 		"helptext" : "The Shield Bot Factory is tough yet flexible. Its units are built to take the pain and dish it back out, without compromising mobility. Clever use of unit combos is well rewarded. Key units: Bandit, Thug, Outlaw, Rogue, Racketeer"
 	},
-	"armraz" : {
-		"name" : "Razorback",
-		"description" : "Assault/Riot Strider",
-		"helptext" : "The Razorback features twin multi-barelled pulse cannons for extreme crowd control, as well as a head-mounted short-range laser for close in work. Don't use recklessly - its short range can be a real liability."
-	},
 	"chickena" : {
 		"name" : "Cockatrice",
 		"description" : "Assault/Anti-Armor",
@@ -423,11 +418,6 @@
 		"name" : "Skuttle",
 		"description" : "Cloaked Jumping Anti-Heavy Bomb",
 		"helptext" : "This slow-moving, expensive cloaked unit can jump on to enemy units and blast even a heavy tank straight to hell. Counter with swarms of cheap screening units. Be careful of its very small explosion radius when using it."
-	},
-	"armcarry" : {
-		"name" : "Reef",
-		"description" : "Aircraft Carrier (Bombardment)",
-		"helptext" : "The most versatile ship on the high seas, the carrier serves several functions. It is equipped with cruise missiles for long range bombardment and serves as a mobile repair base for friendly aircraft. Perhaps most notably, the carrier provides its own complement of surface attack drones to engage targets."
 	},
 	"slowmort" : {
 		"name" : "Moderator",
