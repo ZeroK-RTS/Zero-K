@@ -31,6 +31,13 @@ local CMD_INSERT = CMD.INSERT
 
 local unlockedUnitsByTeam = {}
 local unitLineage = {}
+local vitalUnits = {}
+local teamCommParameters = {}
+local victoryAtLocation
+local defeatConditionConfig
+local firstGameFrame = true
+local checkForLoseAfterSeconds = false
+local allyTeamList = Spring.GetAllyTeamList()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -53,6 +60,10 @@ local function CustomKeyToUsefulTable(dataRaw)
 		if dataFunc then 
 			local success, usefulTable = pcall(dataFunc)
 			if success then
+				if collectgarbage then
+					Spring.Echo("collectgarbage")
+					collectgarbage("collect")
+				end
 				return usefulTable
 			end
 		end
@@ -60,7 +71,108 @@ local function CustomKeyToUsefulTable(dataRaw)
 			Spring.Echo("Customkey error", err)
 		end
 	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Victory and Defeat functions
+
+local function IsVitalUnitType(unitID, unitDefID)
+	-- Commanders are handled seperately
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	if not allyTeamID then
+		Spring.Echo("IsVitalUnitType missing allyTeamID")
+		return
+	end
+	local defeatConfig = defeatConditionConfig[allyTeamID]
+	return defeatConfig.vitalUnitTypes and defeatConfig.vitalUnitTypes[unitDefID]
+end
+
+local function InitializeVictoryConditions()
+	defeatConditionConfig = CustomKeyToUsefulTable(Spring.GetModOptions().defeatconditionconfig) or {}
+	for i = 1, #allyTeamList do
+		local allyTeamID = allyTeamList[i]
+		local defeatConfig = defeatConditionConfig[allyTeamID] or {}
+		if defeatConfig.vitalUnitTypes then
+			local unitsByDefID = {}
+			for i = 1, #defeatConfig.vitalUnitTypes do
+				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[i]]
+				if ud then
+					unitsByDefID[#unitsByDefID + 1] = ud.id
+				end
+			end
+			defeatConfig.vitalUnitTypes = unitsByDefID
+		end
+		if defeatConfig.loseAfterSeconds then
+			checkForLoseAfterSeconds = true
+		end
+		defeatConditionConfig[allyTeamID] = defeatConfig
+	end
+	
+	Spring.Utilities.TableEcho(defeatConditionConfig, "defeatConditionConfig")
+end
+
+local function AddDefeatIfUnitDestroyed(unitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local defeatConfig = defeatConditionConfig[allyTeamID]
+	defeatConfig.defeatIfUnitDestroyed = defeatConfig.defeatIfUnitDestroyed or {}
+	defeatConfig.defeatIfUnitDestroyed[unitID] = true
+	
+	if allyTeamID == 0 then
+		Spring.Utilities.UnitEcho(unitID, "Protect")
+	else
+		Spring.Utilities.UnitEcho(unitID, "Kill")
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Victory at location units
+
+local function AddVictoryAtLocationUnit(unitID, location)
+	victoryAtLocation = victoryAtLocation or {}
+	victoryAtLocation[unitID] = {
+		x = location.x,
+		z = location.z,
+		radiusSq = location.radius*location.radius,
+		allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	}
+	
+	Spring.MarkerAddPoint(location.x, 0, location.z, "Walk Here")
+end
+
+local function DoVictoryAtLocationCheck(unitID, location)
+	if not Spring.ValidUnitID(unitID) then
+		return false
+	end
+	if Spring.GetUnitAllyTeam(unitID) ~= location.allyTeamID then
+		return false
+	end
+	local x, _, z = Spring.GetUnitPosition(unitID)
+	if (x - location.x)^2 + (z - location.z)^2 <= location.radiusSq then
+		return true
+	end
+	return false
+end
+
+local function VictoryAtLocationUpdate()
+	if not victoryAtLocation then
+		return
+	end
+	for unitID, data in pairs(victoryAtLocation) do
+		if DoVictoryAtLocationCheck(unitID, data) then
+			GG.CauseVictory(data.allyTeamID)
+			return
+		end
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Unit Placement
 
 local function PlaceUnit(unitData, teamID)
 	local name = unitData.name
@@ -94,6 +206,19 @@ local function PlaceUnit(unitData, teamID)
 	
 	local build = (unitData.buildProgress and unitData.buildProgress < 1) or false
 	local unitID = Spring.CreateUnit(ud.id, x, Spring.GetGroundHeight(x,z), z, facing, teamID, build)
+	
+	if not unitID then
+		Spring.MarkerAddPoint(x, 0, z, "Error creating unit " .. (((ud or {}).humanName) or "???"))
+		return 
+	end
+	
+	if unitData.defeatIfDestroyed then
+		AddDefeatIfUnitDestroyed(unitID)
+	end
+	if unitData.victoryAtLocation then
+		AddVictoryAtLocationUnit(unitID, unitData.victoryAtLocation)
+	end
+	
 	if build then
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
 		Spring.SetUnitHealth(unitID, {build = unitData.buildProgress, health = maxHealth*unitData.buildProgress})
@@ -126,9 +251,22 @@ local function PlaceRetinueUnit(retinueID, range, unitDefName, spawnX, spawnZ, f
 	Spring.SetUnitExperience(retinueUnitID, experience)
 end
 
+local function HandleCommanderCreation(unitID, teamID)
+	local commParameters = teamCommParameters[teamID]
+	if not commParameters then
+		return
+	end
+	if commParameters.defeatIfDestroyed then
+		AddDefeatIfUnitDestroyed(unitID)
+	end
+	if commParameters.victoryAtLocation then
+		AddVictoryAtLocationUnit(unitID, commParameters.victoryAtLocation)
+	end
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Implement the locks
+-- Unit Locking System
 
 local function RemoveUnit(unitID, lockDefID)
 	local cmdDescID = Spring.FindUnitCmdDesc(unitID, -lockDefID)
@@ -182,6 +320,11 @@ function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
 end
 
 function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	local ud = UnitDefs[unitDefID]
+	if ud.customParams.dynamic_comm then
+		HandleCommanderCreation(unitID, teamID)
+	end
+	
 	if builderID and unitLineage[builderID] then
 		unitLineage[unitID] = unitLineage[builderID]
 	else
@@ -224,12 +367,21 @@ local function PlaceTeamUnits(teamID, customKeys)
 	end
 end
 
+local function InitializeCommanderParameters(teamID, customKeys)
+	local commParameters = CustomKeyToUsefulTable(customKeys and customKeys.commanderparameters)
+	if not commParameters then
+		return
+	end
+	teamCommParameters[teamID] = commParameters
+end
+
 local function InitializeUnlocks()
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
 		SetTeamUnlocks(teamID, customKeys)
+		InitializeCommanderParameters(teamID, customKeys)
 	end
 end
 
@@ -245,6 +397,10 @@ local function DoInitialUnitPlacement()
 	end
 end
 
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Gadget Interface
+
 local Unlocks = {}
 local GalaxyCampaignHandler = {}
 
@@ -255,6 +411,14 @@ function Unlocks.GetIsUnitUnlocked(teamID, unitDefID)
 		end
 	end
 	return true
+end
+
+function GalaxyCampaignHandler.VitalUnit(unitID)
+	return vitalUnits[unitID]
+end
+
+function GalaxyCampaignHandler.GetDefeatConfig(allyTeamID)
+	return defeatConditionConfig[allyTeamID]
 end
 
 function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
@@ -269,8 +433,40 @@ function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
 	end
 end
 
+function GalaxyCampaignHandler.DeployRetinue(unitID, x, z, facing, teamID)
+	local customKeys = select(7, Spring.GetTeamInfo(teamID))
+	local retinueData = CustomKeyToUsefulTable(customKeys and customKeys.retinuestartunits)
+	if retinueData then
+		local range = 70 + #retinueData*20
+		for i = 1, #retinueData do
+			local unitData = retinueData[i]
+			PlaceRetinueUnit(unitData.retinueID, range, unitData.unitDefName, x, z, facing, teamID, unitData.experience)
+		end
+	end
+end
+
+function GalaxyCampaignHandler.HasFactoryPlop(teamID)
+	return teamCommParameters[teamID] and teamCommParameters[teamID].facplop
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- (Most) callins
+
+function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
+	if IsVitalUnitType(unitID, unitDefID) then
+		vitalUnits[unitID] = true
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
+	if vitalUnits[unitID] then
+		vitalUnits[unitID] = false
+	end
+end
 function gadget:Initialize()
 	InitializeUnlocks()
+	InitializeVictoryConditions()
 	
 	local allUnits = Spring.GetAllUnits()
 	for _, unitID in pairs(allUnits) do
@@ -284,7 +480,22 @@ function gadget:Initialize()
 	GG.GalaxyCampaignHandler = GalaxyCampaignHandler
 end
 
-function gadget:GameFrame() -- Would use GamePreload if it didn't cause Circuit to crash.
-	gadgetHandler:RemoveCallIn("GameFrame")
-	DoInitialUnitPlacement()
+function gadget:GameFrame(n)
+	if n%30 == 0 then
+		VictoryAtLocationUpdate()
+		if checkForLoseAfterSeconds then
+			for i = 1, #allyTeamList do
+				local lostAfterSeconds = defeatConditionConfig[allyTeamList[i]].loseAfterSeconds
+				if lostAfterSeconds and lostAfterSeconds <= n/30 then
+					GG.DestroyAlliance(allyTeamList[i])
+				end
+			end
+		end
+	end
+	
+	-- Would use GamePreload if it didn't cause Circuit to crash.
+	if firstGameFrame then
+		firstGameFrame = false
+		DoInitialUnitPlacement()
+	end
 end

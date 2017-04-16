@@ -67,8 +67,8 @@ local toDestroy = {}
 
 local modOptions = Spring.GetModOptions() or {}
 local commends = tobool(modOptions.commends)
-local vitalends = tobool(modOptions.vitalends)
 local noElo = tobool(modOptions.noelo)
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid and true
 
 local revealed = false
 local gameover = false
@@ -84,7 +84,7 @@ local doesNotCountList = {
 	[GetUnitDefIdByName("armflea")] = true,
 	[GetUnitDefIdByName("corroach")] = true,
 	[GetUnitDefIdByName("armtick")] = true,
-	[GetUnitDefIdByName("spherepole")] = true,
+	[GetUnitDefIdByName("blastwing")] = true,
 	[GetUnitDefIdByName("terraunit")] = true,
 }
 
@@ -275,6 +275,7 @@ local function CauseVictory(allyTeamID)
 	end
 	--spGameOver({lastAllyTeam})
 end
+GG.CauseVictory = CauseVictory
 
 local function AddAllianceUnit(unitID, unitDefID, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
@@ -286,9 +287,31 @@ local function AddAllianceUnit(unitID, unitDefID, teamID)
 		commsAlive[allianceID][unitID] = true
 	end
 	
-	if vitalends and GG.VitalUnit and GG.VitalUnit(unitID) then
+	if GG.GalaxyCampaignHandler and GG.GalaxyCampaignHandler.VitalUnit(unitID) then
 		vitalAlive[allianceID][unitID] = true
 	end
+end
+
+local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
+	local defeatConfig = GG.GalaxyCampaignHandler.GetDefeatConfig(allianceID)
+	if defeatConfig.ignoreUnitLossDefeat then
+		return false
+	end
+	if defeatConfig.defeatIfUnitDestroyed and defeatConfig.defeatIfUnitDestroyed[unitID] then
+		return true
+	end
+	if not (defeatConfig.vitalCommanders or defeatConfig.vitalUnitTypes) then
+		return (CountAllianceUnits(allianceID) <= 0) -- Default loss condition
+	end
+	Spring.Echo("HasNoComms(allianceID)", allianceID, HasNoComms(allianceID))
+	if defeatConfig.vitalCommanders and not HasNoComms(allianceID) then
+		return false
+	end
+	Spring.Echo("HasNoVitalUnits(allianceID)", allianceID, HasNoVitalUnits(allianceID))
+	if defeatConfig.vitalUnitTypes and not HasNoVitalUnits(allianceID) then
+		return false
+	end
+	return true
 end
 
 local function RemoveAllianceUnit(unitID, unitDefID, teamID)
@@ -304,12 +327,23 @@ local function RemoveAllianceUnit(unitID, unitDefID, teamID)
 		commsAlive[allianceID][unitID] = nil
 	end
 	
-	if vitalends and vitalAlive[allianceID]and vitalAlive[allianceID][unitID] then
+	if vitalAlive[allianceID] and vitalAlive[allianceID][unitID] then
 		vitalAlive[allianceID][unitID] = nil
 	end
 
-	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) or (vitalends and HasNoVitalUnits(allianceID)))
-	and (allianceID ~= chickenAllyTeamID) then
+	if allianceID == chickenAllyTeamID then
+		return
+	end
+	
+	if campaignBattleID then
+		if CheckMissionDefeatOnUnitLoss(unitID, allianceID) then
+			Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
+			DestroyAlliance(allianceID)
+		end
+		return
+	end
+	
+	if (CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID)
 	end
@@ -410,7 +444,7 @@ local function ProcessLastAlly()
 			return
 		end
 		-- run value comparison
-		local supreme = CompareArmyValues(activeAllies[1], activeAllies[2])
+		local supreme = (not campaignBattleID) and CompareArmyValues(activeAllies[1], activeAllies[2])
 		if supreme then
 			EchoUIMessage("AllyTeam " .. supreme .. " has an overwhelming numerical advantage!")
 			for i=1, #allylist do

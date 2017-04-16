@@ -26,6 +26,7 @@ local modOptions = Spring.GetModOptions()
 local DELAYED_AFK_SPAWN = false
 local COOP_MODE = false
 local playerChickens = Spring.Utilities.tobool(Spring.GetModOption("playerchickens", false, false))
+local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid
 
 local gaiateam = Spring.GetGaiaTeamID()
 local gaiaally = select(6, spGetTeamInfo(gaiateam))
@@ -411,7 +412,8 @@ local function SpawnStartUnit(teamID, playerID, isAI, bonusSpawn, notAtTheStartO
 		Spring.SetTeamResource(teamID, "energy", START_ENERGY + energy)
 		Spring.SetTeamResource(teamID, "metal", START_METAL + metal)
 
-		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") then
+		if (udef.customParams.level and udef.name ~= "chickenbroodqueen") and 
+			((not campaignBattleID) or GG.GalaxyCampaignHandler.HasFactoryPlop(teamID)) then
 			Spring.SetUnitRulesParam(unitID, "facplop", 1, {inlos = true})
 		end
 		
