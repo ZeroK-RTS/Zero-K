@@ -768,8 +768,10 @@ for i = 1, #buildOpts do
 	end
 end
 
-local function AmITeamLeader (teamID)
-	return teamID == Spring.GetMyTeamID() and Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo (teamID))
+local function AmITeamLeader(teamID)
+	local myTeam = (teamID == Spring.GetMyTeamID())
+	local amLeader = myTeam and (Spring.GetMyPlayerID() == select (2, Spring.GetTeamInfo(teamID)))
+	return myTeam, amLeader
 end
 
 local function SetControlGroup(unitID, factID)
@@ -791,8 +793,30 @@ local function SetControlGroup(unitID, factID)
 	end
 end
 
+local function ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
+	local ud = UnitDefs[unitDefID]
+	local name = ud.name
+	if options[name .. "_selection_rank"] and WG.SetSelectionRank then
+		WG.SetSelectionRank(unitID, options[name .. "_selection_rank"].value)
+	end
+	
+	if ud.customParams.commtype or ud.customParams.level then
+		if options.commander_selection_rank and WG.SetSelectionRank then
+			WG.SetSelectionRank(unitID, options.commander_selection_rank.value)
+		end
+	end
+end
+
 function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
-	if not AmITeamLeader (unitTeam) or not unitDefID or not UnitDefs[unitDefID] then
+	if not (unitDefID and UnitDefs[unitDefID]) then
+		return
+	end
+	
+	local myTeam, amLeader = AmITeamLeader(unitTeam)
+	if not amLeader then
+		if myTeam or select(1, Spring.GetSpectatingState()) then
+			ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
+		end
 		return
 	end
 
@@ -800,7 +824,9 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local orderArray = {}
 	if ud.customParams.commtype or ud.customParams.level then
 		local morphed = Spring.GetTeamRulesParam(unitTeam, "morphUnitCreating") == 1
-		if morphed then -- unit states are applied in unit_morph gadget
+		if morphed then
+			-- Gadget and Spring unit states are applied in unit_morph gadget. Widget unit
+			-- states are handled by their widget.
 			return
 		end
 
@@ -1027,12 +1053,11 @@ function widget:GameFrame(n)
 	if n < 10 then
 		return
 	end
-	local team = Spring.GetMyTeamID()
-	local units = Spring.GetTeamUnits(team)
+	local units = (select(1, Spring.GetSpectatingState()) and Spring.GetAllUnits()) or Spring.GetTeamUnits(Spring.GetMyTeamID())
 	if units then
 		for i = 1, #units do
-			widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), team, nil)
-			widget:UnitFinished(units[i], Spring.GetUnitDefID(units[i]), team)
+			widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), Spring.GetUnitTeam(units[i]), nil)
+			widget:UnitFinished(units[i], Spring.GetUnitDefID(units[i]), Spring.GetUnitTeam(units[i]))
 		end
 	end
 	widgetHandler:RemoveCallIn("GameFrame")
