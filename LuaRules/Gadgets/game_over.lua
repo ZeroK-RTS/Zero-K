@@ -211,12 +211,12 @@ local function RevealAllianceUnits(allianceID)
 		local t = teamList[i]
 		local teamUnits = spGetTeamUnits(t) 
 		for j=1,#teamUnits do
-			local u = teamUnits[j]
+			local unitID = teamUnits[j]
 			-- purge extra-map units
-			if not UnitWithinBounds(u) then
-				Spring.DestroyUnit(u)
+			if not UnitWithinBounds(unitID) then
+				Spring.DestroyUnit(unitID)
 			else
-				Spring.SetUnitAlwaysVisible(u, true)
+				Spring.SetUnitAlwaysVisible(unitID, true)
 			end
 		end
 	end
@@ -244,16 +244,16 @@ local function DestroyAlliance(allianceID, skipCheck)
 				local t = teamList[i]
 				local teamUnits = spGetTeamUnits(t) 
 				for j=1,#teamUnits do
-					local u = teamUnits[j]
+					local unitID = teamUnits[j]
 					local pwUnits = (GG.PlanetWars or {}).unitsByID
-					if pwUnits and pwUnits[u] then
+					if pwUnits and pwUnits[unitID] then
 						GG.allowTransfer = true
-						spTransferUnit(u, gaiaTeamID, true)		-- don't blow up PW buildings
+						spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
 						GG.allowTransfer = false
 					else
 						local destroyFrame = frame - math.ceil((math.random()*7)^2)
 						toDestroy[destroyFrame] = toDestroy[destroyFrame] or {}
-						toDestroy[destroyFrame][u] = true
+						toDestroy[destroyFrame][unitID] = true
 					end
 				end
 				Spring.SetTeamRulesParam(t, "isDead", 1, {public = true})
@@ -276,36 +276,36 @@ local function CauseVictory(allyTeamID)
 	--spGameOver({lastAllyTeam})
 end
 
-local function AddAllianceUnit(u, ud, teamID)
+local function AddAllianceUnit(unitID, unitDefID, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] + 1
 	
-	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[ud].metalCost
+	aliveValue[teamID] = aliveValue[teamID] + UnitDefs[unitDefID].metalCost
 
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = true
+	if UnitDefs[unitDefID].customParams.commtype then
+		commsAlive[allianceID][unitID] = true
 	end
 	
-	if vitalends and GG.VitalUnit and GG.VitalUnit(u) then
-		vitalAlive[allianceID][u] = true
+	if vitalends and GG.VitalUnit and GG.VitalUnit(unitID) then
+		vitalAlive[allianceID][unitID] = true
 	end
 end
 
-local function RemoveAllianceUnit(u, ud, teamID)
+local function RemoveAllianceUnit(unitID, unitDefID, teamID)
 	local _, _, _, _, _, allianceID = spGetTeamInfo(teamID)
 	aliveCount[teamID] = aliveCount[teamID] - 1
 	
-	aliveValue[teamID] = aliveValue[teamID] - UnitDefs[ud].metalCost
+	aliveValue[teamID] = aliveValue[teamID] - UnitDefs[unitDefID].metalCost
 	if aliveValue[teamID] < 0 then
 		aliveValue[teamID] = 0
 	end
 
-	if UnitDefs[ud].customParams.commtype then
-		commsAlive[allianceID][u] = nil
+	if UnitDefs[unitDefID].customParams.commtype then
+		commsAlive[allianceID][unitID] = nil
 	end
 	
-	if vitalends and vitalAlive[allianceID]and vitalAlive[allianceID][u] then
-		vitalAlive[allianceID][u] = nil
+	if vitalends and vitalAlive[allianceID]and vitalAlive[allianceID][unitID] then
+		vitalAlive[allianceID][unitID] = nil
 	end
 
 	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) or (vitalends and HasNoVitalUnits(allianceID)))
@@ -467,55 +467,55 @@ function gadget:TeamDied (teamID)
 	end
 end
 
-function gadget:UnitFinished(u, ud, team)
-	if (team ~= gaiaTeamID)
-	  and(not doesNotCountList[ud])
-	  and(not finishedUnits[u])
+function gadget:UnitFinished(unitID, unitDefID, teamID)
+	if (teamID ~= gaiaTeamID)
+	  and(not doesNotCountList[unitDefID])
+	  and(not finishedUnits[unitID])
 	then
-		finishedUnits[u] = true
-		AddAllianceUnit(u, ud, team)
+		finishedUnits[unitID] = true
+		AddAllianceUnit(unitID, unitDefID, teamID)
 	end
 end
 
-function gadget:UnitCreated(u, ud, team)
+function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if revealed then
-		local allyTeam = select(6, spGetTeamInfo(team))
+		local allyTeam = select(6, spGetTeamInfo(teamID))
 		if allyTeam == allianceToReveal then
-			Spring.SetUnitAlwaysVisible(u, true)
+			Spring.SetUnitAlwaysVisible(unitID, true)
 		end
 	end
 end
 
-function gadget:UnitDestroyed(u, ud, team)
+function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if spGetGameRulesParam("loadPurge") == 1 then
 		return
 	end
 	
-	if (team ~= gaiaTeamID)
-	  and(not doesNotCountList[ud])
-	  and finishedUnits[u]
+	if (teamID ~= gaiaTeamID)
+	  and(not doesNotCountList[unitDefID])
+	  and finishedUnits[unitID]
 	then
-		finishedUnits[u] = nil
-		RemoveAllianceUnit(u, ud, team)
+		finishedUnits[unitID] = nil
+		RemoveAllianceUnit(unitID, unitDefID, teamID)
 	end
 end
 
 -- note: Taken comes before Given
-function gadget:UnitGiven(u, ud, newTeam, oldTeam)
+function gadget:UnitGiven(unitID, unitDefID, newTeam, oldTeamID)
 	if (newTeam ~= gaiaTeamID)
-	  and(not doesNotCountList[ud])
-	  and finishedUnits[u]
+	  and(not doesNotCountList[unitDefID])
+	  and finishedUnits[unitID]
 	then
-		AddAllianceUnit(u, ud, newTeam)
+		AddAllianceUnit(unitID, unitDefID, newTeam)
 	end
 end
 
-function gadget:UnitTaken(u, ud, oldTeam, newTeam)
-	if (oldTeam ~= gaiaTeamID)
-	  and(not doesNotCountList[ud])
-	  and finishedUnits[u]
+function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeam)
+	if (oldTeamID ~= gaiaTeamID)
+	  and(not doesNotCountList[unitDefID])
+	  and finishedUnits[unitID]
 	then
-		RemoveAllianceUnit(u, ud, oldTeam)	
+		RemoveAllianceUnit(unitID, unitDefID, oldTeamID)	
 	end
 end
 
@@ -538,9 +538,9 @@ end
 
 function gadget:GameFrame(n)
 	if toDestroy[n] then
-		for u in pairs(toDestroy[n]) do
-			if Spring.ValidUnitID(u) then
-				spDestroyUnit(u, true)
+		for unitID in pairs(toDestroy[n]) do
+			if Spring.ValidUnitID(unitID) then
+				spDestroyUnit(unitID, true)
 			end
 		end
 		toDestroy[n] = nil
