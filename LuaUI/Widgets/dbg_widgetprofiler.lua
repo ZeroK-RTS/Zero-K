@@ -361,9 +361,9 @@ end
     end
 
     local vsx, vsy = gl.GetViewSizes()
-    local x,y = vsx-300, vsy-60
-	local fSize = 9
-	local fSpacing = 9
+    local x,y = vsx-780, vsy-60
+	local fSize = 8
+	local fSpacing = 7
 
     gl.Color(1,1,1,1)
     gl.BeginText()

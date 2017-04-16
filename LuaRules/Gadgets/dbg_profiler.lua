@@ -456,10 +456,10 @@ end
     end
 
     local vsx, vsy = gl.GetViewSizes()
-    local x,y = vsx-1000, vsy-60
-	local sX = vsx-600
+    local x,y = 400, vsy-60
+	local sX = 80
 	local fSize = 8
-	local fSpacing = 10
+	local fSpacing = 8
 
     local maximum_ = (maximumSYNCED > maximum) and (maximumSYNCED) or (maximum)
 
