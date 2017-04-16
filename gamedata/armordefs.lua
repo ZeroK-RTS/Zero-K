@@ -88,7 +88,6 @@ local GAUSS_DAMAGE_MOD = 1.5
 -- Set shields to use their own armor type
 for name, wd in pairs(DEFS.weaponDefs) do
 	if wd.weapontype == "Shield" then
-		wd.armortype = "SHIELD"
 		wd.shieldarmortype = "SHIELD"
 	end
 end
