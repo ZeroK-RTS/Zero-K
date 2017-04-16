@@ -67,6 +67,7 @@ local toDestroy = {}
 
 local modOptions = Spring.GetModOptions() or {}
 local commends = tobool(modOptions.commends)
+local vitalends = tobool(modOptions.vitalends)
 local noElo = tobool(modOptions.noelo)
 
 local revealed = false
@@ -100,8 +101,14 @@ end
 
 local commsAlive = {}
 local allyTeams = spGetAllyTeamList()
-for i=1,#allyTeams do
+for i = 1, #allyTeams do
 	commsAlive[allyTeams[i]] = {}
+end
+
+local vitalAlive = {}
+local allyTeams = spGetAllyTeamList()
+for i = 1, #allyTeams do
+	vitalAlive[allyTeams[i]] = {}
 end
 
 --------------------------------------------------------------------------------
@@ -143,6 +150,13 @@ end
 
 local function HasNoComms(allianceID)
 	for unitID in pairs(commsAlive[allianceID]) do
+		return false
+	end
+	return true
+end
+
+local function HasNoVitalUnits(allianceID)
+	for unitID in pairs(vitalAlive[allianceID]) do
 		return false
 	end
 	return true
@@ -271,6 +285,10 @@ local function AddAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = true
 	end
+	
+	if vitalends and GG.VitalUnit and GG.VitalUnit(u) then
+		vitalAlive[allianceID][u] = true
+	end
 end
 
 local function RemoveAllianceUnit(u, ud, teamID)
@@ -285,8 +303,12 @@ local function RemoveAllianceUnit(u, ud, teamID)
 	if UnitDefs[ud].customParams.commtype then
 		commsAlive[allianceID][u] = nil
 	end
+	
+	if vitalends and vitalAlive[allianceID]and vitalAlive[allianceID][u] then
+		vitalAlive[allianceID][u] = nil
+	end
 
-	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)))
+	if ((CountAllianceUnits(allianceID) <= 0) or (commends and HasNoComms(allianceID)) or (vitalends and HasNoVitalUnits(allianceID)))
 	and (allianceID ~= chickenAllyTeamID) then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "<Game Over> Purging allyTeam " .. allianceID)
 		DestroyAlliance(allianceID)

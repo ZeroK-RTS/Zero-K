@@ -12,7 +12,7 @@ function gadget:GetInfo()
 		author = "GoogleFrog",
 		date = "6 February 2017",
 		license = "GNU GPL, v2 or later",
-		layer = 0,
+		layer = 0, -- Before game_over.lua for the purpose of setting vitalUnit
 		enabled = true
 	}
 end
