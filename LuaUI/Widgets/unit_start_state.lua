@@ -10,13 +10,14 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
 	handler   = false,
     layer     = 1,
-    enabled   = true  --  loaded by default?
+    enabled   = true,  --  loaded by default?
   }
 end
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local alwaysHoldPos, holdPosException, dontFireAtRadarUnits, factoryDefs = VFS.Include("LuaUI/Configs/unit_state_defaults.lua")
+local spectatingState = select(1, Spring.GetSpectatingState())
 
 local function IsGround(ud)
     return not ud.canFly and not ud.isFactory
@@ -814,7 +815,7 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	
 	local myTeam, amLeader = AmITeamLeader(unitTeam)
 	if not amLeader then
-		if myTeam or select(1, Spring.GetSpectatingState()) then
+		if myTeam or spectatingState then
 			ApplyUniversalUnitStates(unitID, unitDefID, unitTeam, builderID)
 		end
 		return
@@ -1049,16 +1050,30 @@ function widget:UnitGiven(unitID, unitDefID, newTeamID, teamID)
 	widget:UnitFinished(unitID, unitDefID, newTeamID)
 end
 
+local function ApplyUnitStates()
+	local teamID = (not spectatingState) and Spring.GetMyTeamID()
+	local units = (teamID and Spring.GetTeamUnits(teamID)) or Spring.GetAllUnits()
+	if units then
+		for i = 1, #units do
+			widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), teamID or Spring.GetUnitTeam(units[i]), nil)
+			widget:UnitFinished(units[i], Spring.GetUnitDefID(units[i]), teamID or Spring.GetUnitTeam(units[i]))
+		end
+	end
+end
+
+function widget:PlayerChanged()
+	local newSpectatingState = select(1, Spring.GetSpectatingState())
+	if newSpectatingState == spectatingState then
+		return
+	end
+	spectatingState = newSpectatingState
+	ApplyUnitStates()
+end
+
 function widget:GameFrame(n)
 	if n < 10 then
 		return
 	end
-	local units = (select(1, Spring.GetSpectatingState()) and Spring.GetAllUnits()) or Spring.GetTeamUnits(Spring.GetMyTeamID())
-	if units then
-		for i = 1, #units do
-			widget:UnitCreated(units[i], Spring.GetUnitDefID(units[i]), Spring.GetUnitTeam(units[i]), nil)
-			widget:UnitFinished(units[i], Spring.GetUnitDefID(units[i]), Spring.GetUnitTeam(units[i]))
-		end
-	end
-	widgetHandler:RemoveCallIn("GameFrame")
+	ApplyUnitStates()
+	widgetHandler:RemoveCallIn("GameFrame", self)
 end
