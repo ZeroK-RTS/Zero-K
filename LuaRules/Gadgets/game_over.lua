@@ -303,11 +303,9 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 	if not (defeatConfig.vitalCommanders or defeatConfig.vitalUnitTypes) then
 		return (CountAllianceUnits(allianceID) <= 0) -- Default loss condition
 	end
-	Spring.Echo("HasNoComms(allianceID)", allianceID, HasNoComms(allianceID))
 	if defeatConfig.vitalCommanders and not HasNoComms(allianceID) then
 		return false
 	end
-	Spring.Echo("HasNoVitalUnits(allianceID)", allianceID, HasNoVitalUnits(allianceID))
 	if defeatConfig.vitalUnitTypes and not HasNoVitalUnits(allianceID) then
 		return false
 	end
