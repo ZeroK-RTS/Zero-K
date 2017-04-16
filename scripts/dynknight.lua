@@ -18,7 +18,8 @@ local thighR = piece 'thighr'
 local forearmL = piece 'forearml' 
 local forearmR = piece 'forearmr' 
 local shinR = piece 'shinr' 
-local shinL = piece 'shinl' 
+local shinL = piece 'shinl'
+local shieldEmit = piece 'shieldemit'
 
 local smokePiece = {torso}
 local nanoPieces = {snout}
@@ -207,7 +208,7 @@ function script.QueryWeapon(num)
 	elseif dyncomm.GetWeapon(num) == 2 then 
 		return flareR
 	end
-	return torso
+	return shieldEmit
 end
 
 local function RestoreAfterDelay()

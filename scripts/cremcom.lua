@@ -18,7 +18,8 @@ local thighR = piece 'thighr'
 local forearmL = piece 'forearml' 
 local forearmR = piece 'forearmr' 
 local shinR = piece 'shinr' 
-local shinL = piece 'shinl' 
+local shinL = piece 'shinl'
+local shieldEmit = piece 'shieldemit'
 
 local smokePiece = {torso}
 local nanoPieces = {snout}
@@ -198,7 +199,7 @@ function script.QueryWeapon(num)
 	if num == 3 then 
 		return flareR 
 	elseif num == 2 or num == 4 then
-		return torso
+		return shieldEmit
 	end
 	return flareL
 end
