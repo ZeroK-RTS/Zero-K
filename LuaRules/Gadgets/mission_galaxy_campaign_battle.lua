@@ -258,7 +258,7 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	end
 	
 	-- Check whether the objective is in the right timeframe and whether it passes/fails
-	-- Times: satisfyAtTime, satisfyByTime, satisfyUntilTime, satisfyAfterTime or satisfyForever
+	-- Times: satisfyAtTime, satisfyByTime, satisfyUntilTime, satisfyAfterTime, satisfyForeverAfterFirstSatisfied or satisfyForever
 	if objectiveData.satisfyByTime and (objectiveData.satisfyByTime < gameSeconds) then
 		CompleteBonusObjective(bonusObjectiveID, false)
 		return
@@ -275,7 +275,7 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	end
 	
 	-- Objective may have succeeded if the game ends.
-	if gameIsOver and not objectiveData.satisfyByTime then
+	if gameIsOver and (not objectiveData.satisfyByTime) and (not objectiveData.satisfyForeverAfterFirstSatisfied) then
 		CompleteBonusObjective(bonusObjectiveID, true)
 		return
 	end
@@ -286,6 +286,10 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	if satisfied then
 		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime then
 			CompleteBonusObjective(bonusObjectiveID, true)
+		end
+		if objectiveData.satisfyForeverAfterFirstSatisfied then
+			objectiveData.satisfyForeverAfterFirstSatisfied = nil
+			objectiveData.satisfyForever = true
 		end
 	else
 		if objectiveData.satisfyAtTime or objectiveData.satisfyUntilTime or objectiveData.satisfyAfterTime or objectiveData.satisfyForever then
