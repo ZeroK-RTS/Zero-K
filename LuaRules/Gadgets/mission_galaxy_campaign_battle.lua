@@ -1,10 +1,5 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
-	return
-end
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
 function gadget:GetInfo()
 	return {
 		name = "Galaxy Campaign Battle Handler",
@@ -22,22 +17,55 @@ if not campaignBattleID then
 	return
 end
 
+local COMPARE = {
+	AT_LEAST = 1,
+	AT_MOST = 2
+}
+
 local alliedTrueTable = {allied = true}
 local CMD_INSERT = CMD.INSERT
+local PLAYER_ALLY_TEAM_ID = 0
+local PLAYER_TEAM_ID = 0
 
+local SAVE_FILE = "Gadgets/mission_galaxy_campaign_battle.lua"
+local loadGameFrame = 0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+if gadgetHandler:IsSyncedCode() then --SYNCED
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Variables
 
-local unlockedUnitsByTeam = {}
+-- Variables that require saving
 local unitLineage = {}
+local initialUnitData = {}
+
 local vitalUnits = {}
-local teamCommParameters = {}
 local victoryAtLocation
 local defeatConditionConfig
-local firstGameFrame = true
+local bonusObjectiveList
+
+local unlockedUnitsByTeam = {}
+local teamCommParameters = {}
+
+local enemyUnitDefBonusObj = {}
+local myUnitDefBonusObj = {}
 local checkForLoseAfterSeconds = false
+
+-- Small speedup things.
+local firstGameFrame = true
+local gameIsOver = false
 local allyTeamList = Spring.GetAllyTeamList()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- For gadget:Save
+
+_G.saveTable = {
+	unitLineage     = unitLineage,
+	initialUnitData = initialUnitData,
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -76,6 +104,35 @@ local function CustomKeyToUsefulTable(dataRaw)
 	end
 end
 
+local function SumUnits(units, limit)
+	if not units then
+		return 0
+	end
+	local count = 0
+	for unitID, wantedAllyTeamID in pairs(units) do
+		local inbuild = select(3, Spring.GetUnitIsStunned(unitID))
+		if not inbuild then
+			local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+			if allyTeamID == wantedAllyTeamID then
+				count = count + 1
+				if count >= limit then
+					return count
+				end
+			end
+		end
+	end
+	return count
+end
+
+local function ComparisionSatisfied(compareType, targetNumber, number)
+	if compareType == COMPARE.AT_LEAST then
+		return number >= targetNumber
+	elseif compareType == COMPARE.AT_MOST then
+		return number <= targetNumber
+	end
+	return false
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- Victory and Defeat functions
@@ -97,26 +154,23 @@ local function InitializeVictoryConditions()
 		local allyTeamID = allyTeamList[i]
 		local defeatConfig = defeatConditionConfig[allyTeamID] or {}
 		if defeatConfig.vitalUnitTypes then
-			local unitsByDefID = {}
+			local unitDefMap = {}
 			for i = 1, #defeatConfig.vitalUnitTypes do
 				local ud = UnitDefNames[defeatConfig.vitalUnitTypes[i]]
 				if ud then
-					unitsByDefID[#unitsByDefID + 1] = ud.id
+					unitDefMap[ud.id] = true
 				end
 			end
-			defeatConfig.vitalUnitTypes = unitsByDefID
+			defeatConfig.vitalUnitTypes = unitDefMap
 		end
 		if defeatConfig.loseAfterSeconds then
 			checkForLoseAfterSeconds = true
 		end
 		defeatConditionConfig[allyTeamID] = defeatConfig
 	end
-	
-	Spring.Utilities.TableEcho(defeatConditionConfig, "defeatConditionConfig")
 end
 
-local function AddDefeatIfUnitDestroyed(unitID)
-	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+local function AddDefeatIfUnitDestroyed(unitID, allyTeamID)
 	local defeatConfig = defeatConditionConfig[allyTeamID]
 	defeatConfig.defeatIfUnitDestroyed = defeatConfig.defeatIfUnitDestroyed or {}
 	defeatConfig.defeatIfUnitDestroyed[unitID] = true
@@ -132,13 +186,13 @@ end
 --------------------------------------------------------------------------------
 -- Victory at location units
 
-local function AddVictoryAtLocationUnit(unitID, location)
+local function AddVictoryAtLocationUnit(unitID, location, allyTeamID)
 	victoryAtLocation = victoryAtLocation or {}
 	victoryAtLocation[unitID] = {
 		x = location.x,
 		z = location.z,
 		radiusSq = location.radius*location.radius,
-		allyTeamID = Spring.GetUnitAllyTeam(unitID)
+		allyTeamID = allyTeamID
 	}
 	
 	Spring.MarkerAddPoint(location.x, 0, location.z, "Walk Here")
@@ -172,7 +226,186 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Bonus Objectives
+
+local function CompleteBonusObjective(bonusObjectiveID, success)
+	local objectiveData = bonusObjectiveList[bonusObjectiveID]
+	Spring.SetGameRulesParam("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
+	
+	objectiveData.success = success
+	objectiveData.terminated = true
+end
+
+local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
+	local objectiveData = bonusObjectiveList[bonusObjectiveID]
+	
+	-- Cbeck whether the objective is open
+	if objectiveData.terminated then
+		return
+	end
+	
+	-- Check for victory timer
+	if objectiveData.victoryByTime then
+		if victory then
+			CompleteBonusObjective(bonusObjectiveID, true)
+		elseif gameSeconds > objectiveData.victoryByTime then
+			CompleteBonusObjective(bonusObjectiveID, false)
+		end
+		return
+	end
+	
+	-- Check whether the objective is in the right timeframe and whether it passes/fails
+	-- Times: satisfyAtTime, satisfyByTime, satisfyUntilTime, satisfyAfterTime or satisfyForever
+	if objectiveData.satisfyByTime and (objectiveData.satisfyByTime < gameSeconds) then
+		CompleteBonusObjective(bonusObjectiveID, false)
+		return
+	end
+	if objectiveData.satisfyUntilTime and (objectiveData.satisfyUntilTime < gameSeconds) then
+		CompleteBonusObjective(bonusObjectiveID, true)
+		return
+	end
+	if objectiveData.satisfyAfterTime and (objectiveData.satisfyAfterTime >= gameSeconds) then
+		return
+	end
+	if objectiveData.satisfyAtTime and (objectiveData.satisfyAtTime ~= gameSeconds) then
+		return
+	end
+	
+	-- Objective must have success if it is not ignored or failed at game end
+	if gameIsOver then
+		CompleteBonusObjective(bonusObjectiveID, true)
+		return
+	end
+	
+	-- Check satisfaction
+	local unitCount = SumUnits(objectiveData.units, objectiveData.targetNumber + 1)
+	local satisfied = ComparisionSatisfied(objectiveData.comparisionType, objectiveData.targetNumber, unitCount)
+	if satisfied then
+		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime then
+			CompleteBonusObjective(bonusObjectiveID, true)
+		end
+	else
+		if objectiveData.satisfyAtTime or objectiveData.satisfyUntilTime or objectiveData.satisfyAfterTime or objectiveData.satisfyForever then
+			CompleteBonusObjective(bonusObjectiveID, false)
+		end
+	end
+end
+
+local function DebugPrintBonusObjective()
+	Spring.Echo(" ====== Bonus Objectives ====== ")
+	for i = 1, #bonusObjectiveList do
+		local objectiveData = bonusObjectiveList[i]
+		Spring.Echo("Objective", i, "Succeed", objectiveData.success, "Terminated", objectiveData.terminated)
+	end
+end
+
+local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
+	for i = 1, #bonusObjectiveList do
+		CheckBonusObjective(i, gameSeconds)
+	end
+	DebugPrintBonusObjective()
+end
+
+local function AddBonusObjectiveUnit(unitID, bonusObjectiveID)
+	bonusObjectiveList[bonusObjectiveID].units = bonusObjectiveList[bonusObjectiveID].units or {}
+	bonusObjectiveList[bonusObjectiveID].units[unitID] = allyTeamID or Spring.GetUnitAllyTeam(unitID)
+end
+
+local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
+	if not bonusObjectiveList[bonusObjectiveID].units then
+		return
+	end
+	bonusObjectiveList[bonusObjectiveID].units[unitID] = nil
+end
+
+local function SetWinBeforeBonusObjective(victory)
+	local gameSeconds = math.floor(Spring.GetGameFrame()/30)
+	for i = 1, #bonusObjectiveList do
+		CheckBonusObjective(i, gameSeconds, victory)
+	end
+	DebugPrintBonusObjective()
+end
+
+local function InitializeBonusObjectives()
+	bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
+	for objectiveID = 1, #bonusObjectiveList do
+		local bonusObjective = bonusObjectiveList[objectiveID] or {}
+		if bonusObjective.unitTypes then
+			local unitDefMap = {}
+			for i = 1, #bonusObjective.unitTypes do
+				local ud = UnitDefNames[bonusObjective.unitTypes[i]]
+				if ud then
+					unitDefMap[ud.id] = true
+					myUnitDefBonusObj[ud.id] = myUnitDefBonusObj[ud.id] or {}
+					myUnitDefBonusObj[ud.id][#myUnitDefBonusObj[ud.id] + 1] = objectiveID
+				end
+			end
+			bonusObjective.unitTypes = unitDefMap
+		end
+		if bonusObjective.enemyUnitTypes then
+			local unitDefMap = {}
+			for i = 1, #bonusObjective.enemyUnitTypes do
+				local ud = UnitDefNames[bonusObjective.enemyUnitTypes[i]]
+				if ud then
+					unitDefMap[ud.id] = true
+					enemyUnitDefBonusObj[ud.id] = enemyUnitDefBonusObj[ud.id] or {}
+					enemyUnitDefBonusObj[ud.id][#enemyUnitDefBonusObj[ud.id] + 1] = objectiveID
+				end
+			end
+			bonusObjective.enemyUnitTypes = unitDefMap
+		end
+		bonusObjectiveList[objectiveID] = bonusObjective
+	end
+end
+
+local function AddUnitToBonusObjectiveList(unitID, objectiveList)
+	if not objectiveList then
+		return
+	end
+	for i = 1, #objectiveList do
+		AddBonusObjectiveUnit(unitID, objectiveList[i])
+	end
+end
+
+local function RemoveUnitFromBonusObjectiveList(unitID, objectiveList)
+	if not objectiveList then
+		return
+	end
+	for i = 1, #objectiveList do
+		RemoveBonusObjectiveUnit(unitID, objectiveList[i])
+	end
+end
+
+local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
+	if teamID == PLAYER_TEAM_ID then
+		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+	elseif Spring.GetUnitAllyTeam(unitID) ~= PLAYER_ALLY_TEAM_ID then
+		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+	end
+end
+
+local function BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
+	RemoveUnitFromBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+	RemoveUnitFromBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID])
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Unit Placement
+
+local function AddInitialUnitObjectiveParameters(unitID, parameters)
+	initialUnitData = parameters
+	initialUnitData.allyTeamID = initialUnitData.allyTeamID or Spring.GetUnitAllyTeam(unitID)
+	if parameters.defeatIfDestroyed then
+		AddDefeatIfUnitDestroyed(unitID, initialUnitData.allyTeamID)
+	end
+	if parameters.victoryAtLocation then
+		AddVictoryAtLocationUnit(unitID, parameters.victoryAtLocation, initialUnitData.allyTeamID)
+	end
+	if parameters.bonusObjectiveID then
+		AddBonusObjectiveUnit(unitID, parameters.bonusObjectiveID, initialUnitData.allyTeamID)
+	end
+end
 
 local function PlaceUnit(unitData, teamID)
 	local name = unitData.name
@@ -212,12 +445,7 @@ local function PlaceUnit(unitData, teamID)
 		return 
 	end
 	
-	if unitData.defeatIfDestroyed then
-		AddDefeatIfUnitDestroyed(unitID)
-	end
-	if unitData.victoryAtLocation then
-		AddVictoryAtLocationUnit(unitID, unitData.victoryAtLocation)
-	end
+	AddInitialUnitObjectiveParameters(unitID, unitData)
 	
 	if build then
 		local _, maxHealth = Spring.GetUnitHealth(unitID)
@@ -256,12 +484,7 @@ local function HandleCommanderCreation(unitID, teamID)
 	if not commParameters then
 		return
 	end
-	if commParameters.defeatIfDestroyed then
-		AddDefeatIfUnitDestroyed(unitID)
-	end
-	if commParameters.victoryAtLocation then
-		AddVictoryAtLocationUnit(unitID, commParameters.victoryAtLocation)
-	end
+	AddInitialUnitObjectiveParameters(unitID, commParameters)
 end
 
 --------------------------------------------------------------------------------
@@ -319,7 +542,7 @@ function gadget:AllowUnitCreation(unitDefID, builderID, builderTeamID, x, y, z)
 	return true
 end
 
-function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+local function LineageUnitCreated(unitID, unitDefID, teamID, builderID)
 	local ud = UnitDefs[unitDefID]
 	if ud.customParams.dynamic_comm then
 		HandleCommanderCreation(unitID, teamID)
@@ -386,9 +609,6 @@ local function InitializeUnlocks()
 end
 
 local function DoInitialUnitPlacement()
-	if Spring.GetGameRulesParam("loadedGame") then
-		return
-	end
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
@@ -453,20 +673,43 @@ end
 --------------------------------------------------------------------------------
 -- (Most) callins
 
+local function IsWinner(winners)
+	for i = 1, #winners do
+		if winners[i] == PLAYER_ALLY_TEAM_ID then
+			return true
+		end
+	end
+	return false
+end
+
+function gadget:GameOver(winners)
+	gameIsOver = true
+	SetWinBeforeBonusObjective(IsWinner(winners))
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID, builderID)
 	if IsVitalUnitType(unitID, unitDefID) then
 		vitalUnits[unitID] = true
+		Spring.Utilities.UnitEcho(unitID, "Vital Unit")
 	end
+end
+
+function gadget:UnitCreated(unitID, unitDefID, teamID, builderID)
+	LineageUnitCreated(unitID, unitDefID, teamID, builderID)
+	BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, teamID)
 	if vitalUnits[unitID] then
 		vitalUnits[unitID] = false
 	end
+	BonusObjectiveUnitDestroyed(unitID, unitDefID, teamID)
 end
+
 function gadget:Initialize()
 	InitializeUnlocks()
 	InitializeVictoryConditions()
+	InitializeBonusObjectives()
 	
 	local allUnits = Spring.GetAllUnits()
 	for _, unitID in pairs(allUnits) do
@@ -481,21 +724,81 @@ function gadget:Initialize()
 end
 
 function gadget:GameFrame(n)
-	if n%30 == 0 then
+	-- Would use GamePreload if it didn't cause Circuit to crash.
+	if firstGameFrame then
+		firstGameFrame = false
+		if not Spring.GetGameRulesParam("loadedGame") then
+			DoInitialUnitPlacement()
+			Spring.Utilities.TableEcho(bonusObjectiveList, "bonusObjectiveList")
+		end
+	end
+	
+	-- Check objectives
+	n = n + loadGameFrame
+	if n%30 == 0 and not gameIsOver then
 		VictoryAtLocationUpdate()
+		local gameSeconds = n/30
 		if checkForLoseAfterSeconds then
 			for i = 1, #allyTeamList do
 				local lostAfterSeconds = defeatConditionConfig[allyTeamList[i]].loseAfterSeconds
-				if lostAfterSeconds and lostAfterSeconds <= n/30 then
+				if lostAfterSeconds and lostAfterSeconds <= gameSeconds then
 					GG.DestroyAlliance(allyTeamList[i])
 				end
 			end
 		end
-	end
-	
-	-- Would use GamePreload if it didn't cause Circuit to crash.
-	if firstGameFrame then
-		firstGameFrame = false
-		DoInitialUnitPlacement()
+		DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Load
+
+function gadget:Load(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
+		return
+	end
+	
+	local loadData = GG.SaveLoad.ReadFile(zip, "Galaxy Campaign Battle Handler", SAVE_FILE) or {}
+	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
+	
+	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
+	local unitLineage = {}
+	for oldUnitID, teamID in pairs(loadData.unitLineage) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		unitLineage[unitID] = teamID
+		SetBuildOptions(unitID, unitDefID, unitLineage[unitID])
+	end
+	
+	-- Clear the commanders out of victoryAtLocation
+	local victoryAtLocation = {}
+	
+	-- Put the units back in the objectives
+	for oldUnitID, data in pairs(loadData.initialUnitData) do
+		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+		AddInitialUnitObjectiveParameters(unitID, data)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+else --UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local MakeRealTable = Spring.Utilities.MakeRealTable
+
+function gadget:Save(zip)
+	if not GG.SaveLoad then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, "Galaxy campaign mission failed to access save/load API")
+		return
+	end
+	GG.SaveLoad.WriteSaveData(zip, SAVE_FILE, MakeRealTable(SYNCED.saveTable))
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+end -- END UNSYNCED
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
