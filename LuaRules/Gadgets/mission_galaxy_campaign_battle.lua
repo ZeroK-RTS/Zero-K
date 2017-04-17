@@ -306,7 +306,7 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	for i = 1, #bonusObjectiveList do
 		CheckBonusObjective(i, gameSeconds)
 	end
-	DebugPrintBonusObjective()
+	--DebugPrintBonusObjective()
 end
 
 local function AddBonusObjectiveUnit(unitID, bonusObjectiveID)
@@ -399,7 +399,7 @@ end
 local function AddInitialUnitObjectiveParameters(unitID, parameters)
 	initialUnitData = parameters
 	initialUnitData.allyTeamID = initialUnitData.allyTeamID or Spring.GetUnitAllyTeam(unitID)
-	if parameters.defeatIfDestroyed then
+	if parameters.defeatIfDestroyeObjectiveID then
 		AddDefeatIfUnitDestroyed(unitID, initialUnitData.allyTeamID)
 	end
 	if parameters.victoryAtLocation then
@@ -749,7 +749,6 @@ function gadget:GameFrame(n)
 		firstGameFrame = false
 		if not Spring.GetGameRulesParam("loadedGame") then
 			DoInitialUnitPlacement()
-			Spring.Utilities.TableEcho(bonusObjectiveList, "bonusObjectiveList")
 		end
 	end
 	
