@@ -376,9 +376,6 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		end
 
 		Sleep()
-		if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
-			return 
-		end
 		
 		local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
 		if morphedTo then
