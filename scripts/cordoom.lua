@@ -8,6 +8,7 @@ local shell_2 = piece "Shell_2"
 
 -- guns
 
+local cannonAim = piece "cannonAim"
 local cannonbase = piece "CannonBase"
 local cannon = piece "Cannon"
 local flare1 = piece "flare1"
@@ -22,6 +23,7 @@ local spGetUnitRulesParam 	= Spring.GetUnitRulesParam
 local smokePiece = { shell_1, shell_2, cannonbase, heatray }
 
 --variables
+local queryPiece = cannonAim
 local heat = false
 local on = false
 --signals
@@ -168,22 +170,29 @@ function Close()
 	Spring.SetUnitArmored(unitID,true)
 end
 
-function script.Activate ()
+function script.Activate()
 	StartThread(Open)
 end
 
-function script.Deactivate ()
+function script.Deactivate()
 	on = false
 	StartThread(Close)
 end
 
 function script.Create()
+	on = true
 	StartThread(SmokeUnit, smokePiece)
 end
 
-local aimFromSet = {cannonbase, heatraybase}
+local aimFromSet = {cannonAim, heatraybase}
 
-function script.AimFromWeapon(num) 
+local function AimingDone()
+	queryPiece = flare1
+	Sleep(500)
+	queryPiece = cannonAim
+end
+
+function script.AimFromWeapon(num)
 	return aimFromSet[num] 
 end
 
@@ -201,7 +210,9 @@ function script.AimWeapon(num, heading, pitch)
 		Turn(cannonbase, x_axis, -pitch, mainPitch) 
 		WaitForTurn (shellbase, y_axis)
 		WaitForTurn (cannonbase, x_axis)
-
+		
+		StartThread(AimingDone)
+		
 		return (spGetUnitRulesParam(unitID, "lowpower") == 0)	--checks for sufficient energy in grid
 	elseif num == 2 then
 		Signal(aim2)
@@ -219,7 +230,7 @@ end
 
 function script.QueryWeapon(num)
 	if num == 1 then
-		return flare1
+		return queryPiece
 	elseif num == 2 then
 		if heat then 
 			return flare2
