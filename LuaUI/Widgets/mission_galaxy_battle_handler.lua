@@ -3,7 +3,7 @@
 
 function widget:GetInfo()
 	return {
-		name      = "Galaxy Battle Reporter",
+		name      = "Galaxy Battle Handler",
 		desc      = "Reports outcome of galaxy battle.",
 		author    = "GoogleFrog",
 		date      = "7 February 2016",
