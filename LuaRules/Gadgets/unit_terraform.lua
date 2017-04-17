@@ -2033,6 +2033,10 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	end
 
 	if (cmdID == CMD_TERRAFORM_INTERNAL) then
+		if GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID] then
+			return
+		end
+		
 		local terraform_type = cmdParams[1]
 		local teamID = cmdParams[2]
 		local commandX = cmdParams[3]
@@ -3625,7 +3629,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:UnitCreated(unitID, unitDefID)
+function gadget:UnitCreated(unitID, unitDefID, teamID)
 
 	if spGetUnitIsDead(unitID) then
 		return
@@ -3633,7 +3637,7 @@ function gadget:UnitCreated(unitID, unitDefID)
 	
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if terraformUnitDefIDs[unitDefID] then
+	if terraformUnitDefIDs[unitDefID] and not (GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID]) then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end

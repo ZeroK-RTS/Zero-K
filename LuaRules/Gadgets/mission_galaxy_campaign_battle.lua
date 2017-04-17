@@ -58,6 +58,9 @@ local firstGameFrame = true
 local gameIsOver = false
 local allyTeamList = Spring.GetAllyTeamList()
 
+GG.terraformRequiresUnlock = true
+GG.terraformUnlocked = {}
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 -- For gadget:Save
@@ -579,6 +582,20 @@ local function SetTeamUnlocks(teamID, customKeys)
 	unlockedUnitsByTeam[teamID] = unlockedUnits
 end
 
+local function SetTeamAbilities(teamID, customKeys)
+	local abilityData = CustomKeyToUsefulTable(customKeys and customKeys.campaignabilities)
+	if not abilityData then
+		return
+	end
+	for i = 1, #abilityData do
+		-- TODO, move to a defs file
+		if abilityData[i] == "terraform" then
+			Spring.SetTeamRulesParam(teamID, "terraformUnlocked", 1)
+			GG.terraformUnlocked[teamID] = true
+		end
+	end
+end
+
 local function PlaceTeamUnits(teamID, customKeys)
 	local unitData = CustomKeyToUsefulTable(customKeys and customKeys.extrastartunits)
 	if not unitData then
@@ -599,10 +616,13 @@ local function InitializeCommanderParameters(teamID, customKeys)
 end
 
 local function InitializeUnlocks()
+	Spring.SetGameRulesParam("terraformRequiresUnlock", 1)
+	
 	local teamList = Spring.GetTeamList()
 	for i = 1, #teamList do
 		local teamID = teamList[i]
 		local customKeys = select(7, Spring.GetTeamInfo(teamID))
+		SetTeamAbilities(teamID, customKeys)
 		SetTeamUnlocks(teamID, customKeys)
 		InitializeCommanderParameters(teamID, customKeys)
 	end
