@@ -396,16 +396,18 @@ local function Jump(unitID, goal, cmdTag, origCmdParams)
 		
 		while reloadAmount < 1 do
 			local morphedTo = Spring.GetUnitRulesParam(unitID, "wasMorphedTo")
-			if morphedTo then unitID = morphedTo end
+			if morphedTo then 
+				unitID = morphedTo 
+			end
+			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
+				return 
+			end
 
 			local stunnedOrInbuild = spGetUnitIsStunned(unitID)
 			local reloadFactor = (stunnedOrInbuild and 0) or spGetUnitRulesParam(unitID, "totalReloadSpeedChange") or 1
 			reloadAmount = reloadAmount + reloadSpeed*reloadFactor
 			spSetUnitRulesParam(unitID,"jumpReload",reloadAmount)
 			Sleep()
-			if (not Spring.ValidUnitID(unitID) or Spring.GetUnitIsDead(unitID)) then 
-				return 
-			end
 		end
 	end
 
