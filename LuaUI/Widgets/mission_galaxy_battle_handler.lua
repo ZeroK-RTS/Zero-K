@@ -33,7 +33,7 @@ local myAllyTeamID = Spring.GetMyAllyTeamID()
 local SUCCESS_ICON = LUAUI_DIRNAME .. "images/tick.png"
 local FAILURE_ICON = LUAUI_DIRNAME .. "images/cross.png"
 
-local objectiveList, bonusObjectiveList, mainObjectiveBlock, bonusObjectiveBlock
+local mainObjectiveBlock, bonusObjectiveBlock
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -127,6 +127,7 @@ local function GetObjectivesBlock(holderWindow, name, position, items, gameRules
 			parent = holderWindow,
 		}
 		
+		objectives[index].success = (newSuccess == 1)
 		objectives[index].terminated = true
 		objectives[index].image = image
 	end
@@ -147,12 +148,24 @@ local function GetObjectivesBlock(holderWindow, name, position, items, gameRules
 		UpdateObjectiveSuccess()
 	end
 	
+	function externalFunctions.MakeObjectivesString()
+		local objectivesString = ""
+		for i = 1, #objectives do
+			if objectives[i].success then
+				objectivesString = objectivesString .. "1"
+			else
+				objectivesString = objectivesString .. "0"
+			end
+		end
+		return objectivesString
+	end
+	
 	return externalFunctions, position
 end
 
 local function InitializeBonusObjectives()
-	objectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
-	bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
+	local objectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
+	local bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
 	
 	local holderHeight = 20 + 16*(#objectiveList)
 	if bonusObjectiveList and #bonusObjectiveList > 0 then
@@ -210,7 +223,8 @@ end
 local function SendVictoryToLuaMenu(planetID)
 	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
 	if luaMenu then
-		Spring.SendLuaMenuMsg(WIN_MESSAGE .. planetID)
+		local bonusObjectiveString = bonusObjectiveBlock and bonusObjectiveBlock.MakeObjectivesString()
+		Spring.SendLuaMenuMsg(WIN_MESSAGE .. planetID .. " " .. (bonusObjectiveString or ""))
 	end
 end
 
@@ -222,6 +236,10 @@ local function SendDefeatToLuaMenu(planetID)
 end
 
 function widget:GameOver(winners)
+	if bonusObjectiveBlock then
+		bonusObjectiveBlock.Update()
+	end
+	
 	for i = 1, #winners do
 		if winners[i] == myAllyTeamID then
 			SendVictoryToLuaMenu(campaignBattleID)

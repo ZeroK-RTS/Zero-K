@@ -274,8 +274,8 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 		return
 	end
 	
-	-- Objective must have success if it is not ignored or failed at game end
-	if gameIsOver then
+	-- Objective may have succeeded if the game ends.
+	if gameIsOver and not objectiveData.satisfyByTime then
 		CompleteBonusObjective(bonusObjectiveID, true)
 		return
 	end
