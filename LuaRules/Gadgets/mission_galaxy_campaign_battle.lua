@@ -258,7 +258,7 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	end
 	
 	-- Check whether the objective is in the right timeframe and whether it passes/fails
-	-- Times: satisfyAtTime, satisfyByTime, satisfyUntilTime, satisfyAfterTime, satisfyForeverAfterFirstSatisfied or satisfyForever
+	-- Times: satisfyAtTime, satisfyByTime, satisfyUntilTime, satisfyAfterTime, satisfyForeverAfterFirstSatisfied, satisfyOnce or satisfyForever
 	if objectiveData.satisfyByTime and (objectiveData.satisfyByTime < gameSeconds) then
 		CompleteBonusObjective(bonusObjectiveID, false)
 		return
@@ -275,16 +275,16 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	end
 	
 	-- Objective may have succeeded if the game ends.
-	if gameIsOver and (not objectiveData.satisfyByTime) and (not objectiveData.satisfyForeverAfterFirstSatisfied) then
+	if gameIsOver and (objectiveData.satisfyForever or objectiveData.satisfyUntilTime or objectiveData.satisfyAfterTime or objectiveData.satisfyForever) then
 		CompleteBonusObjective(bonusObjectiveID, true)
 		return
 	end
 	
 	-- Check satisfaction
-	local unitCount = SumUnits(objectiveData.units, objectiveData.targetNumber + 1)
+	local unitCount = SumUnits(objectiveData.units, objectiveData.targetNumber + 1) + (objectiveData.removedUnits or 0)
 	local satisfied = ComparisionSatisfied(objectiveData.comparisionType, objectiveData.targetNumber, unitCount)
 	if satisfied then
-		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime then
+		if objectiveData.satisfyAtTime or objectiveData.satisfyByTime or objectiveData.satisfyOnce then
 			CompleteBonusObjective(bonusObjectiveID, true)
 		end
 		if objectiveData.satisfyForeverAfterFirstSatisfied then
@@ -319,10 +319,19 @@ local function AddBonusObjectiveUnit(unitID, bonusObjectiveID)
 end
 
 local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
-	if not bonusObjectiveList[bonusObjectiveID].units then
+	local objectiveData = bonusObjectiveList[bonusObjectiveID]
+	if not objectiveData.units then
 		return
 	end
-	bonusObjectiveList[bonusObjectiveID].units[unitID] = nil
+	if objectiveData.units[unitID] then
+		if objectiveData.countRemovedUnits then
+			local inbuild = select(3, Spring.GetUnitIsStunned(unitID))
+			if not inbuild then
+				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
+			end
+		end
+		objectiveData.units[unitID] = nil
+	end
 end
 
 local function SetWinBeforeBonusObjective(victory)
