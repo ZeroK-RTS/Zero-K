@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 550,
   builder                = false,
   buildPic               = [[corsent.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

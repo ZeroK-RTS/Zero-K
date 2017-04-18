@@ -13,7 +13,6 @@ unitDef = {
   },
 
   buildPic            = [[commrecon.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

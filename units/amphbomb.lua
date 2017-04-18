@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 100,
   builder                = false,
   buildPic               = [[AMPHBOMB.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

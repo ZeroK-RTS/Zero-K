@@ -9,7 +9,6 @@ unitDef = {
   buildCostMetal    = 120,
   builder           = false,
   buildPic          = [[CORTL.png]],
-  canAttack         = true,
   category          = [[FLOAT]],
   collisionVolumeOffsets        = [[0 -5 0]],
   collisionVolumeScales         = [[42 50 42]],

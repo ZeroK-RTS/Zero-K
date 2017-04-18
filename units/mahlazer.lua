@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 11,
   buildingGroundDecalType       = [[starlight_aoplate.dds]],
   buildPic                      = [[mahlazer.png]],
-  canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[160 160 160]],

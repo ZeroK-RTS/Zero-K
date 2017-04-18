@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 850,
   builder             = false,
   buildPic            = [[correap.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

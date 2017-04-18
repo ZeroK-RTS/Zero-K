@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 420,
   builder             = false,
   buildPic            = [[capturecar.png]],
-  canAttack           = false,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

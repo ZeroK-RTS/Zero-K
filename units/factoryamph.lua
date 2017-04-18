@@ -21,7 +21,6 @@ unitDef = {
   },
 
   buildPic         = [[factoryamph.png]],
-  canAttack        = true,
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED SINK]],

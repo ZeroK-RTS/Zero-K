@@ -5,7 +5,6 @@ unitDef = {
   brakerate           = 0.4,
   buildCostMetal      = 550,
   buildPic            = [[armstiletto_laser.png]],
-  canAttack           = true,
   canFly              = true,
   canMove             = true,
   canSubmerge         = false,

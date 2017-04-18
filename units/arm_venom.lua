@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.78,
   buildCostMetal         = 200,
   buildPic               = [[arm_venom.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.6,
   buildCostMetal         = 30,
   buildPic               = [[corclog.png]],
-  canAttack              = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -5,7 +5,6 @@ unitDef = {
   brakerate              = 0.4,
   buildCostMetal         = 300,
   buildPic               = [[corvamp.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

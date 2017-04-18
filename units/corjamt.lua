@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[corjamt_aoplane.dds]],
   buildPic                      = [[CORJAMT.png]],
-  canAttack                     = false,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 39 30]],

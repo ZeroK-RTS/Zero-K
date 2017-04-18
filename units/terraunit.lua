@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 1000000,
   builder                = false,
   buildPic               = [[levelterra.png]],
-  canAttack              = false,
   capturable             = false,
   category               = [[TERRAFORM STUPIDTARGET]],
   collisionVolumeOffsets = [[0 -3000 0]],

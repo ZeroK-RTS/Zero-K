@@ -10,7 +10,6 @@ unitDef = {
   builder                       = false,
   buildPic                      = [[levelterra.png]],
   buildTime                     = 0.45,
-  canAttack                     = false,
   canGuard                      = false,
   canMove                       = false,
   canPatrol                     = false,

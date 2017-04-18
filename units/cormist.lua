@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 140,
   builder                = false,
   buildPic               = [[CORMIST.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

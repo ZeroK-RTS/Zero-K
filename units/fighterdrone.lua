@@ -5,7 +5,6 @@ unitDef = {
   brakerate              = 0.4,
   buildCostMetal         = 100,
   buildPic               = [[fighterdrone.png]],
-  canAttack              = true,
   canBeAssisted          = false,
   canFly                 = true,
   canGuard               = true,

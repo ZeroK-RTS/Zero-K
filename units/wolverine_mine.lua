@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 5,
   builder                = false,
   buildPic               = [[wolverine_mine.png]],
-  canAttack              = true,
   canGuard               = false,
   canMove                = false,
   canPatrol              = false,

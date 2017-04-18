@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.32,
   buildCostMetal         = 150,
   buildPic               = [[ARMJETH.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

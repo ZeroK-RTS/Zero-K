@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 50,
   builder                = false,
   buildPic               = [[PUPPY.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

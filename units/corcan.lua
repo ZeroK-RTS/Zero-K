@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 600,
   builder             = false,
   buildPic            = [[CORCAN.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

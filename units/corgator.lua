@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 130,
   builder                = false,
   buildPic               = [[corgator.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

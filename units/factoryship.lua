@@ -20,7 +20,6 @@ unitDef = {
   },
 
   buildPic               = [[FACTORYSHIP.png]],
-  canAttack              = true,
   canMove                = true,
   canPatrol              = true,
   category               = [[UNARMED FLOAT]],

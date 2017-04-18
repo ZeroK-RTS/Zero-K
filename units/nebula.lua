@@ -10,7 +10,6 @@ unitDef = {
   buildCostMetal         = 6000,
   builder                = false,
   buildPic               = [[nebula.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

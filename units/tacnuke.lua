@@ -9,7 +9,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[tacnuke_aoplane.dds]],
   buildPic                      = [[tacnuke.png]],
-  canAttack                     = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 25 0]],
   collisionVolumeScales         = [[20 60 20]],

@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[vehaa.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

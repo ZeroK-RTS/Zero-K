@@ -5,7 +5,6 @@ unitDef = {
   buildCostMetal         = 600,
   builder                = false,
   buildPic               = [[empmissile.png]],
-  canAttack              = true,
   category               = [[SINK UNARMED]],
   collisionVolumeOffsets = [[0 15 0]],
   collisionVolumeScales  = [[20 50 20]],

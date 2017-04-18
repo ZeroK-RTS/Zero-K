@@ -9,7 +9,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chicken_leaper.png]],
   buildTime           = 100,
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

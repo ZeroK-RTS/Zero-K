@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 760,
   builder             = false,
   buildPic            = [[ARMBRAWL.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

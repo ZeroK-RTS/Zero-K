@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.18,
   buildCostMetal         = 1600,
   buildPic               = [[armcrabe.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

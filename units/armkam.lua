@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 220,
   builder                = false,
   buildPic               = [[ARMKAM.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

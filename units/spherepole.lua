@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.3,
   buildCostMetal         = 250,
   buildPic               = [[spherepole.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

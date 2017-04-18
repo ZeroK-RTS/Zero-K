@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[scorpion.png]],
-  canAttack              = true,
   canGuard               = true,
   canManualFire			 = true,
   canMove                = true,

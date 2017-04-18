@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostMetal         = 220,
   buildPic               = [[ARMWAR.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

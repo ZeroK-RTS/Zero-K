@@ -7,7 +7,6 @@ unitDef = {
   brakeRate              = 0.75,
   buildCostMetal         = 600,
   buildPic               = [[spherecloaker.png]],
-  canAttack              = false,
   canMove                = true,
   category               = [[LAND UNARMED]],
   corpse                 = [[DEAD]],

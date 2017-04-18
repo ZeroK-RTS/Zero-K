@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal                = 1000,
   builder                       = false,
   buildPic                      = [[pw_hq.png]],
-  canAttack                     = true,
   canSelfDestruct               = false,
   category                      = [[FLOAT UNARMED]],
   corpse                        = [[DEAD]],

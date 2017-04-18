@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 1700,
   builder             = false,
   buildPic            = [[CORSUMO.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

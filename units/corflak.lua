@@ -11,7 +11,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[corflak_aoplane.dds]],
   buildPic                      = [[CORFLAK.png]],
-  canAttack                     = true,
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 11 -4]],
   collisionVolumeScales         = [[50 86 50]],

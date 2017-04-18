@@ -10,7 +10,6 @@ unitDef = {
   buildCostMetal         = 4500,
   builder                = false,
   buildPic               = [[CORCRW.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[corgrav_aoplane.dds]],
   buildPic                      = [[corgrav.png]],
-  canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 50 50]],

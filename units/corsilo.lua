@@ -11,7 +11,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 10,
   buildingGroundDecalType       = [[corsilo_aoplane.dds]],
   buildPic                      = [[CORSILO.png]],
-  canAttack                     = true,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 

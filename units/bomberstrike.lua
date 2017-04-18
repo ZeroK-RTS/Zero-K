@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal      = 400,
   builder             = false,
   buildPic            = [[bomberstrike.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

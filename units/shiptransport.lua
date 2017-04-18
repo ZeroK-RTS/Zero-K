@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 220,
   builder             = false,
   buildPic            = [[shiptransport.png]],
-  canAttack           = false,
   canMove             = true,
   cantBeTransported   = true,
   category            = [[SHIP UNARMED]],

@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[corrad_aoplane.dds]],
   buildPic                      = [[corrad.png]],
-  canAttack                     = false,
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 -32 0]],
   collisionVolumeScales         = [[32 90 32]],

@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.75,
   buildCostMetal         = 130,
   buildPic               = [[ARMHAM.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

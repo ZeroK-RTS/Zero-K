@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 900,
   builder             = false,
   buildPic            = [[BLACKDAWN.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

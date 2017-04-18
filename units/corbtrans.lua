@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 500,
   builder                = false,
   buildPic               = [[corbtrans.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canload                = [[1]],

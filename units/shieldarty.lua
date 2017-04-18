@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.75,
   buildCostMetal         = 360,
   buildPic               = [[SHIELDARTY.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 400,
   builder             = false,
   buildPic            = [[hoverriot.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

@@ -14,7 +14,6 @@ unitDef = {
   buildingGroundDecalType       = [[chickenspire_aoplane.dds]],
   buildPic                      = [[chickenspire.png]],
   buildTime                     = 2500,
-  canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 48 0]],
   collisionVolumeScales         = [[58 176 58]],

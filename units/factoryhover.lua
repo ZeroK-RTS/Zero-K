@@ -19,7 +19,6 @@ unitDef = {
   },
 
   buildPic         = [[factoryhover.png]],
-  canAttack        = true,
   canMove          = true,
   canPatrol        = true,
   category         = [[UNARMED FLOAT]],

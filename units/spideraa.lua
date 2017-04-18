@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.66,
   buildCostMetal         = 400,
   buildPic               = [[spideraa.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal        = 250,
   builder               = false,
   buildPic              = [[jumpblackhole.png]],
-  canAttack             = true,
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,

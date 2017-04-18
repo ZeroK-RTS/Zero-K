@@ -8,7 +8,6 @@ unitDef = {
   brakeRate              = 0.375,
   buildCostMetal         = 2000,
   buildPic               = [[armcomdgun.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

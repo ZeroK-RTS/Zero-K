@@ -5,7 +5,6 @@ unitDef = {
   brakerate              = 0.4,
   buildCostMetal         = 150,
   buildPic               = [[fighter.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

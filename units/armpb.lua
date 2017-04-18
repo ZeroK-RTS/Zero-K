@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[armpb_aoplane.dds]],
   buildPic                      = [[ARMPB.png]],
-  canAttack                     = true,
   canMove                       = false,
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 20 0]],

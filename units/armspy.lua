@@ -7,7 +7,6 @@ unitDef = {
   brakeRate             = 0.9,
   buildCostMetal        = 280,
   buildPic              = [[armspy.png]],
-  canAttack             = true,
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,

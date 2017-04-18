@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 700,
   builder             = false,
   buildPic            = [[ARMMERL.png]],
-  canAttack           = true,
   canMove             = true,
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],

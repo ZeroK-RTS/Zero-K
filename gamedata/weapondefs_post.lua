@@ -343,65 +343,34 @@ end
 --
 
 do
-  local processed = {}
+	local function RawCanAttack (ud)
+		if (ud.weapons) then
+			for i, weapon in pairs(ud.weapons) do
+				local wd = WeaponDefs[weapon.name:lower()]
+				if wd.weapontype ~= "Shield" and not wd.interceptor then
+					return true
+				end
+			end
+		end
+		if (ud.kamikaze) then
+			return not ud.yardmap
+		end
+		return false
+	end
 
-  local RawCanAttack
-  local FacCanAttack
-  local CanAttack
-
-  RawCanAttack = function(ud)
-    if (ud.weapons) then
-      for i, weapon in pairs(ud.weapons) do
-		--Spring.Echo(ud.name)
-        local wd = WeaponDefs[weapon.name:lower()]
-		if not wd then
-			Spring.Echo("Weapon Def Missing", weapon.name)
+	local function CanAttack (ud)
+		local isFac = ud.yardmap and ud.buildoptions
+		if isFac or RawCanAttack(ud) then
 			return true
 		end
-        if ((not (wd.weapontype == "Shield")) and 
-            (not wd.interceptor)) then
-          return true
-        end
-      end
-    end
-    if (ud.kamikaze) then
-      return not ud.yardmap
-    end
-    return false
-  end
+		return false
+	end
 
-  FacCanAttack = function(ud)
-    if not ud.buildoptions then
-      return false
-    end
-    for _, name in pairs(ud.buildoptions) do
-      if (CanAttack(UnitDefs[name:lower()])) then
-        return true
-      end
-    end
-    return false
-  end
-
-  CanAttack = function(ud)
-    if (processed[ud] ~= nil) then
-      return processed[ud]
-    end
-    local canAttack = false
-    if (RawCanAttack(ud)) then
-      canAttack = true
-    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname:find("pw_") or ud.unitname == "armasp") then
-      if (ud.unitname == "armasp" or FacCanAttack(ud)) then
-        canAttack = true
-      end
-    end
-    processed[ud] = canAttack
-    return canAttack
-  end
-
-  -- loop through the unit defs
-  for name, ud in pairs(UnitDefs) do
-    ud.canattack = CanAttack(ud)
-  end
+	for name, ud in pairs(UnitDefs) do
+		if not ud.canattack then
+			ud.canattack = CanAttack(ud)
+		end
+	end
 end
 
 --------------------------------------------------------------------------------

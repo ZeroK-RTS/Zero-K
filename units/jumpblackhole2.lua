@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 1.05,
   buildCostMetal         = 100,
   buildPic               = [[cormak.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

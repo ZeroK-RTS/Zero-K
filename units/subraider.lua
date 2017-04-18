@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 200,
   builder                = false,
   buildPic               = [[subraider.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

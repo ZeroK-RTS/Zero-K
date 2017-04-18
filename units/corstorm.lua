@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.2,
   buildCostMetal         = 120,
   buildPic               = [[CORSTORM.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

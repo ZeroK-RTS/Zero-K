@@ -11,7 +11,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 3.6,
   buildingGroundDecalType       = [[armcir_aoplane.dds]],
   buildPic                      = [[ARMCIR.png]],
-  canAttack                     = true,
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[58 76 58]],

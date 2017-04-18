@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal      = 180,
   builder             = false,
   buildPic            = [[logkoda.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

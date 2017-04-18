@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 1.35,
   buildCostMetal         = 90,
   buildPic               = [[CORCRASH.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[screamer_aoplane.dds]],
   buildPic                      = [[SCREAMER.png]],
-  canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[74 74 74]],

@@ -7,7 +7,6 @@ unitDef = {
   brakeRate           = 0.22,
   buildCostMetal      = 620,
   buildPic            = [[shieldfelon.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

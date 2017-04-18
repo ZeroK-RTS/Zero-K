@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.6,
   buildCostMetal         = 120,
   buildPic               = [[armtick.png]],
-  canAttack              = true,
   canMove                = true,
   category               = [[LAND TOOFAST]],
   cloakCost              = 0,

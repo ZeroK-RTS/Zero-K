@@ -9,7 +9,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[armbrtha_aoplane.dds]],
   buildPic                      = [[ARMBRTHA.png]],
-  canAttack                     = true,
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 194 70]],

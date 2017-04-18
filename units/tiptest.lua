@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 250,
   builder                = false,
   buildPic               = [[corraid.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

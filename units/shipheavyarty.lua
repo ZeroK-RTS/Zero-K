@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 3800,
   builder                = false,
   buildPic               = [[shipheavyarty.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

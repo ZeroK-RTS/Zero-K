@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.78,
   buildCostMetal         = 280,
   buildPic               = [[ARMSPTK.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

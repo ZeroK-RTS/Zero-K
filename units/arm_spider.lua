@@ -13,7 +13,6 @@ unitDef = {
   },
 
   buildPic               = [[arm_spider.png]],
-  canAttack              = false,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

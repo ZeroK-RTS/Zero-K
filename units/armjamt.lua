@@ -10,7 +10,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[armjamt_aoplane.dds]],
   buildPic                      = [[ARMJAMT.png]],
-  canAttack                     = false,
   category                      = [[SINK UNARMED]],
   cloakCost                     = 1,
   collisionVolumeOffsets        = [[0 0 0]],

@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 3500,
   builder                = false,
   buildPic               = [[ARMRAVEN.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

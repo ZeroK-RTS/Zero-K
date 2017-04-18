@@ -12,7 +12,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 8,
   buildingGroundDecalType       = [[corbhmth_aoplane.dds]],
   buildPic                      = [[CORBHMTH.png]],
-  canAttack                     = true,
   category                      = [[SINK]],
   corpse                        = [[DEAD]],
 

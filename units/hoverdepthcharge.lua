@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 330,
   builder             = false,
   buildPic            = [[hoverdepthcharge.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

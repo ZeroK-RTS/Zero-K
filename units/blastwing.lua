@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 55,
   builder                = false,
   buildPic               = [[blastwing.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,

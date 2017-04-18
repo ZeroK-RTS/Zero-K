@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal    = 450,
   builder           = false,
   buildPic          = [[ARMSONAR.png]],
-  canAttack         = false,
   category          = [[UNARMED FLOAT]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 48 32]],

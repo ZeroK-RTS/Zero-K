@@ -9,7 +9,6 @@ unitDef = {
   buildCostMetal         = 24000,
   builder                = false,
   buildPic               = [[ARMORCO.png]],
-  canAttack              = true,
   canGuard               = true,
   --canManualFire          = true,
   canMove                = true,

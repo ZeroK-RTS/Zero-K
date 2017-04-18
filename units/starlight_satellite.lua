@@ -7,7 +7,6 @@ starlight_satellite = {
   buildCostMetal         = 300,
   builder                = false,
   buildPic               = [[satellite.png]],
-  canAttack              = false,
   canFly                 = false,
   canMove                = true,
   canSubmerge            = false,

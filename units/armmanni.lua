@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal      = 1000,
   builder             = false,
   buildPic            = [[armmanni.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

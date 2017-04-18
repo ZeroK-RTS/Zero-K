@@ -9,7 +9,6 @@ unitDef = {
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[napalmmissile_aoplane.dds]],
   buildPic                      = [[napalmmissile.png]],
-  canAttack                     = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 60 20]],

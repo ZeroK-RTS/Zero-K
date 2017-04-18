@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.66,
   buildCostMetal         = 280,
   buildPic               = [[spiderriot.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal                = 25,
   builder                       = false,
   buildPic                      = [[asteroid.png]],
-  canAttack                     = false,
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
   footprintX                    = 2,

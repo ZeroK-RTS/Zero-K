@@ -6,7 +6,6 @@ unitDef = {
   brakeRate           = 2.1,
   buildCostMetal      = 20,
   buildPic            = [[ARMFLEA.png]],
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

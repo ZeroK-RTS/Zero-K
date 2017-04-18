@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 240,
   builder                = false,
   buildPic               = [[shipskirm.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

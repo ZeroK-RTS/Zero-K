@@ -8,7 +8,6 @@ unitDef = {
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[subtacmissile.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

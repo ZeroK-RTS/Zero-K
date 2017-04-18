@@ -10,7 +10,6 @@ unitDef = {
   builder             = false,
   buildPic            = [[chicken_tiamat.png]],
   buildTime           = 350,
-  canAttack           = true,
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,

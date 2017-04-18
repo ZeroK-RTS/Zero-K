@@ -6,7 +6,6 @@ unitDef = {
   brakeRate              = 0.6,
   buildCostMetal         = 350,
   buildPic               = [[ARMZEUS.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

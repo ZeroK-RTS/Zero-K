@@ -7,7 +7,6 @@ unitDef = {
   buildCostMetal         = 1500,
   builder                = false,
   buildPic               = [[TREM.png]],
-  canAttack              = true,
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,

@@ -6,7 +6,6 @@ unitDef = {
   buildCostMetal      = 360,
   builder             = false,
   buildPic            = [[corhurc2.png]],
-  canAttack           = true,
   canFly              = true,
   canGuard            = true,
   canMove             = true,

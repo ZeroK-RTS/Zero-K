@@ -9,7 +9,6 @@ unitDef = {
   buildCostMetal         = 270,
   builder                = false,
   buildPic               = [[gunshipaa.png]],
-  canAttack              = true,
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
