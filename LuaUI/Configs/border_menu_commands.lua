@@ -182,6 +182,7 @@ local overrides = {
 	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png'},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
+	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
 	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
 
@@ -276,6 +277,8 @@ local custom_cmd_actions = {	-- states are 2, not states are 1
 	unloadunits=1,
 	areaattack=1,
 
+	rawmove=1,
+	
 	-- states
 	onoff=2,
 	['repeat']=2,

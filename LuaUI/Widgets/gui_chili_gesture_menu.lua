@@ -17,6 +17,7 @@ function widget:GetInfo()
 end 
 
 include("keysym.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------
 ------ SPEEDUPS
 -------------------------------------------------
@@ -573,9 +574,9 @@ function widget:MouseRelease(x,y,button)
 			if shift then tinsert(keyState, "shift") end
     
 			if meta and WG.CommandInsert then 
-				GiveNotifyingInsertOrder(CMD.MOVE,pos,keyState)
+				GiveNotifyingInsertOrder(CMD_RAW_MOVE,pos,keyState)
 			else 
-				GiveNotifyingOrder(CMD.MOVE, pos, keyState)
+				GiveNotifyingOrder(CMD_RAW_MOVE, pos, keyState)
 			end 
 		end 
 	end 

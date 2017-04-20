@@ -1,3 +1,6 @@
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 local sprGetActiveCommand    = Spring.GetActiveCommand
 local sprGetDefaultCommand   = Spring.GetDefaultCommand
 local sprGetGameSeconds      = Spring.GetGameSeconds
@@ -35,6 +38,7 @@ local CMD_JUMP = 38521
 local CMD_BUILD = -1
 local cmdColorsTbl = {
 	[CMD.MOVE]         = {0.5, 1.0, 0.5, 0.7},
+	[CMD_RAW_MOVE]         = {0.5, 1.0, 0.5, 0.7},
 	[CMD.PATROL]       = {0.3, 0.3, 1.0, 0.7},
 	[CMD.RECLAIM]      = {1.0, 0.2, 1.0, 0.7},
 	[CMD.REPAIR]       = {0.3, 1.0, 1.0, 0.7},
@@ -51,6 +55,7 @@ local cmdColorsTbl = {
 
 local POINT_COMMAND = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.PATROL] = true,
 	[CMD_JUMP] = true,
 	[CMD.FIGHT] = true,

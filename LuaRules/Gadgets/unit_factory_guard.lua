@@ -35,7 +35,6 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Automatically generated local definitions
 
 local CMD_GUARD            = CMD.GUARD
-local CMD_MOVE             = CMD.MOVE
 local spGetMyTeamID        = Spring.GetMyTeamID
 local spGetUnitBuildFacing = Spring.GetUnitBuildFacing
 local spGetUnitGroup       = Spring.GetUnitGroup
@@ -155,9 +154,9 @@ local function GuardFactory(unitID, unitDefID, factID, factDefID)
 		rx, rz =  0,  dist
 	end
 	
-	GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x + dx, y, z + dz }, { "" })
-	if not GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x + rx, y, z + rz }, { "shift" }, true) then
-		GiveClampedOrderToUnit(unitID, CMD_MOVE,  { x - rx, y, z - rz }, { "shift" })
+	GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + dx, y, z + dz }, { "" })
+	if not GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x + rx, y, z + rz }, { "shift" }, true) then
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE,  { x - rx, y, z - rz }, { "shift" })
 	end
 	spGiveOrderToUnit(unitID, CMD_GUARD, { factID },            { "shift" })
 end

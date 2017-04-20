@@ -105,7 +105,7 @@ return {
 		{	"togglelos",	"Ctrl+l",},
 		{	"loadunits",	"l",},
 		{	"loadselected",	"l",},
-		{	"move",	"m",},
+		{	"rawmove",	"m",},
 		{	"singlestep",	"Alt+o",},
 		{	"patrol",	"p",},
 		{	"groupclear",	"Shift+q",},

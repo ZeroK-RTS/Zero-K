@@ -309,9 +309,9 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, n, doHug
 		
 		if move then
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		else
-			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		end
 		
 		ClampedRawMove(unitID, cx,cy,cz, data)

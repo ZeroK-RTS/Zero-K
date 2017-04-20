@@ -15,6 +15,7 @@ function widget:GetInfo()
 end
 
 include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -739,12 +740,12 @@ local function WaypointHandler(x,y,button)
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt) 
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
   elseif type=='unit' then
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt)
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 
   --if not shift then waypointMode = 0; return true end

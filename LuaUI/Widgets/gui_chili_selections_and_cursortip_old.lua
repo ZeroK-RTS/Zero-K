@@ -2687,6 +2687,7 @@ function widget:Update(dt)
 						else
 							local commandList = {
 													{{CMD.WAIT}, "Wait"},
+													{{CMD_RAW_MOVE}, "Move", {0.2,0.8,0.2,1}},
 													{{CMD.MOVE}, "Move", {0.2,0.8,0.2,1}},
 													{{CMD.PATROL}, "Patrol",{0.4,0,1,1}},
 													{{CMD.FIGHT}, "Fight", {0.4,0,0.8,1}},

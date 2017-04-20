@@ -237,7 +237,7 @@ local function GiveRearmOrders(unitID)
 		
 		if unitIsIdle then
 			local ux, uy, uz = spGetUnitPosition(unitID)
-			GiveClampedOrderToUnit(unitID, CMD.MOVE, {ux, uy, uz}, {"shift"})
+			GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, {"shift"})
 		end
 		
 		local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -255,7 +255,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	local hy = Spring.GetGroundHeight(hx, hz)
 	
 	spGiveOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.WAIT, CMD.OPT_SHIFT}, {"alt"}) --SHIFT W
-	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD.MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, {"alt"}) -- ALT makes the 0 positional
+	GiveClampedOrderToUnit(unitID, CMD.INSERT, { insertIndex, CMD_RAW_MOVE, CMD.OPT_INTERNAL, hx, hy, hz}, {"alt"}) -- ALT makes the 0 positional
 	
 	local cmds = Spring.GetUnitCommands(unitID,2)
 	local tag1, tag2 = cmds[1].tag, cmds[2] and cmds[2].tag
@@ -266,7 +266,7 @@ local function GiveRetreatOrders(unitID, hx,hz)
 	
 	if unitIsIdle then
 		local ux, uy, uz = spGetUnitPosition(unitID)
-		GiveClampedOrderToUnit(unitID, CMD.MOVE, {ux, uy, uz}, {"shift"})
+		GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, {ux, uy, uz}, {"shift"})
 	end
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
@@ -452,7 +452,7 @@ function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdO
 	
     if isRetreating[unitID] and not ignoreAllowCommand and not cmdOptions.shift
 		--need checks here because of random commands like maxwantedspeed, find better way
-		and ( cmdID == CMD.MOVE or cmdID == CMD.FIGHT or cmdID == CMD.STOP or cmdID == CMD.ATTACK or cmdID == CMD.GUARD or cmdID == CMD.PATROL )
+		and ( cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.FIGHT or cmdID == CMD.STOP or cmdID == CMD.ATTACK or cmdID == CMD.GUARD or cmdID == CMD.PATROL )
 		then
 		ResetRetreatData(unitID)
 		if not CheckUnitNextFrame then

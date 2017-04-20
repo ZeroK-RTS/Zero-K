@@ -13,6 +13,8 @@ function gadget:GetInfo()
 	}
 end
 
+include("LuaRules/Configs/customcmds.h.lua")
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local SAVE_FILE = "Gadgets/unit_spawner.lua"
@@ -785,7 +787,7 @@ local function SpawnMiniQueen()
 	local miniQueenTarget	= Spring.GetUnitNearestEnemy(unitID, 20000, false)
 	local tloc
 	if (miniQueenTarget) then tloc = ChooseTarget(miniQueenTarget) end
-	if (tloc) then spGiveOrderToUnit(unitID, CMD.MOVE, tloc, emptyTable) end
+	if (tloc) then spGiveOrderToUnit(unitID, CMD_RAW_MOVE, tloc, emptyTable) end
 end
 
 
@@ -1092,7 +1094,7 @@ function gadget:GameFrame(n)
 				if (not (cmdQueue and cmdQueue[1])) then
 					--AttackNearestEnemy(unitID)
 					if (difficulty > 1) and (unitID == data.queenID) then
-						spGiveOrderToUnit(unitID, CMD.MOVE, data.targetCache, {"shift"})
+						spGiveOrderToUnit(unitID, CMD_RAW_MOVE, data.targetCache, {"shift"})
 					else
 						spGiveOrderToUnit(unitID, CMD_FIGHT, data.targetCache, {"shift"})
 					end

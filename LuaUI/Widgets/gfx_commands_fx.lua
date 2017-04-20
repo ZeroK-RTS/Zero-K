@@ -118,6 +118,12 @@ local OPTIONS = {
 			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},
 			ringColor		= {0.00 ,1.00 ,0.00 ,0.25}
 		},
+		[CMD_RAW_MOVE] = {
+			size			= 1,
+			duration		= 1,
+			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},
+			ringColor		= {0.00 ,1.00 ,0.00 ,0.25}
+		},
 		[CMD.FIGHT] = {
 			size			= 1.2,
 			duration		= 1,

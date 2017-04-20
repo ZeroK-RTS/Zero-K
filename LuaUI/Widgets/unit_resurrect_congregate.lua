@@ -11,6 +11,8 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
 local waitDuration_gbl_cnst = 1
 local blobRadius_gbl_cnst = 300
 local blobUnits_gbl_cnst = 5
@@ -93,7 +95,7 @@ function widget:Update(n)
 				if closestCoordinate[1] then
 					local x,y,z = closestCoordinate[1],closestCoordinate[2],closestCoordinate[3]
 					local currentIndex = #orderArray+1
-					orderArray[currentIndex]={CMD.MOVE, {x,y,z}, { "" }}
+					orderArray[currentIndex]={CMD_RAW_MOVE, {x,y,z}, { "" }}
 					unitArray[currentIndex] = unitToMove_gbl[unitIndex][4] --unitID
 				end
 			end

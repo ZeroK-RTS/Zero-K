@@ -149,6 +149,7 @@ end
 
 local goodCommand = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.WAIT] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 	[CMD.GUARD] = true,
@@ -198,7 +199,7 @@ local function ProcessCommand(unitID, cmdID, params, noUsefuless, noPosition)
 	if not (goodCommand[cmdID] or cmdID < 0) then
 		return false
 	end
-	local halting = not (cmdID == CMD.MOVE or cmdID == CMD.WAIT or cmdID == CMD.SET_WANTED_MAX_SPEED)
+	local halting = not (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.WAIT or cmdID == CMD.SET_WANTED_MAX_SPEED)
 	if noPosition or cmdID == CMD.WAIT or cmdID == CMD.SET_WANTED_MAX_SPEED then
 		return true, halting
 	end
@@ -690,7 +691,7 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 			if usefulCommand then
 				cnt = cnt +1
 				if cx then 
-					spGiveOrderToUnit(transportID, CMD.MOVE, {cx, cy, cz}, {"shift"})
+					spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {cx, cy, cz}, {"shift"})
 					TableInsert(torev, {cx, cy, cz + 20})
 					lastX, lastY, lastZ = cx, cy, cz
 				end
@@ -729,12 +730,12 @@ function widget:UnitLoaded(unitID, unitDefID, teamID, transportID)
 		if toGuard[transportID] or ReturnToPickupLocation(unitDefID) then
 			local i = #torev
 			while (i > 0) do 
-				spGiveOrderToUnit(transportID, CMD.MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
+				spGiveOrderToUnit(transportID, CMD_RAW_MOVE, torev[i], {"shift"}) -- move in zig zaq (if queued)
 				i = i -1
 			end
 
 			local x,y,z = spGetUnitPosition(transportID)
-			spGiveOrderToUnit(transportID, CMD.MOVE, {x,y,z}, {"shift"})
+			spGiveOrderToUnit(transportID, CMD_RAW_MOVE, {x,y,z}, {"shift"})
 			
 			--unload 2nd time at loading point incase transport refuse to drop unit at the intended destination (ie: in water)
 			spGiveOrderToUnit(transportID, CMD.UNLOAD_UNITS, {x,y,z, CONST_UNLOAD_RADIUS}, {"shift"})

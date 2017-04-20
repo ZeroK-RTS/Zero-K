@@ -123,7 +123,7 @@ local ignore = {
   [CMD_SET_WANTED_MAX_SPEED] = true,
 }
 
-local curve = {CMD_MOVE, CMD_JUMP, CMD_FIGHT}
+local curve = {CMD_MOVE, CMD_RAW_MOVE, CMD_JUMP, CMD_FIGHT}
 local line = {CMD_ATTACK}
 
 curve = ListToSet(curve)

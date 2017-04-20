@@ -13,6 +13,7 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local GetSelectedUnits = Spring.GetSelectedUnits
 local GiveOrderToUnit  = Spring.GiveOrderToUnit
 local GetUnitPosition  = Spring.GetUnitPosition

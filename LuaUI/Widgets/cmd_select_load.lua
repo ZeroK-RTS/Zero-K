@@ -31,6 +31,7 @@ local areaTarget -- used to match area command targets
 
 local goodCommand = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.SET_WANTED_MAX_SPEED] = true,
 	[CMD.GUARD] = true,
 	[CMD.RECLAIM] = true,
@@ -43,7 +44,7 @@ local function ProcessCommand(unitID, cmdID, params)
 	if not (goodCommand[cmdID] or cmdID < 0) then
 		return false
 	end
-	local halting = not (cmdID == CMD.MOVE or cmdID == CMD.SET_WANTED_MAX_SPEED)
+	local halting = not (cmdID == CMD.MOVE or cmdID == CMD_RAW_MOVE or cmdID == CMD.SET_WANTED_MAX_SPEED)
 	if cmdID == CMD.SET_WANTED_MAX_SPEED then
 		return true, halting
 	end
@@ -120,7 +121,7 @@ local function CopyMoveThenUnload(transportID, unitID)
 	end
 	local commands = {}
 	for i = 1, #commandLocations - 1 do
-		commands[i] = {CMD.MOVE, commandLocations[i], CMD.OPT_SHIFT}
+		commands[i] = {CMD_RAW_MOVE, commandLocations[i], CMD.OPT_SHIFT}
 	end
 	commandLocations[#commandLocations][4] = 100
 	commands[#commandLocations] = {CMD.UNLOAD_UNITS, commandLocations[#commandLocations], CMD.OPT_SHIFT}

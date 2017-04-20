@@ -24,6 +24,8 @@ local custom_cmd_actions = {
 	unloadunits = {cmdType = 1, name = "Unload Units"},
 	areaattack = {cmdType = 1, name = "Area Attack"},
 	
+	rawmove = {cmdType = 1, name = "Move"},
+	
 	-- states
 	onoff = {cmdType = 2, name = "On/Off", count = 2},
 	['repeat'] = {cmdType = 2, name = "Repeat", count = 2},
@@ -111,7 +113,7 @@ local usedActions = {
 	["movestate"] = true,
 	["repeat"] = true,
 	["loadonto"] = true,
-	["move"] = true,
+	["rawmove"] = true,
 	["patrol"] = true,
 	["fight"] = true,
 	["guard"] = true,

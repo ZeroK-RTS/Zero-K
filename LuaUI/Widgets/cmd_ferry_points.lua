@@ -23,7 +23,6 @@ local CANT_BE_TRANSPORTED_DECAY_TIME = 200
 local COMMAND_MOVE_RADIUS = 80
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
-local CMD_MOVE 		= CMD.MOVE
 local CMD_FIGHT		= CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
@@ -193,7 +192,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == 0 then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_RAW_MOVE, 
 							{route.start.x, route.start.y, route.start.z}, {} )
 					end
 				end
@@ -202,7 +201,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == movingPoint.index then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_RAW_MOVE, 
 							{route.points[movingPoint.index].x, route.points[movingPoint.index].y, route.points[movingPoint.index].z}, {} )
 					end
 				end
@@ -292,7 +291,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		
 		return true
 		
-	elseif (cmdID == CMD_MOVE or cmdID == CMD_FIGHT) and cmdParams then
+	elseif (cmdID == CMD_RAW_MOVE or cmdID == CMD_FIGHT) and cmdParams then
 	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 		if routeID then
@@ -411,7 +410,7 @@ function widget:GameFrame(frame)
 								Spring.GiveOrderToUnit(unitID, CMD.UNLOAD_UNITS, 
 									{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, {} )
 							else
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -423,10 +422,10 @@ function widget:GameFrame(frame)
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.start.x, route.start.y, route.start.z}, {} )
 							else
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -446,7 +445,7 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif disSQ(x, z, route.start.x, route.start.z) > NEAR_WAYPOINT_RANGE_SQ then
-						GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+						GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 							{route.start.x, route.start.y, route.start.z}, {} )
 					end
 				

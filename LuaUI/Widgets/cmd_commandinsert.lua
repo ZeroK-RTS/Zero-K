@@ -78,7 +78,7 @@ local function GetUnitOrFeaturePosition(id)
 end
 
 local function GetCommandPos(command) -- get the command position
-	if command.id < 0 or command.id == CMD.MOVE or command.id == CMD.REPAIR or command.id == CMD.RECLAIM or 
+	if command.id < 0 or command.id == CMD.MOVE or command.id == CMD_RAW_MOVE or command.id == CMD.REPAIR or command.id == CMD.RECLAIM or 
 			command.id == CMD.RESURRECT or command.id == CMD.MANUALFIRE or command.id == CMD.GUARD or 
 			command.id == CMD.FIGHT or command.id == CMD.ATTACK or command.id == CMD_JUMP or command.id == CMD_LEVEL then
 		if #command.params >= 3 then

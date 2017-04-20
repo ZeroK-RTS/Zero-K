@@ -178,6 +178,7 @@ local overrides = {
 	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets on the way."},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
+	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
 	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
 	
@@ -269,6 +270,7 @@ local widgetSpaceHidden = {
 	[60] = true, -- CMD.PAGES
 	[CMD_SETHAVEN] = true,
 	[CMD_SET_FERRY] = true,
+	[CMD.MOVE] = true,
 }
 
 return factory_commands, econ_commands, defense_commands, special_commands, units_factory_commands, overrides, widgetSpaceHidden

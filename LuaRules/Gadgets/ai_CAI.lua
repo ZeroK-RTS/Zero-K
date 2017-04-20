@@ -66,7 +66,7 @@ local CMD_MOVE_STATE	= CMD.MOVE_STATE
 local CMD_FIRE_STATE	= CMD.FIRE_STATE
 local CMD_RECLAIM    	= CMD.RECLAIM
 local CMD_REPAIR		= CMD.REPAIR
-local CMD_MOVE			= CMD.MOVE
+local CMD_MOVE_TO_USE	= CMD_RAW_MOVE
 local CMD_FIGHT			= CMD.FIGHT
 local CMD_ATTACK		= CMD.ATTACK
 local CMD_PATROL        = CMD.PATROL
@@ -653,7 +653,7 @@ local function makeReponsiveDefence(team,unitID,eid,eUnitDefID,aidSearchRange)
 			end
 		end
 		
-		GiveClampedOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*(range+200), 0, ez - vectorZ*(range+200)}, {})
+		GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { ex - vectorX*(range+200), 0, ez - vectorZ*(range+200)}, {})
 		
 		local bx = ex - vectorX*(range+70)
 		local bz = ez - vectorZ*(range+70)
@@ -692,7 +692,7 @@ local function runAway(unitID, enemyID, range)
 	if ((not jump) or jump == 1) and jumpDefs[spGetUnitDefID(unitID)] then
 		GiveClampedOrderToUnit(unitID, CMD_JUMP, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
 	else
-		GiveClampedOrderToUnit(unitID, CMD_MOVE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
+		GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { ex - vectorX*range, 0, ez - vectorZ*range}, {})
 	end
 end
 
@@ -1124,7 +1124,7 @@ local function makeEnergy(team,unitID)
 		if searchRange > 500 then
 			x = ux + math.random(-700,700)
 			z = uz + math.random(-700,700)
-			GiveClampedOrderToUnit(unitID, CMD_MOVE, { x , 0, z },{})
+			GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { x , 0, z },{})
 			return
 		end
 	end
@@ -1187,9 +1187,9 @@ local function assignFactory(team,unitID,cQueue)
 
 			dist = dist * (math.floor(math.random(0,1))*2-1)
 			if (facing == 0) or (facing == 2) then
-				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x + dist, y, z },{})
+				GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { x + dist, y, z },{})
 			else
-				GiveClampedOrderToUnit(unitID, CMD_MOVE, { x , y, z + dist},{})
+				GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE, { x , y, z + dist},{})
 			end
 			
 			
@@ -1698,7 +1698,7 @@ local function battleGroupHandler(team, frame, slowUpdate)
 	
 		local gy = spGetGroundHeight(averageX,averageZ)
 		for unitID,_ in pairs(data.aa) do
-			GiveClampedOrderToUnit(unitID, CMD_MOVE , {averageX,gy,averageZ}, {})
+			GiveClampedOrderToUnit(unitID, CMD_MOVE_TO_USE , {averageX,gy,averageZ}, {})
 		end
 
 		if data.tempTarget then
@@ -1871,7 +1871,7 @@ local function raiderJobHandler(team)
 	for unitID,data in pairs(raiderByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -1924,7 +1924,7 @@ local function raiderJobHandler(team)
 	for unitID,data in pairs(raiderByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
@@ -2035,7 +2035,7 @@ local function gunshipJobHandler(team)
 	for unitID,data in pairs(gunshipByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -2091,7 +2091,7 @@ local function gunshipJobHandler(team)
 	for unitID,data in pairs(gunshipByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})
@@ -2171,7 +2171,7 @@ local function combatJobHandler(team)
 	for unitID,data in pairs(combatByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not unitInBattleGroupByID[unitID] and not retreating then
 			local x, y, z = spGetUnitPosition(unitID)
 			idleCost = idleCost + data.cost
 			averageX = averageX + x
@@ -2255,7 +2255,7 @@ local function combatJobHandler(team)
 	for unitID,data in pairs(combatByID) do
 		local cQueue = spGetCommandQueue(unitID, 3)
 		local retreating = Spring.GetUnitRulesParam(unitID, "retreat") == 1
-		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE)) and data.finished and not retreating then
+		if cQueue and (#cQueue == 0 or (#cQueue == 2 and cQueue[1].id == CMD_MOVE_TO_USE)) and data.finished and not retreating then
 			local eID = spGetUnitNearestEnemy(unitID,1200)
 			if eID and not spGetUnitNeutral(eID) then	-- FIXME: remove in 95.0
 				spGiveOrderToUnit(unitID, CMD_ATTACK , {eID}, {})

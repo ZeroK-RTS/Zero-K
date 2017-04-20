@@ -19,6 +19,7 @@ Changelog:
 		- Added leash so that builders return to where they were sitting when they began autorepairing if they stray too far.
 		- Other small code fixes.
 --]]
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 local repairUnits = {}
 local idleRepairUnits = {}
@@ -154,7 +155,7 @@ function widget:GameFrame(n)
 			local posx, posy, posz = spGetUnitPosition(unitID)
 			if posx then
 				if distSqr(pos[1], pos[2], pos[3], posx, posy, posz) > leashLength*leashLength then
-					spGiveOrderToUnit(unitID, CMD.MOVE, pos, {})
+					spGiveOrderToUnit(unitID, CMD_RAW_MOVE, pos, {})
 				end
 			end
 		end

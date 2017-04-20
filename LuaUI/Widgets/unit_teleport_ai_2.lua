@@ -373,7 +373,7 @@ function widget:GameFrame(n)
 									unitInfo["norm"] = (distance/unitSpeed)*30
 								end
 								--MEASURE DISTANCE WITH TELEPORTER--
-								cmd_queue.id =CMD.MOVE
+								cmd_queue.id =CMD_RAW_MOVE
 								for l=1, #groupBeacon[i],1 do --iterate over all beacon in vicinity
 									local beaconID2 = groupBeacon[i][l]
 									if listOfBeacon[beaconID2] and listOfBeacon[beaconID2]["deployed"] == 1 then --beacon is alive?
@@ -464,7 +464,7 @@ function widget:GameFrame(n)
 							teleportedUnit[unitID] = { x = dx*50+ex ,y = ey, z = dz*50+ez } --(a coordinate of a command that we going to give)
 							--end fix
 							--method A: give GUARD order--
-							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD.MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
+							spGiveOrderArrayToUnitArray({unitID},{{CMD.INSERT, {0, CMD.GUARD, CMD.OPT_SHIFT, pathToFollow}, {"alt"}},{CMD.INSERT, {1, CMD_RAW_MOVE, CMD.OPT_INTERNAL, dx*50+ex,ey,dz*50+ez}, {"alt"}}})
 							local defID = unitInfo["defID"]
 							local chargeTime = transportChargetime[unitID] or listOfMobile[defID][2]
 							beaconCurrentQueue[pathToFollow] = beaconCurrentQueue[pathToFollow] + chargeTime
@@ -514,7 +514,7 @@ function ConvertCMDToMOVE(command)
 		return nil
 	end
 
-	if command.id == CMD.MOVE 
+	if command.id == CMD_RAW_MOVE 
 	or command.id == CMD.PATROL 
 	or command.id == CMD.FIGHT
 	or command.id == CMD.JUMP
@@ -524,13 +524,13 @@ function ConvertCMDToMOVE(command)
 			if not x then --outside LOS and radar
 				return nil
 			end
-			command.id = CMD.MOVE
+			command.id = CMD_RAW_MOVE
 			command.params[1] = x
 			command.params[2] = y
 			command.params[3] = z
 			return command
 		else
-			command.id = CMD.MOVE
+			command.id = CMD_RAW_MOVE
 			return command
 		end
 	end
@@ -550,13 +550,13 @@ function ConvertCMDToMOVE(command)
 				if not x then
 					return nil
 				end
-				command.id = CMD.MOVE
+				command.id = CMD_RAW_MOVE
 				command.params[1] = x
 				command.params[2] = y
 				command.params[3] = z
 				return command
 			else
-				command.id = CMD.MOVE
+				command.id = CMD_RAW_MOVE
 				return command
 			end
 		else
@@ -567,7 +567,7 @@ function ConvertCMDToMOVE(command)
 		if command.params[3]==nil then --is building unit in factory
 			return nil
 		end
-		command.id = CMD.MOVE
+		command.id = CMD_RAW_MOVE
 		return command
 	end
 	if command.id == CMD_WAIT_AT_BEACON then
@@ -582,7 +582,7 @@ function GetWaypointDistance(unitID,moveID,queue,px,py,pz,isAttackCmd,weaponRang
 		return 99999
 	end
 	local v = queue
-	if (v.id == CMD.MOVE) then 
+	if (v.id == CMD_RAW_MOVE) then 
 		local reachable = true --always assume target reachable
 		local waypoints
 		if moveID then --unit has compatible moveID?
