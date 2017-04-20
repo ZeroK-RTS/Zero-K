@@ -159,7 +159,7 @@ local function PlayResponse(unitID, cmdID)
 	end
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]
-	if (CMD[cmdID] or widgetCMD[cmdID]) then
+	if (CMD[cmdID] or widgetCMD[cmdID] or cmdID > 0) then
 		if (sounds and sounds.ok) then
 			CoolNoisePlay(sounds.ok[1], 0.5, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
