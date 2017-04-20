@@ -39,7 +39,7 @@ for i = 1, #UnitDefs do
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
-			stopDist[i] = ud.speed/2
+			stopDist[i] = ud.speed*0.66
 			goalDist[i] = 8
 		end
 		if stopDist[i] then
@@ -47,8 +47,8 @@ for i = 1, #UnitDefs do
 		end
 		if stopDist[i] and not goalDist[i] then
 			goalDist[i] = stopDist[i]
-			stoppingRadiusIncrease[i] = ud.xsize*250
 		end
+		stoppingRadiusIncrease[i] = ud.xsize*250
 	end
 end
 
@@ -78,6 +78,7 @@ local STUCK_TRAVEL = 32
 local STUCK_MOVE_RANGE = 120
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
+local MAX_COMM_STOP_RADIUS = 400^2
 local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 180^2 -- Commanders shorter than this do not activate common stop radius.
 
 ----------------------------------------------------------------------------------------------
@@ -121,6 +122,7 @@ local function ResetUnitData(unitData)
 	unitData.nextTestTime = nil
 	unitData.commandHandled = nil
 	unitData.stuckCheckTimer = nil
+	unitData.handlingWaitTime = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -137,6 +139,13 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	local unitData = rawMoveUnit[unitID]
 	if not (unitData.cx == cmdParams[1] and unitData.cz == cmdParams[3]) then
 		ResetUnitData(unitData)
+	end
+	if unitData.handlingWaitTime then
+		unitData.handlingWaitTime = unitData.handlingWaitTime - 1
+		if unitData.handlingWaitTime <= 0 then
+			unitData.handlingWaitTime = nil
+		end
+		return true, false
 	end
 	
 	local x, y, z = spGetUnitPosition(unitID)
@@ -158,11 +167,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	if distSq < myStopDistSq then
-		if not unitData.switchedFromRaw then
-			Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
-		end
+		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
 		if unitData.commandString then
-			commonStopRadius[unitData.commandString] = commonStopRadius[unitData.commandString] + stoppingRadiusIncrease[unitDefID]
+			commonStopRadius[unitData.commandString] = (commonStopRadius[unitData.commandString] or 0) + stoppingRadiusIncrease[unitDefID]
+			if commonStopRadius[unitData.commandString] > MAX_COMM_STOP_RADIUS then
+				commonStopRadius[unitData.commandString] = MAX_COMM_STOP_RADIUS
+			end
 		end
 		rawMoveUnit[unitID] = nil
 		return true, true
@@ -198,6 +208,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, goalDist[unitDefID] or 16, nil, false)
 				ResetUnitData(unitData)
+				unitData.handlingWaitTime = 3
 				return true, false
 			end
 		end
@@ -215,7 +226,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
 		end
 		unitData.switchedFromRaw = not freePath
-		unitData.nextTestTime = math.floor(math.random()*5) + 2
+		unitData.nextTestTime = math.floor(math.random()*5) + 6
 	end
 	
 	if not unitData.commandHandled then
