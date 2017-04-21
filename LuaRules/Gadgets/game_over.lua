@@ -50,6 +50,7 @@ local spEcho              = Spring.Echo
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
 local MISSION_PLAYER_ALLY_TEAM_ID = 0
+local SPARE_PLANETWARS_UNITS = false
 
 --------------------------------------------------------------------------------
 -- vars
@@ -262,7 +263,7 @@ local function DestroyAlliance(allianceID, skipCheck)
 				for j=1,#teamUnits do
 					local unitID = teamUnits[j]
 					local pwUnits = (GG.PlanetWars or {}).unitsByID
-					if pwUnits and pwUnits[unitID] then
+					if SPARE_PLANETWARS_UNITS and pwUnits and pwUnits[unitID] then
 						GG.allowTransfer = true
 						spTransferUnit(unitID, gaiaTeamID, true)		-- don't blow up PW buildings
 						GG.allowTransfer = false
