@@ -56,7 +56,7 @@ end
 --local oldSetMoveGoal = Spring.SetUnitMoveGoal
 --function Spring.SetUnitMoveGoal(unitID, x, y, z, radius, speed, raw)
 --	oldSetMoveGoal(unitID, x, y, z, radius, speed, raw)
---	Spring.MarkerAddPoint(x, y, z, "")
+--	Spring.MarkerAddPoint(x, y, z, (raw and "r") or "")
 --end
 
 ----------------------------------------------------------------------------------------------
@@ -78,6 +78,7 @@ local STUCK_TRAVEL = 45
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
+local RAW_CHECK_SPACING = 500
 local MAX_COMM_STOP_RADIUS = 400^2
 local COMMON_STOP_RADIUS_ACTIVE_DIST_SQ = 180^2 -- Commanders shorter than this do not activate common stop radius.
 
@@ -93,15 +94,10 @@ local oldCommandStoppingRadius = {}
 ----------------------------------------------------------------------------------------------
 -- Utilities
 
-function GetDistSqr(a, b)
-	local x,z = (a[1] - b[1]), (a[3] - b[3])
-	return (x*x + z*z)
-end
-
-local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distSq, distanceLimit)
+local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, distanceLimit)
 	local vX = gX - sX
 	local vZ = gZ - sZ
-	local distance = math.sqrt(distSq)
+	-- distance had better be math.sqrt(vX*vX + vZ*vZ) or things will break
 	if distance < TEST_MOVE_DISTANCE then
 		return true
 	end
@@ -125,6 +121,8 @@ local function ResetUnitData(unitData)
 	unitData.commandHandled = nil
 	unitData.stuckCheckTimer = nil
 	unitData.handlingWaitTime = nil
+	unitData.nextRawCheckDistSq = nil
+	unitData.doingRawMove = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -151,8 +149,8 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	local x, y, z = spGetUnitPosition(unitID)
-	local distSq = GetDistSqr({x, y, z}, cmdParams)
-
+	local distSq = (x - cmdParams[1])*(x - cmdParams[1]) + (z - cmdParams[3])*(z - cmdParams[3])
+	
 	if not unitData.cx then
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
 		if distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ then
@@ -213,6 +211,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				unitData.commandHandled = nil
 				unitData.switchedFromRaw = nil
 				unitData.nextTestTime = nil
+				unitData.doingRawMove = nil
 				unitData.handlingWaitTime = math.floor(math.random()*4) + 2
 				return true, false
 			end
@@ -222,18 +221,33 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	end
 	
 	if unitData and unitData.switchedFromRaw then
-		return true, false
+		if unitData.nextRawCheckDistSq and (unitData.nextRawCheckDistSq > distSq) then
+			unitData.switchedFromRaw = nil
+			unitData.nextTestTime = nil
+		else
+			return true, false
+		end
 	end
 	
-	local lazy = unitData.commandHandled
 	unitData.nextTestTime = (unitData.nextTestTime or 0) - 1
 	if unitData.nextTestTime <= 0 then
-		local freePath = ((turnRadiusSq[unitDefID] or 0) < distSq) and IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distSq, lazy and LAZY_SEARCH_DISTANCE)
-		if (not unitData.commandHandled) or (not freePath) then
-			Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
+		local lazy = unitData.doingRawMove
+		local freePath
+		if (turnRadiusSq[unitDefID] or 0) > distSq then
+			freePath = false
+		else
+			local distance = math.sqrt(distSq)
+			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, lazy and LAZY_SEARCH_DISTANCE)
+			if (not freePath) then
+				unitData.nextRawCheckDistSq = (distance - RAW_CHECK_SPACING)*(distance - RAW_CHECK_SPACING)
+			end
 		end
+		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
+			Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
+		end
+		unitData.doingRawMove = freePath
 		unitData.switchedFromRaw = not freePath
-		unitData.nextTestTime = math.floor(math.random()*10) + 20
+		unitData.nextTestTime = math.floor(math.random()*12) + 16
 	end
 	
 	if not unitData.commandHandled then
