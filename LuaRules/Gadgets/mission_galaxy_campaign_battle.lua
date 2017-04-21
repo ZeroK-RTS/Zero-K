@@ -40,11 +40,12 @@ if gadgetHandler:IsSyncedCode() then --SYNCED
 -- Variables that require saving
 local unitLineage = {}
 local initialUnitData = {}
+local bonusObjectiveList = {}
 
+-- Regeneratable
 local vitalUnits = {}
-local victoryAtLocation
 local defeatConditionConfig
-local bonusObjectiveList
+local victoryAtLocation = {}
 
 local unlockedUnitsByTeam = {}
 local teamCommParameters = {}
@@ -68,8 +69,9 @@ GG.terraformUnlocked = {}
 -- For gadget:Save
 
 _G.saveTable = {
-	unitLineage     = unitLineage,
-	initialUnitData = initialUnitData,
+	unitLineage        = unitLineage,
+	initialUnitData    = initialUnitData,
+	bonusObjectiveList = bonusObjectiveList,
 }
 
 --------------------------------------------------------------------------------
@@ -348,7 +350,7 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 	--DebugPrintBonusObjective()
 end
 
-local function AddBonusObjectiveUnit(unitID, bonusObjectiveID)
+local function AddBonusObjectiveUnit(unitID, bonusObjectiveID, allyTeamID)
 	if gameIsOver then
 		return
 	end
@@ -398,9 +400,9 @@ local function SetWinBeforeBonusObjective(victory)
 end
 
 local function InitializeBonusObjectives()
-	bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
-	for objectiveID = 1, #bonusObjectiveList do
-		local bonusObjective = bonusObjectiveList[objectiveID] or {}
+	local bonusObjectiveConfig = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
+	for objectiveID = 1, #bonusObjectiveConfig do
+		local bonusObjective = bonusObjectiveConfig[objectiveID] or {}
 		if bonusObjective.unitTypes then
 			local unitDefMap = {}
 			for i = 1, #bonusObjective.unitTypes do
@@ -468,16 +470,16 @@ end
 -- Unit Placement
 
 local function AddInitialUnitObjectiveParameters(unitID, parameters)
-	initialUnitData = parameters
-	initialUnitData.allyTeamID = initialUnitData.allyTeamID or Spring.GetUnitAllyTeam(unitID)
+	initialUnitData[unitID] = parameters
+	initialUnitData[unitID].allyTeamID = initialUnitData[unitID].allyTeamID or Spring.GetUnitAllyTeam(unitID)
 	if parameters.defeatIfDestroyedObjectiveID or parameters.defeatIfDestroyed then
-		AddDefeatIfUnitDestroyed(unitID, initialUnitData.allyTeamID, parameters.defeatIfDestroyedObjectiveID)
+		AddDefeatIfUnitDestroyed(unitID, initialUnitData[unitID].allyTeamID, parameters.defeatIfDestroyedObjectiveID)
 	end
 	if parameters.victoryAtLocation then
-		AddVictoryAtLocationUnit(unitID, parameters.victoryAtLocation, initialUnitData.allyTeamID)
+		AddVictoryAtLocationUnit(unitID, parameters.victoryAtLocation, initialUnitData[unitID].allyTeamID)
 	end
 	if parameters.bonusObjectiveID then
-		AddBonusObjectiveUnit(unitID, parameters.bonusObjectiveID, initialUnitData.allyTeamID)
+		AddBonusObjectiveUnit(unitID, parameters.bonusObjectiveID, initialUnitData[unitID].allyTeamID)
 	end
 end
 
@@ -581,8 +583,9 @@ local function LockUnit(unitID, lockDefID)
 end
 
 local function SetBuildOptions(unitID, unitDefID, teamID)
-	local ud = UnitDefs[unitDefID]
-	if (ud.isBuilder) then
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	local ud = unitDefID and UnitDefs[unitDefID]
+	if ud and ud.isBuilder then
 		local unlockedUnits = unlockedUnitsByTeam[teamID]
 		if unlockedUnits then
 			local buildoptions = ud.buildOptions
@@ -865,6 +868,18 @@ function gadget:Load(zip)
 		SetBuildOptions(unitID, unitDefID, unitLineage[unitID])
 	end
 	
+	for i = 1, #loadData.bonusObjectiveList do
+		bonusObjectiveList[i] = loadData.bonusObjectiveList[i]
+		local oldUnits = loadData.bonusObjectiveList[i].units
+		if oldUnits then
+			bonusObjectiveList[i].units = {}
+			for oldUnitID, allyTeamID in pairs(oldUnits) do
+				local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
+				bonusObjectiveList[i].units[unitID] = allyTeamID
+			end
+		end
+	end
+	
 	-- Clear the commanders out of victoryAtLocation
 	local victoryAtLocation = {}
 	
@@ -873,6 +888,7 @@ function gadget:Load(zip)
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		AddInitialUnitObjectiveParameters(unitID, data)
 	end
+	Spring.Utilities.TableEcho(victoryAtLocation, "victoryAtLocation")
 end
 
 --------------------------------------------------------------------------------

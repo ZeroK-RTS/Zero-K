@@ -258,11 +258,10 @@ local function LoadUnits()
 			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
 			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 			
-			
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral or false)
 			
-			Spring.Echo("unitID check", oldID, newID)
+			--Spring.Echo("unitID check", oldID, newID)
 		end
 	end
 	

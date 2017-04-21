@@ -67,6 +67,7 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
+local lastSaveGameFrame
 
 --file_return = nil
 
@@ -321,8 +322,7 @@ local function tableremove(table1, item)
 end
 
 -- function GetTimeString() taken from trepan's clock widget
-local function GetTimeString()
-  local secs = math.floor(Spring.GetGameSeconds())
+local function GetTimeString(secs)
   if (timeSecs ~= secs) then
     timeSecs = secs
     local h = math.floor(secs / 3600)
@@ -2085,10 +2085,10 @@ local function LeaveExitConfirmWindow()
 	KillSubWindow()
 end
 
-local function MakeExitConfirmWindow(text, action)
+local function MakeExitConfirmWindow(text, action, height)
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	local menu_width = 320
-	local menu_height = 64
+	local menu_height = height or 64
 
 	LeaveExitConfirmWindow()
 	
@@ -3037,14 +3037,11 @@ function widget:SetConfigData(data)
 end
 
 function widget:Update()
-	cycle = cycle%32+1
+	cycle = cycle%10 + 1
 	if cycle == 1 then
 		--Update clock, game timer and fps meter that show on menubar
 		if lbl_fps then
 			lbl_fps:SetCaption( 'FPS: ' .. Spring.GetFPS() )
-		end
-		if lbl_gtime then
-			lbl_gtime:SetCaption( GetTimeString() )
 		end
 		if lbl_clock then
 			--local displaySeconds = true
@@ -3061,6 +3058,16 @@ function widget:Update()
 	end
 end
 
+function widget:GameFrame(n)
+	if lbl_gtime then
+		if not lastSaveGameFrame then
+			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+		end
+		if (n + lastSaveGameFrame)%30 == 0 then
+			lbl_gtime:SetCaption(GetTimeString((n + lastSaveGameFrame)/30))
+		end
+	end
+end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if key == KEYSYMS.LCTRL 

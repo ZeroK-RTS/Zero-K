@@ -277,7 +277,7 @@ local function SaveLoadConfirmationDialogPopup(filename, saveMode, description)
 				LoadGameByFilename(filename)
 			end
 		end
-	WG.crude.MakeExitConfirmWindow(text, yesFunc)
+	WG.crude.MakeExitConfirmWindow(text, yesFunc, 78)
 end
 
 local function PromptSave(filename, description)
@@ -358,7 +358,7 @@ local function AddSaveEntryButton(parent, saveFile, position, saveMode)
 				WG.crude.MakeExitConfirmWindow("Are you sure you want to delete this save?", function() 
 					DeleteSave(saveFile.filename)
 					holder:Dispose()
-				end)
+				end, 78)
 			end
 		}
 	}
