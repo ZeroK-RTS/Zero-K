@@ -335,6 +335,9 @@ local gadgetList = {
 
 local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
+
+local creationUnitList, creationIndex
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -544,6 +547,28 @@ local function restart(cmd,line,words,player)
 	end
 end
 
+local function serial(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	local unitList = {}
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		unitList[#unitList + 1] = udid
+		if ud.buildOptions and #ud.buildOptions > 0 then
+			local sublist = ud.buildOptions
+			for j = 1, #sublist do
+				unitList[#unitList + 1] = sublist[j]
+			end	
+		end
+	end
+	
+	creationIndex = tonumber(words[1]) or 1
+	creationUnitList = unitList
+end
+
 local function bisect(cmd,line,words,player)
 	local increment = math.abs(tonumber(words[1]) or 1)
 	local offset = math.floor(tonumber(words[2]) or 0)
@@ -585,6 +610,33 @@ local function nocost(cmd,line,words,player)
 	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
 end
 
+function gadget:GameFrame(n)
+	if (not creationIndex) then
+		return
+	end
+	
+	if n%120 == 0 then
+		if not creationUnitList[creationIndex] then
+			creationIndex, creationUnitList = nil, nil
+			return
+		end
+		local INCREMENT = 128
+		local unitDefID = creationUnitList[creationIndex]
+		
+		for i = 1, 25 do
+			for j = 1, 25 do
+				local x, z = 1000 + i*INCREMENT, 1000 + j*INCREMENT
+				local y = Spring.GetGroundHeight(x,z)
+				Spring.CreateUnit(unitDefID, x, y, z, 0, 0, false)
+			end
+		end
+		Spring.Echo(UnitDefs[unitDefID].humanName, creationIndex)
+		creationIndex = creationIndex + 1
+	elseif n%120 == 100 then
+		clear()
+	end
+end
+
 function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
@@ -593,6 +645,7 @@ function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
 	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")
+	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
 	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
 end
