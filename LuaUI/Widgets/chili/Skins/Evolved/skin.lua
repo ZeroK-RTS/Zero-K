@@ -268,6 +268,21 @@ skin.editbox = {
   DrawControl = DrawEditBox,
 }
 
+skin.textbox = {
+  hintFont = table.merge({color = {1,1,1,0.7}}, skin.general.font),
+
+  TileImageBK = ":cl:panel2_bg.png",
+  bkgndtiles = {14,14,14,14},
+  
+  TileImageFG = ":cl:panel2_border.png",
+  tiles       = {2, 2, 2, 2},
+
+  borderColor     = {0.0, 0.0, 0.0, 0.0},
+  focusColor      = {0.0, 0.0, 0.0, 0.0},
+
+  DrawControl = DrawEditBox,
+}
+
 skin.imagelistview = {
   imageFolder      = "folder.png",
   imageFolderUp    = "folder_up.png",

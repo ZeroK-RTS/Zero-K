@@ -52,6 +52,7 @@ local teamCommParameters = {}
 local enemyUnitDefBonusObj = {}
 local myUnitDefBonusObj = {}
 local checkForLoseAfterSeconds = false
+local completeAllObjectiveID
 
 -- Small speedup things.
 local firstGameFrame = true
@@ -231,20 +232,46 @@ end
 --------------------------------------------------------------------------------
 -- Bonus Objectives
 
+local function AllOtherObjectivesSucceeded(ignoreObjectiveID)
+	for i = 1, #bonusObjectiveList do
+		if i ~= ignoreObjectiveID then
+			if not bonusObjectiveList[i].success then
+				return false
+			end
+		end
+	end
+	return true
+end
+
 local function CompleteBonusObjective(bonusObjectiveID, success)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
 	Spring.SetGameRulesParam("bonusObjectiveSuccess_" .. bonusObjectiveID, (success and 1) or 0)
 	
 	objectiveData.success = success
 	objectiveData.terminated = true
+	
+	if completeAllObjectiveID and bonusObjectiveID ~= completeAllObjectiveID then
+		if success then
+			if AllOtherObjectivesSucceeded(completeAllObjectiveID) then
+				CompleteBonusObjective(completeAllObjectiveID, true)
+			end
+		else
+			CompleteBonusObjective(completeAllObjectiveID, false)
+		end
+	end
 end
 
 local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
+	gameSeconds = gameSeconds or math.floor(Spring.GetGameFrame()/30), victory
 	
 	-- Cbeck whether the objective is open
 	if objectiveData.terminated then
 		return
+	end
+	
+	if objectiveData.completeAllBonusObjectives then
+		return -- Not handled here
 	end
 	
 	-- Check for victory timer
@@ -291,6 +318,10 @@ local function CheckBonusObjective(bonusObjectiveID, gameSeconds, victory)
 			objectiveData.satisfyForeverAfterFirstSatisfied = nil
 			objectiveData.satisfyForever = true
 		end
+		if objectiveData.lockUnitsOnSatisfy then
+			objectiveData.lockUnitsOnSatisfy = nil
+			objectiveData.unitsLocked = true
+		end
 	else
 		if objectiveData.satisfyAtTime or objectiveData.satisfyUntilTime or objectiveData.satisfyAfterTime or objectiveData.satisfyForever then
 			CompleteBonusObjective(bonusObjectiveID, false)
@@ -314,20 +345,40 @@ local function DoPeriodicBonusObjectiveUpdate(gameSeconds)
 end
 
 local function AddBonusObjectiveUnit(unitID, bonusObjectiveID)
-	bonusObjectiveList[bonusObjectiveID].units = bonusObjectiveList[bonusObjectiveID].units or {}
-	bonusObjectiveList[bonusObjectiveID].units[unitID] = allyTeamID or Spring.GetUnitAllyTeam(unitID)
+	if gameIsOver then
+		return
+	end
+	local objectiveData = bonusObjectiveList[bonusObjectiveID]
+	if objectiveData.unitsLocked or objectiveData.terminated then
+		return
+	end
+	objectiveData.units = objectiveData.units or {}
+	objectiveData.units[unitID] = allyTeamID or Spring.GetUnitAllyTeam(unitID)
+	if objectiveData.lockUnitsOnSatisfy then
+		CheckBonusObjective(bonusObjectiveID)
+	end
 end
 
 local function RemoveBonusObjectiveUnit(unitID, bonusObjectiveID)
+	if gameIsOver then
+		return
+	end
 	local objectiveData = bonusObjectiveList[bonusObjectiveID]
 	if not objectiveData.units then
 		return
 	end
 	if objectiveData.units[unitID] then
+		local inbuild
 		if objectiveData.countRemovedUnits then
-			local inbuild = select(3, Spring.GetUnitIsStunned(unitID))
-			if not inbuild then
+			inbuild = (select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0
+			if inbuild == 0 then
 				objectiveData.removedUnits = (objectiveData.removedUnits or 0) + 1
+			end
+		end
+		if objectiveData.failOnUnitLoss then
+			inbuild = inbuild or ((select(3, Spring.GetUnitIsStunned(unitID)) and 1) or 0)
+			if inbuild == 0 then
+				CompleteBonusObjective(bonusObjectiveID, false)
 			end
 		end
 		objectiveData.units[unitID] = nil
@@ -370,6 +421,9 @@ local function InitializeBonusObjectives()
 			end
 			bonusObjective.enemyUnitTypes = unitDefMap
 		end
+		if bonusObjective.completeAllBonusObjectives then
+			completeAllObjectiveID = objectiveID
+		end
 		bonusObjectiveList[objectiveID] = bonusObjective
 	end
 end
@@ -396,7 +450,7 @@ local function BonusObjectiveUnitCreated(unitID, unitDefID, teamID)
 	if teamID == PLAYER_TEAM_ID then
 		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
 	elseif Spring.GetUnitAllyTeam(unitID) ~= PLAYER_ALLY_TEAM_ID then
-		AddUnitToBonusObjectiveList(unitID, myUnitDefBonusObj[unitDefID])
+		AddUnitToBonusObjectiveList(unitID, enemyUnitDefBonusObj[unitDefID])
 	end
 end
 

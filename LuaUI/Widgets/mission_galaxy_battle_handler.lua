@@ -32,6 +32,7 @@ local myAllyTeamID = Spring.GetMyAllyTeamID()
 
 local SUCCESS_ICON = LUAUI_DIRNAME .. "images/tick.png"
 local FAILURE_ICON = LUAUI_DIRNAME .. "images/cross.png"
+local OBJECTIVE_ICON = LUAUI_DIRNAME .. "images/bullet.png"
 
 local mainObjectiveBlock, bonusObjectiveBlock
 
@@ -75,38 +76,47 @@ end
 
 local function GetObjectivesBlock(holderWindow, name, position, items, gameRulesParam)
 	
-	local missionsLabel = Chili.Label:New{
+	local missionsLabel = Chili.TextBox:New{
 		x = 8,
 		y = position,
 		width = "100%",
 		height = 18,
 		align = "left",
 		valign = "top",
-		caption = name,
-		font = {size = 18},
+		text = name,
+		fontsize = 18,
 		parent = holderWindow,
 	}
-	position = position + 22
+	position = position + 26
 	
 	local objectives = {}
 	
 	for i = 1, #items do
-		local label = Chili.Label:New{
+		local label = Chili.TextBox:New{
 			x = 22,
 			y = position,
-			width = "100%",
+			right = 4,
 			height = 18,
 			align = "left",
 			valign = "top",
-			caption = items[i].description,
-			font = {size = 14},
+			text = items[i].description,
+			fontsize = 14,
+			parent = holderWindow,
+		}
+		local image = Chili.Image:New{
+			x = 4,
+			y = position - 3,
+			width = 16,
+			height = 16,
+			file = OBJECTIVE_ICON,
 			parent = holderWindow,
 		}
 		objectives[i] = {
 			position = position,
 			label = label,
+			image = image,
 		}
-		position = position + 16
+		position = position + (#label.physicalLines)*16
 	end
 	
 	local function UpdateSuccess(index)
@@ -118,14 +128,8 @@ local function GetObjectivesBlock(holderWindow, name, position, items, gameRules
 			return
 		end
 		
-		local image = Chili.Image:New{
-			x = 4,
-			y = objectives[index].position,
-			width = 16,
-			height = 16,
-			file = (newSuccess == 1 and SUCCESS_ICON) or FAILURE_ICON,
-			parent = holderWindow,
-		}
+		objectives[index].image.file = (newSuccess == 1 and SUCCESS_ICON) or FAILURE_ICON
+		objectives[index].image:Invalidate()
 		
 		objectives[index].success = (newSuccess == 1)
 		objectives[index].terminated = true
@@ -167,7 +171,7 @@ local function InitializeBonusObjectives()
 	local objectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().objectiveconfig) or {}
 	local bonusObjectiveList = CustomKeyToUsefulTable(Spring.GetModOptions().bonusobjectiveconfig) or {}
 	
-	local holderHeight = 20 + 16*(#objectiveList)
+	local holderHeight = 22 + 16*(#objectiveList)
 	if bonusObjectiveList and #bonusObjectiveList > 0 then
 		holderHeight = holderHeight + 52 + 16*(#bonusObjectiveList)
 	end
@@ -202,6 +206,8 @@ local function InitializeBonusObjectives()
 		end
 		WG.GlobalCommandBar.AddCommand(LUAUI_DIRNAME .. "images/advplayerslist/random.png", "Toggle mission objectives.", ToggleWindow)
 	end
+	
+	holderWindow:SetPos(nil, nil, nil, position + holderWindow.padding[2] + holderWindow.padding[4] + 3)
 end
 
 --------------------------------------------------------------------------------
