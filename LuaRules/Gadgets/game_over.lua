@@ -49,6 +49,7 @@ local spEcho              = Spring.Echo
 
 local COMM_VALUE = UnitDefNames.armcom1.metalCost or 1200
 local ECON_SUPREMACY_MULT = 25
+local MISSION_PLAYER_ALLY_TEAM_ID = 0
 
 --------------------------------------------------------------------------------
 -- vars
@@ -72,6 +73,7 @@ local campaignBattleID = Spring.GetModOptions().singleplayercampaignbattleid and
 
 local revealed = false
 local gameover = false
+local gameOverSent = false
 
 local inactiveWinAllyTeam = false
 
@@ -172,13 +174,17 @@ local function UnitWithinBounds(unitID)
 end
 
 local function Draw() -- declares a draw
+	if gameOverSent then
+		return
+	end
 	EchoUIMessage("The game ended in a draw!")
 	spGameOver({gaiaAllyTeamID}) -- exit uses {} so use Gaia for draw to differentiate
+	gameOverSent = true
 end
 
 -- if only one allyteam left, declare it the victor
 local function CheckForVictory()
-	if Spring.IsCheatingEnabled() or gameover then
+	if Spring.IsCheatingEnabled() or gameOverSent then
 		return
 	end
 	local allylist = spGetAllyTeamList()
@@ -200,6 +206,7 @@ local function CheckForVictory()
 				EchoUIMessage(name .. " wins!")
 			end
 			spGameOver({lastAllyTeam})
+			gameOverSent = true
 		end
 	end
 end
@@ -227,7 +234,16 @@ local function DestroyAlliance(allianceID, skipCheck)
 	if not destroyedAlliances[allianceID] then
 		destroyedAlliances[allianceID] = true
 		local teamList = spGetTeamList(allianceID)
-		if teamList == nil or (#teamList == 0) then return end	-- empty allyteam, don't bother
+		if teamList == nil or (#teamList == 0) then 
+			return -- empty allyteam, don't bother
+		end
+		
+		if GG.GalaxyCampaignHandler then
+			local defeatConfig = GG.GalaxyCampaignHandler.GetDefeatConfig(allianceID)
+			if defeatConfig and defeatConfig.allyTeamLossObjectiveID then
+				Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.allyTeamLossObjectiveID, (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1)
+			end
+		end
 		
 		if Spring.IsCheatingEnabled() then
 			EchoUIMessage("Game Over: DEBUG")
@@ -298,6 +314,9 @@ local function CheckMissionDefeatOnUnitLoss(unitID, allianceID)
 		return false
 	end
 	if defeatConfig.defeatIfUnitDestroyed and defeatConfig.defeatIfUnitDestroyed[unitID] then
+		if (not gameOverSent) and type(defeatConfig.defeatIfUnitDestroyed[unitID]) == "number" then
+			Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.defeatIfUnitDestroyed[unitID], (allianceID == MISSION_PLAYER_ALLY_TEAM_ID and 0) or 1)
+		end
 		return true
 	end
 	if not (defeatConfig.vitalCommanders or defeatConfig.vitalUnitTypes) then

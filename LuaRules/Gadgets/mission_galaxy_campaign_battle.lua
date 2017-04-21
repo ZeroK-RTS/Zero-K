@@ -52,7 +52,8 @@ local teamCommParameters = {}
 local enemyUnitDefBonusObj = {}
 local myUnitDefBonusObj = {}
 local checkForLoseAfterSeconds = false
-local completeAllObjectiveID
+local completeAllBonusObjectiveID
+local timeLossObjectiveID
 
 -- Small speedup things.
 local firstGameFrame = true
@@ -174,10 +175,10 @@ local function InitializeVictoryConditions()
 	end
 end
 
-local function AddDefeatIfUnitDestroyed(unitID, allyTeamID)
+local function AddDefeatIfUnitDestroyed(unitID, allyTeamID, objectiveID)
 	local defeatConfig = defeatConditionConfig[allyTeamID]
 	defeatConfig.defeatIfUnitDestroyed = defeatConfig.defeatIfUnitDestroyed or {}
-	defeatConfig.defeatIfUnitDestroyed[unitID] = true
+	defeatConfig.defeatIfUnitDestroyed[unitID] = (objectiveID or true)
 	
 	if allyTeamID == 0 then
 		Spring.Utilities.UnitEcho(unitID, "Protect")
@@ -222,6 +223,9 @@ local function VictoryAtLocationUpdate()
 	end
 	for unitID, data in pairs(victoryAtLocation) do
 		if DoVictoryAtLocationCheck(unitID, data) then
+			if data.objectiveID then
+				Spring.SetGameRulesParam("objectiveSuccess_" .. data.objectiveID, (Spring.GetUnitAllyTeam(unitID) == PLAYER_ALLY_TEAM_ID and 1) or 0)
+			end
 			GG.CauseVictory(data.allyTeamID)
 			return
 		end
@@ -250,13 +254,13 @@ local function CompleteBonusObjective(bonusObjectiveID, success)
 	objectiveData.success = success
 	objectiveData.terminated = true
 	
-	if completeAllObjectiveID and bonusObjectiveID ~= completeAllObjectiveID then
+	if completeAllBonusObjectiveID and bonusObjectiveID ~= completeAllBonusObjectiveID then
 		if success then
-			if AllOtherObjectivesSucceeded(completeAllObjectiveID) then
-				CompleteBonusObjective(completeAllObjectiveID, true)
+			if AllOtherObjectivesSucceeded(completeAllBonusObjectiveID) then
+				CompleteBonusObjective(completeAllBonusObjectiveID, true)
 			end
 		else
-			CompleteBonusObjective(completeAllObjectiveID, false)
+			CompleteBonusObjective(completeAllBonusObjectiveID, false)
 		end
 	end
 end
@@ -422,7 +426,7 @@ local function InitializeBonusObjectives()
 			bonusObjective.enemyUnitTypes = unitDefMap
 		end
 		if bonusObjective.completeAllBonusObjectives then
-			completeAllObjectiveID = objectiveID
+			completeAllBonusObjectiveID = objectiveID
 		end
 		bonusObjectiveList[objectiveID] = bonusObjective
 	end
@@ -466,8 +470,8 @@ end
 local function AddInitialUnitObjectiveParameters(unitID, parameters)
 	initialUnitData = parameters
 	initialUnitData.allyTeamID = initialUnitData.allyTeamID or Spring.GetUnitAllyTeam(unitID)
-	if parameters.defeatIfDestroyeObjectiveID then
-		AddDefeatIfUnitDestroyed(unitID, initialUnitData.allyTeamID)
+	if parameters.defeatIfDestroyedObjectiveID or parameters.defeatIfDestroyed then
+		AddDefeatIfUnitDestroyed(unitID, initialUnitData.allyTeamID, parameters.defeatIfDestroyedObjectiveID)
 	end
 	if parameters.victoryAtLocation then
 		AddVictoryAtLocationUnit(unitID, parameters.victoryAtLocation, initialUnitData.allyTeamID)
@@ -828,6 +832,10 @@ function gadget:GameFrame(n)
 			for i = 1, #allyTeamList do
 				local lostAfterSeconds = defeatConditionConfig[allyTeamList[i]].loseAfterSeconds
 				if lostAfterSeconds and lostAfterSeconds <= gameSeconds then
+					local defeatConfig = defeatConditionConfig[allyTeamList[i]]
+					if defeatConfig.timeLossObjectiveID then
+						Spring.SetGameRulesParam("objectiveSuccess_" .. defeatConfig.timeLossObjectiveID, (allyTeamList[i] == PLAYER_ALLY_TEAM_ID and 0) or 1)
+					end
 					GG.DestroyAlliance(allyTeamList[i])
 				end
 			end

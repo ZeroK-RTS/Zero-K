@@ -192,7 +192,7 @@ local function InitializeBonusObjectives()
 	}
 	
 	local position = 4
-	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, "Main Objectives", position, objectiveList)
+	mainObjectiveBlock, position = GetObjectivesBlock(holderWindow, "Main Objectives", position, objectiveList,  "objectiveSuccess_")
 	if #bonusObjectiveList > 0 then
 		position = position + 8
 		bonusObjectiveBlock, position = GetObjectivesBlock(holderWindow, "Bonus Objectives", position, bonusObjectiveList, "bonusObjectiveSuccess_")
@@ -220,6 +220,9 @@ end
 
 function widget:GameFrame(n)
 	if n%30 == 0 then
+		if mainObjectiveBlock then
+			mainObjectiveBlock.Update()
+		end
 		if bonusObjectiveBlock then
 			bonusObjectiveBlock.Update()
 		end
