@@ -73,9 +73,9 @@ local moveRawCmdDesc = {
 }
 
 local TEST_MOVE_DISTANCE = 16
-local LAZY_SEARCH_DISTANCE = 800
-local STUCK_TRAVEL = 32
-local STUCK_MOVE_RANGE = 120
+local LAZY_SEARCH_DISTANCE = 600
+local STUCK_TRAVEL = 45
+local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
 local STOP_STOPPING_RADIUS = 10000000
 local MAX_COMM_STOP_RADIUS = 400^2
@@ -118,6 +118,8 @@ local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distSq, distanceLimit)
 end
 
 local function ResetUnitData(unitData)
+	unitData.cx = nil
+	unitData.cz = nil
 	unitData.switchedFromRaw = nil
 	unitData.nextTestTime = nil
 	unitData.commandHandled = nil
@@ -150,7 +152,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	
 	local x, y, z = spGetUnitPosition(unitID)
 	local distSq = GetDistSqr({x, y, z}, cmdParams)
-	
+
 	if not unitData.cx then
 		unitData.cx, unitData.cz = cmdParams[1], cmdParams[3]
 		if distSq > COMMON_STOP_RADIUS_ACTIVE_DIST_SQ then
@@ -188,17 +190,18 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false
 	end
 	
+	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = math.floor(math.random()*3) + 4
+		unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - 1
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = math.floor(math.random()*3) + 4
 		if travelled < STUCK_TRAVEL then
+			unitData.stuckCheckTimer = math.floor(math.random()*2) + 1
 			if distSq < GIVE_UP_STUCK_DIST_SQ then
 				Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
 				rawMoveUnit[unitID] = nil
@@ -207,10 +210,14 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 				local vx = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				local vz = math.random()*2*STUCK_MOVE_RANGE - STUCK_MOVE_RANGE
 				Spring.SetUnitMoveGoal(unitID, x + vx, y, z + vz, goalDist[unitDefID] or 16, nil, false)
-				ResetUnitData(unitData)
-				unitData.handlingWaitTime = 3
+				unitData.commandHandled = nil
+				unitData.switchedFromRaw = nil
+				unitData.nextTestTime = nil
+				unitData.handlingWaitTime = math.floor(math.random()*4) + 2
 				return true, false
 			end
+		else
+			unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
 		end
 	end
 	
@@ -226,7 +233,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			Spring.SetUnitMoveGoal(unitID, cmdParams[1],cmdParams[2],cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
 		end
 		unitData.switchedFromRaw = not freePath
-		unitData.nextTestTime = math.floor(math.random()*5) + 6
+		unitData.nextTestTime = math.floor(math.random()*10) + 20
 	end
 	
 	if not unitData.commandHandled then
