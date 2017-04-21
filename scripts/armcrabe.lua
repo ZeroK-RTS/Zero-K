@@ -229,12 +229,12 @@ local function Motion()
 	Walk()
 end
 
-function StartMoving()
+function script.StartMoving()
 	--Spring.Echo("Moving")
 	StartThread(Motion)
 end
 
-function StopMoving()
+function script.StopMoving()
 	--Spring.Echo("Stopped moving")
 	StartThread(Curl)
 end
@@ -249,7 +249,7 @@ function script.Create()
 	Hide(flare6)
 	Hide(flare7)
 	
-	StartThread(StartStopMovingControl, StartMoving, StopMoving)
+	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving)
 	
 	--StartThread(MotionControl)
 	StartThread(SmokeUnit, smokePiece)

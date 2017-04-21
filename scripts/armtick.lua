@@ -215,7 +215,7 @@ local function UnBurrow()
 	StartThread(Walk)
 end
 
-function StartMoving()
+function script.StartMoving()
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -224,7 +224,7 @@ function StartMoving()
 	end
 end
 
-function StopMoving()
+function script.StopMoving()
 	StartThread(Burrow)
 end
 
@@ -234,7 +234,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
+	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

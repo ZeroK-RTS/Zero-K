@@ -285,7 +285,7 @@ local function UnBurrow()
 	StartThread(WalkControl)
 end
 
-local function StartMoving()
+function script.StartMoving()
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -294,13 +294,13 @@ local function StartMoving()
 	end
 end
 
-local function StopMoving()
+function script.StopMoving()
 	StartThread(Burrow)
 end
 
 function script.Create()
 	StartThread(SmokeUnit, {body})
-	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
+	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
 end
 
 local function RestoreAfterDelay()

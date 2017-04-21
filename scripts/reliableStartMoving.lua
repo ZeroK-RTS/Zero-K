@@ -29,6 +29,6 @@ function StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCoun
 				startFunc()
 			end
 		end
-		Sleep(60)
+		Sleep(350)
 	end
 end

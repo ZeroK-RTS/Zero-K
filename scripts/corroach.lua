@@ -171,7 +171,7 @@ local function Talk()
 	Spring.Echo("Hello World! ... Directive: Kill all humans")
 end
 
-function StartMoving()
+function script.StartMoving()
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -181,7 +181,7 @@ function StartMoving()
 	--StartThread(Talk)
 end
 
-function StopMoving()
+function script.StopMoving()
 	StartThread(Burrow)
 end
 
@@ -191,7 +191,7 @@ end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
+	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
 end
 
 function script.Killed(recentDamage, maxHealth)
