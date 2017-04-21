@@ -861,7 +861,7 @@ function gadget:Load(zip)
 	loadGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame")
 	
 	-- Unit Lineage. Reset because nonsense would be in it from UnitCreated.
-	local unitLineage = {}
+	unitLineage = {}
 	for oldUnitID, teamID in pairs(loadData.unitLineage) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		unitLineage[unitID] = teamID
@@ -881,14 +881,14 @@ function gadget:Load(zip)
 	end
 	
 	-- Clear the commanders out of victoryAtLocation
-	local victoryAtLocation = {}
+	victoryAtLocation = {}
+	initialUnitData = {}
 	
 	-- Put the units back in the objectives
 	for oldUnitID, data in pairs(loadData.initialUnitData) do
 		local unitID = GG.SaveLoad.GetNewUnitID(oldUnitID)
 		AddInitialUnitObjectiveParameters(unitID, data)
 	end
-	Spring.Utilities.TableEcho(victoryAtLocation, "victoryAtLocation")
 end
 
 --------------------------------------------------------------------------------
