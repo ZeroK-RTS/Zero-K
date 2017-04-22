@@ -200,12 +200,14 @@
         "helptext": "Tuba to jedyna struktura obronna Kurczaków. Wystrzeliwuje zarodniki w cele naziemne i latające."
     },
     "rocksink": {
-        "name": "Huśtawka do testowania",
-        "description": "Zwykła zabawka\nMała huśtawka\nA rozkołysze rozbawi!"
+        "name": "Bańka wstańka",
+        "description" : "Do testowania",
+        "helptext": "Kołysze się pod wpływem ostrzału."
     },
     "fakeunit_aatarget": {
         "name": "Cel przeciwlotniczy",
-        "description": "Skoczek na E5!"
+        "description": "Skoczek na E5!",
+        "helptext" : "Techniczna jednostka do bicia w przelocie."
     },
     "mahlazer": {
         "name": "Starlight",
@@ -279,7 +281,8 @@
     },
     "empiricaldpser": {
         "name": "Empiryczna sprawdzarka DPSów",
-        "description": "W imieniu Rzeczypospolitej skazuję to na śmierć!"
+        "description": "Mierzy obrażenia",
+        "helptext": "Specjalny przyrząd do pomiaru wpierdolu."
     },
     "hoverassault": {
         "name": "Halberd",
@@ -343,7 +346,8 @@
     },
     "terraunit": {
         "name": "Terraform",
-        "description": "Koszt: 0"
+        "description": "Koszt: 0",
+        "helptext" : "Ta jednostka reprezentuje obszar poddany terraformingowi."
     },
     "chickenf": {
         "name": "Talon",
@@ -867,7 +871,8 @@
     },
     "fakeunit_los": {
         "name": "Widzimisię",
-        "description": "Widzi mu się."
+        "description": "Widzi mu się.",
+        "helptext" : "- Widzisz?\n- Nie widzę.\n-No widzisz!"
     },
     "logkoda": {
         "name": "Kodachi",
@@ -886,7 +891,8 @@
     },
     "damagesink": {
         "name": "Pochłaniacz obrażeń",
-        "description": "Ma w dupie, że ktoś go bije."
+        "description": "Ma w dupie, że ktoś go bije.",
+        "helptext" : "No i co mu zrobisz?"
     },
     "bomberdive": {
         "name": "Raven",
@@ -1185,7 +1191,8 @@
     },
     "fakeunit": {
         "name": "Sygnał-ściema",
-        "description": "Jak do mnie, to mnie nie ma!"
+        "description": "Jak do mnie, to mnie nie ma!",
+        "helptext" : "Nikogo nie ma w domu!"
     },
     "heavyturret": {
         "name": "Sunlance",
