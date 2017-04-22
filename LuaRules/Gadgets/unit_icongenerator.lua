@@ -11,7 +11,7 @@
 --
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if (gadgetHandler:IsSyncedCode()) then
+
 --[[
 example usage (need cheats):
 /luarules buildicons all
@@ -29,6 +29,8 @@ function gadget:GetInfo()
     enabled   = false  --  loaded by default?
   }
 end
+
+if (gadgetHandler:IsSyncedCode()) then
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1011,10 +1013,6 @@ local schemes,resolutions,ratios = {},{},{}
   local function BuildIcon(cmd, line, words, playerID)
     if (not Spring.IsCheatingEnabled()) then
       Spring.Echo("Cheating must be enabled");
-      return false;
-    end;
-    if (not Spring.GetModUICtrl()) then
-      Spring.Echo("ModUICtrl is needed (type /luamoduictrl 1)");
       return false;
     end;
     if (final_tex or #jobs>0) then
