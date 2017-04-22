@@ -55,7 +55,7 @@ local EXCEPTION_LIST = {
 local labs = {}
 local labList = {count = 0, data = {}}
 
-local function removeLab(unitID)
+local function RemoveLab(unitID)
 	labs[labList.data[labList.count].unitID ] = labs[unitID]
 	labList.data[labs[unitID] ] = labList.data[labList.count]
 	labList.data[labList.count] = nil
@@ -65,8 +65,9 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Periodic unit and feature checl
 
-function checkLabs(checkFeatures, onlyUnstick)
+local function CheckLabs(checkFeatures, onlyUnstick)
 	local labData = labList.data
 	local data, units, features
 	for i = 1, labList.count do
@@ -76,10 +77,9 @@ function checkLabs(checkFeatures, onlyUnstick)
 			break
 		end
 		
-		units = spGetUnitsInRectangle(data.minx-8, data.minz-8, data.maxx+8, data.maxz+8)
-		features = spGetFeaturesInRectangle(data.minx, data.minz, data.maxx, data.maxz)
-
-		for i=1, #units do
+		local clearUnits = data.unitExpulsionParameters
+		units = spGetUnitsInRectangle(clearUnits[1], clearUnits[2], clearUnits[3], clearUnits[4])
+		for i = 1, #units do
 			local unitID = units[i]
 			local unitDefID = spGetUnitDefID(unitID)
 			local ud = UnitDefs[unitDefID]
@@ -92,13 +92,13 @@ function checkLabs(checkFeatures, onlyUnstick)
 					local ux, _, uz, _,_,_, _, aimY  = spGetUnitPosition(unitID, true, true)
 					local vx, vy, vz = spGetUnitVelocity(unitID)
 					
-					if aimY > -18 and aimY >= data.miny and aimY <= data.maxy then
+					if aimY > -18 and aimY >= clearUnits[5] and aimY <= clearUnits[6] then
 						local isAlly = ally == data.ally 
 						
-						local l = abs(ux-data.minx)
-						local r = abs(ux-data.maxx)
-						local t = abs(uz-data.minz)
-						local b = abs(uz-data.maxz)
+						local l = abs(ux - clearUnits[1])
+						local t = abs(uz - clearUnits[2])
+						local r = abs(ux - clearUnits[3])
+						local b = abs(uz - clearUnits[4])
 						
 						local pushDistance = (data.unstickHelp and 16) or 8
 
@@ -106,28 +106,28 @@ function checkLabs(checkFeatures, onlyUnstick)
 
 						if not (isAlly and ux > data.minBuildX and ux < data.maxBuildX and uz > data.minBuildZ and uz < data.maxBuildZ) then
 							if (side == l) then
-								spSetUnitPosition(unitID, data.minx - pushDistance, uz, true)
+								spSetUnitPosition(unitID, clearUnits[1] - pushDistance, uz, true)
 								if data.unstickHelp then
-								
-								else
-									spSetUnitVelocity(unitID, 0, vy, vz)
-								end
-							elseif (side == r) then
-								spSetUnitPosition(unitID, data.maxx + pushDistance, uz, true)
-								if data.unstickHelp then
-								
+									spSetUnitVelocity(unitID, vx, vy, vz/2)
 								else
 									spSetUnitVelocity(unitID, 0, vy, vz)
 								end
 							elseif (side == t) then
-								spSetUnitPosition(unitID, ux, data.minz - pushDistance, true)
+								spSetUnitPosition(unitID, ux, clearUnits[2] - pushDistance, true)
 								if data.unstickHelp then
-								
+									spSetUnitVelocity(unitID, vx, vy, vz/2)
 								else
 									spSetUnitVelocity(unitID, vx, vy, 0)
 								end
+							elseif (side == r) then
+								spSetUnitPosition(unitID, clearUnits[3] + pushDistance, uz, true)
+								if data.unstickHelp then
+									spSetUnitVelocity(unitID, vx, vy, vz/2)
+								else
+									spSetUnitVelocity(unitID, 0, vy, vz)
+								end
 							else
-								spSetUnitPosition(unitID, ux, data.maxz + pushDistance, true)
+								spSetUnitPosition(unitID, ux, clearUnits[4] + pushDistance, true)
 								if data.unstickHelp then
 									spSetUnitVelocity(unitID, vx, vy, vz/2)
 								else
@@ -139,25 +139,28 @@ function checkLabs(checkFeatures, onlyUnstick)
 				end
 			end
 		end
+		
 		if checkFeatures then
-			for i=1,#features do
+			local clearFeatures = data.featureExpulsionParameters
+			features = spGetFeaturesInRectangle(clearFeatures[1], clearFeatures[2], clearFeatures[3], clearFeatures[4])
+			for i = 1, #features do
 				local featureID = features[i]
 				local fx, fy, fz = spGetFeaturePosition(featureID)
-				if fy > data.miny and fy < data.maxy then
-					local l = abs(fx-data.minx)
-					local r = abs(fx-data.maxx)
-					local t = abs(fz-data.minz)
-					local b = abs(fz-data.maxz)
+				if fy > clearFeatures[5] and fy < clearFeatures[6] then
+					local l = abs(fx - clearFeatures[1])
+					local t = abs(fz - clearFeatures[2])
+					local r = abs(fx - clearFeatures[3])
+					local b = abs(fz - clearFeatures[4])
 
 					local side = min(l,r,t,b)
 					if (side == l) then
-						spSetFeaturePosition(featureID, data.minx, fy, fz, true)
-					elseif (side == r) then
-						spSetFeaturePosition(featureID, data.maxx, fy, fz, true)
+						spSetFeaturePosition(featureID, clearFeatures[1], fy, fz, true)
 					elseif (side == t) then
-						spSetFeaturePosition(featureID, fx, fy, data.minz, true)
+						spSetFeaturePosition(featureID, fx, fy, clearFeatures[2], true)
+					elseif (side == r) then
+						spSetFeaturePosition(featureID, clearFeatures[3], fy, fz, true)
 					else
-						spSetFeaturePosition(featureID, fx, fy, data.maxz, true)
+						spSetFeaturePosition(featureID, fx, fy, clearFeatures[4], true)
 					end
 					spSetFeatureVelocity(featureID, 0, 0, 0)
 				end
@@ -165,6 +168,10 @@ function checkLabs(checkFeatures, onlyUnstick)
 		end
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Unit Handling
 
 function gadget:UnitCreated(unitID, unitDefID,teamID)
 	local ud = UnitDefs[unitDefID]
@@ -196,10 +203,10 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 					uz = math.floor(uz/16)*16+8
 				end
 				
-				minx = ux-xsize+0.1
-				minz = uz-zsize+0.1
-				maxx = ux+xsize-0.1
-                maxz = uz+zsize-0.1
+				minx = ux - xsize
+				minz = uz - zsize
+				maxx = ux + xsize
+                maxz = uz + zsize
 			else
 				if xsize%16 == 0 then
 					uz = math.floor((uz+8)/16)*16
@@ -213,11 +220,47 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 					ux = math.floor(ux/16)*16+8
 				end
 
-				minx = ux-zsize+0.1
-				minz = uz-xsize+0.1
-				maxx = ux+zsize-0.1
-				maxz = uz+xsize-0.1
+				minx = ux - zsize
+				minz = uz - xsize
+				maxx = ux + zsize
+				maxz = uz + xsize
 			end
+			
+			local solidFactoryLimit = ud.customParams.solid_factory and tonumber(ud.customParams.solid_factory)
+			
+			unitExpulsionParameters = {
+				minx - 0.1,
+				minz - 0.1,
+				maxx + 0.1,
+				maxz + 0.1,
+				miny,
+				maxy,
+			}
+			if solidFactoryLimit then
+				local solidFactoryRotation = ud.customParams.solid_factory_rotation and tonumber(ud.customParams.solid_factory_rotation)
+				local solidFace = face
+				if solidFactoryRotation then
+					solidFace = (solidFace + solidFactoryRotation)%4
+				end
+				if solidFace == 0 then -- South
+					unitExpulsionParameters[4] = unitExpulsionParameters[2] + (solidFactoryLimit*16)
+				elseif solidFace == 1 then -- East
+					unitExpulsionParameters[3] = unitExpulsionParameters[1] + (solidFactoryLimit*16)
+				elseif solidFace == 2 then -- North
+					unitExpulsionParameters[2] = unitExpulsionParameters[4] - (solidFactoryLimit*16)
+				elseif solidFace == 3 then -- West
+					unitExpulsionParameters[1] = unitExpulsionParameters[3] - (solidFactoryLimit*16)
+				end
+			end
+			
+			featureExpulsionParameters = {
+				minx - 0.1,
+				minz - 0.1,
+				maxx + 0.1,
+				maxz + 0.1,
+				miny,
+				maxy,
+			}
 			
 			labList.count = labList.count + 1
 			labList.data[labList.count] = {
@@ -225,14 +268,12 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 				ally = ally, 
 				team = teamID, 
 				face = 0,
-				minx = minx,
-				miny = miny,
-				minz = minz,
-				maxx = maxx,
-				maxy = maxy,
-				maxz = maxz,
+				unitExpulsionParameters = unitExpulsionParameters,
+				featureExpulsionParameters = featureExpulsionParameters,
 				unstickHelp = unstickHelp,
+				preventAllyHax = solidFactoryLimit and true,
 			}
+			
 			labs[unitID] = labList.count
 			
 			if unstickHelp then
@@ -250,11 +291,11 @@ function gadget:UnitCreated(unitID, unitDefID,teamID)
 
 			--Spring.Echo(xsize)
 			--Spring.Echo(zsize)
-
-			--Spring.MarkerAddLine(minx,0,minz,maxx,0,minz)
-			--Spring.MarkerAddLine(minx,0,minz,minx,0,maxz)
-			--Spring.MarkerAddLine(maxx,0,maxz,maxx,0,minz)
-			--Spring.MarkerAddLine(maxx,0,maxz,minx,0,maxz)
+			
+			--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[3],0,unitExpulsionParameters[2])
+			--Spring.MarkerAddLine(unitExpulsionParameters[1],0,unitExpulsionParameters[2],unitExpulsionParameters[1],0,unitExpulsionParameters[4])
+			--Spring.MarkerAddLine(unitExpulsionParameters[3],0,unitExpulsionParameters[4],unitExpulsionParameters[3],0,unitExpulsionParameters[2])
+			--Spring.MarkerAddLine(unitExpulsionParameters[3],0,unitExpulsionParameters[4],unitExpulsionParameters[1],0,unitExpulsionParameters[4])
 		end
 	end
 
@@ -262,7 +303,7 @@ end
 
 function gadget:UnitDestroyed(unitID, unitDefID)
 	if (labs[unitID]) then
-		removeLab(unitID)
+		RemoveLab(unitID)
 	end
 end
 
@@ -272,14 +313,85 @@ function gadget:UnitGiven(unitID, unitDefID,unitTeam)
 		labList.data[labs[unitID] ].team = unitTeam
 	end
 end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Structure Construction Blocking
+
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if cmdID >= 0 and cmdID ~= CMD.INSERT then
+		return true
+	end
+	
+	if UnitDefs[unitDefID].isFactory then
+		return true
+	end
+	
+	local buildDefID, x, z, face
+	if cmdID == CMD.INSERT then
+		if cmdParams[2] >= 0 then
+			return true
+		end
+		buildDefID = -cmdParams[2]
+		x = cmdParams[4]
+		z = cmdParams[6]
+		face = cmdParams[7]
+	else
+		buildDefID = -cmdID
+		x = cmdParams[1]
+		z = cmdParams[3]
+		face = cmdParams[4]
+	end
+	
+	local allyTeamID = Spring.GetUnitAllyTeam(unitID)
+	local ud = UnitDefs[buildDefID]
+	local xsize = (ud.xsize)*4 - 8
+	local zsize = (ud.ysize or ud.zsize)*4 - 8
+	
+	if ((face == 1) or (face == 3)) then
+		xsize, zsize = zsize, xsize
+	end
+	
+	--Spring.MarkerAddLine(x - xsize,0,z - zsize,x + xsize,0,z - zsize)
+	--Spring.MarkerAddLine(x + xsize,0,z - zsize,x + xsize,0,z + zsize)
+	--Spring.MarkerAddLine(x + xsize,0,z + zsize,x - xsize,0,z + zsize)
+	--Spring.MarkerAddLine(x - xsize,0,z + zsize,x - xsize,0,z - zsize)
+	
+	if (not x) or (not z) then
+		if Spring.IsCheatingEnabled() then
+			Spring.Echo("Prevent Lab Hax AllowCommand")
+			Spring.Echo("cmdID", cmdID)
+			Spring.Utilities.TableEcho(cmdParams, "cmdParams")
+			Spring.Utilities.TableEcho(cmdOptions, "cmdOptions")
+			Spring.Echo("x z xsize zsize", x, z, xsize, zsize)
+		end
+		return true
+	end
+	
+	local labData = labList.data
+	for i = 1, labList.count do
+		local data = labData[i]
+		if data.ally == allyTeamID then
+			local clearFeatures = data.featureExpulsionParameters
+			if clearFeatures[1] < x + xsize and clearFeatures[3] > x - xsize and 
+					clearFeatures[2] < z + zsize and clearFeatures[4] > z - zsize then
+				return false
+			end
+		end
+	end
+	return true
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Gadget Interface
 
 function gadget:GameFrame(n)
-	checkLabs(n%60 == 0, n%5 == 0)
+	CheckLabs(n%60 == 0, n%2 ~= 0)
 end
 
 function gadget:Initialize()
 	local units = Spring.GetAllUnits()
-	for i=1, #units do
+	for i = 1, #units do
 		local udid = Spring.GetUnitDefID(units[i])
 		gadget:UnitCreated(units[i], udid)
 	end

@@ -62,7 +62,7 @@ AnimControl() {
 	var lastHeading, currHeading, diffHeading, pivotAngle;
 	lastHeading = GET HEADING;
 	while (1) {
-	
+
 		//pivot
 		currHeading = GET HEADING;
 		diffHeading = currHeading - lastHeading;
@@ -72,7 +72,7 @@ AnimControl() {
 		if (pivotAngle > MAX_PIVOT) pivotAngle = MAX_PIVOT;
 		if (pivotAngle < MIN_PIVOT) pivotAngle = MIN_PIVOT;
 		turn steering to y-axis 0 - pivotAngle speed PIVOT_SPEED;
-		
+
 		lastHeading = currHeading;
 		sleep ANIM_PERIOD;
 	}
@@ -84,12 +84,12 @@ DamageControl()
 	while (TRUE)
 	{
 		health = get HEALTH;
-		
+
 		if (health < 50)
 		{
 			emit-sfx SFXTYPE_WHITESMOKE from base;
 			if (health < 25)
-			{	
+			{
 				emit-sfx SFXTYPE_BLACKSMOKE from turret;
 			}
 		}
@@ -100,8 +100,8 @@ DamageControl()
 StartMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
+	set-signal-mask SIG_MOVE;
+
 	isMoving = 1;
 	spin wheel1r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
 	spin wheel2r around x-axis speed WHEEL_SPIN_SPEED accelerate WHEEL_SPIN_ACCEL;
@@ -113,8 +113,8 @@ StartMoving()
 StopMoving()
 {
 	signal SIG_MOVE;
-	set-signal-mask SIG_MOVE;	
-	
+	set-signal-mask SIG_MOVE;
+
 	isMoving = 0;
 
 	stop-spin wheel1r around x-axis decelerate WHEEL_SPIN_DECEL;
@@ -159,9 +159,9 @@ Shot1()
 	move barrel to z-axis RECOIL_BARREL now;
 	move breech to z-axis RECOIL_BREECH now;
 	turn swivel to y-axis RECOIL_SWIVEL now;
-	
+
 	emit-sfx 1024 from muzzle;
-	
+
 	move barrel to z-axis 0 speed RECOIL_RESTORE_BARREL;
 	move breech to z-axis 0 speed RECOIL_RESTORE_BREECH;
 	turn swivel to y-axis 0 speed RECOIL_RESTORE_SWIVEL;
@@ -170,7 +170,7 @@ Shot1()
 
 Killed(severity, corpsetype)
 {
-	if(severity >= 0 AND severity < 25)
+	if(severity <= 25)
 	{
 		corpsetype = 1;
 		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
@@ -178,47 +178,46 @@ Killed(severity, corpsetype)
 		explode gun type BITMAPONLY | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type BITMAPONLY | BITMAP;
+		return (0);
 	}
-	else if(severity >= 25 AND severity < 50)
+	if(severity <= 50)
 	{
-		corpsetype = 2;
+		corpsetype = 1;
 		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode barrel type FALL | BITMAP;
 		explode gun type FALL | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
+		return (0);
 	}
-	else if(severity >= 50 AND severity < 100)
+	if(severity < 100)
 	{
-		corpsetype = 3;
+		corpsetype = 2;
 		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
 		explode base type BITMAPONLY | BITMAP;
 		explode turret type SHATTER | BITMAP;
+		return (0);
 	}
-	// D-Gunned/Self-D
-	else if(severity >= 100)
-	{
-		corpsetype = 3;
-		explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-		explode base type SHATTER | BITMAP;
-		explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
-	}
+	corpsetype = 2;
+	explode arm type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode barrel type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode gun type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;
+	explode base type SHATTER | BITMAP;
+	explode turret type FALL | SMOKE | FIRE | EXPLODE_ON_HIT | BITMAP;	
 }
 
 Create()
 {
 	isMoving = 0;
-	
+
 	call-script RockXInit();
 	start-script AnimControl();
 
 	while (get BUILD_PERCENT_LEFT)
 		sleep 250;
-	
-	
+
+
 	start-script DamageControl();
 }

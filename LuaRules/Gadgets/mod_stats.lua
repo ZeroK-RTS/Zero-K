@@ -10,7 +10,7 @@ function gadget:GetInfo()
     date      = "29.3.2009",
     license   = "GNU GPL, v2 or later",
     layer     = 0,
-    enabled   = true  --  loaded by default?
+    enabled   = false  --  loaded by default?
   }
 end
 
@@ -46,7 +46,7 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 -- drones are counted as parent for damage done, ignored for damage received
 -- key = drone, value = parent
 local drones = {
-	carrydrone = "reef",
+	carrydrone = "shipcarrier",
 	wolverine_mine = "corgarp",
 }
 

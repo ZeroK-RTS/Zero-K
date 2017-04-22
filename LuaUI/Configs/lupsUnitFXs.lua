@@ -95,13 +95,13 @@ effectUnitDefs = {
 --	{class='ShieldSphere', options={piece="base", life=math.huge, size=360, pos={0,-15,0}, colormap1 = {{0.95, 0.1, 0.95, 0.2}}, repeatEffect=true}},
   },
   shieldfelon = {
-	{class='Bursts', options=MergeTable({piece="lpilot"},corjamtBursts)},
-	{class='Bursts', options=MergeTable({piece="rpilot"},corjamtBursts)},
+	--{class='Bursts', options=MergeTable({piece="lpilot"},corjamtBursts)},
+	--{class='Bursts', options=MergeTable({piece="rpilot"},corjamtBursts)},
 	--{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,15,0}, size=100, strength = .001, precision=50, repeatEffect=true, quality = 5}},
   },
   
   funnelweb = {
-	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4}},
+	{class='ShieldJitter', options={delay=0, life=math.huge, pos={0,25,-10}, size=400, strength = .002, precision=50, repeatEffect=true, quality = 4, onActive = true}},
 	{class='Bursts', options=MergeTable(corjamtBursts, {piece="aimpoint"})},
 	{class='ShieldSphere', options={piece="aimpoint", life=math.huge, size=11, colormap1 = {{0.95, 0.1, 0.95, 0.9}}, repeatEffect=true}},
   },
@@ -166,6 +166,10 @@ effectUnitDefs = {
   pw_warpgate = {
     {class='StaticParticles', options=warpgateCorona},
 --    {class='GroundFlash', options=groundFlashOrange},
+  },
+  
+  pw_warpjammer = {
+    {class='StaticParticles', options=MergeTable(warpgateCoronaAlt, {onActive=true})},
   },
 
   zenith = {
@@ -245,6 +249,11 @@ effectUnitDefs = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="lfx", onActive=true, emitVector = {0, 0, 1}}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="rfx", onActive=true, emitVector = {0, 0, 1}}},
   },
+  armca = {
+    {class='Ribbon', options={width=1, size=10, piece="engine1"}},
+    {class='Ribbon', options={width=1, size=10, piece="engine2"}},  
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=8, length=20, piece="body", onActive=true, emitVector = {0, 1, 0}}},
+  },
   gunshipaa = { 
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="ljet", onActive=true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=32, piece="rjet", onActive=true}},
@@ -283,10 +292,12 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, piece="wingtip1"}},
     {class='Ribbon', options={width=1, piece="wingtip2"}},
   },
-  gunshipsupport = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust2", onActive=true}},
-  },
+  gunshipcon = { 
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardRight", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=4, length=25, piece="ExhaustForwardLeft", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearLeft", onActive=true, emitVector = {0, 0, -1}}},
+    {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=15, piece="ExhaustRearRight", onActive=true, emitVector = {0, 0, -1}}},
+   },
   corhurc2 = {
     {class='AirJet', options={color={0.7,0.3,0.1}, width=5, length=40, piece="exhaust", onActive=true}},
     {class='Ribbon', options={width=1, piece="wingtipl"}},
@@ -295,14 +306,11 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },	
   },
   corvamp = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true}},
+    -- jets done in gadget
     {class='Ribbon', options={width=1, size=8, piece="wingtip1"}},
     {class='Ribbon', options={width=1, size=8, piece="wingtip2"}},
   },
   corbtrans = {
-    {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, piece="engineEmit", onActive=true}},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav1", onActive=true})},
     {class='StaticParticles', options=MergeTable(teleCorona, {piece="agrav1", onActive=true})},
     {class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="agrav2", onActive=true})},
@@ -375,15 +383,15 @@ for i=1,#UnitDefs do
 		local s = levelScale[tonumber(unitDef.customParams.level) or 1]
 		if unitDef.customParams.commtype == "1" then
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={color={0,0.7,0,1}, pos={0,4*s,0.35*s}, emitVector={0.3,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
-			}
+				{class='SantaHat', options={pos={0.3*s,1.1*s,-6 - 3*s}, emitVector={-1,0,-0.08}, width=3.6*s, height=6.2*s, ballSize=0.9*s, piece="Head"}},
+			}  
 		elseif unitDef.customParams.commtype == "2" then
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={pos={0,6*s,2*s}, emitVector={0.4,1,0.2}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "3" then 
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.2*s, height=6*s, ballSize=0.7*s, piece="head"}},
+				{class='SantaHat', options={color={0,0.7,0,1}, pos={1.5*s,4*s,0.5*s}, emitVector={0.7,1.6,0.2}, width=2.5*s, height=6*s, ballSize=0.7*s, piece="head"}},
 			}
 		elseif unitDef.customParams.commtype == "4" then 
 			effectUnitDefsXmas[unitDef.name] = {
@@ -391,12 +399,12 @@ for i=1,#UnitDefs do
 			}
 		elseif unitDef.customParams.commtype == "5" then 
 			effectUnitDefsXmas[unitDef.name] = {
-				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,0.1}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
+				{class='SantaHat', options={color={0,0.7,0,1}, pos={0,0,0}, emitVector={0,1,0.1}, width=2.7*s, height=6*s, ballSize=0.7*s, piece="hat"}},
 			}	    
 		elseif unitDef.customParams.commtype == "6" then 
 			effectUnitDefsXmas[unitDef.name] = {
 				{class='SantaHat', options={color={0,0,0.7,1}, pos={0,0,0}, emitVector={0,1,-0.1}, width=4.05*s, height=9*s, ballSize=1.05*s, piece="hat"}},
-			}	    
+			}   
 		end
 	end
 	if unitDef.customParams then

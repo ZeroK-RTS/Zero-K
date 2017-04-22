@@ -5,10 +5,8 @@ unitDef = {
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.22,
-  buildCostEnergy     = 180,
   buildCostMetal      = 180,
   buildPic            = [[CORTHUD.png]],
-  buildTime           = 180,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -17,15 +15,11 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_bp = [[Robô assaltante]],
     description_fr = [[Robot d'Assaut]],
 	description_de = [[Sturmroboter mit Schild]],
-	description_pl = [[Bot szturmowy z tarcza]],
     helptext       = [[Weak on its own, the Thug makes an excellent screen for Outlaws and Rogues. The linking shield gives Thugs strength in numbers, but can be defeated by AoE weapons or focus fire.]],
-    helptext_bp    = [[Thug é um robô assaultante. Pode resistir muito dano, e é útil como um escudo para os mais fracos porém mais potentes Rogues.]],
     helptext_fr    = [[Le Thug est extraordinairement r?sistant pour sa taille. Si ses canons ? plasma n'ont pas la pr?cision requise pour abattre les cibles rapides, il reste n?anmoins un bouclier parfait pour des unit?s moins solides telles que les Rogues.]],
 	helptext_de    = [[Der Thug ist zwar für sich alleine ziemlich schwach, doch bietet er für Rogues und Outlaws eine gute Abschirmung. Der sich verbindende Schild erzeugt mehr Stärke, sobald sich mehrere Thugs zusammenschließen, kann aber durch AoE Waffen oder fokusiertes Feuer geschlagen werden.]],
-	helptext_pl    = [[Chociaz pojedynczo jest slaby, Thug moze dzielic tarcze z innymi jednostkami w nia wyposazona (w tym z innymi Thugami), co znacznie zwieksza jego potencjal w duzych ilosciach. Tarcza swietnie nadaje sie tez do chronienia delikatniejszych jednostek, ktore same nie maja tarczy, jak na przyklad Rogue lub Outlaw.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -45,7 +39,6 @@ unitDef = {
   objectName          = [[thud.s3o]],
   onoffable           = false,
   script			  = [[corthud.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -145,30 +138,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Thug]],
       blocking         = true,
-      damage           = 960,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 72,
       object           = [[thug_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 72,
     },
 
     HEAP  = {
-      description      = [[Debris - Thug]],
       blocking         = false,
-      damage           = 960,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 36,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 36,
     },
 
   },

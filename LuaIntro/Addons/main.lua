@@ -15,7 +15,7 @@ end
 ------------------------------------------
 local BAR_SCALING = 0.72
 local X_OFFSET = -0.19
-local Y_OFFSET = -0.04
+local Y_OFFSET = -0.02
 
 local lastLoadMessage = ""
 local lastProgress = {0, 0}

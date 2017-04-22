@@ -14,6 +14,8 @@ function widget:GetInfo()
 	}
 end
 
+VFS.Include("LuaRules/Configs/constants.lua")
+
 ------------------------
 -- speedups
 local spGetGameSeconds = Spring.GetGameSeconds
@@ -33,25 +35,26 @@ options = {
 		name = "Rank Limit",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Units make comments only to newbies.',
 	},
 	warnExpensiveUnits = {
 		name = "Warning for Expensive Units",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		desc = 'Units complain about expensive units made early game.',
 	},
 	cartoonBubbles = {
 		name = "Cartoon Bubbles",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Use cartoon bubbles + font instead of a standard panel.',
 	}
 }
 
 VFS.Include("LuaUI/Configs/clippy.lua",nil)
-
-local OD_BUFFER = 10000
 
 local activeTips = {}	-- [unitID] = {stuff for tip being displayed}
 
@@ -295,14 +298,15 @@ local function ProcessCommand(unitID, command)
 	eExpe = eExpe + extraChange
 	ePull = ePull + extraEnergyPull + extraChange - cp.team_energyWaste/cp.allies
 	
-	eStor = eStor - OD_BUFFER
+	eStor = eStor - HIDDEN_STORAGE
+	mStor = mStor - HIDDEN_STORAGE
 	
 	if energy[-command] then
 		if tips.energy_excess.lastUsed > gameframe - tips.energy_excess.cooldown*30 then
 			return
 		end
 		
-		if (eInco/mInco > ENERGY_TO_METAL_RATIO) and (eCurr/eStor > 0.9) then
+		if (eInco/mInco > ENERGY_TO_METAL_RATIO) and eStor > 0 and (eCurr/eStor > 0.9) then
 			MakeTip(unitID, "energy_excess")
 			return
 		end
@@ -310,7 +314,7 @@ local function ProcessCommand(unitID, command)
 	
 	if ((eInco/mInco < 1) or (eInco - ePull < 0)) and (eCurr < ENERGY_LOW_THRESHOLD) and not energy[-command] then
 		MakeTip(unitID, "energy_deficit")
-	elseif mCurr/mStor > 0.95 and mInco - mExpe > 0 then
+	elseif mStor > 0 and mCurr/mStor > 0.95 and mInco - mExpe > 0 then
 		MakeTip(unitID, "metal_excess")
 	--elseif metalCurrent/metalStorage > 0.05 and metalIncome - metalExpense < 0 then
 	--	MakeTip(unitID, "metal_deficit")
@@ -442,7 +446,7 @@ function widget:SelectionChanged(newSelection)
 end
 
 function widget:Initialize()
-	if VFS.FileExists("LuaRules/Gadgets/mission.lua") then
+	if VFS.FileExists("mission.lua") then
 		widgetHandler:RemoveWidget()	-- no need for tips in mission
 	end
 	local selection = Spring.GetSelectedUnits()

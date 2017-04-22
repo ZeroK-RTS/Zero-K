@@ -1,14 +1,19 @@
 local tbl = {
   corbtrans = {
-    {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, piece="engineEmit", onActive=true}},
+    {class='AirJet', options={color={0.2,0.4,0.8}, width=8, length=35, baseLength = 9, piece="engineEmit", onActive=true}},
   },
   gunshipsupport = {
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust1", onActive=true}},
-    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, piece="thrust2", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust1", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=22, baseLength = 6, piece="thrust2", onActive=true}},
   },
   fighter = {
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle1", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="nozzle2", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
+  },
+  corvamp = {
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust1", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust2", onActive=true}},
+    {class='AirJet', options={color={0.6,0.1,0.0}, width=3.5, length=55, piece="thrust3", onActive=true}},
   },
 }
 local tbl2 = {}
@@ -22,7 +27,8 @@ for unitName, data in pairs(tbl) do
   for index, fx in ipairs(data) do
     local opts = fx.options
     if opts.length then
-      opts.baseLength = opts.length
+      opts.baseLength = opts.baseLength or 0
+      opts.linearLength = opts.length - opts.baseLength
     end
     if opts.size then
       opts.baseSize = opts.size

@@ -1,13 +1,17 @@
 local support = piece 'support' 
 local flare = piece 'flare' 
+local eye_flare = piece 'eye_flare' 
 local thigh1 = piece 'thigh1' 
 local thigh2 = piece 'thigh2' 
 local torso = piece 'torso' 
+local head = piece 'head' 
 local barrel = piece 'barrel' 
 local foot2 = piece 'foot2' 
 local foot1 = piece 'foot1' 
 local leg2 = piece 'leg2' 
 local leg1 = piece 'leg1' 
+local shoulder = piece 'shoulder'
+local shoulder_left = piece 'shoulder_left'
 
 include "constants.lua"
 
@@ -168,6 +172,8 @@ end
 
 function script.Create()
 	Hide(flare)
+	Hide(support)
+	Hide(barrel)
 	StartThread(SmokeUnit, {torso})
 end
 
@@ -189,77 +195,70 @@ local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
 	SetSignalMask(SIG_RESTORE)
 	Sleep(RESTORE_DELAY)
-	Turn(torso, y_axis, 0, math.rad(90))
-	Turn(support, x_axis, 0, math.rad(45))
+	Turn(torso, y_axis, 0, math.rad(160))
+	Turn(head, x_axis, 0, math.rad(45))
 	aiming = false
 end
 
 function script.AimWeapon(num, heading, pitch)
-
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
 	StartThread(RestoreAfterDelay)
 	aiming = true
 	
 	Turn(torso, y_axis, heading, math.rad(300))
-	Turn(support, x_axis, -pitch, math.rad(150))
+	Turn(head, x_axis, -pitch, math.rad(150))
 	WaitForTurn(torso, y_axis)
-	WaitForTurn(support, x_axis)
+	WaitForTurn(head, x_axis)
 	return true
 end
 
 function script.FireWeapon()
-
-	Move(barrel, z_axis, -5)
-	EmitSfx(flare, 1024)
-	Sleep(150)
-	--Turn(torso, x_axis, math.rad(-10.000000), math.rad(500.120879))
-	Sleep(150)
-	--Turn(torso, x_axis, 0, math.rad(20.000000))
-	Move(barrel, z_axis, 0, 6)
+	EmitSfx(eye_flare, 1024)
+	Spin(shoulder, x_axis, math.rad(485), math.rad(5))
+	Spin(shoulder_left, x_axis, math.rad(485), math.rad(5))
+	Sleep(6600)
+	Spin(shoulder, x_axis, 0, math.rad(5))
+	Spin(shoulder_left, x_axis, 0, math.rad(5))
+	Sleep(3100)
+	Turn(shoulder, x_axis, 0, math.rad(50))
+	Turn(shoulder_left, x_axis, 0, math.rad(50))
 end
 
 function script.QueryWeapon()
-	return flare
+	return eye_flare
 end
 
 function script.AimFromWeapon()
-	return support
+	return head
 end
 
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= 0.25 then
-		Explode(barrel, sfxNone)
 		Explode(foot1, sfxNone)
 		Explode(foot2, sfxNone)
 		Explode(leg1, sfxNone)
 		Explode(leg2, sfxNone)
-		Explode(support, sfxNone)
 		Explode(thigh1, sfxNone)
 		Explode(thigh2, sfxNone)
 		Explode(torso, sfxNone)
 		return 1
 	elseif severity <= 0.50 then
-		Explode(barrel, sfxNone)
 		Explode(foot1, sfxNone)
 		Explode(foot2, sfxNone)
 		Explode(leg1, sfxNone)
 		Explode(leg2, sfxNone)
-		Explode(support, sfxNone)
 		Explode(thigh1, sfxNone)
 		Explode(thigh2, sfxNone)
 		Explode(torso, sfxShatter)
 		return 1
 	end
 
-	
-	Explode(barrel, sfxSmoke + sfxFire)
 	Explode(foot1, sfxSmoke + sfxFire)
 	Explode(foot2, sfxSmoke + sfxFire)
 	Explode(leg1, sfxSmoke + sfxFire)
 	Explode(leg2, sfxSmoke + sfxFire)
-	Explode(support, sfxSmoke + sfxFire)
 	Explode(thigh1, sfxSmoke + sfxFire)
 	Explode(thigh2, sfxSmoke + sfxFire)
 	Explode(torso, sfxShatter)

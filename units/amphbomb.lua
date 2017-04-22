@@ -5,11 +5,9 @@ unitDef = {
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostEnergy        = 100,
   buildCostMetal         = 100,
   builder                = false,
   buildPic               = [[AMPHBOMB.png]],
-  buildTime              = 100,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -19,15 +17,12 @@ unitDef = {
   cloakCost              = 0,
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[22 20 22]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-    description_pl = [[Amfibijna bomba spowalniajaca]],
     helptext       = [[The Limpet can dodge most slow projectiles thanks to its agility and small size, allowing it to get close to enemy units in order to detonate, slowing and damaging them.]],
-    helptext_pl    = [[Dzieki malym rozmiarom i szybkosci Limpet moze unikac wolniejszych pociskow, co pozwala mu podejsc pod jednostki przeciwnika i zdetonowac sie, zadajac obrazenia i spowalniajac.]],
  	maxwatertank = [[100]],
  },
 
@@ -38,7 +33,6 @@ unitDef = {
   iconType               = [[walkerbomb]],
   idleAutoHeal           = 5,
   idleTime               = 1800,
-  mass                   = 100,
   maxDamage              = 140,
   maxSlope               = 36,
   maxVelocity            = 4.1,
@@ -50,7 +44,6 @@ unitDef = {
   objectName             = [[amphbomb.s3o]],
   pushResistant          = 0,
   script                 = [[amphbomb.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[AMPHBOMB_DEATH]],
   selfDestructCountdown  = 1,
 
@@ -64,11 +57,8 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 240,
   sonarDistance          = 260,
-  smoothAnim             = true,
   turnRate               = 3000,
   workerTime             = 0,
 

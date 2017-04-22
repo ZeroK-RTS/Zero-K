@@ -12,7 +12,7 @@ function script.AimWeapon(num, heading, pitch)
 end
 
 function script.BlockShot(num, targetID)
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 350.1, 25, 0.5)
+	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 240, 25, 0.5) -- Leeway for amph regen
 end
 
 local submerged = true

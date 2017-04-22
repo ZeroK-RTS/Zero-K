@@ -14,6 +14,8 @@ end
 ------------------------------------------
 function addon.Initialize()
 	local name = Game.modName
+	local version = (Game and Game.version) or (Engine and Engine.version) or "Engine version error"
 	Spring.SetWMIcon("LuaUI/Images/ZK_logo.png")
-	Spring.SetWMCaption(name .. " (Spring " .. Game.version .. ")", name)
+	--Spring.SetWMCaption(name .. " (Spring " .. version .. ")", name)
+	Spring.SetWMCaption("Zero-K", "Zero-K")
 end

@@ -56,7 +56,7 @@ end
 -- Unit Handling
 
 local function AddUnitTexture(unitID, attributes, tex)
-	if (not VFS.FileExists(tex)) then
+	if not (tex and VFS.FileExists(tex)) then
 		return
 	end
 
@@ -69,7 +69,7 @@ local function AddUnitTexture(unitID, attributes, tex)
 		textures[tex].units[unitID] = {data = {}, count = 0}
 	end	
 		
-	for i=1,#attributes do
+	for i = 1,#attributes do
 		textures[tex].units[unitID].count = textures[tex].units[unitID].count + 1
 		textures[tex].units[unitID].data[textures[tex].units[unitID].count] = {
 			piece = pieceMap[attributes[i].piece],
@@ -84,7 +84,7 @@ local function AddUnitTexture(unitID, attributes, tex)
 	end
 end
 
-local function RemoveUnit(unitID, attributes, tex)
+local function RemoveUnit(unitID, tex)
 	textures[tex].units[unitID] = nil
 	textures[tex].count = textures[tex].count - 1
 	if textures[tex].count == 0 then
@@ -192,17 +192,23 @@ local function DrawWorldFunc()
 	for textureName, texData in pairs(textures) do
 		glTexture(textureName)
 		for unitID, unitData in pairs(texData.units) do
-			local unit = texData.units
-			for i = 1, unitData.count do
-				local attributes = unitData.data[i]
-				glPushMatrix()
-				glUnitMultMatrix(unitID)
-				glUnitPieceMultMatrix(unitID, attributes.piece)
-				glTranslate(attributes.offset[1],attributes.offset[2],attributes.offset[3])
-				glRotate(attributes.rotation,attributes.rotVector[1],attributes.rotVector[2],attributes.rotVector[3])
-				glColor(1,1,1,attributes.alpha)
-				glTexRect(-attributes.width, -attributes.height, attributes.width, attributes.height)
-				glPopMatrix()
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			if unitDefID and UnitDefs[unitDefID].customParams.commtype then
+				local unit = texData.units
+				for i = 1, unitData.count do
+					local attributes = unitData.data[i]
+					glPushMatrix()
+					glUnitMultMatrix(unitID)
+					glUnitPieceMultMatrix(unitID, attributes.piece)
+					glTranslate(attributes.offset[1],attributes.offset[2],attributes.offset[3])
+					glRotate(attributes.rotation,attributes.rotVector[1],attributes.rotVector[2],attributes.rotVector[3])
+					glColor(1,1,1,attributes.alpha)
+					glTexRect(-attributes.width, -attributes.height, attributes.width, attributes.height)
+					glPopMatrix()
+				end
+			else
+				-- Requires more work
+				--RemoveUnit(unitID, textureName)
 			end
 		end
 	end

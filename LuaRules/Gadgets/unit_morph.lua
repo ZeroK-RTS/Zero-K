@@ -16,7 +16,7 @@ function gadget:GetInfo()
 	return {
 		name     = "UnitMorph",
 		desc     = "Adds unit morphing",
-		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer)",
+		author	 = "trepan (improved by jK, Licho, aegis, CarRepairer, Aquanim)",
 		date     = "Jan, 2008",
 		license  = "GNU GPL, v2 or later",
 		layer    = -1, --must start after unit_priority.lua gadget to use GG.AddMiscPriority()
@@ -120,7 +120,8 @@ local spGetUnitPosition = Spring.GetUnitPosition
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local stopPenalty	= 0.667
+local stopPenalty = 0.667
+local freeMorph = false
 
 local PRIVATE = {private = true}
 
@@ -173,9 +174,14 @@ local function GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 end
 
 local function AddMorphCmdDesc(unitID, unitDefID, teamID, morphDef, teamTech)
+	
+	if GG.Unlocks and not GG.Unlocks.GetIsUnitUnlocked(teamID, morphDef) then
+		return
+	end
+	
 	morphCmdDesc.tooltip = GetMorphToolTip(unitID, unitDefID, teamID, morphDef)
 	
-	GG.AddMiscPriorityUnit(unitID,teamID)
+	GG.AddMiscPriorityUnit(unitID)
 	if morphDef.texture then
 		morphCmdDesc.texture = "LuaRules/Images/Morph/".. morphDef.texture
 		morphCmdDesc.name = ''
@@ -226,10 +232,19 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function GetMorphRate(unitID)
+	return (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
+end
+
 local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	-- do not allow morph for unfinsihed units
 	if not isFinished(unitID) then 
 		return true 
+	end
+	
+	-- do not allow morph for units being transported which are not combat morphs
+	if Spring.GetUnitTransporter(unitID) and not morphDef.combatMorph then
+		return true
 	end
 	
 	Spring.SetUnitRulesParam(unitID, "morphing", 1)
@@ -250,6 +265,7 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 		morphID = morphID,
 		teamID = teamID,
 		combatMorph = morphDef.combatMorph,
+		morphRate = 0.0,
 	}
 	
 	if morphDef.cmd then
@@ -262,7 +278,10 @@ local function StartMorph(unitID, unitDefID, teamID, morphDef)
 	end
 
 	SendToUnsynced("unit_morph_start", unitID, unitDefID, morphDef.cmd)
-	GG.StartMiscPriorityResourcing(unitID, teamID, (morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor)
+	
+	local newMorphRate = GetMorphRate(unitID)
+	GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphDef.metal/morphDef.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Note: use metal per second as buildspeed (like regular constructor), modified for slow
+	morphUnits[unitID].morphRate = newMorphRate
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
@@ -270,13 +289,13 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeamID, newTeamID)
 	if not morphData then
 		return 
 	end
-	GG.StopMiscPriorityResourcing(unitID, morphData.teamID, 2)
+	GG.StopMiscPriorityResourcing(unitID, 2)
 	morphData.teamID = newTeamID
-	GG.StartMiscPriorityResourcing(unitID, newTeamID, (morphData.def.metal / morphData.def.time), false, 2)
+	GG.StartMiscPriorityResourcing(unitID, (morphData.def.metal / morphData.def.time), false, 2)
 end
 
 local function StopMorph(unitID, morphData)
-	GG.StopMiscPriorityResourcing(unitID,morphData.teamID, 2) --is using unit_priority.lua gadget to handle morph priority.
+	GG.StopMiscPriorityResourcing(unitID, 2) --is using unit_priority.lua gadget to handle morph priority.
 	morphUnits[unitID] = nil
 	if not morphData.combatMorph then
 		Spring.SetUnitRulesParam(unitID, "morphDisable", 0)
@@ -323,7 +342,7 @@ local function FinishMorph(unitID, morphData)
 	local defName = udDst.name
 	local unitTeam = morphData.teamID
 	-- copy dominatrix stuff
-	local originTeam, originAllyTeam, controllerID, controllerAllyTeam = GG.getMastermind(unitID)
+	local originTeam, originAllyTeam, controllerID, controllerAllyTeam = GG.Capture.GetMastermind(unitID)
 	
 	-- you see, Anarchid's exploit is fixed this way
 	if (originTeam ~= nil) and (Spring.ValidUnitID(controllerID)) then
@@ -442,7 +461,7 @@ local function FinishMorph(unitID, morphData)
 	
 	-- copy dominatrix lineage
 	if (originTeam ~= nil) then
-		GG.setMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
+		GG.Capture.SetMastermind(newUnit, originTeam, originAllyTeam, controllerID, controllerAllyTeam)
 	end
 	
 	Spring.DestroyUnit(unitID, false, true) -- selfd = false, reclaim = true
@@ -479,9 +498,9 @@ local function FinishMorph(unitID, morphData)
 	
 	local newPara = 0
 	newPara = paralyzeDamage*newMaxHealth/oldMaxHealth
-	local slowDamage = GG.getSlowDamage(unitID)
+	local slowDamage = Spring.GetUnitRulesParam(unitID,"slowState")
 	if slowDamage then
-		GG.addSlowDamage(newUnit, slowDamage)
+		GG.addSlowDamage(newUnit, slowDamage*newMaxHealth)
 	end
 	Spring.SetUnitHealth(newUnit, {health = newHealth, build = buildProgress, paralyze = newPara})
 	
@@ -535,17 +554,48 @@ end
 
 
 local function UpdateMorph(unitID, morphData)
-	if Spring.GetUnitTransporter(unitID) then
-		return true 
+	local transportID = Spring.GetUnitTransporter(unitID)
+	local transportUnitDefID = 0
+	if transportID then
+		if not morphData.combatMorph then
+			StopMorph(unitID, morphUnits[unitID])
+			morphUnits[unitID] = nil
+			return true
+		end
+		transportUnitDefID = Spring.GetUnitDefID(transportID)
+		if not UnitDefs[transportUnitDefID].isFirePlatform then
+			return true 
+		end
+	end
+	
+	-- if EMPd or disarmed do not morph
+	if (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) or (Spring.GetUnitIsStunned(unitID)) then
+		return true
 	end
 	
 	if (morphData.progress < 1.0) then
+		
+		local newMorphRate = GetMorphRate(unitID)
+		
+		if (morphData.morphRate ~= newMorphRate) then
+			--GG.StopMiscPriorityResourcing(unitID, 2) not necessary
+			GG.StartMiscPriorityResourcing(unitID, (newMorphRate*morphData.def.metal/morphData.def.time), nil, 2) --is using unit_priority.lua gadget to handle morph priority. Modifies resource drain if slowness has changed.
+			morphData.morphRate = newMorphRate
+		end
 		local allow = GG.AllowMiscPriorityBuildStep(unitID, morphData.teamID) --use unit_priority.lua gadget to handle morph priority.
-		if allow and (Spring.UseUnitResource(unitID, morphData.def.resTable)) then
-			morphData.progress = morphData.progress + morphData.increment
+		
+		local resourceUse = {
+			m = (morphData.def.resTable.m * morphData.morphRate),
+			e = (morphData.def.resTable.e * morphData.morphRate),
+		}
+		
+		if freeMorph then
+			morphData.progress = 1
+		elseif allow and (Spring.UseUnitResource(unitID, resourceUse)) then
+			morphData.progress = morphData.progress + morphData.increment*morphData.morphRate
 		end
 	end
-	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1) then
+	if (morphData.progress >= 1.0 and Spring.GetUnitRulesParam(unitID, "is_jumping") ~= 1 and not transportID) then
 		FinishMorph(unitID, morphData)
 		return false -- remove from the list, all done
 	end
@@ -556,6 +606,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function SetFreeMorph(newFree)
+	freeMorph = newFree
+end
+
 function gadget:Initialize()
 	--// get the morphDefs
 	morphDefs, MAX_MORPH = include("LuaRules/Configs/morph_defs.lua")
@@ -563,6 +617,8 @@ function gadget:Initialize()
 		gadgetHandler:RemoveGadget()
 		return
 	end
+	
+	GG.SetFreeMorph = SetFreeMorph
 
 	--// make it global for unsynced access via SYNCED
 	_G.morphUnits         = morphUnits
@@ -605,7 +661,7 @@ function gadget:Initialize()
 				end
 			end
 		elseif UnitDefs[unitDefID].customParams.dynamic_comm then
-			GG.AddMiscPriorityUnit(unitID,teamID)
+			GG.AddMiscPriorityUnit(unitID)
 		end
 	end
 end
@@ -641,7 +697,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 			end
 		end
 	elseif UnitDefs[unitDefID].customParams.dynamic_comm then
-		GG.AddMiscPriorityUnit(unitID,teamID)
+		GG.AddMiscPriorityUnit(unitID)
 	end
 end
 
@@ -756,11 +812,9 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	local morphData = morphUnits[unitID]
 	if (morphData) then
 		if (cmdID == morphData.def.stopCmd) or (cmdID == CMD.STOP and not morphData.def.combatMorph) or (cmdID == CMD_MORPH_STOP) then
-			if not Spring.GetUnitTransporter(unitID) then
 				StopMorph(unitID, morphData)
 				morphUnits[unitID] = nil
 				return false
-			end
 		elseif cmdID == CMD.SELFD then
 			StopMorph(unitID, morphData)
 			morphUnits[unitID] = nil

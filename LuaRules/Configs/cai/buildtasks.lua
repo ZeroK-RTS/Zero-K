@@ -22,7 +22,7 @@ factory job indexes:
 	5 = gunship
 --]]
 
-local reverseCompat = ((Game.version:find('91.0') == 1))
+local reverseCompat = ((Spring.Utilities.GetEngineVersion():find('91.0') == 1))
 
 factionBuildConfig = {
 	robots = {
@@ -177,9 +177,9 @@ factionBuildConfig = {
 				
 				[2] = { -- scout
 					importanceMult = 1.2,
-					count = 2,
-					[1] = {ID = UnitDefNames['armflea'].id, chance = 0.95},
-					[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
+					count = 1,
+					[1] = {ID = UnitDefNames['armflea'].id, chance = 1},
+					--[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
 				},
 				
 				[3] = { -- raider
@@ -563,7 +563,7 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['armca'].id, chance = 1},
+					[1] = {ID = UnitDefNames['gunshipcon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout

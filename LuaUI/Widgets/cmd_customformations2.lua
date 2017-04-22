@@ -20,7 +20,7 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Command Visibility/Formations'
+options_path = 'Settings/Interface/Command Visibility'--/Formations'
 options_order = { 'drawmode_v2', 'linewidth', 'dotsize' }
 options = {
 	drawmode_v2 = {
@@ -35,6 +35,7 @@ options = {
 			{key='dots', name='Dots only', desc='Draw dots at command locations'},
 			{key='both', name='Draw both', desc='Draw lines and dots'},
 		},
+		noHotkey = true,
 	},
 	
 	linewidth = {
@@ -76,6 +77,7 @@ local lineFadeRate = 2.0
 -- What commands are eligible for custom formations
 local formationCmds = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.FIGHT] = true,
 	[CMD.ATTACK] = true,
 	[CMD.MANUALFIRE] = true,
@@ -105,7 +107,7 @@ local overrideCmds = {
 
 -- What commands are issued at a position or unit/feature ID (Only used by GetUnitPosition)
 local positionCmds = {
-	[CMD.MOVE]=true,		[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
+	[CMD.MOVE]=true,		[CMD_RAW_MOVE]=true,	[CMD.ATTACK]=true,		[CMD.RECLAIM]=true,		[CMD.RESTORE]=true,		[CMD.RESURRECT]=true,
 	[CMD.PATROL]=true,		[CMD.CAPTURE]=true,		[CMD.FIGHT]=true, 		[CMD.MANUALFIRE]=true,		[CMD_JUMP]=true, -- jump
 	[CMD.UNLOAD_UNIT]=true,	[CMD.UNLOAD_UNITS]=true,[CMD.LOAD_UNITS]=true,	[CMD.GUARD]=true,		[CMD.AREA_ATTACK] = true,
 }
@@ -232,6 +234,9 @@ local function GetUnitFinalPosition(uID)
 	local ux, uy, uz = spGetUnitPosition(uID)
 	
 	local cmds = spGetCommandQueue(uID, -1)
+	if not cmds then
+		return 0, 0, 0
+	end
 	for i = #cmds, 1, -1 do
 		
 		local cmd = cmds[i]
@@ -263,7 +268,7 @@ local function GetUnitFinalPosition(uID)
 	return ux, uy, uz
 end
 local function SetColor(cmdID, alpha)
-	if     cmdID == CMD_MOVE       then glColor(0.5, 1.0, 0.5, alpha) -- Green
+	if     cmdID == CMD_MOVE or cmdID == CMD_RAW_MOVE then glColor(0.5, 1.0, 0.5, alpha) -- Green
 	elseif cmdID == CMD_ATTACK     then glColor(1.0, 0.2, 0.2, alpha) -- Red
 	elseif cmdID == CMD.MANUALFIRE then glColor(1.0, 1.0, 1.0, alpha) -- White
 	elseif cmdID == CMD_UNLOADUNIT then glColor(1.0, 1.0, 0.0, alpha) -- Yellow
@@ -889,6 +894,7 @@ end
 function widget:Initialize()
 	-- filledCircle = gl.CreateList(gl.BeginEnd, GL.TRIANGLE_FAN, filledCircleVerts, 8)
 	InitFilledCircle(CMD_MOVE)
+	InitFilledCircle(CMD_RAW_MOVE)
 	InitFilledCircle(CMD_ATTACK)
 	InitFilledCircle(CMD.MANUALFIRE)
 	InitFilledCircle(CMD_UNLOADUNIT)

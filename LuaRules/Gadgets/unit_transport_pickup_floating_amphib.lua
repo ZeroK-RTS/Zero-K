@@ -64,6 +64,7 @@ local extendedunloadCmdDesc = {
 
 local sinkCommand = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.GUARD] = true,
 	[CMD.FIGHT] = true,
 	[CMD.PATROL] = true,

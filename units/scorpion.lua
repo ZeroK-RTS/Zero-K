@@ -3,12 +3,10 @@ unitDef = {
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
   acceleration           = 0.26,
-  brakeRate              = 0.26,
-  buildCostEnergy        = 3000,
+  brakeRate              = 0.78,
   buildCostMetal         = 3000,
   builder                = false,
   buildPic               = [[scorpion.png]],
-  buildTime              = 3000,
   canAttack              = true,
   canGuard               = true,
   canManualFire			 = true,
@@ -20,10 +18,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki pajak bojowy]],
     helptext       = [[The Scorpion paralyzes enemies with its lightning sting and then chews them up with its particle beam claws. Its tough carapace shrugs off most enemy fire, and can also turn the Scorpion transparent.]],
-    helptext_pl    = [[Scorpion to bojowy pajak, ktory paralizuje i szybko niszczy przeciwnikow; jego pancerz jest bardzo wytrzymaly i zapewnia mu maskowanie.]],
-    cloakstealth   = [[1]],
   },
 
   explodeAs              = [[CRAWL_BLASTSML]],
@@ -34,7 +29,6 @@ unitDef = {
   idleTime               = 1800,
   initCloaked			 = true,
   leaveTracks            = true,
-  mass                   = 700,
   maxDamage              = 12000,
   maxSlope               = 72,
   maxVelocity            = 1.3,
@@ -45,7 +39,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[scorpion.s3o]],
   script				 = [[scorpion.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
@@ -58,9 +51,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[ARM]],
-  sightDistance          = 440,
+  sightDistance          = 517,
   trackOffset            = 0,
   trackStrength          = 10,
   trackStretch           = 1,
@@ -245,7 +236,7 @@ unitDef = {
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
       beamDecay               = 0.85,
-      beamTime                = 0.01,
+      beamTime                = 1/30,
       beamttl                 = 45,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -284,42 +275,17 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Scorpion]],
-      blocking         = false,
-      category         = [[corpses]],
-      damage           = 12000,
-      energy           = 0,
+      blocking         = true,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 1200,
       object           = [[scorpion_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1200,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
-	  
     },
     HEAP  = {
-      description      = [[Debris - Scorpion]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 12000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 600,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 600,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

@@ -262,6 +262,7 @@ function gadget:DrawGenesis()
 							wrap_s = GL.CLAMP_TO_EDGE, 
 							wrap_t = GL.CLAMP_TO_EDGE,
 							fbo = true,
+							min_filter = GL.LINEAR_MIPMAP_NEAREST,
 						}),
 						orig = glCreateTexture(SQUARE_SIZE, SQUARE_SIZE, {
 							wrap_s = GL.CLAMP_TO_EDGE, 
@@ -363,6 +364,7 @@ function gadget:DrawGenesis()
 				local sx = square.x
 				local sz = square.z
 				if not (updatedSquareMap[sx] and updatedSquareMap[sx][sz]) then
+					gl.GenerateMipmap(mapTex[sx][sz].cur)
 					spSetMapSquareTexture(sx,sz, mapTex[sx][sz].cur)
 					--Spring.MarkerAddPoint(sx*SQUARE_SIZE,0,sz*SQUARE_SIZE,Spring.GetGameFrame())
 					updatedSquareMap[sx] = updatedSquareMap[sx] or {}

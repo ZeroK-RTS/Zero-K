@@ -8,6 +8,7 @@ local shield
 local weaponNumMap = {}
 local weaponsInitialized = false
 local paceMult
+local scaleMult
 
 local commWreckUnitRulesParam = {"comm_baseWreckID", "comm_baseHeapID"}
 local moduleWreckNamePrefix = {"module_wreck_", "module_heap_"}
@@ -40,22 +41,35 @@ local function IsManualFire(num)
 	return isManual[num]
 end
 
+local levelScale = {
+    [0] = 1,
+    [1] = 1,
+    [2] = 1.1,
+    [3] = 1.2,
+    [4] = 1.25,
+    [5] = 1.3,
+}
+local levelToPace = {}
+for key, value in pairs(levelScale) do
+	levelToPace[key] = 1/value
+end
+
 local function CalculatePaceMult()
-	local levelToPace = {
-		[0] = 1,
-		[1] = 1,
-		[2] = 0.94,
-		[3] = 0.88,
-		[4] = 0.85,
-		[5] = 0.8,
-	}
-	
-	paceMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	paceMult = levelScale[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelScale[5]
 	return paceMult
 end
 
 local function GetPace()
 	return paceMult or CalculatePaceMult()
+end
+
+local function CalculateScaleMult()
+	scaleMult = levelToPace[Spring.GetUnitRulesParam(unitID, "comm_level") or 0] or levelToPace[5]
+	return scaleMult
+end
+
+local function GetScale()
+	return scaleMult or CalculateScaleMult()
 end
 
 local function GetWeapon(num)
@@ -81,22 +95,30 @@ end
 local function EmitWeaponFireSfx(pieceNum, num)
 	local weaponNum = GetWeapon(num)
 	if weaponNum == 1 then
-		EmitSfx(pieceNum, 1029 + weapon1*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1029 + weapon1*2)
+		end
 	elseif weaponNum == 2 then
-		EmitSfx(pieceNum, 1029 + weapon2*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1029 + weapon2*2)
+		end
 	end
 end
 
 local function EmitWeaponShotSfx(pieceNum, num)
 	local weaponNum = GetWeapon(num)
 	if weaponNum == 1 then
-		EmitSfx(pieceNum, 1030 + weapon1*2)
+		if weapon1 then
+			EmitSfx(pieceNum, 1030 + weapon1*2)
+		end
 	elseif weaponNum == 2 then
-		EmitSfx(pieceNum, 1030 + weapon2*2)
+		if weapon2 then
+			EmitSfx(pieceNum, 1030 + weapon2*2)
+		end
 	end
 end
 
-local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
+local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult, damageMult)
 	local weaponDef1 = weaponName1 and unitWeaponNames[weaponName1]
 	local weaponDef2 = weaponName2 and unitWeaponNames[weaponName2]
 	local shieldDef = shieldName and unitWeaponNames[shieldName]
@@ -158,7 +180,14 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 		else
 			maxRange = range
 		end
-		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)
+		Spring.SetUnitWeaponState(unitID, weapon1, "range", range)	
+		
+		local damages = WeaponDefs[weaponDef1.weaponDefID].damages
+		for k, v in pairs(damages) do
+			if type(k) == "number" then
+				Spring.SetUnitWeaponDamages(unitID, weapon1, k, v * damageMult)
+			end
+		end
 	end
 	
 	if weapon2 then
@@ -177,6 +206,13 @@ local function UpdateWeapons(weaponName1, weaponName2, shieldName, rangeMult)
 			maxRange = range
 		end
 		Spring.SetUnitWeaponState(unitID, weapon2, "range", range)
+		
+		local damages = WeaponDefs[weaponDef2.weaponDefID].damages
+		for k, v in pairs(damages) do
+			if type(k) == "number" then
+				Spring.SetUnitWeaponDamages(unitID, weapon2, k, v * damageMult)
+			end
+		end
 	end
 	
 	if weapon1 then
@@ -232,7 +268,8 @@ local function Create()
 			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_1"),
 			Spring.GetUnitRulesParam(unitID, "comm_weapon_name_2"),
 			Spring.GetUnitRulesParam(unitID, "comm_shield_name"),
-			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1
+			Spring.GetUnitRulesParam(unitID, "comm_range_mult") or 1,
+			Spring.GetUnitRulesParam(unitID, "comm_damage_mult") or 1
 		)
 	end
 end
@@ -289,6 +326,7 @@ end
 
 return {
 	GetPace           = GetPace,
+	GetScale          = GetScale,
 	GetWeapon         = GetWeapon,
 	EmitWeaponFireSfx = EmitWeaponFireSfx,
 	EmitWeaponShotSfx = EmitWeaponShotSfx,

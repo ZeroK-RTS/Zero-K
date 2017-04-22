@@ -23,8 +23,6 @@ function widget:GetInfo()
   }
 end
 
-local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -325,13 +323,7 @@ function widget:Update(deltaTime)
         end
         
         local cQueue = GetCommandQueue(unitID, 1)
-		local cQueueCount
-		if reverseCompatibility then
-			local tempQueue = GetCommandQueue(unitID, 5)
-			cQueueCount = #tempQueue
-		else
-			cQueueCount = GetCommandQueue(unitID, 0)
-		end
+		local cQueueCount = GetCommandQueue(unitID, 0)
      
         local commandMe = false
       

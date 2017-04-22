@@ -15,7 +15,7 @@ function combatHandler.CreateCombatHandler(allyTeamID)
 
 	local unitList = UnitListHandler.CreateUnitList()
 
-	function RunJobHandler()
+	local function RunJobHandler()
 		if unscoutedCount > 0 then
 			for unitID,_ in scoutList.Iterator() do
 				local cQueue = spGetCommandQueue(unitID, 1)

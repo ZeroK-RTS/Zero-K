@@ -36,8 +36,6 @@ local echo = Spring.Echo
 
 if (gadgetHandler:IsSyncedCode()) then
 
-Spring.SetGameRulesParam('devmode', 1)
-
 
 local function explode(div,str)
   if (div=='') then return false end
@@ -210,6 +208,7 @@ end
 
 
 function gadget:Initialize()
+	Spring.SetGameRulesParam('devmode', 1)
 end
 
 

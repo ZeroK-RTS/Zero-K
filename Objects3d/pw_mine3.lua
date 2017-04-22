@@ -1,4 +1,4 @@
-pw_mine3 = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -60,7 +60,7 @@ pw_mine3 = {
 
 	radius = 90,
 	height = 100,
-	midpos = {0.00, 50, 0.00},
+	midpos = {0.00, 60, 0.00},
 
 	tex1 = "pw_mine3_1.dds",
 	tex2 = "pw_mine3_2.dds",
@@ -70,5 +70,3 @@ pw_mine3 = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_mine3

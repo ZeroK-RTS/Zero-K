@@ -182,7 +182,7 @@ end
 function script.Create()
 	bMoving = false
 	bAiming = false
-	StartThread(SmokeUnit, smokePiece)
+	StartThread(SmokeUnit, {torso})
 end
 
 function script.StartMoving()

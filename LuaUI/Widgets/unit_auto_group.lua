@@ -56,14 +56,17 @@ local helpText =
 	--'Ctrl+~ removes nearest selected unit from its group and selects it. '
 	--'Extra function: Ctrl+q picks single nearest unit from current selection.',
 
-options_order = { 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
+options_order = { 'mainlabel', 'help', 'cleargroups', 'loadgroups', 'addall', 'verbose', 'immediate', 'groupnumbers', }
 options_path = 'Settings/Interface/Control Groups'
 options = {
+  
+	mainlabel = {name='Auto Group', type='label'},
 	loadgroups = {
 		name = 'Preserve Auto Groups',
 		desc = 'Preserve auto groupings for next game. Unchecking this clears the groups!',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
 				unit2group = {}
@@ -76,22 +79,26 @@ options = {
 		desc = 'Existing units will be added to group# when setting autogroup#.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	verbose = {
 		name = 'Verbose Mode',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	immediate = {
 		name = 'Immediate Mode',
 		desc = 'Units built/resurrected/received are added to autogroups immediately instead of waiting them to be idle.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	groupnumbers = {
 		name = 'Display Group Numbers',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	
 	help = {

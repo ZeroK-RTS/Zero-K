@@ -16,7 +16,12 @@ end
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
-if (not gadgetHandler:IsSyncedCode()) then return end
+if gadgetHandler:IsSyncedCode() then
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -79,6 +84,7 @@ local CMD_OPT_RIGHT = CMD.OPT_RIGHT
 local CMD_OPT_SHIFT = CMD.OPT_SHIFT 
 local CMD_STOP = CMD.STOP
 local CMD_REPAIR = CMD.REPAIR
+local CMD_INSERT = CMD.INSERT
 
 local checkCoord = {
 	{x = -8, z = 0},
@@ -105,7 +111,6 @@ for i = 0, 64, 8 do
 end
 
 local maxAreaSize = 2000 -- max X or Z bound of area terraform
-local updateFrequency = 30 -- how many frames to update
 local areaSegMaxSize = 200 -- max width and height of terraform squares
 
 local maxWallPoints = 700 -- max points that can makeup a wall
@@ -118,7 +123,7 @@ local maxHeightDifference = 30 -- max difference of height around terraforming, 
 local maxRampGradient = 5
 
 local volumeCost = 0.0128
-local pointExtraAreaCost = 0--.027
+local pointExtraAreaCost = 0 -- 0.027
 local pointExtraAreaCostDepth = 6
 local pointExtraPerimeterCost = 0.1
 local pointExtraPerimeterCostDepth = 6
@@ -182,8 +187,6 @@ local terraformUnit 		= {}
 local terraformUnitTable 	= {}
 local terraformUnitCount 	= 0
 
-local terraTagInfo 			= nil
-
 local terraformOrder		= {}
 local terraformOrders 		= 0
 
@@ -194,9 +197,15 @@ local currentCon 			= 0
 
 local checkInterval 		= 0
 
-local unitOrderList 		= {count = 0, data = {}} 
--- workaround: if order is given on the same frame as terraunit creation the order temporarilly
--- points to the ground location
+-- Performance
+local MIN_UPDATE_PERIOD     = 3
+local MAX_UPDATE_PERIOD     = 30
+local updatePeriod          = 15 -- how many frames to update
+local terraformOperations   = 0 -- tracks how many operations. Used to prevent slowdown.
+local nextUpdateCheck       = 0 -- Time at which to check performance
+
+-- Map terraform commands given by teamID and tag.
+local fallbackCommands  = {}
 
 local terraunitDefID = UnitDefNames["terraunit"].id
 
@@ -205,8 +214,16 @@ local corclogDefID = UnitDefNames["corclog"].id
 
 local exceptionArray = {
 	[UnitDefNames["armcarry"].id] = true,
-	[UnitDefNames["reef"].id] = true,
+	[UnitDefNames["shipcarrier"].id] = true,
 }
+
+local terraformUnitDefIDs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud and ud.isBuilder and not ud.isFactory and not exceptionArray[i] then
+		terraformUnitDefIDs[i] = true
+	end
+end
 
 --------------------------------------------------------------------------------
 -- Custom Commands
@@ -218,54 +235,71 @@ local rampCmdDesc = {
   id      = CMD_RAMP,
   type    = CMDTYPE.ICON_MAP,
   name    = 'Ramp',
-  cursor  = 'Repair', 
+  cursor  = 'Ramp', 
   action  = 'rampground',
   tooltip = 'Build a Ramp between 2 positions, click 2 times: start and end of ramp',
 }
 
 local levelCmdDesc = {
   id      = CMD_LEVEL,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Level',
-  cursor  = 'Repair', 
+  cursor  = 'Level', 
   action  = 'levelground',
   tooltip = 'Levels the ground in an area - draw a line or shape while holding mouse',
 }
 
 local raiseCmdDesc = {
   id      = CMD_RAISE,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Raise',
-  cursor  = 'Repair', 
+  cursor  = 'Raise', 
   action  = 'raiseground',
   tooltip = 'Raises/Lowers the ground in an area',
 }
 
 local smoothCmdDesc = {
   id      = CMD_SMOOTH,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Smooth',
-  cursor  = 'Repair', 
+  cursor  = 'Smooth', 
   action  = 'smoothground',
   tooltip = 'Smooths the ground in an area',
 }
 
 local restoreCmdDesc = {
   id      = CMD_RESTORE,
-  type    = CMDTYPE.ICON_MAP,
-  name    = 'Restore',
-  cursor  = 'Repair', 
+  type    = CMDTYPE.ICON_AREA,
+  name    = 'Restore2',
+  cursor  = 'Restore2', 
   action  = 'restoreground',
   tooltip = 'Restores the ground to origional height',
 }
 
 local bumpyCmdDesc = {
   id      = CMD_BUMPY,
-  type    = CMDTYPE.ICON_MAP,
+  type    = CMDTYPE.ICON_AREA,
   name    = 'Bumpify',
   cursor  = 'Repair', 
   action  = 'bumpifyground',
   tooltip = 'Makes the ground bumpy',
+}
+
+local fallbackableCommands = {
+	[CMD_RAMP] = true,
+	[CMD_LEVEL] = true,
+	[CMD_RAISE] = true,
+	[CMD_SMOOTH] = true,
+	[CMD_RESTORE] = true,
+}
+
+local wantedCommands = {
+	[CMD_RAMP] = true,
+	[CMD_LEVEL] = true,
+	[CMD_RAISE] = true,
+	[CMD_SMOOTH] = true,
+	[CMD_RESTORE] = true,
+	[CMD_TERRAFORM_INTERNAL] = true,
 }
 
 local cmdDescsArray = {
@@ -301,8 +335,19 @@ end
 -- New Functions
 --------------------------------------------------------------------------------
 
+local function IsBadNumber(value, thingToSay)
+	local isBad = (string.find(tostring(value), "n") and true) or false
+	if isBad then
+		Spring.Echo("Terraform bad number detected", thingToSay, value)
+	end
+	return isBad
+end
+
 local function SetTooltip(unitID, spent, estimatedCost)
 	Spring.SetUnitRulesParam(unitID, "terraform_spent", spent, {allied = true})
+	if IsBadNumber(estimatedCost, "SetTooltip") then 
+		estimatedCost = 100 -- the estimate is for widgets only so better to have wrong data than to crash
+	end
 	Spring.SetUnitRulesParam(unitID, "terraform_estimate", estimatedCost, {allied = true})
 end
 
@@ -404,14 +449,6 @@ local function getPointInsideMap(x,z)
 end
 
 
-local function setupTerraTag(unitID, terraTag, segment, segmentsCount)
-	if terraTag then
-		spSetUnitRulesParam(unitID, "terraTag", terraTag)
-		spSetUnitRulesParam(unitID, "terraTagSegment", segment)
-		spSetUnitRulesParam(unitID, "terraTagSegmentsCount", segmentsCount)
-	end
-end
-
 local function setupTerraunit(unitID, team, x, y, z)
 
 	local y = y or CallAsTeam(team, function () return spGetGroundHeight(x,z) end)
@@ -438,7 +475,18 @@ local function setupTerraunit(unitID, team, x, y, z)
 	})
 end
 
-local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, terraTag, shift)
+local function AddFallbackCommand(teamID, commandTag, terraunits, terraunitList, commandX, commandZ)
+	fallbackCommands[teamID] = fallbackCommands[teamID] or {}
+	
+	fallbackCommands[teamID][commandTag] = {
+		terraunits = terraunits,
+		terraunitList = terraunitList,
+		commandX = commandX, 
+		commandZ = commandZ, 
+	}
+end
+
+local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
 
 	--** Initial constructor processing **
 	local unitsX = 0
@@ -808,12 +856,6 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			
-			terraTagInfo = {
-				terraTag = terraTag,
-				segment = i,
-				segmentsCount = n - 1
-			}
-
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
@@ -827,6 +869,7 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)				
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				spSetUnitRulesParam(id, "terraformType", 4) --ramp
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -895,24 +938,10 @@ local function TerraformRamp(x1, y1, z1, x2, y2, z2, terraform_width, unit, unit
 		return
 	end
 	
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
-	--[[
-	for i = 1, units do
-		if shift then
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
-		else
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
-		end
-		
-		for j = 2, orderList.count do
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
-		end
-	end--]]
-	
+	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
-local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
+local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0}
 	
@@ -1308,18 +1337,13 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 			
 			local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			
-			terraTagInfo = {
-				terraTag = terraTag,
-				segment = i,
-				segmentsCount = n - 1
-			}
-			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
             if id then			
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				spSetUnitRulesParam(id, "terraformType", terraform_type)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -1365,30 +1389,10 @@ local function TerraformWall(terraform_type, mPoint, mPoints, terraformHeight, u
 		
 	end
 	
-	--** Give repair order for each block to all selected units **
-	
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = {count = blocks, data = block}, shift = shift}
-	--[[	
-	for i = 1, units do
-	
-		if (spValidUnitID(unit[i])) then
-			if shift then
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_SHIFT)
-			else
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[1]},CMD_OPT_RIGHT)
-			end
-			
-			for j = 2, blocks do
-				spGiveOrderToUnit(unit[i],CMD_REPAIR,{block[j]},CMD_OPT_SHIFT)
-			end
-		end
-	end
-	--]]
-
+	AddFallbackCommand(team, commandTag, blocks, block, commandX, commandZ)
 end
 
-local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, terraTag, shift)
+local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, unit, units, team, volumeSelection, shift, commandX, commandZ, commandTag)
 
 	local border = {left = mapWidth, right = 0, top = mapHeight, bottom = 0} -- border for the entire area
 	
@@ -1872,12 +1876,6 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 			
             local teamY = CallAsTeam(team, function () return spGetGroundHeight(segment[i].position.x,segment[i].position.z) end)
 			
-			terraTagInfo = {
-				terraTag = terraTag,
-				segment = i,
-				segmentsCount = n - 1
-			}			
-			
 			local id = spCreateUnit(terraunitDefID, terraunitX, teamY or 0, terraunitZ, 0, team, true)
 			spSetUnitHealth(id, 0.01)
 			
@@ -1890,6 +1888,7 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 				
 				terraunitX, terraunitZ = getPointInsideMap(terraunitX,terraunitZ)
 				setupTerraunit(id, team, terraunitX, false, terraunitZ)
+				spSetUnitRulesParam(id, "terraformType", terraform_type)
 			
 				blocks = blocks + 1
 				block[blocks] = id
@@ -2010,22 +2009,8 @@ local function TerraformArea(terraform_type, mPoint, mPoints, terraformHeight, u
 	if orderList.count == 0 then
 		return
 	end
-	unitOrderList.count = unitOrderList.count + 1
-	unitOrderList.data[unitOrderList.count] = {units = {count = units, data = unit}, orders = orderList, shift = shift}
-	--[[
-	for i = 1, units do
-		if shift then
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_SHIFT)
-		else
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[1]},CMD_OPT_RIGHT)
-		end
-		
-		for j = 2, orderList.count do
-			spGiveOrderToUnit(unit[i],CMD_REPAIR,{orderList.data[j]},CMD_OPT_SHIFT)
-		end
-	end
-	--]]
 	
+	AddFallbackCommand(team, commandTag, orderList.count, orderList.data, commandX, commandZ)
 end
 
 --------------------------------------------------------------------------------
@@ -2033,38 +2018,54 @@ end
 --------------------------------------------------------------------------------
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD_TERRAFORM_INTERNAL] = true}
+	return wantedCommands
 end
 
 function gadget:AllowCommand_GetWantedUnitDefID()	
 	return true
 end
 
-function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOptions)
+function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	
+	-- Don't allow non-constructors to queue terraform fallback.
+	if fallbackableCommands[cmdID] and not terraformUnitDefIDs[unitDefID] then
+		return
+	end
 
-  if (cmdID == CMD_TERRAFORM_INTERNAL) then
-
+	if (cmdID == CMD_TERRAFORM_INTERNAL) then
+		if GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID] then
+			return
+		end
+		
 		local terraform_type = cmdParams[1]
+		local teamID = cmdParams[2]
+		local commandX = cmdParams[3]
+		local commandZ = cmdParams[4]
+		local commandTag = cmdParams[5]
+		local loop = cmdParams[6]
+		local terraformHeight = cmdParams[7]
+		local pointCount = cmdParams[8]
+		local constructorCount = cmdParams[9]
+		local volumeSelection = cmdParams[10]
+		
 		--level or raise or smooth or restore or bumpify
 		if terraform_type == 1 or terraform_type == 2 or terraform_type == 3 or terraform_type == 5 then --or terraform_type == 6 then 
 			local point = {}
 			local unit = {}
-			local i = 8
-			for j = 1, cmdParams[5] do
+			local i = 11
+			for j = 1, pointCount do
 				point[j] = {x = cmdParams[i], z = cmdParams[i+1]}
 				i = i + 2
 			end
-			for j = 1, cmdParams[6] do
+			for j = 1, constructorCount do
 				unit[j] = cmdParams[i]
 				i = i + 1
 			end
 			
-			local terraTag = cmdParams[i]
-			
-			if cmdParams[3] == 0 then
-				TerraformWall(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+			if loop == 0 then
+				TerraformWall(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, cmdOptions.shift, commandX, commandZ, commandTag)
 			else
-				TerraformArea(terraform_type, point, cmdParams[5], cmdParams[4], unit, cmdParams[6], cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+				TerraformArea(terraform_type, point, pointCount, terraformHeight, unit, constructorCount, teamID, volumeSelection, cmdOptions.shift, commandX, commandZ, commandTag)
 			end
 			
 			return false
@@ -2073,24 +2074,20 @@ function gadget:AllowCommand(unitID, unitDefID, teamID,cmdID, cmdParams, cmdOpti
 		
 			local point = {}
 			local unit = {}
-			local i = 8
-			for j = 1, cmdParams[5] do
+			local i = 11
+			for j = 1, pointCount do
 				point[j] = {x = cmdParams[i], y = cmdParams[i+1],z = cmdParams[i+2]}
 				i = i + 3
 			end
-			for j = 1, cmdParams[6] do
+			for j = 1, constructorCount do
 				unit[j] = cmdParams[i]
 				i = i + 1
 			end
 			
-			local terraTag = cmdParams[i]
-			
-			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,cmdParams[4]*2,unit, cmdParams[6],cmdParams[2], cmdParams[7], terraTag, cmdOptions.shift)
+			TerraformRamp(point[1].x,point[1].y,point[1].z,point[2].x,point[2].y,point[2].z,terraformHeight*2,unit, constructorCount,teamID, volumeSelection, cmdOptions.shift, commandX, commandZ, commandTag)
 		
 			return false
-			
 		end
-  
   end
   return true -- allowed
 end
@@ -2099,7 +2096,7 @@ end
 -- Sudden Death Mode
 --------------------------------------------------------------------------------
 
-function GG.Terraform_RaiseWater( raiseAmount)
+function GG.Terraform_RaiseWater(raiseAmount)
 	
 	for i = 1, structureCount do
 		local s = structure[structureTable[i]]
@@ -2115,7 +2112,6 @@ function GG.Terraform_RaiseWater( raiseAmount)
 		end
 	end
 	--[[ move commands looks as though it will be messy
-	
 	
 	local allUnits = spGetAllUnits()
 	local allUnitsCount = #allUnits
@@ -2133,6 +2129,16 @@ function GG.Terraform_RaiseWater( raiseAmount)
 	--]]
 	spAdjustHeightMap(0, 0, mapWidth, mapHeight, -raiseAmount)
 	
+	Spring.SetGameRulesParam("waterLevelModifier", raiseAmount)
+	
+	local features = Spring.GetAllFeatures()
+	for i = 1, #features do
+		local featureID = features[i]
+		local fx, fy, fz = Spring.GetFeaturePosition(featureID)
+		if featureID and fy then
+			Spring.SetFeaturePosition(featureID, fx, fy - raiseAmount, fz, true)
+		end
+	end
 end
 
 --------------------------------------------------------------------------------
@@ -2859,6 +2865,8 @@ local function updateTerraform(diffProgress,health,id,arrayIndex,costDiff)
 		i = i + 1
 	end
 	
+	terraformOperations = terraformOperations + extraPoints
+	
 	local oldCostDiff = costDiff
 	
 	local edgeTerraMult = 1
@@ -3026,6 +3034,14 @@ function gadget:GameFrame(n)
 	--	GG.Terraform_RaiseWater(-20)
 	--end
 	
+	if n >= nextUpdateCheck then
+		updatePeriod = math.max(MIN_UPDATE_PERIOD, math.min(MAX_UPDATE_PERIOD, terraformOperations/60))
+		--Spring.Echo("Terraform operations", terraformOperations, updatePeriod)
+		terraformOperations = 0
+		nextUpdateCheck = n + updatePeriod
+	end
+	
+	
 	local i = 1
 	while i <= terraformUnitCount do
 		local id = terraformUnitTable[i]
@@ -3048,7 +3064,7 @@ function gadget:GameFrame(n)
 					diffProgress = health/terraUnitHP - terraformUnit[id].progress
 				end
 				
-				if n - terraformUnit[id].lastUpdate > updateFrequency then
+				if n - terraformUnit[id].lastUpdate >= updatePeriod then
 					local costDiff = health - terraformUnit[id].lastHealth
 					terraformUnit[id].totalSpent = terraformUnit[id].totalSpent + costDiff
 					SetTooltip(id, terraformUnit[id].totalSpent, terraformUnit[id].pyramidCostEstimate + terraformUnit[id].totalCost)
@@ -3164,29 +3180,47 @@ function gadget:GameFrame(n)
 			i = i + 1
 		end
 	end	
+end
+
+function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
+	if not fallbackableCommands[cmdID] then
+		return false
+	end
+	if not fallbackCommands[teamID] then
+		return false
+	end
+	if not (cmdParams and cmdParams[4]) then
+		return false
+	end
+	local command = fallbackCommands[teamID][cmdParams[4]]
+	if not command then
+		return false
+	end
 	
-	-- give orders to the contructors, workaround for order location bug.
-	if unitOrderList.count ~= 0 then
-		for i = 1, unitOrderList.count do
-			local units = unitOrderList.data[i].units
-			local orders = unitOrderList.data[i].orders
-			local shift = unitOrderList.data[i].shift
-			
-			for j = 1, units.count do
-				if shift then
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_SHIFT)
-				else
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[1]},CMD_OPT_RIGHT)
-				end
-				
-				for k = 2, orders.count do
-					spGiveOrderToUnit(units.data[j],CMD_REPAIR,{orders.data[k]},CMD_OPT_SHIFT)
-				end
+	local ux,_,uz = spGetUnitPosition(unitID)
+	
+	local closestID
+	local closestDistance
+	for i = 1, command.terraunits do
+		local terraID = command.terraunitList[i]
+		if (Spring.ValidUnitID(terraID) and Spring.GetUnitDefID(terraID) == terraunitDefID) then
+			local tx,_,tz = spGetUnitPosition(terraID)
+			local distance = (tx-ux)*(tx-ux) + (tz-uz)*(tz-uz) 
+			if (not closestDistance) or (distance < closestDistance) then
+				closestID = terraID
+				closestDistance = distance
 			end
 		end
-		unitOrderList = {count = 0, data = {}}
 	end
-end	
+	
+	if closestID then
+		spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_REPAIR, CMD_OPT_RIGHT, closestID}, {"alt"})
+		return true, false
+	end
+	
+	fallbackCommands[teamID][cmdParams[4]] = nil
+	return false
+end
 
 function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, 
                             weaponID, attackerID, attackerDefID, attackerTeam)
@@ -3323,7 +3357,7 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 						end
 						posCount = posCount + 1
 						posX[posCount] = i
-						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1-disSQ/smoothradiusSQ)
+						posY[posCount] = (groundHeight - origHeight[i][j]) * maxSmooth * (1 - disSQ/smoothradiusSQ)^2
 						posZ[posCount] = j
 					end
 				end
@@ -3344,10 +3378,11 @@ function gadget:Explosion(weaponID, x, y, z, owner)
 		end
 		
 		if detachmentradius then
+			local GRAVITY = Game.gravity
 			local units = Spring.GetUnitsInCylinder(sx,sz,detachmentradius)
 			for i = 1, #units do
 				local hitUnitID = units[i]
-				GG.DetatchFromGround(hitUnitID)
+				GG.DetatchFromGround(hitUnitID, 1, 0.25, 0.002*GRAVITY)
 			end
 		end
 	end
@@ -3594,22 +3629,15 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function gadget:UnitCreated(unitID, unitDefID)
+function gadget:UnitCreated(unitID, unitDefID, teamID)
 
 	if spGetUnitIsDead(unitID) then
 		return
 	end
 	
-	if unitDefID == terraunitDefID then		
-		if terraTagInfo then
-			setupTerraTag(unitID, terraTagInfo.terraTag, terraTagInfo.segment, terraTagInfo.segmentsCount)
-			terraTagInfo = nil
-		end
-	end
-
 	local ud = UnitDefs[unitDefID]
 	-- add terraform commands to builders
-	if ud.isBuilder and not ud.isFactory and not exceptionArray[unitDefID] then
+	if terraformUnitDefIDs[unitDefID] and not (GG.terraformRequiresUnlock and not GG.terraformUnlocked[teamID]) then
 		for _, cmdDesc in ipairs(cmdDescsArray) do
 			spInsertUnitCmdDesc(unitID, cmdDesc)
 		end
@@ -3694,29 +3722,29 @@ function gadget:UnitCreated(unitID, unitDefID)
 						structure[unitID].checkAtDeath = true
 						
 						local recalc = false
+						local area = terraformUnit[oid].area
 						for k = 1, terraformUnit[oid].points do
-							if structure[unitID].area[terraformUnit[oid].point[k].x] then
-								if structure[unitID].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z] then
-									terraformUnit[oid].point[k].diffHeight = 0.0001
-									terraformUnit[oid].point[k].structure = true
-									--terraformUnit[oid].area[terraformUnit[oid].point[k].x][terraformUnit[oid].point[k].z].building = true
-									recalc = true
+							local point = terraformUnit[oid].point[k]
+							local x, z = point.x, point.z
+							if structure[unitID].area[x] and structure[unitID].area[x][z] then
+								terraformUnit[oid].point[k].diffHeight = 0.0001
+								terraformUnit[oid].point[k].structure = true
+								if area[x] and area[x][z] then
+									area[x][z] = nil
 								end
+								recalc = true
 							end
 						end
 						
 						if recalc then
 							updateTerraformCost(oid)
+							updateTerraformEdgePoints(oid)
 						end
-						
 					end
 				end
 			end
 		end
-		
-
 	end
-	
 end
 
 --------------------------------------------------------------------------------
@@ -3726,13 +3754,75 @@ end
 function gadget:Initialize()
 	gadgetHandler:RegisterCMDID(CMD_TERRAFORM_INTERNAL)
 	
-	if modOptions.waterlevel and modOptions.waterlevel ~= 0 then
-		GG.Terraform_RaiseWater(modOptions.waterlevel)
-	end
+	local terraformColor = {0.7, 0.75, 0, 0.7}
+	
+	Spring.SetCustomCommandDrawData(CMD_RAMP, "Ramp", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_LEVEL, "Level", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_RAISE, "Raise", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_SMOOTH, "Smooth", terraformColor, false)
+	Spring.SetCustomCommandDrawData(CMD_RESTORE, "Restore2", terraformColor, false)
+	
+	Spring.AssignMouseCursor("Ramp", "cursorRamp", true, true)
+	Spring.AssignMouseCursor("Level", "cursorLevel", true, true)
+	Spring.AssignMouseCursor("Raise", "cursorRaise", true, true)
+	Spring.AssignMouseCursor("Smooth", "cursorSmooth", true, true)
+	Spring.AssignMouseCursor("Restore2", "cursorRestore2", true, true)
+	
+	gadgetHandler:RegisterCMDID(CMD_RAMP)
+	gadgetHandler:RegisterCMDID(CMD_LEVEL)
+	gadgetHandler:RegisterCMDID(CMD_RAISE)
+	gadgetHandler:RegisterCMDID(CMD_SMOOTH)
+	gadgetHandler:RegisterCMDID(CMD_RESTORE)
 	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = spGetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
+end
+
+--------------------------------------------------------------------------------
+-- SYNCED
+--------------------------------------------------------------------------------
+
+else
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
+
+local terraunitDefID = UnitDefNames["terraunit"].id
+local terraUnits = {}
+
+function gadget:Initialize()
+	for _, unitID in ipairs(Spring.GetAllUnits()) do
+		local unitDefID = Spring.GetUnitDefID(unitID)
+		local teamID = Spring.GetUnitTeam(unitID)
+		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+end
+
+
+function gadget:UnitCreated(unitID, unitDefID, teamID)
+	if unitDefID == terraunitDefID then
+		terraUnits[unitID] = true
+		Spring.UnitRendering.SetUnitLuaDraw(unitID, true)
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID)
+	if terraUnits[unitID] then
+		terraUnits[unitID] = nil
+	end
+end
+
+function gadget:DrawUnit(unitID, drawMode)
+	if terraUnits[unitID] then
+		return true --supress engine drawing
+	end
+end
+
+--------------------------------------------------------------------------------
+-- UNSYNCED
+--------------------------------------------------------------------------------
 end

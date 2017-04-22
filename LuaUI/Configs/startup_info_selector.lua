@@ -39,7 +39,8 @@ local chassisImages = {
 	recon = "LuaUI/Images/startup_info_selector/chassis_commrecon.png",
 	support = "LuaUI/Images/startup_info_selector/chassis_commsupport.png",
 	assault = "LuaUI/Images/startup_info_selector/chassis_benzcom.png",
-	strike = "LuaUI/Images/startup_info_selector/chassis_commstrike.png"
+	strike = "LuaUI/Images/startup_info_selector/chassis_commstrike.png",
+	knight = "LuaUI/Images/startup_info_selector/chassis_cremcom.png"
 }
 
 local moduleDefs, emptyModules, chassisDefs, upgradeUtilities, chassisDefByBaseDef, moduleDefNames, chassisDefNames = VFS.Include("LuaRules/Configs/dynamic_comm_defs.lua")

@@ -23,19 +23,21 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -- Epic Menu Options
 --------------------------------------------------------------------------------
 
-options_path = 'Game/Target AI'
+options_path = 'Game/Unit Behaviour'
 options = {
 	keepTarget = {
 		name = "Keep overridden attack target",
 		type = "bool",
 		value = true,
 		desc = "Units with an attack command will proritize their target until a canceling command is given.",
+		noHotkey = true,
 	},
 	removeTarget = {
 		name = "Stop clears target",
 		type = "bool",
 		value = true,
 		desc = "Issuing the commands Stop, Fight, Guard, Patrol and Attack cancel priority target orders.",
+		noHotkey = true,
 	},
 }
 
@@ -53,6 +55,7 @@ end
 
 local TargetKeepingCommand = {
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD_JUMP] = true,
 	[CMD.REPAIR] = true,
 	[CMD.RECLAIM] = true,

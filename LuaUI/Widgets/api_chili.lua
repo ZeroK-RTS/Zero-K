@@ -21,12 +21,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local reverseCompatibility = true --(Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
+local reverseCompatibility = false
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-if reverseCompatibility or (Spring.GetConfigInt("ZKuseOldChili")==1) then
+if Spring.GetConfigInt("ZKuseNewChili") ~= 1 then
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -167,6 +167,13 @@ function widget:KeyRelease()
   local _keyPressed = keyPressed
   keyPressed = false
   return _keyPressed -- block engine actions when we processed it
+end
+
+
+function widget:TextInput(utf8, ...)
+	if Spring.IsGUIHidden() then return false end
+
+	return screen0:TextInput(utf8, ...)
 end
 
 

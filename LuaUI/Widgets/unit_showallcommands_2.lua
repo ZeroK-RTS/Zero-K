@@ -48,6 +48,8 @@ local selectedUnits
 local drawUnit = {count = 0, data = {}}
 local drawUnitID = {}
 
+local setTargetUnit = {}
+
 local commandLevel = 1 --default at start of widget is to be disabled!
 
 local myAllyTeamID = Spring.GetLocalAllyTeamID()
@@ -55,6 +57,15 @@ local spectating = Spring.GetSpectatingState()
 local myPlayerID = Spring.GetLocalPlayerID()
 
 local gaiaTeamID = Spring.GetGaiaTeamID()
+
+local setTargetUnitDefIDs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ((not (ud.canFly and (ud.isBomber or ud.isBomberAirUnit))) and 
+			ud.canAttack and ud.canMove and ud.maxWeaponRange and ud.maxWeaponRange > 0) or ud.isFactory then
+		setTargetUnitDefIDs[i] = true
+	end
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -129,6 +140,9 @@ local function AddUnit(unitID)
 			list.count = list.count + 1
 			list.data[list.count] = unitID
 			drawUnitID[unitID] = list.count
+			
+			local unitDefID = Spring.GetUnitDefID(unitID)
+			setTargetUnit[unitID] = unitDefID and setTargetUnitDefIDs[unitDefID]
 		end
 	end
 end
@@ -178,6 +192,9 @@ local function GetDrawLevel()
 end
 
 local function getTargetPosition(unitID)
+	if not setTargetUnit[unitID] then
+		return nil
+	end
 	local target_type=spGetUnitRulesParam(unitID,"target_type") or TARGET_NONE
 	
 	local tx,ty,tz

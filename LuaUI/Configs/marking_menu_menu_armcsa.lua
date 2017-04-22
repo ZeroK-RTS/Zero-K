@@ -64,10 +64,6 @@ local menu_armcsa = {
 		label = "Support",
 		items = {
 		  {
-			angle = 0,
-			unit = "armsonar"
-		  },
-		  {
 			angle = 45,
 			unit = "armarad"
 		  },

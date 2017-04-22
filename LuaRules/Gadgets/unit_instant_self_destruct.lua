@@ -43,16 +43,20 @@ end
 
 local toDestroy 
 
+local function QueueUnitDescruction(unitID)
+	local stunned_or_inbuild = spGetUnitIsStunned(unitID)
+	if not stunned_or_inbuild then
+		if not toDestroy then
+			toDestroy = {count = 0, data = {}}
+		end
+		toDestroy.count = toDestroy.count + 1
+		toDestroy.data[toDestroy.count] = unitID
+	end
+end
+
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
 	if cmdID == CMD_SELFD and selfddefs[unitDefID] and cmdOptions.coded == 0 then
-		local stunned_or_inbuild = spGetUnitIsStunned(unitID)
-		if not stunned_or_inbuild then
-			if not toDestroy then
-				toDestroy = {count = 0, data = {}}
-			end
-			toDestroy.count = toDestroy.count + 1
-			toDestroy.data[toDestroy.count] = unitID
-		end
+		QueueUnitDescruction(unitID)
 	end
 	return true
 end
@@ -64,4 +68,8 @@ function gadget:GameFrame(n)
 		end
 		toDestroy = nil
 	end
+end
+
+function gadget:Initialize()
+	GG.QueueUnitDescruction = QueueUnitDescruction
 end

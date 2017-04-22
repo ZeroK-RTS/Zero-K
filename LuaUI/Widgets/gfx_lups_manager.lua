@@ -290,14 +290,14 @@ local color1 = {0,0,0}
 local color2 = {1,0.5,0}
 
 local function GameFrame(_,n)
-  if (((n+48)%60)<1 and (next(cormexes))) then
+  if (((n+3)%10)<1 and (next(cormexes))) then
     --//Update Overdrive Fx
     for unitID,strength in pairs(cormexes) do
       local cur_strength = spGetUnitRulesParam(unitID,"overdrive") or 1
+      cur_strength = math.min(4, cur_strength)
       local diff         = abs(cur_strength - strength)
-      if (diff>0.1) then
-        -- limit the maximum change per update (else the fx would jump like hell)
-        cur_strength = (strength) + ((cur_strength>strength and 1) or -1)*0.3
+      if (diff>0.01) then
+        cur_strength = 0.3*cur_strength + 0.7*strength
 
         local a = min(1,max(0,(cur_strength-1)*0.35));
         ClearFxs(unitID)

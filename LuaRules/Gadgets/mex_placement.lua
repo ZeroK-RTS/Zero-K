@@ -29,7 +29,7 @@ local mexDefID = UnitDefNames["cormex"].id
 local cmdMex = {
 	id      = CMD_AREA_MEX,
 	type    = CMDTYPE.ICON_AREA,
-	tooltip = 'Define an area to make mexes in',
+	tooltip = 'Area Mex: Click and drag to queue metal extractors in an area.',
 	name    = 'Mex',
 	cursor  = 'Repair',
 	action  = 'areamex',
@@ -75,8 +75,14 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	if (cmdID == -mexDefID or (cmdID == CMD.INSERT and cmdParams and cmdParams[2] == -mexDefID)) and metalSpots then
-		local x = cmdParams[1]
-		local z = cmdParams[3]
+		local x, z
+		if cmdID == CMD.INSERT then
+			x = cmdParams[4] and math.ceil(cmdParams[4])
+			z = cmdParams[6] and math.ceil(cmdParams[6])
+		else
+			x = cmdParams[1] and math.ceil(cmdParams[1])
+			z = cmdParams[3] and math.ceil(cmdParams[3])
+		end
 		if x and z then
 			if metalSpotsByPos[x] and metalSpotsByPos[x][z] then
 				return true
@@ -108,6 +114,18 @@ function gadget:Initialize()
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		local teamID = Spring.GetUnitTeam(unitID)
 		gadget:UnitCreated(unitID, unitDefID, teamID)
+	end
+
+	if metalSpots then
+		local scalingFactor = 2 * Game.squareSize
+		for i = 1, #metalSpots do
+			local spot = metalSpots[i]
+			for x = -1, 1 do
+				for z = -1, 1 do
+					Spring.SetSquareBuildingMask(spot.x / scalingFactor + x, spot.z / scalingFactor + z, 2)
+				end
+			end
+		end
 	end
 end
 

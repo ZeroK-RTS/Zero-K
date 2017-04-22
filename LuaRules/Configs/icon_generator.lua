@@ -73,12 +73,15 @@ local function IsCoreOrChicken(a)
 	if a then return a.chicken
 	else return false end
 end
+local function IsHover(a)
+	return a and string.find(a.name, "hover") ~= nil
+end
 backgrounds = {
 --//chicken queen has air movementtype
   {check={name="chickenq"},                                  texture="LuaRules/Images/IconGenBkgs/bg_ground_rock.png"},
 
 --// stuff that needs hardcoding
-  {check={name="reef"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
+  {check={name="shipcarrier"}, texture="LuaRules/Images/IconGenBkgs/bg_water.png"},
 
   
 --[[terraforms
@@ -93,12 +96,8 @@ backgrounds = {
 --//air
   {check={canFly=true},                                      texture="LuaRules/Images/IconGenBkgs/bg_air.png"},
 --//hovers
-  {check={factions=IsCoreOrChicken,canHover=true},                                    texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
-  {check={factions=IsCoreOrChicken,floatOnWater=true,minWaterDepth=LessEqZero},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
-  {check={factions=IsCoreOrChicken,waterline=GreaterZero,minWaterDepth=LessEqZero},   texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
-  --{check={canHover=true},                                    texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
-  {check={floatOnWater=true,minWaterDepth=LessEqZero},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
-  {check={waterline=GreaterZero,minWaterDepth=LessEqZero},   texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
+  {check={factions=IsCoreOrChicken,moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover_rock.png"},
+  {check={moveDef=IsHover},            texture="LuaRules/Images/IconGenBkgs/bg_hover.png"},
 --//subs
   {check={waterline=GreaterEq15,minWaterDepth=GreaterZero},  texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},
   {check={floatOnWater=false,minWaterDepth=GreaterFour},          texture="LuaRules/Images/IconGenBkgs/bg_underwater.png"},

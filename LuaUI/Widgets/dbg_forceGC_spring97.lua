@@ -19,8 +19,8 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function widget:Initialize()
-	if (Game.version:find('91.0') == 1) then
-		Spring.Echo("Removed 'GC at >100MB': not needed for Spring 91") 
+	if (Spring.Utilities.GetEngineVersion():find('91.0') == 1) or true then
+		Spring.Echo("Removed 'GC at >100MB': disabled.") 
 		widgetHandler:RemoveWidget()
 	end
 end

@@ -1,0 +1,20 @@
+{
+	"idle_cons" : {
+		"one" : "You have %{count} idle constructor.",
+		"other" : "You have %{count} idle constructors."
+	},
+	"quick_rallypoint_mode" : "Quick rallypoint mode",
+	"tacnuke_and_emp" : "Tacnuke and EMP",
+	"seismic" : "Seismic",
+	"emp_aoe" : "EMP AOE",
+	"emp_vertical" : "EMP vertical",
+	"tacnuke_vertical" : "Seismic and Tacnuke vertical",
+	"clear_factory_queue" : "Clear factory queue",
+	"space_click_show_stats" : "Space+click: Show unit stats",
+	"hold_space_for_help" : "Hold Spacebar for help",
+	"fac_modifier_keys_instruction" : "Shift+click: x5 multiplier.\nCtrl+click: x20 multiplier.\nAlt+click: Add units to front of queue.\nRightclick: remove units from queue.\n",
+	"x_units_in_queue" : {
+		"one" : "%{count} unit in queue",
+		"other" : "%{count} units in queue"
+	}
+}

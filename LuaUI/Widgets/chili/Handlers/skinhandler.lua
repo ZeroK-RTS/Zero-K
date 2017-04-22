@@ -108,6 +108,8 @@ SkinHandler.defaultSkin = GetSkin('default')
 --//=============================================================================
 --// API
 
+SkinHandler.GetSkin = GetSkin
+
 function SkinHandler.IsValidSkin(skinname)
   return (not not GetSkin(skinname))
 end
@@ -148,6 +150,7 @@ function SkinHandler.LoadSkin(control, class)
 	local found = false
 	local inherited = class.inherited
 	local classname = control.classname
+	
 	repeat
 		--FIXME scan whole `depend` table
 

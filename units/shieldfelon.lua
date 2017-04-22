@@ -5,10 +5,8 @@ unitDef = {
   acceleration        = 0.25,
   activateWhenBuilt   = true,
   brakeRate           = 0.22,
-  buildCostEnergy     = 620,
   buildCostMetal      = 620,
   buildPic            = [[shieldfelon.png]],
-  buildTime           = 620,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -17,9 +15,7 @@ unitDef = {
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Konwerter tarczy]],
     helptext       = [[The Felon draws energy from its shield, discharging it in accurate bursts. Link it to other shields to increase its rate of fire.]],
-    helptext_pl    = [[Felon rozladowuje swoja tarcze, przemieniajac ja na obrazenia zadawane wrogom w celnych seriach. Nie moze strzelac, gdy ma calkowicie wyczerpana tarcze.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -36,11 +32,11 @@ unitDef = {
   maxWaterDepth       = 22,
   minCloakDistance    = 75,
   movementClass       = [[KBOT2]],
+  moveState           = 0,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
   objectName          = [[shieldfelon.s3o]],
   onoffable           = false,
   script              = [[shieldfelon.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -144,30 +140,18 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Felon]],
       blocking         = true,
-      damage           = 1400,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 248,
       object           = [[shieldfelon_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 248,
     },
 
     HEAP  = {
-      description      = [[Debris - Felon]],
       blocking         = false,
-      damage           = 1400,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 124,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 124,
     },
 
   },

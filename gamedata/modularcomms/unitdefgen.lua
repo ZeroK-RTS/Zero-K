@@ -45,34 +45,39 @@ local legacyTranslators = VFS.Include("gamedata/modularcomms/legacySiteDataTrans
 -- for examples see testdata.lua
 
 local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-local err, success
+local commData
 
-local commDataRaw = modOptions.commandertypes
-local commDataFunc, commData
-
-if not (commDataRaw and type(commDataRaw) == 'string') then
-	err = "Comm data entry in modoption is empty or in invalid format"
-	commData = {}
-else
-	commDataRaw = string.gsub(commDataRaw, '_', '=')
-	commDataRaw = Spring.Utilities.Base64Decode(commDataRaw)
-	--Spring.Echo(commDataRaw)
-	commDataFunc, err = loadstring("return "..commDataRaw)
+local function DecodeBase64CommData(toDecode, useLegacyTranslator)
+	local commData = {}
+	local commDataFunc
+	local err, success
+	
+	if not (toDecode and type(toDecode) == 'string') then
+		err = "Attempt to decode empty or invalid comm data"
+		return {}
+	end
+	
+	toDecode = string.gsub(toDecode, '_', '=')
+	toDecode = Spring.Utilities.Base64Decode(toDecode)
+	--Spring.Echo(toDecode)
+	commDataFunc, err = loadstring("return "..toDecode)
 	if commDataFunc then
 		success, commData = pcall(commDataFunc)
 		if not success then	-- execute Borat
 			err = commData
 			commData = {}
-		else
+		elseif useLegacyTranslator then
 			commData = legacyTranslators.FixOverheadIcon(commData)
 		end
 	end
-end
-if err then 
-	Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
+	if err then 
+		Spring.Log("gamedata/modularcomms/unitdefgen.lua", "warning", 'Modular Comms warning: ' .. err)
+	end
+	return commData
 end
 
 do
+	commData = DecodeBase64CommData(modOptions.commandertypes, true)
 	local commDataPredefined = VFS.Include("gamedata/modularcomms/dyncomms_predefined.lua")
 	commData = MergeTable(commData, commDataPredefined)
 end
@@ -137,7 +142,8 @@ local function GenerateBasicComm()
 
 	--RemoveWeapons(def)
 	--ApplyWeapon(def, "commweapon_sonicgun")
-
+	
+	-- FIXME: not used any more
 	def.customparams.helptext = "The Commander Junior is a basic version of the popular Strike Commander platform, issued to new commanders. "
 			            .."While lacking the glory of its customizable brethren, the Commander Jr. remains an effective tool with full base-building and combat capabilites."
 
@@ -272,9 +278,11 @@ local function ProcessComm(name, config)
 		
 		-- set costs
 		config.cost = config.cost or 0
-		commDefs[name].buildcostmetal = commDefs[name].buildcostmetal + config.cost
-		commDefs[name].buildcostenergy = commDefs[name].buildcostenergy + config.cost
-		commDefs[name].buildtime = commDefs[name].buildtime + config.cost
+		-- a bit less of a hack
+		local commDefsCost = math.max(commDefs[name].buildcostmetal or 0, commDefs[name].buildcostenergy or 0, commDefs[name].buildtime or 0)  --one of these should be set in actual unitdef file
+		commDefs[name].buildcostmetal = commDefsCost + config.cost
+		commDefs[name].buildcostenergy = commDefsCost + config.cost
+		commDefs[name].buildtime = commDefsCost + config.cost
 		cp.cost = config.cost
 		
 		if config.power then
@@ -309,7 +317,7 @@ local function ProcessComm(name, config)
 		
 		-- apply misc. defs
 		if config.miscDefs then
-			commDefs[name] = MergeTable(commDefs[name], config.miscDefs, true)
+			commDefs[name] = MergeTable(config.miscDefs, commDefs[name], true)
 		end
 	end
 end
@@ -342,7 +350,13 @@ end
 
 -- for use by AI, in missions, etc.
 local staticComms = VFS.Include("gamedata/modularcomms/staticcomms.lua")
-for name,data in pairs(staticComms) do
+local staticComms2 = VFS.Include("gamedata/modularcomms/staticcomms_mission.lua")
+local staticComms3 = DecodeBase64CommData(modOptions.campaign_commanders)
+
+local staticCommsMerged = MergeTable(staticComms2, staticComms, true)
+staticCommsMerged = MergeTable(staticCommsMerged, staticComms3, true)
+
+for name,data in pairs(staticCommsMerged) do
 	ProcessComm(name, data)
 end
 
@@ -431,10 +445,6 @@ for name, data in pairs(commDefs) do
 		array.customparams = {}
 		array.customparams.unit = data.unitname
 	end
-	
-	-- set mass
-	data.mass = ((data.buildtime/2 + data.maxdamage/10)^0.55)*9
-	--Spring.Echo("mass " .. (data.mass or "nil") .. " BT/HP " .. (data.buildtime or "nil") .. "  " .. (data.maxdamage or "nil"))
 	
 	-- rez speed
 	if data.canresurrect then 

@@ -45,10 +45,10 @@ local function SetupWindow()
 
 	local newMainWindow = Window:New{
 		--parent = screen0,
-		name  = 'inactivityWindow';
-		color = {0, 0, 0, 0},
+		name  = 'inactivityWindow2';
 		width = 280;
 		height = 160;
+		classname = "main_window_small",
 		y = 80,
 		right = 60;
 		dockable = false;
@@ -56,43 +56,31 @@ local function SetupWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		minWidth = MIN_WIDTH, 
-		minHeight = MIN_HEIGHT,
 		padding = {0, 0, 0, 0},
 		--itemMargin  = {0, 0, 0, 0},
 	}
-	local panel_main = Panel:New{
-		parent = newMainWindow,
-		resizeItems = true;
-		orientation   = "vertical";
-		height = "100%";
-		width =  "100%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-		--backgroundColor = {0, 0, 0, 0},
-	}
 	local label_text = TextBox:New{
-		x = "9%",
+		x = "13%",
 		right = "9%",
 		y = "24%",
 		bottom = "65%",
-		parent = panel_main,
+		parent = newMainWindow,
 		autosize = false;
 		align  = "center";
 		valign = "top";
-		text   = "Connection problems detected for opposition \n\n       Wait  or  Win";
+		text   = "Connection problems detected for opponent \n\n     Wait  or";
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 	}
 	
 	local button_win = Button:New {
 		y = "55%",
 		bottom = "24%",
-		x = "52%",
-		right = "29%",
-		parent = panel_main;
+		x = "54%",
+		right = "26%",
+		classname = "action_button",
+		parent = newMainWindow;
 		padding = {0, 0, 0,0},
 		margin = {0, 0, 0, 0},
-		backgroundColor = {1, 1, 1, 0.9},
 		caption = "Win";
 		font   = {size = 20, color = {1,1,1,1}, outlineColor = {0,0,0,0.7}, outlineWidth = 3},
 		tooltip = "Stop waiting for dropped players and declare yourself the winner.";

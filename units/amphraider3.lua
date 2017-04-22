@@ -5,10 +5,8 @@ unitDef = {
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
-  buildCostEnergy        = 80,
   buildCostMetal         = 80,
   buildPic               = [[amphraider3.png]],
-  buildTime              = 80,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -21,8 +19,6 @@ unitDef = {
     amph_regen = 5,
     amph_submerged_at = 40,
     helptext       = [[The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon.]],
-    helptext_pl    = [[Duck to lekki bot amfibijny ze specjalnymi torpedami krotkiego zasiegu, ktore moze odpalic takze na ladzie. Jest szybki i tani, lecz delikatny.]],
-    description_pl = [[Lekki bot amfibijny]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -40,7 +36,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[amphraider3.s3o]],
   script                 = [[amphraider3.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -49,7 +44,7 @@ unitDef = {
   },
 
   sightDistance          = 500,
-  sonarDistance          = 350,
+  sonarDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -67,7 +62,7 @@ unitDef = {
     {
       def                = [[TORPEDO]],
       badTargetCategory  = [[FIXEDWING]],
-      onlyTargetCategory = [[SWIM FIXEDWING LAND SUB SINK TURRET FLOAT SHIP GUNSHIP HOVER]],
+      onlyTargetCategory = [[SWIM FIXEDWING HOVER LAND SINK TURRET FLOAT SHIP GUNSHIP SUB]],
     },
   },
 
@@ -141,7 +136,7 @@ unitDef = {
       noSelfDamage            = true,
       predictBoost            = 1,
       projectiles	      	  = 2,
-      range                   = 120,
+      range                   = 150,
       reloadtime              = 4,
       soundHit                = [[explosion/wet/ex_underwater]],
       --soundStart              = [[weapon/torpedo]],
@@ -162,30 +157,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Duck]],
       blocking         = true,
-      damage           = 340,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 32,
       object           = [[amphraider3_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
     },
 
     HEAP      = {
-      description      = [[Debris - Duck]],
       blocking         = false,
-      damage           = 340,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 16,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 16,
     },
 
   },

@@ -5,10 +5,8 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostEnergy        = 300,
   buildCostMetal         = 300,
   buildPic               = [[amphfloater.png]],
-  buildTime              = 300,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -20,9 +18,7 @@ unitDef = {
     amph_regen = 60,
     amph_submerged_at = 30,
 	sink_on_emp    = 0,
-    description_pl = [[Amfibijny bot plywak]],
     helptext       = [[The Buoy works around its inability to shoot while submerged by floating to the surface of the sea. Here it can fire a decently ranged cannon with slow damage. It is unable to move while floating.]],
-    helptext_pl    = [[Buoy nie moze strzelac pod woda, ale radzi sobie z tym poprzez wyplywanie na powierzchnie. Wtedy moze atakowac przy uzyciu dzialka o dobrym zasiegu, zadajac dodatkowo obrazenia spowalniajace. Bedac na powierzchni nie moze sie poruszac.]],
     floattoggle    = [[1]],
   },
 
@@ -38,10 +34,10 @@ unitDef = {
   maxVelocity            = 1.4,
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
+  moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName             = [[can.s3o]],
   script                 = [[amphfloater.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -50,6 +46,7 @@ unitDef = {
   },
 
   sightDistance          = 500,
+  sonarDistance          = 500,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 1,
@@ -159,30 +156,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Buoy]],
       blocking         = true,
-      damage           = 1250,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 120,
       object           = [[can_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 120,
     },
 
     HEAP      = {
-      description      = [[Debris - Buoy]],
       blocking         = false,
-      damage           = 1250,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 60,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
   },

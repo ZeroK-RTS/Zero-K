@@ -15,6 +15,8 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -160,6 +162,9 @@ options_order = {
 	'defaultBacklogEnabled',
 	'mousewheelBacklog',
 	'enableSwap',
+	'backlogHideNotChat',
+	'backlogShowWithChatEntry',
+	'backlogArrowOnRight',
 	'changeFont',
 	'enableChatBackground',
 	'toggleBacklog',
@@ -209,12 +214,14 @@ options = {
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
+		advanced = true,
 	},
 	
 	enableConsole = {
 		name = "Enable the debug console",
 		type = 'bool',
 		value = false,
+		advanced = true,
 		OnChange = function(self)
 			if window_console then
 				if self.value then
@@ -252,6 +259,7 @@ options = {
 		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -271,12 +279,14 @@ options = {
 		value = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
+		noHotkey = true,
 		path = dedupe_path,
 	},
 	dedupe_points = {
 		name = "Dedupe points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = dedupe_path,
@@ -285,6 +295,7 @@ options = {
 		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -292,6 +303,7 @@ options = {
 		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -299,6 +311,7 @@ options = {
 		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -306,6 +319,7 @@ options = {
 		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -313,6 +327,7 @@ options = {
 		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 		path = hilite_path,
 	},
@@ -335,6 +350,7 @@ options = {
 		name = "Surround highlighted messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = hilite_path,
@@ -343,6 +359,7 @@ options = {
 		name = "Sound for highlighted messages",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = hilite_path,
@@ -477,12 +494,14 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
 	defaultBacklogEnabled = {
 		name = "Enable backlog at start",
 		desc = "Starts with the backlog chat enabled.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	toggleBacklog = {
 		name = "Toggle backlog",
@@ -494,16 +513,18 @@ options = {
 		desc = "Scroll the backlog chat with the mousewheel.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			scrollpanel_backchat.ignoreMouseWheel = not options.mousewheelBacklog.value
 			scrollpanel_backchat:Invalidate()
 		end,
 	},
 	enableSwap = {
-		name = "Backlog Arrow",
+		name = "Show backlog arrow",
 		desc = "Enable the button to swap between chat and backlog chat.",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			if self.value then
 				window_chat:AddChild(backlogButton)
@@ -511,9 +532,9 @@ options = {
 					window_chat:RemoveChild(inputspace)
 				end
 				inputspace = WG.Chili.ScrollPanel:New{
-					x = 0,
+					x = (options.backlogArrowOnRight.value and 0) or inputsize,
+					right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 					bottom = 0,
-					right = inputsize,
 					height = inputsize,
 					backgroundColor = {1,1,1,1},
 					borderColor = {0,0,0,1},
@@ -543,18 +564,59 @@ options = {
 			window_chat:Invalidate()
 		end,
 	},
+	backlogHideNotChat = {
+		name = "Hide arrow when not chatting",
+		desc = "Enable to hide the backlog arrow when not entering chat.",
+		type = 'bool',
+		value = false,
+		OnChange = function(self)
+			if self.value then
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(WG.enteringText)
+				end
+			else
+				if backlogButton and backlogButton.parent then
+					backlogButton:SetVisibility(true)
+				end
+			end
+		end
+	},
+	backlogShowWithChatEntry = {
+		name = "Auto-toggle backlog",
+		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
+		type = 'bool',
+		value = false,
+	},
+	backlogArrowOnRight = {
+		name = "Backlong Arrow On Right",
+		desc = "Puts the backlong arrow on the right. It appear on the left if disabled..",
+		type = 'bool',
+		value = true,
+		noHotkey = true,
+		OnChange = function(self)
+			if window_chat and window_chat:GetChildByName("backlogButton") then
+				backlogButton._relativeBounds.left = ((not self.value) and 0) or nil
+				backlogButton._relativeBounds.right = (self.value and 0) or nil
+				backlogButton:UpdateClientArea()
+				
+				window_chat:Invalidate()
+			end
+		end,
+	},
 	changeFont = {
 		name = "Change message entering font.",
 		desc = "With this enabled the text-entering font will be changed to match the chat. May cause Spring to competely lock up intermittently on load. Requires reload to update.",
 		type = 'bool',
 		value = false,
 		advanced = true,
+		noHotkey = true,
 	},
 	enableChatBackground = {
 		name = "Enable chat background.",
 		desc = "Enables a background for the text-entering box.",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 		OnChange = function(self)
 			if self.value then
@@ -753,9 +815,7 @@ local function formatMessage(msg)
 end
 
 local function MessageIsChatInfo(msg)
-	return string.find(msg.argument,'enabled!') or
-	string.find(msg.argument,'disabled!') or 
-	string.find(msg.argument,'Speed set to') or
+	return string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
 	string.find(msg.argument,'exited') or 
@@ -764,8 +824,8 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
 	string.find(msg.argument,'resigned') or
-	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-	string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
+	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player'))
+	--string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
 end
 
 local function hideMessage(msg)
@@ -873,8 +933,8 @@ local function AddMessage(msg, target, remake)
 						x=0;y=0;
 						width = 30,
 						height = 20,
+						classname = "overlay_button_tiny",
 						--backgroundColor = {1,1,1,options.pointButtonOpacity.value},
-						backgroundColor = {1,1,1,1},
 						padding = {2,2,2,2},
 						children = {
 							WG.Chili.Image:New {
@@ -888,7 +948,7 @@ local function AddMessage(msg, target, remake)
 						OnClick = {function(self, x, y, mouse)
 							local alt,ctrl, meta,shift = Spring.GetModKeyState()
 							if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they indirectly meant player are using click to issue command (do not steal click)
-							Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+							SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 						end}
 					},
 					textbox,
@@ -919,7 +979,7 @@ local function AddMessage(msg, target, remake)
 						if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
 						local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
 						if (mouse == 1 and click_on_text) then
-							Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+							SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
 						end
 				end}
 				function textbox:HitTest(x, y)  -- copied this hack from chili bubbles
@@ -1057,12 +1117,20 @@ local function ShowInputSpace()
 	inputspace.backgroundColor = {1,1,1,1}
 	inputspace.borderColor = {0,0,0,1}
 	inputspace:Invalidate()
+	
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(true)
+	end
 end
 local function HideInputSpace()
 	WG.enteringText = false
 	inputspace.backgroundColor = {0,0,0,0}
 	inputspace.borderColor = {0,0,0,0}
 	inputspace:Invalidate()
+	
+	if options.backlogHideNotChat.value and backlogButton and backlogButton.parent then
+		backlogButton:SetVisibility(false)
+	end
 end
 
 local function MakeMessageStack(margin)
@@ -1098,7 +1166,7 @@ local function MakeMessageWindow(name, enabled)
 		local resourceBarWidth = 430
 		local maxWidth = math.min(screenWidth/2 - resourceBarWidth/2, screenWidth - 400 - resourceBarWidth)
 		bottom = nil
-		width  = screenWidth * 0.30
+		width  = 380 - 4	--screenWidth * 0.30	-- 380 is epic menu bar width
 		height = screenHeight * 0.20
 		x = screenWidth - width
 		y = 50
@@ -1156,15 +1224,26 @@ local function SwapBacklog()
 	showingBackchat = not showingBackchat
 end
 
+local function SetBacklogShow(newShow)
+	if newShow == showingBackchat then
+		return
+	end
+	SwapBacklog()
+end
+
 options.toggleBacklog.OnChange = SwapBacklog
 
 -----------------------------------------------------------------------
 -- callins
 -----------------------------------------------------------------------
 
+local keypadEnterPressed = false
 
 function widget:KeyPress(key, modifier, isRepeat)
-	if (key == KEYSYMS.RETURN) then
+	if key == KEYSYMS.KP_ENTER then
+		keypadEnterPressed = true
+	end
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
 		if noAlly then
 			firstEnter = false --skip the default-ally-chat initialization if there's no ally. eg: 1vs1
 		end
@@ -1175,12 +1254,31 @@ function widget:KeyPress(key, modifier, isRepeat)
 			firstEnter = false
 		end
 		
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(true)
+		end
 		ShowInputSpace()
 	else
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
+		end
 		HideInputSpace()
 	end 
 end
 
+function widget:KeyRelease(key, modifier, isRepeat)
+	if (key == KEYSYMS.RETURN) or (key == KEYSYMS.KP_ENTER) then
+		if key == KEYSYMS.KP_ENTER and keypadEnterPressed then
+			keypadEnterPressed = false
+			return
+		end
+		if options.backlogShowWithChatEntry.value then
+			SetBacklogShow(false)
+		end
+		HideInputSpace()
+	end
+	keypadEnterPressed = false
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -1215,8 +1313,17 @@ end
 
 -- new callin! will remain in widget
 function widget:AddConsoleMessage(msg)
-	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then return end
-	if msg.msgtype == 'other' and (msg.argument):find('added point') then return end
+	if options.error_opengl_source.value and msg.msgtype == 'other' and (msg.argument):find('Error: OpenGL: source') then 
+		return 
+	end
+	
+	if msg.msgtype == 'other' and (msg.argument):find('added point') then 
+		return 
+	end
+	
+	if msg.msgtype == 'other' and (msg.argument):find("LuaMenuServerMessage") then
+		return
+	end
 	
 	local isChat = isChat(msg) 
 	local isPoint = msg.msgtype == "point" or msg.msgtype == "label"
@@ -1272,12 +1379,6 @@ function widget:AddConsoleMessage(msg)
 	end
 	
 	removeToMaxLines()
-	
-	-- if playername == myName then
-		if WG.enteringText then
-			HideInputSpace()
-		end 		
-	-- end
 end
 
 -----------------------------------------------------------------------
@@ -1293,10 +1394,21 @@ function widget:Update(s)
 	if timer > 2 then
 		timer = 0
 		local sub = 2 / options.autohide_text_time.value
-		Spring.SendCommands({string.format("inputtextgeo %f %f 0.02 %f", 
-			window_chat.x / screen0.width + 0.003, 
-			1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
-			window_chat.width / screen0.width)})
+		
+		local inputWidthAdd = 0
+		if not options.backlogArrowOnRight.value then
+			inputWidthAdd = inputsize
+		end
+		
+		Spring.SendCommands(
+			{
+				string.format("inputtextgeo %f %f 0.02 %f", 
+					(window_chat.x + inputWidthAdd)/ screen0.width + 0.003, 
+					1 - (window_chat.y + window_chat.height) / screen0.height + 0.004, 
+					window_chat.width / screen0.width
+				)
+			}
+		)
 	
 		for k,control in pairs(fadeTracker) do
 			
@@ -1380,28 +1492,30 @@ function widget:Initialize()
 	stack_backchat = MakeMessageStack(1)
 	
 	inputspace = WG.Chili.ScrollPanel:New{
-		x = 0,
+		x = (options.backlogArrowOnRight.value and 0) or inputsize,
+		right = ((not options.backlogArrowOnRight.value) and 0) or inputsize,
 		bottom = 0,
-		right = inputsize,
 		height = inputsize,
 		backgroundColor = {1,1,1,1},
 		borderColor = {0,0,0,1},
 		--backgroundColor = {1,1,1,1},
 	}
 	backlogButtonImage = WG.Chili.Image:New {
-		width = inputsize - 7,
-		height = inputsize - 7,
+		width = "100%",
+		height = "100%",
 		keepAspect = true,
 		--color = {0.7,0.7,0.7,0.4},
 		file = 'LuaUI/Images/arrowhead.png',
 	}
 	backlogButton = WG.Chili.Button:New{
-		right=0,
-		bottom=1,
+		name = "backlogButton",
+		x = ((not options.backlogArrowOnRight.value) and 0) or nil,
+		right = (options.backlogArrowOnRight.value and 0) or nil,
+		bottom = 4,
 		width = inputsize - 3,
 		height = inputsize - 3,
-		padding = { 1,1,1,1 },
-		backgroundColor = {1,1,1,1},
+		classname = "overlay_button_tiny",
+		padding = {1,1,1,1},
 		caption = '',
 		tooltip = 'Swap between decaying chat and scrollable chat backlog.',
 		OnClick = {SwapBacklog},

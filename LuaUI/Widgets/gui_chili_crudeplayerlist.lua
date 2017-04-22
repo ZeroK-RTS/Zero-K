@@ -9,9 +9,11 @@ function widget:GetInfo()
     date      = "2011-01-06",
     license   = "GNU GPL, v2 or later",
     layer     = 50,
-    enabled   = true,
+    enabled   = false,
   }
 end
+
+VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -65,7 +67,7 @@ local function IsFFA()
 	return numAllyTeams > 2
 end
 	
-local cf = Spring.GetModOptions().noceasefire ~= "1" and IsFFA()
+local cf = (not Spring.FixedAllies()) and IsFFA()
 
 if not WG.rzones then
 	WG.rzones = {
@@ -503,12 +505,9 @@ local function AddEntity(entity, teamID, allyTeamID)
 		elseif (customKeys.faction~=nil and customKeys.faction~="") then
 			icon = "LuaUI/Configs/Factions/" .. customKeys.faction ..".png"
 		end 
-		if customKeys.level ~= nil and customKeys.level~="" then 
-			local level = 1+math.floor((customKeys.level or 0)/10)
-			if level > 9 then 
-				level = 9
-			end 
-			icRank = "LuaUI/Images/Ranks/" .. level .. ".png"
+		if customKeys.level and customKeys.level~="" and customKeys.elo and customKeys.elo~="" then
+			local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(customKeys.elo), tonumber(customKeys.level))
+			icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 		end
 	end
 	
@@ -693,10 +692,16 @@ end
 
 local function AlignScrollPanel()
 	--push things to bottom of window if needed
-	local height = math.ceil(row * (options.text_height.value+1.5) + 8)
-	scroll_cpl.height = math.min(height, window_cpl.height)
+	local height = math.ceil(row * (options.text_height.value+1.5) + 10)
+	if height < window_cpl.height then
+		scroll_cpl.height = height
+		scroll_cpl.verticalScrollbar = false
+	else
+		scroll_cpl.height = window_cpl.height
+		scroll_cpl.verticalScrollbar = true
+	end
 	if not (options.alignToTop.value) then
-		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height
+		scroll_cpl.y = (window_cpl.height) - scroll_cpl.height - 2
 	else
 		scroll_cpl.y = 0
 	end
@@ -900,6 +905,7 @@ function widget:Initialize()
 
 	-- Set the size for the default settings.
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
+	local x_bound = 310
 	
 	window_cpl = Window:New{  
 		dockable = true,
@@ -909,14 +915,13 @@ function widget:Initialize()
 		bottom = 0,
 		width  = x_bound,
 		height = 150,
-		padding = {8, 2, 8, 2};
+		padding = {8, 2, 2, 2};
 		--autosize   = true;
 		parent = screen0,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minimizable = true,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)
 		minWidth = x_bound,
 	}

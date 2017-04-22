@@ -26,19 +26,21 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Audio/Music'
+options_path = 'Settings/Audio'
 options = {
 	useIncludedTracks = {
 		name = "Use Included Tracks",
 		type = 'bool',
 		value = true,
 		desc = 'Use the tracks included with Zero-K',
+		noHotkey = true,
 	},
 	pausemusic = {
-		name='Pause Music',
-		type='bool',
-		value=false,
+		name = 'Pause Music',
+		type = 'bool',
+		value = false,
 		desc = "Music pauses with game",
+		noHotkey = true,
 	},
 }
 
@@ -104,6 +106,11 @@ local function StartLoopingTrack(trackInit, trackLoop)
 end
 
 local function StartTrack(track)
+	if not peaceTracks then
+		Spring.Echo("Missing peaceTracks file, no music started")
+		return
+	end
+
 	haltMusic = false
 	looping = false
 	Spring.StopSoundStream()
@@ -299,12 +306,20 @@ function widget:Update(dt)
 end
 
 function widget:GameStart()
-	gameStarted = true
-	previousTrackType = musicType
-	StartTrack()
+	if not gameStarted then
+		gameStarted = true
+		previousTrackType = musicType
+		StartTrack()
+	end
 	
 	--Spring.Echo("Track: " .. newTrack)
 	newTrackWait = 0	
+end
+
+-- Safety of a heisenbug
+function widget:GameFrame()
+	widget:GameStart()
+	widgetHandler:RemoveCallIn('GameFrame')
 end
 
 function widget:Initialize()
@@ -404,17 +419,18 @@ function widget:GameOver()
 		if #victoryTracks <= 0 then return end
 		track = victoryTracks[math.random(1, #victoryTracks)]
 		musicType = "victory"
+		WG.Analytics.SendOnetimeEventWithTime("game:end:won")
 	else
 		if #defeatTracks <= 0 then return end
 		track = defeatTracks[math.random(1, #defeatTracks)]
 		musicType = "defeat"
+		WG.Analytics.SendOnetimeEventWithTime("game:end:lost")
 	end
 	looping = false
 	Spring.StopSoundStream()
 	Spring.PlaySoundStream(track,WG.music_volume or 0.5)
 	WG.music_start_volume = WG.music_volume
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

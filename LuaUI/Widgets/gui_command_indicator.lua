@@ -33,6 +33,7 @@ local colorWhite = {1,1,1}
 -- TODO add more commands
 local cmdColors = {
 	[CMD.MOVE] = {0.1, 0.9, 0.1},
+	[CMD_RAW_MOVE] = {0.1, 0.9, 0.1},
 	[CMD.ATTACK] = {0.9, 0.1, 0.1},
 	[CMD.PATROL] = {0.1, 0.1, 0.9},
 	[CMD.FIGHT] = {0.1, 0.1, 0.9},

@@ -7,7 +7,7 @@ function widget:GetInfo() return {
 	enabled   = true,
 } end
 
-options_path = 'Settings/Graphics/Unit Visibility/Radar Icon Sets'
+options_path = 'Settings/Graphics/Unit Visibility/Radar Icons'
 options_order = { 'coniconchassis' }
 options = {
 	coniconchassis = {
@@ -15,6 +15,7 @@ options = {
 		desc = 'Do constructor icons show chassis? Conveys more information but reduces visibility somewhat.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
 				Spring.SetUnitDefIcon(UnitDefNames["armrectr"].id, "builder")

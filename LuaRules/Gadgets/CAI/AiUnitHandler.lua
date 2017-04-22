@@ -44,7 +44,7 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 	
 	local defenseRequire = UnitClusterHandler.CreateUnitCluster(losCheckAllyTeamID, 300)
 	
-	function AddUnit(unitID, unitDefID)
+	local function AddUnit(unitID, unitDefID)
 		totalCostAdded = totalCostAdded + listData.cost
 		local str = ""
 		
@@ -70,7 +70,7 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 		GG.UnitEcho(unitID, str)
 	end
 	
-	function RemoveUnit(unitID, unitDefID)
+	local function RemoveUnit(unitID, unitDefID)
 		totalCostRemoved = totalCostRemoved + listData.cost
 		
 		-- Complete unit list
@@ -85,11 +85,11 @@ function teamUnitTracker.CreateTeamUnitTracker(teamID, allyTeamID)
 	end
 	
 	
-	function GetUnitList(name)
+	local function GetUnitList(name)
 		return completeUnitList[name]
 	end
 	
-	function GetCombatUnitList(name)
+	local function GetCombatUnitList(name)
 		return combatUnitList[name]
 	end
 	

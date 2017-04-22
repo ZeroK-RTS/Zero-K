@@ -37,6 +37,7 @@ local spGetUnitTeam         = Spring.GetUnitTeam
 local spGetUnitDefID        = Spring.GetUnitDefID
 local spGetUnitExperience   = Spring.GetUnitExperience
 local spGetTeamResources    = Spring.GetTeamResources
+local GetUnitCost           = Spring.Utilities.GetUnitCost
 
 local floor = math.floor
 
@@ -109,6 +110,7 @@ local staticO_small = {
 local staticO_big = {
 	corsilo = 1,
 	mahlazer = 1,
+	starlight_satellite=1,
 	zenith = 1,
 	raveparty = 1,
 }
@@ -496,7 +498,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 	if not spAreTeamsAllied(oldTeam,newTeam) then
 		if awardData['cap'][newTeam] then --if team exist, then:
 			local ud = UnitDefs[unitDefID]
-			local mCost = ud and ud.metalCost or 0
+			local mCost = GetUnitCost(unitID, unitDefID)
 			AddAwardPoints( 'cap', newTeam, mCost )
 			if (ud.customParams.dynamic_comm) then
 				if (not cappedComs[unitID]) then
@@ -508,8 +510,7 @@ function gadget:UnitTaken(unitID, unitDefID, oldTeam, newTeam)
 		end
 	else -- teams are allied
 		if (unitDefID ~= terraunitDefID) and shareListTemp1[oldTeam] and shareListTemp1[newTeam] then
-			local ud = UnitDefs[unitDefID]
-			local mCost = ud and ud.metalCost or 0
+			local mCost = GetUnitCost(unitID, unitDefID)
 
 			shareListTemp1[oldTeam] = shareListTemp1[oldTeam] + mCost
 			shareListTemp1[newTeam] = shareListTemp1[newTeam] - mCost
@@ -562,18 +563,22 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam, _, _, killerTeam)
 	end
 end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, weaponID,
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
 		attackerID, attackerDefID, attackerTeam)
+	if (unitTeam == gaiaTeamID) then return end
+	local hp, maxHP = spGetUnitHealth(unitID)
+	if (hp < 0) then
+		damage = damage + hp
+	end
+	AddAwardPoints( 'ouch', unitTeam, damage )
+
 	if (not attackerTeam)
 		or (attackerTeam == unitTeam)
 		or (attackerTeam == gaiaTeamID)
-		or (unitTeam == gaiaTeamID)
 		then return end
 
-	local hp = spGetUnitHealth(unitID)
-	local damage = (hp > 0) and fullDamage or fullDamage + hp
 	local ud = UnitDefs[unitDefID]
-	local costdamage = (damage / ud.health) * ud.metalCost
+	local costdamage = (damage / maxHP) * GetUnitCost(unitID, unitDefID)
 
 	if spAreTeamsAllied(attackerTeam, unitTeam) then
 		if not paralyzer then
@@ -586,8 +591,6 @@ function gadget:UnitDamaged(unitID, unitDefID, unitTeam, fullDamage, paralyzer, 
 			if ud.name == "chickenflyerqueen" or ud.name == "chickenlandqueen" then
 				AddAwardPoints( 'heart', attackerTeam, damage )
 			end
-			AddAwardPoints( 'pwn', attackerTeam, costdamage )
-			AddAwardPoints( 'ouch', unitTeam, damage )
 			local ad = UnitDefs[attackerDefID]
 
 			if (flamerWeaponDefs[weaponID]) then
@@ -650,13 +653,12 @@ function gadget:GameFrame(n)
 		end
 
 		-- read externally tracked values
-		local last_history_frame = math.floor((n+420)/450)
 		local teams = Spring.GetTeamList()
 		for i = 1, #teams do
 			local team = teams[i]
 			if team ~= gaiaTeamID then
-				local totalReclaim = Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_" .. last_history_frame)
-				AddAwardPoints('reclaim', team, totalReclaim)
+				AddAwardPoints('reclaim', team, Spring.GetTeamRulesParam(team, "stats_history_metal_reclaim_current") or 0)
+				AddAwardPoints('pwn', team, Spring.GetTeamRulesParam(team, "stats_history_damage_dealt_current") or 0)
 			end
 		end
 

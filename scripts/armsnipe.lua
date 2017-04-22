@@ -18,6 +18,7 @@ local handr = piece 'handr'
 local receiver = piece 'receiver' 
 local barrel = piece 'barrel' 
 local flare = piece 'flare' 
+local gunemit = piece 'gunemit' 
 local scope = piece 'scope' 
 local stock = piece 'stock' 
 local thighl = piece 'thighl' 
@@ -166,7 +167,7 @@ function script.AimFromWeapon(num)
 end
 
 function script.QueryWeapon(num)
-	return flare
+	return gunemit
 end
 -----------------------------------------------------------------------
 --gun functions

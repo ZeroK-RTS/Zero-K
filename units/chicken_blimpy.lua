@@ -3,7 +3,7 @@ unitDef = {
   name                = [[Blimpy]],
   description         = [[Dodo Bomber]],
   airHoverFactor      = 0,
-  amphibious          = true,
+  brakerate           = 0.4,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -23,11 +23,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Bombardier ? Dodos]],
 	description_de = [[Dodo Bomber]],
-	description_pl = [[Bombowiec Dodo]],
     helptext       = [[Blimpy drops a Dodo on unsuspecting armies and bases.]],
     helptext_fr    = [[Le Blimpy est une unit? a?rienne ressemblant ? un bourdon dont apparemment la seule vocation soit de l?cher sur l'adversaire le Dodo qu'elle transporte sous son ventre. D?vastateur contre les bases.]],
 	helptext_de    = [[Blimpy wirft Dodos auf ahnungslose Heere und Basen ab.]],
-	helptext_pl    = [[Blimpy zrzuca Dodo w charakterze bomb.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -39,19 +37,15 @@ unitDef = {
   idleTime            = 300,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
-  mass                = 258,
   maxDamage           = 1850,
   maxSlope            = 18,
   maxVelocity         = 5,
   minCloakDistance    = 75,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET]],
   objectName          = [[chicken_blimpy.s3o]],
   power               = 750,
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -62,10 +56,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   turnRate            = 6000,
   workerTime          = 0,
 
@@ -99,7 +90,7 @@ unitDef = {
   weaponDefs          = {
 
     BOGUS_BOMB  = {
-      name                    = [[BogusBomb]],
+      name                    = [[Fake Bomb]],
       areaOfEffect            = 80,
       commandfire             = true,
       craterBoost             = 0,
@@ -124,7 +115,7 @@ unitDef = {
 
 
     BOMBTRIGGER = {
-      name                    = [[Bogus BOMBTRIGGER]],
+      name                    = [[Fake BOMBTRIGGER]],
       accuracy                = 12000,
       areaOfEffect            = 1,
       beamTime                = 0.1,
@@ -201,7 +192,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
     },

@@ -14,6 +14,8 @@ function widget:GetInfo()
   }
 end
 
+include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -253,9 +255,9 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 		Button:New{
 			width = options.buttonsize.value*1.2,
 			height = options.buttonsize.value*1.0,
-			tooltip = 			'Click - ' 			.. GreenStr .. 'Select \n' 					
-				.. WhiteStr .. 	'Middle click - ' 	.. GreenStr .. 'Go to \n'
-				.. WhiteStr .. 	'Right click - ' 	.. GreenStr .. 'Quick Rallypoint Mode' 
+			tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+				.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
+				.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 				,
 			backgroundColor = buttonColor,
 			
@@ -264,7 +266,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 					function(_,_,_,button)
 						if button == 2 then
 							local x,y,z = Spring.GetUnitPosition(unitID)
-							Spring.SetCameraTarget(x,y,z)
+							SetCameraTarget(x,y,z)
 						elseif button == 3 then
 							Spring.Echo("FactoryBar: Entered easy waypoint mode")
 							Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
@@ -448,12 +450,12 @@ local function WaypointHandler(x,y,button)
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt) 
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
   elseif type=='unit' then
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt)
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 
   --if not shift then waypointMode = 0; return true end
@@ -726,7 +728,7 @@ function widget:Initialize()
 		minHeight = 56,
 		color = {0,0,0,0},
 		children = {
-			Label:New{ caption='Factories', fontShadow = true, },
+			Label:New{ caption = WG.Translate("interface", "factories"), fontShadow = true, },
 			stack_main,
 		},
 		OnMouseDown={ function(self)

@@ -641,6 +641,13 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+
+  DrawControl = DrawButton,
+}
+
 skin.checkbox = {
   DrawControl = DrawCheckbox,
 }

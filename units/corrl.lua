@@ -3,9 +3,7 @@ unitDef = {
   name                          = [[Defender]],
   description                   = [[Light Missile Tower]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
-  buildCostEnergy               = 80,
   buildCostMetal                = 80,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -13,28 +11,23 @@ unitDef = {
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[corrl_aoplane.dds]],
   buildPic                      = [[CORRL.png]],
-  buildTime                     = 80,
   canAttack                     = true,
   canstop                       = [[1]],
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 70 24]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_fr = [[Tourelle Lance-Missile Légcre]],
 	description_de = [[Leichter Raketenturm (Flugabwehr/Skirmish)]],
-	description_pl = [[Lekka wieza rakietowa]],
     helptext       = [[The Defender is a light multi-purpose missile tower. It is good for sniping units from a distance, providing some degree of anti-air protection, and skirmishing enemy LLTs from outside their range. However, it breaks when you sneeze on it.]],
     helptext_fr    = [[Le Defender est une tourelle légcre mais r plus longue portée que la LLT, il peut de plus attaquer les unité aeriennes avec précision grâce r ses roquettes r tete chercheuse. C'est la meilleure parade contre les bombes rampantes. Son blindage et son temps de rechargement la rendent rapidement obsolcte.]],
 	helptext_de    = [[Der Defender ist ein leichter, multifunktionaler Raketenturm. Er eignet sich gut, um Einheiten aus der Distanz zu töten und bietet ein wenig Flugabwehr. Außerdem zerlegt er feindliche LLT aufgrund seiner größeren Reichweite. Dennoch ist er extrem schwach gepanzert und zerbricht durch jedes Niesen.]],
-	helptext_pl    = [[Defender to wszechstronna wiezyczka rakietowa. Ma duzy zasieg i jest w stanie trafiac samoloty, ma jednak bardzo dlugi czas przeladowania i bardzo latwo ja zniszczyc.]],
     aimposoffset   = [[0 20 0]],
   },
 
-  defaultmissiontype            = [[GUARD_NOMOVE]],
   explodeAs                     = [[BIG_UNITEX]],
   floater                       = true,
   footprintX                    = 2,
@@ -44,7 +37,6 @@ unitDef = {
   idleTime                      = 1800,
   levelGround                   = false,
   losEmitHeight                 = 40,
-  mass                          = 94,
   maxDamage                     = 300,
   maxSlope                      = 36,
   maxVelocity                   = 0,
@@ -53,7 +45,6 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[lmt2.s3o]],
   script                        = [[corrl.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[BIG_UNITEX]],
 
   sfxtypes                      = {
@@ -64,11 +55,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[CORE]],
   sightDistance                 = 660,
-  smoothAnim                    = true,
-  TEDClass                      = [[METAL]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -98,7 +85,7 @@ unitDef = {
 
 	  customParams        	  = {
 		isaa = [[1]],
-		script_reload = [[11]],
+		script_reload = [[12.5]],
 		script_burst = [[3]],
 		
 		light_camera_height = 2000,
@@ -132,7 +119,6 @@ unitDef = {
       turnRate                = 60000,
       turret                  = true,
       weaponAcceleration      = 300,
-      weaponTimer             = 5,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 750,
     },
@@ -143,43 +129,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Defender]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 300,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 32,
       object           = [[Pulverizer_d.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 32,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Defender]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 300,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 16,
       object           = [[debris3x3b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 16,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

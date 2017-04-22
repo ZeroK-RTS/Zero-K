@@ -1,5 +1,3 @@
-local spGetUnitShieldState = Spring.GetUnitShieldState
-local spSetUnitShieldState = Spring.SetUnitShieldState
 include "constants.lua"
 --------------------------------------------------------------------------------
 -- pieces
@@ -61,22 +59,12 @@ local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
+	local start = 5
+	
 	while (true) do
 		local speedmult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))*SPEED
 		
-		Move(pelvis, y_axis, 6.2, 4*speedmult)
-		
-		Turn(l_thigh, x_axis, -1.3, 1.4*speedmult)
-		Turn(l_leg, x_axis, 0.4, 1.4*speedmult)
-		Turn(l_foot, x_axis, 0.8, 1*speedmult)
-		
-		Turn(r_thigh, x_axis, -0.15, 0.9*speedmult)
-		Turn(r_leg, x_axis, 0.8, 0.6*speedmult)
-		Turn(r_foot, x_axis, -0.65, 1.5*speedmult)
-		
-		Sleep(500/speedmult)
-		
-		Move(pelvis, y_axis, 8.2, 4*speedmult)
+		Move(pelvis, y_axis, 8.2, 4*speedmult*start)
 		
 		Turn(l_thigh, x_axis, -0.6, 1.4*speedmult)
 		Turn(l_leg, x_axis, 0.5, 1*speedmult)
@@ -85,6 +73,8 @@ local function Walk()
 		Turn(r_thigh, x_axis, -0.6, 0.9*speedmult)
 		Turn(r_leg, x_axis, -0.3, 2.2*speedmult)
 		Turn(r_foot, x_axis, 0.3, 1.9*speedmult)
+		
+		start = 1
 		
 		Sleep(500/speedmult)
 		
@@ -111,6 +101,18 @@ local function Walk()
 		Turn(r_foot, x_axis, 0.1, 1.4*speedmult)
 		
 		Sleep(500/speedmult)
+		
+		Move(pelvis, y_axis, 6.2, 4*speedmult)
+		
+		Turn(l_thigh, x_axis, -1.3, 1.4*speedmult)
+		Turn(l_leg, x_axis, 0.4, 1.4*speedmult)
+		Turn(l_foot, x_axis, 0.8, 1*speedmult)
+		
+		Turn(r_thigh, x_axis, -0.15, 0.9*speedmult)
+		Turn(r_leg, x_axis, 0.8, 0.6*speedmult)
+		Turn(r_foot, x_axis, -0.65, 1.5*speedmult)
+		
+		Sleep(500/speedmult)
 	end
 end
 
@@ -118,7 +120,7 @@ local function StopWalk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
 	
-	Move(pelvis, y_axis, 0, 8)
+	Move(pelvis, y_axis, 0, 30)
 	
 	Turn(l_thigh, x_axis, 0, 2)
 	Turn(l_leg, x_axis, 0, 2)
@@ -205,11 +207,7 @@ function script.BlockShot(num)
 	end
 
 	if aimTime <= 0 then
-		local shieldPow = select(2, spGetUnitShieldState(unitID))
-		if shieldPow > DRAIN then
-			spSetUnitShieldState(unitID, shieldPow - DRAIN)
-			return false
-		end
+		return GG.DrainShieldAndCheckProjectilePenetrate(unitID, DRAIN, 0)
 	end
 	return true
 end

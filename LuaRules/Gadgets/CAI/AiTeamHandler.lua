@@ -1,34 +1,30 @@
-
-
-
 local AiUnitHandler = VFS.Include("LuaRules/Gadgets/CAI/AiUnitHandler.lua")
-local ScoutHandler = VFS.Include("LuaRules/Gadgets/CAI/ScoutHandler.lua")
+local AssetTracker = VFS.Include("LuaRules/Gadgets/CAI/AssetTracker.lua")
 
 local aiTeamHandler = {}
 
 function aiTeamHandler.CreateAiTeam(team, allyTeamID, allyTeamInfo)
 
+	local myUnits = AssetTracker.CreateAssetTracker(allyTeamID, teamID)
 
-	function Update()
+	local function GameFrameUpdate()
 	
 	end
 
-	function AddUnit(unitID)
-	
+	local function UnitCreatedUpdate(unitID, unitDefID, unitTeam)
+		--allyTeamInfo.AddScout(unitID)
+		myUnits.AddUnit(unitID)
 	end
 	
-	function RemoveUnit(unitID)
-	
+	local function UnitDestroyedUpdate(unitID, unitDefID, unitTeam)
+		--allyTeamInfo.RemoveScout(unitID)
+		myUnits.AddUnit(unitID)
 	end
-
-
 
 	local newAiTeam = {
-		UpdateHeatmap = UpdateHeatmap,
-		RunJobHandler = RunJobHandler,
-		IsScoutingRequired = IsScoutingRequired,
-		GetScoutedProportion = GetScoutedProportion,
-		GetPositionToScount = GetPositionToScount,
+		GameFrameUpdate = GameFrameUpdate,
+		UnitCreatedUpdate = UnitCreatedUpdate,
+		UnitDestroyedUpdate = UnitDestroyedUpdate,
 	}
 	
 	return newAiTeam

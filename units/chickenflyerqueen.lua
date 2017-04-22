@@ -4,8 +4,7 @@ unitDef = {
   description         = [[Clucking Hell!]],
   acceleration        = 1.2,
   airHoverFactor      = 0,
-  amphibious          = true,
-  brakeRate           = 1,
+  brakeRate           = 0.8,
   buildCostEnergy     = 0,
   buildCostMetal      = 0,
   builder             = false,
@@ -25,11 +24,9 @@ unitDef = {
   customParams        = {
     description_fr = [[L'enfer volant !]],
 	description_de = [[Lachende Höllenbrut!]],
-	description_pl = [[Krolowa Kurnika]],
     helptext       = [[Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. She can spit immensely powerful acid, drop land chickens, and spray spores to kill aircraft. Only the most determined, focused assault can hope to stop this beast in her tracks.]],
     helptext_fr    = [[Deux mots : FUIS MALHEUREUX ! La reine poulet est la matriarche de la colonie et une fois sa col?re atis?e elle est presque indestructible. Elle crache un acide extr?mement corrosif, largue des poulets et envoie des spores aux unit?s volantes. Seuls les assauts les plus brutaux et les mieux coordonn?s peuvent esp?rer venir ? bout de cette monstruosit?.]],
 	helptext_de    = [[Zwei Worte: LAUF WEG! Die Chicken Queen ist die Matriarchin der Thunderbirdkolonie und sobald verärgert ist es eigentlich unmöglich sie noch zu stoppen. Sie kann kraftvolle Säure spucken, Landchicken abwerfen und Sporen gegen Lufteinheiten versprühen. Nur der entschlossenste und konzentrierteste Angriff kann es ermöglichen dieses Biest eventuell doch noch zu stoppen.]],
-	helptext_pl    = [[Dwa slowa: W NOGI! Krolowa kolonii kurczakow moze zostac powstrzymana tylko dzieki pelnej determinacji i przy udziale wielkiej sily ognia; pluje niesamowicie mocnym kwasem, wystrzeliwuje mase zarodnikow i otacza sie mniejszymi kurczakami.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -42,20 +39,16 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   maneuverleashlength = [[64000]],
-  mass                = 2658,
   maxDamage           = 150000,
   maxSlope			  = 36,
   maxVelocity         = 3,
   minCloakDistance    = 250,
-  moverate1           = [[32]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP STUPIDTARGET MINE]],
   objectName          = [[chickenflyerqueen.s3o]],
   power               = 45000,
   script              = [[chickenflyerqueen.lua]],
-  seismicSignature    = 0,
   selfDestructAs      = [[NOWEAPON]],
-  separation          = [[0.2]],
 
   sfxtypes            = {
 
@@ -66,10 +59,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 4096,
-  smoothAnim          = true,
   turnRate            = 900,
   workerTime          = 0,
 
@@ -161,7 +151,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
     },
@@ -205,7 +194,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
     },
@@ -242,7 +230,6 @@ unitDef = {
       sprayAngle              = 6100,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },
@@ -257,6 +244,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 75,
@@ -335,7 +326,6 @@ unitDef = {
       turret                  = true,
       waterweapon             = true,
       weaponAcceleration      = 200,
-      weaponTimer             = 0.1,
       weaponType              = [[AircraftBomb]],
       weaponVelocity          = 200,
     },

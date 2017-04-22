@@ -10,7 +10,6 @@ function widget:GetInfo()
     license   = "GNU GPL, v2 or later",
     layer     = 2, 
     enabled   = true,  --  loaded by default?
-    handler   = true,
   }
 end
 
@@ -26,7 +25,7 @@ local stackPersistent
 local msgBoxConvo
 
 local convoQueue = {}
-local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+local persistentMsgHistory = {}	-- {text = text, width = width, height = height, fontsize = fontsize, image = imagePath}
 local persistentMsgIndex = {}
 
 local useChiliConvo = false
@@ -35,7 +34,7 @@ local font
 local oldDrawScreenWH
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local TIME_TO_FLASH = 3	-- seconds
+local TIME_TO_FLASH = 1.5	-- seconds
 local CONVO_BOX_HEIGHT = 96
 local CONVO_BOX_WIDTH_MIN = 400
 local PERSISTENT_SUBBAR_HEIGHT = 24
@@ -49,8 +48,53 @@ local convoExpireFrame
 
 
 local vsx, vsy = gl.GetViewSizes()
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local COLOR_CODED_PATTERN = "\\%d+\\%d+\\%d+\\%d+\\.-\\008"
 
-local function ShowMessageBox(text, width, height, fontsize, pause)  
+local function SplitString(str, sep)
+  local sep, fields = sep or ":", {}
+  local pattern = string.format("([^%s]+)", sep)
+  string.gsub(str, pattern, function(c) fields[#fields+1] = c end)
+  return fields
+end
+
+local function ProcessColorCodes(text)
+  if text == nil then
+    return
+  end
+  
+  local coloredStrs = string.gmatch(text, COLOR_CODED_PATTERN)
+  for str in coloredStrs do
+    local fields = SplitString(str, "\\")
+    -- fields 1-4 are our color codes, the last field is the \008
+    --Spring.Echo(#fields)
+    --for i, v in ipairs(fields) do
+    --  Spring.Echo(i, v)
+    --end
+    if (#fields >= 6) then
+      local a, r, g, b = tonumber(fields[1]), tonumber(fields[2]), tonumber(fields[3]), tonumber(fields[4])
+      local newStr = string.char(a,r,g,b)
+      for j=5,#fields-1 do
+        newStr = newStr .. fields[j]
+        if j ~= #fields-1 then
+          newStr = newStr .. "\\"
+        end
+      end
+      newStr = newStr .. "\008"
+      text = string.gsub(text, str, newStr)
+    end
+  end
+
+  return text
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function ShowMessageBox(text, width, height, fontsize, pause)
+  text = ProcessColorCodes(text)
+  
   local vsx, vsy = gl.GetViewSizes()
   
   -- reverse compatibility
@@ -108,7 +152,7 @@ local function ShowMessageBox(text, width, height, fontsize, pause)
   }
 end
 
-local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+local function _ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
 	local vsx, vsy = gl.GetViewSizes()
 	--local x = math.floor((vsx - width)/2)
 	local y = math.floor((vsy - height)/2)
@@ -132,15 +176,19 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	
 	-- we have an existing box, modify that one instead of making a new one
 	if msgBoxPersistent then
+		local widthChange = width - msgBoxPersistent.width
 		msgBoxPersistent.width = width
 		msgBoxPersistent.height = height + PERSISTENT_SUBBAR_HEIGHT
-		msgBoxPersistent.x = vsx - width
+		local onRightSide = msgBoxPersistent.x + (width/2) > (vsx/2)
+		if onRightSide then
+			msgBoxPersistent.x = msgBoxPersistent.x - widthChange
+		end
 		
-		local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
-		if imageDir then
+		local x = ((imagePath and imagePersistent.width + imagePersistent.x) or 0) + 5
+		if imagePath then
 			imagePersistent.width = PERSISTENT_IMAGE_HEIGHT
 			imagePersistent.height = PERSISTENT_IMAGE_HEIGHT
-			imagePersistent.file = imageDir
+			imagePersistent.file = imagePath
 			imagePersistent.color = {1, 1, 1, 1}
 			
 			scrollPersistent.width = (width - x - 12)
@@ -180,7 +228,7 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	-- no messagebox exists, make one
 	msgBoxPersistent = Chili.Window:New{
 		parent = Chili.Screen0,
-		name   = 'msgWindow';
+		name   = 'msgPersistentWindow';
 		width = width,
 		height = height + PERSISTENT_SUBBAR_HEIGHT,
 		y = y,
@@ -202,11 +250,11 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 		y = 10;
 		x = 5;
 		keepAspect = true,
-		file = imageDir;
+		file = imagePath;
 		parent = msgBoxPersistent;
 	}
 	
-	local x = ((imageDir and imagePersistent.width + imagePersistent.x) or 0) + 5
+	local x = ((imagePath and imagePersistent.width + imagePersistent.x) or 0) + 5
 	scrollPersistent = Chili.ScrollPanel:New{
 		parent  = msgBoxPersistent;
 		right	= 4,
@@ -285,12 +333,13 @@ local function _ShowPersistentMessageBox(text, width, height, fontsize, imageDir
 	}
 end
 
-local function ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+local function ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
+	text = ProcessColorCodes(text)
 	persistentMsgIndex = #persistentMsgHistory + 1
-	persistentMsgHistory[persistentMsgIndex] = {text = text, width = width, height = height, fontsize = fontsize, image = imageDir}
+	persistentMsgHistory[persistentMsgIndex] = {text = text, width = width, height = height, fontsize = fontsize, image = imagePath}
 	flashTime = TIME_TO_FLASH
 	Spring.PlaySoundFile("sounds/message_team.wav", 1, "ui")
-	_ShowPersistentMessageBox(text, width, height, fontsize, imageDir)
+	_ShowPersistentMessageBox(text, width, height, fontsize, imagePath)
 end
 
 local function HidePersistentMessageBox()
@@ -306,7 +355,7 @@ local function ClearPersistentMessageHistory()
 end
 
 local function ShowConvoBoxNoChili(data)
-  convoString = data.text
+  convoString = ProcessColorCodes(data.text)
   convoSize = data.fontsize
   if data.image then
     convoImage = data.image  
@@ -402,6 +451,7 @@ local function ClearConvoBox(noContinue)
 end
 
 local function AddConvo(text, fontsize, image, sound, time)
+  text = ProcessColorCodes(text)
   convoQueue[#convoQueue+1] = {text = text, fontsize = fontsize, image = image, sound = sound, time = time}
   if #convoQueue == 1 then ShowConvoBox(convoQueue[1]) end
 end
@@ -411,6 +461,20 @@ local function ClearConvoQueue()
   convoQueue = {}
 end
 
+function ReceivePersistentMessages(newMessages)
+  if #newMessages == #persistentMsgHistory then
+    return
+  end
+  
+  ClearPersistentMessageHistory()
+  for index, msg in pairs(newMessages) do
+    local image = (msg.imageFromArchive and "" or "LuaUI/Images/") .. msg.image
+    ShowPersistentMessageBox(msg.message, msg.width, msg.height, msg.fontSize, image)
+  end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 function widget:GameFrame(n)
   if convoExpireFrame and convoExpireFrame <= n then
     ClearConvoBox(false)
@@ -531,15 +595,21 @@ function widget:Initialize()
     WG.AddNoHideWidget(self)
   end
   
+  widgetHandler:RegisterGlobal("MissionPersistentMessagesFromSynced", ReceivePersistentMessages)
+  Spring.SendLuaRulesMsg("sendMissionPersistentMessages")
+  
   -- testing
   --[[
-  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history"yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
   local str2 = 'Enemy nuclear silo spotted!'
   
-  WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
-  WG.ShowPersistentMessageBox(str2, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
-  --WG.AddConvo(str, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 22*30)
-  --WG.AddConvo(str2, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
+  local str3 = '\255\255\255\0\Colored\008 text'
+  local str4 = '\255\255\255\0\Colored text\008 2'
+  
+  --WG.ShowPersistentMessageBox(str3, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
+  --WG.ShowPersistentMessageBox(str4, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
+  --WG.AddConvo(str3, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 10*30)
+  --WG.AddConvo(str4, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
   --]]
   
 end
@@ -558,6 +628,7 @@ function widget:Shutdown()
   WG.HidePersistentMessageBox = nil
   WG.AddConvo = nil
   WG.ClearConvoQueue = nil
+  widgetHandler:DeregisterGlobal("MissionPersistentMessagesFromSynced")
 end
 
 function widget:ViewResize(viewSizeX, viewSizeY)

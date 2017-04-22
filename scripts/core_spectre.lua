@@ -1,4 +1,7 @@
 --by Chris Mackey
+
+include "constants.lua"
+
 local ALLY_ACCESS = {allied = true}
 
 --pieces
@@ -141,7 +144,8 @@ local function Flutter()
 	end
 end
 
-function script.Create()	
+function script.Create()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)	-- don't lose jitter effect with on/off button
 	Turn(lf_leaf, x_axis, l_angle, 1)
 	Turn(lf_leaf, z_axis, -l_angle, 1)
 	Turn(rf_leaf, x_axis, l_angle, 1)
@@ -150,7 +154,8 @@ function script.Create()
 	Turn(lb_leaf, z_axis, -l_angle, 1)
 	Turn(rb_leaf, x_axis, -l_angle, 1)
 	Turn(rb_leaf, z_axis, l_angle, 1)
-	
+
+	StartThread(SmokeUnit, {glow})
 	StartThread(Flutter)
 end
 

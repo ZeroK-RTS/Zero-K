@@ -14,7 +14,12 @@ function gadget:GetInfo()
 end
 
 local disabledunitsstring = Spring.GetModOptions().disabledunits or ""
-local disatbledCount = 0
+
+if (disabledunitsstring == "") then --no unit to disable, exit
+	return
+end
+
+local disabledCount = 0
 local disabledUnits = {}
 
 local UnitDefBothNames = {} -- Includes humanName and name
@@ -29,26 +34,24 @@ for unitDefID = 1, #UnitDefs do
 	AddName(UnitDefs[unitDefID].name, unitDefID)
 end
 
-if (disabledunitsstring == "") then --no unit to disable, exit
-	return
-end
-
-if disabledunitsstring ~= "" then
-	local alreadyDisabled = {}
-	GG.TableEcho(UnitDefBothNames)
-	for name in string.gmatch(disabledunitsstring, '([^+]+)') do
-		Spring.Echo(name)
-		if UnitDefBothNames[name] then
-			for i = 1, #UnitDefBothNames[name] do
-				local unitDefID = UnitDefBothNames[name][i]
-				if not alreadyDisabled[unitDefID] then
-					disatbledCount = disatbledCount + 1
-					disabledUnits[disatbledCount] = unitDefID
-					alreadyDisabled[unitDefID] = true
-				end
+local alreadyDisabled = {}
+GG.TableEcho(UnitDefBothNames)
+for name in string.gmatch(disabledunitsstring, '([^+]+)') do
+	Spring.Echo(name)
+	if UnitDefBothNames[name] then
+		for i = 1, #UnitDefBothNames[name] do
+			local unitDefID = UnitDefBothNames[name][i]
+			if not alreadyDisabled[unitDefID] then
+				disabledCount = disabledCount + 1
+				disabledUnits[disabledCount] = unitDefID
+				alreadyDisabled[unitDefID] = true
 			end
 		end
 	end
+end
+
+for i = 1, disabledCount do
+	Spring.SetGameRulesParam("disabled_unit_" .. UnitDefs[disabledUnits[i]].name, 1)
 end
 
 local function UnlockUnit(unitID, lockDefID)
@@ -78,7 +81,7 @@ local function SetBuildOptions(unitID, unitDefID)
 	local unitDef = UnitDefs[unitDefID]
 	if (unitDef.isBuilder) then
 		for _, buildoptionID in pairs(unitDef.buildOptions) do
-			for i = 1, disatbledCount do
+			for i = 1, disabledCount do
 				RemoveUnit(unitID, disabledUnits[i])
 			end
 		end

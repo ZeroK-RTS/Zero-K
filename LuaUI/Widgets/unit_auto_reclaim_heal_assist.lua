@@ -30,7 +30,6 @@ local lastOrderGivenInSecs= 0
 local idleReclaimers={} --reclaimers because they all can reclaim
 
 myTeamID=-1;
-local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------------
 
 
@@ -65,7 +64,7 @@ end
 --Add reclaimer to the register
 function widget:UnitIdle(unitID, unitDefID, unitTeam)
 	if (myTeamID==getUnitTeam(unitID)) then					--check if unit is mine
-		local factoryType = (reverseCompatibility and UnitDefs[unitDefID].type == "Factory") or UnitDefs[unitDefID].isFactory	--***
+		local factoryType = UnitDefs[unitDefID].isFactory	--***
 		if factoryType then return end						--no factories ***
 			if (UnitDefs[unitDefID]["canReclaim"]) then		--check if unit can reclaim
 				idleReclaimers[unitID]=true					--add unit to register

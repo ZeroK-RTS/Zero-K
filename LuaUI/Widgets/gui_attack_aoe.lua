@@ -48,6 +48,7 @@ local circleList
 local secondPart = 0
 local mouseDistance = 1000
 local extraDrawRange
+local sumoSelected = false
 
 --------------------------------------------------------------------------------
 --speedups
@@ -93,6 +94,12 @@ local floor                  = math.floor
 local max                    = math.max
 local min                    = math.min
 local sqrt                   = math.sqrt
+
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local sumoDefID = UnitDefNames.corsumo.id
+local sumoAoE = WeaponDefNames.corsumo_landing.damageAreaOfEffect
+local sumoEE = WeaponDefNames.corsumo_landing.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions
@@ -274,7 +281,7 @@ local function SetupUnit(unitDef, unitID)
 			local weaponDef = WeaponDefs[weapon.weaponDef]
 			if (weaponDef) then
 				local aoe = weaponDef.damageAreaOfEffect
-				if (num == 3  and unitDef.canManualFire) or num == manualfireWeapon then
+				if (weaponDef.manualFire and unitDef.canManualFire) or num == manualfireWeapon then
 					retDgunInfo = getWeaponInfo(weaponDef, unitDef)
 					if retDgunInfo.range and rangeMult then
 						retDgunInfo.range = retDgunInfo.range * rangeMult
@@ -318,43 +325,46 @@ local function UpdateSelection()
 	aoeUnitInfo = nil
 	dgunUnitID = nil
 	aoeUnitID = nil
+	sumoSelected = false
 
 	for unitDefID, unitIDs in pairs(sel) do
-		if unitDefID == "n" then
-			break
-		end
-		
-		local unitID = unitIDs[1]
-		local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
-		
-		if dynamicComm and not unitHasBeenSetup[unitID] then
-			unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
-			unitHasBeenSetup[unitID] = true
-		end
-		
-		if (dgunInfo[unitDefID]) then 
-			dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
-			dgunUnitID = unitID
-		end
-
-		if (aoeDefInfo[unitDefID]) then
-			local currCost = UnitDefs[unitDefID].cost * #unitIDs
-			if (currCost > maxCost) then
-				maxCost = currCost
-				aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
-				aoeUnitID = unitID
+		if unitDefID ~= "n" then
+			if unitDefID == sumoDefID then
+				sumoSelected = true
 			end
-		end
 
-		local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
-		if extraDrawParam then
-			extraDrawRange = extraDrawParam
-		else
-			extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
-		end
-		
-		if extraDrawRange then
-			selUnitID = unitID
+			local unitID = unitIDs[1]
+			local dynamicComm = Spring.GetUnitRulesParam(unitID, "comm_level")
+			
+			if dynamicComm and not unitHasBeenSetup[unitID] then
+				unitAoeDefs[unitID], unitDgunDefs[unitID] = SetupUnit(UnitDefs[unitDefID], unitID)
+				unitHasBeenSetup[unitID] = true
+			end
+			
+			if (dgunInfo[unitDefID]) then 
+				dgunUnitInfo = unitDgunDefs[unitID] or ((not dynamicComm) and dgunInfo[unitDefID])
+				dgunUnitID = unitID
+			end
+
+			if (aoeDefInfo[unitDefID]) then
+				local currCost = UnitDefs[unitDefID].cost * #unitIDs
+				if (currCost > maxCost) then
+					maxCost = currCost
+					aoeUnitInfo = unitAoeDefs[unitID] or ((not dynamicComm) and aoeDefInfo[unitDefID])
+					aoeUnitID = unitID
+				end
+			end
+
+			local extraDrawParam = Spring.GetUnitRulesParam(unitID, "secondary_range")
+			if extraDrawParam then
+				extraDrawRange = extraDrawParam
+			else
+				extraDrawRange = UnitDefs[unitDefID] and UnitDefs[unitDefID].customParams and UnitDefs[unitDefID].customParams.extradrawrange
+			end
+			
+			if extraDrawRange then
+				selUnitID = unitID
+			end
 		end
 	end
 end
@@ -705,6 +715,9 @@ function widget:DrawWorld()
 			info.range = extraDrawParam
 		end
 		unitID = dgunUnitID
+	elseif (cmd == CMD_JUMP and sumoSelected) then
+		DrawAoE(tx, ty, tz, sumoAoE, sumoEE)
+		return
 	else
 		return
 	end

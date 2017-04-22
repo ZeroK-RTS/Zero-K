@@ -19,8 +19,6 @@ local moving, runSpin, wheelTurnSpeed
 
 local deployed = false
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
-
 local gunPieces = {
 	[1] = {firepoint = firepoint1, exhaust = exhaust1},
 	[2] = {firepoint = firepoint2, exhaust = exhaust2}
@@ -40,7 +38,6 @@ local SIG_RESTORE = 4
 
 local SUSPENSION_BOUND = 6
 
-local ANIM_SPEED = 50
 local RESTORE_DELAY = 3000
 
 local TURRET_TURN_SPEED = math.rad(240)
@@ -56,6 +53,9 @@ local MIN_PIVOT = math.rad(-24)
 local PIVOT_SPEED = math.rad(60)
 
 local turnTilt = 0
+
+local SETTLE_PERIODS = 15
+local settleTimer = 0
 
 local function RestoreAfterDelay()
 	Signal(SIG_RESTORE)
@@ -181,73 +181,73 @@ function Suspension()
 	local ztilt, ztiltv, ztilta = 0, 0, 0
 	local ya, yv, yp = 0, 0, 0
 	local speed = 0
-	local onGround = false
 	
 	while true do 
+		speed = select(4,spGetUnitVelocity(unitID))
+		wheelTurnSpeed = speed*WHEEL_TURN_MULT
 		
-		x,y,z = spGetUnitPosition(unitID)
-		height = spGetGroundHeight(x,z)
-		
-		if y - height < 1 then -- If I am on the ground
-			
-			if isNewEngine then
-				speed = select(4,spGetUnitVelocity(unitID))
-			else
-				x,y,z = spGetUnitVelocity(unitID)
-				speed = math.sqrt(x*x+y*y+z*z)
+		if moving then
+			if speed <= 0.05 then
+				StopMoving()
 			end
-			wheelTurnSpeed = speed*WHEEL_TURN_MULT
-		
-			if moving then
-				if speed <= 0.05 then
-					StopMoving()
-				end
-			else
-				if speed > 0.05 then
-					StartMoving()
-				end
+		else
+			if speed > 0.05 then
+				StartMoving()
 			end
+		end
 
-			s1r = GetWheelHeight(gs1r)
-			s2r = GetWheelHeight(gs2r)
-			s3r = GetWheelHeight(gs3r)
-			s1l = GetWheelHeight(gs1l)
-			s2l = GetWheelHeight(gs2l)
-			s3l = GetWheelHeight(gs3l)
+		if speed > 0.05 then
+			settleTimer = 0
+		elseif settleTimer < SETTLE_PERIODS then
+			settleTimer = settleTimer + 1
+		end
+		
+		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
+			x,y,z = spGetUnitPosition(unitID)
+			height = spGetGroundHeight(x,z)
 			
-			--xtilta = (s3r + s3l - s1l - s1r)/6000	
-			--xtiltv = xtiltv*0.99 + xtilta
-			--xtilt = xtilt*0.98 + xtiltv
+			if y - height < 1 then -- If I am on the ground
+				s1r = GetWheelHeight(gs1r)
+				s2r = GetWheelHeight(gs2r)
+				s3r = GetWheelHeight(gs3r)
+				s1l = GetWheelHeight(gs1l)
+				s2l = GetWheelHeight(gs2l)
+				s3l = GetWheelHeight(gs3l)
+				
+				--xtilta = (s3r + s3l - s1l - s1r)/6000	
+				--xtiltv = xtiltv*0.99 + xtilta
+				--xtilt = xtilt*0.98 + xtiltv
 
-			ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/10000 + turnTilt
-			ztiltv = ztiltv*0.99 + ztilta
-			ztilt = ztilt*0.98 + ztiltv
+				ztilta = (s1r + s2r + s3r - s1l - s2l - s3l)/10000 + turnTilt
+				ztiltv = ztiltv*0.99 + ztilta
+				ztilt = ztilt*0.98 + ztiltv
 
-			ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1000
-			yv = yv*0.99 + ya
-			yp = yp*0.98 + yv
+				ya = (s1r + s2r + s3r + s1l + s2l + s3l)/1000
+				yv = yv*0.99 + ya
+				yp = yp*0.98 + yv
 
-			Move(rockbase, y_axis, yp, 9000)
-			--Turn(rockbase, x_axis, xtilt, math.rad(9000))
-			Turn(rockbase, z_axis, -ztilt, math.rad(9000))
+				Move(rockbase, y_axis, yp, 9000)
+				--Turn(rockbase, x_axis, xtilt, math.rad(9000))
+				Turn(rockbase, z_axis, -ztilt, math.rad(9000))
 
-			Move(rwheel1, y_axis, s1r, 20)
-			Move(rwheel2, y_axis, s2r, 20)
-			Move(rwheel3, y_axis, s3r, 20)
-										
-			Move(lwheel1, y_axis, s1l, 20)
-			Move(lwheel2, y_axis, s2l, 20)
-			Move(lwheel3, y_axis, s3l, 20)
+				Move(rwheel1, y_axis, s1r, 20)
+				Move(rwheel2, y_axis, s2r, 20)
+				Move(rwheel3, y_axis, s3r, 20)
+											
+				Move(lwheel1, y_axis, s1l, 20)
+				Move(lwheel2, y_axis, s2l, 20)
+				Move(lwheel3, y_axis, s3l, 20)
 
-			Spin(rwheel1, x_axis, wheelTurnSpeed)
-			Spin(rwheel2, x_axis, wheelTurnSpeed)
-			Spin(rwheel3, x_axis, wheelTurnSpeed)
-			Spin(lwheel1, x_axis, wheelTurnSpeed)
-			Spin(lwheel2, x_axis, wheelTurnSpeed)
-			Spin(lwheel3, x_axis, wheelTurnSpeed)
+				Spin(rwheel1, x_axis, wheelTurnSpeed)
+				Spin(rwheel2, x_axis, wheelTurnSpeed)
+				Spin(rwheel3, x_axis, wheelTurnSpeed)
+				Spin(lwheel1, x_axis, wheelTurnSpeed)
+				Spin(lwheel2, x_axis, wheelTurnSpeed)
+				Spin(lwheel3, x_axis, wheelTurnSpeed)
+			end
 		end
 		Sleep(ANIM_PERIOD)
- end 
+	end 
 end
 
 function script.Create()
@@ -257,6 +257,9 @@ function script.Create()
 	StartThread(Suspension)
 	StartThread(AnimControl)
 	StartThread(SmokeUnit, smokePiece)
+	
+	Turn(exhaust1, x_axis, math.rad(180))
+	Turn(exhaust2, x_axis, math.rad(180))
 end
 
 -- Weapons
@@ -295,7 +298,7 @@ end
 function script.BlockShot(num, targetID)
 	if Spring.ValidUnitID(targetID) then
 		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/600
-	return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 25 * distMult)
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 30.1, 25 * distMult)
 	end
 	return false
 end

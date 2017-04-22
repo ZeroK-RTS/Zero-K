@@ -69,14 +69,14 @@ local function CreateWindow()
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
 	local screenHorizCentre = screenWidth / 2
 	local windowWidth = 500
-	local resourcePanelHeight = 50
+	local resourcePanelHeight = 100
 
 	data.window = Chili.Window:New{
 		parent = screen0,
 		backgroundColor = {0, 0, 0, 0},
 		color = {0, 0, 0, 0},
 		dockable = true,
-		name = "SpectatorPlayerPanel",
+		name = "NukeLaunchWarningWindow",
 		padding = {0,0,0,0},
 		x = screenHorizCentre - windowWidth/2,
 		y = resourcePanelHeight,
@@ -96,7 +96,7 @@ local function CreateWindow()
 		y      = 0,
 		right  = 0,
 		bottom = 0,
-		caption = "Warning: Nuke Launched",
+		caption = WG.Translate ("interface", "nuclear_launch_detected"),
 		valign = "center",
  		align  = "center",
 		autosize = false,
@@ -114,12 +114,12 @@ local function CreateWindow()
 end
 
 local function ShowWindow()
-	local _,fullView = Spring.GetSpectatingState()
-	
-	-- Spectators with fullview should not be distracted by nuke warning
-	if fullView then
-		return
-	end
+	--local _,fullView = Spring.GetSpectatingState()
+	--
+	---- Spectators with fullview should not be distracted by nuke warning
+	--if fullView then
+	--	return
+	--end
 	
 	if mainWindow then
 		screen0:AddChild(mainWindow.window)
@@ -142,10 +142,16 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local function languageChanged ()
+	if not mainWindow then return end
+	mainWindow.label:SetCaption(WG.Translate ("interface", "nuclear_launch_detected"))
+end
+
 function widget:Shutdown()
 	if mainWindow and mainWindow.window then
 		mainWindow.window:Dispose()
 	end
+	WG.ShutdownTranslation(GetInfo().name)
 end
 
 function widget:Initialize()
@@ -155,6 +161,7 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget()
 		return
 	end
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 function widget:Update(dt)

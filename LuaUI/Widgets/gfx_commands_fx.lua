@@ -41,19 +41,22 @@ local spGetTeamColor			= Spring.GetTeamColor
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Command Visibility/Formations'
-options_order = { 'indicate_cf_v2', 'onClick'}
+options_path = 'Settings/Interface/Command Visibility'--/Formations'
+options_order = { 'lblformations', 'indicate_cf_v2', 'onClick'}
 options = {
+	lblformations = { name = 'Formations', type = 'label'},
 	indicate_cf_v2 = {
 		name = "Indicate for custom formations", 
 		desc = "Draw the command indication for commands given with custom formations.",
 		type = 'bool', 
+		noHotkey = true,
 		value = true
 	},
 	onClick = {
 		name = "Indicate for clicks", 
 		desc = "Draw the command indication for every click.",
 		type = 'bool', 
+		noHotkey = true,
 		value = false
 	}
 }
@@ -110,6 +113,12 @@ local OPTIONS = {
 			ringColor		= {1.00 ,1.00 ,1.00 ,0.00}
 		},
 		[CMD.MOVE] = {
+			size			= 1,
+			duration		= 1,
+			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},
+			ringColor		= {0.00 ,1.00 ,0.00 ,0.25}
+		},
+		[CMD_RAW_MOVE] = {
 			size			= 1,
 			duration		= 1,
 			baseColor		= {0.00 ,1.00 ,0.00 ,0.25},

@@ -47,33 +47,56 @@ end
 
 local canHandleUnit = {}
 local units = {}
+local lastShot = {} -- List of the last targets, to stop target switching
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
+-- Value is the default state of the command
 local HandledUnitDefIDs = {
-	[UnitDefNames["corrl"].id] = true,
-	[UnitDefNames["armcir"].id] = true,
-	[UnitDefNames["nsaclash"].id] = true,
-	[UnitDefNames["missiletower"].id] = true,
-	[UnitDefNames["screamer"].id] = true,
-	[UnitDefNames["amphaa"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
-	[UnitDefNames["fighter"].id] = true,
-	[UnitDefNames["hoveraa"].id] = true,
-	[UnitDefNames["spideraa"].id] = true,
-	[UnitDefNames["vehaa"].id] = true,
-	[UnitDefNames["gunshipaa"].id] = true,
-	[UnitDefNames["gunshipsupport"].id] = true,
-	[UnitDefNames["armsnipe"].id] = true,
-	[UnitDefNames["amphraider3"].id] = true,
-	[UnitDefNames["amphriot"].id] = true,
-	[UnitDefNames["subarty"].id] = true,
-	[UnitDefNames["subraider"].id] = true,
-	[UnitDefNames["corcrash"].id] = true,
-	[UnitDefNames["cormist"].id] = true,
-	[UnitDefNames["tawf114"].id] = true, --HT's banisher	
-	[UnitDefNames["shieldarty"].id] = true, --Shields's racketeer
+	[UnitDefNames["corrl"].id] = 1,
+	[UnitDefNames["armcir"].id] = 1,
+	[UnitDefNames["nsaclash"].id] = 1,
+	[UnitDefNames["missiletower"].id] = 1,
+	[UnitDefNames["screamer"].id] = 1,
+	[UnitDefNames["amphaa"].id] = 1,
+	[UnitDefNames["puppy"].id] = 1,
+	[UnitDefNames["fighter"].id] = 1,
+	[UnitDefNames["hoveraa"].id] = 1,
+	[UnitDefNames["spideraa"].id] = 1,
+	[UnitDefNames["vehaa"].id] = 1,
+	[UnitDefNames["gunshipaa"].id] = 1,
+	[UnitDefNames["gunshipsupport"].id] = 1,
+	[UnitDefNames["armsnipe"].id] = 1,
+	[UnitDefNames["amphraider3"].id] = 1,
+	[UnitDefNames["amphriot"].id] = 1,
+	[UnitDefNames["corcrash"].id] = 1,
+	[UnitDefNames["cormist"].id] = 1,
+	[UnitDefNames["tawf114"].id] = 1, --HT's banisher
+	[UnitDefNames["shieldarty"].id] = 1, --Shields's racketeer
+	[UnitDefNames["corshad"].id] = 1,
+	[UnitDefNames["shipscout"].id] = 0, --Defaults to off because of strange disarm + normal damage behaviour.
+	[UnitDefNames["shiptorpraider"].id] = 1,
+	[UnitDefNames["shipskirm"].id] = 1,
+	[UnitDefNames["subraider"].id] = 1,
+	
+	-- Static only OKP below
+	[UnitDefNames["amphfloater"].id] = 1,
+	[UnitDefNames["armmerl"].id] = 1,
+	[UnitDefNames["corstorm"].id] = 1,
+	[UnitDefNames["corthud"].id] = 1,
+	[UnitDefNames["spiderassault"].id] = 1,
+	[UnitDefNames["armrock"].id] = 1,
+--	[UnitDefNames["shipcarrier"].id] = 1,
+	[UnitDefNames["armorco"].id] = 1,
+	[UnitDefNames["shipassault"].id] = 1,
+	[UnitDefNames["shiparty"].id] = 1,
+	
+	-- Needs LUS
+	--[UnitDefNames["correap"].id] = 1,
+	--[UnitDefNames["corraid"].id] = 1,
+	--[UnitDefNames["corgol"].id] = 1,
+	--[UnitDefNames["armham"].id] = 1,
 }
 
 include("LuaRules/Configs/customcmds.h.lua")
@@ -101,6 +124,10 @@ function GG.OverkillPrevention_IsDoomed(targetID)
 	return false
 end
 
+function GG.OverkillPrevention_GetLastShot(unitID)
+	return lastShot[unitID]
+end
+
 function GG.OverkillPrevention_IsDisarmExpected(targetID)
 	if incomingDamage[targetID] then
 		local gameFrame = spGetGameFrame()
@@ -108,6 +135,17 @@ function GG.OverkillPrevention_IsDisarmExpected(targetID)
 		return (gameFrame <= lastFrame and incomingDamage[targetID].disarmed)
 	end
 	return false
+end
+
+local function IsUnitIdentifiedStructure(identified, unitID)
+	if not identified then
+		return false
+	end
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	if not (unitDefID and UnitDefs[unitDefID]) then
+		return false
+	end
+	return not Spring.Utilities.getMovetype(UnitDefs[unitDefID])
 end
 
 --[[
@@ -119,7 +157,7 @@ end
 	fastMult -- Multiplier to timeout if the target is fast
 	radarMult -- Multiplier to timeout if the taget is a radar dot
 ]]--
-local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult)
+local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout, fastMult, radarMult, staticOnly)
 	
 	-- Modify timeout based on unit speed and fastMult
 	local unitDefID
@@ -136,6 +174,14 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	local targetVisiblityState = Spring.GetUnitLosState(targetID, allyTeamID, true)
 	local targetInLoS = (targetVisiblityState == 15)
 	local targetIdentified = (targetVisiblityState > 2)
+	
+	-- When true, the projectile damage will be added to the damage to be taken by the unit.
+	-- When false, it will only check whether the shot should be blocked.
+	local addToIncomingDamage = true
+	
+	if staticOnly then
+		addToIncomingDamage = IsUnitIdentifiedStructure(targetIdentified, targetID)
+	end
 	
 	local adjHealth, disarmFrame
 	if targetInLoS then
@@ -181,7 +227,11 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 				end
 			end
 		end
-	else --new target
+	else --new targe
+		if not addToIncomingDamage then
+			lastShot[unitID] = targetID
+			return false
+		end
 		incomingDamage[targetID] = {frames = pmap()}
 		incData = incomingDamage[targetID]
 	end
@@ -196,21 +246,23 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 	
 	if not block then
 		--Spring.Echo("^^^^SHOT^^^^")
-		local frameData = incData.frames:Get(targetFrame)
-		if frameData then 
-			-- here we have a rare case when few different projectiles (from different attack units) 
-			-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
-			frameData.fullDamage = frameData.fullDamage + fullDamage
-			frameData.disarmDamage = frameData.disarmDamage + disarmDamage
-			incData.frames:Upsert(targetFrame, frameData)
-		else --this case is much more common: such frame does not exist in incData.frames
-			incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
+		if addToIncomingDamage then
+			local frameData = incData.frames:Get(targetFrame)
+			if frameData then 
+				-- here we have a rare case when few different projectiles (from different attack units) 
+				-- are arriving to the target at the same frame. Their powers must be accumulated/harmonized
+				frameData.fullDamage = frameData.fullDamage + fullDamage
+				frameData.disarmDamage = frameData.disarmDamage + disarmDamage
+				incData.frames:Upsert(targetFrame, frameData)
+			else --this case is much more common: such frame does not exist in incData.frames
+				incData.frames:Insert(targetFrame, {fullDamage = fullDamage, disarmDamage = disarmDamage})
+			end
+			incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 		end
-		incData.lastFrame = math.max(incData.lastFrame or 0, targetFrame)
 	else
 		local teamID = spGetUnitTeam(unitID)
 		-- Overkill prevention does not prevent firing at unidentified radar dots.
-		-- Although, it still remembers what has been fired at a radar dot. This is 
+		-- Although, it still remembers what has been fired at a radar dot.
 		if targetIdentified then
 			local queueSize = spGetUnitCommands(unitID, 0)
 			if queueSize == 1 then
@@ -229,11 +281,12 @@ local function CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmD
 		end
 	end
 	
+	lastShot[unitID] = targetID
 	return false
 end
 
 
-function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult)
+function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeout, disarmTimer, fastMult, radarMult, staticOnly)
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
@@ -241,11 +294,11 @@ function GG.OverkillPrevention_CheckBlockDisarm(unitID, targetID, damage, timeou
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout, fastMult, radarMult)
+		return CheckBlockCommon(unitID, targetID, gameFrame, 0, damage, disarmTimer, timeout, fastMult, radarMult, staticOnly)
 	end
 end
 
-function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult)
+function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fastMult, radarMult, staticOnly)
 	if not (unitID and targetID and units[unitID]) then
 		return false
 	end
@@ -253,7 +306,7 @@ function GG.OverkillPrevention_CheckBlock(unitID, targetID, damage, timeout, fas
 	if spValidUnitID(unitID) and spValidUnitID(targetID) then
 		local gameFrame = spGetGameFrame()
 		--CheckBlockCommon(unitID, targetID, gameFrame, fullDamage, disarmDamage, disarmTimeout, timeout)
-		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult)		
+		return CheckBlockCommon(unitID, targetID, gameFrame, damage, 0, 0, timeout, fastMult, radarMult, staticOnly)		
 	end
 	return false
 end
@@ -284,8 +337,9 @@ local function PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)
 				units[unitID] = nil
 			end
 		end
+		return false
 	end
-	
+	return true
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
@@ -300,8 +354,7 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 	if (cmdID ~= CMD_PREVENT_OVERKILL) then		
 		return true  -- command was not used
 	end	
-	PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
-	return false  -- command was used
+	return PreventOverkillToggleCommand(unitID, cmdParams, cmdOptions)  
 end
 
 --------------------------------------------------------------------------------
@@ -311,7 +364,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if HandledUnitDefIDs[unitDefID] then
 		spInsertUnitCmdDesc(unitID, preventOverkillCmdDesc)
 		canHandleUnit[unitID] = true
-		PreventOverkillToggleCommand(unitID, {1})
+		PreventOverkillToggleCommand(unitID, {HandledUnitDefIDs[unitDefID]})
 	end
 end
 

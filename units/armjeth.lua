@@ -4,10 +4,8 @@ unitDef = {
   description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.32,
-  buildCostEnergy        = 150,
   buildCostMetal         = 150,
   buildPic               = [[ARMJETH.png]],
-  buildTime              = 150,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -22,22 +20,11 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    cloakstealth   = [[1]],
-    description_bp = [[Robô anti-ar]],
     description_de = [[Flugabwehr Roboter]],
-    description_es = [[Robot Antiaéreo]],
-    description_fi = [[Ilmatorjuntarobotti]],
     description_fr = [[Robot Anti-Air]],
-    description_it = [[Robot da contraerea]],
-    description_pl = [[Bot przeciwlotniczy z maskowaniem]],
     helptext       = [[Fast and fairly sturdy for its price, the Gremlin is good budget mobile anti-air. It can cloak, allowing it to provide unexpected anti-air protection or escape ground forces it's defenseless against.]],
-    helptext_bp    = [[Gremlin ? um rob? barato dedicado a defesa anti-a?rea. est? entre Defenders e Razors, sem as fraquezas de nenhum deles, e pode com certeza proteger uma for?a m?vel, dando aos rob?s uma vantagem definitiva contra aeronaves. Nao pode se defender de unidades terrestres.]],
     helptext_de    = [[Durch seine Fähigkeit mobile Kräft vor Luftangriffen zu beschützen, gibt der Gremlin den entsprechenden Einheiten einen wichtigen Vorteil gegenüber Lufteinheiten. Verteidigungslos gegenüber Landeinheiten.]],
-    helptext_es    = [[Un paso entre un Defender y un Razor en términos de defensa antiaérea, sin sus debilidades, y con la abilidad de defender unidades móbiles bien, el Gremlin ofrece una ventaja definitiva para los kbots contra aviones. No tiene defensas contra unidades de tierra.]],
-    helptext_fi    = [[Kevyell? hakeutuvalla ohjuksella varustettu Gremlin on tehokas nopeita, mutta kevyesti panssaroituja ilma-aluksia vastaan. Soveltuu hyvin yksik?iden puolustamiseen ketter?n liikkuvuutensa takia. Ei pysty ampumaan maayksik?it? kohti.]],
     helptext_fr    = [[Se situant entre le Defender et le Razor pour la d?fense a?rienne, en ayant la faiblaisse d'aucun des deux et pouvant offrire un d?fense d?cissive pour les forces mobile, le Gremlin done un avantage d?finis pour les robots. Il est sans d?fense contre les unit?s terriennes.]],
-    helptext_it    = [[Un passo tra un Defender ed un Razor, senza le sue debolezze, e con l'abilitá di proteggere bene una forza mobile, il Gremlin offre ai kbot un vantaggio decisivo contro aerei. Non ha difese contro forze terrestre.]],
-    helptext_pl    = [[Szybki i dosc wytrzymaly jak na swoja cene, Gremlin zapewnia obrone przeciwlotnicza. Jest bezbronny przeciw wojskom ladowym, ale posiada mozliwosc maskowania.]],
 	modelradius    = [[11]],
   },
 
@@ -58,7 +45,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[spherejeth.s3o]],
-  seismicSignature       = 4,
+	script		             = [[armjeth.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -95,7 +82,7 @@ unitDef = {
       name                    = [[Anti-Air Laser]],
       areaOfEffect            = 12,
       beamDecay               = 0.736,
-      beamTime                = 0.01,
+      beamTime                = 1/30,
       beamttl                 = 15,
       canattackground         = false,
       coreThickness           = 0.5,
@@ -139,30 +126,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD = {
-      description      = [[Wreckage - Gremlin]],
       blocking         = true,
-      damage           = 550,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 60,
       object           = [[spherejeth_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 60,
     },
 
     HEAP = {
-      description      = [[Debris - Gremlin]],
       blocking         = false,
-      damage           = 550,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 30,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 30,
     },
 
   },

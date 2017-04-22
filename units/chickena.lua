@@ -18,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Unit? lourde de m?l?e]],
 	description_de = [[Sturm/Anti-Panzerung]],
-	description_pl = [[Kurczak szturmowy/przeciwpancerny]],
     helptext       = [[The Cockatrice is truly a beast. Seemingly impervious to enemy fire, it casually walks up to its target and dismembers it with its incredibly powerful jaws. Fortunately, it is not fast or particularly intelligent, and can be destroyed with skirmishers or swarmers easily.]],
     helptext_fr    = [[Le Cockatrice est un v?ritale monstre. Apparament insensible aux feu adverse it charge sans ralentir sa cible et la d?membre avec ses lentes mais puissantes machoires d?mesur?es. Heuresement il n'est pas tr?s rapide ni intelligent et peut dont ?tre abattu relativement ais?ment par des essaims ou des unit?s ? longue port?e.]],
-	helptext_de    = [[Der Cockatrice ist wahrlich eine Bestie. Scheinbar unverletzlich, bewegt es sich einfach auf seine Ziele zu und zerst¸ckelt sie vor Ort mit seinem unglaublich starken Kiefer. Gl¸cklicherweise ist er nicht besonders schnell und intelligent und kann somit von Skirmishern und Schw‰rmen leicht zerstˆrt werden.]],
-	helptext_pl    = [[Cockatrice to wytrzymala bestia, ktora powoli podchodzi do celu i rozczlonkowuje go przeogromnymi szczekami. Nie grzeszy inteligencja ani szybkostrzelnoscia.]],
+	helptext_de    = [[Der Cockatrice ist wahrlich eine Bestie. Scheinbar unverletzlich, bewegt es sich einfach auf seine Ziele zu und zerstÅEkelt sie vor Ort mit seinem unglaublich starken Kiefer. GlÅEklicherweise ist er nicht besonders schnell und intelligent und kann somit von Skirmishern und Schw‰rmen leicht zerstˆrt werden.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 261,
   maxDamage           = 2800,
   maxSlope            = 37,
   maxVelocity         = 1.8,
@@ -43,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MINE]],
   objectName          = [[chickena.s3o]],
   power               = 420,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -55,10 +51,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  smoothAnim          = true,
   trackOffset         = 7,
   trackStrength       = 9,
   trackStretch        = 1,
@@ -91,6 +84,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 1,
       craterMult              = 2,
+      
+      customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 80,

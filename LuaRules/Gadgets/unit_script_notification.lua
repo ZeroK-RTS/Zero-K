@@ -4,7 +4,7 @@ function gadget:GetInfo() return {
 	author  = "Sprung",
 	date    = "2015-03-12",
 	license = "PD",
-	layer   = -1,
+	layer   = -2,
 	enabled = true,
 } end
 
@@ -24,15 +24,38 @@ local function callScript (unitID, funcName, args)
 	return false
 end
 
-local function ScriptNotifyEMPed (unitID)
-	callScript (unitID, "Stunned", 1)
+function gadget:UnitStunned (unitID, unitDefID, unitTeam, state)
+	if state then
+		callScript (unitID, "Stunned", 2)
+	else
+		callScript (unitID, "Unstunned", 2)
+	end
 end
 
-local function ScriptNotifyDisarmed (unitID)
-	callScript (unitID, "Stunned", 0)
+local function ScriptNotifyDisarmed (unitID, state)
+	if state then
+		callScript (unitID, "Stunned", 1)
+	else
+		callScript (unitID, "Unstunned", 1)
+	end
+end
+
+local function ScriptNotifyUnpowered (unitID, state)
+	if state then
+		callScript (unitID, "Stunned", 4)
+	else
+		callScript (unitID, "Unstunned", 4)
+	end
+end
+
+function gadget:UnitReverseBuilt (unitID)
+	callScript (unitID, "Stunned", 3)
+end
+function gadget:UnitFinished (unitID)
+	callScript (unitID, "Unstunned", 3)
 end
 
 function gadget:Initialize ()
-	GG.ScriptNotifyEMPed    = ScriptNotifyEMPed
 	GG.ScriptNotifyDisarmed = ScriptNotifyDisarmed
+	GG.ScriptNotifyUnpowered = ScriptNotifyUnpowered
 end

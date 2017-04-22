@@ -222,7 +222,9 @@ function UnitPieceLight.Initialize()
     ]],
     uniformInt = {
       tex0 = 0,
-      pixelsize = 1.0/math.ceil(vsx*0.5),
+      uniform = {
+        pixelsize = 1.0/math.ceil(vsx*0.5),
+      }
     },
   })
 

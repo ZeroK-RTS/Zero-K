@@ -82,13 +82,15 @@ local function SanitizeBoxes (boxes)
 	end
 end
 
-function ParseBoxes ()
+function ParseBoxes (backupSeed)
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
+	backupSeed = backupSeed or 0
 
 	local startBoxConfig
 
-	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
+	Spring.Echo("read public_random_seed", Spring.GetGameRulesParam("public_random_seed"), backupSeed)
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)
@@ -99,9 +101,11 @@ function ParseBoxes ()
 	else
 		startBoxConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
+		local startboxStringLoadedBoxes = false
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				startboxStringLoadedBoxes = true -- Autohost always sends a table. Often it is empty.
 				local midX = (box[1]+box[3]) / 2
 				local midZ = (box[2]+box[4]) / 2
 
@@ -161,17 +165,68 @@ function ParseBoxes ()
 				}
 			end
 		end
+		
+		if not startboxStringLoadedBoxes then
+			if Game.mapSizeZ > Game.mapSizeX then
+				startBoxConfig[0] = {
+					boxes = {
+						{0, 0, 0, Game.mapSizeZ * 0.3, Game.mapSizeX, Game.mapSizeZ * 0.3},
+						{0, 0, Game.mapSizeX, Game.mapSizeZ * 0.3, Game.mapSizeX, 0}
+					},
+					startpoints = {
+						{Game.mapSizeX / 2, Game.mapSizeZ * 0.15}
+					},
+					nameLong = "North",
+					nameShort = "N"
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{0, Game.mapSizeZ * 0.7, 0, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ},
+						{0, Game.mapSizeZ * 0.7, Game.mapSizeX, Game.mapSizeZ, Game.mapSizeX, Game.mapSizeZ * 0.7}
+					},
+					startpoints = {
+						{Game.mapSizeX / 2, Game.mapSizeZ * 0.85}
+					},
+					nameLong = "South",
+					nameShort = "S"
+				}
+			else
+				startBoxConfig[0] = {
+					boxes = {
+						{0, 0, Game.mapSizeX * 0.3, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, 0},
+						{0, 0, 0, Game.mapSizeZ - 1, Game.mapSizeX * 0.3, Game.mapSizeZ - 1}
+					},
+					startpoints = {
+						{Game.mapSizeX * 0.15, Game.mapSizeZ / 2}
+					},
+					nameLong = "West",
+					nameShort = "W"
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{Game.mapSizeX * 0.7, 0, Game.mapSizeX, Game.mapSizeZ - 1, Game.mapSizeX, 0},
+						{Game.mapSizeX * 0.7, 0, Game.mapSizeX * 0.7, Game.mapSizeZ - 1, Game.mapSizeX, Game.mapSizeZ - 1}
+					},
+					startpoints = {
+						{Game.mapSizeX * 0.85, Game.mapSizeZ / 2}
+					},
+					nameLong = "East",
+					nameShort = "E"
+				}
+			end
+		end
 	end
 
 	return startBoxConfig
 end
 
-function GetRawBoxes ()
+function GetRawBoxes(backupSeed)
 	local mapsideBoxes = "mapconfig/map_startboxes.lua"
 	local modsideBoxes = "LuaRules/Configs/StartBoxes/" .. (Game.mapName or "") .. ".lua"
+	backupSeed = backupSeed or 0
 
 	local startBoxConfig
-	math.randomseed(Spring.GetGameRulesParam("public_random_seed"))
+	math.randomseed(Spring.GetGameRulesParam("public_random_seed") or backupSeed)
 
 	if VFS.FileExists (modsideBoxes) then
 		startBoxConfig = VFS.Include (modsideBoxes)
@@ -180,9 +235,11 @@ function GetRawBoxes ()
 	else
 		startBoxConfig = { }
 		local startboxString = Spring.GetModOptions().startboxes
+		local startboxStringLoadedBoxes = false
 		if startboxString then
 			local springieBoxes = loadstring(startboxString)()
 			for id, box in pairs(springieBoxes) do
+				startboxStringLoadedBoxes = true -- Autohost always sends a table. Often it is empty.
 				box[1] = box[1]*Game.mapSizeX
 				box[2] = box[2]*Game.mapSizeZ
 				box[3] = box[3]*Game.mapSizeX
@@ -199,6 +256,63 @@ function GetRawBoxes ()
 				}
 			end
 		end
+		
+		if not startboxStringLoadedBoxes then
+			if Game.mapSizeZ > Game.mapSizeX then
+				startBoxConfig[0] = {
+					boxes = {
+						{
+							{0, 0},
+							{0, Game.mapSizeZ * 0.3},
+							{Game.mapSizeX, Game.mapSizeZ * 0.3},
+							{Game.mapSizeX, 0}
+						},
+					},
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{
+							{0, Game.mapSizeZ * 0.7},
+							{0, Game.mapSizeZ},
+							{Game.mapSizeX, Game.mapSizeZ},
+							{Game.mapSizeX, Game.mapSizeZ * 0.7}
+						},
+					},
+				}
+			else
+				startBoxConfig[0] = {
+					boxes = {
+						{
+							{0, 0},
+							{0, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.3, Game.mapSizeZ - 1},
+							{Game.mapSizeX * 0.3, 0},
+						},
+					},
+				}
+				startBoxConfig[1] = {
+					boxes = {
+						{
+							{Game.mapSizeX * 0.7, 0},
+							{Game.mapSizeX * 0.7, Game.mapSizeZ - 1},
+							{Game.mapSizeX, Game.mapSizeZ - 1},
+							{Game.mapSizeX, 0},
+						},
+					},
+				}
+			end
+		end
+	end
+
+	-- fix rendering z-fighting
+	for boxid, box in pairs(startBoxConfig) do
+		for i = 1, #box.boxes do
+			for j = 1, #box.boxes[i] do
+				if box.boxes[i][j][2] > Game.mapSizeZ - 1 then
+					box.boxes[i][j][2] = Game.mapSizeZ - 1
+				end
+			end
+		end
 	end
 
 	return startBoxConfig
@@ -211,8 +325,18 @@ function GetTeamCount()
 	for i = 1, #allyTeamList do
 		local teamList = Spring.GetTeamList(allyTeamList[i]) or {}
 		if ((#teamList > 0) and (allyTeamList[i] ~= gaiaAllyTeamID)) then
-			actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
+			local isTeamValid = true
+			for j = 1, #teamList do
+				local luaAI = Spring.GetTeamLuaAI(teamList[j])
+				if luaAI and luaAI:find("Chicken") then
+					isTeamValid = false
+				end
+			end
+			if isTeamValid then
+				actualAllyTeamList[#actualAllyTeamList+1] = allyTeamList[i]
+			end
 		end
 	end
 	return #actualAllyTeamList
 end
+

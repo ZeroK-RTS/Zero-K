@@ -3,11 +3,9 @@ unitDef = {
   name                   = [[Racketeer]],
   description            = [[Disarming Artillery]],
   acceleration           = 0.25,
-  brakeRate              = 0.25,
-  buildCostEnergy        = 350,
-  buildCostMetal         = 350,
+  brakeRate              = 0.75,
+  buildCostMetal         = 360,
   buildPic               = [[SHIELDARTY.png]],
-  buildTime              = 350,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -16,9 +14,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Artyleria rozbrajajaca]],
     helptext       = [[The Racketeer launches long range missiles that can disarm key enemy defenses or units before assaulting them. Only one Racketeer is needed to keep a target disarmed, so pick a different target for each Racketeer. It is excellent at depleting the energy of enemy shields and rendering large units harmless.]],
-    helptext_pl    = [[Racketeer to wyrzutnia pociskow dalekiego zasiegu, ktore rozbrajaja trafione jednostki. Swietnie nadaje sie do unieszkodliwiania ciezkich jednostek i do wyczerpywania wrogich tarcz.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -35,10 +31,9 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
   moveState              = 0,
-  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP TOOFAST UNARMED CHEAP]],
+  noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP UNARMED]],
   objectName             = [[dominator.s3o]],
   script                 = [[shieldarty.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -71,7 +66,7 @@ unitDef = {
 
   weaponDefs             = {
     EMP_ROCKET = {
-      name                    = [[EMP Cruise Missile]],
+      name                    = [[Disarm Cruise Missile]],
       areaOfEffect            = 24,
       cegTag                  = [[disarmtrail]],
       collideFriendly         = false,
@@ -101,14 +96,15 @@ unitDef = {
       interceptedByShieldType = 2,
       model                   = [[wep_merl.s3o]],
       noSelfDamage            = true,
-	  paralyzer               = true, -- to deal no damage to wrecks
       range                   = 940,
-      reloadtime              = 5,
+      reloadtime              = 6,
       smokeTrail              = false,
       soundHit                = [[weapon/missile/vlaunch_emp_hit]],
+      soundHitVolume          = 9.0,
       soundStart              = [[weapon/missile/missile_launch_high]],
+      soundStartVolume        = 11.0,
       startvelocity           = 250,
---      texture1                = [[spark]], --flare
+	  --texture1                = [[spark]], --flare
       texture3                = [[spark]], --flame
       tolerance               = 4000,
       tracks                  = true,
@@ -123,30 +119,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Racketeer]],
       blocking         = true,
-      damage           = 950,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 140,
       object           = [[dominator_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 140,
     },
 
     HEAP  = {
-      description      = [[Debris - Racketeer]],
       blocking         = false,
-      damage           = 950,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 70,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 70,
     },
 
   },

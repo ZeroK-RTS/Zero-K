@@ -3,15 +3,13 @@ local shield = piece 'shield'
 local turret = piece 'turret' 
 local gun = piece 'gun' 
 local flare1 = piece 'flare1' 
-local flare2 = piece 'flare2' 
-local wake1 = piece 'wake1' 
-local wake2 = piece 'wake2' 
-local wake3 = piece 'wake3' 
-local wake4 = piece 'wake4' 
-local wake5 = piece 'wake5' 
-local wake6 = piece 'wake6' 
-local wake7 = piece 'wake7' 
-local wake8 = piece 'wake8' 
+local flare2 = piece 'flare2'
+
+local wakes = {}
+for i = 1, 8 do
+	wakes[i] = piece ('wake' .. i)
+end
+
 local ground1 = piece 'ground1' 
 local door1 = piece 'door1' 
 local door2 = piece 'door2' 
@@ -84,32 +82,24 @@ function script.HitByWeapon(x, z, weaponID, damage)
 end
 ]]
 
+local sfxNum = 0
+function script.setSFXoccupy(num)
+	sfxNum = num
+end
+
 local function MoveScript()
 	while Spring.GetUnitIsStunned(unitID) do
 		Sleep(2000)
 	end
 	while true do 
 		if not Spring.GetUnitIsCloaked(unitID) then
-			if math.random() < 0.5 then
-				EmitSfx(wake1, 5)
-				EmitSfx(wake3, 5)
-				EmitSfx(wake5, 5)
-				EmitSfx(wake7, 5)
-				EmitSfx(wake1, 3)
-				EmitSfx(wake3, 3)
-				EmitSfx(wake5, 3)
-				EmitSfx(wake7, 3)
+			if (sfxNum == 1 or sfxNum == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0 then
+				for i = 1, 8 do
+					EmitSfx(wakes[i], 3)
+				end
 			else
-				EmitSfx(wake2, 5)
-				EmitSfx(wake4, 5)
-				EmitSfx(wake6, 5)
-				EmitSfx(wake8, 5)
-				EmitSfx(wake2, 3)
-				EmitSfx(wake4, 3)
-				EmitSfx(wake6, 3)
-				EmitSfx(wake8, 3)
+				EmitSfx(ground1, 1024)
 			end
-			EmitSfx(ground1, 1024)
 		end
 		Sleep(150)
 	end
@@ -198,23 +188,11 @@ function script.Killed(recentDamage, maxHealth)
 		Explode(door2, sfxNone)
 		Explode(rim1, sfxShatter)
 		Explode(rim2, sfxShatter)
-		Explode(wake1, sfxFall)
-		Explode(wake2, sfxFall)
-		Explode(wake3, sfxFall)
-		Explode(wake4, sfxFall)
-		Explode(wake5, sfxFall)
-		Explode(wake6, sfxFall)
 		return 1
 	end
 	Explode(door1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
 	Explode(door2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
 	Explode(rim1, sfxShatter)
 	Explode(rim2, sfxShatter)
-	Explode(wake1, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(wake2, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(wake3, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(wake4, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(wake5, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
-	Explode(wake6, sfxSmoke + sfxFall + sfxFire + sfxExplodeOnHit)
 	return 2
 end

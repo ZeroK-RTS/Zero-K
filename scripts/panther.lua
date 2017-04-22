@@ -197,15 +197,16 @@ function script.Shot(num)
 	StartThread(Recoil)
 end
 
-function script.Killed(severity, corpsetype)
-	if severity <= 25 then
+function script.Killed(severity, maxHealth)
+	severity = severity / maxHealth
+	if severity <= 0.25 then
 	
 		corpsetype = 1
 		Explode(main, sfxNone)
 		Explode(turret, sfxNone)
 		return 1
 	end
-	if severity <= 50 then
+	if severity <= 0.50 then
 	
 		corpsetype = 1
 		Explode(main, sfxNone)

@@ -4,10 +4,8 @@ unitDef = {
   description            = [[Cloaked Raider Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.3,
-  buildCostEnergy        = 250,
   buildCostMetal         = 250,
   buildPic               = [[spherepole.png]],
-  buildTime              = 250,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -22,16 +20,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô agressor]],
 	description_de = [[Getarnter Raider Roboter]],
-    description_es = [[Robot de invasi?n]],
-    description_fi = [[Hy?kk??j?robotti]],
     description_fr = [[Robot Pilleur]],
-    description_it = [[Robot d'invasione]],
-    description_pl = [[Kosynier]],
     helptext       = [[The Scythe isn't particularly tough in a stand-up fight, but its cloaking device lets it slip past enemy defenses to stab at the enemy's economy. Damaged Scythes can quickly regenerate when out of combat.]],
 	helptext_de    = [[Der Scythe ist nicht sehr zäh im Standkampf, aber seine Tarnfähigkeit ermöglicht es ihm hinter die feindliche Verteidigung zu gelangen und so die gegnerische Ökonomie zu beeinträchtigen.]],
-	helptext_pl    = [[Scythe to jednostka do walki w zwarciu. Posiada maskowanie, ktore pozwala mu zblizyc sie do wrogich jednostek lub je ominac i zajac sie niszczeniem wrogiej bazy. Uszkodzony Scythe po wyjsciu z walki samoczynnie naprawia sie.]],
 	modelradius    = [[14]],
   },
 
@@ -53,7 +45,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherepole.s3o]],
   script				 = [[spherepole.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -100,6 +91,8 @@ unitDef = {
 		light_color = [[1 1 0.7]],
 		light_radius = 120,
 		light_beam_start = 0.25,
+		
+        combatrange = 50,
       },
 	  
       damage                  = {
@@ -136,30 +129,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Scythe]],
       blocking         = false,
-      damage           = 820,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 100,
       object           = [[scythe_d.dae]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
     HEAP  = {
-      description      = [[Debris - Scythe]],
       blocking         = false,
-      damage           = 820,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 50,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 50,
     },
 
   },

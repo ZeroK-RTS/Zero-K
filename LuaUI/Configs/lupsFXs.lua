@@ -107,6 +107,7 @@ cafusBursts = {
   directional= true,
   repeatEffect = true,
   count      = 20,
+  quality    = 4, -- Ultra settings
 }
 
 corjamtBursts = {
@@ -124,7 +125,7 @@ corjamtBursts = {
   colormap   = { {1, 0.3, 1, 0.8} },
   directional= true,
   repeatEffect = true,
-  count      = 20,
+  count      = 8,
 }
 
 ----------------------------------------------------------------------------
@@ -179,10 +180,10 @@ commandShieldSphere = {
 -- LIGHT -------------------------------------------------------------------
 ----------------------------------------------------------------------------
 cafusCorona = {
-  pos         = {0,58.9,0},
+  pos         = {0,66,0},
   life        = math.huge,
   lifeSpread  = 0,
-  size        = 90,
+  size        = 110,
   sizeGrowth  = 0,
   --colormap    = { {0.7, 0.6, 0.5, 0.01} },
   colormap    = { {0.9, 0.4, 0.2, 0.01} },
@@ -282,6 +283,18 @@ warpgateCorona = {
   sizeGrowth  = 0,
   --colormap    = { {0.7, 0.6, 0.5, 0.01} },
   colormap    = { {0.1, 0.3, 0.8, 0.01} },
+  texture     = 'bitmaps/GPL/groundflash.tga',
+  count       = 1,
+  repeatEffect = true,
+}
+
+warpgateCoronaAlt = {
+  pos         = {0,58.9,0},
+  life        = math.huge,
+  lifeSpread  = 0,
+  size        = 210,
+  sizeGrowth  = 0,
+  colormap    = { {0.1, 0.2, 0.5, 0.01} },
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
   repeatEffect = true,

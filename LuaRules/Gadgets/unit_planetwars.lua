@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-if not gadgetHandler:IsSyncedCode() then
+if (not gadgetHandler:IsSyncedCode()) or VFS.FileExists("mission.lua") then
 	return
 end
 --------------------------------------------------------------------------------
@@ -17,52 +17,241 @@ function gadget:GetInfo()
 	}
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
---local defenderTeam = nil
-local defenderFaction = Spring.GetModOptions().defendingfaction
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local DEBUG_MODE = false
 
-local spAreTeamsAllied		= Spring.AreTeamsAllied
+--local defenderTeam = nil
+local defenderFaction = Spring.GetModOptions().defendingfaction ~= "Mercenary"
+
+local spAreTeamsAllied = Spring.AreTeamsAllied
 local floor = math.floor
 
 include "LuaRules/Configs/customcmds.h.lua"
 
-local abandonCMD = {
-    id      = CMD_ABANDON_PW,
-    name    = "Abandon",
-    action  = "abandon",
+local evacuateCmdDesc = {
+	id      = CMD_ABANDON_PW,
+	name    = "Evacuate",
+	action  = "evacuate",
 	cursor  = 'Repair',
-    type    = CMDTYPE.ICON,
-	tooltip = "Abandon this building (marks it as neutral)",
+	type    = CMDTYPE.ICON,
+	tooltip = "Evacuates the structure from the battle via wormhole teleportation.",
 }
 
-local spGetGroundHeight	= Spring.GetGroundHeight
-local spAreTeamsAllied = Spring.AreTeamsAllied
+local spGetGroundHeight = Spring.GetGroundHeight
+local spSetHeightMap    = Spring.SetHeightMap
+local spAreTeamsAllied  = Spring.AreTeamsAllied
 
 local mapWidth = Game.mapSizeX
 local mapHeight = Game.mapSizeZ
 local lava = (Game.waterDamage > 0)
-local TRANSLOCATION_MULT = 0.6		-- start box is dispaced towards center by (distance to center) * this to get PW spawning area
 local DEFENDER_ALLYTEAM = 1
-local HQ_DEF_ID = UnitDefNames.pw_hq.id
 
-local unitData = {}
+local gaiaTeamID = Spring.GetGaiaTeamID()
+
+local TELEPORT_CHARGE_NEEDED = 10*60 -- seconds
+local TELEPORT_FRAMES = 30*60 -- 1 minute
+local TELEPORT_CHARGE_PERIOD = 30 -- Frames
+local TELEPORT_CHARGE_RATE = TELEPORT_CHARGE_PERIOD/30 -- per update
+local teleportChargeNeededMult = 1
+
+local STRUCTURE_SPACING = 192
+
+local allyTeamRole = {
+	[0] = "attacker",
+	[1] = "defender",
+}
+
+local hqDefID = {
+	[0] = UnitDefNames["pw_hq_attacker"].id,
+	[1] = UnitDefNames["pw_hq_defender"].id,
+}
+
+if DEBUG_MODE then
+	TELEPORT_CHARGE_NEEDED = 10
+	TELEPORT_FRAMES = 30*5
+end
+
+local wormholeDefs = {}
+for i = 1, #UnitDefs do
+	local ud = UnitDefs[i]
+	if ud.customParams.evacuation_speed then
+		wormholeDefs[i] = 1/tonumber(ud.customParams.evacuation_speed)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local structureSpawnData = {}
 local unitsByID = {}
 local hqs = {}
 local hqsDestroyed = {}
-local stuffToReport = {data = {}, count = 0}
-local canAttackTeams = {}	-- teams that can attack PW structures
+local destroyedStructures = {data = {}, count = 0}
+local evacuateStructureString = false
+local haveEvacuable = false
+
+local flattenAreas = {}
+
+local planetwarsStructureCount = 0 -- For GameRulesParams structure list
+local destroyedStructureCount = 0
+local evacStructureCount = 0
+
+local wormholeUnitID
+local planetwarsBoxes = {}
+
+local vector = Spring.Utilities.Vector
 
 local BUILD_RESOLUTION = 16
+
+local EVAC_STATE = {
+	ACTIVE = 1,
+	NO_WORMHOLE = 2,
+	NOTHING_TO_EVAC = 3,
+	WORMHOLE_DESTROYED = 4,
+}
 
 GG.PlanetWars = {}
 GG.PlanetWars.unitsByID = unitsByID
 GG.PlanetWars.hqs = hqs
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function GeneratePlayerNameToTeamIDMap()
+	local map = {}
+	
+	local playerList = Spring.GetPlayerList()
+	for i = 1, #playerList do
+		local name, active, spectator, teamID = Spring.GetPlayerInfo(playerList[i])
+		if name and active and (not spectator) then
+			map[name] = teamID
+		end
+	end
+	
+	return map
+end
+
+local playerNameToTeamID = GeneratePlayerNameToTeamIDMap()
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local function GetUnitCanEvac(unitDef)
+	return (defenderFaction and unitDef.customParams.canbeevacuated) or DEBUG_MODE
+end
+
+local function RemoveEvacCommands()
+	for unitID, data in pairs(unitsByID) do
+		local cmdDesc = Spring.FindUnitCmdDesc(unitID, CMD_ABANDON_PW)
+		if cmdDesc then
+			Spring.RemoveUnitCmdDesc(unitID, cmdDesc)
+		end
+	end
+end
+
+local function UpdateEvacState()
+	if not haveEvacuable then
+		return
+	end
+	for unitID, data in pairs(unitsByID) do
+		if data.canEvac then
+			return
+		end
+	end
+	
+	haveEvacuable = false
+	RemoveEvacCommands()
+	
+	Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+local teleportCharge = -1
+local teleportingUnit, teleportFrame
+local removingTeleportingUnit = false -- set to true prior to DestroyUnit call when teleporting out, then false immediately after
+
+local function SetTeleportCharge(newCharge)
+	if newCharge > TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+		newCharge = TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult
+	end
+	if newCharge == teleportCharge then
+		return
+	end
+	teleportCharge = newCharge
+	Spring.SetGameRulesParam("pw_teleport_charge", teleportCharge)
+end
+
+local function CheckSetWormhole(unitID)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	local chargeMult = wormholeDefs[unitDefID]
+	if not chargeMult then
+		return
+	end
+	wormholeUnitID = unitID
+	teleportChargeNeededMult = chargeMult
+	
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
+end
+
+local function CancelTeleport()
+	if teleportingUnit and Spring.ValidUnitID(teleportingUnit) then
+		Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", nil)
+	end
+	teleportingUnit = nil
+	Spring.SetGameRulesParam("pw_teleport_frame", nil)
+	Spring.SetGameRulesParam("pw_teleport_unitname", nil)
+end
+
+local function CheckRemoveWormhole(unitID, unitDefID)
+	if wormholeUnitID ~= unitID then
+		return
+	end
+	if teleportingUnit == wormholeUnitID then
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+	else
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.WORMHOLE_DESTROYED)
+	end
+	RemoveEvacCommands()
+	wormholeUnitID = nil
+	if teleportingUnit then
+		CancelTeleport()
+	end
+end
+
+local function TeleportChargeTick()
+	if not wormholeUnitID then
+		return
+	end
+	local stunnedOrInbuild = Spring.GetUnitIsStunned(wormholeUnitID)
+	local allyTeamID = Spring.GetUnitAllyTeam(wormholeUnitID)
+	local chargeFactor = ((stunnedOrInbuild or (allyTeamID ~= DEFENDER_ALLYTEAM)) and 0) or Spring.GetUnitRulesParam(wormholeUnitID, "totalReloadSpeedChange") or 1
+	
+	if teleportingUnit then
+		if chargeFactor == 0 then
+			CancelTeleport()
+		elseif chargeFactor ~= 1 then
+			teleportFrame = teleportFrame + (1 - chargeFactor)*TELEPORT_CHARGE_PERIOD
+			if teleportingUnit and Spring.ValidUnitID(teleportingUnit) then
+				Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
+			end
+			Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
+		end
+	end
+	SetTeleportCharge(teleportCharge + TELEPORT_CHARGE_RATE * chargeFactor)
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 local noGoZones = {count = 0, data = {}}
+
+local function AddNoGoZone(x, z, size)
+	noGoZones.count = noGoZones.count + 1
+	noGoZones.data[noGoZones.count] = {zl = z - size, zu = z + size, xl = x - size, xu = x + size}
+end
 
 local function initialiseNoGoZones()
 
@@ -136,145 +325,133 @@ local function checkOverlapWithNoGoZone(xl,zl,xu,zu) -- intersection check does 
 	return false
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
+local function AddDestroyedStructureReport(stuff)
+	destroyedStructures.count = destroyedStructures.count + 1
+	destroyedStructures.data[destroyedStructures.count] = stuff
+end
 
-function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
-	if unitsByID[unitID] and not paralyzer then
-		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
-		if attackerTeam then
-			unitsByID[unitID].teamDamages[attackerTeam] = (unitsByID[unitID].teamDamages[attackerTeam] or 0) + damage
-		else
-			unitsByID[unitID].anonymous = (unitsByID[unitID].anonymous or 0) + damage
-		end
+local function AddEvacuatedStructure(name, unit)
+	evacStructureCount = evacStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureEvacuated_" .. evacStructureCount, name)
+	
+	if evacuateStructureString then
+		evacuateStructureString = evacuateStructureString .. " " .. name
+	else
+		evacuateStructureString = name
 	end
 end
 
-local function addStuffToReport(stuff)
-	stuffToReport.count = stuffToReport.count + 1
-	stuffToReport.data[stuffToReport.count] = stuff
-end
-
-function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if unitsByID[unitID] then
-		local unit = unitsByID[unitID]
-		local name = unit.name
-		addStuffToReport(name .. ",total," .. (unit.totalDamage or 0))
-		addStuffToReport(name .. ",anon," .. (unit.anonymous or 0))
-		for teamID, damage in pairs(unit.teamDamages) do
-			addStuffToReport(name .. "," .. teamID .. "," .. damage)
-		end
-		unitsByID[unitID] = nil
-	end
-	if hqs[unitID] then
-		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
-		hqsDestroyed[#hqsDestroyed+1] = allyTeam
-		hqs[unitID] = nil
+local function AddDestroyedStructure(name, unit)
+	destroyedStructureCount = destroyedStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, name)
+	
+	AddDestroyedStructureReport(name .. ",total," .. (unit.totalDamage or 0))
+	AddDestroyedStructureReport(name .. ",anon," .. (unit.anonymous or 0))
+	for teamID, damage in pairs(unit.teamDamages) do
+		AddDestroyedStructureReport(name .. "," .. teamID .. "," .. damage)
 	end
 end
 
-------------------------------------------------------------------------
-------------------------------------------------------------------------
-
-local function normaliseBoxes(box)
-	box.left = box.left/mapWidth
-	box.top = box.top/mapHeight
-	box.right = box.right/mapWidth
-	box.bottom = box.bottom/mapHeight
-end
-
-local function TranslocateBoxes(box)
-	local midX, midY = (box.left + box.right)/2, (box.top + box.bottom)/2
-	local x1 = box.left + TRANSLOCATION_MULT*(0.5 - midX)
-	local y1 = box.top + TRANSLOCATION_MULT*(0.5 - midY)
-	local x2 = box.right + TRANSLOCATION_MULT*(0.5 - midX)
-	local y2 = box.bottom + TRANSLOCATION_MULT*(0.5 - midY)
-	return x1, y1, x2, y2
-end
-
-local function spawnStructures(left, top, right, bottom, team)
-	local teamID = team or Spring.GetGaiaTeamID()
-	local xBase = mapWidth*left
-	local xRand = mapWidth*(right-left)
-	local zBase = mapHeight*top
-	local zRand = mapHeight*(bottom-top)
-	for _,info in pairs(unitData) do
-		if type(info) == "table" then
-			Spring.Echo("Processing PW structure: "..info.unitname)
-			local giveUp = 0
-			local x = xBase + math.random()*xRand
-			local z = zBase + math.random()*zRand
-			local direction = math.floor(math.random()*4)
-			local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
-			
-			if not defID then
-				Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
-			elseif info.isDestroyed == 1 then
-				--do nothing
-			else
-				local unitDef = UnitDefs[defID]
-				local oddX = unitDef.xsize % 4 == 2
-				local oddZ = unitDef.zsize % 4 == 2
-				local sX = unitDef.xsize*4
-				local sZ = unitDef.xsize*4
-				
-				if direction == 1 or direction == 3 then
-					sX, sZ = sZ, sX
-					oddX, oddZ = oddZ, oddX
+local function GetAllyTeamLeader(teamList)
+	local bestRank, bestRankTeams
+	for i = 1, #teamList do
+		local teamID, leader, _, isAiTeam = Spring.GetTeamInfo(teamList[i])
+		if leader and not isAiTeam then
+			local customKeys = select(10, Spring.GetPlayerInfo(leader)) or {}
+			local rank = customKeys.pwrank
+			if rank then
+				if (not bestRank) or (rank < bestRank) then
+					bestRank = rank
+					bestRankTeams = {teamID}
+				elseif rank == bestRank then
+					bestRankTeams[#bestRankTeams + 1] = teamID
 				end
-				
-				if (unitDef.oddX) then
-					x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
-				else
-					x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
-				end
-				if (unitDef.oddZ) then
-					z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
-				else
-					z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
-				end
-				while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
-					  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
-					  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
-					  and giveUp < 50 do
-					x = xBase + math.random()*xRand
-					z = zBase + math.random()*zRand
-					giveUp = giveUp + 1
-				end
-				
-				local unitID = Spring.CreateUnit(info.unitname, x, spGetGroundHeight(x,z), z, direction, teamID, false, false)
-				Spring.SetUnitNeutral(unitID,true)
-				Spring.InsertUnitCmdDesc(unitID, 500, abandonCMD)
-				unitsByID[unitID] = {name = info.unitname, teamDamages = {}}
-				Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
 			end
 		end
 	end
+	bestRankTeams = bestRankTeams or teamList
+	return bestRankTeams[math.random(#bestRankTeams)]
 end
 
+local function GetRandomPosition(rectangle)
+	local position = vector.Add(rectangle[1], vector.Add(vector.Mult(math.random(), rectangle[2]),vector.Mult(math.random(), rectangle[3])))
+	return position[1], position[2]
+end
 
-local function SpawnHQ(left, top, right, bottom, team)
-	local teamID = team or Spring.GetGaiaTeamID()
-	local xBase = mapWidth*left
-	local xRand = mapWidth*(right-left)
-	local zBase = mapHeight*top
-	local zRand = mapHeight*(bottom-top)
+local function FlattenFunc(left, top, right, bottom, height)
+	-- top and bottom
+	for x = left + 8, right - 8, 8 do
+		spSetHeightMap(x, top, height, 0.5)
+		spSetHeightMap(x, bottom, height, 0.5)
+	end
 	
-	local giveUp = 0
+	-- left and right
+	for z = top + 8, bottom - 8, 8 do
+		spSetHeightMap(left, z, height, 0.5)
+		spSetHeightMap(right, z, height, 0.5)
+	end
 	
-	local x = xBase + math.random()*xRand
-	local z = zBase + math.random()*zRand
+	-- corners
+	spSetHeightMap(left, top, height, 0.5)
+	spSetHeightMap(left, bottom, height, 0.5)
+	spSetHeightMap(right, top, height, 0.5)
+	spSetHeightMap(right, bottom, height, 0.5)
+end
+
+local function FlattenRectangle(left, top, right, bottom, height)
+	Spring.LevelHeightMap(left + 8, top + 8, right - 8, bottom - 8, height)
+	Spring.SetHeightMapFunc(FlattenFunc, left, top, right, bottom, height)
+end
+
+local function SpawnStructure(info, teamID, boxData)
+	if not (type(info) == "table") then
+		return
+	end
+	
+	if info.isDestroyed == 1 then
+		--do nothing
+		return
+	end
+	
+	teamID = (info.owner and playerNameToTeamID[info.owner]) or teamID
+	Spring.Echo("Processing PW structure: "..info.unitname)
+	
+	local defID = UnitDefNames[info.unitname] and UnitDefNames[info.unitname].id
+	if not defID then
+		Spring.Log(gadget:GetInfo().name, LOG.ERROR, 'Planetwars error: Missing structure def ' .. info.unitname)
+		return
+	end
+	
+	local unitDef = UnitDefs[defID]
+	if info.evacuated then
+		planetwarsStructureCount = planetwarsStructureCount + 1
+		Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+		return
+	end
+	
+	local x, z = GetRandomPosition(boxData)
 	local direction = math.floor(math.random()*4)
 	
-	local unitDef = UnitDefs[HQ_DEF_ID]
 	local oddX = unitDef.xsize % 4 == 2
 	local oddZ = unitDef.zsize % 4 == 2
 	local sX = unitDef.xsize*4
-	local sZ = unitDef.xsize*4
+	local sZ = unitDef.zsize*4
 	
 	if direction == 1 or direction == 3 then
 		sX, sZ = sZ, sX
 		oddX, oddZ = oddZ, oddX
+	end
+	
+	local giveUp = 0
+	while (Spring.TestBuildOrder(defID, x, 0 ,z, direction) == 0 or
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+		x, z = GetRandomPosition(boxData)
+		giveUp = giveUp + 1
+		if giveUp > 80 then
+			break
+		end
 	end
 	
 	if (unitDef.oddX) then
@@ -288,70 +465,275 @@ local function SpawnHQ(left, top, right, bottom, team)
 		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
 	end
 	
-	while (Spring.TestBuildOrder(HQ_DEF_ID, x, 0 ,z, direction) == 0 or
-		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
-		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) 
-		  and giveUp < 25 do
-		x = xBase + math.random()*xRand
-		z = zBase + math.random()*zRand
-		giveUp = giveUp + 1
+	local y = spGetGroundHeight(x,z)
+	if (y > 0 or (not unitDef.floatOnWater)) and flattenAreas then
+		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
 	end
 	
-	local unitID = Spring.CreateUnit(HQ_DEF_ID, x, spGetGroundHeight(x,z), z, direction, teamID)
+	local unitID = Spring.CreateUnit(info.unitname, x, y, z, direction, teamID, false, false)
+	CheckSetWormhole(unitID)
+	
+	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	
+	planetwarsStructureCount = planetwarsStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+	
+	if unitDef.customParams.invincible or teamID == gaiaTeamID then
+		-- Makes structures not auto-attacked.
+		Spring.SetUnitNeutral(unitID,true) 
+	end
+	
+	if GetUnitCanEvac(unitDef) then
+		Spring.InsertUnitCmdDesc(unitID, 500, evacuateCmdDesc)
+		haveEvacuable = true
+	end
+	
+	unitsByID[unitID] = {name = info.unitname, teamDamages = {}, canEvac = GetUnitCanEvac(unitDef)}
+	Spring.SetUnitRulesParam(unitID, "can_share_to_gaia", 1)
+end
+
+local function SpawnStructuresInBox(boxData, teamID)
+	teamID = teamID or gaiaTeamID
+	for _,info in pairs(structureSpawnData) do
+		SpawnStructure(info, teamID, boxData)
+	end
+end
+
+local function SpawnHQ(teamID, boxData, hqDefID)
+	teamID = teamID or gaiaTeamID
+	
+	local x, z = GetRandomPosition(boxData)
+	local direction = math.floor(math.random()*4)
+	
+	local unitDef = UnitDefs[hqDefID]
+	local oddX = unitDef.xsize % 4 == 2
+	local oddZ = unitDef.zsize % 4 == 2
+	local sX = unitDef.xsize*4
+	local sZ = unitDef.xsize*4
+	
+	if direction == 1 or direction == 3 then
+		sX, sZ = sZ, sX
+		oddX, oddZ = oddZ, oddX
+	end
+	
+	local giveUp = 0
+	while (Spring.TestBuildOrder(hqDefID, x, 0 ,z, direction) == 0 or
+		  (lava and Spring.GetGroundHeight(x,z) <= 0) or 
+		  checkOverlapWithNoGoZone(x-sX,z-sZ,x+sX,z+sZ)) or
+		  (startBoxID and not GG.CheckStartbox(startBoxID, x, z)) do
+		x, z = GetRandomPosition(boxData)
+		giveUp = giveUp + 1
+		if giveUp > 80 then
+			break
+		end
+	end
+	
+	if (unitDef.oddX) then
+		x = (floor( x / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		x = floor( x / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	if (unitDef.oddZ) then
+		z = (floor( z / BUILD_RESOLUTION) + 0.5) * BUILD_RESOLUTION
+	else
+		z = floor( z / BUILD_RESOLUTION + 0.5) * BUILD_RESOLUTION
+	end
+	
+	local y = spGetGroundHeight(x,z)
+	if (y > 0 or (not unitDef.floatOnWater)) and flattenAreas then
+		flattenAreas[#flattenAreas + 1] = {x-sX, z-sZ, x+sX, z+sZ, y}
+	end
+	
+	planetwarsStructureCount = planetwarsStructureCount + 1
+	Spring.SetGameRulesParam("pw_structureList_" .. planetwarsStructureCount, unitDef.name)
+	
+	AddNoGoZone(x, z, math.max(sX, sZ) + STRUCTURE_SPACING)
+	
+	local unitID = Spring.CreateUnit(hqDefID, x, y, z, direction, teamID)
 	hqs[unitID] = true
-	Spring.SetUnitNeutral(unitID,true)
+	
+	--Spring.SetUnitNeutral(unitID,true) -- Makes structures not auto-attacked.
+end
+
+local function SpawnInDefenderBox()
+	if defenderFaction then
+		local teamList = Spring.GetTeamList(DEFENDER_ALLYTEAM) or {}
+		if teamList and teamList[1] then
+			local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+			if startBoxID then
+				local teamID = GetAllyTeamLeader(teamList)
+				SpawnStructuresInBox(planetwarsBoxes.defender, teamID)
+				return true
+			end
+		end
+	end
+	return false
+end
+
+local function TeleportOut(unitID)
+	local _,_,_,x,y,z = Spring.GetUnitPosition(unitID, true)
+	Spring.SpawnCEG("gate", x, y, z)
+	Spring.PlaySoundFile("sounds/misc/teleport2.wav", 20, x, y, z)
+	removingTeleportingUnit = true
+	Spring.DestroyUnit(unitID, false, true)
+	removingTeleportingUnit = false
+	teleportingUnit = nil
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- callins
+
+function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponDefID, attackerID, attackerDefID, attackerTeam)
+	if unitsByID[unitID] and not paralyzer then
+		unitsByID[unitID].totalDamage = (unitsByID[unitID].totalDamage or 0) + damage
+		if attackerTeam then
+			unitsByID[unitID].teamDamages[attackerTeam] = (unitsByID[unitID].teamDamages[attackerTeam] or 0) + damage
+		else
+			unitsByID[unitID].anonymous = (unitsByID[unitID].anonymous or 0) + damage
+		end
+	end
+end
+
+function gadget:GameFrame(frame)
+	if flattenAreas then
+		for i = 1, #flattenAreas do
+			local rec = flattenAreas[i]
+			FlattenRectangle(rec[1], rec[2], rec[3], rec[4], rec[5])
+		end
+		flattenAreas = nil
+	end
+	if not haveEvacuable then
+		return
+	end
+	if (frame%TELEPORT_CHARGE_PERIOD == 0) then
+		TeleportChargeTick()
+	end
+	if teleportingUnit then
+		if frame >= teleportFrame then
+			TeleportOut(teleportingUnit)
+		else
+			local _,_,_,x,y,z = Spring.GetUnitPosition(teleportingUnit, true)
+			local progress = (teleportFrame - frame)/TELEPORT_FRAMES
+			if frame % (3 + math.floor(30*progress)) == 0 then
+				Spring.SpawnCEG("teleport_out", x, y, z)
+			end
+			if frame % 45 == 0 then
+				Spring.PlaySoundFile("sounds/misc/teleport_loop.wav", 2, x, y, z)
+			end
+		end
+	end
+end
+
+function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
+	
+	if unitsByID[unitID] then
+		local unit = unitsByID[unitID]
+		local name = unit.name
+		if unitID == teleportingUnit and removingTeleportingUnit then
+			Spring.SetGameRulesParam("pw_teleport_frame", nil)
+			Spring.SetGameRulesParam("pw_teleport_unitname", nil)
+			
+			-- unit "died" from being teleported out
+			AddEvacuatedStructure(name, unit)
+		else
+			AddDestroyedStructure(name, unit)
+		end
+		unitsByID[unitID] = nil
+		UpdateEvacState()
+		CheckRemoveWormhole(unitID)
+	end
+	if hqs[unitID] then
+		local allyTeam = select(6, Spring.GetTeamInfo(unitTeam))
+		hqsDestroyed[#hqsDestroyed+1] = allyTeam
+		
+		destroyedStructureCount = destroyedStructureCount + 1
+		Spring.SetGameRulesParam("pw_structureDestroyed_" .. destroyedStructureCount, UnitDefs[unitDefID].name)
+		
+		hqs[unitID] = nil
+	end
+	if unitID == teleportingUnit then
+		teleportingUnit = nil
+	end
 end
 
 function gadget:GamePreload()
-	local box = {[0] = {}, [1] = {}}
-	
-	local startboxString = Spring.GetModOptions().startboxes
-	if not startboxString then -- legacy boxes
-		box[0].left, box[0].top, box[0].right, box[0].bottom  = Spring.GetAllyTeamStartBox(0)
-		box[1].left, box[1].top, box[1].right, box[1].bottom = Spring.GetAllyTeamStartBox(1)
-		
-		if not (box[0].left) then
-			box[0].left, box[0].top, box[0].right, box[0].bottom = 0, 0, mapWidth, mapHeight
-		end
-		if not (box[1].left) then
-			box[1].left, box[1].top, box[1].right, box[1].bottom = 0, 0, mapWidth, mapHeight
-		end
-		
-		normaliseBoxes(box[0])
-		normaliseBoxes(box[1])
-	else
-		local startboxConfig = loadstring(startboxString)()
-
-		local teamList = Spring.GetTeamList(0)
-		local boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		box[0] = boxID and startboxConfig[boxID] or {0,0,1,1}
-
-		teamList = Spring.GetTeamList(1)
-		boxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
-		box[1] = boxID and startboxConfig[boxID] or {0,0,1,1}
-	end
-
 	-- spawn PW planet structures
-	if defenderFaction then
-		local teams = Spring.GetTeamList(DEFENDER_ALLYTEAM)
-		local team = teams[math.random(#teams)]
-		local x1, y1, x2, y2 = TranslocateBoxes(box[DEFENDER_ALLYTEAM])
-		spawnStructures(x1, y1, x2, y2, team)
-	elseif box[0].right - box[0].left >= 0.9 and box[1].right - box[1].left >= 0.9 then -- north vs south
-		spawnStructures(0.1,0.44,0.9,0.56)
-	elseif box[0].bottom - box[0].top >= 0.9 and box[1].bottom - box[1].top >= 0.9 then -- east vs west
-		spawnStructures(0.44,0.1,0.56,0.9)
-	else -- random idk boxes
-		spawnStructures(0.35,0.35,0.65,0.65)
+	if not SpawnInDefenderBox() then
+		SpawnStructuresInBox(planetwarsBoxes.neutral)
 	end
 	
 	-- spawn field command centers
-	for i=0, 1 do	--(defenderFaction and 1 or 0) do
-		local x1, y1, x2, y2 = TranslocateBoxes(box[i])
-		local teams = Spring.GetTeamList(i)
-		local team = teams[math.random(#teams)]
-		SpawnHQ(x1, y1, x2, y2, team)
+	for i = 0, 1 do
+		local teamList = Spring.GetTeamList(i) or {0}
+		local startBoxID = Spring.GetTeamRulesParam(teamList[1], "start_box_id")
+		local teamID = GetAllyTeamLeader(teamList)
+		SpawnHQ(teamID, planetwarsBoxes[allyTeamRole[i]], hqDefID[i])
 	end
+	
+	Spring.SetGameRulesParam("pw_structureList_count", planetwarsStructureCount)
+	
+	SetTeleportCharge(0)
+	
+	if haveEvacuable then
+		if wormholeUnitID then
+			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.ACTIVE)
+		else
+			Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NO_WORMHOLE)
+			RemoveEvacCommands()
+		end
+	else
+		Spring.SetGameRulesParam("pw_evacuable_state", EVAC_STATE.NOTHING_TO_EVAC)
+	end
+end
+
+local function InitializeUnitsToSpawn()
+	local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
+	local pwDataRaw = modOptions.planetwarsstructures
+	local pwDataFunc, err, success, unitData
+	if not (pwDataRaw and type(pwDataRaw) == 'string') then
+		err = "Planetwars data entry in modoption is empty or in invalid format"
+		return {}, false
+	else
+		pwDataRaw = string.gsub(pwDataRaw, '_', '=')
+		pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
+		pwDataFunc, err = loadstring("return "..pwDataRaw)
+		if pwDataFunc then
+			success, unitData = pcall(pwDataFunc)
+			if not success then	-- execute Borat
+				err = unitData
+				unitData = {}
+			end
+		end
+	end
+	if err then 
+		Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
+	end
+
+	if not unitData then 
+		unitData = {} 
+	end
+	
+	local replacedStrucutres = {}
+	for _, data in pairs(unitData) do
+		local ud = UnitDefNames[data.unitname]
+		if ud then
+			if ud.customParams.pw_replaces then
+				replacedStrucutres[ud.customParams.pw_replaces] = true
+			end
+		else
+			replacedStrucutres[data.unitname] = true
+		end
+	end
+	
+	for key, data in pairs(unitData) do
+		if replacedStrucutres[data.unitname] then
+			AddEvacuatedStructure(data.unitname)
+			unitData[key].evacuated = true
+		end
+	end
+	
+	return unitData, true
 end
 
 function gadget:Initialize()
@@ -360,135 +742,79 @@ function gadget:Initialize()
 		return
 	end
 
+	local edgePadding = math.max(200, math.min(math.min(Game.mapSizeX, Game.mapSizeZ)/4 - 800, 800))
+	planetwarsBoxes = GG.GetPlanetwarsBoxes(0.2, 0.25, 0.3, edgePadding)
+	
 	initialiseNoGoZones()
-	if Spring.GetGameFrame() > 0 then	--game has started
-		local units = Spring.GetAllUnits()
-		for i=1,#units do
-			local unitID = units[i]
-			local unitDefID = Spring.GetUnitDefID(unitID)
-			local unitDef = UnitDefs[unitDefID]
-			if unitDefID == HQ_DEF_ID then
-				hqs[unitID] = true
-			elseif unitDef.name:find("pw_") then	-- is PW
-				unitsByID[unitID] = {name = unitDef.name, teamDamages = {}}
-			end
-		end
+	structureSpawnData, spawningAnything = InitializeUnitsToSpawn()
+	
+	if spawningAnything then
+		Spring.SetGameRulesParam("planetwars_structures", 1)
 	else
-		local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) or {}
-		local pwDataRaw = modOptions.planetwarsstructures
-		local pwDataFunc, err, success
-		if not (pwDataRaw and type(pwDataRaw) == 'string') then
-			err = "Planetwars data entry in modoption is empty or in invalid format"
-			unitData = {}
-		else
-			pwDataRaw = string.gsub(pwDataRaw, '_', '=')
-			pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
-			pwDataFunc, err = loadstring("return "..pwDataRaw)
-			if pwDataFunc then
-				success, unitData = pcall(pwDataFunc)
-				if not success then	-- execute Borat
-					err = unitData
-					unitData = {}
-				end
-			end
-		end
-		if err then 
-			Spring.Log(gadget:GetInfo().name, LOG.WARNING, 'Planetwars warning: ' .. err)
-		end
-
-		if not unitData then 
-			unitData = {} 
-		end
-		
-		--[[
-		for _,teamID in pairs(Spring.GetTeamList()) do
-			local keys = select(7, Spring.GetTeamInfo(teamID))
-			if keys and keys.defender then
-				defenderTeam = teamID
-				break
-			end
-		end
-		]]
-		
-		-- spawning code
-		--[[
-		local spawningAnything = false
-		for i,v in pairs(unitData) do
-			if (v.isDestroyed~=1) then 
-				spawningAnything = true
-				break
-			end
-		end
-		]]--
-		spawningAnything = pwDataRaw
-		
-		if spawningAnything then
-			Spring.SetGameRulesParam("planetwars_structures", 1)
-		else
-			Spring.SetGameRulesParam("planetwars_structures", 0)
-			gadgetHandler:RemoveGadget()
-			return
-		end
+		Spring.SetGameRulesParam("planetwars_structures", 0)
+		gadgetHandler:RemoveGadget()
+		return
 	end
 	
 	-- get list of players that can attack PW structures
-	local players = Spring.GetPlayerList()
-	for i=1,#players do
-		local player = players[i]
-		local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
-		if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
-			canAttackTeams[team] = true
-		end
-	end
+	--local players = Spring.GetPlayerList()
+	--for i=1,#players do
+	--	local player = players[i]
+	--	local _,_,_,team,_,_,_,_,_,customkeys = Spring.GetPlayerInfo(player)
+	--	if customkeys and tostring(customkeys.canattackpwstructures) == "1" then
+	--		canAttackTeams[team] = true
+	--	end
+	--end
 	
+	Spring.SetGameRulesParam("pw_teleport_time", TELEPORT_FRAMES)
+	Spring.SetGameRulesParam("pw_teleport_charge_needed", TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult)
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
+function gadget:AllowCommand_GetWantedCommand()
 	return {[CMD_ABANDON_PW] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if unitsByID[unitID] and cmdID == CMD_ABANDON_PW then
-		local gaiaTeam = Spring.GetGaiaTeamID()
-		GG.allowTransfer = true
-		Spring.TransferUnit(unitID, gaiaTeam, true)
-		GG.allowTransfer = false
-		Spring.SetUnitNeutral(unitID, true)
-		return false
-	elseif cmdID == CMD.ATTACK and #cmdParams == 1 then
-		local unitID = cmdParams[1]
-		if unitsByID[unitID] and (not canAttackTeams[unitTeam]) then
-			local unitName = UnitDefs[unitDefID].humanName
-			--Spring.SendMessageToTeam(unitTeam, unitName .. ": Cannot attack that PW structure")
-			return false
-		end
+	if not (unitsByID[unitID] and cmdID == CMD_ABANDON_PW) then
+		return false -- command not used
 	end
-	return true
+	
+	if teleportingUnit then
+		return true
+	end
+	
+	if teleportCharge < TELEPORT_CHARGE_NEEDED*teleportChargeNeededMult then
+		return true -- command used, do not remove
+	end
+	
+	-- start teleporting
+	teleportingUnit = unitID
+	teleportFrame = Spring.GetGameFrame() + TELEPORT_FRAMES
+	
+	Spring.SetGameRulesParam("pw_teleport_frame", teleportFrame)
+	Spring.SetUnitRulesParam(teleportingUnit, "pw_teleport_frame", teleportFrame)
+	Spring.SetGameRulesParam("pw_teleport_unitname", UnitDefs[unitDefID].name)
+	
+	SetTeleportCharge(0)
+	Spring.SetUnitAlwaysVisible(unitID, true)
+	return true -- command used, remove from queue
 end
 
-function gadget:UnitPreDamaged_GetWantedWeaponDef()
-	return WeaponDefs
-end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID, attackerID, attackerDefID, attackerTeam)
-	if attackerTeam and ((unitsByID[unitID] and (not canAttackTeams[attackerTeam])) or (spAreTeamsAllied(unitTeam, attackerTeam) and hqs[unitID])) then
-		return 0
+function gadget:GameOver()
+	for i = 1, destroyedStructures.count do
+		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled," .. destroyedStructures.data[i])
 	end
-	return damage
-end
-
-------------------------------------------------------------------------
-------------------------------------------------------------------------
-
-function gadget:GameOver()	
-	for i =1, stuffToReport.count do
-		Spring.SendCommands("wbynum 255 SPRINGIE:structurekilled,".. stuffToReport.data[i])
+	if evacuateStructureString then
+		Spring.SendCommands("wbynum 255 SPRINGIE:pwEvacuate " .. evacuateStructureString)
 	end
-	for i=1, #hqsDestroyed do
+	for i = 1, #hqsDestroyed do
 		Spring.SendCommands("wbynum 255 SPRINGIE:hqkilled,".. hqsDestroyed[i])
 	end
 end

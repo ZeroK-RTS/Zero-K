@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		version   = "v1.1",
 		date      = "November 2010",
 		license   = "GNU GPL, v2 or later",
-		layer     = -math.huge,
+		layer     = -math.huge + 5,
 		enabled   = true
 	}
 end
@@ -74,7 +74,6 @@ local mexUnitDef = UnitDefNames["cormex"]
 
 local mexDefInfo = {
 	extraction = 0.001,
-	square = false,
 	oddX = mexUnitDef.xsize % 4 == 2,
 	oddZ = mexUnitDef.zsize % 4 == 2,
 }
@@ -196,28 +195,17 @@ function IntegrateMetal(x, z, radius)
 	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
 	
 	local mult = mexDefInfo.extraction
-	local square = mexDefInfo.square
 	local result = 0
-	
-	if (square) then
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+
+	for i = startX, endX do
+		for j = startZ, endZ do
+			local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+			local dx, dz = cx - centerX, cz - centerZ
+			local dist = sqrt(dx * dx + dz * dz)
+
+			if (dist < radius) then
 				local _, metal = spGetGroundInfo(cx, cz)
 				result = result + metal
-			end
-		end
-	else
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
-				local dx, dz = cx - centerX, cz - centerZ
-				local dist = sqrt(dx * dx + dz * dz)
-				
-				if (dist < radius) then
-					local _, metal = spGetGroundInfo(cx, cz)
-					result = result + metal
-				end
 			end
 		end
 	end
@@ -228,7 +216,7 @@ end
 ------------------------------------------------------------
 -- Mex finding
 ------------------------------------------------------------
-local function SanitiseSpots(spots)
+local function SanitiseSpots(spots, metalValueOverride)
 	local i = 1
 	while i <= #spots do
 		local spot = spots[i]
@@ -236,7 +224,7 @@ local function SanitiseSpots(spots)
 			local metal
 			metal, spot.x, spot.z = IntegrateMetal(spot.x, spot.z)
 			spot.y = spGetGroundHeight(spot.x, spot.z)
-			spot.metal = metalValueOverride or spot.metal or (metal > 0 and metal) or DEFAULT_MEX_INCOME
+			spot.metal = spot.metal or metalValueOverride or (metal > 0 and metal) or DEFAULT_MEX_INCOME
 			i = i + 1
 		else
 			spot[i] = spot[#spots]
@@ -272,7 +260,7 @@ function GetSpots()
 	if gameConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading gameside mex config")
 		if gameConfig.spots then
-			spots = SanitiseSpots(gameConfig.spots)
+			spots = SanitiseSpots(gameConfig.spots, gameConfig.metalValueOverride)
 			return spots, false
 		end
 	end
@@ -280,7 +268,7 @@ function GetSpots()
 	if mapConfig then
 		Spring.Log(gadget:GetInfo().name, LOG.INFO, "Loading mapside mex config")
 		loadConfig = true
-		spots = SanitiseSpots(mapConfig.spots)
+		spots = SanitiseSpots(mapConfig.spots, mapConfig.metalValueOverride)
 		return spots, false
 	end
 	

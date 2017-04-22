@@ -119,6 +119,7 @@ options = {
 		type = 'bool',
 		desc = 'Highlight your allies\' selections with their team colors instead of the default yellow.',
 		value = false,
+        noHotkey = true,
 	},
 }
 
@@ -463,7 +464,9 @@ local function DrawWorldFunc()
     glLineWidth(3)
     gl.PointSize(3)
     gl.Blending(false)
-    gl.Smoothing(true,true)
+    if (smoothPolys) then
+        gl.Smoothing(true,true)
+    end
     gl.DepthTest(true)
     gl.PolygonOffset(0,-95)
     gl.StencilTest(true)

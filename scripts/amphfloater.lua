@@ -257,6 +257,14 @@ function script.QueryWeapon(num)
 	return barrel
 end
 
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/450
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 150.1, 35 * distMult, false, false, true)
+	end
+	return false
+end
+
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage/maxHealth
 	if severity <= .25 then

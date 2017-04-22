@@ -5,10 +5,8 @@ unitDef = {
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
-  buildCostEnergy        = 240,
   buildCostMetal         = 240,
   buildPic               = [[amphartillery.png]],
-  buildTime              = 240,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -20,9 +18,7 @@ unitDef = {
   customParams           = {
     amph_regen = 10,
     amph_submerged_at = 40,
-      description_pl = [[Lekki bot amfibijny]],
       helptext       = [[The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. ]],
-      helptext_pl    = [[Grebe to lekki bot z granatami krotkiego zasiegu, ktore dobrze sprawdzaja sie przeciwko ciezszym celom. Mimo ze jest amfibijny, nie moze atakowac spod wody.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -41,7 +37,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[behecrash.s3o]],
   script                 = [[amphartillery.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -149,30 +144,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Kraken]],
       blocking         = true,
-      damage           = 440,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 96,
       object           = [[behecrash_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
     },
 
     HEAP      = {
-      description      = [[Debris - Kraken]],
       blocking         = false,
-      damage           = 440,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 48,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 48,
     },
 
   },

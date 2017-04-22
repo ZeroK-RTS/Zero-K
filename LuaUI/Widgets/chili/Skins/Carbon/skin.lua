@@ -42,6 +42,18 @@ skin.button = {
   DrawControl = DrawButton,
 }
 
+skin.button_disabled = {
+  TileImageBK = ":cl:tech_button.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {32, 32, 32, 32}, --// tile widths: left,top,right,bottom
+  padding = {10, 10, 10, 10},
+
+  color = {0.3,.3,.3,1},
+  backgroundColor = {0.1,0.1,0.1,0.8},
+
+  DrawControl = DrawButton,
+}
+
 skin.checkbox = {
   TileImageFG = ":cl:tech_checkbox_checked.png",
   TileImageBK = ":cl:tech_checkbox_unchecked.png",
@@ -49,6 +61,21 @@ skin.checkbox = {
   boxsize     = 12,
 
   DrawControl = DrawCheckbox,
+}
+
+skin.editbox = {
+  backgroundColor = {0.1, 0.1, 0.1, 0},
+  cursorColor     = {1.0, 0.7, 0.1, 0.8},
+  
+  focusColor  = {1, 1, 1, 1},
+  borderColor = {1, 1, 1, 0.6},
+  padding = {6,2,2,3},
+
+  TileImageBK = ":cl:panel2_bg.png",
+  TileImageFG = ":cl:panel2.png",
+  tiles       = {8,8,8,8},
+
+  DrawControl = DrawEditBox,
 }
 
 skin.imagelistview = {
@@ -96,6 +123,55 @@ skin.panel = {
   DrawControl = DrawPanel,
 }
 
+skin.panelSmall = {
+  --TileImageFG = ":cl:glassFG.png",
+  --TileImageBK = ":cl:glassBK.png",
+  --tiles = {17,15,17,20},
+  TileImageBK = ":cl:tech_button.png",
+  TileImageFG = ":cl:empty.png",
+  tiles = {16, 16, 16, 16},
+
+  backgroundColor = {1, 1, 1, 0.8},
+
+  DrawControl = DrawPanel,
+}
+
+local fancyPanels = {
+	"0100",
+	"0110",
+	"1100",
+	"0011",
+	"1120",
+	"2100",
+	"0120",
+	"0001",
+	"0021",
+	"2001",
+	"2021",
+	"2120",
+	"1011",
+	"2011",
+	"1021",
+}
+
+local fancyPanelsSmall = {
+	"0011_small",
+	"1001_small",
+	"0001_small",
+}
+
+for i = 1, #fancyPanels do
+	local name = "panel_" .. fancyPanels[i]
+	skin[name] = Spring.Utilities.CopyTable(skin.panel)
+	skin[name].TileImageBK = ":cl:" .. name .. ".png"
+end
+
+for i = 1, #fancyPanelsSmall do
+	local name = "panel_" .. fancyPanelsSmall[i]
+	skin[name] = Spring.Utilities.CopyTable(skin.panelSmall)
+	skin[name].TileImageBK = ":cl:" .. name .. ".png"
+end
+
 skin.progressbar = {
   TileImageFG = ":cl:tech_progressbar_full.png",
   TileImageBK = ":cl:tech_progressbar_empty.png",
@@ -131,6 +207,7 @@ skin.scrollpanel = {
   HKnobTiles     = {8,8,8,8},
 
   KnobColorSelected = {0.0, 0.6, 1.0, 1.0},
+  padding = {2, 2, 2, 2},
 
   scrollbarSize = 12,
   DrawControl = DrawScrollPanel,

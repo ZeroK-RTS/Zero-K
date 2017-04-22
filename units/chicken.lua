@@ -11,19 +11,16 @@ unitDef = {
   buildTime           = 25,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,
   canMove             = true,
   canPatrol           = true,
   category            = [[SWIM]],
 
   customParams        = {
     description_fr = [[Soldat de colonie]],
-	description_pl = [[Wojownik kolonii]],
 	description_de = [[Schwärmer]],
     helptext       = [[The footsoldier of the Thunderbirds is an aggressive zergling-type unit. What it lacks in individual strength, it compensates for with its sheer numbers, overwhelming enemies with floods and floods of little chickens. A good riot unit is recommended for stopping them.]],
     helptext_fr    = [[Le soldat de base terrestre des poulets est une petite créature rapide et agressive apparentée aux Zergs. Seul peu utile, sa force se révèle lors d'assaut en masse compacte, submergeant l'adversaire sous un flôt continu d'unités pouvant réduire en cendres une base entière. Pour les contrer rien de mieux qu'une arme anti émeute. Plusieurs étant préférable.]],
 	helptext_de    = [[Diser Fußsoldat ist eine aggressive Einheit. Zwar besitzt es keine außergewöhnlichen, individuellen Qualitäten oder Stärken, doch kompensiert es diesen Mangel mit der ungeheuren Anzahl, mit der diese Einheiten erscheinen. Eine gute Rioteinheit wird empfohle, um diese Chicken zu stoppen.]],
-	helptext_pl    = [[Podstawowy wojownik kolonii kurczakow to agresywna jednostka do walki w zwarciu, ktora niska sile i wytrzymalosc nadrabia niesamowita liczebnoscia.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -33,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 68,
   maxDamage           = 270,
   maxSlope            = 36,
   maxVelocity         = 2.9,
@@ -43,7 +39,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
   objectName          = [[chicken.s3o]],
   power               = 100,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -55,11 +50,8 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  sonarDistance       = 200,  
-  smoothAnim          = true,
+  sonarDistance       = 200,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 1,
@@ -86,7 +78,9 @@ unitDef = {
 
     WEAPON = {
       name                    = [[Claws]],
+      avoidFeature            = false,
       avoidFriendly           = false,
+      collideFeature          = false,
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
@@ -111,7 +105,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },

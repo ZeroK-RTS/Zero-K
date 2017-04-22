@@ -241,8 +241,8 @@ function widget:Initialize()
 		recommendedStartpoints = startboxConfig[myBoxID].startpoints
 	end
 
-	local shuffleMode = Spring.GetModOptions().shuffle or "off"
-	if ((shuffleMode == "off") or (shuffleMode == "shuffle")) then -- only draw occupied boxes
+	local shuffleMode = Spring.GetGameRulesParam("shuffleMode")
+	if (shuffleMode ~= "allshuffle") then -- only draw occupied boxes
 		local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
 		local allyTeamList = Spring.GetAllyTeamList()
 		local actualAllyTeamList = {}

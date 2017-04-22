@@ -20,8 +20,6 @@ function widget:GetInfo()
   }
 end
 
-local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1'))
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -81,11 +79,7 @@ local viabilityColours = {
 local jumpDefs  = VFS.Include"LuaRules/Configs/jump_defs.lua"
 
 local function spTestMoveOrderX(unitDefID, x, y, z)
-	if reverseCompatibility then
-		return spTestBuildOrder(unitDefID, x, y, z, 1)
-	else
-		return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)		
-	end
+	return spTestMoveOrder(unitDefID, x, y, z, 0, 0, 0, true, true, true)
 end
 
 local function GetJumpViabilityLevel(unitDefID, x, y, z)
@@ -129,7 +123,7 @@ local ignore = {
   [CMD_SET_WANTED_MAX_SPEED] = true,
 }
 
-local curve = {CMD_MOVE, CMD_JUMP, CMD_FIGHT}
+local curve = {CMD_MOVE, CMD_RAW_MOVE, CMD_JUMP, CMD_FIGHT}
 local line = {CMD_ATTACK}
 
 curve = ListToSet(curve)
@@ -273,14 +267,8 @@ local function DrawMouseArc(unitID, shift, groundPos, quality)
 		return
 	end
 
-	local passIf
-	if reverseCompatibility then
-		local queue = spGetCommandQueue(unitID, 1)
-		passIf = (not queue or #queue == 0 or not shift)
-	else
-		local queueCount = spGetCommandQueue(unitID, 0)
-		passIf = (not queueCount or queueCount == 0 or not shift)
-	end
+	local queueCount = spGetCommandQueue(unitID, 0)
+	local passIf = (not queueCount or queueCount == 0 or not shift)
 
 	local viability = GetJumpViabilityLevel(unitDefID, groundPos[1], groundPos[2], groundPos[3])
 	

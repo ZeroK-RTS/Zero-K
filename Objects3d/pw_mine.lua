@@ -1,5 +1,4 @@
--- Spring metadata for uar_solartower.obj
-pw_mine = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -11,9 +10,9 @@ pw_mine = {
 		},
 	},
 
-	radius = 40.00,
+	radius = 60.00,
 	height = 80.00,
-	midpos = {0.00, 40.00, 0.00},
+	midpos = {0.00, 50.00, 0.00},
 
 	tex1 = "pw_mine_1.dds",
 	tex2 = "pw_mine_2.dds",
@@ -23,5 +22,3 @@ pw_mine = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_mine

@@ -60,60 +60,58 @@ function Suspension()
 	local onGround = false
 	
 	while true do 
-		
-		x,y,z = spGetUnitPosition(unitID)
-		height = spGetGroundHeight(x,z)
-		
-		if y - height < 1 then -- If I am on the ground
-		
-			-- Moving check
-			x,y,z = spGetUnitVelocity(unitID)
-			speed = math.sqrt(x*x+y*y+z*z)
-			wheelTurnSpeed = speed*WHEEL_TURN_MULT
-		
-			if not moving and speed > 0.06 then
-				runSpin = true
-				moving = true
+		-- Moving check
+		speed = select(4,spGetUnitVelocity(unitID))
+		wheelTurnSpeed = speed*WHEEL_TURN_MULT
+	
+		if not moving and speed > 0.06 then
+			runSpin = true
+			moving = true
+		end
+
+		if moving then
+			x,y,z = spGetUnitPosition(unitID)
+			height = spGetGroundHeight(x,z)
+			if y - height < 1 then -- If I am on the ground
+				s1r = GetWheelHeight(gs1r) 
+				s2r = GetWheelHeight(gs2r) 
+				s1l = GetWheelHeight(gs1l) 
+				s2l = GetWheelHeight(gs2l) 
+				
+				xtilta = (s2r + s2l - s1l - s1r)/6000 
+				xtiltv = xtiltv*0.99 + xtilta
+				xtilt = xtilt*0.98 + xtiltv
+
+				ztilta = (s1r + s2r - s1l - s2l)/10000
+				ztiltv = ztiltv*0.99 + ztilta
+				ztilt = ztilt*0.99 + ztiltv
+
+				ya = (s1r + s2r + s1l + s2l)/1000
+				yv = yv*0.99 + ya
+				yp = yp*0.98 + yv
+
+				Move(base, y_axis, yp, 9000)
+				Turn(base, x_axis, xtilt, math.rad(9000))
+				Turn(base, z_axis, -ztilt, math.rad(9000))
+
+				Move(rwheel1, y_axis, s1r, 20)
+				Move(rwheel2, y_axis, s2r, 20)
+				Move(rfender1, y_axis, s1r, 20)
+				Move(rfender2, y_axis, s2r, 20)
+											
+				Move(lwheel1, y_axis, s1l, 20)
+				Move(lwheel2, y_axis, s2l, 20)
+				Move(lfender1, y_axis, s1l, 20)
+				Move(lfender2, y_axis, s2l, 20)
+
+				Spin(rwheel1, x_axis, wheelTurnSpeed)
+				Spin(rwheel2, x_axis, wheelTurnSpeed)
+				Spin(lwheel1, x_axis, wheelTurnSpeed)
+				Spin(lwheel2, x_axis, wheelTurnSpeed)
 			end
-
-			s1r = GetWheelHeight(gs1r) 
-			s2r = GetWheelHeight(gs2r) 
-			s1l = GetWheelHeight(gs1l) 
-			s2l = GetWheelHeight(gs2l) 
-			
-			xtilta = (s2r + s2l - s1l - s1r)/6000 
-			xtiltv = xtiltv*0.99 + xtilta
-			xtilt = xtilt*0.98 + xtiltv
-
-			ztilta = (s1r + s2r - s1l - s2l)/10000
-			ztiltv = ztiltv*0.99 + ztilta
-			ztilt = ztilt*0.99 + ztiltv
-
-			ya = (s1r + s2r + s1l + s2l)/1000
-			yv = yv*0.99 + ya
-			yp = yp*0.98 + yv
-
-			Move(base, y_axis, yp, 9000)
-			Turn(base, x_axis, xtilt, math.rad(9000))
-			Turn(base, z_axis, -ztilt, math.rad(9000))
-
-			Move(rwheel1, y_axis, s1r, 20)
-			Move(rwheel2, y_axis, s2r, 20)
-			Move(rfender1, y_axis, s1r, 20)
-			Move(rfender2, y_axis, s2r, 20)
-										
-			Move(lwheel1, y_axis, s1l, 20)
-			Move(lwheel2, y_axis, s2l, 20)
-			Move(lfender1, y_axis, s1l, 20)
-			Move(lfender2, y_axis, s2l, 20)
-
-			Spin(rwheel1, x_axis, wheelTurnSpeed)
-			Spin(rwheel2, x_axis, wheelTurnSpeed)
-			Spin(lwheel1, x_axis, wheelTurnSpeed)
-			Spin(lwheel2, x_axis, wheelTurnSpeed)
 		end
 		Sleep(50)
- end 
+	end 
 end
 
 function RestoreAfterDelay()

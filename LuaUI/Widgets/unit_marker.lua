@@ -45,6 +45,7 @@ options = {
 				markingActive = true
 			end
         end,
+		noHotkey = true,
 	},
 	disableAll = {
 		type='button',
@@ -69,6 +70,7 @@ options = {
 				markingActive = false
 			end
         end,
+		noHotkey = true,
 	},
 	
 	unitslabel = {name = "unitslabel", type = 'label', value = "Individual Toggles", path = options_path},
@@ -88,6 +90,7 @@ for unitDefID,_ in pairs(unitList) do
 					markingActive = true
 				end
 			end,
+			noHotkey = true,
 		}
 		options_order[#options_order+1] = ud.name .. "_mark"
 	end
@@ -112,7 +115,7 @@ function widget:TeamDied ()
 end
 
 function widget:UnitEnteredLos (unitID, unitTeam)
-	if Spring.IsUnitAllied(unitID) then return end
+	if Spring.IsUnitAllied(unitID) or Spring.GetSpectatingState() then return end
 
 	local unitDefID = Spring.GetUnitDefID (unitID)
 	if not unitDefID then return end -- safety just in case

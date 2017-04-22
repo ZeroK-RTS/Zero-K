@@ -7,16 +7,16 @@ local function GetGridTooltip (unitID)
 	local windStr = ""
 	local minWind = Spring.GetUnitRulesParam(unitID, "minWind")
 	if minWind then
-		windStr = "\n" ..  WG.Translate("common", "wind_range") .. " " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
+		windStr = "\n" ..  WG.Translate("interface", "wind_range") .. " " .. math.round(minWind, 1) .. " - " .. math.round(Spring.GetGameRulesParam("WindMax") or 2.5, 1)
 	end
 
 	if gridCurrent < 0 then
-		return WG.Translate("common", "disabled_no_grid") .. windStr
+		return WG.Translate("interface", "disabled_no_grid") .. windStr
 	end
 	local gridMaximum = Spring.GetUnitRulesParam(unitID, "OD_gridMaximum") or 0
 	local gridMetal = Spring.GetUnitRulesParam(unitID, "OD_gridMetal") or 0
 
-	return WG.Translate("common", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
+	return WG.Translate("interface", "grid") .. ": " .. math.round(gridCurrent,2) .. "/" .. math.round(gridMaximum,2) .. " E => " .. math.round(gridMetal,2) .. " M " .. windStr
 end
 
 local function GetMexTooltip (unitID)
@@ -28,42 +28,30 @@ local function GetMexTooltip (unitID)
 	local baseFactor = Spring.GetUnitRulesParam(unitID, "resourceGenerationFactor") or 1
 
 	if currentIncome == 0 then
-		return WG.Translate("common", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
+		return WG.Translate("interface", "disabled_base_metal") .. ": " .. math.round(mexIncome,2)
 	end
 
-	return WG.Translate("common", "income") .. ": " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("common", "overdrive")
+	return WG.Translate("interface", "income") .. ": " .. math.round(mexIncome*baseFactor,2) .. " + " .. math.round(metalMult*100) .. "% " .. WG.Translate("interface", "overdrive")
 end
 
 local function GetTerraformTooltip(unitID)
 	local spent = Spring.GetUnitRulesParam(unitID, "terraform_spent")
 	if not spent then return end
 
-	return WG.Translate("common", "terraform") .. " - " .. WG.Translate("common", "estimated_cost") .. ": " .. math.floor(spent) .. " / " .. math.floor(Spring.GetUnitRulesParam(unitID, "terraform_estimate") or 0)
+	return WG.Translate("interface", "terraform") .. " - " .. WG.Translate("interface", "estimated_cost") .. ": " .. math.floor(spent) .. " / " .. math.floor(Spring.GetUnitRulesParam(unitID, "terraform_estimate") or 0)
 end
 
 local function GetZenithTooltip (unitID)
 	local meteorsControlled = Spring.GetUnitRulesParam(unitID, "meteorsControlled")
 	if not meteorsControlled then return end
 
-	return WG.Translate("units", "zenith.description") .. " - " .. WG.Translate("common", "meteors_controlled") .. " " .. meteorsControlled .. "/500"
+	return (WG.Translate("units", "zenith.description") or "Meteor Controller") .. " - " .. (WG.Translate("interface", "meteors_controlled") or "Meteors controlled") .. " " .. (meteorsControlled or "0") .. "/500"
 end
 
 local function GetAvatarTooltip(unitID)
-	local profileID = Spring.GetUnitRulesParam(unitID, "comm_profileID")
-	if not profileID then return end
-
-	local teamID = Spring.GetUnitTeam(unitID)
-	local _, playerID, _, isAI = Spring.GetTeamInfo(teamID)
-
-	local name
-	if isAI then
-		name = select(2, Spring.GetAIInfo(teamID))
-	else
-		name = Spring.GetPlayerInfo(playerID)
-	end
-
-	return name or ""
-	-- todo: for extra My Com Feel, use the original owner's name
+	local commOwner = Spring.GetUnitRulesParam(unitID, "commander_owner")
+	if not commOwner then return end
+	return commOwner or ""
 end
 
 local function GetCustomTooltip (unitID)
@@ -75,12 +63,16 @@ local function GetCustomTooltip (unitID)
 end
 
 function Spring.Utilities.GetHumanName(ud, unitID)
+	if not ud then
+		return ""
+	end
+
 	if unitID then
 		local name = Spring.GetUnitRulesParam(unitID, "comm_name")
 		if name then
 			local level = Spring.GetUnitRulesParam(unitID, "comm_level")
 			if level then
-				return name .. " " .. WG.Translate("common", "lvl") .. " " .. (level + 1)
+				return name .. " " .. WG.Translate("interface", "lvl") .. " " .. (level + 1)
 			else
 				return name
 			end
@@ -92,6 +84,10 @@ function Spring.Utilities.GetHumanName(ud, unitID)
 end
 
 function Spring.Utilities.GetDescription(ud, unitID)
+	if not ud then
+		return ""
+	end
+
 	local name_override = ud.customParams.statsname or ud.name
 	local desc = WG.Translate ("units", name_override .. ".description") or ud.tooltip
 	if Spring.ValidUnitID(unitID) then
@@ -103,7 +99,7 @@ function Spring.Utilities.GetDescription(ud, unitID)
 		local buildPower = Spring.GetUnitRulesParam(unitID, "buildpower_mult")
 		if buildPower then
 			buildPower = buildPower*10
-			desc = desc .. ", " .. WG.Translate("common", "builds_at") .. " " .. buildPower .. " m/s"
+			desc = desc .. ", " .. WG.Translate("interface", "builds_at") .. " " .. buildPower .. " m/s"
 		end
 	end
 	return desc
@@ -111,13 +107,20 @@ end
 
 function Spring.Utilities.GetHelptext(ud, unitID)
 	local name_override = ud.customParams.statsname or ud.name
-	return WG.Translate ("units", name_override .. ".helptext") or ud.customParams.helptext or WG.Translate("common", "no_helptext")
+	return WG.Translate ("units", name_override .. ".helptext") or ud.customParams.helptext or WG.Translate("interface", "no_helptext")
 end
 
+function Spring.Utilities.GetUnitHeight(ud)
+	local customHeight = ud.customParams.custom_height
+	return (customHeight and tonumber(customHeight)) or ud.height
+end
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
 local buildTimes = {}
+local variableCostUnit = {
+	[UnitDefNames["terraunit"].id] = true
+}
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
 	local realBuildTime = ud.customParams.real_buildtime
@@ -126,16 +129,19 @@ for i = 1, #UnitDefs do
 	else
 		buildTimes[i] = ud.buildTime
 	end
+	if ud.customParams.level or ud.customParams.dynamic_comm then
+		variableCostUnit[i] = true
+	end
 end
 
 function Spring.Utilities.GetUnitCost(unitID, unitDefID)
-	if unitID then
-		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost")
+	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
+	if unitID and variableCostUnit[unitDefID] then
+		local realCost = Spring.GetUnitRulesParam(unitID, "comm_cost") or Spring.GetUnitRulesParam(unitID, "terraform_estimate")
 		if realCost then
 			return realCost
 		end
 	end
-	unitDefID = unitDefID or Spring.GetUnitDefID(unitID)
 	if unitDefID and buildTimes[unitDefID] then
 		return buildTimes[unitDefID] 
 	end
@@ -166,4 +172,16 @@ function Spring.Utilities.GetUnitBuildSpeed(unitID, unitDefID)
 		end
 	end
 	return buildPower
+end
+
+function Spring.Utilities.UnitEcho(unitID, st)
+	st = st or unitID
+	if Spring.ValidUnitID(unitID) then
+		local x,y,z = Spring.GetUnitPosition(unitID)
+		Spring.MarkerAddPoint(x,y,z, st)
+	else
+		Spring.Echo("Invalid unitID")
+		Spring.Echo(unitID)
+		Spring.Echo(st)
+	end
 end

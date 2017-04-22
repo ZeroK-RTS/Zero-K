@@ -21,7 +21,6 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-Spring.SetGameRulesParam("unitsOnFire",1)
 
 --// customparams values
 -- setunitsonfire: 
@@ -106,13 +105,12 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 function gadget:UnitEnteredWater(unitID, unitDefID, unitTeam)
-        inWater[unitID] = true
+	inWater[unitID] = true
 end
 
 function gadget:UnitLeftWater(unitID, unitDefID, unitTeam)
-        inWater[unitID] = nil
+	inWater[unitID] = nil
 end
-
 
 function gadget:UnitDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, weaponID,
                             attackerID, attackerDefID, attackerTeam)
@@ -170,3 +168,6 @@ function gadget:GameFrame(n)
 	end
 end
 
+function gadget:Initialize()
+	Spring.SetGameRulesParam("unitsOnFire",1)
+end

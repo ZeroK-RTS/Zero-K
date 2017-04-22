@@ -54,6 +54,7 @@ local completeUnitListNames = {
 		"corch",
 		"amphcon",
 		"armca",
+		"gunshipcon",
 		"shipcon",
 	},
 }

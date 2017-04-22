@@ -1,11 +1,13 @@
 include "constants.lua"
 
 local base = piece "base"
-
-local smokePiece = {base}
+local smoke1 = piece "smoke1"
+local smoke2 = piece "smoke2"
+local smoke3 = piece "smoke3"
 
 function script.Create()
-	StartThread(SmokeUnit, smokePiece)
+	Spin (smoke1, y_axis, math.rad(1000))
+	StartThread(SmokeUnit, {smoke1, smoke2, smoke2, smoke3, smoke3, smoke3}, 6)
 end
 
 function script.Killed(recentDamage, maxHealth)

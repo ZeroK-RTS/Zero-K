@@ -153,15 +153,15 @@ local function UnBurrow()
 	Move(body, 2, 0, 3)
 	Turn(body, 1, 0, 3)
 
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 5)
-	GG.UpdateUnitAttributes(unitID)
+	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 0.2)
+	--Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 5)
+	--GG.UpdateUnitAttributes(unitID)
 	
 	Sleep(600)
 	
-	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
-	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
-	GG.UpdateUnitAttributes(unitID)
+	--Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	--Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
+	--GG.UpdateUnitAttributes(unitID)
 	EmitSfx(digger, dirtfling)
 	
 	StartThread(Walk)
@@ -171,7 +171,7 @@ local function Talk()
 	Spring.Echo("Hello World! ... Directive: Kill all humans")
 end
 
-function StartMoving()
+function script.StartMoving()
 	Signal(SIG_BURROW)
 	if burrowed then
 		StartThread(UnBurrow)
@@ -181,13 +181,17 @@ function StartMoving()
 	--StartThread(Talk)
 end
 
-function StopMoving()
+function script.StopMoving()
 	StartThread(Burrow)
+end
+
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
 end
 
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
-	StartThread(StartStopMovingControl, StartMoving, StopMoving, nil, true)
+	StartThread(StartStopMovingControl, script.StartMoving, script.StopMoving, nil, true)
 end
 
 function script.Killed(recentDamage, maxHealth)

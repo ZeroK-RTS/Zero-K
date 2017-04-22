@@ -44,7 +44,9 @@ local CMD_FIGHT  = CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 local LOS_ACCESS = {inlos = true}
 
-local gaiaTeamID			= Spring.GetGaiaTeamID()
+include("LuaRules/Configs/customcmds.h.lua")
+
+local gaiaTeamID = Spring.GetGaiaTeamID()
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -107,7 +109,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 	-- add slow damage
 	local slowdown = attritionWeaponDefs[weaponID].slowDamage
 	if attritionWeaponDefs[weaponID].scaleSlow then
-		slowdown = slowdown * (damage/WeaponDefs[weaponID].damages[0])
+		slowdown = slowdown * (damage/WeaponDefs[weaponID].customParams.raw_damage)
 	end	--scale slow damage based on real damage (i.e. take into account armortypes etc.)
 
 	slowedUnits[unitID].slowDamage = slowedUnits[unitID].slowDamage + slowdown
@@ -159,7 +161,7 @@ function gadget:UnitPreDamaged(unitID, unitDefID, unitTeam, damage, paralyzer, w
 							else
 								spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[1].tag},{})
 							end
-						elseif #cmd > 1 and cmd[1].id == CMD_MOVE and cmd[2].id == CMD_FIGHT and
+						elseif #cmd > 1 and (cmd[1].id == CMD_MOVE or cmd[1].id == CMD_RAW_MOVE) and cmd[2].id == CMD_FIGHT and
 							cmd[2].options.internal and #cmd[2].params == 1 and cmd[2].params[1] == unitID then
 							spGiveOrderToUnit(attackerID,CMD_REMOVE,{cmd[2].tag},{})
 						end

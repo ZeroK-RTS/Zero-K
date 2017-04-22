@@ -28,6 +28,9 @@ TODO:
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+VFS.Include("LuaRules/Configs/constants.lua")
+VFS.Include ("LuaRules/Utilities/lobbyStuff.lua")
+
 function SetupPlayerNames() end
 function ToggleVisibility() end
 
@@ -53,7 +56,7 @@ local incolor2color
 local window_cpl, scroll_cpl
 
 options_path = 'Settings/HUD Panels/Player List'
-options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'round_elo', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'rank_as_text', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
+options_order = { 'visible', 'backgroundOpacity', 'reset_wins', 'inc_wins_1', 'inc_wins_2','win_show_condition', 'text_height', 'name_width', 'stats_width', 'income_width', 'mousewheel', 'alignToTop', 'alignToLeft', 'showSummaries', 'show_stats', 'colorResourceStats', 'show_ccr', 'show_cpu_ping', 'cpu_ping_as_text', 'show_tooltips', 'list_size'}
 options = {
 	visible = {
 		name = "Visible",
@@ -147,14 +150,6 @@ options = {
 		OnChange = function() SetupPanels() end,
 		advanced = true
 	},
-	round_elo = {
-		name = "Round Elo display",
-		type = 'bool',
-		value = true,
-		desc = "Round Elo display to the nearest 50 points",
-		OnChange = function() SetupPanels() end,
-		advanced = true
-	},
 	mousewheel = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
@@ -205,12 +200,12 @@ options = {
 		desc = "Show the clan, country, and rank columns",
 		OnChange = function() SetupPanels() end,
 	},
-	rank_as_text = {
-		name = "Show rank as text",
+	show_cpu_ping = {
+		name = "Show ping and cpu",
 		type = 'bool',
-		value = false,
-		desc = "Show rank as text (vs. as an icon)",
-		OnChange = function() SetupPlayerNames() end,
+		value = true,
+		desc = "Show player's ping and cpu",
+		OnChange = function() SetupPanels() end,
 	},
 	cpu_ping_as_text = {
 		name = "Show ping/cpu as text",
@@ -279,7 +274,7 @@ end
 -- I'm leaving all the code in place, but disabling the buttons.
 -- Someone can come back in and fix it later.
 --
-local cf = Spring.GetModOptions().noceasefire ~= "1" and IsFFA()
+local cf = (not Spring.FixedAllies()) and IsFFA()
 --local cf = false
 
 local localTeam = 0
@@ -299,7 +294,6 @@ localAlliance = Spring.GetMyAllyTeamID()
 local x_icon_clan
 local x_icon_country
 local x_icon_rank
-local x_elo
 local x_cf
 local x_status
 local x_name
@@ -334,8 +328,7 @@ local function CalculateWidths()
 	x_icon_clan		= wins_width + 10
 	x_icon_country	= x_icon_clan + 18
 	x_icon_rank		= x_icon_country + 20
-	x_elo			= options.show_ccr.value and x_icon_rank + 16 or x_icon_clan
-	x_cf			= x_elo + 32
+	x_cf			= options.show_ccr.value and x_icon_rank + 16 or x_icon_clan
 	x_status		= cf and x_cf + 20 or x_cf
 	x_name			= x_status + 12
 	x_teamsize		= x_icon_clan
@@ -351,8 +344,8 @@ local function CalculateWidths()
 	x_e_income_width = options.income_width.value * options.text_height.value / 2 + 10
 	x_m_fill		= options.show_stats.value and x_e_income + x_e_income_width or x_m_mobiles
 	x_e_fill		= x_m_fill + 30
-	x_cpu			= x_e_fill + (options.cpu_ping_as_text.value and 52 or 30)
-	x_ping			= x_cpu + (options.cpu_ping_as_text.value and 46 or 16)
+	x_cpu			= x_e_fill + (options.show_cpu_ping.value and (options.cpu_ping_as_text.value and 52 or 30) or 0)
+	x_ping			= x_cpu + (options.show_cpu_ping.value and (options.cpu_ping_as_text.value and 46 or 16) or 10)
 	x_bound			= x_ping + 28
 	x_windowbound	= x_bound + 0
 end
@@ -549,8 +542,11 @@ local function GetPlayerTeamStats(teamID)
 		eInco = eInco + energyIncome - math.max(0, energyChange)
 	end
 	
+	if mStor then
+		mStor = mStor - HIDDEN_STORAGE
+	end
 	if eStor then
-		eStor = eStor - 10000					-- eStor has a "hidden 10k" to account for
+		eStor = eStor - HIDDEN_STORAGE					-- eStor has a "hidden 10k" to account for
 		if eStor > 50000 then eStor = 1000 end	-- fix for weirdness where sometimes storage is reported as huge, assume it should be 1000
 	end
 	-- guard against dividing by zero later, when the fill bar percentage is calculated
@@ -749,26 +745,28 @@ end
 --------------------------------------------------------------------------------
 
 local function UpdatePingCpu(entity,pingTime,cpuUsage,pstatus)
-	pingTime = pingTime or 0
-	cpuUsage = cpuUsage or 0
-	if pstatus == 'gone' then
-		pingTime = 0
-		cpuUsage = 0
-	end
-	local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
-	if options.cpu_ping_as_text.value then
-		if entity.cpuLabel then	entity.cpuLabel.font:SetColor(cpuCol) ; entity.cpuLabel:SetCaption(cpuText) end
-		if entity.pingLabel then entity.pingLabel.font:SetColor(pingCol) ; entity.pingLabel:SetCaption(pingText) end
-	else
-		if entity.cpuImg then
-			entity.cpuImg.color = cpuCol
-			if options.show_tooltips.value then entity.cpuImg.tooltip = ('CPU: ' .. cpuText) end
-			entity.cpuImg:Invalidate()
+	if options.show_cpu_ping.value then
+		pingTime = pingTime or 0
+		cpuUsage = cpuUsage or 0
+		if pstatus == 'gone' then
+			pingTime = 0
+			cpuUsage = 0
 		end
-		if entity.pingImg then
-			entity.pingImg.color = pingCol
-			if options.show_tooltips.value then entity.pingImg.tooltip = ('Ping: ' .. pingText) end
-			entity.pingImg:Invalidate()
+		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pingTime,cpuUsage)
+		if options.cpu_ping_as_text.value then
+			if entity.cpuLabel then	entity.cpuLabel.font:SetColor(cpuCol) ; entity.cpuLabel:SetCaption(cpuText) end
+			if entity.pingLabel then entity.pingLabel.font:SetColor(pingCol) ; entity.pingLabel:SetCaption(pingText) end
+		else
+			if entity.cpuImg then
+				entity.cpuImg.color = cpuCol
+				if options.show_tooltips.value then entity.cpuImg.tooltip = ('CPU: ' .. cpuText) end
+				entity.cpuImg:Invalidate()
+			end
+			if entity.pingImg then
+				entity.pingImg.color = pingCol
+				if options.show_tooltips.value then entity.pingImg.tooltip = ('Ping: ' .. pingText) end
+				entity.pingImg:Invalidate()
+			end
 		end
 	end
 end
@@ -889,8 +887,10 @@ local function AddTableHeaders()
 		scroll_cpl:AddChild( Image:New{ x=x_e_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1,  file = 'LuaUI/Images/energy.png',} )
 		scroll_cpl:AddChild( Image:New{ x=x_m_income - 15, y=((fontsize+1) * row) + 3,	height = (fontsize)+1, file = 'LuaUI/Images/ibeam.png',} )
 	end
-	scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
-	scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	if options.show_cpu_ping.value then
+		scroll_cpl:AddChild( Label:New{ x=x_cpu, y=(fontsize+1) * row,	caption = 'C', 	fontShadow = true,  fontsize = fontsize,} )
+		scroll_cpl:AddChild( Label:New{ x=x_ping, y=(fontsize+1) * row,	caption = 'P', 	fontShadow = true,  fontsize = fontsize,} )
+	end
 	if showWins then scroll_cpl:AddChild( Label:New{ x=0, width = wins_width, y=(fontsize+1) * row,	caption = 'Wins', 	fontShadow = true,  fontsize = fontsize, align = "right"} ) end
 end
 
@@ -934,21 +934,14 @@ local function AddEntity(entity, teamID, allyTeamID)
 			elseif entity.faction and entity.faction ~= "" then
 				icon = "LuaUI/Configs/Factions/" .. entity.faction ..".png"
 			end
-			if entity.level and entity.level ~= "" then 
-				icRank = "LuaUI/Images/Ranks/" .. math.min((1+math.floor((entity.level or 0)/10)),9) .. ".png"
+			if entity.level and entity.level ~= "" and entity.elo and entity.elo ~= "" then 
+				local elo, xp = Spring.Utilities.TranslateLobbyRank(tonumber(entity.elo), tonumber(entity.level))
+				icRank = "LuaUI/Images/LobbyRanks/" .. xp .. "_" .. elo .. ".png"
 			end
 			if icCountry then MakeNewIcon(entity,"countryIcon",{x=x_icon_country,file=icCountry,}) end 
-			if options.rank_as_text.value then
-				if entity.level then MakeNewLabel(entity,"rankLabel",{x=x_icon_rank,width=14,caption = math.min(entity.level,99),textColor = {0.85,0.85,0.85,1},align = 'right',}) end
-			else
-				if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
-			end
+			if icRank then MakeNewIcon(entity,"rankIcon",{x=x_icon_rank,file=icRank,}) end
 			if icon then MakeNewIcon(entity,"clanIcon",{x=x_icon_clan,file=icon,y=((fontsize+1)*row)+5,width=fontsize-1,height=fontsize-1}) end 
 		end
-		if entity.elo and entity.elo ~= "" then
-			elo, eloCol = FormatElo(entity.elo, not options.round_elo.value)
-		end
-		if elo then MakeNewLabel(entity,"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) end
 
 		-- status (player status and team status)
 		local pstatus = nil
@@ -993,16 +986,18 @@ local function AddEntity(entity, teamID, allyTeamID)
 
 		-- ping and cpu icons / labels
 		local pingCol, cpuCol, pingText, cpuText = FormatPingCpu(pstatus == 'gone' and 0 or entity.pingTime,pstatus == 'gone' and 0 or entity.cpuUsage)
-		if options.cpu_ping_as_text.value then
-			MakeNewLabel(entity,"cpuLabel",{x=x_cpu,width = (fontsize+3)*10/16,caption = cpuText,textColor = cpuCol,align = 'right',})
-			MakeNewLabel(entity,"pingLabel",{x=x_ping,width = (fontsize+3)*10/16,caption = pingText,textColor = pingCol,align = 'right',})
-		else
-			MakeNewIcon(entity,"cpuImg",{x=x_cpu,file=cpuPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'CPU: ' .. cpuText,})
-			MakeNewIcon(entity,"pingImg",{x=x_ping,file=pingPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'Ping: ' .. pingText,})
-			entity.cpuImg.color = cpuCol
-			entity.pingImg.color = pingCol
-			function entity.cpuImg:HitTest(x,y) return self end
-			function entity.pingImg:HitTest(x,y) return self end
+		if options.show_cpu_ping.value then
+			if options.cpu_ping_as_text.value then
+				MakeNewLabel(entity,"cpuLabel",{x=x_cpu,width = (fontsize+3)*10/16,caption = cpuText,textColor = cpuCol,align = 'right',})
+				MakeNewLabel(entity,"pingLabel",{x=x_ping,width = (fontsize+3)*10/16,caption = pingText,textColor = pingCol,align = 'right',})
+			else
+				MakeNewIcon(entity,"cpuImg",{x=x_cpu,file=cpuPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'CPU: ' .. cpuText,})
+				MakeNewIcon(entity,"pingImg",{x=x_ping,file=pingPic,width = (fontsize+3)*10/16,keepAspect = false,tooltip = 'Ping: ' .. pingText,})
+				entity.cpuImg.color = cpuCol
+				entity.pingImg.color = pingCol
+				function entity.cpuImg:HitTest(x,y) return self end
+				function entity.pingImg:HitTest(x,y) return self end
+			end
 		end
 
 		if showWins and WG.WinCounter_currentWinTable ~= nil and WG.WinCounter_currentWinTable[entity.name] ~= nil then 
@@ -1072,11 +1067,6 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 			if allyTeamResources[allyTeamID] and allyTeams[allyTeamID] then
 				allyTeamEntities[allyTeamID] = allyTeamEntities[allyTeamID] or {}
 				local allyTeamColor
-				local elo
-				local eloCol
-				if allyTeamsElo[allyTeamID] then
-					elo, eloCol = FormatElo(allyTeamsElo[allyTeamID].total / allyTeamsElo[allyTeamID].count, true)
-				end
 				if (localTeam ~= 0 or teamZeroPlayers[myID]) and allyTeamID == localAlliance then
 					allyTeamColor = {Spring.GetTeamColor(localTeam)}
 				else
@@ -1089,15 +1079,7 @@ local function AddAllAllyTeamSummaries(allyTeamsSorted)
 				MakeNewLabel(allyTeamEntities[allyTeamID],"nameLabel",{x=x_name,width=150,caption = teamName,textColor = allyTeamColor,})
 				MakeNewLabel(allyTeamEntities[allyTeamID],"teamsizeLabel", {x=x_teamsize,width=32,caption = (allyTeamsNumActivePlayers[allyTeamID] .. "/" .. #allyTeams[allyTeamID]), textColor = {.85,.85,.85,1}, align = "right"})
 				DrawPlayerTeamStats(allyTeamEntities[allyTeamID],allyTeamColor,allyTeamResources[allyTeamID])
-				local rstring = "smurf"
-				if elo then 
-					MakeNewLabel(allyTeamEntities[allyTeamID],"eloLabel",{x=x_elo,caption = elo,textColor = eloCol,}) 
-					if elo > 1800 then rstring = "napoleon"
-					elseif elo > 1600 then rstring = "soldier"
-					elseif elo > 1400 then rstring = "user"
-					end
-				end
-				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/Ranks/dude_"..rstring..".png",})
+				MakeNewIcon(allyTeamEntities[allyTeamID],"teamsizeIcon", {x=x_teamsize_dude,file="LuaUI/Images/dude.png",})
 				AddCfCheckbox(allyTeamID)
 				if allyTeamsDead[allyTeamID] then MakeNewLabel(allyTeamEntities[allyTeamID],"statusLabel",{x=x_status,width=16,caption = "X",textColor = {1,0,0,1},}) end
 
@@ -1257,6 +1239,12 @@ SetupPlayerNames = function()
 						if a.playerID == myID then return true end
 						if b.playerID == myID then return false end
 					end
+					if not a.elo then
+						return false
+					end
+					if not b.elo then
+						return true
+					end
 					return a.elo > b.elo
 				end
 			)
@@ -1270,27 +1258,44 @@ SetupPlayerNames = function()
 	for i=1,#allyTeamsSorted do  -- for every ally team
 		local allyTeamID = allyTeamsSorted[i]
 		if allyTeams[allyTeamID] then
-			table.sort (allyTeams[allyTeamID], function(a,b)
+			table.sort(allyTeams[allyTeamID], 
+				function(a,b)
 					if not teams[a] or not teams[b] then
-					  Spring.Echo('<ChiliDeluxePlayerlist> Critical Error #1!')
-					  return a > b
+						Spring.Echo('<ChiliDeluxePlayerlist> Critical Error #1!')
+						return a > b
 					else
-					  if (teams[a].isDead or not teams[a].isPlaying) and not (teams[b].isDead or not teams[b].isPlaying) then return false end
-					  if (teams[b].isDead or not teams[b].isPlaying) and not (teams[a].isDead or not teams[a].isPlaying) then return true end
-					  if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
-						  if teams[a].roster[1].isActive and not teams[b].roster[1].isActive then return true end
-						  if teams[b].roster[1].isActive and not teams[a].roster[1].isActive then return false end
-					  end
-					  if localTeam ~= 0 or teamZeroPlayers[myID] then
-						  if a == localTeam then return true end
-						  if b == localTeam then return false end
-					  end
-					  if teams[a].roster[1].elo and teams[b].roster[1].elo then
-						  return teams[a].roster[1].elo > teams[b].roster[1].elo
-					  end
-					  return a > b
+						if (teams[a].isDead or not teams[a].isPlaying) and not (teams[b].isDead or not teams[b].isPlaying) then
+							return false
+						end
+						if (teams[b].isDead or not teams[b].isPlaying) and not (teams[a].isDead or not teams[a].isPlaying) then
+							return true
+						end
+						if (teams[a].isDead or not teams[a].isPlaying) and (teams[b].isDead or not teams[b].isPlaying) then
+							local aActive = teams[a].roster and teams[a].roster[1] and teams[a].roster[1].isActive
+							local bActive = teams[b].roster and teams[b].roster[1] and teams[b].roster[1].isActive
+							if aActive and not bActive then
+								return true
+							end
+							if bActive and not aActive then
+								return false
+							end
+						end
+					if localTeam ~= 0 or teamZeroPlayers[myID] then
+						if a == localTeam then
+							return true
+						end
+						if b == localTeam then return
+							false
+						end
 					end
+					local aElo = teams[a].roster and teams[a].roster[1] and teams[a].roster[1].elo
+					local bElo = teams[b].roster and teams[b].roster[1] and teams[b].roster[1].elo
+					if aElo and bElo then
+						return aElo > bElo
+					end
+					return a > b
 				end
+			end
 			)
 		end
 	end
@@ -1438,7 +1443,7 @@ SetupScrollPanel = function ()
 	local scpl = {
 		parent = window_cpl,
 		--width = "100%",
-		--height = "100%",
+		height = "100%",
 		backgroundColor  = {1,1,1,options.backgroundOpacity.value},
 		borderColor = {1,1,1,options.backgroundOpacity.value},
 		padding = {0, 0, 0, 0},
@@ -1519,7 +1524,6 @@ SetupPanels = function ()
 		minimizable = false,
 		minWidth = x_windowbound,
 	}
-
 	SetupScrollPanel()
 
 	ToggleVisibility()

@@ -1,5 +1,5 @@
 --[[ Handles Lists of Units
- * Create as a list of unit with some functions.
+ * Create as a list of unit with some local functions.
  * Can get total unit cost, a random unit, units in area etc..
  * Elements can have custom data.
  
@@ -8,14 +8,14 @@
  regarding LOS. A non-cheating AI would always create a unit list with its
  allyTeamID to ensure that the UnitList does not cheat.
  
-=== Functions === 
+=== local functions === 
 
  == GetUnitPosition(unitID) -> {x, y, z} or false
  Returns the position of the unitID obeying LOS and radar.
  
  == GetNearestUnit(x, z, condition) -> unitID
  Returns the nearest unit in the list which satisfies the condition.
- The condition is a function of the form
+ The condition is a local function of the form
 	condition(unitID, x, z, customData, cost).
  
  == HasUnitMoved(unitID, range) -> boolean
@@ -30,7 +30,7 @@
  == OverwriteUnitData(unitID, newData)
  == GetUnitData(unitID) -> table
  == SetUnitDataValue(unitID, key, value)
- Functions which get and set the custom data attachable to units in the list.
+ local functions which get and set the custom data attachable to units in the list.
  
  
  == AddUnit(unitID, static, cost, newData)
@@ -97,15 +97,15 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	local unitCount = 0
 	local totalCost = 0
 	
-	-- Indiviual Unit Position Functions
-	function GetUnitPosition(unitID)
+	-- Indiviual Unit Position local functions
+	local function GetUnitPosition(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			return InternalGetUnitPosition(unitList[index], losCheckAllyTeamID)
 		end
 	end
 	
-	function HasUnitMoved(unitID, range)
+	local function HasUnitMoved(unitID, range)
 		if not unitMap[unitID] then
 			return false
 		end
@@ -132,7 +132,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	end
 	
 	-- Position checks over all units in the list
-	function GetNearestUnit(x,z,condition)
+	local function GetNearestUnit(x,z,condition)
 		local minDisSq = false
 		local closeID = false
 		local closeX = false
@@ -153,7 +153,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		return closeID, closeX, closeZ
 	end
 	
-	function IsPositionNearUnit(x, z, radius, condition)
+	local function IsPositionNearUnit(x, z, radius, condition)
 		local radiusSq = radius^2
 		for i = 1, unitCount do
 			local data = unitList[i]
@@ -169,14 +169,14 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	end
 	
 	-- Unit cust data handling
-	function OverwriteUnitData(unitID, newData)
+	local function OverwriteUnitData(unitID, newData)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			unitList[index].customData = newData
 		end
 	end
 	
-	function GetUnitData(unitID)
+	local function GetUnitData(unitID)
 		-- returns a table but don't edit it!
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
@@ -184,7 +184,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		end
 	end
 	
-	function SetUnitDataValue(unitID, key, value)
+	local function SetUnitDataValue(unitID, key, value)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			if not unitList[index].customData then
@@ -195,7 +195,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 	end
 	
 	-- Unit addition and removal handling
-	function AddUnit(unitID, static, cost, newData)
+	local function AddUnit(unitID, static, cost, newData)
 		if unitMap[unitID] then
 			if newData then 
 				OverwriteUnitData(unitID, newData)
@@ -218,7 +218,7 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		return true
 	end
 	
-	function RemoveUnit(unitID)
+	local function RemoveUnit(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			
@@ -237,24 +237,24 @@ function UnitListHandler.CreateUnitList(losCheckAllyTeamID)
 		return false
 	end
 	
-	function ValidUnitID(unitID)
+	local function ValidUnitID(unitID)
 		return (unitMap[unitID] and true) or false
 	end
 	
 	-- Cost Handling
-	function GetUnitCost(unitID)
+	local function GetUnitCost(unitID)
 		if unitMap[unitID] then
 			local index = unitMap[unitID]
 			return unitList[index].cost
 		end
 	end
 	
-	function GetTotalCost()
+	local function GetTotalCost()
 		return totalCost
 	end
 	
 	-- To use Iterator, write "for unitID, data in unitList.Iterator() do"
-	function Iterator()
+	local function Iterator()
 		local i = 0
 		return function ()
 			i = i + 1

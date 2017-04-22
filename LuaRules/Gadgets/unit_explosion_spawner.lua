@@ -7,7 +7,7 @@ function gadget:GetInfo()
 		date = "2007-11-18",
 		license = "None",
 		layer = 50,
-		enabled = true
+		enabled = Spring.Utilities.IsCurrentVersionNewerThan(100, 0)
 	}
 end
 
@@ -37,8 +37,8 @@ function gadget:Initialize()
 		end
 	end
 	for name, v in pairs(shieldCollide_names) do
-		if UnitDefNames[name] then
-			local id = UnitDefNames[name].id
+		if WeaponDefNames[name] then
+			local id = WeaponDefNames[name].id
 			shieldCollide_id[id] = v
 		end
 	end
@@ -48,22 +48,26 @@ function gadget:Explosion_GetWantedWeaponDef()
 	return wantedList
 end
 
-function gadget:Explosion(w, x, y, z, owner)
-	if spawn_defs_id[w] and (owner or (spawn_defs_id[w].feature and Spring.Utilities.IsValidPosition(x, z))) then
-		if (not owner) or (not noCreate[owner]) then
-			--if not Spring.GetGroundBlocked(x,z) then
-			if (not owner) or UseUnitResource(owner, "m", spawn_defs_id[w].cost) then
+function gadget:Explosion(weaponID, px, py, pz, ownerID, proID)
+	local weapDefID=Spring.GetProjectileDefID(proID)
+	local teamID=Spring.GetProjectileTeamID(proID)
+	if spawn_defs_id[weapDefID] then
+		if not noCreate[proID] then
+			local x,y,z=Spring.GetProjectilePosition(proID)
+			local spawnDef=spawn_defs_id[weapDefID]
+			if (spawnDef.feature and Spring.Utilities.IsValidPosition(x, z)) or 
+					Spring.UseTeamResource(teamID, "m", spawnDef.cost) then -- Should it be UseUnitResource? But what gonna happen if projection owner is dead?
 				createList[#createList+1] = {
-					name = spawn_defs_id[w].name,
-					owner = owner, 
+					name = spawnDef.name,
+					team = teamID, 
 					x = x,y = y,z = z, 
-					expire=spawn_defs_id[w].expire, 
-					feature = spawn_defs_id[w].feature
+					expire = spawnDef.expire, 
+					feature = spawnDef.feature
 				}
 				return false
 			end
 		else
-			noCreate[owner] = nil
+			noCreate[proID] = nil
 			return false
 		end
 	end
@@ -73,17 +77,16 @@ end
 -- in event of shield impact, gets data about both units and passes it to UnitPreDamaged
 function gadget:ShieldPreDamaged(proID, proOwnerID, shieldEmitterWeaponNum, shieldCarrierUnitID, bounceProjectile)
 	
-	if proOwnerID and shieldCarrierUnitID and Spring.ValidUnitID(proOwnerID) 
-			and Spring.ValidUnitID(shieldCarrierUnitID) then
-		local udid = Spring.GetUnitDefID(proOwnerID)
-		if udid and shieldCollide_id[udid] then
+	if shieldCarrierUnitID and Spring.ValidUnitID(shieldCarrierUnitID) then
+		local proDefID = Spring.GetProjectileDefID(proID)
+		if proDefID and shieldCollide_id[proDefID] then
 			local shieldOn,shieldCharge = Spring.GetUnitShieldState(shieldCarrierUnitID)
-			local damage = shieldCollide_id[udid].damage
+			local damage = shieldCollide_id[proDefID].damage
 			if shieldCharge < damage then
 				return true
 			end
 			--Spring.SetUnitShieldState(shieldCarrierUnitID, -1, shieldCharge - shieldCollide_id[udid].gadgetDamage)
-			noCreate[proOwnerID] = true
+			noCreate[proID] = true
 		end
 	end
 	return false
@@ -99,12 +102,12 @@ end
 function gadget:GameFrame(f)
 	for i,c in pairs(createList) do
 		if c.feature then
-            local featureID = Spring.CreateFeature(c.name , c.x, c.y, c.z, 0, c.owner and Spring.GetUnitTeam(c.owner))
+            local featureID = Spring.CreateFeature(c.name , c.x, c.y, c.z, 0, c.team)
 			local dir = Spring.Utilities.Vector.PolarToCart(1, 2*math.pi*math.random())
 			Spring.SetFeatureDirection(featureID, dir[1], 0 , dir[2])
         else
-            local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, Spring.GetUnitTeam(c.owner))
-			Spring.SetUnitRulesParam(unitID, "parent_unit_id", c.owner)
+            local unitID = Spring.CreateUnit(c.name , c.x, c.y, c.z, 0, c.team)
+			-- Spring.SetUnitRulesParam(unitID, "parent_unit_id", c.owner)
             if (c.expire > 0) and unitID then 
                 expireList[unitID] = f + c.expire * 32
             end
@@ -112,11 +115,11 @@ function gadget:GameFrame(f)
 		createList[i]=nil
 	end
   if ((f+6)%64<0.1) then 
-    for i, e in pairs(expireList) do
-      if (f > e) then
-        Spring.DestroyUnit(i, true)
-      end
-    end
+	for i, e in pairs(expireList) do
+	  if (f > e) then
+		Spring.DestroyUnit(i, true)
+	  end
+	end
   end
 end
 

@@ -13,7 +13,7 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-Spring.Echo("Loacing FeatureDefs_posts")
+Spring.Echo("Loading FeatureDefs_posts")
 
 local function isbool(x)   return (type(x) == 'boolean') end
 local function istable(x)  return (type(x) == 'table')   end
@@ -109,6 +109,9 @@ end
 --  Per-unitDef featureDefs
 --
 
+local DEAD_MULT = 0.4
+local HEAP_MULT = 0.2
+
 local function ProcessUnitDef(udName, ud)
 
   local fds = ud.featuredefs
@@ -121,8 +124,24 @@ local function ProcessUnitDef(udName, ud)
     if (isstring(fdName) and istable(fd)) then
       local fullName = udName .. '_' .. fdName
       FeatureDefs[fullName] = fd
-	  fd.customparams = fd.customparams or {}
-	  fd.customparams.fromunit = "1"
+
+      if fd.featuredead then -- it's a DEAD feature
+        if not fd.metal then fd.metal = ud.buildcostmetal * DEAD_MULT end
+        if not fd.description then fd.description = "Wreckage - "..ud.name end
+      else --it's a HEAP feature
+        if not fd.metal then fd.metal = ud.buildcostmetal * HEAP_MULT end
+        if not fd.description then fd.description = "Debris - "..ud.name end
+      end
+      
+      fd.footprintx = fd.footprintx or ud.footprintx
+      fd.footprintz = fd.footprintz or ud.footprintz
+
+      fd.customparams = fd.customparams or {}
+      fd.customparams.fromunit = "1"
+      fd.damage = fd.customparams.health_override or ud.maxdamage
+      fd.energy = 0
+      fd.reclaimable = true
+      fd.reclaimtime = fd.metal
       fd.filename = ud.filename
     end
   end
@@ -174,6 +193,10 @@ end
 for name, def in pairs(FeatureDefs) do
 	if def.resurrectable ~= 1 then
 		def.resurrectable = 0
+	end
+	if not def.metal or def.metal == 0 then
+		def.metal = 0.001 -- engine deprioritises things with 0m in force-reclaim mode
+		def.autoreclaimable = false
 	end
 end
  

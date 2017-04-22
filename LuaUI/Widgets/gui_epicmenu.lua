@@ -1,7 +1,7 @@
 function widget:GetInfo()
   return {
     name      = "EPIC Menu",
-    desc      = "v1.438 Extremely Powerful Ingame Chili Menu.",
+    desc      = "v1.439 Extremely Powerful Ingame Chili Menu.",
     author    = "CarRepairer",
     date      = "2009-06-02", --2014-05-3
     license   = "GNU GPL, v2 or later",
@@ -40,22 +40,23 @@ local echo = Spring.Echo
 local isMission = Game.modDesc:find("Mission Mutator")
 
 -- Config file data
-local keybind_file, defaultkeybinds, defaultkeybind_date, confdata
+local keybind_dir, keybind_file, defaultkeybinds, defaultkeybind_date, confdata
 do
 	--load config file:
 	local file = LUAUI_DIRNAME .. "Configs/epicmenu_conf.lua"
 	confdata = VFS.Include(file, nil, VFS.RAW_FIRST)
 	--assign keybind file:
-	keybind_file = LUAUI_DIRNAME .. 'Configs/' .. Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
+	keybind_dir = LUAUI_DIRNAME .. 'Configs/'
+	keybind_file = Game.modShortName:lower() .. '_keys.lua' --example: zk_keys.lua
 	if isMission then
 		--FIXME: find modname instead of using hardcoded mission_keybinds_file name
-		keybind_file = (confdata.mission_keybinds_file and LUAUI_DIRNAME .. 'Configs/' .. confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
+		keybind_file = (confdata.mission_keybinds_file and confdata.mission_keybinds_file) or keybind_file --example: singleplayer_keys.lua
 	end
 	--check for validity, backup or delete
-	CheckLUAFileAndBackup(keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
+	CheckLUAFileAndBackup(keybind_dir .. keybind_file,'') --this utility create backup file in user's Spring folder OR delete them if they are not LUA content (such as corrupted or wrong syntax). included in "utility_two.lua"
 	--load default keybinds:
 	--FIXME: make it automatically use same name for mission, multiplayer, and default keybinding file
-	local default_keybind_file = LUAUI_DIRNAME .. 'Configs/' .. confdata.default_source_file
+	local default_keybind_file = keybind_dir .. confdata.default_source_file
 	local file_return = VFS.FileExists(default_keybind_file, VFS.ZIP) and VFS.Include(default_keybind_file, nil, VFS.ZIP) or {keybinds={},date=0}
 	defaultkeybinds = file_return.keybinds
 	defaultkeybind_date = file_return.date
@@ -66,10 +67,11 @@ local title_text = confdata.title
 local title_image = confdata.title_image
 local subMenuIcons = confdata.subMenuIcons  
 local useUiKeys = false
+local lastSaveGameFrame
 
 --file_return = nil
 
-local custom_cmd_actions = select(9, include("Configs/integral_menu_commands.lua"))
+local custom_cmd_actions = include("Configs/customCmdTypes.lua")
 
 
 --------------------------------------------------------------------------------
@@ -95,7 +97,9 @@ local screen0
 
 --------------------------------------------------------------------------------
 -- Global chili controls
-local window_crude 
+local window_crude
+local panel_crude
+local panel_background
 local window_exit
 local window_exit_confirm
 local window_flags
@@ -110,6 +114,7 @@ local explodeSearchTerm = {text="", terms={}} -- store exploded "filterUserInser
 --------------------------------------------------------------------------------
 -- Misc
 local B_HEIGHT = 26
+local B_HEIGHT_MAIN = 26
 local B_WIDTH_TOMAINMENU = 80
 local C_HEIGHT = 16
 
@@ -125,6 +130,24 @@ local pathoptions = {}
 local actionToOption = {}
 
 local exitWindowVisible = false
+
+local br = '\n'
+local showTidal = false
+if not confdata.description then confdata.description = '' end
+local gameInfoText = ''
+	..Game.modName ..br..br
+	..'Spring Engine version: '..Spring.Utilities.GetEngineVersion()..br..br	
+	..'Map: ' ..Game.mapName ..br
+		
+	..'    Size: '..Game.mapX..' x '..Game.mapY..br        
+	..'    Gravity: '..math.round(Game.gravity)..br
+	.. (showTidal and ('    Tidal Power: '..Game.tidal..br) or '')
+	..'    Water Damage: '..Game.waterDamage..br
+	..'    '.. Game.mapDescription..br
+	..br..br
+	..confdata.description 
+	
+
 --------------------------------------------------------------------------------
 -- Key bindings
 -- KEY BINDINGS AND YOU:
@@ -299,8 +322,7 @@ local function tableremove(table1, item)
 end
 
 -- function GetTimeString() taken from trepan's clock widget
-local function GetTimeString()
-  local secs = math.floor(Spring.GetGameSeconds())
+local function GetTimeString(secs)
   if (timeSecs ~= secs) then
     timeSecs = secs
     local h = math.floor(secs / 3600)
@@ -393,13 +415,13 @@ end
 local function SaveKeybinds()
 	local keybindfile_table = { keybinds = keybounditems, date=keybind_date } 
 	--table.save( keybindfile_table, keybind_file )
-	WG.SaveTable(keybindfile_table, keybind_file, nil, {concise = true, prefixReturn = true, endOfFile = true})
+	WG.SaveTable(keybindfile_table, keybind_dir, keybind_file, nil, {concise = true, prefixReturn = true, endOfFile = true})
 end
 
 local function LoadKeybinds()
 	local loaded = false
-	if VFS.FileExists(keybind_file, VFS.RAW) then
-		local file_return = VFS.Include(keybind_file, nil, VFS.RAW)
+	if VFS.FileExists(keybind_dir .. keybind_file, VFS.RAW) then
+		local file_return = VFS.Include(keybind_dir .. keybind_file, nil, VFS.RAW)
 		if file_return then
 			keybounditems, keybind_date = file_return.keybinds, file_return.date
 			if keybounditems and keybind_date then
@@ -473,8 +495,17 @@ local function RemoveAction(cmd, types)
 	return widgetHandler.actionHandler:RemoveAction(widget, cmd, types)
 end
 
-
+local sentBug = false
 local function GetFullKey(path, option)
+	if not option.key then
+		if not sentBug then
+			Spring.Echo("Error, option missing key", path, option)
+			Spring.Utilities.TableEcho(option, "option")
+			Spring.Echo("Error, option missing key", path, option)
+			sentBug = true
+		end
+		return "badKey"
+	end
 	--local curkey = path .. '_' .. option.key
 	local fullkey = ('epic_'.. option.wname .. '_' .. option.key)
 	fullkey = fullkey:gsub(' ', '_')
@@ -539,6 +570,9 @@ local function KillSubWindow(makingNew)
 	if window_sub_cur then
 		settings.sub_pos_x = window_sub_cur.x
 		settings.sub_pos_y = window_sub_cur.y
+		
+		settings.subwindow_height = window_sub_cur.height
+		
 		window_sub_cur:Dispose()
 		window_sub_cur = nil
 		curPath = ''
@@ -615,8 +649,9 @@ local function MakeFlags()
 		country = myCountry, 
 		countryLang = country_langs[myCountry] or 'en',
 		width='50%',
-		textColor = color.sub_button_fg,
-		backgroundColor = color.sub_button_bg, 
+		--classname = "submenu_navigation_button",
+		--textColor = color.sub_button_fg,
+		--backgroundColor = color.sub_button_bg, 
 		OnClick = { SetCountry }  
 	}
 	
@@ -630,8 +665,9 @@ local function MakeFlags()
 		flagChildren[#flagChildren + 1] = Button:New{ caption = country:upper(),
 			name = 'countryButton' .. country;
 			width='50%',
-			textColor = color.sub_button_fg,
-			backgroundColor = color.sub_button_bg,
+			--classname = "submenu_navigation_button",
+			--textColor = color.sub_button_fg,
+			--backgroundColor = color.sub_button_bg,
 			country = country,
 			countryLang = countryLang,
 			OnClick = { SetCountry } 
@@ -645,13 +681,14 @@ local function MakeFlags()
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small_tall",
 		maxWidth = 200,
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		children = {
 			ScrollPanel:New{
-				x=0,y=15,
-				right=5,bottom=0+B_HEIGHT,
+				x=5,y=15,
+				right=5,bottom=3+B_HEIGHT,
 				
 				children = {
 					Grid:New{
@@ -664,11 +701,13 @@ local function MakeFlags()
 				}
 			},
 			--close button
-			Button:New{ caption = 'Close',  x=10, y=0-B_HEIGHT, bottom=5, right=5,
+			Button:New{ caption = 'Close',  x=5, y=0-B_HEIGHT, bottom=5, right=5,
 				name = 'makeFlagCloseButton';
 				OnClick = { function(self) window_flags:Dispose(); window_flags = nil; end },  
-				width=window_width-20, backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
-				},
+				width=window_width-20, 
+				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg,
+				--classname = "navigation_button",
+			},
 		}
 	}
 end
@@ -684,22 +723,27 @@ local function MakeHelp(caption, text)
 		y = settings.sub_pos_y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small",
 		parent = screen0,
 		backgroundColor = color.sub_bg,
 		children = {
 			ScrollPanel:New{
-				x=0,y=15,
+				x=5,y=15,
 				right=5,
-				bottom=B_HEIGHT,
+				bottom=B_HEIGHT + 3,
 				height = window_height - B_HEIGHT*3 ,
 				children = {
 					TextBox:New{ x=0,y=10, text = text, textColor = color.sub_fg, width  = window_width - 40, }
 				}
 			},
 			--Close button
-			Button:New{ caption = 'Close', OnClick = { function(self) self.parent:Dispose() end }, x=10, bottom=1, right=50, height=B_HEIGHT,
-			name = 'makeHelpCloseButton';
-			backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, },
+			Button:New{ 
+				caption = 'Close', OnClick = { function(self) self.parent:Dispose() end }, 
+				x=45, bottom=1, right=45, height=B_HEIGHT,
+				name = 'makeHelpCloseButton';
+				--backgroundColor = color.sub_close_bg, textColor = color.sub_close_fg, 
+				--classname = "navigation_button",
+			},
 		}
 	}
 end
@@ -787,7 +831,7 @@ local function AssignKeyBindAction(hotkey, actionName, verbose)
 		local isUnitInstantCommand
 		
 		if custom_cmd_actions[actionName] then
-			local number = custom_cmd_actions[actionName]
+			local number = custom_cmd_actions[actionName].cmdType
 			isUnitCommand = number == 1
 			isUnitStateCommand = number == 2
 			isUnitInstantCommand = number == 3
@@ -846,7 +890,9 @@ local function CreateOptionAction(path, option)
 		end
 	end
 	local actionName = GetActionName(path, option)
-	AddAction(actionName, kbfunc, nil, "t")
+	if (not option.dontRegisterAction) then
+		AddAction(actionName, kbfunc, nil, "t")
+	end
 	actionToOption[actionName] = option
 	
 	if option.hotkey then
@@ -1092,7 +1138,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 	
 	--Keybindings
 	if (option.type == 'button' and not option.isDirectoryButton) or option.type == 'bool' then
-		if (not option.dontRegisterAction) then
 		local actionName = GetActionName(path, option)
 		
 		--migrate from old logic, make sure this is done before setting orig_key
@@ -1107,7 +1152,6 @@ local function AddOption(path, option, wname ) --Note: this is used when loading
 		end
 		
 		CreateOptionAction(path, option)
-		end
 	--Keybinds for radiobuttons
 	elseif option.type == 'radioButton' then --if its a list of checkboxes:
 		for i=1, #option.items do --prepare keybinds for each of radioButton's checkbox
@@ -1350,6 +1394,7 @@ local function MakeKeybindWindow( path, option, hotkey )
 		caption = 'Set a HotKey',
 		x = (scrW-window_width)/2,  
 		y = (scrH-window_height)/2,  
+		classname = "main_window_small_flat",
 		clientWidth  = window_width,
 		clientHeight = window_height,
 		parent = screen0,
@@ -1357,8 +1402,8 @@ local function MakeKeybindWindow( path, option, hotkey )
 		resizable=false,
 		draggable=false,
 		children = {
-			Label:New{ y=10, caption = 'Press a key combo', textColor = color.sub_fg, },
-			Label:New{ y=30, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg, },
+			Label:New{x = 8, y=20, caption = 'Press a key combo', textColor = color.sub_fg, },
+			Label:New{x = 8, y=38, caption = '(Hit "Escape" to clear keybinding)', textColor = color.sub_fg, },
 		}
 	}
 end
@@ -1426,8 +1471,9 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 			width = hklength,
 			caption = hotkeystring, 
 			OnClick = { kbfunc },
-			backgroundColor = color.sub_button_bg,
-			textColor = color.sub_button_fg, 
+			--classname = "submenu_navigation_button",
+			--backgroundColor = color.sub_button_bg,
+			--textColor = color.sub_button_fg, 
 			tooltip = 'Hotkey: ' .. hotkeystring,
 		}
 		
@@ -1455,11 +1501,11 @@ local function MakeHotkeyedControl(control, path, option, icon, noHotkey)
 	}
 end
 
+local unresetableSettings = {button = true, label = true, menu = true}
 local function ResetWinSettings(path)
 	for _,elem in ipairs(pathoptions[path]) do
 		local option = elem[2]
-		
-		if not ({button=1, label=1, menu=1})[option.type] then
+		if not (unresetableSettings[option.type] or option.developmentOnly) then
 			if option.default ~= nil then --fixme : need default
 				if option.type == 'bool' or option.type == 'number' then
 					option.value = option.valuelist and GetIndex(option.valuelist, option.default) or option.default
@@ -1493,7 +1539,7 @@ end
 local function SearchElement(termToSearch,path)
 	local filtered_pathOptions = {}
 	local tree_children = {} --used for displaying buttons
-	local maximumResult = 23 --maximum result to display. Any more it will just say "too many"
+	local maximumResult = 50 --maximum result to display. Any more it will just say "too many"
 	
 	local DiggDeeper = function() end --must declare itself first before callin self within self
 	DiggDeeper = function(currentPath)
@@ -1515,7 +1561,7 @@ local function SearchElement(termToSearch,path)
 				if option.desc and option.desc:find(currentPath) and option.name:find("...") then --this type of button is defined in AddOption(path,option,wname) (a link into submenu)
 					local menupath = option.desc
 					if pathoptions[menupath] then
-						if #pathoptions[menupath] >= 1 then
+						if #pathoptions[menupath] >= 1 and menupath ~= "" then
 							DiggDeeper(menupath) --travel into & search into this branch
 						else --dead end
 							hide = true
@@ -1693,14 +1739,17 @@ MakeSubWindow = function(path, pause)
 				local escapeSearch = searchedElement and option.desc and option.desc:find(currentPath) and option.isDirectoryButton --this type of button will open sub-level when pressed (defined in "AddOption(path, option, wname )")
 				local disabled = option.DisableFunc and option.DisableFunc()
 				local icon = option.icon
+				local button_height = root and 36 or 30
 				local button = Button:New{
 					name = option.wname .. " " .. option.name;
 					x=0,
-					minHeight = root and 36 or 30,
-					caption = option.name, 
+					minHeight = button_height,
+					--caption = option.name, 
+					caption = '', 
 					OnClick = escapeSearch and {function() filterUserInsertedTerm = ''; end,option.OnChange} or {option.OnChange},
-					backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
-					textColor = disabled and color.disabled_fg or color.sub_button_fg, 
+					--backgroundColor = disabled and color.disabled_bg or {1, 1, 1, 1},
+					--textColor = disabled and color.disabled_fg or color.sub_button_fg, 
+					classname = (disabled and "button_disabled"),
 					tooltip = option.desc,
 					
 					padding={2,2,2,2},
@@ -1710,7 +1759,10 @@ MakeSubWindow = function(path, pause)
 					local width = root and 24 or 16
 					Image:New{ file= icon, width = width, height = width, parent = button, x=4,y=4,  }
 				end
-				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton )
+				
+				Label:New{ parent = button, x=35,y=button_height*0.2,  caption=option.name}
+				
+				tree_children[#tree_children+1] = MakeHotkeyedControl(button, path, option,nil,option.isDirectoryButton or option.noHotkey)
 			end
 			
 		elseif option.type == 'label' then	
@@ -1724,8 +1776,9 @@ MakeSubWindow = function(path, pause)
 					minHeight = 30,
 					caption = option.name, 
 					OnClick = { function() MakeHelp(option.name, option.value) end },
-					backgroundColor = color.sub_button_bg,
-					textColor = color.sub_button_fg, 
+					--classname = "submenu_navigation_button",
+					--backgroundColor = color.sub_button_bg,
+					--textColor = color.sub_button_fg, 
 					tooltip=option.desc
 				}
 			
@@ -1740,7 +1793,8 @@ MakeSubWindow = function(path, pause)
 				textColor = color.sub_fg, 
 				tooltip   = option.desc,
 			}
-			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option)
+			option.epic_reference = chbox
+			tree_children[#tree_children+1] = MakeHotkeyedControl(chbox,  path, option, icon, option.noHotkey)
 			
 		elseif option.type == 'number' then	
 			settings_height = settings_height + B_HEIGHT
@@ -1789,8 +1843,9 @@ MakeSubWindow = function(path, pause)
 						width = "100%",
 						caption = item.name, 
 						OnClick = { function(self) option.OnChange(item) end },
-						backgroundColor = color.sub_button_bg,
-						textColor = color.sub_button_fg, 
+						--classname = "submenu_navigation_button",
+						--backgroundColor = color.sub_button_bg,
+						--textColor = color.sub_button_fg, 
 						tooltip=item.desc,
 					}
 			end
@@ -1815,7 +1870,7 @@ MakeSubWindow = function(path, pause)
 					tooltip = item.desc, --tooltip
 				}
 				local icon = option.items[i].icon
-				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon)
+				tree_children[#tree_children+1] = MakeHotkeyedControl( cb, path, item, icon, option.noHotkey)
 					
 			end
 			tree_children[#tree_children+1] = Label:New{ caption = '', }
@@ -1844,9 +1899,9 @@ MakeSubWindow = function(path, pause)
 	local window_children = {}
 	window_children[#window_children+1] =
 		ScrollPanel:New{
-			x=0,y=15,
-			bottom=B_HEIGHT+20,
-			width = '100%',
+			x=5,y=15,
+			bottom=B_HEIGHT+26,
+			right = 5,
 			children = {
 				StackPanel:New{
 					x=0,
@@ -1869,8 +1924,8 @@ MakeSubWindow = function(path, pause)
 	window_height = window_height + B_HEIGHT
 	
 	local buttonBar = Grid:New{
-		x=0;bottom=0;
-		right=10,height=B_HEIGHT,
+		x=5;bottom=5;
+		right=5,height=B_HEIGHT,
 		columns = 4,
 		padding = {0, 0, 0, 0},
 		itemMargin = {0, 0, 0, 0}, --{1, 1, 1, 1},
@@ -1883,7 +1938,7 @@ MakeSubWindow = function(path, pause)
 		--x=0,
 		width=180;
 		right = 5,
-		bottom=B_HEIGHT;
+		bottom=B_HEIGHT + 5;
 		
 		caption = 'Show Advanced Settings', 
 		checked = settings.showAdvanced, 
@@ -1900,7 +1955,9 @@ MakeSubWindow = function(path, pause)
 	--back button
 	if parent_path then
 		Button:New{ name= 'backButton', caption = '', OnClick = { KillSubWindow, function() filterUserInsertedTerm = ''; MakeSubWindow(parent_path, false) end,  }, 
-			backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, height=B_HEIGHT,
+			--backgroundColor = color.sub_back_bg,textColor = color.sub_back_fg, 
+			--classname = "back_button",
+			height=B_HEIGHT,
 			padding= {2,2,2,2},
 			parent = buttonBar;
 			children = {
@@ -1913,7 +1970,9 @@ MakeSubWindow = function(path, pause)
 	--search button
 	Button:New{ name= 'searchButton', caption = '',
 		OnClick = { function() spSendCommands("chat","PasteText /search:" ) end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, 
+		--classname = "navigation_button",
+		height=B_HEIGHT,
 		padding= {2,2,2,2},parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/find.png', width = 16,height = 16, parent = button, x=4,y=2,  },
@@ -1925,7 +1984,9 @@ MakeSubWindow = function(path, pause)
 		--reset button
 		Button:New{ name= 'resetButton', caption = '',
 			OnClick = { function() ResetWinSettings(path); RemakeEpicMenu(); end }, 
-			textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+			--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+			--classname = "navigation_button",
+			height=B_HEIGHT,
 			padding= {2,2,2,2}, parent = buttonBar;
 			children = {
 				Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/undo.png', width = 16,height = 16, parent = button, x=4,y=2,  },
@@ -1937,7 +1998,9 @@ MakeSubWindow = function(path, pause)
 	--close button
 	Button:New{ name= 'menuCloseButton', caption = '',
 		OnClick = { function() KillSubWindow(); filterUserInsertedTerm = '';  end }, 
-		textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg, height=B_HEIGHT,
+		--textColor = color.sub_close_fg, backgroundColor = color.sub_close_bg,
+		--classname = "navigation_button",
+		height=B_HEIGHT,
 		padding= {2,2,2,2}, parent = buttonBar;
 		children = {
 			Image:New{ file= LUAUI_DIRNAME  .. 'images/epicmenu/close.png', width = 16,height = 16, parent = button, x=4,y=2,  },
@@ -1950,9 +2013,11 @@ MakeSubWindow = function(path, pause)
 	window_sub_cur = Window:New{  
 		caption= (searchedElement and "Searching in: \"" .. path .. "...\"") or ((not root) and (path) or "MAIN MENU"),
 		x = settings.sub_pos_x,  
-		y = settings.sub_pos_y, 
+		y = math.floor(settings.sub_pos_y), 
 		clientWidth = window_width,
-		clientHeight = window_height+B_HEIGHT*4,
+		classname = "main_window_tall",
+		--clientHeight = window_height+B_HEIGHT*4,
+		height = math.floor(settings.subwindow_height),
 		minWidth = 250,
 		minHeight = 350,		
 		--resizable = false,
@@ -2016,23 +2081,23 @@ local function DisposeExitConfirmWindow()
 end
 
 local function LeaveExitConfirmWindow()
-	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
-	ShowHideCrudeMenu(true)
+	KillSubWindow()
 end
 
-local function MakeExitConfirmWindow(text, action)
+local function MakeExitConfirmWindow(text, action, height)
 	local screen_width,screen_height = Spring.GetWindowGeometry()
 	local menu_width = 320
-	local menu_height = 64
+	local menu_height = height or 64
 
 	LeaveExitConfirmWindow()
 	
 	window_exit_confirm = Window:New{
 		name='exitwindow_confirm',
 		parent = screen0,
-		x = screen_width/2 - menu_width/2,  
-		y = screen_height/2 - menu_height/2,  
+		x = math.floor(screen_width/2 - menu_width/2),  
+		y = math.floor(screen_height/2 - menu_height/2),  
+		classname = "main_window_small_flat",
 		dockable = false,
 		clientWidth = menu_width,
 		clientHeight = menu_height,
@@ -2079,44 +2144,346 @@ local function MakeExitConfirmWindow(text, action)
 		bottom = 4,
 	}
 end
+WG.crude.MakeExitConfirmWindow = MakeExitConfirmWindow
 
-local function MakeMenuBar()
-	local btn_padding = {4,3,2,2}
-	local btn_margin = {0,0,0,0}
-	local exit_menu_width = 210
-	local exit_menu_height = 280
-	local exit_menu_btn_width = 7*exit_menu_width/8
-	local exit_menu_btn_height = max(exit_menu_height/8, 30)
-	local exit_menu_cancel_width = exit_menu_btn_width/2
-	local exit_menu_cancel_height = 2*exit_menu_btn_height/3
-
-	local crude_width = 400
-	local crude_height = B_HEIGHT+10
+local oldWidth, oldHeight
+local function GetMainPanel(parent, width, height)
+	if oldWidth == width and oldHeight == height then
+		return false
+	end
+	oldWidth = width
+	oldHeight = height
 	
-
-	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
-	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
-	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
-	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16,height = 11, OnClick = { MakeFlags }, margin={4,4,4,6}  }
+	local luaMenu = Spring.GetMenuName and Spring.SendLuaMenuMsg and Spring.GetMenuName()
+	if luaMenu then
+		Spring.SendLuaMenuMsg("disableLobbyButton")
+	end	
 	
-	local screen_width,screen_height = Spring.GetWindowGeometry()
+	local stackChildren = {}
+	local holderWidth = 6
+	local sliderWidth = 100
+	if width < 372 then
+		sliderWidth = width - 272
+	end
 	
-	window_crude = Window:New{
-		name='epicmenubar',
-		right = 0,  
+	if height < 45 then
+		
+		if width > 435 then
+			stackChildren[#stackChildren + 1] = StackPanel:New{
+				orientation = 'horizontal',
+				width = 62,
+				height = '100%',
+				resizeItems = false,
+				autoArrangeV = false,
+				autoArrangeH = false,
+				padding = {0,2,0,0},
+				itemMargin = {1,0,0,0},
+				children = {
+					Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 26,  },
+					lbl_clock,
+				},
+			}
+			holderWidth = holderWidth + 64
+		end
+		
+		stackChildren[#stackChildren + 1] = StackPanel:New{
+			orientation = 'horizontal',
+			width = 74,
+			height = '100%',
+			resizeItems = false,
+			autoArrangeV = false,
+			autoArrangeH = false,
+			padding = {0,2,0,0},
+			itemMargin = {1,0,0,0},
+			children = {
+				Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 26,  },
+				lbl_gtime,
+			},
+		}
+		holderWidth = holderWidth + 76
+		
+		stackChildren[#stackChildren + 1] = Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, }
+		stackChildren[#stackChildren + 1] = Grid:New{
+			height = 24,
+			width = sliderWidth - 25,
+			columns = 1,
+			rows = 2,
+			resizeItems = false,
+			margin = {0,0,0,0},
+			padding = {0,-2,0,0},
+			itemPadding = {0,0,0,0},
+			itemMargin = {0,0,0,0},
+			
+			children = {
+				Trackbar:New{
+					tooltip = 'Volume',
+					height = 12,
+					width = sliderWidth - 25,
+					trackColor = color.main_fg,
+					value = spGetConfigInt("snd_volmaster", 50),
+					OnChange = {
+						function(self)
+							spSendCommands{"set snd_volmaster " .. self.value}
+							if WG.ttsNotify then 
+								WG.ttsNotify() 
+							end
+						end	
+					},
+				},
+				
+				Trackbar:New{
+					tooltip = 'Music',
+					height = 12,
+					width = sliderWidth - 25,
+					min = 0,
+					max = 1,
+					step = 0.01,
+					trackColor = color.main_fg,
+					value = settings.music_volume or 0.5,
+					prevValue = settings.music_volume or 0.5,
+					OnChange = { 
+						function(self)
+							if ((WG.music_start_volume or 0) > 0) then 
+								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+							else 
+								Spring.SetSoundStreamVolume(self.value) 
+							end 
+							settings.music_volume = self.value
+							WG.music_volume = self.value
+							if (self.prevValue > 0 and self.value <=0) then 
+								widgetHandler:DisableWidget("Music Player") 
+							end 
+							if (self.prevValue <=0 and self.value > 0) then
+								-- Disable first in case widget is already enabled.
+								-- This is required for it to notice the volume
+								-- change from 0 in some cases.
+								widgetHandler:DisableWidget("Music Player")
+								widgetHandler:EnableWidget("Music Player") 
+							end 
+							self.prevValue = self.value
+						end	
+					},
+				},
+			},
+		}
+		--stackChildren[#stackChildren + 1] = Trackbar:New{
+		--	tooltip = 'Volume',
+		--	height = 15,
+		--	width = sliderWidth - 25,
+		--	trackColor = color.main_fg,
+		--	value = spGetConfigInt("snd_volmaster", 50),
+		--	OnChange = {
+		--		function(self)
+		--			spSendCommands{"set snd_volmaster " .. self.value}
+		--			if WG.ttsNotify then 
+		--				WG.ttsNotify() 
+		--			end
+		--		end	
+		--	},
+		--}
+		
+		holderWidth = holderWidth + sliderWidth + 2
+	else
+		stackChildren[#stackChildren + 1] = Grid:New{
+			orientation = 'horizontal',
+			columns = 1,
+			rows = 2,
+			width = 80,
+			height = '100%',
+			--height = 40,
+			resizeItems = true,
+			autoArrangeV = true,
+			autoArrangeH = true,
+			padding = {0,0,0,0},
+			itemPadding = {0,0,0,0},
+			itemMargin = {0,0,0,0},
+			
+			children = {
+				StackPanel:New{
+					orientation = 'horizontal',
+					width = 70,
+					height = '100%',
+					resizeItems = false,
+					autoArrangeV = false,
+					autoArrangeH = false,
+					padding = {0,1,0,0},
+					itemMargin = {2,0,0,0},
+					children = {
+						Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
+						lbl_gtime,
+					},
+				},
+				StackPanel:New{
+					orientation = 'horizontal',
+					width = 80,
+					height = '100%',
+					resizeItems = false,
+					autoArrangeV = false,
+					autoArrangeH = false,
+					padding = {0,0,0,0},
+					itemMargin = {2,0,0,0},
+					children = {
+						Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
+						lbl_clock,
+					},
+				},
+			},
+		}
+		
+		holderWidth = holderWidth + 82
+		
+		stackChildren[#stackChildren + 1] = Grid:New{
+			height = '100%',
+			width = sliderWidth,
+			columns = 2,
+			rows = 2,
+			resizeItems = false,
+			margin = {0,0,0,0},
+			padding = {0,0,0,0},
+			itemPadding = {1,1,1,1},
+			itemMargin = {1,1,1,1},
+			
+			children = {
+				--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
+				Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, },
+				Trackbar:New{
+					tooltip = 'Volume',
+					height = 15,
+					width = sliderWidth - 25,
+					trackColor = color.main_fg,
+					value = spGetConfigInt("snd_volmaster", 50),
+					OnChange = {
+						function(self)
+							spSendCommands{"set snd_volmaster " .. self.value}
+							if WG.ttsNotify then 
+								WG.ttsNotify() 
+							end
+						end	
+					},
+				},
+				
+				Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
+				Trackbar:New{
+					tooltip = 'Music',
+					height = 15,
+					width = sliderWidth - 25,
+					min = 0,
+					max = 1,
+					step = 0.01,
+					trackColor = color.main_fg,
+					value = settings.music_volume or 0.5,
+					prevValue = settings.music_volume or 0.5,
+					OnChange = { 
+						function(self)
+							if ((WG.music_start_volume or 0) > 0) then 
+								Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+							else 
+								Spring.SetSoundStreamVolume(self.value) 
+							end 
+							settings.music_volume = self.value
+							WG.music_volume = self.value
+							if (self.prevValue > 0 and self.value <=0) then 
+								widgetHandler:DisableWidget("Music Player") 
+							end 
+							if (self.prevValue <=0 and self.value > 0) then
+								-- Disable first in case widget is already enabled.
+								-- This is required for it to notice the volume
+								-- change from 0 in some cases.
+								widgetHandler:DisableWidget("Music Player")
+								widgetHandler:EnableWidget("Music Player") 
+							end 
+							self.prevValue = self.value
+						end	
+					},
+				},
+			},
+		}
+		
+		holderWidth = holderWidth + sliderWidth + 2
+	end
+	
+	stackChildren[#stackChildren + 1] = img_flag
+	holderWidth = holderWidth + 26
+	
+	stackChildren[#stackChildren + 1] = Button:New{
+		name= 'subMenuButton',
+		OnClick = { function() ActionSubmenu(nil,'') end, },
+		textColor = color.game_fg,
+		height = height - 9,
+		width = B_WIDTH_TOMAINMENU + 1,
+		caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
+		padding = btn_padding,
+		margin = btn_margin,
+		tooltip = '',
+		children = {
+			--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+			--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
+		},
+	}
+	holderWidth = holderWidth + 80
+	
+	if luaMenu then
+		stackChildren[#stackChildren + 1] = Button:New{
+			name = 'lobbyButton',
+			OnClick = { function() ViewLobby() end, },
+			textColor = color.game_fg,
+			height = height - 9,
+			width = B_WIDTH_TOMAINMENU + 1,
+			caption = "Lobby (\255\0\255\0"..WG.crude.GetHotkey("viewlobby").."\008)",
+			padding = btn_padding,
+			margin = btn_margin,
+			tooltip = '',
+			children = {
+				--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
+				--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
+			},
+		}
+		holderWidth = holderWidth + 80
+	end
+	
+	-- FPS
+	--Grid:New{
+	--	orientation = 'horizontal',
+	--	columns = 1,
+	--	rows = 2,
+	--	width = 60,
+	--	height = '100%',
+	--	--height = 40,
+	--	resizeItems = true,
+	--	autoArrangeV = true,
+	--	autoArrangeH = true,
+	--	padding = {0,0,0,0},
+	--	itemPadding = {0,0,0,0},
+	--	itemMargin = {0,0,0,0},
+	--	
+	--	children = {
+	--		lbl_fps,
+	--		img_flag,
+	--	},
+	--},
+	
+	-- Game Logo
+	--Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
+	--
+	--Button:New{
+	--	name= 'tweakGuiButton',
+	--	caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
+	--	padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
+	--	children = {
+	--		Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
+	--	},
+	--},
+	
+	local mainPanel = Panel:New{
 		y = 0,
-		dockable = true,
-		clientWidth = crude_width,
-		clientHeight = crude_height,
-		draggable = false,
-		tweakDraggable = true,
-		resizable = false,
-		minimizable = false,
-		backgroundColor = color.main_bg,
-		color = color.main_bg,
+		right = 0, 
+		bottom = 0,
+		clientWidth = holderWidth,
+		backgroundColor = color.empty,
+		color = color.empty,
 		margin = {0,0,0,0},
-		padding = {0,0,0,0},
-		parent = screen0,
+		padding = {0,0,3,6},
+		parent = parent,
 		
 		children = {
 			StackPanel:New{
@@ -2130,168 +2497,76 @@ local function MakeMenuBar()
 				itemMargin = {1,1,1,1},
 				autoArrangeV = false,
 				autoArrangeH = false,
-						
-				children = {
-					--GAME LOGO GOES HERE
-					Image:New{ tooltip = title_text, file = title_image, height=B_HEIGHT, width=B_HEIGHT, },
-					
-					Button:New{
-						name= 'tweakGuiButton',
-						caption = "", OnClick = { function() spSendCommands{"luaui tweakgui"} end, }, textColor=color.menu_fg, height=B_HEIGHT+4, width=B_HEIGHT+5, 
-						padding = btn_padding, margin = btn_margin, tooltip = "Move and resize parts of the user interface (\255\0\255\0Ctrl+F11\008) (Hit ESC to exit)",
-						children = {
-							Image:New{ file=LUAUI_DIRNAME .. 'Images/epicmenu/move.png', height=B_HEIGHT-2,width=B_HEIGHT-2, },
-						},
-					},
-					--MAIN MENU BUTTON
-					Button:New{
-						name= 'subMenuButton',
-						OnClick = { function() ActionSubmenu(nil,'') end, },
-						textColor=color.game_fg,
-						height=B_HEIGHT+12,
-						width=B_WIDTH_TOMAINMENU + 1,
-						caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)",
-						padding = btn_padding,
-						margin = btn_margin,
-						tooltip = '',
-						children = {
-							--Image:New{file = title_image, height=B_HEIGHT-2,width=B_HEIGHT-2, x=2, y = 4},
-							--Label:New{ caption = "Menu (\255\0\255\0"..WG.crude.GetHotkey("crudesubmenu").."\008)", valign = "center"}
-						},
-					},
-					--VOLUME SLIDERS
-					Grid:New{
-						height = '100%',
-						width = 100,
-						columns = 2,
-						rows = 2,
-						resizeItems = false,
-						margin = {0,0,0,0},
-						padding = {0,0,0,0},
-						itemPadding = {1,1,1,1},
-						itemMargin = {1,1,1,1},
-						
-						
-						children = {
-							--Label:New{ caption = 'Vol', width = 20, textColor = color.main_fg },
-							Image:New{ tooltip = 'Volume', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol.png', width= 18,height= 18, },
-							Trackbar:New{
-								tooltip = 'Volume',
-								height=15,
-								width=70,
-								trackColor = color.main_fg,
-								value = spGetConfigInt("snd_volmaster", 50),
-								OnChange = { function(self)	spSendCommands{"set snd_volmaster " .. self.value} end	},
-							},
-							
-							Image:New{ tooltip = 'Music', file=LUAUI_DIRNAME .. 'Images/epicmenu/vol_music.png', width= 18,height= 18, },
-							Trackbar:New{
-								tooltip = 'Music',
-								height=15,
-								width=70,
-								min = 0,
-								max = 1,
-								step = 0.01,
-								trackColor = color.main_fg,
-								value = settings.music_volume or 0.5,
-								prevValue = settings.music_volume or 0.5,
-								OnChange = { 
-									function(self)
-										if ((WG.music_start_volume or 0) > 0) then 
-											Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-										else 
-											Spring.SetSoundStreamVolume(self.value) 
-										end 
-										settings.music_volume = self.value
-										WG.music_volume = self.value
-										if (self.prevValue > 0 and self.value <=0) then 
-											widgetHandler:DisableWidget("Music Player") 
-										end 
-										if (self.prevValue <=0 and self.value > 0) then
-											-- Disable first in case widget is already enabled.
-											-- This is required for it to notice the volume
-											-- change from 0 in some cases.
-											widgetHandler:DisableWidget("Music Player")
-											widgetHandler:EnableWidget("Music Player") 
-										end 
-										self.prevValue = self.value
-									end	
-								},
-							},
-						},
-					
-					},
-
-					--FPS & FLAG
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 1,
-						rows = 2,
-						width = 60,
-						height = '100%',
-						--height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
-						children = {
-							lbl_fps,
-							img_flag,
-						},
-					},
-					--GAME CLOCK AND REAL-LIFE CLOCK
-					Grid:New{
-						orientation = 'horizontal',
-						columns = 1,
-						rows = 2,
-						width = 80,
-						height = '100%',
-						--height = 40,
-						resizeItems = true,
-						autoArrangeV = true,
-						autoArrangeH = true,
-						padding = {0,0,0,0},
-						itemPadding = {0,0,0,0},
-						itemMargin = {0,0,0,0},
-						
-						children = {
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 70,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/epicmenu/game.png', width = 20,height = 20,  },
-									lbl_gtime,
-								},
-							},
-							StackPanel:New{
-								orientation = 'horizontal',
-								width = 80,
-								height = '100%',
-								resizeItems = false,
-								autoArrangeV = false,
-								autoArrangeH = false,
-								padding = {0,0,0,0},
-								itemMargin = {2,0,0,0},
-								children = {
-									Image:New{ file= LUAUI_DIRNAME .. 'Images/clock.png', width = 20,height = 20,  },
-									lbl_clock,
-								},
-							},
-							
-						},
-					},				
-				}
+				
+				children = stackChildren,
 			}
 		}
+	}
+	
+	return mainPanel
+end
+
+local function MakeMenuBar()
+	local btn_padding = {4,3,3,2}
+	local btn_margin = {0,0,0,0}
+	local exit_menu_width = 210
+	local exit_menu_height = 280
+	local exit_menu_btn_width = 7*exit_menu_width/8
+	local exit_menu_btn_height = max(exit_menu_height/8, 30)
+	local exit_menu_cancel_width = exit_menu_btn_width/2
+	local exit_menu_cancel_height = 2*exit_menu_btn_height/3
+
+	local crude_width = 380
+	local crude_minWidth = 350
+	local crude_height = B_HEIGHT_MAIN + 8
+	
+	-- A bit evil, but par for the course
+	lbl_fps = Label:New{ name='lbl_fps', caption = 'FPS:', textColor = color.sub_header, margin={0,5,0,0}, }
+	lbl_gtime = Label:New{ name='lbl_gtime', caption = 'Time:', width = 55, height=5, textColor = color.sub_header,  }
+	lbl_clock = Label:New{ name='lbl_clock', caption = 'Clock:', width = 45, height=5, textColor = color.main_fg, } -- autosize=false, }
+	img_flag = Image:New{ tooltip='Choose Your Location', file=":cn:".. LUAUI_DIRNAME .. "Images/flags/".. settings.country ..'.png', width = 16, height = 11, OnClick = { MakeFlags }, padding={4,4,4,6}  }
+	
+	local screen_width,screen_height = Spring.GetWindowGeometry()
+	
+	window_crude = Window:New{
+		name = 'epicmenubar',
+		x = screen_width - crude_width,
+		y = 0,
+		width = crude_width,
+		height = crude_height,
+		minHeight = crude_height,
+		minWidth = crude_minWidth,
+		draggable = false,
+		tweakDraggable = true,
+		tweakResizable = true,
+		resizable = false,
+		minimizable = false,
+		dockable = true,
+		backgroundColor = color.empty,
+		color = color.empty,
+		padding = {0,0,0,0},
+		parent = screen0,
+		OnResize = {
+			function (obj)
+				local newPanel = GetMainPanel(obj, obj.width, obj.height)
+				if newPanel then
+					if panel_crude then
+						panel_crude:Dispose()
+					end
+					panel_crude = newPanel
+				end
+				panel_crude:BringToFront()
+			end
+		}
+	}
+	
+	panel_background = Panel:New{
+		classname = settings.menuClassname,
+		x = 0,
+		y = 0,
+		right = 0,
+		bottom = 0,
+		parent = window_crude,
 	}
 	settings.show_crudemenu = true
 	--ShowHideCrudeMenu()
@@ -2304,13 +2579,17 @@ local function MakeQuitButtons()
 		value = 'Quit game',
 		key='Quit game',
 	})
+	
+	local imgPath = LUAUI_DIRNAME  .. 'images/'
+
 	AddOption('',{
 		type='button',
 		name='Vote Resign',
 		desc = "Ask teammates to resign",
+		icon = imgPath..'epicmenu/whiteflag_check.png',
 		OnChange = function()
 				if not (Spring.GetSpectatingState() or PlayingButNoTeammate() or isMission) then
-					spSendCommands("say !voteresign")
+					spSendCommands("say !poll resign")
 					ActionMenu()
 				end
 			end,
@@ -2321,8 +2600,9 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Resign',
+		name='Resign...',
 		desc = "Abandon team and become spectator",
+		icon = imgPath..'epicmenu/whiteflag.png',
 		OnChange = function()
 				if not (isMission or Spring.GetSpectatingState()) then
 					MakeExitConfirmWindow("Are you sure you want to resign?", function() 
@@ -2330,7 +2610,10 @@ local function MakeQuitButtons()
 						if (paused) and AllowPauseOnMenuChange() then
 							spSendCommands("pause")
 						end
-						spSendCommands{"spectator"} 
+						local frame = Spring.GetGameFrame()
+						if frame and frame > 0 then
+							spSendCommands{"spectator"}
+						end
 					end)
 				end
 			end,
@@ -2341,15 +2624,20 @@ local function MakeQuitButtons()
 	})
 	AddOption('',{
 		type='button',
-		name='Exit to Desktop',
-		desc = "Exit game completely",
+		name='Quit...',
+		desc = "Leave the game.",
+		icon = imgPath..'epicmenu/exit.png',
 		OnChange = function() 
 			MakeExitConfirmWindow("Are you sure you want to quit the game?", function()
 				local paused = select(3, Spring.GetGameSpeed())
 				if (paused) and AllowPauseOnMenuChange() then
 					spSendCommands("pause")
 				end
-				spSendCommands{"quit","quitforce"} 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					spSendCommands{"quit","quitforce"} 
+				end
 			end)
 		end,
 		key='Exit to Desktop',
@@ -2412,9 +2700,12 @@ function widget:Initialize()
 	
 	-- Set default positions of windows on first run
 	local screenWidth, screenHeight = Spring.GetWindowGeometry()
+	if not settings.subwindow_height then
+		settings.subwindow_height = 582
+	end
 	if not settings.sub_pos_x then
-		settings.sub_pos_x = screenWidth/2 - 150
-		settings.sub_pos_y = screenHeight/2 - 200
+		settings.sub_pos_x = math.floor(screenWidth/2 - 150)
+		settings.sub_pos_y = math.floor(screenHeight/2 - settings.subwindow_height * 0.55)
 	end
 	
 	if not keybounditems then
@@ -2460,6 +2751,15 @@ function widget:Initialize()
 	end
 	
 	MakeQuitButtons()
+	
+	AddOption('',{ type='label',name='',value = '',key='',})
+	AddOption('Game',{
+		type='text',
+		name='About...',
+		value=gameInfoText,
+		--desc = "about game",
+		key='About',
+	})
 	
 	-- Clears all saved settings of custom widgets stored in crudemenu's config
 	WG.crude.ResetSettings = function()
@@ -2555,9 +2855,38 @@ function widget:Initialize()
 		end
 	end
 	
+	function WG.crude.SetMenuSkinClass(newClassName)
+		if newClassName == settings.menuClassname then
+			return
+		end
+		settings.menuClassname = newClassName
+		
+		local currentSkin = Chili.theme.skin.general.skinName
+		local skin = Chili.SkinHandler.GetSkin(currentSkin)
+		
+		local newClass = skin[newClassName]
+		if not newClass then
+			newClass = skin.panel
+			newClassName = "panel"
+		end
+		panel_background.classname = newClassName
+		
+		panel_background.tiles = newClass.tiles
+		panel_background.TileImageFG = newClass.TileImageFG
+		--panel_background.backgroundColor = newClass.backgroundColor
+		panel_background.TileImageBK = newClass.TileImageBK
+		if newClass.padding then
+			panel_background.padding = newClass.padding
+			panel_background:UpdateClientArea()
+		end
+		panel_background:Invalidate()
+	end
+		
 	-- Add custom actions for the following keybinds
 	AddAction("crudemenu", ActionMenu, nil, "t")
+	AddAction("show_toggle_crudemenu", ToggleActionMenu, nil, "t")
 	AddAction("crudesubmenu", ActionSubmenu, nil, "t")
+	AddAction("viewlobby", ViewLobby, nil, "t")
 	AddAction("exitwindow", ActionExitWindow, nil, "t")
 	
 	MakeMenuBar()
@@ -2708,14 +3037,11 @@ function widget:SetConfigData(data)
 end
 
 function widget:Update()
-	cycle = cycle%32+1
+	cycle = cycle%10 + 1
 	if cycle == 1 then
 		--Update clock, game timer and fps meter that show on menubar
 		if lbl_fps then
 			lbl_fps:SetCaption( 'FPS: ' .. Spring.GetFPS() )
-		end
-		if lbl_gtime then
-			lbl_gtime:SetCaption( GetTimeString() )
 		end
 		if lbl_clock then
 			--local displaySeconds = true
@@ -2732,6 +3058,16 @@ function widget:Update()
 	end
 end
 
+function widget:GameFrame(n)
+	if lbl_gtime then
+		if not lastSaveGameFrame then
+			lastSaveGameFrame = Spring.GetGameRulesParam("lastSaveGameFrame") or 0
+		end
+		if (n + lastSaveGameFrame)%30 == 0 then
+			lbl_gtime:SetCaption(GetTimeString((n + lastSaveGameFrame)/30))
+		end
+	end
+end
 
 function widget:KeyPress(key, modifier, isRepeat)
 	if key == KEYSYMS.LCTRL 
@@ -2760,13 +3096,15 @@ function widget:KeyPress(key, modifier, isRepeat)
 		window_getkey:Dispose()
 		translatedkey = transkey[ keysyms[''..key]:lower() ] or keysyms[''..key]:lower()
 		--local hotkey = { key = translatedkey, mod = modstring, }		
+		translatedkey = translatedkey:gsub("n_", "") -- Remove 'n_' prefix from number keys.
 		local hotkey = modstring .. translatedkey	
+		
+		Spring.Echo("Binding key code", key, "Translated", translatedkey, "Modifer", modstring)
 		
 		if key ~= KEYSYMS.ESCAPE then
 			--otset( keybounditems, kb_action, hotkey )
 			AssignKeyBindAction(hotkey, kb_action, true) -- param4 = verbose
 			otset( keybounditems, kb_action, hotkey )
-	
 		end
 		ReApplyKeybinds()
 		
@@ -2793,7 +3131,18 @@ function ActionSubmenu(_, submenu)
 	end
 end
 
+function ViewLobby()
+	if Spring.SendLuaMenuMsg then
+		Spring.Echo("SendLuaMenuMsg showLobby")
+		Spring.SendLuaMenuMsg("showLobby")
+	end
+end
+
 function ActionMenu()
+	ActionSubmenu()
+end
+
+function ToggleActionMenu()
 	settings.show_crudemenu = not settings.show_crudemenu
 	DisposeExitConfirmWindow()
 	ShowHideCrudeMenu()

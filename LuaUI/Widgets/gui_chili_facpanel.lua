@@ -14,6 +14,8 @@ function widget:GetInfo()
   }
 end
 
+include("Widgets/COFCTools/ExportUtilities.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -71,7 +73,7 @@ options = {
 		value = 1, min = 0, max = 1, step = 0.01,
 		OnChange = function(self)
 			window_facbar.color = {1,1,1,self.value}
-			window_facbar.caption = self.value == 0 and '' or 'Factories'
+			window_facbar.caption = self.value == 0 and '' or WG.Translate("interface", "factories")
 			window_facbar:Invalidate()
 		end,
 	},
@@ -81,7 +83,7 @@ options = {
 		desc = 'When spectating, show the factory queues of all players. When disabled, only shows the factory queue of the currently spectated player.',
 		value = false,
 		OnChange = function() UpdateFactoryList() end,
-	};
+	},
 	
 	showETA = {
 		name = "Show ETA",
@@ -89,7 +91,20 @@ options = {
 		desc = 'Show ETA for the unit currently being built.',
 		value = true,
 		OnChange = function() RecreateFacbar() end,
-	};
+	},
+
+	showBuildPanel = {
+		name = "Show Selected Factory's Units Panel",
+		type = 'radioButton',
+		value = 'always',
+		items = {
+			{key = 'always', 		name = 'Always'},
+			{key = 'playerOnly', name = 'Only when not spectating'},
+			{key = 'never', 			name = 'Never'},
+		},
+		OnChange = function() widget:SelectionChanged(Spring.GetSelectedUnits()) end,
+		noHotkey = true,
+	},
 }
 
 -------------------------------------------------------------------------------
@@ -108,9 +123,6 @@ local alreadyRemovedTag = {}
 local myTeamID = 0
 local inTweak  = false
 local leftTweak, enteredTweak = false, false
-local cycle_half_s = 1
-local cycle_2_s = 1
-local updateQSoon={}
 local lmx,lmy=-1,-1
 local showAllPlayers
 
@@ -283,9 +295,9 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 	local facButton = Button:New{
 		width = options.buttonsize.value*1.2,
 		height = options.buttonsize.value*1.0,
-		tooltip = 			'Click - ' 			.. GreenStr .. 'Select \n' 					
-			.. WhiteStr .. 	'Middle click - ' 	.. GreenStr .. 'Go to \n'
-			.. WhiteStr .. 	'Right click - ' 	.. GreenStr .. 'Quick Rallypoint Mode' 
+		tooltip = 			WG.Translate("interface", "lmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "select") .. '\n' 					
+			.. WhiteStr .. 	WG.Translate("interface", "mmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "go_to") .. '\n'
+			.. WhiteStr .. 	WG.Translate("interface", "rmb") .. ' - ' .. GreenStr .. WG.Translate("interface", "quick_rallypoint_mode")
 			,
 		--backgroundColor = buttonColor,
 		backgroundColor = {1,1,1,1},
@@ -295,7 +307,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 				function(_,_,_,button)
 					if button == 2 then
 						local x,y,z = Spring.GetUnitPosition(unitID)
-						Spring.SetCameraTarget(x,y,z)
+						SetCameraTarget(x,y,z)
 					elseif button == 3 then
 						Spring.Echo("FactoryPanel: Entered Quick Rallypoint mode")
 						Spring.PlaySoundFile(sound_waypoint, 1, 'ui')
@@ -308,7 +320,7 @@ local function AddFacButton(unitID, unitDefID, tocontrol, stackname)
 				end
 				or nil
 		},
-		caption= unitID == 0 and 'Factory\nButton' or '',
+		caption= unitID == 0 and WG.Translate("interface", "button") or '',
 		padding={3, 3, 3, 3},
 		--margin={0, 0, 0, 0},
 		children = {
@@ -523,7 +535,6 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 				buildRow_dragDrop[1] = nil
 				
 				--UpdateFac(facIndex, facs[facIndex])
-				updateQSoon[facIndex] = true
 			end},
 			OnMouseDown = { function(self,x,y,mouse) --for drag_drop feature
 				
@@ -579,7 +590,6 @@ local function MakeButton(unitDefID, facID, buttonId, facIndex, bqPos)
 						BuildRowButtonFunc(prevIndex, facs[i].qStack.children[prevIndex].cmdid, false, true,countTransfer, nil,facID) --then, remove queue on the left
 					end
 					buildRow_dragDrop[1] = nil
-					updateQSoon[facIndex] = true
 				end
 			end},
 			
@@ -671,33 +681,35 @@ local function UpdateFacQ(i, facInfo)
 end
 
 local function UpdateFacProg(i, facInfo)
-	local progress = 0
-	local unitBuildDefID
+	local etaLabel = facInfo.facButton:GetChildByName('facIcon'):GetChildByName('etaLabel')
+
 	local unitBuildID = GetUnitIsBuilding(facInfo.unitID)
-	if unitBuildID then
-		unitBuildDefID = GetUnitDefID(unitBuildID)
-		_, _, _, _, progress = GetUnitHealth(unitBuildID)
-		
-		if options.showETA.value then
-			local etaLabel = facInfo.facButton:GetChildByName('facIcon'):GetChildByName('etaLabel')
-			local timeLeft = WG.etaTable and WG.etaTable[unitBuildID] and WG.etaTable[unitBuildID].timeLeft
-			local etaStr = ''
-			if timeLeft then
-				local color = timeLeft > 0 and '\255\1\255\1' or '\255\255\1\1'
-				--etaStr = "\255\255\255\1ETA: " .. string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
-				etaStr = string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60)
-			end
-			etaLabel:SetCaption(etaStr)
-		end
+	if not unitBuildID then
+		etaLabel:SetCaption("")
+		return
 	end
-	
+
+	if options.showETA.value then
+		local timeLeft = WG.etaTable and WG.etaTable[unitBuildID] and WG.etaTable[unitBuildID].timeLeft
+		local etaStr = ''
+		if timeLeft then
+			local color = WG.etaTable[unitBuildID].negative and '\255\255\1\1' or '\255\1\255\1'
+			etaLabel:SetCaption(string.format('%s%d:%02d', color, timeLeft / 60, timeLeft % 60))
+		else
+			etaLabel:SetCaption("\255\255\255\0?:??")
+		end
+	else
+		etaLabel:SetCaption("")
+	end
+
 	local firstButton = facs[i].qStack and facs[i].qStack.children[1]
 	if not firstButton then return end
-	if not unitBuildDefID then return end
+
 	local qBar = firstButton.childrenByName['bp'].childrenByName['prog']
-	local boButton = facs[i].boStack:GetChildByName(unitBuildDefID)
+	local boButton = facs[i].boStack:GetChildByName(GetUnitDefID(unitBuildID))
 	local boBar = boButton:GetChildByName('bp'):GetChildByName('prog')
-	
+
+	local progress = select(5, GetUnitHealth(unitBuildID))
 	qBar:SetValue(progress)
 	boBar:SetValue(progress)
 end
@@ -728,12 +740,12 @@ local function WaypointHandler(x,y,button)
 
   local type,param = Spring.TraceScreenRay(x,y)
   if type=='ground' then
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt) 
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt) 
   elseif type=='unit' then
     Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.GUARD,{param},opt)     
   else --feature
     type,param = Spring.TraceScreenRay(x,y,true)
-    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD.MOVE,param,opt)
+    Spring.GiveOrderToUnit(facs[waypointFac].unitID, CMD_RAW_MOVE,param,opt)
   end
 
   --if not shift then waypointMode = 0; return true end
@@ -742,7 +754,7 @@ end
 local function MakeClearButton(unitID, i)
 	return Button:New{
 		name = 'clearfac-' .. unitID,
-		tooltip='Clear Factory Queue',
+		tooltip= WG.Translate("interface", "clear_factory_queue"),
 		x=0,
 		caption='',
 		width = options.buttonsize.value,
@@ -756,11 +768,10 @@ local function MakeClearButton(unitID, i)
 					Spring.GiveOrderToUnit( unitID, CMD.REMOVE, { buildCommand.tag } , {"ctrl"} )
 				end
 				Spring.PlaySoundFile(sound_queue_clear, 0.97, 'ui')
-				updateQSoon[i] = true
 			end
 		},
 		children = {
-			Label:New{ caption = 'Clear Q', fontSize = 11, x=2, bottom=2, fontShadow = true, },
+			Label:New{ caption = WG.Translate("interface", "clear"), fontSize = 11, x=2, bottom=2, fontShadow = true, },
 			Image:New{
 				file='LuaUI/images/drawingcursors/eraser.png',
 				width="80%";
@@ -841,8 +852,6 @@ RecreateFacbar = function()
 			boStack:AddChild( MakeButton(unitDefIDb, facInfo.unitID, unitDefIDb, i) )
 		end
 		boStack:AddChild( MakeClearButton( facInfo.unitID, i ) )
-		
-		updateQSoon[i] = true
 
 	end
 	
@@ -936,9 +945,6 @@ function widget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	local bdid = builderID and Spring.GetUnitDefID(builderID)
     if UnitDefs[bdid] and UnitDefs[bdid].isFactory then
 		local i = facsByUnitId[builderID]
-		if i then
-			updateQSoon[i] = true
-		end
 	end
 end
 
@@ -971,7 +977,9 @@ function widget:UnitTaken(unitID, unitDefID, unitTeam, newTeam)
   widget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
-function widget:Update()
+local updateT = -1
+function widget:Update(dt)
+	updateT = updateT - dt
 	if myTeamID~=Spring.GetMyTeamID() then
 		myTeamID = Spring.GetMyTeamID()
 		UpdateFactoryList()
@@ -979,32 +987,18 @@ function widget:Update()
 	end
 	inTweak = widgetHandler:InTweakMode()
   
-	cycle_half_s = (cycle_half_s % 16) + 1
-	cycle_2_s = (cycle_2_s % (32*2)) + 1
-	
-	if cycle_half_s == 1 then 
-		for i,facInfo in ipairs(facs) do
-			if Spring.ValidUnitID( facInfo.unitID ) then
-				if cycle_2_s == 1 then
-					UpdateFac(i, facInfo)
-				end
-				if updateQSoon[i] then
-					UpdateFacQ(i, facInfo)
-				end
-			end
+	if updateT < 0 then
+		updateT = 0.25
+		for i = 1, #facs do
+			UpdateFac(i, facs[i])
+			UpdateFacQ(i, facs[i])
 		end
-		--[[
-		if updateQSoon then
-			updateQSoon = false
-		end
-		--]]
-		updateQSoon={}
 	end
-	
+
 	for i,facInfo in ipairs(facs) do
 		UpdateFacProg(i, facInfo)
 	end
-	
+
 	if inTweak and not enteredTweak then
 		enteredTweak = true
 		stack_main:ClearChildren()
@@ -1036,45 +1030,31 @@ function widget:Update()
 	end
 end
 
-
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-
-
-function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, userOrders)
-	if unitTeam ~= myTeamID and not showAllPlayers then
-		return
-	end
-	local i = facsByUnitId[factID]
-	if i then
-		updateQSoon[i] = true
-	end
-end
-
 function widget:SelectionChanged(selectedUnits)
 	CheckRemoveFacStack()
 	
 	pressedFac = -1
+
+	local showBuildPanel = options.showBuildPanel.value == 'always' or 
+	(options.showBuildPanel.value == 'playerOnly' and not Spring.GetSpectatingState())
 	
 	if (#selectedUnits == 1) then 
 		for cnt, f in ipairs(facs) do 
 			if f.unitID == selectedUnits[1] then 
 				pressedFac = cnt
+				if showBuildPanel then
 				--local qStack = facs[pressedFac].qStack
-				local boStack = facs[pressedFac].boStack
+					local boStack = facs[pressedFac].boStack
 				--facs[pressedFac].facStack:RemoveChild(qStack)
-				stack_build:AddChild(boStack)
-				stack_build.backgroundColor = {1,1,1,1}
+					stack_build:AddChild(boStack)
+					stack_build.backgroundColor = {1,1,1,1}
+				end
 				facs[pressedFac].facButton.backgroundColor = magenta_table
 				facs[pressedFac].facButton:Invalidate()
 				
 				alreadyRemovedTag = {}
 			end
 		end
-	end
-	if pressedFac ~= -1 then
-		updateQSoon[pressedFac] = true
 	end
 end
 
@@ -1212,7 +1192,7 @@ function widget:Initialize()
 		minWidth = 56,
 		minHeight = 56,
 --		color = {0,0,0,1},
-		caption='Factories',
+		caption= WG.Translate("interface", "factories"),
 		children = {
 			stack_build,
 			scrollpanel

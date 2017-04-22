@@ -3,9 +3,7 @@ unitDef = {
   name                          = [[Roost]],
   description                   = [[Spawns Big Chickens]],
   acceleration                  = 0,
-  bmcode                        = [[0]],
   brakeRate                     = 0,
-  buildAngle                    = 4096,
   buildCostEnergy               = 0,
   buildCostMetal                = 0,
   builder                       = true,
@@ -33,14 +31,11 @@ unitDef = {
   canPatrol                     = true,
   canstop                       = [[1]],
   category                      = [[SINK UNARMED]],
-  commander                     = false,
 
   customParams                  = {
     description_de = [[Erzeugt groﬂe Chicken]],
-    description_pl = [[Rozmnaza wieksze kurczaki]],
 	helptext       = [[Roosts such as this one are where the more powerful Thunderbirds are hatched.]],
 	helptext_de    = [[M‰chtige Kreaturen werden hier erzeugt und losgelassen.]],
-	helptext_pl    = [[W tym gniezdzie rodza sie wieksze, bardziej zaawansowane kurczaki.]],
     chickenFac = [[true]],
   },
 
@@ -53,7 +48,6 @@ unitDef = {
   iconType                      = [[factory]],
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
-  mass                          = 380,
   maxDamage                     = 8000,
   maxSlope                      = 15,
   maxVelocity                   = 0,
@@ -63,7 +57,6 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[roostfac_big]],
   power                         = 1000,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {
@@ -77,10 +70,7 @@ unitDef = {
   },
 
   showNanoSpray                 = false,
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 273,
-  smoothAnim                    = true,
-  TEDClass                      = [[PLANT]],
   turnRate                      = 0,
   useBuildingGroundDecal        = true,
   workerTime                    = 42,

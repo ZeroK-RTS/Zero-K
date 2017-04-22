@@ -5,6 +5,7 @@ confdata.default_source_file = 'zk_keys.lua' --the file in ZIP archive where def
 confdata.mission_keybinds_file = 'zk_keys.lua' --the filename to be used for Mission mod. set this to NIL if want to use mission's name as filename.
 -- confdata.regular_keybind_file = LUAUI_DIRNAME .. 'Configs/zk_keys.lua' --for Multiplayer this is automatically set according to modName in epicmenu.lua
 --FIXME: find modname instead of using hardcoded mission_keybinds_file name
+confdata.description = 'Zero-K is a free real time strategy (RTS), that aims to be the best open source multi-platform strategy game available :-) \n\n www.zero-k.info'
 local color = {
 	white = {1,1,1,1},
 	yellow = {1,1,0,1},
@@ -25,6 +26,7 @@ local color = {
 	transblack2 = {0,0,0,0.7},
 	transGray = {0.1,0.1,0.1,0.8},
 	
+	empty = {0,0,0,0},
 	null = {nil, nil, nil, 1},
 	transnull = {nil, nil, nil, 0.3},
 	transnull2 = {nil, nil, nil, 0.5},
@@ -36,7 +38,7 @@ color.tooltip_fg = color.null
 color.tooltip_info = color.cyan
 color.tooltip_help = color.green
 
-color.main_bg = color.transnull2
+color.main_bg = color.transnull3
 color.main_fg = color.null
 
 color.menu_bg = color.null
@@ -104,7 +106,7 @@ end
 
 
 --ShortHand for adding radiobuttons
-local function ShRadio(path, caption, items,defValue, action2, advanced) 
+local function ShRadio(path, caption, items,defValue, action2, advanced, nhk) 
 	AddOption(path,
 	{
 		type='radioButton', 
@@ -115,6 +117,7 @@ local function ShRadio(path, caption, items,defValue, action2, advanced)
 		action = (type(action2) == 'string' and action2 or nil),
 		OnChange = (type(action2) ~= 'string' and action2 or nil),
 		advanced = advanced,
+		noHotkey = nhk,
 	})
 end
 
@@ -136,24 +139,58 @@ confdata.subMenuIcons = {
 	['Settings'] = imgPath..'epicmenu/settings.png',
 	['Help'] = imgPath..'epicmenu/questionmark.png',
 	
-	['Game/Game Speed'] = imgPath..'epicmenu/speed-test-icon.png',
-	['Game/New Unit States'] = imgPath..'epicmenu/robot2.png',
-	['Settings/Reset Settings'] = imgPath..'epicmenu/undo.png',
-	['Settings/Audio'] = imgPath..'epicmenu/vol.png',
-	['Settings/Camera'] = imgPath..'epicmenu/video_camera.png',
-	['Settings/Graphics'] = imgPath..'epicmenu/graphics.png',
-	['Settings/HUD Panels'] = imgPath..'epicmenu/control_panel.png',
-	['Settings/Interface'] = imgPath..'epicmenu/robotarm.png',
-	['Settings/Misc'] = imgPath..'epicmenu/misc.png',
+	['Game/Game Speed'] 			= imgPath..'epicmenu/speed-test-icon.png',
+	['Game/New Unit States'] 		= imgPath..'epicmenu/robot2.png',
+	['Game/Unit Behaviour'] 		= imgPath..'epicmenu/robot2.png',
+	['Game/Transport AI'] 			= imgPath..'epicmenu/robot2.png',
+	['Game/Worker AI'] 				= imgPath..'commands/Bold/build_light.png',
+	['Game/Unit Marker'] 			= imgPath..'epicmenu/marker.png',
+	['Game/Construction Hotkeys'] 	= imgPath..'epicmenu/keyboard.png',
+	['Game/Selection Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
+	['Game/Command Hotkeys'] 		= imgPath..'epicmenu/keyboard.png',
 	
-	['Settings/Interface/Mouse Cursor'] = imgPath..'epicmenu/input_mouse.png',
-	['Settings/Interface/Map'] = imgPath..'epicmenu/map.png',
-	['Settings/Interface/Healthbars'] = imgPath..'commands/Bold/health.png',
-	['Settings/Interface/Retreat Zones'] = imgPath..'commands/Bold/retreat.png',
-	['Settings/Interface/Spectating'] = imgPath..'epicmenu/find.png',
+	['Settings/Reset Settings'] 	= imgPath..'epicmenu/undo.png',
+	['Settings/Audio'] 				= imgPath..'epicmenu/vol.png',
+	['Settings/Camera'] 			= imgPath..'epicmenu/video_camera.png',
+	['Settings/Graphics'] 			= imgPath..'epicmenu/graphics.png',
+	['Settings/HUD Panels'] 		= imgPath..'epicmenu/control_panel.png',
+	['Settings/Interface'] 			= imgPath..'epicmenu/robotarm.png',
+	['Settings/Misc'] 				= imgPath..'epicmenu/misc.png',
+	
+	['Settings/Interface/Mouse Cursor'] 		= imgPath..'epicmenu/input_mouse.png',
+	['Settings/Interface/Map'] 					= imgPath..'epicmenu/map.png',
+	['Settings/Interface/Healthbars'] 			= imgPath..'commands/Bold/health.png',
+	['Settings/Interface/Retreat Zones'] 		= imgPath..'commands/Bold/retreat.png',
+	['Settings/Interface/Spectating'] 			= imgPath..'epicmenu/popcorn.png',
+	['Settings/Interface/Building Placement'] 	= imgPath..'factory.png',
+	['Settings/Interface/Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Common Team Colors'] 	= imgPath..'map/minimap_colors_simple.png',
+	['Settings/Interface/Build ETA'] 			= imgPath..'epicmenu/stop_watch_icon.png',
+	['Settings/Interface/Defense Ranges'] 		= imgPath..'epicmenu/target.png',
+	['Settings/Interface/Command Visibility'] 	= imgPath..'epicmenu/fingertap.png',
+	['Settings/Interface/Hovering Icons'] 		= imgPath..'epicmenu/halo.png',
+	['Settings/Interface/Selection'] 			= imgPath..'epicmenu/selection.png',
+	['Settings/Interface/Control Groups'] 		= imgPath..'epicmenu/addusergroup.png',
+	
+	
+	['Settings/HUD Panels/Minimap'] 				= imgPath..'epicmenu/map.png',
+	['Settings/HUD Panels/Economy Panel']	 		= imgPath..'cost.png',
+	['Settings/HUD Panels/Commander Selector'] 		= imgPath..'epicmenu/corcommander.png',
+	['Settings/HUD Panels/Tooltip'] 				= imgPath..'epicmenu/lightbulb.png',
+	['Settings/HUD Panels/Chat'] 					= imgPath..'advplayerslist/chat.png',
+	['Settings/HUD Panels/FactoryPanel'] 			= imgPath..'factory.png',
+	['Settings/HUD Panels/Pause Screen'] 			= imgPath..'epicmenu/media_playback_pause.png',
+	['Settings/HUD Panels/Replay Controls'] 		= imgPath..'epicmenu/key_play_pause.png',
+	['Settings/HUD Panels/Unit Stats Help Window'] 	= imgPath..'advplayerslist/random.png',
+	['Settings/HUD Panels/Player List'] 			= imgPath..'epicmenu/people.png',
+	['Settings/HUD Panels/Extras/Docking'] 				= imgPath..'epicmenu/anchor.png',
+	['Settings/HUD Panels/Selected Units Panel'] 	= imgPath..'epicmenu/grid.png',
 }
 
 -- SETUP MENU HERE
+
+ShButton('', 'Save Game', (function() if WG.SaveGame then WG.SaveGame.CreateSaveWindow() end end), nil, nil, imgPath .. 'commands/Bold/unload.png')
+ShButton('', 'Load Game', (function() if WG.SaveGame then WG.SaveGame.CreateLoadWindow() end end), nil, nil, imgPath .. 'commands/Bold/load.png')
 
 --- GENERAL SETTINGS --- settings about settings
 local generalPath = 'Settings/Reset Settings'
@@ -171,7 +208,6 @@ local generalPath = 'Settings/Reset Settings'
 						'mapborder 1',
 						"luaui disablewidget SelectionHalo",
 						"luaui disablewidget SelectionCircle",
-						"luaui disablewidget UnitShapes",
 					}
 				end,
 				'Use this if your performance is poor'
@@ -202,9 +238,17 @@ local gameSpeedPath = 'Game/Game Speed'
 		ShButton(gameSpeedPath, 'Decrease Speed', 'slowdown')
 		
 	ShLabel(gamePath, '')
-	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end)) 
---	ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
+	ShButton(gamePath, 'Choose Commander Type', (function() spSendCommands{"luaui showstartupinfoselector"} end), nil, nil, imgPath..'epicmenu/corcommander.png' ) 
+	
+	--ShButton(gamePath, 'Constructor Auto Assist', function() spSendCommands{"luaui togglewidget Constructor Auto Assist"} end)
 
+-- global build command
+local GBCPath = 'Game/Worker AI'
+local gbcinfo = "Global Build Command gives you a global, persistent build queue for all workers that automatically assigns workers to the nearest jobs.\n \nInstructions: Enable this " ..
+"then give any worker build-related commands. Placing buildings on top of existing jobs while holding \255\200\200\200Shift\255\255\255\255 cancels them, and without shift replaces them. \n" ..
+"You can also exclude workers from GBC's control by using the state toggle button in the unit's orders menu. " ..
+"Units also get a job area removal command, the default hotkey is \255\255\90\90alt-s\255\255\255\255.\n \n" .. "It can also handle repair/reclaim/res, and automatically converts area res to reclaim for targets that cannot be resurrected.\n \n"
+ShButton(GBCPath, 'Toggle Global Build Command', function() spSendCommands{"luaui togglewidget Global Build Command"} end, gbcinfo)
 
 --- CAMERA ---
 local cameraPath = 'Settings/Camera'
@@ -268,8 +312,9 @@ local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'
 --- HUD Panels --- Only settings that pertain to windows/icons at the drawscreen level should go here.
 local HUDPath = 'Settings/HUD Panels/Extras'
 	ShButton(HUDPath, 'Tweak Mode (Esc to exit)', 'luaui tweakgui', 'Tweak Mode. Move and resize parts of the user interface. (Hit Esc to exit)')
+	ShButton(HUDPath .. "/Display Keys", 'Toggle input visualizer', function() spSendCommands{"luaui togglewidget Display Keys"} end, "Shows pressed key combinations and mouse buttons.")
 
-local HUDSkinPath = 'Settings/Extras/HUD Panels/HUD Skin'
+local HUDSkinPath = 'Settings/HUD Panels/Extras/HUD Skin'
 	AddOption(HUDSkinPath,
 	{
 		name = 'Skin Sets (Requires LuaUI Reload)',
@@ -278,10 +323,14 @@ local HUDSkinPath = 'Settings/Extras/HUD Panels/HUD Skin'
 			WG.crude.SetSkin( self.value );
 		end,
 		items = {
+			{ key = 'Blueprint', name = 'Blueprint', },
 			{ key = 'Carbon', name = 'Carbon', },
 			{ key = 'Robocracy', name = 'Robocracy', },
+			--{ key = 'DarkGlass', name = 'DarkGlass', }, -- Broken
 			{ key = 'DarkHive', name = 'DarkHive', },
 			{ key = 'DarkHiveSquare', name = 'DarkHive (square)', },
+			{ key = 'Evolved', name = 'Evolved', },
+			--{ key = 'Glass', name = 'Glass', }, -- Broken
 			{ key = 'Twilight', name = 'Twilight', },
 		},
 	})
@@ -291,13 +340,12 @@ local HUDSkinPath = 'Settings/Extras/HUD Panels/HUD Skin'
 --- Interface --- anything that's an interface but not a HUD Panel
 local pathInterface = 'Settings/Interface'
 local pathMouse = 'Settings/Interface/Mouse Cursor'
-	ShButton(pathInterface, 'Toggle DPS Display', function() spSendCommands{"luaui togglewidget Display DPS"} end, 'Shows RPG-style damage')
-	ShButton(pathMouse, 'Toggle Grab Input', function() spSendCommands{"grabinput"} end, 'Mouse cursor won\'t be able to leave the window.')
 	AddOption(pathMouse,
 	{ 	
 		name = 'Hardware Cursor',
 		type = 'bool',
 		springsetting = 'HardwareCursor',
+		noHotkey = true,
 		OnChange=function(self) spSendCommands{"hardwarecursor " .. (self.value and 1 or 0) } end, 
 	})	
 	
@@ -307,8 +355,8 @@ local pathSelectionPlatters = 'Settings/Interface/Selection/Team Platters'
 local pathSelectionBluryHalo = 'Settings/Interface/Selection/Blurry Halo Selections'
 	ShButton(pathSelectionShapes, 'Toggle Selection Shapes', function() spSendCommands{"luaui togglewidget UnitShapes"} end, "Draws coloured shapes under selected units")
 	ShButton(pathSelectionXrayHalo, 'Toggle Selection XRay&Halo', function() spSendCommands{"luaui togglewidget XrayHaloSelections"} end, "Highlights bodies of selected units")	
-	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() Spring.SendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
-	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() Spring.SendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
+	ShButton(pathSelectionPlatters, 'Toggle Team Platters', function() spSendCommands{"luaui togglewidget TeamPlatter"} end, "Puts team-coloured disk below units")
+	ShButton(pathSelectionBluryHalo, 'Toggle Blurry Halo Selections', function() spSendCommands{"luaui togglewidget Selection BlurryHalo"} end, "Places blurry halo around selected units")
 
   
 --- MISC --- Ungrouped. If some of the settings here can be grouped together, make a new subsection or its own section.
@@ -324,6 +372,7 @@ local pathMisc = 'Settings/Misc'
 		desc = 'Does opening the menu pause the game (and closing unpause it) in single player?',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	})
 	AddOption(pathMisc,
 	{
@@ -331,6 +380,7 @@ local pathMisc = 'Settings/Misc'
 		desc = 'NOT RECOMMENDED! Enable this to use the engine\'s keybind file. This can break existing functionality. Requires restart.',
 		type = 'bool',
 		advanced = true,
+		noHotkey = true,
 		value = false,
 	})
 	AddOption(pathMisc,
@@ -341,6 +391,7 @@ local pathMisc = 'Settings/Misc'
 				'\n(type "/luaui reload" to apply settings)',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function (self)
 			local value = (self.value and 1) or 0 --true = 1, false = 0
 			if self.value then
@@ -354,7 +405,7 @@ local pathMisc = 'Settings/Misc'
 
 
 local pathMiscScreenshots = 'Settings/Misc/Screenshots'	
-	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot', 'Find your screenshots under Spring/screenshots') 
+	ShButton(pathMiscScreenshots, 'Save Screenshot (PNG)', 'screenshot png', 'Find your screenshots under Spring/screenshots') 
 	ShButton(pathMiscScreenshots, 'Save Screenshot (JPG)', 'screenshot jpg', 'Find your screenshots under Spring/screenshots')
 	ShButton(pathMiscScreenshots, 
 			'Create Video (risky)', 'createvideo', 'Capture video directly from Spring without sound. Gets saved in the Spring folder. '
@@ -365,91 +416,81 @@ local pathMiscScreenshots = 'Settings/Misc/Screenshots'
 	
 --- GRAPHICS --- We might define section as containing anything graphical that has a significant impact on performance and isn't necessary for gameplay
 local pathGraphicsMap = 'Settings/Graphics/Map Detail'
-	ShLabel(pathGraphicsMap, 'Terrain Detail')
 	
-	ShButton(pathGraphicsMap, 'Increase Terrain Detail', "increaseviewradius")
-	ShButton(pathGraphicsMap, 'Decrease Terrain Detail', "decreaseviewradius")
+	ShRadio( pathGraphicsMap,
+		'Water rendering', {
+			{name = 'Basic',key='0', desc='A simple plane.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Reflective',key='1', desc='Reflects the world.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Dynamic',key='2', desc='Has waves and wakes when units move and projectiles explode.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Reflective / Refractive',key='3', desc='Reflects the world and has distortions.', icon=imgPath..'epicmenu/water.png'},
+			{name = 'Bumpmapped',key='4', desc='Fast and good-looking.', icon=imgPath..'epicmenu/water.png'},
+		},'4',
+		function(self)
+			spSendCommands{"water " .. self.value}
+		end,
+		false,
+		true
+	)
 
-
-	ShLabel(pathGraphicsMap, 'Trees')
-	ShButton(pathGraphicsMap, 'Toggle Trees', 'drawtrees', nil, nil, imgPath..'epicmenu/tree_1.png')
-	ShButton(pathGraphicsMap, 'See More Trees', 'moretrees', nil, nil, imgPath..'epicmenu/tree_1.png')
-	ShButton(pathGraphicsMap, 'See Less Trees', 'lesstrees', nil, nil, imgPath..'epicmenu/tree_1.png')
-	--{'Toggle Dynamic Sky', function(self) spSendCommands{'dynamicsky'} end },
-	
-	ShLabel(pathGraphicsMap, 'Water Settings')
-	ShButton(pathGraphicsMap, 'Basic', function() spSendCommands{"water 0"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphicsMap, 'Reflective', function() spSendCommands{"water 1"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphicsMap, 'Reflective and Refractive', function() spSendCommands{"water 3"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphicsMap, 'Dynamic', function() spSendCommands{"water 2"} end, nil, nil, imgPath..'epicmenu/water.png')
-	ShButton(pathGraphicsMap, 'Bumpmapped', function() spSendCommands{"water 4"} end, nil, nil, imgPath..'epicmenu/water.png')
-
-	ShLabel(pathGraphicsMap, 'Shadow Settings')
-	
+	ShRadio( pathGraphicsMap,
+		'Shadows cast by', {
+			{name = 'Nothing',key='0', desc='Shadows disabled.'},
+			{name = 'Units',key='2', desc='Only units cast shadows.'},
+			{name = 'Units and terrain',key='1', desc='Terrain can cast shadows onto lower terrain. Units also cast shadows.'},
+		},'1',
+		function(self)
+			spSendCommands{"Shadows " .. self.value}
+		end,
+		false,
+		true
+	)
 	AddOption(pathGraphicsMap, 
 	{
-		name = 'Shadow Detail (Slide left for off)',
+		name = 'Shadow detail level',
+		desc = 'How detailed shadows are.',
 		type = 'number',
 		valuelist = {512, 1024, 2048, 4096},
 		springsetting = 'ShadowMapSize',
 		OnChange=function(self)
 			local curShadow = Spring.GetConfigInt("Shadows") or 0
-			if curShadow == 0 then
-				return
-			end
-			curShadow=math.max(1,curShadow)
 			spSendCommands{"Shadows " .. curShadow .. ' ' .. self.value}
 		end, 
 	})
-	
-	ShButton(pathGraphicsMap, 
-	'Toggle Shadows',
-		function()
-			local curShadow = Spring.GetConfigInt("Shadows") or 0
-			if curShadow == 0 then
-				spSendCommands{"Shadows 1"}
-			elseif curShadow > 0 then
-				spSendCommands{"Shadows 0"}
-			elseif curShadow == -1 then
-				Spring.Echo("Shadows cannot be toggled ingame with Shadows = -1 in springsettings")
-			end
-		end
-	)
 
-	ShButton(pathGraphicsMap, 'Toggle Terrain Shadows',
-		function()
-			local curShadow=Spring.GetConfigInt("Shadows") or 0
-			if curShadow == 0 then
-				Spring.Echo 'Shadows are turned off, you must first enable them.'
-				return
-			end
-			if (curShadow<2) then 
-				curShadow=2 
-			else 
-				curShadow=1 
-			end
-			spSendCommands{"Shadows "..curShadow}
-		end
-	)
+	ShLabel(pathGraphicsMap, 'Miscellaneous')
 	AddOption(pathGraphicsMap, 
 	{
 		name = 'Map Brightness',
+		desc = 'How bright the terrain appears.',
 		type = 'number',
 		min = 0, 
 		max = 1, 
 		step = 0.01,
 		value = 1,
 		icon = imgPath..'epicmenu/stock_brightness.png',
-		OnChange = function(self) Spring.SendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end, 
+		OnChange = function(self) spSendCommands{"luaui enablewidget Darkening", "luaui darkening " .. 1-self.value} end, 
 	} )
-	
-	
+
 	AddOption(pathGraphicsMap, 
-	{ 	
+	{
+		name = 'Terrain geometry detail',
+		desc = 'How detailed the terrain geometry is.',
+		type = 'number',
+		min = 32, 
+		max = 256, 
+		step = 8,
+		value = 128,
+		OnChange = function(self) spSendCommands{"GroundDetail " .. self.value} end, 
+	})
+
+	AddOption(pathGraphicsMap, 
+	{
 		name = 'Ground Decals',
+		desc = 'Whether explosions leave scars on the ground.',
 		type = 'bool',
 		springsetting = 'GroundDecals',
-		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end, 
+		OnChange=function(self) spSendCommands{"grounddecals " .. (self.value and 1 or 0) } end,
+		noHotkey = true,
 	} )
 	
 	--ShButton(pathGraphicsMap, 'Toggle ROAM Rendering', function() spSendCommands{"roam"} end, "Toggle between legacy map rendering and (the new) ROAM map rendering." )
@@ -457,11 +498,15 @@ local pathGraphicsMap = 'Settings/Graphics/Map Detail'
 local pathGraphicsExtras = 'Settings/Graphics/Effects'
 	AddOption(pathGraphicsExtras, 
 	{
-		name = 'Maximum Particles (100 - 20,000)',
+		name = 'Particle density',
+		desc = 'How many visual effects can exist at the same time.',
 		type = 'number',
-		valuelist = {100,500,1000,2000,5000,10000,20000},
+		min = 250, 
+		max = 20000, 
+		step = 250,
+		value = 10000,
 		springsetting = 'MaxParticles',
-		OnChange=function(self) Spring.SendCommands{"maxparticles " .. self.value } end, 
+		OnChange=function(self) spSendCommands{"maxparticles " .. self.value } end, 
 	} )
 	ShButton(pathGraphicsExtras, 'Toggle Lups (Lua Particle System)', function() spSendCommands{'luaui togglewidget LupsManager','luaui togglewidget Lups'} end )
 	ShButton(pathGraphicsExtras, 'Toggle Nightvision', function() spSendCommands{'luaui togglewidget Nightvision Shader'} end, 'Applies a nightvision filter to screen')
@@ -478,7 +523,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		min = 1, 
 		max = 10000,
 		springsetting = 'UnitLodDist',
-		OnChange = function(self) Spring.SendCommands{"distdraw " .. self.value} end 
+		OnChange = function(self) spSendCommands{"distdraw " .. self.value} end 
 	} )
 	AddOption(pathUnitVisiblity,
 	{
@@ -487,7 +532,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	  min = 1, 
 	  max = 1000,
 	  springsetting = 'UnitIconDist',
-	  OnChange = function(self) Spring.SendCommands{"disticon " .. self.value} end 
+	  OnChange = function(self) spSendCommands{"disticon " .. self.value} end 
 	  } )
 	AddOption(pathUnitVisiblity,
 	{
@@ -500,23 +545,23 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")
 	
 	local pathSpotter = 'Settings/Graphics/Unit Visibility/Spotter'
-		ShButton(pathSpotter, 'Toggle Unit Spotter', function() Spring.SendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
+		ShButton(pathSpotter, 'Toggle Unit Spotter', function() spSendCommands{"luaui togglewidget Spotter"} end, "Puts team-coloured blob below units")
 	local pathXrayShader = 'Settings/Graphics/Unit Visibility/XRay Shader'
 		ShButton(pathXrayShader, 'Toggle XRay Shader', function() spSendCommands{"luaui togglewidget XrayShader"} end, "Highlights edges of units")
 	local pathUnitOutline = 'Settings/Graphics/Unit Visibility/Outline'
 		ShButton(pathUnitOutline, 'Toggle Unit Outline', function() spSendCommands{"luaui togglewidget Outline"} end, "Highlights edges of units")
 
---[[
-path='Settings/Audio'
-	AddOption({
-		name = 'Sound Volume',
+
+local pathAudio = 'Settings/Audio'
+	AddOption(pathAudio,{
+		name = 'Master Volume',
 		type = 'number',
 		min = 0, 
 		max = 100,
 		springsetting = 'snd_volmaster',
 		OnChange = function(self) spSendCommands{"set snd_volmaster " .. self.value} end
-	} )
-	AddOption({
+	})
+	AddOption(pathAudio,{
 		name = 'Music Volume',
 		type = 'number',
 		min = 0, 
@@ -524,19 +569,18 @@ path='Settings/Audio'
 		step = 0.01,
 		value = WG.music_volume or 0.5,
 		OnChange = function(self)	
-				if (WG.music_start_volume or 0 > 0) then 
-					Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
-				else 
-					Spring.SetSoundStreamVolume(self.value) 
-				end
-				local prevValue = WG.music_volume
-				--settings.music_volume = self.value
-				WG.music_volume = self.value
-				if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
-				if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
-			end,
-	} )
-]]
+			if (WG.music_start_volume or 0 > 0) then 
+				Spring.SetSoundStreamVolume(self.value / WG.music_start_volume) 
+			else 
+				Spring.SetSoundStreamVolume(self.value) 
+			end
+			local prevValue = WG.music_volume
+			--settings.music_volume = self.value
+			WG.music_volume = self.value
+			if (prevValue > 0 and self.value <=0) then widgetHandler:DisableWidget("Music Player") end 
+			if (prevValue <=0 and self.value > 0) then widgetHandler:EnableWidget("Music Player") end 
+		end,
+	})
 		
 --- HELP ---
 local pathHelp = 'Help'

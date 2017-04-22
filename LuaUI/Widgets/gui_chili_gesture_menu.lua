@@ -11,12 +11,13 @@ function widget:GetInfo()
     date      = "2009-not as hot as before",
     license   = "GNU GPL, v2 or later",
     layer     = 100000,
-    enabled   = true,
-    handler = true,
+    enabled   = false,
+    handler   = true,
   }
 end 
 
 include("keysym.h.lua")
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 -------------------------------------------------
 ------ SPEEDUPS
 -------------------------------------------------
@@ -82,7 +83,7 @@ local function OptionsChanged()
 	end
 end 
 
-options_path = 'Settings/HUD Panels/Gestures'
+options_path = 'Settings/Interface/Gesture Menu'
 options_order = { 'markingmenu', 'iconDistance', 'iconSize', 'selectedIconSize', 'mouseMoveThreshold', 'mouseIdleThreshold', 'keyboardOnly', 'onlyOpenWithKeyboard', "qwertz", 'alternateconfig', 'allowMultiple'}
 options = {
 	
@@ -573,9 +574,9 @@ function widget:MouseRelease(x,y,button)
 			if shift then tinsert(keyState, "shift") end
     
 			if meta and WG.CommandInsert then 
-				GiveNotifyingInsertOrder(CMD.MOVE,pos,keyState)
+				GiveNotifyingInsertOrder(CMD_RAW_MOVE,pos,keyState)
 			else 
-				GiveNotifyingOrder(CMD.MOVE, pos, keyState)
+				GiveNotifyingOrder(CMD_RAW_MOVE, pos, keyState)
 			end 
 		end 
 	end 

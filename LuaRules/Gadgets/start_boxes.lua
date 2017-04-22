@@ -6,29 +6,180 @@ function gadget:GetInfo() return {
 	author   = "Sprung",
 	date     = "2015-05-19",
 	license  = "PD",
-	layer    = -1,
+	layer    = -math.huge + 10,
 	enabled  = true,
 } end
 
 local gaiaAllyTeamID = select(6, Spring.GetTeamInfo(Spring.GetGaiaTeamID()))
-local shuffleMode = Spring.GetModOptions().shuffle or "off"
+local shuffleMode = Spring.GetModOptions().shuffle or "auto"
+local private_seed, startboxConfig
 
 VFS.Include ("LuaRules/Utilities/startbox_utilities.lua")
 
---[[ expose a randomness seed
-this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
-afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
 
--- turns out synced RNG is seeded only *after* the game starts so we have to hack ourselves another source of randomness
--- this makes the shuffle result discoverable through a widget with some extra work - hopefully the engine gets fixed sometime
-local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "some string")
-local private_seed = math.random(13,37) * public_seed
+local function GetAverageStartpoint(boxID)
+	local box = startboxConfig[boxID]
+	local startpoints = box.startpoints
 
-Spring.SetGameRulesParam("public_random_seed", public_seed)
-local startboxConfig = ParseBoxes()
-math.randomseed(private_seed)
+	local x, z = 0, 0
+	for i = 1, #startpoints do
+		x = x + startpoints[i][1]
+		z = z + startpoints[i][2]
+	end
+	x = x / #startpoints
+	z = z / #startpoints
+	
+	return x, z
+end
 
-GG.startBoxConfig = startboxConfig
+local function RegtangularizeTrapezoid(edgeA, edgeB)
+	local vector = Spring.Utilities.Vector
+	local origin = edgeA[1]
+	local unit = vector.Unit(vector.Subtract(edgeA[2], edgeA[1]))
+
+	if (edgeA[1][1] < edgeA[1][2]) ~= (edgeB[1][1] < edgeB[1][2]) then
+		-- Swap points if lines are passed backwards
+		edgeB[1], edgeB[2] = edgeB[2], edgeB[1]
+	end
+	
+	local distANear, distAFar = 0, vector.AbsVal(vector.Subtract(edgeA[2], edgeA[1]))
+	local distBNear, distBFar = vector.Dot(vector.Subtract(edgeB[1], edgeA[1]), unit), vector.Dot(vector.Subtract(edgeB[2], edgeA[1]), unit)
+	
+	local nearDist, farDist = math.max(distANear, distBNear), math.min(distAFar, distBFar)
+	
+	edgeA[1] = vector.Add(origin, vector.Mult(nearDist, unit))
+	edgeA[2] = vector.Add(origin, vector.Mult(farDist, unit))
+	local normal = vector.Normal(vector.Subtract(edgeB[1], edgeA[1]), unit)
+	return {edgeA[1], vector.Subtract(edgeA[2], edgeA[1]), normal}
+end
+
+local function GetBoxID(allyTeamID)
+	local teamID = Spring.GetTeamList(allyTeamID)[1]
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
+	return boxID
+end
+
+local function GetPlanetwarsBoxes (teamDistance, teamWidth, neutralWidth, edgeDist)
+	local attackerBoxID = GetBoxID(0)
+	local defenderBoxID = GetBoxID(1)
+
+	local attackerX, attackerZ = GetAverageStartpoint(attackerBoxID)
+	local defenderX, defenderZ = GetAverageStartpoint(defenderBoxID)
+
+	local function GetPointOnLine(distance)
+		return {
+			defenderX + distance * (attackerX - defenderX),
+			defenderZ + distance * (attackerZ - defenderZ),
+		}
+	end
+
+	local defenderBoxStart = GetPointOnLine(teamDistance)
+	local attackerBoxStart = GetPointOnLine(1 - teamDistance)
+	local middleBoxStart   = GetPointOnLine(0.5 - (neutralWidth / 2))
+	
+	local defenderBoxEnd = GetPointOnLine(teamDistance + teamWidth)
+	local attackerBoxEnd = GetPointOnLine(1 - (teamDistance + teamWidth))
+	local middleBoxEnd   = GetPointOnLine(0.5 + (neutralWidth / 2))
+
+	local function GetBasicRectangle(pointA, pointB, isX)
+		if isX then
+			return {
+				{edgeDist, pointA[2]},
+				{0, pointB[2] - pointA[2]},
+				{Game.mapSizeX - 2*edgeDist, 0},
+			}
+		else
+			return {
+				{pointA[1], edgeDist},
+				{0, Game.mapSizeZ - 2*edgeDist},
+				{pointB[1] - pointA[1], 0},
+			}
+		end
+	end
+	
+	if math.abs(defenderX - attackerX) < 10 or math.abs(defenderZ - attackerZ) < 10 then
+		local isX = math.abs(defenderX - attackerX) < 10
+		return {
+			attacker = GetBasicRectangle(attackerBoxStart, attackerBoxEnd, isX),
+			defender = GetBasicRectangle(defenderBoxStart, defenderBoxEnd, isX),
+			neutral = GetBasicRectangle(middleBoxStart, middleBoxEnd, isX),
+		}
+	end
+	
+	-- Note that the gradient is perpendicular to the gradient Attacker-Defender line.
+	local gradient = (attackerX - defenderX) / (defenderZ - attackerZ)
+	
+	local function GetEdgePoints(point)
+		local offset = point[2] - (gradient * point[1])
+		
+		local left = {
+			edgeDist,
+			(gradient * edgeDist) + offset,
+		}
+		if left[2] < edgeDist then
+			left[1] = (edgeDist - offset) / gradient
+			left[2] = edgeDist
+		elseif left[2] > Game.mapSizeZ - edgeDist then
+			left[1] = ((Game.mapSizeZ - edgeDist) - offset) / gradient
+			left[2] = Game.mapSizeZ - edgeDist
+		end
+		
+		local right = {
+			Game.mapSizeX - edgeDist,
+			(gradient * (Game.mapSizeX - edgeDist)) + offset,
+		}
+		if right[2] < edgeDist then
+			right[1] = (edgeDist - offset) / gradient
+			right[2] = edgeDist
+		elseif right[2] > Game.mapSizeZ - edgeDist then
+			right[1] = ((Game.mapSizeZ - edgeDist) - offset) / gradient
+			right[2] = Game.mapSizeZ - edgeDist
+		end
+		
+		return {left, right}
+	end
+
+	local function GetRectangle(pointA, pointB)
+		local edgesA = GetEdgePoints(pointA)
+		local edgesB = GetEdgePoints(pointB)
+		
+		return RegtangularizeTrapezoid(edgesA, edgesB)
+	end
+
+	return {
+		attacker = GetRectangle(attackerBoxStart, attackerBoxEnd),
+		defender = GetRectangle(defenderBoxStart, defenderBoxEnd),
+		neutral = GetRectangle(middleBoxStart, middleBoxEnd),
+	}
+end
+
+local function InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
+	if shuffleMode == "auto" then
+		if GetTeamCount() > 2 then
+			shuffleMode = "shuffle"
+		else
+			shuffleMode = "off"
+		end
+	end
+	Spring.SetGameRulesParam("shuffleMode", shuffleMode)
+
+	--[[ expose a randomness seed
+	this is so that LuaUI can reproduce randomness in the box config as otherwise they use different seeds
+	afterwards, reseed with a secret seed to prevent LuaUI from reproducing the randomness used for shuffling ]]
+
+	-- turns out synced RNG is seeded only *after* the game starts so we have to hack ourselves another source of randomness
+	-- this makes the shuffle result discoverable through a widget with some extra work - hopefully the engine gets fixed sometime
+	local public_seed = 123 * string.len(Spring.GetModOptions().commandertypes or "some string")
+	private_seed = math.random(13,37) * public_seed
+
+	Spring.Echo("Startboxes public_seed", public_seed)
+	Spring.SetGameRulesParam("public_random_seed", public_seed)
+	startboxConfig = ParseBoxes(public_seed)
+	math.randomseed(private_seed)
+
+	GG.startBoxConfig = startboxConfig
+	GG.GetPlanetwarsBoxes = GetPlanetwarsBoxes
+end
 
 local function CheckStartbox (boxID, x, z)
 	if not boxID then
@@ -73,6 +224,24 @@ end
 local function GetTeamNames (allyTeamID)
 	if allyTeamID == gaiaAllyTeamID then
 		return "Neutral", "Neutral" -- more descriptive than "Gaia"
+	end
+
+	local pwPlanet = Spring.GetModOptions().planet
+	if pwPlanet then
+		if allyTeamID == 0 then -- attacker is always 0, and always present
+			local shortName = Spring.GetModOptions().attackingfaction
+			local longName = Spring.GetModOptions().attackingfactionname
+			return longName, shortName
+		else
+			local defenderShortName = Spring.GetModOptions().defendingfaction
+			if not defenderShortName then -- attacking a neutral planet
+				local longName = pwPlanet .. " Militia"
+				return longName, "Militia"
+			else
+				local longName = Spring.GetModOptions().defendingfactionname
+				return longName, defenderShortName
+			end
+		end
 	end
 
 	local teamList = Spring.GetTeamList(allyTeamID) or {}
@@ -138,12 +307,15 @@ local function GetTeamNames (allyTeamID)
 end
 
 function gadget:Initialize()
+	InitializeThingsThatShouldNotBeInitializedOutsideACallinExclaimationMark()
+	GG.CheckStartbox = CheckStartbox
 
 	Spring.SetGameRulesParam("startbox_max_n", #startboxConfig)
 	Spring.SetGameRulesParam("startbox_recommended_startpos", 1)
 
 	local rawBoxes = GetRawBoxes()
-	for box_id, polygons in pairs(rawBoxes) do
+	for box_id, rawbox in pairs(rawBoxes) do
+		local polygons = rawbox.boxes
 		Spring.SetGameRulesParam("startbox_n_" .. box_id, #polygons)
 		for i = 1, #polygons do
 			local polygon = polygons[i]
@@ -176,7 +348,7 @@ function gadget:Initialize()
 		end
 	end
 
-	if (shuffleMode == "off") then
+	if (shuffleMode == "off") or (shuffleMode == "disable") then
 
 		for i = 1, #allyTeamList do
 			local allyTeamID = allyTeamList[i]
@@ -249,9 +421,7 @@ function gadget:Initialize()
 	end
 end
 
-GG.CheckStartbox = CheckStartbox
-
-function gadget:AllowStartPosition(x, y, z, playerID, readyState)
+function gadget:AllowStartPosition(playerID, teamID, readyState, x, y, z, rx, ry, rz)
 	if (x == 0 and z == 0) then
 		-- engine default startpos
 		return false
@@ -262,6 +432,13 @@ function gadget:AllowStartPosition(x, y, z, playerID, readyState)
 	end
 
 	local teamID = select(4, Spring.GetPlayerInfo(playerID))
+
+	if (shuffleMode == "disable") then
+		-- note this is after the AI check; toasters still have to obey
+		Spring.SetTeamRulesParam (teamID, "valid_startpos", 1)
+		return true
+	end
+
 	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
 	if (not boxID) or CheckStartbox(boxID, x, z) then
@@ -274,7 +451,14 @@ end
 
 function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	local command = "ai_is_valid_startpos:"
-	if not dataStr:find(command,1,true) then return end
+	local command2 = "ai_is_valid_enemy_startpos:"
+	if not dataStr:find(command,1,true) and not dataStr:find(command2,1,true) then return end
+	
+	if dataStr:find(command2,1,true) then
+		command = command2
+	end
+
+	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
 
 	local xz = dataStr:sub(command:len()+1)
 	local slash = xz:find("/",1,true)
@@ -284,10 +468,47 @@ function gadget:RecvSkirmishAIMessage(teamID, dataStr)
 	local z = tonumber(xz:sub(slash+1))
 	if not x or not z then return end
 
-	local boxID = Spring.GetTeamRulesParam(teamID, "start_box_id")
-	if (not boxID) or CheckStartbox(boxID, x, z) then
-		return "1"
+	if not dataStr:find(command2,1,true) then
+		-- for checking own startpos
+		if (not boxID) or CheckStartbox(boxID, x, z) then
+			return "1"
+		else
+			return "0"
+		end
 	else
-		return "0"
+		-- for checking enemy startpos
+		local enemyboxes = {}
+		local _,_,_,_,_,allyteamid,_,_ = Spring.GetTeamInfo(teamID)
+		local allyteams = Spring.GetAllyTeamList()
+		
+		if shuffleMode == "allshuffle" then
+			for id,_ in pairs(startboxConfig) do
+				if id ~= boxID then
+					enemyboxes[id] = true
+				end
+			end
+		else
+			for _,value in pairs(allyteams) do
+				if value ~= allyteamid then
+					local enemyteams = Spring.GetTeamList(value)
+					for _,value1 in pairs(enemyteams) do
+						local enemybox = Spring.GetTeamRulesParam(value1, "start_box_id")
+						if (enemybox) then
+							enemyboxes[enemybox] = true
+						end
+						break
+					end
+				end
+			end
+		end
+		
+		local valid = "0"
+		for bid,_ in pairs(enemyboxes) do
+			if CheckStartbox(bid, x, z) then
+				valid = "1"
+				break
+			end
+		end
+		return valid
 	end
 end

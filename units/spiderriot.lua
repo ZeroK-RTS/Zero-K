@@ -3,11 +3,9 @@ unitDef = {
   name                   = [[Redback]],
   description            = [[Riot Spider]],
   acceleration           = 0.22,
-  brakeRate              = 0.22,
-  buildCostEnergy        = 280,
+  brakeRate              = 0.66,
   buildCostMetal         = 280,
   buildPic               = [[spiderriot.png]],
-  buildTime              = 280,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -16,14 +14,11 @@ unitDef = {
   category               = [[LAND]],
   collisionVolumeOffsets = [[0 5 0]],
   collisionVolumeScales  = [[36 36 36]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]], 
   corpse                 = [[DEAD]],
 
   customParams           = {
     helptext       = [[A rapid fire spider which excels at picking off fast units.]],
-    description_pl = [[Pajak wsparcia]],
-    helptext_pl    = [[Szybkostrzelny pajak, ktory swietnie radzi sobie z niszczeniem lekkich jednostek.]],
     aimposoffset   = [[0 10 0]],
   },
 
@@ -43,7 +38,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName             = [[spiderriot.s3o]],
   script                 = [[spiderriot.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 366,
   trackOffset            = 0,
@@ -68,7 +62,7 @@ unitDef = {
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
       beamDecay               = 0.85,
-      beamTime                = 0.01,
+      beamTime                = 1/30,
       beamttl                 = 45,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -107,30 +101,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Tarantula]],
       blocking         = true,
-      damage           = 900,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 112,
       object           = [[tarantula_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 112,
     },
 
     HEAP  = {
-      description      = [[Debris - Tarantula]],
       blocking         = false,
-      damage           = 900,
-      energy           = 0,
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 56,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 56,
     },
 
   },

@@ -13,7 +13,7 @@ local Chili
 local spectating = Spring.GetSpectatingState()
 local allied_teams
 
-local scheme = Spring.GetModOptions().overdrivesharingscheme or "investmentreturn"
+local is_RoI = (Spring.GetModOptions().overdrivesharingscheme ~= "0")
 
 local window, fake_window
 local name_labels = {}
@@ -23,7 +23,7 @@ local base_income_labels = {}
 local od_income_labels = {}
 
 function widget:Initialize()
-	if (scheme ~= "investmentreturn") then
+	if not is_RoI then
 		Spring.Echo ("RoI Counter: No need to track capital under Communism, comrade!")
 		widgetHandler:RemoveWidget()
 		return
@@ -94,6 +94,7 @@ function CreateWindow()
 		minWidth = 320,
 		clientHeight = 100,
 		minHeight = 50,
+		classname = "main_window_small",
 		draggable = true,
 		resizable = true,
 		tweakDraggable = true,

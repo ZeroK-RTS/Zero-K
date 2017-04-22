@@ -4,23 +4,18 @@ unitDef = {
   description         = [[Minelaying Hover]],
   acceleration        = 0.0435,
   brakeRate           = 0.205,
-  buildCostEnergy     = 200,
   buildCostMetal      = 200,
   builder             = false,
   buildPic            = [[hoverminer.png]],
-  buildTime           = 200,
   canAttack           = true,
   canGuard            = true,
-  canHover            = true,
   canMove             = true,
   canPatrol           = true,
   category            = [[HOVER]],
   corpse              = [[DEAD]],
 
   customParams        = {
-    description_pl = [[Poduszkowiec - stawiacz min]],
     helptext       = [[The Dampener deploys mines a short distance from itself.]],
-    helptext_pl    = [[Dampener rozklada naokolo siebie miny.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -30,7 +25,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 153,
   maxDamage           = 400,
   maxSlope            = 18,
   maxVelocity         = 2.1,
@@ -41,7 +35,6 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[hoverminer.s3o]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -51,10 +44,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[ARM]],
   sightDistance       = 484,
-  smoothAnim          = true,
   turninplace         = 0,
   turnRate            = 500,
   workerTime          = 0,
@@ -112,36 +102,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Dampener]],
       blocking         = true,
-      damage           = 400,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 80,
       object           = [[hoverminer_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Dampener]],
       blocking         = false,
-      damage           = 400,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 40,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
   },

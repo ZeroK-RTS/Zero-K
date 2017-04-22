@@ -14,8 +14,7 @@ end
 
 
 -- Speedups
-
-local CMD_MOVE = CMD.MOVE
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_WAIT = CMD.WAIT
 local CMD_STOP = CMD.STOP
 local CMD_GUARD = CMD.GUARD
@@ -143,9 +142,9 @@ local function updateFollowers()
 	if (v.fol) then -- give move orders to cloakiees
 	  local dis = spGetUnitSeparation(unit,v.fol)
 	  if dis > v.range then
-	    GiveClampedOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
 	  elseif (cloakieeStopDis < dis) then
-	    GiveClampedOrderToUnit(unit,CMD_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
+	    GiveClampedOrderToUnit(unit,CMD_RAW_MOVE,{cloakers[v.fol].ux,cloakers[v.fol].uy,cloakers[v.fol].uz},CMD_OPT_RIGHT)
 	  else
 	    spGiveOrderToUnit(unit,CMD_STOP,{},CMD_OPT_RIGHT)
 	  end

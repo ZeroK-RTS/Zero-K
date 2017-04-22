@@ -19,7 +19,7 @@ local carrierDefNames = {
 		},
 	},
 	
-	reef = {
+	shipcarrier = {
 		spawnPieces = {"DroneAft", "DroneFore", "DroneLower","DroneUpper"},
 		{
 			drone = UnitDefNames.carrydrone.id, 
@@ -68,6 +68,58 @@ local carrierDefNames = {
 			buildTime = 3, 
 			maxBuild = 1,
 			offsets = {0, 8, 15, colvolMidX = 0, colvolMidY = 30, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0} --shift colvol to avoid collision.
+		},
+	},
+	pw_garrison = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.attackdrone.id, 
+			reloadTime = 10, 
+			maxDrones = 8, 
+			spawnSize = 1, 
+			range = 800, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
+		},
+	},
+	pw_grid = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.battledrone.id, 
+			reloadTime = 10, 
+			maxDrones = 6, 
+			spawnSize = 1, 
+			range = 800, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 5, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
+		},
+	},
+	pw_hq_attacker = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.attackdrone.id, 
+			reloadTime = 10, 
+			maxDrones = 6, 
+			spawnSize = 1, 
+			range = 500, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
+		},
+	},
+	pw_hq_defender = {
+		spawnPieces = {"drone"},
+		{
+			drone = UnitDefNames.attackdrone.id, 
+			reloadTime = 10, 
+			maxDrones = 6, 
+			spawnSize = 1, 
+			range = 500, 
+			buildTime = 5, 
+			maxBuild = 1,
+			offsets = {0, 3, 0, colvolMidX = 0, colvolMidY = 0, colvolMidZ = 0, aimX = 0, aimY = 0, aimZ = 0}
 		},
 	},
 }

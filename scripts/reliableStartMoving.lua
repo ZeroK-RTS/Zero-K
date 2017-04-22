@@ -1,4 +1,3 @@
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
 
 local spGetGroundHeight = Spring.GetGroundHeight
 local spGetUnitVelocity = Spring.GetUnitVelocity
@@ -12,12 +11,7 @@ function StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCoun
 		x,y,z = spGetUnitPosition(unitID)
 		height = spGetGroundHeight(x,z)
 		if y - height < 1 then
-			if isNewEngine then
-				speed = select(4,spGetUnitVelocity(unitID))
-			else
-				x,y,z = spGetUnitVelocity(unitID)
-				speed = math.sqrt(x*x+y*y+z*z)
-			end
+			speed = select(4,spGetUnitVelocity(unitID))
 			if moving then
 				if speed <= thresholdSpeed then
 					moving = false
@@ -35,6 +29,6 @@ function StartStopMovingControl(startFunc, stopFunc, thresholdSpeed, fallingCoun
 				startFunc()
 			end
 		end
-		Sleep(60)
+		Sleep(350)
 	end
 end

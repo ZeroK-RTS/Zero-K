@@ -19,13 +19,11 @@ unitDef = {
   customParams        = {
     description_fr = [[Taupe Scout/Raider]],
 	description_de = [[Eingrabender Scout/Raider]],
-	description_pl = [[Podziemny zwiadowca]],
 	-- Currently Diggers only appear through ninja spawn (not actual unburrowing) and there is no "seismic detection equipment"
     -- helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can burrow and travel underground (very slowly), where the only way to locate it is with sesimic detection equipment.]],
     helptext       = [[The Digger's strong claws can scoop through the hardest rock like gravy. As such, it can undetectably travel underground and appear anyplace it can cause mayhem. Protect your valuables directly, as Diggers can bypass your main defense lines.]],
     helptext_fr    = [[Les griffes puissantes du Digger lui permettent de creuser avec facilit? m?me dans les sols les plus durs. Cela lui permet donc de s'enterrer et de creuser des galeries sous terre, bien que tr?s lentement, mais n?cessitant alors pour le localiser un ?quipement de d?tection sismique.]],
 	helptext_de    = [[Der Digger gräbt sich mit seinen scharfen Klauen auch durch das härteste Gestein. So kann er sich eingraben und sich im Untergrund sehr langsam fortbewegen, wo man ihn nur mit seismischen Detektionsgeräten entdecken kann.]],
-	helptext_pl    = [[Digger niczym kret przebija sie niewykrywalnie przez skaly i moze wyjsc w dowolnym miejscu. Chron wazne jednostki bezposrednio, jako ze Digger moze bezpiecznie ominac glowne linie obrony.]],
   },
 
   explodeAs           = [[SMALL_UNITEX]],
@@ -36,7 +34,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 67,
   maxDamage           = 180,
   maxSlope            = 36,
   maxVelocity         = 3,
@@ -48,7 +45,6 @@ unitDef = {
   objectName          = [[chicken_digger.s3o]],
   onoffable           = true,
   power               = 40,
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -60,10 +56,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 256,
-  smoothAnim          = true,
   trackOffset         = 1,
   trackStrength       = 6,
   trackStretch        = 1,
@@ -115,7 +108,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterWeapon             = true,
-      weaponTimer             = 0.1,
       weaponType              = [[Cannon]],
       weaponVelocity          = 500,
     },

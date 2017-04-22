@@ -8,15 +8,11 @@ local lbarrel = piece 'lbarrel'
 local rbarrel = piece 'rbarrel' 
 local lflare = piece 'lflare' 
 local rflare = piece 'rflare' 
-local exhaust = piece 'exhaust' 
-local wake1 = piece 'wake1' 
-local wake2 = piece 'wake2' 
-local wake3 = piece 'wake3' 
-local wake4 = piece 'wake4' 
-local wake5 = piece 'wake5' 
-local wake6 = piece 'wake6' 
-local wake7 = piece 'wake7' 
-local wake8 = piece 'wake8' 
+local exhaust = piece 'exhaust'
+local wakes = {}
+for i = 1, 8 do
+	wakes[i] = piece ('wake' .. i)
+end
 local ground1 = piece 'ground1'
 
 local random = math.random 
@@ -60,32 +56,24 @@ local function WobbleUnit()
 	end
 end
 
+local sfxNum = 0
+function script.setSFXoccupy(num)
+	sfxNum = num
+end
+
 local function MoveScript()
 	while Spring.GetUnitIsStunned(unitID) do
 		Sleep(2000)
 	end
 	while true do
 		if not Spring.GetUnitIsCloaked(unitID) then
-			if random() < 0.5 then
-				EmitSfx(wake1, 5)
-				EmitSfx(wake3, 5)
-				EmitSfx(wake5, 5)
-				EmitSfx(wake7, 5)
-				EmitSfx(wake1, 3)
-				EmitSfx(wake3, 3)
-				EmitSfx(wake5, 3)
-				EmitSfx(wake7, 3)
+			if (sfxNum == 1 or sfxNum == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0 then
+				for i = 1, 8 do
+					EmitSfx(wakes[i], 3)
+				end
 			else
-				EmitSfx(wake2, 5)
-				EmitSfx(wake4, 5)
-				EmitSfx(wake6, 5)
-				EmitSfx(wake8, 5)
-				EmitSfx(wake2, 3)
-				EmitSfx(wake4, 3)
-				EmitSfx(wake6, 3)
-				EmitSfx(wake8, 3)
+				EmitSfx(ground1, 1024)
 			end
-			EmitSfx(ground1, UNIT_SFX1)
 		end
 		Sleep(150)
 	end
@@ -150,42 +138,17 @@ end
 function script.Killed(recentDamage, maxHealth)
 	local severity = recentDamage / maxHealth
 	if severity <= 0.25 then
-		Explode(front, sfxNone)
-		Explode(wake1, sfxNone)
-		Explode(wake2, sfxNone)
-		Explode(wake3, sfxNone)
-		Explode(wake4, sfxNone)
-		Explode(wake5, sfxNone)
-		Explode(wake6, sfxNone)
 		return 1
 	elseif severity <= 0.50 then
 		Explode(front, sfxNone)
 		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall)
-		Explode(wake2, sfxFall)
-		Explode(wake3, sfxFall)
-		Explode(wake4, sfxFall)
-		Explode(wake5, sfxFall)
-		Explode(wake6, sfxFall)
 		return 1
 	elseif severity <= 0.99 then
 		Explode(front, sfxShatter)
 		Explode(turret, sfxShatter)
-		Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-		Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 		return 2
 	end
 	Explode(front, sfxShatter)
 	Explode(turret, sfxShatter)
-	Explode(wake1, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(wake2, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(wake3, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(wake4, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(wake5, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
-	Explode(wake6, sfxFall + sfxSmoke + sfxFire + sfxExplodeOnHit)
 	return 2
 end

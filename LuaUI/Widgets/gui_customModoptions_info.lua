@@ -17,6 +17,10 @@ end
 
 local options = VFS.Include("ModOptions.lua")
 
+local displayExceptions = {
+	mutespec = true,
+}
+
 -- gui elements
 local window2
 	
@@ -30,6 +34,8 @@ function widget:Initialize()
 		widgetHandler:RemoveWidget() --auto-close in case user do /luaui reload
 		return
 	end
+	
+	displayWindow = false
 
 	local customizedModOptions = {}
 	for i=1, #options do
@@ -48,6 +54,9 @@ function widget:Initialize()
 				value = value or defValue
 			end
 			if value and value ~= defValue then
+				if not displayExceptions[keyName] then
+					displayWindow = true
+				end
 				local index = #customizedModOptions
 				customizedModOptions[index+1] = options[i].name
 				customizedModOptions[index+2] = {"value: "..value,{options[i].desc}}
@@ -55,7 +64,7 @@ function widget:Initialize()
 		end
 	end
 
-	if #customizedModOptions == 0 then
+	if not displayWindow then
 		widgetHandler:RemoveWidget()
 		return
 	end
@@ -65,8 +74,8 @@ function widget:Initialize()
 	window2 = Chili.Window:New{
 		x = vsx/2-100,
 		y = 3*vsy/4-20,
-		width  = 200,
-		padding = {5, 0, 5,5},
+		width  = 210,
+		classname = "main_window_small_tall",
 		textColor = {1,1,1,0.55}, 
 		height = math.min(112,vsy/2),
 		parent = Chili.Screen0,
@@ -76,8 +85,8 @@ function widget:Initialize()
 			Chili.Button:New { --from gui_chili_vote.lua by KingRaptor
 				width = 7,
 				height = 7,
-				y = 0,
-				right = 0,
+				y = 4,
+				right = 4,
 				textColor = {1,1,1,0.55}, 
 				caption="x";
 				tooltip = "Close window";
@@ -87,8 +96,8 @@ function widget:Initialize()
 						end}
 			},
 			Chili.ScrollPanel:New{
-				x=0, right=0,
-				y=20, bottom=0,
+				x=4, right=4,
+				y=20, bottom=4,
 				children = {
 					Chili.TreeView:New{ --from gui_chilidemo.lua by quantum
 						x=0, right=0,

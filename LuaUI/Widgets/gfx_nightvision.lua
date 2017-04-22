@@ -107,7 +107,7 @@ function widget:Initialize()
   if gl.CreateShader then
     shaderProgram = gl.CreateShader(shaderTable)
   else
-    Spring.Echo("<Obama Shader>: GLSL not supported.")
+    Spring.Echo("<Night Vision Shader>: GLSL not supported.")
   end
   
   if not shaderProgram then

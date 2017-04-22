@@ -95,7 +95,7 @@ local scrH, scrW 		= 0,0
 local myAlliance 		= Spring.GetLocalAllyTeamID()
 local myTeamID 			= Spring.GetLocalTeamID()
 
-local ceasefires 		= true
+local ceasefires 		= (not Spring.FixedAllies())
 local marketandbounty 	= false
 
 local window_unitcontext, window_unitstats
@@ -106,6 +106,9 @@ local colorFire = {1, 0.3, 0, 1}
 local colorPurple = {0.9, 0.2, 1, 1}
 local colorDisarm = {0.5, 0.5, 0.5, 1}
 local colorCapture = {0.6, 1, 0.6, 1}
+
+local valkMaxMass = UnitDefNames.corvalk.transportMass
+local valkMaxSize = UnitDefNames.corvalk.transportSize * 2
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -121,6 +124,7 @@ options = {
 		name = "Short Number Notation",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		desc = 'Shows short number notation for HP and other values.',
 		path = 'Settings/HUD Panels/Unit Stats Help Window'
 	},
@@ -165,7 +169,7 @@ end
 local function AddFactoryOfUnits(defName)
 	local ud = UnitDefNames[defName]
     local name = "Units/" .. string.gsub(ud.humanName, "/", "-")
-	addUnit(ud.id, name, true)
+	addUnit(ud.id, "Buildings/Factory", true)
 	for i = 1, #ud.buildOptions do
 		addUnit(ud.buildOptions[i], name, true)
     end
@@ -186,7 +190,7 @@ AddFactoryOfUnits("striderhub")
 AddFactoryOfUnits("missilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-local _, _, factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
+local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")
 
 for i = 1, #buildOpts do
 	local udid = UnitDefNames[buildOpts[i]].id
@@ -241,15 +245,6 @@ local function tobool(val)
   end
   return false
 end
-
-if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
-  ceasefires = false
-end 
-
-if tobool(Spring.GetModOptions().marketandbounty) then
-	marketandbounty = true
-end 
-
 
 function comma_value(amount, displayPlusMinus)
 	local formatted
@@ -316,8 +311,9 @@ local function CloseButton(width)
 		OnClick = { CloseButtonFunc }, 
 		width=width, 
 		height = B_HEIGHT,
-		backgroundColor=color.sub_back_bg, 
-		textColor=color.sub_back_fg,
+		--backgroundColor=color.sub_back_bg, 
+		--textColor=color.sub_back_fg,
+		--classname = "back_button",
 	}
 end
 
@@ -407,10 +403,10 @@ local function weapons2Table(cells, ws, unitID)
 
 		local stun_time = 0
 
-		local val = tonumber(cp.statsdamage) or wd.damages[0] or 0
+		local val = tonumber(cp.statsdamage) or wd.customParams.shield_damage or 0
 		
 		if cp.disarmdamagemult then
-			damd = val * cp.disarmdamagemult
+			damd = val * cp.disarmdamagemult * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if (cp.disarmdamageonly == "1") then
 				val = 0
 			end
@@ -418,7 +414,7 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if cp.timeslow_damagefactor then
-			dams = val * cp.timeslow_damagefactor
+			dams = val * cp.timeslow_damagefactor * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if (cp.timeslow_onlyslow == "1") then
 				val = 0
 			end
@@ -434,13 +430,15 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if wd.paralyzer then
-			damw = val
+			damw = val * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 			if stun_time == 0 then
 				stun_time = wd.damages.paralyzeDamageTime
 			end
 		else
 			dam = val
 		end
+		
+		dam = dam * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_damage_mult")) or 1)
 
 		-- get reloadtime and calculate dps
 		local reloadtime = tonumber(cp.script_reload) or wd.reload
@@ -558,8 +556,9 @@ local function weapons2Table(cells, ws, unitID)
 		end
 
 		if show_range then
+			local range = cp.truerange or wd.range
 			cells[#cells+1] = ' - Range:'
-			cells[#cells+1] = numformat(wd.range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
+			cells[#cells+1] = numformat(range * ((unitID and Spring.GetUnitRulesParam(unitID, "comm_range_mult")) or 1),2) .. " elmo"
 		end
 
 		local aoe = wd.impactOnly and 0 or wd.damageAreaOfEffect
@@ -1078,10 +1077,15 @@ local function printAbilities(ud, unitID)
 	end
 
 	if ud.metalStorage > 0 then
-		cells[#cells+1] = 'Stores: '
+		cells[#cells+1] = 'Stores metal: '
 		cells[#cells+1] = ud.metalStorage .. " M"
 	end
-
+	
+	if ud.energyStorage > 0 then
+		cells[#cells+1] = 'Stores energy: '
+		cells[#cells+1] = ud.energyStorage .. " E"
+	end
+	
 	if (#cells > 2 and cells[#cells-1] == '') then
 		cells[#cells] = nil
 		cells[#cells] = nil
@@ -1289,6 +1293,13 @@ local function printunitinfo(ud, buttonWidth, unitID)
 		statschildren[#statschildren+1] = Label:New{ caption = numformat(ud.turnRate * Game.gameSpeed * COB_angle_to_degree) .. " deg/s", textColor = color.stats_fg, }
 	end
 
+	local metal = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_metalIncome") or 0) or ((ud.metalMake or 0) + (ud.customParams.income_metal or 0)))
+
+	if metal ~= 0 then
+		statschildren[#statschildren+1] = Label:New{ caption = 'Metal: ', textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = (metal > 0 and '+' or '') .. numformat(metal,2) .. " M/s", textColor = color.stats_fg, }
+	end
+	
 	local energy = (isCommander and (Spring.GetUnitRulesParam(unitID, "wanted_energyIncome") or 0) or ((ud.energyMake or 0) - (ud.customParams.upkeep_energy or 0) + (ud.customParams.income_energy or 0)))
 
 	if energy ~= 0 then
@@ -1321,7 +1332,7 @@ local function printunitinfo(ud, buttonWidth, unitID)
 	-- transportability by light or heavy airtrans
 	if not (ud.canFly or ud.cantBeTransported) then
 		statschildren[#statschildren+1] = Label:New{ caption = 'Transportable: ', textColor = color.stats_fg, }
-		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > 350) or (ud.xsize > 4) or (ud.zsize > 4)) and "Heavy") or "Light"), textColor = color.stats_fg, }
+		statschildren[#statschildren+1] = Label:New{ caption = ((((ud.mass > valkMaxMass) or (ud.xsize > valkMaxSize) or (ud.zsize > valkMaxSize)) and "Heavy") or "Light"), textColor = color.stats_fg, }
 	end
 	
 	if legacyModules then
@@ -1484,23 +1495,9 @@ local function tooltipBreakdown(tooltip)
 	local unitname = nil
 
 	if tooltip:find('Build', 1, true) == 1 then
-		local start,fin = tooltip:find([[ - ]], 1, true)
-		if start and fin then
-			local unitHumanName
-			local buildType
-			if (tooltip:find('Build Unit:', 1, true) == 1) then
-				buildType = 'buildunit'
-				unitHumanName = tooltip:sub(13,start-1)
-			else
-				buildType = 'build'
-				unitHumanName = tooltip:sub(8,start-1)
-			end
-			local udef = GetUnitDefByHumanName(unitHumanName)
-			
-			return udef or false
-			
-		end
-		
+		local name = string.sub(tooltip, ((tooltip:find('BuildUnit', 1, true) == 1) and 10) or 6)
+		local ud = name and UnitDefNames[name]
+		return ud or false
 	elseif tooltip:find('Morph', 1, true) == 1 then
 		local unitHumanName = tooltip:gsub('Morph into a (.*)(time).*', '%1'):gsub('[^%a \-]', '')
 		local udef = GetUnitDefByHumanName(unitHumanName)
@@ -1557,9 +1554,9 @@ MakeStatsWindow = function(ud, x,y, unitID)
 	local children = {
 		ScrollPanel:New{
 			--horizontalScrollbar = false,
-			x=0,y=15,
-			width='100%',
-			bottom = B_HEIGHT*2,
+			x=5,y=15,
+			right = 5,
+			bottom = B_HEIGHT + 10,
 			padding = {2,2,2,2},
 			children = printunitinfo(ud, window_width, unitID) ,
 		},	
@@ -1567,13 +1564,14 @@ MakeStatsWindow = function(ud, x,y, unitID)
 			caption = 'Close', 
 			OnClick = { function(self) KillStatsWindow(num) end }, 
 			
-			x=0,
+			x=5,
 			height=B_HEIGHT,
-			right=10,
-			bottom=1,
+			right=5,
+			bottom=5,
 			
-			backgroundColor=color.sub_back_bg, 
-			textColor=color.sub_back_fg,
+			--backgroundColor=color.sub_back_bg, 
+			--textColor=color.sub_back_fg,
+			--classname = "back_button",
 		}
 	}
 
@@ -1589,6 +1587,7 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		resizable = true,
 		parent = screen0,
 		backgroundColor = color.stats_bg, 
+		classname = "main_window_small",
 		
 		minWidth = 250,
 		minHeight = 300,
@@ -1598,7 +1597,6 @@ MakeStatsWindow = function(ud, x,y, unitID)
 		children = children,
 	}
 	AdjustWindow(statswindows[num])
-	
 end
 
 local function PriceWindow(unitID, action)
@@ -1640,8 +1638,9 @@ local function PriceWindow(unitID, action)
 				OnClick = { func, CloseButtonFunc2 }, 
 				width=window_width,
 				height=B_HEIGHT,
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				--classname = "back_button",
 			}
 		end
 	end
@@ -1715,8 +1714,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 			caption = 'Unit Info', 
 			OnClick = { function() MakeStatsWindow(ud,x,y) end }, 
 			width=window_width,
-			backgroundColor=color.sub_back_bg, 
-			textColor=color.sub_back_fg,
+			--backgroundColor=color.sub_back_bg, 
+			--textColor=color.sub_back_fg,
+			--classname = "back_button",
 		},
 	}
 	local y = scrH-y
@@ -1728,16 +1728,18 @@ local function MakeUnitContextMenu(unitID,x,y)
 				caption = 'Set Sale Price', 
 				OnClick = { function(self) PriceWindow(unitID, 'sell') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				--classname = "back_button",
 			}
 		else
 			children[#children+1] =  Button:New{ 
 				caption = 'Offer To Buy', 
 				OnClick = { function(self) PriceWindow(unitID, 'buy') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				--classname = "back_button",
 			}
 		end
 		if myAlliance ~= alliance then
@@ -1745,8 +1747,9 @@ local function MakeUnitContextMenu(unitID,x,y)
 				caption = 'Place Bounty', 
 				OnClick = { function(self) PriceWindow(unitID, 'bounty') end }, 
 				width=window_width, 
-				backgroundColor=color.sub_back_bg, 
-				textColor=color.sub_back_fg,
+				--backgroundColor=color.sub_back_bg, 
+				--textColor=color.sub_back_fg,
+				--classname = "back_button",
 			}
 		end
 	end
@@ -1782,6 +1785,7 @@ local function MakeUnitContextMenu(unitID,x,y)
 		y = y,  
 		clientWidth  = window_width,
 		clientHeight = window_height,
+		classname = "main_window_small",
 		resizable = false,
 		parent = screen0,
 		backgroundColor = color.context_bg, 
@@ -1803,7 +1807,7 @@ function widget:MousePress(x,y,button)
 		----------
 		local groundTooltip
 		if WG.customToolTip then --find any custom ground tooltip placed on the ground
-			local _, pos = spTraceScreenRay(x,y, true) --return coordinate of the ground
+			local _, pos = spTraceScreenRay(x,y, true, false, false, true) --return coordinate of the ground
 			for _, data in pairs(WG.customToolTip) do --iterate over WG.customToolTip
 				if data.box and pos and (pos[1]>= data.box.x1 and pos[1]<= data.box.x2) and (pos[3]>= data.box.z1 and pos[3]<= data.box.z2) then --check if within box side x & check if within box side z
 					groundTooltip = data.tooltip --copy tooltip
@@ -1821,7 +1825,7 @@ function widget:MousePress(x,y,button)
 			return false
 		end
 		
-		local type, data = spTraceScreenRay(x, y)
+		local type, data = spTraceScreenRay(x, y, false, false, false, true)
 		if (type == 'unit') then
 			local unitID = data
 			

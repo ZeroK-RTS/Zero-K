@@ -29,7 +29,7 @@ local function HoveringAnimations () -- wobbling, waves and dust clouds
 		end
 
 		if not Spring.GetUnitIsCloaked(unitID) then
-			if (curTerrainType <= 2) then
+			if (curTerrainType == 1 or curTerrainType == 2) and select(2, Spring.GetUnitPosition(unitID)) == 0 then
 				for j = 1, 8 do
 					EmitSfx (wakes[j], 3)
 				end
@@ -71,7 +71,7 @@ function script.StopBuilding()
 	Turn(boom, y_axis, math.pi, math.rad(50))
 end
 
-function script.SetSFXoccupy(num)
+function script.setSFXoccupy(num)
 	curTerrainType = num
 end
 

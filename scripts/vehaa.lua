@@ -20,8 +20,6 @@ local spGetUnitVelocity = Spring.GetUnitVelocity
 local spGetUnitPosition = Spring.GetUnitPosition
 local spGetUnitPiecePosDir = Spring.GetUnitPiecePosDir
 
-local isNewEngine = not ((Game.version:find('91.0') == 1) and (Game.version:find('91.0.1') == nil))
-
 local SUSPENSION_BOUND = 7
 local WHEEL_TURN_MULT = 1.2
 local ANIM_PERIOD = 50
@@ -30,6 +28,9 @@ local smokePiece = {turret, body}
 local moving, runSpin, wheelTurnSpeed
 
 local turnTilt = 0
+
+local SETTLE_PERIODS = 15
+local settleTimer = 0
 
 local function GetWheelHeight(piece)
 	local x,y,z = spGetUnitPiecePosDir(unitID, piece)
@@ -113,64 +114,65 @@ function Suspension()
 	local speed = 0
 	
 	while true do 
-		
-		x,y,z = spGetUnitPosition(unitID)
-		height = spGetGroundHeight(x,z)
-		
-		if y - height < 1 then -- If I am on the ground
-			
-			if isNewEngine then
-				speed = select(4,spGetUnitVelocity(unitID))
-			else
-				x,y,z = spGetUnitVelocity(unitID)
-				speed = math.sqrt(x*x+y*y+z*z)
+		speed = select(4,spGetUnitVelocity(unitID))
+		wheelTurnSpeed = speed*WHEEL_TURN_MULT
+	
+		if moving then
+			if speed <= 0.05 then
+				StopMoving()
 			end
-			wheelTurnSpeed = speed*WHEEL_TURN_MULT
-		
-			if moving then
-				if speed <= 0.05 then
-					StopMoving()
-				end
-			else
-				if speed > 0.05 then
-					StartMoving()
-				end
+		else
+			if speed > 0.05 then
+				StartMoving()
 			end
-
-			s1r = GetWheelHeight(gs1r)
-			s2r = GetWheelHeight(gs2r)
-			s1l = GetWheelHeight(gs1l)
-			s2l = GetWheelHeight(gs2l)
+		end
+		
+		if speed > 0.05 then
+			settleTimer = 0
+		elseif settleTimer < SETTLE_PERIODS then
+			settleTimer = settleTimer + 1
+		end
+		
+		if speed > 0.05 or (settleTimer < SETTLE_PERIODS) then
+			x,y,z = spGetUnitPosition(unitID)
+			height = spGetGroundHeight(x,z)
 			
-			--xtilta = (s3r + s3l - s1l - s1r)/6000	
-			--xtiltv = xtiltv*0.99 + xtilta
-			--xtilt = xtilt*0.98 + xtiltv
+			if y - height < 1 then -- If I am on the ground
+				s1r = GetWheelHeight(gs1r)
+				s2r = GetWheelHeight(gs2r)
+				s1l = GetWheelHeight(gs1l)
+				s2l = GetWheelHeight(gs2l)
+				
+				--xtilta = (s3r + s3l - s1l - s1r)/6000	
+				--xtiltv = xtiltv*0.99 + xtilta
+				--xtilt = xtilt*0.98 + xtiltv
 
-			ztilta = (s1r + s2r - s1l - s2l)/10000 + turnTilt
-			ztiltv = ztiltv*0.99 + ztilta
-			ztilt = ztilt*0.98 + ztiltv
+				ztilta = (s1r + s2r - s1l - s2l)/10000 + turnTilt
+				ztiltv = ztiltv*0.99 + ztilta
+				ztilt = ztilt*0.98 + ztiltv
 
-			ya = (s1r + s2r + s1l + s2l)/1000
-			yv = yv*0.99 + ya
-			yp = yp*0.98 + yv
+				ya = (s1r + s2r + s1l + s2l)/1000
+				yv = yv*0.99 + ya
+				yp = yp*0.98 + yv
 
-			Move(rockbase, y_axis, yp, 9000)
-			--Turn(rockbase, x_axis, xtilt, math.rad(9000))
-			Turn(rockbase, z_axis, -ztilt, math.rad(9000))
+				Move(rockbase, y_axis, yp, 9000)
+				--Turn(rockbase, x_axis, xtilt, math.rad(9000))
+				Turn(rockbase, z_axis, -ztilt, math.rad(9000))
 
-			Move(rwheel1, y_axis, s1r, 20)
-			Move(rwheel2, y_axis, s2r, 20)
-										
-			Move(lwheel1, y_axis, s1l, 20)
-			Move(lwheel2, y_axis, s2l, 20)
+				Move(rwheel1, y_axis, s1r, 20)
+				Move(rwheel2, y_axis, s2r, 20)
+											
+				Move(lwheel1, y_axis, s1l, 20)
+				Move(lwheel2, y_axis, s2l, 20)
 
-			Spin(rwheel1, x_axis, wheelTurnSpeed)
-			Spin(rwheel2, x_axis, wheelTurnSpeed)
-			Spin(lwheel1, x_axis, wheelTurnSpeed)
-			Spin(lwheel2, x_axis, wheelTurnSpeed)
+				Spin(rwheel1, x_axis, wheelTurnSpeed)
+				Spin(rwheel2, x_axis, wheelTurnSpeed)
+				Spin(lwheel1, x_axis, wheelTurnSpeed)
+				Spin(lwheel2, x_axis, wheelTurnSpeed)
+			end
 		end
 		Sleep(ANIM_PERIOD)
- end 
+	end 
 end
 
 function script.Create()

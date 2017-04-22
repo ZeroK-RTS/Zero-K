@@ -1,5 +1,4 @@
--- Spring metadata for uar_gazpoweredenergystation.obj
-pw_gaspowerstation = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -31,7 +30,7 @@ pw_gaspowerstation = {
 		},
 	},
 
-	radius = 30,
+	radius = 40,
 	height = 40.00,
 	midpos = {0.00, 20.00, 0.00},
 
@@ -43,5 +42,3 @@ pw_gaspowerstation = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return pw_gaspowerstation

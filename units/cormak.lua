@@ -3,11 +3,10 @@ unitDef = {
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
-  brakeRate              = 0.25,
-  buildCostEnergy        = 250,
+  activateWhenBuilt      = true,
+  brakeRate              = 0.75,
   buildCostMetal         = 250,
   buildPic               = [[cormak.png]],
-  buildTime              = 250,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -16,15 +15,10 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô dispersador]],
-    description_es = [[Robot de alboroto]],
     description_fr = [[Robot ?meurier]],
-    description_it = [[Robot da rissa]],
     description_de = [[Riot Roboter]],
-    description_pl = [[Bot wsparcia]],
     helptext       = [[The Outlaw emits an electromagnetic disruption pulse in a wide circle around it that damages and slows enemy units. Friendly units are unaffected.]],
     helptext_de    = [[Der Outlaw stößt einen elektromagnetischen Störungspuls, in einem weiten Kreis um sich herum, aus, welcher feindliche Einheiten schädigt und verlangsamt. Freundliche Einheiten sind davon aber nicht betroffen.]],
-    helptext_pl    = [[Outlaw wyzwala fale, ktore uszkadzaja i spowalniaja wszystkie wrogie jednostki wokol niego, zostawiajac sojusznikow bez szwanku.]],
   },
 
   explodeAs              = [[BIG_UNITEX]],
@@ -43,7 +37,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[behethud.s3o]],
   onoffable              = true,
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
   script                 = [[cormak.lua]],
 
@@ -187,7 +180,7 @@ unitDef = {
       flightTime              = 1,
       impactOnly              = true,
       interceptedByShieldType = 1,
-      range                   = 300,
+      range                   = 240,
       reloadtime              = 0.95,
       size                    = 1E-06,
       smokeTrail              = false,
@@ -211,28 +204,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Outlaw]],
       blocking         = true,
-      damage           = 1050,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 100,
       object           = [[behethud_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 100,
     },
 
     HEAP  = {
-      description      = [[Debris - Outlaw]],
       blocking         = false,
-      damage           = 1050,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 50,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 50,
     },
 
   },

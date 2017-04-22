@@ -19,7 +19,7 @@ local weaponDef = {
 	cylinderTargeting       = 0,
 
 	damage                  = {
-		default = 640,
+		default = 550,
 	},
 
 	explosionGenerator      = [[custom:LIGHTNINGPLOSION]],
@@ -32,7 +32,7 @@ local weaponDef = {
 	paralyzer               = true,
 	paralyzeTime            = 1,
 	range                   = 300,
-	reloadtime              = 1 + 25/30,
+	reloadtime              = 1 + 20/30,
 	rgbColor                = [[0.5 0.5 1]],
 	soundStart              = [[weapon/more_lightning_fast]],
 	soundTrigger            = true,

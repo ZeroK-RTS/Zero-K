@@ -12,8 +12,6 @@
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
-
 Spring.Echo("Loading WeaponDefs_posts")
 
 --------------------------------------------------------------------------------
@@ -105,25 +103,10 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --
--- 91.0 compatibility
-
-if reverseCompat then
-	for _, weaponDef in pairs(WeaponDefs) do
-		if (weaponDef.weapontype == "Shield") then
-			weaponDef.isshield = true
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Remove special stuff for empirical DPS purposes
+-- customParams is never nil
 
 for _, weaponDef in pairs(WeaponDefs) do
-	if weaponDef.impactonly then
-		weaponDef.edgeeffectiveness = 1
-	end
+	weaponDef.customparams = weaponDef.customparams or {}
 end
 
 --------------------------------------------------------------------------------
@@ -143,12 +126,15 @@ end
 -- Preserve crater sizes for new engine
 -- https://github.com/spring/spring/commit/77c8378b04907417a62c25218d69ff323ba74c8d
 
-if not reverseCompat then
-	for _, weaponDef in pairs(WeaponDefs) do
-		if (not weaponDef.craterareaofeffect) then
-			weaponDef.craterareaofeffect = tonumber(weaponDef.areaofeffect or 0) * 1.5
-		end
+for _, weaponDef in pairs(WeaponDefs) do
+	if (not weaponDef.craterareaofeffect) then
+		weaponDef.craterareaofeffect = tonumber(weaponDef.areaofeffect or 0) * 1.5
 	end
+end
+
+-- New engine seems to have covertly increased the effect of cratermult
+for _, weaponDef in pairs(WeaponDefs) do
+	weaponDef.cratermult = (weaponDef.cratermult or 1) * 0.3
 end
 
 -- https://github.com/spring/spring/commit/dd7d1f79c3a9b579f874c210eb4c2a8ae7b72a16
@@ -337,6 +323,18 @@ for _, weaponDef in pairs(WeaponDefs) do
 		weaponDef.edgeeffectiveness = 1
 	end
 end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--
+-- Combatrange/truerange handling (see unit_control_gunship_strafe_range.lua)
+
+for _, weaponDef in pairs(WeaponDefs) do
+	if weaponDef.customparams.combatrange then
+		weaponDef.customparams.truerange = weaponDef.range
+		weaponDef.range = weaponDef.customparams.combatrange
+	end
+end
  
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -373,6 +371,9 @@ do
   end
 
   FacCanAttack = function(ud)
+    if not ud.buildoptions then
+      return false
+    end
     for _, name in pairs(ud.buildoptions) do
       if (CanAttack(UnitDefs[name:lower()])) then
         return true
@@ -388,8 +389,8 @@ do
     local canAttack = false
     if (RawCanAttack(ud)) then
       canAttack = true
-    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname == "armasp") then
-      if (FacCanAttack(ud) or ud.unitname == "armasp") then
+    elseif (ud.unitname:find("factory") or (ud.unitname == "missilesilo") or ud.unitname:find("pw_") or ud.unitname == "armasp") then
+      if (ud.unitname == "armasp" or FacCanAttack(ud)) then
         canAttack = true
       end
     end

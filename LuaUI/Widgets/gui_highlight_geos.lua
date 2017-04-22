@@ -72,6 +72,10 @@ function widget:Shutdown()
 	end
 end
 
+function widget:Initialize()
+	geoDisplayList = gl.CreateList(HighlightGeos)
+end
+
 function widget:DrawWorld()
 	
 	local _, cmdID = spGetActiveCommand()
@@ -79,11 +83,6 @@ function widget:DrawWorld()
 	drawGeos = spGetMapDrawMode() == 'metal' or showecoMode or -geoDefID == cmdID or spGetGameFrame() < 1
 	
 	if drawGeos then
-		
-		if not geoDisplayList then
-			geoDisplayList = gl.CreateList(HighlightGeos)
-		end
-		
 		glLineWidth(20)
 		glDepthTest(true)
 		glCallList(geoDisplayList)
@@ -91,11 +90,32 @@ function widget:DrawWorld()
 	end
 end
 
+function widget:Update()
+	local mx, my = Spring.GetMouseState()
+	local pos = select(2, Spring.TraceScreenRay(mx, my, true))
+	if pos then
+		for i = 1, #geos do
+			if (math.abs(pos[1] - geos[i].x) < 24 and math.abs(pos[3] - geos[i].z) < 24) then
+				WG.mouseAboveGeo = {geos[i].x, geos[i].z}
+				return
+			end
+		end
+	end
+	WG.mouseAboveGeo = nil
+end
+
 local function drawMinimapGeos(x,z)
 	gl.Vertex(x - size,0,z - size)
 	gl.Vertex(x + size,0,z + size)
 	gl.Vertex(x + size,0,z - size)
 	gl.Vertex(x - size,0,z + size)
+end
+
+function widget:DefaultCommand(type, id)
+	local geospot = WG.mouseAboveGeo
+	if geospot and WG.selectionEntirelyCons and WG.showeco and (not type) and (Spring.TestBuildOrder(geoDefID, geospot[1], 0, geospot[2], 0) > 0) then
+		return -geoDefID
+	end
 end
 
 function widget:DrawInMiniMap()

@@ -102,10 +102,6 @@ local menu_armcom = {
         angle = 45,
         unit = "corrl"
       },
---      {
---        angle = 90,
---        unit = "corpre"
---      },
       {
         angle = 90,
         unit = "corhlt"
@@ -176,10 +172,6 @@ local menu_armcom = {
         angle = 135,
         unit = "armjamt"
       },
-      {
-        angle = 45,
-        unit = "armsonar"
-      },
 	  {
         angle = -45,
         unit = "armestor"
@@ -233,10 +225,6 @@ local menu_armcom = {
 	   {
         angle = 180,
         unit = "raveparty"
-       },
-	   {
-        angle = 135,
-        unit = "iwin"
        },
 	   {
         angle = 0,

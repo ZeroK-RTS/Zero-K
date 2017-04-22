@@ -2,7 +2,7 @@ function widget:GetInfo()
 	return {
 		name = "Local Team Colors",
 		desc = "Makes neat team color scheme - you teal, allies blueish, enemies reddish",
-		author = "Licho",
+		author = "Licho, GoogleFrog",
 		date = "February, 2010",
 		license = "GNU GPL v2, or later",
 		layer = -10001,
@@ -10,56 +10,113 @@ function widget:GetInfo()
 	}
 end
 
+local selfName = "Local Team Colors"
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Interface/Local Team Colors'
+local function GetColorConfig()
+	if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then -- user override
+		Spring.Echo("Loaded local team color config.")
+		return VFS.Include("LuaUI/Configs/LocalColors.lua")
+	elseif VFS.FileExists("LuaUI/Configs/ZKTeamColors.lua") then
+		return VFS.Include("LuaUI/Configs/ZKTeamColors.lua")
+	else
+		error("missing file: LuaUI/Configs/LocalColors.lua")
+	end
+	return {}
+end
+
+local function FixRanges(colors)
+	if colors.myColor[1] <= 1 and colors.myColor[2] <= 1 and colors.myColor[3] < 1 and
+			colors.gaiaColor[1] <= 1 and colors.gaiaColor[2] <= 1 and colors.gaiaColor[3] < 1 then
+		return colors
+	end
+	colors.gaiaColor[1] = colors.gaiaColor[1]/255 
+	colors.gaiaColor[2] = colors.gaiaColor[2]/255
+	colors.gaiaColor[3] = colors.gaiaColor[3]/255
+
+	colors.myColor[1] = colors.myColor[1]/255 
+	colors.myColor[2] = colors.myColor[2]/255
+	colors.myColor[3] = colors.myColor[3]/255
+
+	for set, contents in pairs(colors.allyColors) do
+		colors.allyColors[set][1] = colors.allyColors[set][1]/255 
+		colors.allyColors[set][2] = colors.allyColors[set][2]/255
+		colors.allyColors[set][3] = colors.allyColors[set][3]/255
+	end
+
+	for set, contents in pairs(colors.enemyColors) do
+		colors.enemyColors[set][1] = colors.enemyColors[set][1]/255 
+		colors.enemyColors[set][2] = colors.enemyColors[set][2]/255
+		colors.enemyColors[set][3] = colors.enemyColors[set][3]/255
+	end
+	
+	return colors
+end
+
+local colorConfig = VFS.Include("LuaUI/Configs/TeamColorConfig.lua")
+local colorSettingsItems = {}
+for key, value in pairs(colorConfig) do
+	colorSettingsItems[value.order] = {
+		key = key,
+		name = value.name,
+		desc = value.desc
+	}
+end
+
+if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then
+	colorConfig.custom = {
+		name = "Custom",
+		desc = "Custom colour configration, as defined in LuaUI/Configs/LocalColors.lua.",
+		colors = FixRanges(VFS.Include("LuaUI/Configs/LocalColors.lua"))
+	}
+	colorSettingsItems[#colorSettingsItems + 1] = {
+		key = "custom",
+		name = colorConfig.custom.name,
+		desc = colorConfig.custom.desc
+	}
+end
+
+local myColor, gaiaColor, allyColors, enemyColors
+
+local function UpdateColorConfig(self)
+	if not colorConfig[self.value] then
+		return
+	end
+	Spring.Echo("UpdateColorConfig", self.value)
+	myColor = colorConfig[self.value].colors.myColor
+	gaiaColor = colorConfig[self.value].colors.gaiaColor
+	allyColors = colorConfig[self.value].colors.allyColors
+	enemyColors = colorConfig[self.value].colors.enemyColors
+	
+	UpdateColor()
+end
+
+local function UpdateColorNotify()
+	Spring.Echo("UpdateColorNotify")
+	UpdateColor()
+end
+
+options_path = 'Settings/Interface/Team Colors'
 options = {
-	simpleColors = {
-		name = "Simple Colors",
+	colorSetting = {
+		name = 'Team Color Mode',
+		type = 'radioButton',
+		value = 'default',
+		items = colorSettingsItems,
+		OnChange = UpdateColorConfig
+	},
+	matchColors = {
+		name = 'Sync Colors With Team',
 		type = 'bool',
 		value = false,
-		desc = 'All allies are green, all enemies are red.',
-		OnChange = function() widget:Initialize() end
-	},
+		OnChange = UpdateColorNotify
+	}
 }
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-
-if VFS.FileExists("LuaUI/Configs/LocalColors.lua") then -- user override
-	colorCFG = VFS.Include("LuaUI/Configs/LocalColors.lua")
-	Spring.Echo("Loaded local team color config.")
-elseif VFS.FileExists("LuaUI/Configs/ZKTeamColors.lua") then
-	colorCFG = VFS.Include("LuaUI/Configs/ZKTeamColors.lua")
-else
-	error("missing file: LuaUI/Configs/LocalColors.lua")
-end
-
-colorCFG.gaiaColor[1] = colorCFG.gaiaColor[1]/255 
-colorCFG.gaiaColor[2] = colorCFG.gaiaColor[2]/255
-colorCFG.gaiaColor[3] = colorCFG.gaiaColor[3]/255
-
-colorCFG.myColor[1] = colorCFG.myColor[1]/255 
-colorCFG.myColor[2] = colorCFG.myColor[2]/255
-colorCFG.myColor[3] = colorCFG.myColor[3]/255
-
-for set, contents in pairs(colorCFG.allyColors) do
-	colorCFG.allyColors[set][1] = colorCFG.allyColors[set][1]/255 
-	colorCFG.allyColors[set][2] = colorCFG.allyColors[set][2]/255
-	colorCFG.allyColors[set][3] = colorCFG.allyColors[set][3]/255
-end
-
-for set, contents in pairs(colorCFG.enemyColors) do
-	colorCFG.enemyColors[set][1] = colorCFG.enemyColors[set][1]/255 
-	colorCFG.enemyColors[set][2] = colorCFG.enemyColors[set][2]/255
-	colorCFG.enemyColors[set][3] = colorCFG.enemyColors[set][3]/255
-end
-
-local myColor = colorCFG.myColor
-local gaiaColor = colorCFG.gaiaColor
-local allyColors = colorCFG.allyColors
-local enemyColors = colorCFG.enemyColors
 
 WG.LocalColor = (type(WG.LocalColor) == "table" and WG.LocalColor) or {}
 WG.LocalColor.listeners = WG.LocalColor.listeners or {}
@@ -80,31 +137,13 @@ local function SetNewTeamColors()
 	for _, teamID in ipairs(Spring.GetTeamList()) do
 		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
 		if (allyID == myAlly) then
-			a = (a % #allyColors) + 1
-			Spring.SetTeamColor(teamID, unpack(allyColors[a]))
+			if is_speccing or options.matchColors.value or (myTeam ~= teamID) then
+				a = (a % #allyColors) + 1
+				Spring.SetTeamColor(teamID, unpack(allyColors[a]))
+			end
 		elseif (teamID ~= gaia) then
 			e = (e % #enemyColors) + 1
 			Spring.SetTeamColor(teamID, unpack(enemyColors[e]))
-		end
-	end
-	if not is_speccing then
-		Spring.SetTeamColor(myTeam, unpack(myColor))	-- overrides previously defined color
-	end
-end
-
-local function SetNewSimpleTeamColors() 
-	local gaia = Spring.GetGaiaTeamID()
-	Spring.SetTeamColor(gaia, unpack(gaiaColor))
-	
-	local myAlly = Spring.GetMyAllyTeamID()
-	local myTeam = Spring.GetMyTeamID()
-
-	for _, teamID in ipairs(Spring.GetTeamList()) do
-		local _,_,_,_,_,allyID = Spring.GetTeamInfo(teamID)
-		if (allyID == myAlly) then
-			Spring.SetTeamColor(teamID, unpack(allyColors[1]))
-		elseif (teamID ~= gaia) then
-			Spring.SetTeamColor(teamID, unpack(enemyColors[1]))
 		end
 	end
 	if not is_speccing then
@@ -120,8 +159,8 @@ end
 
 local function NotifyColorChange()
 	for name,func in pairs(WG.LocalColor.listeners) do
-		if type(func) == "function" then	-- because we don't trust other widget writers to not give us random junk
-			func()				-- yeah we wouldn't even need to do this with static typing :(
+		if type(func) == "function" then -- because we don't trust other widget writers to not give us random junk
+			func() -- yeah we wouldn't even need to do this with static typing :(
 		else
 			Spring.Echo("<Local Team Colors> ERROR: Listener '" .. name .. "' is not a function!" )
 		end
@@ -129,8 +168,12 @@ local function NotifyColorChange()
 end
 
 function WG.LocalColor.localTeamColorToggle()
-	options.simpleColors.value = not options.simpleColors.value
-	widget:Initialize()
+	if options.colorSetting.value == "simple" then
+		WG.SetWidgetOption(selfName, options_path, "colorSetting", "default")
+	else
+		WG.SetWidgetOption(selfName, options_path, "colorSetting", "simple")
+	end
+	UpdateColor()
 end
 
 function WG.LocalColor.RegisterListener(name, func)
@@ -144,15 +187,33 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function widget:Initialize()
+function UpdateColor(doNotNotify)
 	is_speccing = Spring.GetSpectatingState()
-	if options.simpleColors.value then
-		SetNewSimpleTeamColors()
-	else
-		SetNewTeamColors()
+	SetNewTeamColors()
+	
+	if not doNotNotify then
+		NotifyColorChange()
+	end
+end
+
+function widget:Initialize()
+	UpdateColorConfig(options.colorSetting)
+end
+
+local oldTeamID = Spring.GetMyTeamID()
+-- This function is alright but other, poorly written widgets cause a massive spike when team colours change. 
+function widget:PlayerChanged()
+	if Spring.GetSpectatingState() then
+		return
 	end
 	
-	NotifyColorChange()
+	local newTeamID = Spring.GetMyTeamID()
+	if oldTeamID == newTeamID then
+		return
+	end
+	oldTeamID = newTeamID
+	
+	UpdateColor(true)
 end
 
 function widget:Shutdown()

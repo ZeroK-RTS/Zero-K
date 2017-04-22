@@ -13,22 +13,6 @@ end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-function MergeTable(outtable,intable)
-  for i,v in pairs(intable) do 
-    if (outtable[i]==nil) then
-      if (type(v)=='table') then
-        if (type(outtable[i])~='table') then outtable[i] = {} end
-        MergeTable(outtable[i],v)
-      else
-        outtable[i] = v
-      end
-    end
-  end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
 local smokeFX = {
     layer     = 1,
 	alwaysVisible = true,

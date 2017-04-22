@@ -1,4 +1,5 @@
 include "constants.lua"
+include "gunshipConstructionTurnHax.lua"
 
 local base = piece 'base' 
 local body = piece 'body' 
@@ -23,24 +24,72 @@ local engShield2 		= piece 'EngShield2'
 local smokePiece = {base, engine1, engine2}
 local nanoPieces = {nano, CentreNano, LeftNano}
 
+local SIG_TILT = 1
+local SIG_LAND = 2
+
+local function TiltBody()
+	Signal(SIG_TILT)
+	SetSignalMask(SIG_TILT)
+	while true do
+		local vx,_,vz,speed = Spring.GetUnitVelocity(unitID)
+		if vx*vx + vz*vz > 0.5 then
+			if speed > 6 then
+				speed = 6
+			end
+			Turn(base, x_axis, math.rad(2) * speed, math.rad(45))
+			Move(engShield1, y_axis, 0.25*speed, 2) 
+			Move(engShield2, y_axis, -0.25*speed, 2) 
+			Sleep(100)
+		else
+			Turn(base, x_axis, math.rad(0), math.rad(45))
+			Move(engShield1, y_axis, 0, 2) 
+			Move(engShield2, y_axis, 0, 2) 
+			Sleep(100)
+		end
+	end
+end
+
 function script.Create()
+	Move(engine1, y_axis, -1)
+	Move(engine2, y_axis, -1)
+	Move(engine1, z_axis, 15)
+	Move(engine2, z_axis, 15)
+	Move(engine1, x_axis, 19.5)
+	Move(engine2, x_axis, -19.5)
+	
+	Move(body, z_axis, -8)
+
 	Move(engShield1, y_axis, 0, 0.5) 
 	Move(engShield2, y_axis, 0, 0.5) 
 	StartThread(SmokeUnit, smokePiece)
 	Spring.SetUnitNanoPieces(unitID, nanoPieces)
+	StartThread(TiltBody)
+end
+
+local function StartLanded()
+	Signal(SIG_LAND)
+	SetSignalMask(SIG_LAND)
+	Sleep(500) -- Repair and reclaim have jittery Deactivate
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 0)
+end
+
+local function StopLanded()
+	Spring.SetUnitRulesParam(unitID, "unitActiveOverride", 1)
+	Signal(SIG_LAND)
 end
 
 function script.Activate()
-	Move(engShield1, y_axis, 0.8, 0.5) 
-	Move(engShield2, y_axis, -0.8, 0.5) 
+	StopLanded()
 end
 
 function script.Deactivate()
-	Move(engShield1, y_axis, 0, 0.5) 
-	Move(engShield2, y_axis, 0, 0.5) 	
+	StartThread(StartLanded)
 end
 
 function script.StartBuilding()
+	ConstructionTurnHax()
+	
+	Signal(SIG_TILT)
 	SetUnitValue(COB.INBUILDSTANCE, 1)
 	
 	Turn(base,x_axis, rad(30),0.5)
@@ -63,6 +112,7 @@ function script.StartBuilding()
 end
 
 function script.StopBuilding()
+	StartThread(TiltBody)
 	SetUnitValue(COB.INBUILDSTANCE, 0)
 	
 	Turn(base,x_axis, rad(0),0.5)

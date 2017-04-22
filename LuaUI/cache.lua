@@ -11,6 +11,44 @@ local visibleUnits = {}
 local GetTeamColor = Spring.GetTeamColor
 local SetTeamColor = Spring.SetTeamColor
 local GetVisibleUnits = Spring.GetVisibleUnits
+local MarkerAddPoint = Spring.MarkerAddPoint
+
+-- Block line drawing widgets
+--local MarkerAddLine = Spring.MarkerAddLine
+--function Spring.MarkerAddLine(a,b,c,d,e,f,g)
+--	MarkerAddLine(a,b,c,d,e,f,true)
+--end
+
+local spGetProjectileDefID = Spring.GetProjectileDefID
+local sniperWeaponDefID = WeaponDefNames.armsnipe_shockrifle.id
+local function FilterOutSniperBullets(projectiles)
+	local i = 1
+	local n = #projectiles
+	while i <= n do
+		local p = projectiles[i]
+		local pID = spGetProjectileDefID(p)
+		if pID == sniperWeaponDefID then
+			projectiles[i] = projectiles[n]
+			projectiles[n] = nil
+			n = n - 1
+			i = i - 1
+		end
+		i = i + 1
+	end
+	return projectiles
+end
+
+local GetProjectilesInRectangle = Spring.GetProjectilesInRectangle
+function Spring.GetProjectilesInRectangle(x1,z1,x2,z2)
+	local projectiles = GetProjectilesInRectangle(x1,z1,x2,z2)
+	return FilterOutSniperBullets(projectiles)
+end
+
+-- Cutscenes apply F5
+local IsGUIHidden = Spring.IsGUIHidden
+function Spring.IsGUIHidden()
+	return IsGUIHidden() or (WG.Cutscene and WG.Cutscene.IsInCutscene())
+end
 
 function Spring.GetTeamColor(teamid)
   if teamColor[teamid] then
@@ -18,6 +56,10 @@ function Spring.GetTeamColor(teamid)
     teamColor[teamid] = { GetTeamColor(teamid) }
   end
   return unpack(teamColor[teamid])
+end
+
+function Spring.MarkerAddPoint(x, y, z, t, b)
+	MarkerAddPoint(x,y,z,t,true)
 end
 
 function Spring.SetTeamColor(teamid, r, g, b)
@@ -46,7 +88,7 @@ function Spring.GetVisibleUnits(teamID, radius, Icons)
     -- check time
     local now = Spring.GetTimer()
     local diff = Spring.DiffTimers(now, visible.time)
-    if diff > 1/25 then
+    if diff > 1/20 then
       visible.time = now
       update = true
     else

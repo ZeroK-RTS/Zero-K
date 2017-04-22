@@ -55,7 +55,6 @@ local secondsPerDay        = 600                 --seconds per day
 
 local maxBeamDivergent = 2 					--how big the light beam can expand if unit get further away from ground
 
-local reverseCompatibility = (Game.version:find('91.0') == 1) or (Game.version:find('94') and not Game.version:find('94.1.1')) -- for UnitDef Tag
 --------------------------------------------------------------------------------
 --other vars
 --------------------------------------------------------------------------------
@@ -97,12 +96,14 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Bright units even at night',
+		noHotkey = true,
 	},
 	cycle = {
 		name = "Day/night cycle",
 		type = 'bool',
 		value = true,
 		desc = 'Enable day/night cycle',
+		noHotkey = true,
 	},
 	time = {
 		name = "Time of day",
@@ -135,6 +136,7 @@ options = {
 		type = 'bool',
 		value = true,
 		desc = 'Display searchlight beams',
+		noHotkey = true,
 	},
 	bases = {
 		name = "Searchlight Bases",
@@ -145,6 +147,7 @@ options = {
 			{ key = 'full', name = 'Full', },
 		},
 		value = 'full',
+		noHotkey = true,
 	},
 }
 
@@ -333,8 +336,7 @@ local function DrawSearchlights()
 			leadDistance = cache[defID].leadDist
 			leadDist_to_height_ratio = cache[defID].lhRatio
 			radius = unitRadius
-		  elseif (reverseCompatibility and (unitDef.type == "Bomber" or unitDef.type == "Fighter") or 
-		  (unitDef.isBomberAirUnit or unitDef.isFighterAirUnit)) then --https://github.com/spring/spring/blob/develop/doc/changelog.txt
+		  elseif unitDef.isBomberAirUnit or unitDef.isFighterAirUnit then
 			local vx, _, vz = GetUnitVelocity(unitID)
 			if not vx or not vz then --sometimes happen when seeing enemy airplane
 				vx=0

@@ -22,8 +22,7 @@ local UNLOAD_RADIUS = 160
 local CANT_BE_TRANSPORTED_DECAY_TIME = 200
 local COMMAND_MOVE_RADIUS = 80
 
-local CMD_SET_FERRY	= 11000
-local CMD_MOVE 		= CMD.MOVE
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local CMD_FIGHT		= CMD.FIGHT
 local CMD_SET_WANTED_MAX_SPEED = CMD.SET_WANTED_MAX_SPEED
 
@@ -193,7 +192,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == 0 then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_RAW_MOVE, 
 							{route.start.x, route.start.y, route.start.z}, {} )
 					end
 				end
@@ -202,7 +201,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 				for i = 1, route.transportCount do
 					local trans = transport[route.transporters[i]]
 					if trans.waypoint == movingPoint.index then
-						Spring.GiveOrderToUnit(route.transporters[i], CMD_MOVE, 
+						Spring.GiveOrderToUnit(route.transporters[i], CMD_RAW_MOVE, 
 							{route.points[movingPoint.index].x, route.points[movingPoint.index].y, route.points[movingPoint.index].z}, {} )
 					end
 				end
@@ -292,7 +291,7 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 		
 		return true
 		
-	elseif (cmdID == CMD_MOVE or cmdID == CMD_FIGHT) and cmdParams then
+	elseif (cmdID == CMD_RAW_MOVE or cmdID == CMD_FIGHT) and cmdParams then
 	
 		local routeID = nearFerryPoint(cmdParams[1], cmdParams[3], COLLECTION_RADIUS_DRAW)
 		if routeID then
@@ -411,7 +410,7 @@ function widget:GameFrame(frame)
 								Spring.GiveOrderToUnit(unitID, CMD.UNLOAD_UNITS, 
 									{route.finish.x, route.finish.y, route.finish.z, UNLOAD_RADIUS}, {} )
 							else
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -423,10 +422,10 @@ function widget:GameFrame(frame)
 						if trans.waypoint > route.pointcount or disSQ(x, z, route.points[trans.waypoint].x, route.points[trans.waypoint].z) < NEAR_WAYPOINT_RANGE_SQ then
 							trans.waypoint = trans.waypoint - 1
 							if trans.waypoint == 0 then
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.start.x, route.start.y, route.start.z}, {} )
 							else
-								GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+								GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 									{route.points[trans.waypoint].x, route.points[trans.waypoint].y, route.points[trans.waypoint].z}, {} )
 							end
 						end
@@ -434,10 +433,11 @@ function widget:GameFrame(frame)
 						local cmd = Spring.GetCommandQueue(unitID, 1)
 						if #cmd == 0 or cmd[1].id ~= CMD.LOAD_UNITS then
 							local choice = math.floor(math.random(1,unitsToTransport.count))
-							local ud = UnitDefs[Spring.GetUnitDefID(unitsToTransport.unit[choice])]
+							local choiceUnitID = unitsToTransport.unit[choice]
+							local ud = UnitDefs[Spring.GetUnitDefID(choiceUnitID)]
 							if ud.xsize <= trans.maxSize and ud.zsize <= trans.maxSize and ud.mass <= trans.maxMass then
-								Spring.GiveOrderToUnit(unitID, CMD.LOAD_UNITS, {unitsToTransport.unit[choice]}, {} )
-								route.unitsQueuedToBeTransported[unitsToTransport.unit[choice]] = frame
+								Spring.GiveOrderToUnit(unitID, CMD.LOAD_UNITS, {choiceUnitID}, {} )
+								route.unitsQueuedToBeTransported[choiceUnitID] = frame
 								
 								unitsToTransport.unit[choice] = unitsToTransport.unit[unitsToTransport.count]
 								unitsToTransport.unit[unitsToTransport.count] = nil
@@ -445,7 +445,7 @@ function widget:GameFrame(frame)
 							end
 						end
 					elseif disSQ(x, z, route.start.x, route.start.z) > NEAR_WAYPOINT_RANGE_SQ then
-						GiveClampedOrderToUnit(unitID, CMD_MOVE, 
+						GiveClampedOrderToUnit(unitID, CMD_RAW_MOVE, 
 							{route.start.x, route.start.y, route.start.z}, {} )
 					end
 				

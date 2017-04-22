@@ -537,14 +537,6 @@ local sounds = {
 			[1] = "heavy_bot_move",
 		},
 	},
-	gorg = {
-		ok = {
-			[1] = "turret_select",
-		},
-		select = {
-			[1] = "turret_select",
-		},
-	},
 	scorpion = {
 		ok = {
 			[1] = "spy_move",
@@ -879,6 +871,15 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
+	gunshipcon = {
+		build = "builder_start",
+		ok = {
+			[1] = "gunship_move",
+		},
+		select = {
+			[1] = "light_gunship_select",
+		},
+	},
 	bladew = {
 		ok = {
 			[1] = "gunship_move",
@@ -961,6 +962,8 @@ local sounds = {
 	},
 	
 	-- Sea
+	
+	-- New Ships
 	shipcon = {
 		build = "builder_start",
 		ok = {
@@ -982,7 +985,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shipraider = {
+	shiptorpraider = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -992,7 +995,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	shiptorp = {
+	shipriot = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1010,6 +1013,16 @@ local sounds = {
 		select = {
 			[1] = "sub_select",
 			volume = 1.1,
+		},
+	},
+	shipassault = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "rumble1",
+			volume = 1.6,
 		},
 	},
 	shiparty = {
@@ -1032,7 +1045,27 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
-	subarty = {
+	shipheavyarty = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "rumble1",
+			volume = 1.6,
+		},
+	},
+	shipcarrier = {
+		ok = {
+			[1] = "rumble2",
+			volume = 1.6,
+		},
+		select = {
+			[1] = "rumble1",
+			volume = 1.6,
+		},
+	},
+	subtacmissile = {
 		ok = {
 			[1] = "rumble2",
 			volume = 1.6,
@@ -1040,46 +1073,6 @@ local sounds = {
 		select = {
 			[1] = "sub_select",
 			volume = 1.1,
-		},
-	},
-	cornukesub = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "sub_select",
-			volume = 1.1,
-		},
-	},
-	armcarry = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	reef = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
-		},
-	},
-	corbats = {
-		ok = {
-			[1] = "rumble2",
-			volume = 1.6,
-		},
-		select = {
-			[1] = "rumble1",
-			volume = 1.6,
 		},
 	},
 	shipaa = {
@@ -1092,6 +1085,7 @@ local sounds = {
 			volume = 1.6,
 		},
 	},
+	-- Transport boat doesn't have one by design.
 	
 	-- Economy
 	cormex = {
@@ -1228,14 +1222,6 @@ local sounds = {
 	-- Intel
 	--[[
 	corrad = { NEEDED
-		select = {
-			[1] = "factory_select",
-		},
-	},
-	corvrad = { NEEDED
-		ok = {
-			[1] = "bot_move",
-		},
 		select = {
 			[1] = "factory_select",
 		},

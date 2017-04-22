@@ -55,7 +55,6 @@ local function CalculateBallisticConstant(deltaV,myGravity,heightDiff)
 	return maxRange, t --return maximum range and flight time.
 end
 
-local reverseCompat = (Game.version:find('91.0') == 1)
 local function CalculateModdedMaxRange(heightDiff,weaponDef,modType)
 	local customMaxRange = weaponDef.range
 	local customHeightMod = weaponDef.heightMod
@@ -83,10 +82,6 @@ local function CalculateModdedMaxRange(heightDiff,weaponDef,modType)
 		--CYLINDER
 		effectiveRange = customMaxRange - heightModded*customHeightMod --Example: GetRange2D() in Spring\rts\Sim\Weapons\StarburstLauncher.cpp
 		--Note: for unknown reason we must "Minus the heightMod" instead of adding it. This is the opposite of what shown on the source-code, but ingame test suggest "Minus heightMod" and not adding.
-	end
-	--equivalent to: TestRange():
-	if reverseCompat and modType == 0 then
-		customCylinderTargeting = 128
 	end
 	if customCylinderTargeting >= 0.01 then --See Example: TestRange() in Spring\rts\Sim\Weapons\Weapon.cpp
 		--STRICT CYLINDER

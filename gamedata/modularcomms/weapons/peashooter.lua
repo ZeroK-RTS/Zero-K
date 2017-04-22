@@ -15,9 +15,9 @@ local weaponDef = {
 	},
 
 	damage                  = {
-		default = 10.5,
-		planes  = 10.5,
-		subs    = 0.55,
+		default = 12,
+		planes  = 12,
+		subs    = 0.6,
 	},
 
 	duration                = 0.02,
@@ -29,6 +29,7 @@ local weaponDef = {
 	impulseFactor           = 0.4,
 	interceptedByShieldType = 1,
 	noSelfDamage            = true,
+	predictBoost            = 1,
 	range                   = 300,
 	reloadtime              = 0.1,
 	rgbColor                = [[1 0 0]],
@@ -36,7 +37,7 @@ local weaponDef = {
 	soundStart              = [[weapon/laser/small_laser_fire2]],
 	soundTrigger            = true,
 	thickness               = 2.55,
-	tolerance               = 10000,
+	tolerance               = 1000,
 	turret                  = true,
 	weaponType              = [[LaserCannon]],
 	weaponVelocity          = 880,

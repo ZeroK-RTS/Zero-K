@@ -335,6 +335,9 @@ local gadgetList = {
 
 local spIsCheatingEnabled = Spring.IsCheatingEnabled
 
+
+local creationUnitList, creationIndex
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -380,6 +383,19 @@ if (gadgetHandler:IsSyncedCode()) then
 -- '/luarules clear'
 -- '/luarules restart'
 
+local ORDERS_PASSIVE = {
+	{
+		CMD.FIRE_STATE,
+		{0},
+		{},
+	},
+	{
+		CMD.MOVE_STATE,
+		{0},
+		{},
+	},
+}
+
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------
 
@@ -413,6 +429,7 @@ local function give(cmd,line,words,player)
 	if spIsCheatingEnabled() then
 		local buildlist = UnitDefNames["armcom1"].buildOptions
 		local INCREMENT = 128
+		local orderUnit = {}
 		for i = 1, #buildlist do
 			local udid = buildlist[i]
 			local x, z = INCREMENT, i*INCREMENT
@@ -425,14 +442,47 @@ local function give(cmd,line,words,player)
 					local subUdid = sublist[j]
 					local x2, z2 = (j+1)*INCREMENT, i*INCREMENT
 					local y2 = Spring.GetGroundHeight(x2,z2)
-					Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, false)
+					orderUnit[#orderUnit + 1] = Spring.CreateUnit(subUdid, x2, y2, z2+32, 0, 0, false)
 					--Spring.CreateUnit(subUdid, x2+32, y2, z2, 1, 0, false)
 					--Spring.CreateUnit(subUdid, x2, y2, z2-32, 2, 0, false)
 					--Spring.CreateUnit(subUdid, x2-32, y2, z2, 3, 0, false)
 				end	
 			end
 		end
+		Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 	end
+end
+
+local function ColorTest(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	
+	local displayDefID = UnitDefNames["armsolar"].id
+	local displayDefID2 = UnitDefNames["dyntrainer_assault_base"].id
+	local jumbleDefID = UnitDefNames["armpw"].id
+	local INCREMENT = 96
+	local orderUnit = {}
+	
+	local allyTeamList = Spring.GetAllyTeamList()
+	for i = 1, #allyTeamList do
+		local teamList = Spring.GetTeamList(allyTeamList[i])
+		for j = 1, #teamList do
+			local teamID = teamList[j]
+			local x, z = j*INCREMENT, i*INCREMENT
+			local y = Spring.GetGroundHeight(x,z)
+			orderUnit[#orderUnit + 1] = Spring.CreateUnit(displayDefID, x, y, z, 0, teamID, false)
+			orderUnit[#orderUnit + 1] = Spring.CreateUnit(displayDefID2, x, y, 800 + z, 0, teamID, false)
+			
+			for k = 1, 15 do
+				local rx, rz = 2600 + math.random()*1000, 3000 + math.random()*1000
+				local ry = Spring.GetGroundHeight(rx, rz)
+				orderUnit[#orderUnit + 1] = Spring.CreateUnit(jumbleDefID, rx, ry, rz, 0, teamID, false)
+			end
+		end
+	end
+	
+	Spring.GiveOrderArrayToUnitArray(orderUnit, ORDERS_PASSIVE)
 end
 
 local function gentleKill(cmd,line,words,player)
@@ -442,6 +492,16 @@ local function gentleKill(cmd,line,words,player)
 			local unitID = units[i]
 			Spring.SetUnitHealth(unitID,0.1)
 			Spring.AddUnitDamage(unitID,1, 0, nil, -7)
+		end
+	end
+end
+
+local function damage(cmd,line,words,player)
+	if spIsCheatingEnabled() then
+		local units = Spring.GetAllUnits()
+		for i=1, #units do
+			local unitID = units[i]
+			Spring.SetUnitHealth(unitID,1)
 		end
 	end
 end
@@ -487,6 +547,28 @@ local function restart(cmd,line,words,player)
 	end
 end
 
+local function serial(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local buildlist = UnitDefNames["armcom1"].buildOptions
+	local unitList = {}
+	for i = 1, #buildlist do
+		local udid = buildlist[i]
+		local ud = UnitDefs[udid]
+		unitList[#unitList + 1] = udid
+		if ud.buildOptions and #ud.buildOptions > 0 then
+			local sublist = ud.buildOptions
+			for j = 1, #sublist do
+				unitList[#unitList + 1] = sublist[j]
+			end	
+		end
+	end
+	
+	creationIndex = tonumber(words[1]) or 1
+	creationUnitList = unitList
+end
+
 local function bisect(cmd,line,words,player)
 	local increment = math.abs(tonumber(words[1]) or 1)
 	local offset = math.floor(tonumber(words[2]) or 0)
@@ -519,13 +601,53 @@ local function bisect(cmd,line,words,player)
 	end
 end
 
+local function nocost(cmd,line,words,player)
+	if not spIsCheatingEnabled() then
+		return
+	end
+	local enabled = not (tonumber(words[1]) == 0)
+	GG.SetFreeMorph(enabled)
+	Spring.Echo("Free morph " .. ((enabled and "enabled") or "disabled") .. ".")
+end
+
+function gadget:GameFrame(n)
+	if (not creationIndex) then
+		return
+	end
+	
+	if n%120 == 0 then
+		if not creationUnitList[creationIndex] then
+			creationIndex, creationUnitList = nil, nil
+			return
+		end
+		local INCREMENT = 128
+		local unitDefID = creationUnitList[creationIndex]
+		
+		for i = 1, 25 do
+			for j = 1, 25 do
+				local x, z = 1000 + i*INCREMENT, 1000 + j*INCREMENT
+				local y = Spring.GetGroundHeight(x,z)
+				Spring.CreateUnit(unitDefID, x, y, z, 0, 0, false)
+			end
+		end
+		Spring.Echo(UnitDefs[unitDefID].humanName, creationIndex)
+		creationIndex = creationIndex + 1
+	elseif n%120 == 100 then
+		clear()
+	end
+end
+
 function gadget:Initialize()
 	gadgetHandler.actionHandler.AddChatAction(self,"bisect",bisect,"Bisect gadget disables.")
 	gadgetHandler.actionHandler.AddChatAction(self,"circle",circleGive,"Gives a bunch of units in a circle.")
 	gadgetHandler.actionHandler.AddChatAction(self,"give",give,"Like give all but without all the crap.")
 	gadgetHandler.actionHandler.AddChatAction(self,"gk",gentleKill,"Gently kills everything.")
+	gadgetHandler.actionHandler.AddChatAction(self,"damage",damage,"Damages everything.")
+	gadgetHandler.actionHandler.AddChatAction(self,"color",ColorTest,"Spawns units for color test.")
 	gadgetHandler.actionHandler.AddChatAction(self,"clear",clear,"Clears all units and wreckage.")
+	gadgetHandler.actionHandler.AddChatAction(self,"serial",serial,"Gives all units in succession.")
 	gadgetHandler.actionHandler.AddChatAction(self,"restart",restart,"Gives some commanders and clears everything else.")
+	gadgetHandler.actionHandler.AddChatAction(self,"nocost",nocost,"Makes everything gadget-implemented free.")
 end
 
 -------------------------------------------------------------------------------------

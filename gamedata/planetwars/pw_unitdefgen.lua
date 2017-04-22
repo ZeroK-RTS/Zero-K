@@ -15,7 +15,10 @@ VFS.Include("LuaRules/Utilities/base64.lua")
 --------------------------------------------------------------------------------
 
 
-VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
+local structureConfig = VFS.Include("gamedata/planetwars/pw_structuredefs.lua")
+
+local ALLOW_SERVER_OVERRIDE_UNIT_TEXT = false
+local LOAD_ALL_STRUCTURES = true
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -23,14 +26,15 @@ local modOptions = (Spring and Spring.GetModOptions and Spring.GetModOptions()) 
 local pwDataRaw = modOptions.planetwarsstructures
 local pwDataFunc, err, success, unitData
 
-pwDataRaw = pwDataRaw or TEST_DEF_STRING
+pwDataRaw = pwDataRaw
 
 if not (pwDataRaw and type(pwDataRaw) == 'string') then
-	err = "Planetwars data entry in modoption is empty or in invalid format"
 	unitData = {}
 else
 	pwDataRaw = string.gsub(pwDataRaw, '_', '=')
 	pwDataRaw = Spring.Utilities.Base64Decode(pwDataRaw)
+	pwDataRaw = pwDataRaw:gsub("True", "true")
+	pwDataRaw = pwDataRaw:gsub("False", "false")
 	pwDataFunc, err = loadstring("return "..pwDataRaw)
 	if pwDataFunc then
 		success, unitData = pcall(pwDataFunc)
@@ -64,9 +68,15 @@ local function makeTechStructure(def, name)
 	structureConfig["generic_tech"](def)
 end
 
+local function commonDefs(def)
+	local fd = def.featuredefs.dead
+	fd.collisionvolumetype = fd.collisionvolumetype or def.collisionvolumetype
+	fd.collisionvolumescales = fd.collisionvolumescales or def.collisionvolumescales
+end
+
 --for name in pairs(unitData) do
 for _, info in pairs(unitData) do
-	if type(info) == "table" and info.isDestroyed ~= 1 then 
+	if type(info) == "table" and info.isDestroyed ~= 1 then
 		structureDefs[info.unitname] = CopyTable(genericStructure, true)
 		structureDefs[info.unitname].customparams = structureDefs[info.unitname].customparams or {}
 		if structureConfig[info.unitname] then
@@ -80,11 +90,21 @@ for _, info in pairs(unitData) do
 			structureDefs[info.unitname].name = info.name
 			structureDefs[info.unitname].description = info.description
 		end
-		
-		structureDefs[info.unitname].buildcostmetal = structureDefs[info.unitname].maxdamage
-		structureDefs[info.unitname].buildcostenergy = structureDefs[info.unitname].maxdamage
-		structureDefs[info.unitname].buildtime = structureDefs[info.unitname].maxdamage
+		structureDefs[info.unitname].customparams.canbeevacuated = info.canBeEvacuated
 	end 
+end
+
+if LOAD_ALL_STRUCTURES then
+	for name, structureFunction in pairs(structureConfig) do
+		if not structureDefs[name] then
+			structureDefs[name] = CopyTable(genericStructure, true)
+			structureFunction(structureDefs[name]) -- Yay side effects! >:-/
+		end
+	end
+end
+
+for name, data in pairs(structureDefs) do
+	commonDefs(data)
 end
 
 -- splice back into unitdefs

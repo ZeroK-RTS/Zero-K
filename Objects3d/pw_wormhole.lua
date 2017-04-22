@@ -1,5 +1,4 @@
--- Spring metadata for uar_emp.obj
-uar_emp = {
+return {
 	pieces = {
 		base = {
 			offset = {0.00, 0.00, 0.00},
@@ -52,12 +51,15 @@ uar_emp = {
 				offset = {32.27, 23.47, -0.00},
 
 			},
+			drone = {
+				offset = {0, 56, 0},
+			}
 		},
 	},
 
 	radius = 70,
 	height = 70,
-	midpos = {0.00, 0.00, 0.00},
+	midpos = {0.00, 30, 0.00},
 
 	tex1 = "pw_wormhole_1.dds",
 	tex2 = "pw_wormhole_2.dds",
@@ -67,5 +69,3 @@ uar_emp = {
 	globalvertexoffsets = false, -- vertices in global space?
 	localpieceoffsets = true, -- offsets in local space?
 }
-
-return uar_emp

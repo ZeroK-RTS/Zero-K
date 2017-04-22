@@ -25,7 +25,8 @@ local spawn_defs = {
 }
 
 local shieldCollide = { -- unitDefs as the shield hit callin is setup really strangely
-	corgarp = {damage = 220, gadgetDamage = 200}, -- gadgetDamage = damage - weapon default damage
+	corgarp_mine = {damage = 220, gadgetDamage = 200}, -- gadgetDamage = damage - weapon default damage
+	-- Weapon name must be used
 }
 
 return spawn_defs, shieldCollide

@@ -397,6 +397,7 @@ function CreateWindow()
 		parent = Chili.Screen0,
 		dockable = true,
 		name = "AttritionCounter",
+		classname = "main_window_small_flat",
 		padding = {0,0,0,0},
 		margin = {0,0,0,0},
 		right = 0,
@@ -411,7 +412,6 @@ function CreateWindow()
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = true,
-		minimizable = true,
 		parentWidgetName = widget:GetInfo().name, --for gui_chili_docking.lua (minimize function)		
 	}
 		
@@ -549,6 +549,15 @@ function CreateWindow()
 			label_other_kills_units.x = icon_other_skull.x - (font:GetTextWidth(label_other_kills_units.caption) + 1); label_other_kills_units:Invalidate()
 		end
 	}
+	
+	if WG.GlobalCommandBar then
+		local function ToggleWindow()
+			if window_main then
+				window_main:SetVisibility(not window_main.visible)
+			end
+		end
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/AttritionCounter/Skull.png", "Toggle attrition counter.", ToggleWindow)
+	end
 	
 	return
 end

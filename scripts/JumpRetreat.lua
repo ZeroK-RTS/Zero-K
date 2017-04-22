@@ -7,7 +7,7 @@ local firstTime = true
 function RetreatFunction(hx, hy, hz)
 	if firstTime then
 		local jumpReload = Spring.GetUnitRulesParam(unitID,"jumpReload")
-		if not jumpReload or jumpReload == 1 then
+		if not jumpReload or jumpReload >= 1 then
 			local ux, uy, uz = Spring.GetUnitPosition(unitID)
 			local moveDistance = math.sqrt((ux - hx)^2 + (uz - hz)^2)
 			local disScale = jumpRange/moveDistance*0.95

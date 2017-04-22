@@ -36,6 +36,7 @@ local incolor2color
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
+local showEndgameWindowTimer
 local window_endgame
 local awardPanel
 local awardSubPanel
@@ -50,8 +51,10 @@ local teamColors = {}
 
 local awardPanelHeight = 50
 
-local white_table 	= {1,1,1, 1}
-local magenta_table = {0.8, 0, 0, 1}
+local SELECT_BUTTON_COLOR = {0.98, 0.48, 0.26, 0.85}
+local SELECT_BUTTON_FOCUS_COLOR = {0.98, 0.48, 0.26, 0.85}
+local BUTTON_COLOR
+local BUTTON_FOCUS_COLOR
 
 local awardDescs = VFS.Include("LuaRules/Configs/award_names.lua")
 
@@ -106,8 +109,14 @@ local function AddStatsSubPanel()
 	statsPanel:AddChild(statsSubPanel)
 end
 
-local function SetButtonColor(button, color)
-	button.backgroundColor = color
+local function SetButtonSelected(button, isSelected)
+	if isSelected then
+		button.backgroundColor = SELECT_BUTTON_COLOR
+		button.focusColor = SELECT_BUTTON_FOCUS_COLOR
+	else
+		button.backgroundColor = BUTTON_COLOR
+		button.focusColor = BUTTON_FOCUS_COLOR
+	end
 	button:Invalidate()
 end
 
@@ -117,8 +126,8 @@ local function ShowAwards()
 	window_endgame:RemoveChild(statsPanel)
 	window_endgame:AddChild(awardPanel)
 	
-	SetButtonColor( awardButton, magenta_table )
-	SetButtonColor( statsButton, white_table )
+	SetButtonSelected(awardButton, true)
+	SetButtonSelected(statsButton, false)
 end
 local function ShowStats()
 	statsSubPanel = WG.statsPanel
@@ -134,8 +143,8 @@ local function ShowStats()
 	window_endgame:RemoveChild(awardPanel)
 	window_endgame:AddChild(statsPanel)
 	
-	SetButtonColor( statsButton, magenta_table )
-	SetButtonColor( awardButton, white_table )
+	SetButtonSelected(statsButton, true)
+	SetButtonSelected(awardButton, false)
 end
 
 
@@ -189,7 +198,7 @@ local function SetupControls()
 		y = '20%',
 		width  = '60%',
 		height = '60%',
-		padding = {8, 8, 8, 8};
+		classname = "main_window",
 		--autosize   = true;
 		--parent = screen0,
 		draggable = true,
@@ -200,15 +209,16 @@ local function SetupControls()
 	
 	awardPanel = ScrollPanel:New{
 		parent = window_endgame,
-		x=10;y=55;
+		x=10;y=50;
 		bottom=10;right=10;
 		autosize = true,
 		scrollbarSize = 6,
 		horizontalScrollbar = false,
 		hitTestAllowEmpty = true;
+		tooltip = "",
 	}
-	statsPanel = StackPanel:New{
-		x=10;y=40;
+	statsPanel = ScrollPanel:New{
+		x=10;y=50;
 		bottom=10;right=10;
 		backgroundColor  = {1,1,1,1},
 		borderColor = {1,1,1,1},
@@ -222,6 +232,7 @@ local function SetupControls()
 		borderColor = {1,1,1,1},
 		padding = {10, 10, 10, 10},
 		itemMargin = {1, 1, 1, 1},
+		tooltip = "",
 		autosize = true,
 		
 		resizeItems = false,
@@ -231,17 +242,20 @@ local function SetupControls()
 	
 	local B_HEIGHT = 40
 	awardButton = Button:New{
-		x=0, y=0,
+		x=9, y=7,
 		height=B_HEIGHT;
 		caption="Awards",
-		backgroundColor = magenta_table;
 		OnClick = {
 			ShowAwards
 		};
 		parent = window_endgame;
 	}
+	BUTTON_COLOR = awardButton.backgroundColor
+	BUTTON_FOCUS_COLOR = awardButton.focusColor
+	SetButtonSelected(awardButton, true)
+	
 	statsButton = Button:New{
-		x=80, y=0,
+		x=85, y=7,
 		height=B_HEIGHT;
 		caption="Statistics",
 		OnClick = {
@@ -251,18 +265,22 @@ local function SetupControls()
 	}
 	
 	Button:New{
-		y=0;
-		width='80';
-		right=0;
+		y=7;
+		width=80;
+		right=9;
 		height=B_HEIGHT;
 		caption="Exit",
 		OnClick = {
-			function() Spring.SendCommands("quit","quitforce") end
+			function() 
+				if Spring.GetMenuName and Spring.GetMenuName() ~= "" then
+					Spring.Reload("")
+				else
+					Spring.SendCommands("quit","quitforce")
+				end
+			 end
 		};
 		parent = window_endgame;
 	}
-	
-
 end
 
 --------------------------------------------------------------------------------
@@ -296,6 +314,10 @@ function widget:Initialize()
 	widgetHandler:RegisterGlobal("SetAwardList", SetAwardList)
 	
 	SetTeamNamesAndColors()
+	
+	if Spring.IsGameOver() then
+		showEndgameWindowTimer = 1
+	end
 end
 
 function widget:GameOver (winners)
@@ -344,8 +366,22 @@ function widget:GameOver (winners)
 			window_endgame.font.color = {1,0,0,1}
 		end
 	end
+	window_endgame.tooltip = ""
 	window_endgame:Invalidate()
+	showEndgameWindowTimer = 2
+end
+
+function widget:Update(dt)
+	if not showEndgameWindowTimer then
+		return
+	end
+	showEndgameWindowTimer = showEndgameWindowTimer - dt
+	if showEndgameWindowTimer > 0 then
+		return
+	end
+	
 	ShowEndGameWindow()
+	showEndgameWindowTimer = nil
 end
 
 function widget:Shutdown()

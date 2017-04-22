@@ -1,5 +1,6 @@
 include "constants.lua"
 include "pieceControl.lua"
+include "aimPosTerraform.lua"
 
 ----------------------------------------------------------------------------------------------
 -- Model Pieces
@@ -15,31 +16,43 @@ local smokePiece = {basebottom, basemid, basetop}
 local BASETOP_TURN_SPEED = rad(200)
 local BASEMID_TURN_SPEED = rad(230)
 local HOUSING_TURN_SPEED = rad(200)
-local SPINDLE_TURN_SPEED = rad(240)
+local SPINDLE_TURN_SPEED = rad(120 / 0.8)
 
 local firing = false
 local index = 1
+
+local stuns = {false, false, false}
+local disarmed = false
 
 ----------------------------------------------------------------------------------------------
 -- Signal Definitions
 
 local SIG_AIM = 2
-local SIG_RESTORE = 4
 
 ----------------------------------------------------------------------------------------------
 -- Local Animation Functions
 
 local function RestoreAfterDelay()
-	Signal(SIG_RESTORE)
-	SetSignalMask(SIG_RESTORE)
-	Sleep(6000)
-	Turn(housing, x_axis, 0, HOUSING_TURN_SPEED) 
+	Sleep(5000)
+	Turn(housing, x_axis, 0, math.rad(10)) 
+	Turn(basetop, y_axis, 0, math.rad(10)) 
 end
 
 ----------------------------------------------------------------------------------------------
 -- Script Functions
 
 function script.Create()
+	local ud = UnitDefs[unitDefID]
+	local midTable = ud
+	if Spring.Utilities.IsCurrentVersionNewerThan(100, 0) then
+		midTable = ud.model
+	end
+	
+	local mid = {midTable.midx, midTable.midy, midTable.midz}
+	local aim = {midTable.midx, midTable.midy + 15, midTable.midz}
+
+	SetupAimPosTerraform(mid, aim, midTable.midy + 15, midTable.midy + 60, 15, 48)
+	
 	StartThread(SmokeUnit, smokePiece)
 end
 
@@ -47,36 +60,57 @@ end
 -- Weapon Animations
 
 function script.QueryWeapon(num) return flare end
-
 function script.AimFromWeapon(num) return holder end
 
-function Stunned ()
+local function StunThread ()
+	Signal (SIG_AIM)
+	SetSignalMask(SIG_AIM)
+	disarmed = true
+
 	StopTurn (basetop, y_axis)
 	StopTurn (housing, x_axis)
+end
+
+local function UnstunThread()
+	disarmed = false
+	SetSignalMask(SIG_AIM)
+	RestoreAfterDelay()
+end
+
+function Stunned (stun_type)
+	stuns[stun_type] = true
+	StartThread (StunThread)
+end
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread (UnstunThread)
+	end
 end
 
 function script.AimWeapon(num, heading, pitch)
 	Signal(SIG_AIM)
 	SetSignalMask(SIG_AIM)
-	while firing or (Spring.GetUnitRulesParam(unitID, "disarmed") == 1) do
-		Sleep (100)
+
+	while firing or disarmed do
+		Sleep (34)
 	end
-	
+
 	local slowMult = (1-(Spring.GetUnitRulesParam(unitID,"slowState") or 0))
 	Turn(basetop, y_axis, heading, BASETOP_TURN_SPEED*slowMult)
 	Turn(housing, x_axis, -pitch, HOUSING_TURN_SPEED*slowMult)
 	WaitForTurn(basetop, y_axis)
 	WaitForTurn(housing, x_axis)
-
+	StartThread (RestoreAfterDelay)
 	return true
 end
 
 function script.FireWeapon(num)
 	firing = true
 	EmitSfx(flare, UNIT_SFX2)
-	Sleep(800)
 	local rz = select(3, GetPieceRotation(spindle))
 	Turn(spindle, z_axis, rz + rad(120),SPINDLE_TURN_SPEED)
+	Sleep(800)
 	firing = false
 end
 

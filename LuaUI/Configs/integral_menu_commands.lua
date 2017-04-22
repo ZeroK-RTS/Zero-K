@@ -8,13 +8,194 @@ local tooltips = {
 	retreat = "Retreat: Retreat to closest retreat point or airpad at 30/65/99% of health (right-click to disable). Airpad for aircraft only.",
 	landat = "Repair level: set the HP % at which this aircraft will go to a repair pad (0, 30, 50, 80)",
 	factoryGuard = "Auto Assist: Newly built constructors automatically assist their factory",
+	globalBuild = "Global Build Command: toggle using worker AI.",
 	diveBomb = "\255\90\255\90Green\255\255\255\255:Dive For Shielded or Mobile Target\n\255\255\255\90Yellow\255\255\255\255:Dive For Mobile Target\n\255\255\90\90Red\255\255\255\255:Always Fly Low\n\255\90\90\90Grey\255\255\255\255:Always Fly High", --override tooltip supplied by unit_bomber_dive.lua gadget.
 	floatState = "\255\90\255\90Green\255\255\255\255:Always float \n\255\90\90\90Grey\255\255\255\255:Float to fire\n\255\255\90\90Red\255\255\255\255:Never float",
 	fireState = "Fire State: Sets under what conditions a unit will fire without an explicit attack order (never, when attacked, always)",
 	moveState = "Move State: Sets how far out of its way a unit will move to attack enemies",
 	["repeat"] = "Repeat: if on the unit will continously push finished orders to the end of its order queue",
 	dropflag = "Drop flag on the ground.",
+	autoCallTransport = "Automatically call transports between constructor tasks."
 }
+
+local CONSTRUCTOR     = {order = 1, row = 1, col = 1}
+local RAIDER          = {order = 2, row = 1, col = 2}
+local SKIRMISHER      = {order = 3, row = 1, col = 3}
+local RIOT            = {order = 4, row = 1, col = 4}
+local ASSAULT         = {order = 5, row = 1, col = 5}
+local ARTILLERY       = {order = 6, row = 1, col = 6}
+
+local WEIRD_RAIDER    = {order = 7, row = 2, col = 2}
+local ANTI_AIR        = {order = 8, row = 2, col = 3}
+local HEAVY_SOMETHING = {order = 9, row = 2, col = 4}
+local SPECIAL         = {order = 10, row = 2, col = 5}
+local UTILITY         = {order = 11, row = 2, col = 6}
+
+local units = {
+	factorycloak = {
+		armrectr = CONSTRUCTOR,
+		armpw = RAIDER,
+		spherepole = WEIRD_RAIDER,
+		armwar = RIOT,
+		armrock = SKIRMISHER,
+		armham = ARTILLERY,
+		armjeth = ANTI_AIR,
+		armzeus = ASSAULT,
+		armsnipe = HEAVY_SOMETHING,
+		armtick = SPECIAL,
+		spherecloaker = UTILITY,
+	},
+	factoryshield = {
+		cornecro = CONSTRUCTOR,
+		corclog = WEIRD_RAIDER,
+		corak = RAIDER,
+		cormak = RIOT,
+		corstorm = SKIRMISHER,
+		shieldarty = ARTILLERY,
+		corcrash = ANTI_AIR,
+		corthud = ASSAULT,
+		shieldfelon = HEAVY_SOMETHING,
+		corroach = SPECIAL,
+		core_spectre = UTILITY,	
+	},
+	factoryveh = {
+		corned = CONSTRUCTOR,
+		corfav = WEIRD_RAIDER,
+		corgator = RAIDER,
+		corlevlr = RIOT,
+		cormist = SKIRMISHER, -- Not really but nowhere else to go
+		corgarp = ARTILLERY,
+		vehaa = ANTI_AIR,
+		corraid = ASSAULT,
+		armmerl = HEAVY_SOMETHING,
+		capturecar = SPECIAL,
+	},
+	factoryhover = {
+		corch = CONSTRUCTOR,
+		corsh = RAIDER,
+		hoverdepthcharge = SPECIAL,
+		hoverriot = RIOT,
+		nsaclash = SKIRMISHER,
+		armmanni = ARTILLERY,
+		hoveraa = ANTI_AIR,
+		hoverassault = ASSAULT,
+	},
+	factorygunship = {
+		gunshipcon = CONSTRUCTOR,
+		bladew = WEIRD_RAIDER,
+		armkam = RAIDER,
+		armbrawl = ARTILLERY,
+		gunshipsupport = SKIRMISHER,
+		corvalk = SPECIAL,
+		corbtrans = UTILITY,
+		gunshipaa = ANTI_AIR,
+		blackdawn = ASSAULT,
+		corcrw = HEAVY_SOMETHING,
+		blastwing = RIOT,
+	},
+	factoryplane = {
+		armca = CONSTRUCTOR,
+		fighter = RAIDER,
+		corhurc2 = RIOT,
+		-- No Plane Artillery
+		corvamp = WEIRD_RAIDER,
+		corawac = UTILITY,
+		corshad = ASSAULT,
+		armcybr = HEAVY_SOMETHING,
+		armstiletto_laser = SPECIAL,
+	},
+	factoryspider = {
+		arm_spider = CONSTRUCTOR,
+		armflea = RAIDER,
+		spiderriot = RIOT,
+		armsptk = SKIRMISHER,
+		-- No Spider Artillery
+		spideraa = ANTI_AIR,
+		arm_venom = WEIRD_RAIDER,
+		spiderassault = ASSAULT,
+		armcrabe = HEAVY_SOMETHING,
+		armspy = SPECIAL,
+	},
+	factoryjump = {
+		corfast = CONSTRUCTOR,
+		puppy = WEIRD_RAIDER,
+		corpyro = RAIDER,
+		jumpblackhole = RIOT,
+		slowmort = SKIRMISHER,
+		firewalker = ARTILLERY,
+		armaak = ANTI_AIR,
+		corcan = ASSAULT,
+		corsumo = HEAVY_SOMETHING,
+		corsktl = SPECIAL,
+	},
+	factorytank = {
+		coracv =  CONSTRUCTOR,
+		logkoda = WEIRD_RAIDER,
+		panther = RAIDER,
+		tawf114 = RIOT,
+		cormart = ARTILLERY,
+		trem = UTILITY,
+		corsent = ANTI_AIR,
+		correap = ASSAULT,
+		corgol = HEAVY_SOMETHING,
+	},
+	factoryamph = {
+		amphcon = CONSTRUCTOR,
+		amphraider3 = RAIDER,
+		amphraider2 = WEIRD_RAIDER,
+		amphriot = RIOT,
+		amphfloater = SKIRMISHER,
+		-- No Amph Artillery
+		amphaa = ANTI_AIR,
+		amphassault = HEAVY_SOMETHING,
+		amphtele = SPECIAL,
+	},
+	factoryship = {
+		shipcon = CONSTRUCTOR,
+		shiptorpraider = RAIDER,
+		shipriot = RIOT,
+		shipskirm = SKIRMISHER,
+		shiparty = ARTILLERY,
+		shipaa = ANTI_AIR,
+		shipscout = WEIRD_RAIDER,
+		shipassault = ASSAULT,
+		-- No Ship HEAVY_SOMETHING (yet)
+		subraider = SPECIAL,
+	},
+	pw_bomberfac = {
+		corhurc2 = RIOT,
+		corshad = ASSAULT,
+		armcybr = HEAVY_SOMETHING,
+		armstiletto_laser = SPECIAL,
+	},
+	pw_dropfac = {
+		corvalk = SPECIAL,
+		corbtrans = UTILITY,
+	},
+}
+
+local function AddBuildQueue(name)
+	units[name] = {}
+	local ud = UnitDefNames[name]
+	if ud and ud.buildOptions then
+		local row = 1
+		local col = 1
+		local order = 1
+		for i = 1, #ud.buildOptions do
+			local buildName = UnitDefs[ud.buildOptions[i]].name
+			units[name][buildName] = {row = row, col = col, order = order}
+			col = col + 1
+			if col == 7 then
+				col = 1
+				row = row + 1
+			end
+			order = order + 1
+		end
+	end
+end
+
+AddBuildQueue("striderhub")
+AddBuildQueue("missilesilo")
 
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},
@@ -71,14 +252,13 @@ local defense = {
 
 local aux = {	--merged into special
 	corrad =   {order = 10, row = 1, col = 1},
-	armsonar = {order = 11, row = 1, col = 2},
-	armjamt =  {order = 12, row = 1, col = 3},
-	armarad =  {order = 14, row = 1, col = 4},
+	armjamt =  {order = 12, row = 1, col = 2},
+	armarad =  {order = 14, row = 1, col = 3},
 }
 
 local super = {	--merged into special
-	missilesilo = {order = 15, row = 1, col = 5},
-	armamd =      {order = 16, row = 1, col = 6},
+	missilesilo = {order = 15, row = 1, col = 4},
+	armamd =      {order = 16, row = 1, col = 5},
 	corbhmth =     {order = 2, row = 2, col = 1},
 	armbrtha =     {order = 3, row = 2, col = 2},
 	corsilo =      {order = 4, row = 2, col = 3},
@@ -102,6 +282,7 @@ local special_commands = {
 	[CMD_SMOOTH] =  {order = 20, row = 3, col = 5},
 	--[CMD_BUMPY] = {order = 21, row = 3},
 }
+local units_factory_commands = {}
 
 local function CopyBuildArray(source, target)
 	for name, value in pairs(source) do
@@ -118,67 +299,18 @@ CopyBuildArray(aux, special_commands)
 CopyBuildArray(defense, defense_commands)
 CopyBuildArray(super, special_commands)
 
--- Global commands defined here - they have cmdDesc format + 
-local globalCommands = {
---[[	{
-		name = "crap",
-		texture= 'LuaUi/Images/move_hold.png',
-		id = math.huge,
-		OnClick = {function() 
-			Spring.SendMessage("crap")
-		end }
-	}
-	{
-		id      = CMD_RETREAT_ZONE
-		type    = CMDTYPE.ICON_MAP,
-		tooltip = 'Place a retreat zone. Units will retreat there. Constructors placed in it will repair units.',
-		cursor  = 'Repair',
-		action  = 'sethaven',
-		params  = { }, 
-		texture = 'LuaUI/Images/ambulance.png',
-	}]]--
-}
+for name, listData in pairs(units) do
+	local unitDefID = UnitDefNames[name]
+	unitDefID = unitDefID and unitDefID.id
+	if unitDefID then
+		units_factory_commands[unitDefID] = {}
+		CopyBuildArray(listData, units_factory_commands[unitDefID])
+	end
+end
 
 -- Command overrides. State commands by default expect array of textures, one for each state.
 -- You can specify texture, text,tooltip, color
 local imageDir = 'LuaUI/Images/commands/'
-
---[[
-local overrides = {
-	[CMD.ATTACK] = { texture = imageDir .. 'attack.png',  text= '\255\0\255\0A\008ttack'},
-	[CMD.STOP] = { texture = imageDir .. 'cancel.png', color={1,0,0,1.2}, text= '\255\0\255\0S\008top'},
-	[CMD.FIGHT] = { texture = imageDir .. 'fight.png',text= '\255\0\255\0F\008ight'},
-	[CMD.GUARD] = { texture = imageDir .. 'guard.png', text= '\255\0\255\0G\008uard'},
-	[CMD.MOVE] = { texture = imageDir .. 'move.png', text= '\255\0\255\0M\008ove'},
-	[CMD.PATROL] = { texture = imageDir .. 'patrol.png', text= '\255\0\255\0P\008atrol'},
-	[CMD.WAIT] = { texture = imageDir .. 'wait.png', text= '\255\0\255\0W\008ait'},
-	
-	[CMD.REPAIR] = {text= '\255\0\255\0R\008epair', texture = imageDir .. 'repair.png'},
-	[CMD.RECLAIM] = {text= 'R\255\0\255\0e\008claim', texture = imageDir .. 'reclaim.png'},
-	[CMD.RESURRECT] = {text= 'Resurrec\255\0\255\0t\008', texture = imageDir .. 'resurrect.png'},
-	[CMD_BUILD] = {text = '\255\0\255\0B\008uild'},
-	[CMD.DGUN] = { texture = imageDir .. 'dgun.png', text= '\255\0\255\0D\008Gun'},
-	
-	[CMD_RAMP] = {text = 'Ramp', texture = imageDir .. 'ramp.png'},
-	[CMD_LEVEL] = {text = 'Level', texture = imageDir .. 'level.png'},
-	[CMD_RAISE] = {text = 'Raise', texture = imageDir .. 'raise.png'},
-	[CMD_SMOOTH] = {text = 'Smooth', texture = imageDir .. 'smooth.png'},
-	[CMD_RESTORE] = {text = 'Restore', texture = imageDir .. 'restore.png'},
-	
-	[CMD_AREA_MEX] = {text = 'Mex', texture = 'LuaUi/Images/ibeam.png'},
-	[CMD_JUMP] = {text = 'Jump', texture = imageDir .. 'Bold/jump.png'},	
-	
-	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
-	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
-	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, text=''},
-	[CMD_WANT_CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'}, text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
-	[CMD_CLOAK_SHIELD] = { texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'}, text ='',},
-	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, text ='', },
-	[CMD_PRIORITY] = { texture = {imageDir .. 'states/wrench_low.png', imageDir .. 'states/wrench_med.png', imageDir .. 'states/wrench_high.png'}, text='', tooltip = tooltips.priority},
-	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text=''},
-	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, text=''},
-	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'}, text=''},
-}]]
 
 local overrides = {
 	[CMD.ATTACK] = { texture = imageDir .. 'Bold/attack.png', tooltip = "Force Fire: Shoot at a particular target or position."},
@@ -186,6 +318,7 @@ local overrides = {
 	[CMD.FIGHT] = { texture = imageDir .. 'Bold/fight.png', tooltip = "Attack Move: Move to a position engaging targets on the way."},
 	[CMD.GUARD] = { texture = imageDir .. 'Bold/guard.png'},
 	[CMD.MOVE] = { texture = imageDir .. 'Bold/move.png'},
+	[CMD_RAW_MOVE] = { texture = imageDir .. 'Bold/move.png'},
 	[CMD.PATROL] = { texture = imageDir .. 'Bold/patrol.png'},
 	[CMD.WAIT] = { texture = imageDir .. 'Bold/wait.png'},
 	
@@ -221,19 +354,23 @@ local overrides = {
 	[CMD_UNIT_SET_TARGET_CIRCLE] = {text='', texture = imageDir .. 'Bold/settarget.png'},
 	[CMD_UNIT_CANCEL_TARGET] = {text='', texture = imageDir .. 'Bold/canceltarget.png'},
 	
-	[CMD_ABANDON_PW] = {text= '', texture = 'LuaUI/Images/Crystal_Clear_action_flag_white.png'},
+	[CMD_ABANDON_PW] = {text= '', texture = imageDir .. 'Bold/drop_beacon.png'},
 	
 	[CMD_PLACE_BEACON] = {text= '', texture = imageDir .. 'Bold/drop_beacon.png'},
 	[CMD_UPGRADE_STOP] = { texture = imageDir .. 'Bold/cancelupgrade.png'},
+	[CMD_STOP_PRODUCTION] = { texture = imageDir .. 'Bold/stopbuild.png'},
+	[CMD_GBCANCEL] = { texture = imageDir .. 'Bold/stopbuild.png'},
+	
+	[CMD_RECALL_DRONES] = {texture = imageDir .. 'Bold/recall_drones.png'},
 	
 	-- states
 	[CMD.ONOFF] = { texture = {imageDir .. 'states/off.png', imageDir .. 'states/on.png'}, text=''},
 	[CMD_UNIT_AI] = { texture = {imageDir .. 'states/bulb_off.png', imageDir .. 'states/bulb_on.png'}, text=''},
 	[CMD.REPEAT] = { texture = {imageDir .. 'states/repeat_off.png', imageDir .. 'states/repeat_on.png'}, text='', tooltip = tooltips["repeat"]},
 	[CMD_WANT_CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+		text ='', tooltip =  'Desired cloak state'},
 	[CMD.CLOAK] = { texture = {imageDir .. 'states/cloak_off.png', imageDir .. 'states/cloak_on.png'},
-		text ='', tooltip =  'Unit cloaking state - press \255\0\255\0K\008 to toggle'},
+		text ='', tooltip =  'Desired cloak state'},
 	[CMD_CLOAK_SHIELD] = { texture = {imageDir .. 'states/areacloak_off.png', imageDir .. 'states/areacloak_on.png'}, 
 		text ='',	tooltip = 'Area Cloaker State'},
 	[CMD_STEALTH] = { texture = {imageDir .. 'states/stealth_off.png', imageDir .. 'states/stealth_on.png'}, text ='', },
@@ -243,6 +380,10 @@ local overrides = {
 		text='', tooltip = tooltips.miscpriority},
 	[CMD_FACTORY_GUARD] = { texture = {imageDir .. 'states/autoassist_off.png', imageDir .. 'states/autoassist_on.png'},
 		text='', tooltip = tooltips.factoryGuard,},
+	[CMD_AUTO_CALL_TRANSPORT] = { texture = {imageDir .. 'states/auto_call_off.png', imageDir .. 'states/auto_call_on.png'},
+		text='', tooltip = tooltips.autoCallTransport,},
+	[CMD_GLOBAL_BUILD] = { texture = {imageDir .. 'Bold/buildgrey.png', imageDir .. 'Bold/build_light.png'},
+		text='', tooltip = tooltips.globalBuild,},
 	[CMD.MOVE_STATE] = { texture = {imageDir .. 'states/move_hold.png', imageDir .. 'states/move_engage.png', imageDir .. 'states/move_roam.png'}, text='', tooltip = tooltips.moveState},
 	[CMD.FIRE_STATE] = { texture = {imageDir .. 'states/fire_hold.png', imageDir .. 'states/fire_return.png', imageDir .. 'states/fire_atwill.png'}, text='', tooltip = tooltips.fireState},
 	[CMD_RETREAT] = { texture = {imageDir .. 'states/retreat_off.png', imageDir .. 'states/retreat_30.png', imageDir .. 'states/retreat_60.png', imageDir .. 'states/retreat_90.png'},
@@ -257,99 +398,19 @@ local overrides = {
 		text = '', tooltip = tooltips.diveBomb},
 	[CMD_UNIT_KILL_SUBORDINATES] = {texture = {imageDir .. 'states/capturekill_off.png', imageDir .. 'states/capturekill_on.png'}, text=''},
 	[CMD_DONT_FIRE_AT_RADAR] = {texture = {imageDir .. 'states/stealth_on.png', imageDir .. 'states/stealth_off.png'}, text=''},
-	[CMD_PREVENT_OVERKILL] = {texture = {imageDir .. 'states/landat_off.png', imageDir .. 'states/landat_80.png'}, text=''},
+	[CMD_PREVENT_OVERKILL] = {texture = {imageDir .. 'states/overkill_off.png', imageDir .. 'states/overkill_on.png'}, text=''},
 	[CMD.TRAJECTORY] = { texture = {imageDir .. 'states/traj_low.png', imageDir .. 'states/traj_high.png'}, text=''},
 	[CMD_AIR_STRAFE] = { texture = {imageDir .. 'states/strafe_off.png', imageDir .. 'states/strafe_on.png'}, text=''},
 	[CMD_UNIT_FLOAT_STATE] = { texture = {imageDir .. 'states/amph_sink.png', imageDir .. 'states/amph_attack.png', imageDir .. 'states/amph_float.png'}, text='', tooltip=tooltips.floatState},
-	}
-
--- This is the list of name ("action name") related to unit command. This name won't work using command line (eg: /fight, won't activate FIGHT command) but it can be binded to a key (eg: /bind f fight, will activate FIGHT when f is pressed)
--- In reverse, one can use Spring.GetActionHotkey(name) to get the key binded to this name.
--- This table is used in Keyboardmenu, Integral menu, and Epicmenu for hotkey management.
-local custom_cmd_actions = {
-	-- states are 2, targeted commands (e.g. attack) are 1, instant commands (e.g. selfd) are 3
-	-- can (probably) set to 1 instead of 3 if order doesn't need to be queueable
-	--SPRING COMMANDS
-	selfd=3,
-	attack=1,
-	stop=3,
-	fight=1,
-	guard=1,
-	move=1,
-	patrol=1,
-	wait=3,
-	repair=1,
-	reclaim=1,
-	resurrect=1,
-	manualfire=1,
-	loadunits=1,
-	unloadunits=1,
-	areaattack=1,
-	
-	-- states
-	onoff=2,
-	['repeat']=2,
-	wantcloak=2,
-	movestate=2,
-	firestate=2,
-	idlemode=2,
-	autorepairlevel=2,
-	
-	      
-	--CUSTOM COMMANDS
-	sethaven=1,
-	--build=1,
-	areamex=1,
-	mine=1,
-	build=1,
-	jump=1,
-	find_pad=3,
-	embark=3,
-	disembark=3,
-	oneclickwep=3,
-	settarget=1,
-	settargetcircle=1,
-	canceltarget=3,
-	setferry=1, 
-	setfirezone=1,
-	cancelfirezone=3,
-	radialmenu=3,
-	placebeacon=1,
-	buildprev=1,
-	areaguard=1,
-	dropflag=3,
-	upgradecomm=3,
-	
-	-- terraform
-	rampground=1,
-	levelground=1,
-	raiseground=1,
-	smoothground=1,
-	restoreground=1,
-	--terraform_internal=1,
-	
-	resetfire=3,
-	resetmove=3,
-	
-	--states
---	stealth=2, --no longer applicable
-	cloak_shield=2,
-	retreat=2,
-	['luaui noretreat']=2,
-	priority=2,
-	miscpriority=2,
-	ap_fly_state=2,
-	ap_autorepairlevel=2,
-	floatstate=2,
-	dontfireatradar=2,
-	antinukezone=2,
-	unitai=2,
-	unit_kill_subordinates=2,
-	autoassist=2,	
-	airstrafe=2,
-	divestate=2,
-	autoeco=2,
+	[CMD_SELECTION_RANK] = { texture = {imageDir .. 'states/selection_rank_0.png', imageDir .. 'states/selection_rank_1.png', imageDir .. 'states/selection_rank_2.png', imageDir .. 'states/selection_rank_3.png'}, text=''},
 }
 
+-- Commands that only exist in LuaUI cannot have a hidden param. Therefore those that should be hidden are placed in this table.
+local widgetSpaceHidden = {
+	[60] = true, -- CMD.PAGES
+	[CMD_SETHAVEN] = true,
+	[CMD_SET_FERRY] = true,
+	[CMD.MOVE] = true,
+}
 
-return common_commands, states_commands, factory_commands, econ_commands, defense_commands, special_commands, globalCommands, overrides, custom_cmd_actions
+return factory_commands, econ_commands, defense_commands, special_commands, units_factory_commands, overrides, widgetSpaceHidden

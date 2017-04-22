@@ -94,40 +94,92 @@ end
 wepTable = nil
 
 --------------------------------------------------------------------------------
--- funcs
+-- Walking
 --------------------------------------------------------------------------------
+local PACE_MULT = 0.7
+local PACE = 2*PACE_MULT
+local BASE_VELOCITY = UnitDefNames.benzcom1.speed or 1.25*30
+local VELOCITY = UnitDefs[unitDefID].speed or BASE_VELOCITY
+local PACE = PACE * VELOCITY/BASE_VELOCITY
+
+local SLEEP_TIME = 360/PACE_MULT
+
+local walkCycle = 1 -- Alternate between 1 and 2
+
+local walkAngle = {
+	{ -- Moving forwards
+		{
+			hip = {math.rad(-12), math.rad(35) * PACE},
+			leg = {math.rad(80), math.rad(100) * PACE},
+			foot = {math.rad(5), math.rad(40) * PACE},
+			arm = {math.rad(-10), math.rad(10) * PACE},
+		},
+		{
+			hip = {math.rad(-40), math.rad(50) * PACE},
+			leg = {math.rad(10), math.rad(100) * PACE},
+			foot = {math.rad(-5), math.rad(140) * PACE},
+		},
+	},
+	{ -- Moving backwards
+		{
+			hip = {math.rad(2), math.rad(50) * PACE},
+			leg = {math.rad(2), math.rad(40) * PACE},
+			foot = {math.rad(8), math.rad(20) * PACE},
+			arm = {math.rad(10), math.rad(15) * PACE},
+		},
+		{
+			hip = {math.rad(20), math.rad(25) * PACE},
+			leg = {math.rad(35), math.rad(35) * PACE},
+			foot = {math.rad(-10), math.rad(80) * PACE},
+		}
+		
+	},
+}
+
 local function Walk()
 	Signal(SIG_WALK)
 	SetSignalMask(SIG_WALK)
+	
+	local speedMult = 1
+	local scaleMult = dyncomm.GetScale()
+	
 	while true do
+		walkCycle = 3 - walkCycle
 		local speedMult = (Spring.GetUnitRulesParam(unitID,"totalMoveSpeedChange") or 1)*dyncomm.GetPace()
-		--left leg up, right leg back
-		Turn(lupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
-		Turn(lleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
-		Turn(rupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
-		Turn(rleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
-		if not(isLasering or isDgunning) then
-			--left arm back, right arm front
-			Turn(torso, y_axis, TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
---			Turn(rarm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
-		end
-		WaitForTurn(rupleg, x_axis)
-		Sleep(0)
 		
-		--right leg up, left leg back
-		Turn(lupleg, x_axis, THIGH_BACK_ANGLE, THIGH_BACK_SPEED * speedMult)
-		Turn(lleg, x_axis, SHIN_BACK_ANGLE, SHIN_BACK_SPEED * speedMult)
-		Turn(rupleg, x_axis, THIGH_FRONT_ANGLE, THIGH_FRONT_SPEED * speedMult)
-		Turn(rleg, x_axis, SHIN_FRONT_ANGLE, SHIN_FRONT_SPEED * speedMult)
-		if not(isLasering or isDgunning) then
-			--left arm front, right arm back
-			Turn(torso, y_axis, -TORSO_ANGLE_MOTION, TORSO_SPEED_MOTION * speedMult)
---			Turn(larm, x_axis, ARM_FRONT_ANGLE, ARM_FRONT_SPEED)
---			Turn(rarm, x_axis, ARM_BACK_ANGLE, ARM_BACK_SPEED)
+		local left = walkAngle[walkCycle] 
+		local right = walkAngle[3 - walkCycle] 
+		-----------------------------------------------------------------------------------
+		
+		Turn(lupleg, x_axis,  left[1].hip[1],  left[1].hip[2] * speedMult)
+		Turn(lleg, x_axis, left[1].leg[1],  left[1].leg[2] * speedMult)
+		Turn(lfoot, x_axis, left[1].foot[1], left[1].foot[2] * speedMult)
+		
+		Turn(rupleg, x_axis,  right[1].hip[1],  right[1].hip[2] * speedMult)
+		Turn(rleg, x_axis, right[1].leg[1],  right[1].leg[2] * speedMult)
+		Turn(rfoot, x_axis,  right[1].foot[1], right[1].foot[2] * speedMult)
+		
+		if not (isLasering or isDgunning) then
+			Turn(larm, x_axis, left[1].arm[1],  left[1].arm[2] * speedMult)
+			Turn(rarm, x_axis, right[1].arm[1],  right[1].arm[2] * speedMult)
 		end
-		WaitForTurn(lupleg, x_axis)		
-		Sleep(0)
+		
+		Sleep(SLEEP_TIME / speedMult)
+		-----------------------------------------------------------------------------------
+		
+		Turn(lupleg, x_axis,  left[2].hip[1],  left[2].hip[2] * speedMult)
+		Turn(lleg, x_axis, left[2].leg[1],  left[2].leg[2] * speedMult)
+		Turn(lfoot, x_axis, left[2].foot[1], left[2].foot[2] * speedMult)
+		
+		Turn(rupleg, x_axis,  right[2].hip[1],  right[2].hip[2] * speedMult)
+		Turn(rleg, x_axis, right[2].leg[1],  right[2].leg[2] * speedMult)
+		Turn(rfoot, x_axis,  right[2].foot[1], right[2].foot[2] * speedMult)
+		
+		if not (isLasering or isDgunning) then
+			Turn(torso, z_axis, -0.1*(walkCycle - 1.5), 0.12 * speedMult)
+		end
+		
+		Sleep(SLEEP_TIME / speedMult)
 	end
 end
 
@@ -136,13 +188,18 @@ local function RestoreLegs()
 	SetSignalMask(SIG_WALK)
 	
 	Move(pelvis, y_axis, 0, 1)
-	Turn(rupleg, x_axis, 0, math.rad(200))
-	Turn(rleg, x_axis, 0, math.rad(200))
 	Turn(lupleg, x_axis, 0, math.rad(200))
 	Turn(lleg, x_axis, 0, math.rad(200))
+	Turn(lfoot, x_axis, 0, math.rad(200))
+	Turn(rupleg, x_axis, 0, math.rad(200))
+	Turn(rleg, x_axis, 0, math.rad(200))
+	Turn(rfoot, x_axis, 0, math.rad(200))
 	Turn(torso, y_axis, 0, math.rad(200))
-	Turn(larm, x_axis, 0, math.rad(200))
-	Turn(rarm, x_axis, 0, math.rad(200))
+	if not (isLasering or isDgunning) then
+		Turn(larm, x_axis, 0, math.rad(200))
+		Turn(rarm, x_axis, 0, math.rad(200))
+		Turn(torso, z_axis, 0, math.rad(200))
+	end
 end
 
 
@@ -169,6 +226,10 @@ function script.StopMoving()
 	isMoving = false
 	StartThread(RestoreLegs)
 end
+
+--------------------------------------------------------------------------------
+-- Aiming
+--------------------------------------------------------------------------------
 
 local function RestoreTorsoAim()
 	Signal(SIG_RESTORE_TORSO)

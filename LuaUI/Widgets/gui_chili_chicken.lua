@@ -342,6 +342,9 @@ function ChickenEvent(chickenEventArgs)
     waveMessage    = {}
     waveMessage[1] = "The Hive is angered!"
     waveTime = Spring.GetTimer()
+  elseif (chickenEventArgs.type == "refresh") then
+    UpdateRules()
+    UpdateAnger()
   end
 end
 
@@ -384,12 +387,9 @@ function widget:Initialize()
 	
 	--create main Chili elements
 	local screenWidth,screenHeight = Spring.GetWindowGeometry()
-	local height = tostring(math.floor(screenWidth/screenHeight*0.35*0.35*100)) .. "%"
-	local y = tostring(math.floor((1-screenWidth/screenHeight*0.35*0.35)*100)) .. "%"
 	
 	local labelHeight = 22
 	local fontSize = 16
-
 	
 	window = Window:New{
 		parent = screen0,
@@ -398,7 +398,7 @@ function widget:Initialize()
 		width = 270;
 		height = 189;
 		right = 0; 
-		bottom = 0;
+		y = 100,
 		dockable = true;
 		draggable = false,
 		resizable = false,

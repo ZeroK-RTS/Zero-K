@@ -53,7 +53,7 @@ local airpadDefs = {
 		cap = 9, 
 		padPieceName={"landpad1","landpad2","landpad3","landpad4","landpad5","landpad6","landpad7","landpad8","landpad9"}
 	},
-	[UnitDefNames["reef"].id] = {
+	[UnitDefNames["shipcarrier"].id] = {
 		mobile = true, 
 		cap = 2, 
 		padPieceName={"LandingFore","LandingAft"}
@@ -115,6 +115,7 @@ local defaultCommands = { -- commands that is processed by gadget
 	[CMD_REARM] = true,
 	[CMD_FIND_PAD] = true,
 	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
 	[CMD.REMOVE] = true,
 	[CMD.INSERT] = true,
 }
@@ -317,6 +318,13 @@ local function RequestRearm(unitID, team, forceNow, replaceExisting)
 			return false
 		end
 	end
+	
+	-- Remove fight orders to implement a fight command version of CommandFire if Fight is the last command.
+	local queueLength = spGetCommandQueue(unitID, 0)
+	if queueLength == 2 and (not Spring.GetUnitStates(unitID)["repeat"]) then
+		spGiveOrderToUnit(unitID, CMD.REMOVE, {CMD.FIGHT}, {"alt"})
+	end
+	
 	--Spring.Echo(unitID.." requesting rearm")
 	local detectedRearm = false
 	local queue = spGetCommandQueue(unitID, -1) or emptyTable

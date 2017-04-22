@@ -8,12 +8,12 @@ end
 
 function gadget:GetInfo()
   return {
-	name 	= "Target on the move",
-	desc	= "Adds a command to set unit target without using the normal command queue",
-	author	= "Google Frog",
-	date	= "September 25 2011",
-	license	= "GNU GPL, v2 or later",
-	layer	= 0,
+	name    = "Target on the move",
+	desc    = "Adds a command to set unit target without using the normal command queue",
+	author  = "Google Frog",
+	date    = "September 25 2011",
+	license = "GNU GPL, v2 or later",
+	layer   = 0,
 	enabled = true,
   }
 end
@@ -27,18 +27,18 @@ local spValidUnitID         = Spring.ValidUnitID
 local spGetUnitPosition     = Spring.GetUnitPosition
 local spGetGroundHeight     = Spring.GetGroundHeight
 local spGetUnitDefID        = Spring.GetUnitDefID
-local spGetUnitLosState 	= Spring.GetUnitLosState
+local spGetUnitLosState     = Spring.GetUnitLosState
 local spGiveOrderToUnit     = Spring.GiveOrderToUnit
-local spSetUnitRulesParam	= Spring.SetUnitRulesParam
+local spSetUnitRulesParam   = Spring.SetUnitRulesParam
 
 local getMovetype = Spring.Utilities.getMovetype
 
 local CMD_WAIT = CMD.WAIT
 
 -- Constans
-local TARGET_NONE = 0
+local TARGET_NONE   = 0
 local TARGET_GROUND = 1
-local TARGET_UNIT= 2
+local TARGET_UNIT   = 2
 --------------------------------------------------------------------------------
 -- Config
 
@@ -79,29 +79,29 @@ local allyTargetUnits = {
 include("LuaRules/Configs/customcmds.h.lua")
 
 local unitSetTargetCmdDesc = {
-	id      = CMD_UNIT_SET_TARGET,
-	type    = CMDTYPE.ICON_UNIT_OR_RECTANGLE,
-	name    = 'Set Target',
+	id	  = CMD_UNIT_SET_TARGET,
+	type	= CMDTYPE.ICON_UNIT_OR_RECTANGLE,
+	name	= 'Set Target',
 	action  = 'settarget',
-    cursor  = 'Attack',
+	cursor  = 'Attack',
 	tooltip	= 'Sets target for unit, not removed by move commands',
 	hidden = true,
 }
 
 local unitSetTargetCircleCmdDesc = {
-	id      = CMD_UNIT_SET_TARGET_CIRCLE,
-	type    = CMDTYPE.ICON_UNIT_OR_AREA,
-	name    = 'Set Target Circle',
+	id	  = CMD_UNIT_SET_TARGET_CIRCLE,
+	type	= CMDTYPE.ICON_UNIT_OR_AREA,
+	name	= 'Set Target Circle',
 	action  = 'settargetcircle',
-    cursor  = 'Attack',
+	cursor  = 'Attack',
 	tooltip	= 'Sets target for unit, not removed by move commands, circle version',
 	hidden = false,
 }
 
 local unitCancelTargetCmdDesc = {
-	id      = CMD_UNIT_CANCEL_TARGET,
-	type    = CMDTYPE.ICON,
-	name    = 'Cancel Target',
+	id	  = CMD_UNIT_CANCEL_TARGET,
+	type	= CMDTYPE.ICON,
+	name	= 'Cancel Target',
 	action  = 'canceltarget',
 	tooltip	= 'Removes target for unit',
 	hidden = false,
@@ -118,13 +118,13 @@ end
 -- Target Handling
 
 local function unitInRange(unitID, targetID, range)
-    local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
-    return dis and range and dis < range
+	local dis = Spring.GetUnitSeparation(unitID, targetID) -- 2d range
+	return dis and range and dis < range
 end
 
 local function locationInRange(unitID, x, y, z, range)
-    local ux, uy, uz = spGetUnitPosition(unitID)
-    return range and ((ux - x)^2 + (uz - z)^2) < range^2
+	local ux, uy, uz = spGetUnitPosition(unitID)
+	return range and ((ux - x)^2 + (uz - z)^2) < range^2
 end
 
 local function clearTarget(unitID)
@@ -133,30 +133,30 @@ local function clearTarget(unitID)
 end
 
 local function setTarget(data, sendToWidget)
-    if spValidUnitID(data.id) then
-        if not data.targetID then
-            if locationInRange(data.id, data.x, data.y, data.z, data.range) then
-                spSetUnitTarget(data.id, data.x, data.y, data.z)
-            end
+	if spValidUnitID(data.id) then
+		if not data.targetID then
+			if locationInRange(data.id, data.x, data.y, data.z, data.range) then
+				spSetUnitTarget(data.id, data.x, data.y, data.z)
+			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id,"target_type",TARGET_GROUND)
 				spSetUnitRulesParam(data.id,"target_x",data.x)
 				spSetUnitRulesParam(data.id,"target_y",data.y)
 				spSetUnitRulesParam(data.id,"target_z",data.z)
 			end
-        elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
-            if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
-                spSetUnitTarget(data.id, data.targetID)
-            end
+		elseif spValidUnitID(data.targetID) and (data.allyAllowed or (spGetUnitAllyTeam(data.targetID) ~= data.allyTeam)) then
+			if (not Spring.GetUnitIsCloaked(data.targetID)) and unitInRange(data.id, data.targetID, data.range) then
+				spSetUnitTarget(data.id, data.targetID)
+			end
 			if sendToWidget then
 				spSetUnitRulesParam(data.id,"target_type",TARGET_UNIT)
 				spSetUnitRulesParam(data.id,"target_id",data.targetID)
 			end
-        else
-            return false
-        end
-    end
-    return true
+		else
+			return false
+		end
+	end
+	return true
 end
 
 local function removeUnseenTarget(data)
@@ -182,17 +182,17 @@ end
 local function addUnit(unitID, data)
 	if spValidUnitID(unitID) then
 		-- clear current traget
-        clearTarget(unitID)
-        if setTarget(data, true) then
-            if unitById[unitID] then
-                unit.data[unitById[unitID]] = data
-            else
-                unit.count = unit.count + 1
-                unit.data[unit.count] = data
-                unitById[unitID] = unit.count
-            end
-        end
-    end
+		clearTarget(unitID)
+		if setTarget(data, true) then
+			if unitById[unitID] then
+				unit.data[unitById[unitID]] = data
+			else
+				unit.count = unit.count + 1
+				unit.data[unit.count] = data
+				unitById[unitID] = unit.count
+			end
+		end
+	end
 end
 
 local function removeUnit(unitID)
@@ -208,19 +208,19 @@ local function removeUnit(unitID)
 			spGiveOrderToUnit(unitID,CMD_WAIT, {}, {})
 		end
 		if unitById[unitID] ~= unit.count then
-            unit.data[unitById[unitID]] = unit.data[unit.count]
-            unitById[unit.data[unit.count].id] = unitById[unitID]
-        end
-        unit.data[unit.count] = nil
-        unit.count = unit.count - 1
-        unitById[unitID] = nil
+			unit.data[unitById[unitID]] = unit.data[unit.count]
+			unitById[unit.data[unit.count].id] = unitById[unitID]
+		end
+		unit.data[unit.count] = nil
+		unit.count = unit.count - 1
+		unitById[unitID] = nil
 	end
 end
 
 function gadget:Initialize()
 	-- register command
 	gadgetHandler:RegisterCMDID(CMD_UNIT_SET_TARGET)
-    gadgetHandler:RegisterCMDID(CMD_UNIT_CANCEL_TARGET)
+	gadgetHandler:RegisterCMDID(CMD_UNIT_CANCEL_TARGET)
 	
 	-- load active units
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
@@ -235,23 +235,23 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam, builderID)
 	if validUnits[unitDefID] then
 		spInsertUnitCmdDesc(unitID, unitSetTargetCmdDesc)
 		spInsertUnitCmdDesc(unitID, unitSetTargetCircleCmdDesc)
-        spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
+		spInsertUnitCmdDesc(unitID, unitCancelTargetCmdDesc)
 	end
 	
 end
 
 function gadget:UnitFromFactory(unitID, unitDefID, unitTeam, facID, facDefID)
-    if unitById[facID] and validUnits[unitDefID] then
+	if unitById[facID] and validUnits[unitDefID] then
 		local data = unit.data[unitById[facID]]
-        addUnit(unitID, {
-            id = unitID, 
-            targetID = data.targetID, 
-            x = data.x, y = data.y, z = data.z,
-            allyTeam = spGetUnitAllyTeam(unitID), 
-            range = UnitDefs[unitDefID].maxWeaponRange,
+		addUnit(unitID, {
+			id = unitID, 
+			targetID = data.targetID, 
+			x = data.x, y = data.y, z = data.z,
+			allyTeam = spGetUnitAllyTeam(unitID), 
+			range = UnitDefs[unitDefID].maxWeaponRange,
 			alwaysSeen = data.alwaysSeen,
-        })
-    end
+		})
+	end
 end
 
 function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
@@ -259,7 +259,7 @@ function gadget:UnitDestroyed(unitID, unitDefID, unitTeam)
 end
 
 function gadget:UnitTaken(unitID, unitDefID, oldTeamID, teamID)
-    removeUnit(unitID)
+	removeUnit(unitID)
 end
 
 --------------------------------------------------------------------------------
@@ -315,9 +315,9 @@ end
 
 function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions)
 	
-    if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
+	if cmdID == CMD_UNIT_SET_TARGET or cmdID == CMD_UNIT_SET_TARGET_CIRCLE then
 		if validUnits[unitDefID] then
-            if #cmdParams == 6 then
+			if #cmdParams == 6 then
 				local team = Spring.GetUnitTeam(unitID)
 				
 				if not team then
@@ -348,14 +348,14 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
 			elseif #cmdParams == 3 or (#cmdParams == 4 and cmdParams[4] == 0) then
-                addUnit(unitID, {
-                    id = unitID, 
-                    x = cmdParams[1], 
-                    y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
-                    z = cmdParams[3], 
-                    allyTeam = spGetUnitAllyTeam(unitID), 
-                    range = UnitDefs[unitDefID].maxWeaponRange
-                })
+				addUnit(unitID, {
+					id = unitID, 
+					x = cmdParams[1], 
+					y = CallAsTeam(teamID, function () return spGetGroundHeight(cmdParams[1],cmdParams[3]) end), 
+					z = cmdParams[3], 
+					allyTeam = spGetUnitAllyTeam(unitID), 
+					range = UnitDefs[unitDefID].maxWeaponRange
+				})
 			
 			elseif #cmdParams == 4 then
 			
@@ -371,26 +371,26 @@ function gadget:AllowCommand(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOpt
 					
 				setTargetClosestFromList(unitID, unitDefID, team, units)
 				
-            elseif #cmdParams == 1 then
-                local targetUnitDef = spGetUnitDefID(cmdParams[1])
+			elseif #cmdParams == 1 then
+				local targetUnitDef = spGetUnitDefID(cmdParams[1])
 				local tud = targetUnitDef and UnitDefs[targetUnitDef]
 				addUnit(unitID, {
-                    id = unitID, 
-                    targetID = cmdParams[1], 
-                    allyTeam = spGetUnitAllyTeam(unitID), 
+					id = unitID, 
+					targetID = cmdParams[1], 
+					allyTeam = spGetUnitAllyTeam(unitID), 
 					allyAllowed = allyTargetUnits[unitDefID],
-                    range = UnitDefs[unitDefID].maxWeaponRange,
+					range = UnitDefs[unitDefID].maxWeaponRange,
 					alwaysSeen = tud and (tud.isBuilding == true or tud.maxAcc == 0),
-                })
-            end
-        end
-        return false  -- command was used
-    elseif cmdID == CMD_UNIT_CANCEL_TARGET then
+				})
+			end
+		end
+		return false  -- command was used
+	elseif cmdID == CMD_UNIT_CANCEL_TARGET then
 		if validUnits[unitDefID] then
 			removeUnit(unitID)
 		end
-        return false  -- command was used
-    end
+		return false  -- command was used
+	end
 	return true  -- command was not used
 end
 
@@ -399,33 +399,33 @@ end
 
 function gadget:GameFrame(n)
 	if n%16 == 15 then -- timing synced with slow update to reduce attack jittering
-        -- 15 causes attack command to override target command
-        -- 0 causes target command to take precedence
-        
-        local toRemove = {count = 0, data = {}}
-        for i = 1, unit.count do
-            if not setTarget(unit.data[i], false) then
-                toRemove.count = toRemove.count + 1
-                toRemove.data[toRemove.count] = unit.data[i].id
-            end
-        end
-        
-        for i = 1, toRemove.count do
-            removeUnit(toRemove.data[i])
-        end
-    end
-	
+		-- 15 causes attack command to override target command
+		-- 0 causes target command to take precedence
+
+		local toRemove = {count = 0, data = {}}
+		for i = 1, unit.count do
+			if not setTarget(unit.data[i], false) then
+				toRemove.count = toRemove.count + 1
+				toRemove.data[toRemove.count] = unit.data[i].id
+			end
+		end
+
+		for i = 1, toRemove.count do
+			removeUnit(toRemove.data[i])
+		end
+	end
+
 	if n%USEEN_UPDATE_FREQUENCY == 0 then
 		local toRemove = {count = 0, data = {}}
 		for i = 1, unit.count do
 			if removeUnseenTarget(unit.data[i]) then
 				toRemove.count = toRemove.count + 1
-                toRemove.data[toRemove.count] = unit.data[i].id
+				toRemove.data[toRemove.count] = unit.data[i].id
 			end
 		end
 		for i = 1, toRemove.count do
-            removeUnit(toRemove.data[i])
-        end
+			removeUnit(toRemove.data[i])
+		end
 	end
 	
 end

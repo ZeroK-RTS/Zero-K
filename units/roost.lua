@@ -5,20 +5,15 @@ unitDef = {
   acceleration      = 0,
   activateWhenBuilt = true,
   brakeRate         = 0,
-  buildAngle        = 4096,
-  buildCostEnergy   = 340,
   buildCostMetal    = 340,
   builder           = false,
   buildPic          = [[roost.png]],
-  buildTime         = 340,
   category          = [[SINK]],
 
   customParams      = {
     description_de = [[Erzeugt Chicken]],
-    description_pl = [[Rozmnaza kurczaki]],
 	helptext       = [[Roosts such as this one are the hatching grounds of the Thunderbirds.]],
 	helptext_de    = [[In den Nestern der Chicken wird die Brut herangezogen und nach einer gewissen Zeit auf die restliche Welt losgelassen.]],
-	helptext_pl    = [[W tym gniezdzie rodza sie kurczaki.]],
   },
   
   energyMake        = 0,
@@ -29,7 +24,6 @@ unitDef = {
   idleAutoHeal      = 0,
   idleTime          = 1800,
   levelGround       = false,
-  mass              = 226,
   maxDamage         = 1800,
   maxSlope          = 36,
   maxVelocity       = 0,
@@ -37,7 +31,6 @@ unitDef = {
   minCloakDistance  = 150,
   noAutoFire        = false,
   objectName        = [[roost]],
-  seismicSignature  = 4,
   selfDestructAs    = [[NOWEAPON]],
 
   sfxtypes          = {
@@ -48,10 +41,7 @@ unitDef = {
     },
 
   },
-
-  side              = [[THUNDERBIRDS]],
   sightDistance     = 273,
-  smoothAnim        = true,
   turnRate          = 0,
   upright           = false,
   waterline         = 0,
@@ -80,7 +70,11 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
-
+      
+      customParams            = {
+        light_radius = 0,
+      },
+      
       damage                  = {
         default = 80,
         planes  = 80,

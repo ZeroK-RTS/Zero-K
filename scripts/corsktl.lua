@@ -12,7 +12,7 @@ local Tail = piece 'tail'
 
 include "constants.lua"
 
-local smokePiece = { hump }
+local smokePiece = { Hump }
 
 local moving = false
 local SIG_MOVE = 1
@@ -95,6 +95,10 @@ end
 
 function preJump () end
 function jumping() end
+
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
 
 function script.Create ()
 	StartThread (SmokeUnit, smokePiece)

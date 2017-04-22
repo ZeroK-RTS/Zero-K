@@ -43,7 +43,7 @@ local fontSize = 14
 local myTeamID = Spring.GetMyTeamID()
 local myPlayerID = Spring.GetMyPlayerID()
 
-local sDefID = Spring.GetTeamRulesParam(myTeamID, "commChoice") or UnitDefNames.commbasic.id-- Starting unit def ID
+local sDefID = Spring.GetTeamRulesParam(myTeamID, "commChoice") or UnitDefNames.dyntrainer_strike_base.id-- Starting unit def ID
 local sDef = UnitDefs[sDefID]
 local buildDistance = sDef.buildDistance
 
@@ -112,10 +112,11 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.Color(1.0, 1.0, 1.0, buildingAlpha)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(bx, by, bz)
 		gl.Rotate(90 * facing, 0, 1, 0)
 		gl.Texture("%"..bDefID..":0") --.s3o texture atlas for .s3o model
-		gl.UnitShape(bDefID, teamID, false, true, false)
+		gl.UnitShape(bDefID, teamID, false, false, false)
 		gl.Texture(false)
 	gl.PopMatrix()
 
@@ -123,7 +124,7 @@ local function DrawBuilding(buildData, borderColor, buildingAlpha, drawRanges,te
 	gl.DepthTest(false)
 	gl.DepthMask(false)
 end
-local function DrawUnitDef(uDefID, uTeam, ux, uy, uz)
+local function DrawUnitDef(uDefID, uTeam, ux, uy, uz, rot)
 
 	gl.Color(1.0, 1.0, 1.0, 1.0)
 	gl.DepthTest(GL.LEQUAL)
@@ -131,8 +132,10 @@ local function DrawUnitDef(uDefID, uTeam, ux, uy, uz)
 	gl.Lighting(true)
 
 	gl.PushMatrix()
+		gl.LoadIdentity()
 		gl.Translate(ux, uy, uz)
-		gl.UnitShape(uDefID, uTeam, false, true, true)
+		gl.Rotate(rot, 0, 1, 0)
+		gl.UnitShape(uDefID, uTeam, false, false, true)
 	gl.PopMatrix()
 
 	gl.Lighting(false)
@@ -211,9 +214,36 @@ end
 ------------------------------------------------------------
 -- Initialize/shutdown
 ------------------------------------------------------------
+
+local function GetUnlockedBuildOptions(fullOptions)
+	local teamID = Spring.GetMyTeamID()
+	local unlockedCount = Spring.GetTeamRulesParam(teamID, "unlockedUnitCount")
+	if not unlockedCount then
+		return fullOptions
+	end
+	local unlockedMap = {}
+	for i = 1, unlockedCount do
+		local unitDefID = Spring.GetTeamRulesParam(teamID, "unlockedUnit" .. i)
+		if unitDefID then
+			unlockedMap[unitDefID] = true
+		end
+	end
+	local newOptions = {}
+	for i = 1, #fullOptions do
+		if unlockedMap[fullOptions[i]] then
+			newOptions[#newOptions + 1] = fullOptions[i]
+		end
+	end
+	return newOptions
+end
+
 function widget:Initialize()
 	if (Spring.GetGameFrame() > 0) then		-- Don't run if game has already started
 		Spring.Echo("Game already started or Start Position is randomized. Removed: Initial Queue ZK") --added this message because widget removed message might not appear (make debugging harder)
+		widgetHandler:RemoveWidget(self)
+		return
+	end
+	if Spring.GetModOptions().singleplayercampaignbattleid then -- Don't run in campaign battles.
 		widgetHandler:RemoveWidget(self)
 		return
 	end
@@ -230,6 +260,8 @@ function widget:Initialize()
 		isMex[UnitDefNames["cormex"].id] = true;
 	end
 	WG.InitialQueue = true
+	
+	buildOptions = GetUnlockedBuildOptions(buildOptions)
 end
 
 function widget:Shutdown()
@@ -312,7 +344,10 @@ local function DrawWorldFunc()
 		sy = Spring.GetGroundHeight(sx, sz)
 
 		-- Draw the starting unit at start position
-		DrawUnitDef(sDefID, myTeamID, sx, sy, sz)
+		local rot = (math.abs(Game.mapSizeX/2 - sx) > math.abs(Game.mapSizeZ/2 - sz))
+			and ((sx>Game.mapSizeX/2) and 270 or 90)
+			or ((sz>Game.mapSizeZ/2) and 180 or 0)
+		DrawUnitDef(sDefID, myTeamID, sx, sy, sz, rot)
 
 		-- Draw start units build radius
 		gl.Color(buildDistanceColor)
@@ -482,6 +517,9 @@ function widget:GameFrame(n)
 	end
 	if tasker then
 		--Spring.Echo("sending queue to unit")
+		-- notify other widgets that we're giving orders to the commander.
+		if WG.GlobalBuildCommand then WG.GlobalBuildCommand.CommandNotifyPreQue(tasker) end
+		
 		for b = 1, #buildQueue do
 			local buildData = buildQueue[b]
 			Spring.GiveOrderToUnit(tasker, -buildData[1], {buildData[2], buildData[3], buildData[4], buildData[5]}, {"shift"})
@@ -572,21 +610,24 @@ function widget:CommandsChanged()
 	end
 	for i=1, #buildOptions do
 		local unitName = buildOptions[i]
-		table.insert(widgetHandler.customCommands, {
-			id      = -1*UnitDefNames[unitName].id,
-			type    = 20,
-			tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
-			cursor  = unitName,
-			action  = "buildunit_" .. unitName,
-			params  = {}, 
-			texture = "", --"#"..id,
-			name = unitName,
-		})
+		if not Spring.GetGameRulesParam("disabled_unit_" .. unitName) then
+			table.insert(widgetHandler.customCommands, {
+				id      = -1*UnitDefNames[unitName].id,
+				type    = 20,
+				tooltip = "Build: " .. UnitDefNames[unitName].humanName .. " - " .. UnitDefNames[unitName].tooltip,
+				cursor  = unitName,
+				action  = "buildunit_" .. unitName,
+				params  = {}, 
+				texture = "", --"#"..id,
+				name = unitName,
+			})
+		end
 	end
 	table.insert(widgetHandler.customCommands, {
 		id      = CMD_STOP,
 		type    = CMDTYPE.ICON,
 		tooltip = "Stop",
+		action  = "stop",
 		params  = {}, 
 	})
 end
@@ -636,7 +677,8 @@ function widget:CommandNotify(cmdID, cmdParams, cmdOptions)
 	if Spring.TestBuildOrder(selDefID, bx, by, bz, buildFacing) ~= 0 then
 		if isMex[selDefID] and WG.metalSpots then
 			local bestSpot = GetClosestMetalSpot(bx, bz)
-			bx, by, bz = bestSpot.x, bestSpot.y, bestSpot.z
+			bx, bz = bestSpot.x, bestSpot.z
+			by = math.max(0, Spring.GetGroundHeight(bx, bz))
 		end
 		local buildData = {selDefID, bx, by, bz, buildFacing}
 		local msg

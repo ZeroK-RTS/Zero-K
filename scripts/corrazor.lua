@@ -11,6 +11,7 @@ local smokePiece = { body, turret }
 
 local gun = false
 local closed = true
+local stuns = {false, false, false}
 local disarmed = false
 local currentTask = 0
 
@@ -18,7 +19,7 @@ local SigAim = 1
 
 local function Close ()
 	currentTask = 1
-	if disarmed then return	end
+	if disarmed then return end
 	closed = true
 
 	Turn (launcher, x_axis, 0, math.rad(90))
@@ -60,7 +61,6 @@ local function Open ()
 end
 
 local function StunThread ()
-	if disarmed then return end
 	disarmed = true
 	Signal (SigAim)
 
@@ -69,11 +69,9 @@ local function StunThread ()
 	StopTurn (launcher, x_axis)
 	StopTurn (door1, z_axis)
 	StopTurn (door2, z_axis)
+end
 
-	while IsDisarmed() do
-		Sleep (100)
-	end
-
+local function UnstunThread ()
 	SetSignalMask (SigAim)
 	disarmed = false
 	if currentTask == 1 then
@@ -85,8 +83,15 @@ local function StunThread ()
 	end
 end
 
-function Stunned ()
+function Stunned (stun_type)
+	stuns[stun_type] = true
 	StartThread (StunThread)
+end
+function Unstunned (stun_type)
+	stuns[stun_type] = false
+	if not stuns[1] and not stuns[2] and not stuns[3] then
+		StartThread (UnstunThread)
+	end
 end
 
 function script.Create()
@@ -109,12 +114,12 @@ function script.AimWeapon (num, heading, pitch)
 	SetSignalMask (SigAim)
 
 	while disarmed do
-		Sleep (100)
+		Sleep (34)
 	end
 
 	StartThread (Open)
 	while closed do
-		Sleep (100)
+		Sleep (34)
 	end
 
 	local slowMult = (1 - (Spring.GetUnitRulesParam(unitID,"slowState") or 0))

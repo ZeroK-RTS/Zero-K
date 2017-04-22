@@ -259,9 +259,7 @@ function script.QueryWeapon(num)
 end
 
 function script.FireWeapon(num) 
-
 	if gun_1 then 
-	
 		Move(l_missile, z_axis, 10, 100)
 		WaitForMove(l_missile, z_axis)
 		Hide(l_missile)
@@ -273,9 +271,16 @@ function script.FireWeapon(num)
 		Hide(r_missile)
 		StartThread(RestoreAfterDelayRight)
 	end
-	
 	gun_1 = not gun_1
 	--StartThread(RestoreAfterDelay)
+end
+
+function script.BlockShot(num, targetID)
+	if Spring.ValidUnitID(targetID) then
+		local distMult = (Spring.GetUnitSeparation(unitID, targetID) or 0)/530
+		return GG.OverkillPrevention_CheckBlock(unitID, targetID, 350.1, 85 * distMult, false, false, true)
+	end
+	return false
 end
 
 function script.Killed(recentDamage, maxHealth)

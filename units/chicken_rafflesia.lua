@@ -15,9 +15,7 @@ unitDef = {
   category                      = [[SINK]],
 
   customParams                  = {
-    description_pl = [[Tarcza]],
     helptext       = [[The Rafflesia protects nearby chicken units and structures with its shield.]],
-    helptext_pl    = [[Rafflesia chroni okoliczne kurczaki swoja tarcza.]],
   },
 
   explodeAs                     = [[NOWEAPON]],
@@ -27,7 +25,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 120,
   maxDamage                     = 500,
   maxSlope                      = 36,
   maxVelocity                   = 0,
@@ -37,7 +34,6 @@ unitDef = {
   objectName                    = [[chicken_rafflesia.s3o]],
   onoffable                     = true,
   power                         = 480,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {
@@ -49,10 +45,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 512,
-  smoothAnim                    = true,
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,

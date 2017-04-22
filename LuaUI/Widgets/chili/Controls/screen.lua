@@ -103,6 +103,10 @@ function Screen:IsRectInView(x,y,w,h)
 end
 
 
+function Screen:IsVisibleOnScreen()
+  return true
+end
+
 --//=============================================================================
 
 function Screen:Resize(w,h)
@@ -269,6 +273,15 @@ function Screen:KeyPress(...)
 		return (not not focusedControl:KeyPress(...))
 	end
 	return (not not inherited:KeyPress(...))
+end
+
+
+function Screen:TextInput(...)
+        local focusedControl = UnlinkSafe(self.focusedControl)
+        if focusedControl then
+                return (not not focusedControl:TextInput(...))
+        end
+        return (not not inherited:TextInput(...))
 end
 
 --//=============================================================================

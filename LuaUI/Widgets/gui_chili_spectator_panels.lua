@@ -117,7 +117,7 @@ ShowOptions = {ShowOptions}
 --------------------------------------------------------------------------------
 -- Options
 
-options_path = 'Settings/HUD Panels/Extras/Spectating'
+options_path = 'Settings/HUD Panels/Spectator Panels'
 
 options_order = {
 	'enableSpectator',
@@ -135,14 +135,19 @@ options_order = {
 	'resourceMainFontSize', 
 	'resourceFontSize',
 	'colourBlind', 
+	'fancySkinning',
 }
  
+local econName, econPath = "Chili Economy Panel Default", "Settings/HUD Panels/Economy Panel"
 options = {
 	enableSpectator = {
 		name  = "Enable as Spectator",
 		type  = "bool", 
 		value = false, 
-		OnChange = function(self) option_CheckEnable(self) end, 
+		OnChange = function(self)
+			option_CheckEnable(self)
+			WG.SetWidgetOption(econName, econPath, "ecoPanelHideSpec", self.value)
+		end,
 		desc = "Enables the spectator resource bars when spectating a game with two teams."
 	},
 	clanNameLengthCutoff = {
@@ -232,8 +237,44 @@ options = {
 		name  = "Colourblind mode",
 		type  = "bool", 
 		value = false, 
+		noHotkey = true,
 		OnChange = option_ColourBlindUpdate, 
 		desc = "Uses Blue and Yellow instead of Red and Green for number display"
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'radioButton',
+		value = 'panel',
+		items = {
+			{key = 'panel', name = 'None'},
+			--{key = 'panel_0001', name = 'Flush',},
+			{key = 'panel_1011', name = 'Not Flush',},
+		},
+		OnChange = function (self)
+			if not (playerWindow and playerWindow.mainPanel) then
+				return
+			end
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local className = self.value
+			local newClass = skin.panel
+			if skin[className] then
+				newClass = skin[className]
+			end
+			
+			playerWindow.mainPanel.tiles = newClass.tiles
+			playerWindow.mainPanel.TileImageFG = newClass.TileImageFG
+			--playerWindow.mainPanel.backgroundColor = newClass.backgroundColor
+			playerWindow.mainPanel.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				playerWindow.mainPanel.padding = newClass.padding
+				playerWindow.mainPanel:UpdateClientArea()
+			end
+			playerWindow.mainPanel:Invalidate()
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 }
 
@@ -288,7 +329,7 @@ local function Format(input, override)
 	leadingString = override or leadingString
 	input = math.abs(input)
 	
-	if input < 0.01 then
+	if input < 0.05 then
 		if override then
 			return override .. "0.0"
 		end
@@ -407,7 +448,7 @@ local function UpdateResourceWindowPanel(sideID)
 		local mCurr, mStor, mPull, mInco, mExpe, mShar, mSent, mReci = spGetTeamResources(teams[i], "metal")
 		metalIncome = metalIncome + (mInco or 0)
 		metalStorage = metalStorage + (mCurr or 0)
-		metalStorageMax = metalStorageMax + (mStor or 0)
+		metalStorageMax = metalStorageMax + (mStor or 0) - HIDDEN_STORAGE
 		
 		metalSpent = metalSpent + (mExpe or 0)
 		
@@ -475,7 +516,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	local data = {}
 	
 	--// Panel configuration
-	local incomeX      = "3%"
+	local incomeX      = "1%"
 	local incomeY      = "10%"
 	local incomeWidth  = "24%"
 	local incomeHeight = "70%"
@@ -491,7 +532,7 @@ local function CreateResourceWindowPanel(parentData, left, width, resourceColor,
 	local barRight  = "4%"
 	local barHeight = "36%"
 	
-	data.mainPanel = Chili.Panel:New{
+	data.mainPanel = Chili.Control:New{
 		parent = parentPanel,
 		x      = left,
 		width  = width,
@@ -599,15 +640,13 @@ local function CreateResourceWindow(allyTeamDataNumber, x, width)
 	
 	data.window = Chili.Window:New{
 		parent = screen0,
-		backgroundColor = {0, 0, 0, 0},
-		color = {0, 0, 0, 0},
 		dockable = true,
-		name = "SpectatorEconomyPanel" .. allyTeamDataNumber,
-		padding = {0,0,0,0},
+		name = "SpectatorEconomyPanel_vz_" .. allyTeamDataNumber,
 		x = x,
-		y = 0,
-		clientWidth  = width,
-		clientHeight = 50,
+		y = 58,
+		width  = width,
+		height = 62,
+		classname = "main_window_small_very_flat",
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
@@ -617,8 +656,7 @@ local function CreateResourceWindow(allyTeamDataNumber, x, width)
 		tooltip = "Economy for " .. allyTeamData[allyTeamDataNumber].name,
 	}
 	
-	data.mainPanel = Chili.Panel:New{
-		backgroundColor = {0, 0, 0, 0},
+	data.mainPanel = Chili.Control:New{
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -653,12 +691,12 @@ local function AddEconomyWindows()
 		
 		local screenWidth,screenHeight = Spring.GetWindowGeometry()
 		local screenHorizCentre = screenWidth / 2
-		local playerWindowWidth = 500
-		local econWidth = 460
+		local spacing = 360
+		local econWidth = 480
 		
 		economyWindowData = {
-			[1] = CreateResourceWindow(1, screenHorizCentre - playerWindowWidth/2 - econWidth, econWidth),
-			[2] = CreateResourceWindow(2, screenHorizCentre + playerWindowWidth/2, econWidth),
+			[1] = CreateResourceWindow(1, screenHorizCentre - spacing/2 - econWidth, econWidth),
+			[2] = CreateResourceWindow(2, screenHorizCentre + spacing/2, econWidth),
 		}
 	end
 	enabledEconomy = true
@@ -703,8 +741,9 @@ local function CreatePlayerWindow()
 	}
 	
 	data.mainPanel = Chili.Panel:New{
-		backgroundColor = {1,1,1,options.resourceOpacity.value},
-		color = {1,1,1,options.resourceOpacity.value},
+		classname = options.fancySkinning.value,
+		backgroundColor = {1,1,1,options.playerOpacity.value},
+		color = {1,1,1,options.playerOpacity.value},
 		parent = data.window,
 		padding = {0,0,0,0},
 		y      = 0,
@@ -879,9 +918,9 @@ local function GetOpposingAllyTeams()
 				end
 			end
 
-			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID)
-			if string.len(name) > options.clanNameLengthCutoff.value then
-				name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID)
+			local name = Spring.GetGameRulesParam("allyteam_long_name_" .. allyTeamID) or "Unknown"
+			if name and string.len(name) > options.clanNameLengthCutoff.value then
+				name = Spring.GetGameRulesParam("allyteam_short_name_" .. allyTeamID) or name
 			end
 
 			returnData[#returnData + 1] = {
@@ -916,21 +955,26 @@ function option_CheckEnable(self)
 			RemoveEconomyWindows()
 			enabled = false
 		end
-		return
-	end
-	
-	if enabled then
-		return
+		return false
 	end
 	
 	local spectating = select(1, Spring.GetSpectatingState())
 	if not spectating then
-		return
+		if enabled then
+			RemovePlayerWindow()
+			RemoveEconomyWindows()
+			enabled = false
+		end
+		return false
+	end
+	
+	if enabled then
+		return true
 	end
 	
 	allyTeamData = GetOpposingAllyTeams()
 	if not allyTeamData then
-		return
+		return false
 	end
 	
 	if options.enablePlayerPanel.value then
@@ -942,6 +986,7 @@ function option_CheckEnable(self)
 	end
 	
 	enabled = true
+	return true
 end
 
 function option_CheckEnablePlayer(self)
@@ -973,6 +1018,17 @@ end
 
 function widget:Shutdown()
 	--window:Dispose()
+end
+
+function widget:PlayerChanged(pID)
+	if pID == Spring.GetMyPlayerID() then
+		local newEnabled = option_CheckEnable(options.enableSpectator)
+		if WG.EconomyPanel then
+			-- new second arg is "dispose"
+			-- I don't know if it specifically requires panel to be disposed, but let's do so to avoid behavior changes - KR
+			WG.EconomyPanel.SetEconomyPanelVisibility(not newEnabled, true)
+		end
+	end
 end
 
 function widget:Initialize()

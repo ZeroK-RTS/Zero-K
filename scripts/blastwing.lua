@@ -42,8 +42,6 @@ local function Burrow()
 	Turn(r_wing, side, RIGHT_ANGLE, 5)
 	Move(base, up, 8, 8)
 	--Move(base, forward, -4, 5)
-	Spring.SetUnitCloak(unitID, 2)
-	Spring.SetUnitStealth(unitID, true)
 end
 
 local function UnBurrow()
@@ -59,12 +57,21 @@ local function UnBurrow()
 	--Move(base, forward, 0, 5)
 end
 
+function Detonate() -- Giving an order causes recursion.
+	GG.QueueUnitDescruction(unitID)
+end
+
 function script.Create()
 	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.Activate()
 	StartThread(UnBurrow)
+end
+
+function script.Deactivate()
+	Spring.SetUnitCloak(unitID, 2)
+	Spring.SetUnitStealth(unitID, true)
 end
 
 function script.StopMoving()

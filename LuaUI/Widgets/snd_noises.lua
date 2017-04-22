@@ -45,7 +45,7 @@ local spGetUnitHealth	= Spring.GetUnitHealth
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
-options_path = 'Settings/Audio/Unit Replies'
+options_path = 'Settings/Audio'
 options_order = { 
 'selectnoisevolume','ordernoisevolume','attacknoisevolume', 
 }
@@ -86,10 +86,14 @@ local SOUNDTABLE_FILENAME = LUAUI_DIRNAME.."Configs/sounds_noises.lua"
 local soundTable = VFS.Include(SOUNDTABLE_FILENAME, nil, VFS.RAW_FIRST)
 local myTeamID
 local cooldown = {}
-local previousSelection
 
-local unitInSelection = {}
-local doNotPlayNextSelection = false
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+
+local widgetCMD = {
+	[CMD_EMBARK] = true,
+	[CMD_DISEMBARK] = true,
+	[CMD_TRANSPORTTO] = true,
+}
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -114,27 +118,12 @@ local function CoolNoisePlay(category, cooldownTime, volume)
 	end
 end
 
-function widget:Initialize()
-	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) 
-	myTeamID = team
-	WG.noises = true
-end
-
-function widget:Shutdown()
-	WG.noises = nil
-end
-
-function widget:SelectionChanged(selection)
-	if doNotPlayNextSelection then
-		doNotPlayNextSelection = false
+function widget:SelectionChanged(selection, subselection)
+	if subselection then
 		return
 	end
 	if (not selection[1]) then
 		return
-	end
-	unitInSelection = {}
-	for i = 1, #selection do
-		unitInSelection[selection[i]] = true
 	end
 	local unitDefID = GetUnitDefID(selection[1])
 	if (unitDefID) then --only make sound when selecting own units
@@ -163,24 +152,28 @@ function WG.sounds_gaveOrderToUnit(unitID, isBuild)
 	end
 end
 
-function widget:CommandNotify(cmdID)
-	local unitID = GetSelectedUnits()[1]
-	if (not unitID) then
-		return
-	end
+local function PlayResponse(unitID, cmdID)
 	local unitDefID = GetUnitDefID(unitID)
 	if not (unitDefID and UnitDefs[unitDefID]) then
 		return false
 	end
 	local unitName = UnitDefs[unitDefID].name
 	local sounds = soundTable[unitName] or soundTable[default]
-	if (CMD[cmdID]) then
+	if (CMD[cmdID] or widgetCMD[cmdID] or cmdID > 0) then
 		if (sounds and sounds.ok) then
 			CoolNoisePlay(sounds.ok[1], 0.5, (sounds.ok.volume or 1)*options.ordernoisevolume.value)
 		end
 	elseif (sounds and sounds.build) then
 		CoolNoisePlay(sounds.build, 0.5, options.ordernoisevolume.value)
 	end
+end
+
+function widget:CommandNotify(cmdID)
+	local unitID = GetSelectedUnits()[1]
+	if (not unitID) then
+		return
+	end
+	PlayResponse(unitID, cmdID)
 end
 
 function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
@@ -199,10 +192,24 @@ function widget:UnitDamaged(unitID, unitDefID, unitTeam, damage)
 	end
 end
 
-function widget:UnitDestroyed(unitID, unitDefID, unitTeam)
-	if unitInSelection[unitID] then
-		doNotPlayNextSelection = true
-	end
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- External Functions
+
+local externalFunctions = {}
+
+function externalFunctions.PlayResponse(unitID, cmdID)
+	PlayResponse(unitID, cmdID)
+end
+
+function widget:Initialize()
+	local _, _, spec, team = Spring.GetPlayerInfo(Spring.GetMyPlayerID()) 
+	myTeamID = team
+	WG.noises = externalFunctions
+end
+
+function widget:Shutdown()
+	WG.noises = nil
 end
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

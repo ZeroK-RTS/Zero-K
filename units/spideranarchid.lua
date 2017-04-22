@@ -3,11 +3,9 @@ unitDef = {
   name                   = [[Anarchid]],
   description            = [[Riot EMP Spider]],
   acceleration           = 0.26,
-  brakeRate              = 0.26,
-  buildCostEnergy        = 250,
+  brakeRate              = 0.78,
   buildCostMetal         = 250,
   buildPic               = [[arm_venom.png]],
-  buildTime              = 250,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -40,7 +38,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[spideranarchid.s3o]],
   script                 = [[spideranarchid.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -119,30 +116,17 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Venom]],
       blocking         = false,
-      damage           = 750,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 80,
       object           = [[venom_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
-
     },
     HEAP  = {
-      description      = [[Debris - Venom]],
       blocking         = false,
-      damage           = 750,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 40,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 40,
     },
 
   },

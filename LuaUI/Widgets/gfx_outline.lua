@@ -25,17 +25,20 @@ function widget:GetInfo()
 end
 
 local thickness = 1
+local thicknessMult = 1
 local forceLowQuality = false
+local scaleWithHeight
 
 local function OnchangeFunc()
-  thickness = options.thickness.value
+	thickness = options.thickness.value
 end
+
 local function QualityChangeCheckFunc()
-  if forceLowQuality then
-    options.lowQualityOutlines.OnChange = nil
-    options.lowQualityOutlines.value = true
-    options.lowQualityOutlines.OnChange = QualityChangeCheckFunc
-  end
+	if forceLowQuality then
+		options.lowQualityOutlines.OnChange = nil
+		options.lowQualityOutlines.value = true
+		options.lowQualityOutlines.OnChange = QualityChangeCheckFunc
+	end
 end
 
 options_path = 'Settings/Graphics/Unit Visibility/Outline'
@@ -48,14 +51,28 @@ options = {
 		value = 1,
     OnChange = OnchangeFunc,
 	},
-  lowQualityOutlines = {
-    name = 'Low Quality Outlines',
-    desc = 'Reduces outline accuracy to improve perfomance, only recommended for low-end machines',
-    type = 'bool',
-    value = false,
-    advanced = true,
-    OnChange = QualityChangeCheckFunc,
-  },
+	scaleWithHeight = {
+		name = 'Scale With Distance',
+		desc = 'Reduces the screen space width of outlines when zoomed out.',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = function (self)
+			scaleWithHeight = self.value
+			if not scaleWithHeight then
+				thicknessMult = 1
+			end
+		end,
+	},
+	lowQualityOutlines = {
+		name = 'Low Quality Outlines',
+		desc = 'Reduces outline accuracy to improve perfomance, only recommended for low-end machines',
+		type = 'bool',
+		value = false,
+		advanced = true,
+		noHotkey = true,
+		OnChange = QualityChangeCheckFunc,
+	},
 }
 
 OnchangeFunc()
@@ -370,7 +387,7 @@ local MyDrawVisibleUnits = function()
   glClear(GL_COLOR_BUFFER_BIT,0,0,0,0)
   glPushMatrix()
   glResetMatrices()
-  glColor(0,0,0,thickness)
+  glColor(0,0,0,thickness * thicknessMult)
   DrawVisibleUnits(true)
   glColor(1,1,1,1)
   glPopMatrix()
@@ -380,14 +397,14 @@ local DrawVisibleUnitsLines = function(underwater, frontLines) --This is expecte
 
   gl.DepthTest(GL.LESS)
   if underwater then
-    gl.LineWidth(3.0 * thickness)
+    gl.LineWidth(3.0 * thickness * thicknessMult)
     gl.PolygonOffset(8.0, 4.0)
   else
     if options.lowQualityOutlines.value then
-      gl.LineWidth(4.0 * thickness)
+      gl.LineWidth(4.0 * thickness * thicknessMult)
     end
     if frontLines then
-      gl.LineWidth(3.0 * thickness)
+      gl.LineWidth(3.0 * thickness * thicknessMult)
       gl.PolygonOffset(10.0, 5.0)
     end
   end
@@ -478,6 +495,23 @@ function widget:UnitDestroyed(unitID)
   unbuiltUnits[unitID] = nil
 end
 
+function widget:Update(dt)
+	if not scaleWithHeight then
+		return
+	end
+	local cs = Spring.GetCameraState()
+	local gy = Spring.GetGroundHeight(cs.px, cs.pz)
+	local cameraHeight
+	if cs.name == "ta" then
+		cameraHeight = cs.height - gy
+	else
+		cameraHeight = cs.py - gy
+	end
+	if cameraHeight < 1 then
+		cameraHeight = 1
+	end
+	thicknessMult = 1000/cameraHeight
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

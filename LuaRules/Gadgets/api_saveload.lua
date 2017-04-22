@@ -26,7 +26,7 @@ function gadget:GetInfo()
     author    = "KingRaptor (L.J. Lim)",
     date      = "25 September 2011",
     license   = "GNU LGPL, v2 or later",
-    layer     = -math.huge,	-- we want this to go first
+    layer     = -math.huge + 1,	-- we want this to go first
     enabled   = true
   }
 end
@@ -109,6 +109,26 @@ local function ReadFile(zip, name, file)
 end
 GG.SaveLoad.ReadFile = ReadFile
 
+local function FacingFromHeading (h)
+	if h > 0 then
+		if h < 8192 then
+			return 's'
+		elseif h < 24576 then
+			return 'e'
+		else
+			return 'n'
+		end
+	else
+		if h >= -8192 then
+			return 's'
+		elseif h >= -24576 then
+			return 'w'
+		else
+			return 'n'
+		end
+	end
+end
+
 local function boolToNum(bool)
 	if bool then return 1
 	else return 0 end
@@ -143,6 +163,15 @@ local function GetNewFeatureID(oldFeatureID)
 	return savedata.feature[oldFeatureID] and savedata.feature[oldFeatureID].newID
 end
 GG.SaveLoad.GetNewFeatureID = GetNewFeatureID
+
+local function GetNewFeatureIDKeys(data)
+	local ret = {}
+	for i, v in pairs(data) do
+		ret[GetNewFeatureID(i)] = v
+	end
+	return ret
+end
+GG.SaveLoad.GetNewFeatureIDKeys = GetNewFeatureIDKeys
 
 local function GetNewProjectileID(oldProjectileID)
 	return savedata.projectile[oldProjectileID] and savedata.projectile[oldProjectileID].newID
@@ -192,15 +221,18 @@ local function LoadUnits()
 		-- with that unitID then the new unit will fail to be created. The old unit
 		-- do not immediately de-allocate their ID on Spring.DestroyUnit so some blocking
 		-- can occur with explicitly set IDs.
-		local newID = spCreateUnit(data.unitDefName, px, py, pz, 0, data.unitTeam, isNanoFrame, false)
+		local newID = spCreateUnit(data.unitDefName, px, py, pz, FacingFromHeading(data.heading), data.unitTeam, isNanoFrame, false)
 		if newID then
 			data.newID = newID
 			-- position and velocity
 			spSetUnitVelocity(newID, unpack(data.vel))
 			--spSetUnitDirection(newID, unpack(data.dir))	-- FIXME: callin does not exist
-			Spring.MoveCtrl.Enable(newID)
-			Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
-			Spring.MoveCtrl.Disable(newID)
+			
+			if not UnitDefNames[data.unitDefName].isBuilding then
+				Spring.MoveCtrl.Enable(newID)
+				Spring.MoveCtrl.SetHeading(newID, data.heading)	-- workaround?
+				Spring.MoveCtrl.Disable(newID)
+			end
 			-- health
 			spSetUnitMaxHealth(newID, data.maxHealth)
 			spSetUnitHealth(newID, {health = data.health, capture = data.captureProgress, paralyze = data.paralyzeDamage, build = data.buildProgress})
@@ -220,17 +252,16 @@ local function LoadUnits()
 			-- states
 			spGiveOrderToUnit(newID, CMD.FIRE_STATE, {data.states.firestate or 2}, {})
 			spGiveOrderToUnit(newID, CMD.MOVE_STATE, {data.states.movestate or 1}, {})
-			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"] or 0)}, {})
-			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak or 0)}, {})
-			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active) or 1}, {})
-			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory) or 0}, {})
-			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel) or 1}, {})
-			
+			spGiveOrderToUnit(newID, CMD.REPEAT, {boolToNum(data.states["repeat"])}, {})
+			spGiveOrderToUnit(newID, CMD.CLOAK, {boolToNum(data.states.cloak)}, {})
+			spGiveOrderToUnit(newID, CMD.ONOFF, {boolToNum(data.states.active)}, {})
+			spGiveOrderToUnit(newID, CMD.TRAJECTORY, {boolToNum(data.states.trajectory)}, {})
+			spGiveOrderToUnit(newID, CMD.AUTOREPAIRLEVEL, {boolToNum(data.states.autorepairlevel)}, {})
 			
 			-- is neutral
 			spSetUnitNeutral(newID, data.neutral or false)
 			
-			Spring.Echo("unitID check", oldID, newID)
+			--Spring.Echo("unitID check", oldID, newID)
 		end
 	end
 	
@@ -299,6 +330,14 @@ local function LoadUnits()
 				Spring.SetUnitCOBValue(data.newID, COB.INBUILDSTANCE, 1)
 				Spring.SetUnitCOBValue(data.newID, COB.BUGGER_OFF, 1)
 			end
+		end
+	end
+	
+	-- WAIT WAIT everything
+	for oldID, data in pairs(savedata.unit) do
+		if data.newID then
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
+			spGiveOrderToUnit(data.newID, CMD.WAIT, {}, {})
 		end
 	end
 	
@@ -760,13 +799,11 @@ local function SaveUnits()
 		-- save rulesparams
 		unitInfo.rulesParams = {}		
 		local params = Spring.GetUnitRulesParams(unitID)
-		for i=1,#params do
-			for name,value in pairs(params[i]) do
-				unitInfo.rulesParams[name] = value 
-			end
+		for name,value in pairs(params) do
+			unitInfo.rulesParams[name] = value 
 		end
 	end
-	savedata.unit = data
+	return data
 end
 
 local function SaveFeatures()
@@ -790,9 +827,42 @@ local function SaveFeatures()
 		featureInfo.health, featureInfo.maxHealth, featureInfo.resurrectProgress = spGetFeatureHealth(featureID)
 		featureInfo.reclaimLeft = select(5, spGetFeatureResources(featureID))
 	end
-	savedata.feature = data
+	return data
 end
 
+local function GetProjectileSaveInfo(projectileID)
+	local isWeapon, isPiece = Spring.GetProjectileType(projectileID)
+	if not isWeapon then
+		return
+	end
+	
+	local projectileInfo = {}
+	-- basic projectile information
+	local projectileDefID = spGetProjectileDefID(projectileID)
+	projectileInfo.projectileDefID = projectileDefID
+	projectileInfo.teamID = spGetProjectileTeamID(projectileID)
+	projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
+	local timeToLive = spGetProjectileTimeToLive(projectileID)
+	projectileInfo.timeToLive = timeToLive
+	-- save position/velocity
+	projectileInfo.pos = {spGetProjectilePosition(projectileID)}
+	projectileInfo.velocity = {spGetProjectileVelocity(projectileID)}
+	-- save tracking and interception
+	local targetType, target = spGetProjectileTarget(projectileID)
+	projectileInfo.targetType = targetType
+	projectileInfo.target = target
+	projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
+	
+	local wd = WeaponDefs[projectileDefID]
+	if wd and wd.type == "StarburstLauncher" and wd.customParams then
+		local cp = wd.customParams
+		-- Some crazyness with how these values are interpreted:
+		-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
+		-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
+		projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
+	end
+	return projectileInfo
+end
 
 local function SaveProjectiles()
 	local data = {}
@@ -800,35 +870,12 @@ local function SaveProjectiles()
 	-- Collect projectiles for 600 outside the map to get wobbly ones or those chasing flying units.
 	for i = 1, #projectiles do
 		local projectileID = projectiles[i]
-		data[projectileID] = {}
-		local projectileInfo = data[projectileID]
-		
-		-- basic projectile information
-		local projectileDefID = spGetProjectileDefID(projectileID)
-		projectileInfo.projectileDefID = projectileDefID
-		projectileInfo.teamID = spGetProjectileTeamID(projectileID)
-		projectileInfo.ownerID = spGetProjectileOwnerID(projectileID)
-		local timeToLive = spGetProjectileTimeToLive(projectileID)
-		projectileInfo.timeToLive = timeToLive
-		-- save position/velocity
-		projectileInfo.pos = {spGetProjectilePosition(projectileID)}
-		projectileInfo.velocity = {spGetProjectileVelocity(projectileID)}
-		-- save tracking and interception
-		local targetType, target = spGetProjectileTarget(projectileID)
-		projectileInfo.targetType = targetType
-		projectileInfo.target = target
-		projectileInfo.isIntercepted = spGetProjectileIsIntercepted(projectileID)
-		
-		local wd = WeaponDefs[projectileDefID]
-		if wd and wd.type == "StarburstLauncher" and wd.customParams then
-			local cp = wd.customParams
-			-- Some crazyness with how these values are interpreted:
-			-- flightTime (ttl) is multiplied by 32 when weaponDefs are loaded. 
-			-- weaponTimer (upTime) is multiplied by 30 when the weapon is loaded.
-			projectileInfo.upTime = math.max(0, cp.weapontimer*30 - math.max(0, cp.flighttime*32 - timeToLive))
+		local projectileInfo = GetProjectileSaveInfo(projectileID)
+		if projectileInfo then
+			data[projectileID] = projectileInfo
 		end
 	end
-	savedata.projectile = data
+	return data
 end
 
 local function SaveGeneralInfo()
@@ -840,10 +887,8 @@ local function SaveGeneralInfo()
 	-- gameRulesParams
 	data.gameRulesParams = {}
 	local gameRulesParams = spGetGameRulesParams()
-	for i=1,#gameRulesParams do
-		for name,value in pairs(gameRulesParams[i]) do
-			data.gameRulesParams[name] = value 
-		end
+	for name,value in pairs(gameRulesParams) do
+		data.gameRulesParams[name] = value 
 	end
 	
 	-- team stuff - rulesparams, resources
@@ -858,14 +903,12 @@ local function SaveGeneralInfo()
 		
 		local rulesParams = spGetTeamRulesParams(teamID) or {}
 		data.teams[teamID].rulesParams = {}
-		for j=1,#rulesParams do
-			for name,value in pairs(rulesParams[j]) do
-				data.teams[teamID].rulesParams[name] = value 
-			end
+		for name,value in pairs(rulesParams) do
+			data.teams[teamID].rulesParams[name] = value 
 		end
 	end
 	
-	savedata.general = data
+	return data
 end
 
 local function ModifyUnitData(unitID)
@@ -875,18 +918,34 @@ end
 -----------------------------------------------------------------------------------
 -- callins
 function gadget:Save(zip)
-	SaveGeneralInfo()
-	SaveUnits()
-	SaveFeatures()
-	SaveProjectiles()
-	WriteSaveData(zip, generalFile, savedata.general)
-	WriteSaveData(zip, unitFile, savedata.unit)
-	WriteSaveData(zip, featureFile, savedata.feature)
-	WriteSaveData(zip, projectileFile, savedata.projectile)
+	WriteSaveData(zip, generalFile, SaveGeneralInfo())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveGeneralInfo - Done")
+	WriteSaveData(zip, unitFile, SaveUnits())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveUnits - Done")
+	WriteSaveData(zip, featureFile, SaveFeatures())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveFeatures - Done")
+	WriteSaveData(zip, projectileFile, SaveProjectiles())
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("SaveProjectiles - Done")
 	
 	for _,entry in pairs(savedata.gadgets) do
 		WriteSaveData(zip, entry.filename, entry.data)
 	end
+	if collectgarbage then
+		collectgarbage("collect")
+	end
+	Spring.Echo("Save - Done")
 end
 
 function gadget:Initialize()

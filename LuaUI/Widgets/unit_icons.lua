@@ -62,6 +62,7 @@ options = {
 		desc = 'Draws state icons when zoomed out.',
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = function(self)
 			forRadarIcons = self.value
 		end
@@ -229,7 +230,7 @@ function WG.icons.SetUnitIcon( unitID, data )
 		if (ud == nil) then
 			unitHeights[unitID] = nil
 		else
-			--unitHeights[unitID] = ud.height + iconoffset
+			--unitHeights[unitID] = Spring.Utilities.GetUnitHeight(ud) + iconoffset
 			unitHeights[unitID] = Spring.GetUnitHeight(unitID) + iconoffset
 		end
 	end

@@ -1,6 +1,6 @@
 function gadget:GetInfo()
   return {
-    name      = "Comander Upgrade",
+    name      = "Commander Upgrade",
     desc      = "",
     author    = "Google Frog",
     date      = "30 December 2015",
@@ -25,7 +25,7 @@ local interallyCreatedUnit = false
 local internalCreationUpgradeDef
 local internalCreationModuleEffectData
 
-local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedCloakShield, unitCreatedWeaponNums
+local unitCreatedShield, unitCreatedShieldNum, unitCreatedCloak, unitCreatedJammingRange, unitCreatedCloakShield, unitCreatedWeaponNums
 
 local moduleDefs, chassisDefs, upgradeUtilities, UNBOUNDED_LEVEL, chassisDefByBaseDef, moduleDefNames, chassisDefNames =  include("LuaRules/Configs/dynamic_comm_defs.lua")
 	
@@ -44,15 +44,17 @@ local commanderCloakShieldDef = {
 	minrad = 64,
 	maxrad = 350,
 	
-	growRate =	512,
+	growRate = 512,
 	shrinkRate = 2048,
 	selfCloak = true,
 	decloakDistance = 75,
 	isTransport = false,
 	
-	radiusException = {}	
+	radiusException = {}
 }
-	
+
+local COMMANDER_JAMMING_COST = 1.5
+
 for _, eud in pairs (UnitDefs) do
 	if eud.decloakDistance < commanderCloakShieldDef.decloakDistance then
 		commanderCloakShieldDef.radiusException[eud.id] = true
@@ -89,10 +91,10 @@ local function SetUnitRulesModuleCounts(unitID, counts)
 	end
 end
 
-local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
+local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult, damageMult)
 	if (not weapon2) and weapon1 then
 		local unitDefID = Spring.GetUnitDefID(unitID)
-		local weaponName = UnitDefs[unitDefID].name .. "_" .. weapon1
+		local weaponName = "0_" .. weapon1
 		local wd = WeaponDefNames[weaponName]
 		if wd and wd.customParams and wd.customParams.manualfire then
 			weapon2 = weapon1
@@ -109,9 +111,11 @@ local function ApplyWeaponData(unitID, weapon1, weapon2, shield, rangeMult)
 	
 	rangeMult = rangeMult or 1
 	Spring.SetUnitRulesParam(unitID, "comm_range_mult", rangeMult,  INLOS)
+	damageMult = damageMult or 1
+	Spring.SetUnitRulesParam(unitID, "comm_damage_mult", damageMult,  INLOS)
 	
 	local env = Spring.UnitScript.GetScriptEnv(unitID)
-	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult)
+	Spring.UnitScript.CallAsUnit(unitID, env.dyncomm.UpdateWeapons, weapon1, weapon2, shield, rangeMult, damageMult)
 end
 
 local function ApplyModuleEffects(unitID, data, totalCost, images)
@@ -125,6 +129,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	
 	if data.radarJammingRange then
 		Spring.SetUnitRulesParam(unitID, "jammingRangeOverride", data.radarJammingRange, INLOS)
+		Spring.SetUnitRulesParam(unitID, "comm_jamming_cost", COMMANDER_JAMMING_COST, INLOS)
 	else
 		local onOffCmd = Spring.FindUnitCmdDesc(unitID, CMD.ONOFF)
 		if onOffCmd then
@@ -153,14 +158,16 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	data.energyIncome = (data.energyIncome or 0) + buildPower*0.03
 	Spring.SetUnitRulesParam(unitID, "buildpower_mult", buildPower/10, INLOS)
 	
-	if data.metalIncome and GG.Overdrive_AddUnitResourceGeneration then
-		GG.Overdrive_AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
+	if data.metalIncome and GG.Overdrive then
+		GG.Overdrive.AddUnitResourceGeneration(unitID, data.metalIncome, data.energyIncome)
 	end
 	
 	if data.healthBonus then
 		local health, maxHealth = Spring.GetUnitHealth(unitID)
-		Spring.SetUnitHealth(unitID, health + data.healthBonus)
-		Spring.SetUnitMaxHealth(unitID, maxHealth + data.healthBonus)
+		local newHealth = math.max(health + data.healthBonus, 1)
+		local newMaxHealth = math.max(maxHealth + data.healthBonus, 1)
+		Spring.SetUnitHealth(unitID, newHealth)
+		Spring.SetUnitMaxHealth(unitID, newMaxHealth)
 	end
 	
 	if data.skinOverride then
@@ -194,7 +201,7 @@ local function ApplyModuleEffects(unitID, data, totalCost, images)
 	local effectiveMass = (((totalCost/2) + (maxHealth/8))^0.6)*6.5
 	Spring.SetUnitRulesParam(unitID, "massOverride", effectiveMass, INLOS)
 	
-	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult)
+	ApplyWeaponData(unitID, data.weapon1, data.weapon2, data.shield, data.rangeMult, data.damageMult)
 	
 	-- Do this all the time as it will be needed almost always.
 	GG.UpdateUnitAttributes(unitID)
@@ -219,7 +226,7 @@ local function GetModuleEffectsData(moduleList, level, chassis)
 	return moduleEffectData
 end
 
-local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images, profileID)
+local function InitializeDynamicCommander(unitID, level, chassis, totalCost, name, baseUnitDefID, baseWreckID, baseHeapID, moduleList, moduleEffectData, images, profileID, staticLevel)
 	-- This function sets the UnitRulesParams and updates the unit attributes after
 	-- a commander has been created. This can either happen internally due to a request
 	-- to spawn a commander or with rezz/construction/spawning.
@@ -235,8 +242,13 @@ local function InitializeDynamicCommander(unitID, level, chassis, totalCost, nam
 	Spring.SetUnitRulesParam(unitID, "comm_baseUnitDefID", baseUnitDefID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseWreckID",   baseWreckID, INLOS)
 	Spring.SetUnitRulesParam(unitID, "comm_baseHeapID",    baseHeapID, INLOS)
+	
 	if profileID then
 		Spring.SetUnitRulesParam(unitID, "comm_profileID",     profileID, INLOS)
+	end
+	
+	if staticLevel then -- unmorphable
+		Spring.SetUnitRulesParam(unitID, "comm_staticLevel",   staticLevel, INLOS)
 	end
 	
 	Spring.SetUnitCosts(unitID, {
@@ -273,6 +285,10 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 		unitCreatedCloak = true
 	end
 	
+	if moduleEffectData.radarJammingRange then
+		unitCreatedJammingRange = COMMANDER_JAMMING_COST
+	end
+	
 	if moduleEffectData.areaCloak then
 		unitCreatedCloakShield = true
 	end
@@ -304,6 +320,7 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	unitCreatedShieldNum = nil
 	unitCreatedShield = nil
 	unitCreatedCloak = nil
+	unitCreatedJammingRange = nil
 	unitCreatedCloakShield = nil
 	unitCreatedWeaponNums = nil
 	unitCreatedCarrierDef = nil
@@ -315,7 +332,47 @@ local function Upgrades_CreateUpgradedUnit(defName, x, y, z, face, unitTeam, isB
 	return unitID
 end
 
-local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
+local function CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, targetLevel)
+	for i = 1, targetLevel do
+		local levelModules = commProfileInfo.modules[i]
+		if levelModules then
+			for j = 1, #levelModules do
+				local moduleID = moduleDefNames[levelModules[j]]
+				if moduleID and moduleDefs[moduleID] then
+					moduleList[#moduleList + 1] = moduleID
+					moduleCost = moduleCost + moduleDefs[moduleID].cost
+				end
+			end
+		end
+	end
+	
+	local moduleByDefID = upgradeUtilities.ModuleListToByDefID(moduleList)
+	
+	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
+	local chassisData = chassisDefs[chassisDefID]
+	local chassisLevel = math.min(chassisData.maxNormalLevel, targetLevel)
+	local unitDefID = chassisData.levelDefs[chassisLevel].morphUnitDefFunction(moduleByDefID)
+	
+	local upgradeDef = {
+		level = targetLevel,
+		staticLevel = targetLevel,
+		chassis = chassisDefID, 
+		totalCost = UnitDefs[chassisDefID].metalCost + moduleCost,
+		name = commProfileInfo.name,
+		moduleList = moduleList,
+		baseUnitDefID = unitDefID,
+		baseWreckID = commProfileInfo.baseWreckID or chassisData.baseWreckID,
+		baseHeapID = commProfileInfo.baseHeapID or chassisData.baseHeapID,
+		images = commProfileInfo.images,
+		profileID = dyncommID,
+	}
+	
+	local unitID = Upgrades_CreateUpgradedUnit(unitDefID, x, y, z, facing, teamID, false, upgradeDef)
+	
+	return unitID
+end
+
+local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID, staticLevel)
 	--Spring.Echo("Creating starter dyncomm " .. dyncommID)
 	local commProfileInfo = GG.ModularCommAPI.GetCommProfileInfo(dyncommID)
 	local chassisDefID = chassisDefNames[commProfileInfo.chassis]
@@ -325,6 +382,11 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 	end
 	
 	local chassisData = chassisDefs[chassisDefID]
+	if chassisData.notSelectable and not staticLevel then
+		Spring.Echo("Chassis not selectable", commProfileInfo.chassis)
+		return false
+	end
+	
 	local baseUnitDefID = commProfileInfo.baseUnitDefID or chassisData.baseUnitDef
 	
 	local moduleList = {moduleDefNames.econ}
@@ -337,6 +399,10 @@ local function Upgrades_CreateStarterDyncomm(dyncommID, x, y, z, facing, teamID)
 				moduleList[#moduleList + 1] = moduleDefNames[decName]
 			end
 		end
+	end
+	
+	if staticLevel then
+		return CreateStaticCommander(dyncommID, commProfileInfo, moduleList, moduleCost, x, y, z, facing, teamID, staticLevel - 1)
 	end
 	
 	local upgradeDef = {
@@ -375,7 +441,8 @@ function gadget:UnitCreated(unitID, unitDefID, unitTeam)
 			internalCreationUpgradeDef.moduleList, 
 			internalCreationModuleEffectData,
 			internalCreationUpgradeDef.images,
-			internalCreationUpgradeDef.profileID
+			internalCreationUpgradeDef.profileID,
+			internalCreationUpgradeDef.staticLevel
 		)
 		return
 	end
@@ -446,6 +513,10 @@ local function Upgrades_GetValidAndMorphAttributes(unitID, params)
 	local pNewCount = params[4]
 	
 	if #params ~= 4 + pAlreadyCount + pNewCount then
+		return false
+	end
+	
+	if Spring.GetUnitRulesParam(unitID, "comm_staticLevel") then
 		return false
 	end
 	
@@ -597,6 +668,10 @@ end
 
 function GG.Upgrades_UnitCanCloak(unitID)
 	return unitCreatedCloak or Spring.GetUnitRulesParam(unitID, "comm_personal_cloak")
+end
+
+function GG.Upgrades_UnitJammerEnergyDrain(unitID)
+	return unitCreatedJammingRange or Spring.GetUnitRulesParam(unitID, "comm_jamming_cost")
 end
 
 function GG.Upgrades_UnitCloakShieldDef(unitID)

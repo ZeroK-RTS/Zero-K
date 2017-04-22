@@ -1,0 +1,2 @@
+hotspot topleft
+frame  anims/cursorrestore2_0.png  0.1

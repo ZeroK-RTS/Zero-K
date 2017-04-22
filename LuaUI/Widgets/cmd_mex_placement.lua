@@ -159,7 +159,6 @@ local solarDefID = UnitDefNames["armsolar"].id
 local mexUnitDef = UnitDefNames["cormex"]
 local mexDefInfo = {
 	extraction = 0.001,
-	square = false,
 	oddX = mexUnitDef.xsize % 4 == 2,
 	oddZ = mexUnitDef.zsize % 4 == 2,
 }
@@ -250,28 +249,17 @@ local function IntegrateMetal(x, z, forceUpdate)
 	endX, endZ = min(endX, MAP_SIZE_X_SCALED - 1), min(endZ, MAP_SIZE_Z_SCALED - 1)
 	
 	local mult = mexDefInfo.extraction
-	local square = mexDefInfo.square
 	local result = 0
-	
-	if (square) then
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+
+	for i = startX, endX do
+		for j = startZ, endZ do
+			local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
+			local dx, dz = cx - centerX, cz - centerZ
+			local dist = sqrt(dx * dx + dz * dz)
+
+			if (dist < MEX_RADIUS) then
 				local _, metal = spGetGroundInfo(cx, cz)
 				result = result + metal
-			end
-		end
-	else
-		for i = startX, endX do
-			for j = startZ, endZ do
-				local cx, cz = (i + 0.5) * METAL_MAP_SQUARE_SIZE, (j + 0.5) * METAL_MAP_SQUARE_SIZE
-				local dx, dz = cx - centerX, cz - centerZ
-				local dist = sqrt(dx * dx + dz * dz)
-				
-				if (dist < MEX_RADIUS) then
-					local _, metal = spGetGroundInfo(cx, cz)
-					result = result + metal
-				end
 			end
 		end
 	end
@@ -365,7 +353,10 @@ function widget:CommandNotify(cmdID, params, options)
 				local z = command.z
 				local y = Spring.GetGroundHeight(x, z)
 
-				commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+				-- check if some other widget wants to handle the command before sending it to units.
+				if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-mexDefID, {x, y, z, 0}, options, true) then
+					commandArrayToIssue[#commandArrayToIssue+1] = {-mexDefID, {x,y,z,0} , {"shift"}}
+				end
 
 				if (options["alt"]) then
 					for i=1, #addons do
@@ -373,11 +364,18 @@ function widget:CommandNotify(cmdID, params, options)
 						local xx = x+addon[1]
 						local zz = z+addon[2]
 						local yy = Spring.GetGroundHeight(xx, zz)
-						commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						
+						-- check if some other widget wants to handle the command before sending it to units.
+						if not WG.GlobalBuildCommand or not WG.GlobalBuildCommand.CommandNotifyMex(-solarDefID, {xx, yy, zz, 0}, options, true) then
+							commandArrayToIssue[#commandArrayToIssue+1] = {-solarDefID, {xx,yy,zz,0}, {"shift"}}
+						end
 					end
 				end
 			end
-			Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+			
+			if (#commandArrayToIssue > 0) then
+				Spring.GiveOrderArrayToUnitArray(unitArrayToReceive,commandArrayToIssue)
+			end
 		end
   
 		return true
@@ -403,16 +401,15 @@ function widget:CommandNotify(cmdID, params, options)
 			if foundUnit then
 				local build = select(5, spGetUnitHealth(foundUnit))
 				if build ~= 1 then
-					spGiveOrder(CMD.REPAIR, {foundUnit}, options.coded)
+					WG.CommandInsert(CMD.REPAIR, {foundUnit}, options)
 				end
 				return true
 			else
-				local handledExternally = false
-				if (Script.LuaUI('CommandNotifyMex')) then --send away new mex queue in an event called CommandNotifyMex. Used by "central_build_AI.lua"
-					handledExternally = Script.LuaUI.CommandNotifyMex(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options)
-				end
-				if ( not handledExternally ) then
-					spGiveOrder(cmdID, {closestSpot.x, closestSpot.y, closestSpot.z, params[4]}, options.coded)
+				-- check if some other widget wants to handle the command before sending it to units.
+				local commandHeight = math.max(0, Spring.GetGroundHeight(closestSpot.x, closestSpot.z))
+				local GBC_processed = WG.GlobalBuildCommand and WG.GlobalBuildCommand.CommandNotifyMex(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options, false)
+				if not GBC_processed then
+					WG.CommandInsert(cmdID, {closestSpot.x, commandHeight, closestSpot.z, params[4]}, options)
 				end
 				return true
 			end
@@ -450,6 +447,9 @@ function widget:UnitFinished(unitID, unitDefID, teamID)
 end
 
 function widget:UnitDestroyed(unitID, unitDefID)
+	if mexBuilder[unitID] then
+		mexBuilder[unitID] = nil
+	end
 	if unitDefID == mexDefID and spotByID[unitID] then
 		spotData[spotByID[unitID]] = nil
 		spotByID[unitID] = nil
@@ -492,6 +492,8 @@ local function Initialize()
 	else
 		Spring.Echo("Mex Placement Initialised with metal map mode.")
 	end
+	
+	WG.GetClosestMetalSpot = GetClosestMetalSpot
 end
 
 local mexSpotToDraw = false
@@ -522,6 +524,7 @@ function widget:Update()
 	
 	if mexSpotToDraw and WG.metalSpots then
 		WG.mouseoverMexIncome = mexSpotToDraw.metal
+		WG.mouseoverMex = mexSpotToDraw
 	else
 		local _, cmd_id = spGetActiveCommand()
 		if -mexDefID ~= cmd_id then
@@ -778,6 +781,12 @@ function widget:DrawWorld()
 	end
 	
 	gl.Color(1, 1, 1, 1)
+end
+
+function widget:DefaultCommand(type, id)
+	if mexSpotToDraw and WG.selectionEntirelyCons and not type and (Spring.TestBuildOrder(mexDefID, mexSpotToDraw.x, 0, mexSpotToDraw.z, 0) > 0) then
+		return -mexDefID
+	end
 end
 
 function widget:DrawInMiniMap()

@@ -23,6 +23,7 @@ function widget:GetInfo()
 end
 
 include("keysym.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -211,7 +212,7 @@ end
 
 options = {
 	
-	lblError = {name='Error Filter', type='label'},
+	lblError = {name='Error Filter', type='label', advanced = true},
 	lblFilter = {name='Filtering', type='label', advanced = false},
 	lblPointButtons = {name='Point Buttons', type='label', advanced = true},
 	lblAutohide = {name='Auto Hiding', type='label'},
@@ -225,6 +226,7 @@ options = {
 		value = true,
 		desc = "This filter out \'Error: OpenGL: source\' error message from ingame chat, which happen specifically in Spring 91 with Intel Mesa driver."
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
+		advanced = true,
 	},
 	
 	text_height = {
@@ -245,6 +247,7 @@ options = {
 		name = "Clickable points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -261,6 +264,7 @@ options = {
 		name = "Dedupe messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -268,6 +272,7 @@ options = {
 		name = "Dedupe points and labels",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -275,30 +280,35 @@ options = {
 		name = "Highlight all private messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_allies = {
 		name = "Check allies messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_enemies = {
 		name = "Check enemy messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_specs = {
 		name = "Check spec messages for highlight",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		advanced = true,
 	},
 	highlight_filter_other = {
 		name = "Check other messages for highlight",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		advanced = true,
 	},
 --[[
@@ -320,6 +330,7 @@ options = {
 		name = "Surround highlighted messages",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -327,6 +338,7 @@ options = {
 		name = "Sound for highlighted messages",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 		advanced = true,
 	},
@@ -426,6 +438,7 @@ options = {
 		name = "Scroll with mousewheel",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = function(self) scrollpanel1.ignoreMouseWheel = not self.value; end,
 	},
 	defaultAllyChat = {
@@ -433,12 +446,14 @@ options = {
 		desc = "Sets default chat mode to allies at game start",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},	
 	autohide = {
 		name = "Autohide chat",
 		desc = "Hides the chat when not in use",
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = onOptionsChanged,
 	},
 	autohide_time = {
@@ -566,9 +581,7 @@ local function formatMessage(msg)
 end
 
 local function MessageIsChatInfo(msg)
-	return string.find(msg.argument,'enabled!') or
-	string.find(msg.argument,'disabled!') or 
-	string.find(msg.argument,'Speed set to') or
+	return string.find(msg.argument,'Speed set to') or
 	string.find(msg.argument,'following') or
 	string.find(msg.argument,'Connection attempted') or
 	string.find(msg.argument,'exited') or 
@@ -577,8 +590,8 @@ local function MessageIsChatInfo(msg)
 	string.find(msg.argument,'Sync error for') or
 	string.find(msg.argument,'Cheating is') or
 	string.find(msg.argument,'resigned') or
-	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player')) or
-	string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
+	(string.find(msg.argument,'left the game') and string.find(msg.argument,'Player'))
+	--string.find(msg.argument,'Team') --endgame comedic message. Engine message, loaded from gamedata/messages.lua (hopefully 'Team' with capital 'T' is not used anywhere else)
 end
 
 local function hideMessage(msg)
@@ -648,7 +661,7 @@ local function displayMessage(msg, remake)
 					OnClick = {function(self, x, y, mouse)
 						local alt,ctrl, meta,shift = Spring.GetModKeyState()
 						if (shift or ctrl or meta or alt) or ( mouse ~= 1 ) then return false end --skip modifier key since they meant player are using click to issue command.Try to not steal click
-						Spring.SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
+						SetCameraTarget(msg.point.x, msg.point.y, msg.point.z, 1)
 					end}
 				}
 				
@@ -660,7 +673,7 @@ local function displayMessage(msg, remake)
 							if ( shift or ctrl or meta or alt ) then return false end --skip all modifier key
 							local click_on_text = x <= textbox.font:GetTextWidth(self.text); -- use self.text instead of text to include dedupe message prefix
 							if (mouse == 1 and click_on_text) then
-								Spring.SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
+								SetCameraTarget(cur[1], 0,cur[2], 1) --go to where player is pointing at. NOTE: "cur" is table referenced to "WG.alliedCursorsPos" so its always updated with latest value
 							end
 					end}
 					function textbox:HitTest(x, y)  -- copied this hack from chili bubbles

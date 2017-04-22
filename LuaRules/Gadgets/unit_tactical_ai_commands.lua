@@ -83,6 +83,7 @@ end
 local function getUnitOrderState(unitID,data,cQueue)
 	-- ret 1: enemy ID, value of -1 means not target and one should be found. Return false means the unit does not want orders from tactical ai.
 	-- ret 2: true if there is a move command at the start of queue which will need removal.
+	-- ret 3: true if the unit is using AI due to a fight or patrol command.
 	
 	if not cQueue or #cQueue == 0 then
 		local movestate = spGetUnitStates(unitID).movestate
@@ -99,20 +100,20 @@ local function getUnitOrderState(unitID,data,cQueue)
 	
 	local fightTwo = (#cQueue > 1 and cQueue[2].id == CMD_FIGHT)
 	if cQueue[1].id == CMD_FIGHT then
-		return -1, false
+		return -1, false, true
 	elseif cQueue[1].id == CMD_ATTACK and (movestate ~= 0 or fightTwo) then -- if I attack 
 		local target,check = cQueue[1].params[1],cQueue[1].params[2]
 		if (not check) and spValidUnitID(target) then -- if I target a unit
 			if not (cQueue[1].id == CMD_FIGHT or fightTwo) then -- only skirm single target when given the order manually
-				return target,false
+				return target, false
 			else
-				return -1,false
+				return -1, false, true
 			end
 		elseif (cQueue[1].id == 16) then --  if I target the ground and have fight or patrol command
-			return -1,false
+			return -1, false
 		end
 	  
-    elseif (cQueue[1].id == CMD_MOVE) and #cQueue > 1 then -- if I am moving
+    elseif (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE) and #cQueue > 1 then -- if I am moving
 	
 		local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 		if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
@@ -121,12 +122,12 @@ local function getUnitOrderState(unitID,data,cQueue)
 				local target,check = cQueue[2].params[1],cQueue[2].params[2]
 				if not check then -- if I target a unit
 					if not (cQueue[2].id == CMD_FIGHT or fightThree) then -- only skirm single target when given the order manually
-						return target,true
+						return target, true
 					else
-						return -1,true
+						return -1, true, true
 					end
 				elseif (cQueue[2].id == 16) then -- if I target the ground and have fight or patrol command
-					return -1,true
+					return -1, true, true
 				end
 			end
 		end
@@ -140,7 +141,7 @@ local function clearOrder(unitID,data,cQueue)
 	-- removes move order
 	if data.receivedOrder then
 
-		if (#cQueue >= 1 and cQueue[1].id == CMD_MOVE) then -- if I am moving
+		if (#cQueue >= 1 and (cQueue[1].id == CMD_MOVE or cQueue[1].id == CMD_RAW_MOVE)) then -- if I am moving
 			local cx,cy,cz = cQueue[1].params[1],cQueue[1].params[2],cQueue[1].params[3]
 			if (cx == data.cx) and (cy == data.cy) and (cz == data.cz) then -- if I was given this move command by this gadget
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
@@ -186,9 +187,9 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
                     
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					else
-						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					end
 					data.cx,data.cy,data.cz = cx,cy,cz
 					
@@ -231,9 +232,9 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 					
 					if move then
 						spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					else
-						GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+						cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 					end
 					data.cx,data.cy,data.cz = cx,cy,cz
 					data.receivedOrder = true
@@ -272,9 +273,9 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
             
 			if move then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 			else
-				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				spGiveOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 			end
 			--Spring.SetUnitMoveGoal(unitID, cx,cy,cz)
 			data.cx,data.cy,data.cz = cx,cy,cz
@@ -289,7 +290,7 @@ local function swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, mov
 end
 
 
-local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n)
+local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, n, doHug)
 
 	local data = unit[unitID]
 	
@@ -311,7 +312,11 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 	ex, ey, ez = ex - ux, ey - uy, ez - uz
 	
 	-- The d vector is also relative to unit position.
-	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
+	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	if behaviour.selfVelocityPrediction then
+		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
+		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
+	end
 	
 	local eDistSq = ex^2 + ey^2 + ez^2
 	local eDist = sqrt(eDistSq)
@@ -327,33 +332,37 @@ local function skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue,n
 		-- In this case the enemy is predicted to go past me
 		predictedDist = 0
 	end
-	local skirmRange = GetEffectiveWeaponRange(data.udID, -(ey+vy*behaviour.velocityPrediction), behaviour.weaponNum) - behaviour.skirmLeeway
+	
+	local skirmRange = (doHug and behaviour.hugRange) or (GetEffectiveWeaponRange(data.udID, -dy, behaviour.weaponNum) - behaviour.skirmLeeway)
 
-	if skirmRange > predictedDist then
+	if doHug or skirmRange > predictedDist then
 	
 		if behaviour.skirmOnlyNearEnemyRange then
-			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef,(ey+vy*behaviour.velocityPrediction),behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
+			local enemyRange = GetEffectiveWeaponRange(enemyUnitDef, dy,behaviour.weaponNum) + behaviour.skirmOnlyNearEnemyRange
 			if enemyRange < predictedDist then
 				return behaviour.skirmKeepOrder
 			end
 		end
-
+		
 		local wantedDis = min(behaviour.skirmOrderDis, skirmRange - behaviour.stoppingDistance - predictedDist)
+		if behaviour.skirmOrderDisMin and behaviour.skirmOrderDisMin > wantedDis then
+			wantedDis = behaviour.skirmOrderDisMin
+		end
 		local cx = ux - wantedDis*ex/eDist
 		local cy = uy
 		local cz = uz - wantedDis*ez/eDist
 		
 		if move then
 			spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		else
-			GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 		end
 		
 		data.cx,data.cy,data.cz = cx,cy,cz
 		data.receivedOrder = true
 		return true
-	elseif #cQueue > 0 and move then
+	elseif #cQueue > 0 and move and not behaviour.skirmKeepOrder then
 		spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
 	end
 
@@ -385,8 +394,12 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 	local vx,vy,vz = spGetUnitVelocity(enemy)
 	local ex,ey,ez = spGetUnitPosition(enemy) -- enemy position
 	local ux,uy,uz = spGetUnitPosition(unitID) -- my position
-	local cx,cy,cz -- command position	
-	local dx,dy,dz = ex+vx*behaviour.velocityPrediction,ey+vy*behaviour.velocityPrediction,ez+vz*behaviour.velocityPrediction
+	local cx,cy,cz -- command position		
+	local dx,dy,dz = ex + vx*behaviour.velocityPrediction, ey + vy*behaviour.velocityPrediction, ez + vz*behaviour.velocityPrediction
+	if behaviour.selfVelocityPrediction then
+		local uvx,uvy,uvz = spGetUnitVelocity(unitID)
+		dx,dy,dz = dx - uvx*behaviour.velocityPrediction, dy - uvy*behaviour.velocityPrediction, dz - uvz*behaviour.velocityPrediction
+	end
 	
 	local pointDis = sqrt((dx-ux)^2 + (dy-uy)^2 + (dz-uz)^2)
 
@@ -404,12 +417,12 @@ local function fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move
 		if #cQueue > 0 then
 			if move then
 				spGiveOrderToUnit(unitID, CMD_REMOVE, {cQueue[1].tag}, {} )
-				GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 			else
-				GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
+				cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_INSERT, {0, CMD_RAW_MOVE, CMD_OPT_INTERNAL, cx,cy,cz }, {"alt"} )
 			end
 		else
-			GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
+			cx,cy,cz = GiveClampedOrderToUnit(unitID, CMD_FIGHT, {cx,cy,cz }, CMD_OPT_RIGHT )
 		end
 		
 		data.cx,data.cy,data.cz = cx,cy,cz
@@ -453,7 +466,7 @@ local function updateUnits(frame, start, increment)
 				break
 			end
 			local cQueue = spGetCommandQueue(unitID,3)
-			local enemy,move = getUnitOrderState(unitID,data,cQueue) -- returns target enemy and movement state
+			local enemy, move, haveFight = getUnitOrderState(unitID,data,cQueue) -- returns target enemy and movement state
 			--local ux,uy,uz = spGetUnitPosition(unitID)
 			--Spring.MarkerAddPoint(ux,uy,uz,"unit active")
 			if (enemy) then -- if I am fighting/patroling ground or targeting an enemy
@@ -492,26 +505,29 @@ local function updateUnits(frame, start, increment)
 					end
 				end
 				
-				local checkSkirm = true
+				if not (typeKnown and (not haveFight) and behaviour.fightOnlyUnits and behaviour.fightOnlyUnits[enemyUnitDef]) then
+					local checkSkirm = true
 
-				if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
-					--Spring.Echo("unit checking swarm")
-					if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
-						checkSkirm = false
-					else
-						clearOrder(unitID,data,cQueue)
-					end
-				end
-				if checkSkirm then
-					if enemy and ((typeKnown and behaviour.skirms[enemyUnitDef]) or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
-						--Spring.Echo("unit checking skirm")
-						if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame) then
+					if alwaysJink or (enemy and typeKnown and behaviour.swarms[enemyUnitDef]) then
+						--Spring.Echo("unit checking swarm")
+						if swarmEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
+							checkSkirm = false
+						else
 							clearOrder(unitID,data,cQueue)
 						end
-					else
-						--Spring.Echo("unit checking flee")
-						if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
-							clearOrder(unitID,data,cQueue)
+					end
+					if checkSkirm then
+						local typeSkirm = typeKnown and (behaviour.skirms[enemyUnitDef] or (behaviour.hugs and behaviour.hugs[enemyUnitDef]))
+						if enemy and (typeSkirm or ((not typeKnown) and behaviour.skirmRadar) or behaviour.skirmEverything) then
+							--Spring.Echo("unit checking skirm")
+							if not skirmEnemy(unitID, behaviour, enemy, enemyUnitDef, move, cQueue, frame, (behaviour.hugs and behaviour.hugs[enemyUnitDef])) then
+								clearOrder(unitID,data,cQueue)
+							end
+						else
+							--Spring.Echo("unit checking flee")
+							if not fleeEnemy(unitID, behaviour, enemy, enemyUnitDef, typeKnown, move, cQueue, frame) then
+								clearOrder(unitID,data,cQueue)
+							end
 						end
 					end
 				end
@@ -581,6 +597,8 @@ local function GetBehaviourTable(behaviourData, ud)
 		skirms = behaviourData.skirms, 
 		swarms = behaviourData.swarms, 
 		flees  = behaviourData.flees,
+		hugs   = behaviourData.hugs,
+		fightOnlyUnits = behaviourData.fightOnlyUnits,
 		weaponNum = (behaviourData.weaponNum or 1), 
 		circleStrafe = (behaviourData.circleStrafe or false), 
 		skirmRadar = (behaviourData.skirmRadar or false), 
@@ -605,9 +623,12 @@ local function GetBehaviourTable(behaviourData, ud)
 		minFleeRange = (behaviourData.minFleeRange or 0), 
 		swarmLeeway = (behaviourData.swarmLeeway or 50), 
 		skirmOrderDis = (behaviourData.skirmOrderDis or behaviourDefaults.defaultSkirmOrderDis),
+		skirmOrderDisMin = behaviourData.skirmOrderDisMin, -- can be nil
 		velocityPrediction = (behaviourData.velocityPrediction or behaviourDefaults.defaultVelocityPrediction),
+		selfVelocityPrediction = behaviourData.selfVelocityPrediction,
 		searchRange = (behaviourData.searchRange or math.max(weaponRange + 100, 800)),
 		fleeOrderDis = (behaviourData.fleeOrderDis or 120),
+		hugRange = (behaviourData.hugRange or behaviourDefaults.defaultHugRange),
 	}
 	
 	behaviourTable.minFleeRange = behaviourTable.minFleeRange - behaviourTable.fleeLeeway

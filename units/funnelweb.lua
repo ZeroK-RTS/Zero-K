@@ -5,10 +5,8 @@ unitDef = {
   acceleration           = 0.0552,
   activateWhenBuilt      = true,
   brakeRate              = 0.1375,
-  buildCostEnergy        = 4500,
   buildCostMetal         = 4500,
   buildPic               = [[funnelweb.png]],
-  buildTime              = 4500,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -17,9 +15,7 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_pl = [[Ciezki pajak wsparcia]],
     helptext       = [[The slow all-terrain Funnelweb features an area shield and a powerful drone complement.]],
-    helptext_pl    = [[Funnelweb to ciezki pajak wsparcia. Posiada tarcze obszarowa oraz produkuje zestaw dronow.]],
 	priority_misc  = 1, -- Medium
   },
 
@@ -40,7 +36,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[funnelweb.s3o]],
   onoffable              = true,
-  seismicSignature       = 4,
   selfDestructAs         = [[ESTOR_BUILDING]],
 
   sfxtypes               = {
@@ -80,17 +75,10 @@ unitDef = {
 
     BOGUS_FAKE_TARGETER = {
       name                    = [[Bogus Fake Targeter]],
-      alphaDecay              = 0.1,
-      areaOfEffect            = 8,
       avoidGround             = false, -- avoid nothing, else attempts to move out to clear line of fine
       avoidFriendly           = false,
       avoidFeature            = false,
       avoidNeutral            = false,
-      burst                   = 3,
-      burstrate               = 0.1,
-      colormap                = [[1 0.95 0.4 1   1 0.95 0.4 1    0 0 0 0.01    1 0.7 0.2 1]],
-      craterBoost             = 0,
-      craterMult              = 0,
 
       damage                  = {
         default = 11.34,
@@ -99,25 +87,9 @@ unitDef = {
       },
 
       explosionGenerator      = [[custom:FLASHPLOSION]],
-      flightTime              = 1,
-      impactOnly              = true,
-      impulseBoost            = 0,
-      impulseFactor           = 0.4,
-      intensity               = 0.7,
-      interceptedByShieldType = 1,
-      noGap                   = false,
       noSelfDamage            = true,
-      projectiles             = 2,
       range                   = 800,
-      reloadtime              = 0.31,
-      rgbColor                = [[1 0.95 0.4]],
-      separation              = 1.5,
-      size                    = 1.75,
-      sizeDecay               = 0,
-      soundStart              = [[weapon/emg]],
-      soundStartVolume        = 4,
-      sprayAngle              = 1180,
-      stages                  = 10,
+      reloadtime              = 1,
       tolerance               = 5000,
       turret                  = true,
       weaponType              = [[StarburstLauncher]],
@@ -155,30 +127,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Funnelweb]],
       blocking         = true,
-      damage           = 11000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 1800,
       object           = [[funnelweb_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1800,
     },
 
     HEAP  = {
-      description      = [[Debris - Funnelweb]],
       blocking         = false,
-      damage           = 11000,
-      energy           = 0,
       footprintX       = 4,
       footprintZ       = 4,
-      metal            = 900,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 900,
     },
 
   },

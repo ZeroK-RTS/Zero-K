@@ -70,12 +70,12 @@ function gadget:GameFrame(n)
 		local def = stockpileUnitDefID[data.unitDefID]
 		local queue = Spring.GetCommandQueue(unitID, 1)
 		local isWaiting = queue and queue[1] and (queue[1].id == CMD.WAIT)
-		if (not (stunned_or_inbuild or disarmed)) and queued > stocked and not (isWaiting and (def.stockCost > 0)) then
+		if (not (stunned_or_inbuild or disarmed)) and queued ~= 0 and not (isWaiting and (def.stockCost > 0)) then
 			
 			local newStockSpeed = GetStockSpeed(unitID)
 			if data.stockSpeed ~= newStockSpeed then
 				if def.stockCost > 0 then
-					GG.StartMiscPriorityResourcing(unitID,data.teamID,def.stockDrain*newStockSpeed)
+					GG.StartMiscPriorityResourcing(unitID, def.stockDrain*newStockSpeed)
 				end
 				data.stockSpeed = newStockSpeed
 			end
@@ -90,15 +90,15 @@ function gadget:GameFrame(n)
 			if (def.stockCost == 0) or spUseUnitResource(unitID, data.resTable) then
 				data.progress = data.progress - newStockSpeed
 				if data.progress <= 0 then
-					spSetUnitStockpile(unitID, stocked + 1)
+					spSetUnitStockpile(unitID, stocked, 1)
 					data.progress = def.stockUpdates
 				end
-				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockUpdates-data.progress)/def.stockUpdates)
+				spSetUnitRulesParam(unitID, "gadgetStockpile", (def.stockUpdates - data.progress)/def.stockUpdates)
 			end
 		else
 			if data.stockSpeed ~= 0 then
 				if def.stockCost > 0 then
-					GG.StopMiscPriorityResourcing(unitID,data.teamID)
+					GG.StopMiscPriorityResourcing(unitID)
 				end
 				data.stockSpeed = 0
 			end
@@ -110,7 +110,7 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	if stockpileUnitDefID[unitDefID] and not unitsByID[unitID] then
 		local def = stockpileUnitDefID[unitDefID]
 		if def.stockCost > 0 then
-			GG.AddMiscPriorityUnit(unitID, teamID)
+			GG.AddMiscPriorityUnit(unitID)
 		end
 	end
 end

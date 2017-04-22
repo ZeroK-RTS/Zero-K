@@ -30,6 +30,7 @@ end
 function script.Create()
 	Turn(thrust1, x_axis, -math.rad(90), 1)
 	Turn(thrust2, x_axis, -math.rad(90), 1)
+	StartThread(SmokeUnit, smokePiece)
 end
 
 function script.StartMoving()
@@ -85,6 +86,7 @@ local function RestoreAfterDelay()
 	
 	Sleep(RESTORE_DELAY)
 	Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", 1)
+	Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1)
 
 	-- Don't ask me why this must be called twice for planes, Spring is crazy
 	GG.UpdateUnitAttributes(unitID)
@@ -104,6 +106,7 @@ function script.BlockShot(num)
 	else
 		if Spring.GetUnitRulesParam(unitID, "selfMoveSpeedChange") ~= FIRE_SLOWDOWN then
 			Spring.SetUnitRulesParam(unitID, "selfMoveSpeedChange", FIRE_SLOWDOWN)
+			Spring.SetUnitRulesParam(unitID, "selfTurnSpeedChange", 1/FIRE_SLOWDOWN)
 			GG.UpdateUnitAttributes(unitID)
 		end
 		StartThread(RestoreAfterDelay)

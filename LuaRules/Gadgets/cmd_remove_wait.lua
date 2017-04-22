@@ -18,6 +18,12 @@ local spRemoveUnitCmdDesc = Spring.RemoveUnitCmdDesc
 local spFindUnitCmdDesc   = Spring.FindUnitCmdDesc
 local CMD_WAIT = CMD.WAIT
 
+local removeCommands = {
+	CMD.WAIT,
+	CMD.STOP,
+	CMD.REPEAT,
+}
+
 local waitRemoveDefs = {}
 
 for unitDefID = 1, #UnitDefs do
@@ -44,8 +50,12 @@ end
 
 function gadget:UnitCreated(unitID, unitDefID)
 	if waitRemoveDefs[unitDefID] then
-		local cmdDesc = spFindUnitCmdDesc(unitID, CMD_WAIT)
-		spRemoveUnitCmdDesc(unitID, cmdDesc)
+		for i = 1, #removeCommands do
+			local cmdDesc = spFindUnitCmdDesc(unitID, removeCommands[i])
+			if cmdDesc then
+				spRemoveUnitCmdDesc(unitID, cmdDesc)
+			end
+		end
 	end
 end
 

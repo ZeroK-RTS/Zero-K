@@ -13,7 +13,7 @@ end
 local TESTMODE = false
 local testOnce = true
 
-if tobool(Spring.GetModOptions().noceasefire) or Spring.FixedAllies() then
+if Spring.FixedAllies() then
 	return
 end
 

@@ -157,8 +157,8 @@ local function updateReserveBars(metal, energy, value, overrideOption)
 		if value > 1 then value = 1 end
 		if metal then
 			local _, mStor = GetTeamResources(GetMyTeamID(), "metal")
-			Spring.SendLuaRulesMsg("mreserve:"..value*mStor) 
-			WG.metalStorageReserve = value*mStor
+			Spring.SendLuaRulesMsg("mreserve:"..value*(mStor - HIDDEN_STORAGE)) 
+			WG.metalStorageReserve = value*(mStor - HIDDEN_STORAGE)
 			bar_metal_reserve_overlay:SetValue(value)
 		end
 		if energy then
@@ -204,7 +204,7 @@ local function Format(input, override)
 	leadingString = override or leadingString
 	input = math.abs(input)
 	
-	if input < 0.01 then
+	if input < 0.05 then
 		return WhiteStr .. "0"
 	elseif input < 5 then
 		return leadingString .. ("%.2f"):format(input) .. WhiteStr
@@ -259,8 +259,8 @@ function widget:GameFrame(n)
 		teamMInco = teamMInco + mInco
 		teamMSpent = teamMSpent + mExpe
 		teamFreeStorage = teamFreeStorage + mStor - mCurr
-		teamTotalMetalStored = teamTotalMetalStored + mCurr
-		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor
+		teamTotalMetalStored = teamTotalMetalStored + math.min(mCurr, mStor - HIDDEN_STORAGE)
+		teamTotalMetalCapacity = teamTotalMetalCapacity + mStor - HIDDEN_STORAGE
 		
 		local extraMetalPull = spGetTeamRulesParam(teams[i], "extraMetalPull") or 0
 		teamMPull = teamMPull + mPull + extraMetalPull
@@ -297,6 +297,7 @@ function widget:GameFrame(n)
 	
 	ePull = ePull + extraEnergyPull - math.min(0, cp.energyOverdrive)
 	
+	mStor = mStor - HIDDEN_STORAGE -- reduce by hidden storage
 	eStor = eStor - HIDDEN_STORAGE -- reduce by hidden storage
 	if eCurr > eStor then 
 		eCurr = eStor -- cap by storage

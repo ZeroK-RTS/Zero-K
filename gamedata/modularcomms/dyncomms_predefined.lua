@@ -50,6 +50,22 @@ return {
 		--decorations = {"banner_overhead"},
 		--images = {overhead = "166"}
 	},
+	--[[
+	dyntrainer_knight = {
+		name = "Knight Trainer",
+		--notStarter = true,
+		chassis = "knight",
+		modules = {
+			{"commweapon_lparticlebeam", "module_radarnet"},
+			{"module_ablative_armor", "module_autorepair"},
+			{"commweapon_lightninggun", "module_personal_cloak", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		--decorations = {"banner_overhead"},
+		--images = {overhead = "184"}
+	},
+	]]
 	dynhub_strike = {
 		name = "Strike Support",
 		notStarter = true,
@@ -109,6 +125,28 @@ return {
 			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
 		},
 		decorations = {"skin_recon_dark", "banner_overhead"},
+		images = {overhead = "184"}
+	},
+	dynfancy_support = {
+		name = "Engineer Trainer",
+		chassis = "support",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+		},
+		decorations = {"skin_support_zebra", "banner_overhead"},
+		images = {overhead = "184"}
+	},
+	dynfancy_strike = {
+		name = "Strike Trainer",
+		chassis = "strike",
+		modules = {
+			{"commweapon_beamlaser", "module_ablative_armor"},
+			{"module_high_power_servos", "commweapon_personal_shield"},
+			{"commweapon_clusterbomb", "module_dmg_booster", "module_ablative_armor"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+			{"module_high_power_servos", "module_ablative_armor", "module_dmg_booster"},
+		},
+		decorations = {"banner_overhead"},
 		images = {overhead = "184"}
 	},
 }

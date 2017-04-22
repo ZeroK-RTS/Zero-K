@@ -1,3 +1,0 @@
-hotspot topleft
-frame  anims/ca/cursorattack_0.png  1
-frame  anims/ca/cursorattack_1.png  0.1

@@ -6,7 +6,7 @@ function gadget:GetInfo()
 		date      = "15 April 2013",
 		license   = "GNU GPL, v2 or later",
 		layer     = 0,
-		enabled   = true
+		enabled   = false
 	}
 end
 
@@ -29,12 +29,6 @@ local SNAP_HEIGHT = 40 -- How far up a chicken is placed
 local HORIZONTAL_IMPULSE = 2 -- Impulse applied after snap
 local VERTICAL_IMPULSE = 1.2*Game.gravity/70 -- Impulse applied after snap
 local MAGIC_Y_CONSTANT = 10
-
-if Game.version:find(95.) then
-	MAGIC_Y_CONSTANT = 0
-	--HORIZONTAL_IMPULSE = HORIZONTAL_IMPULSE * 0.5
-	--VERTICAL_IMPULSE = VERTICAL_IMPULSE * 0.5
-end
 
 local SwarmUnitDefs = {
 	[UnitDefNames["chicken"].id] = true,

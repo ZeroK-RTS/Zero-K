@@ -4,12 +4,10 @@ unitDef = {
   description            = [[Walking Missile]],
   acceleration           = 0.24,
   activateWhenBuilt      = true,
-  brakeRate              = 0.24,
-  buildCostEnergy        = 50,
+  brakeRate              = 0.72,
   buildCostMetal         = 50,
   builder                = false,
   buildPic               = [[PUPPY.png]],
-  buildTime              = 50,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -18,15 +16,12 @@ unitDef = {
   category               = [[LAND TOOFAST]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[20 20 20]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[ellipsoid]],
 
   customParams           = {
     description_de = [[Wandernde Rakete]],
-    description_pl = [[Chodzaca rakieta]],
     helptext       = [[This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style.]],
 	helptext_de    = [[Diese flinke Kamikazeinheit ist ideal, um schlecht gepanzerte Ziele zu überfallen. Sobald sie neben Wracks steht, zieht sie automatisch Metall aus diesen, um sich selbst zu vervielfältigen.]],
-	helptext_pl    = [[Ta samobojcza jednostka dobrze nadaje sie do najazdow na przeciwnika i niszczeniu lekkich celow. Gdy stoi w poblizu zlomu, samoczynnie pobiera metal i replikuje sie.]],
 	modelradius    = [[10]],
 
 	grey_goo = 1,
@@ -43,7 +38,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   leaveTracks            = true,
-  mass                   = 66,
   maxDamage              = 80,
   maxSlope               = 36,
   maxVelocity            = 3.5,
@@ -54,7 +48,6 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING]],
   objectName             = [[puppy.s3o]],
   script                 = [[puppy.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 5,
 
@@ -67,10 +60,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
-  sightDistance          = 425,
-  smoothAnim             = true,
+  sightDistance          = 560,
   trackOffset            = 0,
   trackStrength          = 8,
   trackStretch           = 0.6,
@@ -125,7 +115,6 @@ unitDef = {
       turnRate                = 56000,
       turret                  = true,
       weaponAcceleration      = 300,
-      weaponTimer             = 3,
       weaponType              = [[MissileLauncher]],
       weaponVelocity          = 400,
     },
@@ -135,30 +124,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD      = {
-      description      = [[Wreckage - Puppy]],
       blocking         = false,
-      damage           = 80,
-      energy           = 0,
-      featureDead      = [[DEAD2]],
+      featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      metal            = 20,
       object           = [[debris2x2a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 20,
     },
 	
 	HEAP      = {
-      description      = [[Debris - Puppy]],
       blocking         = false,
-      damage           = 80,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 10,
       object           = [[debris2x2c.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 10,
     },
 
   },

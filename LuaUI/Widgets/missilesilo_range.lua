@@ -14,7 +14,17 @@ end
 ----------------------------
 -- Config
 
-local radiusCount = 5
+options_path = 'Settings/Interface/Building Placement'
+options_order = { 'missile_silo_advanced'}
+options = {
+	missile_silo_advanced = {
+		name = "Advanced Missile Silo ranges",
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		desc = 'When placing a Missile Silo, show at what range the missiles will fall vertically, ie. are unblockable by terrain geometry and walls. Also, show how far away from the nominal range you can reach through AoE.',
+	},
+}
 
 local drawRadius = {}
 
@@ -29,15 +39,6 @@ drawRadius[1] = {
 	}
 
 drawRadius[2] = {
-	range = 3675,
-	color = {0.2,0.2,1,1},
-	text = "EMP AOE",
-	width = 1,
-	miniWidth = 1,
-	textSize = 180,
-	}	
-	
-drawRadius[3] = {
 	range = 6000,
 	color = {0.4,1,0.2,1},
 	text = "Seismic",
@@ -45,6 +46,15 @@ drawRadius[3] = {
 	miniWidth = 1,
 	textSize = 260,
 	}
+
+drawRadius[3] = {
+	range = 3675,
+	color = {0.2,0.2,1,1},
+	text = "EMP AOE",
+	width = 1,
+	miniWidth = 1,
+	textSize = 180,
+}	
 	
 drawRadius[4] = {
 	range = 1500,
@@ -131,7 +141,7 @@ local function DrawActiveCommandRanges()
 		dz = sin(rotY)
 	end
 	
-	for i = 1, radiusCount do
+	for i = 1, (options.missile_silo_advanced.value and 5 or 2) do
 		local radius = drawRadius[i]
 		
 		glLineWidth(radius.width)
@@ -184,7 +194,7 @@ local function DrawActiveCommandRangesMinimap()
 	glScale(1/mapX , -1/mapZ, 1)
 	glRotate(270,1,0,0)
 	
-	for i = 1, radiusCount do
+	for i = 1, (options.missile_silo_advanced.value and 5 or 2) do
 		local radius = drawRadius[i]
 		
 		glLineWidth(radius.miniWidth)
@@ -215,4 +225,20 @@ function widget:DrawWorld()
 	
 	DrawActiveCommandRanges()
 	
+end
+
+local function languageChanged ()
+	drawRadius[1].text = WG.Translate("interface", "tacnuke_and_emp")
+	drawRadius[2].text = WG.Translate("interface", "seismic")
+	drawRadius[3].text = WG.Translate("interface", "emp_aoe")
+	drawRadius[4].text = WG.Translate("interface", "emp_vertical")
+	drawRadius[5].text = WG.Translate("interface", "tacnuke_vertical")
+end
+
+function widget:Initialize()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
+end
+
+function widget:Shutdown()
+	WG.ShutdownTranslation(GetInfo().name)
 end

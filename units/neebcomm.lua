@@ -4,16 +4,14 @@ unitDef = {
   description         = [[Ugly Turkey]],
   acceleration        = 0.2,
   brakeRate           = 0.205,
-  buildCostEnergy     = 1200,
   buildCostMetal      = 1200,
-  buildDistance       = 120,
+  buildDistance       = 128,
   builder             = true,
 
   buildoptions        = {
   },
 
   buildPic            = [[chickenbroodqueen.png]],
-  buildTime           = 1200,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -21,16 +19,14 @@ unitDef = {
   canSubmerge         = true,
   cantBeTransported   = true,
   category            = [[LAND UNARMED]],
-  commander           = true,
 
   customParams        = {
-    description_pl = [[Karny kurczak]],
     helptext       = [[This fat chicken is presented to you as a reward for your misdeeds. Behave next time!]],
-    helptext_pl    = [[Karny kurczak za zle zachowanie. Popraw sie!]],
 	level		   = [[1]],
   },
 
   energyMake		  = 2,
+  energyStorage       = 500,
   explodeAs           = [[SMALL_UNITEX]],
   footprintX          = 4,
   footprintZ          = 4,
@@ -38,12 +34,12 @@ unitDef = {
   idleAutoHeal        = 0,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 712,
   maxDamage           = 2000,
   maxSlope            = 36,
   maxVelocity         = 1.2,
   maxWaterDepth       = 22,
   metalMake           = 2,
+  metalStorage        = 500,
   minCloakDistance    = 75,
   movementClass       = [[AKBOT3]],
   noAutoFire          = false,
@@ -52,7 +48,6 @@ unitDef = {
   power               = 2500,
   reclaimable         = false,
   script			  = [[chickenbroodqueen.cob]],
-  seismicSignature    = 4,
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -67,9 +62,7 @@ unitDef = {
 
   showNanoSpray       = false,
   showPlayerName      = true,
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 500,
-  smoothAnim          = true,
   sonarDistance       = 300,
   trackOffset         = 8,
   trackStrength       = 8,

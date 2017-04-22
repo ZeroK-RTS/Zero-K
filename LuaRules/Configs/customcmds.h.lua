@@ -13,6 +13,7 @@
 -- if you add a command, please order it by ID!
 
 --CMD_RETREAT =	10000
+CMD_SET_FERRY = 11000
 CMD_RETREAT_ZONE = 10001
 CMD_SETHAVEN = CMD_RETREAT_ZONE
 CMD_RESETFIRE = 10003
@@ -25,12 +26,17 @@ CMD_STOP_NEWTON_FIREZONE = 10284
 CMD_FACTORY_GUARD = 13921
 CMD_AREA_GUARD = 13922
 CMD_ORBIT = 13923
+CMD_SELECTION_RANK = 13987
 
 -- CMD_CIRCLE_GUARD_DRAW is an evil on the order of CMD.SET_WANTED_MAX_SPEED.
 -- It is required because CMD_CIRCLE_GUARD needs two parameters but this
 -- causes it to not draw in the command queue.
 -- See https://springrts.com/mantis/view.php?id=4931
 CMD_ORBIT_DRAW = 13924
+
+CMD_GLOBAL_BUILD = 13925 -- global build command state toggle command
+CMD_GBCANCEL = 13926 -- global build command area cancel cmd
+CMD_STOP_PRODUCTION = 13954
 
 CMD_AREA_MEX = 30100
 CMD_STEALTH = 31100
@@ -41,7 +47,9 @@ CMD_DISEMBARK = 31201 --unit_transport_ai_button.lua
 CMD_TRANSPORTTO = 31202 --unit_transport_ai_button.lua
 CMD_EXTENDED_LOAD = 31203 --unit_transport_pickup_floating_amphib.lua
 CMD_EXTENDED_UNLOAD = 31204 --unit_transport_pickup_floating_amphib.lua
-CMD_RAW_MOVE = 31205 --cmd_raw_move.lua
+CMD_LOADUNITS_SELECTED = 31205
+CMD_AUTO_CALL_TRANSPORT = 31206 --unit_transport_ai_button.lua
+CMD_RAW_MOVE = 31109 --cmd_raw_move.lua
 CMD_MORPH_UPGRADE_INTERNAL = 31207
 CMD_UPGRADE_STOP = 31208
 CMD_MORPH = 31210 -- up to 32209
@@ -62,6 +70,7 @@ CMD_ONECLICK_WEAPON = 35000
 CMD_PLACE_BEACON = 35170
 CMD_WAIT_AT_BEACON = 35171
 CMD_ABANDON_PW = 35200
+CMD_RECALL_DRONES = 35300
 CMD_ANTINUKEZONE = 35130	-- ceasefire
 CMD_UNIT_KILL_SUBORDINATES = 35821	-- unit_capture
 CMD_UNIT_AI = 36214

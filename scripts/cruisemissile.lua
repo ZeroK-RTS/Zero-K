@@ -1,6 +1,7 @@
 include "constants.lua"
 
 local base = piece 'base' 
+local launched = false
 
 function script.AimWeapon1(heading, pitch) return true end
 
@@ -12,6 +13,7 @@ local function RemoveMissile()
 	Spring.SetUnitCloak(unitID, 4)
 	Spring.SetUnitStealth(unitID, true)	
 	Spring.SetUnitBlocking(unitID,false,false,false)
+	launched = true
 	Sleep(2000)
 
 	-- keep alive for stats
@@ -40,6 +42,12 @@ end
 function script.Create()
 	Turn(base, x_axis, math.rad(-90))
 	Move(base, y_axis, 40)
+end
+
+function script.HitByWeapon(x, z, weaponDefID, damage)
+	if launched then
+		return 0
+	end
 end
 
 function script.Killed(recentDamage, maxHealth)

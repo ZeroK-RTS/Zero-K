@@ -31,42 +31,35 @@ function Spring.Utilities.MergeTable(primary, secondary, deep)
     return new
 end
 
-function Spring.Utilities.TableToString(data)
-	 local str = ""
-
-    if(indent == nil) then
-        indent = 0
-    end
-	local indenter = "    "
-    -- Check the type
-    if(type(data) == "string") then
-        str = str .. (indenter):rep(indent) .. data .. "\n"
-    elseif(type(data) == "number") then
-        str = str .. (indenter):rep(indent) .. data .. "\n"
-    elseif(type(data) == "boolean") then
-        if(data == true) then
-            str = str .. "true"
-        else
-            str = str .. "false"
-        end
-    elseif(type(data) == "table") then
-        local i, v
-        for i, v in pairs(data) do
-            -- Check for a table in a table
-            if(type(v) == "table") then
-                str = str .. (indenter):rep(indent) .. i .. ":\n"
-                str = str .. Spring.Utilities.TableToString(v, indent + 2)
-            else
-                str = str .. (indenter):rep(indent) .. i .. ": " .. Spring.Utilities.TableToString(v, 0)
-            end
-        end
-	elseif(type(data) == "function") then
-		str = str .. (indenter):rep(indent) .. 'function' .. "\n"
-    else
-        echo(1, "Error: unknown data type: %s", type(data))
-    end
-
-    return str
+function Spring.Utilities.TableToString(data, key)
+	 local dataType = type(data)
+	-- Check the type
+	if key then
+		if type(key) == "number" then
+			key = "[" .. key .. "]"
+		end
+	end
+	if dataType == "string" then
+		return key .. [[="]] .. data .. [["]] 
+	elseif dataType == "number" then
+		return key .. "=" .. data 
+	elseif dataType == "boolean" then
+		return key .. "=" .. ((data and "true") or "false")
+	elseif dataType == "table" then
+		local str
+		if key then
+			str = key ..  "={"
+		else
+			str = "{"
+		end
+		for k, v in pairs(data) do
+			str = str .. Spring.Utilities.TableToString(v, k) .. ","
+		end
+		return str .. "}"
+	else
+		Spring.Echo("TableToString Error: unknown data type", dataType)
+	end
+	return ""
 end
 
 -- need this because SYNCED.tables are merely proxies, not real tables
@@ -83,21 +76,30 @@ local function MakeRealTable(proxy)
 	return ret
 end
 
-local function TableEcho(data, name, indent)
+Spring.Utilities.MakeRealTable = MakeRealTable
+
+local function TableEcho(data, name, indent, tableChecked)
 	name = name or "TableEcho"
-	Spring.Echo((indent or "") .. name .. " = {")
-	indent = indent or "    "
+	indent = indent or ""
+	if (not tableChecked) and type(data) ~= "table" then
+		Spring.Echo(indent .. name, data)
+		return
+	end
+	Spring.Echo(indent .. name .. " = {")
+	local newIndent = indent .. "    "
 	for name, v in pairs(data) do
-		local ty =  type(v)
+		local ty = type(v)
 		if ty == "table" then
-			TableEcho(v, name, indent .. "    ")
+			TableEcho(v, name, newIndent, true)
 		elseif ty == "boolean" then
-			Spring.Echo(indent .. name .. " = " .. (v and "true" or "false"))
+			Spring.Echo(newIndent .. name .. " = " .. (v and "true" or "false"))
+		elseif ty == "string" or ty == "number" then
+			Spring.Echo(newIndent .. name .. " = " .. v)
 		else
-			Spring.Echo(indent .. name .. " = " .. v)
+			Spring.Echo(newIndent .. name .. " = ", v)
 		end
 	end
-	Spring.Echo(indent .. "}")
+	Spring.Echo(indent .. "},")
 end
 
 Spring.Utilities.TableEcho = TableEcho

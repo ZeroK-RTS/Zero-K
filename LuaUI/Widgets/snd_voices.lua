@@ -71,6 +71,7 @@ local SOUND_DIRNAME    = LUAUI_DIRNAME .. 'Sounds/'
 local NOISE_SOUND_DIRNAME = 'Sounds/'
 local VFSMODE          = VFS.ZIP_FIRST
 local CMD_RETREAT      = 10000
+local VOICE_DIRNAME_LENGTH = string.len(SOUND_DIRNAME.."Voices/")
 
 local mySide	--not used for anything right now
 local myTeamID
@@ -104,7 +105,6 @@ local heavies = { --not used yet
 	"corgol", --goliath
 	"corcan",
 	"corsumo",
-	"gorg", --juggernaut
 	"dante",
 }
 
@@ -126,7 +126,7 @@ local sea = { --not used yet
 	"armpt", --skeeter
 	"armroy", --crusader
 	"coresupp", --supporter
-	"cornukesub", --leviathan
+	"shipsubtacmissile", --leviathan
 	"armboat", --surboat(sea transporter)
 }
 
@@ -204,16 +204,8 @@ local function Play(category, sex, side)
   
   if (numFiles > 0) then
     local fileNum = rand(numFiles)
-    if (not sex) then
-      fileName = category.."_"..side.."_"..fileNum..".wav"
-    else
-      fileName = category.."_"..side.."_"..sex.."_"..fileNum..".wav"
-    end
-    local fullName = SOUND_DIRNAME.."Voices/"..fileName
-    local exists = VFS.DirList(fullName, fileSearch, VFSMODE)
-    if (exists) then
-      PlaySound(fileName, 1, 'voice')
-    end
+    local filename = string.sub(fileList[fileNum], VOICE_DIRNAME_LENGTH)
+    PlaySound(filename, 1, 'voice')
   end
 end
 

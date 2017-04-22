@@ -36,8 +36,6 @@ if (Spring.GetModOptions) then
   modOptions = Spring.GetModOptions()
 end
 
-local reverseCompat = not((Game and true) or false) -- Game is nil in 91.0
-
 Spring.Echo("Loading UnitDefs_posts")
 
 --------------------------------------------------------------------------------
@@ -170,85 +168,13 @@ for name, ud in pairs(UnitDefs) do
 	end
 end
 
- 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---
--- Set unit faction and build options
---
-
-local function TagTree(unit, faction, newbuildoptions)
- -- local morphDefs = VFS.Include"LuaRules/Configs/morph_defs.lua"
-  
-  local function Tag(unit)
-    if (not UnitDefs[unit] or UnitDefs[unit].faction) then
-      return
-    end
-	local ud = UnitDefs[unit]
-    ud.faction = faction
-    if (UnitDefs[unit].buildoptions) and (ud.workertime and ud.workertime > 0) then
-	  if ud.maxvelocity and (ud.maxvelocity > 0) and unit ~= "armcsa" then
-	    ud.buildoptions = newbuildoptions
-	  end	
-	  for _, buildoption in ipairs(ud.buildoptions) do
-        Tag(buildoption)
-      end
-    end	
-    --if (morphDefs[unit]) then
-    --  if (morphDefs[unit].into) then
-    --    Tag(morphDefs[unit].into)
-    --  else
-    --    for _, t in ipairs(morphDefs[unit]) do
-    --      Tag(t.into)
-    --    end
-    --  end        
-    --end
-  
-  end
-
-  Tag(unit)
-end
-
-local function ProcessCommBuildOpts()
-	local chassisList = {"armcom", "corcom", "commrecon", "commsupport", "cremcom", "benzcom"}
-	local commanders = {}
-	local numLevels = 5
-	
-	local buildOpts = VFS.Include("gamedata/buildoptions.lua")
-	
-    if modOptions and tobool(modOptions.iwinbutton) then
-        buildOpts[#buildOpts+1] = 'iwin'
-    end
-    
-	for _, name in pairs(chassisList) do
-		for i=1, numLevels do
-			commanders[#commanders + 1] = name..i
-		end
-	end
-	
-	--add procedural comms
-	for name in pairs(commDefs) do
-		commanders[#commanders + 1] = name
-	end
-	
-	commanders[#commanders + 1] = "neebcomm"
-	commanders[#commanders + 1] = "commbasic"
-
-	for _,name in pairs(commanders) do
-		TagTree(name, "arm", buildOpts)
-	end
-end
-ProcessCommBuildOpts()
-
+-- Set build options
+local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 for name, ud in pairs(UnitDefs) do
-	--Spring.Echo(name, ud.faction)
-	if not name:find("chicken") then
-		ud.faction = "arm"
-	else
-		ud.faction = "chicken"
+	if ud.buildoptions and (#ud.buildoptions == 0) then
+		ud.buildoptions = buildOpts
 	end
-end 
-
+end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -306,6 +232,60 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- UnitDefs Dont Repeat Yourself
+--
+local BP2RES = 0.03
+local BP2TERRASPEED = 60 --used to be 60 in most of the cases
+--local SEISMICSIG = 4 --used to be 4 in most of the cases
+for name, ud in pairs (UnitDefs) do
+		local cost = math.max (ud.buildcostenergy or 0, ud.buildcostmetal or 0, ud.buildtime or 0) --one of these should be set in actual unitdef file
+
+		--setting uniform buildTime, M/E cost
+		if not ud.buildcostenergy then ud.buildcostenergy = cost end
+		if not ud.buildcostmetal then ud.buildcostmetal = cost end
+		if not ud.buildtime then ud.buildtime = cost end
+
+		--setting uniform M/E storage
+		local storage = math.max (ud.metalstorage or 0, ud.energystorage or 0)
+		if storage > 0 then
+			if not ud.metalstorage then ud.metalstorage = storage end
+			if not ud.energystorage then ud.energystorage = storage end
+		end
+
+		--setting metalmake, energymake, terraformspeed for construction units
+		if tobool(ud.builder) and ud.workertime then
+			local bp = ud.workertime
+
+			local mult = (ud.customparams.dynamic_comm and 0) or 1
+			if not ud.metalmake then ud.metalmake = bp * BP2RES * mult end
+			if not ud.energymake then ud.energymake = bp * BP2RES * mult end
+
+			if not ud.terraformspeed then
+				ud.terraformspeed = bp * BP2TERRASPEED
+			end
+		end
+
+		--setting standard seismicSignature
+		--[[
+		if ud.floater or ud.canhover or ud.canfly then
+			if not ud.seismicsignature then ud.seismicsignature = 0 end
+		else
+			if not ud.seismicsignature then ud.seismicsignature = SEISMICSIG end
+		end
+		]]--
+
+		--setting levelGround
+		--[[
+		if (ud.isBuilding == true or ud.maxAcc == 0) and (not ud.customParams.mobilebuilding) then --looks like a building
+			if ud.levelGround == nil then
+				ud.levelGround = false -- or true
+			end
+		end
+		]]--
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Lua implementation of energyUse
 --
 
@@ -323,94 +303,19 @@ end
 -- 
 
 for name, ud in pairs(UnitDefs) do
-    if (ud.canfly) then
+	if (ud.canfly) then
 		ud.usesmoothmesh = false
 		if not ud.maxfuel then
 			ud.maxfuel = 1000000
 			ud.refueltime = ud.refueltime or 1
 		end
-    end
+	end
 end 
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
--- Use old diving bomber for 91.0
-
-if reverseCompat then
-	for i, name in pairs(UnitDefs.factoryplane.buildoptions) do
-		if name == "bomberdive" then
-			UnitDefs.factoryplane.buildoptions[i] = "corshad"
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Different aircraft turn radius in new engine
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if name == "fighter" then
-			ud.turnradius = 150
-			ud.maxrudder = 0.007
-		elseif name == "corvamp" then
-			ud.turnradius = 80
-			ud.maxrudder = 0.006
-		elseif name == "bomberdive" then
-			ud.turnradius = 40
-		elseif name == "corhurc2" then
-			ud.turnradius = 20
-		elseif name == "armstiletto_laser" then
-			ud.turnradius = 20
-		elseif name == "armcybr" then
-			ud.turnradius = 20
-		elseif "corawac" then
-			ud.turnradius = 60
-		end
-	end
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Increase pathable areas of yardmaps for new engine as a test.
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if name == "factorytank" then
-			ud.yardmap = "oooooooooo oooooooooo oooooooooo ooccccccoo ooccccccoo yoccccccoy yoccccccoy yyccccccyy"
-		elseif name == "factoryveh" then
-			ud.yardmap = "yyoooyy yoooooy ooooooo occccco occccco occccco occccco"
-		elseif name == "factorycloak" then
-			ud.yardmap = "ooooooo ooooooo ooooooo occccco occccco occccco occccco"
-		end
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Aircraft Brake Rate is not multiplied by 0.1 in 94.1.1+
--- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-
-if not reverseCompat then
-	for name, ud in pairs(UnitDefs) do
-		if (ud.canfly) and not ud.isHoveringAirUnit then
-			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 0.8
-		end
-	end
-else
-	for name, ud in pairs(UnitDefs) do
-		if (ud.canfly) and not (ud.isFighter or ud.isBomber) then
-			ud.brakerate = (ud.brakerate or ud.acceleration or 0.5) * 20
-		end
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Maneuverablity Buff
--- 
+-- Maneuverability multipliers, useful for testing.
+-- TODO: migrate the x3 and x5 ones to defs, leave at x1 for easy testing
 
 local TURNRATE_MULT = 1
 local ACCEL_MULT = 3
@@ -419,65 +324,17 @@ local ACCEL_MULT_HIGH = 5
 for name, ud in pairs(UnitDefs) do
 	if ud.turnrate and ud.acceleration and ud.brakerate and ud.movementclass then
 		local class = ud.movementclass
-		
-		-- https://github.com/spring/spring/commit/8009eb548cc62162d9fd15f2914437f4ca63a198
-		if ud.acceleration == ud.brakerate and not reverseCompat then
-			ud.brakerate = ud.brakerate * 3
-		end
-		
+
+		ud.turnrate = ud.turnrate * TURNRATE_MULT
 		if class:find("TANK") or class:find("BOAT") or class:find("HOVER") then
-			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT_HIGH
 			ud.brakerate = ud.brakerate * ACCEL_MULT_HIGH*2
 		else
-			ud.turnrate = ud.turnrate * TURNRATE_MULT
 			ud.acceleration = ud.acceleration * ACCEL_MULT
 			ud.brakerate = ud.brakerate * ACCEL_MULT*2
 		end
 	end
 end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Special Air
---
-
---if (modOptions and tobool(modOptions.specialair)) then
---  local replacements = VFS.Include("LuaRules/Configs/specialair.lua")
---  if (replacements[modOptions.specialair]) then
---    replacements = replacements[modOptions.specialair]
---    for name, ud in pairs(UnitDefs) do
---      if (ud.buildoptions) then
---        for buildKey, buildOption in pairs(ud.buildoptions) do
---          if (replacements[buildOption]) then
---            ud.buildoptions[buildKey] = replacements[buildOption];
---          end
---        end
---      end
---    end
---  end
---end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Tactics GameMode
---
-
-if (modOptions and (modOptions.zkmode == "tactics")) then
-  -- remove all build options
-  Game = { gameSpeed = 30 };  --  required by tactics.lua
-  local options = VFS.Include("LuaRules/Configs/tactics.lua")
-  local customBuilds = options.customBuilds
-  for name, ud in pairs(UnitDefs) do
-    if tobool(ud.commander) then
-      ud.buildoptions = (customBuilds[name] or {}).allow or {}
-    else
-      ud.buildoptions = {}
-    end
-  end
-end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -491,27 +348,14 @@ if (modOptions and modOptions.energymult) then
     if (em) then
       UnitDefs[name].energymake = em * modOptions.energymult
     end
-	-- for solars
-	em = (UnitDefs[name].energyuse and tonumber(UnitDefs[name].energyuse) < 0) and UnitDefs[name].energyuse
-	if (em) then
-      UnitDefs[name].energyuse = em * modOptions.energymult
-    end
   end
 end
 
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- OD mex divide by 20
---
-
-for _,ud in pairs(UnitDefs) do
-    local em = tonumber(ud.extractsmetal)
-    if (em) then
-		ud.extractsmetal = em * 0.05
-    end
+if (modOptions and modOptions.metalmult) then
+	for name in pairs(UnitDefs) do
+		UnitDefs[name].metalmake = (UnitDefs[name].metalmake or 0) * modOptions.metalmult
+	end
 end
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -592,6 +436,17 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+-- Massive terraform speed to make ground flattening rapid for construction
+--
+
+for name, unitDef in pairs(UnitDefs) do
+	if (unitDef.workertime) then
+		unitDef.terraformspeed = unitDef.workertime * 20
+    end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 -- Set higher default losEmitHeight. Engine default is 20.
 --
 
@@ -600,30 +455,6 @@ for name, unitDef in pairs(UnitDefs) do
 		unitDef.losEmitHeight = 30
     end
 end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Lasercannons going through units fix
--- 
-
-for name, ud in pairs(UnitDefs) do
-  ud.collisionVolumeTest = 1
-end
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Burrowed
--- 
-
---for name, ud in pairs(UnitDefs) do
---  if (ud.weapondefs) then
---    for wName,wDef in pairs(ud.weapondefs) do      
---      wDef.damage.burrowed = 0.001
---    end
---  end
---end --for
-
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -639,10 +470,12 @@ for name, ud in pairs(UnitDefs) do
 			end
 		end
 	end
-	if not ud.canfly then
-		ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
-	else
-		ud.nochasecategory = (ud.nochasecategory or "") .. " SOLAR"
+	if not ud.customparams.chase_everything then
+		if not ud.canfly then
+			ud.nochasecategory = (ud.nochasecategory or "") .. " STUPIDTARGET"
+		else
+			ud.nochasecategory = (ud.nochasecategory or "") .. " SOLAR"
+		end
 	end
 end
 
@@ -684,7 +517,8 @@ end
 -- Set mass
 -- 
 for name, ud in pairs(UnitDefs) do
-	ud.mass = (((ud.buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
+	local buildtime = ud.customparams.real_buildtime or ud.buildtime
+	ud.mass = (((buildtime/2) + (ud.maxdamage/8))^0.6)*6.5
 	if ud.customparams.massmult then
 		ud.mass = ud.mass*ud.customparams.massmult
 	end
@@ -694,25 +528,17 @@ end
 --------------------------------------------------------------------------------
 -- Set incomes
 --
-if not reverseCompat then 
-	for name, ud in pairs(UnitDefs) do
-		if ud.metalmake and ud.metalmake > 0 then
-			ud.customparams.income_metal = ud.metalmake
-			ud.activatewhenbuilt = true
-			ud.metalmake = 0
-		end
-		if ud.energymake and ud.energymake > 0 then
-			ud.customparams.income_energy = ud.energymake
-			ud.activatewhenbuilt = true
-			ud.energymake = 0
-		end
+
+for name, ud in pairs(UnitDefs) do
+	if ud.metalmake and ud.metalmake > 0 then
+		ud.customparams.income_metal = ud.metalmake
+		ud.activatewhenbuilt = true
+		ud.metalmake = 0
 	end
-else
-	for name, ud in pairs(UnitDefs) do
-		if name == "armsolar" then
-			ud.energymake = 0
-			ud.energyuse = -2
-		end
+	if ud.energymake and ud.energymake > 0 then
+		ud.customparams.income_energy = ud.energymake
+		ud.activatewhenbuilt = true
+		ud.energymake = 0
 	end
 end
 
@@ -725,29 +551,6 @@ end
 --	if ud.buildcostmetal ~= ud.buildcostenergy or ud.buildtime ~= ud.buildcostenergy then
 --		Spring.Echo("Inconsistent Cost for " .. ud.name)
 --	end
---end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
--- Min Build Range back to what it used to be
--- 
-for name, ud in pairs(UnitDefs) do
-	if ud.builddistance and ud.builddistance < 128 and name ~= "armasp" and name ~= "armcarry" then
-		ud.builddistance = 128 
-	end
-end
-
-
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---  No leveling ground
-
-
---for name, ud in pairs(UnitDefs) do
---  if (ud.yardmap)  then
---    ud.levelGround = false
---  end
 --end
 
 
@@ -794,6 +597,20 @@ for name, ud in pairs(UnitDefs) do
 		ud.initcloaked = false
 		ud.customparams.initcloaked = "1"
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Altered unit health mod option
+-- 
+
+if modOptions and modOptions.hpmult and modOptions.hpmult ~= 1 then
+    local hpMulti = modOptions.hpmult
+    for unitDefID, unitDef in pairs(UnitDefs) do
+        if unitDef.maxdamage and unitDef.unitname ~= "terraunit" then
+            unitDef.maxdamage = math.max(unitDef.maxdamage*hpMulti, 1) 
+        end
+    end
 end
 
 --------------------------------------------------------------------------------

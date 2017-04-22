@@ -5,14 +5,11 @@ unitDef = {
   acceleration           = 0.09,
   activateWhenBuilt      = true,
   airStrafe              = 0,
-  amphibious             = true,
   bankingAllowed         = false,
-  brakeRate              = 0.05,
-  buildCostEnergy        = 4500,
+  brakeRate              = 0.04,
   buildCostMetal         = 4500,
   builder                = false,
   buildPic               = [[CORCRW.png]],
-  buildTime              = 4500,
   canAttack              = true,
   canFly                 = true,
   canGuard               = true,
@@ -24,21 +21,16 @@ unitDef = {
   collide                = true,
   collisionVolumeOffsets = [[0 0 5]],
   collisionVolumeScales  = [[86 22 86]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[cylY]],
   corpse                 = [[DEAD]],
   cruiseAlt              = 120,
 
   customParams           = {
-    description_bp = [[Fortaleza voadora]],
     description_fr = [[Forteresse Volante]],
     description_de = [[Schwebendes Bollwerk]],
-    description_pl = [[Latajaca forteca]],
     helptext	   = [[The Krow may be expensive and ponderous, but its incredible armor allows it do fly into all but the thickest anti-air defenses and engage enemies with its three laser cannons. Best of all, it can drop a large spread of carpet bombs that devastates anything under it.]],
-    helptext_bp    = [[Aeronave flutuante armada com lasers para ataque terrestre. Muito cara e muito poderosa.]],
     helptext_fr    = [[La Forteresse Volante est l'ADAV le plus solide jamais construit, est ?quip?e de nombreuses tourelles laser, elle est capable de riposter dans toutes les directions et d'encaisser des d?g?ts importants. Id?al pour un appuyer un assaut lourd ou monopiler l'Anti-Air pendant une attaque a?rienne.]],
 	helptext_de    = [[Der Krow scheint teuer und schwerfällig, aber seine unglaubliche Panzerung erlaubt ihm auch durch die größe Flugabwehr zu kommen und alles abzuholzen, was in Sichtweite seiner drei Laserkanonen kommt. Er kann sogar feindliche Jäger vom Himmel holen.]],
-	helptext_pl    = [[Krow jest drogi i wolny, jednak jego niesamowita wytrzymalosc pozwala mu latac nawet nad obrona przeciwlotnicza i ostrzeliwac wrogow swoim zestawem dzialek laserowych. Jego glownym atutem jest mozliwosc zrzucenia serii niszczyscielskich bomb, ktore zrownuja z ziemia obszar znajdujacy sie bezposrednio pod nim.]],
 	modelradius    = [[10]],
   },
 
@@ -51,16 +43,13 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 1800,
   maneuverleashlength    = [[500]],
-  mass                   = 886,
   maxDamage              = 16000,
   maxVelocity            = 3.3,
   minCloakDistance       = 150,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          	 = [[krow.s3o]],
-  scale                  = [[1]],
   script			     = [[corcrw.lua]],
-  seismicSignature       = 0,
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {
@@ -71,8 +60,6 @@ unitDef = {
     },
 
   },
-
-  side                   = [[CORE]],
   sightDistance          = 633,
   turnRate               = 250,
   upright                = true,
@@ -98,7 +85,7 @@ unitDef = {
     },
 	
     {
-      def                = [[SPECIALTRIGGER]],
+      def                = [[CLUSTERBOMB]],
 	  mainDir            = [[0 0 1]],
 	  maxAngleDif        = 360,	  
     },
@@ -109,12 +96,6 @@ unitDef = {
 	  maxAngleDif        = 180,
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
-    },
-
-    {
-      --def				 = [[LIGHTNING]],
-	  def				 = [[CLUSTERBOMB]],
-	  --def				 = [[TIMEDISTORT]],		  
     },
 
   },
@@ -163,35 +144,6 @@ unitDef = {
       weaponVelocity          = 2300,
     },
 
-    SPECIALTRIGGER      = {
-      name                    = [[FakeWeapon]],
-	  commandFire			  = true,
-	  cylinderTargeting		  = 1,
-      craterBoost             = 0,
-      craterMult              = 0,
-
-      damage                  = {
-        default = -0.001,
-        planes  = -0.001,
-        subs    = -0.001,
-      },
-
-      explosionGenerator      = [[custom:NONE]],
-	  impactOnly			  = true,
-      impulseBoost            = 0,
-      impulseFactor           = 1,
-      interceptedByShieldType = 0,
-      range                   = 200,
-      reloadtime              = 30,
-      size                    = 0,
-      targetborder            = 1,
-      tolerance               = 20000,
-      turret                  = true,
-      waterWeapon             = true,
-      weaponType              = [[Cannon]],
-      weaponVelocity          = 600,
-    },
-    
     TIMEDISTORT    = {
       name                    = [[Time Distortion Field]],
       areaOfEffect            = 600,
@@ -225,7 +177,7 @@ unitDef = {
       accuracy                = 200,
       areaOfEffect            = 128,
 	  burst					  = 75,
-	  burstRate				  = 0.3,	  
+	  burstRate				  = 0.07, -- real value in script; here for widgets	  
       commandFire             = true,
       craterBoost             = 1,
       craterMult              = 2,
@@ -242,7 +194,7 @@ unitDef = {
       impulseFactor           = 0.2,
       interceptedByShieldType = 2,
       model                   = [[wep_b_fabby.s3o]],
-      range                   = 10,
+      range                   = 200,
       reloadtime              = 30, -- if you change this redo the value in oneclick_weapon_defs EMPIRICALLY
       smokeTrail              = true,
       soundHit                = [[explosion/ex_med6]],
@@ -260,47 +212,22 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Krow]],
       blocking         = true,
-      category         = [[corpses]],
 	  collisionVolumeOffsets = [[0 0 0]],
 	  collisionVolumeScales  = [[80 30 80]],
-	  collisionVolumeTest    = 1,
 	  collisionVolumeType    = [[ellipsoid]],	  
-      damage           = 16000,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 5,
       footprintZ       = 5,
-      height           = [[40]],
-      hitdensity       = [[100]],
-      metal            = 1800,
       object           = [[krow_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 1800,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP  = {
-      description      = [[Debris - Krow]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 16000,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 4,
       footprintZ       = 4,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 900,
       object           = [[debris4x4a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 900,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

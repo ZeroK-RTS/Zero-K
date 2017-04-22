@@ -11,7 +11,6 @@ unitDef = {
   buildTime           = 900,
   canAttack           = true,
   canGuard            = true,
-  canHover            = false,  
   canMove             = true,
   canPatrol           = true,
   category            = [[LAND]],
@@ -19,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Artillery Lourde poulet]],
 	description_de = [[Schwere Artillerie]],
-	description_pl = [[Ciezka artyleria]],
     helptext       = [[The Lobber's big brother, the Blobber hurls a wide-scatter rain of acid goo. It can pummel even the toughest shield network very quickly, but remains relatively prone to direct attack.]],
     helptext_fr    = [[Grand fr?re du Lobber, le Blobber projette ? longue distance une v?ritable pluie d'acide sur une zone importante. Il peut ainsi rapidement annihiler m?me les d?fenses prot?g?es par un important r?seau de boucliers mais il reste tr?s vuln?rable aux attaques raproch?es.]],
 	helptext_de    = [[Der groﬂe Bruder vom Lobber, der Blobber, schleudert eine weite Streuung an ‰tzender Schmiere. Er kann sogar die st‰krsten Schildnetze sehr schnell einschlagen, doch gegen direkte Attacken wirkt er sehr anf‰llig.]],
-	helptext_pl    = [[Starszy brat Lobbera. Blobber jest w stanie z bezpiecznej odleglosci zniszczyc kazda siec obronna, ale pozostaje bezbronny w bezposredniej walce.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -34,7 +31,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 328,
   maxDamage           = 2400,
   maxSlope            = 36,
   maxVelocity         = 1.8,
@@ -45,7 +41,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB MOBILE STUPIDTARGET MINE]],
   objectName          = [[chickenblobber.s3o]],
   power               = 400,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
   
 
@@ -58,10 +53,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 1200,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 6,
   trackStrength       = 8,
@@ -118,7 +110,6 @@ unitDef = {
       sprayAngle              = 1792,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 350,
     },

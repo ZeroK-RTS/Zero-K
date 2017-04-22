@@ -2,7 +2,6 @@ unitDef = {
   unitname                      = [[napalmmissile]],
   name                          = [[Inferno]],
   description                   = [[Napalm Missile]],
-  buildCostEnergy               = 500,
   buildCostMetal                = 500,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -10,20 +9,16 @@ unitDef = {
   buildingGroundDecalSizeY      = 3,
   buildingGroundDecalType       = [[napalmmissile_aoplane.dds]],
   buildPic                      = [[napalmmissile.png]],
-  buildTime                     = 500,
   canAttack                     = true,
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[20 60 20]],
-  collisionVolumeTest	        = 1,
   collisionVolumeType	        = [[CylY]],
 
   customParams                  = {
     description_de = [[Napalm-Rakete]],
-    description_pl = [[Rakieta zapalajaca]],
     helptext       = [[The Inferno is a large AoE fire weapon. Its direct damage is modest, but the cloud of fire it creates lasts for a very long time.]],
     helptext_de    = [[Der Inferno ist eine große AoE Feuerwaffe. Sein direkter Schaden ist gering, aber die Flammenhölle erzeugt Verluste für längere Zeit.]],
-    helptext_pl    = [[Jednorazowa rakieta dalekiego zasięgu, ktora podpala na dlugi czas trafiony obszar, zadajac znajdujacym sie w nim jednostkom obrazenia.]],
   },
 
   explodeAs                     = [[WEAPON]],
@@ -37,7 +32,6 @@ unitDef = {
   minCloakDistance              = 150,
   objectName                    = [[wep_napalm.s3o]],
   script                        = [[cruisemissile.lua]],
-  seismicSignature              = 4,
   selfDestructAs                = [[WEAPON]],
 
   sfxtypes                      = {

@@ -171,7 +171,7 @@ function widget:Update()
 		highProgress = -1 --magic value: no active nukes
 		for unitID, udefID in pairs( nukeList ) do
 			local numStockpiled, numStockPQue = spGetUnitStockpile( unitID)
-			local buildPercent = Spring.GetUnitRulesParam("gadgetStockpile",unitID);
+			local buildPercent = Spring.GetUnitRulesParam(unitID, "gadgetStockpile")
 			
 			if ( buildPercent == nil ) then
 				--unit seems to be gone, delete it

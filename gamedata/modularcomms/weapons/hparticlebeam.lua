@@ -2,7 +2,7 @@ local name = "commweapon_hparticlebeam"
 local weaponDef = {
 	name                    = [[Heavy Particle Beam]],
 	beamDecay               = 0.9,
-	beamTime                = 0.01,
+	beamTime                = 1/30,
 	beamttl                 = 75,
 	coreThickness           = 0.5,
 	craterBoost             = 0,
@@ -11,7 +11,7 @@ local weaponDef = {
 	customParams            = {
 		slot = [[5]],
 		
-		light_color = [[0.3 1 3]],
+		light_color = [[0.4 1.6 0.4]],
 		light_radius = 120,
 	},
 

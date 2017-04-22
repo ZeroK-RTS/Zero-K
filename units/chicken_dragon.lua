@@ -1,10 +1,10 @@
 unitDef = {
   unitname               = [[chicken_dragon]],
   name                   = [[White Dragon]],
-  description            = [[Über Assault Chicken]],
+  description            = [[Prime Assault Chicken]],
   acceleration           = 1,
   autoHeal               = 0,
-  brakeRate              = 1,
+  brakeRate              = 3,
   buildCostEnergy        = 0,
   buildCostMetal         = 0,
   builder                = false,
@@ -21,17 +21,14 @@ unitDef = {
   collisionSphereScale   = 1,
   collisionVolumeOffsets = [[0 -5 -5]],
   collisionVolumeScales  = [[30 70 70]],
-  collisionVolumeTest    = 1,
   collisionVolumeType    = [[box]],
 
   customParams           = {
     description_fr = [[Unit? d'assaut poulet ultra lourde]],
 	description_de = [[Über Sturmchicken]],
-	description_pl = [[Kogut szturmowy]],
     helptext       = [[The White Dragons, senior guardians of the chicken hive, are monstrous beings second only to the queen herself. With a powerful stomp, lethal jaws, corrosive goo and a multitude of spores, they are a threat to be feared indeed.]],
     helptext_fr    = [[Les White Dragons, gardiens s?culaires des nids poulet sont d'immenses cr?atures monstrueuses extr?mement f?roces. Capables d'?craser sous leur poids leurs adversaires, de broyer les alliages les plus robustes avec leur m?choire, de projeter leur bave corrosive et de cribler les unit?s a?riennes d'un amas de spores corrosifs, leur simple apparition sur le champ de bataille glace le sang.]],
 	helptext_de    = [[Der White Dragon ist ein außerordentlich monströses Wesen. Mit kraftvollen Stampfern, todbringendem Maul, ätzendem Schleim und einer Vielzahl von Sporen stellt er eine bedrohliche und furchteinflößende Gefahr dar.]],
-	helptext_pl    = [[White Dragon to straznik roju. Mocne kopniecia, smiertelne szczeki, zracy szlam i mnostwo zarodnikow to powody, dla ktorych nalezy sie go bac.]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -41,7 +38,6 @@ unitDef = {
   idleAutoHeal           = 5,
   idleTime               = 300,
   leaveTracks            = true,
-  mass                   = 1284,
   maxDamage              = 32000,
   maxSlope               = 36,
   maxVelocity            = 2.1,
@@ -52,7 +48,6 @@ unitDef = {
   objectName             = [[chicken_dragon.s3o]],
   power                  = 10500,
   script                 = [[chickenq.cob]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -64,10 +59,7 @@ unitDef = {
     },
 
   },
-
-  side                   = [[THUNDERBIRDS]],
   sightDistance          = 1200,
-  smoothAnim             = true,
   sonarDistance          = 450,
   trackOffset            = 18,
   trackStrength          = 8,
@@ -155,7 +147,6 @@ unitDef = {
       sprayAngle              = 6100,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 600,
     },
@@ -231,6 +222,10 @@ unitDef = {
       collideFriendly         = false,
       craterBoost             = 0,
       craterMult              = 0,
+      
+      customParams            = {
+        light_radius = 0,
+      },
 
       damage                  = {
         default = 60,

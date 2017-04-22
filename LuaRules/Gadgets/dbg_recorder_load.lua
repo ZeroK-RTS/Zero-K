@@ -251,7 +251,7 @@ function gadget:DrawScreen()
 end
 
 function Finished()
-    local version = Game.version 
+    local version = Spring.Utilities.GetEngineVersion() 
     local buildFlags = Game.buildFlags or ""
     local gameName = Game.gameName
     local gameVersion = Game.gameVersion

@@ -15,15 +15,22 @@ end
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-local Chili
 
-local window, stackPanelMain
-local stackPanels = {}
+VFS.Include("LuaRules/Utilities/base64.lua")
+
+local Chili
+local factionDisplayWindow, teleportWindow
 
 local imageDir = "LuaUI/Configs/Factions/"
-local WINDOW_HEIGHT = 108
-local WINDOW_WIDTH = 220
-local IMAGE_WIDTH = 32
+
+local STRUCTURE_HEIGHT = 16
+
+local EVAC_STATE = {
+	ACTIVE = 1,
+	NO_WORMHOLE = 2,
+	NOTHING_TO_EVAC = 3,
+	WORMHOLE_DESTROYED = 4,
+}
 
 local factions = {
 	Cybernetic = {name = "Cybernetic Front", color = {136,170,255} },
@@ -36,161 +43,491 @@ local factions = {
 }
 
 for faction, data in pairs(factions) do
-	for i=1,3 do
+	for i = 1, 3 do
 		data.color[i] = data.color[i]/255
 	end
 end
 
+local flashState = true
+
+local numCharges = -1
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 local function IsSpec()
 	return (Spring.GetSpectatingState() or Spring.IsReplay())
 end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
-function widget:GameFrame(n)
-	if n%120 == 1 and (not IsSpec()) then
-		widgetHandler:RemoveWidget()
+-- Structure List
+
+local function CreateStructureButton(holder, index)
+	local unitName = Spring.GetGameRulesParam("pw_structureList_" .. index)
+	local humanName = UnitDefNames[unitName].humanName
+	
+	-- TODO: This should have a button which zooms the camera to the structure, when pressed,
+	-- if the structure is visible and alive.
+	
+	local structureName = Chili.Label:New{
+		x = 2,
+		y = (index - 1)*STRUCTURE_HEIGHT,
+		width = "100%",
+		height = STRUCTURE_HEIGHT,
+		align = "left",
+		valign = "top",
+		caption = humanName,
+		font = {size = 14},
+		parent = holder,
+	}
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.Destroy()
+		structureName:SetCaption("\255\255\0\0\x " .. humanName)
 	end
+	function externalFunctions.Evacuate()
+		structureName:SetCaption("\255\0\255\255\~ " .. humanName)
+	end
+	function externalFunctions.Teleporting()
+		flashState = not flashState
+		if flashState then
+			structureName:SetCaption("\255\0\205\255\- " .. humanName)
+		else
+			structureName:SetCaption("\255\0\255\205\- " .. humanName)
+		end
+	end
+	
+	return externalFunctions, unitName
 end
 
-function widget:Initialize()
+local function CreateStructureList(holder)
+	local structureCount = Spring.GetGameRulesParam("pw_structureList_count")
+	if not structureCount then
+		return
+	end
+	
+	local destroyedCount, evacCount = 0, 0
+	local structures = {}
+	local structuresByName = {}
+	for i = 1, structureCount do
+		structures[i], unitName = CreateStructureButton(holder, i)
+		structuresByName[unitName] = structures[i]
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.Update()
+		local newDestroyed = Spring.GetGameRulesParam("pw_structureDestroyed_" .. (destroyedCount + 1))
+		while newDestroyed do
+			structuresByName[newDestroyed].Destroy()
+			destroyedCount = destroyedCount + 1
+			newDestroyed = Spring.GetGameRulesParam("pw_structureDestroyed_" .. (destroyedCount + 1))
+		end
+		
+		local newEvac = Spring.GetGameRulesParam("pw_structureEvacuated_" .. (evacCount + 1))
+		while newEvac do
+			structuresByName[newEvac].Evacuate()
+			evacCount = evacCount + 1
+			newEvac = Spring.GetGameRulesParam("pw_structureEvacuated_" .. (evacCount + 1))
+		end
+		
+		local teleportUnitName = Spring.GetGameRulesParam("pw_teleport_unitname")
+		if teleportUnitName then
+			structuresByName[teleportUnitName].Teleporting()
+		end
+		
+	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Teleport Window
+
+local function CreateTeleportWindow()
+	local structureCount = Spring.GetGameRulesParam("pw_structureList_count") or 0
+	
+	local evacuable = true
+	local holderHeight = 78 + structureCount*STRUCTURE_HEIGHT
+	
+	local holderWindow = Chili.Window:New{
+		classname = "main_window_small",
+		name   = 'pw_teleport_meter',
+		x = 2,
+		y = 50,
+		width = 240,
+		height = holderHeight,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		parent = Chili.Screen0,
+	}
+	local teleportImage = Chili.Image:New{
+		y = 2,
+		right = 4,
+		width = 24,
+		height = 24,
+		file = "LuaUI/Images/commands/Bold/drop_beacon.png",
+		parent = holderWindow,
+	}
+	local teleportLabel = Chili.Label:New{
+		x = 4,
+		y = 4,
+		width = "100%",
+		height = 18,
+		align = "left",
+		valign = "top",
+		caption = '',
+		font = {size = 14},
+		parent = holderWindow,
+	}
+	local teleportProgress = WG.Chili.Progressbar:New{
+		x       = 4,
+		y       = 26,
+		right   = 4,
+		height  = 20,
+		max     = 1,
+		caption = "0%",
+		color   =  {0.15,0.4,0.9,1},
+		parent  = holderWindow,
+	}
+	
+	local structureHolder = WG.Chili.ScrollPanel:New{
+		x       = 4,
+		y       = 52,
+		right   = 4,
+		bottom  = 4,
+		horizontalScrollbar = false,
+		parent  = holderWindow,
+	}
+	
+	local structureList = CreateStructureList(structureHolder)
+	
+	local function CheckEvacuationState()
+		if not evacuable then
+			return false
+		end
+		local evacuateState = Spring.GetGameRulesParam("pw_evacuable_state")
+		if evacuateState == EVAC_STATE.ACTIVE then
+			return true
+		end
+		evacuable = false
+		
+		teleportImage:SetVisibility(false)
+		teleportProgress:SetVisibility(false)
+		structureHolder:SetPos(4, 20)
+		holderWindow:SetPos(nil, nil, nil, holderHeight - 32)
+		
+		if evacuateState == EVAC_STATE.NO_WORMHOLE then
+			teleportLabel:SetCaption("\255\128\128\128\No wormhole\008")
+		elseif evacuateState == EVAC_STATE.NOTHING_TO_EVAC then
+			teleportLabel:SetCaption("\255\128\128\128\Nothing to evacuate\008")
+		elseif evacuateState == EVAC_STATE.WORMHOLE_DESTROYED then
+			teleportLabel:SetCaption("\255\128\128\128\Wormhole destroyed\008")
+		else
+			teleportLabel:SetCaption("\255\128\128\128\Evacuation broken\008")
+		end
+	end
+	
+	local function UpdateBar()
+		local current = Spring.GetGameRulesParam("pw_teleport_charge") or 0
+		local needed = Spring.GetGameRulesParam("pw_teleport_charge_needed") or 1
+		local currentRemainder = current%needed
+		local numChargesNew = math.floor(current/needed)
+		
+		teleportProgress:SetValue(current/needed)
+		local percent = math.floor(current/needed * 100 + 0.5)
+		teleportProgress:SetCaption(percent .. "%")
+		
+		if numChargesNew ~= numCharges then
+			local text = ""
+			if (numChargesNew > 0) then
+				-- TODO: localize this
+				text = "\255\0\255\32\Evacuation ready\008"
+				teleportImage.color = {1,1,1,1}
+			else
+				text = "\255\128\128\128\Evacuation charging\008"
+				teleportImage.color = {0.3, 0.3, 0.3, 1}
+			end
+			teleportLabel:SetCaption(text)
+			teleportImage:Invalidate()
+			
+			numCharges = numChargesNew
+		end
+	end
+	
+	local externalFunctions = {}
+	
+	function externalFunctions.Update()
+		if CheckEvacuationState() then
+			UpdateBar()
+		end
+		if structureList then
+			structureList.Update()
+		end
+	end
+	
+	externalFunctions.Update()
+	
+	if WG.GlobalCommandBar then
+		local function ToggleWindow()
+			if holderWindow then
+				holderWindow:SetVisibility(not holderWindow.visible)
+			end
+		end
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/commands/Bold/drop_beacon.png", "Toggle structure status and evacuation panel.", ToggleWindow)
+	end
+	
+	return externalFunctions
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Info Window
+
+local function CreateFactionDisplayWindow()
 	local modoptions = Spring.GetModOptions()
 	local planet = modoptions.planet
 	local attacker = modoptions.attackingfaction
 	local defender = modoptions.defendingfaction
 	
-	if not planet then
-		widgetHandler:RemoveWidget()
-		return
-	end
-
-	Chili = WG.Chili
+	local WINDOW_HEIGHT = 116
+	local WINDOW_WIDTH = 220
+	local IMAGE_WIDTH = 36
 	
-	window = Chili.Window:New{
-		parent = Chili.Screen0,
-		name   = 'pwinfo';
+	local ATTACKER_POS = 20
+	local DEFENDER_POS = 60
+	
+	factionDisplayWindow = Chili.Window:New{
+		classname = "main_window_small",
+		name   = 'pwinfo',
 		width = WINDOW_WIDTH,
 		height = WINDOW_HEIGHT,
 		y = "20%",
-		right = 0; 
-		dockable = true;
+		right = 0, 
+		dockable = true,
 		draggable = false,
 		resizable = false,
 		tweakDraggable = true,
 		tweakResizable = false,
-		padding = {5, 0, 5, 0},
 		--color = {1, 1, 1, 0.6},
 		--minimizable = true,
 		--itemMargin  = {0, 0, 0, 0},
+		parent = Chili.Screen0,
 	}
-	
-	stackPanelMain = Chili.StackPanel:New{
-		parent = window,
-		resizeItems = false;
-		orientation   = "vertical";
-		height = "100%";
-		width = "100%";
-		padding = {0, 0, 0, 0},
-		itemMargin  = {0, 0, 0, 0},
-	}
-	
-	for i=1,3 do
-		stackPanels[i] = Chili.Panel:New{
-			parent = stackPanelMain,
-			resizeItems = false;
-			orientation   = "horizontal";
-			height = WINDOW_HEIGHT/3;
-			width = "100%";
-			padding = {0, 0, 0, 0},
-			itemMargin  = {0, 0, 0, 0},
-			backgroundColor = {0, 0, 0, 0},
-		}
-	end
 	
 	Chili.Label:New {
-		x = 0;
-		width = WINDOW_WIDTH;
-		height = WINDOW_HEIGHT/3;
+		x = 0,
+		y = 4,
+		width = WINDOW_WIDTH - factionDisplayWindow.padding[1] - factionDisplayWindow.padding[3],
+		height = WINDOW_HEIGHT/3,
 		align = "center",
-		caption = "Planet " .. planet;
+		caption = "Planet " .. planet,
 		font = {
-			size = 16;
-			shadow = true;
-		};
-		parent = stackPanels[1];
+			size = 16,
+			shadow = true,
+		},
+		parent = factionDisplayWindow,
 	}
 	
 	if not attacker then
 		Chili.Label:New {
-			x = IMAGE_WIDTH + 16;
-			height = IMAGE_WIDTH;
-			caption = "No attacker";
+			x = IMAGE_WIDTH + 20,
+			y = ATTACKER_POS + 6,
+			height = IMAGE_WIDTH,
+			caption = "No attacker",
 			font = {
-				size = 14;
-				shadow = true;
-			};
-			parent = stackPanels[2];
+				size = 14,
+				shadow = true,
+			},
+			parent = factionDisplayWindow,
 		}
 	else
 		local attackerIcon = imageDir..attacker..".png"
 		if VFS.FileExists(attackerIcon) then
 			Chili.Image:New {
-				x = 0;
-				width = IMAGE_WIDTH;
-				height = IMAGE_WIDTH;
+				x = 10,
+				y = ATTACKER_POS,
+				width = IMAGE_WIDTH,
+				height = IMAGE_WIDTH,
 				keepAspect = true,
-				file = attackerIcon;
-				parent = stackPanels[2];
+				file = attackerIcon,
+				parent = factionDisplayWindow,
 			}
 		end
 		Chili.Label:New {
-			x = IMAGE_WIDTH + 16;
-			height = IMAGE_WIDTH;
-			align="left";
-			caption = factions[attacker] and factions[attacker].name or attacker or "Unknown attacker";
+			x = IMAGE_WIDTH + 20,
+			y = ATTACKER_POS + 6,
+			height = IMAGE_WIDTH,
+			align="left",
+			caption = factions[attacker] and factions[attacker].name or attacker or "Unknown attacker",
 			font = {
-				size = 14;
-				shadow = true;
-				color = factions[attacker] and factions[attacker].color;
-			};
-			parent = stackPanels[2];
+				size = 14,
+				shadow = true,
+				color = factions[attacker] and factions[attacker].color,
+			},
+			parent = factionDisplayWindow,
 		}
 	end
 	
 	if not defender then
 		Chili.Label:New {
-			x = IMAGE_WIDTH + 16;
-			height = IMAGE_WIDTH;
-			caption = "No defender";
+			x = IMAGE_WIDTH + 20,
+			y = DEFENDER_POS + 6,
+			height = IMAGE_WIDTH,
+			caption = "No defender",
 			font = {
-				size = 14;
-				shadow = true;
-			};
-			parent = stackPanels[3];
+				size = 14,
+				shadow = true,
+			},
+			parent = factionDisplayWindow,
 		}
 	else
 		local defenderIcon = imageDir..defender..".png"
 		if VFS.FileExists(defenderIcon) then
 			Chili.Image:New {
-				x = 0;
-				width = IMAGE_WIDTH;
-				height = IMAGE_WIDTH;
+				x = 10,
+				y = DEFENDER_POS,
+				width = IMAGE_WIDTH,
+				height = IMAGE_WIDTH,
 				keepAspect = true,
-				file = defenderIcon;
-				parent = stackPanels[3];
+				file = defenderIcon,
+				parent = factionDisplayWindow,
 			}
 		end
 		Chili.Label:New {
-			x = IMAGE_WIDTH + 16;
-			height = IMAGE_WIDTH;
-			caption = factions[defender] and factions[defender].name or defender or "Unknown defender";
+			x = IMAGE_WIDTH + 20,
+			y = DEFENDER_POS + 6,
+			height = IMAGE_WIDTH,
+			caption = factions[defender] and factions[defender].name or defender or "Unknown defender",
 			font = {
-				size = 14;
-				shadow = true;
-				color = factions[defender] and factions[defender].color;
-			};
-			parent = stackPanels[3];
+				size = 14,
+				shadow = true,
+				color = factions[defender] and factions[defender].color,
+			},
+			parent = factionDisplayWindow,
 		}
 	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-- Info Window
+
+local function CreateGoalWindow()
+	if IsSpec() then
+		return
+	end
+	local customKeys = select(10, Spring.GetPlayerInfo(Spring.GetMyPlayerID())) or {}
+	if not customKeys.pwinstructions then
+		return
+	end
+	local instructions = Spring.Utilities.Base64Decode(customKeys.pwinstructions)
+	if not instructions then
+		return
+	end
+	
+	local WINDOW_HEIGHT = 320
+	local WINDOW_WIDTH = 480
+	
+	local instructionWindow =  Chili.Window:New{
+		classname = "main_window_small",
+		name   = 'pw_instructions',
+		x = 0,
+		y = 250, 
+		width = WINDOW_WIDTH,
+		height = WINDOW_HEIGHT,
+		dockable = true,
+		draggable = false,
+		resizable = false,
+		tweakDraggable = true,
+		tweakResizable = false,
+		--color = {1, 1, 1, 0.6},
+		--minimizable = true,
+		--itemMargin  = {0, 0, 0, 0},
+		parent = Chili.Screen0,
+	}
+	
+	Chili.Label:New {
+		x = 0,
+		y = 4,
+		width = WINDOW_WIDTH - instructionWindow.padding[1] - instructionWindow.padding[3],
+		height = 20,
+		align = "center",
+		caption = "Battle Instructions",
+		font = {
+			size = 18,
+			shadow = true,
+		},
+		parent = instructionWindow,
+	}
+	
+	Chili.TextBox:New {
+		x = 6,
+		y = 35,
+		right = 6,
+		bottom = 6,
+		text = instructions,
+		fontsize = 14,
+		parent = instructionWindow,
+	}
+	
+	local function ToggleWindow()
+		if instructionWindow then
+			instructionWindow:SetVisibility(not instructionWindow.visible)
+		end
+	end
+	
+	Chili.Button:New {
+		name = 'closeButton',
+		width = 80,
+		height = 38,
+		bottom = 6,
+		right = 5,
+		caption = WG.Translate("interface", "close") or "Close",
+		OnClick = {ToggleWindow},
+		font = {size = 16},
+		parent = instructionWindow,
+	}
+	
+	if WG.GlobalCommandBar then
+		WG.GlobalCommandBar.AddCommand("LuaUI/Images/planetQuestion.png", "Toggle battle instructions panel.", ToggleWindow)
+	end
+end
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+function widget:GameFrame(n)
+	if n%120 == 1 and (not IsSpec()) then
+		if factionDisplayWindow then
+			factionDisplayWindow:Dispose()
+		end
+	end
+	if n%10 == 3 then
+		if teleportWindow then
+			teleportWindow.Update()
+		else
+			teleportWindow = CreateTeleportWindow()
+		end
+	end
+end
+
+function widget:Initialize()
+	if not Spring.GetModOptions().planet then
+		widgetHandler:RemoveWidget()
+		return
+	end
+
+	Chili = WG.Chili
+	CreateFactionDisplayWindow()
+	CreateGoalWindow()
+end
+
+function widget:GamePreload()
+	teleportWindow = CreateTeleportWindow()
 end
 
 --------------------------------------------------------------------------------

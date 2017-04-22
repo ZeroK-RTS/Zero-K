@@ -10,6 +10,8 @@ function widget:GetInfo()
   }
 end
 
+VFS.Include("LuaRules/Configs/customcmds.h.lua")
+include("Widgets/COFCTools/ExportUtilities.lua")
 
 --// gl const
 
@@ -120,8 +122,7 @@ options_order = {
 	'showeco',
 	
 	'lable_initialView', 
-	'initialSensorState', 
-	'start_with_showeco',
+	'initialSensorState',
 	
 	-- Radar view configuration
 	'radar_view_colors_label1',
@@ -142,14 +143,20 @@ options_order = {
 	'radar_preset_green_in_blue', 
 	
 	-- Minimap options
+	'disableMinimap',
+	'hideOnOverview',
 	'use_map_ratio',
 	'opacity', 
 	'alwaysResizable', 
 	'buttonsOnRight', 
 	'hidebuttons', 
 	'minimizable',
+	'lblblank1',
+
 	'leftClickOnMinimap', 
 	'fadeMinimapOnZoomOut', 
+	
+	'fancySkinning',
 }
 options = {
 	label_drawing = { type = 'label', name = 'Map Drawing and Messaging', },
@@ -213,7 +220,7 @@ options = {
 				WG.ToggleShoweco()
 			end
 		end,
-	},
+	},	
 	
 	lable_initialView = { type = 'label', name = 'Initial Map Overlay', },
 	
@@ -222,19 +229,8 @@ options = {
 		desc = "Game starts with Line of Sight Overlay enabled",
 		type = 'bool',
 		value = true,
+		noHotkey = true,
 	},
-	start_with_showeco = {
-		name = "Start with economy overly",
-		desc = "Game starts with Economy Overlay enabled",
-		type = 'bool',
-		value = false,
-		OnChange = function(self)
-			if (self.value) then
-				WG.showeco = self.value
-			end
-		end,
-	},
-	
 	
 --------------------------------------------------------------------------
 -- Configure Radar and Line of Sight 'Settings/Interface/Map/Radar'
@@ -366,14 +362,29 @@ options = {
 --------------------------------------------------------------------------
 -- Minimap path area 'Settings/HUD Panels/Minimap'
 --------------------------------------------------------------------------
+	disableMinimap = {
+		name = 'Disable Minimap',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+	},
+	hideOnOverview = {
+		name = 'Hide on Overview',
+		type = 'bool',
+		value = false,
+		OnChange = function(self) MakeMinimapWindow() end,
+		path = minimap_path,
+		noHotkey = true,
+	},	
 	use_map_ratio = {
 		name = 'Keep Aspect Ratio',
 		type = 'radioButton',
 		value = 'arwindow',
 		items = {
-			{key = 'arwindow', 	name='Aspect Ratio Window'},
-			{key ='armap', 		name='Aspect Ratio Map'},
-			{key ='arnone', 		name='Map Fills Window'},
+			{key = 'arwindow',  name = 'Aspect Ratio Window'},
+			{key = 'armap',     name = 'Aspect Ratio Map'},
+			{key = 'arnone',    name = 'Map Fills Window'},
 		},
 		OnChange = function(self)
 			local arwindow = self.value == 'arwindow'
@@ -385,6 +396,7 @@ options = {
 			end 
 		end,
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	opacity = {
 		name = "Opacity",
@@ -409,6 +421,7 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	buttonsOnRight = {
 		name = 'Map buttons on the right',
@@ -416,17 +429,19 @@ options = {
 		value = false,
 		OnChange = function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},
 	hidebuttons = {
 		name = 'Hide Minimap Buttons',
 		type = 'bool',
 		advanced = true,
-		OnChange= function(self) 
+		OnChange= function(self)
 			iconsize = self.value and 0 or 20 
 			MakeMinimapWindow() 
 		end,
 		value = false,
 		path = minimap_path,
+		noHotkey = true,
 	},
 	minimizable = {
 		name = 'Minimizable',
@@ -434,17 +449,20 @@ options = {
 		value = false,
 		OnChange= function(self) MakeMinimapWindow() end,
 		path = minimap_path,
+		noHotkey = true,
 	},
+	lblblank1 = {name=' ', type='label'},
 	leftClickOnMinimap = {
 		name = 'Left Click Behaviour',
 		type = 'radioButton',
-		value = 'unitselection',
+		value = 'camera',
 		items={
 			{key='unitselection', name='Unit Selection'},
 			{key='situational', name='Context Dependant'},
 			{key='camera', name='Camera Movement'},
 		},
 		path = minimap_path,
+		noHotkey = true,
 	},	
 	fadeMinimapOnZoomOut = {
 		name = "Minimap fading when zoomed out",
@@ -459,6 +477,49 @@ options = {
 			last_alpha = 2 --invalidate last_alpha so it needs to be recomputed, for the background opacity
 			end,
 		path = minimap_path,
+		noHotkey = true,
+	},
+	fancySkinning = {
+		name = 'Fancy Skinning',
+		type = 'radioButton',
+		value = 'panel',
+		path = minimap_path,
+		items = {
+			{key = 'panel', name = 'None'},
+			{key = 'panel_1100_large', name = 'Bottom Left',},
+			{key = 'panel_2100', name = 'Bottom Left Flush',},
+			{key = 'panel_0110_large', name = 'Bottom Right'},
+			{key = 'panel_0120', name = 'Bottom Right Flush'},
+			{key = 'panel_1001', name = 'Top Left',},
+		},
+		OnChange = function (self)
+			local currentSkin = Chili.theme.skin.general.skinName
+			local skin = Chili.SkinHandler.GetSkin(currentSkin)
+			
+			local className = self.value
+			local newClass = skin.panel
+			if skin[className] then
+				newClass = skin[className]
+			end
+			
+			map_panel.tiles = newClass.tiles
+			map_panel.TileImageFG = newClass.TileImageFG
+			--map_panel.backgroundColor = newClass.backgroundColor
+			map_panel.TileImageBK = newClass.TileImageBK
+			if newClass.padding then
+				map_panel.padding = newClass.padding
+				map_panel:UpdateClientArea()
+			end
+			map_panel:Invalidate()
+			
+			fakewindow.tiles = newClass.tiles
+			fakewindow.TileImageFG = newClass.TileImageFG
+			--fakewindow.backgroundColor = newClass.backgroundColor
+			fakewindow.TileImageBK = newClass.TileImageBK
+			fakewindow:Invalidate()
+		end,
+		advanced = true,
+		noHotkey = true,
 	},
 	--[[
 	simpleMinimapColors = {
@@ -534,15 +595,17 @@ function widget:Update() --Note: these run-once codes is put here (instead of in
 	end
 
 	local cs = Spring.GetCameraState()
-	if cs.name == "ov" and not tabbedMode then
-		Chili.Screen0:RemoveChild(window)
-		tabbedMode = true
+	if not options.hideOnOverview.value then
+		if cs.name == "ov" and not tabbedMode then
+			Chili.Screen0:RemoveChild(window)
+			tabbedMode = true
+		end
+		if cs.name ~= "ov" and tabbedMode then
+			Chili.Screen0:AddChild(window)
+			window:BringToFront()
+			tabbedMode = false
+		end
 	end
-	if cs.name ~= "ov" and tabbedMode then
-		Chili.Screen0:AddChild(window)
-		tabbedMode = false
-	end
-
 	WG.MinimapDraggingCamera = options.leftClickOnMinimap.value == 'camera' or leftClickDraggingCamera
 	-- widgetHandler:RemoveCallIn("Update") -- remove update call-in since it only need to run once. ref: gui_ally_cursors.lua by jK
 end
@@ -554,7 +617,7 @@ end
 
 local function MakeMinimapButton(file, params)
 	local option = params.option
-	local name, desc, action, hotkey
+	local name, desc, action, hotkey, command
 	if option then
 		name = options[option].name
 		desc = options[option].desc and (' (' .. options[option].desc .. ')') or ''
@@ -564,6 +627,7 @@ local function MakeMinimapButton(file, params)
 	desc = desc or params.desc or ""
 	action = action or params.action
 	hotkey = WG.crude.GetHotkey(action)
+	command = params.command
 	
 	if hotkey ~= '' then
 		hotkey = ' (\255\0\255\0' .. hotkey:upper() .. '\008)'
@@ -582,7 +646,15 @@ local function MakeMinimapButton(file, params)
 				WG.crude.ShowMenu() --make epic Chili menu appear.
 				return true
 			end
-			Spring.SendCommands( action )
+			
+			if command then
+				local left, right = true, false
+				local alt, ctrl, meta, shift = Spring.GetModKeyState()
+				local index = Spring.GetCmdDescIndex(command)
+				Spring.SetActiveCommand(index, 1, left, right, alt, ctrl, meta, shift)
+			else
+				Spring.SendCommands(action)
+			end
 		end },
 		children={
 		  file and
@@ -600,6 +672,10 @@ end
 MakeMinimapWindow = function()
 	if (window) then
 		window:Dispose()
+	end
+	
+	if options.disableMinimap.value then
+		return
 	end
 	
 	-- Set the size for the default settings.
@@ -624,15 +700,16 @@ MakeMinimapWindow = function()
 	local map_panel_right = 0
 	
 	local buttons_height = iconsize+3
-	local buttons_width = iconsize*10
+	local buttons_width = iconsize*13
 	if options.buttonsOnRight.value then
 		map_panel_bottom = 0
 		map_panel_right = iconsize*1.3
-		buttons_height = iconsize*10
+		buttons_height = iconsize*13
 		buttons_width = iconsize+3
 	end
 	
 	map_panel = Chili.Panel:New {
+		--classname = "bottomLeftPanel",
 		x = 0,
 		y = 0,
 		bottom = map_panel_bottom,
@@ -641,8 +718,8 @@ MakeMinimapWindow = function()
 		margin = {0,0,0,0},
 		padding = {8,8,8,8},
 		backgroundColor = bgColor_panel
-		}
-	
+	}
+
 	buttons_panel = Chili.StackPanel:New{
 		name = "Minimap buttons_panel",
 		orientation = 'horizontal',
@@ -691,8 +768,16 @@ MakeMinimapWindow = function()
 			
 			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
 			
+			MakeMinimapButton( 'LuaUI/images/commands/Bold/retreat.png', {name = "Place Retreat Zone", action = 'sethaven', command = CMD_RETREAT_ZONE, desc = " (Shift to place multiple zones, overlap to remove)"}),
+			MakeMinimapButton( 'LuaUI/images/commands/Bold/ferry.png', {name = "Place Ferry Route", action = 'setferry', command = CMD_SET_FERRY, desc = " (Shift to queue and edit waypoints, overlap the start to remove)"}),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
 			MakeMinimapButton( 'LuaUI/images/drawingcursors/eraser.png', {option = 'clearmapmarks'} ),
 			MakeMinimapButton( 'LuaUI/images/Crystal_Clear_action_flag.png', {option = 'lastmsgpos'} ),
+			
+			Chili.Label:New{ width=iconsize/2, height=iconsize/2, caption='', autosize = false,},
+			
 		},
 	}
 	
@@ -714,10 +799,11 @@ MakeMinimapWindow = function()
 		dragUseGrip = false,
 		minWidth = 100,
 		minHeight = 100,
-		maxWidth = screenWidth*0.8,
-		maxHeight = screenHeight*0.8,
+		maxWidth = screenWidth,
+		maxHeight = screenHeight,
 		fixedRatio = options.use_map_ratio.value == 'arwindow',
 	}
+	window:BringToFront()
 	
 	options.use_map_ratio.OnChange(options.use_map_ratio)
 	
@@ -734,9 +820,13 @@ MakeMinimapWindow = function()
 		padding = {0, 0, 0, 0},
 		children = {
 			map_panel,
-			buttons_panel,
+			((not options.hidebuttons.value) and buttons_panel) or nil,
 		},
 	}
+		
+	if options.fancySkinning.value then
+		options.fancySkinning.OnChange(options.fancySkinning)
+	end
 
 end
 
@@ -750,12 +840,6 @@ function widget:MousePress(x, y, button)
 		return false
 	end
 	if Spring.GetActiveCommand() == 0 then
-		local alt, ctrl, meta, shift = Spring.GetModKeyState()
-		if meta and not shift then --//activate epicMenu when user didn't have active command & Spacebar+click on the minimap
-			WG.crude.OpenPath(minimap_path) --click + space will shortcut to option-menu
-			WG.crude.ShowMenu() --make epic Chili menu appear.
-			return true
-		end
 		if (options.leftClickOnMinimap.value ~= 'unitselection' and button == 1) or button == 2 then
 			local traceType,traceValue = Spring.TraceScreenRay(x,y,false,true)
 			local coord 
@@ -776,11 +860,7 @@ function widget:MousePress(x, y, button)
 				end
 			end
 			if coord then
-				if (WG.COFC_SetCameraTarget) then
-					WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
-				else
-			 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-				end
+				SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 				leftClickDraggingCamera = true
 				return true
 			end
@@ -796,11 +876,7 @@ function widget:MouseMove(x, y, dx, dy, button)
 			coord = traceValue
 		end
 		if coord then
-			if (WG.COFC_SetCameraTarget) then
-				WG.COFC_SetCameraTarget(coord[1],coord[2],coord[3],0,true)
-			else
-		 		Spring.SetCameraTarget(coord[1],coord[2],coord[3],0)
-			end
+			SetCameraTarget(coord[1],coord[2],coord[3],0,true)
 			leftClickDraggingCamera = true
 			return true
 		end
@@ -900,9 +976,9 @@ function widget:Initialize()
 		      tex0 = 0,
 		    },
 		    uniform = {
-		    	alpha = 1,
-		    	bounds = 2,
-		    	screen = 3,
+              alpha = 0,
+              bounds = {0,0,0,0},
+              screen = {0,0},
 		  	},
 		  })
 
@@ -950,7 +1026,7 @@ end
 
 function widget:DrawScreen() 
 	local cs = Spring.GetCameraState()
-	if (window.hidden or cs.name == "ov") then 
+	if (options.disableMinimap.value or window.hidden or cs.name == "ov") then 
 		gl.ConfigMiniMap(0,0,0,0) --// a phantom map still clickable if this is not present.
 		lx = 0
 		ly = 0

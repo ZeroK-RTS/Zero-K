@@ -15,6 +15,7 @@ local disabled = false
 local enemyDots = {}
 local allyDots = {}
 local needsUpdate = false
+local myAllyTeamID
 
 local function forceUpdate ()
 	needsUpdate = true
@@ -33,6 +34,7 @@ options = {
 			{key ='radar',  name='In radar, not in sight'},
 			{key ='never',  name='Never'},
 		},
+		noHotkey = true,
 		OnChange = forceUpdate,
 	},
 	enable_vertical_lines_water = {
@@ -45,6 +47,7 @@ options = {
 			{key ='radar',  name='In radar, not in sight'},
 			{key ='never',  name='Never'},
 		},
+		noHotkey = true,
 	},
 	enable_vertical_lines_ally = {
 		name = 'Show for allied units',
@@ -57,6 +60,7 @@ options = {
 			{key ='water',  name='Underwater'},
 			{key ='never',  name='None'},
 		},
+		noHotkey = true,
 	},
 }
 
@@ -64,6 +68,7 @@ local function UpdateSpec ()
 	if Spring.GetSpectatingState() then 
 		disabled = true
 	end
+	myAllyTeamID = Spring.GetMyAllyTeamID()
 end
 
 function widget:Initialize()
@@ -75,9 +80,9 @@ function widget:PlayerChanged (playerID)
 end
 
 function widget:UnitEnteredRadar (unitID, unitTeam)
-	if (Spring.GetUnitAllyTeam(unitID) ~= Spring.GetMyAllyTeamID()) then
+	if (Spring.GetUnitAllyTeam(unitID) ~= myAllyTeamID) then
 		local x, y, z = Spring.GetUnitPosition (unitID)
-		local losState = Spring.GetUnitLosState(unitID)
+		local losState = Spring.GetUnitLosState(unitID, myAllyTeamID)
 		local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
 		enemyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), losState.los, r, g, b} -- x, y, z, ground, inlos, r, g, b
 	end
@@ -93,7 +98,7 @@ function widget:UnitDestroyed (unitID, unitTeam)
 end
 
 function widget:UnitCreated (unitID)
-	if (Spring.GetUnitAllyTeam(unitID) == Spring.GetMyAllyTeamID()) then
+	if (Spring.GetUnitAllyTeam(unitID) == myAllyTeamID) then
 		local x, y, z = Spring.GetUnitPosition (unitID)
 		local r, g, b = Spring.GetTeamColor (Spring.GetUnitTeam(unitID))
 		allyDots[unitID] = {x, y, z, math.max(Spring.GetGroundHeight(x,z), 0), true, r, g, b} -- x, y, z, ground, inlos, r, g, b

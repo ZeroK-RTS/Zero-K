@@ -17,7 +17,7 @@ local aStar = dofile"astar.lua"
 aStar.gridHeight = 250
 aStar.gridWidth = 250
 
-aStar.IsBlocked = function(id) return false end
+aStar.IsBlocked = local function(id) return false end
 
 function aStar.GetDistanceEstimate(a, b) -- heuristic estimate of distance to goal
   local x1, y1 = aStar.ToCoords(a)
@@ -156,24 +156,24 @@ function aStar.NewPriorityQueue()
 end
 
 
-function aStar.ToID(coords) -- override this function if necessary, converts grid coords to node id
+function aStar.ToID(coords) -- override this local function if necessary, converts grid coords to node id
   local x, y = coords[1], coords[2]
   return y * aStar.gridWidth + x
 end
 
 
-function aStar.ToCoords(id) -- override this function if necessary, converts node id to grid coords
+function aStar.ToCoords(id) -- override this local function if necessary, converts node id to grid coords
   return id % aStar.gridWidth, math.floor(id/aStar.gridWidth)
 end
 
 
-function aStar.GetDistance(a, b) -- override this function, exact distance beween adjacent nodes a and b
-  error"override this function"
+function aStar.GetDistance(a, b) -- override this local function, exact distance beween adjacent nodes a and b
+  error"override this local function"
 end
 
 
 function aStar.IsBlocked(id)
-  error"override this function"
+  error"override this local function"
 end
 
 
@@ -203,7 +203,7 @@ end
 
 
 function aStar.GetDistanceEstimate(a, b) -- heuristic estimate of distance to goal
-  error"override this function"
+  error"override this local function"
 end
 
 function aStar.GetPathsThreaded(startID, goalID, cyclesBeforeYield)

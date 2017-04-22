@@ -75,11 +75,23 @@ for i=1,#UnitDefs do
 		}
 	end
 	if modelRadius or modelHeight then
-		modelRadii[i] = {
+		modelRadii[i] = true -- mark that we need to initialize this
+	end
+end
+
+-- lazily initialize model radius/height since they force loading the model
+local function GetModelRadii(unitDefID)
+	if modelRadii[unitDefID] == true then
+		local ud = UnitDefs[unitDefID]
+		local modelRadius  = ud.customParams.modelradius
+		local modelHeight  = ud.customParams.modelheight
+		modelRadii[unitDefID] = {
 			radius = ( modelRadius and tonumber(modelRadius) or ud.radius ),
 			height = ( modelHeight and tonumber(modelHeight) or ud.height ),
 		}
 	end
+
+	return modelRadii[unitDefID]
 end
 
 --------------------------------------------------------------------------------
@@ -95,6 +107,13 @@ local function UpdateUnitGrow(unitID, growScale)
 			unit.scale[1], unit.scale[2], unit.scale[3], 
 			unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
 			unit.volumeType, unit.testType, unit.primaryAxis)
+			
+		if Spring.SetUnitSelectionVolumeData then
+			Spring.SetUnitSelectionVolumeData(unitID,
+				unit.scale[1], unit.scale[2], unit.scale[3], 
+				unit.offset[1], unit.offset[2] - growScale*unit.scaleOff, unit.offset[3], 
+				unit.volumeType, unit.testType, unit.primaryAxis)
+		end
 	else
 		spSetUnitCollisionVolumeData(unitID,
 			unit.scale[1], unit.scale[2] - growScale*unit.scaleOff, unit.scale[3], 
@@ -132,7 +151,8 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	if modelRadii[unitDefID] then
-		spSetUnitRadiusAndHeight(unitID, modelRadii[unitDefID].radius, modelRadii[unitDefID].height)
+		local mr = GetModelRadii(unitDefID)
+		spSetUnitRadiusAndHeight(unitID, mr.radius, mr.height)
 	end
 	
 	local buildProgress = select(5, spGetUnitHealth(unitID))
@@ -142,7 +162,6 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	end
 	
 	-- Sertup growth scale
-	
 	local _, baseY, _, _, midY, _, _, aimY = spGetUnitPosition(unitID, true, true)
 	local scaleX, scaleY, scaleZ, offsetX, offsetY, offsetZ, 
 		volumeType, testType, primaryAxis = spGetUnitCollisionVolumeData(unitID)
@@ -181,6 +200,19 @@ function gadget:UnitCreated(unitID, unitDefID, teamID)
 	UpdateUnitGrow(unitID, growScale)
 end
 
+local function OverrideMidAndAimPos(unitID, mid, aim)
+	if not spValidUnitID(unitID) then
+		return
+	end
+	
+	-- Do not override growing units
+	if growUnit[unitID] then
+		return
+	end
+	
+	spSetUnitMidAndAimPos(unitID, mid[1], mid[2], mid[3], aim[1], aim[2], aim[3], true)
+end
+
 function gadget:UnitFinished(unitID, unitDefID, teamID)
 	if growUnit[unitID] then
 		UpdateUnitGrow(unitID, 1)
@@ -211,6 +243,8 @@ function gadget:GameFrame(f)
 end
 
 function gadget:Initialize()
+	GG.OverrideMidAndAimPos = OverrideMidAndAimPos
+	
 	for _, unitID in ipairs(Spring.GetAllUnits()) do
 		local unitDefID = Spring.GetUnitDefID(unitID)
 		gadget:UnitCreated(unitID, unitDefID)

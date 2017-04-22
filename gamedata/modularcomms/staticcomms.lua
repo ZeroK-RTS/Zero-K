@@ -1,7 +1,7 @@
-local comms = {
+local commsCampaign = {
   -- singleplayer
   comm_mission_tutorial1 = {
-    chassis = "armcom3",
+    chassis = "cremcom3",
     name = "Tutorial Commander",
     modules = { "commweapon_beamlaser", "module_autorepair", "module_autorepair"},
   },  
@@ -9,104 +9,58 @@ local comms = {
   comm_campaign_ada = {
     chassis = "cremcom2",
     name = "Ada's Commander",
-    description = "Relic Commander, Builds at 10 m/s",
-    helptext = "A special piloted commander unit from before the Fall, functioning well despite its age. Piloted by Captain Ada Caedmon, formerly of the 13th Imperial Auxiliary Cohort.",
-    modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Specjalna zalogowa jednostka dowodzenia sprzed Upadku, sprawna mimo wieku. Pilotem jest Kapitan Ada Caedmon z dawnej 13 Imperialnej Kohorty Wsparcia.",
-      },
-    },
+    -- comm module list should be empty/nil to avoid funny stuff when merging with misson's module table
+    --modules = { "commweapon_beamlaser", "module_ablative_armor", "module_autorepair", "module_high_power_servos"},
   },
   
   comm_campaign_promethean = {
     chassis = "commrecon2",
     name = "The Promethean",
-    helptext = "Founder of the Free Machines and creator of the Firebrand virus, a calm, philosophical AI fighting for the freedom of robotkind. A burning spirit.",
-    modules = { "commweapon_heatray", "module_ablative_armor", "module_ablative_armor", "weaponmod_plasma_containment", "module_autorepair" },
+    --modules = { "commweapon_heatray", "module_ablative_armor", "module_ablative_armor", "weaponmod_plasma_containment", "module_autorepair" },
     decorations = {"skin_recon_red"},
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Zalozyciel Wolnych Maszyn i tworca wirusa Zarzewie; spokojna, filozoficzna sztuczna inteligencja walczaca za wolnosc robotow. Plonie zadza walki.",
-      },
-    },
   },
   
   comm_campaign_freemachine = {
-    chassis = "corcom2",
+    chassis = "commstrike2",
     name = "Libertas Machina",
-    helptext = "The Promethean's top lieutenant, a revolutionary commited to the cause of machine liberation. Loaded for bear and well armored; not to be taken lightly.",
-    modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Najbardziej zaufany porucznik Prometheana, rewolucjonista oddany sprawie wyzwolenia maszyn. Uzbrojony po zeby i dobrze opancerzony - nie mozna go lekcewazyc.",
-      },
-    },
+    --modules = { "commweapon_riotcannon", "module_ablative_armor", "module_ablative_armor", "module_adv_targeting", "module_autorepair" },
   },
   
   comm_campaign_odin = {
     chassis = "commrecon2",
     name = "Odin",
-    helptext = "The leader of the Valhallans, a warrior built and bred who lives for the glory of battle. An extremely ruthless foe.",
-    modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos", "module_autorepair", "module_companion_drone"},
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Lider Valhallan, wojownik z krwi i kosci, ktory zyje dla chwaly bitwy. Nie ma skrupulow.",
-      },
-    },
+    --modules = { "commweapon_lparticlebeam", "module_ablative_armor", "module_ablative_armor", "module_high_power_servos", "module_autorepair", "module_companion_drone"},
   },
 
   comm_campaign_biovizier = {
     chassis = "commsupport2",
     name = "The Biovizier",
-    helptext = "AI keeper of the Dynasty's genetic vaults and master geneticist. Cold and calculating.",
-    modules = { "commweapon_gaussrifle", "module_ablative_armor", "weaponmod_railaccel", "module_autorepair", "module_autorepair" },
+    --modules = { "commweapon_gaussrifle", "module_ablative_armor", "weaponmod_railaccel", "module_autorepair", "module_autorepair" },
     decorations = { "skin_support_green" },
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Sztuczna inteligencja sprawujaca piecze nad kryptami przechowujacymi dane genetyczne Dynastii. Zimna i przebiegla.",
-      },
-    },
   },
   
   comm_campaign_isonade = {
     chassis = "benzcom2",	-- TODO get a properly organic model
     name = "Lord Isonade",
-    helptext = "One of the ubermenschen nobles of the Dynasty, an ambitious warlord who seeks to establish himself as master of the galaxy. A horribly mutated beast.",
-    modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
+    --modules = { "commweapon_sonicgun", "module_heavy_armor", "module_dmg_booster", "module_autorepair", "module_autorepair" },
     decorations = { "skin_bombard_steel" },
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Jeden z lordow-nadludzi Dynastii - ambitny wojownik, ktory ma zamiar przejac wladze nad galaktyka. Bestia zmutowana nie do poznania.",
-      },
-    },
   },
 
   comm_campaign_legion = {
-    chassis = "corcom2",
+    chassis = "commstrike2",
     name = "Legate Fidus",
-    helptext = "Commander of the Imperial Vanguard Legion, enforcers of the Emperor's will.  A loyal, steadfast soldier.",
-    modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
+    --modules = { "commweapon_shotgun", "module_heavy_armor", "weaponmod_autoflechette", "module_adv_targeting", "module_autorepair"},
     --decorations = { "skin_battle_tiger" },
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Dowodca Imperialnego Legionu Strazniczego, ktory wykonuje wole Imperatora. Wierny i niezlomny zolnierz.",
-      },
-    },
   },  
     
   comm_campaign_praetorian = {
     chassis = "benzcom2",
     name = "Scipio Astra",
-    helptext = "Prefect of the elite Praetorian Guard, the Empire's paladins. A fanatic adherent of the Emperor's cult, purging heretics with massive firepower.",
-    modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
-    miscDefs = {
-      customparams = {
-        helptext_pl = "Prefekt Strazy Pretorianskiej, paladynow Imperium. Fanatyczna wyznawczyni kultu Imperatora, ktora oczyszcza heretykow ogromna sila ognia.",
-      },
-    },
+    --modules = { "commweapon_assaultcannon", "module_heavy_armor", "weaponmod_high_caliber_barrel", "module_adv_targeting", "module_autorepair"},
   },
+}
   
+local comms = {    
   -- Not Hax
   comm_riot_cai = {
     chassis = "corcom1",
@@ -217,10 +171,18 @@ local comms = {
   },  
 }
 
+for name, data in pairs(commsCampaign) do
+  data.miscDefs = data.miscDefs or {}
+  data.miscDefs.customparams = data.miscDefs.customparams or {}
+  data.miscDefs.customparams.statsname = name;
+  data.miscDefs.reclaimable = false
+  data.miscDefs.canSelfDestruct = false
+  comms[name] = data
+end
+
 --------------------------------------------------------------------------------------
 -- Dynamic Commander Clone Generation
 --------------------------------------------------------------------------------------
-
 local powerAtLevel = {2000, 3000, 4000, 5000, 6000}
 
 local function MakeClones(levelLimits, moduleNames, fullChassisName, unitName, power, modules, moduleType)
@@ -255,23 +217,28 @@ end
 -- Must match dynamic_comm_defs.lua around line 800 (top of the chassis defs)
 --------------------------------------------------------------------------------------
 MakeCommanderChassisClones("dynrecon", 
-	{{1, 0}, {3, 1}, {5, 1}, {8, 1}, {8, 1}}, 
-	{"module_dmg_booster", "module_personal_shield"}
+	{{0}, {1}, {1}, {1}, {1}}, 
+	{"module_personal_shield"}
 )
 
 MakeCommanderChassisClones("dynsupport",
-	{{1, 0, 0, 0}, {3, 1, 0, 1}, {5, 1, 1, 1}, {8, 1, 1, 1}, {8, 1, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield", "module_resurrect"}
+	{{0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+	{"module_personal_shield", "module_areashield", "module_resurrect"}
 )
 
 MakeCommanderChassisClones("dynassault", 
-	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
+	{"module_personal_shield", "module_areashield"}
 )
 
 MakeCommanderChassisClones("dynstrike", 
-	{{1, 0, 0}, {3, 1, 0}, {5, 1, 1}, {8, 1, 1}, {8, 1, 1}},
-	{"module_dmg_booster", "module_personal_shield", "module_areashield"}
+	{{0, 0}, {1, 0}, {1, 1}, {1, 1}, {1, 1}},
+	{"module_personal_shield", "module_areashield"}
+)
+
+MakeCommanderChassisClones("dynknight", 
+	{{0, 0, 0}, {1, 0, 1}, {1, 1, 1}, {1, 1, 1}, {1, 1, 1}},
+	{"module_personal_shield", "module_areashield", "module_resurrect"}
 )
 
 --[[

@@ -1,15 +1,13 @@
 unitDef = {
   unitname            = [[slowmort]],
   name                = [[Moderator]],
-  description         = [[Distruptor Skirmisher Walker]],
+  description         = [[Disruptor Skirmisher Walker]],
   acceleration        = 0.2,
   activateWhenBuilt   = true,
-  brakeRate           = 0.2,
-  buildCostEnergy     = 240,
+  brakeRate           = 0.6,
   buildCostMetal      = 240,
   builder             = false,
   buildPic            = [[slowmort.png]],
-  buildTime           = 240,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -19,10 +17,8 @@ unitDef = {
 
   customParams        = {
     description_de = [[Kurzstrahl Roboter]],
-    description_pl = [[Robot spowalniajacy]],
     helptext       = [[The Moderator's disruptor beam reduces enemy speed and rate of fire by up to 50% in addition to dealing damage, making it effective against almost all targets.]],
     helptext_de    = [[Seine verlangsamender Strahl reduziert die Geschwindigkeit feindlicher Einheiten und die Feuerrate um bis zu 50%, deshalb sind sie effektiv gegen fast alle Ziele.]],
-    helptext_pl    = [[Promien spowalniajacy Moderatora oprocz zadawania obrazen zmniejsza predkosc ruchu i ataku trafionych jednostek maksymalnie dwukrotnie, dzieki czemu jest pomocny w walce z kazdym przeciwnikiem.]],
   },
 
   explodeAs           = [[BIG_UNITEX]],
@@ -32,7 +28,6 @@ unitDef = {
   idleAutoHeal        = 5,
   idleTime            = 1800,
   leaveTracks         = true,
-  mass                = 164,
   maxDamage           = 450,
   maxSlope            = 36,
   maxVelocity         = 1.9,
@@ -44,7 +39,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB UNARMED]],
   objectName          = [[CORMORT.s3o]],
   script              = [[slowmort.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -55,8 +49,7 @@ unitDef = {
 
   },
 
-  sightDistance       = 660,
-  smoothAnim          = true,
+  sightDistance       = 473,
   trackOffset         = 0,
   trackStrength       = 8,
   trackStretch        = 0.8,
@@ -83,7 +76,7 @@ unitDef = {
     name                    = [[Disruptor Pulse Beam]],
 	  areaOfEffect            = 32,
 	  beamdecay               = 0.9,
-	  beamTime                = 0.03,
+	  beamTime                = 1/30,
 	  beamttl                 = 50,
 	  coreThickness           = 0.25,
 	  craterBoost             = 0,
@@ -218,41 +211,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD  = {
-      description      = [[Wreckage - Moderator]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 450,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 96,
-      object           = [[CORMORT_DEAD.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 96,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
+      object           = [[cormort_dead_no_gun.s3o]],
     },
 
 
     HEAP  = {
-      description = [[Debris - Moderator]],
       blocking    = false,
-      category    = [[heaps]],
-      damage      = 450,
-      energy      = 0,
       footprintX  = 2,
       footprintZ  = 2,
-      height      = [[4]],
-      hitdensity  = [[100]],
-      metal       = 48,
       object      = [[debris2x2a.s3o]],
-      reclaimable = true,
-      reclaimTime = 48,
-      world       = [[All Worlds]],
     },
 
   },

@@ -3,7 +3,6 @@ unitDef = {
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
   acceleration                  = 0,
-  buildCostEnergy               = 400,
   buildCostMetal                = 400,
   builder                       = false,
   buildingGroundDecalDecaySpeed = 30,
@@ -11,23 +10,19 @@ unitDef = {
   buildingGroundDecalSizeY      = 5,
   buildingGroundDecalType       = [[armpb_aoplane.dds]],
   buildPic                      = [[ARMPB.png]],
-  buildTime                     = 400,
   canAttack                     = true,
   canMove                       = false,
   canstop                       = [[1]],
   category                      = [[SINK TURRET]],
-  collisionVolumeOffsets        = [[0 0 0]],
-  collisionVolumeScales         = [[28 80 28]],
-  collisionVolumeTest           = 1,
+  collisionVolumeOffsets        = [[0 20 0]],
+  collisionVolumeScales         = [[28 40 28]],
   collisionVolumeType           = [[CylY]],
   corpse                        = [[DEAD]],
 
   customParams                  = {
     description_de = [[Versteckter Gaussturm]],
-    description_pl = [[Dzialo Gaussa]],
     helptext       = [[The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets.]],
     helptext_de	   = [[Der Gauss ist ein kompakter Turm mit einem Gausswerfer mittleren Bereichs. Wenn er sich in seine Panzerung zurückgezogen hat, ist es viermal schwerer ihn zu zerstören, was ihn effektive gegen gegnerische Artillerie macht. Es kann auch U-Booten schiessen.]],
-    helptext_pl	   = [[Dzialo Gaussa to wszechstronna wiezyczka, ktora otrzymuje tylko cwierc obrazen, gdy sama nie prowadzi ostrzalu. Jest w stanie atakowac cele podwodne.]],
     modelradius    = [[15]],
 	aimposoffset   = [[0 25 0]],
     armored_regen  = [[20]],
@@ -41,7 +36,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 252,
   maxDamage                     = 3000,
   maxSlope                      = 18,
   maxVelocity                   = 0,
@@ -49,9 +43,8 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[gauss_91.dae]],
+  objectName                    = [[gauss.dae]],
   script                 		= [[armpb.lua]],
-  seismicSignature              = 16,
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  
   sfxtypes               = {
@@ -61,8 +54,12 @@ unitDef = {
   }, 
 
   sightDistance                 = 660,
-  smoothAnim                    = true,
   useBuildingGroundDecal        = true,
+  yardmap                       = [[ooooooooo]],
+  buildingGroundDecalDecaySpeed = 30,
+  buildingGroundDecalSizeX      = 4,
+  buildingGroundDecalSizeY      = 4,
+  buildingGroundDecalType       = [[gauss_aoplate.dds]],
 
   weapons                       = {
 
@@ -129,37 +126,19 @@ unitDef = {
   featureDefs                   = {
 
     DEAD  = {
-      description      = [[Wreckage - Gauss]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 3000,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[15]],
-      hitdensity       = [[100]],
-      metal            = 160,
       object           = [[gauss_91_dead1.dae]],
-      reclaimable      = true,
-      reclaimTime      = 160,
     },
 
 
     HEAP  = {
-      description      = [[Debris - Gauss]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 3000,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 80,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 80,
     },
 
   },

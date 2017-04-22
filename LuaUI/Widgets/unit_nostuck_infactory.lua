@@ -35,12 +35,12 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 				if ( firstCommand.id < 0 ) and (not firstCommand.params[1] ) then --if build-unit-command (which can be accidentally given when you use Chili Integral Menu)
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
 							{CMD.REMOVE, {firstCommand.tag}, {}}, --remove build-unit command since its only valid for factory & it prevent idle status from being called for regular unit (it disturb other widget's logic)
-							{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
+							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
 							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, --stop unit at end of move command (else it will return to original position).
 							})--insert move-stop command behind existing command
 				else	
 					Spring.GiveOrderArrayToUnitArray( {unitID},{
-							{CMD.INSERT, {0, CMD.MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
+							{CMD.INSERT, {0, CMD_RAW_MOVE, CMD.OPT_INTERNAL, x+dx, y, z+dz}, {"alt"}},   
 							{CMD.INSERT, {1, CMD.STOP, CMD.OPT_INTERNAL,}, {"alt"}}, 
 							})
 					--Spring.Echo(CMD[firstCommand.id])
@@ -51,7 +51,7 @@ function widget:UnitFromFactory(unitID, unitDefID, unitTeam, factID, factDefID, 
 			local x,y,z = Spring.GetUnitPosition(unitID)
 			dx = dx*100
 			dz = dz*100
-			Spring.GiveOrderToUnit( unitID, CMD.MOVE, {x+dx, y, z+dz}, {})
+			Spring.GiveOrderToUnit( unitID, CMD_RAW_MOVE, {x+dx, y, z+dz}, {})
 		end
 		------
 	end

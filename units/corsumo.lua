@@ -4,12 +4,10 @@ unitDef = {
   description         = [[Heavy Riot Jumper - On to Repulse, Off to Attract]],
   acceleration        = 0.1,
   activateWhenBuilt   = true,
-  brakeRate           = 0.1,
-  buildCostEnergy     = 1700,
+  brakeRate           = 0.3,
   buildCostMetal      = 1700,
   builder             = false,
   buildPic            = [[CORSUMO.png]],
-  buildTime           = 1700,
   canAttack           = true,
   canGuard            = true,
   canMove             = true,
@@ -17,7 +15,6 @@ unitDef = {
   category            = [[LAND]],
   collisionVolumeOffsets  = [[0 0 0]],
   collisionVolumeScales   = [[64 64 64]],
-  collisionVolumeTest	  = 1,
   collisionVolumeType	  = [[ellipsoid]],
   corpse              = [[DEAD]],
 
@@ -31,15 +28,11 @@ unitDef = {
     jump_from_midair   = 0,
     jump_rotate_midair = 0,
 
-    --description_bp = [[Robô dispersador]],
     description_fr = [[Robot Émeutier]],
     description_de = [[Springender Sturm Roboter]],
-    description_pl = [[Ciezki robot szturmowy]],
     helptext       = [[The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings.]],
-    --helptext_bp    = [[O raio de calor do Sumo é muito poderoso a curto alcançe, mas se dissipa com a distância e é bem mais fraca de longe. A velocidade alta de disparo o torna ideal para lutar contra grandes grupos de unidades baratas. ]],
     --helptext_fr    = [[Le rayon r chaleur du Sumo est capable de délivrer une puissance de feu important sur un point précis. Plus la cible est proche, plus les dégâts seront importants. La précision du rayon est idéale pour lutter contre de larges vagues d'ennemis, mais l'imposant blindage du Sumo le restreint r une vitesse réduite.]],
 	--helptext_de    = [[Der Sumo nutzt seinen mächtigen Heat Ray in nächster Nähe, auf größerer Entfernung aber verliert er entsprechend an Feuerkraft. Er eignet sich ideal, um größere Gruppen von billigen, feindlichen Einheiten zu vernichten. Bemerkenswert ist, dass der Sumo in die Luft springen kann und schließlich auf feindlichen Einheiten landet, was diesen enormen Schaden zufügt.]],
-	helptext_pl    = [[Sumo posiada imponujaca wytrzymalosc i podwojne promienie grawitacyjne, ktore moga przyciagac lub odpychac inne jednostki. Moze rowniez skakac, co w polaczeniu z jego duza masa pozwala mu zgniatac wrogie jednostki, skaczac na nie.]],
 	aimposoffset   = [[0 6 0]],
 	midposoffset   = [[0 6 0]],
 	modelradius    = [[32]],
@@ -53,7 +46,6 @@ unitDef = {
   idleTime            = 1800,
   leaveTracks         = true,
   losEmitHeight       = 60,
-  mass                = 621,
   maxDamage           = 13500,
   maxSlope            = 36,
   maxVelocity         = 1.15,
@@ -65,7 +57,6 @@ unitDef = {
   objectName          = [[m-9.s3o]],
   onoffable           = true,
   script              = [[corsumo.lua]],
-  seismicSignature    = 4,
   selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {
@@ -76,8 +67,6 @@ unitDef = {
     },
 
   },
-
-  side                = [[CORE]],
   sightDistance       = 480,
   trackOffset         = 0,
   trackStrength       = 8,
@@ -188,7 +177,7 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams            = {
-	    impulse = [[-125]],
+	    impulse = [[-150]],
 		
 		light_color = [[0.33 0.33 1.28]],
 		light_radius = 140,
@@ -218,7 +207,6 @@ unitDef = {
       thickness               = 4,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2200,
     },
@@ -235,10 +223,12 @@ unitDef = {
       craterMult              = 0,
 
 	  customParams            = {
-	    impulse = [[125]],
+	    impulse = [[150]],
 		
 		light_color = [[0.85 0.2 0.2]],
 		light_radius = 140,
+		light_beam_mult_frames = 9,
+		light_beam_mult = 8,
 	  },
 	  
       damage                  = {
@@ -265,7 +255,6 @@ unitDef = {
       thickness               = 4,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.1,
       weaponType              = [[LaserCannon]],
       weaponVelocity          = 2200,
     },
@@ -274,7 +263,6 @@ unitDef = {
       name                    = [[Heat Ray]],
       accuracy                = 512,
       areaOfEffect            = 20,
-      cegTag                  = [[HEATRAY_CEG]],
       coreThickness           = 0.5,
       craterBoost             = 0,
       craterMult              = 0,
@@ -312,7 +300,7 @@ unitDef = {
     PARTICLEBEAM = {
       name                    = [[Auto Particle Beam]],
       beamDecay               = 0.85,
-      beamTime                = 0.01,
+      beamTime                = 1/30,
       beamttl                 = 45,
       coreThickness           = 0.5,
       craterBoost             = 0,
@@ -345,7 +333,7 @@ unitDef = {
       name                    = [[Disruptor Pulse Beam]],
       areaOfEffect            = 24,
       beamdecay               = 0.9,
-      beamTime                = 0.03,
+      beamTime                = 1/30,
       beamttl                 = 50,
       coreThickness           = 0.25,
       craterBoost             = 0,
@@ -426,43 +414,19 @@ unitDef = {
   featureDefs         = {
 
     DEAD = {
-      description      = [[Wreckage - Sumo]],
       blocking         = true,
-      category         = [[corpses]],
-      damage           = 13500,
-      energy           = 0,
       featureDead      = [[HEAP]],
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[20]],
-      hitdensity       = [[100]],
-      metal            = 680,
       object           = [[m-9_wreck.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 680,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
 
     HEAP = {
-      description      = [[Debris - Sumo]],
       blocking         = false,
-      category         = [[heaps]],
-      damage           = 13500,
-      energy           = 0,
-      featurereclamate = [[SMUDGE01]],
       footprintX       = 3,
       footprintZ       = 3,
-      height           = [[4]],
-      hitdensity       = [[100]],
-      metal            = 340,
       object           = [[debris3x3a.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 340,
-      seqnamereclamate = [[TREE1RECLAMATE]],
-      world            = [[All Worlds]],
     },
 
   },

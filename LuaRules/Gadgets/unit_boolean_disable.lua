@@ -62,6 +62,11 @@ local paraUnitID = {}
 -- table[unitID] = {frameID = x, index = y}
 -- stores current frame and index of unitID in their respective tables
 
+local weaponCount = {}
+for udid, ud in pairs(UnitDefs) do
+	weaponCount[udid] = #ud.weapons
+end
+
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 
@@ -70,12 +75,20 @@ local f = 0 -- frame, set in game frame
 local function applyEffect(unitID)
 	Spring.SetUnitRulesParam(unitID, "disarmed", 1, LOS_ACCESS)
 	GG.UpdateUnitAttributes(unitID)
-	GG.ScriptNotifyDisarmed(unitID)
+	GG.ScriptNotifyDisarmed(unitID, true)
 end
 
 local function removeEffect(unitID)
 	Spring.SetUnitRulesParam(unitID, "disarmed", 0, LOS_ACCESS)
 	GG.UpdateUnitAttributes(unitID)
+	GG.ScriptNotifyDisarmed(unitID, false)
+end
+
+local function HaltBurst(unitID, untilFrame)
+	local unitDefID = Spring.GetUnitDefID(unitID)
+	for i = 1, weaponCount[unitDefID] do
+		Spring.SetUnitWeaponState (unitID, i, "nextSalvo", untilFrame)
+	end
 end
 
 local function addUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
@@ -84,6 +97,9 @@ local function addUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 	byFrame[frame].data[byFrame[frame].count] = unitID
 	byUnitID[unitID] = {frameID = frame, index = byFrame[frame].count}
 
+	if (extraParamFrames > 0) then
+		HaltBurst(unitID, frame)
+	end
 	Spring.SetUnitRulesParam(unitID, "disarmframe", frame + extraParamFrames, LOS_ACCESS)
 end
 
@@ -100,7 +116,10 @@ local function moveUnitID(unitID, byFrame, byUnitID, frame, extraParamFrames)
 	byFrame[frame].count = byFrame[frame].count + 1
 	byFrame[frame].data[ byFrame[frame].count] = unitID
 	byUnitID[unitID] = {frameID = frame, index = byFrame[frame].count}
-	
+
+	if (extraParamFrames > 0) then
+		HaltBurst(unitID, frame)
+	end
 	Spring.SetUnitRulesParam(unitID, "disarmframe", frame + extraParamFrames, LOS_ACCESS)
 end
 

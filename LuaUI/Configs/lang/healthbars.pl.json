@@ -1,6 +1,6 @@
 {
 	"shield" : "tarcza",
-	"health" : "życie",
+	"health_bar" : "życie",
 	"building" : "budowa",
 	"morph" : "ulepszenie",
 	"stockpile" : "amunicja",

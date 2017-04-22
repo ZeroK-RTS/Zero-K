@@ -362,7 +362,7 @@ function AirJet:Visible()
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
 	if ux then
       posX,posY,posZ = posX+ux,posY+uy,posZ+uz
-      radius = radius + spGetUnitRadius(self.unit)
+      radius = radius + (spGetUnitRadius(self.unit) or 30)
 	end
   end
   if (losState==nil) then

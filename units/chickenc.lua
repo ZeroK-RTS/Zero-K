@@ -18,11 +18,9 @@ unitDef = {
   customParams        = {
     description_fr = [[Anti ?meute tout terrain]],
 	description_de = [[Geländegängige Rioteinheit]],
-	description_pl = [[Wsparcie terenowe]],
     helptext       = [[The Basilisk climbs walls like a spider to surprise the enemy with its highly acidic spit. Only a vigilant watch keeps these critters from sauntering over hills to wreck your base from unexpected directions. Gunships are the best solution to Basilisk incursions.]],
     helptext_fr    = [[Le Basilisk grimpe le long des murs comme un l?zard pour surprend l'enemi avec ses attaques hautement corrosives. Seule une surveillance de tout les instants peut emp?cher ces bestioles d'arriver des chemins cru inpassables. Les VTOLs sont la meilleure r?ponse ? offrir aux incursions de Basilisks.]],
 	helptext_de    = [[Der Basilisk erklettert Wände wie eine Spinne und kann somit den Gegner mit seiner hoch ätzenden Spucke überraschen. Nur ein wachsames Auge hält diese Viecher von deiner Basis fern. Kampfhubschrauber sind die beste Lösung gegen die Basiliskeneinfälle.]],
-	helptext_pl    = [[Basilisk moze wspinac sie po scianach, by niespodzianie zaatakowac kwasem. Do obrony przed nimi nalezy przede wszystkim miec sie na bacznosci; znalezione Basiliski mozna szybko zniszczyc statkami powietrznymi.]],
   },
 
   explodeAs           = [[NOWEAPON]],
@@ -32,7 +30,6 @@ unitDef = {
   idleAutoHeal        = 20,
   idleTime            = 300,
   leaveTracks         = true,
-  mass                = 256,
   maxDamage           = 1800,
   maxSlope            = 72,
   maxVelocity         = 2.2,
@@ -43,7 +40,6 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB STUPIDTARGET]],
   objectName          = [[chickenc.s3o]],
   power               = 520,
-  seismicSignature    = 4,
   selfDestructAs      = [[NOWEAPON]],
 
   sfxtypes            = {
@@ -55,10 +51,7 @@ unitDef = {
     },
 
   },
-
-  side                = [[THUNDERBIRDS]],
   sightDistance       = 512,
-  smoothAnim          = true,
   sonarDistance       = 450,
   trackOffset         = 0.5,
   trackStrength       = 9,
@@ -114,7 +107,6 @@ unitDef = {
       sprayAngle              = 1024,
       tolerance               = 5000,
       turret                  = true,
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 400,
     },

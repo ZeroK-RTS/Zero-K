@@ -22,7 +22,7 @@ local icontypes = {
     size=0,
     radiusadjust=0,
   },
-
+  
 -- commanders
   commander0 = {
     bitmap='icons/armcommander.dds',
@@ -813,6 +813,54 @@ local icontypes = {
     bitmap='icons/supergunship.dds',
     size=2.8,
   },
+  gunshipscout = {
+    bitmap='icons/gunshipscout.png',
+    size=1.5,
+  },
+  gunshipspecial = {
+    bitmap='icons/gunshipspecial.png',
+    size=1.5,
+  },
+  gunshipraider = {
+    bitmap='icons/gunshipraider.png',
+    size=2,
+  },
+  gunshipskirm = {
+    bitmap='icons/gunshipskirm.png',
+    size=2,
+  },
+  gunshipriot = {
+    bitmap='icons/gunshipriot.png',
+    size=4,
+  },
+  gunshipassault = {
+    bitmap='icons/gunshipassault.png',
+    size=2.4,
+  },
+  gunshiparty = {
+    bitmap='icons/gunshiparty.png',
+    size=2.4,
+  },
+  gunshiptransport = {
+    bitmap='icons/gunshiptransport.png',
+    size=2,
+  },
+  gunshiptransport_large = {
+    bitmap='icons/gunshiptransport.png',
+    size=3.2,
+  },
+  heavygunshipskirm = {
+    bitmap='icons/heavygunshipskirm.png',
+    size=2.4,
+  },
+  heavygunshiptransport = {
+    bitmap='icons/heavygunshiptransport.png',
+    size=2.4,
+  },
+  heavygunshipassault = {
+    bitmap='icons/heavygunshipassault.png',
+    size=2.4,
+  },
   nebula = {
     bitmap='icons/nebula.dds',
     size=4,
@@ -843,58 +891,58 @@ local icontypes = {
   },
 
   --ship icons
-  scoutboat = {
-    bitmap='icons/scoutboat.dds',
+  shipcon = {
+    bitmap='icons/shipcon.dds',
     size=2.2,
   },
-  corvette = {
-    bitmap='icons/corvette.dds',
+  shipscout = {
+    bitmap='icons/shipscout.dds',
+    size=2.2,
+  },
+  shipskirm = {
+    bitmap='icons/shipskirm.dds',
     size=2.8,
   },
-  hunter = {
-    bitmap='icons/hunter.dds',
-    size=2.8,
+  shiptorpraider = {
+	bitmap='icons/shiptorpraider.dds',
+    size=2.2,
   },
-  vanquisher = {
-    bitmap='icons/vanquisher.dds',
-    size=3.2,
-  },
-  destroyer = {
-    bitmap='icons/destroyer.dds',
-    size=3.2,
-  },
-  aaship = {
-    bitmap='icons/aaship.dds',
-    size=2.9,
-  },
-  enforcer = {
-    bitmap='icons/enforcer.dds',
-    size=3.2,
-  },
-  submarine = {
-    bitmap='icons/submarine.dds',
+  subraider = {
+	bitmap='icons/subraider.dds',
     size=3.0,
   },
-  snipersub = {
-    bitmap='icons/snipersub.dds',
-    size=3.5,
+  shipriot = {
+    bitmap='icons/shipriot.dds',
+	size=2.8,
   },
-  missilesub = {
-    bitmap='icons/missilesub.dds',
-    size=4,
+  shipassault = {
+    bitmap='icons/shipassault.png',
+	size=2.8,
   },
-  battleship = {
-    bitmap='icons/battleship.dds',
-    size=4,
+  shiparty = {
+    bitmap='icons/shiparty.dds',
+	size=3.0,
   },
-  carrier = {
-    bitmap='icons/carrier.dds',
-    size=4,
+  shipaa = {
+    bitmap='icons/shipaa.dds',
+	size=3.0,
   },
   shiptransport = {
     bitmap='icons/shiptransport.dds',
     size=2.5,
-  },    
+  },   
+  shipheavyarty = {
+    bitmap='icons/shipheavyarty.dds',
+    size=4,
+  },
+  subtacmissile = {
+    bitmap='icons/subtacmissile.dds',
+    size=4,
+  },
+  shipcarrier = {
+    bitmap='icons/shipcarrier.dds',
+    size=4,
+  },  
 
   --icon for energy buildings of various tiers, including pylon
   energy_med = {
@@ -963,7 +1011,11 @@ local icontypes = {
     bitmap='icons/mahlazer.dds',
     size=3.0,
   },
-
+  -- Starlight satellite
+  satellite = {
+    bitmap = 'icons/satellite.png',
+    size = 3.0,
+  },
   special = {
     bitmap='icons/special.dds',
     size=1.6,
@@ -1110,6 +1162,78 @@ local icontypes = {
   chickenq = { 
     bitmap='icons/chickenq.dds', 
     size=5.0, 
+  },
+  
+  --planetwars 
+  pw_assault = {
+    bitmap='icons/pw_assault.png',
+	distance = 1.3,
+    size = 3.0,
+  },
+  pw_bomberfac = {
+    bitmap='icons/pw_bomberfac.png',
+	distance = 1.6,
+    size = 3.4,
+  },
+  pw_defense = {
+    bitmap='icons/pw_defense.png',
+	distance = 1.3,
+    size = 3.0,
+  },
+  pw_defense2 = {
+    bitmap='icons/pw_defense2.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_dropfac = {
+    bitmap='icons/pw_dropfac.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_energy = {
+    bitmap='icons/pw_energy.png',
+	distance = 1.2,
+    size = 2.7,
+  },
+  pw_energy2 = {
+    bitmap='icons/pw_energy2.png',
+	distance = 1.6,
+    size = 3.2,
+  },
+  pw_interception = {
+    bitmap='icons/pw_interception.png',
+	distance = 1.2,
+    size = 3.0,
+  },
+  pw_jammer = {
+    bitmap='icons/pw_jammer.png',
+	distance = 1.0,
+    size = 3.0,
+  },
+  pw_riot = {
+    bitmap='icons/pw_riot.png',
+	distance = 1.0,
+    size = 3.0,
+  },
+  pw_special = {
+    bitmap='icons/pw_special.png',
+	distance = 1.0,
+    size = 2.7,
+  },
+  pw_warpgate = {
+    bitmap='icons/pw_warpgate.png',
+	distance = 1.6,
+    size = 3.0,
+  },
+  pw_wormhole = {
+    bitmap='icons/pw_wormhole.png',
+	distance = 1.0,
+    size = 2.7,
+  },
+  pw_wormhole2 = {
+    bitmap='icons/pw_wormhole2.png',
+	distance = 1.0,
+    size = 3.0,
   },
 }
 

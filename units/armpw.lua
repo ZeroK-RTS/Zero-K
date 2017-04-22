@@ -4,10 +4,8 @@ unitDef = {
   description            = [[Light Raider Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.4,
-  buildCostEnergy        = 65,
-  buildCostMetal         = 65,
+  buildCostMetal         = 60,
   buildPic               = [[armpw.png]],
-  buildTime              = 65,
   canAttack              = true,
   canGuard               = true,
   canMove                = true,
@@ -20,22 +18,12 @@ unitDef = {
   corpse                 = [[DEAD]],
 
   customParams           = {
-    description_bp = [[Robô agressor]],
-    description_es = [[Robot de invasi?n]],
-    description_fi = [[Hy?kk??j?robotti]],
     description_fr = [[Robot Pilleur]],
-    description_it = [[Robot d'invasione]],
-    description_pl = [[Lekki bot]],
 	description_de = [[Leichter Raider Roboter]],
     helptext       = [[Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmanouver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat.]],
-    helptext_bp    = [[Glaive é um leve e barato robô agressor. Embora vo?e possa faze-lo em dezenas, ele morre igualmente rápido, e raramente é muito útil contra oposiç?o séria. Defenda-se dele com Torres de laser leves ou unidades dispersadoras.]],
-    helptext_es    = [[Ligero y barato, el Glaive puede ser construido a docenas, pero muere r?pidamente y raramente es ?til contra enemigos serios.  Se contrastan con unidades de alboroto y llt.]],
-    helptext_fi    = [[Kevytt?, nopeaa ja halpaa Glaivea pystyy nopeasti rakentamaan suuren joukon, mutta se my?s kuolee nopeasti vastustusta kohdatessaan. Torju mellakkayksik?ill? tai kevyill? laaseritorneilla.]],
     helptext_fr    = [[L?ger et peut couteux, le Glaive peut ?tre produit en masse , mais meurt tres rapidement et n'offre aucune r?sistance face ? des opposants s?rieux. A contrer avec des ?meutiers ou des LLTs]],
-    helptext_it    = [[Leggero ed economico, il Glave pu? essere costruito a dozzina, ma muore velocemente ed e raramente utile contro nemici seri. Si contrastano con unita da rissa ed llt.]],
-    helptext_pl    = [[Glaive jest lekki, tani i szybki. Moze byc budowany w duzych ilosciach, ale ginie bardzo szybko w kontakcie z podstawowymi nawet jednostkami obronnymi. Po wyjsciu z walki uszkodzony Glaive samoczynnie naprawi sie.]],
 	helptext_de    = [[Leicht und billig, der Glaive kann in Massen gebaut werden, stirbt aber genauso schnell und ist kaum von Nützlichkeit gegen ernsthafte Gegenwehr. Mit Riot Einheiten oder leichten Lasertürmen kontern.]],
-	modelradius    = [[9]],
+	modelradius    = [[17]],
   },
 
   explodeAs              = [[SMALL_UNITEX]],
@@ -47,7 +35,7 @@ unitDef = {
   leaveTracks            = true,
   maxDamage              = 200,
   maxSlope               = 36,
-  maxVelocity            = 3.8,
+  maxVelocity            = 3.9,
   maxWaterDepth          = 22,
   minCloakDistance       = 75,
   movementClass          = [[KBOT2]],
@@ -55,7 +43,6 @@ unitDef = {
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherebot.s3o]],
   script                 = [[armpw.lua]],
-  seismicSignature       = 4,
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -138,30 +125,18 @@ unitDef = {
   featureDefs            = {
 
     DEAD  = {
-      description      = [[Wreckage - Glaive]],
       blocking         = false,
-      damage           = 200,
-      energy           = 0,
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 26,
       object           = [[spherebot_dead.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 26,
     },
 
     HEAP  = {
-      description      = [[Debris - Glaive]],
       blocking         = false,
-      damage           = 200,
-      energy           = 0,
       footprintX       = 2,
       footprintZ       = 2,
-      metal            = 13,
       object           = [[debris2x2b.s3o]],
-      reclaimable      = true,
-      reclaimTime      = 13,
     },
 
   },

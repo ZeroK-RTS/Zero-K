@@ -19,17 +19,14 @@ unitDef = {
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 48 0]],
   collisionVolumeScales         = [[58 176 58]],
-  collisionVolumeTest           = 1,
   collisionVolumeType           = [[CylY]],
 
   customParams                  = {
     description_fr = [[Artillerie statique]],
 	description_de = [[Stationäre Artillerie]],
-	description_pl = [[Artyleria stacjonarna]],
     helptext       = [[Long range static artillery.]],
     helptext_fr    = [[La terreur verte projette des amas commpos?s de d'acides corrosifs et de germes sur de tr?s longues distances.]],
 	helptext_de    = [[Weitreichende, stationäre Artillerie.]],
-	helptext_pl    = [[Dalekosiezna stacjonarna artyleria. Delikatna i bezbronna w bezposredniej walce.]],
   },
 
   energyMake                    = 0,
@@ -42,7 +39,6 @@ unitDef = {
   idleAutoHeal                  = 5,
   idleTime                      = 1800,
   levelGround                   = false,
-  mass                          = 344,
   maxDamage                     = 1500,
   maxSlope                      = 36,
   maxVelocity                   = 0,
@@ -52,7 +48,6 @@ unitDef = {
   objectName                    = [[spire.s3o]],
   onoffable                     = true,
   power                         = 2500,
-  seismicSignature              = 4,
   selfDestructAs                = [[NOWEAPON]],
 
   sfxtypes                      = {
@@ -64,10 +59,7 @@ unitDef = {
     },
 
   },
-
-  side                          = [[THUNDERBIRDS]],
   sightDistance                 = 512,
-  smoothAnim                    = true,
   turnRate                      = 0,
   upright                       = false,
   useBuildingGroundDecal        = true,
@@ -117,7 +109,6 @@ unitDef = {
       tolerance               = 5000,
       turret                  = true,
       waterweapon             = true,	  
-      weaponTimer             = 0.2,
       weaponType              = [[Cannon]],
       weaponVelocity          = 550,
     },  
