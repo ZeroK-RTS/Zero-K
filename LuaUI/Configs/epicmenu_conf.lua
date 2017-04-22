@@ -279,10 +279,6 @@ local cameraPath = 'Settings/Camera'
 		)
 	
 	ShButton(cameraPath, 'Flip the TA Camera', 'viewtaflip')
-	ShButton(cameraPath, 'Toggle Camera Shake', 'luaui togglewidget CameraShake')
-	ShButton(cameraPath, 'Toggle SmooothScroll', 'luaui togglewidget SmoothScroll')
-	ShButton(cameraPath, 'Toggle Smooth Camera', 'luaui togglewidget SmoothCam')
-	--ShButton(cameraPath, 'Toggle advanced COFC camera', 'luaui togglewidget Combo Overhead/Free Camera (experimental)' )
 
 local oldCameraPath = 'Settings/Camera/Old Camera Shortcuts'	
 	ShButton(oldCameraPath, 'Total Annihilation', 'viewta')
