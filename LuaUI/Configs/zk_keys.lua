@@ -163,7 +163,6 @@ return {
 		{	"screenshot jpg", "ctrl+f12"}, 
 		{	"movefast",	"Any+shift",},
 		{	"moveslow",	"Any+ctrl",},
-		{	"track",	"alt+t",},
 		{	"resurrect",	"t",},
 		{	"jump",	"j",},
 		{	"select AllMap++_ClearSelection_SelectAll+",	"ctrl+a",},
