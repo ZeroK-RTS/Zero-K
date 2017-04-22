@@ -969,16 +969,14 @@ local function MoveRotatedCam(cs, mxm, mym)
 end
 --]]
 
-local function CorrectTraceTargetToSmoothMesh(cs,x,y,z) --Returns true if it corrected anything, false if no changes
-	if cs.ry > 0 and options.smoothmeshscroll.value then --We couldn't tell Spring to trace to the smooth mesh point, so compensate with vector multiplication
-		local y_smooth = spGetSmoothMeshHeight(x, z) or 0
-		local correction_vector_scale = 1 - (cs.py - y_smooth)/(cs.py - y) --Since cs.ry > 0, cs.py > y. We want real ground to smooth ground proportion
-		local dx, dz = cs.px - x, cs.pz - z
-		y = y_smooth
-		x, z = x + dx * correction_vector_scale, z + dz * correction_vector_scale
-		return true, x, y, z
-	end
-	return false, x, y, z
+local function CorrectTraceTargetToSmoothMesh(cs,x,y,z)
+	--We couldn't tell Spring to trace to the smooth mesh point, so compensate with vector multiplication
+	local y_smooth = spGetSmoothMeshHeight(x, z) or 0
+	local correction_vector_scale = (cs.py - y_smooth)/(cs.py - y)
+	local dx, dz = cs.px - x, cs.pz - z
+	y = y_smooth
+	x, z = cs.px - dx * correction_vector_scale, cs.pz - dz * correction_vector_scale
+	return x, y, z
 end
 
 --Note: If the x,y is not pointing at an onmap point, this function traces a virtual ray to an
@@ -1072,9 +1070,8 @@ local function SetLockSpot2(cs, x, y, useSmoothMeshSetting) --set an anchor on t
 
 	local onmap, gx,gy,gz = VirtTraceRay(x, y, cs) --convert screen coordinate to ground coordinate
 
-
 	if useSmoothMeshSetting then
-		_, gx,gy,gz = CorrectTraceTargetToSmoothMesh(cs, gx,gy,gz)
+		gx,gy,gz = CorrectTraceTargetToSmoothMesh(cs, gx,gy,gz)
 	end
 	ComputeLockSpotParams(cs, gx, gy, gz, onmap)
 end
