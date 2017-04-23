@@ -17,7 +17,7 @@ VFS.Include("LuaRules/Configs/constants.lua")
 options_path = 'Settings/HUD Panels/Attrition Counter'
 options_order = {'updateFrequency'}
 options = {
-	updateFrequency = {
+	updateFrequency = { -- fixme: this setting should die and the counters should update if and only if needed
 		name = "Update every N Frames",
 		type = 'number',
 		min = 1,
@@ -52,6 +52,7 @@ local spectating = Spring.GetSpectatingState();
 
 local window_main
 local label_rate
+local global_command_button
 
 local label_self
 local label_other
@@ -250,6 +251,14 @@ end
 --------------- widget: functions
 ------------------------------------------------------------------------------------------------------------------------------------
 
+local function languageChanged ()
+	if global_command_button then
+		global_command_button.tooltip = WG.Translate("interface", "toggle_attrition_counter_name") .. "\n\n" .. WG.Translate("interface", "toggle_attrition_counter_desc")
+		global_command_button:Invalidate()
+	end
+	-- todo: translate the rest of the widget as well
+end
+
 function widget:Initialize()
 	Chili = WG.Chili; 
 	if (not Chili) then 
@@ -321,7 +330,8 @@ function widget:Initialize()
 	if not allyTeams[enemyAllyTeam].name:find("\n") then
 		label_other.y = label_other.y+18;
 	end
-	
+
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 
@@ -556,10 +566,10 @@ function CreateWindow()
 				window_main:SetVisibility(not window_main.visible)
 			end
 		end
-		WG.GlobalCommandBar.AddCommand("LuaUI/Images/AttritionCounter/Skull.png", "Toggle attrition counter.", ToggleWindow)
+		global_command_button = WG.GlobalCommandBar.AddCommand("LuaUI/Images/AttritionCounter/Skull.png", "", ToggleWindow)
 	end
+
 	
-	return
 end
 
 

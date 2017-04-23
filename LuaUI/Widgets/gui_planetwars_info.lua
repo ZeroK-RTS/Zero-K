@@ -50,6 +50,25 @@ end
 
 local flashState = true
 
+local global_button_evacuation
+local global_button_instructions
+local lbl_battle_instructions
+local lbl_planet
+
+local strings = {
+	evac_ready = "",
+	evac_charging = "",
+	evac_no_wormhole = "",
+	evac_wormhole_destroyed = "",
+	evac_nothing_to_evac = "",
+	evac_broken = "",
+	toggle_evacuation_name = "",
+	toggle_evacuation_desc = "",
+	toggle_pw_instructions_name = "",
+	toggle_pw_instructions_desc = "",
+	pw_battle_instructions = "",
+}
+
 local numCharges = -1
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
@@ -206,8 +225,8 @@ local function CreateTeleportWindow()
 	
 	local structureList = CreateStructureList(structureHolder)
 	
-	local function CheckEvacuationState()
-		if not evacuable then
+	local function CheckEvacuationState(forceUpdate)
+		if not evacuable and not forceUpdate then
 			return false
 		end
 		local evacuateState = Spring.GetGameRulesParam("pw_evacuable_state")
@@ -222,13 +241,13 @@ local function CreateTeleportWindow()
 		holderWindow:SetPos(nil, nil, nil, holderHeight - 32)
 		
 		if evacuateState == EVAC_STATE.NO_WORMHOLE then
-			teleportLabel:SetCaption("\255\128\128\128\No wormhole\008")
+			teleportLabel:SetCaption("\255\128\128\128" .. strings.evac_no_wormhole .. "\008")
 		elseif evacuateState == EVAC_STATE.NOTHING_TO_EVAC then
-			teleportLabel:SetCaption("\255\128\128\128\Nothing to evacuate\008")
+			teleportLabel:SetCaption("\255\128\128\128" .. strings.evac_nothing_to_evac .. "\008")
 		elseif evacuateState == EVAC_STATE.WORMHOLE_DESTROYED then
-			teleportLabel:SetCaption("\255\128\128\128\Wormhole destroyed\008")
+			teleportLabel:SetCaption("\255\128\128\128" .. strings.evac_wormhole_destroyed .. "\008")
 		else
-			teleportLabel:SetCaption("\255\128\128\128\Evacuation broken\008")
+			teleportLabel:SetCaption("\255\128\128\128" .. strings.evac_broken .. "\008")
 		end
 	end
 	
@@ -245,11 +264,10 @@ local function CreateTeleportWindow()
 		if numChargesNew ~= numCharges then
 			local text = ""
 			if (numChargesNew > 0) then
-				-- TODO: localize this
-				text = "\255\0\255\32\Evacuation ready\008"
+				text = "\255\0\255\32 " .. strings.evac_ready .. "\008"
 				teleportImage.color = {1,1,1,1}
 			else
-				text = "\255\128\128\128\Evacuation charging\008"
+				text = "\255\128\128\128" .. strings.evac_charging .. "\008"
 				teleportImage.color = {0.3, 0.3, 0.3, 1}
 			end
 			teleportLabel:SetCaption(text)
@@ -261,8 +279,8 @@ local function CreateTeleportWindow()
 	
 	local externalFunctions = {}
 	
-	function externalFunctions.Update()
-		if CheckEvacuationState() then
+	function externalFunctions.Update(force)
+		if CheckEvacuationState(force) then
 			UpdateBar()
 		end
 		if structureList then
@@ -278,7 +296,7 @@ local function CreateTeleportWindow()
 				holderWindow:SetVisibility(not holderWindow.visible)
 			end
 		end
-		WG.GlobalCommandBar.AddCommand("LuaUI/Images/commands/Bold/drop_beacon.png", "Toggle structure status and evacuation panel.", ToggleWindow)
+		global_button_evacuation = WG.GlobalCommandBar.AddCommand("LuaUI/Images/commands/Bold/drop_beacon.png", strings.toggle_evacuation_name .. "\n\n" .. strings.toggle_evacuation_desc, ToggleWindow)
 	end
 	
 	return externalFunctions
@@ -319,13 +337,13 @@ local function CreateFactionDisplayWindow()
 		parent = Chili.Screen0,
 	}
 	
-	Chili.Label:New {
+	lbl_planet = Chili.Label:New {
 		x = 0,
 		y = 4,
 		width = WINDOW_WIDTH - factionDisplayWindow.padding[1] - factionDisplayWindow.padding[3],
 		height = WINDOW_HEIGHT/3,
 		align = "center",
-		caption = "Planet " .. planet,
+		caption = WG.Translate("interface", "planet", {planet = planet}),
 		font = {
 			size = 16,
 			shadow = true,
@@ -451,13 +469,13 @@ local function CreateGoalWindow()
 		parent = Chili.Screen0,
 	}
 	
-	Chili.Label:New {
+	lbl_battle_instructions = Chili.Label:New {
 		x = 0,
 		y = 4,
 		width = WINDOW_WIDTH - instructionWindow.padding[1] - instructionWindow.padding[3],
 		height = 20,
 		align = "center",
-		caption = "Battle Instructions",
+		caption = strings.pw_battle_instructions,
 		font = {
 			size = 18,
 			shadow = true,
@@ -487,14 +505,14 @@ local function CreateGoalWindow()
 		height = 38,
 		bottom = 6,
 		right = 5,
-		caption = WG.Translate("interface", "close") or "Close",
+		caption = WG.Translate("interface", "close"),
 		OnClick = {ToggleWindow},
 		font = {size = 16},
 		parent = instructionWindow,
 	}
 	
 	if WG.GlobalCommandBar then
-		WG.GlobalCommandBar.AddCommand("LuaUI/Images/planetQuestion.png", "Toggle battle instructions panel.", ToggleWindow)
+		global_button_instructions = WG.GlobalCommandBar.AddCommand("LuaUI/Images/planetQuestion.png", strings.toggle_pw_instructions_name .. "\n\n" .. strings.toggle_pw_instructions_desc, ToggleWindow)
 	end
 end
 
@@ -515,6 +533,30 @@ function widget:GameFrame(n)
 	end
 end
 
+local function languageChanged ()
+	for k, v in pairs(strings) do
+		strings[k] = WG.Translate("interface", k)
+	end
+
+	if global_button_evacuation then
+		global_button_evacuation.tooltip = strings.toggle_evacuation_name .. "\n\n" .. strings.toggle_evacuation_desc
+		global_button_evacuation:Invalidate()
+	end
+	if global_button_instructions then
+		global_button_instructions.tooltip = strings.toggle_pw_instructions_name .. "\n\n" .. strings.toggle_pw_instructions_desc
+		global_button_instructions:Invalidate()
+	end
+	if lbl_battle_instructions then
+		lbl_battle_instructions:SetCaption(strings.pw_battle_instructions)
+	end
+	if lbl_planet then
+		lbl_planet:SetCaption(WG.Translate("interface", "planet", {planet = Spring.GetModOptions().planet}))
+	end
+	if teleportWindow then
+		teleportWindow.Update(true)
+	end
+end
+
 function widget:Initialize()
 	if not Spring.GetModOptions().planet then
 		widgetHandler:RemoveWidget()
@@ -524,6 +566,7 @@ function widget:Initialize()
 	Chili = WG.Chili
 	CreateFactionDisplayWindow()
 	CreateGoalWindow()
+	WG.InitializeTranslation (languageChanged, GetInfo().name)
 end
 
 function widget:GamePreload()
