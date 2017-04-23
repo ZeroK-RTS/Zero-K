@@ -1274,6 +1274,31 @@
         "description": "Samolot zwiadowczy z zakłócaczem",
         "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."
     },
+	"dynstrike1" : {
+		"name" : "Dowódca Strike",
+		"description" : "Dowódca szturmowy",
+		"helptext" : "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
+	},
+	"dynknight1" : {
+		"name" : "Dowódca Knight",
+		"description" : "Dowódca szturmowy",
+		"helptext" : "Knight to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
+	},
+	"dynsupport1" : {
+		"name" : "Dowódca Engineer",
+		"description" : "Dowódca ekonomiczny",
+		"helptext" : "Dowódca Engineer może korzystać z najbardziej ezoterycznych modułów i broni. Mimo że jego prędkość i wytrzymałość pozostawiają wiele do życzenia, to świetnie nadaje się do budowy z racji zwiększonej mocy i zasięgu konstrukcji."
+	},
+	"dynassault1" : {
+		"name" : "Dowódca Guardian",
+		"description" : "Ciężki Dowódca bojowy",
+		"helptext" : "Guardian to Dowódca reprezentujący brutalną siłę i wytrzymałość; jest jednak wolny i nie może używać większości modułów wsparcia."
+	},
+	"dynrecon1" : {
+		"name" : "Dowódca Recon",
+		"description" : "Mobilny Dowódca",
+		"helptext" : "Recon to zwinny Dowódca, który może używać większość specjalnych broni i jest w stanie skakać."
+	},
     "amphfloater": {
         "name": "Buoy",
         "description": "Ciężki amfibijny bot harcownik",
