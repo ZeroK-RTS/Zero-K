@@ -336,7 +336,7 @@ options = {
 				mainBackground.SetSkin(self.value)
 			end
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	}
 }

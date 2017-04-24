@@ -142,7 +142,7 @@ options = {
 			end
 			contentHolder:Invalidate()
 		end,
-		advanced = true,
+		hidden = true,
 		noHotkey = true,
 	},
 }

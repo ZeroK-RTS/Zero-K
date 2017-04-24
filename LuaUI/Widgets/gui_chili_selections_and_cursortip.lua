@@ -299,7 +299,7 @@ options = {
 	--		end
 	--		window_corner:Invalidate()
 	--	end,
-	--	advanced = true,
+	--	hidden = true,
 	--	noHotkey = true,
 	--},
 	--leftPadding = {
@@ -310,6 +310,7 @@ options = {
 	--		window_corner.padding[1] = 8 + self.value
 	--		window_corner:UpdateClientArea()
 	--	end,
+	--	hidden = true,
 	--	path = selPath,
 	--},
 }

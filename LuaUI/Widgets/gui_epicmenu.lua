@@ -1553,7 +1553,7 @@ local function SearchElement(termToSearch,path)
 			local found_name = SearchInText(lowercase_name,termToSearch) or SearchInText(lowercase_text,termToSearch) or SearchInText(lowercase_desc,termToSearch) or virtualCategoryHit
 					
 			--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-			if option.advanced and not settings.showAdvanced then
+			if option.hidden or (option.advanced and not settings.showAdvanced) then
 				--do nothing
 			elseif option.type == 'button' then
 				local hide = false
@@ -1722,7 +1722,7 @@ MakeSubWindow = function(path, pause)
 		
 		
 		--if option.advanced and not settings.config['epic_Settings_Show_Advanced_Settings'] then
-		if option.advanced and not settings.showAdvanced then
+		if option.hidden or (option.advanced and not settings.showAdvanced) then
 			--do nothing
 		elseif option.type == 'button' then
 			local hide = false
