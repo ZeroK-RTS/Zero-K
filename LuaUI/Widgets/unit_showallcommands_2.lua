@@ -109,6 +109,7 @@ options = {
 				UpdateSelection(spGetSelectedUnits())
 			end
 		end,
+		noHotkey = true,
 	},
 	lbl_filters = {name='Filters', type='label'},
 	includeallies = {
@@ -116,6 +117,7 @@ options = {
 		desc = 'When showing commands for selected units, show them for both your own and your allies\' selections.',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 	},
 	includeneutral = {
 		name = 'Include Neutral Units',
@@ -125,6 +127,7 @@ options = {
 		OnChange = function(self)
 			PoolUnit()
 		end,
+		noHotkey = true,
 	},
 }
 

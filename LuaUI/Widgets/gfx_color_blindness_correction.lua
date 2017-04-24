@@ -25,18 +25,21 @@ options = {
 			{key = "deuteranopia", name="Deuteranopia - missing GREEN"},
 			{key = "tritanopia", name="Tritanopia - missing BLUE"},
 		},
+		noHotkey = true,
 	},
 	cbcMethod = {
 		name = "Color Blindness Correction Method",
 		type = "number",
 		value = 2,
 		min = 1, max = 2, step = 1,
+		noHotkey = true,
 	},
 	cbcOnlySim = {
 		name = 'Only simulate color blindness',
 		type = 'bool',
 		value = false,
 		advanced = true,
+		noHotkey = true,
 	},
 }
 

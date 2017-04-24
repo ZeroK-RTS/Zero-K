@@ -62,7 +62,8 @@ options = {
 		desc = "Enable to use selection filtering.",
 		OnChange = function (self)
 			useSelectionFiltering = self.value
-		end
+		end,
+		noHotkey = true,
 	},
 	selectionFilteringOnlyAltOption = {
 		name = "Only filter when Alt is held",
@@ -71,7 +72,8 @@ options = {
 		desc = "Enable selection filtering when Alt is held. Required the main selection filtering option to be enabled.",
 		OnChange = function (self)
 			selectionFilteringOnlyAlt = self.value
-		end
+		end,
+		noHotkey = true,
 	},
 	ctrlFlattenRankOption = {
 		name = 'Hold Ctrl to ignore rank difference above:',

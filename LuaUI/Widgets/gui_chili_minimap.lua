@@ -300,6 +300,7 @@ options = {
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
+		noHotkey = true,
 	},
 	
 	radar_preset_double_outline = {
@@ -315,6 +316,7 @@ options = {
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
+		noHotkey = true,
 	},
 	radar_preset_blue_line = {
 		name = 'Blue Outline',
@@ -328,6 +330,7 @@ options = {
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
+		noHotkey = true,
 	},
 	
 	radar_preset_green = {
@@ -342,6 +345,7 @@ options = {
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
+		noHotkey = true,
 	},
 	
 	radar_preset_green_in_blue = {
@@ -356,6 +360,7 @@ options = {
 			WG.crude.OpenPath(radar_path, false)
 		end,
 		path = radar_path,
+		noHotkey = true,
 	},
 	
 	

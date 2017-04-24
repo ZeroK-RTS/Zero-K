@@ -31,6 +31,7 @@ options = {
 		OnChange = function(self)
 			GetHavens()
 		end,
+		noHotkey = true,
 	},
 	cancelRetreat = {
 		name = 'Cancel Retreat',

@@ -528,6 +528,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		type = 'bool',
 		springsetting = 'AdvUnitShading',
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
+		noHotkey = true,
 	} )
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')
 	ShButton(pathUnitVisiblity,'Toggle Unit Halos', function() spSendCommands{"luaui togglewidget Halo"} end, "Shows halo around units")

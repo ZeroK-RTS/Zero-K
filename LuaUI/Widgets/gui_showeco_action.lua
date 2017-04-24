@@ -110,6 +110,7 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = ForceRedraw,
+		noHotkey = true,
 	},
 	drawQueued = {
 		name = "Draw grid in queue",
@@ -117,6 +118,7 @@ options = {
 		type = 'bool',
 		value = true,
 		OnChange = ForceRedraw,
+		noHotkey = true,
 	},
 }
 -------------------------------------------------------------------------------------

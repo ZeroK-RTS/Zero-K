@@ -120,6 +120,7 @@ options = {
 			forceUpdate = true
 			visibleAllySelUnits = {}
 		end,
+		noHotkey = true,
 	},
 	showallyplayercolours = {
 		name = 'Use Player Colors when Spectating',

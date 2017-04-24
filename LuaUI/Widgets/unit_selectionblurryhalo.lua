@@ -37,6 +37,7 @@ options = {
 		type = 'bool',
 		desc = 'Highlight the units your allies currently have selected.',
 		value = true,
+		noHotkey = true,
 	},
 	
 	thickness = {
