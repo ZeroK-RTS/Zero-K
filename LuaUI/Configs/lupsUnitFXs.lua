@@ -188,7 +188,7 @@ effectUnitDefs = {
 	{class='ShieldSphere', options=MergeTable(teleShieldSphere, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere"})},
 	{class='StaticParticles', options=MergeTable(teleCorona, {piece="sphere", onActive = true, size=50})},
-	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=30, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
+	{class='ShieldJitter', options={delay=0, life=math.huge, piece="sphere", size=20, strength = .005, precision=50, repeatEffect=true, onActive=true, noIconDraw = true}},	
   },
   
   armbanth = {
