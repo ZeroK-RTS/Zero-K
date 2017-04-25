@@ -42,6 +42,8 @@ local turnRadiusSq = {}
 local turnPeriods = {}
 local stopDistSq = {}
 local stoppingRadiusIncrease = {}
+local stuckTravelOverride = {}
+local startMovingTime = {}
 
 for i = 1, #UnitDefs do
 	local ud = UnitDefs[i]
@@ -56,6 +58,13 @@ for i = 1, #UnitDefs do
 			turnPeriods[i] = math.ceil(1100/ud.turnRate)
 		else
 			turnPeriods[i] = 8
+		end
+		if (ud.moveDef.maxSlope or 0) > 0.8 and ud.speed < 60 then
+			-- Slow spiders need a lot of leeway when climing cliffs.
+			stuckTravelOverride[i] = 5
+			startMovingTime[i] = 12 -- May take longer to start moving
+			-- Lower stopping distance for more precise placement on terrain
+			stopDist[i] = 4
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
@@ -224,7 +233,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
-		unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
+		unitData.stuckCheckTimer = math.floor(math.random()*10) + (startMovingTime[unitDefID] or 6)
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - 1
 	
@@ -232,7 +241,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
 		unitData.ux, unitData.uz = x, z
-		if travelled < STUCK_TRAVEL then
+		if travelled < (stuckTravelOverride[unitDefID] or STUCK_TRAVEL) then
 			unitData.stuckCheckTimer = math.floor(math.random()*2) + 1
 			if distSq < GIVE_UP_STUCK_DIST_SQ then
 				Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
