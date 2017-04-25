@@ -120,6 +120,7 @@ options = {
 		type = 'bool',
 		value = true,
 		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
+		noHotkey = true,
 		OnChange = function() updateMexDrawList() end
 	},
 	size = {

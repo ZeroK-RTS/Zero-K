@@ -105,12 +105,14 @@ options = {
 		type = 'radioButton',
 		value = 'default',
 		items = colorSettingsItems,
+		noHotkey = true,
 		OnChange = UpdateColorConfig
 	},
 	matchColors = {
 		name = 'Sync Colors With Team',
 		type = 'bool',
 		value = false,
+		noHotkey = true,
 		OnChange = UpdateColorNotify
 	}
 }

@@ -527,6 +527,7 @@ local pathUnitVisiblity = 'Settings/Graphics/Unit Visibility'
 		name = 'Shiny Units',
 		type = 'bool',
 		springsetting = 'AdvUnitShading',
+		noHotkey = true,
 		OnChange=function(self) spSendCommands{"advmodelshading " .. (self.value and 1 or 0) } end, --needed as setconfigint doesn't apply change right away
 	} )
 	ShLabel(pathUnitVisiblity, 'Unit Visibility Widgets')

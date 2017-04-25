@@ -502,11 +502,21 @@ options = {
 		},
 		OnChange = option_Deselect,
 		path = selPath,
+		noHotkey = true,
 	},
-	showgroupinfo = {name='Show Group Info', type='bool', value=true, OnChange = option_Deselect,
+	showgroupinfo = {
+		name = 'Show Group Info',
+		type = 'bool',
+		value = true,
+		OnChange = option_Deselect,
 		path = selPath,
 	},
-	squarepics = {name='Square Buildpics', type='bool', value=false, OnChange = option_Deselect,
+	squarepics = {
+		name = 'Square Buildpics',
+		type = 'bool',
+		value = false,
+		noHotkey = true,
+		OnChange = option_Deselect,
 		path = selPath,
 	},
 	unitCommand = {
