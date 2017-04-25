@@ -388,8 +388,16 @@ function SimpleParticles2:Visible()
   if (self.unit and not self.worldspace) then
     losState = GetUnitLosState(self.unit)
     local ux,uy,uz = spGetUnitViewPosition(self.unit)
+    if not ux then
+      return false
+    end
+    radius = radius + (spGetUnitRadius(self.unit) or 0)
+    if self.noIconDraw then
+      if not Spring.IsUnitVisible(self.unit, radius, self.noIconDraw) then
+        return false
+      end
+    end
     posX,posY,posZ = posX+ux,posY+uy,posZ+uz
-    radius = radius + spGetUnitRadius(self.unit)
   elseif (self.projectile and not self.worldspace) then
     local px,py,pz = spGetProjectilePosition(self.projectile)
     posX,posY,posZ = posX+px,posY+py,posZ+pz

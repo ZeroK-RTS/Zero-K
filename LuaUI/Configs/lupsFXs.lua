@@ -106,6 +106,7 @@ cafusBursts = {
   colormap   = { {1.0, 0.7, 0.5, 0.3} },
   directional= true,
   repeatEffect = true,
+  noIconDraw = true,
   count      = 20,
   quality    = 4, -- Ultra settings
 }
@@ -125,7 +126,16 @@ corjamtBursts = {
   colormap   = { {1, 0.3, 1, 0.8} },
   directional= true,
   repeatEffect = true,
+  noIconDraw = true,
   count      = 8,
+}
+corjamtBall = {
+	piece = "glow", 
+	life = math.huge, 
+	size = 11, 
+	colormap1 = {{0.95, 0.1, 0.95, 0.9}}, 
+	repeatEffect = true,
+	noIconDraw = true,
 }
 
 ----------------------------------------------------------------------------
@@ -157,7 +167,8 @@ teleShieldSphere = {
   size=9,
   colormap1 = { {0.9, 0.9, 1, 0.75},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 0.75} },
   colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
-  repeatEffect=true
+  repeatEffect=true,
+  noIconDraw = true,
 }
 
 valkShieldSphere = {
@@ -166,14 +177,15 @@ valkShieldSphere = {
   size=4,
   colormap1 = { {0.9, 0.9, 1, 0.75},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 1.0},{0.9, 0.9, 1, 0.75} },
   colormap2 = { {0.2, 0.2, 1, 0.7},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.75},{0.2, 0.2, 1, 0.7} },
-  repeatEffect=true
+  repeatEffect=true,
+  noIconDraw = true,
 }
 
 commandShieldSphere = {
   life			= math.huge,
   heightFactor	= 0.75,
   radiusFactor	= 1.75, 
-  repeatEffect	= true
+  repeatEffect	= true,
 }
 
 ----------------------------------------------------------------------------
@@ -273,6 +285,7 @@ radarBlink = {
   texture     = 'bitmaps/GPL/smallflare.tga',
   count       = 1,
   repeatEffect= true,
+  noIconDraw = true,
 }
 
 warpgateCorona = {
@@ -322,6 +335,7 @@ teleCorona = {
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
   repeatEffect = true,
+  noIconDraw = true,
 }
 
 valkCorona = {
@@ -334,6 +348,7 @@ valkCorona = {
   texture     = 'bitmaps/GPL/groundflash.tga',
   count       = 1,
   repeatEffect = true,
+  noIconDraw = true,
 }
 
 commandCoronaWhite = {
@@ -399,6 +414,7 @@ blinkyLightWhite = {
   texture     = 'bitmaps/GPL/smallflare.tga',
   count       = 1,
   repeatEffect = true,
+  noIconDraw = true,
 }
 
 local blinkyLightColors = {

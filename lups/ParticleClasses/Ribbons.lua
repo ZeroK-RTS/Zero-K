@@ -265,6 +265,12 @@ end
 
 function Ribbon:Visible()
   self.isvalid = (self.unit and spGetUnitIsDead(self.unit) == false) or (self.projectile and Spring.GetProjectileDefID(self.projectile))
+    
+  if self.noIconDraw then
+    if not Spring.IsUnitVisible(self.unit, radius, self.noIconDraw) then
+      return false
+    end
+  end
   local pos = self.oldPos[self.posIdx]
   return (self.blendfactor>0) and (spIsSphereInView(pos[1],pos[2],pos[3], self.radius))
 end
