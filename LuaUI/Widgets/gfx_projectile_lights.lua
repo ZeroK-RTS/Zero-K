@@ -96,14 +96,12 @@ options = {
 		type = 'bool',
 		desc = 'Reduces the number of lights drawn based on camera distance and current fps.',
 		value = true,
-		noHotkey = true,
 	},
 	projectileFade = {
 		name = 'Fade Projectiles',
 		type = 'bool',
 		desc = 'Projectile lights smoothly fade out after the projectile disappears.',
 		value = true,
-		noHotkey = true,
 	},
 	light_override = {
 		name = "Override Parameters",

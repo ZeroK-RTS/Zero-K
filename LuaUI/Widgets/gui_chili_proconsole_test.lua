@@ -215,7 +215,6 @@ options = {
 		.."\nTips: the spam will be written in infolog.txt, if the file get unmanageably large try set it to Read-Only to prevent write.",
 		path = filter_path ,
 		advanced = true,
-		noHotkey = true,
 	},
 	
 	enableConsole = {
@@ -372,7 +371,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = false,
 		path = filter_path,
-		noHotkey = true,
 	},
 	hideAlly = {
 		name = "Hide Ally Chat",
@@ -381,7 +379,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = filter_path,
-		noHotkey = true,
 	},
 	hidePoint = {
 		name = "Hide Points",
@@ -390,7 +387,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = filter_path,
-		noHotkey = true,
 	},
 	hideLabel = {
 		name = "Hide Labels",         
@@ -399,7 +395,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = filter_path,
-		noHotkey = true,
 	},
 	hideLog = {
 		name = "Hide Engine Logging Messages",
@@ -408,7 +403,6 @@ options = {
 		OnChange = onOptionsChanged,
 		advanced = true,
 		path = filter_path,
-		noHotkey = true,
 	},
 	max_lines = {
 		name = 'Maximum Lines (20-100)',
@@ -575,7 +569,6 @@ options = {
 		desc = "Enable to hide the backlog arrow when not entering chat.",
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 		OnChange = function(self)
 			if self.value then
 				if backlogButton and backlogButton.parent then
@@ -593,7 +586,6 @@ options = {
 		desc = "Enable to have the backlog enabled when entering text and disabled when not entering text.",
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	},
 	backlogArrowOnRight = {
 		name = "Backlong Arrow On Right",

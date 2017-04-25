@@ -28,21 +28,18 @@ options={
 		desc = 'RECLAIM & RESURRECT toggle metalmap vision.',
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	},
 	engineheightview ={
 		name = 'Heightview Color',
 		desc = 'TERRAFORM & BUILD toggle heightmap vision.',
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	},
 	enginepathview ={
 		name = 'Pathview Color',
 		desc = 'MOVE & JUMP toggle pathmap vision.',
 		type = 'bool',
 		value = false,
-		noHotkey = true,
 	},	
 }
 --------------------------------------------------------------------------------

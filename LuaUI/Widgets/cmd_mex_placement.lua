@@ -120,8 +120,7 @@ options = {
 		type = 'bool',
 		value = true,
 		tooltip = "When enabled income is shown pictorially. When disabled income is shown as a number.",
-		OnChange = function() updateMexDrawList() end,
-		noHotkey = true,
+		OnChange = function() updateMexDrawList() end
 	},
 	size = {
 		name = "Income Display Size", 
@@ -145,8 +144,7 @@ options = {
 		name = "Use player colours when spectating",
 		type = "bool",
 		value = false,
-		OnChange = function() updateMexDrawList() end,
-		noHotkey = true,
+		OnChange = function() updateMexDrawList() end
 	}
 }
 
