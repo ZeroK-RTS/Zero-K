@@ -39,6 +39,7 @@ local canFlyDefs = {}
 local stopDist = {}
 local goalDist = {}
 local turnRadiusSq = {}
+local turnPeriods = {}
 local stopDistSq = {}
 local stoppingRadiusIncrease = {}
 
@@ -50,6 +51,11 @@ for i = 1, #UnitDefs do
 		local turningRadius = ud.speed*2195/(ud.turnRate * 2 * math.pi)
 		if turningRadius > 40 then
 			turnRadiusSq[i] = turningRadius*turningRadius
+		end
+		if ud.turnRate > 150 then
+			turnPeriods[i] = math.ceil(1100/ud.turnRate)
+		else
+			turnPeriods[i] = 8
 		end
 		if ud.canFly then
 			canFlyDefs[i] = true
@@ -86,8 +92,9 @@ local moveRawCmdDesc = {
 	tooltip = 'Move: Order the unit to move to a position.',
 }
 
-local TEST_MOVE_DISTANCE = 16
-local LAZY_SEARCH_DISTANCE = 600
+local TEST_MOVE_SPACING = 16
+local LAZY_TEST_MOVE_SPACING = 8
+local LAZY_SEARCH_DISTANCE = 450
 local STUCK_TRAVEL = 45
 local STUCK_MOVE_RANGE = 140
 local GIVE_UP_STUCK_DIST_SQ = 250^2
@@ -108,18 +115,18 @@ local oldCommandStoppingRadius = {}
 ----------------------------------------------------------------------------------------------
 -- Utilities
 
-local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, distanceLimit)
+local function IsPathFree(unitDefID, sX, sZ, gX, gZ, distance, testSpacing, distanceLimit)
 	local vX = gX - sX
 	local vZ = gZ - sZ
 	-- distance had better be math.sqrt(vX*vX + vZ*vZ) or things will break
-	if distance < TEST_MOVE_DISTANCE then
+	if distance < testSpacing then
 		return true
 	end
 	vX, vZ = vX/distance, vZ/distance
 	if distanceLimit and (distance > distanceLimit) then
 		distance = distanceLimit
 	end
-	for test = 0, distance, TEST_MOVE_DISTANCE do
+	for test = 0, distance, testSpacing do
 		if not Spring.TestMoveOrder(unitDefID, sX + test*vX, 0, sZ + test*vZ) then
 			return false
 		end
@@ -137,6 +144,7 @@ local function ResetUnitData(unitData)
 	unitData.handlingWaitTime = nil
 	unitData.nextRawCheckDistSq = nil
 	unitData.doingRawMove = nil
+	unitData.possiblyTurning = nil
 end
 
 ----------------------------------------------------------------------------------------------
@@ -214,12 +222,12 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 		return true, false
 	end
 	
-	
 	if not unitData.stuckCheckTimer then
 		unitData.ux, unitData.uz = x, z
 		unitData.stuckCheckTimer = math.floor(math.random()*10) + 6
 	end
 	unitData.stuckCheckTimer = unitData.stuckCheckTimer - 1
+	
 	if unitData.stuckCheckTimer <= 0 then
 		local oldX, oldZ = unitData.ux, unitData.uz
 		local travelled = math.abs(oldX - x) + math.abs(oldZ - z)
@@ -263,17 +271,24 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
-			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, lazy and LAZY_SEARCH_DISTANCE)
+			freePath = IsPathFree(unitDefID, x, z, cmdParams[1], cmdParams[3], distance, TEST_MOVE_SPACING, lazy and LAZY_SEARCH_DISTANCE)
 			if (not freePath) then
 				unitData.nextRawCheckDistSq = (distance - RAW_CHECK_SPACING)*(distance - RAW_CHECK_SPACING)
 			end
 		end
 		if (not unitData.commandHandled) or unitData.doingRawMove ~= freePath then
 			Spring.SetUnitMoveGoal(unitID, cmdParams[1], cmdParams[2], cmdParams[3], goalDist[unitDefID] or 16, nil, freePath)
+			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
+			unitData.possiblyTurning = true
+		elseif unitData.possiblyTurning then
+			unitData.nextTestTime = math.floor(math.random()*2) + turnPeriods[unitDefID]
+			unitData.possiblyTurning = false
+		else
+			unitData.nextTestTime = math.floor(math.random()*5) + 6
 		end
+		
 		unitData.doingRawMove = freePath
 		unitData.switchedFromRaw = not freePath
-		unitData.nextTestTime = math.floor(math.random()*12) + 16
 	end
 	
 	if not unitData.commandHandled then
