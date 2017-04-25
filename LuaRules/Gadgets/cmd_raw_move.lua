@@ -38,7 +38,7 @@ local canMoveDefs = {}
 local canFlyDefs = {}
 local stopDist = {}
 local goalDist = {}
-local turnRadiusSq = {}
+local turnDiameterSq = {}
 local turnPeriods = {}
 local stopDistSq = {}
 local stoppingRadiusIncrease = {}
@@ -50,9 +50,9 @@ for i = 1, #UnitDefs do
 	if ud.canMove then
 		canMoveDefs[i] = true
 		stopDist[i] = 16
-		local turningRadius = ud.speed*2195/(ud.turnRate * 2 * math.pi)
-		if turningRadius > 40 then
-			turnRadiusSq[i] = turningRadius*turningRadius
+		local turningDiameter = 2*(ud.speed*2195/(ud.turnRate * 2 * math.pi))
+		if turningDiameter > 20 then
+			turnDiameterSq[i] = turningDiameter*turningDiameter
 		end
 		if ud.turnRate > 150 then
 			turnPeriods[i] = math.ceil(1100/ud.turnRate)
@@ -276,7 +276,7 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	if unitData.nextTestTime <= 0 then
 		local lazy = unitData.doingRawMove
 		local freePath
-		if (turnRadiusSq[unitDefID] or 0) > distSq then
+		if (turnDiameterSq[unitDefID] or 0) > distSq then
 			freePath = false
 		else
 			local distance = math.sqrt(distSq)
