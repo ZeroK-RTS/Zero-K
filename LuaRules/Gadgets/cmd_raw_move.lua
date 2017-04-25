@@ -20,6 +20,9 @@ if gadgetHandler:IsSyncedCode() then
 local spGetUnitPosition = Spring.GetUnitPosition
 local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 
+local CMD_STOP   = CMD.STOP
+local CMD_INSERT = CMD.INSERT
+
 local canMoveDefs = {}
 local canFlyDefs = {}
 local stopDist = {}
@@ -257,20 +260,28 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 end
 
 function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD.STOP] = true}
+	return {[CMD.STOP] = true, [CMD_RAW_MOVE] = true, [CMD_INSERT] = true}
 end
 
-function gadget:AllowCommand_GetWantedUnitDefID()	
+function gadget:AllowCommand_GetWantedUnitDefID()
 	return true
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD.STOP and rawMoveUnit[unitID] then
+	if cmdID == CMD_STOP and rawMoveUnit[unitID] then
 		if not rawMoveUnit[unitID].switchedFromRaw then
 			local x, y, z = spGetUnitPosition(unitID)
 			Spring.SetUnitMoveGoal(unitID, x, y, z, stopDist[unitDefID] or 16)
 		end
 		rawMoveUnit[unitID] = nil
+	end
+	if not canMoveDefs[unitDefID] then
+		if cmdID == CMD_INSERT then
+			cmdID = cmdParams[2]
+		end
+		if cmdID == CMD_RAW_MOVE then
+			return false
+		end
 	end
 	return true
 end
