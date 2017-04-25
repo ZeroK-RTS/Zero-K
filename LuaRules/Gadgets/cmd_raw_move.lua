@@ -23,6 +23,17 @@ local spInsertUnitCmdDesc = Spring.InsertUnitCmdDesc
 local CMD_STOP   = CMD.STOP
 local CMD_INSERT = CMD.INSERT
 
+local stopCommand = {
+	[CMD.GUARD] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+	[CMD_JUMP] = true,
+	[CMD.PATROL] = true,
+	[CMD.FIGHT] = true,
+	[CMD.MOVE] = true,
+}
+
 local canMoveDefs = {}
 local canFlyDefs = {}
 local stopDist = {}
@@ -131,6 +142,18 @@ end
 ----------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------
 -- Unit and command handling
+
+local function StopRawMoveUnit(unitID)
+	if not rawMoveUnit[unitID] then
+		return
+	end
+	if not rawMoveUnit[unitID].switchedFromRaw then
+		local x, y, z = spGetUnitPosition(unitID)
+		Spring.SetUnitMoveGoal(unitID, x, y, z, STOP_STOPPING_RADIUS)
+	end
+	rawMoveUnit[unitID] = nil
+	--Spring.Echo("StopRawMoveUnit", math.random())
+end
 
 function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmdOptions) -- Only calls for custom commands
 	if (cmdID ~= CMD_RAW_MOVE) then
@@ -259,23 +282,21 @@ function gadget:CommandFallback(unitID, unitDefID, teamID, cmdID, cmdParams, cmd
 	return true, false
 end
 
-function gadget:AllowCommand_GetWantedCommand()	
-	return {[CMD.STOP] = true, [CMD_RAW_MOVE] = true, [CMD_INSERT] = true}
-end
-
-function gadget:AllowCommand_GetWantedUnitDefID()
-	return true
+function gadget:UnitCmdDone(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions, cmdTag)
+	if cmdID == CMD_STOP then
+		-- Handling for shift clicking on commands to remove.
+		StopRawMoveUnit(unitID)
+	end
 end
 
 function gadget:AllowCommand(unitID, unitDefID, unitTeam, cmdID, cmdParams, cmdOptions)
-	if cmdID == CMD_STOP and rawMoveUnit[unitID] then
-		if not rawMoveUnit[unitID].switchedFromRaw then
-			local x, y, z = spGetUnitPosition(unitID)
-			Spring.SetUnitMoveGoal(unitID, x, y, z, stopDist[unitDefID] or 16)
+	if canMoveDefs[unitDefID] then
+		if cmdID == CMD_STOP or ((not cmdOptions.shift) and (cmdID < 0 or stopCommand[cmdID])) then
+			StopRawMoveUnit(unitID)
+		elseif cmdID == CMD_INSERT and (cmdParams[1] == 0 or not cmdOptions.alt) then
+			StopRawMoveUnit(unitID)
 		end
-		rawMoveUnit[unitID] = nil
-	end
-	if not canMoveDefs[unitDefID] then
+	else
 		if cmdID == CMD_INSERT then
 			cmdID = cmdParams[2]
 		end

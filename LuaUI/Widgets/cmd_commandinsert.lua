@@ -23,6 +23,20 @@ VFS.Include("LuaRules/Configs/customcmds.h.lua")
 local shift_table = {"shift"}
 local alt_table = {"alt"}
 
+local positionCommand = {
+	[CMD.MOVE] = true,
+	[CMD_RAW_MOVE] = true,
+	[CMD.REPAIR] = true,
+	[CMD.RECLAIM] = true,
+	[CMD.RESURRECT] = true,
+	[CMD.MANUALFIRE] = true,
+	[CMD.GUARD] = true,
+	[CMD.FIGHT] = true,
+	[CMD.ATTACK] = true,
+	[CMD_JUMP] = true,
+	[CMD_LEVEL] = true,
+}
+
 --[[
 -- use this for debugging:
 function table.val_to_str ( v )
@@ -78,13 +92,16 @@ local function GetUnitOrFeaturePosition(id)
 end
 
 local function GetCommandPos(command) -- get the command position
-	if command.id < 0 or command.id == CMD.MOVE or command.id == CMD_RAW_MOVE or command.id == CMD.REPAIR or command.id == CMD.RECLAIM or 
-			command.id == CMD.RESURRECT or command.id == CMD.MANUALFIRE or command.id == CMD.GUARD or 
-			command.id == CMD.FIGHT or command.id == CMD.ATTACK or command.id == CMD_JUMP or command.id == CMD_LEVEL then
+	if command.id < 0 or positionCommand[command.id] then
 		if #command.params >= 3 then
 			return command.params[1], command.params[2], command.params[3]
 		elseif #command.params >= 1 then
-			return GetUnitOrFeaturePosition(command.params[1])
+			local x, y, z = GetUnitOrFeaturePosition(command.params[1])
+			if x then
+				return x, y, z
+			else
+				return -10,-10,-10
+			end
 		end	
 	end
 	return -10,-10,-10
