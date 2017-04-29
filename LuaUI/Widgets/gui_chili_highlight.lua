@@ -111,7 +111,7 @@ local function DrawArrow(x, y, controlWidth, controlHeight, color, angle)
     -- nearest diagonal
     angle = GetAngleFromVector(sMidX - x, sMidY - y)
     angle = math.deg(angle) - 90
-    angle = math.floor(angle/90 + 0.5) * 90 - 45
+    angle = math.floor(angle/90) * 90 + 45
   end
   
   gl.PushMatrix()
@@ -138,16 +138,17 @@ local function DrawCircle(x, y, width, height, color, lineWidth, drawArrow)
   gl.Translate(x, y, 0)
   gl.Scale((width*sizeMult + PADDING_X)/2, (height*sizeMult + PADDING_Y)/2, 1)
   gl.Color(color[1], color[2], color[3], alpha)
-  gl.LineStipple(true)
+  gl.LineStipple('any')
   if rectangle then
     gl.CallList(rectangleDrawList)
   else
     gl.CallList(circleDrawList)
   end
+  gl.LineStipple(false)
   gl.PopMatrix()
   
   if drawArrow then
-    gl.LineStipple(false)
+    
     DrawArrow(x, y, width, height, color, type(drawArrow) == "number" and drawArrow)
   end
 end
@@ -189,7 +190,6 @@ function widget:DrawScreen()
     end
   end
   gl.LineWidth(1)
-  gl.LineStipple(false)
   gl.Color(1,1,1,1)
 end
 
@@ -216,6 +216,7 @@ function widget:Initialize()
   --WG.ChiliHighlight.AddControlFunc("attackButton", function() return {WG.IntegralMenu.GetCommandButtonPosition(CMD.ATTACK)} end)
   
   widget:ViewResize(Spring.GetViewGeometry())
+  --AddControl("core_backgroundPanel", nil, true)
 end
 
 function widget:Shutdown()
