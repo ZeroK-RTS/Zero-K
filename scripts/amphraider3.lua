@@ -38,8 +38,8 @@ local SIG_RESTORE = 8
 local unitDefID = Spring.GetUnitDefID(unitID)
 local wd = UnitDefs[unitDefID].weapons[1] and UnitDefs[unitDefID].weapons[1].weaponDef
 local reloadTime = wd and WeaponDefs[wd].reload*30 or 30
-local torpRange = WeaponDefNames["amphraider3_torpedo"].range
-local shotRange = WeaponDefNames["amphraider3_torpmissile"].range
+local torpRange = WeaponDefNames["amphraid_torpedo"].range
+local shotRange = WeaponDefNames["amphraid_torpmissile"].range
 local longRange = true
 
 --------------------------------------------------------------------------------------
