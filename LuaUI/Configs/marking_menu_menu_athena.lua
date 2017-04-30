@@ -11,7 +11,7 @@ local menu_athena = {
 		  },
 		  { 
 			angle = -135,
-			unit = "corak",
+			unit = "shieldraid",
 		  },
 		  { 
 			angle = -180,

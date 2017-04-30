@@ -239,7 +239,7 @@
 		"description" : "Air Superiority Fighter",
 		"helptext" : "The Hawk specializes in bringing down anything else that flies. It is sturdy enough to take limited AA fire, although it has no ground attack capability."
 	},
-	"hoverskirm" : {
+	"hoverskirm2" : {
 		"name" : "Trisula",
 		"description" : "Light Assault/Battle Hovercraft",
 		"helptext" : "The Trisula is a fairly fast, sturdy combatant armed with a scatter beam weapon that can erase multiple small targets or slag a single large one."
@@ -1214,7 +1214,7 @@
 		"description" : "Raider Gunship",
 		"helptext" : "The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense."
 	},
-	"corak" : {
+	"shieldraid" : {
 		"name" : "Bandit",
 		"description" : "Medium-Light Raider Bot",
 		"helptext" : "The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs."

@@ -122,7 +122,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 	"jumpsumo",
 	
 	"jumpbomb",
-	"corak",
+	"shieldraid",
 })
 
 local riotRangeSkirmieeArray = NameToDefID({
@@ -502,7 +502,7 @@ local behaviourConfig = {
 	},
   
 	-- longer ranged swarmers
-	["corak"] = {
+	["shieldraid"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},

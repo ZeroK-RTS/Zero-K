@@ -14,7 +14,7 @@ unitDef = {
   buildoptions                  = {
     [[shieldcon]],
 	[[shieldscout]],
-    [[corak]],
+    [[shieldraid]],
     [[shieldskirm]],
 	[[shieldassault]],
 	[[shieldriot]],

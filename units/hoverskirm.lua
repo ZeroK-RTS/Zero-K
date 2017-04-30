@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[hoverskirm]],
+  unitname            = [[hoverskirm2]],
   name                = [[Trisula]],
   description         = [[Light Assault/Battle Hovercraft]],
   acceleration        = 0.03,
   brakeRate           = 0.043,
   buildCostMetal      = 180,
   builder             = false,
-  buildPic            = [[hoverskirm.png]],
+  buildPic            = [[hoverskirm2.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -121,4 +121,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ hoverskirm = unitDef })
+return lowerkeys({ hoverskirm2 = unitDef })

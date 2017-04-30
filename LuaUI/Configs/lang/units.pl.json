@@ -254,7 +254,7 @@
         "description": "Myśliwiec",
         "helptext": "Hawk specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."
     },
-    "hoverskirm": {
+    "hoverskirm2": {
         "name": "Trisula",
         "description": "Lekki poduszkowiec bojowy",
         "helptext": "Trisula to w miarę szybki, wytrzymały poduszkowiec uzbrojony w rozszczepiany promień, który może zniszczyć kilka mniejszych jednostek lub mocno uszkodzić jedną większą."
@@ -1179,7 +1179,7 @@
         "description": "Lekki statek powietrzny",
         "helptext": "Banshee ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Banshee jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
     },
-    "corak": {
+    "shieldraid": {
         "name": "Bandit",
         "description": "Lekki bot",
         "helptext": "Bandit jest szybki, lekki i zadaje dość wysokie obrażenia. Nie jest jednak na tyle mocny, by można go było używać przeciwko obwarowanym przeciwnikom. Przegrywa w bezpośrednim starciu z jednostkami wsparcia i wieżyczkami."
