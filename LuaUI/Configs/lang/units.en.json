@@ -1119,7 +1119,7 @@
 		"description" : "Heavy Riot Jumper - On to Repulse, Off to Attract",
 		"helptext" : "The Sumo's impressive armor makes it a near-unstoppable sphere of death. It stomps on enemy units to break up their formation and can toss the survivors around with its Gravity Beams. Its stomp is the only way it can damage buildings."
 	},
-	"puppy" : {
+	"jumpscout" : {
 		"name" : "Puppy",
 		"description" : "Walking Missile",
 		"helptext" : "This fast-moving suicide unit is good for raiding and sniping lightly-armored targets. When standing next to wreckages, it automatically draws metal from them to replicate itself, grey goo style."

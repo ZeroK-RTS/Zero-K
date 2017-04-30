@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[puppy]],
+  unitname               = [[jumpscout]],
   name                   = [[Puppy]],
   description            = [[Walking Missile]],
   acceleration           = 0.24,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate              = 0.72,
   buildCostMetal         = 50,
   builder                = false,
-  buildPic               = [[PUPPY.png]],
+  buildPic               = [[jumpscout.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -23,7 +23,7 @@ unitDef = {
 	modelradius    = [[10]],
 
 	grey_goo = 1,
-	grey_goo_spawn = "puppy",
+	grey_goo_spawn = "jumpscout",
 	grey_goo_drain = 5,
 	grey_goo_cost = 75,
 	grey_goo_range = 120,
@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[FIXEDWING]],
   objectName             = [[puppy.s3o]],
-  script                 = [[puppy.lua]],
+  script                 = [[jumpscout.lua]],
   selfDestructAs         = [[TINY_BUILDINGEX]],
   selfDestructCountdown  = 5,
 
@@ -140,4 +140,4 @@ unitDef = {
   
 }
 
-return lowerkeys({ puppy = unitDef })
+return lowerkeys({ jumpscout = unitDef })

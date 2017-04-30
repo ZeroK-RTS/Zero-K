@@ -256,7 +256,7 @@ local sounds = {
 		},
 	},
 	
-	puppy = {
+	jumpscout = {
 		ok = {
 			[1] = "light_bot_move",
 		},

@@ -112,7 +112,7 @@ local arty = {
 }
 
 local counteredByAssaults = {
-	"puppy",
+	"jumpscout",
 	"cormist",
 }
 

@@ -119,13 +119,13 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['puppy'].id, chance = 1},
+					[1] = {ID = UnitDefNames['jumpscout'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['puppy'].id, chance = 0.6},
+					[1] = {ID = UnitDefNames['jumpscout'].id, chance = 0.6},
 					[2] = {ID = UnitDefNames['corpyro'].id, chance = 0.4},
 				},
 				

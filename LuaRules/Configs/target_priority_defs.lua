@@ -111,7 +111,7 @@ local unitIsCheap = {
 	[UnitDefNames["corgator"].id] = true,
 	[UnitDefNames["corsh"].id] = true,
 	[UnitDefNames["corak"].id] = true,
-	[UnitDefNames["puppy"].id] = true,
+	[UnitDefNames["jumpscout"].id] = true,
 }
 
 local unitIsHeavy = {
@@ -160,7 +160,7 @@ local velocityPenaltyDefs = {
 	[WeaponDefNames["armsptk_adv_rocket"].id]        = {2.5},
 	[WeaponDefNames["armcrabe_arm_crabe_gauss"].id]  = {2.5},
 	[WeaponDefNames["spideraa_aa"].id]               = {11.0},
-	[WeaponDefNames["puppy_missile"].id]             = {8.0},
+	[WeaponDefNames["jumpscout_missile"].id]             = {8.0},
 	[WeaponDefNames["correap_cor_reap"].id]          = {2.5},
 	[WeaponDefNames["corgol_cor_gol"].id]            = {2.0},
 	[WeaponDefNames["cormart_core_artillery"].id]    = {1.5},

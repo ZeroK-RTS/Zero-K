@@ -101,7 +101,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"corcan",
 	"cloakheavyraid",
 	"armtick",
-	"puppy",
+	"jumpscout",
 	"corroach",
 	"chicken",
 	"chickena",
@@ -444,7 +444,7 @@ local behaviourConfig = {
 		alwaysJinkFight = true,	
 	},
 	
-	["puppy"] = {
+	["jumpscout"] = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},

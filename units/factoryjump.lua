@@ -13,7 +13,7 @@ unitDef = {
 
   buildoptions                  = {
     [[corfast]],
-    [[puppy]],
+    [[jumpscout]],
     [[corpyro]],
 	[[jumpblackhole]],
 	[[slowmort]],

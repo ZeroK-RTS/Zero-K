@@ -118,7 +118,7 @@ local units = {
 	},
 	factoryjump = {
 		corfast = CONSTRUCTOR,
-		puppy = WEIRD_RAIDER,
+		jumpscout = WEIRD_RAIDER,
 		corpyro = RAIDER,
 		jumpblackhole = RIOT,
 		slowmort = SKIRMISHER,

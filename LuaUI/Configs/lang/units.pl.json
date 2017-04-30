@@ -1109,7 +1109,7 @@
         "description": "Lekki amfibijny bot wsparcia",
         "helptext": "Archer używa strumienia wody do walki. W miarę strzelania, opróżnia się jego zbiornik wody pod ciśnieniem, co skutkuje zmniejszeniem zasięgu i siły ataku. Zbiorniki można ponownie napełnić stojąc w wodzie. Archer jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni wody."
     },
-    "puppy": {
+    "jumpscout": {
         "name": "Puppy",
         "description": "Jednorazowa rakieta",
         "helptext": "Szybka jednostka samobójcza dobra do wyborowego niszczenia odsłoniętych celów. Stojąc obok złomu, pobiera z niego metal i replikuje się."

@@ -119,7 +119,7 @@ local kamikaze = {
 	corroach=1,
 	corsktl=1,
 	blastwing=1,
-	puppy=1,
+	jumpscout=1,
 }
 
 local flamerWeaponDefs = {}
