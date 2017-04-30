@@ -93,7 +93,7 @@ local riot = {
 local arty = {
 	"armham",
 	"punisher",
-	"firewalker",
+	"jumparty",
 	"tawf013",
 	"corgarp",
 	

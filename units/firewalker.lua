@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[firewalker]],
+  unitname               = [[jumparty]],
   name                   = [[Firewalker]],
   description            = [[Saturation Artillery Walker]],
   acceleration           = 0.12,
   brakeRate              = 0.24,
   buildCostMetal         = 900,
   builder                = false,
-  buildPic               = [[firewalker.png]],
+  buildPic               = [[jumparty.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -36,7 +36,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
   objectName             = [[firewalker.s3o]],
-  script				 = [[firewalker.lua]],
+  script				 = [[jumparty.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -190,4 +190,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ firewalker = unitDef })
+return lowerkeys({ jumparty = unitDef })

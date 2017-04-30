@@ -64,7 +64,7 @@
         "description": "Ciężki Dowódca bojowy, moc 10 m/s",
         "helptext": "Battle to Dowódca reprezentujący brutalną siłę i wytrzymałość; jest jednak wolny i nie może używać większości modułów wsparcia."
     },
-    "firewalker": {
+    "jumparty": {
         "name": "Firewalker",
         "description": "Ciężki bot wsparcia artyleryjskiego",
         "helptext": "Firewalker posiada wyrzutnie napalmu średniego zasięgu, które podpalają trafiony teren. Jest jednak dość niezdarny i ma problemy z ruchliwością."

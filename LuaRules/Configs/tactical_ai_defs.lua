@@ -54,7 +54,7 @@ end
 
 local longRangeSwarmieeArray = NameToDefID({ 
 	"cormart",
-	"firewalker",
+	"jumparty",
 	"armsptk",
 	"corstorm",
 	"shiparty",
@@ -1085,7 +1085,7 @@ local behaviourConfig = {
 		skirmRadar = true,
 		skirmLeeway = 40, 
 	},
-	["firewalker"] = {
+	["jumparty"] = {
 		skirms = allGround, 
 		swarms = {}, 
 		flees = {},

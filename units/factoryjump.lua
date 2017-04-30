@@ -19,7 +19,7 @@ unitDef = {
 	[[slowmort]],
     [[corcan]],
     [[corsumo]],
-	[[firewalker]],
+	[[jumparty]],
     [[armaak]],
 	[[corsktl]],
   },

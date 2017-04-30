@@ -934,7 +934,7 @@
 		"description" : "Tachyon Projector - Requires 50 Power",
 		"helptext" : "Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
 	},
-	"firewalker" : {
+	"jumparty" : {
 		"name" : "Firewalker",
 		"description" : "Saturation Artillery Walker",
 		"helptext" : "The Firewalker's medium range mortars immolate a small area, denying use of that terrain for brief periods of time. The bot itself is somewhat clumsy and slow to maneuver."

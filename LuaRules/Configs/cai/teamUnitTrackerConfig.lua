@@ -113,7 +113,7 @@ local ground = {
 	antiSkirm = {
 		"armcrabe",
 		"cormist",
-		"firewalker",
+		"jumparty",
 	},
 
 	riot = {

@@ -264,7 +264,7 @@
 
 		"income_tier": [40],
 		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
-		"unit":      ["corfast", "puppy", "corpyro", "jumpblackhole", "slowmort", "corcan", "corsumo", "firewalker", "corsktl", "armaak"],
+		"unit":      ["corfast", "puppy", "corpyro", "jumpblackhole", "slowmort", "corcan", "corsumo", "jumparty", "corsktl", "armaak"],
 		"land": {
 			"tier0": [ 0.10,      0.20,    0.35,      0.05,            0.20,       0.10,     0.00,      0.00,         0.00,      0.00],
 			"tier1": [ 0.10,      0.00,    0.30,      0.05,            0.25,       0.15,     0.03,      0.12,         0.00,      0.00]
@@ -774,7 +774,7 @@
 		"limit": 1,
 		"attribute": ["melee", "no_jump"]  // jump on attack
 	},
-	"firewalker": {
+	"jumparty": {
 		"role": ["artillery"],
 		"attribute": ["siege"],
 		"retreat": 0.99

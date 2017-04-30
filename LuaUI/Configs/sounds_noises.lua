@@ -280,7 +280,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	firewalker = {
+	jumparty = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},

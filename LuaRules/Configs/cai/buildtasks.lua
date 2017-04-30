@@ -132,7 +132,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 0.3,
 					count = 1,
-					[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},	
+					[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},	
 				},
 				
 				[5] = { --assault
@@ -307,7 +307,7 @@ factionBuildConfig = {
 				[4] = { -- arty
 					importanceMult = 0,
 					count = 0,	
-				--	[1] = {ID = UnitDefNames['firewalker'].id, chance = 1},					
+				--	[1] = {ID = UnitDefNames['jumparty'].id, chance = 1},					
 				},
 				
 				[5] = { --assault

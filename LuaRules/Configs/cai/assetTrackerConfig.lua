@@ -74,7 +74,7 @@ local heatmapNames = {
         
 		["armcrabe"] = {mult = 1},
 		["cormist"] = {mult = 1},
-		["firewalker"] = {mult = 1},
+		["jumparty"] = {mult = 1},
 		
 		["armwar"] = {mult = 1},
 		["cormak"] = {mult = 1},
@@ -229,7 +229,7 @@ local ground = {
 	antiSkirm = {
 		"armcrabe",
 		"cormist",
-		"firewalker",
+		"jumparty",
 	},
 
 	riot = {
