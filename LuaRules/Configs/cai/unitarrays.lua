@@ -78,7 +78,7 @@ local riot = {
 	"amphimpulse",
 	"amphriot",
 	
-	"arm_venom",
+	"spideremp",
 	"tawf003",
 	"tawf114",
 

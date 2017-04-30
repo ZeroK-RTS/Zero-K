@@ -158,7 +158,7 @@ factionBuildConfig = {
 				[8] = { -- aa
 					importanceMult = 0.8,
 					count = 1,
-					[1] = {ID = UnitDefNames['armaak'].id, chance = 1},
+					[1] = {ID = UnitDefNames['jumpaa'].id, chance = 1},
 				},				
 			},
 			[UnitDefNames['factoryspider'].id] = {
@@ -209,7 +209,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 0.5,
 					count = 1,
-					[1] = {ID = UnitDefNames['arm_venom'].id, chance = 0.4},
+					[1] = {ID = UnitDefNames['spideremp'].id, chance = 0.4},
 					[2] = {ID = UnitDefNames['spiderriot'].id, chance = 0.6},
 				},
 				
@@ -717,7 +717,7 @@ factionBuildConfig = {
 			[2] = {
 				count = 3,
 				[1] = {ID = UnitDefNames['armdeva'].id, chance = 0.4},
-				[2] = {ID = UnitDefNames['armartic'].id, chance = 0.3},
+				[2] = {ID = UnitDefNames['turretemp'].id, chance = 0.3},
 				[3] = {ID = UnitDefNames['corgrav'].id, chance = 0.3},
 			},
 			
@@ -741,7 +741,7 @@ factionBuildConfig = {
 				level = 2,
 				index = 1,
 			},
-			[UnitDefNames['armartic'].id] = {
+			[UnitDefNames['turretemp'].id] = {
 				level = 2,
 				index = 2,
 			},
@@ -797,7 +797,7 @@ factionBuildConfig = {
 			},
 		},
 
-		airpadDefID = UnitDefNames['armasp'].id,
+		airpadDefID = UnitDefNames['staticrearm'].id,
 		nanoDefID = UnitDefNames['armnanotc'].id,
 		metalStoreDefID = UnitDefNames['armmstor'].id,
 	}

@@ -694,7 +694,7 @@
         "description": "Wykrywa jednostki podwodne",
         "helptext": "Sonar pozwala wykrywać zanurzone jednostki."
     },
-    "arm_venom": {
+    "spideremp": {
         "name": "Venom",
         "description": "Pająk wsparcia EMP",
         "helptext": "Venom to pająk, który paraliżuje trafione jednostki i jest szybki jak na jednostkę wsparcia. Dobrze współgra z Hermitem i Reclusem, nie pozwalając przeciwnikom unikać ich wolnych pocisków."
@@ -724,7 +724,7 @@
         "description": "Ciężki czołg wsparcia",
         "helptext": "Mobilny jak na jednostkę wsparcia, Banisher posiada ciężkie rakiety krótkiego zasięgu, które szybko niszczą grupy lekkich jednostek, są skuteczne przeciw lotnictwu i wyrównują teren. Banishera łatwo zniszczyć jednostkami szturmowymi lub harcownikami."
     },
-    "armamd": {
+    "staticantinuke": {
         "name": "Protector",
         "description": "Tarcza antyrakietowa",
         "helptext": "Protector automatycznie przechwytuje rakiety z głowicami atomowymi wycelowane w obszar przezeń broniony."
@@ -799,7 +799,7 @@
         "description": "Artyleria",
         "helptext": "Artyleria dalekiego zasięgu."
     },
-    "armartic": {
+    "turretemp": {
         "name": "Faraday",
         "description": "Wieżyczka paralizacyjna",
         "helptext": "Faraday to wieżyczka uzbrojona w mocne działko EMP. Doskonale współpracuje z innymi wieżyczkami, lecz sama jest bezużyteczna. Kiedy nie atakuje, otrzymuje tylko ćwierć obrażeń."
@@ -934,7 +934,7 @@
         "description": "Lekka łódź podwodna",
         "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami; należy też wystrzegać się niszczycieli."
     },
-    "armanni": {
+    "turretantiheavy": {
         "name": "Annihilator",
         "description": "Akcelerator tachionów - wymaga sieci energetycznej 50 E",
         "helptext": "Annihilator posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia czterokrotnie."
@@ -1094,12 +1094,12 @@
         "description": "Poduszkowiec konstruktor, moc 5 m/s",
         "helptext": "Quill pozwala na bezproblemową rozbudowę zarówno na ziemi, jak i w wodzie."
     },
-    "armaak": {
+    "jumpaa": {
         "name": "Archangel",
         "description": "Ciężki skoczek przeciwlotniczy",
         "helptext": "Archangel posiada podwójny laser i działko przeciwlotnicze, które szybko zestrzeliwują wrogie lotnictwo. Jest także w stanie skakać, co pozwala mu pokonywać trudny teren lub unikać ostrzału."
     },
-    "armarad": {
+    "staticheavyradar": {
         "name": "Zaawansowany radar",
         "description": "Radar dalekiego zasięgu",
         "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja."
@@ -1224,7 +1224,7 @@
         "description": "O kurczę!",
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
-    "armasp": {
+    "staticrearm": {
         "name": "Lądowisko",
         "description": "Naprawia i dozbraja samoloty, moc 2.5 e/s na stanowisko",
         "helptext": "Stacja naprawcza odnawia amunicję bombowcom i naprawia samoloty."

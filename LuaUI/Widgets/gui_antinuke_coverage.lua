@@ -21,7 +21,7 @@ local nukeDefs = {
 }
 
 local intDefs = {
-	[UnitDefNames["armamd"].id] = {
+	[UnitDefNames["staticantinuke"].id] = {
 		range = 2500,
 		rangeSq = 2500^2,
 		static = true,

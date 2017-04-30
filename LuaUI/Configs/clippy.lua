@@ -102,7 +102,7 @@ local defenseDefs = {
 	"screamer",
 	
 	"cordoom",
-	"armanni",
+	"turretantiheavy",
 	
 	"turrettorp",
 	

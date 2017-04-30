@@ -85,14 +85,14 @@ local econ = {
 	armmstor =   {order = 7, row = 3, col = 1},
 	armestor =   {order = 8, row = 3, col = 2},
 	armnanotc =  {order = 9, row = 3, col = 3},
-	armasp =    {order = 10, row = 3, col = 4},
+	staticrearm =    {order = 10, row = 3, col = 4},
 }
 
 local defense = {
 	corrl =    {order = 0, row = 1, col = 1},
 	corllt =   {order = 1, row = 1, col = 2},
 	armdeva =  {order = 2, row = 1, col = 3},
-	armartic = {order = 3, row = 1, col = 4},
+	turretemp = {order = 3, row = 1, col = 4},
 	armpb =    {order = 5, row = 1, col = 5},
 	corhlt =   {order = 6, row = 1, col = 6},
 
@@ -102,23 +102,23 @@ local defense = {
 	armcir =       {order = 12, row = 2, col = 4},
 	screamer =     {order = 13, row = 2, col = 5},
 
---	armartic = {order = 3, row = 3},
+--	turretemp = {order = 3, row = 3},
 	corgrav =    {order = 4, row = 3, col = 1},
 	turrettorp = {order = 14, row = 3, col = 2},
 	cordoom =    {order = 16, row = 3, col = 3},
-	armanni =    {order = 17, row = 3, col = 4},
+	turretantiheavy =    {order = 17, row = 3, col = 4},
 	corjamt =    {order = 18, row = 3, col = 5},
 }
 
 local aux = {	--merged into special
 	corrad =   {order = 10, row = 1, col = 1},
 	armjamt =  {order = 12, row = 1, col = 2},
-	armarad =  {order = 14, row = 1, col = 3},
+	staticheavyradar =  {order = 14, row = 1, col = 3},
 }
 
 local super = {	--merged into special
 	missilesilo = {order = 15, row = 1, col = 4},
-	armamd =      {order = 16, row = 1, col = 5},
+	staticantinuke =      {order = 16, row = 1, col = 5},
 	corbhmth =     {order = 2, row = 2, col = 1},
 	armbrtha =     {order = 3, row = 2, col = 2},
 	corsilo =      {order = 4, row = 2, col = 3},

@@ -43,13 +43,13 @@ modConfig["ZK"] = {}
 modConfig["ZK"]["unitList"] =
 {
 	--1FACTION
-	armamd = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
-	armartic = { weapons = { 1 } },		--faraday
+	staticantinuke = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
+	turretemp = { weapons = { 1 } },		--faraday
 	armdeva = { weapons = { 1 } },		--stardust
 	armpb = { weapons = { 1 } },		--pitbull
 	mahlazer = { weapons = { 1 } },		--starlight
-	armartic = { weapons = { 1 } },		--faraday
-	armanni = { weapons = { 1 } },		--annihilator
+	turretemp = { weapons = { 1 } },		--faraday
+	turretantiheavy = { weapons = { 1 } },		--annihilator
 	armbrtha = { weapons = { 1 } },		--bertha
 	tacnuke = { weapons = { 1 } },		--tacnuke
 	armarch = { weapons = { 2 } },		--packo (unused)

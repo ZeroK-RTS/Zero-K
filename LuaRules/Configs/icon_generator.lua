@@ -212,10 +212,10 @@ unitConfigs = {
   [UnitDefNames.armspy.id] = {
     unfold = true,
   },
-  [UnitDefNames.armanni.id] = {
+  [UnitDefNames.turretantiheavy.id] = {
     unfold = true,
   },
-  [UnitDefNames.armarad.id] = {
+  [UnitDefNames.staticheavyradar.id] = {
     unfold = true,
     wait   = 225,
   },

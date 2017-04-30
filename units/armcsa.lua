@@ -13,7 +13,7 @@ unitDef = {
   buildoptions        = {
     [[armnanotc]],
     [[corrad]],
-    [[armarad]],
+    [[staticheavyradar]],
     [[armjamt]],
     [[armrectr]],
     [[armflea]],

@@ -65,7 +65,7 @@ local menu_armcsa = {
 		items = {
 		  {
 			angle = 45,
-			unit = "armarad"
+			unit = "staticheavyradar"
 		  },
 		  {
 			angle = 135,

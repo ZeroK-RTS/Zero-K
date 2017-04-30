@@ -20,7 +20,7 @@ unitDef = {
     [[corcan]],
     [[corsumo]],
 	[[firewalker]],
-    [[armaak]],
+    [[jumpaa]],
 	[[corsktl]],
   },
 

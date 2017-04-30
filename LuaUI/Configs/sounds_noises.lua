@@ -10,7 +10,7 @@ local sounds = {
 			[1] = "light_bot_select",
 		},
 	},
-	armasp = {
+	staticrearm = {
 		select = {
 			[1] = "building_select1",
 		},
@@ -128,7 +128,7 @@ local sounds = {
 			[1] = "spider_select",
 		},
 	},
-	arm_venom = {
+	spideremp = {
 		ok = {
 			[1] = "spider_move",
 		},
@@ -320,7 +320,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	armaak = {
+	jumpaa = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -1226,7 +1226,7 @@ local sounds = {
 			[1] = "factory_select",
 		},
 	},
-	armarad = { NEEDED
+	staticheavyradar = { NEEDED
 		select = {
 			[1] = "factory_select",
 		},
@@ -1242,7 +1242,7 @@ local sounds = {
 			[1] = "radar_select",
 		},
 	},
-	armarad = {
+	staticheavyradar = {
 		select = {
 			[1] = "radar_select",
 		},
@@ -1292,7 +1292,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	armartic = {
+	turretemp = {
 		ok = {
 			[1] = "turret_move",
 		},
@@ -1324,7 +1324,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	armanni = {
+	turretantiheavy = {
 		ok = {
 			[1] = "light_turret_select",
 		},
@@ -1470,7 +1470,7 @@ local sounds = {
 			[1] = "silo_select",
 		},
 	},
-	armamd = {
+	staticantinuke = {
 		ok = {
 			[1] = "turret_select",
 		},

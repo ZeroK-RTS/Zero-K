@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[arm_venom]],
+  unitname               = [[spideremp]],
   name                   = [[Venom]],
   description            = [[Lightning Riot Spider]],
   acceleration           = 0.26,
   brakeRate              = 0.78,
   buildCostMetal         = 200,
-  buildPic               = [[arm_venom.png]],
+  buildPic               = [[spideremp.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -41,7 +41,7 @@ unitDef = {
   movementClass          = [[TKBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[venom.s3o]],
-  script                 = [[arm_venom.lua]],
+  script                 = [[spideremp.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -135,4 +135,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ arm_venom = unitDef })
+return lowerkeys({ spideremp = unitDef })

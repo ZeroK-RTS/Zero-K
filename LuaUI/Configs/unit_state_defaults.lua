@@ -11,7 +11,7 @@ local holdPosException = {
 local dontFireAtRadarUnits = {
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["armmanni"].id] = true,
-	[UnitDefNames["armanni"].id] = true,
+	[UnitDefNames["turretantiheavy"].id] = true,
 	[UnitDefNames["armmerl"].id] = true,
 }
 

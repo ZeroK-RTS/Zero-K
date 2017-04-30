@@ -136,7 +136,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	
 	"armjeth",
 	"corcrash",
-	"armaak",
+	"jumpaa",
 	"hoveraa",
 	"spideraa",
 	"amphaa",
@@ -162,7 +162,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 local lowMedRangeSkirmieeArray = NameToDefID({
 	"armwar",
 	"hoverassault",
-	"arm_venom",
+	"spideremp",
 	
 	"cormak",
 	"corthud",
@@ -208,7 +208,7 @@ local longRangeSkirmieeArray = NameToDefID({
 	"armbanth",
 	"corllt",
 	"armdeva",
-	"armartic",
+	"turretemp",
 })
 
 local artyRangeSkirmieeArray = NameToDefID({
@@ -246,7 +246,7 @@ local slasherSkirmieeArray = NameToDefID({
 	"armpb",
 	"corllt",
 	"armdeva",
-	"armartic",
+	"turretemp",
 })
 
 -- Nested union so long ranged things also skirm the things skirmed by short ranged things
@@ -326,7 +326,7 @@ local brawler = NameToDefID({
 local fleeables = NameToDefID({
 	"corllt",
 	"armdeva",
-	"armartic",
+	"turretemp",
 	"corgrav",
 	
 	"armcom",
@@ -337,7 +337,7 @@ local fleeables = NameToDefID({
 	"armwar",
 	"armzeus",
 	
-	"arm_venom",
+	"spideremp",
 	"spiderriot",
 	
 	"cormak",
@@ -693,7 +693,7 @@ local behaviourConfig = {
 		skirmLeeway = 0, 
 		velocityPrediction = 20
 	},
-	["arm_venom"] = {
+	["spideremp"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -1198,7 +1198,7 @@ local behaviourConfig = {
 		minFleeRange = 500,
         skirmLeeway = 50, 
 	},
-	["armaak"] = {
+	["jumpaa"] = {
 		skirms = skirmableAir, 
 		swarms = brawler, 
 		flees = armedLand,

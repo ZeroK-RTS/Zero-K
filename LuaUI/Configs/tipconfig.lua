@@ -109,7 +109,7 @@ riotDefs = {
 	"cormak",
 	"corlevlr",
 	
-	"arm_venom",
+	"spideremp",
 	"tawf003",
 	"tawf114",
 
@@ -195,7 +195,7 @@ superweaponDefs = {
 }
 
 needPowerDefs = {
-	"armanni",
+	"turretantiheavy",
 	"corbhmth",
 	"cordoom",
 }

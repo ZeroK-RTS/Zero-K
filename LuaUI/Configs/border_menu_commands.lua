@@ -47,7 +47,7 @@ local buildoptions = {
 		{ "armsolar",  notSea=true },
 		{ "armnanotc" },-- caretaker
 		{ "geo",  notSea=true },
-		{ "armasp" },-- repair pad
+		{ "staticrearm" },-- repair pad
 
 		-- adv
 		{ "armestor",  tech=2 },-- pylon
@@ -59,16 +59,16 @@ local buildoptions = {
 
 	{-- point_defense
 		{ "corllt",  notSea=true },
-		{ "armartic",  notSea=true },-- Faraday
+		{ "turretemp",  notSea=true },-- Faraday
 		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
 		{ "armdeva" },-- Stardust
 		{ "corgrav",  notSea=true },-- newton
 		{ "armpb",  notSea=true },-- Popup gauss
 		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
 		{ "cordoom",  tech=2, notSea=true },
-		{ "armanni",  tech=3, notSea=true },
+		{ "turretantiheavy",  tech=3, notSea=true },
 		{ "corbhmth",  tech=3, notSea=true },
-		{ "armamd",  tech=3, notSea=true },-- Protector
+		{ "staticantinuke",  tech=3, notSea=true },-- Protector
 	},
 
 	{-- air_defense
@@ -83,7 +83,7 @@ local buildoptions = {
 
 	{-- special
 		{ "corrad" },
-		{ "armarad",  tech=2 },
+		{ "staticheavyradar",  tech=2 },
 		{ "corjamt",  tech=2 },-- Aegis
 		{ "armjamt",  tech=2 },-- Sneaky Pete
 		{ "missilesilo",  tech=2 },

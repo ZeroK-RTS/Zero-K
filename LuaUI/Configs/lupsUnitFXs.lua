@@ -133,12 +133,12 @@ effectUnitDefs = {
     {class='SimpleParticles', options=MergeTable({delay=120},roostDirt)},
   },
   
-  armasp= {
+  staticrearm= {
   	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light1"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light2"}) },
   },
   
-  armarad = {
+  staticheavyradar = {
     {class='StaticParticles', options=MergeTable(blinkyLightWhite,{piece="point"})},
     --{class='StaticParticles', options=MergeTable(blinkyLightBlue,{piece="point", delay=15})},
   },  

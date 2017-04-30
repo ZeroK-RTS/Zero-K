@@ -1,6 +1,6 @@
 local unitlistNames = {
 	energyheavygeo = {},
-	armamd = {},
+	staticantinuke = {},
 	armbrtha = {},
 	armcsa = { mark_each_appearance = true, show_owner = true, },
 	armsnipe = { mark_each_appearance = true, },

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armarad]],
+  unitname                      = [[staticheavyradar]],
   name                          = [[Advanced Radar]],
   description                   = [[Long-Range Radar]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[armarad_aoplane.dds]],
-  buildPic                      = [[armarad.png]],
+  buildingGroundDecalType       = [[staticheavyradar_aoplane.dds]],
+  buildPic                      = [[staticheavyradar.png]],
   category                      = [[UNARMED FLOAT]],
   collisionVolumeOffsets        = [[0 -8 0]],
   collisionVolumeScales         = [[32 83 32]],
@@ -38,7 +38,7 @@ unitDef = {
   maxSlope                      = 36,
   minCloakDistance              = 150,
   objectName                    = [[novaradar.s3o]],
-  script                        = [[armarad.lua]],
+  script                        = [[staticheavyradar.lua]],
   onoffable                     = true,
   radarDistance                 = 4000,
   radarEmitHeight               = 32,
@@ -68,4 +68,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armarad = unitDef })
+return lowerkeys({ staticheavyradar = unitDef })

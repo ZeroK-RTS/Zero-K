@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armamd]],
+  unitname                      = [[staticantinuke]],
   name                          = [[Protector]],
   description                   = [[Strategic Nuke Interception System]],
   acceleration                  = 0,
@@ -11,7 +11,7 @@ unitDef = {
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
   buildingGroundDecalType       = [[antinuke_decal.dds]],
-  buildPic                      = [[ARMAMD.png]],
+  buildPic                      = [[staticantinuke.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 70 110]],
@@ -43,7 +43,7 @@ unitDef = {
   objectName                    = [[antinuke.s3o]],
   radarDistance                 = 2500,
   radarEmitHeight			    = 24,
-  script                        = [[armamd.lua]],
+  script                        = [[staticantinuke.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   sightDistance                 = 660,
   turnRate                      = 0,
@@ -129,4 +129,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armamd = unitDef })
+return lowerkeys({ staticantinuke = unitDef })

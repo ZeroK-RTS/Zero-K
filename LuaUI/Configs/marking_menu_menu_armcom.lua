@@ -58,7 +58,7 @@ local menu_armcom = {
       },
       {
         angle = 0,
-        unit = "armasp"
+        unit = "staticrearm"
       },
     }
   },
@@ -116,7 +116,7 @@ local menu_armcom = {
       },
       {
         angle = -135,
-        unit = "armartic"
+        unit = "turretemp"
       },
       {
         angle = -45,
@@ -162,7 +162,7 @@ local menu_armcom = {
     items = {
       {
         angle = 0,
-        unit = "armarad"
+        unit = "staticheavyradar"
       },
       {
         angle = -180,
@@ -184,7 +184,7 @@ local menu_armcom = {
   },
   {
     angle = -135,
-    unit = "armamd",
+    unit = "staticantinuke",
     label = "Super",
     items = {
       {
@@ -197,7 +197,7 @@ local menu_armcom = {
       },
 	  {
         angle = 135,
-        unit = "armanni"
+        unit = "turretantiheavy"
       },
       {
         angle = 180,

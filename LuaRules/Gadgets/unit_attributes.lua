@@ -60,7 +60,7 @@ local workingGroundMoveType = true -- not ((Spring.GetModOptions() and (Spring.G
 -- Sensor Handling
 
 local hasSensorOrJamm = {
-	[ UnitDefNames['armarad'].id ] = true,
+	[ UnitDefNames['staticheavyradar'].id ] = true,
 	[ UnitDefNames['spherecloaker'].id ] = true,
 	[ UnitDefNames['armjamt'].id ] = true,
 	[ UnitDefNames['armsonar'].id ] = true,

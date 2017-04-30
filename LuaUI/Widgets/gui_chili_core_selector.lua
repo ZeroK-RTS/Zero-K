@@ -110,7 +110,7 @@ local FACTORY_ORDER = 3
 local CONSTRUCTOR_BUTTON_ID = "cons"
 
 local exceptionList = {
-	armasp = true,
+	staticrearm = true,
 	reef = true,
 }
 

@@ -679,7 +679,7 @@
 		"description" : "Locates Water Units",
 		"helptext" : "The docile Sonar Station provides one of the few means of locating underwater targets."
 	},
-	"arm_venom" : {
+	"spideremp" : {
 		"name" : "Venom",
 		"description" : "Lightning Riot Spider",
 		"helptext" : "The Venom is an all-terrain unit designed to paralyze enemies so other units can easily destroy them. It moves particularly fast for a riot unit and in addition to paralysis it does a small amount of damage. Works well in tandem with the Recluse to keep enemies from closing range with the fragile skirmisher."
@@ -709,7 +709,7 @@
 		"description" : "Heavy Riot Support Tank",
 		"helptext" : "Remarkably mobile for a riot platform, the Banisher packs twin high-velocity fragmentation missiles that are devastating to light units and aircraft alike, although they have limited range. Like other riot units, the Banisher does not have the range and speed to hold its own against most skirmishers. The missile is quite effective at flattening terrain so it is particularly useful at knocking down walls that Welders cannot reach."
 	},
-	"armamd" : {
+	"staticantinuke" : {
 		"name" : "Protector",
 		"description" : "Strategic Nuke Interception System",
 		"helptext" : "The Protector automatically intercepts enemy nuclear ICBMs aimed within its coverage radius."
@@ -784,7 +784,7 @@
 		"description" : "Static Artillery",
 		"helptext" : "Long range static artillery."
 	},
-	"armartic" : {
+	"turretemp" : {
 		"name" : "Faraday",
 		"description" : "EMP Turret",
 		"helptext" : "The Faraday is a powerful EMP tower. It has high damage and area of effect. Greatly amplifies the effect of other towers, but virtually useless on its own. When closed damage received is reduced to a quarter. Be careful of its splash damage though, as it can paralyze your own units if they are too close to the enemy."
@@ -929,7 +929,7 @@
 		"description" : "All Terrain Assault Bot",
 		"helptext" : "The Hermit can take an incredible beating, and is useful as a shield for the weaker, more-damaging Recluses."
 	},
-	"armanni" : {
+	"turretantiheavy" : {
 		"name" : "Annihilator",
 		"description" : "Tachyon Projector - Requires 50 Power",
 		"helptext" : "Inside the heavily armored shell of the Annihilator lies the devastating Tachyon Accelerator. This fearsome weapon is capable of delivering pinpoint damage at extreme ranges, provided you keep it connected to a power source. Remember that the Annihilator is strictly a support weapon; leave it unguarded and it will be swamped with raiders. When under attack by long range artillery or bombers the main gun can retract to reduce incoming damage to a quarter."
@@ -1134,7 +1134,7 @@
 		"description" : "Construction Hovercraft, Builds at 5 m/s",
 		"helptext" : "The Quill allows smooth expansion across both land and sea."
 	},
-	"armaak" : {
+	"jumpaa" : {
 		"name" : "Archangel",
 		"description" : "Heavy Anti-Air Jumper",
 		"helptext" : "The Archangel packs twin anti-air lasers and an autocannon for slaying enemy aircraft rapidly. It can also jump to quickly access high ground or to escape."
@@ -1144,7 +1144,7 @@
 		"description" : "Lightning Assault/Raider Tank",
 		"helptext" : "The Panther is a high-tech raider. Its weapon, a lightning gun, deals mostly paralyze damage. This way, the Panther can disable turrets, waltz through the defensive line, and proceed to level the economic heart of the opponent's base. When killed, it sets off an EMP explosion that can stun surrounding raiders."
 	},
-	"armarad" : {
+	"staticheavyradar" : {
 		"name" : "Advanced Radar",
 		"description" : "Long-Range Radar",
 		"helptext" : "The advanced Radar Tower has a considerably greater range than the basic version."
@@ -1259,7 +1259,7 @@
 		"description" : "Clucking Hell!",
 		"helptext" : "Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. It can spit acid, spray spores to kill aircraft, and kick land units away from it. Most of all, its jaws can rip apart the largest assault mech in seconds. Only the most determined, focused assault can hope to stop this beast in her tracks."
 	},
-	"armasp" : {
+	"staticrearm" : {
 		"name" : "Air Repair/Rearm Pad",
 		"description" : "Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad",
 		"helptext" : "The Air Repair/Rearm Pad repairs up to four aircraft at a time. It also refuels/rearms bombers."

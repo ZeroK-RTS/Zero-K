@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[armasp]],
+  unitname            = [[staticrearm]],
   name                = [[Air Repair/Rearm Pad]],
   description         = [[Repairs and Rearms Aircraft, repairs at 2.5 e/s per pad]],
   acceleration        = 0,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostMetal      = 350,
   buildDistance       = 6,
   builder             = true,
-  buildPic            = [[ARMASP.png]],
+  buildPic            = [[staticrearm.png]],
   canAttack           = true,
   canMove             = true,
   canPatrol           = true,
@@ -38,7 +38,7 @@ unitDef = {
   maxVelocity         = 0,
   minCloakDistance    = 150,
   objectName          = [[airpad.s3o]],
-  script			  = [[armasp.lua]],
+  script			  = [[staticrearm.lua]],
   selfDestructAs      = [[LARGE_BUILDINGEX]],
   showNanoSpray       = false,
   sightDistance       = 273,
@@ -68,4 +68,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armasp = unitDef })
+return lowerkeys({ staticrearm = unitDef })

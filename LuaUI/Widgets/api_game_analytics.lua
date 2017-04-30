@@ -56,7 +56,7 @@ unitCategories.energyBuildings = Spring.Utilities.MergeTable(	unitCategories.bas
 																unitCategories.advancedEnergyBuildings)
 
 unitCategories.lightGroundTurrets = {
-	armartic   = true,
+	turretemp   = true,
 	armdeva    = true,
 	corllt     = true,
 	corrl      = true,
@@ -65,7 +65,7 @@ unitCategories.lightGroundTurrets = {
 }              
 
 unitCategories.heavyGroundTurrets = {
-	armanni  = true,
+	turretantiheavy  = true,
 	corbhmth = true,
 	corhlt   = true,
 	cordoom  = true,

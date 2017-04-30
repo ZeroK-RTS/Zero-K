@@ -120,7 +120,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             weaver,       flea,      hermit,          venom,       redback,      recluse,   crabe,      infiltrator, tarantula
-		"unit":      ["spidercon", "armflea", "spiderassault", "arm_venom", "spiderriot", "armsptk", "armcrabe", "armspy",    "spideraa"],
+		"unit":      ["spidercon", "armflea", "spiderassault", "spideremp", "spiderriot", "armsptk", "armcrabe", "armspy",    "spideraa"],
 		"land": {
 			// 0-12m Opening - Opening turbo Flea spam & Riots
 			"tier0": [ 0.00,         0.93,      0.00,            0.02,        0.05,         0.00,      0.00,       0.00,        0.00],
@@ -264,7 +264,7 @@
 
 		"income_tier": [40],
 		//             freaker,   puppy,   pyro,      placeholder,     moderator,  jack,     sumo,      firewalker,   skuttle,   archangel
-		"unit":      ["corfast", "puppy", "corpyro", "jumpblackhole", "slowmort", "corcan", "corsumo", "firewalker", "corsktl", "armaak"],
+		"unit":      ["corfast", "puppy", "corpyro", "jumpblackhole", "slowmort", "corcan", "corsumo", "firewalker", "corsktl", "jumpaa"],
 		"land": {
 			"tier0": [ 0.10,      0.20,    0.35,      0.05,            0.20,       0.10,     0.00,      0.00,         0.00,      0.00],
 			"tier1": [ 0.10,      0.00,    0.30,      0.05,            0.25,       0.15,     0.03,      0.12,         0.00,      0.00]
@@ -581,7 +581,7 @@
 		"pwr_mod": 2.0,
 		"thr_mod": 2.0
 	},
-	"arm_venom": {
+	"spideremp": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"limit": 2,
@@ -788,7 +788,7 @@
 		"pwr_mod": 3.0,
 		"thr_mod": 0.2
 	},
-	"armaak": {
+	"jumpaa": {
 		"role": ["anti_air"],
 		"retreat": 0.8,
 		"pwr_mod": 2.0,
@@ -1072,7 +1072,7 @@
 		"role": ["static", "support", "static"],
 		"thr_mod": 0.75
 	},
-	"armanni": {
+	"turretantiheavy": {
 		"role": ["static", "support", "static"],
 		"thr_mod": 0.75
 	},
@@ -1080,7 +1080,7 @@
 		"role": ["static", "support", "static"],
 		"thr_mod": 1.0
 	},
-	"armamd": {
+	"staticantinuke": {
 		"role": ["static", "heavy"]
 	},
 	"corhlt": {
@@ -1132,7 +1132,7 @@
 		"attribute": ["siege"],
 		"thr_mod": 1.5
 	},
-	"armartic": {
+	"turretemp": {
 		"role": ["static"],
 		"thr_mod": 3.5
 	},
@@ -1171,7 +1171,7 @@
 	"armestor": {
 		"role": ["mine"]
 	},
-	"armarad": {
+	"staticheavyradar": {
 		"role": ["mine"]
 	},
 	"armmstor": {
@@ -1430,7 +1430,7 @@
 	"switch": 600,
 
 	"terra": "terraunit",
-	"airpad": "armasp",
+	"airpad": "staticrearm",
 
 	// Unknown UnitDef replacer
 	"default": "corrl"
@@ -1438,7 +1438,7 @@
 
 "porcupine": {
 	//        0         1        2          3         4             5           6            7          8          9           10         11          12        13
-	"unit": ["corllt", "corrl", "armdeva", "corhlt", "turrettorp", "corrazor", "armnanotc", "cordoom", "corjamt", "armartic", "armanni", "corbhmth", "armcir", "screamer"],
+	"unit": ["corllt", "corrl", "armdeva", "corhlt", "turrettorp", "corrazor", "armnanotc", "cordoom", "corjamt", "turretemp", "turretantiheavy", "corbhmth", "armcir", "screamer"],
 	// Actual number of defences per cluster bounded by income
 	"land":  [0, 1, 1, 2, 3, 5, 2, 6, 2, 3, 12, 11, 13],
 	"water": [4, 1, 6, 4, 4, 3, 5],
@@ -1877,7 +1877,7 @@
 				],
 				[  // chain2
 					{"unit": "corllt", "category": "defence", "offset": [80, 80]},
-					{"unit": "armartic", "category": "defence", "offset": {"right": 80}},
+					{"unit": "turretemp", "category": "defence", "offset": {"right": 80}},
 					{"unit": "corrl", "category": "defence", "offset": [70, -70]},
 					{"unit": "corrl", "category": "defence", "offset": [80, -80]},
 					{"unit": "armcir", "category": "defence", "offset": {"front": 120}, "condition": "air"},
@@ -2074,7 +2074,7 @@
 	},
 	"instance": {
 		"fac_land": ["factorycloak", "factoryamph", "factoryhover", "factoryjump", "factoryshield", "factoryspider", "factorytank", "factoryveh"],
-		"fac_air": ["factoryplane", "factorygunship", "armasp"],
+		"fac_air": ["factoryplane", "factorygunship", "staticrearm"],
 		"fac_water": ["factoryship"],
 		"fac_strider": ["striderhub"],
 		"solar": ["armsolar"],
@@ -2087,7 +2087,7 @@
 		"def_low": ["corrl", "corllt"],
 		"caretaker": ["armnanotc"],
 		"superweapon": ["raveparty", "corsilo", "armbrtha", "zenith", "screamer"],
-		"protector": ["armamd"],
+		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
 		"strider": ["armcomdgun", "scorpion", "dante", "armraven", "funnelweb", "armbanth", "armorco", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}

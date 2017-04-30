@@ -93,7 +93,7 @@ local unitIsBomber = {
 
 -- Hardcode things which do high burst damage with a long cooldown
 local unitIsHeavyHitter = {
-	[UnitDefNames["armanni"].id] = true,
+	[UnitDefNames["turretantiheavy"].id] = true,
 	[UnitDefNames["armmanni"].id] = true,
 	[UnitDefNames["armsnipe"].id] = true,
 	[UnitDefNames["shieldarty"].id] = true,
@@ -184,7 +184,7 @@ local velocityPenaltyDefs = {
 local stunWeaponDefs = {
 	[WeaponDefNames["shieldarty_emp_rocket"].id] = true,
 	[WeaponDefNames["shipscout_missile"].id] = true,
-	--[WeaponDefNames["armartic_arm_det_weapon"].id] = true,
+	--[WeaponDefNames["turretemp_arm_det_weapon"].id] = true,
 	--[WeaponDefNames["arm_venom_spider"].id] = true,
 }
 
@@ -211,7 +211,7 @@ local radarWobblePenalty = {
 	[WeaponDefNames["armmerl_cortruck_rocket"].id] = 5,
 --	[WeaponDefNames["shipcarrier_armmship_rocket"].id] = 5,
 	[WeaponDefNames["armsnipe_shockrifle"].id] = 5,
-	[WeaponDefNames["armanni_ata"].id] = 5,
+	[WeaponDefNames["turretantiheavy_ata"].id] = 5,
 	[WeaponDefNames["armmanni_ata"].id] = 5,
 	[WeaponDefNames["armham_hammer_weapon"].id] = 5,
 }
