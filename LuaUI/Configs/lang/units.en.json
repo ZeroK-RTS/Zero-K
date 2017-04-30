@@ -774,7 +774,7 @@
 		"description" : "Drone/Shield Support Strider",
 		"helptext" : "The slow all-terrain Funnelweb features an area shield and a powerful drone complement."
 	},
-	"armwar" : {
+	"cloakriot" : {
 		"name" : "Warrior",
 		"description" : "Riot Bot",
 		"helptext" : "The Warrior's devastating heavy Energy Machine Gun is effective versus most enemy units, in particular raiders. It performs poorly versus static defense, so do not use it as an assault unit. Counter by staying out of their range, as they are slow. Warriors quickly regenerate damage when out of combat."

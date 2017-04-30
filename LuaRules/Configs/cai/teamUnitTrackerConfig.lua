@@ -116,7 +116,7 @@ local ground = {
 	},
 
 	riot = {
-		"armwar",
+		"cloakriot",
 		"shieldriot",
 		"vehriot",
 		"spiderriot",

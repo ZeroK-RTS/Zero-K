@@ -71,7 +71,7 @@ local jumper = { -- uses jump for offense. IE do not put commander or AA here.
 }
 
 local riot = {
-	"armwar",
+	"cloakriot",
 	"shieldriot",
 	"vehriot",
 	"spiderriot",

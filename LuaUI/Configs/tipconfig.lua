@@ -105,7 +105,7 @@ skirmDefs = {
 }
 
 riotDefs = {
-	"armwar",
+	"cloakriot",
 	"shieldriot",
 	"vehriot",
 	

@@ -789,7 +789,7 @@
         "description": "Ekranowany mech-matka ",
         "helptext": "Funnelweb to ciężki mech-pająk z tarczą obszarową i kontyngentem dronów bojowych."
     },
-    "armwar": {
+    "cloakriot": {
         "name": "Warrior",
         "description": "Bot wsparcia",
         "helptext": "Warrior ma ciężkie karabiny skuteczne przeciwko większości jednostek, szczególnie lekkim. Słabo spisuje się jednak przeciwko wieżyczkom i harcownikom z racji niewielkiej wytrzymałości i niskiej prędkości. Po wyjściu z walki Warrior samoczynnie naprawia się."

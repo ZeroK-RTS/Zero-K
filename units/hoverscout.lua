@@ -37,8 +37,8 @@ unitDef = {
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[hoverraid.s3o]],
-  script			  = [[hoverraid.cob]],
+  objectName          = [[corsh.s3o]],
+  script              = [[hoverraid.cob]],
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

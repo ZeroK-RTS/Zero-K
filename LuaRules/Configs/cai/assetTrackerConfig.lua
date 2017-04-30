@@ -76,7 +76,7 @@ local heatmapNames = {
 		["vehsupport"] = {mult = 1},
 		["jumparty"] = {mult = 1},
 		
-		["armwar"] = {mult = 1},
+		["cloakriot"] = {mult = 1},
 		["shieldriot"] = {mult = 1},
 		["vehriot"] = {mult = 1},
 		["spiderriot"] = {mult = 1},
@@ -232,7 +232,7 @@ local ground = {
 	},
 
 	riot = {
-		"armwar",
+		"cloakriot",
 		"shieldriot",
 		"vehriot",
 		"spiderriot",

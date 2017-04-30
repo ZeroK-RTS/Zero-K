@@ -73,7 +73,7 @@ local options = {
 	{ -- string
 		key     = 'disabledunits',
 		name    = 'Disabled units',
-		desc    = 'Disable usage of specific units.\nSyntax: armwar+cloakraid+raveparty\nkey: disabledunits',
+		desc    = 'Disable usage of specific units.\nSyntax: cloakriot+cloakraid+raveparty\nkey: disabledunits',
 		type    = 'string',
 		def     = '',
 	},

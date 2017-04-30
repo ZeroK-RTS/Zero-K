@@ -127,7 +127,7 @@ local shortRangeSkirmieeArray = NameToDefID({
 
 local riotRangeSkirmieeArray = NameToDefID({
 	"tankheavyraid",
-	"armwar",
+	"cloakriot",
 	"hoverraid",
 	"hoverscout",
 	"amphriot",
@@ -160,7 +160,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 })
 
 local lowMedRangeSkirmieeArray = NameToDefID({
-	"armwar",
+	"cloakriot",
 	"hoverassault",
 	"spideremp",
 	
@@ -230,7 +230,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 local slasherSkirmieeArray = NameToDefID({
 	"jumpsumo",
 	"striderdante",
-	"armwar",
+	"cloakriot",
 	"hoverassault",
 	"shieldriot",
 	"shieldassault",
@@ -334,7 +334,7 @@ local fleeables = NameToDefID({
 	"corcom",
 	"coradvcom",
 	
-	"armwar",
+	"cloakriot",
 	"cloakassault",
 	
 	"spideremp",
@@ -675,7 +675,7 @@ local behaviourConfig = {
 	},
 	
 	-- riots
-	["armwar"] = {
+	["cloakriot"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = {}, 
 		flees = {},

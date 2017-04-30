@@ -14,7 +14,7 @@ unitDef = {
     [[cloakraid]],
     [[cloakheavyraid]],
     [[cloakskirm]],
-    [[armwar]],
+    [[cloakriot]],
     [[cloakassault]],
     [[cloakarty]],
     [[cloaksnipe]],

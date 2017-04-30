@@ -25,7 +25,7 @@
 		"income_tier": [20, 30, 60],
 
 		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
-		"unit":      ["cloakcon", "cloakraid", "cloakheavyraid", "cloakskirm", "armwar", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "cloakjammer", "cloakaa"],
+		"unit":      ["cloakcon", "cloakraid", "cloakheavyraid", "cloakskirm", "cloakriot", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "cloakjammer", "cloakaa"],
 
 		"land": {
 			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
@@ -416,7 +416,7 @@
 		"role": ["skirmish"],
 		"retreat": 0.15  // mostly disposable
 	},
-	"armwar": {
+	"cloakriot": {
 		"role": ["riot"],
 		"attribute": ["support"],
 		"retreat": 0.6,

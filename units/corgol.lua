@@ -36,7 +36,7 @@ unitDef = {
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
-  objectName          = [[tankheavyassault_512.s3o]],
+  objectName          = [[corgol_512.s3o]],
   script	      = [[tankheavyassault.cob]],
   selfDestructAs      = [[BIG_UNIT]],
 

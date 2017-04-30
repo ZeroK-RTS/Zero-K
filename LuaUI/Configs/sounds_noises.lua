@@ -396,7 +396,7 @@ local sounds = {
 			[1] = "crawlie_select",
 		},
 	},
-	armwar = {
+	cloakriot = {
 		ok = {
 			[1] = "bot_move",
 		},

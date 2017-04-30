@@ -268,7 +268,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['armwar'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakriot'].id, chance = 1},
 				},
 				
 				[8] = { -- aa

@@ -38,8 +38,8 @@ unitDef = {
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
-  objectName          = [[hoverraid.s3o]],
-  script              = "hoverraid.lua",
+  objectName          = [[corsh.s3o]],
+  script              = [[hoverraid.lua]],
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {

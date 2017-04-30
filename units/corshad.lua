@@ -48,8 +48,8 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
-  objectName          = [[bomberprec.s3o]],
-  script			  = [[bomberprec.lua]],
+  objectName          = [[corshad.s3o]],
+  script              = [[bomberprec.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {

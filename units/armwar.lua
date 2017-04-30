@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armwar]],
+  unitname               = [[cloakriot]],
   name                   = [[Warrior]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.2,
   buildCostMetal         = 220,
-  buildPic               = [[ARMWAR.png]],
+  buildPic               = [[cloakriot.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -39,7 +39,7 @@ unitDef = {
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[Spherewarrior.s3o]],
-  script                 = [[armwar.lua]],
+  script                 = [[cloakriot.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -138,4 +138,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armwar = unitDef })
+return lowerkeys({ cloakriot = unitDef })
