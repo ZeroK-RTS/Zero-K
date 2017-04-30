@@ -5,7 +5,7 @@ local raider = {
 	"armflash",
 	"corfav",
 	"corgator",
-	"amphraider3",
+	"amphraid",
 	
 	"corpyro",
 	"panther",
@@ -75,7 +75,7 @@ local riot = {
 	"cormak",
 	"corlevlr",
 	"spiderriot",
-	"amphraider2",
+	"amphimpulse",
 	"amphriot",
 	
 	"arm_venom",

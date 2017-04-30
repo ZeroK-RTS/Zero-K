@@ -299,7 +299,7 @@ unitConfigs = {
   [UnitDefNames.spiderassault.id] = {
     unfold = true,
   },  
-  [UnitDefNames.arm_spider.id] = {
+  [UnitDefNames.spidercon.id] = {
     scale    = 3,
     attempts = 10,
   },

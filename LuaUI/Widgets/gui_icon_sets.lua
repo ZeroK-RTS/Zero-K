@@ -24,7 +24,7 @@ options = {
 				Spring.SetUnitDefIcon(UnitDefNames["coracv"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["amphcon"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["corfast"].id, "builder")
-				Spring.SetUnitDefIcon(UnitDefNames["arm_spider"].id, "builder")
+				Spring.SetUnitDefIcon(UnitDefNames["spidercon"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["corch"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "builder")
 			else
@@ -34,7 +34,7 @@ options = {
 				Spring.SetUnitDefIcon(UnitDefNames["coracv"].id, "tankbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["amphcon"].id, "amphbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["corfast"].id, "jumpjetbuilder")
-				Spring.SetUnitDefIcon(UnitDefNames["arm_spider"].id, "spiderbuilder")
+				Spring.SetUnitDefIcon(UnitDefNames["spidercon"].id, "spiderbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["corch"].id, "hoverbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "shipbuilder")
 			end

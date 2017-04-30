@@ -105,7 +105,7 @@ local units = {
 		armstiletto_laser = SPECIAL,
 	},
 	factoryspider = {
-		arm_spider = CONSTRUCTOR,
+		spidercon = CONSTRUCTOR,
 		armflea = RAIDER,
 		spiderriot = RIOT,
 		armsptk = SKIRMISHER,
@@ -141,8 +141,8 @@ local units = {
 	},
 	factoryamph = {
 		amphcon = CONSTRUCTOR,
-		amphraider3 = RAIDER,
-		amphraider2 = WEIRD_RAIDER,
+		amphraid = RAIDER,
+		amphimpulse = WEIRD_RAIDER,
 		amphriot = RIOT,
 		amphfloater = SKIRMISHER,
 		-- No Amph Artillery

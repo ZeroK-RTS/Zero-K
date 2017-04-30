@@ -12,7 +12,7 @@ unitDef = {
   buildingGroundDecalType       = [[factoryspider_aoplane.dds]],
 
   buildoptions                  = {
-    [[arm_spider]],
+    [[spidercon]],
     [[armflea]],
 	[[spiderassault]],
     [[arm_venom]],

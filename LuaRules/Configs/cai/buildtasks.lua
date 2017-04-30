@@ -172,7 +172,7 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 0.9,
 					count = 1,
-					[1] = {ID = UnitDefNames['arm_spider'].id, chance = 1},
+					[1] = {ID = UnitDefNames['spidercon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout
@@ -469,14 +469,14 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['amphraider3'].id, chance = 1},
+					[1] = {ID = UnitDefNames['amphraid'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['amphraider3'].id, chance = 0.8},
-					[2] = {ID = UnitDefNames['amphraider2'].id, chance = 0.2},
+					[1] = {ID = UnitDefNames['amphraid'].id, chance = 0.8},
+					[2] = {ID = UnitDefNames['amphimpulse'].id, chance = 0.2},
 				},
 				
 				[4] = { -- arty
@@ -501,7 +501,7 @@ factionBuildConfig = {
 				[7] = { -- riot
 					importanceMult = 0.6,
 					count = 2,
-					[2] = {ID = UnitDefNames['amphraider2'].id, chance = 0.7},
+					[2] = {ID = UnitDefNames['amphimpulse'].id, chance = 0.7},
 					[1] = {ID = UnitDefNames['amphriot'].id, chance = 0.3},
 				},
 				

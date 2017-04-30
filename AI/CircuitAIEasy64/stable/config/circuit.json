@@ -91,7 +91,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             conch,     duck,          archer,        buoy,          scallop,    grizzly,       djinn,      angler
-		"unit":      ["amphcon", "amphraider3", "amphraider2", "amphfloater", "amphriot", "amphassault", "amphtele", "amphaa"],
+		"unit":      ["amphcon", "amphraid", "amphimpulse", "amphfloater", "amphriot", "amphassault", "amphtele", "amphaa"],
 		"land": {
 			// 0-8m Opening - Ducks and Archers
 			"tier0": [ 0.00,      0.73,          0.25,          0.00,          0.02,       0.00,          0.00,       0.00],
@@ -120,7 +120,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             weaver,       flea,      hermit,          venom,       redback,      recluse,   crabe,      infiltrator, tarantula
-		"unit":      ["arm_spider", "armflea", "spiderassault", "arm_venom", "spiderriot", "armsptk", "armcrabe", "armspy",    "spideraa"],
+		"unit":      ["spidercon", "armflea", "spiderassault", "arm_venom", "spiderriot", "armsptk", "armcrabe", "armspy",    "spideraa"],
 		"land": {
 			// 0-12m Opening - Opening turbo Flea spam & Riots
 			"tier0": [ 0.00,         0.93,      0.00,            0.02,        0.05,         0.00,      0.00,       0.00,        0.00],
@@ -511,12 +511,12 @@
 	"amphcon": {
 		"role": ["builder"]
 	},
-	"amphraider3": {
+	"amphraid": {
 		"role": ["raider"],
 		"attribute": ["scout"],
 		"retreat": 0.35  // pretty disposable
 	},
-	"amphraider2": {
+	"amphimpulse": {
 		"role": ["riot"],
 		"attribute": ["melee"],
 		"retreat": 0.5,
@@ -547,7 +547,7 @@
 	},
 
 	// factoryspider
-	"arm_spider": {
+	"spidercon": {
 		"role": ["builder"]
 	},
 	"armflea": {

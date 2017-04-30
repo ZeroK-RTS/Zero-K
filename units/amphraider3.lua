@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[amphraider3]],
+  unitname               = [[amphraid]],
   name                   = [[Duck]],
   description            = [[Amphibious Raider Bot (Anti-Sub)]],
   acceleration           = 0.18,
   activateWhenBuilt      = true,
   brakeRate              = 0.375,
   buildCostMetal         = 80,
-  buildPic               = [[amphraider3.png]],
+  buildPic               = [[amphraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -32,8 +32,8 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP]],
-  objectName             = [[amphraider3.s3o]],
-  script                 = [[amphraider3.lua]],
+  objectName             = [[amphraid.s3o]],
+  script                 = [[amphraid.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -173,4 +173,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ amphraider3 = unitDef })
+return lowerkeys({ amphraid = unitDef })

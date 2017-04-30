@@ -9,7 +9,7 @@ local waterCannonIndexable = {
 }
 
 local unitDefData = {
-	[UnitDefNames["amphraider2"].id] = {
+	[UnitDefNames["amphimpulse"].id] = {
 		tankMax = 180,
 		shotCost = 1.2,
 		tankRegenRate = 14,

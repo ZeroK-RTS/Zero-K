@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[arm_spider]],
+  unitname               = [[spidercon]],
   name                   = [[Weaver]],
   description            = [[Construction Spider, Builds at 7.5 m/s]],
   acceleration           = 0.2,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[arm_spider.png]],
+  buildPic               = [[spidercon.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -48,7 +48,7 @@ unitDef = {
   objectName             = [[weaver.s3o]],
   radarDistance          = 1200,
   radarEmitHeight        = 12,
-  script                 = [[arm_spider.lua]],
+  script                 = [[spidercon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 380,
@@ -81,4 +81,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ arm_spider = unitDef })
+return lowerkeys({ spidercon = unitDef })

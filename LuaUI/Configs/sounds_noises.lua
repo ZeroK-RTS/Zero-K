@@ -87,7 +87,7 @@ local sounds = {
 	},
 	
 	-- Spider
-	arm_spider = {
+	spidercon = {
 		build = "builder_start",
 		ok = {
 			[1] = "spider_move",
@@ -432,7 +432,7 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
-	amphraider2 = {
+	amphimpulse = {
 		ok = {
 			[1] = "amph_move",
 		},
@@ -441,7 +441,7 @@ local sounds = {
 			volume = 0.7,
 		},
 	},
-	amphraider3 = {
+	amphraid = {
 		ok = {
 			[1] = "amph_move",
 		},

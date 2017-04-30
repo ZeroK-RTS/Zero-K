@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[amphraider]],
+  unitname               = [[grebe]],
   name                   = [[Grebe]],
   description            = [[Amphibious Raider Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
   buildCostMetal         = 300,
-  buildPic               = [[amphraider.png]],
+  buildPic               = [[grebe.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -32,7 +32,7 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[amphraider.s3o]],
-  script                 = [[amphraider.lua]],
+  script                 = [[grebe.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -160,4 +160,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ amphraider = unitDef })
+return lowerkeys({ grebe = unitDef })

@@ -118,7 +118,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 local shortRangeSkirmieeArray = NameToDefID({
 	"corpyro",
 	"logkoda",
-	"amphraider3",
+	"amphraid",
 	"corsumo",
 	
 	"corsktl",
@@ -147,7 +147,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"corned",
 	"corch",
 	"coracv",
-	"arm_spider",
+	"spidercon",
 	"corfast",
 	"amphcon",
 	"shipcon",
@@ -174,7 +174,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 local medRangeSkirmieeArray = NameToDefID({
 	"spiderriot",
 	"armzeus",
-	"amphraider2",
+	"amphimpulse",
 	
 	"spiderassault",
 	"corlevlr",
@@ -222,7 +222,7 @@ local artyRangeSkirmieeArray = NameToDefID({
 	"armpb",
 	"cordoom",
 	"armorco",
-	"amphartillery",
+	"ampharty",
 	
 	"shipskirm",
 })
@@ -516,7 +516,7 @@ local behaviourConfig = {
 		velocityPrediction = 30,
 	},
 	
-	["amphraider3"] = {
+	["amphraid"] = {
 		waterline = -5,
 		land = {
 			weaponNum = 1,
@@ -630,7 +630,7 @@ local behaviourConfig = {
 		skirmOrderDis = 150,
 	},
 	
-	["amphraider2"] = {
+	["amphimpulse"] = {
 		skirms = riotRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -778,7 +778,7 @@ local behaviourConfig = {
 		},
 	},
 	
-	["amphartillery"] = {
+	["ampharty"] = {
 		waterline = -5,
 		land = {
 			weaponNum = 1,

@@ -19,7 +19,7 @@
 		"description" : "Produces Cloaky Robots, Builds at 10 m/s",
 		"helptext" : "Emphasizing guile over brute force, the Cloaky Bot Factory makes good use of stealth, mobility and EMP weapons to strike at the enemy's weak points. Key units:  Glaive, Rocko, Warrior, Zeus, Hammer"
 	},
-	"amphartillery" : {
+	"ampharty" : {
 		"name" : "Kraken",
 		"description" : "Amphibious Skirmisher/Artillery Bot",
 		"helptext" : "The Kraken is a mobile short ranged artillery bot, armed with twin-firing cannons. For underwater combat it can rapidly fire unguided charges to kill slow enemies. "
@@ -504,7 +504,7 @@
 		"description" : "Deployable Missile Vehicle (must stop to fire)",
 		"helptext" : "Keep the Slasher at maximum range to harass the opponent's units. The Slasher's missiles track, so they are ideal to kill fast-moving raiders and crawling bombs. It is able to hit air, but is only really useful against fighters. Cannot fire over obstacles, and does poorly if enemies, particularly assault units, are allowed to close range. Unlike skirmishers, the Slasher cannot fire while moving."
 	},
-	"amphraider" : {
+	"grebe" : {
 		"name" : "Grebe",
 		"description" : "Amphibious Raider Bot",
 		"helptext" : "The Grebe is a basic raider armed with grenades - a decent short ranged anti-heavy weapon. Despite being amphibious, it cannot shoot while submerged."
@@ -529,7 +529,7 @@
 		"description" : "Area Cloaker/Jammer Walker",
 		"helptext" : "The Eraser has a jamming device to conceal your units' radar returns. It also has a small cloak shield to hide friendly nearby units from enemy sight."
 	},
-	"arm_spider" : {
+	"spidercon" : {
 		"name" : "Weaver",
 		"description" : "Construction Spider, Builds at 7.5 m/s",
 		"helptext" : "The Weaver is a constructor that can climb over any obstacle and build defenses on high ground. It is also equipped with a short range radar."
@@ -1149,7 +1149,7 @@
 		"description" : "Long-Range Radar",
 		"helptext" : "The advanced Radar Tower has a considerably greater range than the basic version."
 	},
-	"amphraider2" : {
+	"amphimpulse" : {
 		"name" : "Archer",
 		"description" : "Amphibious Raider/Riot Bot",
 		"helptext" : "The Archer uses a powerful water cutting jet to hit enemies. While the water cannon loses firepower and range as its water tank empties, it can be refilled by standing in a body of water. Archers can float to surface in order to fight naval units."
@@ -1219,7 +1219,7 @@
 		"description" : "Medium-Light Raider Bot",
 		"helptext" : "The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs."
 	},
-	"amphraider3" : {
+	"amphraid" : {
 		"name" : "Duck",
 		"description" : "Amphibious Raider Bot (Anti-Sub)",
 		"helptext" : "The Duck is the basic underwater raider. Armed with short ranged torpedoes, it uses its (relatively) high speed to harass sea targets that cannot shoot back, though it dies to serious opposition. On land it can launch the torpedoes a short distance as a decent short ranged anti-heavy weapon."

@@ -19,7 +19,7 @@
         "description": "Buduje cichociemne boty, moc 10 m/s",
         "helptext": "Jednostki z tej fabryki cechują się zwinnością i nieuchwytnością bardziej niż siłą ognia i wytrzymałością. Wiele z nich posiada maskowanie lub broń EMP, co promuje sprytne podejście do walki."
     },
-    "amphartillery": {
+    "ampharty": {
         "name": "Kraken",
         "description": "Amfibijny bot artyleryjski / harcownik",
         "helptext": "Kraken to amfibijny bot z podwójnym działem o niedużym zasięgu - jak na artylerię. Pod wodą korzysta z szybkiej wyrzutni bomb głębinowych, które nie są naprowadzane i tym samym najlepiej sprawdzają się przeciwko powolnym celom."
@@ -524,7 +524,7 @@
         "description": "Pojazd rakietowy (musi stać w miejscu, by strzelać)",
         "helptext": "Slasher nie może strzelać w ruchu. Stojące w miejscu Slashery automatycznie rozstawiają swoją dalekosiężną wyrzutnię lekkich rakiet samonaprowadzających, które świetnie nadają się do niszczenia lekkich jednostek i bomb; mogą także służyć jako improwizowana obrona przeciwlotnicza. Slasher nie może jednak strzelać nad przeszkodami i ma niską wytrzymałość."
     },
-    "amphraider": {
+    "grebe": {
         "name": "Grebe",
         "description": "Lekki bot amfibijny",
         "helptext": "Grebe to lekki bot z granatami krótkiego zasięgu, które dobrze sprawdzają się przeciwko cięższym celom. Mimo że jest amfibijny, nie może strzelać w wodzie."
@@ -549,7 +549,7 @@
         "description": "Bot zakłócająco-maskujący",
         "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Eraser posiada również niewidzalność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
     },
-    "arm_spider": {
+    "spidercon": {
         "name": "Weaver",
         "description": "Pająk konstruktor, moc 7.5 m/s",
         "helptext": "Weaver to pajęczy konstruktor, który może wspinać się po dowolnej powierzchni. Jest także wyposażony w radar."
@@ -1104,7 +1104,7 @@
         "description": "Radar dalekiego zasięgu",
         "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja."
     },
-    "amphraider2": {
+    "amphimpulse": {
         "name": "Archer",
         "description": "Lekki amfibijny bot wsparcia",
         "helptext": "Archer używa strumienia wody do walki. W miarę strzelania, opróżnia się jego zbiornik wody pod ciśnieniem, co skutkuje zmniejszeniem zasięgu i siły ataku. Zbiorniki można ponownie napełnić stojąc w wodzie. Archer jest w stanie wynurzyć się, by walczyć z jednostkami na powierzchni wody."
@@ -1184,7 +1184,7 @@
         "description": "Lekki bot",
         "helptext": "Bandit jest szybki, lekki i zadaje dość wysokie obrażenia. Nie jest jednak na tyle mocny, by można go było używać przeciwko obwarowanym przeciwnikom. Przegrywa w bezpośrednim starciu z jednostkami wsparcia i wieżyczkami."
     },
-    "amphraider3": {
+    "amphraid": {
         "name": "Duck",
         "description": "Lekki bot amfibijny",
         "helptext": "Duck to lekki bot amfibijny ze specjalnymi rakietami krótkiego zasięgu, które może odpalić także w wodzie. Jest szybki i tani, lecz delikatny."

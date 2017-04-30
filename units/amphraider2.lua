@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[amphraider2]],
+  unitname               = [[amphimpulse]],
   name                   = [[Archer]],
   description            = [[Amphibious Raider/Riot Bot]],
   acceleration           = 0.2,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
   buildCostMetal         = 200,
-  buildPic               = [[amphraider2.png]],
+  buildPic               = [[amphimpulse.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -35,8 +35,8 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName             = [[amphraider2.s3o]],
-  script                 = [[amphraider2.lua]],
+  objectName             = [[amphimpulse.s3o]],
+  script                 = [[amphimpulse.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -197,4 +197,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ amphraider2 = unitDef })
+return lowerkeys({ amphimpulse = unitDef })
