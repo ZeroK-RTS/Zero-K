@@ -1,4 +1,4 @@
-amgeo = {
+energyheavygeo = {
 	pieces = {
 		base = {},
 	},
@@ -11,4 +11,4 @@ amgeo = {
 	numpieces = 1,
 }
 
-return amgeo
+return energyheavygeo

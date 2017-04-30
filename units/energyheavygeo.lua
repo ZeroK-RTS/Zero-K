@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[amgeo]],
+  unitname                      = [[energyheavygeo]],
   name                          = [[Advanced Geothermal]],
   description                   = [[Large Powerplant (+100) - HAZARDOUS]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 9,
-  buildingGroundDecalType       = [[amgeo_aoplane.dds]],
-  buildPic                      = [[AMGEO.png]],
+  buildingGroundDecalType       = [[energymohogeo_aoplane.dds]],
+  buildPic                      = [[energyheavygeo.png]],
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 
@@ -35,7 +35,7 @@ unitDef = {
   maxSlope                      = 255,
   minCloakDistance              = 150,
   objectName                    = [[amgeo.s3o]],
-  script                        = [[amgeo.lua]],
+  script                        = [[energyheavygeo.lua]],
   selfDestructAs                = [[NUCLEAR_MISSILE]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
@@ -62,4 +62,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ amgeo = unitDef })
+return lowerkeys({ energyheavygeo = unitDef })

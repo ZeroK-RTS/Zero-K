@@ -46,7 +46,7 @@ unitCategories.basicEnergyBuildings = {
 }
 
 unitCategories.advancedEnergyBuildings = {
-	amgeo  = true, 
+	energyheavygeo  = true, 
 	armfus = true, 
 	cafus  = true, 
 	geo    = true, 

@@ -29,7 +29,7 @@ unitDef = {
     modelradius    = [[42]],
 	removewait     = 1,
     
-    morphto = [[amgeo]],
+    morphto = [[energyheavygeo]],
     morphtime = [[90]],
 	
 	priority_misc = 1, -- Medium

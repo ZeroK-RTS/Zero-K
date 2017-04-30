@@ -1,5 +1,5 @@
 local unitlistNames = {
-	amgeo = {},
+	energyheavygeo = {},
 	armamd = {},
 	armbrtha = {},
 	armcsa = { mark_each_appearance = true, show_owner = true, },

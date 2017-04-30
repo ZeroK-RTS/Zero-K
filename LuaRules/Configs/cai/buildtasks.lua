@@ -654,7 +654,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['amgeo'].id] = {
+			[UnitDefNames['energyheavygeo'].id] = {
 				energyGreaterThan = 120, 
 				energySpacing = 900,
 				whileStall = false,

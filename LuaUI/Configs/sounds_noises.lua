@@ -1123,7 +1123,7 @@ local sounds = {
 			[1] = "geo_select",
 		},
 	},
-	amgeo = {
+	energyheavygeo = {
 		select = {
 			[1] = "geo_select",
 		},

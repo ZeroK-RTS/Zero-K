@@ -319,7 +319,7 @@
 		"description" : "Heavy Artillery",
 		"helptext" : "The Lobber's big brother, the Blobber hurls a wide-scatter rain of acid goo. It can pummel even the toughest shield network very quickly, but remains relatively prone to direct attack."
 	},
-	"amgeo" : {
+	"energyheavygeo" : {
 		"name" : "Advanced Geothermal",
 		"description" : "Large Powerplant (+100) - HAZARDOUS",
 		"helptext" : "The Advanced Geothermal Powerplant produces a massive amount of energy. It requires protection, though, as destroying it results in a devastating explosion."

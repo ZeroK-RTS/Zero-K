@@ -174,7 +174,7 @@ local energyStructureDefs = {
 	[UnitDefNames["armwin"].id] = {cost = 35, income = 1.25},
 	[UnitDefNames["armsolar"].id] = {cost = 70, income = 2},
 	[UnitDefNames["geo"].id] = {cost = 500, income = 25},
-	[UnitDefNames["amgeo"].id] = {cost = 1000, income = 75},
+	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
 	[UnitDefNames["armfus"].id] = {cost = 1000, income = 35},
 	[UnitDefNames["cafus"].id] = {cost = 4000, income = 225},
 }

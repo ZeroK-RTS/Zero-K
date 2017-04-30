@@ -334,7 +334,7 @@
         "description": "Ciężka artyleria",
         "helptext": "Blobber wypluwa kwas na szeroki obszar. W ten sposób bardzo szybko niszczy budynki i tarcze, lecz jest wrażliwy na bezpośredni ostrzał."
     },
-    "amgeo": {
+    "energyheavygeo": {
         "name": "Ulepszona Geotermia",
         "description": "Duża elektrownia (+100) - NIEBEZPIECZNE",
         "helptext": "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."

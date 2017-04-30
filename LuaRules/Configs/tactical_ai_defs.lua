@@ -281,7 +281,7 @@ local medRangeExplodables = NameToDefID({
 	"armfus", -- don't suicide vs fusions if possible.
 	"geo",
 	"cafus", -- same with singu, at least to make an effort for survival.
-	"amgeo",
+	"energyheavygeo",
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
 })
 

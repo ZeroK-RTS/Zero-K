@@ -204,7 +204,7 @@ for i = 1, #buildOpts do
 end
 
 -- Misc stuff without direct buildability
-addUnit(UnitDefNames["amgeo"].id, "Buildings/Economy", true) -- moho geo
+addUnit(UnitDefNames["energyheavygeo"].id, "Buildings/Economy", true) -- moho geo
 addUnit(UnitDefNames["armcsa"].id, "Units/Misc", true) -- athena
 addUnit(UnitDefNames["wolverine_mine"].id, "Units/Misc", false) -- maybe should go under LV fac, like wolverine? to consider.
 addUnit(UnitDefNames["tele_beacon"].id, "Units/Misc", false)
