@@ -256,7 +256,7 @@ end
 local function initialiseNoGoZones()
 
 	do
-		local geoUnitDef = UnitDefNames["geo"]
+		local geoUnitDef = UnitDefNames["energygeo"]
 		local features = Spring.GetAllFeatures()
 		
 		local sX = geoUnitDef.xsize*4

@@ -28,7 +28,7 @@ local spGetActiveCommand = Spring.GetActiveCommand
 local spGetGameFrame        = Spring.GetGameFrame
 
 
-local geoDefID = UnitDefNames["geo"].id
+local geoDefID = UnitDefNames["energygeo"].id
 
 local mapX = Game.mapSizeX
 local mapZ = Game.mapSizeZ

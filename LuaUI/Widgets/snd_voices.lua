@@ -96,7 +96,7 @@ local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
   "cafus", 
   "armtide", 
   "armwin",
-  "geo",
+  "energygeo",
 }
 local commanders = {}
 

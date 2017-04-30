@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[geo]],
+  unitname                      = [[energygeo]],
   name                          = [[Geothermal Generator]],
   description                   = [[Medium Powerplant (+25)]],
   acceleration                  = 0,
@@ -11,7 +11,7 @@ unitDef = {
   buildingGroundDecalSizeX      = 7,
   buildingGroundDecalSizeY      = 7,
   buildingGroundDecalType       = [[geo_aoplane.dds]],
-  buildPic                      = [[GEO.png]],
+  buildPic                      = [[energygeo.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[84 84 84]],
@@ -79,4 +79,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ geo = unitDef })
+return lowerkeys({ energygeo = unitDef })

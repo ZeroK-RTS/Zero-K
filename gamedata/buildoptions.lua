@@ -4,7 +4,7 @@ local buildOpts = {
 	[[armfus]],
 	[[cafus]],
 	[[armwin]],
-	[[geo]],
+	[[energygeo]],
 	[[armmstor]],
 	[[armestor]],
 	[[armnanotc]],

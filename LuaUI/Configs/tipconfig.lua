@@ -166,7 +166,7 @@ energyDefs = {
 	"armsolar",
 	"armwin",
 	"armfus",
-	"geo",
+	"energygeo",
 	"cafus",
 }
 

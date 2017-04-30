@@ -664,7 +664,7 @@
         "description": "Najcięższy mech szturmowy",
         "helptext": "Detriment to najcięższy mech na polu bitwy. Posiada lasery przeciwlotnicze i rakiety dalekiego zasięgu, ale jego siła pochodzi z niesamowitego pancerza i potężnych dział, które szybko likwidują wrogie jednostki. Mimo swojej ogromnej mocy, Detriment nie powinien pracować bez odpowiedniego wsparcia ze strony lzejszych jednostek."
     },
-    "geo": {
+    "energygeo": {
         "name": "Geotermia",
         "description": "Średnia elektrownia (+25)",
         "helptext": "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."

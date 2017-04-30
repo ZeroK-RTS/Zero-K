@@ -79,7 +79,7 @@ local econ = {
 	cormex =     {order = 1, row = 1, col = 1},
 	armwin =     {order = 2, row = 2, col = 1},
 	armsolar =   {order = 3, row = 2, col = 2},
-	geo =        {order = 4, row = 2, col = 3},
+	energygeo =        {order = 4, row = 2, col = 3},
 	armfus =     {order = 5, row = 2, col = 4},
 	cafus =      {order = 6, row = 2, col = 5},
 	armmstor =   {order = 7, row = 3, col = 1},

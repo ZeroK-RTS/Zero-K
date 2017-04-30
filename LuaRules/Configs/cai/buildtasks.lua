@@ -626,7 +626,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['geo'].id] = {
+			[UnitDefNames['energygeo'].id] = {
 				energyGreaterThan = 20, 
 				energySpacing = 400,
 				whileStall = false,

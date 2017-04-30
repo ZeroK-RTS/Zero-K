@@ -1118,7 +1118,7 @@ local sounds = {
 			[1] = "adv_fusion_select",
 		},
 	},
-	geo = {
+	energygeo = {
 		select = {
 			[1] = "geo_select",
 		},

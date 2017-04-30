@@ -46,7 +46,7 @@ local buildoptions = {
 		{ "armwin" },-- wind
 		{ "armsolar",  notSea=true },
 		{ "armnanotc" },-- caretaker
-		{ "geo",  notSea=true },
+		{ "energygeo",  notSea=true },
 		{ "armasp" },-- repair pad
 
 		-- adv

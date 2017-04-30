@@ -1170,7 +1170,7 @@
 	//   P2 = armsolar: (70/2; random(10..15)) = (35, 13)
 	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
 	// Then parabola P(x) defines limit for
-	//   "geo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
+	//   "energygeo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
 	//   "armwin": x=35/1.2=29.17, y = P(29.17) ~= 4
 	//
 	// Metal income condition for energy structure is: income > sqrt(structure_cost*0.4).

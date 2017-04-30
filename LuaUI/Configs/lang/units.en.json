@@ -649,7 +649,7 @@
 		"description" : "Ultimate Assault Strider",
 		"helptext" : "The Detriment is the single heaviest strider in the field. It can defend itself against air attacks or use its rockets to hit distant targets, but the real meat lies in the massive gauss guns designed for one purpose - to kill other heavy units quickly and efficiently. Remember - the wise commander sends his Detriment out with adequate escorts against light unit swarms and air assaults."
 	},
-	"geo" : {
+	"energygeo" : {
 		"name" : "Geothermal Generator",
 		"description" : "Medium Powerplant (+25)",
 		"helptext" : "Geothermal plants are highly efficient energy sources that can only be built on geovents on the map. They explode quite violently when destroyed, so avoid placing anything directly adjacent."

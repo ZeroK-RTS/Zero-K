@@ -15,7 +15,7 @@ local menu_armcom = {
       },
       {
         angle= 135,
-        unit = "geo",
+        unit = "energygeo",
       },
       --{
       --  angle = -45,

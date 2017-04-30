@@ -279,7 +279,7 @@ local diverExplodables = NameToDefID({
 
 local medRangeExplodables = NameToDefID({
 	"armfus", -- don't suicide vs fusions if possible.
-	"geo",
+	"energygeo",
 	"cafus", -- same with singu, at least to make an effort for survival.
 	"energyheavygeo",
 	"armbanth", -- banthas also have a fairly heavy but dodgeable explosion.
