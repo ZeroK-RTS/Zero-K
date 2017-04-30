@@ -945,7 +945,7 @@
 		"limit": 1,
 		"dmg_mod": 0.01
 	},
-	"missilesilo": {
+	"staticmissilesilo": {
 		"role": ["static", "support", "heavy"],
 		"dmg_mod": 0.01
 	},

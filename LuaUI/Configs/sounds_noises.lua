@@ -1440,7 +1440,7 @@ local sounds = {
 	},
 	
 	-- Silo etc
-	missilesilo = {
+	staticmissilesilo = {
 		build = "builder_start",
 		select = {
 			[1] = "silo_select",

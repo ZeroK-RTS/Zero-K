@@ -43,7 +43,7 @@ local buildOpts = {
 	[[armamd]],
 	[[corbhmth]],
 	[[armbrtha]],
-	[[missilesilo]],
+	[[staticmissilesilo]],
 	[[corsilo]],
 	[[mahlazer]],
 	[[raveparty]],

@@ -187,7 +187,7 @@ AddFactoryOfUnits("factoryjump")
 AddFactoryOfUnits("factorytank")
 AddFactoryOfUnits("factoryship")
 AddFactoryOfUnits("striderhub")
-AddFactoryOfUnits("missilesilo")
+AddFactoryOfUnits("staticmissilesilo")
 
 local buildOpts = VFS.Include("gamedata/buildoptions.lua")
 local factory_commands, econ_commands, defense_commands, special_commands = include("Configs/integral_menu_commands.lua")

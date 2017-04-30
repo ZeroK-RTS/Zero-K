@@ -87,7 +87,7 @@ local spTraceScreenRay		= Spring.TraceScreenRay
 local spGetGroundHeight		= Spring.GetGroundHeight
 local spGetCameraState 		= Spring.GetCameraState
 
-local siloDefID = -UnitDefNames["missilesilo"].id
+local siloDefID = -UnitDefNames["staticmissilesilo"].id
 
 local floor = math.floor
 local cos = math.cos

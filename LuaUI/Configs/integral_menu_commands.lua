@@ -195,7 +195,7 @@ local function AddBuildQueue(name)
 end
 
 AddBuildQueue("striderhub")
-AddBuildQueue("missilesilo")
+AddBuildQueue("staticmissilesilo")
 
 local factories = {
 	factorycloak =    {order = 1, row = 1, col = 1},
@@ -257,7 +257,7 @@ local aux = {	--merged into special
 }
 
 local super = {	--merged into special
-	missilesilo = {order = 15, row = 1, col = 4},
+	staticmissilesilo = {order = 15, row = 1, col = 4},
 	armamd =      {order = 16, row = 1, col = 5},
 	corbhmth =     {order = 2, row = 2, col = 1},
 	armbrtha =     {order = 3, row = 2, col = 2},

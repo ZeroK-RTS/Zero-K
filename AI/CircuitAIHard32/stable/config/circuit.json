@@ -1047,7 +1047,7 @@
 		"limit": 1,
 		"thr_mod": 0.01
 	},
-	"missilesilo": {
+	"staticmissilesilo": {
 		"role": ["static", "support", "heavy"],
 		"thr_mod": 0.01
 	},

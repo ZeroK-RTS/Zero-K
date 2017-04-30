@@ -29,7 +29,7 @@
 		"description" : "General-Purpose Artillery",
 		"helptext" : "The heavy, long-ranging gun of the Pillager makes it the unit of choice for standoff shelling of enemy mobiles or structures. As always, it should be wary of anything that gets close to it."
 	},
-	"missilesilo" : {
+	"staticmissilesilo" : {
 		"name" : "Missile Silo",
 		"description" : "Produces Tactical Missiles, Builds at 10 m/s",
 		"helptext" : "The Missile Silo constructs and holds up to four different cruise missiles, each with a unique warhead. It offers excellent standoff strike capability for offensive and defensive purposes."

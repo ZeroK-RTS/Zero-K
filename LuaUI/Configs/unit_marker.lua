@@ -20,7 +20,7 @@ local unitlistNames = {
 	factoryspider = { show_owner = true, },
 	factorytank = { show_owner = true, },
 	factoryveh = { show_owner = true, },
-	missilesilo = {},
+	staticmissilesilo = {},
 	pw_hq_attacker = {},
 	pw_hq_defender = {},
 	raveparty = {},

@@ -75,7 +75,7 @@ modConfig["ZK"]["unitList"] =
 local shieldDefID = UnitDefNames["corjamt"].id
 
 local unitDefIDRemap = {
-	[UnitDefNames["missilesilo"].id] = UnitDefNames["tacnuke"].id,
+	[UnitDefNames["staticmissilesilo"].id] = UnitDefNames["tacnuke"].id,
 	[UnitDefNames["tacnuke"].id] = -1,
 }
 

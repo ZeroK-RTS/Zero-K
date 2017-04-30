@@ -29,7 +29,7 @@
         "description": "Czołg artyleryjski",
         "helptext": "Pillager to świetna jednostka do ostrzału wrogich jednostek za sprawą swojego ciężkiego, dalekosiężnego działa. Jak każda jednostka artyleryjska, jest wrażliwy podczas walki na krótkie dystanse."
     },
-    "missilesilo": {
+    "staticmissilesilo": {
         "name": "Silos rakietowy",
         "description": "Buduje rakiety taktyczne, moc 10 m/s",
         "helptext": "Silos rakietowy buduje rakiety taktyczne. Do wyboru jest kilka różnych głowic, co zapewnia świetne możliwości zarówno defensywne, jak i ofensywne. Silos może składować do czterech rakiet."
