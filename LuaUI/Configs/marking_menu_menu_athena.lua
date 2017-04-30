@@ -1,4 +1,4 @@
-local menu_athena = { -- TODO_RENAME_FILE
+local menu_athena = {
 	items = {
 	  {
 		angle = -90,
