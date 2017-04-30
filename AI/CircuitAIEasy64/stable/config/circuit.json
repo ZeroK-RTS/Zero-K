@@ -235,7 +235,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             welder,   kodachi,   panther,   banisher,  reaper,    goliath,  pillager,  tremor, copperhead
-		"unit":      ["coracv", "logkoda", "panther", "tankriot", "correap", "corgol", "cormart", "tankheavyarty", "corsent"],
+		"unit":      ["coracv", "tankraid", "panther", "tankriot", "correap", "corgol", "cormart", "tankheavyarty", "corsent"],
 		"land": {
 			// 0-8m Opening - Koda and Banisher
 			"tier0": [ 0.00,     0.50,      0.00,      0.10,      0.40,      0.00,     0.00,      0.00,   0.00],
@@ -840,7 +840,7 @@
 	"coracv": {
 		"role": ["builder"]
 	},
-	"logkoda": {
+	"tankraid": {
 		"role": ["skirmish"],
 		"attribute": ["scout"],
 		"limit": 2,

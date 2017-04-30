@@ -130,7 +130,7 @@ local units = {
 	},
 	factorytank = {
 		coracv =  CONSTRUCTOR,
-		logkoda = WEIRD_RAIDER,
+		tankraid = WEIRD_RAIDER,
 		panther = RAIDER,
 		tankriot = RIOT,
 		cormart = ARTILLERY,

@@ -13,7 +13,7 @@ unitDef = {
 
   buildoptions                  = {
     [[coracv]],
-    [[logkoda]],
+    [[tankraid]],
 	[[panther]],
     [[tankriot]],
 	[[correap]],

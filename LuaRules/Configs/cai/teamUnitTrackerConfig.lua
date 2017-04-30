@@ -69,7 +69,7 @@ local ground = {
 		"corgator",
 		"panther",
 		"panther",
-		"logkoda",
+		"tankraid",
 		"armflea",
 		"corpyro",
 		"amphraid",

@@ -358,7 +358,7 @@ effectUnitDefs = {
     {class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="light2"}) },
     {class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="light1"}) },    
   },
-  fighterdrone = {
+  dronefighter = {
     --{class='AirJet', options={color={0.6,0.1,0.0}, width=3, length=40, piece="DroneMain", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true}},
     {class='Ribbon', options={width=1, size=24, piece="DroneMain"}},
   },

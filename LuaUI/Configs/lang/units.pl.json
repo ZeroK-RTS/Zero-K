@@ -389,7 +389,7 @@
         "description": "Podziemny robal (zieje ogniem)",
         "helptext": "Wurm zakopuje się pod ziemią, by w końcu ujawnić się obok ofiary i zaskoczyć ją ogniem. Nie radzi sobie w bezpośredniej walce."
     },
-    "fighterdrone": {
+    "dronefighter": {
         "name": "Spicula",
         "description": "Dron-myśliwiec",
         "helptext": "Spicula to dron-myśliwiec, który skutecznie atakuje cele naziemne i latające."
@@ -874,7 +874,7 @@
         "description": "Widzi mu się.",
         "helptext" : "- Widzisz?\n- Nie widzę.\n-No widzisz!"
     },
-    "logkoda": {
+    "tankraid": {
         "name": "Kodachi",
         "description": "Lekki czołg",
         "helptext": "Kodachi to lekki czołg z bombami zapalającymi, które dobrze spisują się przeciwko budynkom. Po wyjściu z walki szybko regeneruje się, co wspiera używanie go zaczepnie."
@@ -1194,7 +1194,7 @@
         "description": "Jak do mnie, to mnie nie ma!",
         "helptext" : "Nikogo nie ma w domu!"
     },
-    "heavyturret": {
+    "turretsunlance": {
         "name": "Sunlance",
         "description": "Wieżyczka przeciwczołgowa - wymaga sieci energetycznej 25 E",
         "helptext": "Sunlance posiada ciężki promień spowalniający, który skutecznie unieszkodliwia nawet ciężkie jednostki."

@@ -409,13 +409,13 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['logkoda'].id, chance = 1},
+					[1] = {ID = UnitDefNames['tankraid'].id, chance = 1},
 				},
 				
 				[3] = { -- raider
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['logkoda'].id, chance = 0.3},
+					[1] = {ID = UnitDefNames['tankraid'].id, chance = 0.3},
 					[2] = {ID = UnitDefNames['panther'].id, chance = 0.7},
 				},
 				

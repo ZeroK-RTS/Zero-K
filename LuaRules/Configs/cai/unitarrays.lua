@@ -9,7 +9,7 @@ local raider = {
 	
 	"corpyro",
 	"panther",
-	"logkoda",
+	"tankraid",
 	
 	"armsh",
 	"corsh",

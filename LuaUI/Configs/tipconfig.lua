@@ -52,7 +52,7 @@ raiderDefs = {
 	
 	"corpyro",
 	"panther",
-	"logkoda",
+	"tankraid",
 	
 	"armsh",
 	"corsh",

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[logkoda]],
+  unitname            = [[tankraid]],
   name                = [[Kodachi]],
   description         = [[Raider Tank]],
   acceleration        = 0.125,
   brakeRate           = 0.1375,
   buildCostMetal      = 180,
   builder             = false,
-  buildPic            = [[logkoda.png]],
+  buildPic            = [[tankraid.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -37,8 +37,8 @@ unitDef = {
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[logkoda.s3o]],
-  script              = [[logkoda.lua]],
+  objectName          = [[tankraid.s3o]],
+  script              = [[tankraid.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 600,
   trackOffset         = 6,
@@ -179,7 +179,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[logkoda_dead.s3o]],
+      object           = [[tankraid_dead.s3o]],
     },
 
 
@@ -194,4 +194,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ logkoda = unitDef })
+return lowerkeys({ tankraid = unitDef })

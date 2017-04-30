@@ -380,7 +380,7 @@
         "description": "Закапывающийся огнеметчик (штурмовик/подавитель)",
         "name": "Червь"
     },
-    "fighterdrone": {
+    "dronefighter": {
         "helptext": "Щупальце (Spicula) - это многоцелевой боевой дрон, силовые лучи  которого эффективны как против наземных, так и воздушных целей.",
         "description": "Боевой дрон",
         "name": "Щупальце"
@@ -1128,7 +1128,7 @@
         "description": "Соединимый щитовой робот",
         "name": "Аспид"
     },
-    "logkoda": {
+    "tankraid": {
         "helptext": "Крохотный Кодачи (Kodachi) - уникален в своём классе. Маленький и юркий, он, в тоже время, хорошо бронирован, что позволяет ему поехать достаточно близко что-бы выстрелить снарядом с напалмом. Для наибольшей эффективности, Кодачи должен подъехать, атаковать и быстро удрать до того как враги его убьют. Поврежденные Кадачи быстро восстанавливаются после битвы.",
         "description": "Танк-рейдер",
         "name": "Кодачи"
@@ -1158,7 +1158,7 @@
         "description": "Штурмовой бот со щитом",
         "name": "Головорез"
     },
-    "heavyturret": {
+    "turretsunlance": {
         "helptext": "The Sunlance's heavy disruptor beam cripples even the heaviest assault unit and will stop any armored assault dead in its tracks.",
         "description": "Anti-Tank Turret - Requires 25 Power",
         "name": "Sunlance"

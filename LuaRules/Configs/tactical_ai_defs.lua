@@ -74,7 +74,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"spiderassault",
 	"corraid",
 	"armzeus",
-	"logkoda",
+	"tankraid",
 	"hoverassault",
 	
 	"correap",
@@ -117,7 +117,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 
 local shortRangeSkirmieeArray = NameToDefID({
 	"corpyro",
-	"logkoda",
+	"tankraid",
 	"amphraid",
 	"corsumo",
 	
@@ -605,7 +605,7 @@ local behaviourConfig = {
 		velocityPrediction = 20
 	},
 	
-	["logkoda"] = {
+	["tankraid"] = {
 		skirms = shortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},

@@ -47,7 +47,7 @@ local carrierDefNames = {
 	nebula = {
 		spawnPieces = {"pad1", "pad2", "pad3", "pad4"},
 		{
-			drone = UnitDefNames.fighterdrone.id, 
+			drone = UnitDefNames.dronefighter.id, 
 			reloadTime = 15, 
 			maxDrones = 8, 
 			spawnSize = 2, 
@@ -185,7 +185,7 @@ local thingsWhichAreDrones = {
 	[UnitDefNames.carrydrone.id] = true,
 	[UnitDefNames.attackdrone.id] = true,
 	[UnitDefNames.battledrone.id] = true,
-	[UnitDefNames.fighterdrone.id] = true
+	[UnitDefNames.dronefighter.id] = true
 }
 
 local function ProcessCarrierDef(carrierData)

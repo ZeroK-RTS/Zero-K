@@ -25,7 +25,7 @@ local oneClickWepDefNames = {
 		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	--[[
-	logkoda = {
+	tankraid = {
 		{ functionToCall = "FlameTrail", reloadTime = 850, name = "Flame Trail", tooltip = "Leave a path of flame in your wake", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--]]

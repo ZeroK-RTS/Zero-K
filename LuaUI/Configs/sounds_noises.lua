@@ -655,7 +655,7 @@ local sounds = {
 			[1] = "tank_select",
 		},
 	},
-	logkoda = {
+	tankraid = {
 		ok = {
 			[1] = "light_tank_move2",
 		},

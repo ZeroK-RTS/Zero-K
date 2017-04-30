@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[heavyturret]],
+  unitname                      = [[turretsunlance]],
   name                          = [[Sunlance]],
   description                   = [[Anti-Tank Turret - Requires 25 Power]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[heavyturret_decal.dds]],
-  buildPic                      = [[heavyturret.png]],
+  buildingGroundDecalType       = [[turretsunlance_decal.dds]],
+  buildPic                      = [[turretsunlance.png]],
   canGuard                      = true,
   category                      = [[FLOAT]],
   corpse                        = [[DEAD]],
@@ -32,8 +32,8 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[heavyturret.s3o]],
-  script                        = [[heavyturret.lua]],
+  objectName                    = [[turretsunlance.s3o]],
+  script                        = [[turretsunlance.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {
@@ -117,7 +117,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[heavyturret_dead.s3o]],
+      object           = [[turretsunlance_dead.s3o]],
     },
 
 
@@ -132,4 +132,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ heavyturret = unitDef })
+return lowerkeys({ turretsunlance = unitDef })
