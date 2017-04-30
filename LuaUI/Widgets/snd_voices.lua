@@ -111,7 +111,7 @@ local heavies = { --not used yet
 local aa = {
 	"turretmissile", --defender
 	"turretaalaser", --razor kiss
-	"missiletower",--hacksaw
+	"turretaaclose",--hacksaw
 	"turretaaflak",
 	"turretaafar", --chainsaw
 	"screamer",

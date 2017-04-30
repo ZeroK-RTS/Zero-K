@@ -1386,7 +1386,7 @@ return {
 		f = 0,
 		h = 1500,
 		mh = 1500,
-		name = "missiletower",
+		name = "turretaaclose",
 		uID = 15567,
 		x = 2808,
 		y = 91.71875,

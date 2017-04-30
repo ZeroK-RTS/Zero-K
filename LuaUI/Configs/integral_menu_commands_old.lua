@@ -96,7 +96,7 @@ local defense = {
 	turretgauss =    {order = 5, row = 1, col = 5},
 	turretheavylaser =   {order = 6, row = 1, col = 6},
 
-	missiletower =  {order = 9, row = 2, col = 1},
+	turretaaclose =  {order = 9, row = 2, col = 1},
 	turretaalaser =     {order = 10, row = 2, col = 2},
 	turretaaflak =      {order = 11, row = 2, col = 3},
 	turretaafar =       {order = 12, row = 2, col = 4},

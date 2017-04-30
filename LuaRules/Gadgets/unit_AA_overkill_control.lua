@@ -41,10 +41,10 @@ local airtargets         = {} -- {id = unitID, incoming = {shotID}, receivingdam
 
 local shot               = {} -- {id = shotID, unitID = ownerunitID, target = targetunitID, damage = int)
 
-local AAunittypes        = {["turretmissile"] = 1, ["missiletower"] = 1, ["turretaafar"] = 1, ["screamer"] = 1} -- number = shot damage
+local AAunittypes        = {["turretmissile"] = 1, ["turretaaclose"] = 1, ["turretaafar"] = 1, ["screamer"] = 1} -- number = shot damage
 local IsAA = {
 	[UnitDefNames.turretmissile.id] = true, 
-	[UnitDefNames.missiletower.id] = true, 
+	[UnitDefNames.turretaaclose.id] = true, 
 	[UnitDefNames.turretaafar.id] = true, 
 	[UnitDefNames.screamer.id] = true
 }

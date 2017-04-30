@@ -36,7 +36,7 @@ local buildOpts = {
 	[[turretheavy]],
 	[[turrettorp]],
 	[[turretaalaser]],
-	[[missiletower]],
+	[[turretaaclose]],
 	[[turretaafar]],
 	[[turretaaflak]],
 	[[screamer]],

@@ -1123,7 +1123,7 @@
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},
-	"missiletower": {
+	"turretaaclose": {
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},

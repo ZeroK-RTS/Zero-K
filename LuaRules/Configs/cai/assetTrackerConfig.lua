@@ -20,7 +20,7 @@ local heatmapNames = {
 	staticAntiAir = {
 		["turretmissile"] = {mult = 1},
 		["turretaalaser"] = {mult = 1},
-		["missiletower"] = {mult = 2},
+		["turretaaclose"] = {mult = 2},
 		["turretaafar"] = {mult = 1.5},
 		["turretaaflak"] = {mult = 2},
 		["screamer"] = {mult = 1},
@@ -119,7 +119,7 @@ local completeUnitListNames = {
 
 	turretAA = {
 		"turretaalaser",
-		"missiletower",
+		"turretaaclose",
 		"turretaafar",
 		"turretaaflak",
 		"screamer",

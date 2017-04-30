@@ -254,7 +254,7 @@
 		"description" : "Area Shield",
 		"helptext" : "The Aegis protects a modest area with its bubble shield that stops incoming projectiles (but not AoE effects). The shield has a significant energy upkeep and does not block very powerful weapons."
 	},
-	"missiletower" : {
+	"turretaaclose" : {
 		"name" : "Hacksaw",
 		"description" : "Burst Anti-Air Turret",
 		"helptext" : "The Hacksaw's twin missiles brutally punish any aircraft that enters their range, but take a considerable amount of time to reload, making them less than ideal against light targets."

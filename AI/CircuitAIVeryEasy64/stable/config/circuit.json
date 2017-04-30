@@ -1031,7 +1031,7 @@
 		"role": ["static", "anti_air"],
 		"dmg_mod": 4.0
 	},
-	"missiletower": {
+	"turretaaclose": {
 		"role": ["static", "anti_air"],
 		"dmg_mod": 4.0
 	},

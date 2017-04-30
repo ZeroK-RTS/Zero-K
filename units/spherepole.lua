@@ -41,7 +41,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
-  objectName             = [[cloakheavyraid.s3o]],
+  objectName             = [[spherepole.s3o]],
   script				 = [[cloakheavyraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 

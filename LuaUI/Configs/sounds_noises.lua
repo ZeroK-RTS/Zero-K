@@ -1398,7 +1398,7 @@ local sounds = {
 			[1] = "light_turret_select",
 		},
 	},
-	missiletower = {
+	turretaaclose = {
 		ok = {
 			[1] = "turret_move",
 		},

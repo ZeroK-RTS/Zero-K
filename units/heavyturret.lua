@@ -32,7 +32,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[turretsunlance.s3o]],
+  objectName                    = [[heavyturret.s3o]],
   script                        = [[turretsunlance.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
@@ -117,7 +117,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[turretsunlance_dead.s3o]],
+      object           = [[heavyturret_dead.s3o]],
     },
 
 

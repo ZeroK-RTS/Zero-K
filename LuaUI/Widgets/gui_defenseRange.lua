@@ -64,7 +64,7 @@ modConfig["ZK"]["unitList"] =
 	turretaalaser = { weapons = { 2 } },		--razorkiss
 	turretaaflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
-	missiletower = { weapons = { 2 } },	--hacksaw
+	turretaaclose = { weapons = { 2 } },	--hacksaw
 	staticarty = { weapons = { 1 } },		--behemoth
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[missiletower]],
+  unitname                      = [[turretaaclose]],
   name                          = [[Hacksaw]],
   description                   = [[Burst Anti-Air Turret]],
   buildCostMetal                = 220,
@@ -7,8 +7,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[missiletower_aoplane.dds]],
-  buildPic                      = [[missiletower.png]],
+  buildingGroundDecalType       = [[turretaaclose_aoplane.dds]],
+  buildPic                      = [[turretaaclose.png]],
   category                      = [[FLOAT]],
   collisionVolumeOffsets        = [[0 12 0]],
   collisionVolumeScales         = [[42 53 42]],
@@ -33,7 +33,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[missiletower.s3o]],
-  script                        = [[missiletower.lua]],
+  script                        = [[turretaaclose.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {
@@ -134,4 +134,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ missiletower = unitDef })
+return lowerkeys({ turretaaclose = unitDef })

@@ -764,7 +764,7 @@ factionBuildConfig = {
 			[2] = {
 				count = 2,
 				[1] = {ID = UnitDefNames['turretaalaser'].id, chance = 0.7},
-				[2] = {ID = UnitDefNames['missiletower'].id, chance = 0.3},
+				[2] = {ID = UnitDefNames['turretaaclose'].id, chance = 0.3},
 			},
 			
 			[3] = {
@@ -783,7 +783,7 @@ factionBuildConfig = {
 				level = 2,
 				index = 1,
 			},
-			[UnitDefNames['missiletower'].id] = {
+			[UnitDefNames['turretaaclose'].id] = {
 				level = 2,
 				index = 2,
 			},

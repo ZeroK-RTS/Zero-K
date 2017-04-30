@@ -39,10 +39,10 @@ local GetUnitCmdDesc     = Spring.GetUnitCmdDescs
 local InsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 
 local hpthreshold        = 650 -- maxhp below which an air unit is considered bait
-local baitexceptions     = {["phoenix"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are never considered bait, "name" = 1 means that tower will consider the target to be part of this category
-local alwaysbait         = {["planefighterheavy"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are always considered bait
+local baitexceptions     = {["phoenix"] = {["turretaaclose"] = 1, ["screamer"] = 1}} -- units which are never considered bait, "name" = 1 means that tower will consider the target to be part of this category
+local alwaysbait         = {["planefighterheavy"] = {["turretaaclose"] = 1, ["screamer"] = 1}} -- units which are always considered bait
 
-local AAunittypes        = {["missiletower"] = 100, ["screamer"] = 300} -- what is valid for anti-bait behaviour
+local AAunittypes        = {["turretaaclose"] = 100, ["screamer"] = 300} -- what is valid for anti-bait behaviour
 -- number is the threshold of "points" above which a turret is considered escorted if it has at least that amount within half range
 local AAescort           = {  -- points of how much each AA unit is worth
 ["turretmissile"] = 100, 
@@ -72,7 +72,7 @@ local remUnitDefID = {}
 local Echo = Spring.Echo
 
 local IsAA = {
-	[UnitDefNames.missiletower.id] = true,
+	[UnitDefNames.turretaaclose.id] = true,
 	[UnitDefNames.screamer.id] = true,
 }
 

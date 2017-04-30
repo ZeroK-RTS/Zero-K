@@ -143,7 +143,7 @@ local menu_armcom = {
       },
       {
         angle = -135,
-        unit = "missiletower"
+        unit = "turretaaclose"
       },
       {
         angle = 90,

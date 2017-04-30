@@ -96,7 +96,7 @@ local defenseDefs = {
 	"turretgauss",
 	
 	"turretaalaser",
-	"missiletower",
+	"turretaaclose",
 	"turretaaflak",
 	"turretaafar",
 	"screamer",

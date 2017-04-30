@@ -51,7 +51,7 @@ unitDef = {
   mygravity              = 1,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SUB]],
-  objectName             = [[dronefighter.dae]],
+  objectName             = [[fighterdrone.dae]],
   script                 = [[dronefighter.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 

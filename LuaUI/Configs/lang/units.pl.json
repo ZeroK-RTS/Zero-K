@@ -269,7 +269,7 @@
         "description": "Tarcza obszarowa",
         "helptext": "Aegis posiada tarczę obszarową, która detonuje nadlatujące pociski. Wiąże się to jednak z wysokim kosztem energetycznym, a potężne ataki i tak mogą przebić się przez osłabioną tarczę."
     },
-    "missiletower": {
+    "turretaaclose": {
         "name": "Hacksaw",
         "description": "Wieżyczka przeciwlotnicza",
         "helptext": "Hacksaw posiada ciężkie rakiety przeciwlotnicze, które z łatwością niszczą bombowce. Ma jednak malutki zasięg i bardzo długi czas przeładowania."

@@ -44,7 +44,7 @@ unitDef = {
   moveState           = 0,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
-  objectName          = [[hoverskirm.s3o]],
+  objectName          = [[nsaclash.s3o]],
   script              = [[hoverskirm.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
 
@@ -131,7 +131,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[hoverskirm_dead.s3o]],
+      object           = [[nsaclash_dead.s3o]],
     },
 
     HEAP  = {

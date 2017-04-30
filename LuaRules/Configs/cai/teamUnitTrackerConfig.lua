@@ -3,7 +3,7 @@ local completeUnitListNames = {
 
 	turretAA = {
 		"turretaalaser",
-		"missiletower",
+		"turretaaclose",
 		"turretaafar",
 		"turretaaflak",
 		"screamer",

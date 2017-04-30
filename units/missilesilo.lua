@@ -7,7 +7,7 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[missilesilo_aoplane.dds]],
+  buildingGroundDecalType       = [[staticmissilesilo_aoplane.dds]],
 
   buildoptions                  = {
     [[tacnuke]],

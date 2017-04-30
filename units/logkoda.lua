@@ -37,7 +37,7 @@ unitDef = {
   movementClass       = [[TANK3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[tankraid.s3o]],
+  objectName          = [[logkoda.s3o]],
   script              = [[tankraid.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 600,
@@ -179,7 +179,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[tankraid_dead.s3o]],
+      object           = [[logkoda_dead.s3o]],
     },
 
 

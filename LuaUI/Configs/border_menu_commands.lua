@@ -74,7 +74,7 @@ local buildoptions = {
 	{-- air_defense
 		{ "corr" },-- mt
 		{ "turretaalaser" },
-		{ "missiletower" },-- hacksaw
+		{ "turretaaclose" },-- hacksaw
 		{ "turretaaflak" },
 
 		{ "turretaafar",  tech=2 },-- chainsaw
