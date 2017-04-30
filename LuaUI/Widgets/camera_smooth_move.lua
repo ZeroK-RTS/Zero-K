@@ -1,6 +1,6 @@
 
 function widget:GetInfo() return {
-	name    = "SmoothScroll",
+	name    = "Smooth Scroll",
 	desc    = "Alternate view movement for the middle mouse button",
 	author  = "trepan",
 	date    = "Feb 27, 2007",
