@@ -40,6 +40,8 @@ local CONVO_BOX_WIDTH_MIN = 400
 local PERSISTENT_SUBBAR_HEIGHT = 24
 local PERSISTENT_IMAGE_HEIGHT = 96
 
+local TEST_MODE = false
+
 local convoString 	-- for non-Chili convobox; stores the current string to display
 local convoImg		-- for non-Chili convobox; stores the current image to display
 local convoFontsize = 14
@@ -81,7 +83,7 @@ local function ProcessColorCodes(text)
           newStr = newStr .. "\\"
         end
       end
-      newStr = newStr .. "\008"
+      newStr = newStr .. "\255\255\255\255"
       text = string.gsub(text, str, newStr)
     end
   end
@@ -599,19 +601,18 @@ function widget:Initialize()
   Spring.SendLuaRulesMsg("sendMissionPersistentMessages")
   
   -- testing
-  --[[
-  local str = 'In some remote corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
-  local str2 = 'Enemy nuclear silo spotted!'
-  
-  local str3 = '\255\255\255\0\Colored\008 text'
-  local str4 = '\255\255\255\0\Colored text\008 2'
-  
-  --WG.ShowPersistentMessageBox(str3, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
-  --WG.ShowPersistentMessageBox(str4, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
-  --WG.AddConvo(str3, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 10*30)
-  --WG.AddConvo(str4, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
-  --]]
-  
+  if TEST_MODE then
+    local str = '\255\255\255\0\In some remote\255\255\255\255 corner of the universe, poured out and glittering in innumerable solar systems, there once was a star on which clever animals invented knowledge. That was the highest and most mendacious minute of "world history" – yet only a minute. After nature had drawn a few breaths the star grew cold, and the clever animals had to die.'
+    local str2 = 'Enemy nuclear silo spotted!'
+    
+    local str3 = '\255\255\255\0\Colored\008 text'
+    local str4 = '\255\255\255\0\Colored text\008 2'
+    
+    WG.ShowPersistentMessageBox(str, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
+    --WG.ShowPersistentMessageBox(str4, 320, 100, 12, "LuaUI/Images/advisor2.jpg")
+    --WG.AddConvo(str3, nil, "LuaUI/Images/advisor2.jpg", "sounds/voice.wav", 10*30)
+    --WG.AddConvo(str4, nil, "LuaUI/Images/startup_info_selector/chassis_strike.png", "sounds/reply/advisor/enemy_nuke_spotted.wav", 3*30)
+  end
 end
 
 function widget:Shutdown()
