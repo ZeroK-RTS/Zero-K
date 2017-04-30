@@ -27,11 +27,11 @@ local menu_armcom = {
       },
       {
         angle= -90,
-        unit = "armsolar",
+        unit = "energysolar",
       },
       {
         angle= -135,
-        unit = "armwin",
+        unit = "energywind",
       },
     }
   },
@@ -120,7 +120,7 @@ local menu_armcom = {
       },
       {
         angle = -45,
-        unit = "armpb"
+        unit = "turretgauss"
       }
     }
   },

@@ -24,7 +24,7 @@ local spGetUnitIsStunned = Spring.GetUnitIsStunned
 local spGetGameSeconds = Spring.GetGameSeconds
 ------------------------------------------------------------
 ------------------------------------------------------------
-local gaussUnitDefID = UnitDefNames["armpb"].id
+local gaussUnitDefID = UnitDefNames["turretgauss"].id
 local myTeamID
 local jumperAddInfo={}
 --Spread job stuff: (spread looping across 1 second)

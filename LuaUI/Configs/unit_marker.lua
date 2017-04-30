@@ -3,7 +3,7 @@ local unitlistNames = {
 	staticantinuke = {},
 	staticheavyarty = {},
 	athena = { mark_each_appearance = true, show_owner = true, },
-	armsnipe = { mark_each_appearance = true, },
+	cloaksnipe = { mark_each_appearance = true, },
 	cafus = {},
 	chicken_dragon = {},
 	chickenflyerqueen = {},

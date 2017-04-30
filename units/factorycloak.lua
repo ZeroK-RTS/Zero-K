@@ -10,16 +10,16 @@ unitDef = {
   buildingGroundDecalType       = [[factorycloak_aoplane.dds]],
 
   buildoptions                  = {
-    [[armrectr]],
-    [[armpw]],
+    [[cloakcon]],
+    [[cloakraid]],
     [[spherepole]],
-    [[armrock]],
+    [[cloakskirm]],
     [[armwar]],
-    [[armzeus]],
+    [[cloakassault]],
     [[cloakarty]],
-    [[armsnipe]],
+    [[cloaksnipe]],
     [[cloakaa]],
-    [[armtick]],
+    [[cloakbomb]],
     [[spherecloaker]],
   },
 

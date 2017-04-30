@@ -5,7 +5,7 @@
 
 local spawn_defs = {
     corhurc_minebomb   = {name = "cormine_impulse", cost = 0, expire = 60},
-	armcent_droppod = {name = "armpw", cost=0, expire=0},
+	armcent_droppod = {name = "cloakraid", cost=0, expire=0},
 	armpnix3_armadvbomb = {name = "spiderscout", cost=0, expire=0},
 	cormine_cortruck_missile = {name = "corareamine", cost=0, expire=0},
 	chicken_blimpy_dodobomb = {name = "chicken_dodo", cost=0, expire=30},

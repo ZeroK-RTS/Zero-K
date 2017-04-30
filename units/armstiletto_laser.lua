@@ -1,10 +1,10 @@
 unitDef = {
-  unitname            = [[armstiletto_laser]],
+  unitname            = [[bomberdisarm]],
   name                = [[Thunderbird]],
   description         = [[Disarming Lightning Bomber]],
   brakerate           = 0.4,
   buildCostMetal      = 550,
-  buildPic            = [[armstiletto_laser.png]],
+  buildPic            = [[bomberdisarm.png]],
   canFly              = true,
   canMove             = true,
   canSubmerge         = false,
@@ -41,7 +41,7 @@ unitDef = {
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName          = [[stiletto.s3o]],
-  script              = [[armstiletto_laser.lua]],
+  script              = [[bomberdisarm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 660,
   turnRadius          = 20,
@@ -166,4 +166,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armstiletto_laser = unitDef })
+return lowerkeys({ bomberdisarm = unitDef })

@@ -48,7 +48,7 @@ local GetUnitIsCloaked = Spring.GetUnitIsCloaked
 local myTeam
 
 local exceptionList = {	--add exempt units here
-	"armsnipe",
+	"cloaksnipe",
 	"cloakaa",
 	"wolverine_mine",
 	"blastwing",

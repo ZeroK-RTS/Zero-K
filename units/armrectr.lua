@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[armrectr]],
+  unitname               = [[cloakcon]],
   name                   = [[Conjurer]],
   description            = [[Cloaked Construction Bot, Builds at 5 m/s]],
   acceleration           = 0.5,
@@ -12,7 +12,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[ARMRECTR.png]],
+  buildPic               = [[cloakcon.png]],
   canMove                = true,
   canPatrol              = true,
   category               = [[LAND UNARMED]],
@@ -48,7 +48,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   objectName             = [[spherecon.s3o]],
   radarDistanceJam       = 256,
-	script                 = [[armrectr.lua]],
+	script                 = [[cloakcon.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   showNanoSpray          = false,
   sightDistance          = 375,
@@ -82,4 +82,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armrectr = unitDef })
+return lowerkeys({ cloakcon = unitDef })

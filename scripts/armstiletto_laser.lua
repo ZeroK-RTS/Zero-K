@@ -12,7 +12,7 @@ local sound_index = 0
 local BOMB_DELAY = 1
 
 local SIG_TAKEOFF = 1
-local takeoffHeight = UnitDefNames["armstiletto_laser"].wantedHeight
+local takeoffHeight = UnitDefNames["bomberdisarm"].wantedHeight
 
 function script.Create()
 	Hide(preDrop)

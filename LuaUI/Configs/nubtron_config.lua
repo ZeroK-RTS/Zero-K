@@ -6,7 +6,7 @@ Choose names for the unitClass table and use those names in conditions.
 For example if you use "Con" then you must use "ConSelected" not "conSelected":
 
 local unitClasses = {
-	Con	= { 'armrectr' },
+	Con	= { 'cloakcon' },
 }
 
 local steps = {	
@@ -59,13 +59,13 @@ finish<unitClass>		- Triggers if structure partly completed structure is no long
 --- unit classes ---
 local unitClasses = {
 	Mex	= { 'cormex' },
-	Solar	= { 'armsolar' },
+	Solar	= { 'energysolar' },
 	LLT	= { 'corllt' },
 	BotLab	= { 'factorycloak' },
 	Radar	= { 'corrad' },
 
-	Con	= { 'armrectr' },
-	Raider	= { 'armpw' },
+	Con	= { 'cloakcon' },
+	Raider	= { 'cloakraid' },
 }
 local unitClassNames = {
 	Mex		= 'Mex',

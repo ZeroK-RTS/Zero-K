@@ -43,8 +43,8 @@ local buildoptions = {
 	{-- economy
 		-- common
 		{ "cormex" },
-		{ "armwin" },-- wind
-		{ "armsolar",  notSea=true },
+		{ "energywind" },-- wind
+		{ "energysolar",  notSea=true },
 		{ "staticcon" },-- caretaker
 		{ "geo",  notSea=true },
 		{ "staticrearm" },-- repair pad
@@ -63,7 +63,7 @@ local buildoptions = {
 		{ "turrettorp",  notLand=true },-- you can build it on land, but torpedoes are only useful around water.
 		{ "turretriot" },-- Stardust
 		{ "corgrav",  notSea=true },-- newton
-		{ "armpb",  notSea=true },-- Popup gauss
+		{ "turretgauss",  notSea=true },-- Popup gauss
 		{ "corhlt",  tech=2 },-- peoples should prefer Stardust, Faraday, Newton, Urchin more.
 		{ "cordoom",  tech=2, notSea=true },
 		{ "turretantiheavy",  tech=3, notSea=true },

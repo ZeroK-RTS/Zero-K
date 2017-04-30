@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armsptk]],
+  unitname               = [[spiderskirm]],
   name                   = [[Recluse]],
   description            = [[Skirmisher Spider (Indirect Fire)]],
   acceleration           = 0.26,
   brakeRate              = 0.78,
   buildCostMetal         = 280,
-  buildPic               = [[ARMSPTK.png]],
+  buildPic               = [[spiderskirm.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -37,7 +37,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SATELLITE SUB]],
   objectName             = [[recluse.s3o]],
-  script				 = [[armsptk.lua]],
+  script				 = [[spiderskirm.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 627,
   trackOffset            = 0,
@@ -128,4 +128,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armsptk = unitDef })
+return lowerkeys({ spiderskirm = unitDef })

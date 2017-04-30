@@ -16,7 +16,7 @@ unitDef = {
     [[striderantiheavy]],
 	[[scorpion]],
     [[dante]],
-    [[armraven]],
+    [[striderarty]],
     [[funnelweb]],
     [[bantha]],
     [[detriment]],

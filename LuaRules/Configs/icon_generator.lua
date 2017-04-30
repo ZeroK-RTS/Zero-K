@@ -204,12 +204,12 @@ unitConfigs = {
     attack = true,
     wait   = 120,
    },  
-  [UnitDefNames.armpb.id] = {
+  [UnitDefNames.turretgauss.id] = {
     unfold = true,
     attack = true,
     wait   = 50,
   },
-  [UnitDefNames.armspy.id] = {
+  [UnitDefNames.spiderantiheavy.id] = {
     unfold = true,
   },
   [UnitDefNames.turretantiheavy.id] = {
@@ -219,14 +219,14 @@ unitConfigs = {
     unfold = true,
     wait   = 225,
   },
-  [UnitDefNames.armsolar.id] = {
+  [UnitDefNames.energysolar.id] = {
     unfold = true,
   },
-  [UnitDefNames.armsnipe.id] = {
+  [UnitDefNames.cloaksnipe.id] = {
 --    unfold = true,
 --    attack = true,
   },
-  [UnitDefNames.armzeus.id] = {
+  [UnitDefNames.cloakassault.id] = {
     unfold = true,
     attack = true,
   },

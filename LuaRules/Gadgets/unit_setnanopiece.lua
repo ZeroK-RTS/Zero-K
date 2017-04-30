@@ -25,7 +25,7 @@ local spGetUnitPiecePosDir  = Spring.GetUnitPiecePosDir
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 local units = {
-  [UnitDefNames.armrectr.id] = {"claw1"},
+  [UnitDefNames.cloakcon.id] = {"claw1"},
   [UnitDefNames.corfast.id] = {"flare"},
   [UnitDefNames.corned.id] = {"firepoint"},
   [UnitDefNames.coracv.id] = {"nano1", "nano2"},

@@ -154,7 +154,7 @@ options = {
 
 local mexDefID = UnitDefNames["cormex"].id
 local lltDefID = UnitDefNames["corllt"].id
-local solarDefID = UnitDefNames["armsolar"].id
+local solarDefID = UnitDefNames["energysolar"].id
 
 local mexUnitDef = UnitDefNames["cormex"]
 local mexDefInfo = {

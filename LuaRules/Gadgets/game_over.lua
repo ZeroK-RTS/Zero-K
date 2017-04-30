@@ -86,7 +86,7 @@ end
 local doesNotCountList = {
 	[GetUnitDefIdByName("spiderscout")] = true,
 	[GetUnitDefIdByName("corroach")] = true,
-	[GetUnitDefIdByName("armtick")] = true,
+	[GetUnitDefIdByName("cloakbomb")] = true,
 	[GetUnitDefIdByName("blastwing")] = true,
 	[GetUnitDefIdByName("terraunit")] = true,
 }

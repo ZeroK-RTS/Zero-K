@@ -1,5 +1,5 @@
 local raider = {
-	"armpw",
+	"cloakraid",
 	"spherepole",
 	"corak",
 	"armflash",
@@ -22,7 +22,7 @@ local assault = {
 	"corthud",
 	"corraid",
 	
-	"armzeus",
+	"cloakassault",
 	--"spidercrabe",
 	"spiderassault",
 	"corcan",
@@ -45,14 +45,14 @@ local assault = {
 }
 
 local skirm = {
-	"armrock",
+	"cloakskirm",
 	"corstorm",
 	"armjanus",
 	"armstump",
 	"amphfloater",
 	
-	"armsptk",
-	"armsnipe",
+	"spiderskirm",
+	"cloaksnipe",
 	"cormort",
 	"slowmort",
 	"cormortgold",
@@ -103,7 +103,7 @@ local arty = {
 	"trem",
 	
 	"armshock",
-	"armraven",
+	"striderarty",
 	
 	"hoverartillery",
 	

@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armsnipe]],
+  unitname               = [[cloaksnipe]],
   name                   = [[Spectre]],
   description            = [[Cloaked Skirmish/Anti-Heavy Artillery Bot]],
   acceleration           = 0.3,
   brakeRate              = 0.2,
   buildCostMetal         = 750,
-  buildPic               = [[ARMSNIPE.png]],
+  buildPic               = [[cloaksnipe.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -46,7 +46,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName             = [[sharpshooter.s3o]],
-  script                 = [[armsnipe.lua]],
+  script                 = [[cloaksnipe.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -139,4 +139,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armsnipe = unitDef })
+return lowerkeys({ cloaksnipe = unitDef })

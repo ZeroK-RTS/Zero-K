@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armzeus]],
+  unitname               = [[cloakassault]],
   name                   = [[Zeus]],
   description            = [[Lightning Assault Bot]],
   acceleration           = 0.2,
   brakeRate              = 0.6,
   buildCostMetal         = 350,
-  buildPic               = [[ARMZEUS.png]],
+  buildPic               = [[cloakassault.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -40,7 +40,7 @@ unitDef = {
   movementClass          = [[KBOT3]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherezeus.s3o]],
-  script		         = [[armzeus.lua]],
+  script		         = [[cloakassault.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -142,4 +142,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armzeus = unitDef })
+return lowerkeys({ cloakassault = unitDef })

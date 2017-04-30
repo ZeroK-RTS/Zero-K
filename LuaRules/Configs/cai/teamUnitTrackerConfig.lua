@@ -16,15 +16,15 @@ local completeUnitListNames = {
 		"turretemp",
 		"turretriot",
 		"corhlt",
-		"armpb",
+		"turretgauss",
 		"turretantiheavy",
 		"cordoom",
 	},
 	
 	economy = {
 		"cormex",
-		"armwin",
-		"armsolar",
+		"energywind",
+		"energysolar",
 		"energyfusion",
 		"cafus",
 		"geo",
@@ -45,7 +45,7 @@ local completeUnitListNames = {
 	},
 	
 	constructor = {
-		"armrectr",
+		"cloakcon",
 		"cornecro",
 		"corned",
 		"coracv",
@@ -62,7 +62,7 @@ local completeUnitListNames = {
 local ground = {
 
 	raider = {
-		"armpw",
+		"cloakraid",
 		"spherepole",
 		"corak",
 		"corfav",
@@ -79,7 +79,7 @@ local ground = {
 	},
 
 	assault = {
-		"armzeus",
+		"cloakassault",
 		"corthud",
 		"corraid",
 		"spiderassault",
@@ -98,12 +98,12 @@ local ground = {
 	},
 
 	skirm = {
-		"armrock",
+		"cloakskirm",
 		"corstorm",
 		"nsaclash",
 		"amphfloater",
-		"armsptk",
-		"armsnipe",
+		"spiderskirm",
+		"cloaksnipe",
 		"slowmort",
 		"chickens",
 		"chicken_sporeshooter",
@@ -139,7 +139,7 @@ local ground = {
 		"hoverarty",
 		"cormart",
 		"trem",
-		"armraven",
+		"striderarty",
 		"chickenr",
 		"chickenblobber",
 	},
@@ -164,7 +164,7 @@ local air = {
 	bomber = {
 		"corshad",
 		"corhurc2",
-		"armstiletto_laser",
+		"bomberdisarm",
 		"bomberheavy",
 	},
 	
@@ -193,8 +193,8 @@ local fighter = {
 
 local defenseRequirementNames =  {
 	["cormex"] = {mult = 1.5},
-	["armwin"] = {mult = 1},
-	["armsolar"] = {mult = 0.6},
+	["energywind"] = {mult = 1},
+	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},
 	["cafus"] = {mult = 1},
 	["geo"] = {mult = 1.5},

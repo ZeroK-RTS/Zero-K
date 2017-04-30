@@ -714,7 +714,7 @@ end
 --[[
 local disabledunitsstring = modOptions and modOptions.disabledunits or ""
 local disabledunits = { }
-local defenceunits = {"corrl", "corllt", "turretriot", "turretemp", "armpb", "corhlt", "corrazor", "missiletower", "corflak", "turretaafar", "screamer", "corgrav", "turrettorp", "cordoom", "turretantiheavy", "corjamt" }
+local defenceunits = {"corrl", "corllt", "turretriot", "turretemp", "turretgauss", "corhlt", "corrazor", "missiletower", "corflak", "turretaafar", "screamer", "corgrav", "turrettorp", "cordoom", "turretantiheavy", "corjamt" }
 
 --Different lock modoptions are compatible
 if modOptions and tobool(modOptions.noair) then

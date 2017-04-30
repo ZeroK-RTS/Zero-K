@@ -2,7 +2,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 	items = {
 	  {
 		angle = -90,
-		unit = "armrectr",
+		unit = "cloakcon",
 		label = "Bots",
 		items = {
 		  {
@@ -23,18 +23,18 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },
 		  { 
 			angle = 45,
-			unit = "armzeus",
+			unit = "cloakassault",
 		  },
 		}
 	  },
 	{
 		angle = 0,
-		unit = "armsptk",
+		unit = "spiderskirm",
 		label = "Walkers",
 		items = {
 		  { 
 			angle = -90,
-			unit = "armsnipe",
+			unit = "cloaksnipe",
 		  },
 		  { 
 			angle = 135,
@@ -46,7 +46,7 @@ local menu_athena = { -- TODO_RENAME_FILE
 		  },	
 		  {
 			angle = -45,
-			unit = "armspy"
+			unit = "spiderantiheavy"
 		  },
 		  { 
 			angle = 90,

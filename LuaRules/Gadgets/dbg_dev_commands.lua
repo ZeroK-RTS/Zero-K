@@ -458,9 +458,9 @@ local function ColorTest(cmd,line,words,player)
 		return
 	end
 	
-	local displayDefID = UnitDefNames["armsolar"].id
+	local displayDefID = UnitDefNames["energysolar"].id
 	local displayDefID2 = UnitDefNames["dyntrainer_assault_base"].id
-	local jumbleDefID = UnitDefNames["armpw"].id
+	local jumbleDefID = UnitDefNames["cloakraid"].id
 	local INCREMENT = 96
 	local orderUnit = {}
 	

@@ -17,10 +17,10 @@ unitDef = {
 	[[spiderassault]],
     [[spideremp]],
 	[[spiderriot]],
-    [[armsptk]],
+    [[spiderskirm]],
     [[spidercrabe]],
     [[spideraa]],
-    [[armspy]],
+    [[spiderantiheavy]],
   },
 
   buildPic                      = [[factoryspider.png]],

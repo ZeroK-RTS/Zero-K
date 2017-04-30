@@ -32,7 +32,7 @@ local reservedBombers = {}
 local bombderDefIDs = {
 	[UnitDefNames["corshad"].id] = true,
 	[UnitDefNames["corhurc2"].id] = true,
-	[UnitDefNames["armstiletto_laser"].id] = true,
+	[UnitDefNames["bomberdisarm"].id] = true,
 	[UnitDefNames["bomberheavy"].id] = true,
 }
 

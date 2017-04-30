@@ -13,7 +13,7 @@ local heatmapNames = {
 		
 		["tawf114"] = {mult = 0.4},
 		["slowmort"] = {mult = 0.4},
-		["armsnipe"] = {mult = 0.4},
+		["cloaksnipe"] = {mult = 0.4},
 		["shieldfelon"] = {mult = 0.4},
 	},
 	
@@ -30,7 +30,7 @@ local heatmapNames = {
 	},
 	
 	mobileLand = {
-		["armpw"] = {mult = 1},
+		["cloakraid"] = {mult = 1},
 		["spherepole"] = {mult = 1},
 		["corak"] = {mult = 1},
 		["corfav"] = {mult = 1},
@@ -44,7 +44,7 @@ local heatmapNames = {
 		["chicken"] = {mult = 1},
 		["chicken_leaper"] = {mult = 1},
         
-		["armzeus"] = {mult = 1},
+		["cloakassault"] = {mult = 1},
 		["corthud"] = {mult = 1},
 		["corraid"] = {mult = 1},
 		["spiderassault"] = {mult = 1},
@@ -61,12 +61,12 @@ local heatmapNames = {
 		["chickenc"] = {mult = 1},
 		["chicken_tiamat"] = {mult = 1},
         
-		["armrock"] = {mult = 1},
+		["cloakskirm"] = {mult = 1},
 		["corstorm"] = {mult = 1},
 		["nsaclash"] = {mult = 1},
 		["amphfloater"] = {mult = 1},
-		["armsptk"] = {mult = 1},
-		["armsnipe"] = {mult = 1},
+		["spiderskirm"] = {mult = 1},
+		["cloaksnipe"] = {mult = 1},
 		["slowmort"] = {mult = 1},
 		["chickens"] = {mult = 1},
 		["chicken_sporeshooter"] = {mult = 1},
@@ -96,7 +96,7 @@ local heatmapNames = {
 		["hoverarty"] = {mult = 1},
 		["cormart"] = {mult = 1},
 		["trem"] = {mult = 1},
-		["armraven"] = {mult = 1},
+		["striderarty"] = {mult = 1},
 		["chickenr"] = {mult = 1},
 		["chickenblobber"] = {mult = 1},
 	},
@@ -108,7 +108,7 @@ local heatmapNames = {
 		["turretemp"] = {mult = 2},
 		["turretriot"] = {mult = 2},
 		["corhlt"] = {mult = 2},
-		["armpb"] = {mult = 2},
+		["turretgauss"] = {mult = 2},
 		["turretantiheavy"] = {mult = 2},
 		["cordoom"] = {mult = 2},
 		["corbhmth"] = {mult = 2},
@@ -132,15 +132,15 @@ local completeUnitListNames = {
 		"turretemp",
 		"turretriot",
 		"corhlt",
-		"armpb",
+		"turretgauss",
 		"turretantiheavy",
 		"cordoom",
 	},
 	
 	economy = {
 		"cormex",
-		"armwin",
-		"armsolar",
+		"energywind",
+		"energysolar",
 		"energyfusion",
 		"cafus",
 		"geo",
@@ -161,7 +161,7 @@ local completeUnitListNames = {
 	},
 	
 	constructor = {
-		"armrectr",
+		"cloakcon",
 		"cornecro",
 		"corned",
 		"coracv",
@@ -178,7 +178,7 @@ local completeUnitListNames = {
 local ground = {
 
 	raider = {
-		"armpw",
+		"cloakraid",
 		"spherepole",
 		"corak",
 		"corfav",
@@ -195,7 +195,7 @@ local ground = {
 	},
 
 	assault = {
-		"armzeus",
+		"cloakassault",
 		"corthud",
 		"corraid",
 		"spiderassault",
@@ -214,12 +214,12 @@ local ground = {
 	},
 
 	skirm = {
-		"armrock",
+		"cloakskirm",
 		"corstorm",
 		"nsaclash",
 		"amphfloater",
-		"armsptk",
-		"armsnipe",
+		"spiderskirm",
+		"cloaksnipe",
 		"slowmort",
 		"chickens",
 		"chicken_sporeshooter",
@@ -255,7 +255,7 @@ local ground = {
 		"hoverarty",
 		"cormart",
 		"trem",
-		"armraven",
+		"striderarty",
 		"chickenr",
 		"chickenblobber",
 	},
@@ -281,7 +281,7 @@ local air = {
 		"corshad",
 		"bomberdive",
 		"corhurc2",
-		"armstiletto_laser",
+		"bomberdisarm",
 		"bomberheavy",
 	},
 	
@@ -310,8 +310,8 @@ local fighter = {
 
 local economyTargetNames =  {
 	["cormex"] = {mult = 1.5},
-	["armwin"] = {mult = 1},
-	["armsolar"] = {mult = 0.6},
+	["energywind"] = {mult = 1},
+	["energysolar"] = {mult = 0.6},
 	["energyfusion"] = {mult = 1},
 	["cafus"] = {mult = 1},
 	["geo"] = {mult = 1.5},
@@ -330,7 +330,7 @@ local economyTargetNames =  {
 	["striderhub"] = {mult = 0.2},
 	["factoryship"] = {mult = 0.2},
 
-	["armrectr"] = {mult = 1},
+	["cloakcon"] = {mult = 1},
 	["cornecro"] = {mult = 1},
 	["corned"] = {mult = 1},
 	["coracv"] = {mult = 1},

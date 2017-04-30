@@ -179,7 +179,7 @@ factionBuildConfig = {
 					importanceMult = 1.2,
 					count = 1,
 					[1] = {ID = UnitDefNames['spiderscout'].id, chance = 1},
-					--[2] = {ID = UnitDefNames['armspy'].id, chance = 0.05},
+					--[2] = {ID = UnitDefNames['spiderantiheavy'].id, chance = 0.05},
 				},
 				
 				[3] = { -- raider
@@ -203,7 +203,7 @@ factionBuildConfig = {
 				[6] = { -- skirm
 					importanceMult = 1.5,
 					count = 1,
-					[1] = {ID = UnitDefNames['armsptk'].id, chance = 1},
+					[1] = {ID = UnitDefNames['spiderskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
@@ -230,19 +230,19 @@ factionBuildConfig = {
 				[1] = { -- con
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['armrectr'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakcon'].id, chance = 1},
 				},
 				
 				[2] = { -- scout
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['armpw'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakraid'].id, chance = 1},
 				},
 				
 				[3] = { -- raid
 					importanceMult = 1,
 					count = 2,
-					[1] = {ID = UnitDefNames['armpw'].id, chance = 0.7},
+					[1] = {ID = UnitDefNames['cloakraid'].id, chance = 0.7},
 					[2] = {ID = UnitDefNames['spherepole'].id, chance = 0.3},
 				},
 				
@@ -250,19 +250,19 @@ factionBuildConfig = {
 					importanceMult = 1,
 					count = 2,
 					[1] = {ID = UnitDefNames['cloakarty'].id, chance = 0.9},
-					[2] = {ID = UnitDefNames['armsnipe'].id, chance = 0.1},
+					[2] = {ID = UnitDefNames['cloaksnipe'].id, chance = 0.1},
 				},
 				
 				[5] = { --assault
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['armzeus'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakassault'].id, chance = 1},
 				},	
 				
 				[6] = { -- skirm
 					importanceMult = 1.2,
 					count = 1,
-					[1] = {ID = UnitDefNames['armrock'].id, chance = 1},
+					[1] = {ID = UnitDefNames['cloakskirm'].id, chance = 1},
 				},
 				
 				[7] = { -- riot
@@ -608,8 +608,8 @@ factionBuildConfig = {
 			count = 4,
 			[1] = {ID = UnitDefNames['cafus'].id},
 			[2] = {ID = UnitDefNames['energyfusion'].id},
-			[3] = {ID = UnitDefNames['armsolar'].id},
-			[4] = {ID = UnitDefNames['armwin'].id},
+			[3] = {ID = UnitDefNames['energysolar'].id},
+			[4] = {ID = UnitDefNames['energywind'].id},
 		},
 		econByDefId = {
 			[UnitDefNames['energyfusion'].id] = {
@@ -668,7 +668,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['armsolar'].id] = {
+			[UnitDefNames['energysolar'].id] = {
 				energyGreaterThan = 0, 
 				whileStall = true,
 				makeNearFactory = false,
@@ -682,7 +682,7 @@ factionBuildConfig = {
 				energy = true,
 			},
 			
-			[UnitDefNames['armwin'].id] = {
+			[UnitDefNames['energywind'].id] = {
 				energyGreaterThan = 0, 
 				whileStall = true,
 				makeNearFactory = false,

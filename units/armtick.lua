@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armtick]],
+  unitname               = [[cloakbomb]],
   name                   = [[Tick]],
   description            = [[All Terrain EMP Bomb (Burrows)]],
   acceleration           = 0.25,
   brakeRate              = 0.6,
   buildCostMetal         = 120,
-  buildPic               = [[armtick.png]],
+  buildPic               = [[cloakbomb.png]],
   canMove                = true,
   category               = [[LAND TOOFAST]],
   cloakCost              = 0,
@@ -26,7 +26,7 @@ unitDef = {
     idle_cloak = 1,
   },
 
-  explodeAs              = [[ARMTICK_DEATH]],
+  explodeAs              = [[cloakbomb_DEATH]],
   fireState              = 0,
   footprintX             = 1,
   footprintZ             = 1,
@@ -40,10 +40,10 @@ unitDef = {
   minCloakDistance       = 75,
   movementClass          = [[TKBOT1]],
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName             = [[ARMTICK]],
+  objectName             = [[cloakbomb]],
   pushResistant          = 0,
-  script                 = [[armtick.lua]],
-  selfDestructAs         = [[ARMTICK_DEATH]],
+  script                 = [[cloakbomb.lua]],
+  selfDestructAs         = [[cloakbomb_DEATH]],
   selfDestructCountdown  = 0,
 
   sfxtypes               = {
@@ -80,12 +80,12 @@ unitDef = {
 --------------------------------------------------------------------------------
 
 local weaponDefs = {
-  ARMTICK_DEATH = {
+  cloakbomb_DEATH = {
     areaOfEffect       = 352,
     craterBoost        = 0,
     craterMult         = 0,
     edgeEffectiveness  = 0.5,
-    explosionGenerator = "custom:ARMTICK_EXPLOSION",
+    explosionGenerator = "custom:cloakbomb_EXPLOSION",
 	explosionSpeed     = 10,
     impulseBoost       = 0,
     impulseFactor      = 0,
@@ -101,4 +101,4 @@ local weaponDefs = {
 unitDef.weaponDefs = weaponDefs
 
 --------------------------------------------------------------------------------
-return lowerkeys({ armtick = unitDef })
+return lowerkeys({ cloakbomb = unitDef })

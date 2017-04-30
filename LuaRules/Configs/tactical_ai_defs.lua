@@ -55,7 +55,7 @@ end
 local longRangeSwarmieeArray = NameToDefID({ 
 	"cormart",
 	"firewalker",
-	"armsptk",
+	"spiderskirm",
 	"corstorm",
 	"shiparty",
 	"cloakarty",
@@ -63,7 +63,7 @@ local longRangeSwarmieeArray = NameToDefID({
 })
 
 local medRangeSwarmieeArray = NameToDefID({ 
-	"armrock",
+	"cloakskirm",
 	"amphfloater",
 	"chickens",
 	"shipskirm",
@@ -73,7 +73,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	"corthud",
 	"spiderassault",
 	"corraid",
-	"armzeus",
+	"cloakassault",
 	"logkoda",
 	"hoverassault",
 	
@@ -85,7 +85,7 @@ local lowRangeSwarmieeArray = NameToDefID({
 	
 	"chickenr",
 	"chickenblobber",
-	"armsnipe", -- only worth swarming sniper at low range, too accurate otherwise.
+	"cloaksnipe", -- only worth swarming sniper at low range, too accurate otherwise.
 })
 
 medRangeSwarmieeArray = Union(medRangeSwarmieeArray,longRangeSwarmieeArray)
@@ -100,7 +100,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	"corclog",
 	"corcan",
 	"spherepole",
-	"armtick",
+	"cloakbomb",
 	"puppy",
 	"corroach",
 	"chicken",
@@ -111,7 +111,7 @@ local veryShortRangeSkirmieeArray = NameToDefID({
 	
 	"corgator",
 	"spiderscout",
-	"armpw",
+	"cloakraid",
 	"corfav",
 })
 
@@ -142,7 +142,7 @@ local riotRangeSkirmieeArray = NameToDefID({
 	"amphaa",
 	"shipaa",
 	
-	"armrectr",
+	"cloakcon",
 	"cornecro",
 	"corned",
 	"corch",
@@ -173,7 +173,7 @@ local lowMedRangeSkirmieeArray = NameToDefID({
 
 local medRangeSkirmieeArray = NameToDefID({
 	"spiderriot",
-	"armzeus",
+	"cloakassault",
 	"amphimpulse",
 	
 	"spiderassault",
@@ -199,7 +199,7 @@ for name, data in pairs(UnitDefNames) do -- add all comms to mid ranged skirm be
 end
 
 local longRangeSkirmieeArray = NameToDefID({
-	"armrock",
+	"cloakskirm",
 	"slowmort",
 	"amphfloater",
 	"nsaclash", -- hover janus
@@ -212,14 +212,14 @@ local longRangeSkirmieeArray = NameToDefID({
 })
 
 local artyRangeSkirmieeArray = NameToDefID({
-	"armsptk",
+	"spiderskirm",
 	"corstorm",
 	"cormist",
 	"amphassault",
 	"chicken_sporeshooter",
 	"corrl",
 	"corhlt",
-	"armpb",
+	"turretgauss",
 	"cordoom",
 	"detriment",
 	"ampharty",
@@ -235,15 +235,15 @@ local slasherSkirmieeArray = NameToDefID({
 	"cormak",
 	"corthud",
 	"spiderriot",
-	"armzeus",
+	"cloakassault",
 	"spiderassault",
 	"corraid",
 	"corlevlr",
 	"hoverriot",
 	"shieldfelon",
 	"correap",
-	"armrock",
-	"armpb",
+	"cloakskirm",
+	"turretgauss",
 	"corllt",
 	"turretriot",
 	"turretemp",
@@ -262,12 +262,12 @@ artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray, longRangeSkirmieeArray)
 ---------------------------------------------------------------------------
 
 local veryShortRangeExplodables = NameToDefID({
-	"armwin",
+	"energywind",
 	"cormex",
 })
 
 local shortRangeExplodables = NameToDefID({
-	"armwin",
+	"energywind",
 	"cormex",
 	"turretriot",
 	"energypylon",
@@ -335,7 +335,7 @@ local fleeables = NameToDefID({
 	"coradvcom",
 	
 	"armwar",
-	"armzeus",
+	"cloakassault",
 	
 	"spideremp",
 	"spiderriot",
@@ -418,7 +418,7 @@ local behaviourDefaults = {
 
 local behaviourConfig = { 
 	-- swarmers
-	["armtick"] = {
+	["cloakbomb"] = {
 		skirms = {}, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -457,7 +457,7 @@ local behaviourConfig = {
 		swarmLeeway = 200, 
 	},
   
-	["armpw"] = {
+	["cloakraid"] = {
 		skirms = veryShortRangeSkirmieeArray, 
 		swarms = lowRangeSwarmieeArray, 
 		flees = {},
@@ -828,7 +828,7 @@ local behaviourConfig = {
 	},
 		
 	--assaults
-	["armzeus"] = {
+	["cloakassault"] = {
 		skirms = lowMedRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -885,7 +885,7 @@ local behaviourConfig = {
 	},		
 	
 	-- med range skirms
-	["armrock"] = {
+	["cloakskirm"] = {
 		skirms = medRangeSkirmieeArray, 
 		swarms = medRangeSwarmieeArray, 
 		flees = {},
@@ -965,7 +965,7 @@ local behaviourConfig = {
 		minSwarmLeeway = 130, 
 		skirmLeeway = 10, 
 	},
-	["armsptk"] = {
+	["spiderskirm"] = {
 		skirms = longRangeSkirmieeArray, 
 		swarms = longRangeSwarmieeArray, 
 		flees = {},
@@ -1030,7 +1030,7 @@ local behaviourConfig = {
 	},
 	
 	-- arty range skirms
-	["armsnipe"] = {
+	["cloaksnipe"] = {
 		skirms = allGround,
 		skirmRadar = true,
 		swarms = {}, 
@@ -1070,7 +1070,7 @@ local behaviourConfig = {
 		skirmOrderDis = 250,
 	},
 	
-	["armraven"] = {
+	["striderarty"] = {
 		skirms = allGround,
 		skirmRadar = true,
 		swarms = {}, 

@@ -18,7 +18,7 @@ options = {
 		noHotkey = true,
 		OnChange = function(self)
 			if not self.value then
-				Spring.SetUnitDefIcon(UnitDefNames["armrectr"].id, "builder")
+				Spring.SetUnitDefIcon(UnitDefNames["cloakcon"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["cornecro"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["corned"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["coracv"].id, "builder")
@@ -28,7 +28,7 @@ options = {
 				Spring.SetUnitDefIcon(UnitDefNames["corch"].id, "builder")
 				Spring.SetUnitDefIcon(UnitDefNames["shipcon"].id, "builder")
 			else
-				Spring.SetUnitDefIcon(UnitDefNames["armrectr"].id, "kbotbuilder")
+				Spring.SetUnitDefIcon(UnitDefNames["cloakcon"].id, "kbotbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["cornecro"].id, "walkerbuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["corned"].id, "vehiclebuilder")
 				Spring.SetUnitDefIcon(UnitDefNames["coracv"].id, "tankbuilder")

@@ -19,7 +19,7 @@ if (not gadgetHandler:IsSyncedCode()) then
   return false  --  no unsynced code
 end
 
-local tickDefID = UnitDefNames["armtick"].id
+local tickDefID = UnitDefNames["cloakbomb"].id
 
 
 local selfddefs = {}

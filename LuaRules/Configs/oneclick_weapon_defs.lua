@@ -9,7 +9,7 @@ local oneClickWepDefNames = {
 	hoverdepthcharge = {
 		{ functionToCall = "ShootDepthcharge", reloadTime = 256, name = "Drop Depthcharge", tooltip = "Drops a depthchage.", weaponToReload = 1, texture = "LuaUI/Images/Commands/Bold/dgun.png",},
 	},
-	armtick = {
+	cloakbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	corroach = {
@@ -21,7 +21,7 @@ local oneClickWepDefNames = {
 	blastwing = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	armstiletto_laser = {
+	bomberdisarm = {
 		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	--[[

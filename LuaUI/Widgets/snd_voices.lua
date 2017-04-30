@@ -91,11 +91,11 @@ local fireState        = {}
 local sexTable         = {}
 local statsBuffer      = {0, 0, 0, 0, 0}
 local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
-  "armsolar",
+  "energysolar",
   "energyfusion", 
   "cafus", 
   "armtide", 
-  "armwin",
+  "energywind",
   "geo",
 }
 local commanders = {}

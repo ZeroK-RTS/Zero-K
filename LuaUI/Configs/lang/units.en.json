@@ -69,7 +69,7 @@
 		"description" : "Impulse Shenanigans Jumpbot",
 		"helptext" : "Shenanigans jumpbot."
 	},
-	"armtick" : {
+	"cloakbomb" : {
 		"name" : "Tick",
 		"description" : "All Terrain EMP Bomb (Burrows)",
 		"helptext" : "The Tick relies on its speed and small size to dodge inaccurate weapons, especially those of assaults and many skirmishers. It can paralyze heavy units or packs of lighter raiders which cannot kill it before it is already in range. Warriors or Glaives can then eliminate the helpless enemies without risk. Counter with defenses or single cheap units to set off a premature detonation. This unit cloaks when otherwise idle."
@@ -159,7 +159,7 @@
 		"description" : "Produces Wheeled Vehicles, Builds at 10 m/s",
 		"helptext" : "A traditional favourite, the Vehicle Plant is the ideal blitzkrieg fac with its fast, highly aggressive units. Those units that lack speed make up for it with copious firepower. Key Units: Dart, Scorcher, Ravager, Leveler, Slasher"
 	},
-	"armpb" : {
+	"turretgauss" : {
 		"name" : "Gauss",
 		"description" : "Gauss Turret, 20 health/s when closed",
 		"helptext" : "The Gauss is a compact, resilent turret with a medium-range gauss cannon. When popped down, it recieves a quarter of incoming damage as well as small amount of health regeneration. It can also attack underwater targets."
@@ -289,7 +289,7 @@
 		"description" : "Large Powerplant (+225) - HAZARDOUS",
 		"helptext" : "The Singularity Reactor generates massive amount of energy using a controlled black hole - which is about as safe as it sounds. When the reactor is destroyed, the black hole implodes violently, dragging units inside. An entire continent on which this is built should be considered unsafe ground."
 	},
-	"armstiletto_laser" : {
+	"bomberdisarm" : {
 		"name" : "Thunderbird",
 		"description" : "Disarming Lightning Bomber",
 		"helptext" : "Fast bomber armed with a lightning generator that disarms units in a wide area under it."
@@ -384,12 +384,12 @@
 		"description" : "Assault Bomber (Anti-Static)",
 		"helptext" : "The Eclipse's imposing hull can weather significant punishment while steadily blazing to deliver its massive payload of devastation, but the unguided bomb has problems with hitting mobile targets, and big size makes it an easy target."
 	},
-	"armzeus" : {
+	"cloakassault" : {
 		"name" : "Zeus",
 		"description" : "Lightning Assault Bot",
 		"helptext" : "Slowly and steadily, groups of Zeuses can shrug off heavy fire as they make their way towards enemy fortifications, until they can field their short-range lightning cannon, which damages and stuns entrenched foes. Counter with anything that can reliably kite it, making sure that you don't get paralyzed (in which case you are as good as dead.)"
 	},
-	"armsolar" : {
+	"energysolar" : {
 		"name" : "Solar Collector",
 		"description" : "Small Powerplant (+2)",
 		"helptext" : "Solar collectors are the least cost-efficient of the energy structures, but they are also the most reliable and sturdy. When attacked, solars will curl up into armored form for 8 seconds, which reduces incoming damage to a quarter and offers excellent protection against raiders."
@@ -454,7 +454,7 @@
 		"description" : "Shotgun Hover",
 		"helptext" : "The Punisher has a shotgun which shoots a spray of projectiles which are good against large targets or tight clusters of enemies."
 	},
-	"armspy" : {
+	"spiderantiheavy" : {
 		"name" : "Infiltrator",
 		"description" : "Cloaked Scout/Anti-Heavy",
 		"helptext" : "The Infiltrator is useful in two ways. Firstly it is an excellent scout, and very difficult to detect. It can penetrate deep into enemy lines. It also has the capacity to shoot a paralyzing bolt that will freeze any one target, good against heavy enemies and enemy infrastructure."
@@ -464,7 +464,7 @@
 		"description" : "Radar Vehicle",
 		"helptext" : "The Informant provides radar coverage on the battlefield."
 	},
-	"armwin" : {
+	"energywind" : {
 		"name" : "Wind/Tidal Generator",
 		"description" : "Small Powerplant",
 		"helptext" : "Wind generators produce a variable amount of energy, depending on altitude and wind speed. They are extremely fragile and chain explode when bunched, so consider their placement carefully. When placed in water, they become somewhat more sturdy tidal generators with a good, constant output."
@@ -599,7 +599,7 @@
 		"description" : "Light Laser Tower",
 		"helptext" : "The Lotus is a basic turret. A versatile, solid anti-ground weapon, it does well versus scouts as well as being able to take on one or two raiders. Falls relatively easily to skirmishers, artillery or assault units unless supported."
 	},
-	"armrock" : {
+	"cloakskirm" : {
 		"name" : "Rocko",
 		"description" : "Skirmisher Bot (Direct-Fire)",
 		"helptext" : "The Rocko's low damage, low speed unguided rockets are redeemed by their range. They are most effective in a line formation, firing at maximum range and kiting the enemy. Counter them by attacking them with fast units which can close range and dodge their missiles."
@@ -624,7 +624,7 @@
 		"description" : "Econ/Support Commander",
 		"helptext" : "The esoteric Engineer chassis uses a more unorthodox weapon set. Though lacking armor or speed, this chassis is still favored due to its intrinsic buildpower bonus."
 	},
-	"armpw" : {
+	"cloakraid" : {
 		"name" : "Glaive",
 		"description" : "Light Raider Bot",
 		"helptext" : "Light and cheap, the Glaive makes short work of enemy skirmishers, artillery and economy, but should avoid and outmanouver riot units and defenses, where it is not as strong. Damaged Glaives regenerate when out of combat."
@@ -674,7 +674,7 @@
 		"description" : "Airborne SpecOps Engineer, Builds at 7.5 m/s",
 		"helptext" : "The Athena is the pinnacle of stealth strike capability. Equipped with a cloaking device and a radar jammer, it can slip through enemy lines to assemble squads of raiders, inflicting havoc on the opposition's logistics. The Athena can also resurrect wrecks on the battlefield, adding them to your army."
 	},
-	"armsonar" : {
+	"staticsonar" : {
 		"name" : "Sonar Station",
 		"description" : "Locates Water Units",
 		"helptext" : "The docile Sonar Station provides one of the few means of locating underwater targets."
@@ -724,7 +724,7 @@
 		"description" : "Napalm Bomber",
 		"helptext" : "The Phoenix's napalm bombs decimate large clumps of units and light structures."
 	},
-	"armsnipe" : {
+	"cloaksnipe" : {
 		"name" : "Spectre",
 		"description" : "Cloaked Skirmish/Anti-Heavy Artillery Bot",
 		"helptext" : "The Spectre's energy rifle inflicts heavy damage to a single target. It can fire while cloaked; however its visible round betrays its position. It requires quite a bit of energy to keep cloaked, especially when moving. The best way to locate a Spectre is by sweeping the area with many cheap units."
@@ -844,7 +844,7 @@
 		"description" : "Fast Anti-Air Vehicle",
 		"helptext" : "The Crasher is a speedy solution to enemy bomber attacks, and also works well against gunships."
 	},
-	"armsptk" : {
+	"spiderskirm" : {
 		"name" : "Recluse",
 		"description" : "Skirmisher Spider (Indirect Fire)",
 		"helptext" : "An all terrain missile launching unit. Climb walls with this spider walker and take your enemy by surprise. The unguided rockets cannot hit a rapidly jinking target, but they have a fairly long range."
@@ -1184,7 +1184,7 @@
 		"description" : "Raider Tank",
 		"helptext" : "The diminutive Kodachi is a unique raider. Its small yet agile chassis has enough armor and speed to get it close enough to fire its weapon, a napalm bomb. The Kodachi should run in, get a shot off, and withdraw before it takes significant damage. Damaged Kodachis regenerate out of combat."
 	},
-	"armrectr" : {
+	"cloakcon" : {
 		"name" : "Conjurer",
 		"description" : "Cloaked Construction Bot, Builds at 5 m/s",
 		"helptext" : "The Conjurer packs a short-ranged jammer and a cloaking device for stealthy expansion and base maintenance."
@@ -1294,7 +1294,7 @@
 		"description" : "Saturation Napalm Bomber",
 		"helptext" : "The Phoenix's napalm bombs decimate large clumps of units and light structures."
 	},
-	"armraven" : {
+	"striderarty" : {
 		"name" : "Catapult",
 		"description" : "Heavy Saturation Artillery Strider",
 		"helptext" : "The Catapult is an MLRS strider. It can launch a volley of rockets that guarantees the destruction of almost anything in the target area, then quickly retreat behind friendly forces."

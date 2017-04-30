@@ -74,7 +74,7 @@
         "description": "Niszczyciel (wsparcie / szturmowy)",
         "helptext": "Niszczyciel Siren to statek ogólnego przeznaczenia, który łączy silne obszarowe działko soniczne (zdolne razić cele zarówno pod wodą, jak i nad nią), rakiety kinetyczne średniego zasięgu (świetne na budynki) oraz dobry pancerz."
     },
-    "armtick": {
+    "cloakbomb": {
         "name": "Tick",
         "description": "Pajęcza bomba EMP (zakopuje się)",
         "helptext": "Tick zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Tick słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
@@ -174,7 +174,7 @@
         "description": "Łódź atomowa, moc 20 m/s, 30s przeładowanie",
         "helptext": "Scylla jest w stanie wytwarzać i wysyłać rakiety taktyczne. Nie ma jednak broni do walki bezpośredniej i należy trzymać ją jak najdalej od wrogich jednostek."
     },
-    "armpb": {
+    "turretgauss": {
         "name": "Gauss",
         "description": "Działo Gaussa, +20 HP/s gdy nie strzela",
         "helptext": "Wytrzymała wiezyczka uzbrojona w działo Gaussa, która może atakować także cele podwodne. Gdy jest zamknięta, otrzymuje tylko ćwierć obrażeń i regeneruje 20 punktów wytrzymałości na sekundę."
@@ -304,7 +304,7 @@
         "description": "Duża elektrownia (+225) - NIEBEZPIECZNE",
         "helptext": "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
     },
-    "armstiletto_laser": {
+    "bomberdisarm": {
         "name": "Thunderbird",
         "description": "Bombowiec rozbrajający",
         "helptext": "Szybki bombowiec, który rozbraja jednostki na szerokim obszarze."
@@ -399,12 +399,12 @@
         "description": "Bombowiec szturmowy (na budynki)",
         "helptext": "Mimo że przez swój rozmiar łatwo go trafić, Eclipse jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
     },
-    "armzeus": {
+    "cloakassault": {
         "name": "Zeus",
         "description": "Bot szturmowy",
         "helptext": "Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie jednostki i niszczenia ich mocnym działkiem EMP. Nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, lecz jednostki o mniejszym od niego zasięgu niszczy skutecznie."
     },
-    "armsolar": {
+    "energysolar": {
         "name": "Panel słoneczny",
         "description": "Mała elektrownia (+2)",
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
@@ -474,7 +474,7 @@
         "description": "Poduszkowiec z shotgunem",
         "helptext": "Punisher ma shotguna i jest dobry na ciężkie jednostki lub grupy lekkich."
     },
-    "armspy": {
+    "spiderantiheavy": {
         "name": "Infiltrator",
         "description": "Niewidzialny zwiadowca / paralizator",
         "helptext": "Infiltrator spełnia dwie role. Przede wszystkim jest świetnym zwiadowcą dzięki niewidzialności, pajęczemu poruszaniu się po klifach i dużemu zasięgowi wzroku. Ponadto może sparaliżować pojedynczy cel, co dobrze jest używać przeciwko ciężkim jednostkom."
@@ -484,7 +484,7 @@
         "description": "Pojazd radarowy",
         "helptext": "Informant zapewnia radar na polu bitwy."
     },
-    "armwin": {
+    "energywind": {
         "name": "Turbina",
         "description": "Mała elektrownia",
         "helptext": "Turbiny produkują różną ilość energii zależnie od tego, gdzie się je zbuduje. Na lądzie produkują zmienną ilość energii, która zwiększa się wraz z wysokością nad poziomem morza. Wiatraki są bardzo delikatne, zatem należy stawiać je rozważnie. W wodzie turbiny produkują stałą ilość energii i są nieco wytrzymalsze niż wiatraki."
@@ -619,7 +619,7 @@
         "description": "Lekka wieżyczka laserowa",
         "helptext": "Lotus to podstawowa wieżyczka. Dobrze chroni przed lekkimi jednostkami, chociaż stosunkowo łatwo zniszczyć go harcownikami, artylerią lub jednostkami szturmowymi."
     },
-    "armrock": {
+    "cloakskirm": {
         "name": "Rocko",
         "description": "Bot harcownik",
         "helptext": "Rocko jest uzbrojony w powolne rakiety, które mimo niskich obrażeń i braku samonaprowadzania mają duży zasięg. Najlepiej sprawdzają się stojąc w linii prostopadłej do celu, atakując z maksymalnej odległości i nie dając się złapać przeciwnikom. Można go pokonać lekkimi jednostkami, które są w stanie unikać ich rakiet, dogonić go i zniszczyć."
@@ -639,7 +639,7 @@
         "description": "Wylęgarnia kurczaków",
         "helptext": "Gniazda takie jak to to wylęgarnie kurczaków."
     },
-    "armpw": {
+    "cloakraid": {
         "name": "Glaive",
         "description": "Lekki bot",
         "helptext": "Tani, lekki i szybki, Glaive świetnie nadaje się do niszczenia wrogich harcowników, artylerii i budynków ekonomicznych. Jest jednak bardzo delikatny i nie powinno się go rzucać przeciwko jednostkom wsparcia i wieżyczkom. Glaive samoczynnie regeneruje się po wyjściu z walki."
@@ -689,7 +689,7 @@
         "description": "Konstruktor specjalistyczny, moc 7.5 m/s",
         "helptext": "Athena to technologiczne cacko wyposażone w niewidzialność, zakłócacz radaru i możliwość odbudowy jednostek bezpośrednio ze złomu. Ponadto jest w stanie budować jednostki na polu bitwy bez użycia fabryki i działać jak normalny konstruktor."
     },
-    "armsonar": {
+    "staticsonar": {
         "name": "Sonar",
         "description": "Wykrywa jednostki podwodne",
         "helptext": "Sonar pozwala wykrywać zanurzone jednostki."
@@ -709,7 +709,7 @@
         "description": "Pojazd zwiadowczy",
         "helptext": "Tani i szybki, Dart jest niezmiernie groźny w początkowej fazie gry dla nieprzygotowanych przeciwników. Dowolne jednostki bojowe skutecznie się go pozbywają."
     },
-    "armsptk": {
+    "spiderskirm": {
         "name": "Recluse",
         "description": "Pająk harcownik",
         "helptext": "Pająk wyposażony w rakiety dalekiego zasięgu o niestabilnej trajektorii."
@@ -739,7 +739,7 @@
         "description": "Bombowiec z napalmem",
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
-    "armsnipe": {
+    "cloaksnipe": {
         "name": "Spectre",
         "description": "Niewidzialny snajper harcownik",
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
@@ -1149,7 +1149,7 @@
         "description": "Skaczący bot miglanc",
         "helptext": "Największy miglanc na osiedlu."
     },
-    "armrectr": {
+    "cloakcon": {
         "name": "Conjurer",
         "description": "Niewidzialny bot konstruktor, moc 5 m/s",
         "helptext": "Conjurer to niewidzialny konstruktor z zakłócaczem krótkiego zasięgu."
@@ -1259,7 +1259,7 @@
         "description": "Bombowiec z napalmem",
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
-    "armraven": {
+    "striderarty": {
         "name": "Catapult",
         "description": "Ciężki rakietowy mech artyleryjski",
         "helptext": "Catapult to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."

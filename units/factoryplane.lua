@@ -18,7 +18,7 @@ unitDef = {
     [[corvamp]],
 	[[corshad]],
 	[[corhurc2]],
-    [[armstiletto_laser]],
+    [[bomberdisarm]],
     [[bomberheavy]],
     [[corawac]],
   },

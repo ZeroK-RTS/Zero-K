@@ -41,8 +41,8 @@ VFS.Include("LuaRules/Utilities/tablefunctions.lua")
 local unitCategories = {}
 
 unitCategories.basicEnergyBuildings = {
-	armsolar     = true,
-	armwin       = true,
+	energysolar     = true,
+	energywind       = true,
 }
 
 unitCategories.advancedEnergyBuildings = {
@@ -95,7 +95,7 @@ unitCategories.builders = {
 	amphcon    = true,
 	planecon      = true,
 	-- athena  = true,
-	armrectr   = true,
+	cloakcon   = true,
 	spidercon = true,
 	coracv     = true,
 	corfast    = true,

@@ -23,7 +23,7 @@ local menu = {
 		},
 		{
 			angle = -135,
-			unit = "armraven",
+			unit = "striderarty",
 			label = "Artillery",
 		},
 		{

@@ -46,7 +46,7 @@ modConfig["ZK"]["unitList"] =
 	staticantinuke = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
 	turretemp = { weapons = { 1 } },		--faraday
 	turretriot = { weapons = { 1 } },		--stardust
-	armpb = { weapons = { 1 } },		--pitbull
+	turretgauss = { weapons = { 1 } },		--pitbull
 	mahlazer = { weapons = { 1 } },		--starlight
 	turretemp = { weapons = { 1 } },		--faraday
 	turretantiheavy = { weapons = { 1 } },		--annihilator

@@ -70,7 +70,7 @@ local canRetreatDefs = {
 	"corsumo",
 	
 	"dante",
-	--"armraven",
+	--"striderarty",
 	"scorpion",
 	"bantha",
 	"detriment",
@@ -80,8 +80,8 @@ local canRetreatDefs = {
 }
 
 local energyDefs = {
-	"armsolar",
-	"armwin",
+	"energysolar",
+	"energywind",
 	"energyfusion",
 	--"geo",
 	"cafus",
@@ -93,7 +93,7 @@ local defenseDefs = {
 	"turretriot",
 	"corgrav",
 	"corhlt",
-	"armpb",
+	"turretgauss",
 	
 	"corrazor",
 	"missiletower",

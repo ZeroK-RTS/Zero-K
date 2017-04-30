@@ -112,7 +112,7 @@ local sounds = {
 			[1] = "crawlie_select",
 		},
 	},
-	armsptk = {
+	spiderskirm = {
 		ok = {
 			[1] = "spider_move",
 		},
@@ -153,7 +153,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	armspy = {
+	spiderantiheavy = {
 		ok = {
 			[1] = "spy_move",
 		},
@@ -338,7 +338,7 @@ local sounds = {
 	},
 	
 	-- Cloak
-	armrectr = {
+	cloakcon = {
 		build = "builder_start",
 		ok = {
 			[1] = "bot_move",
@@ -348,7 +348,7 @@ local sounds = {
 		},
 	},
 	
-	armsnipe = {
+	cloaksnipe = {
 		ok = {
 			[1] = "spy_move",
 		},
@@ -356,7 +356,7 @@ local sounds = {
 			[1] = "spy_select",
 		},
 	},
-	armpw = {
+	cloakraid = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -372,7 +372,7 @@ local sounds = {
 			[1] = "spy_select",
 		},
 	},
-	armrock = {
+	cloakskirm = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -380,7 +380,7 @@ local sounds = {
 			[1] = "medium_bot_select",
 		},
 	},
-	armzeus = {
+	cloakassault = {
 		ok = {
 			[1] = "bot_move",
 		},
@@ -388,7 +388,7 @@ local sounds = {
 			[1] = "medium_bot_select",
 		},
 	},
-	armtick = {
+	cloakbomb = {
 		ok = {
 			[1] = "light_bot_move",
 		},
@@ -529,7 +529,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	armraven = {
+	striderarty = {
 		ok = {
 			[1] = "heavy_bot_move",
 		},
@@ -836,7 +836,7 @@ local sounds = {
 			[1] = "bomber_select",
 		},
 	},
-	armstiletto_laser = {
+	bomberdisarm = {
 		ok = {
 			[1] = "bomber_move",
 		},
@@ -1093,12 +1093,12 @@ local sounds = {
 			[1] = "building_select2",
 		},
 	},
-	armwin = {
+	energywind = {
 		select = {
 			[1] = "windmill",
 		},
 	},
-	armsolar = {
+	energysolar = {
 		select = {
 			[1] = "building_select1",
 		},
@@ -1232,7 +1232,7 @@ local sounds = {
 		},
 	},
 	--]]
-	armsonar = {
+	staticsonar = {
 		select = {
 			[1] = "sonar_select",
 		},
@@ -1316,7 +1316,7 @@ local sounds = {
 			[1] = "turret_select",
 		},
 	},
-	armpb = {
+	turretgauss = {
 		ok = {
 			[1] = "light_turret_select",
 		},

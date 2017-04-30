@@ -221,7 +221,7 @@ effectUnitDefs = {
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="rjet", noIconDraw = true}},
     {class='Ribbon', options={color={.3,.3,01,1}, width=5.5, piece="ljet", noIconDraw = true}},
   },
-  armstiletto_laser = {
+  bomberdisarm = {
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet1", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3.5, length=20, piece="Jet2", onActive=true, noIconDraw = true}},
     {class='Ribbon', options={width=1, size=6, piece="LWingTip", noIconDraw = true}},

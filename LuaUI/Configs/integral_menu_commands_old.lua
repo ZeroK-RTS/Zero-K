@@ -77,8 +77,8 @@ local factories = {
 --you can put too many things into the same row, but the buttons will be squished
 local econ = {
 	cormex =     {order = 1, row = 1, col = 1},
-	armwin =     {order = 2, row = 2, col = 1},
-	armsolar =   {order = 3, row = 2, col = 2},
+	energywind =     {order = 2, row = 2, col = 1},
+	energysolar =   {order = 3, row = 2, col = 2},
 	geo =        {order = 4, row = 2, col = 3},
 	energyfusion =     {order = 5, row = 2, col = 4},
 	cafus =      {order = 6, row = 2, col = 5},
@@ -93,7 +93,7 @@ local defense = {
 	corllt =   {order = 1, row = 1, col = 2},
 	turretriot =  {order = 2, row = 1, col = 3},
 	turretemp = {order = 3, row = 1, col = 4},
-	armpb =    {order = 5, row = 1, col = 5},
+	turretgauss =    {order = 5, row = 1, col = 5},
 	corhlt =   {order = 6, row = 1, col = 6},
 
 	missiletower =  {order = 9, row = 2, col = 1},

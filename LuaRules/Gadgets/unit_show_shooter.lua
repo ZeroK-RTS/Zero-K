@@ -31,7 +31,7 @@ local MOBILE_SHOW_TIME = 4.5 -- 2.5 seconds
 
 local fakeWeapons = {}   -- WeaponDefs which are for hax.
 local staticWeapons = {} -- WeaponDefs which are on turrets.
-local noDecloakWeapons = {[WeaponDefNames["armsnipe_shockrifle"].id] = true}
+local noDecloakWeapons = {[WeaponDefNames["cloaksnipe_shockrifle"].id] = true}
 
 for i = 1, #WeaponDefs do
 	local wd = WeaponDefs[i]

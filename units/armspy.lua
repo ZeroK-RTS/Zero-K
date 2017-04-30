@@ -1,12 +1,12 @@
 unitDef = {
-  unitname              = [[armspy]],
+  unitname              = [[spiderantiheavy]],
   name                  = [[Infiltrator]],
   description           = [[Cloaked Scout/Anti-Heavy]],
   acceleration          = 0.3,
   activateWhenBuilt     = true,
   brakeRate             = 0.9,
   buildCostMetal        = 280,
-  buildPic              = [[armspy.png]],
+  buildPic              = [[spiderantiheavy.png]],
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
@@ -41,7 +41,7 @@ unitDef = {
   moveState             = 0,
   noChaseCategory       = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName            = [[infiltrator.s3o]],
-  script                = [[armspy.lua]],
+  script                = [[spiderantiheavy.lua]],
   selfDestructAs        = [[BIG_UNITEX]],
   sightDistance         = 550,
   trackOffset           = 0,
@@ -126,4 +126,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armspy = unitDef })
+return lowerkeys({ spiderantiheavy = unitDef })

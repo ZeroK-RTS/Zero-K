@@ -43,7 +43,7 @@ unitTips = {
 }
 
 raiderDefs = {
-	"armpw",
+	"cloakraid",
 	"spherepole",
 	"corak",
 	"armflash",
@@ -65,7 +65,7 @@ assaultDefs = {
 	"corthud",
 	"corraid",
 	
-	"armzeus",
+	"cloakassault",
 	--"spidercrabe",
 	"spiderassault",
 	"corcan",
@@ -87,13 +87,13 @@ assaultDefs = {
 }
 
 skirmDefs = {
-	"armrock",
+	"cloakskirm",
 	"corstorm",
 	"armjanus",
 	"armstump",
 	
-	"armsptk",
-	"armsnipe",
+	"spiderskirm",
+	"cloaksnipe",
 	"cormort",
 	"slowmort",
 	"cormortgold",
@@ -132,7 +132,7 @@ artyDefs = {
 	"trem",
 	
 	"armshock",
-	"armraven",
+	"striderarty",
 	
 	"hoverartillery",
 	
@@ -144,12 +144,12 @@ bomberDefs = {
 	"bomberdive",
 	"corshad",
 	"corhurc2",
-	"armstiletto_laser",
+	"bomberdisarm",
 	"bomberheavy",
 }
 
 conDefs = {
-	"armrectr",
+	"cloakcon",
 	"cornecro",
 	"arm_weaver",
 	"corfast",
@@ -163,8 +163,8 @@ conDefs = {
 mexDefs = {"cormex"}
 
 energyDefs = {
-	"armsolar",
-	"armwin",
+	"energysolar",
+	"energywind",
 	"energyfusion",
 	"geo",
 	"cafus",

@@ -2,7 +2,7 @@
 {
 // --- EASY config ---
 "easy": {  // Null AI
-"economy": {"energy": {"land": {"cafus": [1], "energyfusion": [2], "armsolar": [3]}, "water": {"cafus": [1], "energyfusion": [2], "armwin": [3]}}, "default": "corrl"}
+"economy": {"energy": {"land": {"cafus": [1], "energyfusion": [2], "energysolar": [3]}, "water": {"cafus": [1], "energyfusion": [2], "energywind": [3]}}, "default": "corrl"}
 },
 // --- EASY config ---
 
@@ -25,7 +25,7 @@
 		"income_tier": [20, 30, 60],
 
 		//             conjurer,   glaive,  scythe,       rocko,     warrior,  zeus,      hammer,   sniper,     tick,      eraser,          gremlin
-		"unit":      ["armrectr", "armpw", "spherepole", "armrock", "armwar", "armzeus", "cloakarty", "armsnipe", "armtick", "spherecloaker", "cloakaa"],
+		"unit":      ["cloakcon", "cloakraid", "spherepole", "cloakskirm", "armwar", "cloakassault", "cloakarty", "cloaksnipe", "cloakbomb", "spherecloaker", "cloakaa"],
 
 		"land": {
 			// 0-8m Opening - Glaives & Warriors most important for scouting, map control and defence.
@@ -120,7 +120,7 @@
 
 		"income_tier": [8, 16, 24, 32, 40, 56, 72],
 		//             weaver,       flea,      hermit,          venom,       redback,      recluse,   crabe,      infiltrator, tarantula
-		"unit":      ["spidercon", "spiderscout", "spiderassault", "spideremp", "spiderriot", "armsptk", "spidercrabe", "armspy",    "spideraa"],
+		"unit":      ["spidercon", "spiderscout", "spiderassault", "spideremp", "spiderriot", "spiderskirm", "spidercrabe", "spiderantiheavy",    "spideraa"],
 		"land": {
 			// 0-12m Opening - Opening turbo Flea spam & Riots
 			"tier0": [ 0.00,         0.93,      0.00,            0.02,        0.05,         0.00,      0.00,       0.00,        0.00],
@@ -213,7 +213,7 @@
 
 		"income_tier": [30, 60],
 		//             crane,   swift,     hawk,      raven,     phoenix,    thunderbird,         wyvern,    vulture
-		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "armstiletto_laser", "bomberheavy", "corawac"],
+		"unit":      ["planecon", "fighter", "corvamp", "corshad", "corhurc2", "bomberdisarm", "bomberheavy", "corawac"],
 		"air": {
 			// 0-10m Early Game
 			"tier0": [ 0.00,    0.00,      0.90,      0.00,      0.00,       0.00,                0.05,      0.05],
@@ -313,7 +313,7 @@
 
 		"income_tier": [60, 80, 100],
 		//             ultimatum,    scorpion,   dante,   catapult,   funnelweb,   bantha,     detriment, scylla,          reef,          battleship
-		"unit":      ["striderantiheavy", "scorpion", "dante", "armraven", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
+		"unit":      ["striderantiheavy", "scorpion", "dante", "striderarty", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"],
 		"land": {
 			"tier0": [ 0.01,         0.10,       0.81,    0.00,       0.05,        0.03,       0.00,      0.00,            0.00,          0.00],
 			"tier1": [ 0.03,         0.14,       0.22,    0.24,       0.20,        0.16,       0.01,      0.00,            0.00,          0.00],
@@ -360,7 +360,7 @@
 
 "behaviour": {
 	// factorycloak
-	"armrectr": {
+	"cloakcon": {
 		// "role": [<main>, <enemy>, <enemy>, ...]
 		// <main> is the role to make desicions of when to build it and what task to assign
 		// <enemy> is to decide how to counter enemy unit, if missing then equals to <main>
@@ -399,7 +399,7 @@
 		// Enemy threat multiplier
 //		"thr_mod": 1.0
 	},
-	"armpw": {
+	"cloakraid": {
 		"role": ["raider"],
 		"attribute": ["scout"],
 		"retreat": 0,
@@ -411,7 +411,7 @@
 		"limit": 8,
 		"retreat": 0.2
 	},
-	"armrock": {
+	"cloakskirm": {
 		"role": ["skirmish"],
 		"retreat": 0.15  // mostly disposable
 	},
@@ -422,7 +422,7 @@
 		"pwr_mod": 1.6,
 		"thr_mod": 1.6
 	},
-	"armzeus": {
+	"cloakassault": {
 		"role": ["assault", "heavy"],
 		"retreat": 0.5,  // assaults need to assault
 		"pwr_mod": 0.9,
@@ -433,7 +433,7 @@
 		"retreat": 0.99,
 		"thr_mod": 0.1
 	},
-	"armsnipe": {
+	"cloaksnipe": {
 		"role": ["anti_heavy"],
 		"attribute": ["support"],
 		"fire_state": "open",
@@ -441,7 +441,7 @@
 		"pwr_mod": 3.0,
 		"thr_mod": 0.1
 	},
-	"armtick": {
+	"cloakbomb": {
 		"role": ["mine"],
 		"retreat": 0.01
 	},
@@ -592,7 +592,7 @@
 		"attribute": ["support"],
 		"retreat": 0.55
 	},
-	"armsptk": {
+	"spiderskirm": {
 		"role": ["assault"],
 		"attribute": ["support"],
 		"retreat": 0.8
@@ -604,7 +604,7 @@
 		"pwr_mod": 2.5,
 		"thr_mod": 2.5
 	},
-	"armspy": {
+	"spiderantiheavy": {
 		"role": ["anti_heavy", "mine", "scout"],
 		"limit": 0
 	},
@@ -880,7 +880,7 @@
 		"limit": 0,
 		"retreat": 0.6
 	},
-	"armstiletto_laser": {
+	"bomberdisarm": {
 		"role": ["anti_heavy", "air"],
 		"limit": 1,
 		"retreat": 0.99,
@@ -1002,7 +1002,7 @@
 		"pwr_mod": 0.8,
 		"thr_mod": 0.75
 	},
-	"armraven": {
+	"striderarty": {
 		"role": ["anti_heavy", "heavy"],
 		"attribute": ["siege"],
 		"fire_state": "return",
@@ -1127,7 +1127,7 @@
 		"role": ["anti_air"],
 		"thr_mod": 2.0
 	},
-	"armpb": {
+	"turretgauss": {
 		"role": ["static"],
 		"attribute": ["siege"],
 		"thr_mod": 1.5
@@ -1159,7 +1159,7 @@
 	"cormex": {
 		"role": ["mine"]
 	},
-	"armwin": {
+	"energywind": {
 		"role": ["mine"]
 	},
 	"corrad": {
@@ -1178,7 +1178,7 @@
 		"role": ["mine"],
 		"limit": 5
 	},
-	"armsolar": {
+	"energysolar": {
 		"role": ["mine"]
 	},
 
@@ -1380,11 +1380,11 @@
 	// For example land config:
 	//   P0 = cafus: (4000/225; random(1..2)) = (17.78, 1)
 	//   P1 = energyfusion: (1000/35; random(3)) = (28.57, 3)
-	//   P2 = armsolar: (70/2; random(10..15)) = (35, 13)
+	//   P2 = energysolar: (70/2; random(10..15)) = (35, 13)
 	// P(x) => y = 0.079550*x*x - 3.501790*x + 38.113789
 	// Then parabola P(x) defines limit for
 	//   "geo": x=500/25=20, y = P(20) = 31.82 - 70.0358 + 38.113789 ~= 0
-	//   "armwin": x=35/1.2=29.17, y = P(29.17) ~= 4
+	//   "energywind": x=35/1.2=29.17, y = P(29.17) ~= 4
 	//
 	// Metal income condition for energy structure is: income > sqrt(structure_cost*0.4).
 	// Energy buildings are sorted by structure_cost/energy_make (asc).
@@ -1403,16 +1403,16 @@
 			// limit = random(<lower limit>..<upper limit>)
 			"cafus": [1, 1],
 			"energyfusion": [3],
-			"armsolar": [6, 18]
+			"energysolar": [6, 18]
 		},
 		"water": {
 			"cafus": [1],
 			"energyfusion": [4],
-			"armwin": [20]
+			"energywind": [20]
 		},
 		"factor": 0.51,  // income factor for energy
 
-		"pylon": ["energypylon", "armsolar", "armwin"]
+		"pylon": ["energypylon", "energysolar", "energywind"]
 	},
 
 	// Scales metal income
@@ -2077,8 +2077,8 @@
 		"fac_air": ["factoryplane", "factorygunship", "staticrearm"],
 		"fac_water": ["factoryship"],
 		"fac_strider": ["striderhub"],
-		"solar": ["armsolar"],
-		"wind": ["armwin"],
+		"solar": ["energysolar"],
+		"wind": ["energywind"],
 		"fusion": ["energyfusion"],
 		"singu": ["cafus"],
 		"pylon": ["energypylon"],
@@ -2089,7 +2089,7 @@
 		"superweapon": ["raveparty", "corsilo", "staticheavyarty", "zenith", "screamer"],
 		"protector": ["staticantinuke"],
 //		"terraform": ["terraunit"],
-		"strider": ["striderantiheavy", "scorpion", "dante", "armraven", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
+		"strider": ["striderantiheavy", "scorpion", "dante", "striderarty", "funnelweb", "bantha", "detriment", "subtacmissile", "shipcarrier", "shipheavyarty"]
 	}
 }
 },
