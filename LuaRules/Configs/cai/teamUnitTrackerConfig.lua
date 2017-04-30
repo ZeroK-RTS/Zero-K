@@ -169,11 +169,11 @@ local air = {
 	},
 	
 	gunship = {
-		"bladew",
-		"blastwing",
+		"gunshipemp",
+		"gunshipbomb",
 		"gunshipraid",
 		"gunshipsupport",
-		"blackdawn",
+		"gunshipassault",
 		"gunshipheavyskirm",
 		"corcrw",
 	},

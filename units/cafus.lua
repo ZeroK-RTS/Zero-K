@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[cafus]],
+  unitname                      = [[energysingu]],
   name                          = [[Singularity Reactor]],
   description                   = [[Large Powerplant (+225) - HAZARDOUS]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 9,
   buildingGroundDecalSizeY      = 9,
-  buildingGroundDecalType       = [[cafus_aoplane.dds]],
-  buildPic                      = [[CAFUS.png]],
+  buildingGroundDecalType       = [[energysingu_aoplane.dds]],
+  buildPic                      = [[energysingu.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[120 120 120]],
@@ -44,7 +44,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[fus.s3o]],
   onoffable                     = false,
-  script                        = [[cafus.lua]],
+  script                        = [[energysingu.lua]],
   selfDestructAs                = [[SINGULARITY]],
   sightDistance                 = 273,
   turnRate                      = 0,
@@ -89,4 +89,4 @@ unitDef = {
   },
 }
 
-return lowerkeys({ cafus = unitDef })
+return lowerkeys({ energysingu = unitDef })

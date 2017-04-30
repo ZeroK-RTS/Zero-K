@@ -6666,7 +6666,7 @@ return {
 		f = 0,
 		h = 2288.0710449219,
 		mh = 3400,
-		name = "blackdawn",
+		name = "gunshipassault",
 		uID = 22716,
 		x = 3112,
 		y = 112.60301208496,

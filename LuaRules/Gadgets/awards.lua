@@ -118,7 +118,7 @@ local staticO_big = {
 local kamikaze = {
 	corroach=1,
 	corsktl=1,
-	blastwing=1,
+	gunshipbomb=1,
 	puppy=1,
 }
 

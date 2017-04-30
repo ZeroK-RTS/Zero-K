@@ -309,7 +309,7 @@
 		"description" : "Standoff Combat Commander, Builds at 10 m/s",
 		"helptext" : "The Siege Commander is optimized for pummeling the enemy from a distance. Its low speed and armor leave it vulnerable in a knife fight."
 	},
-	"attackdrone" : {
+	"dronelight" : {
 		"name" : "Firefly",
 		"description" : "Attack Drone",
 		"helptext" : "The Firefly is an attack drone with a weak high precision pulse laser. They can protect their parent unit from light enemy units. They do not share stealth with it though, so they can also betray the presence of a cloaked commander."
@@ -559,10 +559,10 @@
 		"description" : "Produces Airplanes, Builds at 10 m/s",
 		"helptext" : "The Airplane Plant offers a variety of fixed-wing aircraft to suit your needs. Choose between multirole fighters that can double as light attackers or specialized interceptors, and between precision bombers for taking down specific targets or their saturation counterparts for destroying swarms. The plant also comes bundled with one rearm pad."
 	},
-	"blastwing" : {
+	"gunshipbomb" : {
 		"name" : "Blastwing",
 		"description" : "Flying Bomb (Burrows)",
-		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your blastwing dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
+		"helptext" : "The Blastwing does only a small amount of damage, suitable for taking out mexes, solars, LLTs, wind farms and nanotowers, though it can offer a more fomidible punch en-masse. Be mindful of the speed and direction it is travelling, as much of the damage done by it is directional shrapnel that will continue on the trajectory of the bomb after it dies. In this way, you can spray an enemy with shards of metal even if your gunshipbomb dies before it is in range. Do not pack them too tightly, as they can chain explode. Cloaks when landed."
 	},
 	"pw_generic" : {
 		"name" : "Generic Neutral Structure",
@@ -664,7 +664,7 @@
 		"description" : "Dodo Bomber",
 		"helptext" : "Blimpy drops a Dodo on unsuspecting armies and bases."
 	},
-	"battledrone" : {
+	"droneheavyslow" : {
 		"name" : "Viper",
 		"description" : "Advanced Battle Drone",
 		"helptext" : "The Viper is an advanced battle drone similar to the Firefly but equipped with a Disruptor Pulse Beam, slowing its targets more with each hit."
@@ -699,7 +699,7 @@
 		"description" : "Produces Hovercraft, Builds at 10 m/s",
 		"helptext" : "The Hovercraft Platform is fast and deadly, offering the ability to cross sea and plains alike and outmaneuver the enemy. Key units: Dagger, Halberd, Scalpel, Mace, Penetrator"
 	},
-	"blackdawn" : {
+	"gunshipassault" : {
 		"name" : "Black Dawn",
 		"description" : "Heavy Raider/Assault Gunship",
 		"helptext" : "The Black Dawn fires a volley of unguided rockets. It has high HP and a huge damage output, but is expensive and inaccurate, especially vs moving targets. It is best for taking on clumps of base structures, slow moving or stationary units. The Black Dawn should disengage between volleys to minimize damage taken."
@@ -1229,7 +1229,7 @@
 		"description" : "Multi-role Fighter",
 		"helptext" : "The Swift can hit both land and air. It is effective against air units with its guided missiles and lasers, but enemy AA and air superiority fighters will kill it quickly. In numbers, it can harass land units and is suitable for raiding. Perhaps most notably, they are equipped with afterburner jets that can be used to give the Swift a massive speed boost, allowing them to execute incredible combat and evasive maneuvers."
 	},
-	"carrydrone" : {
+	"dronecarry" : {
 		"name" : "Gull",
 		"description" : "Carrier Drone",
 		"helptext" : "The Gull is a small, aggressive drone armed with an energy MG."
@@ -1274,7 +1274,7 @@
 		"description" : "Clucking Hell!",
 		"helptext" : "Two words: RUN AWAY! The Chicken Queen is the matriach of the Thunderbird colony, and when aggravated is virtually impossible to stop. She can spit immensely powerful acid, drop land chickens, and spray spores to kill aircraft. Only the most determined, focused assault can hope to stop this beast in her tracks."
 	},
-	"bladew" : {
+	"gunshipemp" : {
 		"name" : "Gnat",
 		"description" : "Anti-Heavy EMP Drone",
 		"helptext" : "The Gnat can be used to paralyze enemy units. It makes an excellent defensive unit, and when combined with banshees or other units can halt the enemy to give you time to kill him. Offensively it can paralyze even heavily fortified areas, but dies relatively easily to defenders."

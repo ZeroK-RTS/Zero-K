@@ -236,7 +236,7 @@ effectUnitDefs = {
     {class='Ribbon', options={width=1, size=12, piece="wingtipr", noIconDraw = true}},
   },
 
-  bladew = {
+  gunshipemp = {
     {class='Ribbon', options={width=1, size=5, piece="ljet", noIconDraw = true}},
     {class='Ribbon', options={width=1, size=5, piece="rjet", noIconDraw = true}},  
     {class='AirJet', options={color={0.1,0.4,0.6}, width=3, length=14, piece="ljet", onActive=true, emitVector = {0, 1, 0}, noIconDraw = true}},
@@ -338,7 +338,7 @@ effectUnitDefs = {
 	{class='StaticParticles', options=MergeTable(blinkyLightRed, {piece="wingtipr"}) },
 	{class='StaticParticles', options=MergeTable(blinkyLightGreen, {piece="wingtipl"}) },		
   },
-  blackdawn = {
+  gunshipassault = {
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Rengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},
     {class='AirJet', options={color={0.8,0.1,0.0}, width=7, length=30, jitterWidthScale=2, distortion=0.01, piece="Lwingengine", texture2=":c:bitmaps/gpl/lups/jet2.bmp", onActive=true, noIconDraw = true}},

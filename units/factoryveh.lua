@@ -18,7 +18,7 @@ unitDef = {
     [[cormist]],
     [[corlevlr]],
     [[corraid]],
-    [[capturecar]],
+    [[vehcapture]],
     [[corgarp]],
     [[vehheavyarty]],
     [[vehaa]],

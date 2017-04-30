@@ -13,12 +13,12 @@ unitDef = {
 
   buildoptions                  = {
     [[gunshipcon]],
-    [[blastwing]],
-    [[bladew]],
+    [[gunshipbomb]],
+    [[gunshipemp]],
     [[gunshipraid]],
     [[gunshipsupport]],
     [[gunshipheavyskirm]],
-    [[blackdawn]],
+    [[gunshipassault]],
     [[corcrw]],
 	[[gunshipaa]],
     [[corvalk]],

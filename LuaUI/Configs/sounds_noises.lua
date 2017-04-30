@@ -880,7 +880,7 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
-	bladew = {
+	gunshipemp = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -888,7 +888,7 @@ local sounds = {
 			[1] = "light_gunship_select",
 		},
 	},
-	blastwing = {
+	gunshipbomb = {
 		ok = {
 			[1] = "gunship_move",
 		},
@@ -928,7 +928,7 @@ local sounds = {
 			[1] = "heavy_gunship_select",
 		},
 	},
-	blackdawn = {
+	gunshipassault = {
 		ok = {
 			[1] = "heavy_gunship_move",
 		},

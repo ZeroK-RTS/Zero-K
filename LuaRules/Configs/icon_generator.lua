@@ -163,10 +163,10 @@ unitConfigs = {
   [UnitDefNames.corfav.id] = {
     border = 0.156,
   },
-  [UnitDefNames.blastwing.id] = {
+  [UnitDefNames.gunshipbomb.id] = {
     border = 0.156,
   },
-  [UnitDefNames.bladew.id] = {
+  [UnitDefNames.gunshipemp.id] = {
     border = 0.125,
   },
   [UnitDefNames.corgator.id] = {

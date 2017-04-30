@@ -60,7 +60,7 @@ local hyperweaponDefs = {
 }
 local canRetreatDefs = {
 	"gunshipheavyskirm",
-	"blackdawn",
+	"gunshipassault",
 	"corcrw",
 	
 	"correap",

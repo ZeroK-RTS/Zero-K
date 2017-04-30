@@ -569,7 +569,7 @@ factionBuildConfig = {
 				[2] = { -- scout
 					importanceMult = 0.6,
 					count = 1,
-					[1] = {ID = UnitDefNames['blastwing'].id, chance = 1},
+					[1] = {ID = UnitDefNames['gunshipbomb'].id, chance = 1},
 				},
 				
 				[3] = { -- fighter
@@ -589,7 +589,7 @@ factionBuildConfig = {
 					[1] = {ID = UnitDefNames['gunshipsupport'].id, chance = 0.30},
 					[2] = {ID = UnitDefNames['gunshipraid'].id, chance = 0.35},
 					[3] = {ID = UnitDefNames['gunshipheavyskirm'].id, chance = 0.175},
-					[4] = {ID = UnitDefNames['blackdawn'].id, chance = 0.175},
+					[4] = {ID = UnitDefNames['gunshipassault'].id, chance = 0.175},
 				},	
 			},
 		},

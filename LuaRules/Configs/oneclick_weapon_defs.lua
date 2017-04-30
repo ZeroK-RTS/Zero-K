@@ -18,7 +18,7 @@ local oneClickWepDefNames = {
 	corsktl = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	blastwing = {
+	gunshipbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
 	bomberdisarm = {

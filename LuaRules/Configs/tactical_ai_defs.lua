@@ -307,12 +307,12 @@ artyRangeSkirmieeArray   = Union(artyRangeSkirmieeArray, medRangeExplodables)
 -- Stuff that mobile AA skirms
 
 local skirmableAir = NameToDefID({
-	"blastwing",
-	"bladew",
+	"gunshipbomb",
+	"gunshipemp",
 	"gunshipraid",
 	"gunshipsupport",
 	"gunshipheavyskirm",
-	"blackdawn",
+	"gunshipassault",
 	"corbtrans",
 	"corcrw",
 })

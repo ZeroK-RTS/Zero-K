@@ -68,9 +68,9 @@ end
 local unitIsFighterOrDrone = {
 	[UnitDefNames["fighter"].id] = true,
 	[UnitDefNames["corvamp"].id] = true,
-	[UnitDefNames["attackdrone"].id] = true,
-	[UnitDefNames["battledrone"].id] = true,
-	[UnitDefNames["carrydrone"].id] = true,
+	[UnitDefNames["dronelight"].id] = true,
+	[UnitDefNames["droneheavyslow"].id] = true,
+	[UnitDefNames["dronecarry"].id] = true,
 }
 
 --Wolverine mines are stupid targets.

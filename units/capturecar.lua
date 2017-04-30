@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[capturecar]],
+  unitname            = [[vehcapture]],
   name                = [[Dominatrix]],
   description         = [[Capture Vehicle]],
   acceleration        = 0.0444,
   brakeRate           = 0.0385,
   buildCostMetal      = 420,
   builder             = false,
-  buildPic            = [[capturecar.png]],
+  buildPic            = [[vehcapture.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -41,7 +41,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP]],
   objectName          = [[corvrad_big.s3o]],
-  script              = [[capturecar.lua]],
+  script              = [[vehcapture.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 550,
   trackOffset         = -7,
@@ -143,4 +143,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ capturecar = unitDef })
+return lowerkeys({ vehcapture = unitDef })

@@ -324,7 +324,7 @@
         "description": "Dowódca dalekiego zasięgu, moc 10 m/s",
         "helptext": "Siege to Dowódca nastawiony na ostrzał z dystansu, co zresztą wymuszają jego niska szybkość i wytrzymałość."
     },
-    "attackdrone": {
+    "dronelight": {
         "name": "Firefly",
         "description": "Dron bojowy",
         "helptext": "Firefly to dron bojowy z precyzyjnym laserem, który dobrze chroni właściciela przed lekkimi jednostkami. "
@@ -579,7 +579,7 @@
         "description": "Buduje samoloty, moc 10 m/s",
         "helptext": "Lotnisko produkuje samoloty; oferuje przede wszystkim myśliwce i bombowce, aczkolwiek nie tylko. Na lotnisku znajduje się jedno lądowisko do naprawy samolotów i przeładowywania bombowców."
     },
-    "blastwing": {
+    "gunshipbomb": {
         "name": "Blastwing",
         "description": "Latająca bomba (zakopuje się)",
         "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
@@ -679,7 +679,7 @@
         "description": "Zrzuca Dodo",
         "helptext": "Blimpy zrzuca Dodo niczym bombowiec."
     },
-    "battledrone": {
+    "droneheavyslow": {
         "name": "Viper",
         "description": "Zaawansowany dron bojowy",
         "helptext": "Viper to zaawansowany dron bojowy uzbrojony w promień spowalniający."
@@ -714,10 +714,10 @@
         "description": "Pająk harcownik",
         "helptext": "Pająk wyposażony w rakiety dalekiego zasięgu o niestabilnej trajektorii."
     },
-    "blackdawn": {
+    "gunshipassault": {
         "name": "Black Dawn",
         "description": "Zaczepny statek powietrzny",
-        "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. Blackdawn jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
+        "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. gunshipassault jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
     },
     "tawf114": {
         "name": "Banisher",
@@ -1199,7 +1199,7 @@
         "description": "Wieżyczka przeciwczołgowa - wymaga sieci energetycznej 25 E",
         "helptext": "Sunlance posiada ciężki promień spowalniający, który skutecznie unieszkodliwia nawet ciężkie jednostki."
     },
-    "carrydrone": {
+    "dronecarry": {
         "name": "Gull",
         "description": "Dron bojowy",
         "helptext": "Drony walczą razem ze swoim lotniskowcem i nie mogą się zbytnio od niego oddalić. Lotniskowiec automatycznie zastępuje zniszczone drony nowymi."
@@ -1239,7 +1239,7 @@
         "description": "O kurczę!",
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
-    "bladew": {
+    "gunshipemp": {
         "name": "Gnat",
         "description": "Dron paralizator",
         "helptext": "Gnat może paraliżować wrogie jednostki, co czyni go świetną jednostką defensywną, szczególnie w połączeniu z jednostkami zadającymi obrażenia. Jest jednak delikatny i łatwo go zniszczyć."

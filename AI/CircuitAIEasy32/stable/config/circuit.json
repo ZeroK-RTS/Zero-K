@@ -61,12 +61,12 @@
 		"require_energy": false,
 
 		"income_tier": [7, 16, 24, 32, 40, 56, 72],
-		//             wasp,         blastwing,   gnat,     banshee,  rapier,           brawler,    blackdawn,   krow,     valkyrie,  vindicator,  trident
-		"unit":      ["gunshipcon", "blastwing", "bladew", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "blackdawn", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
+		//             wasp,         gunshipbomb,   gnat,     banshee,  rapier,           brawler,    gunshipassault,   krow,     valkyrie,  vindicator,  trident
+		"unit":      ["gunshipcon", "gunshipbomb", "gunshipemp", "gunshipraid", "gunshipsupport", "gunshipheavyskirm", "gunshipassault", "corcrw", "corvalk", "corbtrans", "gunshipaa"],
 		"land": {
 			// 0-8m Opening - Blastwing and banshee Harass
 			"tier0": [ 0.00,         0.17,        0.00,     0.10,     0.71,             0.00,       0.02,        0.00,     0.00,      0.00,        0.00],
-			// 9-16m Early Game - Banshee with a chance of Blackdawn
+			// 9-16m Early Game - Banshee with a chance of gunshipassault
 			"tier1": [ 0.00,         0.20,        0.00,     0.02,     0.75,             0.01,       0.02,        0.00,     0.00,      0.00,        0.00],
 			// 17-24m Expanding - Time to start a-makin Brawlers
 			"tier2": [ 0.00,         0.02,        0.00,     0.00,     0.87,             0.05,       0.04,        0.02,     0.00,      0.00,        0.00],
@@ -460,11 +460,11 @@
 		"limit": 2,
 		"retreat": 0.99
 	},
-	"blastwing": {
+	"gunshipbomb": {
 		"role": ["air"],
 		"retreat": 0.01
 	},
-	"bladew": {
+	"gunshipemp": {
 		"role": ["air", "air"],
 		"retreat": 0.9
 	},
@@ -483,7 +483,7 @@
 		"retreat": 0.55,
 		"dmg_mod": 1.25
 	},
-	"blackdawn": {
+	"gunshipassault": {
 		"role": ["anti_heavy", "air"],
 		"fire_state": "hold",
 		"reload": 5.5,
