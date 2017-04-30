@@ -64,7 +64,7 @@ local ground = {
 	raider = {
 		"cloakraid",
 		"cloakheavyraid",
-		"corak",
+		"shieldraid",
 		"vehscout",
 		"vehraid",
 		"tankheavyraid",

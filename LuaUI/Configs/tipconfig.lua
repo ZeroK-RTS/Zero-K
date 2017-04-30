@@ -45,7 +45,7 @@ unitTips = {
 raiderDefs = {
 	"cloakraid",
 	"cloakheavyraid",
-	"corak",
+	"shieldraid",
 	"armflash",
 	"vehscout",
 	"vehraid",

@@ -295,13 +295,13 @@ factionBuildConfig = {
 					importanceMult = 2,
 					count = 2,
 					[1] = {ID = UnitDefNames['shieldscout'].id, chance = 0.4},
-					[2] = {ID = UnitDefNames['corak'].id, chance = 0.6},
+					[2] = {ID = UnitDefNames['shieldraid'].id, chance = 0.6},
 				},
 				
 				[3] = { -- raid
 					importanceMult = 1,
 					count = 1,
-					[1] = {ID = UnitDefNames['corak'].id, chance = 1},
+					[1] = {ID = UnitDefNames['shieldraid'].id, chance = 1},
 				},
 				
 				[4] = { -- arty

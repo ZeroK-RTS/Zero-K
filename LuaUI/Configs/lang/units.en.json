@@ -1214,7 +1214,7 @@
 		"description" : "Raider Gunship",
 		"helptext" : "The Banshee is a light gunship. Its high speed and decent damage makes it excellent for quickly taking out enemy economy or inaccurate units like assaults. However, it flies close to the ground and has a short range, meaning even other raiders can engage it on an equal footing. Like any raider, the Banshee should avoid riots and static defense."
 	},
-	"corak" : {
+	"shieldraid" : {
 		"name" : "Bandit",
 		"description" : "Medium-Light Raider Bot",
 		"helptext" : "The Bandit outranges and is somewhat tougher than the Glaive, but still not something that you hurl against entrenched forces. Counter with riot units and LLTs."

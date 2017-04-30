@@ -17,7 +17,7 @@ unitDef = {
     [[staticjammer]],
     [[cloakcon]],
     [[spiderscout]],
-    [[corak]],
+    [[shieldraid]],
     [[hoverassault]],
     [[cloakheavyraid]],
     [[jumpskirm]],

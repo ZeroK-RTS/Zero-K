@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[corak]],
+  unitname               = [[shieldraid]],
   name                   = [[Bandit]],
   description            = [[Medium-Light Raider Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.4,
   buildCostMetal         = 75,
-  buildPic               = [[CORAK.png]],
+  buildPic               = [[shieldraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -39,7 +39,7 @@ unitDef = {
   movementClass          = [[KBOT2]],
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[mbot.s3o]],
-  script				 = [[corak.lua]],
+  script				 = [[shieldraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -133,4 +133,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corak = unitDef })
+return lowerkeys({ shieldraid = unitDef })

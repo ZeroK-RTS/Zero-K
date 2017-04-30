@@ -110,7 +110,7 @@ local unitIsCheap = {
 	[UnitDefNames["vehscout"].id] = true,
 	[UnitDefNames["vehraid"].id] = true,
 	[UnitDefNames["hoverraid"].id] = true,
-	[UnitDefNames["corak"].id] = true,
+	[UnitDefNames["shieldraid"].id] = true,
 	[UnitDefNames["jumpscout"].id] = true,
 }
 

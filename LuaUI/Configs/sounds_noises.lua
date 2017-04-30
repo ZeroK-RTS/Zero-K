@@ -180,7 +180,7 @@ local sounds = {
 			[1] = "bot_select",
 		},
 	},
-	corak = {
+	shieldraid = {
 		ok = {
 			[1] = "bot_move",
 		},

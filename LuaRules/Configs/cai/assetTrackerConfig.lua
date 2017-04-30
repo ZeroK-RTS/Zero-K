@@ -32,7 +32,7 @@ local heatmapNames = {
 	mobileLand = {
 		["cloakraid"] = {mult = 1},
 		["cloakheavyraid"] = {mult = 1},
-		["corak"] = {mult = 1},
+		["shieldraid"] = {mult = 1},
 		["vehscout"] = {mult = 1},
 		["vehraid"] = {mult = 1},
 		["tankheavyraid"] = {mult = 1},
@@ -180,7 +180,7 @@ local ground = {
 	raider = {
 		"cloakraid",
 		"cloakheavyraid",
-		"corak",
+		"shieldraid",
 		"vehscout",
 		"vehraid",
 		"tankheavyraid",

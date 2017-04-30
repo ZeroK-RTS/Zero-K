@@ -199,7 +199,7 @@ unitConfigs = {
     shotangle = 45,
     wait   = 120,
   },
-  [UnitDefNames.corak.id] = {
+  [UnitDefNames.shieldraid.id] = {
     unfold = true,
     attack = true,
     wait   = 120,
