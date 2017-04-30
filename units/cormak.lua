@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[cormak]],
+  unitname               = [[shieldriot]],
   name                   = [[Outlaw]],
   description            = [[Riot Bot]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.75,
   buildCostMetal         = 250,
-  buildPic               = [[cormak.png]],
+  buildPic               = [[shieldriot.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -37,7 +37,7 @@ unitDef = {
   objectName             = [[behethud.s3o]],
   onoffable              = true,
   selfDestructAs         = [[BIG_UNITEX]],
-  script                 = [[cormak.lua]],
+  script                 = [[shieldriot.lua]],
 
   sfxtypes               = {
 
@@ -221,4 +221,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cormak = unitDef })
+return lowerkeys({ shieldriot = unitDef })

@@ -152,11 +152,11 @@ options = {
 -------------------------------------------------------------------------------------
 -- Mexes and builders
 
-local mexDefID = UnitDefNames["cormex"].id
-local lltDefID = UnitDefNames["corllt"].id
-local solarDefID = UnitDefNames["armsolar"].id
+local mexDefID = UnitDefNames["staticmex"].id
+local lltDefID = UnitDefNames["turretlaser"].id
+local solarDefID = UnitDefNames["energysolar"].id
 
-local mexUnitDef = UnitDefNames["cormex"]
+local mexUnitDef = UnitDefNames["staticmex"]
 local mexDefInfo = {
 	extraction = 0.001,
 	oddX = mexUnitDef.xsize % 4 == 2,

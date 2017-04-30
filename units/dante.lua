@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[dante]],
+  unitname            = [[striderdante]],
   name                = [[Dante]],
   description         = [[Assault/Riot Strider]],
   acceleration        = 0.0984,
   brakeRate           = 0.2392,
   buildCostMetal      = 3500,
   builder             = false,
-  buildPic            = [[dante.png]],
+  buildPic            = [[striderdante.png]],
   canGuard            = true,
   canManualFire       = true,
   canMove             = true,
@@ -39,7 +39,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[dante.s3o]],
-  script			  = [[dante.lua]],
+  script			  = [[striderdante.lua]],
   selfDestructAs      = [[CRAWL_BLASTSML]],
 
   sfxtypes            = {
@@ -326,4 +326,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ dante = unitDef })
+return lowerkeys({ striderdante = unitDef })

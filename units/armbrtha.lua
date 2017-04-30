@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armbrtha]],
+  unitname                      = [[staticheavyarty]],
   name                          = [[Big Bertha]],
   description                   = [[Strategic Plasma Cannon]],
   buildCostMetal                = 5000,
@@ -7,8 +7,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[armbrtha_aoplane.dds]],
-  buildPic                      = [[ARMBRTHA.png]],
+  buildingGroundDecalType       = [[staticheavyarty_aoplane.dds]],
+  buildPic                      = [[staticheavyarty.png]],
   category                      = [[SINK]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[70 194 70]],
@@ -39,15 +39,15 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[armbrtha.s3o]],
-  script                        = [[armbrtha.lua]],
+  script                        = [[staticheavyarty.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
 
   sfxtypes                      = {
 
     explosiongenerators = {
-      [[custom:ARMBRTHA_SHOCKWAVE]],
-      [[custom:ARMBRTHA_SMOKE]],
-      [[custom:ARMBRTHA_FLARE]],
+      [[custom:staticheavyarty_SHOCKWAVE]],
+      [[custom:staticheavyarty_SMOKE]],
+      [[custom:staticheavyarty_FLARE]],
     },
 
   },
@@ -115,7 +115,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[armbrtha_dead.s3o]],
+      object           = [[staticheavyarty_dead.s3o]],
     },
 
 
@@ -130,4 +130,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armbrtha = unitDef })
+return lowerkeys({ staticheavyarty = unitDef })

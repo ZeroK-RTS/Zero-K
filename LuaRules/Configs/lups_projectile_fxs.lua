@@ -115,7 +115,7 @@ local fx = {
 
 local tbl = {
 	--[[
-	corpyro_flamethrower = {
+	jumpraid_flamethrower = {
 		{class = "JitterParticles2", options = fx.flame_heat},
 		{class = "SimpleParticles2", options = fx.flame1},
 		{class = "SimpleParticles2", options = fx.flame2},

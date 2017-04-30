@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corbtrans]],
+  unitname               = [[gunshipheavytrans]],
   name                   = [[Vindicator]],
   description            = [[Armed Heavy Air Transport]],
   acceleration           = 0.2,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate              = 0.248,
   buildCostMetal         = 500,
   builder                = false,
-  buildPic               = [[corbtrans.png]],
+  buildPic               = [[gunshipheavytrans.png]],
   canFly                 = true,
   canGuard               = true,
   canload                = [[1]],
@@ -47,7 +47,7 @@ unitDef = {
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[largeTransport.s3o]],
-  script				 = [[corbtrans.lua]],
+  script				 = [[gunshipheavytrans.lua]],
   releaseHeld            = true,
   selfDestructAs         = [[GUNSHIPEX]],
 
@@ -210,4 +210,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corbtrans = unitDef })
+return lowerkeys({ gunshipheavytrans = unitDef })

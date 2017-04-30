@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[armaak]],
+  unitname            = [[jumpaa]],
   name                = [[Archangel]],
   description         = [[Heavy Anti-Air Jumper]],
   acceleration        = 0.18,
   brakeRate           = 0.2,
   buildCostMetal      = 550,
-  buildPic            = [[ARMAAK.png]],
+  buildPic            = [[jumpaa.png]],
   canMove             = true,
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
@@ -44,7 +44,7 @@ unitDef = {
   moveState           = 0,
   noChaseCategory     = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
   objectName          = [[hunchback.s3o]],
-  script			  = [[armaak.lua]],
+  script			  = [[jumpaa.lua]],
   selfDestructAs      = [[BIG_UNITEX]],
   sightDistance       = 660,
   trackOffset         = 0,
@@ -189,4 +189,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armaak = unitDef })
+return lowerkeys({ jumpaa = unitDef })

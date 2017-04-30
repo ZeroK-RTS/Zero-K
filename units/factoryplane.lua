@@ -13,14 +13,14 @@ unitDef = {
   buildingGroundDecalType       = [[factoryplane_aoplane.dds]],
 
   buildoptions                  = {
-    [[armca]],
-    [[fighter]],
-    [[corvamp]],
-	[[corshad]],
-	[[corhurc2]],
-    [[armstiletto_laser]],
-    [[armcybr]],
-    [[corawac]],
+    [[planecon]],
+    [[planefighter]],
+    [[planefighterheavy]],
+	[[bomberprec]],
+	[[bomberriot]],
+    [[bomberdisarm]],
+    [[bomberheavy]],
+    [[planescout]],
   },
 
   buildPic                      = [[factoryplane.png]],

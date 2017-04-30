@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corrazor]],
+  unitname                      = [[turretaalaser]],
   name                          = [[Razor]],
   description                   = [[Hardened Anti-Air Laser]],
   buildCostMetal                = 280,
@@ -7,8 +7,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[corrazor_aoplane.dds]],
-  buildPic                      = [[corrazor.png]],
+  buildingGroundDecalType       = [[turretaalaser_aoplane.dds]],
+  buildPic                      = [[turretaalaser.png]],
   category                      = [[FLOAT UNARMED STUPIDTARGET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[50 36 50]],
@@ -46,7 +46,7 @@ unitDef = {
 
   },
 
-  script                        = [[corrazor.lua]],
+  script                        = [[turretaalaser.lua]],
   sightDistance                 = 660,
   useBuildingGroundDecal        = true,
   workerTime                    = 0,
@@ -137,4 +137,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corrazor = unitDef })
+return lowerkeys({ turretaalaser = unitDef })

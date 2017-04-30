@@ -70,7 +70,7 @@ local metalmapStartZ = 1.5 * gridSize
 -- Variables
 ------------------------------------------------------------
 
-local mexUnitDef = UnitDefNames["cormex"]
+local mexUnitDef = UnitDefNames["staticmex"]
 
 local mexDefInfo = {
 	extraction = 0.001,

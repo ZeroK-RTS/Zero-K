@@ -97,9 +97,9 @@ local sqrt                   = math.sqrt
 
 VFS.Include("LuaRules/Configs/customcmds.h.lua")
 
-local sumoDefID = UnitDefNames.corsumo.id
-local sumoAoE = WeaponDefNames.corsumo_landing.damageAreaOfEffect
-local sumoEE = WeaponDefNames.corsumo_landing.edgeEffectiveness
+local sumoDefID = UnitDefNames.jumpsumo.id
+local sumoAoE = WeaponDefNames.jumpsumo_landing.damageAreaOfEffect
+local sumoEE = WeaponDefNames.jumpsumo_landing.edgeEffectiveness
 
 --------------------------------------------------------------------------------
 --utility functions

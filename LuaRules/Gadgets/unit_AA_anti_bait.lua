@@ -40,26 +40,26 @@ local InsertUnitCmdDesc  = Spring.InsertUnitCmdDesc
 
 local hpthreshold        = 650 -- maxhp below which an air unit is considered bait
 local baitexceptions     = {["phoenix"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are never considered bait, "name" = 1 means that tower will consider the target to be part of this category
-local alwaysbait         = {["corvamp"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are always considered bait
+local alwaysbait         = {["planefighterheavy"] = {["missiletower"] = 1, ["screamer"] = 1}} -- units which are always considered bait
 
 local AAunittypes        = {["missiletower"] = 100, ["screamer"] = 300} -- what is valid for anti-bait behaviour
 -- number is the threshold of "points" above which a turret is considered escorted if it has at least that amount within half range
 local AAescort           = {  -- points of how much each AA unit is worth
-["corrl"] = 100, 
-["armcir"] = 350, 
-["corrazor"] = 250, 
-["corflak"] = 350, 
+["turretmissile"] = 100, 
+["turretaafar"] = 350, 
+["turretaalaser"] = 250, 
+["turretaaflak"] = 350, 
 
-["corvamp"] = 100, 
-["fighter"] = 80, 
+["planefighterheavy"] = 100, 
+["planefighter"] = 80, 
 ["gunshipskirm"] = 100, 
 
-["armjeth"] = 60, 
-["corcrash"] = 80, 
+["cloakaa"] = 60, 
+["shieldaa"] = 80, 
 ["vehaa"] = 60, 
-["armaak"] = 250, 
+["jumpaa"] = 250, 
 ["corarch"] = 250, 
-["corsent"] = 250}
+["tankaa"] = 250}
 
 local AA                 = {} -- {id = unitID, escorted = boolean, range = maxrange, threshold = integer from unittypes}
 local AAcount            = 1

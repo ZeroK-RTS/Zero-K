@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[armmerl]],
+  unitname            = [[vehheavyarty]],
   name                = [[Impaler]],
   description         = [[Precision Artillery Vehicle]],
   acceleration        = 0.042,
   brakeRate           = 0.08,
   buildCostMetal      = 700,
   builder             = false,
-  buildPic            = [[ARMMERL.png]],
+  buildPic            = [[vehheavyarty.png]],
   canMove             = true,
   category            = [[LAND]],
   collisionVolumeOffsets = [[0 0 0]],
@@ -38,7 +38,7 @@ unitDef = {
   movementClass       = [[TANK3]],
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP]],
   objectName          = [[core_diplomat.s3o]],
-  script              = [[armmerl.lua]],
+  script              = [[vehheavyarty.lua]],
   selfDestructAs      = [[BIG_UNITEX_MERL]],
 
   sfxtypes            = {
@@ -144,5 +144,5 @@ unitDef = {
 
 }
 
-return lowerkeys({ armmerl = unitDef })
+return lowerkeys({ vehheavyarty = unitDef })
 

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[attackdrone]],
+  unitname            = [[dronelight]],
   name                = [[Firefly]],
   description         = [[Attack Drone]],
   acceleration        = 0.3,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.24,
   buildCostMetal      = 50,
   builder             = false,
-  buildPic            = [[attackdrone.png]],
+  buildPic            = [[dronelight.png]],
   canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,
@@ -31,7 +31,7 @@ unitDef = {
   objectName          = [[attackdrone.s3o]],
   reclaimable         = false,
   refuelTime          = 10,
-  script              = [[attackdrone.lua]],
+  script              = [[dronelight.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
@@ -112,4 +112,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ attackdrone = unitDef })
+return lowerkeys({ dronelight = unitDef })

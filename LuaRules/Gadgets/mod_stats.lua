@@ -46,8 +46,8 @@ local gaiaTeamID = Spring.GetGaiaTeamID()
 -- drones are counted as parent for damage done, ignored for damage received
 -- key = drone, value = parent
 local drones = {
-	carrydrone = "shipcarrier",
-	wolverine_mine = "corgarp",
+	dronecarry = "shipcarrier",
+	wolverine_mine = "veharty",
 }
 
 -- fallback for when attacker is already dead at damage event - attackerDefID == nil
@@ -55,18 +55,18 @@ local drones = {
 local weaponIDToUnitDefIDRaw = {
 	tankraid_napalm_bomblet = "tankraid",
 	jumparty_napalm_mortar = "jumparty",
-	corhurc2_napalm = "corhurc2",
-	corpyro_napalm = "corpyro",
-	corpyro_flamethrower = "corpyro",
-	dante_napalm_rockets = "dante",
-	dante_napalm_rocket_salvo = "dante",
-	dante_dante_flamer = "dante",
-	armtick_death = "armtick",
+	bomberriot_napalm = "bomberriot",
+	jumpraid_napalm = "jumpraid",
+	jumpraid_flamethrower = "jumpraid",
+	striderdante_napalm_rockets = "striderdante",
+	striderdante_napalm_rocket_salvo = "striderdante",
+	striderdante_striderdante_flamer = "striderdante",
+	cloakbomb_death = "cloakbomb",
 	tacnuke_weapon = "tacnuke",
 	napalmmissile_weapon = "napalmmissile",
 	seismic_seismic_weapon = "seismic",
 	empmissile_emp_weapon = "emp",
-	wolverine_mine_bomblet = "corgarp",
+	wolverine_mine_bomblet = "veharty",
 }
 local weaponIDToUnitDefID = {}
 

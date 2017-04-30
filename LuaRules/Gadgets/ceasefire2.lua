@@ -50,7 +50,7 @@ local gaiaAlliance, gaiaTeam
 include("LuaRules/Configs/customcmds.h.lua")
 
 local nukeDefs = {}
-local nukeNames = { 'corsilo', }
+local nukeNames = { 'staticnuke', }
 
 -------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------

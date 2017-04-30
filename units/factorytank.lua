@@ -12,15 +12,15 @@ unitDef = {
   buildingGroundDecalType       = [[factorytank_aoplane.dds]],
 
   buildoptions                  = {
-    [[coracv]],
+    [[tankcon]],
     [[tankraid]],
 	[[tankheavyraid]],
     [[tankriot]],
-	[[correap]],
-    [[corgol]],
-	[[cormart]],
+	[[tankassault]],
+    [[tankheavyassault]],
+	[[tankarty]],
 	[[tankheavyarty]],
-    [[corsent]],
+    [[tankaa]],
   },
 
   buildPic                      = [[factorytank.png]],

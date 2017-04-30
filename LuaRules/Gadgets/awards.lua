@@ -44,8 +44,8 @@ local floor = math.floor
 local terraunitDefID = UnitDefNames["terraunit"].id
 local terraformCost  = UnitDefNames["terraunit"].metalCost
 
-local mexDefID = UnitDefNames["cormex"].id
-local mexCost  = UnitDefNames["cormex"].metalCost
+local mexDefID = UnitDefNames["staticmex"].id
+local mexCost  = UnitDefNames["staticmex"].metalCost
 
 local shareListTemp1 = {}
 local shareListTemp2 = {}
@@ -99,7 +99,7 @@ local shareList_update = TEAM_SLOWUPDATE_RATE*60*5 -- five minute frames
 local boats, t3Units, comms = {}, {}, {}
 
 local staticO_small = {
-	armbrtha = 1,
+	staticheavyarty = 1,
 	seismic = 1,
 	tacnuke = 1,
 	empmissile = 1,
@@ -108,7 +108,7 @@ local staticO_small = {
 }
 
 local staticO_big = {
-	corsilo = 1,
+	staticnuke = 1,
 	mahlazer = 1,
 	starlight_satellite=1,
 	zenith = 1,
@@ -116,9 +116,9 @@ local staticO_big = {
 }
 
 local kamikaze = {
-	corroach=1,
-	corsktl=1,
-	blastwing=1,
+	shieldbomb=1,
+	jumpbomb=1,
+	gunshipbomb=1,
 	jumpscout=1,
 }
 

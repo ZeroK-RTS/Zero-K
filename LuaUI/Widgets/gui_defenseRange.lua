@@ -43,36 +43,36 @@ modConfig["ZK"] = {}
 modConfig["ZK"]["unitList"] =
 {
 	--1FACTION
-	armamd = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
-	armartic = { weapons = { 1 } },		--faraday
-	armdeva = { weapons = { 1 } },		--stardust
-	armpb = { weapons = { 1 } },		--pitbull
+	staticantinuke = { weapons = { 3 }, differentInbuildDraw = true },		--antinuke
+	turretemp = { weapons = { 1 } },		--faraday
+	turretriot = { weapons = { 1 } },		--stardust
+	turretgauss = { weapons = { 1 } },		--pitbull
 	mahlazer = { weapons = { 1 } },		--starlight
-	armartic = { weapons = { 1 } },		--faraday
-	armanni = { weapons = { 1 } },		--annihilator
-	armbrtha = { weapons = { 1 } },		--bertha
+	turretemp = { weapons = { 1 } },		--faraday
+	turretantiheavy = { weapons = { 1 } },		--annihilator
+	staticheavyarty = { weapons = { 1 } },		--bertha
 	tacnuke = { weapons = { 1 } },		--tacnuke
 	armarch = { weapons = { 2 } },		--packo (unused)
-	armcir = { weapons = { 2 } },		--chainsaw
+	turretaafar = { weapons = { 2 } },		--chainsaw
 	armdl = { weapons = { 1 } },		--anemone (unused)
-	corrl = { weapons = { 4 } },		--defender
-	corllt = { weapons = { 1 } },		--LLT
-	corhlt = { weapons = { 1 } },		--HLT
+	turretmissile = { weapons = { 4 } },		--defender
+	turretlaser = { weapons = { 1 } },		--LLT
+	turretheavylaser = { weapons = { 1 } },		--HLT
 	corvipe = { weapons = { 1 } },		--viper (unused)
-	cordoom = { weapons = { 1 } },		--doomsday
+	turretheavy = { weapons = { 1 } },		--doomsday
 	cordl = { weapons = { 1 } },		--jellyfish (unused)
-	corrazor = { weapons = { 2 } },		--razorkiss
-	corflak = { weapons = { 2 } },		--flak
+	turretaalaser = { weapons = { 2 } },		--razorkiss
+	turretaaflak = { weapons = { 2 } },		--flak
 	screamer = { weapons = { 2 } },		--screamer
 	missiletower = { weapons = { 2 } },	--hacksaw
-	corbhmth = { weapons = { 1 } },		--behemoth
+	staticarty = { weapons = { 1 } },		--behemoth
 	turrettorp = { weapons = { 1 } },	--torpedo launcher
 	coratl = { weapons = { 1 } },		--adv torpedo launcher (unused)
-	corgrav = { weapons = { 1 } },		--newton
-	corjamt = { },
+	turretimpulse = { weapons = { 1 } },		--newton
+	staticshield = { },
 }
 
-local shieldDefID = UnitDefNames["corjamt"].id
+local shieldDefID = UnitDefNames["staticshield"].id
 
 local unitDefIDRemap = {
 	[UnitDefNames["staticmissilesilo"].id] = UnitDefNames["tacnuke"].id,

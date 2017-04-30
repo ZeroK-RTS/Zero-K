@@ -24,7 +24,7 @@ include("LuaRules/Configs/customcmds.h.lua")
 -- Command Definition
 --------------------------------------------------------------------------------
 
-local mexDefID = UnitDefNames["cormex"].id
+local mexDefID = UnitDefNames["staticmex"].id
 
 local cmdMex = {
 	id      = CMD_AREA_MEX,

@@ -13,14 +13,14 @@ unitDef = {
 
   buildoptions                  = {
     [[spidercon]],
-    [[armflea]],
+    [[spiderscout]],
 	[[spiderassault]],
-    [[arm_venom]],
+    [[spideremp]],
 	[[spiderriot]],
-    [[armsptk]],
-    [[armcrabe]],
+    [[spiderskirm]],
+    [[spidercrabe]],
     [[spideraa]],
-    [[armspy]],
+    [[spiderantiheavy]],
   },
 
   buildPic                      = [[factoryspider.png]],

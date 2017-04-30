@@ -42,8 +42,8 @@ local toBeWaited = {count = 0, unit = {}}
 local wasTransported = {count = 0, unit = {}}
 
 local transportDefs = {
-	[UnitDefNames["corvalk"].id] = true,
-	[UnitDefNames["corbtrans"].id] = true,
+	[UnitDefNames["gunshiptrans"].id] = true,
+	[UnitDefNames["gunshipheavytrans"].id] = true,
 }
 
 local transport = {}

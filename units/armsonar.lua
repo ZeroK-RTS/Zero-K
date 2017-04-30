@@ -1,11 +1,11 @@
 unitDef = {
-  unitname          = [[armsonar]],
+  unitname          = [[staticsonar]],
   name              = [[Sonar Station]],
   description       = [[Locates Water Units]],
   activateWhenBuilt = true,
   buildCostMetal    = 450,
   builder           = false,
-  buildPic          = [[ARMSONAR.png]],
+  buildPic          = [[staticsonar.png]],
   category          = [[UNARMED FLOAT]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 48 32]],
@@ -25,7 +25,7 @@ unitDef = {
   minWaterDepth     = 10,
   objectName        = [[novasonar.s3o]],
   onoffable         = true,
-  script            = "armsonar.lua",
+  script            = "staticsonar.lua",
   selfDestructAs    = [[SMALL_BUILDINGEX]],
   sightDistance     = 640,
   sonarDistance     = 640,
@@ -62,4 +62,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armsonar = unitDef })
+return lowerkeys({ staticsonar = unitDef })

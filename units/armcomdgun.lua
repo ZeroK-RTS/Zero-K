@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[armcomdgun]],
+  unitname               = [[striderantiheavy]],
   name                   = [[Ultimatum]],
   description            = [[Cloaked Anti-Heavy/Anti-Strider Walker]],
   acceleration           = 0.18,
@@ -7,7 +7,7 @@ unitDef = {
   autoHeal               = 5,
   brakeRate              = 0.375,
   buildCostMetal         = 2000,
-  buildPic               = [[armcomdgun.png]],
+  buildPic               = [[striderantiheavy.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -43,7 +43,7 @@ unitDef = {
   movementClass          = [[AKBOT2]],
   noChaseCategory        = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
   objectName             = [[noruas]],
-  script                 = [[armcomdgun.lua]],
+  script                 = [[striderantiheavy.lua]],
   selfDestructAs         = [[ESTOR_BUILDING]],
 
   sfxtypes               = {
@@ -136,4 +136,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcomdgun = unitDef })
+return lowerkeys({ striderantiheavy = unitDef })

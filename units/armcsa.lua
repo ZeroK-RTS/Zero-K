@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[armcsa]],
+  unitname            = [[athena]],
   name                = [[Athena]],
   description         = [[Airborne SpecOps Engineer, Builds at 7.5 m/s]],
   acceleration        = 0.1,
@@ -11,30 +11,30 @@ unitDef = {
   builder             = true,
 
   buildoptions        = {
-    [[armnanotc]],
-    [[corrad]],
-    [[armarad]],
-    [[armjamt]],
-    [[armrectr]],
-    [[armflea]],
+    [[staticcon]],
+    [[staticradar]],
+    [[staticheavyradar]],
+    [[staticjammer]],
+    [[cloakcon]],
+    [[spiderscout]],
     [[corak]],
     [[hoverassault]],
     [[cloakheavyraid]],
     [[slowmort]],
-    [[armsptk]],
+    [[spiderskirm]],
     [[tankheavyraid]],
-    [[armzeus]],
-    [[armsnipe]],
-    [[armmerl]],
-    [[armspy]],
-    [[armjeth]],
-    [[core_spectre]],
+    [[cloakassault]],
+    [[cloaksnipe]],
+    [[vehheavyarty]],
+    [[spiderantiheavy]],
+    [[cloakaa]],
+    [[shieldshield]],
     [[cloakjammer]],
     [[amphtele]],
-    [[armcomdgun]],
+    [[striderantiheavy]],
   },
 
-  buildPic            = [[ARMCSA.png]],
+  buildPic            = [[athena.png]],
   buildRange3D        = false,
   canFly              = true,
   canGuard            = true,
@@ -79,7 +79,7 @@ unitDef = {
   objectName          = [[selene.s3o]],
   radarDistance       = 1200,
   radarDistanceJam    = 300,
-  script              = [[armcsa.lua]],
+  script              = [[athena.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   showNanoSpray       = false,
   sightDistance       = 380,
@@ -109,4 +109,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armcsa = unitDef })
+return lowerkeys({ athena = unitDef })

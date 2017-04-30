@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[battledrone]],
+  unitname            = [[droneheavyslow]],
   name                = [[Viper]],
   description         = [[Advanced Battle Drone]],
   acceleration        = 0.3,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.24,
   buildCostMetal      = 120,
   builder             = false,
-  buildPic            = [[battledrone.png]],
+  buildPic            = [[droneheavyslow.png]],
   canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,
@@ -30,7 +30,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[battledrone.s3o]],
   reclaimable         = false,
-  script              = [[battledrone.lua]],
+  script              = [[droneheavyslow.lua]],
   selfDestructAs      = [[SMALL_BUILDINGEX]],
   
   customParams        = {
@@ -122,4 +122,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ battledrone = unitDef })
+return lowerkeys({ droneheavyslow = unitDef })

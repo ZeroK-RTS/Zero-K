@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[corawac]],
+  unitname            = [[planescout]],
   name                = [[Vulture]],
   description         = [[Area Jammer, Radar/Sonar Plane]],
   brakerate           = 0.4,
   buildCostMetal      = 340,
   builder             = false,
-  buildPic            = [[CORAWAC.png]],
+  buildPic            = [[planescout.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -51,7 +51,7 @@ unitDef = {
   objectName          = [[armpnix.s3o]],
   radarDistance       = 2400,
   radarDistanceJam    = 700,
-  script              = [[corawac.lua]],
+  script              = [[planescout.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 1400,
   sonarDistance       = 700,
@@ -80,4 +80,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corawac = unitDef })
+return lowerkeys({ planescout = unitDef })

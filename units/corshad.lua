@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[corshad]],
+  unitname            = [[bomberprec]],
   name                = [[Raven]],
   description         = [[Precision Bomber]],
   brakerate           = 0.4,
   buildCostMetal      = 300,
   builder             = false,
-  buildPic            = [[CORSHAD.png]],
+  buildPic            = [[bomberprec.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -48,8 +48,8 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP]],
-  objectName          = [[corshad.s3o]],
-  script			  = [[corshad.lua]],
+  objectName          = [[bomberprec.s3o]],
+  script			  = [[bomberprec.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
@@ -136,7 +136,7 @@ unitDef = {
       },
 	  
 	  customParams            = {
-		torp_underwater = [[corshad_a_torpedo]],
+		torp_underwater = [[bomberprec_a_torpedo]],
 	  },
 
       explosionGenerator      = [[custom:xamelimpact]],
@@ -255,4 +255,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corshad = unitDef })
+return lowerkeys({ bomberprec = unitDef })

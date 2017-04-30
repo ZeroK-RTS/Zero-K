@@ -1,12 +1,12 @@
 unitDef = {
-  unitname              = [[corpyro2]],
+  unitname              = [[jumpraid2]],
   name                  = [[Pyro]],
   description           = [[Raider/Riot Jumper]],
   acceleration          = 0.4,
   brakeRate             = 1.2,
   buildCostMetal        = 220,
   builder               = false,
-  buildPic              = [[CORPYRO.png]],
+  buildPic              = [[jumpraid.png]],
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
@@ -23,7 +23,7 @@ unitDef = {
 	helptext_de    = [[Der Pyro ist ein günstiger und schneller Roboter, der mit einem Flammenwerfer ausgestattet ist. Dieser fügt großen Zielen erheblichen Schaden zu und kleineren entsprechend weniger. Außerdem können mehrere Ziele gleichzeitig getroffen werden, welche auch im Feuer aufgehen können. Der Pyro explodiert brutalst, sobald er zerstört wird. Zusätzlich besitzt er noch ein Jetpack, welches ihm zum Beispiel das Springen über Hindernisse ermöglicht.]],
   },
 
-  explodeAs             = [[CORPYRO_PYRO_DEATH]],
+  explodeAs             = [[jumpraid_PYRO_DEATH]],
   footprintX            = 2,
   footprintZ            = 2,
   iconType              = [[jumpjetraider]],
@@ -39,8 +39,8 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName            = [[m-5_alt.s3o]],
-  script				= [[corpyro.cob]],
-  selfDestructAs        = [[CORPYRO_PYRO_DEATH]],
+  script				= [[jumpraid.cob]],
+  selfDestructAs        = [[jumpraid_PYRO_DEATH]],
   selfDestructCountdown = 1,
 
   sfxtypes              = {
@@ -147,4 +147,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corpyro2 = unitDef })
+return lowerkeys({ jumpraid2 = unitDef })

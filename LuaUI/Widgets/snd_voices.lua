@@ -91,29 +91,29 @@ local fireState        = {}
 local sexTable         = {}
 local statsBuffer      = {0, 0, 0, 0, 0}
 local energy = {     --FIXME not used, see line 443 in widget:UnitDestroyed
-  "armsolar",
-  "armfus", 
-  "cafus", 
+  "energysolar",
+  "energyfusion", 
+  "energysingu", 
   "armtide", 
-  "armwin",
+  "energywind",
   "energygeo",
 }
 local commanders = {}
 
 local heavies = { --not used yet
-	"correap",
-	"corgol", --goliath
-	"corcan",
-	"corsumo",
-	"dante",
+	"tankassault",
+	"tankheavyassault", --goliath
+	"jumpassault",
+	"jumpsumo",
+	"striderdante",
 }
 
 local aa = {
-	"corrl", --defender
-	"corrazor", --razor kiss
+	"turretmissile", --defender
+	"turretaalaser", --razor kiss
 	"missiletower",--hacksaw
-	"corflak",
-	"armcir", --chainsaw
+	"turretaaflak",
+	"turretaafar", --chainsaw
 	"screamer",
 }
 
@@ -227,9 +227,9 @@ local function CheckSelected()
       isTurret =true
     end
     
-    if ((name == "armfus") or -- fusion
+    if ((name == "energyfusion") or -- fusion
 	--(name == "corfus") or (name == "aafus") are not in game anymore.
-        (name == "cafus"))then  --adv fusion
+        (name == "energysingu"))then  --adv fusion
       isFus = true
     end
 

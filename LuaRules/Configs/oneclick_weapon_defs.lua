@@ -3,25 +3,25 @@
 local oneClickWepDefs = {}
 
 local oneClickWepDefNames = {
-	corcrw = {
+	gunshipkrow = {
 		{ functionToCall = "ClusterBomb", reloadTime = 854, name = "Carpet Bomb", tooltip = "Drop a huge number of bombs in a circle under the Krow", weaponToReload = 3, texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	hoverdepthcharge = {
 		{ functionToCall = "ShootDepthcharge", reloadTime = 256, name = "Drop Depthcharge", tooltip = "Drops a depthchage.", weaponToReload = 1, texture = "LuaUI/Images/Commands/Bold/dgun.png",},
 	},
-	armtick = {
+	cloakbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	corroach = {
+	shieldbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	corsktl = {
+	jumpbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.",  texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	blastwing = {
+	gunshipbomb = {
 		{ functionToCall = "Detonate", name = "Detonate", tooltip = "Detonate selected bomb units.", texture = "LuaUI/Images/Commands/Bold/detonate.png",},
 	},
-	armstiletto_laser = {
+	bomberdisarm = {
 		{ functionToCall = "StartRun", name = "Start Run", tooltip = "Manually activate Thunderbird run.", texture = "LuaUI/Images/Commands/Bold/bomb.png",},
 	},
 	--[[
@@ -29,16 +29,16 @@ local oneClickWepDefNames = {
 		{ functionToCall = "FlameTrail", reloadTime = 850, name = "Flame Trail", tooltip = "Leave a path of flame in your wake", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
 	--]]
-	fighter = {
+	planefighter = {
 		{ functionToCall = "Sprint", reloadTime = 850, name = "Speed Boost", tooltip = "Speed boost (5x for 1 second)", useSpecialReloadFrame = true, texture = "LuaUI/Images/Commands/Bold/sprint.png",},
 	},
-	--corawac = {
+	--planescout = {
 	--	{ functionToCall = "Cloak", reloadTime = 600, name = "Temp Cloak", tooltip = "Cloaks for 5 seconds", useSpecialReloadFrame = true},
 	--},
-	corbtrans = {
+	gunshipheavytrans = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
 	},
-	corvalk = {
+	gunshiptrans = {
 		{ functionToCall = "ForceDropUnit", reloadTime = 7, name = "Drop Cargo", tooltip = "Eject cargo!", useSpecialReloadFrame = true,},
 	},		
 }

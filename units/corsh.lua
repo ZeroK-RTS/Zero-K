@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[corsh]],
+  unitname            = [[hoverraid]],
   name                = [[Dagger]],
   description         = [[Fast Attack Hovercraft]],
   acceleration        = 0.066,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.0835,
   buildCostMetal      = 80,
   builder             = false,
-  buildPic            = [[CORSH.png]],
+  buildPic            = [[hoverraid.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -38,8 +38,8 @@ unitDef = {
   movementClass       = [[HOVER3]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SUB]],
-  objectName          = [[CORSH.s3o]],
-  script              = "corsh.lua",
+  objectName          = [[hoverraid.s3o]],
+  script              = "hoverraid.lua",
   selfDestructAs      = [[SMALL_UNITEX]],
 
   sfxtypes            = {
@@ -130,7 +130,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[corsh_dead.s3o]],
+      object           = [[hoverraid_dead.s3o]],
     },
 
     HEAP  = {
@@ -144,4 +144,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corsh = unitDef })
+return lowerkeys({ hoverraid = unitDef })

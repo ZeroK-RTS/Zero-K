@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[bladew]],
+  unitname            = [[gunshipemp]],
   name                = [[Gnat]],
   description         = [[Anti-Heavy EMP Drone]],
   acceleration        = 0.264,
   brakeRate           = 0.2112,
   buildCostMetal      = 90,
   builder             = false,
-  buildPic            = [[BLADEW.png]],
+  buildPic            = [[gunshipemp.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -43,7 +43,7 @@ unitDef = {
   minCloakDistance    = 75,
   noChaseCategory     = [[TERRAFORM SUB UNARMED]],
   objectName          = [[marshmellow.s3o]],
-  script              = [[bladew.lua]],
+  script              = [[gunshipemp.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
   sfxtypes            = {
@@ -137,4 +137,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ bladew = unitDef })
+return lowerkeys({ gunshipemp = unitDef })

@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[corhurc2]],
+  unitname            = [[bomberriot]],
   name                = [[Phoenix]],
   description         = [[Saturation Napalm Bomber]],
   brakerate           = 0.4,
   buildCostMetal      = 360,
   builder             = false,
-  buildPic            = [[corhurc2.png]],
+  buildPic            = [[bomberriot.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -48,7 +48,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING GUNSHIP SUB]],
   objectName          = [[firestorm.s3o]],
-  script			  = [[corhurc2.lua]],
+  script			  = [[bomberriot.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
@@ -140,4 +140,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corhurc2 = unitDef })
+return lowerkeys({ bomberriot = unitDef })

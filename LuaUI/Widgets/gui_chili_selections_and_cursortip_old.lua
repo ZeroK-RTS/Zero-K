@@ -164,23 +164,23 @@ WG.drawtoolKeyPressed = nil
 WG.customToolTip = {}
 
 local windTooltips = {
-	["armwin"] = true,
+	["energywind"] = true,
 }
 
-local mexDefID = UnitDefNames["cormex"] and UnitDefNames["cormex"].id or ''
-local windgenDefID = UnitDefNames["armwin"] and UnitDefNames["armwin"].id or ''
+local mexDefID = UnitDefNames["staticmex"] and UnitDefNames["staticmex"].id or ''
+local windgenDefID = UnitDefNames["energywind"] and UnitDefNames["energywind"].id or ''
 
 local energyStructureDefs = {
-	[UnitDefNames["armwin"].id] = {cost = 35, income = 1.25},
-	[UnitDefNames["armsolar"].id] = {cost = 70, income = 2},
+	[UnitDefNames["energywind"].id] = {cost = 35, income = 1.25},
+	[UnitDefNames["energysolar"].id] = {cost = 70, income = 2},
 	[UnitDefNames["energygeo"].id] = {cost = 500, income = 25},
 	[UnitDefNames["energyheavygeo"].id] = {cost = 1000, income = 75},
-	[UnitDefNames["armfus"].id] = {cost = 1000, income = 35},
-	[UnitDefNames["cafus"].id] = {cost = 4000, income = 225},
+	[UnitDefNames["energyfusion"].id] = {cost = 1000, income = 35},
+	[UnitDefNames["energysingu"].id] = {cost = 4000, income = 225},
 }
 
 local metalStructureDefs = {
-	[UnitDefNames["cormex"].id] = {cost = 75},
+	[UnitDefNames["staticmex"].id] = {cost = 75},
 }
 
 local terraCmds = {

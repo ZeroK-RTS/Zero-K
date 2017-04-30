@@ -1,12 +1,12 @@
 unitDef = {
-  unitname              = [[corpyro]],
+  unitname              = [[jumpraid]],
   name                  = [[Pyro]],
   description           = [[Raider/Riot Jumper]],
   acceleration          = 0.4,
   brakeRate             = 1.2,
   buildCostMetal        = 220,
   builder               = false,
-  buildPic              = [[CORPYRO.png]],
+  buildPic              = [[jumpraid.png]],
   canGuard              = true,
   canMove               = true,
   canPatrol             = true,
@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire            = false,
   noChaseCategory       = [[FIXEDWING GUNSHIP SUB]],
   objectName            = [[m-5.s3o]],
-  script                = [[corpyro.lua]],
+  script                = [[jumpraid.lua]],
   selfDestructAs        = [[PYRO_DEATH]],
   selfDestructCountdown = 5,
 
@@ -192,4 +192,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corpyro = unitDef })
+return lowerkeys({ jumpraid = unitDef })

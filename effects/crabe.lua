@@ -1,10 +1,10 @@
--- armcrabe_flare
--- armcrabe_explosion
--- armcrabe_whitelight
--- armcrabe_flash
+-- spidercrabe_flare
+-- spidercrabe_explosion
+-- spidercrabe_whitelight
+-- spidercrabe_flash
 
 return {
-  ["armcrabe_flare"] = {
+  ["spidercrabe_flare"] = {
     clouds0 = {
       air                = true,
       class              = [[CSimpleParticleSystem]],
@@ -149,7 +149,7 @@ return {
     },
   },
 
-  ["armcrabe_explosion"] = {
+  ["spidercrabe_explosion"] = {
     dirt1 = {
       air                = false,
       useairlos       = false,
@@ -262,7 +262,7 @@ return {
     },
   },
 
-  ["armcrabe_whitelight"] = {
+  ["spidercrabe_whitelight"] = {
     heatcloud = {
       air                = true,
       count              = 2,
@@ -285,7 +285,7 @@ return {
     },
   },
 
-  ["armcrabe_flash"] = {
+  ["spidercrabe_flash"] = {
     groundflash = {
       circlealpha        = 0,
       circlegrowth       = 0,

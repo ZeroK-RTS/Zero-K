@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[corroach]],
+  unitname               = [[shieldbomb]],
   name                   = [[Roach]],
   description            = [[Crawling Bomb (Burrows)]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.4,
   buildCostMetal         = 160,
-  buildPic               = [[CORROACH.png]],
+  buildPic               = [[shieldbomb.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -27,7 +27,7 @@ unitDef = {
 	idle_cloak = 1,
   },
 
-  explodeAs              = [[CORROACH_DEATH]],
+  explodeAs              = [[shieldbomb_DEATH]],
   fireState              = 0,
   footprintX             = 1,
   footprintZ             = 1,
@@ -46,8 +46,8 @@ unitDef = {
   noChaseCategory        = [[FIXEDWING LAND SINK TURRET SHIP SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName             = [[logroach.s3o]],
   pushResistant          = 0,
-  script                 = [[corroach.lua]],
-  selfDestructAs         = [[CORROACH_DEATH]],
+  script                 = [[shieldbomb.lua]],
+  selfDestructAs         = [[shieldbomb_DEATH]],
   selfDestructCountdown  = 0,
 
   sfxtypes               = {
@@ -86,7 +86,7 @@ unitDef = {
 --------------------------------------------------------------------------------
 
 local weaponDefs = {
-  CORROACH_DEATH = {
+  shieldbomb_DEATH = {
     areaOfEffect       = 384,
     craterBoost        = 1,
     craterMult         = 3.5,
@@ -105,4 +105,4 @@ local weaponDefs = {
 unitDef.weaponDefs = weaponDefs
 
 --------------------------------------------------------------------------------
-return lowerkeys({ corroach = unitDef })
+return lowerkeys({ shieldbomb = unitDef })

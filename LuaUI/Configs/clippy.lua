@@ -2,7 +2,7 @@ local THRESHOLD_EXPENSIVE = 1200
 INCOME_TO_SPLURGE = 20	-- ignore expensive warning if you have this much income
 METAL_PER_NANO = 8		-- suggested nanos per metal ^ -1
 MIN_PULL_FOR_NANOS = -10	-- don't make more nanos if our pull is already this low	--unused
-NANO_DEF_ID = UnitDefNames.armnanotc.id
+NANO_DEF_ID = UnitDefNames.staticcon.id
 ENERGY_TO_METAL_RATIO = 6	-- suggested maximum for energy
 ENERGY_LOW_THRESHOLD = 200
 DEFENSE_QUOTA = 0.4	-- suggested maximum proportion of total assets that is defense
@@ -49,65 +49,65 @@ for name,data in pairs(tips) do
 end
 
 local superweaponDefs = {
-	"armbrtha",
-	"corsilo",
+	"staticheavyarty",
+	"staticnuke",
 }
 local hyperweaponDefs = {
 	"mahlazer",
 	"zenith",
 	"raveparty",
-	"armorco",
+	"striderdetriment",
 }
 local canRetreatDefs = {
-	"armbrawl",
-	"blackdawn",
-	"corcrw",
+	"gunshipheavyskirm",
+	"gunshipassault",
+	"gunshipkrow",
 	
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	--"tankheavyarty",
-	"corcan",
-	"corsumo",
+	"jumpassault",
+	"jumpsumo",
 	
-	"dante",
-	--"armraven",
-	"scorpion",
-	"armbanth",
-	"armorco",
+	"striderdante",
+	--"striderarty",
+	"striderscorpion",
+	"striderbantha",
+	"striderdetriment",
 	
 	"shipheavyarty",
 	"reef",
 }
 
 local energyDefs = {
-	"armsolar",
-	"armwin",
-	"armfus",
+	"energysolar",
+	"energywind",
+	"energyfusion",
 	--"energygeo",
-	"cafus",
+	"energysingu",
 }
 
 local defenseDefs = {
-	"corllt",
-	"corrl",
-	"armdeva",
-	"corgrav",
-	"corhlt",
-	"armpb",
+	"turretlaser",
+	"turretmissile",
+	"turretriot",
+	"turretimpulse",
+	"turretheavylaser",
+	"turretgauss",
 	
-	"corrazor",
+	"turretaalaser",
 	"missiletower",
-	"corflak",
-	"armcir",
+	"turretaaflak",
+	"turretaafar",
 	"screamer",
 	
-	"cordoom",
-	"armanni",
+	"turretheavy",
+	"turretantiheavy",
 	
 	"turrettorp",
 	
-	"armjamt",
-	"corjamt"
+	"staticjammer",
+	"staticshield"
 }
 
 factoryDefs = {

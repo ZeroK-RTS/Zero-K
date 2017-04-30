@@ -1,11 +1,11 @@
 local ignoreweapon =
 {
-	armaak = {1},
+	jumpaa = {1},
 	shipcarrier = {1},
 	armaas = {1},
 	armraz = {2},
 	
-	cormak = {1,3},
+	shieldriot = {1,3},
 	coraak = {1},
 	coramph = {2},	
 }

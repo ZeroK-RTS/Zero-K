@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armwin]],
+  unitname                      = [[energywind]],
   name                          = [[Wind/Tidal Generator]],
   description                   = [[Small Powerplant]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armwin_aoplane.dds]],
-  buildPic                      = [[armwin.png]],
+  buildingGroundDecalType       = [[energywind_aoplane.dds]],
+  buildPic                      = [[energywind.png]],
   category                      = [[FLOAT UNARMED]],
   collisionVolumeOffsets        = [[0 15 0]],
   collisionVolumeScales         = [[30 60 30]],
@@ -43,7 +43,7 @@ unitDef = {
   maxSlope                      = 75,
   minCloakDistance              = 150,
   objectName                    = [[arm_wind_generator.s3o]],
-  script                        = [[armwin.lua]],
+  script                        = [[energywind.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
@@ -81,4 +81,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armwin = unitDef })
+return lowerkeys({ energywind = unitDef })

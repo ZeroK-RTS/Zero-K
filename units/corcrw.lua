@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[corcrw]],
+  unitname               = [[gunshipkrow]],
   name                   = [[Krow]],
   description            = [[Flying Fortress]],
   acceleration           = 0.09,
@@ -9,7 +9,7 @@ unitDef = {
   brakeRate              = 0.04,
   buildCostMetal         = 4500,
   builder                = false,
-  buildPic               = [[CORCRW.png]],
+  buildPic               = [[gunshipkrow.png]],
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -47,7 +47,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          	 = [[krow.s3o]],
-  script			     = [[corcrw.lua]],
+  script			     = [[gunshipkrow.lua]],
   selfDestructAs         = [[LARGE_BUILDINGEX]],
 
   sfxtypes               = {
@@ -232,4 +232,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corcrw = unitDef })
+return lowerkeys({ gunshipkrow = unitDef })

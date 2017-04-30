@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armrock]],
+  unitname               = [[cloakskirm]],
   name                   = [[Rocko]],
   description            = [[Skirmisher Bot (Direct-Fire)]],
   acceleration           = 0.32,
   brakeRate              = 0.2,
   buildCostMetal         = 90,
-  buildPic               = [[ARMROCK.png]],
+  buildPic               = [[cloakskirm.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -41,7 +41,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[sphererock.s3o]],
-  script                 = "armrock.lua",
+  script                 = "cloakskirm.lua",
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -139,4 +139,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armrock = unitDef })
+return lowerkeys({ cloakskirm = unitDef })

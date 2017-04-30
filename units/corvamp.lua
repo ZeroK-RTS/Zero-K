@@ -1,10 +1,10 @@
 unitDef = {
-  unitname               = [[corvamp]],
+  unitname               = [[planefighterheavy]],
   name                   = [[Hawk]],
   description            = [[Air Superiority Fighter]],
   brakerate              = 0.4,
   buildCostMetal         = 300,
-  buildPic               = [[corvamp.png]],
+  buildPic               = [[planefighterheavy.png]],
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -51,7 +51,7 @@ unitDef = {
   mygravity              = 1,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[fighter2.s3o]],
-  script                 = [[corvamp.lua]],
+  script                 = [[fighterheavy.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
   sightDistance          = 750,
   speedToFront           = 0.5,
@@ -141,4 +141,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corvamp = unitDef })
+return lowerkeys({ planefighterheavy = unitDef })

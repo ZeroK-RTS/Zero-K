@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[cormex]],
+  unitname               = [[staticmex]],
   name                   = [[Metal Extractor]],
   description            = [[Produces Metal]],
   acceleration           = 0,
@@ -8,7 +8,7 @@ unitDef = {
   buildCostMetal         = 75,
   builder                = false,
   buildingMask           = 0,
-  buildPic               = [[cormex.png]],
+  buildPic               = [[staticmex.png]],
   category               = [[UNARMED FLOAT]],
   collisionVolumeOffsets = [[0 0 0]],
   collisionVolumeScales  = [[40 40 40]],
@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire             = false,
   objectName             = [[AMETALEXTRACTORLVL1.S3O]],
   onoffable              = false,
-  script                 = "cormex.lua",
+  script                 = "staticmex.lua",
   selfDestructAs         = [[SMALL_BUILDINGEX]],
   sightDistance          = 273,
   turnRate               = 0,
@@ -75,4 +75,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cormex = unitDef })
+return lowerkeys({ staticmex = unitDef })

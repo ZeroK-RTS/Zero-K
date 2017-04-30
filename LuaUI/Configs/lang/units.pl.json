@@ -24,7 +24,7 @@
         "description": "Amfibijny bot artyleryjski / harcownik",
         "helptext": "Kraken to amfibijny bot z podwójnym działem o niedużym zasięgu - jak na artylerię. Pod wodą korzysta z szybkiej wyrzutni bomb głębinowych, które nie są naprowadzane i tym samym najlepiej sprawdzają się przeciwko powolnym celom."
     },
-    "cormart": {
+    "tankarty": {
         "name": "Pillager",
         "description": "Czołg artyleryjski",
         "helptext": "Pillager to świetna jednostka do ostrzału wrogich jednostek za sprawą swojego ciężkiego, dalekosiężnego działa. Jak każda jednostka artyleryjska, jest wrażliwy podczas walki na krótkie dystanse."
@@ -34,12 +34,12 @@
         "description": "Buduje rakiety taktyczne, moc 10 m/s",
         "helptext": "Silos rakietowy buduje rakiety taktyczne. Do wyboru jest kilka różnych głowic, co zapewnia świetne możliwości zarówno defensywne, jak i ofensywne. Silos może składować do czterech rakiet."
     },
-    "armflea": {
+    "spiderscout": {
         "name": "Flea",
         "description": "Ultralekki pająk zwiadowczy (zakopuje się)",
         "helptext": "Flea ma duży zasięg widzenia i włącza niewidzialość, gdy stoi nieruchomo, może więc schować się w trudno dostępnych miejscach i obserwować wroga z ukrycia. W małych grupkach dobrze nadaje się do najazdów na kopalnie lub dywersji poprzez atak od strony klifów. Zadaje jednak bardzo mało obrażeń i można go zniszczyć bez większego wysiłku."
     },
-    "armfus": {
+    "energyfusion": {
         "name": "Reaktor fuzyjny",
         "description": "Średnia elektrownia (+35)",
         "helptext": "Reaktory fuzyjne zapewniają stały przypływ dużej ilości energii za niewygórowaną cenę. Są jednak dobrym celem dla wroga i nie są zbyt wytrzymałe, toteż warto zapewnić im ochronę. Wybuch reaktora zadaje wysokie obrażenia okolicznym jednostkom."
@@ -49,7 +49,7 @@
         "description": "O kurczę!",
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
-    "correap": {
+    "tankassault": {
         "name": "Reaper",
         "description": "Czołg szturmowy",
         "helptext": "Ciężki czołg bojowy. Reaper jest w stanie przyjąć wiele obrażeń w zaciętych walkach, ale jego niska szybkostrzelność powoduje, że słabo radzi sobie z lekkimi jednostkami, a jego ciężki pancerz jest okupiony niską ruchliwością."
@@ -74,12 +74,12 @@
         "description": "Niszczyciel (wsparcie / szturmowy)",
         "helptext": "Niszczyciel Siren to statek ogólnego przeznaczenia, który łączy silne obszarowe działko soniczne (zdolne razić cele zarówno pod wodą, jak i nad nią), rakiety kinetyczne średniego zasięgu (świetne na budynki) oraz dobry pancerz."
     },
-    "armtick": {
+    "cloakbomb": {
         "name": "Tick",
         "description": "Pajęcza bomba EMP (zakopuje się)",
         "helptext": "Tick zbliża się do przeciwnika, wykorzystując mały rozmiar i szybkość, by unikać niecelnych pocisków harcowników i jednostek szturmowych. Jego wybuch może sparaliżować ciężkie jednostki lub grupę lekkich, co pozwala innym jednostkom bezpiecznie się ich pozbyć. Tick słabo radzi sobie z wieżyczkami i można go zmarnować pojedynczą, tanią jednostką. Gdy jest nieruchomy, włącza niewidzialność."
     },
-    "cormak": {
+    "shieldriot": {
         "name": "Outlaw",
         "description": "Bot wsparcia",
         "helptext": "Outlaw wysyła fale elektromagnetyczne, uszkadzając i spowalniając wszystkie wrogie jednostki wokół niego, pozostawiając sojusznicze jednostki nietknięte."
@@ -89,7 +89,7 @@
         "description": "Pająk wsparcia",
         "helptext": "Basilisk może wspinać się po ścianach, by zaskoczyć przeciwnika silnym kwasem. Wykrycie Basilisków chcących wejść do bazy w nieoczekiwanych miejscach wymaga czujności, a do zajęcia się takimi intruzami najlepiej użyć statków powietrznych."
     },
-    "corsh": {
+    "hoverraid": {
         "name": "Dagger",
         "description": "Lekki poduszkowiec",
         "helptext": "Dagger to lekki poduszkowiec. Nadaje się do zwiadu, jako że jest szybki i tani; może też niszczyć odsłonięte cele. Jego lekkie działko Gaussa może atakować również cele podwodne."
@@ -119,17 +119,17 @@
         "description": "Wyrzutnia torped",
         "helptext": "Wyrzutnia torped to podstawowa wieżyczka do obrony na morzu - atakuje cele pod wodą, na powierzchni i poduszkowce."
     },
-    "corgol": {
+    "tankheavyassault": {
         "name": "Goliath",
         "description": "Ciężki niszczyciel czołgów",
         "helptext": "Goliath to najcięższy czołg. Jego główne działo zadaje ciężkie obrażenia i jest w stanie rujnować terraformowane ściany, a promień spowalniający nie pozwala ofiarom uciec. Choć Goliath ma problemy ze zwrotnością, to pod względem wytrzymałości i siły ognia nie ma sobie równych."
     },
-    "corpyro": {
+    "jumpraid": {
         "name": "Pyro",
         "description": "Lekki skoczek wsparcia",
         "helptext": "Pyro to lekki bot z miotaczem ognia, który zadaje zwiększone obrażenia dużym jednostkom i może razić wiele celów jednocześnie, i możliwością skoku. Chociaż Pyro otrzymuje obrażenia od ognia, to nie da się go podpalić. Ze zniszczonych Pyro wylewa się resztka napalmu, podpalając okoliczne jednostki."
     },
-    "corrl": {
+    "turretmissile": {
         "name": "Defender",
         "description": "Lekka wieżyczka rakietowa",
         "helptext": "Defender to lekka, wszechstronna wieżyczka. Jego celne pociski świetnie nadają się do niszczenia jednostek z dala i zapewniają podstawowe możliwości przeciwlotnicze. Główną wadą Defendera jest jego bardzo niska wytrzymałość."
@@ -154,7 +154,7 @@
         "description": "Przeobraża się w budynki kurczaków",
         "helptext": "Bezbronny kurczak, którego celem życiowym jest przeobrażenie się w jeden z budynków kurczaków."
     },
-    "armjamt": {
+    "staticjammer": {
         "name": "Sneaky Pete",
         "description": "Wieża zakłócająco-maskująca",
         "helptext": "Zakłócacze nie pozwalają radarom wykrywać jednostek na ich obszarze. Sneaky Peet posiada również niewidzialność obszarową, które pozwala ukryć jednostki także przed normalnym widzeniem."
@@ -174,7 +174,7 @@
         "description": "Łódź atomowa, moc 20 m/s, 30s przeładowanie",
         "helptext": "Scylla jest w stanie wytwarzać i wysyłać rakiety taktyczne. Nie ma jednak broni do walki bezpośredniej i należy trzymać ją jak najdalej od wrogich jednostek."
     },
-    "armpb": {
+    "turretgauss": {
         "name": "Gauss",
         "description": "Działo Gaussa, +20 HP/s gdy nie strzela",
         "helptext": "Wytrzymała wiezyczka uzbrojona w działo Gaussa, która może atakować także cele podwodne. Gdy jest zamknięta, otrzymuje tylko ćwierć obrażeń i regeneruje 20 punktów wytrzymałości na sekundę."
@@ -189,7 +189,7 @@
         "description": "Poduszkowiec przeciwlotniczy",
         "helptext": "Flail jest uzbrojony w ciężkie rakiety ziemia-powietrze średniego zasięgu."
     },
-    "armham": {
+    "cloakarty": {
         "name": "Hammer",
         "description": "Lekki bot artyleryjski",
         "helptext": "Hammer ma działa plazmowe dalekiego zasięgu, których wysoka trajektoria pozwala im omijać przeszkody. Ma większy zasięg niż podstawowe wieżyczki obronne. Daje radę przeciwko jednostkom bojowym."
@@ -214,7 +214,7 @@
         "description": "Laser orbitalny",
         "helptext": "W czasie pokoju narzędzie do przerabiania terenu pod terraforming. W czasie wojny narzędzie do przerabiania wrogich robotów w złom."
     },
-    "armcrabe": {
+    "spidercrabe": {
         "name": "Crab",
         "description": "Ciężki opancerzony pająk bojowy",
         "helptext": "Ciężkie pociski Craba niszczą grupy lekkich jednostek i mają zasięg większy niż lekkie wieżyczki. Gdy nie porusza się, Crab zwija się w kulkę i otrzymuje tylko 1/4 obrażeń."
@@ -224,12 +224,12 @@
         "description": "Zwiadowcza łódź podwodna kamikaze",
         "helptext": "Lancelet to właściwie duża torpeda z możliwościami zwiadowczymi. Po wykonaniu rekonesansu może zdetonować się, zadając ciężkie obrażenia."
     },
-    "armmstor": {
+    "staticstorage": {
         "name": "Magazyn",
         "description": "Magazynuje metal i energię (po 500)",
         "helptext": "Magazyn pozwala na przechowywanie surowców na wypadek, gdy nie ma wystarczająco dużo budowniczych, by je wykorzystać. Lepiej jest jednak zbudować więcej budowniczych, a magazynu używać bardziej jako bufora na wypadek dużych, niespodziewanych zysków, na przykład zbierania dużego złomowiska."
     },
-    "corclog": {
+    "shieldscout": {
         "name": "Dirtbag",
         "description": "Pudło z piachem",
         "helptext": "Dirtbag istnieje po to, by blokować ruch przeciwnika i się mu naprzykrzać. Po zniszczeniu wysypuje się z niego piach, tworząc utrudniający poruszanie się pagórek. Dirtbag może także skakać i używać swojego pudełka, by uderzać przeciwnikow z dyńki; sprawdza się też jako tani zwiadowca."
@@ -239,7 +239,7 @@
         "description": "Amfibijny bot przeciwlotniczy",
         "helptext": "Angler to amfibia przeciwlownicza, która najlepiej sprawuje się przeciwko bombowcom Raven.  Anglery są w stanie wypłynąć na powierzchnię i parami je zestrzeliwać."
     },
-    "corsent": {
+    "tankaa": {
         "name": "Copperhead",
         "description": "Czołg przeciwlotniczy",
         "helptext": "Copperhead posiada działa przeciwlotnicze, które dobrze sprawdzają się przeciwko samolotom i jeszcze lepiej przeciwko statkom powietrznym."
@@ -249,7 +249,7 @@
         "description": "Meteoryt",
         "helptext": "Asteroidy ściągnięte z orbity miażdżą jednostki, na które spadną; można z nich także odzyskać surowce."
     },
-    "corvamp": {
+    "planefighterheavy": {
         "name": "Hawk",
         "description": "Myśliwiec",
         "helptext": "Hawk specjalizuje się w zestrzeliwaniu innych jednostek latających. Jest dość wytrzymały i może działać pod lekkim ostrzałem przeciwlotniczym, ale sam nie jest w stanie atakować celów naziemnych."
@@ -259,12 +259,12 @@
         "description": "Lekki poduszkowiec bojowy",
         "helptext": "Trisula to w miarę szybki, wytrzymały poduszkowiec uzbrojony w rozszczepiany promień, który może zniszczyć kilka mniejszych jednostek lub mocno uszkodzić jedną większą."
     },
-    "corlevlr": {
+    "vehriot": {
         "name": "Leveler",
         "description": "Pojazd wsparcia",
         "helptext": "Działo Levelera skutecznie niszczy grupy lżejszych jednostek, jednak musi mieć czystą linię strzału, zatem w miarę możliwości Levelery należy zawsze ustawiać w linii. Słabościami Levelera są niska szybkość i zasięg. Pociski Levelera wyrównują teren, co może ułatwić pojazdom przejazd po grząskim terenie."
     },
-    "corjamt": {
+    "staticshield": {
         "name": "Aegis",
         "description": "Tarcza obszarowa",
         "helptext": "Aegis posiada tarczę obszarową, która detonuje nadlatujące pociski. Wiąże się to jednak z wysokim kosztem energetycznym, a potężne ataki i tak mogą przebić się przez osłabioną tarczę."
@@ -289,7 +289,7 @@
         "description": "Poduszkowiec szturmowy",
         "helptext": "Halberd przechodzi w tryb opancerzony, gdy nie strzela, co zmniejsza przyjmowane obrażenia 4-krotnie. Jego powolne działko energetyczne nie sprawdza się przeciwko szybkim jednostkom."
     },
-    "cornecro": {
+    "shieldcon": {
         "name": "Convict",
         "description": "Bot konstruktor z tarczą, moc 5 m/s",
         "helptext": "Convict to bot budowniczy z tarczą, którą ochrania siebie i to, co buduje."
@@ -299,12 +299,12 @@
         "description": "Statek transportowy",
         "helptext": "Surfboard jest statkiem transportowym; jednostki, które przewozi, mogą strzelać w trakcie przewozu."
     },
-    "cafus": {
+    "energysingu": {
         "name": "Reaktor grawitacyjny",
         "description": "Duża elektrownia (+225) - NIEBEZPIECZNE",
         "helptext": "Reaktor grawitacyjny wytwarza niesamowite ilości energii przy użyciu technologii czarnych dziur - co jest tak niebezpieczne, na jakie brzmi. Zniszczenie reaktora powoduje wybuch porównywalny ze strategiczną bombą atomową. Okolicę reaktora należy traktować jako niebezpieczną."
     },
-    "armstiletto_laser": {
+    "bomberdisarm": {
         "name": "Thunderbird",
         "description": "Bombowiec rozbrajający",
         "helptext": "Szybki bombowiec, który rozbraja jednostki na szerokim obszarze."
@@ -314,7 +314,7 @@
         "description": "Pająk wsparcia",
         "helptext": "Spidermonkey wypluwa lepką, włóknistą maź, która spowalnia cel."
     },
-    "corstorm": {
+    "shieldskirm": {
         "name": "Rogue",
         "description": "Bot harcownik (wysoka trajektoria)",
         "helptext": "Rogue używa ciężkich rakiet, które mają długi czas przeładowania, ale zadają wysokie obrażenia. Ich trajektoria pozwala im strzelać nad przeszkodami. Szybkie jednostki są w stanie omijać rakiety i skutecznie niszczyć Rogue."
@@ -324,7 +324,7 @@
         "description": "Dowódca dalekiego zasięgu, moc 10 m/s",
         "helptext": "Siege to Dowódca nastawiony na ostrzał z dystansu, co zresztą wymuszają jego niska szybkość i wytrzymałość."
     },
-    "attackdrone": {
+    "dronelight": {
         "name": "Firefly",
         "description": "Dron bojowy",
         "helptext": "Firefly to dron bojowy z precyzyjnym laserem, który dobrze chroni właściciela przed lekkimi jednostkami. "
@@ -339,7 +339,7 @@
         "description": "Duża elektrownia (+100) - NIEBEZPIECZNE",
         "helptext": "Ulepszona elektrownia geotermiczna produkuje ogromne ilości energii, jednak jej zniszczenie wiąże się z równie wielkim wybuchem."
     },
-    "armnanotc": {
+    "staticcon": {
         "name": "Caretaker",
         "description": "Wieżyczka budowlana, moc 10 m/s",
         "helptext": "Jako najtańsze źródło mocy budowlanej, Caretaker świetnie sprawuje się do pomocy fabrykom, naprawy jednostek i zbierania złomu. Nie jest jednak w stanie samemu rozpoczynać żadnej budowy."
@@ -354,12 +354,12 @@
         "description": "Latający kurczak",
         "helptext": "Talon to latający kurczak, który atakuje cele naziemne i latające. Broń przeciwlotnicza dobrze się go pozbywa."
     },
-    "armestor": {
+    "energypylon": {
         "name": "Pylon",
         "description": "Węzeł energetyczny",
         "helptext": "Węzeł energetyczny pozwala rozszerzyć siatkę energetyczną, by pomóc dostarczyć energię z generatorów do kopalni lub wieżyczek. Pamiętaj, że na małe dystanse bardziej opłaca się użyć rzędu lekkich elektrowni (tj. paneli słonecznych lub turbin)."
     },
-    "corshad": {
+    "bomberprec": {
         "name": "Raven",
         "description": "Bombowiec precyzyjny",
         "helptext": "Raven to bombowiec precyzyjny. Świetnie nadaje się do bombardowania ważnych celów, ale przenosi na pokładzie tylko jedną bombę i musi skorzystać z lądowiska, by można było go ponownie użyć."
@@ -374,7 +374,7 @@
         "description": "Kurczak-bomba",
         "helptext": "Dodo zawiera w sobie niestabilną mieszankę i jest w stanie wybuchnąć; rozrzucone wokół kolce z jego skorupy także zadają poważne obrażenia."
     },
-    "armcybr": {
+    "bomberheavy": {
         "name": "Wyvern",
         "description": "Bombowiec implozyjny",
         "helptext": "Wyvern spuszcza pojedynczą niszczycielską bombę o dużej sile i obszarze rażenia, która może rozrzucić mniejsze jednostki wokół. Jest też wystarczająco wytrzymały, by latać wśród umiarkowanej ilości obrony przeciwlotniczej. Jest jednak bardzo drogi, co nie pozwala na lekkomyślne używanie."
@@ -399,17 +399,17 @@
         "description": "Bombowiec szturmowy (na budynki)",
         "helptext": "Mimo że przez swój rozmiar łatwo go trafić, Eclipse jest w stanie wytrzymać ciężki ostrzał, by spuścić na swój cel potężną bombę, która jednak spada na tyle wolno, że nie można liczyć na trafienie w ruchome jednostki."
     },
-    "armzeus": {
+    "cloakassault": {
         "name": "Zeus",
         "description": "Bot szturmowy",
         "helptext": "Zeus jest na tyle wytrzymały, że niska szybkość nie przeszkadza mu podczas podchodzenia pod wrogie jednostki i niszczenia ich mocnym działkiem EMP. Nie jest w stanie dogonić jednostek mających większe szybkość i zasięg, lecz jednostki o mniejszym od niego zasięgu niszczy skutecznie."
     },
-    "armsolar": {
+    "energysolar": {
         "name": "Panel słoneczny",
         "description": "Mała elektrownia (+2)",
         "helptext": "Panele słoneczne to najbardziej podstawowe elektrownie. Zaatakowane, zwijają się na 8 sekund, co daje im świetną ochronę przed lekkimi najazdami przez zmniejszenie otrzymywanych obrażeń czterokrotnie. "
     },
-    "armbrawl": {
+    "gunshipheavyskirm": {
         "name": "Brawler",
         "description": "Statek powietrzny wsparcia",
         "helptext": "Brawler to statek powietrzny, którego wysokość lotu sprawia nie lada problem przy próbach zestrzelenia go. Jest wytrzymały i posiada podwójne karabiny o dużym zasięgu."
@@ -434,7 +434,7 @@
         "description": "Transportowiec powietrzny",
         "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
     },
-    "corsktl": {
+    "jumpbomb": {
         "name": "Skuttle",
         "description": "Skacząca niewidzialna bomba",
         "helptext": "Mimo że jest powolna, droga i ma niski obszar rażenia, ta niesamowicie niszczycielska bomba wyposażona w niewidzialność i możliwość skakania jest postrachem wszystkich ciężkich jednostek. Dobrą obronę przed nią stanowią lekkie jednostki przeczesujące okolicę."
@@ -454,7 +454,7 @@
         "description": "Kurczak harcownik (i przeciwlotniczy)",
         "helptext": "Sporeshooter wypuszcza zarodniki, by niszczyć przeciwników i jest w stanie wspinać się po klifach."
     },
-    "armcir": {
+    "turretaafar": {
         "name": "Chainsaw",
         "description": "Bateria przeciwlotnicza dalekiego zasięgu",
         "helptext": "Chainsaw to wieżyczka przeciwlotnicza o dużym zasięgu. Pomimo, że sama nie jest zbyt wytrzymała, i w razie bezpośredniego ataku nie utrzyma się długo, to potrafi mocno zaszkodzić wrogim bombowcom, prawie całkowicie zamykając dla nich przestrzeń powietrzną wokół siebie."
@@ -464,7 +464,7 @@
         "description": "Lekka łódź torpedowa",
         "helptext": "Hunter to lekka łódź z torpedami przeznaczona do najazdów i niszczenia łodzi podwodnych. W dużej ilości nieźle się też sprawdza przeciwko bardzo ciężkim okrętom."
     },
-    "corsilo": {
+    "staticnuke": {
         "name": "Silencer",
         "description": "Silos rakiet strategicznych, moc 18 m/s, budowa rakiety 3 minuty",
         "helptext": "Silencer może wystrzelić potężną rakietę z głowicą atomową, która jest w stanie zrównać z ziemią całą bazę wroga. Jednakże przed naciśnięciem czerwonego guzika należy upewnić się, że celu nie broni tarcza antyrakietowa, i w razie potrzeby pozbyć się jej."
@@ -474,7 +474,7 @@
         "description": "Poduszkowiec z shotgunem",
         "helptext": "Punisher ma shotguna i jest dobry na ciężkie jednostki lub grupy lekkich."
     },
-    "armspy": {
+    "spiderantiheavy": {
         "name": "Infiltrator",
         "description": "Niewidzialny zwiadowca / paralizator",
         "helptext": "Infiltrator spełnia dwie role. Przede wszystkim jest świetnym zwiadowcą dzięki niewidzialności, pajęczemu poruszaniu się po klifach i dużemu zasięgowi wzroku. Ponadto może sparaliżować pojedynczy cel, co dobrze jest używać przeciwko ciężkim jednostkom."
@@ -484,7 +484,7 @@
         "description": "Pojazd radarowy",
         "helptext": "Informant zapewnia radar na polu bitwy."
     },
-    "armwin": {
+    "energywind": {
         "name": "Turbina",
         "description": "Mała elektrownia",
         "helptext": "Turbiny produkują różną ilość energii zależnie od tego, gdzie się je zbuduje. Na lądzie produkują zmienną ilość energii, która zwiększa się wraz z wysokością nad poziomem morza. Wiatraki są bardzo delikatne, zatem należy stawiać je rozważnie. W wodzie turbiny produkują stałą ilość energii i są nieco wytrzymalsze niż wiatraki."
@@ -494,7 +494,7 @@
         "description": "Ciężki amfibijny bot szturmowy",
         "helptext": "Grizzly to klasyczna jednostka szturmowa - dość wolna i niezdarna, lecz prawie niepowstrzymana. Jego bronią jest laser o dużym zasięgu i obrażeniach, który ma problemy właściwie tylko z szybkimi jednostkami atakujacymi w grupach i lotnictwem. Grizzly może się wynurzyć do strzału, ale nie może strzelać pod wodą."
     },
-    "corcrash": {
+    "shieldaa": {
         "name": "Vandal",
         "description": "Bot przeciwlotniczy",
         "helptext": "Vandal to tani i niezawodny bot przeciwlotniczy. Bezbronny przeciwko jednostkom naziemnym."
@@ -504,22 +504,22 @@
         "description": "Poduszkowiec wsparcia",
         "helptext": "Mace to ruchoma wieża laserowa. Ma ciągły laser precyzyjny wysokiej mocy, który świetnie nadaje się do niszczenia lekkich jednostek. Jego wytrzymałość i prędkość są jednak przeciętne."
     },
-    "corgarp": {
+    "veharty": {
         "name": "Wolverine",
         "description": "Pojazd artyleryjski / stawiacz min",
         "helptext": "Wolverine wystrzeliwuje na wyznaczony obszar miny (które pozostają uzbrojone przez ograniczony czas). Wolverine ma większy zasięg niż większość wieżyczek, jednak z powodu bardzo niskiej wytrzymałości wymaga ochrony innych jednostek lub swoich własnych min."
     },
-    "armcomdgun": {
+    "striderantiheavy": {
         "name": "Ultimatum",
         "description": "Niewidzialny bot na ciężkie jednostki",
         "helptext": "Ultimatum posiada dezintegrator, który jest w stanie zniszczyć nawet ciężkie jednostki jednym strzałem. Niewidzialność pozwala mu podejść pod wrogie mechy i szybko się ich pozbyć; lekkie jednostki bardzo skutecznie mu w tym przeszkadzają."
     },
-    "cormex": {
+    "staticmex": {
         "name": "Kopalnia",
         "description": "Wydobywa metal",
         "helptext": "Kopalnia to główne źródło metalu i najważniejszy nabytek na polu bitwy. Nadmiar energii automatycznie trafia do kopalni, by zwiększyć wydobycie."
     },
-    "cormist": {
+    "vehsupport": {
         "name": "Slasher",
         "description": "Pojazd rakietowy (musi stać w miejscu, by strzelać)",
         "helptext": "Slasher nie może strzelać w ruchu. Stojące w miejscu Slashery automatycznie rozstawiają swoją dalekosiężną wyrzutnię lekkich rakiet samonaprowadzających, które świetnie nadają się do niszczenia lekkich jednostek i bomb; mogą także służyć jako improwizowana obrona przeciwlotnicza. Slasher nie może jednak strzelać nad przeszkodami i ma niską wytrzymałość."
@@ -534,12 +534,12 @@
         "description": "Amfibijny Dowódca, moc 10 m/s",
         "helptext": "Sonic to Dowódca z działkiem dźwiękowym, które pozwala mu walczyć zarówno na ziemi, jak i pod wodą."
     },
-    "armmanni": {
+    "hoverarty": {
         "name": "Penetrator",
         "description": "Poduszkowiec precyzyjnej artylerii",
         "helptext": "Broń Penetratora ma wystarczającą siłę i celność, by jednym strzałem zniszczyć lub poważnie uszkodzić większość jednostek. Jest jednak wolny i ma niską wytrzymałość, a zatem warto trzymać go z dala od niebezpieczeństw - ma wystarczająco duży zasięg, by bezpiecznie prowadzić ostrzał."
     },
-    "corroach": {
+    "shieldbomb": {
         "name": "Roach",
         "description": "Bomba (zakopuje się)",
         "helptext": "Roach to szybka jednostka samobójcza; swietnie niszczy jednostki w grupach, przede wszystkim szturmowe i harcowników. Gdy nie porusza się, staje się niewidzialny, dzięki czemu działa jak mina. Można go skutecznie zniszczyć celnymi jednostkami lub poświęcić lekką jednostkę, aby przedwcześnie go zdetonować."
@@ -559,7 +559,7 @@
         "description": "Poduszkowiec przeciwpodwodny",
         "helptext": "Claymore zrzuca do wody ładunki głębinowe o wysokim obszarze rażenia. W razie potrzeby można je zrzucić na lądzie ręcznie."
     },
-    "corcrw": {
+    "gunshipkrow": {
         "name": "Krow",
         "description": "Latająca forteca",
         "helptext": "Krow jest drogi i powolny, jednak jego niesamowita wytrzymałość pozwala mu latać nawet nad silną obroną przeciwlotniczą i ostrzeliwać wrogow swoim zestawem działek laserowych. Jego głownym atutem jest możliwość zrzucenia serii niszczycielskich bomb, które zrównują z ziemią obszar znajdujący się bezpośrednio pod nim."
@@ -579,10 +579,10 @@
         "description": "Buduje samoloty, moc 10 m/s",
         "helptext": "Lotnisko produkuje samoloty; oferuje przede wszystkim myśliwce i bombowce, aczkolwiek nie tylko. Na lotnisku znajduje się jedno lądowisko do naprawy samolotów i przeładowywania bombowców."
     },
-    "blastwing": {
+    "gunshipbomb": {
         "name": "Blastwing",
         "description": "Latająca bomba (zakopuje się)",
-        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu Blastwingów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
+        "helptext": "Blastwing zadaje skromne obrażenia, które wystarczają do zniczenia kopalni lub turbiny. Większa część zniszczeń odbywa się na skutek odłamków lecących po jego torze lotu, toteż należy rozważnie dobierać kierunek ataku. Gdy wyląduje na ziemi, włącza niewidzialność, co czyni z niego minę. Nie powinno się używać zbyt wielu gunshipbombów jednocześnie, ponieważ zniszczenie jednego powoduje reakcję łańcuchową i detonację całej grupy."
     },
     "pw_generic": {
         "name": "Neutralny Budynek",
@@ -604,7 +604,7 @@
         "description": "Buduje statki, moc 10 m/s",
         "helptext": "Stocznia buduje statki i łodzie podwodne. Pozostałe jednostki wodne, tj. poduszkowce i amfibie, mają osobne fabryki."
     },
-    "corraid": {
+    "vehassault": {
         "name": "Ravager",
         "description": "Pojazd szturmowy",
         "helptext": "Drogi, lecz potężny, Ravager jest w stanie poradzić sobie z większoscią przeciwników. Chociaż jego zwrotność jest bardzo niska, ma wysoką prędkość maksymalną, dzięki czemu jest w stanie dogonić i zniszczyć lżejsze jednostki. Jego działo może strzelać nad przeszkodami, na przykład wrakami lub innymi czołgami. Duże grupy Ravagerów można skutecznie niszczyć bombami."
@@ -614,17 +614,17 @@
         "description": "Tęczowa niespodzianka",
         "helptext": "Disco Rave Party wystrzeliwuje kolorowe kulki, z których każda zawiera inną niespodziankę. Świetna zabawa dla całej rodziny!"
     },
-    "corllt": {
+    "turretlaser": {
         "name": "Lotus",
         "description": "Lekka wieżyczka laserowa",
         "helptext": "Lotus to podstawowa wieżyczka. Dobrze chroni przed lekkimi jednostkami, chociaż stosunkowo łatwo zniszczyć go harcownikami, artylerią lub jednostkami szturmowymi."
     },
-    "armrock": {
+    "cloakskirm": {
         "name": "Rocko",
         "description": "Bot harcownik",
         "helptext": "Rocko jest uzbrojony w powolne rakiety, które mimo niskich obrażeń i braku samonaprowadzania mają duży zasięg. Najlepiej sprawdzają się stojąc w linii prostopadłej do celu, atakując z maksymalnej odległości i nie dając się złapać przeciwnikom. Można go pokonać lekkimi jednostkami, które są w stanie unikać ich rakiet, dogonić go i zniszczyć."
     },
-    "coracv": {
+    "tankcon": {
         "name": "Welder",
         "description": "Uzbrojony czołg konstruktor, moc 7.5 m/s",
         "helptext": "Welder to konstruktor, który może sam się bronić przed lekkimi atakami dzięki wbudowanemu działku."
@@ -639,7 +639,7 @@
         "description": "Wylęgarnia kurczaków",
         "helptext": "Gniazda takie jak to to wylęgarnie kurczaków."
     },
-    "armpw": {
+    "cloakraid": {
         "name": "Glaive",
         "description": "Lekki bot",
         "helptext": "Tani, lekki i szybki, Glaive świetnie nadaje się do niszczenia wrogich harcowników, artylerii i budynków ekonomicznych. Jest jednak bardzo delikatny i nie powinno się go rzucać przeciwko jednostkom wsparcia i wieżyczkom. Glaive samoczynnie regeneruje się po wyjściu z walki."
@@ -654,12 +654,12 @@
         "description": "Poduszkowiec stawiacz min",
         "helptext": "Dampener rozstawia wokół siebie miny."
     },
-    "corvalk": {
+    "gunshiptrans": {
         "name": "Valkyrie",
         "description": "Transportowiec powietrzny",
         "helptext": "Valkyrie to podstawowa latająca jednostka transportowa. Świetnie radzi sobie w szybkim przenoszeniu jednostek z bazy na front, bądź w desancie głęboko za linie wroga, lecz musi unikać obszaru bronionego przez nawet najmniejszą ilość artylerii przeciwlotniczej."
     },
-    "armorco": {
+    "striderdetriment": {
         "name": "Detriment",
         "description": "Najcięższy mech szturmowy",
         "helptext": "Detriment to najcięższy mech na polu bitwy. Posiada lasery przeciwlotnicze i rakiety dalekiego zasięgu, ale jego siła pochodzi z niesamowitego pancerza i potężnych dział, które szybko likwidują wrogie jednostki. Mimo swojej ogromnej mocy, Detriment nie powinien pracować bez odpowiedniego wsparcia ze strony lzejszych jednostek."
@@ -669,7 +669,7 @@
         "description": "Średnia elektrownia (+25)",
         "helptext": "Elektrownie geotermiczne to bardzo oszczędne i efektywne źródła energii, mogą jednak być budowane jedynie na wylotach geotermalnych w określonych miejscach na mapie. Ponadto zniszczenie ich wiąże się z dość silnym wybuchem."
     },
-    "corfast": {
+    "jumpcon": {
         "name": "Constable",
         "description": "Skoczek konstruktor, moc 5 m/s",
         "helptext": "Szybki konstruktor z możliwością skoku, Constable świetnie nadaje się do zajmowania trudno dostępnych obszarów. Zapewnia też wsparcie bojowe - jest uzbrojony w lekki promień spowalniający."
@@ -679,57 +679,57 @@
         "description": "Zrzuca Dodo",
         "helptext": "Blimpy zrzuca Dodo niczym bombowiec."
     },
-    "battledrone": {
+    "droneheavyslow": {
         "name": "Viper",
         "description": "Zaawansowany dron bojowy",
         "helptext": "Viper to zaawansowany dron bojowy uzbrojony w promień spowalniający."
     },
-    "armcsa": {
+    "athena": {
         "name": "Athena",
         "description": "Konstruktor specjalistyczny, moc 7.5 m/s",
         "helptext": "Athena to technologiczne cacko wyposażone w niewidzialność, zakłócacz radaru i możliwość odbudowy jednostek bezpośrednio ze złomu. Ponadto jest w stanie budować jednostki na polu bitwy bez użycia fabryki i działać jak normalny konstruktor."
     },
-    "armsonar": {
+    "staticsonar": {
         "name": "Sonar",
         "description": "Wykrywa jednostki podwodne",
         "helptext": "Sonar pozwala wykrywać zanurzone jednostki."
     },
-    "arm_venom": {
+    "spideremp": {
         "name": "Venom",
         "description": "Pająk wsparcia EMP",
         "helptext": "Venom to pająk, który paraliżuje trafione jednostki i jest szybki jak na jednostkę wsparcia. Dobrze współgra z Hermitem i Reclusem, nie pozwalając przeciwnikom unikać ich wolnych pocisków."
     },
-    "corcan": {
+    "jumpassault": {
         "name": "Jack",
         "description": "Skoczek do walki wręcz",
         "helptext": "Jack to skoczek szturmowy walczący w zwarciu. Kilka Jacków jest w stanie zrównać z ziemią większość fortyfikacji. Jest jednak wolny i nie może atakować na odległość, co czyni go łatwym celem dla szybszych jednostek."
     },
-    "corfav": {
+    "vehscout": {
         "name": "Dart",
         "description": "Pojazd zwiadowczy",
         "helptext": "Tani i szybki, Dart jest niezmiernie groźny w początkowej fazie gry dla nieprzygotowanych przeciwników. Dowolne jednostki bojowe skutecznie się go pozbywają."
     },
-    "armsptk": {
+    "spiderskirm": {
         "name": "Recluse",
         "description": "Pająk harcownik",
         "helptext": "Pająk wyposażony w rakiety dalekiego zasięgu o niestabilnej trajektorii."
     },
-    "blackdawn": {
+    "gunshipassault": {
         "name": "Black Dawn",
         "description": "Zaczepny statek powietrzny",
-        "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. Blackdawn jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
+        "helptext": "Black Dawn wystrzeliwuje niszczycielskie salwy rakiet, które z braku samonaprowadzania mają jednak kłopoty z trafianiem szybkich jednostek. gunshipassault jest wytrzymały, ale też drogi i ma niską szybkostrzelnosc, zatem oczekując między atakami warto oddalić sie, aby nie otrzymywać niepotrzebnie obrażeń."
     },
     "tankriot": {
         "name": "Banisher",
         "description": "Ciężki czołg wsparcia",
         "helptext": "Mobilny jak na jednostkę wsparcia, Banisher posiada ciężkie rakiety krótkiego zasięgu, które szybko niszczą grupy lekkich jednostek, są skuteczne przeciw lotnictwu i wyrównują teren. Banishera łatwo zniszczyć jednostkami szturmowymi lub harcownikami."
     },
-    "armamd": {
+    "staticantinuke": {
         "name": "Protector",
         "description": "Tarcza antyrakietowa",
         "helptext": "Protector automatycznie przechwytuje rakiety z głowicami atomowymi wycelowane w obszar przezeń broniony."
     },
-    "armbrtha": {
+    "staticheavyarty": {
         "name": "Big Bertha",
         "description": "Działo strategiczne",
         "helptext": "Bertha to masywne działo o ogromnym zasięgu. Przy roztropnym doborze celów jest w stanie niweczyć przedsięwzięcia przeciwnika i niszczyć ważne cele z bezpiecznej odległości, jednak nie jest w stanie sama zapewnić zwycięstwa ze względu na bardzo ograniczoną szybkostrzelność."
@@ -739,12 +739,12 @@
         "description": "Bombowiec z napalmem",
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
-    "armsnipe": {
+    "cloaksnipe": {
         "name": "Spectre",
         "description": "Niewidzialny snajper harcownik",
         "helptext": "Karabin snajperski Spectra zadaje ciężkie obrażenia pojedynczym celom. Jako jedyna jednostka może strzelać pozostając niewidzialnym; jego naboje są jednak widoczne i mogą pomóc przeciwnikom w znalezieniu go. Utrzymanie niewidzialności kosztuje także spore ilości energii. Najlepszym sposobem na wykrycie Spectra jest przeczesanie okolicy tanimi jednostkami."
     },
-    "corbhmth": {
+    "staticarty": {
         "name": "Behemoth",
         "description": "Bateria plazmowa - wymaga sieci energetycznej 50 E",
         "helptext": "Behemoth to skuteczna (przeciw-)artyleria; świetnie chroni okolicę. Nie jest to jednak klasyczna wieża obronna i łatwo ją zniszczyć w bezpośrednim natarciu."
@@ -754,12 +754,12 @@
         "description": "Mina",
         "helptext": "Ta mina nie wybucha, lecz wystrzeliwuje serię pocisków w cel. Po minucie życia dezaktywuje się."
     },
-    "corrad": {
+    "staticradar": {
         "name": "Wieża radarowa",
         "description": "System wczesnego ostrzegania",
         "helptext": "Radar wykrywa obecność wrogich jednostek z dużej odległości. Ma malutki koszt utrzymania, lecz wyłączy się w razie braku energii. Radar jest blokowany przez teren, na przykład góry."
     },
-    "armdeva": {
+    "turretriot": {
         "name": "Stardust",
         "description": "Wieżyczka wsparcia",
         "helptext": "Stardust posiada potężne działko maszynowe, które zadaje ogromne obrażenia obszarowe; jego niski zasięg powoduje jednak, że jest bezbronny przeciwko harcownikom i artylerii."
@@ -769,17 +769,17 @@
         "description": "Pająk wsparcia EMP",
         "helptext": "Anarchid to Pajęczy Mesjasz."
     },
-    "corgator": {
-        "name": "Scorcher",
+    "vehraid": {
+        "name": "Shoverconer",
         "description": "Lekki pojazd",
-        "helptext": "Scorcher to lekki pojazd bojowy świetny do bezpośredniej walki; jest jednak dosyć drogi i nie jest w stanie efektywnie radzić sobie z jednostkami wsparcia. Jego broń zadaje tym więcej obrażeń, im bliżej celu się znajduje."
+        "helptext": "Shoverconer to lekki pojazd bojowy świetny do bezpośredniej walki; jest jednak dosyć drogi i nie jest w stanie efektywnie radzić sobie z jednostkami wsparcia. Jego broń zadaje tym więcej obrażeń, im bliżej celu się znajduje."
     },
     "jumpblackhole2": {
         "name": "Hoarder",
         "description": "Szturmowy bot wsparcia",
         "helptext": "Hoarder to jednostka wsparcia, która zasysa okoliczne jednostki, co ułatwia ich zniszczenie."
     },
-    "corpyro2": {
+    "jumpraid2": {
         "name": "Pyro",
         "description": "Lekki skoczek wsparcia",
         "helptext": "Pyro to lekki bot z miotaczem ognia, który zadaje zwiększone obrażenia dużym jednostkom i może razić wiele celów jednocześnie, i możliwością skoku. Chociaż Pyro otrzymuje obrażenia od ognia, to nie da się go podpalić. Ze zniszczonych Pyro wylewa się resztka napalmu, podpalając okoliczne jednostki."
@@ -799,7 +799,7 @@
         "description": "Artyleria",
         "helptext": "Artyleria dalekiego zasięgu."
     },
-    "armartic": {
+    "turretemp": {
         "name": "Faraday",
         "description": "Wieżyczka paralizacyjna",
         "helptext": "Faraday to wieżyczka uzbrojona w mocne działko EMP. Doskonale współpracuje z innymi wieżyczkami, lecz sama jest bezużyteczna. Kiedy nie atakuje, otrzymuje tylko ćwierć obrażeń."
@@ -829,7 +829,7 @@
         "description": "Kwatera główna Wojen Planet (zmienia uzyskiwane wpływy)",
         "helptext": "Kwatera główna jest kluczowa w utrzymaniu kontroli nad planetą; jeżeli zwycięzca bitwy ją utraci, to czekają go konsekwencje. W wypadku agresora, otrzymuje on dwukrotnie mniejsze wpływy. Utracony przez obrońców powoduje, że agresor otrzymuje 20%% wpływów."
     },
-    "dante": {
+    "striderdante": {
         "name": "Dante",
         "description": "Szturmowy mech bojowy",
         "helptext": "Dante to ciężki mech bojowy stworzony do walki na krótki dystans. Posiada promień cieplny, miotacz ognia i rakiety zapalające, które może wystrzelić w salwie."
@@ -844,12 +844,12 @@
         "description": "Dba o gniazdo",
         "helptext": "Matka roju zajmuje się rodzeniem różnych typów kurczaków bojowych."
     },
-    "armjeth": {
+    "cloakaa": {
         "name": "Gremlin",
         "description": "Niewidzialny bot przeciwlotniczy",
         "helptext": "Niewidzialny, szybki i dość wytrzymały jak na swoją cenę, Gremlin skutecznie zapewnia obronę przeciwlotniczą. Jest bezbronny przeciw wojskom lądowym."
     },
-    "armmerl": {
+    "vehheavyarty": {
         "name": "Impaler",
         "description": "Pojazd artylerii precyzyjnej",
         "helptext": "Impaler wystrzeliwuje potężne pociski kinetyczne dalekiego zasięgu, które dzięki wysokiej trajektorii są w stanie omijać większość przeszkód, choć są jednak przez to bezużyteczne przeciw poruszającym się celom. Impaler jest przeznaczony do niszczenia budynków."
@@ -934,7 +934,7 @@
         "description": "Lekka łódź podwodna",
         "helptext": "Cicha i śmiercionośna łódź podwodna, która szybko pozbywa się jednostek bez ochrony. Spowalnia trafione cele. Łatwo zniszczyć ją jednak torpedami; należy też wystrzegać się niszczycieli."
     },
-    "armanni": {
+    "turretantiheavy": {
         "name": "Annihilator",
         "description": "Akcelerator tachionów - wymaga sieci energetycznej 50 E",
         "helptext": "Annihilator posiada akcelerator tachionów, który zadaje poważne obrażenia ciężkim jednostkom i zmiata z powierzchni ziemi lżejsze, a wszystko to na daleki zasięg. Ma jednak niską szybkostrzelność i wytrzymałość. W razie potrzeby można schować działo, co nie pozwala strzelać, lecz zmniejsza otrzymywane obrażenia czterokrotnie."
@@ -964,7 +964,7 @@
         "description": "Wyrzutnia czarnych dziur",
         "helptext": "Placeholder to jednostka pomocnicza, która tworzy wir wsysający okoliczne jednostki, co nie pozwala im się poruszać, zbiera w jednym miejscu i tym samym ułatwia zniszczenie ich."
     },
-    "corned": {
+    "vehcon": {
         "name": "Mason",
         "description": "Pojazd konstruktor, moc 5 m/s",
         "helptext": "Mason to prędki i wytrzymały konstruktor idealny do szybkiego zajmowania kopalń."
@@ -984,7 +984,7 @@
         "description": "Dowódca szturmowy, moc 10 m/s",
         "helptext": "Strike to zrównoważony Dowódca, który może używać większość modułów i ma dobre osiągi. Posiada zwiększoną regenerację w porównaniu do innych Dowódców."
     },
-    "cordoom": {
+    "turretheavy": {
         "name": "Doomsday Machine",
         "description": "Forteca średniego zasięgu (działo wymaga sieci energetycznej 50 E)",
         "helptext": "Doomsday Machine to opancerzona forteca uzbrojona w ciężkie działo oraz promień cieplny.  Jest w stanie schować działo, by zmniejszyć otrzymywane obrażenia czterokrotnie."
@@ -1024,7 +1024,7 @@
         "description": "Ciężki krążownik szturmowy",
         "helptext": "Vanquisher to krążownik o wysokiej wytrzymałości i sile ognia. Jego działa szybko likwidują cele na powierzchni, natomiast cele nad i pod wodą eliminują rakiety. Jego głównym mankamentem jest niski zasięg."
     },
-    "corhlt": {
+    "turretheavylaser": {
         "name": "Stinger",
         "description": "Ciężka wieżyczka laserowa",
         "helptext": "Stinger to średnia wieża laserowa, która jest w stanie jednym strzałem zniszczyć większość lekkich jednostek, jednak niska szybkostrzelność pozwala dużej ilości tanich jednostek ją zniszczyć."
@@ -1044,12 +1044,12 @@
         "description": "Rakieta sejsmiczna",
         "helptext": "Jednorazowa rakieta sejsmiczna dalekiego zasięgu. Nie zadaje obrażeń, lecz wyrównuje trafiony teren."
     },
-    "scorpion": {
+    "striderscorpion": {
         "name": "Scorpion",
         "description": "Ciężki niewidzialny pająk-mech",
         "helptext": "Scorpion to ciężki pajęczy mech bojowy z działkiem EMP i dwoma promieniami cząsteczkowymi. Jest bardzo wytrzymały i może stać się niewidzialny."
     },
-    "capturecar": {
+    "vehcapture": {
         "name": "Dominatrix",
         "description": "Pojazd do przejmowania",
         "helptext": "Dominatrix przejmuje jednostki wroga pod swoją kontrolę. Wiele Dominatrix może współpracować przy przejmowaniu danej jednostki, ale tylko jednej z nich zostanie przypisana. Po przejęciu jednostki, Dominatrix nie może przejmować przez kolejne 12 sekund. Zniszczenie powoduje zwrot wszystkich przypisanych jednostek do pierwotnego właściciela."
@@ -1059,7 +1059,7 @@
         "description": "Buduje czołgi, moc 10 m/s",
         "helptext": "Czołgi specjalizują się w brutalnej sile i wytrzymałości pancerza. Nic tak nie załatwia sporów, jak pancerna pięść na gąsienicach."
     },
-    "armbanth": {
+    "striderbantha": {
         "name": "Bantha",
         "description": "Mech bojowy",
         "helptext": "Bantha to ciężki mech bojowy, uzbrojony po zęby i bardzo wytrzymały. Posiada rakiety EMP dalekiego zasięgu, ciężki laser oraz działka EMP. Nie ma jednak żadnej obrony przeciwlotniczej i słabo radzi sobie bez wsparcia mniejszych jednostek"
@@ -1069,7 +1069,7 @@
         "description": "Wylęgarnia kurczaków",
         "helptext": "Gniazda takie jak to to wylęgarnie kurczaków."
     },
-    "corflak": {
+    "turretaaflak": {
         "name": "Cobra",
         "description": "Działo przeciwlotnicze Flak",
         "helptext": "Cobra to działo przeciwlotnicze które zadaje ciężkie obrażenia na dużym obszarze. Świetnie niszczy wrogie statki powietrzne."
@@ -1079,27 +1079,27 @@
         "description": "Lotniskowiec z rakietami taktycznymi",
         "helptext": "Najbardziej wielozadaniowy spośród okrętów. Lotniskowiec posiada rakiety taktyczne do bombardowania odległych celów, posiada lądowiska dla samolotów i przede wszystkim produkuje własne drony bojowe."
     },
-    "corsumo": {
+    "jumpsumo": {
         "name": "Sumo",
         "description": "Ciężki skoczek grawitacyjny - włączony odpycha, wyłączony przyciąga",
         "helptext": "Sumo posiada imponującą wytrzymałość i podwójne promienie grawitacyjne, które mogą przyciągać lub odpychać inne jednostki. Może również skakać, co w połączeniu z jego dużą masą pozwala mu zgniatać wrogie jednostki, skacząc na nie."
     },
-    "corrazor": {
+    "turretaalaser": {
         "name": "Razor",
         "description": "Laser przeciwlotniczy",
         "helptext": "Razor to wytrzymała wieżyczka przeciwlotnicza. Wysoka wyrzymałość i 4-krotne zmniejszenie obrażeń, gdy nie atakuje powodują, że ciężko jest się go pozbyć."
     },
-    "corch": {
+    "hovercon": {
         "name": "Quill",
         "description": "Poduszkowiec konstruktor, moc 5 m/s",
         "helptext": "Quill pozwala na bezproblemową rozbudowę zarówno na ziemi, jak i w wodzie."
     },
-    "armaak": {
+    "jumpaa": {
         "name": "Archangel",
         "description": "Ciężki skoczek przeciwlotniczy",
         "helptext": "Archangel posiada podwójny laser i działko przeciwlotnicze, które szybko zestrzeliwują wrogie lotnictwo. Jest także w stanie skakać, co pozwala mu pokonywać trudny teren lub unikać ostrzału."
     },
-    "armarad": {
+    "staticheavyradar": {
         "name": "Zaawansowany radar",
         "description": "Radar dalekiego zasięgu",
         "helptext": "Zaawansowany radar posiada znacznie większy zasięg, niż podstawowa wersja."
@@ -1119,7 +1119,7 @@
         "description": "Lekki czołg szturmowy",
         "helptext": "Panther to lekki czołg uzbrojony w działko EMP, które zadaje niskie obrażenia, ale paraliżuje cel, dzięki czemu może unieszkodliwiać mało ważne cele, by je ominąć i przejść do niszczenia ważniejszych. Zniszczony Panther uwalnia falę EMP."
     },
-    "corgrav": {
+    "turretimpulse": {
         "name": "Newton",
         "description": "Wieżyczka grawitacyjna - włącz, by odpychać, wyłącz, by przyciągać ",
         "helptext": "Newton to eksperymentalne działko grawitacyjne, które choć nie zadaje obrażeń, to jest w stanie przyciągać lub odpychać inne jednostki, w tym także sojusznicze."
@@ -1129,12 +1129,12 @@
         "description": "Buduje poduszkowce, moc 10 m/s",
         "helptext": "Poduszkowce są śmiercionośne i szybko poruszają się zarówno po powierzchni wody, jak i po płaskim terenie."
     },
-    "core_spectre": {
+    "shieldshield": {
         "name": "Aspis",
         "description": "Bot z tarczą obszarową",
         "helptext": "Aspis chroni pobliskie jednostki tarczą obszarową, która niszczy wrogie pociski. Aspis automatycznie podłączy się do innych jednostek uzbrojonych w tarczę, aby współdzielić ładunek. Tarcza obszarowa nie zatrzymuje jednostek, zatem przeciwnik moze strzelać do chronionych jednostek, gdy wejdzie pod nią. Utrzymanie i regeneracja tarczy obszarowej kosztują energię."
     },
-    "fighter": {
+    "planefighter": {
         "name": "Swift",
         "description": "Myśliwiec wielozadaniowy",
         "helptext": "Swift to wielozadaniowy myśliwiec szybkiego reagowania, który może atakować zarówno cele powietrzne, jak i naziemne. Jest bardzo zwinny i świetnie sobie radzi z wrogim lotnictwem dzięki samonaprowadzanym rakietom powietrze-powietrze, jednak jest bardzo lekki i łatwo go zestrzelić. Posiada także dopalacz."
@@ -1149,7 +1149,7 @@
         "description": "Skaczący bot miglanc",
         "helptext": "Największy miglanc na osiedlu."
     },
-    "armrectr": {
+    "cloakcon": {
         "name": "Conjurer",
         "description": "Niewidzialny bot konstruktor, moc 5 m/s",
         "helptext": "Conjurer to niewidzialny konstruktor z zakłócaczem krótkiego zasięgu."
@@ -1159,7 +1159,7 @@
         "description": "Lekki poduszkowiec",
         "helptext": "Dagger to lekki poduszkowiec. Nadaje się do zwiadu, jako że jest szybki i tani; może też niszczyć odsłonięte cele. Jego lekkie działko Gaussa może atakować również cele podwodne."
     },
-    "corthud": {
+    "shieldassault": {
         "name": "Thug",
         "description": "Ekranowany bot szturmowy",
         "helptext": "Choć słaby w pojedynkę, Thug dobrze działa w grupie: jego tarcza świetnie chroni lżejsze jednostki i może współdzielić ładunek z innymi tarczami."
@@ -1169,12 +1169,12 @@
         "description": "Amfibijny bot wsparcia",
         "helptext": "Wszechstronna amfibia uzbrojona w torpedy do użytku pod wodą i shotgun do niszczenia celów na lądzie."
     },
-    "armca": {
+    "planecon": {
         "name": "Crane",
         "description": "Statek powietrzny konstruktor, moc 4 m/s",
         "helptext": "Crane to latający konstruktor, który mimo niskiej mocy budowy jest w stanie szybko przelecieć w dowolne miejsce, co czyni go idealnym do zajmowania kopalń, zbierania złomu i innych podobnych zadań."
     },
-    "armkam": {
+    "gunshipraid": {
         "name": "Banshee",
         "description": "Lekki statek powietrzny",
         "helptext": "Banshee ma bardzo dużą prędkość i dość dobre obrażenia, co pozwala na szybkie najazdy w celu zniszczenia ekonomii przeciwnika lub niecelnych jednostek, na przykład szturmowych lub harcowników. Pułap lotu Banshee jest jednak na tyle niski, że może zostać zestrzelona nawet przez jednostki o krótszym zasięgu."
@@ -1199,7 +1199,7 @@
         "description": "Wieżyczka przeciwczołgowa - wymaga sieci energetycznej 25 E",
         "helptext": "Sunlance posiada ciężki promień spowalniający, który skutecznie unieszkodliwia nawet ciężkie jednostki."
     },
-    "carrydrone": {
+    "dronecarry": {
         "name": "Gull",
         "description": "Dron bojowy",
         "helptext": "Drony walczą razem ze swoim lotniskowcem i nie mogą się zbytnio od niego oddalić. Lotniskowiec automatycznie zastępuje zniszczone drony nowymi."
@@ -1224,7 +1224,7 @@
         "description": "O kurczę!",
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
-    "armasp": {
+    "staticrearm": {
         "name": "Lądowisko",
         "description": "Naprawia i dozbraja samoloty, moc 2.5 e/s na stanowisko",
         "helptext": "Stacja naprawcza odnawia amunicję bombowcom i naprawia samoloty."
@@ -1239,7 +1239,7 @@
         "description": "O kurczę!",
         "helptext": "Królowa kurnika może zostać powstrzymana tylko dzięki pełnej determinacji i przy udziale wielkiej siły ognia; pluje płonącym kwasem, wystrzeliwuje masę zarodników, rozdeptuje mniejsze jednostki niczym robaki i jest w stanie rozszarpać nawet ciężkie roboty szturmowe."
     },
-    "bladew": {
+    "gunshipemp": {
         "name": "Gnat",
         "description": "Dron paralizator",
         "helptext": "Gnat może paraliżować wrogie jednostki, co czyni go świetną jednostką defensywną, szczególnie w połączeniu z jednostkami zadającymi obrażenia. Jest jednak delikatny i łatwo go zniszczyć."
@@ -1254,22 +1254,22 @@
         "description": "Dowódca wsparcia, moc 12 m/s",
         "helptext": "Dowódca Support może korzystać z najbardziej ezoterycznych modułów i broni. Mimo że jego prędkość i wytrzymałość pozostawiają wiele do życzenia, to świetnie nadaje się do budowy z racji zwiększonej mocy i zasięgu konstrukcji."
     },
-    "corhurc2": {
+    "bomberriot": {
         "name": "Phoenix",
         "description": "Bombowiec z napalmem",
         "helptext": "Napalm zrzucany przez Phoenixa dziesiątkuje grupy lekkich jednostek i budynków."
     },
-    "armraven": {
+    "striderarty": {
         "name": "Catapult",
         "description": "Ciężki rakietowy mech artyleryjski",
         "helptext": "Catapult to mech artyleryjski zalewający okolicę falami ciężkich rakiet. Świetny przeciwko ufortyfikowanym pozycjom."
     },
-    "corbtrans": {
+    "gunshipheavytrans": {
         "name": "Vindicator",
         "description": "Uzbrojony transportowy statek powietrzny",
         "helptext": "Vindicator jest w stanie przenosić każdą jednostkę. Jego wytrzymałość i lekkie uzbrojenie pomagają mu dostarczać jednostki nawet w wirze walki."
     },
-    "corawac": {
+    "planescout": {
         "name": "Vulture",
         "description": "Samolot zwiadowczy z zakłócaczem",
         "helptext": "Vulture oferuje niezrównane możliwości zwiadowcze, zapewniając radar i sonar. Jest także wyposażony w zakłócacz."

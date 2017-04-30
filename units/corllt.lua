@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corllt]],
+  unitname                      = [[turretlaser]],
   name                          = [[Lotus]],
   description                   = [[Light Laser Tower]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corllt_aoplane.dds]],
-  buildPic                      = [[CORLLT.png]],
+  buildingGroundDecalType       = [[turretlaser_aoplane.dds]],
+  buildPic                      = [[turretlaser.png]],
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[30 90 30]],
@@ -41,7 +41,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[lotustest2.s3o]],
-  script                        = [[corllt.lua]],
+  script                        = [[turretlaser.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
 
   sfxtypes                      = {
@@ -144,4 +144,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corllt = unitDef })
+return lowerkeys({ turretlaser = unitDef })

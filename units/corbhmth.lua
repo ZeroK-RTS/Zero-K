@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corbhmth]],
+  unitname                      = [[staticarty]],
   name                          = [[Behemoth]],
   description                   = [[Plasma Artillery Battery - Requires 50 Power]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 8,
   buildingGroundDecalSizeY      = 8,
-  buildingGroundDecalType       = [[corbhmth_aoplane.dds]],
-  buildPic                      = [[CORBHMTH.png]],
+  buildingGroundDecalType       = [[staticarty_aoplane.dds]],
+  buildPic                      = [[staticarty.png]],
   category                      = [[SINK]],
   corpse                        = [[DEAD]],
 
@@ -38,9 +38,9 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[corbhmth.s3o]],
+  objectName                    = [[staticarty.s3o]],
   onoffable                     = false,
-  script                        = [[corbhmth.lua]],
+  script                        = [[staticarty.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
   
   sfxtypes               = {
@@ -116,7 +116,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[corbhmth_dead.s3o]],
+      object           = [[staticarty_dead.s3o]],
     },
 
 
@@ -131,4 +131,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corbhmth = unitDef })
+return lowerkeys({ staticarty = unitDef })

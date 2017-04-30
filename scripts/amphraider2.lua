@@ -50,7 +50,7 @@ local SIG_BOB = 32
 local spGetUnitRulesParam = Spring.GetUnitRulesParam
 local spGetGroundHeight = Spring.GetGroundHeight
 
-local wd = WeaponDefNames["amphraider2_watercannon"]
+local wd = WeaponDefNames["amphimpulse_watercannon"]
 
 local impulse = tonumber(wd.customParams.impulse)
 local maxProjectiles = 8

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[armbrawl]],
+  unitname            = [[gunshipheavyskirm]],
   name                = [[Brawler]],
   description         = [[Fire Support Gunship]],
   acceleration        = 0.2,
   brakeRate           = 0.16,
   buildCostMetal      = 760,
   builder             = false,
-  buildPic            = [[ARMBRAWL.png]],
+  buildPic            = [[gunshipheavyskirm.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -45,7 +45,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE SUB]],
   objectName          = [[stingray.s3o]],
-  script              = [[armbrawl.lua]],
+  script              = [[gunshipheavyskirm.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
 
   sfxtypes            = {
@@ -142,4 +142,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armbrawl = unitDef })
+return lowerkeys({ gunshipheavyskirm = unitDef })

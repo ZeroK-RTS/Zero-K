@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[armkam]],
+  unitname               = [[gunshipraid]],
   name                   = [[Banshee]],
   description            = [[Raider Gunship]],
   acceleration           = 0.18,
   brakeRate              = 0.16,
   buildCostMetal         = 220,
   builder                = false,
-  buildPic               = [[ARMKAM.png]],
+  buildPic               = [[gunshipraid.png]],
   canFly                 = true,
   canGuard               = true,
   canMove                = true,
@@ -40,7 +40,7 @@ unitDef = {
   minCloakDistance       = 75,
   noChaseCategory        = [[TERRAFORM SUB]],
   objectName             = [[banshee.s3o]],
-  script                 = [[armkam.lua]],
+  script                 = [[gunshipraid.lua]],
   selfDestructAs         = [[GUNSHIPEX]],
 
   sfxtypes               = {
@@ -142,4 +142,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armkam = unitDef })
+return lowerkeys({ gunshipraid = unitDef })

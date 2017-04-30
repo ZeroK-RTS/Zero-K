@@ -37,7 +37,7 @@ include "fixedwingTakeOff.lua"
 
 local ud = UnitDefs[unitDefID]
 local highBehaviour = {
-	wantedHeight = UnitDefNames["corshad"].wantedHeight*1.5,
+	wantedHeight = UnitDefNames["bomberprec"].wantedHeight*1.5,
 	maxPitch = ud.maxPitch,
 	maxBank = ud.maxBank,
 	turnRadius = ud.turnRadius,
@@ -57,8 +57,8 @@ local lowBehaviour = {
 local SIG_TAKEOFF = 1
 local SIG_CHANGE_FLY_HEIGHT = 2
 local SIG_SPEED_CONTROL = 4
-local takeoffHeight = UnitDefNames["corshad"].wantedHeight
-local fullHeight = UnitDefNames["corshad"].wantedHeight/1.5
+local takeoffHeight = UnitDefNames["bomberprec"].wantedHeight
+local fullHeight = UnitDefNames["bomberprec"].wantedHeight/1.5
 
 local minSpeedMult = 0.75
 

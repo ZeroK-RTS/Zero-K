@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armham]],
+  unitname               = [[cloakarty]],
   name                   = [[Hammer]],
   description            = [[Light Artillery Bot]],
   acceleration           = 0.25,
   brakeRate              = 0.75,
   buildCostMetal         = 130,
-  buildPic               = [[ARMHAM.png]],
+  buildPic               = [[cloakarty.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -132,4 +132,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armham = unitDef })
+return lowerkeys({ cloakarty = unitDef })

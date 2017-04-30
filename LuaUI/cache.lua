@@ -20,7 +20,7 @@ local MarkerAddPoint = Spring.MarkerAddPoint
 --end
 
 local spGetProjectileDefID = Spring.GetProjectileDefID
-local sniperWeaponDefID = WeaponDefNames.armsnipe_shockrifle.id
+local sniperWeaponDefID = WeaponDefNames.cloaksnipe_shockrifle.id
 local function FilterOutSniperBullets(projectiles)
 	local i = 1
 	local n = #projectiles

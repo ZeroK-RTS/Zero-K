@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armpw]],
+  unitname               = [[cloakraid]],
   name                   = [[Glaive]],
   description            = [[Light Raider Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.4,
   buildCostMetal         = 60,
-  buildPic               = [[armpw.png]],
+  buildPic               = [[cloakraid.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -40,7 +40,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SUB]],
   objectName             = [[spherebot.s3o]],
-  script                 = [[armpw.lua]],
+  script                 = [[cloakraid.lua]],
   selfDestructAs         = [[SMALL_UNITEX]],
 
   sfxtypes               = {
@@ -141,4 +141,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armpw = unitDef })
+return lowerkeys({ cloakraid = unitDef })

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[corsent]],
+  unitname               = [[tankaa]],
   name                   = [[Copperhead]],
   description            = [[Flak Anti-Air Tank]],
   acceleration           = 0.05952,
   brakeRate              = 0.14875,
   buildCostMetal         = 550,
   builder                = false,
-  buildPic               = [[corsent.png]],
+  buildPic               = [[tankaa.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName             = [[corsent.s3o]],
+  objectName             = [[tankaa.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
   
   sfxtypes               = {
@@ -126,7 +126,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[corsent_dead.s3o]],
+      object           = [[tankaa_dead.s3o]],
     },
 
 
@@ -141,4 +141,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corsent = unitDef })
+return lowerkeys({ tankaa = unitDef })

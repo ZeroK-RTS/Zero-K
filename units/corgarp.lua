@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[corgarp]],
+  unitname            = [[veharty]],
   name                = [[Wolverine]],
   description         = [[Artillery Minelayer Vehicle]],
   acceleration        = 0.0282,
   brakeRate           = 0.08,
   buildCostMetal      = 260,
   builder             = false,
-  buildPic            = [[corgarp.png]],
+  buildPic            = [[veharty.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -137,4 +137,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corgarp = unitDef })
+return lowerkeys({ veharty = unitDef })

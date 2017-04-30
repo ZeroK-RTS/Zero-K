@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corrl]],
+  unitname                      = [[turretmissile]],
   name                          = [[Defender]],
   description                   = [[Light Missile Tower]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[corrl_aoplane.dds]],
-  buildPic                      = [[CORRL.png]],
+  buildingGroundDecalType       = [[turretmissile_aoplane.dds]],
+  buildPic                      = [[turretmissile.png]],
   category                      = [[FLOAT TURRET CHEAP]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[24 70 24]],
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
   objectName                    = [[lmt2.s3o]],
-  script                        = [[corrl.lua]],
+  script                        = [[turretmissile.lua]],
   selfDestructAs                = [[BIG_UNITEX]],
 
   sfxtypes                      = {
@@ -146,4 +146,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corrl = unitDef })
+return lowerkeys({ turretmissile = unitDef })

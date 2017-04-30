@@ -65,10 +65,10 @@ groundFlashCorestor = {
   colormap   = { {0.9, 0.9, 0.0, 0.15},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.20},{0.9, 0.9, 0.0, 0.15}, },
   repeatEffect = true,
 }
-groundFlashArmestor = {
+groundFlashenergypylon = {
   life       = 50,
   size       = 80,
-  texture    = "bitmaps/GPL/Lups/gf_armestor.png",
+  texture    = "bitmaps/GPL/Lups/gf_energypylon.png",
   colormap   = { {0.9, 0.9, 0.0, 0.2},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.3},{0.9, 0.9, 0.0, 0.2}, },
   repeatEffect = true,
 }
@@ -94,7 +94,7 @@ corfusBursts = {
   count      = 17,
 }
 
-cafusBursts = {
+energysinguBursts = {
   life       = math.huge,
   pos        = {0,58,-5},
   rotSpeed   = 0.5,
@@ -111,7 +111,7 @@ cafusBursts = {
   quality    = 4, -- Ultra settings
 }
 
-corjamtBursts = {
+staticshieldBursts = {
   layer      = -35,
   life       = math.huge,
   piece      = "glow",
@@ -129,7 +129,7 @@ corjamtBursts = {
   noIconDraw = true,
   count      = 8,
 }
-corjamtBall = {
+staticshieldBall = {
 	piece = "glow", 
 	life = math.huge, 
 	size = 11, 
@@ -141,7 +141,7 @@ corjamtBall = {
 ----------------------------------------------------------------------------
 -- COLORSPHERES ------------------------------------------------------------
 ----------------------------------------------------------------------------
-cafusShieldSphere = {
+energysinguShieldSphere = {
   layer=-35,
   life=20,
   pos={0,58.9,-4.5},
@@ -191,7 +191,7 @@ commandShieldSphere = {
 ----------------------------------------------------------------------------
 -- LIGHT -------------------------------------------------------------------
 ----------------------------------------------------------------------------
-cafusCorona = {
+energysinguCorona = {
   pos         = {0,66,0},
   life        = math.huge,
   lifeSpread  = 0,
@@ -435,7 +435,7 @@ end
 -- OverDrive FXs -----------------------------------------------------------
 ----------------------------------------------------------------------------
 
-cormexGlow = {
+staticmexGlow = {
   layer       = -5,
   delay       = 0,
   pos         = {0,0,0},

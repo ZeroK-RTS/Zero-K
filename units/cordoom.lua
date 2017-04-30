@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[cordoom]],
+  unitname                      = [[turretheavy]],
   name                          = [[Doomsday Machine]],
   description                   = [[Medium Range Defense Fortress - Requires 50 Power]],
   acceleration                  = 0,
@@ -10,8 +10,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[cordoom_aoplane.dds]],
-  buildPic                      = [[CORDOOM.png]],
+  buildingGroundDecalType       = [[turretheavy_aoplane.dds]],
+  buildPic                      = [[turretheavy.png]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 100 45]],
@@ -50,7 +50,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[DDM.s3o]],
   onoffable                     = true,
-  script                        = [[cordoom.lua]],
+  script                        = [[turretheavy.lua]],
   selfDestructAs                = [[ESTOR_BUILDING]],
 
   sfxtypes            = {
@@ -199,4 +199,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ cordoom = unitDef })
+return lowerkeys({ turretheavy = unitDef })

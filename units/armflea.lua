@@ -1,11 +1,11 @@
 unitDef = {
-  unitname            = [[armflea]],
+  unitname            = [[spiderscout]],
   name                = [[Flea]],
   description         = [[Ultralight Scout Spider (Burrows)]],
   acceleration        = 0.7,
   brakeRate           = 2.1,
   buildCostMetal      = 20,
-  buildPic            = [[ARMFLEA.png]],
+  buildPic            = [[spiderscout.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -38,7 +38,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[arm_flea.s3o]],
   pushResistant       = 0,
-  script	      			= [[armflea.lua]],
+  script	      			= [[spiderscout.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
 
   sfxtypes            = {
@@ -128,4 +128,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armflea = unitDef })
+return lowerkeys({ spiderscout = unitDef })

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[core_spectre]],
+  unitname               = [[shieldshield]],
   name                   = [[Aspis]],
   description            = [[Area Shield Walker]],
   acceleration           = 0.25,
   activateWhenBuilt      = true,
   brakeRate              = 0.75,
   buildCostMetal         = 600,
-  buildPic               = [[core_spectre.png]],
+  buildPic               = [[shieldshield.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -24,7 +24,7 @@ unitDef = {
     helptext_de    = [[Der Aspis bietet den umliegenden, alliierten Einheiten durch seinen energetischen Schild Schutz vor Angriffen. Doch sobald Feinde in den Schild kommen oder sich die Energie dem Ende neigt, verfällt dieser Schutz und deine Einheiten stehen dem Gegner vielleicht schutzlos gegenüber. Mehrere Aspis verbinden sich untereinander zu einem großen Schild, was den Vorteil hat, dass Angriffe besser absorbiert werden können.]],
     modelradius    = [[17]],
     
-    morphto = [[corjamt]],
+    morphto = [[staticshield]],
     morphtime = 30,
 	
 	priority_misc = 1, -- Medium
@@ -48,7 +48,7 @@ unitDef = {
   objectName             = [[m-8.s3o]],
   onoffable              = true,
   pushResistant          = 0,
-  script                 = [[core_spectre.lua]],
+  script                 = [[shieldshield.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
   sightDistance          = 300,
   trackOffset            = 0,
@@ -117,4 +117,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ core_spectre = unitDef })
+return lowerkeys({ shieldshield = unitDef })

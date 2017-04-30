@@ -8,13 +8,13 @@ unitDef = {
   builder          = true,
 
   buildoptions     = {
-    [[corch]],
-    [[corsh]],
+    [[hovercon]],
+    [[hoverraid]],
     [[hoverskirm]],
     [[hoverassault]],
 	[[hoverdepthcharge]],
 	[[hoverriot]],
-    [[armmanni]],
+    [[hoverarty]],
     [[hoveraa]],
   },
 

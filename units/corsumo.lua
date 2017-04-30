@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[corsumo]],
+  unitname            = [[jumpsumo]],
   name                = [[Sumo]],
   description         = [[Heavy Riot Jumper - On to Repulse, Off to Attract]],
   acceleration        = 0.1,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.3,
   buildCostMetal      = 1700,
   builder             = false,
-  buildPic            = [[CORSUMO.png]],
+  buildPic            = [[jumpsumo.png]],
   canGuard            = true,
   canMove             = true,
   canPatrol           = true,
@@ -55,7 +55,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[m-9.s3o]],
   onoffable           = true,
-  script              = [[corsumo.lua]],
+  script              = [[jumpsumo.lua]],
   selfDestructAs      = [[BIG_UNIT]],
 
   sfxtypes            = {
@@ -432,4 +432,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corsumo = unitDef })
+return lowerkeys({ jumpsumo = unitDef })

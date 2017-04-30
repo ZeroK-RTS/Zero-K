@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armsolar]],
+  unitname                      = [[energysolar]],
   name                          = [[Solar Collector]],
   description                   = [[Small Powerplant (+2)]],
   acceleration                  = 0,
@@ -11,7 +11,7 @@ unitDef = {
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
   buildingGroundDecalType       = [[arm_solar_ground.dds]],
-  buildPic                      = [[ARMSOLAR.png]],
+  buildPic                      = [[energysolar.png]],
   category                      = [[SINK UNARMED STUPIDTARGET SOLAR]],
   corpse                        = [[DEAD]],
 
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire                    = false,
   objectName                    = [[arm_solar.s3o]],
   onoffable                     = true,
-  script                        = [[armsolar.lua]],
+  script                        = [[energysolar.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
   sightDistance                 = 273,
   turnRate                      = 0,
@@ -71,4 +71,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armsolar = unitDef })
+return lowerkeys({ energysolar = unitDef })

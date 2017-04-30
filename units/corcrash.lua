@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[corcrash]],
+  unitname               = [[shieldaa]],
   name                   = [[Vandal]],
   description            = [[Anti-Air Bot]],
   acceleration           = 0.45,
   brakeRate              = 1.35,
   buildCostMetal         = 90,
-  buildPic               = [[CORCRASH.png]],
+  buildPic               = [[shieldaa.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -39,7 +39,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[crasher.s3o]],
-  script                 = [[corcrash.lua]],
+  script                 = [[shieldaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -139,4 +139,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corcrash = unitDef })
+return lowerkeys({ shieldaa = unitDef })

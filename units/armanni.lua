@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armanni]],
+  unitname                      = [[turretantiheavy]],
   name                          = [[Annihilator]],
   description                   = [[Tachyon Projector - Requires 50 Power]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 6,
   buildingGroundDecalSizeY      = 6,
-  buildingGroundDecalType       = [[armanni_aoplane.dds]],
-  buildPic                      = [[ARMANNI.png]],
+  buildingGroundDecalType       = [[turretantiheavy_aoplane.dds]],
+  buildPic                      = [[turretantiheavy.png]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   --collisionVolumeScales         = [[75 100 75]],
@@ -50,7 +50,7 @@ unitDef = {
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[arm_annihilator.s3o]],
   onoffable                     = true,
-  script                        = [[armanni.lua]],
+  script                        = [[turretantiheavy.lua]],
   explodeAs                     = [[ESTOR_BUILDING]],
   sightDistance                 = 780,
   useBuildingGroundDecal        = true,
@@ -140,4 +140,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armanni = unitDef })
+return lowerkeys({ turretantiheavy = unitDef })

@@ -17,7 +17,7 @@ RADIUS_CHECK_POS_FOR_ENEMY_DEF = 650	-- radius to check for enemy defences in ra
 CACHE_POS_THREATENED_TTL = 1800	-- how long to keep the cache
 MIN_RANGE_TO_THREATEN_SPOT = 250	-- don't let any random flea be considered a threat
 
-waypointTester = UnitDefNames['cafus'].id
+waypointTester = UnitDefNames['energysingu'].id
 
 
 conJobNames = {

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armpb]],
+  unitname                      = [[turretgauss]],
   name                          = [[Gauss]],
   description                   = [[Gauss Turret, 20 health/s when closed]],
   acceleration                  = 0,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armpb_aoplane.dds]],
-  buildPic                      = [[ARMPB.png]],
+  buildingGroundDecalType       = [[turretgauss_aoplane.dds]],
+  buildPic                      = [[turretgauss.png]],
   canMove                       = false,
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 20 0]],
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[gauss.dae]],
-  script                 		= [[armpb.lua]],
+  script                 		= [[turretgauss.lua]],
   selfDestructAs                = [[SMALL_BUILDINGEX]],
  
   sfxtypes               = {
@@ -143,4 +143,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armpb = unitDef })
+return lowerkeys({ turretgauss = unitDef })

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armartic]],
+  unitname                      = [[turretemp]],
   name                          = [[Faraday]],
   description                   = [[EMP Turret]],
   buildCostMetal                = 200,
@@ -7,8 +7,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 4,
   buildingGroundDecalSizeY      = 4,
-  buildingGroundDecalType       = [[armartic_aoplane.dds]],
-  buildPic                      = [[armartic.png]],
+  buildingGroundDecalType       = [[turretemp_aoplane.dds]],
+  buildPic                      = [[turretemp.png]],
   category                      = [[SINK TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[32 75 32]],
@@ -37,8 +37,8 @@ unitDef = {
   maxWaterDepth                 = 0,
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[ARMARTIC]],
-  script                        = [[armartic.lua]],
+  objectName                    = [[armartic]],
+  script                        = [[turretemp.lua]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
 
   sfxtypes                      = {
@@ -114,7 +114,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[armartic_dead.s3o]],
+      object           = [[turretemp_dead.s3o]],
     },
 
     HEAP  = {
@@ -128,4 +128,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armartic = unitDef })
+return lowerkeys({ turretemp = unitDef })

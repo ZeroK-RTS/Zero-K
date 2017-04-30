@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[corraid]],
+  unitname               = [[vehassault]],
   name                   = [[Ravager]],
   description            = [[Assault Vehicle]],
   acceleration           = 0.027,
   brakeRate              = 0.0385,
   buildCostMetal         = 250,
   builder                = false,
-  buildPic               = [[corraid.png]],
+  buildPic               = [[vehassault.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -42,8 +42,8 @@ unitDef = {
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[CORRAID.s3o]],
-  script		 = [[corraid.cob]],
+  objectName             = [[vehassault.s3o]],
+  script		 = [[vehassault.cob]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -117,7 +117,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[corraid_dead.s3o]],
+      object           = [[vehassault_dead.s3o]],
     },
 
 
@@ -132,4 +132,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corraid = unitDef })
+return lowerkeys({ vehassault = unitDef })

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[armraven]],
+  unitname               = [[striderarty]],
   name                   = [[Catapult]],
   description            = [[Heavy Saturation Artillery Strider]],
   acceleration           = 0.1092,
   brakeRate              = 0.1942,
   buildCostMetal         = 3500,
   builder                = false,
-  buildPic               = [[ARMRAVEN.png]],
+  buildPic               = [[striderarty.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -41,7 +41,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName             = [[catapult.s3o]],
-  script		 = [[armraven.cob]],
+  script		 = [[striderarty.cob]],
   selfDestructAs         = [[ATOMIC_BLASTSML]],
   sightDistance          = 660,
   trackOffset            = 0,
@@ -143,4 +143,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armraven = unitDef })
+return lowerkeys({ striderarty = unitDef })

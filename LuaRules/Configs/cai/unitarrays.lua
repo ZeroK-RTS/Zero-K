@@ -1,42 +1,42 @@
 local raider = {
-	"armpw",
+	"cloakraid",
 	"cloakheavyraid",
 	"corak",
 	"armflash",
-	"corfav",
-	"corgator",
+	"vehscout",
+	"vehraid",
 	"amphraid",
 	
-	"corpyro",
+	"jumpraid",
 	"tankheavyraid",
 	"tankraid",
 	
 	"armsh",
-	"corsh",
+	"hoverraid",
 	
 	"chicken",
 	"chicken_leaper",
 }
 
 local assault = {
-	"corthud",
-	"corraid",
+	"shieldassault",
+	"vehassault",
 	
-	"armzeus",
-	--"armcrabe",
+	"cloakassault",
+	--"spidercrabe",
 	"spiderassault",
-	"corcan",
-	--"corsumo",
+	"jumpassault",
+	--"jumpsumo",
 	"armbull",
-	"correap",
-	"corgol",
+	"tankassault",
+	"tankheavyassault",
 	"amphassault",
 	
 	"armanac",
 	"hoverassault",
 	
-	--"armbanth",
-	--"armorco",
+	--"striderbantha",
+	--"striderdetriment",
 	--"corkrog",
 	
 	--"chickena",
@@ -45,65 +45,65 @@ local assault = {
 }
 
 local skirm = {
-	"armrock",
-	"corstorm",
+	"cloakskirm",
+	"shieldskirm",
 	"armjanus",
 	"armstump",
 	"amphfloater",
 	
-	"armsptk",
-	"armsnipe",
+	"spiderskirm",
+	"cloaksnipe",
 	"cormort",
 	"slowmort",
 	"cormortgold",
-	"armmanni",
+	"hoverarty",
 	
 	"hoverskirm",
 	
 	"chickens",
 	"chicken_sporeshooter",
-	--"scorpion",
+	--"striderscorpion",
 }
 
 local jumper = { -- uses jump for offense. IE do not put commander or AA here.
-	"corcan",
-	"corsumo",
+	"jumpassault",
+	"jumpsumo",
 }
 
 local riot = {
 	"armwar",
-	"cormak",
-	"corlevlr",
+	"shieldriot",
+	"vehriot",
 	"spiderriot",
 	"amphimpulse",
 	"amphriot",
 	
-	"arm_venom",
+	"spideremp",
 	"tawf003",
 	"tankriot",
 
 	"hoverriot",
 	
 	"armraz",
-	"dante",
+	"striderdante",
 	
 	"chickenwurm",
 }
 
 local arty = {
-	"armham",
+	"cloakarty",
 	"punisher",
 	"jumparty",
 	"tawf013",
-	"corgarp",
+	"veharty",
 	
-	"armmerl",
-	--"armmanni",
-	"cormart",
+	"vehheavyarty",
+	--"hoverarty",
+	"tankarty",
 	"tankheavyarty",
 	
 	"armshock",
-	"armraven",
+	"striderarty",
 	
 	"hoverartillery",
 	
@@ -113,12 +113,12 @@ local arty = {
 
 local counteredByAssaults = {
 	"jumpscout",
-	"cormist",
+	"vehsupport",
 }
 
 local prioritySos = {
-	"armfus",
-	"cafus",
+	"energyfusion",
+	"energysingu",
 	"factoryshield",
     "factorycloak",
     "factoryveh",

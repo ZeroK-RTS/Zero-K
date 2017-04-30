@@ -140,60 +140,60 @@ defaults = {border=0.05, angle=45, rot="right", clamp=-10000, scale=1.5, empty=f
 --// per unitdef settings
 unitConfigs = {
   
-  [UnitDefNames.corrad.id] = {
+  [UnitDefNames.staticradar.id] = {
     scale = 3,
     rot   = 200,
     clamp = 10,
   },
-  [UnitDefNames.armjamt.id] = {
+  [UnitDefNames.staticjammer.id] = {
     rot = -45,
   },
-  [UnitDefNames.corsilo.id] = {
+  [UnitDefNames.staticnuke.id] = {
     clamp = 0,
   },
-  [UnitDefNames.corsh.id] = {
+  [UnitDefNames.hoverraid.id] = {
     clamp = 0,
   },
-  [UnitDefNames.corrl.id] = {
+  [UnitDefNames.turretmissile.id] = {
     clamp = 2,
   },
-  [UnitDefNames.corhlt.id] = {
+  [UnitDefNames.turretheavylaser.id] = {
     clamp = 2,
   },
-  [UnitDefNames.corfav.id] = {
+  [UnitDefNames.vehscout.id] = {
     border = 0.156,
   },
-  [UnitDefNames.blastwing.id] = {
+  [UnitDefNames.gunshipbomb.id] = {
     border = 0.156,
   },
-  [UnitDefNames.bladew.id] = {
+  [UnitDefNames.gunshipemp.id] = {
     border = 0.125,
   },
-  [UnitDefNames.corgator.id] = {
+  [UnitDefNames.vehraid.id] = {
     border = 0.125,
   },
-  [UnitDefNames.armflea.id] = {
+  [UnitDefNames.spiderscout.id] = {
     border = 0.125,
   },
 
 
-  [UnitDefNames.corsumo.id] = {
+  [UnitDefNames.jumpsumo.id] = {
     unfold = true,
   },
-  [UnitDefNames.corpyro.id] = {
+  [UnitDefNames.jumpraid.id] = {
     unfold = true,
   },
-  [UnitDefNames.corstorm.id] = {
+  [UnitDefNames.shieldskirm.id] = {
     unfold = true,
   },
-  [UnitDefNames.core_spectre.id] = {
+  [UnitDefNames.shieldshield.id] = {
     unfold = true,
   },
-  [UnitDefNames.corjamt.id] = {
+  [UnitDefNames.staticshield.id] = {
     unfold = true,
   },
   	
-  [UnitDefNames.cormart.id] = {
+  [UnitDefNames.tankarty.id] = {
     unfold = true,
     attack = true,
     shotangle = 45,
@@ -204,29 +204,29 @@ unitConfigs = {
     attack = true,
     wait   = 120,
    },  
-  [UnitDefNames.armpb.id] = {
+  [UnitDefNames.turretgauss.id] = {
     unfold = true,
     attack = true,
     wait   = 50,
   },
-  [UnitDefNames.armspy.id] = {
+  [UnitDefNames.spiderantiheavy.id] = {
     unfold = true,
   },
-  [UnitDefNames.armanni.id] = {
+  [UnitDefNames.turretantiheavy.id] = {
     unfold = true,
   },
-  [UnitDefNames.armarad.id] = {
+  [UnitDefNames.staticheavyradar.id] = {
     unfold = true,
     wait   = 225,
   },
-  [UnitDefNames.armsolar.id] = {
+  [UnitDefNames.energysolar.id] = {
     unfold = true,
   },
-  [UnitDefNames.armsnipe.id] = {
+  [UnitDefNames.cloaksnipe.id] = {
 --    unfold = true,
 --    attack = true,
   },
-  [UnitDefNames.armzeus.id] = {
+  [UnitDefNames.cloakassault.id] = {
     unfold = true,
     attack = true,
   },
@@ -237,15 +237,15 @@ unitConfigs = {
     unfold = true,
     wait   = 100,
   },
-  [UnitDefNames.cormex.id] = {
+  [UnitDefNames.staticmex.id] = {
     clamp  = 0,
     unfold = true,
     wait   = 600,
   },
-  [UnitDefNames.cordoom.id] = {
+  [UnitDefNames.turretheavy.id] = {
     unfold = true,
   },
-  [UnitDefNames.corcrw.id] = {
+  [UnitDefNames.gunshipkrow.id] = {
     unfold = true,
   },
   [UnitDefNames.chickenf.id] = {
@@ -270,11 +270,11 @@ unitConfigs = {
     angle  = 10,
     unfold = false,
   },
-  [UnitDefNames.armorco.id] = {
+  [UnitDefNames.striderdetriment.id] = {
     rot    = 20,
     angle  = 10,
   },
-  [UnitDefNames.armbanth.id] = {
+  [UnitDefNames.striderbantha.id] = {
     rot    = 28,
     angle  = 10,
     unfold = true,
@@ -284,7 +284,7 @@ unitConfigs = {
     angle  = 10,
     border = 0.09,
   },
-  [UnitDefNames.dante.id] = {
+  [UnitDefNames.striderdante.id] = {
     rot    = 28,
     angle  = 10,
   },
@@ -327,7 +327,7 @@ unitConfigs = {
     unfold  = true,
     wait = 60,
   },
-  [UnitDefNames.corch.id] = {
+  [UnitDefNames.hovercon.id] = {
     unfold  = true,
     wait = 60,
   },

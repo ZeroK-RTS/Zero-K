@@ -1,11 +1,11 @@
 local menu_armcom = include("Configs/marking_menu_menu_armcom.lua")
-local menu_armcsa = include("Configs/marking_menu_menu_armcsa.lua")
+local menu_athena = include("Configs/marking_menu_menu_athena.lua")
 local menu_striderhub = include("Configs/marking_menu_menu_striderhub.lua")
 local menu_chickenbroodqueen = include("Configs/marking_menu_menu_chickenbroodqueen.lua")
 
 
 local menu_use = {
-  armcsa = menu_armcsa,
+  athena = menu_athena,
   striderhub = menu_striderhub,
   chickenbroodqueen = menu_chickenbroodqueen,
 }

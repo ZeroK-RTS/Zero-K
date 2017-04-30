@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[corsilo]],
+  unitname                      = [[staticnuke]],
   name                          = [[Silencer]],
   description                   = [[Strategic Nuclear Launcher, Drains 18 m/s, 3 minute stockpile]],
   acceleration                  = 0,
@@ -9,8 +9,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 10,
   buildingGroundDecalSizeY      = 10,
-  buildingGroundDecalType       = [[corsilo_aoplane.dds]],
-  buildPic                      = [[CORSILO.png]],
+  buildingGroundDecalType       = [[staticnuke_aoplane.dds]],
+  buildPic                      = [[staticnuke.png]],
   category                      = [[SINK UNARMED]],
   corpse                        = [[DEAD]],
 
@@ -38,7 +38,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[Silencer.s3o]],
-  script                        = [[corsilo.lua]],
+  script                        = [[staticnuke.lua]],
   selfDestructAs                = [[ATOMIC_BLAST]],
   sightDistance                 = 660,
   turnRate                      = 0,
@@ -127,4 +127,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ corsilo = unitDef })
+return lowerkeys({ staticnuke = unitDef })

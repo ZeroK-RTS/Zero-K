@@ -292,7 +292,7 @@ local cegs = {
     },
   },
   
-  ["napalm_blastwing"] = {
+  ["napalm_gunshipbomb"] = {
     usedefaultexplosions = false,
     groundflash = {
       flashalpha         = 1,

@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armdeva]],
+  unitname                      = [[turretriot]],
   name                          = [[Stardust]],
   description                   = [[Anti-Swarm Turret]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armdeva_aoplane.dds]],
-  buildPic                      = [[armdeva.png]],
+  buildingGroundDecalType       = [[turretriot_aoplane.dds]],
+  buildPic                      = [[turretriot.png]],
   category                      = [[FLOAT TURRET]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[45 45 45]],
@@ -37,7 +37,7 @@ unitDef = {
   minCloakDistance              = 150,
   noChaseCategory               = [[FIXEDWING LAND SHIP SWIM GUNSHIP SUB HOVER]],
   objectName                    = [[afury.s3o]],
-  script                        = "armdeva.lua",
+  script                        = "turretriot.lua",
   selfDestructAs                = [[LARGE_BUILDINGEX]],
 
   sfxtypes                      = {
@@ -56,7 +56,7 @@ unitDef = {
   weapons                       = {
 
     {
-      def                = [[ARMDEVA_WEAPON]],
+      def                = [[turretriot_WEAPON]],
       badTargetCategory  = [[FIXEDWING]],
       onlyTargetCategory = [[FIXEDWING LAND SINK TURRET SHIP SWIM FLOAT GUNSHIP HOVER]],
       mainDir            = [[0 1 0]],
@@ -67,7 +67,7 @@ unitDef = {
 
   weaponDefs                    = {
 
-    ARMDEVA_WEAPON = {
+    turretriot_WEAPON = {
       name                    = [[Pulse Autocannon]],
       accuracy                = 2300,
       alphaDecay              = 0.7,
@@ -131,4 +131,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armdeva = unitDef })
+return lowerkeys({ turretriot = unitDef })

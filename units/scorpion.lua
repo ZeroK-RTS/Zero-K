@@ -1,12 +1,12 @@
 unitDef = {
-  unitname               = [[scorpion]],
+  unitname               = [[striderscorpion]],
   name                   = [[Scorpion]],
   description            = [[Cloaked Infiltration Strider]],
   acceleration           = 0.26,
   brakeRate              = 0.78,
   buildCostMetal         = 3000,
   builder                = false,
-  buildPic               = [[scorpion.png]],
+  buildPic               = [[striderscorpion.png]],
   canGuard               = true,
   canManualFire			 = true,
   canMove                = true,
@@ -37,7 +37,7 @@ unitDef = {
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName             = [[scorpion.s3o]],
-  script				 = [[scorpion.lua]],
+  script				 = [[striderscorpion.lua]],
   selfDestructAs         = [[CRAWL_BLASTSML]],
 
   sfxtypes               = {
@@ -291,4 +291,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ scorpion = unitDef })
+return lowerkeys({ striderscorpion = unitDef })

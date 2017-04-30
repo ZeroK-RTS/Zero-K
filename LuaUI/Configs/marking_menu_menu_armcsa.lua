@@ -1,13 +1,13 @@
-local menu_armcsa = {
+local menu_athena = { -- TODO_RENAME_FILE
 	items = {
 	  {
 		angle = -90,
-		unit = "armrectr",
+		unit = "cloakcon",
 		label = "Bots",
 		items = {
 		  {
 			angle= -45,
-			unit = "armflea",
+			unit = "spiderscout",
 		  },
 		  { 
 			angle = -135,
@@ -19,22 +19,22 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = 0,
-			unit = "armjeth",
+			unit = "cloakaa",
 		  },
 		  { 
 			angle = 45,
-			unit = "armzeus",
+			unit = "cloakassault",
 		  },
 		}
 	  },
 	{
 		angle = 0,
-		unit = "armsptk",
+		unit = "spiderskirm",
 		label = "Walkers",
 		items = {
 		  { 
 			angle = -90,
-			unit = "armsnipe",
+			unit = "cloaksnipe",
 		  },
 		  { 
 			angle = 135,
@@ -42,11 +42,11 @@ local menu_armcsa = {
 		  },
 		  { 
 			angle = -135,
-			unit = "core_spectre",
+			unit = "shieldshield",
 		  },	
 		  {
 			angle = -45,
-			unit = "armspy"
+			unit = "spiderantiheavy"
 		  },
 		  { 
 			angle = 90,
@@ -60,20 +60,20 @@ local menu_armcsa = {
 	  },
 	  {
 		angle = 90,
-		unit = "corrad",
+		unit = "staticradar",
 		label = "Support",
 		items = {
 		  {
 			angle = 45,
-			unit = "armarad"
+			unit = "staticheavyradar"
 		  },
 		  {
 			angle = 135,
-			unit = "armjamt"
+			unit = "staticjammer"
 		  },		  
 		  {
 			angle = 180,
-			unit = "armnanotc"
+			unit = "staticcon"
 		  },		  
 		}
 	  },
@@ -84,11 +84,11 @@ local menu_armcsa = {
 		items = {
 		  {
 			angle = 90,
-			unit = "armmerl"
+			unit = "vehheavyarty"
 		  },
 		  {
 			angle = 135,
-			unit = "armcomdgun"
+			unit = "striderantiheavy"
 		  },		  
 		  {
 			angle = -90,
@@ -99,5 +99,5 @@ local menu_armcsa = {
   }
 }
 
-return menu_armcsa
+return menu_athena
 

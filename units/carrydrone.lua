@@ -1,5 +1,5 @@
 unitDef = {
-  unitname            = [[carrydrone]],
+  unitname            = [[dronecarry]],
   name                = [[Gull]],
   description         = [[Carrier Drone]],
   acceleration        = 0.3,
@@ -7,7 +7,7 @@ unitDef = {
   brakeRate           = 0.24,
   buildCostMetal      = 75,
   builder             = false,
-  buildPic            = [[carrydrone.png]],
+  buildPic            = [[dronecarry.png]],
   canBeAssisted       = false,
   canFly              = true,
   canGuard            = true,
@@ -34,7 +34,7 @@ unitDef = {
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
   objectName          = [[carrydrone.s3o]],
   reclaimable         = false,
-  script              = [[carrydrone.lua]],
+  script              = [[dronecarry.lua]],
   selfDestructAs      = [[TINY_BUILDINGEX]],
   
   customParams        = {
@@ -116,4 +116,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ carrydrone = unitDef })
+return lowerkeys({ dronecarry = unitDef })

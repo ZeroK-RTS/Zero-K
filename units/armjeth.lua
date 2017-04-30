@@ -1,11 +1,11 @@
 unitDef = {
-  unitname               = [[armjeth]],
+  unitname               = [[cloakaa]],
   name                   = [[Gremlin]],
   description            = [[Cloaked Anti-Air Bot]],
   acceleration           = 0.5,
   brakeRate              = 0.32,
   buildCostMetal         = 150,
-  buildPic               = [[ARMJETH.png]],
+  buildPic               = [[cloakaa.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -43,7 +43,7 @@ unitDef = {
   moveState              = 0,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SWIM FLOAT SUB HOVER]],
   objectName             = [[spherejeth.s3o]],
-	script		             = [[armjeth.lua]],
+	script		             = [[cloakaa.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -142,4 +142,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armjeth = unitDef })
+return lowerkeys({ cloakaa = unitDef })

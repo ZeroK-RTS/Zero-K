@@ -110,7 +110,7 @@ local FACTORY_ORDER = 3
 local CONSTRUCTOR_BUTTON_ID = "cons"
 
 local exceptionList = {
-	armasp = true,
+	staticrearm = true,
 	reef = true,
 }
 
@@ -1646,7 +1646,7 @@ function widget:UnitFinished(unitID, unitDefID, unitTeam)
 		end
 	end
 	local unitName = UnitDefs[unitDefID].name
-	if (unitName == "corshad") then
+	if (unitName == "bomberprec") then
 		setBomberReadyStatus(unitID)
 	end
 end
@@ -1692,7 +1692,7 @@ function widget:UnitIdle(unitID, unitDefID, unitTeam)
 		wantUpdateCons = true
 	end
 	local unitName = UnitDefs[unitDefID].name
-	if (unitName == "corshad") then
+	if (unitName == "bomberprec") then
 		setBomberReadyStatus(unitID)
 	end
 end
@@ -1718,7 +1718,7 @@ function widget:UnitCommand(unitID, unitDefID, unitTeam, cmdID, cmdOpts, cmdPara
 	end
 
 	local unitName = UnitDefs[unitDefID].name
-	if (unitName == "corshad") then
+	if (unitName == "bomberprec") then
 		setBomberReadyStatus(unitID)
 	end
 end

@@ -1,12 +1,12 @@
 unitDef = {
-  unitname            = [[blackdawn]],
+  unitname            = [[gunshipassault]],
   name                = [[Black Dawn]],
   description         = [[Heavy Raider/Assault Gunship]],
   acceleration        = 0.135,
   brakeRate           = 0.108,
   buildCostMetal      = 900,
   builder             = false,
-  buildPic            = [[BLACKDAWN.png]],
+  buildPic            = [[gunshipassault.png]],
   canFly              = true,
   canGuard            = true,
   canMove             = true,
@@ -42,7 +42,7 @@ unitDef = {
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE GUNSHIP SUB]],
   objectName          = [[Black_Dawn.s3o]],
-  script              = [[blackdawn.lua]],
+  script              = [[gunshipassault.lua]],
   selfDestructAs      = [[GUNSHIPEX]],
   sightDistance       = 585,
   turnRate            = 849,
@@ -138,4 +138,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ blackdawn = unitDef })
+return lowerkeys({ gunshipassault = unitDef })

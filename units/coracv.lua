@@ -1,5 +1,5 @@
 unitDef = {
-  unitname               = [[coracv]],
+  unitname               = [[tankcon]],
   name                   = [[Welder]],
   description            = [[Armed Construction Tank, Builds at 7.5 m/s]],
   acceleration           = 0.066,
@@ -11,7 +11,7 @@ unitDef = {
   buildoptions           = {
   },
 
-  buildPic               = [[coracv.png]],
+  buildPic               = [[tankcon.png]],
   canGuard               = true,
   canMove                = true,
   canPatrol              = true,
@@ -147,4 +147,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ coracv = unitDef })
+return lowerkeys({ tankcon = unitDef })

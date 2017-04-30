@@ -127,7 +127,7 @@ local velocityAddingCONSTANTg=50 --add or remove command lenght (default = 50 el
 --Weapon Reload and Shield constant:
 local reloadableWeaponCriteriaG = 0.5 --second at which reload time is considered high enough to be a "reload-able". eg: 0.5second
 local criticalShieldLevelG = 0.5 --percent at which shield is considered low and should activate avoidance. eg: 50%
-local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate (note: overriden by 1/4 of weapon's reload time if its bigger). eg: 0.9 second before finish (or 7 second for armspy)
+local minimumRemainingReloadTimeG = 0.9 --seconds before actual reloading finish which avoidance should de-activate (note: overriden by 1/4 of weapon's reload time if its bigger). eg: 0.9 second before finish (or 7 second for spiderantiheavy)
 local thresholdForArtyG = 459 --elmo (weapon range) before unit is considered an arty. Arty will never set enemy as target and will always avoid. default: 459elmo (1 elmo smaller than Rocko range)
 local maximumMeleeRangeG = 101 --elmo (weapon range) before unit is considered a melee. Melee will target enemy and do not avoid at halfTargetBoxSize_g[1]. default: 101elmo (1 elmo bigger than Sycthe range)
 local secondPerGameFrameG = 1/30 --engine depended second-per-frame (for calculating remaining reload time). eg: 0.0333 second-per-frame or 0.5sec/15frame

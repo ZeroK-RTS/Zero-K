@@ -1,5 +1,5 @@
 unitDef = {
-  unitname                      = [[armestor]],
+  unitname                      = [[energypylon]],
   name                          = [[Energy Pylon]],
   description                   = [[Extends overdrive grid]],
   activateWhenBuilt             = true,
@@ -8,8 +8,8 @@ unitDef = {
   buildingGroundDecalDecaySpeed = 30,
   buildingGroundDecalSizeX      = 5,
   buildingGroundDecalSizeY      = 5,
-  buildingGroundDecalType       = [[armestor_aoplane.dds]],
-  buildPic                      = [[ARMESTOR.png]],
+  buildingGroundDecalType       = [[energypylon_aoplane.dds]],
+  buildPic                      = [[energypylon.png]],
   category                      = [[SINK UNARMED]],
   collisionVolumeOffsets        = [[0 0 0]],
   collisionVolumeScales         = [[48 48 48]],
@@ -40,7 +40,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   objectName                    = [[armestor.s3o]],
-  script                        = "armestor.lua",
+  script                        = "energypylon.lua",
   selfDestructAs                = [[ESTOR_BUILDINGEX]],
   sightDistance                 = 273,
   useBuildingGroundDecal        = true,
@@ -53,7 +53,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[ARMESTOR_DEAD.s3o]],
+      object           = [[energypylon_DEAD.s3o]],
     },
 
     HEAP  = {
@@ -67,4 +67,4 @@ unitDef = {
 
 }
 
-return lowerkeys({ armestor = unitDef })
+return lowerkeys({ energypylon = unitDef })
