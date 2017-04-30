@@ -40,7 +40,7 @@ unitDef = {
   movementClass          = [[TANK2]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[vehraid_512.s3o]],
+  objectName             = [[corgator_512.s3o]],
   script                 = [[vehraid.lua]],
   selfDestructAs         = [[BIG_UNITEX]],
 

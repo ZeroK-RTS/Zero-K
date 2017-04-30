@@ -53,7 +53,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[energypylon_DEAD.s3o]],
+      object           = [[ARMESTOR_DEAD.s3o]],
     },
 
     HEAP  = {

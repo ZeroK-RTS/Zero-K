@@ -42,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM LAND SINK TURRET SHIP SATELLITE SWIM FLOAT SUB HOVER]],
-  objectName             = [[tankaa.s3o]],
+  objectName             = [[corsent.s3o]],
   selfDestructAs         = [[BIG_UNITEX]],
   
   sfxtypes               = {
@@ -126,7 +126,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[tankaa_dead.s3o]],
+      object           = [[corsent_dead.s3o]],
     },
 
 

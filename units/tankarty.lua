@@ -109,7 +109,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[tankarty_dead.s3o]],
+      object           = [[cormart_dead.s3o]],
     },
 
     

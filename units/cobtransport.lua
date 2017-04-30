@@ -45,7 +45,7 @@ unitDef = {
   minCloakDistance    = 75,
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM SATELLITE FIXEDWING GUNSHIP HOVER SHIP SWIM SUB LAND FLOAT SINK TURRET]],
-  objectName          = [[gunshiptrans.s3o]],
+  objectName          = [[corvalk.s3o]],
   releaseHeld         = true,
   selfDestructAs      = [[GUNSHIPEX]],
 

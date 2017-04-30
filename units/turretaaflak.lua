@@ -41,7 +41,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SINK TURRET SHIP SATELLITE SWIM GUNSHIP FLOAT SUB HOVER]],
-  objectName                    = [[turretaaflak.s3o]],
+  objectName                    = [[corflak.s3o]],
   selfDestructAs                = [[MEDIUM_BUILDINGEX]],
   
   sfxtypes               = {
@@ -120,7 +120,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[turretaaflak_dead.s3o]],
+      object           = [[corflak_dead.s3o]],
     },
 
 

@@ -38,8 +38,8 @@ unitDef = {
   movementClass          = [[TANK3]],
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[vehassault.s3o]],
-  script				 = [[vehassault.cob]],
+  objectName             = [[corraid.s3o]],
+  script                 = [[vehassault.cob]],
   selfDestructAs         = [[BIG_UNITEX]],
 
   sfxtypes               = {
@@ -109,7 +109,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[vehassault_dead.s3o]],
+      object           = [[corraid_dead.s3o]],
     },
 
     HEAP  = {

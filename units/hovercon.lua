@@ -71,7 +71,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[hovercon_dead.s3o]],
+      object           = [[corch_dead.s3o]],
     },
 
     HEAP  = {

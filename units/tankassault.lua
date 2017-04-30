@@ -42,8 +42,8 @@ unitDef = {
   movementClass       = [[TANK4]],
   noAutoFire          = false,
   noChaseCategory     = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName          = [[tankassault.s3o]],
-  script	      = [[tankassault.cob]],
+  objectName          = [[correap.s3o]],
+  script              = [[tankassault.cob]],
   selfDestructAs      = [[BIG_UNITEX]],
 
   sfxtypes            = {
@@ -114,7 +114,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[tankassault_dead.s3o]],
+      object           = [[correap_dead.s3o]],
     },
 
     HEAP  = {

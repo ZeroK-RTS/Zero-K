@@ -131,7 +131,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[jumpassault_dead.s3o]],
+      object           = [[corcan_dead.s3o]],
     },
 
 

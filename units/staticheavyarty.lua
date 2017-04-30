@@ -115,7 +115,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[staticheavyarty_dead.s3o]],
+      object           = [[armbrtha_dead.s3o]],
     },
 
 

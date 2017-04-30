@@ -132,7 +132,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[turretheavylaser_d.s3o]],
+      object           = [[corhlt_d.s3o]],
     },
     
 

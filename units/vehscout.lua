@@ -41,7 +41,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM FIXEDWING SATELLITE SUB]],
-  objectName             = [[vehscout.s3o]],
+  objectName             = [[corfav.s3o]],
   selfDestructAs         = [[SMALL_UNITEX]],
   sightDistance          = 580,
   trackOffset            = 0,
@@ -115,7 +115,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[vehscout_DEAD.s3o]],
+      object           = [[CORFAV_DEAD.s3o]],
     },
 
     HEAP  = {

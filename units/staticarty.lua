@@ -38,7 +38,7 @@ unitDef = {
   minCloakDistance              = 150,
   noAutoFire                    = false,
   noChaseCategory               = [[FIXEDWING LAND SHIP SATELLITE SWIM GUNSHIP SUB HOVER]],
-  objectName                    = [[staticarty.s3o]],
+  objectName                    = [[corbhmth.s3o]],
   onoffable                     = false,
   script                        = [[staticarty.lua]],
   selfDestructAs                = [[LARGE_BUILDINGEX]],
@@ -116,7 +116,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[staticarty_dead.s3o]],
+      object           = [[corbhmth_dead.s3o]],
     },
 
 

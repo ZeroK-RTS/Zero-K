@@ -42,7 +42,7 @@ unitDef = {
   moveState              = 0,
   noAutoFire             = false,
   noChaseCategory        = [[TERRAFORM SATELLITE SUB]],
-  objectName             = [[vehsupport_512.s3o]],
+  objectName             = [[cormist_512.s3o]],
   script                 = [[vehsupport.lua]],
   pushResistant          = 0,
   selfDestructAs         = [[BIG_UNITEX]],
@@ -128,7 +128,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 3,
       footprintZ       = 3,
-      object           = [[vehsupport_dead_new.s3o]],
+      object           = [[cormist_dead_new.s3o]],
     },
 
     HEAP  = {

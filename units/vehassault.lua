@@ -117,7 +117,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 2,
       footprintZ       = 2,
-      object           = [[vehassault_dead.s3o]],
+      object           = [[corraid_dead.s3o]],
     },
 
 

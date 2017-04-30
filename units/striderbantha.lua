@@ -246,7 +246,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 4,
       footprintZ       = 4,
-      object           = [[striderbantha_wreck.s3o]],
+      object           = [[bantha_wreck.s3o]],
     },
 
 

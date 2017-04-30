@@ -165,7 +165,7 @@ unitDef = {
       featureDead      = [[HEAP]],
       footprintX       = 5,
       footprintZ       = 5,
-      object           = [[turretimpulse_dead]],
+      object           = [[corgrav_dead]],
     },
 
     HEAP  = {
